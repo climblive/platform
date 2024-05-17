@@ -1,0 +1,4 @@
+{
+  "API_URL": "https://api.test.climblive.app",
+  "WSS_URL": "wss://api.test.climblive.app/live/websocket"
+}
