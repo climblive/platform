@@ -4,63 +4,65 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-dependencies:
-  '@shoelace-style/shoelace':
-    specifier: ^2.12.0
-    version: 2.12.0(@types/react@18.2.46)
-  '@stomp/stompjs':
-    specifier: ^7.0.0
-    version: 7.0.0
-  '@tanstack/svelte-query':
-    specifier: ^5.36.0
-    version: 5.36.0(svelte@4.2.8)
-  axios:
-    specifier: ^1.6.3
-    version: 1.6.3
-  date-fns:
-    specifier: ^3.0.6
-    version: 3.0.6
-  normalize.css:
-    specifier: ^8.0.1
-    version: 8.0.1
-  svelte-routing:
-    specifier: ^2.11.0
-    version: 2.11.0
-  zod:
-    specifier: ^3.22.4
-    version: 3.22.4
+importers:
 
-devDependencies:
-  '@sveltejs/vite-plugin-svelte':
-    specifier: ^3.0.1
-    version: 3.0.1(svelte@4.2.8)(vite@5.0.8)
-  '@tanstack/svelte-query-devtools':
-    specifier: ^5.17.0
-    version: 5.17.0(@tanstack/svelte-query@5.36.0)(svelte@4.2.8)
-  '@tsconfig/svelte':
-    specifier: ^5.0.2
-    version: 5.0.2
-  rollup-plugin-copy:
-    specifier: ^3.5.0
-    version: 3.5.0
-  rollup-plugin-visualizer:
-    specifier: ^5.12.0
-    version: 5.12.0
-  svelte:
-    specifier: ^4.2.8
-    version: 4.2.8
-  svelte-check:
-    specifier: ^3.6.2
-    version: 3.6.2(svelte@4.2.8)
-  tslib:
-    specifier: ^2.6.2
-    version: 2.6.2
-  typescript:
-    specifier: ^5.3.3
-    version: 5.3.3
-  vite:
-    specifier: ^5.0.8
-    version: 5.0.8
+  app:
+    dependencies:
+      '@shoelace-style/shoelace':
+        specifier: ^2.12.0
+        version: 2.12.0(@types/react@18.2.46)
+      '@stomp/stompjs':
+        specifier: ^7.0.0
+        version: 7.0.0
+      '@tanstack/svelte-query':
+        specifier: ^5.36.0
+        version: 5.36.0(svelte@4.2.8)
+      axios:
+        specifier: ^1.6.3
+        version: 1.6.3
+      date-fns:
+        specifier: ^3.0.6
+        version: 3.0.6
+      normalize.css:
+        specifier: ^8.0.1
+        version: 8.0.1
+      svelte-routing:
+        specifier: ^2.11.0
+        version: 2.11.0
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
+    devDependencies:
+      '@sveltejs/vite-plugin-svelte':
+        specifier: ^3.0.1
+        version: 3.0.1(svelte@4.2.8)(vite@5.0.8)
+      '@tanstack/svelte-query-devtools':
+        specifier: ^5.17.0
+        version: 5.17.0(@tanstack/svelte-query@5.36.0)(svelte@4.2.8)
+      '@tsconfig/svelte':
+        specifier: ^5.0.2
+        version: 5.0.2
+      rollup-plugin-copy:
+        specifier: ^3.5.0
+        version: 3.5.0
+      rollup-plugin-visualizer:
+        specifier: ^5.12.0
+        version: 5.12.0
+      svelte:
+        specifier: ^4.2.8
+        version: 4.2.8
+      svelte-check:
+        specifier: ^3.6.2
+        version: 3.6.2(svelte@4.2.8)
+      tslib:
+        specifier: ^2.6.2
+        version: 2.6.2
+      typescript:
+        specifier: ^5.3.3
+        version: 5.3.3
+      vite:
+        specifier: ^5.0.8
+        version: 5.0.8
 
 packages:
 
