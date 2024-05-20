@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "admin",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -14,7 +14,6 @@
     "@tanstack/svelte-query-devtools": "^5.17.0",
     "@tsconfig/svelte": "^5.0.2",
     "rollup-plugin-copy": "^3.5.0",
-    "rollup-plugin-visualizer": "^5.12.0",
     "svelte": "^4.2.8",
     "svelte-check": "^3.6.2",
     "tslib": "^2.6.2",
@@ -23,13 +22,11 @@
   },
   "dependencies": {
     "@shoelace-style/shoelace": "^2.12.0",
-    "@stomp/stompjs": "^7.0.0",
     "@tanstack/svelte-query": "^5.36.0",
     "axios": "^1.6.3",
     "date-fns": "^3.0.6",
     "normalize.css": "^8.0.1",
     "svelte-routing": "^2.11.0",
     "zod": "^3.22.4"
-  },
-  "packageManager": "pnpm@8.6.3+sha256.8fac042fa8319cecb01f6b35cd265ec5c1cb0a63b7b25a0cb347848ed892fcf5"
+  }
 }
