@@ -7,6 +7,11 @@ export default defineConfig({
   build: {
     minify: true,
   },
+  resolve: {
+    alias: {
+      "@climblive/shared": path.resolve(__dirname, '../packages/shared/src')
+    }
+  },
   plugins: [
     svelte(),
     copy({

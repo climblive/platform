@@ -1,10 +1,8 @@
 <script lang="ts">
-  import "@shoelace-style/shoelace/dist/themes/light.css";
   import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path.js";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { Route, Router } from "svelte-routing";
-  import "./main.css";
   import Start from "./pages/Start.svelte";
 
   setBasePath("/shoelace");

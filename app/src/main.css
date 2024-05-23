@@ -1,8 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
 html {
     box-sizing: border-box;
-    font-family: 'Noto Sans', sans-serif;
 }
 
 *,
@@ -11,62 +8,11 @@ html {
     box-sizing: inherit;
 }
 
-:root {
-    /*
-      Generator: https://uicolors.app/create
-      Input: #bc5656
-      Hue shift: -10
-    */
-    --sl-color-primary-50: #fcfbf3;
-    --sl-color-primary-100: #f9f7eb;
-    --sl-color-primary-200: #f3ead8;
-    --sl-color-primary-300: #e9d1b9;
-    --sl-color-primary-400: #dca88e;
-    --sl-color-primary-500: #cc7966;
-    --sl-color-primary-600: #bc5757;
-    --sl-color-primary-700: #993847;
-    --sl-color-primary-800: #81314c;
-    --sl-color-primary-900: #6d2c4d;
-    --sl-color-primary-950: #3c152c;
-}
-
 body {
-    background-color: var(--sl-color-primary-200);
     overflow: scroll;
     overscroll-behavior-y: none;
     margin: 0 auto;
     max-width: 640px;
-
-    --sl-input-focus-ring-color: var(--sl-color-primary-400);
-}
-
-sl-input,
-sl-select,
-sl-checkbox {
-    display: block;
-}
-
-sl-input[data-user-invalid]::part(base),
-sl-select[data-user-invalid]::part(combobox),
-sl-checkbox[data-user-invalid]::part(control) {
-    border-color: var(--sl-color-danger-600);
-}
-
-[data-user-invalid]::part(form-control-label),
-[data-user-invalid]::part(form-control-help-text),
-sl-checkbox[data-user-invalid]::part(label) {
-    color: var(--sl-color-danger-700);
-}
-
-sl-checkbox[data-user-invalid]::part(control) {
-    outline: none;
-}
-
-sl-input:focus-within[data-user-invalid]::part(base),
-sl-select:focus-within[data-user-invalid]::part(combobox),
-sl-checkbox:focus-within[data-user-invalid]::part(control) {
-    border-color: var(--sl-color-danger-600);
-    box-shadow: 0 0 0 var(--sl-focus-ring-width) var(--sl-color-danger-300);
 }
 
 .sl-toast-stack {

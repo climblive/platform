@@ -1,12 +1,10 @@
 <script lang="ts">
-  import "@shoelace-style/shoelace/dist/themes/light.css";
   import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path.js";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { setContext } from "svelte";
   import { Route, Router, navigate } from "svelte-routing";
   import { writable } from "svelte/store";
-  import "./main.css";
   import EditProfile from "./pages/EditProfile.svelte";
   import Loading from "./pages/Loading.svelte";
   import Register from "./pages/Register.svelte";

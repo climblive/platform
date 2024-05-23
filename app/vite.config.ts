@@ -1,12 +1,16 @@
-import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
-import copy from "rollup-plugin-copy";
 import path from "path";
-import { visualizer } from "rollup-plugin-visualizer";
+import copy from "rollup-plugin-copy";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   build: {
     minify: true,
+  },
+  resolve: {
+    alias: {
+      "@climblive/shared": path.resolve(__dirname, '../packages/shared/src')
+    }
   },
   plugins: [
     svelte(),
