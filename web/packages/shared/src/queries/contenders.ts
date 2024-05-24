@@ -1,7 +1,7 @@
 import { createMutation, createQuery, useQueryClient, type QueryKey } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import { HOUR } from "./constants";
 import type { Contender } from "../models/contender";
+import { HOUR } from "./constants";
 
 export const getContenderQuery = (contenderId: number) =>
   createQuery({

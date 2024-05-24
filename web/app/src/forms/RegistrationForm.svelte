@@ -1,4 +1,10 @@
 <script lang="ts">
+  import type { ScorecardSession } from "@/types";
+  import {
+    registrationFormSchema,
+    type RegistrationFormData,
+  } from "@climblive/shared/models";
+  import { getCompClassesQuery } from "@climblive/shared/queries";
   import { serialize } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import SlInput from "@shoelace-style/shoelace/dist/components/input/input.js";
@@ -7,12 +13,6 @@
   import type SlSelect from "@shoelace-style/shoelace/dist/components/select/select.js";
   import { createEventDispatcher, getContext } from "svelte";
   import type { Readable } from "svelte/store";
-  import {
-    registrationFormSchema,
-    type RegistrationFormData,
-  } from "@climblive/shared/models";
-  import { getCompClassesQuery } from "@climblive/shared/queries";
-  import type { ScorecardSession } from "@/types";
 
   const dispatch = createEventDispatcher<{ submit: RegistrationFormData }>();
 

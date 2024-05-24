@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { scorecardSessionSchema, type ScorecardSession } from "@/types";
+  import { authenticateContender } from "@/utils/auth";
+  import { PinInput } from "@climblive/shared/components";
   import "@shoelace-style/shoelace/dist/components/alert/alert.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
@@ -8,9 +11,6 @@
   import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
-  import { PinInput } from "@climblive/shared/components";
-  import { scorecardSessionSchema, type ScorecardSession } from "@/types";
-  import { authenticateContender } from "@/utils/auth";
 
   let loadingContender = false;
   let loadingFailed = false;

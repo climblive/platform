@@ -1,12 +1,12 @@
 import type { RawAxiosRequestHeaders } from "axios";
 import axios from "axios";
 import configData from "../src/config.json";
+import type { CompClass } from "./models/compClass";
 import type { Contender } from "./models/contender";
 import type { Contest } from "./models/contest";
 import type { Problem } from "./models/problem";
-import type { CompClass } from "./models/compClass";
-import type { Tick } from "./models/tick";
 import type { Scoreboard } from "./models/scoreboard";
+import type { Tick } from "./models/tick";
 
 interface ApiCredentialsProvider {
   getAuthHeaders(): RawAxiosRequestHeaders;

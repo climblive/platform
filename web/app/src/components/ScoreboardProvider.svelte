@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { Client } from "@stomp/stompjs";
-  import { onDestroy, onMount, setContext } from "svelte";
-  import { writable } from "svelte/store";
+  import type { RankedContender } from "@/types";
   import { ApiClient, configData } from "@climblive/shared";
   import type {
     ScoreboardContender,
     ScoreboardUpdate,
   } from "@climblive/shared/models";
-  import type { RankedContender } from "@/types";
+  import { Client } from "@stomp/stompjs";
+  import { onDestroy, onMount, setContext } from "svelte";
+  import { writable } from "svelte/store";
 
   export let contestId: number;
   export let numFinalists: number;

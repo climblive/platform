@@ -1,16 +1,16 @@
 <script lang="ts">
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
-  import { getContext } from "svelte";
-  import { navigate } from "svelte-routing";
-  import type { Readable } from "svelte/store";
   import RegistrationForm from "@/forms/RegistrationForm.svelte";
+  import type { ScorecardSession } from "@/types";
   import type { RegistrationFormData } from "@climblive/shared/models";
   import {
     getContenderQuery,
     updateContenderMutation,
   } from "@climblive/shared/queries";
-  import type { ScorecardSession } from "@/types";
   import { toastError } from "@climblive/shared/utils";
+  import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import { getContext } from "svelte";
+  import { navigate } from "svelte-routing";
+  import type { Readable } from "svelte/store";
   import Loading from "./Loading.svelte";
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
