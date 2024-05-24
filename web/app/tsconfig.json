@@ -14,7 +14,11 @@
     "allowJs": true,
     "checkJs": true,
     "isolatedModules": true,
+    "baseUrl": ".",
     "paths": {
+      "@/*": [
+        "src/*"
+      ],
       "@climblive/shared/*": [
         "../packages/shared/src/*"
       ]

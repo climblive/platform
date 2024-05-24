@@ -3,7 +3,7 @@
   import { type Readable } from "svelte/store";
   import Floater from "./Floater.svelte";
   import ResultEntry from "./ResultEntry.svelte";
-  import type { RankedContender } from "../types";
+  import type { RankedContender } from "@/types";
   import "@shoelace-style/shoelace/dist/components/progress-bar/progress-bar.js";
 
   export let compClassId: number;

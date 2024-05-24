@@ -12,7 +12,7 @@
     createTickMutation,
     deleteTickMutation,
   } from "@climblive/shared/queries/ticks";
-  import type { ScorecardSession } from "../types";
+  import type { ScorecardSession } from "@/types";
   import { toastError } from "@climblive/shared/utils/errors";
 
   export let problem: Problem;

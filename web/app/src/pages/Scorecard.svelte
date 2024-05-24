@@ -6,16 +6,16 @@
   import { parseISO } from "date-fns";
   import { getContext } from "svelte";
   import type { Readable } from "svelte/store";
-  import Header from "../components/Header.svelte";
-  import ProblemView from "../components/ProblemView.svelte";
-  import ResultList from "../components/ResultList.svelte";
-  import ScoreboardProvider from "../components/ScoreboardProvider.svelte";
+  import Header from "@/components/Header.svelte";
+  import ProblemView from "@/components/ProblemView.svelte";
+  import ResultList from "@/components/ResultList.svelte";
+  import ScoreboardProvider from "@/components/ScoreboardProvider.svelte";
   import { getCompClassesQuery } from "@climblive/shared/queries/compClasses";
   import { getContenderQuery } from "@climblive/shared/queries/contenders";
   import { getContestQuery } from "@climblive/shared/queries/contests";
   import { getProblemsQuery } from "@climblive/shared/queries/problems";
   import { getTicksQuery } from "@climblive/shared/queries/ticks";
-  import type { ScorecardSession } from "../types";
+  import type { ScorecardSession } from "@/types";
   import Loading from "./Loading.svelte";
   import { calculateProblemScore } from "@climblive/shared/utils/scores";
 

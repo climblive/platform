@@ -1,6 +1,6 @@
 import type { QueryClient } from "@tanstack/svelte-query";
 import { ApiClient, ContenderCredentialsProvider } from "@climblive/shared/Api";
-import type { ScorecardSession } from "../types";
+import type { ScorecardSession } from "@/types";
 import type { Writable } from "svelte/store";
 import type { Contender } from "@climblive/shared/models/contender";
 

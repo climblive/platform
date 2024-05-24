@@ -9,8 +9,8 @@
   import { navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
   import PinInput from "@climblive/shared/components/PinInput.svelte";
-  import { scorecardSessionSchema, type ScorecardSession } from "../types";
-  import { authenticateContender } from "../utils/auth";
+  import { scorecardSessionSchema, type ScorecardSession } from "@/types";
+  import { authenticateContender } from "@/utils/auth";
 
   let loadingContender = false;
   let loadingFailed = false;

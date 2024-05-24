@@ -5,13 +5,13 @@
   import { getContext } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Readable } from "svelte/store";
-  import RegistrationForm from "../forms/RegistrationForm.svelte";
+  import RegistrationForm from "@/forms/RegistrationForm.svelte";
   import type { RegistrationFormData } from "@climblive/shared/models/forms";
   import {
     getContenderQuery,
     updateContenderMutation,
   } from "@climblive/shared/queries/contenders";
-  import type { ScorecardSession } from "../types";
+  import type { ScorecardSession } from "@/types";
   import { toastError } from "@climblive/shared/utils/errors";
   import Loading from "./Loading.svelte";
 

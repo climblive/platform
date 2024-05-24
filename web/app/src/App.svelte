@@ -5,13 +5,13 @@
   import { setContext } from "svelte";
   import { Route, Router, navigate } from "svelte-routing";
   import { writable } from "svelte/store";
-  import EditProfile from "./pages/EditProfile.svelte";
-  import Loading from "./pages/Loading.svelte";
-  import Register from "./pages/Register.svelte";
-  import Scorecard from "./pages/Scorecard.svelte";
-  import Start from "./pages/Start.svelte";
-  import { type ScorecardSession } from "./types";
-  import { authenticateContender } from "./utils/auth";
+  import EditProfile from "@/pages/EditProfile.svelte";
+  import Loading from "@/pages/Loading.svelte";
+  import Register from "@/pages/Register.svelte";
+  import Scorecard from "@/pages/Scorecard.svelte";
+  import Start from "@/pages/Start.svelte";
+  import { type ScorecardSession } from "@/types";
+  import { authenticateContender } from "@/utils/auth";
 
   let authenticating = true;
 

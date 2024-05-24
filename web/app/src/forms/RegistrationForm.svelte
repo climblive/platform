@@ -12,7 +12,7 @@
     type RegistrationFormData,
   } from "@climblive/shared/models/forms";
   import { getCompClassesQuery } from "@climblive/shared/queries/compClasses";
-  import type { ScorecardSession } from "../types";
+  import type { ScorecardSession } from "@/types";
 
   const dispatch = createEventDispatcher<{ submit: RegistrationFormData }>();
 

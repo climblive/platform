@@ -8,7 +8,7 @@
     ScoreboardContender,
     ScoreboardUpdate,
   } from "@climblive/shared/models/scoreboard";
-  import type { RankedContender } from "../types";
+  import type { RankedContender } from "@/types";
 
   export let contestId: number;
   export let numFinalists: number;
