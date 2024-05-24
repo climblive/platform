@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@climblive/lib':
         specifier: workspace:*
-        version: link:../packages/shared
+        version: link:../packages/lib
       '@shoelace-style/shoelace':
         specifier: ^2.12.0
         version: 2.12.0(@types/react@18.2.46)
@@ -65,7 +65,7 @@ importers:
     dependencies:
       '@climblive/lib':
         specifier: workspace:*
-        version: link:../packages/shared
+        version: link:../packages/lib
       '@shoelace-style/shoelace':
         specifier: ^2.12.0
         version: 2.12.0(@types/react@18.2.46)
@@ -119,7 +119,7 @@ importers:
         specifier: ^5.0.8
         version: 5.0.8
 
-  packages/shared:
+  packages/lib:
     dependencies:
       '@shoelace-style/shoelace':
         specifier: ^2.12.0
