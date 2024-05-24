@@ -4,13 +4,13 @@
   import { navigate } from "svelte-routing";
   import type { Readable } from "svelte/store";
   import RegistrationForm from "../forms/RegistrationForm.svelte";
-  import type { RegistrationFormData } from "../models/forms";
+  import type { RegistrationFormData } from "@climblive/shared/models/forms";
   import {
     getContenderQuery,
     updateContenderMutation,
-  } from "../queries/contenders";
+  } from "@climblive/shared/queries/contenders";
   import type { ScorecardSession } from "../types";
-  import { toastError } from "../utils/errors";
+  import { toastError } from "@climblive/shared/utils/errors";
   import Loading from "./Loading.svelte";
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");

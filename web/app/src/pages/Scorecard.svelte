@@ -10,14 +10,14 @@
   import ProblemView from "../components/ProblemView.svelte";
   import ResultList from "../components/ResultList.svelte";
   import ScoreboardProvider from "../components/ScoreboardProvider.svelte";
-  import { getCompClassesQuery } from "../queries/compClasses";
-  import { getContenderQuery } from "../queries/contenders";
-  import { getContestQuery } from "../queries/contests";
-  import { getProblemsQuery } from "../queries/problems";
-  import { getTicksQuery } from "../queries/ticks";
+  import { getCompClassesQuery } from "@climblive/shared/queries/compClasses";
+  import { getContenderQuery } from "@climblive/shared/queries/contenders";
+  import { getContestQuery } from "@climblive/shared/queries/contests";
+  import { getProblemsQuery } from "@climblive/shared/queries/problems";
+  import { getTicksQuery } from "@climblive/shared/queries/ticks";
   import type { ScorecardSession } from "../types";
   import Loading from "./Loading.svelte";
-  import { calculateProblemScore } from "../utils/scores";
+  import { calculateProblemScore } from "@climblive/shared/utils/scores";
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 

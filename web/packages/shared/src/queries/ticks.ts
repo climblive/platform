@@ -5,8 +5,8 @@ import {
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import { HOUR, MINUTE } from "../constants";
 import type { Tick } from "../models/tick";
+import { HOUR } from "./constants";
 
 export const getTicksQuery = (contenderId: number) =>
   createQuery({

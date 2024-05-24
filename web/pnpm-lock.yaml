@@ -75,9 +75,6 @@ importers:
       '@tanstack/svelte-query':
         specifier: ^5.36.0
         version: 5.36.0(svelte@4.2.8)
-      axios:
-        specifier: ^1.6.3
-        version: 1.6.3
       date-fns:
         specifier: ^3.0.6
         version: 3.0.6
@@ -123,6 +120,19 @@ importers:
         version: 5.0.8
 
   packages/shared:
+    dependencies:
+      '@shoelace-style/shoelace':
+        specifier: ^2.12.0
+        version: 2.12.0(@types/react@18.2.46)
+      '@tanstack/svelte-query':
+        specifier: ^5.36.0
+        version: 5.36.0(svelte@4.2.12)
+      axios:
+        specifier: ^1.6.3
+        version: 1.6.3
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
     devDependencies:
       '@rollup/plugin-typescript':
         specifier: ^11.1.6
@@ -1042,6 +1052,15 @@ packages:
       svelte: 4.2.8
     dev: true
 
+  /@tanstack/svelte-query@5.36.0(svelte@4.2.12):
+    resolution: {integrity: sha512-CuGTvsodI90uS6G5Q1fi5tr3ylG+k4wRSALl8oxCLnd5CAgeNJEM3N4sDvUrbYkyfJ6DJZJrBVN36F6RPIATIg==}
+    peerDependencies:
+      svelte: ^3.54.0 || ^4.0.0 || ^5.0.0-next.0
+    dependencies:
+      '@tanstack/query-core': 5.36.0
+      svelte: 4.2.12
+    dev: false
+
   /@tanstack/svelte-query@5.36.0(svelte@4.2.8):
     resolution: {integrity: sha512-CuGTvsodI90uS6G5Q1fi5tr3ylG+k4wRSALl8oxCLnd5CAgeNJEM3N4sDvUrbYkyfJ6DJZJrBVN36F6RPIATIg==}
     peerDependencies:
@@ -1162,7 +1181,6 @@ packages:
     resolution: {integrity: sha512-+60uv1hiVFhHZeO+Lz0RYzsVHy5Wr1ayX0mwda9KPDVLNJgZ1T9Ny7VmFbLDzxsH0D87I86vgj3gFrjTJUYznw==}
     dependencies:
       dequal: 2.0.3
-    dev: true
 
   /balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -2180,7 +2198,6 @@ packages:
       locate-character: 3.0.0
       magic-string: 0.30.5
       periscopic: 3.1.0
-    dev: true
 
   /svelte@4.2.8:
     resolution: {integrity: sha512-hU6dh1MPl8gh6klQZwK/n73GiAHiR95IkFsesLPbMeEZi36ydaXL/ZAb4g9sayT0MXzpxyZjR28yderJHxcmYA==}

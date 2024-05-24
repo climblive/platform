@@ -8,7 +8,7 @@
   import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
-  import { PinInput } from "@climblive/shared";
+  import PinInput from "@climblive/shared/components/PinInput.svelte";
   import { scorecardSessionSchema, type ScorecardSession } from "../types";
   import { authenticateContender } from "../utils/auth";
 

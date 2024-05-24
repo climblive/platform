@@ -1,6 +1,6 @@
 import type { RawAxiosRequestHeaders } from "axios";
 import axios from "axios";
-import configData from "./config.json";
+import configData from "../src/config.json";
 import type { Contender } from "./models/contender";
 import type { Contest } from "./models/contest";
 import type { Problem } from "./models/problem";

@@ -1,6 +1,6 @@
 import { createQuery } from "@tanstack/svelte-query";
+import { HOUR } from "./constants";
 import { ApiClient } from "../Api";
-import { HOUR, MINUTE } from "../constants";
 
 export const getProblemsQuery = (contestId: number) =>
   createQuery({

@@ -2,12 +2,12 @@
   import { Client } from "@stomp/stompjs";
   import { onDestroy, onMount, setContext } from "svelte";
   import { writable } from "svelte/store";
-  import { ApiClient } from "../Api";
-  import configData from "../config.json";
+  import { ApiClient } from "@climblive/shared/Api";
+  import configData from "@climblive/shared/config.json";
   import type {
     ScoreboardContender,
     ScoreboardUpdate,
-  } from "../models/scoreboard";
+  } from "@climblive/shared/models/scoreboard";
   import type { RankedContender } from "../types";
 
   export let contestId: number;
