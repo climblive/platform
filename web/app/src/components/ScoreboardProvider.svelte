@@ -1,10 +1,10 @@
 <script lang="ts">
   import type { RankedContender } from "@/types";
-  import { ApiClient, configData } from "@climblive/shared";
+  import { ApiClient, configData } from "@climblive/lib";
   import type {
     ScoreboardContender,
     ScoreboardUpdate,
-  } from "@climblive/shared/models";
+  } from "@climblive/lib/models";
   import { Client } from "@stomp/stompjs";
   import { onDestroy, onMount, setContext } from "svelte";
   import { writable } from "svelte/store";

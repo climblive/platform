@@ -1,11 +1,11 @@
 <script lang="ts">
   import type { ScorecardSession } from "@/types";
-  import type { Problem, Tick } from "@climblive/shared/models";
+  import type { Problem, Tick } from "@climblive/lib/models";
   import {
     createTickMutation,
     deleteTickMutation,
-  } from "@climblive/shared/queries";
-  import { toastError } from "@climblive/shared/utils";
+  } from "@climblive/lib/queries";
+  import { toastError } from "@climblive/lib/utils";
   import type { SlPopup } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";

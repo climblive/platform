@@ -8,7 +8,7 @@ importers:
 
   admin:
     dependencies:
-      '@climblive/shared':
+      '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/shared
       '@shoelace-style/shoelace':
@@ -63,7 +63,7 @@ importers:
 
   app:
     dependencies:
-      '@climblive/shared':
+      '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/shared
       '@shoelace-style/shoelace':

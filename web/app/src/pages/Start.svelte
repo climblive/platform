@@ -1,7 +1,7 @@
 <script lang="ts">
   import { scorecardSessionSchema, type ScorecardSession } from "@/types";
   import { authenticateContender } from "@/utils/auth";
-  import { PinInput } from "@climblive/shared/components";
+  import { PinInput } from "@climblive/lib/components";
   import "@shoelace-style/shoelace/dist/components/alert/alert.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";

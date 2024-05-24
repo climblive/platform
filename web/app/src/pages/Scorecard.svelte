@@ -10,8 +10,8 @@
     getContestQuery,
     getProblemsQuery,
     getTicksQuery,
-  } from "@climblive/shared/queries";
-  import { calculateProblemScore } from "@climblive/shared/utils";
+  } from "@climblive/lib/queries";
+  import { calculateProblemScore } from "@climblive/lib/utils";
   import type { SlTabGroup, SlTabShowEvent } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";

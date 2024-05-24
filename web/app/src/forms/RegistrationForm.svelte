@@ -3,8 +3,8 @@
   import {
     registrationFormSchema,
     type RegistrationFormData,
-  } from "@climblive/shared/models";
-  import { getCompClassesQuery } from "@climblive/shared/queries";
+  } from "@climblive/lib/models";
+  import { getCompClassesQuery } from "@climblive/lib/queries";
   import { serialize } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import SlInput from "@shoelace-style/shoelace/dist/components/input/input.js";

@@ -1,4 +1,4 @@
-import type { ScoreboardContender } from "@climblive/shared/models";
+import type { ScoreboardContender } from "@climblive/lib/models";
 import * as z from "zod";
 
 export type ScorecardSession = {

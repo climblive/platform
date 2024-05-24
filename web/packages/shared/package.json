@@ -1,5 +1,5 @@
 {
-  "name": "@climblive/shared",
+  "name": "@climblive/lib",
   "private": true,
   "version": "0.0.0",
   "type": "module",

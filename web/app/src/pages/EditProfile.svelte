@@ -1,12 +1,12 @@
 <script lang="ts">
   import RegistrationForm from "@/forms/RegistrationForm.svelte";
   import type { ScorecardSession } from "@/types";
-  import type { RegistrationFormData } from "@climblive/shared/models";
+  import type { RegistrationFormData } from "@climblive/lib/models";
   import {
     getContenderQuery,
     updateContenderMutation,
-  } from "@climblive/shared/queries";
-  import { toastError } from "@climblive/shared/utils";
+  } from "@climblive/lib/queries";
+  import { toastError } from "@climblive/lib/utils";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { getContext } from "svelte";
   import { navigate } from "svelte-routing";
