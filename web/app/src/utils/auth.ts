@@ -1,8 +1,8 @@
 import type { QueryClient } from "@tanstack/svelte-query";
-import { ApiClient, ContenderCredentialsProvider } from "@climblive/shared/Api";
+import { ApiClient, ContenderCredentialsProvider } from "@climblive/shared";
 import type { ScorecardSession } from "@/types";
 import type { Writable } from "svelte/store";
-import type { Contender } from "@climblive/shared/models/contender";
+import type { Contender } from "@climblive/shared/models";
 
 export const authenticateContender = async (code: string, queryClient: QueryClient, session: Writable<ScorecardSession>): Promise<Contender> => {
     const provider = new ContenderCredentialsProvider(code);

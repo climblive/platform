@@ -9,7 +9,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@climblive/shared": path.resolve(__dirname, '../packages/shared/src')
+      "@": path.resolve(__dirname, 'src'),
     }
   },
   plugins: [

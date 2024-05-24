@@ -1,4 +1,17 @@
 <script lang="ts">
+  import Header from "@/components/Header.svelte";
+  import ProblemView from "@/components/ProblemView.svelte";
+  import ResultList from "@/components/ResultList.svelte";
+  import ScoreboardProvider from "@/components/ScoreboardProvider.svelte";
+  import type { ScorecardSession } from "@/types";
+  import {
+    getCompClassesQuery,
+    getContenderQuery,
+    getContestQuery,
+    getProblemsQuery,
+    getTicksQuery,
+  } from "@climblive/shared/queries";
+  import { calculateProblemScore } from "@climblive/shared/utils";
   import type { SlTabGroup, SlTabShowEvent } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
@@ -6,18 +19,7 @@
   import { parseISO } from "date-fns";
   import { getContext } from "svelte";
   import type { Readable } from "svelte/store";
-  import Header from "@/components/Header.svelte";
-  import ProblemView from "@/components/ProblemView.svelte";
-  import ResultList from "@/components/ResultList.svelte";
-  import ScoreboardProvider from "@/components/ScoreboardProvider.svelte";
-  import { getCompClassesQuery } from "@climblive/shared/queries/compClasses";
-  import { getContenderQuery } from "@climblive/shared/queries/contenders";
-  import { getContestQuery } from "@climblive/shared/queries/contests";
-  import { getProblemsQuery } from "@climblive/shared/queries/problems";
-  import { getTicksQuery } from "@climblive/shared/queries/ticks";
-  import type { ScorecardSession } from "@/types";
   import Loading from "./Loading.svelte";
-  import { calculateProblemScore } from "@climblive/shared/utils/scores";
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 

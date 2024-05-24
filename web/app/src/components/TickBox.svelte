@@ -6,14 +6,14 @@
   import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
   import { afterUpdate, getContext } from "svelte";
   import type { Readable } from "svelte/store";
-  import type { Problem } from "@climblive/shared/models/problem";
-  import type { Tick } from "@climblive/shared/models/tick";
+  import type { Problem } from "@climblive/shared/models";
+  import type { Tick } from "@climblive/shared/models";
   import {
     createTickMutation,
     deleteTickMutation,
-  } from "@climblive/shared/queries/ticks";
+  } from "@climblive/shared/queries";
   import type { ScorecardSession } from "@/types";
-  import { toastError } from "@climblive/shared/utils/errors";
+  import { toastError } from "@climblive/shared/utils";
 
   export let problem: Problem;
   export let tick: Tick | undefined;

@@ -1,7 +1,6 @@
 <script lang="ts">
-  import type { Problem } from "@climblive/shared/models/problem";
-  import type { Tick } from "@climblive/shared/models/tick";
-  import { calculateProblemScore } from "@climblive/shared/utils/scores";
+  import type { Problem, Tick } from "@climblive/shared/models";
+  import { calculateProblemScore } from "@climblive/shared/utils";
   import HoldColorIndicator from "./HoldColorIndicator.svelte";
   import Score from "./Score.svelte";
   import TickBox from "./TickBox.svelte";

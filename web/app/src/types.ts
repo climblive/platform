@@ -1,5 +1,5 @@
 import * as z from "zod";
-import type { ScoreboardContender } from "@climblive/shared/models/scoreboard";
+import type { ScoreboardContender } from "@climblive/shared/models";
 
 export type ScorecardSession = {
   contenderId: number;

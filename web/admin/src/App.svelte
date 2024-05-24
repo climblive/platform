@@ -3,7 +3,7 @@
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { Route, Router } from "svelte-routing";
-  import Start from "./pages/Start.svelte";
+  import Start from "@/pages/Start.svelte";
 
   setBasePath("/shoelace");
 

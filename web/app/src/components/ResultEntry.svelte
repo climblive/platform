@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { ScoreboardContender } from "@climblive/shared/models/scoreboard";
-  import { asOrdinal } from "@climblive/shared/utils/text";
+  import type { ScoreboardContender } from "@climblive/shared/models";
+  import { asOrdinal } from "@climblive/shared/utils";
   import Score from "./Score.svelte";
 
   export let placement: number;

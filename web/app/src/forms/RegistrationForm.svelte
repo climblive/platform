@@ -10,8 +10,8 @@
   import {
     registrationFormSchema,
     type RegistrationFormData,
-  } from "@climblive/shared/models/forms";
-  import { getCompClassesQuery } from "@climblive/shared/queries/compClasses";
+  } from "@climblive/shared/models";
+  import { getCompClassesQuery } from "@climblive/shared/queries";
   import type { ScorecardSession } from "@/types";
 
   const dispatch = createEventDispatcher<{ submit: RegistrationFormData }>();

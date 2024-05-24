@@ -1,2 +1,2 @@
-import PinInput from "./components/PinInput.svelte"
-export { PinInput }
+export * from './Api';
+export { default as configData } from "./config.json";
