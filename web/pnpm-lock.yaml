@@ -17,12 +17,6 @@ importers:
       '@tanstack/svelte-query':
         specifier: ^5.36.0
         version: 5.36.0(svelte@4.2.8)
-      axios:
-        specifier: ^1.6.3
-        version: 1.6.3
-      date-fns:
-        specifier: ^3.0.6
-        version: 3.0.6
       normalize.css:
         specifier: ^8.0.1
         version: 8.0.1
