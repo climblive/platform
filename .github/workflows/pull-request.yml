@@ -1,0 +1,13 @@
+on: pull_request
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: pnpm install
+        working-directory: web
+      - run: pnpm --filter=* build
+        working-directory: web
