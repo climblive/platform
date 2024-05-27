@@ -20,6 +20,7 @@
         "src/*"
       ],
     },
+    "strict": true
   },
   "include": [
     "src/**/*.ts",
@@ -28,7 +29,7 @@
   ],
   "references": [
     {
-      "path": "./tsconfig.node.json"
+      "path": "./tsconfig.vite.json"
     }
   ]
 }

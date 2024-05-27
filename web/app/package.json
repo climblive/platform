@@ -7,28 +7,37 @@
     "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "lint": "eslint './src/**/*.{js,ts,svelte}'",
+    "format": "prettier --write .",
+    "format:check": "prettier  ."
   },
   "devDependencies": {
+    "@eslint/js": "^9.3.0",
     "@sveltejs/vite-plugin-svelte": "^3.0.1",
     "@tanstack/svelte-query-devtools": "^5.17.0",
     "@tsconfig/svelte": "^5.0.2",
+    "eslint": "~8.56.0",
+    "globals": "^15.3.0",
+    "prettier": "^3.2.5",
+    "prettier-plugin-svelte": "^3.2.3",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-visualizer": "^5.12.0",
     "svelte": "^4.2.8",
     "svelte-check": "^3.6.2",
     "tslib": "^2.6.2",
     "typescript": "^5.3.3",
+    "typescript-eslint": "^7.10.0",
     "vite": "^5.0.8"
   },
   "dependencies": {
+    "@climblive/lib": "workspace:*",
     "@shoelace-style/shoelace": "^2.12.0",
     "@stomp/stompjs": "^7.0.0",
+    "@tanstack/svelte-query": "^5.36.0",
     "date-fns": "^3.0.6",
     "normalize.css": "^8.0.1",
     "svelte-routing": "^2.11.0",
-    "@climblive/lib": "workspace:*",
-    "@tanstack/svelte-query": "^5.36.0",
     "zod": "^3.22.4"
   }
 }
