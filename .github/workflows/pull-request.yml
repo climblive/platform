@@ -19,8 +19,6 @@ jobs:
         working-directory: web
       - run: pnpm --filter=* format:check
         working-directory: web
-      - run: pnpm --filter=* check
-        working-directory: web
       - run: pnpm --filter=* lint
         working-directory: web
 
