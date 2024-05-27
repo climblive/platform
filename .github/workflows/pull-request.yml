@@ -15,6 +15,8 @@ jobs:
           node-version-file: web/package.json
           cache: pnpm
           cache-dependency-path: web/pnpm-lock.yaml
+      - run: pnpm install
+        working-directory: web
       - run: pnpm --filter=* format:check
         working-directory: web
       - run: pnpm --filter=* check
