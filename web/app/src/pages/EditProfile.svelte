@@ -39,7 +39,7 @@
       {
         onSuccess: gotoScorecard,
         onError: () => toastError("Failed to save registration data."),
-      }
+      },
     );
   };
 </script>

@@ -38,7 +38,7 @@
   $: problems = $problemsQuery.data;
   $: ticks = $ticksQuery.data;
   $: selectedCompClass = compClasses?.find(
-    ({ id }) => id === contender?.compClassId
+    ({ id }) => id === contender?.compClassId,
   );
   $: endTime = selectedCompClass?.timeEnd
     ? parseISO(selectedCompClass.timeEnd)

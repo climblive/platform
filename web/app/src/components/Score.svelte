@@ -15,7 +15,7 @@
     const diff = currentValue - prevValue;
 
     const nextIncrements = Array.from({ length: 11 }).map((_, i) =>
-      Math.ceil(prevValue + (i * diff) / 10)
+      Math.ceil(prevValue + (i * diff) / 10),
     );
 
     setTimeout(() => (increments = nextIncrements));

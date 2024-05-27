@@ -51,7 +51,7 @@
       const contender = await authenticateContender(
         registrationCode,
         queryClient,
-        session
+        session,
       );
 
       if (contender.entered) {

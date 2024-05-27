@@ -41,7 +41,7 @@
       {
         onSuccess: gotoScorecard,
         onError: () => toastError("Registration was not successful."),
-      }
+      },
     );
   };
 </script>

@@ -61,7 +61,7 @@
       },
       {
         onError: () => toastError("Failed to register ascent."),
-      }
+      },
     );
   };
 
