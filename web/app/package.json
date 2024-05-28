@@ -17,7 +17,6 @@
     "@sveltejs/vite-plugin-svelte": "^3.0.1",
     "@tanstack/svelte-query-devtools": "^5.17.0",
     "@tsconfig/svelte": "^5.0.2",
-    "@typescript-eslint/parser": "^7.10.0",
     "eslint": "~8.56.0",
     "eslint-plugin-svelte": "^2.39.0",
     "globals": "^15.3.0",

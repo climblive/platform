@@ -96,9 +96,6 @@ importers:
       '@tsconfig/svelte':
         specifier: ^5.0.2
         version: 5.0.2
-      '@typescript-eslint/parser':
-        specifier: ^7.10.0
-        version: 7.10.0(eslint@8.56.0)(typescript@5.3.3)
       eslint:
         specifier: ~8.56.0
         version: 8.56.0
