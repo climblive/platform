@@ -1,1 +1,1 @@
-import "@climblive/lib/prettier.config.js";
+export { default as default } from "@climblive/lib/prettier.config.js";
