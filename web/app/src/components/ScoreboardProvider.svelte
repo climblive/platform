@@ -66,7 +66,7 @@
             handleUpdate({ compClassId, contender: item });
             $resultsStore = calculateResults();
           }
-        }
+        },
       );
     };
   });
@@ -107,10 +107,10 @@
 
   const rankContenders = (
     contenders: RankedContender[],
-    numFinalists: number
+    numFinalists: number,
   ) => {
     const sortedContenders = contenders.toSorted(
-      (c1, c2) => c2.qualifyingScore - c1.qualifyingScore
+      (c1, c2) => c2.qualifyingScore - c1.qualifyingScore,
     );
 
     let index = 0;
