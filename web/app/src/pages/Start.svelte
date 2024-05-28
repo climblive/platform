@@ -27,7 +27,9 @@
         if (differenceInHours(new Date(), sess.timestamp) < 12) {
           registrationCode = sess.registrationCode;
         }
-      } catch (_) {}
+      } catch (_) {
+        /* discard corrupt session data */
+      }
     }
   });
 

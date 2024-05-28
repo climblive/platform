@@ -27,7 +27,7 @@
   let open = false;
 
   $: loading = $createTick.isPending || $deleteTick.isPending;
-  $: variant = !!tick ? (tick.flash ? "flashed" : "ticked") : undefined;
+  $: variant = tick ? (tick.flash ? "flashed" : "ticked") : undefined;
 
   const handleClickOutside = (event: MouseEvent) => {
     if (

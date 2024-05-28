@@ -8,7 +8,8 @@
 		"vscode": {
 			"extensions": [
 				"svelte.svelte-vscode",
-				"dbaeumer.vscode-eslint"
+				"dbaeumer.vscode-eslint",
+				"esbenp.prettier-vscode"
 			]
 		}
 	}
