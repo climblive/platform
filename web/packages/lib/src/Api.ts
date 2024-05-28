@@ -33,7 +33,7 @@ export class ApiClient {
   private static baseUrl: string = configData.API_URL;
   private credentialsProvider: ApiCredentialsProvider | undefined;
 
-  private constructor() { }
+  private constructor() {}
 
   public static getInstance(): ApiClient {
     if (!ApiClient.instance) {
@@ -54,7 +54,7 @@ export class ApiClient {
       `${ApiClient.baseUrl}${endpoint}`,
       {
         headers: this.credentialsProvider?.getAuthHeaders(),
-      }
+      },
     );
 
     return result.data;
@@ -67,7 +67,7 @@ export class ApiClient {
       `${ApiClient.baseUrl}${endpoint}`,
       {
         headers: this.credentialsProvider?.getAuthHeaders(),
-      }
+      },
     );
 
     return result.data;
@@ -81,7 +81,7 @@ export class ApiClient {
       contender,
       {
         headers: this.credentialsProvider?.getAuthHeaders(),
-      }
+      },
     );
 
     return result.data;
@@ -104,7 +104,7 @@ export class ApiClient {
       `${ApiClient.baseUrl}${endpoint}`,
       {
         headers: this.credentialsProvider?.getAuthHeaders(),
-      }
+      },
     );
 
     return result.data;
@@ -117,7 +117,7 @@ export class ApiClient {
       `${ApiClient.baseUrl}${endpoint}`,
       {
         headers: this.credentialsProvider?.getAuthHeaders(),
-      }
+      },
     );
 
     return result.data;
@@ -141,7 +141,7 @@ export class ApiClient {
       tick,
       {
         headers: this.credentialsProvider?.getAuthHeaders(),
-      }
+      },
     );
 
     return result.data;
@@ -159,7 +159,7 @@ export class ApiClient {
     const endpoint = `/contests/${contestId}/scoreboard`;
 
     const result = await axios.get<Scoreboard>(
-      `${ApiClient.baseUrl}${endpoint}`
+      `${ApiClient.baseUrl}${endpoint}`,
     );
 
     return result.data;

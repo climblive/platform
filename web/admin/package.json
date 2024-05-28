@@ -7,7 +7,10 @@
     "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "lint": "eslint './src/**/*.{js,ts,svelte}'",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^3.0.1",
@@ -21,11 +24,11 @@
     "vite": "^5.0.8"
   },
   "dependencies": {
+    "@climblive/lib": "workspace:*",
     "@shoelace-style/shoelace": "^2.12.0",
     "@tanstack/svelte-query": "^5.36.0",
     "normalize.css": "^8.0.1",
     "svelte-routing": "^2.11.0",
-    "zod": "^3.22.4",
-    "@climblive/lib": "workspace:*"
+    "zod": "^3.22.4"
   }
 }

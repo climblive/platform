@@ -9,8 +9,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, 'src'),
-    }
+      "@": path.resolve(__dirname, "src"),
+    },
   },
   plugins: [
     svelte(),
@@ -20,7 +20,7 @@ export default defineConfig({
         {
           src: path.resolve(
             __dirname,
-            "node_modules/@shoelace-style/shoelace/dist/assets"
+            "node_modules/@shoelace-style/shoelace/dist/assets",
           ),
           dest: path.resolve(__dirname, "public/shoelace"),
         },

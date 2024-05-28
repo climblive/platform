@@ -10,4 +10,3 @@ export const asOrdinal = (value: number): string => {
       return `${value}th`;
   }
 };
-

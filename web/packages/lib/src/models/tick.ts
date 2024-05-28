@@ -4,4 +4,4 @@ export type Tick = {
   contenderId: number;
   problemId: number;
   timestamp?: string;
-}
+};
