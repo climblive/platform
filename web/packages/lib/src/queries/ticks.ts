@@ -27,7 +27,7 @@ export const createTickMutation = (contenderId: number) => {
       const queryKey: QueryKey = ["ticks", { contenderId }];
 
       client.setQueryData<Tick[]>(queryKey, (oldTicks) =>
-        oldTicks ? [...oldTicks, newTick] : [newTick]
+        oldTicks ? [...oldTicks, newTick] : [newTick],
       );
     },
   });
@@ -47,7 +47,7 @@ export const deleteTickMutation = () => {
           exact: false,
         },
         (oldTicks) =>
-          oldTicks ? oldTicks.filter(({ id }) => id !== variables) : undefined
+          oldTicks ? oldTicks.filter(({ id }) => id !== variables) : undefined,
       );
     },
   });

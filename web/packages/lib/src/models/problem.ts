@@ -1,4 +1,3 @@
-
 export type Problem = {
   id: number;
   number: number;

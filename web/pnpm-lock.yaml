@@ -38,6 +38,12 @@ importers:
       '@tsconfig/svelte':
         specifier: ^5.0.2
         version: 5.0.2
+      prettier:
+        specifier: ^3.2.5
+        version: 3.2.5
+      prettier-plugin-svelte:
+        specifier: ^3.2.3
+        version: 3.2.3(prettier@3.2.5)(svelte@4.2.8)
       rollup-plugin-copy:
         specifier: ^3.5.0
         version: 3.5.0
@@ -163,6 +169,12 @@ importers:
       '@tsconfig/svelte':
         specifier: ^5.0.2
         version: 5.0.2
+      prettier:
+        specifier: ^3.2.5
+        version: 3.2.5
+      prettier-plugin-svelte:
+        specifier: ^3.2.3
+        version: 3.2.3(prettier@3.2.5)(svelte@4.2.12)
       svelte:
         specifier: ^4.2.12
         version: 4.2.12
@@ -3078,6 +3090,11 @@ snapshots:
       source-map-js: 1.2.0
 
   prelude-ls@1.2.1: {}
+
+  prettier-plugin-svelte@3.2.3(prettier@3.2.5)(svelte@4.2.12):
+    dependencies:
+      prettier: 3.2.5
+      svelte: 4.2.12
 
   prettier-plugin-svelte@3.2.3(prettier@3.2.5)(svelte@4.2.8):
     dependencies:

@@ -18,4 +18,4 @@ export type ScoreboardContender = {
 export type ScoreboardUpdate = {
   compClassId: number;
   contender: ScoreboardContender;
-}
+};
