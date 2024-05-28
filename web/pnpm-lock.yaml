@@ -29,9 +29,6 @@ importers:
         specifier: ^3.22.4
         version: 3.22.4
     devDependencies:
-      '@eslint/js':
-        specifier: ^9.3.0
-        version: 9.3.0
       '@sveltejs/vite-plugin-svelte':
         specifier: ^3.0.1
         version: 3.0.1(svelte@4.2.8)(vite@5.0.8(@types/node@20.10.6))
@@ -41,21 +38,6 @@ importers:
       '@tsconfig/svelte':
         specifier: ^5.0.2
         version: 5.0.2
-      eslint:
-        specifier: ~8.56.0
-        version: 8.56.0
-      eslint-plugin-svelte:
-        specifier: ^2.39.0
-        version: 2.39.0(eslint@8.56.0)(svelte@4.2.8)
-      globals:
-        specifier: ^15.3.0
-        version: 15.3.0
-      prettier:
-        specifier: ^3.2.5
-        version: 3.2.5
-      prettier-plugin-svelte:
-        specifier: ^3.2.3
-        version: 3.2.3(prettier@3.2.5)(svelte@4.2.8)
       rollup-plugin-copy:
         specifier: ^3.5.0
         version: 3.5.0
@@ -65,18 +47,12 @@ importers:
       svelte-check:
         specifier: ^3.6.2
         version: 3.6.2(postcss-load-config@3.1.4(postcss@8.4.38))(postcss@8.4.38)(svelte@4.2.8)
-      svelte-eslint-parser:
-        specifier: ^0.36.0
-        version: 0.36.0(svelte@4.2.8)
       tslib:
         specifier: ^2.6.2
         version: 2.6.2
       typescript:
         specifier: ^5.3.3
         version: 5.3.3
-      typescript-eslint:
-        specifier: ^7.10.0
-        version: 7.10.0(eslint@8.56.0)(typescript@5.3.3)
       vite:
         specifier: ^5.0.8
         version: 5.0.8(@types/node@20.10.6)
@@ -108,9 +84,6 @@ importers:
         specifier: ^3.22.4
         version: 3.22.4
     devDependencies:
-      '@eslint/js':
-        specifier: ^9.3.0
-        version: 9.3.0
       '@sveltejs/vite-plugin-svelte':
         specifier: ^3.0.1
         version: 3.0.1(svelte@4.2.8)(vite@5.0.8(@types/node@20.10.6))
@@ -120,21 +93,6 @@ importers:
       '@tsconfig/svelte':
         specifier: ^5.0.2
         version: 5.0.2
-      eslint:
-        specifier: ~8.56.0
-        version: 8.56.0
-      eslint-plugin-svelte:
-        specifier: ^2.39.0
-        version: 2.39.0(eslint@8.56.0)(svelte@4.2.8)
-      globals:
-        specifier: ^15.3.0
-        version: 15.3.0
-      prettier:
-        specifier: ^3.2.5
-        version: 3.2.5
-      prettier-plugin-svelte:
-        specifier: ^3.2.3
-        version: 3.2.3(prettier@3.2.5)(svelte@4.2.8)
       rollup-plugin-copy:
         specifier: ^3.5.0
         version: 3.5.0
@@ -147,18 +105,12 @@ importers:
       svelte-check:
         specifier: ^3.6.2
         version: 3.6.2(postcss-load-config@3.1.4(postcss@8.4.38))(postcss@8.4.38)(svelte@4.2.8)
-      svelte-eslint-parser:
-        specifier: ^0.36.0
-        version: 0.36.0(svelte@4.2.8)
       tslib:
         specifier: ^2.6.2
         version: 2.6.2
       typescript:
         specifier: ^5.3.3
         version: 5.3.3
-      typescript-eslint:
-        specifier: ^7.10.0
-        version: 7.10.0(eslint@8.56.0)(typescript@5.3.3)
       vite:
         specifier: ^5.0.8
         version: 5.0.8(@types/node@20.10.6)
@@ -2699,27 +2651,6 @@ snapshots:
       - supports-color
       - ts-node
 
-  eslint-plugin-svelte@2.39.0(eslint@8.56.0)(svelte@4.2.8):
-    dependencies:
-      '@eslint-community/eslint-utils': 4.4.0(eslint@8.56.0)
-      '@jridgewell/sourcemap-codec': 1.4.15
-      debug: 4.3.4
-      eslint: 8.56.0
-      eslint-compat-utils: 0.5.0(eslint@8.56.0)
-      esutils: 2.0.3
-      known-css-properties: 0.31.0
-      postcss: 8.4.38
-      postcss-load-config: 3.1.4(postcss@8.4.38)
-      postcss-safe-parser: 6.0.0(postcss@8.4.38)
-      postcss-selector-parser: 6.1.0
-      semver: 7.6.2
-      svelte-eslint-parser: 0.36.0(svelte@4.2.8)
-    optionalDependencies:
-      svelte: 4.2.8
-    transitivePeerDependencies:
-      - supports-color
-      - ts-node
-
   eslint-scope@7.2.2:
     dependencies:
       esrecurse: 4.3.0
@@ -3153,11 +3084,6 @@ snapshots:
       prettier: 3.2.5
       svelte: 4.2.12
 
-  prettier-plugin-svelte@3.2.3(prettier@3.2.5)(svelte@4.2.8):
-    dependencies:
-      prettier: 3.2.5
-      svelte: 4.2.8
-
   prettier@3.2.5: {}
 
   proxy-from-env@1.1.0: {}
@@ -3361,16 +3287,6 @@ snapshots:
       postcss-scss: 4.0.9(postcss@8.4.38)
     optionalDependencies:
       svelte: 4.2.12
-
-  svelte-eslint-parser@0.36.0(svelte@4.2.8):
-    dependencies:
-      eslint-scope: 7.2.2
-      eslint-visitor-keys: 3.4.3
-      espree: 9.6.1
-      postcss: 8.4.38
-      postcss-scss: 4.0.9(postcss@8.4.38)
-    optionalDependencies:
-      svelte: 4.2.8
 
   svelte-hmr@0.15.3(svelte@4.2.12):
     dependencies:
