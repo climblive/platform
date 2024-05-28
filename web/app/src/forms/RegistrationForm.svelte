@@ -18,7 +18,7 @@
 
   export let data: Partial<RegistrationFormData>;
 
-  let session = getContext<Readable<ScorecardSession>>("scorecardSession");
+  const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
   $: compClassesQuery = getCompClassesQuery($session.contestId);
 
