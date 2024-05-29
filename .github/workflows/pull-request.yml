@@ -22,8 +22,8 @@ jobs:
       - run: pnpm --filter=* lint
         working-directory: web
 
-  build:
-    name: Build
+  build-web:
+    name: Build web
     runs-on: ubuntu-22.04
 
     steps:
@@ -40,3 +40,15 @@ jobs:
         working-directory: web
       - run: pnpm --filter=* build
         working-directory: web
+
+  build-backend:
+    name: Build backend
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: "backend/go.mod"
+      - run: go build cmd/api/main.go
+        working-directory: backend
