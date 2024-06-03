@@ -1,6 +1,9 @@
 package domain
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 type Tick struct {
 	ID          ResourceID
@@ -11,4 +14,8 @@ type Tick struct {
 }
 
 type TickUsecase interface {
+	GetTicks(ctx context.Context, contenderID ResourceID) ([]Tick, error)
+	GetTicksByProblem(ctx context.Context, problemID ResourceID) ([]Tick, error)
+	DeleteTick(ctx context.Context, id ResourceID) error
+	CreateTick(ctx context.Context, contenderID ResourceID, tick Tick) (Tick, error)
 }

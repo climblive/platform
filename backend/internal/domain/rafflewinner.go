@@ -1,6 +1,9 @@
 package domain
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 type RaffleWinner struct {
 	ID            ResourceID
@@ -11,4 +14,6 @@ type RaffleWinner struct {
 }
 
 type RaffleWinnerUsecase interface {
+	GetRaffleWinners(ctx context.Context, raffleID ResourceID) ([]RaffleWinner, error)
+	DrawRaffleWinner(ctx context.Context, raffleID ResourceID) (RaffleWinner, error)
 }
