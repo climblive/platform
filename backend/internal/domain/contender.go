@@ -14,16 +14,16 @@ type Contender struct {
 	Club             string
 	Entered          time.Time
 	Disqualified     bool
+	Score            int
+	Placement        int
 }
 
 type ContenderUsecase interface {
-	GetContender(ctx context.Context, id ResourceID) (Contender, error)
+	GetContender(ctx context.Context, contenderID ResourceID) (Contender, error)
 	GetContenderByCode(ctx context.Context, registrationCode string) (Contender, error)
+	GetContendersByCompClass(ctx context.Context, compClassID ResourceID) ([]Contender, error)
 	GetContendersByContest(ctx context.Context, contestID ResourceID) ([]Contender, error)
-	UpdateContender(ctx context.Context, id ResourceID, contender Contender) (Contender, error)
-	DeleteContender(ctx context.Context, id ResourceID) error
-	CreateContender(ctx context.Context, contestID ResourceID, template Contender) (Contender, error)
-	AddTickets(ctx context.Context, contestID ResourceID, count int) ([]Contender, error)
-	ExportContestResults(ctx context.Context, contestID ResourceID) ([]byte, error)
-	ExportTicketsPDF(ctx context.Context, contestID ResourceID) ([]byte, error)
+	UpdateContender(ctx context.Context, contenderID ResourceID, contender Contender) (Contender, error)
+	DeleteContender(ctx context.Context, contenderID ResourceID) error
+	CreateContenders(ctx context.Context, contestID ResourceID, number int) ([]Contender, error)
 }

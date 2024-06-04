@@ -14,8 +14,8 @@ type Tick struct {
 }
 
 type TickUsecase interface {
-	GetTicks(ctx context.Context, contenderID ResourceID) ([]Tick, error)
+	GetTicksByContender(ctx context.Context, contenderID ResourceID) ([]Tick, error)
 	GetTicksByProblem(ctx context.Context, problemID ResourceID) ([]Tick, error)
-	DeleteTick(ctx context.Context, id ResourceID) error
+	DeleteTick(ctx context.Context, tickID ResourceID) error
 	CreateTick(ctx context.Context, contenderID ResourceID, tick Tick) (Tick, error)
 }

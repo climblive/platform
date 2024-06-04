@@ -9,8 +9,8 @@ type Series struct {
 }
 
 type SeriesUsecase interface {
-	GetSeries(ctx context.Context, organizerID ResourceID) (Series, error)
 	GetSeriesByOrganizer(ctx context.Context, organizerID ResourceID) ([]Series, error)
-	DeleteSeries(ctx context.Context, id ResourceID) (error)
-	CreateSeries(ctx context.Context, organizerID ResourceID) ([]Series, error)
+	UpdateSeries(ctx context.Context, seriesID ResourceID, series Series) (Series, error)
+	DeleteSeries(ctx context.Context, seriesID ResourceID) error
+	CreateSeries(ctx context.Context, organizerID ResourceID) (Series, error)
 }

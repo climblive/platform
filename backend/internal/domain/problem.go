@@ -15,9 +15,8 @@ type Problem struct {
 }
 
 type ProblemUsecase interface {
-	GetProblem(ctx context.Context, id ResourceID) (Problem, error)
 	GetProblemsByContest(ctx context.Context, contestID ResourceID) ([]Problem, error)
-	UpdateProblem(ctx context.Context, id ResourceID, problem Problem) (Problem, error)
-	DeleteProblem(ctx context.Context, id ResourceID) (error)
+	UpdateProblem(ctx context.Context, problemID ResourceID, problem Problem) (Problem, error)
+	DeleteProblem(ctx context.Context, problemID ResourceID) error
 	CreateProblem(ctx context.Context, contestID ResourceID, problem Problem) (Problem, error)
 }
