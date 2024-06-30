@@ -9,7 +9,11 @@ import (
 	"github.com/climblive/platform/backend/internal/domain"
 )
 
+const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
 type repository interface {
+	domain.Transactor
+
 	GetContender(ctx context.Context, contenderID domain.ResourceID) (domain.Contender, error)
 	GetContenderByCode(ctx context.Context, registrationCode string) (domain.Contender, error)
 	GetContendersByCompClass(ctx context.Context, compClassID domain.ResourceID) ([]domain.Contender, error)
@@ -245,28 +249,33 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID doma
 		return nil, err
 	}
 
-	// TODO: begin transaction
-	characters := "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	contenders := make([]domain.Contender, 0)
 
-	for range number {
-		var code []rune
+	err = uc.repo.WithinTransaction(ctx, func(txCtx context.Context) error {
+		for range number {
+			var code []rune
 
-		for range registrationCodeLength {
-			code = append(code, []rune(characters)[rand.Intn(len(characters))])
+			for range registrationCodeLength {
+				code = append(code, []rune(characters)[rand.Intn(len(characters))])
+			}
+
+			contender := domain.Contender{
+				ContestID: contestID,
+				Ownership: domain.OwnershipData{
+					OrganizerID: contest.Ownership.OrganizerID,
+				},
+				RegistrationCode: string(code),
+			}
+
+			contenders = append(contenders, contender)
+
+			if err := uc.repo.StoreContender(ctx, contender); err != nil {
+				return fmt.Errorf("%w: %w", domain.ErrRepositoryFailure, err)
+			}
 		}
 
-		contender := domain.Contender{
-			ContestID: contestID,
-			Ownership: domain.OwnershipData{
-				OrganizerID: contest.Ownership.OrganizerID,
-			},
-			RegistrationCode: string(code),
-		}
+		return nil
+	})
 
-		if err := uc.repo.StoreContender(ctx, contender); err != nil {
-			return []domain.Contender{}, fmt.Errorf("%w: %w", domain.ErrRepositoryFailure, err)
-		}
-	}
-
-	return nil, nil
+	return contenders, err
 }
