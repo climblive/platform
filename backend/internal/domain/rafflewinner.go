@@ -7,6 +7,7 @@ import (
 
 type RaffleWinner struct {
 	ID            ResourceID
+	Ownership     OwnershipData
 	RaffleID      ResourceID
 	ContenderID   ResourceID
 	ContenderName string

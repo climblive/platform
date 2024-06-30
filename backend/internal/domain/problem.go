@@ -4,13 +4,15 @@ import "context"
 
 type Problem struct {
 	ID                 ResourceID
+	Ownership          OwnershipData
 	ContestID          ResourceID
 	Number             int
 	HoldColorPrimary   string
 	HoldColorSecondary string
 	Name               string
 	Description        string
-	Points             int
+	PointsTop          int
+	PointsZone         int
 	FlashBonus         int
 }
 

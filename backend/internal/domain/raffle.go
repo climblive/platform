@@ -4,6 +4,7 @@ import "context"
 
 type Raffle struct {
 	ID        ResourceID
+	Ownership OwnershipData
 	ContestID ResourceID
 	Active    bool
 }

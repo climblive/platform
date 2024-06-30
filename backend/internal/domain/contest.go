@@ -1,11 +1,14 @@
 package domain
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 type Contest struct {
 	ID                 ResourceID
+	Ownership          OwnershipData
 	Location           string
-	OrganizerID        ResourceID
 	SeriesID           ResourceID
 	Protected          bool
 	Name               string
@@ -14,15 +17,7 @@ type Contest struct {
 	QualifyingProblems int
 	Finalists          int
 	Rules              string
-	GracePeriod        int
-}
-
-type Score struct {
-	ContenderID         ResourceID
-	ContenderPublicName string
-	CompClassID         ResourceID
-	Score               int
-	Placement           int
+	GracePeriod        time.Duration
 }
 
 type ContestUsecase interface {

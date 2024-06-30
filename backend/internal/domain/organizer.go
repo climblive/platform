@@ -3,9 +3,10 @@ package domain
 import "context"
 
 type Organizer struct {
-	ID       ResourceID
-	Name     string
-	Homepage string
+	ID        ResourceID
+	Ownership OwnershipData
+	Name      string
+	Homepage  string
 }
 
 type OrganizerUsecase interface {

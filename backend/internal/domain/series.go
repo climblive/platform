@@ -3,9 +3,9 @@ package domain
 import "context"
 
 type Series struct {
-	ID          ResourceID
-	OrganizerID ResourceID
-	Name        string
+	ID        ResourceID
+	Ownership OwnershipData
+	Name      string
 }
 
 type SeriesUsecase interface {

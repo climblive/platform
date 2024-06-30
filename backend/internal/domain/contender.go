@@ -6,16 +6,20 @@ import (
 )
 
 type Contender struct {
-	ID               ResourceID
-	CompClassID      ResourceID
-	ContestID        ResourceID
-	RegistrationCode string
-	Name             string
-	Club             string
-	Entered          time.Time
-	Disqualified     bool
-	Score            int
-	Placement        int
+	ID                  ResourceID
+	Ownership           OwnershipData
+	ContestID           ResourceID
+	CompClassID         ResourceID
+	RegistrationCode    string
+	Name                string
+	PublicName          string
+	ClubName            string
+	Entered             time.Time
+	WithdrawnFromFinals bool
+	Disqualified        bool
+	Score               int
+	Placement           int
+	ScoreTimestamp      time.Time
 }
 
 type ContenderUsecase interface {

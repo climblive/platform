@@ -6,11 +6,14 @@ import (
 )
 
 type Tick struct {
-	ID          ResourceID
-	Timestamp   time.Time
-	ContenderID ResourceID
-	ProblemID   ResourceID
-	Flash       bool
+	ID           ResourceID
+	Ownership    OwnershipData
+	Timestamp    time.Time
+	ProblemID    ResourceID
+	Top          bool
+	AttemptsTop  int
+	Zone         bool
+	AttemptsZone int
 }
 
 type TickUsecase interface {

@@ -9,6 +9,7 @@ type ColorRGB string
 
 type CompClass struct {
 	ID          ResourceID
+	Ownership   OwnershipData
 	ContestID   ResourceID
 	Name        string
 	Description string
