@@ -10,7 +10,7 @@ type User struct {
 	Organizers []ResourceID
 }
 
-type UserUsecase interface {
+type UserUseCase interface {
 	GetCurrentUser(ctx context.Context) (User, error)
 	GetUsersByOrganizer(ctx context.Context, organizerID ResourceID) ([]User, error)
 	UpdateUser(ctx context.Context, userID ResourceID, user User) (User, error)

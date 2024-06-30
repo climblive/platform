@@ -9,6 +9,7 @@ type ColorRGB string
 
 type CompClass struct {
 	ID          ResourceID
+	Ownership   OwnershipData
 	ContestID   ResourceID
 	Name        string
 	Description string
@@ -17,7 +18,7 @@ type CompClass struct {
 	TimeEnd     time.Time
 }
 
-type CompClassUsecase interface {
+type CompClassUseCase interface {
 	GetCompClassesByContest(ctx context.Context, contestID ResourceID) ([]CompClass, error)
 	UpdateCompClass(ctx context.Context, compClassID ResourceID, compClass CompClass) (CompClass, error)
 	DeleteCompClass(ctx context.Context, compClassID ResourceID) error

@@ -1,11 +1,14 @@
 package domain
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 type Contest struct {
 	ID                 ResourceID
+	Ownership          OwnershipData
 	Location           string
-	OrganizerID        ResourceID
 	SeriesID           ResourceID
 	Protected          bool
 	Name               string
@@ -14,18 +17,10 @@ type Contest struct {
 	QualifyingProblems int
 	Finalists          int
 	Rules              string
-	GracePeriod        int
+	GracePeriod        time.Duration
 }
 
-type Score struct {
-	ContenderID         ResourceID
-	ContenderPublicName string
-	CompClassID         ResourceID
-	Score               int
-	Placement           int
-}
-
-type ContestUsecase interface {
+type ContestUseCase interface {
 	GetContest(ctx context.Context, contestID ResourceID) (Contest, error)
 	GetContestsByOrganizer(ctx context.Context, organizerID ResourceID) ([]Contest, error)
 	UpdateContest(ctx context.Context, contestID ResourceID, contest Contest) (Contest, error)
