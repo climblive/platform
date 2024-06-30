@@ -1,7 +1,11 @@
 package domain
 
-import "context"
+type TransactionController interface {
+	Commit() error
+	Rollback()
+}
 
-type Transactor interface {
-	WithinTransaction(ctx context.Context, fn func(ctx context.Context) error) error
+type Transactor[R any] interface {
+	Autocommit() R
+	Begin() (TransactionController, R)
 }

@@ -12,8 +12,6 @@ import (
 const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 type repository interface {
-	domain.Transactor
-
 	GetContender(ctx context.Context, contenderID domain.ResourceID) (domain.Contender, error)
 	GetContenderByCode(ctx context.Context, registrationCode string) (domain.Contender, error)
 	GetContendersByCompClass(ctx context.Context, compClassID domain.ResourceID) ([]domain.Contender, error)
@@ -25,7 +23,7 @@ type repository interface {
 }
 
 type ContenderUseCase struct {
-	repo        repository
+	repo        domain.Transactor[repository]
 	authorizer  domain.Authorizer
 	eventBroker domain.EventBroker
 }
@@ -35,7 +33,7 @@ func NewContenderUseCase() domain.ContenderUsecase {
 }
 
 func (uc *ContenderUseCase) GetContender(ctx context.Context, contenderID domain.ResourceID) (domain.Contender, error) {
-	contender, err := uc.repo.GetContender(ctx, contenderID)
+	contender, err := uc.repo.Autocommit().GetContender(ctx, contenderID)
 	if err != nil {
 		return domain.Contender{}, fmt.Errorf("%w: %w", domain.ErrNotFound, err)
 	}
@@ -48,11 +46,11 @@ func (uc *ContenderUseCase) GetContender(ctx context.Context, contenderID domain
 }
 
 func (uc *ContenderUseCase) GetContenderByCode(ctx context.Context, registrationCode string) (domain.Contender, error) {
-	return uc.repo.GetContenderByCode(ctx, registrationCode)
+	return uc.repo.Autocommit().GetContenderByCode(ctx, registrationCode)
 }
 
 func (uc *ContenderUseCase) GetContendersByCompClass(ctx context.Context, compClassID domain.ResourceID) ([]domain.Contender, error) {
-	compClass, err := uc.repo.GetCompClass(ctx, compClassID)
+	compClass, err := uc.repo.Autocommit().GetCompClass(ctx, compClassID)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %w", domain.ErrNotFound, err)
 	}
@@ -61,7 +59,7 @@ func (uc *ContenderUseCase) GetContendersByCompClass(ctx context.Context, compCl
 		return nil, err
 	}
 
-	contenders, err := uc.repo.GetContendersByCompClass(ctx, compClassID)
+	contenders, err := uc.repo.Autocommit().GetContendersByCompClass(ctx, compClassID)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %w", domain.ErrRepositoryFailure, err)
 	}
@@ -70,7 +68,7 @@ func (uc *ContenderUseCase) GetContendersByCompClass(ctx context.Context, compCl
 }
 
 func (uc *ContenderUseCase) GetContendersByContest(ctx context.Context, contestID domain.ResourceID) ([]domain.Contender, error) {
-	contest, err := uc.repo.GetContest(ctx, contestID)
+	contest, err := uc.repo.Autocommit().GetContest(ctx, contestID)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %w", domain.ErrNotFound, err)
 	}
@@ -79,7 +77,7 @@ func (uc *ContenderUseCase) GetContendersByContest(ctx context.Context, contestI
 		return nil, err
 	}
 
-	contenders, err := uc.repo.GetContendersByContest(ctx, contestID)
+	contenders, err := uc.repo.Autocommit().GetContendersByContest(ctx, contestID)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %w", domain.ErrRepositoryFailure, err)
 	}
@@ -91,7 +89,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 	var mty domain.Contender
 	var events []any
 
-	orig, err := uc.repo.GetContender(ctx, contenderID)
+	orig, err := uc.repo.Autocommit().GetContender(ctx, contenderID)
 	if err != nil {
 		return mty, fmt.Errorf("%w: %w", domain.ErrNotFound, err)
 	}
@@ -112,7 +110,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 
 	publicInfoEventBaseline := publicInfoEvent
 
-	contest, err := uc.repo.GetContest(ctx, orig.ContestID)
+	contest, err := uc.repo.Autocommit().GetContest(ctx, orig.ContestID)
 	if err != nil {
 		return mty, fmt.Errorf("%w: %w", domain.ErrBadState, err)
 	}
@@ -124,14 +122,14 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 		publicInfoEvent.CompClassID = upd.CompClassID
 
 		if orig.CompClassID != 0 {
-			compClass, err = uc.repo.GetCompClass(ctx, orig.CompClassID)
+			compClass, err = uc.repo.Autocommit().GetCompClass(ctx, orig.CompClassID)
 
 			events = append(events, domain.ContenderSwitchClassEvent{
 				ContenderID: contenderID,
 				CompClassID: upd.CompClassID,
 			})
 		} else {
-			compClass, err = uc.repo.GetCompClass(ctx, upd.CompClassID)
+			compClass, err = uc.repo.Autocommit().GetCompClass(ctx, upd.CompClassID)
 
 			events = append(events, domain.ContenderEnterEvent{
 				ContenderID: contenderID,
@@ -204,7 +202,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 	orig.WithdrawnFromFinals = upd.WithdrawnFromFinals
 	orig.Disqualified = upd.Disqualified
 
-	if err := uc.repo.StoreContender(ctx, orig); err != nil {
+	if err := uc.repo.Autocommit().StoreContender(ctx, orig); err != nil {
 		return mty, fmt.Errorf("%w: %w", domain.ErrRepositoryFailure, err)
 	}
 
@@ -216,7 +214,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 }
 
 func (uc *ContenderUseCase) DeleteContender(ctx context.Context, contenderID domain.ResourceID) error {
-	contender, err := uc.repo.GetContender(ctx, contenderID)
+	contender, err := uc.repo.Autocommit().GetContender(ctx, contenderID)
 	if err != nil {
 		return domain.ErrNotFound
 	}
@@ -230,7 +228,7 @@ func (uc *ContenderUseCase) DeleteContender(ctx context.Context, contenderID dom
 		return domain.ErrNotAllowed
 	}
 
-	if err := uc.repo.DeleteContender(ctx, contenderID); err != nil {
+	if err := uc.repo.Autocommit().DeleteContender(ctx, contenderID); err != nil {
 		return fmt.Errorf("%w: %w", domain.ErrRepositoryFailure, err)
 	}
 
@@ -240,7 +238,7 @@ func (uc *ContenderUseCase) DeleteContender(ctx context.Context, contenderID dom
 const registrationCodeLength = 8
 
 func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID domain.ResourceID, number int) ([]domain.Contender, error) {
-	contest, err := uc.repo.GetContest(ctx, contestID)
+	contest, err := uc.repo.Autocommit().GetContest(ctx, contestID)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %w", domain.ErrNotFound, err)
 	}
@@ -251,31 +249,32 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID doma
 
 	contenders := make([]domain.Contender, 0)
 
-	err = uc.repo.WithinTransaction(ctx, func(txCtx context.Context) error {
-		for range number {
-			var code []rune
+	txc, tx := uc.repo.Begin()
+	defer txc.Rollback()
 
-			for range registrationCodeLength {
-				code = append(code, []rune(characters)[rand.Intn(len(characters))])
-			}
+	for range number {
+		var code []rune
 
-			contender := domain.Contender{
-				ContestID: contestID,
-				Ownership: domain.OwnershipData{
-					OrganizerID: contest.Ownership.OrganizerID,
-				},
-				RegistrationCode: string(code),
-			}
-
-			contenders = append(contenders, contender)
-
-			if err := uc.repo.StoreContender(ctx, contender); err != nil {
-				return fmt.Errorf("%w: %w", domain.ErrRepositoryFailure, err)
-			}
+		for range registrationCodeLength {
+			code = append(code, []rune(characters)[rand.Intn(len(characters))])
 		}
 
-		return nil
-	})
+		contender := domain.Contender{
+			ContestID: contestID,
+			Ownership: domain.OwnershipData{
+				OrganizerID: contest.Ownership.OrganizerID,
+			},
+			RegistrationCode: string(code),
+		}
+
+		contenders = append(contenders, contender)
+
+		if err := tx.StoreContender(ctx, contender); err != nil {
+			return nil, fmt.Errorf("%w: %w", domain.ErrRepositoryFailure, err)
+		}
+	}
+
+	txc.Commit()
 
 	return contenders, err
 }
