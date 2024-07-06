@@ -2,6 +2,7 @@ package rest
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -25,10 +26,22 @@ func writeResponse(w http.ResponseWriter, status int, data any) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
 	w.Write(json)
 }
 
 func writeError(w http.ResponseWriter, err error) {
-	w.WriteHeader(http.StatusInternalServerError)
+	switch {
+	case errors.Is(err, domain.ErrNotFound):
+		w.WriteHeader(http.StatusNotFound)
+	case errors.Is(err, domain.ErrPermissionDenied):
+		fallthrough
+	case errors.Is(err, domain.ErrContestEnded):
+		fallthrough
+	case errors.Is(err, domain.ErrNotAllowed):
+		w.WriteHeader(http.StatusForbidden)
+	default:
+		w.WriteHeader(http.StatusInternalServerError)
+	}
 }

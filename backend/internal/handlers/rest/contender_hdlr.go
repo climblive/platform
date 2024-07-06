@@ -77,7 +77,11 @@ func (hdlr *contenderHandler) UpdateContender(w http.ResponseWriter, r *http.Req
 	contenderID := parseResourceID(r.PathValue("contenderID"))
 
 	var contender domain.Contender
-	json.NewDecoder(r.Body).Decode(&contender)
+	err := json.NewDecoder(r.Body).Decode(&contender)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	updatedContender, err := hdlr.contenderUseCase.UpdateContender(r.Context(), contenderID, contender)
 	if err != nil {
@@ -108,7 +112,11 @@ func (hdlr *contenderHandler) CreateContenders(w http.ResponseWriter, r *http.Re
 	contestID := parseResourceID(r.PathValue("contestID"))
 
 	var tmpl createContendersTemplate
-	json.NewDecoder(r.Body).Decode(&tmpl)
+	err := json.NewDecoder(r.Body).Decode(&tmpl)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	contenders, err := hdlr.contenderUseCase.CreateContenders(r.Context(), contestID, tmpl.Number)
 	if err != nil {
