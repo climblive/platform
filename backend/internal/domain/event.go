@@ -20,7 +20,7 @@ type ContenderWithdrawFromFinalsEvent struct {
 	ContenderID ResourceID
 }
 
-type ContenderReenterIntoFinalsEvent struct {
+type ContenderReenterFinalsEvent struct {
 	ContenderID ResourceID
 }
 
