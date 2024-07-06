@@ -4,20 +4,6 @@ import (
 	"context"
 )
 
-type PermissionType string
-
-const (
-	ReadPermission  PermissionType = "read"
-	WritePermission PermissionType = "write"
-)
-
-type ResourceType string
-
-const (
-	OrganizationType ResourceType = "organization"
-	ContenderType    ResourceType = "contender"
-)
-
 type AuthRole string
 
 const (
