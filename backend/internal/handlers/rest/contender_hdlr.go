@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -25,7 +26,20 @@ func InstallContenderHandler(contenderUseCase domain.ContenderUseCase) {
 }
 
 func (hdlr *contenderHandler) GetContender(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
+	contenderID := parseResourceID(r.PathValue("contenderID"))
+
+	contender, err := hdlr.contenderUseCase.GetContender(r.Context(), contenderID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	json, err := json.Marshal(contender)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(json)
 }
 
 func (hdlr *contenderHandler) GetContenderByCode(w http.ResponseWriter, r *http.Request) {
