@@ -9,7 +9,7 @@ type Contender struct {
 	ID                  ResourceID    `json:"id"`
 	Ownership           OwnershipData `json:"-"`
 	ContestID           ResourceID    `json:"contestId"`
-	CompClassID         ResourceID    `json:"compClassId"`
+	CompClassID         ResourceID    `json:"compClassId,omitempty"`
 	RegistrationCode    string        `json:"registrationCode"`
 	Name                string        `json:"name"`
 	PublicName          string        `json:"publicName"`
