@@ -6,20 +6,20 @@ import (
 )
 
 type Contender struct {
-	ID                  ResourceID
-	Ownership           OwnershipData
-	ContestID           ResourceID
-	CompClassID         ResourceID
-	RegistrationCode    string
-	Name                string
-	PublicName          string
-	ClubName            string
-	Entered             time.Time
-	WithdrawnFromFinals bool
-	Disqualified        bool
-	Score               int
-	Placement           int
-	ScoreTimestamp      time.Time
+	ID                  ResourceID    `json:"id"`
+	Ownership           OwnershipData `json:"-"`
+	ContestID           ResourceID    `json:"contestId"`
+	CompClassID         ResourceID    `json:"compClassId,omitempty"`
+	RegistrationCode    string        `json:"registrationCode"`
+	Name                string        `json:"name"`
+	PublicName          string        `json:"publicName"`
+	ClubName            string        `json:"clubName"`
+	Entered             time.Time     `json:"entered,omitempty"`
+	WithdrawnFromFinals bool          `json:"withdrawnFromFinals"`
+	Disqualified        bool          `json:"disqualified"`
+	Score               int           `json:"score"`
+	Placement           int           `json:"placement"`
+	ScoreUpdated        time.Time     `json:"scoreUpdated"`
 }
 
 type ContenderUseCase interface {
