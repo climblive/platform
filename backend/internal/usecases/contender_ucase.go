@@ -177,7 +177,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 				ContenderID: contenderID,
 			}
 		} else {
-			event = domain.ContenderReenterIntoFinalsEvent{
+			event = domain.ContenderReenterFinalsEvent{
 				ContenderID: contenderID,
 			}
 		}
