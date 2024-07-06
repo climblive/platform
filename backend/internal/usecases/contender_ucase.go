@@ -233,7 +233,7 @@ func (uc *ContenderUseCase) DeleteContender(ctx context.Context, contenderID dom
 
 	role, err := uc.Authorizer.HasOwnership(ctx, contender.Ownership)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	if !role.OneOf(domain.AdminRole, domain.OrganizerRole) {
