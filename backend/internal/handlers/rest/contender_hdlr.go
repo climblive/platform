@@ -89,7 +89,7 @@ func (hdlr *contenderHandler) UpdateContender(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	writeResponse(w, http.StatusCreated, updatedContender)
+	writeResponse(w, http.StatusOK, updatedContender)
 }
 
 func (hdlr *contenderHandler) DeleteContender(w http.ResponseWriter, r *http.Request) {
