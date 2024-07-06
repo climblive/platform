@@ -155,7 +155,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 
 		gracePeriodEnd := compClass.TimeEnd.Add(contest.GracePeriod)
 
-		if *role != domain.OrganizerRole && time.Now().After(gracePeriodEnd) {
+		if !role.OneOf(domain.AdminRole, domain.OrganizerRole) && time.Now().After(gracePeriodEnd) {
 			return mty, domain.ErrContestEnded
 		}
 	}
