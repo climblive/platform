@@ -1,16 +1,55 @@
 package repository
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/climblive/platform/backend/internal/domain"
+
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 type Database struct {
+	db *gorm.DB
 }
 
-func NewDatabase() *Database {
-	return &Database{}
+func NewDatabase(username, password, host, database string) (*Database, error) {
+	var db *gorm.DB
+
+	dsn := fmt.Sprintf(
+		"%s:%s@tcp(%s:3306)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		username,
+		password,
+		host,
+		database)
+
+	var logLevel logger.LogLevel = logger.Info
+
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logLevel),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	sqlDB, _ := db.DB()
+
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxLifetime(time.Hour)
+
+	return &Database{
+		db: db,
+	}, nil
 }
 
 func (d *Database) Begin() domain.Transaction {
-	return &transaction{}
+	tx := d.db.Begin()
+
+	return &transaction{
+		db:     tx,
+		active: true,
+	}
 }

@@ -18,7 +18,7 @@ type repository interface {
 	GetContenderByCode(ctx context.Context, tx domain.Transaction, registrationCode string) (domain.Contender, error)
 	GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) ([]domain.Contender, error)
 	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) ([]domain.Contender, error)
-	StoreContender(ctx context.Context, tx domain.Transaction, contender domain.Contender) error
+	StoreContender(ctx context.Context, tx domain.Transaction, contender domain.Contender) (domain.Contender, error)
 	DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) error
 	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (domain.Contest, error)
 	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) (domain.CompClass, error)
@@ -214,7 +214,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 	contender.WithdrawnFromFinals = updates.WithdrawnFromFinals
 	contender.Disqualified = updates.Disqualified
 
-	if err := uc.Repo.StoreContender(ctx, nil, contender); err != nil {
+	if contender, err = uc.Repo.StoreContender(ctx, nil, contender); err != nil {
 		return mty, fmt.Errorf("%w: %w", domain.ErrRepositoryFailure, err)
 	}
 
@@ -279,11 +279,11 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID doma
 			RegistrationCode: string(code),
 		}
 
-		contenders = append(contenders, contender)
-
-		if err := uc.Repo.StoreContender(ctx, tx, contender); err != nil {
+		if contender, err = uc.Repo.StoreContender(ctx, tx, contender); err != nil {
 			return nil, fmt.Errorf("%w: %w", domain.ErrRepositoryFailure, err)
 		}
+
+		contenders = append(contenders, contender)
 	}
 
 	tx.Commit()
