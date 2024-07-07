@@ -56,8 +56,13 @@ func (r *contenderRecord) ToDomain() domain.Contender {
 }
 
 func (d *Database) GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) (domain.Contender, error) {
+	transaction, ok := tx.(*transaction)
+	if !ok {
+		return domain.Contender{}, ErrIncompatibleTransaction
+	}
+
 	var record contenderRecord
-	err := d.db.WithContext(ctx).Raw(`SELECT * FROM contender WHERE id = ?`, contenderID).Scan(&record).Error
+	err := transaction.db.WithContext(ctx).Raw(`SELECT * FROM contender WHERE id = ?`, contenderID).Scan(&record).Error
 
 	return record.ToDomain(), err
 }
