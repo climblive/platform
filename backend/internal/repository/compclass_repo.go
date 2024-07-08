@@ -47,8 +47,13 @@ func (r *compClassRecord) toDomain() domain.CompClass {
 }
 
 func (d *Database) GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) (domain.CompClass, error) {
+	transaction, ok := tx.(*transaction)
+	if !ok {
+		return domain.CompClass{}, ErrIncompatibleTransaction
+	}
+
 	var record compClassRecord
-	err := d.db.WithContext(ctx).Raw(`SELECT * FROM comp_class WHERE id = ?`, compClassID).Scan(&record).Error
+	err := transaction.db.WithContext(ctx).Raw(`SELECT * FROM comp_class WHERE id = ?`, compClassID).Scan(&record).Error
 
 	return record.toDomain(), err
 }

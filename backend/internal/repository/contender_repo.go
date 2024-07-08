@@ -68,16 +68,26 @@ func (d *Database) GetContender(ctx context.Context, tx domain.Transaction, cont
 }
 
 func (d *Database) GetContenderByCode(ctx context.Context, tx domain.Transaction, registrationCode string) (domain.Contender, error) {
+	transaction, ok := tx.(*transaction)
+	if !ok {
+		return domain.Contender{}, ErrIncompatibleTransaction
+	}
+
 	var record contenderRecord
-	err := d.db.WithContext(ctx).Raw(`SELECT * FROM contender WHERE registration_code = ?`, registrationCode).Scan(&record).Error
+	err := transaction.db.WithContext(ctx).Raw(`SELECT * FROM contender WHERE registration_code = ?`, registrationCode).Scan(&record).Error
 
 	return record.toDomain(), err
 }
 
 func (d *Database) GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) ([]domain.Contender, error) {
+	transaction, ok := tx.(*transaction)
+	if !ok {
+		return nil, ErrIncompatibleTransaction
+	}
+
 	var records []contenderRecord
 
-	err := d.db.WithContext(ctx).Raw(`SELECT * FROM contender WHERE class_id = ?`, compClassID).Scan(&records).Error
+	err := transaction.db.WithContext(ctx).Raw(`SELECT * FROM contender WHERE class_id = ?`, compClassID).Scan(&records).Error
 	if err != nil {
 		return nil, err
 	}
@@ -92,9 +102,14 @@ func (d *Database) GetContendersByCompClass(ctx context.Context, tx domain.Trans
 }
 
 func (d *Database) GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) ([]domain.Contender, error) {
+	transaction, ok := tx.(*transaction)
+	if !ok {
+		return nil, ErrIncompatibleTransaction
+	}
+
 	var records []contenderRecord
 
-	err := d.db.WithContext(ctx).Raw(`SELECT * FROM contender WHERE contest_id = ?`, contestID).Scan(&records).Error
+	err := transaction.db.WithContext(ctx).Raw(`SELECT * FROM contender WHERE contest_id = ?`, contestID).Scan(&records).Error
 	if err != nil {
 		return nil, err
 	}
@@ -109,9 +124,14 @@ func (d *Database) GetContendersByContest(ctx context.Context, tx domain.Transac
 }
 
 func (d *Database) StoreContender(ctx context.Context, tx domain.Transaction, contender domain.Contender) (domain.Contender, error) {
+	transaction, ok := tx.(*transaction)
+	if !ok {
+		return domain.Contender{}, ErrIncompatibleTransaction
+	}
+
 	var storedRecord contenderRecord
 
-	err := d.db.WithContext(ctx).Raw(`
+	err := transaction.db.WithContext(ctx).Raw(`
 		INSERT INTO
 			contender (id, organizer_id, contest_id, registration_code, name, club, class_id, entered, disqualified)
 			VALUES (@ID, @OrganizerID, @ContestID, @RegistrationCode, @Name, @Club, @ClassID, @Entered, @Disqualified)
@@ -130,5 +150,10 @@ func (d *Database) StoreContender(ctx context.Context, tx domain.Transaction, co
 }
 
 func (d *Database) DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) error {
-	return d.db.WithContext(ctx).Raw(`DELETE FROM contender WHERE id = ?`, contenderID).Error
+	transaction, ok := tx.(*transaction)
+	if !ok {
+		return ErrIncompatibleTransaction
+	}
+
+	return transaction.db.WithContext(ctx).Raw(`DELETE FROM contender WHERE id = ?`, contenderID).Error
 }
