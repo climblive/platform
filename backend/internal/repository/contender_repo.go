@@ -118,7 +118,7 @@ func (d *Database) StoreContender(ctx context.Context, tx domain.Transaction, co
 	}
 
 	if err != nil {
-		return domain.Contender{}, nil
+		return domain.Contender{}, err
 	}
 
 	return record.toDomain(), nil
