@@ -8,45 +8,45 @@ import (
 )
 
 type contenderRecord struct {
-	ID               *int       `gorm:"primaryKey,autoIncrement:true"`
-	OrganizerID      int        `gorm:"column:organizer_id"`
-	ContestID        int        `gorm:"column:contest_id"`
-	RegistrationCode string     `gorm:"column:registration_code"`
-	Name             *string    `gorm:"column:name"`
-	Club             *string    `gorm:"column:club"`
-	ClassID          *int       `gorm:"column:class_id"`
-	Entered          *time.Time `gorm:"column:entered"`
-	Disqualified     bool       `gorm:"column:disqualified"`
+	ID               *int `gorm:"primaryKey;autoIncrement"`
+	OrganizerID      int
+	ContestID        int
+	RegistrationCode string
+	Name             *string
+	Club             *string
+	ClassID          *int
+	Entered          *time.Time
+	Disqualified     bool
 }
 
-func (r contenderRecord) ToRecord(contender domain.Contender) contenderRecord {
+func (r contenderRecord) fromDomain(contender domain.Contender) contenderRecord {
 	return contenderRecord{
-		ID:               emptyAsNil(contender.ID),
+		ID:               e2n(contender.ID),
 		OrganizerID:      contender.Ownership.OrganizerID,
 		ContestID:        contender.ContestID,
 		RegistrationCode: contender.RegistrationCode,
-		Name:             emptyAsNil(contender.Name),
-		Club:             emptyAsNil(contender.ClubName),
-		ClassID:          emptyAsNil(contender.CompClassID),
-		Entered:          emptyAsNil(contender.Entered),
+		Name:             e2n(contender.Name),
+		Club:             e2n(contender.ClubName),
+		ClassID:          e2n(contender.CompClassID),
+		Entered:          e2n(contender.Entered),
 		Disqualified:     contender.Disqualified,
 	}
 }
 
-func (r *contenderRecord) ToDomain() domain.Contender {
+func (r *contenderRecord) toDomain() domain.Contender {
 	return domain.Contender{
-		ID: nilAsEmpty(r.ID),
+		ID: n2e(r.ID),
 		Ownership: domain.OwnershipData{
 			OrganizerID: r.OrganizerID,
 			ContenderID: r.ID,
 		},
 		ContestID:           r.ContestID,
-		CompClassID:         nilAsEmpty(r.ClassID),
 		RegistrationCode:    r.RegistrationCode,
-		Name:                nilAsEmpty(r.Name),
-		PublicName:          nilAsEmpty(r.Name),
-		ClubName:            nilAsEmpty(r.Club),
-		Entered:             nilAsEmpty(r.Entered),
+		Name:                n2e(r.Name),
+		PublicName:          n2e(r.Name),
+		ClubName:            n2e(r.Club),
+		CompClassID:         n2e(r.ClassID),
+		Entered:             n2e(r.Entered),
 		WithdrawnFromFinals: false,
 		Disqualified:        r.Disqualified,
 		Score:               0,
@@ -64,14 +64,14 @@ func (d *Database) GetContender(ctx context.Context, tx domain.Transaction, cont
 	var record contenderRecord
 	err := transaction.db.WithContext(ctx).Raw(`SELECT * FROM contender WHERE id = ?`, contenderID).Scan(&record).Error
 
-	return record.ToDomain(), err
+	return record.toDomain(), err
 }
 
 func (d *Database) GetContenderByCode(ctx context.Context, tx domain.Transaction, registrationCode string) (domain.Contender, error) {
 	var record contenderRecord
 	err := d.db.WithContext(ctx).Raw(`SELECT * FROM contender WHERE registration_code = ?`, registrationCode).Scan(&record).Error
 
-	return record.ToDomain(), err
+	return record.toDomain(), err
 }
 
 func (d *Database) GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) ([]domain.Contender, error) {
@@ -85,7 +85,7 @@ func (d *Database) GetContendersByCompClass(ctx context.Context, tx domain.Trans
 	contenders := make([]domain.Contender, 0)
 
 	for _, record := range records {
-		contenders = append(contenders, record.ToDomain())
+		contenders = append(contenders, record.toDomain())
 	}
 
 	return contenders, nil
@@ -102,7 +102,7 @@ func (d *Database) GetContendersByContest(ctx context.Context, tx domain.Transac
 	contenders := make([]domain.Contender, 0)
 
 	for _, record := range records {
-		contenders = append(contenders, record.ToDomain())
+		contenders = append(contenders, record.toDomain())
 	}
 
 	return contenders, nil
@@ -120,13 +120,13 @@ func (d *Database) StoreContender(ctx context.Context, tx domain.Transaction, co
 			club = @Club,
 			class_id = @ClassID,
 			entered = @Entered,
-			disqualified = @Disqualified`, contenderRecord{}.ToRecord(contender),
+			disqualified = @Disqualified`, contenderRecord{}.fromDomain(contender),
 	).Scan(&storedRecord).Error
 	if err != nil {
 		return domain.Contender{}, nil
 	}
 
-	return storedRecord.ToDomain(), nil
+	return storedRecord.toDomain(), nil
 }
 
 func (d *Database) DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) error {

@@ -1,6 +1,6 @@
 package repository
 
-func emptyAsNil[T comparable](value T) *T {
+func e2n[T comparable](value T) *T {
 	var empty T
 
 	if value == empty {
@@ -10,7 +10,7 @@ func emptyAsNil[T comparable](value T) *T {
 	return &value
 }
 
-func nilAsEmpty[T comparable](value *T) T {
+func n2e[T comparable](value *T) T {
 	var empty T
 
 	if value == nil {

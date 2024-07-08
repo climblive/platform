@@ -8,52 +8,52 @@ import (
 )
 
 type contestRecord struct {
-	ID                 *int    `gorm:"column:id,primaryKey,autoIncrement:true"`
-	OrganizerID        int     `gorm:"column:organizer_id"`
-	Protected          bool    `gorm:"column:protected"`
-	SeriesID           *int    `gorm:"column:series_id"`
-	Name               string  `gorm:"column:name"`
-	Description        *string `gorm:"column:description"`
-	Location           *string `gorm:"column:location"`
-	FinalEnabled       bool    `gorm:"column:final_enabled"`
-	QualifyingProblems int     `gorm:"column:qualifying_problems"`
-	Finalists          int     `gorm:"column:finalists"`
-	Rules              *string `gorm:"column:rules"`
-	GracePeriod        int     `gorm:"column:grace_period"`
+	ID                 *int `gorm:"primaryKey;autoIncrement"`
+	OrganizerID        int
+	Protected          bool
+	SeriesID           *int
+	Name               string
+	Description        *string
+	Location           *string
+	FinalEnabled       bool
+	QualifyingProblems int
+	Finalists          int
+	Rules              *string
+	GracePeriod        int
 }
 
-func (r contestRecord) ToRecord(contest domain.Contest) contestRecord {
+func (r contestRecord) FromDomain(contest domain.Contest) contestRecord {
 	return contestRecord{
-		ID:                 emptyAsNil(contest.ID),
+		ID:                 e2n(contest.ID),
 		OrganizerID:        contest.Ownership.OrganizerID,
 		Protected:          contest.Protected,
-		SeriesID:           emptyAsNil(contest.SeriesID),
+		SeriesID:           e2n(contest.SeriesID),
 		Name:               contest.Name,
-		Description:        emptyAsNil(contest.Description),
-		Location:           emptyAsNil(contest.Location),
-		FinalEnabled:       contest.FinalEnabled,
+		Description:        e2n(contest.Description),
+		Location:           e2n(contest.Location),
+		FinalEnabled:       contest.FinalsEnabled,
 		QualifyingProblems: contest.QualifyingProblems,
 		Finalists:          contest.Finalists,
-		Rules:              emptyAsNil(contest.Rules),
+		Rules:              e2n(contest.Rules),
 		GracePeriod:        int(contest.GracePeriod.Seconds()),
 	}
 }
 
 func (r *contestRecord) ToDomain() domain.Contest {
 	return domain.Contest{
-		ID: nilAsEmpty(r.ID),
+		ID: n2e(r.ID),
 		Ownership: domain.OwnershipData{
 			OrganizerID: r.OrganizerID,
 		},
-		Location:           nilAsEmpty(r.Location),
-		SeriesID:           nilAsEmpty(r.SeriesID),
 		Protected:          r.Protected,
+		SeriesID:           n2e(r.SeriesID),
 		Name:               r.Name,
-		Description:        nilAsEmpty(r.Description),
-		FinalEnabled:       r.FinalEnabled,
+		Description:        n2e(r.Description),
+		Location:           n2e(r.Location),
+		FinalsEnabled:      r.FinalEnabled,
 		QualifyingProblems: r.QualifyingProblems,
 		Finalists:          r.Finalists,
-		Rules:              nilAsEmpty(r.Rules),
+		Rules:              n2e(r.Rules),
 		GracePeriod:        time.Duration(r.GracePeriod) * time.Second,
 	}
 }
