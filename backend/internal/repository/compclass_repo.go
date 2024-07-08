@@ -18,6 +18,10 @@ type compClassRecord struct {
 	TimeEnd     time.Time
 }
 
+func (compClassRecord) TableName() string {
+	return "comp_class"
+}
+
 func (r compClassRecord) fromDomain(compClass domain.CompClass) compClassRecord {
 	return compClassRecord{
 		ID:          e2n(compClass.ID),
@@ -47,13 +51,8 @@ func (r *compClassRecord) toDomain() domain.CompClass {
 }
 
 func (d *Database) GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) (domain.CompClass, error) {
-	transaction, ok := tx.(*transaction)
-	if !ok {
-		return domain.CompClass{}, ErrIncompatibleTransaction
-	}
-
 	var record compClassRecord
-	err := transaction.db.WithContext(ctx).Raw(`SELECT * FROM comp_class WHERE id = ?`, compClassID).Scan(&record).Error
+	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM comp_class WHERE id = ?`, compClassID).Scan(&record).Error
 
 	return record.toDomain(), err
 }

@@ -22,7 +22,11 @@ type contestRecord struct {
 	GracePeriod        int
 }
 
-func (r contestRecord) FromDomain(contest domain.Contest) contestRecord {
+func (contestRecord) TableName() string {
+	return "contest"
+}
+
+func (r contestRecord) fromDomain(contest domain.Contest) contestRecord {
 	return contestRecord{
 		ID:                 e2n(contest.ID),
 		OrganizerID:        contest.Ownership.OrganizerID,
@@ -39,7 +43,7 @@ func (r contestRecord) FromDomain(contest domain.Contest) contestRecord {
 	}
 }
 
-func (r *contestRecord) ToDomain() domain.Contest {
+func (r *contestRecord) toDomain() domain.Contest {
 	return domain.Contest{
 		ID: n2e(r.ID),
 		Ownership: domain.OwnershipData{
@@ -59,13 +63,8 @@ func (r *contestRecord) ToDomain() domain.Contest {
 }
 
 func (d *Database) GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (domain.Contest, error) {
-	transaction, ok := tx.(*transaction)
-	if !ok {
-		return domain.Contest{}, ErrIncompatibleTransaction
-	}
-
 	var record contestRecord
-	err := transaction.db.WithContext(ctx).Raw(`SELECT * FROM contest WHERE id = ?`, contestID).Scan(&record).Error
+	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contest WHERE id = ?`, contestID).Scan(&record).Error
 
-	return record.ToDomain(), err
+	return record.toDomain(), err
 }

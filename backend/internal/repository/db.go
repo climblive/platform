@@ -53,3 +53,12 @@ func (d *Database) Begin() domain.Transaction {
 		active: true,
 	}
 }
+
+func (d *Database) tx(tx domain.Transaction) *gorm.DB {
+	transaction, ok := tx.(*transaction)
+	if ok {
+		return transaction.db
+	} else {
+		return d.db
+	}
+}
