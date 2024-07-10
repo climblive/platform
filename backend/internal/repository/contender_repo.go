@@ -111,12 +111,7 @@ func (d *Database) StoreContender(ctx context.Context, tx domain.Transaction, co
 	var err error
 	var record contenderRecord = contenderRecord{}.fromDomain(contender)
 
-	if record.ID != nil {
-		err = d.tx(tx).WithContext(ctx).Create(&record).Error
-	} else {
-		err = d.tx(tx).WithContext(ctx).Save(&record).Error
-	}
-
+	err = d.tx(tx).WithContext(ctx).Save(&record).Error
 	if err != nil {
 		return domain.Contender{}, err
 	}
