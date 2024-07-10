@@ -62,6 +62,13 @@ func (r *contenderRecord) toDomain() domain.Contender {
 func (d *Database) GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) (domain.Contender, error) {
 	var record contenderRecord
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE id = ?`, contenderID).Scan(&record).Error
+	if err != nil {
+		return domain.Contender{}, err
+	}
+
+	if record.ID == nil {
+		return domain.Contender{}, domain.ErrNotFound
+	}
 
 	return record.toDomain(), err
 }
@@ -69,6 +76,13 @@ func (d *Database) GetContender(ctx context.Context, tx domain.Transaction, cont
 func (d *Database) GetContenderByCode(ctx context.Context, tx domain.Transaction, registrationCode string) (domain.Contender, error) {
 	var record contenderRecord
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE registration_code = ?`, registrationCode).Scan(&record).Error
+	if err != nil {
+		return domain.Contender{}, err
+	}
+
+	if record.ID == nil {
+		return domain.Contender{}, domain.ErrNotFound
+	}
 
 	return record.toDomain(), err
 }

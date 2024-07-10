@@ -34,7 +34,7 @@ type ContenderUseCase struct {
 func (uc *ContenderUseCase) GetContender(ctx context.Context, contenderID domain.ResourceID) (domain.Contender, error) {
 	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
 	if err != nil {
-		return domain.Contender{}, fmt.Errorf("%w: %w", domain.ErrNotFound, err)
+		return domain.Contender{}, err
 	}
 
 	if _, err := uc.Authorizer.HasOwnership(ctx, contender.Ownership); err != nil {
@@ -47,7 +47,7 @@ func (uc *ContenderUseCase) GetContender(ctx context.Context, contenderID domain
 func (uc *ContenderUseCase) GetContenderByCode(ctx context.Context, registrationCode string) (domain.Contender, error) {
 	contender, err := uc.Repo.GetContenderByCode(ctx, nil, registrationCode)
 	if err != nil {
-		return domain.Contender{}, fmt.Errorf("%w: %w", domain.ErrNotFound, err)
+		return domain.Contender{}, err
 	}
 
 	return withScore(contender, uc.ScoreKeeper), nil
