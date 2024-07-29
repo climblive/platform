@@ -16,7 +16,7 @@ import (
 func main() {
 	fmt.Println("Hello, Climbers!")
 
-	repo, err := repository.NewDatabase("climblive", "climblive", "host.docker.internal", "climblive")
+	repo, err := repository.NewDatabase("climblive", "climblive", "localhost", "climblive")
 	if err != nil {
 		log.Fatal(err)
 	}
