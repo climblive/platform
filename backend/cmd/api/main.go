@@ -16,7 +16,11 @@ import (
 func main() {
 	fmt.Println("Hello, Climbers!")
 
-	repo := repository.NewDatabase()
+	repo, err := repository.NewDatabase("climblive", "climblive", "localhost", "climblive")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	authorizer := authorizer.NewAuthorizer()
 	eventBroker := events.NewBroker()
 	scoreKeeper := scores.NewScoreKeeper()
@@ -30,7 +34,7 @@ func main() {
 
 	rest.InstallContenderHandler(&contenderUseCase)
 
-	err := http.ListenAndServe("localhost:80", nil)
+	err = http.ListenAndServe("localhost:80", nil)
 	if err != nil {
 		log.Fatal(err)
 	}

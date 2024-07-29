@@ -1,3 +1,3 @@
 package domain
 
-type ResourceID int
+type ResourceID = int

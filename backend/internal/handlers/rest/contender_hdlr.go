@@ -19,10 +19,10 @@ func InstallContenderHandler(contenderUseCase domain.ContenderUseCase) {
 	http.HandleFunc("GET /contenders/{contenderID}", handler.GetContender)
 	http.HandleFunc("GET /codes/{registrationCode}/contender", handler.GetContenderByCode)
 	http.HandleFunc("GET /compClasses/{compClassID}/contenders", handler.GetContendersByCompClass)
-	http.HandleFunc("GET /contest/{contestID}/contenders", handler.GetContendersByContest)
+	http.HandleFunc("GET /contests/{contestID}/contenders", handler.GetContendersByContest)
 	http.HandleFunc("PUT /contenders/{contenderID}", handler.UpdateContender)
 	http.HandleFunc("DELETE /contenders/{contenderID}", handler.DeleteContender)
-	http.HandleFunc("POST /contest/{contestID}/contenders", handler.CreateContenders)
+	http.HandleFunc("POST /contests/{contestID}/contenders", handler.CreateContenders)
 }
 
 func (hdlr *contenderHandler) GetContender(w http.ResponseWriter, r *http.Request) {
@@ -105,7 +105,7 @@ func (hdlr *contenderHandler) DeleteContender(w http.ResponseWriter, r *http.Req
 }
 
 type createContendersTemplate struct {
-	Number int
+	Number int `json:"number"`
 }
 
 func (hdlr *contenderHandler) CreateContenders(w http.ResponseWriter, r *http.Request) {

@@ -13,7 +13,7 @@ type Contest struct {
 	Protected          bool
 	Name               string
 	Description        string
-	FinalEnabled       bool
+	FinalsEnabled      bool
 	QualifyingProblems int
 	Finalists          int
 	Rules              string
