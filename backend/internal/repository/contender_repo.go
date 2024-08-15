@@ -70,7 +70,7 @@ func (d *Database) GetContender(ctx context.Context, tx domain.Transaction, cont
 		return domain.Contender{}, domain.ErrNotFound
 	}
 
-	return record.toDomain(), err
+	return record.toDomain(), nil
 }
 
 func (d *Database) GetContenderByCode(ctx context.Context, tx domain.Transaction, registrationCode string) (domain.Contender, error) {
@@ -84,7 +84,7 @@ func (d *Database) GetContenderByCode(ctx context.Context, tx domain.Transaction
 		return domain.Contender{}, domain.ErrNotFound
 	}
 
-	return record.toDomain(), err
+	return record.toDomain(), nil
 }
 
 func (d *Database) GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) ([]domain.Contender, error) {

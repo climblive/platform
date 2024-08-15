@@ -65,6 +65,13 @@ func (r *contestRecord) toDomain() domain.Contest {
 func (d *Database) GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (domain.Contest, error) {
 	var record contestRecord
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contest WHERE id = ?`, contestID).Scan(&record).Error
+	if err != nil {
+		return domain.Contest{}, err
+	}
 
-	return record.toDomain(), err
+	if record.ID == nil {
+		return domain.Contest{}, domain.ErrNotFound
+	}
+
+	return record.toDomain(), nil
 }
