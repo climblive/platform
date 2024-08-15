@@ -236,7 +236,7 @@ func (uc *ContenderUseCase) DeleteContender(ctx context.Context, contenderID dom
 		return err
 	}
 
-	if role != nil && !role.OneOf(domain.AdminRole, domain.OrganizerRole) {
+	if role != "" && !role.OneOf(domain.AdminRole, domain.OrganizerRole) {
 		return domain.ErrNotAllowed
 	}
 
