@@ -1,0 +1,11 @@
+INSERT INTO organizer VALUES (NULL, 'Test Organizer', 'https://example.org');
+INSERT INTO series VALUES (NULL, 1, 'Test series');
+INSERT INTO contest VALUES (NULL, 1, FALSE, 1, 'World Testing Championships', 'The world\'s number one competition for testing', 'On the web', TRUE, 10, 7, 'Everything is allowed', 300);
+INSERT INTO comp_class VALUES (NULL, 1, 1, 'Unicorns', '16 years and older', '#ff0000', '2024-01-01 00:00:00', '2024-01-01 06:00:00');
+INSERT INTO contender VALUES (NULL, 1, 1, 'ABCD1234', 'Albert Einstein', 'Testers\' Climbing Club', 1, '2024-01-01 00:00:00', FALSE);
+INSERT INTO problem VALUES (NULL, 1, 1, 1, '#ff0000', '#00ff00', 'The sloper', 'Very slippery', 100, 10);
+INSERT INTO tick VALUES (NULL, 1, 1, 1, 1, FALSE, '2024-01-01 00:00:00');
+INSERT INTO raffle VALUES (NULL, 1, 1, FALSE);
+INSERT INTO raffle_winner VALUES (NULL, 1, 1, 1, '2024-01-01 06:00:00');
+INSERT INTO user VALUES (NULL, 'John Doe', 'johndoe', FALSE);
+INSERT INTO user_organizer VALUES (1, 1);

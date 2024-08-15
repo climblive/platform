@@ -18,7 +18,7 @@ type repository interface {
 	GetContenderByCode(ctx context.Context, tx domain.Transaction, registrationCode string) (domain.Contender, error)
 	GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) ([]domain.Contender, error)
 	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) ([]domain.Contender, error)
-	StoreContender(ctx context.Context, tx domain.Transaction, contender domain.Contender) error
+	StoreContender(ctx context.Context, tx domain.Transaction, contender domain.Contender) (domain.Contender, error)
 	DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) error
 	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (domain.Contest, error)
 	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) (domain.CompClass, error)
@@ -34,7 +34,7 @@ type ContenderUseCase struct {
 func (uc *ContenderUseCase) GetContender(ctx context.Context, contenderID domain.ResourceID) (domain.Contender, error) {
 	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
 	if err != nil {
-		return domain.Contender{}, fmt.Errorf("%w: %w", domain.ErrNotFound, err)
+		return domain.Contender{}, err
 	}
 
 	if _, err := uc.Authorizer.HasOwnership(ctx, contender.Ownership); err != nil {
@@ -47,7 +47,7 @@ func (uc *ContenderUseCase) GetContender(ctx context.Context, contenderID domain
 func (uc *ContenderUseCase) GetContenderByCode(ctx context.Context, registrationCode string) (domain.Contender, error) {
 	contender, err := uc.Repo.GetContenderByCode(ctx, nil, registrationCode)
 	if err != nil {
-		return domain.Contender{}, fmt.Errorf("%w: %w", domain.ErrNotFound, err)
+		return domain.Contender{}, err
 	}
 
 	return withScore(contender, uc.ScoreKeeper), nil
@@ -214,7 +214,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 	contender.WithdrawnFromFinals = updates.WithdrawnFromFinals
 	contender.Disqualified = updates.Disqualified
 
-	if err := uc.Repo.StoreContender(ctx, nil, contender); err != nil {
+	if contender, err = uc.Repo.StoreContender(ctx, nil, contender); err != nil {
 		return mty, fmt.Errorf("%w: %w", domain.ErrRepositoryFailure, err)
 	}
 
@@ -236,7 +236,7 @@ func (uc *ContenderUseCase) DeleteContender(ctx context.Context, contenderID dom
 		return err
 	}
 
-	if !role.OneOf(domain.AdminRole, domain.OrganizerRole) {
+	if role != nil && !role.OneOf(domain.AdminRole, domain.OrganizerRole) {
 		return domain.ErrNotAllowed
 	}
 
@@ -279,11 +279,11 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID doma
 			RegistrationCode: string(code),
 		}
 
-		contenders = append(contenders, contender)
-
-		if err := uc.Repo.StoreContender(ctx, tx, contender); err != nil {
+		if contender, err = uc.Repo.StoreContender(ctx, tx, contender); err != nil {
 			return nil, fmt.Errorf("%w: %w", domain.ErrRepositoryFailure, err)
 		}
+
+		contenders = append(contenders, contender)
 	}
 
 	tx.Commit()
