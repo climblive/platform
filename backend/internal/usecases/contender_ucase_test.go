@@ -11,6 +11,74 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
+func TestGetContender_BadCredentials(t *testing.T) {
+	mockRepo := new(mockRepository)
+	mockAuthorizer := new(mockAuthorizer)
+	mockOwnership := domain.OwnershipData{}
+
+	mockAuthorizer.
+		On("HasOwnership", mock.Anything, mockOwnership).
+		Return(domain.NilRole, domain.ErrPermissionDenied)
+
+	mockRepo.
+		On("GetContender", mock.Anything, mock.Anything, 1).
+		Return(domain.Contender{Ownership: mockOwnership}, nil)
+
+	ucase := usecases.ContenderUseCase{
+		Repo:        mockRepo,
+		Authorizer:  mockAuthorizer,
+		ScoreKeeper: &mockScoreKeeper{},
+	}
+
+	contender, err := ucase.GetContender(context.Background(), 1)
+
+	assert.ErrorIs(t, err, domain.ErrPermissionDenied)
+	assert.Empty(t, contender)
+}
+
+func TestGetContender(t *testing.T) {
+	mockRepo := new(mockRepository)
+	mockAuthorizer := new(mockAuthorizer)
+	mockScoreKeeper := new(mockScoreKeeper)
+
+	mockOwnership := domain.OwnershipData{}
+	mockContender := domain.Contender{
+		ID:        1,
+		Ownership: mockOwnership,
+	}
+
+	mockAuthorizer.
+		On("HasOwnership", mock.Anything, mockOwnership).
+		Return(domain.ContenderRole, nil)
+
+	mockRepo.
+		On("GetContender", mock.Anything, mock.Anything, 1).
+		Return(mockContender, nil)
+
+	mockScoreKeeper.On("GetScore", 1).Return(domain.Score{
+		Timestamp:   time.Now().Truncate(time.Hour),
+		ContenderID: 1,
+		Score:       1000,
+		Placement:   5,
+	}, nil)
+
+	ucase := usecases.ContenderUseCase{
+		Repo:        mockRepo,
+		Authorizer:  mockAuthorizer,
+		ScoreKeeper: mockScoreKeeper,
+	}
+
+	contender, err := ucase.GetContender(context.Background(), 1)
+
+	assert.NoError(t, err)
+	assert.NotEmpty(t, contender, mockContender)
+
+	assert.Equal(t, 1, contender.ID)
+	assert.Equal(t, 1000, contender.Score)
+	assert.Equal(t, 5, contender.Placement)
+	assert.Equal(t, time.Now().Truncate(time.Hour), *contender.ScoreUpdated)
+}
+
 type mockRepository struct {
 	mock.Mock
 }
@@ -81,72 +149,4 @@ func (m *mockScoreKeeper) UpdateScore(contenderID domain.ResourceID, score domai
 func (m *mockScoreKeeper) GetScore(contenderID domain.ResourceID) (domain.Score, error) {
 	args := m.Called(contenderID)
 	return args.Get(0).(domain.Score), args.Error(1)
-}
-
-func TestGetContender_BadCredentials(t *testing.T) {
-	mockRepo := new(mockRepository)
-	mockAuthorizer := new(mockAuthorizer)
-	mockOwnership := domain.OwnershipData{}
-
-	mockAuthorizer.
-		On("HasOwnership", mock.Anything, mockOwnership).
-		Return(domain.NilRole, domain.ErrPermissionDenied)
-
-	mockRepo.
-		On("GetContender", mock.Anything, mock.Anything, 1).
-		Return(domain.Contender{Ownership: mockOwnership}, nil)
-
-	ucase := usecases.ContenderUseCase{
-		Repo:        mockRepo,
-		Authorizer:  mockAuthorizer,
-		ScoreKeeper: &mockScoreKeeper{},
-	}
-
-	contender, err := ucase.GetContender(context.Background(), 1)
-
-	assert.ErrorIs(t, err, domain.ErrPermissionDenied)
-	assert.Empty(t, contender)
-}
-
-func TestGetContender(t *testing.T) {
-	mockRepo := new(mockRepository)
-	mockAuthorizer := new(mockAuthorizer)
-	mockScoreKeeper := new(mockScoreKeeper)
-
-	mockOwnership := domain.OwnershipData{}
-	mockContender := domain.Contender{
-		ID:        1,
-		Ownership: mockOwnership,
-	}
-
-	mockAuthorizer.
-		On("HasOwnership", mock.Anything, mockOwnership).
-		Return(domain.ContenderRole, nil)
-
-	mockRepo.
-		On("GetContender", mock.Anything, mock.Anything, 1).
-		Return(mockContender, nil)
-
-	mockScoreKeeper.On("GetScore", 1).Return(domain.Score{
-		Timestamp:   time.Now().Truncate(time.Hour),
-		ContenderID: 1,
-		Score:       1000,
-		Placement:   5,
-	}, nil)
-
-	ucase := usecases.ContenderUseCase{
-		Repo:        mockRepo,
-		Authorizer:  mockAuthorizer,
-		ScoreKeeper: mockScoreKeeper,
-	}
-
-	contender, err := ucase.GetContender(context.Background(), 1)
-
-	assert.NoError(t, err)
-	assert.NotEmpty(t, contender, mockContender)
-
-	assert.Equal(t, 1, contender.ID)
-	assert.Equal(t, 1000, contender.Score)
-	assert.Equal(t, 5, contender.Placement)
-	assert.Equal(t, time.Now().Truncate(time.Hour), *contender.ScoreUpdated)
 }
