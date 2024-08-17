@@ -35,9 +35,11 @@ func writeError(w http.ResponseWriter, err error) {
 	switch {
 	case errors.Is(err, domain.ErrNotFound):
 		w.WriteHeader(http.StatusNotFound)
-	case errors.Is(err, domain.ErrPermissionDenied):
+	case errors.Is(err, domain.ErrNoOwnership):
 		fallthrough
 	case errors.Is(err, domain.ErrContestEnded):
+		fallthrough
+	case errors.Is(err, domain.ErrInsufficientRole):
 		fallthrough
 	case errors.Is(err, domain.ErrNotAllowed):
 		w.WriteHeader(http.StatusForbidden)

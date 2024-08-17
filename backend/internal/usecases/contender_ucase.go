@@ -237,7 +237,7 @@ func (uc *ContenderUseCase) DeleteContender(ctx context.Context, contenderID dom
 	}
 
 	if !role.OneOf(domain.AdminRole, domain.OrganizerRole) {
-		return domain.ErrNotAllowed
+		return domain.ErrInsufficientRole
 	}
 
 	if err := uc.Repo.DeleteContender(ctx, nil, contenderID); err != nil {
