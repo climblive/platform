@@ -5,20 +5,13 @@ import (
 )
 
 type transaction struct {
-	db     *gorm.DB
-	active bool
+	db *gorm.DB
 }
 
 func (tx *transaction) Commit() error {
-	tx.active = false
 	return tx.db.Commit().Error
 }
 
 func (tx *transaction) Rollback() {
-	if !tx.active {
-		return
-	}
-
-	tx.active = false
 	tx.db.Rollback()
 }
