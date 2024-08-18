@@ -11,160 +11,143 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestGetContender_BadCredentials(t *testing.T) {
-	mockRepo := new(mockRepository)
-	mockAuthorizer := new(mockAuthorizer)
-	mockOwnership := domain.OwnershipData{}
-
-	mockAuthorizer.
-		On("HasOwnership", mock.Anything, mockOwnership).
-		Return(domain.NilRole, domain.ErrNoOwnership)
-
-	mockRepo.
-		On("GetContender", mock.Anything, mock.Anything, 1).
-		Return(domain.Contender{Ownership: mockOwnership}, nil)
-
-	ucase := usecases.ContenderUseCase{
-		Repo:        mockRepo,
-		Authorizer:  mockAuthorizer,
-		ScoreKeeper: &mockScoreKeeper{},
+func TestGetContender(t *testing.T) {
+	mockContenderID := domain.ResourceID(1)
+	mockOwnership := domain.OwnershipData{
+		OrganizerID: 1,
+		ContenderID: &mockContenderID,
 	}
 
-	contender, err := ucase.GetContender(context.Background(), 1)
-
-	assert.ErrorIs(t, err, domain.ErrNoOwnership)
-	assert.Empty(t, contender)
-}
-
-func TestGetContender(t *testing.T) {
-	mockRepo := new(mockRepository)
-	mockAuthorizer := new(mockAuthorizer)
-	mockScoreKeeper := new(mockScoreKeeper)
-
-	mockOwnership := domain.OwnershipData{}
 	mockContender := domain.Contender{
-		ID:        1,
+		ID:        mockContenderID,
 		Ownership: mockOwnership,
 	}
 
-	mockAuthorizer.
-		On("HasOwnership", mock.Anything, mockOwnership).
-		Return(domain.ContenderRole, nil)
+	mockRepo := new(mockRepository)
+	mockScoreKeeper := new(mockScoreKeeper)
 
 	mockRepo.
-		On("GetContender", mock.Anything, mock.Anything, 1).
+		On("GetContender", mock.Anything, mock.Anything, mockContenderID).
 		Return(mockContender, nil)
 
-	mockScoreKeeper.On("GetScore", 1).Return(domain.Score{
+	mockScoreKeeper.On("GetScore", mockContenderID).Return(domain.Score{
 		Timestamp:   time.Now().Truncate(time.Hour),
-		ContenderID: 1,
+		ContenderID: mockContenderID,
 		Score:       1000,
 		Placement:   5,
 	}, nil)
 
-	ucase := usecases.ContenderUseCase{
-		Repo:        mockRepo,
-		Authorizer:  mockAuthorizer,
-		ScoreKeeper: mockScoreKeeper,
-	}
+	t.Run("HappyPath", func(t *testing.T) {
+		mockAuthorizer := new(mockAuthorizer)
 
-	contender, err := ucase.GetContender(context.Background(), 1)
+		mockAuthorizer.
+			On("HasOwnership", mock.Anything, mockOwnership).
+			Return(domain.ContenderRole, nil)
 
-	assert.NoError(t, err)
-	assert.NotEmpty(t, contender, mockContender)
+		ucase := usecases.ContenderUseCase{
+			Repo:        mockRepo,
+			Authorizer:  mockAuthorizer,
+			ScoreKeeper: mockScoreKeeper,
+		}
 
-	assert.Equal(t, 1, contender.ID)
-	assert.Equal(t, 1000, contender.Score)
-	assert.Equal(t, 5, contender.Placement)
-	assert.Equal(t, time.Now().Truncate(time.Hour), *contender.ScoreUpdated)
-}
+		contender, err := ucase.GetContender(context.Background(), mockContenderID)
 
-func TestDeleteContender_BadCredentials(t *testing.T) {
-	var contenderID domain.ResourceID = 1
+		assert.NoError(t, err)
 
-	mockRepo := new(mockRepository)
-	mockAuthorizer := new(mockAuthorizer)
-	mockOwnership := domain.OwnershipData{
-		OrganizerID: 1,
-		ContenderID: &contenderID,
-	}
+		assert.Equal(t, mockContenderID, contender.ID)
+		assert.Equal(t, 1000, contender.Score)
+		assert.Equal(t, 5, contender.Placement)
+		assert.Equal(t, time.Now().Truncate(time.Hour), *contender.ScoreUpdated)
 
-	mockAuthorizer.
-		On("HasOwnership", mock.Anything, mockOwnership).
-		Return(domain.NilRole, domain.ErrNoOwnership)
+	})
 
-	mockRepo.
-		On("GetContender", mock.Anything, mock.Anything, 1).
-		Return(domain.Contender{Ownership: mockOwnership}, nil)
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockAuthorizer := new(mockAuthorizer)
 
-	ucase := usecases.ContenderUseCase{
-		Repo:       mockRepo,
-		Authorizer: mockAuthorizer,
-	}
+		mockAuthorizer.
+			On("HasOwnership", mock.Anything, mockOwnership).
+			Return(domain.NilRole, domain.ErrNoOwnership)
 
-	err := ucase.DeleteContender(context.Background(), 1)
+		ucase := usecases.ContenderUseCase{
+			Repo:        mockRepo,
+			Authorizer:  mockAuthorizer,
+			ScoreKeeper: mockScoreKeeper,
+		}
 
-	assert.ErrorIs(t, err, domain.ErrNoOwnership)
-}
+		contender, err := ucase.GetContender(context.Background(), mockContenderID)
 
-func TestDeleteContender_InsufficientRole(t *testing.T) {
-	var contenderID domain.ResourceID = 1
-
-	mockRepo := new(mockRepository)
-	mockAuthorizer := new(mockAuthorizer)
-	mockOwnership := domain.OwnershipData{
-		OrganizerID: 1,
-		ContenderID: &contenderID,
-	}
-
-	mockAuthorizer.
-		On("HasOwnership", mock.Anything, mockOwnership).
-		Return(domain.ContenderRole, nil)
-
-	mockRepo.
-		On("GetContender", mock.Anything, mock.Anything, 1).
-		Return(domain.Contender{Ownership: mockOwnership}, nil)
-
-	ucase := usecases.ContenderUseCase{
-		Repo:       mockRepo,
-		Authorizer: mockAuthorizer,
-	}
-
-	err := ucase.DeleteContender(context.Background(), 1)
-
-	assert.ErrorIs(t, err, domain.ErrInsufficientRole)
+		assert.ErrorIs(t, err, domain.ErrNoOwnership)
+		assert.Empty(t, contender)
+	})
 }
 
 func TestDeleteContender(t *testing.T) {
-	var contenderID domain.ResourceID = 1
-
-	mockRepo := new(mockRepository)
-	mockAuthorizer := new(mockAuthorizer)
+	mockContenderID := domain.ResourceID(1)
 	mockOwnership := domain.OwnershipData{
 		OrganizerID: 1,
-		ContenderID: &contenderID,
+		ContenderID: &mockContenderID,
 	}
 
-	mockAuthorizer.
-		On("HasOwnership", mock.Anything, mockOwnership).
-		Return(domain.OrganizerRole, nil)
+	mockRepo := new(mockRepository)
 
 	mockRepo.
-		On("GetContender", mock.Anything, mock.Anything, 1).
+		On("GetContender", mock.Anything, mock.Anything, mockContenderID).
 		Return(domain.Contender{Ownership: mockOwnership}, nil)
 
 	mockRepo.
-		On("DeleteContender", mock.Anything, mock.Anything, 1).
+		On("DeleteContender", mock.Anything, mock.Anything, mockContenderID).
 		Return(nil)
 
-	ucase := usecases.ContenderUseCase{
-		Repo:       mockRepo,
-		Authorizer: mockAuthorizer,
-	}
+	t.Run("HappyPath", func(t *testing.T) {
+		mockAuthorizer := new(mockAuthorizer)
 
-	err := ucase.DeleteContender(context.Background(), 1)
+		mockAuthorizer.
+			On("HasOwnership", mock.Anything, mockOwnership).
+			Return(domain.OrganizerRole, nil)
 
-	assert.NoError(t, err)
+		ucase := usecases.ContenderUseCase{
+			Repo:       mockRepo,
+			Authorizer: mockAuthorizer,
+		}
+
+		err := ucase.DeleteContender(context.Background(), mockContenderID)
+
+		assert.NoError(t, err)
+	})
+
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockAuthorizer := new(mockAuthorizer)
+
+		mockAuthorizer.
+			On("HasOwnership", mock.Anything, mockOwnership).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		ucase := usecases.ContenderUseCase{
+			Repo:       mockRepo,
+			Authorizer: mockAuthorizer,
+		}
+
+		err := ucase.DeleteContender(context.Background(), mockContenderID)
+
+		assert.ErrorIs(t, err, domain.ErrNoOwnership)
+	})
+
+	t.Run("InsufficientRole", func(t *testing.T) {
+		mockAuthorizer := new(mockAuthorizer)
+
+		mockAuthorizer.
+			On("HasOwnership", mock.Anything, mockOwnership).
+			Return(domain.ContenderRole, nil)
+
+		ucase := usecases.ContenderUseCase{
+			Repo:       mockRepo,
+			Authorizer: mockAuthorizer,
+		}
+
+		err := ucase.DeleteContender(context.Background(), mockContenderID)
+
+		assert.ErrorIs(t, err, domain.ErrInsufficientRole)
+	})
 }
 
 type mockRepository struct {
