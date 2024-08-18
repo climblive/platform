@@ -31,3 +31,7 @@ type ContenderUseCase interface {
 	DeleteContender(ctx context.Context, contenderID ResourceID) error
 	CreateContenders(ctx context.Context, contestID ResourceID, number int) ([]Contender, error)
 }
+
+type CodeGenerator interface {
+	Generate(length int) string
+}

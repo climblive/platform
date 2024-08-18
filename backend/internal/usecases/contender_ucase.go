@@ -3,13 +3,10 @@ package usecases
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 )
-
-const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 type repository interface {
 	domain.Transactor
@@ -25,10 +22,11 @@ type repository interface {
 }
 
 type ContenderUseCase struct {
-	Repo        repository
-	Authorizer  domain.Authorizer
-	EventBroker domain.EventBroker
-	ScoreKeeper domain.ScoreKeeper
+	Repo                      repository
+	Authorizer                domain.Authorizer
+	EventBroker               domain.EventBroker
+	ScoreKeeper               domain.ScoreKeeper
+	RegistrationCodeGenerator domain.CodeGenerator
 }
 
 func (uc *ContenderUseCase) GetContender(ctx context.Context, contenderID domain.ResourceID) (domain.Contender, error) {
@@ -262,24 +260,19 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID doma
 	contenders := make([]domain.Contender, 0)
 
 	tx := uc.Repo.Begin()
-	defer tx.Rollback()
 
 	for range number {
-		var code []rune
-
-		for range registrationCodeLength {
-			code = append(code, []rune(characters)[rand.Intn(len(characters))])
-		}
 
 		contender := domain.Contender{
 			ContestID: contestID,
 			Ownership: domain.OwnershipData{
 				OrganizerID: contest.Ownership.OrganizerID,
 			},
-			RegistrationCode: string(code),
+			RegistrationCode: uc.RegistrationCodeGenerator.Generate(registrationCodeLength),
 		}
 
 		if contender, err = uc.Repo.StoreContender(ctx, tx, contender); err != nil {
+			tx.Rollback()
 			return nil, fmt.Errorf("%w: %w", domain.ErrRepositoryFailure, err)
 		}
 

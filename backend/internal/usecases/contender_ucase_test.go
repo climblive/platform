@@ -2,6 +2,8 @@ package usecases_test
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -148,6 +150,123 @@ func TestDeleteContender(t *testing.T) {
 
 		assert.ErrorIs(t, err, domain.ErrInsufficientRole)
 	})
+}
+
+func TestCreateContenders(t *testing.T) {
+	mockContestID := domain.ResourceID(1)
+	mockOwnership := domain.OwnershipData{
+		OrganizerID: 1,
+	}
+
+	mockRepo := new(mockRepository)
+	mockTx := new(mockTransaction)
+	mockCodeGenerator := new(mockCodeGenerator)
+
+	mockRepo.
+		On("GetContest", mock.Anything, mock.Anything, mockContestID).
+		Return(domain.Contest{
+			ID:        mockContestID,
+			Ownership: mockOwnership,
+		}, nil)
+
+	for n := range 100 {
+		code := fmt.Sprintf("%08d", n)
+		contender := domain.Contender{
+			ContestID: 1,
+			Ownership: domain.OwnershipData{
+				OrganizerID: 1,
+			},
+			RegistrationCode: code,
+		}
+
+		mockCodeGenerator.
+			On("Generate", 8).
+			Return(code).Once()
+
+		mockRepo.
+			On("StoreContender", mock.Anything, mock.Anything, contender).
+			Return(contender, nil)
+	}
+
+	mockRepo.
+		On("Begin").
+		Return(mockTx, nil)
+
+	mockTx.On("Commit").Return(nil)
+	mockTx.On("Rollback").Return()
+
+	t.Run("HappyPath", func(t *testing.T) {
+		mockAuthorizer := new(mockAuthorizer)
+
+		mockAuthorizer.
+			On("HasOwnership", mock.Anything, mockOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		ucase := usecases.ContenderUseCase{
+			Repo:                      mockRepo,
+			Authorizer:                mockAuthorizer,
+			RegistrationCodeGenerator: mockCodeGenerator,
+		}
+
+		contenders, err := ucase.CreateContenders(context.Background(), mockContestID, 100)
+
+		assert.NoError(t, err)
+		assert.Len(t, contenders, 100)
+
+		mockRepo.AssertExpectations(t)
+		mockTx.AssertNumberOfCalls(t, "Commit", 1)
+		mockTx.AssertNotCalled(t, "Rollback")
+
+		for idx, contender := range contenders {
+			assert.Equal(t, fmt.Sprintf("%08d", idx), contender.RegistrationCode)
+		}
+	})
+
+	t.Run("Rollback", func(t *testing.T) {
+		t.Fail()
+	})
+
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockAuthorizer := new(mockAuthorizer)
+
+		mockAuthorizer.
+			On("HasOwnership", mock.Anything, mockOwnership).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		ucase := usecases.ContenderUseCase{
+			Repo:       mockRepo,
+			Authorizer: mockAuthorizer,
+		}
+
+		contender, err := ucase.CreateContenders(context.Background(), mockContestID, 100)
+
+		assert.ErrorIs(t, err, domain.ErrNoOwnership)
+		assert.Empty(t, contender)
+	})
+}
+
+var errSimulatedRepositoryFailure = errors.New("simulated repository failure")
+
+type mockTransaction struct {
+	mock.Mock
+}
+
+func (m *mockTransaction) Commit() error {
+	args := m.Called()
+	return args.Error(0)
+}
+
+func (m *mockTransaction) Rollback() {
+	m.Called()
+}
+
+type mockCodeGenerator struct {
+	mock.Mock
+}
+
+func (m *mockCodeGenerator) Generate(length int) string {
+	args := m.Called(length)
+	return args.Get(0).(string)
 }
 
 type mockRepository struct {
