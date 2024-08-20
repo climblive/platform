@@ -14,49 +14,49 @@ import (
 )
 
 func TestGetContender(t *testing.T) {
-	mockContenderID := domain.ResourceID(1)
-	mockOwnership := domain.OwnershipData{
+	mockedContenderID := domain.ResourceID(1)
+	mockedOwnership := domain.OwnershipData{
 		OrganizerID: 1,
-		ContenderID: &mockContenderID,
+		ContenderID: &mockedContenderID,
 	}
 
-	mockContender := domain.Contender{
-		ID:        mockContenderID,
-		Ownership: mockOwnership,
+	mockedContender := domain.Contender{
+		ID:        mockedContenderID,
+		Ownership: mockedOwnership,
 	}
 
-	mockRepo := new(mockRepository)
-	mockScoreKeeper := new(mockScoreKeeper)
+	mockedRepo := new(repositoryMock)
+	mockedScoreKeeper := new(scoreKeeperMock)
 
-	mockRepo.
-		On("GetContender", mock.Anything, mock.Anything, mockContenderID).
-		Return(mockContender, nil)
+	mockedRepo.
+		On("GetContender", mock.Anything, mock.Anything, mockedContenderID).
+		Return(mockedContender, nil)
 
-	mockScoreKeeper.On("GetScore", mockContenderID).Return(domain.Score{
+	mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{
 		Timestamp:   time.Now().Truncate(time.Hour),
-		ContenderID: mockContenderID,
+		ContenderID: mockedContenderID,
 		Score:       1000,
 		Placement:   5,
 	}, nil)
 
 	t.Run("HappyPath", func(t *testing.T) {
-		mockAuthorizer := new(mockAuthorizer)
+		mockedAuthorizer := new(authorizerMock)
 
-		mockAuthorizer.
-			On("HasOwnership", mock.Anything, mockOwnership).
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.ContenderRole, nil)
 
 		ucase := usecases.ContenderUseCase{
-			Repo:        mockRepo,
-			Authorizer:  mockAuthorizer,
-			ScoreKeeper: mockScoreKeeper,
+			Repo:        mockedRepo,
+			Authorizer:  mockedAuthorizer,
+			ScoreKeeper: mockedScoreKeeper,
 		}
 
-		contender, err := ucase.GetContender(context.Background(), mockContenderID)
+		contender, err := ucase.GetContender(context.Background(), mockedContenderID)
 
 		assert.NoError(t, err)
 
-		assert.Equal(t, mockContenderID, contender.ID)
+		assert.Equal(t, mockedContenderID, contender.ID)
 		assert.Equal(t, 1000, contender.Score)
 		assert.Equal(t, 5, contender.Placement)
 		assert.Equal(t, time.Now().Truncate(time.Hour), *contender.ScoreUpdated)
@@ -64,19 +64,19 @@ func TestGetContender(t *testing.T) {
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {
-		mockAuthorizer := new(mockAuthorizer)
+		mockedAuthorizer := new(authorizerMock)
 
-		mockAuthorizer.
-			On("HasOwnership", mock.Anything, mockOwnership).
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.NilRole, domain.ErrNoOwnership)
 
 		ucase := usecases.ContenderUseCase{
-			Repo:        mockRepo,
-			Authorizer:  mockAuthorizer,
-			ScoreKeeper: mockScoreKeeper,
+			Repo:        mockedRepo,
+			Authorizer:  mockedAuthorizer,
+			ScoreKeeper: mockedScoreKeeper,
 		}
 
-		contender, err := ucase.GetContender(context.Background(), mockContenderID)
+		contender, err := ucase.GetContender(context.Background(), mockedContenderID)
 
 		assert.ErrorIs(t, err, domain.ErrNoOwnership)
 		assert.Empty(t, contender)
@@ -84,89 +84,89 @@ func TestGetContender(t *testing.T) {
 }
 
 func TestDeleteContender(t *testing.T) {
-	mockContenderID := domain.ResourceID(1)
-	mockOwnership := domain.OwnershipData{
+	mockedContenderID := domain.ResourceID(1)
+	mockedOwnership := domain.OwnershipData{
 		OrganizerID: 1,
-		ContenderID: &mockContenderID,
+		ContenderID: &mockedContenderID,
 	}
 
-	mockRepo := new(mockRepository)
+	mockedRepo := new(repositoryMock)
 
-	mockRepo.
-		On("GetContender", mock.Anything, mock.Anything, mockContenderID).
-		Return(domain.Contender{Ownership: mockOwnership}, nil)
+	mockedRepo.
+		On("GetContender", mock.Anything, mock.Anything, mockedContenderID).
+		Return(domain.Contender{Ownership: mockedOwnership}, nil)
 
-	mockRepo.
-		On("DeleteContender", mock.Anything, mock.Anything, mockContenderID).
+	mockedRepo.
+		On("DeleteContender", mock.Anything, mock.Anything, mockedContenderID).
 		Return(nil)
 
 	t.Run("HappyPath", func(t *testing.T) {
-		mockAuthorizer := new(mockAuthorizer)
+		mockedAuthorizer := new(authorizerMock)
 
-		mockAuthorizer.
-			On("HasOwnership", mock.Anything, mockOwnership).
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.OrganizerRole, nil)
 
 		ucase := usecases.ContenderUseCase{
-			Repo:       mockRepo,
-			Authorizer: mockAuthorizer,
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
 		}
 
-		err := ucase.DeleteContender(context.Background(), mockContenderID)
+		err := ucase.DeleteContender(context.Background(), mockedContenderID)
 
 		assert.NoError(t, err)
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {
-		mockAuthorizer := new(mockAuthorizer)
+		mockedAuthorizer := new(authorizerMock)
 
-		mockAuthorizer.
-			On("HasOwnership", mock.Anything, mockOwnership).
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.NilRole, domain.ErrNoOwnership)
 
 		ucase := usecases.ContenderUseCase{
-			Repo:       mockRepo,
-			Authorizer: mockAuthorizer,
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
 		}
 
-		err := ucase.DeleteContender(context.Background(), mockContenderID)
+		err := ucase.DeleteContender(context.Background(), mockedContenderID)
 
 		assert.ErrorIs(t, err, domain.ErrNoOwnership)
 	})
 
 	t.Run("InsufficientRole", func(t *testing.T) {
-		mockAuthorizer := new(mockAuthorizer)
+		mockedAuthorizer := new(authorizerMock)
 
-		mockAuthorizer.
-			On("HasOwnership", mock.Anything, mockOwnership).
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.ContenderRole, nil)
 
 		ucase := usecases.ContenderUseCase{
-			Repo:       mockRepo,
-			Authorizer: mockAuthorizer,
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
 		}
 
-		err := ucase.DeleteContender(context.Background(), mockContenderID)
+		err := ucase.DeleteContender(context.Background(), mockedContenderID)
 
 		assert.ErrorIs(t, err, domain.ErrInsufficientRole)
 	})
 }
 
 func TestCreateContenders(t *testing.T) {
-	mockContestID := domain.ResourceID(1)
-	mockOwnership := domain.OwnershipData{
+	mockedContestID := domain.ResourceID(1)
+	mockedOwnership := domain.OwnershipData{
 		OrganizerID: 1,
 	}
 
-	mockRepo := new(mockRepository)
-	mockTx := new(mockTransaction)
+	mockedRepo := new(repositoryMock)
+	mockedTx := new(transactionMock)
 	mockedCodeGenerator := new(codeGeneratorMock)
 
-	mockRepo.
-		On("GetContest", mock.Anything, mock.Anything, mockContestID).
+	mockedRepo.
+		On("GetContest", mock.Anything, mock.Anything, mockedContestID).
 		Return(domain.Contest{
-			ID:        mockContestID,
-			Ownership: mockOwnership,
+			ID:        mockedContestID,
+			Ownership: mockedOwnership,
 		}, nil)
 
 	for n := range 100 {
@@ -183,39 +183,39 @@ func TestCreateContenders(t *testing.T) {
 			On("Generate", 8).
 			Return(code).Once()
 
-		mockRepo.
+		mockedRepo.
 			On("StoreContender", mock.Anything, mock.Anything, contender).
 			Return(contender, nil)
 	}
 
-	mockRepo.
+	mockedRepo.
 		On("Begin").
-		Return(mockTx, nil)
+		Return(mockedTx, nil)
 
-	mockTx.On("Commit").Return(nil)
-	mockTx.On("Rollback").Return()
+	mockedTx.On("Commit").Return(nil)
+	mockedTx.On("Rollback").Return()
 
 	t.Run("HappyPath", func(t *testing.T) {
-		mockAuthorizer := new(mockAuthorizer)
+		mockedAuthorizer := new(authorizerMock)
 
-		mockAuthorizer.
-			On("HasOwnership", mock.Anything, mockOwnership).
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.OrganizerRole, nil)
 
 		ucase := usecases.ContenderUseCase{
-			Repo:                      mockRepo,
-			Authorizer:                mockAuthorizer,
+			Repo:                      mockedRepo,
+			Authorizer:                mockedAuthorizer,
 			RegistrationCodeGenerator: mockedCodeGenerator,
 		}
 
-		contenders, err := ucase.CreateContenders(context.Background(), mockContestID, 100)
+		contenders, err := ucase.CreateContenders(context.Background(), mockedContestID, 100)
 
 		assert.NoError(t, err)
 		assert.Len(t, contenders, 100)
 
-		mockRepo.AssertExpectations(t)
-		mockTx.AssertNumberOfCalls(t, "Commit", 1)
-		mockTx.AssertNotCalled(t, "Rollback")
+		mockedRepo.AssertExpectations(t)
+		mockedTx.AssertNumberOfCalls(t, "Commit", 1)
+		mockedTx.AssertNotCalled(t, "Rollback")
 
 		for idx, contender := range contenders {
 			assert.Equal(t, fmt.Sprintf("%08d", idx), contender.RegistrationCode)
@@ -223,18 +223,18 @@ func TestCreateContenders(t *testing.T) {
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {
-		mockAuthorizer := new(mockAuthorizer)
+		mockedAuthorizer := new(authorizerMock)
 
-		mockAuthorizer.
-			On("HasOwnership", mock.Anything, mockOwnership).
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.NilRole, domain.ErrNoOwnership)
 
 		ucase := usecases.ContenderUseCase{
-			Repo:       mockRepo,
-			Authorizer: mockAuthorizer,
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
 		}
 
-		contender, err := ucase.CreateContenders(context.Background(), mockContestID, 100)
+		contender, err := ucase.CreateContenders(context.Background(), mockedContestID, 100)
 
 		assert.ErrorIs(t, err, domain.ErrNoOwnership)
 		assert.Empty(t, contender)
@@ -242,28 +242,28 @@ func TestCreateContenders(t *testing.T) {
 }
 
 func TestCreateContenders_Rollback(t *testing.T) {
-	mockContestID := domain.ResourceID(1)
+	mockedContestID := domain.ResourceID(1)
 
-	mockRepo := new(mockRepository)
-	mockTx := new(mockTransaction)
-	mockAuthorizer := new(mockAuthorizer)
+	mockedRepo := new(repositoryMock)
+	mockedTx := new(transactionMock)
+	mockedAuthorizer := new(authorizerMock)
 	mockedCodeGenerator := new(codeGeneratorMock)
 
-	mockRepo.
-		On("GetContest", mock.Anything, mock.Anything, mockContestID).
+	mockedRepo.
+		On("GetContest", mock.Anything, mock.Anything, mockedContestID).
 		Return(domain.Contest{}, nil)
 
-	mockRepo.
+	mockedRepo.
 		On("Begin").
-		Return(mockTx, nil)
+		Return(mockedTx, nil)
 
-	mockRepo.
+	mockedRepo.
 		On("StoreContender", mock.Anything, mock.Anything, mock.Anything).
 		Return(domain.Contender{}, errMock)
 
-	mockTx.On("Rollback").Return()
+	mockedTx.On("Rollback").Return()
 
-	mockAuthorizer.
+	mockedAuthorizer.
 		On("HasOwnership", mock.Anything, domain.OwnershipData{}).
 		Return(domain.AdminRole, nil)
 
@@ -272,32 +272,32 @@ func TestCreateContenders_Rollback(t *testing.T) {
 		Return("DEAFBEEF")
 
 	ucase := usecases.ContenderUseCase{
-		Repo:                      mockRepo,
-		Authorizer:                mockAuthorizer,
+		Repo:                      mockedRepo,
+		Authorizer:                mockedAuthorizer,
 		RegistrationCodeGenerator: mockedCodeGenerator,
 	}
 
-	contenders, err := ucase.CreateContenders(context.Background(), mockContestID, 1)
+	contenders, err := ucase.CreateContenders(context.Background(), mockedContestID, 1)
 
 	assert.Error(t, err)
 	assert.Nil(t, contenders)
 
-	mockRepo.AssertExpectations(t)
-	mockTx.AssertExpectations(t)
+	mockedRepo.AssertExpectations(t)
+	mockedTx.AssertExpectations(t)
 }
 
 var errMock = errors.New("mock error")
 
-type mockTransaction struct {
+type transactionMock struct {
 	mock.Mock
 }
 
-func (m *mockTransaction) Commit() error {
+func (m *transactionMock) Commit() error {
 	args := m.Called()
 	return args.Error(0)
 }
 
-func (m *mockTransaction) Rollback() {
+func (m *transactionMock) Rollback() {
 	m.Called()
 }
 
@@ -310,74 +310,74 @@ func (m *codeGeneratorMock) Generate(length int) string {
 	return args.Get(0).(string)
 }
 
-type mockRepository struct {
+type repositoryMock struct {
 	mock.Mock
 }
 
-func (m *mockRepository) Begin() domain.Transaction {
+func (m *repositoryMock) Begin() domain.Transaction {
 	args := m.Called()
 	return args.Get(0).(domain.Transaction)
 }
 
-func (m *mockRepository) GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) (domain.Contender, error) {
+func (m *repositoryMock) GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) (domain.Contender, error) {
 	args := m.Called(ctx, tx, contenderID)
 	return args.Get(0).(domain.Contender), args.Error(1)
 }
 
-func (m *mockRepository) GetContenderByCode(ctx context.Context, tx domain.Transaction, registrationCode string) (domain.Contender, error) {
+func (m *repositoryMock) GetContenderByCode(ctx context.Context, tx domain.Transaction, registrationCode string) (domain.Contender, error) {
 	args := m.Called(ctx, tx, registrationCode)
 	return args.Get(0).(domain.Contender), args.Error(1)
 }
 
-func (m *mockRepository) GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) ([]domain.Contender, error) {
+func (m *repositoryMock) GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) ([]domain.Contender, error) {
 	args := m.Called(ctx, tx, compClassID)
 	return args.Get(0).([]domain.Contender), args.Error(1)
 }
 
-func (m *mockRepository) GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) ([]domain.Contender, error) {
+func (m *repositoryMock) GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) ([]domain.Contender, error) {
 	args := m.Called(ctx, tx, contestID)
 	return args.Get(0).([]domain.Contender), args.Error(1)
 }
 
-func (m *mockRepository) StoreContender(ctx context.Context, tx domain.Transaction, contender domain.Contender) (domain.Contender, error) {
+func (m *repositoryMock) StoreContender(ctx context.Context, tx domain.Transaction, contender domain.Contender) (domain.Contender, error) {
 	args := m.Called(ctx, tx, contender)
 	return args.Get(0).(domain.Contender), args.Error(1)
 }
 
-func (m *mockRepository) DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) error {
+func (m *repositoryMock) DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) error {
 	args := m.Called(ctx, tx, contenderID)
 	return args.Error(0)
 }
 
-func (m *mockRepository) GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (domain.Contest, error) {
+func (m *repositoryMock) GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (domain.Contest, error) {
 	args := m.Called(ctx, tx, contestID)
 	return args.Get(0).(domain.Contest), args.Error(1)
 }
 
-func (m *mockRepository) GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) (domain.CompClass, error) {
+func (m *repositoryMock) GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) (domain.CompClass, error) {
 	args := m.Called(ctx, tx, compClassID)
 	return args.Get(0).(domain.CompClass), args.Error(1)
 }
 
-type mockAuthorizer struct {
+type authorizerMock struct {
 	mock.Mock
 }
 
-func (m *mockAuthorizer) HasOwnership(ctx context.Context, resourceOwnership domain.OwnershipData) (domain.AuthRole, error) {
+func (m *authorizerMock) HasOwnership(ctx context.Context, resourceOwnership domain.OwnershipData) (domain.AuthRole, error) {
 	args := m.Called(ctx, resourceOwnership)
 	return args.Get(0).(domain.AuthRole), args.Error(1)
 }
 
-type mockScoreKeeper struct {
+type scoreKeeperMock struct {
 	mock.Mock
 }
 
-func (m *mockScoreKeeper) UpdateScore(contenderID domain.ResourceID, score domain.Score) error {
+func (m *scoreKeeperMock) UpdateScore(contenderID domain.ResourceID, score domain.Score) error {
 	args := m.Called(contenderID, score)
 	return args.Error(0)
 }
 
-func (m *mockScoreKeeper) GetScore(contenderID domain.ResourceID) (domain.Score, error) {
+func (m *scoreKeeperMock) GetScore(contenderID domain.ResourceID) (domain.Score, error) {
 	args := m.Called(contenderID)
 	return args.Get(0).(domain.Score), args.Error(1)
 }
