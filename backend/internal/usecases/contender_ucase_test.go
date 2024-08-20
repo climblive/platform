@@ -286,6 +286,109 @@ func TestCreateContenders_Rollback(t *testing.T) {
 	mockedTx.AssertExpectations(t)
 }
 
+func TestUpdateContender(t *testing.T) {
+	mockedContenderID := domain.ResourceID(1)
+	mockedOwnership := domain.OwnershipData{
+		OrganizerID: 1,
+		ContenderID: &mockedContenderID,
+	}
+	currentTime := time.Now()
+
+	mockedContender := domain.Contender{
+		ID:                  mockedContenderID,
+		Ownership:           mockedOwnership,
+		ContestID:           1,
+		CompClassID:         1,
+		RegistrationCode:    "ABCD1234",
+		Name:                "John Doe",
+		PublicName:          "John Doe",
+		ClubName:            "Testers' Climbing Club",
+		Entered:             &currentTime,
+		WithdrawnFromFinals: false,
+		Disqualified:        false,
+		Score:               100,
+		Placement:           1,
+		ScoreUpdated:        &currentTime,
+	}
+
+	mockedContest := domain.Contest{
+		ID:          1,
+		GracePeriod: 15 * time.Minute,
+	}
+
+	mockedRepo := new(repositoryMock)
+	mockedScoreKeeper := new(scoreKeeperMock)
+
+	mockedRepo.
+		On("GetContender", mock.Anything, mock.Anything, mockedContenderID).
+		Return(mockedContender, nil)
+
+	mockedRepo.
+		On("GetContest", mock.Anything, mock.Anything, 1).
+		Return(mockedContest, nil)
+
+	mockedRepo.
+		On("StoreContender", mock.Anything, mock.Anything, mockedContender).
+		Return(mockedContender, nil)
+
+	mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{
+		Timestamp:   currentTime.Truncate(time.Hour),
+		ContenderID: mockedContenderID,
+		Score:       1000,
+		Placement:   5,
+	}, nil)
+
+	t.Run("Identity", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.Anything).
+			Return(domain.ContenderRole, nil)
+
+		ucase := usecases.ContenderUseCase{
+			Repo:        mockedRepo,
+			Authorizer:  mockedAuthorizer,
+			ScoreKeeper: mockedScoreKeeper,
+		}
+
+		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, mockedContender)
+
+		assert.NoError(t, err)
+		assert.Equal(t, mockedContender.ID, contender.ID)
+		assert.Equal(t, mockedContender.Ownership, contender.Ownership)
+		assert.Equal(t, mockedContender.ContestID, contender.ContestID)
+		assert.Equal(t, mockedContender.CompClassID, contender.CompClassID)
+		assert.Equal(t, mockedContender.RegistrationCode, contender.RegistrationCode)
+		assert.Equal(t, mockedContender.Name, contender.Name)
+		assert.Equal(t, mockedContender.PublicName, contender.PublicName)
+		assert.Equal(t, mockedContender.ClubName, contender.ClubName)
+		assert.Equal(t, mockedContender.Entered, contender.Entered)
+		assert.Equal(t, mockedContender.WithdrawnFromFinals, contender.WithdrawnFromFinals)
+		assert.Equal(t, mockedContender.Disqualified, contender.Disqualified)
+		assert.Equal(t, 1000, contender.Score)
+		assert.Equal(t, 5, contender.Placement)
+		assert.Equal(t, currentTime.Truncate(time.Hour), *contender.ScoreUpdated)
+	})
+
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.Anything).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		ucase := usecases.ContenderUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, domain.Contender{})
+
+		assert.ErrorIs(t, err, domain.ErrNoOwnership)
+		assert.Empty(t, contender)
+	})
+}
+
 var errMock = errors.New("mock error")
 
 type transactionMock struct {
