@@ -328,8 +328,8 @@ func TestUpdateContender(t *testing.T) {
 		Return(mockedContest, nil)
 
 	mockedRepo.
-		On("StoreContender", mock.Anything, mock.Anything, mockedContender).
-		Return(mockedContender, nil)
+		On("StoreContender", mock.Anything, mock.Anything, mock.AnythingOfType("domain.Contender")).
+		Return(mirrorInstruction{}, nil)
 
 	mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{
 		Timestamp:   currentTime.Truncate(time.Hour),
@@ -391,6 +391,8 @@ func TestUpdateContender(t *testing.T) {
 
 var errMock = errors.New("mock error")
 
+type mirrorInstruction struct{}
+
 type transactionMock struct {
 	mock.Mock
 }
@@ -444,7 +446,12 @@ func (m *repositoryMock) GetContendersByContest(ctx context.Context, tx domain.T
 
 func (m *repositoryMock) StoreContender(ctx context.Context, tx domain.Transaction, contender domain.Contender) (domain.Contender, error) {
 	args := m.Called(ctx, tx, contender)
-	return args.Get(0).(domain.Contender), args.Error(1)
+
+	if _, ok := args.Get(0).(mirrorInstruction); ok {
+		return contender, nil
+	} else {
+		return args.Get(0).(domain.Contender), args.Error(1)
+	}
 }
 
 func (m *repositoryMock) DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) error {
