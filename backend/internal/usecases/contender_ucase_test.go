@@ -160,7 +160,7 @@ func TestCreateContenders(t *testing.T) {
 
 	mockRepo := new(mockRepository)
 	mockTx := new(mockTransaction)
-	mockCodeGenerator := new(mockCodeGenerator)
+	mockedCodeGenerator := new(codeGeneratorMock)
 
 	mockRepo.
 		On("GetContest", mock.Anything, mock.Anything, mockContestID).
@@ -179,7 +179,7 @@ func TestCreateContenders(t *testing.T) {
 			RegistrationCode: code,
 		}
 
-		mockCodeGenerator.
+		mockedCodeGenerator.
 			On("Generate", 8).
 			Return(code).Once()
 
@@ -205,7 +205,7 @@ func TestCreateContenders(t *testing.T) {
 		ucase := usecases.ContenderUseCase{
 			Repo:                      mockRepo,
 			Authorizer:                mockAuthorizer,
-			RegistrationCodeGenerator: mockCodeGenerator,
+			RegistrationCodeGenerator: mockedCodeGenerator,
 		}
 
 		contenders, err := ucase.CreateContenders(context.Background(), mockContestID, 100)
@@ -220,10 +220,6 @@ func TestCreateContenders(t *testing.T) {
 		for idx, contender := range contenders {
 			assert.Equal(t, fmt.Sprintf("%08d", idx), contender.RegistrationCode)
 		}
-	})
-
-	t.Run("Rollback", func(t *testing.T) {
-		t.Fail()
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {
@@ -245,7 +241,52 @@ func TestCreateContenders(t *testing.T) {
 	})
 }
 
-var errSimulatedRepositoryFailure = errors.New("simulated repository failure")
+func TestCreateContenders_Rollback(t *testing.T) {
+	mockContestID := domain.ResourceID(1)
+
+	mockRepo := new(mockRepository)
+	mockTx := new(mockTransaction)
+	mockAuthorizer := new(mockAuthorizer)
+	mockedCodeGenerator := new(codeGeneratorMock)
+
+	mockRepo.
+		On("GetContest", mock.Anything, mock.Anything, mockContestID).
+		Return(domain.Contest{}, nil)
+
+	mockRepo.
+		On("Begin").
+		Return(mockTx, nil)
+
+	mockRepo.
+		On("StoreContender", mock.Anything, mock.Anything, mock.Anything).
+		Return(domain.Contender{}, errMock)
+
+	mockTx.On("Rollback").Return()
+
+	mockAuthorizer.
+		On("HasOwnership", mock.Anything, domain.OwnershipData{}).
+		Return(domain.AdminRole, nil)
+
+	mockedCodeGenerator.
+		On("Generate", 8).
+		Return("DEAFBEEF")
+
+	ucase := usecases.ContenderUseCase{
+		Repo:                      mockRepo,
+		Authorizer:                mockAuthorizer,
+		RegistrationCodeGenerator: mockedCodeGenerator,
+	}
+
+	contenders, err := ucase.CreateContenders(context.Background(), mockContestID, 1)
+
+	assert.Error(t, err)
+	assert.Nil(t, contenders)
+
+	mockRepo.AssertExpectations(t)
+	mockTx.AssertExpectations(t)
+}
+
+var errMock = errors.New("mock error")
 
 type mockTransaction struct {
 	mock.Mock
@@ -260,11 +301,11 @@ func (m *mockTransaction) Rollback() {
 	m.Called()
 }
 
-type mockCodeGenerator struct {
+type codeGeneratorMock struct {
 	mock.Mock
 }
 
-func (m *mockCodeGenerator) Generate(length int) string {
+func (m *codeGeneratorMock) Generate(length int) string {
 	args := m.Called(length)
 	return args.Get(0).(string)
 }
