@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/go-errors/errors"
 )
 
 type compClassRecord struct {
@@ -54,12 +55,12 @@ func (d *Database) GetCompClass(ctx context.Context, tx domain.Transaction, comp
 	var record compClassRecord
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM comp_class WHERE id = ?`, compClassID).Scan(&record).Error
 	if err != nil {
-		return domain.CompClass{}, err
+		return domain.CompClass{}, errors.New(err)
 	}
 
 	if record.ID == nil {
-		return domain.CompClass{}, domain.ErrNotFound
+		return domain.CompClass{}, errors.New(domain.ErrNotFound)
 	}
 
-	return record.toDomain(), err
+	return record.toDomain(), nil
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/authorizer"
@@ -18,7 +17,7 @@ func main() {
 
 	repo, err := repository.NewDatabase("climblive", "climblive", "localhost", "climblive")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	authorizer := authorizer.NewAuthorizer()
@@ -36,6 +35,6 @@ func main() {
 
 	err = http.ListenAndServe("localhost:80", nil)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }

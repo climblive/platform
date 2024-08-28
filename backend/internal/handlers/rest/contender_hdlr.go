@@ -30,7 +30,7 @@ func (hdlr *contenderHandler) GetContender(w http.ResponseWriter, r *http.Reques
 
 	contender, err := hdlr.contenderUseCase.GetContender(r.Context(), contenderID)
 	if err != nil {
-		writeError(w, err)
+		handleError(w, err)
 		return
 	}
 
@@ -42,7 +42,7 @@ func (hdlr *contenderHandler) GetContenderByCode(w http.ResponseWriter, r *http.
 
 	contender, err := hdlr.contenderUseCase.GetContenderByCode(r.Context(), code)
 	if err != nil {
-		writeError(w, err)
+		handleError(w, err)
 		return
 	}
 
@@ -54,7 +54,7 @@ func (hdlr *contenderHandler) GetContendersByCompClass(w http.ResponseWriter, r 
 
 	contenders, err := hdlr.contenderUseCase.GetContendersByCompClass(r.Context(), compClassID)
 	if err != nil {
-		writeError(w, err)
+		handleError(w, err)
 		return
 	}
 
@@ -66,7 +66,7 @@ func (hdlr *contenderHandler) GetContendersByContest(w http.ResponseWriter, r *h
 
 	contenders, err := hdlr.contenderUseCase.GetContendersByContest(r.Context(), contestID)
 	if err != nil {
-		writeError(w, err)
+		handleError(w, err)
 		return
 	}
 
@@ -85,7 +85,7 @@ func (hdlr *contenderHandler) UpdateContender(w http.ResponseWriter, r *http.Req
 
 	updatedContender, err := hdlr.contenderUseCase.UpdateContender(r.Context(), contenderID, contender)
 	if err != nil {
-		writeError(w, err)
+		handleError(w, err)
 		return
 	}
 
@@ -97,7 +97,7 @@ func (hdlr *contenderHandler) DeleteContender(w http.ResponseWriter, r *http.Req
 
 	err := hdlr.contenderUseCase.DeleteContender(r.Context(), contenderID)
 	if err != nil {
-		writeError(w, err)
+		handleError(w, err)
 		return
 	}
 
@@ -120,7 +120,7 @@ func (hdlr *contenderHandler) CreateContenders(w http.ResponseWriter, r *http.Re
 
 	contenders, err := hdlr.contenderUseCase.CreateContenders(r.Context(), contestID, tmpl.Number)
 	if err != nil {
-		writeError(w, err)
+		handleError(w, err)
 		return
 	}
 

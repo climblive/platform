@@ -5,6 +5,7 @@ go 1.22
 require gorm.io/driver/postgres v1.5.9
 
 require (
+	github.com/go-errors/errors v1.5.1
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
