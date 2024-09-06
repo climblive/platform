@@ -24,7 +24,7 @@ func writeResponse(w http.ResponseWriter, status int, data any) {
 
 	json, err := json.Marshal(data)
 	if err != nil {
-		handleError(w, err)
+		handleError(w, errors.New(err))
 		return
 	}
 
