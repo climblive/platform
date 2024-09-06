@@ -50,7 +50,7 @@
   };
 
   const handleTick = (flash: boolean) => {
-    navigator.vibrate(50);
+    navigator.vibrate?.(50);
     open = false;
 
     $createTick.mutate(

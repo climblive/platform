@@ -26,7 +26,7 @@
   <span class="contender-class">{compClassName}</span>
   <div class="lower">
     <div class="points">
-      <Score value={points} size="large" />
+      <Score value={points} />
       <span>{qualifyingProblems} hardest</span>
     </div>
     <div class="timer">
@@ -71,9 +71,12 @@
     }
 
     & .points {
-      font-weight: var(--sl-font-weight-bold);
+      & > :not(span) {
+        font-weight: var(--sl-font-weight-bold);
+        font-size: var(--sl-font-size-2x-large);
+      }
 
-      & span {
+      & > span {
         font-size: var(--sl-font-size-x-small);
         font-weight: var(--sl-font-weight-normal);
       }

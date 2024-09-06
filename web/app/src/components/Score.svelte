@@ -1,77 +1,48 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+
   export let value: number;
   export let prefix: string = "";
-  export let size: "small" | "large" = "small";
   export let hideZero: boolean = false;
 
-  let prevValue: number = 0;
-
-  let increments: number[] | undefined = [];
+  let counter: HTMLDivElement | undefined;
+  let prevValue: number = value;
 
   $: {
-    setTimeout(() => (increments = undefined));
-
-    const currentValue = value;
-    const diff = currentValue - prevValue;
-
-    const nextIncrements = Array.from({ length: 11 }).map((_, i) =>
-      Math.ceil(prevValue + (i * diff) / 10),
+    const animation = counter?.animate(
+      [{ "--num": prevValue }, { "--num": value }],
+      {
+        fill: "forwards",
+        duration: 250,
+      },
     );
 
-    setTimeout(() => (increments = nextIncrements));
-
-    prevValue = value;
+    animation?.finished.then(() => (prevValue = value));
   }
+
+  onMount(() => {
+    counter?.style.setProperty("--num", value.toString());
+  });
 </script>
 
-<div>
-  {#if increments}
-    <div class="counter" data-large={size === "large"}>
-      <div class="increments">
-        {#each increments as inc}
-          <div class={inc === 0 && hideZero ? "hidden" : undefined}>
-            {prefix}{inc}p
-          </div>
-        {/each}
-      </div>
-    </div>
+<div bind:this={counter} class="counter">
+  {#if !(hideZero && value === 0 && prevValue === 0)}
+    {prefix}<span class="suffix">p</span>
   {/if}
 </div>
 
 <style>
+  @property --num {
+    syntax: "<integer>";
+    initial-value: 0;
+    inherits: false;
+  }
+
   .counter {
-    --height: 1.25rem;
-
-    height: var(--height);
-    overflow: hidden;
+    counter-reset: num var(--num);
   }
 
-  .counter[data-large="true"] {
-    --height: 2.75rem;
-
-    font-size: var(--sl-font-size-2x-large);
-  }
-
-  .increments {
-    height: 100%;
-    animation: counter 0.4s forwards;
-    animation-timing-function: steps(10);
-  }
-
-  .increments > * {
-    height: var(--height);
-  }
-
-  .hidden {
-    visibility: hidden;
-  }
-
-  @keyframes counter {
-    0% {
-      margin-top: 0rem;
-    }
-    100% {
-      margin-top: calc(-10 * var(--height));
-    }
+  .counter > .suffix::before {
+    content: counter(num);
   }
 </style>
