@@ -2,11 +2,13 @@ package rest
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/utils"
+	"github.com/go-errors/errors"
 )
 
 func parseResourceID(id string) domain.ResourceID {
@@ -22,7 +24,7 @@ func writeResponse(w http.ResponseWriter, status int, data any) {
 
 	json, err := json.Marshal(data)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		handleError(w, errors.New(err))
 		return
 	}
 
@@ -31,7 +33,11 @@ func writeResponse(w http.ResponseWriter, status int, data any) {
 	w.Write(json)
 }
 
-func writeError(w http.ResponseWriter, err error) {
+func handleError(w http.ResponseWriter, err error) {
+	if stack := utils.GetErrorStack(err); stack != "" {
+		fmt.Println(stack)
+	}
+
 	switch {
 	case errors.Is(err, domain.ErrNotFound):
 		w.WriteHeader(http.StatusNotFound)

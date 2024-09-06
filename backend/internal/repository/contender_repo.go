@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/go-errors/errors"
 )
 
 type contenderRecord struct {
@@ -63,11 +64,11 @@ func (d *Database) GetContender(ctx context.Context, tx domain.Transaction, cont
 	var record contenderRecord
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE id = ?`, contenderID).Scan(&record).Error
 	if err != nil {
-		return domain.Contender{}, err
+		return domain.Contender{}, errors.New(err)
 	}
 
 	if record.ID == nil {
-		return domain.Contender{}, domain.ErrNotFound
+		return domain.Contender{}, errors.New(domain.ErrNotFound)
 	}
 
 	return record.toDomain(), nil
@@ -77,11 +78,11 @@ func (d *Database) GetContenderByCode(ctx context.Context, tx domain.Transaction
 	var record contenderRecord
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE registration_code = ?`, registrationCode).Scan(&record).Error
 	if err != nil {
-		return domain.Contender{}, err
+		return domain.Contender{}, errors.New(err)
 	}
 
 	if record.ID == nil {
-		return domain.Contender{}, domain.ErrNotFound
+		return domain.Contender{}, errors.New(domain.ErrNotFound)
 	}
 
 	return record.toDomain(), nil
@@ -92,7 +93,7 @@ func (d *Database) GetContendersByCompClass(ctx context.Context, tx domain.Trans
 
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE class_id = ?`, compClassID).Scan(&records).Error
 	if err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	}
 
 	contenders := make([]domain.Contender, 0)
@@ -109,7 +110,7 @@ func (d *Database) GetContendersByContest(ctx context.Context, tx domain.Transac
 
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE contest_id = ?`, contestID).Scan(&records).Error
 	if err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	}
 
 	contenders := make([]domain.Contender, 0)
@@ -127,12 +128,14 @@ func (d *Database) StoreContender(ctx context.Context, tx domain.Transaction, co
 
 	err = d.tx(tx).WithContext(ctx).Save(&record).Error
 	if err != nil {
-		return domain.Contender{}, err
+		return domain.Contender{}, errors.New(err)
 	}
 
 	return record.toDomain(), nil
 }
 
 func (d *Database) DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) error {
-	return d.tx(tx).WithContext(ctx).Exec(`DELETE FROM contender WHERE id = ?`, contenderID).Error
+	err := d.tx(tx).WithContext(ctx).Exec(`DELETE FROM contender WHERE id = ?`, contenderID).Error
+
+	return errors.New(err)
 }

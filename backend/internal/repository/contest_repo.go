@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/go-errors/errors"
 )
 
 type contestRecord struct {
@@ -66,11 +67,11 @@ func (d *Database) GetContest(ctx context.Context, tx domain.Transaction, contes
 	var record contestRecord
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contest WHERE id = ?`, contestID).Scan(&record).Error
 	if err != nil {
-		return domain.Contest{}, err
+		return domain.Contest{}, errors.New(err)
 	}
 
 	if record.ID == nil {
-		return domain.Contest{}, domain.ErrNotFound
+		return domain.Contest{}, errors.New(domain.ErrNotFound)
 	}
 
 	return record.toDomain(), nil
