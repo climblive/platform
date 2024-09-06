@@ -108,7 +108,7 @@ func (d *Database) GetContendersByCompClass(ctx context.Context, tx domain.Trans
 func (d *Database) GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) ([]domain.Contender, error) {
 	var records []contenderRecord
 
-	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE contest_i = ?`, contestID).Scan(&records).Error
+	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE contest_id = ?`, contestID).Scan(&records).Error
 	if err != nil {
 		return nil, errors.New(err)
 	}
