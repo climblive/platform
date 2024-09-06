@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/authorizer"
@@ -10,6 +11,7 @@ import (
 	"github.com/climblive/platform/backend/internal/repository"
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/climblive/platform/backend/internal/usecases"
+	"github.com/climblive/platform/backend/internal/utils"
 )
 
 func main() {
@@ -17,6 +19,9 @@ func main() {
 
 	repo, err := repository.NewDatabase("climblive", "climblive", "localhost", "climblive")
 	if err != nil {
+		if stack := utils.GetErrorStack(err); stack != "" {
+			log.Println(stack)
+		}
 		panic(err)
 	}
 
@@ -35,6 +40,9 @@ func main() {
 
 	err = http.ListenAndServe("localhost:80", nil)
 	if err != nil {
+		if stack := utils.GetErrorStack(err); stack != "" {
+			log.Println(stack)
+		}
 		panic(err)
 	}
 }

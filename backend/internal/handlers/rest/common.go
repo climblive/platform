@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/utils"
 	"github.com/go-errors/errors"
 )
 
@@ -33,8 +34,8 @@ func writeResponse(w http.ResponseWriter, status int, data any) {
 }
 
 func handleError(w http.ResponseWriter, err error) {
-	if err, ok := err.(*errors.Error); ok {
-		fmt.Println(err.ErrorStack())
+	if stack := utils.GetErrorStack(err); stack != "" {
+		fmt.Println(stack)
 	}
 
 	switch {
