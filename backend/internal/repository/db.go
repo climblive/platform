@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/go-errors/errors"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -31,7 +32,7 @@ func NewDatabase(username, password, host, database string) (*Database, error) {
 		Logger: logger.Default.LogMode(logLevel),
 	})
 	if err != nil {
-		return nil, err
+		return nil, errors.New(err)
 	}
 
 	sqlDB, _ := db.DB()
@@ -49,8 +50,7 @@ func (d *Database) Begin() domain.Transaction {
 	tx := d.db.Begin()
 
 	return &transaction{
-		db:     tx,
-		active: true,
+		db: tx,
 	}
 }
 

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/go-errors/errors"
 	"gorm.io/gorm"
 )
 
@@ -9,7 +10,7 @@ type transaction struct {
 }
 
 func (tx *transaction) Commit() error {
-	return tx.db.Commit().Error
+	return errors.New(tx.db.Commit().Error)
 }
 
 func (tx *transaction) Rollback() {
