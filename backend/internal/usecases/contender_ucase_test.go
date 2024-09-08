@@ -11,6 +11,7 @@ import (
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetContender(t *testing.T) {
@@ -293,60 +294,75 @@ func TestUpdateContender(t *testing.T) {
 		ContenderID: &mockedContenderID,
 	}
 	currentTime := time.Now()
+	gracePeriod := 15 * time.Minute
 
-	mockedContender := domain.Contender{
-		ID:                  mockedContenderID,
-		Ownership:           mockedOwnership,
-		ContestID:           1,
-		CompClassID:         1,
-		RegistrationCode:    "ABCD1234",
-		Name:                "John Doe",
-		PublicName:          "John Doe",
-		ClubName:            "Testers' Climbing Club",
-		Entered:             &currentTime,
-		WithdrawnFromFinals: false,
-		Disqualified:        false,
-		Score:               100,
-		Placement:           1,
-		ScoreUpdated:        &currentTime,
+	makeMockedRepo := func(contender domain.Contender) *repositoryMock {
+		mockedContest := domain.Contest{
+			ID:          1,
+			GracePeriod: gracePeriod,
+		}
+
+		mockedCompClass := domain.CompClass{
+			ID:        1,
+			TimeBegin: currentTime.Add(-1 * time.Hour),
+			TimeEnd:   currentTime.Add(time.Hour),
+		}
+
+		mockedRepo := new(repositoryMock)
+
+		mockedRepo.
+			On("GetContender", mock.Anything, mock.Anything, contender.ID).
+			Return(contender, nil)
+
+		mockedRepo.
+			On("GetContest", mock.Anything, mock.Anything, 1).
+			Return(mockedContest, nil)
+
+		mockedRepo.
+			On("GetCompClass", mock.Anything, mock.Anything, 1).
+			Return(mockedCompClass, nil)
+
+		mockedRepo.
+			On("StoreContender", mock.Anything, mock.Anything, mock.AnythingOfType("domain.Contender")).
+			Return(mirrorInstruction{}, nil)
+
+		return mockedRepo
 	}
 
-	mockedContest := domain.Contest{
-		ID:          1,
-		GracePeriod: 15 * time.Minute,
-	}
-
-	mockedRepo := new(repositoryMock)
-	mockedScoreKeeper := new(scoreKeeperMock)
-
-	mockedRepo.
-		On("GetContender", mock.Anything, mock.Anything, mockedContenderID).
-		Return(mockedContender, nil)
-
-	mockedRepo.
-		On("GetContest", mock.Anything, mock.Anything, 1).
-		Return(mockedContest, nil)
-
-	mockedRepo.
-		On("StoreContender", mock.Anything, mock.Anything, mock.AnythingOfType("domain.Contender")).
-		Return(mirrorInstruction{}, nil)
-
-	mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{
-		Timestamp:   currentTime.Truncate(time.Hour),
-		ContenderID: mockedContenderID,
-		Score:       1000,
-		Placement:   5,
-	}, nil)
-
-	t.Run("Identity", func(t *testing.T) {
+	t.Run("UpdateWithoutChanges", func(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
+		mockedScoreKeeper := new(scoreKeeperMock)
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, mock.Anything).
 			Return(domain.ContenderRole, nil)
 
+		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{
+			Timestamp:   currentTime,
+			ContenderID: mockedContenderID,
+			Score:       1000,
+			Placement:   5,
+		}, nil)
+
+		mockedContender := domain.Contender{
+			ID:                  mockedContenderID,
+			Ownership:           mockedOwnership,
+			ContestID:           1,
+			CompClassID:         1,
+			RegistrationCode:    "ABCD1234",
+			Name:                "John Doe",
+			PublicName:          "John",
+			ClubName:            "Testers' Climbing Club",
+			Entered:             &currentTime,
+			WithdrawnFromFinals: false,
+			Disqualified:        false,
+			Score:               100,
+			Placement:           1,
+			ScoreUpdated:        &currentTime,
+		}
+
 		ucase := usecases.ContenderUseCase{
-			Repo:        mockedRepo,
+			Repo:        makeMockedRepo(mockedContender),
 			Authorizer:  mockedAuthorizer,
 			ScoreKeeper: mockedScoreKeeper,
 		}
@@ -354,6 +370,7 @@ func TestUpdateContender(t *testing.T) {
 		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, mockedContender)
 
 		assert.NoError(t, err)
+
 		assert.Equal(t, mockedContender.ID, contender.ID)
 		assert.Equal(t, mockedContender.Ownership, contender.Ownership)
 		assert.Equal(t, mockedContender.ContestID, contender.ContestID)
@@ -365,9 +382,518 @@ func TestUpdateContender(t *testing.T) {
 		assert.Equal(t, mockedContender.Entered, contender.Entered)
 		assert.Equal(t, mockedContender.WithdrawnFromFinals, contender.WithdrawnFromFinals)
 		assert.Equal(t, mockedContender.Disqualified, contender.Disqualified)
+
 		assert.Equal(t, 1000, contender.Score)
 		assert.Equal(t, 5, contender.Placement)
-		assert.Equal(t, currentTime.Truncate(time.Hour), *contender.ScoreUpdated)
+		assert.Equal(t, currentTime, *contender.ScoreUpdated)
+	})
+
+	t.Run("ReadOnlyFieldsAreUnaltered", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+		mockedScoreKeeper := new(scoreKeeperMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.Anything).
+			Return(domain.ContenderRole, nil)
+
+		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
+
+		mockedContender := domain.Contender{
+			ID:                  mockedContenderID,
+			Ownership:           mockedOwnership,
+			ContestID:           1,
+			CompClassID:         1,
+			RegistrationCode:    "ABCD1234",
+			Name:                "John Doe",
+			PublicName:          "John",
+			ClubName:            "Testers' Climbing Club",
+			Entered:             &currentTime,
+			WithdrawnFromFinals: false,
+			Disqualified:        false,
+			Score:               100,
+			Placement:           1,
+			ScoreUpdated:        &currentTime,
+		}
+
+		ucase := usecases.ContenderUseCase{
+			Repo:        makeMockedRepo(mockedContender),
+			Authorizer:  mockedAuthorizer,
+			ScoreKeeper: mockedScoreKeeper,
+		}
+
+		modifiers := []func(domain.Contender) domain.Contender{
+			func(contender domain.Contender) domain.Contender {
+				contender.ID += 1
+				return contender
+			},
+			func(contender domain.Contender) domain.Contender {
+				contender.Ownership.OrganizerID += 1
+				return contender
+			},
+			func(contender domain.Contender) domain.Contender {
+				contender.ContestID += 1
+				return contender
+			},
+			func(contender domain.Contender) domain.Contender {
+				contender.RegistrationCode = "DEADBEEF"
+				return contender
+			},
+			func(contender domain.Contender) domain.Contender {
+				contender.Score += 1
+				return contender
+			},
+			func(contender domain.Contender) domain.Contender {
+				contender.Placement += 1
+				return contender
+			},
+			func(contender domain.Contender) domain.Contender {
+				soon := currentTime.Add(time.Hour)
+				contender.Entered = &soon
+				return contender
+			},
+			func(contender domain.Contender) domain.Contender {
+				soon := currentTime.Add(time.Hour)
+				contender.ScoreUpdated = &soon
+				return contender
+			},
+		}
+
+		for _, fn := range modifiers {
+			contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, fn(mockedContender))
+
+			assert.NoError(t, err)
+			assert.Equal(t, mockedContender, contender)
+		}
+
+	})
+
+	t.Run("ContenderCannotAlterDisqualifiedState", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+		mockedScoreKeeper := new(scoreKeeperMock)
+		mockedEventBroker := new(eventBrokerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.Anything).
+			Return(domain.ContenderRole, nil)
+
+		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
+
+		mockedEventBroker.On("Dispatch", 1, mock.Anything).Return()
+
+		mockedContender := domain.Contender{
+			ID:                  mockedContenderID,
+			Ownership:           mockedOwnership,
+			ContestID:           1,
+			CompClassID:         1,
+			RegistrationCode:    "ABCD1234",
+			Name:                "John Doe",
+			PublicName:          "John",
+			ClubName:            "Testers' Climbing Club",
+			Entered:             &currentTime,
+			WithdrawnFromFinals: false,
+			Disqualified:        true,
+			Score:               100,
+			Placement:           1,
+			ScoreUpdated:        &currentTime,
+		}
+
+		ucase := usecases.ContenderUseCase{
+			Repo:        makeMockedRepo(mockedContender),
+			Authorizer:  mockedAuthorizer,
+			ScoreKeeper: mockedScoreKeeper,
+			EventBroker: mockedEventBroker,
+		}
+
+		_, err := ucase.UpdateContender(context.Background(), mockedContenderID, mockedContender)
+		assert.NoError(t, err)
+
+		updatedContender := mockedContender
+		updatedContender.Disqualified = false
+
+		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
+
+		assert.ErrorIs(t, err, domain.ErrInsufficientRole)
+		assert.Nil(t, contender)
+	})
+
+	t.Run("EnterContest", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+		mockedScoreKeeper := new(scoreKeeperMock)
+		mockedEventBroker := new(eventBrokerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.Anything).
+			Return(domain.ContenderRole, nil)
+
+		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
+
+		mockedEventBroker.On("Dispatch", 1, mock.Anything).Return()
+
+		mockedContender := domain.Contender{
+			ID:                  mockedContenderID,
+			Ownership:           mockedOwnership,
+			ContestID:           1,
+			CompClassID:         0,
+			RegistrationCode:    "ABCD1234",
+			Name:                "",
+			PublicName:          "",
+			ClubName:            "",
+			Entered:             nil,
+			WithdrawnFromFinals: false,
+			Disqualified:        false,
+			Score:               0,
+			Placement:           0,
+			ScoreUpdated:        nil,
+		}
+
+		ucase := usecases.ContenderUseCase{
+			Repo:        makeMockedRepo(mockedContender),
+			Authorizer:  mockedAuthorizer,
+			ScoreKeeper: mockedScoreKeeper,
+			EventBroker: mockedEventBroker,
+		}
+
+		updatedContender := mockedContender
+		updatedContender.CompClassID = 1
+		updatedContender.Name = "John Doe"
+		updatedContender.PublicName = "John"
+		updatedContender.ClubName = "Testers' Climbing Club"
+
+		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
+
+		require.NoError(t, err)
+		assert.Equal(t, 1, contender.CompClassID)
+		assert.Equal(t, "John Doe", contender.Name)
+		assert.Equal(t, "John", contender.PublicName)
+		assert.Equal(t, "Testers' Climbing Club", contender.ClubName)
+		require.NotNil(t, contender.Entered)
+		assert.WithinDuration(t, time.Now(), *contender.Entered, time.Minute)
+
+		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderEnterEvent{
+			ContenderID: mockedContenderID,
+			CompClassID: 1,
+		})
+
+		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderPublicInfoUpdateEvent{
+			ContenderID:         mockedContenderID,
+			CompClassID:         1,
+			PublicName:          "John",
+			ClubName:            "Testers' Climbing Club",
+			WithdrawnFromFinals: false,
+			Disqualified:        false,
+		})
+	})
+
+	t.Run("BatchUpdate", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+		mockedScoreKeeper := new(scoreKeeperMock)
+		mockedEventBroker := new(eventBrokerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.Anything).
+			Return(domain.OrganizerRole, nil)
+
+		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
+
+		mockedEventBroker.On("Dispatch", 1, mock.Anything).Return()
+
+		mockedContender := domain.Contender{
+			ID:                  mockedContenderID,
+			Ownership:           mockedOwnership,
+			ContestID:           1,
+			CompClassID:         1,
+			RegistrationCode:    "ABCD1234",
+			Name:                "John Doe",
+			PublicName:          "John",
+			ClubName:            "Testers' Climbing Club",
+			Entered:             &currentTime,
+			WithdrawnFromFinals: false,
+			Disqualified:        false,
+			Score:               100,
+			Placement:           1,
+			ScoreUpdated:        &currentTime,
+		}
+
+		ucase := usecases.ContenderUseCase{
+			Repo:        makeMockedRepo(mockedContender),
+			Authorizer:  mockedAuthorizer,
+			ScoreKeeper: mockedScoreKeeper,
+			EventBroker: mockedEventBroker,
+		}
+
+		updatedContender := mockedContender
+		updatedContender.CompClassID = 2
+		updatedContender.Name = "Jane Doe"
+		updatedContender.PublicName = "Jane"
+		updatedContender.ClubName = "Space Climbers"
+		updatedContender.WithdrawnFromFinals = true
+		updatedContender.Disqualified = true
+
+		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
+
+		assert.NoError(t, err)
+		assert.Equal(t, 2, contender.CompClassID)
+		assert.Equal(t, "Jane Doe", contender.Name)
+		assert.Equal(t, "Jane", contender.PublicName)
+		assert.Equal(t, "Space Climbers", contender.ClubName)
+		assert.Equal(t, true, contender.WithdrawnFromFinals)
+		assert.Equal(t, true, contender.Disqualified)
+
+		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderSwitchClassEvent{
+			ContenderID: mockedContenderID,
+			CompClassID: 2,
+		})
+
+		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderPublicInfoUpdateEvent{
+			ContenderID:         mockedContenderID,
+			CompClassID:         2,
+			PublicName:          "Jane",
+			ClubName:            "Space Climbers",
+			WithdrawnFromFinals: true,
+			Disqualified:        true,
+		})
+
+		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderWithdrawFromFinalsEvent{
+			ContenderID: mockedContenderID,
+		})
+
+		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderDisqualifyEvent{
+			ContenderID: mockedContenderID,
+		})
+	})
+
+	t.Run("NameCannotBeEmpty", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.Anything).
+			Return(domain.ContenderRole, nil)
+
+		mockedContender := domain.Contender{
+			ID:                  mockedContenderID,
+			Ownership:           mockedOwnership,
+			ContestID:           1,
+			CompClassID:         1,
+			RegistrationCode:    "ABCD1234",
+			Name:                "John Doe",
+			PublicName:          "John",
+			ClubName:            "Testers' Climbing Club",
+			Entered:             &currentTime,
+			WithdrawnFromFinals: false,
+			Disqualified:        false,
+			Score:               100,
+			Placement:           1,
+			ScoreUpdated:        &currentTime,
+		}
+
+		ucase := usecases.ContenderUseCase{
+			Repo:       makeMockedRepo(mockedContender),
+			Authorizer: mockedAuthorizer,
+		}
+
+		updatedContender := mockedContender
+		updatedContender.Name = ""
+
+		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
+
+		assert.ErrorIs(t, err, domain.ErrEmptyName)
+		assert.Nil(t, contender)
+	})
+
+	t.Run("ReenterFinals", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+		mockedScoreKeeper := new(scoreKeeperMock)
+		mockedEventBroker := new(eventBrokerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.Anything).
+			Return(domain.OrganizerRole, nil)
+
+		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
+
+		mockedEventBroker.On("Dispatch", 1, mock.Anything).Return()
+
+		mockedContender := domain.Contender{
+			ID:                  mockedContenderID,
+			Ownership:           mockedOwnership,
+			ContestID:           1,
+			CompClassID:         1,
+			RegistrationCode:    "ABCD1234",
+			Name:                "John Doe",
+			PublicName:          "John",
+			ClubName:            "Testers' Climbing Club",
+			Entered:             &currentTime,
+			WithdrawnFromFinals: true,
+			Disqualified:        false,
+			Score:               100,
+			Placement:           1,
+			ScoreUpdated:        &currentTime,
+		}
+
+		ucase := usecases.ContenderUseCase{
+			Repo:        makeMockedRepo(mockedContender),
+			Authorizer:  mockedAuthorizer,
+			ScoreKeeper: mockedScoreKeeper,
+			EventBroker: mockedEventBroker,
+		}
+
+		updatedContender := mockedContender
+		updatedContender.WithdrawnFromFinals = false
+
+		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
+
+		assert.NoError(t, err)
+		assert.Equal(t, false, contender.WithdrawnFromFinals)
+
+		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderReenterFinalsEvent{
+			ContenderID: mockedContenderID,
+		})
+	})
+
+	t.Run("Requalify", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+		mockedScoreKeeper := new(scoreKeeperMock)
+		mockedEventBroker := new(eventBrokerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.Anything).
+			Return(domain.OrganizerRole, nil)
+
+		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
+
+		mockedEventBroker.On("Dispatch", 1, mock.Anything).Return()
+
+		mockedContender := domain.Contender{
+			ID:                  mockedContenderID,
+			Ownership:           mockedOwnership,
+			ContestID:           1,
+			CompClassID:         1,
+			RegistrationCode:    "ABCD1234",
+			Name:                "John Doe",
+			PublicName:          "John",
+			ClubName:            "Testers' Climbing Club",
+			Entered:             &currentTime,
+			WithdrawnFromFinals: false,
+			Disqualified:        true,
+			Score:               100,
+			Placement:           1,
+			ScoreUpdated:        &currentTime,
+		}
+
+		ucase := usecases.ContenderUseCase{
+			Repo:        makeMockedRepo(mockedContender),
+			Authorizer:  mockedAuthorizer,
+			ScoreKeeper: mockedScoreKeeper,
+			EventBroker: mockedEventBroker,
+		}
+
+		updatedContender := mockedContender
+		updatedContender.Disqualified = false
+
+		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
+
+		assert.NoError(t, err)
+		assert.Equal(t, false, contender.Disqualified)
+
+		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderRequalifyEvent{
+			ContenderID: mockedContenderID,
+		})
+	})
+
+	t.Run("CannotSwitchToAnEndedCompClass", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.Anything).
+			Return(domain.ContenderRole, nil)
+
+		mockedContender := domain.Contender{
+			ID:                  mockedContenderID,
+			Ownership:           mockedOwnership,
+			ContestID:           1,
+			CompClassID:         1,
+			RegistrationCode:    "ABCD1234",
+			Name:                "John Doe",
+			PublicName:          "John",
+			ClubName:            "Testers' Climbing Club",
+			Entered:             &currentTime,
+			WithdrawnFromFinals: false,
+			Disqualified:        true,
+			Score:               100,
+			Placement:           1,
+			ScoreUpdated:        &currentTime,
+		}
+
+		mockedCompClass := domain.CompClass{
+			ID:        2,
+			TimeBegin: currentTime.Add(-1 * time.Hour),
+			TimeEnd:   currentTime.Add(-1 * gracePeriod),
+		}
+
+		mockedRepo := makeMockedRepo(mockedContender)
+
+		mockedRepo.
+			On("GetCompClass", mock.Anything, mock.Anything, 2).
+			Return(mockedCompClass, nil)
+
+		ucase := usecases.ContenderUseCase{
+			Repo:       makeMockedRepo(mockedContender),
+			Authorizer: mockedAuthorizer,
+		}
+
+		updatedContender := mockedContender
+		updatedContender.CompClassID = 2
+
+		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
+
+		assert.ErrorIs(t, err, domain.ErrContestEnded)
+		assert.Nil(t, contender)
+	})
+
+	t.Run("ContenderCannotMakeChangesAfterGracePeriod", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.Anything).
+			Return(domain.ContenderRole, nil)
+
+		mockedContender := domain.Contender{
+			ID:                  mockedContenderID,
+			Ownership:           mockedOwnership,
+			ContestID:           1,
+			CompClassID:         2,
+			RegistrationCode:    "ABCD1234",
+			Name:                "John Doe",
+			PublicName:          "John",
+			ClubName:            "Testers' Climbing Club",
+			Entered:             &currentTime,
+			WithdrawnFromFinals: false,
+			Disqualified:        true,
+			Score:               100,
+			Placement:           1,
+			ScoreUpdated:        &currentTime,
+		}
+
+		mockedCompClass := domain.CompClass{
+			ID:        2,
+			TimeBegin: currentTime.Add(-1 * time.Hour),
+			TimeEnd:   currentTime.Add(-1 * gracePeriod),
+		}
+
+		mockedRepo := makeMockedRepo(mockedContender)
+
+		mockedRepo.
+			On("GetCompClass", mock.Anything, mock.Anything, 2).
+			Return(mockedCompClass, nil)
+
+		ucase := usecases.ContenderUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, mockedContender)
+		assert.ErrorIs(t, err, domain.ErrContestEnded)
+		assert.Nil(t, contender)
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {
@@ -378,7 +904,10 @@ func TestUpdateContender(t *testing.T) {
 			Return(domain.NilRole, domain.ErrNoOwnership)
 
 		ucase := usecases.ContenderUseCase{
-			Repo:       mockedRepo,
+			Repo: makeMockedRepo(domain.Contender{
+				ID:        mockedContenderID,
+				Ownership: mockedOwnership,
+			}),
 			Authorizer: mockedAuthorizer,
 		}
 
@@ -490,4 +1019,12 @@ func (m *scoreKeeperMock) UpdateScore(contenderID domain.ResourceID, score domai
 func (m *scoreKeeperMock) GetScore(contenderID domain.ResourceID) (domain.Score, error) {
 	args := m.Called(contenderID)
 	return args.Get(0).(domain.Score), args.Error(1)
+}
+
+type eventBrokerMock struct {
+	mock.Mock
+}
+
+func (m *eventBrokerMock) Dispatch(contestID domain.ResourceID, event any) {
+	m.Called(contestID, event)
 }
