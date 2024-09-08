@@ -121,7 +121,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 
 	publicInfoEventBaseline := publicInfoEvent
 
-	contest, err := uc.Repo.GetContest(ctx, nil, 42)
+	contest, err := uc.Repo.GetContest(ctx, nil, contender.ContestID)
 	if err != nil {
 		return mty, errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
 	}
