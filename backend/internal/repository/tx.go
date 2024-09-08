@@ -10,7 +10,7 @@ type transaction struct {
 }
 
 func (tx *transaction) Commit() error {
-	return errors.New(tx.db.Commit().Error)
+	return errors.Wrap(tx.db.Commit().Error, 0)
 }
 
 func (tx *transaction) Rollback() {

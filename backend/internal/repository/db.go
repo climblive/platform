@@ -32,7 +32,7 @@ func NewDatabase(username, password, host, database string) (*Database, error) {
 		Logger: logger.Default.LogMode(logLevel),
 	})
 	if err != nil {
-		return nil, errors.New(err)
+		return nil, errors.Wrap(err, 0)
 	}
 
 	sqlDB, _ := db.DB()

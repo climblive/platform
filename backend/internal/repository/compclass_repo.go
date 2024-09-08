@@ -55,11 +55,11 @@ func (d *Database) GetCompClass(ctx context.Context, tx domain.Transaction, comp
 	var record compClassRecord
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM comp_class WHERE id = ?`, compClassID).Scan(&record).Error
 	if err != nil {
-		return domain.CompClass{}, errors.New(err)
+		return domain.CompClass{}, errors.Wrap(err, 0)
 	}
 
 	if record.ID == nil {
-		return domain.CompClass{}, errors.New(domain.ErrNotFound)
+		return domain.CompClass{}, errors.Wrap(domain.ErrNotFound, 0)
 	}
 
 	return record.toDomain(), nil
