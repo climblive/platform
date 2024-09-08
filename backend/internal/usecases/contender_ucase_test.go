@@ -513,7 +513,7 @@ func TestUpdateContender(t *testing.T) {
 		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
 
 		assert.ErrorIs(t, err, domain.ErrInsufficientRole)
-		assert.Nil(t, contender)
+		assert.Empty(t, contender)
 	})
 
 	t.Run("EnterContest", func(t *testing.T) {
@@ -584,6 +584,44 @@ func TestUpdateContender(t *testing.T) {
 		})
 	})
 
+	t.Run("CannotLeaveContest", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.Anything).
+			Return(domain.OrganizerRole, nil)
+
+		mockedContender := domain.Contender{
+			ID:                  mockedContenderID,
+			Ownership:           mockedOwnership,
+			ContestID:           1,
+			CompClassID:         1,
+			RegistrationCode:    "ABCD1234",
+			Name:                "John Doe",
+			PublicName:          "John",
+			ClubName:            "Testers' Climbing Club",
+			Entered:             &currentTime,
+			WithdrawnFromFinals: false,
+			Disqualified:        false,
+			Score:               100,
+			Placement:           1,
+			ScoreUpdated:        &currentTime,
+		}
+
+		ucase := usecases.ContenderUseCase{
+			Repo:       makeMockedRepo(mockedContender),
+			Authorizer: mockedAuthorizer,
+		}
+
+		updatedContender := mockedContender
+		updatedContender.CompClassID = 0
+
+		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
+
+		assert.ErrorIs(t, err, domain.ErrNotAllowed)
+		assert.Empty(t, contender)
+	})
+
 	t.Run("BatchUpdate", func(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 		mockedScoreKeeper := new(scoreKeeperMock)
@@ -614,8 +652,20 @@ func TestUpdateContender(t *testing.T) {
 			ScoreUpdated:        &currentTime,
 		}
 
+		mockedCompClass := domain.CompClass{
+			ID:        2,
+			TimeBegin: currentTime.Add(-1 * time.Hour),
+			TimeEnd:   currentTime,
+		}
+
+		mockedRepo := makeMockedRepo(mockedContender)
+
+		mockedRepo.
+			On("GetCompClass", mock.Anything, mock.Anything, 2).
+			Return(mockedCompClass, nil)
+
 		ucase := usecases.ContenderUseCase{
-			Repo:        makeMockedRepo(mockedContender),
+			Repo:        mockedRepo,
 			Authorizer:  mockedAuthorizer,
 			ScoreKeeper: mockedScoreKeeper,
 			EventBroker: mockedEventBroker,
@@ -638,6 +688,7 @@ func TestUpdateContender(t *testing.T) {
 		assert.Equal(t, "Space Climbers", contender.ClubName)
 		assert.Equal(t, true, contender.WithdrawnFromFinals)
 		assert.Equal(t, true, contender.Disqualified)
+		assert.Equal(t, currentTime, *contender.Entered)
 
 		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderSwitchClassEvent{
 			ContenderID: mockedContenderID,
@@ -697,7 +748,7 @@ func TestUpdateContender(t *testing.T) {
 		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
 
 		assert.ErrorIs(t, err, domain.ErrEmptyName)
-		assert.Nil(t, contender)
+		assert.Empty(t, contender)
 	})
 
 	t.Run("ReenterFinals", func(t *testing.T) {
@@ -837,7 +888,7 @@ func TestUpdateContender(t *testing.T) {
 			Return(mockedCompClass, nil)
 
 		ucase := usecases.ContenderUseCase{
-			Repo:       makeMockedRepo(mockedContender),
+			Repo:       mockedRepo,
 			Authorizer: mockedAuthorizer,
 		}
 
@@ -847,7 +898,7 @@ func TestUpdateContender(t *testing.T) {
 		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
 
 		assert.ErrorIs(t, err, domain.ErrContestEnded)
-		assert.Nil(t, contender)
+		assert.Empty(t, contender)
 	})
 
 	t.Run("ContenderCannotMakeChangesAfterGracePeriod", func(t *testing.T) {
@@ -893,7 +944,7 @@ func TestUpdateContender(t *testing.T) {
 
 		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, mockedContender)
 		assert.ErrorIs(t, err, domain.ErrContestEnded)
-		assert.Nil(t, contender)
+		assert.Empty(t, contender)
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {

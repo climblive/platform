@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -101,7 +102,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 
 	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
 	if err != nil {
-		return mty, errors.New(err)
+		return mty, errors.Join(domain.ErrRepositoryIntegrityViolation, err)
 	}
 
 	role, err := uc.Authorizer.HasOwnership(ctx, contender.Ownership)
@@ -122,39 +123,55 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 
 	contest, err := uc.Repo.GetContest(ctx, nil, contender.ContestID)
 	if err != nil {
-		return mty, errors.New(err)
+		return mty, errors.Join(domain.ErrRepositoryIntegrityViolation, err)
 	}
 
-	if contender.CompClassID != updates.CompClassID && updates.CompClassID != 0 {
-		var compClass domain.CompClass
-		var err error
+	if contender.CompClassID != 0 {
+		compClass, err := uc.Repo.GetCompClass(ctx, nil, contender.CompClassID)
+		if err != nil {
+			return mty, errors.Join(domain.ErrRepositoryIntegrityViolation, err)
+		}
 
-		publicInfoEvent.CompClassID = updates.CompClassID
+		gracePeriodEnd := compClass.TimeEnd.Add(contest.GracePeriod)
+		if !role.OneOf(domain.AdminRole, domain.OrganizerRole) && time.Now().After(gracePeriodEnd) {
+			return mty, errors.New(domain.ErrContestEnded)
+		}
+	}
 
-		if contender.CompClassID != 0 {
-			compClass, err = uc.Repo.GetCompClass(ctx, nil, contender.CompClassID)
+	if contender.CompClassID != updates.CompClassID {
+		if updates.CompClassID == 0 {
+			return mty, errors.New(domain.ErrNotAllowed)
+		}
 
-			events = append(events, domain.ContenderSwitchClassEvent{
-				ContenderID: contenderID,
-				CompClassID: updates.CompClassID,
-			})
-		} else {
-			compClass, err = uc.Repo.GetCompClass(ctx, nil, updates.CompClassID)
+		compClass, err := uc.Repo.GetCompClass(ctx, nil, updates.CompClassID)
+		if err != nil {
+			return mty, errors.New(err)
+		}
 
+		if contender.CompClassID == 0 {
 			events = append(events, domain.ContenderEnterEvent{
 				ContenderID: contenderID,
 				CompClassID: updates.CompClassID,
 			})
-		}
-
-		if err != nil {
-			return mty, errors.New(err)
+		} else {
+			events = append(events, domain.ContenderSwitchClassEvent{
+				ContenderID: contenderID,
+				CompClassID: updates.CompClassID,
+			})
 		}
 
 		gracePeriodEnd := compClass.TimeEnd.Add(contest.GracePeriod)
 
 		if !role.OneOf(domain.AdminRole, domain.OrganizerRole) && time.Now().After(gracePeriodEnd) {
 			return mty, errors.New(domain.ErrContestEnded)
+		}
+
+		contender.CompClassID = compClass.ID
+		publicInfoEvent.CompClassID = updates.CompClassID
+
+		if contender.Entered == nil {
+			timestamp := time.Now()
+			contender.Entered = &timestamp
 		}
 	}
 
@@ -184,6 +201,10 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 	}
 
 	if contender.Disqualified != updates.Disqualified {
+		if !role.OneOf(domain.AdminRole, domain.OrganizerRole) {
+			return mty, errors.New(domain.ErrInsufficientRole)
+		}
+
 		publicInfoEvent.Disqualified = updates.Disqualified
 
 		var event any
@@ -206,11 +227,15 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 	}
 
 	contender.CompClassID = updates.CompClassID
-	contender.Name = updates.Name
-	contender.PublicName = updates.PublicName
-	contender.ClubName = updates.ClubName
+	contender.Name = strings.TrimSpace(updates.Name)
+	contender.PublicName = strings.TrimSpace(updates.PublicName)
+	contender.ClubName = strings.TrimSpace(updates.ClubName)
 	contender.WithdrawnFromFinals = updates.WithdrawnFromFinals
 	contender.Disqualified = updates.Disqualified
+
+	if contender.Name == "" {
+		return mty, errors.New(domain.ErrEmptyName)
+	}
 
 	if contender, err = uc.Repo.StoreContender(ctx, nil, contender); err != nil {
 		return mty, errors.New(err)
@@ -235,7 +260,7 @@ func (uc *ContenderUseCase) DeleteContender(ctx context.Context, contenderID dom
 	}
 
 	if !role.OneOf(domain.AdminRole, domain.OrganizerRole) {
-		return errors.New(domain.ErrNotAllowed)
+		return errors.New(domain.ErrInsufficientRole)
 	}
 
 	if err := uc.Repo.DeleteContender(ctx, nil, contenderID); err != nil {
