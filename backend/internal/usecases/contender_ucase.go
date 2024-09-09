@@ -234,7 +234,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 	contender.Disqualified = updates.Disqualified
 
 	if contender.Name == "" {
-		return mty, errors.Wrap(domain.ErrEmptyName, 0)
+		return mty, errors.Errorf("%w: %w", domain.ErrInvalidData, domain.ErrEmptyName)
 	}
 
 	if contender, err = uc.Repo.StoreContender(ctx, nil, contender); err != nil {

@@ -797,6 +797,7 @@ func TestUpdateContender(t *testing.T) {
 
 		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
 
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
 		assert.ErrorIs(t, err, domain.ErrEmptyName)
 		assert.Empty(t, contender)
 	})

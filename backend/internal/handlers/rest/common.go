@@ -34,10 +34,6 @@ func writeResponse(w http.ResponseWriter, status int, data any) {
 }
 
 func handleError(w http.ResponseWriter, err error) {
-	if stack := utils.GetErrorStack(err); stack != "" {
-		fmt.Println(stack)
-	}
-
 	switch {
 	case errors.Is(err, domain.ErrNotFound):
 		w.WriteHeader(http.StatusNotFound)
@@ -49,7 +45,13 @@ func handleError(w http.ResponseWriter, err error) {
 		fallthrough
 	case errors.Is(err, domain.ErrNotAllowed):
 		w.WriteHeader(http.StatusForbidden)
+	case errors.Is(err, domain.ErrInvalidData):
+		w.WriteHeader(http.StatusBadRequest)
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
+
+		if stack := utils.GetErrorStack(err); stack != "" {
+			fmt.Println(stack)
+		}
 	}
 }
