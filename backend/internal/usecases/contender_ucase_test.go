@@ -84,6 +84,56 @@ func TestGetContender(t *testing.T) {
 	})
 }
 
+func TestGetContenderByCode(t *testing.T) {
+	mockedContenderID := domain.ResourceID(1)
+	mockedOwnership := domain.OwnershipData{
+		OrganizerID: 1,
+		ContenderID: &mockedContenderID,
+	}
+
+	mockedContender := domain.Contender{
+		ID:        mockedContenderID,
+		Ownership: mockedOwnership,
+	}
+
+	mockedRepo := new(repositoryMock)
+	mockedScoreKeeper := new(scoreKeeperMock)
+
+	mockedRepo.
+		On("GetContenderByCode", mock.Anything, mock.Anything, "ABCD1234").
+		Return(mockedContender, nil)
+
+	mockedRepo.
+		On("GetContenderByCode", mock.Anything, mock.Anything, mock.AnythingOfType("string")).
+		Return(domain.Contender{}, domain.ErrNotFound)
+
+	mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, nil)
+
+	t.Run("HappyPath", func(t *testing.T) {
+		ucase := usecases.ContenderUseCase{
+			Repo:        mockedRepo,
+			ScoreKeeper: mockedScoreKeeper,
+		}
+
+		contender, err := ucase.GetContenderByCode(context.Background(), "ABCD1234")
+
+		assert.NoError(t, err)
+		assert.Equal(t, mockedContenderID, contender.ID)
+	})
+
+	t.Run("NotFound", func(t *testing.T) {
+		ucase := usecases.ContenderUseCase{
+			Repo:        mockedRepo,
+			ScoreKeeper: mockedScoreKeeper,
+		}
+
+		contender, err := ucase.GetContenderByCode(context.Background(), "WXYZ9876")
+
+		assert.ErrorIs(t, err, domain.ErrNotFound)
+		assert.Empty(t, contender)
+	})
+}
+
 func TestDeleteContender(t *testing.T) {
 	mockedContenderID := domain.ResourceID(1)
 	mockedOwnership := domain.OwnershipData{
