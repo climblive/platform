@@ -20,6 +20,7 @@ type repository interface {
 	DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) error
 	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (domain.Contest, error)
 	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) (domain.CompClass, error)
+	GetNumberOfContenders(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (int, error)
 }
 
 type ContenderUseCase struct {
@@ -135,7 +136,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 		gracePeriodEnd := compClass.TimeEnd.Add(contest.GracePeriod)
 		switch {
 		case role.OneOf(domain.AdminRole, domain.OrganizerRole):
-			break;
+			break
 		case time.Now().After(gracePeriodEnd):
 			return mty, errors.Wrap(domain.ErrContestEnded, 0)
 		}
@@ -167,7 +168,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 
 		switch {
 		case role.OneOf(domain.AdminRole, domain.OrganizerRole):
-			break;
+			break
 		case time.Now().After(gracePeriodEnd):
 			return mty, errors.Wrap(domain.ErrContestEnded, 0)
 		}
@@ -288,12 +289,20 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID doma
 		return nil, errors.Wrap(err, 0)
 	}
 
+	numberOfContenders, err := uc.Repo.GetNumberOfContenders(ctx, nil, contestID)
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	if numberOfContenders+number > 500 {
+		return nil, errors.New(domain.ErrContenderLimitExceeded)
+	}
+
 	contenders := make([]domain.Contender, 0)
 
 	tx := uc.Repo.Begin()
 
 	for range number {
-
 		contender := domain.Contender{
 			ContestID: contestID,
 			Ownership: domain.OwnershipData{

@@ -209,45 +209,54 @@ func TestCreateContenders(t *testing.T) {
 		OrganizerID: 1,
 	}
 
-	mockedRepo := new(repositoryMock)
-	mockedTx := new(transactionMock)
-	mockedCodeGenerator := new(codeGeneratorMock)
-
-	mockedRepo.
-		On("GetContest", mock.Anything, mock.Anything, mockedContestID).
-		Return(domain.Contest{
-			ID:        mockedContestID,
-			Ownership: mockedOwnership,
-		}, nil)
-
-	for n := range 100 {
-		code := fmt.Sprintf("%08d", n)
-		contender := domain.Contender{
-			ContestID: 1,
-			Ownership: domain.OwnershipData{
-				OrganizerID: 1,
-			},
-			RegistrationCode: code,
-		}
-
-		mockedCodeGenerator.
-			On("Generate", 8).
-			Return(code).Once()
+	makeMocks := func() (*repositoryMock, *transactionMock, *codeGeneratorMock) {
+		mockedRepo := new(repositoryMock)
+		mockedTx := new(transactionMock)
+		mockedCodeGenerator := new(codeGeneratorMock)
 
 		mockedRepo.
-			On("StoreContender", mock.Anything, mock.Anything, contender).
-			Return(contender, nil)
+			On("GetContest", mock.Anything, mock.Anything, mockedContestID).
+			Return(domain.Contest{
+				ID:        mockedContestID,
+				Ownership: mockedOwnership,
+			}, nil)
+
+		mockedRepo.
+			On("GetNumberOfContenders", mock.Anything, mock.Anything, mockedContestID).
+			Return(400, nil)
+
+		for n := range 100 {
+			code := fmt.Sprintf("%08d", n)
+			contender := domain.Contender{
+				ContestID: 1,
+				Ownership: domain.OwnershipData{
+					OrganizerID: 1,
+				},
+				RegistrationCode: code,
+			}
+
+			mockedCodeGenerator.
+				On("Generate", 8).
+				Return(code).Once()
+
+			mockedRepo.
+				On("StoreContender", mock.Anything, mock.Anything, contender).
+				Return(contender, nil)
+		}
+
+		mockedRepo.
+			On("Begin").
+			Return(mockedTx, nil)
+
+		mockedTx.On("Commit").Return(nil)
+		mockedTx.On("Rollback").Return()
+
+		return mockedRepo, mockedTx, mockedCodeGenerator
 	}
-
-	mockedRepo.
-		On("Begin").
-		Return(mockedTx, nil)
-
-	mockedTx.On("Commit").Return(nil)
-	mockedTx.On("Rollback").Return()
 
 	t.Run("HappyPath", func(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
+		mockedRepo, mockedTx, mockedCodeGenerator := makeMocks()
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, mockedOwnership).
@@ -273,8 +282,29 @@ func TestCreateContenders(t *testing.T) {
 		}
 	})
 
+	t.Run("CannotExceed500Contenders", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+		mockedRepo, _, mockedCodeGenerator := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mockedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		ucase := usecases.ContenderUseCase{
+			Repo:                      mockedRepo,
+			Authorizer:                mockedAuthorizer,
+			RegistrationCodeGenerator: mockedCodeGenerator,
+		}
+
+		contenders, err := ucase.CreateContenders(context.Background(), mockedContestID, 101)
+
+		assert.ErrorIs(t, err, domain.ErrContenderLimitExceeded)
+		assert.Nil(t, contenders)
+	})
+
 	t.Run("BadCredentials", func(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
+		mockedRepo, _, _ := makeMocks()
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, mockedOwnership).
@@ -1162,6 +1192,11 @@ func (m *repositoryMock) GetContest(ctx context.Context, tx domain.Transaction, 
 func (m *repositoryMock) GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) (domain.CompClass, error) {
 	args := m.Called(ctx, tx, compClassID)
 	return args.Get(0).(domain.CompClass), args.Error(1)
+}
+
+func (m *repositoryMock) GetNumberOfContenders(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (int, error) {
+	args := m.Called(ctx, tx, contestID)
+	return args.Get(0).(int), args.Error(1)
 }
 
 type authorizerMock struct {
