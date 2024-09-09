@@ -998,6 +998,70 @@ func TestUpdateContender(t *testing.T) {
 		assert.Empty(t, contender)
 	})
 
+	t.Run("OrganizerCanMakeChangesAfterGracePeriod", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+		mockedScoreKeeper := new(scoreKeeperMock)
+		mockedEventBroker := new(eventBrokerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.Anything).
+			Return(domain.OrganizerRole, nil)
+
+		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
+
+		mockedEventBroker.On("Dispatch", 1, mock.Anything).Return()
+
+		mockedContender := domain.Contender{
+			ID:                  mockedContenderID,
+			Ownership:           mockedOwnership,
+			ContestID:           1,
+			CompClassID:         2,
+			RegistrationCode:    "ABCD1234",
+			Name:                "John Doe",
+			PublicName:          "John",
+			ClubName:            "Testers' Climbing Club",
+			Entered:             &currentTime,
+			WithdrawnFromFinals: false,
+			Disqualified:        false,
+			Score:               100,
+			Placement:           1,
+			ScoreUpdated:        &currentTime,
+		}
+
+		mockedRepo := makeMockedRepo(mockedContender)
+
+		mockedRepo.
+			On("GetCompClass", mock.Anything, mock.Anything, 2).
+			Return(domain.CompClass{
+				ID:        2,
+				TimeBegin: currentTime.Add(-1 * time.Hour),
+				TimeEnd:   currentTime.Add(-1 * gracePeriod),
+			}, nil)
+
+		mockedRepo.
+			On("GetCompClass", mock.Anything, mock.Anything, 3).
+			Return(domain.CompClass{
+				ID:        3,
+				TimeBegin: currentTime.Add(-1 * time.Hour),
+				TimeEnd:   currentTime.Add(-1 * gracePeriod),
+			}, nil)
+
+		ucase := usecases.ContenderUseCase{
+			Repo:        mockedRepo,
+			Authorizer:  mockedAuthorizer,
+			ScoreKeeper: mockedScoreKeeper,
+			EventBroker: mockedEventBroker,
+		}
+
+		updatedContender := mockedContender
+		updatedContender.CompClassID = 3
+
+		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
+
+		assert.NoError(t, err)
+		assert.Equal(t, 3, contender.CompClassID)
+	})
+
 	t.Run("BadCredentials", func(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 

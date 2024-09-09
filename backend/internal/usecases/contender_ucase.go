@@ -133,7 +133,10 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 		}
 
 		gracePeriodEnd := compClass.TimeEnd.Add(contest.GracePeriod)
-		if !role.OneOf(domain.AdminRole, domain.OrganizerRole) && time.Now().After(gracePeriodEnd) {
+		switch {
+		case role.OneOf(domain.AdminRole, domain.OrganizerRole):
+			break;
+		case time.Now().After(gracePeriodEnd):
 			return mty, errors.Wrap(domain.ErrContestEnded, 0)
 		}
 	}
@@ -162,7 +165,10 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 
 		gracePeriodEnd := compClass.TimeEnd.Add(contest.GracePeriod)
 
-		if !role.OneOf(domain.AdminRole, domain.OrganizerRole) && time.Now().After(gracePeriodEnd) {
+		switch {
+		case role.OneOf(domain.AdminRole, domain.OrganizerRole):
+			break;
+		case time.Now().After(gracePeriodEnd):
 			return mty, errors.Wrap(domain.ErrContestEnded, 0)
 		}
 
