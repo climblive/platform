@@ -102,7 +102,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 
 	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
 	if err != nil {
-		return mty, errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
+		return mty, errors.Wrap(err, 0)
 	}
 
 	role, err := uc.Authorizer.HasOwnership(ctx, contender.Ownership)
