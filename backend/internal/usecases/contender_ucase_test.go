@@ -298,7 +298,7 @@ func TestCreateContenders(t *testing.T) {
 
 		contenders, err := ucase.CreateContenders(context.Background(), mockedContestID, 101)
 
-		assert.ErrorIs(t, err, domain.ErrContenderLimitExceeded)
+		assert.ErrorIs(t, err, domain.ErrLimitExceeded)
 		assert.Nil(t, contenders)
 	})
 
@@ -341,6 +341,10 @@ func TestCreateContenders_Rollback(t *testing.T) {
 	mockedRepo.
 		On("StoreContender", mock.Anything, mock.Anything, mock.Anything).
 		Return(domain.Contender{}, errMock)
+
+	mockedRepo.
+		On("GetNumberOfContenders", mock.Anything, mock.Anything, mockedContestID).
+		Return(0, nil)
 
 	mockedTx.On("Rollback").Return()
 
@@ -662,6 +666,41 @@ func TestUpdateContender(t *testing.T) {
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
 		})
+	})
+
+	t.Run("CannotChangeUnregisteredContender", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.Anything).
+			Return(domain.AdminRole, nil)
+
+		mockedContender := domain.Contender{
+			ID:                  mockedContenderID,
+			Ownership:           mockedOwnership,
+			ContestID:           1,
+			CompClassID:         0,
+			RegistrationCode:    "ABCD1234",
+			Name:                "",
+			PublicName:          "",
+			ClubName:            "",
+			Entered:             nil,
+			WithdrawnFromFinals: false,
+			Disqualified:        false,
+			Score:               0,
+			Placement:           0,
+			ScoreUpdated:        nil,
+		}
+
+		ucase := usecases.ContenderUseCase{
+			Repo:       makeMockedRepo(mockedContender),
+			Authorizer: mockedAuthorizer,
+		}
+
+		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, mockedContender)
+
+		assert.ErrorIs(t, err, domain.ErrNotRegistered)
+		assert.Empty(t, contender)
 	})
 
 	t.Run("CannotLeaveContest", func(t *testing.T) {

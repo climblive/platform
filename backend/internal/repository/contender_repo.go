@@ -139,3 +139,14 @@ func (d *Database) DeleteContender(ctx context.Context, tx domain.Transaction, c
 
 	return errors.Wrap(err, 0)
 }
+
+func (d *Database) GetNumberOfContenders(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (int, error) {
+	var count int
+
+	err := d.tx(tx).WithContext(ctx).Raw(`SELECT COUNT(*) FROM contender WHERE contest_id = ?`, contestID).Scan(&count).Error
+	if err != nil {
+		return 0, errors.Wrap(err, 0)
+	}
+
+	return count, nil
+}

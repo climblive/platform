@@ -182,6 +182,10 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 		}
 	}
 
+	if contender.CompClassID == 0 {
+		return mty, errors.New(domain.ErrNotRegistered)
+	}
+
 	if contender.PublicName != updates.PublicName {
 		publicInfoEvent.PublicName = updates.PublicName
 	}
@@ -295,7 +299,7 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID doma
 	}
 
 	if numberOfContenders+number > 500 {
-		return nil, errors.New(domain.ErrContenderLimitExceeded)
+		return nil, errors.New(domain.ErrLimitExceeded)
 	}
 
 	contenders := make([]domain.Contender, 0)
