@@ -219,6 +219,91 @@ func TestGetContendersByCompClass(t *testing.T) {
 	})
 }
 
+func TestGetContendersByContest(t *testing.T) {
+	mockedContestID := domain.ResourceID(1)
+	mockedOwnership := domain.OwnershipData{
+		OrganizerID: 1,
+	}
+	currentTime := time.Now()
+
+	mockedContest := domain.Contest{
+		ID:        mockedContestID,
+		Ownership: mockedOwnership,
+	}
+
+	mockedRepo := new(repositoryMock)
+	mockedScoreKeeper := new(scoreKeeperMock)
+
+	mockedRepo.
+		On("GetContest", mock.Anything, mock.Anything, mockedContestID).
+		Return(mockedContest, nil)
+
+	var contenders []domain.Contender
+
+	for k := 1; k <= 10; k++ {
+		contenderID := k
+
+		contenders = append(contenders, domain.Contender{
+			ID: contenderID,
+		})
+
+		mockedScoreKeeper.On("GetScore", contenderID).Return(domain.Score{
+			Timestamp:   currentTime,
+			ContenderID: contenderID,
+			Score:       k * 10,
+			Placement:   k,
+		}, nil)
+	}
+
+	mockedRepo.
+		On("GetContendersByContest", mock.Anything, mock.Anything, mockedContestID).
+		Return(contenders, nil)
+
+	t.Run("HappyPath", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mockedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		ucase := usecases.ContenderUseCase{
+			Repo:        mockedRepo,
+			Authorizer:  mockedAuthorizer,
+			ScoreKeeper: mockedScoreKeeper,
+		}
+
+		contenders, err := ucase.GetContendersByContest(context.Background(), mockedContestID)
+
+		assert.NoError(t, err)
+		assert.Len(t, contenders, 10)
+
+		for i, contender := range contenders {
+			assert.Equal(t, i+1, contender.ID)
+			assert.Equal(t, (i+1)*10, contender.Score)
+			assert.Equal(t, i+1, contender.Placement)
+			assert.Equal(t, currentTime, *contender.ScoreUpdated)
+		}
+	})
+
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mockedOwnership).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		ucase := usecases.ContenderUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		contenders, err := ucase.GetContendersByContest(context.Background(), mockedContestID)
+
+		assert.ErrorIs(t, err, domain.ErrNoOwnership)
+		assert.Nil(t, contenders)
+	})
+}
+
 func TestDeleteContender(t *testing.T) {
 	mockedContenderID := domain.ResourceID(1)
 	mockedOwnership := domain.OwnershipData{
