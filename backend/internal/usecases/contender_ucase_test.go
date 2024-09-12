@@ -355,20 +355,22 @@ func TestDeleteContender(t *testing.T) {
 	})
 
 	t.Run("InsufficientRole", func(t *testing.T) {
-		mockedAuthorizer := new(authorizerMock)
+		for _, insufficientRole := range []domain.AuthRole{domain.NilRole, domain.ContenderRole, domain.JudgeRole} {
+			mockedAuthorizer := new(authorizerMock)
 
-		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mockedOwnership).
-			Return(domain.ContenderRole, nil)
+			mockedAuthorizer.
+				On("HasOwnership", mock.Anything, mockedOwnership).
+				Return(insufficientRole, nil)
 
-		ucase := usecases.ContenderUseCase{
-			Repo:       mockedRepo,
-			Authorizer: mockedAuthorizer,
+			ucase := usecases.ContenderUseCase{
+				Repo:       mockedRepo,
+				Authorizer: mockedAuthorizer,
+			}
+
+			err := ucase.DeleteContender(context.Background(), mockedContenderID)
+
+			assert.ErrorIs(t, err, domain.ErrInsufficientRole)
 		}
-
-		err := ucase.DeleteContender(context.Background(), mockedContenderID)
-
-		assert.ErrorIs(t, err, domain.ErrInsufficientRole)
 	})
 }
 
