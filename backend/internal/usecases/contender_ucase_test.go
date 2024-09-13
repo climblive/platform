@@ -590,7 +590,7 @@ func TestUpdateContender(t *testing.T) {
 		mockedScoreKeeper := new(scoreKeeperMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mock.Anything).
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.ContenderRole, nil)
 
 		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{
@@ -625,7 +625,7 @@ func TestUpdateContender(t *testing.T) {
 
 		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, mockedContender)
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		assert.Equal(t, mockedContender.ID, contender.ID)
 		assert.Equal(t, mockedContender.Ownership, contender.Ownership)
@@ -649,7 +649,7 @@ func TestUpdateContender(t *testing.T) {
 		mockedScoreKeeper := new(scoreKeeperMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mock.Anything).
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.ContenderRole, nil)
 
 		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
@@ -717,7 +717,7 @@ func TestUpdateContender(t *testing.T) {
 		for _, fn := range modifiers {
 			contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, fn(mockedContender))
 
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, mockedContender, contender)
 		}
 
@@ -726,15 +726,12 @@ func TestUpdateContender(t *testing.T) {
 	t.Run("ContenderCannotAlterDisqualifiedState", func(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 		mockedScoreKeeper := new(scoreKeeperMock)
-		mockedEventBroker := new(eventBrokerMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mock.Anything).
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.ContenderRole, nil)
 
 		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
-
-		mockedEventBroker.On("Dispatch", 1, mock.Anything).Return()
 
 		mockedContender := domain.Contender{
 			ID:                  mockedContenderID,
@@ -757,11 +754,10 @@ func TestUpdateContender(t *testing.T) {
 			Repo:        makeMockedRepo(mockedContender),
 			Authorizer:  mockedAuthorizer,
 			ScoreKeeper: mockedScoreKeeper,
-			EventBroker: mockedEventBroker,
 		}
 
 		_, err := ucase.UpdateContender(context.Background(), mockedContenderID, mockedContender)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		updatedContender := mockedContender
 		updatedContender.Disqualified = false
@@ -778,7 +774,7 @@ func TestUpdateContender(t *testing.T) {
 		mockedEventBroker := new(eventBrokerMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mock.Anything).
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.ContenderRole, nil)
 
 		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
@@ -818,6 +814,7 @@ func TestUpdateContender(t *testing.T) {
 		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
 
 		require.NoError(t, err)
+
 		assert.Equal(t, 1, contender.CompClassID)
 		assert.Equal(t, "John Doe", contender.Name)
 		assert.Equal(t, "John", contender.PublicName)
@@ -840,11 +837,11 @@ func TestUpdateContender(t *testing.T) {
 		})
 	})
 
-	t.Run("CannotChangeUnregisteredContender", func(t *testing.T) {
+	t.Run("CannotMakeChangesToAnUnregisteredContender", func(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mock.Anything).
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.AdminRole, nil)
 
 		mockedContender := domain.Contender{
@@ -877,10 +874,13 @@ func TestUpdateContender(t *testing.T) {
 
 	t.Run("CannotLeaveContest", func(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
+		mockedScoreKeeper := new(scoreKeeperMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mock.Anything).
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.OrganizerRole, nil)
+
+		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
 
 		mockedContender := domain.Contender{
 			ID:                  mockedContenderID,
@@ -900,9 +900,13 @@ func TestUpdateContender(t *testing.T) {
 		}
 
 		ucase := usecases.ContenderUseCase{
-			Repo:       makeMockedRepo(mockedContender),
-			Authorizer: mockedAuthorizer,
+			Repo:        makeMockedRepo(mockedContender),
+			Authorizer:  mockedAuthorizer,
+			ScoreKeeper: mockedScoreKeeper,
 		}
+
+		_, err := ucase.UpdateContender(context.Background(), mockedContenderID, mockedContender)
+		require.NoError(t, err)
 
 		updatedContender := mockedContender
 		updatedContender.CompClassID = 0
@@ -919,7 +923,7 @@ func TestUpdateContender(t *testing.T) {
 		mockedEventBroker := new(eventBrokerMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mock.Anything).
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.OrganizerRole, nil)
 
 		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
@@ -972,7 +976,8 @@ func TestUpdateContender(t *testing.T) {
 
 		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
+
 		assert.Equal(t, 2, contender.CompClassID)
 		assert.Equal(t, "Jane Doe", contender.Name)
 		assert.Equal(t, "Jane", contender.PublicName)
@@ -1008,7 +1013,7 @@ func TestUpdateContender(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mock.Anything).
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.ContenderRole, nil)
 
 		mockedContender := domain.Contender{
@@ -1049,8 +1054,8 @@ func TestUpdateContender(t *testing.T) {
 		mockedEventBroker := new(eventBrokerMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mock.Anything).
-			Return(domain.OrganizerRole, nil)
+			On("HasOwnership", mock.Anything, mockedOwnership).
+			Return(domain.ContenderRole, nil)
 
 		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
 
@@ -1085,7 +1090,7 @@ func TestUpdateContender(t *testing.T) {
 
 		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, false, contender.WithdrawnFromFinals)
 
 		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderReenterFinalsEvent{
@@ -1099,7 +1104,7 @@ func TestUpdateContender(t *testing.T) {
 		mockedEventBroker := new(eventBrokerMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mock.Anything).
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.OrganizerRole, nil)
 
 		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
@@ -1135,7 +1140,7 @@ func TestUpdateContender(t *testing.T) {
 
 		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, false, contender.Disqualified)
 
 		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderRequalifyEvent{
@@ -1147,7 +1152,7 @@ func TestUpdateContender(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mock.Anything).
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.ContenderRole, nil)
 
 		mockedContender := domain.Contender{
@@ -1161,7 +1166,7 @@ func TestUpdateContender(t *testing.T) {
 			ClubName:            "Testers' Climbing Club",
 			Entered:             &currentTime,
 			WithdrawnFromFinals: false,
-			Disqualified:        true,
+			Disqualified:        false,
 			Score:               100,
 			Placement:           1,
 			ScoreUpdated:        &currentTime,
@@ -1197,7 +1202,7 @@ func TestUpdateContender(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mock.Anything).
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.ContenderRole, nil)
 
 		mockedContender := domain.Contender{
@@ -1211,7 +1216,7 @@ func TestUpdateContender(t *testing.T) {
 			ClubName:            "Testers' Climbing Club",
 			Entered:             &currentTime,
 			WithdrawnFromFinals: false,
-			Disqualified:        true,
+			Disqualified:        false,
 			Score:               100,
 			Placement:           1,
 			ScoreUpdated:        &currentTime,
@@ -1245,7 +1250,7 @@ func TestUpdateContender(t *testing.T) {
 		mockedEventBroker := new(eventBrokerMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mock.Anything).
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.OrganizerRole, nil)
 
 		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
@@ -1299,7 +1304,7 @@ func TestUpdateContender(t *testing.T) {
 
 		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, 3, contender.CompClassID)
 	})
 
@@ -1307,7 +1312,7 @@ func TestUpdateContender(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mock.Anything).
+			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.NilRole, domain.ErrNoOwnership)
 
 		ucase := usecases.ContenderUseCase{
