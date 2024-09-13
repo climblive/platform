@@ -19,6 +19,7 @@ func TestGetContender(t *testing.T) {
 		OrganizerID: 1,
 		ContenderID: &mockedContenderID,
 	}
+	currentTime := time.Now()
 
 	mockedContender := domain.Contender{
 		ID:        mockedContenderID,
@@ -33,7 +34,7 @@ func TestGetContender(t *testing.T) {
 		Return(mockedContender, nil)
 
 	mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{
-		Timestamp:   time.Now().Truncate(time.Hour),
+		Timestamp:   currentTime,
 		ContenderID: mockedContenderID,
 		Score:       1000,
 		Placement:   5,
@@ -54,12 +55,12 @@ func TestGetContender(t *testing.T) {
 
 		contender, err := ucase.GetContender(context.Background(), mockedContenderID)
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		assert.Equal(t, mockedContenderID, contender.ID)
 		assert.Equal(t, 1000, contender.Score)
 		assert.Equal(t, 5, contender.Placement)
-		assert.Equal(t, time.Now().Truncate(time.Hour), *contender.ScoreUpdated)
+		assert.Equal(t, currentTime, *contender.ScoreUpdated)
 
 	})
 
@@ -106,7 +107,7 @@ func TestGetContenderByCode(t *testing.T) {
 		On("GetContenderByCode", mock.Anything, mock.Anything, mock.AnythingOfType("string")).
 		Return(domain.Contender{}, domain.ErrNotFound)
 
-	mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, nil)
+	mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
 
 	t.Run("HappyPath", func(t *testing.T) {
 		ucase := usecases.ContenderUseCase{
@@ -116,7 +117,7 @@ func TestGetContenderByCode(t *testing.T) {
 
 		contender, err := ucase.GetContenderByCode(context.Background(), "ABCD1234")
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, mockedContenderID, contender.ID)
 	})
 
@@ -126,7 +127,7 @@ func TestGetContenderByCode(t *testing.T) {
 			ScoreKeeper: mockedScoreKeeper,
 		}
 
-		contender, err := ucase.GetContenderByCode(context.Background(), "WXYZ9876")
+		contender, err := ucase.GetContenderByCode(context.Background(), "DEADBEEF")
 
 		assert.ErrorIs(t, err, domain.ErrNotFound)
 		assert.Empty(t, contender)
@@ -188,7 +189,7 @@ func TestGetContendersByCompClass(t *testing.T) {
 
 		contenders, err := ucase.GetContendersByCompClass(context.Background(), mockedCompClassID)
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Len(t, contenders, 10)
 
 		for i, contender := range contenders {
@@ -273,7 +274,7 @@ func TestGetContendersByContest(t *testing.T) {
 
 		contenders, err := ucase.GetContendersByContest(context.Background(), mockedContestID)
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Len(t, contenders, 10)
 
 		for i, contender := range contenders {
@@ -334,7 +335,7 @@ func TestDeleteContender(t *testing.T) {
 
 		err := ucase.DeleteContender(context.Background(), mockedContenderID)
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {
@@ -441,15 +442,15 @@ func TestCreateContenders(t *testing.T) {
 
 		contenders, err := ucase.CreateContenders(context.Background(), mockedContestID, 100)
 
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Len(t, contenders, 100)
 
 		mockedRepo.AssertExpectations(t)
 		mockedTx.AssertNumberOfCalls(t, "Commit", 1)
 		mockedTx.AssertNotCalled(t, "Rollback")
 
-		for idx, contender := range contenders {
-			assert.Equal(t, fmt.Sprintf("%08d", idx), contender.RegistrationCode)
+		for i, contender := range contenders {
+			assert.Equal(t, fmt.Sprintf("%08d", i), contender.RegistrationCode)
 		}
 	})
 
@@ -486,10 +487,10 @@ func TestCreateContenders(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		contender, err := ucase.CreateContenders(context.Background(), mockedContestID, 100)
+		contenders, err := ucase.CreateContenders(context.Background(), mockedContestID, 100)
 
 		assert.ErrorIs(t, err, domain.ErrNoOwnership)
-		assert.Empty(t, contender)
+		assert.Empty(t, contenders)
 	})
 }
 

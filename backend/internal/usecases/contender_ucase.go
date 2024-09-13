@@ -308,10 +308,8 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID doma
 
 	for range number {
 		contender := domain.Contender{
-			ContestID: contestID,
-			Ownership: domain.OwnershipData{
-				OrganizerID: contest.Ownership.OrganizerID,
-			},
+			ContestID:        contestID,
+			Ownership:        contest.Ownership,
 			RegistrationCode: uc.RegistrationCodeGenerator.Generate(registrationCodeLength),
 		}
 
