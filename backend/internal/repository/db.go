@@ -32,7 +32,7 @@ func NewDatabase(username, password, host, database string) (*Database, error) {
 		Logger: logger.Default.LogMode(logLevel),
 	})
 	if err != nil {
-		return nil, errors.New(err)
+		return nil, errors.Wrap(err, 0)
 	}
 
 	sqlDB, _ := db.DB()
@@ -50,8 +50,7 @@ func (d *Database) Begin() domain.Transaction {
 	tx := d.db.Begin()
 
 	return &transaction{
-		db:     tx,
-		active: true,
+		db: tx,
 	}
 }
 

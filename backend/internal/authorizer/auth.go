@@ -13,7 +13,6 @@ func NewAuthorizer() domain.Authorizer {
 	return &authorizer{}
 }
 
-func (a *authorizer) HasOwnership(ctx context.Context, resourceOwnership domain.OwnershipData) (*domain.AuthRole, error) {
-	role := domain.AdminRole
-	return &role, nil
+func (a *authorizer) HasOwnership(ctx context.Context, resourceOwnership domain.OwnershipData) (domain.AuthRole, error) {
+	return domain.AdminRole, nil
 }

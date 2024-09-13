@@ -7,18 +7,23 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - uses: pnpm/action-setup@v4
         with:
           package_json_file: web/package.json
+
       - uses: actions/setup-node@v4
         with:
           node-version-file: web/package.json
           cache: pnpm
           cache-dependency-path: web/pnpm-lock.yaml
+
       - run: pnpm install
         working-directory: web
+
       - run: pnpm --filter=* format:check
         working-directory: web
+
       - run: pnpm --filter=* lint
         working-directory: web
 
@@ -28,18 +33,36 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - uses: pnpm/action-setup@v4
         with:
           package_json_file: web/package.json
+
       - uses: actions/setup-node@v4
         with:
           node-version-file: web/package.json
           cache: pnpm
           cache-dependency-path: web/pnpm-lock.yaml
+
       - run: pnpm install
         working-directory: web
+
       - run: pnpm --filter=* build
         working-directory: web
+
+  test-backend:
+    name: Test backend
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: "backend/go.mod"
+
+      - run: go test ./...
+        working-directory: backend
 
   build-backend:
     name: Build backend
@@ -47,8 +70,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-go@v5
         with:
           go-version-file: "backend/go.mod"
+
       - run: go build cmd/api/main.go
         working-directory: backend

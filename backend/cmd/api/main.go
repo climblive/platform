@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/authorizer"
@@ -13,6 +14,20 @@ import (
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/utils"
 )
+
+type registrationCodeGenerator struct {
+}
+
+func (g *registrationCodeGenerator) Generate(length int) string {
+	const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	var code []rune
+
+	for range length {
+		code = append(code, []rune(characters)[rand.Intn(len(characters))])
+	}
+
+	return string(code)
+}
 
 func main() {
 	fmt.Println("Hello, Climbers!")
@@ -30,10 +45,11 @@ func main() {
 	scoreKeeper := scores.NewScoreKeeper()
 
 	contenderUseCase := usecases.ContenderUseCase{
-		Repo:        repo,
-		Authorizer:  authorizer,
-		EventBroker: eventBroker,
-		ScoreKeeper: scoreKeeper,
+		Repo:                      repo,
+		Authorizer:                authorizer,
+		EventBroker:               eventBroker,
+		ScoreKeeper:               scoreKeeper,
+		RegistrationCodeGenerator: &registrationCodeGenerator{},
 	}
 
 	rest.InstallContenderHandler(&contenderUseCase)

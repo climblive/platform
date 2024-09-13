@@ -67,11 +67,11 @@ func (d *Database) GetContest(ctx context.Context, tx domain.Transaction, contes
 	var record contestRecord
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contest WHERE id = ?`, contestID).Scan(&record).Error
 	if err != nil {
-		return domain.Contest{}, errors.New(err)
+		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
 	if record.ID == nil {
-		return domain.Contest{}, errors.New(domain.ErrNotFound)
+		return domain.Contest{}, errors.Wrap(domain.ErrNotFound, 0)
 	}
 
 	return record.toDomain(), nil

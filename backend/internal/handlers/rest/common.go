@@ -24,7 +24,7 @@ func writeResponse(w http.ResponseWriter, status int, data any) {
 
 	json, err := json.Marshal(data)
 	if err != nil {
-		handleError(w, errors.New(err))
+		handleError(w, errors.Wrap(err, 0))
 		return
 	}
 
@@ -34,20 +34,24 @@ func writeResponse(w http.ResponseWriter, status int, data any) {
 }
 
 func handleError(w http.ResponseWriter, err error) {
-	if stack := utils.GetErrorStack(err); stack != "" {
-		fmt.Println(stack)
-	}
-
 	switch {
 	case errors.Is(err, domain.ErrNotFound):
 		w.WriteHeader(http.StatusNotFound)
-	case errors.Is(err, domain.ErrPermissionDenied):
+	case errors.Is(err, domain.ErrNoOwnership):
 		fallthrough
 	case errors.Is(err, domain.ErrContestEnded):
 		fallthrough
+	case errors.Is(err, domain.ErrInsufficientRole):
+		fallthrough
 	case errors.Is(err, domain.ErrNotAllowed):
 		w.WriteHeader(http.StatusForbidden)
+	case errors.Is(err, domain.ErrInvalidData):
+		w.WriteHeader(http.StatusBadRequest)
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
+
+		if stack := utils.GetErrorStack(err); stack != "" {
+			fmt.Println(stack)
+		}
 	}
 }

@@ -64,11 +64,11 @@ func (d *Database) GetContender(ctx context.Context, tx domain.Transaction, cont
 	var record contenderRecord
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE id = ?`, contenderID).Scan(&record).Error
 	if err != nil {
-		return domain.Contender{}, errors.New(err)
+		return domain.Contender{}, errors.Wrap(err, 0)
 	}
 
 	if record.ID == nil {
-		return domain.Contender{}, errors.New(domain.ErrNotFound)
+		return domain.Contender{}, errors.Wrap(domain.ErrNotFound, 0)
 	}
 
 	return record.toDomain(), nil
@@ -78,11 +78,11 @@ func (d *Database) GetContenderByCode(ctx context.Context, tx domain.Transaction
 	var record contenderRecord
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE registration_code = ?`, registrationCode).Scan(&record).Error
 	if err != nil {
-		return domain.Contender{}, errors.New(err)
+		return domain.Contender{}, errors.Wrap(err, 0)
 	}
 
 	if record.ID == nil {
-		return domain.Contender{}, errors.New(domain.ErrNotFound)
+		return domain.Contender{}, errors.Wrap(domain.ErrNotFound, 0)
 	}
 
 	return record.toDomain(), nil
@@ -93,7 +93,7 @@ func (d *Database) GetContendersByCompClass(ctx context.Context, tx domain.Trans
 
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE class_id = ?`, compClassID).Scan(&records).Error
 	if err != nil {
-		return nil, errors.New(err)
+		return nil, errors.Wrap(err, 0)
 	}
 
 	contenders := make([]domain.Contender, 0)
@@ -110,7 +110,7 @@ func (d *Database) GetContendersByContest(ctx context.Context, tx domain.Transac
 
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE contest_id = ?`, contestID).Scan(&records).Error
 	if err != nil {
-		return nil, errors.New(err)
+		return nil, errors.Wrap(err, 0)
 	}
 
 	contenders := make([]domain.Contender, 0)
@@ -128,7 +128,7 @@ func (d *Database) StoreContender(ctx context.Context, tx domain.Transaction, co
 
 	err = d.tx(tx).WithContext(ctx).Save(&record).Error
 	if err != nil {
-		return domain.Contender{}, errors.New(err)
+		return domain.Contender{}, errors.Wrap(err, 0)
 	}
 
 	return record.toDomain(), nil
@@ -137,5 +137,16 @@ func (d *Database) StoreContender(ctx context.Context, tx domain.Transaction, co
 func (d *Database) DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) error {
 	err := d.tx(tx).WithContext(ctx).Exec(`DELETE FROM contender WHERE id = ?`, contenderID).Error
 
-	return errors.New(err)
+	return errors.Wrap(err, 0)
+}
+
+func (d *Database) GetNumberOfContenders(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (int, error) {
+	var count int
+
+	err := d.tx(tx).WithContext(ctx).Raw(`SELECT COUNT(*) FROM contender WHERE contest_id = ?`, contestID).Scan(&count).Error
+	if err != nil {
+		return 0, errors.Wrap(err, 0)
+	}
+
+	return count, nil
 }
