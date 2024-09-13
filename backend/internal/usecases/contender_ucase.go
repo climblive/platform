@@ -173,8 +173,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 			return mty, errors.Wrap(domain.ErrContestEnded, 0)
 		}
 
-		contender.CompClassID = compClass.ID
-		publicInfoEvent.CompClassID = updates.CompClassID
+		contender.CompClassID = updates.CompClassID
 
 		if contender.Entered == nil {
 			timestamp := time.Now()
@@ -186,17 +185,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 		return mty, errors.New(domain.ErrNotRegistered)
 	}
 
-	if contender.PublicName != updates.PublicName {
-		publicInfoEvent.PublicName = updates.PublicName
-	}
-
-	if contender.ClubName != updates.ClubName {
-		publicInfoEvent.ClubName = updates.ClubName
-	}
-
 	if contender.WithdrawnFromFinals != updates.WithdrawnFromFinals {
-		publicInfoEvent.WithdrawnFromFinals = updates.WithdrawnFromFinals
-
 		var event any
 		if updates.WithdrawnFromFinals {
 			event = domain.ContenderWithdrawFromFinalsEvent{
@@ -216,8 +205,6 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 			return mty, errors.Wrap(domain.ErrInsufficientRole, 0)
 		}
 
-		publicInfoEvent.Disqualified = updates.Disqualified
-
 		var event any
 
 		if updates.Disqualified {
@@ -233,10 +220,6 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 		events = append(events, event)
 	}
 
-	if publicInfoEvent != publicInfoEventBaseline {
-		events = append(events, publicInfoEvent)
-	}
-
 	contender.CompClassID = updates.CompClassID
 	contender.Name = strings.TrimSpace(updates.Name)
 	contender.PublicName = strings.TrimSpace(updates.PublicName)
@@ -246,6 +229,16 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 
 	if contender.Name == "" {
 		return mty, errors.Errorf("%w: %w", domain.ErrInvalidData, domain.ErrEmptyName)
+	}
+
+	publicInfoEvent.CompClassID = contender.CompClassID
+	publicInfoEvent.PublicName = contender.PublicName
+	publicInfoEvent.ClubName = contender.ClubName
+	publicInfoEvent.WithdrawnFromFinals = contender.WithdrawnFromFinals
+	publicInfoEvent.Disqualified = contender.Disqualified
+
+	if publicInfoEvent != publicInfoEventBaseline {
+		events = append(events, publicInfoEvent)
 	}
 
 	if contender, err = uc.Repo.StoreContender(ctx, nil, contender); err != nil {
