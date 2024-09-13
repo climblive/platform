@@ -9,7 +9,7 @@ import (
 	"github.com/go-errors/errors"
 )
 
-type repository interface {
+type contenderUseCaseRepository interface {
 	domain.Transactor
 
 	GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) (domain.Contender, error)
@@ -24,7 +24,7 @@ type repository interface {
 }
 
 type ContenderUseCase struct {
-	Repo                      repository
+	Repo                      contenderUseCaseRepository
 	Authorizer                domain.Authorizer
 	EventBroker               domain.EventBroker
 	ScoreKeeper               domain.ScoreKeeper
