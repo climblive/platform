@@ -56,8 +56,13 @@ func main() {
 		Repo: repo,
 	}
 
+	compClassUseCase := usecases.CompClassUseCase{
+		Repo: repo,
+	}
+
 	rest.InstallContenderHandler(&contenderUseCase)
 	rest.InstallContestHandler(&contestUseCase)
+	rest.InstallCompClassHandler(&compClassUseCase)
 
 	err = http.ListenAndServe("localhost:80", nil)
 	if err != nil {

@@ -13,13 +13,9 @@ import (
 
 func TestGetContest(t *testing.T) {
 	mockedContestID := domain.ResourceID(1)
-	mockedOwnership := domain.OwnershipData{
-		OrganizerID: 1,
-	}
 
 	mockedContest := domain.Contest{
-		ID:        mockedContestID,
-		Ownership: mockedOwnership,
+		ID: mockedContestID,
 	}
 
 	mockedRepo := new(repositoryMock)

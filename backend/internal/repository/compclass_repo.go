@@ -64,3 +64,20 @@ func (d *Database) GetCompClass(ctx context.Context, tx domain.Transaction, comp
 
 	return record.toDomain(), nil
 }
+
+func (d *Database) GetCompClassesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) ([]domain.CompClass, error) {
+	var records []compClassRecord
+
+	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM comp_class WHERE contest_id = ?`, contestID).Scan(&records).Error
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	compClasses := make([]domain.CompClass, 0)
+
+	for _, record := range records {
+		compClasses = append(compClasses, record.toDomain())
+	}
+
+	return compClasses, nil
+}
