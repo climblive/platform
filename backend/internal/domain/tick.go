@@ -6,14 +6,15 @@ import (
 )
 
 type Tick struct {
-	ID           ResourceID
-	Ownership    OwnershipData
-	Timestamp    time.Time
-	ProblemID    ResourceID
-	Top          bool
-	AttemptsTop  int
-	Zone         bool
-	AttemptsZone int
+	ID           ResourceID    `json:"id,omitempty"`
+	Ownership    OwnershipData `json:"-"`
+	Timestamp    time.Time     `json:"timestamp"`
+	ContestID    ResourceID    `json:"contestId"`
+	ProblemID    ResourceID    `json:"problemId"`
+	Top          bool          `json:"top"`
+	AttemptsTop  int           `json:"attemptsTop"`
+	Zone         bool          `json:"zone"`
+	AttemptsZone int           `json:"attemptsZone"`
 }
 
 type TickUseCase interface {

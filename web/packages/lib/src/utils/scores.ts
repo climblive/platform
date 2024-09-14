@@ -10,7 +10,7 @@ export const calculateProblemScore = (
   if (tick) {
     pointValue += problem.pointsTop;
 
-    if (problem.flashBonus && tick.flash === true) {
+    if (problem.flashBonus && tick.attemptsTop === 1) {
       pointValue += problem.flashBonus;
     }
   }

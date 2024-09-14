@@ -1,7 +1,10 @@
 export type Tick = {
   id: number;
-  flash: boolean;
   contenderId: number;
-  problemId: number;
   timestamp?: string;
+  problemId: number;
+  top: boolean;
+  attemptsTop: number;
+  zone: boolean;
+  attemptsZone: number;
 };

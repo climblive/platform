@@ -103,6 +103,11 @@ func (m *repositoryMock) GetProblemsByContest(ctx context.Context, tx domain.Tra
 	return args.Get(0).([]domain.Problem), args.Error(1)
 }
 
+func (m *repositoryMock) GetTicksByContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) ([]domain.Tick, error) {
+	args := m.Called(ctx, tx, contenderID)
+	return args.Get(0).([]domain.Tick), args.Error(1)
+}
+
 type authorizerMock struct {
 	mock.Mock
 }

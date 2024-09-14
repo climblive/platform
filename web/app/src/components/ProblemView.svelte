@@ -11,7 +11,7 @@
   $: pointValue = calculateProblemScore(problem, tick);
 </script>
 
-<section data-ticked={!!tick} data-flashed={tick?.flash}>
+<section data-ticked={!!tick} data-flashed={tick?.attemptsTop === 1}>
   <span class="number">{problem.number}.</span>
   <HoldColorIndicator
     primary={problem.holdColorPrimary}
