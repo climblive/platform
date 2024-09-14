@@ -8,14 +8,14 @@ import (
 type ColorRGB string
 
 type CompClass struct {
-	ID          ResourceID
-	Ownership   OwnershipData
-	ContestID   ResourceID
-	Name        string
-	Description string
-	Color       ColorRGB
-	TimeBegin   time.Time
-	TimeEnd     time.Time
+	ID          ResourceID    `json:"id,omitempty"`
+	Ownership   OwnershipData `json:"-"`
+	ContestID   ResourceID    `json:"contestId"`
+	Name        string        `json:"name"`
+	Description string        `json:"description"`
+	Color       ColorRGB      `json:"color"`
+	TimeBegin   time.Time     `json:"timeBegin"`
+	TimeEnd     time.Time     `json:"timeEnd"`
 }
 
 type CompClassUseCase interface {

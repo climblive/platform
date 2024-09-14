@@ -88,6 +88,11 @@ func (m *repositoryMock) GetCompClass(ctx context.Context, tx domain.Transaction
 	return args.Get(0).(domain.CompClass), args.Error(1)
 }
 
+func (m *repositoryMock) GetCompClassesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) ([]domain.CompClass, error) {
+	args := m.Called(ctx, tx, contestID)
+	return args.Get(0).([]domain.CompClass), args.Error(1)
+}
+
 func (m *repositoryMock) GetNumberOfContenders(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (int, error) {
 	args := m.Called(ctx, tx, contestID)
 	return args.Get(0).(int), args.Error(1)
