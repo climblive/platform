@@ -33,7 +33,7 @@ export class ApiClient {
   private static baseUrl: string = configData.API_URL;
   private credentialsProvider: ApiCredentialsProvider | undefined;
 
-  private constructor() { }
+  private constructor() {}
 
   public static getInstance(): ApiClient {
     if (!ApiClient.instance) {
