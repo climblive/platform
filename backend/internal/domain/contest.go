@@ -8,7 +8,7 @@ import (
 type Contest struct {
 	ID                 ResourceID    `json:"id,omitempty"`
 	Ownership          OwnershipData `json:"-"`
-	Location           string        `json:"location"`
+	Location           string        `json:"location,omitempty"`
 	SeriesID           ResourceID    `json:"seriesId"`
 	Protected          bool          `json:"protected"`
 	Name               string        `json:"name"`
