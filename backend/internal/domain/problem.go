@@ -3,17 +3,17 @@ package domain
 import "context"
 
 type Problem struct {
-	ID                 ResourceID
-	Ownership          OwnershipData
-	ContestID          ResourceID
-	Number             int
-	HoldColorPrimary   string
-	HoldColorSecondary string
-	Name               string
-	Description        string
-	PointsTop          int
-	PointsZone         int
-	FlashBonus         int
+	ID                 ResourceID    `json:"id,omitempty"`
+	Ownership          OwnershipData `json:"-"`
+	ContestID          ResourceID    `json:"contestId"`
+	Number             int           `json:"number"`
+	HoldColorPrimary   string        `json:"holdColorPrimary"`
+	HoldColorSecondary string        `json:"holdColorSecondary"`
+	Name               string        `json:"name"`
+	Description        string        `json:"description"`
+	PointsTop          int           `json:"pointsTop"`
+	PointsZone         int           `json:"pointsZone"`
+	FlashBonus         int           `json:"flashBonus"`
 }
 
 type ProblemUseCase interface {
