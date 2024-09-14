@@ -52,7 +52,12 @@ func main() {
 		RegistrationCodeGenerator: &registrationCodeGenerator{},
 	}
 
+	contestUseCase := usecases.ContestUseCase{
+		Repo: repo,
+	}
+
 	rest.InstallContenderHandler(&contenderUseCase)
+	rest.InstallContestHandler(&contestUseCase)
 
 	err = http.ListenAndServe("localhost:80", nil)
 	if err != nil {

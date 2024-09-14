@@ -6,18 +6,18 @@ import (
 )
 
 type Contest struct {
-	ID                 ResourceID
-	Ownership          OwnershipData
-	Location           string
-	SeriesID           ResourceID
-	Protected          bool
-	Name               string
-	Description        string
-	FinalsEnabled      bool
-	QualifyingProblems int
-	Finalists          int
-	Rules              string
-	GracePeriod        time.Duration
+	ID                 ResourceID    `json:"id,omitempty"`
+	Ownership          OwnershipData `json:"-"`
+	Location           string        `json:"location,omitempty"`
+	SeriesID           ResourceID    `json:"seriesId,omitempty"`
+	Protected          bool          `json:"protected"`
+	Name               string        `json:"name"`
+	Description        string        `json:"description"`
+	FinalsEnabled      bool          `json:"finalsEnabled"`
+	QualifyingProblems int           `json:"qualifyingProblems"`
+	Finalists          int           `json:"finalists"`
+	Rules              string        `json:"rules"`
+	GracePeriod        time.Duration `json:"gracePeriod"`
 }
 
 type ContestUseCase interface {
