@@ -9,7 +9,7 @@ type Contest struct {
 	ID                 ResourceID    `json:"id,omitempty"`
 	Ownership          OwnershipData `json:"-"`
 	Location           string        `json:"location,omitempty"`
-	SeriesID           ResourceID    `json:"seriesId"`
+	SeriesID           ResourceID    `json:"seriesId,omitempty"`
 	Protected          bool          `json:"protected"`
 	Name               string        `json:"name"`
 	Description        string        `json:"description"`
