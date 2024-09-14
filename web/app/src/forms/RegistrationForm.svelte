@@ -25,7 +25,7 @@
   let form: HTMLFormElement;
   const controls: {
     name?: SlInput;
-    club?: SlInput;
+    clubName?: SlInput;
     compClassId?: SlSelect;
   } = {};
 
@@ -86,12 +86,12 @@
       use:value={data.name}
     ></sl-input>
     <sl-input
-      bind:this={controls.club}
+      bind:this={controls.clubName}
       size="small"
-      name="club"
+      name="clubName"
       label="Club name"
       type="text"
-      use:value={data.club}
+      use:value={data.clubName}
     ></sl-input>
     <sl-select
       bind:this={controls.compClassId}

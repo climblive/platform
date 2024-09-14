@@ -12,8 +12,8 @@ type CompClass struct {
 	Ownership   OwnershipData `json:"-"`
 	ContestID   ResourceID    `json:"contestId"`
 	Name        string        `json:"name"`
-	Description string        `json:"description"`
-	Color       ColorRGB      `json:"color"`
+	Description string        `json:"description,omitempty"`
+	Color       ColorRGB      `json:"color,omitempty"`
 	TimeBegin   time.Time     `json:"timeBegin"`
 	TimeEnd     time.Time     `json:"timeEnd"`
 }

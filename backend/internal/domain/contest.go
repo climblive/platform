@@ -12,11 +12,11 @@ type Contest struct {
 	SeriesID           ResourceID    `json:"seriesId,omitempty"`
 	Protected          bool          `json:"protected"`
 	Name               string        `json:"name"`
-	Description        string        `json:"description"`
+	Description        string        `json:"description,omitempty"`
 	FinalsEnabled      bool          `json:"finalsEnabled"`
 	QualifyingProblems int           `json:"qualifyingProblems"`
 	Finalists          int           `json:"finalists"`
-	Rules              string        `json:"rules"`
+	Rules              string        `json:"rules,omitempty"`
 	GracePeriod        time.Duration `json:"gracePeriod"`
 }
 

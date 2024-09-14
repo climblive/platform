@@ -1,9 +1,13 @@
 export type Contest = {
   id: number;
+  location?: string;
+  seriesId?: number;
+  protected: boolean;
   name: string;
-  rules: string;
+  description?: string;
+  finalEnabled: boolean;
   qualifyingProblems: number;
   finalists: number;
+  rules?: string;
   gracePeriod: number;
-  finalEnabled: boolean;
 };

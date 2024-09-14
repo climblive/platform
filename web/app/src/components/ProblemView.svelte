@@ -19,7 +19,7 @@
   />
   <span class="points">
     <span class="top">
-      {problem.points}p
+      {problem.pointsTop}p
     </span>
     {#if problem.flashBonus}
       <span class="flash">

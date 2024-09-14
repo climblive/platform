@@ -33,7 +33,7 @@ export class ApiClient {
   private static baseUrl: string = configData.API_URL;
   private credentialsProvider: ApiCredentialsProvider | undefined;
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): ApiClient {
     if (!ApiClient.instance) {
@@ -48,13 +48,10 @@ export class ApiClient {
   };
 
   findContender = async (registrationCode: string) => {
-    const endpoint = `/contenders/findByCode?code=${registrationCode}`;
+    const endpoint = `/codes/${registrationCode}/contender`;
 
     const result = await axios.get<Contender>(
       `${ApiClient.baseUrl}${endpoint}`,
-      {
-        headers: this.credentialsProvider?.getAuthHeaders(),
-      },
     );
 
     return result.data;

@@ -8,7 +8,7 @@ export const calculateProblemScore = (
   let pointValue = 0;
 
   if (tick) {
-    pointValue += problem.points;
+    pointValue += problem.pointsTop;
 
     if (problem.flashBonus && tick.flash === true) {
       pointValue += problem.flashBonus;

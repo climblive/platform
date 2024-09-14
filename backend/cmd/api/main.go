@@ -29,6 +29,13 @@ func (g *registrationCodeGenerator) Generate(length int) string {
 	return string(code)
 }
 
+func HandleCORSPreFlight(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
+	w.WriteHeader(http.StatusOK)
+}
+
 func main() {
 	fmt.Println("Hello, Climbers!")
 
@@ -69,7 +76,9 @@ func main() {
 	rest.InstallCompClassHandler(&compClassUseCase)
 	rest.InstallProblemHandler(&problemUseCase)
 
-	err = http.ListenAndServe("localhost:80", nil)
+	http.HandleFunc("OPTIONS /*", HandleCORSPreFlight)
+
+	err = http.ListenAndServe("localhost:8080", nil)
 	if err != nil {
 		if stack := utils.GetErrorStack(err); stack != "" {
 			log.Println(stack)

@@ -19,7 +19,7 @@ type Contender struct {
 	Disqualified        bool          `json:"disqualified"`
 	Score               int           `json:"score"`
 	Placement           int           `json:"placement"`
-	ScoreUpdated        *time.Time    `json:"scoreUpdated"`
+	ScoreUpdated        *time.Time    `json:"scoreUpdated,omitempty"`
 }
 
 type ContenderUseCase interface {

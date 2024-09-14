@@ -84,7 +84,7 @@
         contestName={contest.name}
         compClassName={selectedCompClass?.name}
         contenderName={contender.name}
-        contenderClub={contender.club}
+        contenderClub={contender.clubName}
         points={totalPoints}
         {endTime}
         qualifyingProblems={contest.qualifyingProblems}
