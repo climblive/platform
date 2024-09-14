@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetCompClassByContest(t *testing.T) {
+func TestGetCompClassesByContest(t *testing.T) {
 	t.Parallel()
 
 	mockedContestID := domain.ResourceID(1)
