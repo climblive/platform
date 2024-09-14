@@ -51,7 +51,7 @@
     on:submit={handleSubmit}
     data={{
       name: contender.name,
-      club: contender.club,
+      clubName: contender.clubName,
       compClassId: contender.compClassId,
     }}
   >

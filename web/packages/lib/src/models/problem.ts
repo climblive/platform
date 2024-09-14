@@ -1,10 +1,12 @@
 export type Problem = {
   id: number;
+  contestId: number;
   number: number;
   holdColorPrimary: string;
   holdColorSecondary?: string;
-  points: number;
-  flashBonus?: number;
-  name: string;
+  name?: string;
   description?: string;
+  pointsTop: number;
+  pointsZone: number;
+  flashBonus?: number;
 };

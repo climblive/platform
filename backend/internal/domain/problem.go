@@ -8,12 +8,12 @@ type Problem struct {
 	ContestID          ResourceID    `json:"contestId"`
 	Number             int           `json:"number"`
 	HoldColorPrimary   string        `json:"holdColorPrimary"`
-	HoldColorSecondary string        `json:"holdColorSecondary"`
-	Name               string        `json:"name"`
-	Description        string        `json:"description"`
+	HoldColorSecondary string        `json:"holdColorSecondary,omitempty"`
+	Name               string        `json:"name,omitempty"`
+	Description        string        `json:"description,omitempty"`
 	PointsTop          int           `json:"pointsTop"`
 	PointsZone         int           `json:"pointsZone"`
-	FlashBonus         int           `json:"flashBonus"`
+	FlashBonus         int           `json:"flashBonus,omitempty"`
 }
 
 type ProblemUseCase interface {
