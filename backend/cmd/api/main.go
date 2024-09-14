@@ -71,10 +71,16 @@ func main() {
 		Repo: repo,
 	}
 
+	tickUseCase := usecases.TickUseCase{
+		Repo:       repo,
+		Authorizer: authorizer,
+	}
+
 	rest.InstallContenderHandler(&contenderUseCase)
 	rest.InstallContestHandler(&contestUseCase)
 	rest.InstallCompClassHandler(&compClassUseCase)
 	rest.InstallProblemHandler(&problemUseCase)
+	rest.InstallTickHandler(&tickUseCase)
 
 	http.HandleFunc("OPTIONS /*", HandleCORSPreFlight)
 

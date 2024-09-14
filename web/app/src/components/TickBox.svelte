@@ -27,7 +27,11 @@
   let open = false;
 
   $: loading = $createTick.isPending || $deleteTick.isPending;
-  $: variant = tick ? (tick.flash ? "flashed" : "ticked") : undefined;
+  $: variant = tick
+    ? tick.attemptsTop === 1
+      ? "flashed"
+      : "ticked"
+    : undefined;
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -57,7 +61,10 @@
       {
         problemId: problem.id,
         contenderId: $session.contenderId,
-        flash,
+        top: true,
+        attemptsTop: flash ? 1 : 999,
+        zone: true,
+        attemptsZone: flash ? 1 : 999,
       },
       {
         onError: () => toastError("Failed to register ascent."),
