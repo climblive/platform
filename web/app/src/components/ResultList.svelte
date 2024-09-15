@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { RankedContender } from "@/types";
+  import type { ScoreboardEntry } from "@climblive/lib/models";
   import "@shoelace-style/shoelace/dist/components/progress-bar/progress-bar.js";
   import { getContext } from "svelte";
   import { type Readable } from "svelte/store";
@@ -9,8 +9,10 @@
   export let compClassId: number;
 
   const scoreboard =
-    getContext<Readable<Map<number, RankedContender[]>>>("scoreboard");
+    getContext<Readable<Map<number, ScoreboardEntry[]>>>("scoreboard");
   $: results = $scoreboard.get(compClassId);
+
+  $: console.log(results);
 </script>
 
 {#if results}
@@ -18,13 +20,9 @@
     style="height: calc({results.length} * 2.25rem + {results.length -
       1} * var(--sl-spacing-x-small))"
   >
-    {#each results as contender (contender.contenderId)}
-      <Floater order={contender.order}>
-        <ResultEntry
-          placement={contender.placement}
-          finalist={contender.finalist}
-          {contender}
-        />
+    {#each results as scoreboardEntry (scoreboardEntry.contenderId)}
+      <Floater order={scoreboardEntry.placement ?? 0}>
+        <ResultEntry {scoreboardEntry} />
       </Floater>
     {/each}
   </div>

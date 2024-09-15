@@ -1,17 +1,19 @@
 <script lang="ts">
-  import type { ScoreboardContender } from "@climblive/lib/models";
+  import type { ScoreboardEntry } from "@climblive/lib/models";
   import { asOrdinal } from "@climblive/lib/utils";
   import Score from "./Score.svelte";
 
-  export let placement: number;
-  export let finalist: boolean;
-  export let contender: ScoreboardContender;
+  export let scoreboardEntry: ScoreboardEntry;
 </script>
 
-<section data-finalist={finalist}>
-  <span class="number">{asOrdinal(placement)}</span>
-  <div>{contender.contenderName}</div>
-  <div class="score"><Score value={contender.qualifyingScore} /></div>
+<section data-finalist={scoreboardEntry.finalist}>
+  <span class="number"
+    >{scoreboardEntry.placement
+      ? asOrdinal(scoreboardEntry.placement)
+      : "-"}</span
+  >
+  <div>{scoreboardEntry.publicName}</div>
+  <div class="score"><Score value={scoreboardEntry.score} /></div>
 </section>
 
 <style>

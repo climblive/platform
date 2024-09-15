@@ -1,149 +1,112 @@
 <script lang="ts">
-  import type { RankedContender } from "@/types";
-  import { ApiClient, configData } from "@climblive/lib";
+  import { ApiClient } from "@climblive/lib";
+  import configData from "@climblive/lib/config.json";
   import type {
-    ScoreboardContender,
-    ScoreboardUpdate,
+    ContenderPublicInfoUpdatedEvent,
+    ContenderScoreUpdatedEvent,
+    ScoreboardEntry,
   } from "@climblive/lib/models";
-  import { Client } from "@stomp/stompjs";
   import { onDestroy, onMount, setContext } from "svelte";
   import { writable } from "svelte/store";
 
   export let contestId: number;
-  export let numFinalists: number;
 
-  let wsClient: Client;
+  let eventSource: EventSource | undefined;
   let initialized = false;
 
-  const contenders: Map<number, ScoreboardContender> = new Map();
-  const contendersToCompClass: Map<number, number> = new Map();
-  const pendingUpdates: ScoreboardUpdate[] = [];
+  const contenders: Map<number, ScoreboardEntry> = new Map();
+  const pendingUpdates: ((contenders: Map<number, ScoreboardEntry>) => void)[] =
+    [];
 
-  const resultsStore = writable<Map<number, RankedContender[]>>(new Map());
+  const resultsStore = writable<Map<number, ScoreboardEntry[]>>(new Map());
 
   setContext("scoreboard", resultsStore);
 
   onMount(async () => {
-    const scoreboard = await ApiClient.getInstance().getScoreboard(contestId);
+    const entries = await ApiClient.getInstance().getScoreboard(contestId);
 
-    for (const { compClass, contenders: results } of scoreboard.scores) {
-      for (const contender of results) {
-        handleUpdate({ compClassId: compClass.id, contender });
-      }
+    for (const entry of entries) {
+      contenders.set(entry.contenderId, entry);
     }
 
-    pendingUpdates.forEach(handleUpdate);
+    pendingUpdates.forEach((handler) => handler(contenders));
 
+    rebuildStore();
     initialized = true;
-    $resultsStore = calculateResults();
   });
 
-  const handleUpdate = ({ compClassId, contender }: ScoreboardUpdate) => {
-    contenders.set(contender.contenderId, contender);
-    contendersToCompClass.set(contender.contenderId, compClassId);
+  const rebuildStore = () => {
+    const results = new Map<number, ScoreboardEntry[]>();
+
+    for (const contender of contenders.values()) {
+      let classEntries: ScoreboardEntry[];
+
+      if (results.has(contender.compClassId)) {
+        classEntries = results.get(contender.compClassId)!;
+      } else {
+        classEntries = [];
+        results.set(contender.compClassId, classEntries);
+      }
+
+      classEntries.push(contender);
+    }
+
+    $resultsStore = results;
+  };
+
+  const queueEventHandler = (
+    handler: (contenders: Map<number, ScoreboardEntry>) => void,
+  ) => {
+    if (initialized) {
+      handler(contenders);
+      rebuildStore();
+    } else {
+      pendingUpdates.push(handler);
+    }
   };
 
   onMount(() => {
-    wsClient = new Client({
-      brokerURL: configData.WSS_URL,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
+    eventSource = new EventSource(
+      `${configData.API_URL}/contests/${contestId}/events`,
+    );
+
+    eventSource.addEventListener("CONTENDER_PUBLIC_INFO_UPDATED", (e) => {
+      const event = JSON.parse(e.data) as ContenderPublicInfoUpdatedEvent;
+
+      queueEventHandler((contenders: Map<number, ScoreboardEntry>) => {
+        const contender = contenders.get(event.contenderId);
+        if (!contender) {
+          return;
+        }
+
+        contender.compClassId = event.compClassId;
+        contender.publicName = event.publicName;
+        contender.clubName = event.clubName;
+        contender.withdrawnFromFinals = event.withdrawnFromFinals;
+        contender.disqualified = event.disqualified;
+      });
     });
 
-    wsClient.activate();
-    wsClient.onConnect = () => {
-      wsClient.subscribe(
-        `/topic/contest/${contestId}/scoreboard`,
-        (message) => {
-          const { compClassId, item } = JSON.parse(message.body) as {
-            compClassId: number;
-            item: ScoreboardContender;
-          };
+    eventSource.addEventListener("CONTENDER_SCORE_UPDATED", (e) => {
+      const event = JSON.parse(e.data) as ContenderScoreUpdatedEvent;
 
-          if (!initialized) {
-            pendingUpdates.push({ compClassId, contender: item });
-          } else {
-            handleUpdate({ compClassId, contender: item });
-            $resultsStore = calculateResults();
-          }
-        },
-      );
-    };
+      queueEventHandler((contenders: Map<number, ScoreboardEntry>) => {
+        const contender = contenders.get(event.contenderId);
+        if (!contender) {
+          return;
+        }
+
+        contender.score = event.score;
+        contender.placement = event.placement;
+        contender.finalist = event.finalist;
+      });
+    });
   });
 
   onDestroy(() => {
-    wsClient.deactivate();
+    eventSource?.close();
+    eventSource = undefined;
   });
-
-  const calculateResults = () => {
-    const results: Map<number, RankedContender[]> = new Map();
-
-    for (const contender of contenders.values()) {
-      const compClassId = contendersToCompClass.get(contender.contenderId);
-      if (!compClassId) {
-        continue;
-      }
-
-      let classResults = results.get(compClassId);
-      if (classResults === undefined) {
-        classResults = [];
-        results.set(compClassId, classResults);
-      }
-
-      classResults.push({
-        ...contender,
-        finalist: false,
-        order: 0,
-        placement: 0,
-      });
-    }
-
-    for (const contenders of results.values()) {
-      rankContenders(contenders, numFinalists);
-    }
-
-    return results;
-  };
-
-  const rankContenders = (
-    contenders: RankedContender[],
-    numFinalists: number,
-  ) => {
-    const sortedContenders = contenders.toSorted(
-      (c1, c2) => c2.qualifyingScore - c1.qualifyingScore,
-    );
-
-    let index = 0;
-    let placementCounter = 0;
-    let prevScore = NaN;
-    let gap = 1;
-    let countedFinalists = 0;
-    let highestFinalistPlacement = 0;
-
-    for (const contender of sortedContenders) {
-      contender.order = index++;
-
-      if (prevScore !== contender.qualifyingScore) {
-        placementCounter += gap;
-        gap = 1;
-      } else {
-        gap += 1;
-      }
-
-      prevScore = contender.qualifyingScore;
-
-      contender.placement = placementCounter;
-
-      if (
-        countedFinalists < numFinalists ||
-        contender.placement === highestFinalistPlacement
-      ) {
-        contender.finalist = contender.qualifyingScore > 0;
-        countedFinalists += 1;
-        highestFinalistPlacement = placementCounter;
-      }
-    }
-  };
 </script>
 
 <slot />

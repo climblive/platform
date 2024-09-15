@@ -19,6 +19,7 @@ type Contender struct {
 	Disqualified        bool          `json:"disqualified"`
 	Score               int           `json:"score"`
 	Placement           int           `json:"placement"`
+	Finalist            bool          `json:"finalist"`
 	ScoreUpdated        *time.Time    `json:"scoreUpdated,omitempty"`
 }
 

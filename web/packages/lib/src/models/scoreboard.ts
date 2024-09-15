@@ -1,21 +1,12 @@
-import type { CompClass } from "./compClass";
-
-export type Scoreboard = {
-  contestId: number;
-  scores: {
-    compClass: CompClass;
-    contenders: ScoreboardContender[];
-  }[];
-};
-
-export type ScoreboardContender = {
-  contenderId: number;
-  contenderName: string;
-  totalScore: number;
-  qualifyingScore: number;
-};
-
-export type ScoreboardUpdate = {
-  compClassId: number;
-  contender: ScoreboardContender;
+export type ScoreboardEntry = {
+  contenderId: number,
+  compClassId: number,
+  publicName: string,
+  clubName: string,
+  withdrawnFromFinals: boolean,
+  disqualified: boolean,
+  score: number,
+  placement?: number,
+  scoreUpdated?: string,
+  finalist: boolean;
 };

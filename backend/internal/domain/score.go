@@ -8,8 +8,9 @@ type ScoreKeeper interface {
 }
 
 type Score struct {
-	Timestamp   time.Time
-	ContenderID ResourceID
-	Score       int
-	Placement   int
+	Timestamp   *time.Time `json:"timestamp"`
+	ContenderID ResourceID `json:"contenderId"`
+	Score       int        `json:"score"`
+	Placement   int        `json:"placement"`
+	Finalist    bool       `json:"finalist"`
 }

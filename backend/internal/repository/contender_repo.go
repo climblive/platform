@@ -56,6 +56,7 @@ func (r *contenderRecord) toDomain() domain.Contender {
 		Disqualified:        r.Disqualified,
 		Score:               0,
 		Placement:           0,
+		Finalist:            false,
 		ScoreUpdated:        nil,
 	}
 }

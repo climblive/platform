@@ -1,4 +1,3 @@
-import type { ScoreboardContender } from "@climblive/lib/models";
 import * as z from "zod";
 
 export type ScorecardSession = {
@@ -15,8 +14,3 @@ export const scorecardSessionSchema: z.ZodType<ScorecardSession> = z.object({
   timestamp: z.coerce.date(),
 });
 
-export type RankedContender = ScoreboardContender & {
-  order: number;
-  placement: number;
-  finalist: boolean;
-};

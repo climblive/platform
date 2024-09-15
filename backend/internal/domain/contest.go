@@ -27,5 +27,5 @@ type ContestUseCase interface {
 	DeleteContest(ctx context.Context, contestID ResourceID) error
 	DuplicateContest(ctx context.Context, contestID ResourceID) (Contest, error)
 	CreateContest(ctx context.Context, organizerID ResourceID, contest Contest) (Contest, error)
-	GetScores(ctx context.Context, contestID ResourceID) ([]Score, error)
+	GetScoreboard(ctx context.Context, contestID ResourceID) ([]ScoreboardEntry, error)
 }

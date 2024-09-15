@@ -5,7 +5,7 @@ import type { CompClass } from "./models/compClass";
 import type { Contender } from "./models/contender";
 import type { Contest } from "./models/contest";
 import type { Problem } from "./models/problem";
-import type { Scoreboard } from "./models/scoreboard";
+import type { ScoreboardEntry } from "./models/score";
 import type { Tick } from "./models/tick";
 
 interface ApiCredentialsProvider {
@@ -33,7 +33,7 @@ export class ApiClient {
   private static baseUrl: string = configData.API_URL;
   private credentialsProvider: ApiCredentialsProvider | undefined;
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): ApiClient {
     if (!ApiClient.instance) {
@@ -155,7 +155,7 @@ export class ApiClient {
   getScoreboard = async (contestId: number) => {
     const endpoint = `/contests/${contestId}/scoreboard`;
 
-    const result = await axios.get<Scoreboard>(
+    const result = await axios.get<ScoreboardEntry[]>(
       `${ApiClient.baseUrl}${endpoint}`,
     );
 

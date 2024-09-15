@@ -60,7 +60,8 @@ func main() {
 	}
 
 	contestUseCase := usecases.ContestUseCase{
-		Repo: repo,
+		Repo:        repo,
+		ScoreKeeper: scoreKeeper,
 	}
 
 	compClassUseCase := usecases.CompClassUseCase{
