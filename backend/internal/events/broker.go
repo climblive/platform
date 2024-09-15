@@ -11,7 +11,7 @@ type subscription struct {
 	id          domain.SubscriptionID
 	contestID   domain.ResourceID
 	contenderID *domain.ResourceID
-	ch          chan domain.EventEnclosure
+	ch          chan domain.EventContainer
 }
 
 type broker struct {
@@ -26,7 +26,7 @@ func NewBroker() domain.EventBroker {
 	}
 }
 
-func (b *broker) Subscribe(contestID domain.ResourceID, contenderID *domain.ResourceID, ch chan domain.EventEnclosure) domain.SubscriptionID {
+func (b *broker) Subscribe(contestID domain.ResourceID, contenderID *domain.ResourceID, ch chan domain.EventContainer) domain.SubscriptionID {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
@@ -55,7 +55,7 @@ func (b *broker) Dispatch(contestID domain.ResourceID, event any) {
 
 	for _, subscription := range b.subscriptions {
 		if subscription.contestID == contestID {
-			subscription.ch <- domain.EventEnclosure{
+			subscription.ch <- domain.EventContainer{
 				Name: eventName(event),
 				Data: event,
 			}

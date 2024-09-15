@@ -4,6 +4,7 @@
   import ResultList from "@/components/ResultList.svelte";
   import ScoreboardProvider from "@/components/ScoreboardProvider.svelte";
   import type { ScorecardSession } from "@/types";
+  import configData from "@climblive/lib/config.json";
   import type { ContenderPublicInfoUpdatedEvent } from "@climblive/lib/models";
   import {
     getCompClassesQuery,
@@ -74,7 +75,9 @@
   };
 
   onMount(() => {
-    eventSource = new EventSource("http://localhost:8080/contests/1/events");
+    eventSource = new EventSource(
+      `${configData.API_URL}/contests/${$session.contestId}/events`,
+    );
 
     eventSource.addEventListener("CONTENDER_PUBLIC_INFO_UPDATED", (e) => {
       const event = JSON.parse(e.data) as ContenderPublicInfoUpdatedEvent;

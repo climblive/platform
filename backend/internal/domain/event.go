@@ -10,11 +10,11 @@ type SubscriptionID = uuid.UUID
 
 type EventBroker interface {
 	Dispatch(contestID ResourceID, event any)
-	Subscribe(contestID ResourceID, contenderID *ResourceID, ch chan EventEnclosure) SubscriptionID
+	Subscribe(contestID ResourceID, contenderID *ResourceID, ch chan EventContainer) SubscriptionID
 	Unsubscribe(subscriptionID SubscriptionID)
 }
 
-type EventEnclosure struct {
+type EventContainer struct {
 	Name string
 	Data any
 }
@@ -48,10 +48,10 @@ type ContenderRequalifiedEvent struct {
 type AscentRegisteredEvent struct {
 	ContenderID  ResourceID `json:"contenderId"`
 	ProblemID    ResourceID `json:"problemId"`
-	Top          bool
-	AttemptsTop  int
-	Zone         bool
-	AttemptsZone int
+	Top          bool       `json:"top"`
+	AttemptsTop  int        `json:"attemptsTop"`
+	Zone         bool       `json:"zone"`
+	AttemptsZone int        `json:"attemptsZone"`
 }
 
 type AscentDeregisteredEvent struct {

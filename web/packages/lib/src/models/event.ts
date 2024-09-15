@@ -5,7 +5,7 @@ export type ContenderPublicInfoUpdatedEvent = {
     compClassId: number,
     publicName: string,
     clubName: string,
-    withdrawnFromFinal: boolean,
+    withdrawnFromFinals: boolean,
     disqualified: boolean,
 }
 

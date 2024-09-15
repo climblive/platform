@@ -29,7 +29,7 @@ func (hdlr *eventHandler) ListenContestEvents(w http.ResponseWriter, r *http.Req
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
-	events := make(chan domain.EventEnclosure)
+	events := make(chan domain.EventContainer)
 
 	subscriptionID := hdlr.eventBroker.Subscribe(contestID, nil, events)
 	slog.Info("start event subscription", "contest_id", contestID, "remote_addr", r.RemoteAddr)
