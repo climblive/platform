@@ -81,6 +81,7 @@ func main() {
 	rest.InstallCompClassHandler(&compClassUseCase)
 	rest.InstallProblemHandler(&problemUseCase)
 	rest.InstallTickHandler(&tickUseCase)
+	rest.InstallEventHandler(eventBroker)
 
 	http.HandleFunc("OPTIONS /*", HandleCORSPreFlight)
 

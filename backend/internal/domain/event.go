@@ -1,81 +1,94 @@
 package domain
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
+
+type SubscriptionID = uuid.UUID
 
 type EventBroker interface {
 	Dispatch(contestID ResourceID, event any)
+	Subscribe(contestID ResourceID, contenderID *ResourceID, ch chan EventContainer) SubscriptionID
+	Unsubscribe(subscriptionID SubscriptionID)
 }
 
-type ContenderEnterEvent struct {
-	ContenderID ResourceID
-	CompClassID ResourceID
+type EventContainer struct {
+	Name string
+	Data any
 }
 
-type ContenderSwitchClassEvent struct {
-	ContenderID ResourceID
-	CompClassID ResourceID
+type ContenderEnteredEvent struct {
+	ContenderID ResourceID `json:"contenderId"`
+	CompClassID ResourceID `json:"compClassId"`
 }
 
-type ContenderWithdrawFromFinalsEvent struct {
-	ContenderID ResourceID
+type ContenderSwitchedClassEvent struct {
+	ContenderID ResourceID `json:"contenderId"`
+	CompClassID ResourceID `json:"compClassId"`
 }
 
-type ContenderReenterFinalsEvent struct {
-	ContenderID ResourceID
+type ContenderWithdrewFromFinalsEvent struct {
+	ContenderID ResourceID `json:"contenderId"`
 }
 
-type ContenderDisqualifyEvent struct {
-	ContenderID ResourceID
+type ContenderReenteredFinalsEvent struct {
+	ContenderID ResourceID `json:"contenderId"`
 }
 
-type ContenderRequalifyEvent struct {
-	ContenderID ResourceID
+type ContenderDisqualifiedEvent struct {
+	ContenderID ResourceID `json:"contenderId"`
 }
 
-type RegisterAscentEvent struct {
-	ContenderID  ResourceID
-	ProblemID    ResourceID
-	Top          bool
-	AttemptsTop  int
-	Zone         bool
-	AttemptsZone int
+type ContenderRequalifiedEvent struct {
+	ContenderID ResourceID `json:"contenderId"`
 }
 
-type DeregisterAscentEvent struct {
-	ContenderID ResourceID
-	ProblemID   ResourceID
+type AscentRegisteredEvent struct {
+	ContenderID  ResourceID `json:"contenderId"`
+	ProblemID    ResourceID `json:"problemId"`
+	Top          bool       `json:"top"`
+	AttemptsTop  int        `json:"attemptsTop"`
+	Zone         bool       `json:"zone"`
+	AttemptsZone int        `json:"attemptsZone"`
 }
 
-type AddProblemEvent struct {
-	ProblemID  ResourceID
-	PointsTop  int
-	PointsZone int
-	FlashBonus int
+type AscentDeregisteredEvent struct {
+	ContenderID ResourceID `json:"contenderId"`
+	ProblemID   ResourceID `json:"problemId"`
 }
 
-type UpdateProblemEvent struct {
-	ProblemID  ResourceID
-	PointsTop  int
-	PointsZone int
-	FlashBonus int
+type ProblemAddedEvent struct {
+	ProblemID  ResourceID `json:"problemId"`
+	PointsTop  int        `json:"pointsTop"`
+	PointsZone int        `json:"pointsZone"`
+	FlashBonus int        `json:"flashBonus"`
 }
 
-type DeleteProblemEvent struct {
-	ProblemID ResourceID
+type ProblemUpdatedEvent struct {
+	ProblemID  ResourceID `json:"problemId"`
+	PointsTop  int        `json:"pointsTop"`
+	PointsZone int        `json:"pointsZone"`
+	FlashBonus int        `json:"flashBonus"`
 }
 
-type ContenderPublicInfoUpdateEvent struct {
-	ContenderID         ResourceID
-	CompClassID         ResourceID
-	PublicName          string
-	ClubName            string
-	WithdrawnFromFinals bool
-	Disqualified        bool
+type ProblemDeletedEvent struct {
+	ProblemID ResourceID `json:"problemId"`
 }
 
-type ContenderScoreUpdateEvent struct {
-	Timestamp   time.Time
-	ContenderID ResourceID
-	Score       int
-	Placement   int
+type ContenderPublicInfoUpdatedEvent struct {
+	ContenderID         ResourceID `json:"contenderId"`
+	CompClassID         ResourceID `json:"compClassId"`
+	PublicName          string     `json:"publicName"`
+	ClubName            string     `json:"clubName"`
+	WithdrawnFromFinals bool       `json:"withdrawnFromFinals"`
+	Disqualified        bool       `json:"disqualified"`
+}
+
+type ContenderScoreUpdatedEvent struct {
+	Timestamp   time.Time  `json:"timestamp"`
+	ContenderID ResourceID `json:"contenderId"`
+	Score       int        `json:"score"`
+	Placement   int        `json:"placement"`
 }
