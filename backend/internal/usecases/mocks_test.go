@@ -138,3 +138,12 @@ type eventBrokerMock struct {
 func (m *eventBrokerMock) Dispatch(contestID domain.ResourceID, event any) {
 	m.Called(contestID, event)
 }
+
+func (m *eventBrokerMock) Subscribe(contestID domain.ResourceID, contenderID *domain.ResourceID, ch chan domain.EventContainer) domain.SubscriptionID {
+	args := m.Called(contestID, contenderID, ch)
+	return args.Get(0).(domain.SubscriptionID)
+}
+
+func (m *eventBrokerMock) Unsubscribe(subscriptionID domain.SubscriptionID) {
+	m.Called(subscriptionID)
+}
