@@ -11,8 +11,6 @@
   const scoreboard =
     getContext<Readable<Map<number, ScoreboardEntry[]>>>("scoreboard");
   $: results = $scoreboard.get(compClassId);
-
-  $: console.log(results);
 </script>
 
 {#if results}

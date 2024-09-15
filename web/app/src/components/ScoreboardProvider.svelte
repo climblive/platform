@@ -39,11 +39,9 @@
     const results = new Map<number, ScoreboardEntry[]>();
 
     for (const contender of contenders.values()) {
-      let classEntries: ScoreboardEntry[];
+      let classEntries = results.get(contender.compClassId);
 
-      if (results.has(contender.compClassId)) {
-        classEntries = results.get(contender.compClassId)!;
-      } else {
+      if (classEntries === undefined) {
         classEntries = [];
         results.set(contender.compClassId, classEntries);
       }
