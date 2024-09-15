@@ -822,12 +822,12 @@ func TestUpdateContender(t *testing.T) {
 		require.NotNil(t, contender.Entered)
 		assert.WithinDuration(t, time.Now(), *contender.Entered, time.Minute)
 
-		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderEnterEvent{
+		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderEnteredEvent{
 			ContenderID: mockedContenderID,
 			CompClassID: 1,
 		})
 
-		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderPublicInfoUpdateEvent{
+		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderPublicInfoUpdatedEvent{
 			ContenderID:         mockedContenderID,
 			CompClassID:         1,
 			PublicName:          "John",
@@ -986,12 +986,12 @@ func TestUpdateContender(t *testing.T) {
 		assert.Equal(t, true, contender.Disqualified)
 		assert.Equal(t, currentTime, *contender.Entered)
 
-		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderSwitchClassEvent{
+		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderSwitchedClassEvent{
 			ContenderID: mockedContenderID,
 			CompClassID: 2,
 		})
 
-		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderPublicInfoUpdateEvent{
+		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderPublicInfoUpdatedEvent{
 			ContenderID:         mockedContenderID,
 			CompClassID:         2,
 			PublicName:          "Jane",
@@ -1000,11 +1000,11 @@ func TestUpdateContender(t *testing.T) {
 			Disqualified:        true,
 		})
 
-		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderWithdrawFromFinalsEvent{
+		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderWithdrewFromFinalsEvent{
 			ContenderID: mockedContenderID,
 		})
 
-		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderDisqualifyEvent{
+		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderDisqualifiedEvent{
 			ContenderID: mockedContenderID,
 		})
 	})
@@ -1093,7 +1093,7 @@ func TestUpdateContender(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, false, contender.WithdrawnFromFinals)
 
-		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderReenterFinalsEvent{
+		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderReenteredFinalsEvent{
 			ContenderID: mockedContenderID,
 		})
 	})
@@ -1143,7 +1143,7 @@ func TestUpdateContender(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, false, contender.Disqualified)
 
-		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderRequalifyEvent{
+		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderRequalifiedEvent{
 			ContenderID: mockedContenderID,
 		})
 	})

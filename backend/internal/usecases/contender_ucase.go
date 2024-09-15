@@ -111,7 +111,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 		return mty, errors.Wrap(err, 0)
 	}
 
-	publicInfoEvent := domain.ContenderPublicInfoUpdateEvent{
+	publicInfoEvent := domain.ContenderPublicInfoUpdatedEvent{
 		ContenderID:         contenderID,
 		CompClassID:         contender.CompClassID,
 		PublicName:          contender.PublicName,
@@ -153,12 +153,12 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 		}
 
 		if contender.CompClassID == 0 {
-			events = append(events, domain.ContenderEnterEvent{
+			events = append(events, domain.ContenderEnteredEvent{
 				ContenderID: contenderID,
 				CompClassID: updates.CompClassID,
 			})
 		} else {
-			events = append(events, domain.ContenderSwitchClassEvent{
+			events = append(events, domain.ContenderSwitchedClassEvent{
 				ContenderID: contenderID,
 				CompClassID: updates.CompClassID,
 			})
@@ -188,11 +188,11 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 	if contender.WithdrawnFromFinals != updates.WithdrawnFromFinals {
 		var event any
 		if updates.WithdrawnFromFinals {
-			event = domain.ContenderWithdrawFromFinalsEvent{
+			event = domain.ContenderWithdrewFromFinalsEvent{
 				ContenderID: contenderID,
 			}
 		} else {
-			event = domain.ContenderReenterFinalsEvent{
+			event = domain.ContenderReenteredFinalsEvent{
 				ContenderID: contenderID,
 			}
 		}
@@ -208,11 +208,11 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 		var event any
 
 		if updates.Disqualified {
-			event = domain.ContenderDisqualifyEvent{
+			event = domain.ContenderDisqualifiedEvent{
 				ContenderID: contenderID,
 			}
 		} else {
-			event = domain.ContenderRequalifyEvent{
+			event = domain.ContenderRequalifiedEvent{
 				ContenderID: contenderID,
 			}
 		}

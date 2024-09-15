@@ -4,6 +4,7 @@
   import ResultList from "@/components/ResultList.svelte";
   import ScoreboardProvider from "@/components/ScoreboardProvider.svelte";
   import type { ScorecardSession } from "@/types";
+  import type { ContenderPublicInfoUpdatedEvent } from "@climblive/lib/models";
   import {
     getCompClassesQuery,
     getContenderQuery,
@@ -17,7 +18,7 @@
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
   import { parseISO } from "date-fns";
-  import { getContext } from "svelte";
+  import { getContext, onDestroy, onMount } from "svelte";
   import type { Readable } from "svelte/store";
   import Loading from "./Loading.svelte";
 
@@ -31,6 +32,7 @@
 
   let resultsConnected = false;
   let tabGroup: SlTabGroup;
+  let eventSource: EventSource | undefined;
 
   $: contender = $contenderQuery.data;
   $: contest = $contestQuery.data;
@@ -70,6 +72,20 @@
       tabGroup.show("problems");
     }
   };
+
+  onMount(() => {
+    eventSource = new EventSource("http://localhost:8080/contests/1/events");
+
+    eventSource.addEventListener("CONTENDER_PUBLIC_INFO_UPDATED", (e) => {
+      const event = JSON.parse(e.data) as ContenderPublicInfoUpdatedEvent;
+      console.log(event);
+    });
+  });
+
+  onDestroy(() => {
+    eventSource?.close();
+    eventSource = undefined;
+  });
 </script>
 
 <svelte:window on:visibilitychange={handleVisibilityChange} />
