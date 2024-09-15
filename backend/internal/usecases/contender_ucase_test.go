@@ -601,7 +601,7 @@ func TestUpdateContender(t *testing.T) {
 			ContenderID: mockedContenderID,
 			Score:       1000,
 			Placement:   5,
-			Finalist:    false,
+			Finalist:    true,
 		}, nil)
 
 		mockedContender := domain.Contender{
@@ -647,6 +647,7 @@ func TestUpdateContender(t *testing.T) {
 		assert.Equal(t, 1000, contender.Score)
 		assert.Equal(t, 5, contender.Placement)
 		assert.Equal(t, currentTime, *contender.ScoreUpdated)
+		assert.Equal(t, true, contender.Finalist)
 	})
 
 	t.Run("ReadOnlyFieldsAreUnaltered", func(t *testing.T) {

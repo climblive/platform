@@ -34,11 +34,11 @@ func (hdlr *contestHandler) GetContest(w http.ResponseWriter, r *http.Request) {
 func (hdlr *contestHandler) GetScoreboard(w http.ResponseWriter, r *http.Request) {
 	contestID := parseResourceID(r.PathValue("contestID"))
 
-	scores, err := hdlr.contestUseCase.GetScoreboard(r.Context(), contestID)
+	scoreboard, err := hdlr.contestUseCase.GetScoreboard(r.Context(), contestID)
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	writeResponse(w, http.StatusOK, scores)
+	writeResponse(w, http.StatusOK, scoreboard)
 }
