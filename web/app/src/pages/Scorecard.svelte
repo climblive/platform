@@ -80,8 +80,7 @@
     );
 
     eventSource.addEventListener("CONTENDER_PUBLIC_INFO_UPDATED", (e) => {
-      const event = JSON.parse(e.data) as ContenderPublicInfoUpdatedEvent;
-      console.log(event);
+      JSON.parse(e.data) as ContenderPublicInfoUpdatedEvent;
     });
   });
 
