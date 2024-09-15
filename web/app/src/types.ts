@@ -13,4 +13,3 @@ export const scorecardSessionSchema: z.ZodType<ScorecardSession> = z.object({
   registrationCode: z.string().length(8),
   timestamp: z.coerce.date(),
 });
-

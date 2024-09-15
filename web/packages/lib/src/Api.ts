@@ -1,11 +1,11 @@
 import type { RawAxiosRequestHeaders } from "axios";
 import axios from "axios";
 import configData from "../src/config.json";
+import type { ScoreboardEntry } from "./models";
 import type { CompClass } from "./models/compClass";
 import type { Contender } from "./models/contender";
 import type { Contest } from "./models/contest";
 import type { Problem } from "./models/problem";
-import type { ScoreboardEntry } from "./models/score";
 import type { Tick } from "./models/tick";
 
 interface ApiCredentialsProvider {
@@ -33,7 +33,7 @@ export class ApiClient {
   private static baseUrl: string = configData.API_URL;
   private credentialsProvider: ApiCredentialsProvider | undefined;
 
-  private constructor() { }
+  private constructor() {}
 
   public static getInstance(): ApiClient {
     if (!ApiClient.instance) {
