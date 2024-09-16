@@ -7,9 +7,10 @@ import (
 func withScore(contender domain.Contender, scoreKeeper domain.ScoreKeeper) domain.Contender {
 	score, err := scoreKeeper.GetScore(contender.ID)
 	if err == nil {
-		contender.ScoreUpdated = &score.Timestamp
+		contender.ScoreUpdated = score.Timestamp
 		contender.Score = score.Score
 		contender.Placement = score.Placement
+		contender.Finalist = score.Finalist
 	}
 
 	return contender

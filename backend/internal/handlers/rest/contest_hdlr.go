@@ -16,6 +16,7 @@ func InstallContestHandler(contestUseCase domain.ContestUseCase) {
 	}
 
 	http.HandleFunc("GET /contests/{contestID}", handler.GetContest)
+	http.HandleFunc("GET /contests/{contestID}/scoreboard", handler.GetScoreboard)
 }
 
 func (hdlr *contestHandler) GetContest(w http.ResponseWriter, r *http.Request) {
@@ -28,4 +29,16 @@ func (hdlr *contestHandler) GetContest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeResponse(w, http.StatusOK, contest)
+}
+
+func (hdlr *contestHandler) GetScoreboard(w http.ResponseWriter, r *http.Request) {
+	contestID := parseResourceID(r.PathValue("contestID"))
+
+	scoreboard, err := hdlr.contestUseCase.GetScoreboard(r.Context(), contestID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusOK, scoreboard)
 }

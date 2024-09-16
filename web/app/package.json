@@ -27,7 +27,6 @@
   "dependencies": {
     "@climblive/lib": "workspace:*",
     "@shoelace-style/shoelace": "^2.12.0",
-    "@stomp/stompjs": "^7.0.0",
     "@tanstack/svelte-query": "^5.36.0",
     "date-fns": "^3.0.6",
     "normalize.css": "^8.0.1",
