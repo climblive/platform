@@ -39,7 +39,7 @@ func HandleCORSPreFlight(w http.ResponseWriter, r *http.Request) {
 func main() {
 	fmt.Println("Hello, Climbers!")
 
-	repo, err := repository.NewDatabase("climblive", "climblive", "localhost", "climblive")
+	repo, err := repository.NewDatabase("climblive", "secretpassword", "localhost", "climblive")
 	if err != nil {
 		if stack := utils.GetErrorStack(err); stack != "" {
 			log.Println(stack)
@@ -86,7 +86,7 @@ func main() {
 
 	http.HandleFunc("OPTIONS /*", HandleCORSPreFlight)
 
-	err = http.ListenAndServe("localhost:8080", nil)
+	err = http.ListenAndServe("localhost:8090", nil)
 	if err != nil {
 		if stack := utils.GetErrorStack(err); stack != "" {
 			log.Println(stack)

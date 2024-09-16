@@ -18,8 +18,8 @@
     style="height: calc({results.length} * 2.25rem + {results.length -
       1} * var(--sl-spacing-x-small))"
   >
-    {#each results as scoreboardEntry (scoreboardEntry.contenderId)}
-      <Floater order={scoreboardEntry.placement ?? 0}>
+    {#each results as scoreboardEntry, index (scoreboardEntry.contenderId)}
+      <Floater order={index}>
         <ResultEntry {scoreboardEntry} />
       </Floater>
     {/each}
