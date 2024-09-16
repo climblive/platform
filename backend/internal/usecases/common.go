@@ -10,6 +10,7 @@ func withScore(contender domain.Contender, scoreKeeper domain.ScoreKeeper) domai
 		contender.ScoreUpdated = score.Timestamp
 		contender.Score = score.Score
 		contender.Placement = score.Placement
+		contender.Finalist = score.Finalist
 	}
 
 	return contender
