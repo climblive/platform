@@ -25,6 +25,7 @@ func (hdlr *eventHandler) ListenContestEvents(w http.ResponseWriter, r *http.Req
 	contestID := parseResourceID(r.PathValue("contestID"))
 
 	w.Header().Set("Content-Type", "text/event-stream")
+	w.Header().Set("X-Accel-Buffering", "no")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
@@ -37,6 +38,7 @@ func (hdlr *eventHandler) ListenContestEvents(w http.ResponseWriter, r *http.Req
 	defer hdlr.eventBroker.Unsubscribe(subscriptionID)
 
 	w.WriteHeader(http.StatusOK)
+	w.(http.Flusher).Flush()
 
 	for {
 		select {
