@@ -74,7 +74,7 @@ func (uc *ContestUseCase) GetScoreboard(ctx context.Context, contestID domain.Re
 			Finalist:            contender.Finalist,
 		}
 
-		if score, err := uc.ScoreKeeper.GetScore(contender.ID); err != nil {
+		if score, err := uc.ScoreKeeper.GetScore(contender.ID); err == nil {
 			entry.Score = score.Score
 			entry.Placement = score.Placement
 			entry.Finalist = score.Finalist
