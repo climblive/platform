@@ -74,6 +74,7 @@ func TestGetScoreboard(t *testing.T) {
 		Placement:   42,
 		Finalist:    false,
 	}, nil)
+
 	mockedScoreKeeper.On("GetScore", mock.Anything).Return(domain.Score{}, errMock)
 
 	ucase := usecases.ContestUseCase{
