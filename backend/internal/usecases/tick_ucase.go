@@ -17,7 +17,7 @@ type tickUseCaseRepository interface {
 	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) (domain.CompClass, error)
 	GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ResourceID) (domain.Problem, error)
 	DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.ResourceID) error
-	CreateTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error)
+	StoreTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error)
 }
 
 type TickUseCase struct {
@@ -63,11 +63,6 @@ func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.Resour
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
-	problem, err := uc.Repo.GetProblem(ctx, nil, tick.ProblemID)
-	if err != nil {
-		return domain.Tick{}, errors.Wrap(err, 0)
-	}
-
 	contest, err := uc.Repo.GetContest(ctx, nil, contender.ContestID)
 	if err != nil {
 		return domain.Tick{}, errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
@@ -76,6 +71,11 @@ func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.Resour
 	compClass, err := uc.Repo.GetCompClass(ctx, nil, contender.CompClassID)
 	if err != nil {
 		return domain.Tick{}, errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
+	}
+
+	problem, err := uc.Repo.GetProblem(ctx, nil, tick.ProblemID)
+	if err != nil {
+		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
 	gracePeriodEnd := compClass.TimeEnd.Add(contest.GracePeriod)
@@ -97,7 +97,7 @@ func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.Resour
 		AttemptsZone: tick.AttemptsZone,
 	}
 
-	tick, err = uc.Repo.CreateTick(ctx, nil, newTick)
+	tick, err = uc.Repo.StoreTick(ctx, nil, newTick)
 	if err != nil {
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
@@ -108,7 +108,7 @@ func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.Resour
 		Top:          tick.Top,
 		AttemptsTop:  tick.AttemptsTop,
 		Zone:         tick.Zone,
-		AttemptsZone: tick.AttemptsTop,
+		AttemptsZone: tick.AttemptsZone,
 	})
 
 	return tick, nil

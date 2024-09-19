@@ -73,8 +73,9 @@ func main() {
 	}
 
 	tickUseCase := usecases.TickUseCase{
-		Repo:       repo,
-		Authorizer: authorizer,
+		Repo:        repo,
+		Authorizer:  authorizer,
+		EventBroker: eventBroker,
 	}
 
 	rest.InstallContenderHandler(&contenderUseCase)

@@ -73,3 +73,17 @@ func (d *Database) GetProblemsByContest(ctx context.Context, tx domain.Transacti
 
 	return problems, nil
 }
+
+func (d *Database) GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ResourceID) (domain.Problem, error) {
+	var record problemRecord
+	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM problem WHERE id = ?`, problemID).Scan(&record).Error
+	if err != nil {
+		return domain.Problem{}, errors.Wrap(err, 0)
+	}
+
+	if record.ID == nil {
+		return domain.Problem{}, errors.Wrap(domain.ErrNotFound, 0)
+	}
+
+	return record.toDomain(), nil
+}

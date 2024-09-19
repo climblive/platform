@@ -2,6 +2,7 @@ package usecases_test
 
 import (
 	"context"
+	"math/rand"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
@@ -9,6 +10,10 @@ import (
 )
 
 var errMock = errors.New("mock error")
+
+func randomResourceID() domain.ResourceID {
+	return rand.Int()
+}
 
 type mirrorInstruction struct{}
 
@@ -106,6 +111,26 @@ func (m *repositoryMock) GetProblemsByContest(ctx context.Context, tx domain.Tra
 func (m *repositoryMock) GetTicksByContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) ([]domain.Tick, error) {
 	args := m.Called(ctx, tx, contenderID)
 	return args.Get(0).([]domain.Tick), args.Error(1)
+}
+
+func (m *repositoryMock) DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.ResourceID) error {
+	args := m.Called(ctx, tx, tickID)
+	return args.Error(0)
+}
+
+func (m *repositoryMock) StoreTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error) {
+	args := m.Called(ctx, tx, tick)
+
+	if _, ok := args.Get(0).(mirrorInstruction); ok {
+		return tick, nil
+	} else {
+		return args.Get(0).(domain.Tick), args.Error(1)
+	}
+}
+
+func (m *repositoryMock) GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ResourceID) (domain.Problem, error) {
+	args := m.Called(ctx, tx, problemID)
+	return args.Get(0).(domain.Problem), args.Error(1)
 }
 
 type authorizerMock struct {
