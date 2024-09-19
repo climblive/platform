@@ -118,6 +118,11 @@ func (m *repositoryMock) DeleteTick(ctx context.Context, tx domain.Transaction, 
 	return args.Error(0)
 }
 
+func (m *repositoryMock) GetTick(ctx context.Context, tx domain.Transaction, tickID domain.ResourceID) (domain.Tick, error) {
+	args := m.Called(ctx, tx, tickID)
+	return args.Get(0).(domain.Tick), args.Error(1)
+}
+
 func (m *repositoryMock) StoreTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error) {
 	args := m.Called(ctx, tx, tick)
 

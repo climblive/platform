@@ -137,8 +137,11 @@ func (d *Database) StoreContender(ctx context.Context, tx domain.Transaction, co
 
 func (d *Database) DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) error {
 	err := d.tx(tx).WithContext(ctx).Exec(`DELETE FROM contender WHERE id = ?`, contenderID).Error
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
 
-	return errors.Wrap(err, 0)
+	return nil
 }
 
 func (d *Database) GetNumberOfContenders(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (int, error) {

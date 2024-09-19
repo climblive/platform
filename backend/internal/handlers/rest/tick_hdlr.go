@@ -18,6 +18,7 @@ func InstallTickHandler(tickUseCase domain.TickUseCase) {
 
 	http.HandleFunc("GET /contenders/{contenderID}/ticks", handler.GetTicksByContender)
 	http.HandleFunc("POST /contenders/{contenderID}/ticks", handler.CreateTick)
+	http.HandleFunc("DELETE /ticks/{tickID}", handler.DeleteTick)
 }
 
 func (hdlr *tickHandler) GetTicksByContender(w http.ResponseWriter, r *http.Request) {
@@ -49,4 +50,17 @@ func (hdlr *tickHandler) CreateTick(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeResponse(w, http.StatusCreated, createdTick)
+}
+
+func (hdlr *tickHandler) DeleteTick(w http.ResponseWriter, r *http.Request) {
+	tickID := parseResourceID(r.PathValue("tickID"))
+
+	err := hdlr.tickUseCase.DeleteTick(r.Context(), tickID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	writeResponse(w, http.StatusNoContent, nil)
 }

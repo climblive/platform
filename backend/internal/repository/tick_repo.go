@@ -90,6 +90,23 @@ func (d *Database) StoreTick(ctx context.Context, tx domain.Transaction, tick do
 
 func (d *Database) DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.ResourceID) error {
 	err := d.tx(tx).WithContext(ctx).Exec(`DELETE FROM tick WHERE id = ?`, tickID).Error
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
 
-	return errors.Wrap(err, 0)
+	return nil
+}
+
+func (d *Database) GetTick(ctx context.Context, tx domain.Transaction, tickID domain.ResourceID) (domain.Tick, error) {
+	var record tickRecord
+	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM tick WHERE id = ?`, tickID).Scan(&record).Error
+	if err != nil {
+		return domain.Tick{}, errors.Wrap(err, 0)
+	}
+
+	if record.ID == nil {
+		return domain.Tick{}, errors.Wrap(domain.ErrNotFound, 0)
+	}
+
+	return record.toDomain(), nil
 }
