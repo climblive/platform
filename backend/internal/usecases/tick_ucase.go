@@ -91,7 +91,7 @@ func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.ResourceID)
 	}
 
 	uc.EventBroker.Dispatch(contest.ID, domain.AscentDeregisteredEvent{
-		ContenderID: *tick.Ownership.ContenderID,
+		ContenderID: contender.ID,
 		ProblemID:   tick.ProblemID,
 	})
 
