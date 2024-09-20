@@ -203,7 +203,6 @@ func TestCreateTick(t *testing.T) {
 
 		assert.ErrorIs(t, err, domain.ErrContestEnded)
 		assert.Empty(t, tick)
-
 	})
 
 	t.Run("OrganizerCanRegisterAscentAfterGracePeriod", func(t *testing.T) {
