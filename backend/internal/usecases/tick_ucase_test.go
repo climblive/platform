@@ -90,17 +90,17 @@ func TestCreateTick(t *testing.T) {
 		ContenderID: &mockedContenderID,
 	}
 
-	mockedContender := domain.Contender{
-		ID:          mockedContenderID,
-		Ownership:   mockedOwnership,
-		ContestID:   mockedContestID,
-		CompClassID: mockedCompClassID,
-	}
-
 	mockedEventBroker := new(eventBrokerMock)
 
 	makeMockedRepo := func(timeEnd time.Time) *repositoryMock {
 		mockedRepo := new(repositoryMock)
+
+		mockedContender := domain.Contender{
+			ID:          mockedContenderID,
+			Ownership:   mockedOwnership,
+			ContestID:   mockedContestID,
+			CompClassID: mockedCompClassID,
+		}
 
 		mockedRepo.
 			On("GetContender", mock.Anything, mock.Anything, mockedContenderID).
@@ -249,5 +249,150 @@ func TestCreateTick(t *testing.T) {
 
 		assert.ErrorIs(t, err, domain.ErrNoOwnership)
 		assert.Empty(t, tick)
+	})
+}
+
+func TestDeleteTick(t *testing.T) {
+	mockedTickID := randomResourceID()
+	mockedContenderID := randomResourceID()
+	mockedContestID := randomResourceID()
+	mockedCompClassID := randomResourceID()
+	mockedProblemID := randomResourceID()
+
+	gracePeriod := 15 * time.Minute
+
+	mockedOwnership := domain.OwnershipData{
+		OrganizerID: 1,
+		ContenderID: &mockedContenderID,
+	}
+
+	mockedEventBroker := new(eventBrokerMock)
+
+	makeMockedRepo := func(timeEnd time.Time) *repositoryMock {
+		mockedRepo := new(repositoryMock)
+
+		mockedContender := domain.Contender{
+			ID:          mockedContenderID,
+			ContestID:   mockedContestID,
+			CompClassID: mockedCompClassID,
+		}
+
+		mockedTick := domain.Tick{
+			ID:        mockedTickID,
+			Ownership: mockedOwnership,
+			ProblemID: mockedProblemID,
+			ContestID: mockedContestID,
+		}
+
+		mockedRepo.
+			On("GetTick", mock.Anything, mock.Anything, mockedTickID).
+			Return(mockedTick, nil)
+
+		mockedRepo.
+			On("GetContender", mock.Anything, mock.Anything, mockedContenderID).
+			Return(mockedContender, nil)
+
+		mockedRepo.
+			On("GetContest", mock.Anything, mock.Anything, mockedContestID).
+			Return(domain.Contest{
+				ID:          mockedContestID,
+				GracePeriod: gracePeriod,
+			}, nil)
+
+		mockedRepo.
+			On("GetCompClass", mock.Anything, mock.Anything, mockedCompClassID).
+			Return(domain.CompClass{
+				ID:      mockedCompClassID,
+				TimeEnd: timeEnd,
+			}, nil)
+
+		mockedRepo.
+			On("DeleteTick", mock.Anything, mock.Anything, mockedTickID).
+			Return(nil)
+
+		mockedEventBroker.On("Dispatch", mockedContestID, mock.Anything).Return()
+
+		return mockedRepo
+	}
+
+	t.Run("HappyPath", func(t *testing.T) {
+		mockedRepo := makeMockedRepo(time.Now())
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mockedOwnership).
+			Return(domain.ContenderRole, nil)
+
+		ucase := usecases.TickUseCase{
+			Repo:        mockedRepo,
+			Authorizer:  mockedAuthorizer,
+			EventBroker: mockedEventBroker,
+		}
+
+		err := ucase.DeleteTick(context.Background(), mockedTickID)
+
+		require.NoError(t, err)
+
+		mockedRepo.AssertExpectations(t)
+
+		mockedEventBroker.AssertCalled(t, "Dispatch", mockedContestID, domain.AscentDeregisteredEvent{
+			ContenderID: mockedContenderID,
+			ProblemID:   mockedProblemID,
+		})
+	})
+
+	t.Run("ContenderCannotDeregisterAscentAfterGracePeriod", func(t *testing.T) {
+		mockedRepo := makeMockedRepo(time.Now().Add(-1 * gracePeriod))
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mockedOwnership).
+			Return(domain.ContenderRole, nil)
+
+		ucase := usecases.TickUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		err := ucase.DeleteTick(context.Background(), mockedTickID)
+
+		assert.ErrorIs(t, err, domain.ErrContestEnded)
+	})
+
+	t.Run("OrganizerCanDeregisterAscentAfterGracePeriod", func(t *testing.T) {
+		mockedRepo := makeMockedRepo(time.Now().Add(-1 * gracePeriod))
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mockedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		ucase := usecases.TickUseCase{
+			Repo:        mockedRepo,
+			Authorizer:  mockedAuthorizer,
+			EventBroker: mockedEventBroker,
+		}
+
+		err := ucase.DeleteTick(context.Background(), mockedTickID)
+
+		require.NoError(t, err)
+	})
+
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockedRepo := makeMockedRepo(time.Now())
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mockedOwnership).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		ucase := usecases.TickUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		err := ucase.DeleteTick(context.Background(), mockedTickID)
+
+		assert.ErrorIs(t, err, domain.ErrNoOwnership)
 	})
 }
