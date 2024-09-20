@@ -73,9 +73,12 @@ func main() {
 	}
 
 	tickUseCase := usecases.TickUseCase{
-		Repo:       repo,
-		Authorizer: authorizer,
+		Repo:        repo,
+		Authorizer:  authorizer,
+		EventBroker: eventBroker,
 	}
+
+	http.HandleFunc("OPTIONS /", HandleCORSPreFlight)
 
 	rest.InstallContenderHandler(&contenderUseCase)
 	rest.InstallContestHandler(&contestUseCase)
@@ -83,8 +86,6 @@ func main() {
 	rest.InstallProblemHandler(&problemUseCase)
 	rest.InstallTickHandler(&tickUseCase)
 	rest.InstallEventHandler(eventBroker)
-
-	http.HandleFunc("OPTIONS /*", HandleCORSPreFlight)
 
 	err = http.ListenAndServe("localhost:8090", nil)
 	if err != nil {
