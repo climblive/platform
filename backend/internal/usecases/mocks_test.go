@@ -151,11 +151,6 @@ type scoreKeeperMock struct {
 	mock.Mock
 }
 
-func (m *scoreKeeperMock) UpdateScore(contenderID domain.ResourceID, score domain.Score) error {
-	args := m.Called(contenderID, score)
-	return args.Error(0)
-}
-
 func (m *scoreKeeperMock) GetScore(contenderID domain.ResourceID) (domain.Score, error) {
 	args := m.Called(contenderID)
 	return args.Get(0).(domain.Score), args.Error(1)
@@ -169,8 +164,8 @@ func (m *eventBrokerMock) Dispatch(contestID domain.ResourceID, event any) {
 	m.Called(contestID, event)
 }
 
-func (m *eventBrokerMock) Subscribe(contestID domain.ResourceID, contenderID *domain.ResourceID, ch chan domain.EventContainer) domain.SubscriptionID {
-	args := m.Called(contestID, contenderID, ch)
+func (m *eventBrokerMock) Subscribe(filter domain.EventFilter, ch chan domain.EventContainer) domain.SubscriptionID {
+	args := m.Called(filter, ch)
 	return args.Get(0).(domain.SubscriptionID)
 }
 

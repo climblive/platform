@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { asOrdinal } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
   import Score from "./Score.svelte";
   import Timer from "./Timer.svelte";
@@ -8,9 +9,9 @@
   export let compClassName: string | undefined;
   export let contenderName: string | undefined;
   export let contenderClub: string | undefined;
-  export let points: number;
+  export let score: number;
+  export let placement: number | undefined;
   export let endTime: Date;
-  export let qualifyingProblems: number;
 </script>
 
 <header>
@@ -25,9 +26,9 @@
   <span class="contender-club">{contenderClub}</span>
   <span class="contender-class">{compClassName}</span>
   <div class="lower">
-    <div class="points">
-      <Score value={points} />
-      <span>{qualifyingProblems} hardest</span>
+    <div class="score">
+      <Score value={score} />
+      <span>{placement ? `${asOrdinal(placement)} place` : "-"} </span>
     </div>
     <div class="timer">
       <Timer {endTime} />
@@ -70,7 +71,7 @@
       font-size: var(--sl-font-size-x-small);
     }
 
-    & .points {
+    & .score {
       & > :not(span) {
         font-weight: var(--sl-font-weight-bold);
         font-size: var(--sl-font-size-2x-large);

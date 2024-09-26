@@ -12,5 +12,6 @@ export type ContenderScoreUpdatedEvent = {
   contenderId: number;
   score: number;
   placement: number;
+  rankOrder: number;
   finalist: boolean;
 };
