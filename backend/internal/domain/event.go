@@ -8,9 +8,15 @@ import (
 
 type SubscriptionID = uuid.UUID
 
+type EventFilter struct {
+	ContestID   ResourceID
+	ContenderID ResourceID
+	Types       map[string]struct{}
+}
+
 type EventBroker interface {
 	Dispatch(contestID ResourceID, event any)
-	Subscribe(contestID ResourceID, contenderID *ResourceID, ch chan EventContainer) SubscriptionID
+	Subscribe(filter EventFilter, ch chan EventContainer) SubscriptionID
 	Unsubscribe(subscriptionID SubscriptionID)
 }
 
@@ -91,4 +97,6 @@ type ContenderScoreUpdatedEvent struct {
 	ContenderID ResourceID `json:"contenderId"`
 	Score       int        `json:"score"`
 	Placement   int        `json:"placement"`
+	Finalist    bool       `json:"finalist"`
+	RankOrder   int        `json:"rankOrder"`
 }

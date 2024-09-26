@@ -4,6 +4,8 @@
   import ResultList from "@/components/ResultList.svelte";
   import ScoreboardProvider from "@/components/ScoreboardProvider.svelte";
   import type { ScorecardSession } from "@/types";
+  import configData from "@climblive/lib/config.json";
+  import type { ContenderScoreUpdatedEvent } from "@climblive/lib/models";
   import {
     getCompClassesQuery,
     getContenderQuery,
@@ -11,14 +13,13 @@
     getProblemsQuery,
     getTicksQuery,
   } from "@climblive/lib/queries";
-  import { calculateProblemScore } from "@climblive/lib/utils";
   import type { SlTabGroup, SlTabShowEvent } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
   import { parseISO } from "date-fns";
-  import { getContext } from "svelte";
-  import type { Readable } from "svelte/store";
+  import { getContext, onDestroy, onMount } from "svelte";
+  import { type Readable } from "svelte/store";
   import Loading from "./Loading.svelte";
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
@@ -31,6 +32,7 @@
 
   let resultsConnected = false;
   let tabGroup: SlTabGroup;
+  let eventSource: EventSource | undefined;
 
   $: contender = $contenderQuery.data;
   $: contest = $contestQuery.data;
@@ -44,19 +46,17 @@
     ? parseISO(selectedCompClass.timeEnd)
     : new Date(0);
 
-  $: totalPoints =
-    ticks
-      ?.map((tick) => {
-        const problem = problems?.find(({ id }) => id === tick.problemId);
-        if (problem) {
-          return calculateProblemScore(problem, tick);
-        }
+  let score: number;
+  let placement: number;
+  let finalist: boolean;
 
-        return 0;
-      })
-      .toSorted((a, b) => b - a)
-      .slice(0, contest?.qualifyingProblems ?? 0)
-      .reduce((prev, cur) => prev + cur, 0) ?? 0;
+  $: {
+    if (contender) {
+      score = contender.score;
+      placement = contender.placement;
+      finalist = contender.finalist;
+    }
+  }
 
   const handleShowTab = ({ detail }: SlTabShowEvent) => {
     if (detail.name === "results") {
@@ -70,6 +70,26 @@
       tabGroup.show("problems");
     }
   };
+
+  onMount(() => {
+    eventSource = new EventSource(
+      `${configData.API_URL}/contests/${$session.contestId}/events`,
+    );
+
+    eventSource.addEventListener("CONTENDER_SCORE_UPDATED", (e) => {
+      const event = JSON.parse(e.data) as ContenderScoreUpdatedEvent;
+
+      if (event.contenderId === contender?.id) {
+        score = event.score;
+        placement = event.placement;
+      }
+    });
+  });
+
+  onDestroy(() => {
+    eventSource?.close();
+    eventSource = undefined;
+  });
 </script>
 
 <svelte:window on:visibilitychange={handleVisibilityChange} />
@@ -85,9 +105,9 @@
         compClassName={selectedCompClass?.name}
         contenderName={contender.name}
         contenderClub={contender.clubName}
-        points={totalPoints}
+        {score}
+        {placement}
         {endTime}
-        qualifyingProblems={contest.qualifyingProblems}
       />
     </div>
     <sl-tab-group bind:this={tabGroup} on:sl-tab-show={handleShowTab}>

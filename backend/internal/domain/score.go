@@ -3,7 +3,6 @@ package domain
 import "time"
 
 type ScoreKeeper interface {
-	UpdateScore(contenderID ResourceID, score Score) error
 	GetScore(contenderID ResourceID) (Score, error)
 }
 
@@ -13,4 +12,5 @@ type Score struct {
 	Score       int        `json:"score"`
 	Placement   int        `json:"placement"`
 	Finalist    bool       `json:"finalist"`
+	RankOrder   int        `json:"rankOrder"`
 }
