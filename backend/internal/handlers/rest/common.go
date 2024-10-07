@@ -29,7 +29,6 @@ func writeResponse(w http.ResponseWriter, status int, data any) {
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(status)
 	w.Write(json)
 }

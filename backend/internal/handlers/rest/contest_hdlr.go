@@ -10,13 +10,13 @@ type contestHandler struct {
 	contestUseCase domain.ContestUseCase
 }
 
-func InstallContestHandler(contestUseCase domain.ContestUseCase) {
+func InstallContestHandler(mux *Mux, contestUseCase domain.ContestUseCase) {
 	handler := &contestHandler{
 		contestUseCase: contestUseCase,
 	}
 
-	http.HandleFunc("GET /contests/{contestID}", handler.GetContest)
-	http.HandleFunc("GET /contests/{contestID}/scoreboard", handler.GetScoreboard)
+	mux.HandleFunc("GET /contests/{contestID}", handler.GetContest)
+	mux.HandleFunc("GET /contests/{contestID}/scoreboard", handler.GetScoreboard)
 }
 
 func (hdlr *contestHandler) GetContest(w http.ResponseWriter, r *http.Request) {

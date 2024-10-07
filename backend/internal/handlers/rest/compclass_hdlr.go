@@ -10,12 +10,12 @@ type compClassHandler struct {
 	compClassUseCase domain.CompClassUseCase
 }
 
-func InstallCompClassHandler(compClassUseCase domain.CompClassUseCase) {
+func InstallCompClassHandler(mux *Mux, compClassUseCase domain.CompClassUseCase) {
 	handler := &compClassHandler{
 		compClassUseCase: compClassUseCase,
 	}
 
-	http.HandleFunc("GET /contests/{contestID}/compClasses", handler.GetCompClassesByContest)
+	mux.HandleFunc("GET /contests/{contestID}/compClasses", handler.GetCompClassesByContest)
 }
 
 func (hdlr *compClassHandler) GetCompClassesByContest(w http.ResponseWriter, r *http.Request) {
