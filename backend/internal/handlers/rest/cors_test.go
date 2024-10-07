@@ -10,7 +10,7 @@ import (
 )
 
 func TestCORS(t *testing.T) {
-	r := httptest.NewRequest("GET", "http://localhost/foo", nil)
+	r := httptest.NewRequest("GET", "http://localhost", nil)
 	w := httptest.NewRecorder()
 
 	dummyHandler := func(w http.ResponseWriter, r *http.Request) {
