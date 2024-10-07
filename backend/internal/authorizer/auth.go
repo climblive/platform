@@ -45,7 +45,7 @@ func (a *Authorizer) HasOwnership(ctx context.Context, resourceOwnership domain.
 		return domain.ContenderRole, nil
 	}
 
-	return domain.NilRole, nil
+	return domain.NilRole, domain.ErrNoOwnership
 }
 
 func (a *Authorizer) Middleware(next http.Handler) http.Handler {
