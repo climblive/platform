@@ -24,8 +24,6 @@ func (m *Mux) RegisterMiddleware(mw Middleware) {
 }
 
 func (m *Mux) HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request)) {
-	m.middlewares[0](m.middlewares[1](http.HandlerFunc(handler)))
-
 	var chain http.Handler = http.HandlerFunc(handler)
 
 	for _, mw := range slices.Backward(m.middlewares) {
