@@ -87,9 +87,7 @@ export class ApiClient {
   getContest = async (id: number) => {
     const endpoint = `/contests/${id}`;
 
-    const result = await axios.get<Contest>(`${ApiClient.baseUrl}${endpoint}`, {
-      headers: this.credentialsProvider?.getAuthHeaders(),
-    });
+    const result = await axios.get<Contest>(`${ApiClient.baseUrl}${endpoint}`);
 
     return result.data;
   };
@@ -99,9 +97,6 @@ export class ApiClient {
 
     const result = await axios.get<Problem[]>(
       `${ApiClient.baseUrl}${endpoint}`,
-      {
-        headers: this.credentialsProvider?.getAuthHeaders(),
-      },
     );
 
     return result.data;
@@ -112,9 +107,6 @@ export class ApiClient {
 
     const result = await axios.get<CompClass[]>(
       `${ApiClient.baseUrl}${endpoint}`,
-      {
-        headers: this.credentialsProvider?.getAuthHeaders(),
-      },
     );
 
     return result.data;
