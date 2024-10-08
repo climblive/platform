@@ -98,13 +98,13 @@
     strategy="fixed"
     distance="4"
   >
-    <sl-button size="small" on:click|stopPropagation={() => handleTick(true)}>
-      <sl-icon slot="prefix" name="lightning-charge"></sl-icon>
-      Flash
-    </sl-button>
     <sl-button size="small" on:click|stopPropagation={() => handleTick(false)}>
       <sl-icon slot="prefix" name="check2-all"></sl-icon>
       Top
+    </sl-button>
+    <sl-button size="small" on:click|stopPropagation={() => handleTick(true)}>
+      <sl-icon slot="prefix" name="lightning-charge"></sl-icon>
+      Flash
     </sl-button>
   </sl-popup>
 </div>
