@@ -9,10 +9,10 @@ export const authenticateContender = async (
   queryClient: QueryClient,
   session: Writable<ScorecardSession>,
 ): Promise<Contender> => {
+  const contender = await ApiClient.getInstance().findContender(code);
+
   const provider = new ContenderCredentialsProvider(code);
   ApiClient.getInstance().setCredentialsProvider(provider);
-
-  const contender = await ApiClient.getInstance().findContender(code);
 
   session.update((current) => {
     const updatedSession = {
