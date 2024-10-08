@@ -10,12 +10,12 @@ type problemHandler struct {
 	problemUseCase domain.ProblemUseCase
 }
 
-func InstallProblemHandler(problemUseCase domain.ProblemUseCase) {
+func InstallProblemHandler(mux *Mux, problemUseCase domain.ProblemUseCase) {
 	handler := &problemHandler{
 		problemUseCase: problemUseCase,
 	}
 
-	http.HandleFunc("GET /contests/{contestID}/problems", handler.GetProblemsByContest)
+	mux.HandleFunc("GET /contests/{contestID}/problems", handler.GetProblemsByContest)
 }
 
 func (hdlr *problemHandler) GetProblemsByContest(w http.ResponseWriter, r *http.Request) {
