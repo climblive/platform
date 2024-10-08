@@ -12,10 +12,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMux(t *testing.T) {
+func TestMuxWithMiddlewares(t *testing.T) {
 	mw1 := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("a"))
+			w.Write([]byte("A\n"))
 
 			next.ServeHTTP(w, r)
 		})
@@ -23,7 +23,7 @@ func TestMux(t *testing.T) {
 
 	mw2 := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("b"))
+			w.Write([]byte("B\n"))
 
 			next.ServeHTTP(w, r)
 		})
@@ -31,7 +31,7 @@ func TestMux(t *testing.T) {
 
 	mw3 := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("c"))
+			w.Write([]byte("C\n"))
 
 			next.ServeHTTP(w, r)
 		})
@@ -41,7 +41,7 @@ func TestMux(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	dummyHandler := func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("d"))
+		w.Write([]byte("Hello, Mux!"))
 	}
 
 	mux := rest.NewMux()
@@ -60,5 +60,31 @@ func TestMux(t *testing.T) {
 	_, err := io.Copy(buf, result.Body)
 
 	require.NoError(t, err)
-	assert.Equal(t, "abcd", buf.String())
+	assert.Equal(t, `A
+B
+C
+Hello, Mux!`, buf.String())
+}
+
+func TestMuxWithoutMiddlewares(t *testing.T) {
+	r := httptest.NewRequest("GET", "http://localhost/", nil)
+	w := httptest.NewRecorder()
+
+	dummyHandler := func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Hello, Mux!"))
+	}
+
+	mux := rest.NewMux()
+
+	mux.HandleFunc("/", dummyHandler)
+
+	mux.ServeHTTP(w, r)
+
+	result := w.Result()
+
+	buf := new(strings.Builder)
+	_, err := io.Copy(buf, result.Body)
+
+	require.NoError(t, err)
+	assert.Equal(t, "Hello, Mux!", buf.String())
 }
