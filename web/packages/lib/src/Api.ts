@@ -33,7 +33,7 @@ export class ApiClient {
   private static baseUrl: string = configData.API_URL;
   private credentialsProvider: ApiCredentialsProvider | undefined;
 
-  private constructor() { }
+  private constructor() {}
 
   public static getInstance(): ApiClient {
     if (!ApiClient.instance) {
@@ -96,7 +96,8 @@ export class ApiClient {
     const endpoint = `/contests/${contestId}/problems`;
 
     const result = await axios.get<Problem[]>(
-      `${ApiClient.baseUrl}${endpoint}`);
+      `${ApiClient.baseUrl}${endpoint}`,
+    );
 
     return result.data;
   };
@@ -105,7 +106,8 @@ export class ApiClient {
     const endpoint = `/contests/${contestId}/compClasses`;
 
     const result = await axios.get<CompClass[]>(
-      `${ApiClient.baseUrl}${endpoint}`);
+      `${ApiClient.baseUrl}${endpoint}`,
+    );
 
     return result.data;
   };
