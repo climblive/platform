@@ -66,6 +66,23 @@ func TestAuthorizer(t *testing.T) {
 		handler.ServeHTTP(w, r)
 	})
 
+	t.Run("BadSyntax", func(t *testing.T) {
+		dummyHandler := func(w http.ResponseWriter, r *http.Request) {
+			role, err := authorizer.HasOwnership(r.Context(), mockedOwnership)
+
+			assert.Equal(t, domain.NilRole, role)
+			assert.ErrorIs(t, err, domain.ErrNotAuthorized)
+		}
+
+		r := httptest.NewRequest("GET", "http://localhost", nil)
+		w := httptest.NewRecorder()
+
+		r.Header.Set("Authorization", "totally_wrong")
+
+		handler := authorizer.Middleware(http.HandlerFunc(dummyHandler))
+		handler.ServeHTTP(w, r)
+	})
+
 	t.Run("AuthorizedWithOwnership", func(t *testing.T) {
 		dummyHandler := func(w http.ResponseWriter, r *http.Request) {
 			role, err := authorizer.HasOwnership(r.Context(), mockedOwnership)
