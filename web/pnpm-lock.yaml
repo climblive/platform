@@ -57,61 +57,6 @@ importers:
         specifier: ^5.0.8
         version: 5.0.8(@types/node@20.10.6)
 
-  app:
-    dependencies:
-      '@climblive/lib':
-        specifier: workspace:*
-        version: link:../packages/lib
-      '@shoelace-style/shoelace':
-        specifier: ^2.12.0
-        version: 2.12.0(@types/react@18.2.46)
-      '@tanstack/svelte-query':
-        specifier: ^5.36.0
-        version: 5.36.0(svelte@4.2.8)
-      date-fns:
-        specifier: ^3.0.6
-        version: 3.0.6
-      normalize.css:
-        specifier: ^8.0.1
-        version: 8.0.1
-      svelte-routing:
-        specifier: ^2.11.0
-        version: 2.11.0
-      zod:
-        specifier: ^3.22.4
-        version: 3.22.4
-    devDependencies:
-      '@sveltejs/vite-plugin-svelte':
-        specifier: ^3.0.1
-        version: 3.0.1(svelte@4.2.8)(vite@5.0.8(@types/node@20.10.6))
-      '@tanstack/svelte-query-devtools':
-        specifier: ^5.17.0
-        version: 5.17.0(@tanstack/svelte-query@5.36.0(svelte@4.2.8))(svelte@4.2.8)
-      '@tsconfig/svelte':
-        specifier: ^5.0.2
-        version: 5.0.2
-      rollup-plugin-copy:
-        specifier: ^3.5.0
-        version: 3.5.0
-      rollup-plugin-visualizer:
-        specifier: ^5.12.0
-        version: 5.12.0(rollup@4.17.2)
-      svelte:
-        specifier: ^4.2.8
-        version: 4.2.8
-      svelte-check:
-        specifier: ^3.6.2
-        version: 3.6.2(postcss-load-config@3.1.4(postcss@8.4.38))(postcss@8.4.38)(svelte@4.2.8)
-      tslib:
-        specifier: ^2.6.2
-        version: 2.6.2
-      typescript:
-        specifier: ^5.3.3
-        version: 5.3.3
-      vite:
-        specifier: ^5.0.8
-        version: 5.0.8(@types/node@20.10.6)
-
   packages/lib:
     dependencies:
       '@shoelace-style/shoelace':
@@ -174,6 +119,110 @@ importers:
         version: 7.10.0(eslint@8.56.0)(typescript@5.3.3)
       vite:
         specifier: ^5.2.0
+        version: 5.2.0(@types/node@20.10.6)
+
+  scoreboard:
+    dependencies:
+      '@climblive/lib':
+        specifier: workspace:*
+        version: link:../packages/lib
+      '@shoelace-style/shoelace':
+        specifier: ^2.12.0
+        version: 2.12.0(@types/react@18.2.46)
+      '@tanstack/svelte-query':
+        specifier: ^5.36.0
+        version: 5.36.0(svelte@4.2.12)
+      normalize.css:
+        specifier: ^8.0.1
+        version: 8.0.1
+      svelte-routing:
+        specifier: ^2.11.0
+        version: 2.11.0
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
+    devDependencies:
+      '@sveltejs/vite-plugin-svelte':
+        specifier: ^3.0.1
+        version: 3.0.2(svelte@4.2.12)(vite@5.2.0(@types/node@20.10.6))
+      '@tanstack/svelte-query-devtools':
+        specifier: ^5.17.0
+        version: 5.17.0(@tanstack/svelte-query@5.36.0(svelte@4.2.12))(svelte@4.2.12)
+      '@tsconfig/svelte':
+        specifier: ^5.0.2
+        version: 5.0.2
+      rollup-plugin-copy:
+        specifier: ^3.5.0
+        version: 3.5.0
+      svelte:
+        specifier: ^4.2.8
+        version: 4.2.12
+      svelte-check:
+        specifier: ^3.6.2
+        version: 3.6.7(postcss-load-config@3.1.4(postcss@8.4.38))(postcss@8.4.38)(svelte@4.2.12)
+      tslib:
+        specifier: ^2.6.2
+        version: 2.6.2
+      typescript:
+        specifier: ^5.3.3
+        version: 5.3.3
+      vite:
+        specifier: ^5.0.8
+        version: 5.2.0(@types/node@20.10.6)
+
+  scorecard:
+    dependencies:
+      '@climblive/lib':
+        specifier: workspace:*
+        version: link:../packages/lib
+      '@shoelace-style/shoelace':
+        specifier: ^2.12.0
+        version: 2.12.0(@types/react@18.2.46)
+      '@tanstack/svelte-query':
+        specifier: ^5.36.0
+        version: 5.36.0(svelte@4.2.12)
+      date-fns:
+        specifier: ^3.0.6
+        version: 3.0.6
+      normalize.css:
+        specifier: ^8.0.1
+        version: 8.0.1
+      svelte-routing:
+        specifier: ^2.11.0
+        version: 2.11.0
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
+    devDependencies:
+      '@sveltejs/vite-plugin-svelte':
+        specifier: ^3.0.1
+        version: 3.0.2(svelte@4.2.12)(vite@5.2.0(@types/node@20.10.6))
+      '@tanstack/svelte-query-devtools':
+        specifier: ^5.17.0
+        version: 5.17.0(@tanstack/svelte-query@5.36.0(svelte@4.2.12))(svelte@4.2.12)
+      '@tsconfig/svelte':
+        specifier: ^5.0.2
+        version: 5.0.2
+      rollup-plugin-copy:
+        specifier: ^3.5.0
+        version: 3.5.0
+      rollup-plugin-visualizer:
+        specifier: ^5.12.0
+        version: 5.12.0(rollup@4.17.2)
+      svelte:
+        specifier: ^4.2.8
+        version: 4.2.12
+      svelte-check:
+        specifier: ^3.6.2
+        version: 3.6.7(postcss-load-config@3.1.4(postcss@8.4.38))(postcss@8.4.38)(svelte@4.2.12)
+      tslib:
+        specifier: ^2.6.2
+        version: 2.6.2
+      typescript:
+        specifier: ^5.3.3
+        version: 5.3.3
+      vite:
+        specifier: ^5.0.8
         version: 5.2.0(@types/node@20.10.6)
 
 packages:
@@ -2264,6 +2313,13 @@ snapshots:
   '@tanstack/query-core@5.36.0': {}
 
   '@tanstack/query-devtools@5.15.0': {}
+
+  '@tanstack/svelte-query-devtools@5.17.0(@tanstack/svelte-query@5.36.0(svelte@4.2.12))(svelte@4.2.12)':
+    dependencies:
+      '@tanstack/query-devtools': 5.15.0
+      '@tanstack/svelte-query': 5.36.0(svelte@4.2.12)
+      esm-env: 1.0.0
+      svelte: 4.2.12
 
   '@tanstack/svelte-query-devtools@5.17.0(@tanstack/svelte-query@5.36.0(svelte@4.2.8))(svelte@4.2.8)':
     dependencies:
