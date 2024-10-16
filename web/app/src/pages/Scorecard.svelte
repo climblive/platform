@@ -48,13 +48,11 @@
 
   let score: number;
   let placement: number;
-  let finalist: boolean;
 
   $: {
     if (contender) {
       score = contender.score;
       placement = contender.placement;
-      finalist = contender.finalist;
     }
   }
 

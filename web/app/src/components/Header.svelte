@@ -28,7 +28,7 @@
   <div class="lower">
     <div class="score">
       <Score value={score} />
-      <span>{placement ? `${asOrdinal(placement)} place` : "-"} </span>
+      <span>{placement ? `${asOrdinal(placement)} place` : "-"}</span>
     </div>
     <div class="timer">
       <Timer {endTime} />
