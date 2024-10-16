@@ -80,7 +80,7 @@ func (uc *ContestUseCase) GetScoreboard(ctx context.Context, contestID domain.Re
 			entry.Placement = score.Placement
 			entry.RankOrder = score.RankOrder
 			entry.Finalist = score.Finalist
-			entry.ScoreUpdated = score.Timestamp
+			entry.ScoreUpdated = &score.Timestamp
 		}
 
 		entries = append(entries, entry)

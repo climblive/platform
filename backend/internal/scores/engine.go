@@ -265,7 +265,7 @@ func (e *ScoreEngine) PublishUpdatedScores() {
 
 	for score := range slices.Values(diff) {
 		e.eventBroker.Dispatch(e.contestID, domain.ContenderScoreUpdatedEvent{
-			Timestamp:   *score.Timestamp,
+			Timestamp:   score.Timestamp,
 			ContenderID: score.ContenderID,
 			Score:       score.Score,
 			Placement:   score.Placement,

@@ -69,7 +69,7 @@ func TestGetScoreboard(t *testing.T) {
 	future := currentTime.Add(time.Minute)
 
 	mockedScoreKeeper.On("GetScore", 1).Return(domain.Score{
-		Timestamp:   &future,
+		Timestamp:   future,
 		ContenderID: 1,
 		Score:       1234,
 		Placement:   42,

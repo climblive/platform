@@ -96,7 +96,7 @@ type ContenderScoreUpdatedEvent struct {
 	Timestamp   time.Time  `json:"timestamp"`
 	ContenderID ResourceID `json:"contenderId"`
 	Score       int        `json:"score"`
-	Placement   int        `json:"placement"`
+	Placement   int        `json:"placement,omitempty"`
 	Finalist    bool       `json:"finalist"`
 	RankOrder   int        `json:"rankOrder"`
 }

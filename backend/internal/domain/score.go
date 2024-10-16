@@ -7,10 +7,10 @@ type ScoreKeeper interface {
 }
 
 type Score struct {
-	Timestamp   *time.Time `json:"timestamp"`
+	Timestamp   time.Time  `json:"timestamp"`
 	ContenderID ResourceID `json:"contenderId"`
-	Score       int        `json:"score,omitempty"`
-	Placement   int        `json:"placement"`
+	Score       int        `json:"score"`
+	Placement   int        `json:"placement,omitempty"`
 	Finalist    bool       `json:"finalist"`
 	RankOrder   int        `json:"rankOrder"`
 }

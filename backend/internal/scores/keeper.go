@@ -44,7 +44,7 @@ func (k *Keeper) Run(ctx context.Context) {
 
 func (k *Keeper) HandleContenderScoreUpdated(event domain.ContenderScoreUpdatedEvent) {
 	k.scores[event.ContenderID] = domain.Score{
-		Timestamp:   &event.Timestamp,
+		Timestamp:   event.Timestamp,
 		ContenderID: event.ContenderID,
 		Score:       event.Score,
 		Placement:   event.Placement,
