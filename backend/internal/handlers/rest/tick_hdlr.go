@@ -11,14 +11,14 @@ type tickHandler struct {
 	tickUseCase domain.TickUseCase
 }
 
-func InstallTickHandler(tickUseCase domain.TickUseCase) {
+func InstallTickHandler(mux *Mux, tickUseCase domain.TickUseCase) {
 	handler := &tickHandler{
 		tickUseCase: tickUseCase,
 	}
 
-	http.HandleFunc("GET /contenders/{contenderID}/ticks", handler.GetTicksByContender)
-	http.HandleFunc("POST /contenders/{contenderID}/ticks", handler.CreateTick)
-	http.HandleFunc("DELETE /ticks/{tickID}", handler.DeleteTick)
+	mux.HandleFunc("GET /contenders/{contenderID}/ticks", handler.GetTicksByContender)
+	mux.HandleFunc("POST /contenders/{contenderID}/ticks", handler.CreateTick)
+	mux.HandleFunc("DELETE /ticks/{tickID}", handler.DeleteTick)
 }
 
 func (hdlr *tickHandler) GetTicksByContender(w http.ResponseWriter, r *http.Request) {
@@ -61,6 +61,5 @@ func (hdlr *tickHandler) DeleteTick(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	writeResponse(w, http.StatusNoContent, nil)
 }

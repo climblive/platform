@@ -51,7 +51,7 @@ func main() {
 		panic(err)
 	}
 
-	authorizer := authorizer.NewAuthorizer()
+	authorizer := authorizer.NewAuthorizer(repo)
 	eventBroker := events.NewBroker()
 	scoreKeeper := scores.NewScoreKeeper(eventBroker)
 
@@ -130,20 +130,25 @@ func main() {
 		EventBroker: eventBroker,
 	}
 
-	http.HandleFunc("OPTIONS /", HandleCORSPreFlight)
+	mux := rest.NewMux()
+	mux.RegisterMiddleware(rest.CORS)
+	mux.RegisterMiddleware(authorizer.Middleware)
 
-	rest.InstallContenderHandler(&contenderUseCase)
-	rest.InstallContestHandler(&contestUseCase)
-	rest.InstallCompClassHandler(&compClassUseCase)
-	rest.InstallProblemHandler(&problemUseCase)
-	rest.InstallTickHandler(&tickUseCase)
-	rest.InstallEventHandler(eventBroker)
+	mux.HandleFunc("OPTIONS /", HandleCORSPreFlight)
 
-	err = http.ListenAndServe("localhost:8090", nil)
+	rest.InstallContenderHandler(mux, &contenderUseCase)
+	rest.InstallContestHandler(mux, &contestUseCase)
+	rest.InstallCompClassHandler(mux, &compClassUseCase)
+	rest.InstallProblemHandler(mux, &problemUseCase)
+	rest.InstallTickHandler(mux, &tickUseCase)
+	rest.InstallEventHandler(mux, eventBroker)
+
+	err = http.ListenAndServe("localhost:8090", mux)
 	if err != nil {
 		if stack := utils.GetErrorStack(err); stack != "" {
 			log.Println(stack)
 		}
+
 		panic(err)
 	}
 }

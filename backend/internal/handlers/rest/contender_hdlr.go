@@ -11,18 +11,18 @@ type contenderHandler struct {
 	contenderUseCase domain.ContenderUseCase
 }
 
-func InstallContenderHandler(contenderUseCase domain.ContenderUseCase) {
+func InstallContenderHandler(mux *Mux, contenderUseCase domain.ContenderUseCase) {
 	handler := &contenderHandler{
 		contenderUseCase: contenderUseCase,
 	}
 
-	http.HandleFunc("GET /contenders/{contenderID}", handler.GetContender)
-	http.HandleFunc("GET /codes/{registrationCode}/contender", handler.GetContenderByCode)
-	http.HandleFunc("GET /compClasses/{compClassID}/contenders", handler.GetContendersByCompClass)
-	http.HandleFunc("GET /contests/{contestID}/contenders", handler.GetContendersByContest)
-	http.HandleFunc("PUT /contenders/{contenderID}", handler.UpdateContender)
-	http.HandleFunc("DELETE /contenders/{contenderID}", handler.DeleteContender)
-	http.HandleFunc("POST /contests/{contestID}/contenders", handler.CreateContenders)
+	mux.HandleFunc("GET /contenders/{contenderID}", handler.GetContender)
+	mux.HandleFunc("GET /codes/{registrationCode}/contender", handler.GetContenderByCode)
+	mux.HandleFunc("GET /compClasses/{compClassID}/contenders", handler.GetContendersByCompClass)
+	mux.HandleFunc("GET /contests/{contestID}/contenders", handler.GetContendersByContest)
+	mux.HandleFunc("PUT /contenders/{contenderID}", handler.UpdateContender)
+	mux.HandleFunc("DELETE /contenders/{contenderID}", handler.DeleteContender)
+	mux.HandleFunc("POST /contests/{contestID}/contenders", handler.CreateContenders)
 }
 
 func (hdlr *contenderHandler) GetContender(w http.ResponseWriter, r *http.Request) {
