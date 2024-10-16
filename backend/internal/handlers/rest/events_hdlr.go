@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/events"
 )
 
 type eventHandler struct {
@@ -30,7 +31,7 @@ func (hdlr *eventHandler) ListenContestEvents(w http.ResponseWriter, r *http.Req
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
-	events := make(chan domain.EventContainer, 1000)
+	events := make(chan domain.EventContainer, events.EventChannelBufferSize)
 
 	subscriptionID := hdlr.eventBroker.Subscribe(domain.EventFilter{
 		ContestID: contestID,

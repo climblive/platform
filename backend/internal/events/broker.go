@@ -1,12 +1,13 @@
 package events
 
 import (
-	"log/slog"
 	"sync"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/google/uuid"
 )
+
+const EventChannelBufferSize = 1000
 
 type subscription struct {
 	id     domain.SubscriptionID

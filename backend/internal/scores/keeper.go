@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/events"
 )
 
 type Keeper struct {
@@ -19,7 +20,7 @@ func NewScoreKeeper(eventBroker domain.EventBroker) *Keeper {
 }
 
 func (k *Keeper) Run(ctx context.Context) {
-	events := make(chan domain.EventContainer, 1000)
+	events := make(chan domain.EventContainer, events.EventChannelBufferSize)
 	subscriptionID := k.eventBroker.Subscribe(domain.EventFilter{
 		Types: map[string]struct{}{
 			"CONTENDER_SCORE_UPDATED": {},

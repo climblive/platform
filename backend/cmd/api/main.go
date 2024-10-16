@@ -57,7 +57,7 @@ func main() {
 
 	go scoreKeeper.Run(ctx)
 
-	engine := scores.NewScoreEngine(1, eventBroker, &scores.XHardest{Number: 5}, 1)
+	engine := scores.NewScoreEngine(1, eventBroker, &scores.HardestProblems{Number: 5}, scores.NewBasicRanker(3))
 
 	go engine.Run(context.Background(), 1)
 
