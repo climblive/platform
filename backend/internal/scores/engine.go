@@ -11,7 +11,7 @@ import (
 )
 
 type ScoringRules interface {
-	CalculateScore(ticks iter.Seq[int]) int
+	CalculateScore(tickPointValues iter.Seq[int]) int
 }
 
 type Ranker interface {
