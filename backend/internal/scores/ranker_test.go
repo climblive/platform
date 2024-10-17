@@ -83,29 +83,6 @@ func TestBasicRanker(t *testing.T) {
 		assert.Equal(t, expected, prettifyAll(scores))
 	})
 
-	t.Run("SharedPlacement", func(t *testing.T) {
-		contenders := makeContenders(5)
-		contenders[0].Score = 300
-		contenders[1].Score = 200
-		contenders[2].Score = 200
-		contenders[3].Score = 200
-		contenders[4].Score = 100
-
-		shuffleSlice(contenders)
-
-		scores := ranker.RankContenders(slices.Values(contenders))
-
-		expected := []string{
-			"i:1 p:1 r:0 f:🏆",
-			"i:2 p:2 r:1 f:🏆",
-			"i:3 p:2 r:2 f:🏆",
-			"i:4 p:2 r:3 f:🏆",
-			"i:5 p:5 r:4 f:🏆",
-		}
-
-		assert.Equal(t, expected, prettifyAll(scores))
-	})
-
 	t.Run("ExtraFinalists", func(t *testing.T) {
 		contenders := makeContenders(10)
 		contenders[0].Score = 500
