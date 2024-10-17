@@ -13,7 +13,9 @@
       : "-"}</span
   >
   <div>{scoreboardEntry.publicName}</div>
-  <div class="score"><Score value={scoreboardEntry.score} /></div>
+  <div class="score">
+    <Score value={scoreboardEntry.score} />
+  </div>
 </section>
 
 <style>

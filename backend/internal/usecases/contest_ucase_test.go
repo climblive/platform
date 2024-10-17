@@ -55,6 +55,7 @@ func TestGetScoreboard(t *testing.T) {
 			Score:               i * 10,
 			Placement:           i,
 			Finalist:            true,
+			RankOrder:           i - 1,
 			ScoreUpdated:        &currentTime,
 		}
 
@@ -68,11 +69,12 @@ func TestGetScoreboard(t *testing.T) {
 	future := currentTime.Add(time.Minute)
 
 	mockedScoreKeeper.On("GetScore", 1).Return(domain.Score{
-		Timestamp:   &future,
+		Timestamp:   future,
 		ContenderID: 1,
 		Score:       1234,
 		Placement:   42,
 		Finalist:    false,
+		RankOrder:   1337,
 	}, nil)
 
 	mockedScoreKeeper.On("GetScore", mock.Anything).Return(domain.Score{}, errMock)
@@ -99,6 +101,7 @@ func TestGetScoreboard(t *testing.T) {
 	assert.Equal(t, 1234, scoreboard[0].Score)
 	assert.Equal(t, 42, scoreboard[0].Placement)
 	assert.Equal(t, false, scoreboard[0].Finalist)
+	assert.Equal(t, 1337, scoreboard[0].RankOrder)
 
 	for i := 2; i <= 10; i++ {
 		entry := scoreboard[i-1]
@@ -113,6 +116,7 @@ func TestGetScoreboard(t *testing.T) {
 		assert.Equal(t, currentTime, *entry.ScoreUpdated)
 		assert.Equal(t, i*10, entry.Score)
 		assert.Equal(t, i, entry.Placement)
+		assert.Equal(t, i-1, entry.RankOrder)
 		assert.Equal(t, true, entry.Finalist)
 	}
 }

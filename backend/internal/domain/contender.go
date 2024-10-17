@@ -18,8 +18,9 @@ type Contender struct {
 	WithdrawnFromFinals bool          `json:"withdrawnFromFinals"`
 	Disqualified        bool          `json:"disqualified"`
 	Score               int           `json:"score"`
-	Placement           int           `json:"placement"`
+	Placement           int           `json:"placement,omitempty"`
 	Finalist            bool          `json:"finalist"`
+	RankOrder           int           `json:"rankOrder"`
 	ScoreUpdated        *time.Time    `json:"scoreUpdated,omitempty"`
 }
 
