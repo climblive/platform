@@ -13,4 +13,5 @@ type ScoreboardEntry struct {
 	Score               int        `json:"score"`
 	Placement           int        `json:"placement,omitempty"`
 	Finalist            bool       `json:"finalist"`
+	RankOrder           int        `json:"rankOrder"`
 }

@@ -7,6 +7,7 @@ export type ScoreboardEntry = {
   disqualified: boolean;
   score: number;
   placement?: number;
+  rankOrder: number;
   scoreUpdated?: string;
   finalist: boolean;
 };

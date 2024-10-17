@@ -97,6 +97,7 @@
         contender.score = event.score;
         contender.placement = event.placement;
         contender.finalist = event.finalist;
+        contender.rankOrder = event.rankOrder;
       });
     });
   });

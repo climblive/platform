@@ -7,11 +7,12 @@ import (
 	"github.com/google/uuid"
 )
 
+const EventChannelBufferSize = 1000
+
 type subscription struct {
-	id          domain.SubscriptionID
-	contestID   domain.ResourceID
-	contenderID *domain.ResourceID
-	ch          chan domain.EventContainer
+	id     domain.SubscriptionID
+	filter domain.EventFilter
+	ch     chan domain.EventContainer
 }
 
 type broker struct {
@@ -26,15 +27,14 @@ func NewBroker() domain.EventBroker {
 	}
 }
 
-func (b *broker) Subscribe(contestID domain.ResourceID, contenderID *domain.ResourceID, ch chan domain.EventContainer) domain.SubscriptionID {
+func (b *broker) Subscribe(filter domain.EventFilter, ch chan domain.EventContainer) domain.SubscriptionID {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
 	subscription := subscription{
-		id:          uuid.New(),
-		contestID:   contestID,
-		contenderID: contenderID,
-		ch:          ch,
+		id:     uuid.New(),
+		filter: filter,
+		ch:     ch,
 	}
 
 	b.subscriptions[subscription.id] = subscription
@@ -53,12 +53,19 @@ func (b *broker) Dispatch(contestID domain.ResourceID, event any) {
 	b.mu.RLock()
 	defer b.mu.RUnlock()
 
+	eventName := eventName(event)
+
 	for _, subscription := range b.subscriptions {
-		if subscription.contestID == contestID {
-			subscription.ch <- domain.EventContainer{
-				Name: eventName(event),
-				Data: event,
-			}
+		switch subscription.filter.ContestID {
+		case 0:
+		case contestID:
+		default:
+			continue
+		}
+
+		subscription.ch <- domain.EventContainer{
+			Name: eventName,
+			Data: event,
 		}
 	}
 }

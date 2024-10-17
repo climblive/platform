@@ -34,11 +34,12 @@ func TestGetContender(t *testing.T) {
 		Return(mockedContender, nil)
 
 	mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{
-		Timestamp:   &currentTime,
+		Timestamp:   currentTime,
 		ContenderID: mockedContenderID,
 		Score:       1000,
 		Placement:   5,
-		Finalist:    false,
+		Finalist:    true,
+		RankOrder:   6,
 	}, nil)
 
 	t.Run("HappyPath", func(t *testing.T) {
@@ -61,6 +62,8 @@ func TestGetContender(t *testing.T) {
 		assert.Equal(t, mockedContenderID, contender.ID)
 		assert.Equal(t, 1000, contender.Score)
 		assert.Equal(t, 5, contender.Placement)
+		assert.Equal(t, true, contender.Finalist)
+		assert.Equal(t, 6, contender.RankOrder)
 		assert.Equal(t, currentTime, *contender.ScoreUpdated)
 
 	})
@@ -164,7 +167,7 @@ func TestGetContendersByCompClass(t *testing.T) {
 		})
 
 		mockedScoreKeeper.On("GetScore", contenderID).Return(domain.Score{
-			Timestamp:   &currentTime,
+			Timestamp:   currentTime,
 			ContenderID: contenderID,
 			Score:       k * 10,
 			Placement:   k,
@@ -250,7 +253,7 @@ func TestGetContendersByContest(t *testing.T) {
 		})
 
 		mockedScoreKeeper.On("GetScore", contenderID).Return(domain.Score{
-			Timestamp:   &currentTime,
+			Timestamp:   currentTime,
 			ContenderID: contenderID,
 			Score:       k * 10,
 			Placement:   k,
@@ -597,11 +600,12 @@ func TestUpdateContender(t *testing.T) {
 			Return(domain.ContenderRole, nil)
 
 		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{
-			Timestamp:   &currentTime,
+			Timestamp:   currentTime,
 			ContenderID: mockedContenderID,
 			Score:       1000,
 			Placement:   5,
 			Finalist:    true,
+			RankOrder:   6,
 		}, nil)
 
 		mockedContender := domain.Contender{
@@ -648,6 +652,7 @@ func TestUpdateContender(t *testing.T) {
 		assert.Equal(t, 5, contender.Placement)
 		assert.Equal(t, currentTime, *contender.ScoreUpdated)
 		assert.Equal(t, true, contender.Finalist)
+		assert.Equal(t, 6, contender.RankOrder)
 	})
 
 	t.Run("ReadOnlyFieldsAreUnaltered", func(t *testing.T) {
