@@ -59,7 +59,7 @@ func main() {
 
 	engine := scores.NewScoreEngine(1, eventBroker, &scores.HardestProblems{Number: 5}, scores.NewBasicRanker(3))
 
-	go engine.Run(context.Background(), 1)
+	go engine.Run(context.Background())
 
 	problems, err := repo.GetProblemsByContest(ctx, nil, 1)
 	if err != nil {

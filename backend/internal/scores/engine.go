@@ -43,10 +43,10 @@ func NewScoreEngine(contestID domain.ResourceID, eventBroker domain.EventBroker,
 	return engine
 }
 
-func (e *ScoreEngine) Run(ctx context.Context, contestID domain.ResourceID) {
+func (e *ScoreEngine) Run(ctx context.Context) {
 	events := make(chan domain.EventContainer, events.EventChannelBufferSize)
 	subscriptionID := e.eventBroker.Subscribe(domain.EventFilter{
-		ContestID: contestID,
+		ContestID: e.contestID,
 	}, events)
 
 	defer e.eventBroker.Unsubscribe(subscriptionID)
