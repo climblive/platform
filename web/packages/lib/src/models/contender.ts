@@ -10,7 +10,7 @@ export type Contender = {
   withdrawnFromFinals: boolean;
   disqualified: boolean;
   score: number;
-  placement: number;
+  placement?: number;
   rankOrder: number;
   finalist: boolean;
   scoreUpdated?: string;
