@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRankContenders(t *testing.T) {
+func TestBasicRanker(t *testing.T) {
 	ranker := scores.NewBasicRanker(5)
 
 	makeContenders := func(count int) []*scores.Contender {
