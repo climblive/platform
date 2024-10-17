@@ -11,7 +11,7 @@ export type ContenderScoreUpdatedEvent = {
   timestamp: string;
   contenderId: number;
   score: number;
-  placement: number;
+  placement?: number;
   rankOrder: number;
   finalist: boolean;
 };
