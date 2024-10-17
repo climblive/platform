@@ -14,7 +14,11 @@
   >
   <div>{scoreboardEntry.publicName}</div>
   <div class="score">
-    <Score value={scoreboardEntry.score} />
+    {#if scoreboardEntry.score === 0}
+      -
+    {:else}
+      <Score value={scoreboardEntry.score} />
+    {/if}
   </div>
 </section>
 

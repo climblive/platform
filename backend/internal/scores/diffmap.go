@@ -1,14 +1,16 @@
 package scores
 
-type DiffMap[K comparable, V comparable] struct {
-	committed map[K]V
-	dirty     map[K]V
+type DiffMap[K comparable, V any] struct {
+	committed  map[K]V
+	dirty      map[K]V
+	comparator func(v1, v2 V) bool
 }
 
-func NewDiffMap[K comparable, V comparable]() DiffMap[K, V] {
+func NewDiffMap[K comparable, V any](comparator func(v1, v2 V) bool) DiffMap[K, V] {
 	return DiffMap[K, V]{
-		committed: make(map[K]V),
-		dirty:     make(map[K]V),
+		committed:  make(map[K]V),
+		dirty:      make(map[K]V),
+		comparator: comparator,
 	}
 }
 
@@ -27,7 +29,7 @@ func (d *DiffMap[K, V]) Commit() []V {
 
 func (d *DiffMap[K, V]) Set(key K, val V) {
 	existing, found := d.committed[key]
-	if found && existing == val {
+	if found && d.comparator(existing, val) {
 		return
 	}
 

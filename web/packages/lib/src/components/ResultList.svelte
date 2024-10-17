@@ -10,23 +10,19 @@
 
   const scoreboard =
     getContext<Readable<Map<number, ScoreboardEntry[]>>>("scoreboard");
-  $: results = $scoreboard.get(compClassId);
+  $: results = $scoreboard.get(compClassId) ?? [];
 </script>
 
-{#if results}
-  <div
-    style="height: calc({results.length} * 2.25rem + {results.length -
-      1} * var(--sl-spacing-x-small))"
-  >
-    {#each results as scoreboardEntry (scoreboardEntry.contenderId)}
-      <Floater order={scoreboardEntry.rankOrder}>
-        <ResultEntry {scoreboardEntry} />
-      </Floater>
-    {/each}
-  </div>
-{:else}
-  <sl-progress-bar indeterminate></sl-progress-bar>
-{/if}
+<div
+  style="height: calc({results.length} * 2.25rem + {results.length -
+    1} * var(--sl-spacing-x-small))"
+>
+  {#each results as scoreboardEntry (scoreboardEntry.contenderId)}
+    <Floater order={scoreboardEntry.rankOrder}>
+      <ResultEntry {scoreboardEntry} />
+    </Floater>
+  {/each}
+</div>
 
 <style>
   div {

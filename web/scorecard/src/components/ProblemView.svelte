@@ -1,8 +1,8 @@
 <script lang="ts">
+  import { Score } from "@climblive/lib/components";
   import type { Problem, Tick } from "@climblive/lib/models";
   import { calculateProblemScore } from "@climblive/lib/utils";
   import HoldColorIndicator from "./HoldColorIndicator.svelte";
-  import Score from "./Score.svelte";
   import TickBox from "./TickBox.svelte";
 
   export let problem: Problem;

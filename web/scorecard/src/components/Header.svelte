@@ -1,8 +1,7 @@
 <script lang="ts">
+  import { Score, Timer } from "@climblive/lib/components";
   import { asOrdinal } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
-  import Score from "./Score.svelte";
-  import Timer from "./Timer.svelte";
 
   export let registrationCode: string;
   export let contestName: string;

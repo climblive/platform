@@ -8,7 +8,7 @@ import (
 )
 
 func TestDiffMap(t *testing.T) {
-	dm := scores.NewDiffMap[int, string]()
+	dm := scores.NewDiffMap[int, string](func(v1, v2 string) bool { return v1 == v2 })
 
 	dm.Set(1, "Alice")
 	dm.Set(2, "Bob")

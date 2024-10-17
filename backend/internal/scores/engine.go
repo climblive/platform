@@ -37,7 +37,7 @@ func NewScoreEngine(contestID domain.ResourceID, eventBroker domain.EventBroker,
 		rules:       rules,
 		problems:    make(map[int]*Problem),
 		contenders:  make(map[int]*Contender),
-		scores:      NewDiffMap[domain.ContenderID, domain.Score](),
+		scores:      NewDiffMap[domain.ContenderID, domain.Score](CompareScore),
 	}
 
 	return engine
@@ -106,12 +106,23 @@ func (e *ScoreEngine) HandleContenderSwitchedClass(event domain.ContenderSwitche
 		return
 	}
 
+	if contender.CompClassID == event.CompClassID {
+		return
+	}
+
+	reRankList := []domain.ResourceID{
+		contender.CompClassID,
+		event.CompClassID,
+	}
+
 	contender.CompClassID = event.CompClassID
 
-	scores := e.ranker.RankContenders(FilterByClass(e.contenders, contender.CompClassID))
+	for compClassID := range slices.Values(reRankList) {
+		scores := e.ranker.RankContenders(FilterByClass(e.contenders, compClassID))
 
-	for score := range slices.Values(scores) {
-		e.scores.Set(domain.ContenderID(score.ContenderID), score)
+		for score := range slices.Values(scores) {
+			e.scores.Set(domain.ContenderID(score.ContenderID), score)
+		}
 	}
 
 	e.PublishUpdatedScores()
