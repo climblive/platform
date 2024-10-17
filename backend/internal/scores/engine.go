@@ -219,7 +219,6 @@ func (e *ScoreEngine) HandleAscentRegistered(event domain.AscentRegisteredEvent)
 
 func (e *ScoreEngine) HandleAscentDeregistered(event domain.AscentDeregisteredEvent) {
 	contender, found := e.contenders[event.ContenderID]
-
 	if !found {
 		return
 	}
