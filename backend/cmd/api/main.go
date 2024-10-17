@@ -57,51 +57,7 @@ func main() {
 
 	go scoreKeeper.Run(ctx)
 
-	engine := scores.NewScoreEngine(1, eventBroker, &scores.HardestProblems{Number: 5}, scores.NewBasicRanker(3))
-
-	go engine.Run(context.Background())
-
-	problems, err := repo.GetProblemsByContest(ctx, nil, 1)
-	if err != nil {
-		panic(err)
-	}
-
-	for problem := range slices.Values(problems) {
-		eventBroker.Dispatch(1, domain.ProblemAddedEvent{
-			ProblemID:  problem.ID,
-			PointsTop:  problem.PointsTop,
-			PointsZone: problem.PointsZone,
-			FlashBonus: problem.FlashBonus,
-		})
-	}
-
-	contenders, err := repo.GetContendersByContest(ctx, nil, 1)
-	if err != nil {
-		panic(err)
-	}
-
-	for contender := range slices.Values(contenders) {
-		eventBroker.Dispatch(1, domain.ContenderEnteredEvent{
-			ContenderID: contender.ID,
-			CompClassID: contender.CompClassID,
-		})
-
-		ticks, err := repo.GetTicksByContender(ctx, nil, contender.ID)
-		if err != nil {
-			panic(err)
-		}
-
-		for tick := range slices.Values(ticks) {
-			eventBroker.Dispatch(1, domain.AscentRegisteredEvent{
-				ContenderID:  contender.ID,
-				ProblemID:    tick.ProblemID,
-				Top:          tick.Top,
-				AttemptsTop:  tick.AttemptsTop,
-				Zone:         tick.Zone,
-				AttemptsZone: tick.AttemptsTop,
-			})
-		}
-	}
+	startTestingScoreEngine(ctx, 1, repo, eventBroker)
 
 	contenderUseCase := usecases.ContenderUseCase{
 		Repo:                      repo,
@@ -150,5 +106,58 @@ func main() {
 		}
 
 		panic(err)
+	}
+}
+
+func startTestingScoreEngine(
+	ctx context.Context,
+	contestID domain.ResourceID,
+	repo *repository.Database,
+	eventBroker domain.EventBroker,
+) {
+	engine := scores.NewScoreEngine(contestID, eventBroker, &scores.HardestProblems{Number: 5}, scores.NewBasicRanker(3))
+
+	go engine.Run(context.Background())
+
+	problems, err := repo.GetProblemsByContest(ctx, nil, 1)
+	if err != nil {
+		panic(err)
+	}
+
+	for problem := range slices.Values(problems) {
+		eventBroker.Dispatch(1, domain.ProblemAddedEvent{
+			ProblemID:  problem.ID,
+			PointsTop:  problem.PointsTop,
+			PointsZone: problem.PointsZone,
+			FlashBonus: problem.FlashBonus,
+		})
+	}
+
+	contenders, err := repo.GetContendersByContest(ctx, nil, 1)
+	if err != nil {
+		panic(err)
+	}
+
+	for contender := range slices.Values(contenders) {
+		eventBroker.Dispatch(1, domain.ContenderEnteredEvent{
+			ContenderID: contender.ID,
+			CompClassID: contender.CompClassID,
+		})
+
+		ticks, err := repo.GetTicksByContender(ctx, nil, contender.ID)
+		if err != nil {
+			panic(err)
+		}
+
+		for tick := range slices.Values(ticks) {
+			eventBroker.Dispatch(1, domain.AscentRegisteredEvent{
+				ContenderID:  contender.ID,
+				ProblemID:    tick.ProblemID,
+				Top:          tick.Top,
+				AttemptsTop:  tick.AttemptsTop,
+				Zone:         tick.Zone,
+				AttemptsZone: tick.AttemptsTop,
+			})
+		}
 	}
 }
