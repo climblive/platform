@@ -47,7 +47,7 @@
     : new Date(0);
 
   let score: number;
-  let placement: number;
+  let placement: number | undefined;
 
   $: {
     if (contender) {
