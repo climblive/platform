@@ -21,11 +21,7 @@ func NewScoreKeeper(eventBroker domain.EventBroker) *Keeper {
 
 func (k *Keeper) Run(ctx context.Context) {
 	events := make(chan domain.EventContainer, events.EventChannelBufferSize)
-	subscriptionID := k.eventBroker.Subscribe(domain.EventFilter{
-		Types: map[string]struct{}{
-			"CONTENDER_SCORE_UPDATED": {},
-		},
-	}, events)
+	subscriptionID := k.eventBroker.Subscribe(domain.EventFilter{}, events)
 
 	defer k.eventBroker.Unsubscribe(subscriptionID)
 

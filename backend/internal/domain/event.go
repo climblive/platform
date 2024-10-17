@@ -11,7 +11,6 @@ type SubscriptionID = uuid.UUID
 type EventFilter struct {
 	ContestID   ResourceID
 	ContenderID ResourceID
-	Types       map[string]struct{}
 }
 
 type EventBroker interface {

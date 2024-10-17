@@ -63,15 +63,6 @@ func (b *broker) Dispatch(contestID domain.ResourceID, event any) {
 			continue
 		}
 
-		_, match := subscription.filter.Types[eventName]
-
-		switch {
-		case len(subscription.filter.Types) == 0:
-		case match:
-		default:
-			continue
-		}
-
 		subscription.ch <- domain.EventContainer{
 			Name: eventName,
 			Data: event,
