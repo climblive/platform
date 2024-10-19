@@ -18,7 +18,10 @@
   <Loading />
 {:else}
   <ScoreboardProvider {contestId}>
-    <div class="container">
+    <div
+      class="container"
+      style="grid-template-columns: repeat({compClasses.length}, 1fr)"
+    >
       {#each compClasses as compClass}
         <section class="class">
           <header>
@@ -35,10 +38,15 @@
 <style>
   .container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr;
     padding: var(--sl-spacing-small);
     gap: var(--sl-spacing-small);
+    height: 100%;
+  }
+
+  .class {
+    display: flex;
+    flex-direction: column;
   }
 
   header {
