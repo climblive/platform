@@ -28,7 +28,7 @@
     display: grid;
     padding-inline: var(--sl-spacing-small);
     border-radius: var(--sl-border-radius-medium);
-    grid-template-columns: min-content 1fr min-content;
+    grid-template-columns: 2rem 1fr min-content;
     grid-template-rows: 1fr;
     gap: var(--sl-spacing-x-small);
     align-items: center;
@@ -55,7 +55,6 @@
 
   .number {
     font-size: var(--sl-font-size-x-small);
-    margin-right: var(--sl-spacing-x-small);
   }
 
   .name {
