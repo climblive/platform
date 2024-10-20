@@ -12,7 +12,7 @@
       ? asOrdinal(scoreboardEntry.placement)
       : "-"}</span
   >
-  <div>{scoreboardEntry.publicName}</div>
+  <div class="name">{scoreboardEntry.publicName}</div>
   <div class="score">
     {#if scoreboardEntry.score === 0}
       -
@@ -50,6 +50,13 @@
 
   .number {
     font-size: var(--sl-font-size-x-small);
+  }
+
+  .name {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .score {
