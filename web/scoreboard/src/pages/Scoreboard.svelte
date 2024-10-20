@@ -18,10 +18,7 @@
   <Loading />
 {:else}
   <ScoreboardProvider {contestId}>
-    <div
-      class="container"
-      style="grid-template-columns: repeat({compClasses.length}, 1fr)"
-    >
+    <main style="grid-template-columns: repeat({compClasses.length}, 1fr)">
       {#each compClasses as compClass}
         <section class="class">
           <header>
@@ -31,12 +28,12 @@
           <ResultList compClassId={compClass.id} overflow="pagination" />
         </section>
       {/each}
-    </div>
+    </main>
   </ScoreboardProvider>
 {/if}
 
 <style>
-  .container {
+  main {
     display: grid;
     grid-template-rows: 1fr;
     padding: var(--sl-spacing-small);

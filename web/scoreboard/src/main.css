@@ -13,7 +13,5 @@ html {
 }
 
 body {
-  overflow: scroll;
-  overscroll-behavior-y: none;
   height: 100vh;
 }
