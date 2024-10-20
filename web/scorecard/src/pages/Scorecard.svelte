@@ -1,9 +1,8 @@
 <script lang="ts">
   import Header from "@/components/Header.svelte";
   import ProblemView from "@/components/ProblemView.svelte";
-  import ResultList from "@/components/ResultList.svelte";
-  import ScoreboardProvider from "@/components/ScoreboardProvider.svelte";
   import type { ScorecardSession } from "@/types";
+  import { ResultList, ScoreboardProvider } from "@climblive/lib/components";
   import configData from "@climblive/lib/config.json";
   import type { ContenderScoreUpdatedEvent } from "@climblive/lib/models";
   import {

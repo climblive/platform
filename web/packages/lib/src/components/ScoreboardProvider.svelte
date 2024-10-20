@@ -18,9 +18,9 @@
   const pendingUpdates: ((contenders: Map<number, ScoreboardEntry>) => void)[] =
     [];
 
-  const resultsStore = writable<Map<number, ScoreboardEntry[]>>(new Map());
+  const scoreboardStore = writable<Map<number, ScoreboardEntry[]>>(new Map());
 
-  setContext("scoreboard", resultsStore);
+  setContext("scoreboard", scoreboardStore);
 
   onMount(async () => {
     const entries = await ApiClient.getInstance().getScoreboard(contestId);
@@ -49,7 +49,7 @@
       classEntries.push(contender);
     }
 
-    $resultsStore = results;
+    $scoreboardStore = results;
   };
 
   const queueEventHandler = (

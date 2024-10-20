@@ -2,6 +2,7 @@ package scores
 
 import (
 	"iter"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 )
@@ -18,4 +19,11 @@ func FilterByClass(contenders map[domain.ResourceID]*Contender, compClassID doma
 			}
 		}
 	}
+}
+
+func CompareScore(s1, s2 domain.Score) bool {
+	s1.Timestamp = time.Time{}
+	s2.Timestamp = time.Time{}
+
+	return s1 == s2
 }
