@@ -7,12 +7,10 @@
 </script>
 
 <section data-finalist={scoreboardEntry.finalist}>
-  <span class="number"
-    >{scoreboardEntry.placement
-      ? asOrdinal(scoreboardEntry.placement)
-      : "-"}</span
-  >
-  <div>{scoreboardEntry.publicName}</div>
+  <div class="number">
+    {scoreboardEntry.placement ? asOrdinal(scoreboardEntry.placement) : "-"}
+  </div>
+  <div class="name">{scoreboardEntry.publicName}</div>
   <div class="score">
     {#if scoreboardEntry.score === 0}
       -
@@ -30,7 +28,7 @@
     display: grid;
     padding-inline: var(--sl-spacing-small);
     border-radius: var(--sl-border-radius-medium);
-    grid-template-columns: 2rem 3fr 1fr;
+    grid-template-columns: min-content 1fr min-content;
     grid-template-rows: 1fr;
     gap: var(--sl-spacing-x-small);
     align-items: center;
@@ -48,8 +46,20 @@
     );
   }
 
+  section > div {
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    line-height: 2.25rem;
+  }
+
   .number {
     font-size: var(--sl-font-size-x-small);
+    margin-right: var(--sl-spacing-x-small);
+  }
+
+  .name {
+    text-overflow: ellipsis;
   }
 
   .score {
