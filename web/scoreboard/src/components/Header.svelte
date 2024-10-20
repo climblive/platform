@@ -18,7 +18,7 @@
 </script>
 
 <header>
-  <h1>{name} <span class="size">({results.length}/{allContenders})</span></h1>
+  <h2>{name} <span class="size">({results.length}/{allContenders})</span></h2>
   <Timer endTime={timeEnd} />
 </header>
 
@@ -27,7 +27,7 @@
     text-align: center;
     margin-bottom: var(--sl-spacing-large);
 
-    & h1 {
+    & h2 {
       line-height: var(--sl-line-height-denser);
     }
   }
