@@ -6,10 +6,10 @@ import (
 )
 
 type Contest struct {
-	ID                 ResourceID    `json:"id,omitempty"`
+	ID                 ContestID     `json:"id,omitempty"`
 	Ownership          OwnershipData `json:"-"`
 	Location           string        `json:"location,omitempty"`
-	SeriesID           ResourceID    `json:"seriesId,omitempty"`
+	SeriesID           SeriesID      `json:"seriesId,omitempty"`
 	Protected          bool          `json:"protected"`
 	Name               string        `json:"name"`
 	Description        string        `json:"description,omitempty"`
@@ -21,11 +21,11 @@ type Contest struct {
 }
 
 type ContestUseCase interface {
-	GetContest(ctx context.Context, contestID ResourceID) (Contest, error)
-	GetContestsByOrganizer(ctx context.Context, organizerID ResourceID) ([]Contest, error)
-	UpdateContest(ctx context.Context, contestID ResourceID, contest Contest) (Contest, error)
-	DeleteContest(ctx context.Context, contestID ResourceID) error
-	DuplicateContest(ctx context.Context, contestID ResourceID) (Contest, error)
-	CreateContest(ctx context.Context, organizerID ResourceID, contest Contest) (Contest, error)
-	GetScoreboard(ctx context.Context, contestID ResourceID) ([]ScoreboardEntry, error)
+	GetContest(ctx context.Context, contestID ContestID) (Contest, error)
+	GetContestsByOrganizer(ctx context.Context, organizerID OrganizerID) ([]Contest, error)
+	UpdateContest(ctx context.Context, contestID ContestID, contest Contest) (Contest, error)
+	DeleteContest(ctx context.Context, contestID ContestID) error
+	DuplicateContest(ctx context.Context, contestID ContestID) (Contest, error)
+	CreateContest(ctx context.Context, organizerID OrganizerID, contest Contest) (Contest, error)
+	GetScoreboard(ctx context.Context, contestID ContestID) ([]ScoreboardEntry, error)
 }

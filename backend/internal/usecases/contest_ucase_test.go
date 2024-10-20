@@ -14,7 +14,7 @@ import (
 )
 
 func TestGetContest(t *testing.T) {
-	mockedContestID := domain.ResourceID(1)
+	mockedContestID := domain.ContestID(1)
 
 	mockedContest := domain.Contest{
 		ID: mockedContestID,
@@ -37,7 +37,7 @@ func TestGetContest(t *testing.T) {
 }
 
 func TestGetScoreboard(t *testing.T) {
-	mockedContestID := domain.ResourceID(1)
+	mockedContestID := domain.ContestID(1)
 	mockedRepo := new(repositoryMock)
 	mockedScoreKeeper := new(scoreKeeperMock)
 	currentTime := time.Now()
@@ -45,8 +45,10 @@ func TestGetScoreboard(t *testing.T) {
 	var contenders []domain.Contender
 
 	for i := 1; i <= 10; i++ {
+		contenderID := domain.ContenderID(i)
+
 		mockedContender := domain.Contender{
-			ID:                  i,
+			ID:                  contenderID,
 			CompClassID:         1,
 			PublicName:          fmt.Sprintf("Climber %d", i),
 			ClubName:            "Testers' Climbing Club",

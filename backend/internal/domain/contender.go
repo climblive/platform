@@ -6,10 +6,10 @@ import (
 )
 
 type Contender struct {
-	ID                  ResourceID    `json:"id,omitempty"`
+	ID                  ContenderID   `json:"id,omitempty"`
 	Ownership           OwnershipData `json:"-"`
-	ContestID           ResourceID    `json:"contestId"`
-	CompClassID         ResourceID    `json:"compClassId,omitempty"`
+	ContestID           ContestID     `json:"contestId"`
+	CompClassID         CompClassID   `json:"compClassId,omitempty"`
 	RegistrationCode    string        `json:"registrationCode"`
 	Name                string        `json:"name,omitempty"`
 	PublicName          string        `json:"publicName,omitempty"`
@@ -25,13 +25,13 @@ type Contender struct {
 }
 
 type ContenderUseCase interface {
-	GetContender(ctx context.Context, contenderID ResourceID) (Contender, error)
+	GetContender(ctx context.Context, contenderID ContenderID) (Contender, error)
 	GetContenderByCode(ctx context.Context, registrationCode string) (Contender, error)
-	GetContendersByCompClass(ctx context.Context, compClassID ResourceID) ([]Contender, error)
-	GetContendersByContest(ctx context.Context, contestID ResourceID) ([]Contender, error)
-	UpdateContender(ctx context.Context, contenderID ResourceID, contender Contender) (Contender, error)
-	DeleteContender(ctx context.Context, contenderID ResourceID) error
-	CreateContenders(ctx context.Context, contestID ResourceID, number int) ([]Contender, error)
+	GetContendersByCompClass(ctx context.Context, compClassID CompClassID) ([]Contender, error)
+	GetContendersByContest(ctx context.Context, contestID ContestID) ([]Contender, error)
+	UpdateContender(ctx context.Context, contenderID ContenderID, contender Contender) (Contender, error)
+	DeleteContender(ctx context.Context, contenderID ContenderID) error
+	CreateContenders(ctx context.Context, contestID ContestID, number int) ([]Contender, error)
 }
 
 type CodeGenerator interface {

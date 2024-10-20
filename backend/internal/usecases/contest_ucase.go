@@ -10,8 +10,8 @@ import (
 type contestUseCaseRepository interface {
 	domain.Transactor
 
-	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (domain.Contest, error)
-	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) ([]domain.Contender, error)
+	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
+	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error)
 }
 
 type ContestUseCase struct {
@@ -19,7 +19,7 @@ type ContestUseCase struct {
 	ScoreKeeper domain.ScoreKeeper
 }
 
-func (uc *ContestUseCase) GetContest(ctx context.Context, contestID domain.ResourceID) (domain.Contest, error) {
+func (uc *ContestUseCase) GetContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error) {
 	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
 	if err != nil {
 		return domain.Contest{}, errors.Wrap(err, 0)
@@ -28,27 +28,27 @@ func (uc *ContestUseCase) GetContest(ctx context.Context, contestID domain.Resou
 	return contest, nil
 }
 
-func (uc *ContestUseCase) GetContestsByOrganizer(ctx context.Context, organizerID domain.ResourceID) ([]domain.Contest, error) {
+func (uc *ContestUseCase) GetContestsByOrganizer(ctx context.Context, organizerID domain.OrganizerID) ([]domain.Contest, error) {
 	panic("not implemented")
 }
 
-func (uc *ContestUseCase) UpdateContest(ctx context.Context, contestID domain.ResourceID, contest domain.Contest) (domain.Contest, error) {
+func (uc *ContestUseCase) UpdateContest(ctx context.Context, contestID domain.ContestID, contest domain.Contest) (domain.Contest, error) {
 	panic("not implemented")
 }
 
-func (uc *ContestUseCase) DeleteContest(ctx context.Context, contestID domain.ResourceID) error {
+func (uc *ContestUseCase) DeleteContest(ctx context.Context, contestID domain.ContestID) error {
 	panic("not implemented")
 }
 
-func (uc *ContestUseCase) DuplicateContest(ctx context.Context, contestID domain.ResourceID) (domain.Contest, error) {
+func (uc *ContestUseCase) DuplicateContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error) {
 	panic("not implemented")
 }
 
-func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.ResourceID, contest domain.Contest) (domain.Contest, error) {
+func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.OrganizerID, contest domain.Contest) (domain.Contest, error) {
 	panic("not implemented")
 }
 
-func (uc *ContestUseCase) GetScoreboard(ctx context.Context, contestID domain.ResourceID) ([]domain.ScoreboardEntry, error) {
+func (uc *ContestUseCase) GetScoreboard(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreboardEntry, error) {
 	contenders, err := uc.Repo.GetContendersByContest(ctx, nil, contestID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)

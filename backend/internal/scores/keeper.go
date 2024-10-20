@@ -9,13 +9,13 @@ import (
 
 type Keeper struct {
 	eventBroker domain.EventBroker
-	scores      map[domain.ResourceID]domain.Score
+	scores      map[domain.ContenderID]domain.Score
 }
 
 func NewScoreKeeper(eventBroker domain.EventBroker) *Keeper {
 	return &Keeper{
 		eventBroker: eventBroker,
-		scores:      make(map[int]domain.Score),
+		scores:      make(map[domain.ContenderID]domain.Score),
 	}
 }
 
@@ -49,7 +49,7 @@ func (k *Keeper) HandleContenderScoreUpdated(event domain.ContenderScoreUpdatedE
 	}
 }
 
-func (k *Keeper) GetScore(contenderID domain.ResourceID) (domain.Score, error) {
+func (k *Keeper) GetScore(contenderID domain.ContenderID) (domain.Score, error) {
 	if score, found := k.scores[contenderID]; found {
 		return score, nil
 	}

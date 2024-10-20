@@ -49,7 +49,7 @@ func (b *broker) Unsubscribe(subscriptionID domain.SubscriptionID) {
 	delete(b.subscriptions, subscriptionID)
 }
 
-func (b *broker) Dispatch(contestID domain.ResourceID, event any) {
+func (b *broker) Dispatch(contestID domain.ContestID, event any) {
 	b.mu.RLock()
 	defer b.mu.RUnlock()
 

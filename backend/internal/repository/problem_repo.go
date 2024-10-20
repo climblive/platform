@@ -26,9 +26,9 @@ func (problemRecord) TableName() string {
 
 func (r problemRecord) fromDomain(problem domain.Problem) problemRecord {
 	return problemRecord{
-		ID:                 e2n(problem.ID),
-		OrganizerID:        problem.Ownership.OrganizerID,
-		ContestID:          problem.ContestID,
+		ID:                 e2n(int(problem.ID)),
+		OrganizerID:        int(problem.Ownership.OrganizerID),
+		ContestID:          int(problem.ContestID),
 		Number:             problem.Number,
 		HoldColorPrimary:   problem.HoldColorPrimary,
 		HoldColorSecondary: e2n(problem.HoldColorSecondary),
@@ -41,11 +41,11 @@ func (r problemRecord) fromDomain(problem domain.Problem) problemRecord {
 
 func (r *problemRecord) toDomain() domain.Problem {
 	return domain.Problem{
-		ID: n2e(r.ID),
+		ID: domain.ProblemID(n2e(r.ID)),
 		Ownership: domain.OwnershipData{
-			OrganizerID: r.OrganizerID,
+			OrganizerID: domain.OrganizerID(r.OrganizerID),
 		},
-		ContestID:          r.ContestID,
+		ContestID:          domain.ContestID(r.ContestID),
 		Number:             r.Number,
 		HoldColorPrimary:   r.HoldColorPrimary,
 		HoldColorSecondary: n2e(r.HoldColorSecondary),
@@ -57,7 +57,7 @@ func (r *problemRecord) toDomain() domain.Problem {
 	}
 }
 
-func (d *Database) GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) ([]domain.Problem, error) {
+func (d *Database) GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Problem, error) {
 	var records []problemRecord
 
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM problem WHERE contest_id = ?`, contestID).Scan(&records).Error
@@ -74,7 +74,7 @@ func (d *Database) GetProblemsByContest(ctx context.Context, tx domain.Transacti
 	return problems, nil
 }
 
-func (d *Database) GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ResourceID) (domain.Problem, error) {
+func (d *Database) GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) (domain.Problem, error) {
 	var record problemRecord
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM problem WHERE id = ?`, problemID).Scan(&record).Error
 	if err != nil {

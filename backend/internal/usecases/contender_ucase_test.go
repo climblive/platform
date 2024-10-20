@@ -14,7 +14,7 @@ import (
 )
 
 func TestGetContender(t *testing.T) {
-	mockedContenderID := domain.ResourceID(1)
+	mockedContenderID := domain.ContenderID(1)
 	mockedOwnership := domain.OwnershipData{
 		OrganizerID: 1,
 		ContenderID: &mockedContenderID,
@@ -89,7 +89,7 @@ func TestGetContender(t *testing.T) {
 }
 
 func TestGetContenderByCode(t *testing.T) {
-	mockedContenderID := domain.ResourceID(1)
+	mockedContenderID := domain.ContenderID(1)
 	mockedOwnership := domain.OwnershipData{
 		OrganizerID: 1,
 		ContenderID: &mockedContenderID,
@@ -139,7 +139,7 @@ func TestGetContenderByCode(t *testing.T) {
 }
 
 func TestGetContendersByCompClass(t *testing.T) {
-	mockedCompClassID := domain.ResourceID(1)
+	mockedCompClassID := domain.CompClassID(1)
 	mockedOwnership := domain.OwnershipData{
 		OrganizerID: 1,
 	}
@@ -160,7 +160,7 @@ func TestGetContendersByCompClass(t *testing.T) {
 	var contenders []domain.Contender
 
 	for k := 1; k <= 10; k++ {
-		contenderID := k
+		contenderID := domain.ContenderID(k)
 
 		contenders = append(contenders, domain.Contender{
 			ID: contenderID,
@@ -225,7 +225,7 @@ func TestGetContendersByCompClass(t *testing.T) {
 }
 
 func TestGetContendersByContest(t *testing.T) {
-	mockedContestID := domain.ResourceID(1)
+	mockedContestID := domain.ContestID(1)
 	mockedOwnership := domain.OwnershipData{
 		OrganizerID: 1,
 	}
@@ -246,7 +246,7 @@ func TestGetContendersByContest(t *testing.T) {
 	var contenders []domain.Contender
 
 	for k := 1; k <= 10; k++ {
-		contenderID := k
+		contenderID := domain.ContenderID(k)
 
 		contenders = append(contenders, domain.Contender{
 			ID: contenderID,
@@ -311,7 +311,7 @@ func TestGetContendersByContest(t *testing.T) {
 }
 
 func TestDeleteContender(t *testing.T) {
-	mockedContenderID := domain.ResourceID(1)
+	mockedContenderID := domain.ContenderID(1)
 	mockedOwnership := domain.OwnershipData{
 		OrganizerID: 1,
 		ContenderID: &mockedContenderID,
@@ -382,7 +382,7 @@ func TestDeleteContender(t *testing.T) {
 }
 
 func TestCreateContenders(t *testing.T) {
-	mockedContestID := domain.ResourceID(1)
+	mockedContestID := domain.ContestID(1)
 	mockedOwnership := domain.OwnershipData{
 		OrganizerID: 1,
 	}
@@ -501,7 +501,7 @@ func TestCreateContenders(t *testing.T) {
 }
 
 func TestCreateContenders_Rollback(t *testing.T) {
-	mockedContestID := domain.ResourceID(1)
+	mockedContestID := domain.ContestID(1)
 
 	mockedRepo := new(repositoryMock)
 	mockedTx := new(transactionMock)
@@ -550,7 +550,7 @@ func TestCreateContenders_Rollback(t *testing.T) {
 }
 
 func TestUpdateContender(t *testing.T) {
-	mockedContenderID := domain.ResourceID(1)
+	mockedContenderID := domain.ContenderID(1)
 	mockedOwnership := domain.OwnershipData{
 		OrganizerID: 1,
 		ContenderID: &mockedContenderID,

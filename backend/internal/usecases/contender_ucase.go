@@ -12,15 +12,15 @@ import (
 type contenderUseCaseRepository interface {
 	domain.Transactor
 
-	GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) (domain.Contender, error)
+	GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error)
 	GetContenderByCode(ctx context.Context, tx domain.Transaction, registrationCode string) (domain.Contender, error)
-	GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) ([]domain.Contender, error)
-	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) ([]domain.Contender, error)
+	GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) ([]domain.Contender, error)
+	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error)
 	StoreContender(ctx context.Context, tx domain.Transaction, contender domain.Contender) (domain.Contender, error)
-	DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) error
-	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (domain.Contest, error)
-	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) (domain.CompClass, error)
-	GetNumberOfContenders(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (int, error)
+	DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) error
+	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
+	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error)
+	GetNumberOfContenders(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (int, error)
 }
 
 type ContenderUseCase struct {
@@ -31,7 +31,7 @@ type ContenderUseCase struct {
 	RegistrationCodeGenerator domain.CodeGenerator
 }
 
-func (uc *ContenderUseCase) GetContender(ctx context.Context, contenderID domain.ResourceID) (domain.Contender, error) {
+func (uc *ContenderUseCase) GetContender(ctx context.Context, contenderID domain.ContenderID) (domain.Contender, error) {
 	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
 	if err != nil {
 		return domain.Contender{}, errors.Wrap(err, 0)
@@ -53,7 +53,7 @@ func (uc *ContenderUseCase) GetContenderByCode(ctx context.Context, registration
 	return withScore(contender, uc.ScoreKeeper), nil
 }
 
-func (uc *ContenderUseCase) GetContendersByCompClass(ctx context.Context, compClassID domain.ResourceID) ([]domain.Contender, error) {
+func (uc *ContenderUseCase) GetContendersByCompClass(ctx context.Context, compClassID domain.CompClassID) ([]domain.Contender, error) {
 	compClass, err := uc.Repo.GetCompClass(ctx, nil, compClassID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
@@ -75,7 +75,7 @@ func (uc *ContenderUseCase) GetContendersByCompClass(ctx context.Context, compCl
 	return contenders, nil
 }
 
-func (uc *ContenderUseCase) GetContendersByContest(ctx context.Context, contestID domain.ResourceID) ([]domain.Contender, error) {
+func (uc *ContenderUseCase) GetContendersByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Contender, error) {
 	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
@@ -97,7 +97,7 @@ func (uc *ContenderUseCase) GetContendersByContest(ctx context.Context, contestI
 	return contenders, nil
 }
 
-func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID domain.ResourceID, updates domain.Contender) (domain.Contender, error) {
+func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID domain.ContenderID, updates domain.Contender) (domain.Contender, error) {
 	var mty domain.Contender
 	var events []any
 
@@ -252,7 +252,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 	return withScore(contender, uc.ScoreKeeper), nil
 }
 
-func (uc *ContenderUseCase) DeleteContender(ctx context.Context, contenderID domain.ResourceID) error {
+func (uc *ContenderUseCase) DeleteContender(ctx context.Context, contenderID domain.ContenderID) error {
 	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
 	if err != nil {
 		return errors.Wrap(err, 0)
@@ -276,7 +276,7 @@ func (uc *ContenderUseCase) DeleteContender(ctx context.Context, contenderID dom
 
 const registrationCodeLength = 8
 
-func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID domain.ResourceID, number int) ([]domain.Contender, error) {
+func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID domain.ContestID, number int) ([]domain.Contender, error) {
 	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)

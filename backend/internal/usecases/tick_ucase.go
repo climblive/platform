@@ -11,14 +11,14 @@ import (
 type tickUseCaseRepository interface {
 	domain.Transactor
 
-	GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) (domain.Contender, error)
-	GetTicksByContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) ([]domain.Tick, error)
-	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (domain.Contest, error)
-	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) (domain.CompClass, error)
-	GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ResourceID) (domain.Problem, error)
-	DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.ResourceID) error
+	GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error)
+	GetTicksByContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) ([]domain.Tick, error)
+	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
+	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error)
+	GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) (domain.Problem, error)
+	DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) error
 	StoreTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error)
-	GetTick(ctx context.Context, tx domain.Transaction, tickID domain.ResourceID) (domain.Tick, error)
+	GetTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) (domain.Tick, error)
 }
 
 type TickUseCase struct {
@@ -27,7 +27,7 @@ type TickUseCase struct {
 	EventBroker domain.EventBroker
 }
 
-func (uc *TickUseCase) GetTicksByContender(ctx context.Context, contenderID domain.ResourceID) ([]domain.Tick, error) {
+func (uc *TickUseCase) GetTicksByContender(ctx context.Context, contenderID domain.ContenderID) ([]domain.Tick, error) {
 	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
@@ -45,11 +45,11 @@ func (uc *TickUseCase) GetTicksByContender(ctx context.Context, contenderID doma
 	return ticks, nil
 }
 
-func (uc *TickUseCase) GetTicksByProblem(ctx context.Context, problemID domain.ResourceID) ([]domain.Tick, error) {
+func (uc *TickUseCase) GetTicksByProblem(ctx context.Context, problemID domain.ProblemID) ([]domain.Tick, error) {
 	panic("not implemented")
 }
 
-func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.ResourceID) error {
+func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.TickID) error {
 	tick, err := uc.Repo.GetTick(ctx, nil, tickID)
 	if err != nil {
 		return errors.Wrap(err, 0)
@@ -98,7 +98,7 @@ func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.ResourceID)
 	return nil
 }
 
-func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.ResourceID, tick domain.Tick) (domain.Tick, error) {
+func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.ContenderID, tick domain.Tick) (domain.Tick, error) {
 	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
 	if err != nil {
 		return domain.Tick{}, errors.Wrap(err, 0)

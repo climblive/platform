@@ -26,13 +26,13 @@ func (contenderRecord) TableName() string {
 
 func (r contenderRecord) fromDomain(contender domain.Contender) contenderRecord {
 	return contenderRecord{
-		ID:               e2n(contender.ID),
-		OrganizerID:      contender.Ownership.OrganizerID,
-		ContestID:        contender.ContestID,
+		ID:               e2n(int(contender.ID)),
+		OrganizerID:      int(contender.Ownership.OrganizerID),
+		ContestID:        int(contender.ContestID),
 		RegistrationCode: contender.RegistrationCode,
 		Name:             e2n(contender.Name),
 		Club:             e2n(contender.ClubName),
-		ClassID:          e2n(contender.CompClassID),
+		ClassID:          e2n(int(contender.CompClassID)),
 		Entered:          contender.Entered,
 		Disqualified:     contender.Disqualified,
 	}
@@ -40,17 +40,17 @@ func (r contenderRecord) fromDomain(contender domain.Contender) contenderRecord 
 
 func (r *contenderRecord) toDomain() domain.Contender {
 	return domain.Contender{
-		ID: n2e(r.ID),
+		ID: domain.ContenderID(n2e(r.ID)),
 		Ownership: domain.OwnershipData{
-			OrganizerID: r.OrganizerID,
-			ContenderID: r.ID,
+			OrganizerID: domain.OrganizerID(r.OrganizerID),
+			ContenderID: nillableIntToResourceID[domain.ContenderID](r.ID),
 		},
-		ContestID:           r.ContestID,
+		ContestID:           domain.ContestID(r.ContestID),
 		RegistrationCode:    r.RegistrationCode,
 		Name:                n2e(r.Name),
 		PublicName:          n2e(r.Name),
 		ClubName:            n2e(r.Club),
-		CompClassID:         n2e(r.ClassID),
+		CompClassID:         domain.CompClassID(n2e(r.ClassID)),
 		Entered:             r.Entered,
 		WithdrawnFromFinals: false,
 		Disqualified:        r.Disqualified,
@@ -62,7 +62,7 @@ func (r *contenderRecord) toDomain() domain.Contender {
 	}
 }
 
-func (d *Database) GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) (domain.Contender, error) {
+func (d *Database) GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error) {
 	var record contenderRecord
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE id = ?`, contenderID).Scan(&record).Error
 	if err != nil {
@@ -90,7 +90,7 @@ func (d *Database) GetContenderByCode(ctx context.Context, tx domain.Transaction
 	return record.toDomain(), nil
 }
 
-func (d *Database) GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) ([]domain.Contender, error) {
+func (d *Database) GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) ([]domain.Contender, error) {
 	var records []contenderRecord
 
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE class_id = ?`, compClassID).Scan(&records).Error
@@ -107,7 +107,7 @@ func (d *Database) GetContendersByCompClass(ctx context.Context, tx domain.Trans
 	return contenders, nil
 }
 
-func (d *Database) GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) ([]domain.Contender, error) {
+func (d *Database) GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error) {
 	var records []contenderRecord
 
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE contest_id = ?`, contestID).Scan(&records).Error
@@ -136,7 +136,7 @@ func (d *Database) StoreContender(ctx context.Context, tx domain.Transaction, co
 	return record.toDomain(), nil
 }
 
-func (d *Database) DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) error {
+func (d *Database) DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) error {
 	err := d.tx(tx).WithContext(ctx).Exec(`DELETE FROM contender WHERE id = ?`, contenderID).Error
 	if err != nil {
 		return errors.Wrap(err, 0)
@@ -145,7 +145,7 @@ func (d *Database) DeleteContender(ctx context.Context, tx domain.Transaction, c
 	return nil
 }
 
-func (d *Database) GetNumberOfContenders(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (int, error) {
+func (d *Database) GetNumberOfContenders(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (int, error) {
 	var count int
 
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT COUNT(*) FROM contender WHERE contest_id = ?`, contestID).Scan(&count).Error

@@ -11,8 +11,8 @@ import (
 
 var errMock = errors.New("mock error")
 
-func randomResourceID() domain.ResourceID {
-	return rand.Int()
+func randomResourceID[T domain.ResourceIDType]() T {
+	return T(rand.Int())
 }
 
 type mirrorInstruction struct{}
@@ -48,7 +48,7 @@ func (m *repositoryMock) Begin() domain.Transaction {
 	return args.Get(0).(domain.Transaction)
 }
 
-func (m *repositoryMock) GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) (domain.Contender, error) {
+func (m *repositoryMock) GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error) {
 	args := m.Called(ctx, tx, contenderID)
 	return args.Get(0).(domain.Contender), args.Error(1)
 }
@@ -58,12 +58,12 @@ func (m *repositoryMock) GetContenderByCode(ctx context.Context, tx domain.Trans
 	return args.Get(0).(domain.Contender), args.Error(1)
 }
 
-func (m *repositoryMock) GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) ([]domain.Contender, error) {
+func (m *repositoryMock) GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) ([]domain.Contender, error) {
 	args := m.Called(ctx, tx, compClassID)
 	return args.Get(0).([]domain.Contender), args.Error(1)
 }
 
-func (m *repositoryMock) GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) ([]domain.Contender, error) {
+func (m *repositoryMock) GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error) {
 	args := m.Called(ctx, tx, contestID)
 	return args.Get(0).([]domain.Contender), args.Error(1)
 }
@@ -78,47 +78,47 @@ func (m *repositoryMock) StoreContender(ctx context.Context, tx domain.Transacti
 	}
 }
 
-func (m *repositoryMock) DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) error {
+func (m *repositoryMock) DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) error {
 	args := m.Called(ctx, tx, contenderID)
 	return args.Error(0)
 }
 
-func (m *repositoryMock) GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (domain.Contest, error) {
+func (m *repositoryMock) GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error) {
 	args := m.Called(ctx, tx, contestID)
 	return args.Get(0).(domain.Contest), args.Error(1)
 }
 
-func (m *repositoryMock) GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) (domain.CompClass, error) {
+func (m *repositoryMock) GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error) {
 	args := m.Called(ctx, tx, compClassID)
 	return args.Get(0).(domain.CompClass), args.Error(1)
 }
 
-func (m *repositoryMock) GetCompClassesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) ([]domain.CompClass, error) {
+func (m *repositoryMock) GetCompClassesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.CompClass, error) {
 	args := m.Called(ctx, tx, contestID)
 	return args.Get(0).([]domain.CompClass), args.Error(1)
 }
 
-func (m *repositoryMock) GetNumberOfContenders(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (int, error) {
+func (m *repositoryMock) GetNumberOfContenders(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (int, error) {
 	args := m.Called(ctx, tx, contestID)
 	return args.Get(0).(int), args.Error(1)
 }
 
-func (m *repositoryMock) GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) ([]domain.Problem, error) {
+func (m *repositoryMock) GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Problem, error) {
 	args := m.Called(ctx, tx, contestID)
 	return args.Get(0).([]domain.Problem), args.Error(1)
 }
 
-func (m *repositoryMock) GetTicksByContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) ([]domain.Tick, error) {
+func (m *repositoryMock) GetTicksByContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) ([]domain.Tick, error) {
 	args := m.Called(ctx, tx, contenderID)
 	return args.Get(0).([]domain.Tick), args.Error(1)
 }
 
-func (m *repositoryMock) DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.ResourceID) error {
+func (m *repositoryMock) DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) error {
 	args := m.Called(ctx, tx, tickID)
 	return args.Error(0)
 }
 
-func (m *repositoryMock) GetTick(ctx context.Context, tx domain.Transaction, tickID domain.ResourceID) (domain.Tick, error) {
+func (m *repositoryMock) GetTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) (domain.Tick, error) {
 	args := m.Called(ctx, tx, tickID)
 	return args.Get(0).(domain.Tick), args.Error(1)
 }
@@ -133,7 +133,7 @@ func (m *repositoryMock) StoreTick(ctx context.Context, tx domain.Transaction, t
 	}
 }
 
-func (m *repositoryMock) GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ResourceID) (domain.Problem, error) {
+func (m *repositoryMock) GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) (domain.Problem, error) {
 	args := m.Called(ctx, tx, problemID)
 	return args.Get(0).(domain.Problem), args.Error(1)
 }
@@ -151,7 +151,7 @@ type scoreKeeperMock struct {
 	mock.Mock
 }
 
-func (m *scoreKeeperMock) GetScore(contenderID domain.ResourceID) (domain.Score, error) {
+func (m *scoreKeeperMock) GetScore(contenderID domain.ContenderID) (domain.Score, error) {
 	args := m.Called(contenderID)
 	return args.Get(0).(domain.Score), args.Error(1)
 }
@@ -160,7 +160,7 @@ type eventBrokerMock struct {
 	mock.Mock
 }
 
-func (m *eventBrokerMock) Dispatch(contestID domain.ResourceID, event any) {
+func (m *eventBrokerMock) Dispatch(contestID domain.ContestID, event any) {
 	m.Called(contestID, event)
 }
 

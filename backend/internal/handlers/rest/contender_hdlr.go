@@ -26,7 +26,7 @@ func InstallContenderHandler(mux *Mux, contenderUseCase domain.ContenderUseCase)
 }
 
 func (hdlr *contenderHandler) GetContender(w http.ResponseWriter, r *http.Request) {
-	contenderID := parseResourceID(r.PathValue("contenderID"))
+	contenderID := parseResourceID[domain.ContenderID](r.PathValue("contenderID"))
 
 	contender, err := hdlr.contenderUseCase.GetContender(r.Context(), contenderID)
 	if err != nil {
@@ -50,7 +50,7 @@ func (hdlr *contenderHandler) GetContenderByCode(w http.ResponseWriter, r *http.
 }
 
 func (hdlr *contenderHandler) GetContendersByCompClass(w http.ResponseWriter, r *http.Request) {
-	compClassID := parseResourceID(r.PathValue("compClassID"))
+	compClassID := parseResourceID[domain.CompClassID](r.PathValue("compClassID"))
 
 	contenders, err := hdlr.contenderUseCase.GetContendersByCompClass(r.Context(), compClassID)
 	if err != nil {
@@ -62,7 +62,7 @@ func (hdlr *contenderHandler) GetContendersByCompClass(w http.ResponseWriter, r 
 }
 
 func (hdlr *contenderHandler) GetContendersByContest(w http.ResponseWriter, r *http.Request) {
-	contestID := parseResourceID(r.PathValue("contestID"))
+	contestID := parseResourceID[domain.ContestID](r.PathValue("contestID"))
 
 	contenders, err := hdlr.contenderUseCase.GetContendersByContest(r.Context(), contestID)
 	if err != nil {
@@ -74,7 +74,7 @@ func (hdlr *contenderHandler) GetContendersByContest(w http.ResponseWriter, r *h
 }
 
 func (hdlr *contenderHandler) UpdateContender(w http.ResponseWriter, r *http.Request) {
-	contenderID := parseResourceID(r.PathValue("contenderID"))
+	contenderID := parseResourceID[domain.ContenderID](r.PathValue("contenderID"))
 
 	var contender domain.Contender
 	err := json.NewDecoder(r.Body).Decode(&contender)
@@ -93,7 +93,7 @@ func (hdlr *contenderHandler) UpdateContender(w http.ResponseWriter, r *http.Req
 }
 
 func (hdlr *contenderHandler) DeleteContender(w http.ResponseWriter, r *http.Request) {
-	contenderID := parseResourceID(r.PathValue("contenderID"))
+	contenderID := parseResourceID[domain.ContenderID](r.PathValue("contenderID"))
 
 	err := hdlr.contenderUseCase.DeleteContender(r.Context(), contenderID)
 	if err != nil {
@@ -109,7 +109,7 @@ type createContendersTemplate struct {
 }
 
 func (hdlr *contenderHandler) CreateContenders(w http.ResponseWriter, r *http.Request) {
-	contestID := parseResourceID(r.PathValue("contestID"))
+	contestID := parseResourceID[domain.ContestID](r.PathValue("contestID"))
 
 	var tmpl createContendersTemplate
 	err := json.NewDecoder(r.Body).Decode(&tmpl)

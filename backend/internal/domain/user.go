@@ -3,16 +3,16 @@ package domain
 import "context"
 
 type User struct {
-	ID         ResourceID
+	ID         UserID
 	Name       string
 	Username   string
 	Admin      bool
-	Organizers []ResourceID
+	Organizers []OrganizerID
 }
 
 type UserUseCase interface {
 	GetCurrentUser(ctx context.Context) (User, error)
-	GetUsersByOrganizer(ctx context.Context, organizerID ResourceID) ([]User, error)
-	UpdateUser(ctx context.Context, userID ResourceID, user User) (User, error)
-	DeleteUser(ctx context.Context, userID ResourceID) error
+	GetUsersByOrganizer(ctx context.Context, organizerID OrganizerID) ([]User, error)
+	UpdateUser(ctx context.Context, userID UserID, user User) (User, error)
+	DeleteUser(ctx context.Context, userID UserID) error
 }

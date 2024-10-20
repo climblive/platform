@@ -8,9 +8,9 @@ import (
 type ColorRGB string
 
 type CompClass struct {
-	ID          ResourceID    `json:"id,omitempty"`
+	ID          CompClassID   `json:"id,omitempty"`
 	Ownership   OwnershipData `json:"-"`
-	ContestID   ResourceID    `json:"contestId"`
+	ContestID   ContestID     `json:"contestId"`
 	Name        string        `json:"name"`
 	Description string        `json:"description,omitempty"`
 	Color       ColorRGB      `json:"color,omitempty"`
@@ -19,8 +19,8 @@ type CompClass struct {
 }
 
 type CompClassUseCase interface {
-	GetCompClassesByContest(ctx context.Context, contestID ResourceID) ([]CompClass, error)
-	UpdateCompClass(ctx context.Context, compClassID ResourceID, compClass CompClass) (CompClass, error)
-	DeleteCompClass(ctx context.Context, compClassID ResourceID) error
-	CreateCompClass(ctx context.Context, contestID ResourceID, compClass CompClass) (CompClass, error)
+	GetCompClassesByContest(ctx context.Context, contestID ContestID) ([]CompClass, error)
+	UpdateCompClass(ctx context.Context, compClassID CompClassID, compClass CompClass) (CompClass, error)
+	DeleteCompClass(ctx context.Context, compClassID CompClassID) error
+	CreateCompClass(ctx context.Context, contestID ContestID, compClass CompClass) (CompClass, error)
 }

@@ -6,15 +6,15 @@ import (
 )
 
 type RaffleWinner struct {
-	ID            ResourceID
+	ID            RaffleWinnerID
 	Ownership     OwnershipData
-	RaffleID      ResourceID
-	ContenderID   ResourceID
+	RaffleID      RaffleID
+	ContenderID   ContenderID
 	ContenderName string
 	Timestamp     time.Time
 }
 
 type RaffleWinnerUseCase interface {
-	GetRaffleWinners(ctx context.Context, raffleID ResourceID) ([]RaffleWinner, error)
-	DrawRaffleWinner(ctx context.Context, raffleID ResourceID) (RaffleWinner, error)
+	GetRaffleWinners(ctx context.Context, raffleID RaffleID) ([]RaffleWinner, error)
+	DrawRaffleWinner(ctx context.Context, raffleID RaffleID) (RaffleWinner, error)
 }

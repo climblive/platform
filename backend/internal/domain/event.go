@@ -9,12 +9,12 @@ import (
 type SubscriptionID = uuid.UUID
 
 type EventFilter struct {
-	ContestID   ResourceID
-	ContenderID ResourceID
+	ContestID   ContestID
+	ContenderID ContenderID
 }
 
 type EventBroker interface {
-	Dispatch(contestID ResourceID, event any)
+	Dispatch(contestID ContestID, event any)
 	Subscribe(filter EventFilter, ch chan EventContainer) SubscriptionID
 	Unsubscribe(subscriptionID SubscriptionID)
 }
@@ -25,77 +25,77 @@ type EventContainer struct {
 }
 
 type ContenderEnteredEvent struct {
-	ContenderID ResourceID `json:"contenderId"`
-	CompClassID ResourceID `json:"compClassId"`
+	ContenderID ContenderID `json:"contenderId"`
+	CompClassID CompClassID `json:"compClassId"`
 }
 
 type ContenderSwitchedClassEvent struct {
-	ContenderID ResourceID `json:"contenderId"`
-	CompClassID ResourceID `json:"compClassId"`
+	ContenderID ContenderID `json:"contenderId"`
+	CompClassID CompClassID `json:"compClassId"`
 }
 
 type ContenderWithdrewFromFinalsEvent struct {
-	ContenderID ResourceID `json:"contenderId"`
+	ContenderID ContenderID `json:"contenderId"`
 }
 
 type ContenderReenteredFinalsEvent struct {
-	ContenderID ResourceID `json:"contenderId"`
+	ContenderID ContenderID `json:"contenderId"`
 }
 
 type ContenderDisqualifiedEvent struct {
-	ContenderID ResourceID `json:"contenderId"`
+	ContenderID ContenderID `json:"contenderId"`
 }
 
 type ContenderRequalifiedEvent struct {
-	ContenderID ResourceID `json:"contenderId"`
+	ContenderID ContenderID `json:"contenderId"`
 }
 
 type AscentRegisteredEvent struct {
-	ContenderID  ResourceID `json:"contenderId"`
-	ProblemID    ResourceID `json:"problemId"`
-	Top          bool       `json:"top"`
-	AttemptsTop  int        `json:"attemptsTop"`
-	Zone         bool       `json:"zone"`
-	AttemptsZone int        `json:"attemptsZone"`
+	ContenderID  ContenderID `json:"contenderId"`
+	ProblemID    ProblemID   `json:"problemId"`
+	Top          bool        `json:"top"`
+	AttemptsTop  int         `json:"attemptsTop"`
+	Zone         bool        `json:"zone"`
+	AttemptsZone int         `json:"attemptsZone"`
 }
 
 type AscentDeregisteredEvent struct {
-	ContenderID ResourceID `json:"contenderId"`
-	ProblemID   ResourceID `json:"problemId"`
+	ContenderID ContenderID `json:"contenderId"`
+	ProblemID   ProblemID   `json:"problemId"`
 }
 
 type ProblemAddedEvent struct {
-	ProblemID  ResourceID `json:"problemId"`
-	PointsTop  int        `json:"pointsTop"`
-	PointsZone int        `json:"pointsZone"`
-	FlashBonus int        `json:"flashBonus"`
+	ProblemID  ProblemID `json:"problemId"`
+	PointsTop  int       `json:"pointsTop"`
+	PointsZone int       `json:"pointsZone"`
+	FlashBonus int       `json:"flashBonus"`
 }
 
 type ProblemUpdatedEvent struct {
-	ProblemID  ResourceID `json:"problemId"`
-	PointsTop  int        `json:"pointsTop"`
-	PointsZone int        `json:"pointsZone"`
-	FlashBonus int        `json:"flashBonus"`
+	ProblemID  ProblemID `json:"problemId"`
+	PointsTop  int       `json:"pointsTop"`
+	PointsZone int       `json:"pointsZone"`
+	FlashBonus int       `json:"flashBonus"`
 }
 
 type ProblemDeletedEvent struct {
-	ProblemID ResourceID `json:"problemId"`
+	ProblemID ProblemID `json:"problemId"`
 }
 
 type ContenderPublicInfoUpdatedEvent struct {
-	ContenderID         ResourceID `json:"contenderId"`
-	CompClassID         ResourceID `json:"compClassId"`
-	PublicName          string     `json:"publicName"`
-	ClubName            string     `json:"clubName"`
-	WithdrawnFromFinals bool       `json:"withdrawnFromFinals"`
-	Disqualified        bool       `json:"disqualified"`
+	ContenderID         ContenderID `json:"contenderId"`
+	CompClassID         CompClassID `json:"compClassId"`
+	PublicName          string      `json:"publicName"`
+	ClubName            string      `json:"clubName"`
+	WithdrawnFromFinals bool        `json:"withdrawnFromFinals"`
+	Disqualified        bool        `json:"disqualified"`
 }
 
 type ContenderScoreUpdatedEvent struct {
-	Timestamp   time.Time  `json:"timestamp"`
-	ContenderID ResourceID `json:"contenderId"`
-	Score       int        `json:"score"`
-	Placement   int        `json:"placement,omitempty"`
-	Finalist    bool       `json:"finalist"`
-	RankOrder   int        `json:"rankOrder"`
+	Timestamp   time.Time   `json:"timestamp"`
+	ContenderID ContenderID `json:"contenderId"`
+	Score       int         `json:"score"`
+	Placement   int         `json:"placement,omitempty"`
+	Finalist    bool        `json:"finalist"`
+	RankOrder   int         `json:"rankOrder"`
 }

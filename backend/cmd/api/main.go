@@ -111,7 +111,7 @@ func main() {
 
 func startTestingScoreEngine(
 	ctx context.Context,
-	contestID domain.ResourceID,
+	contestID domain.ContestID,
 	repo *repository.Database,
 	eventBroker domain.EventBroker,
 ) {

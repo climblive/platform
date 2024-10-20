@@ -29,10 +29,10 @@ func (contestRecord) TableName() string {
 
 func (r contestRecord) fromDomain(contest domain.Contest) contestRecord {
 	return contestRecord{
-		ID:                 e2n(contest.ID),
-		OrganizerID:        contest.Ownership.OrganizerID,
+		ID:                 e2n(int(contest.ID)),
+		OrganizerID:        int(contest.Ownership.OrganizerID),
 		Protected:          contest.Protected,
-		SeriesID:           e2n(contest.SeriesID),
+		SeriesID:           e2n(int(contest.SeriesID)),
 		Name:               contest.Name,
 		Description:        e2n(contest.Description),
 		Location:           e2n(contest.Location),
@@ -46,12 +46,12 @@ func (r contestRecord) fromDomain(contest domain.Contest) contestRecord {
 
 func (r *contestRecord) toDomain() domain.Contest {
 	return domain.Contest{
-		ID: n2e(r.ID),
+		ID: domain.ContestID(n2e(r.ID)),
 		Ownership: domain.OwnershipData{
-			OrganizerID: r.OrganizerID,
+			OrganizerID: domain.OrganizerID(r.OrganizerID),
 		},
 		Protected:          r.Protected,
-		SeriesID:           n2e(r.SeriesID),
+		SeriesID:           domain.SeriesID(n2e(r.SeriesID)),
 		Name:               r.Name,
 		Description:        n2e(r.Description),
 		Location:           n2e(r.Location),
@@ -63,7 +63,7 @@ func (r *contestRecord) toDomain() domain.Contest {
 	}
 }
 
-func (d *Database) GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) (domain.Contest, error) {
+func (d *Database) GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error) {
 	var record contestRecord
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contest WHERE id = ?`, contestID).Scan(&record).Error
 	if err != nil {

@@ -24,11 +24,11 @@ func (tickRecord) TableName() string {
 
 func (r tickRecord) fromDomain(tick domain.Tick) tickRecord {
 	return tickRecord{
-		ID:          e2n(tick.ID),
-		OrganizerID: tick.Ownership.OrganizerID,
-		ContestID:   tick.ContestID,
-		ContenderID: *tick.Ownership.ContenderID,
-		ProblemID:   tick.ProblemID,
+		ID:          e2n(int(tick.ID)),
+		OrganizerID: int(tick.Ownership.OrganizerID),
+		ContestID:   int(tick.ContestID),
+		ContenderID: int(*tick.Ownership.ContenderID),
+		ProblemID:   int(tick.ProblemID),
 		Flash:       tick.AttemptsTop == 1,
 		Timestamp:   tick.Timestamp,
 	}
@@ -44,14 +44,14 @@ func (r *tickRecord) toDomain() domain.Tick {
 	}
 
 	return domain.Tick{
-		ID: n2e(r.ID),
+		ID: domain.TickID(n2e(r.ID)),
 		Ownership: domain.OwnershipData{
-			OrganizerID: r.OrganizerID,
-			ContenderID: &r.ContenderID,
+			OrganizerID: domain.OrganizerID(r.OrganizerID),
+			ContenderID: nillableIntToResourceID[domain.ContenderID](&r.ContenderID),
 		},
 		Timestamp:    r.Timestamp,
-		ContestID:    r.ContestID,
-		ProblemID:    r.ProblemID,
+		ContestID:    domain.ContestID(r.ContestID),
+		ProblemID:    domain.ProblemID(r.ProblemID),
 		Top:          true,
 		AttemptsTop:  attempts(r.Flash),
 		Zone:         true,
@@ -59,7 +59,7 @@ func (r *tickRecord) toDomain() domain.Tick {
 	}
 }
 
-func (d *Database) GetTicksByContender(ctx context.Context, tx domain.Transaction, contenderID domain.ResourceID) ([]domain.Tick, error) {
+func (d *Database) GetTicksByContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) ([]domain.Tick, error) {
 	var records []tickRecord
 
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM tick WHERE contender_id = ?`, contenderID).Scan(&records).Error
@@ -88,7 +88,7 @@ func (d *Database) StoreTick(ctx context.Context, tx domain.Transaction, tick do
 	return record.toDomain(), nil
 }
 
-func (d *Database) DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.ResourceID) error {
+func (d *Database) DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) error {
 	err := d.tx(tx).WithContext(ctx).Exec(`DELETE FROM tick WHERE id = ?`, tickID).Error
 	if err != nil {
 		return errors.Wrap(err, 0)
@@ -97,7 +97,7 @@ func (d *Database) DeleteTick(ctx context.Context, tx domain.Transaction, tickID
 	return nil
 }
 
-func (d *Database) GetTick(ctx context.Context, tx domain.Transaction, tickID domain.ResourceID) (domain.Tick, error) {
+func (d *Database) GetTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) (domain.Tick, error) {
 	var record tickRecord
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM tick WHERE id = ?`, tickID).Scan(&record).Error
 	if err != nil {

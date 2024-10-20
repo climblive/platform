@@ -6,11 +6,11 @@ import (
 )
 
 type Tick struct {
-	ID           ResourceID    `json:"id,omitempty"`
+	ID           TickID        `json:"id,omitempty"`
 	Ownership    OwnershipData `json:"-"`
 	Timestamp    time.Time     `json:"timestamp"`
-	ContestID    ResourceID    `json:"contestId"`
-	ProblemID    ResourceID    `json:"problemId"`
+	ContestID    ContestID     `json:"contestId"`
+	ProblemID    ProblemID     `json:"problemId"`
 	Top          bool          `json:"top"`
 	AttemptsTop  int           `json:"attemptsTop"`
 	Zone         bool          `json:"zone"`
@@ -18,8 +18,8 @@ type Tick struct {
 }
 
 type TickUseCase interface {
-	GetTicksByContender(ctx context.Context, contenderID ResourceID) ([]Tick, error)
-	GetTicksByProblem(ctx context.Context, problemID ResourceID) ([]Tick, error)
-	DeleteTick(ctx context.Context, tickID ResourceID) error
-	CreateTick(ctx context.Context, contenderID ResourceID, tick Tick) (Tick, error)
+	GetTicksByContender(ctx context.Context, contenderID ContenderID) ([]Tick, error)
+	GetTicksByProblem(ctx context.Context, problemID ProblemID) ([]Tick, error)
+	DeleteTick(ctx context.Context, tickID TickID) error
+	CreateTick(ctx context.Context, contenderID ContenderID, tick Tick) (Tick, error)
 }
