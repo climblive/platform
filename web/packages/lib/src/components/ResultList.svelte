@@ -7,17 +7,29 @@
   import ResultEntry from "./ResultEntry.svelte";
 
   export let compClassId: number;
+  export let overflow: "pagination" | "scroll" = "scroll";
+
+  const ITEM_HEIGHT = 36;
+  const GAP = 8;
 
   let container: HTMLDivElement | undefined;
   let observer: ResizeObserver | undefined;
-  let timerId: number;
+  let pageFlipIntervalTimerId: number;
 
-  let height: number;
+  let containerHeight: number;
   let pageSize: number;
   let pageIndex = 0;
 
   $: {
-    pageSize = Math.floor(height / 42);
+    switch (overflow) {
+      case "pagination":
+        pageSize = Math.floor((containerHeight + GAP) / (ITEM_HEIGHT + GAP));
+        break;
+      case "scroll":
+        pageSize = results.length;
+        break;
+    }
+
     pageIndex = 0;
   }
 
@@ -28,15 +40,17 @@
   $: results = $scoreboard.get(compClassId) ?? [];
 
   onMount(() => {
-    timerId = setInterval(() => {
-      pageIndex = (pageIndex + 1) % pageCount;
-    }, 10_000);
+    if (overflow === "pagination") {
+      pageFlipIntervalTimerId = setInterval(() => {
+        pageIndex = (pageIndex + 1) % pageCount;
+      }, 10_000);
+    }
 
     observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
         if (entry.contentBoxSize) {
           const contentBoxSize = entry.contentBoxSize[0];
-          height = contentBoxSize.blockSize;
+          containerHeight = contentBoxSize.blockSize;
         }
       }
     });
@@ -46,12 +60,12 @@
     observer?.disconnect();
     observer = undefined;
 
-    clearInterval(timerId);
-    timerId = 0;
+    clearInterval(pageFlipIntervalTimerId);
+    pageFlipIntervalTimerId = 0;
   });
 
   $: {
-    if (container) {
+    if (container && overflow === "pagination") {
       observer?.observe(container);
     }
   }
@@ -61,6 +75,7 @@
   class="container"
   bind:this={container}
   style="--page-size: {pageSize}; --page-index: {pageIndex}"
+  {overflow}
 >
   {#each results as scoreboardEntry (scoreboardEntry.contenderId)}
     <Floater order={scoreboardEntry.rankOrder}>
@@ -73,14 +88,24 @@
   .container {
     overflow: hidden;
     position: relative;
+  }
+
+  .container[overflow="pagination"] {
     height: 100%;
     clip-path: rect(
       0px 0px
         calc(
-          var(--page-size) * (2.25rem) + (var(--page-size) - 1) *
+          var(--page-size) * 2.25rem + (var(--page-size) - 1) *
             var(--sl-spacing-x-small)
         )
         100%
+    );
+  }
+
+  .container[overflow="scroll"] {
+    height: calc(
+      var(--page-size) * 2.25rem + (var(--page-size) - 1) *
+        var(--sl-spacing-x-small)
     );
   }
 </style>

@@ -28,7 +28,7 @@
             <h1>{compClass.name}</h1>
             <Timer endTime={new Date(compClass.timeEnd)} />
           </header>
-          <ResultList compClassId={compClass.id} />
+          <ResultList compClassId={compClass.id} overflow="pagination" />
         </section>
       {/each}
     </div>
