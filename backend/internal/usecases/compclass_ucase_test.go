@@ -14,10 +14,10 @@ import (
 func TestGetCompClassesByContest(t *testing.T) {
 	t.Parallel()
 
-	mockedContestID := domain.ContestID(1)
+	mockedContestID := randomResourceID[domain.ContestID]()
 
 	mockedCompClasses := []domain.CompClass{{
-		ID:        1,
+		ID:        randomResourceID[domain.CompClassID](),
 		ContestID: mockedContestID,
 	},
 	}
