@@ -15,8 +15,10 @@ import (
 
 func TestAuthorizer(t *testing.T) {
 	mockedContenderID := domain.ContenderID(rand.Int())
+	mockedOrganizerID := domain.OrganizerID(rand.Int())
+
 	mockedOwnership := domain.OwnershipData{
-		OrganizerID: 1,
+		OrganizerID: mockedOrganizerID,
 		ContenderID: &mockedContenderID,
 	}
 
@@ -104,7 +106,7 @@ func TestAuthorizer(t *testing.T) {
 		otherContenderID := mockedContenderID + 1
 
 		mockedOtherOwnership := domain.OwnershipData{
-			OrganizerID: 1,
+			OrganizerID: mockedOrganizerID,
 			ContenderID: &otherContenderID,
 		}
 

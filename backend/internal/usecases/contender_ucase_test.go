@@ -14,9 +14,9 @@ import (
 )
 
 func TestGetContender(t *testing.T) {
-	mockedContenderID := domain.ContenderID(1)
+	mockedContenderID := randomResourceID[domain.ContenderID]()
 	mockedOwnership := domain.OwnershipData{
-		OrganizerID: 1,
+		OrganizerID: randomResourceID[domain.OrganizerID](),
 		ContenderID: &mockedContenderID,
 	}
 	currentTime := time.Now()
@@ -89,9 +89,9 @@ func TestGetContender(t *testing.T) {
 }
 
 func TestGetContenderByCode(t *testing.T) {
-	mockedContenderID := domain.ContenderID(1)
+	mockedContenderID := randomResourceID[domain.ContenderID]()
 	mockedOwnership := domain.OwnershipData{
-		OrganizerID: 1,
+		OrganizerID: randomResourceID[domain.OrganizerID](),
 		ContenderID: &mockedContenderID,
 	}
 
@@ -139,9 +139,9 @@ func TestGetContenderByCode(t *testing.T) {
 }
 
 func TestGetContendersByCompClass(t *testing.T) {
-	mockedCompClassID := domain.CompClassID(1)
+	mockedCompClassID := randomResourceID[domain.CompClassID]()
 	mockedOwnership := domain.OwnershipData{
-		OrganizerID: 1,
+		OrganizerID: randomResourceID[domain.OrganizerID](),
 	}
 	currentTime := time.Now()
 
@@ -225,9 +225,9 @@ func TestGetContendersByCompClass(t *testing.T) {
 }
 
 func TestGetContendersByContest(t *testing.T) {
-	mockedContestID := domain.ContestID(1)
+	mockedContestID := randomResourceID[domain.ContestID]()
 	mockedOwnership := domain.OwnershipData{
-		OrganizerID: 1,
+		OrganizerID: randomResourceID[domain.OrganizerID](),
 	}
 	currentTime := time.Now()
 
@@ -311,9 +311,9 @@ func TestGetContendersByContest(t *testing.T) {
 }
 
 func TestDeleteContender(t *testing.T) {
-	mockedContenderID := domain.ContenderID(1)
+	mockedContenderID := randomResourceID[domain.ContenderID]()
 	mockedOwnership := domain.OwnershipData{
-		OrganizerID: 1,
+		OrganizerID: randomResourceID[domain.OrganizerID](),
 		ContenderID: &mockedContenderID,
 	}
 
@@ -382,9 +382,10 @@ func TestDeleteContender(t *testing.T) {
 }
 
 func TestCreateContenders(t *testing.T) {
-	mockedContestID := domain.ContestID(1)
+	mockedContestID := randomResourceID[domain.ContestID]()
+	mockedOrganizerID := randomResourceID[domain.OrganizerID]()
 	mockedOwnership := domain.OwnershipData{
-		OrganizerID: 1,
+		OrganizerID: mockedOrganizerID,
 	}
 
 	makeMocks := func() (*repositoryMock, *transactionMock, *codeGeneratorMock) {
@@ -406,9 +407,9 @@ func TestCreateContenders(t *testing.T) {
 		for n := range 100 {
 			code := fmt.Sprintf("%08d", n)
 			contender := domain.Contender{
-				ContestID: 1,
+				ContestID: mockedContestID,
 				Ownership: domain.OwnershipData{
-					OrganizerID: 1,
+					OrganizerID: mockedOrganizerID,
 				},
 				RegistrationCode: code,
 			}
@@ -501,7 +502,7 @@ func TestCreateContenders(t *testing.T) {
 }
 
 func TestCreateContenders_Rollback(t *testing.T) {
-	mockedContestID := domain.ContestID(1)
+	mockedContestID := randomResourceID[domain.ContestID]()
 
 	mockedRepo := new(repositoryMock)
 	mockedTx := new(transactionMock)
@@ -550,9 +551,9 @@ func TestCreateContenders_Rollback(t *testing.T) {
 }
 
 func TestUpdateContender(t *testing.T) {
-	mockedContenderID := domain.ContenderID(1)
+	mockedContenderID := randomResourceID[domain.ContenderID]()
 	mockedOwnership := domain.OwnershipData{
-		OrganizerID: 1,
+		OrganizerID: randomResourceID[domain.OrganizerID](),
 		ContenderID: &mockedContenderID,
 	}
 	mockedContestID := randomResourceID[domain.ContestID]()
