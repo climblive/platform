@@ -19,7 +19,7 @@ func InstallProblemHandler(mux *Mux, problemUseCase domain.ProblemUseCase) {
 }
 
 func (hdlr *problemHandler) GetProblemsByContest(w http.ResponseWriter, r *http.Request) {
-	contestID := parseResourceID(r.PathValue("contestID"))
+	contestID := parseResourceID[domain.ContestID](r.PathValue("contestID"))
 
 	problems, err := hdlr.problemUseCase.GetProblemsByContest(r.Context(), contestID)
 	if err != nil {

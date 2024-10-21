@@ -3,24 +3,24 @@ package scores
 import "github.com/climblive/platform/backend/internal/domain"
 
 type Contender struct {
-	ID                  domain.ResourceID
-	CompClassID         domain.ResourceID
+	ID                  domain.ContenderID
+	CompClassID         domain.CompClassID
 	Disqualified        bool
 	WithdrawnFromFinals bool
-	Ticks               map[domain.ResourceID]*Tick
+	Ticks               map[domain.ProblemID]*Tick
 	Score               int
 }
 
 func (c Contender) Compare(other Contender) int {
 	if c.Score == other.Score {
-		return c.ID - other.ID
+		return int(c.ID) - int(other.ID)
 	}
 
 	return other.Score - c.Score
 }
 
 type Tick struct {
-	ProblemID    domain.ResourceID
+	ProblemID    domain.ProblemID
 	Top          bool
 	AttemptsTop  int
 	Zone         bool
@@ -43,7 +43,7 @@ func (t *Tick) Score(problem Problem) {
 }
 
 type Problem struct {
-	ID         domain.ResourceID
+	ID         domain.ProblemID
 	PointsTop  int
 	PointsZone int
 	FlashBonus int

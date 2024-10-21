@@ -1,5 +1,7 @@
 package repository
 
+import "github.com/climblive/platform/backend/internal/domain"
+
 func e2n[T comparable](value T) *T {
 	var empty T
 
@@ -18,4 +20,13 @@ func n2e[T comparable](value *T) T {
 	}
 
 	return *value
+}
+
+func nillableIntToResourceID[T domain.ResourceIDType](value *int) *T {
+	if value == nil {
+		return nil
+	}
+
+	var out T = T(*value)
+	return &out
 }

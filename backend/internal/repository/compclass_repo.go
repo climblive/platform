@@ -25,9 +25,9 @@ func (compClassRecord) TableName() string {
 
 func (r compClassRecord) fromDomain(compClass domain.CompClass) compClassRecord {
 	return compClassRecord{
-		ID:          e2n(compClass.ID),
-		OrganizerID: compClass.Ownership.OrganizerID,
-		ContestID:   compClass.ContestID,
+		ID:          e2n(int(compClass.ID)),
+		OrganizerID: int(compClass.Ownership.OrganizerID),
+		ContestID:   int(compClass.ContestID),
 		Name:        compClass.Name,
 		Description: e2n(compClass.Description),
 		Color:       e2n(string(compClass.Color)),
@@ -38,11 +38,11 @@ func (r compClassRecord) fromDomain(compClass domain.CompClass) compClassRecord 
 
 func (r *compClassRecord) toDomain() domain.CompClass {
 	return domain.CompClass{
-		ID: n2e(r.ID),
+		ID: domain.CompClassID(n2e(r.ID)),
 		Ownership: domain.OwnershipData{
-			OrganizerID: r.OrganizerID,
+			OrganizerID: domain.OrganizerID(r.OrganizerID),
 		},
-		ContestID:   r.ContestID,
+		ContestID:   domain.ContestID(r.ContestID),
 		Name:        r.Name,
 		Description: n2e(r.Description),
 		Color:       domain.ColorRGB(n2e(r.Color)),
@@ -51,7 +51,7 @@ func (r *compClassRecord) toDomain() domain.CompClass {
 	}
 }
 
-func (d *Database) GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.ResourceID) (domain.CompClass, error) {
+func (d *Database) GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error) {
 	var record compClassRecord
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM comp_class WHERE id = ?`, compClassID).Scan(&record).Error
 	if err != nil {
@@ -65,7 +65,7 @@ func (d *Database) GetCompClass(ctx context.Context, tx domain.Transaction, comp
 	return record.toDomain(), nil
 }
 
-func (d *Database) GetCompClassesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ResourceID) ([]domain.CompClass, error) {
+func (d *Database) GetCompClassesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.CompClass, error) {
 	var records []compClassRecord
 
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM comp_class WHERE contest_id = ?`, contestID).Scan(&records).Error

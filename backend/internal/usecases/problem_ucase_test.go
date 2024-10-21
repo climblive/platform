@@ -12,7 +12,7 @@ import (
 )
 
 func TestGetProblemsByContest(t *testing.T) {
-	mockedContestID := domain.ResourceID(1)
+	mockedContestID := domain.ContestID(1)
 	mockedProblems := []domain.Problem{
 		{
 			ID:        1,

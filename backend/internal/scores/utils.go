@@ -7,7 +7,7 @@ import (
 	"github.com/climblive/platform/backend/internal/domain"
 )
 
-func FilterByClass(contenders map[domain.ResourceID]*Contender, compClassID domain.ResourceID) iter.Seq[*Contender] {
+func FilterByClass(contenders map[domain.ContenderID]*Contender, compClassID domain.CompClassID) iter.Seq[*Contender] {
 	return func(yield func(*Contender) bool) {
 		for _, contender := range contenders {
 			if contender.CompClassID != compClassID {

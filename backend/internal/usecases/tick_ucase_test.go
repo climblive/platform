@@ -13,7 +13,7 @@ import (
 )
 
 func TestGetTicksByContender(t *testing.T) {
-	mockedContenderID := domain.ResourceID(1)
+	mockedContenderID := domain.ContenderID(1)
 	mockedOwnership := domain.OwnershipData{
 		OrganizerID: 1,
 		ContenderID: &mockedContenderID,
@@ -78,10 +78,10 @@ func TestGetTicksByContender(t *testing.T) {
 }
 
 func TestCreateTick(t *testing.T) {
-	mockedContenderID := randomResourceID()
-	mockedContestID := randomResourceID()
-	mockedCompClassID := randomResourceID()
-	mockedProblemID := randomResourceID()
+	mockedContenderID := randomResourceID[domain.ContenderID]()
+	mockedContestID := randomResourceID[domain.ContestID]()
+	mockedCompClassID := randomResourceID[domain.CompClassID]()
+	mockedProblemID := randomResourceID[domain.ProblemID]()
 
 	gracePeriod := 15 * time.Minute
 
@@ -252,11 +252,11 @@ func TestCreateTick(t *testing.T) {
 }
 
 func TestDeleteTick(t *testing.T) {
-	mockedTickID := randomResourceID()
-	mockedContenderID := randomResourceID()
-	mockedContestID := randomResourceID()
-	mockedCompClassID := randomResourceID()
-	mockedProblemID := randomResourceID()
+	mockedTickID := randomResourceID[domain.TickID]()
+	mockedContenderID := randomResourceID[domain.ContenderID]()
+	mockedContestID := randomResourceID[domain.ContestID]()
+	mockedCompClassID := randomResourceID[domain.CompClassID]()
+	mockedProblemID := randomResourceID[domain.ProblemID]()
 
 	gracePeriod := 15 * time.Minute
 

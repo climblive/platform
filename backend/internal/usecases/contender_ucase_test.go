@@ -14,7 +14,7 @@ import (
 )
 
 func TestGetContender(t *testing.T) {
-	mockedContenderID := domain.ResourceID(1)
+	mockedContenderID := domain.ContenderID(1)
 	mockedOwnership := domain.OwnershipData{
 		OrganizerID: 1,
 		ContenderID: &mockedContenderID,
@@ -89,7 +89,7 @@ func TestGetContender(t *testing.T) {
 }
 
 func TestGetContenderByCode(t *testing.T) {
-	mockedContenderID := domain.ResourceID(1)
+	mockedContenderID := domain.ContenderID(1)
 	mockedOwnership := domain.OwnershipData{
 		OrganizerID: 1,
 		ContenderID: &mockedContenderID,
@@ -139,7 +139,7 @@ func TestGetContenderByCode(t *testing.T) {
 }
 
 func TestGetContendersByCompClass(t *testing.T) {
-	mockedCompClassID := domain.ResourceID(1)
+	mockedCompClassID := domain.CompClassID(1)
 	mockedOwnership := domain.OwnershipData{
 		OrganizerID: 1,
 	}
@@ -160,7 +160,7 @@ func TestGetContendersByCompClass(t *testing.T) {
 	var contenders []domain.Contender
 
 	for k := 1; k <= 10; k++ {
-		contenderID := k
+		contenderID := domain.ContenderID(k)
 
 		contenders = append(contenders, domain.Contender{
 			ID: contenderID,
@@ -198,7 +198,7 @@ func TestGetContendersByCompClass(t *testing.T) {
 		assert.Len(t, contenders, 10)
 
 		for i, contender := range contenders {
-			assert.Equal(t, i+1, contender.ID)
+			assert.Equal(t, domain.ContenderID(i+1), contender.ID)
 			assert.Equal(t, (i+1)*10, contender.Score)
 			assert.Equal(t, i+1, contender.Placement)
 			assert.Equal(t, currentTime, *contender.ScoreUpdated)
@@ -225,7 +225,7 @@ func TestGetContendersByCompClass(t *testing.T) {
 }
 
 func TestGetContendersByContest(t *testing.T) {
-	mockedContestID := domain.ResourceID(1)
+	mockedContestID := domain.ContestID(1)
 	mockedOwnership := domain.OwnershipData{
 		OrganizerID: 1,
 	}
@@ -246,7 +246,7 @@ func TestGetContendersByContest(t *testing.T) {
 	var contenders []domain.Contender
 
 	for k := 1; k <= 10; k++ {
-		contenderID := k
+		contenderID := domain.ContenderID(k)
 
 		contenders = append(contenders, domain.Contender{
 			ID: contenderID,
@@ -284,7 +284,7 @@ func TestGetContendersByContest(t *testing.T) {
 		assert.Len(t, contenders, 10)
 
 		for i, contender := range contenders {
-			assert.Equal(t, i+1, contender.ID)
+			assert.Equal(t, domain.ContenderID(i+1), contender.ID)
 			assert.Equal(t, (i+1)*10, contender.Score)
 			assert.Equal(t, i+1, contender.Placement)
 			assert.Equal(t, currentTime, *contender.ScoreUpdated)
@@ -311,7 +311,7 @@ func TestGetContendersByContest(t *testing.T) {
 }
 
 func TestDeleteContender(t *testing.T) {
-	mockedContenderID := domain.ResourceID(1)
+	mockedContenderID := domain.ContenderID(1)
 	mockedOwnership := domain.OwnershipData{
 		OrganizerID: 1,
 		ContenderID: &mockedContenderID,
@@ -382,7 +382,7 @@ func TestDeleteContender(t *testing.T) {
 }
 
 func TestCreateContenders(t *testing.T) {
-	mockedContestID := domain.ResourceID(1)
+	mockedContestID := domain.ContestID(1)
 	mockedOwnership := domain.OwnershipData{
 		OrganizerID: 1,
 	}
@@ -501,7 +501,7 @@ func TestCreateContenders(t *testing.T) {
 }
 
 func TestCreateContenders_Rollback(t *testing.T) {
-	mockedContestID := domain.ResourceID(1)
+	mockedContestID := domain.ContestID(1)
 
 	mockedRepo := new(repositoryMock)
 	mockedTx := new(transactionMock)
@@ -550,22 +550,25 @@ func TestCreateContenders_Rollback(t *testing.T) {
 }
 
 func TestUpdateContender(t *testing.T) {
-	mockedContenderID := domain.ResourceID(1)
+	mockedContenderID := domain.ContenderID(1)
 	mockedOwnership := domain.OwnershipData{
 		OrganizerID: 1,
 		ContenderID: &mockedContenderID,
 	}
+	mockedContestID := randomResourceID[domain.ContestID]()
+	mockedCompClassID := randomResourceID[domain.CompClassID]()
+
 	currentTime := time.Now()
 	gracePeriod := 15 * time.Minute
 
 	makeMockedRepo := func(contender domain.Contender) *repositoryMock {
 		mockedContest := domain.Contest{
-			ID:          1,
+			ID:          mockedContestID,
 			GracePeriod: gracePeriod,
 		}
 
 		mockedCompClass := domain.CompClass{
-			ID:        1,
+			ID:        mockedCompClassID,
 			TimeBegin: currentTime.Add(-1 * time.Hour),
 			TimeEnd:   currentTime.Add(time.Hour),
 		}
@@ -577,11 +580,11 @@ func TestUpdateContender(t *testing.T) {
 			Return(contender, nil)
 
 		mockedRepo.
-			On("GetContest", mock.Anything, mock.Anything, 1).
+			On("GetContest", mock.Anything, mock.Anything, mockedContestID).
 			Return(mockedContest, nil)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, 1).
+			On("GetCompClass", mock.Anything, mock.Anything, mockedCompClassID).
 			Return(mockedCompClass, nil)
 
 		mockedRepo.
@@ -611,8 +614,8 @@ func TestUpdateContender(t *testing.T) {
 		mockedContender := domain.Contender{
 			ID:                  mockedContenderID,
 			Ownership:           mockedOwnership,
-			ContestID:           1,
-			CompClassID:         1,
+			ContestID:           mockedContestID,
+			CompClassID:         mockedCompClassID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			PublicName:          "John",
@@ -668,8 +671,8 @@ func TestUpdateContender(t *testing.T) {
 		mockedContender := domain.Contender{
 			ID:                  mockedContenderID,
 			Ownership:           mockedOwnership,
-			ContestID:           1,
-			CompClassID:         1,
+			ContestID:           mockedContestID,
+			CompClassID:         mockedCompClassID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			PublicName:          "John",
@@ -748,8 +751,8 @@ func TestUpdateContender(t *testing.T) {
 		mockedContender := domain.Contender{
 			ID:                  mockedContenderID,
 			Ownership:           mockedOwnership,
-			ContestID:           1,
-			CompClassID:         1,
+			ContestID:           mockedContestID,
+			CompClassID:         mockedCompClassID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			PublicName:          "John",
@@ -792,12 +795,12 @@ func TestUpdateContender(t *testing.T) {
 
 		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
 
-		mockedEventBroker.On("Dispatch", 1, mock.Anything).Return()
+		mockedEventBroker.On("Dispatch", mockedContestID, mock.Anything).Return()
 
 		mockedContender := domain.Contender{
 			ID:                  mockedContenderID,
 			Ownership:           mockedOwnership,
-			ContestID:           1,
+			ContestID:           mockedContestID,
 			CompClassID:         0,
 			RegistrationCode:    "ABCD1234",
 			Name:                "",
@@ -820,7 +823,7 @@ func TestUpdateContender(t *testing.T) {
 		}
 
 		updatedContender := mockedContender
-		updatedContender.CompClassID = 1
+		updatedContender.CompClassID = mockedCompClassID
 		updatedContender.Name = "John Doe"
 		updatedContender.PublicName = "John"
 		updatedContender.ClubName = "Testers' Climbing Club"
@@ -829,21 +832,21 @@ func TestUpdateContender(t *testing.T) {
 
 		require.NoError(t, err)
 
-		assert.Equal(t, 1, contender.CompClassID)
+		assert.Equal(t, mockedCompClassID, contender.CompClassID)
 		assert.Equal(t, "John Doe", contender.Name)
 		assert.Equal(t, "John", contender.PublicName)
 		assert.Equal(t, "Testers' Climbing Club", contender.ClubName)
 		require.NotNil(t, contender.Entered)
 		assert.WithinDuration(t, time.Now(), *contender.Entered, time.Minute)
 
-		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderEnteredEvent{
+		mockedEventBroker.AssertCalled(t, "Dispatch", mockedContestID, domain.ContenderEnteredEvent{
 			ContenderID: mockedContenderID,
-			CompClassID: 1,
+			CompClassID: mockedCompClassID,
 		})
 
-		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderPublicInfoUpdatedEvent{
+		mockedEventBroker.AssertCalled(t, "Dispatch", mockedContestID, domain.ContenderPublicInfoUpdatedEvent{
 			ContenderID:         mockedContenderID,
-			CompClassID:         1,
+			CompClassID:         mockedCompClassID,
 			PublicName:          "John",
 			ClubName:            "Testers' Climbing Club",
 			WithdrawnFromFinals: false,
@@ -861,7 +864,7 @@ func TestUpdateContender(t *testing.T) {
 		mockedContender := domain.Contender{
 			ID:                  mockedContenderID,
 			Ownership:           mockedOwnership,
-			ContestID:           1,
+			ContestID:           mockedContestID,
 			CompClassID:         0,
 			RegistrationCode:    "ABCD1234",
 			Name:                "",
@@ -900,8 +903,8 @@ func TestUpdateContender(t *testing.T) {
 		mockedContender := domain.Contender{
 			ID:                  mockedContenderID,
 			Ownership:           mockedOwnership,
-			ContestID:           1,
-			CompClassID:         1,
+			ContestID:           mockedContestID,
+			CompClassID:         mockedCompClassID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			PublicName:          "John",
@@ -944,13 +947,13 @@ func TestUpdateContender(t *testing.T) {
 
 		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
 
-		mockedEventBroker.On("Dispatch", 1, mock.Anything).Return()
+		mockedEventBroker.On("Dispatch", mockedContestID, mock.Anything).Return()
 
 		mockedContender := domain.Contender{
 			ID:                  mockedContenderID,
 			Ownership:           mockedOwnership,
-			ContestID:           1,
-			CompClassID:         1,
+			ContestID:           mockedContestID,
+			CompClassID:         mockedCompClassID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			PublicName:          "John",
@@ -964,8 +967,8 @@ func TestUpdateContender(t *testing.T) {
 			ScoreUpdated:        &currentTime,
 		}
 
-		mockedCompClass := domain.CompClass{
-			ID:        2,
+		mockedOtherCompClass := domain.CompClass{
+			ID:        randomResourceID[domain.CompClassID](),
 			TimeBegin: currentTime.Add(-1 * time.Hour),
 			TimeEnd:   currentTime,
 		}
@@ -973,8 +976,8 @@ func TestUpdateContender(t *testing.T) {
 		mockedRepo := makeMockedRepo(mockedContender)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, 2).
-			Return(mockedCompClass, nil)
+			On("GetCompClass", mock.Anything, mock.Anything, mockedOtherCompClass.ID).
+			Return(mockedOtherCompClass, nil)
 
 		ucase := usecases.ContenderUseCase{
 			Repo:        mockedRepo,
@@ -984,7 +987,7 @@ func TestUpdateContender(t *testing.T) {
 		}
 
 		updatedContender := mockedContender
-		updatedContender.CompClassID = 2
+		updatedContender.CompClassID = mockedOtherCompClass.ID
 		updatedContender.Name = "Jane Doe"
 		updatedContender.PublicName = "Jane"
 		updatedContender.ClubName = "Space Climbers"
@@ -995,7 +998,7 @@ func TestUpdateContender(t *testing.T) {
 
 		require.NoError(t, err)
 
-		assert.Equal(t, 2, contender.CompClassID)
+		assert.Equal(t, mockedOtherCompClass.ID, contender.CompClassID)
 		assert.Equal(t, "Jane Doe", contender.Name)
 		assert.Equal(t, "Jane", contender.PublicName)
 		assert.Equal(t, "Space Climbers", contender.ClubName)
@@ -1003,25 +1006,25 @@ func TestUpdateContender(t *testing.T) {
 		assert.Equal(t, true, contender.Disqualified)
 		assert.Equal(t, currentTime, *contender.Entered)
 
-		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderSwitchedClassEvent{
+		mockedEventBroker.AssertCalled(t, "Dispatch", mockedContestID, domain.ContenderSwitchedClassEvent{
 			ContenderID: mockedContenderID,
-			CompClassID: 2,
+			CompClassID: mockedOtherCompClass.ID,
 		})
 
-		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderPublicInfoUpdatedEvent{
+		mockedEventBroker.AssertCalled(t, "Dispatch", mockedContestID, domain.ContenderPublicInfoUpdatedEvent{
 			ContenderID:         mockedContenderID,
-			CompClassID:         2,
+			CompClassID:         mockedOtherCompClass.ID,
 			PublicName:          "Jane",
 			ClubName:            "Space Climbers",
 			WithdrawnFromFinals: true,
 			Disqualified:        true,
 		})
 
-		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderWithdrewFromFinalsEvent{
+		mockedEventBroker.AssertCalled(t, "Dispatch", mockedContestID, domain.ContenderWithdrewFromFinalsEvent{
 			ContenderID: mockedContenderID,
 		})
 
-		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderDisqualifiedEvent{
+		mockedEventBroker.AssertCalled(t, "Dispatch", mockedContestID, domain.ContenderDisqualifiedEvent{
 			ContenderID: mockedContenderID,
 		})
 	})
@@ -1036,8 +1039,8 @@ func TestUpdateContender(t *testing.T) {
 		mockedContender := domain.Contender{
 			ID:                  mockedContenderID,
 			Ownership:           mockedOwnership,
-			ContestID:           1,
-			CompClassID:         1,
+			ContestID:           mockedContestID,
+			CompClassID:         mockedCompClassID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			PublicName:          "John",
@@ -1077,13 +1080,13 @@ func TestUpdateContender(t *testing.T) {
 
 		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
 
-		mockedEventBroker.On("Dispatch", 1, mock.Anything).Return()
+		mockedEventBroker.On("Dispatch", mockedContestID, mock.Anything).Return()
 
 		mockedContender := domain.Contender{
 			ID:                  mockedContenderID,
 			Ownership:           mockedOwnership,
-			ContestID:           1,
-			CompClassID:         1,
+			ContestID:           mockedContestID,
+			CompClassID:         mockedCompClassID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			PublicName:          "John",
@@ -1112,7 +1115,7 @@ func TestUpdateContender(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, false, contender.WithdrawnFromFinals)
 
-		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderReenteredFinalsEvent{
+		mockedEventBroker.AssertCalled(t, "Dispatch", mockedContestID, domain.ContenderReenteredFinalsEvent{
 			ContenderID: mockedContenderID,
 		})
 	})
@@ -1128,13 +1131,13 @@ func TestUpdateContender(t *testing.T) {
 
 		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
 
-		mockedEventBroker.On("Dispatch", 1, mock.Anything).Return()
+		mockedEventBroker.On("Dispatch", mockedContestID, mock.Anything).Return()
 
 		mockedContender := domain.Contender{
 			ID:                  mockedContenderID,
 			Ownership:           mockedOwnership,
-			ContestID:           1,
-			CompClassID:         1,
+			ContestID:           mockedContestID,
+			CompClassID:         mockedCompClassID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			PublicName:          "John",
@@ -1163,7 +1166,7 @@ func TestUpdateContender(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, false, contender.Disqualified)
 
-		mockedEventBroker.AssertCalled(t, "Dispatch", 1, domain.ContenderRequalifiedEvent{
+		mockedEventBroker.AssertCalled(t, "Dispatch", mockedContestID, domain.ContenderRequalifiedEvent{
 			ContenderID: mockedContenderID,
 		})
 	})
@@ -1178,8 +1181,8 @@ func TestUpdateContender(t *testing.T) {
 		mockedContender := domain.Contender{
 			ID:                  mockedContenderID,
 			Ownership:           mockedOwnership,
-			ContestID:           1,
-			CompClassID:         1,
+			ContestID:           mockedContestID,
+			CompClassID:         mockedCompClassID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			PublicName:          "John",
@@ -1193,8 +1196,8 @@ func TestUpdateContender(t *testing.T) {
 			ScoreUpdated:        &currentTime,
 		}
 
-		mockedCompClass := domain.CompClass{
-			ID:        2,
+		mockedOtherCompClass := domain.CompClass{
+			ID:        randomResourceID[domain.CompClassID](),
 			TimeBegin: currentTime.Add(-1 * time.Hour),
 			TimeEnd:   currentTime.Add(-1 * gracePeriod),
 		}
@@ -1202,8 +1205,8 @@ func TestUpdateContender(t *testing.T) {
 		mockedRepo := makeMockedRepo(mockedContender)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, 2).
-			Return(mockedCompClass, nil)
+			On("GetCompClass", mock.Anything, mock.Anything, mockedOtherCompClass.ID).
+			Return(mockedOtherCompClass, nil)
 
 		ucase := usecases.ContenderUseCase{
 			Repo:       mockedRepo,
@@ -1211,7 +1214,7 @@ func TestUpdateContender(t *testing.T) {
 		}
 
 		updatedContender := mockedContender
-		updatedContender.CompClassID = 2
+		updatedContender.CompClassID = mockedOtherCompClass.ID
 
 		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
 
@@ -1226,11 +1229,17 @@ func TestUpdateContender(t *testing.T) {
 			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.ContenderRole, nil)
 
+		mockedOtherCompClass := domain.CompClass{
+			ID:        randomResourceID[domain.CompClassID](),
+			TimeBegin: currentTime.Add(-1 * time.Hour),
+			TimeEnd:   currentTime.Add(-1 * gracePeriod),
+		}
+
 		mockedContender := domain.Contender{
 			ID:                  mockedContenderID,
 			Ownership:           mockedOwnership,
-			ContestID:           1,
-			CompClassID:         2,
+			ContestID:           mockedContestID,
+			CompClassID:         mockedOtherCompClass.ID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			PublicName:          "John",
@@ -1244,17 +1253,11 @@ func TestUpdateContender(t *testing.T) {
 			ScoreUpdated:        &currentTime,
 		}
 
-		mockedCompClass := domain.CompClass{
-			ID:        2,
-			TimeBegin: currentTime.Add(-1 * time.Hour),
-			TimeEnd:   currentTime.Add(-1 * gracePeriod),
-		}
-
 		mockedRepo := makeMockedRepo(mockedContender)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, 2).
-			Return(mockedCompClass, nil)
+			On("GetCompClass", mock.Anything, mock.Anything, mockedOtherCompClass.ID).
+			Return(mockedOtherCompClass, nil)
 
 		ucase := usecases.ContenderUseCase{
 			Repo:       mockedRepo,
@@ -1277,13 +1280,25 @@ func TestUpdateContender(t *testing.T) {
 
 		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
 
-		mockedEventBroker.On("Dispatch", 1, mock.Anything).Return()
+		mockedEventBroker.On("Dispatch", mockedContestID, mock.Anything).Return()
+
+		mockedSecondCompClass := domain.CompClass{
+			ID:        randomResourceID[domain.CompClassID](),
+			TimeBegin: currentTime.Add(-1 * time.Hour),
+			TimeEnd:   currentTime.Add(-1 * gracePeriod),
+		}
+
+		mockedThirdCompClass := domain.CompClass{
+			ID:        randomResourceID[domain.CompClassID](),
+			TimeBegin: currentTime.Add(-1 * time.Hour),
+			TimeEnd:   currentTime.Add(-1 * gracePeriod),
+		}
 
 		mockedContender := domain.Contender{
 			ID:                  mockedContenderID,
 			Ownership:           mockedOwnership,
-			ContestID:           1,
-			CompClassID:         2,
+			ContestID:           mockedContestID,
+			CompClassID:         mockedSecondCompClass.ID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			PublicName:          "John",
@@ -1300,20 +1315,12 @@ func TestUpdateContender(t *testing.T) {
 		mockedRepo := makeMockedRepo(mockedContender)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, 2).
-			Return(domain.CompClass{
-				ID:        2,
-				TimeBegin: currentTime.Add(-1 * time.Hour),
-				TimeEnd:   currentTime.Add(-1 * gracePeriod),
-			}, nil)
+			On("GetCompClass", mock.Anything, mock.Anything, mockedSecondCompClass.ID).
+			Return(mockedSecondCompClass, nil)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, 3).
-			Return(domain.CompClass{
-				ID:        3,
-				TimeBegin: currentTime.Add(-1 * time.Hour),
-				TimeEnd:   currentTime.Add(-1 * gracePeriod),
-			}, nil)
+			On("GetCompClass", mock.Anything, mock.Anything, mockedThirdCompClass.ID).
+			Return(mockedThirdCompClass, nil)
 
 		ucase := usecases.ContenderUseCase{
 			Repo:        mockedRepo,
@@ -1323,12 +1330,12 @@ func TestUpdateContender(t *testing.T) {
 		}
 
 		updatedContender := mockedContender
-		updatedContender.CompClassID = 3
+		updatedContender.CompClassID = mockedThirdCompClass.ID
 
 		contender, err := ucase.UpdateContender(context.Background(), mockedContenderID, updatedContender)
 
 		require.NoError(t, err)
-		assert.Equal(t, 3, contender.CompClassID)
+		assert.Equal(t, mockedThirdCompClass.ID, contender.CompClassID)
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {

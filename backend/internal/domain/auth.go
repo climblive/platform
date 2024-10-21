@@ -29,6 +29,6 @@ type Authorizer interface {
 }
 
 type OwnershipData struct {
-	OrganizerID ResourceID
-	ContenderID *ResourceID
+	OrganizerID OrganizerID
+	ContenderID *ContenderID
 }

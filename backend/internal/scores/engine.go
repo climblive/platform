@@ -19,24 +19,24 @@ type Ranker interface {
 }
 
 type ScoreEngine struct {
-	contestID   domain.ResourceID
+	contestID   domain.ContestID
 	ranker      Ranker
 	eventBroker domain.EventBroker
 	rules       ScoringRules
 
-	problems   map[domain.ResourceID]*Problem
-	contenders map[domain.ResourceID]*Contender
+	problems   map[domain.ProblemID]*Problem
+	contenders map[domain.ContenderID]*Contender
 	scores     DiffMap[domain.ContenderID, domain.Score]
 }
 
-func NewScoreEngine(contestID domain.ResourceID, eventBroker domain.EventBroker, rules ScoringRules, ranker Ranker) ScoreEngine {
+func NewScoreEngine(contestID domain.ContestID, eventBroker domain.EventBroker, rules ScoringRules, ranker Ranker) ScoreEngine {
 	engine := ScoreEngine{
 		contestID:   contestID,
 		ranker:      ranker,
 		eventBroker: eventBroker,
 		rules:       rules,
-		problems:    make(map[int]*Problem),
-		contenders:  make(map[int]*Contender),
+		problems:    make(map[domain.ProblemID]*Problem),
+		contenders:  make(map[domain.ContenderID]*Contender),
 		scores:      NewDiffMap[domain.ContenderID, domain.Score](CompareScore),
 	}
 
@@ -86,7 +86,7 @@ func (e *ScoreEngine) HandleContenderEntered(event domain.ContenderEnteredEvent)
 	contender := Contender{
 		ID:          event.ContenderID,
 		CompClassID: event.CompClassID,
-		Ticks:       make(map[int]*Tick),
+		Ticks:       make(map[domain.ProblemID]*Tick),
 	}
 
 	e.contenders[event.ContenderID] = &contender
@@ -110,7 +110,7 @@ func (e *ScoreEngine) HandleContenderSwitchedClass(event domain.ContenderSwitche
 		return
 	}
 
-	reRankList := []domain.ResourceID{
+	reRankList := []domain.CompClassID{
 		contender.CompClassID,
 		event.CompClassID,
 	}
@@ -257,7 +257,7 @@ func (e *ScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) {
 }
 
 func (e *ScoreEngine) ScoreContender(contender *Contender) {
-	tickPointValues := func(ticks map[domain.ResourceID]*Tick) iter.Seq[int] {
+	tickPointValues := func(ticks map[domain.ProblemID]*Tick) iter.Seq[int] {
 		return func(yield func(int) bool) {
 			for _, tick := range ticks {
 				if !yield(tick.Points) {

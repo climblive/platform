@@ -19,7 +19,7 @@ func InstallCompClassHandler(mux *Mux, compClassUseCase domain.CompClassUseCase)
 }
 
 func (hdlr *compClassHandler) GetCompClassesByContest(w http.ResponseWriter, r *http.Request) {
-	contestID := parseResourceID(r.PathValue("contestID"))
+	contestID := parseResourceID[domain.ContestID](r.PathValue("contestID"))
 
 	compClasses, err := hdlr.compClassUseCase.GetCompClassesByContest(r.Context(), contestID)
 	if err != nil {

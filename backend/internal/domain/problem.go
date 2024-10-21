@@ -3,9 +3,9 @@ package domain
 import "context"
 
 type Problem struct {
-	ID                 ResourceID    `json:"id,omitempty"`
+	ID                 ProblemID     `json:"id,omitempty"`
 	Ownership          OwnershipData `json:"-"`
-	ContestID          ResourceID    `json:"contestId"`
+	ContestID          ContestID     `json:"contestId"`
 	Number             int           `json:"number"`
 	HoldColorPrimary   string        `json:"holdColorPrimary"`
 	HoldColorSecondary string        `json:"holdColorSecondary,omitempty"`
@@ -17,8 +17,8 @@ type Problem struct {
 }
 
 type ProblemUseCase interface {
-	GetProblemsByContest(ctx context.Context, contestID ResourceID) ([]Problem, error)
-	UpdateProblem(ctx context.Context, problemID ResourceID, problem Problem) (Problem, error)
-	DeleteProblem(ctx context.Context, problemID ResourceID) error
-	CreateProblem(ctx context.Context, contestID ResourceID, problem Problem) (Problem, error)
+	GetProblemsByContest(ctx context.Context, contestID ContestID) ([]Problem, error)
+	UpdateProblem(ctx context.Context, problemID ProblemID, problem Problem) (Problem, error)
+	DeleteProblem(ctx context.Context, problemID ProblemID) error
+	CreateProblem(ctx context.Context, contestID ContestID, problem Problem) (Problem, error)
 }

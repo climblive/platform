@@ -14,7 +14,7 @@ import (
 )
 
 func TestGetContest(t *testing.T) {
-	mockedContestID := domain.ResourceID(1)
+	mockedContestID := domain.ContestID(1)
 
 	mockedContest := domain.Contest{
 		ID: mockedContestID,
@@ -37,7 +37,8 @@ func TestGetContest(t *testing.T) {
 }
 
 func TestGetScoreboard(t *testing.T) {
-	mockedContestID := domain.ResourceID(1)
+	mockedContestID := domain.ContestID(1)
+	mockedCompClassID := domain.CompClassID(1)
 	mockedRepo := new(repositoryMock)
 	mockedScoreKeeper := new(scoreKeeperMock)
 	currentTime := time.Now()
@@ -45,9 +46,11 @@ func TestGetScoreboard(t *testing.T) {
 	var contenders []domain.Contender
 
 	for i := 1; i <= 10; i++ {
+		contenderID := domain.ContenderID(i)
+
 		mockedContender := domain.Contender{
-			ID:                  i,
-			CompClassID:         1,
+			ID:                  contenderID,
+			CompClassID:         mockedCompClassID,
 			PublicName:          fmt.Sprintf("Climber %d", i),
 			ClubName:            "Testers' Climbing Club",
 			WithdrawnFromFinals: true,
@@ -68,9 +71,9 @@ func TestGetScoreboard(t *testing.T) {
 
 	future := currentTime.Add(time.Minute)
 
-	mockedScoreKeeper.On("GetScore", 1).Return(domain.Score{
+	mockedScoreKeeper.On("GetScore", domain.ContenderID(1)).Return(domain.Score{
 		Timestamp:   future,
-		ContenderID: 1,
+		ContenderID: domain.ContenderID(1),
 		Score:       1234,
 		Placement:   42,
 		Finalist:    false,
@@ -90,8 +93,8 @@ func TestGetScoreboard(t *testing.T) {
 
 	assert.Len(t, scoreboard, 10)
 
-	assert.Equal(t, 1, scoreboard[0].ContenderID)
-	assert.Equal(t, 1, scoreboard[0].CompClassID)
+	assert.Equal(t, domain.ContenderID(1), scoreboard[0].ContenderID)
+	assert.Equal(t, mockedCompClassID, scoreboard[0].CompClassID)
 	assert.Equal(t, "Climber 1", scoreboard[0].PublicName)
 	assert.Equal(t, "Testers' Climbing Club", scoreboard[0].ClubName)
 	assert.Equal(t, true, scoreboard[0].WithdrawnFromFinals)
@@ -106,8 +109,8 @@ func TestGetScoreboard(t *testing.T) {
 	for i := 2; i <= 10; i++ {
 		entry := scoreboard[i-1]
 
-		assert.Equal(t, i, entry.ContenderID)
-		assert.Equal(t, 1, entry.CompClassID)
+		assert.Equal(t, domain.ContenderID(i), entry.ContenderID)
+		assert.Equal(t, mockedCompClassID, entry.CompClassID)
 		assert.Equal(t, fmt.Sprintf("Climber %d", i), entry.PublicName)
 		assert.Equal(t, "Testers' Climbing Club", entry.ClubName)
 		assert.Equal(t, true, entry.WithdrawnFromFinals)

@@ -23,7 +23,7 @@ func InstallEventHandler(mux *Mux, eventBroker domain.EventBroker) {
 }
 
 func (hdlr *eventHandler) ListenContestEvents(w http.ResponseWriter, r *http.Request) {
-	contestID := parseResourceID(r.PathValue("contestID"))
+	contestID := parseResourceID[domain.ContestID](r.PathValue("contestID"))
 
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("X-Accel-Buffering", "no")

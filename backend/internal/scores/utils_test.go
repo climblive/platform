@@ -10,7 +10,7 @@ import (
 )
 
 func TestFilterByClass(t *testing.T) {
-	contenders := make(map[domain.ResourceID]*scores.Contender)
+	contenders := make(map[domain.ContenderID]*scores.Contender)
 
 	contenders[1] = &scores.Contender{
 		ID:          1,
@@ -42,29 +42,29 @@ func TestFilterByClass(t *testing.T) {
 	}
 
 	t.Run("CompClassOne", func(t *testing.T) {
-		var filteredContenders []domain.ResourceID
+		var filteredContenders []domain.ContenderID
 		for contender := range slices.Values(slices.Collect(scores.FilterByClass(contenders, 1))) {
 			filteredContenders = append(filteredContenders, contender.ID)
 		}
 
-		assert.ElementsMatch(t, filteredContenders, []domain.ResourceID{1, 2, 5, 7})
+		assert.ElementsMatch(t, filteredContenders, []domain.ContenderID{1, 2, 5, 7})
 	})
 
 	t.Run("CompClassTwo", func(t *testing.T) {
-		var filteredContenders []domain.ResourceID
+		var filteredContenders []domain.ContenderID
 		for contender := range slices.Values(slices.Collect(scores.FilterByClass(contenders, 2))) {
 			filteredContenders = append(filteredContenders, contender.ID)
 		}
 
-		assert.ElementsMatch(t, filteredContenders, []domain.ResourceID{3, 6})
+		assert.ElementsMatch(t, filteredContenders, []domain.ContenderID{3, 6})
 	})
 
 	t.Run("CompClassThree", func(t *testing.T) {
-		var filteredContenders []domain.ResourceID
+		var filteredContenders []domain.ContenderID
 		for contender := range slices.Values(slices.Collect(scores.FilterByClass(contenders, 3))) {
 			filteredContenders = append(filteredContenders, contender.ID)
 		}
 
-		assert.ElementsMatch(t, filteredContenders, []domain.ResourceID{4})
+		assert.ElementsMatch(t, filteredContenders, []domain.ContenderID{4})
 	})
 }

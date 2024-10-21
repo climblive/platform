@@ -20,7 +20,7 @@ func InstallContestHandler(mux *Mux, contestUseCase domain.ContestUseCase) {
 }
 
 func (hdlr *contestHandler) GetContest(w http.ResponseWriter, r *http.Request) {
-	contestID := parseResourceID(r.PathValue("contestID"))
+	contestID := parseResourceID[domain.ContestID](r.PathValue("contestID"))
 
 	contest, err := hdlr.contestUseCase.GetContest(r.Context(), contestID)
 	if err != nil {
@@ -32,7 +32,7 @@ func (hdlr *contestHandler) GetContest(w http.ResponseWriter, r *http.Request) {
 }
 
 func (hdlr *contestHandler) GetScoreboard(w http.ResponseWriter, r *http.Request) {
-	contestID := parseResourceID(r.PathValue("contestID"))
+	contestID := parseResourceID[domain.ContestID](r.PathValue("contestID"))
 
 	scoreboard, err := hdlr.contestUseCase.GetScoreboard(r.Context(), contestID)
 	if err != nil {

@@ -22,7 +22,7 @@ func InstallTickHandler(mux *Mux, tickUseCase domain.TickUseCase) {
 }
 
 func (hdlr *tickHandler) GetTicksByContender(w http.ResponseWriter, r *http.Request) {
-	contenderID := parseResourceID(r.PathValue("contenderID"))
+	contenderID := parseResourceID[domain.ContenderID](r.PathValue("contenderID"))
 
 	ticks, err := hdlr.tickUseCase.GetTicksByContender(r.Context(), contenderID)
 	if err != nil {
@@ -34,7 +34,7 @@ func (hdlr *tickHandler) GetTicksByContender(w http.ResponseWriter, r *http.Requ
 }
 
 func (hdlr *tickHandler) CreateTick(w http.ResponseWriter, r *http.Request) {
-	contenderID := parseResourceID(r.PathValue("contenderID"))
+	contenderID := parseResourceID[domain.ContenderID](r.PathValue("contenderID"))
 
 	var tick domain.Tick
 	err := json.NewDecoder(r.Body).Decode(&tick)
@@ -53,7 +53,7 @@ func (hdlr *tickHandler) CreateTick(w http.ResponseWriter, r *http.Request) {
 }
 
 func (hdlr *tickHandler) DeleteTick(w http.ResponseWriter, r *http.Request) {
-	tickID := parseResourceID(r.PathValue("tickID"))
+	tickID := parseResourceID[domain.TickID](r.PathValue("tickID"))
 
 	err := hdlr.tickUseCase.DeleteTick(r.Context(), tickID)
 	if err != nil {

@@ -18,8 +18,10 @@ func TestBasicRanker(t *testing.T) {
 		contenders := make([]*scores.Contender, count)
 
 		for n := range count {
+			contenderID := domain.ContenderID(n + 1)
+
 			contenders[n] = &scores.Contender{
-				ID: n + 1,
+				ID: contenderID,
 			}
 		}
 

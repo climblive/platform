@@ -11,9 +11,9 @@ import (
 	"github.com/go-errors/errors"
 )
 
-func parseResourceID(id string) domain.ResourceID {
+func parseResourceID[T domain.ResourceIDType](id string) T {
 	number, _ := strconv.Atoi(id)
-	return domain.ResourceID(number)
+	return T(number)
 }
 
 func writeResponse(w http.ResponseWriter, status int, data any) {
