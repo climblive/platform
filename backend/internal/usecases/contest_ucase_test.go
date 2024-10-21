@@ -14,7 +14,7 @@ import (
 )
 
 func TestGetContest(t *testing.T) {
-	mockedContestID := domain.ContestID(1)
+	mockedContestID := randomResourceID[domain.ContestID]()
 
 	mockedContest := domain.Contest{
 		ID: mockedContestID,
@@ -37,8 +37,8 @@ func TestGetContest(t *testing.T) {
 }
 
 func TestGetScoreboard(t *testing.T) {
-	mockedContestID := domain.ContestID(1)
-	mockedCompClassID := domain.CompClassID(1)
+	mockedContestID := randomResourceID[domain.ContestID]()
+	mockedCompClassID := randomResourceID[domain.CompClassID]()
 	mockedRepo := new(repositoryMock)
 	mockedScoreKeeper := new(scoreKeeperMock)
 	currentTime := time.Now()

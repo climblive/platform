@@ -13,9 +13,9 @@ import (
 )
 
 func TestGetTicksByContender(t *testing.T) {
-	mockedContenderID := domain.ContenderID(1)
+	mockedContenderID := randomResourceID[domain.ContenderID]()
 	mockedOwnership := domain.OwnershipData{
-		OrganizerID: 1,
+		OrganizerID: randomResourceID[domain.OrganizerID](),
 		ContenderID: &mockedContenderID,
 	}
 
@@ -26,7 +26,7 @@ func TestGetTicksByContender(t *testing.T) {
 
 	mockedTicks := []domain.Tick{
 		{
-			ID: 1,
+			ID: randomResourceID[domain.TickID](),
 		},
 	}
 
@@ -86,7 +86,7 @@ func TestCreateTick(t *testing.T) {
 	gracePeriod := 15 * time.Minute
 
 	mockedOwnership := domain.OwnershipData{
-		OrganizerID: 1,
+		OrganizerID: randomResourceID[domain.OrganizerID](),
 		ContenderID: &mockedContenderID,
 	}
 
@@ -261,7 +261,7 @@ func TestDeleteTick(t *testing.T) {
 	gracePeriod := 15 * time.Minute
 
 	mockedOwnership := domain.OwnershipData{
-		OrganizerID: 1,
+		OrganizerID: randomResourceID[domain.OrganizerID](),
 		ContenderID: &mockedContenderID,
 	}
 
