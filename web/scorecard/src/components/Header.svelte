@@ -11,6 +11,7 @@
   export let score: number;
   export let placement: number | undefined;
   export let endTime: Date;
+  export let disabled: boolean;
 </script>
 
 <header>
@@ -18,6 +19,7 @@
     name="gear"
     label="Edit"
     on:click={() => navigate(`/${registrationCode}/edit`)}
+    {disabled}
   >
   </sl-icon-button>
   <h1>{contestName}</h1>

@@ -16,6 +16,7 @@
 
   export let problem: Problem;
   export let tick: Tick | undefined;
+  export let disabled: boolean;
 
   let container: HTMLDivElement;
   let popup: SlPopup;
@@ -80,7 +81,7 @@
 <svelte:body on:click|capture={handleClickOutside} />
 
 <div data-variant={variant} bind:this={container}>
-  <button disabled={loading} on:click={handleCheck}>
+  <button disabled={disabled || loading} on:click={handleCheck}>
     {#if loading}
       <sl-spinner></sl-spinner>
     {:else if variant === "flashed"}
@@ -138,6 +139,7 @@
 
   button:disabled {
     cursor: not-allowed;
+    border: 0;
   }
 
   div[data-variant] {

@@ -17,6 +17,9 @@
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
   import { parseISO } from "date-fns";
+  import { add } from "date-fns/add";
+  import { isAfter } from "date-fns/isAfter";
+  import { isBefore } from "date-fns/isBefore";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
   import Loading from "./Loading.svelte";
@@ -32,6 +35,9 @@
   let resultsConnected = false;
   let tabGroup: SlTabGroup;
   let eventSource: EventSource | undefined;
+  let checkContestTimeIntervalId: number;
+
+  let disabled = true;
 
   $: contender = $contenderQuery.data;
   $: contest = $contestQuery.data;
@@ -41,9 +47,37 @@
   $: selectedCompClass = compClasses?.find(
     ({ id }) => id === contender?.compClassId,
   );
+  $: startTime = selectedCompClass?.timeBegin
+    ? parseISO(selectedCompClass.timeBegin)
+    : new Date(0);
   $: endTime = selectedCompClass?.timeEnd
     ? parseISO(selectedCompClass.timeEnd)
     : new Date(0);
+  $: gracePeriodEnd = add(endTime, {
+    minutes: (contest?.gracePeriod ?? 0) / (1_000_000_000 * 60),
+  });
+
+  $: {
+    disabled = checkContestTime();
+  }
+
+  const checkContestTime = (): boolean => {
+    const now = new Date();
+    return isBefore(now, startTime) || isAfter(now, gracePeriodEnd);
+  };
+
+  onMount(() => {
+    checkContestTime();
+
+    checkContestTimeIntervalId = setInterval(() => {
+      disabled = checkContestTime();
+    }, 1000);
+  });
+
+  onDestroy(() => {
+    clearInterval(checkContestTimeIntervalId);
+    checkContestTimeIntervalId = 0;
+  });
 
   let score: number;
   let placement: number | undefined;
@@ -105,6 +139,7 @@
         {score}
         {placement}
         {endTime}
+        {disabled}
       />
     </div>
     <sl-tab-group bind:this={tabGroup} on:sl-tab-show={handleShowTab}>
@@ -116,6 +151,7 @@
           <ProblemView
             {problem}
             tick={ticks.find(({ problemId }) => problemId === problem.id)}
+            {disabled}
           />
         {/each}
       </sl-tab-panel>

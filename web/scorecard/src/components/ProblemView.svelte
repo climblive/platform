@@ -7,6 +7,7 @@
 
   export let problem: Problem;
   export let tick: Tick | undefined = undefined;
+  export let disabled: boolean;
 
   $: pointValue = calculateProblemScore(problem, tick);
 </script>
@@ -32,7 +33,7 @@
     <Score value={pointValue} hideZero prefix="+" />
   </div>
 
-  <TickBox {problem} {tick} />
+  <TickBox {problem} {tick} {disabled} />
 </section>
 
 <style>
