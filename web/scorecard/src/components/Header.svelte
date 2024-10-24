@@ -26,9 +26,11 @@
   >
   </sl-icon-button>
   <h1>{contestName}</h1>
-  <span class="contender-name">{contenderName}</span>
-  <span class="contender-club">{contenderClub}</span>
-  <span class="contender-class">{compClassName}</span>
+  <p class="contender-name">
+    {contenderName} <span class="contender-class">{compClassName}</span>
+  </p>
+
+  <p class="contender-club">{contenderClub}</p>
   <div class="lower">
     <div class="score">
       <Score value={score} />
@@ -73,6 +75,24 @@
     & h1 {
       margin: 0;
       font-size: var(--sl-font-size-x-large);
+      width: calc(100% - 2rem);
+      white-space: nowrap;
+      overflow: hidden;
+      line-height: var(--sl-line-height-dense);
+      text-overflow: ellipsis;
+    }
+
+    & .contender-name,
+    & .contender-club {
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      line-height: var(--sl-line-height-dense);
+      text-overflow: ellipsis;
+    }
+
+    & .contender-club {
+      font-size: var(--sl-font-size-x-small);
     }
 
     & .contender-class {
