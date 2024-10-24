@@ -2,6 +2,7 @@
   import Header from "@/components/Header.svelte";
   import ProblemView from "@/components/ProblemView.svelte";
   import type { ScorecardSession } from "@/types";
+  import type { ContestState } from "@/types/state";
   import { ResultList, ScoreboardProvider } from "@climblive/lib/components";
   import configData from "@climblive/lib/config.json";
   import type { ContenderScoreUpdatedEvent } from "@climblive/lib/models";
@@ -18,7 +19,7 @@
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
   import { parseISO } from "date-fns";
   import { add } from "date-fns/add";
-  import { isAfter } from "date-fns/isAfter";
+  import { differenceInMilliseconds } from "date-fns/differenceInMilliseconds";
   import { isBefore } from "date-fns/isBefore";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
@@ -35,9 +36,10 @@
   let resultsConnected = false;
   let tabGroup: SlTabGroup;
   let eventSource: EventSource | undefined;
-  let checkContestTimeIntervalId: number;
-
-  let disabled = true;
+  let score: number;
+  let placement: number | undefined;
+  let updateStateTimerId: number = 0;
+  let state: ContestState = "NOT_STARTED";
 
   $: contender = $contenderQuery.data;
   $: contest = $contestQuery.data;
@@ -49,38 +51,21 @@
   );
   $: startTime = selectedCompClass?.timeBegin
     ? parseISO(selectedCompClass.timeBegin)
-    : new Date(0);
+    : new Date(8640000000000000);
   $: endTime = selectedCompClass?.timeEnd
     ? parseISO(selectedCompClass.timeEnd)
-    : new Date(0);
+    : new Date(-8640000000000000);
   $: gracePeriodEnd = add(endTime, {
     minutes: (contest?.gracePeriod ?? 0) / (1_000_000_000 * 60),
   });
 
   $: {
-    disabled = checkContestTime();
+    if (startTime && endTime && gracePeriodEnd) {
+      calulateAndScheduleNextStateChange();
+    }
   }
 
-  const checkContestTime = (): boolean => {
-    const now = new Date();
-    return isBefore(now, startTime) || isAfter(now, gracePeriodEnd);
-  };
-
-  onMount(() => {
-    checkContestTime();
-
-    checkContestTimeIntervalId = setInterval(() => {
-      disabled = checkContestTime();
-    }, 1000);
-  });
-
-  onDestroy(() => {
-    clearInterval(checkContestTimeIntervalId);
-    checkContestTimeIntervalId = 0;
-  });
-
-  let score: number;
-  let placement: number | undefined;
+  $: disabled = ["NOT_STARTED", "ENDED"].includes(state);
 
   $: {
     if (contender) {
@@ -89,6 +74,8 @@
     }
   }
 
+  $: console.log("state is: ", state);
+
   const handleShowTab = ({ detail }: SlTabShowEvent) => {
     if (detail.name === "results") {
       resultsConnected = true;
@@ -96,9 +83,52 @@
   };
 
   const handleVisibilityChange = () => {
-    if (document.visibilityState === "hidden") {
-      resultsConnected = false;
-      tabGroup.show("problems");
+    switch (document.visibilityState) {
+      case "hidden":
+        resultsConnected = false;
+        tabGroup.show("problems");
+
+        clearInterval(updateStateTimerId);
+        updateStateTimerId = 0;
+        break;
+      case "visible":
+        calulateAndScheduleNextStateChange();
+        break;
+    }
+  };
+
+  const calulateAndScheduleNextStateChange = () => {
+    clearInterval(updateStateTimerId);
+    updateStateTimerId = 0;
+
+    const now = new Date();
+    let durationUntilNextState = 0;
+
+    switch (true) {
+      case isBefore(now, startTime):
+        state = "NOT_STARTED";
+        durationUntilNextState = differenceInMilliseconds(startTime, now);
+
+        break;
+      case isBefore(now, endTime):
+        state = "RUNNING";
+        durationUntilNextState = differenceInMilliseconds(endTime, now);
+
+        break;
+      case isBefore(now, gracePeriodEnd):
+        state = "GRACE_PERIOD";
+        durationUntilNextState = differenceInMilliseconds(gracePeriodEnd, now);
+
+        break;
+      default:
+        state = "ENDED";
+    }
+
+    if (durationUntilNextState) {
+      updateStateTimerId = setTimeout(
+        calulateAndScheduleNextStateChange,
+        durationUntilNextState,
+      );
     }
   };
 
@@ -138,6 +168,8 @@
         contenderClub={contender.clubName}
         {score}
         {placement}
+        {state}
+        {startTime}
         {endTime}
         {disabled}
       />
@@ -186,6 +218,7 @@
     z-index: 10;
     background-color: var(--sl-color-primary-200);
     padding: var(--sl-spacing-small);
+    padding-bottom: 0;
   }
 
   sl-tab-group {
