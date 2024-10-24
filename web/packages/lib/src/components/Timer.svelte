@@ -1,6 +1,5 @@
 <script lang="ts">
-  import "@shoelace-style/shoelace/dist/components/tooltip/tooltip.js";
-  import { format, formatDistanceToNow, intervalToDuration } from "date-fns";
+  import { formatDistanceToNow, intervalToDuration } from "date-fns";
   import { onDestroy, onMount } from "svelte";
 
   export let endTime: Date;
@@ -38,16 +37,4 @@
   });
 </script>
 
-<sl-tooltip
-  content={format(endTime, "PPP pp")}
-  trigger="hover click"
-  placement="top-start"
->
-  {displayValue}
-</sl-tooltip>
-
-<style>
-  sl-tooltip::part(base) {
-    display: block;
-  }
-</style>
+<span>{displayValue}</span>

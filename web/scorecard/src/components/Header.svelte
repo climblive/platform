@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { ContestState } from "@/types/state";
   import { Score, Timer } from "@climblive/lib/components";
   import { asOrdinal } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
@@ -10,7 +11,10 @@
   export let contenderClub: string | undefined;
   export let score: number;
   export let placement: number | undefined;
+  export let state: ContestState;
+  export let startTime: Date;
   export let endTime: Date;
+  export let disabled: boolean;
 </script>
 
 <header>
@@ -18,6 +22,7 @@
     name="gear"
     label="Edit"
     on:click={() => navigate(`/${registrationCode}/edit`)}
+    {disabled}
   >
   </sl-icon-button>
   <h1>{contestName}</h1>
@@ -30,8 +35,13 @@
       <span>{placement ? `${asOrdinal(placement)} place` : "-"}</span>
     </div>
     <div class="timer">
-      <Timer {endTime} />
-      <span>Time remaining</span>
+      {#if state === "NOT_STARTED"}
+        <Timer endTime={startTime} />
+        <span class="footer">Time until start</span>
+      {:else}
+        <Timer {endTime} />
+        <span class="footer">Time remaining</span>
+      {/if}
     </div>
   </div>
 </header>
@@ -91,8 +101,13 @@
 
     & .timer {
       font-weight: var(--sl-font-weight-bold);
+      font-size: var(--sl-font-small);
 
-      & span {
+      & > * {
+        display: block;
+      }
+
+      & .footer {
         font-size: var(--sl-font-size-x-small);
         font-weight: var(--sl-font-weight-normal);
       }
