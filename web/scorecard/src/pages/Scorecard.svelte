@@ -74,8 +74,6 @@
     }
   }
 
-  $: console.log("state is: ", state);
-
   const handleShowTab = ({ detail }: SlTabShowEvent) => {
     if (detail.name === "results") {
       resultsConnected = true;
