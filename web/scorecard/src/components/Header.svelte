@@ -14,7 +14,6 @@
   export let state: ContestState;
   export let startTime: Date;
   export let endTime: Date;
-  export let disabled: boolean;
 </script>
 
 <header>
@@ -22,13 +21,14 @@
     name="gear"
     label="Edit"
     on:click={() => navigate(`/${registrationCode}/edit`)}
-    {disabled}
+    disabled={state === "ENDED"}
   >
   </sl-icon-button>
   <h1>{contestName}</h1>
-  <span class="contender-name">{contenderName}</span>
-  <span class="contender-club">{contenderClub}</span>
-  <span class="contender-class">{compClassName}</span>
+  <p class="contender-name">
+    {contenderName} <span class="contender-class">{compClassName}</span>
+  </p>
+  <p class="contender-club">{contenderClub}</p>
   <div class="lower">
     <div class="score">
       <Score value={score} />
@@ -70,9 +70,29 @@
       padding: 0;
     }
 
+    & h1,
+    & .contender-name,
+    & .contender-club {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     & h1 {
       margin: 0;
-      font-size: var(--sl-font-size-x-large);
+      font-size: var(--sl-font-size-large);
+      width: calc(100% - 2rem);
+      line-height: var(--sl-line-height-dense);
+    }
+
+    & .contender-name,
+    & .contender-club {
+      margin: 0;
+      line-height: var(--sl-line-height-dense);
+    }
+
+    & .contender-club {
+      font-size: var(--sl-font-size-x-small);
     }
 
     & .contender-class {
