@@ -28,7 +28,6 @@
   <p class="contender-name">
     {contenderName} <span class="contender-class">{compClassName}</span>
   </p>
-
   <p class="contender-club">{contenderClub}</p>
   <div class="lower">
     <div class="score">
