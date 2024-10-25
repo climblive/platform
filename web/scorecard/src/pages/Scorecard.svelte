@@ -65,8 +65,6 @@
     }
   }
 
-  $: disabled = ["NOT_STARTED", "ENDED"].includes(state);
-
   $: {
     if (contender) {
       score = contender.score;
@@ -169,7 +167,6 @@
         {state}
         {startTime}
         {endTime}
-        {disabled}
       />
     </div>
     <sl-tab-group bind:this={tabGroup} on:sl-tab-show={handleShowTab}>
@@ -181,7 +178,7 @@
           <ProblemView
             {problem}
             tick={ticks.find(({ problemId }) => problemId === problem.id)}
-            {disabled}
+            disabled={["NOT_STARTED", "ENDED"].includes(state)}
           />
         {/each}
       </sl-tab-panel>

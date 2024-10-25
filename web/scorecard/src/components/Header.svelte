@@ -14,7 +14,6 @@
   export let state: ContestState;
   export let startTime: Date;
   export let endTime: Date;
-  export let disabled: boolean;
 </script>
 
 <header>
@@ -22,7 +21,7 @@
     name="gear"
     label="Edit"
     on:click={() => navigate(`/${registrationCode}/edit`)}
-    {disabled}
+    disabled={state === "ENDED"}
   >
   </sl-icon-button>
   <h1>{contestName}</h1>
@@ -72,23 +71,25 @@
       padding: 0;
     }
 
-    & h1 {
-      margin: 0;
-      font-size: var(--sl-font-size-x-large);
-      width: calc(100% - 2rem);
+    & h1,
+    & .contender-name,
+    & .contender-club {
       white-space: nowrap;
       overflow: hidden;
-      line-height: var(--sl-line-height-dense);
       text-overflow: ellipsis;
+    }
+
+    & h1 {
+      margin: 0;
+      font-size: var(--sl-font-size-large);
+      width: calc(100% - 2rem);
+      line-height: var(--sl-line-height-dense);
     }
 
     & .contender-name,
     & .contender-club {
       margin: 0;
-      white-space: nowrap;
-      overflow: hidden;
       line-height: var(--sl-line-height-dense);
-      text-overflow: ellipsis;
     }
 
     & .contender-club {
