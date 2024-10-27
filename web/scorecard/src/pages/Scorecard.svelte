@@ -131,7 +131,7 @@
     }
 
     eventSource = new EventSource(
-      `${configData.API_URL}/contests/${$session.contestId}/events`,
+      `${configData.API_URL}/contenders/${$session.contenderId}/events`,
     );
 
     eventSource.addEventListener("CONTENDER_SCORE_UPDATED", (e) => {

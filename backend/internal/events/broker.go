@@ -41,12 +41,10 @@ func (b *broker) Dispatch(contestID domain.ContestID, event any) {
 	defer b.mu.RUnlock()
 
 	eventName := eventName(event)
+	contenderID := extractContenderID(event)
 
 	for _, subscription := range b.subscriptions {
-		switch subscription.Filter.ContestID {
-		case 0:
-		case contestID:
-		default:
+		if !subscription.FilterMatch(contestID, contenderID, eventName) {
 			continue
 		}
 
@@ -87,5 +85,32 @@ func eventName(event any) string {
 		return "CONTENDER_SCORE_UPDATED"
 	default:
 		return "UNKNOWN"
+	}
+}
+
+func extractContenderID(event any) domain.ContenderID {
+	switch ev := event.(type) {
+	case domain.ContenderEnteredEvent:
+		return ev.ContenderID
+	case domain.ContenderSwitchedClassEvent:
+		return ev.ContenderID
+	case domain.ContenderWithdrewFromFinalsEvent:
+		return ev.ContenderID
+	case domain.ContenderReenteredFinalsEvent:
+		return ev.ContenderID
+	case domain.ContenderDisqualifiedEvent:
+		return ev.ContenderID
+	case domain.ContenderRequalifiedEvent:
+		return ev.ContenderID
+	case domain.AscentRegisteredEvent:
+		return ev.ContenderID
+	case domain.AscentDeregisteredEvent:
+		return ev.ContenderID
+	case domain.ContenderPublicInfoUpdatedEvent:
+		return ev.ContenderID
+	case domain.ContenderScoreUpdatedEvent:
+		return ev.ContenderID
+	default:
+		return 0
 	}
 }
