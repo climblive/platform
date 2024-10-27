@@ -4,42 +4,29 @@ import (
 	"sync"
 
 	"github.com/climblive/platform/backend/internal/domain"
-	"github.com/google/uuid"
 )
-
-const EventChannelBufferSize = 1000
-
-type subscription struct {
-	id     domain.SubscriptionID
-	filter domain.EventFilter
-	ch     chan domain.EventContainer
-}
 
 type broker struct {
 	mu            sync.RWMutex
-	subscriptions map[domain.SubscriptionID]subscription
+	subscriptions map[domain.SubscriptionID]*Subscription
 }
 
 func NewBroker() domain.EventBroker {
 	return &broker{
 		mu:            sync.RWMutex{},
-		subscriptions: make(map[domain.SubscriptionID]subscription),
+		subscriptions: make(map[domain.SubscriptionID]*Subscription),
 	}
 }
 
-func (b *broker) Subscribe(filter domain.EventFilter, ch chan domain.EventContainer) domain.SubscriptionID {
+func (b *broker) Subscribe(filter domain.EventFilter, bufferCapacity int) (domain.SubscriptionID, domain.EventReader) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
-	subscription := subscription{
-		id:     uuid.New(),
-		filter: filter,
-		ch:     ch,
-	}
+	subscription := NewSubscription(filter, bufferCapacity)
 
-	b.subscriptions[subscription.id] = subscription
+	b.subscriptions[subscription.ID] = subscription
 
-	return subscription.id
+	return subscription.ID, subscription
 }
 
 func (b *broker) Unsubscribe(subscriptionID domain.SubscriptionID) {
@@ -56,17 +43,17 @@ func (b *broker) Dispatch(contestID domain.ContestID, event any) {
 	eventName := eventName(event)
 
 	for _, subscription := range b.subscriptions {
-		switch subscription.filter.ContestID {
+		switch subscription.Filter.ContestID {
 		case 0:
 		case contestID:
 		default:
 			continue
 		}
 
-		subscription.ch <- domain.EventContainer{
+		subscription.Post(domain.EventEnvelope{
 			Name: eventName,
 			Data: event,
-		}
+		})
 	}
 }
 

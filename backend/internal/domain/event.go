@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"context"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,11 +16,15 @@ type EventFilter struct {
 
 type EventBroker interface {
 	Dispatch(contestID ContestID, event any)
-	Subscribe(filter EventFilter, ch chan EventContainer) SubscriptionID
+	Subscribe(filter EventFilter, bufferCapacity int) (SubscriptionID, EventReader)
 	Unsubscribe(subscriptionID SubscriptionID)
 }
 
-type EventContainer struct {
+type EventReader interface {
+	Await(ctx context.Context) (EventEnvelope, error)
+}
+
+type EventEnvelope struct {
 	Name string
 	Data any
 }
