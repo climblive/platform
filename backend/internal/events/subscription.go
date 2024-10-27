@@ -23,12 +23,12 @@ type Subscription struct {
 
 func NewSubscription(
 	filter domain.EventFilter,
-	bufferSize int,
+	bufferCapacity int,
 ) *Subscription {
 	sub := Subscription{
 		ID:             uuid.New(),
 		Filter:         filter,
-		bufferCapacity: bufferSize,
+		bufferCapacity: bufferCapacity,
 	}
 
 	sub.cond = sync.NewCond(&sub.mu)
@@ -36,7 +36,7 @@ func NewSubscription(
 	return &sub
 }
 
-func (s *Subscription) Await(ctx context.Context) (domain.EventEnvelope, error) {
+func (s *Subscription) AwaitEvent(ctx context.Context) (domain.EventEnvelope, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -83,6 +83,7 @@ func (s *Subscription) Post(event domain.EventEnvelope) error {
 
 	if s.bufferCapacity != 0 && len(s.buffer) == s.bufferCapacity {
 		s.closeReason = ErrBufferFull
+		s.buffer = nil
 
 		return ErrBufferFull
 	}

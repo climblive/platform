@@ -46,7 +46,7 @@ func (hdlr *eventHandler) ListenContestEvents(w http.ResponseWriter, r *http.Req
 	w.(http.Flusher).Flush()
 
 	for {
-		event, err := eventReader.Await(r.Context())
+		event, err := eventReader.AwaitEvent(r.Context())
 		if err != nil {
 			switch {
 			case errors.Is(err, context.Canceled):

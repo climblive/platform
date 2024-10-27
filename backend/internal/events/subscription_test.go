@@ -23,10 +23,28 @@ func TestPostAndReceive(t *testing.T) {
 		Data: randomNumber,
 	})
 
-	event, err := subscription.Await(context.Background())
+	event, err := subscription.AwaitEvent(context.Background())
 
 	require.NoError(t, err)
 	assert.Equal(t, randomNumber, event.Data)
+}
+
+func TestFIFO(t *testing.T) {
+	subscription := events.NewSubscription(domain.EventFilter{}, 3)
+
+	for k := 1; k <= 3; k++ {
+		subscription.Post(domain.EventEnvelope{
+			Name: "TEST",
+			Data: k,
+		})
+	}
+
+	for k := 1; k <= 3; k++ {
+		event, err := subscription.AwaitEvent(context.Background())
+
+		require.NoError(t, err)
+		assert.Equal(t, k, event.Data)
+	}
 }
 
 func TestAwait(t *testing.T) {
@@ -41,7 +59,7 @@ func TestAwait(t *testing.T) {
 	var err error
 
 	go func() {
-		event, err = subscription.Await(context.Background())
+		event, err = subscription.AwaitEvent(context.Background())
 
 		wg.Done()
 	}()
@@ -83,7 +101,7 @@ func TestBufferFull(t *testing.T) {
 	wg.Wait()
 
 	for range 2 {
-		event, err := subscription.Await(context.Background())
+		event, err := subscription.AwaitEvent(context.Background())
 
 		assert.Empty(t, event)
 		require.ErrorIs(t, err, events.ErrBufferFull)
@@ -102,7 +120,7 @@ func TestAwaitCancelled(t *testing.T) {
 	var err error
 
 	go func() {
-		event, err = subscription.Await(ctx)
+		event, err = subscription.AwaitEvent(ctx)
 
 		wg.Done()
 	}()
@@ -122,7 +140,7 @@ func TestContextCancelledPreAwait(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
 
-	event, err := subscription.Await(ctx)
+	event, err := subscription.AwaitEvent(ctx)
 
 	assert.Empty(t, event)
 	require.ErrorIs(t, err, context.Canceled)

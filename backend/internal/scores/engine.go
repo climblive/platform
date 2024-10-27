@@ -51,7 +51,7 @@ func (e *ScoreEngine) Run(ctx context.Context) {
 	defer e.eventBroker.Unsubscribe(subscriptionID)
 
 	for {
-		event, err := eventReader.Await(ctx)
+		event, err := eventReader.AwaitEvent(ctx)
 		if err != nil {
 			panic(err)
 		}

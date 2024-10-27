@@ -24,7 +24,7 @@ func (k *Keeper) Run(ctx context.Context) {
 	defer k.eventBroker.Unsubscribe(subscriptionID)
 
 	for {
-		event, err := eventReader.Await(ctx)
+		event, err := eventReader.AwaitEvent(ctx)
 		if err != nil {
 			panic(err)
 		}
