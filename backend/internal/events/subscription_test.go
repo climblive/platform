@@ -188,7 +188,7 @@ func TestMatchFilter(t *testing.T) {
 		assert.True(t, match)
 	})
 
-	t.Run("ContenderMatch", func(t *testing.T) {
+	t.Run("ContenderNoMatch", func(t *testing.T) {
 		subscription := events.NewSubscription(domain.NewEventFilter(0, 1337), 0)
 
 		match := subscription.FilterMatch(domain.ContestID(rand.Int()), domain.ContenderID(42), "A")
