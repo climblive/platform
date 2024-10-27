@@ -1,14 +1,17 @@
 package rest
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/domain"
-	"github.com/climblive/platform/backend/internal/events"
 )
+
+const bufferCapacity = 1_000
 
 type eventHandler struct {
 	eventBroker domain.EventBroker
@@ -30,12 +33,12 @@ func (hdlr *eventHandler) ListenContestEvents(w http.ResponseWriter, r *http.Req
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
-	events := make(chan domain.EventContainer, events.EventChannelBufferSize)
-
-	subscriptionID := hdlr.eventBroker.Subscribe(domain.EventFilter{
+	filter := domain.EventFilter{
 		ContestID: contestID,
-	}, events)
-	slog.Info("start event subscription", "contest_id", contestID, "remote_addr", r.RemoteAddr)
+	}
+
+	slog.Info("starting event subscription", "contest_id", contestID, "remote_addr", r.RemoteAddr)
+	subscriptionID, eventReader := hdlr.eventBroker.Subscribe(filter, bufferCapacity)
 
 	defer hdlr.eventBroker.Unsubscribe(subscriptionID)
 
@@ -43,19 +46,29 @@ func (hdlr *eventHandler) ListenContestEvents(w http.ResponseWriter, r *http.Req
 	w.(http.Flusher).Flush()
 
 	for {
-		select {
-		case event := <-events:
-			json, err := json.Marshal(event.Data)
-			if err != nil {
-				return
+		event, err := eventReader.AwaitEvent(r.Context())
+		if err != nil {
+			switch {
+			case errors.Is(err, context.Canceled):
+			case errors.Is(err, context.DeadlineExceeded):
+			default:
+				slog.Warn("subscription closed unexpectedly",
+					"contest_id", contestID,
+					"remote_addr", r.RemoteAddr,
+					"error", err)
 			}
 
-			w.Write([]byte(fmt.Sprintf("event: %s\n", event.Name)))
-			w.Write([]byte(fmt.Sprintf("data: %s\n\n", json)))
-
-			w.(http.Flusher).Flush()
-		case <-r.Context().Done():
 			return
 		}
+
+		json, err := json.Marshal(event.Data)
+		if err != nil {
+			panic(err)
+		}
+
+		w.Write([]byte(fmt.Sprintf("event: %s\n", event.Name)))
+		w.Write([]byte(fmt.Sprintf("data: %s\n\n", json)))
+
+		w.(http.Flusher).Flush()
 	}
 }

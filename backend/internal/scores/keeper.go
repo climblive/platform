@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/climblive/platform/backend/internal/domain"
-	"github.com/climblive/platform/backend/internal/events"
 )
 
 type Keeper struct {
@@ -20,20 +19,19 @@ func NewScoreKeeper(eventBroker domain.EventBroker) *Keeper {
 }
 
 func (k *Keeper) Run(ctx context.Context) {
-	events := make(chan domain.EventContainer, events.EventChannelBufferSize)
-	subscriptionID := k.eventBroker.Subscribe(domain.EventFilter{}, events)
+	subscriptionID, eventReader := k.eventBroker.Subscribe(domain.EventFilter{}, 0)
 
 	defer k.eventBroker.Unsubscribe(subscriptionID)
 
 	for {
-		select {
-		case event := <-events:
-			switch ev := event.Data.(type) {
-			case domain.ContenderScoreUpdatedEvent:
-				k.HandleContenderScoreUpdated(ev)
-			}
-		case <-ctx.Done():
-			return
+		event, err := eventReader.AwaitEvent(ctx)
+		if err != nil {
+			panic(err)
+		}
+
+		switch ev := event.Data.(type) {
+		case domain.ContenderScoreUpdatedEvent:
+			k.HandleContenderScoreUpdated(ev)
 		}
 	}
 }
