@@ -82,7 +82,7 @@ func (hdlr *eventHandler) subscribe(
 			case errors.Is(err, context.Canceled):
 				fallthrough
 			case errors.Is(err, context.DeadlineExceeded):
-				logger.Info("subscription closed by remote")
+				logger.Info("subscription closed")
 			default:
 				logger.Warn("subscription closed unexpectedly", "error", err)
 			}
