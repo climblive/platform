@@ -81,14 +81,11 @@
   const handleVisibilityChange = () => {
     switch (document.visibilityState) {
       case "hidden":
-        resultsConnected = false;
-        tabGroup.show("problems");
-
-        clearInterval(updateStateTimerId);
-        updateStateTimerId = 0;
+        tearDown();
         break;
       case "visible":
         calulateAndScheduleNextStateChange();
+        startEventSubscription();
         break;
     }
   };
@@ -128,7 +125,11 @@
     }
   };
 
-  onMount(() => {
+  const startEventSubscription = () => {
+    if (eventSource) {
+      return;
+    }
+
     eventSource = new EventSource(
       `${configData.API_URL}/contests/${$session.contestId}/events`,
     );
@@ -141,11 +142,25 @@
         placement = event.placement;
       }
     });
+  };
+
+  const tearDown = () => {
+    resultsConnected = false;
+    tabGroup.show("problems");
+
+    eventSource?.close();
+    eventSource = undefined;
+
+    clearInterval(updateStateTimerId);
+    updateStateTimerId = 0;
+  };
+
+  onMount(() => {
+    startEventSubscription();
   });
 
   onDestroy(() => {
-    eventSource?.close();
-    eventSource = undefined;
+    tearDown();
   });
 </script>
 

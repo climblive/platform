@@ -50,7 +50,11 @@ func (hdlr *eventHandler) ListenContestEvents(w http.ResponseWriter, r *http.Req
 		if err != nil {
 			switch {
 			case errors.Is(err, context.Canceled):
+				fallthrough
 			case errors.Is(err, context.DeadlineExceeded):
+				slog.Info("subscription closed by remote",
+					"contest_id", contestID,
+					"remote_addr", r.RemoteAddr)
 			default:
 				slog.Warn("subscription closed unexpectedly",
 					"contest_id", contestID,
