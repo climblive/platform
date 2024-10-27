@@ -15,6 +15,7 @@ export const getContenderQuery = (contenderId: number) =>
     retry: false,
     gcTime: 12 * HOUR,
     staleTime: 12 * HOUR,
+    refetchOnWindowFocus: true,
   });
 
 export const updateContenderMutation = (contenderId: number) => {
