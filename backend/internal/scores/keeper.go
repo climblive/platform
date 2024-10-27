@@ -19,7 +19,13 @@ func NewScoreKeeper(eventBroker domain.EventBroker) *Keeper {
 }
 
 func (k *Keeper) Run(ctx context.Context) {
-	subscriptionID, eventReader := k.eventBroker.Subscribe(domain.EventFilter{}, 0)
+	filter := domain.NewEventFilter(
+		0,
+		0,
+		"CONTENDER_SCORE_UPDATED",
+	)
+
+	subscriptionID, eventReader := k.eventBroker.Subscribe(filter, 0)
 
 	defer k.eventBroker.Unsubscribe(subscriptionID)
 

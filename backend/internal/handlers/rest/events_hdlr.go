@@ -22,22 +22,52 @@ func InstallEventHandler(mux *Mux, eventBroker domain.EventBroker) {
 		eventBroker: eventBroker,
 	}
 
-	mux.HandleFunc("GET /contests/{contestID}/events", handler.ListenContestEvents)
+	mux.HandleFunc("GET /contests/{contestID}/events", handler.HandleSubscribeContestEvents)
+	mux.HandleFunc("GET /contenders/{contenderID}/events", handler.HandleSubscribeContenderEvents)
 }
 
-func (hdlr *eventHandler) ListenContestEvents(w http.ResponseWriter, r *http.Request) {
+func (hdlr *eventHandler) HandleSubscribeContestEvents(w http.ResponseWriter, r *http.Request) {
 	contestID := parseResourceID[domain.ContestID](r.PathValue("contestID"))
 
+	logger := slog.Default().With("contest_id", contestID, "remote_addr", r.RemoteAddr)
+
+	filter := domain.NewEventFilter(
+		contestID,
+		0,
+		"CONTENDER_PUBLIC_INFO_UPDATED",
+		"CONTENDER_SCORE_UPDATED",
+	)
+
+	hdlr.subscribe(w, r, filter, logger)
+}
+
+func (hdlr *eventHandler) HandleSubscribeContenderEvents(w http.ResponseWriter, r *http.Request) {
+	contenderID := parseResourceID[domain.ContenderID](r.PathValue("contenderID"))
+
+	logger := slog.Default().With("contender_id", contenderID, "remote_addr", r.RemoteAddr)
+
+	filter := domain.NewEventFilter(
+		0,
+		contenderID,
+		"CONTENDER_PUBLIC_INFO_UPDATED",
+		"CONTENDER_SCORE_UPDATED",
+	)
+
+	hdlr.subscribe(w, r, filter, logger)
+}
+
+func (hdlr *eventHandler) subscribe(
+	w http.ResponseWriter,
+	r *http.Request,
+	filter domain.EventFilter,
+	logger *slog.Logger,
+) {
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("X-Accel-Buffering", "no")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
-	filter := domain.EventFilter{
-		ContestID: contestID,
-	}
-
-	slog.Info("starting event subscription", "contest_id", contestID, "remote_addr", r.RemoteAddr)
+	logger.Info("starting event subscription")
 	subscriptionID, eventReader := hdlr.eventBroker.Subscribe(filter, bufferCapacity)
 
 	defer hdlr.eventBroker.Unsubscribe(subscriptionID)
@@ -52,14 +82,9 @@ func (hdlr *eventHandler) ListenContestEvents(w http.ResponseWriter, r *http.Req
 			case errors.Is(err, context.Canceled):
 				fallthrough
 			case errors.Is(err, context.DeadlineExceeded):
-				slog.Info("subscription closed by remote",
-					"contest_id", contestID,
-					"remote_addr", r.RemoteAddr)
+				logger.Info("subscription closed by remote")
 			default:
-				slog.Warn("subscription closed unexpectedly",
-					"contest_id", contestID,
-					"remote_addr", r.RemoteAddr,
-					"error", err)
+				logger.Warn("subscription closed unexpectedly", "error", err)
 			}
 
 			return

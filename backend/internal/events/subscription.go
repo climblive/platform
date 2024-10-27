@@ -13,7 +13,7 @@ var ErrBufferFull = errors.New("buffer full")
 
 type Subscription struct {
 	ID             domain.SubscriptionID
-	Filter         domain.EventFilter
+	filter         domain.EventFilter
 	mu             sync.Mutex
 	cond           *sync.Cond
 	buffer         []domain.EventEnvelope
@@ -27,7 +27,7 @@ func NewSubscription(
 ) *Subscription {
 	sub := Subscription{
 		ID:             uuid.New(),
-		Filter:         filter,
+		filter:         filter,
 		bufferCapacity: bufferCapacity,
 	}
 
@@ -92,4 +92,26 @@ func (s *Subscription) Post(event domain.EventEnvelope) error {
 	s.cond.Broadcast()
 
 	return nil
+}
+
+func (s *Subscription) FilterMatch(contestID domain.ContestID, contenderID domain.ContenderID, eventType string) bool {
+	switch s.filter.ContestID {
+	case 0, contestID:
+	default:
+		return false
+	}
+
+	switch s.filter.ContenderID {
+	case 0, contenderID:
+	default:
+		return false
+	}
+
+	hasEventTypeFilters := len(s.filter.EventTypes) > 0
+
+	if _, found := s.filter.EventTypes[eventType]; hasEventTypeFilters && !found {
+		return false
+	}
+
+	return true
 }

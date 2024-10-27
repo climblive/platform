@@ -3,6 +3,7 @@ package events_test
 import (
 	"context"
 	"math/rand"
+	"slices"
 	"sync"
 	"testing"
 	"time"
@@ -144,4 +145,72 @@ func TestContextCancelledPreAwait(t *testing.T) {
 
 	assert.Empty(t, event)
 	require.ErrorIs(t, err, context.Canceled)
+}
+
+func TestMatchFilter(t *testing.T) {
+	t.Run("ContestMatchWildcard", func(t *testing.T) {
+		subscription := events.NewSubscription(domain.NewEventFilter(0, 0), 0)
+
+		match := subscription.FilterMatch(domain.ContestID(rand.Int()), 0, "A")
+
+		assert.True(t, match)
+	})
+
+	t.Run("ContestMatch", func(t *testing.T) {
+		subscription := events.NewSubscription(domain.NewEventFilter(1337, 0), 0)
+
+		match := subscription.FilterMatch(domain.ContestID(1337), 0, "A")
+
+		assert.True(t, match)
+	})
+
+	t.Run("ContestNoMatch", func(t *testing.T) {
+		subscription := events.NewSubscription(domain.NewEventFilter(1337, 0), 0)
+
+		match := subscription.FilterMatch(domain.ContestID(42), 0, "A")
+
+		assert.False(t, match)
+	})
+
+	t.Run("ContenderMatchWildcard", func(t *testing.T) {
+		subscription := events.NewSubscription(domain.NewEventFilter(0, 0), 0)
+
+		match := subscription.FilterMatch(domain.ContestID(rand.Int()), domain.ContenderID(rand.Int()), "A")
+
+		assert.True(t, match)
+	})
+
+	t.Run("ContenderMatch", func(t *testing.T) {
+		subscription := events.NewSubscription(domain.NewEventFilter(0, 1337), 0)
+
+		match := subscription.FilterMatch(domain.ContestID(rand.Int()), domain.ContenderID(1337), "A")
+
+		assert.True(t, match)
+	})
+
+	t.Run("ContenderMatch", func(t *testing.T) {
+		subscription := events.NewSubscription(domain.NewEventFilter(0, 1337), 0)
+
+		match := subscription.FilterMatch(domain.ContestID(rand.Int()), domain.ContenderID(42), "A")
+
+		assert.False(t, match)
+	})
+
+	t.Run("EventTypeMatch", func(t *testing.T) {
+		subscription := events.NewSubscription(domain.NewEventFilter(0, 0, "A", "B", "C"), 0)
+
+		for eventType := range slices.Values([]string{"A", "B", "C"}) {
+			match := subscription.FilterMatch(domain.ContestID(rand.Int()), domain.ContenderID(rand.Int()), eventType)
+
+			assert.True(t, match)
+		}
+	})
+
+	t.Run("EventTypeNoMatch", func(t *testing.T) {
+		subscription := events.NewSubscription(domain.NewEventFilter(0, 0, "A", "B", "C"), 0)
+
+		match := subscription.FilterMatch(domain.ContestID(rand.Int()), domain.ContenderID(rand.Int()), "X")
+
+		assert.False(t, match)
+	})
 }

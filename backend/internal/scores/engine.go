@@ -43,9 +43,21 @@ func NewScoreEngine(contestID domain.ContestID, eventBroker domain.EventBroker, 
 }
 
 func (e *ScoreEngine) Run(ctx context.Context) {
-	filter := domain.EventFilter{
-		ContestID: e.contestID,
-	}
+	filter := domain.NewEventFilter(
+		e.contestID,
+		0,
+		"CONTENDER_ENTERED",
+		"CONTENDER_SWITCHED_CLASS",
+		"CONTENDER_WITHDREW_FROM_FINALS",
+		"CONTENDER_REENTERED_FINALS",
+		"CONTENDER_DISQUALIFIED",
+		"CONTENDER_REQUALIFIED",
+		"ASCENT_REGISTERED",
+		"ASCENT_DEREGISTERED",
+		"PROBLEM_ADDED",
+		"PROBLEM_UPDATED",
+		"PROBLEM_DELETED",
+	)
 	subscriptionID, eventReader := e.eventBroker.Subscribe(filter, 0)
 
 	defer e.eventBroker.Unsubscribe(subscriptionID)
