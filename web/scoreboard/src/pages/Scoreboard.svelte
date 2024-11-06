@@ -29,9 +29,9 @@
             <Header
               compClassId={compClass.id}
               name={compClass.name}
-              startTime={new Date(compClass.timeBegin)}
-              endTime={new Date(compClass.timeEnd)}
-              gracePeriodEndTime={add(new Date(compClass.timeEnd), {
+              startTime={compClass.timeBegin}
+              endTime={compClass.timeEnd}
+              gracePeriodEndTime={add(compClass.timeEnd, {
                 minutes: contest.gracePeriod / (1_000_000_000 * 60),
               })}
             ></Header>

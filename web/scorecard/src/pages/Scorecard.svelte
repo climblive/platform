@@ -17,7 +17,6 @@
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
-  import { parseISO } from "date-fns";
   import { add } from "date-fns/add";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
@@ -45,12 +44,8 @@
   $: selectedCompClass = compClasses?.find(
     ({ id }) => id === contender?.compClassId,
   );
-  $: startTime = selectedCompClass?.timeBegin
-    ? parseISO(selectedCompClass.timeBegin)
-    : new Date(8640000000000000);
-  $: endTime = selectedCompClass?.timeEnd
-    ? parseISO(selectedCompClass.timeEnd)
-    : new Date(-8640000000000000);
+  $: startTime = selectedCompClass?.timeBegin ?? new Date(8640000000000000);
+  $: endTime = selectedCompClass?.timeEnd ?? new Date(-8640000000000000);
   $: gracePeriodEndTime = add(endTime, {
     minutes: (contest?.gracePeriod ?? 0) / (1_000_000_000 * 60),
   });
