@@ -2,7 +2,6 @@
   import Header from "@/components/Header.svelte";
   import ProblemView from "@/components/ProblemView.svelte";
   import type { ScorecardSession } from "@/types";
-  import type { ContestState } from "@/types/state";
   import { ResultList, ScoreboardProvider } from "@climblive/lib/components";
   import configData from "@climblive/lib/config.json";
   import type { ContenderScoreUpdatedEvent } from "@climblive/lib/models";
@@ -13,14 +12,13 @@
     getProblemsQuery,
     getTicksQuery,
   } from "@climblive/lib/queries";
+  import { useContestState } from "@climblive/lib/utils";
   import type { SlTabGroup, SlTabShowEvent } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
   import { parseISO } from "date-fns";
   import { add } from "date-fns/add";
-  import { differenceInMilliseconds } from "date-fns/differenceInMilliseconds";
-  import { isBefore } from "date-fns/isBefore";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
   import Loading from "./Loading.svelte";
@@ -38,8 +36,6 @@
   let eventSource: EventSource | undefined;
   let score: number;
   let placement: number | undefined;
-  let updateStateTimerId: number = 0;
-  let state: ContestState = "NOT_STARTED";
 
   $: contender = $contenderQuery.data;
   $: contest = $contestQuery.data;
@@ -55,13 +51,15 @@
   $: endTime = selectedCompClass?.timeEnd
     ? parseISO(selectedCompClass.timeEnd)
     : new Date(-8640000000000000);
-  $: gracePeriodEnd = add(endTime, {
+  $: gracePeriodEndTime = add(endTime, {
     minutes: (contest?.gracePeriod ?? 0) / (1_000_000_000 * 60),
   });
 
+  const { state, stop, update } = useContestState();
+
   $: {
-    if (startTime && endTime && gracePeriodEnd) {
-      calulateAndScheduleNextStateChange();
+    if (startTime && endTime && gracePeriodEndTime) {
+      update(startTime, endTime, gracePeriodEndTime);
     }
   }
 
@@ -84,44 +82,8 @@
         tearDown();
         break;
       case "visible":
-        calulateAndScheduleNextStateChange();
         startEventSubscription();
         break;
-    }
-  };
-
-  const calulateAndScheduleNextStateChange = () => {
-    clearInterval(updateStateTimerId);
-    updateStateTimerId = 0;
-
-    const now = new Date();
-    let durationUntilNextState = 0;
-
-    switch (true) {
-      case isBefore(now, startTime):
-        state = "NOT_STARTED";
-        durationUntilNextState = differenceInMilliseconds(startTime, now);
-
-        break;
-      case isBefore(now, endTime):
-        state = "RUNNING";
-        durationUntilNextState = differenceInMilliseconds(endTime, now);
-
-        break;
-      case isBefore(now, gracePeriodEnd):
-        state = "GRACE_PERIOD";
-        durationUntilNextState = differenceInMilliseconds(gracePeriodEnd, now);
-
-        break;
-      default:
-        state = "ENDED";
-    }
-
-    if (durationUntilNextState) {
-      updateStateTimerId = setTimeout(
-        calulateAndScheduleNextStateChange,
-        durationUntilNextState,
-      );
     }
   };
 
@@ -151,8 +113,7 @@
     eventSource?.close();
     eventSource = undefined;
 
-    clearInterval(updateStateTimerId);
-    updateStateTimerId = 0;
+    stop();
   };
 
   onMount(() => {
@@ -179,7 +140,7 @@
         contenderClub={contender.clubName}
         {score}
         {placement}
-        {state}
+        state={$state}
         {startTime}
         {endTime}
       />
@@ -193,7 +154,7 @@
           <ProblemView
             {problem}
             tick={ticks.find(({ problemId }) => problemId === problem.id)}
-            disabled={["NOT_STARTED", "ENDED"].includes(state)}
+            disabled={["NOT_STARTED", "ENDED"].includes($state)}
           />
         {/each}
       </sl-tab-panel>

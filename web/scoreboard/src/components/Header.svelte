@@ -1,12 +1,27 @@
 <script lang="ts">
   import { Timer } from "@climblive/lib/components";
   import type { ScoreboardEntry } from "@climblive/lib/models";
-  import { getContext } from "svelte";
+  import { useContestState } from "@climblive/lib/utils";
+  import { getContext, onDestroy } from "svelte";
   import { type Readable } from "svelte/store";
 
   export let name: string;
   export let compClassId: number;
-  export let timeEnd: Date;
+  export let startTime: Date;
+  export let endTime: Date;
+  export let gracePeriodEndTime: Date;
+
+  const { state, stop, update } = useContestState();
+
+  $: {
+    if (startTime && endTime && gracePeriodEndTime) {
+      update(startTime, endTime, gracePeriodEndTime);
+    }
+  }
+
+  onDestroy(() => {
+    stop();
+  });
 
   const scoreboard =
     getContext<Readable<Map<number, ScoreboardEntry[]>>>("scoreboard");
@@ -19,7 +34,17 @@
 
 <header>
   <h2>{name} <span class="size">({results.length}/{allContenders})</span></h2>
-  <Timer endTime={timeEnd} />
+  <div class="timer">
+    {#if $state === "NOT_STARTED"}
+      <Timer endTime={startTime} />
+      <span>Time until start</span>
+    {:else if $state === "RUNNING"}
+      <Timer {endTime} />
+      <span>Time remaining</span>
+    {:else}
+      <span>Ended</span>
+    {/if}
+  </div>
 </header>
 
 <style>
@@ -35,5 +60,11 @@
   .size {
     font-size: var(--sl-font-size-small);
     color: var(--sl-color-primary-700);
+  }
+
+  .timer {
+    & > * {
+      display: block;
+    }
   }
 </style>

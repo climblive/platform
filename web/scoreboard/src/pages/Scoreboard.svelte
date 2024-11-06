@@ -2,6 +2,7 @@
   import Header from "@/components/Header.svelte";
   import { ResultList, ScoreboardProvider } from "@climblive/lib/components";
   import { getCompClassesQuery, getContestQuery } from "@climblive/lib/queries";
+  import { add } from "date-fns/add";
   import Loading from "./Loading.svelte";
 
   export let contestId: number;
@@ -28,7 +29,11 @@
             <Header
               compClassId={compClass.id}
               name={compClass.name}
-              timeEnd={new Date(compClass.timeEnd)}
+              startTime={new Date(compClass.timeBegin)}
+              endTime={new Date(compClass.timeEnd)}
+              gracePeriodEndTime={add(new Date(compClass.timeEnd), {
+                minutes: contest.gracePeriod / (1_000_000_000 * 60),
+              })}
             ></Header>
             <ResultList compClassId={compClass.id} overflow="pagination" />
           </section>
