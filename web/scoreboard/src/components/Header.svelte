@@ -9,13 +9,12 @@
   export let compClassId: number;
   export let startTime: Date;
   export let endTime: Date;
-  export let gracePeriodEndTime: Date;
 
   const { state, stop, update } = useContestState();
 
   $: {
-    if (startTime && endTime && gracePeriodEndTime) {
-      update(startTime, endTime, gracePeriodEndTime);
+    if (startTime && endTime) {
+      update(startTime, endTime);
     }
   }
 

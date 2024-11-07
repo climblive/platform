@@ -9,12 +9,11 @@ export const useContestState = () => {
         intervalTimerId: number;
         startTime: Date;
         endTime: Date;
-        gracePeriodEndTime: Date
+        gracePeriodEndTime?: Date
     } = {
         intervalTimerId: NaN,
         startTime: new Date(),
         endTime: new Date(),
-        gracePeriodEndTime: new Date(),
     };
 
     const computeState = () => {
@@ -32,7 +31,7 @@ export const useContestState = () => {
                 durationUntilNextState = differenceInMilliseconds(state.endTime, now);
 
                 break;
-            case isBefore(now, state.gracePeriodEndTime):
+            case state.gracePeriodEndTime && isBefore(now, state.gracePeriodEndTime):
                 stateStore.set("GRACE_PERIOD");
                 durationUntilNextState = differenceInMilliseconds(state.gracePeriodEndTime, now);
 
@@ -57,7 +56,7 @@ export const useContestState = () => {
         stop: () => {
             clearTimeout(state.intervalTimerId)
         },
-        update: (startTime: Date, endTime: Date, gracePeriodEndTime: Date) => {
+        update: (startTime: Date, endTime: Date, gracePeriodEndTime?: Date) => {
             state.startTime = startTime;
             state.endTime = endTime;
             state.gracePeriodEndTime = gracePeriodEndTime;
