@@ -12,8 +12,8 @@ export const useContestState = () => {
         gracePeriodEndTime?: Date
     } = {
         intervalTimerId: NaN,
-        startTime: new Date(),
-        endTime: new Date(),
+        startTime: new Date(8640000000000000),
+        endTime: new Date(-8640000000000000),
     };
 
     const computeState = () => {
