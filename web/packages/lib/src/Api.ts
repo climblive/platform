@@ -34,7 +34,7 @@ export class ApiClient {
   private static baseUrl: string = configData.API_URL;
   private credentialsProvider: ApiCredentialsProvider | undefined;
 
-  private constructor() { }
+  private constructor() {}
 
   public static getInstance(): ApiClient {
     if (!ApiClient.instance) {
@@ -106,9 +106,7 @@ export class ApiClient {
   getCompClasses = async (contestId: number) => {
     const endpoint = `/contests/${contestId}/compClasses`;
 
-    const result = await axios.get(
-      `${ApiClient.baseUrl}${endpoint}`,
-    );
+    const result = await axios.get(`${ApiClient.baseUrl}${endpoint}`);
 
     return z.array(compClassSchema).parse(result.data);
   };
