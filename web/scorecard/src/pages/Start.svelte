@@ -11,6 +11,7 @@
   import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
+  import { ZodError } from "zod";
 
   let loadingContender = false;
   let loadingFailed = false;
@@ -62,6 +63,10 @@
         navigate(`/${registrationCode}/register`);
       }
     } catch (e) {
+      if (e instanceof ZodError) {
+        console.error(e);
+      }
+
       loadingFailed = true;
     } finally {
       loadingContender = false;

@@ -11,6 +11,12 @@
     defaultOptions: {
       queries: {
         refetchOnWindowFocus: false,
+        throwOnError: (error) => {
+          console.log("asd");
+          console.error(error);
+
+          return false;
+        },
       },
     },
   });
