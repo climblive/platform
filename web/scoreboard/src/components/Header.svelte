@@ -37,20 +37,21 @@
   <div class="timer">
     {#if $state === "NOT_STARTED"}
       <Timer endTime={startTime} />
-      <span>Time until start</span>
-    {:else if $state === "RUNNING"}
-      <Timer {endTime} />
-      <span>Time remaining</span>
+      <span class="footer">Time until start</span>
     {:else}
-      <span>Ended</span>
+      <Timer {endTime} />
+      <span class="footer">Time remaining</span>
     {/if}
   </div>
 </header>
 
 <style>
   header {
-    text-align: center;
     margin-bottom: var(--sl-spacing-large);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
     & h2 {
       line-height: var(--sl-line-height-denser);
@@ -63,8 +64,17 @@
   }
 
   .timer {
+    text-align: center;
+    font-weight: var(--sl-font-weight-bold);
+    font-size: var(--sl-font-size-large);
+
     & > * {
       display: block;
+    }
+
+    & .footer {
+      font-weight: var(--sl-font-weight-normal);
+      font-size: var(--sl-font-size-small);
     }
   }
 </style>
