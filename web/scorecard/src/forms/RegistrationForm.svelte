@@ -11,6 +11,7 @@
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/select/select.js";
   import type SlSelect from "@shoelace-style/shoelace/dist/components/select/select.js";
+  import { isAfter } from "date-fns";
   import { createEventDispatcher, getContext } from "svelte";
   import type { Readable } from "svelte/store";
 
@@ -102,7 +103,11 @@
       use:value={data.compClassId}
     >
       {#each $compClassesQuery.data as compClass}
-        <sl-option value={compClass.id}>{compClass.name}</sl-option>
+        <sl-option
+          value={compClass.id}
+          disabled={isAfter(new Date(), compClass.timeEnd)}
+          >{compClass.name}</sl-option
+        >
       {/each}
     </sl-select>
     <slot />
