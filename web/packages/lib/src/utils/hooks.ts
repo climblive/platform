@@ -4,7 +4,8 @@ import { writable } from "svelte/store";
 export type ContestState = "NOT_STARTED" | "RUNNING" | "GRACE_PERIOD" | "ENDED";
 
 export const useContestState = () => {
-    const stateStore = writable<ContestState>("NOT_STARTED");
+    const contestState = writable<ContestState>("NOT_STARTED");
+
     const state: {
         intervalTimerId: number;
         startTime: Date;
@@ -22,22 +23,22 @@ export const useContestState = () => {
 
         switch (true) {
             case isBefore(now, state.startTime):
-                stateStore.set("NOT_STARTED");
+                contestState.set("NOT_STARTED");
                 durationUntilNextState = differenceInMilliseconds(state.startTime, now);
 
                 break;
             case isBefore(now, state.endTime):
-                stateStore.set("RUNNING");
+                contestState.set("RUNNING");
                 durationUntilNextState = differenceInMilliseconds(state.endTime, now);
 
                 break;
             case state.gracePeriodEndTime && isBefore(now, state.gracePeriodEndTime):
-                stateStore.set("GRACE_PERIOD");
+                contestState.set("GRACE_PERIOD");
                 durationUntilNextState = differenceInMilliseconds(state.gracePeriodEndTime, now);
 
                 break;
             default:
-                stateStore.set("ENDED");
+                contestState.set("ENDED");
         }
 
 
@@ -52,7 +53,7 @@ export const useContestState = () => {
     computeState()
 
     return {
-        state: stateStore,
+        state: contestState,
         stop: () => {
             clearTimeout(state.intervalTimerId)
         },
