@@ -30,6 +30,11 @@
     defaultOptions: {
       queries: {
         refetchOnWindowFocus: false,
+        throwOnError: (error) => {
+          console.error(error);
+
+          return false;
+        },
       },
     },
   });

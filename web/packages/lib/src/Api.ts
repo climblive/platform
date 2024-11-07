@@ -2,12 +2,11 @@ import type { RawAxiosRequestHeaders } from "axios";
 import axios from "axios";
 import { z } from "zod";
 import configData from "../src/config.json";
-import type { ScoreboardEntry } from "./models";
+import { contestSchema, scoreboardEntrySchema } from "./models";
 import { compClassSchema } from "./models/compClass";
-import type { Contender } from "./models/contender";
-import type { Contest } from "./models/contest";
-import type { Problem } from "./models/problem";
-import type { Tick } from "./models/tick";
+import { contenderSchema, type Contender } from "./models/contender";
+import { problemSchema } from "./models/problem";
+import { tickSchema, type Tick } from "./models/tick";
 
 interface ApiCredentialsProvider {
   getAuthHeaders(): RawAxiosRequestHeaders;
@@ -34,7 +33,7 @@ export class ApiClient {
   private static baseUrl: string = configData.API_URL;
   private credentialsProvider: ApiCredentialsProvider | undefined;
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): ApiClient {
     if (!ApiClient.instance) {
@@ -51,30 +50,30 @@ export class ApiClient {
   findContender = async (registrationCode: string) => {
     const endpoint = `/codes/${registrationCode}/contender`;
 
-    const result = await axios.get<Contender>(
+    const result = await axios.get(
       `${ApiClient.baseUrl}${endpoint}`,
     );
 
-    return result.data;
+    return contenderSchema.parse(result.data);
   };
 
   getContender = async (id: number) => {
     const endpoint = `/contenders/${id}`;
 
-    const result = await axios.get<Contender>(
+    const result = await axios.get(
       `${ApiClient.baseUrl}${endpoint}`,
       {
         headers: this.credentialsProvider?.getAuthHeaders(),
       },
     );
 
-    return result.data;
+    return contenderSchema.parse(result.data);
   };
 
   updateContender = async (id: number, contender: Contender) => {
     const endpoint = `/contenders/${id}`;
 
-    const result = await axios.put<Contender>(
+    const result = await axios.put(
       `${ApiClient.baseUrl}${endpoint}`,
       contender,
       {
@@ -82,25 +81,25 @@ export class ApiClient {
       },
     );
 
-    return result.data;
+    return contenderSchema.parse(result.data);
   };
 
   getContest = async (id: number) => {
     const endpoint = `/contests/${id}`;
 
-    const result = await axios.get<Contest>(`${ApiClient.baseUrl}${endpoint}`);
+    const result = await axios.get(`${ApiClient.baseUrl}${endpoint}`);
 
-    return result.data;
+    return contestSchema.parse(result.data);
   };
 
   getProblems = async (contestId: number) => {
     const endpoint = `/contests/${contestId}/problems`;
 
-    const result = await axios.get<Problem[]>(
+    const result = await axios.get(
       `${ApiClient.baseUrl}${endpoint}`,
     );
 
-    return result.data;
+    return z.array(problemSchema).parse(result.data);
   };
 
   getCompClasses = async (contestId: number) => {
@@ -114,17 +113,17 @@ export class ApiClient {
   getTicks = async (contenderId: number) => {
     const endpoint = `/contenders/${contenderId}/ticks`;
 
-    const result = await axios.get<Tick[]>(`${ApiClient.baseUrl}${endpoint}`, {
+    const result = await axios.get(`${ApiClient.baseUrl}${endpoint}`, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 
-    return result.data;
+    return z.array(tickSchema).parse(result.data);
   };
 
   createTick = async (contenderId: number, tick: Omit<Tick, "id">) => {
     const endpoint = `/contenders/${contenderId}/ticks`;
 
-    const result = await axios.post<Tick>(
+    const result = await axios.post(
       `${ApiClient.baseUrl}${endpoint}`,
       tick,
       {
@@ -132,7 +131,7 @@ export class ApiClient {
       },
     );
 
-    return result.data;
+    return tickSchema.parse(result.data);
   };
 
   deleteTick = async (tickId: number) => {
@@ -146,10 +145,10 @@ export class ApiClient {
   getScoreboard = async (contestId: number) => {
     const endpoint = `/contests/${contestId}/scoreboard`;
 
-    const result = await axios.get<ScoreboardEntry[]>(
+    const result = await axios.get(
       `${ApiClient.baseUrl}${endpoint}`,
     );
 
-    return result.data;
+    return z.array(scoreboardEntrySchema).parse(result.data);
   };
 }

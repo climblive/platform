@@ -8,7 +8,7 @@
     ScoreboardProvider,
   } from "@climblive/lib/components";
   import configData from "@climblive/lib/config.json";
-  import type { ContenderScoreUpdatedEvent } from "@climblive/lib/models";
+  import { contenderScoreUpdatedEventSchema } from "@climblive/lib/models";
   import {
     getCompClassesQuery,
     getContenderQuery,
@@ -34,7 +34,7 @@
   const ticksQuery = getTicksQuery($session.contenderId);
 
   let resultsConnected = false;
-  let tabGroup: SlTabGroup;
+  let tabGroup: SlTabGroup | undefined;
   let eventSource: EventSource | undefined;
   let score: number;
   let placement: number | undefined;
@@ -87,7 +87,7 @@
     );
 
     eventSource.addEventListener("CONTENDER_SCORE_UPDATED", (e) => {
-      const event = JSON.parse(e.data) as ContenderScoreUpdatedEvent;
+      const event = contenderScoreUpdatedEventSchema.parse(JSON.parse(e.data));
 
       if (event.contenderId === contender?.id) {
         score = event.score;
@@ -98,7 +98,7 @@
 
   const tearDown = () => {
     resultsConnected = false;
-    tabGroup.show("problems");
+    tabGroup?.show("problems");
 
     eventSource?.close();
     eventSource = undefined;
