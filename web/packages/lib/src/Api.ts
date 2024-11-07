@@ -106,7 +106,7 @@ export class ApiClient {
   getCompClasses = async (contestId: number) => {
     const endpoint = `/contests/${contestId}/compClasses`;
 
-    const result = await axios.get<any>(
+    const result = await axios.get(
       `${ApiClient.baseUrl}${endpoint}`,
     );
 
