@@ -2,7 +2,11 @@
   import Header from "@/components/Header.svelte";
   import ProblemView from "@/components/ProblemView.svelte";
   import type { ScorecardSession } from "@/types";
-  import { ResultList, ScoreboardProvider } from "@climblive/lib/components";
+  import {
+    ContestStateProvider,
+    ResultList,
+    ScoreboardProvider,
+  } from "@climblive/lib/components";
   import configData from "@climblive/lib/config.json";
   import type { ContenderScoreUpdatedEvent } from "@climblive/lib/models";
   import {
@@ -12,7 +16,6 @@
     getProblemsQuery,
     getTicksQuery,
   } from "@climblive/lib/queries";
-  import { useContestState } from "@climblive/lib/utils";
   import type { SlTabGroup, SlTabShowEvent } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
@@ -49,14 +52,6 @@
   $: gracePeriodEndTime = add(endTime, {
     minutes: (contest?.gracePeriod ?? 0) / (1_000_000_000 * 60),
   });
-
-  const { state, stop, update } = useContestState();
-
-  $: {
-    if (startTime && endTime && gracePeriodEndTime) {
-      update(startTime, endTime, gracePeriodEndTime);
-    }
-  }
 
   $: {
     if (contender) {
@@ -125,43 +120,45 @@
 {#if !contender || !contest || !compClasses || !problems || !ticks || !selectedCompClass}
   <Loading />
 {:else}
-  <main>
-    <div class="sticky">
-      <Header
-        registrationCode={$session.registrationCode}
-        contestName={contest.name}
-        compClassName={selectedCompClass?.name}
-        contenderName={contender.name}
-        contenderClub={contender.clubName}
-        {score}
-        {placement}
-        state={$state}
-        {startTime}
-        {endTime}
-      />
-    </div>
-    <sl-tab-group bind:this={tabGroup} on:sl-tab-show={handleShowTab}>
-      <sl-tab slot="nav" panel="problems">Scorecard</sl-tab>
-      <sl-tab slot="nav" panel="results">Results</sl-tab>
+  <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime} let:state>
+    <main>
+      <div class="sticky">
+        <Header
+          registrationCode={$session.registrationCode}
+          contestName={contest.name}
+          compClassName={selectedCompClass?.name}
+          contenderName={contender.name}
+          contenderClub={contender.clubName}
+          {score}
+          {placement}
+          {state}
+          {startTime}
+          {endTime}
+        />
+      </div>
+      <sl-tab-group bind:this={tabGroup} on:sl-tab-show={handleShowTab}>
+        <sl-tab slot="nav" panel="problems">Scorecard</sl-tab>
+        <sl-tab slot="nav" panel="results">Results</sl-tab>
 
-      <sl-tab-panel name="problems">
-        {#each problems as problem}
-          <ProblemView
-            {problem}
-            tick={ticks.find(({ problemId }) => problemId === problem.id)}
-            disabled={["NOT_STARTED", "ENDED"].includes($state)}
-          />
-        {/each}
-      </sl-tab-panel>
-      <sl-tab-panel name="results">
-        {#if resultsConnected && contender.compClassId}
-          <ScoreboardProvider contestId={$session.contestId}>
-            <ResultList compClassId={contender.compClassId} />
-          </ScoreboardProvider>
-        {/if}
-      </sl-tab-panel>
-    </sl-tab-group>
-  </main>
+        <sl-tab-panel name="problems">
+          {#each problems as problem}
+            <ProblemView
+              {problem}
+              tick={ticks.find(({ problemId }) => problemId === problem.id)}
+              disabled={["NOT_STARTED", "ENDED"].includes(state)}
+            />
+          {/each}
+        </sl-tab-panel>
+        <sl-tab-panel name="results">
+          {#if resultsConnected && contender.compClassId}
+            <ScoreboardProvider contestId={$session.contestId}>
+              <ResultList compClassId={contender.compClassId} />
+            </ScoreboardProvider>
+          {/if}
+        </sl-tab-panel>
+      </sl-tab-group>
+    </main></ContestStateProvider
+  >
 {/if}
 
 <style>

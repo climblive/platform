@@ -12,7 +12,8 @@
     "./components": "./src/components/index.ts",
     "./queries": "./src/queries/index.ts",
     "./models": "./src/models/index.ts",
-    "./utils": "./src/utils/index.ts"
+    "./utils": "./src/utils/index.ts",
+    "./types": "./src/types/index.ts"
   },
   "scripts": {
     "check": "svelte-check --tsconfig ./tsconfig.json",

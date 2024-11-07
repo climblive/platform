@@ -1,26 +1,13 @@
 <script lang="ts">
-  import { Timer } from "@climblive/lib/components";
+  import { ContestStateProvider, Timer } from "@climblive/lib/components";
   import type { ScoreboardEntry } from "@climblive/lib/models";
-  import { useContestState } from "@climblive/lib/utils";
-  import { getContext, onDestroy } from "svelte";
+  import { getContext } from "svelte";
   import { type Readable } from "svelte/store";
 
   export let name: string;
   export let compClassId: number;
   export let startTime: Date;
   export let endTime: Date;
-
-  const { state, stop, update } = useContestState();
-
-  $: {
-    if (startTime && endTime) {
-      update(startTime, endTime);
-    }
-  }
-
-  onDestroy(() => {
-    stop();
-  });
 
   const scoreboard =
     getContext<Readable<Map<number, ScoreboardEntry[]>>>("scoreboard");
@@ -31,18 +18,20 @@
   }, 0);
 </script>
 
-<header>
-  <h2>{name} <span class="size">({results.length}/{allContenders})</span></h2>
-  <div class="timer">
-    {#if $state === "NOT_STARTED"}
-      <Timer endTime={startTime} />
-      <span class="footer">Time until start</span>
-    {:else}
-      <Timer {endTime} />
-      <span class="footer">Time remaining</span>
-    {/if}
-  </div>
-</header>
+<ContestStateProvider {startTime} {endTime} let:state>
+  <header>
+    <h2>{name} <span class="size">({results.length}/{allContenders})</span></h2>
+    <div class="timer">
+      {#if state === "NOT_STARTED"}
+        <Timer endTime={startTime} />
+        <span class="footer">Time until start</span>
+      {:else}
+        <Timer {endTime} />
+        <span class="footer">Time remaining</span>
+      {/if}
+    </div>
+  </header>
+</ContestStateProvider>
 
 <style>
   header {
