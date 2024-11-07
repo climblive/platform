@@ -9,14 +9,15 @@ export type ContenderPublicInfoUpdatedEvent = {
   disqualified: boolean;
 };
 
-export const contenderPublicInfoUpdatedEventSchema: z.ZodType<ContenderPublicInfoUpdatedEvent> = z.object({
-  contenderId: z.number(),
-  compClassId: z.number(),
-  publicName: z.string().optional(),
-  clubName: z.string().optional(),
-  withdrawnFromFinals: z.boolean(),
-  disqualified: z.boolean(),
-});
+export const contenderPublicInfoUpdatedEventSchema: z.ZodType<ContenderPublicInfoUpdatedEvent> =
+  z.object({
+    contenderId: z.number(),
+    compClassId: z.number(),
+    publicName: z.string().optional(),
+    clubName: z.string().optional(),
+    withdrawnFromFinals: z.boolean(),
+    disqualified: z.boolean(),
+  });
 
 export type ContenderScoreUpdatedEvent = {
   timestamp: Date;
@@ -27,11 +28,12 @@ export type ContenderScoreUpdatedEvent = {
   finalist: boolean;
 };
 
-export const contenderScoreUpdatedEventSchema: z.ZodType<ContenderScoreUpdatedEvent> = z.object({
-  timestamp: z.coerce.date(),
-  contenderId: z.number(),
-  score: z.number(),
-  placement: z.number().optional(),
-  rankOrder: z.number(),
-  finalist: z.boolean(),
-});
+export const contenderScoreUpdatedEventSchema: z.ZodType<ContenderScoreUpdatedEvent> =
+  z.object({
+    timestamp: z.coerce.date(),
+    contenderId: z.number(),
+    score: z.number(),
+    placement: z.number().optional(),
+    rankOrder: z.number(),
+    finalist: z.boolean(),
+  });

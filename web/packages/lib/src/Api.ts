@@ -33,7 +33,7 @@ export class ApiClient {
   private static baseUrl: string = configData.API_URL;
   private credentialsProvider: ApiCredentialsProvider | undefined;
 
-  private constructor() { }
+  private constructor() {}
 
   public static getInstance(): ApiClient {
     if (!ApiClient.instance) {
@@ -50,9 +50,7 @@ export class ApiClient {
   findContender = async (registrationCode: string) => {
     const endpoint = `/codes/${registrationCode}/contender`;
 
-    const result = await axios.get(
-      `${ApiClient.baseUrl}${endpoint}`,
-    );
+    const result = await axios.get(`${ApiClient.baseUrl}${endpoint}`);
 
     return contenderSchema.parse(result.data);
   };
@@ -60,12 +58,9 @@ export class ApiClient {
   getContender = async (id: number) => {
     const endpoint = `/contenders/${id}`;
 
-    const result = await axios.get(
-      `${ApiClient.baseUrl}${endpoint}`,
-      {
-        headers: this.credentialsProvider?.getAuthHeaders(),
-      },
-    );
+    const result = await axios.get(`${ApiClient.baseUrl}${endpoint}`, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
 
     return contenderSchema.parse(result.data);
   };
@@ -95,9 +90,7 @@ export class ApiClient {
   getProblems = async (contestId: number) => {
     const endpoint = `/contests/${contestId}/problems`;
 
-    const result = await axios.get(
-      `${ApiClient.baseUrl}${endpoint}`,
-    );
+    const result = await axios.get(`${ApiClient.baseUrl}${endpoint}`);
 
     return z.array(problemSchema).parse(result.data);
   };
@@ -123,13 +116,9 @@ export class ApiClient {
   createTick = async (contenderId: number, tick: Omit<Tick, "id">) => {
     const endpoint = `/contenders/${contenderId}/ticks`;
 
-    const result = await axios.post(
-      `${ApiClient.baseUrl}${endpoint}`,
-      tick,
-      {
-        headers: this.credentialsProvider?.getAuthHeaders(),
-      },
-    );
+    const result = await axios.post(`${ApiClient.baseUrl}${endpoint}`, tick, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
 
     return tickSchema.parse(result.data);
   };
@@ -145,9 +134,7 @@ export class ApiClient {
   getScoreboard = async (contestId: number) => {
     const endpoint = `/contests/${contestId}/scoreboard`;
 
-    const result = await axios.get(
-      `${ApiClient.baseUrl}${endpoint}`,
-    );
+    const result = await axios.get(`${ApiClient.baseUrl}${endpoint}`);
 
     return z.array(scoreboardEntrySchema).parse(result.data);
   };
