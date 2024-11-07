@@ -12,6 +12,7 @@
   import { setContext } from "svelte";
   import { Route, Router, navigate } from "svelte-routing";
   import { writable } from "svelte/store";
+  import { ZodError } from "zod";
 
   let authenticating = true;
 
@@ -42,6 +43,11 @@
         navigate(`/${code}/register`);
       }
     } catch (e) {
+      if (e instanceof ZodError) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+      }
+
       navigate("/");
     } finally {
       authenticating = false;

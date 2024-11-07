@@ -28,7 +28,8 @@
             <Header
               compClassId={compClass.id}
               name={compClass.name}
-              timeEnd={new Date(compClass.timeEnd)}
+              startTime={compClass.timeBegin}
+              endTime={compClass.timeEnd}
             ></Header>
             <ResultList compClassId={compClass.id} overflow="pagination" />
           </section>

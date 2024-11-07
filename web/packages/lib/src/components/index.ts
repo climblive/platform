@@ -1,3 +1,4 @@
+export { default as ContestStateProvider } from "./ContestStateProvider.svelte";
 export { default as Floater } from "./Floater.svelte";
 export { default as PinInput } from "./PinInput.svelte";
 export { default as ResultEntry } from "./ResultEntry.svelte";

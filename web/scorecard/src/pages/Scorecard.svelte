@@ -2,10 +2,13 @@
   import Header from "@/components/Header.svelte";
   import ProblemView from "@/components/ProblemView.svelte";
   import type { ScorecardSession } from "@/types";
-  import type { ContestState } from "@/types/state";
-  import { ResultList, ScoreboardProvider } from "@climblive/lib/components";
+  import {
+    ContestStateProvider,
+    ResultList,
+    ScoreboardProvider,
+  } from "@climblive/lib/components";
   import configData from "@climblive/lib/config.json";
-  import type { ContenderScoreUpdatedEvent } from "@climblive/lib/models";
+  import { contenderScoreUpdatedEventSchema } from "@climblive/lib/models";
   import {
     getCompClassesQuery,
     getContenderQuery,
@@ -17,10 +20,7 @@
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
-  import { parseISO } from "date-fns";
   import { add } from "date-fns/add";
-  import { differenceInMilliseconds } from "date-fns/differenceInMilliseconds";
-  import { isBefore } from "date-fns/isBefore";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
   import Loading from "./Loading.svelte";
@@ -34,12 +34,10 @@
   const ticksQuery = getTicksQuery($session.contenderId);
 
   let resultsConnected = false;
-  let tabGroup: SlTabGroup;
+  let tabGroup: SlTabGroup | undefined;
   let eventSource: EventSource | undefined;
   let score: number;
   let placement: number | undefined;
-  let updateStateTimerId: number = 0;
-  let state: ContestState = "NOT_STARTED";
 
   $: contender = $contenderQuery.data;
   $: contest = $contestQuery.data;
@@ -49,21 +47,11 @@
   $: selectedCompClass = compClasses?.find(
     ({ id }) => id === contender?.compClassId,
   );
-  $: startTime = selectedCompClass?.timeBegin
-    ? parseISO(selectedCompClass.timeBegin)
-    : new Date(8640000000000000);
-  $: endTime = selectedCompClass?.timeEnd
-    ? parseISO(selectedCompClass.timeEnd)
-    : new Date(-8640000000000000);
-  $: gracePeriodEnd = add(endTime, {
+  $: startTime = selectedCompClass?.timeBegin ?? new Date(8640000000000000);
+  $: endTime = selectedCompClass?.timeEnd ?? new Date(-8640000000000000);
+  $: gracePeriodEndTime = add(endTime, {
     minutes: (contest?.gracePeriod ?? 0) / (1_000_000_000 * 60),
   });
-
-  $: {
-    if (startTime && endTime && gracePeriodEnd) {
-      calulateAndScheduleNextStateChange();
-    }
-  }
 
   $: {
     if (contender) {
@@ -84,44 +72,8 @@
         tearDown();
         break;
       case "visible":
-        calulateAndScheduleNextStateChange();
         startEventSubscription();
         break;
-    }
-  };
-
-  const calulateAndScheduleNextStateChange = () => {
-    clearInterval(updateStateTimerId);
-    updateStateTimerId = 0;
-
-    const now = new Date();
-    let durationUntilNextState = 0;
-
-    switch (true) {
-      case isBefore(now, startTime):
-        state = "NOT_STARTED";
-        durationUntilNextState = differenceInMilliseconds(startTime, now);
-
-        break;
-      case isBefore(now, endTime):
-        state = "RUNNING";
-        durationUntilNextState = differenceInMilliseconds(endTime, now);
-
-        break;
-      case isBefore(now, gracePeriodEnd):
-        state = "GRACE_PERIOD";
-        durationUntilNextState = differenceInMilliseconds(gracePeriodEnd, now);
-
-        break;
-      default:
-        state = "ENDED";
-    }
-
-    if (durationUntilNextState) {
-      updateStateTimerId = setTimeout(
-        calulateAndScheduleNextStateChange,
-        durationUntilNextState,
-      );
     }
   };
 
@@ -135,7 +87,7 @@
     );
 
     eventSource.addEventListener("CONTENDER_SCORE_UPDATED", (e) => {
-      const event = JSON.parse(e.data) as ContenderScoreUpdatedEvent;
+      const event = contenderScoreUpdatedEventSchema.parse(JSON.parse(e.data));
 
       if (event.contenderId === contender?.id) {
         score = event.score;
@@ -146,13 +98,12 @@
 
   const tearDown = () => {
     resultsConnected = false;
-    tabGroup.show("problems");
+    tabGroup?.show("problems");
 
     eventSource?.close();
     eventSource = undefined;
 
-    clearInterval(updateStateTimerId);
-    updateStateTimerId = 0;
+    stop();
   };
 
   onMount(() => {
@@ -169,43 +120,45 @@
 {#if !contender || !contest || !compClasses || !problems || !ticks || !selectedCompClass}
   <Loading />
 {:else}
-  <main>
-    <div class="sticky">
-      <Header
-        registrationCode={$session.registrationCode}
-        contestName={contest.name}
-        compClassName={selectedCompClass?.name}
-        contenderName={contender.name}
-        contenderClub={contender.clubName}
-        {score}
-        {placement}
-        {state}
-        {startTime}
-        {endTime}
-      />
-    </div>
-    <sl-tab-group bind:this={tabGroup} on:sl-tab-show={handleShowTab}>
-      <sl-tab slot="nav" panel="problems">Scorecard</sl-tab>
-      <sl-tab slot="nav" panel="results">Results</sl-tab>
+  <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime} let:state>
+    <main>
+      <div class="sticky">
+        <Header
+          registrationCode={$session.registrationCode}
+          contestName={contest.name}
+          compClassName={selectedCompClass?.name}
+          contenderName={contender.name}
+          contenderClub={contender.clubName}
+          {score}
+          {placement}
+          {state}
+          {startTime}
+          {endTime}
+        />
+      </div>
+      <sl-tab-group bind:this={tabGroup} on:sl-tab-show={handleShowTab}>
+        <sl-tab slot="nav" panel="problems">Scorecard</sl-tab>
+        <sl-tab slot="nav" panel="results">Results</sl-tab>
 
-      <sl-tab-panel name="problems">
-        {#each problems as problem}
-          <ProblemView
-            {problem}
-            tick={ticks.find(({ problemId }) => problemId === problem.id)}
-            disabled={["NOT_STARTED", "ENDED"].includes(state)}
-          />
-        {/each}
-      </sl-tab-panel>
-      <sl-tab-panel name="results">
-        {#if resultsConnected && contender.compClassId}
-          <ScoreboardProvider contestId={$session.contestId}>
-            <ResultList compClassId={contender.compClassId} />
-          </ScoreboardProvider>
-        {/if}
-      </sl-tab-panel>
-    </sl-tab-group>
-  </main>
+        <sl-tab-panel name="problems">
+          {#each problems as problem}
+            <ProblemView
+              {problem}
+              tick={ticks.find(({ problemId }) => problemId === problem.id)}
+              disabled={["NOT_STARTED", "ENDED"].includes(state)}
+            />
+          {/each}
+        </sl-tab-panel>
+        <sl-tab-panel name="results">
+          {#if resultsConnected && contender.compClassId}
+            <ScoreboardProvider contestId={$session.contestId}>
+              <ResultList compClassId={contender.compClassId} />
+            </ScoreboardProvider>
+          {/if}
+        </sl-tab-panel>
+      </sl-tab-group>
+    </main></ContestStateProvider
+  >
 {/if}
 
 <style>

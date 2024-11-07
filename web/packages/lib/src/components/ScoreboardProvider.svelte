@@ -1,10 +1,10 @@
 <script lang="ts">
   import { ApiClient } from "@climblive/lib";
   import configData from "@climblive/lib/config.json";
-  import type {
-    ContenderPublicInfoUpdatedEvent,
-    ContenderScoreUpdatedEvent,
-    ScoreboardEntry,
+  import {
+    contenderPublicInfoUpdatedEventSchema,
+    contenderScoreUpdatedEventSchema,
+    type ScoreboardEntry,
   } from "@climblive/lib/models";
   import { onDestroy, onMount, setContext } from "svelte";
   import { writable } from "svelte/store";
@@ -69,7 +69,9 @@
     );
 
     eventSource.addEventListener("CONTENDER_PUBLIC_INFO_UPDATED", (e) => {
-      const event = JSON.parse(e.data) as ContenderPublicInfoUpdatedEvent;
+      const event = contenderPublicInfoUpdatedEventSchema.parse(
+        JSON.parse(e.data),
+      );
 
       queueEventHandler((contenders: Map<number, ScoreboardEntry>) => {
         const contender = contenders.get(event.contenderId);
@@ -86,7 +88,7 @@
     });
 
     eventSource.addEventListener("CONTENDER_SCORE_UPDATED", (e) => {
-      const event = JSON.parse(e.data) as ContenderScoreUpdatedEvent;
+      const event = contenderScoreUpdatedEventSchema.parse(JSON.parse(e.data));
 
       queueEventHandler((contenders: Map<number, ScoreboardEntry>) => {
         const contender = contenders.get(event.contenderId);
