@@ -37,7 +37,7 @@ export class ApiClient {
     this.axiosInstance = axios.create({
       baseURL: configData.API_URL,
       timeout: 10_000,
-    })
+    });
   }
 
   public static getInstance(): ApiClient {
@@ -71,13 +71,9 @@ export class ApiClient {
   updateContender = async (id: number, contender: Contender) => {
     const endpoint = `/contenders/${id}`;
 
-    const result = await this.axiosInstance.put(
-      endpoint,
-      contender,
-      {
-        headers: this.credentialsProvider?.getAuthHeaders(),
-      },
-    );
+    const result = await this.axiosInstance.put(endpoint, contender, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
 
     return contenderSchema.parse(result.data);
   };
