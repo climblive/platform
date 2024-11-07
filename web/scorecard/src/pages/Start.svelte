@@ -64,6 +64,7 @@
       }
     } catch (e) {
       if (e instanceof ZodError) {
+        // eslint-disable-next-line no-console
         console.error(e);
       }
 
