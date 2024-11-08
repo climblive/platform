@@ -144,6 +144,18 @@ func startTestingScoreEngine(
 			CompClassID: contender.CompClassID,
 		})
 
+		if contender.WithdrawnFromFinals {
+			eventBroker.Dispatch(1, domain.ContenderWithdrewFromFinalsEvent{
+				ContenderID: contender.ID,
+			})
+		}
+
+		if contender.Disqualified {
+			eventBroker.Dispatch(1, domain.ContenderDisqualifiedEvent{
+				ContenderID: contender.ID,
+			})
+		}
+
 		ticks, err := repo.GetTicksByContender(ctx, nil, contender.ID)
 		if err != nil {
 			panic(err)
