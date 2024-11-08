@@ -125,6 +125,22 @@ func TestAuthorizer(t *testing.T) {
 		handler := authorizer.Middleware(http.HandlerFunc(dummyHandler))
 		handler.ServeHTTP(w, r)
 	})
+
+	t.Run("CodesConvertedToUpperCase", func(t *testing.T) {
+		dummyHandler := func(w http.ResponseWriter, r *http.Request) {
+			_, _ = authorizer.HasOwnership(r.Context(), mockedOwnership)
+		}
+
+		r := httptest.NewRequest("GET", "http://localhost", nil)
+		w := httptest.NewRecorder()
+
+		r.Header.Set("Authorization", "Regcode wxyz1234")
+
+		handler := authorizer.Middleware(http.HandlerFunc(dummyHandler))
+		handler.ServeHTTP(w, r)
+
+		mockedRepo.AssertCalled(t, "GetContenderByCode", mock.Anything, nil, "WXYZ1234")
+	})
 }
 
 type repositoryMock struct {
