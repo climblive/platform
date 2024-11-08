@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"regexp"
+	"strings"
 
 	"github.com/climblive/platform/backend/internal/domain"
 )
@@ -22,7 +23,7 @@ type Authorizer struct {
 }
 
 func NewAuthorizer(repo authorizerRepository) *Authorizer {
-	re := regexp.MustCompile(`^Regcode ([A-Z0-9]{8})$`)
+	re := regexp.MustCompile(`^Regcode ([A-Za-z0-9]{8})$`)
 
 	return &Authorizer{
 		repo:                       repo,
@@ -36,7 +37,7 @@ func (a *Authorizer) HasOwnership(ctx context.Context, resourceOwnership domain.
 		return domain.NilRole, domain.ErrNotAuthorized
 	}
 
-	contender, err := a.repo.GetContenderByCode(ctx, nil, registrationCode)
+	contender, err := a.repo.GetContenderByCode(ctx, nil, strings.ToUpper(registrationCode))
 	if err != nil {
 		return domain.NilRole, domain.ErrNotAuthorized
 	}
