@@ -76,3 +76,24 @@ func (d *Database) GetContest(ctx context.Context, tx domain.Transaction, contes
 
 	return record.toDomain(), nil
 }
+
+func (d *Database) GetContestsRunningOrAboutToStart(ctx context.Context, tx domain.Transaction, earliestStartTime, latestStartTime time.Time) ([]domain.Contest, error) {
+	var records []contestRecord
+
+	err := d.tx(tx).WithContext(ctx).Raw(`SELECT contest.* FROM contest
+JOIN comp_class cc ON cc.contest_id = contest.id
+HAVING
+	? BETWEEN MIN(cc.time_begin) AND MAX(cc.time_end)
+	OR MIN(cc.time_begin) BETWEEN ? AND ?`, time.Now(), earliestStartTime, latestStartTime).Scan(&records).Error
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	contests := make([]domain.Contest, 0)
+
+	for _, record := range records {
+		contests = append(contests, record.toDomain())
+	}
+
+	return contests, nil
+}

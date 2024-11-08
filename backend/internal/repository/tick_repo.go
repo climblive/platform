@@ -76,6 +76,23 @@ func (d *Database) GetTicksByContender(ctx context.Context, tx domain.Transactio
 	return ticks, nil
 }
 
+func (d *Database) GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error) {
+	var records []tickRecord
+
+	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM tick WHERE contest_id = ?`, contestID).Scan(&records).Error
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	ticks := make([]domain.Tick, 0)
+
+	for _, record := range records {
+		ticks = append(ticks, record.toDomain())
+	}
+
+	return ticks, nil
+}
+
 func (d *Database) StoreTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error) {
 	var err error
 	var record tickRecord = tickRecord{}.fromDomain(tick)
