@@ -9,15 +9,16 @@ import (
 )
 
 type contenderRecord struct {
-	ID               *int `gorm:"primaryKey;autoIncrement"`
-	OrganizerID      int
-	ContestID        int
-	RegistrationCode string
-	Name             *string
-	Club             *string
-	ClassID          *int
-	Entered          *time.Time
-	Disqualified     bool
+	ID                  *int `gorm:"primaryKey;autoIncrement"`
+	OrganizerID         int
+	ContestID           int
+	RegistrationCode    string
+	Name                *string
+	Club                *string
+	ClassID             *int
+	Entered             *time.Time
+	Disqualified        bool
+	WithdrawnFromFinals bool
 }
 
 func (contenderRecord) TableName() string {
@@ -26,15 +27,16 @@ func (contenderRecord) TableName() string {
 
 func (r contenderRecord) fromDomain(contender domain.Contender) contenderRecord {
 	return contenderRecord{
-		ID:               e2n(int(contender.ID)),
-		OrganizerID:      int(contender.Ownership.OrganizerID),
-		ContestID:        int(contender.ContestID),
-		RegistrationCode: contender.RegistrationCode,
-		Name:             e2n(contender.Name),
-		Club:             e2n(contender.ClubName),
-		ClassID:          e2n(int(contender.CompClassID)),
-		Entered:          contender.Entered,
-		Disqualified:     contender.Disqualified,
+		ID:                  e2n(int(contender.ID)),
+		OrganizerID:         int(contender.Ownership.OrganizerID),
+		ContestID:           int(contender.ContestID),
+		RegistrationCode:    contender.RegistrationCode,
+		Name:                e2n(contender.Name),
+		Club:                e2n(contender.ClubName),
+		ClassID:             e2n(int(contender.CompClassID)),
+		Entered:             contender.Entered,
+		Disqualified:        contender.Disqualified,
+		WithdrawnFromFinals: contender.WithdrawnFromFinals,
 	}
 }
 
@@ -52,7 +54,7 @@ func (r *contenderRecord) toDomain() domain.Contender {
 		ClubName:            n2e(r.Club),
 		CompClassID:         domain.CompClassID(n2e(r.ClassID)),
 		Entered:             r.Entered,
-		WithdrawnFromFinals: false,
+		WithdrawnFromFinals: r.WithdrawnFromFinals,
 		Disqualified:        r.Disqualified,
 		Score:               0,
 		Placement:           0,
