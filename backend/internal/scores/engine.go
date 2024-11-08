@@ -42,7 +42,9 @@ func NewScoreEngine(contestID domain.ContestID, eventBroker domain.EventBroker, 
 	return engine
 }
 
-func (e *ScoreEngine) Run(ctx context.Context) {
+func (e *ScoreEngine) Run(ctx context.Context) <-chan int {
+	control := make(chan int)
+
 	filter := domain.NewEventFilter(
 		e.contestID,
 		0,
@@ -58,39 +60,46 @@ func (e *ScoreEngine) Run(ctx context.Context) {
 		"PROBLEM_UPDATED",
 		"PROBLEM_DELETED",
 	)
-	subscriptionID, eventReader := e.eventBroker.Subscribe(filter, 0)
 
-	defer e.eventBroker.Unsubscribe(subscriptionID)
+	go func() {
+		subscriptionID, eventReader := e.eventBroker.Subscribe(filter, 0)
 
-	for {
-		event, err := eventReader.AwaitEvent(ctx)
-		if err != nil {
-			panic(err)
+		defer e.eventBroker.Unsubscribe(subscriptionID)
+
+		control <- 1
+
+		for {
+			event, err := eventReader.AwaitEvent(ctx)
+			if err != nil {
+				panic(err)
+			}
+
+			switch ev := event.Data.(type) {
+			case domain.ContenderEnteredEvent:
+				e.HandleContenderEntered(ev)
+			case domain.ContenderSwitchedClassEvent:
+				e.HandleContenderSwitchedClass(ev)
+			case domain.ContenderWithdrewFromFinalsEvent:
+				e.HandleContenderWithdrewFromFinals(ev)
+			case domain.ContenderReenteredFinalsEvent:
+				e.HandleContenderReenteredFinals(ev)
+			case domain.ContenderDisqualifiedEvent:
+				e.HandleContenderDisqualified(ev)
+			case domain.ContenderRequalifiedEvent:
+				e.HandleContenderRequalified(ev)
+			case domain.AscentRegisteredEvent:
+				e.HandleAscentRegistered(ev)
+			case domain.AscentDeregisteredEvent:
+				e.HandleAscentDeregistered(ev)
+			case domain.ProblemAddedEvent:
+				e.HandleProblemAdded(ev)
+			case domain.ProblemUpdatedEvent, domain.ProblemDeletedEvent:
+				slog.Warn("discarding unsupported event", "event", event)
+			}
 		}
+	}()
 
-		switch ev := event.Data.(type) {
-		case domain.ContenderEnteredEvent:
-			e.HandleContenderEntered(ev)
-		case domain.ContenderSwitchedClassEvent:
-			e.HandleContenderSwitchedClass(ev)
-		case domain.ContenderWithdrewFromFinalsEvent:
-			e.HandleContenderWithdrewFromFinals(ev)
-		case domain.ContenderReenteredFinalsEvent:
-			e.HandleContenderReenteredFinals(ev)
-		case domain.ContenderDisqualifiedEvent:
-			e.HandleContenderDisqualified(ev)
-		case domain.ContenderRequalifiedEvent:
-			e.HandleContenderRequalified(ev)
-		case domain.AscentRegisteredEvent:
-			e.HandleAscentRegistered(ev)
-		case domain.AscentDeregisteredEvent:
-			e.HandleAscentDeregistered(ev)
-		case domain.ProblemAddedEvent:
-			e.HandleProblemAdded(ev)
-		case domain.ProblemUpdatedEvent, domain.ProblemDeletedEvent:
-			slog.Warn("discarding unsupported event", "event", event)
-		}
-	}
+	return control
 }
 
 func (e *ScoreEngine) HandleContenderEntered(event domain.ContenderEnteredEvent) {
