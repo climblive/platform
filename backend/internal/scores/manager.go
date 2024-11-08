@@ -52,9 +52,12 @@ func (mngr *ScoreEngineManager) pollContests(ctx context.Context) {
 			continue
 		}
 
-		engine := NewScoreEngine(contest.ID, mngr.eventBroker, &HardestProblems{Number: 5}, NewBasicRanker(3))
+		engine := NewScoreEngine(contest.ID, mngr.eventBroker, &HardestProblems{Number: contest.QualifyingProblems}, NewBasicRanker(contest.Finalists))
 
-		slog.Info("spinning up score engine", "contest_id", contest.ID)
+		slog.Info("spinning up score engine",
+			"contest_id", contest.ID,
+			"qualifying_problems", contest.QualifyingProblems,
+			"finalists", contest.Finalists)
 		go engine.Run(context.Background())
 		mngr.running[contest.ID] = struct{}{}
 
@@ -63,6 +66,7 @@ func (mngr *ScoreEngineManager) pollContests(ctx context.Context) {
 			panic(err)
 		}
 
+		slog.Info("re-playing problem events", "count", len(problems))
 		for problem := range slices.Values(problems) {
 			mngr.eventBroker.Dispatch(1, domain.ProblemAddedEvent{
 				ProblemID:  problem.ID,
@@ -77,6 +81,7 @@ func (mngr *ScoreEngineManager) pollContests(ctx context.Context) {
 			panic(err)
 		}
 
+		slog.Info("re-playing contender events", "count", len(contenders))
 		for contender := range slices.Values(contenders) {
 			mngr.eventBroker.Dispatch(1, domain.ContenderEnteredEvent{
 				ContenderID: contender.ID,
@@ -101,6 +106,7 @@ func (mngr *ScoreEngineManager) pollContests(ctx context.Context) {
 			panic(err)
 		}
 
+		slog.Info("re-playing tick events", "count", len(ticks))
 		for tick := range slices.Values(ticks) {
 			mngr.eventBroker.Dispatch(1, domain.AscentRegisteredEvent{
 				ContenderID:  *tick.Ownership.ContenderID,

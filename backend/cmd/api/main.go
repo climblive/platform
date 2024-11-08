@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
+	"log/slog"
 	"math/rand"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/authorizer"
 	"github.com/climblive/platform/backend/internal/events"
@@ -38,7 +40,12 @@ func HandleCORSPreFlight(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	fmt.Println("Hello, Climbers!")
+	startTime := time.Now()
+
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+
+	slog.SetDefault(logger)
+
 	ctx := context.Background()
 
 	repo, err := repository.NewDatabase("climblive", "secretpassword", "localhost", "climblive")
@@ -56,6 +63,7 @@ func main() {
 	go scoreKeeper.Run(ctx)
 
 	scoreEngineManager := scores.NewScoreEngineManager(repo, eventBroker)
+
 	scoreEngineManager.Run(ctx)
 
 	contenderUseCase := usecases.ContenderUseCase{
@@ -98,6 +106,7 @@ func main() {
 	rest.InstallTickHandler(mux, &tickUseCase)
 	rest.InstallEventHandler(mux, eventBroker)
 
+	slog.Info("initialized", "duration", time.Since(startTime))
 	err = http.ListenAndServe("localhost:8090", mux)
 	if err != nil {
 		if stack := utils.GetErrorStack(err); stack != "" {
