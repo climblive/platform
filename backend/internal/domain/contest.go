@@ -18,6 +18,8 @@ type Contest struct {
 	Finalists          int           `json:"finalists"`
 	Rules              string        `json:"rules,omitempty"`
 	GracePeriod        time.Duration `json:"gracePeriod"`
+	TimeBegin          *time.Time    `json:"timeBegin,omitempty"`
+	TimeEnd            *time.Time    `json:"timeEnd,omitempty"`
 }
 
 type ContestUseCase interface {

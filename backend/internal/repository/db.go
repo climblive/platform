@@ -26,7 +26,7 @@ func NewDatabase(username, password, host, database string) (*Database, error) {
 		host,
 		database)
 
-	var logLevel logger.LogLevel = logger.Info
+	var logLevel logger.LogLevel = logger.Warn
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logLevel),

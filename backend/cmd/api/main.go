@@ -2,11 +2,15 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
+	"log/slog"
 	"math/rand"
+	"net"
 	"net/http"
-	"slices"
+	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 
 	"github.com/climblive/platform/backend/internal/authorizer"
 	"github.com/climblive/platform/backend/internal/domain"
@@ -40,25 +44,68 @@ func HandleCORSPreFlight(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	fmt.Println("Hello, Climbers!")
-	ctx := context.Background()
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+
+	var barriers []*sync.WaitGroup
 
 	repo, err := repository.NewDatabase("climblive", "secretpassword", "localhost", "climblive")
 	if err != nil {
 		if stack := utils.GetErrorStack(err); stack != "" {
 			log.Println(stack)
 		}
+
 		panic(err)
 	}
 
 	authorizer := authorizer.NewAuthorizer(repo)
 	eventBroker := events.NewBroker()
 	scoreKeeper := scores.NewScoreKeeper(eventBroker)
+	scoreEngineManager := scores.NewScoreEngineManager(repo, eventBroker)
 
-	go scoreKeeper.Run(ctx)
+	barriers = append(barriers,
+		scoreKeeper.Run(ctx),
+		scoreEngineManager.Run(ctx))
 
-	startTestingScoreEngine(ctx, 1, repo, eventBroker)
+	mux := setupMux(repo, authorizer, eventBroker, scoreKeeper)
 
+	httpServer := &http.Server{
+		Addr:    "localhost:8090",
+		Handler: mux,
+		BaseContext: func(_ net.Listener) context.Context {
+			return ctx
+		},
+	}
+
+	context.AfterFunc(ctx, func() {
+		httpServer.Shutdown(context.Background())
+	})
+
+	err = httpServer.ListenAndServe()
+	switch err {
+	case http.ErrServerClosed:
+	default:
+		if stack := utils.GetErrorStack(err); stack != "" {
+			log.Println(stack)
+		}
+
+		panic(err)
+	}
+
+	for _, barrier := range barriers {
+		barrier.Wait()
+	}
+}
+
+func setupMux(
+	repo *repository.Database,
+	authorizer *authorizer.Authorizer,
+	eventBroker domain.EventBroker,
+	scoreKeeper domain.ScoreKeeper,
+) *rest.Mux {
 	contenderUseCase := usecases.ContenderUseCase{
 		Repo:                      repo,
 		Authorizer:                authorizer,
@@ -99,77 +146,5 @@ func main() {
 	rest.InstallTickHandler(mux, &tickUseCase)
 	rest.InstallEventHandler(mux, eventBroker)
 
-	err = http.ListenAndServe("localhost:8090", mux)
-	if err != nil {
-		if stack := utils.GetErrorStack(err); stack != "" {
-			log.Println(stack)
-		}
-
-		panic(err)
-	}
-}
-
-func startTestingScoreEngine(
-	ctx context.Context,
-	contestID domain.ContestID,
-	repo *repository.Database,
-	eventBroker domain.EventBroker,
-) {
-	engine := scores.NewScoreEngine(contestID, eventBroker, &scores.HardestProblems{Number: 5}, scores.NewBasicRanker(3))
-
-	go engine.Run(context.Background())
-
-	problems, err := repo.GetProblemsByContest(ctx, nil, 1)
-	if err != nil {
-		panic(err)
-	}
-
-	for problem := range slices.Values(problems) {
-		eventBroker.Dispatch(1, domain.ProblemAddedEvent{
-			ProblemID:  problem.ID,
-			PointsTop:  problem.PointsTop,
-			PointsZone: problem.PointsZone,
-			FlashBonus: problem.FlashBonus,
-		})
-	}
-
-	contenders, err := repo.GetContendersByContest(ctx, nil, 1)
-	if err != nil {
-		panic(err)
-	}
-
-	for contender := range slices.Values(contenders) {
-		eventBroker.Dispatch(1, domain.ContenderEnteredEvent{
-			ContenderID: contender.ID,
-			CompClassID: contender.CompClassID,
-		})
-
-		if contender.WithdrawnFromFinals {
-			eventBroker.Dispatch(1, domain.ContenderWithdrewFromFinalsEvent{
-				ContenderID: contender.ID,
-			})
-		}
-
-		if contender.Disqualified {
-			eventBroker.Dispatch(1, domain.ContenderDisqualifiedEvent{
-				ContenderID: contender.ID,
-			})
-		}
-
-		ticks, err := repo.GetTicksByContender(ctx, nil, contender.ID)
-		if err != nil {
-			panic(err)
-		}
-
-		for tick := range slices.Values(ticks) {
-			eventBroker.Dispatch(1, domain.AscentRegisteredEvent{
-				ContenderID:  contender.ID,
-				ProblemID:    tick.ProblemID,
-				Top:          tick.Top,
-				AttemptsTop:  tick.AttemptsTop,
-				Zone:         tick.Zone,
-				AttemptsZone: tick.AttemptsTop,
-			})
-		}
-	}
+	return mux
 }
