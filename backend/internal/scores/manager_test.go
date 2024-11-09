@@ -44,6 +44,8 @@ func TestScoreEngineManager(t *testing.T) {
 		mockedContenderID := domain.ContenderID(rand.Int())
 		mockedCompClassID := domain.CompClassID(rand.Int())
 
+		now := time.Now()
+
 		mockedEventBroker.
 			On("Subscribe", mock.Anything, mock.Anything).
 			Return(domain.SubscriptionID(uuid.New()), events.NewSubscription(domain.EventFilter{}, 1000))
@@ -55,6 +57,8 @@ func TestScoreEngineManager(t *testing.T) {
 					ID:                 mockedContestID,
 					QualifyingProblems: 10,
 					Finalists:          7,
+					TimeBegin:          &now,
+					TimeEnd:            &now,
 				},
 			}, nil)
 
