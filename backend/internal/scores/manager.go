@@ -96,7 +96,7 @@ func (mngr *ScoreEngineManager) poll(ctx context.Context) {
 
 		startTime := time.Now()
 
-		logger.Info("revving up score engine",
+		logger.Info("creating score engine",
 			"qualifying_problems", contest.QualifyingProblems,
 			"finalists", contest.Finalists)
 
