@@ -21,6 +21,8 @@ type contestRecord struct {
 	Finalists          int
 	Rules              *string
 	GracePeriod        int
+	TimeBegin          *time.Time
+	TimeEnd            *time.Time
 }
 
 func (contestRecord) TableName() string {
@@ -60,12 +62,16 @@ func (r *contestRecord) toDomain() domain.Contest {
 		Finalists:          r.Finalists,
 		Rules:              n2e(r.Rules),
 		GracePeriod:        time.Duration(r.GracePeriod) * time.Second,
+		TimeBegin:          r.TimeBegin,
+		TimeEnd:            r.TimeEnd,
 	}
 }
 
 func (d *Database) GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error) {
 	var record contestRecord
-	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contest WHERE id = ?`, contestID).Scan(&record).Error
+	err := d.tx(tx).WithContext(ctx).Raw(`SELECT contest.*, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end FROM contest
+LEFT JOIN comp_class cc ON cc.contest_id = contest.id
+WHERE contest.id = ?`, contestID).Scan(&record).Error
 	if err != nil {
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
@@ -80,7 +86,7 @@ func (d *Database) GetContest(ctx context.Context, tx domain.Transaction, contes
 func (d *Database) GetContestsRunningOrAboutToStart(ctx context.Context, tx domain.Transaction, earliestStartTime, latestStartTime time.Time) ([]domain.Contest, error) {
 	var records []contestRecord
 
-	err := d.tx(tx).WithContext(ctx).Raw(`SELECT contest.* FROM contest
+	err := d.tx(tx).WithContext(ctx).Raw(`SELECT contest.*, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end FROM contest
 JOIN comp_class cc ON cc.contest_id = contest.id
 HAVING
 	? BETWEEN MIN(cc.time_begin) AND MAX(cc.time_end)

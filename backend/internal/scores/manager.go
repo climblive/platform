@@ -82,7 +82,7 @@ func (mngr *ScoreEngineManager) Run(ctx context.Context) *sync.WaitGroup {
 
 func (mngr *ScoreEngineManager) poll(ctx context.Context) {
 	now := time.Now()
-	contests, err := mngr.repo.GetContestsRunningOrAboutToStart(ctx, nil, now.Add(-1*time.Hour), now.Add(time.Hour))
+	contests, err := mngr.repo.GetContestsRunningOrAboutToStart(ctx, nil, now, now.Add(time.Hour))
 	if err != nil {
 		panic(err)
 	}
@@ -97,6 +97,7 @@ func (mngr *ScoreEngineManager) poll(ctx context.Context) {
 		startTime := time.Now()
 
 		logger.Info("preparing score engine",
+			"starting_in", contest.TimeBegin.Sub(now),
 			slog.Group("config",
 				"qualifying_problems", contest.QualifyingProblems,
 				"finalists", contest.Finalists))
@@ -111,8 +112,6 @@ func (mngr *ScoreEngineManager) poll(ctx context.Context) {
 			cancel: cancel,
 			wg:     wg,
 		}
-
-		logger.Info("score engine ready for hydration")
 
 		stats := mngr.hydrateEngine(ctx, contest.ID)
 
