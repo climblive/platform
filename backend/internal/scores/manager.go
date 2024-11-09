@@ -126,7 +126,7 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) error {
 
 			handler.cancel()
 
-			return errors.Wrap(err, 0)
+			continue
 		}
 
 		logger.Info("score engine hydration complete",
