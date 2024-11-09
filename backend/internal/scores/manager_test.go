@@ -127,7 +127,6 @@ func TestScoreEngineManager(t *testing.T) {
 		mngr := scores.NewScoreEngineManager(mockedRepo, mockedEventBroker)
 
 		ctx, cancel := context.WithCancel(context.Background())
-		defer cancel()
 
 		wg := mngr.Run(ctx)
 
