@@ -43,18 +43,15 @@ func NewScoreEngineManager(repo scoreEngineManagerRepository, eventBroker domain
 
 func (mngr *ScoreEngineManager) Run(ctx context.Context) *sync.WaitGroup {
 	wg := new(sync.WaitGroup)
-	ready := make(chan struct{}, 1)
 
 	wg.Add(1)
 
-	go mngr.run(ctx, wg, ready)
-
-	<-ready
+	go mngr.run(ctx, wg)
 
 	return wg
 }
 
-func (mngr *ScoreEngineManager) run(ctx context.Context, wg *sync.WaitGroup, ready chan struct{}) {
+func (mngr *ScoreEngineManager) run(ctx context.Context, wg *sync.WaitGroup) {
 	defer func() {
 		if r := recover(); r != nil {
 			slog.Error("score engine manager panicked", "error", r)
@@ -63,16 +60,10 @@ func (mngr *ScoreEngineManager) run(ctx context.Context, wg *sync.WaitGroup, rea
 
 	defer wg.Done()
 
-	signalReady := sync.OnceFunc(func() {
-		close(ready)
-	})
-
 	for {
 		err := mngr.runPeriodicCheck(ctx)
 		if err != nil {
 			slog.Error("score engine manager failed to complete periodic check", "error", err)
-		} else {
-			signalReady()
 		}
 
 		sleepTimer := time.NewTimer(pollInterval)
