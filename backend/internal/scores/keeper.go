@@ -2,6 +2,8 @@ package scores
 
 import (
 	"context"
+	"log/slog"
+	"sync"
 
 	"github.com/climblive/platform/backend/internal/domain"
 )
@@ -18,20 +20,48 @@ func NewScoreKeeper(eventBroker domain.EventBroker) *Keeper {
 	}
 }
 
-func (k *Keeper) Run(ctx context.Context) {
+func (k *Keeper) Run(ctx context.Context) *sync.WaitGroup {
+	wg := new(sync.WaitGroup)
+	ready := make(chan struct{}, 1)
+
 	filter := domain.NewEventFilter(
 		0,
 		0,
 		"CONTENDER_SCORE_UPDATED",
 	)
 
-	subscriptionID, eventReader := k.eventBroker.Subscribe(filter, 0)
+	wg.Add(1)
 
+	go k.run(ctx, filter, wg, ready)
+
+	<-ready
+
+	return wg
+}
+
+func (k *Keeper) run(ctx context.Context, filter domain.EventFilter, wg *sync.WaitGroup, ready chan<- struct{}) {
+	defer func() {
+		if r := recover(); r != nil {
+			slog.Error("score keeper paniced", "error", r)
+		}
+	}()
+
+	defer wg.Done()
+
+	subscriptionID, eventReader := k.eventBroker.Subscribe(filter, 0)
 	defer k.eventBroker.Unsubscribe(subscriptionID)
+
+	ready <- struct{}{}
 
 	for {
 		event, err := eventReader.AwaitEvent(ctx)
-		if err != nil {
+		switch err {
+		case nil:
+		case context.Canceled, context.DeadlineExceeded:
+			slog.Info("score keeper shutting down", "reason", err.Error())
+
+			return
+		default:
 			panic(err)
 		}
 

@@ -5,11 +5,15 @@ import (
 	"log"
 	"log/slog"
 	"math/rand"
+	"net"
 	"net/http"
 	"os"
-	"time"
+	"os/signal"
+	"sync"
+	"syscall"
 
 	"github.com/climblive/platform/backend/internal/authorizer"
+	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/events"
 	"github.com/climblive/platform/backend/internal/handlers/rest"
 	"github.com/climblive/platform/backend/internal/repository"
@@ -40,19 +44,20 @@ func HandleCORSPreFlight(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	startTime := time.Now()
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
 
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-
 	slog.SetDefault(logger)
 
-	ctx := context.Background()
+	var barriers []*sync.WaitGroup
 
 	repo, err := repository.NewDatabase("climblive", "secretpassword", "localhost", "climblive")
 	if err != nil {
 		if stack := utils.GetErrorStack(err); stack != "" {
 			log.Println(stack)
 		}
+
 		panic(err)
 	}
 
@@ -60,12 +65,48 @@ func main() {
 	eventBroker := events.NewBroker()
 	scoreKeeper := scores.NewScoreKeeper(eventBroker)
 
-	go scoreKeeper.Run(ctx)
+	barriers = append(barriers, scoreKeeper.Run(ctx))
 
 	scoreEngineManager := scores.NewScoreEngineManager(repo, eventBroker)
 
-	scoreEngineManager.Run(ctx)
+	barriers = append(barriers, scoreEngineManager.Run(ctx))
 
+	mux := setupMux(repo, authorizer, eventBroker, scoreKeeper)
+
+	httpServer := &http.Server{
+		Addr:    "localhost:8090",
+		Handler: mux,
+		BaseContext: func(_ net.Listener) context.Context {
+			return ctx
+		},
+	}
+
+	context.AfterFunc(ctx, func() {
+		httpServer.Shutdown(context.Background())
+	})
+
+	err = httpServer.ListenAndServe()
+	switch err {
+	case http.ErrServerClosed:
+	default:
+		if stack := utils.GetErrorStack(err); stack != "" {
+			log.Println(stack)
+		}
+
+		panic(err)
+	}
+
+	for _, barrier := range barriers {
+		barrier.Wait()
+	}
+}
+
+func setupMux(
+	repo *repository.Database,
+	authorizer *authorizer.Authorizer,
+	eventBroker domain.EventBroker,
+	scoreKeeper domain.ScoreKeeper,
+) *rest.Mux {
 	contenderUseCase := usecases.ContenderUseCase{
 		Repo:                      repo,
 		Authorizer:                authorizer,
@@ -106,13 +147,5 @@ func main() {
 	rest.InstallTickHandler(mux, &tickUseCase)
 	rest.InstallEventHandler(mux, eventBroker)
 
-	slog.Info("initialized", "duration", time.Since(startTime))
-	err = http.ListenAndServe("localhost:8090", mux)
-	if err != nil {
-		if stack := utils.GetErrorStack(err); stack != "" {
-			log.Println(stack)
-		}
-
-		panic(err)
-	}
+	return mux
 }

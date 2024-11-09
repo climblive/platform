@@ -3,11 +3,15 @@ package scores
 import (
 	"context"
 	"log/slog"
+	"maps"
 	"slices"
+	"sync"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 )
+
+const pollInterval = 10 * time.Second
 
 type scoreEngineManagerRepository interface {
 	GetContestsRunningOrAboutToStart(ctx context.Context, tx domain.Transaction, earliestStartTime, latestStartTime time.Time) ([]domain.Contest, error)
@@ -19,28 +23,64 @@ type scoreEngineManagerRepository interface {
 type ScoreEngineManager struct {
 	repo        scoreEngineManagerRepository
 	eventBroker domain.EventBroker
-	running     map[domain.ContestID]struct{}
+	engines     map[domain.ContestID]managedEngine
+}
+
+type managedEngine struct {
+	engine *ScoreEngine
+	cancel func()
+	wg     *sync.WaitGroup
 }
 
 func NewScoreEngineManager(repo scoreEngineManagerRepository, eventBroker domain.EventBroker) ScoreEngineManager {
 	return ScoreEngineManager{
 		repo:        repo,
 		eventBroker: eventBroker,
-		running:     make(map[domain.ContestID]struct{}),
+		engines:     make(map[domain.ContestID]managedEngine),
 	}
 }
 
-func (mngr *ScoreEngineManager) Run(ctx context.Context) {
-	go func() {
-		for {
-			mngr.pollContests(ctx)
+func (mngr *ScoreEngineManager) Run(ctx context.Context) *sync.WaitGroup {
+	wg := new(sync.WaitGroup)
+	ready := make(chan struct{}, 1)
 
-			time.Sleep(10 * time.Second)
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+
+		mngr.poll(ctx)
+		ready <- struct{}{}
+
+		for {
+			sleepTimer := time.NewTimer(pollInterval)
+
+			select {
+			case <-ctx.Done():
+				slog.Info("score engine manager shutting down", "reason", ctx.Err().Error())
+
+				for managedEngine := range maps.Values(mngr.engines) {
+					managedEngine.cancel()
+				}
+
+				for managedEngine := range maps.Values(mngr.engines) {
+					managedEngine.wg.Wait()
+				}
+
+				return
+			case <-sleepTimer.C:
+			}
+
+			mngr.poll(ctx)
 		}
 	}()
+
+	<-ready
+
+	return wg
 }
 
-func (mngr *ScoreEngineManager) pollContests(ctx context.Context) {
+func (mngr *ScoreEngineManager) poll(ctx context.Context) {
 	now := time.Now()
 	contests, err := mngr.repo.GetContestsRunningOrAboutToStart(ctx, nil, now.Add(-1*time.Hour), now.Add(time.Hour))
 	if err != nil {
@@ -48,7 +88,7 @@ func (mngr *ScoreEngineManager) pollContests(ctx context.Context) {
 	}
 
 	for contest := range slices.Values(contests) {
-		if _, ok := mngr.running[contest.ID]; ok {
+		if _, ok := mngr.engines[contest.ID]; ok {
 			continue
 		}
 
@@ -56,76 +96,100 @@ func (mngr *ScoreEngineManager) pollContests(ctx context.Context) {
 
 		startTime := time.Now()
 
-		engine := NewScoreEngine(contest.ID, mngr.eventBroker, &HardestProblems{Number: contest.QualifyingProblems}, NewBasicRanker(contest.Finalists))
-
-		logger.Info("launching score engine",
-			"contest_id", contest.ID,
+		logger.Info("revving up score engine",
 			"qualifying_problems", contest.QualifyingProblems,
 			"finalists", contest.Finalists)
-		controlChannel := engine.Run(context.Background())
-		mngr.running[contest.ID] = struct{}{}
 
-		<-controlChannel
+		engine := NewScoreEngine(contest.ID, mngr.eventBroker, &HardestProblems{Number: contest.QualifyingProblems}, NewBasicRanker(contest.Finalists))
 
-		problems, err := mngr.repo.GetProblemsByContest(ctx, nil, contest.ID)
-		if err != nil {
-			panic(err)
+		cancellableCtx, cancel := context.WithCancel(ctx)
+		wg := engine.Run(cancellableCtx)
+
+		mngr.engines[contest.ID] = managedEngine{
+			engine: engine,
+			cancel: cancel,
+			wg:     wg,
 		}
 
-		for problem := range slices.Values(problems) {
-			mngr.eventBroker.Dispatch(1, domain.ProblemAddedEvent{
-				ProblemID:  problem.ID,
-				PointsTop:  problem.PointsTop,
-				PointsZone: problem.PointsZone,
-				FlashBonus: problem.FlashBonus,
-			})
-		}
+		logger.Info("score engine ready for hydration")
 
-		contenders, err := mngr.repo.GetContendersByContest(ctx, nil, contest.ID)
-		if err != nil {
-			panic(err)
-		}
-
-		for contender := range slices.Values(contenders) {
-			mngr.eventBroker.Dispatch(1, domain.ContenderEnteredEvent{
-				ContenderID: contender.ID,
-				CompClassID: contender.CompClassID,
-			})
-
-			if contender.WithdrawnFromFinals {
-				mngr.eventBroker.Dispatch(1, domain.ContenderWithdrewFromFinalsEvent{
-					ContenderID: contender.ID,
-				})
-			}
-
-			if contender.Disqualified {
-				mngr.eventBroker.Dispatch(1, domain.ContenderDisqualifiedEvent{
-					ContenderID: contender.ID,
-				})
-			}
-		}
-
-		ticks, err := mngr.repo.GetTicksByContest(ctx, nil, contest.ID)
-		if err != nil {
-			panic(err)
-		}
-
-		for tick := range slices.Values(ticks) {
-			mngr.eventBroker.Dispatch(1, domain.AscentRegisteredEvent{
-				ContenderID:  *tick.Ownership.ContenderID,
-				ProblemID:    tick.ProblemID,
-				Top:          tick.Top,
-				AttemptsTop:  tick.AttemptsTop,
-				Zone:         tick.Zone,
-				AttemptsZone: tick.AttemptsTop,
-			})
-		}
+		stats := mngr.hydrateEngine(ctx, contest.ID)
 
 		logger.Info("score engine hydration complete",
 			"time", time.Since(startTime),
-			"contenders", len(contenders),
-			"problems", len(problems),
-			"ticks", len(ticks),
+			slog.Group("stats",
+				"contenders", stats.contenders,
+				"problems", stats.problems,
+				"ticks", stats.ticks,
+			),
 		)
+	}
+}
+
+type hydrationStats struct {
+	contenders int
+	problems   int
+	ticks      int
+}
+
+func (mngr *ScoreEngineManager) hydrateEngine(ctx context.Context, contestID domain.ContestID) hydrationStats {
+	problems, err := mngr.repo.GetProblemsByContest(ctx, nil, contestID)
+	if err != nil {
+		panic(err)
+	}
+
+	for problem := range slices.Values(problems) {
+		mngr.eventBroker.Dispatch(1, domain.ProblemAddedEvent{
+			ProblemID:  problem.ID,
+			PointsTop:  problem.PointsTop,
+			PointsZone: problem.PointsZone,
+			FlashBonus: problem.FlashBonus,
+		})
+	}
+
+	contenders, err := mngr.repo.GetContendersByContest(ctx, nil, contestID)
+	if err != nil {
+		panic(err)
+	}
+
+	for contender := range slices.Values(contenders) {
+		mngr.eventBroker.Dispatch(1, domain.ContenderEnteredEvent{
+			ContenderID: contender.ID,
+			CompClassID: contender.CompClassID,
+		})
+
+		if contender.WithdrawnFromFinals {
+			mngr.eventBroker.Dispatch(1, domain.ContenderWithdrewFromFinalsEvent{
+				ContenderID: contender.ID,
+			})
+		}
+
+		if contender.Disqualified {
+			mngr.eventBroker.Dispatch(1, domain.ContenderDisqualifiedEvent{
+				ContenderID: contender.ID,
+			})
+		}
+	}
+
+	ticks, err := mngr.repo.GetTicksByContest(ctx, nil, contestID)
+	if err != nil {
+		panic(err)
+	}
+
+	for tick := range slices.Values(ticks) {
+		mngr.eventBroker.Dispatch(1, domain.AscentRegisteredEvent{
+			ContenderID:  *tick.Ownership.ContenderID,
+			ProblemID:    tick.ProblemID,
+			Top:          tick.Top,
+			AttemptsTop:  tick.AttemptsTop,
+			Zone:         tick.Zone,
+			AttemptsZone: tick.AttemptsTop,
+		})
+	}
+
+	return hydrationStats{
+		contenders: len(contenders),
+		problems:   len(problems),
+		ticks:      len(ticks),
 	}
 }
