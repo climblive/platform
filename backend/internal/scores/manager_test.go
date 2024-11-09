@@ -14,7 +14,7 @@ import (
 )
 
 func TestScoreEngineManager(t *testing.T) {
-	t.Run("StartStop", func(t *testing.T) {
+	t.Run("StartAndStop", func(t *testing.T) {
 		mockedRepo := new(repositoryMock)
 		mockedEventBroker := new(eventBrokerMock)
 
