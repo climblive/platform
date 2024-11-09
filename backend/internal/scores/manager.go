@@ -139,7 +139,7 @@ func (mngr *ScoreEngineManager) hydrateEngine(ctx context.Context, contestID dom
 	}
 
 	for problem := range slices.Values(problems) {
-		mngr.eventBroker.Dispatch(1, domain.ProblemAddedEvent{
+		mngr.eventBroker.Dispatch(contestID, domain.ProblemAddedEvent{
 			ProblemID:  problem.ID,
 			PointsTop:  problem.PointsTop,
 			PointsZone: problem.PointsZone,
@@ -153,19 +153,19 @@ func (mngr *ScoreEngineManager) hydrateEngine(ctx context.Context, contestID dom
 	}
 
 	for contender := range slices.Values(contenders) {
-		mngr.eventBroker.Dispatch(1, domain.ContenderEnteredEvent{
+		mngr.eventBroker.Dispatch(contestID, domain.ContenderEnteredEvent{
 			ContenderID: contender.ID,
 			CompClassID: contender.CompClassID,
 		})
 
 		if contender.WithdrawnFromFinals {
-			mngr.eventBroker.Dispatch(1, domain.ContenderWithdrewFromFinalsEvent{
+			mngr.eventBroker.Dispatch(contestID, domain.ContenderWithdrewFromFinalsEvent{
 				ContenderID: contender.ID,
 			})
 		}
 
 		if contender.Disqualified {
-			mngr.eventBroker.Dispatch(1, domain.ContenderDisqualifiedEvent{
+			mngr.eventBroker.Dispatch(contestID, domain.ContenderDisqualifiedEvent{
 				ContenderID: contender.ID,
 			})
 		}
@@ -177,13 +177,13 @@ func (mngr *ScoreEngineManager) hydrateEngine(ctx context.Context, contestID dom
 	}
 
 	for tick := range slices.Values(ticks) {
-		mngr.eventBroker.Dispatch(1, domain.AscentRegisteredEvent{
+		mngr.eventBroker.Dispatch(contestID, domain.AscentRegisteredEvent{
 			ContenderID:  *tick.Ownership.ContenderID,
 			ProblemID:    tick.ProblemID,
 			Top:          tick.Top,
 			AttemptsTop:  tick.AttemptsTop,
 			Zone:         tick.Zone,
-			AttemptsZone: tick.AttemptsTop,
+			AttemptsZone: tick.AttemptsZone,
 		})
 	}
 
