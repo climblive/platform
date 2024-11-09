@@ -115,7 +115,7 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) error {
 
 		switch {
 		case contest.TimeBegin != nil && contest.TimeBegin.After(now):
-			logger.Info("detected contest about to start", "starting_in", (*contest.TimeBegin).Sub(now), config)
+			logger.Info("detected contest about to start", "starting_in", time.Until(*contest.TimeBegin), config)
 		default:
 			logger.Info("detected contest that is currently running", config)
 		}
