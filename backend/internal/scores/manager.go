@@ -92,7 +92,7 @@ func (mngr *ScoreEngineManager) poll(ctx context.Context) {
 			continue
 		}
 
-		logger := slog.New(slog.Default().Handler()).With("contest_id", int(contest.ID))
+		logger := slog.New(slog.Default().Handler()).With("contest_id", contest.ID)
 
 		startTime := time.Now()
 
