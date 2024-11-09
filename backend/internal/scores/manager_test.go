@@ -49,7 +49,7 @@ func TestScoreEngineManager(t *testing.T) {
 			Return(domain.SubscriptionID(uuid.New()), events.NewSubscription(domain.EventFilter{}, 1000))
 
 		mockedRepo.
-			On("GetContestsRunningOrAboutToStart", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+			On("GetContestsRunningOrAboutToStart", mock.Anything, mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
 			Return([]domain.Contest{
 				{
 					ID:                 mockedContestID,
