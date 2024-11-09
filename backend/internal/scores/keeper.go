@@ -42,7 +42,7 @@ func (k *Keeper) Run(ctx context.Context) *sync.WaitGroup {
 func (k *Keeper) run(ctx context.Context, filter domain.EventFilter, wg *sync.WaitGroup, ready chan<- struct{}) {
 	defer func() {
 		if r := recover(); r != nil {
-			slog.Error("score keeper paniced", "error", r)
+			slog.Error("score keeper panicked", "error", r)
 		}
 	}()
 
