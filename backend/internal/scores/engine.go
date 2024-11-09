@@ -67,14 +67,14 @@ func (e *ScoreEngine) Run(ctx context.Context) *sync.WaitGroup {
 		"PROBLEM_DELETED",
 	)
 
-	go e.processEvents(ctx, filter, wg, ready)
+	go e.run(ctx, filter, wg, ready)
 
 	<-ready
 
 	return wg
 }
 
-func (e *ScoreEngine) processEvents(ctx context.Context, filter domain.EventFilter, wg *sync.WaitGroup, ready chan<- struct{}) {
+func (e *ScoreEngine) run(ctx context.Context, filter domain.EventFilter, wg *sync.WaitGroup, ready chan<- struct{}) {
 	defer func() {
 		if r := recover(); r != nil {
 			e.logger.Error("score engine panicked", "error", r)

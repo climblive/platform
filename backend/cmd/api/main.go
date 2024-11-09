@@ -64,12 +64,11 @@ func main() {
 	authorizer := authorizer.NewAuthorizer(repo)
 	eventBroker := events.NewBroker()
 	scoreKeeper := scores.NewScoreKeeper(eventBroker)
-
-	barriers = append(barriers, scoreKeeper.Run(ctx))
-
 	scoreEngineManager := scores.NewScoreEngineManager(repo, eventBroker)
 
-	barriers = append(barriers, scoreEngineManager.Run(ctx))
+	barriers = append(barriers,
+		scoreKeeper.Run(ctx),
+		scoreEngineManager.Run(ctx))
 
 	mux := setupMux(repo, authorizer, eventBroker, scoreKeeper)
 

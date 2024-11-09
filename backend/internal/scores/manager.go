@@ -23,10 +23,10 @@ type scoreEngineManagerRepository interface {
 type ScoreEngineManager struct {
 	repo        scoreEngineManagerRepository
 	eventBroker domain.EventBroker
-	engines     map[domain.ContestID]managedEngine
+	handlers    map[domain.ContestID]engineHandler
 }
 
-type managedEngine struct {
+type engineHandler struct {
 	engine *ScoreEngine
 	cancel func()
 	wg     *sync.WaitGroup
@@ -36,7 +36,7 @@ func NewScoreEngineManager(repo scoreEngineManagerRepository, eventBroker domain
 	return ScoreEngineManager{
 		repo:        repo,
 		eventBroker: eventBroker,
-		engines:     make(map[domain.ContestID]managedEngine),
+		handlers:    make(map[domain.ContestID]engineHandler),
 	}
 }
 
@@ -59,12 +59,12 @@ func (mngr *ScoreEngineManager) Run(ctx context.Context) *sync.WaitGroup {
 			case <-ctx.Done():
 				slog.Info("score engine manager shutting down", "reason", ctx.Err().Error())
 
-				for managedEngine := range maps.Values(mngr.engines) {
-					managedEngine.cancel()
+				for handler := range maps.Values(mngr.handlers) {
+					handler.cancel()
 				}
 
-				for managedEngine := range maps.Values(mngr.engines) {
-					managedEngine.wg.Wait()
+				for handler := range maps.Values(mngr.handlers) {
+					handler.wg.Wait()
 				}
 
 				return
@@ -88,7 +88,7 @@ func (mngr *ScoreEngineManager) poll(ctx context.Context) {
 	}
 
 	for contest := range slices.Values(contests) {
-		if _, ok := mngr.engines[contest.ID]; ok {
+		if _, ok := mngr.handlers[contest.ID]; ok {
 			continue
 		}
 
@@ -96,16 +96,17 @@ func (mngr *ScoreEngineManager) poll(ctx context.Context) {
 
 		startTime := time.Now()
 
-		logger.Info("creating score engine",
-			"qualifying_problems", contest.QualifyingProblems,
-			"finalists", contest.Finalists)
+		logger.Info("preparing score engine",
+			slog.Group("config",
+				"qualifying_problems", contest.QualifyingProblems,
+				"finalists", contest.Finalists))
 
 		engine := NewScoreEngine(contest.ID, mngr.eventBroker, &HardestProblems{Number: contest.QualifyingProblems}, NewBasicRanker(contest.Finalists))
 
 		cancellableCtx, cancel := context.WithCancel(ctx)
 		wg := engine.Run(cancellableCtx)
 
-		mngr.engines[contest.ID] = managedEngine{
+		mngr.handlers[contest.ID] = engineHandler{
 			engine: engine,
 			cancel: cancel,
 			wg:     wg,
