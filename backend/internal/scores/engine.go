@@ -77,7 +77,7 @@ func (e *ScoreEngine) Run(ctx context.Context) *sync.WaitGroup {
 func (e *ScoreEngine) processEvents(ctx context.Context, filter domain.EventFilter, wg *sync.WaitGroup, ready chan<- struct{}) {
 	defer func() {
 		if r := recover(); r != nil {
-			e.logger.Error("score engine paniced", "error", r)
+			e.logger.Error("score engine panicked", "error", r)
 		}
 	}()
 
