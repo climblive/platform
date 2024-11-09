@@ -14,7 +14,7 @@ import (
 const pollInterval = 10 * time.Second
 
 type scoreEngineManagerRepository interface {
-	GetContestsRunningOrAboutToStart(ctx context.Context, tx domain.Transaction, earliestStartTime, latestStartTime time.Time) ([]domain.Contest, error)
+	GetContestsCurrentlyRunningOrByStartTime(ctx context.Context, tx domain.Transaction, earliestStartTime, latestStartTime time.Time) ([]domain.Contest, error)
 	GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Problem, error)
 	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error)
 	GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error)
@@ -82,7 +82,7 @@ func (mngr *ScoreEngineManager) Run(ctx context.Context) *sync.WaitGroup {
 
 func (mngr *ScoreEngineManager) poll(ctx context.Context) {
 	now := time.Now()
-	contests, err := mngr.repo.GetContestsRunningOrAboutToStart(ctx, nil, now, now.Add(time.Hour))
+	contests, err := mngr.repo.GetContestsCurrentlyRunningOrByStartTime(ctx, nil, now, now.Add(time.Hour))
 	if err != nil {
 		panic(err)
 	}

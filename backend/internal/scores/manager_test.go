@@ -19,7 +19,7 @@ func TestScoreEngineManager(t *testing.T) {
 		mockedEventBroker := new(eventBrokerMock)
 
 		mockedRepo.
-			On("GetContestsRunningOrAboutToStart", mock.Anything, mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
+			On("GetContestsCurrentlyRunningOrByStartTime", mock.Anything, mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
 			Return([]domain.Contest{}, nil)
 
 		mngr := scores.NewScoreEngineManager(mockedRepo, mockedEventBroker)
@@ -51,7 +51,7 @@ func TestScoreEngineManager(t *testing.T) {
 			Return(domain.SubscriptionID(uuid.New()), events.NewSubscription(domain.EventFilter{}, 1000))
 
 		mockedRepo.
-			On("GetContestsRunningOrAboutToStart", mock.Anything, mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
+			On("GetContestsCurrentlyRunningOrByStartTime", mock.Anything, mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
 			Return([]domain.Contest{
 				{
 					ID:                 mockedContestID,
@@ -146,7 +146,7 @@ type repositoryMock struct {
 	mock.Mock
 }
 
-func (m *repositoryMock) GetContestsRunningOrAboutToStart(ctx context.Context, tx domain.Transaction, earliestStartTime, latestStartTime time.Time) ([]domain.Contest, error) {
+func (m *repositoryMock) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context, tx domain.Transaction, earliestStartTime, latestStartTime time.Time) ([]domain.Contest, error) {
 	args := m.Called(ctx, tx, earliestStartTime, latestStartTime)
 	return args.Get(0).([]domain.Contest), args.Error(1)
 }

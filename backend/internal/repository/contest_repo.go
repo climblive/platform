@@ -83,7 +83,7 @@ WHERE contest.id = ?`, contestID).Scan(&record).Error
 	return record.toDomain(), nil
 }
 
-func (d *Database) GetContestsRunningOrAboutToStart(ctx context.Context, tx domain.Transaction, earliestStartTime, latestStartTime time.Time) ([]domain.Contest, error) {
+func (d *Database) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context, tx domain.Transaction, earliestStartTime, latestStartTime time.Time) ([]domain.Contest, error) {
 	var records []contestRecord
 
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT contest.*, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end FROM contest
