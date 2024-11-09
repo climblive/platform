@@ -35,7 +35,7 @@ func TestScoreEngineManager(t *testing.T) {
 		wg.Wait()
 	})
 
-	t.Run("LoadEngines", func(t *testing.T) {
+	t.Run("LoadSingleEngine", func(t *testing.T) {
 		mockedRepo := new(repositoryMock)
 		mockedEventBroker := new(eventBrokerMock)
 
