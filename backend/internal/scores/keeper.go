@@ -51,7 +51,7 @@ func (k *Keeper) run(ctx context.Context, filter domain.EventFilter, wg *sync.Wa
 	subscriptionID, eventReader := k.eventBroker.Subscribe(filter, 0)
 	defer k.eventBroker.Unsubscribe(subscriptionID)
 
-	ready <- struct{}{}
+	close(ready)
 
 	for {
 		event, err := eventReader.AwaitEvent(ctx)

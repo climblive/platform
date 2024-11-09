@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/go-errors/errors"
 )
 
 const pollInterval = 10 * time.Second
@@ -46,45 +47,59 @@ func (mngr *ScoreEngineManager) Run(ctx context.Context) *sync.WaitGroup {
 
 	wg.Add(1)
 
-	go func() {
-		defer wg.Done()
-
-		mngr.poll(ctx)
-		ready <- struct{}{}
-
-		for {
-			sleepTimer := time.NewTimer(pollInterval)
-
-			select {
-			case <-ctx.Done():
-				slog.Info("score engine manager shutting down", "reason", ctx.Err().Error())
-
-				for handler := range maps.Values(mngr.handlers) {
-					handler.cancel()
-				}
-
-				for handler := range maps.Values(mngr.handlers) {
-					handler.wg.Wait()
-				}
-
-				return
-			case <-sleepTimer.C:
-			}
-
-			mngr.poll(ctx)
-		}
-	}()
+	go mngr.run(ctx, wg, ready)
 
 	<-ready
 
 	return wg
 }
 
-func (mngr *ScoreEngineManager) poll(ctx context.Context) {
+func (mngr *ScoreEngineManager) run(ctx context.Context, wg *sync.WaitGroup, ready chan struct{}) {
+	defer func() {
+		if r := recover(); r != nil {
+			slog.Error("score engine manager panicked", "error", r)
+		}
+	}()
+
+	defer wg.Done()
+
+	signalReady := sync.OnceFunc(func() {
+		close(ready)
+	})
+
+	for {
+		err := mngr.runPeriodicCheck(ctx)
+		if err != nil {
+			slog.Error("score engine manager failed to complete periodic check", "error", err)
+		} else {
+			signalReady()
+		}
+
+		sleepTimer := time.NewTimer(pollInterval)
+
+		select {
+		case <-ctx.Done():
+			slog.Info("score engine manager shutting down", "reason", ctx.Err().Error())
+
+			for handler := range maps.Values(mngr.handlers) {
+				handler.cancel()
+			}
+
+			for handler := range maps.Values(mngr.handlers) {
+				handler.wg.Wait()
+			}
+
+			return
+		case <-sleepTimer.C:
+		}
+	}
+}
+
+func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) error {
 	now := time.Now()
 	contests, err := mngr.repo.GetContestsCurrentlyRunningOrByStartTime(ctx, nil, now, now.Add(time.Hour))
 	if err != nil {
-		panic(err)
+		return errors.Wrap(err, 0)
 	}
 
 	for contest := range slices.Values(contests) {
@@ -94,36 +109,48 @@ func (mngr *ScoreEngineManager) poll(ctx context.Context) {
 
 		logger := slog.New(slog.Default().Handler()).With("contest_id", contest.ID)
 
-		startTime := time.Now()
+		config := slog.Group("config",
+			"qualifying_problems", contest.QualifyingProblems,
+			"finalists", contest.Finalists)
 
-		logger.Info("preparing score engine",
-			"starting_in", contest.TimeBegin.Sub(now),
-			slog.Group("config",
-				"qualifying_problems", contest.QualifyingProblems,
-				"finalists", contest.Finalists))
-
-		engine := NewScoreEngine(contest.ID, mngr.eventBroker, &HardestProblems{Number: contest.QualifyingProblems}, NewBasicRanker(contest.Finalists))
-
-		cancellableCtx, cancel := context.WithCancel(ctx)
-		wg := engine.Run(cancellableCtx)
-
-		mngr.handlers[contest.ID] = engineHandler{
-			engine: engine,
-			cancel: cancel,
-			wg:     wg,
+		switch {
+		case contest.TimeBegin != nil && contest.TimeBegin.After(now):
+			logger.Info("detected contest about to start", "starting_in", (*contest.TimeBegin).Sub(now), config)
+		default:
+			logger.Info("detected contest that is currently running", config)
 		}
 
-		stats := mngr.hydrateEngine(ctx, contest.ID)
+		handler := engineHandler{
+			engine: NewScoreEngine(contest.ID, mngr.eventBroker, &HardestProblems{Number: contest.QualifyingProblems}, NewBasicRanker(contest.Finalists)),
+		}
+
+		var cancellableCtx context.Context
+		cancellableCtx, handler.cancel = context.WithCancel(ctx)
+		handler.wg = handler.engine.Run(cancellableCtx)
+
+		hydrationStartTime := time.Now()
+		stats, err := mngr.hydrateEngine(ctx, contest.ID)
+		if err != nil {
+			logger.Error("failed to hydrate score engine", "error", err)
+
+			handler.cancel()
+
+			continue
+		}
 
 		logger.Info("score engine hydration complete",
-			"time", time.Since(startTime),
+			"time", time.Since(hydrationStartTime),
 			slog.Group("stats",
 				"contenders", stats.contenders,
 				"problems", stats.problems,
 				"ticks", stats.ticks,
 			),
 		)
+
+		mngr.handlers[contest.ID] = handler
 	}
+
+	return nil
 }
 
 type hydrationStats struct {
@@ -132,10 +159,10 @@ type hydrationStats struct {
 	ticks      int
 }
 
-func (mngr *ScoreEngineManager) hydrateEngine(ctx context.Context, contestID domain.ContestID) hydrationStats {
+func (mngr *ScoreEngineManager) hydrateEngine(ctx context.Context, contestID domain.ContestID) (hydrationStats, error) {
 	problems, err := mngr.repo.GetProblemsByContest(ctx, nil, contestID)
 	if err != nil {
-		panic(err)
+		return hydrationStats{}, errors.Wrap(err, 0)
 	}
 
 	for problem := range slices.Values(problems) {
@@ -149,7 +176,7 @@ func (mngr *ScoreEngineManager) hydrateEngine(ctx context.Context, contestID dom
 
 	contenders, err := mngr.repo.GetContendersByContest(ctx, nil, contestID)
 	if err != nil {
-		panic(err)
+		return hydrationStats{}, errors.Wrap(err, 0)
 	}
 
 	for contender := range slices.Values(contenders) {
@@ -173,7 +200,7 @@ func (mngr *ScoreEngineManager) hydrateEngine(ctx context.Context, contestID dom
 
 	ticks, err := mngr.repo.GetTicksByContest(ctx, nil, contestID)
 	if err != nil {
-		panic(err)
+		return hydrationStats{}, errors.Wrap(err, 0)
 	}
 
 	for tick := range slices.Values(ticks) {
@@ -191,5 +218,5 @@ func (mngr *ScoreEngineManager) hydrateEngine(ctx context.Context, contestID dom
 		contenders: len(contenders),
 		problems:   len(problems),
 		ticks:      len(ticks),
-	}
+	}, nil
 }

@@ -88,7 +88,7 @@ func (e *ScoreEngine) run(ctx context.Context, filter domain.EventFilter, wg *sy
 
 	defer e.eventBroker.Unsubscribe(subscriptionID)
 
-	ready <- struct{}{}
+	close(ready)
 
 	for {
 		event, err := eventReader.AwaitEvent(ctx)
