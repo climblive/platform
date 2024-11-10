@@ -1,4 +1,4 @@
-limit_req_zone $binary_remote_addr zone=apilimit:10m rate=10r/s;
+limit_req_zone $binary_remote_addr$remote_port zone=apilimit:10m rate=10r/s;
 
 server {
 	listen 443 ssl;
