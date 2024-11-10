@@ -2,6 +2,7 @@
   import Header from "@/components/Header.svelte";
   import { ResultList, ScoreboardProvider } from "@climblive/lib/components";
   import { getCompClassesQuery, getContestQuery } from "@climblive/lib/queries";
+  import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/select/select.js";
   import Loading from "./Loading.svelte";
 
@@ -37,6 +38,9 @@
         name="compClassId"
         label="Competition class"
         use:value={selectedCompClassId}
+        on:sl-change={(event) => {
+          selectedCompClassId = parseInt(event.target.value);
+        }}
       >
         {#each compClasses as compClass}
           <sl-option value={compClass.id}>{compClass.name}</sl-option>
