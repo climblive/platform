@@ -4,6 +4,7 @@ import (
 	"context"
 	"iter"
 	"log/slog"
+	"maps"
 	"slices"
 	"sync"
 
@@ -124,6 +125,48 @@ func (e *ScoreEngine) run(ctx context.Context, filter domain.EventFilter, wg *sy
 			e.logger.Warn("discarding unsupported event", "event", event)
 		}
 	}
+}
+
+func (e *ScoreEngine) SetScoringRules(rules ScoringRules) {
+	e.rules = rules
+
+	compClasses := make(map[domain.CompClassID]struct{})
+
+	for contender := range maps.Values(e.contenders) {
+		e.ScoreContender(contender)
+		compClasses[contender.CompClassID] = struct{}{}
+	}
+
+	for compClassID := range maps.Keys(compClasses) {
+		scores := e.ranker.RankContenders(FilterByClass(e.contenders, compClassID))
+
+		for score := range slices.Values(scores) {
+			e.scores.Set(domain.ContenderID(score.ContenderID), score)
+		}
+	}
+
+	e.PublishUpdatedScores()
+}
+
+func (e *ScoreEngine) SetRanker(ranker Ranker) {
+	e.ranker = ranker
+
+	compClasses := make(map[domain.CompClassID]struct{})
+
+	for contender := range maps.Values(e.contenders) {
+		e.ScoreContender(contender)
+		compClasses[contender.CompClassID] = struct{}{}
+	}
+
+	for compClassID := range maps.Keys(compClasses) {
+		scores := e.ranker.RankContenders(FilterByClass(e.contenders, compClassID))
+
+		for score := range slices.Values(scores) {
+			e.scores.Set(domain.ContenderID(score.ContenderID), score)
+		}
+	}
+
+	e.PublishUpdatedScores()
 }
 
 func (e *ScoreEngine) HandleContenderEntered(event domain.ContenderEnteredEvent) {

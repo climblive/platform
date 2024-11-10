@@ -24,20 +24,22 @@ type scoreEngineManagerRepository interface {
 type ScoreEngineManager struct {
 	repo        scoreEngineManagerRepository
 	eventBroker domain.EventBroker
-	handlers    map[domain.ContestID]engineHandler
+	handlers    map[domain.ContestID]*engineHandler
 }
 
 type engineHandler struct {
-	engine *ScoreEngine
-	cancel func()
-	wg     *sync.WaitGroup
+	engine             *ScoreEngine
+	cancel             func()
+	wg                 *sync.WaitGroup
+	finalists          int
+	qualifyingProblems int
 }
 
 func NewScoreEngineManager(repo scoreEngineManagerRepository, eventBroker domain.EventBroker) ScoreEngineManager {
 	return ScoreEngineManager{
 		repo:        repo,
 		eventBroker: eventBroker,
-		handlers:    make(map[domain.ContestID]engineHandler),
+		handlers:    make(map[domain.ContestID]*engineHandler),
 	}
 }
 
@@ -94,11 +96,23 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) error {
 	}
 
 	for contest := range slices.Values(contests) {
-		if _, ok := mngr.handlers[contest.ID]; ok {
+		logger := slog.New(slog.Default().Handler()).With("contest_id", contest.ID)
+
+		if handler, ok := mngr.handlers[contest.ID]; ok {
+			if contest.QualifyingProblems != handler.qualifyingProblems {
+				slog.Info("updating scoring rules", "qualifying_problems", contest.QualifyingProblems)
+				handler.engine.SetScoringRules(&HardestProblems{Number: contest.QualifyingProblems})
+				handler.qualifyingProblems = contest.QualifyingProblems
+			}
+
+			if contest.Finalists != handler.finalists {
+				slog.Info("updating ranker", "finalists", contest.Finalists)
+				handler.engine.SetRanker(NewBasicRanker(contest.Finalists))
+				handler.finalists = contest.Finalists
+			}
+
 			continue
 		}
-
-		logger := slog.New(slog.Default().Handler()).With("contest_id", contest.ID)
 
 		config := slog.Group("config",
 			"qualifying_problems", contest.QualifyingProblems,
@@ -112,7 +126,9 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) error {
 		}
 
 		handler := engineHandler{
-			engine: NewScoreEngine(contest.ID, mngr.eventBroker, &HardestProblems{Number: contest.QualifyingProblems}, NewBasicRanker(contest.Finalists)),
+			engine:             NewScoreEngine(contest.ID, mngr.eventBroker, &HardestProblems{Number: contest.QualifyingProblems}, NewBasicRanker(contest.Finalists)),
+			finalists:          contest.Finalists,
+			qualifyingProblems: contest.QualifyingProblems,
 		}
 
 		var cancellableCtx context.Context
@@ -138,7 +154,7 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) error {
 			),
 		)
 
-		mngr.handlers[contest.ID] = handler
+		mngr.handlers[contest.ID] = &handler
 	}
 
 	return nil
