@@ -1,3 +1,5 @@
+limit_req_zone $binary_remote_addr zone=apilimit:10m rate=10r/s;
+
 server {
 	listen 443 ssl;
 	server_name labs.climblive.app;
@@ -60,6 +62,7 @@ server {
 		proxy_pass http://127.0.0.1:8090;
 		proxy_http_version 1.1;
 		add_header Cache-Control "no-store";
+		limit_req zone=apilimit burst=20 nodelay;
 	}
 
 	include /etc/nginx/options-ssl.conf;
