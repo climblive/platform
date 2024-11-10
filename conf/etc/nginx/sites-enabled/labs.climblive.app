@@ -35,6 +35,10 @@ server {
 		try_files /index.html =404;
 	}
 
+	add_header Content-Security-Policy "default-src 'self'; connect-src 'self' api.labs.climblive.app data:; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'self'";
+	add_header X-Content-Type-Options "nosniff";
+	add_header Referrer-Policy "same-origin";
+
 	include /etc/nginx/options-ssl.conf;
 
 	ssl_certificate /etc/letsencrypt/live/labs.climblive.app/fullchain.pem;
