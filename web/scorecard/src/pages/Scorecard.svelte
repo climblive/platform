@@ -181,7 +181,6 @@
     z-index: 10;
     background-color: var(--sl-color-primary-200);
     padding: var(--sl-spacing-small);
-    padding-bottom: 0;
   }
 
   sl-tab-group {

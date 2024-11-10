@@ -36,8 +36,7 @@
         if (entry.contentBoxSize) {
           const contentBoxSize = entry.contentBoxSize[0];
 
-          overflow =
-            contentBoxSize.inlineSize <= 16 * 32 ? "scroll" : "pagination";
+          overflow = contentBoxSize.inlineSize <= 512 ? "scroll" : "pagination";
         }
       }
     });
@@ -102,6 +101,7 @@
     flex-direction: column;
     height: 100%;
     padding: var(--sl-spacing-small);
+    gap: var(--sl-spacing-small);
   }
 
   h1 {
@@ -127,7 +127,7 @@
     display: none;
   }
 
-  @media screen and (max-width: 32rem) {
+  @media screen and (max-width: 512px) {
     sl-select {
       display: block;
     }

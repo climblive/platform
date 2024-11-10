@@ -46,6 +46,12 @@
     }
   }
 
+  @media screen and (max-width: 512px) {
+    header > h2 {
+      display: none;
+    }
+  }
+
   .size {
     font-size: var(--sl-font-size-small);
     color: var(--sl-color-primary-700);
