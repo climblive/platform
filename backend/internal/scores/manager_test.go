@@ -101,10 +101,7 @@ func TestScoreEngineManager(t *testing.T) {
 					Zone:         true,
 					AttemptsZone: 1,
 				},
-			}, nil).
-			Run(func(args mock.Arguments) {
-				cancel()
-			})
+			}, nil)
 
 		mockedEventBroker.On("Dispatch", mockedContestID, domain.ProblemAddedEvent{
 			ProblemID:  mockedProblemID,
@@ -133,7 +130,10 @@ func TestScoreEngineManager(t *testing.T) {
 			AttemptsTop:  999,
 			Zone:         true,
 			AttemptsZone: 1,
-		}).Return()
+		}).Return().
+			Run(func(args mock.Arguments) {
+				cancel()
+			})
 
 		mngr := scores.NewScoreEngineManager(mockedRepo, mockedEventBroker)
 
