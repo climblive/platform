@@ -8,7 +8,7 @@
 
   export let contestId: number;
 
-  let selectedCompClassId: number | undefined = 1;
+  let selectedCompClassId: number | undefined;
   let overflow: "pagination" | "scroll" = "scroll";
 
   const contestQuery = getContestQuery(contestId);
@@ -16,6 +16,12 @@
 
   $: contest = $contestQuery.data;
   $: compClasses = $compClassesQuery.data;
+
+  $: {
+    if (compClasses && !selectedCompClassId) {
+      selectedCompClassId = compClasses[0].id;
+    }
+  }
 
   const value = (node: HTMLElement, value: string | number | undefined) => {
     node.setAttribute("value", value?.toString() ?? "");
