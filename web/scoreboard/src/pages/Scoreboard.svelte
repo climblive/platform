@@ -4,14 +4,11 @@
   import { getCompClassesQuery, getContestQuery } from "@climblive/lib/queries";
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/select/select.js";
-  import { onDestroy, onMount } from "svelte";
   import Loading from "./Loading.svelte";
 
   export let contestId: number;
 
   let selectedCompClassId: number | undefined = 1;
-  let main: HTMLElement | undefined;
-  let observer: ResizeObserver | undefined;
   let overflow: "pagination" | "scroll" = "scroll";
 
   const contestQuery = getContestQuery(contestId);
@@ -29,36 +26,19 @@
       },
     };
   };
-
-  onMount(() => {
-    observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.contentBoxSize) {
-          const contentBoxSize = entry.contentBoxSize[0];
-
-          overflow = contentBoxSize.inlineSize <= 512 ? "scroll" : "pagination";
-        }
-      }
-    });
-  });
-
-  onDestroy(() => {
-    observer?.disconnect();
-    observer = undefined;
-  });
-
-  $: {
-    if (main) {
-      observer?.observe(main);
-    }
-  }
 </script>
+
+<svelte:window
+  on:resize={() => {
+    overflow = window.innerWidth <= 512 ? "scroll" : "pagination";
+  }}
+/>
 
 {#if !contest || !compClasses}
   <Loading />
 {:else}
   <ScoreboardProvider {contestId}>
-    <main bind:this={main}>
+    <main>
       <h1>{contest.name}</h1>
       <sl-select
         size="small"
