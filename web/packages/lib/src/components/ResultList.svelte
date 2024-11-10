@@ -93,12 +93,12 @@
   .container[overflow="pagination"] {
     height: 100%;
     clip-path: rect(
-      0px 0px
+      0px 100%
         calc(
           var(--page-size) * 2.25rem + (var(--page-size) - 1) *
             var(--sl-spacing-x-small)
         )
-        100%
+        0px
     );
   }
 
