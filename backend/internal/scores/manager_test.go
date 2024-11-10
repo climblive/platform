@@ -28,14 +28,13 @@ func TestScoreEngineManager(t *testing.T) {
 
 		wg := mngr.Run(ctx)
 
-		mockedRepo.AssertExpectations(t)
-		mockedEventBroker.AssertExpectations(t)
-
 		cancel()
 		wg.Wait()
 	})
 
 	t.Run("LoadSingleEngine", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(context.Background())
+
 		mockedRepo := new(repositoryMock)
 		mockedEventBroker := new(eventBrokerMock)
 
@@ -43,12 +42,17 @@ func TestScoreEngineManager(t *testing.T) {
 		mockedProblemID := domain.ProblemID(rand.Int())
 		mockedContenderID := domain.ContenderID(rand.Int())
 		mockedCompClassID := domain.CompClassID(rand.Int())
+		mockedSubscriptionID := domain.SubscriptionID(uuid.New())
 
 		now := time.Now()
 
 		mockedEventBroker.
 			On("Subscribe", mock.Anything, mock.Anything).
-			Return(domain.SubscriptionID(uuid.New()), events.NewSubscription(domain.EventFilter{}, 1000))
+			Return(mockedSubscriptionID, events.NewSubscription(domain.EventFilter{}, 1000))
+
+		mockedEventBroker.
+			On("Unsubscribe", mockedSubscriptionID).
+			Return()
 
 		mockedRepo.
 			On("GetContestsCurrentlyRunningOrByStartTime", mock.Anything, mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
@@ -97,7 +101,10 @@ func TestScoreEngineManager(t *testing.T) {
 					Zone:         true,
 					AttemptsZone: 1,
 				},
-			}, nil)
+			}, nil).
+			Run(func(args mock.Arguments) {
+				cancel()
+			})
 
 		mockedEventBroker.On("Dispatch", mockedContestID, domain.ProblemAddedEvent{
 			ProblemID:  mockedProblemID,
@@ -130,14 +137,13 @@ func TestScoreEngineManager(t *testing.T) {
 
 		mngr := scores.NewScoreEngineManager(mockedRepo, mockedEventBroker)
 
-		ctx, cancel := context.WithCancel(context.Background())
-
 		wg := mngr.Run(ctx)
+
+		<-ctx.Done()
 
 		mockedRepo.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)
 
-		cancel()
 		wg.Wait()
 	})
 }
