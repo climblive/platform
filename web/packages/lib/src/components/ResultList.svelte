@@ -103,9 +103,6 @@
   }
 
   .container[overflow="scroll"] {
-    height: calc(
-      var(--page-size) * 2.25rem + (var(--page-size) - 1) *
-        var(--sl-spacing-x-small)
-    );
+    height: calc(var(--page-size) * (2.25rem + var(--sl-spacing-x-small)));
   }
 </style>
