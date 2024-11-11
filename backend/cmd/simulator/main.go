@@ -11,6 +11,7 @@ import (
 	"math/rand"
 	"net/http"
 	"slices"
+	"strings"
 	"sync"
 	"time"
 
@@ -25,7 +26,7 @@ func main() {
 
 	var registrationCodes []string
 
-	for n := range 30 {
+	for n := range 200 {
 		registrationCodes = append(registrationCodes, fmt.Sprintf("ABCD%04d", n+1))
 	}
 
@@ -130,7 +131,7 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, requestsChannel,
 			r.ticks[problem.ID] = tick
 		}
 
-		time.Sleep(time.Duration(rand.Int()%100) * time.Millisecond)
+		time.Sleep(time.Duration(rand.Int()%10000) * time.Millisecond)
 	}
 }
 
@@ -315,7 +316,7 @@ func (r *ContenderRunner) ReadEvents(contenderID domain.ContenderID) {
 	reader := bufio.NewReader(resp.Body)
 
 	for {
-		_, err := reader.ReadString('\n')
+		line, err := reader.ReadString('\n')
 		if err != nil {
 			if errors.Is(err, io.EOF) {
 				return
@@ -324,6 +325,8 @@ func (r *ContenderRunner) ReadEvents(contenderID domain.ContenderID) {
 			panic(err)
 		}
 
-		r.eventsChannel <- struct{}{}
+		if strings.HasPrefix(line, "event:") {
+			r.eventsChannel <- struct{}{}
+		}
 	}
 }
