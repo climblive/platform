@@ -5,11 +5,25 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "API server",
+            "name": "Backend",
             "type": "go",
             "request": "launch",
             "mode": "auto",
             "program": "backend/cmd/api/main.go"
-        }
+        },
+        {
+            "name": "Scorecard",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "pnpm run dev",
+            "cwd": "${workspaceFolder}/web/scorecard",
+        },
+        {
+            "name": "Scoreboard",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "pnpm run dev",
+            "cwd": "${workspaceFolder}/web/scoreboard",
+        },
     ]
 }
