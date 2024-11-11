@@ -22,7 +22,7 @@
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [],
   "forwardPorts": [8090],
-  "postAttachCommand": "gh codespace ports visibility 8090:public -c $CODESPACE_NAME",
+  "portsAttributes": { "8090": { "protocol": "https" } },
   // Use 'postCreateCommand' to run commands after the container is created.
   "postCreateCommand": "./.devcontainer/scripts/post.sh"
   // Configure tool-specific properties.
