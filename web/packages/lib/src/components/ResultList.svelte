@@ -29,8 +29,12 @@
         pageSize = results.length;
         break;
     }
+  }
 
-    pageIndex = 0;
+  $: {
+    if (overflow === "scroll") {
+      pageIndex = 0;
+    }
   }
 
   $: pageCount = Math.ceil(results.length / pageSize);
@@ -40,11 +44,11 @@
   $: results = $scoreboard.get(compClassId) ?? [];
 
   onMount(() => {
-    if (overflow === "pagination") {
-      pageFlipIntervalTimerId = setInterval(() => {
+    pageFlipIntervalTimerId = setInterval(() => {
+      if (overflow === "pagination") {
         pageIndex = (pageIndex + 1) % pageCount;
-      }, 10_000);
-    }
+      }
+    }, 10_000);
 
     observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
