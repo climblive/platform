@@ -4,6 +4,7 @@
   import { getCompClassesQuery, getContestQuery } from "@climblive/lib/queries";
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/select/select.js";
+  import { onMount } from "svelte";
   import Loading from "./Loading.svelte";
 
   export let contestId: number;
@@ -32,11 +33,19 @@
       },
     };
   };
+
+  const determineOverflowBehaviour = () => {
+    overflow = window.innerWidth <= 512 ? "scroll" : "pagination";
+  };
+
+  onMount(() => {
+    determineOverflowBehaviour();
+  });
 </script>
 
 <svelte:window
   on:resize={() => {
-    overflow = window.innerWidth <= 512 ? "scroll" : "pagination";
+    determineOverflowBehaviour();
   }}
 />
 
