@@ -9,15 +9,9 @@
   let prevValue: number = value;
 
   $: {
-    const animation = counter?.animate(
-      [{ "--num": prevValue }, { "--num": value }],
-      {
-        fill: "forwards",
-        duration: 250,
-      },
-    );
+    counter?.style.setProperty("--num", value.toString());
 
-    animation?.finished.then(() => (prevValue = value));
+    setTimeout(() => (prevValue = value), 250);
   }
 
   onMount(() => {
@@ -39,10 +33,11 @@
   }
 
   .counter {
-    counter-reset: num var(--num);
+    counter-reset: nv var(--num);
+    transition: --num 250ms steps(10);
   }
 
   .counter > .suffix::before {
-    content: counter(num);
+    content: counter(nv);
   }
 </style>
