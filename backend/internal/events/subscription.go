@@ -36,6 +36,13 @@ func NewSubscription(
 	return &sub
 }
 
+func (s *Subscription) More() bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	return len(s.buffer) > 0
+}
+
 func (s *Subscription) AwaitEvent(ctx context.Context) (domain.EventEnvelope, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()

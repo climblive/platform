@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"slices"
 	"sync"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 )
@@ -90,6 +91,8 @@ func (e *ScoreEngine) run(ctx context.Context, filter domain.EventFilter, wg *sy
 
 	close(ready)
 
+	var lastPublished time.Time
+
 	for {
 		event, err := eventReader.AwaitEvent(ctx)
 		switch err {
@@ -123,6 +126,11 @@ func (e *ScoreEngine) run(ctx context.Context, filter domain.EventFilter, wg *sy
 		case domain.ProblemUpdatedEvent, domain.ProblemDeletedEvent:
 			e.logger.Warn("discarding unsupported event", "event", event)
 		}
+
+		if !eventReader.More() || time.Since(lastPublished) >= 100*time.Millisecond {
+			e.PublishUpdatedScores()
+			lastPublished = time.Now()
+		}
 	}
 }
 
@@ -140,8 +148,6 @@ func (e *ScoreEngine) HandleContenderEntered(event domain.ContenderEnteredEvent)
 	for score := range slices.Values(scores) {
 		e.scores.Set(domain.ContenderID(score.ContenderID), score)
 	}
-
-	e.PublishUpdatedScores()
 }
 
 func (e *ScoreEngine) HandleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent) {
@@ -168,9 +174,8 @@ func (e *ScoreEngine) HandleContenderSwitchedClass(event domain.ContenderSwitche
 			e.scores.Set(domain.ContenderID(score.ContenderID), score)
 		}
 	}
-
-	e.PublishUpdatedScores()
 }
+
 func (e *ScoreEngine) HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent) {
 	contender, found := e.contenders[event.ContenderID]
 	if !found {
@@ -184,9 +189,8 @@ func (e *ScoreEngine) HandleContenderWithdrewFromFinals(event domain.ContenderWi
 	for score := range slices.Values(scores) {
 		e.scores.Set(domain.ContenderID(score.ContenderID), score)
 	}
-
-	e.PublishUpdatedScores()
 }
+
 func (e *ScoreEngine) HandleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent) {
 	contender, found := e.contenders[event.ContenderID]
 	if !found {
@@ -200,9 +204,8 @@ func (e *ScoreEngine) HandleContenderReenteredFinals(event domain.ContenderReent
 	for score := range slices.Values(scores) {
 		e.scores.Set(domain.ContenderID(score.ContenderID), score)
 	}
-
-	e.PublishUpdatedScores()
 }
+
 func (e *ScoreEngine) HandleContenderDisqualified(event domain.ContenderDisqualifiedEvent) {
 	contender, found := e.contenders[event.ContenderID]
 	if !found {
@@ -217,9 +220,8 @@ func (e *ScoreEngine) HandleContenderDisqualified(event domain.ContenderDisquali
 	for score := range slices.Values(scores) {
 		e.scores.Set(domain.ContenderID(score.ContenderID), score)
 	}
-
-	e.PublishUpdatedScores()
 }
+
 func (e *ScoreEngine) HandleContenderRequalified(event domain.ContenderRequalifiedEvent) {
 	contender, found := e.contenders[event.ContenderID]
 	if !found {
@@ -234,8 +236,6 @@ func (e *ScoreEngine) HandleContenderRequalified(event domain.ContenderRequalifi
 	for score := range slices.Values(scores) {
 		e.scores.Set(domain.ContenderID(score.ContenderID), score)
 	}
-
-	e.PublishUpdatedScores()
 }
 
 func (e *ScoreEngine) HandleAscentRegistered(event domain.AscentRegisteredEvent) {
@@ -268,8 +268,6 @@ func (e *ScoreEngine) HandleAscentRegistered(event domain.AscentRegisteredEvent)
 	for score := range slices.Values(scores) {
 		e.scores.Set(domain.ContenderID(score.ContenderID), score)
 	}
-
-	e.PublishUpdatedScores()
 }
 
 func (e *ScoreEngine) HandleAscentDeregistered(event domain.AscentDeregisteredEvent) {
@@ -287,8 +285,6 @@ func (e *ScoreEngine) HandleAscentDeregistered(event domain.AscentDeregisteredEv
 	for score := range slices.Values(scores) {
 		e.scores.Set(domain.ContenderID(score.ContenderID), score)
 	}
-
-	e.PublishUpdatedScores()
 }
 
 func (e *ScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) {
