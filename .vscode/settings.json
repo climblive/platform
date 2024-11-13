@@ -12,5 +12,6 @@
     },
     "[go]": {
         "editor.defaultFormatter": "golang.go"
-    }
+    },
+    "terminal.integrated.gpuAcceleration": "off"
 }

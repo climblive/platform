@@ -11,7 +11,7 @@
     position: absolute;
     left: 0;
     right: 0;
-    transition: transform 0.2s linear;
+    transition: transform 0.3s ease-out;
     transform: translateY(
       calc(
         (var(--order) - var(--page-index) * var(--page-size)) *
