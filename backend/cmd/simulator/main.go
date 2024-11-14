@@ -19,11 +19,20 @@ import (
 	"github.com/go-faker/faker/v4"
 )
 
-const APIURL = "http://localhost:8090"
+const (
+	APIURL     = "http://localhost:8090"
+	ITERATIONS = 1000
+	MAX_SLEEP  = 100 * time.Millisecond
+)
+
+type SimulatorEvent int
+
+const (
+	EventReceived SimulatorEvent = iota
+	RequestSent
+)
 
 func main() {
-	log.Println("Hello, World!")
-
 	var registrationCodes []string
 
 	for n := range 200 {
@@ -31,32 +40,40 @@ func main() {
 	}
 
 	var wg sync.WaitGroup
-	requests := make(chan struct{})
-	events := make(chan struct{})
-
-	stats := struct {
-		requests int
-		events   int
-	}{}
+	var metricsMutex sync.Mutex
+	metrics := map[SimulatorEvent]int{
+		EventReceived: 0,
+		RequestSent:   0,
+	}
+	events := make(chan SimulatorEvent)
 
 	go func() {
 		for {
-			select {
-			case <-requests:
-				stats.requests++
-			case <-events:
-				stats.events++
-			}
+			event := <-events
+
+			metricsMutex.Lock()
+			metrics[event] = metrics[event] + 1
+			metricsMutex.Unlock()
 		}
 	}()
 
 	go func() {
 		for {
-			startRequests, startEvents := stats.requests, stats.events
+			start := make(map[SimulatorEvent]int)
+
+			metricsMutex.Lock()
+			for k, v := range metrics {
+				start[k] = v
+			}
+			metricsMutex.Unlock()
 
 			time.Sleep(time.Second)
 
-			log.Printf("%d req/s; %d events/s", stats.requests-startRequests, stats.events-startEvents)
+			metricsMutex.Lock()
+			log.Printf("%d requests/s; %d events/s",
+				metrics[RequestSent]-start[RequestSent],
+				metrics[EventReceived]-start[EventReceived])
+			metricsMutex.Unlock()
 		}
 	}()
 
@@ -64,7 +81,7 @@ func main() {
 		runner := ContenderRunner{RegistrationCode: code}
 
 		wg.Add(1)
-		go runner.Run(1250, &wg, requests, events)
+		go runner.Run(ITERATIONS, &wg, events)
 	}
 
 	wg.Wait()
@@ -74,16 +91,14 @@ type ContenderRunner struct {
 	RegistrationCode string
 	contender        domain.Contender
 	ticks            map[domain.ProblemID]domain.Tick
-	requestsChannel  chan<- struct{}
-	eventsChannel    chan<- struct{}
+	events           chan<- SimulatorEvent
 }
 
-func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, requestsChannel, eventsChannel chan<- struct{}) {
+func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- SimulatorEvent) {
 	defer wg.Done()
 
 	r.ticks = make(map[domain.ProblemID]domain.Tick)
-	r.requestsChannel = requestsChannel
-	r.eventsChannel = eventsChannel
+	r.events = events
 
 	r.contender = r.GetContender()
 	compClasses := r.GetCompClasses(r.contender.ContestID)
@@ -131,7 +146,7 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, requestsChannel,
 			r.ticks[problem.ID] = tick
 		}
 
-		time.Sleep(time.Duration(rand.Int()%10000) * time.Millisecond)
+		time.Sleep(time.Duration(rand.Int() % int(MAX_SLEEP)))
 	}
 }
 
@@ -141,7 +156,7 @@ func (r *ContenderRunner) GetContender() domain.Contender {
 		panic(err)
 	}
 
-	r.requestsChannel <- struct{}{}
+	r.events <- RequestSent
 
 	defer resp.Body.Close()
 
@@ -171,7 +186,7 @@ func (r *ContenderRunner) UpdateContender(contender domain.Contender) domain.Con
 		panic(err)
 	}
 
-	r.requestsChannel <- struct{}{}
+	r.events <- RequestSent
 
 	defer resp.Body.Close()
 
@@ -189,7 +204,7 @@ func (r *ContenderRunner) GetCompClasses(contestID domain.ContestID) []domain.Co
 		panic(err)
 	}
 
-	r.requestsChannel <- struct{}{}
+	r.events <- RequestSent
 
 	defer resp.Body.Close()
 
@@ -209,7 +224,7 @@ func (r *ContenderRunner) GetProblems(contestID domain.ContestID) []domain.Probl
 		panic(err)
 	}
 
-	r.requestsChannel <- struct{}{}
+	r.events <- RequestSent
 
 	defer resp.Body.Close()
 
@@ -229,7 +244,7 @@ func (r *ContenderRunner) GetTicks(contenderID domain.ContenderID) []domain.Tick
 		panic(err)
 	}
 
-	r.requestsChannel <- struct{}{}
+	r.events <- RequestSent
 
 	req.Header.Set("Authorization", fmt.Sprintf("Regcode %s", r.RegistrationCode))
 
@@ -256,7 +271,7 @@ func (r *ContenderRunner) DeleteTick(tickID domain.TickID) {
 		panic(err)
 	}
 
-	r.requestsChannel <- struct{}{}
+	r.events <- RequestSent
 
 	req.Header.Set("Authorization", fmt.Sprintf("Regcode %s", r.RegistrationCode))
 
@@ -284,7 +299,7 @@ func (r *ContenderRunner) AddTick(contenderID domain.ContenderID, tick domain.Ti
 		panic(err)
 	}
 
-	r.requestsChannel <- struct{}{}
+	r.events <- RequestSent
 
 	defer resp.Body.Close()
 
@@ -309,8 +324,6 @@ func (r *ContenderRunner) ReadEvents(contenderID domain.ContenderID) {
 		panic(err)
 	}
 
-	r.requestsChannel <- struct{}{}
-
 	defer resp.Body.Close()
 
 	reader := bufio.NewReader(resp.Body)
@@ -326,7 +339,7 @@ func (r *ContenderRunner) ReadEvents(contenderID domain.ContenderID) {
 		}
 
 		if strings.HasPrefix(line, "event:") {
-			r.eventsChannel <- struct{}{}
+			r.events <- EventReceived
 		}
 	}
 }
