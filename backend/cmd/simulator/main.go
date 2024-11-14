@@ -22,7 +22,7 @@ import (
 const (
 	APIURL     = "http://localhost:8090"
 	ITERATIONS = 1000
-	MAX_SLEEP  = 100 * time.Millisecond
+	MAX_SLEEP  = 10000 * time.Millisecond
 )
 
 type SimulatorEvent int
@@ -244,14 +244,14 @@ func (r *ContenderRunner) GetTicks(contenderID domain.ContenderID) []domain.Tick
 		panic(err)
 	}
 
-	r.events <- RequestSent
-
 	req.Header.Set("Authorization", fmt.Sprintf("Regcode %s", r.RegistrationCode))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		panic(err)
 	}
+
+	r.events <- RequestSent
 
 	defer resp.Body.Close()
 
@@ -271,14 +271,14 @@ func (r *ContenderRunner) DeleteTick(tickID domain.TickID) {
 		panic(err)
 	}
 
-	r.events <- RequestSent
-
 	req.Header.Set("Authorization", fmt.Sprintf("Regcode %s", r.RegistrationCode))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		panic(err)
 	}
+
+	r.events <- RequestSent
 
 	defer resp.Body.Close()
 }
@@ -323,6 +323,8 @@ func (r *ContenderRunner) ReadEvents(contenderID domain.ContenderID) {
 	if err != nil {
 		panic(err)
 	}
+
+	r.events <- RequestSent
 
 	defer resp.Body.Close()
 
