@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"slices"
 	"sync"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 )
@@ -27,7 +28,7 @@ type ScoreEngine struct {
 
 	problems   map[domain.ProblemID]*Problem
 	contenders map[domain.ContenderID]*Contender
-	scores     DiffMap[domain.ContenderID, domain.Score]
+	scores     *DiffMap[domain.ContenderID, domain.Score]
 }
 
 func NewScoreEngine(contestID domain.ContestID, eventBroker domain.EventBroker, rules ScoringRules, ranker Ranker) *ScoreEngine {
@@ -90,6 +91,19 @@ func (e *ScoreEngine) run(ctx context.Context, filter domain.EventFilter, wg *sy
 
 	close(ready)
 
+	go func(ctx context.Context) {
+		ticker := time.Tick(100 * time.Millisecond)
+
+		for {
+			select {
+			case <-ticker:
+				e.PublishUpdatedScores()
+			case <-ctx.Done():
+				return
+			}
+		}
+	}(ctx)
+
 	for {
 		event, err := eventReader.AwaitEvent(ctx)
 		switch err {
@@ -140,8 +154,6 @@ func (e *ScoreEngine) HandleContenderEntered(event domain.ContenderEnteredEvent)
 	for score := range slices.Values(scores) {
 		e.scores.Set(domain.ContenderID(score.ContenderID), score)
 	}
-
-	e.PublishUpdatedScores()
 }
 
 func (e *ScoreEngine) HandleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent) {
@@ -168,9 +180,8 @@ func (e *ScoreEngine) HandleContenderSwitchedClass(event domain.ContenderSwitche
 			e.scores.Set(domain.ContenderID(score.ContenderID), score)
 		}
 	}
-
-	e.PublishUpdatedScores()
 }
+
 func (e *ScoreEngine) HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent) {
 	contender, found := e.contenders[event.ContenderID]
 	if !found {
@@ -184,9 +195,8 @@ func (e *ScoreEngine) HandleContenderWithdrewFromFinals(event domain.ContenderWi
 	for score := range slices.Values(scores) {
 		e.scores.Set(domain.ContenderID(score.ContenderID), score)
 	}
-
-	e.PublishUpdatedScores()
 }
+
 func (e *ScoreEngine) HandleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent) {
 	contender, found := e.contenders[event.ContenderID]
 	if !found {
@@ -200,9 +210,8 @@ func (e *ScoreEngine) HandleContenderReenteredFinals(event domain.ContenderReent
 	for score := range slices.Values(scores) {
 		e.scores.Set(domain.ContenderID(score.ContenderID), score)
 	}
-
-	e.PublishUpdatedScores()
 }
+
 func (e *ScoreEngine) HandleContenderDisqualified(event domain.ContenderDisqualifiedEvent) {
 	contender, found := e.contenders[event.ContenderID]
 	if !found {
@@ -217,9 +226,8 @@ func (e *ScoreEngine) HandleContenderDisqualified(event domain.ContenderDisquali
 	for score := range slices.Values(scores) {
 		e.scores.Set(domain.ContenderID(score.ContenderID), score)
 	}
-
-	e.PublishUpdatedScores()
 }
+
 func (e *ScoreEngine) HandleContenderRequalified(event domain.ContenderRequalifiedEvent) {
 	contender, found := e.contenders[event.ContenderID]
 	if !found {
@@ -234,8 +242,6 @@ func (e *ScoreEngine) HandleContenderRequalified(event domain.ContenderRequalifi
 	for score := range slices.Values(scores) {
 		e.scores.Set(domain.ContenderID(score.ContenderID), score)
 	}
-
-	e.PublishUpdatedScores()
 }
 
 func (e *ScoreEngine) HandleAscentRegistered(event domain.AscentRegisteredEvent) {
@@ -268,8 +274,6 @@ func (e *ScoreEngine) HandleAscentRegistered(event domain.AscentRegisteredEvent)
 	for score := range slices.Values(scores) {
 		e.scores.Set(domain.ContenderID(score.ContenderID), score)
 	}
-
-	e.PublishUpdatedScores()
 }
 
 func (e *ScoreEngine) HandleAscentDeregistered(event domain.AscentDeregisteredEvent) {
@@ -287,8 +291,6 @@ func (e *ScoreEngine) HandleAscentDeregistered(event domain.AscentDeregisteredEv
 	for score := range slices.Values(scores) {
 		e.scores.Set(domain.ContenderID(score.ContenderID), score)
 	}
-
-	e.PublishUpdatedScores()
 }
 
 func (e *ScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) {
@@ -317,14 +319,24 @@ func (e *ScoreEngine) ScoreContender(contender *Contender) {
 func (e *ScoreEngine) PublishUpdatedScores() {
 	diff := e.scores.Commit()
 
+	var batch []domain.ContenderScoreUpdatedEvent
+
 	for score := range slices.Values(diff) {
-		e.eventBroker.Dispatch(e.contestID, domain.ContenderScoreUpdatedEvent{
+		event := domain.ContenderScoreUpdatedEvent{
 			Timestamp:   score.Timestamp,
 			ContenderID: score.ContenderID,
 			Score:       score.Score,
 			Placement:   score.Placement,
 			Finalist:    score.Finalist,
 			RankOrder:   score.RankOrder,
-		})
+		}
+
+		e.eventBroker.Dispatch(e.contestID, event)
+
+		batch = append(batch, event)
+	}
+
+	if len(batch) > 0 {
+		e.eventBroker.Dispatch(e.contestID, batch)
 	}
 }
