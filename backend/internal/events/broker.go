@@ -83,6 +83,8 @@ func eventName(event any) string {
 		return "CONTENDER_PUBLIC_INFO_UPDATED"
 	case domain.ContenderScoreUpdatedEvent:
 		return "CONTENDER_SCORE_UPDATED"
+	case []domain.ContenderScoreUpdatedEvent:
+		return "[]CONTENDER_SCORE_UPDATED"
 	default:
 		return "UNKNOWN"
 	}
