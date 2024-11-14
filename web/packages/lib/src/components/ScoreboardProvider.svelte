@@ -8,6 +8,7 @@
   } from "@climblive/lib/models";
   import { onDestroy, onMount, setContext } from "svelte";
   import { writable } from "svelte/store";
+  import * as z from "zod";
 
   export let contestId: number;
 
@@ -87,20 +88,24 @@
       });
     });
 
-    eventSource.addEventListener("CONTENDER_SCORE_UPDATED", (e) => {
-      const event = contenderScoreUpdatedEventSchema.parse(JSON.parse(e.data));
+    eventSource.addEventListener("[]CONTENDER_SCORE_UPDATED", (e) => {
+      const events = z
+        .array(contenderScoreUpdatedEventSchema)
+        .parse(JSON.parse(e.data));
 
-      queueEventHandler((contenders: Map<number, ScoreboardEntry>) => {
-        const contender = contenders.get(event.contenderId);
-        if (!contender) {
-          return;
-        }
+      for (const event of events) {
+        queueEventHandler((contenders: Map<number, ScoreboardEntry>) => {
+          const contender = contenders.get(event.contenderId);
+          if (!contender) {
+            return;
+          }
 
-        contender.score = event.score;
-        contender.placement = event.placement;
-        contender.finalist = event.finalist;
-        contender.rankOrder = event.rankOrder;
-      });
+          contender.score = event.score;
+          contender.placement = event.placement;
+          contender.finalist = event.finalist;
+          contender.rankOrder = event.rankOrder;
+        });
+      }
     });
   });
 
