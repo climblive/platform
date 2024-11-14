@@ -41,7 +41,6 @@ type EventBroker interface {
 
 type EventReader interface {
 	AwaitEvent(ctx context.Context) (EventEnvelope, error)
-	More() bool
 }
 
 type EventEnvelope struct {
