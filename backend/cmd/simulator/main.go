@@ -107,9 +107,9 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 
 	switch selectedCompClass.Name {
 	case "Males":
-		r.contender.Name = fmt.Sprintf("%s %s", faker.FirstNameMale(), faker.LastName())
+		r.contender.Name = fmt.Sprintf("%s %s (%d)", faker.FirstNameMale(), faker.LastName(), r.contender.ID)
 	case "Females":
-		r.contender.Name = fmt.Sprintf("%s %s", faker.FirstNameFemale(), faker.LastName())
+		r.contender.Name = fmt.Sprintf("%s %s (%d)", faker.FirstNameFemale(), faker.LastName(), r.contender.ID)
 	}
 
 	r.contender.CompClassID = selectedCompClass.ID

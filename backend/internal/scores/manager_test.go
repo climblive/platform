@@ -85,6 +85,7 @@ func TestScoreEngineManager(t *testing.T) {
 					CompClassID:         mockedCompClassID,
 					Disqualified:        true,
 					WithdrawnFromFinals: true,
+					Entered:             &now,
 				},
 			}, nil)
 

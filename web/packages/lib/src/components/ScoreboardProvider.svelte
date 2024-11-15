@@ -40,6 +40,10 @@
     const results = new Map<number, ScoreboardEntry[]>();
 
     for (const contender of contenders.values()) {
+      if (!contender.scoreUpdated) {
+        continue;
+      }
+
       let classEntries = results.get(contender.compClassId);
 
       if (classEntries === undefined) {
@@ -75,9 +79,10 @@
       );
 
       queueEventHandler((contenders: Map<number, ScoreboardEntry>) => {
-        const contender = contenders.get(event.contenderId);
+        let contender = contenders.get(event.contenderId);
         if (!contender) {
-          return;
+          contender = createEmptyEntry(event.contenderId);
+          contenders.set(event.contenderId, contender);
         }
 
         contender.compClassId = event.compClassId;
@@ -95,18 +100,30 @@
 
       for (const event of events) {
         queueEventHandler((contenders: Map<number, ScoreboardEntry>) => {
-          const contender = contenders.get(event.contenderId);
+          let contender = contenders.get(event.contenderId);
           if (!contender) {
-            return;
+            contender = createEmptyEntry(event.contenderId);
+            contenders.set(event.contenderId, contender);
           }
 
           contender.score = event.score;
           contender.placement = event.placement;
           contender.finalist = event.finalist;
           contender.rankOrder = event.rankOrder;
+          contender.scoreUpdated = event.timestamp;
         });
       }
     });
+  });
+
+  const createEmptyEntry = (contenderId: number): ScoreboardEntry => ({
+    contenderId: contenderId,
+    compClassId: 0,
+    withdrawnFromFinals: false,
+    disqualified: false,
+    score: 0,
+    rankOrder: 0,
+    finalist: false,
   });
 
   onDestroy(() => {

@@ -171,6 +171,10 @@ func (mngr *ScoreEngineManager) hydrateEngine(ctx context.Context, contestID dom
 	}
 
 	for contender := range slices.Values(contenders) {
+		if contender.Entered == nil {
+			continue
+		}
+
 		mngr.eventBroker.Dispatch(contestID, domain.ContenderEnteredEvent{
 			ContenderID: contender.ID,
 			CompClassID: contender.CompClassID,
