@@ -28,4 +28,7 @@ func TestDiffMap(t *testing.T) {
 
 	assert.Len(t, diff, 3)
 	assert.ElementsMatch(t, []string{"Alicia", "Tommy", "Eve"}, diff)
+
+	diff = dm.Commit()
+	assert.Len(t, diff, 0)
 }

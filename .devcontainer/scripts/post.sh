@@ -6,3 +6,8 @@ sudo mariadb -e "CREATE USER climblive@localhost IDENTIFIED BY 'secretpassword';
 sudo mariadb -e "GRANT ALL PRIVILEGES ON climblive.* TO climblive@localhost;"
 sudo mariadb climblive -e "SOURCE backend/database/scoreboard.sql" --default-character-set utf8mb4
 sudo mariadb climblive -e "SOURCE backend/database/samples.sql" --default-character-set utf8mb4
+
+for i in $(seq -f "%04g" 2 200)
+do
+    sudo mariadb climblive -e "INSERT INTO contender VALUES (NULL, 1, 1, 'ABCD$i', NULL, NULL, NULL, NULL, FALSE, FALSE)"
+done

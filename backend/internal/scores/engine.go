@@ -7,6 +7,7 @@ import (
 	"maps"
 	"slices"
 	"sync"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 )
@@ -30,7 +31,7 @@ type ScoreEngine struct {
 
 	problems   map[domain.ProblemID]*Problem
 	contenders map[domain.ContenderID]*Contender
-	scores     DiffMap[domain.ContenderID, domain.Score]
+	scores     *DiffMap[domain.ContenderID, domain.Score]
 }
 
 func NewScoreEngine(contestID domain.ContestID, eventBroker domain.EventBroker, rules ScoringRules, ranker Ranker) *ScoreEngine {
@@ -92,6 +93,19 @@ func (e *ScoreEngine) run(ctx context.Context, filter domain.EventFilter, wg *sy
 	defer e.eventBroker.Unsubscribe(subscriptionID)
 
 	close(ready)
+
+	go func(ctx context.Context) {
+		ticker := time.Tick(100 * time.Millisecond)
+
+		for {
+			select {
+			case <-ticker:
+				e.publishUpdatedScores()
+			case <-ctx.Done():
+				return
+			}
+		}
+	}(ctx)
 
 	for {
 		func() {
@@ -317,14 +331,24 @@ func (e *ScoreEngine) rankCompClasses(compClassIDs iter.Seq[domain.CompClassID])
 func (e *ScoreEngine) publishUpdatedScores() {
 	diff := e.scores.Commit()
 
+	var batch []domain.ContenderScoreUpdatedEvent
+
 	for score := range slices.Values(diff) {
-		e.eventBroker.Dispatch(e.contestID, domain.ContenderScoreUpdatedEvent{
+		event := domain.ContenderScoreUpdatedEvent{
 			Timestamp:   score.Timestamp,
 			ContenderID: score.ContenderID,
 			Score:       score.Score,
 			Placement:   score.Placement,
 			Finalist:    score.Finalist,
 			RankOrder:   score.RankOrder,
-		})
+		}
+
+		e.eventBroker.Dispatch(e.contestID, event)
+
+		batch = append(batch, event)
+	}
+
+	if len(batch) > 0 {
+		e.eventBroker.Dispatch(e.contestID, batch)
 	}
 }

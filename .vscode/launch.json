@@ -25,5 +25,12 @@
             "command": "pnpm run dev",
             "cwd": "${workspaceFolder}/web/scoreboard",
         },
+        {
+            "name": "Simulator",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "backend/cmd/simulator/main.go"
+        }
     ]
 }

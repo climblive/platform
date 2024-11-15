@@ -231,6 +231,10 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 		return mty, errors.Errorf("%w: %w", domain.ErrInvalidData, domain.ErrEmptyName)
 	}
 
+	if contender.PublicName == "" {
+		contender.PublicName = contender.Name
+	}
+
 	publicInfoEvent.CompClassID = contender.CompClassID
 	publicInfoEvent.PublicName = contender.PublicName
 	publicInfoEvent.ClubName = contender.ClubName

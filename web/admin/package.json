@@ -17,11 +17,11 @@
     "@tanstack/svelte-query-devtools": "^5.17.0",
     "@tsconfig/svelte": "^5.0.2",
     "rollup-plugin-copy": "^3.5.0",
-    "svelte": "^4.2.8",
+    "svelte": "^4.2.19",
     "svelte-check": "^3.6.2",
     "tslib": "^2.6.2",
     "typescript": "^5.3.3",
-    "vite": "^5.0.8"
+    "vite": "^5.2.14"
   },
   "dependencies": {
     "@climblive/lib": "workspace:*",

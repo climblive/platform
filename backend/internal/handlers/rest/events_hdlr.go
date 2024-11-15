@@ -35,7 +35,7 @@ func (hdlr *eventHandler) HandleSubscribeContestEvents(w http.ResponseWriter, r 
 		contestID,
 		0,
 		"CONTENDER_PUBLIC_INFO_UPDATED",
-		"CONTENDER_SCORE_UPDATED",
+		"[]CONTENDER_SCORE_UPDATED",
 	)
 
 	hdlr.subscribe(w, r, filter, logger)
@@ -95,8 +95,10 @@ func (hdlr *eventHandler) subscribe(
 			panic(err)
 		}
 
-		w.Write([]byte(fmt.Sprintf("event: %s\n", event.Name)))
-		w.Write([]byte(fmt.Sprintf("data: %s\n\n", json)))
+		_, err = w.Write([]byte(fmt.Sprintf("event: %s\ndata: %s\n\n", event.Name, json)))
+		if err != nil {
+			panic(err)
+		}
 
 		w.(http.Flusher).Flush()
 	}
