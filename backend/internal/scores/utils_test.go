@@ -73,31 +73,31 @@ func TestCompClasses(t *testing.T) {
 	contenders := make(map[domain.ContenderID]*scores.Contender)
 
 	contenders[1] = &scores.Contender{
-		ID:          1,
+		ID:          rand.Int(),
 		CompClassID: 1,
 	}
 	contenders[2] = &scores.Contender{
-		ID:          2,
+		ID:          rand.Int(),
 		CompClassID: 1,
 	}
 	contenders[3] = &scores.Contender{
-		ID:          3,
+		ID:          rand.Int(),
 		CompClassID: 2,
 	}
 	contenders[4] = &scores.Contender{
-		ID:          4,
+		ID:          rand.Int(),
 		CompClassID: 3,
 	}
 	contenders[5] = &scores.Contender{
-		ID:          5,
+		ID:          rand.Int(),
 		CompClassID: 1,
 	}
 	contenders[6] = &scores.Contender{
-		ID:          6,
+		ID:          rand.Int(),
 		CompClassID: 2,
 	}
 	contenders[7] = &scores.Contender{
-		ID:          7,
+		ID:          rand.Int(),
 		CompClassID: 1,
 	}
 
