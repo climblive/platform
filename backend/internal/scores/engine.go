@@ -108,13 +108,13 @@ func (e *ScoreEngine) run(ctx context.Context, filter domain.EventFilter, wg *sy
 	}(ctx)
 
 	for {
-		func() {
+		proceed := func() bool {
 			event, err := eventReader.AwaitEvent(ctx)
 			switch err {
 			case nil:
 			case context.Canceled, context.DeadlineExceeded:
 				e.logger.Info("score engine shutting down", "reason", err.Error())
-				return
+				return false
 			default:
 				panic(err)
 			}
@@ -144,7 +144,13 @@ func (e *ScoreEngine) run(ctx context.Context, filter domain.EventFilter, wg *sy
 			case domain.ProblemUpdatedEvent, domain.ProblemDeletedEvent:
 				e.logger.Warn("discarding unsupported event", "event", event)
 			}
+
+			return true
 		}()
+
+		if !proceed {
+			break
+		}
 	}
 }
 
