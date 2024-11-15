@@ -110,6 +110,7 @@
           contender.placement = event.placement;
           contender.finalist = event.finalist;
           contender.rankOrder = event.rankOrder;
+          contender.scoreUpdated = event.timestamp;
         });
       }
     });
@@ -118,8 +119,6 @@
   const createEmptyEntry = (contenderId: number): ScoreboardEntry => ({
     contenderId: contenderId,
     compClassId: 0,
-    publicName: "",
-    clubName: "",
     withdrawnFromFinals: false,
     disqualified: false,
     score: 0,
