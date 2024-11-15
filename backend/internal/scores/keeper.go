@@ -9,6 +9,7 @@ import (
 )
 
 type Keeper struct {
+	mu          sync.RWMutex
 	eventBroker domain.EventBroker
 	scores      map[domain.ContenderID]domain.Score
 }
@@ -73,17 +74,16 @@ func (k *Keeper) run(ctx context.Context, filter domain.EventFilter, wg *sync.Wa
 }
 
 func (k *Keeper) HandleContenderScoreUpdated(event domain.ContenderScoreUpdatedEvent) {
-	k.scores[event.ContenderID] = domain.Score{
-		Timestamp:   event.Timestamp,
-		ContenderID: event.ContenderID,
-		Score:       event.Score,
-		Placement:   event.Placement,
-		Finalist:    event.Finalist,
-		RankOrder:   event.RankOrder,
-	}
+	k.mu.Lock()
+	defer k.mu.Unlock()
+
+	k.scores[event.ContenderID] = domain.Score(event)
 }
 
 func (k *Keeper) GetScore(contenderID domain.ContenderID) (domain.Score, error) {
+	k.mu.RLock()
+	defer k.mu.RUnlock()
+
 	if score, found := k.scores[contenderID]; found {
 		return score, nil
 	}

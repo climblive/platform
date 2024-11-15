@@ -24,6 +24,7 @@ func (problemRecord) TableName() string {
 	return "problem"
 }
 
+//nolint:unused // will be used in future versions
 func (r problemRecord) fromDomain(problem domain.Problem) problemRecord {
 	return problemRecord{
 		ID:                 e2n(int(problem.ID)),

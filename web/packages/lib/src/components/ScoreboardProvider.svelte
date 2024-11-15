@@ -8,6 +8,7 @@
   } from "@climblive/lib/models";
   import { onDestroy, onMount, setContext } from "svelte";
   import { writable } from "svelte/store";
+  import * as z from "zod";
 
   export let contestId: number;
 
@@ -39,6 +40,10 @@
     const results = new Map<number, ScoreboardEntry[]>();
 
     for (const contender of contenders.values()) {
+      if (!contender.scoreUpdated) {
+        continue;
+      }
+
       let classEntries = results.get(contender.compClassId);
 
       if (classEntries === undefined) {
@@ -74,9 +79,10 @@
       );
 
       queueEventHandler((contenders: Map<number, ScoreboardEntry>) => {
-        const contender = contenders.get(event.contenderId);
+        let contender = contenders.get(event.contenderId);
         if (!contender) {
-          return;
+          contender = createEmptyEntry(event.contenderId);
+          contenders.set(event.contenderId, contender);
         }
 
         contender.compClassId = event.compClassId;
@@ -87,21 +93,37 @@
       });
     });
 
-    eventSource.addEventListener("CONTENDER_SCORE_UPDATED", (e) => {
-      const event = contenderScoreUpdatedEventSchema.parse(JSON.parse(e.data));
+    eventSource.addEventListener("[]CONTENDER_SCORE_UPDATED", (e) => {
+      const events = z
+        .array(contenderScoreUpdatedEventSchema)
+        .parse(JSON.parse(e.data));
 
-      queueEventHandler((contenders: Map<number, ScoreboardEntry>) => {
-        const contender = contenders.get(event.contenderId);
-        if (!contender) {
-          return;
-        }
+      for (const event of events) {
+        queueEventHandler((contenders: Map<number, ScoreboardEntry>) => {
+          let contender = contenders.get(event.contenderId);
+          if (!contender) {
+            contender = createEmptyEntry(event.contenderId);
+            contenders.set(event.contenderId, contender);
+          }
 
-        contender.score = event.score;
-        contender.placement = event.placement;
-        contender.finalist = event.finalist;
-        contender.rankOrder = event.rankOrder;
-      });
+          contender.score = event.score;
+          contender.placement = event.placement;
+          contender.finalist = event.finalist;
+          contender.rankOrder = event.rankOrder;
+          contender.scoreUpdated = event.timestamp;
+        });
+      }
     });
+  });
+
+  const createEmptyEntry = (contenderId: number): ScoreboardEntry => ({
+    contenderId: contenderId,
+    compClassId: 0,
+    withdrawnFromFinals: false,
+    disqualified: false,
+    score: 0,
+    rankOrder: 0,
+    finalist: false,
   });
 
   onDestroy(() => {

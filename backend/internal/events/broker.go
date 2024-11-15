@@ -1,6 +1,7 @@
 package events
 
 import (
+	"log/slog"
 	"sync"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -48,10 +49,14 @@ func (b *broker) Dispatch(contestID domain.ContestID, event any) {
 			continue
 		}
 
-		subscription.Post(domain.EventEnvelope{
+		err := subscription.Post(domain.EventEnvelope{
 			Name: eventName,
 			Data: event,
 		})
+
+		if err != nil {
+			slog.Error("failed to post event", "subscription_id", subscription.ID, "error", err)
+		}
 	}
 }
 
@@ -83,6 +88,8 @@ func eventName(event any) string {
 		return "CONTENDER_PUBLIC_INFO_UPDATED"
 	case domain.ContenderScoreUpdatedEvent:
 		return "CONTENDER_SCORE_UPDATED"
+	case []domain.ContenderScoreUpdatedEvent:
+		return "[]CONTENDER_SCORE_UPDATED"
 	default:
 		return "UNKNOWN"
 	}

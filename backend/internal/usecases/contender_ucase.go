@@ -231,6 +231,10 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 		return mty, errors.Errorf("%w: %w", domain.ErrInvalidData, domain.ErrEmptyName)
 	}
 
+	if contender.PublicName == "" {
+		contender.PublicName = contender.Name
+	}
+
 	publicInfoEvent.CompClassID = contender.CompClassID
 	publicInfoEvent.PublicName = contender.PublicName
 	publicInfoEvent.ClubName = contender.ClubName
@@ -314,7 +318,10 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID doma
 		contenders = append(contenders, contender)
 	}
 
-	tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
 
 	return contenders, err
 }
