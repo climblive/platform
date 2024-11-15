@@ -324,8 +324,6 @@ func (e *ScoreEngine) rankCompClasses(compClassIDs iter.Seq[domain.CompClassID])
 			e.scores.Set(score.ContenderID, score)
 		}
 	}
-
-	e.publishUpdatedScores()
 }
 
 func (e *ScoreEngine) publishUpdatedScores() {
