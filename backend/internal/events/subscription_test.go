@@ -19,10 +19,11 @@ func TestPostAndReceive(t *testing.T) {
 
 	subscription := events.NewSubscription(domain.EventFilter{}, 1)
 
-	subscription.Post(domain.EventEnvelope{
+	err := subscription.Post(domain.EventEnvelope{
 		Name: "TEST",
 		Data: randomNumber,
 	})
+	require.NoError(t, err)
 
 	event, err := subscription.AwaitEvent(context.Background())
 
@@ -34,10 +35,12 @@ func TestFIFO(t *testing.T) {
 	subscription := events.NewSubscription(domain.EventFilter{}, 3)
 
 	for k := 1; k <= 3; k++ {
-		subscription.Post(domain.EventEnvelope{
+		err := subscription.Post(domain.EventEnvelope{
 			Name: "TEST",
 			Data: k,
 		})
+
+		require.NoError(t, err)
 	}
 
 	for k := 1; k <= 3; k++ {
@@ -67,10 +70,11 @@ func TestAwait(t *testing.T) {
 
 	time.Sleep(100 * time.Millisecond)
 
-	subscription.Post(domain.EventEnvelope{
+	err = subscription.Post(domain.EventEnvelope{
 		Name: "TEST",
 		Data: randomNumber,
 	})
+	require.NoError(t, err)
 
 	wg.Wait()
 

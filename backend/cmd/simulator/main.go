@@ -172,7 +172,10 @@ func (r *ContenderRunner) GetContender() domain.Contender {
 
 func (r *ContenderRunner) UpdateContender(contender domain.Contender) domain.Contender {
 	buf := new(bytes.Buffer)
-	json.NewEncoder(buf).Encode(contender)
+	err := json.NewEncoder(buf).Encode(contender)
+	if err != nil {
+		panic(err)
+	}
 
 	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("%s/contenders/%d", APIURL, contender.ID), buf)
 	if err != nil {
@@ -285,7 +288,10 @@ func (r *ContenderRunner) DeleteTick(tickID domain.TickID) {
 
 func (r *ContenderRunner) AddTick(contenderID domain.ContenderID, tick domain.Tick) domain.Tick {
 	buf := new(bytes.Buffer)
-	json.NewEncoder(buf).Encode(tick)
+	err := json.NewEncoder(buf).Encode(tick)
+	if err != nil {
+		panic(err)
+	}
 
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/contenders/%d/ticks", APIURL, contenderID), buf)
 	if err != nil {

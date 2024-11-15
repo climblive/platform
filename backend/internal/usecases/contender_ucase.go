@@ -318,7 +318,10 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID doma
 		contenders = append(contenders, contender)
 	}
 
-	tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
 
 	return contenders, err
 }

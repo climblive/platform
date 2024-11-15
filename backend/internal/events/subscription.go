@@ -83,7 +83,6 @@ func (s *Subscription) Post(event domain.EventEnvelope) error {
 
 	if s.bufferCapacity != 0 && len(s.buffer) == s.bufferCapacity {
 		s.closeReason = ErrBufferFull
-		s.buffer = nil
 
 		return ErrBufferFull
 	}
