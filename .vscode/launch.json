@@ -15,14 +15,14 @@
             "name": "Scorecard",
             "type": "node-terminal",
             "request": "launch",
-            "command": "pnpm run dev",
+            "command": "pnpm i && pnpm build && pnpm run dev",
             "cwd": "${workspaceFolder}/web/scorecard",
         },
         {
             "name": "Scoreboard",
             "type": "node-terminal",
             "request": "launch",
-            "command": "pnpm run dev",
+            "command": "pnpm i && pnpm build && pnpm run dev",
             "cwd": "${workspaceFolder}/web/scoreboard",
         },
         {
