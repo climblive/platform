@@ -1,6 +1,7 @@
 package scores_test
 
 import (
+	"math/rand"
 	"slices"
 	"testing"
 
@@ -73,31 +74,31 @@ func TestCompClasses(t *testing.T) {
 	contenders := make(map[domain.ContenderID]*scores.Contender)
 
 	contenders[1] = &scores.Contender{
-		ID:          rand.Int(),
+		ID:          domain.ContenderID(rand.Int()),
 		CompClassID: 1,
 	}
 	contenders[2] = &scores.Contender{
-		ID:          rand.Int(),
+		ID:          domain.ContenderID(rand.Int()),
 		CompClassID: 1,
 	}
 	contenders[3] = &scores.Contender{
-		ID:          rand.Int(),
+		ID:          domain.ContenderID(rand.Int()),
 		CompClassID: 2,
 	}
 	contenders[4] = &scores.Contender{
-		ID:          rand.Int(),
+		ID:          domain.ContenderID(rand.Int()),
 		CompClassID: 3,
 	}
 	contenders[5] = &scores.Contender{
-		ID:          rand.Int(),
+		ID:          domain.ContenderID(rand.Int()),
 		CompClassID: 1,
 	}
 	contenders[6] = &scores.Contender{
-		ID:          rand.Int(),
+		ID:          domain.ContenderID(rand.Int()),
 		CompClassID: 2,
 	}
 	contenders[7] = &scores.Contender{
-		ID:          rand.Int(),
+		ID:          domain.ContenderID(rand.Int()),
 		CompClassID: 1,
 	}
 
