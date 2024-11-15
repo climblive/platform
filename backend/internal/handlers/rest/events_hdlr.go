@@ -97,7 +97,8 @@ func (hdlr *eventHandler) subscribe(
 
 		_, err = w.Write([]byte(fmt.Sprintf("event: %s\ndata: %s\n\n", event.Name, json)))
 		if err != nil {
-			panic(err)
+			slog.Error("failed to write server-sent event", "error", err)
+			return
 		}
 
 		w.(http.Flusher).Flush()
