@@ -50,6 +50,23 @@ jobs:
       - run: pnpm --filter=* build
         working-directory: web
 
+  lint-backend:
+    name: Lint backend
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: "backend/go.mod"
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.60
+          working-directory: backend
+
   test-backend:
     name: Test backend
     runs-on: ubuntu-22.04

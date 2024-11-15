@@ -29,6 +29,7 @@ func (contestRecord) TableName() string {
 	return "contest"
 }
 
+//nolint:unused // will be used in future versions
 func (r contestRecord) fromDomain(contest domain.Contest) contestRecord {
 	return contestRecord{
 		ID:                 e2n(int(contest.ID)),

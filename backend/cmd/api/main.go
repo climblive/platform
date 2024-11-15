@@ -81,7 +81,7 @@ func main() {
 	}
 
 	context.AfterFunc(ctx, func() {
-		httpServer.Shutdown(context.Background())
+		_ = httpServer.Shutdown(context.Background())
 	})
 
 	err = httpServer.ListenAndServe()

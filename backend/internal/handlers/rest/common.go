@@ -3,6 +3,7 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -30,7 +31,11 @@ func writeResponse(w http.ResponseWriter, status int, data any) {
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
-	w.Write(json)
+
+	_, err = w.Write(json)
+	if err != nil {
+		slog.Error("failed to write http response", "error", err)
+	}
 }
 
 func handleError(w http.ResponseWriter, err error) {

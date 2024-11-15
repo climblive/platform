@@ -15,7 +15,8 @@ import (
 func TestMuxWithMiddlewares(t *testing.T) {
 	mw1 := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("A\n"))
+			_, err := w.Write([]byte("A\n"))
+			require.NoError(t, err)
 
 			next.ServeHTTP(w, r)
 		})
@@ -23,7 +24,8 @@ func TestMuxWithMiddlewares(t *testing.T) {
 
 	mw2 := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("B\n"))
+			_, err := w.Write([]byte("B\n"))
+			require.NoError(t, err)
 
 			next.ServeHTTP(w, r)
 		})
@@ -31,7 +33,8 @@ func TestMuxWithMiddlewares(t *testing.T) {
 
 	mw3 := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("C\n"))
+			_, err := w.Write([]byte("C\n"))
+			require.NoError(t, err)
 
 			next.ServeHTTP(w, r)
 		})
@@ -41,7 +44,8 @@ func TestMuxWithMiddlewares(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	dummyHandler := func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello, Mux!"))
+		_, err := w.Write([]byte("Hello, Mux!"))
+		require.NoError(t, err)
 	}
 
 	mux := rest.NewMux()
@@ -71,7 +75,8 @@ func TestMuxWithoutMiddlewares(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	dummyHandler := func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello, Mux!"))
+		_, err := w.Write([]byte("Hello, Mux!"))
+		require.NoError(t, err)
 	}
 
 	mux := rest.NewMux()

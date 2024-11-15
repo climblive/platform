@@ -23,6 +23,7 @@ func (compClassRecord) TableName() string {
 	return "comp_class"
 }
 
+//nolint:unused // will be used in future versions
 func (r compClassRecord) fromDomain(compClass domain.CompClass) compClassRecord {
 	return compClassRecord{
 		ID:          e2n(int(compClass.ID)),

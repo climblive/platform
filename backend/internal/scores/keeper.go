@@ -77,14 +77,7 @@ func (k *Keeper) HandleContenderScoreUpdated(event domain.ContenderScoreUpdatedE
 	k.mu.Lock()
 	defer k.mu.Unlock()
 
-	k.scores[event.ContenderID] = domain.Score{
-		Timestamp:   event.Timestamp,
-		ContenderID: event.ContenderID,
-		Score:       event.Score,
-		Placement:   event.Placement,
-		Finalist:    event.Finalist,
-		RankOrder:   event.RankOrder,
-	}
+	k.scores[event.ContenderID] = domain.Score(event)
 }
 
 func (k *Keeper) GetScore(contenderID domain.ContenderID) (domain.Score, error) {

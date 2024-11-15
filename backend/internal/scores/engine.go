@@ -338,18 +338,9 @@ func (e *ScoreEngine) publishUpdatedScores() {
 	var batch []domain.ContenderScoreUpdatedEvent
 
 	for score := range slices.Values(diff) {
-		event := domain.ContenderScoreUpdatedEvent{
-			Timestamp:   score.Timestamp,
-			ContenderID: score.ContenderID,
-			Score:       score.Score,
-			Placement:   score.Placement,
-			Finalist:    score.Finalist,
-			RankOrder:   score.RankOrder,
-		}
+		e.eventBroker.Dispatch(e.contestID, domain.ContenderScoreUpdatedEvent(score))
 
-		e.eventBroker.Dispatch(e.contestID, event)
-
-		batch = append(batch, event)
+		batch = append(batch, domain.ContenderScoreUpdatedEvent(score))
 	}
 
 	if len(batch) > 0 {
