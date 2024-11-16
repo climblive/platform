@@ -31,7 +31,7 @@ importers:
     devDependencies:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^3.0.1
-        version: 3.0.1(svelte@4.2.19)(vite@5.2.14(@types/node@20.10.6))
+        version: 3.0.1(svelte@4.2.19)(vite@5.2.14(@types/node@22.9.0))
       '@tanstack/svelte-query-devtools':
         specifier: ^5.17.0
         version: 5.17.0(@tanstack/svelte-query@5.36.0(svelte@4.2.19))(svelte@4.2.19)
@@ -55,7 +55,28 @@ importers:
         version: 5.3.3
       vite:
         specifier: ^5.2.14
-        version: 5.2.14(@types/node@20.10.6)
+        version: 5.2.14(@types/node@22.9.0)
+
+  e2e:
+    devDependencies:
+      '@playwright/test':
+        specifier: ^1.48.2
+        version: 1.48.2
+      '@testcontainers/mariadb':
+        specifier: ^10.14.0
+        version: 10.14.0
+      '@types/node':
+        specifier: ^22.9.0
+        version: 22.9.0
+      fs:
+        specifier: 0.0.1-security
+        version: 0.0.1-security
+      mariadb:
+        specifier: ^3.4.0
+        version: 3.4.0
+      testcontainers:
+        specifier: ^10.14.0
+        version: 10.14.0
 
   packages/lib:
     dependencies:
@@ -83,7 +104,7 @@ importers:
         version: 11.1.6(rollup@4.17.2)(tslib@2.6.2)(typescript@5.3.3)
       '@sveltejs/vite-plugin-svelte':
         specifier: ^3.0.2
-        version: 3.0.2(svelte@4.2.19)(vite@5.2.14(@types/node@20.10.6))
+        version: 3.0.2(svelte@4.2.19)(vite@5.2.14(@types/node@22.9.0))
       '@tsconfig/svelte':
         specifier: ^5.0.2
         version: 5.0.2
@@ -122,7 +143,7 @@ importers:
         version: 7.10.0(eslint@8.56.0)(typescript@5.3.3)
       vite:
         specifier: ^5.2.14
-        version: 5.2.14(@types/node@20.10.6)
+        version: 5.2.14(@types/node@22.9.0)
 
   scoreboard:
     dependencies:
@@ -150,7 +171,7 @@ importers:
     devDependencies:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^3.0.1
-        version: 3.0.2(svelte@4.2.19)(vite@5.2.14(@types/node@20.10.6))
+        version: 3.0.2(svelte@4.2.19)(vite@5.2.14(@types/node@22.9.0))
       '@tanstack/svelte-query-devtools':
         specifier: ^5.17.0
         version: 5.17.0(@tanstack/svelte-query@5.36.0(svelte@4.2.19))(svelte@4.2.19)
@@ -174,7 +195,7 @@ importers:
         version: 5.3.3
       vite:
         specifier: ^5.2.14
-        version: 5.2.14(@types/node@20.10.6)
+        version: 5.2.14(@types/node@22.9.0)
 
   scorecard:
     dependencies:
@@ -202,7 +223,7 @@ importers:
     devDependencies:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^3.0.1
-        version: 3.0.2(svelte@4.2.19)(vite@5.2.14(@types/node@20.10.6))
+        version: 3.0.2(svelte@4.2.19)(vite@5.2.14(@types/node@22.9.0))
       '@tanstack/svelte-query-devtools':
         specifier: ^5.17.0
         version: 5.17.0(@tanstack/svelte-query@5.36.0(svelte@4.2.19))(svelte@4.2.19)
@@ -229,28 +250,7 @@ importers:
         version: 5.3.3
       vite:
         specifier: ^5.2.14
-        version: 5.2.14(@types/node@20.10.6)
-
-  scorecard/e2e:
-    devDependencies:
-      '@playwright/test':
-        specifier: ^1.48.2
-        version: 1.48.2
-      '@testcontainers/mariadb':
-        specifier: ^10.14.0
-        version: 10.14.0
-      '@types/node':
-        specifier: ^22.9.0
-        version: 22.9.0
-      fs:
-        specifier: 0.0.1-security
-        version: 0.0.1-security
-      mariadb:
-        specifier: ^3.4.0
-        version: 3.4.0
-      testcontainers:
-        specifier: ^10.14.0
-        version: 10.14.0
+        version: 5.2.14(@types/node@22.9.0)
 
 packages:
 
@@ -685,9 +685,6 @@ packages:
 
   '@types/node@18.19.64':
     resolution: {integrity: sha512-955mDqvO2vFf/oL7V3WiUtiz+BugyX8uVbaT2H8oj3+8dRyH2FLiNdowe7eNqRM7IOIZvzDH76EoAT+gwm6aIQ==}
-
-  '@types/node@20.10.6':
-    resolution: {integrity: sha512-Vac8H+NlRNNlAmDfGUP7b5h/KA+AtWIzuXy0E6OyP8f1tCLYAtPvKRRDJjAPqhpCb0t6U2j7/xqAuLEebW2kiw==}
 
   '@types/node@22.9.0':
     resolution: {integrity: sha512-vuyHg81vvWA1Z1ELfvLko2c8f34gyA0zaic0+Rllc5lbCnbSyuvb2Oxpm6TAUAC/2xZN3QGqxBNggD1nNR2AfQ==}
@@ -2362,49 +2359,49 @@ snapshots:
     transitivePeerDependencies:
       - '@types/react'
 
-  '@sveltejs/vite-plugin-svelte-inspector@2.0.0(@sveltejs/vite-plugin-svelte@3.0.1(svelte@4.2.19)(vite@5.2.14(@types/node@20.10.6)))(svelte@4.2.19)(vite@5.2.14(@types/node@20.10.6))':
+  '@sveltejs/vite-plugin-svelte-inspector@2.0.0(@sveltejs/vite-plugin-svelte@3.0.1(svelte@4.2.19)(vite@5.2.14(@types/node@22.9.0)))(svelte@4.2.19)(vite@5.2.14(@types/node@22.9.0))':
     dependencies:
-      '@sveltejs/vite-plugin-svelte': 3.0.1(svelte@4.2.19)(vite@5.2.14(@types/node@20.10.6))
+      '@sveltejs/vite-plugin-svelte': 3.0.1(svelte@4.2.19)(vite@5.2.14(@types/node@22.9.0))
       debug: 4.3.4
       svelte: 4.2.19
-      vite: 5.2.14(@types/node@20.10.6)
+      vite: 5.2.14(@types/node@22.9.0)
     transitivePeerDependencies:
       - supports-color
 
-  '@sveltejs/vite-plugin-svelte-inspector@2.0.0(@sveltejs/vite-plugin-svelte@3.0.2(svelte@4.2.19)(vite@5.2.14(@types/node@20.10.6)))(svelte@4.2.19)(vite@5.2.14(@types/node@20.10.6))':
+  '@sveltejs/vite-plugin-svelte-inspector@2.0.0(@sveltejs/vite-plugin-svelte@3.0.2(svelte@4.2.19)(vite@5.2.14(@types/node@22.9.0)))(svelte@4.2.19)(vite@5.2.14(@types/node@22.9.0))':
     dependencies:
-      '@sveltejs/vite-plugin-svelte': 3.0.2(svelte@4.2.19)(vite@5.2.14(@types/node@20.10.6))
+      '@sveltejs/vite-plugin-svelte': 3.0.2(svelte@4.2.19)(vite@5.2.14(@types/node@22.9.0))
       debug: 4.3.4
       svelte: 4.2.19
-      vite: 5.2.14(@types/node@20.10.6)
+      vite: 5.2.14(@types/node@22.9.0)
     transitivePeerDependencies:
       - supports-color
 
-  '@sveltejs/vite-plugin-svelte@3.0.1(svelte@4.2.19)(vite@5.2.14(@types/node@20.10.6))':
+  '@sveltejs/vite-plugin-svelte@3.0.1(svelte@4.2.19)(vite@5.2.14(@types/node@22.9.0))':
     dependencies:
-      '@sveltejs/vite-plugin-svelte-inspector': 2.0.0(@sveltejs/vite-plugin-svelte@3.0.1(svelte@4.2.19)(vite@5.2.14(@types/node@20.10.6)))(svelte@4.2.19)(vite@5.2.14(@types/node@20.10.6))
+      '@sveltejs/vite-plugin-svelte-inspector': 2.0.0(@sveltejs/vite-plugin-svelte@3.0.1(svelte@4.2.19)(vite@5.2.14(@types/node@22.9.0)))(svelte@4.2.19)(vite@5.2.14(@types/node@22.9.0))
       debug: 4.3.4
       deepmerge: 4.3.1
       kleur: 4.1.5
       magic-string: 0.30.5
       svelte: 4.2.19
       svelte-hmr: 0.15.3(svelte@4.2.19)
-      vite: 5.2.14(@types/node@20.10.6)
-      vitefu: 0.2.5(vite@5.2.14(@types/node@20.10.6))
+      vite: 5.2.14(@types/node@22.9.0)
+      vitefu: 0.2.5(vite@5.2.14(@types/node@22.9.0))
     transitivePeerDependencies:
       - supports-color
 
-  '@sveltejs/vite-plugin-svelte@3.0.2(svelte@4.2.19)(vite@5.2.14(@types/node@20.10.6))':
+  '@sveltejs/vite-plugin-svelte@3.0.2(svelte@4.2.19)(vite@5.2.14(@types/node@22.9.0))':
     dependencies:
-      '@sveltejs/vite-plugin-svelte-inspector': 2.0.0(@sveltejs/vite-plugin-svelte@3.0.2(svelte@4.2.19)(vite@5.2.14(@types/node@20.10.6)))(svelte@4.2.19)(vite@5.2.14(@types/node@20.10.6))
+      '@sveltejs/vite-plugin-svelte-inspector': 2.0.0(@sveltejs/vite-plugin-svelte@3.0.2(svelte@4.2.19)(vite@5.2.14(@types/node@22.9.0)))(svelte@4.2.19)(vite@5.2.14(@types/node@22.9.0))
       debug: 4.3.4
       deepmerge: 4.3.1
       kleur: 4.1.5
       magic-string: 0.30.5
       svelte: 4.2.19
       svelte-hmr: 0.15.3(svelte@4.2.19)
-      vite: 5.2.14(@types/node@20.10.6)
-      vitefu: 0.2.5(vite@5.2.14(@types/node@20.10.6))
+      vite: 5.2.14(@types/node@22.9.0)
+      vitefu: 0.2.5(vite@5.2.14(@types/node@22.9.0))
     transitivePeerDependencies:
       - supports-color
 
@@ -2447,22 +2444,18 @@ snapshots:
 
   '@types/fs-extra@8.1.5':
     dependencies:
-      '@types/node': 20.10.6
+      '@types/node': 22.9.0
 
   '@types/geojson@7946.0.14': {}
 
   '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 20.10.6
+      '@types/node': 22.9.0
 
   '@types/minimatch@5.1.2': {}
 
   '@types/node@18.19.64':
-    dependencies:
-      undici-types: 5.26.5
-
-  '@types/node@20.10.6':
     dependencies:
       undici-types: 5.26.5
 
@@ -3888,18 +3881,18 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  vite@5.2.14(@types/node@20.10.6):
+  vite@5.2.14(@types/node@22.9.0):
     dependencies:
       esbuild: 0.20.2
       postcss: 8.4.38
       rollup: 4.17.2
     optionalDependencies:
-      '@types/node': 20.10.6
+      '@types/node': 22.9.0
       fsevents: 2.3.3
 
-  vitefu@0.2.5(vite@5.2.14(@types/node@20.10.6)):
+  vitefu@0.2.5(vite@5.2.14(@types/node@22.9.0)):
     optionalDependencies:
-      vite: 5.2.14(@types/node@20.10.6)
+      vite: 5.2.14(@types/node@22.9.0)
 
   which@2.0.2:
     dependencies:
