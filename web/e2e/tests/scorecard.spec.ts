@@ -48,6 +48,16 @@ test.beforeAll(async () => {
     .withExposedPorts({ container: 8090, host: 8090 })
     .withWaitStrategy(Wait.forHttp("/contests/1", 8090))
     .start()
+
+  const webContainer = await GenericContainer
+    .fromDockerfile("..")
+    .build();
+
+  await webContainer
+    .withNetwork(network)
+    .withExposedPorts({ container: 80, host: 8080 })
+    .withWaitStrategy(Wait.forListeningPorts())
+    .start()
 })
 
 test('enter contest by entering code', async ({ page }) => {
