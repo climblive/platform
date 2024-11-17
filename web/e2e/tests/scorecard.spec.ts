@@ -60,7 +60,7 @@ test.beforeAll(async () => {
     .start()
 })
 
-test('enter contest by entering code', async ({ page }) => {
+test('enter contest by entering registration code', async ({ page }) => {
   await page.goto('/');
 
   await expect(page).toHaveTitle(/ClimbLive/);
