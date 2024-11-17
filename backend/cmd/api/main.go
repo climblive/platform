@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"sync"
 	"syscall"
 
@@ -52,10 +53,13 @@ func main() {
 
 	var barriers []*sync.WaitGroup
 
+	dbPort, _ := strconv.Atoi(os.Getenv("DB_PORT"))
+
 	repo, err := repository.NewDatabase(
 		os.Getenv("DB_USERNAME"),
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_HOST"),
+		dbPort,
 		os.Getenv("DB_DATABASE"))
 	if err != nil {
 		if stack := utils.GetErrorStack(err); stack != "" {

@@ -13,7 +13,7 @@ test.beforeAll(async () => {
     .withUsername("climblive")
     .withUserPassword("secretpassword")
     .withDatabase("climblive")
-    .withExposedPorts({ container: 3306, host: 3306 })
+    .withExposedPorts(3306)
     .withNetwork(network)
     .withNetworkAliases("e2e")
     .start();
@@ -42,6 +42,7 @@ test.beforeAll(async () => {
       "DB_USERNAME": "climblive",
       "DB_PASSWORD": "secretpassword",
       "DB_HOST": "e2e",
+      "DB_PORT": "3306",
       "DB_DATABASE": "climblive",
     })
     .withNetwork(network)

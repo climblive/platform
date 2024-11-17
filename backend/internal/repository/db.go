@@ -16,14 +16,15 @@ type Database struct {
 	db *gorm.DB
 }
 
-func NewDatabase(username, password, host, database string) (*Database, error) {
+func NewDatabase(username, password, host string, port int, database string) (*Database, error) {
 	var db *gorm.DB
 
 	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:3306)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		username,
 		password,
 		host,
+		port,
 		database)
 
 	var logLevel logger.LogLevel = logger.Warn
