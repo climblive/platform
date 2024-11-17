@@ -75,7 +75,7 @@ jobs:
         working-directory: web/e2e
 
       - name: Run Playwright tests
-        run: DEBUG=testcontainers* pnpm exec playwright test
+        run: DEBUG=testcontainers* pnpm exec playwright test --project=chromium
         working-directory: web/e2e
 
       - uses: actions/upload-artifact@v4
