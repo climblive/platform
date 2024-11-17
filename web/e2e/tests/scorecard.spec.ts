@@ -4,14 +4,18 @@ import {
 } from "@testcontainers/mariadb";
 import { readFile } from "fs/promises";
 import { createConnection } from "mariadb";
-import { GenericContainer } from "testcontainers";
+import { GenericContainer, Network, Wait } from "testcontainers";
 
 test.beforeAll(async () => {
+  const network = await new Network().start();
+
   const dbContainer = await new MariaDbContainer()
     .withUsername("climblive")
     .withUserPassword("secretpassword")
     .withDatabase("climblive")
-    .withExposedPorts(3306)
+    .withExposedPorts({ container: 3306, host: 3306 })
+    .withNetwork(network)
+    .withNetworkAliases("e2e")
     .start();
 
   var dbConnection = await createConnection({
@@ -24,7 +28,7 @@ test.beforeAll(async () => {
   });
 
   const schema = await readFile("../../backend/database/scoreboard.sql", "utf8")
-  const samples = await readFile("../../backend/database/samples.sql", "utf8")
+  const samples = await readFile("./samples.sql", "utf8")
 
   dbConnection.query(schema)
   dbConnection.query(samples)
@@ -33,7 +37,8 @@ test.beforeAll(async () => {
     .fromDockerfile("../../backend")
     .build();
 
-  apiContainer.withExposedPorts({ container: 8090, host: 8090 }).start()
+  await apiContainer.withNetwork(network).withExposedPorts({ container: 8090, host: 8090 })
+    .withWaitStrategy(Wait.forHttp("/contests/1", 8090)).start()
 })
 
 test('enter contest by entering code', async ({ page }) => {
@@ -42,7 +47,17 @@ test('enter contest by entering code', async ({ page }) => {
   await expect(page).toHaveTitle(/ClimbLive/);
 
   const pinInput = await page.getByRole("textbox").first()
-  pinInput.pressSequentially("abcd0001");
+  pinInput.pressSequentially("abcd0002");
 
-  await page.getByRole("button", { name: "Enter" }).click();
+  await page.getByRole("textbox", { name: "Full name *" }).pressSequentially("Dwight Schrute")
+  await page.getByRole("textbox", {
+    name: "Club name"
+  }).pressSequentially("Scranton Climbing Club")
+  const compClass = page.getByRole("combobox", { name: "Competition class *" })
+  await compClass.click()
+  page.getByRole("option", { name: "Males", exact: true }).click()
+
+  await page.getByRole("button", { name: "Register" }).click()
+
+  await page.getByText("0p")
 });

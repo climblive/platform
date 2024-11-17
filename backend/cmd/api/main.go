@@ -52,7 +52,7 @@ func main() {
 
 	var barriers []*sync.WaitGroup
 
-	repo, err := repository.NewDatabase("climblive", "secretpassword", "localhost", "climblive")
+	repo, err := repository.NewDatabase("climblive", "secretpassword", "e2e", "climblive")
 	if err != nil {
 		if stack := utils.GetErrorStack(err); stack != "" {
 			log.Println(stack)
@@ -73,7 +73,7 @@ func main() {
 	mux := setupMux(repo, authorizer, eventBroker, scoreKeeper)
 
 	httpServer := &http.Server{
-		Addr:    "localhost:8090",
+		Addr:    "0.0.0.0:8090",
 		Handler: mux,
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
