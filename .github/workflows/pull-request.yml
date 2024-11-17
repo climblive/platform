@@ -67,6 +67,9 @@ jobs:
           cache: pnpm
           cache-dependency-path: web/pnpm-lock.yaml
 
+      - run: pnpm i
+        working-directory: web/e2e
+
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
         working-directory: web/e2e
