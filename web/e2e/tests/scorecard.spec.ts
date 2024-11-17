@@ -37,8 +37,17 @@ test.beforeAll(async () => {
     .fromDockerfile("../../backend")
     .build();
 
-  await apiContainer.withNetwork(network).withExposedPorts({ container: 8090, host: 8090 })
-    .withWaitStrategy(Wait.forHttp("/contests/1", 8090)).start()
+  await apiContainer
+    .withEnvironment({
+      "DB_USERNAME": "climblive",
+      "DB_PASSWORD": "secretpassword",
+      "DB_HOST": "e2e",
+      "DB_DATABASE": "climblive",
+    })
+    .withNetwork(network)
+    .withExposedPorts({ container: 8090, host: 8090 })
+    .withWaitStrategy(Wait.forHttp("/contests/1", 8090))
+    .start()
 })
 
 test('enter contest by entering code', async ({ page }) => {

@@ -52,7 +52,11 @@ func main() {
 
 	var barriers []*sync.WaitGroup
 
-	repo, err := repository.NewDatabase("climblive", "secretpassword", "e2e", "climblive")
+	repo, err := repository.NewDatabase(
+		os.Getenv("DB_USERNAME"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_DATABASE"))
 	if err != nil {
 		if stack := utils.GetErrorStack(err); stack != "" {
 			log.Println(stack)
