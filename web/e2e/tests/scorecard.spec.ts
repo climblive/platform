@@ -1,15 +1,22 @@
 import { expect, test } from '@playwright/test';
 import {
-  MariaDbContainer
+  MariaDbContainer,
+  StartedMariaDbContainer
 } from "@testcontainers/mariadb";
-import { readFile } from "fs/promises";
-import { createConnection } from "mariadb";
-import { GenericContainer, Network, Wait } from "testcontainers";
+import { readFile } from 'fs/promises';
+import { Connection, createConnection } from "mariadb";
+import { GenericContainer, Network, StartedTestContainer, Wait } from "testcontainers";
+
+let dbConnection: Connection | undefined;
+let startedDbContainer: StartedMariaDbContainer | undefined;
+let startedApiContainer: StartedTestContainer | undefined;
+let startedWebContainer: StartedTestContainer | undefined;
 
 test.beforeAll(async () => {
+  await new Promise(r => setTimeout(r, 2000));
   const network = await new Network().start();
 
-  const dbContainer = await new MariaDbContainer()
+  startedDbContainer = await new MariaDbContainer()
     .withUsername("climblive")
     .withUserPassword("secretpassword")
     .withDatabase("climblive")
@@ -18,9 +25,9 @@ test.beforeAll(async () => {
     .withNetworkAliases("e2e")
     .start();
 
-  var dbConnection = await createConnection({
+  dbConnection = await createConnection({
     host: "localhost",
-    port: dbContainer.getMappedPort(3306),
+    port: startedDbContainer.getMappedPort(3306),
     user: "climblive",
     password: "secretpassword",
     database: "climblive",
@@ -37,7 +44,7 @@ test.beforeAll(async () => {
     .fromDockerfile("../../backend")
     .build();
 
-  await apiContainer
+  startedApiContainer = await apiContainer
     .withEnvironment({
       "DB_USERNAME": "climblive",
       "DB_PASSWORD": "secretpassword",
@@ -54,11 +61,18 @@ test.beforeAll(async () => {
     .fromDockerfile("..")
     .build();
 
-  await webContainer
+  startedWebContainer = await webContainer
     .withNetwork(network)
     .withExposedPorts({ container: 80, host: 8080 })
     .withWaitStrategy(Wait.forListeningPorts())
     .start()
+})
+
+test.afterAll(async () => {
+  await startedWebContainer?.stop()
+  await startedApiContainer?.stop();
+  await dbConnection?.end();
+  await startedDbContainer?.stop()
 })
 
 test('enter contest by entering registration code', async ({ page }) => {
