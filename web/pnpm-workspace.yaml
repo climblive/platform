@@ -3,3 +3,4 @@ packages:
   - scoreboard
   - admin
   - "packages/*"
+  - e2e

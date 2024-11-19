@@ -9,7 +9,14 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "backend/cmd/api/main.go"
+            "program": "backend/cmd/api/main.go",
+            "env": {
+                "DB_USERNAME": "climblive",
+                "DB_PASSWORD": "secretpassword",
+                "DB_HOST": "localhost",
+                "DB_PORT": "3306",
+                "DB_DATABASE": "climblive",
+            }
         },
         {
             "name": "Scorecard",

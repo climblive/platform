@@ -14,15 +14,22 @@
       ]
     }
   },
-  "runArgs": ["--add-host=host.docker.internal:host-gateway"],
+  "runArgs": [
+    "--add-host=host.docker.internal:host-gateway"
+  ],
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
-    "ghcr.io/devcontainers/features/go:1": {}
+    "ghcr.io/devcontainers/features/go:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [],
-  "forwardPorts": [8090],
-  "portsAttributes": { "8090": {} },
+  "forwardPorts": [
+    8090
+  ],
+  "portsAttributes": {
+    "8090": {}
+  },
   // Use 'postCreateCommand' to run commands after the container is created.
   "postCreateCommand": "./.devcontainer/scripts/post.sh"
   // Configure tool-specific properties.

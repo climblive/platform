@@ -1,3 +1,4 @@
+#!/bin/bash
 sudo apt update
 sudo apt install -y mariadb-server
 sudo service mariadb start
@@ -16,3 +17,6 @@ if [[ -n "${CODESPACE_NAME}" ]]; then
     API_URL="https://${CODESPACE_NAME}-8090.app.github.dev"
     sed -i "s,\"API_URL\":.*,\"API_URL\": \"${API_URL}\",g" web/packages/lib/src/config.json
 fi
+
+pnpm exec playwright install
+sudo /usr/local/share/npm-global/bin/pnpm exec playwright install-deps

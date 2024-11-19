@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"sync"
 	"syscall"
 
@@ -52,7 +53,14 @@ func main() {
 
 	var barriers []*sync.WaitGroup
 
-	repo, err := repository.NewDatabase("climblive", "secretpassword", "localhost", "climblive")
+	dbPort, _ := strconv.Atoi(os.Getenv("DB_PORT"))
+
+	repo, err := repository.NewDatabase(
+		os.Getenv("DB_USERNAME"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_HOST"),
+		dbPort,
+		os.Getenv("DB_DATABASE"))
 	if err != nil {
 		if stack := utils.GetErrorStack(err); stack != "" {
 			log.Println(stack)
@@ -73,7 +81,7 @@ func main() {
 	mux := setupMux(repo, authorizer, eventBroker, scoreKeeper)
 
 	httpServer := &http.Server{
-		Addr:    "localhost:8090",
+		Addr:    "0.0.0.0:8090",
 		Handler: mux,
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
