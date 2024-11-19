@@ -65,7 +65,10 @@ test.beforeAll(async () => {
     .withExposedPorts({ container: 80, host: 8080 })
     .withWaitStrategy(Wait.forListeningPorts())
 
-  return await Promise.all([apiContainer.start(), webContainer.start()])
+  const startedContainers = await Promise.all([apiContainer.start(), webContainer.start()])
+
+  startedApiContainer = startedContainers[0];
+  startedWebContainer = startedContainers[1]
 })
 
 test.afterAll(async () => {
