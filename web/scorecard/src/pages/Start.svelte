@@ -78,7 +78,7 @@
 <main>
   <header>
     <h1>Welcome</h1>
-    <p>Enter your unique registration code:</p>
+    <p>Enter your unique registration code!</p>
   </header>
   <form on:submit|preventDefault={submitForm}>
     <PinInput
