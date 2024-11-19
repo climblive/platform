@@ -13,7 +13,6 @@ let startedApiContainer: StartedTestContainer | undefined;
 let startedWebContainer: StartedTestContainer | undefined;
 
 test.beforeAll(async () => {
-  await new Promise(r => setTimeout(r, 2000));
   const network = await new Network().start();
 
   startedDbContainer = await new MariaDbContainer()
