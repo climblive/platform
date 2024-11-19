@@ -40,11 +40,15 @@ test.beforeAll(async () => {
   dbConnection.query(schema)
   dbConnection.query(samples)
 
-  const apiContainer = await GenericContainer
+  const apiContainerBuilder = GenericContainer
     .fromDockerfile("../../backend")
-    .build();
 
-  startedApiContainer = await apiContainer
+  const webContainerBuilder = GenericContainer
+    .fromDockerfile("..")
+
+  let [apiContainer, webContainer] = await Promise.all([apiContainerBuilder.build(), webContainerBuilder.build()]);
+
+  apiContainer = apiContainer
     .withEnvironment({
       "DB_USERNAME": "climblive",
       "DB_PASSWORD": "secretpassword",
@@ -55,17 +59,13 @@ test.beforeAll(async () => {
     .withNetwork(network)
     .withExposedPorts({ container: 8090, host: 8090 })
     .withWaitStrategy(Wait.forHttp("/contests/1", 8090))
-    .start()
 
-  const webContainer = await GenericContainer
-    .fromDockerfile("..")
-    .build();
-
-  startedWebContainer = await webContainer
+  webContainer = webContainer
     .withNetwork(network)
     .withExposedPorts({ container: 80, host: 8080 })
     .withWaitStrategy(Wait.forListeningPorts())
-    .start()
+
+  return await Promise.all([apiContainer.start(), webContainer.start()])
 })
 
 test.afterAll(async () => {
