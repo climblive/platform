@@ -82,8 +82,10 @@ test('enter contest by entering registration code', async ({ page }) => {
 
   await expect(page).toHaveTitle(/ClimbLive/);
 
-  const pinInput = await page.getByRole("textbox").first()
+  const pinInput = await page.getByRole("textbox", { name: "Pin character 1 out of 8" })
   pinInput.pressSequentially("abcd0002");
+
+  await page.waitForURL('/ABCD0002/register');
 
   await page.getByRole("textbox", { name: "Full name *" }).pressSequentially("Dwight Schrute")
   await page.getByRole("textbox", {
@@ -95,5 +97,27 @@ test('enter contest by entering registration code', async ({ page }) => {
 
   await page.getByRole("button", { name: "Register" }).click()
 
+  await page.waitForURL('/ABCD0002');
+
   await page.getByText("0p")
+});
+
+test('registration code is saved in local storage', async ({ page }) => {
+  await page.goto('/');
+
+  await expect(page).toHaveTitle(/ClimbLive/);
+
+  const pinInput = await page.getByRole("textbox", { name: "Pin character 1 out of 8" })
+  pinInput.pressSequentially("abcd0001");
+
+  await page.waitForURL('/ABCD0001');
+  await page.getByText("Albert Einstein")
+
+  await page.goto('/');
+  await page.waitForURL('/');
+
+  await page.getByRole("button", { name: "Enter" }).click()
+
+  await page.waitForURL('/ABCD0001');
+  await page.getByText("Albert Einstein")
 });
