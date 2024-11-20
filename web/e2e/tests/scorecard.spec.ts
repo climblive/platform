@@ -82,8 +82,8 @@ test('enter contest by entering registration code', async ({ page }) => {
 
   await expect(page).toHaveTitle(/ClimbLive/);
 
-  const pinInput = await page.getByRole("textbox", { name: "Pin character 1 out of 8" })
-  pinInput.pressSequentially("abcd0002");
+  const pinInput = page.getByRole("textbox", { name: "Pin character 1 out of 8" })
+  await pinInput.pressSequentially("abcd0002");
 
   await page.waitForURL('/ABCD0002/register');
 
@@ -93,25 +93,23 @@ test('enter contest by entering registration code', async ({ page }) => {
   }).pressSequentially("Scranton Climbing Club")
   const compClass = page.getByRole("combobox", { name: "Competition class *" })
   await compClass.click()
-  page.getByRole("option", { name: "Males", exact: true }).click()
+  await page.getByRole("option", { name: "Males", exact: true }).click()
 
   await page.getByRole("button", { name: "Register" }).click()
 
   await page.waitForURL('/ABCD0002');
 
-  await page.getByText("0p")
+  await expect(page.getByText("2nd place")).toBeVisible()
 });
 
 test('registration code is saved in local storage', async ({ page }) => {
   await page.goto('/');
 
-  await expect(page).toHaveTitle(/ClimbLive/);
-
-  const pinInput = await page.getByRole("textbox", { name: "Pin character 1 out of 8" })
-  pinInput.pressSequentially("abcd0001");
+  const pinInput = page.getByRole("textbox", { name: "Pin character 1 out of 8" })
+  await pinInput.pressSequentially("abcd0001");
 
   await page.waitForURL('/ABCD0001');
-  await page.getByText("Albert Einstein")
+  await expect(page.getByText("Albert Einstein")).toBeVisible();
 
   await page.goto('/');
   await page.waitForURL('/');
@@ -119,5 +117,21 @@ test('registration code is saved in local storage', async ({ page }) => {
   await page.getByRole("button", { name: "Enter" }).click()
 
   await page.waitForURL('/ABCD0001');
-  await page.getByText("Albert Einstein")
+  await expect(page.getByText("Albert Einstein")).toBeVisible();
+});
+
+test('deep link into scorecard', async ({ page }) => {
+  await page.goto('/abcd0001');
+
+  await expect(page.getByText("Albert Einstein")).toBeVisible();
+});
+
+test('garbage session value in local storage is thrown out', async ({ page }) => {
+  await page.goto('/');
+
+  await page.evaluate(() => localStorage.setItem('session', 'bad_data'))
+
+  await page.goto('/');
+
+  await expect(page.getByRole("textbox", { name: "Pin character 1 out of 8" })).toHaveValue("");
 });
