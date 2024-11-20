@@ -135,3 +135,49 @@ test('garbage session value in local storage is thrown out', async ({ page }) =>
 
   await expect(page.getByRole("textbox", { name: "Pin character 1 out of 8" })).toHaveValue("");
 });
+
+test('edit profile', async ({ page }) => {
+  await page.goto('/ABCD0003');
+
+  await page.pause()
+
+  await expect(page.getByText("Michael Scott")).toBeVisible()
+  await expect(page.getByText("Scranton Climbing Club")).toBeVisible()
+  await expect(page.getByText("Males")).toBeVisible()
+
+  await page.getByRole("button", { name: "Edit" }).click();
+
+  await page.waitForURL('/ABCD0003/edit');
+
+  const nameInput = page.getByRole("textbox", { name: "Full name *" })
+  await nameInput.fill("")
+  await nameInput.pressSequentially("Phyllis Lapin-Vance")
+
+  const clubNameInput = page.getByRole("textbox", {
+    name: "Club name"
+  })
+  await clubNameInput.fill("")
+  await clubNameInput.pressSequentially("Dunder Mifflin Climbing Club")
+
+  const compClass = page.getByRole("combobox", { name: "Competition class *" })
+  await compClass.click()
+  await page.getByRole("option", { name: "Females", exact: true }).click()
+
+  await page.getByRole("button", { name: "Save" }).click()
+
+  await page.waitForURL('/ABCD0003');
+
+  await expect(page.getByText("Phyllis Lapin-Vance")).toBeVisible()
+  await expect(page.getByText("Dunder Mifflin Climbing Club")).toBeVisible()
+  await expect(page.getByText("Females")).toBeVisible()
+});
+
+test('cancel edit profile', async ({ page }) => {
+  await page.goto('/ABCD0001/edit');
+
+  await page.getByRole("button", { name: "Cancel" }).click();
+
+  await page.waitForURL('/ABCD0001');
+
+  await expect(page.getByText("Albert Einstein")).toBeVisible()
+});
