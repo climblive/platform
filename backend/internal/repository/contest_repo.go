@@ -89,6 +89,7 @@ func (d *Database) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context,
 
 	err := d.tx(tx).WithContext(ctx).Raw(`SELECT contest.*, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end FROM contest
 JOIN comp_class cc ON cc.contest_id = contest.id
+GROUP BY contest.id
 HAVING
 	? BETWEEN MIN(cc.time_begin) AND MAX(cc.time_end)
 	OR MIN(cc.time_begin) BETWEEN ? AND ?`, time.Now(), earliestStartTime, latestStartTime).Scan(&records).Error
