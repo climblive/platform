@@ -26,10 +26,16 @@
 
   let displayValue = formatTimeRemaining();
 
+  const tick = () => {
+    displayValue = formatTimeRemaining();
+
+    const next = 1_000 - (Date.now() % 1_000);
+
+    intervalTimerId = setTimeout(tick, next);
+  };
+
   onMount(() => {
-    intervalTimerId = setInterval(() => {
-      displayValue = formatTimeRemaining();
-    }, 1000);
+    tick();
   });
 
   onDestroy(() => {
