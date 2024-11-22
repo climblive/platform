@@ -139,8 +139,6 @@ test('garbage session value in local storage is thrown out', async ({ page }) =>
 test('edit profile', async ({ page }) => {
   await page.goto('/ABCD0003');
 
-  await page.pause()
-
   await expect(page.getByText("Michael Scott")).toBeVisible()
   await expect(page.getByText("Scranton Climbing Club")).toBeVisible()
   await expect(page.getByText("Males")).toBeVisible()
