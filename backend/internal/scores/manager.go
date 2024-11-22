@@ -167,6 +167,8 @@ type hydrationStats struct {
 }
 
 func (mngr *ScoreEngineManager) hydrateEngine(ctx context.Context, contestID domain.ContestID) (hydrationStats, error) {
+	stats := hydrationStats{}
+
 	problems, err := mngr.repo.GetProblemsByContest(ctx, nil, contestID)
 	if err != nil {
 		return hydrationStats{}, errors.Wrap(err, 0)
@@ -179,6 +181,8 @@ func (mngr *ScoreEngineManager) hydrateEngine(ctx context.Context, contestID dom
 			PointsZone: problem.PointsZone,
 			FlashBonus: problem.FlashBonus,
 		})
+
+		stats.problems += 1
 	}
 
 	contenders, err := mngr.repo.GetContendersByContest(ctx, nil, contestID)
@@ -207,6 +211,8 @@ func (mngr *ScoreEngineManager) hydrateEngine(ctx context.Context, contestID dom
 				ContenderID: contender.ID,
 			})
 		}
+
+		stats.contenders += 1
 	}
 
 	ticks, err := mngr.repo.GetTicksByContest(ctx, nil, contestID)
@@ -223,11 +229,9 @@ func (mngr *ScoreEngineManager) hydrateEngine(ctx context.Context, contestID dom
 			Zone:         tick.Zone,
 			AttemptsZone: tick.AttemptsZone,
 		})
+
+		stats.ticks += 1
 	}
 
-	return hydrationStats{
-		contenders: len(contenders),
-		problems:   len(problems),
-		ticks:      len(ticks),
-	}, nil
+	return stats, nil
 }

@@ -25,7 +25,7 @@
   });
 </script>
 
-<div bind:this={counter} class="counter">
+<div bind:this={counter} class="counter" aria-live="polite">
   {#if !(hideZero && value === 0 && prevValue === 0)}
     {prefix}<span class="suffix">p</span>
   {/if}

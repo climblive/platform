@@ -21,15 +21,11 @@
 <ContestStateProvider {startTime} {endTime} let:state>
   <header>
     <h2>{name} <span class="size">({results.length}/{allContenders})</span></h2>
-    <div class="timer">
-      {#if state === "NOT_STARTED"}
-        <Timer endTime={startTime} />
-        <span class="footer">Time until start</span>
-      {:else}
-        <Timer {endTime} />
-        <span class="footer">Time remaining</span>
-      {/if}
-    </div>
+    {#if state === "NOT_STARTED"}
+      <Timer endTime={startTime} label="Time until start" />
+    {:else}
+      <Timer {endTime} label="Time remaining" />
+    {/if}
   </header>
 </ContestStateProvider>
 
@@ -55,20 +51,5 @@
   .size {
     font-size: var(--sl-font-size-small);
     color: var(--sl-color-primary-700);
-  }
-
-  .timer {
-    text-align: center;
-    font-weight: var(--sl-font-weight-bold);
-    font-size: var(--sl-font-size-large);
-
-    & > * {
-      display: block;
-    }
-
-    & .footer {
-      font-weight: var(--sl-font-weight-normal);
-      font-size: var(--sl-font-size-small);
-    }
   }
 </style>
