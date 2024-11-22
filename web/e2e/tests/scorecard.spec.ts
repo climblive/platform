@@ -179,3 +179,64 @@ test('cancel edit profile', async ({ page }) => {
 
   await expect(page.getByText("Albert Einstein")).toBeVisible()
 });
+
+test("tick and untick all problems", async ({ page }) => {
+  await page.goto('/ABCD0003');
+
+  for (let p = 1; p <= 5; p++) {
+    const problem = page.getByRole("region", { name: `Problem ${p}` });
+    await expect(problem).toBeVisible();
+
+    await problem.getByRole("button", { name: "Tick" }).click();
+    await problem.getByRole("button", { name: "Top" }).click();
+
+    await expect(problem.getByText(`+${p * 100}p`)).toBeVisible();
+  }
+
+  await expect(page.getByText("1500p")).toBeVisible()
+  await expect(page.getByText("1st place")).toBeVisible()
+
+  for (let p = 1; p <= 5; p++) {
+    const problem = page.getByRole("region", { name: `Problem ${p}` });
+    await expect(problem).toBeVisible();
+
+    await problem.getByRole("button", { name: "Untick" }).click();
+
+    await expect(problem.getByText(`+${p * 100}p`)).not.toBeVisible();
+  }
+
+  await expect(page.getByText("0p", { exact: true })).toBeVisible()
+  await expect(page.getByText("2nd place")).toBeVisible()
+})
+
+test("flash a problem", async ({ page }) => {
+  await page.goto('/ABCD0003');
+
+  const problem = page.getByRole("region", { name: "Problem 1" });
+  await expect(problem).toBeVisible();
+
+  await problem.getByRole("button", { name: "Tick" }).click();
+  await problem.getByRole("button", { name: "Flash" }).click();
+
+  await expect(problem.getByText("+110p")).toBeVisible();
+
+  await problem.getByRole("button", { name: "Untick" }).click();
+
+  await expect(problem.getByText("+110p")).not.toBeVisible();
+})
+
+test.only("tick buttons are disabled before contest has started", async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2023-11-01T00:00:00'));
+
+  await page.goto('/ABCD0001');
+
+  const timer = page.getByRole("timer", { name: "Time until start" })
+  await expect(timer).toHaveText("2 months")
+
+  await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
+
+  const problem = page.getByRole("region", { name: "Problem 1" });
+  await expect(problem).toBeVisible();
+
+  await expect(problem.getByRole("button", { name: "Tick" })).toBeDisabled();
+})
