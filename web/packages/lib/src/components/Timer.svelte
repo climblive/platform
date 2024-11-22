@@ -1,10 +1,13 @@
 <script lang="ts">
   import { formatDistanceToNow, intervalToDuration } from "date-fns";
   import { onDestroy, onMount } from "svelte";
+  import { uuidv4 } from "../utils";
 
   export let endTime: Date;
+  export let label: string;
 
   let intervalTimerId: number;
+  const labelId = uuidv4();
 
   const formatTimeRemaining = () => {
     const now = new Date();
@@ -48,4 +51,28 @@
   });
 </script>
 
-<span role="timer" aria-live="off">{displayValue}</span>
+<div class="timer">
+  <span role="timer" aria-live="off" aria-labelledby={labelId}
+    >{displayValue}</span
+  >
+  <label for="" id={labelId}>{label}</label>
+</div>
+
+<style>
+  .timer {
+    text-align: right;
+
+    & > * {
+      display: block;
+    }
+
+    & span[role="timer"] {
+      font-weight: var(--sl-font-weight-bold);
+    }
+
+    & label {
+      font-weight: var(--sl-font-weight-normal);
+      font-size: 0.75em;
+    }
+  }
+</style>
