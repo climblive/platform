@@ -13,6 +13,8 @@
       return "00:00:00";
     }
 
+    now.setMilliseconds(0);
+
     const duration = intervalToDuration({ start: now, end: endTime });
 
     if (duration.years || duration.months || duration.weeks || duration.days) {
@@ -29,7 +31,10 @@
   const tick = () => {
     displayValue = formatTimeRemaining();
 
-    const next = 1_000 - (Date.now() % 1_000);
+    const firefoxEarlyWakeUpCompensation = 1;
+
+    const drift = Date.now() % 1_000;
+    const next = 1_000 - drift + firefoxEarlyWakeUpCompensation;
 
     intervalTimerId = setTimeout(tick, next);
   };
@@ -43,4 +48,4 @@
   });
 </script>
 
-<span>{displayValue}</span>
+<span role="timer" aria-live="off">{displayValue}</span>
