@@ -33,15 +33,11 @@
       <Score value={score} />
       <span>{placement ? `${asOrdinal(placement)} place` : "-"}</span>
     </div>
-    <div class="timer">
-      {#if state === "NOT_STARTED"}
-        <Timer endTime={startTime} />
-        <span class="footer">Time until start</span>
-      {:else}
-        <Timer {endTime} />
-        <span class="footer">Time remaining</span>
-      {/if}
-    </div>
+    {#if state === "NOT_STARTED"}
+      <Timer endTime={startTime} label="Time until start" />
+    {:else}
+      <Timer {endTime} label="Time remaining" />
+    {/if}
   </div>
 </header>
 
@@ -116,22 +112,6 @@
       display: flex;
       justify-content: space-between;
       align-items: end;
-    }
-
-    & .timer {
-      font-weight: var(--sl-font-weight-bold);
-      font-size: var(--sl-font-small);
-
-      & > * {
-        display: block;
-      }
-
-      & .footer {
-        font-size: var(--sl-font-size-x-small);
-        font-weight: var(--sl-font-weight-normal);
-      }
-
-      text-align: right;
     }
   }
 </style>

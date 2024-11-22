@@ -1,10 +1,13 @@
 <script lang="ts">
   import { formatDistanceToNow, intervalToDuration } from "date-fns";
   import { onDestroy, onMount } from "svelte";
+  import { uuidv4 } from "../utils";
 
   export let endTime: Date;
+  export let label: string;
 
   let intervalTimerId: number;
+  const labelId = uuidv4();
 
   const formatTimeRemaining = () => {
     const now = new Date();
@@ -12,6 +15,8 @@
     if (endTime.getTime() - now.getTime() <= 0) {
       return "00:00:00";
     }
+
+    now.setMilliseconds(0);
 
     const duration = intervalToDuration({ start: now, end: endTime });
 
@@ -26,10 +31,19 @@
 
   let displayValue = formatTimeRemaining();
 
+  const tick = () => {
+    displayValue = formatTimeRemaining();
+
+    const firefoxEarlyWakeUpCompensation = 1;
+
+    const drift = Date.now() % 1_000;
+    const next = 1_000 - drift + firefoxEarlyWakeUpCompensation;
+
+    intervalTimerId = setTimeout(tick, next);
+  };
+
   onMount(() => {
-    intervalTimerId = setInterval(() => {
-      displayValue = formatTimeRemaining();
-    }, 1000);
+    tick();
   });
 
   onDestroy(() => {
@@ -37,4 +51,28 @@
   });
 </script>
 
-<span>{displayValue}</span>
+<div class="timer">
+  <span role="timer" aria-live="off" aria-labelledby={labelId}
+    >{displayValue}</span
+  >
+  <label for="" id={labelId}>{label}</label>
+</div>
+
+<style>
+  .timer {
+    text-align: right;
+
+    & > * {
+      display: block;
+    }
+
+    & span[role="timer"] {
+      font-weight: var(--sl-font-weight-bold);
+    }
+
+    & label {
+      font-weight: var(--sl-font-weight-normal);
+      font-size: 0.75em;
+    }
+  }
+</style>
