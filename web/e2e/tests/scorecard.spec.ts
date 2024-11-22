@@ -57,7 +57,7 @@ test.beforeAll(async () => {
     })
     .withNetwork(network)
     .withExposedPorts({ container: 8090, host: 8090 })
-    .withWaitStrategy(Wait.forHttp("/contests/1", 8090))
+    .withWaitStrategy(Wait.forLogMessage(/score engine hydration complete/))
 
   webContainer = webContainer
     .withNetwork(network)
