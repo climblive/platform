@@ -8,5 +8,5 @@ test: images
 	PW_TEST_HTML_REPORT_OPEN='never' pnpm exec playwright test --headed --project="Mobile Chrome"
 
 .PHONY: test-ci
-test: images
+test-ci: images
 	DEBUG=testcontainers* pnpm exec playwright test
