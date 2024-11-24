@@ -41,15 +41,7 @@ test.beforeAll(async () => {
   dbConnection.query(schema)
   dbConnection.query(samples)
 
-  const apiContainerBuilder = GenericContainer
-    .fromDockerfile("../../backend")
-
-  const webContainerBuilder = GenericContainer
-    .fromDockerfile("..")
-
-  let [apiContainer, webContainer] = await Promise.all([apiContainerBuilder.build(), webContainerBuilder.build()]);
-
-  apiContainer = apiContainer
+  const apiContainer = new GenericContainer("climblive-api:latest")
     .withEnvironment({
       "DB_USERNAME": "climblive",
       "DB_PASSWORD": "secretpassword",
@@ -61,7 +53,7 @@ test.beforeAll(async () => {
     .withExposedPorts({ container: 8090, host: 8090 })
     .withWaitStrategy(Wait.forLogMessage(/score engine hydration complete/))
 
-  webContainer = webContainer
+  const webContainer = new GenericContainer("climblive-web:latest")
     .withNetwork(network)
     .withExposedPorts({ container: 80, host: 8080 })
     .withWaitStrategy(Wait.forListeningPorts())

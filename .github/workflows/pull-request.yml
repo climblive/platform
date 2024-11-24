@@ -75,7 +75,7 @@ jobs:
         working-directory: web/e2e
 
       - name: Run Playwright tests
-        run: pnpm exec playwright test
+        run: make test
         working-directory: web/e2e
 
       - uses: actions/upload-artifact@v4
