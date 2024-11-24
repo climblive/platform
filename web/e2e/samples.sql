@@ -6,6 +6,7 @@ INSERT INTO comp_class VALUES (NULL, 1, 1, 'Females', '16 years and older', '#ff
 INSERT INTO contender VALUES (NULL, 1, 1, 'ABCD0001', 'Albert Einstein', 'Testers\' Climbing Club', 1, '2024-01-01 00:00:00', FALSE, FALSE);
 INSERT INTO contender VALUES (NULL, 1, 1, 'ABCD0002', NULL, NULL, NULL, NULL, FALSE, FALSE);
 INSERT INTO contender VALUES (NULL, 1, 1, 'ABCD0003', 'Michael Scott', 'Scranton Climbing Club', 1, '2024-01-01 00:00:00', FALSE, FALSE);
+INSERT INTO contender VALUES (NULL, 1, 1, 'ABCD0004', NULL, NULL, NULL, NULL, FALSE, FALSE);
 INSERT INTO problem VALUES (NULL, 1, 1, 1, '#ef4444', '#eab308', 'The sloper', 'Very slippery', 100, 10);
 INSERT INTO problem VALUES (NULL, 1, 1, 2, '#f97316', NULL, NULL, NULL, 200, 10);
 INSERT INTO problem VALUES (NULL, 1, 1, 3, '#84cc16', NULL, NULL, NULL, 300, 10);

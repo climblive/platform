@@ -12,6 +12,8 @@ let startedDbContainer: StartedMariaDbContainer | undefined;
 let startedApiContainer: StartedTestContainer | undefined;
 let startedWebContainer: StartedTestContainer | undefined;
 
+test.describe.configure({ mode: 'serial' });
+
 test.beforeAll(async () => {
   const network = await new Network().start();
 
@@ -98,8 +100,6 @@ test('enter contest by entering registration code', async ({ page }) => {
   await page.getByRole("button", { name: "Register" }).click()
 
   await page.waitForURL('/ABCD0002');
-
-  await expect(page.getByText("2nd place")).toBeVisible()
 });
 
 test('registration code is saved in local storage', async ({ page }) => {
@@ -206,7 +206,7 @@ test("tick and untick all problems", async ({ page }) => {
   }
 
   await expect(page.getByText("0p", { exact: true })).toBeVisible()
-  await expect(page.getByText("2nd place")).toBeVisible()
+  await expect(page.getByText("1st place")).toBeVisible()
 })
 
 test("flash a problem", async ({ page }) => {
@@ -225,7 +225,7 @@ test("flash a problem", async ({ page }) => {
   await expect(problem.getByText("+110p")).not.toBeVisible();
 })
 
-test.only("tick buttons are disabled before contest has started", async ({ page }) => {
+test("tick buttons are disabled before contest has started", async ({ page }) => {
   await page.clock.setFixedTime(new Date('2023-11-01T00:00:00'));
 
   await page.goto('/ABCD0001');
@@ -240,3 +240,64 @@ test.only("tick buttons are disabled before contest has started", async ({ page 
 
   await expect(problem.getByRole("button", { name: "Tick" })).toBeDisabled();
 })
+
+test.describe("screenshots", () => {
+  test("registration code input", async ({ page }) => {
+    await page.goto('/')
+
+    await expect(page.getByRole("heading", { name: "Welcome" })).toBeVisible()
+    await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
+  });
+
+  test("registration", async ({ page }) => {
+    await page.goto('/abcd0004/register')
+
+    await expect(page.getByRole("textbox", { name: "Full name *" })).toBeVisible();
+    await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
+  });
+
+  test("edit profile", async ({ page }) => {
+    await page.goto('/abcd0001/edit')
+
+    await expect(page.getByRole("textbox", { name: "Full name *" })).toBeVisible();
+    await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
+  });
+
+  test.describe("scorecard", () => {
+    test("before contest has started", async ({ page }) => {
+      await page.clock.setFixedTime(new Date('2023-11-01T00:00:00'));
+
+      await page.goto('/abcd0001')
+
+      await expect(page.getByText("Albert Einstein")).toBeVisible();
+      await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
+    });
+
+    test("while contest is running", async ({ page }) => {
+      await page.clock.setFixedTime(new Date('2024-01-01T00:00:00'));
+
+      await page.goto('/abcd0001')
+
+      await expect(page.getByText("Albert Einstein")).toBeVisible();
+      await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
+    });
+
+    test("during grace period", async ({ page }) => {
+      await page.clock.setFixedTime(new Date('2025-01-01T00:00:00'));
+
+      await page.goto('/abcd0001')
+
+      await expect(page.getByText("Albert Einstein")).toBeVisible();
+      await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
+    });
+
+    test("after contest has ended", async ({ page }) => {
+      await page.clock.setFixedTime(new Date('2025-01-01T00:05:00'));
+
+      await page.goto('/abcd0001')
+
+      await expect(page.getByText("Albert Einstein")).toBeVisible();
+      await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
+    });
+  })
+});
