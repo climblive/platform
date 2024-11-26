@@ -64,6 +64,10 @@ test.beforeAll(async () => {
   startedWebContainer = startedContainers[1]
 })
 
+test.beforeAll(async ({ page }) => {
+  await page.waitForFunction(() => document.fonts.ready);
+})
+
 test.afterAll(async () => {
   await startedWebContainer?.stop()
   await startedApiContainer?.stop();
