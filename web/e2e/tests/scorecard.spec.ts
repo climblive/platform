@@ -64,10 +64,6 @@ test.beforeAll(async () => {
   startedWebContainer = startedContainers[1]
 })
 
-test.beforeAll(async ({ page }) => {
-  await page.waitForFunction(() => document.fonts.ready);
-})
-
 test.afterAll(async () => {
   await startedWebContainer?.stop()
   await startedApiContainer?.stop();
@@ -240,6 +236,7 @@ test("tick buttons are disabled before contest has started", async ({ page }) =>
 test.describe("screenshots", () => {
   test("registration code input", async ({ page }) => {
     await page.goto('/')
+    await page.waitForFunction(() => document.fonts.ready);
 
     await expect(page.getByRole("heading", { name: "Welcome" })).toBeVisible()
     await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
@@ -247,6 +244,7 @@ test.describe("screenshots", () => {
 
   test("registration", async ({ page }) => {
     await page.goto('/abcd0004/register')
+    await page.waitForFunction(() => document.fonts.ready);
 
     await expect(page.getByRole("textbox", { name: "Full name *" })).toBeVisible();
     await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
@@ -254,6 +252,7 @@ test.describe("screenshots", () => {
 
   test("edit profile", async ({ page }) => {
     await page.goto('/abcd0001/edit')
+    await page.waitForFunction(() => document.fonts.ready);
 
     await expect(page.getByRole("textbox", { name: "Full name *" })).toBeVisible();
     await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
@@ -264,6 +263,7 @@ test.describe("screenshots", () => {
       await page.clock.setFixedTime(new Date('2023-11-01T00:00:00'));
 
       await page.goto('/abcd0001')
+      await page.waitForFunction(() => document.fonts.ready);
 
       await expect(page.getByText("Albert Einstein")).toBeVisible();
       await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
@@ -273,6 +273,7 @@ test.describe("screenshots", () => {
       await page.clock.setFixedTime(new Date('2024-01-01T00:00:00'));
 
       await page.goto('/abcd0001')
+      await page.waitForFunction(() => document.fonts.ready);
 
       await expect(page.getByText("Albert Einstein")).toBeVisible();
       await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
@@ -282,6 +283,7 @@ test.describe("screenshots", () => {
       await page.clock.setFixedTime(new Date('2025-01-01T00:00:00'));
 
       await page.goto('/abcd0001')
+      await page.waitForFunction(() => document.fonts.ready);
 
       await expect(page.getByText("Albert Einstein")).toBeVisible();
       await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
@@ -291,6 +293,7 @@ test.describe("screenshots", () => {
       await page.clock.setFixedTime(new Date('2025-01-01T00:05:00'));
 
       await page.goto('/abcd0001')
+      await page.waitForFunction(() => document.fonts.ready);
 
       await expect(page.getByText("Albert Einstein")).toBeVisible();
       await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
