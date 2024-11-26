@@ -127,12 +127,6 @@
       outline-offset: var(--sl-input-focus-ring-offset);
       color: var(--sl-input-color-focus);
     }
-
-    &:hover {
-      background-color: var(--sl-input-background-color-hover);
-      border-color: var(--sl-input-border-color-hover);
-      color: var(--sl-input-color-hover);
-    }
   }
 
   input::placeholder {
