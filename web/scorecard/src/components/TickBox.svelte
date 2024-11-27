@@ -81,7 +81,11 @@
 <svelte:body on:click|capture={handleClickOutside} />
 
 <div data-variant={variant} bind:this={container}>
-  <button disabled={disabled || loading} on:click={handleCheck}>
+  <button
+    disabled={disabled || loading}
+    on:click={handleCheck}
+    aria-label={tick?.id ? "Untick" : "Tick"}
+  >
     {#if loading}
       <sl-spinner></sl-spinner>
     {:else if variant === "flashed"}
