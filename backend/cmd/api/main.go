@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/authorizer"
 	"github.com/climblive/platform/backend/internal/domain"
@@ -21,6 +22,8 @@ import (
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/utils"
+	"github.com/lmittmann/tint"
+	"github.com/mattn/go-isatty"
 )
 
 type registrationCodeGenerator struct {
@@ -48,7 +51,18 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	w := os.Stdout
+
+	logger := slog.New(tint.NewHandler(w, nil))
+
+	slog.SetDefault(slog.New(
+		tint.NewHandler(w, &tint.Options{
+			Level:      slog.LevelDebug,
+			TimeFormat: time.Kitchen,
+			NoColor:    !isatty.IsTerminal(w.Fd()),
+		}),
+	))
+
 	slog.SetDefault(logger)
 
 	var barriers []*sync.WaitGroup
