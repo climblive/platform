@@ -217,86 +217,68 @@ test("flash a problem", async ({ page }) => {
   await expect(problem.getByText("+110p")).not.toBeVisible();
 })
 
-test("tick buttons are disabled before contest has started", async ({ page }) => {
-  await page.clock.setFixedTime(new Date('2023-11-01T00:00:00'));
+test.describe("contest states", () => {
+  test("before contest has started", async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2023-11-01T00:00:00'));
 
-  await page.goto('/ABCD0001');
+    await page.goto('/ABCD0001');
 
-  const timer = page.getByRole("timer", { name: "Time until start" })
-  await expect(timer).toHaveText("2 months")
+    const timer = page.getByRole("timer", { name: "Time until start" })
+    await expect(timer).toHaveText("2 months")
 
-  await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
+    await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
 
-  const problem = page.getByRole("region", { name: "Problem 1" });
-  await expect(problem).toBeVisible();
+    const problem = page.getByRole("region", { name: "Problem 1" });
+    await expect(problem).toBeVisible();
 
-  await expect(problem.getByRole("button", { name: "Tick" })).toBeDisabled();
-})
-
-test.describe("screenshots", () => {
-  test("registration code input", async ({ page }) => {
-    await page.goto('/')
-    await page.waitForFunction(() => document.fonts.ready);
-
-    await expect(page.getByRole("heading", { name: "Welcome" })).toBeVisible()
-    await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
+    await expect(problem.getByRole("button", { name: "Tick" })).toBeDisabled();
   });
 
-  test("registration", async ({ page }) => {
-    await page.goto('/abcd0004/register')
-    await page.waitForFunction(() => document.fonts.ready);
+  test("while contest is running", async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2024-01-01T00:00:00'));
 
-    await expect(page.getByRole("textbox", { name: "Full name *" })).toBeVisible();
-    await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
+    await page.goto('/ABCD0001');
+
+    const timer = page.getByRole("timer", { name: "Time remaining" })
+    await expect(timer).toHaveText("12 months")
+
+    await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
+
+    const problem = page.getByRole("region", { name: "Problem 1" });
+    await expect(problem).toBeVisible();
+
+    await expect(problem.getByRole("button", { name: "Tick" })).toBeEnabled();
   });
 
-  test("edit profile", async ({ page }) => {
-    await page.goto('/abcd0001/edit')
-    await page.waitForFunction(() => document.fonts.ready);
+  test("during grace period", async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2025-01-01T00:00:00'));
 
-    await expect(page.getByRole("textbox", { name: "Full name *" })).toBeVisible();
-    await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
+    await page.goto('/ABCD0001');
+
+    const timer = page.getByRole("timer", { name: "Time remaining" })
+    await expect(timer).toHaveText("00:00:00")
+
+    await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
+
+    const problem = page.getByRole("region", { name: "Problem 1" });
+    await expect(problem).toBeVisible();
+
+    await expect(problem.getByRole("button", { name: "Tick" })).toBeEnabled();
   });
 
-  test.describe("scorecard", () => {
-    test("before contest has started", async ({ page }) => {
-      await page.clock.setFixedTime(new Date('2023-11-01T00:00:00'));
+  test("after contest has ended", async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2025-01-01T00:05:00'));
 
-      await page.goto('/abcd0001')
-      await page.waitForFunction(() => document.fonts.ready);
+    await page.goto('/ABCD0001');
 
-      await expect(page.getByText("Albert Einstein")).toBeVisible();
-      await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
-    });
+    const timer = page.getByRole("timer", { name: "Time remaining" })
+    await expect(timer).toHaveText("00:00:00")
 
-    test("while contest is running", async ({ page }) => {
-      await page.clock.setFixedTime(new Date('2024-01-01T00:00:00'));
+    await expect(page.getByRole("button", { name: "Edit" })).toBeDisabled();
 
-      await page.goto('/abcd0001')
-      await page.waitForFunction(() => document.fonts.ready);
+    const problem = page.getByRole("region", { name: "Problem 1" });
+    await expect(problem).toBeVisible();
 
-      await expect(page.getByText("Albert Einstein")).toBeVisible();
-      await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
-    });
-
-    test("during grace period", async ({ page }) => {
-      await page.clock.setFixedTime(new Date('2025-01-01T00:00:00'));
-
-      await page.goto('/abcd0001')
-      await page.waitForFunction(() => document.fonts.ready);
-
-      await expect(page.getByText("Albert Einstein")).toBeVisible();
-      await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
-    });
-
-    test("after contest has ended", async ({ page }) => {
-      await page.clock.setFixedTime(new Date('2025-01-01T00:05:00'));
-
-      await page.goto('/abcd0001')
-      await page.waitForFunction(() => document.fonts.ready);
-
-      await expect(page.getByText("Albert Einstein")).toBeVisible();
-      await expect(page).toHaveScreenshot({ maxDiffPixels: 100 })
-    });
+    await expect(problem.getByRole("button", { name: "Tick" })).toBeDisabled();
   })
 });
