@@ -106,6 +106,15 @@ test('registration code is saved in local storage', async ({ page }) => {
   await page.goto('/');
   await page.waitForURL('/');
 
+  await expect(page.getByRole("textbox", { name: "Pin character 1 out of 8" })).toHaveValue("A");
+  await expect(page.getByRole("textbox", { name: "Pin character 2 out of 8" })).toHaveValue("B");
+  await expect(page.getByRole("textbox", { name: "Pin character 3 out of 8" })).toHaveValue("C");
+  await expect(page.getByRole("textbox", { name: "Pin character 4 out of 8" })).toHaveValue("D");
+  await expect(page.getByRole("textbox", { name: "Pin character 5 out of 8" })).toHaveValue("0");
+  await expect(page.getByRole("textbox", { name: "Pin character 6 out of 8" })).toHaveValue("0");
+  await expect(page.getByRole("textbox", { name: "Pin character 7 out of 8" })).toHaveValue("0");
+  await expect(page.getByRole("textbox", { name: "Pin character 8 out of 8" })).toHaveValue("1");
+
   await page.getByRole("button", { name: "Enter" }).click()
 
   await page.waitForURL('/ABCD0001');
