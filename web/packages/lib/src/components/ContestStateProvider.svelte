@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { differenceInMilliseconds, isBefore } from "date-fns";
+  import { isBefore } from "date-fns";
   import { onDestroy } from "svelte";
   import type { ContestState } from "../types";
 
@@ -13,40 +13,35 @@
   $: {
     if (startTime && endTime) {
       clearInterval(intervalTimerId);
-      computeState();
+      tick();
     }
   }
 
-  const computeState = () => {
+  const computeState = (): ContestState => {
     const now = new Date();
-    let durationUntilNextState: number = NaN;
+    now.setMilliseconds(0);
 
     switch (true) {
       case isBefore(now, startTime):
-        state = "NOT_STARTED";
-        durationUntilNextState = differenceInMilliseconds(startTime, now);
-
-        break;
+        return "NOT_STARTED";
       case isBefore(now, endTime):
-        state = "RUNNING";
-        durationUntilNextState = differenceInMilliseconds(endTime, now);
-
-        break;
+        return "RUNNING";
       case gracePeriodEndTime && isBefore(now, gracePeriodEndTime):
-        state = "GRACE_PERIOD";
-        durationUntilNextState = differenceInMilliseconds(
-          gracePeriodEndTime,
-          now,
-        );
-
-        break;
+        return "GRACE_PERIOD";
       default:
-        state = "ENDED";
+        return "ENDED";
     }
+  };
 
-    if (durationUntilNextState) {
-      intervalTimerId = setTimeout(computeState, durationUntilNextState);
-    }
+  const tick = () => {
+    state = computeState();
+
+    const firefoxEarlyWakeUpCompensation = 1;
+
+    const drift = Date.now() % 1_000;
+    const next = 1_000 - drift + firefoxEarlyWakeUpCompensation;
+
+    intervalTimerId = setTimeout(tick, next);
   };
 
   onDestroy(() => {
