@@ -36,6 +36,24 @@ func NewSubscription(
 	return &sub
 }
 
+func (s *Subscription) ReadEvents(ctx context.Context) <-chan domain.EventEnvelope {
+	ch := make(chan domain.EventEnvelope)
+
+	go func() {
+		for {
+			event, err := s.AwaitEvent(ctx)
+			if err != nil {
+				close(ch)
+				return
+			}
+
+			ch <- event
+		}
+	}()
+
+	return ch
+}
+
 func (s *Subscription) AwaitEvent(ctx context.Context) (domain.EventEnvelope, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()

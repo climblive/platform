@@ -1,12 +1,11 @@
 package rest
 
 import (
-	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 )
@@ -75,32 +74,37 @@ func (hdlr *eventHandler) subscribe(
 	w.WriteHeader(http.StatusOK)
 	w.(http.Flusher).Flush()
 
+	keepAlive := time.NewTicker(10 * time.Second)
+	events := eventReader.ReadEvents(r.Context())
+
 	for {
-		event, err := eventReader.AwaitEvent(r.Context())
-		if err != nil {
-			switch {
-			case errors.Is(err, context.Canceled):
-				fallthrough
-			case errors.Is(err, context.DeadlineExceeded):
-				logger.Info("subscription closed")
-			default:
-				logger.Warn("subscription closed unexpectedly", "error", err)
+		select {
+		case event, open := <-events:
+			if !open {
+				logger.Warn("subscription closed unexpectedly")
 			}
 
-			return
-		}
+			json, err := json.Marshal(event.Data)
+			if err != nil {
+				panic(err)
+			}
 
-		json, err := json.Marshal(event.Data)
-		if err != nil {
-			panic(err)
+			write(w, fmt.Sprintf("event: %s\ndata: %s\n\n", event.Name, json))
+		case <-keepAlive.C:
+			write(w, ":\n\n")
+		case <-r.Context().Done():
+			logger.Info("subscription closed")
 		}
-
-		_, err = w.Write([]byte(fmt.Sprintf("event: %s\ndata: %s\n\n", event.Name, json)))
-		if err != nil {
-			slog.Error("failed to write server-sent event", "error", err)
-			return
-		}
-
-		w.(http.Flusher).Flush()
 	}
+}
+
+func write(w http.ResponseWriter, data string) {
+	_, err := w.Write([]byte(data))
+	if err != nil {
+		slog.Error("failed to write server-sent event", "error", err)
+		return
+	}
+
+	w.(http.Flusher).Flush()
+
 }
