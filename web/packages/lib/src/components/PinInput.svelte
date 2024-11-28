@@ -35,9 +35,6 @@
       return;
     }
 
-    const input = inputs[index];
-    input.value = event.data.slice(-1);
-
     if (event.isComposing) {
       // Mobile browsers enter composition (IME) when the user starts typing.
       // On Chrome, when focusing the next input field the composition is ended
@@ -47,6 +44,9 @@
       // input field we blur the current input.
       inputs[index].blur();
     }
+
+    const input = inputs[index];
+    input.value = event.data.slice(-1);
 
     focusInputField("next", index);
   };
