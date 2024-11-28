@@ -82,6 +82,7 @@
 <div>
   {#each inputs as input, index (index)}
     <input
+      aria-label={`Pin character ${index + 1} out of ${inputs.length}`}
       {disabled}
       bind:this={input}
       {placeholder}
