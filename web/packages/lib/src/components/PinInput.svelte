@@ -8,18 +8,33 @@
   $: inputs = Array.from<HTMLInputElement>({ length });
 
   const focusInputField = (dir: "next" | "prev", index: number) => {
+    let input: HTMLInputElement | undefined;
+
     if (dir === "next") {
       const nextIndex = index + 1;
-      inputs[nextIndex < length ? nextIndex : index].focus();
+      input = inputs[nextIndex < length ? nextIndex : index];
     }
 
     if (dir === "prev") {
       const nextIndex = index - 1;
-      inputs[nextIndex > -1 ? nextIndex : index].focus();
+      input = inputs[nextIndex > -1 ? nextIndex : index];
+    }
+
+    if (input) {
+      input.focus();
     }
   };
 
+  const handleFocus = (_: FocusEvent, index: number) => {
+    const input = inputs[index];
+    input.setSelectionRange(0, 0);
+  };
+
   const handleInput = (event: InputEvent, index: number) => {
+    if (event.data === null) {
+      return;
+    }
+
     if (event.isComposing) {
       // Mobile browsers enter composition (IME) when the user starts typing.
       // On Chrome, when focusing the next input field the composition is ended
@@ -29,6 +44,9 @@
       // input field we blur the current input.
       inputs[index].blur();
     }
+
+    const input = inputs[index];
+    input.value = event.data.slice(-1);
 
     focusInputField("next", index);
   };
@@ -74,11 +92,11 @@
       bind:this={input}
       {placeholder}
       type="text"
+      on:focus={(e) => handleFocus(e, index)}
       on:input={(e) => handleInput(e, index)}
       on:keydown={(e) => handleKeyDown(e, index)}
       on:keyup={() => handleKeyUp()}
       on:paste|preventDefault={handlePaste}
-      maxlength="1"
       value={defaultValue?.[index] ?? ""}
     />
   {/each}
@@ -114,12 +132,6 @@
       outline-color: var(--sl-input-focus-ring-color);
       outline-offset: var(--sl-input-focus-ring-offset);
       color: var(--sl-input-color-focus);
-    }
-
-    &:hover {
-      background-color: var(--sl-input-background-color-hover);
-      border-color: var(--sl-input-border-color-hover);
-      color: var(--sl-input-color-hover);
     }
   }
 
