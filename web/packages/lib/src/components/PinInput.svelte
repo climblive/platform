@@ -25,10 +25,18 @@
     }
   };
 
+  const handleFocus = (_: FocusEvent, index: number) => {
+    const input = inputs[index];
+    input.setSelectionRange(0, 0);
+  };
+
   const handleInput = (event: InputEvent, index: number) => {
     if (event.data === null) {
       return;
     }
+
+    const input = inputs[index];
+    input.value = event.data.slice(-1);
 
     if (event.isComposing) {
       // Mobile browsers enter composition (IME) when the user starts typing.
@@ -39,9 +47,6 @@
       // input field we blur the current input.
       inputs[index].blur();
     }
-
-    const input = inputs[index];
-    input.value = event.data.slice(-1);
 
     focusInputField("next", index);
   };
@@ -87,6 +92,7 @@
       bind:this={input}
       {placeholder}
       type="text"
+      on:focus={(e) => handleFocus(e, index)}
       on:input={(e) => handleInput(e, index)}
       on:keydown={(e) => handleKeyDown(e, index)}
       on:keyup={() => handleKeyUp()}
@@ -108,7 +114,6 @@
     line-height: var(--sl-input-height-small);
     text-align: center;
     text-transform: uppercase;
-    caret-color: transparent;
 
     background-color: var(--sl-input-background-color);
     border-style: solid;
