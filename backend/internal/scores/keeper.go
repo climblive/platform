@@ -70,6 +70,7 @@ ConsumeEvents:
 				k.HandleContenderScoreUpdated(ev)
 			}
 		case <-ctx.Done():
+			slog.Info("subscription closed", "reason", ctx.Err().Error())
 			break ConsumeEvents
 		}
 	}

@@ -77,11 +77,13 @@ func (hdlr *eventHandler) subscribe(
 	keepAlive := time.NewTicker(10 * time.Second)
 	events := eventReader.EventsChan(r.Context())
 
+ConsumeEvents:
 	for {
 		select {
 		case event, open := <-events:
 			if !open && r.Context().Err() == nil {
 				logger.Warn("subscription closed unexpectedly")
+				break ConsumeEvents
 			}
 
 			json, err := json.Marshal(event.Data)
@@ -93,7 +95,8 @@ func (hdlr *eventHandler) subscribe(
 		case <-keepAlive.C:
 			write(w, ":\n\n")
 		case <-r.Context().Done():
-			logger.Info("subscription closed")
+			logger.Info("subscription closed", "reason", r.Context().Err())
+			break ConsumeEvents
 		}
 	}
 }
