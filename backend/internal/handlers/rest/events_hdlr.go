@@ -11,6 +11,7 @@ import (
 )
 
 const bufferCapacity = 1_000
+const clientRetry = 5 * time.Second
 
 type eventHandler struct {
 	eventBroker domain.EventBroker
@@ -65,6 +66,8 @@ func (hdlr *eventHandler) subscribe(
 	w.Header().Set("X-Accel-Buffering", "no")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
+
+	write(w, fmt.Sprintf("retry: %d\n\n", clientRetry.Milliseconds()))
 
 	logger.Info("starting event subscription")
 	subscriptionID, eventReader := hdlr.eventBroker.Subscribe(filter, bufferCapacity)
