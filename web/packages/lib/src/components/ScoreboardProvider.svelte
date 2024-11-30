@@ -14,10 +14,10 @@
 
   let eventSource: EventSource | undefined;
   let initialized = false;
-  let pendingUpdates: ((contenders: Map<number, ScoreboardEntry>) => void)[] =
-    [];
 
   const contenders: Map<number, ScoreboardEntry> = new Map();
+  const pendingUpdates: ((contenders: Map<number, ScoreboardEntry>) => void)[] =
+    [];
   const scoreboardStore = writable<Map<number, ScoreboardEntry[]>>(new Map());
 
   setContext("scoreboard", scoreboardStore);
@@ -35,7 +35,6 @@
 
       initialized = false;
       contenders.clear();
-      pendingUpdates = [];
       $scoreboardStore = new Map();
     };
 
