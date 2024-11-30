@@ -67,15 +67,14 @@ func (hdlr *eventHandler) subscribe(
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
-	write(w, fmt.Sprintf("retry: %d\n\n", clientRetry.Milliseconds()))
-
 	logger.Info("starting event subscription")
 	subscriptionID, eventReader := hdlr.eventBroker.Subscribe(filter, bufferCapacity)
 
 	defer hdlr.eventBroker.Unsubscribe(subscriptionID)
 
 	w.WriteHeader(http.StatusOK)
-	w.(http.Flusher).Flush()
+
+	write(w, fmt.Sprintf("retry: %d\n\n", clientRetry.Milliseconds()))
 
 	keepAlive := time.Tick(10 * time.Second)
 	events := eventReader.EventsChan(r.Context())
