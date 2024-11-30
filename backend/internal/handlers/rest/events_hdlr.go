@@ -75,12 +75,12 @@ func (hdlr *eventHandler) subscribe(
 	w.(http.Flusher).Flush()
 
 	keepAlive := time.NewTicker(10 * time.Second)
-	events := eventReader.ReadEvents(r.Context())
+	events := eventReader.EventsChan(r.Context())
 
 	for {
 		select {
 		case event, open := <-events:
-			if !open {
+			if !open && r.Context().Err() == nil {
 				logger.Warn("subscription closed unexpectedly")
 			}
 

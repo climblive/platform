@@ -54,23 +54,27 @@ func (k *Keeper) run(ctx context.Context, filter domain.EventFilter, wg *sync.Wa
 
 	close(ready)
 
+	events := eventReader.EventsChan(ctx)
+
+ConsumeEvents:
 	for {
-		event, err := eventReader.AwaitEvent(ctx)
-		switch err {
-		case nil:
-		case context.Canceled, context.DeadlineExceeded:
-			slog.Info("score keeper shutting down", "reason", err.Error())
+		select {
+		case event, open := <-events:
+			if !open && ctx.Err() == nil {
+				slog.Warn("subscription closed unexpectedly")
+				break ConsumeEvents
+			}
 
-			return
-		default:
-			panic(err)
-		}
-
-		switch ev := event.Data.(type) {
-		case domain.ContenderScoreUpdatedEvent:
-			k.HandleContenderScoreUpdated(ev)
+			switch ev := event.Data.(type) {
+			case domain.ContenderScoreUpdatedEvent:
+				k.HandleContenderScoreUpdated(ev)
+			}
+		case <-ctx.Done():
+			break ConsumeEvents
 		}
 	}
+
+	slog.Info("score keeper shutting down")
 }
 
 func (k *Keeper) HandleContenderScoreUpdated(event domain.ContenderScoreUpdatedEvent) {

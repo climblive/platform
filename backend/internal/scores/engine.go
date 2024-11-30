@@ -94,64 +94,27 @@ func (e *ScoreEngine) run(ctx context.Context, filter domain.EventFilter, wg *sy
 
 	close(ready)
 
-	go func(ctx context.Context) {
-		ticker := time.Tick(100 * time.Millisecond)
+	events := eventReader.EventsChan(ctx)
+	ticker := time.Tick(100 * time.Millisecond)
 
-		for {
-			select {
-			case <-ticker:
-				e.publishUpdatedScores()
-			case <-ctx.Done():
-				return
-			}
-		}
-	}(ctx)
-
+ConsumeEvents:
 	for {
-		proceed := func() bool {
-			event, err := eventReader.AwaitEvent(ctx)
-			switch err {
-			case nil:
-			case context.Canceled, context.DeadlineExceeded:
-				e.logger.Info("score engine shutting down", "reason", err.Error())
-				return false
-			default:
-				panic(err)
+		select {
+		case event, open := <-events:
+			if !open && ctx.Err() == nil {
+				e.logger.Warn("subscription closed unexpectedly")
+				break ConsumeEvents
 			}
 
-			e.Lock()
-			defer e.Unlock()
-
-			switch ev := event.Data.(type) {
-			case domain.ContenderEnteredEvent:
-				e.handleContenderEntered(ev)
-			case domain.ContenderSwitchedClassEvent:
-				e.handleContenderSwitchedClass(ev)
-			case domain.ContenderWithdrewFromFinalsEvent:
-				e.handleContenderWithdrewFromFinals(ev)
-			case domain.ContenderReenteredFinalsEvent:
-				e.handleContenderReenteredFinals(ev)
-			case domain.ContenderDisqualifiedEvent:
-				e.handleContenderDisqualified(ev)
-			case domain.ContenderRequalifiedEvent:
-				e.handleContenderRequalified(ev)
-			case domain.AscentRegisteredEvent:
-				e.handleAscentRegistered(ev)
-			case domain.AscentDeregisteredEvent:
-				e.handleAscentDeregistered(ev)
-			case domain.ProblemAddedEvent:
-				e.handleProblemAdded(ev)
-			case domain.ProblemUpdatedEvent, domain.ProblemDeletedEvent:
-				e.logger.Warn("discarding unsupported event", "event", event)
-			}
-
-			return true
-		}()
-
-		if !proceed {
-			break
+			e.HandleEvent(event)
+		case <-ticker:
+			e.publishUpdatedScores()
+		case <-ctx.Done():
+			break ConsumeEvents
 		}
 	}
+
+	e.logger.Info("score engine shutting down")
 }
 
 func (e *ScoreEngine) SetScoringRules(rules ScoringRules) {
@@ -174,6 +137,34 @@ func (e *ScoreEngine) SetRanker(ranker Ranker) {
 	e.ranker = ranker
 
 	e.rankCompClasses(CompClasses(e.contenders))
+}
+
+func (e *ScoreEngine) HandleEvent(event domain.EventEnvelope) {
+	e.Lock()
+	defer e.Unlock()
+
+	switch ev := event.Data.(type) {
+	case domain.ContenderEnteredEvent:
+		e.handleContenderEntered(ev)
+	case domain.ContenderSwitchedClassEvent:
+		e.handleContenderSwitchedClass(ev)
+	case domain.ContenderWithdrewFromFinalsEvent:
+		e.handleContenderWithdrewFromFinals(ev)
+	case domain.ContenderReenteredFinalsEvent:
+		e.handleContenderReenteredFinals(ev)
+	case domain.ContenderDisqualifiedEvent:
+		e.handleContenderDisqualified(ev)
+	case domain.ContenderRequalifiedEvent:
+		e.handleContenderRequalified(ev)
+	case domain.AscentRegisteredEvent:
+		e.handleAscentRegistered(ev)
+	case domain.AscentDeregisteredEvent:
+		e.handleAscentDeregistered(ev)
+	case domain.ProblemAddedEvent:
+		e.handleProblemAdded(ev)
+	case domain.ProblemUpdatedEvent, domain.ProblemDeletedEvent:
+		e.logger.Warn("discarding unsupported event", "event", event)
+	}
 }
 
 func (e *ScoreEngine) handleContenderEntered(event domain.ContenderEnteredEvent) {

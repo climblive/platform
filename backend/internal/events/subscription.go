@@ -36,8 +36,8 @@ func NewSubscription(
 	return &sub
 }
 
-func (s *Subscription) ReadEvents(ctx context.Context) <-chan domain.EventEnvelope {
-	ch := make(chan domain.EventEnvelope)
+func (s *Subscription) EventsChan(ctx context.Context) <-chan domain.EventEnvelope {
+	ch := make(chan domain.EventEnvelope, 1)
 
 	go func() {
 		for {
