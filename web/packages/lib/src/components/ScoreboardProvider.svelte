@@ -55,7 +55,10 @@
       contenders.set(entry.contenderId, entry);
     }
 
-    pendingUpdates.forEach((handler) => handler(contenders));
+    while (pendingUpdates.length > 0) {
+      const handler = pendingUpdates.shift();
+      handler?.(contenders);
+    }
 
     rebuildStore();
     initialized = true;
