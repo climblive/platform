@@ -14,16 +14,41 @@
 
   let eventSource: EventSource | undefined;
   let initialized = false;
-
-  const contenders: Map<number, ScoreboardEntry> = new Map();
-  const pendingUpdates: ((contenders: Map<number, ScoreboardEntry>) => void)[] =
+  let pendingUpdates: ((contenders: Map<number, ScoreboardEntry>) => void)[] =
     [];
 
+  const contenders: Map<number, ScoreboardEntry> = new Map();
   const scoreboardStore = writable<Map<number, ScoreboardEntry[]>>(new Map());
 
   setContext("scoreboard", scoreboardStore);
 
   onMount(async () => {
+    eventSource = new EventSource(
+      `${configData.API_URL}/contests/${contestId}/events`,
+    );
+
+    setupEventHandlers(eventSource);
+
+    eventSource.onerror = (e) => {
+      console.error(e);
+
+      initialized = false;
+      contenders.clear();
+      pendingUpdates = [];
+      $scoreboardStore = new Map();
+    };
+
+    eventSource.onopen = (e) => {
+      initializeStore();
+    };
+  });
+
+  onDestroy(() => {
+    eventSource?.close();
+    eventSource = undefined;
+  });
+
+  const initializeStore = async () => {
     const entries = await ApiClient.getInstance().getScoreboard(contestId);
 
     for (const entry of entries) {
@@ -34,7 +59,7 @@
 
     rebuildStore();
     initialized = true;
-  });
+  };
 
   const rebuildStore = () => {
     const results = new Map<number, ScoreboardEntry[]>();
@@ -68,11 +93,7 @@
     }
   };
 
-  onMount(() => {
-    eventSource = new EventSource(
-      `${configData.API_URL}/contests/${contestId}/events`,
-    );
-
+  const setupEventHandlers = (eventSource: EventSource) => {
     eventSource.addEventListener("CONTENDER_PUBLIC_INFO_UPDATED", (e) => {
       const event = contenderPublicInfoUpdatedEventSchema.parse(
         JSON.parse(e.data),
@@ -114,7 +135,7 @@
         });
       }
     });
-  });
+  };
 
   const createEmptyEntry = (contenderId: number): ScoreboardEntry => ({
     contenderId: contenderId,
@@ -124,11 +145,6 @@
     score: 0,
     rankOrder: 0,
     finalist: false,
-  });
-
-  onDestroy(() => {
-    eventSource?.close();
-    eventSource = undefined;
   });
 </script>
 
