@@ -1,17 +1,17 @@
 package rest
 
 import (
-	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 )
 
 const bufferCapacity = 1_000
+const clientRetry = 5 * time.Second
 
 type eventHandler struct {
 	eventBroker domain.EventBroker
@@ -67,6 +67,8 @@ func (hdlr *eventHandler) subscribe(
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
+	write(w, fmt.Sprintf("retry: %d\n\n", clientRetry.Milliseconds()))
+
 	logger.Info("starting event subscription")
 	subscriptionID, eventReader := hdlr.eventBroker.Subscribe(filter, bufferCapacity)
 
@@ -75,32 +77,42 @@ func (hdlr *eventHandler) subscribe(
 	w.WriteHeader(http.StatusOK)
 	w.(http.Flusher).Flush()
 
+	keepAlive := time.Tick(10 * time.Second)
+	events := eventReader.EventsChan(r.Context())
+
+ConsumeEvents:
 	for {
-		event, err := eventReader.AwaitEvent(r.Context())
-		if err != nil {
-			switch {
-			case errors.Is(err, context.Canceled):
-				fallthrough
-			case errors.Is(err, context.DeadlineExceeded):
-				logger.Info("subscription closed")
-			default:
-				logger.Warn("subscription closed unexpectedly", "error", err)
+		select {
+		case event, open := <-events:
+			if !open {
+				break ConsumeEvents
 			}
 
-			return
-		}
+			json, err := json.Marshal(event.Data)
+			if err != nil {
+				panic(err)
+			}
 
-		json, err := json.Marshal(event.Data)
-		if err != nil {
-			panic(err)
+			write(w, fmt.Sprintf("event: %s\ndata: %s\n\n", event.Name, json))
+		case <-keepAlive:
+			write(w, ":\n\n")
+		case <-r.Context().Done():
+			logger.Info("subscription closed", "reason", r.Context().Err())
+			break ConsumeEvents
 		}
-
-		_, err = w.Write([]byte(fmt.Sprintf("event: %s\ndata: %s\n\n", event.Name, json)))
-		if err != nil {
-			slog.Error("failed to write server-sent event", "error", err)
-			return
-		}
-
-		w.(http.Flusher).Flush()
 	}
+
+	if r.Context().Err() == nil {
+		logger.Warn("subscription closed unexpectedly")
+	}
+}
+
+func write(w http.ResponseWriter, data string) {
+	_, err := w.Write([]byte(data))
+	if err != nil {
+		slog.Error("failed to write server-sent event", "error", err)
+		return
+	}
+
+	w.(http.Flusher).Flush()
 }

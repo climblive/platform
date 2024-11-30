@@ -18,23 +18,51 @@
   const contenders: Map<number, ScoreboardEntry> = new Map();
   const pendingUpdates: ((contenders: Map<number, ScoreboardEntry>) => void)[] =
     [];
-
   const scoreboardStore = writable<Map<number, ScoreboardEntry[]>>(new Map());
 
   setContext("scoreboard", scoreboardStore);
 
   onMount(async () => {
+    eventSource = new EventSource(
+      `${configData.API_URL}/contests/${contestId}/events`,
+    );
+
+    setupEventHandlers(eventSource);
+
+    eventSource.onerror = (e) => {
+      // eslint-disable-next-line no-console
+      console.error(e);
+
+      initialized = false;
+      contenders.clear();
+      $scoreboardStore = new Map();
+    };
+
+    eventSource.onopen = () => {
+      initializeStore();
+    };
+  });
+
+  onDestroy(() => {
+    eventSource?.close();
+    eventSource = undefined;
+  });
+
+  const initializeStore = async () => {
     const entries = await ApiClient.getInstance().getScoreboard(contestId);
 
     for (const entry of entries) {
       contenders.set(entry.contenderId, entry);
     }
 
-    pendingUpdates.forEach((handler) => handler(contenders));
+    while (pendingUpdates.length > 0) {
+      const handler = pendingUpdates.shift();
+      handler?.(contenders);
+    }
 
     rebuildStore();
     initialized = true;
-  });
+  };
 
   const rebuildStore = () => {
     const results = new Map<number, ScoreboardEntry[]>();
@@ -68,11 +96,7 @@
     }
   };
 
-  onMount(() => {
-    eventSource = new EventSource(
-      `${configData.API_URL}/contests/${contestId}/events`,
-    );
-
+  const setupEventHandlers = (eventSource: EventSource) => {
     eventSource.addEventListener("CONTENDER_PUBLIC_INFO_UPDATED", (e) => {
       const event = contenderPublicInfoUpdatedEventSchema.parse(
         JSON.parse(e.data),
@@ -114,7 +138,7 @@
         });
       }
     });
-  });
+  };
 
   const createEmptyEntry = (contenderId: number): ScoreboardEntry => ({
     contenderId: contenderId,
@@ -124,11 +148,6 @@
     score: 0,
     rankOrder: 0,
     finalist: false,
-  });
-
-  onDestroy(() => {
-    eventSource?.close();
-    eventSource = undefined;
   });
 </script>
 

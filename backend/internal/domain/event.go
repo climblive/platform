@@ -40,7 +40,7 @@ type EventBroker interface {
 }
 
 type EventReader interface {
-	AwaitEvent(ctx context.Context) (EventEnvelope, error)
+	EventsChan(ctx context.Context) <-chan EventEnvelope
 }
 
 type EventEnvelope struct {
