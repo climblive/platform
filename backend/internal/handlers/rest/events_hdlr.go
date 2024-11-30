@@ -74,7 +74,7 @@ func (hdlr *eventHandler) subscribe(
 	w.WriteHeader(http.StatusOK)
 	w.(http.Flusher).Flush()
 
-	keepAlive := time.NewTicker(10 * time.Second)
+	keepAlive := time.Tick(10 * time.Second)
 	events := eventReader.EventsChan(r.Context())
 
 ConsumeEvents:
@@ -92,7 +92,7 @@ ConsumeEvents:
 			}
 
 			write(w, fmt.Sprintf("event: %s\ndata: %s\n\n", event.Name, json))
-		case <-keepAlive.C:
+		case <-keepAlive:
 			write(w, ":\n\n")
 		case <-r.Context().Done():
 			logger.Info("subscription closed", "reason", r.Context().Err())
