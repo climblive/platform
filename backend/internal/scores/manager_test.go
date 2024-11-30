@@ -141,11 +141,10 @@ func TestScoreEngineManager(t *testing.T) {
 		wg := mngr.Run(ctx)
 
 		<-ctx.Done()
+		wg.Wait()
 
 		mockedRepo.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)
-
-		wg.Wait()
 	})
 }
 
