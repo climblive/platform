@@ -115,5 +115,4 @@ func write(w http.ResponseWriter, data string) {
 	}
 
 	w.(http.Flusher).Flush()
-
 }
