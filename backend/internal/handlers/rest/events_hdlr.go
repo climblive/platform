@@ -73,7 +73,6 @@ func (hdlr *eventHandler) subscribe(
 	defer hdlr.eventBroker.Unsubscribe(subscriptionID)
 
 	w.WriteHeader(http.StatusOK)
-	w.(http.Flusher).Flush()
 
 	write(w, fmt.Sprintf("retry: %d\n\n", clientRetry.Milliseconds()))
 
