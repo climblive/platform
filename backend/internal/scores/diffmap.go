@@ -39,6 +39,7 @@ func (d *DiffMap[K, V]) Set(key K, val V) {
 
 	existing, found := d.committed[key]
 	if found && d.comparator(existing, val) {
+		delete(d.dirty, key)
 		return
 	}
 
