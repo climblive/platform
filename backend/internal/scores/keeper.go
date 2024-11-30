@@ -60,8 +60,7 @@ ConsumeEvents:
 	for {
 		select {
 		case event, open := <-events:
-			if !open && ctx.Err() == nil {
-				slog.Warn("subscription closed unexpectedly")
+			if !open {
 				break ConsumeEvents
 			}
 
@@ -73,6 +72,10 @@ ConsumeEvents:
 			slog.Info("subscription closed", "reason", ctx.Err())
 			break ConsumeEvents
 		}
+	}
+
+	if ctx.Err() == nil {
+		slog.Warn("subscription closed unexpectedly")
 	}
 
 	slog.Info("score keeper shutting down")

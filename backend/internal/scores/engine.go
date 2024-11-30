@@ -101,8 +101,7 @@ ConsumeEvents:
 	for {
 		select {
 		case event, open := <-events:
-			if !open && ctx.Err() == nil {
-				e.logger.Warn("subscription closed unexpectedly")
+			if !open {
 				break ConsumeEvents
 			}
 
@@ -112,6 +111,10 @@ ConsumeEvents:
 		case <-ctx.Done():
 			break ConsumeEvents
 		}
+	}
+
+	if ctx.Err() == nil {
+		e.logger.Warn("subscription closed unexpectedly")
 	}
 
 	e.logger.Info("score engine shutting down")

@@ -187,6 +187,34 @@ func TestEventsChan(t *testing.T) {
 	assert.False(t, open)
 }
 
+func TestEventsChanBufferFull(t *testing.T) {
+	bufferCapacity := 1
+
+	ctx := context.Background()
+
+	subscription := events.NewSubscription(domain.EventFilter{}, bufferCapacity)
+
+	err := subscription.Post(domain.EventEnvelope{})
+	assert.NoError(t, err)
+
+	err = subscription.Post(domain.EventEnvelope{})
+	assert.ErrorIs(t, err, events.ErrBufferFull)
+
+	events := subscription.EventsChan(ctx)
+
+ConsumeEvents:
+	for {
+		select {
+		case event, open := <-events:
+			assert.Empty(t, event)
+			assert.False(t, open)
+			break ConsumeEvents
+		case <-ctx.Done():
+			break ConsumeEvents
+		}
+	}
+}
+
 func TestMatchFilter(t *testing.T) {
 	t.Run("ContestMatchWildcard", func(t *testing.T) {
 		subscription := events.NewSubscription(domain.NewEventFilter(0, 0), 0)

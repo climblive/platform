@@ -81,8 +81,7 @@ ConsumeEvents:
 	for {
 		select {
 		case event, open := <-events:
-			if !open && r.Context().Err() == nil {
-				logger.Warn("subscription closed unexpectedly")
+			if !open {
 				break ConsumeEvents
 			}
 
@@ -98,6 +97,10 @@ ConsumeEvents:
 			logger.Info("subscription closed", "reason", r.Context().Err())
 			break ConsumeEvents
 		}
+	}
+
+	if r.Context().Err() == nil {
+		logger.Warn("subscription closed unexpectedly")
 	}
 }
 
