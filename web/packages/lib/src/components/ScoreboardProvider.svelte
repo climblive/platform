@@ -30,6 +30,7 @@
     setupEventHandlers(eventSource);
 
     eventSource.onerror = (e) => {
+      // eslint-disable-next-line no-console
       console.error(e);
 
       initialized = false;
@@ -38,7 +39,7 @@
       $scoreboardStore = new Map();
     };
 
-    eventSource.onopen = (e) => {
+    eventSource.onopen = () => {
       initializeStore();
     };
   });
