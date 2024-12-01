@@ -32,3 +32,18 @@ func TestDiffMap(t *testing.T) {
 	diff = dm.Commit()
 	assert.Len(t, diff, 0)
 }
+
+func TestDiffMap_RevertValue(t *testing.T) {
+	dm := scores.NewDiffMap[int, string](func(v1, v2 string) bool { return v1 == v2 })
+
+	dm.Set(1, "Alice")
+
+	diff := dm.Commit()
+	assert.ElementsMatch(t, []string{"Alice"}, diff)
+
+	dm.Set(1, "Bob")
+	dm.Set(1, "Alice")
+
+	diff = dm.Commit()
+	assert.Len(t, diff, 0)
+}
