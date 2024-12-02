@@ -8,16 +8,24 @@ import (
 	"github.com/climblive/platform/backend/internal/domain"
 )
 
+type keeperRepository interface {
+	domain.Transactor
+
+	StoreScore(ctx context.Context, tx domain.Transaction, score domain.Score) (domain.Score, error)
+}
+
 type Keeper struct {
 	mu          sync.RWMutex
 	eventBroker domain.EventBroker
 	scores      map[domain.ContenderID]domain.Score
+	repo        keeperRepository
 }
 
-func NewScoreKeeper(eventBroker domain.EventBroker) *Keeper {
+func NewScoreKeeper(eventBroker domain.EventBroker, repo keeperRepository) *Keeper {
 	return &Keeper{
 		eventBroker: eventBroker,
 		scores:      make(map[domain.ContenderID]domain.Score),
+		repo:        repo,
 	}
 }
 
@@ -86,6 +94,8 @@ func (k *Keeper) HandleContenderScoreUpdated(event domain.ContenderScoreUpdatedE
 	defer k.mu.Unlock()
 
 	k.scores[event.ContenderID] = domain.Score(event)
+
+	k.repo.StoreScore(context.Background(), nil, domain.Score(event))
 }
 
 func (k *Keeper) GetScore(contenderID domain.ContenderID) (domain.Score, error) {

@@ -14,7 +14,7 @@ type scoreRecord struct {
 	Score       int
 	Placement   int
 	Finalist    bool
-	Rankorder   int
+	Rankorder   int `gorm:"column:rank_order"`
 }
 
 func (scoreRecord) TableName() string {
