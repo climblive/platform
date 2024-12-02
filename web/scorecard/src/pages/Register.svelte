@@ -37,6 +37,7 @@
       {
         ...contender,
         ...form,
+        publicName: form.name,
       },
       {
         onSuccess: gotoScorecard,

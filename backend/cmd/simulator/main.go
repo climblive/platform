@@ -21,8 +21,8 @@ import (
 
 const (
 	APIURL     = "http://localhost:8090"
-	ITERATIONS = 1000
-	MAX_SLEEP  = 10000 * time.Millisecond
+	ITERATIONS = 100
+	MAX_SLEEP  = 100 * time.Millisecond
 )
 
 type SimulatorEvent int
@@ -112,6 +112,7 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 		r.contender.Name = fmt.Sprintf("%s %s (%d)", faker.FirstNameFemale(), faker.LastName(), r.contender.ID)
 	}
 
+	r.contender.PublicName = r.contender.Name
 	r.contender.CompClassID = selectedCompClass.ID
 	r.contender.ClubName = faker.ChineseName()
 
