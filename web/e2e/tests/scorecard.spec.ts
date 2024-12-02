@@ -227,9 +227,11 @@ test("flash a problem", async ({ page }) => {
 })
 
 test.describe("contest states", () => {
-  test("before contest has started", async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
     await page.clock.setFixedTime(new Date('2023-11-01T00:00:00'));
+  })
 
+  test("before contest has started", async ({ page }) => {
     await page.goto('/ABCD0001');
 
     const timer = page.getByRole("timer", { name: "Time until start" })
@@ -244,9 +246,9 @@ test.describe("contest states", () => {
   });
 
   test("while contest is running", async ({ page }) => {
-    await page.clock.setFixedTime(new Date('2024-01-01T00:00:00'));
-
     await page.goto('/ABCD0001');
+
+    await page.clock.setFixedTime(new Date('2024-01-01T00:00:00'));
 
     const timer = page.getByRole("timer", { name: "Time remaining" })
     await expect(timer).toHaveText("12 months")
@@ -260,9 +262,9 @@ test.describe("contest states", () => {
   });
 
   test("during grace period", async ({ page }) => {
-    await page.clock.setFixedTime(new Date('2025-01-01T00:00:00'));
-
     await page.goto('/ABCD0001');
+
+    await page.clock.setFixedTime(new Date('2025-01-01T00:00:00'));
 
     const timer = page.getByRole("timer", { name: "Time remaining" })
     await expect(timer).toHaveText("00:00:00")
@@ -276,9 +278,9 @@ test.describe("contest states", () => {
   });
 
   test("after contest has ended", async ({ page }) => {
-    await page.clock.setFixedTime(new Date('2025-01-01T00:05:00'));
-
     await page.goto('/ABCD0001');
+
+    await page.clock.setFixedTime(new Date('2025-01-01T00:05:00'));
 
     const timer = page.getByRole("timer", { name: "Time remaining" })
     await expect(timer).toHaveText("00:00:00")
