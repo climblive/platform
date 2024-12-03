@@ -19,4 +19,4 @@ if [[ -n "${CODESPACE_NAME}" ]]; then
 fi
 
 pnpm exec playwright install
-sudo /usr/local/share/npm-global/bin/pnpm exec playwright install-deps
+sudo pnpm exec playwright install-deps
