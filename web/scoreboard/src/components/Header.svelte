@@ -1,16 +1,14 @@
 <script lang="ts">
   import { ContestStateProvider, Timer } from "@climblive/lib/components";
   import type { ScoreboardEntry } from "@climblive/lib/models";
-  import { getContext } from "svelte";
   import { type Readable } from "svelte/store";
 
   export let name: string;
   export let compClassId: number;
   export let startTime: Date;
   export let endTime: Date;
+  export let scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
 
-  const scoreboard =
-    getContext<Readable<Map<number, ScoreboardEntry[]>>>("scoreboard");
   $: results = $scoreboard.get(compClassId) ?? [];
 
   $: allContenders = [...$scoreboard.values()].reduce((count, results) => {

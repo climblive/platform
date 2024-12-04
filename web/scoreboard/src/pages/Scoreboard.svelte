@@ -52,7 +52,7 @@
 {#if !contest || !compClasses}
   <Loading />
 {:else}
-  <ScoreboardProvider {contestId}>
+  <ScoreboardProvider {contestId} let:scoreboard let:loading>
     <main>
       <h1>{contest.name}</h1>
       <sl-select
@@ -81,8 +81,14 @@
               name={compClass.name}
               startTime={compClass.timeBegin}
               endTime={compClass.timeEnd}
+              {scoreboard}
             ></Header>
-            <ResultList compClassId={compClass.id} {overflow} />
+            <ResultList
+              compClassId={compClass.id}
+              {overflow}
+              {scoreboard}
+              {loading}
+            />
           </section>
         {/each}
       </div>

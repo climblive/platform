@@ -151,8 +151,16 @@
         </sl-tab-panel>
         <sl-tab-panel name="results">
           {#if resultsConnected && contender.compClassId}
-            <ScoreboardProvider contestId={$session.contestId}>
-              <ResultList compClassId={contender.compClassId} />
+            <ScoreboardProvider
+              contestId={$session.contestId}
+              let:scoreboard
+              let:loading
+            >
+              <ResultList
+                compClassId={contender.compClassId}
+                {scoreboard}
+                {loading}
+              />
             </ScoreboardProvider>
           {/if}
         </sl-tab-panel>
