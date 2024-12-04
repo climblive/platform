@@ -20,4 +20,4 @@ fi
 
 cd web/e2e
 pnpm exec playwright install
-sudo /usr/local/share/nvm/versions/node/v20.18.1/bin/pnpm exec playwright install-deps
+pnpm exec playwright install-deps
