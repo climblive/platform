@@ -226,7 +226,7 @@ test("flash a problem", async ({ page }) => {
   await expect(problem.getByText("+110p")).not.toBeVisible();
 })
 
-test.only("show rules", async ({ page }) => {
+test("show rules", async ({ page }) => {
   await page.goto('/ABCD0001');
 
   await page.getByRole("tab", { name: "Rules" }).click();
