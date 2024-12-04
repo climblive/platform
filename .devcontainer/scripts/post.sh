@@ -18,7 +18,7 @@ if [[ -n "${CODESPACE_NAME}" ]]; then
     sed -i "s,\"API_URL\":.*,\"API_URL\": \"${API_URL}\",g" web/packages/lib/src/config.json
 
     sudo apt install -y gh
-    gh codespace ports visibility 8090:private -c $CODESPACE_NAME
+    gh codespace ports visibility 8090:public -c $CODESPACE_NAME
 fi
 
 cd web
