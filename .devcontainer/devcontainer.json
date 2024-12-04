@@ -11,16 +11,20 @@
       ]
     }
   },
-  "runArgs": ["--add-host=host.docker.internal:host-gateway"],
+  "runArgs": [
+    "--add-host=host.docker.internal:host-gateway"
+  ],
   "features": {
     "ghcr.io/devcontainers/features/go:1": {},
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
     "ghcr.io/devcontainers/features/node:1": {
       "version": "20",
-      "pnpmVersion": "9.1.1"
+      "pnpmVersion": "9.14.4"
     }
   },
-  "forwardPorts": [8090],
+  "forwardPorts": [
+    8090
+  ],
   "portsAttributes": {
     "8090": {}
   },

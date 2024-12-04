@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 sudo apt update
 sudo apt install -y mariadb-server
 sudo service mariadb start
@@ -18,5 +18,6 @@ if [[ -n "${CODESPACE_NAME}" ]]; then
     sed -i "s,\"API_URL\":.*,\"API_URL\": \"${API_URL}\",g" web/packages/lib/src/config.json
 fi
 
+cd web/e2e
 pnpm exec playwright install
-sudo pnpm exec playwright install-deps
+sudo /usr/local/share/nvm/versions/node/v20.18.1/bin/pnpm exec playwright install-deps
