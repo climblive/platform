@@ -18,6 +18,7 @@ if [[ -n "${CODESPACE_NAME}" ]]; then
     sed -i "s,\"API_URL\":.*,\"API_URL\": \"${API_URL}\",g" web/packages/lib/src/config.json
 fi
 
-cd web/e2e
-pnpm exec playwright install
-pnpm exec playwright install-deps
+cd web
+pnpm i
+cd e2e
+pnpm exec playwright install --with-deps
