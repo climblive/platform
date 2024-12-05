@@ -139,6 +139,9 @@
       <sl-tab-group bind:this={tabGroup} on:sl-tab-show={handleShowTab}>
         <sl-tab slot="nav" panel="problems">Scorecard</sl-tab>
         <sl-tab slot="nav" panel="results">Results</sl-tab>
+        {#if contest.rules}
+          <sl-tab slot="nav" panel="rules">Rules</sl-tab>
+        {/if}
 
         <sl-tab-panel name="problems">
           {#each problems as problem}
@@ -164,6 +167,11 @@
             </ScoreboardProvider>
           {/if}
         </sl-tab-panel>
+        <sl-tab-panel name="rules">
+          <p>
+            {contest.rules}
+          </p>
+        </sl-tab-panel>
       </sl-tab-group>
     </main></ContestStateProvider
   >
@@ -173,6 +181,17 @@
   sl-tab-panel::part(base) {
     padding-top: var(--sl-spacing-small);
     padding-bottom: 0;
+  }
+
+  sl-tab-panel[name="rules"] {
+    padding-inline: var(--sl-spacing-small);
+
+    & p {
+      white-space: pre-line;
+      margin: 0;
+      overflow: hidden;
+      color: var(--sl-color-neutral-700);
+    }
   }
 
   main {
