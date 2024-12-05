@@ -6,7 +6,7 @@
     contenderScoreUpdatedEventSchema,
     type ScoreboardEntry,
   } from "@climblive/lib/models";
-  import { onDestroy, onMount, setContext } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { writable } from "svelte/store";
   import * as z from "zod";
 
@@ -18,9 +18,7 @@
   const contenders: Map<number, ScoreboardEntry> = new Map();
   const pendingUpdates: ((contenders: Map<number, ScoreboardEntry>) => void)[] =
     [];
-  const scoreboardStore = writable<Map<number, ScoreboardEntry[]>>(new Map());
-
-  setContext("scoreboard", scoreboardStore);
+  const scoreboard = writable<Map<number, ScoreboardEntry[]>>(new Map());
 
   onMount(async () => {
     eventSource = new EventSource(
@@ -35,7 +33,7 @@
 
       initialized = false;
       contenders.clear();
-      $scoreboardStore = new Map();
+      $scoreboard = new Map();
     };
 
     eventSource.onopen = () => {
@@ -82,7 +80,7 @@
       classEntries.push(contender);
     }
 
-    $scoreboardStore = results;
+    $scoreboard = results;
   };
 
   const queueEventHandler = (
@@ -151,4 +149,4 @@
   });
 </script>
 
-<slot />
+<slot {scoreboard} loading={!initialized} />
