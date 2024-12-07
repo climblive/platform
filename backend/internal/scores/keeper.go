@@ -4,9 +4,13 @@ import (
 	"context"
 	"log/slog"
 	"sync"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 )
+
+const persistInterval = time.Minute
+const lastDitchPersistTimeout = 5 * time.Second
 
 type keeperRepository interface {
 	domain.Transactor
@@ -63,6 +67,7 @@ func (k *Keeper) run(ctx context.Context, filter domain.EventFilter, wg *sync.Wa
 	close(ready)
 
 	events := eventReader.EventsChan(ctx)
+	ticker := time.Tick(persistInterval)
 
 ConsumeEvents:
 	for {
@@ -76,6 +81,8 @@ ConsumeEvents:
 			case domain.ContenderScoreUpdatedEvent:
 				k.HandleContenderScoreUpdated(ev)
 			}
+		case <-ticker:
+			k.persistScores(ctx)
 		case <-ctx.Done():
 			slog.Info("subscription closed", "reason", ctx.Err())
 			break ConsumeEvents
@@ -86,7 +93,69 @@ ConsumeEvents:
 		slog.Warn("subscription closed unexpectedly")
 	}
 
+	if len(k.scores) > 0 {
+		ctxWithDeadline, cancel := context.WithTimeout(context.Background(), lastDitchPersistTimeout)
+		defer cancel()
+
+		slog.Info("making a last-ditch attempt to persist scores", "timeout", lastDitchPersistTimeout)
+		k.persistScores(ctxWithDeadline)
+	}
+
 	slog.Info("score keeper shutting down")
+}
+
+func (k *Keeper) persistScores(ctx context.Context) {
+	takeFirst := func() (domain.ContenderID, domain.Score) {
+		k.mu.Lock()
+		defer k.mu.Unlock()
+
+		var contenderID domain.ContenderID
+		var score domain.Score
+		for contenderID, score = range k.scores {
+			break
+		}
+
+		if contenderID == 0 {
+			return 0, domain.Score{}
+		}
+
+		delete(k.scores, contenderID)
+
+		return contenderID, score
+	}
+
+	putBack := func(contenderID domain.ContenderID, score domain.Score) {
+		k.mu.Lock()
+		defer k.mu.Unlock()
+
+		if _, found := k.scores[contenderID]; !found {
+			k.scores[contenderID] = score
+		}
+	}
+
+	for ctx.Err() == nil {
+		contenderID, score := takeFirst()
+
+		if contenderID == 0 {
+			break
+		}
+
+		_, err := k.repo.StoreScore(ctx, nil, score)
+		if err != nil {
+			slog.Error("failed to persist score",
+				"contender_id", contenderID,
+				"error", err)
+
+			putBack(contenderID, score)
+		}
+	}
+
+	if ctx.Err() != nil && len(k.scores) > 0 {
+		slog.Warn("not all scores where persisted",
+			"reason", ctx.Err(),
+			"left_in_memory", len(k.scores),
+		)
+	}
 }
 
 func (k *Keeper) HandleContenderScoreUpdated(event domain.ContenderScoreUpdatedEvent) {
@@ -94,8 +163,6 @@ func (k *Keeper) HandleContenderScoreUpdated(event domain.ContenderScoreUpdatedE
 	defer k.mu.Unlock()
 
 	k.scores[event.ContenderID] = domain.Score(event)
-
-	k.repo.StoreScore(context.Background(), nil, domain.Score(event))
 }
 
 func (k *Keeper) GetScore(contenderID domain.ContenderID) (domain.Score, error) {
