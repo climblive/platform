@@ -195,7 +195,7 @@ test("tick and untick all problems", async ({ page }) => {
   }
 
   await expect(page.getByText("1500p")).toBeVisible()
-  await expect(page.getByText("1st place")).toBeVisible()
+  await expect(page.getByText("1st")).toBeVisible()
 
   for (let p = 1; p <= 5; p++) {
     const problem = page.getByRole("region", { name: `Problem ${p}` });
@@ -207,7 +207,7 @@ test("tick and untick all problems", async ({ page }) => {
   }
 
   await expect(page.getByText("0p", { exact: true })).toBeVisible()
-  await expect(page.getByText("1st place")).toBeVisible()
+  await expect(page.getByText("1st")).toBeVisible()
 })
 
 test("flash a problem", async ({ page }) => {
