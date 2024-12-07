@@ -142,7 +142,7 @@ test('edit profile', async ({ page }) => {
 
   await expect(page.getByText("Michael Scott")).toBeVisible()
   await expect(page.getByText("Scranton Climbing Club")).toBeVisible()
-  await expect(page.getByText("Males")).toBeVisible()
+  await expect(page.getByText("Males", { exact: true })).toBeVisible()
 
   await page.getByRole("button", { name: "Edit" }).click();
 
@@ -168,7 +168,7 @@ test('edit profile', async ({ page }) => {
 
   await expect(page.getByText("Phyllis Lapin-Vance")).toBeVisible()
   await expect(page.getByText("Dunder Mifflin Climbing Club")).toBeVisible()
-  await expect(page.getByText("Females")).toBeVisible()
+  await expect(page.getByText("Females", { exact: true })).toBeVisible()
 });
 
 test('cancel edit profile', async ({ page }) => {
