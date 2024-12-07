@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ContestInfo from "@/components/ContestInfo.svelte";
   import Header from "@/components/Header.svelte";
   import ProblemView from "@/components/ProblemView.svelte";
   import type { ScorecardSession } from "@/types";
@@ -140,7 +141,7 @@
         <sl-tab slot="nav" panel="problems">Scorecard</sl-tab>
         <sl-tab slot="nav" panel="results">Results</sl-tab>
         {#if contest.rules}
-          <sl-tab slot="nav" panel="rules">Rules</sl-tab>
+          <sl-tab slot="nav" panel="info">Info</sl-tab>
         {/if}
 
         <sl-tab-panel name="problems">
@@ -167,10 +168,8 @@
             </ScoreboardProvider>
           {/if}
         </sl-tab-panel>
-        <sl-tab-panel name="rules">
-          <p>
-            {contest.rules}
-          </p>
+        <sl-tab-panel name="info">
+          <ContestInfo {contest} {problems} {compClasses} />
         </sl-tab-panel>
       </sl-tab-group>
     </main></ContestStateProvider
@@ -181,17 +180,6 @@
   sl-tab-panel::part(base) {
     padding-top: var(--sl-spacing-small);
     padding-bottom: 0;
-  }
-
-  sl-tab-panel[name="rules"] {
-    padding-inline: var(--sl-spacing-small);
-
-    & p {
-      white-space: pre-line;
-      margin: 0;
-      overflow: hidden;
-      color: var(--sl-color-neutral-700);
-    }
   }
 
   main {

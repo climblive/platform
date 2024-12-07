@@ -12,6 +12,8 @@ export type Contest = {
   finalists: number;
   rules?: string;
   gracePeriod: number;
+  timeBegin?: Date;
+  timeEnd?: Date;
 };
 
 export const contestSchema: z.ZodType<Contest> = z.object({
@@ -26,4 +28,6 @@ export const contestSchema: z.ZodType<Contest> = z.object({
   finalists: z.number(),
   rules: z.string().optional(),
   gracePeriod: z.number(),
+  timeBegin: z.coerce.date().optional(),
+  timeEnd: z.coerce.date().optional(),
 });
