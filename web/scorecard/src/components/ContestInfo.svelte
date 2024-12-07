@@ -70,7 +70,6 @@
 
   sl-details::part(base) {
     margin-top: var(--sl-spacing-small);
-    background-color: transparent;
     background-color: var(--sl-color-primary-100);
     font-size: var(--sl-font-size-small);
   }
