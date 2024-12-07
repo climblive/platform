@@ -14,6 +14,7 @@
 
   const ITEM_HEIGHT = 36;
   const GAP = 8;
+  const SCROLLABLE_SKELETON_ENTRIES = 10;
 
   let container: HTMLDivElement | undefined;
   let observer: ResizeObserver | undefined;
@@ -30,6 +31,11 @@
         break;
       case "scroll":
         pageSize = results.length;
+
+        if (loading) {
+          pageSize = SCROLLABLE_SKELETON_ENTRIES;
+        }
+
         break;
     }
   }
@@ -83,7 +89,7 @@
   {overflow}
 >
   {#if loading}
-    {#each [...Array(overflow === "pagination" ? pageSize : 10).keys()] as i (i)}
+    {#each [...Array(overflow === "pagination" ? pageSize : SCROLLABLE_SKELETON_ENTRIES).keys()] as i (i)}
       <sl-skeleton effect="sheen"></sl-skeleton>
     {/each}
   {:else}
