@@ -19,6 +19,7 @@ type contenderRecord struct {
 	Entered             *time.Time
 	Disqualified        bool
 	WithdrawnFromFinals bool
+	Score               *scoreRecord `gorm:"embedded"` // embeddedPrefix:score_
 }
 
 func (contenderRecord) TableName() string {
@@ -41,7 +42,7 @@ func (r contenderRecord) fromDomain(contender domain.Contender) contenderRecord 
 }
 
 func (r *contenderRecord) toDomain() domain.Contender {
-	return domain.Contender{
+	contender := domain.Contender{
 		ID: domain.ContenderID(n2e(r.ID)),
 		Ownership: domain.OwnershipData{
 			OrganizerID: domain.OrganizerID(r.OrganizerID),
@@ -56,17 +57,22 @@ func (r *contenderRecord) toDomain() domain.Contender {
 		Entered:             r.Entered,
 		WithdrawnFromFinals: r.WithdrawnFromFinals,
 		Disqualified:        r.Disqualified,
-		Score:               0,
-		Placement:           0,
-		Finalist:            false,
-		RankOrder:           0,
-		ScoreUpdated:        nil,
 	}
+
+	if r.Score != nil {
+		score := r.Score.toDomain()
+		contender.Score = &score
+	}
+
+	return contender
 }
 
 func (d *Database) GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error) {
 	var record contenderRecord
-	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE id = ?`, contenderID).Scan(&record).Error
+	err := d.tx(tx).WithContext(ctx).Raw(`SELECT *
+FROM contender
+LEFT JOIN score ON score.contender_id = contender.id
+WHERE id = ?`, contenderID).Scan(&record).Error
 	if err != nil {
 		return domain.Contender{}, errors.Wrap(err, 0)
 	}
@@ -80,7 +86,10 @@ func (d *Database) GetContender(ctx context.Context, tx domain.Transaction, cont
 
 func (d *Database) GetContenderByCode(ctx context.Context, tx domain.Transaction, registrationCode string) (domain.Contender, error) {
 	var record contenderRecord
-	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE registration_code = ?`, registrationCode).Scan(&record).Error
+	err := d.tx(tx).WithContext(ctx).Raw(`SELECT *
+FROM contender
+LEFT JOIN score ON score.contender_id = contender.id
+WHERE registration_code = ?`, registrationCode).Scan(&record).Error
 	if err != nil {
 		return domain.Contender{}, errors.Wrap(err, 0)
 	}
@@ -95,7 +104,10 @@ func (d *Database) GetContenderByCode(ctx context.Context, tx domain.Transaction
 func (d *Database) GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) ([]domain.Contender, error) {
 	var records []contenderRecord
 
-	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE class_id = ?`, compClassID).Scan(&records).Error
+	err := d.tx(tx).WithContext(ctx).Raw(`SELECT *
+FROM contender
+LEFT JOIN score ON score.contender_id = contender.id
+WHERE class_id = ?`, compClassID).Scan(&records).Error
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -112,7 +124,10 @@ func (d *Database) GetContendersByCompClass(ctx context.Context, tx domain.Trans
 func (d *Database) GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error) {
 	var records []contenderRecord
 
-	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM contender WHERE contest_id = ?`, contestID).Scan(&records).Error
+	err := d.tx(tx).WithContext(ctx).Raw(`SELECT *
+FROM contender
+LEFT JOIN score ON score.contender_id = contender.id
+WHERE contest_id = ?`, contestID).Scan(&records).Error
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}

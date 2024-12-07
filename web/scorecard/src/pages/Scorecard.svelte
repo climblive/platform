@@ -56,8 +56,8 @@
 
   $: {
     if (contender) {
-      score = contender.score;
-      placement = contender.placement;
+      score = contender.score?.score ?? 0;
+      placement = contender.score?.placement;
     }
   }
 

@@ -68,19 +68,11 @@ func (uc *ContestUseCase) GetScoreboard(ctx context.Context, contestID domain.Co
 			ClubName:            contender.ClubName,
 			WithdrawnFromFinals: contender.WithdrawnFromFinals,
 			Disqualified:        contender.Disqualified,
-			ScoreUpdated:        contender.ScoreUpdated,
 			Score:               contender.Score,
-			Placement:           contender.Placement,
-			RankOrder:           contender.RankOrder,
-			Finalist:            contender.Finalist,
 		}
 
 		if score, err := uc.ScoreKeeper.GetScore(contender.ID); err == nil {
-			entry.Score = score.Score
-			entry.Placement = score.Placement
-			entry.RankOrder = score.RankOrder
-			entry.Finalist = score.Finalist
-			entry.ScoreUpdated = &score.Timestamp
+			entry.Score = &score
 		}
 
 		entries = append(entries, entry)

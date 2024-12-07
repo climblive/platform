@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { scoreSchema, type Score } from "./score";
 
 export type Contender = {
   id: number;
@@ -11,11 +12,7 @@ export type Contender = {
   entered?: Date;
   withdrawnFromFinals: boolean;
   disqualified: boolean;
-  score: number;
-  placement?: number;
-  rankOrder: number;
-  finalist: boolean;
-  scoreUpdated?: Date;
+  score?: Score;
 };
 
 export const contenderSchema: z.ZodType<Contender> = z.object({
@@ -29,9 +26,5 @@ export const contenderSchema: z.ZodType<Contender> = z.object({
   entered: z.coerce.date().optional(),
   withdrawnFromFinals: z.boolean(),
   disqualified: z.boolean(),
-  score: z.number(),
-  placement: z.number().optional(),
-  rankOrder: z.number(),
-  finalist: z.boolean(),
-  scoreUpdated: z.coerce.date().optional(),
+  score: scoreSchema.optional(),
 });
