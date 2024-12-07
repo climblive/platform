@@ -1,18 +1,21 @@
 <script lang="ts">
   export let label: string;
-  export let text: string;
 </script>
 
 <section>
   <p>
     <strong>{label}</strong>
-    {text}
+    <slot />
   </p>
 </section>
 
 <style>
   strong {
     display: block;
-    font-size: var(--sl-font-size-small);
+    font-size: var(--sl-font-size-x-small);
+  }
+
+  p {
+    margin: 0;
   }
 </style>
