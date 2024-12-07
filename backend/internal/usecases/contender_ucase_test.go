@@ -118,7 +118,7 @@ func TestGetContenderByCode(t *testing.T) {
 		On("GetContenderByCode", mock.Anything, mock.Anything, mock.AnythingOfType("string")).
 		Return(domain.Contender{}, domain.ErrNotFound)
 
-	mockedScoreKeeper.On("GetScore", mockedContenderID).Return(mockedScore, errMock)
+	mockedScoreKeeper.On("GetScore", mockedContenderID).Return(mockedScore, nil)
 
 	t.Run("HappyPath", func(t *testing.T) {
 		ucase := usecases.ContenderUseCase{
@@ -659,7 +659,8 @@ func TestUpdateContender(t *testing.T) {
 		assert.Equal(t, mockedContender.WithdrawnFromFinals, contender.WithdrawnFromFinals)
 		assert.Equal(t, mockedContender.Disqualified, contender.Disqualified)
 
-		assert.Equal(t, mockedScore, contender.Score)
+		require.NotNil(t, contender.Score)
+		assert.Equal(t, mockedScore, *contender.Score)
 	})
 
 	t.Run("ReadOnlyFieldsAreUnaltered", func(t *testing.T) {
