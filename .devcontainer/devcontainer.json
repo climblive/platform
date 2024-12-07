@@ -1,9 +1,6 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
 {
-  "name": "Node.js & TypeScript",
-  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+  "name": "ClimbLive",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -17,23 +14,19 @@
   "runArgs": [
     "--add-host=host.docker.internal:host-gateway"
   ],
-  // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
     "ghcr.io/devcontainers/features/go:1": {},
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20",
+      "pnpmVersion": "9.14.4"
+    }
   },
-  // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  // "forwardPorts": [],
   "forwardPorts": [
     8090
   ],
   "portsAttributes": {
     "8090": {}
   },
-  // Use 'postCreateCommand' to run commands after the container is created.
   "postCreateCommand": "./.devcontainer/scripts/post.sh"
-  // Configure tool-specific properties.
-  // "customizations": {},
-  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-  // "remoteUser": "root"
 }

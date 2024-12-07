@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ContestInfo from "@/components/ContestInfo.svelte";
   import Header from "@/components/Header.svelte";
   import ProblemView from "@/components/ProblemView.svelte";
   import type { ScorecardSession } from "@/types";
@@ -139,6 +140,9 @@
       <sl-tab-group bind:this={tabGroup} on:sl-tab-show={handleShowTab}>
         <sl-tab slot="nav" panel="problems">Scorecard</sl-tab>
         <sl-tab slot="nav" panel="results">Results</sl-tab>
+        {#if contest.rules}
+          <sl-tab slot="nav" panel="info">Info</sl-tab>
+        {/if}
 
         <sl-tab-panel name="problems">
           {#each problems as problem}
@@ -151,10 +155,21 @@
         </sl-tab-panel>
         <sl-tab-panel name="results">
           {#if resultsConnected && contender.compClassId}
-            <ScoreboardProvider contestId={$session.contestId}>
-              <ResultList compClassId={contender.compClassId} />
+            <ScoreboardProvider
+              contestId={$session.contestId}
+              let:scoreboard
+              let:loading
+            >
+              <ResultList
+                compClassId={contender.compClassId}
+                {scoreboard}
+                {loading}
+              />
             </ScoreboardProvider>
           {/if}
+        </sl-tab-panel>
+        <sl-tab-panel name="info">
+          <ContestInfo {contest} {problems} {compClasses} />
         </sl-tab-panel>
       </sl-tab-group>
     </main></ContestStateProvider

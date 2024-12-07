@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Score, Timer } from "@climblive/lib/components";
   import { type ContestState } from "@climblive/lib/types";
-  import { asOrdinal } from "@climblive/lib/utils";
+  import { ordinalSuperscript } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
   export let registrationCode: string;
@@ -28,11 +28,17 @@
   <p class="contender-name">
     {contenderName} <span class="contender-class">{compClassName}</span>
   </p>
-  <p class="contender-club">{contenderClub}</p>
+  <p class="contender-club">{contenderClub ?? "No club"}</p>
   <div class="lower">
     <div class="score">
+      <span>
+        {#if placement}
+          {placement}<sup>{ordinalSuperscript(placement)}</sup>
+        {:else}
+          -
+        {/if}
+      </span>
       <Score value={score} />
-      <span>{placement ? `${asOrdinal(placement)} place` : "-"}</span>
     </div>
     {#if state === "NOT_STARTED"}
       <Timer endTime={startTime} label="Time until start" />
@@ -97,12 +103,12 @@
     }
 
     & .score {
-      & > :not(span) {
+      & > span {
         font-weight: var(--sl-font-weight-bold);
-        font-size: var(--sl-font-size-2x-large);
+        font-size: var(--sl-font-size-large);
       }
 
-      & > span {
+      & > :not(span) {
         font-size: var(--sl-font-size-x-small);
         font-weight: var(--sl-font-weight-normal);
       }

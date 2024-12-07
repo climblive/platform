@@ -142,7 +142,7 @@ test('edit profile', async ({ page }) => {
 
   await expect(page.getByText("Michael Scott")).toBeVisible()
   await expect(page.getByText("Scranton Climbing Club")).toBeVisible()
-  await expect(page.getByText("Males")).toBeVisible()
+  await expect(page.getByText("Males", { exact: true })).toBeVisible()
 
   await page.getByRole("button", { name: "Edit" }).click();
 
@@ -168,7 +168,7 @@ test('edit profile', async ({ page }) => {
 
   await expect(page.getByText("Phyllis Lapin-Vance")).toBeVisible()
   await expect(page.getByText("Dunder Mifflin Climbing Club")).toBeVisible()
-  await expect(page.getByText("Females")).toBeVisible()
+  await expect(page.getByText("Females", { exact: true })).toBeVisible()
 });
 
 test('cancel edit profile', async ({ page }) => {
@@ -195,7 +195,7 @@ test("tick and untick all problems", async ({ page }) => {
   }
 
   await expect(page.getByText("1500p")).toBeVisible()
-  await expect(page.getByText("1st place")).toBeVisible()
+  await expect(page.getByText("1st")).toBeVisible()
 
   for (let p = 1; p <= 5; p++) {
     const problem = page.getByRole("region", { name: `Problem ${p}` });
@@ -207,7 +207,7 @@ test("tick and untick all problems", async ({ page }) => {
   }
 
   await expect(page.getByText("0p", { exact: true })).toBeVisible()
-  await expect(page.getByText("1st place")).toBeVisible()
+  await expect(page.getByText("1st")).toBeVisible()
 })
 
 test("flash a problem", async ({ page }) => {
@@ -224,6 +224,24 @@ test("flash a problem", async ({ page }) => {
   await problem.getByRole("button", { name: "Untick" }).click();
 
   await expect(problem.getByText("+110p")).not.toBeVisible();
+})
+
+test("info tab", async ({ page }) => {
+  await page.goto('/ABCD0001');
+
+  await page.getByRole("tab", { name: "Info" }).click();
+
+  await expect(page.getByText("Name World Testing Championships")).toBeVisible();
+  await expect(page.getByText("Description The world's number one competition for testing")).toBeVisible();
+  await expect(page.getByText("Location On the web")).toBeVisible();
+  await expect(page.getByText("Classes Males, Females")).toBeVisible();
+  await expect(page.getByText("Number of problems 5")).toBeVisible();
+  await expect(page.getByText("Qualifying problems 10 hardest")).toBeVisible();
+  await expect(page.getByText("Number of finalists 7")).toBeVisible();
+
+  await page.getByRole("button", { name: "Rules" }).click();
+
+  await expect(page.getByText("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")).toBeVisible();
 })
 
 test.describe("contest states", () => {

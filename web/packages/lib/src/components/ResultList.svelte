@@ -1,23 +1,27 @@
 <script lang="ts">
   import type { ScoreboardEntry } from "@climblive/lib/models";
   import "@shoelace-style/shoelace/dist/components/progress-bar/progress-bar.js";
-  import { getContext, onDestroy, onMount } from "svelte";
+  import "@shoelace-style/shoelace/dist/components/skeleton/skeleton.js";
+  import { onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
   import Floater from "./Floater.svelte";
   import ResultEntry from "./ResultEntry.svelte";
 
   export let compClassId: number;
   export let overflow: "pagination" | "scroll" = "scroll";
+  export let scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
+  export let loading: boolean;
 
   const ITEM_HEIGHT = 36;
   const GAP = 8;
+  const SCROLLABLE_SKELETON_ENTRIES = 10;
 
   let container: HTMLDivElement | undefined;
   let observer: ResizeObserver | undefined;
   let pageFlipIntervalTimerId: number;
 
-  let containerHeight: number;
-  let pageSize: number;
+  let containerHeight: number = 0;
+  let pageSize: number = 0;
   let pageIndex = 0;
 
   $: {
@@ -27,6 +31,11 @@
         break;
       case "scroll":
         pageSize = results.length;
+
+        if (loading) {
+          pageSize = SCROLLABLE_SKELETON_ENTRIES;
+        }
+
         break;
     }
   }
@@ -39,8 +48,6 @@
 
   $: pageCount = Math.ceil(results.length / pageSize);
 
-  const scoreboard =
-    getContext<Readable<Map<number, ScoreboardEntry[]>>>("scoreboard");
   $: results = $scoreboard.get(compClassId) ?? [];
 
   onMount(() => {
@@ -81,14 +88,29 @@
   style="--page-size: {pageSize}; --page-index: {pageIndex}"
   {overflow}
 >
-  {#each results as scoreboardEntry (scoreboardEntry.contenderId)}
-    <Floater order={scoreboardEntry.rankOrder}>
-      <ResultEntry {scoreboardEntry} />
-    </Floater>
-  {/each}
+  {#if loading}
+    {#each [...Array(overflow === "pagination" ? pageSize : SCROLLABLE_SKELETON_ENTRIES).keys()] as i (i)}
+      <sl-skeleton effect="sheen"></sl-skeleton>
+    {/each}
+  {:else}
+    {#each results as scoreboardEntry (scoreboardEntry.contenderId)}
+      <Floater order={scoreboardEntry.rankOrder}>
+        <ResultEntry {scoreboardEntry} />
+      </Floater>
+    {/each}
+  {/if}
 </div>
 
 <style>
+  sl-skeleton {
+    --color: var(--sl-color-primary-400);
+    --sheen-color: var(--sl-color-primary-300);
+    --border-radius: var(--sl-border-radius-medium);
+
+    margin-bottom: var(--sl-spacing-x-small);
+    height: 2.25rem;
+  }
+
   .container {
     overflow: hidden;
     position: relative;

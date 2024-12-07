@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { ScoreboardEntry } from "@climblive/lib/models";
-  import { asOrdinal } from "@climblive/lib/utils";
+  import { ordinalSuperscript } from "../utils";
   import Score from "./Score.svelte";
 
   export let scoreboardEntry: ScoreboardEntry;
@@ -8,7 +8,13 @@
 
 <section data-finalist={scoreboardEntry.finalist}>
   <div class="number">
-    {scoreboardEntry.placement ? asOrdinal(scoreboardEntry.placement) : "-"}
+    {#if scoreboardEntry.placement}
+      {scoreboardEntry.placement}<sup
+        >{ordinalSuperscript(scoreboardEntry.placement)}</sup
+      >
+    {:else}
+      -
+    {/if}
   </div>
   <div class="name">{scoreboardEntry.publicName}</div>
   <div class="score">
