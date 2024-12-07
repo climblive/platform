@@ -182,9 +182,6 @@
     padding-bottom: 0;
   }
 
-  sl-tab-panel[name="rules"] {
-  }
-
   main {
     height: 100%;
     display: flex;
