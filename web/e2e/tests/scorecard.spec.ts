@@ -226,10 +226,20 @@ test("flash a problem", async ({ page }) => {
   await expect(problem.getByText("+110p")).not.toBeVisible();
 })
 
-test("show rules", async ({ page }) => {
+test("info tab", async ({ page }) => {
   await page.goto('/ABCD0001');
 
-  await page.getByRole("tab", { name: "Rules" }).click();
+  await page.getByRole("tab", { name: "Info" }).click();
+
+  await expect(page.getByText("Name World Testing Championships")).toBeVisible();
+  await expect(page.getByText("Description The world's number one competition for testing")).toBeVisible();
+  await expect(page.getByText("Location On the web")).toBeVisible();
+  await expect(page.getByText("Classes Males, Females")).toBeVisible();
+  await expect(page.getByText("Number of problems 5")).toBeVisible();
+  await expect(page.getByText("Qualifying problems 10 hardest")).toBeVisible();
+  await expect(page.getByText("Number of finalists 7")).toBeVisible();
+
+  await page.getByRole("button", { name: "Rules" }).click();
 
   await expect(page.getByText("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")).toBeVisible();
 })
