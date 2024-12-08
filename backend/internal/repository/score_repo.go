@@ -51,9 +51,10 @@ func (d *Database) StoreScore(ctx context.Context, tx domain.Transaction, score 
 	err = d.tx(tx).WithContext(ctx).Save(&record).Error
 	switch err {
 	case nil:
-		return domain.Score{}, errors.Wrap(err, 0)
 	case gorm.ErrForeignKeyViolated:
 		return domain.Score{}, errors.New(domain.ErrNotFound)
+	default:
+		return domain.Score{}, errors.Wrap(err, 0)
 	}
 
 	return record.toDomain(), nil
