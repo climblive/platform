@@ -13,6 +13,7 @@
   strong {
     display: block;
     font-size: var(--sl-font-size-x-small);
+    line-height: var(--sl-line-height-normal);
   }
 
   p {
