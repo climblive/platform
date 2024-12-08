@@ -170,7 +170,7 @@ IterateScores:
 		}
 	}
 
-	if ctx.Err() != nil && len(k.scores) > 0 {
+	if len(k.scores) > 0 {
 		slog.Warn("not all scores where persisted",
 			"left_in_memory", len(k.scores),
 		)
