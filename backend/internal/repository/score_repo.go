@@ -6,6 +6,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
+	"gorm.io/gorm"
 )
 
 type scoreRecord struct {
@@ -48,8 +49,11 @@ func (d *Database) StoreScore(ctx context.Context, tx domain.Transaction, score 
 	var record scoreRecord = scoreRecord{}.fromDomain(score)
 
 	err = d.tx(tx).WithContext(ctx).Save(&record).Error
-	if err != nil {
+	switch err {
+	case nil:
 		return domain.Score{}, errors.Wrap(err, 0)
+	case gorm.ErrForeignKeyViolated:
+		return domain.Score{}, errors.New(domain.ErrNotFound)
 	}
 
 	return record.toDomain(), nil

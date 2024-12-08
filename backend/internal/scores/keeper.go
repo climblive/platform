@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/go-errors/errors"
 )
 
 const persistInterval = time.Minute
@@ -139,6 +140,7 @@ func (k *Keeper) persistScores(ctx context.Context) {
 		}
 	}
 
+IterateScores:
 	for ctx.Err() == nil {
 		contenderID, score := takeFirst()
 
@@ -147,18 +149,29 @@ func (k *Keeper) persistScores(ctx context.Context) {
 		}
 
 		_, err := k.repo.StoreScore(ctx, nil, score)
-		if err != nil {
+		switch {
+		case err == nil:
+		case errors.Is(err, domain.ErrNotFound):
+			slog.Warn("failed to persist score for non-existent contender",
+				"contender_id", contenderID,
+				"action", "drop",
+				"error", err)
+
+			continue
+		default:
 			slog.Error("failed to persist score",
 				"contender_id", contenderID,
+				"action", "try_again_later",
 				"error", err)
 
 			putBack(contenderID, score)
+
+			break IterateScores
 		}
 	}
 
 	if ctx.Err() != nil && len(k.scores) > 0 {
 		slog.Warn("not all scores where persisted",
-			"reason", ctx.Err(),
 			"left_in_memory", len(k.scores),
 		)
 	}
