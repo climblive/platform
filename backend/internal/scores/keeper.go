@@ -10,11 +10,9 @@ import (
 )
 
 const persistInterval = time.Minute
-const lastDitchPersistTimeout = 5 * time.Second
+const lastDitchPersistTimeout = 10 * time.Second
 
 type keeperRepository interface {
-	domain.Transactor
-
 	StoreScore(ctx context.Context, tx domain.Transaction, score domain.Score) (domain.Score, error)
 }
 
