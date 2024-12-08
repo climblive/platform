@@ -11,7 +11,7 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/popup/popup.js";
   import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
-  import { afterUpdate, getContext } from "svelte";
+  import { afterUpdate, getContext, onMount } from "svelte";
   import type { Readable } from "svelte/store";
 
   export let problem: Problem;
@@ -20,6 +20,7 @@
 
   let container: HTMLDivElement;
   let popup: SlPopup;
+  let audio: HTMLAudioElement | undefined;
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
   const createTick = createTickMutation($session.contenderId);
@@ -56,6 +57,7 @@
 
   const handleTick = (flash: boolean) => {
     navigator.vibrate?.(50);
+    audio?.play();
     open = false;
 
     $createTick.mutate(
@@ -72,6 +74,12 @@
       },
     );
   };
+
+  onMount(() => {
+    audio = new Audio(
+      "/ho-ho-ho-it-s-a-christmas-miracle-santa-voice-david-h-m-lambert-1-00-04.mp3",
+    );
+  });
 
   afterUpdate(() => {
     popup.anchor = container;
