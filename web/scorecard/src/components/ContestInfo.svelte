@@ -35,10 +35,10 @@
   {/if}
   {#if contest.timeEnd}
     <LabeledText label="End time">
-      {format(contest.timeEnd, "PPpp", { locale: sv })}}
+      {format(contest.timeEnd, "PPpp", { locale: sv })}
     </LabeledText>
   {/if}
-  <LabeledText label="Classes">
+  <LabeledText label="Competition classes">
     {compClasses.map((cc) => cc.name).join(", ")}
   </LabeledText>
   <LabeledText label="Number of problems">
