@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS `score` (
   CONSTRAINT `fk_score_1`
     FOREIGN KEY (`contender_id`)
     REFERENCES `contender` (`id`)
-    ON DELETE RESTRICT
-    ON UPDATE RESTRICT)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
