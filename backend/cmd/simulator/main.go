@@ -35,7 +35,7 @@ const (
 func main() {
 	var registrationCodes []string
 
-	for n := range 10 {
+	for n := range 200 {
 		registrationCodes = append(registrationCodes, fmt.Sprintf("ABCD%04d", n+1))
 	}
 
