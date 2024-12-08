@@ -93,15 +93,15 @@ ConsumeEvents:
 		slog.Warn("subscription closed unexpectedly")
 	}
 
+	slog.Info("score keeper shutting down")
+
 	if len(k.scores) > 0 {
 		ctxWithDeadline, cancel := context.WithTimeout(context.Background(), lastDitchPersistTimeout)
 		defer cancel()
 
-		slog.Info("making a last-ditch attempt to persist scores", "timeout", lastDitchPersistTimeout)
+		slog.Warn("making a last-ditch attempt to persist scores", "timeout", lastDitchPersistTimeout)
 		k.persistScores(ctxWithDeadline)
 	}
-
-	slog.Info("score keeper shutting down")
 }
 
 func (k *Keeper) persistScores(ctx context.Context) {
