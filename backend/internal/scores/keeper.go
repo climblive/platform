@@ -67,12 +67,12 @@ func (k *Keeper) run(ctx context.Context, filter domain.EventFilter, wg *sync.Wa
 	events := eventReader.EventsChan(ctx)
 	ticker := time.Tick(persistInterval)
 
-ConsumeEvents:
+EventLoop:
 	for {
 		select {
 		case event, open := <-events:
 			if !open {
-				break ConsumeEvents
+				break EventLoop
 			}
 
 			switch ev := event.Data.(type) {
@@ -83,12 +83,12 @@ ConsumeEvents:
 			k.persistScores(ctx)
 		case <-ctx.Done():
 			slog.Info("subscription closed", "reason", ctx.Err())
-			break ConsumeEvents
+			break EventLoop
 		}
 	}
 
 	if ctx.Err() == nil {
-		slog.Warn("subscription closed unexpectedly")
+		slog.Error("subscription closed unexpectedly")
 	}
 
 	slog.Info("score keeper shutting down")

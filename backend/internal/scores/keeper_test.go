@@ -58,7 +58,7 @@ func TestKeeperGatherScores(t *testing.T) {
 		wg := keeper.Run(ctx)
 
 		for k := 1; k <= 5; k++ {
-			subscription.Post(domain.EventEnvelope{
+			err := subscription.Post(domain.EventEnvelope{
 				Name: "CONTENDER_SCORE_UPDATED",
 				Data: domain.ContenderScoreUpdatedEvent{
 					Timestamp:   now,
@@ -69,6 +69,8 @@ func TestKeeperGatherScores(t *testing.T) {
 					RankOrder:   k - 1,
 				},
 			})
+
+			require.NoError(t, err)
 		}
 
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
@@ -112,12 +114,14 @@ func TestKeeperGatherScores(t *testing.T) {
 				RankOrder:   k - 1,
 			}
 
-			subscription.Post(domain.EventEnvelope{
+			mockedRepo.On("StoreScore", mock.Anything, mock.Anything, score).Return(score, nil)
+
+			err := subscription.Post(domain.EventEnvelope{
 				Name: "CONTENDER_SCORE_UPDATED",
 				Data: domain.ContenderScoreUpdatedEvent(score),
 			})
 
-			mockedRepo.On("StoreScore", mock.Anything, mock.Anything, score).Return(score, nil)
+			require.NoError(t, err)
 		}
 
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
