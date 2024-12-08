@@ -94,9 +94,11 @@
     {/each}
   {:else}
     {#each results as scoreboardEntry (scoreboardEntry.contenderId)}
-      <Floater order={scoreboardEntry.rankOrder}>
-        <ResultEntry {scoreboardEntry} />
-      </Floater>
+      {#if scoreboardEntry.score}
+        <Floater order={scoreboardEntry.score.rankOrder}>
+          <ResultEntry {scoreboardEntry} />
+        </Floater>
+      {/if}
     {/each}
   {/if}
 </div>

@@ -55,11 +55,14 @@ func TestGetScoreboard(t *testing.T) {
 			ClubName:            "Testers' Climbing Club",
 			WithdrawnFromFinals: true,
 			Disqualified:        true,
-			Score:               i * 10,
-			Placement:           i,
-			Finalist:            true,
-			RankOrder:           i - 1,
-			ScoreUpdated:        &currentTime,
+			Score: &domain.Score{
+				ContenderID: contenderID,
+				Score:       i * 10,
+				Placement:   i,
+				Finalist:    true,
+				RankOrder:   i - 1,
+				Timestamp:   currentTime,
+			},
 		}
 
 		contenders = append(contenders, mockedContender)
@@ -99,12 +102,12 @@ func TestGetScoreboard(t *testing.T) {
 	assert.Equal(t, "Testers' Climbing Club", scoreboard[0].ClubName)
 	assert.Equal(t, true, scoreboard[0].WithdrawnFromFinals)
 	assert.Equal(t, true, scoreboard[0].Disqualified)
-	assert.NotNil(t, scoreboard[0].ScoreUpdated)
-	assert.Equal(t, future, *scoreboard[0].ScoreUpdated)
-	assert.Equal(t, 1234, scoreboard[0].Score)
-	assert.Equal(t, 42, scoreboard[0].Placement)
-	assert.Equal(t, false, scoreboard[0].Finalist)
-	assert.Equal(t, 1337, scoreboard[0].RankOrder)
+	assert.NotNil(t, scoreboard[0].Score)
+	assert.Equal(t, future, scoreboard[0].Score.Timestamp)
+	assert.Equal(t, 1234, scoreboard[0].Score.Score)
+	assert.Equal(t, 42, scoreboard[0].Score.Placement)
+	assert.Equal(t, false, scoreboard[0].Score.Finalist)
+	assert.Equal(t, 1337, scoreboard[0].Score.RankOrder)
 
 	for i := 2; i <= 10; i++ {
 		entry := scoreboard[i-1]
@@ -115,11 +118,11 @@ func TestGetScoreboard(t *testing.T) {
 		assert.Equal(t, "Testers' Climbing Club", entry.ClubName)
 		assert.Equal(t, true, entry.WithdrawnFromFinals)
 		assert.Equal(t, true, entry.Disqualified)
-		assert.NotNil(t, entry.ScoreUpdated)
-		assert.Equal(t, currentTime, *entry.ScoreUpdated)
-		assert.Equal(t, i*10, entry.Score)
-		assert.Equal(t, i, entry.Placement)
-		assert.Equal(t, i-1, entry.RankOrder)
-		assert.Equal(t, true, entry.Finalist)
+		assert.NotNil(t, entry.Score)
+		assert.Equal(t, currentTime, entry.Score.Timestamp)
+		assert.Equal(t, i*10, entry.Score.Score)
+		assert.Equal(t, i, entry.Score.Placement)
+		assert.Equal(t, i-1, entry.Score.RankOrder)
+		assert.Equal(t, true, entry.Score.Finalist)
 	}
 }
