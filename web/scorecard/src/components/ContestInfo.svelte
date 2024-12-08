@@ -16,6 +16,8 @@
       details.innerHTML = contest.rules;
     }
   }
+
+  const scoreboardUrl = `${location.protocol}//${location.host}/scoreboard/${contest.id}`;
 </script>
 
 <section>
@@ -48,6 +50,9 @@
   <LabeledText label="Number of finalists">
     {contest.finalists.toString()}
   </LabeledText>
+  <LabeledText label="Scoreboard">
+    <a href={scoreboardUrl} target="_blank">{scoreboardUrl}</a>
+  </LabeledText>
 </section>
 {#if contest.rules}
   <sl-details bind:this={details} summary="Rules"> </sl-details>
@@ -76,5 +81,9 @@
 
   sl-details::part(content) {
     padding-top: 0;
+  }
+
+  a {
+    color: var(--sl-color-primary-700);
   }
 </style>
