@@ -21,8 +21,8 @@ import (
 
 const (
 	APIURL     = "http://localhost:8090"
-	ITERATIONS = 1000
-	MAX_SLEEP  = 10000 * time.Millisecond
+	ITERATIONS = 10
+	MAX_SLEEP  = 10_000 * time.Millisecond
 )
 
 type SimulatorEvent int

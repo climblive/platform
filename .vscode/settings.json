@@ -13,5 +13,8 @@
     "[go]": {
         "editor.defaultFormatter": "golang.go"
     },
-    "terminal.integrated.gpuAcceleration": "off"
+    "terminal.integrated.gpuAcceleration": "off",
+    "vim.handleKeys": {
+        "<C-p>": false
+    }
 }

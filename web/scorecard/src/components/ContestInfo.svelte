@@ -16,6 +16,8 @@
       details.innerHTML = contest.rules;
     }
   }
+
+  const scoreboardUrl = `${location.protocol}//${location.host}/scoreboard/${contest.id}`;
 </script>
 
 <section>
@@ -33,10 +35,10 @@
   {/if}
   {#if contest.timeEnd}
     <LabeledText label="End time">
-      {format(contest.timeEnd, "PPpp", { locale: sv })}}
+      {format(contest.timeEnd, "PPpp", { locale: sv })}
     </LabeledText>
   {/if}
-  <LabeledText label="Classes">
+  <LabeledText label="Competition classes">
     {compClasses.map((cc) => cc.name).join(", ")}
   </LabeledText>
   <LabeledText label="Number of problems">
@@ -47,6 +49,9 @@
   </LabeledText>
   <LabeledText label="Number of finalists">
     {contest.finalists.toString()}
+  </LabeledText>
+  <LabeledText label="Scoreboard">
+    <a href={scoreboardUrl} target="_blank">{scoreboardUrl}</a>
   </LabeledText>
 </section>
 {#if contest.rules}
@@ -76,5 +81,9 @@
 
   sl-details::part(content) {
     padding-top: 0;
+  }
+
+  a {
+    color: var(--sl-color-primary-700);
   }
 </style>
