@@ -17,17 +17,19 @@ type keeperRepository interface {
 }
 
 type Keeper struct {
-	mu          sync.RWMutex
-	eventBroker domain.EventBroker
-	scores      map[domain.ContenderID]domain.Score
-	repo        keeperRepository
+	mu                     sync.RWMutex
+	eventBroker            domain.EventBroker
+	scores                 map[domain.ContenderID]domain.Score
+	repo                   keeperRepository
+	externalPersistTrigger chan struct{}
 }
 
 func NewScoreKeeper(eventBroker domain.EventBroker, repo keeperRepository) *Keeper {
 	return &Keeper{
-		eventBroker: eventBroker,
-		scores:      make(map[domain.ContenderID]domain.Score),
-		repo:        repo,
+		eventBroker:            eventBroker,
+		scores:                 make(map[domain.ContenderID]domain.Score),
+		repo:                   repo,
+		externalPersistTrigger: make(chan struct{}, 1),
 	}
 }
 
@@ -81,6 +83,8 @@ EventLoop:
 			}
 		case <-ticker:
 			k.persistScores(ctx)
+		case <-k.externalPersistTrigger:
+			k.persistScores(ctx)
 		case <-ctx.Done():
 			slog.Info("subscription closed", "reason", ctx.Err())
 			break EventLoop
@@ -100,6 +104,10 @@ EventLoop:
 		slog.Warn("making a last-ditch attempt to persist scores", "timeout", lastDitchPersistTimeout)
 		k.persistScores(ctxWithDeadline)
 	}
+}
+
+func (k *Keeper) RequestPersist() {
+	k.externalPersistTrigger <- struct{}{}
 }
 
 func (k *Keeper) persistScores(ctx context.Context) {
