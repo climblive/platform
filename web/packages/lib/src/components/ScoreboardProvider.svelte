@@ -135,7 +135,7 @@
             placement: event.placement,
             finalist: event.finalist,
             rankOrder: event.rankOrder,
-            scoreUpdated: event.timestamp,
+            timestamp: event.timestamp,
           };
 
           contender.score = score;
