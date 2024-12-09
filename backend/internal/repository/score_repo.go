@@ -29,7 +29,7 @@ func (r scoreRecord) fromDomain(score domain.Score) scoreRecord {
 		Score:       score.Score,
 		Placement:   score.Placement,
 		Finalist:    score.Finalist,
-		Rankorder:   score.RankOrder,
+		RankOrder:   score.RankOrder,
 	}
 }
 
@@ -40,7 +40,7 @@ func (r *scoreRecord) toDomain() domain.Score {
 		Score:       r.Score,
 		Placement:   r.Placement,
 		Finalist:    r.Finalist,
-		RankOrder:   r.Rankorder,
+		RankOrder:   r.RankOrder,
 	}
 }
 
