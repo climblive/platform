@@ -208,6 +208,7 @@ func TestGetContendersByCompClass(t *testing.T) {
 
 		for i, contender := range contenders {
 			assert.Equal(t, domain.ContenderID(i+1), contender.ID)
+			require.NotNil(t, contender.Score)
 			assert.Equal(t, (i+1)*10, contender.Score.Score)
 			assert.Equal(t, i+1, contender.Score.Placement)
 			assert.Equal(t, currentTime, contender.Score.Timestamp)
