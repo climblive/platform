@@ -23,6 +23,7 @@ const (
 	APIURL     = "http://localhost:8090"
 	ITERATIONS = 10
 	MAX_SLEEP  = 10_000 * time.Millisecond
+	CONTENDERS = 10
 )
 
 type SimulatorEvent int
@@ -35,7 +36,7 @@ const (
 func main() {
 	var registrationCodes []string
 
-	for n := range 200 {
+	for n := range CONTENDERS {
 		registrationCodes = append(registrationCodes, fmt.Sprintf("ABCD%04d", n+1))
 	}
 
