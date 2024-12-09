@@ -15,5 +15,5 @@ export const scoreSchema: z.ZodType<Score> = z.object({
   placement: z.number(),
   rankOrder: z.number(),
   finalist: z.boolean(),
-  scoreUpdated: z.coerce.date().optional(),
+  scoreUpdated: z.coerce.date(),
 });
