@@ -69,10 +69,8 @@ func (r *contenderRecord) toDomain() domain.Contender {
 
 func (d *Database) GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error) {
 	var record contenderRecord
-	err := d.tx(tx).WithContext(ctx).Raw(`SELECT *
-FROM contender
-LEFT JOIN score ON score.contender_id = contender.id
-WHERE id = ?`, contenderID).Scan(&record).Error
+
+	err := d.tx(tx).WithContext(ctx).Model(&contenderRecord{}).Select("*").Joins("LEFT JOIN score ON score.contender_id = contender.id").Where("id = ?", contenderID).Scan(&record).Error
 	if err != nil {
 		return domain.Contender{}, errors.Wrap(err, 0)
 	}
@@ -86,10 +84,7 @@ WHERE id = ?`, contenderID).Scan(&record).Error
 
 func (d *Database) GetContenderByCode(ctx context.Context, tx domain.Transaction, registrationCode string) (domain.Contender, error) {
 	var record contenderRecord
-	err := d.tx(tx).WithContext(ctx).Raw(`SELECT *
-FROM contender
-LEFT JOIN score ON score.contender_id = contender.id
-WHERE registration_code = ?`, registrationCode).Scan(&record).Error
+	err := d.tx(tx).WithContext(ctx).Model(&contenderRecord{}).Select("*").Joins("LEFT JOIN score ON score.contender_id = contender.id").Where("registration_code = ?", registrationCode).Scan(&record).Error
 	if err != nil {
 		return domain.Contender{}, errors.Wrap(err, 0)
 	}
