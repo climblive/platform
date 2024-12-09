@@ -94,7 +94,7 @@ test('enter contest by entering registration code', async ({ page }) => {
   await page.waitForURL('/ABCD0002');
 });
 
-test.only('registration code is saved in local storage for 12 hours', async ({ page }) => {
+test('registration code is saved in local storage for 12 hours', async ({ page }) => {
   await page.clock.install({ time: new Date() });
   await page.goto('/');
 
