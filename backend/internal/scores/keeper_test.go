@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestKeeperGatherScores(t *testing.T) {
+func TestKeeper(t *testing.T) {
 	makeMocks := func(bufferCapacity int) (*repositoryMock, *eventBrokerMock, *events.Subscription) {
 		mockedRepo := new(repositoryMock)
 		mockedEventBroker := new(eventBrokerMock)
@@ -139,7 +139,7 @@ func TestKeeperGatherScores(t *testing.T) {
 				RankOrder:   k - 1,
 			}
 
-			mockedRepo.On("StoreScore", mock.Anything, mock.Anything, score).Return(score, nil)
+			mockedRepo.On("StoreScore", mock.Anything, nil, score).Return(score, nil)
 
 			err := subscription.Post(domain.EventEnvelope{
 				Name: "CONTENDER_SCORE_UPDATED",
@@ -194,7 +194,7 @@ func TestKeeperGatherScores(t *testing.T) {
 				RankOrder:   k - 1,
 			}
 
-			mockedRepo.On("StoreScore", mock.Anything, mock.Anything, score).Return(score, nil)
+			mockedRepo.On("StoreScore", mock.Anything, nil, score).Return(score, nil)
 
 			err := subscription.Post(domain.EventEnvelope{
 				Name: "CONTENDER_SCORE_UPDATED",
@@ -220,10 +220,12 @@ func TestKeeperGatherScores(t *testing.T) {
 		mockedRepo.AssertExpectations(t)
 	})
 
-	t.Run("PersistScoresFailure", func(t *testing.T) {
+	t.Run("PersistScores_KeepInMemoryOnFailure", func(t *testing.T) {
 		mockedRepo, mockedEventBroker, subscription := makeMocks(0)
 		keeper := scores.NewScoreKeeper(mockedEventBroker, mockedRepo)
 		var errMock error = errors.New("mock error")
+
+		mockedRepo.On("StoreScore", mock.Anything, nil, mock.AnythingOfType("domain.Score")).Return(domain.Score{}, errMock)
 
 		ctx, cancel := context.WithCancel(context.Background())
 		now := time.Now()
@@ -239,8 +241,6 @@ func TestKeeperGatherScores(t *testing.T) {
 				Finalist:    true,
 				RankOrder:   k - 1,
 			}
-
-			mockedRepo.On("StoreScore", mock.Anything, mock.Anything, score).Return(domain.Score{}, errMock)
 
 			err := subscription.Post(domain.EventEnvelope{
 				Name: "CONTENDER_SCORE_UPDATED",
@@ -260,6 +260,52 @@ func TestKeeperGatherScores(t *testing.T) {
 
 		keeper.RequestPersist()
 
+		assert.EventuallyWithT(t, withLogf(func(collect *CollectTWithLogf) {
+			mockedRepo.AssertExpectations(collect)
+
+			for k := 1; k <= 5; k++ {
+				_, err := keeper.GetScore(domain.ContenderID(k))
+
+				require.NoError(collect, err)
+			}
+		}), time.Second, 10*time.Millisecond)
+
+		cancel()
+
+		wg.Wait()
+
+		mockedEventBroker.AssertExpectations(t)
+	})
+
+	t.Run("PersistScores_DropIfContenderNotFound", func(t *testing.T) {
+		mockedRepo, mockedEventBroker, subscription := makeMocks(0)
+		keeper := scores.NewScoreKeeper(mockedEventBroker, mockedRepo)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		now := time.Now()
+
+		wg := keeper.Run(ctx)
+
+		for k := 1; k <= 5; k++ {
+			score := domain.Score{
+				Timestamp:   now,
+				ContenderID: domain.ContenderID(k),
+				Score:       k * 100,
+				Placement:   k,
+				Finalist:    true,
+				RankOrder:   k - 1,
+			}
+
+			mockedRepo.On("StoreScore", mock.Anything, nil, score).Return(domain.Score{}, domain.ErrNotFound)
+
+			err := subscription.Post(domain.EventEnvelope{
+				Name: "CONTENDER_SCORE_UPDATED",
+				Data: domain.ContenderScoreUpdatedEvent(score),
+			})
+
+			require.NoError(t, err)
+		}
+
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			for k := 1; k <= 5; k++ {
 				_, err := keeper.GetScore(domain.ContenderID(k))
@@ -268,11 +314,35 @@ func TestKeeperGatherScores(t *testing.T) {
 			}
 		}, time.Second, 10*time.Millisecond)
 
+		keeper.RequestPersist()
+
+		assert.EventuallyWithT(t, withLogf(func(collect *CollectTWithLogf) {
+			mockedRepo.AssertExpectations(collect)
+
+			for k := 1; k <= 5; k++ {
+				_, err := keeper.GetScore(domain.ContenderID(k))
+
+				require.Error(collect, err, domain.ErrNotFound)
+			}
+		}), time.Second, 10*time.Millisecond)
+
 		cancel()
 
 		wg.Wait()
 
 		mockedEventBroker.AssertExpectations(t)
-		mockedRepo.AssertExpectations(t)
 	})
+}
+
+func withLogf(condition func(*CollectTWithLogf)) func(*assert.CollectT) {
+	return func(c *assert.CollectT) {
+		condition(&CollectTWithLogf{c})
+	}
+}
+
+type CollectTWithLogf struct {
+	*assert.CollectT
+}
+
+func (c *CollectTWithLogf) Logf(format string, args ...interface{}) {
 }
