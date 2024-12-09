@@ -19,7 +19,7 @@ type contenderRecord struct {
 	Entered             *time.Time
 	Disqualified        bool
 	WithdrawnFromFinals bool
-	Score               *scoreRecord `gorm:"<-:false;foreignKey:contender_id;embedded"`
+	Score               *scoreRecord `gorm:"<-:false;foreignKey:contender_id"`
 }
 
 func (contenderRecord) TableName() string {
