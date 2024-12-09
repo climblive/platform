@@ -26,6 +26,15 @@ func TestGetContender(t *testing.T) {
 		Ownership: mockedOwnership,
 	}
 
+	mockedScore := domain.Score{
+		Timestamp:   currentTime,
+		ContenderID: mockedContenderID,
+		Score:       1000,
+		Placement:   5,
+		Finalist:    true,
+		RankOrder:   6,
+	}
+
 	mockedRepo := new(repositoryMock)
 	mockedScoreKeeper := new(scoreKeeperMock)
 
@@ -33,14 +42,7 @@ func TestGetContender(t *testing.T) {
 		On("GetContender", mock.Anything, mock.Anything, mockedContenderID).
 		Return(mockedContender, nil)
 
-	mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{
-		Timestamp:   currentTime,
-		ContenderID: mockedContenderID,
-		Score:       1000,
-		Placement:   5,
-		Finalist:    true,
-		RankOrder:   6,
-	}, nil)
+	mockedScoreKeeper.On("GetScore", mockedContenderID).Return(mockedScore, nil)
 
 	t.Run("HappyPath", func(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
@@ -60,12 +62,8 @@ func TestGetContender(t *testing.T) {
 		require.NoError(t, err)
 
 		assert.Equal(t, mockedContenderID, contender.ID)
-		assert.Equal(t, 1000, contender.Score)
-		assert.Equal(t, 5, contender.Placement)
-		assert.Equal(t, true, contender.Finalist)
-		assert.Equal(t, 6, contender.RankOrder)
-		assert.Equal(t, currentTime, *contender.ScoreUpdated)
-
+		require.NotNil(t, contender.Score)
+		assert.Equal(t, mockedScore, *contender.Score)
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {
@@ -100,6 +98,15 @@ func TestGetContenderByCode(t *testing.T) {
 		Ownership: mockedOwnership,
 	}
 
+	mockedScore := domain.Score{
+		Timestamp:   time.Now(),
+		ContenderID: mockedContenderID,
+		Score:       1000,
+		Placement:   5,
+		Finalist:    true,
+		RankOrder:   6,
+	}
+
 	mockedRepo := new(repositoryMock)
 	mockedScoreKeeper := new(scoreKeeperMock)
 
@@ -111,7 +118,7 @@ func TestGetContenderByCode(t *testing.T) {
 		On("GetContenderByCode", mock.Anything, mock.Anything, mock.AnythingOfType("string")).
 		Return(domain.Contender{}, domain.ErrNotFound)
 
-	mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{}, errMock)
+	mockedScoreKeeper.On("GetScore", mockedContenderID).Return(mockedScore, nil)
 
 	t.Run("HappyPath", func(t *testing.T) {
 		ucase := usecases.ContenderUseCase{
@@ -123,6 +130,8 @@ func TestGetContenderByCode(t *testing.T) {
 
 		require.NoError(t, err)
 		assert.Equal(t, mockedContenderID, contender.ID)
+		require.NotNil(t, contender.Score)
+		assert.Equal(t, mockedScore, *contender.Score)
 	})
 
 	t.Run("NotFound", func(t *testing.T) {
@@ -171,7 +180,8 @@ func TestGetContendersByCompClass(t *testing.T) {
 			ContenderID: contenderID,
 			Score:       k * 10,
 			Placement:   k,
-			Finalist:    false,
+			RankOrder:   k - 1,
+			Finalist:    true,
 		}, nil)
 	}
 
@@ -199,9 +209,12 @@ func TestGetContendersByCompClass(t *testing.T) {
 
 		for i, contender := range contenders {
 			assert.Equal(t, domain.ContenderID(i+1), contender.ID)
-			assert.Equal(t, (i+1)*10, contender.Score)
-			assert.Equal(t, i+1, contender.Placement)
-			assert.Equal(t, currentTime, *contender.ScoreUpdated)
+			require.NotNil(t, contender.Score)
+			assert.Equal(t, (i+1)*10, contender.Score.Score)
+			assert.Equal(t, i+1, contender.Score.Placement)
+			assert.Equal(t, i, contender.Score.RankOrder)
+			assert.True(t, contender.Score.Finalist)
+			assert.Equal(t, currentTime, contender.Score.Timestamp)
 		}
 	})
 
@@ -257,7 +270,8 @@ func TestGetContendersByContest(t *testing.T) {
 			ContenderID: contenderID,
 			Score:       k * 10,
 			Placement:   k,
-			Finalist:    false,
+			RankOrder:   k - 1,
+			Finalist:    true,
 		}, nil)
 	}
 
@@ -285,9 +299,12 @@ func TestGetContendersByContest(t *testing.T) {
 
 		for i, contender := range contenders {
 			assert.Equal(t, domain.ContenderID(i+1), contender.ID)
-			assert.Equal(t, (i+1)*10, contender.Score)
-			assert.Equal(t, i+1, contender.Placement)
-			assert.Equal(t, currentTime, *contender.ScoreUpdated)
+			require.NotNil(t, contender.Score)
+			assert.Equal(t, (i+1)*10, contender.Score.Score)
+			assert.Equal(t, i+1, contender.Score.Placement)
+			assert.Equal(t, i, contender.Score.RankOrder)
+			assert.True(t, contender.Score.Finalist)
+			assert.Equal(t, currentTime, contender.Score.Timestamp)
 		}
 	})
 
@@ -603,14 +620,16 @@ func TestUpdateContender(t *testing.T) {
 			On("HasOwnership", mock.Anything, mockedOwnership).
 			Return(domain.ContenderRole, nil)
 
-		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(domain.Score{
+		mockedScore := domain.Score{
 			Timestamp:   currentTime,
 			ContenderID: mockedContenderID,
 			Score:       1000,
 			Placement:   5,
 			Finalist:    true,
 			RankOrder:   6,
-		}, nil)
+		}
+
+		mockedScoreKeeper.On("GetScore", mockedContenderID).Return(mockedScore, nil)
 
 		mockedContender := domain.Contender{
 			ID:                  mockedContenderID,
@@ -624,10 +643,6 @@ func TestUpdateContender(t *testing.T) {
 			Entered:             &currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
-			Score:               100,
-			Placement:           1,
-			Finalist:            false,
-			ScoreUpdated:        &currentTime,
 		}
 
 		ucase := usecases.ContenderUseCase{
@@ -652,11 +667,8 @@ func TestUpdateContender(t *testing.T) {
 		assert.Equal(t, mockedContender.WithdrawnFromFinals, contender.WithdrawnFromFinals)
 		assert.Equal(t, mockedContender.Disqualified, contender.Disqualified)
 
-		assert.Equal(t, 1000, contender.Score)
-		assert.Equal(t, 5, contender.Placement)
-		assert.Equal(t, currentTime, *contender.ScoreUpdated)
-		assert.Equal(t, true, contender.Finalist)
-		assert.Equal(t, 6, contender.RankOrder)
+		require.NotNil(t, contender.Score)
+		assert.Equal(t, mockedScore, *contender.Score)
 	})
 
 	t.Run("ReadOnlyFieldsAreUnaltered", func(t *testing.T) {
@@ -681,10 +693,6 @@ func TestUpdateContender(t *testing.T) {
 			Entered:             &currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
-			Score:               100,
-			Placement:           1,
-			Finalist:            false,
-			ScoreUpdated:        &currentTime,
 		}
 
 		ucase := usecases.ContenderUseCase{
@@ -711,21 +719,12 @@ func TestUpdateContender(t *testing.T) {
 				return contender
 			},
 			func(contender domain.Contender) domain.Contender {
-				contender.Score += 1
-				return contender
-			},
-			func(contender domain.Contender) domain.Contender {
-				contender.Placement += 1
+				contender.Score = &domain.Score{}
 				return contender
 			},
 			func(contender domain.Contender) domain.Contender {
 				soon := currentTime.Add(time.Hour)
 				contender.Entered = &soon
-				return contender
-			},
-			func(contender domain.Contender) domain.Contender {
-				soon := currentTime.Add(time.Hour)
-				contender.ScoreUpdated = &soon
 				return contender
 			},
 		}
@@ -761,10 +760,6 @@ func TestUpdateContender(t *testing.T) {
 			Entered:             &currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        true,
-			Score:               100,
-			Placement:           1,
-			Finalist:            false,
-			ScoreUpdated:        &currentTime,
 		}
 
 		ucase := usecases.ContenderUseCase{
@@ -810,10 +805,6 @@ func TestUpdateContender(t *testing.T) {
 			Entered:             nil,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
-			Score:               0,
-			Placement:           0,
-			Finalist:            false,
-			ScoreUpdated:        nil,
 		}
 
 		ucase := usecases.ContenderUseCase{
@@ -874,10 +865,6 @@ func TestUpdateContender(t *testing.T) {
 			Entered:             nil,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
-			Score:               0,
-			Placement:           0,
-			Finalist:            false,
-			ScoreUpdated:        nil,
 		}
 
 		ucase := usecases.ContenderUseCase{
@@ -913,10 +900,6 @@ func TestUpdateContender(t *testing.T) {
 			Entered:             &currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
-			Score:               100,
-			Placement:           1,
-			Finalist:            false,
-			ScoreUpdated:        &currentTime,
 		}
 
 		ucase := usecases.ContenderUseCase{
@@ -962,10 +945,6 @@ func TestUpdateContender(t *testing.T) {
 			Entered:             &currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
-			Score:               100,
-			Placement:           1,
-			Finalist:            false,
-			ScoreUpdated:        &currentTime,
 		}
 
 		mockedOtherCompClass := domain.CompClass{
@@ -1049,10 +1028,6 @@ func TestUpdateContender(t *testing.T) {
 			Entered:             &currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
-			Score:               100,
-			Placement:           1,
-			Finalist:            false,
-			ScoreUpdated:        &currentTime,
 		}
 
 		ucase := usecases.ContenderUseCase{
@@ -1095,10 +1070,6 @@ func TestUpdateContender(t *testing.T) {
 			Entered:             &currentTime,
 			WithdrawnFromFinals: true,
 			Disqualified:        false,
-			Score:               100,
-			Placement:           1,
-			Finalist:            false,
-			ScoreUpdated:        &currentTime,
 		}
 
 		ucase := usecases.ContenderUseCase{
@@ -1146,10 +1117,6 @@ func TestUpdateContender(t *testing.T) {
 			Entered:             &currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        true,
-			Score:               100,
-			Placement:           1,
-			Finalist:            false,
-			ScoreUpdated:        &currentTime,
 		}
 
 		ucase := usecases.ContenderUseCase{
@@ -1191,10 +1158,6 @@ func TestUpdateContender(t *testing.T) {
 			Entered:             &currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
-			Score:               100,
-			Placement:           1,
-			Finalist:            false,
-			ScoreUpdated:        &currentTime,
 		}
 
 		mockedOtherCompClass := domain.CompClass{
@@ -1248,10 +1211,6 @@ func TestUpdateContender(t *testing.T) {
 			Entered:             &currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
-			Score:               100,
-			Placement:           1,
-			Finalist:            false,
-			ScoreUpdated:        &currentTime,
 		}
 
 		mockedRepo := makeMockedRepo(mockedContender)
@@ -1307,10 +1266,6 @@ func TestUpdateContender(t *testing.T) {
 			Entered:             &currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
-			Score:               100,
-			Placement:           1,
-			Finalist:            false,
-			ScoreUpdated:        &currentTime,
 		}
 
 		mockedRepo := makeMockedRepo(mockedContender)
