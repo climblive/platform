@@ -12,7 +12,7 @@ export type Score = {
 export const scoreSchema: z.ZodType<Score> = z.object({
   contenderId: z.number(),
   score: z.number(),
-  placement: z.number().optional(),
+  placement: z.number(),
   rankOrder: z.number(),
   finalist: z.boolean(),
   scoreUpdated: z.coerce.date().optional(),
