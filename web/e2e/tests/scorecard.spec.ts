@@ -94,7 +94,8 @@ test('enter contest by entering registration code', async ({ page }) => {
   await page.waitForURL('/ABCD0002');
 });
 
-test('registration code is saved in local storage for 12 hours', async ({ page }) => {
+test.only('registration code is saved in local storage for 12 hours', async ({ page }) => {
+  await page.clock.install({ time: new Date() });
   await page.goto('/');
 
   const pinInput = page.getByRole("textbox", { name: "Pin character 1 out of 8" })
@@ -120,7 +121,7 @@ test('registration code is saved in local storage for 12 hours', async ({ page }
   await page.waitForURL('/ABCD0001');
   await expect(page.getByText("Albert Einstein")).toBeVisible();
 
-  await page.clock.fastForward("12:00:01");
+  await page.clock.fastForward("12:00:00");
 
   await page.goto('/');
   await page.waitForURL('/');
