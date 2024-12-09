@@ -3,7 +3,7 @@ import * as z from "zod";
 export type Score = {
   contenderId: number;
   score: number;
-  placement?: number;
+  placement: number;
   rankOrder: number;
   finalist: boolean;
   scoreUpdated?: Date;
