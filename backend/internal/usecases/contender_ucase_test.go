@@ -180,7 +180,8 @@ func TestGetContendersByCompClass(t *testing.T) {
 			ContenderID: contenderID,
 			Score:       k * 10,
 			Placement:   k,
-			Finalist:    false,
+			RankOrder:   k - 1,
+			Finalist:    true,
 		}, nil)
 	}
 
@@ -211,6 +212,8 @@ func TestGetContendersByCompClass(t *testing.T) {
 			require.NotNil(t, contender.Score)
 			assert.Equal(t, (i+1)*10, contender.Score.Score)
 			assert.Equal(t, i+1, contender.Score.Placement)
+			assert.Equal(t, i, contender.Score.RankOrder)
+			assert.True(t, contender.Score.Finalist)
 			assert.Equal(t, currentTime, contender.Score.Timestamp)
 		}
 	})
@@ -267,7 +270,8 @@ func TestGetContendersByContest(t *testing.T) {
 			ContenderID: contenderID,
 			Score:       k * 10,
 			Placement:   k,
-			Finalist:    false,
+			RankOrder:   k - 1,
+			Finalist:    true,
 		}, nil)
 	}
 
@@ -298,6 +302,8 @@ func TestGetContendersByContest(t *testing.T) {
 			require.NotNil(t, contender.Score)
 			assert.Equal(t, (i+1)*10, contender.Score.Score)
 			assert.Equal(t, i+1, contender.Score.Placement)
+			assert.Equal(t, i, contender.Score.RankOrder)
+			assert.True(t, contender.Score.Finalist)
 			assert.Equal(t, currentTime, contender.Score.Timestamp)
 		}
 	})
