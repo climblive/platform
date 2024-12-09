@@ -106,7 +106,7 @@ func TestGetScoreboard(t *testing.T) {
 	assert.Equal(t, future, scoreboard[0].Score.Timestamp)
 	assert.Equal(t, 1234, scoreboard[0].Score.Score)
 	assert.Equal(t, 42, scoreboard[0].Score.Placement)
-	assert.Equal(t, false, scoreboard[0].Score.Finalist)
+	assert.False(t, scoreboard[0].Score.Finalist)
 	assert.Equal(t, 1337, scoreboard[0].Score.RankOrder)
 
 	for i := 2; i <= 10; i++ {
