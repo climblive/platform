@@ -123,6 +123,6 @@ func TestGetScoreboard(t *testing.T) {
 		assert.Equal(t, i*10, entry.Score.Score)
 		assert.Equal(t, i, entry.Score.Placement)
 		assert.Equal(t, i-1, entry.Score.RankOrder)
-		assert.Equal(t, true, entry.Score.Finalist)
+		assert.True(t, entry.Score.Finalist)
 	}
 }
