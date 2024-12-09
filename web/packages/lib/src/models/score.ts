@@ -6,7 +6,7 @@ export type Score = {
   placement: number;
   rankOrder: number;
   finalist: boolean;
-  scoreUpdated?: Date;
+  scoreUpdated: Date;
 };
 
 export const scoreSchema: z.ZodType<Score> = z.object({
