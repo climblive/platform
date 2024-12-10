@@ -140,6 +140,8 @@ func (k *Keeper) persistScores(ctx context.Context) {
 		}
 	}
 
+	numScores := len(k.scores)
+
 IterateScores:
 	for ctx.Err() == nil {
 		contenderID, score := takeFirst()
@@ -175,6 +177,8 @@ IterateScores:
 			"left_in_memory", len(k.scores),
 		)
 	}
+
+	slog.Info("successfully persisted scores", "num_scores", numScores)
 }
 
 func (k *Keeper) HandleContenderScoreUpdated(event domain.ContenderScoreUpdatedEvent) {

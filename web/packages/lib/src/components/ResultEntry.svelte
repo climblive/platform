@@ -4,7 +4,7 @@
   import Score from "./Score.svelte";
 
   export let scoreboardEntry: ScoreboardEntry;
-  const score = scoreboardEntry.score;
+  $: score = scoreboardEntry.score;
 </script>
 
 <section data-finalist={score?.finalist ?? false}>
