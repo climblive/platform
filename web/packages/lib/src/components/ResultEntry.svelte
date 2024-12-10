@@ -4,24 +4,23 @@
   import Score from "./Score.svelte";
 
   export let scoreboardEntry: ScoreboardEntry;
+  $: score = scoreboardEntry.score;
 </script>
 
-<section data-finalist={scoreboardEntry.finalist}>
+<section data-finalist={score?.finalist ?? false}>
   <div class="number">
-    {#if scoreboardEntry.placement}
-      {scoreboardEntry.placement}<sup
-        >{ordinalSuperscript(scoreboardEntry.placement)}</sup
-      >
+    {#if score?.placement}
+      {score.placement}<sup>{ordinalSuperscript(score.placement)}</sup>
     {:else}
       -
     {/if}
   </div>
   <div class="name">{scoreboardEntry.publicName}</div>
   <div class="score">
-    {#if scoreboardEntry.score === 0}
+    {#if score === undefined || score.score === 0}
       -
     {:else}
-      <Score value={scoreboardEntry.score} />
+      <Score value={score.score} />
     {/if}
   </div>
 </section>

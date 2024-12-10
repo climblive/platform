@@ -17,11 +17,7 @@ type Contender struct {
 	Entered             *time.Time    `json:"entered,omitempty"`
 	WithdrawnFromFinals bool          `json:"withdrawnFromFinals"`
 	Disqualified        bool          `json:"disqualified"`
-	Score               int           `json:"score"`
-	Placement           int           `json:"placement,omitempty"`
-	Finalist            bool          `json:"finalist"`
-	RankOrder           int           `json:"rankOrder"`
-	ScoreUpdated        *time.Time    `json:"scoreUpdated,omitempty"`
+	Score               *Score        `json:"score,omitempty"`
 }
 
 type ContenderUseCase interface {

@@ -9,6 +9,7 @@
   import { onDestroy, onMount } from "svelte";
   import { writable } from "svelte/store";
   import * as z from "zod";
+  import type { Score } from "../models/score";
 
   export let contestId: number;
 
@@ -66,7 +67,7 @@
     const results = new Map<number, ScoreboardEntry[]>();
 
     for (const contender of contenders.values()) {
-      if (!contender.scoreUpdated) {
+      if (!contender.score) {
         continue;
       }
 
@@ -128,11 +129,16 @@
             contenders.set(event.contenderId, contender);
           }
 
-          contender.score = event.score;
-          contender.placement = event.placement;
-          contender.finalist = event.finalist;
-          contender.rankOrder = event.rankOrder;
-          contender.scoreUpdated = event.timestamp;
+          const score: Score = {
+            contenderId: event.contenderId,
+            score: event.score,
+            placement: event.placement,
+            finalist: event.finalist,
+            rankOrder: event.rankOrder,
+            timestamp: event.timestamp,
+          };
+
+          contender.score = score;
         });
       }
     });
@@ -143,9 +149,6 @@
     compClassId: 0,
     withdrawnFromFinals: false,
     disqualified: false,
-    score: 0,
-    rankOrder: 0,
-    finalist: false,
   });
 </script>
 

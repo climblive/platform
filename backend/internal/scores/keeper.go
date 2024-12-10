@@ -4,20 +4,33 @@ import (
 	"context"
 	"log/slog"
 	"sync"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/go-errors/errors"
 )
 
-type Keeper struct {
-	mu          sync.RWMutex
-	eventBroker domain.EventBroker
-	scores      map[domain.ContenderID]domain.Score
+const persistInterval = time.Minute
+const lastDitchPersistTimeout = 10 * time.Second
+
+type keeperRepository interface {
+	StoreScore(ctx context.Context, tx domain.Transaction, score domain.Score) (domain.Score, error)
 }
 
-func NewScoreKeeper(eventBroker domain.EventBroker) *Keeper {
+type Keeper struct {
+	mu                     sync.RWMutex
+	eventBroker            domain.EventBroker
+	scores                 map[domain.ContenderID]domain.Score
+	repo                   keeperRepository
+	externalPersistTrigger chan struct{}
+}
+
+func NewScoreKeeper(eventBroker domain.EventBroker, repo keeperRepository) *Keeper {
 	return &Keeper{
-		eventBroker: eventBroker,
-		scores:      make(map[domain.ContenderID]domain.Score),
+		eventBroker:            eventBroker,
+		scores:                 make(map[domain.ContenderID]domain.Score),
+		repo:                   repo,
+		externalPersistTrigger: make(chan struct{}, 1),
 	}
 }
 
@@ -55,30 +68,117 @@ func (k *Keeper) run(ctx context.Context, filter domain.EventFilter, wg *sync.Wa
 	close(ready)
 
 	events := eventReader.EventsChan(ctx)
+	ticker := time.Tick(persistInterval)
 
-ConsumeEvents:
+EventLoop:
 	for {
 		select {
 		case event, open := <-events:
 			if !open {
-				break ConsumeEvents
+				break EventLoop
 			}
 
 			switch ev := event.Data.(type) {
 			case domain.ContenderScoreUpdatedEvent:
 				k.HandleContenderScoreUpdated(ev)
 			}
+		case <-ticker:
+			k.persistScores(ctx)
+		case <-k.externalPersistTrigger:
+			k.persistScores(ctx)
 		case <-ctx.Done():
 			slog.Info("subscription closed", "reason", ctx.Err())
-			break ConsumeEvents
+			break EventLoop
 		}
 	}
 
 	if ctx.Err() == nil {
-		slog.Warn("subscription closed unexpectedly")
+		slog.Error("subscription closed unexpectedly")
 	}
 
 	slog.Info("score keeper shutting down")
+
+	if len(k.scores) > 0 {
+		ctxWithDeadline, cancel := context.WithTimeout(context.Background(), lastDitchPersistTimeout)
+		defer cancel()
+
+		slog.Warn("making a last-ditch attempt to persist scores", "timeout", lastDitchPersistTimeout)
+		k.persistScores(ctxWithDeadline)
+	}
+}
+
+func (k *Keeper) RequestPersist() {
+	k.externalPersistTrigger <- struct{}{}
+}
+
+func (k *Keeper) persistScores(ctx context.Context) {
+	takeFirst := func() (domain.ContenderID, domain.Score) {
+		k.mu.Lock()
+		defer k.mu.Unlock()
+
+		var contenderID domain.ContenderID
+		var score domain.Score
+		for contenderID, score = range k.scores {
+			break
+		}
+
+		if contenderID == 0 {
+			return 0, domain.Score{}
+		}
+
+		delete(k.scores, contenderID)
+
+		return contenderID, score
+	}
+
+	putBack := func(contenderID domain.ContenderID, score domain.Score) {
+		k.mu.Lock()
+		defer k.mu.Unlock()
+
+		if _, found := k.scores[contenderID]; !found {
+			k.scores[contenderID] = score
+		}
+	}
+
+	numScores := len(k.scores)
+
+IterateScores:
+	for ctx.Err() == nil {
+		contenderID, score := takeFirst()
+
+		if contenderID == 0 {
+			break
+		}
+
+		_, err := k.repo.StoreScore(ctx, nil, score)
+		switch {
+		case err == nil:
+		case errors.Is(err, domain.ErrNotFound):
+			slog.Warn("failed to persist score for non-existent contender",
+				"contender_id", contenderID,
+				"action", "drop",
+				"error", err)
+
+			continue
+		default:
+			slog.Error("failed to persist score",
+				"contender_id", contenderID,
+				"action", "try_again_later",
+				"error", err)
+
+			putBack(contenderID, score)
+
+			break IterateScores
+		}
+	}
+
+	if len(k.scores) > 0 {
+		slog.Warn("not all scores where persisted",
+			"left_in_memory", len(k.scores),
+		)
+	}
+
+	slog.Info("successfully persisted scores", "num_scores", numScores)
 }
 
 func (k *Keeper) HandleContenderScoreUpdated(event domain.ContenderScoreUpdatedEvent) {

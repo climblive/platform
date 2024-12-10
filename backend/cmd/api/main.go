@@ -85,7 +85,7 @@ func main() {
 
 	authorizer := authorizer.NewAuthorizer(repo)
 	eventBroker := events.NewBroker()
-	scoreKeeper := scores.NewScoreKeeper(eventBroker)
+	scoreKeeper := scores.NewScoreKeeper(eventBroker, repo)
 	scoreEngineManager := scores.NewScoreEngineManager(repo, eventBroker)
 
 	barriers = append(barriers,

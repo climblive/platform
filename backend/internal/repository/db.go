@@ -30,7 +30,8 @@ func NewDatabase(username, password, host string, port int, database string) (*D
 	var logLevel logger.LogLevel = logger.Warn
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logLevel),
+		Logger:         logger.Default.LogMode(logLevel),
+		TranslateError: true,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
