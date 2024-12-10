@@ -94,7 +94,8 @@ test('enter contest by entering registration code', async ({ page }) => {
   await page.waitForURL('/ABCD0002');
 });
 
-test('registration code is saved in local storage', async ({ page }) => {
+test('registration code is saved in local storage for 12 hours', async ({ page }) => {
+  await page.clock.install({ time: new Date() });
   await page.goto('/');
 
   const pinInput = page.getByRole("textbox", { name: "Pin character 1 out of 8" })
@@ -119,6 +120,20 @@ test('registration code is saved in local storage', async ({ page }) => {
 
   await page.waitForURL('/ABCD0001');
   await expect(page.getByText("Albert Einstein")).toBeVisible();
+
+  await page.clock.fastForward("12:00:00");
+
+  await page.goto('/');
+  await page.waitForURL('/');
+
+  await expect(page.getByRole("textbox", { name: "Pin character 1 out of 8" })).toHaveValue("");
+  await expect(page.getByRole("textbox", { name: "Pin character 2 out of 8" })).toHaveValue("");
+  await expect(page.getByRole("textbox", { name: "Pin character 3 out of 8" })).toHaveValue("");
+  await expect(page.getByRole("textbox", { name: "Pin character 4 out of 8" })).toHaveValue("");
+  await expect(page.getByRole("textbox", { name: "Pin character 5 out of 8" })).toHaveValue("");
+  await expect(page.getByRole("textbox", { name: "Pin character 6 out of 8" })).toHaveValue("");
+  await expect(page.getByRole("textbox", { name: "Pin character 7 out of 8" })).toHaveValue("");
+  await expect(page.getByRole("textbox", { name: "Pin character 8 out of 8" })).toHaveValue("");
 });
 
 test('deep link into scorecard', async ({ page }) => {
