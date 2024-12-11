@@ -26,10 +26,19 @@ func InstallEventHandler(mux *Mux, eventBroker domain.EventBroker) {
 	mux.HandleFunc("GET /contenders/{contenderID}/events", handler.HandleSubscribeContenderEvents)
 }
 
+func readRemoteAddr(r *http.Request) string {
+	addr := r.Header.Get("X-Real-IP")
+	if addr == "" {
+		addr = r.RemoteAddr
+	}
+
+	return addr
+}
+
 func (hdlr *eventHandler) HandleSubscribeContestEvents(w http.ResponseWriter, r *http.Request) {
 	contestID := parseResourceID[domain.ContestID](r.PathValue("contestID"))
 
-	logger := slog.Default().With("contest_id", contestID, "remote_addr", r.RemoteAddr)
+	logger := slog.Default().With("contest_id", contestID, "remote_addr", readRemoteAddr(r))
 
 	filter := domain.NewEventFilter(
 		contestID,
@@ -44,7 +53,7 @@ func (hdlr *eventHandler) HandleSubscribeContestEvents(w http.ResponseWriter, r 
 func (hdlr *eventHandler) HandleSubscribeContenderEvents(w http.ResponseWriter, r *http.Request) {
 	contenderID := parseResourceID[domain.ContenderID](r.PathValue("contenderID"))
 
-	logger := slog.Default().With("contender_id", contenderID, "remote_addr", r.RemoteAddr)
+	logger := slog.Default().With("contender_id", contenderID, "remote_addr", readRemoteAddr(r))
 
 	filter := domain.NewEventFilter(
 		0,
