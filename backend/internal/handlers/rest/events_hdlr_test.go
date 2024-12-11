@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/events"
@@ -38,7 +39,7 @@ func TestEventsHandler(t *testing.T) {
 		mockedEventBroker, _ := makeMocks(0)
 
 		mux := rest.NewMux()
-		rest.InstallEventHandler(mux, mockedEventBroker)
+		rest.InstallEventHandler(mux, mockedEventBroker, 0)
 
 		server := httptest.NewServer(mux)
 
@@ -55,6 +56,39 @@ func TestEventsHandler(t *testing.T) {
 		line, _, err := buf.ReadLine()
 		require.NoError(t, err)
 		assert.Equal(t, "retry: 5000", string(line))
+
+		resp.Body.Close()
+
+		server.Close()
+
+		mockedEventBroker.AssertExpectations(t)
+	})
+
+	t.Run("ReceivePing", func(t *testing.T) {
+		mockedEventBroker, _ := makeMocks(0)
+
+		mux := rest.NewMux()
+		rest.InstallEventHandler(mux, mockedEventBroker, time.Millisecond)
+
+		server := httptest.NewServer(mux)
+
+		resp, err := http.Get(server.URL + "/contenders/1/events")
+		require.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		buf := bufio.NewReader(resp.Body)
+
+		var lines []string
+
+		for i := 0; i < 3; i++ {
+			line, _, err := buf.ReadLine()
+			require.NoError(t, err)
+
+			lines = append(lines, string(line))
+		}
+
+		assert.ElementsMatch(t, []string{"retry: 5000", "", ":"}, lines)
 
 		resp.Body.Close()
 
