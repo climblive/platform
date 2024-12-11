@@ -100,13 +100,13 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) error {
 
 		if handler, ok := mngr.handlers[contest.ID]; ok {
 			if contest.QualifyingProblems != handler.qualifyingProblems {
-				slog.Info("updating scoring rules", "qualifying_problems", contest.QualifyingProblems)
+				logger.Info("updating scoring rules", "qualifying_problems", contest.QualifyingProblems)
 				handler.engine.SetScoringRules(&HardestProblems{Number: contest.QualifyingProblems})
 				handler.qualifyingProblems = contest.QualifyingProblems
 			}
 
 			if contest.Finalists != handler.finalists {
-				slog.Info("updating ranker", "finalists", contest.Finalists)
+				logger.Info("updating ranker", "finalists", contest.Finalists)
 				handler.engine.SetRanker(NewBasicRanker(contest.Finalists))
 				handler.finalists = contest.Finalists
 			}
