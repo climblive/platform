@@ -98,7 +98,8 @@ EventLoop:
 
 	slog.Info("score keeper shutting down")
 
-	if len(k.scores) > 0 {
+	numScores := k.getNumScoresWithLock()
+	if numScores > 0 {
 		ctxWithDeadline, cancel := context.WithTimeout(context.Background(), lastDitchPersistTimeout)
 		defer cancel()
 
@@ -140,7 +141,7 @@ func (k *Keeper) persistScores(ctx context.Context) {
 		}
 	}
 
-	numScores := len(k.scores)
+	persistedScores := 0
 
 IterateScores:
 	for ctx.Err() == nil {
@@ -153,6 +154,7 @@ IterateScores:
 		_, err := k.repo.StoreScore(ctx, nil, score)
 		switch {
 		case err == nil:
+			persistedScores += 1
 		case errors.Is(err, domain.ErrNotFound):
 			slog.Warn("failed to persist score for non-existent contender",
 				"contender_id", contenderID,
@@ -172,13 +174,23 @@ IterateScores:
 		}
 	}
 
-	if len(k.scores) > 0 {
+	leftInMemory := k.getNumScoresWithLock()
+	if leftInMemory > 0 {
 		slog.Warn("not all scores where persisted",
-			"left_in_memory", len(k.scores),
+			"left_in_memory", leftInMemory,
 		)
 	}
 
-	slog.Info("successfully persisted scores", "num_scores", numScores)
+	if persistedScores > 0 {
+		slog.Info("successfully persisted scores", "num_scores", persistedScores)
+	}
+}
+
+func (k *Keeper) getNumScoresWithLock() int {
+	k.mu.RLock()
+	defer k.mu.RUnlock()
+
+	return len(k.scores)
 }
 
 func (k *Keeper) HandleContenderScoreUpdated(event domain.ContenderScoreUpdatedEvent) {
