@@ -179,9 +179,7 @@ IterateScores:
 		slog.Warn("not all scores where persisted",
 			"left_in_memory", leftInMemory,
 		)
-	}
-
-	if persistedScores > 0 {
+	} else if persistedScores > 0 {
 		slog.Info("successfully persisted scores", "num_scores", persistedScores)
 	}
 }
