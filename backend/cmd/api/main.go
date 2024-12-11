@@ -166,7 +166,7 @@ func setupMux(
 	rest.InstallCompClassHandler(mux, &compClassUseCase)
 	rest.InstallProblemHandler(mux, &problemUseCase)
 	rest.InstallTickHandler(mux, &tickUseCase)
-	rest.InstallEventHandler(mux, eventBroker)
+	rest.InstallEventHandler(mux, eventBroker, 10*time.Second)
 
 	return mux
 }
