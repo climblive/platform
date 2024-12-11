@@ -147,6 +147,36 @@ func TestEventsHandler(t *testing.T) {
 
 		mockedEventBroker.AssertExpectations(t)
 	})
+
+	t.Run("SubscriptionUnexpectedlyClosed", func(t *testing.T) {
+		mockedEventBroker, subscription := makeMocks(1)
+
+		err := subscription.Post(domain.EventEnvelope{
+			Name: "CONTENDER_SCORE_UPDATED",
+			Data: domain.ContenderScoreUpdatedEvent{},
+		})
+		require.NoError(t, err)
+
+		err = subscription.Post(domain.EventEnvelope{
+			Name: "CONTENDER_SCORE_UPDATED",
+			Data: domain.ContenderScoreUpdatedEvent{},
+		})
+		require.ErrorIs(t, err, events.ErrBufferFull)
+
+		mux := rest.NewMux()
+		rest.InstallEventHandler(mux, mockedEventBroker, 0)
+
+		server := httptest.NewServer(mux)
+
+		resp, err := http.Get(server.URL + "/contenders/1/events")
+		require.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		server.Close()
+
+		mockedEventBroker.AssertExpectations(t)
+	})
 }
 
 type eventBrokerMock struct {
