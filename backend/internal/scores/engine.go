@@ -7,6 +7,7 @@ import (
 	"maps"
 	"slices"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -25,9 +26,10 @@ type ScoreEngine struct {
 	contestID   domain.ContestID
 	eventBroker domain.EventBroker
 
-	sync.Mutex
-	ranker Ranker
-	rules  ScoringRules
+	running    atomic.Bool
+	ranker     Ranker
+	rules      ScoringRules
+	sideQuests chan func()
 
 	problems   map[domain.ProblemID]*Problem
 	contenders map[domain.ContenderID]*Contender
@@ -43,6 +45,7 @@ func NewScoreEngine(contestID domain.ContestID, eventBroker domain.EventBroker, 
 		eventBroker: eventBroker,
 		ranker:      ranker,
 		rules:       rules,
+		sideQuests:  make(chan func(), 1),
 		problems:    make(map[domain.ProblemID]*Problem),
 		contenders:  make(map[domain.ContenderID]*Contender),
 		scores:      NewDiffMap[domain.ContenderID, domain.Score](CompareScore),
@@ -68,7 +71,6 @@ func (e *ScoreEngine) Run(ctx context.Context) *sync.WaitGroup {
 		"ASCENT_DEREGISTERED",
 		"PROBLEM_ADDED",
 		"PROBLEM_UPDATED",
-		"PROBLEM_DELETED",
 	)
 
 	go e.run(ctx, filter, wg, ready)
@@ -87,6 +89,16 @@ func (e *ScoreEngine) run(ctx context.Context, filter domain.EventFilter, wg *sy
 
 	defer wg.Done()
 
+	defer func() {
+		close(e.sideQuests)
+
+		for range e.sideQuests {
+		}
+	}()
+
+	e.running.Store(true)
+	defer e.running.Store(false)
+
 	subscriptionID, eventReader := e.eventBroker.Subscribe(filter, 0)
 	e.logger.Info("score engine subscribed", "subscription_id", subscriptionID)
 
@@ -97,19 +109,21 @@ func (e *ScoreEngine) run(ctx context.Context, filter domain.EventFilter, wg *sy
 	events := eventReader.EventsChan(ctx)
 	ticker := time.Tick(100 * time.Millisecond)
 
-ConsumeEvents:
+MainLoop:
 	for {
 		select {
 		case event, open := <-events:
 			if !open {
-				break ConsumeEvents
+				break MainLoop
 			}
 
-			e.HandleEvent(event)
+			e.handleEvent(event)
 		case <-ticker:
 			e.publishUpdatedScores()
+		case f := <-e.sideQuests:
+			f()
 		case <-ctx.Done():
-			break ConsumeEvents
+			break MainLoop
 		}
 	}
 
@@ -121,31 +135,34 @@ ConsumeEvents:
 }
 
 func (e *ScoreEngine) SetScoringRules(rules ScoringRules) {
-	e.Lock()
-	defer e.Unlock()
+	quest := func() {
+		e.rules = rules
 
-	e.rules = rules
+		for contender := range maps.Values(e.contenders) {
+			e.scoreContender(contender)
+		}
 
-	for contender := range maps.Values(e.contenders) {
-		e.scoreContender(contender)
+		e.rankCompClasses(CompClasses(e.contenders))
 	}
 
-	e.rankCompClasses(CompClasses(e.contenders))
+	if e.running.Load() {
+		e.sideQuests <- quest
+	}
 }
 
 func (e *ScoreEngine) SetRanker(ranker Ranker) {
-	e.Lock()
-	defer e.Unlock()
+	quest := func() {
+		e.ranker = ranker
 
-	e.ranker = ranker
+		e.rankCompClasses(CompClasses(e.contenders))
+	}
 
-	e.rankCompClasses(CompClasses(e.contenders))
+	if e.running.Load() {
+		e.sideQuests <- quest
+	}
 }
 
-func (e *ScoreEngine) HandleEvent(event domain.EventEnvelope) {
-	e.Lock()
-	defer e.Unlock()
-
+func (e *ScoreEngine) handleEvent(event domain.EventEnvelope) {
 	switch ev := event.Data.(type) {
 	case domain.ContenderEnteredEvent:
 		e.handleContenderEntered(ev)
@@ -165,7 +182,7 @@ func (e *ScoreEngine) HandleEvent(event domain.EventEnvelope) {
 		e.handleAscentDeregistered(ev)
 	case domain.ProblemAddedEvent:
 		e.handleProblemAdded(ev)
-	case domain.ProblemUpdatedEvent, domain.ProblemDeletedEvent:
+	case domain.ProblemUpdatedEvent:
 		e.logger.Warn("discarding unsupported event", "event", event)
 	}
 }
