@@ -93,7 +93,7 @@ func TestEventsHandler(t *testing.T) {
 			lines = append(lines, string(line))
 		}
 
-		assert.ElementsMatch(t, []string{"retry: 5000", "", ":"}, lines)
+		assert.Equal(t, []string{"retry: 5000", "", ":"}, lines)
 
 		resp.Body.Close()
 
