@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { preventDefault } from 'svelte/legacy';
+  import { preventDefault } from "svelte/legacy";
 
   interface Props {
     length: number;
@@ -14,7 +14,7 @@
     placeholder = undefined,
     disabled = false,
     onChange,
-    defaultValue
+    defaultValue,
   }: Props = $props();
 
   let inputs = $derived(Array.from<HTMLInputElement>({ length }));
@@ -101,7 +101,7 @@
     <input
       aria-label={`Pin character ${index + 1} out of ${inputs.length}`}
       {disabled}
-      bind:this={input}
+      bind:this={inputs[index]}
       {placeholder}
       type="text"
       onfocus={(e) => handleFocus(e, index)}
