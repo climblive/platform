@@ -17,18 +17,13 @@ import (
 )
 
 func TestEventsHandler(t *testing.T) {
-	makeMocks := func(bufferCapacity int) (*eventBrokerMock, *events.Subscription) {
+	makeMocks := func(bufferCapacity int, filter domain.EventFilter) (*eventBrokerMock, *events.Subscription) {
 		mockedEventBroker := new(eventBrokerMock)
 
 		subscription := events.NewSubscription(domain.EventFilter{}, bufferCapacity)
 		subscriptionID := uuid.New()
 
-		mockedEventBroker.On("Subscribe", domain.NewEventFilter(
-			0,
-			domain.ContenderID(1),
-			"CONTENDER_PUBLIC_INFO_UPDATED",
-			"CONTENDER_SCORE_UPDATED",
-		), 1000).Return(subscriptionID, subscription)
+		mockedEventBroker.On("Subscribe", filter, 1000).Return(subscriptionID, subscription)
 
 		mockedEventBroker.On("Unsubscribe", subscriptionID).Return()
 
@@ -36,7 +31,12 @@ func TestEventsHandler(t *testing.T) {
 	}
 
 	t.Run("ConnectAndDisconnect", func(t *testing.T) {
-		mockedEventBroker, _ := makeMocks(0)
+		mockedEventBroker, _ := makeMocks(0, domain.NewEventFilter(
+			0,
+			domain.ContenderID(1),
+			"CONTENDER_PUBLIC_INFO_UPDATED",
+			"CONTENDER_SCORE_UPDATED",
+		))
 
 		mux := rest.NewMux()
 		rest.InstallEventHandler(mux, mockedEventBroker, 0)
@@ -65,7 +65,12 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("ReceivePing", func(t *testing.T) {
-		mockedEventBroker, _ := makeMocks(0)
+		mockedEventBroker, _ := makeMocks(0, domain.NewEventFilter(
+			0,
+			domain.ContenderID(1),
+			"CONTENDER_PUBLIC_INFO_UPDATED",
+			"CONTENDER_SCORE_UPDATED",
+		))
 
 		mux := rest.NewMux()
 		rest.InstallEventHandler(mux, mockedEventBroker, time.Millisecond)
@@ -98,7 +103,12 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("ReceiveEvent", func(t *testing.T) {
-		mockedEventBroker, subscription := makeMocks(0)
+		mockedEventBroker, subscription := makeMocks(0, domain.NewEventFilter(
+			0,
+			domain.ContenderID(1),
+			"CONTENDER_PUBLIC_INFO_UPDATED",
+			"CONTENDER_SCORE_UPDATED",
+		))
 
 		err := subscription.Post(domain.EventEnvelope{
 			Name: "CONTENDER_SCORE_UPDATED",
@@ -149,7 +159,12 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("SubscriptionUnexpectedlyClosed", func(t *testing.T) {
-		mockedEventBroker, subscription := makeMocks(1)
+		mockedEventBroker, subscription := makeMocks(1, domain.NewEventFilter(
+			0,
+			domain.ContenderID(1),
+			"CONTENDER_PUBLIC_INFO_UPDATED",
+			"CONTENDER_SCORE_UPDATED",
+		))
 
 		err := subscription.Post(domain.EventEnvelope{
 			Name: "CONTENDER_SCORE_UPDATED",
@@ -172,6 +187,31 @@ func TestEventsHandler(t *testing.T) {
 		require.NoError(t, err)
 
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		server.Close()
+
+		mockedEventBroker.AssertExpectations(t)
+	})
+
+	t.Run("ContestEvents", func(t *testing.T) {
+		mockedEventBroker, _ := makeMocks(0, domain.NewEventFilter(
+			domain.ContestID(1),
+			0,
+			"CONTENDER_PUBLIC_INFO_UPDATED",
+			"[]CONTENDER_SCORE_UPDATED",
+		))
+
+		mux := rest.NewMux()
+		rest.InstallEventHandler(mux, mockedEventBroker, time.Hour)
+
+		server := httptest.NewServer(mux)
+
+		resp, err := http.Get(server.URL + "/contests/1/events")
+		require.NoError(t, err)
+
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+		resp.Body.Close()
 
 		server.Close()
 
