@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { preventDefault } from 'svelte/legacy';
+
   import { scorecardSessionSchema, type ScorecardSession } from "@/types";
   import { authenticateContender } from "@/utils/auth";
   import { PinInput } from "@climblive/lib/components";
@@ -13,10 +15,10 @@
   import type { Writable } from "svelte/store";
   import { ZodError } from "zod";
 
-  let loadingContender = false;
-  let loadingFailed = false;
+  let loadingContender = $state(false);
+  let loadingFailed = $state(false);
   let queryClient = useQueryClient();
-  let registrationCode: string | undefined;
+  let registrationCode: string | undefined = $state();
 
   onMount(() => {
     const data = localStorage.getItem("session");
@@ -80,7 +82,7 @@
     <h1>Welcome</h1>
     <p>Enter your unique registration code!</p>
   </header>
-  <form on:submit|preventDefault={submitForm}>
+  <form onsubmit={preventDefault(submitForm)}>
     <PinInput
       length={8}
       defaultValue={registrationCode}

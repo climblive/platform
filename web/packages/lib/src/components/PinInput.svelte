@@ -1,11 +1,23 @@
 <script lang="ts">
-  export let length: number;
-  export let placeholder: string | undefined = undefined;
-  export let disabled: boolean = false;
-  export let onChange: (value: string) => void;
-  export let defaultValue: string | undefined;
+  import { preventDefault } from 'svelte/legacy';
 
-  $: inputs = Array.from<HTMLInputElement>({ length });
+  interface Props {
+    length: number;
+    placeholder?: string | undefined;
+    disabled?: boolean;
+    onChange: (value: string) => void;
+    defaultValue: string | undefined;
+  }
+
+  let {
+    length,
+    placeholder = undefined,
+    disabled = false,
+    onChange,
+    defaultValue
+  }: Props = $props();
+
+  let inputs = $derived(Array.from<HTMLInputElement>({ length }));
 
   const focusInputField = (dir: "next" | "prev", index: number) => {
     let input: HTMLInputElement | undefined;
@@ -92,11 +104,11 @@
       bind:this={input}
       {placeholder}
       type="text"
-      on:focus={(e) => handleFocus(e, index)}
-      on:input={(e) => handleInput(e, index)}
-      on:keydown={(e) => handleKeyDown(e, index)}
-      on:keyup={() => handleKeyUp()}
-      on:paste|preventDefault={handlePaste}
+      onfocus={(e) => handleFocus(e, index)}
+      oninput={(e) => handleInput(e, index)}
+      onkeydown={(e) => handleKeyDown(e, index)}
+      onkeyup={() => handleKeyUp()}
+      onpaste={preventDefault(handlePaste)}
       value={defaultValue?.[index] ?? ""}
     />
   {/each}

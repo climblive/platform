@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script lang="ts">
   import type { ScorecardSession } from "@/types";
   import type { Problem, Tick } from "@climblive/lib/models";

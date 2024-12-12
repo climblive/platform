@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { preventDefault } from 'svelte/legacy';
+
   import type { ScorecardSession } from "@/types";
   import {
     registrationFormSchema,
@@ -17,18 +19,23 @@
 
   const dispatch = createEventDispatcher<{ submit: RegistrationFormData }>();
 
-  export let data: Partial<RegistrationFormData>;
+  interface Props {
+    data: Partial<RegistrationFormData>;
+    children?: import('svelte').Snippet;
+  }
+
+  let { data, children }: Props = $props();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
-  $: compClassesQuery = getCompClassesQuery($session.contestId);
+  let compClassesQuery = $derived(getCompClassesQuery($session.contestId));
 
-  let form: HTMLFormElement;
+  let form: HTMLFormElement = $state();
   const controls: {
     name?: SlInput;
     clubName?: SlInput;
     compClassId?: SlSelect;
-  } = {};
+  } = $state({});
 
   const handleSubmit = () => {
     const data = serialize(form);
@@ -74,8 +81,8 @@
 {#if $compClassesQuery.data}
   <form
     bind:this={form}
-    on:submit|preventDefault={handleSubmit}
-    on:sl-input={resetCustomValidation}
+    onsubmit={preventDefault(handleSubmit)}
+    onsl-input={resetCustomValidation}
   >
     <sl-input
       bind:this={controls.name}
@@ -110,7 +117,7 @@
         >
       {/each}
     </sl-select>
-    <slot />
+    {@render children?.()}
   </form>
 {/if}
 

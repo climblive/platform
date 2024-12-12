@@ -18,8 +18,10 @@
 
 <QueryClientProvider client={queryClient}>
   <Router>
-    <Route path="/scoreboard/:contestId" let:params
-      ><Scoreboard contestId={Number(params.contestId)} /></Route
+    <Route path="/scoreboard/:contestId" 
+      >{#snippet children({ params })}
+            <Scoreboard contestId={Number(params.contestId)} />          {/snippet}
+        </Route
     >
   </Router>
   {#if import.meta.env.DEV && false}

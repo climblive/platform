@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { run } from 'svelte/legacy';
+
   import type { ScoreboardEntry } from "@climblive/lib/models";
   import "@shoelace-style/shoelace/dist/components/progress-bar/progress-bar.js";
   import "@shoelace-style/shoelace/dist/components/skeleton/skeleton.js";
@@ -7,48 +9,35 @@
   import Floater from "./Floater.svelte";
   import ResultEntry from "./ResultEntry.svelte";
 
-  export let compClassId: number;
-  export let overflow: "pagination" | "scroll" = "scroll";
-  export let scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
-  export let loading: boolean;
+  interface Props {
+    compClassId: number;
+    overflow?: "pagination" | "scroll";
+    scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
+    loading: boolean;
+  }
+
+  let {
+    compClassId,
+    overflow = "scroll",
+    scoreboard,
+    loading
+  }: Props = $props();
 
   const ITEM_HEIGHT = 36;
   const GAP = 8;
   const SCROLLABLE_SKELETON_ENTRIES = 10;
 
-  let container: HTMLDivElement | undefined;
-  let observer: ResizeObserver | undefined;
+  let container: HTMLDivElement | undefined = $state();
+  let observer: ResizeObserver | undefined = $state();
   let pageFlipIntervalTimerId: number;
 
-  let containerHeight: number = 0;
-  let pageSize: number = 0;
-  let pageIndex = 0;
+  let containerHeight: number = $state(0);
+  let pageSize: number = $state(0);
+  let pageIndex = $state(0);
 
-  $: {
-    switch (overflow) {
-      case "pagination":
-        pageSize = Math.floor((containerHeight + GAP) / (ITEM_HEIGHT + GAP));
-        break;
-      case "scroll":
-        pageSize = results.length;
 
-        if (loading) {
-          pageSize = SCROLLABLE_SKELETON_ENTRIES;
-        }
 
-        break;
-    }
-  }
 
-  $: {
-    if (overflow === "scroll") {
-      pageIndex = 0;
-    }
-  }
-
-  $: pageCount = Math.ceil(results.length / pageSize);
-
-  $: results = $scoreboard.get(compClassId) ?? [];
 
   onMount(() => {
     pageFlipIntervalTimerId = setInterval(() => {
@@ -75,11 +64,33 @@
     pageFlipIntervalTimerId = 0;
   });
 
-  $: {
+  let results = $derived($scoreboard.get(compClassId) ?? []);
+  run(() => {
+    switch (overflow) {
+      case "pagination":
+        pageSize = Math.floor((containerHeight + GAP) / (ITEM_HEIGHT + GAP));
+        break;
+      case "scroll":
+        pageSize = results.length;
+
+        if (loading) {
+          pageSize = SCROLLABLE_SKELETON_ENTRIES;
+        }
+
+        break;
+    }
+  });
+  run(() => {
+    if (overflow === "scroll") {
+      pageIndex = 0;
+    }
+  });
+  let pageCount = $derived(Math.ceil(results.length / pageSize));
+  run(() => {
     if (container && overflow === "pagination") {
       observer?.observe(container);
     }
-  }
+  });
 </script>
 
 <div

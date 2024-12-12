@@ -3,8 +3,12 @@
   import { ordinalSuperscript } from "../utils";
   import Score from "./Score.svelte";
 
-  export let scoreboardEntry: ScoreboardEntry;
-  $: score = scoreboardEntry.score;
+  interface Props {
+    scoreboardEntry: ScoreboardEntry;
+  }
+
+  let { scoreboardEntry }: Props = $props();
+  let score = $derived(scoreboardEntry.score);
 </script>
 
 <section data-finalist={score?.finalist ?? false}>

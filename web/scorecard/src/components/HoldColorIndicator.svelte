@@ -1,6 +1,10 @@
 <script lang="ts">
-  export let primary: string;
-  export let secondary: string | undefined = undefined;
+  interface Props {
+    primary: string;
+    secondary?: string | undefined;
+  }
+
+  let { primary, secondary = undefined }: Props = $props();
 </script>
 
 <svg viewBox="0 0 100 100">

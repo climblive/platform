@@ -1,7 +1,11 @@
 <script lang="ts">
-  export let value: number;
-  export let prefix: string = "";
-  export let hideZero: boolean = false;
+  interface Props {
+    value: number;
+    prefix?: string;
+    hideZero?: boolean;
+  }
+
+  let { value, prefix = "", hideZero = false }: Props = $props();
 </script>
 
 <div class="counter" aria-live="polite">

@@ -20,7 +20,7 @@
   const contenderQuery = getContenderQuery($session.contenderId);
   const updateContender = updateContenderMutation($session.contenderId);
 
-  $: contender = $contenderQuery.data;
+  let contender = $derived($contenderQuery.data);
 
   const gotoScorecard = () => {
     navigate(`/${contender?.registrationCode}`);

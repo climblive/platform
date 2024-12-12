@@ -11,10 +11,15 @@
   import * as z from "zod";
   import type { Score } from "../models/score";
 
-  export let contestId: number;
+  interface Props {
+    contestId: number;
+    children?: import('svelte').Snippet<[any]>;
+  }
+
+  let { contestId, children }: Props = $props();
 
   let eventSource: EventSource | undefined;
-  let initialized = false;
+  let initialized = $state(false);
 
   const contenders: Map<number, ScoreboardEntry> = new Map();
   const pendingUpdates: ((contenders: Map<number, ScoreboardEntry>) => void)[] =
@@ -152,4 +157,4 @@
   });
 </script>
 
-<slot {scoreboard} loading={!initialized} />
+{@render children?.({ scoreboard, loading: !initialized, })}
