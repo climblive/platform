@@ -14,12 +14,14 @@ const bufferCapacity = 1_000
 const clientRetry = 5 * time.Second
 
 type eventHandler struct {
-	eventBroker domain.EventBroker
+	eventBroker  domain.EventBroker
+	pingInterval time.Duration
 }
 
-func InstallEventHandler(mux *Mux, eventBroker domain.EventBroker) {
+func InstallEventHandler(mux *Mux, eventBroker domain.EventBroker, pingInterval time.Duration) {
 	handler := &eventHandler{
-		eventBroker: eventBroker,
+		eventBroker:  eventBroker,
+		pingInterval: pingInterval,
 	}
 
 	mux.HandleFunc("GET /contests/{contestID}/events", handler.HandleSubscribeContestEvents)
@@ -73,7 +75,7 @@ func (hdlr *eventHandler) subscribe(
 ) {
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("X-Accel-Buffering", "no")
-	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Cache-Control", "no-store")
 	w.Header().Set("Connection", "keep-alive")
 
 	logger.Info("starting event subscription")
@@ -85,7 +87,7 @@ func (hdlr *eventHandler) subscribe(
 
 	write(w, fmt.Sprintf("retry: %d\n\n", clientRetry.Milliseconds()))
 
-	keepAlive := time.Tick(10 * time.Second)
+	keepAlive := time.Tick(hdlr.pingInterval)
 	events := eventReader.EventsChan(r.Context())
 
 ConsumeEvents:
