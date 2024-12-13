@@ -49,7 +49,7 @@ func TestEventsHandler(t *testing.T) {
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 		assert.Equal(t, "text/event-stream", resp.Header.Get("Content-Type"))
 		assert.Equal(t, "no", resp.Header.Get("X-Accel-Buffering"))
-		assert.Equal(t, "no-cache", resp.Header.Get("Cache-Control"))
+		assert.Equal(t, "no-store", resp.Header.Get("Cache-Control"))
 		assert.Equal(t, "keep-alive", resp.Header.Get("Connection"))
 
 		buf := bufio.NewReader(resp.Body)
