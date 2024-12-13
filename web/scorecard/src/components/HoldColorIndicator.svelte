@@ -4,7 +4,7 @@
     secondary?: string | undefined;
   }
 
-  let { primary, secondary = undefined }: Props = $props();
+  let { primary, secondary }: Props = $props();
 </script>
 
 <svg viewBox="0 0 100 100">
