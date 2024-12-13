@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import type { CompClass, Contest, Problem } from "@climblive/lib/models";
   import type { SlDetails } from "@shoelace-style/shoelace";
   import { format } from "date-fns";
@@ -15,9 +13,9 @@
 
   let { contest, compClasses, problems }: Props = $props();
 
-  let details: SlDetails = $state();
+  let details: SlDetails | undefined = $state();
 
-  run(() => {
+  $effect(() => {
     if (details && contest.rules) {
       details.innerHTML = contest.rules;
     }
