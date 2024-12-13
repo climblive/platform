@@ -11,7 +11,7 @@
     disabled: boolean;
   }
 
-  let { problem, tick = undefined, disabled }: Props = $props();
+  let { problem, tick, disabled }: Props = $props();
 
   let pointValue = $derived(calculateProblemScore(problem, tick));
 </script>
