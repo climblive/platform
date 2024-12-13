@@ -6,14 +6,14 @@
     contenderScoreUpdatedEventSchema,
     type ScoreboardEntry,
   } from "@climblive/lib/models";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, type Snippet } from "svelte";
   import { writable } from "svelte/store";
   import * as z from "zod";
   import type { Score } from "../models/score";
 
   interface Props {
     contestId: number;
-    children?: import('svelte').Snippet<[any]>;
+    children?: Snippet;
   }
 
   let { contestId, children }: Props = $props();
@@ -157,4 +157,4 @@
   });
 </script>
 
-{@render children?.({ scoreboard, loading: !initialized, })}
+{@render children?.({ scoreboard, loading: !initialized })}

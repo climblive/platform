@@ -1,7 +1,9 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
+
   interface Props {
     order: number;
-    children?: import('svelte').Snippet;
+    children?: Snippet;
   }
 
   let { order, children }: Props = $props();

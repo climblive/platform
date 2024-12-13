@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { preventDefault } from 'svelte/legacy';
+  import { preventDefault } from "svelte/legacy";
 
   import type { ScorecardSession } from "@/types";
   import {
@@ -14,14 +14,14 @@
   import "@shoelace-style/shoelace/dist/components/select/select.js";
   import type SlSelect from "@shoelace-style/shoelace/dist/components/select/select.js";
   import { isAfter } from "date-fns";
-  import { createEventDispatcher, getContext } from "svelte";
+  import { createEventDispatcher, getContext, type Snippet } from "svelte";
   import type { Readable } from "svelte/store";
 
   const dispatch = createEventDispatcher<{ submit: RegistrationFormData }>();
 
   interface Props {
     data: Partial<RegistrationFormData>;
-    children?: import('svelte').Snippet;
+    children?: Snippet;
   }
 
   let { data, children }: Props = $props();
