@@ -21,7 +21,7 @@ export const createTickMutation = (contenderId: number) => {
   const client = useQueryClient();
 
   return createMutation({
-    mutationFn: (tick: Omit<Tick, "id">) =>
+    mutationFn: (tick: Omit<Tick, "id" | "timestamp">) =>
       ApiClient.getInstance().createTick(contenderId, tick),
     onSuccess: (newTick) => {
       const queryKey: QueryKey = ["ticks", { contenderId }];

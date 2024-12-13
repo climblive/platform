@@ -114,7 +114,7 @@ export class ApiClient {
     return z.array(tickSchema).parse(result.data);
   };
 
-  createTick = async (contenderId: number, tick: Omit<Tick, "id">) => {
+  createTick = async (contenderId: number, tick: Omit<Tick, "id" | "timestamp">) => {
     const endpoint = `/contenders/${contenderId}/ticks`;
 
     const result = await this.axiosInstance.post(endpoint, tick, {
