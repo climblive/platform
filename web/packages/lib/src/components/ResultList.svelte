@@ -28,7 +28,7 @@
   const SCROLLABLE_SKELETON_ENTRIES = 10;
 
   let container: HTMLDivElement | undefined = $state();
-  let observer: ResizeObserver | undefined = $state();
+  let observer: ResizeObserver | undefined;
   let pageFlipIntervalTimerId: number;
 
   let containerHeight: number = $state(0);
