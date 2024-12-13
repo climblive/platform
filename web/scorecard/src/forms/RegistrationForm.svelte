@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { preventDefault } from "svelte/legacy";
-
   import type { ScorecardSession } from "@/types";
   import {
     registrationFormSchema,
@@ -30,14 +28,20 @@
 
   let compClassesQuery = $derived(getCompClassesQuery($session.contestId));
 
-  let form: HTMLFormElement = $state();
+  let form: HTMLFormElement | undefined = $state();
   const controls: {
     name?: SlInput;
     clubName?: SlInput;
     compClassId?: SlSelect;
   } = $state({});
 
-  const handleSubmit = () => {
+  const handleSubmit = (event: SubmitEvent) => {
+    event.preventDefault();
+
+    if (!form) {
+      return;
+    }
+
     const data = serialize(form);
     const result = registrationFormSchema.safeParse(data);
 
@@ -49,7 +53,7 @@
       }
     }
 
-    form.reportValidity();
+    form?.reportValidity();
   };
 
   const setCustomValidity = (path: (string | number)[], message: string) => {
@@ -81,7 +85,7 @@
 {#if $compClassesQuery.data}
   <form
     bind:this={form}
-    onsubmit={preventDefault(handleSubmit)}
+    onsubmit={handleSubmit}
     onsl-input={resetCustomValidation}
   >
     <sl-input
