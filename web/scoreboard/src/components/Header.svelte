@@ -23,12 +23,12 @@
 </script>
 
 <ContestStateProvider {startTime} {endTime}>
-  {#snippet children({ state })}
+  {#snippet children({ contestState })}
     <header>
       <h2>
         {name} <span class="size">({results.length}/{allContenders})</span>
       </h2>
-      {#if state === "NOT_STARTED"}
+      {#if contestState === "NOT_STARTED"}
         <Timer endTime={startTime} label="Time until start" />
       {:else}
         <Timer {endTime} label="Time remaining" />

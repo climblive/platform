@@ -7,13 +7,20 @@
     type ScoreboardEntry,
   } from "@climblive/lib/models";
   import { onDestroy, onMount, type Snippet } from "svelte";
-  import { writable } from "svelte/store";
+  import { writable, type Writable } from "svelte/store";
   import * as z from "zod";
   import type { Score } from "../models/score";
 
   interface Props {
     contestId: number;
-    children?: Snippet;
+    children?: Snippet<
+      [
+        {
+          scoreboard: Writable<Map<number, ScoreboardEntry[]>>;
+          loading: boolean;
+        },
+      ]
+    >;
   }
 
   let { contestId, children }: Props = $props();

@@ -128,7 +128,7 @@
   <Loading />
 {:else}
   <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime}>
-    {#snippet children({ state })}
+    {#snippet children({ contestState })}
       <main>
         <div class="sticky">
           <Header
@@ -139,7 +139,7 @@
             contenderClub={contender.clubName}
             {score}
             {placement}
-            {state}
+            {contestState}
             {startTime}
             {endTime}
           />
@@ -156,7 +156,7 @@
               <ProblemView
                 {problem}
                 tick={ticks.find(({ problemId }) => problemId === problem.id)}
-                disabled={["NOT_STARTED", "ENDED"].includes(state)}
+                disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
               />
             {/each}
           </sl-tab-panel>

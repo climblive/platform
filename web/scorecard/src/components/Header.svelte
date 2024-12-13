@@ -12,7 +12,7 @@
     contenderClub: string | undefined;
     score: number;
     placement: number | undefined;
-    state: ContestState;
+    contestState: ContestState;
     startTime: Date;
     endTime: Date;
   }
@@ -25,7 +25,7 @@
     contenderClub,
     score,
     placement,
-    state,
+    contestState: state,
     startTime,
     endTime,
   }: Props = $props();
