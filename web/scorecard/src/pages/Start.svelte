@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { preventDefault } from 'svelte/legacy';
-
   import { scorecardSessionSchema, type ScorecardSession } from "@/types";
   import { authenticateContender } from "@/utils/auth";
   import { PinInput } from "@climblive/lib/components";
@@ -19,6 +17,7 @@
   let loadingFailed = $state(false);
   let queryClient = useQueryClient();
   let registrationCode: string | undefined = $state();
+  let form: HTMLFormElement | undefined = $state();
 
   onMount(() => {
     const data = localStorage.getItem("session");
@@ -41,10 +40,12 @@
   const handleCodeChange = (code: string) => {
     const autoSubmit = registrationCode === undefined && code.length === 8;
     registrationCode = code;
-    autoSubmit && submitForm();
+    autoSubmit && form?.submit();
   };
 
-  const submitForm = async () => {
+  const submitForm = async (event: SubmitEvent) => {
+    event.preventDefault();
+
     if (!registrationCode) {
       return;
     }
@@ -82,7 +83,7 @@
     <h1>Welcome</h1>
     <p>Enter your unique registration code!</p>
   </header>
-  <form onsubmit={preventDefault(submitForm)}>
+  <form bind:this={form} onsubmit={submitForm}>
     <PinInput
       length={8}
       defaultValue={registrationCode}
