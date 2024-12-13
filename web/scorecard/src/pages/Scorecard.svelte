@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import ContestInfo from "@/components/ContestInfo.svelte";
   import Header from "@/components/Header.svelte";
   import ProblemView from "@/components/ProblemView.svelte";
@@ -39,7 +37,7 @@
   let resultsConnected = $state(false);
   let tabGroup: SlTabGroup | undefined = $state();
   let eventSource: EventSource | undefined;
-  let score: number = $state();
+  let score: number = $state(0);
   let placement: number | undefined = $state();
 
   let contender = $derived($contenderQuery.data);
@@ -47,16 +45,22 @@
   let compClasses = $derived($compClassesQuery.data);
   let problems = $derived($problemsQuery.data);
   let ticks = $derived($ticksQuery.data);
-  let selectedCompClass = $derived(compClasses?.find(
-    ({ id }) => id === contender?.compClassId,
-  ));
-  let startTime = $derived(selectedCompClass?.timeBegin ?? new Date(8640000000000000));
-  let endTime = $derived(selectedCompClass?.timeEnd ?? new Date(-8640000000000000));
-  let gracePeriodEndTime = $derived(add(endTime, {
-    minutes: (contest?.gracePeriod ?? 0) / (1_000_000_000 * 60),
-  }));
+  let selectedCompClass = $derived(
+    compClasses?.find(({ id }) => id === contender?.compClassId),
+  );
+  let startTime = $derived(
+    selectedCompClass?.timeBegin ?? new Date(8640000000000000),
+  );
+  let endTime = $derived(
+    selectedCompClass?.timeEnd ?? new Date(-8640000000000000),
+  );
+  let gracePeriodEndTime = $derived(
+    add(endTime, {
+      minutes: (contest?.gracePeriod ?? 0) / (1_000_000_000 * 60),
+    }),
+  );
 
-  run(() => {
+  $effect(() => {
     if (contender) {
       score = contender.score?.score ?? 0;
       placement = contender.score?.placement;
@@ -123,9 +127,9 @@
 {#if !contender || !contest || !compClasses || !problems || !ticks || !selectedCompClass}
   <Loading />
 {:else}
-  <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime} >
+  <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime}>
     {#snippet children({ state })}
-        <main>
+      <main>
         <div class="sticky">
           <Header
             registrationCode={$session.registrationCode}
@@ -158,28 +162,24 @@
           </sl-tab-panel>
           <sl-tab-panel name="results">
             {#if resultsConnected && contender.compClassId}
-              <ScoreboardProvider
-                contestId={$session.contestId}
-                
-                
-              >
+              <ScoreboardProvider contestId={$session.contestId}>
                 {#snippet children({ scoreboard, loading })}
-                            <ResultList
+                  <ResultList
                     compClassId={contender.compClassId}
                     {scoreboard}
                     {loading}
                   />
-                                          {/snippet}
-                        </ScoreboardProvider>
+                {/snippet}
+              </ScoreboardProvider>
             {/if}
           </sl-tab-panel>
           <sl-tab-panel name="info">
             <ContestInfo {contest} {problems} {compClasses} />
           </sl-tab-panel>
         </sl-tab-group>
-      </main>      {/snippet}
-    </ContestStateProvider
-  >
+      </main>
+    {/snippet}
+  </ContestStateProvider>
 {/if}
 
 <style>
