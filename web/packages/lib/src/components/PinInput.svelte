@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { preventDefault } from "svelte/legacy";
-
   interface Props {
     length: number;
     placeholder?: string | undefined;
@@ -11,7 +9,7 @@
 
   let {
     length,
-    placeholder = undefined,
+    placeholder,
     disabled = false,
     onChange,
     defaultValue,
@@ -82,6 +80,8 @@
   };
 
   const handlePaste = (event: ClipboardEvent) => {
+    event.preventDefault();
+
     const pasteValue = event.clipboardData?.getData("Text");
     for (const index in inputs) {
       inputs[index].value = pasteValue?.[index] ?? "";
@@ -108,7 +108,7 @@
       oninput={(e) => handleInput(e, index)}
       onkeydown={(e) => handleKeyDown(e, index)}
       onkeyup={() => handleKeyUp()}
-      onpaste={preventDefault(handlePaste)}
+      onpaste={handlePaste}
       value={defaultValue?.[index] ?? ""}
     />
   {/each}
