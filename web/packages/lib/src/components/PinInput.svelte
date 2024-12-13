@@ -101,7 +101,7 @@
     <input
       aria-label={`Pin character ${index + 1} out of ${inputs.length}`}
       {disabled}
-      bind:this={inputs[index]}
+      bind:this={inputs[inputs.findIndex((i) => i === input)]}
       {placeholder}
       type="text"
       onfocus={(e) => handleFocus(e, index)}

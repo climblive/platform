@@ -29,7 +29,7 @@
         if (differenceInHours(new Date(), sess.timestamp) < 12) {
           registrationCode = sess.registrationCode;
         }
-      } catch (_) {
+      } catch {
         /* discard corrupt session data */
       }
     }
@@ -40,7 +40,9 @@
   const handleCodeChange = (code: string) => {
     const autoSubmit = registrationCode === undefined && code.length === 8;
     registrationCode = code;
-    autoSubmit && form?.submit();
+    if (autoSubmit) {
+      form?.submit();
+    }
   };
 
   const submitForm = async (event: SubmitEvent) => {
