@@ -75,7 +75,7 @@ func (hdlr *eventHandler) subscribe(
 ) {
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("X-Accel-Buffering", "no")
-	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("Cache-Control", "no-store")
 	w.Header().Set("Connection", "keep-alive")
 
 	logger.Info("starting event subscription")
