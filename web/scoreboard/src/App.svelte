@@ -18,11 +18,11 @@
 
 <QueryClientProvider client={queryClient}>
   <Router>
-    <Route path="/scoreboard/:contestId" 
+    <Route path="/scoreboard/:contestId"
       >{#snippet children({ params })}
-            <Scoreboard contestId={Number(params.contestId)} />          {/snippet}
-        </Route
-    >
+        <Scoreboard contestId={Number(params.contestId)} />
+      {/snippet}
+    </Route>
   </Router>
   {#if import.meta.env.DEV && false}
     <SvelteQueryDevtools />

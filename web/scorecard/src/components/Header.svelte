@@ -27,7 +27,7 @@
     placement,
     state,
     startTime,
-    endTime
+    endTime,
   }: Props = $props();
 </script>
 

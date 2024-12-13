@@ -11,25 +11,23 @@
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
   }
 
-  let {
-    name,
-    compClassId,
-    startTime,
-    endTime,
-    scoreboard
-  }: Props = $props();
+  let { name, compClassId, startTime, endTime, scoreboard }: Props = $props();
 
   let results = $derived($scoreboard.get(compClassId) ?? []);
 
-  let allContenders = $derived([...$scoreboard.values()].reduce((count, results) => {
-    return count + results.length;
-  }, 0));
+  let allContenders = $derived(
+    [...$scoreboard.values()].reduce((count, results) => {
+      return count + results.length;
+    }, 0),
+  );
 </script>
 
-<ContestStateProvider {startTime} {endTime} >
+<ContestStateProvider {startTime} {endTime}>
   {#snippet children({ state })}
     <header>
-      <h2>{name} <span class="size">({results.length}/{allContenders})</span></h2>
+      <h2>
+        {name} <span class="size">({results.length}/{allContenders})</span>
+      </h2>
       {#if state === "NOT_STARTED"}
         <Timer endTime={startTime} label="Time until start" />
       {:else}
