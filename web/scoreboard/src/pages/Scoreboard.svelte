@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import Header from "@/components/Header.svelte";
   import { ResultList, ScoreboardProvider } from "@climblive/lib/components";
   import { getCompClassesQuery, getContestQuery } from "@climblive/lib/queries";
@@ -24,7 +22,7 @@
   let contest = $derived($contestQuery.data);
   let compClasses = $derived($compClassesQuery.data);
 
-  run(() => {
+  $effect(() => {
     if (compClasses && !selectedCompClassId) {
       selectedCompClassId = compClasses[0].id;
     }
@@ -58,9 +56,9 @@
 {#if !contest || !compClasses}
   <Loading />
 {:else}
-  <ScoreboardProvider {contestId}  >
+  <ScoreboardProvider {contestId}>
     {#snippet children({ scoreboard, loading })}
-        <main>
+      <main>
         <h1>{contest.name}</h1>
         <sl-select
           size="small"
@@ -100,8 +98,8 @@
           {/each}
         </div>
       </main>
-          {/snippet}
-    </ScoreboardProvider>
+    {/snippet}
+  </ScoreboardProvider>
 {/if}
 
 <style>
