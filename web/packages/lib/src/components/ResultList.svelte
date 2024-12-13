@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { run } from 'svelte/legacy';
-
   import type { ScoreboardEntry } from "@climblive/lib/models";
   import "@shoelace-style/shoelace/dist/components/progress-bar/progress-bar.js";
   import "@shoelace-style/shoelace/dist/components/skeleton/skeleton.js";
@@ -20,7 +18,7 @@
     compClassId,
     overflow = "scroll",
     scoreboard,
-    loading
+    loading,
   }: Props = $props();
 
   const ITEM_HEIGHT = 36;
@@ -34,10 +32,6 @@
   let containerHeight: number = $state(0);
   let pageSize: number = $state(0);
   let pageIndex = $state(0);
-
-
-
-
 
   onMount(() => {
     pageFlipIntervalTimerId = setInterval(() => {
@@ -65,7 +59,8 @@
   });
 
   let results = $derived($scoreboard.get(compClassId) ?? []);
-  run(() => {
+
+  $effect(() => {
     switch (overflow) {
       case "pagination":
         pageSize = Math.floor((containerHeight + GAP) / (ITEM_HEIGHT + GAP));
@@ -80,13 +75,16 @@
         break;
     }
   });
-  run(() => {
+
+  $effect(() => {
     if (overflow === "scroll") {
       pageIndex = 0;
     }
   });
+
   let pageCount = $derived(Math.ceil(results.length / pageSize));
-  run(() => {
+
+  $effect(() => {
     if (container && overflow === "pagination") {
       observer?.observe(container);
     }
@@ -97,7 +95,7 @@
   class="container"
   bind:this={container}
   style="--page-size: {pageSize}; --page-index: {pageIndex}"
-  {overflow}
+  data-overflow={overflow}
 >
   {#if loading}
     {#each [...Array(overflow === "pagination" ? pageSize : SCROLLABLE_SKELETON_ENTRIES).keys()] as i (i)}
@@ -129,7 +127,7 @@
     position: relative;
   }
 
-  .container[overflow="pagination"] {
+  .container[data-overflow="pagination"] {
     height: 100%;
     clip-path: rect(
       0px 100%
@@ -141,7 +139,7 @@
     );
   }
 
-  .container[overflow="scroll"] {
+  .container[data-overflow="scroll"] {
     height: calc(var(--page-size) * (2.25rem + var(--sl-spacing-x-small)));
   }
 </style>
