@@ -47,6 +47,11 @@ jobs:
       - run: pnpm install
         working-directory: web
 
+      - shell: bash
+        run: |
+          API_URL="https://labs.climblive.app/api"
+          sed -i "s,\"API_URL\":.*,\"API_URL\": \"${API_URL}\",g" web/packages/lib/src/config.json
+
       - run: pnpm --filter=* build
         working-directory: web
 
@@ -176,6 +181,7 @@ jobs:
           mv scorecard packageroot/usr/share/climblive/
           mv scoreboard packageroot/usr/share/climblive/
           mv backend/climblive packageroot/usr/bin
+          chmod +x packageroot/usr/bin/climblive
           sed -i "s/VERSION/${GITHUB_RUN_ID}/g" packageroot/DEBIAN/control
           dpkg-deb -b packageroot .
           mkdir -p ~/.ssh
