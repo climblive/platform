@@ -8,6 +8,7 @@
     "./prettier.config.js": "./prettier.config.js",
     "./eslint.config.js": "./eslint.config.js",
     "./config.json": "./src/config.json",
+    "./svelte.config.js": "./svelte.config.js",
     "./theme.css": "./src/theme.css",
     "./components": "./src/components/index.ts",
     "./queries": "./src/queries/index.ts",
