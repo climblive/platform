@@ -60,19 +60,21 @@
     {#snippet children({ scoreboard, loading })}
       <main>
         <h1>{contest.name}</h1>
-        <sl-select
-          size="small"
-          name="compClassId"
-          label="Competition class"
-          use:value={selectedCompClassId}
-          onsl-change={(event) => {
-            selectedCompClassId = parseInt(event.target.value);
-          }}
-        >
-          {#each compClasses as compClass}
-            <sl-option value={compClass.id}>{compClass.name}</sl-option>
-          {/each}
-        </sl-select>
+        {#if compClasses.length > 1}
+          <sl-select
+            size="small"
+            name="compClassId"
+            label="Competition class"
+            use:value={selectedCompClassId}
+            onsl-change={(event) => {
+              selectedCompClassId = parseInt(event.target.value);
+            }}
+          >
+            {#each compClasses as compClass}
+              <sl-option value={compClass.id}>{compClass.name}</sl-option>
+            {/each}
+          </sl-select>
+        {/if}
         <div class="container" style="--num-columns: {compClasses.length}">
           {#each compClasses as compClass}
             <section
@@ -114,6 +116,7 @@
   h1 {
     text-align: center;
     line-height: 1;
+    color: var(--sl-color-primary-700);
   }
 
   .container {
@@ -135,6 +138,10 @@
   }
 
   @media screen and (max-width: 512px) {
+    h1 {
+      font-size: var(--sl-font-size-x-large);
+    }
+
     sl-select {
       display: block;
     }

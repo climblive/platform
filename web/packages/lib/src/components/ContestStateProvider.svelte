@@ -6,11 +6,16 @@
   interface Props {
     startTime: Date;
     endTime: Date;
-    gracePeriodEndTime: Date | undefined;
+    gracePeriodEndTime?: Date;
     children?: Snippet<[{ contestState: ContestState }]>;
   }
 
-  let { startTime, endTime, gracePeriodEndTime, children }: Props = $props();
+  let {
+    startTime,
+    endTime,
+    gracePeriodEndTime = undefined,
+    children,
+  }: Props = $props();
 
   let contestState: ContestState = $state("NOT_STARTED");
   let intervalTimerId: number;

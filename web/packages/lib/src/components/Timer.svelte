@@ -64,10 +64,11 @@
 
 <style>
   .timer {
-    text-align: right;
+    text-align: left;
 
     & > * {
       display: block;
+      white-space: nowrap;
     }
 
     & span[role="timer"] {

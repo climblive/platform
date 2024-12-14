@@ -13,25 +13,28 @@
 
   let { name, compClassId, startTime, endTime, scoreboard }: Props = $props();
 
-  let results = $derived($scoreboard.get(compClassId) ?? []);
-
-  let allContenders = $derived(
-    [...$scoreboard.values()].reduce((count, results) => {
-      return count + results.length;
-    }, 0),
-  );
+  let classSize = $derived(($scoreboard.get(compClassId) ?? []).length);
 </script>
 
 <ContestStateProvider {startTime} {endTime}>
   {#snippet children({ contestState })}
     <header>
-      <h2>
-        {name} <span class="size">({results.length}/{allContenders})</span>
-      </h2>
-      {#if contestState === "NOT_STARTED"}
-        <Timer endTime={startTime} label="Time until start" />
-      {:else}
-        <Timer {endTime} label="Time remaining" />
+      <div class="left">
+        <div class="title">
+          <h2>
+            {name}
+          </h2>
+        </div>
+        {#if contestState === "NOT_STARTED"}
+          <Timer endTime={startTime} label="Time until start" />
+        {:else}
+          <Timer {endTime} label="Time remaining" />
+        {/if}
+      </div>
+      {#if classSize > 0}
+        <div class="size">
+          #{classSize}
+        </div>
       {/if}
     </header>
   {/snippet}
@@ -39,25 +42,53 @@
 
 <style>
   header {
-    margin-bottom: var(--sl-spacing-large);
+    margin-bottom: var(--sl-spacing-small);
+    background-color: var(--sl-color-primary-600);
+    border-radius: var(--sl-border-radius-medium);
 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    color: var(--sl-color-primary-100);
+
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    grid-template-rows: 1fr;
+
+    .left {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sl-spacing-x-small);
+      align-items: start;
+
+      padding: var(--sl-spacing-small);
+    }
+
+    .title {
+      width: 100%;
+      position: relative;
+      height: 2rem;
+    }
 
     & h2 {
-      line-height: var(--sl-line-height-denser);
-    }
-  }
+      position: absolute;
+      inset: 0;
 
-  @media screen and (max-width: 512px) {
-    header > h2 {
-      display: none;
-    }
-  }
+      margin: 0;
+      font-weight: var(--sl-font-weight-bold);
 
-  .size {
-    font-size: var(--sl-font-size-small);
-    color: var(--sl-color-primary-700);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .size {
+      align-self: start;
+      padding: var(--sl-spacing-small);
+      border-radius: 0 var(--sl-border-radius-medium) 0
+        var(--sl-border-radius-medium);
+
+      background-color: var(--sl-color-primary-50);
+      color: var(--sl-color-primary-700);
+      font-size: var(--sl-font-size-medium);
+      font-weight: var(--sl-font-weight-bold);
+    }
   }
 </style>

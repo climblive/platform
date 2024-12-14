@@ -32,8 +32,8 @@
 <style>
   section {
     height: 2.25rem;
-    background-color: var(--sl-color-primary-600);
-    color: var(--sl-color-primary-200);
+    background-color: var(--sl-color-primary-500);
+    color: white;
     display: grid;
     padding-inline: var(--sl-spacing-small);
     border-radius: var(--sl-border-radius-medium);
