@@ -146,29 +146,33 @@ jobs:
           path: backend/climblive
 
   deploy:
-    - uses: actions/checkout@v4
+    name: Deploy
+    runs-on: ubuntu-22.04
 
-    - uses: actions/download-artifact@v4
-      with:
-        name: scorecard
-        path: scorecard
+    steps:
+      - uses: actions/checkout@v4
 
-    - uses: actions/download-artifact@v4
-      with:
-        name: scoreboard
-        path: scoreboard
+      - uses: actions/download-artifact@v4
+        with:
+          name: scorecard
+          path: scorecard
 
-    - uses: actions/download-artifact@v4
-      with:
-        name: climblive
-        path: climblive
+      - uses: actions/download-artifact@v4
+        with:
+          name: scoreboard
+          path: scoreboard
 
-    - shell: bash
-      run: |
-        mkdir -p packageroot/usr/share/climblive
-        mkdir -p packageroot/usr/bin
-        mv scorecard packageroot/usr/share/climblive/
-        mv scoreboard packageroot/usr/share/climblive/
-        mv climblive packageroot/usr/bin
-        sed -i "s/VERSION/${GITHUB_RUN_ID}/g" packageroot/DEBIAN/control
-        dpkg-deb -b packageroot .
+      - uses: actions/download-artifact@v4
+        with:
+          name: climblive
+          path: climblive
+
+      - shell: bash
+        run: |
+          mkdir -p packageroot/usr/share/climblive
+          mkdir -p packageroot/usr/bin
+          mv scorecard packageroot/usr/share/climblive/
+          mv scoreboard packageroot/usr/share/climblive/
+          mv climblive packageroot/usr/bin
+          sed -i "s/VERSION/${GITHUB_RUN_ID}/g" packageroot/DEBIAN/control
+          dpkg-deb -b packageroot .
