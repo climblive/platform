@@ -177,5 +177,6 @@ jobs:
           mv climblive packageroot/usr/bin
           sed -i "s/VERSION/${GITHUB_RUN_ID}/g" packageroot/DEBIAN/control
           dpkg-deb -b packageroot .
+          mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ecdsa
           scp *.deb $DEPLOY_HOST:
