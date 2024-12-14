@@ -14,7 +14,8 @@ export const getTicksQuery = (contenderId: number) =>
     queryFn: async () => ApiClient.getInstance().getTicks(contenderId),
     retry: false,
     gcTime: 12 * HOUR,
-    staleTime: 12 * HOUR,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   });
 
 export const createTickMutation = (contenderId: number) => {

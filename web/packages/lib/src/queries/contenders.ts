@@ -14,7 +14,7 @@ export const getContenderQuery = (contenderId: number) =>
     queryFn: async () => ApiClient.getInstance().getContender(contenderId),
     retry: false,
     gcTime: 12 * HOUR,
-    staleTime: 12 * HOUR,
+    staleTime: 0,
     refetchOnWindowFocus: true,
   });
 
