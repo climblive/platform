@@ -34,6 +34,25 @@
   const scoreboard = writable<Map<number, ScoreboardEntry[]>>(new Map());
 
   onMount(async () => {
+    setup();
+  });
+
+  onDestroy(() => {
+    tearDown();
+  });
+
+  const handleVisibilityChange = () => {
+    switch (document.visibilityState) {
+      case "hidden":
+        tearDown();
+        break;
+      case "visible":
+        setup();
+        break;
+    }
+  };
+
+  const setup = () => {
     eventSource = new EventSource(
       `${configData.API_URL}/contests/${contestId}/events`,
     );
@@ -44,20 +63,26 @@
       // eslint-disable-next-line no-console
       console.error(e);
 
-      initialized = false;
-      contenders.clear();
-      $scoreboard = new Map();
+      reset();
     };
 
     eventSource.onopen = () => {
       initializeStore();
     };
-  });
+  };
 
-  onDestroy(() => {
+  const reset = () => {
+    initialized = false;
+    contenders.clear();
+    $scoreboard = new Map();
+  };
+
+  const tearDown = () => {
     eventSource?.close();
     eventSource = undefined;
-  });
+
+    reset();
+  };
 
   const initializeStore = async () => {
     const entries = await ApiClient.getInstance().getScoreboard(contestId);
@@ -163,5 +188,7 @@
     disqualified: false,
   });
 </script>
+
+<svelte:window onvisibilitychange={handleVisibilityChange} />
 
 {@render children?.({ scoreboard, loading: !initialized })}

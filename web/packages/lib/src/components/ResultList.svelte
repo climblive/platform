@@ -36,7 +36,11 @@
   onMount(() => {
     pageFlipIntervalTimerId = setInterval(() => {
       if (overflow === "pagination") {
-        pageIndex = (pageIndex + 1) % pageCount;
+        if (pageCount === 0) {
+          pageIndex = 0;
+        } else {
+          pageIndex = (pageIndex + 1) % pageCount;
+        }
       }
     }, 10_000);
 
