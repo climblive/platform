@@ -36,7 +36,7 @@
     name="gear"
     label="Edit"
     onclick={() => navigate(`/${registrationCode}/edit`)}
-    disabled={state === "ENDED"}
+    disabled={contestState === "ENDED"}
   >
   </sl-icon-button>
   <h1>{contestName}</h1>
