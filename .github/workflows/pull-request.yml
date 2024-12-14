@@ -182,7 +182,7 @@ jobs:
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ecdsa
           chmod 400 ~/.ssh/id_ecdsa
           scp -o StrictHostKeyChecking=accept-new climblive_${GITHUB_RUN_ID}_amd64.deb root@${{ vars.DEPLOY_HOST }}:
-          ssh -t root@${{ vars.DEPLOY_HOST }} "apt install -y ~/climblive_${GITHUB_RUN_ID}_amd64.deb"
+          ssh -t root@${{ vars.DEPLOY_HOST }} "apt-get install -y ~/climblive_${GITHUB_RUN_ID}_amd64.deb"
           ssh -t root@${{ vars.DEPLOY_HOST }} "systemctl daemon-reload"
           ssh -t root@${{ vars.DEPLOY_HOST }} "systemctl restart climblive2"
           ssh -t root@${{ vars.DEPLOY_HOST }} "systemctl reload nginx"
