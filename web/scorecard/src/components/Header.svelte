@@ -56,9 +56,9 @@
       <Score value={score} />
     </div>
     {#if contestState === "NOT_STARTED"}
-      <Timer endTime={startTime} label="Time until start" />
+      <Timer align="right" endTime={startTime} label="Time until start" />
     {:else}
-      <Timer {endTime} label="Time remaining" />
+      <Timer align="right" {endTime} label="Time remaining" />
     {/if}
   </div>
 </header>
