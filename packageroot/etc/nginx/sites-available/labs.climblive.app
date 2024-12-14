@@ -20,7 +20,7 @@ server {
 	}
 
 	location /scoreboard {
-		root /opt/climblive/labs;
+		root /usr/share/climblive;
 		try_files $uri /scoreboard;
 		expires 1d;
 		add_header Cache-Control "public";
@@ -28,12 +28,12 @@ server {
 	}
 
 	location = /scoreboard {
-		root /opt/climblive/labs/scoreboard;
+		root /usr/share/climblive/scoreboard;
 		try_files /index.html =404;
 	}
 
 	location / {
-		root /opt/climblive/labs/scorecard;
+		root /usr/share/climblive/scorecard;
 		try_files $uri /;
 		expires 1d;
 		add_header Cache-Control "public";
@@ -41,7 +41,7 @@ server {
 	}
 
 	location = / {
-		root /opt/climblive/labs/scorecard;
+		root /usr/share/climblive/scorecard;
 		try_files /index.html =404;
 	}
 
