@@ -72,7 +72,7 @@
       inset: 0;
 
       margin: 0;
-      font-weight: var(--sl-font-weight-bold);
+      font-weight: var(--sl-font-weight-semibold);
 
       white-space: nowrap;
       overflow: hidden;

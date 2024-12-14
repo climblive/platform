@@ -6,9 +6,10 @@
   interface Props {
     endTime: Date;
     label: string;
+    align?: "left" | "right";
   }
 
-  let { endTime, label }: Props = $props();
+  let { endTime, label, align = "left" }: Props = $props();
 
   let intervalTimerId: number;
   const labelId = uuidv4();
@@ -55,7 +56,7 @@
   });
 </script>
 
-<div class="timer">
+<div class="timer" data-alignment={align}>
   <span role="timer" aria-live="off" aria-labelledby={labelId}
     >{displayValue}</span
   >
@@ -79,5 +80,9 @@
       font-weight: var(--sl-font-weight-normal);
       font-size: 0.75em;
     }
+  }
+
+  .timer[data-alignment="right"] {
+    text-align: right;
   }
 </style>
