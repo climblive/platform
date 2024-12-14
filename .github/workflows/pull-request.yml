@@ -180,4 +180,5 @@ jobs:
           dpkg-deb -b packageroot .
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ecdsa
+          chmod 400 ~/.ssh/id_ecdsa
           scp -o StrictHostKeyChecking=accept-new *.deb root@${{ vars.DEPLOY_HOST }}:
