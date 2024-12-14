@@ -25,7 +25,7 @@
     contenderClub,
     score,
     placement,
-    contestState: state,
+    contestState,
     startTime,
     endTime,
   }: Props = $props();
@@ -55,7 +55,7 @@
       </span>
       <Score value={score} />
     </div>
-    {#if state === "NOT_STARTED"}
+    {#if contestState === "NOT_STARTED"}
       <Timer endTime={startTime} label="Time until start" />
     {:else}
       <Timer {endTime} label="Time remaining" />
