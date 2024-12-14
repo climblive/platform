@@ -1,11 +1,21 @@
 <script lang="ts">
-  export let length: number;
-  export let placeholder: string | undefined = undefined;
-  export let disabled: boolean = false;
-  export let onChange: (value: string) => void;
-  export let defaultValue: string | undefined;
+  interface Props {
+    length: number;
+    placeholder?: string | undefined;
+    disabled?: boolean;
+    onChange: (value: string) => void;
+    defaultValue: string | undefined;
+  }
 
-  $: inputs = Array.from<HTMLInputElement>({ length });
+  let {
+    length,
+    placeholder,
+    disabled = false,
+    onChange,
+    defaultValue,
+  }: Props = $props();
+
+  let inputs = $derived(Array.from<HTMLInputElement>({ length }));
 
   const focusInputField = (dir: "next" | "prev", index: number) => {
     let input: HTMLInputElement | undefined;
@@ -70,6 +80,8 @@
   };
 
   const handlePaste = (event: ClipboardEvent) => {
+    event.preventDefault();
+
     const pasteValue = event.clipboardData?.getData("Text");
     for (const index in inputs) {
       inputs[index].value = pasteValue?.[index] ?? "";
@@ -89,14 +101,14 @@
     <input
       aria-label={`Pin character ${index + 1} out of ${inputs.length}`}
       {disabled}
-      bind:this={input}
+      bind:this={inputs[inputs.findIndex((i) => i === input)]}
       {placeholder}
       type="text"
-      on:focus={(e) => handleFocus(e, index)}
-      on:input={(e) => handleInput(e, index)}
-      on:keydown={(e) => handleKeyDown(e, index)}
-      on:keyup={() => handleKeyUp()}
-      on:paste|preventDefault={handlePaste}
+      onfocus={(e) => handleFocus(e, index)}
+      oninput={(e) => handleInput(e, index)}
+      onkeydown={(e) => handleKeyDown(e, index)}
+      onkeyup={() => handleKeyUp()}
+      onpaste={handlePaste}
       value={defaultValue?.[index] ?? ""}
     />
   {/each}

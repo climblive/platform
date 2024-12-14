@@ -5,17 +5,21 @@
   import { sv } from "date-fns/locale";
   import LabeledText from "./LabeledText.svelte";
 
-  export let contest: Contest;
-  export let compClasses: CompClass[];
-  export let problems: Problem[];
+  interface Props {
+    contest: Contest;
+    compClasses: CompClass[];
+    problems: Problem[];
+  }
 
-  let details: SlDetails;
+  let { contest, compClasses, problems }: Props = $props();
 
-  $: {
+  let details: SlDetails | undefined = $state();
+
+  $effect(() => {
     if (details && contest.rules) {
       details.innerHTML = contest.rules;
     }
-  }
+  });
 
   const scoreboardUrl = `${location.protocol}//${location.host}/scoreboard/${contest.id}`;
 </script>

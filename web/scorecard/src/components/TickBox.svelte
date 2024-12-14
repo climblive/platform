@@ -11,28 +11,30 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/popup/popup.js";
   import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
-  import { afterUpdate, getContext } from "svelte";
+  import { getContext } from "svelte";
   import type { Readable } from "svelte/store";
 
-  export let problem: Problem;
-  export let tick: Tick | undefined;
-  export let disabled: boolean;
+  interface Props {
+    problem: Problem;
+    tick: Tick | undefined;
+    disabled: boolean | undefined;
+  }
 
-  let container: HTMLDivElement;
-  let popup: SlPopup;
+  let { problem, tick, disabled = false }: Props = $props();
+
+  let container: HTMLDivElement | undefined = $state();
+  let popup: SlPopup | undefined = $state();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
   const createTick = createTickMutation($session.contenderId);
   const deleteTick = deleteTickMutation();
 
-  let open = false;
+  let open = $state(false);
 
-  $: loading = $createTick.isPending || $deleteTick.isPending;
-  $: variant = tick
-    ? tick.attemptsTop === 1
-      ? "flashed"
-      : "ticked"
-    : undefined;
+  let loading = $derived($createTick.isPending || $deleteTick.isPending);
+  let variant = $derived(
+    tick ? (tick.attemptsTop === 1 ? "flashed" : "ticked") : undefined,
+  );
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -54,14 +56,15 @@
     }
   };
 
-  const handleTick = (flash: boolean) => {
+  const handleTick = (event: MouseEvent, flash: boolean) => {
+    event.stopPropagation();
+
     navigator.vibrate?.(50);
     open = false;
 
     $createTick.mutate(
       {
         problemId: problem.id,
-        contenderId: $session.contenderId,
         top: true,
         attemptsTop: flash ? 1 : 999,
         zone: true,
@@ -73,8 +76,10 @@
     );
   };
 
-  afterUpdate(() => {
-    popup.anchor = container;
+  $effect(() => {
+    if (popup && container) {
+      popup.anchor = container;
+    }
   });
 </script>
 
@@ -83,7 +88,7 @@
 <div data-variant={variant} bind:this={container}>
   <button
     disabled={disabled || loading}
-    on:click={handleCheck}
+    onclick={handleCheck}
     aria-label={tick?.id ? "Untick" : "Tick"}
   >
     {#if loading}
@@ -103,11 +108,11 @@
     strategy="fixed"
     distance="4"
   >
-    <sl-button size="small" on:click|stopPropagation={() => handleTick(false)}>
+    <sl-button size="small" onclick={(e) => handleTick(e, false)}>
       <sl-icon slot="prefix" name="check2-all"></sl-icon>
       Top
     </sl-button>
-    <sl-button size="small" on:click|stopPropagation={() => handleTick(true)}>
+    <sl-button size="small" onclick={(e) => handleTick(e, true)}>
       <sl-icon slot="prefix" name="lightning-charge"></sl-icon>
       Flash
     </sl-button>

@@ -18,7 +18,7 @@
   const contenderQuery = getContenderQuery($session.contenderId);
   const updateContender = updateContenderMutation($session.contenderId);
 
-  $: contender = $contenderQuery.data;
+  let contender = $derived($contenderQuery.data);
 
   const gotoScorecard = () => {
     navigate(`/${contender?.registrationCode}`);
@@ -61,7 +61,7 @@
         size="small"
         type="button"
         variant="text"
-        on:click={gotoScorecard}
+        onclick={gotoScorecard}
         >Cancel
       </sl-button>
       <sl-button

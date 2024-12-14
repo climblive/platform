@@ -7,48 +7,31 @@
   import Floater from "./Floater.svelte";
   import ResultEntry from "./ResultEntry.svelte";
 
-  export let compClassId: number;
-  export let overflow: "pagination" | "scroll" = "scroll";
-  export let scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
-  export let loading: boolean;
+  interface Props {
+    compClassId: number;
+    overflow?: "pagination" | "scroll";
+    scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
+    loading: boolean;
+  }
+
+  let {
+    compClassId,
+    overflow = "scroll",
+    scoreboard,
+    loading,
+  }: Props = $props();
 
   const ITEM_HEIGHT = 36;
   const GAP = 8;
   const SCROLLABLE_SKELETON_ENTRIES = 10;
 
-  let container: HTMLDivElement | undefined;
+  let container: HTMLDivElement | undefined = $state();
   let observer: ResizeObserver | undefined;
   let pageFlipIntervalTimerId: number;
 
-  let containerHeight: number = 0;
-  let pageSize: number = 0;
-  let pageIndex = 0;
-
-  $: {
-    switch (overflow) {
-      case "pagination":
-        pageSize = Math.floor((containerHeight + GAP) / (ITEM_HEIGHT + GAP));
-        break;
-      case "scroll":
-        pageSize = results.length;
-
-        if (loading) {
-          pageSize = SCROLLABLE_SKELETON_ENTRIES;
-        }
-
-        break;
-    }
-  }
-
-  $: {
-    if (overflow === "scroll") {
-      pageIndex = 0;
-    }
-  }
-
-  $: pageCount = Math.ceil(results.length / pageSize);
-
-  $: results = $scoreboard.get(compClassId) ?? [];
+  let containerHeight: number = $state(0);
+  let pageSize: number = $state(0);
+  let pageIndex = $state(0);
 
   onMount(() => {
     pageFlipIntervalTimerId = setInterval(() => {
@@ -75,18 +58,44 @@
     pageFlipIntervalTimerId = 0;
   });
 
-  $: {
+  let results = $derived($scoreboard.get(compClassId) ?? []);
+
+  $effect(() => {
+    switch (overflow) {
+      case "pagination":
+        pageSize = Math.floor((containerHeight + GAP) / (ITEM_HEIGHT + GAP));
+        break;
+      case "scroll":
+        pageSize = results.length;
+
+        if (loading) {
+          pageSize = SCROLLABLE_SKELETON_ENTRIES;
+        }
+
+        break;
+    }
+  });
+
+  $effect(() => {
+    if (overflow === "scroll") {
+      pageIndex = 0;
+    }
+  });
+
+  let pageCount = $derived(Math.ceil(results.length / pageSize));
+
+  $effect(() => {
     if (container && overflow === "pagination") {
       observer?.observe(container);
     }
-  }
+  });
 </script>
 
 <div
   class="container"
   bind:this={container}
   style="--page-size: {pageSize}; --page-index: {pageIndex}"
-  {overflow}
+  data-overflow={overflow}
 >
   {#if loading}
     {#each [...Array(overflow === "pagination" ? pageSize : SCROLLABLE_SKELETON_ENTRIES).keys()] as i (i)}
@@ -118,7 +127,7 @@
     position: relative;
   }
 
-  .container[overflow="pagination"] {
+  .container[data-overflow="pagination"] {
     height: 100%;
     clip-path: rect(
       0px 100%
@@ -130,7 +139,7 @@
     );
   }
 
-  .container[overflow="scroll"] {
+  .container[data-overflow="scroll"] {
     height: calc(var(--page-size) * (2.25rem + var(--sl-spacing-x-small)));
   }
 </style>

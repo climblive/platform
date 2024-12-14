@@ -7,22 +7,26 @@
   import { onMount } from "svelte";
   import Loading from "./Loading.svelte";
 
-  export let contestId: number;
+  interface Props {
+    contestId: number;
+  }
 
-  let selectedCompClassId: number | undefined;
-  let overflow: "pagination" | "scroll" = "scroll";
+  let { contestId }: Props = $props();
+
+  let selectedCompClassId: number | undefined = $state();
+  let overflow: "pagination" | "scroll" = $state("scroll");
 
   const contestQuery = getContestQuery(contestId);
   const compClassesQuery = getCompClassesQuery(contestId);
 
-  $: contest = $contestQuery.data;
-  $: compClasses = $compClassesQuery.data;
+  let contest = $derived($contestQuery.data);
+  let compClasses = $derived($compClassesQuery.data);
 
-  $: {
+  $effect(() => {
     if (compClasses && !selectedCompClassId) {
       selectedCompClassId = compClasses[0].id;
     }
-  }
+  });
 
   const value = (node: HTMLElement, value: string | number | undefined) => {
     node.setAttribute("value", value?.toString() ?? "");
@@ -44,7 +48,7 @@
 </script>
 
 <svelte:window
-  on:resize={() => {
+  onresize={() => {
     determineOverflowBehaviour();
   }}
 />
@@ -52,47 +56,49 @@
 {#if !contest || !compClasses}
   <Loading />
 {:else}
-  <ScoreboardProvider {contestId} let:scoreboard let:loading>
-    <main>
-      <h1>{contest.name}</h1>
-      <sl-select
-        size="small"
-        name="compClassId"
-        label="Competition class"
-        use:value={selectedCompClassId}
-        on:sl-change={(event) => {
-          selectedCompClassId = parseInt(event.target.value);
-        }}
-      >
-        {#each compClasses as compClass}
-          <sl-option value={compClass.id}>{compClass.name}</sl-option>
-        {/each}
-      </sl-select>
-      <div class="container" style="--num-columns: {compClasses.length}">
-        {#each compClasses as compClass}
-          <section
-            class="class"
-            data-selected={compClass.id === selectedCompClassId
-              ? "true"
-              : "false"}
-          >
-            <Header
-              compClassId={compClass.id}
-              name={compClass.name}
-              startTime={compClass.timeBegin}
-              endTime={compClass.timeEnd}
-              {scoreboard}
-            ></Header>
-            <ResultList
-              compClassId={compClass.id}
-              {overflow}
-              {scoreboard}
-              {loading}
-            />
-          </section>
-        {/each}
-      </div>
-    </main>
+  <ScoreboardProvider {contestId}>
+    {#snippet children({ scoreboard, loading })}
+      <main>
+        <h1>{contest.name}</h1>
+        <sl-select
+          size="small"
+          name="compClassId"
+          label="Competition class"
+          use:value={selectedCompClassId}
+          onsl-change={(event) => {
+            selectedCompClassId = parseInt(event.target.value);
+          }}
+        >
+          {#each compClasses as compClass}
+            <sl-option value={compClass.id}>{compClass.name}</sl-option>
+          {/each}
+        </sl-select>
+        <div class="container" style="--num-columns: {compClasses.length}">
+          {#each compClasses as compClass}
+            <section
+              class="class"
+              data-selected={compClass.id === selectedCompClassId
+                ? "true"
+                : "false"}
+            >
+              <Header
+                compClassId={compClass.id}
+                name={compClass.name}
+                startTime={compClass.timeBegin}
+                endTime={compClass.timeEnd}
+                {scoreboard}
+              ></Header>
+              <ResultList
+                compClassId={compClass.id}
+                {overflow}
+                {scoreboard}
+                {loading}
+              />
+            </section>
+          {/each}
+        </div>
+      </main>
+    {/snippet}
   </ScoreboardProvider>
 {/if}
 

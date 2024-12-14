@@ -13,10 +13,11 @@
   import type { Writable } from "svelte/store";
   import { ZodError } from "zod";
 
-  let loadingContender = false;
-  let loadingFailed = false;
+  let loadingContender = $state(false);
+  let loadingFailed = $state(false);
   let queryClient = useQueryClient();
-  let registrationCode: string | undefined;
+  let registrationCode: string | undefined = $state();
+  let form: HTMLFormElement | undefined = $state();
 
   onMount(() => {
     const data = localStorage.getItem("session");
@@ -28,7 +29,7 @@
         if (differenceInHours(new Date(), sess.timestamp) < 12) {
           registrationCode = sess.registrationCode;
         }
-      } catch (_) {
+      } catch {
         /* discard corrupt session data */
       }
     }
@@ -39,10 +40,14 @@
   const handleCodeChange = (code: string) => {
     const autoSubmit = registrationCode === undefined && code.length === 8;
     registrationCode = code;
-    autoSubmit && submitForm();
+    if (autoSubmit) {
+      form?.requestSubmit();
+    }
   };
 
-  const submitForm = async () => {
+  const submitForm = async (event: SubmitEvent) => {
+    event.preventDefault();
+
     if (!registrationCode) {
       return;
     }
@@ -80,7 +85,7 @@
     <h1>Welcome</h1>
     <p>Enter your unique registration code!</p>
   </header>
-  <form on:submit|preventDefault={submitForm}>
+  <form bind:this={form} onsubmit={submitForm}>
     <PinInput
       length={8}
       defaultValue={registrationCode}

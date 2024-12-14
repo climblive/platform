@@ -3,8 +3,12 @@
   import { onDestroy, onMount } from "svelte";
   import { uuidv4 } from "../utils";
 
-  export let endTime: Date;
-  export let label: string;
+  interface Props {
+    endTime: Date;
+    label: string;
+  }
+
+  let { endTime, label }: Props = $props();
 
   let intervalTimerId: number;
   const labelId = uuidv4();
@@ -29,7 +33,7 @@
     }
   };
 
-  let displayValue = formatTimeRemaining();
+  let displayValue = $state(formatTimeRemaining());
 
   const tick = () => {
     displayValue = formatTimeRemaining();

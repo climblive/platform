@@ -4,24 +4,39 @@
   import { ordinalSuperscript } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
-  export let registrationCode: string;
-  export let contestName: string;
-  export let compClassName: string | undefined;
-  export let contenderName: string | undefined;
-  export let contenderClub: string | undefined;
-  export let score: number;
-  export let placement: number | undefined;
-  export let state: ContestState;
-  export let startTime: Date;
-  export let endTime: Date;
+  interface Props {
+    registrationCode: string;
+    contestName: string;
+    compClassName: string | undefined;
+    contenderName: string | undefined;
+    contenderClub: string | undefined;
+    score: number;
+    placement: number | undefined;
+    contestState: ContestState;
+    startTime: Date;
+    endTime: Date;
+  }
+
+  let {
+    registrationCode,
+    contestName,
+    compClassName,
+    contenderName,
+    contenderClub,
+    score,
+    placement,
+    contestState,
+    startTime,
+    endTime,
+  }: Props = $props();
 </script>
 
 <header>
   <sl-icon-button
     name="gear"
     label="Edit"
-    on:click={() => navigate(`/${registrationCode}/edit`)}
-    disabled={state === "ENDED"}
+    onclick={() => navigate(`/${registrationCode}/edit`)}
+    disabled={contestState === "ENDED"}
   >
   </sl-icon-button>
   <h1>{contestName}</h1>
@@ -40,7 +55,7 @@
       </span>
       <Score value={score} />
     </div>
-    {#if state === "NOT_STARTED"}
+    {#if contestState === "NOT_STARTED"}
       <Timer endTime={startTime} label="Time until start" />
     {:else}
       <Timer {endTime} label="Time remaining" />

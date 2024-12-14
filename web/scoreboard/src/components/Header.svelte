@@ -3,28 +3,38 @@
   import type { ScoreboardEntry } from "@climblive/lib/models";
   import { type Readable } from "svelte/store";
 
-  export let name: string;
-  export let compClassId: number;
-  export let startTime: Date;
-  export let endTime: Date;
-  export let scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
+  interface Props {
+    name: string;
+    compClassId: number;
+    startTime: Date;
+    endTime: Date;
+    scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
+  }
 
-  $: results = $scoreboard.get(compClassId) ?? [];
+  let { name, compClassId, startTime, endTime, scoreboard }: Props = $props();
 
-  $: allContenders = [...$scoreboard.values()].reduce((count, results) => {
-    return count + results.length;
-  }, 0);
+  let results = $derived($scoreboard.get(compClassId) ?? []);
+
+  let allContenders = $derived(
+    [...$scoreboard.values()].reduce((count, results) => {
+      return count + results.length;
+    }, 0),
+  );
 </script>
 
-<ContestStateProvider {startTime} {endTime} let:state>
-  <header>
-    <h2>{name} <span class="size">({results.length}/{allContenders})</span></h2>
-    {#if state === "NOT_STARTED"}
-      <Timer endTime={startTime} label="Time until start" />
-    {:else}
-      <Timer {endTime} label="Time remaining" />
-    {/if}
-  </header>
+<ContestStateProvider {startTime} {endTime}>
+  {#snippet children({ contestState })}
+    <header>
+      <h2>
+        {name} <span class="size">({results.length}/{allContenders})</span>
+      </h2>
+      {#if contestState === "NOT_STARTED"}
+        <Timer endTime={startTime} label="Time until start" />
+      {:else}
+        <Timer {endTime} label="Time remaining" />
+      {/if}
+    </header>
+  {/snippet}
 </ContestStateProvider>
 
 <style>

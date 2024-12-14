@@ -14,7 +14,7 @@
   import { writable } from "svelte/store";
   import { ZodError } from "zod";
 
-  let authenticating = true;
+  let authenticating = $state(true);
 
   setBasePath("/shoelace");
 

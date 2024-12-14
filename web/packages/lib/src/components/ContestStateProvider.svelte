@@ -1,21 +1,26 @@
 <script lang="ts">
   import { isBefore } from "date-fns";
-  import { onDestroy } from "svelte";
+  import { onDestroy, type Snippet } from "svelte";
   import type { ContestState } from "../types";
 
-  export let startTime: Date;
-  export let endTime: Date;
-  export let gracePeriodEndTime: Date | undefined = undefined;
+  interface Props {
+    startTime: Date;
+    endTime: Date;
+    gracePeriodEndTime: Date | undefined;
+    children?: Snippet<[{ contestState: ContestState }]>;
+  }
 
-  let state: ContestState = "NOT_STARTED";
+  let { startTime, endTime, gracePeriodEndTime, children }: Props = $props();
+
+  let contestState: ContestState = $state("NOT_STARTED");
   let intervalTimerId: number;
 
-  $: {
+  $effect(() => {
     if (startTime && endTime) {
       clearInterval(intervalTimerId);
       tick();
     }
-  }
+  });
 
   const computeState = (): ContestState => {
     const now = new Date();
@@ -34,7 +39,7 @@
   };
 
   const tick = () => {
-    state = computeState();
+    contestState = computeState();
 
     const firefoxEarlyWakeUpCompensation = 1;
 
@@ -49,4 +54,4 @@
   });
 </script>
 
-<slot {state} />
+{@render children?.({ contestState })}

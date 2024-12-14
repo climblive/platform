@@ -5,11 +5,15 @@
   import HoldColorIndicator from "./HoldColorIndicator.svelte";
   import TickBox from "./TickBox.svelte";
 
-  export let problem: Problem;
-  export let tick: Tick | undefined = undefined;
-  export let disabled: boolean;
+  interface Props {
+    problem: Problem;
+    tick?: Tick | undefined;
+    disabled: boolean;
+  }
 
-  $: pointValue = calculateProblemScore(problem, tick);
+  let { problem, tick, disabled }: Props = $props();
+
+  let pointValue = $derived(calculateProblemScore(problem, tick));
 </script>
 
 <section

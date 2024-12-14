@@ -12,25 +12,36 @@
   import "@shoelace-style/shoelace/dist/components/select/select.js";
   import type SlSelect from "@shoelace-style/shoelace/dist/components/select/select.js";
   import { isAfter } from "date-fns";
-  import { createEventDispatcher, getContext } from "svelte";
+  import { createEventDispatcher, getContext, type Snippet } from "svelte";
   import type { Readable } from "svelte/store";
 
   const dispatch = createEventDispatcher<{ submit: RegistrationFormData }>();
 
-  export let data: Partial<RegistrationFormData>;
+  interface Props {
+    data: Partial<RegistrationFormData>;
+    children?: Snippet;
+  }
+
+  let { data, children }: Props = $props();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
-  $: compClassesQuery = getCompClassesQuery($session.contestId);
+  let compClassesQuery = $derived(getCompClassesQuery($session.contestId));
 
-  let form: HTMLFormElement;
+  let form: HTMLFormElement | undefined = $state();
   const controls: {
     name?: SlInput;
     clubName?: SlInput;
     compClassId?: SlSelect;
-  } = {};
+  } = $state({});
 
-  const handleSubmit = () => {
+  const handleSubmit = (event: SubmitEvent) => {
+    event.preventDefault();
+
+    if (!form) {
+      return;
+    }
+
     const data = serialize(form);
     const result = registrationFormSchema.safeParse(data);
 
@@ -42,7 +53,7 @@
       }
     }
 
-    form.reportValidity();
+    form?.reportValidity();
   };
 
   const setCustomValidity = (path: (string | number)[], message: string) => {
@@ -74,8 +85,8 @@
 {#if $compClassesQuery.data}
   <form
     bind:this={form}
-    on:submit|preventDefault={handleSubmit}
-    on:sl-input={resetCustomValidation}
+    onsubmit={handleSubmit}
+    onsl-input={resetCustomValidation}
   >
     <sl-input
       bind:this={controls.name}
@@ -110,7 +121,7 @@
         >
       {/each}
     </sl-select>
-    <slot />
+    {@render children?.()}
   </form>
 {/if}
 

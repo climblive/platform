@@ -34,32 +34,38 @@
   const problemsQuery = getProblemsQuery($session.contestId);
   const ticksQuery = getTicksQuery($session.contenderId);
 
-  let resultsConnected = false;
-  let tabGroup: SlTabGroup | undefined;
+  let resultsConnected = $state(false);
+  let tabGroup: SlTabGroup | undefined = $state();
   let eventSource: EventSource | undefined;
-  let score: number;
-  let placement: number | undefined;
+  let score: number = $state(0);
+  let placement: number | undefined = $state();
 
-  $: contender = $contenderQuery.data;
-  $: contest = $contestQuery.data;
-  $: compClasses = $compClassesQuery.data;
-  $: problems = $problemsQuery.data;
-  $: ticks = $ticksQuery.data;
-  $: selectedCompClass = compClasses?.find(
-    ({ id }) => id === contender?.compClassId,
+  let contender = $derived($contenderQuery.data);
+  let contest = $derived($contestQuery.data);
+  let compClasses = $derived($compClassesQuery.data);
+  let problems = $derived($problemsQuery.data);
+  let ticks = $derived($ticksQuery.data);
+  let selectedCompClass = $derived(
+    compClasses?.find(({ id }) => id === contender?.compClassId),
   );
-  $: startTime = selectedCompClass?.timeBegin ?? new Date(8640000000000000);
-  $: endTime = selectedCompClass?.timeEnd ?? new Date(-8640000000000000);
-  $: gracePeriodEndTime = add(endTime, {
-    minutes: (contest?.gracePeriod ?? 0) / (1_000_000_000 * 60),
-  });
+  let startTime = $derived(
+    selectedCompClass?.timeBegin ?? new Date(8640000000000000),
+  );
+  let endTime = $derived(
+    selectedCompClass?.timeEnd ?? new Date(-8640000000000000),
+  );
+  let gracePeriodEndTime = $derived(
+    add(endTime, {
+      minutes: (contest?.gracePeriod ?? 0) / (1_000_000_000 * 60),
+    }),
+  );
 
-  $: {
+  $effect(() => {
     if (contender) {
       score = contender.score?.score ?? 0;
       placement = contender.score?.placement;
     }
-  }
+  });
 
   const handleShowTab = ({ detail }: SlTabShowEvent) => {
     if (detail.name === "results") {
@@ -116,64 +122,64 @@
   });
 </script>
 
-<svelte:window on:visibilitychange={handleVisibilityChange} />
+<svelte:window onvisibilitychange={handleVisibilityChange} />
 
 {#if !contender || !contest || !compClasses || !problems || !ticks || !selectedCompClass}
   <Loading />
 {:else}
-  <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime} let:state>
-    <main>
-      <div class="sticky">
-        <Header
-          registrationCode={$session.registrationCode}
-          contestName={contest.name}
-          compClassName={selectedCompClass?.name}
-          contenderName={contender.name}
-          contenderClub={contender.clubName}
-          {score}
-          {placement}
-          {state}
-          {startTime}
-          {endTime}
-        />
-      </div>
-      <sl-tab-group bind:this={tabGroup} on:sl-tab-show={handleShowTab}>
-        <sl-tab slot="nav" panel="problems">Scorecard</sl-tab>
-        <sl-tab slot="nav" panel="results">Results</sl-tab>
-        {#if contest.rules}
-          <sl-tab slot="nav" panel="info">Info</sl-tab>
-        {/if}
-
-        <sl-tab-panel name="problems">
-          {#each problems as problem}
-            <ProblemView
-              {problem}
-              tick={ticks.find(({ problemId }) => problemId === problem.id)}
-              disabled={["NOT_STARTED", "ENDED"].includes(state)}
-            />
-          {/each}
-        </sl-tab-panel>
-        <sl-tab-panel name="results">
-          {#if resultsConnected && contender.compClassId}
-            <ScoreboardProvider
-              contestId={$session.contestId}
-              let:scoreboard
-              let:loading
-            >
-              <ResultList
-                compClassId={contender.compClassId}
-                {scoreboard}
-                {loading}
-              />
-            </ScoreboardProvider>
+  <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime}>
+    {#snippet children({ contestState })}
+      <main>
+        <div class="sticky">
+          <Header
+            registrationCode={$session.registrationCode}
+            contestName={contest.name}
+            compClassName={selectedCompClass?.name}
+            contenderName={contender.name}
+            contenderClub={contender.clubName}
+            {score}
+            {placement}
+            {contestState}
+            {startTime}
+            {endTime}
+          />
+        </div>
+        <sl-tab-group bind:this={tabGroup} onsl-tab-show={handleShowTab}>
+          <sl-tab slot="nav" panel="problems">Scorecard</sl-tab>
+          <sl-tab slot="nav" panel="results">Results</sl-tab>
+          {#if contest.rules}
+            <sl-tab slot="nav" panel="info">Info</sl-tab>
           {/if}
-        </sl-tab-panel>
-        <sl-tab-panel name="info">
-          <ContestInfo {contest} {problems} {compClasses} />
-        </sl-tab-panel>
-      </sl-tab-group>
-    </main></ContestStateProvider
-  >
+
+          <sl-tab-panel name="problems">
+            {#each problems as problem}
+              <ProblemView
+                {problem}
+                tick={ticks.find(({ problemId }) => problemId === problem.id)}
+                disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
+              />
+            {/each}
+          </sl-tab-panel>
+          <sl-tab-panel name="results">
+            {#if resultsConnected && contender.compClassId}
+              <ScoreboardProvider contestId={$session.contestId}>
+                {#snippet children({ scoreboard, loading })}
+                  <ResultList
+                    compClassId={contender.compClassId}
+                    {scoreboard}
+                    {loading}
+                  />
+                {/snippet}
+              </ScoreboardProvider>
+            {/if}
+          </sl-tab-panel>
+          <sl-tab-panel name="info">
+            <ContestInfo {contest} {problems} {compClasses} />
+          </sl-tab-panel>
+        </sl-tab-group>
+      </main>
+    {/snippet}
+  </ContestStateProvider>
 {/if}
 
 <style>

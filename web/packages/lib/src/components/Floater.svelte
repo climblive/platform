@@ -1,9 +1,16 @@
 <script lang="ts">
-  export let order: number;
+  import type { Snippet } from "svelte";
+
+  interface Props {
+    order: number;
+    children?: Snippet;
+  }
+
+  let { order, children }: Props = $props();
 </script>
 
 <div style="--order: {order}">
-  <slot />
+  {@render children?.()}
 </div>
 
 <style>
