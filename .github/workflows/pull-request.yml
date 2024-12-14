@@ -167,7 +167,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: backend
-          path: climblive
+          path: backend
 
       - shell: bash
         run: |
@@ -175,10 +175,14 @@ jobs:
           mkdir -p packageroot/usr/bin
           mv scorecard packageroot/usr/share/climblive/
           mv scoreboard packageroot/usr/share/climblive/
-          mv climblive packageroot/usr/bin
+          mv backend/climblive packageroot/usr/bin
           sed -i "s/VERSION/${GITHUB_RUN_ID}/g" packageroot/DEBIAN/control
           dpkg-deb -b packageroot .
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ecdsa
           chmod 400 ~/.ssh/id_ecdsa
-          scp -o StrictHostKeyChecking=accept-new *.deb root@${{ vars.DEPLOY_HOST }}:
+          scp -o StrictHostKeyChecking=accept-new climblive_${{ secrets.DEPLOY_SSH_KEY }}_amd64.deb root@${{ vars.DEPLOY_HOST }}:
+          ssh -t root@${{ vars.DEPLOY_HOST }} "apt install -y ~/climblive_${{ secrets.DEPLOY_SSH_KEY }}_amd64.deb"
+          ssh -t root@${{ vars.DEPLOY_HOST }} "systemctl daemon-reload"
+          ssh -t root@${{ vars.DEPLOY_HOST }} "systemctl restart climblive2"
+          ssh -t root@${{ vars.DEPLOY_HOST }} "systemctl reload nginx"
