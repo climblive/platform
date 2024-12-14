@@ -50,6 +50,16 @@ jobs:
       - run: pnpm --filter=* build
         working-directory: web
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scorecard
+          path: web/scorecard/dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scoreboard
+          path: web/scoreboard/dist
+
   run-e2e-tests:
     name: Run E2E tests
     timeout-minutes: 15
@@ -127,5 +137,38 @@ jobs:
         with:
           go-version-file: "backend/go.mod"
 
-      - run: go build cmd/api/main.go
+      - run: go build -o climblive cmd/api/main.go
         working-directory: backend
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend
+          path: backend/climblive
+
+  deploy:
+    - uses: actions/checkout@v4
+
+    - uses: actions/download-artifact@v4
+      with:
+        name: scorecard
+        path: scorecard
+
+    - uses: actions/download-artifact@v4
+      with:
+        name: scoreboard
+        path: scoreboard
+
+    - uses: actions/download-artifact@v4
+      with:
+        name: climblive
+        path: climblive
+
+    - shell: bash
+      run: |
+        mkdir -p packageroot/usr/share/climblive
+        mkdir -p packageroot/usr/bin
+        mv scorecard packageroot/usr/share/climblive/
+        mv scoreboard packageroot/usr/share/climblive/
+        mv climblive packageroot/usr/bin
+        sed -i "s/VERSION/${GITHUB_RUN_ID}/g" packageroot/DEBIAN/control
+        dpkg-deb -b packageroot .
