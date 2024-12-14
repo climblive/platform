@@ -1,0 +1,7 @@
+Package: climblive
+Version: VERSION
+Architecture: amd64
+Maintainer: Kasper Ingelvide <kasper@hubben.xyz>
+Depends: nginx, certbot, python3-certbot-nginx
+Description: ClimbLive 2.0
+  A web application for managing bouldering competitions.
