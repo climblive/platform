@@ -179,5 +179,4 @@ jobs:
           dpkg-deb -b packageroot .
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ecdsa
-          ssh-keyscan $DEPLOY_HOST >> /home/runner/.ssh/known_hosts
           scp *.deb root@$DEPLOY_HOST:
