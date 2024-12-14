@@ -41,7 +41,7 @@
     const autoSubmit = registrationCode === undefined && code.length === 8;
     registrationCode = code;
     if (autoSubmit) {
-      form?.submit();
+      form?.requestSubmit();
     }
   };
 
