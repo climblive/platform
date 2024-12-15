@@ -18,7 +18,7 @@ runs:
         echo "${{ inputs.deploy-ssh-key }}" > ~/.ssh/id_ecdsa
         chmod 400 ~/.ssh/id_ecdsa
         scp -o StrictHostKeyChecking=accept-new ${{ inputs.package-file-name }} root@${{ inputs.deploy-host }}:
-        ssh -t root@${{ vars.DEPLOY_HOST }} "apt-get install -y ~/${{ inputs.package-file-name }}"
-        ssh -t root@${{ vars.DEPLOY_HOST }} "systemctl daemon-reload"
-        ssh -t root@${{ vars.DEPLOY_HOST }} "systemctl restart climblive2"
-        ssh -t root@${{ vars.DEPLOY_HOST }} "systemctl reload nginx"
+        ssh -t root@${{ inputs.deploy-host }} "apt-get install -y ~/${{ inputs.package-file-name }}"
+        ssh -t root@${{ inputs.deploy-host }} "systemctl daemon-reload"
+        ssh -t root@${{ inputs.deploy-host }} "systemctl restart climblive2"
+        ssh -t root@${{ inputs.deploy-host }} "systemctl reload nginx"
