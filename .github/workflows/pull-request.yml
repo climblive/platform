@@ -122,6 +122,8 @@ jobs:
 
       - uses: ./.github/actions/package
         id: build-pkg
+        with:
+          deploy-host: ${{ vars.DEPLOY_HOST }}
 
       - uses: ./.github/actions/deploy
         with:

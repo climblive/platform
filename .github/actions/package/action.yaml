@@ -1,4 +1,8 @@
 name: "Package for Debian"
+inputs:
+  deploy-host:
+    description: "Deploy host"
+    required: true
 outputs:
   package-file-name:
     description: "Package file name"
@@ -31,6 +35,6 @@ runs:
         mv backend/climblive packageroot/usr/bin
         chmod +x packageroot/usr/bin/climblive
         sed -i "s/VERSION/${GITHUB_RUN_ID}/g" packageroot/DEBIAN/control
-        sed -i "s,labs.climblive.app,${{ vars.DEPLOY_HOST }},g" packageroot/etc/nginx/sites-available/labs.climblive.app
+        sed -i "s,labs.climblive.app,${{ inputs.deploy-host }},g" packageroot/etc/nginx/sites-available/labs.climblive.app
         dpkg-deb -b packageroot .
         echo "package-file-name=climblive_${GITHUB_RUN_ID}_amd64.deb" >> $GITHUB_OUTPUT
