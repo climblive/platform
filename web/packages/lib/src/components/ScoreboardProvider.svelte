@@ -1,6 +1,5 @@
 <script lang="ts">
   import { ApiClient } from "@climblive/lib";
-  import configData from "@climblive/lib/config.json";
   import {
     contenderPublicInfoUpdatedEventSchema,
     contenderScoreUpdatedEventSchema,
@@ -10,6 +9,7 @@
   import { writable, type Writable } from "svelte/store";
   import * as z from "zod";
   import type { Score } from "../models/score";
+  import { getApiUrl } from "../utils";
 
   interface Props {
     contestId: number;
@@ -54,7 +54,7 @@
 
   const setup = () => {
     eventSource = new EventSource(
-      `${configData.API_URL}/contests/${contestId}/events`,
+      `${getApiUrl()}/contests/${contestId}/events`,
     );
 
     setupEventHandlers(eventSource);

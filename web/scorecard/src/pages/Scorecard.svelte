@@ -8,7 +8,6 @@
     ResultList,
     ScoreboardProvider,
   } from "@climblive/lib/components";
-  import configData from "@climblive/lib/config.json";
   import { contenderScoreUpdatedEventSchema } from "@climblive/lib/models";
   import {
     getCompClassesQuery,
@@ -17,6 +16,7 @@
     getProblemsQuery,
     getTicksQuery,
   } from "@climblive/lib/queries";
+  import { getApiUrl } from "@climblive/lib/utils";
   import type { SlTabGroup, SlTabShowEvent } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
@@ -90,7 +90,7 @@
     }
 
     eventSource = new EventSource(
-      `${configData.API_URL}/contenders/${$session.contenderId}/events`,
+      `${getApiUrl()}/contenders/${$session.contenderId}/events`,
     );
 
     eventSource.addEventListener("CONTENDER_SCORE_UPDATED", (e) => {
