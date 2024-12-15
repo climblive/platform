@@ -112,7 +112,7 @@ jobs:
       - uses: ./.github/actions/build-backend
 
   deploy:
-    name: Deploy
+    name: Deploy to test environment
     runs-on: ubuntu-22.04
     environment: test
     needs: [build-web, build-backend]
@@ -123,13 +123,8 @@ jobs:
       - uses: ./.github/actions/package
         id: build-pkg
 
-      - shell: bash
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ecdsa
-          chmod 400 ~/.ssh/id_ecdsa
-          scp -o StrictHostKeyChecking=accept-new ${{ steps.build-pkg.outputs.package-file-name }} root@${{ vars.DEPLOY_HOST }}:
-          ssh -t root@${{ vars.DEPLOY_HOST }} "apt-get install -y ~/${{ steps.build-pkg.outputs.package-file-name }}"
-          ssh -t root@${{ vars.DEPLOY_HOST }} "systemctl daemon-reload"
-          ssh -t root@${{ vars.DEPLOY_HOST }} "systemctl restart climblive2"
-          ssh -t root@${{ vars.DEPLOY_HOST }} "systemctl reload nginx"
+      - uses: ./.github/actions/deploy
+        with:
+          package-file-name: ${{ steps.build-pkg.outputs.package-file-name }}
+          deploy-host: ${{ vars.DEPLOY_HOST }}
+          deploy-ssh-key: ${{ secrets.DEPLOY_SSH_KEY }}
