@@ -134,4 +134,3 @@ jobs:
         with:
           package-file-name: ${{ steps.build-pkg.outputs.package-file-name }}
           deploy-host: ${{ vars.DEPLOY_HOST }}
-          deploy-ssh-key: ${{ secrets.DEPLOY_SSH_KEY }}
