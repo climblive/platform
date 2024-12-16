@@ -129,7 +129,7 @@ jobs:
       - shell: bash
         run: |
           eval $(ssh-agent -s)
-          echo "${{ inputs.deploy-ssh-key }}" | ssh-add -
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" | ssh-add -
 
       - uses: ./.github/actions/deploy
         with:
