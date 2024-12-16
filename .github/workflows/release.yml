@@ -30,10 +30,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Remove first character from tag name
+        run: echo "${{ github.event.release.tag_name }}" | cut -c 2-
+        id: tag_name
+
       - uses: ./.github/actions/package
         id: build-pkg
         with:
           deploy-host: ${{ vars.DEPLOY_HOST }}
+          version: ${{ steps.tag_name.outputs.result }}
 
       - name: Upload assets to release
         uses: softprops/action-gh-release@v2
