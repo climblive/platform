@@ -1,0 +1,47 @@
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-web:
+    name: Build web
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/build-web
+
+  build-backend:
+    name: Build backend
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/build-backend
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-24.04
+    environment: production
+    needs: [build-web, build-backend]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/package
+        id: build-pkg
+        with:
+          deploy-host: ${{ vars.DEPLOY_HOST }}
+
+      - name: Upload assets to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.build-pkg.outputs.package-file-name }}
+
+      - uses: ./.github/actions/deploy
+        with:
+          package-file-name: ${{ steps.build-pkg.outputs.package-file-name }}
+          deploy-host: ${{ vars.DEPLOY_HOST }}
+          deploy-ssh-key: ${{ secrets.DEPLOY_SSH_KEY }}

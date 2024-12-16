@@ -3,7 +3,7 @@ on: pull_request
 jobs:
   check:
     name: Code check
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -29,7 +29,7 @@ jobs:
 
   build-web:
     name: Build web
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -73,7 +73,7 @@ jobs:
 
   lint-backend:
     name: Lint backend
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -90,7 +90,7 @@ jobs:
 
   test-backend:
     name: Test backend
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -104,7 +104,7 @@ jobs:
 
   build-backend:
     name: Build backend
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -112,8 +112,8 @@ jobs:
       - uses: ./.github/actions/build-backend
 
   deploy:
-    name: Deploy to test environment
-    runs-on: ubuntu-22.04
+    name: Deploy
+    runs-on: ubuntu-24.04
     environment: test
     needs: [build-web, build-backend]
 
