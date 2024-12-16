@@ -130,6 +130,7 @@ jobs:
         run: |
           eval $(ssh-agent -s)
           echo "${{ secrets.DEPLOY_SSH_KEY }}" | ssh-add -
+          ssh-add -L
 
       - uses: ./.github/actions/deploy
         with:
