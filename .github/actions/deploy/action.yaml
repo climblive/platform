@@ -6,17 +6,11 @@ inputs:
   deploy-host:
     description: "Deploy host"
     required: true
-  deploy-ssh-key:
-    description: "Deploy SSH key"
-    required: true
 runs:
   using: "composite"
   steps:
     - shell: bash
       run: |
-        mkdir -p ~/.ssh
-        echo "${{ inputs.deploy-ssh-key }}" > ~/.ssh/id_ecdsa
-        chmod 400 ~/.ssh/id_ecdsa
         scp -o StrictHostKeyChecking=accept-new ${{ inputs.package-file-name }} root@${{ inputs.deploy-host }}:
         ssh -t root@${{ inputs.deploy-host }} "apt-get install -y ~/${{ inputs.package-file-name }}"
         ssh -t root@${{ inputs.deploy-host }} "systemctl daemon-reload"

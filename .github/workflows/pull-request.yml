@@ -126,6 +126,10 @@ jobs:
           deploy-host: ${{ vars.DEPLOY_HOST }}
           version: ${GITHUB_RUN_ID}
 
+      - shell: bash
+        run: |
+          echo "${{ inputs.deploy-ssh-key }}" | ssh-add -
+
       - uses: ./.github/actions/deploy
         with:
           package-file-name: ${{ steps.build-pkg.outputs.package-file-name }}
