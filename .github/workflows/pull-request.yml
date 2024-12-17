@@ -127,15 +127,14 @@ jobs:
           version: ${GITHUB_RUN_ID}
 
       - shell: bash
+        id: start-agent
         run: |
-          eval $(ssh-agent -s) &
+          eval $(ssh-agent -s)
           echo "${{ secrets.DEPLOY_SSH_KEY }}" | ssh-add -
-
-      - shell: bash
-        run: |
-          ssh-add -L
+          echo $SSH_AUTH_SOCK
 
       - uses: ./.github/actions/deploy
         with:
           package-file-name: ${{ steps.build-pkg.outputs.package-file-name }}
           deploy-host: ${{ vars.DEPLOY_HOST }}
+          ssh-auth-sock: ${{ steps.start-agent.outputs.result }}
