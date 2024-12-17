@@ -31,21 +31,31 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Remove first character from tag name
-        run: echo "${{ github.event.release.tag_name }}" | cut -c 2-
+        run: |
+          TAG=$(echo "${{ github.event.release.tag_name }}" | cut -c 2-)
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
         id: tag_name
 
       - uses: ./.github/actions/package
         id: build-pkg
         with:
           deploy-host: ${{ vars.DEPLOY_HOST }}
-          version: ${{ steps.tag_name.outputs.result }}
+          version: ${{ steps.tag_name.outputs.tag }}
 
       - name: Upload assets to release
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ steps.build-pkg.outputs.package-file-name }}
 
+      - shell: bash
+        id: start-agent
+        run: |
+          eval $(ssh-agent -s)
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" | ssh-add -
+          echo "ssh-auth-sock=$SSH_AUTH_SOCK" >> $GITHUB_OUTPUT
+
       - uses: ./.github/actions/deploy
         with:
           package-file-name: ${{ steps.build-pkg.outputs.package-file-name }}
           deploy-host: ${{ vars.DEPLOY_HOST }}
+          ssh-auth-sock: ${{ steps.start-agent.outputs.ssh-auth-sock }}
