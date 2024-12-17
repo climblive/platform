@@ -131,10 +131,10 @@ jobs:
         run: |
           eval $(ssh-agent -s)
           echo "${{ secrets.DEPLOY_SSH_KEY }}" | ssh-add -
-          echo $SSH_AUTH_SOCK
+          echo "ssh-auth-sock=$SSH_AUTH_SOCK" >> $GITHUB_OUTPUT
 
       - uses: ./.github/actions/deploy
         with:
           package-file-name: ${{ steps.build-pkg.outputs.package-file-name }}
           deploy-host: ${{ vars.DEPLOY_HOST }}
-          ssh-auth-sock: ${{ steps.start-agent.outputs.result }}
+          ssh-auth-sock: ${{ steps.start-agent.outputs.ssh-auth-sock }}
