@@ -1,12 +1,12 @@
 import type { AxiosInstance, RawAxiosRequestHeaders } from "axios";
 import axios from "axios";
 import { z } from "zod";
-import configData from "../src/config.json";
 import { contestSchema, scoreboardEntrySchema } from "./models";
 import { compClassSchema } from "./models/compClass";
 import { contenderSchema, type Contender } from "./models/contender";
 import { problemSchema } from "./models/problem";
 import { tickSchema, type Tick } from "./models/tick";
+import { getApiUrl } from "./utils/config";
 
 interface ApiCredentialsProvider {
   getAuthHeaders(): RawAxiosRequestHeaders;
@@ -35,7 +35,7 @@ export class ApiClient {
 
   private constructor() {
     this.axiosInstance = axios.create({
-      baseURL: configData.API_URL,
+      baseURL: getApiUrl(),
       timeout: 10_000,
     });
   }

@@ -1,0 +1,43 @@
+name: "Package for Debian"
+inputs:
+  deploy-host:
+    description: "Deploy host"
+    required: true
+  version:
+    description: "Version"
+    required: true
+outputs:
+  package-file-name:
+    description: "Package file name"
+    value: ${{ steps.build-pkg.outputs.package-file-name }}
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/download-artifact@v4
+      with:
+        name: scorecard
+        path: scorecard
+
+    - uses: actions/download-artifact@v4
+      with:
+        name: scoreboard
+        path: scoreboard
+
+    - uses: actions/download-artifact@v4
+      with:
+        name: backend
+        path: backend
+
+    - shell: bash
+      id: build-pkg
+      run: |
+        mkdir -p packageroot/usr/share/climblive
+        mkdir -p packageroot/usr/bin
+        mv scorecard packageroot/usr/share/climblive/
+        mv scoreboard packageroot/usr/share/climblive/
+        mv backend/climblive packageroot/usr/bin
+        chmod +x packageroot/usr/bin/climblive
+        sed -i "s/VERSION/${{ inputs.version }}/g" packageroot/DEBIAN/control
+        sed -i "s,labs.climblive.app,${{ inputs.deploy-host }},g" packageroot/etc/nginx/sites-available/labs.climblive.app
+        dpkg-deb -b packageroot .
+        echo "package-file-name=climblive_${{ inputs.version }}_amd64.deb" >> $GITHUB_OUTPUT

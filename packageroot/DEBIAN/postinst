@@ -1,0 +1,5 @@
+#!/bin/bash
+
+id -u climblive &>/dev/null || adduser --system --no-create-home climblive
+
+chown -R climblive /usr/share/climblive

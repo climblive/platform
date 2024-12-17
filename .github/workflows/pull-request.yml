@@ -3,7 +3,7 @@ on: pull_request
 jobs:
   check:
     name: Code check
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -29,26 +29,12 @@ jobs:
 
   build-web:
     name: Build web
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        with:
-          package_json_file: web/package.json
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: web/package.json
-          cache: pnpm
-          cache-dependency-path: web/pnpm-lock.yaml
-
-      - run: pnpm install
-        working-directory: web
-
-      - run: pnpm --filter=* build
-        working-directory: web
+      - uses: ./.github/actions/build-web
 
   run-e2e-tests:
     name: Run E2E tests
@@ -87,7 +73,7 @@ jobs:
 
   lint-backend:
     name: Lint backend
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -104,7 +90,7 @@ jobs:
 
   test-backend:
     name: Test backend
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -118,14 +104,37 @@ jobs:
 
   build-backend:
     name: Build backend
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: "backend/go.mod"
+      - uses: ./.github/actions/build-backend
 
-      - run: go build cmd/api/main.go
-        working-directory: backend
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-24.04
+    environment: test
+    needs: [build-web, build-backend]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/package
+        id: build-pkg
+        with:
+          deploy-host: ${{ vars.DEPLOY_HOST }}
+          version: ${GITHUB_RUN_ID}
+
+      - shell: bash
+        id: start-agent
+        run: |
+          eval $(ssh-agent -s)
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" | ssh-add -
+          echo "ssh-auth-sock=$SSH_AUTH_SOCK" >> $GITHUB_OUTPUT
+
+      - uses: ./.github/actions/deploy
+        with:
+          package-file-name: ${{ steps.build-pkg.outputs.package-file-name }}
+          deploy-host: ${{ vars.DEPLOY_HOST }}
+          ssh-auth-sock: ${{ steps.start-agent.outputs.ssh-auth-sock }}

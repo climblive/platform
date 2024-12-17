@@ -1,0 +1,35 @@
+name: "Build web"
+runs:
+  using: "composite"
+  steps:
+    - uses: pnpm/action-setup@v4
+      with:
+        package_json_file: web/package.json
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version-file: web/package.json
+        cache: pnpm
+        cache-dependency-path: web/pnpm-lock.yaml
+
+    - run: pnpm install
+      shell: bash
+      working-directory: web
+
+    - run: |
+        sed -i "s,\"API_URL\":.*,\"API_URL\": \"\",g" web/packages/lib/src/config.json
+      shell: bash
+
+    - run: pnpm --filter=* build
+      shell: bash
+      working-directory: web
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: scorecard
+        path: web/scorecard/dist
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: scoreboard
+        path: web/scoreboard/dist
