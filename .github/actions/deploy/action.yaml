@@ -15,7 +15,6 @@ runs:
     - shell: bash
       run: |
         export SSH_AUTH_SOCK=${{ inputs.ssh-auth-sock }}
-        ssh-add -L
         scp -o StrictHostKeyChecking=accept-new ${{ inputs.package-file-name }} root@${{ inputs.deploy-host }}:
         ssh -t root@${{ inputs.deploy-host }} "apt-get install -y ~/${{ inputs.package-file-name }}"
         ssh -t root@${{ inputs.deploy-host }} "systemctl daemon-reload"
