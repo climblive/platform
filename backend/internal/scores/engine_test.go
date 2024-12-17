@@ -10,12 +10,13 @@ import (
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 func TestScoreEngine(t *testing.T) {
 	mockedContestID := domain.ContestID(1)
 
-	makeMocks := func(bufferCapacity int) (*eventBrokerMock, *rankerMock, *scoringRulesMock) {
+	makeMocks := func(bufferCapacity int) (*eventBrokerMock, *rankerMock, *scoringRulesMock, *events.Subscription) {
 		mockedEventBroker := new(eventBrokerMock)
 		mockedRanker := new(rankerMock)
 		mockedRules := new(scoringRulesMock)
@@ -42,11 +43,11 @@ func TestScoreEngine(t *testing.T) {
 
 		mockedEventBroker.On("Unsubscribe", subscriptionID).Return()
 
-		return mockedEventBroker, mockedRanker, mockedRules
+		return mockedEventBroker, mockedRanker, mockedRules, subscription
 	}
 
 	t.Run("StartAndStop", func(t *testing.T) {
-		mockedEventBroker, mockedRanker, mockedRules := makeMocks(0)
+		mockedEventBroker, mockedRanker, mockedRules, _ := makeMocks(0)
 		engine := scores.NewScoreEngine(mockedContestID, mockedEventBroker, mockedRules, mockedRanker)
 
 		ctx, cancel := context.WithCancel(context.Background())
@@ -56,6 +57,35 @@ func TestScoreEngine(t *testing.T) {
 		cancel()
 
 		wg.Wait()
+
+		mockedEventBroker.AssertExpectations(t)
+		mockedRanker.AssertExpectations(t)
+		mockedRules.AssertExpectations(t)
+	})
+
+	t.Run("SubscriptionUnexpectedlyClosed", func(t *testing.T) {
+		mockedEventBroker, mockedRanker, mockedRules, subscription := makeMocks(1)
+		engine := scores.NewScoreEngine(mockedContestID, mockedEventBroker, mockedRules, mockedRanker)
+
+		err := subscription.Post(domain.EventEnvelope{
+			Name: "CONTENDER_SCORE_UPDATED",
+			Data: domain.ContenderScoreUpdatedEvent{},
+		})
+		require.NoError(t, err)
+
+		err = subscription.Post(domain.EventEnvelope{
+			Name: "CONTENDER_ENTERED",
+			Data: domain.ContenderEnteredEvent{},
+		})
+		require.ErrorIs(t, err, events.ErrBufferFull)
+
+		wg := engine.Run(context.Background())
+
+		wg.Wait()
+
+		mockedEventBroker.AssertExpectations(t)
+		mockedRanker.AssertExpectations(t)
+		mockedRules.AssertExpectations(t)
 	})
 }
 
