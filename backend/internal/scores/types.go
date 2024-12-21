@@ -7,7 +7,6 @@ type Contender struct {
 	CompClassID         domain.CompClassID
 	Disqualified        bool
 	WithdrawnFromFinals bool
-	Ticks               map[domain.ProblemID]*Tick
 	Score               int
 }
 
@@ -29,6 +28,8 @@ type Tick struct {
 }
 
 func (t *Tick) Score(problem Problem) {
+	t.Points = 0
+
 	if t.Zone {
 		t.Points = problem.PointsZone
 	}
@@ -37,7 +38,7 @@ func (t *Tick) Score(problem Problem) {
 		t.Points = problem.PointsTop
 	}
 
-	if t.AttemptsTop == 1 {
+	if t.Top && t.AttemptsTop == 1 {
 		t.Points += problem.FlashBonus
 	}
 }

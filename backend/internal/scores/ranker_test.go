@@ -14,13 +14,13 @@ import (
 func TestBasicRanker(t *testing.T) {
 	ranker := scores.NewBasicRanker(5)
 
-	makeContenders := func(count int) []*scores.Contender {
-		contenders := make([]*scores.Contender, count)
+	makeContenders := func(count int) []scores.Contender {
+		contenders := make([]scores.Contender, count)
 
 		for n := range count {
 			contenderID := domain.ContenderID(n + 1)
 
-			contenders[n] = &scores.Contender{
+			contenders[n] = scores.Contender{
 				ID: contenderID,
 			}
 		}

@@ -126,7 +126,7 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) error {
 		}
 
 		handler := engineHandler{
-			engine:             NewScoreEngine(contest.ID, mngr.eventBroker, &HardestProblems{Number: contest.QualifyingProblems}, NewBasicRanker(contest.Finalists)),
+			engine:             NewScoreEngine(contest.ID, mngr.eventBroker, &HardestProblems{Number: contest.QualifyingProblems}, NewBasicRanker(contest.Finalists), NewMemoryStore()),
 			finalists:          contest.Finalists,
 			qualifyingProblems: contest.QualifyingProblems,
 		}

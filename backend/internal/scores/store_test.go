@@ -11,40 +11,40 @@ import (
 )
 
 func TestFilterByCompClass(t *testing.T) {
-	contenders := make(map[domain.ContenderID]*scores.Contender)
+	store := scores.NewMemoryStore()
 
-	contenders[1] = &scores.Contender{
+	store.SaveContender(scores.Contender{
 		ID:          1,
 		CompClassID: 1,
-	}
-	contenders[2] = &scores.Contender{
+	})
+	store.SaveContender(scores.Contender{
 		ID:          2,
 		CompClassID: 1,
-	}
-	contenders[3] = &scores.Contender{
+	})
+	store.SaveContender(scores.Contender{
 		ID:          3,
 		CompClassID: 2,
-	}
-	contenders[4] = &scores.Contender{
+	})
+	store.SaveContender(scores.Contender{
 		ID:          4,
 		CompClassID: 3,
-	}
-	contenders[5] = &scores.Contender{
+	})
+	store.SaveContender(scores.Contender{
 		ID:          5,
 		CompClassID: 1,
-	}
-	contenders[6] = &scores.Contender{
+	})
+	store.SaveContender(scores.Contender{
 		ID:          6,
 		CompClassID: 2,
-	}
-	contenders[7] = &scores.Contender{
+	})
+	store.SaveContender(scores.Contender{
 		ID:          7,
 		CompClassID: 1,
-	}
+	})
 
 	t.Run("CompClassOne", func(t *testing.T) {
 		var filteredContenders []domain.ContenderID
-		for contender := range slices.Values(slices.Collect(scores.FilterByCompClass(contenders, 1))) {
+		for contender := range slices.Values(slices.Collect(store.GetContendersByCompClass(1))) {
 			filteredContenders = append(filteredContenders, contender.ID)
 		}
 
@@ -53,7 +53,7 @@ func TestFilterByCompClass(t *testing.T) {
 
 	t.Run("CompClassTwo", func(t *testing.T) {
 		var filteredContenders []domain.ContenderID
-		for contender := range slices.Values(slices.Collect(scores.FilterByCompClass(contenders, 2))) {
+		for contender := range slices.Values(slices.Collect(store.GetContendersByCompClass(2))) {
 			filteredContenders = append(filteredContenders, contender.ID)
 		}
 
@@ -62,7 +62,7 @@ func TestFilterByCompClass(t *testing.T) {
 
 	t.Run("CompClassThree", func(t *testing.T) {
 		var filteredContenders []domain.ContenderID
-		for contender := range slices.Values(slices.Collect(scores.FilterByCompClass(contenders, 3))) {
+		for contender := range slices.Values(slices.Collect(store.GetContendersByCompClass(3))) {
 			filteredContenders = append(filteredContenders, contender.ID)
 		}
 
@@ -71,40 +71,40 @@ func TestFilterByCompClass(t *testing.T) {
 }
 
 func TestCompClasses(t *testing.T) {
-	contenders := make(map[domain.ContenderID]*scores.Contender)
+	store := scores.NewMemoryStore()
 
-	contenders[1] = &scores.Contender{
+	store.SaveContender(scores.Contender{
 		ID:          domain.ContenderID(rand.Int()),
 		CompClassID: 1,
-	}
-	contenders[2] = &scores.Contender{
+	})
+	store.SaveContender(scores.Contender{
 		ID:          domain.ContenderID(rand.Int()),
 		CompClassID: 1,
-	}
-	contenders[3] = &scores.Contender{
+	})
+	store.SaveContender(scores.Contender{
 		ID:          domain.ContenderID(rand.Int()),
 		CompClassID: 2,
-	}
-	contenders[4] = &scores.Contender{
+	})
+	store.SaveContender(scores.Contender{
 		ID:          domain.ContenderID(rand.Int()),
 		CompClassID: 3,
-	}
-	contenders[5] = &scores.Contender{
+	})
+	store.SaveContender(scores.Contender{
 		ID:          domain.ContenderID(rand.Int()),
 		CompClassID: 1,
-	}
-	contenders[6] = &scores.Contender{
+	})
+	store.SaveContender(scores.Contender{
 		ID:          domain.ContenderID(rand.Int()),
 		CompClassID: 2,
-	}
-	contenders[7] = &scores.Contender{
+	})
+	store.SaveContender(scores.Contender{
 		ID:          domain.ContenderID(rand.Int()),
 		CompClassID: 1,
-	}
+	})
 
 	var compClasses []domain.CompClassID
 
-	for compClassID := range scores.CompClasses(contenders) {
+	for _, compClassID := range store.GetCompClassIDs() {
 		compClasses = append(compClasses, compClassID)
 	}
 
