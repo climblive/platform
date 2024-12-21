@@ -14,6 +14,35 @@ func TestScoreTick(t *testing.T) {
 		FlashBonus: 10,
 	}
 
+	t.Run("NoAttempts", func(t *testing.T) {
+		previousPoints := 1_000
+
+		tick := scores.Tick{
+			Top:          false,
+			AttemptsTop:  0,
+			Zone:         false,
+			AttemptsZone: 0,
+			Points:       previousPoints,
+		}
+
+		tick.Score(problem)
+
+		assert.Equal(t, 0, tick.Points)
+	})
+
+	t.Run("SingleAttemptNoLuck", func(t *testing.T) {
+		tick := scores.Tick{
+			Top:          false,
+			AttemptsTop:  1,
+			Zone:         false,
+			AttemptsZone: 1,
+		}
+
+		tick.Score(problem)
+
+		assert.Equal(t, 0, tick.Points)
+	})
+
 	t.Run("Flash", func(t *testing.T) {
 		tick := scores.Tick{
 			Top:          true,

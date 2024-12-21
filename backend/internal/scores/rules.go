@@ -9,16 +9,16 @@ type HardestProblems struct {
 	Number int
 }
 
-func (r *HardestProblems) CalculateScore(tickPointValues iter.Seq[int]) int {
+func (r *HardestProblems) CalculateScore(points iter.Seq[int]) int {
 	score := 0
 
 	n := 0
-	for _, points := range slices.Backward(slices.Sorted(tickPointValues)) {
+	for _, p := range slices.Backward(slices.Sorted(points)) {
 		if n >= r.Number {
 			break
 		}
 
-		score += points
+		score += p
 		n++
 	}
 
