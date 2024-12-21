@@ -39,22 +39,6 @@ type EngineStore interface {
 	GetUnpublishedScores() []domain.Score
 }
 
-type EngineDriver interface {
-	ReplaceScoringRules(rules ScoringRules)
-	ReplaceRanker(ranker Ranker)
-	GetUpdatedScores() []domain.Score
-
-	HandleContenderEntered(event domain.ContenderEnteredEvent)
-	HandleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent)
-	HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent)
-	HandleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent)
-	HandleContenderDisqualified(event domain.ContenderDisqualifiedEvent)
-	HandleContenderRequalified(event domain.ContenderRequalifiedEvent)
-	HandleAscentRegistered(event domain.AscentRegisteredEvent)
-	HandleAscentDeregistered(event domain.AscentDeregisteredEvent)
-	HandleProblemAdded(event domain.ProblemAddedEvent)
-}
-
 type ScoreEngine struct {
 	logger      *slog.Logger
 	contestID   domain.ContestID
