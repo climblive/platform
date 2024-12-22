@@ -92,7 +92,9 @@ func TestBufferFull(t *testing.T) {
 
 	go func() {
 		for range bufferCapacity {
-			err := subscription.Post(domain.EventEnvelope{})
+			err := subscription.Post(domain.EventEnvelope{
+				Name: "TEST",
+			})
 			assert.NoError(t, err)
 		}
 
@@ -105,12 +107,17 @@ func TestBufferFull(t *testing.T) {
 
 	wg.Wait()
 
-	for range 2 {
+	for range 10 {
 		event, err := subscription.AwaitEvent(context.Background())
 
-		assert.Empty(t, event)
-		require.ErrorIs(t, err, events.ErrBufferFull)
+		assert.Equal(t, domain.EventEnvelope{Name: "TEST"}, event)
+		require.NoError(t, err)
 	}
+
+	event, err := subscription.AwaitEvent(context.Background())
+
+	assert.Empty(t, event)
+	require.ErrorIs(t, err, events.ErrBufferFull)
 }
 
 func TestAwaitCancelled(t *testing.T) {
@@ -194,25 +201,21 @@ func TestEventsChanBufferFull(t *testing.T) {
 
 	subscription := events.NewSubscription(domain.EventFilter{}, bufferCapacity)
 
-	err := subscription.Post(domain.EventEnvelope{})
+	err := subscription.Post(domain.EventEnvelope{Name: "TEST"})
 	assert.NoError(t, err)
 
-	err = subscription.Post(domain.EventEnvelope{})
+	err = subscription.Post(domain.EventEnvelope{Name: "TEST"})
 	assert.ErrorIs(t, err, events.ErrBufferFull)
 
 	events := subscription.EventsChan(ctx)
 
-ConsumeEvents:
-	for {
-		select {
-		case event, open := <-events:
-			assert.Empty(t, event)
-			assert.False(t, open)
-			break ConsumeEvents
-		case <-ctx.Done():
-			break ConsumeEvents
-		}
-	}
+	event, open := <-events
+	assert.Equal(t, domain.EventEnvelope{Name: "TEST"}, event)
+	assert.True(t, open)
+
+	event, open = <-events
+	assert.Empty(t, event)
+	assert.False(t, open)
 }
 
 func TestMatchFilter(t *testing.T) {
