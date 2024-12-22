@@ -3,12 +3,14 @@ package scores_test
 import (
 	"context"
 	"iter"
+	"slices"
 	"testing"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/events"
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
@@ -16,7 +18,16 @@ import (
 func TestScoreEngine(t *testing.T) {
 	mockedContestID := domain.ContestID(1)
 
-	makeMocks := func(bufferCapacity int) (*eventBrokerMock, *scoringRulesMock, *rankerMock, *engineStoreMock, *events.Subscription) {
+	type fixture struct {
+		broker       *eventBrokerMock
+		rules        *scoringRulesMock
+		ranker       *rankerMock
+		store        *engineStoreMock
+		subscription *events.Subscription
+		engine       *scores.ScoreEngine
+	}
+
+	makeFixture := func(bufferCapacity int) fixture {
 		mockedEventBroker := new(eventBrokerMock)
 		mockedRanker := new(rankerMock)
 		mockedRules := new(scoringRulesMock)
@@ -44,51 +55,101 @@ func TestScoreEngine(t *testing.T) {
 
 		mockedEventBroker.On("Unsubscribe", subscriptionID).Return()
 
-		return mockedEventBroker, mockedRules, mockedRanker, mockedStore, subscription
+		engine := scores.NewScoreEngine(mockedContestID, mockedEventBroker, mockedRules, mockedRanker, mockedStore)
+
+		return fixture{
+			broker:       mockedEventBroker,
+			rules:        mockedRules,
+			ranker:       mockedRanker,
+			store:        mockedStore,
+			subscription: subscription,
+			engine:       engine,
+		}
 	}
 
 	t.Run("StartAndStop", func(t *testing.T) {
-		mockedEventBroker, mockedRules, mockedRanker, mockedStore, _ := makeMocks(0)
-		engine := scores.NewScoreEngine(mockedContestID, mockedEventBroker, mockedRules, mockedRanker, mockedStore)
+		f := makeFixture(0)
 
 		ctx, cancel := context.WithCancel(context.Background())
 
-		wg := engine.Run(ctx)
+		wg := f.engine.Run(ctx)
 
 		cancel()
 
 		wg.Wait()
 
-		mockedEventBroker.AssertExpectations(t)
-		mockedRules.AssertExpectations(t)
-		mockedRanker.AssertExpectations(t)
-		mockedStore.AssertExpectations(t)
+		f.broker.AssertExpectations(t)
+		f.rules.AssertExpectations(t)
+		f.ranker.AssertExpectations(t)
+		f.store.AssertExpectations(t)
 	})
 
 	t.Run("SubscriptionUnexpectedlyClosed", func(t *testing.T) {
-		mockedEventBroker, mockedRules, mockedRanker, mockedStore, subscription := makeMocks(1)
-		engine := scores.NewScoreEngine(mockedContestID, mockedEventBroker, mockedRules, mockedRanker, mockedStore)
+		f := makeFixture(1)
 
-		err := subscription.Post(domain.EventEnvelope{
+		err := f.subscription.Post(domain.EventEnvelope{
 			Name: "CONTENDER_SCORE_UPDATED",
 			Data: domain.ContenderScoreUpdatedEvent{},
 		})
 		require.NoError(t, err)
 
-		err = subscription.Post(domain.EventEnvelope{
+		err = f.subscription.Post(domain.EventEnvelope{
 			Name: "CONTENDER_ENTERED",
 			Data: domain.ContenderEnteredEvent{},
 		})
 		require.ErrorIs(t, err, events.ErrBufferFull)
 
-		wg := engine.Run(context.Background())
+		wg := f.engine.Run(context.Background())
 
 		wg.Wait()
 
-		mockedEventBroker.AssertExpectations(t)
-		mockedRules.AssertExpectations(t)
-		mockedRanker.AssertExpectations(t)
-		mockedStore.AssertExpectations(t)
+		f.broker.AssertExpectations(t)
+		f.rules.AssertExpectations(t)
+		f.ranker.AssertExpectations(t)
+		f.store.AssertExpectations(t)
+	})
+
+	t.Run("ContenderEntered", func(t *testing.T) {
+		f := makeFixture(0)
+
+		f.store.On("SaveContender", scores.Contender{
+			ID:          1,
+			CompClassID: 1,
+		}).Return()
+
+		f.store.
+			On("GetContendersByCompClass", domain.CompClassID(1)).
+			Return(slices.Values([]scores.Contender{{ID: 1}, {ID: 2}, {ID: 3}}))
+
+		f.ranker.
+			On("RankContenders", mock.MatchedBy(func(contenders iter.Seq[scores.Contender]) bool {
+				return assert.ObjectsAreEqual(slices.Collect(contenders), []scores.Contender{{ID: 1}, {ID: 2}, {ID: 3}})
+			})).
+			Return([]domain.Score{{ContenderID: 1, Score: 100}, {ContenderID: 2, Score: 200}, {ContenderID: 3, Score: 300}})
+
+		f.store.On("SaveScore", domain.Score{ContenderID: 1, Score: 100}).Return()
+		f.store.On("SaveScore", domain.Score{ContenderID: 2, Score: 200}).Return()
+		f.store.On("SaveScore", domain.Score{ContenderID: 3, Score: 300}).Return()
+
+		err := f.subscription.Post(domain.EventEnvelope{
+			Name: "CONTENDER_ENTERED",
+			Data: domain.ContenderEnteredEvent{
+				ContenderID: 1,
+				CompClassID: 1,
+			},
+		})
+		require.NoError(t, err)
+
+		wg := f.engine.Run(context.Background())
+
+		f.subscription.Terminate()
+
+		wg.Wait()
+
+		f.broker.AssertExpectations(t)
+		f.rules.AssertExpectations(t)
+		f.ranker.AssertExpectations(t)
+		f.store.AssertExpectations(t)
 	})
 }
 
