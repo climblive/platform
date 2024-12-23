@@ -10,6 +10,7 @@ import (
 )
 
 var ErrBufferFull = errors.New("buffer full")
+var ErrTerminated = errors.New("terminated")
 
 type Subscription struct {
 	ID             domain.SubscriptionID
@@ -63,13 +64,13 @@ func (s *Subscription) AwaitEvent(ctx context.Context) (domain.EventEnvelope, er
 			return domain.EventEnvelope{}, ctx.Err()
 		}
 
-		if s.closeReason != nil {
-			return domain.EventEnvelope{}, s.closeReason
-		}
-
 		event, ok := s.popQueueUnsafe()
 		if ok {
 			return event, nil
+		}
+
+		if s.closeReason != nil {
+			return domain.EventEnvelope{}, s.closeReason
 		}
 
 		stop := context.AfterFunc(ctx, func() {
@@ -93,6 +94,15 @@ func (s *Subscription) popQueueUnsafe() (domain.EventEnvelope, bool) {
 	}
 
 	return domain.EventEnvelope{}, false
+}
+
+func (s *Subscription) Terminate() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.closeReason = ErrTerminated
+
+	s.cond.Broadcast()
 }
 
 func (s *Subscription) Post(event domain.EventEnvelope) error {

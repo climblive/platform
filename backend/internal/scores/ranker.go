@@ -18,11 +18,11 @@ func NewBasicRanker(numberOfFinalists int) *BasicRanker {
 	}
 }
 
-func (r *BasicRanker) RankContenders(contenders iter.Seq[*Contender]) []domain.Score {
+func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Score {
 	var scores []domain.Score
 
-	comparator := func(c1, c2 *Contender) int {
-		return c1.Compare(*c2)
+	comparator := func(c1, c2 Contender) int {
+		return c1.Compare(c2)
 	}
 
 	var previousContender *Contender
@@ -69,7 +69,7 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[*Contender]) []domain.S
 		}
 
 		scores = append(scores, score)
-		previousContender = contender
+		previousContender = &contender
 	}
 
 	return scores
