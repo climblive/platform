@@ -287,15 +287,16 @@ func TestScoreEngine(t *testing.T) {
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
 			Return(scores.Contender{
-				ID:          1,
-				CompClassID: 1,
-				Score:       123,
+				ID:           1,
+				CompClassID:  1,
+				Disqualified: true,
+				Score:        123,
 			}, true)
 
 		f.store.On("SaveContender", scores.Contender{
 			ID:                  1,
 			CompClassID:         1,
-			Disqualified:        false,
+			Disqualified:        true,
 			WithdrawnFromFinals: true,
 			Score:               123,
 		}).Return()
@@ -360,6 +361,7 @@ func TestScoreEngine(t *testing.T) {
 			Return(scores.Contender{
 				ID:                  1,
 				CompClassID:         1,
+				Disqualified:        true,
 				WithdrawnFromFinals: true,
 				Score:               123,
 			}, true)
@@ -367,6 +369,7 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveContender", scores.Contender{
 			ID:                  1,
 			CompClassID:         1,
+			Disqualified:        true,
 			WithdrawnFromFinals: false,
 			Score:               123,
 		}).Return()
@@ -385,6 +388,159 @@ func TestScoreEngine(t *testing.T) {
 		err := f.subscription.Post(domain.EventEnvelope{
 			Name: "CONTENDER_REENTERED_FINALS",
 			Data: domain.ContenderReenteredFinalsEvent{
+				ContenderID: 1,
+			},
+		})
+		require.NoError(t, err)
+
+		wg := f.engine.Run(context.Background())
+
+		f.subscription.Terminate()
+
+		wg.Wait()
+
+		awaitExpectations(t)
+	})
+
+	t.Run("ContenderDisqualified_ContenderNotFound", func(t *testing.T) {
+		f, awaitExpectations := makeFixture(0)
+
+		f.store.
+			On("GetContender", domain.ContenderID(1)).
+			Return(scores.Contender{}, false)
+
+		err := f.subscription.Post(domain.EventEnvelope{
+			Name: "CONTENDER_DISQUALIFIED",
+			Data: domain.ContenderDisqualifiedEvent{
+				ContenderID: 1,
+			},
+		})
+		require.NoError(t, err)
+
+		wg := f.engine.Run(context.Background())
+
+		f.subscription.Terminate()
+
+		wg.Wait()
+
+		awaitExpectations(t)
+	})
+
+	t.Run("ContenderDisqualified", func(t *testing.T) {
+		f, awaitExpectations := makeFixture(0)
+
+		f.store.
+			On("GetContender", domain.ContenderID(1)).
+			Return(scores.Contender{
+				ID:                  1,
+				CompClassID:         1,
+				WithdrawnFromFinals: true,
+				Score:               123,
+			}, true)
+
+		f.store.On("SaveContender", scores.Contender{
+			ID:                  1,
+			CompClassID:         1,
+			Disqualified:        true,
+			WithdrawnFromFinals: true,
+			Score:               0,
+		}).Return()
+
+		f.store.
+			On("GetContendersByCompClass", domain.CompClassID(1)).
+			Return(slices.Values([]scores.Contender{{ID: 1}, {ID: 2}}))
+
+		f.ranker.
+			On("RankContenders", iterMatcher([]scores.Contender{{ID: 1}, {ID: 2}})).
+			Return([]domain.Score{{ContenderID: 1, Placement: 1}, {ContenderID: 2, Placement: 2}})
+
+		f.store.On("SaveScore", domain.Score{ContenderID: 1, Placement: 1}).Return()
+		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
+
+		err := f.subscription.Post(domain.EventEnvelope{
+			Name: "CONTENDER_DISQUALIFIED",
+			Data: domain.ContenderDisqualifiedEvent{
+				ContenderID: 1,
+			},
+		})
+		require.NoError(t, err)
+
+		wg := f.engine.Run(context.Background())
+
+		f.subscription.Terminate()
+
+		wg.Wait()
+
+		awaitExpectations(t)
+	})
+
+	t.Run("ContenderRequalified_ContenderNotFound", func(t *testing.T) {
+		f, awaitExpectations := makeFixture(0)
+
+		f.store.
+			On("GetContender", domain.ContenderID(1)).
+			Return(scores.Contender{}, false)
+
+		err := f.subscription.Post(domain.EventEnvelope{
+			Name: "CONTENDER_REQUALIFIED",
+			Data: domain.ContenderRequalifiedEvent{
+				ContenderID: 1,
+			},
+		})
+		require.NoError(t, err)
+
+		wg := f.engine.Run(context.Background())
+
+		f.subscription.Terminate()
+
+		wg.Wait()
+
+		awaitExpectations(t)
+	})
+
+	t.Run("ContenderRequalified", func(t *testing.T) {
+		f, awaitExpectations := makeFixture(0)
+
+		f.store.
+			On("GetContender", domain.ContenderID(1)).
+			Return(scores.Contender{
+				ID:                  1,
+				CompClassID:         1,
+				Disqualified:        true,
+				WithdrawnFromFinals: true,
+				Score:               0,
+			}, true)
+
+		f.store.
+			On("GetTicks", domain.ContenderID(1)).
+			Return(slices.Values([]scores.Tick{{Points: 100}, {Points: 200}, {Points: 300}}))
+
+		f.rules.
+			On("CalculateScore", iterMatcher([]int{100, 200, 300})).
+			Return(123)
+
+		f.store.On("SaveContender", scores.Contender{
+			ID:                  1,
+			CompClassID:         1,
+			Disqualified:        false,
+			WithdrawnFromFinals: true,
+			Score:               123,
+		}).Return()
+
+		f.store.
+			On("GetContendersByCompClass", domain.CompClassID(1)).
+			Return(slices.Values([]scores.Contender{{ID: 1}, {ID: 2}}))
+
+		f.ranker.
+			On("RankContenders", iterMatcher([]scores.Contender{{ID: 1}, {ID: 2}})).
+			Return([]domain.Score{{ContenderID: 1, Placement: 1}, {ContenderID: 2, Placement: 2}})
+
+		f.store.On("SaveScore", domain.Score{ContenderID: 1, Placement: 1}).Return()
+		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
+
+		err := f.subscription.Post(domain.EventEnvelope{
+			Name: "CONTENDER_REQUALIFIED",
+			Data: domain.ContenderRequalifiedEvent{
 				ContenderID: 1,
 			},
 		})
