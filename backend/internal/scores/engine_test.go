@@ -157,7 +157,35 @@ func TestScoreEngine(t *testing.T) {
 
 		wg := f.engine.Run(context.Background())
 
-		f.engine.SetScoringRules(&jackpot{})
+		f.engine.SetScoringRules(&jackpotRules{})
+
+		f.subscription.Terminate()
+
+		wg.Wait()
+
+		awaitExpectations(t)
+	})
+
+	t.Run("SetRanker", func(t *testing.T) {
+		f, awaitExpectations := makeFixture(0)
+
+		f.store.On("GetCompClassIDs").Return([]domain.CompClassID{1, 2, 3})
+
+		f.store.
+			On("GetContendersByCompClass", domain.CompClassID(1)).
+			Return(slices.Values([]scores.Contender{{ID: 1}})).
+			On("GetContendersByCompClass", domain.CompClassID(2)).
+			Return(slices.Values([]scores.Contender{{ID: 2}})).
+			On("GetContendersByCompClass", domain.CompClassID(3)).
+			Return(slices.Values([]scores.Contender{{ID: 3}}))
+
+		f.store.On("SaveScore", domain.Score{ContenderID: 1, Placement: 1_000}).Return()
+		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 1_000}).Return()
+		f.store.On("SaveScore", domain.Score{ContenderID: 3, Placement: 1_000}).Return()
+
+		wg := f.engine.Run(context.Background())
+
+		f.engine.SetRanker(&fakeRanker{})
 
 		f.subscription.Terminate()
 
@@ -1041,8 +1069,23 @@ func (m *engineStoreMock) GetUnpublishedScores() []domain.Score {
 	return args.Get(0).([]domain.Score)
 }
 
-type jackpot struct{}
+type jackpotRules struct{}
 
-func (m *jackpot) CalculateScore(points iter.Seq[int]) int {
+func (m *jackpotRules) CalculateScore(points iter.Seq[int]) int {
 	return len(slices.Collect(points)) * 1_000_000
+}
+
+type fakeRanker struct{}
+
+func (r *fakeRanker) RankContenders(contenders iter.Seq[scores.Contender]) []domain.Score {
+	var scores []domain.Score
+
+	for contender := range contenders {
+		scores = append(scores, domain.Score{
+			ContenderID: contender.ID,
+			Placement:   1_000,
+		})
+	}
+
+	return scores
 }
