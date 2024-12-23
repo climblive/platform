@@ -1,6 +1,7 @@
 package scores_test
 
 import (
+	"context"
 	"math/rand"
 	"testing"
 	"time"
@@ -80,4 +81,10 @@ func TestHydrate(t *testing.T) {
 		Zone:         true,
 		AttemptsZone: 1,
 	}).Return()
+
+	hydrator := &scores.StandardEngineStoreHydrator{Repo: mockedRepo}
+	hydrator.Hydrate(context.Background(), mockedContestID, mockedStore)
+
+	mockedRepo.AssertExpectations(t)
+	mockedStore.AssertExpectations(t)
 }
