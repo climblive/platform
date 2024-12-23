@@ -9,6 +9,7 @@ import (
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 func TestHydrate(t *testing.T) {
@@ -83,7 +84,9 @@ func TestHydrate(t *testing.T) {
 	}).Return()
 
 	hydrator := &scores.StandardEngineStoreHydrator{Repo: mockedRepo}
-	hydrator.Hydrate(context.Background(), mockedContestID, mockedStore)
+	err := hydrator.Hydrate(context.Background(), mockedContestID, mockedStore)
+
+	require.NoError(t, err)
 
 	mockedRepo.AssertExpectations(t)
 	mockedStore.AssertExpectations(t)
