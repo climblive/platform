@@ -5,6 +5,7 @@ import (
 	"iter"
 	"slices"
 	"testing"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/events"
@@ -979,6 +980,111 @@ func TestScoreEngine(t *testing.T) {
 		wg := f.engine.Run(context.Background())
 
 		f.subscription.Terminate()
+
+		wg.Wait()
+
+		awaitExpectations(t)
+	})
+
+	t.Run("PublishUpdatedScores", func(t *testing.T) {
+		f, awaitExpectations := makeFixture(0)
+
+		now := time.Now()
+
+		f.store.
+			On("GetUnpublishedScores").
+			Return([]domain.Score{
+				{
+					ContenderID: 1,
+					Timestamp:   now,
+					Score:       100,
+					Placement:   1,
+					RankOrder:   0,
+					Finalist:    true,
+				},
+				{
+					ContenderID: 2,
+					Timestamp:   now,
+					Score:       200,
+					Placement:   2,
+					RankOrder:   1,
+					Finalist:    true,
+				},
+				{
+					ContenderID: 3,
+					Timestamp:   now,
+					Score:       300,
+					Placement:   3,
+					RankOrder:   2,
+					Finalist:    false,
+				},
+			})
+
+		f.broker.
+			On("Dispatch", domain.ContestID(1),
+				domain.ContenderScoreUpdatedEvent{
+					ContenderID: 1,
+					Timestamp:   now,
+					Score:       100,
+					Placement:   1,
+					RankOrder:   0,
+					Finalist:    true,
+				},
+			).Return().
+			On("Dispatch", domain.ContestID(1),
+				domain.ContenderScoreUpdatedEvent{
+					ContenderID: 2,
+					Timestamp:   now,
+					Score:       200,
+					Placement:   2,
+					RankOrder:   1,
+					Finalist:    true,
+				},
+			).Return().
+			On("Dispatch", domain.ContestID(1),
+				domain.ContenderScoreUpdatedEvent{
+					ContenderID: 3,
+					Timestamp:   now,
+					Score:       300,
+					Placement:   3,
+					RankOrder:   2,
+					Finalist:    false,
+				},
+			).Return().
+			On("Dispatch", domain.ContestID(1),
+				[]domain.ContenderScoreUpdatedEvent{
+					{
+						ContenderID: 1,
+						Timestamp:   now,
+						Score:       100,
+						Placement:   1,
+						RankOrder:   0,
+						Finalist:    true,
+					},
+					{
+						ContenderID: 2,
+						Timestamp:   now,
+						Score:       200,
+						Placement:   2,
+						RankOrder:   1,
+						Finalist:    true,
+					},
+					{
+						ContenderID: 3,
+						Timestamp:   now,
+						Score:       300,
+						Placement:   3,
+						RankOrder:   2,
+						Finalist:    false,
+					},
+				},
+			).Return()
+
+		ctx, cancel := context.WithCancel(context.Background())
+
+		wg := f.engine.Run(ctx)
+
+		cancel()
 
 		wg.Wait()
 

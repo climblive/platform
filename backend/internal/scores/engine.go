@@ -109,6 +109,8 @@ func (e *ScoreEngine) run(ctx context.Context, filter domain.EventFilter, wg *sy
 
 	defer wg.Done()
 
+	defer e.publishUpdatedScores()
+
 	defer func() {
 		close(e.sideQuests)
 
