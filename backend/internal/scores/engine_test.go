@@ -110,6 +110,62 @@ func TestScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
+	t.Run("SetScoringRules", func(t *testing.T) {
+		f, awaitExpectations := makeFixture(0)
+
+		f.store.On("GetAllContenders").
+			Return(slices.Values([]scores.Contender{
+				{ID: 1, CompClassID: 1},
+				{ID: 2, CompClassID: 2},
+				{ID: 3, CompClassID: 3},
+			}))
+
+		f.store.
+			On("GetTicks", domain.ContenderID(1)).
+			Return(slices.Values([]scores.Tick{{Points: 100}, {Points: 200}, {Points: 300}})).
+			On("GetTicks", domain.ContenderID(2)).
+			Return(slices.Values([]scores.Tick{{Points: 400}, {Points: 500}})).
+			On("GetTicks", domain.ContenderID(3)).
+			Return(slices.Values([]scores.Tick{{Points: 600}}))
+
+		f.store.
+			On("SaveContender", scores.Contender{ID: 1, CompClassID: 1, Score: 3_000_000}).Return().
+			On("SaveContender", scores.Contender{ID: 2, CompClassID: 2, Score: 2_000_000}).Return().
+			On("SaveContender", scores.Contender{ID: 3, CompClassID: 3, Score: 1_000_000}).Return()
+
+		f.store.On("GetCompClassIDs").Return([]domain.CompClassID{1, 2, 3})
+
+		f.store.
+			On("GetContendersByCompClass", domain.CompClassID(1)).
+			Return(slices.Values([]scores.Contender{{ID: 1}})).
+			On("GetContendersByCompClass", domain.CompClassID(2)).
+			Return(slices.Values([]scores.Contender{{ID: 2}})).
+			On("GetContendersByCompClass", domain.CompClassID(3)).
+			Return(slices.Values([]scores.Contender{{ID: 3}}))
+
+		f.ranker.
+			On("RankContenders", iterMatcher([]scores.Contender{{ID: 1}})).
+			Return([]domain.Score{{ContenderID: 1, Placement: 1}}).
+			On("RankContenders", iterMatcher([]scores.Contender{{ID: 2}})).
+			Return([]domain.Score{{ContenderID: 2, Placement: 2}}).
+			On("RankContenders", iterMatcher([]scores.Contender{{ID: 3}})).
+			Return([]domain.Score{{ContenderID: 3, Placement: 3}})
+
+		f.store.On("SaveScore", domain.Score{ContenderID: 1, Placement: 1}).Return()
+		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
+		f.store.On("SaveScore", domain.Score{ContenderID: 3, Placement: 3}).Return()
+
+		wg := f.engine.Run(context.Background())
+
+		f.engine.SetScoringRules(&jackpot{})
+
+		f.subscription.Terminate()
+
+		wg.Wait()
+
+		awaitExpectations(t)
+	})
+
 	t.Run("ContenderEntered", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
@@ -921,8 +977,8 @@ type scoringRulesMock struct {
 	mock.Mock
 }
 
-func (m *scoringRulesMock) CalculateScore(tickPointValues iter.Seq[int]) int {
-	args := m.Called(tickPointValues)
+func (m *scoringRulesMock) CalculateScore(points iter.Seq[int]) int {
+	args := m.Called(points)
 	return args.Get(0).(int)
 }
 
@@ -983,4 +1039,10 @@ func (m *engineStoreMock) SaveScore(score domain.Score) {
 func (m *engineStoreMock) GetUnpublishedScores() []domain.Score {
 	args := m.Called()
 	return args.Get(0).([]domain.Score)
+}
+
+type jackpot struct{}
+
+func (m *jackpot) CalculateScore(points iter.Seq[int]) int {
+	return len(slices.Collect(points)) * 1_000_000
 }
