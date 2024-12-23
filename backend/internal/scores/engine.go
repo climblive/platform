@@ -356,10 +356,6 @@ func (e *ScoreEngine) handleProblemAdded(event domain.ProblemAddedEvent) {
 	e.store.SaveProblem(problem)
 }
 
-func (e *ScoreEngine) GetUpdatedScores() []domain.Score {
-	return e.store.GetUnpublishedScores()
-}
-
 func (e *ScoreEngine) rankCompClasses(compClassIDs ...domain.CompClassID) {
 	for _, compClassID := range compClassIDs {
 		scores := e.ranker.RankContenders(e.store.GetContendersByCompClass(compClassID))
