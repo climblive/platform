@@ -1182,7 +1182,7 @@ func (m *engineStoreMock) GetAllContenders() iter.Seq[scores.Contender] {
 	return args.Get(0).(iter.Seq[scores.Contender])
 }
 
-func (m *engineStoreMock) SaveContender(score scores.Contender) {
+func (m *engineStoreMock) SaveContender(contender scores.Contender) {
 	m.Called(score)
 }
 
