@@ -90,7 +90,6 @@ func (e *ScoreEngine) Run(ctx context.Context) *sync.WaitGroup {
 		"ASCENT_REGISTERED",
 		"ASCENT_DEREGISTERED",
 		"PROBLEM_ADDED",
-		"PROBLEM_UPDATED",
 	)
 
 	go e.run(ctx, filter, wg, ready)
