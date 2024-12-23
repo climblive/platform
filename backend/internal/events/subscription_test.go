@@ -102,7 +102,6 @@ func TestBufferFull(t *testing.T) {
 		assert.ErrorIs(t, err, events.ErrBufferFull)
 
 		wg.Done()
-
 	}()
 
 	wg.Wait()
@@ -118,6 +117,27 @@ func TestBufferFull(t *testing.T) {
 
 	assert.Empty(t, event)
 	require.ErrorIs(t, err, events.ErrBufferFull)
+}
+
+func TestTerminate(t *testing.T) {
+	subscription := events.NewSubscription(domain.EventFilter{}, 0)
+
+	err := subscription.Post(domain.EventEnvelope{
+		Name: "TEST",
+	})
+	assert.NoError(t, err)
+
+	subscription.Terminate()
+
+	event, err := subscription.AwaitEvent(context.Background())
+
+	assert.Equal(t, domain.EventEnvelope{Name: "TEST"}, event)
+	require.NoError(t, err)
+
+	event, err = subscription.AwaitEvent(context.Background())
+
+	assert.Empty(t, event)
+	require.ErrorIs(t, err, events.ErrTerminated)
 }
 
 func TestAwaitCancelled(t *testing.T) {
