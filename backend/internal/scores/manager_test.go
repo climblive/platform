@@ -16,7 +16,7 @@ import (
 func TestScoreEngineManager(t *testing.T) {
 	t.Run("StartAndStop", func(t *testing.T) {
 		mockedRepo := new(repositoryMock)
-		mockedStoreHydrator := new(hydratorMock)
+		mockedStoreHydrator := new(engineStoreHydratorMock)
 		mockedEventBroker := new(eventBrokerMock)
 
 		mockedRepo.
@@ -37,7 +37,7 @@ func TestScoreEngineManager(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 
 		mockedRepo := new(repositoryMock)
-		mockedStoreHydrator := new(hydratorMock)
+		mockedStoreHydrator := new(engineStoreHydratorMock)
 		mockedEventBroker := new(eventBrokerMock)
 
 		mockedSubscriptionID := domain.SubscriptionID(uuid.New())
@@ -131,11 +131,11 @@ func (m *eventBrokerMock) Unsubscribe(subscriptionID domain.SubscriptionID) {
 	m.Called(subscriptionID)
 }
 
-type hydratorMock struct {
+type engineStoreHydratorMock struct {
 	mock.Mock
 }
 
-func (m *hydratorMock) Hydrate(ctx context.Context, contestID domain.ContestID, store scores.EngineStore) error {
+func (m *engineStoreHydratorMock) Hydrate(ctx context.Context, contestID domain.ContestID, store scores.EngineStore) error {
 	args := m.Called(ctx, contestID, store)
 	return args.Error(0)
 }

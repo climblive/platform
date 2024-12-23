@@ -14,7 +14,7 @@ import (
 
 const pollInterval = 10 * time.Second
 
-type EngineHydrator interface {
+type EngineStoreHydrator interface {
 	Hydrate(ctx context.Context, contestID domain.ContestID, store EngineStore) error
 }
 
@@ -24,7 +24,7 @@ type scoreEngineManagerRepository interface {
 
 type ScoreEngineManager struct {
 	repo                scoreEngineManagerRepository
-	engineStoreHydrator EngineHydrator
+	engineStoreHydrator EngineStoreHydrator
 	eventBroker         domain.EventBroker
 	handlers            map[domain.ContestID]*engineHandler
 }
@@ -37,7 +37,7 @@ type engineHandler struct {
 	qualifyingProblems int
 }
 
-func NewScoreEngineManager(repo scoreEngineManagerRepository, engineStoreHydrator EngineHydrator, eventBroker domain.EventBroker) ScoreEngineManager {
+func NewScoreEngineManager(repo scoreEngineManagerRepository, engineStoreHydrator EngineStoreHydrator, eventBroker domain.EventBroker) ScoreEngineManager {
 	return ScoreEngineManager{
 		repo:                repo,
 		engineStoreHydrator: engineStoreHydrator,

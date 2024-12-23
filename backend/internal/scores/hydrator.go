@@ -8,17 +8,17 @@ import (
 	"github.com/go-errors/errors"
 )
 
-type standardEngineHydratorRepository interface {
+type standardEngineStoreHydratorRepository interface {
 	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error)
 	GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Problem, error)
 	GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error)
 }
 
-type StandardEngineHydrator struct {
-	Repo standardEngineHydratorRepository
+type StandardEngineStoreHydrator struct {
+	Repo standardEngineStoreHydratorRepository
 }
 
-func (h *StandardEngineHydrator) Hydrate(ctx context.Context, contestID domain.ContestID, store EngineStore) error {
+func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID domain.ContestID, store EngineStore) error {
 	problems, err := h.Repo.GetProblemsByContest(ctx, nil, contestID)
 	if err != nil {
 		return errors.Wrap(err, 0)
