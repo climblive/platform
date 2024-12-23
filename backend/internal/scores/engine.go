@@ -317,8 +317,10 @@ func (e *ScoreEngine) HandleAscentRegistered(event domain.AscentRegisteredEvent)
 	tick.Score(problem)
 	e.store.SaveTick(event.ContenderID, tick)
 
-	contender.Score = e.rules.CalculateScore(Points(e.store.GetTicks(contender.ID)))
-	e.store.SaveContender(contender)
+	if !contender.Disqualified {
+		contender.Score = e.rules.CalculateScore(Points(e.store.GetTicks(contender.ID)))
+		e.store.SaveContender(contender)
+	}
 
 	e.rankCompClasses(contender.CompClassID)
 }
@@ -331,7 +333,10 @@ func (e *ScoreEngine) HandleAscentDeregistered(event domain.AscentDeregisteredEv
 
 	e.store.DeleteTick(event.ContenderID, event.ProblemID)
 
-	contender.Score = e.rules.CalculateScore(Points(e.store.GetTicks(contender.ID)))
+	if !contender.Disqualified {
+		contender.Score = e.rules.CalculateScore(Points(e.store.GetTicks(contender.ID)))
+		e.store.SaveContender(contender)
+	}
 
 	e.rankCompClasses(contender.CompClassID)
 }

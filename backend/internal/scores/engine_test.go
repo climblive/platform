@@ -554,6 +554,38 @@ func TestScoreEngine(t *testing.T) {
 
 		awaitExpectations(t)
 	})
+
+	t.Run("ProblemAdded", func(t *testing.T) {
+		f, awaitExpectations := makeFixture(0)
+
+		f.store.
+			On("SaveProblem", scores.Problem{
+				ID:         1,
+				PointsTop:  100,
+				PointsZone: 50,
+				FlashBonus: 10,
+			}).
+			Return()
+
+		err := f.subscription.Post(domain.EventEnvelope{
+			Name: "PROBLEM_ADDED",
+			Data: domain.ProblemAddedEvent{
+				ProblemID:  1,
+				PointsTop:  100,
+				PointsZone: 50,
+				FlashBonus: 10,
+			},
+		})
+		require.NoError(t, err)
+
+		wg := f.engine.Run(context.Background())
+
+		f.subscription.Terminate()
+
+		wg.Wait()
+
+		awaitExpectations(t)
+	})
 }
 
 func iterMatcher[T comparable](expected []T) any {
