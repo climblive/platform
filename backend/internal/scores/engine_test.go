@@ -78,6 +78,8 @@ func TestScoreEngine(t *testing.T) {
 	t.Run("StartAndStop", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+
 		ctx, cancel := context.WithCancel(context.Background())
 
 		wg := f.engine.Run(ctx)
@@ -91,6 +93,8 @@ func TestScoreEngine(t *testing.T) {
 
 	t.Run("SubscriptionUnexpectedlyClosed", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(1)
+
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
 
 		err := f.subscription.Post(domain.EventEnvelope{
 			Name: "CONTENDER_SCORE_UPDATED",
@@ -113,6 +117,8 @@ func TestScoreEngine(t *testing.T) {
 
 	t.Run("SetScoringRules", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
+
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
 
 		f.store.On("GetAllContenders").
 			Return(slices.Values([]scores.Contender{
@@ -170,6 +176,8 @@ func TestScoreEngine(t *testing.T) {
 	t.Run("SetRanker", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+
 		f.store.On("GetCompClassIDs").Return([]domain.CompClassID{1, 2, 3})
 
 		f.store.
@@ -197,6 +205,8 @@ func TestScoreEngine(t *testing.T) {
 
 	t.Run("ContenderEntered", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
+
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
 
 		f.store.On("SaveContender", scores.Contender{
 			ID:          1,
@@ -236,6 +246,8 @@ func TestScoreEngine(t *testing.T) {
 	t.Run("ContenderSwitchedClass_ContenderNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
 			Return(scores.Contender{}, false)
@@ -260,6 +272,8 @@ func TestScoreEngine(t *testing.T) {
 
 	t.Run("ContenderSwitchedClass_SameClass", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
+
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -288,6 +302,8 @@ func TestScoreEngine(t *testing.T) {
 
 	t.Run("ContenderSwitchedClass", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
+
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
 
 		f.store.
 			On("GetContender", domain.ContenderID(4)).
@@ -345,6 +361,8 @@ func TestScoreEngine(t *testing.T) {
 	t.Run("ContenderWithdrewFromFinals_ContenderNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
 			Return(scores.Contender{}, false)
@@ -368,6 +386,8 @@ func TestScoreEngine(t *testing.T) {
 
 	t.Run("ContenderWithdrewFromFinals", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
+
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -417,6 +437,8 @@ func TestScoreEngine(t *testing.T) {
 	t.Run("ContenderReenteredFinals_ContenderNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
 			Return(scores.Contender{}, false)
@@ -440,6 +462,8 @@ func TestScoreEngine(t *testing.T) {
 
 	t.Run("ContenderReenteredFinals", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
+
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -490,6 +514,8 @@ func TestScoreEngine(t *testing.T) {
 	t.Run("ContenderDisqualified_ContenderNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
 			Return(scores.Contender{}, false)
@@ -513,6 +539,8 @@ func TestScoreEngine(t *testing.T) {
 
 	t.Run("ContenderDisqualified", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
+
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -562,6 +590,8 @@ func TestScoreEngine(t *testing.T) {
 	t.Run("ContenderRequalified_ContenderNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
 			Return(scores.Contender{}, false)
@@ -585,6 +615,8 @@ func TestScoreEngine(t *testing.T) {
 
 	t.Run("ContenderRequalified", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
+
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -643,6 +675,8 @@ func TestScoreEngine(t *testing.T) {
 	t.Run("ProblemAdded", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+
 		f.store.
 			On("SaveProblem", scores.Problem{
 				ID:         1,
@@ -675,6 +709,8 @@ func TestScoreEngine(t *testing.T) {
 	t.Run("AscentRegistered_ContenderNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
 			Return(scores.Contender{}, false)
@@ -703,6 +739,8 @@ func TestScoreEngine(t *testing.T) {
 
 	t.Run("AscentRegistered_ProblemNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
+
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -739,6 +777,8 @@ func TestScoreEngine(t *testing.T) {
 
 	t.Run("AscentRegistered_Disqualified", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
+
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -792,6 +832,8 @@ func TestScoreEngine(t *testing.T) {
 
 	t.Run("AscentRegistered", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
+
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -872,6 +914,8 @@ func TestScoreEngine(t *testing.T) {
 	t.Run("AscentDeregistered_ContenderNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
 			Return(scores.Contender{}, false)
@@ -896,6 +940,8 @@ func TestScoreEngine(t *testing.T) {
 
 	t.Run("AscentDeregistered_Disqualified", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
+
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -929,6 +975,8 @@ func TestScoreEngine(t *testing.T) {
 
 	t.Run("AscentDeregistered", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
+
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
