@@ -335,10 +335,12 @@ func (e *ScoreEngine) handleAscentDeregistered(event domain.AscentDeregisteredEv
 
 	e.store.DeleteTick(event.ContenderID, event.ProblemID)
 
-	if !contender.Disqualified {
-		contender.Score = e.rules.CalculateScore(Points(e.store.GetTicks(contender.ID)))
-		e.store.SaveContender(contender)
+	if contender.Disqualified {
+		return
 	}
+
+	contender.Score = e.rules.CalculateScore(Points(e.store.GetTicks(contender.ID)))
+	e.store.SaveContender(contender)
 
 	e.rankCompClasses(contender.CompClassID)
 }

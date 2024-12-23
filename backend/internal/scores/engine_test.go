@@ -652,6 +652,59 @@ func TestScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
+	t.Run("AscentRegistered_Disqualified", func(t *testing.T) {
+		f, awaitExpectations := makeFixture(0)
+
+		f.store.
+			On("GetContender", domain.ContenderID(1)).
+			Return(scores.Contender{
+				ID:           1,
+				CompClassID:  1,
+				Disqualified: true,
+			}, true)
+
+		f.store.
+			On("GetProblem", domain.ProblemID(1)).
+			Return(scores.Problem{
+				ID:         1,
+				PointsTop:  100,
+				PointsZone: 50,
+				FlashBonus: 10,
+			}, true)
+
+		f.store.
+			On("SaveTick", domain.ContenderID(1), scores.Tick{
+				ProblemID:    1,
+				Top:          true,
+				AttemptsTop:  5,
+				Zone:         true,
+				AttemptsZone: 2,
+				Points:       100,
+			}).
+			Return()
+
+		err := f.subscription.Post(domain.EventEnvelope{
+			Name: "ASCENT_REGISTERED",
+			Data: domain.AscentRegisteredEvent{
+				ContenderID:  1,
+				ProblemID:    1,
+				Top:          true,
+				AttemptsTop:  5,
+				Zone:         true,
+				AttemptsZone: 2,
+			},
+		})
+		require.NoError(t, err)
+
+		wg := f.engine.Run(context.Background())
+
+		f.subscription.Terminate()
+
+		wg.Wait()
+
+		awaitExpectations(t)
+	})
+
 	t.Run("AscentRegistered", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
@@ -718,6 +771,123 @@ func TestScoreEngine(t *testing.T) {
 				AttemptsTop:  5,
 				Zone:         true,
 				AttemptsZone: 2,
+			},
+		})
+		require.NoError(t, err)
+
+		wg := f.engine.Run(context.Background())
+
+		f.subscription.Terminate()
+
+		wg.Wait()
+
+		awaitExpectations(t)
+	})
+
+	t.Run("AscentDeregistered_ContenderNotFound", func(t *testing.T) {
+		f, awaitExpectations := makeFixture(0)
+
+		f.store.
+			On("GetContender", domain.ContenderID(1)).
+			Return(scores.Contender{}, false)
+
+		err := f.subscription.Post(domain.EventEnvelope{
+			Name: "ASCENT_DEREGISTERED",
+			Data: domain.AscentDeregisteredEvent{
+				ContenderID: 1,
+				ProblemID:   1,
+			},
+		})
+		require.NoError(t, err)
+
+		wg := f.engine.Run(context.Background())
+
+		f.subscription.Terminate()
+
+		wg.Wait()
+
+		awaitExpectations(t)
+	})
+
+	t.Run("AscentDeregistered_Disqualified", func(t *testing.T) {
+		f, awaitExpectations := makeFixture(0)
+
+		f.store.
+			On("GetContender", domain.ContenderID(1)).
+			Return(scores.Contender{
+				ID:           1,
+				CompClassID:  1,
+				Disqualified: true,
+			}, true)
+
+		f.store.
+			On("DeleteTick", domain.ContenderID(1), domain.ProblemID(1)).
+			Return()
+
+		err := f.subscription.Post(domain.EventEnvelope{
+			Name: "ASCENT_DEREGISTERED",
+			Data: domain.AscentDeregisteredEvent{
+				ContenderID: 1,
+				ProblemID:   1,
+			},
+		})
+		require.NoError(t, err)
+
+		wg := f.engine.Run(context.Background())
+
+		f.subscription.Terminate()
+
+		wg.Wait()
+
+		awaitExpectations(t)
+	})
+
+	t.Run("AscentDeregistered", func(t *testing.T) {
+		f, awaitExpectations := makeFixture(0)
+
+		f.store.
+			On("GetContender", domain.ContenderID(1)).
+			Return(scores.Contender{
+				ID:          1,
+				CompClassID: 1,
+			}, true)
+
+		f.store.
+			On("DeleteTick", domain.ContenderID(1), domain.ProblemID(1)).
+			Return()
+
+		f.store.
+			On("GetTicks", domain.ContenderID(1)).
+			Return(slices.Values([]scores.Tick{{Points: 100}, {Points: 200}, {Points: 300}}))
+
+		f.rules.
+			On("CalculateScore", iterMatcher([]int{100, 200, 300})).
+			Return(123)
+
+		f.store.
+			On("SaveContender", scores.Contender{
+				ID:          1,
+				CompClassID: 1,
+				Score:       123,
+			}).
+			Return()
+
+		f.store.
+			On("GetContendersByCompClass", domain.CompClassID(1)).
+			Return(slices.Values([]scores.Contender{{ID: 1}, {ID: 2}}))
+
+		f.ranker.
+			On("RankContenders", iterMatcher([]scores.Contender{{ID: 1}, {ID: 2}})).
+			Return([]domain.Score{{ContenderID: 1, Placement: 1}, {ContenderID: 2, Placement: 2}})
+
+		f.store.On("SaveScore", domain.Score{ContenderID: 1, Placement: 1}).Return()
+		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
+
+		err := f.subscription.Post(domain.EventEnvelope{
+			Name: "ASCENT_DEREGISTERED",
+			Data: domain.AscentDeregisteredEvent{
+				ContenderID: 1,
+				ProblemID:   1,
 			},
 		})
 		require.NoError(t, err)
