@@ -186,29 +186,29 @@ func (e *ScoreEngine) SetRanker(ranker Ranker) {
 func (e *ScoreEngine) handleEvent(event domain.EventEnvelope) {
 	switch ev := event.Data.(type) {
 	case domain.ContenderEnteredEvent:
-		e.HandleContenderEntered(ev)
+		e.handleContenderEntered(ev)
 	case domain.ContenderSwitchedClassEvent:
-		e.HandleContenderSwitchedClass(ev)
+		e.handleContenderSwitchedClass(ev)
 	case domain.ContenderWithdrewFromFinalsEvent:
-		e.HandleContenderWithdrewFromFinals(ev)
+		e.handleContenderWithdrewFromFinals(ev)
 	case domain.ContenderReenteredFinalsEvent:
-		e.HandleContenderReenteredFinals(ev)
+		e.handleContenderReenteredFinals(ev)
 	case domain.ContenderDisqualifiedEvent:
-		e.HandleContenderDisqualified(ev)
+		e.handleContenderDisqualified(ev)
 	case domain.ContenderRequalifiedEvent:
-		e.HandleContenderRequalified(ev)
+		e.handleContenderRequalified(ev)
 	case domain.AscentRegisteredEvent:
-		e.HandleAscentRegistered(ev)
+		e.handleAscentRegistered(ev)
 	case domain.AscentDeregisteredEvent:
-		e.HandleAscentDeregistered(ev)
+		e.handleAscentDeregistered(ev)
 	case domain.ProblemAddedEvent:
-		e.HandleProblemAdded(ev)
+		e.handleProblemAdded(ev)
 	case domain.ProblemUpdatedEvent:
 		e.logger.Warn("discarding unsupported event", "event", event)
 	}
 }
 
-func (e *ScoreEngine) HandleContenderEntered(event domain.ContenderEnteredEvent) {
+func (e *ScoreEngine) handleContenderEntered(event domain.ContenderEnteredEvent) {
 	contender := Contender{
 		ID:          event.ContenderID,
 		CompClassID: event.CompClassID,
@@ -219,7 +219,7 @@ func (e *ScoreEngine) HandleContenderEntered(event domain.ContenderEnteredEvent)
 	e.rankCompClasses(contender.CompClassID)
 }
 
-func (e *ScoreEngine) HandleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent) {
+func (e *ScoreEngine) handleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent) {
 	contender, found := e.store.GetContender(event.ContenderID)
 	if !found {
 		return
@@ -241,7 +241,7 @@ func (e *ScoreEngine) HandleContenderSwitchedClass(event domain.ContenderSwitche
 	e.rankCompClasses(compClassesToReRank...)
 }
 
-func (e *ScoreEngine) HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent) {
+func (e *ScoreEngine) handleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent) {
 	contender, found := e.store.GetContender(event.ContenderID)
 	if !found {
 		return
@@ -254,7 +254,7 @@ func (e *ScoreEngine) HandleContenderWithdrewFromFinals(event domain.ContenderWi
 	e.rankCompClasses(contender.CompClassID)
 }
 
-func (e *ScoreEngine) HandleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent) {
+func (e *ScoreEngine) handleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent) {
 	contender, found := e.store.GetContender(event.ContenderID)
 	if !found {
 		return
@@ -267,7 +267,7 @@ func (e *ScoreEngine) HandleContenderReenteredFinals(event domain.ContenderReent
 	e.rankCompClasses(contender.CompClassID)
 }
 
-func (e *ScoreEngine) HandleContenderDisqualified(event domain.ContenderDisqualifiedEvent) {
+func (e *ScoreEngine) handleContenderDisqualified(event domain.ContenderDisqualifiedEvent) {
 	contender, found := e.store.GetContender(event.ContenderID)
 	if !found {
 		return
@@ -281,7 +281,7 @@ func (e *ScoreEngine) HandleContenderDisqualified(event domain.ContenderDisquali
 	e.rankCompClasses(contender.CompClassID)
 }
 
-func (e *ScoreEngine) HandleContenderRequalified(event domain.ContenderRequalifiedEvent) {
+func (e *ScoreEngine) handleContenderRequalified(event domain.ContenderRequalifiedEvent) {
 	contender, found := e.store.GetContender(event.ContenderID)
 	if !found {
 		return
@@ -295,7 +295,7 @@ func (e *ScoreEngine) HandleContenderRequalified(event domain.ContenderRequalifi
 	e.rankCompClasses(contender.CompClassID)
 }
 
-func (e *ScoreEngine) HandleAscentRegistered(event domain.AscentRegisteredEvent) {
+func (e *ScoreEngine) handleAscentRegistered(event domain.AscentRegisteredEvent) {
 	tick := Tick{
 		ProblemID:    event.ProblemID,
 		Top:          event.Top,
@@ -317,15 +317,17 @@ func (e *ScoreEngine) HandleAscentRegistered(event domain.AscentRegisteredEvent)
 	tick.Score(problem)
 	e.store.SaveTick(event.ContenderID, tick)
 
-	if !contender.Disqualified {
-		contender.Score = e.rules.CalculateScore(Points(e.store.GetTicks(contender.ID)))
-		e.store.SaveContender(contender)
+	if contender.Disqualified {
+		return
 	}
+
+	contender.Score = e.rules.CalculateScore(Points(e.store.GetTicks(contender.ID)))
+	e.store.SaveContender(contender)
 
 	e.rankCompClasses(contender.CompClassID)
 }
 
-func (e *ScoreEngine) HandleAscentDeregistered(event domain.AscentDeregisteredEvent) {
+func (e *ScoreEngine) handleAscentDeregistered(event domain.AscentDeregisteredEvent) {
 	contender, found := e.store.GetContender(event.ContenderID)
 	if !found {
 		return
@@ -341,7 +343,7 @@ func (e *ScoreEngine) HandleAscentDeregistered(event domain.AscentDeregisteredEv
 	e.rankCompClasses(contender.CompClassID)
 }
 
-func (e *ScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) {
+func (e *ScoreEngine) handleProblemAdded(event domain.ProblemAddedEvent) {
 	problem := Problem{
 		ID:         event.ProblemID,
 		PointsTop:  event.PointsTop,
