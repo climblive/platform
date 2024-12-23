@@ -173,7 +173,7 @@ func TestMemoryStore(t *testing.T) {
 			CompClassID: 1,
 		})
 
-		assert.ElementsMatch(t, store.GetCompClassIDs(), []domain.CompClassID{1, 2, 3})
+		assert.ElementsMatch(t, []domain.CompClassID{1, 2, 3}, store.GetCompClassIDs())
 	})
 
 	t.Run("GetTicks", func(t *testing.T) {

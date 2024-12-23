@@ -150,7 +150,7 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) error {
 			continue
 		}
 
-		logger.Info("score engine hydration complete", "time", time.Since(hydrationStartTime))
+		logger.Info("score engine store hydration complete", "time", time.Since(hydrationStartTime))
 
 		mngr.handlers[contest.ID] = &handler
 	}

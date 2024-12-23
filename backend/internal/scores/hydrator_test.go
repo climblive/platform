@@ -22,7 +22,7 @@ func TestHydrate(t *testing.T) {
 	now := time.Now()
 
 	mockedRepo.
-		On("GetProblemsByContest", mock.Anything, mock.Anything, mockedContestID).
+		On("GetProblemsByContest", mock.Anything, nil, mockedContestID).
 		Return([]domain.Problem{
 			{
 				ID:         mockedProblemID,
@@ -33,7 +33,7 @@ func TestHydrate(t *testing.T) {
 		}, nil)
 
 	mockedRepo.
-		On("GetContendersByContest", mock.Anything, mock.Anything, mockedContestID).
+		On("GetContendersByContest", mock.Anything, nil, mockedContestID).
 		Return([]domain.Contender{
 			{
 				ID:                  mockedContenderID,
@@ -45,7 +45,7 @@ func TestHydrate(t *testing.T) {
 		}, nil)
 
 	mockedRepo.
-		On("GetTicksByContest", mock.Anything, mock.Anything, mockedContestID).
+		On("GetTicksByContest", mock.Anything, nil, mockedContestID).
 		Return([]domain.Tick{
 			{
 				Ownership: domain.OwnershipData{
