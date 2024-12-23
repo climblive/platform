@@ -49,7 +49,6 @@ func TestScoreEngine(t *testing.T) {
 			"ASCENT_REGISTERED",
 			"ASCENT_DEREGISTERED",
 			"PROBLEM_ADDED",
-			"PROBLEM_UPDATED",
 		)
 
 		mockedEventBroker.On("Subscribe", filter, 0).Return(subscriptionID, subscription)
