@@ -96,15 +96,13 @@ func (s *Subscription) popQueueUnsafe() (domain.EventEnvelope, bool) {
 	return domain.EventEnvelope{}, false
 }
 
-func (s *Subscription) Terminate() error {
+func (s *Subscription) Terminate() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	s.closeReason = ErrTerminated
 
 	s.cond.Broadcast()
-
-	return nil
 }
 
 func (s *Subscription) Post(event domain.EventEnvelope) error {
