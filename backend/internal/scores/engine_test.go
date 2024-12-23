@@ -1183,7 +1183,7 @@ func (m *engineStoreMock) GetAllContenders() iter.Seq[scores.Contender] {
 }
 
 func (m *engineStoreMock) SaveContender(contender scores.Contender) {
-	m.Called(score)
+	m.Called(contender)
 }
 
 func (m *engineStoreMock) GetCompClassIDs() []domain.CompClassID {
