@@ -14,17 +14,19 @@ import (
 
 const pollInterval = 10 * time.Second
 
+type EngineHydrator interface {
+	Hydrate(ctx context.Context, contestID domain.ContestID, store EngineStore) error
+}
+
 type scoreEngineManagerRepository interface {
 	GetContestsCurrentlyRunningOrByStartTime(ctx context.Context, tx domain.Transaction, earliestStartTime, latestStartTime time.Time) ([]domain.Contest, error)
-	GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Problem, error)
-	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error)
-	GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error)
 }
 
 type ScoreEngineManager struct {
-	repo        scoreEngineManagerRepository
-	eventBroker domain.EventBroker
-	handlers    map[domain.ContestID]*engineHandler
+	repo                scoreEngineManagerRepository
+	engineStoreHydrator EngineHydrator
+	eventBroker         domain.EventBroker
+	handlers            map[domain.ContestID]*engineHandler
 }
 
 type engineHandler struct {
@@ -35,11 +37,12 @@ type engineHandler struct {
 	qualifyingProblems int
 }
 
-func NewScoreEngineManager(repo scoreEngineManagerRepository, eventBroker domain.EventBroker) ScoreEngineManager {
+func NewScoreEngineManager(repo scoreEngineManagerRepository, engineStoreHydrator EngineHydrator, eventBroker domain.EventBroker) ScoreEngineManager {
 	return ScoreEngineManager{
-		repo:        repo,
-		eventBroker: eventBroker,
-		handlers:    make(map[domain.ContestID]*engineHandler),
+		repo:                repo,
+		engineStoreHydrator: engineStoreHydrator,
+		eventBroker:         eventBroker,
+		handlers:            make(map[domain.ContestID]*engineHandler),
 	}
 }
 
@@ -125,8 +128,10 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) error {
 			logger.Info("detected contest that is currently running", config)
 		}
 
+		store := NewMemoryStore()
+
 		handler := engineHandler{
-			engine:             NewScoreEngine(contest.ID, mngr.eventBroker, &HardestProblems{Number: contest.QualifyingProblems}, NewBasicRanker(contest.Finalists), NewMemoryStore()),
+			engine:             NewScoreEngine(contest.ID, mngr.eventBroker, &HardestProblems{Number: contest.QualifyingProblems}, NewBasicRanker(contest.Finalists), store),
 			finalists:          contest.Finalists,
 			qualifyingProblems: contest.QualifyingProblems,
 		}
@@ -136,7 +141,7 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) error {
 		handler.wg = handler.engine.Run(cancellableCtx)
 
 		hydrationStartTime := time.Now()
-		stats, err := mngr.hydrateEngine(ctx, contest.ID)
+		err := mngr.engineStoreHydrator.Hydrate(ctx, contest.ID, store)
 		if err != nil {
 			logger.Error("failed to hydrate score engine", "error", err)
 
@@ -145,93 +150,10 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) error {
 			continue
 		}
 
-		logger.Info("score engine hydration complete",
-			"time", time.Since(hydrationStartTime),
-			slog.Group("stats",
-				"contenders", stats.contenders,
-				"problems", stats.problems,
-				"ticks", stats.ticks,
-			),
-		)
+		logger.Info("score engine hydration complete", "time", time.Since(hydrationStartTime))
 
 		mngr.handlers[contest.ID] = &handler
 	}
 
 	return nil
-}
-
-type hydrationStats struct {
-	contenders int
-	problems   int
-	ticks      int
-}
-
-func (mngr *ScoreEngineManager) hydrateEngine(ctx context.Context, contestID domain.ContestID) (hydrationStats, error) {
-	stats := hydrationStats{}
-
-	problems, err := mngr.repo.GetProblemsByContest(ctx, nil, contestID)
-	if err != nil {
-		return hydrationStats{}, errors.Wrap(err, 0)
-	}
-
-	for problem := range slices.Values(problems) {
-		mngr.eventBroker.Dispatch(contestID, domain.ProblemAddedEvent{
-			ProblemID:  problem.ID,
-			PointsTop:  problem.PointsTop,
-			PointsZone: problem.PointsZone,
-			FlashBonus: problem.FlashBonus,
-		})
-
-		stats.problems += 1
-	}
-
-	contenders, err := mngr.repo.GetContendersByContest(ctx, nil, contestID)
-	if err != nil {
-		return hydrationStats{}, errors.Wrap(err, 0)
-	}
-
-	for contender := range slices.Values(contenders) {
-		if contender.Entered == nil {
-			continue
-		}
-
-		mngr.eventBroker.Dispatch(contestID, domain.ContenderEnteredEvent{
-			ContenderID: contender.ID,
-			CompClassID: contender.CompClassID,
-		})
-
-		if contender.WithdrawnFromFinals {
-			mngr.eventBroker.Dispatch(contestID, domain.ContenderWithdrewFromFinalsEvent{
-				ContenderID: contender.ID,
-			})
-		}
-
-		if contender.Disqualified {
-			mngr.eventBroker.Dispatch(contestID, domain.ContenderDisqualifiedEvent{
-				ContenderID: contender.ID,
-			})
-		}
-
-		stats.contenders += 1
-	}
-
-	ticks, err := mngr.repo.GetTicksByContest(ctx, nil, contestID)
-	if err != nil {
-		return hydrationStats{}, errors.Wrap(err, 0)
-	}
-
-	for tick := range slices.Values(ticks) {
-		mngr.eventBroker.Dispatch(contestID, domain.AscentRegisteredEvent{
-			ContenderID:  *tick.Ownership.ContenderID,
-			ProblemID:    tick.ProblemID,
-			Top:          tick.Top,
-			AttemptsTop:  tick.AttemptsTop,
-			Zone:         tick.Zone,
-			AttemptsZone: tick.AttemptsZone,
-		})
-
-		stats.ticks += 1
-	}
-
-	return stats, nil
 }

@@ -16,13 +16,14 @@ import (
 func TestScoreEngineManager(t *testing.T) {
 	t.Run("StartAndStop", func(t *testing.T) {
 		mockedRepo := new(repositoryMock)
+		mockedStoreHydrator := new(hydratorMock)
 		mockedEventBroker := new(eventBrokerMock)
 
 		mockedRepo.
 			On("GetContestsCurrentlyRunningOrByStartTime", mock.Anything, mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
 			Return([]domain.Contest{}, nil)
 
-		mngr := scores.NewScoreEngineManager(mockedRepo, mockedEventBroker)
+		mngr := scores.NewScoreEngineManager(mockedRepo, mockedStoreHydrator, mockedEventBroker)
 
 		ctx, cancel := context.WithCancel(context.Background())
 
@@ -36,23 +37,13 @@ func TestScoreEngineManager(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 
 		mockedRepo := new(repositoryMock)
+		mockedStoreHydrator := new(hydratorMock)
 		mockedEventBroker := new(eventBrokerMock)
 
-		mockedContestID := domain.ContestID(rand.Int())
-		mockedProblemID := domain.ProblemID(rand.Int())
-		mockedContenderID := domain.ContenderID(rand.Int())
-		mockedCompClassID := domain.CompClassID(rand.Int())
 		mockedSubscriptionID := domain.SubscriptionID(uuid.New())
+		mockedContestID := domain.ContestID(rand.Int())
 
 		now := time.Now()
-
-		mockedEventBroker.
-			On("Subscribe", mock.Anything, mock.Anything).
-			Return(mockedSubscriptionID, events.NewSubscription(domain.EventFilter{}, 1000))
-
-		mockedEventBroker.
-			On("Unsubscribe", mockedSubscriptionID).
-			Return()
 
 		mockedRepo.
 			On("GetContestsCurrentlyRunningOrByStartTime", mock.Anything, mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
@@ -66,77 +57,22 @@ func TestScoreEngineManager(t *testing.T) {
 				},
 			}, nil)
 
-		mockedRepo.
-			On("GetProblemsByContest", mock.Anything, mock.Anything, mockedContestID).
-			Return([]domain.Problem{
-				{
-					ID:         mockedProblemID,
-					PointsTop:  100,
-					PointsZone: 50,
-					FlashBonus: 10,
-				},
-			}, nil)
+		mockedEventBroker.
+			On("Subscribe", mock.Anything, mock.Anything).
+			Return(mockedSubscriptionID, events.NewSubscription(domain.EventFilter{}, 1000))
 
-		mockedRepo.
-			On("GetContendersByContest", mock.Anything, mock.Anything, mockedContestID).
-			Return([]domain.Contender{
-				{
-					ID:                  mockedContenderID,
-					CompClassID:         mockedCompClassID,
-					Disqualified:        true,
-					WithdrawnFromFinals: true,
-					Entered:             &now,
-				},
-			}, nil)
+		mockedEventBroker.
+			On("Unsubscribe", mockedSubscriptionID).
+			Return()
 
-		mockedRepo.
-			On("GetTicksByContest", mock.Anything, mock.Anything, mockedContestID).
-			Return([]domain.Tick{
-				{
-					Ownership: domain.OwnershipData{
-						ContenderID: &mockedContenderID,
-					},
-					ProblemID:    mockedProblemID,
-					Top:          true,
-					AttemptsTop:  999,
-					Zone:         true,
-					AttemptsZone: 1,
-				},
-			}, nil)
-
-		mockedEventBroker.On("Dispatch", mockedContestID, domain.ProblemAddedEvent{
-			ProblemID:  mockedProblemID,
-			PointsTop:  100,
-			PointsZone: 50,
-			FlashBonus: 10,
-		}).Return()
-
-		mockedEventBroker.On("Dispatch", mockedContestID, domain.ContenderEnteredEvent{
-			ContenderID: mockedContenderID,
-			CompClassID: mockedCompClassID,
-		}).Return()
-
-		mockedEventBroker.On("Dispatch", mockedContestID, domain.ContenderWithdrewFromFinalsEvent{
-			ContenderID: mockedContenderID,
-		}).Return()
-
-		mockedEventBroker.On("Dispatch", mockedContestID, domain.ContenderDisqualifiedEvent{
-			ContenderID: mockedContenderID,
-		}).Return()
-
-		mockedEventBroker.On("Dispatch", mockedContestID, domain.AscentRegisteredEvent{
-			ContenderID:  mockedContenderID,
-			ProblemID:    mockedProblemID,
-			Top:          true,
-			AttemptsTop:  999,
-			Zone:         true,
-			AttemptsZone: 1,
-		}).Return().
+		mockedStoreHydrator.
+			On("Hydrate", mock.Anything, mockedContestID, mock.AnythingOfType("*scores.MemoryStore")).
 			Run(func(args mock.Arguments) {
 				cancel()
-			})
+			}).
+			Return(nil)
 
-		mngr := scores.NewScoreEngineManager(mockedRepo, mockedEventBroker)
+		mngr := scores.NewScoreEngineManager(mockedRepo, mockedStoreHydrator, mockedEventBroker)
 
 		wg := mngr.Run(ctx)
 
@@ -144,6 +80,7 @@ func TestScoreEngineManager(t *testing.T) {
 		wg.Wait()
 
 		mockedRepo.AssertExpectations(t)
+		mockedStoreHydrator.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)
 	})
 }
@@ -192,4 +129,13 @@ func (m *eventBrokerMock) Subscribe(filter domain.EventFilter, bufferCapacity in
 
 func (m *eventBrokerMock) Unsubscribe(subscriptionID domain.SubscriptionID) {
 	m.Called(subscriptionID)
+}
+
+type hydratorMock struct {
+	mock.Mock
+}
+
+func (m *hydratorMock) Hydrate(ctx context.Context, contestID domain.ContestID, store scores.EngineStore) error {
+	args := m.Called(ctx, contestID, store)
+	return args.Error(0)
 }
