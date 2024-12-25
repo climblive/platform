@@ -22,21 +22,11 @@ func TestAuthorizer(t *testing.T) {
 		ContenderID: &mockedContenderID,
 	}
 
-	mockedRepo := new(repositoryMock)
-
-	mockedRepo.
-		On("GetContenderByCode", mock.Anything, nil, "ABCD1234").
-		Return(domain.Contender{
-			ID: mockedContenderID,
-		}, nil)
-
-	mockedRepo.
-		On("GetContenderByCode", mock.Anything, nil, mock.AnythingOfType("string")).
-		Return(domain.Contender{}, domain.ErrNotFound)
-
-	authorizer := authorizer.NewAuthorizer(mockedRepo)
-
 	t.Run("MissingAuthorization", func(t *testing.T) {
+		mockedRepo := new(repositoryMock)
+
+		authorizer := authorizer.NewAuthorizer(mockedRepo)
+
 		dummyHandler := func(w http.ResponseWriter, r *http.Request) {
 			role, err := authorizer.HasOwnership(r.Context(), mockedOwnership)
 
@@ -49,9 +39,19 @@ func TestAuthorizer(t *testing.T) {
 
 		handler := authorizer.Middleware(http.HandlerFunc(dummyHandler))
 		handler.ServeHTTP(w, r)
+
+		mockedRepo.AssertExpectations(t)
 	})
 
 	t.Run("BadAuthorization", func(t *testing.T) {
+		mockedRepo := new(repositoryMock)
+
+		mockedRepo.
+			On("GetContenderByCode", mock.Anything, nil, mock.AnythingOfType("string")).
+			Return(domain.Contender{}, domain.ErrNotFound)
+
+		authorizer := authorizer.NewAuthorizer(mockedRepo)
+
 		dummyHandler := func(w http.ResponseWriter, r *http.Request) {
 			role, err := authorizer.HasOwnership(r.Context(), mockedOwnership)
 
@@ -66,9 +66,15 @@ func TestAuthorizer(t *testing.T) {
 
 		handler := authorizer.Middleware(http.HandlerFunc(dummyHandler))
 		handler.ServeHTTP(w, r)
+
+		mockedRepo.AssertExpectations(t)
 	})
 
 	t.Run("BadSyntax", func(t *testing.T) {
+		mockedRepo := new(repositoryMock)
+
+		authorizer := authorizer.NewAuthorizer(mockedRepo)
+
 		dummyHandler := func(w http.ResponseWriter, r *http.Request) {
 			role, err := authorizer.HasOwnership(r.Context(), mockedOwnership)
 
@@ -83,9 +89,21 @@ func TestAuthorizer(t *testing.T) {
 
 		handler := authorizer.Middleware(http.HandlerFunc(dummyHandler))
 		handler.ServeHTTP(w, r)
+
+		mockedRepo.AssertExpectations(t)
 	})
 
 	t.Run("AuthorizedWithOwnership", func(t *testing.T) {
+		mockedRepo := new(repositoryMock)
+
+		mockedRepo.
+			On("GetContenderByCode", mock.Anything, nil, "ABCD1234").
+			Return(domain.Contender{
+				ID: mockedContenderID,
+			}, nil)
+
+		authorizer := authorizer.NewAuthorizer(mockedRepo)
+
 		dummyHandler := func(w http.ResponseWriter, r *http.Request) {
 			role, err := authorizer.HasOwnership(r.Context(), mockedOwnership)
 
@@ -100,15 +118,27 @@ func TestAuthorizer(t *testing.T) {
 
 		handler := authorizer.Middleware(http.HandlerFunc(dummyHandler))
 		handler.ServeHTTP(w, r)
+
+		mockedRepo.AssertExpectations(t)
 	})
 
 	t.Run("AuthorizedWithoutOwnership", func(t *testing.T) {
+		mockedRepo := new(repositoryMock)
+
+		mockedRepo.
+			On("GetContenderByCode", mock.Anything, nil, "ABCD1234").
+			Return(domain.Contender{
+				ID: mockedContenderID,
+			}, nil)
+
 		otherContenderID := mockedContenderID + 1
 
 		mockedOtherOwnership := domain.OwnershipData{
 			OrganizerID: mockedOrganizerID,
 			ContenderID: &otherContenderID,
 		}
+
+		authorizer := authorizer.NewAuthorizer(mockedRepo)
 
 		dummyHandler := func(w http.ResponseWriter, r *http.Request) {
 			role, err := authorizer.HasOwnership(r.Context(), mockedOtherOwnership)
@@ -124,9 +154,19 @@ func TestAuthorizer(t *testing.T) {
 
 		handler := authorizer.Middleware(http.HandlerFunc(dummyHandler))
 		handler.ServeHTTP(w, r)
+
+		mockedRepo.AssertExpectations(t)
 	})
 
 	t.Run("CodesConvertedToUpperCase", func(t *testing.T) {
+		mockedRepo := new(repositoryMock)
+
+		mockedRepo.
+			On("GetContenderByCode", mock.Anything, nil, "WXYZ1234").
+			Return(domain.Contender{}, nil)
+
+		authorizer := authorizer.NewAuthorizer(mockedRepo)
+
 		dummyHandler := func(w http.ResponseWriter, r *http.Request) {
 			_, _ = authorizer.HasOwnership(r.Context(), mockedOwnership)
 		}
@@ -139,7 +179,7 @@ func TestAuthorizer(t *testing.T) {
 		handler := authorizer.Middleware(http.HandlerFunc(dummyHandler))
 		handler.ServeHTTP(w, r)
 
-		mockedRepo.AssertCalled(t, "GetContenderByCode", mock.Anything, nil, "WXYZ1234")
+		mockedRepo.AssertExpectations(t)
 	})
 }
 
