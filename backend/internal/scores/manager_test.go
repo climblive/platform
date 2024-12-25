@@ -31,6 +31,10 @@ func TestScoreEngineManager(t *testing.T) {
 
 		cancel()
 		wg.Wait()
+
+		mockedRepo.AssertExpectations(t)
+		mockedStoreHydrator.AssertExpectations(t)
+		mockedEventBroker.AssertExpectations(t)
 	})
 
 	t.Run("LoadSingleEngine", func(t *testing.T) {
