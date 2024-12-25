@@ -34,13 +34,17 @@ func TestGetContest(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, mockedContestID, contest.ID)
+
+	mockedRepo.AssertExpectations(t)
 }
 
 func TestGetScoreboard(t *testing.T) {
 	mockedContestID := randomResourceID[domain.ContestID]()
 	mockedCompClassID := randomResourceID[domain.CompClassID]()
+
 	mockedRepo := new(repositoryMock)
 	mockedScoreKeeper := new(scoreKeeperMock)
+
 	currentTime := time.Now()
 
 	var contenders []domain.Contender
@@ -125,4 +129,7 @@ func TestGetScoreboard(t *testing.T) {
 		assert.Equal(t, i-1, entry.Score.RankOrder)
 		assert.True(t, entry.Score.Finalist)
 	}
+
+	mockedRepo.AssertExpectations(t)
+	mockedScoreKeeper.AssertExpectations(t)
 }
