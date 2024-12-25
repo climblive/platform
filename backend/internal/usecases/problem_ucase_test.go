@@ -34,4 +34,6 @@ func TestGetProblemsByContest(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, mockedProblems, problems)
+
+	mockedRepo.AssertExpectations(t)
 }
