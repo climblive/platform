@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/events"
 )
 
 const bufferCapacity = 1_000
@@ -88,12 +89,12 @@ func (hdlr *eventHandler) subscribe(
 	write(w, fmt.Sprintf("retry: %d\n\n", clientRetry.Milliseconds()))
 
 	keepAlive := time.Tick(hdlr.pingInterval)
-	events := eventReader.EventsChan(r.Context())
+	eventsCh := eventReader.EventsChan(r.Context())
 
 ConsumeEvents:
 	for {
 		select {
-		case event, open := <-events:
+		case event, open := <-eventsCh:
 			if !open {
 				break ConsumeEvents
 			}
@@ -103,7 +104,7 @@ ConsumeEvents:
 				panic(err)
 			}
 
-			write(w, fmt.Sprintf("event: %s\ndata: %s\n\n", event.Name, json))
+			write(w, fmt.Sprintf("event: %s\ndata: %s\n\n", events.EventName(event.Data), json))
 		case <-keepAlive:
 			write(w, ":\n\n")
 		case <-r.Context().Done():

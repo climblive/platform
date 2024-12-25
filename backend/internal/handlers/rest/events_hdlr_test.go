@@ -111,7 +111,6 @@ func TestEventsHandler(t *testing.T) {
 		))
 
 		err := subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_SCORE_UPDATED",
 			Data: domain.ContenderScoreUpdatedEvent{
 				Timestamp:   time.Date(2024, 12, 01, 00, 00, 00, 0, time.UTC),
 				ContenderID: domain.ContenderID(1),
@@ -167,13 +166,11 @@ func TestEventsHandler(t *testing.T) {
 		))
 
 		err := subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_SCORE_UPDATED",
 			Data: domain.ContenderScoreUpdatedEvent{},
 		})
 		require.NoError(t, err)
 
 		err = subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_SCORE_UPDATED",
 			Data: domain.ContenderScoreUpdatedEvent{},
 		})
 		require.ErrorIs(t, err, events.ErrBufferFull)

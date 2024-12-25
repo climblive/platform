@@ -96,13 +96,11 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_SCORE_UPDATED",
 			Data: domain.ContenderScoreUpdatedEvent{},
 		})
 		require.NoError(t, err)
 
 		err = f.subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_ENTERED",
 			Data: domain.ContenderEnteredEvent{},
 		})
 		require.ErrorIs(t, err, events.ErrBufferFull)
@@ -225,7 +223,6 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 3, Placement: 3}).Return()
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_ENTERED",
 			Data: domain.ContenderEnteredEvent{
 				ContenderID: 1,
 				CompClassID: 1,
@@ -252,7 +249,6 @@ func TestScoreEngine(t *testing.T) {
 			Return(scores.Contender{}, false)
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_SWITCHED_CLASS",
 			Data: domain.ContenderSwitchedClassEvent{
 				ContenderID: 1,
 				CompClassID: 1,
@@ -282,7 +278,6 @@ func TestScoreEngine(t *testing.T) {
 			}, true)
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_SWITCHED_CLASS",
 			Data: domain.ContenderSwitchedClassEvent{
 				ContenderID: 1,
 				CompClassID: 1,
@@ -340,7 +335,6 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 4, Placement: 4}).Return()
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_SWITCHED_CLASS",
 			Data: domain.ContenderSwitchedClassEvent{
 				ContenderID: 4,
 				CompClassID: 2,
@@ -367,7 +361,6 @@ func TestScoreEngine(t *testing.T) {
 			Return(scores.Contender{}, false)
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_WITHDREW_FROM_FINALS",
 			Data: domain.ContenderWithdrewFromFinalsEvent{
 				ContenderID: 1,
 			},
@@ -417,7 +410,6 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_WITHDREW_FROM_FINALS",
 			Data: domain.ContenderWithdrewFromFinalsEvent{
 				ContenderID: 1,
 			},
@@ -443,7 +435,6 @@ func TestScoreEngine(t *testing.T) {
 			Return(scores.Contender{}, false)
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_REENTERED_FINALS",
 			Data: domain.ContenderReenteredFinalsEvent{
 				ContenderID: 1,
 			},
@@ -494,7 +485,6 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_REENTERED_FINALS",
 			Data: domain.ContenderReenteredFinalsEvent{
 				ContenderID: 1,
 			},
@@ -520,7 +510,6 @@ func TestScoreEngine(t *testing.T) {
 			Return(scores.Contender{}, false)
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_DISQUALIFIED",
 			Data: domain.ContenderDisqualifiedEvent{
 				ContenderID: 1,
 			},
@@ -570,7 +559,6 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_DISQUALIFIED",
 			Data: domain.ContenderDisqualifiedEvent{
 				ContenderID: 1,
 			},
@@ -596,7 +584,6 @@ func TestScoreEngine(t *testing.T) {
 			Return(scores.Contender{}, false)
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_REQUALIFIED",
 			Data: domain.ContenderRequalifiedEvent{
 				ContenderID: 1,
 			},
@@ -655,7 +642,6 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_REQUALIFIED",
 			Data: domain.ContenderRequalifiedEvent{
 				ContenderID: 1,
 			},
@@ -686,7 +672,6 @@ func TestScoreEngine(t *testing.T) {
 			Return()
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "PROBLEM_ADDED",
 			Data: domain.ProblemAddedEvent{
 				ProblemID:  1,
 				PointsTop:  100,
@@ -715,7 +700,6 @@ func TestScoreEngine(t *testing.T) {
 			Return(scores.Contender{}, false)
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "ASCENT_REGISTERED",
 			Data: domain.AscentRegisteredEvent{
 				ContenderID:  1,
 				ProblemID:    1,
@@ -753,7 +737,6 @@ func TestScoreEngine(t *testing.T) {
 			Return(scores.Problem{}, false)
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "ASCENT_REGISTERED",
 			Data: domain.AscentRegisteredEvent{
 				ContenderID:  1,
 				ProblemID:    1,
@@ -808,7 +791,6 @@ func TestScoreEngine(t *testing.T) {
 			Return()
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "ASCENT_REGISTERED",
 			Data: domain.AscentRegisteredEvent{
 				ContenderID:  1,
 				ProblemID:    1,
@@ -889,7 +871,6 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "ASCENT_REGISTERED",
 			Data: domain.AscentRegisteredEvent{
 				ContenderID:  1,
 				ProblemID:    1,
@@ -920,7 +901,6 @@ func TestScoreEngine(t *testing.T) {
 			Return(scores.Contender{}, false)
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "ASCENT_DEREGISTERED",
 			Data: domain.AscentDeregisteredEvent{
 				ContenderID: 1,
 				ProblemID:   1,
@@ -955,7 +935,6 @@ func TestScoreEngine(t *testing.T) {
 			Return()
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "ASCENT_DEREGISTERED",
 			Data: domain.AscentDeregisteredEvent{
 				ContenderID: 1,
 				ProblemID:   1,
@@ -1016,7 +995,6 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Name: "ASCENT_DEREGISTERED",
 			Data: domain.AscentDeregisteredEvent{
 				ContenderID: 1,
 				ProblemID:   1,

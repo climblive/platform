@@ -41,7 +41,7 @@ func (b *broker) Dispatch(contestID domain.ContestID, event any) {
 	b.mu.RLock()
 	defer b.mu.RUnlock()
 
-	eventName := eventName(event)
+	eventName := EventName(event)
 	contenderID := extractContenderID(event)
 
 	for _, subscription := range b.subscriptions {
@@ -50,7 +50,6 @@ func (b *broker) Dispatch(contestID domain.ContestID, event any) {
 		}
 
 		err := subscription.Post(domain.EventEnvelope{
-			Name: eventName,
 			Data: event,
 		})
 
@@ -60,7 +59,7 @@ func (b *broker) Dispatch(contestID domain.ContestID, event any) {
 	}
 }
 
-func eventName(event any) string {
+func EventName(event any) string {
 	switch event.(type) {
 	case domain.ContenderEnteredEvent:
 		return "CONTENDER_ENTERED"
