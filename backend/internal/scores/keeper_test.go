@@ -54,13 +54,11 @@ func TestKeeper(t *testing.T) {
 		keeper := scores.NewScoreKeeper(mockedEventBroker, mockedRepo)
 
 		err := subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_SCORE_UPDATED",
 			Data: domain.ContenderScoreUpdatedEvent{},
 		})
 		require.NoError(t, err)
 
 		err = subscription.Post(domain.EventEnvelope{
-			Name: "CONTENDER_SCORE_UPDATED",
 			Data: domain.ContenderScoreUpdatedEvent{},
 		})
 		require.Error(t, err)
@@ -84,7 +82,6 @@ func TestKeeper(t *testing.T) {
 
 		for k := 1; k <= 5; k++ {
 			err := subscription.Post(domain.EventEnvelope{
-				Name: "CONTENDER_SCORE_UPDATED",
 				Data: domain.ContenderScoreUpdatedEvent{
 					Timestamp:   now,
 					ContenderID: domain.ContenderID(k),
@@ -142,7 +139,6 @@ func TestKeeper(t *testing.T) {
 			mockedRepo.On("StoreScore", mock.Anything, nil, score).Return(score, nil)
 
 			err := subscription.Post(domain.EventEnvelope{
-				Name: "CONTENDER_SCORE_UPDATED",
 				Data: domain.ContenderScoreUpdatedEvent(score),
 			})
 
@@ -197,7 +193,6 @@ func TestKeeper(t *testing.T) {
 			mockedRepo.On("StoreScore", mock.Anything, nil, score).Return(score, nil)
 
 			err := subscription.Post(domain.EventEnvelope{
-				Name: "CONTENDER_SCORE_UPDATED",
 				Data: domain.ContenderScoreUpdatedEvent(score),
 			})
 
@@ -243,7 +238,6 @@ func TestKeeper(t *testing.T) {
 			}
 
 			err := subscription.Post(domain.EventEnvelope{
-				Name: "CONTENDER_SCORE_UPDATED",
 				Data: domain.ContenderScoreUpdatedEvent(score),
 			})
 
@@ -299,7 +293,6 @@ func TestKeeper(t *testing.T) {
 			mockedRepo.On("StoreScore", mock.Anything, nil, score).Return(domain.Score{}, domain.ErrNotFound)
 
 			err := subscription.Post(domain.EventEnvelope{
-				Name: "CONTENDER_SCORE_UPDATED",
 				Data: domain.ContenderScoreUpdatedEvent(score),
 			})
 

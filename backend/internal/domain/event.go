@@ -44,7 +44,6 @@ type EventReader interface {
 }
 
 type EventEnvelope struct {
-	Name string
 	Data any
 }
 

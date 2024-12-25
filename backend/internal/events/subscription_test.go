@@ -20,7 +20,6 @@ func TestPostAndReceive(t *testing.T) {
 	subscription := events.NewSubscription(domain.EventFilter{}, 1)
 
 	err := subscription.Post(domain.EventEnvelope{
-		Name: "TEST",
 		Data: randomNumber,
 	})
 	require.NoError(t, err)
@@ -36,7 +35,6 @@ func TestFIFO(t *testing.T) {
 
 	for k := 1; k <= 3; k++ {
 		err := subscription.Post(domain.EventEnvelope{
-			Name: "TEST",
 			Data: k,
 		})
 
@@ -71,7 +69,6 @@ func TestAwait(t *testing.T) {
 	time.Sleep(100 * time.Millisecond)
 
 	err = subscription.Post(domain.EventEnvelope{
-		Name: "TEST",
 		Data: randomNumber,
 	})
 	require.NoError(t, err)
@@ -93,7 +90,7 @@ func TestBufferFull(t *testing.T) {
 	go func() {
 		for range bufferCapacity {
 			err := subscription.Post(domain.EventEnvelope{
-				Name: "TEST",
+				Data: "Something",
 			})
 			assert.NoError(t, err)
 		}
@@ -109,7 +106,7 @@ func TestBufferFull(t *testing.T) {
 	for range 10 {
 		event, err := subscription.AwaitEvent(context.Background())
 
-		assert.Equal(t, domain.EventEnvelope{Name: "TEST"}, event)
+		assert.Equal(t, domain.EventEnvelope{Data: "Something"}, event)
 		require.NoError(t, err)
 	}
 
@@ -123,7 +120,7 @@ func TestTerminate(t *testing.T) {
 	subscription := events.NewSubscription(domain.EventFilter{}, 0)
 
 	err := subscription.Post(domain.EventEnvelope{
-		Name: "TEST",
+		Data: "Something",
 	})
 	assert.NoError(t, err)
 
@@ -131,7 +128,7 @@ func TestTerminate(t *testing.T) {
 
 	event, err := subscription.AwaitEvent(context.Background())
 
-	assert.Equal(t, domain.EventEnvelope{Name: "TEST"}, event)
+	assert.Equal(t, domain.EventEnvelope{Data: "Something"}, event)
 	require.NoError(t, err)
 
 	event, err = subscription.AwaitEvent(context.Background())
@@ -189,7 +186,6 @@ func TestEventsChan(t *testing.T) {
 	go func() {
 		for range bufferCapacity {
 			err := subscription.Post(domain.EventEnvelope{
-				Name: "TEST",
 				Data: randomNumber,
 			})
 			assert.NoError(t, err)
@@ -201,7 +197,6 @@ func TestEventsChan(t *testing.T) {
 	for range bufferCapacity {
 		event, open := <-events
 		assert.Equal(t, domain.EventEnvelope{
-			Name: "TEST",
 			Data: randomNumber,
 		}, event)
 		assert.True(t, open)
@@ -221,16 +216,16 @@ func TestEventsChanBufferFull(t *testing.T) {
 
 	subscription := events.NewSubscription(domain.EventFilter{}, bufferCapacity)
 
-	err := subscription.Post(domain.EventEnvelope{Name: "TEST"})
+	err := subscription.Post(domain.EventEnvelope{Data: "Something"})
 	assert.NoError(t, err)
 
-	err = subscription.Post(domain.EventEnvelope{Name: "TEST"})
+	err = subscription.Post(domain.EventEnvelope{Data: "Something"})
 	assert.ErrorIs(t, err, events.ErrBufferFull)
 
 	events := subscription.EventsChan(ctx)
 
 	event, open := <-events
-	assert.Equal(t, domain.EventEnvelope{Name: "TEST"}, event)
+	assert.Equal(t, domain.EventEnvelope{Data: "Something"}, event)
 	assert.True(t, open)
 
 	event, open = <-events
