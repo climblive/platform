@@ -14,12 +14,12 @@ import (
 )
 
 func TestAuthorizer(t *testing.T) {
-	mockedContenderID := domain.ContenderID(rand.Int())
-	mockedOrganizerID := domain.OrganizerID(rand.Int())
+	fakedContenderID := domain.ContenderID(rand.Int())
+	fakedOrganizerID := domain.OrganizerID(rand.Int())
 
-	mockedOwnership := domain.OwnershipData{
-		OrganizerID: mockedOrganizerID,
-		ContenderID: &mockedContenderID,
+	fakedOwnership := domain.OwnershipData{
+		OrganizerID: fakedOrganizerID,
+		ContenderID: &fakedContenderID,
 	}
 
 	t.Run("MissingAuthorization", func(t *testing.T) {
@@ -28,7 +28,7 @@ func TestAuthorizer(t *testing.T) {
 		authorizer := authorizer.NewAuthorizer(mockedRepo)
 
 		dummyHandler := func(w http.ResponseWriter, r *http.Request) {
-			role, err := authorizer.HasOwnership(r.Context(), mockedOwnership)
+			role, err := authorizer.HasOwnership(r.Context(), fakedOwnership)
 
 			assert.Equal(t, domain.NilRole, role)
 			assert.ErrorIs(t, err, domain.ErrNotAuthorized)
@@ -53,7 +53,7 @@ func TestAuthorizer(t *testing.T) {
 		authorizer := authorizer.NewAuthorizer(mockedRepo)
 
 		dummyHandler := func(w http.ResponseWriter, r *http.Request) {
-			role, err := authorizer.HasOwnership(r.Context(), mockedOwnership)
+			role, err := authorizer.HasOwnership(r.Context(), fakedOwnership)
 
 			assert.Equal(t, domain.NilRole, role)
 			assert.ErrorIs(t, err, domain.ErrNotAuthorized)
@@ -76,7 +76,7 @@ func TestAuthorizer(t *testing.T) {
 		authorizer := authorizer.NewAuthorizer(mockedRepo)
 
 		dummyHandler := func(w http.ResponseWriter, r *http.Request) {
-			role, err := authorizer.HasOwnership(r.Context(), mockedOwnership)
+			role, err := authorizer.HasOwnership(r.Context(), fakedOwnership)
 
 			assert.Equal(t, domain.NilRole, role)
 			assert.ErrorIs(t, err, domain.ErrNotAuthorized)
@@ -99,13 +99,13 @@ func TestAuthorizer(t *testing.T) {
 		mockedRepo.
 			On("GetContenderByCode", mock.Anything, nil, "ABCD1234").
 			Return(domain.Contender{
-				ID: mockedContenderID,
+				ID: fakedContenderID,
 			}, nil)
 
 		authorizer := authorizer.NewAuthorizer(mockedRepo)
 
 		dummyHandler := func(w http.ResponseWriter, r *http.Request) {
-			role, err := authorizer.HasOwnership(r.Context(), mockedOwnership)
+			role, err := authorizer.HasOwnership(r.Context(), fakedOwnership)
 
 			assert.Equal(t, domain.ContenderRole, role)
 			assert.NoError(t, err)
@@ -128,20 +128,20 @@ func TestAuthorizer(t *testing.T) {
 		mockedRepo.
 			On("GetContenderByCode", mock.Anything, nil, "ABCD1234").
 			Return(domain.Contender{
-				ID: mockedContenderID,
+				ID: fakedContenderID,
 			}, nil)
 
-		otherContenderID := mockedContenderID + 1
+		otherContenderID := fakedContenderID + 1
 
-		mockedOtherOwnership := domain.OwnershipData{
-			OrganizerID: mockedOrganizerID,
+		fakedOtherOwnership := domain.OwnershipData{
+			OrganizerID: fakedOrganizerID,
 			ContenderID: &otherContenderID,
 		}
 
 		authorizer := authorizer.NewAuthorizer(mockedRepo)
 
 		dummyHandler := func(w http.ResponseWriter, r *http.Request) {
-			role, err := authorizer.HasOwnership(r.Context(), mockedOtherOwnership)
+			role, err := authorizer.HasOwnership(r.Context(), fakedOtherOwnership)
 
 			assert.Equal(t, domain.NilRole, role)
 			assert.ErrorIs(t, err, domain.ErrNoOwnership)
@@ -168,7 +168,7 @@ func TestAuthorizer(t *testing.T) {
 		authorizer := authorizer.NewAuthorizer(mockedRepo)
 
 		dummyHandler := func(w http.ResponseWriter, r *http.Request) {
-			_, _ = authorizer.HasOwnership(r.Context(), mockedOwnership)
+			_, _ = authorizer.HasOwnership(r.Context(), fakedOwnership)
 		}
 
 		r := httptest.NewRequest("GET", "http://localhost", nil)

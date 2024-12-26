@@ -13,24 +13,24 @@ import (
 )
 
 func TestGetTicksByContender(t *testing.T) {
-	mockedContenderID := randomResourceID[domain.ContenderID]()
-	mockedOwnership := domain.OwnershipData{
+	fakedContenderID := randomResourceID[domain.ContenderID]()
+	fakedOwnership := domain.OwnershipData{
 		OrganizerID: randomResourceID[domain.OrganizerID](),
-		ContenderID: &mockedContenderID,
+		ContenderID: &fakedContenderID,
 	}
 
 	makeMocks := func() (*repositoryMock, *authorizerMock) {
 		mockedRepo := new(repositoryMock)
 		mockedAuthorizer := new(authorizerMock)
 
-		mockedContender := domain.Contender{
-			ID:        mockedContenderID,
-			Ownership: mockedOwnership,
+		fakedContender := domain.Contender{
+			ID:        fakedContenderID,
+			Ownership: fakedOwnership,
 		}
 
 		mockedRepo.
-			On("GetContender", mock.Anything, mock.Anything, mockedContenderID).
-			Return(mockedContender, nil)
+			On("GetContender", mock.Anything, mock.Anything, fakedContenderID).
+			Return(fakedContender, nil)
 
 		return mockedRepo, mockedAuthorizer
 	}
@@ -38,18 +38,18 @@ func TestGetTicksByContender(t *testing.T) {
 	t.Run("HappyPath", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 
-		mockedTicks := []domain.Tick{
+		fakedTicks := []domain.Tick{
 			{
 				ID: randomResourceID[domain.TickID](),
 			},
 		}
 
 		mockedRepo.
-			On("GetTicksByContender", mock.Anything, mock.Anything, mockedContenderID).
-			Return(mockedTicks, nil)
+			On("GetTicksByContender", mock.Anything, mock.Anything, fakedContenderID).
+			Return(fakedTicks, nil)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mockedOwnership).
+			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.ContenderRole, nil)
 
 		ucase := usecases.TickUseCase{
@@ -57,10 +57,10 @@ func TestGetTicksByContender(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		ticks, err := ucase.GetTicksByContender(context.Background(), mockedContenderID)
+		ticks, err := ucase.GetTicksByContender(context.Background(), fakedContenderID)
 
 		require.NoError(t, err)
-		assert.Equal(t, mockedTicks, ticks)
+		assert.Equal(t, fakedTicks, ticks)
 
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
@@ -70,7 +70,7 @@ func TestGetTicksByContender(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mockedOwnership).
+			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.NilRole, domain.ErrNoOwnership)
 
 		ucase := usecases.TickUseCase{
@@ -78,7 +78,7 @@ func TestGetTicksByContender(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		ticks, err := ucase.GetTicksByContender(context.Background(), mockedContenderID)
+		ticks, err := ucase.GetTicksByContender(context.Background(), fakedContenderID)
 
 		assert.ErrorIs(t, err, domain.ErrNoOwnership)
 		assert.Nil(t, ticks)
@@ -89,51 +89,51 @@ func TestGetTicksByContender(t *testing.T) {
 }
 
 func TestCreateTick(t *testing.T) {
-	mockedContenderID := randomResourceID[domain.ContenderID]()
-	mockedContestID := randomResourceID[domain.ContestID]()
-	mockedCompClassID := randomResourceID[domain.CompClassID]()
-	mockedProblemID := randomResourceID[domain.ProblemID]()
+	fakedContenderID := randomResourceID[domain.ContenderID]()
+	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedCompClassID := randomResourceID[domain.CompClassID]()
+	fakedProblemID := randomResourceID[domain.ProblemID]()
 
 	gracePeriod := 15 * time.Minute
 
-	mockedOwnership := domain.OwnershipData{
+	fakedOwnership := domain.OwnershipData{
 		OrganizerID: randomResourceID[domain.OrganizerID](),
-		ContenderID: &mockedContenderID,
+		ContenderID: &fakedContenderID,
 	}
 
 	makeMocks := func(timeEnd time.Time) (*repositoryMock, *eventBrokerMock) {
 		mockedRepo := new(repositoryMock)
 		mockedEventBroker := new(eventBrokerMock)
 
-		mockedContender := domain.Contender{
-			ID:          mockedContenderID,
-			Ownership:   mockedOwnership,
-			ContestID:   mockedContestID,
-			CompClassID: mockedCompClassID,
+		fakedContender := domain.Contender{
+			ID:          fakedContenderID,
+			Ownership:   fakedOwnership,
+			ContestID:   fakedContestID,
+			CompClassID: fakedCompClassID,
 		}
 
 		mockedRepo.
-			On("GetContender", mock.Anything, mock.Anything, mockedContenderID).
-			Return(mockedContender, nil)
+			On("GetContender", mock.Anything, mock.Anything, fakedContenderID).
+			Return(fakedContender, nil)
 
 		mockedRepo.
-			On("GetContest", mock.Anything, mock.Anything, mockedContestID).
+			On("GetContest", mock.Anything, mock.Anything, fakedContestID).
 			Return(domain.Contest{
-				ID:          mockedContestID,
+				ID:          fakedContestID,
 				GracePeriod: gracePeriod,
 			}, nil)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, mockedCompClassID).
+			On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
 			Return(domain.CompClass{
-				ID:      mockedCompClassID,
+				ID:      fakedCompClassID,
 				TimeEnd: timeEnd,
 			}, nil)
 
 		mockedRepo.
-			On("GetProblem", mock.Anything, mock.Anything, mockedProblemID).
+			On("GetProblem", mock.Anything, mock.Anything, fakedProblemID).
 			Return(domain.Problem{
-				ID: mockedProblemID,
+				ID: fakedProblemID,
 			}, nil)
 
 		return mockedRepo, mockedEventBroker
@@ -144,16 +144,16 @@ func TestCreateTick(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mockedOwnership).
+			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.ContenderRole, nil)
 
 		mockedRepo.
 			On("StoreTick", mock.Anything, mock.Anything, mock.AnythingOfType("domain.Tick")).
 			Return(mirrorInstruction{}, nil)
 
-		mockedEventBroker.On("Dispatch", mockedContestID, domain.AscentRegisteredEvent{
-			ContenderID:  mockedContenderID,
-			ProblemID:    mockedProblemID,
+		mockedEventBroker.On("Dispatch", fakedContestID, domain.AscentRegisteredEvent{
+			ContenderID:  fakedContenderID,
+			ProblemID:    fakedProblemID,
 			Top:          true,
 			AttemptsTop:  5,
 			Zone:         true,
@@ -166,8 +166,8 @@ func TestCreateTick(t *testing.T) {
 			EventBroker: mockedEventBroker,
 		}
 
-		tick, err := ucase.CreateTick(context.Background(), mockedContenderID, domain.Tick{
-			ProblemID:    mockedProblemID,
+		tick, err := ucase.CreateTick(context.Background(), fakedContenderID, domain.Tick{
+			ProblemID:    fakedProblemID,
 			Top:          true,
 			AttemptsTop:  5,
 			Zone:         true,
@@ -176,10 +176,10 @@ func TestCreateTick(t *testing.T) {
 
 		require.NoError(t, err)
 
-		assert.Equal(t, mockedOwnership, tick.Ownership)
+		assert.Equal(t, fakedOwnership, tick.Ownership)
 		assert.WithinDuration(t, time.Now(), tick.Timestamp, time.Minute)
-		assert.Equal(t, mockedContestID, tick.ContestID)
-		assert.Equal(t, mockedProblemID, tick.ProblemID)
+		assert.Equal(t, fakedContestID, tick.ContestID)
+		assert.Equal(t, fakedProblemID, tick.ProblemID)
 		assert.Equal(t, true, tick.Top)
 		assert.Equal(t, 5, tick.AttemptsTop)
 		assert.Equal(t, true, tick.Zone)
@@ -195,7 +195,7 @@ func TestCreateTick(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mockedOwnership).
+			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.ContenderRole, nil)
 
 		ucase := usecases.TickUseCase{
@@ -203,8 +203,8 @@ func TestCreateTick(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		tick, err := ucase.CreateTick(context.Background(), mockedContenderID, domain.Tick{
-			ProblemID:    mockedProblemID,
+		tick, err := ucase.CreateTick(context.Background(), fakedContenderID, domain.Tick{
+			ProblemID:    fakedProblemID,
 			Top:          true,
 			AttemptsTop:  5,
 			Zone:         true,
@@ -224,16 +224,16 @@ func TestCreateTick(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mockedOwnership).
+			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
 			On("StoreTick", mock.Anything, mock.Anything, mock.AnythingOfType("domain.Tick")).
 			Return(mirrorInstruction{}, nil)
 
-		mockedEventBroker.On("Dispatch", mockedContestID, domain.AscentRegisteredEvent{
-			ContenderID:  mockedContenderID,
-			ProblemID:    mockedProblemID,
+		mockedEventBroker.On("Dispatch", fakedContestID, domain.AscentRegisteredEvent{
+			ContenderID:  fakedContenderID,
+			ProblemID:    fakedProblemID,
 			Top:          true,
 			AttemptsTop:  5,
 			Zone:         true,
@@ -246,8 +246,8 @@ func TestCreateTick(t *testing.T) {
 			EventBroker: mockedEventBroker,
 		}
 
-		tick, err := ucase.CreateTick(context.Background(), mockedContenderID, domain.Tick{
-			ProblemID:    mockedProblemID,
+		tick, err := ucase.CreateTick(context.Background(), fakedContenderID, domain.Tick{
+			ProblemID:    fakedProblemID,
 			Top:          true,
 			AttemptsTop:  5,
 			Zone:         true,
@@ -266,17 +266,17 @@ func TestCreateTick(t *testing.T) {
 		mockedRepo := new(repositoryMock)
 		mockedAuthorizer := new(authorizerMock)
 
-		mockedContender := domain.Contender{
-			ID:        mockedContenderID,
-			Ownership: mockedOwnership,
+		fakedContender := domain.Contender{
+			ID:        fakedContenderID,
+			Ownership: fakedOwnership,
 		}
 
 		mockedRepo.
-			On("GetContender", mock.Anything, mock.Anything, mockedContenderID).
-			Return(mockedContender, nil)
+			On("GetContender", mock.Anything, mock.Anything, fakedContenderID).
+			Return(fakedContender, nil)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mockedOwnership).
+			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.NilRole, domain.ErrNoOwnership)
 
 		ucase := usecases.TickUseCase{
@@ -284,7 +284,7 @@ func TestCreateTick(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		tick, err := ucase.CreateTick(context.Background(), mockedContenderID, domain.Tick{})
+		tick, err := ucase.CreateTick(context.Background(), fakedContenderID, domain.Tick{})
 
 		assert.ErrorIs(t, err, domain.ErrNoOwnership)
 		assert.Empty(t, tick)
@@ -295,55 +295,55 @@ func TestCreateTick(t *testing.T) {
 }
 
 func TestDeleteTick(t *testing.T) {
-	mockedTickID := randomResourceID[domain.TickID]()
-	mockedContenderID := randomResourceID[domain.ContenderID]()
-	mockedContestID := randomResourceID[domain.ContestID]()
-	mockedCompClassID := randomResourceID[domain.CompClassID]()
-	mockedProblemID := randomResourceID[domain.ProblemID]()
+	fakedTickID := randomResourceID[domain.TickID]()
+	fakedContenderID := randomResourceID[domain.ContenderID]()
+	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedCompClassID := randomResourceID[domain.CompClassID]()
+	fakedProblemID := randomResourceID[domain.ProblemID]()
 
 	gracePeriod := 15 * time.Minute
 
-	mockedOwnership := domain.OwnershipData{
+	fakedOwnership := domain.OwnershipData{
 		OrganizerID: randomResourceID[domain.OrganizerID](),
-		ContenderID: &mockedContenderID,
+		ContenderID: &fakedContenderID,
 	}
 
 	makeMocks := func(timeEnd time.Time) (*repositoryMock, *eventBrokerMock) {
 		mockedRepo := new(repositoryMock)
 		mockedEventBroker := new(eventBrokerMock)
 
-		mockedContender := domain.Contender{
-			ID:          mockedContenderID,
-			ContestID:   mockedContestID,
-			CompClassID: mockedCompClassID,
+		fakedContender := domain.Contender{
+			ID:          fakedContenderID,
+			ContestID:   fakedContestID,
+			CompClassID: fakedCompClassID,
 		}
 
-		mockedTick := domain.Tick{
-			ID:        mockedTickID,
-			Ownership: mockedOwnership,
-			ProblemID: mockedProblemID,
-			ContestID: mockedContestID,
+		fakedTick := domain.Tick{
+			ID:        fakedTickID,
+			Ownership: fakedOwnership,
+			ProblemID: fakedProblemID,
+			ContestID: fakedContestID,
 		}
 
 		mockedRepo.
-			On("GetTick", mock.Anything, mock.Anything, mockedTickID).
-			Return(mockedTick, nil)
+			On("GetTick", mock.Anything, mock.Anything, fakedTickID).
+			Return(fakedTick, nil)
 
 		mockedRepo.
-			On("GetContender", mock.Anything, mock.Anything, mockedContenderID).
-			Return(mockedContender, nil)
+			On("GetContender", mock.Anything, mock.Anything, fakedContenderID).
+			Return(fakedContender, nil)
 
 		mockedRepo.
-			On("GetContest", mock.Anything, mock.Anything, mockedContestID).
+			On("GetContest", mock.Anything, mock.Anything, fakedContestID).
 			Return(domain.Contest{
-				ID:          mockedContestID,
+				ID:          fakedContestID,
 				GracePeriod: gracePeriod,
 			}, nil)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, mockedCompClassID).
+			On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
 			Return(domain.CompClass{
-				ID:      mockedCompClassID,
+				ID:      fakedCompClassID,
 				TimeEnd: timeEnd,
 			}, nil)
 
@@ -355,16 +355,16 @@ func TestDeleteTick(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mockedOwnership).
+			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.ContenderRole, nil)
 
 		mockedRepo.
-			On("DeleteTick", mock.Anything, mock.Anything, mockedTickID).
+			On("DeleteTick", mock.Anything, mock.Anything, fakedTickID).
 			Return(nil)
 
-		mockedEventBroker.On("Dispatch", mockedContestID, domain.AscentDeregisteredEvent{
-			ContenderID: mockedContenderID,
-			ProblemID:   mockedProblemID,
+		mockedEventBroker.On("Dispatch", fakedContestID, domain.AscentDeregisteredEvent{
+			ContenderID: fakedContenderID,
+			ProblemID:   fakedProblemID,
 		}).Return()
 
 		ucase := usecases.TickUseCase{
@@ -373,7 +373,7 @@ func TestDeleteTick(t *testing.T) {
 			EventBroker: mockedEventBroker,
 		}
 
-		err := ucase.DeleteTick(context.Background(), mockedTickID)
+		err := ucase.DeleteTick(context.Background(), fakedTickID)
 
 		require.NoError(t, err)
 
@@ -387,7 +387,7 @@ func TestDeleteTick(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mockedOwnership).
+			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.ContenderRole, nil)
 
 		ucase := usecases.TickUseCase{
@@ -395,7 +395,7 @@ func TestDeleteTick(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		err := ucase.DeleteTick(context.Background(), mockedTickID)
+		err := ucase.DeleteTick(context.Background(), fakedTickID)
 
 		assert.ErrorIs(t, err, domain.ErrContestEnded)
 
@@ -409,16 +409,16 @@ func TestDeleteTick(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mockedOwnership).
+			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
-			On("DeleteTick", mock.Anything, mock.Anything, mockedTickID).
+			On("DeleteTick", mock.Anything, mock.Anything, fakedTickID).
 			Return(nil)
 
-		mockedEventBroker.On("Dispatch", mockedContestID, domain.AscentDeregisteredEvent{
-			ContenderID: mockedContenderID,
-			ProblemID:   mockedProblemID,
+		mockedEventBroker.On("Dispatch", fakedContestID, domain.AscentDeregisteredEvent{
+			ContenderID: fakedContenderID,
+			ProblemID:   fakedProblemID,
 		}).Return()
 
 		ucase := usecases.TickUseCase{
@@ -427,7 +427,7 @@ func TestDeleteTick(t *testing.T) {
 			EventBroker: mockedEventBroker,
 		}
 
-		err := ucase.DeleteTick(context.Background(), mockedTickID)
+		err := ucase.DeleteTick(context.Background(), fakedTickID)
 
 		require.NoError(t, err)
 
@@ -441,14 +441,14 @@ func TestDeleteTick(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 
 		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, mockedOwnership).
+			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.NilRole, domain.ErrNoOwnership)
 
 		mockedRepo.
-			On("GetTick", mock.Anything, mock.Anything, mockedTickID).
+			On("GetTick", mock.Anything, mock.Anything, fakedTickID).
 			Return(domain.Tick{
-				ID:        mockedTickID,
-				Ownership: mockedOwnership,
+				ID:        fakedTickID,
+				Ownership: fakedOwnership,
 			}, nil)
 
 		ucase := usecases.TickUseCase{
@@ -456,7 +456,7 @@ func TestDeleteTick(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		err := ucase.DeleteTick(context.Background(), mockedTickID)
+		err := ucase.DeleteTick(context.Background(), fakedTickID)
 
 		assert.ErrorIs(t, err, domain.ErrNoOwnership)
 

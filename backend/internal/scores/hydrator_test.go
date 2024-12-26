@@ -16,18 +16,18 @@ func TestHydrate(t *testing.T) {
 	mockedRepo := new(repositoryMock)
 	mockedStore := new(engineStoreMock)
 
-	mockedContestID := domain.ContestID(rand.Int())
-	mockedProblemID := domain.ProblemID(rand.Int())
-	mockedContenderID := domain.ContenderID(rand.Int())
-	mockedCompClassID := domain.CompClassID(rand.Int())
+	fakedContestID := domain.ContestID(rand.Int())
+	fakedProblemID := domain.ProblemID(rand.Int())
+	fakedContenderID := domain.ContenderID(rand.Int())
+	fakedCompClassID := domain.CompClassID(rand.Int())
 
 	now := time.Now()
 
 	mockedRepo.
-		On("GetProblemsByContest", mock.Anything, nil, mockedContestID).
+		On("GetProblemsByContest", mock.Anything, nil, fakedContestID).
 		Return([]domain.Problem{
 			{
-				ID:         mockedProblemID,
+				ID:         fakedProblemID,
 				PointsTop:  100,
 				PointsZone: 50,
 				FlashBonus: 10,
@@ -35,11 +35,11 @@ func TestHydrate(t *testing.T) {
 		}, nil)
 
 	mockedRepo.
-		On("GetContendersByContest", mock.Anything, nil, mockedContestID).
+		On("GetContendersByContest", mock.Anything, nil, fakedContestID).
 		Return([]domain.Contender{
 			{
-				ID:                  mockedContenderID,
-				CompClassID:         mockedCompClassID,
+				ID:                  fakedContenderID,
+				CompClassID:         fakedCompClassID,
 				Disqualified:        true,
 				WithdrawnFromFinals: true,
 				Entered:             &now,
@@ -47,13 +47,13 @@ func TestHydrate(t *testing.T) {
 		}, nil)
 
 	mockedRepo.
-		On("GetTicksByContest", mock.Anything, nil, mockedContestID).
+		On("GetTicksByContest", mock.Anything, nil, fakedContestID).
 		Return([]domain.Tick{
 			{
 				Ownership: domain.OwnershipData{
-					ContenderID: &mockedContenderID,
+					ContenderID: &fakedContenderID,
 				},
-				ProblemID:    mockedProblemID,
+				ProblemID:    fakedProblemID,
 				Top:          true,
 				AttemptsTop:  999,
 				Zone:         true,
@@ -62,21 +62,21 @@ func TestHydrate(t *testing.T) {
 		}, nil)
 
 	mockedStore.On("SaveProblem", scores.Problem{
-		ID:         mockedProblemID,
+		ID:         fakedProblemID,
 		PointsTop:  100,
 		PointsZone: 50,
 		FlashBonus: 10,
 	}).Return()
 
 	mockedStore.On("SaveContender", scores.Contender{
-		ID:                  mockedContenderID,
-		CompClassID:         mockedCompClassID,
+		ID:                  fakedContenderID,
+		CompClassID:         fakedCompClassID,
 		Disqualified:        true,
 		WithdrawnFromFinals: true,
 	}).Return()
 
-	mockedStore.On("SaveTick", mockedContenderID, scores.Tick{
-		ProblemID:    mockedProblemID,
+	mockedStore.On("SaveTick", fakedContenderID, scores.Tick{
+		ProblemID:    fakedProblemID,
 		Top:          true,
 		AttemptsTop:  999,
 		Zone:         true,
@@ -84,7 +84,7 @@ func TestHydrate(t *testing.T) {
 	}).Return()
 
 	hydrator := &scores.StandardEngineStoreHydrator{Repo: mockedRepo}
-	err := hydrator.Hydrate(context.Background(), mockedContestID, mockedStore)
+	err := hydrator.Hydrate(context.Background(), fakedContestID, mockedStore)
 
 	require.NoError(t, err)
 
