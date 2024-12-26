@@ -200,6 +200,58 @@ func TestScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
+	t.Run("ScoreAll", func(t *testing.T) {
+		f, awaitExpectations := makeFixture(0)
+
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+
+		f.store.On("GetAllContenders").
+			Return(slices.Values([]scores.Contender{
+				{ID: 1, CompClassID: 1},
+			}))
+
+		f.store.
+			On("GetTicks", domain.ContenderID(1)).
+			Return(slices.Values([]scores.Tick{{ProblemID: 1, Top: true}, {ProblemID: 2, Top: true}, {ProblemID: 3, Top: true}})).
+			On("GetTicks", domain.ContenderID(2)).
+			Return(slices.Values([]scores.Tick{{ProblemID: 1, Zone: true}, {ProblemID: 2, Zone: true}}))
+
+		f.store.
+			On("GetProblem", domain.ProblemID(1)).
+			Return(scores.Problem{ID: 1, PointsTop: 100, PointsZone: 50}, true).
+			On("GetProblem", domain.ProblemID(2)).
+			Return(scores.Problem{ID: 2, PointsTop: 200, PointsZone: 75}, true).
+			On("GetProblem", domain.ProblemID(3)).
+			Return(scores.Problem{ID: 3, PointsTop: 300}, true)
+
+		f.store.
+			On("SaveTick", domain.ContenderID(1), scores.Tick{ProblemID: 1, Top: true, Points: 100}).Return().
+			On("SaveTick", domain.ContenderID(1), scores.Tick{ProblemID: 2, Top: true, Points: 200}).Return().
+			On("SaveTick", domain.ContenderID(1), scores.Tick{ProblemID: 3, Top: true, Points: 300}).Return().
+			On("SaveTick", domain.ContenderID(2), scores.Tick{ProblemID: 1, Zone: true, Points: 50}).Return().
+			On("SaveTick", domain.ContenderID(2), scores.Tick{ProblemID: 2, Zone: true, Points: 75}).Return()
+
+		f.rules.
+			On("CalculateScore", iterMatcher([]int{100, 200, 300})).
+			Return(600).
+			On("CalculateScore", iterMatcher([]int{50, 75})).
+			Return(125)
+
+		f.store.
+			On("SaveContender", scores.Contender{ID: 1, CompClassID: 1, Score: 3_000_000}).Return().
+			On("SaveContender", scores.Contender{ID: 2, CompClassID: 2, Score: 2_000_000}).Return()
+
+		wg := f.engine.Run(context.Background())
+
+		f.engine.ScoreAll()
+
+		f.subscription.Terminate()
+
+		wg.Wait()
+
+		awaitExpectations(t)
+	})
+
 	t.Run("ContenderEntered", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
