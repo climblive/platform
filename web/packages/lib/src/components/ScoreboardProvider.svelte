@@ -142,7 +142,6 @@
         let contender = contenders.get(event.contenderId);
         if (!contender) {
           contender = createEmptyEntry(event.contenderId);
-          contenders.set(event.contenderId, contender);
         }
 
         contender.compClassId = event.compClassId;
@@ -150,6 +149,8 @@
         contender.clubName = event.clubName;
         contender.withdrawnFromFinals = event.withdrawnFromFinals;
         contender.disqualified = event.disqualified;
+
+        contenders.set(event.contenderId, { ...contender });
       });
     });
 
@@ -163,7 +164,6 @@
           let contender = contenders.get(event.contenderId);
           if (!contender) {
             contender = createEmptyEntry(event.contenderId);
-            contenders.set(event.contenderId, contender);
           }
 
           const score: Score = {
@@ -176,6 +176,7 @@
           };
 
           contender.score = score;
+          contenders.set(event.contenderId, { ...contender });
         });
       }
     });
