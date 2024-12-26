@@ -5,12 +5,13 @@
     type RegistrationFormData,
   } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
-  import { serialize } from "@shoelace-style/shoelace";
+  import { serialize, SlSwitch } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import SlInput from "@shoelace-style/shoelace/dist/components/input/input.js";
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/select/select.js";
   import type SlSelect from "@shoelace-style/shoelace/dist/components/select/select.js";
+  import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import { isAfter } from "date-fns";
   import { createEventDispatcher, getContext, type Snippet } from "svelte";
   import type { Readable } from "svelte/store";
@@ -33,6 +34,7 @@
     name?: SlInput;
     clubName?: SlInput;
     compClassId?: SlSelect;
+    withdrawnFromFinals?: SlSwitch;
   } = $state({});
 
   const handleSubmit = (event: SubmitEvent) => {
@@ -72,13 +74,19 @@
   };
 
   const value = (node: HTMLElement, value: string | number | undefined) => {
-    node.setAttribute("value", value?.toString() ?? "");
+    $effect(() => {
+      node.setAttribute("value", value?.toString() ?? "");
+    });
+  };
 
-    return {
-      update(value: string | number | undefined) {
-        node.setAttribute("value", value?.toString() ?? "");
-      },
-    };
+  const checked = (node: HTMLElement, value: boolean | undefined) => {
+    $effect(() => {
+      if (value) {
+        node.setAttribute("checked", "");
+      } else {
+        node.removeAttribute("checked");
+      }
+    });
   };
 </script>
 
@@ -121,6 +129,13 @@
         >
       {/each}
     </sl-select>
+    <sl-switch
+      bind:this={controls.withdrawnFromFinals}
+      size="small"
+      name="withdrawnFromFinals"
+      help-text="If you end up in the finals, you'll give up your spot."
+      use:checked={data.withdrawnFromFinals}>Opt out of finals</sl-switch
+    >
     {@render children?.()}
   </form>
 {/if}

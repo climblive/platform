@@ -56,6 +56,7 @@
       name: contender.name,
       clubName: contender.clubName,
       compClassId: contender.compClassId,
+      withdrawnFromFinals: contender.withdrawnFromFinals,
     }}
   >
     <sl-button
