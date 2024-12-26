@@ -14,33 +14,33 @@ import (
 )
 
 func TestGetContest(t *testing.T) {
-	mockedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := randomResourceID[domain.ContestID]()
 
-	mockedContest := domain.Contest{
-		ID: mockedContestID,
+	fakedContest := domain.Contest{
+		ID: fakedContestID,
 	}
 
 	mockedRepo := new(repositoryMock)
 
 	mockedRepo.
-		On("GetContest", mock.Anything, mock.Anything, mockedContestID).
-		Return(mockedContest, nil)
+		On("GetContest", mock.Anything, mock.Anything, fakedContestID).
+		Return(fakedContest, nil)
 
 	ucase := usecases.ContestUseCase{
 		Repo: mockedRepo,
 	}
 
-	contest, err := ucase.GetContest(context.Background(), mockedContestID)
+	contest, err := ucase.GetContest(context.Background(), fakedContestID)
 
 	require.NoError(t, err)
-	assert.Equal(t, mockedContestID, contest.ID)
+	assert.Equal(t, fakedContestID, contest.ID)
 
 	mockedRepo.AssertExpectations(t)
 }
 
 func TestGetScoreboard(t *testing.T) {
-	mockedContestID := randomResourceID[domain.ContestID]()
-	mockedCompClassID := randomResourceID[domain.CompClassID]()
+	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedCompClassID := randomResourceID[domain.CompClassID]()
 
 	mockedRepo := new(repositoryMock)
 	mockedScoreKeeper := new(scoreKeeperMock)
@@ -52,9 +52,9 @@ func TestGetScoreboard(t *testing.T) {
 	for i := 1; i <= 10; i++ {
 		contenderID := domain.ContenderID(i)
 
-		mockedContender := domain.Contender{
+		fakedContender := domain.Contender{
 			ID:                  contenderID,
-			CompClassID:         mockedCompClassID,
+			CompClassID:         fakedCompClassID,
 			PublicName:          fmt.Sprintf("Climber %d", i),
 			ClubName:            "Testers' Climbing Club",
 			WithdrawnFromFinals: true,
@@ -69,11 +69,11 @@ func TestGetScoreboard(t *testing.T) {
 			},
 		}
 
-		contenders = append(contenders, mockedContender)
+		contenders = append(contenders, fakedContender)
 	}
 
 	mockedRepo.
-		On("GetContendersByContest", mock.Anything, mock.Anything, mockedContestID).
+		On("GetContendersByContest", mock.Anything, mock.Anything, fakedContestID).
 		Return(contenders, nil)
 
 	future := currentTime.Add(time.Minute)
@@ -94,14 +94,14 @@ func TestGetScoreboard(t *testing.T) {
 		ScoreKeeper: mockedScoreKeeper,
 	}
 
-	scoreboard, err := ucase.GetScoreboard(context.Background(), mockedContestID)
+	scoreboard, err := ucase.GetScoreboard(context.Background(), fakedContestID)
 
 	require.NoError(t, err)
 
 	assert.Len(t, scoreboard, 10)
 
 	assert.Equal(t, domain.ContenderID(1), scoreboard[0].ContenderID)
-	assert.Equal(t, mockedCompClassID, scoreboard[0].CompClassID)
+	assert.Equal(t, fakedCompClassID, scoreboard[0].CompClassID)
 	assert.Equal(t, "Climber 1", scoreboard[0].PublicName)
 	assert.Equal(t, "Testers' Climbing Club", scoreboard[0].ClubName)
 	assert.Equal(t, true, scoreboard[0].WithdrawnFromFinals)
@@ -117,7 +117,7 @@ func TestGetScoreboard(t *testing.T) {
 		entry := scoreboard[i-1]
 
 		assert.Equal(t, domain.ContenderID(i), entry.ContenderID)
-		assert.Equal(t, mockedCompClassID, entry.CompClassID)
+		assert.Equal(t, fakedCompClassID, entry.CompClassID)
 		assert.Equal(t, fmt.Sprintf("Climber %d", i), entry.PublicName)
 		assert.Equal(t, "Testers' Climbing Club", entry.ClubName)
 		assert.Equal(t, true, entry.WithdrawnFromFinals)

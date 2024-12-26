@@ -44,8 +44,8 @@ func TestScoreEngineManager(t *testing.T) {
 		mockedStoreHydrator := new(engineStoreHydratorMock)
 		mockedEventBroker := new(eventBrokerMock)
 
-		mockedSubscriptionID := domain.SubscriptionID(uuid.New())
-		mockedContestID := domain.ContestID(rand.Int())
+		fakedSubscriptionID := domain.SubscriptionID(uuid.New())
+		fakedContestID := domain.ContestID(rand.Int())
 
 		now := time.Now()
 
@@ -53,7 +53,7 @@ func TestScoreEngineManager(t *testing.T) {
 			On("GetContestsCurrentlyRunningOrByStartTime", mock.Anything, mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
 			Return([]domain.Contest{
 				{
-					ID:                 mockedContestID,
+					ID:                 fakedContestID,
 					QualifyingProblems: 10,
 					Finalists:          7,
 					TimeBegin:          &now,
@@ -63,14 +63,14 @@ func TestScoreEngineManager(t *testing.T) {
 
 		mockedEventBroker.
 			On("Subscribe", mock.Anything, mock.Anything).
-			Return(mockedSubscriptionID, events.NewSubscription(domain.EventFilter{}, 1000))
+			Return(fakedSubscriptionID, events.NewSubscription(domain.EventFilter{}, 1000))
 
 		mockedEventBroker.
-			On("Unsubscribe", mockedSubscriptionID).
+			On("Unsubscribe", fakedSubscriptionID).
 			Return()
 
 		mockedStoreHydrator.
-			On("Hydrate", mock.Anything, mockedContestID, mock.AnythingOfType("*scores.MemoryStore")).
+			On("Hydrate", mock.Anything, fakedContestID, mock.AnythingOfType("*scores.MemoryStore")).
 			Run(func(args mock.Arguments) {
 				cancel()
 			}).

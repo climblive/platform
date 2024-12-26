@@ -17,7 +17,7 @@ import (
 )
 
 func TestScoreEngine(t *testing.T) {
-	mockedContestID := domain.ContestID(1)
+	fakedContestID := domain.ContestID(1)
 
 	type fixture struct {
 		broker       *eventBrokerMock
@@ -38,7 +38,7 @@ func TestScoreEngine(t *testing.T) {
 		subscriptionID := uuid.New()
 
 		filter := domain.NewEventFilter(
-			mockedContestID,
+			fakedContestID,
 			0,
 			"CONTENDER_ENTERED",
 			"CONTENDER_SWITCHED_CLASS",
@@ -55,7 +55,7 @@ func TestScoreEngine(t *testing.T) {
 
 		mockedEventBroker.On("Unsubscribe", subscriptionID).Return()
 
-		engine := scores.NewScoreEngine(mockedContestID, mockedEventBroker, mockedRules, mockedRanker, mockedStore)
+		engine := scores.NewScoreEngine(fakedContestID, mockedEventBroker, mockedRules, mockedRanker, mockedStore)
 
 		awaitExpectations := func(t *testing.T) {
 			mockedEventBroker.AssertExpectations(t)

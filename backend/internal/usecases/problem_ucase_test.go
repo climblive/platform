@@ -12,28 +12,28 @@ import (
 )
 
 func TestGetProblemsByContest(t *testing.T) {
-	mockedContestID := randomResourceID[domain.ContestID]()
-	mockedProblems := []domain.Problem{
+	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedProblems := []domain.Problem{
 		{
 			ID:        randomResourceID[domain.ProblemID](),
-			ContestID: mockedContestID,
+			ContestID: fakedContestID,
 		},
 	}
 
 	mockedRepo := new(repositoryMock)
 
 	mockedRepo.
-		On("GetProblemsByContest", mock.Anything, mock.Anything, mockedContestID).
-		Return(mockedProblems, nil)
+		On("GetProblemsByContest", mock.Anything, mock.Anything, fakedContestID).
+		Return(fakedProblems, nil)
 
 	ucase := usecases.ProblemUseCase{
 		Repo: mockedRepo,
 	}
 
-	problems, err := ucase.GetProblemsByContest(context.Background(), mockedContestID)
+	problems, err := ucase.GetProblemsByContest(context.Background(), fakedContestID)
 
 	require.NoError(t, err)
-	assert.Equal(t, mockedProblems, problems)
+	assert.Equal(t, fakedProblems, problems)
 
 	mockedRepo.AssertExpectations(t)
 }

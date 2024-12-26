@@ -14,28 +14,28 @@ import (
 func TestGetCompClassesByContest(t *testing.T) {
 	t.Parallel()
 
-	mockedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := randomResourceID[domain.ContestID]()
 
-	mockedCompClasses := []domain.CompClass{{
+	fakedCompClasses := []domain.CompClass{{
 		ID:        randomResourceID[domain.CompClassID](),
-		ContestID: mockedContestID,
+		ContestID: fakedContestID,
 	},
 	}
 
 	mockedRepo := new(repositoryMock)
 
 	mockedRepo.
-		On("GetCompClassesByContest", mock.Anything, mock.Anything, mockedContestID).
-		Return(mockedCompClasses, nil)
+		On("GetCompClassesByContest", mock.Anything, mock.Anything, fakedContestID).
+		Return(fakedCompClasses, nil)
 
 	ucase := usecases.CompClassUseCase{
 		Repo: mockedRepo,
 	}
 
-	compClasses, err := ucase.GetCompClassesByContest(context.Background(), mockedContestID)
+	compClasses, err := ucase.GetCompClassesByContest(context.Background(), fakedContestID)
 
 	require.NoError(t, err)
-	assert.Equal(t, mockedCompClasses, compClasses)
+	assert.Equal(t, fakedCompClasses, compClasses)
 
 	mockedRepo.AssertExpectations(t)
 }
