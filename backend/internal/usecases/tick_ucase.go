@@ -119,17 +119,21 @@ func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.Conten
 		return domain.Tick{}, errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
 	}
 
-	problem, err := uc.Repo.GetProblem(ctx, nil, tick.ProblemID)
-	if err != nil {
-		return domain.Tick{}, errors.Wrap(err, 0)
-	}
-
 	gracePeriodEnd := compClass.TimeEnd.Add(contest.GracePeriod)
 
 	switch {
 	case role.OneOf(domain.OrganizerRole, domain.AdminRole):
 	case time.Now().After(gracePeriodEnd):
 		return domain.Tick{}, errors.New(domain.ErrContestEnded)
+	}
+
+	problem, err := uc.Repo.GetProblem(ctx, nil, tick.ProblemID)
+	if err != nil {
+		return domain.Tick{}, errors.Wrap(err, 0)
+	}
+
+	if problem.ContestID != contest.ID {
+		return domain.Tick{}, errors.New(domain.ErrProblemNotInContest)
 	}
 
 	newTick := domain.Tick{
