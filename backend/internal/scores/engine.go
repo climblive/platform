@@ -184,6 +184,33 @@ func (e *ScoreEngine) SetRanker(ranker Ranker) {
 	}
 }
 
+func (e *ScoreEngine) ScoreAll() {
+	quest := func() {
+		for contender := range e.store.GetAllContenders() {
+			ticks := e.store.GetTicks(contender.ID)
+
+			for tick := range ticks {
+				problem, found := e.store.GetProblem(tick.ProblemID)
+				if !found {
+					continue
+				}
+
+				tick.Score(problem)
+				e.store.SaveTick(contender.ID, tick)
+			}
+
+			contender.Score = e.rules.CalculateScore(Points(ticks))
+			e.store.SaveContender(contender)
+		}
+
+		e.rankCompClasses(e.store.GetCompClassIDs()...)
+	}
+
+	if e.running.Load() {
+		e.sideQuests <- quest
+	}
+}
+
 func (e *ScoreEngine) handleEvent(event domain.EventEnvelope) {
 	switch ev := event.Data.(type) {
 	case domain.ContenderEnteredEvent:
