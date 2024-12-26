@@ -186,7 +186,7 @@ test('edit profile', async ({ page }) => {
   await expect(page.getByText("Females", { exact: true })).toBeVisible()
 });
 
-test.only('withdraw from finals and reenter', async ({ page }) => {
+test('withdraw from finals and reenter', async ({ page }) => {
   await page.goto('/ABCD0003/edit');
 
   await expect(page.getByRole("switch", { name: "Opt out of finals" })).not.toBeChecked();
