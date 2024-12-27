@@ -6,6 +6,9 @@ inputs:
   deploy-host:
     description: "Deploy host"
     required: true
+  deploy-user:
+    description: "Deploy user"
+    required: true
   ssh-auth-sock:
     description: "SSH auth sock"
     required: true
@@ -15,8 +18,8 @@ runs:
     - shell: bash
       run: |
         export SSH_AUTH_SOCK=${{ inputs.ssh-auth-sock }}
-        scp -o StrictHostKeyChecking=accept-new ${{ inputs.package-file-name }} root@${{ inputs.deploy-host }}:
-        ssh -t root@${{ inputs.deploy-host }} "apt-get install -y ~/${{ inputs.package-file-name }}"
-        ssh -t root@${{ inputs.deploy-host }} "systemctl daemon-reload"
-        ssh -t root@${{ inputs.deploy-host }} "systemctl restart climblive2"
-        ssh -t root@${{ inputs.deploy-host }} "systemctl reload nginx"
+        scp -o StrictHostKeyChecking=accept-new ${{ inputs.package-file-name }} ${{ inputs.deploy-user }}@${{ inputs.deploy-host }}:
+        ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo apt-get install -y ~/${{ inputs.package-file-name }}"
+        ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo systemctl daemon-reload"
+        ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo systemctl restart climblive2"
+        ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo systemctl reload nginx"
