@@ -172,7 +172,6 @@
 
       display: flex;
       justify-content: center;
-      flex-wrap: wrap;
       gap: 0.5rem;
     }
   }
@@ -181,7 +180,7 @@
     width: 0.5rem;
     height: 0.5rem;
     border-radius: 50%;
-    background-color: var(--sl-color-primary-500);
+    background-color: var(--sl-color-primary-600);
     opacity: 0.5;
 
     &[data-current="true"] {
