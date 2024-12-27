@@ -59,4 +59,5 @@ jobs:
           package-file-name: ${{ steps.build-pkg.outputs.package-file-name }}
           deploy-host: ${{ vars.DEPLOY_HOST }}
           deploy-user: ${{ vars.DEPLOY_SSH_USER }}
+          database-password: ${{ secrets.DATABASE_PASSWORD }}
           ssh-auth-sock: ${{ steps.start-agent.outputs.ssh-auth-sock }}
