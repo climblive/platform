@@ -1,8 +1,6 @@
 server {
-	listen 443 ssl;
+	listen 443 ssl http2;
 	server_name labs.climblive.app;
-
-	http2 on;
 
 	# Gzip Settings
 	include snippets/gzip.conf;

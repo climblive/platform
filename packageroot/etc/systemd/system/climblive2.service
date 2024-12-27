@@ -9,11 +9,6 @@ User=climblive
 ExecStart=/usr/bin/climblive
 Restart=always
 RestartSec=5
-Environment="DB_USERNAME=climblive"
-Environment="DB_PASSWORD=secretpassword"
-Environment="DB_HOST=localhost"
-Environment="DB_PORT=3306"
-Environment="DB_DATABASE=climblive"
 
 [Install]
 WantedBy=multi-user.target
