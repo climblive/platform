@@ -81,13 +81,13 @@
 
     .size {
       align-self: start;
-      padding: var(--sl-spacing-small);
+      padding: var(--sl-spacing-x-small);
       border-radius: 0 var(--sl-border-radius-medium) 0
         var(--sl-border-radius-medium);
 
       background-color: var(--sl-color-primary-50);
       color: var(--sl-color-primary-700);
-      font-size: var(--sl-font-size-medium);
+      font-size: var(--sl-font-size-small);
       font-weight: var(--sl-font-weight-bold);
     }
   }
