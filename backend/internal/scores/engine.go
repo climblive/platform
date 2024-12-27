@@ -189,17 +189,21 @@ func (e *ScoreEngine) ScoreAll() {
 		for contender := range e.store.GetAllContenders() {
 			ticks := e.store.GetTicks(contender.ID)
 
-			for tick := range ticks {
-				problem, found := e.store.GetProblem(tick.ProblemID)
-				if !found {
-					continue
-				}
+			var scoredTicks iter.Seq[Tick] = func(yield func(Tick) bool) {
+				for tick := range ticks {
+					problem, found := e.store.GetProblem(tick.ProblemID)
+					if !found {
+						continue
+					}
 
-				tick.Score(problem)
-				e.store.SaveTick(contender.ID, tick)
+					tick.Score(problem)
+					e.store.SaveTick(contender.ID, tick)
+
+					yield(tick)
+				}
 			}
 
-			contender.Score = e.rules.CalculateScore(Points(ticks))
+			contender.Score = e.rules.CalculateScore(Points(scoredTicks))
 			e.store.SaveContender(contender)
 		}
 
