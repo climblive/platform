@@ -114,7 +114,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-24.04
-    environment: test
+    environment: production
     needs: [build-web, build-backend]
 
     steps:
