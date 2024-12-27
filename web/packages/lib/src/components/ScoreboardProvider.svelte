@@ -65,7 +65,7 @@
 
     setupEventHandlers(eventSource);
 
-    eventSource.onerror = (e) => {
+    eventSource.onerror = () => {
       online = false;
       reset();
 
