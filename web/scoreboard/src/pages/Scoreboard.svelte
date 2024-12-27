@@ -112,7 +112,6 @@
     background-color: var(--sl-color-danger-600);
     width: 100%;
     height: 2rem;
-    flex-shrink: 0;
     display: flex;
     justify-content: center;
     align-items: center;
