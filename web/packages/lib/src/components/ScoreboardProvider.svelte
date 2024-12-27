@@ -54,6 +54,10 @@
     }
   };
 
+  const handleBeforeUnload = () => {
+    tearDown();
+  };
+
   const setup = () => {
     eventSource = new EventSource(
       `${getApiUrl()}/contests/${contestId}/events`,
@@ -194,6 +198,9 @@
   });
 </script>
 
-<svelte:window onvisibilitychange={handleVisibilityChange} />
+<svelte:window
+  onbeforeunload={handleBeforeUnload}
+  onvisibilitychange={handleVisibilityChange}
+/>
 
 {@render children?.({ scoreboard, loading, online })}
