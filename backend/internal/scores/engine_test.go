@@ -200,6 +200,81 @@ func TestScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
+	t.Run("ScoreAll", func(t *testing.T) {
+		f, awaitExpectations := makeFixture(0)
+
+		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+
+		f.store.On("GetAllContenders").
+			Return(slices.Values([]scores.Contender{
+				{ID: 1, CompClassID: 1},
+				{ID: 2, CompClassID: 2},
+			}))
+
+		f.store.
+			On("GetTicks", domain.ContenderID(1)).
+			Return(slices.Values([]scores.Tick{{ProblemID: 1, Top: true}, {ProblemID: 2, Top: true}, {ProblemID: 3, Top: true}})).
+			On("GetTicks", domain.ContenderID(2)).
+			Return(slices.Values([]scores.Tick{{ProblemID: 1, Zone: true}, {ProblemID: 2, Zone: true}}))
+
+		f.store.
+			On("GetProblem", domain.ProblemID(1)).
+			Return(scores.Problem{ID: 1, PointsTop: 100, PointsZone: 10}, true).
+			On("GetProblem", domain.ProblemID(2)).
+			Return(scores.Problem{ID: 2, PointsTop: 200, PointsZone: 20}, true).
+			On("GetProblem", domain.ProblemID(3)).
+			Return(scores.Problem{ID: 3, PointsTop: 300}, true)
+
+		f.store.
+			On("SaveTick", domain.ContenderID(1), scores.Tick{ProblemID: 1, Top: true, Points: 100}).Return().
+			On("SaveTick", domain.ContenderID(1), scores.Tick{ProblemID: 2, Top: true, Points: 200}).Return().
+			On("SaveTick", domain.ContenderID(1), scores.Tick{ProblemID: 3, Top: true, Points: 300}).Return().
+			On("SaveTick", domain.ContenderID(2), scores.Tick{ProblemID: 1, Zone: true, Points: 10}).Return().
+			On("SaveTick", domain.ContenderID(2), scores.Tick{ProblemID: 2, Zone: true, Points: 20}).Return()
+
+		f.rules.
+			On("CalculateScore", iterMatcher([]int{100, 200, 300})).
+			Return(600).
+			On("CalculateScore", iterMatcher([]int{10, 20})).
+			Return(30)
+
+		f.store.
+			On("SaveContender", scores.Contender{ID: 1, CompClassID: 1, Score: 600}).Return().
+			On("SaveContender", scores.Contender{ID: 2, CompClassID: 2, Score: 30}).Return()
+
+		f.store.On("GetCompClassIDs").Return([]domain.CompClassID{1, 2, 3})
+
+		f.store.
+			On("GetContendersByCompClass", domain.CompClassID(1)).
+			Return(slices.Values([]scores.Contender{{ID: 1}})).
+			On("GetContendersByCompClass", domain.CompClassID(2)).
+			Return(slices.Values([]scores.Contender{{ID: 2}})).
+			On("GetContendersByCompClass", domain.CompClassID(3)).
+			Return(slices.Values([]scores.Contender{{ID: 3}}))
+
+		f.ranker.
+			On("RankContenders", iterMatcher([]scores.Contender{{ID: 1}})).
+			Return([]domain.Score{{ContenderID: 1, Placement: 1}}).
+			On("RankContenders", iterMatcher([]scores.Contender{{ID: 2}})).
+			Return([]domain.Score{{ContenderID: 2, Placement: 2}}).
+			On("RankContenders", iterMatcher([]scores.Contender{{ID: 3}})).
+			Return([]domain.Score{{ContenderID: 3, Placement: 3}})
+
+		f.store.On("SaveScore", domain.Score{ContenderID: 1, Placement: 1}).Return()
+		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
+		f.store.On("SaveScore", domain.Score{ContenderID: 3, Placement: 3}).Return()
+
+		wg := f.engine.Run(context.Background())
+
+		f.engine.ScoreAll()
+
+		f.subscription.Terminate()
+
+		wg.Wait()
+
+		awaitExpectations(t)
+	})
+
 	t.Run("ContenderEntered", func(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
