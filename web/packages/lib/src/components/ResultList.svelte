@@ -86,7 +86,9 @@
     }
   });
 
-  let pageCount = $derived(Math.ceil(results.length / pageSize));
+  let pageCount = $derived(
+    pageSize === 0 ? 0 : Math.ceil(results.length / pageSize),
+  );
 
   $effect(() => {
     if (container && overflow === "pagination") {
@@ -115,6 +117,15 @@
     {/each}
   {/if}
 </div>
+{#if overflow === "pagination"}
+  <div class="pagination">
+    <div class="inset">
+      {#each [...Array(pageCount).keys()] as i (i)}
+        <div class="pageIndicator" data-current={i === pageIndex}></div>
+      {/each}
+    </div>
+  </div>
+{/if}
 
 <style>
   sl-skeleton {
@@ -145,5 +156,35 @@
 
   .container[data-overflow="scroll"] {
     height: calc(var(--page-size) * (2.25rem + var(--sl-spacing-x-small)));
+  }
+
+  .pagination {
+    width: 100%;
+    height: 0.5rem;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    margin-top: var(--sl-spacing-small);
+
+    & .inset {
+      position: absolute;
+      inset: 0;
+
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+  }
+
+  .pageIndicator {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background-color: var(--sl-color-primary-600);
+    opacity: 0.5;
+
+    &[data-current="true"] {
+      opacity: 1;
+    }
   }
 </style>
