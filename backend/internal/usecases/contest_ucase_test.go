@@ -133,3 +133,25 @@ func TestGetScoreboard(t *testing.T) {
 	mockedRepo.AssertExpectations(t)
 	mockedScoreKeeper.AssertExpectations(t)
 }
+
+func TestGetScoreboard_Empty(t *testing.T) {
+	fakedContestID := randomResourceID[domain.ContestID]()
+
+	mockedRepo := new(repositoryMock)
+
+	mockedRepo.
+		On("GetContendersByContest", mock.Anything, mock.Anything, fakedContestID).
+		Return([]domain.Contender{}, nil)
+
+	ucase := usecases.ContestUseCase{
+		Repo: mockedRepo,
+	}
+
+	scoreboard, err := ucase.GetScoreboard(context.Background(), fakedContestID)
+
+	require.NoError(t, err)
+	assert.NotNil(t, scoreboard)
+	assert.Len(t, scoreboard, 0)
+
+	mockedRepo.AssertExpectations(t)
+}

@@ -54,7 +54,7 @@ func (uc *ContestUseCase) GetScoreboard(ctx context.Context, contestID domain.Co
 		return nil, errors.Wrap(err, 0)
 	}
 
-	var entries []domain.ScoreboardEntry
+	entries := make([]domain.ScoreboardEntry, 0)
 
 	for _, contender := range contenders {
 		if contender.CompClassID == 0 {
