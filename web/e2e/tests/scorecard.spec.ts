@@ -51,7 +51,7 @@ test.beforeAll(async () => {
     })
     .withNetwork(network)
     .withExposedPorts({ container: 8090, host: 8090 })
-    .withWaitStrategy(Wait.forLogMessage(/score engine store hydration complete/))
+    .withWaitStrategy(Wait.forLogMessage(/score engine started/))
 
   const webContainer = new GenericContainer("climblive-web:latest")
     .withNetwork(network)

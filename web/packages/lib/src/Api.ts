@@ -97,7 +97,7 @@ export class ApiClient {
   };
 
   getCompClasses = async (contestId: number) => {
-    const endpoint = `/contests/${contestId}/compClasses`;
+    const endpoint = `/contests/${contestId}/comp-classes`;
 
     const result = await this.axiosInstance.get(endpoint);
 

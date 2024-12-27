@@ -1,6 +1,10 @@
 package domain
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type ScoreKeeper interface {
 	GetScore(contenderID ContenderID) (Score, error)
@@ -14,3 +18,5 @@ type Score struct {
 	Finalist    bool        `json:"finalist"`
 	RankOrder   int         `json:"rankOrder"`
 }
+
+type ScoreEngineInstanceID = uuid.UUID

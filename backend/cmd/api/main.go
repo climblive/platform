@@ -93,7 +93,7 @@ func main() {
 		scoreKeeper.Run(ctx),
 		scoreEngineManager.Run(ctx))
 
-	mux := setupMux(repo, authorizer, eventBroker, scoreKeeper)
+	mux := setupMux(repo, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
 
 	httpServer := &http.Server{
 		Addr:    "0.0.0.0:8090",
@@ -128,6 +128,7 @@ func setupMux(
 	authorizer *authorizer.Authorizer,
 	eventBroker domain.EventBroker,
 	scoreKeeper domain.ScoreKeeper,
+	scoreEngineManager *scores.ScoreEngineManager,
 ) *rest.Mux {
 	contenderUseCase := usecases.ContenderUseCase{
 		Repo:                      repo,
@@ -168,6 +169,7 @@ func setupMux(
 	rest.InstallProblemHandler(mux, &problemUseCase)
 	rest.InstallTickHandler(mux, &tickUseCase)
 	rest.InstallEventHandler(mux, eventBroker, 10*time.Second)
+	rest.InstallScoreEngineHandler(mux, scoreEngineManager)
 
 	return mux
 }

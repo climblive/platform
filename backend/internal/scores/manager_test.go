@@ -98,6 +98,11 @@ func (m *repositoryMock) GetContestsCurrentlyRunningOrByStartTime(ctx context.Co
 	return args.Get(0).([]domain.Contest), args.Error(1)
 }
 
+func (m *repositoryMock) GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error) {
+	args := m.Called(ctx, tx, contestID)
+	return args.Get(0).(domain.Contest), args.Error(1)
+}
+
 func (m *repositoryMock) GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error) {
 	args := m.Called(ctx, tx, contestID)
 	return args.Get(0).([]domain.Contender), args.Error(1)

@@ -10,7 +10,23 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
+	"github.com/google/uuid"
 )
+
+type listRequest struct {
+	contestID domain.ContestID
+	response  chan []domain.ScoreEngineInstanceID
+}
+
+type stopRequest struct {
+	instanceID domain.ScoreEngineInstanceID
+	response   chan struct{}
+}
+
+type startRequest struct {
+	contestID domain.ContestID
+	response  chan domain.ScoreEngineInstanceID
+}
 
 const pollInterval = 10 * time.Second
 
@@ -20,6 +36,7 @@ type EngineStoreHydrator interface {
 
 type scoreEngineManagerRepository interface {
 	GetContestsCurrentlyRunningOrByStartTime(ctx context.Context, tx domain.Transaction, earliestStartTime, latestStartTime time.Time) ([]domain.Contest, error)
+	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
 }
 
 type ScoreEngineManager struct {
@@ -27,9 +44,11 @@ type ScoreEngineManager struct {
 	engineStoreHydrator EngineStoreHydrator
 	eventBroker         domain.EventBroker
 	handlers            map[domain.ContestID]*engineHandler
+	requests            chan any
 }
 
 type engineHandler struct {
+	instanceID         domain.ScoreEngineInstanceID
 	engine             *ScoreEngine
 	cancel             func()
 	wg                 *sync.WaitGroup
@@ -54,6 +73,63 @@ func (mngr *ScoreEngineManager) Run(ctx context.Context) *sync.WaitGroup {
 	go mngr.run(ctx, wg)
 
 	return wg
+}
+
+func (mngr *ScoreEngineManager) ListScoreEnginesByContest(
+	ctx context.Context,
+	contestID domain.ContestID,
+) ([]domain.ScoreEngineInstanceID, error) {
+	response := make(chan []domain.ScoreEngineInstanceID, 1)
+
+	mngr.requests <- listRequest{
+		contestID: contestID,
+		response:  response,
+	}
+
+	select {
+	case instances := <-response:
+		return instances, nil
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+}
+
+func (mngr *ScoreEngineManager) StopScoreEngine(
+	ctx context.Context,
+	instanceID domain.ScoreEngineInstanceID,
+) error {
+	response := make(chan struct{}, 1)
+
+	mngr.requests <- stopRequest{
+		instanceID: instanceID,
+		response:   response,
+	}
+
+	select {
+	case <-response:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}
+
+func (mngr *ScoreEngineManager) StartScoreEngine(
+	ctx context.Context,
+	contestID domain.ContestID,
+) (domain.ScoreEngineInstanceID, error) {
+	response := make(chan domain.ScoreEngineInstanceID, 1)
+
+	mngr.requests <- startRequest{
+		contestID: contestID,
+		response:  response,
+	}
+
+	select {
+	case instanceID := <-response:
+		return instanceID, nil
+	case <-ctx.Done():
+		return uuid.UUID{}, ctx.Err()
+	}
 }
 
 func (mngr *ScoreEngineManager) run(ctx context.Context, wg *sync.WaitGroup) {
@@ -87,6 +163,23 @@ func (mngr *ScoreEngineManager) run(ctx context.Context, wg *sync.WaitGroup) {
 
 			return
 		case <-sleepTimer.C:
+		case request := <-mngr.requests:
+			switch req := request.(type) {
+			case listRequest:
+				req.response <- mngr.listScoreEnginesByContest(req.contestID)
+				close(req.response)
+			case stopRequest:
+				mngr.stopScoreEngine(req.instanceID)
+				close(req.response)
+			case startRequest:
+				instanceID, err := mngr.startScoreEngine(ctx, req.contestID)
+				if err != nil {
+					panic("not implemented")
+				}
+
+				req.response <- instanceID
+				close(req.response)
+			}
 		}
 	}
 }
@@ -99,9 +192,11 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) error {
 	}
 
 	for contest := range slices.Values(contests) {
-		logger := slog.New(slog.Default().Handler()).With("contest_id", contest.ID)
-
 		if handler, ok := mngr.handlers[contest.ID]; ok {
+			logger := slog.New(slog.Default().Handler()).
+				With("contest_id", contest.ID).
+				With("instance_id", handler.instanceID)
+
 			if contest.QualifyingProblems != handler.qualifyingProblems {
 				logger.Info("updating scoring rules", "qualifying_problems", contest.QualifyingProblems)
 				handler.engine.SetScoringRules(&HardestProblems{Number: contest.QualifyingProblems})
@@ -117,45 +212,63 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) error {
 			continue
 		}
 
-		config := slog.Group("config",
-			"qualifying_problems", contest.QualifyingProblems,
-			"finalists", contest.Finalists)
-
-		switch {
-		case contest.TimeBegin != nil && contest.TimeBegin.After(now):
-			logger.Info("detected contest about to start", "starting_in", time.Until(*contest.TimeBegin), config)
-		default:
-			logger.Info("detected contest that is currently running", config)
-		}
-
-		store := NewMemoryStore()
-
-		handler := engineHandler{
-			engine:             NewScoreEngine(contest.ID, mngr.eventBroker, &HardestProblems{Number: contest.QualifyingProblems}, NewBasicRanker(contest.Finalists), store),
-			finalists:          contest.Finalists,
-			qualifyingProblems: contest.QualifyingProblems,
-		}
-
-		var cancellableCtx context.Context
-		cancellableCtx, handler.cancel = context.WithCancel(ctx)
-		handler.wg = handler.engine.Run(cancellableCtx)
-
-		hydrationStartTime := time.Now()
-		err := mngr.engineStoreHydrator.Hydrate(ctx, contest.ID, store)
-		if err != nil {
-			logger.Error("failed to hydrate score engine", "error", err)
-
-			handler.cancel()
-
-			continue
-		}
-
-		handler.engine.ScoreAll()
-
-		logger.Info("score engine store hydration complete", "time", time.Since(hydrationStartTime))
-
-		mngr.handlers[contest.ID] = &handler
+		_, _ = mngr.startScoreEngine(ctx, contest.ID)
 	}
 
 	return nil
+}
+
+func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID domain.ContestID) (domain.ScoreEngineInstanceID, error) {
+	now := time.Now()
+
+	contest, err := mngr.repo.GetContest(ctx, nil, contestID)
+	if err != nil {
+		return uuid.UUID{}, errors.Wrap(err, 0)
+	}
+
+	logger := slog.New(slog.Default().Handler()).With("contest_id", contestID)
+
+	logger = logger.With(slog.Group("config",
+		"qualifying_problems", contest.QualifyingProblems,
+		"finalists", contest.Finalists))
+
+	if contest.TimeBegin != nil && contest.TimeBegin.After(now) {
+		logger = logger.With("starting_in", time.Until(*contest.TimeBegin))
+	}
+
+	logger.Info("spinning up score engine")
+
+	instanceID := uuid.New()
+	store := NewMemoryStore()
+	rules := &HardestProblems{Number: contest.QualifyingProblems}
+	ranker := NewBasicRanker(contest.Finalists)
+	engine := NewScoreEngine(contestID, mngr.eventBroker, rules, ranker, store)
+
+	hydrationStartTime := time.Now()
+	err = mngr.engineStoreHydrator.Hydrate(ctx, contestID, store)
+	if err != nil {
+		logger.Error("hydration failed", "error", err)
+
+		return uuid.UUID{}, errors.Wrap(err, 0)
+	}
+
+	logger.Debug("score engine store hydration complete", "time", time.Since(hydrationStartTime))
+
+	cancellableCtx, cancel := context.WithCancel(ctx)
+	wg := engine.Run(cancellableCtx)
+
+	engine.ScoreAll()
+
+	mngr.handlers[contestID] = &engineHandler{
+		instanceID:         instanceID,
+		engine:             engine,
+		cancel:             cancel,
+		wg:                 wg,
+		finalists:          contest.Finalists,
+		qualifyingProblems: contest.QualifyingProblems,
+	}
+
+	logger.Info("score engine started", "instance_id", instanceID)
+
+	return instanceID, nil
 }
