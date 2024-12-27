@@ -66,11 +66,16 @@
     setupEventHandlers(eventSource);
 
     eventSource.onerror = (e) => {
-      // eslint-disable-next-line no-console
-      console.error(e);
-
       online = false;
       reset();
+
+      if (eventSource?.readyState === EventSource.CLOSED) {
+        setTimeout(() => {
+          setup();
+        }, 5000);
+
+        return;
+      }
     };
 
     eventSource.onopen = () => {
