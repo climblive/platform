@@ -97,7 +97,7 @@ func (uc *ContenderUseCase) GetContendersByContest(ctx context.Context, contestI
 	return contenders, nil
 }
 
-func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID domain.ContenderID, updates domain.Contender) (domain.Contender, error) {
+func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID domain.ContenderID, patch domain.ContenderPatch) (domain.Contender, error) {
 	var mty domain.Contender
 	var events []any
 
@@ -142,12 +142,12 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 		}
 	}
 
-	if contender.CompClassID != updates.CompClassID {
-		if updates.CompClassID == 0 {
+	if patch.CompClassID != nil && contender.CompClassID != patch.CompClassID.Value {
+		if patch.CompClassID.Value == 0 {
 			return mty, errors.Wrap(domain.ErrNotAllowed, 0)
 		}
 
-		compClass, err := uc.Repo.GetCompClass(ctx, nil, updates.CompClassID)
+		compClass, err := uc.Repo.GetCompClass(ctx, nil, patch.CompClassID.Value)
 		if err != nil {
 			return mty, errors.Wrap(err, 0)
 		}
@@ -155,12 +155,12 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 		if contender.CompClassID == 0 {
 			events = append(events, domain.ContenderEnteredEvent{
 				ContenderID: contenderID,
-				CompClassID: updates.CompClassID,
+				CompClassID: patch.CompClassID.Value,
 			})
 		} else {
 			events = append(events, domain.ContenderSwitchedClassEvent{
 				ContenderID: contenderID,
-				CompClassID: updates.CompClassID,
+				CompClassID: patch.CompClassID.Value,
 			})
 		}
 
@@ -173,7 +173,7 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 			return mty, errors.Wrap(domain.ErrContestEnded, 0)
 		}
 
-		contender.CompClassID = updates.CompClassID
+		contender.CompClassID = patch.CompClassID.Value
 
 		if contender.Entered == nil {
 			timestamp := time.Now()
@@ -185,54 +185,56 @@ func (uc *ContenderUseCase) UpdateContender(ctx context.Context, contenderID dom
 		return mty, errors.New(domain.ErrNotRegistered)
 	}
 
-	if contender.WithdrawnFromFinals != updates.WithdrawnFromFinals {
-		var event any
-		if updates.WithdrawnFromFinals {
-			event = domain.ContenderWithdrewFromFinalsEvent{
-				ContenderID: contenderID,
-			}
-		} else {
-			event = domain.ContenderReenteredFinalsEvent{
-				ContenderID: contenderID,
-			}
-		}
+	if patch.Name != nil {
+		contender.Name = strings.TrimSpace(patch.Name.Value)
 
-		events = append(events, event)
+		if contender.Name == "" {
+			return mty, errors.Errorf("%w: %w", domain.ErrInvalidData, domain.ErrEmptyName)
+		}
 	}
 
-	if contender.Disqualified != updates.Disqualified {
+	if patch.PublicName != nil {
+		contender.PublicName = strings.TrimSpace(patch.PublicName.Value)
+
+		if contender.PublicName == "" {
+			contender.PublicName = contender.Name
+		}
+	}
+
+	if patch.ClubName != nil {
+		contender.ClubName = strings.TrimSpace(patch.ClubName.Value)
+	}
+
+	if patch.WithdrawnFromFinals != nil && contender.WithdrawnFromFinals != patch.WithdrawnFromFinals.Value {
+		if patch.WithdrawnFromFinals.Value {
+			events = append(events, domain.ContenderWithdrewFromFinalsEvent{
+				ContenderID: contenderID,
+			})
+		} else {
+			events = append(events, domain.ContenderReenteredFinalsEvent{
+				ContenderID: contenderID,
+			})
+		}
+
+		contender.WithdrawnFromFinals = patch.WithdrawnFromFinals.Value
+	}
+
+	if patch.Disqualified != nil && contender.Disqualified != patch.Disqualified.Value {
 		if !role.OneOf(domain.AdminRole, domain.OrganizerRole) {
 			return mty, errors.Wrap(domain.ErrInsufficientRole, 0)
 		}
 
-		var event any
-
-		if updates.Disqualified {
-			event = domain.ContenderDisqualifiedEvent{
+		if patch.Disqualified.Value {
+			events = append(events, domain.ContenderDisqualifiedEvent{
 				ContenderID: contenderID,
-			}
+			})
 		} else {
-			event = domain.ContenderRequalifiedEvent{
+			events = append(events, domain.ContenderRequalifiedEvent{
 				ContenderID: contenderID,
-			}
+			})
 		}
 
-		events = append(events, event)
-	}
-
-	contender.CompClassID = updates.CompClassID
-	contender.Name = strings.TrimSpace(updates.Name)
-	contender.PublicName = strings.TrimSpace(updates.PublicName)
-	contender.ClubName = strings.TrimSpace(updates.ClubName)
-	contender.WithdrawnFromFinals = updates.WithdrawnFromFinals
-	contender.Disqualified = updates.Disqualified
-
-	if contender.Name == "" {
-		return mty, errors.Errorf("%w: %w", domain.ErrInvalidData, domain.ErrEmptyName)
-	}
-
-	if contender.PublicName == "" {
-		contender.PublicName = contender.Name
+		contender.Disqualified = patch.Disqualified.Value
 	}
 
 	publicInfoEvent.CompClassID = contender.CompClassID

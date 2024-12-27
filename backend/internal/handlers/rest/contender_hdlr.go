@@ -20,7 +20,7 @@ func InstallContenderHandler(mux *Mux, contenderUseCase domain.ContenderUseCase)
 	mux.HandleFunc("GET /codes/{registrationCode}/contender", handler.GetContenderByCode)
 	mux.HandleFunc("GET /compClasses/{compClassID}/contenders", handler.GetContendersByCompClass)
 	mux.HandleFunc("GET /contests/{contestID}/contenders", handler.GetContendersByContest)
-	mux.HandleFunc("PUT /contenders/{contenderID}", handler.UpdateContender)
+	mux.HandleFunc("PATCH /contenders/{contenderID}", handler.UpdateContender)
 	mux.HandleFunc("DELETE /contenders/{contenderID}", handler.DeleteContender)
 	mux.HandleFunc("POST /contests/{contestID}/contenders", handler.CreateContenders)
 }
@@ -76,14 +76,14 @@ func (hdlr *contenderHandler) GetContendersByContest(w http.ResponseWriter, r *h
 func (hdlr *contenderHandler) UpdateContender(w http.ResponseWriter, r *http.Request) {
 	contenderID := parseResourceID[domain.ContenderID](r.PathValue("contenderID"))
 
-	var contender domain.Contender
-	err := json.NewDecoder(r.Body).Decode(&contender)
+	var patch domain.ContenderPatch
+	err := json.NewDecoder(r.Body).Decode(&patch)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	updatedContender, err := hdlr.contenderUseCase.UpdateContender(r.Context(), contenderID, contender)
+	updatedContender, err := hdlr.contenderUseCase.PatchContender(r.Context(), contenderID, patch)
 	if err != nil {
 		handleError(w, err)
 		return

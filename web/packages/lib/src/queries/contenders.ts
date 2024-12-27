@@ -5,7 +5,7 @@ import {
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import type { Contender } from "../models/contender";
+import type { Contender, ContenderPatch } from "../models/contender";
 import { HOUR } from "./constants";
 
 export const getContenderQuery = (contenderId: number) =>
@@ -22,8 +22,8 @@ export const updateContenderMutation = (contenderId: number) => {
   const client = useQueryClient();
 
   return createMutation({
-    mutationFn: async (contender: Contender) =>
-      ApiClient.getInstance().updateContender(contenderId, contender),
+    mutationFn: async (patch: ContenderPatch) =>
+      ApiClient.getInstance().updateContender(contenderId, patch),
     onSuccess: (updatedContender) => {
       const queryKey: QueryKey = ["contender", { id: contenderId }];
       client.setQueryData<Contender>(queryKey, updatedContender);

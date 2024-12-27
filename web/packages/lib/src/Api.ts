@@ -3,7 +3,7 @@ import axios from "axios";
 import { z } from "zod";
 import { contestSchema, scoreboardEntrySchema } from "./models";
 import { compClassSchema } from "./models/compClass";
-import { contenderSchema, type Contender } from "./models/contender";
+import { contenderSchema, type ContenderPatch } from "./models/contender";
 import { problemSchema } from "./models/problem";
 import { tickSchema, type Tick } from "./models/tick";
 import { getApiUrl } from "./utils/config";
@@ -70,10 +70,10 @@ export class ApiClient {
     return contenderSchema.parse(result.data);
   };
 
-  updateContender = async (id: number, contender: Contender) => {
+  updateContender = async (id: number, patch: ContenderPatch) => {
     const endpoint = `/contenders/${id}`;
 
-    const result = await this.axiosInstance.put(endpoint, contender, {
+    const result = await this.axiosInstance.patch(endpoint, patch, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 

@@ -33,7 +33,6 @@
 
     $updateContender.mutate(
       {
-        ...contender,
         ...form,
         publicName: form.name,
       },
