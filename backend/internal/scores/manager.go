@@ -13,6 +13,8 @@ import (
 	"github.com/google/uuid"
 )
 
+var ErrAlreadyStarted = errors.New("already started")
+
 type listRequest struct {
 	contestID domain.ContestID
 	response  chan []domain.ScoreEngineInstanceID
@@ -25,7 +27,12 @@ type stopRequest struct {
 
 type startRequest struct {
 	contestID domain.ContestID
-	response  chan domain.ScoreEngineInstanceID
+	response  chan startResponse
+}
+
+type startResponse struct {
+	instanceID domain.ScoreEngineInstanceID
+	err        error
 }
 
 const pollInterval = 10 * time.Second
@@ -62,6 +69,7 @@ func NewScoreEngineManager(repo scoreEngineManagerRepository, engineStoreHydrato
 		engineStoreHydrator: engineStoreHydrator,
 		eventBroker:         eventBroker,
 		handlers:            make(map[domain.ContestID]*engineHandler),
+		requests:            make(chan any),
 	}
 }
 
@@ -117,7 +125,7 @@ func (mngr *ScoreEngineManager) StartScoreEngine(
 	ctx context.Context,
 	contestID domain.ContestID,
 ) (domain.ScoreEngineInstanceID, error) {
-	response := make(chan domain.ScoreEngineInstanceID, 1)
+	response := make(chan startResponse, 1)
 
 	mngr.requests <- startRequest{
 		contestID: contestID,
@@ -125,8 +133,8 @@ func (mngr *ScoreEngineManager) StartScoreEngine(
 	}
 
 	select {
-	case instanceID := <-response:
-		return instanceID, nil
+	case response := <-response:
+		return response.instanceID, response.err
 	case <-ctx.Done():
 		return uuid.UUID{}, ctx.Err()
 	}
@@ -141,13 +149,11 @@ func (mngr *ScoreEngineManager) run(ctx context.Context, wg *sync.WaitGroup) {
 
 	defer wg.Done()
 
-	for {
-		err := mngr.runPeriodicCheck(ctx)
-		if err != nil {
-			slog.Error("score engine manager failed to complete periodic check", "error", err)
-		}
+	ticker := time.Tick(pollInterval)
 
-		sleepTimer := time.NewTimer(pollInterval)
+	mngr.runPeriodicCheck(ctx)
+
+	for {
 
 		select {
 		case <-ctx.Done():
@@ -162,33 +168,46 @@ func (mngr *ScoreEngineManager) run(ctx context.Context, wg *sync.WaitGroup) {
 			}
 
 			return
-		case <-sleepTimer.C:
+		case <-ticker:
+			mngr.runPeriodicCheck(ctx)
 		case request := <-mngr.requests:
-			switch req := request.(type) {
-			case listRequest:
-				req.response <- mngr.listScoreEnginesByContest(req.contestID)
-				close(req.response)
-			case stopRequest:
-				mngr.stopScoreEngine(req.instanceID)
-				close(req.response)
-			case startRequest:
-				instanceID, err := mngr.startScoreEngine(ctx, req.contestID)
-				if err != nil {
-					panic("not implemented")
-				}
-
-				req.response <- instanceID
-				close(req.response)
-			}
+			mngr.handleRequest(request)
 		}
 	}
 }
 
-func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) error {
+func (mngr *ScoreEngineManager) handleRequest(request any) {
+	switch req := request.(type) {
+	case listRequest:
+		req.response <- mngr.listScoreEnginesByContest(req.contestID)
+
+		close(req.response)
+	case startRequest:
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		instanceID, err := mngr.startScoreEngine(ctx, req.contestID)
+
+		req.response <- startResponse{
+			instanceID: instanceID,
+			err:        err,
+		}
+
+		close(req.response)
+	case stopRequest:
+		mngr.stopScoreEngine(req.instanceID)
+
+		close(req.response)
+	}
+}
+
+func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) {
 	now := time.Now()
 	contests, err := mngr.repo.GetContestsCurrentlyRunningOrByStartTime(ctx, nil, now, now.Add(time.Hour))
 	if err != nil {
-		return errors.Wrap(err, 0)
+		slog.Error("score engine manager failed to complete periodic check", "error", err)
+
+		return
 	}
 
 	for contest := range slices.Values(contests) {
@@ -214,11 +233,13 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) error {
 
 		_, _ = mngr.startScoreEngine(ctx, contest.ID)
 	}
-
-	return nil
 }
 
 func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID domain.ContestID) (domain.ScoreEngineInstanceID, error) {
+	if _, ok := mngr.handlers[contestID]; ok {
+		return uuid.UUID{}, errors.New(ErrAlreadyStarted)
+	}
+
 	now := time.Now()
 
 	contest, err := mngr.repo.GetContest(ctx, nil, contestID)
@@ -254,7 +275,7 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 
 	logger.Debug("score engine store hydration complete", "time", time.Since(hydrationStartTime))
 
-	cancellableCtx, cancel := context.WithCancel(ctx)
+	cancellableCtx, cancel := context.WithCancel(context.Background())
 	wg := engine.Run(cancellableCtx)
 
 	engine.ScoreAll()
@@ -271,4 +292,29 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 	logger.Info("score engine started", "instance_id", instanceID)
 
 	return instanceID, nil
+}
+
+func (mngr *ScoreEngineManager) listScoreEnginesByContest(contestID domain.ContestID) []domain.ScoreEngineInstanceID {
+	instances := make([]domain.ScoreEngineInstanceID, 0)
+
+	for id, handler := range mngr.handlers {
+		if id == contestID {
+			instances = append(instances, handler.instanceID)
+		}
+	}
+
+	return instances
+}
+
+func (mngr *ScoreEngineManager) stopScoreEngine(instanceID domain.ScoreEngineInstanceID) {
+	for contestID, handler := range mngr.handlers {
+		if handler.instanceID == instanceID {
+			handler.cancel()
+			handler.wg.Wait()
+
+			delete(mngr.handlers, contestID)
+
+			return
+		}
+	}
 }
