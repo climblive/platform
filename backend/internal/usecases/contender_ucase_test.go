@@ -628,7 +628,7 @@ func TestCreateContenders(t *testing.T) {
 	})
 }
 
-func TestUpdateContender(t *testing.T) {
+func TestPatchContender(t *testing.T) {
 	fakedContenderID := randomResourceID[domain.ContenderID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: randomResourceID[domain.OrganizerID](),
@@ -712,7 +712,7 @@ func TestUpdateContender(t *testing.T) {
 			ScoreKeeper: mockedScoreKeeper,
 		}
 
-		contender, err := ucase.UpdateContender(context.Background(), fakedContenderID, fakedContender)
+		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{})
 
 		require.NoError(t, err)
 
@@ -730,90 +730,6 @@ func TestUpdateContender(t *testing.T) {
 
 		require.NotNil(t, contender.Score)
 		assert.Equal(t, fakedScore, *contender.Score)
-
-		mockedAuthorizer.AssertExpectations(t)
-		mockedScoreKeeper.AssertExpectations(t)
-		mockedRepo.AssertExpectations(t)
-	})
-
-	t.Run("ReadOnlyFieldsAreUnaltered", func(t *testing.T) {
-		mockedAuthorizer := new(authorizerMock)
-		mockedScoreKeeper := new(scoreKeeperMock)
-
-		fakedContender := domain.Contender{
-			ID:                  fakedContenderID,
-			Ownership:           fakedOwnership,
-			ContestID:           fakedContestID,
-			CompClassID:         fakedCompClassID,
-			RegistrationCode:    "ABCD1234",
-			Name:                "John Doe",
-			PublicName:          "John",
-			ClubName:            "Testers' Climbing Club",
-			Entered:             &currentTime,
-			WithdrawnFromFinals: false,
-			Disqualified:        false,
-		}
-
-		mockedRepo := makeMockedRepo(fakedContender)
-
-		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
-			Return(domain.CompClass{
-				ID:        fakedCompClassID,
-				TimeBegin: currentTime.Add(-1 * time.Hour),
-				TimeEnd:   currentTime.Add(time.Hour),
-			}, nil)
-
-		mockedRepo.
-			On("StoreContender", mock.Anything, mock.Anything, mock.AnythingOfType("domain.Contender")).
-			Return(mirrorInstruction{}, nil)
-
-		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, fakedOwnership).
-			Return(domain.ContenderRole, nil)
-
-		mockedScoreKeeper.On("GetScore", fakedContenderID).Return(domain.Score{}, errMock)
-
-		ucase := usecases.ContenderUseCase{
-			Repo:        mockedRepo,
-			Authorizer:  mockedAuthorizer,
-			ScoreKeeper: mockedScoreKeeper,
-		}
-
-		modifiers := []func(domain.Contender) domain.Contender{
-			func(contender domain.Contender) domain.Contender {
-				contender.ID += 1
-				return contender
-			},
-			func(contender domain.Contender) domain.Contender {
-				contender.Ownership.OrganizerID += 1
-				return contender
-			},
-			func(contender domain.Contender) domain.Contender {
-				contender.ContestID += 1
-				return contender
-			},
-			func(contender domain.Contender) domain.Contender {
-				contender.RegistrationCode = "DEADBEEF"
-				return contender
-			},
-			func(contender domain.Contender) domain.Contender {
-				contender.Score = &domain.Score{}
-				return contender
-			},
-			func(contender domain.Contender) domain.Contender {
-				soon := currentTime.Add(time.Hour)
-				contender.Entered = &soon
-				return contender
-			},
-		}
-
-		for _, fn := range modifiers {
-			contender, err := ucase.UpdateContender(context.Background(), fakedContenderID, fn(fakedContender))
-
-			require.NoError(t, err)
-			assert.Equal(t, fakedContender, contender)
-		}
 
 		mockedAuthorizer.AssertExpectations(t)
 		mockedScoreKeeper.AssertExpectations(t)
@@ -856,10 +772,9 @@ func TestUpdateContender(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		updatedContender := fakedContender
-		updatedContender.Disqualified = false
-
-		contender, err := ucase.UpdateContender(context.Background(), fakedContenderID, updatedContender)
+		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
+			Disqualified: domain.NewPatch(false),
+		})
 
 		assert.ErrorIs(t, err, domain.ErrInsufficientRole)
 		assert.Empty(t, contender)
@@ -916,13 +831,12 @@ func TestUpdateContender(t *testing.T) {
 			EventBroker: mockedEventBroker,
 		}
 
-		updatedContender := fakedContender
-		updatedContender.CompClassID = fakedCompClassID
-		updatedContender.Name = "John Doe"
-		updatedContender.PublicName = "John"
-		updatedContender.ClubName = "Testers' Climbing Club"
-
-		contender, err := ucase.UpdateContender(context.Background(), fakedContenderID, updatedContender)
+		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
+			CompClassID: domain.NewPatch(fakedCompClassID),
+			Name:        domain.NewPatch("John Doe"),
+			PublicName:  domain.NewPatch("John"),
+			ClubName:    domain.NewPatch("Testers' Climbing Club"),
+		})
 
 		require.NoError(t, err)
 
@@ -981,7 +895,7 @@ func TestUpdateContender(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		contender, err := ucase.UpdateContender(context.Background(), fakedContenderID, fakedContender)
+		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{})
 
 		assert.ErrorIs(t, err, domain.ErrNotRegistered)
 		assert.Empty(t, contender)
@@ -1026,10 +940,9 @@ func TestUpdateContender(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		updatedContender := fakedContender
-		updatedContender.CompClassID = 0
-
-		contender, err := ucase.UpdateContender(context.Background(), fakedContenderID, updatedContender)
+		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
+			CompClassID: domain.NewPatch(domain.CompClassID(0)),
+		})
 
 		assert.ErrorIs(t, err, domain.ErrNotAllowed)
 		assert.Empty(t, contender)
@@ -1096,15 +1009,14 @@ func TestUpdateContender(t *testing.T) {
 			EventBroker: mockedEventBroker,
 		}
 
-		updatedContender := fakedContender
-		updatedContender.CompClassID = fakedOtherCompClass.ID
-		updatedContender.Name = "Jane Doe"
-		updatedContender.PublicName = "Jane"
-		updatedContender.ClubName = "Space Climbers"
-		updatedContender.WithdrawnFromFinals = true
-		updatedContender.Disqualified = true
-
-		contender, err := ucase.UpdateContender(context.Background(), fakedContenderID, updatedContender)
+		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
+			CompClassID:         domain.NewPatch(fakedOtherCompClass.ID),
+			Name:                domain.NewPatch("Jane Doe"),
+			PublicName:          domain.NewPatch("Jane"),
+			ClubName:            domain.NewPatch("Space Climbers"),
+			WithdrawnFromFinals: domain.NewPatch(true),
+			Disqualified:        domain.NewPatch(true),
+		})
 
 		require.NoError(t, err)
 
@@ -1180,10 +1092,9 @@ func TestUpdateContender(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		updatedContender := fakedContender
-		updatedContender.Name = ""
-
-		contender, err := ucase.UpdateContender(context.Background(), fakedContenderID, updatedContender)
+		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
+			Name: domain.NewPatch(""),
+		})
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
 		assert.ErrorIs(t, err, domain.ErrEmptyName)
@@ -1241,10 +1152,9 @@ func TestUpdateContender(t *testing.T) {
 			EventBroker: mockedEventBroker,
 		}
 
-		updatedContender := fakedContender
-		updatedContender.WithdrawnFromFinals = false
-
-		contender, err := ucase.UpdateContender(context.Background(), fakedContenderID, updatedContender)
+		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
+			WithdrawnFromFinals: domain.NewPatch(false),
+		})
 
 		require.NoError(t, err)
 		assert.Equal(t, false, contender.WithdrawnFromFinals)
@@ -1307,10 +1217,9 @@ func TestUpdateContender(t *testing.T) {
 			EventBroker: mockedEventBroker,
 		}
 
-		updatedContender := fakedContender
-		updatedContender.Disqualified = false
-
-		contender, err := ucase.UpdateContender(context.Background(), fakedContenderID, updatedContender)
+		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
+			Disqualified: domain.NewPatch(false),
+		})
 
 		require.NoError(t, err)
 		assert.Equal(t, false, contender.Disqualified)
@@ -1371,10 +1280,9 @@ func TestUpdateContender(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		updatedContender := fakedContender
-		updatedContender.CompClassID = fakedOtherCompClass.ID
-
-		contender, err := ucase.UpdateContender(context.Background(), fakedContenderID, updatedContender)
+		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
+			CompClassID: domain.NewPatch(fakedOtherCompClass.ID),
+		})
 
 		assert.ErrorIs(t, err, domain.ErrContestEnded)
 		assert.Empty(t, contender)
@@ -1421,7 +1329,7 @@ func TestUpdateContender(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		contender, err := ucase.UpdateContender(context.Background(), fakedContenderID, fakedContender)
+		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{})
 		assert.ErrorIs(t, err, domain.ErrContestEnded)
 		assert.Empty(t, contender)
 
@@ -1489,10 +1397,9 @@ func TestUpdateContender(t *testing.T) {
 			EventBroker: mockedEventBroker,
 		}
 
-		updatedContender := fakedContender
-		updatedContender.CompClassID = fakedThirdCompClass.ID
-
-		contender, err := ucase.UpdateContender(context.Background(), fakedContenderID, updatedContender)
+		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
+			CompClassID: domain.NewPatch(fakedThirdCompClass.ID),
+		})
 
 		require.NoError(t, err)
 		assert.Equal(t, fakedThirdCompClass.ID, contender.CompClassID)
@@ -1523,7 +1430,7 @@ func TestUpdateContender(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		contender, err := ucase.UpdateContender(context.Background(), fakedContenderID, domain.Contender{})
+		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{})
 
 		assert.ErrorIs(t, err, domain.ErrNoOwnership)
 		assert.Empty(t, contender)

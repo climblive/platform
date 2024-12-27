@@ -28,3 +28,12 @@ export const contenderSchema: z.ZodType<Contender> = z.object({
   disqualified: z.boolean(),
   score: scoreSchema.optional(),
 });
+
+export type ContenderPatch = {
+  compClassId?: number;
+  name?: string;
+  publicName?: string;
+  clubName?: string;
+  withdrawnFromFinals?: boolean;
+  disqualified?: boolean;
+};

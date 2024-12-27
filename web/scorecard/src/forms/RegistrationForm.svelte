@@ -1,9 +1,6 @@
 <script lang="ts">
   import type { ScorecardSession } from "@/types";
-  import {
-    registrationFormSchema,
-    type RegistrationFormData,
-  } from "@climblive/lib/models";
+  import { type ContenderPatch } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
   import { serialize, SlSwitch } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
@@ -15,11 +12,19 @@
   import { isAfter } from "date-fns";
   import { createEventDispatcher, getContext, type Snippet } from "svelte";
   import type { Readable } from "svelte/store";
+  import * as z from "zod";
 
-  const dispatch = createEventDispatcher<{ submit: RegistrationFormData }>();
+  const registrationFormSchema: z.ZodType<ContenderPatch> = z.object({
+    name: z.string().min(1),
+    clubName: z.string().optional(),
+    compClassId: z.coerce.number(),
+    withdrawnFromFinals: z.coerce.boolean(),
+  });
+
+  const dispatch = createEventDispatcher<{ submit: ContenderPatch }>();
 
   interface Props {
-    data: Partial<RegistrationFormData>;
+    data: Partial<ContenderPatch>;
     children?: Snippet;
   }
 
