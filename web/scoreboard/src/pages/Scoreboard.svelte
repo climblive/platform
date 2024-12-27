@@ -57,7 +57,10 @@
   <Loading />
 {:else}
   <ScoreboardProvider {contestId}>
-    {#snippet children({ scoreboard, loading })}
+    {#snippet children({ scoreboard, loading, online })}
+      <header data-online={online}>
+        <sl-icon name="cloud-slash-fill"></sl-icon>Offline
+      </header>
       <main>
         <h1>{contest.name}</h1>
         {#if compClasses.length > 1}
@@ -105,6 +108,24 @@
 {/if}
 
 <style>
+  header {
+    background-color: var(--sl-color-danger-600);
+    width: 100%;
+    height: 2rem;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--sl-spacing-x-small);
+    color: white;
+    font-weight: var(--sl-font-weight-semibold);
+    font-size: var(--sl-font-size-small);
+
+    &[data-online="true"] {
+      display: none;
+    }
+  }
+
   main {
     display: flex;
     flex-direction: column;
@@ -116,7 +137,7 @@
   h1 {
     text-align: center;
     line-height: 1;
-    color: var(--sl-color-primary-700);
+    color: black;
   }
 
   .container {

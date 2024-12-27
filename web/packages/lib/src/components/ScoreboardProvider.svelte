@@ -18,6 +18,7 @@
         {
           scoreboard: Writable<Map<number, ScoreboardEntry[]>>;
           loading: boolean;
+          online: boolean;
         },
       ]
     >;
@@ -26,7 +27,8 @@
   let { contestId, children }: Props = $props();
 
   let eventSource: EventSource | undefined;
-  let initialized = $state(false);
+  let loading = $state(true);
+  let online = $state(true);
 
   const contenders: Map<number, ScoreboardEntry> = new Map();
   const pendingUpdates: ((contenders: Map<number, ScoreboardEntry>) => void)[] =
@@ -63,16 +65,18 @@
       // eslint-disable-next-line no-console
       console.error(e);
 
+      online = false;
       reset();
     };
 
     eventSource.onopen = () => {
+      online = true;
       initializeStore();
     };
   };
 
   const reset = () => {
-    initialized = false;
+    loading = true;
     contenders.clear();
     $scoreboard = new Map();
   };
@@ -97,7 +101,7 @@
     }
 
     rebuildStore();
-    initialized = true;
+    loading = false;
   };
 
   const rebuildStore = () => {
@@ -124,11 +128,11 @@
   const queueEventHandler = (
     handler: (contenders: Map<number, ScoreboardEntry>) => void,
   ) => {
-    if (initialized) {
+    if (loading) {
+      pendingUpdates.push(handler);
+    } else {
       handler(contenders);
       rebuildStore();
-    } else {
-      pendingUpdates.push(handler);
     }
   };
 
@@ -192,4 +196,4 @@
 
 <svelte:window onvisibilitychange={handleVisibilityChange} />
 
-{@render children?.({ scoreboard, loading: !initialized })}
+{@render children?.({ scoreboard, loading, online })}
