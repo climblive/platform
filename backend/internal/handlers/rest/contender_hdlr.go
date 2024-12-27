@@ -20,7 +20,7 @@ func InstallContenderHandler(mux *Mux, contenderUseCase domain.ContenderUseCase)
 	mux.HandleFunc("GET /codes/{registrationCode}/contender", handler.GetContenderByCode)
 	mux.HandleFunc("GET /compClasses/{compClassID}/contenders", handler.GetContendersByCompClass)
 	mux.HandleFunc("GET /contests/{contestID}/contenders", handler.GetContendersByContest)
-	mux.HandleFunc("PATCH /contenders/{contenderID}", handler.UpdateContender)
+	mux.HandleFunc("PATCH /contenders/{contenderID}", handler.PatchContender)
 	mux.HandleFunc("DELETE /contenders/{contenderID}", handler.DeleteContender)
 	mux.HandleFunc("POST /contests/{contestID}/contenders", handler.CreateContenders)
 }
@@ -73,7 +73,7 @@ func (hdlr *contenderHandler) GetContendersByContest(w http.ResponseWriter, r *h
 	writeResponse(w, http.StatusOK, contenders)
 }
 
-func (hdlr *contenderHandler) UpdateContender(w http.ResponseWriter, r *http.Request) {
+func (hdlr *contenderHandler) PatchContender(w http.ResponseWriter, r *http.Request) {
 	contenderID := parseResourceID[domain.ContenderID](r.PathValue("contenderID"))
 
 	var patch domain.ContenderPatch

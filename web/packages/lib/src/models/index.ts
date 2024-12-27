@@ -5,4 +5,3 @@ export * from "./event";
 export * from "./problem";
 export * from "./scoreboard";
 export * from "./tick";
-
