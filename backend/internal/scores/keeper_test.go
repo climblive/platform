@@ -136,7 +136,7 @@ func TestKeeper(t *testing.T) {
 				RankOrder:   k - 1,
 			}
 
-			mockedRepo.On("StoreScore", mock.Anything, nil, score).Return(score, nil)
+			mockedRepo.On("StoreScore", mock.Anything, nil, score).Return(nil)
 
 			err := subscription.Post(domain.EventEnvelope{
 				Data: domain.ContenderScoreUpdatedEvent(score),
@@ -190,7 +190,7 @@ func TestKeeper(t *testing.T) {
 				RankOrder:   k - 1,
 			}
 
-			mockedRepo.On("StoreScore", mock.Anything, nil, score).Return(score, nil)
+			mockedRepo.On("StoreScore", mock.Anything, nil, score).Return(nil)
 
 			err := subscription.Post(domain.EventEnvelope{
 				Data: domain.ContenderScoreUpdatedEvent(score),
@@ -220,7 +220,7 @@ func TestKeeper(t *testing.T) {
 		keeper := scores.NewScoreKeeper(mockedEventBroker, mockedRepo)
 		var errMock error = errors.New("mock error")
 
-		mockedRepo.On("StoreScore", mock.Anything, nil, mock.AnythingOfType("domain.Score")).Return(domain.Score{}, errMock)
+		mockedRepo.On("StoreScore", mock.Anything, nil, mock.AnythingOfType("domain.Score")).Return(errMock)
 
 		ctx, cancel := context.WithCancel(context.Background())
 		now := time.Now()
@@ -290,7 +290,7 @@ func TestKeeper(t *testing.T) {
 				RankOrder:   k - 1,
 			}
 
-			mockedRepo.On("StoreScore", mock.Anything, nil, score).Return(domain.Score{}, domain.ErrNotFound)
+			mockedRepo.On("StoreScore", mock.Anything, nil, score).Return(domain.ErrNotFound)
 
 			err := subscription.Post(domain.EventEnvelope{
 				Data: domain.ContenderScoreUpdatedEvent(score),

@@ -35,7 +35,7 @@ test.beforeAll(async () => {
     multipleStatements: true,
   });
 
-  const schema = await readFile("../../backend/database/scoreboard.sql", "utf8")
+  const schema = await readFile("../../backend/database/climblive.sql", "utf8")
   const samples = await readFile("./samples.sql", "utf8")
 
   dbConnection.query(schema)

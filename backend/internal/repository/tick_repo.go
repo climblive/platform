@@ -2,67 +2,15 @@ package repository
 
 import (
 	"context"
-	"time"
+	"database/sql"
 
+	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
 )
 
-type tickRecord struct {
-	ID          *int `gorm:"primaryKey;autoIncrement"`
-	OrganizerID int
-	ContestID   int
-	ContenderID int
-	ProblemID   int
-	Flash       bool
-	Timestamp   time.Time
-}
-
-func (tickRecord) TableName() string {
-	return "tick"
-}
-
-func (r tickRecord) fromDomain(tick domain.Tick) tickRecord {
-	return tickRecord{
-		ID:          e2n(int(tick.ID)),
-		OrganizerID: int(tick.Ownership.OrganizerID),
-		ContestID:   int(tick.ContestID),
-		ContenderID: int(*tick.Ownership.ContenderID),
-		ProblemID:   int(tick.ProblemID),
-		Flash:       tick.AttemptsTop == 1,
-		Timestamp:   tick.Timestamp,
-	}
-}
-
-func (r *tickRecord) toDomain() domain.Tick {
-	attempts := func(isFlash bool) int {
-		if isFlash {
-			return 1
-		}
-
-		return 999
-	}
-
-	return domain.Tick{
-		ID: domain.TickID(n2e(r.ID)),
-		Ownership: domain.OwnershipData{
-			OrganizerID: domain.OrganizerID(r.OrganizerID),
-			ContenderID: nillableIntToResourceID[domain.ContenderID](&r.ContenderID),
-		},
-		Timestamp:    r.Timestamp,
-		ContestID:    domain.ContestID(r.ContestID),
-		ProblemID:    domain.ProblemID(r.ProblemID),
-		Top:          true,
-		AttemptsTop:  attempts(r.Flash),
-		Zone:         true,
-		AttemptsZone: attempts(r.Flash),
-	}
-}
-
 func (d *Database) GetTicksByContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) ([]domain.Tick, error) {
-	var records []tickRecord
-
-	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM tick WHERE contender_id = ?`, contenderID).Scan(&records).Error
+	records, err := d.WithTx(tx).GetTicksByContender(ctx, int32(contenderID))
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -70,16 +18,14 @@ func (d *Database) GetTicksByContender(ctx context.Context, tx domain.Transactio
 	ticks := make([]domain.Tick, 0)
 
 	for _, record := range records {
-		ticks = append(ticks, record.toDomain())
+		ticks = append(ticks, tickToDomain(record.Tick))
 	}
 
 	return ticks, nil
 }
 
 func (d *Database) GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error) {
-	var records []tickRecord
-
-	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM tick WHERE contest_id = ?`, contestID).Scan(&records).Error
+	records, err := d.WithTx(tx).GetTicksByContest(ctx, int32(contestID))
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -87,26 +33,34 @@ func (d *Database) GetTicksByContest(ctx context.Context, tx domain.Transaction,
 	ticks := make([]domain.Tick, 0)
 
 	for _, record := range records {
-		ticks = append(ticks, record.toDomain())
+		ticks = append(ticks, tickToDomain(record.Tick))
 	}
 
 	return ticks, nil
 }
 
 func (d *Database) StoreTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error) {
-	var err error
-	var record tickRecord = tickRecord{}.fromDomain(tick)
+	params := database.InsertTickParams{
+		OrganizerID: int32(tick.Ownership.OrganizerID),
+		ContestID:   int32(tick.ContestID),
+		ContenderID: int32(*tick.Ownership.ContenderID),
+		ProblemID:   int32(tick.ProblemID),
+		Flash:       tick.AttemptsTop == 1,
+		Timestamp:   tick.Timestamp,
+	}
 
-	err = d.tx(tx).WithContext(ctx).Save(&record).Error
+	insertID, err := d.WithTx(tx).InsertTick(ctx, params)
 	if err != nil {
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
-	return record.toDomain(), nil
+	tick.ID = domain.TickID(insertID)
+
+	return tick, nil
 }
 
 func (d *Database) DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) error {
-	err := d.tx(tx).WithContext(ctx).Exec(`DELETE FROM tick WHERE id = ?`, tickID).Error
+	err := d.WithTx(tx).DeleteTick(ctx, int32(tickID))
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
@@ -115,15 +69,13 @@ func (d *Database) DeleteTick(ctx context.Context, tx domain.Transaction, tickID
 }
 
 func (d *Database) GetTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) (domain.Tick, error) {
-	var record tickRecord
-	err := d.tx(tx).WithContext(ctx).Raw(`SELECT * FROM tick WHERE id = ?`, tickID).Scan(&record).Error
-	if err != nil {
+	record, err := d.WithTx(tx).GetTick(ctx, int32(tickID))
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return domain.Tick{}, errors.Wrap(domain.ErrNotFound, 0)
+	case err != nil:
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
-	if record.ID == nil {
-		return domain.Tick{}, errors.Wrap(domain.ErrNotFound, 0)
-	}
-
-	return record.toDomain(), nil
+	return tickToDomain(record.Tick), nil
 }

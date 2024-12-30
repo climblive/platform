@@ -1,66 +1,75 @@
 package repository
 
 import (
+	"database/sql"
 	"fmt"
-	"time"
 
+	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
 
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type Database struct {
-	db *gorm.DB
+	db      *sql.DB
+	queries *database.Queries
 }
 
-func NewDatabase(username, password, host string, port int, database string) (*Database, error) {
-	var db *gorm.DB
-
+func NewDatabase(username, password, host string, port int, databaseName string) (*Database, error) {
 	dsn := fmt.Sprintf(
 		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		username,
 		password,
 		host,
 		port,
-		database)
+		databaseName)
 
-	var logLevel logger.LogLevel = logger.Warn
-
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger:         logger.Default.LogMode(logLevel),
-		TranslateError: true,
-	})
+	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
 
-	sqlDB, _ := db.DB()
+	queries := database.New(db)
 
-	sqlDB.SetMaxIdleConns(10)
-	sqlDB.SetMaxOpenConns(100)
-	sqlDB.SetConnMaxLifetime(time.Hour)
+	//	var logLevel logger.LogLevel = logger.Warn
+	//
+	//	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+	//		Logger:         logger.Default.LogMode(logLevel),
+	//		TranslateError: true,
+	//	})
+	//	if err != nil {
+	//		return nil, errors.Wrap(err, 0)
+	//	}
+	//
+	//	sqlDB, _ := db.DB()
+	//
+	//	sqlDB.SetMaxIdleConns(10)
+	//	sqlDB.SetMaxOpenConns(100)
+	//	sqlDB.SetConnMaxLifetime(time.Hour)
 
 	return &Database{
-		db: db,
+		db:      db,
+		queries: queries,
 	}, nil
 }
 
 func (d *Database) Begin() domain.Transaction {
-	tx := d.db.Begin()
+	tx, err := d.db.Begin()
+	if err != nil {
+		panic("not handled")
+	}
 
 	return &transaction{
-		db: tx,
+		tx: tx,
 	}
 }
 
-func (d *Database) tx(tx domain.Transaction) *gorm.DB {
+func (d *Database) WithTx(tx domain.Transaction) *database.Queries {
 	transaction, ok := tx.(*transaction)
 	if ok {
-		return transaction.db
+		return d.queries.WithTx(transaction.tx)
 	} else {
-		return d.db
+		return d.queries
 	}
 }
