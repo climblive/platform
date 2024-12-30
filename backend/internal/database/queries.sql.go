@@ -235,8 +235,7 @@ func (q *Queries) GetContendersByCompClass(ctx context.Context, classID sql.Null
 }
 
 const getContendersByContest = `-- name: GetContendersByContest :many
-SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.club, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, score.contender_id, score.timestamp, score.score, score.placement, score.finalist, score.rank_order, score.contender_id, score.timestamp, score.score, score.placement, score.finalist, score.rank_order FROM contender
-JOIN score ON score.contender_id = id
+SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.club, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, score.contender_id, score.timestamp, score.score, score.placement, score.finalist, score.rank_order FROM contender
 JOIN score ON score.contender_id = id
 WHERE contest_id = ?
 `

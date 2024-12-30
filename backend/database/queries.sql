@@ -16,7 +16,6 @@ WHERE class_id = ?;
 -- name: GetContendersByContest :many
 SELECT sqlc.embed(contender), sqlc.embed(score) FROM contender
 JOIN score ON score.contender_id = id
-JOIN score ON score.contender_id = id
 WHERE contest_id = ?;
 
 -- name: DeleteContender :exec
