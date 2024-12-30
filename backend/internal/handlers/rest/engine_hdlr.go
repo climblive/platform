@@ -8,19 +8,19 @@ import (
 	"github.com/google/uuid"
 )
 
-type scoreEngineManager interface {
+type scoreEngineController interface {
 	ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreEngineInstanceID, error)
 	StopScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) error
 	StartScoreEngine(ctx context.Context, contestID domain.ContestID) (domain.ScoreEngineInstanceID, error)
 }
 
 type engineHandler struct {
-	scoreEngineManager scoreEngineManager
+	controller scoreEngineController
 }
 
-func InstallScoreEngineHandler(mux *Mux, scoreEngineManager scoreEngineManager) {
+func InstallScoreEngineHandler(mux *Mux, controller scoreEngineController) {
 	handler := &engineHandler{
-		scoreEngineManager: scoreEngineManager,
+		controller: controller,
 	}
 
 	mux.HandleFunc("GET /contests/{contestID}/score-engines", handler.ListScoreEnginesByContest)
@@ -31,7 +31,7 @@ func InstallScoreEngineHandler(mux *Mux, scoreEngineManager scoreEngineManager) 
 func (hdlr *engineHandler) ListScoreEnginesByContest(w http.ResponseWriter, r *http.Request) {
 	contestID := parseResourceID[domain.ContestID](r.PathValue("contestID"))
 
-	instances, err := hdlr.scoreEngineManager.ListScoreEnginesByContest(r.Context(), contestID)
+	instances, err := hdlr.controller.ListScoreEnginesByContest(r.Context(), contestID)
 	if err != nil {
 		handleError(w, err)
 		return
@@ -49,7 +49,7 @@ func (hdlr *engineHandler) StopScoreEngine(w http.ResponseWriter, r *http.Reques
 
 	instanceID := domain.ScoreEngineInstanceID(id)
 
-	err = hdlr.scoreEngineManager.StopScoreEngine(r.Context(), instanceID)
+	err = hdlr.controller.StopScoreEngine(r.Context(), instanceID)
 	if err != nil {
 		handleError(w, err)
 		return
@@ -61,7 +61,7 @@ func (hdlr *engineHandler) StopScoreEngine(w http.ResponseWriter, r *http.Reques
 func (hdlr *engineHandler) StartScoreEngine(w http.ResponseWriter, r *http.Request) {
 	contestID := parseResourceID[domain.ContestID](r.PathValue("contestID"))
 
-	instanceID, err := hdlr.scoreEngineManager.StartScoreEngine(r.Context(), contestID)
+	instanceID, err := hdlr.controller.StartScoreEngine(r.Context(), contestID)
 	if err != nil {
 		handleError(w, err)
 		return

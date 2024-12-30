@@ -157,6 +157,12 @@ func setupMux(
 		EventBroker: eventBroker,
 	}
 
+	scoreEngineUseCase := usecases.ScoreEngineUseCase{
+		Repo:               repo,
+		Authorizer:         authorizer,
+		ScoreEngineManager: scoreEngineManager,
+	}
+
 	mux := rest.NewMux()
 	mux.RegisterMiddleware(rest.CORS)
 	mux.RegisterMiddleware(authorizer.Middleware)
@@ -169,7 +175,7 @@ func setupMux(
 	rest.InstallProblemHandler(mux, &problemUseCase)
 	rest.InstallTickHandler(mux, &tickUseCase)
 	rest.InstallEventHandler(mux, eventBroker, 10*time.Second)
-	rest.InstallScoreEngineHandler(mux, scoreEngineManager)
+	rest.InstallScoreEngineHandler(mux, &scoreEngineUseCase)
 
 	return mux
 }
