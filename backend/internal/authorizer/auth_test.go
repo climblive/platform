@@ -196,3 +196,18 @@ func (m *repositoryMock) GetContenderByCode(ctx context.Context, tx domain.Trans
 	args := m.Called(ctx, tx, registrationCode)
 	return args.Get(0).(domain.Contender), args.Error(1)
 }
+
+func (m *repositoryMock) GetUserByUsername(ctx context.Context, tx domain.Transaction, username string) (domain.User, error) {
+	args := m.Called(ctx, tx, username)
+	return args.Get(0).(domain.User), args.Error(1)
+}
+
+func (m *repositoryMock) StoreUser(ctx context.Context, tx domain.Transaction, user domain.User) (domain.User, error) {
+	args := m.Called(ctx, tx, user)
+	return args.Get(0).(domain.User), args.Error(1)
+}
+
+func (m *repositoryMock) StoreOrganizer(ctx context.Context, tx domain.Transaction, organizer domain.Organizer) (domain.Organizer, error) {
+	args := m.Called(ctx, tx, organizer)
+	return args.Get(0).(domain.Organizer), args.Error(1)
+}
