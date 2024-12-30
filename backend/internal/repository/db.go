@@ -43,15 +43,15 @@ func NewDatabase(username, password, host string, port int, databaseName string)
 	}, nil
 }
 
-func (d *Database) Begin() domain.Transaction {
+func (d *Database) Begin() (domain.Transaction, error) {
 	tx, err := d.db.Begin()
 	if err != nil {
-		panic("not handled")
+		return nil, err
 	}
 
 	return &transaction{
 		tx: tx,
-	}
+	}, nil
 }
 
 func (d *Database) WithTx(tx domain.Transaction) *database.Queries {

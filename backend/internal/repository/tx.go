@@ -15,5 +15,5 @@ func (tx *transaction) Commit() error {
 }
 
 func (tx *transaction) Rollback() {
-	tx.tx.Rollback()
+	_ = tx.tx.Rollback()
 }
