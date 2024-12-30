@@ -80,7 +80,18 @@ func (d *Database) GetContendersByContest(ctx context.Context, tx domain.Transac
 }
 
 func (d *Database) StoreContender(ctx context.Context, tx domain.Transaction, contender domain.Contender) (domain.Contender, error) {
-	params := database.UpsertContenderParams{}
+	params := database.UpsertContenderParams{
+		ID:                  int32(contender.ID),
+		OrganizerID:         int32(contender.Ownership.OrganizerID),
+		ContestID:           int32(contender.ContestID),
+		RegistrationCode:    contender.RegistrationCode,
+		Name:                makeNullString(contender.Name),
+		Club:                makeNullString(contender.ClubName),
+		ClassID:             makeNullInt32(int32(contender.CompClassID)),
+		Entered:             makeNullTime(contender.Entered),
+		Disqualified:        contender.Disqualified,
+		WithdrawnFromFinals: contender.WithdrawnFromFinals,
+	}
 
 	insertID, err := d.WithTx(tx).UpsertContender(ctx, params)
 	if err != nil {

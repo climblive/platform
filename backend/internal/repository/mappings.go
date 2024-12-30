@@ -122,3 +122,36 @@ func tickToDomain(tick database.Tick) domain.Tick {
 		AttemptsZone: attempts(tick.Flash),
 	}
 }
+
+func makeNullString(value string) sql.NullString {
+	if value == "" {
+		return sql.NullString{}
+	}
+
+	return sql.NullString{
+		Valid:  true,
+		String: value,
+	}
+}
+
+func makeNullInt32(value int32) sql.NullInt32 {
+	if value == 0 {
+		return sql.NullInt32{}
+	}
+
+	return sql.NullInt32{
+		Valid: true,
+		Int32: value,
+	}
+}
+
+func makeNullTime(value *time.Time) sql.NullTime {
+	if value == nil {
+		return sql.NullTime{}
+	}
+
+	return sql.NullTime{
+		Valid: true,
+		Time:  *value,
+	}
+}

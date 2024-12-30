@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
@@ -32,21 +33,9 @@ func NewDatabase(username, password, host string, port int, databaseName string)
 
 	queries := database.New(db)
 
-	//	var logLevel logger.LogLevel = logger.Warn
-	//
-	//	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-	//		Logger:         logger.Default.LogMode(logLevel),
-	//		TranslateError: true,
-	//	})
-	//	if err != nil {
-	//		return nil, errors.Wrap(err, 0)
-	//	}
-	//
-	//	sqlDB, _ := db.DB()
-	//
-	//	sqlDB.SetMaxIdleConns(10)
-	//	sqlDB.SetMaxOpenConns(100)
-	//	sqlDB.SetConnMaxLifetime(time.Hour)
+	db.SetMaxIdleConns(10)
+	db.SetMaxOpenConns(100)
+	db.SetConnMaxLifetime(time.Hour)
 
 	return &Database{
 		db:      db,
