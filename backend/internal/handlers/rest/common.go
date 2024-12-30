@@ -13,7 +13,11 @@ import (
 )
 
 func parseResourceID[T domain.ResourceIDType](id string) T {
-	number, _ := strconv.Atoi(id)
+	number, err := strconv.ParseInt(id, 10, 32)
+	if err != nil {
+		panic(err)
+	}
+
 	return T(number)
 }
 
