@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
 )
@@ -32,7 +33,10 @@ func (d *Database) GetContest(ctx context.Context, tx domain.Transaction, contes
 }
 
 func (d *Database) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context, tx domain.Transaction, earliestStartTime, latestStartTime time.Time) ([]domain.Contest, error) {
-	records, err := d.WithTx(tx).GetContestsCurrentlyRunningOrByStartTime(ctx)
+	records, err := d.WithTx(tx).GetContestsCurrentlyRunningOrByStartTime(ctx, database.GetContestsCurrentlyRunningOrByStartTimeParams{
+		EarliestStartTime: earliestStartTime,
+		LatestStartTime:   latestStartTime,
+	})
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -40,7 +44,20 @@ func (d *Database) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context,
 	contests := make([]domain.Contest, 0)
 
 	for _, record := range records {
-		contest := contestToDomain(record.Contest)
+		contest := contestToDomain(database.Contest{
+			ID:                 record.ID,
+			OrganizerID:        record.OrganizerID,
+			Protected:          record.Protected,
+			SeriesID:           record.SeriesID,
+			Name:               record.Name,
+			Description:        record.Description,
+			Location:           record.Location,
+			FinalEnabled:       record.FinalEnabled,
+			QualifyingProblems: record.QualifyingProblems,
+			Finalists:          record.Finalists,
+			Rules:              record.Rules,
+			GracePeriod:        record.GracePeriod,
+		})
 
 		if timeBegin, ok := record.TimeBegin.(time.Time); ok {
 			contest.TimeBegin = &timeBegin

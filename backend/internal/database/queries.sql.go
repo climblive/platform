@@ -321,23 +321,42 @@ func (q *Queries) GetContest(ctx context.Context, id int32) (GetContestRow, erro
 }
 
 const getContestsCurrentlyRunningOrByStartTime = `-- name: GetContestsCurrentlyRunningOrByStartTime :many
-SELECT contest.id, contest.organizer_id, contest.protected, contest.series_id, contest.name, contest.description, contest.location, contest.final_enabled, contest.qualifying_problems, contest.finalists, contest.rules, contest.grace_period, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
-FROM contest
-JOIN comp_class cc ON cc.contest_id = contest.id
-GROUP BY contest.id
-HAVING
-    NOW() BETWEEN MIN(cc.time_begin) AND MAX(cc.time_end)
-	OR MIN(cc.time_begin) BETWEEN ? AND ?
+SELECT
+	id, organizer_id, protected, series_id, name, description, location, final_enabled, qualifying_problems, finalists, rules, grace_period, time_begin, time_end
+FROM (
+    SELECT contest.id, contest.organizer_id, contest.protected, contest.series_id, contest.name, contest.description, contest.location, contest.final_enabled, contest.qualifying_problems, contest.finalists, contest.rules, contest.grace_period, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+    FROM contest
+    JOIN comp_class cc ON cc.contest_id = contest.id
+    GROUP BY contest.id) AS sub
+WHERE
+    NOW() BETWEEN sub.time_begin AND sub.time_end
+	OR sub.time_begin BETWEEN ? AND ?
 `
 
-type GetContestsCurrentlyRunningOrByStartTimeRow struct {
-	Contest   Contest
-	TimeBegin interface{}
-	TimeEnd   interface{}
+type GetContestsCurrentlyRunningOrByStartTimeParams struct {
+	EarliestStartTime time.Time
+	LatestStartTime   time.Time
 }
 
-func (q *Queries) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context) ([]GetContestsCurrentlyRunningOrByStartTimeRow, error) {
-	rows, err := q.db.QueryContext(ctx, getContestsCurrentlyRunningOrByStartTime)
+type GetContestsCurrentlyRunningOrByStartTimeRow struct {
+	ID                 int32
+	OrganizerID        int32
+	Protected          bool
+	SeriesID           sql.NullInt32
+	Name               string
+	Description        sql.NullString
+	Location           sql.NullString
+	FinalEnabled       bool
+	QualifyingProblems int32
+	Finalists          int32
+	Rules              sql.NullString
+	GracePeriod        int32
+	TimeBegin          interface{}
+	TimeEnd            interface{}
+}
+
+func (q *Queries) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context, arg GetContestsCurrentlyRunningOrByStartTimeParams) ([]GetContestsCurrentlyRunningOrByStartTimeRow, error) {
+	rows, err := q.db.QueryContext(ctx, getContestsCurrentlyRunningOrByStartTime, arg.EarliestStartTime, arg.LatestStartTime)
 	if err != nil {
 		return nil, err
 	}
@@ -346,18 +365,18 @@ func (q *Queries) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context) 
 	for rows.Next() {
 		var i GetContestsCurrentlyRunningOrByStartTimeRow
 		if err := rows.Scan(
-			&i.Contest.ID,
-			&i.Contest.OrganizerID,
-			&i.Contest.Protected,
-			&i.Contest.SeriesID,
-			&i.Contest.Name,
-			&i.Contest.Description,
-			&i.Contest.Location,
-			&i.Contest.FinalEnabled,
-			&i.Contest.QualifyingProblems,
-			&i.Contest.Finalists,
-			&i.Contest.Rules,
-			&i.Contest.GracePeriod,
+			&i.ID,
+			&i.OrganizerID,
+			&i.Protected,
+			&i.SeriesID,
+			&i.Name,
+			&i.Description,
+			&i.Location,
+			&i.FinalEnabled,
+			&i.QualifyingProblems,
+			&i.Finalists,
+			&i.Rules,
+			&i.GracePeriod,
 			&i.TimeBegin,
 			&i.TimeEnd,
 		); err != nil {

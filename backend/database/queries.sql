@@ -72,13 +72,16 @@ LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 WHERE contest.id = ?;
 
 -- name: GetContestsCurrentlyRunningOrByStartTime :many
-SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
-FROM contest
-JOIN comp_class cc ON cc.contest_id = contest.id
-GROUP BY contest.id
-HAVING
-    NOW() BETWEEN MIN(cc.time_begin) AND MAX(cc.time_end)
-	OR MIN(cc.time_begin) BETWEEN sqlc.arg(earliestStartTime) AND sqlc.arg(latestStartTime);
+SELECT
+	*
+FROM (
+    SELECT contest.*, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+    FROM contest
+    JOIN comp_class cc ON cc.contest_id = contest.id
+    GROUP BY contest.id) AS sub
+WHERE
+    NOW() BETWEEN sub.time_begin AND sub.time_end
+	OR sub.time_begin BETWEEN sqlc.arg(earliest_start_time) AND sqlc.arg(latest_start_time);
 
 -- name: GetProblem :one
 SELECT sqlc.embed(problem)
