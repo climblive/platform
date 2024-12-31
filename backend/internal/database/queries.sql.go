@@ -115,7 +115,7 @@ func (q *Queries) GetCompClassesByContest(ctx context.Context, contestID int32) 
 
 const getContender = `-- name: GetContender :one
 SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.club, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, score.contender_id, score.timestamp, score.score, score.placement, score.finalist, score.rank_order FROM contender
-JOIN score ON score.contender_id = id
+LEFT JOIN score ON score.contender_id = id
 WHERE id = ?
 `
 
@@ -150,7 +150,7 @@ func (q *Queries) GetContender(ctx context.Context, id int32) (GetContenderRow, 
 
 const getContenderByCode = `-- name: GetContenderByCode :one
 SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.club, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, score.contender_id, score.timestamp, score.score, score.placement, score.finalist, score.rank_order FROM contender
-JOIN score ON score.contender_id = id
+LEFT JOIN score ON score.contender_id = id
 WHERE registration_code = ?
 `
 
@@ -185,7 +185,7 @@ func (q *Queries) GetContenderByCode(ctx context.Context, registrationCode strin
 
 const getContendersByCompClass = `-- name: GetContendersByCompClass :many
 SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.club, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, score.contender_id, score.timestamp, score.score, score.placement, score.finalist, score.rank_order FROM contender
-JOIN score ON score.contender_id = id
+LEFT JOIN score ON score.contender_id = id
 WHERE class_id = ?
 `
 
@@ -236,7 +236,7 @@ func (q *Queries) GetContendersByCompClass(ctx context.Context, classID sql.Null
 
 const getContendersByContest = `-- name: GetContendersByContest :many
 SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.club, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, score.contender_id, score.timestamp, score.score, score.placement, score.finalist, score.rank_order FROM contender
-JOIN score ON score.contender_id = id
+LEFT JOIN score ON score.contender_id = id
 WHERE contest_id = ?
 `
 
