@@ -12,13 +12,14 @@ import (
 	"github.com/go-errors/errors"
 )
 
-func parseResourceID[T domain.ResourceIDType](id string) T {
+func parseResourceID[T domain.ResourceIDType](id string) (T, error) {
 	number, err := strconv.ParseInt(id, 10, 32)
 	if err != nil {
-		panic(err)
+		var empty T
+		return empty, err
 	}
 
-	return T(number)
+	return T(number), nil
 }
 
 func writeResponse(w http.ResponseWriter, status int, data any) {
