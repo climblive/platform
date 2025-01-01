@@ -35,29 +35,21 @@ func contenderToDomain(record database.Contender, scoreRecord database.Contender
 	}
 
 	if scoreRecord.ContenderID.Valid {
-		score := domain.Score{
-			Timestamp:   scoreRecord.Timestamp.Time,
-			ContenderID: domain.ContenderID(scoreRecord.ContenderID.Int32),
-			Score:       int(scoreRecord.Score.Int32),
-			Placement:   int(scoreRecord.Placement.Int32),
-			Finalist:    scoreRecord.Finalist.Bool,
-			RankOrder:   int(scoreRecord.RankOrder.Int32),
-		}
-
+		score := scoreToDomain(scoreRecord)
 		contender.Score = &score
 	}
 
 	return contender
 }
 
-func scoreToDomain(record database.Score) domain.Score {
+func scoreToDomain(record database.ContenderScore) domain.Score {
 	return domain.Score{
-		Timestamp:   record.Timestamp,
-		ContenderID: domain.ContenderID(record.ContenderID),
-		Score:       int(record.Score),
-		Placement:   int(record.Placement),
-		Finalist:    record.Finalist,
-		RankOrder:   int(record.RankOrder),
+		Timestamp:   record.Timestamp.Time,
+		ContenderID: domain.ContenderID(record.ContenderID.Int32),
+		Score:       int(record.Score.Int32),
+		Placement:   int(record.Placement.Int32),
+		Finalist:    record.Finalist.Bool,
+		RankOrder:   int(record.RankOrder.Int32),
 	}
 }
 
