@@ -1,21 +1,25 @@
 -- name: GetContender :one
-SELECT sqlc.embed(contender), sqlc.embed(score) FROM contender
-LEFT JOIN score ON score.contender_id = id
+SELECT sqlc.embed(contender), sqlc.embed(cs)
+FROM contender
+LEFT JOIN contender_score cs ON cs.contender_id = id
 WHERE id = ?;
 
 -- name: GetContenderByCode :one
-SELECT sqlc.embed(contender), sqlc.embed(score) FROM contender
-LEFT JOIN score ON score.contender_id = id
+SELECT sqlc.embed(contender), sqlc.embed(cs)
+FROM contender
+LEFT JOIN contender_score cs ON cs.contender_id = id
 WHERE registration_code = ?;
 
 -- name: GetContendersByCompClass :many
-SELECT sqlc.embed(contender), sqlc.embed(score) FROM contender
-LEFT JOIN score ON score.contender_id = id
+SELECT sqlc.embed(contender), sqlc.embed(cs)
+FROM contender
+LEFT JOIN contender_score cs ON cs.contender_id = id
 WHERE class_id = ?;
 
 -- name: GetContendersByContest :many
-SELECT sqlc.embed(contender), sqlc.embed(score) FROM contender
-LEFT JOIN score ON score.contender_id = id
+SELECT sqlc.embed(contender), sqlc.embed(cs)
+FROM contender
+LEFT JOIN contender_score cs ON cs.contender_id = id
 WHERE contest_id = ?;
 
 -- name: DeleteContender :exec

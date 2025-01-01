@@ -114,14 +114,15 @@ func (q *Queries) GetCompClassesByContest(ctx context.Context, contestID int32) 
 }
 
 const getContender = `-- name: GetContender :one
-SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.club, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, score.contender_id, score.timestamp, score.score, score.placement, score.finalist, score.rank_order FROM contender
-LEFT JOIN score ON score.contender_id = id
+SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.club, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, cs.contender_id, cs.timestamp, cs.score, cs.placement, cs.finalist, cs.rank_order
+FROM contender
+LEFT JOIN contender_score cs ON cs.contender_id = id
 WHERE id = ?
 `
 
 type GetContenderRow struct {
-	Contender Contender
-	Score     Score
+	Contender      Contender
+	ContenderScore ContenderScore
 }
 
 func (q *Queries) GetContender(ctx context.Context, id int32) (GetContenderRow, error) {
@@ -138,25 +139,26 @@ func (q *Queries) GetContender(ctx context.Context, id int32) (GetContenderRow, 
 		&i.Contender.Entered,
 		&i.Contender.Disqualified,
 		&i.Contender.WithdrawnFromFinals,
-		&i.Score.ContenderID,
-		&i.Score.Timestamp,
-		&i.Score.Score,
-		&i.Score.Placement,
-		&i.Score.Finalist,
-		&i.Score.RankOrder,
+		&i.ContenderScore.ContenderID,
+		&i.ContenderScore.Timestamp,
+		&i.ContenderScore.Score,
+		&i.ContenderScore.Placement,
+		&i.ContenderScore.Finalist,
+		&i.ContenderScore.RankOrder,
 	)
 	return i, err
 }
 
 const getContenderByCode = `-- name: GetContenderByCode :one
-SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.club, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, score.contender_id, score.timestamp, score.score, score.placement, score.finalist, score.rank_order FROM contender
-LEFT JOIN score ON score.contender_id = id
+SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.club, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, cs.contender_id, cs.timestamp, cs.score, cs.placement, cs.finalist, cs.rank_order
+FROM contender
+LEFT JOIN contender_score cs ON cs.contender_id = id
 WHERE registration_code = ?
 `
 
 type GetContenderByCodeRow struct {
-	Contender Contender
-	Score     Score
+	Contender      Contender
+	ContenderScore ContenderScore
 }
 
 func (q *Queries) GetContenderByCode(ctx context.Context, registrationCode string) (GetContenderByCodeRow, error) {
@@ -173,25 +175,26 @@ func (q *Queries) GetContenderByCode(ctx context.Context, registrationCode strin
 		&i.Contender.Entered,
 		&i.Contender.Disqualified,
 		&i.Contender.WithdrawnFromFinals,
-		&i.Score.ContenderID,
-		&i.Score.Timestamp,
-		&i.Score.Score,
-		&i.Score.Placement,
-		&i.Score.Finalist,
-		&i.Score.RankOrder,
+		&i.ContenderScore.ContenderID,
+		&i.ContenderScore.Timestamp,
+		&i.ContenderScore.Score,
+		&i.ContenderScore.Placement,
+		&i.ContenderScore.Finalist,
+		&i.ContenderScore.RankOrder,
 	)
 	return i, err
 }
 
 const getContendersByCompClass = `-- name: GetContendersByCompClass :many
-SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.club, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, score.contender_id, score.timestamp, score.score, score.placement, score.finalist, score.rank_order FROM contender
-LEFT JOIN score ON score.contender_id = id
+SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.club, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, cs.contender_id, cs.timestamp, cs.score, cs.placement, cs.finalist, cs.rank_order
+FROM contender
+LEFT JOIN contender_score cs ON cs.contender_id = id
 WHERE class_id = ?
 `
 
 type GetContendersByCompClassRow struct {
-	Contender Contender
-	Score     Score
+	Contender      Contender
+	ContenderScore ContenderScore
 }
 
 func (q *Queries) GetContendersByCompClass(ctx context.Context, classID sql.NullInt32) ([]GetContendersByCompClassRow, error) {
@@ -214,12 +217,12 @@ func (q *Queries) GetContendersByCompClass(ctx context.Context, classID sql.Null
 			&i.Contender.Entered,
 			&i.Contender.Disqualified,
 			&i.Contender.WithdrawnFromFinals,
-			&i.Score.ContenderID,
-			&i.Score.Timestamp,
-			&i.Score.Score,
-			&i.Score.Placement,
-			&i.Score.Finalist,
-			&i.Score.RankOrder,
+			&i.ContenderScore.ContenderID,
+			&i.ContenderScore.Timestamp,
+			&i.ContenderScore.Score,
+			&i.ContenderScore.Placement,
+			&i.ContenderScore.Finalist,
+			&i.ContenderScore.RankOrder,
 		); err != nil {
 			return nil, err
 		}
@@ -235,14 +238,15 @@ func (q *Queries) GetContendersByCompClass(ctx context.Context, classID sql.Null
 }
 
 const getContendersByContest = `-- name: GetContendersByContest :many
-SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.club, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, score.contender_id, score.timestamp, score.score, score.placement, score.finalist, score.rank_order FROM contender
-LEFT JOIN score ON score.contender_id = id
+SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.club, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, cs.contender_id, cs.timestamp, cs.score, cs.placement, cs.finalist, cs.rank_order
+FROM contender
+LEFT JOIN contender_score cs ON cs.contender_id = id
 WHERE contest_id = ?
 `
 
 type GetContendersByContestRow struct {
-	Contender Contender
-	Score     Score
+	Contender      Contender
+	ContenderScore ContenderScore
 }
 
 func (q *Queries) GetContendersByContest(ctx context.Context, contestID int32) ([]GetContendersByContestRow, error) {
@@ -265,12 +269,12 @@ func (q *Queries) GetContendersByContest(ctx context.Context, contestID int32) (
 			&i.Contender.Entered,
 			&i.Contender.Disqualified,
 			&i.Contender.WithdrawnFromFinals,
-			&i.Score.ContenderID,
-			&i.Score.Timestamp,
-			&i.Score.Score,
-			&i.Score.Placement,
-			&i.Score.Finalist,
-			&i.Score.RankOrder,
+			&i.ContenderScore.ContenderID,
+			&i.ContenderScore.Timestamp,
+			&i.ContenderScore.Score,
+			&i.ContenderScore.Placement,
+			&i.ContenderScore.Finalist,
+			&i.ContenderScore.RankOrder,
 		); err != nil {
 			return nil, err
 		}

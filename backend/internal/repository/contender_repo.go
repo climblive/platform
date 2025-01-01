@@ -18,9 +18,7 @@ func (d *Database) GetContender(ctx context.Context, tx domain.Transaction, cont
 		return domain.Contender{}, errors.Wrap(err, 0)
 	}
 
-	contender := contenderToDomain(record.Contender)
-	score := scoreToDomain(record.Score)
-	contender.Score = &score
+	contender := contenderToDomain(record.Contender, record.ContenderScore)
 
 	return contender, nil
 }
@@ -34,9 +32,7 @@ func (d *Database) GetContenderByCode(ctx context.Context, tx domain.Transaction
 		return domain.Contender{}, errors.Wrap(err, 0)
 	}
 
-	contender := contenderToDomain(record.Contender)
-	score := scoreToDomain(record.Score)
-	contender.Score = &score
+	contender := contenderToDomain(record.Contender, record.ContenderScore)
 
 	return contender, nil
 }
@@ -50,9 +46,7 @@ func (d *Database) GetContendersByCompClass(ctx context.Context, tx domain.Trans
 	contenders := make([]domain.Contender, 0)
 
 	for _, record := range records {
-		contender := contenderToDomain(record.Contender)
-		score := scoreToDomain(record.Score)
-		contender.Score = &score
+		contender := contenderToDomain(record.Contender, record.ContenderScore)
 
 		contenders = append(contenders, contender)
 	}
@@ -69,9 +63,7 @@ func (d *Database) GetContendersByContest(ctx context.Context, tx domain.Transac
 	contenders := make([]domain.Contender, 0)
 
 	for _, record := range records {
-		contender := contenderToDomain(record.Contender)
-		score := scoreToDomain(record.Score)
-		contender.Score = &score
+		contender := contenderToDomain(record.Contender, record.ContenderScore)
 
 		contenders = append(contenders, contender)
 	}

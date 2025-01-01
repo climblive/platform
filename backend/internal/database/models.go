@@ -33,6 +33,15 @@ type Contender struct {
 	WithdrawnFromFinals bool
 }
 
+type ContenderScore struct {
+	ContenderID sql.NullInt32
+	Timestamp   sql.NullTime
+	Score       sql.NullInt32
+	Placement   sql.NullInt32
+	Finalist    sql.NullBool
+	RankOrder   sql.NullInt32
+}
+
 type Contest struct {
 	ID                 int32
 	OrganizerID        int32
