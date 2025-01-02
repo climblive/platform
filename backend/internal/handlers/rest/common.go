@@ -47,6 +47,8 @@ func handleError(w http.ResponseWriter, err error) {
 	switch {
 	case errors.Is(err, domain.ErrNotFound):
 		w.WriteHeader(http.StatusNotFound)
+	case errors.Is(err, domain.ErrNotAuthenticated):
+		fallthrough
 	case errors.Is(err, domain.ErrNotAuthorized):
 		fallthrough
 	case errors.Is(err, domain.ErrNoOwnership):
