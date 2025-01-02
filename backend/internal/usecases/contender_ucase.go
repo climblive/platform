@@ -303,7 +303,10 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID doma
 
 	contenders := make([]domain.Contender, 0)
 
-	tx := uc.Repo.Begin()
+	tx, err := uc.Repo.Begin()
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
 
 	for range number {
 		contender := domain.Contender{

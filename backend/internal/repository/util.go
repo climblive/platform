@@ -1,28 +1,11 @@
 package repository
 
-import "github.com/climblive/platform/backend/internal/domain"
+import (
+	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/go-sql-driver/mysql"
+)
 
-func e2n[T comparable](value T) *T {
-	var empty T
-
-	if value == empty {
-		return nil
-	}
-
-	return &value
-}
-
-func n2e[T comparable](value *T) T {
-	var empty T
-
-	if value == nil {
-		return empty
-	}
-
-	return *value
-}
-
-func nillableIntToResourceID[T domain.ResourceIDType](value *int) *T {
+func nillableIntToResourceID[T domain.ResourceIDType](value *int32) *T {
 	if value == nil {
 		return nil
 	}
@@ -30,3 +13,5 @@ func nillableIntToResourceID[T domain.ResourceIDType](value *int) *T {
 	var out T = T(*value)
 	return &out
 }
+
+var mysqlForeignKeyConstraintViolation = mysql.MySQLError{Number: 1452}

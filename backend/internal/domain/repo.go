@@ -6,5 +6,5 @@ type Transaction interface {
 }
 
 type Transactor interface {
-	Begin() Transaction
+	Begin() (Transaction, error)
 }

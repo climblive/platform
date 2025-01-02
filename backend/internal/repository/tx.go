@@ -1,18 +1,24 @@
 package repository
 
 import (
+	"database/sql"
+
 	"github.com/go-errors/errors"
-	"gorm.io/gorm"
 )
 
 type transaction struct {
-	db *gorm.DB
+	tx *sql.Tx
 }
 
 func (tx *transaction) Commit() error {
-	return errors.Wrap(tx.db.Commit().Error, 0)
+	err := tx.tx.Commit()
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	return nil
 }
 
 func (tx *transaction) Rollback() {
-	tx.db.Rollback()
+	_ = tx.tx.Rollback()
 }

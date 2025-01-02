@@ -187,9 +187,9 @@ type repositoryMock struct {
 	mock.Mock
 }
 
-func (m *repositoryMock) Begin() domain.Transaction {
+func (m *repositoryMock) Begin() (domain.Transaction, error) {
 	args := m.Called()
-	return args.Get(0).(domain.Transaction)
+	return args.Get(0).(domain.Transaction), args.Error(1)
 }
 
 func (m *repositoryMock) GetContenderByCode(ctx context.Context, tx domain.Transaction, registrationCode string) (domain.Contender, error) {
