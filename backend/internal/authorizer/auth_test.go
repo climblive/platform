@@ -220,7 +220,7 @@ func (m *repositoryMock) StoreOrganizer(ctx context.Context, tx domain.Transacti
 
 func (m *repositoryMock) AddUserToOrganizer(ctx context.Context, tx domain.Transaction, userID domain.UserID, organizerID domain.OrganizerID) error {
 	args := m.Called(ctx, tx, userID, organizerID)
-	return args.Error(1)
+	return args.Error(0)
 }
 
 type jwtDecoderMock struct {
