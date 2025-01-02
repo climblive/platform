@@ -32,7 +32,7 @@ func TestAuthorizer(t *testing.T) {
 			role, err := authorizer.HasOwnership(r.Context(), fakedOwnership)
 
 			assert.Equal(t, domain.NilRole, role)
-			assert.ErrorIs(t, err, domain.ErrNotAuthorized)
+			assert.ErrorIs(t, err, domain.ErrNotAuthenticated)
 		}
 
 		r := httptest.NewRequest("GET", "http://localhost", nil)
@@ -82,7 +82,7 @@ func TestAuthorizer(t *testing.T) {
 			role, err := authorizer.HasOwnership(r.Context(), fakedOwnership)
 
 			assert.Equal(t, domain.NilRole, role)
-			assert.ErrorIs(t, err, domain.ErrNotAuthorized)
+			assert.ErrorIs(t, err, domain.ErrNotAuthenticated)
 		}
 
 		r := httptest.NewRequest("GET", "http://localhost", nil)
