@@ -128,9 +128,8 @@ func (a *Authorizer) createUser(ctx context.Context, username string) error {
 		}
 
 		user, err := a.repo.StoreUser(ctx, tx, domain.User{
-			Name:       username,
-			Username:   username,
-			Organizers: []domain.OrganizerID{organizer.ID},
+			Name:     username,
+			Username: username,
 		})
 		if err != nil {
 			return errors.Wrap(err, 0)
