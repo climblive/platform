@@ -83,7 +83,7 @@ func main() {
 		panic(err)
 	}
 
-	authorizer := authorizer.NewAuthorizer(repo)
+	authorizer := authorizer.NewAuthorizer(repo, authorizer.NewStandardJWTDecoder())
 	eventBroker := events.NewBroker()
 	scoreKeeper := scores.NewScoreKeeper(eventBroker, repo)
 	scoreEngineStoreHydrator := &scores.StandardEngineStoreHydrator{Repo: repo}

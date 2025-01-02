@@ -29,15 +29,27 @@ type authorizerRepository interface {
 	AddUserToOrganizer(ctx context.Context, tx domain.Transaction, userID domain.UserID, organizerID domain.OrganizerID) error
 }
 
+type Claims struct {
+	Username   string `json:"username"`
+	Expiration int64  `json:"exp"`
+	Issuer     string `json:"iss"`
+}
+
+type JWTDecoder interface {
+	Decode(jwt string) (Claims, error)
+}
+
 type Authorizer struct {
 	repo           authorizerRepository
 	regcodePattern *regexp.Regexp
+	jwtDecoder     JWTDecoder
 }
 
-func NewAuthorizer(repo authorizerRepository) *Authorizer {
+func NewAuthorizer(repo authorizerRepository, jwtDecoder JWTDecoder) *Authorizer {
 	return &Authorizer{
 		repo:           repo,
 		regcodePattern: regexp.MustCompile(`^Regcode ([A-Za-z0-9]{8})$`),
+		jwtDecoder:     jwtDecoder,
 	}
 }
 
@@ -153,9 +165,8 @@ func (a *Authorizer) Middleware(next http.Handler) http.Handler {
 		nextCtx := r.Context()
 
 		var bearer string
-		var payload []byte
 		var err error
-		var username string
+		var claims Claims
 
 		matches := a.regcodePattern.FindStringSubmatch(header)
 		if matches != nil {
@@ -167,14 +178,8 @@ func (a *Authorizer) Middleware(next http.Handler) http.Handler {
 			goto Next
 		}
 
-		payload, err = a.verifyJWT(bearer)
-		if err != nil {
-			nextCtx = context.WithValue(nextCtx, contextKey{}, authenticationResult{err: err})
-			goto Next
-		}
-
-		username, err = a.decodeJWT(payload)
-		nextCtx = context.WithValue(nextCtx, contextKey{}, authenticationResult{username: username, err: err})
+		claims, err = a.jwtDecoder.Decode(bearer)
+		nextCtx = context.WithValue(nextCtx, contextKey{}, authenticationResult{username: claims.Username, err: err})
 
 	Next:
 		next.ServeHTTP(w, r.WithContext(nextCtx))

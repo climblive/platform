@@ -14,18 +14,14 @@ import (
 var ErrUnexpectedIssuer = errors.New("unexpected issuer")
 var ErrExpiredCredentials = errors.New("expired credentials")
 
-type claims struct {
-	Username   string `json:"username"`
-	Expiration int64  `json:"exp"`
-	Issuer     string `json:"iss"`
-}
-
-var keys jose.JSONWebKeySet
-
 //go:embed keys.json
 var jwks []byte
 
-func init() {
+type StandardJWTDecoder struct {
+	keys jose.JSONWebKeySet
+}
+
+func NewStandardJWTDecoder() *StandardJWTDecoder {
 	var keyList struct {
 		Keys []json.RawMessage `json:"keys"`
 	}
@@ -35,6 +31,8 @@ func init() {
 		panic(fmt.Errorf("unmarshal jwks: %w", err))
 	}
 
+	var keys jose.JSONWebKeySet
+
 	for _, jsonKey := range keyList.Keys {
 		k := jose.JSONWebKey{}
 		if err := k.UnmarshalJSON(jsonKey); err != nil {
@@ -43,40 +41,40 @@ func init() {
 
 		keys.Keys = append(keys.Keys, k)
 	}
+
+	return &StandardJWTDecoder{
+		keys: keys,
+	}
 }
 
-func (a *Authorizer) verifyJWT(jwt string) ([]byte, error) {
+func (d *StandardJWTDecoder) Decode(jwt string) (Claims, error) {
 	signature, err := jose.ParseSigned(jwt)
 	if err != nil {
-		return nil, errors.Wrap(err, 0)
+		return Claims{}, errors.Wrap(err, 0)
 	}
 
 	kid := signature.Signatures[0].Header.KeyID
 	var key interface{}
-	if result := keys.Key(kid); len(result) == 1 {
+	if result := d.keys.Key(kid); len(result) == 1 {
 		key = result[0].Key
 	} else {
-		return nil, ErrUnexpectedIssuer
+		return Claims{}, ErrUnexpectedIssuer
 	}
 
 	payload, err := signature.Verify(key)
 	if err != nil {
-		return nil, errors.Wrap(err, 0)
+		return Claims{}, errors.Wrap(err, 0)
 	}
 
-	return payload, nil
-}
-
-func (a *Authorizer) decodeJWT(payload []byte) (string, error) {
-	var claims claims
+	var claims Claims
 
 	if err := json.Unmarshal(payload, &claims); err != nil {
-		return "", err
+		return Claims{}, err
 	}
 
 	if time.Unix(claims.Expiration, 0).Before(time.Now()) {
-		return "", ErrExpiredCredentials
+		return Claims{}, ErrExpiredCredentials
 	}
 
-	return claims.Username, nil
+	return claims, nil
 }
