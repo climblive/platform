@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
@@ -44,11 +43,12 @@ func (d *Database) AddUserToOrganizer(ctx context.Context, tx domain.Transaction
 
 func (d *Database) GetUserByUsername(ctx context.Context, tx domain.Transaction, username string) (domain.User, error) {
 	records, err := d.WithTx(tx).GetUserByUsername(ctx, username)
-	switch {
-	case errors.Is(err, sql.ErrNoRows):
-		return domain.User{}, errors.Wrap(domain.ErrNotFound, 0)
-	case err != nil:
+	if err != nil {
 		return domain.User{}, errors.Wrap(err, 0)
+	}
+
+	if len(records) == 0 {
+		return domain.User{}, errors.Wrap(domain.ErrNotFound, 0)
 	}
 
 	var user domain.User
