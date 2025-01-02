@@ -45,7 +45,7 @@ func (d *Database) StoreTick(ctx context.Context, tx domain.Transaction, tick do
 		ContestID:   int32(tick.ContestID),
 		ContenderID: int32(*tick.Ownership.ContenderID),
 		ProblemID:   int32(tick.ProblemID),
-		Flash:       tick.AttemptsTop == 1,
+		Flash:       tick.Top && tick.AttemptsTop == 1,
 		Timestamp:   tick.Timestamp,
 	}
 
