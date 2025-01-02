@@ -11,7 +11,12 @@ type transaction struct {
 }
 
 func (tx *transaction) Commit() error {
-	return errors.Wrap(tx.tx.Commit().Error, 0)
+	err := tx.tx.Commit()
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	return nil
 }
 
 func (tx *transaction) Rollback() {
