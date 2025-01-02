@@ -211,3 +211,8 @@ func (m *repositoryMock) StoreOrganizer(ctx context.Context, tx domain.Transacti
 	args := m.Called(ctx, tx, organizer)
 	return args.Get(0).(domain.Organizer), args.Error(1)
 }
+
+func (m *repositoryMock) AddUserToOrganizer(ctx context.Context, tx domain.Transaction, userID domain.UserID, organizerID domain.OrganizerID) error {
+	args := m.Called(ctx, tx, userID, organizerID)
+	return args.Error(1)
+}

@@ -11,6 +11,23 @@ import (
 	"time"
 )
 
+const addUserToOrganizer = `-- name: AddUserToOrganizer :exec
+INSERT INTO
+    user_organizer (user_id, organizer_id)
+VALUES
+    (?, ?)
+`
+
+type AddUserToOrganizerParams struct {
+	UserID      int32
+	OrganizerID int32
+}
+
+func (q *Queries) AddUserToOrganizer(ctx context.Context, arg AddUserToOrganizerParams) error {
+	_, err := q.db.ExecContext(ctx, addUserToOrganizer, arg.UserID, arg.OrganizerID)
+	return err
+}
+
 const countContenders = `-- name: CountContenders :one
 SELECT COUNT(*)
 FROM contender
@@ -596,6 +613,48 @@ func (q *Queries) GetTicksByContest(ctx context.Context, contestID int32) ([]Get
 	return items, nil
 }
 
+const getUserByUsername = `-- name: GetUserByUsername :many
+SELECT user.id, user.name, user.username, user.admin, organizer.id AS organizer_id
+FROM user
+LEFT JOIN user_organizer uo ON uo.user_id = user.id
+LEFT JOIN organizer ON organizer.id = uo.organizer_id
+WHERE username = ?
+`
+
+type GetUserByUsernameRow struct {
+	User        User
+	OrganizerID sql.NullInt32
+}
+
+func (q *Queries) GetUserByUsername(ctx context.Context, username string) ([]GetUserByUsernameRow, error) {
+	rows, err := q.db.QueryContext(ctx, getUserByUsername, username)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetUserByUsernameRow
+	for rows.Next() {
+		var i GetUserByUsernameRow
+		if err := rows.Scan(
+			&i.User.ID,
+			&i.User.Name,
+			&i.User.Username,
+			&i.User.Admin,
+			&i.OrganizerID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const insertTick = `-- name: InsertTick :execlastid
 INSERT INTO
     tick (organizer_id, contest_id, contender_id, problem_id, flash, timestamp)
@@ -676,6 +735,30 @@ func (q *Queries) UpsertContender(ctx context.Context, arg UpsertContenderParams
 	return result.LastInsertId()
 }
 
+const upsertOrganizer = `-- name: UpsertOrganizer :execlastid
+INSERT INTO
+    organizer (id, name, homepage)
+VALUES
+    (?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    homepage = VALUES(homepage)
+`
+
+type UpsertOrganizerParams struct {
+	ID       int32
+	Name     string
+	Homepage sql.NullString
+}
+
+func (q *Queries) UpsertOrganizer(ctx context.Context, arg UpsertOrganizerParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, upsertOrganizer, arg.ID, arg.Name, arg.Homepage)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
+}
+
 const upsertScore = `-- name: UpsertScore :exec
 INSERT INTO
     score (contender_id, timestamp, score, placement, finalist, rank_order)
@@ -708,4 +791,35 @@ func (q *Queries) UpsertScore(ctx context.Context, arg UpsertScoreParams) error 
 		arg.RankOrder,
 	)
 	return err
+}
+
+const upsertUser = `-- name: UpsertUser :execlastid
+INSERT INTO
+    user (id, name, username, admin)
+VALUES
+    (?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    username = VALUES(username),
+    admin = VALUES(admin)
+`
+
+type UpsertUserParams struct {
+	ID       int32
+	Name     string
+	Username string
+	Admin    bool
+}
+
+func (q *Queries) UpsertUser(ctx context.Context, arg UpsertUserParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, upsertUser,
+		arg.ID,
+		arg.Name,
+		arg.Username,
+		arg.Admin,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
 }

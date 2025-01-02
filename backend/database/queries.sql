@@ -122,3 +122,35 @@ INSERT INTO
     tick (organizer_id, contest_id, contender_id, problem_id, flash, timestamp)
 VALUES
     (?, ?, ?, ?, ?, ?);
+
+-- name: UpsertOrganizer :execlastid
+INSERT INTO
+    organizer (id, name, homepage)
+VALUES
+    (?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    homepage = VALUES(homepage);
+
+-- name: UpsertUser :execlastid
+INSERT INTO
+    user (id, name, username, admin)
+VALUES
+    (?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    username = VALUES(username),
+    admin = VALUES(admin);
+
+-- name: GetUserByUsername :many
+SELECT sqlc.embed(user), organizer.id AS organizer_id
+FROM user
+LEFT JOIN user_organizer uo ON uo.user_id = user.id
+LEFT JOIN organizer ON organizer.id = uo.organizer_id
+WHERE username = ?;
+
+-- name: AddUserToOrganizer :exec
+INSERT INTO
+    user_organizer (user_id, organizer_id)
+VALUES
+    (?, ?);

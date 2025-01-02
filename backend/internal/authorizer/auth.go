@@ -26,6 +26,7 @@ type authorizerRepository interface {
 	GetUserByUsername(ctx context.Context, tx domain.Transaction, username string) (domain.User, error)
 	StoreUser(ctx context.Context, tx domain.Transaction, user domain.User) (domain.User, error)
 	StoreOrganizer(ctx context.Context, tx domain.Transaction, organizer domain.Organizer) (domain.Organizer, error)
+	AddUserToOrganizer(ctx context.Context, tx domain.Transaction, userID domain.UserID, organizerID domain.OrganizerID) error
 }
 
 type Authorizer struct {
@@ -101,27 +102,47 @@ func (a *Authorizer) checkUsername(ctx context.Context, username string, resourc
 }
 
 func (a *Authorizer) createUser(ctx context.Context, username string) error {
-	tx := a.repo.Begin()
-
-	organizer, err := a.repo.StoreOrganizer(ctx, tx, domain.Organizer{
-		Name: fmt.Sprintf("%s's organizer", username),
-	})
+	tx, err := a.repo.Begin()
 	if err != nil {
-		tx.Rollback()
 		return errors.Wrap(err, 0)
 	}
 
-	_, err = a.repo.StoreUser(ctx, tx, domain.User{
-		Name:       username,
-		Username:   username,
-		Organizers: []domain.OrganizerID{organizer.ID},
-	})
+	exec := func() error {
+		organizer, err := a.repo.StoreOrganizer(ctx, tx, domain.Organizer{
+			Name: fmt.Sprintf("%s's organizer", username),
+		})
+		if err != nil {
+			return errors.Wrap(err, 0)
+		}
+
+		user, err := a.repo.StoreUser(ctx, tx, domain.User{
+			Name:       username,
+			Username:   username,
+			Organizers: []domain.OrganizerID{organizer.ID},
+		})
+		if err != nil {
+			return errors.Wrap(err, 0)
+		}
+
+		err = a.repo.AddUserToOrganizer(ctx, tx, user.ID, organizer.ID)
+		if err != nil {
+			return errors.Wrap(err, 0)
+		}
+
+		return nil
+	}
+
+	err = exec()
 	if err != nil {
 		tx.Rollback()
+
 		return errors.Wrap(err, 0)
 	}
 
-	tx.Commit()
+	err = tx.Commit()
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
 
 	return nil
 }

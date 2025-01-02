@@ -2,84 +2,66 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 
+	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
 )
 
-type userRecord struct {
-	ID         *int `gorm:"primaryKey;autoIncrement"`
-	Name       string
-	Username   string
-	Admin      bool
-	Organizers []organizerRecord `gorm:"many2many:user_organizer;foreignKey:id;joinForeignKey:user_id;References:id;joinReferences:organizer_id;"`
-}
-
-func (userRecord) TableName() string {
-	return "user"
-}
-
-func (r userRecord) fromDomain(user domain.User) userRecord {
-	record := userRecord{
-		ID:       e2n(int(user.ID)),
+func (d *Database) StoreUser(ctx context.Context, tx domain.Transaction, user domain.User) (domain.User, error) {
+	params := database.UpsertUserParams{
+		ID:       int32(user.ID),
 		Name:     user.Name,
 		Username: user.Username,
 		Admin:    user.Admin,
 	}
 
-	for _, organizerID := range user.Organizers {
-		record.Organizers = append(record.Organizers, organizerRecord{
-			ID: e2n(int(organizerID)),
-		})
-	}
-
-	return record
-}
-
-func (r *userRecord) toDomain() domain.User {
-	entity := domain.User{
-		ID:       domain.UserID(n2e(r.ID)),
-		Name:     r.Name,
-		Username: r.Username,
-		Admin:    r.Admin,
-	}
-
-	for _, organizer := range r.Organizers {
-		entity.Organizers = append(entity.Organizers, domain.OrganizerID(n2e(organizer.ID)))
-	}
-
-	return entity
-}
-
-func (d *Database) StoreUser(ctx context.Context, tx domain.Transaction, user domain.User) (domain.User, error) {
-	var err error
-	var record userRecord = userRecord{}.fromDomain(user)
-
-	err = d.tx(tx).WithContext(ctx).Save(&record).Error
+	insertID, err := d.WithTx(tx).UpsertUser(ctx, params)
 	if err != nil {
 		return domain.User{}, errors.Wrap(err, 0)
 	}
 
-	return record.toDomain(), nil
+	user.ID = domain.UserID(insertID)
+
+	return user, nil
+}
+
+func (d *Database) AddUserToOrganizer(ctx context.Context, tx domain.Transaction, userID domain.UserID, organizerID domain.OrganizerID) error {
+	params := database.AddUserToOrganizerParams{
+		UserID:      int32(userID),
+		OrganizerID: int32(organizerID),
+	}
+
+	err := d.WithTx(tx).AddUserToOrganizer(ctx, params)
+
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	return nil
 }
 
 func (d *Database) GetUserByUsername(ctx context.Context, tx domain.Transaction, username string) (domain.User, error) {
-	var record userRecord
-
-	err := d.tx(tx).WithContext(ctx).
-		Debug().
-		Model(&userRecord{}).
-		Preload("Organizers").
-		Select("*").
-		Where("username = ?", username).
-		Scan(&record).Error
-	if err != nil {
+	records, err := d.WithTx(tx).GetUserByUsername(ctx, username)
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return domain.User{}, errors.Wrap(domain.ErrNotFound, 0)
+	case err != nil:
 		return domain.User{}, errors.Wrap(err, 0)
 	}
 
-	if record.ID == nil {
-		return domain.User{}, errors.Wrap(domain.ErrNotFound, 0)
+	var user domain.User
+
+	for index, record := range records {
+		if index == 0 {
+			user = userToDomain(record.User)
+		}
+
+		if record.OrganizerID.Valid {
+			user.Organizers = append(user.Organizers, domain.OrganizerID(record.OrganizerID.Int32))
+		}
 	}
 
-	return record.toDomain(), nil
+	return user, nil
 }
