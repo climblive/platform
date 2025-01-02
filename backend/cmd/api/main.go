@@ -83,7 +83,16 @@ func main() {
 		panic(err)
 	}
 
-	authorizer := authorizer.NewAuthorizer(repo, authorizer.NewStandardJWTDecoder())
+	jwtDecoder, err := authorizer.NewStandardJWTDecoder()
+	if err != nil {
+		if stack := utils.GetErrorStack(err); stack != "" {
+			log.Println(stack)
+		}
+
+		panic(err)
+	}
+
+	authorizer := authorizer.NewAuthorizer(repo, jwtDecoder)
 	eventBroker := events.NewBroker()
 	scoreKeeper := scores.NewScoreKeeper(eventBroker, repo)
 	scoreEngineStoreHydrator := &scores.StandardEngineStoreHydrator{Repo: repo}

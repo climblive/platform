@@ -2,7 +2,6 @@ package authorizer
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 
 	_ "embed"
@@ -13,6 +12,7 @@ import (
 
 var ErrUnexpectedIssuer = errors.New("unexpected issuer")
 var ErrExpiredCredentials = errors.New("expired credentials")
+var ErrBadSignature = errors.New("bad signature")
 
 //go:embed keys.json
 var jwks []byte
@@ -21,14 +21,14 @@ type StandardJWTDecoder struct {
 	keys jose.JSONWebKeySet
 }
 
-func NewStandardJWTDecoder() *StandardJWTDecoder {
+func NewStandardJWTDecoder() (*StandardJWTDecoder, error) {
 	var keyList struct {
 		Keys []json.RawMessage `json:"keys"`
 	}
 
 	err := json.Unmarshal(jwks, &keyList)
 	if err != nil {
-		panic(fmt.Errorf("unmarshal jwks: %w", err))
+		return nil, errors.Wrap(err, 0)
 	}
 
 	var keys jose.JSONWebKeySet
@@ -36,7 +36,7 @@ func NewStandardJWTDecoder() *StandardJWTDecoder {
 	for _, jsonKey := range keyList.Keys {
 		k := jose.JSONWebKey{}
 		if err := k.UnmarshalJSON(jsonKey); err != nil {
-			panic(fmt.Errorf("unmarshal jwk: %w", err))
+			return nil, errors.Wrap(err, 0)
 		}
 
 		keys.Keys = append(keys.Keys, k)
@@ -44,7 +44,7 @@ func NewStandardJWTDecoder() *StandardJWTDecoder {
 
 	return &StandardJWTDecoder{
 		keys: keys,
-	}
+	}, nil
 }
 
 func (d *StandardJWTDecoder) Decode(jwt string) (Claims, error) {
@@ -58,22 +58,22 @@ func (d *StandardJWTDecoder) Decode(jwt string) (Claims, error) {
 	if result := d.keys.Key(kid); len(result) == 1 {
 		key = result[0].Key
 	} else {
-		return Claims{}, ErrUnexpectedIssuer
+		return Claims{}, errors.Wrap(ErrUnexpectedIssuer, 0)
 	}
 
 	payload, err := signature.Verify(key)
 	if err != nil {
-		return Claims{}, errors.Wrap(err, 0)
+		return Claims{}, errors.Wrap(ErrBadSignature, 0)
 	}
 
 	var claims Claims
 
 	if err := json.Unmarshal(payload, &claims); err != nil {
-		return Claims{}, err
+		return Claims{}, errors.Wrap(err, 0)
 	}
 
 	if time.Unix(claims.Expiration, 0).Before(time.Now()) {
-		return Claims{}, ErrExpiredCredentials
+		return Claims{}, errors.Wrap(ErrExpiredCredentials, 0)
 	}
 
 	return claims, nil
