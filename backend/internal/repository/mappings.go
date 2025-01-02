@@ -16,41 +16,38 @@ func nullTimeToTime(time sql.NullTime) *time.Time {
 	return nil
 }
 
-func contenderToDomain(record database.Contender, scoreRecord database.ContenderScore) domain.Contender {
+func contenderToDomain(record database.GetContenderRow) domain.Contender {
 	contender := domain.Contender{
-		ID: domain.ContenderID(record.ID),
+		ID: domain.ContenderID(record.Contender.ID),
 		Ownership: domain.OwnershipData{
-			OrganizerID: domain.OrganizerID(record.OrganizerID),
-			ContenderID: nillableIntToResourceID[domain.ContenderID](&record.ID),
+			OrganizerID: domain.OrganizerID(record.Contender.OrganizerID),
+			ContenderID: nillableIntToResourceID[domain.ContenderID](&record.Contender.ID),
 		},
-		ContestID:           domain.ContestID(record.ContestID),
-		CompClassID:         domain.CompClassID(record.ClassID.Int32),
-		RegistrationCode:    record.RegistrationCode,
-		Name:                record.Name.String,
-		PublicName:          record.Name.String,
-		ClubName:            record.Club.String,
-		Entered:             nullTimeToTime(record.Entered),
-		WithdrawnFromFinals: record.WithdrawnFromFinals,
-		Disqualified:        record.Disqualified,
+		ContestID:           domain.ContestID(record.Contender.ContestID),
+		CompClassID:         domain.CompClassID(record.Contender.ClassID.Int32),
+		RegistrationCode:    record.Contender.RegistrationCode,
+		Name:                record.Contender.Name.String,
+		PublicName:          record.Contender.Name.String,
+		ClubName:            record.Contender.Club.String,
+		Entered:             nullTimeToTime(record.Contender.Entered),
+		WithdrawnFromFinals: record.Contender.WithdrawnFromFinals,
+		Disqualified:        record.Contender.Disqualified,
 	}
 
-	if scoreRecord.ContenderID.Valid {
-		score := scoreToDomain(scoreRecord)
+	if record.ContenderID.Valid {
+		score := domain.Score{
+			Timestamp:   record.Timestamp.Time,
+			ContenderID: domain.ContenderID(record.ContenderID.Int32),
+			Score:       int(record.Score.Int32),
+			Placement:   int(record.Placement.Int32),
+			Finalist:    record.Finalist.Bool,
+			RankOrder:   int(record.RankOrder.Int32),
+		}
+
 		contender.Score = &score
 	}
 
 	return contender
-}
-
-func scoreToDomain(record database.ContenderScore) domain.Score {
-	return domain.Score{
-		Timestamp:   record.Timestamp.Time,
-		ContenderID: domain.ContenderID(record.ContenderID.Int32),
-		Score:       int(record.Score.Int32),
-		Placement:   int(record.Placement.Int32),
-		Finalist:    record.Finalist.Bool,
-		RankOrder:   int(record.RankOrder.Int32),
-	}
 }
 
 func compClassToDomain(record database.CompClass) domain.CompClass {
