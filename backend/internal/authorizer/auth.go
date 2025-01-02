@@ -32,7 +32,6 @@ type authorizerRepository interface {
 type Claims struct {
 	Username   string `json:"username"`
 	Expiration int64  `json:"exp"`
-	Issuer     string `json:"iss"`
 }
 
 type JWTDecoder interface {
@@ -59,20 +58,19 @@ func (a *Authorizer) HasOwnership(ctx context.Context, resourceOwnership domain.
 		return domain.NilRole, domain.ErrNotAuthenticated
 	}
 
-	if authenticationResult.err != nil {
+	switch {
+	case authenticationResult.err != nil:
 		return domain.NilRole, errors.Errorf("%w: %w", domain.ErrNotAuthenticated, authenticationResult.err)
-	}
-
-	if authenticationResult.regcode != "" {
-		return a.checkRegcode(ctx, authenticationResult.regcode, resourceOwnership)
-	} else if authenticationResult.username != "" {
-		return a.checkUsername(ctx, authenticationResult.username, resourceOwnership)
+	case authenticationResult.regcode != "":
+		return a.authorizeByRegCode(ctx, authenticationResult.regcode, resourceOwnership)
+	case authenticationResult.username != "":
+		return a.authorizeByUsername(ctx, authenticationResult.username, resourceOwnership)
 	}
 
 	return domain.NilRole, domain.ErrNoOwnership
 }
 
-func (a *Authorizer) checkRegcode(ctx context.Context, regcode string, resourceOwnership domain.OwnershipData) (domain.AuthRole, error) {
+func (a *Authorizer) authorizeByRegCode(ctx context.Context, regcode string, resourceOwnership domain.OwnershipData) (domain.AuthRole, error) {
 	contender, err := a.repo.GetContenderByCode(ctx, nil, strings.ToUpper(regcode))
 	if err != nil {
 		return domain.NilRole, domain.ErrNotAuthorized
@@ -85,7 +83,7 @@ func (a *Authorizer) checkRegcode(ctx context.Context, regcode string, resourceO
 	return domain.NilRole, domain.ErrNoOwnership
 }
 
-func (a *Authorizer) checkUsername(ctx context.Context, username string, resourceOwnership domain.OwnershipData) (domain.AuthRole, error) {
+func (a *Authorizer) authorizeByUsername(ctx context.Context, username string, resourceOwnership domain.OwnershipData) (domain.AuthRole, error) {
 	user, err := a.repo.GetUserByUsername(ctx, nil, username)
 
 	switch {
@@ -97,7 +95,7 @@ func (a *Authorizer) checkUsername(ctx context.Context, username string, resourc
 
 		return domain.NilRole, domain.ErrNoOwnership
 	case err != nil:
-		return domain.NilRole, domain.ErrNotAuthorized
+		return domain.NilRole, errors.Wrap(err, 0)
 	}
 
 	if user.Admin {
@@ -119,7 +117,7 @@ func (a *Authorizer) createUser(ctx context.Context, username string) error {
 		return errors.Wrap(err, 0)
 	}
 
-	exec := func() error {
+	runTransaction := func() error {
 		organizer, err := a.repo.StoreOrganizer(ctx, tx, domain.Organizer{
 			Name: fmt.Sprintf("%s's organizer", username),
 		})
@@ -143,7 +141,7 @@ func (a *Authorizer) createUser(ctx context.Context, username string) error {
 		return nil
 	}
 
-	err = exec()
+	err = runTransaction()
 	if err != nil {
 		tx.Rollback()
 
