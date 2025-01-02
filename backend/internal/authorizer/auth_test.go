@@ -42,6 +42,7 @@ func TestAuthorizer(t *testing.T) {
 		handler.ServeHTTP(w, r)
 
 		mockedRepo.AssertExpectations(t)
+		mockedJWTDecoder.AssertExpectations(t)
 	})
 
 	t.Run("BadAuthorization", func(t *testing.T) {
@@ -70,6 +71,7 @@ func TestAuthorizer(t *testing.T) {
 		handler.ServeHTTP(w, r)
 
 		mockedRepo.AssertExpectations(t)
+		mockedJWTDecoder.AssertExpectations(t)
 	})
 
 	t.Run("BadSyntax", func(t *testing.T) {
@@ -94,6 +96,7 @@ func TestAuthorizer(t *testing.T) {
 		handler.ServeHTTP(w, r)
 
 		mockedRepo.AssertExpectations(t)
+		mockedJWTDecoder.AssertExpectations(t)
 	})
 
 	t.Run("AuthorizedWithOwnership", func(t *testing.T) {
@@ -124,6 +127,7 @@ func TestAuthorizer(t *testing.T) {
 		handler.ServeHTTP(w, r)
 
 		mockedRepo.AssertExpectations(t)
+		mockedJWTDecoder.AssertExpectations(t)
 	})
 
 	t.Run("AuthorizedWithoutOwnership", func(t *testing.T) {
@@ -161,6 +165,7 @@ func TestAuthorizer(t *testing.T) {
 		handler.ServeHTTP(w, r)
 
 		mockedRepo.AssertExpectations(t)
+		mockedJWTDecoder.AssertExpectations(t)
 	})
 
 	t.Run("CodesConvertedToUpperCase", func(t *testing.T) {
@@ -186,6 +191,7 @@ func TestAuthorizer(t *testing.T) {
 		handler.ServeHTTP(w, r)
 
 		mockedRepo.AssertExpectations(t)
+		mockedJWTDecoder.AssertExpectations(t)
 	})
 }
 
