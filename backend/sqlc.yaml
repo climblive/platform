@@ -1,0 +1,9 @@
+version: "2"
+sql:
+  - engine: "mysql"
+    schema: "database/climblive.sql"
+    queries: "database/queries.sql"
+    gen:
+      go:
+        package: "database"
+        out: "internal/database"

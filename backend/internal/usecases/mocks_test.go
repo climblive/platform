@@ -43,9 +43,9 @@ type repositoryMock struct {
 	mock.Mock
 }
 
-func (m *repositoryMock) Begin() domain.Transaction {
+func (m *repositoryMock) Begin() (domain.Transaction, error) {
 	args := m.Called()
-	return args.Get(0).(domain.Transaction)
+	return args.Get(0).(domain.Transaction), args.Error(1)
 }
 
 func (m *repositoryMock) GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error) {

@@ -1,6 +1,6 @@
 package domain
 
-type resourceID int
+type resourceID int32
 
 type CompClassID resourceID
 type ContenderID resourceID
