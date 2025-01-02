@@ -355,8 +355,8 @@ func TestAuthorizer(t *testing.T) {
 			mockedJWTDecoder := new(jwtDecoderMock)
 			mockedTx := new(transactionMock)
 
-			fakedNewOrganizerID := domain.OrganizerID(rand.Int())
-			fakedNewUserID := domain.UserID(rand.Int())
+			fakedNewOrganizerID := fakedOrganizerID + 1
+			fakedNewUserID := fakedUserID + 1
 
 			mockedRepo.
 				On("GetUserByUsername", mock.Anything, nil, "john").
@@ -417,6 +417,7 @@ func TestAuthorizer(t *testing.T) {
 
 			mockedRepo.AssertExpectations(t)
 			mockedJWTDecoder.AssertExpectations(t)
+			mockedTx.AssertExpectations(t)
 		})
 	})
 }
