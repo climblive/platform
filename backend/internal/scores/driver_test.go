@@ -292,7 +292,7 @@ func TestEngineDriver(t *testing.T) {
 	})
 
 	t.Run("SetScoringRules", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(1)
+		f, awaitExpectations := makeFixture()
 
 		ctx, cancel := context.WithCancel(context.Background())
 		wg, installEngine := f.driver.Run(ctx)
