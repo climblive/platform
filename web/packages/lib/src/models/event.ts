@@ -1,5 +1,8 @@
 import * as z from "zod";
-import type { ContenderPublicInfoUpdatedEvent, ContenderScoreUpdatedEvent } from "./generated";
+import type {
+  ContenderPublicInfoUpdatedEvent,
+  ContenderScoreUpdatedEvent,
+} from "./generated";
 
 export const contenderPublicInfoUpdatedEventSchema: z.ZodType<ContenderPublicInfoUpdatedEvent> =
   z.object({
