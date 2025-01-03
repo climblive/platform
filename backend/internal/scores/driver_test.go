@@ -173,7 +173,11 @@ func TestEngineDriver(t *testing.T) {
 			CompClassID: 1,
 		}).Return()
 
-		time.Sleep(10 * time.Millisecond)
+		time.Sleep(time.Millisecond)
+
+		mockedEngine.AssertNotCalled(t, "HandleAscentRegistered")
+		mockedEngine.AssertNotCalled(t, "HandleAscentDeregistered")
+		mockedEngine.AssertNotCalled(t, "HandleContenderEntered")
 
 		installEngine(mockedEngine)
 
