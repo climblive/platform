@@ -30,7 +30,7 @@ type ScoreEngineManager struct {
 }
 
 type engineHandler struct {
-	engine             *ScoreEngine
+	driver             *ScoreEngineDriver
 	cancel             func()
 	wg                 *sync.WaitGroup
 	finalists          int
@@ -104,13 +104,13 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) error {
 		if handler, ok := mngr.handlers[contest.ID]; ok {
 			if contest.QualifyingProblems != handler.qualifyingProblems {
 				logger.Info("updating scoring rules", "qualifying_problems", contest.QualifyingProblems)
-				handler.engine.SetScoringRules(&HardestProblems{Number: contest.QualifyingProblems})
+				handler.driver.SetScoringRules(&HardestProblems{Number: contest.QualifyingProblems})
 				handler.qualifyingProblems = contest.QualifyingProblems
 			}
 
 			if contest.Finalists != handler.finalists {
 				logger.Info("updating ranker", "finalists", contest.Finalists)
-				handler.engine.SetRanker(NewBasicRanker(contest.Finalists))
+				handler.driver.SetRanker(NewBasicRanker(contest.Finalists))
 				handler.finalists = contest.Finalists
 			}
 
@@ -128,29 +128,36 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) error {
 			logger.Info("detected contest that is currently running", config)
 		}
 
-		store := NewMemoryStore()
-
 		handler := engineHandler{
-			engine:             NewScoreEngine(contest.ID, mngr.eventBroker, &HardestProblems{Number: contest.QualifyingProblems}, NewBasicRanker(contest.Finalists), store),
+			driver:             NewScoreEngineDriver(contest.ID, mngr.eventBroker),
 			finalists:          contest.Finalists,
 			qualifyingProblems: contest.QualifyingProblems,
 		}
 
 		var cancellableCtx context.Context
 		cancellableCtx, handler.cancel = context.WithCancel(ctx)
-		handler.wg = handler.engine.Run(cancellableCtx)
+
+		wg, installEngine := handler.driver.Run(cancellableCtx)
+		handler.wg = wg
+
+		store := NewMemoryStore()
 
 		hydrationStartTime := time.Now()
 		err := mngr.engineStoreHydrator.Hydrate(ctx, contest.ID, store)
 		if err != nil {
-			logger.Error("failed to hydrate score engine", "error", err)
+			logger.Error("failed to hydrate score engine store", "error", err)
 
 			handler.cancel()
 
 			continue
 		}
 
-		handler.engine.ScoreAll()
+		rules := &HardestProblems{Number: contest.QualifyingProblems}
+		ranker := NewBasicRanker(contest.Finalists)
+
+		engine := NewDefaultScoreEngine(ranker, rules, store)
+
+		installEngine(engine)
 
 		logger.Info("score engine store hydration complete", "time", time.Since(hydrationStartTime))
 

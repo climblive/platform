@@ -100,6 +100,6 @@ func (s *MemoryStore) SaveScore(score domain.Score) {
 	s.scores.Set(score.ContenderID, score)
 }
 
-func (s *MemoryStore) GetUnpublishedScores() []domain.Score {
+func (s *MemoryStore) GetDirtyScores() []domain.Score {
 	return s.scores.Commit()
 }
