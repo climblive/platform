@@ -1,13 +1,5 @@
 import * as z from "zod";
-
-export type ContenderPublicInfoUpdatedEvent = {
-  contenderId: number;
-  compClassId: number;
-  publicName: string;
-  clubName?: string;
-  withdrawnFromFinals: boolean;
-  disqualified: boolean;
-};
+import type { ContenderPublicInfoUpdatedEvent, ContenderScoreUpdatedEvent } from "./generated";
 
 export const contenderPublicInfoUpdatedEventSchema: z.ZodType<ContenderPublicInfoUpdatedEvent> =
   z.object({
@@ -18,15 +10,6 @@ export const contenderPublicInfoUpdatedEventSchema: z.ZodType<ContenderPublicInf
     withdrawnFromFinals: z.boolean(),
     disqualified: z.boolean(),
   });
-
-export type ContenderScoreUpdatedEvent = {
-  timestamp: Date;
-  contenderId: number;
-  score: number;
-  placement: number;
-  rankOrder: number;
-  finalist: boolean;
-};
 
 export const contenderScoreUpdatedEventSchema: z.ZodType<ContenderScoreUpdatedEvent> =
   z.object({
