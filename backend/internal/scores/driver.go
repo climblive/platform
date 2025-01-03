@@ -79,21 +79,27 @@ func (d *ScoreEngineDriver) Run(ctx context.Context) (*sync.WaitGroup, func(Scor
 		"PROBLEM_ADDED",
 	)
 
-	hose := make(chan ScoreEngine, 1)
+	engineReceiver := make(chan ScoreEngine, 1)
 
 	installEngine := func(engine ScoreEngine) {
-		hose <- engine
-		close(hose)
+		engineReceiver <- engine
+		close(engineReceiver)
 	}
 
-	go d.run(ctx, filter, wg, ready, hose)
+	go d.run(ctx, filter, wg, ready, engineReceiver)
 
 	<-ready
 
 	return wg, installEngine
 }
 
-func (d *ScoreEngineDriver) run(ctx context.Context, filter domain.EventFilter, wg *sync.WaitGroup, ready chan<- struct{}, hose chan ScoreEngine) {
+func (d *ScoreEngineDriver) run(
+	ctx context.Context,
+	filter domain.EventFilter,
+	wg *sync.WaitGroup,
+	ready chan<- struct{},
+	engineReceiver chan ScoreEngine,
+) {
 	defer func() {
 		if r := recover(); r != nil {
 			d.logger.Error("score engine panicked", "error", r)
@@ -118,7 +124,7 @@ func (d *ScoreEngineDriver) run(ctx context.Context, filter domain.EventFilter, 
 
 	events := eventReader.EventsChan(ctx)
 
-	d.processEvents(ctx, events, hose)
+	d.processEvents(ctx, events, engineReceiver)
 
 	if ctx.Err() == nil {
 		d.logger.Warn("subscription closed unexpectedly")
@@ -127,7 +133,11 @@ func (d *ScoreEngineDriver) run(ctx context.Context, filter domain.EventFilter, 
 	d.logger.Info("score engine shutting down")
 }
 
-func (d *ScoreEngineDriver) processEvents(ctx context.Context, events <-chan domain.EventEnvelope, hose chan ScoreEngine) {
+func (d *ScoreEngineDriver) processEvents(
+	ctx context.Context,
+	events <-chan domain.EventEnvelope,
+	engineReceiver chan ScoreEngine,
+) {
 PreLoop:
 	for {
 		select {
@@ -137,7 +147,7 @@ PreLoop:
 			}
 
 			d.pendingEvents = append(d.pendingEvents, event)
-		case engine := <-hose:
+		case engine := <-engineReceiver:
 			d.engine = engine
 
 			d.engine.Start()
