@@ -122,6 +122,14 @@ func (d *ScoreEngineDriver) run(
 
 	close(ready)
 
+	d.eventBroker.Dispatch(d.contestID, domain.ScoreEngineStarted{
+		ContestID: d.contestID,
+	})
+
+	defer d.eventBroker.Dispatch(d.contestID, domain.ScoreEngineStopped{
+		ContestID: d.contestID,
+	})
+
 	events := eventReader.EventsChan(ctx)
 
 	d.processEvents(ctx, events, engineReceiver)
