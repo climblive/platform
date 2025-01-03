@@ -297,7 +297,7 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 	store := NewMemoryStore()
 	rules := &HardestProblems{Number: contest.QualifyingProblems}
 	ranker := NewBasicRanker(contest.Finalists)
-	driver := NewScoreEngineDriver(contest.ID, mngr.eventBroker)
+	driver := NewScoreEngineDriver(contest.ID, instanceID, mngr.eventBroker)
 	engine := NewDefaultScoreEngine(ranker, rules, store)
 
 	cancellableCtx, stop := context.WithCancel(context.Background())
