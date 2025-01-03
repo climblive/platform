@@ -169,7 +169,7 @@ MainLoop:
 		select {
 		case event, open := <-events:
 			if !open {
-				break MainLoop
+				return
 			}
 
 			d.handleEvent(event)
