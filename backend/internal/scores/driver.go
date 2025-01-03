@@ -16,7 +16,7 @@ type ScoreEngine interface {
 	Stop()
 
 	ReplaceScoringRules(rules ScoringRules)
-	ReplaceRanker(rules Ranker)
+	ReplaceRanker(ranker Ranker)
 
 	HandleContenderEntered(event domain.ContenderEnteredEvent)
 	HandleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent)
