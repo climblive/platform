@@ -29,7 +29,12 @@ func InstallScoreEngineHandler(mux *Mux, controller scoreEngineController) {
 }
 
 func (hdlr *engineHandler) ListScoreEnginesByContest(w http.ResponseWriter, r *http.Request) {
-	contestID := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+
+		return
+	}
 
 	instances, err := hdlr.controller.ListScoreEnginesByContest(r.Context(), contestID)
 	if err != nil {
@@ -59,7 +64,12 @@ func (hdlr *engineHandler) StopScoreEngine(w http.ResponseWriter, r *http.Reques
 }
 
 func (hdlr *engineHandler) StartScoreEngine(w http.ResponseWriter, r *http.Request) {
-	contestID := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+
+		return
+	}
 
 	instanceID, err := hdlr.controller.StartScoreEngine(r.Context(), contestID)
 	if err != nil {

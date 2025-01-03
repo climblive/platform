@@ -140,6 +140,10 @@ func (mngr *ScoreEngineManager) StartScoreEngine(
 	}
 }
 
+func (mngr *ScoreEngineManager) ReverseLoopupScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) (domain.ContestID, error) {
+	return domain.ContestID(0), nil
+}
+
 func (mngr *ScoreEngineManager) run(ctx context.Context, wg *sync.WaitGroup) {
 	defer func() {
 		if r := recover(); r != nil {
