@@ -48,6 +48,23 @@ func NewDefaultScoreEngine(ranker Ranker, rules ScoringRules, store EngineStore)
 	}
 }
 
+func (e *DefaultScoreEngine) ReplaceScoringRules(rules ScoringRules) {
+	e.rules = rules
+
+	for contender := range e.store.GetAllContenders() {
+		contender.Score = e.rules.CalculateScore(Points(e.store.GetTicks(contender.ID)))
+		e.store.SaveContender(contender)
+	}
+
+	e.rankCompClasses(e.store.GetCompClassIDs()...)
+}
+
+func (e *DefaultScoreEngine) ReplaceRanker(ranker Ranker) {
+	e.ranker = ranker
+
+	e.rankCompClasses(e.store.GetCompClassIDs()...)
+}
+
 func (e *DefaultScoreEngine) Start() {
 	for contender := range e.store.GetAllContenders() {
 		ticks := e.store.GetTicks(contender.ID)
@@ -74,23 +91,6 @@ func (e *DefaultScoreEngine) Start() {
 }
 
 func (e *DefaultScoreEngine) Stop() {
-}
-
-func (e *DefaultScoreEngine) ReplaceScoringRules(rules ScoringRules) {
-	e.rules = rules
-
-	for contender := range e.store.GetAllContenders() {
-		contender.Score = e.rules.CalculateScore(Points(e.store.GetTicks(contender.ID)))
-		e.store.SaveContender(contender)
-	}
-
-	e.rankCompClasses(e.store.GetCompClassIDs()...)
-}
-
-func (e *DefaultScoreEngine) ReplaceRanker(ranker Ranker) {
-	e.ranker = ranker
-
-	e.rankCompClasses(e.store.GetCompClassIDs()...)
 }
 
 func (e *DefaultScoreEngine) HandleContenderEntered(event domain.ContenderEnteredEvent) {
