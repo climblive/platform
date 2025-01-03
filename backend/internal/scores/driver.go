@@ -177,7 +177,7 @@ PreLoop:
 		case f := <-d.sideQuests:
 			f()
 		case <-ctx.Done():
-			break MainLoop
+			return
 		}
 	}
 }
