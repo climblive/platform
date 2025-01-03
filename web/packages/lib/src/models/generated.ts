@@ -119,7 +119,7 @@ export interface Series {
 export interface ScoreboardEntry {
   contenderId: ContenderID;
   compClassId: CompClassID;
-  publicName?: string;
+  publicName: string;
   clubName?: string;
   withdrawnFromFinals: boolean;
   disqualified: boolean;
