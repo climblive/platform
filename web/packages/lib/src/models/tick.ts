@@ -1,14 +1,5 @@
 import * as z from "zod";
-
-export type Tick = {
-  id: number;
-  timestamp: Date;
-  problemId: number;
-  top: boolean;
-  attemptsTop: number;
-  zone: boolean;
-  attemptsZone: number;
-};
+import type { Tick } from "./generated";
 
 export const tickSchema: z.ZodType<Tick> = z.object({
   id: z.number(),

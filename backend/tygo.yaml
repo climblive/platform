@@ -1,0 +1,12 @@
+packages:
+  - path: "github.com/climblive/platform/backend/internal/domain"
+    include_files:
+      - "id.go"
+      - "public.go"
+    output_path: "../web/packages/lib/src/models/generated.ts"
+    type_mappings:
+      time.Time: "Date"
+      uuid.UUID: "string"
+      time.Duration: "number"
+    preserve_comments: none
+    optional_type: undefined

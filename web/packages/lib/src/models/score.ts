@@ -1,13 +1,5 @@
 import * as z from "zod";
-
-export type Score = {
-  contenderId: number;
-  score: number;
-  placement: number;
-  rankOrder: number;
-  finalist: boolean;
-  timestamp: Date;
-};
+import type { Score } from "./generated";
 
 export const scoreSchema: z.ZodType<Score> = z.object({
   contenderId: z.number(),

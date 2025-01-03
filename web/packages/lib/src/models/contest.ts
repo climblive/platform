@@ -1,20 +1,5 @@
 import * as z from "zod";
-
-export type Contest = {
-  id: number;
-  location?: string;
-  seriesId?: number;
-  protected: boolean;
-  name: string;
-  description?: string;
-  finalsEnabled: boolean;
-  qualifyingProblems: number;
-  finalists: number;
-  rules?: string;
-  gracePeriod: number;
-  timeBegin?: Date;
-  timeEnd?: Date;
-};
+import type { Contest } from "./generated";
 
 export const contestSchema: z.ZodType<Contest> = z.object({
   id: z.number(),

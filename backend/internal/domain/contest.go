@@ -2,25 +2,7 @@ package domain
 
 import (
 	"context"
-	"time"
 )
-
-type Contest struct {
-	ID                 ContestID     `json:"id,omitempty"`
-	Ownership          OwnershipData `json:"-"`
-	Location           string        `json:"location,omitempty"`
-	SeriesID           SeriesID      `json:"seriesId,omitempty"`
-	Protected          bool          `json:"protected"`
-	Name               string        `json:"name"`
-	Description        string        `json:"description,omitempty"`
-	FinalsEnabled      bool          `json:"finalsEnabled"`
-	QualifyingProblems int           `json:"qualifyingProblems"`
-	Finalists          int           `json:"finalists"`
-	Rules              string        `json:"rules,omitempty"`
-	GracePeriod        time.Duration `json:"gracePeriod"`
-	TimeBegin          *time.Time    `json:"timeBegin,omitempty"`
-	TimeEnd            *time.Time    `json:"timeEnd,omitempty"`
-}
 
 type ContestUseCase interface {
 	GetContest(ctx context.Context, contestID ContestID) (Contest, error)
