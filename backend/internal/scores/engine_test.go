@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestScoreEngine(t *testing.T) {
+func TestDefaultScoreEngine(t *testing.T) {
 	type fixture struct {
 		rules  *scoringRulesMock
 		ranker *rankerMock
