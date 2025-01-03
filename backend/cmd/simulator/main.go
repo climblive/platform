@@ -179,7 +179,7 @@ func (r *ContenderRunner) UpdateContender(contender domain.Contender) domain.Con
 		panic(err)
 	}
 
-	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("%s/contenders/%d", APIURL, contender.ID), buf)
+	req, err := http.NewRequest(http.MethodPatch, fmt.Sprintf("%s/contenders/%d", APIURL, contender.ID), buf)
 	if err != nil {
 		panic(err)
 	}

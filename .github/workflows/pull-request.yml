@@ -88,6 +88,23 @@ jobs:
           version: v1.60
           working-directory: backend
 
+  lint-sql:
+    name: Lint SQL
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: sqlc-dev/setup-sqlc@v3
+        with:
+          sqlc-version: "1.27.0"
+
+      - run: sqlc diff
+        working-directory: backend
+
+      - run: sqlc vet
+        working-directory: backend
+
   test-backend:
     name: Test backend
     runs-on: ubuntu-24.04

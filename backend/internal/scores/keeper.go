@@ -14,7 +14,7 @@ const persistInterval = time.Minute
 const lastDitchPersistTimeout = 10 * time.Second
 
 type keeperRepository interface {
-	StoreScore(ctx context.Context, tx domain.Transaction, score domain.Score) (domain.Score, error)
+	StoreScore(ctx context.Context, tx domain.Transaction, score domain.Score) error
 }
 
 type Keeper struct {
@@ -151,7 +151,7 @@ IterateScores:
 			break
 		}
 
-		_, err := k.repo.StoreScore(ctx, nil, score)
+		err := k.repo.StoreScore(ctx, nil, score)
 		switch {
 		case err == nil:
 			persistedScores += 1

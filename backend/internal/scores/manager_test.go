@@ -118,9 +118,9 @@ func (m *repositoryMock) GetTicksByContest(ctx context.Context, tx domain.Transa
 	return args.Get(0).([]domain.Tick), args.Error(1)
 }
 
-func (m *repositoryMock) StoreScore(ctx context.Context, tx domain.Transaction, score domain.Score) (domain.Score, error) {
+func (m *repositoryMock) StoreScore(ctx context.Context, tx domain.Transaction, score domain.Score) error {
 	args := m.Called(ctx, tx, score)
-	return args.Get(0).(domain.Score), args.Error(1)
+	return args.Error(0)
 }
 
 type eventBrokerMock struct {

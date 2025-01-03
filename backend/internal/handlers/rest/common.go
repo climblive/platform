@@ -12,9 +12,14 @@ import (
 	"github.com/go-errors/errors"
 )
 
-func parseResourceID[T domain.ResourceIDType](id string) T {
-	number, _ := strconv.Atoi(id)
-	return T(number)
+func parseResourceID[T domain.ResourceIDType](id string) (T, error) {
+	number, err := strconv.ParseInt(id, 10, 32)
+	if err != nil {
+		var empty T
+		return empty, err
+	}
+
+	return T(number), nil
 }
 
 func writeResponse(w http.ResponseWriter, status int, data any) {
@@ -42,6 +47,8 @@ func handleError(w http.ResponseWriter, err error) {
 	switch {
 	case errors.Is(err, domain.ErrNotFound):
 		w.WriteHeader(http.StatusNotFound)
+	case errors.Is(err, domain.ErrNotAuthenticated):
+		fallthrough
 	case errors.Is(err, domain.ErrNotAuthorized):
 		fallthrough
 	case errors.Is(err, domain.ErrNoOwnership):

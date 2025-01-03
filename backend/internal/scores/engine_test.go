@@ -1,121 +1,48 @@
 package scores_test
 
 import (
-	"context"
 	"iter"
 	"slices"
 	"testing"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
-	"github.com/climblive/platform/backend/internal/events"
 	"github.com/climblive/platform/backend/internal/scores"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 )
 
-func TestScoreEngine(t *testing.T) {
-	fakedContestID := domain.ContestID(1)
-
+func TestDefaultScoreEngine(t *testing.T) {
 	type fixture struct {
-		broker       *eventBrokerMock
-		rules        *scoringRulesMock
-		ranker       *rankerMock
-		store        *engineStoreMock
-		subscription *events.Subscription
-		engine       *scores.ScoreEngine
+		rules  *scoringRulesMock
+		ranker *rankerMock
+		store  *engineStoreMock
+		engine *scores.DefaultScoreEngine
 	}
 
-	makeFixture := func(bufferCapacity int) (fixture, func(t *testing.T)) {
-		mockedEventBroker := new(eventBrokerMock)
+	makeFixture := func() (fixture, func(t *testing.T)) {
 		mockedRanker := new(rankerMock)
 		mockedRules := new(scoringRulesMock)
 		mockedStore := new(engineStoreMock)
 
-		subscription := events.NewSubscription(domain.EventFilter{}, bufferCapacity)
-		subscriptionID := uuid.New()
-
-		filter := domain.NewEventFilter(
-			fakedContestID,
-			0,
-			"CONTENDER_ENTERED",
-			"CONTENDER_SWITCHED_CLASS",
-			"CONTENDER_WITHDREW_FROM_FINALS",
-			"CONTENDER_REENTERED_FINALS",
-			"CONTENDER_DISQUALIFIED",
-			"CONTENDER_REQUALIFIED",
-			"ASCENT_REGISTERED",
-			"ASCENT_DEREGISTERED",
-			"PROBLEM_ADDED",
-		)
-
-		mockedEventBroker.On("Subscribe", filter, 0).Return(subscriptionID, subscription)
-
-		mockedEventBroker.On("Unsubscribe", subscriptionID).Return()
-
-		engine := scores.NewScoreEngine(fakedContestID, mockedEventBroker, mockedRules, mockedRanker, mockedStore)
+		engine := scores.NewDefaultScoreEngine(mockedRanker, mockedRules, mockedStore)
 
 		awaitExpectations := func(t *testing.T) {
-			mockedEventBroker.AssertExpectations(t)
 			mockedRules.AssertExpectations(t)
 			mockedRanker.AssertExpectations(t)
 			mockedStore.AssertExpectations(t)
 		}
 
 		return fixture{
-			broker:       mockedEventBroker,
-			rules:        mockedRules,
-			ranker:       mockedRanker,
-			store:        mockedStore,
-			subscription: subscription,
-			engine:       engine,
+			rules:  mockedRules,
+			ranker: mockedRanker,
+			store:  mockedStore,
+			engine: engine,
 		}, awaitExpectations
 	}
 
-	t.Run("StartAndStop", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
-
-		ctx, cancel := context.WithCancel(context.Background())
-
-		wg := f.engine.Run(ctx)
-
-		cancel()
-
-		wg.Wait()
-
-		awaitExpectations(t)
-	})
-
-	t.Run("SubscriptionUnexpectedlyClosed", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(1)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
-
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderScoreUpdatedEvent{},
-		})
-		require.NoError(t, err)
-
-		err = f.subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderEnteredEvent{},
-		})
-		require.ErrorIs(t, err, events.ErrBufferFull)
-
-		wg := f.engine.Run(context.Background())
-
-		wg.Wait()
-
-		awaitExpectations(t)
-	})
-
-	t.Run("SetScoringRules", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+	t.Run("ReplaceScoringRules", func(t *testing.T) {
+		f, awaitExpectations := makeFixture()
 
 		f.store.On("GetAllContenders").
 			Return(slices.Values([]scores.Contender{
@@ -159,21 +86,13 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
 		f.store.On("SaveScore", domain.Score{ContenderID: 3, Placement: 3}).Return()
 
-		wg := f.engine.Run(context.Background())
-
-		f.engine.SetScoringRules(&jackpotRules{})
-
-		f.subscription.Terminate()
-
-		wg.Wait()
+		f.engine.ReplaceScoringRules(&jackpotRules{})
 
 		awaitExpectations(t)
 	})
 
-	t.Run("SetRanker", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+	t.Run("ReplaceRanker", func(t *testing.T) {
+		f, awaitExpectations := makeFixture()
 
 		f.store.On("GetCompClassIDs").Return([]domain.CompClassID{1, 2, 3})
 
@@ -189,21 +108,13 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 1_000}).Return()
 		f.store.On("SaveScore", domain.Score{ContenderID: 3, Placement: 1_000}).Return()
 
-		wg := f.engine.Run(context.Background())
-
-		f.engine.SetRanker(&fakeRanker{})
-
-		f.subscription.Terminate()
-
-		wg.Wait()
+		f.engine.ReplaceRanker(&fakeRanker{})
 
 		awaitExpectations(t)
 	})
 
-	t.Run("ScoreAll", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+	t.Run("Start", func(t *testing.T) {
+		f, awaitExpectations := makeFixture()
 
 		f.store.On("GetAllContenders").
 			Return(slices.Values([]scores.Contender{
@@ -264,21 +175,13 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
 		f.store.On("SaveScore", domain.Score{ContenderID: 3, Placement: 3}).Return()
 
-		wg := f.engine.Run(context.Background())
-
-		f.engine.ScoreAll()
-
-		f.subscription.Terminate()
-
-		wg.Wait()
+		f.engine.Start()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("ContenderEntered", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.On("SaveContender", scores.Contender{
 			ID:          1,
@@ -297,53 +200,32 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
 		f.store.On("SaveScore", domain.Score{ContenderID: 3, Placement: 3}).Return()
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderEnteredEvent{
-				ContenderID: 1,
-				CompClassID: 1,
-			},
+		f.engine.HandleContenderEntered(domain.ContenderEnteredEvent{
+			ContenderID: 1,
+			CompClassID: 1,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("ContenderSwitchedClass_ContenderNotFound", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
 			Return(scores.Contender{}, false)
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderSwitchedClassEvent{
+		f.engine.HandleContenderSwitchedClass(
+			domain.ContenderSwitchedClassEvent{
 				ContenderID: 1,
 				CompClassID: 1,
-			},
-		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
+			})
 
 		awaitExpectations(t)
 	})
 
 	t.Run("ContenderSwitchedClass_SameClass", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -352,27 +234,16 @@ func TestScoreEngine(t *testing.T) {
 				CompClassID: 1,
 			}, true)
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderSwitchedClassEvent{
-				ContenderID: 1,
-				CompClassID: 1,
-			},
+		f.engine.HandleContenderSwitchedClass(domain.ContenderSwitchedClassEvent{
+			ContenderID: 1,
+			CompClassID: 1,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("ContenderSwitchedClass", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("GetContender", domain.ContenderID(4)).
@@ -409,52 +280,30 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 3, Placement: 3}).Return()
 		f.store.On("SaveScore", domain.Score{ContenderID: 4, Placement: 4}).Return()
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderSwitchedClassEvent{
-				ContenderID: 4,
-				CompClassID: 2,
-			},
+		f.engine.HandleContenderSwitchedClass(domain.ContenderSwitchedClassEvent{
+			ContenderID: 4,
+			CompClassID: 2,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("ContenderWithdrewFromFinals_ContenderNotFound", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
 			Return(scores.Contender{}, false)
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderWithdrewFromFinalsEvent{
-				ContenderID: 1,
-			},
+		f.engine.HandleContenderWithdrewFromFinals(domain.ContenderWithdrewFromFinalsEvent{
+			ContenderID: 1,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("ContenderWithdrewFromFinals", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -484,51 +333,29 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 1, Placement: 1}).Return()
 		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderWithdrewFromFinalsEvent{
-				ContenderID: 1,
-			},
+		f.engine.HandleContenderWithdrewFromFinals(domain.ContenderWithdrewFromFinalsEvent{
+			ContenderID: 1,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("ContenderReenteredFinals_ContenderNotFound", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
 			Return(scores.Contender{}, false)
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderReenteredFinalsEvent{
-				ContenderID: 1,
-			},
+		f.engine.HandleContenderReenteredFinals(domain.ContenderReenteredFinalsEvent{
+			ContenderID: 1,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("ContenderReenteredFinals", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -559,51 +386,29 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 1, Placement: 1}).Return()
 		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderReenteredFinalsEvent{
-				ContenderID: 1,
-			},
+		f.engine.HandleContenderReenteredFinals(domain.ContenderReenteredFinalsEvent{
+			ContenderID: 1,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("ContenderDisqualified_ContenderNotFound", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
 			Return(scores.Contender{}, false)
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderDisqualifiedEvent{
-				ContenderID: 1,
-			},
+		f.engine.HandleContenderDisqualified(domain.ContenderDisqualifiedEvent{
+			ContenderID: 1,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("ContenderDisqualified", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -633,51 +438,29 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 1, Placement: 1}).Return()
 		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderDisqualifiedEvent{
-				ContenderID: 1,
-			},
+		f.engine.HandleContenderDisqualified(domain.ContenderDisqualifiedEvent{
+			ContenderID: 1,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("ContenderRequalified_ContenderNotFound", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
 			Return(scores.Contender{}, false)
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderRequalifiedEvent{
-				ContenderID: 1,
-			},
+		f.engine.HandleContenderRequalified(domain.ContenderRequalifiedEvent{
+			ContenderID: 1,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("ContenderRequalified", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -716,26 +499,15 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 1, Placement: 1}).Return()
 		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderRequalifiedEvent{
-				ContenderID: 1,
-			},
+		f.engine.HandleContenderRequalified(domain.ContenderRequalifiedEvent{
+			ContenderID: 1,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("ProblemAdded", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("SaveProblem", scores.Problem{
@@ -746,59 +518,37 @@ func TestScoreEngine(t *testing.T) {
 			}).
 			Return()
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.ProblemAddedEvent{
-				ProblemID:  1,
-				PointsTop:  100,
-				PointsZone: 50,
-				FlashBonus: 10,
-			},
+		f.engine.HandleProblemAdded(domain.ProblemAddedEvent{
+			ProblemID:  1,
+			PointsTop:  100,
+			PointsZone: 50,
+			FlashBonus: 10,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("AscentRegistered_ContenderNotFound", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
 			Return(scores.Contender{}, false)
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.AscentRegisteredEvent{
-				ContenderID:  1,
-				ProblemID:    1,
-				Top:          true,
-				AttemptsTop:  1,
-				Zone:         true,
-				AttemptsZone: 1,
-			},
+		f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
+			ContenderID:  1,
+			ProblemID:    1,
+			Top:          true,
+			AttemptsTop:  1,
+			Zone:         true,
+			AttemptsZone: 1,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("AscentRegistered_ProblemNotFound", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -811,31 +561,20 @@ func TestScoreEngine(t *testing.T) {
 			On("GetProblem", domain.ProblemID(1)).
 			Return(scores.Problem{}, false)
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.AscentRegisteredEvent{
-				ContenderID:  1,
-				ProblemID:    1,
-				Top:          true,
-				AttemptsTop:  1,
-				Zone:         true,
-				AttemptsZone: 1,
-			},
+		f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
+			ContenderID:  1,
+			ProblemID:    1,
+			Top:          true,
+			AttemptsTop:  1,
+			Zone:         true,
+			AttemptsZone: 1,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("AscentRegistered_Disqualified", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -865,31 +604,20 @@ func TestScoreEngine(t *testing.T) {
 			}).
 			Return()
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.AscentRegisteredEvent{
-				ContenderID:  1,
-				ProblemID:    1,
-				Top:          true,
-				AttemptsTop:  5,
-				Zone:         true,
-				AttemptsZone: 2,
-			},
+		f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
+			ContenderID:  1,
+			ProblemID:    1,
+			Top:          true,
+			AttemptsTop:  5,
+			Zone:         true,
+			AttemptsZone: 2,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("AscentRegistered", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -945,57 +673,35 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 1, Placement: 1}).Return()
 		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.AscentRegisteredEvent{
-				ContenderID:  1,
-				ProblemID:    1,
-				Top:          true,
-				AttemptsTop:  5,
-				Zone:         true,
-				AttemptsZone: 2,
-			},
+		f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
+			ContenderID:  1,
+			ProblemID:    1,
+			Top:          true,
+			AttemptsTop:  5,
+			Zone:         true,
+			AttemptsZone: 2,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("AscentDeregistered_ContenderNotFound", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
 			Return(scores.Contender{}, false)
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.AscentDeregisteredEvent{
-				ContenderID: 1,
-				ProblemID:   1,
-			},
+		f.engine.HandleAscentDeregistered(domain.AscentDeregisteredEvent{
+			ContenderID: 1,
+			ProblemID:   1,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("AscentDeregistered_Disqualified", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -1009,27 +715,16 @@ func TestScoreEngine(t *testing.T) {
 			On("DeleteTick", domain.ContenderID(1), domain.ProblemID(1)).
 			Return()
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.AscentDeregisteredEvent{
-				ContenderID: 1,
-				ProblemID:   1,
-			},
+		f.engine.HandleAscentDeregistered(domain.AscentDeregisteredEvent{
+			ContenderID: 1,
+			ProblemID:   1,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
 	t.Run("AscentDeregistered", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		f.store.On("GetUnpublishedScores").Return([]domain.Score{})
+		f, awaitExpectations := makeFixture()
 
 		f.store.
 			On("GetContender", domain.ContenderID(1)).
@@ -1069,124 +764,53 @@ func TestScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 1, Placement: 1}).Return()
 		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
 
-		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.AscentDeregisteredEvent{
-				ContenderID: 1,
-				ProblemID:   1,
-			},
+		f.engine.HandleAscentDeregistered(domain.AscentDeregisteredEvent{
+			ContenderID: 1,
+			ProblemID:   1,
 		})
-		require.NoError(t, err)
-
-		wg := f.engine.Run(context.Background())
-
-		f.subscription.Terminate()
-
-		wg.Wait()
 
 		awaitExpectations(t)
 	})
 
-	t.Run("PublishUpdatedScores", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
+	t.Run("GetDirtyScores", func(t *testing.T) {
+		f, awaitExpectations := makeFixture()
 
 		now := time.Now()
 
+		fakedScores := []domain.Score{
+			{
+				ContenderID: 1,
+				Timestamp:   now,
+				Score:       100,
+				Placement:   1,
+				RankOrder:   0,
+				Finalist:    true,
+			},
+			{
+				ContenderID: 2,
+				Timestamp:   now,
+				Score:       200,
+				Placement:   2,
+				RankOrder:   1,
+				Finalist:    true,
+			},
+			{
+				ContenderID: 3,
+				Timestamp:   now,
+				Score:       300,
+				Placement:   3,
+				RankOrder:   2,
+				Finalist:    false,
+			},
+		}
+
 		f.store.
-			On("GetUnpublishedScores").
-			Return([]domain.Score{
-				{
-					ContenderID: 1,
-					Timestamp:   now,
-					Score:       100,
-					Placement:   1,
-					RankOrder:   0,
-					Finalist:    true,
-				},
-				{
-					ContenderID: 2,
-					Timestamp:   now,
-					Score:       200,
-					Placement:   2,
-					RankOrder:   1,
-					Finalist:    true,
-				},
-				{
-					ContenderID: 3,
-					Timestamp:   now,
-					Score:       300,
-					Placement:   3,
-					RankOrder:   2,
-					Finalist:    false,
-				},
-			})
+			On("GetDirtyScores").
+			Return(fakedScores)
 
-		f.broker.
-			On("Dispatch", domain.ContestID(1),
-				domain.ContenderScoreUpdatedEvent{
-					ContenderID: 1,
-					Timestamp:   now,
-					Score:       100,
-					Placement:   1,
-					RankOrder:   0,
-					Finalist:    true,
-				},
-			).Return().
-			On("Dispatch", domain.ContestID(1),
-				domain.ContenderScoreUpdatedEvent{
-					ContenderID: 2,
-					Timestamp:   now,
-					Score:       200,
-					Placement:   2,
-					RankOrder:   1,
-					Finalist:    true,
-				},
-			).Return().
-			On("Dispatch", domain.ContestID(1),
-				domain.ContenderScoreUpdatedEvent{
-					ContenderID: 3,
-					Timestamp:   now,
-					Score:       300,
-					Placement:   3,
-					RankOrder:   2,
-					Finalist:    false,
-				},
-			).Return().
-			On("Dispatch", domain.ContestID(1),
-				[]domain.ContenderScoreUpdatedEvent{
-					{
-						ContenderID: 1,
-						Timestamp:   now,
-						Score:       100,
-						Placement:   1,
-						RankOrder:   0,
-						Finalist:    true,
-					},
-					{
-						ContenderID: 2,
-						Timestamp:   now,
-						Score:       200,
-						Placement:   2,
-						RankOrder:   1,
-						Finalist:    true,
-					},
-					{
-						ContenderID: 3,
-						Timestamp:   now,
-						Score:       300,
-						Placement:   3,
-						RankOrder:   2,
-						Finalist:    false,
-					},
-				},
-			).Return()
+		scores := f.engine.GetDirtyScores()
 
-		ctx, cancel := context.WithCancel(context.Background())
-
-		wg := f.engine.Run(ctx)
-
-		cancel()
-
-		wg.Wait()
+		assert.Equal(t, fakedScores, scores)
 
 		awaitExpectations(t)
 	})
@@ -1270,7 +894,7 @@ func (m *engineStoreMock) SaveScore(score domain.Score) {
 	m.Called(score)
 }
 
-func (m *engineStoreMock) GetUnpublishedScores() []domain.Score {
+func (m *engineStoreMock) GetDirtyScores() []domain.Score {
 	args := m.Called()
 	return args.Get(0).([]domain.Score)
 }

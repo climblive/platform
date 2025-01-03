@@ -56,8 +56,8 @@ type ScoreEngineManager struct {
 
 type engineHandler struct {
 	instanceID         domain.ScoreEngineInstanceID
-	engine             *ScoreEngine
-	cancel             func()
+	driver             *ScoreEngineDriver
+	stop               func()
 	wg                 *sync.WaitGroup
 	finalists          int
 	qualifyingProblems int
@@ -160,7 +160,7 @@ func (mngr *ScoreEngineManager) run(ctx context.Context, wg *sync.WaitGroup) {
 			slog.Info("score engine manager shutting down", "reason", ctx.Err().Error())
 
 			for handler := range maps.Values(mngr.handlers) {
-				handler.cancel()
+				handler.stop()
 			}
 
 			for handler := range maps.Values(mngr.handlers) {
@@ -218,13 +218,13 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) {
 
 			if contest.QualifyingProblems != handler.qualifyingProblems {
 				logger.Info("updating scoring rules", "qualifying_problems", contest.QualifyingProblems)
-				handler.engine.SetScoringRules(&HardestProblems{Number: contest.QualifyingProblems})
+				handler.driver.SetScoringRules(&HardestProblems{Number: contest.QualifyingProblems})
 				handler.qualifyingProblems = contest.QualifyingProblems
 			}
 
 			if contest.Finalists != handler.finalists {
 				logger.Info("updating ranker", "finalists", contest.Finalists)
-				handler.engine.SetRanker(NewBasicRanker(contest.Finalists))
+				handler.driver.SetRanker(NewBasicRanker(contest.Finalists))
 				handler.finalists = contest.Finalists
 			}
 
@@ -263,27 +263,30 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 	store := NewMemoryStore()
 	rules := &HardestProblems{Number: contest.QualifyingProblems}
 	ranker := NewBasicRanker(contest.Finalists)
-	engine := NewScoreEngine(contestID, mngr.eventBroker, rules, ranker, store)
+	driver := NewScoreEngineDriver(contest.ID, mngr.eventBroker)
+	engine := NewDefaultScoreEngine(ranker, rules, store)
+
+	cancellableCtx, stop := context.WithCancel(context.Background())
+	wg, installEngine := driver.Run(cancellableCtx)
 
 	hydrationStartTime := time.Now()
 	err = mngr.engineStoreHydrator.Hydrate(ctx, contestID, store)
 	if err != nil {
 		logger.Error("hydration failed", "error", err)
 
+		stop()
+
 		return uuid.UUID{}, errors.Wrap(err, 0)
 	}
 
 	logger.Debug("score engine store hydration complete", "time", time.Since(hydrationStartTime))
 
-	cancellableCtx, cancel := context.WithCancel(context.Background())
-	wg := engine.Run(cancellableCtx)
-
-	engine.ScoreAll()
+	installEngine(engine)
 
 	mngr.handlers[contestID] = &engineHandler{
 		instanceID:         instanceID,
-		engine:             engine,
-		cancel:             cancel,
+		driver:             driver,
+		stop:               stop,
 		wg:                 wg,
 		finalists:          contest.Finalists,
 		qualifyingProblems: contest.QualifyingProblems,
@@ -309,7 +312,7 @@ func (mngr *ScoreEngineManager) listScoreEnginesByContest(contestID domain.Conte
 func (mngr *ScoreEngineManager) stopScoreEngine(instanceID domain.ScoreEngineInstanceID) {
 	for contestID, handler := range mngr.handlers {
 		if handler.instanceID == instanceID {
-			handler.cancel()
+			handler.stop()
 			handler.wg.Wait()
 
 			delete(mngr.handlers, contestID)
