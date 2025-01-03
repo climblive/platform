@@ -164,7 +164,6 @@ PreLoop:
 
 	ticker := time.Tick(100 * time.Millisecond)
 
-MainLoop:
 	for {
 		select {
 		case event, open := <-events:
