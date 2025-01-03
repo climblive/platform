@@ -52,6 +52,8 @@ func (hdlr *eventHandler) HandleSubscribeContestEvents(w http.ResponseWriter, r 
 		0,
 		"CONTENDER_PUBLIC_INFO_UPDATED",
 		"[]CONTENDER_SCORE_UPDATED",
+		"SCORE_ENGINE_STARTED",
+		"SCORE_ENGINE_STOPPED",
 	)
 
 	hdlr.subscribe(w, r, filter, logger)

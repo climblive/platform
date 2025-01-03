@@ -47,7 +47,7 @@ func TestEngineDriver(t *testing.T) {
 
 		mockedEventBroker.On("Unsubscribe", subscriptionID).Return()
 
-		driver := scores.NewScoreEngineDriver(fakedContestID, mockedEventBroker)
+		driver := scores.NewScoreEngineDriver(fakedContestID, uuid.New(), mockedEventBroker)
 
 		awaitExpectations := func(t *testing.T) {
 			mockedEventBroker.AssertExpectations(t)

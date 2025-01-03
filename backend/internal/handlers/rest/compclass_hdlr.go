@@ -15,7 +15,7 @@ func InstallCompClassHandler(mux *Mux, compClassUseCase domain.CompClassUseCase)
 		compClassUseCase: compClassUseCase,
 	}
 
-	mux.HandleFunc("GET /contests/{contestID}/compClasses", handler.GetCompClassesByContest)
+	mux.HandleFunc("GET /contests/{contestID}/comp-classes", handler.GetCompClassesByContest)
 }
 
 func (hdlr *compClassHandler) GetCompClassesByContest(w http.ResponseWriter, r *http.Request) {

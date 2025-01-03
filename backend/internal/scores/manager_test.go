@@ -61,6 +61,16 @@ func TestScoreEngineManager(t *testing.T) {
 				},
 			}, nil)
 
+		mockedRepo.
+			On("GetContest", mock.Anything, mock.Anything, fakedContestID).
+			Return(domain.Contest{
+				ID:                 fakedContestID,
+				QualifyingProblems: 10,
+				Finalists:          7,
+				TimeBegin:          &now,
+				TimeEnd:            &now,
+			}, nil)
+
 		mockedEventBroker.
 			On("Subscribe", mock.Anything, mock.Anything).
 			Return(fakedSubscriptionID, events.NewSubscription(domain.EventFilter{}, 1000))
@@ -96,6 +106,11 @@ type repositoryMock struct {
 func (m *repositoryMock) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context, tx domain.Transaction, earliestStartTime, latestStartTime time.Time) ([]domain.Contest, error) {
 	args := m.Called(ctx, tx, earliestStartTime, latestStartTime)
 	return args.Get(0).([]domain.Contest), args.Error(1)
+}
+
+func (m *repositoryMock) GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error) {
+	args := m.Called(ctx, tx, contestID)
+	return args.Get(0).(domain.Contest), args.Error(1)
 }
 
 func (m *repositoryMock) GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error) {
