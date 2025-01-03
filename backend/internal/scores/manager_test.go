@@ -61,6 +61,16 @@ func TestScoreEngineManager(t *testing.T) {
 				},
 			}, nil)
 
+		mockedRepo.
+			On("GetContest", mock.Anything, mock.Anything, fakedContestID).
+			Return(domain.Contest{
+				ID:                 fakedContestID,
+				QualifyingProblems: 10,
+				Finalists:          7,
+				TimeBegin:          &now,
+				TimeEnd:            &now,
+			}, nil)
+
 		mockedEventBroker.
 			On("Subscribe", mock.Anything, mock.Anything).
 			Return(fakedSubscriptionID, events.NewSubscription(domain.EventFilter{}, 1000))

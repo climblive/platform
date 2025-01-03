@@ -35,6 +35,16 @@ type startResponse struct {
 	err        error
 }
 
+type reverseLookupRequest struct {
+	instanceID domain.ScoreEngineInstanceID
+	response   chan reverseLookupResponse
+}
+
+type reverseLookupResponse struct {
+	contestID domain.ContestID
+	err       error
+}
+
 const pollInterval = 10 * time.Second
 
 type EngineStoreHydrator interface {
@@ -141,7 +151,19 @@ func (mngr *ScoreEngineManager) StartScoreEngine(
 }
 
 func (mngr *ScoreEngineManager) ReverseLoopupScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) (domain.ContestID, error) {
-	return domain.ContestID(0), nil
+	response := make(chan reverseLookupResponse, 1)
+
+	mngr.requests <- reverseLookupRequest{
+		instanceID: instanceID,
+		response:   response,
+	}
+
+	select {
+	case response := <-response:
+		return response.contestID, response.err
+	case <-ctx.Done():
+		return 0, ctx.Err()
+	}
 }
 
 func (mngr *ScoreEngineManager) run(ctx context.Context, wg *sync.WaitGroup) {
@@ -200,6 +222,14 @@ func (mngr *ScoreEngineManager) handleRequest(request any) {
 		close(req.response)
 	case stopRequest:
 		mngr.stopScoreEngine(req.instanceID)
+
+		close(req.response)
+	case reverseLookupRequest:
+		contestID, err := mngr.reverseLookupInstance(req.instanceID)
+		req.response <- reverseLookupResponse{
+			contestID: contestID,
+			err:       err,
+		}
 
 		close(req.response)
 	}
@@ -324,4 +354,14 @@ func (mngr *ScoreEngineManager) stopScoreEngine(instanceID domain.ScoreEngineIns
 			return
 		}
 	}
+}
+
+func (mngr *ScoreEngineManager) reverseLookupInstance(instanceID domain.ScoreEngineInstanceID) (domain.ContestID, error) {
+	for contestID, handler := range mngr.handlers {
+		if handler.instanceID == instanceID {
+			return contestID, nil
+		}
+	}
+
+	return 0, errors.Wrap(domain.ErrNotFound, 0)
 }
