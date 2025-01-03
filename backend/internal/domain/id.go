@@ -1,5 +1,7 @@
 package domain
 
+import "github.com/google/uuid"
+
 type ResourceID int32
 
 type CompClassID ResourceID
@@ -25,3 +27,5 @@ type ResourceIDType interface {
 		UserID |
 		TickID
 }
+
+type ScoreEngineInstanceID = uuid.UUID

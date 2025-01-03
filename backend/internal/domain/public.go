@@ -213,3 +213,13 @@ type ContenderScoreUpdatedEvent struct {
 	Finalist    bool        `json:"finalist"`
 	RankOrder   int         `json:"rankOrder"`
 }
+
+type ScoreEngineStarted struct {
+	ContestID  ContestID             `json:"contestId"`
+	InstanceID ScoreEngineInstanceID `json:"instanceId"`
+}
+
+type ScoreEngineStopped struct {
+	ContestID  ContestID             `json:"contestId"`
+	InstanceID ScoreEngineInstanceID `json:"instanceId"`
+}
