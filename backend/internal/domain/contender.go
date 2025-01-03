@@ -2,32 +2,7 @@ package domain
 
 import (
 	"context"
-	"time"
 )
-
-type Contender struct {
-	ID                  ContenderID   `json:"id,omitempty"`
-	Ownership           OwnershipData `json:"-"`
-	ContestID           ContestID     `json:"contestId"`
-	CompClassID         CompClassID   `json:"compClassId,omitempty"`
-	RegistrationCode    string        `json:"registrationCode"`
-	Name                string        `json:"name,omitempty"`
-	PublicName          string        `json:"publicName,omitempty"`
-	ClubName            string        `json:"clubName,omitempty"`
-	Entered             *time.Time    `json:"entered,omitempty"`
-	WithdrawnFromFinals bool          `json:"withdrawnFromFinals"`
-	Disqualified        bool          `json:"disqualified"`
-	Score               *Score        `json:"score,omitempty"`
-}
-
-type ContenderPatch struct {
-	CompClassID         *Patch[CompClassID] `json:"compClassId"`
-	Name                *Patch[string]      `json:"name"`
-	PublicName          *Patch[string]      `json:"publicName"`
-	ClubName            *Patch[string]      `json:"clubName"`
-	WithdrawnFromFinals *Patch[bool]        `json:"withdrawnFromFinals"`
-	Disqualified        *Patch[bool]        `json:"disqualified"`
-}
 
 type ContenderUseCase interface {
 	GetContender(ctx context.Context, contenderID ContenderID) (Contender, error)

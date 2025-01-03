@@ -1,14 +1,5 @@
 import * as z from "zod";
-
-export type CompClass = {
-  id: number;
-  contestId: number;
-  name: string;
-  description?: string;
-  color?: string;
-  timeBegin: Date;
-  timeEnd: Date;
-};
+import type { CompClass } from "./generated";
 
 export const compClassSchema: z.ZodType<CompClass> = z.object({
   id: z.number(),

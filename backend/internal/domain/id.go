@@ -1,17 +1,17 @@
 package domain
 
-type resourceID int32
+type ResourceID int32
 
-type CompClassID resourceID
-type ContenderID resourceID
-type ContestID resourceID
-type OrganizerID resourceID
-type ProblemID resourceID
-type RaffleID resourceID
-type RaffleWinnerID resourceID
-type SeriesID resourceID
-type UserID resourceID
-type TickID resourceID
+type CompClassID ResourceID
+type ContenderID ResourceID
+type ContestID ResourceID
+type OrganizerID ResourceID
+type ProblemID ResourceID
+type RaffleID ResourceID
+type RaffleWinnerID ResourceID
+type SeriesID ResourceID
+type UserID ResourceID
+type TickID ResourceID
 
 type ResourceIDType interface {
 	CompClassID |
