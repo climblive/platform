@@ -1,0 +1,9 @@
+@page {
+    size: A4 portrait;
+    margin-left: 3cm;
+    margin-right: 3cm;
+}
+
+body {
+    background-color: white !important;
+}

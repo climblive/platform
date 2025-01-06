@@ -4,6 +4,7 @@
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { Route, Router } from "svelte-routing";
+  import Tickets from "./pages/Tickets.svelte";
 
   setBasePath("/shoelace");
 
@@ -19,6 +20,7 @@
 <QueryClientProvider client={queryClient}>
   <Router>
     <Route path="/"><Start /></Route>
+    <Route path="/contests/1/tickets"><Tickets /></Route>
   </Router>
   {#if import.meta.env.DEV && false}
     <SvelteQueryDevtools />
