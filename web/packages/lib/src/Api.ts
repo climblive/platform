@@ -28,6 +28,22 @@ export class ContenderCredentialsProvider implements ApiCredentialsProvider {
   };
 }
 
+export class OrganizerCredentialsProvider implements ApiCredentialsProvider {
+  private jwt: string;
+
+  constructor(registrationCode: string) {
+    this.jwt = registrationCode;
+  }
+
+  getAuthHeaders = (): RawAxiosRequestHeaders => {
+    const headers: RawAxiosRequestHeaders = {};
+
+    headers["Authorization"] = `Bearer ${this.jwt}`;
+
+    return headers;
+  };
+}
+
 export class ApiClient {
   private static instance: ApiClient;
   private axiosInstance: AxiosInstance;
