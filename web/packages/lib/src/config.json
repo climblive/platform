@@ -1,3 +1,5 @@
 {
-  "API_URL": "http://localhost:8090"
+  "API_URL": "http://localhost:8090",
+  "COGNITO_POOL_ID": "eu-west-1_Jftnyms2n",
+  "COGNITO_CLIENT_ID": "55s3rmvp8t26lmi0898n9d1lfn"
 }
