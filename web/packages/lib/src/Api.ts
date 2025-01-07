@@ -31,8 +31,8 @@ export class ContenderCredentialsProvider implements ApiCredentialsProvider {
 export class OrganizerCredentialsProvider implements ApiCredentialsProvider {
   private jwt: string;
 
-  constructor(registrationCode: string) {
-    this.jwt = registrationCode;
+  constructor(jwt: string) {
+    this.jwt = jwt;
   }
 
   getAuthHeaders = (): RawAxiosRequestHeaders => {
