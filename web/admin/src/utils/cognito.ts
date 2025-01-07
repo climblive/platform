@@ -12,7 +12,10 @@ interface OAuthTokenResponse {
 const instance = axios.create({
   baseURL: "https://clmb.auth.eu-west-1.amazoncognito.com",
   timeout: 10_000,
-  headers: { "Content-Type": "application/x-www-form-urlencoded" },
+  headers: {
+    "Content-Type": "application/x-www-form-urlencoded",
+    Authorization: `Basic ${btoa(configData.COGNITO_CLIENT_ID + ":" + configData.COGNITO_CLIENT_SECRET)}`
+  },
 });
 
 export const exchangeCode = async (code: string) => {
@@ -25,11 +28,7 @@ export const exchangeCode = async (code: string) => {
     window.location.protocol + "//" + window.location.host + "/admin",
   );
 
-  const response = await instance.post("/oauth2/token", params, {
-    headers: {
-      Authorization: `Basic ${btoa(configData.COGNITO_CLIENT_ID + ":" + configData.COGNITO_CLIENT_SECRET)}`,
-    },
-  });
+  const response = await instance.post("/oauth2/token", params);
 
   return response.data as OAuthTokenResponse;
 };
@@ -40,11 +39,7 @@ export const refreshSession = async (refreshToken: string) => {
   params.append("client_id", configData.COGNITO_CLIENT_ID);
   params.append("refresh_token", refreshToken);
 
-  const response = await instance.post("/oauth2/token", params, {
-    headers: {
-      Authorization: `Basic ${btoa(configData.COGNITO_CLIENT_ID + ":" + configData.COGNITO_CLIENT_SECRET)}`,
-    },
-  });
+  const response = await instance.post("/oauth2/token", params);
 
   return response.data as Omit<OAuthTokenResponse, "refresh_token">;
 };

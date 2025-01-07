@@ -27,17 +27,19 @@
     const code = query.get("code");
 
     if (code != null) {
-      exchangeCode(code).then(({ access_token, refresh_token }) => {
-        ApiClient.getInstance().setCredentialsProvider(
-          new OrganizerCredentialsProvider(access_token),
-        );
+      const { access_token, refresh_token } = await exchangeCode(code);
 
-        localStorage.setItem("refresh_token", refresh_token);
+      ApiClient.getInstance().setCredentialsProvider(
+        new OrganizerCredentialsProvider(access_token),
+      );
 
-        authenticated = true;
+      localStorage.setItem("refresh_token", refresh_token);
 
-        navigate("/");
-      });
+      authenticated = true;
+
+      navigate("/");
+
+      return;
     }
 
     try {
@@ -70,7 +72,7 @@
 
 {#await authenticate()}
   <sl-spinner></sl-spinner>
-{:then _}
+{:then}
   <QueryClientProvider client={queryClient}>
     {#if !authenticated}
       <sl-button variant="primary" onclick={login}>Login</sl-button>
