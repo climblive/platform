@@ -14,7 +14,7 @@ const instance = axios.create({
   timeout: 10_000,
   headers: {
     "Content-Type": "application/x-www-form-urlencoded",
-    Authorization: `Basic ${btoa(configData.COGNITO_CLIENT_ID + ":" + configData.COGNITO_CLIENT_SECRET)}`
+    Authorization: `Basic ${btoa(configData.COGNITO_CLIENT_ID + ":" + configData.COGNITO_CLIENT_SECRET)}`,
   },
 });
 
