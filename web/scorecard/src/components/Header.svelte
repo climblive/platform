@@ -46,7 +46,7 @@
   <p class="contender-club">{contenderClub ?? "No club"}</p>
   <div class="lower">
     <div class="score">
-      <span>
+      <span class="animate__animated animate__bounce">
         {#if placement}
           {placement}<sup>{ordinalSuperscript(placement)}</sup>
         {:else}
