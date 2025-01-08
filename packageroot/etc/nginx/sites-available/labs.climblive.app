@@ -17,6 +17,19 @@ server {
 		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 	}
 
+	location /admin {
+		root /usr/share/climblive;
+		try_files $uri /admin;
+		expires 1d;
+		add_header Cache-Control "public";
+		access_log off;
+	}
+
+	location = /admin {
+		root /usr/share/climblive/admin;
+		try_files /index.html =404;
+	}
+
 	location /scoreboard {
 		root /usr/share/climblive;
 		try_files $uri /scoreboard;

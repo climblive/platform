@@ -17,7 +17,7 @@ runs:
       working-directory: web
 
     - run: |
-        sed -i "s,\"API_URL\":.*,\"API_URL\": \"\",g" web/packages/lib/src/config.json
+        sed -i "s/\"API_URL\":.*/\"API_URL\": \"\",/g" web/packages/lib/src/config.json
       shell: bash
 
     - run: pnpm --filter=* build
@@ -33,3 +33,8 @@ runs:
       with:
         name: scoreboard
         path: web/scoreboard/dist
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: admin
+        path: web/admin/dist

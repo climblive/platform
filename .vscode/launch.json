@@ -33,6 +33,13 @@
             "cwd": "${workspaceFolder}/web/scoreboard",
         },
         {
+            "name": "Admin",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "pnpm i && pnpm build && pnpm run dev",
+            "cwd": "${workspaceFolder}/web/admin",
+        },
+        {
             "name": "Simulator",
             "type": "go",
             "request": "launch",
