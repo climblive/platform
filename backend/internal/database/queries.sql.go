@@ -331,6 +331,7 @@ SELECT contest.id, contest.organizer_id, contest.protected, contest.series_id, c
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 WHERE contest.id = ?
+GROUP BY contest.id
 `
 
 type GetContestRow struct {

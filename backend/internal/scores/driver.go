@@ -42,6 +42,8 @@ type ScoreEngineDriver struct {
 
 	running    atomic.Bool
 	sideQuests chan func()
+
+	publishToken bool
 }
 
 func NewScoreEngineDriver(
@@ -183,11 +185,23 @@ PreLoop:
 
 			d.handleEvent(event)
 		case <-ticker:
-			d.publishUpdatedScores()
+			d.publishToken = false
+
+			n := d.publishUpdatedScores()
+			if n == 0 {
+				d.publishToken = true
+			}
 		case f := <-d.sideQuests:
 			f()
 		case <-ctx.Done():
 			return
+		}
+
+		if d.publishToken {
+			n := d.publishUpdatedScores()
+			if n > 0 {
+				d.publishToken = false
+			}
 		}
 	}
 }
@@ -235,7 +249,7 @@ func (d *ScoreEngineDriver) handleEvent(event domain.EventEnvelope) {
 	}
 }
 
-func (d *ScoreEngineDriver) publishUpdatedScores() {
+func (d *ScoreEngineDriver) publishUpdatedScores() int {
 	scores := d.engine.GetDirtyScores()
 
 	var batch []domain.ContenderScoreUpdatedEvent
@@ -249,4 +263,6 @@ func (d *ScoreEngineDriver) publishUpdatedScores() {
 	if len(batch) > 0 {
 		d.eventBroker.Dispatch(d.contestID, batch)
 	}
+
+	return len(scores)
 }
