@@ -68,10 +68,10 @@ func TestAwait(t *testing.T) {
 
 	time.Sleep(100 * time.Millisecond)
 
-	err = subscription.Post(domain.EventEnvelope{
+	postErr := subscription.Post(domain.EventEnvelope{
 		Data: randomNumber,
 	})
-	require.NoError(t, err)
+	require.NoError(t, postErr)
 
 	wg.Wait()
 
