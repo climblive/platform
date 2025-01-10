@@ -10,6 +10,9 @@
             "request": "launch",
             "mode": "auto",
             "program": "backend/cmd/api/main.go",
+            "buildFlags": [
+                "-race"
+            ],
             "env": {
                 "DB_USERNAME": "climblive",
                 "DB_PASSWORD": "secretpassword",
