@@ -1,5 +1,4 @@
 <script lang="ts">
-  import Start from "@/pages/Start.svelte";
   import { ApiClient, OrganizerCredentialsProvider } from "@climblive/lib";
   import configData from "@climblive/lib/config.json";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
@@ -8,6 +7,7 @@
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { navigate, Route, Router } from "svelte-routing";
+  import Contest from "./pages/Contest.svelte";
   import { exchangeCode, refreshSession } from "./utils/cognito";
 
   setBasePath("/shoelace");
@@ -78,7 +78,11 @@
       <sl-button variant="primary" onclick={login}>Login</sl-button>
     {/if}
     <Router basepath="/admin">
-      <Route path="/"><Start /></Route>
+      <Route path="/contests/:contestId">
+        {#snippet children({ params })}
+          <Contest contestId={Number(params.contestId)} />
+        {/snippet}
+      </Route>
     </Router>
     {#if import.meta.env.DEV && false}
       <SvelteQueryDevtools />

@@ -1,11 +1,11 @@
 import type { AxiosInstance, RawAxiosRequestHeaders } from "axios";
 import axios from "axios";
 import { z } from "zod";
-import { contestSchema, scoreboardEntrySchema } from "./models";
+import { contestSchema, scoreboardEntrySchema, type ContenderPatch, type ContestID, type ScoreEngineInstanceID, type Tick } from "./models";
 import { compClassSchema } from "./models/compClass";
-import { contenderSchema, type ContenderPatch } from "./models/contender";
+import { contenderSchema } from "./models/contender";
 import { problemSchema } from "./models/problem";
-import { tickSchema, type Tick } from "./models/tick";
+import { tickSchema } from "./models/tick";
 import { getApiUrl } from "./utils/config";
 
 interface ApiCredentialsProvider {
@@ -157,5 +157,33 @@ export class ApiClient {
     const result = await this.axiosInstance.get(endpoint);
 
     return z.array(scoreboardEntrySchema).parse(result.data);
+  };
+
+  getScoreEngines = async (contestId: ContestID) => {
+    const endpoint = `/contests/${contestId}/score-engines`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(z.string().uuid()).parse(result.data);
+  };
+
+  startScoreEngine = async (contestId: ContestID) => {
+    const endpoint = `/contests/${contestId}/score-engines`;
+
+    const result = await this.axiosInstance.post(endpoint, undefined, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.string().uuid().parse(result.data);
+  };
+
+  stopScoreEngine = async (instanceId: ScoreEngineInstanceID) => {
+    const endpoint = `/score-engines/${instanceId}`;
+
+    await this.axiosInstance.delete(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
   };
 }
