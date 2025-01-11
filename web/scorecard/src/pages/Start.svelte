@@ -121,7 +121,9 @@
         <p class="timestamp">{format(restoredSession.timestamp, "PPpp")}</p>
         <sl-button
           onclick={() => {
-            restoredSession && handleEnter(restoredSession.registrationCode);
+            if (restoredSession) {
+              handleEnter(restoredSession.registrationCode);
+            }
           }}
           loading={loadingContender}
           size="small"
