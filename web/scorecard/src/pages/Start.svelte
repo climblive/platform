@@ -7,7 +7,7 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import { useQueryClient } from "@tanstack/svelte-query";
-  import { differenceInHours } from "date-fns";
+  import { differenceInHours, format } from "date-fns";
   import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
@@ -18,6 +18,7 @@
   let queryClient = useQueryClient();
   let registrationCode: string | undefined = $state();
   let form: HTMLFormElement | undefined = $state();
+  let restoredSession: ScorecardSession | undefined = $state();
 
   onMount(() => {
     const data = localStorage.getItem("session");
@@ -27,7 +28,7 @@
         const sess = scorecardSessionSchema.parse(obj);
 
         if (differenceInHours(new Date(), sess.timestamp) < 12) {
-          registrationCode = sess.registrationCode;
+          restoredSession = sess;
         }
       } catch {
         /* discard corrupt session data */
@@ -52,6 +53,10 @@
       return;
     }
 
+    handleEnter(registrationCode);
+  };
+
+  const handleEnter = async (registrationCode: string) => {
     try {
       loadingFailed = false;
       loadingContender = true;
@@ -83,7 +88,7 @@
 <main>
   <header>
     <h1>Welcome</h1>
-    <p>Enter your unique registration code!</p>
+    <p>Enter your registration code:</p>
   </header>
   <form bind:this={form} onsubmit={submitForm}>
     <PinInput
@@ -103,8 +108,30 @@
       type="submit"
       size="small"
       disabled={registrationCode?.length !== 8}
-      loading={loadingContender}>Enter</sl-button
-    >
+      loading={loadingContender}
+      >Enter
+    </sl-button>
+    {#if restoredSession}
+      <sl-divider style="--color: var(--sl-color-primary-600);"></sl-divider>
+      <div class="restoredSession">
+        <h3>
+          Saved session <span class="code"
+            >{restoredSession.registrationCode}</span
+          >
+        </h3>
+        <p class="timestamp">{format(restoredSession.timestamp, "pp")}</p>
+        <sl-button
+          onclick={() => {
+            if (restoredSession) {
+              handleEnter(restoredSession.registrationCode);
+            }
+          }}
+          loading={loadingContender}
+          size="small"
+          >Restore
+        </sl-button>
+      </div>
+    {/if}
   </form>
   <footer>by ClimbLive™</footer>
 </main>
@@ -136,5 +163,31 @@
     line-height: 4rem;
     font-size: var(--sl-font-size-x-small);
     color: var(--sl-color-primary-900);
+  }
+
+  .restoredSession {
+    background-color: var(--sl-color-primary-600);
+    border-radius: var(--sl-border-radius-medium);
+    padding: var(--sl-spacing-small);
+    text-align: left;
+    color: white;
+
+    & h3 {
+      margin: 0;
+      font-weight: normal;
+    }
+
+    & .timestamp {
+      font-size: var(--sl-font-size-x-small);
+    }
+
+    & sl-button {
+      width: 100%;
+    }
+
+    & .code {
+      text-transform: uppercase;
+      font-weight: bold;
+    }
   }
 </style>
