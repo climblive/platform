@@ -62,6 +62,7 @@ type ScoreEngineManager struct {
 	eventBroker         domain.EventBroker
 	handlers            map[domain.ContestID]*engineHandler
 	requests            chan any
+	terminations        chan domain.ScoreEngineInstanceID
 }
 
 type engineHandler struct {
@@ -80,6 +81,7 @@ func NewScoreEngineManager(repo scoreEngineManagerRepository, engineStoreHydrato
 		eventBroker:         eventBroker,
 		handlers:            make(map[domain.ContestID]*engineHandler),
 		requests:            make(chan any),
+		terminations:        make(chan domain.ScoreEngineInstanceID),
 	}
 }
 
@@ -198,6 +200,15 @@ func (mngr *ScoreEngineManager) run(ctx context.Context, wg *sync.WaitGroup) {
 			mngr.runPeriodicCheck(ctx)
 		case request := <-mngr.requests:
 			mngr.handleRequest(request)
+		case terminatedInstanceID := <-mngr.terminations:
+			for contestID, handler := range mngr.handlers {
+				if handler.instanceID == terminatedInstanceID {
+					slog.Warn("garbage collecting terminated score engine", "instance_id", terminatedInstanceID)
+					delete(mngr.handlers, contestID)
+
+					break
+				}
+			}
 		}
 	}
 }
@@ -325,6 +336,12 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 		finalists:          contest.Finalists,
 		qualifyingProblems: contest.QualifyingProblems,
 	}
+
+	go func() {
+		wg.Wait()
+
+		mngr.terminations <- instanceID
+	}()
 
 	logger.Info("score engine started", "instance_id", instanceID)
 
