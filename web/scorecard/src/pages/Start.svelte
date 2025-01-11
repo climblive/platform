@@ -113,7 +113,11 @@
     </sl-button>
     {#if restoredSession}
       <div class="restoredSession">
-        <h3>Saved session {restoredSession.registrationCode}</h3>
+        <h3>
+          Saved session <span class="code"
+            >{restoredSession.registrationCode}</span
+          >
+        </h3>
         <p class="timestamp">{format(restoredSession.timestamp, "PPpp")}</p>
         <sl-button
           onclick={() => {
@@ -167,6 +171,7 @@
 
     & h3 {
       margin: 0;
+      font-weight: normal;
     }
 
     & .timestamp {
@@ -175,6 +180,11 @@
 
     & sl-button {
       width: 100%;
+    }
+
+    & .code {
+      text-transform: uppercase;
+      font-weight: bold;
     }
   }
 </style>
