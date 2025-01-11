@@ -88,7 +88,7 @@
 <main>
   <header>
     <h1>Welcome</h1>
-    <p>Enter your unique registration code!</p>
+    <p>Enter your registration code:</p>
   </header>
   <form bind:this={form} onsubmit={submitForm}>
     <PinInput
@@ -112,13 +112,14 @@
       >Enter
     </sl-button>
     {#if restoredSession}
+      <sl-divider style="--color: var(--sl-color-primary-600);"></sl-divider>
       <div class="restoredSession">
         <h3>
           Saved session <span class="code"
             >{restoredSession.registrationCode}</span
           >
         </h3>
-        <p class="timestamp">{format(restoredSession.timestamp, "PPpp")}</p>
+        <p class="timestamp">{format(restoredSession.timestamp, "pp")}</p>
         <sl-button
           onclick={() => {
             if (restoredSession) {
