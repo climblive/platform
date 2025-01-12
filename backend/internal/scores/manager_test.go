@@ -151,16 +151,20 @@ func TestScoreEngineManager(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotEmpty(t, instanceID)
 
-		meta, err := mngr.GetScoreEngine(context.Background(), instanceID)
+		_, err = mngr.StartScoreEngine(context.Background(), fakedContestID)
+
+		require.ErrorIs(t, err, scores.ErrAlreadyStarted)
+
+		scoreEngineDescriptor, err := mngr.GetScoreEngine(context.Background(), instanceID)
 
 		require.NoError(t, err)
-		assert.Equal(t, instanceID, meta.InstanceID)
-		assert.Equal(t, fakedContestID, meta.ContestID)
+		assert.Equal(t, instanceID, scoreEngineDescriptor.InstanceID)
+		assert.Equal(t, fakedContestID, scoreEngineDescriptor.ContestID)
 
 		instances, err := mngr.ListScoreEnginesByContest(context.Background(), fakedContestID)
 
 		require.NoError(t, err)
-		assert.ElementsMatch(t, []scores.ScoreEngineMeta{{
+		assert.ElementsMatch(t, []scores.ScoreEngineDescriptor{{
 			InstanceID: instanceID,
 			ContestID:  fakedContestID,
 		}}, instances)
@@ -169,10 +173,10 @@ func TestScoreEngineManager(t *testing.T) {
 
 		require.NoError(t, err)
 
-		meta, err = mngr.GetScoreEngine(context.Background(), instanceID)
+		scoreEngineDescriptor, err = mngr.GetScoreEngine(context.Background(), instanceID)
 
 		require.ErrorIs(t, err, domain.ErrNotFound)
-		assert.Empty(t, meta)
+		assert.Empty(t, scoreEngineDescriptor)
 
 		instances, err = mngr.ListScoreEnginesByContest(context.Background(), fakedContestID)
 

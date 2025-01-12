@@ -37,7 +37,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 
 			mockedAuthorizer.On("HasOwnership", mock.Anything, fakedOwnership).Return(domain.OrganizerRole, nil)
 
-			fakedScoreEngines := []scores.ScoreEngineMeta{
+			fakedScoreEngines := []scores.ScoreEngineDescriptor{
 				{
 					InstanceID: uuid.New(),
 					ContestID:  fakedContestID,
@@ -140,7 +140,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 
 			mockedScoreEngineManager.
 				On("GetScoreEngine", mock.Anything, fakedInstanceID).
-				Return(scores.ScoreEngineMeta{
+				Return(scores.ScoreEngineDescriptor{
 					InstanceID: fakedInstanceID,
 					ContestID:  fakedContestID,
 				}, nil)
@@ -169,7 +169,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 
 			mockedScoreEngineManager.
 				On("GetScoreEngine", mock.Anything, fakedInstanceID).
-				Return(scores.ScoreEngineMeta{
+				Return(scores.ScoreEngineDescriptor{
 					InstanceID: fakedInstanceID,
 					ContestID:  fakedContestID,
 				}, nil)
@@ -191,14 +191,14 @@ type scoreEngineManagerMock struct {
 	mock.Mock
 }
 
-func (m *scoreEngineManagerMock) GetScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) (scores.ScoreEngineMeta, error) {
+func (m *scoreEngineManagerMock) GetScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) (scores.ScoreEngineDescriptor, error) {
 	args := m.Called(ctx, instanceID)
-	return args.Get(0).(scores.ScoreEngineMeta), args.Error(1)
+	return args.Get(0).(scores.ScoreEngineDescriptor), args.Error(1)
 }
 
-func (m *scoreEngineManagerMock) ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]scores.ScoreEngineMeta, error) {
+func (m *scoreEngineManagerMock) ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]scores.ScoreEngineDescriptor, error) {
 	args := m.Called(ctx, contestID)
-	return args.Get(0).([]scores.ScoreEngineMeta), args.Error(1)
+	return args.Get(0).([]scores.ScoreEngineDescriptor), args.Error(1)
 }
 
 func (m *scoreEngineManagerMock) StopScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) error {
