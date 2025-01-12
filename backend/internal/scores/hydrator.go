@@ -39,7 +39,7 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 	}
 
 	for contender := range slices.Values(contenders) {
-		if contender.Entered == nil {
+		if contender.CompClassID == 0 {
 			continue
 		}
 
