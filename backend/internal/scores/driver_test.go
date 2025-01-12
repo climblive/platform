@@ -52,10 +52,6 @@ func TestEngineDriver(t *testing.T) {
 			InstanceID: fakedInstanceID,
 		}).Return()
 
-		mockedEventBroker.On("Dispatch", fakedContestID, domain.ScoreEngineStartedEvent{
-			InstanceID: fakedInstanceID,
-		}).Return()
-
 		mockedEventBroker.On("Dispatch", fakedContestID, domain.ScoreEngineStoppedEvent{
 			InstanceID: fakedInstanceID,
 		}).Return()
