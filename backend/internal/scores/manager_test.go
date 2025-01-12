@@ -10,7 +10,9 @@ import (
 	"github.com/climblive/platform/backend/internal/events"
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 func TestScoreEngineManager(t *testing.T) {
@@ -91,6 +93,94 @@ func TestScoreEngineManager(t *testing.T) {
 		wg := mngr.Run(ctx)
 
 		<-ctx.Done()
+		wg.Wait()
+
+		mockedRepo.AssertExpectations(t)
+		mockedStoreHydrator.AssertExpectations(t)
+		mockedEventBroker.AssertExpectations(t)
+	})
+
+	t.Run("ManageScoreEngines", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(context.Background())
+
+		mockedRepo := new(repositoryMock)
+		mockedStoreHydrator := new(engineStoreHydratorMock)
+		mockedEventBroker := new(eventBrokerMock)
+
+		fakedSubscriptionID := domain.SubscriptionID(uuid.New())
+		fakedContestID := domain.ContestID(rand.Int())
+
+		now := time.Now()
+
+		mockedRepo.
+			On("GetContestsCurrentlyRunningOrByStartTime", mock.Anything, mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
+			Return([]domain.Contest{}, nil)
+
+		mockedRepo.
+			On("GetContest", mock.Anything, mock.Anything, fakedContestID).
+			Return(domain.Contest{
+				ID:                 fakedContestID,
+				QualifyingProblems: 10,
+				Finalists:          7,
+				TimeBegin:          &now,
+				TimeEnd:            &now,
+			}, nil)
+
+		mockedEventBroker.
+			On("Subscribe", mock.Anything, mock.Anything).
+			Return(fakedSubscriptionID, events.NewSubscription(domain.EventFilter{}, 1000))
+
+		mockedEventBroker.
+			On("Unsubscribe", fakedSubscriptionID).
+			Return()
+
+		mockedStoreHydrator.
+			On("Hydrate", mock.Anything, fakedContestID, mock.AnythingOfType("*scores.MemoryStore")).
+			Return(nil)
+
+		mockedEventBroker.
+			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.ScoreEngineStartedEvent")).Return().
+			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.ScoreEngineStoppedEvent")).Return()
+
+		mngr := scores.NewScoreEngineManager(mockedRepo, mockedStoreHydrator, mockedEventBroker)
+
+		wg := mngr.Run(ctx)
+
+		instanceID, err := mngr.StartScoreEngine(context.Background(), fakedContestID)
+
+		require.NoError(t, err)
+		assert.NotEmpty(t, instanceID)
+
+		meta, err := mngr.GetScoreEngine(context.Background(), instanceID)
+
+		require.NoError(t, err)
+		assert.Equal(t, instanceID, meta.InstanceID)
+		assert.Equal(t, fakedContestID, meta.ContestID)
+
+		instances, err := mngr.ListScoreEnginesByContest(context.Background(), fakedContestID)
+
+		require.NoError(t, err)
+		assert.ElementsMatch(t, []scores.ScoreEngineMeta{{
+			InstanceID: instanceID,
+			ContestID:  fakedContestID,
+		}}, instances)
+
+		err = mngr.StopScoreEngine(context.Background(), instanceID)
+
+		require.NoError(t, err)
+
+		meta, err = mngr.GetScoreEngine(context.Background(), instanceID)
+
+		require.ErrorIs(t, err, domain.ErrNotFound)
+		assert.Empty(t, meta)
+
+		instances, err = mngr.ListScoreEnginesByContest(context.Background(), fakedContestID)
+
+		require.NoError(t, err)
+		require.Len(t, instances, 0)
+
+		cancel()
+
 		wg.Wait()
 
 		mockedRepo.AssertExpectations(t)
