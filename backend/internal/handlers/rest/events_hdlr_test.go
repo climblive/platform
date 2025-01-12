@@ -196,6 +196,8 @@ func TestEventsHandler(t *testing.T) {
 			0,
 			"CONTENDER_PUBLIC_INFO_UPDATED",
 			"[]CONTENDER_SCORE_UPDATED",
+			"SCORE_ENGINE_STARTED",
+			"SCORE_ENGINE_STOPPED",
 		))
 
 		mux := rest.NewMux()
