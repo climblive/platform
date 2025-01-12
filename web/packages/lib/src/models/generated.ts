@@ -14,17 +14,8 @@ export type RaffleWinnerID = ResourceID;
 export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
-export type ResourceIDType =
-  | CompClassID
-  | ContenderID
-  | ContestID
-  | OrganizerID
-  | ProblemID
-  | RaffleID
-  | RaffleWinnerID
-  | SeriesID
-  | UserID
-  | TickID;
+export type ResourceIDType = 
+    CompClassID | ContenderID | ContestID | OrganizerID | ProblemID | RaffleID | RaffleWinnerID | SeriesID | UserID | TickID;
 export type ScoreEngineInstanceID = string;
 
 //////////
@@ -205,11 +196,11 @@ export interface ContenderScoreUpdatedEvent {
   finalist: boolean;
   rankOrder: number /* int */;
 }
-export interface ScoreEngineStarted {
+export interface ScoreEngineStartedEvent {
   contestId: ContestID;
   instanceId: ScoreEngineInstanceID;
 }
-export interface ScoreEngineStopped {
+export interface ScoreEngineStoppedEvent {
   contestId: ContestID;
   instanceId: ScoreEngineInstanceID;
 }

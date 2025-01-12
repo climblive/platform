@@ -214,12 +214,10 @@ type ContenderScoreUpdatedEvent struct {
 	RankOrder   int         `json:"rankOrder"`
 }
 
-type ScoreEngineStarted struct {
-	ContestID  ContestID             `json:"contestId"`
+type ScoreEngineStartedEvent struct {
 	InstanceID ScoreEngineInstanceID `json:"instanceId"`
 }
 
-type ScoreEngineStopped struct {
-	ContestID  ContestID             `json:"contestId"`
+type ScoreEngineStoppedEvent struct {
 	InstanceID ScoreEngineInstanceID `json:"instanceId"`
 }

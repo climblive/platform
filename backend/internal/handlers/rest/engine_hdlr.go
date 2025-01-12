@@ -8,19 +8,19 @@ import (
 	"github.com/google/uuid"
 )
 
-type scoreEngineController interface {
+type scoreEngineUseCase interface {
 	ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreEngineInstanceID, error)
 	StopScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) error
 	StartScoreEngine(ctx context.Context, contestID domain.ContestID) (domain.ScoreEngineInstanceID, error)
 }
 
-type engineHandler struct {
-	controller scoreEngineController
+type scoreEngineHandler struct {
+	scoreEngineUseCase scoreEngineUseCase
 }
 
-func InstallScoreEngineHandler(mux *Mux, controller scoreEngineController) {
-	handler := &engineHandler{
-		controller: controller,
+func InstallScoreEngineHandler(mux *Mux, scoreEngineUseCase scoreEngineUseCase) {
+	handler := &scoreEngineHandler{
+		scoreEngineUseCase: scoreEngineUseCase,
 	}
 
 	mux.HandleFunc("GET /contests/{contestID}/score-engines", handler.ListScoreEnginesByContest)
@@ -28,7 +28,7 @@ func InstallScoreEngineHandler(mux *Mux, controller scoreEngineController) {
 	mux.HandleFunc("POST /contests/{contestID}/score-engines", handler.StartScoreEngine)
 }
 
-func (hdlr *engineHandler) ListScoreEnginesByContest(w http.ResponseWriter, r *http.Request) {
+func (hdlr *scoreEngineHandler) ListScoreEnginesByContest(w http.ResponseWriter, r *http.Request) {
 	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -36,7 +36,7 @@ func (hdlr *engineHandler) ListScoreEnginesByContest(w http.ResponseWriter, r *h
 		return
 	}
 
-	instances, err := hdlr.controller.ListScoreEnginesByContest(r.Context(), contestID)
+	instances, err := hdlr.scoreEngineUseCase.ListScoreEnginesByContest(r.Context(), contestID)
 	if err != nil {
 		handleError(w, err)
 		return
@@ -45,7 +45,7 @@ func (hdlr *engineHandler) ListScoreEnginesByContest(w http.ResponseWriter, r *h
 	writeResponse(w, http.StatusOK, instances)
 }
 
-func (hdlr *engineHandler) StopScoreEngine(w http.ResponseWriter, r *http.Request) {
+func (hdlr *scoreEngineHandler) StopScoreEngine(w http.ResponseWriter, r *http.Request) {
 	id, err := uuid.Parse(r.PathValue("instanceID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -54,16 +54,16 @@ func (hdlr *engineHandler) StopScoreEngine(w http.ResponseWriter, r *http.Reques
 
 	instanceID := domain.ScoreEngineInstanceID(id)
 
-	err = hdlr.controller.StopScoreEngine(r.Context(), instanceID)
+	err = hdlr.scoreEngineUseCase.StopScoreEngine(r.Context(), instanceID)
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	writeResponse(w, http.StatusAccepted, nil)
+	writeResponse(w, http.StatusNoContent, nil)
 }
 
-func (hdlr *engineHandler) StartScoreEngine(w http.ResponseWriter, r *http.Request) {
+func (hdlr *scoreEngineHandler) StartScoreEngine(w http.ResponseWriter, r *http.Request) {
 	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
@@ -71,11 +71,11 @@ func (hdlr *engineHandler) StartScoreEngine(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	instanceID, err := hdlr.controller.StartScoreEngine(r.Context(), contestID)
+	instanceID, err := hdlr.scoreEngineUseCase.StartScoreEngine(r.Context(), contestID)
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	writeResponse(w, http.StatusOK, instanceID)
+	writeResponse(w, http.StatusCreated, instanceID)
 }

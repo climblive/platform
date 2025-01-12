@@ -47,7 +47,7 @@ func (uc *ScoreEngineUseCase) ListScoreEnginesByContest(ctx context.Context, con
 		instances = append(instances, engine.InstanceID)
 	}
 
-	return instances, err
+	return instances, nil
 }
 
 func (uc *ScoreEngineUseCase) StopScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) error {
@@ -65,7 +65,12 @@ func (uc *ScoreEngineUseCase) StopScoreEngine(ctx context.Context, instanceID do
 		return errors.Wrap(err, 0)
 	}
 
-	return uc.ScoreEngineManager.StopScoreEngine(ctx, instanceID)
+	err = uc.ScoreEngineManager.StopScoreEngine(ctx, instanceID)
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	return nil
 }
 
 func (uc *ScoreEngineUseCase) StartScoreEngine(ctx context.Context, contestID domain.ContestID) (domain.ScoreEngineInstanceID, error) {

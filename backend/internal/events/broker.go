@@ -89,9 +89,9 @@ func EventName(event any) string {
 		return "CONTENDER_SCORE_UPDATED"
 	case []domain.ContenderScoreUpdatedEvent:
 		return "[]CONTENDER_SCORE_UPDATED"
-	case domain.ScoreEngineStarted:
+	case domain.ScoreEngineStartedEvent:
 		return "SCORE_ENGINE_STARTED"
-	case domain.ScoreEngineStopped:
+	case domain.ScoreEngineStoppedEvent:
 		return "SCORE_ENGINE_STOPPED"
 	default:
 		return "UNKNOWN"
