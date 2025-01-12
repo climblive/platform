@@ -15,35 +15,36 @@ import (
 
 var ErrAlreadyStarted = errors.New("already started")
 
-type listRequest struct {
-	contestID domain.ContestID
-	response  chan []domain.ScoreEngineInstanceID
+type Request[T any, A any, R any] struct {
+	Method   T
+	Args     A
+	Response chan<- Response[R]
 }
 
-type stopRequest struct {
-	instanceID domain.ScoreEngineInstanceID
-	response   chan struct{}
+type Response[R any] struct {
+	Value R
+	Err   error
 }
 
-type startRequest struct {
-	contestID domain.ContestID
-	response  chan startResponse
+func (r Request[T, A, R]) Do(ctx context.Context, requests chan<- any) (R, error) {
+	response := make(chan Response[R], 1)
+	r.Response = response
+
+	requests <- r
+
+	select {
+	case r := <-response:
+		return r.Value, r.Err
+	case <-ctx.Done():
+		var empty R
+		return empty, ctx.Err()
+	}
 }
 
-type startResponse struct {
-	instanceID domain.ScoreEngineInstanceID
-	err        error
-}
-
-type reverseLookupRequest struct {
-	instanceID domain.ScoreEngineInstanceID
-	response   chan reverseLookupResponse
-}
-
-type reverseLookupResponse struct {
-	contestID domain.ContestID
-	err       error
-}
+type listRequest struct{}
+type stopRequest struct{}
+type startRequest struct{}
+type reverseLookupRequest struct{}
 
 const pollInterval = 10 * time.Second
 
@@ -99,73 +100,31 @@ func (mngr *ScoreEngineManager) ListScoreEnginesByContest(
 	ctx context.Context,
 	contestID domain.ContestID,
 ) ([]domain.ScoreEngineInstanceID, error) {
-	response := make(chan []domain.ScoreEngineInstanceID, 1)
-
-	mngr.requests <- listRequest{
-		contestID: contestID,
-		response:  response,
-	}
-
-	select {
-	case instances := <-response:
-		return instances, nil
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	}
+	request := Request[listRequest, domain.ContestID, []domain.ScoreEngineInstanceID]{Args: contestID}
+	return request.Do(ctx, mngr.requests)
 }
 
 func (mngr *ScoreEngineManager) StopScoreEngine(
 	ctx context.Context,
 	instanceID domain.ScoreEngineInstanceID,
 ) error {
-	response := make(chan struct{}, 1)
+	request := Request[stopRequest, domain.ScoreEngineInstanceID, struct{}]{Args: instanceID}
+	_, err := request.Do(ctx, mngr.requests)
 
-	mngr.requests <- stopRequest{
-		instanceID: instanceID,
-		response:   response,
-	}
-
-	select {
-	case <-response:
-		return nil
-	case <-ctx.Done():
-		return ctx.Err()
-	}
+	return err
 }
 
 func (mngr *ScoreEngineManager) StartScoreEngine(
 	ctx context.Context,
 	contestID domain.ContestID,
 ) (domain.ScoreEngineInstanceID, error) {
-	response := make(chan startResponse, 1)
-
-	mngr.requests <- startRequest{
-		contestID: contestID,
-		response:  response,
-	}
-
-	select {
-	case response := <-response:
-		return response.instanceID, response.err
-	case <-ctx.Done():
-		return uuid.UUID{}, ctx.Err()
-	}
+	request := Request[startRequest, domain.ContestID, domain.ScoreEngineInstanceID]{Args: contestID}
+	return request.Do(ctx, mngr.requests)
 }
 
 func (mngr *ScoreEngineManager) ReverseLoopupScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) (domain.ContestID, error) {
-	response := make(chan reverseLookupResponse, 1)
-
-	mngr.requests <- reverseLookupRequest{
-		instanceID: instanceID,
-		response:   response,
-	}
-
-	select {
-	case response := <-response:
-		return response.contestID, response.err
-	case <-ctx.Done():
-		return 0, ctx.Err()
-	}
+	request := Request[reverseLookupRequest, domain.ScoreEngineInstanceID, domain.ContestID]{Args: instanceID}
+	return request.Do(ctx, mngr.requests)
 }
 
 func (mngr *ScoreEngineManager) run(ctx context.Context, wg *sync.WaitGroup) {
@@ -215,34 +174,34 @@ func (mngr *ScoreEngineManager) run(ctx context.Context, wg *sync.WaitGroup) {
 
 func (mngr *ScoreEngineManager) handleRequest(request any) {
 	switch req := request.(type) {
-	case listRequest:
-		req.response <- mngr.listScoreEnginesByContest(req.contestID)
+	case Request[listRequest, domain.ContestID, []domain.ScoreEngineInstanceID]:
+		req.Response <- Response[[]domain.ScoreEngineInstanceID]{Value: mngr.listScoreEnginesByContest(req.Args)}
 
-		close(req.response)
-	case startRequest:
+		close(req.Response)
+	case Request[startRequest, domain.ContestID, domain.ScoreEngineInstanceID]:
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
-		instanceID, err := mngr.startScoreEngine(ctx, req.contestID)
+		instanceID, err := mngr.startScoreEngine(ctx, req.Args)
 
-		req.response <- startResponse{
-			instanceID: instanceID,
-			err:        err,
+		req.Response <- Response[domain.ScoreEngineInstanceID]{
+			Value: instanceID,
+			Err:   err,
 		}
 
-		close(req.response)
-	case stopRequest:
-		mngr.stopScoreEngine(req.instanceID)
+		close(req.Response)
+	case Request[stopRequest, domain.ScoreEngineInstanceID, struct{}]:
+		mngr.stopScoreEngine(req.Args)
 
-		close(req.response)
-	case reverseLookupRequest:
-		contestID, err := mngr.reverseLookupInstance(req.instanceID)
-		req.response <- reverseLookupResponse{
-			contestID: contestID,
-			err:       err,
+		close(req.Response)
+	case Request[reverseLookupRequest, domain.ScoreEngineInstanceID, domain.ContestID]:
+		contestID, err := mngr.reverseLookupInstance(req.Args)
+		req.Response <- Response[domain.ContestID]{
+			Value: contestID,
+			Err:   err,
 		}
 
-		close(req.response)
+		close(req.Response)
 	}
 }
 
