@@ -15,6 +15,11 @@ import (
 
 var ErrAlreadyStarted = errors.New("already started")
 
+type ScoreEngineMeta struct {
+	InstanceID domain.ScoreEngineInstanceID
+	ContestID  domain.ContestID
+}
+
 type Request[T any, A any, R any] struct {
 	Method   T
 	Args     A
@@ -44,7 +49,7 @@ func (r Request[T, A, R]) Do(ctx context.Context, requests chan<- any) (R, error
 type listRequest struct{}
 type stopRequest struct{}
 type startRequest struct{}
-type reverseLookupRequest struct{}
+type getScoreEngine struct{}
 
 const pollInterval = 10 * time.Second
 
@@ -99,8 +104,8 @@ func (mngr *ScoreEngineManager) Run(ctx context.Context) *sync.WaitGroup {
 func (mngr *ScoreEngineManager) ListScoreEnginesByContest(
 	ctx context.Context,
 	contestID domain.ContestID,
-) ([]domain.ScoreEngineInstanceID, error) {
-	request := Request[listRequest, domain.ContestID, []domain.ScoreEngineInstanceID]{Args: contestID}
+) ([]ScoreEngineMeta, error) {
+	request := Request[listRequest, domain.ContestID, []ScoreEngineMeta]{Args: contestID}
 	return request.Do(ctx, mngr.requests)
 }
 
@@ -122,8 +127,8 @@ func (mngr *ScoreEngineManager) StartScoreEngine(
 	return request.Do(ctx, mngr.requests)
 }
 
-func (mngr *ScoreEngineManager) ReverseLoopupScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) (domain.ContestID, error) {
-	request := Request[reverseLookupRequest, domain.ScoreEngineInstanceID, domain.ContestID]{Args: instanceID}
+func (mngr *ScoreEngineManager) GetScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) (ScoreEngineMeta, error) {
+	request := Request[getScoreEngine, domain.ScoreEngineInstanceID, ScoreEngineMeta]{Args: instanceID}
 	return request.Do(ctx, mngr.requests)
 }
 
@@ -174,8 +179,8 @@ func (mngr *ScoreEngineManager) run(ctx context.Context, wg *sync.WaitGroup) {
 
 func (mngr *ScoreEngineManager) handleRequest(request any) {
 	switch req := request.(type) {
-	case Request[listRequest, domain.ContestID, []domain.ScoreEngineInstanceID]:
-		req.Response <- Response[[]domain.ScoreEngineInstanceID]{Value: mngr.listScoreEnginesByContest(req.Args)}
+	case Request[listRequest, domain.ContestID, []ScoreEngineMeta]:
+		req.Response <- Response[[]ScoreEngineMeta]{Value: mngr.listScoreEnginesByContest(req.Args)}
 
 		close(req.Response)
 	case Request[startRequest, domain.ContestID, domain.ScoreEngineInstanceID]:
@@ -194,10 +199,10 @@ func (mngr *ScoreEngineManager) handleRequest(request any) {
 		mngr.stopScoreEngine(req.Args)
 
 		close(req.Response)
-	case Request[reverseLookupRequest, domain.ScoreEngineInstanceID, domain.ContestID]:
-		contestID, err := mngr.reverseLookupInstance(req.Args)
-		req.Response <- Response[domain.ContestID]{
-			Value: contestID,
+	case Request[getScoreEngine, domain.ScoreEngineInstanceID, ScoreEngineMeta]:
+		meta, err := mngr.getScoreEngine(req.Args)
+		req.Response <- Response[ScoreEngineMeta]{
+			Value: meta,
 			Err:   err,
 		}
 
@@ -307,12 +312,15 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 	return instanceID, nil
 }
 
-func (mngr *ScoreEngineManager) listScoreEnginesByContest(contestID domain.ContestID) []domain.ScoreEngineInstanceID {
-	instances := make([]domain.ScoreEngineInstanceID, 0)
+func (mngr *ScoreEngineManager) listScoreEnginesByContest(contestID domain.ContestID) []ScoreEngineMeta {
+	instances := make([]ScoreEngineMeta, 0)
 
 	for id, handler := range mngr.handlers {
 		if id == contestID {
-			instances = append(instances, handler.instanceID)
+			instances = append(instances, ScoreEngineMeta{
+				InstanceID: handler.instanceID,
+				ContestID:  contestID,
+			})
 		}
 	}
 
@@ -332,12 +340,15 @@ func (mngr *ScoreEngineManager) stopScoreEngine(instanceID domain.ScoreEngineIns
 	}
 }
 
-func (mngr *ScoreEngineManager) reverseLookupInstance(instanceID domain.ScoreEngineInstanceID) (domain.ContestID, error) {
+func (mngr *ScoreEngineManager) getScoreEngine(instanceID domain.ScoreEngineInstanceID) (ScoreEngineMeta, error) {
 	for contestID, handler := range mngr.handlers {
 		if handler.instanceID == instanceID {
-			return contestID, nil
+			return ScoreEngineMeta{
+				InstanceID: handler.instanceID,
+				ContestID:  contestID,
+			}, nil
 		}
 	}
 
-	return 0, errors.Wrap(domain.ErrNotFound, 0)
+	return ScoreEngineMeta{}, errors.Wrap(domain.ErrNotFound, 0)
 }
