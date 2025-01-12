@@ -1,7 +1,14 @@
 import type { AxiosInstance, RawAxiosRequestHeaders } from "axios";
 import axios from "axios";
 import { z } from "zod";
-import { contestSchema, scoreboardEntrySchema, type ContenderPatch, type ContestID, type ScoreEngineInstanceID, type Tick } from "./models";
+import {
+  contestSchema,
+  scoreboardEntrySchema,
+  type ContenderPatch,
+  type ContestID,
+  type ScoreEngineInstanceID,
+  type Tick,
+} from "./models";
 import { compClassSchema } from "./models/compClass";
 import { contenderSchema } from "./models/contender";
 import { problemSchema } from "./models/problem";

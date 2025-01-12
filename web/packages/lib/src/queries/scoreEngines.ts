@@ -22,8 +22,7 @@ export const startScoreEngineMutation = (contestId: number) => {
   const client = useQueryClient();
 
   return createMutation({
-    mutationFn: () =>
-      ApiClient.getInstance().startScoreEngine(contestId),
+    mutationFn: () => ApiClient.getInstance().startScoreEngine(contestId),
     onSuccess: (newEngine) => {
       const queryKey: QueryKey = ["score-engines", { contestId }];
 
@@ -38,7 +37,8 @@ export const stopScoreEngineMutation = () => {
   const client = useQueryClient();
 
   return createMutation({
-    mutationFn: (instanceId: ScoreEngineInstanceID) => ApiClient.getInstance().stopScoreEngine(instanceId),
+    mutationFn: (instanceId: ScoreEngineInstanceID) =>
+      ApiClient.getInstance().stopScoreEngine(instanceId),
     onSuccess: (...args) => {
       const [, variables] = args;
       const queryKey = ["score-engines"];
@@ -48,7 +48,9 @@ export const stopScoreEngineMutation = () => {
           exact: false,
         },
         (oldEngines) =>
-          oldEngines ? oldEngines.filter((instanceId) => instanceId !== variables) : undefined,
+          oldEngines
+            ? oldEngines.filter((instanceId) => instanceId !== variables)
+            : undefined,
       );
     },
   });
