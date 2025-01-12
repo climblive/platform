@@ -44,6 +44,10 @@ func TestHydrate(t *testing.T) {
 				WithdrawnFromFinals: true,
 				Entered:             &now,
 			},
+			{
+				ID:          fakedContenderID + 1,
+				CompClassID: 0,
+			},
 		}, nil)
 
 	mockedRepo.
