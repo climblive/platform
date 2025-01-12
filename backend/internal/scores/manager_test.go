@@ -10,7 +10,9 @@ import (
 	"github.com/climblive/platform/backend/internal/events"
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 func TestScoreEngineManager(t *testing.T) {
@@ -61,6 +63,16 @@ func TestScoreEngineManager(t *testing.T) {
 				},
 			}, nil)
 
+		mockedRepo.
+			On("GetContest", mock.Anything, mock.Anything, fakedContestID).
+			Return(domain.Contest{
+				ID:                 fakedContestID,
+				QualifyingProblems: 10,
+				Finalists:          7,
+				TimeBegin:          &now,
+				TimeEnd:            &now,
+			}, nil)
+
 		mockedEventBroker.
 			On("Subscribe", mock.Anything, mock.Anything).
 			Return(fakedSubscriptionID, events.NewSubscription(domain.EventFilter{}, 1000))
@@ -87,6 +99,98 @@ func TestScoreEngineManager(t *testing.T) {
 		mockedStoreHydrator.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)
 	})
+
+	t.Run("ManageScoreEngines", func(t *testing.T) {
+		ctx, cancel := context.WithCancel(context.Background())
+
+		mockedRepo := new(repositoryMock)
+		mockedStoreHydrator := new(engineStoreHydratorMock)
+		mockedEventBroker := new(eventBrokerMock)
+
+		fakedSubscriptionID := domain.SubscriptionID(uuid.New())
+		fakedContestID := domain.ContestID(rand.Int())
+
+		now := time.Now()
+
+		mockedRepo.
+			On("GetContestsCurrentlyRunningOrByStartTime", mock.Anything, mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
+			Return([]domain.Contest{}, nil)
+
+		mockedRepo.
+			On("GetContest", mock.Anything, mock.Anything, fakedContestID).
+			Return(domain.Contest{
+				ID:                 fakedContestID,
+				QualifyingProblems: 10,
+				Finalists:          7,
+				TimeBegin:          &now,
+				TimeEnd:            &now,
+			}, nil)
+
+		mockedEventBroker.
+			On("Subscribe", mock.Anything, mock.Anything).
+			Return(fakedSubscriptionID, events.NewSubscription(domain.EventFilter{}, 1000))
+
+		mockedEventBroker.
+			On("Unsubscribe", fakedSubscriptionID).
+			Return()
+
+		mockedStoreHydrator.
+			On("Hydrate", mock.Anything, fakedContestID, mock.AnythingOfType("*scores.MemoryStore")).
+			Return(nil)
+
+		mockedEventBroker.
+			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.ScoreEngineStartedEvent")).Return().
+			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.ScoreEngineStoppedEvent")).Return()
+
+		mngr := scores.NewScoreEngineManager(mockedRepo, mockedStoreHydrator, mockedEventBroker)
+
+		wg := mngr.Run(ctx)
+
+		instanceID, err := mngr.StartScoreEngine(context.Background(), fakedContestID)
+
+		require.NoError(t, err)
+		assert.NotEmpty(t, instanceID)
+
+		_, err = mngr.StartScoreEngine(context.Background(), fakedContestID)
+
+		require.ErrorIs(t, err, scores.ErrAlreadyStarted)
+
+		scoreEngineDescriptor, err := mngr.GetScoreEngine(context.Background(), instanceID)
+
+		require.NoError(t, err)
+		assert.Equal(t, instanceID, scoreEngineDescriptor.InstanceID)
+		assert.Equal(t, fakedContestID, scoreEngineDescriptor.ContestID)
+
+		instances, err := mngr.ListScoreEnginesByContest(context.Background(), fakedContestID)
+
+		require.NoError(t, err)
+		assert.ElementsMatch(t, []scores.ScoreEngineDescriptor{{
+			InstanceID: instanceID,
+			ContestID:  fakedContestID,
+		}}, instances)
+
+		err = mngr.StopScoreEngine(context.Background(), instanceID)
+
+		require.NoError(t, err)
+
+		scoreEngineDescriptor, err = mngr.GetScoreEngine(context.Background(), instanceID)
+
+		require.ErrorIs(t, err, domain.ErrNotFound)
+		assert.Empty(t, scoreEngineDescriptor)
+
+		instances, err = mngr.ListScoreEnginesByContest(context.Background(), fakedContestID)
+
+		require.NoError(t, err)
+		require.Len(t, instances, 0)
+
+		cancel()
+
+		wg.Wait()
+
+		mockedRepo.AssertExpectations(t)
+		mockedStoreHydrator.AssertExpectations(t)
+		mockedEventBroker.AssertExpectations(t)
+	})
 }
 
 type repositoryMock struct {
@@ -96,6 +200,11 @@ type repositoryMock struct {
 func (m *repositoryMock) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context, tx domain.Transaction, earliestStartTime, latestStartTime time.Time) ([]domain.Contest, error) {
 	args := m.Called(ctx, tx, earliestStartTime, latestStartTime)
 	return args.Get(0).([]domain.Contest), args.Error(1)
+}
+
+func (m *repositoryMock) GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error) {
+	args := m.Called(ctx, tx, contestID)
+	return args.Get(0).(domain.Contest), args.Error(1)
 }
 
 func (m *repositoryMock) GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error) {

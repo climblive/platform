@@ -16,6 +16,7 @@ import (
 
 func TestEngineDriver(t *testing.T) {
 	fakedContestID := domain.ContestID(rand.Int())
+	fakedInstanceID := uuid.New()
 
 	type fixture struct {
 		broker       *eventBrokerMock
@@ -47,7 +48,15 @@ func TestEngineDriver(t *testing.T) {
 
 		mockedEventBroker.On("Unsubscribe", subscriptionID).Return()
 
-		driver := scores.NewScoreEngineDriver(fakedContestID, mockedEventBroker)
+		mockedEventBroker.On("Dispatch", fakedContestID, domain.ScoreEngineStartedEvent{
+			InstanceID: fakedInstanceID,
+		}).Return()
+
+		mockedEventBroker.On("Dispatch", fakedContestID, domain.ScoreEngineStoppedEvent{
+			InstanceID: fakedInstanceID,
+		}).Return()
+
+		driver := scores.NewScoreEngineDriver(fakedContestID, fakedInstanceID, mockedEventBroker)
 
 		awaitExpectations := func(t *testing.T) {
 			mockedEventBroker.AssertExpectations(t)

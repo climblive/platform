@@ -5,7 +5,7 @@ import {
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import type { Contender, ContenderPatch } from "../models/contender";
+import type { Contender, ContenderPatch } from "../models";
 import { HOUR } from "./constants";
 
 export const getContenderQuery = (contenderId: number) =>

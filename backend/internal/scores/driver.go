@@ -32,8 +32,9 @@ type ScoreEngine interface {
 }
 
 type ScoreEngineDriver struct {
-	logger    *slog.Logger
-	contestID domain.ContestID
+	logger     *slog.Logger
+	contestID  domain.ContestID
+	instanceID domain.ScoreEngineInstanceID
 
 	eventBroker   domain.EventBroker
 	pendingEvents []domain.EventEnvelope
@@ -48,13 +49,17 @@ type ScoreEngineDriver struct {
 
 func NewScoreEngineDriver(
 	contestID domain.ContestID,
+	instanceID domain.ScoreEngineInstanceID,
 	eventBroker domain.EventBroker,
 ) *ScoreEngineDriver {
-	logger := slog.New(slog.Default().Handler()).With("contest_id", contestID)
+	logger := slog.New(slog.Default().Handler()).
+		With("contest_id", contestID).
+		With("instance_id", instanceID)
 
 	return &ScoreEngineDriver{
 		logger:        logger,
 		contestID:     contestID,
+		instanceID:    instanceID,
 		eventBroker:   eventBroker,
 		pendingEvents: make([]domain.EventEnvelope, 0),
 		sideQuests:    make(chan func()),
@@ -123,6 +128,14 @@ func (d *ScoreEngineDriver) run(
 	defer d.eventBroker.Unsubscribe(subscriptionID)
 
 	close(ready)
+
+	d.eventBroker.Dispatch(d.contestID, domain.ScoreEngineStartedEvent{
+		InstanceID: d.instanceID,
+	})
+
+	defer d.eventBroker.Dispatch(d.contestID, domain.ScoreEngineStoppedEvent{
+		InstanceID: d.instanceID,
+	})
 
 	events := eventReader.EventsChan(ctx)
 

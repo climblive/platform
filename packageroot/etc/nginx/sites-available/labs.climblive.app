@@ -56,7 +56,7 @@ server {
 		try_files /index.html =404;
 	}
 
-	add_header Content-Security-Policy "default-src 'self'; connect-src 'self' api.labs.climblive.app data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'self'";
+	add_header Content-Security-Policy "default-src 'self'; connect-src 'self' clmb.auth.eu-west-1.amazoncognito.com data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'self'";
 	add_header X-Content-Type-Options "nosniff";
 	add_header Referrer-Policy "same-origin";
 

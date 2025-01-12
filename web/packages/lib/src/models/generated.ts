@@ -25,6 +25,7 @@ export type ResourceIDType =
   | SeriesID
   | UserID
   | TickID;
+export type ScoreEngineInstanceID = string;
 
 //////////
 // source: public.go
@@ -203,4 +204,12 @@ export interface ContenderScoreUpdatedEvent {
   placement: number /* int */;
   finalist: boolean;
   rankOrder: number /* int */;
+}
+export interface ScoreEngineStartedEvent {
+  contestId: ContestID;
+  instanceId: ScoreEngineInstanceID;
+}
+export interface ScoreEngineStoppedEvent {
+  contestId: ContestID;
+  instanceId: ScoreEngineInstanceID;
 }
