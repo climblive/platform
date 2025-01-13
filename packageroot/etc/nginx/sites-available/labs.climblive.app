@@ -65,3 +65,9 @@ server {
 	ssl_certificate /etc/letsencrypt/live/labs.climblive.app/fullchain.pem;
 	ssl_certificate_key /etc/letsencrypt/live/labs.climblive.app/privkey.pem;
 }
+
+server {
+	listen 80;
+	server_name labs.climblive.app;
+	return 301 https://labs.climblive.app$request_uri;
+}
