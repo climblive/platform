@@ -15,15 +15,20 @@ import (
 	"sync"
 	"time"
 
+	_ "embed"
+
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-faker/faker/v4"
 )
+
+//go:embed codes.txt
+var codes string
 
 const (
 	APIURL     = "http://localhost:8090"
 	ITERATIONS = 10
 	MAX_SLEEP  = 10_000 * time.Millisecond
-	CONTENDERS = 10
+	CONTENDERS = 200
 )
 
 type SimulatorEvent int
@@ -34,11 +39,7 @@ const (
 )
 
 func main() {
-	var registrationCodes []string
-
-	for n := range CONTENDERS {
-		registrationCodes = append(registrationCodes, fmt.Sprintf("ABCD%04d", n+1))
-	}
+	var registrationCodes []string = strings.Split(codes, "\n")
 
 	var wg sync.WaitGroup
 	var metricsMutex sync.Mutex
@@ -204,7 +205,7 @@ func (r *ContenderRunner) UpdateContender(contender domain.Contender) domain.Con
 }
 
 func (r *ContenderRunner) GetCompClasses(contestID domain.ContestID) []domain.CompClass {
-	resp, err := http.Get(fmt.Sprintf("%s/contests/%d/compClasses", APIURL, contestID))
+	resp, err := http.Get(fmt.Sprintf("%s/contests/%d/comp-classes", APIURL, contestID))
 	if err != nil {
 		panic(err)
 	}
