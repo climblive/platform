@@ -28,6 +28,8 @@ server {
 	location = /admin {
 		root /usr/share/climblive/admin;
 		try_files /index.html =404;
+		add_header Cache-Control "no-store";
+		expires 0;
 	}
 
 	location /scoreboard {
@@ -41,6 +43,8 @@ server {
 	location = /scoreboard {
 		root /usr/share/climblive/scoreboard;
 		try_files /index.html =404;
+		add_header Cache-Control "no-store";
+		expires 0;
 	}
 
 	location / {
@@ -54,6 +58,8 @@ server {
 	location = / {
 		root /usr/share/climblive/scorecard;
 		try_files /index.html =404;
+		add_header Cache-Control "no-store";
+		expires 0;
 	}
 
 	add_header Content-Security-Policy "default-src 'self'; connect-src 'self' clmb.auth.eu-west-1.amazoncognito.com data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'self'";
