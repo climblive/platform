@@ -1,7 +1,7 @@
 <script lang="ts">
   import { scorecardSessionSchema, type ScorecardSession } from "@/types";
   import { authenticateContender } from "@/utils/auth";
-  import { PinInput } from "@climblive/lib/components";
+  import { serialize } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/alert/alert.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
@@ -11,12 +11,16 @@
   import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
+  import * as z from "zod";
   import { ZodError } from "zod";
+
+  const enterFormSchema = z.object({
+    code: z.string().length(8),
+  });
 
   let loadingContender = $state(false);
   let loadingFailed = $state(false);
   let queryClient = useQueryClient();
-  let registrationCode: string | undefined = $state();
   let form: HTMLFormElement | undefined = $state();
   let restoredSession: ScorecardSession | undefined = $state();
 
@@ -38,22 +42,18 @@
 
   const session = getContext<Writable<ScorecardSession>>("scorecardSession");
 
-  const handleCodeChange = (code: string) => {
-    const autoSubmit = registrationCode === undefined && code.length === 8;
-    registrationCode = code;
-    if (autoSubmit) {
-      form?.requestSubmit();
-    }
-  };
-
-  const submitForm = async (event: SubmitEvent) => {
+  const handleSubmit = async (event: SubmitEvent) => {
     event.preventDefault();
 
-    if (!registrationCode) {
+    if (!form) {
       return;
     }
 
-    handleEnter(registrationCode);
+    const { data, success } = enterFormSchema.safeParse(serialize(form));
+
+    if (success) {
+      handleEnter(data.code.toUpperCase());
+    }
   };
 
   const handleEnter = async (registrationCode: string) => {
@@ -87,62 +87,62 @@
 
 <main>
   <header>
-    <h1>Welcome</h1>
-    <p>Enter your registration code:</p>
+    <h1>Welcome!</h1>
   </header>
-  <form bind:this={form} onsubmit={submitForm}>
-    <PinInput
-      length={8}
-      defaultValue={registrationCode}
-      onChange={handleCodeChange}
-      disabled={loadingContender}
-    />
+  <form bind:this={form} onsubmit={handleSubmit}>
+    <sl-input
+      required
+      placeholder="ABCD1234"
+      label="Registration code"
+      help-text="Input your 8 digit registration code"
+      name="code"
+      type="text"
+      minlength="8"
+      maxlength="8"
+    >
+      <sl-icon name="key" slot="prefix"></sl-icon>
+    </sl-input>
     {#if loadingFailed}
       <sl-alert open variant="danger">
         <sl-icon slot="icon" name="exclamation-octagon"></sl-icon>
         The registration code is not valid.
       </sl-alert>
     {/if}
-    <sl-button
-      variant="primary"
-      type="submit"
-      size="small"
-      disabled={registrationCode?.length !== 8}
-      loading={loadingContender}
-      >Enter
+    <sl-button variant="primary" type="submit" loading={loadingContender}>
+      <sl-icon slot="prefix" name="box-arrow-in-right"></sl-icon>
+      Enter
     </sl-button>
-    {#if restoredSession}
-      <sl-divider style="--color: var(--sl-color-primary-600);"></sl-divider>
-      <div class="restoredSession">
-        <h3>
-          Saved session <span class="code"
-            >{restoredSession.registrationCode}</span
-          >
-        </h3>
-        <p class="timestamp">{format(restoredSession.timestamp, "pp")}</p>
-        <sl-button
-          onclick={() => {
-            if (restoredSession) {
-              handleEnter(restoredSession.registrationCode);
-            }
-          }}
-          loading={loadingContender}
-          size="small"
-          >Restore
-        </sl-button>
-      </div>
-    {/if}
   </form>
+  {#if restoredSession}
+    <sl-divider style="--color: var(--sl-color-primary-600);"></sl-divider>
+    <div class="restoredSession">
+      <h3>
+        Saved session <span class="code"
+          >{restoredSession.registrationCode}</span
+        >
+      </h3>
+      <p class="timestamp">{format(restoredSession.timestamp, "pp")}</p>
+      <sl-button
+        onclick={() => {
+          if (restoredSession) {
+            handleEnter(restoredSession.registrationCode);
+          }
+        }}
+        loading={loadingContender}
+        size="small"
+        >Restore
+      </sl-button>
+    </div>
+  {/if}
   <footer>by ClimbLive™</footer>
 </main>
 
 <style>
   main {
-    width: 100%;
     height: 100vh;
-    text-align: center;
     display: flex;
     flex-direction: column;
+    padding-inline: var(--sl-spacing-large);
   }
 
   header {
@@ -150,14 +150,22 @@
   }
 
   form {
-    display: grid;
-    grid-template-columns: min-content;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
     gap: var(--sl-spacing-small);
-    justify-content: center;
-    margin-bottom: auto;
+
+    & sl-input::part(input) {
+      text-transform: uppercase;
+      font-family: monospace;
+      white-space: pre;
+
+      width: 100%;
+    }
   }
 
   footer {
+    margin-top: auto;
     text-align: center;
     font-weight: var(--sl-font-weight-semibold);
     line-height: 4rem;

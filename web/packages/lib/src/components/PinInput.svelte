@@ -147,6 +147,10 @@
     }
   }
 
+  input:focus::placeholder {
+    color: transparent;
+  }
+
   input::placeholder {
     color: var(--sl-input-placeholder-color);
   }

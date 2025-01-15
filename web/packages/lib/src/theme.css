@@ -24,6 +24,12 @@
 body {
   font-family: "Noto Sans", sans-serif;
   background-color: var(--sl-color-primary-200);
+
+  font-weight: var(--sl-font-weight-normal);
+}
+
+form {
+  line-height: var(--sl-line-height-normal);
 }
 
 sl-input,
