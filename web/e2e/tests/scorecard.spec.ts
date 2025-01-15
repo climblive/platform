@@ -76,8 +76,8 @@ test('enter contest by entering registration code', async ({ page }) => {
 
   await expect(page).toHaveTitle(/ClimbLive/);
 
-  const pinInput = page.getByRole("textbox", { name: "Pin character 1 out of 8" })
-  await pinInput.pressSequentially("abcd0002");
+  const codeInput = page.getByRole("textbox", { name: "Registration code" })
+  await codeInput.pressSequentially("abcd0002");
 
   await page.waitForURL('/ABCD0002/register');
 
@@ -98,8 +98,8 @@ test('registration code is saved in local storage for 12 hours', async ({ page }
   await page.clock.install({ time: new Date() });
   await page.goto('/');
 
-  const pinInput = page.getByRole("textbox", { name: "Pin character 1 out of 8" })
-  await pinInput.pressSequentially("abcd0001");
+  const codeInput = page.getByRole("textbox", { name: "Registration code" })
+  await codeInput.pressSequentially("abcd0001");
 
   await page.waitForURL('/ABCD0001');
   await expect(page.getByText("Albert Einstein")).toBeVisible();
@@ -133,7 +133,7 @@ test('garbage session value in local storage is thrown out', async ({ page }) =>
 
   await page.goto('/');
 
-  await expect(page.getByRole("textbox", { name: "Pin character 1 out of 8" })).toHaveValue("");
+  await expect(page.getByRole("textbox", { name: "Registration code" })).toHaveValue("");
 });
 
 test('edit profile', async ({ page }) => {
