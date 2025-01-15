@@ -52,7 +52,7 @@
     const { data, success } = enterFormSchema.safeParse(serialize(form));
 
     if (success) {
-      handleEnter(data.code);
+      handleEnter(data.code.toUpperCase());
     }
   };
 
