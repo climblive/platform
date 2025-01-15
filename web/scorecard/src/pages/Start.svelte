@@ -11,7 +11,12 @@
   import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
+  import * as z from "zod";
   import { ZodError } from "zod";
+
+  const enterFormSchema = z.object({
+    code: z.string().length(8),
+  });
 
   let loadingContender = $state(false);
   let loadingFailed = $state(false);
@@ -44,9 +49,11 @@
       return;
     }
 
-    const data = serialize(form) as Record<string, string>;
+    const { data, success } = enterFormSchema.safeParse(serialize(form));
 
-    handleEnter(data.code);
+    if (success) {
+      handleEnter(data.code);
+    }
   };
 
   const handleEnter = async (registrationCode: string) => {
@@ -95,17 +102,17 @@
     >
       <sl-icon name="key" slot="prefix"></sl-icon>
     </sl-input>
+    {#if loadingFailed}
+      <sl-alert open variant="danger">
+        <sl-icon slot="icon" name="exclamation-octagon"></sl-icon>
+        The registration code is not valid.
+      </sl-alert>
+    {/if}
     <sl-button variant="primary" type="submit" loading={loadingContender}>
       <sl-icon slot="prefix" name="box-arrow-in-right"></sl-icon>
       Enter
     </sl-button>
   </form>
-  {#if loadingFailed}
-    <sl-alert open variant="danger">
-      <sl-icon slot="icon" name="exclamation-octagon"></sl-icon>
-      The registration code is not valid.
-    </sl-alert>
-  {/if}
   {#if restoredSession}
     <sl-divider style="--color: var(--sl-color-primary-600);"></sl-divider>
     <div class="restoredSession">
@@ -147,7 +154,6 @@
     flex-direction: column;
     text-align: left;
     gap: var(--sl-spacing-small);
-    width: 100%;
 
     & sl-input {
       flex-grow: 1;
@@ -161,15 +167,6 @@
         width: 100%;
       }
     }
-  }
-
-  sl-alert {
-    margin-top: var(--sl-spacing-medium);
-    width: 100%;
-  }
-
-  sl-divider {
-    width: 100%;
   }
 
   footer {
@@ -187,7 +184,6 @@
     padding: var(--sl-spacing-small);
     text-align: left;
     color: white;
-    width: 100%;
 
     & h3 {
       margin: 0;
