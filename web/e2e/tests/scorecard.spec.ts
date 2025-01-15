@@ -79,6 +79,8 @@ test('enter contest by entering registration code', async ({ page }) => {
   const codeInput = page.getByRole("textbox", { name: "Registration code *" })
   await codeInput.pressSequentially("abcd0002");
 
+  await page.getByRole("button", { name: "Enter" }).click()
+
   await page.waitForURL('/ABCD0002/register');
 
   await page.getByRole("textbox", { name: "Full name *" }).pressSequentially("Dwight Schrute")
@@ -100,6 +102,8 @@ test('registration code is saved in local storage for 12 hours', async ({ page }
 
   const codeInput = page.getByRole("textbox", { name: "Registration code *" })
   await codeInput.pressSequentially("abcd0001");
+
+  await page.getByRole("button", { name: "Enter" }).click()
 
   await page.waitForURL('/ABCD0001');
   await expect(page.getByText("Albert Einstein")).toBeVisible();
