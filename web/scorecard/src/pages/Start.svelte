@@ -155,17 +155,12 @@
     text-align: left;
     gap: var(--sl-spacing-small);
 
-    & sl-input {
-      flex-grow: 1;
-      flex-shrink: 1;
+    & sl-input::part(input) {
+      text-transform: uppercase;
+      font-family: monospace;
+      white-space: pre;
 
-      &::part(input) {
-        text-transform: uppercase;
-        font-family: monospace;
-        white-space: pre;
-
-        width: 100%;
-      }
+      width: 100%;
     }
   }
 
