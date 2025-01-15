@@ -37,7 +37,7 @@
 
   const session = getContext<Writable<ScorecardSession>>("scorecardSession");
 
-  const submitForm = async (event: SubmitEvent) => {
+  const handleSubmit = async (event: SubmitEvent) => {
     event.preventDefault();
 
     if (!form) {
@@ -82,13 +82,15 @@
   <header>
     <h1>Welcome!</h1>
   </header>
-  <form bind:this={form} onsubmit={submitForm}>
+  <form bind:this={form} onsubmit={handleSubmit}>
     <sl-input
       required
       placeholder="ABCD1234"
       label="Registration code"
       help-text="Input your 8 digit registration code"
       name="code"
+      type="text"
+      minlength="8"
       maxlength="8"
     >
       <sl-icon name="key" slot="prefix"></sl-icon>
