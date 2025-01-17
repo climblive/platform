@@ -3,6 +3,7 @@ package domain
 import "errors"
 
 var ErrNotFound = errors.New("not found")
+var ErrDuplicate = errors.New("duplicate")
 var ErrBadState = errors.New("bad state")
 var ErrNotAuthenticated = errors.New("not authenticated")
 var ErrNotAuthorized = errors.New("not authorized")
