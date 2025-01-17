@@ -17,7 +17,7 @@
   const registrationFormSchema: z.ZodType<ContenderPatch> = z.object({
     name: z.string().min(1),
     clubName: z.string().optional(),
-    compClassId: z.coerce.number(),
+    compClassId: z.coerce.number().min(1, { message: "" }),
     withdrawnFromFinals: z.coerce.boolean(),
   });
 
