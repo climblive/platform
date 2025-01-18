@@ -94,6 +94,7 @@ func TestCreateTick(t *testing.T) {
 	fakedCompClassID := randomResourceID[domain.CompClassID]()
 	fakedProblemID := randomResourceID[domain.ProblemID]()
 
+	now := time.Now()
 	gracePeriod := 15 * time.Minute
 
 	fakedOwnership := domain.OwnershipData{
@@ -137,6 +138,8 @@ func TestCreateTick(t *testing.T) {
 		mockedRepo, mockedEventBroker := makeMocks(time.Now())
 		mockedAuthorizer := new(authorizerMock)
 
+		fakedTickID := randomResourceID[domain.TickID]()
+
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.ContenderRole, nil)
@@ -149,10 +152,24 @@ func TestCreateTick(t *testing.T) {
 			}, nil)
 
 		mockedRepo.
-			On("StoreTick", mock.Anything, mock.Anything, mock.AnythingOfType("domain.Tick")).
-			Return(mirrorInstruction{}, nil)
+			On("StoreTick", mock.Anything, mock.Anything, mock.MatchedBy(func(tick domain.Tick) bool {
+				return true
+			})).
+			Return(domain.Tick{
+				ID:           fakedTickID,
+				Ownership:    fakedOwnership,
+				Timestamp:    now,
+				ContestID:    fakedContestID,
+				ProblemID:    fakedProblemID,
+				Top:          true,
+				AttemptsTop:  5,
+				Zone:         true,
+				AttemptsZone: 2,
+			}, nil)
 
 		mockedEventBroker.On("Dispatch", fakedContestID, domain.AscentRegisteredEvent{
+			TickID:       fakedTickID,
+			Timestamp:    now,
 			ContenderID:  fakedContenderID,
 			ProblemID:    fakedProblemID,
 			Top:          true,

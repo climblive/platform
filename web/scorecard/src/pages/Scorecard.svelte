@@ -8,7 +8,12 @@
     ResultList,
     ScoreboardProvider,
   } from "@climblive/lib/components";
-  import { contenderScoreUpdatedEventSchema } from "@climblive/lib/models";
+  import {
+    ascentDeregisteredEventSchema,
+    ascentRegisteredEventSchema,
+    contenderScoreUpdatedEventSchema,
+    type Tick,
+  } from "@climblive/lib/models";
   import {
     getCompClassesQuery,
     getContenderQuery,
@@ -21,12 +26,15 @@
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
+  import { useQueryClient, type QueryKey } from "@tanstack/svelte-query";
   import { add } from "date-fns/add";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
   import Loading from "./Loading.svelte";
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
+
+  const queryClient = useQueryClient();
 
   const contenderQuery = getContenderQuery($session.contenderId);
   const contestQuery = getContestQuery($session.contestId);
@@ -100,6 +108,60 @@
         score = event.score;
         placement = event.placement;
       }
+    });
+
+    eventSource.addEventListener("ASCENT_REGISTERED", (e) => {
+      const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
+
+      const queryKey: QueryKey = [
+        "ticks",
+        { contenderId: $session.contenderId },
+      ];
+
+      queryClient.setQueryData<Tick[]>(queryKey, (oldTicks) => {
+        const newTick: Tick = {
+          id: event.tickId,
+          timestamp: event.timestamp,
+          problemId: event.problemId,
+          top: event.top,
+          attemptsTop: event.attemptsTop,
+          zone: event.zone,
+          attemptsZone: event.attemptsZone,
+        };
+
+        const predicate = (tick: Tick) => tick.problemId === event.problemId;
+
+        const found = (oldTicks ?? []).findIndex(predicate) !== -1;
+
+        if (found) {
+          return (oldTicks ?? []).map((oldTick) => {
+            if (predicate(oldTick)) {
+              return newTick;
+            } else {
+              return oldTick;
+            }
+          });
+        } else {
+          return [...(oldTicks ?? []), newTick];
+        }
+      });
+    });
+
+    eventSource.addEventListener("ASCENT_DEREGISTERED", (e) => {
+      const event = ascentDeregisteredEventSchema.parse(JSON.parse(e.data));
+
+      const queryKey = ["ticks"];
+      queryClient.setQueriesData<Tick[]>(
+        {
+          queryKey,
+          exact: false,
+        },
+        (oldTicks) => {
+          const predicate = (tick: Tick) => tick.id !== event.tickId;
+
+          return oldTicks ? oldTicks.filter(predicate) : undefined;
+        },
+      );
     });
   };
 

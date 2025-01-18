@@ -14,17 +14,8 @@ export type RaffleWinnerID = ResourceID;
 export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
-export type ResourceIDType =
-  | CompClassID
-  | ContenderID
-  | ContestID
-  | OrganizerID
-  | ProblemID
-  | RaffleID
-  | RaffleWinnerID
-  | SeriesID
-  | UserID
-  | TickID;
+export type ResourceIDType = 
+    CompClassID | ContenderID | ContestID | OrganizerID | ProblemID | RaffleID | RaffleWinnerID | SeriesID | UserID | TickID;
 export type ScoreEngineInstanceID = string;
 
 //////////
@@ -163,6 +154,8 @@ export interface ContenderRequalifiedEvent {
   contenderId: ContenderID;
 }
 export interface AscentRegisteredEvent {
+  tickId: TickID;
+  timestamp: Date;
   contenderId: ContenderID;
   problemId: ProblemID;
   top: boolean;
@@ -171,6 +164,7 @@ export interface AscentRegisteredEvent {
   attemptsZone: number /* int */;
 }
 export interface AscentDeregisteredEvent {
+  tickId: TickID;
   contenderId: ContenderID;
   problemId: ProblemID;
 }
@@ -206,10 +200,8 @@ export interface ContenderScoreUpdatedEvent {
   rankOrder: number /* int */;
 }
 export interface ScoreEngineStartedEvent {
-  contestId: ContestID;
   instanceId: ScoreEngineInstanceID;
 }
 export interface ScoreEngineStoppedEvent {
-  contestId: ContestID;
   instanceId: ScoreEngineInstanceID;
 }
