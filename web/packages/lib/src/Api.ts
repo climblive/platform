@@ -1,5 +1,6 @@
 import type { AxiosInstance, RawAxiosRequestHeaders } from "axios";
 import axios from "axios";
+import { add } from "date-fns";
 import { z } from "zod";
 import {
   contestSchema,
@@ -179,7 +180,9 @@ export class ApiClient {
   startScoreEngine = async (contestId: ContestID) => {
     const endpoint = `/contests/${contestId}/score-engines`;
 
-    const result = await this.axiosInstance.post(endpoint, undefined, {
+    const result = await this.axiosInstance.post(endpoint, {
+      terminatedBy: add(new Date(), { seconds: 5 })
+    }, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 
