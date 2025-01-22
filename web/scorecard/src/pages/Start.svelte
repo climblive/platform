@@ -103,7 +103,10 @@
   </form>
   {#each restoredSessions as restoredSession (restoredSession.registrationCode)}
     <sl-divider style="--color: var(--sl-color-primary-600);"></sl-divider>
-    <div class="restoredSession">
+    <section
+      class="restoredSession"
+      aria-label="Saved session {restoredSession.registrationCode}"
+    >
       <h3>
         Saved session <span class="code"
           >{restoredSession.registrationCode}</span
@@ -118,9 +121,9 @@
         }}
         loading={loadingContender}
         size="small"
-        >Restore {restoredSession.registrationCode.toUpperCase()}
+        >Restore
       </sl-button>
-    </div>
+    </section>
   {/each}
   <footer>by ClimbLive™</footer>
 </main>
