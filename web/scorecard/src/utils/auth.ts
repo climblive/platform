@@ -26,8 +26,9 @@ export const authenticateContender = async (
     };
 
     let sessions = readStoredSessions();
-    const predicate = ({ registrationCode }: ScorecardSession) => registrationCode !== updatedSession.registrationCode;
-    sessions = sessions.filter(predicate)
+    const predicate = ({ registrationCode }: ScorecardSession) =>
+      registrationCode !== updatedSession.registrationCode;
+    sessions = sessions.filter(predicate);
     sessions.splice(0, 0, updatedSession);
 
     localStorage.setItem("sessions", JSON.stringify(sessions));
@@ -62,7 +63,9 @@ export const readStoredSessions = (): ScorecardSession[] => {
     }
   }
 
-  sessions.sort((s1: ScorecardSession, s2: ScorecardSession) => { return s2.timestamp.getTime() - s1.timestamp.getTime() })
+  sessions.sort((s1: ScorecardSession, s2: ScorecardSession) => {
+    return s2.timestamp.getTime() - s1.timestamp.getTime();
+  });
 
   return sessions.slice(0, 3);
-}
+};
