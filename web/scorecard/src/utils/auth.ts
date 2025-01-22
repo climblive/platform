@@ -45,7 +45,7 @@ export const authenticateContender = async (
 export const readStoredSessions = (): ScorecardSession[] => {
   const sessions: ScorecardSession[] = [];
 
-  const data = localStorage.getItem("session");
+  const data = localStorage.getItem("sessions");
   if (data) {
     try {
       const obj = JSON.parse(data);
