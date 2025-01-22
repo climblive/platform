@@ -155,7 +155,7 @@ test('deep link into scorecard', async ({ page }) => {
 test('garbage session value in local storage is thrown out', async ({ page }) => {
   await page.goto('/');
 
-  await page.evaluate(() => localStorage.setItem('session', 'bad_data'))
+  await page.evaluate(() => localStorage.setItem('sessions', 'bad_data'))
 
   await page.goto('/');
 
