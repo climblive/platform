@@ -101,8 +101,10 @@
       Enter
     </sl-button>
   </form>
+
+  <sl-divider style="--color: var(--sl-color-primary-600);"></sl-divider>
+
   {#each restoredSessions as restoredSession (restoredSession.registrationCode)}
-    <sl-divider style="--color: var(--sl-color-primary-600);"></sl-divider>
     <section
       class="restoredSession"
       aria-label="Saved session {restoredSession.registrationCode}"
@@ -187,5 +189,9 @@
       text-transform: uppercase;
       font-weight: bold;
     }
+  }
+
+  .restoredSession:not(:last-of-type) {
+    margin-bottom: var(--sl-spacing-small);
   }
 </style>

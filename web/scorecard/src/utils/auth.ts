@@ -26,7 +26,8 @@ export const authenticateContender = async (
     };
 
     let sessions = readStoredSessions();
-    sessions = sessions.filter(({ registrationCode }) => registrationCode !== updatedSession.registrationCode)
+    const predicate = ({ registrationCode }: ScorecardSession) => registrationCode !== updatedSession.registrationCode;
+    sessions = sessions.filter(predicate)
     sessions.splice(0, 0, updatedSession);
 
     localStorage.setItem("sessions", JSON.stringify(sessions));
