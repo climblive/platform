@@ -26,7 +26,7 @@ export const authenticateContender = async (
     };
 
     let sessions = readStoredSessions();
-    sessions = sessions.filter(session => session.registrationCode !== updatedSession.registrationCode)
+    sessions = sessions.filter({registrationCode} => registrationCode !== updatedSession.registrationCode)
     sessions.splice(0, 0, updatedSession);
 
     localStorage.setItem("sessions", JSON.stringify(sessions));
