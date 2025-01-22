@@ -118,7 +118,7 @@
         }}
         loading={loadingContender}
         size="small"
-        >Restore
+        >Restore {restoredSession.registrationCode.toUpperCase()}
       </sl-button>
     </div>
   {/each}

@@ -96,7 +96,7 @@ test('enter contest by entering registration code', async ({ page }) => {
   await page.waitForURL('/ABCD0002');
 });
 
-test('registration code is saved in local storage for 12 hours', async ({ page }) => {
+test.only('registration code is saved in local storage for 12 hours', async ({ page }) => {
   await page.clock.install({ time: new Date() });
   await page.goto('/');
 
@@ -111,7 +111,7 @@ test('registration code is saved in local storage for 12 hours', async ({ page }
   await page.goto('/');
   await page.waitForURL('/');
 
-  await page.getByRole("button", { name: "Restore" }).click()
+  await page.getByRole("button", { name: "Restore ABCD0001" }).click()
 
   await page.waitForURL('/ABCD0001');
   await expect(page.getByText("Albert Einstein")).toBeVisible();
@@ -122,6 +122,22 @@ test('registration code is saved in local storage for 12 hours', async ({ page }
   await page.waitForURL('/');
 
   await expect(page.getByRole("button", { name: "Restore" })).not.toBeVisible();
+});
+
+test.only('the three most recently used registration codes can be restored', async ({ page }) => {
+  await page.goto('/ABCD0001');
+  await page.goto('/ABCD0002');
+  await page.goto('/ABCD0003');
+  await page.goto('/ABCD0004');
+
+  await page.goto('/');
+  await page.waitForURL('/');
+
+  await expect(page.getByRole("button", { name: "Restore ABCD0001" })).not.toBeVisible();
+
+  await expect(page.getByRole("button", { name: "Restore ABCD0002" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Restore ABCD0003" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Restore ABCD0004" })).toBeVisible();
 });
 
 test('deep link into scorecard', async ({ page }) => {
