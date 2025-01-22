@@ -96,7 +96,7 @@ test('enter contest by entering registration code', async ({ page }) => {
   await page.waitForURL('/ABCD0002');
 });
 
-test.only('registration code is saved in local storage for 12 hours', async ({ page }) => {
+test('registration code is saved in local storage for 12 hours', async ({ page }) => {
   await page.clock.install({ time: new Date() });
   await page.goto('/');
 
@@ -124,11 +124,15 @@ test.only('registration code is saved in local storage for 12 hours', async ({ p
   await expect(page.getByRole("button", { name: "Restore" })).not.toBeVisible();
 });
 
-test.only('the three most recently used registration codes can be restored', async ({ page }) => {
-  await page.goto('/ABCD0001');
-  await page.goto('/ABCD0002');
-  await page.goto('/ABCD0003');
-  await page.goto('/ABCD0004');
+test('the three most recently used registration codes can be restored', async ({ page }) => {
+  await page.clock.install({ time: new Date() });
+
+  for (const code of ["ABCD0001", "ABCD0002", "ABCD0003", "ABCD0004"]) {
+    await page.goto(`/${code}`);
+    await page.waitForURL(`/${code}`);
+
+    await page.clock.fastForward("00:00:01");
+  }
 
   await page.goto('/');
   await page.waitForURL('/');
