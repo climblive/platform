@@ -211,6 +211,9 @@ importers:
       '@tanstack/svelte-query':
         specifier: ^5.62.7
         version: 5.62.7(svelte@5.14.2)
+      axios:
+        specifier: ^1.7.9
+        version: 1.7.9
       date-fns:
         specifier: ^3.6.0
         version: 3.6.0

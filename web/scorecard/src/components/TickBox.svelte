@@ -11,6 +11,7 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/popup/popup.js";
   import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
+  import { AxiosError } from "axios";
   import { getContext } from "svelte";
   import type { Readable } from "svelte/store";
 
@@ -49,7 +50,13 @@
   const handleCheck = () => {
     if (tick?.id) {
       $deleteTick.mutate(tick.id, {
-        onError: () => toastError("Failed to remove ascent."),
+        onError: (error) => {
+          if (error instanceof AxiosError && error.status === 404) {
+            toastError("Ascent is already removed.");
+          } else {
+            toastError("Failed to remove ascent.");
+          }
+        },
       });
     } else {
       open = true;
@@ -71,7 +78,13 @@
         attemptsZone: flash ? 1 : 999,
       },
       {
-        onError: () => toastError("Failed to register ascent."),
+        onError: (error) => {
+          if (error instanceof AxiosError && error.status === 409) {
+            toastError("Ascent is already registered.");
+          } else {
+            toastError("Failed to register ascent.");
+          }
+        },
       },
     );
   };
