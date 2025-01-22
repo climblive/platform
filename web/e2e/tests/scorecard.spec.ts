@@ -111,7 +111,7 @@ test('registration code is saved in local storage for 12 hours', async ({ page }
   await page.goto('/');
   await page.waitForURL('/');
 
-  const region = await page.getByRole("region", { name: /saved session abcd0001/ });
+  const region = await page.getByRole("region", { name: "Saved session ABCD0001" });
 
   await region.getByRole("button", { name: "Restore" }).click()
 
