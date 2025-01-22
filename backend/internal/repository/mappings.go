@@ -80,7 +80,7 @@ func contestToDomain(record database.Contest) domain.Contest {
 		QualifyingProblems: int(record.QualifyingProblems),
 		Finalists:          int(record.Finalists),
 		Rules:              record.Rules.String,
-		GracePeriod:        time.Duration(record.GracePeriod) * time.Second,
+		GracePeriod:        time.Duration(record.GracePeriod) * time.Minute,
 	}
 }
 
