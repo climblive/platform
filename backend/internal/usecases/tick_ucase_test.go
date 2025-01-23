@@ -153,7 +153,19 @@ func TestCreateTick(t *testing.T) {
 
 		mockedRepo.
 			On("StoreTick", mock.Anything, mock.Anything, mock.MatchedBy(func(tick domain.Tick) bool {
-				return true
+				tick.Timestamp = time.Time{}
+
+				expected := domain.Tick{
+					Ownership:    fakedOwnership,
+					ContestID:    fakedContestID,
+					ProblemID:    fakedProblemID,
+					Top:          true,
+					AttemptsTop:  5,
+					Zone:         true,
+					AttemptsZone: 2,
+				}
+
+				return tick.Timestamp.Sub(now) < time.Second && tick == expected
 			})).
 			Return(domain.Tick{
 				ID:           fakedTickID,
@@ -279,6 +291,8 @@ func TestCreateTick(t *testing.T) {
 		mockedRepo, mockedEventBroker := makeMocks(time.Now().Add(-1 * gracePeriod))
 		mockedAuthorizer := new(authorizerMock)
 
+		fakedTickID := randomResourceID[domain.TickID]()
+
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.OrganizerRole, nil)
@@ -291,10 +305,36 @@ func TestCreateTick(t *testing.T) {
 			}, nil)
 
 		mockedRepo.
-			On("StoreTick", mock.Anything, mock.Anything, mock.AnythingOfType("domain.Tick")).
-			Return(mirrorInstruction{}, nil)
+			On("StoreTick", mock.Anything, mock.Anything, mock.MatchedBy(func(tick domain.Tick) bool {
+				tick.Timestamp = time.Time{}
+
+				expected := domain.Tick{
+					Ownership:    fakedOwnership,
+					ContestID:    fakedContestID,
+					ProblemID:    fakedProblemID,
+					Top:          true,
+					AttemptsTop:  5,
+					Zone:         true,
+					AttemptsZone: 2,
+				}
+
+				return tick.Timestamp.Sub(now) < time.Second && tick == expected
+			})).
+			Return(domain.Tick{
+				ID:           fakedTickID,
+				Ownership:    fakedOwnership,
+				Timestamp:    now,
+				ContestID:    fakedContestID,
+				ProblemID:    fakedProblemID,
+				Top:          true,
+				AttemptsTop:  5,
+				Zone:         true,
+				AttemptsZone: 2,
+			}, nil)
 
 		mockedEventBroker.On("Dispatch", fakedContestID, domain.AscentRegisteredEvent{
+			TickID:       fakedTickID,
+			Timestamp:    now,
 			ContenderID:  fakedContenderID,
 			ProblemID:    fakedProblemID,
 			Top:          true,
@@ -426,6 +466,7 @@ func TestDeleteTick(t *testing.T) {
 			Return(nil)
 
 		mockedEventBroker.On("Dispatch", fakedContestID, domain.AscentDeregisteredEvent{
+			TickID:      fakedTickID,
 			ContenderID: fakedContenderID,
 			ProblemID:   fakedProblemID,
 		}).Return()
@@ -480,6 +521,7 @@ func TestDeleteTick(t *testing.T) {
 			Return(nil)
 
 		mockedEventBroker.On("Dispatch", fakedContestID, domain.AscentDeregisteredEvent{
+			TickID:      fakedTickID,
 			ContenderID: fakedContenderID,
 			ProblemID:   fakedProblemID,
 		}).Return()
