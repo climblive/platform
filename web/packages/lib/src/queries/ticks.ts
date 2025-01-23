@@ -26,7 +26,7 @@ export const createTickMutation = (contenderId: number) => {
     mutationFn: (tick: Omit<Tick, "id" | "timestamp">) =>
       ApiClient.getInstance().createTick(contenderId, tick),
     onSuccess: (newTick) => {
-      updateTickInCache(client, contenderId, newTick)
+      updateTickInCache(client, contenderId, newTick);
     },
   });
 };
@@ -44,28 +44,33 @@ export const deleteTickMutation = () => {
   });
 };
 
-export const updateTickInCache = (queryClient: QueryClient, contenderId: number, updatedTick: Tick) => {
-  const queryKey: QueryKey = [
-    "ticks",
-    { contenderId },
-  ];
+export const updateTickInCache = (
+  queryClient: QueryClient,
+  contenderId: number,
+  updatedTick: Tick,
+) => {
+  const queryKey: QueryKey = ["ticks", { contenderId }];
 
   queryClient.setQueryData<Tick[]>(queryKey, (oldTicks) => {
-    const predicate = ({ problemId }: Tick) => problemId === updatedTick.problemId;
+    const predicate = ({ problemId }: Tick) =>
+      problemId === updatedTick.problemId;
 
     const found = (oldTicks ?? []).findIndex(predicate) !== -1;
 
     if (found) {
       return (oldTicks ?? []).map((oldTick) =>
-        predicate(oldTick) ? updatedTick : oldTick
+        predicate(oldTick) ? updatedTick : oldTick,
       );
     } else {
       return [...(oldTicks ?? []), updatedTick];
     }
   });
-}
+};
 
-export const removeTickFromCache = (queryClient: QueryClient, tickId: number) => {
+export const removeTickFromCache = (
+  queryClient: QueryClient,
+  tickId: number,
+) => {
   const queryKey = ["ticks"];
 
   queryClient.setQueriesData<Tick[]>(
@@ -79,4 +84,4 @@ export const removeTickFromCache = (queryClient: QueryClient, tickId: number) =>
       return oldTicks ? oldTicks.filter(predicate) : undefined;
     },
   );
-}
+};
