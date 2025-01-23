@@ -36,6 +36,8 @@ func TestEventsHandler(t *testing.T) {
 			domain.ContenderID(1),
 			"CONTENDER_PUBLIC_INFO_UPDATED",
 			"CONTENDER_SCORE_UPDATED",
+			"ASCENT_REGISTERED",
+			"ASCENT_DEREGISTERED",
 		))
 
 		mux := rest.NewMux()
@@ -70,6 +72,8 @@ func TestEventsHandler(t *testing.T) {
 			domain.ContenderID(1),
 			"CONTENDER_PUBLIC_INFO_UPDATED",
 			"CONTENDER_SCORE_UPDATED",
+			"ASCENT_REGISTERED",
+			"ASCENT_DEREGISTERED",
 		))
 
 		mux := rest.NewMux()
@@ -108,6 +112,8 @@ func TestEventsHandler(t *testing.T) {
 			domain.ContenderID(1),
 			"CONTENDER_PUBLIC_INFO_UPDATED",
 			"CONTENDER_SCORE_UPDATED",
+			"ASCENT_REGISTERED",
+			"ASCENT_DEREGISTERED",
 		))
 
 		err := subscription.Post(domain.EventEnvelope{
@@ -163,6 +169,8 @@ func TestEventsHandler(t *testing.T) {
 			domain.ContenderID(1),
 			"CONTENDER_PUBLIC_INFO_UPDATED",
 			"CONTENDER_SCORE_UPDATED",
+			"ASCENT_REGISTERED",
+			"ASCENT_DEREGISTERED",
 		))
 
 		err := subscription.Post(domain.EventEnvelope{
