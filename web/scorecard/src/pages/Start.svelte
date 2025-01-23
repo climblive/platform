@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { scorecardSessionSchema, type ScorecardSession } from "@/types";
-  import { authenticateContender } from "@/utils/auth";
+  import { type ScorecardSession } from "@/types";
+  import { authenticateContender, readStoredSessions } from "@/utils/auth";
   import { serialize } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/alert/alert.js";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import { useQueryClient } from "@tanstack/svelte-query";
-  import { differenceInHours, format } from "date-fns";
+  import { format } from "date-fns";
   import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
@@ -22,22 +22,10 @@
   let loadingFailed = $state(false);
   let queryClient = useQueryClient();
   let form: HTMLFormElement | undefined = $state();
-  let restoredSession: ScorecardSession | undefined = $state();
+  let restoredSessions: ScorecardSession[] = $state([]);
 
   onMount(() => {
-    const data = localStorage.getItem("session");
-    if (data) {
-      try {
-        const obj = JSON.parse(data);
-        const sess = scorecardSessionSchema.parse(obj);
-
-        if (differenceInHours(new Date(), sess.timestamp) < 12) {
-          restoredSession = sess;
-        }
-      } catch {
-        /* discard corrupt session data */
-      }
-    }
+    restoredSessions = readStoredSessions();
   });
 
   const session = getContext<Writable<ScorecardSession>>("scorecardSession");
@@ -113,9 +101,14 @@
       Enter
     </sl-button>
   </form>
-  {#if restoredSession}
-    <sl-divider style="--color: var(--sl-color-primary-600);"></sl-divider>
-    <div class="restoredSession">
+
+  <sl-divider style="--color: var(--sl-color-primary-600);"></sl-divider>
+
+  {#each restoredSessions as restoredSession (restoredSession.registrationCode)}
+    <section
+      class="restoredSession"
+      aria-label="Saved session {restoredSession.registrationCode}"
+    >
       <h3>
         Saved session <span class="code"
           >{restoredSession.registrationCode}</span
@@ -132,8 +125,8 @@
         size="small"
         >Restore
       </sl-button>
-    </div>
-  {/if}
+    </section>
+  {/each}
   <footer>by ClimbLive™</footer>
 </main>
 
@@ -196,5 +189,9 @@
       text-transform: uppercase;
       font-weight: bold;
     }
+  }
+
+  .restoredSession:not(:last-of-type) {
+    margin-bottom: var(--sl-spacing-small);
   }
 </style>

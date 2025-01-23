@@ -50,7 +50,10 @@ func (d *Database) StoreTick(ctx context.Context, tx domain.Transaction, tick do
 	}
 
 	insertID, err := d.WithTx(tx).InsertTick(ctx, params)
-	if err != nil {
+	switch {
+	case mysqlDuplicateKeyConstraintViolation.Is(err):
+		return domain.Tick{}, errors.New(domain.ErrDuplicate)
+	case err != nil:
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
