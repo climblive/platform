@@ -20,13 +20,15 @@
     getContestQuery,
     getProblemsQuery,
     getTicksQuery,
+    removeTickFromCache as removeTickFromQueryCache,
+    updateTickInCache as updateTickInQueryCache,
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
   import type { SlTabGroup, SlTabShowEvent } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
-  import { useQueryClient, type QueryKey } from "@tanstack/svelte-query";
+  import { useQueryClient } from "@tanstack/svelte-query";
   import { add } from "date-fns/add";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
@@ -113,55 +115,23 @@
     eventSource.addEventListener("ASCENT_REGISTERED", (e) => {
       const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
 
-      const queryKey: QueryKey = [
-        "ticks",
-        { contenderId: $session.contenderId },
-      ];
+      const newTick: Tick = {
+        id: event.tickId,
+        timestamp: event.timestamp,
+        problemId: event.problemId,
+        top: event.top,
+        attemptsTop: event.attemptsTop,
+        zone: event.zone,
+        attemptsZone: event.attemptsZone,
+      };
 
-      queryClient.setQueryData<Tick[]>(queryKey, (oldTicks) => {
-        const newTick: Tick = {
-          id: event.tickId,
-          timestamp: event.timestamp,
-          problemId: event.problemId,
-          top: event.top,
-          attemptsTop: event.attemptsTop,
-          zone: event.zone,
-          attemptsZone: event.attemptsZone,
-        };
-
-        const predicate = (tick: Tick) => tick.problemId === event.problemId;
-
-        const found = (oldTicks ?? []).findIndex(predicate) !== -1;
-
-        if (found) {
-          return (oldTicks ?? []).map((oldTick) => {
-            if (predicate(oldTick)) {
-              return newTick;
-            } else {
-              return oldTick;
-            }
-          });
-        } else {
-          return [...(oldTicks ?? []), newTick];
-        }
-      });
+      updateTickInQueryCache(queryClient, $session.contenderId, newTick);
     });
 
     eventSource.addEventListener("ASCENT_DEREGISTERED", (e) => {
       const event = ascentDeregisteredEventSchema.parse(JSON.parse(e.data));
 
-      const queryKey = ["ticks"];
-      queryClient.setQueriesData<Tick[]>(
-        {
-          queryKey,
-          exact: false,
-        },
-        (oldTicks) => {
-          const predicate = (tick: Tick) => tick.id !== event.tickId;
-
-          return oldTicks ? oldTicks.filter(predicate) : undefined;
-        },
-      );
+      removeTickFromQueryCache(queryClient, event.tickId);
     });
   };
 
