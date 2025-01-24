@@ -86,21 +86,19 @@
                 ? "true"
                 : "false"}
             >
-              <div class="wrapper">
-                <Header
-                  compClassId={compClass.id}
-                  name={compClass.name}
-                  startTime={compClass.timeBegin}
-                  endTime={compClass.timeEnd}
-                  {scoreboard}
-                ></Header>
-                <ResultList
-                  compClassId={compClass.id}
-                  {overflow}
-                  {scoreboard}
-                  {loading}
-                />
-              </div>
+              <Header
+                compClassId={compClass.id}
+                name={compClass.name}
+                startTime={compClass.timeBegin}
+                endTime={compClass.timeEnd}
+                {scoreboard}
+              ></Header>
+              <ResultList
+                compClassId={compClass.id}
+                {overflow}
+                {scoreboard}
+                {loading}
+              />
             </section>
           {/each}
         </div>
@@ -144,22 +142,20 @@
   .container {
     flex-grow: 1;
     display: grid;
-    grid-template-columns: repeat(var(--num-columns), 1fr);
+    grid-template-columns: repeat(
+      var(--num-columns),
+      minmax(max-content, 32rem)
+    );
     grid-template-rows: 1fr;
     padding-top: 0;
     gap: var(--sl-spacing-small);
+
+    justify-content: center;
   }
 
   .class {
-  }
-
-  .wrapper {
-    height: 100%;
     display: flex;
     flex-direction: column;
-
-    max-width: 600px;
-    margin-inline: auto;
   }
 
   sl-select {
