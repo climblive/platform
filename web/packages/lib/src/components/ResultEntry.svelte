@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ScoreboardEntry } from "@climblive/lib/models";
+  import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import { ordinalSuperscript } from "../utils";
   import Score from "./Score.svelte";
 
@@ -25,6 +26,7 @@
       -
     {:else}
       <Score value={score.score} />
+      <sl-icon name={score?.finalist ? "trophy" : "dash"}></sl-icon>
     {/if}
   </div>
 </section>
@@ -37,7 +39,7 @@
     display: grid;
     padding-inline: var(--sl-spacing-small);
     border-radius: var(--sl-border-radius-medium);
-    grid-template-columns: 2rem 1fr min-content;
+    grid-template-columns: 2rem 1fr max-content;
     grid-template-rows: 1fr;
     gap: var(--sl-spacing-x-small);
     align-items: center;
@@ -53,6 +55,22 @@
       var(--sl-color-yellow-800),
       var(--sl-color-yellow-500)
     );
+    background-size: 150%;
+    background-position: left;
+    animation: shine 5s infinite;
+    color: white;
+  }
+
+  @keyframes shine {
+    0% {
+      background-position: left;
+    }
+    50% {
+      background-position: right;
+    }
+    100% {
+      background-position: left;
+    }
   }
 
   section > div {
@@ -72,6 +90,11 @@
 
   .score {
     justify-self: end;
+
+    display: flex;
+    align-items: center;
+    gap: var(--sl-spacing-x-small);
+
     text-align: right;
     font-weight: var(--sl-font-weight-bold);
     font-size: var(--sl-font-size-medium);

@@ -13,3 +13,9 @@
     {prefix}{value}<span class="suffix">p</span>
   {/if}
 </div>
+
+<style>
+  div {
+    display: inline;
+  }
+</style>
