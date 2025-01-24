@@ -111,7 +111,9 @@ test('registration code is saved in local storage for 12 hours', async ({ page }
   await page.goto('/');
   await page.waitForURL('/');
 
-  await page.getByRole("button", { name: "Restore" }).click()
+  const region = await page.getByRole("region", { name: "Saved session ABCD0001" });
+
+  await region.getByRole("button", { name: "Restore" }).click()
 
   await page.waitForURL('/ABCD0001');
   await expect(page.getByText("Albert Einstein")).toBeVisible();
@@ -124,6 +126,26 @@ test('registration code is saved in local storage for 12 hours', async ({ page }
   await expect(page.getByRole("button", { name: "Restore" })).not.toBeVisible();
 });
 
+test('the three most recently used registration codes can be restored', async ({ page }) => {
+  await page.clock.install({ time: new Date() });
+
+  for (const code of ["ABCD0001", "ABCD0002", "ABCD0003", "ABCD0004"]) {
+    await page.goto(`/${code}`);
+    await page.waitForURL(`/${code}`);
+
+    await page.clock.fastForward("00:00:01");
+  }
+
+  await page.goto('/');
+  await page.waitForURL('/');
+
+  await expect(page.getByRole("region", { name: "Saved session ABCD0001" })).not.toBeVisible();
+
+  await expect(page.getByRole("region", { name: "Saved session ABCD0002" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Saved session ABCD0003" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Saved session ABCD0004" })).toBeVisible();
+});
+
 test('deep link into scorecard', async ({ page }) => {
   await page.goto('/abcd0001');
 
@@ -133,7 +155,7 @@ test('deep link into scorecard', async ({ page }) => {
 test('garbage session value in local storage is thrown out', async ({ page }) => {
   await page.goto('/');
 
-  await page.evaluate(() => localStorage.setItem('session', 'bad_data'))
+  await page.evaluate(() => localStorage.setItem('sessions', 'bad_data'))
 
   await page.goto('/');
 
