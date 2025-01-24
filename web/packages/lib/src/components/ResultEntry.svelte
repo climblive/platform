@@ -62,14 +62,11 @@
   }
 
   @keyframes shine {
-    0% {
+    0%, 100% {
       background-position: left;
     }
     50% {
       background-position: right;
-    }
-    100% {
-      background-position: left;
     }
   }
 
