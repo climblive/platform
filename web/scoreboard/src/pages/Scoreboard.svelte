@@ -86,19 +86,21 @@
                 ? "true"
                 : "false"}
             >
-              <Header
-                compClassId={compClass.id}
-                name={compClass.name}
-                startTime={compClass.timeBegin}
-                endTime={compClass.timeEnd}
-                {scoreboard}
-              ></Header>
-              <ResultList
-                compClassId={compClass.id}
-                {overflow}
-                {scoreboard}
-                {loading}
-              />
+              <div class="wrapper">
+                <Header
+                  compClassId={compClass.id}
+                  name={compClass.name}
+                  startTime={compClass.timeBegin}
+                  endTime={compClass.timeEnd}
+                  {scoreboard}
+                ></Header>
+                <ResultList
+                  compClassId={compClass.id}
+                  {overflow}
+                  {scoreboard}
+                  {loading}
+                />
+              </div>
             </section>
           {/each}
         </div>
@@ -149,8 +151,15 @@
   }
 
   .class {
+  }
+
+  .wrapper {
+    height: 100%;
     display: flex;
     flex-direction: column;
+
+    max-width: 600px;
+    margin-inline: auto;
   }
 
   sl-select {
