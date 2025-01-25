@@ -8,7 +8,10 @@
     ResultList,
     ScoreboardProvider,
   } from "@climblive/lib/components";
-  import { contenderScoreUpdatedEventSchema } from "@climblive/lib/models";
+  import {
+    contenderScoreUpdatedEventSchema,
+    type Problem,
+  } from "@climblive/lib/models";
   import {
     getCompClassesQuery,
     getContenderQuery,
@@ -17,7 +20,12 @@
     getTicksQuery,
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
-  import type { SlTabGroup, SlTabShowEvent } from "@shoelace-style/shoelace";
+  import type {
+    SlChangeEvent,
+    SlRadioGroup,
+    SlTabGroup,
+    SlTabShowEvent,
+  } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
@@ -36,6 +44,7 @@
 
   let resultsConnected = $state(false);
   let tabGroup: SlTabGroup | undefined = $state();
+  let radioGroup: SlRadioGroup | undefined = $state();
   let eventSource: EventSource | undefined;
   let score: number = $state(0);
   let placement: number | undefined = $state();
@@ -59,6 +68,23 @@
       minutes: (contest?.gracePeriod ?? 0) / (1_000_000_000 * 60),
     }),
   );
+
+  let sortBy = $state<"number" | "points">("number");
+
+  let sortedProblems = $derived.by(() => {
+    switch (sortBy) {
+      case "number":
+        return problems?.toSorted(
+          (p1: Problem, p2: Problem) => p1.number - p2.number,
+        );
+      case "points":
+        return problems?.toSorted(
+          (p1: Problem, p2: Problem) => p1.pointsTop - p2.pointsTop,
+        );
+      default:
+        return problems;
+    }
+  });
 
   $effect(() => {
     if (contender) {
@@ -124,7 +150,7 @@
 
 <svelte:window onvisibilitychange={handleVisibilityChange} />
 
-{#if !contender || !contest || !compClasses || !problems || !ticks || !selectedCompClass}
+{#if !contender || !contest || !compClasses || !sortedProblems || !ticks || !selectedCompClass}
   <Loading />
 {:else}
   <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime}>
@@ -152,7 +178,26 @@
           {/if}
 
           <sl-tab-panel name="problems">
-            {#each problems as problem}
+            <sl-radio-group
+              bind:this={radioGroup}
+              value={sortBy}
+              size="small"
+              onsl-change={(event: SlChangeEvent) => {
+                if (radioGroup) {
+                  sortBy = radioGroup.value as typeof sortBy;
+                }
+              }}
+            >
+              <sl-radio-button value="number">
+                <sl-icon name="sort-numeric-down" label="Sort by number"
+                ></sl-icon>
+              </sl-radio-button>
+
+              <sl-radio-button value="points">
+                <sl-icon name="sort-up-alt" label="Sort by points"></sl-icon>
+              </sl-radio-button>
+            </sl-radio-group>
+            {#each sortedProblems as problem}
               <ProblemView
                 {problem}
                 tick={ticks.find(({ problemId }) => problemId === problem.id)}
@@ -174,7 +219,7 @@
             {/if}
           </sl-tab-panel>
           <sl-tab-panel name="info">
-            <ContestInfo {contest} {problems} {compClasses} />
+            <ContestInfo {contest} problems={sortedProblems} {compClasses} />
           </sl-tab-panel>
         </sl-tab-group>
       </main>
