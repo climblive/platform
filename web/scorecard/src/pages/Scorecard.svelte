@@ -68,10 +68,10 @@
     }),
   );
 
-  let sortBy = $state<"number" | "points">("number");
+  let orderProblemsBy = $state<"number" | "points">("number");
 
   let sortedProblems = $derived.by(() => {
-    switch (sortBy) {
+    switch ($session.orderProblemsBy) {
       case "number":
         return problems?.toSorted(
           (p1: Problem, p2: Problem) => p1.number - p2.number,
@@ -178,22 +178,31 @@
 
           <sl-tab-panel name="problems">
             <sl-radio-group
-              bind:this={radioGroup}
-              value={sortBy}
               size="small"
+              bind:this={radioGroup}
+              value="points"
               onsl-change={() => {
                 if (radioGroup) {
-                  sortBy = radioGroup.value as typeof sortBy;
+                  orderProblemsBy = radioGroup.value as typeof orderProblemsBy;
                 }
               }}
             >
               <sl-radio-button value="number">
-                <sl-icon name="sort-numeric-down" label="Sort by number"
+                <sl-icon
+                  slot="prefix"
+                  name="sort-numeric-down"
+                  label="Sort by number"
                 ></sl-icon>
+                Sort by number
               </sl-radio-button>
 
               <sl-radio-button value="points">
-                <sl-icon name="sort-up-alt" label="Sort by points"></sl-icon>
+                <sl-icon
+                  slot="prefix"
+                  name="sort-down-alt"
+                  label="Sort by points"
+                ></sl-icon>
+                Sort by points
               </sl-radio-button>
             </sl-radio-group>
             {#each sortedProblems as problem}
@@ -203,24 +212,24 @@
                 disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
               />
             {/each}
-          </sl-tab-panel>
-          <sl-tab-panel name="results">
-            {#if resultsConnected && contender.compClassId}
-              <ScoreboardProvider contestId={$session.contestId}>
-                {#snippet children({ scoreboard, loading })}
-                  <ResultList
-                    compClassId={contender.compClassId}
-                    {scoreboard}
-                    {loading}
-                  />
-                {/snippet}
-              </ScoreboardProvider>
-            {/if}
-          </sl-tab-panel>
-          <sl-tab-panel name="info">
-            <ContestInfo {contest} problems={sortedProblems} {compClasses} />
-          </sl-tab-panel>
-        </sl-tab-group>
+            <sl-tab-panel name="results">
+              {#if resultsConnected && contender.compClassId}
+                <ScoreboardProvider contestId={$session.contestId}>
+                  {#snippet children({ scoreboard, loading })}
+                    <ResultList
+                      compClassId={contender.compClassId}
+                      {scoreboard}
+                      {loading}
+                    />
+                  {/snippet}
+                </ScoreboardProvider>
+              {/if}
+            </sl-tab-panel>
+            <sl-tab-panel name="info">
+              <ContestInfo {contest} problems={sortedProblems} {compClasses} />
+            </sl-tab-panel>
+          </sl-tab-panel></sl-tab-group
+        >
       </main>
     {/snippet}
   </ContestStateProvider>
@@ -259,5 +268,13 @@
     flex-direction: column;
     gap: var(--sl-spacing-x-small);
     width: 100%;
+  }
+
+  sl-radio-group::part(button-group) {
+    width: 100%;
+  }
+
+  sl-radio-button {
+    flex-grow: 1;
   }
 </style>
