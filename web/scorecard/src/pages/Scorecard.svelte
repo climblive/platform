@@ -71,7 +71,7 @@
   let orderProblemsBy = $state<"number" | "points">("number");
 
   let sortedProblems = $derived.by(() => {
-    switch ($session.orderProblemsBy) {
+    switch (orderProblemsBy) {
       case "number":
         return problems?.toSorted(
           (p1: Problem, p2: Problem) => p1.number - p2.number,
@@ -180,7 +180,7 @@
             <sl-radio-group
               size="small"
               bind:this={radioGroup}
-              value="points"
+              value={orderProblemsBy}
               onsl-change={() => {
                 if (radioGroup) {
                   orderProblemsBy = radioGroup.value as typeof orderProblemsBy;
