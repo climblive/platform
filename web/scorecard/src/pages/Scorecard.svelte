@@ -21,7 +21,6 @@
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
   import type {
-    SlChangeEvent,
     SlRadioGroup,
     SlTabGroup,
     SlTabShowEvent,
@@ -182,7 +181,7 @@
               bind:this={radioGroup}
               value={sortBy}
               size="small"
-              onsl-change={(event: SlChangeEvent) => {
+              onsl-change={() => {
                 if (radioGroup) {
                   sortBy = radioGroup.value as typeof sortBy;
                 }
