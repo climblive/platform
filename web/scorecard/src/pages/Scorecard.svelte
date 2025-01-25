@@ -212,24 +212,24 @@
                 disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
               />
             {/each}
-            <sl-tab-panel name="results">
-              {#if resultsConnected && contender.compClassId}
-                <ScoreboardProvider contestId={$session.contestId}>
-                  {#snippet children({ scoreboard, loading })}
-                    <ResultList
-                      compClassId={contender.compClassId}
-                      {scoreboard}
-                      {loading}
-                    />
-                  {/snippet}
-                </ScoreboardProvider>
-              {/if}
-            </sl-tab-panel>
-            <sl-tab-panel name="info">
-              <ContestInfo {contest} problems={sortedProblems} {compClasses} />
-            </sl-tab-panel>
-          </sl-tab-panel></sl-tab-group
-        >
+          </sl-tab-panel>
+          <sl-tab-panel name="results">
+            {#if resultsConnected && contender.compClassId}
+              <ScoreboardProvider contestId={$session.contestId}>
+                {#snippet children({ scoreboard, loading })}
+                  <ResultList
+                    compClassId={contender.compClassId}
+                    {scoreboard}
+                    {loading}
+                  />
+                {/snippet}
+              </ScoreboardProvider>
+            {/if}
+          </sl-tab-panel>
+          <sl-tab-panel name="info">
+            <ContestInfo {contest} problems={sortedProblems} {compClasses} />
+          </sl-tab-panel>
+        </sl-tab-group>
       </main>
     {/snippet}
   </ContestStateProvider>
