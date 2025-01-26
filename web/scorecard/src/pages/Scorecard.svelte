@@ -78,7 +78,11 @@
         );
       case "points":
         return problems?.toSorted(
-          (p1: Problem, p2: Problem) => p1.pointsTop - p2.pointsTop,
+          (p1: Problem, p2: Problem) =>
+            p1.pointsTop +
+            (p1.flashBonus ?? 0) -
+            p2.pointsTop -
+            (p2.flashBonus ?? 0),
         );
       default:
         return problems;
