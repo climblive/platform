@@ -1,3 +1,13 @@
+ALTER TABLE comp_class
+    DROP CONSTRAINT `fk_comp_class_1`;
+
+ALTER TABLE comp_class
+    ADD CONSTRAINT `fk_comp_class_1`
+    FOREIGN KEY (`contest_id` , `organizer_id`)
+    REFERENCES `contest` (`id` , `organizer_id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE;
+
 ALTER TABLE series
     DROP CONSTRAINT `fk_series_1`;
 
