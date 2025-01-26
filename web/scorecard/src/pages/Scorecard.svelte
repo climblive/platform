@@ -9,8 +9,11 @@
     ScoreboardProvider,
   } from "@climblive/lib/components";
   import {
+    ascentDeregisteredEventSchema,
+    ascentRegisteredEventSchema,
     contenderScoreUpdatedEventSchema,
     type Problem,
+    type Tick,
   } from "@climblive/lib/models";
   import {
     getCompClassesQuery,
@@ -18,6 +21,8 @@
     getContestQuery,
     getProblemsQuery,
     getTicksQuery,
+    removeTickFromQueryCache,
+    updateTickInQueryCache,
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
   import type {
@@ -28,12 +33,15 @@
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
+  import { useQueryClient } from "@tanstack/svelte-query";
   import { add } from "date-fns/add";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
   import Loading from "./Loading.svelte";
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
+
+  const queryClient = useQueryClient();
 
   const contenderQuery = getContenderQuery($session.contenderId);
   const contestQuery = getContestQuery($session.contestId);
@@ -129,6 +137,28 @@
         score = event.score;
         placement = event.placement;
       }
+    });
+
+    eventSource.addEventListener("ASCENT_REGISTERED", (e) => {
+      const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
+
+      const newTick: Tick = {
+        id: event.tickId,
+        timestamp: event.timestamp,
+        problemId: event.problemId,
+        top: event.top,
+        attemptsTop: event.attemptsTop,
+        zone: event.zone,
+        attemptsZone: event.attemptsZone,
+      };
+
+      updateTickInQueryCache(queryClient, $session.contenderId, newTick);
+    });
+
+    eventSource.addEventListener("ASCENT_DEREGISTERED", (e) => {
+      const event = ascentDeregisteredEventSchema.parse(JSON.parse(e.data));
+
+      removeTickFromQueryCache(queryClient, event.tickId);
     });
   };
 
