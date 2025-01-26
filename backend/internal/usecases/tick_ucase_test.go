@@ -305,7 +305,7 @@ func TestCreateTick(t *testing.T) {
 			}, nil)
 
 		mockedRepo.
-			On("StoreTick", mock.Anything, mock.Anything, mock.MatchedBy(func(tick domain.Tick) bool {
+			On("StoreTick", mock.Anything, nil, mock.MatchedBy(func(tick domain.Tick) bool {
 				tick.Timestamp = time.Time{}
 
 				expected := domain.Tick{
