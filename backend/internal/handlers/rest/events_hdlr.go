@@ -73,6 +73,8 @@ func (hdlr *eventHandler) HandleSubscribeContenderEvents(w http.ResponseWriter, 
 		contenderID,
 		"CONTENDER_PUBLIC_INFO_UPDATED",
 		"CONTENDER_SCORE_UPDATED",
+		"ASCENT_REGISTERED",
+		"ASCENT_DEREGISTERED",
 	)
 
 	hdlr.subscribe(w, r, filter, logger)

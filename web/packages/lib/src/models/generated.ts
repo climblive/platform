@@ -163,6 +163,8 @@ export interface ContenderRequalifiedEvent {
   contenderId: ContenderID;
 }
 export interface AscentRegisteredEvent {
+  tickId: TickID;
+  timestamp: Date;
   contenderId: ContenderID;
   problemId: ProblemID;
   top: boolean;
@@ -171,6 +173,7 @@ export interface AscentRegisteredEvent {
   attemptsZone: number /* int */;
 }
 export interface AscentDeregisteredEvent {
+  tickId: TickID;
   contenderId: ContenderID;
   problemId: ProblemID;
 }
@@ -206,10 +209,8 @@ export interface ContenderScoreUpdatedEvent {
   rankOrder: number /* int */;
 }
 export interface ScoreEngineStartedEvent {
-  contestId: ContestID;
   instanceId: ScoreEngineInstanceID;
 }
 export interface ScoreEngineStoppedEvent {
-  contestId: ContestID;
   instanceId: ScoreEngineInstanceID;
 }
