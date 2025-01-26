@@ -21,7 +21,7 @@
   data-flashed={tick?.attemptsTop === 1}
   aria-label={`Problem ${problem.number}`}
 >
-  <span class="number">{problem.number}.</span>
+  <span class="number">#{problem.number}</span>
   <HoldColorIndicator
     primary={problem.holdColorPrimary}
     secondary={problem.holdColorSecondary}
