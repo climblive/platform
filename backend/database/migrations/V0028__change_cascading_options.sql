@@ -2,11 +2,11 @@ ALTER TABLE series
     DROP CONSTRAINT `fk_series_1`;
 
 ALTER TABLE series
-    ADD CONSTRAINT `fk_series_1` FOREIGN KEY `fk_series_1`
+    ADD CONSTRAINT `fk_series_1`
     FOREIGN KEY (`organizer_id`)
     REFERENCES `organizer` (`id`)
     ON DELETE RESTRICT
-    ON UPDATE CASCADE);
+    ON UPDATE CASCADE;
 
 ALTER TABLE contest
     DROP CONSTRAINT `fk_contest_2`;
@@ -16,7 +16,6 @@ ALTER TABLE contest
 
 ALTER TABLE contest
     ADD CONSTRAINT `fk_contest_2`
-    CONSTRAINT `fk_contest_2`
     FOREIGN KEY (`organizer_id`)
     REFERENCES `organizer` (`id`)
     ON DELETE RESTRICT
