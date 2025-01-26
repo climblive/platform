@@ -102,7 +102,9 @@
     </sl-button>
   </form>
 
-  <sl-divider style="--color: var(--sl-color-primary-600);"></sl-divider>
+  {#if restoredSessions.length > 0}
+    <sl-divider style="--color: var(--sl-color-primary-600);"></sl-divider>
+  {/if}
 
   {#each restoredSessions as restoredSession (restoredSession.registrationCode)}
     <section
