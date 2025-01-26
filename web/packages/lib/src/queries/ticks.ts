@@ -52,8 +52,7 @@ export const updateTickInQueryCache = (
   const queryKey: QueryKey = ["ticks", { contenderId }];
 
   queryClient.setQueryData<Tick[]>(queryKey, (oldTicks) => {
-    const predicate = ({ id }: Tick) =>
-      id === updatedTick.id;
+    const predicate = ({ id }: Tick) => id === updatedTick.id;
 
     const found = (oldTicks ?? []).findIndex(predicate) !== -1;
 
