@@ -8,19 +8,32 @@
     ResultList,
     ScoreboardProvider,
   } from "@climblive/lib/components";
-  import { contenderScoreUpdatedEventSchema } from "@climblive/lib/models";
+  import {
+    ascentDeregisteredEventSchema,
+    ascentRegisteredEventSchema,
+    contenderScoreUpdatedEventSchema,
+    type Problem,
+    type Tick,
+  } from "@climblive/lib/models";
   import {
     getCompClassesQuery,
     getContenderQuery,
     getContestQuery,
     getProblemsQuery,
     getTicksQuery,
+    removeTickFromQueryCache,
+    updateTickInQueryCache,
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
-  import type { SlTabGroup, SlTabShowEvent } from "@shoelace-style/shoelace";
+  import type {
+    SlRadioGroup,
+    SlTabGroup,
+    SlTabShowEvent,
+  } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
+  import { useQueryClient } from "@tanstack/svelte-query";
   import { add } from "date-fns/add";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";

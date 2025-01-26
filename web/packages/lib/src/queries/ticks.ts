@@ -26,7 +26,7 @@ export const createTickMutation = (contenderId: number) => {
     mutationFn: (tick: Omit<Tick, "id" | "timestamp">) =>
       ApiClient.getInstance().createTick(contenderId, tick),
     onSuccess: (newTick) => {
-      updateTickInCache(client, contenderId, newTick);
+      updateTickInQueryCache(client, contenderId, newTick);
     },
   });
 };
@@ -39,12 +39,12 @@ export const deleteTickMutation = () => {
     onSuccess: (...args) => {
       const [, tickId] = args;
 
-      removeTickFromCache(client, tickId);
+      removeTickFromQueryCache(client, tickId);
     },
   });
 };
 
-export const updateTickInCache = (
+export const updateTickInQueryCache = (
   queryClient: QueryClient,
   contenderId: number,
   updatedTick: Tick,
@@ -67,7 +67,7 @@ export const updateTickInCache = (
   });
 };
 
-export const removeTickFromCache = (
+export const removeTickFromQueryCache = (
   queryClient: QueryClient,
   tickId: number,
 ) => {
