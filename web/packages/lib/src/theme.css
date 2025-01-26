@@ -6,24 +6,24 @@
       Input: #bc5656
       Hue shift: -10
     */
-  --sl-color-primary-50: #fcfbf3;
-  --sl-color-primary-100: #f9f7eb;
-  --sl-color-primary-200: #f3ead8;
-  --sl-color-primary-300: #e9d1b9;
-  --sl-color-primary-400: #dca88e;
-  --sl-color-primary-500: #cc7966;
-  --sl-color-primary-600: #bc5757;
-  --sl-color-primary-700: #993847;
-  --sl-color-primary-800: #81314c;
-  --sl-color-primary-900: #6d2c4d;
-  --sl-color-primary-950: #3c152c;
+  --sl-color-primary-50: #fcf5f4;
+  --sl-color-primary-100: #f9ecea;
+  --sl-color-primary-200: #f3dbd8;
+  --sl-color-primary-300: #e9bdb8;
+  --sl-color-primary-400: #dd948f;
+  --sl-color-primary-500: #cc6c67;
+  --sl-color-primary-600: #bc5656;
+  --sl-color-primary-700: #98383a;
+  --sl-color-primary-800: #803136;
+  --sl-color-primary-900: #6e2d33;
+  --sl-color-primary-950: #3c1517;
 
   --sl-input-focus-ring-color: var(--sl-color-primary-400);
 }
 
 body {
   font-family: "Noto Sans", sans-serif;
-  background-color: var(--sl-color-primary-200);
+  background-color: var(--sl-color-neutral-50);
 
   font-weight: var(--sl-font-weight-normal);
 }

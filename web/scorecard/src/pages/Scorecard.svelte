@@ -221,15 +221,6 @@
                 }
               }}
             >
-              <sl-radio-button value="number">
-                <sl-icon
-                  slot="prefix"
-                  name="sort-numeric-down"
-                  label="Sort by number"
-                ></sl-icon>
-                Sort by number
-              </sl-radio-button>
-
               <sl-radio-button value="points">
                 <sl-icon
                   slot="prefix"
@@ -237,6 +228,15 @@
                   label="Sort by points"
                 ></sl-icon>
                 Sort by points
+              </sl-radio-button>
+
+              <sl-radio-button value="number">
+                <sl-icon
+                  slot="prefix"
+                  name="sort-numeric-down"
+                  label="Sort by number"
+                ></sl-icon>
+                Sort by number
               </sl-radio-button>
             </sl-radio-group>
             {#each sortedProblems as problem}
@@ -287,7 +287,7 @@
     left: 0;
     right: 0;
     z-index: 10;
-    background-color: var(--sl-color-primary-200);
+    background-color: var(--sl-color-neutral-50);
     padding: var(--sl-spacing-small);
   }
 
