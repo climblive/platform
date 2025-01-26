@@ -94,6 +94,12 @@
       popup.anchor = container;
     }
   });
+
+  $effect(() => {
+    if (tick !== undefined) {
+      open = false;
+    }
+  });
 </script>
 
 <svelte:body on:click|capture={handleClickOutside} />
