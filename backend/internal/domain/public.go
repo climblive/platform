@@ -1,6 +1,8 @@
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 type ColorRGB string
 
@@ -165,6 +167,8 @@ type ContenderRequalifiedEvent struct {
 }
 
 type AscentRegisteredEvent struct {
+	TickID       TickID      `json:"tickId"`
+	Timestamp    time.Time   `json:"timestamp"`
 	ContenderID  ContenderID `json:"contenderId"`
 	ProblemID    ProblemID   `json:"problemId"`
 	Top          bool        `json:"top"`
@@ -174,6 +178,7 @@ type AscentRegisteredEvent struct {
 }
 
 type AscentDeregisteredEvent struct {
+	TickID      TickID      `json:"tickId"`
 	ContenderID ContenderID `json:"contenderId"`
 	ProblemID   ProblemID   `json:"problemId"`
 }

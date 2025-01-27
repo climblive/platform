@@ -91,6 +91,7 @@ func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.TickID) err
 	}
 
 	uc.EventBroker.Dispatch(contest.ID, domain.AscentDeregisteredEvent{
+		TickID:      tickID,
 		ContenderID: contender.ID,
 		ProblemID:   tick.ProblemID,
 	})
@@ -153,6 +154,8 @@ func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.Conten
 	}
 
 	uc.EventBroker.Dispatch(contest.ID, domain.AscentRegisteredEvent{
+		TickID:       tick.ID,
+		Timestamp:    tick.Timestamp,
 		ContenderID:  contender.ID,
 		ProblemID:    problem.ID,
 		Top:          tick.Top,

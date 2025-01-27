@@ -1,5 +1,4 @@
-import type { Problem } from "../models/problem";
-import type { Tick } from "../models/tick";
+import type { Problem, Tick } from "../models";
 
 export const calculateProblemScore = (
   problem: Problem,

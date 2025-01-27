@@ -142,10 +142,15 @@
   .container {
     flex-grow: 1;
     display: grid;
-    grid-template-columns: repeat(var(--num-columns), 1fr);
+    grid-template-columns: repeat(
+      var(--num-columns),
+      minmax(max-content, 32rem)
+    );
     grid-template-rows: 1fr;
     padding-top: 0;
     gap: var(--sl-spacing-small);
+
+    justify-content: center;
   }
 
   .class {
