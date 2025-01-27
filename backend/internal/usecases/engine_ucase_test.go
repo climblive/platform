@@ -208,6 +208,6 @@ func (m *scoreEngineManagerMock) StopScoreEngine(ctx context.Context, instanceID
 }
 
 func (m *scoreEngineManagerMock) StartScoreEngine(ctx context.Context, contestID domain.ContestID, terminatedBy time.Time) (domain.ScoreEngineInstanceID, error) {
-	args := m.Called(ctx, contestID)
+	args := m.Called(ctx, contestID, terminatedBy)
 	return args.Get(0).(domain.ScoreEngineInstanceID), args.Error(1)
 }
