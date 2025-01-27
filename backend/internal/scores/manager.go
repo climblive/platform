@@ -237,8 +237,6 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) {
 	for contest := range slices.Values(contests) {
 		if contest.TimeEnd == nil {
 			continue
-		
-
 		}
 
 		if handler, ok := mngr.handlers[contest.ID]; ok {
