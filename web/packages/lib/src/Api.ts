@@ -1,6 +1,5 @@
 import type { AxiosInstance, RawAxiosRequestHeaders } from "axios";
 import axios from "axios";
-import { add } from "date-fns";
 import { z } from "zod";
 import {
   contestSchema,
@@ -13,6 +12,7 @@ import {
 import { compClassSchema } from "./models/compClass";
 import { contenderSchema } from "./models/contender";
 import { problemSchema } from "./models/problem";
+import type { StartScoreEngineArguments } from "./models/rest";
 import { tickSchema } from "./models/tick";
 import { getApiUrl } from "./utils/config";
 
@@ -94,7 +94,7 @@ export class ApiClient {
     return contenderSchema.parse(result.data);
   };
 
-  updateContender = async (id: number, patch: ContenderPatch) => {
+  patchContender = async (id: number, patch: ContenderPatch) => {
     const endpoint = `/contenders/${id}`;
 
     const result = await this.axiosInstance.patch(endpoint, patch, {
@@ -177,12 +177,10 @@ export class ApiClient {
     return z.array(z.string().uuid()).parse(result.data);
   };
 
-  startScoreEngine = async (contestId: ContestID) => {
+  startScoreEngine = async (contestId: ContestID, args: StartScoreEngineArguments) => {
     const endpoint = `/contests/${contestId}/score-engines`;
 
-    const result = await this.axiosInstance.post(endpoint, {
-      terminatedBy: add(new Date(), { seconds: 5 })
-    }, {
+    const result = await this.axiosInstance.post(endpoint, args, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 

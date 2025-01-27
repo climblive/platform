@@ -35,7 +35,7 @@
     </div>
   {/each}
   <sl-button
-    onclick={() => $startScoreEngine.mutate()}
+    onclick={() => $startScoreEngine.mutate({ terminatedBy: new Date() })}
     loading={$startScoreEngine.isPending}
     disabled={scoreEngines.length > 0}>Start engine</sl-button
   >

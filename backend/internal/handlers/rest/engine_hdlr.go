@@ -65,10 +65,6 @@ func (hdlr *scoreEngineHandler) StopScoreEngine(w http.ResponseWriter, r *http.R
 	writeResponse(w, http.StatusNoContent, nil)
 }
 
-type startScoreEngineArguments struct {
-	TerminatedBy time.Time `json:"terminatedBy"`
-}
-
 func (hdlr *scoreEngineHandler) StartScoreEngine(w http.ResponseWriter, r *http.Request) {
 	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
 	if err != nil {
@@ -77,7 +73,7 @@ func (hdlr *scoreEngineHandler) StartScoreEngine(w http.ResponseWriter, r *http.
 		return
 	}
 
-	var arguments startScoreEngineArguments
+	var arguments StartScoreEngineArguments
 	err = json.NewDecoder(r.Body).Decode(&arguments)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)

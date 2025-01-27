@@ -3,12 +3,12 @@
   import {
     contenderPublicInfoUpdatedEventSchema,
     contenderScoreUpdatedEventSchema,
+    type Score,
     type ScoreboardEntry,
   } from "@climblive/lib/models";
   import { onDestroy, onMount, type Snippet } from "svelte";
   import { writable, type Writable } from "svelte/store";
   import * as z from "zod";
-  import type { Score } from "../models/score";
   import { getApiUrl } from "../utils";
 
   interface Props {
@@ -198,6 +198,7 @@
   const createEmptyEntry = (contenderId: number): ScoreboardEntry => ({
     contenderId: contenderId,
     compClassId: 0,
+    publicName: "",
     withdrawnFromFinals: false,
     disqualified: false,
   });
