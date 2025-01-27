@@ -89,7 +89,7 @@ func (uc *ScoreEngineUseCase) StartScoreEngine(ctx context.Context, contestID do
 	}
 
 	if terminatedBy.After(contest.TimeEnd.Add(contest.GracePeriod).Add(time.Hour)) {
-		return uuid.Nil, domain.ErrNotAllowed
+		return uuid.Nil, errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 
 	instanceID, err := uc.ScoreEngineManager.StartScoreEngine(ctx, contestID, terminatedBy)
