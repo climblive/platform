@@ -85,7 +85,7 @@ func (uc *ScoreEngineUseCase) StartScoreEngine(ctx context.Context, contestID do
 	}
 
 	if contest.TimeEnd == nil {
-		return uuid.Nil, domain.ErrNotAllowed
+		return uuid.Nil, errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 
 	if terminatedBy.After(contest.TimeEnd.Add(contest.GracePeriod).Add(time.Hour)) {
