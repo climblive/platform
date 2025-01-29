@@ -134,6 +134,7 @@ type Tick struct {
 	AttemptsTop  int           `json:"attemptsTop"`
 	Zone         bool          `json:"zone"`
 	AttemptsZone int           `json:"attemptsZone"`
+	Points       int           `json:"points"`
 }
 
 type User struct {
@@ -225,6 +226,12 @@ type ContenderScoreUpdatedEvent struct {
 	Placement     int         `json:"placement"`
 	Finalist      bool        `json:"finalist"`
 	RankOrder     int         `json:"rankOrder"`
+}
+
+type TickPointsUpdatedEvent struct {
+	ContenderID ContenderID `json:"contenderId"`
+	TickID      TickID      `json:"tickId"`
+	Points      int         `json:"points"`
 }
 
 type ScoreEngineStartedEvent struct {

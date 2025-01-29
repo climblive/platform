@@ -14,17 +14,8 @@ export type RaffleWinnerID = ResourceID;
 export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
-export type ResourceIDType =
-  | CompClassID
-  | ContenderID
-  | ContestID
-  | OrganizerID
-  | ProblemID
-  | RaffleID
-  | RaffleWinnerID
-  | SeriesID
-  | UserID
-  | TickID;
+export type ResourceIDType = 
+    CompClassID | ContenderID | ContestID | OrganizerID | ProblemID | RaffleID | RaffleWinnerID | SeriesID | UserID | TickID;
 export type ScoreEngineInstanceID = string;
 
 //////////
@@ -109,6 +100,10 @@ export interface Score {
   timestamp: Date;
   contenderId: ContenderID;
   score: number /* int */;
+  tops: number /* int */;
+  attemptsTops: number /* int */;
+  zones: number /* int */;
+  attemptsZones: number /* int */;
   placement: number /* int */;
   finalist: boolean;
   rankOrder: number /* int */;
@@ -134,6 +129,7 @@ export interface Tick {
   attemptsTop: number /* int */;
   zone: boolean;
   attemptsZone: number /* int */;
+  points: number /* int */;
 }
 export interface User {
   id?: UserID;
@@ -204,9 +200,17 @@ export interface ContenderScoreUpdatedEvent {
   timestamp: Date;
   contenderId: ContenderID;
   score: number /* int */;
+  tops: number /* int */;
+  attemptsTops: number /* int */;
+  zones: number /* int */;
+  attemptsZones: number /* int */;
   placement: number /* int */;
   finalist: boolean;
   rankOrder: number /* int */;
+}
+export interface TickPointsUpdatedEvent {
+  tickId: TickID;
+  points: number /* int */;
 }
 export interface ScoreEngineStartedEvent {
   instanceId: ScoreEngineInstanceID;

@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Score } from "@climblive/lib/components";
   import type { Problem, Tick } from "@climblive/lib/models";
-  import { calculateProblemScore } from "@climblive/lib/utils";
   import HoldColorIndicator from "./HoldColorIndicator.svelte";
   import TickBox from "./TickBox.svelte";
 
@@ -13,7 +12,7 @@
 
   let { problem, tick, disabled }: Props = $props();
 
-  let pointValue = $derived(calculateProblemScore(problem, tick));
+  let pointValue = $derived(tick?.points);
 </script>
 
 <section
@@ -38,7 +37,9 @@
     {/if}
   </span>
   <div class="score">
-    <Score value={pointValue} hideZero prefix="+" />
+    {#if pointValue}
+      <Score value={pointValue} hideZero prefix="+" />
+    {/if}
   </div>
 
   <TickBox {problem} {tick} {disabled} />
