@@ -99,7 +99,7 @@
   <form
     bind:this={form}
     onsubmit={handleSubmit}
-    onsl-input={resetCustomValidation}
+    oninput={resetCustomValidation}
   >
     <sl-input
       bind:this={controls.name}

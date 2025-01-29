@@ -248,11 +248,11 @@
             {/each}
           </sl-tab-panel>
           <sl-tab-panel name="results">
-            {#if resultsConnected && contender.compClassId}
+            {#if resultsConnected}
               <ScoreboardProvider contestId={$session.contestId}>
                 {#snippet children({ scoreboard, loading })}
                   <ResultList
-                    compClassId={contender.compClassId}
+                    compClassId={selectedCompClass.id}
                     {scoreboard}
                     {loading}
                   />

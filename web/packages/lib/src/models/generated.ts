@@ -23,7 +23,7 @@ export type ScoreEngineInstanceID = string;
 
 export type ColorRGB = string;
 export interface CompClass {
-  id?: CompClassID;
+  id: CompClassID;
   contestId: ContestID;
   name: string;
   description?: string;
@@ -32,7 +32,7 @@ export interface CompClass {
   timeEnd: Date;
 }
 export interface Contender {
-  id?: ContenderID;
+  id: ContenderID;
   contestId: ContestID;
   compClassId?: CompClassID;
   registrationCode: string;
@@ -53,7 +53,7 @@ export interface ContenderPatch {
   disqualified?: boolean;
 }
 export interface Contest {
-  id?: ContestID;
+  id: ContestID;
   location?: string;
   seriesId?: SeriesID;
   protected: boolean;
@@ -68,12 +68,12 @@ export interface Contest {
   timeEnd?: Date;
 }
 export interface Organizer {
-  id?: OrganizerID;
+  id: OrganizerID;
   name: string;
   homepage?: string;
 }
 export interface Problem {
-  id?: ProblemID;
+  id: ProblemID;
   contestId: ContestID;
   number: number /* int */;
   holdColorPrimary: string;
@@ -85,12 +85,12 @@ export interface Problem {
   flashBonus?: number /* int */;
 }
 export interface Raffle {
-  id?: RaffleID;
+  id: RaffleID;
   contestId: ContestID;
   active: boolean;
 }
 export interface RaffleWinner {
-  id?: RaffleWinnerID;
+  id: RaffleWinnerID;
   raffleId: RaffleID;
   contenderId: ContenderID;
   readonly contenderName: string;
@@ -105,7 +105,7 @@ export interface Score {
   rankOrder: number /* int */;
 }
 export interface Series {
-  id?: SeriesID;
+  id: SeriesID;
   name: string;
 }
 export interface ScoreboardEntry {
@@ -118,7 +118,7 @@ export interface ScoreboardEntry {
   score?: Score;
 }
 export interface Tick {
-  id?: TickID;
+  id: TickID;
   timestamp: Date;
   problemId: ProblemID;
   top: boolean;
@@ -127,7 +127,7 @@ export interface Tick {
   attemptsZone: number /* int */;
 }
 export interface User {
-  id?: UserID;
+  id: UserID;
   name: string;
   username: string;
   admin: boolean;
