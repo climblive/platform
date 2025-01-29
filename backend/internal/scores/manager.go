@@ -270,7 +270,7 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 
 	instanceID := uuid.New()
 	store := NewMemoryStore()
-	rules := &HardestProblems{Number: contest.QualifyingProblems}
+	rules := &PooledPoints{}
 	ranker := NewBasicRanker(contest.Finalists)
 	driver := NewScoreEngineDriver(contest.ID, instanceID, mngr.eventBroker)
 	engine := NewDefaultScoreEngine(ranker, rules, store)

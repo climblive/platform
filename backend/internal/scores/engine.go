@@ -9,6 +9,7 @@ import (
 
 type ScoringRules interface {
 	CalculateScore(points iter.Seq[int]) int
+	CalculatePoints(tick Tick, problem Problem, poolTicks iter.Seq[Tick]) int
 }
 
 type Ranker interface {
@@ -24,6 +25,7 @@ type EngineStore interface {
 	GetCompClassIDs() []domain.CompClassID
 
 	GetTicks(domain.ContenderID) iter.Seq[Tick]
+	GetTicksByProblem(domain.ProblemID) iter.Seq[Tick]
 	SaveTick(domain.ContenderID, Tick)
 	DeleteTick(domain.ContenderID, domain.ProblemID)
 
@@ -76,7 +78,7 @@ func (e *DefaultScoreEngine) Start() {
 					continue
 				}
 
-				tick.Score(problem)
+				tick.Points = e.rules.CalculatePoints(tick, problem, e.store.GetTicksByProblem(problem.ID))
 				e.store.SaveTick(contender.ID, tick)
 
 				yield(tick)

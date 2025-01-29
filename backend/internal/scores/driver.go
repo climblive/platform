@@ -260,6 +260,8 @@ func (d *ScoreEngineDriver) handleEvent(event domain.EventEnvelope) {
 	case domain.ProblemAddedEvent:
 		d.engine.HandleProblemAdded(ev)
 	}
+
+	d.engine.Start()
 }
 
 func (d *ScoreEngineDriver) publishUpdatedScores() int {

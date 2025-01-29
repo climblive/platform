@@ -84,6 +84,19 @@ func TestScoreTick(t *testing.T) {
 }
 
 func TestCompareContender(t *testing.T) {
+	t.Run("ByTops", func(t *testing.T) {
+		c1 := scores.Contender{
+			Tops: 5,
+		}
+
+		c2 := scores.Contender{
+			Tops: 4,
+		}
+
+		assert.Less(t, c1.Compare(c2), 0)
+		assert.Greater(t, c2.Compare(c1), 0)
+	})
+
 	t.Run("ByScore", func(t *testing.T) {
 		c1 := scores.Contender{
 			Score: 200,

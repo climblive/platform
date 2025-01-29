@@ -96,12 +96,16 @@ type RaffleWinner struct {
 }
 
 type Score struct {
-	Timestamp   time.Time   `json:"timestamp"`
-	ContenderID ContenderID `json:"contenderId"`
-	Score       int         `json:"score"`
-	Placement   int         `json:"placement"`
-	Finalist    bool        `json:"finalist"`
-	RankOrder   int         `json:"rankOrder"`
+	Timestamp     time.Time   `json:"timestamp"`
+	ContenderID   ContenderID `json:"contenderId"`
+	Score         int         `json:"score"`
+	Tops          int         `json:"tops"`
+	AttemptsTops  int         `json:"attemptsTops"`
+	Zones         int         `json:"zones"`
+	AttemptsZones int         `json:"attemptsZones"`
+	Placement     int         `json:"placement"`
+	Finalist      bool        `json:"finalist"`
+	RankOrder     int         `json:"rankOrder"`
 }
 
 type Series struct {
@@ -211,12 +215,16 @@ type ContenderPublicInfoUpdatedEvent struct {
 }
 
 type ContenderScoreUpdatedEvent struct {
-	Timestamp   time.Time   `json:"timestamp"`
-	ContenderID ContenderID `json:"contenderId"`
-	Score       int         `json:"score"`
-	Placement   int         `json:"placement"`
-	Finalist    bool        `json:"finalist"`
-	RankOrder   int         `json:"rankOrder"`
+	Timestamp     time.Time   `json:"timestamp"`
+	ContenderID   ContenderID `json:"contenderId"`
+	Score         int         `json:"score"`
+	Tops          int         `json:"tops"`
+	AttemptsTops  int         `json:"attemptsTops"`
+	Zones         int         `json:"zones"`
+	AttemptsZones int         `json:"attemptsZones"`
+	Placement     int         `json:"placement"`
+	Finalist      bool        `json:"finalist"`
+	RankOrder     int         `json:"rankOrder"`
 }
 
 type ScoreEngineStartedEvent struct {

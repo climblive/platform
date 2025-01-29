@@ -65,6 +65,22 @@ func (s *MemoryStore) GetTicks(contenderID domain.ContenderID) iter.Seq[Tick] {
 	return slices.Values(s.ticks[contenderID])
 }
 
+func (s *MemoryStore) GetTicksByProblem(problemID domain.ProblemID) iter.Seq[Tick] {
+	return func(yield func(Tick) bool) {
+		for _, contenderTicks := range s.ticks {
+			for _, tick := range contenderTicks {
+				if tick.ProblemID != problemID {
+					continue
+				}
+
+				if !yield(tick) {
+					return
+				}
+			}
+		}
+	}
+}
+
 func (s *MemoryStore) SaveTick(contenderID domain.ContenderID, tick Tick) {
 	cmp := func(t Tick) bool {
 		return t.ProblemID == tick.ProblemID

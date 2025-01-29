@@ -840,6 +840,11 @@ func (m *scoringRulesMock) CalculateScore(points iter.Seq[int]) int {
 	return args.Get(0).(int)
 }
 
+func (m *scoringRulesMock) CalculatePoints(tick scores.Tick, problem scores.Problem, poolTicks iter.Seq[scores.Tick]) int {
+	args := m.Called(tick, problem, poolTicks)
+	return args.Get(0).(int)
+}
+
 type engineStoreMock struct {
 	mock.Mock
 }
@@ -873,6 +878,11 @@ func (m *engineStoreMock) GetTicks(contenderID domain.ContenderID) iter.Seq[scor
 	return args.Get(0).(iter.Seq[scores.Tick])
 }
 
+func (m *engineStoreMock) GetTicksByProblem(problemID domain.ProblemID) iter.Seq[scores.Tick] {
+	args := m.Called(problemID)
+	return args.Get(0).(iter.Seq[scores.Tick])
+}
+
 func (m *engineStoreMock) SaveTick(contenderID domain.ContenderID, tick scores.Tick) {
 	m.Called(contenderID, tick)
 }
@@ -903,6 +913,10 @@ type jackpotRules struct{}
 
 func (m *jackpotRules) CalculateScore(points iter.Seq[int]) int {
 	return len(slices.Collect(points)) * 1_000_000
+}
+
+func (m *jackpotRules) CalculatePoints(tick scores.Tick, problem scores.Problem, poolTicks iter.Seq[scores.Tick]) int {
+	return 0
 }
 
 type fakeRanker struct{}

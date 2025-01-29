@@ -8,14 +8,39 @@ type Contender struct {
 	Disqualified        bool
 	WithdrawnFromFinals bool
 	Score               int
+	Tops                int
+	AttemptsTops        int
+	Zones               int
+	AttemptsZones       int
 }
 
 func (c Contender) Compare(other Contender) int {
-	if c.Score == other.Score {
-		return int(c.ID) - int(other.ID)
+	cmp := other.Score - c.Score
+	if cmp != 0 {
+		return cmp
 	}
 
-	return other.Score - c.Score
+	cmp = other.Tops - c.Tops
+	if cmp != 0 {
+		return cmp
+	}
+
+	cmp = other.AttemptsTops - c.AttemptsTops
+	if cmp != 0 {
+		return cmp
+	}
+
+	cmp = other.Zones - c.Zones
+	if cmp != 0 {
+		return cmp
+	}
+
+	cmp = other.AttemptsZones - c.AttemptsZones
+	if cmp != 0 {
+		return cmp
+	}
+
+	return int(other.ID) - int(c.ID)
 }
 
 type Tick struct {
@@ -25,6 +50,10 @@ type Tick struct {
 	Zone         bool
 	AttemptsZone int
 	Points       int
+}
+
+func (tick Tick) IsFlash() bool {
+	return tick.Top && tick.AttemptsTop == 1
 }
 
 func (t *Tick) Score(problem Problem) {
