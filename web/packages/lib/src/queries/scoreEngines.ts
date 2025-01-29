@@ -23,7 +23,8 @@ export const startScoreEngineMutation = (contestId: number) => {
   const client = useQueryClient();
 
   return createMutation({
-    mutationFn: (args: StartScoreEngineArguments) => ApiClient.getInstance().startScoreEngine(contestId, args),
+    mutationFn: (args: StartScoreEngineArguments) =>
+      ApiClient.getInstance().startScoreEngine(contestId, args),
     onSuccess: (newEngine) => {
       const queryKey: QueryKey = ["score-engines", { contestId }];
 

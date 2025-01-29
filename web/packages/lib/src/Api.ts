@@ -177,7 +177,10 @@ export class ApiClient {
     return z.array(z.string().uuid()).parse(result.data);
   };
 
-  startScoreEngine = async (contestId: ContestID, args: StartScoreEngineArguments) => {
+  startScoreEngine = async (
+    contestId: ContestID,
+    args: StartScoreEngineArguments,
+  ) => {
     const endpoint = `/contests/${contestId}/score-engines`;
 
     const result = await this.axiosInstance.post(endpoint, args, {
