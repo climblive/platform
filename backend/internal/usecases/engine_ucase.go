@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
@@ -13,7 +14,7 @@ type scoreEngineManager interface {
 	GetScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) (scores.ScoreEngineDescriptor, error)
 	ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]scores.ScoreEngineDescriptor, error)
 	StopScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) error
-	StartScoreEngine(ctx context.Context, contestID domain.ContestID) (domain.ScoreEngineInstanceID, error)
+	StartScoreEngine(ctx context.Context, contestID domain.ContestID, terminatedBy time.Time) (domain.ScoreEngineInstanceID, error)
 }
 
 type scoreEngineUseCaseRepository interface {
@@ -73,7 +74,7 @@ func (uc *ScoreEngineUseCase) StopScoreEngine(ctx context.Context, instanceID do
 	return nil
 }
 
-func (uc *ScoreEngineUseCase) StartScoreEngine(ctx context.Context, contestID domain.ContestID) (domain.ScoreEngineInstanceID, error) {
+func (uc *ScoreEngineUseCase) StartScoreEngine(ctx context.Context, contestID domain.ContestID, terminatedBy time.Time) (domain.ScoreEngineInstanceID, error) {
 	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
 	if err != nil {
 		return uuid.Nil, errors.Wrap(err, 0)
@@ -83,7 +84,15 @@ func (uc *ScoreEngineUseCase) StartScoreEngine(ctx context.Context, contestID do
 		return uuid.Nil, errors.Wrap(err, 0)
 	}
 
-	instanceID, err := uc.ScoreEngineManager.StartScoreEngine(ctx, contestID)
+	if contest.TimeEnd == nil {
+		return uuid.Nil, errors.Wrap(domain.ErrNotAllowed, 0)
+	}
+
+	if terminatedBy.After(contest.TimeEnd.Add(contest.GracePeriod).Add(time.Hour)) {
+		return uuid.Nil, errors.Wrap(domain.ErrNotAllowed, 0)
+	}
+
+	instanceID, err := uc.ScoreEngineManager.StartScoreEngine(ctx, contestID, terminatedBy)
 	if err != nil {
 		return uuid.Nil, errors.Wrap(err, 0)
 	}

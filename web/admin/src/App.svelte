@@ -79,7 +79,7 @@
     {/if}
     <Router basepath="/admin">
       <Route path="/contests/:contestId">
-        {#snippet children({ params })}
+        {#snippet children({ params }: { params: { contestId: number } })}
           <Contest contestId={Number(params.contestId)} />
         {/snippet}
       </Route>
