@@ -26,7 +26,7 @@
     navigate(`/${contender?.registrationCode}`);
   };
 
-  const handleSubmit = ({ detail: form }: CustomEvent<ContenderPatch>) => {
+  const handleSubmit = (form: ContenderPatch) => {
     if (!contender || $patchContender.isPending) {
       return;
     }
@@ -48,7 +48,7 @@
   <Loading />
 {:else}
   <RegistrationForm
-    on:submit={handleSubmit}
+    submit={handleSubmit}
     data={{
       name: contender.name,
       clubName: contender.clubName,
