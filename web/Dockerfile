@@ -1,4 +1,5 @@
 FROM node:20 AS base
+RUN corepack --version
 RUN corepack enable
 COPY . /app
 WORKDIR /app
