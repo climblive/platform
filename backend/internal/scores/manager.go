@@ -58,7 +58,7 @@ type getScoreEngineArguments struct {
 }
 
 type startScoreEngineArguments struct {
-	contestID    domain.ContestID
+	contestID domain.ContestID
 }
 
 const pollInterval = 10 * time.Second
@@ -132,10 +132,9 @@ func (mngr *ScoreEngineManager) StopScoreEngine(
 func (mngr *ScoreEngineManager) StartScoreEngine(
 	ctx context.Context,
 	contestID domain.ContestID,
-	terminatedBy time.Time,
 ) (domain.ScoreEngineInstanceID, error) {
 	request := Request[startScoreEngineArguments, domain.ScoreEngineInstanceID]{Args: startScoreEngineArguments{
-		contestID:    contestID,
+		contestID: contestID,
 	}}
 	return request.Do(ctx, mngr.requests)
 }
@@ -257,7 +256,7 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) {
 			continue
 		}
 
-		_, _ = mngr.startScoreEngine(ctx, contest.ID, (*contest.TimeEnd).Add(contest.GracePeriod).Add(time.Hour))
+		_, _ = mngr.startScoreEngine(ctx, contest.ID)
 	}
 }
 
