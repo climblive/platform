@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { ScoreboardEntry } from "@climblive/lib/models";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import type { ScoreboardEntry } from "../models";
   import { ordinalSuperscript } from "../utils";
   import Score from "./Score.svelte";
 

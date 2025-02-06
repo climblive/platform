@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { ApiClient } from "@climblive/lib";
+  import { onDestroy, onMount, type Snippet } from "svelte";
+  import { writable, type Writable } from "svelte/store";
+  import * as z from "zod";
+  import { ApiClient } from "../Api";
   import {
     contenderPublicInfoUpdatedEventSchema,
     contenderScoreUpdatedEventSchema,
     type Score,
     type ScoreboardEntry,
-  } from "@climblive/lib/models";
-  import { onDestroy, onMount, type Snippet } from "svelte";
-  import { writable, type Writable } from "svelte/store";
-  import * as z from "zod";
+  } from "../models";
   import { getApiUrl } from "../utils";
 
   interface Props {
