@@ -124,10 +124,6 @@ func (hdlr *contenderHandler) DeleteContender(w http.ResponseWriter, r *http.Req
 	writeResponse(w, http.StatusNoContent, nil)
 }
 
-type createContendersTemplate struct {
-	Number int `json:"number"`
-}
-
 func (hdlr *contenderHandler) CreateContenders(w http.ResponseWriter, r *http.Request) {
 	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
 	if err != nil {
@@ -135,14 +131,14 @@ func (hdlr *contenderHandler) CreateContenders(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	var tmpl createContendersTemplate
-	err = json.NewDecoder(r.Body).Decode(&tmpl)
+	var arguments CreateContendersArguments
+	err = json.NewDecoder(r.Body).Decode(&arguments)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	contenders, err := hdlr.contenderUseCase.CreateContenders(r.Context(), contestID, tmpl.Number)
+	contenders, err := hdlr.contenderUseCase.CreateContenders(r.Context(), contestID, arguments.Number)
 	if err != nil {
 		handleError(w, err)
 		return

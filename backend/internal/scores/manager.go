@@ -20,8 +20,7 @@ type ScoreEngineDescriptor struct {
 	ContestID  domain.ContestID
 }
 
-type Request[T any, A any, R any] struct {
-	Method   T
+type Request[A any, R any] struct {
 	Args     A
 	Response chan<- Response[R]
 }
@@ -31,7 +30,7 @@ type Response[R any] struct {
 	Err   error
 }
 
-func (r Request[T, A, R]) Do(ctx context.Context, requests chan<- any) (R, error) {
+func (r Request[A, R]) Do(ctx context.Context, requests chan<- any) (R, error) {
 	response := make(chan Response[R], 1)
 	r.Response = response
 
@@ -46,10 +45,21 @@ func (r Request[T, A, R]) Do(ctx context.Context, requests chan<- any) (R, error
 	}
 }
 
-type listScoreEngines struct{}
-type stopScoreEngine struct{}
-type startScoreEngine struct{}
-type getScoreEngine struct{}
+type listScoreEnginesArguments struct {
+	contestID domain.ContestID
+}
+
+type stopScoreEngineArguments struct {
+	instanceID domain.ScoreEngineInstanceID
+}
+
+type getScoreEngineArguments struct {
+	instanceID domain.ScoreEngineInstanceID
+}
+
+type startScoreEngineArguments struct {
+	contestID domain.ContestID
+}
 
 const pollInterval = 10 * time.Second
 
@@ -105,7 +115,7 @@ func (mngr *ScoreEngineManager) ListScoreEnginesByContest(
 	ctx context.Context,
 	contestID domain.ContestID,
 ) ([]ScoreEngineDescriptor, error) {
-	request := Request[listScoreEngines, domain.ContestID, []ScoreEngineDescriptor]{Args: contestID}
+	request := Request[listScoreEnginesArguments, []ScoreEngineDescriptor]{Args: listScoreEnginesArguments{contestID: contestID}}
 	return request.Do(ctx, mngr.requests)
 }
 
@@ -113,7 +123,7 @@ func (mngr *ScoreEngineManager) StopScoreEngine(
 	ctx context.Context,
 	instanceID domain.ScoreEngineInstanceID,
 ) error {
-	request := Request[stopScoreEngine, domain.ScoreEngineInstanceID, struct{}]{Args: instanceID}
+	request := Request[stopScoreEngineArguments, struct{}]{Args: stopScoreEngineArguments{instanceID: instanceID}}
 	_, err := request.Do(ctx, mngr.requests)
 
 	return err
@@ -123,12 +133,14 @@ func (mngr *ScoreEngineManager) StartScoreEngine(
 	ctx context.Context,
 	contestID domain.ContestID,
 ) (domain.ScoreEngineInstanceID, error) {
-	request := Request[startScoreEngine, domain.ContestID, domain.ScoreEngineInstanceID]{Args: contestID}
+	request := Request[startScoreEngineArguments, domain.ScoreEngineInstanceID]{Args: startScoreEngineArguments{
+		contestID: contestID,
+	}}
 	return request.Do(ctx, mngr.requests)
 }
 
 func (mngr *ScoreEngineManager) GetScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) (ScoreEngineDescriptor, error) {
-	request := Request[getScoreEngine, domain.ScoreEngineInstanceID, ScoreEngineDescriptor]{Args: instanceID}
+	request := Request[getScoreEngineArguments, ScoreEngineDescriptor]{Args: getScoreEngineArguments{instanceID: instanceID}}
 	return request.Do(ctx, mngr.requests)
 }
 
@@ -179,15 +191,15 @@ func (mngr *ScoreEngineManager) run(ctx context.Context, wg *sync.WaitGroup) {
 
 func (mngr *ScoreEngineManager) handleRequest(request any) {
 	switch req := request.(type) {
-	case Request[listScoreEngines, domain.ContestID, []ScoreEngineDescriptor]:
-		req.Response <- Response[[]ScoreEngineDescriptor]{Value: mngr.listScoreEnginesByContest(req.Args)}
+	case Request[listScoreEnginesArguments, []ScoreEngineDescriptor]:
+		req.Response <- Response[[]ScoreEngineDescriptor]{Value: mngr.listScoreEnginesByContest(req.Args.contestID)}
 
 		close(req.Response)
-	case Request[startScoreEngine, domain.ContestID, domain.ScoreEngineInstanceID]:
+	case Request[startScoreEngineArguments, domain.ScoreEngineInstanceID]:
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
-		instanceID, err := mngr.startScoreEngine(ctx, req.Args)
+		instanceID, err := mngr.startScoreEngine(ctx, req.Args.contestID)
 
 		req.Response <- Response[domain.ScoreEngineInstanceID]{
 			Value: instanceID,
@@ -195,12 +207,12 @@ func (mngr *ScoreEngineManager) handleRequest(request any) {
 		}
 
 		close(req.Response)
-	case Request[stopScoreEngine, domain.ScoreEngineInstanceID, struct{}]:
-		mngr.stopScoreEngine(req.Args)
+	case Request[stopScoreEngineArguments, struct{}]:
+		mngr.stopScoreEngine(req.Args.instanceID)
 
 		close(req.Response)
-	case Request[getScoreEngine, domain.ScoreEngineInstanceID, ScoreEngineDescriptor]:
-		descriptor, err := mngr.getScoreEngine(req.Args)
+	case Request[getScoreEngineArguments, ScoreEngineDescriptor]:
+		descriptor, err := mngr.getScoreEngine(req.Args.instanceID)
 		req.Response <- Response[ScoreEngineDescriptor]{
 			Value: descriptor,
 			Err:   err,
@@ -220,6 +232,10 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) {
 	}
 
 	for contest := range slices.Values(contests) {
+		if contest.TimeEnd == nil {
+			continue
+		}
+
 		if handler, ok := mngr.handlers[contest.ID]; ok {
 			logger := slog.New(slog.Default().Handler()).
 				With("contest_id", contest.ID).

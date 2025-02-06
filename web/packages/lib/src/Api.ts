@@ -93,7 +93,7 @@ export class ApiClient {
     return contenderSchema.parse(result.data);
   };
 
-  updateContender = async (id: number, patch: ContenderPatch) => {
+  patchContender = async (id: number, patch: ContenderPatch) => {
     const endpoint = `/contenders/${id}`;
 
     const result = await this.axiosInstance.patch(endpoint, patch, {

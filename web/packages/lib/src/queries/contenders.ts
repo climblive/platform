@@ -18,12 +18,12 @@ export const getContenderQuery = (contenderId: number) =>
     refetchOnWindowFocus: true,
   });
 
-export const updateContenderMutation = (contenderId: number) => {
+export const patchContenderMutation = (contenderId: number) => {
   const client = useQueryClient();
 
   return createMutation({
     mutationFn: async (patch: ContenderPatch) =>
-      ApiClient.getInstance().updateContender(contenderId, patch),
+      ApiClient.getInstance().patchContender(contenderId, patch),
     onSuccess: (updatedContender) => {
       const queryKey: QueryKey = ["contender", { id: contenderId }];
       client.setQueryData<Contender>(queryKey, updatedContender);
