@@ -61,5 +61,8 @@ sl-checkbox:focus-within[data-user-invalid]::part(control) {
   box-shadow: 0 0 0 var(--sl-focus-ring-width) var(--sl-color-danger-300);
 }
 
+@media (prefers-color-scheme: light) {
+}
+
 @media (prefers-color-scheme: dark) {
 }
