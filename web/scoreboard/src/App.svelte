@@ -19,7 +19,7 @@
 <QueryClientProvider client={queryClient}>
   <Router>
     <Route path="/scoreboard/:contestId"
-      >{#snippet children({ params })}
+      >{#snippet children({ params }: { params: { contestId: number } })}
         <Scoreboard contestId={Number(params.contestId)} />
       {/snippet}
     </Route>

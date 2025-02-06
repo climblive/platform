@@ -10,7 +10,7 @@
   import type SlSelect from "@shoelace-style/shoelace/dist/components/select/select.js";
   import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import { isAfter } from "date-fns";
-  import { createEventDispatcher, getContext, type Snippet } from "svelte";
+  import { getContext, type Snippet } from "svelte";
   import type { Readable } from "svelte/store";
   import * as z from "zod";
 
@@ -21,14 +21,13 @@
     withdrawnFromFinals: z.coerce.boolean(),
   });
 
-  const dispatch = createEventDispatcher<{ submit: ContenderPatch }>();
-
   interface Props {
     data: Partial<ContenderPatch>;
+    submit: (patch: ContenderPatch) => void;
     children?: Snippet;
   }
 
-  let { data, children }: Props = $props();
+  let { data, submit, children }: Props = $props();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
@@ -53,7 +52,7 @@
     const result = registrationFormSchema.safeParse(data);
 
     if (result.success) {
-      dispatch("submit", result.data);
+      submit(result.data);
     } else {
       for (const issue of result.error.issues) {
         setCustomValidity(issue.path, issue.message);
@@ -99,7 +98,7 @@
   <form
     bind:this={form}
     onsubmit={handleSubmit}
-    onsl-input={resetCustomValidation}
+    oninput={resetCustomValidation}
   >
     <sl-input
       bind:this={controls.name}

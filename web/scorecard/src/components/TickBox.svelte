@@ -127,11 +127,11 @@
     strategy="fixed"
     distance="4"
   >
-    <sl-button size="small" onclick={(e) => handleTick(e, false)}>
+    <sl-button size="small" onclick={(e: MouseEvent) => handleTick(e, false)}>
       <sl-icon slot="prefix" name="check2-all"></sl-icon>
       Top
     </sl-button>
-    <sl-button size="small" onclick={(e) => handleTick(e, true)}>
+    <sl-button size="small" onclick={(e: MouseEvent) => handleTick(e, true)}>
       <sl-icon slot="prefix" name="lightning-charge"></sl-icon>
       Flash
     </sl-button>

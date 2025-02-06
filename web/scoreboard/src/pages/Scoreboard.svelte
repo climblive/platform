@@ -2,6 +2,7 @@
   import Header from "@/components/Header.svelte";
   import { ResultList, ScoreboardProvider } from "@climblive/lib/components";
   import { getCompClassesQuery, getContestQuery } from "@climblive/lib/queries";
+  import { SlSelect } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/select/select.js";
   import { onMount } from "svelte";
@@ -13,6 +14,7 @@
 
   let { contestId }: Props = $props();
 
+  let compClassSelector: SlSelect | undefined = $state();
   let selectedCompClassId: number | undefined = $state();
   let overflow: "pagination" | "scroll" = $state("scroll");
 
@@ -65,12 +67,13 @@
         <h1>{contest.name}</h1>
         {#if compClasses.length > 1}
           <sl-select
+            bind:this={compClassSelector}
             size="small"
             name="compClassId"
             label="Competition class"
             use:value={selectedCompClassId}
-            onsl-change={(event) => {
-              selectedCompClassId = parseInt(event.target.value);
+            onsl-change={() => {
+              selectedCompClassId = Number(compClassSelector?.value);
             }}
           >
             {#each compClasses as compClass}

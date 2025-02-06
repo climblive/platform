@@ -7,7 +7,7 @@ import (
 type ColorRGB string
 
 type CompClass struct {
-	ID          CompClassID   `json:"id,omitempty"`
+	ID          CompClassID   `json:"id"`
 	Ownership   OwnershipData `json:"-"`
 	ContestID   ContestID     `json:"contestId"`
 	Name        string        `json:"name"`
@@ -18,7 +18,7 @@ type CompClass struct {
 }
 
 type Contender struct {
-	ID                  ContenderID   `json:"id,omitempty"`
+	ID                  ContenderID   `json:"id"`
 	Ownership           OwnershipData `json:"-"`
 	ContestID           ContestID     `json:"contestId"`
 	CompClassID         CompClassID   `json:"compClassId,omitempty"`
@@ -42,7 +42,7 @@ type ContenderPatch struct {
 }
 
 type Contest struct {
-	ID                 ContestID     `json:"id,omitempty"`
+	ID                 ContestID     `json:"id"`
 	Ownership          OwnershipData `json:"-"`
 	Location           string        `json:"location,omitempty"`
 	SeriesID           SeriesID      `json:"seriesId,omitempty"`
@@ -59,14 +59,14 @@ type Contest struct {
 }
 
 type Organizer struct {
-	ID        OrganizerID   `json:"id,omitempty"`
+	ID        OrganizerID   `json:"id"`
 	Ownership OwnershipData `json:"-"`
 	Name      string        `json:"name"`
 	Homepage  string        `json:"homepage,omitempty"`
 }
 
 type Problem struct {
-	ID                 ProblemID     `json:"id,omitempty"`
+	ID                 ProblemID     `json:"id"`
 	Ownership          OwnershipData `json:"-"`
 	ContestID          ContestID     `json:"contestId"`
 	Number             int           `json:"number"`
@@ -80,14 +80,14 @@ type Problem struct {
 }
 
 type Raffle struct {
-	ID        RaffleID      `json:"id,omitempty"`
+	ID        RaffleID      `json:"id"`
 	Ownership OwnershipData `json:"-"`
 	ContestID ContestID     `json:"contestId"`
 	Active    bool          `json:"active"`
 }
 
 type RaffleWinner struct {
-	ID            RaffleWinnerID `json:"id,omitempty"`
+	ID            RaffleWinnerID `json:"id"`
 	Ownership     OwnershipData  `json:"-"`
 	RaffleID      RaffleID       `json:"raffleId"`
 	ContenderID   ContenderID    `json:"contenderId"`
@@ -105,7 +105,7 @@ type Score struct {
 }
 
 type Series struct {
-	ID        SeriesID      `json:"id,omitempty"`
+	ID        SeriesID      `json:"id"`
 	Ownership OwnershipData `json:"-"`
 	Name      string        `json:"name"`
 }
@@ -121,7 +121,7 @@ type ScoreboardEntry struct {
 }
 
 type Tick struct {
-	ID           TickID        `json:"id,omitempty"`
+	ID           TickID        `json:"id"`
 	Ownership    OwnershipData `json:"-"`
 	Timestamp    time.Time     `json:"timestamp"`
 	ContestID    ContestID     `json:"-"`
@@ -133,7 +133,7 @@ type Tick struct {
 }
 
 type User struct {
-	ID         UserID        `json:"id,omitempty"`
+	ID         UserID        `json:"id"`
 	Name       string        `json:"name"`
 	Username   string        `json:"username"`
 	Admin      bool          `json:"admin"`
