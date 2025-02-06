@@ -146,12 +146,12 @@ func TestScoreEngineManager(t *testing.T) {
 
 		wg := mngr.Run(ctx)
 
-		instanceID, err := mngr.StartScoreEngine(context.Background(), fakedContestID, time.Now().Add(time.Hour))
+		instanceID, err := mngr.StartScoreEngine(context.Background(), fakedContestID)
 
 		require.NoError(t, err)
 		assert.NotEmpty(t, instanceID)
 
-		_, err = mngr.StartScoreEngine(context.Background(), fakedContestID, time.Now().Add(time.Hour))
+		_, err = mngr.StartScoreEngine(context.Background(), fakedContestID)
 
 		require.ErrorIs(t, err, scores.ErrAlreadyStarted)
 

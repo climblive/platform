@@ -6,6 +6,3 @@
 export interface CreateContendersArguments {
   number: number /* int */;
 }
-export interface StartScoreEngineArguments {
-  terminatedBy: Date;
-}

@@ -59,7 +59,6 @@ type getScoreEngineArguments struct {
 
 type startScoreEngineArguments struct {
 	contestID    domain.ContestID
-	terminatedBy time.Time
 }
 
 const pollInterval = 10 * time.Second
@@ -137,7 +136,6 @@ func (mngr *ScoreEngineManager) StartScoreEngine(
 ) (domain.ScoreEngineInstanceID, error) {
 	request := Request[startScoreEngineArguments, domain.ScoreEngineInstanceID]{Args: startScoreEngineArguments{
 		contestID:    contestID,
-		terminatedBy: terminatedBy,
 	}}
 	return request.Do(ctx, mngr.requests)
 }
@@ -202,7 +200,7 @@ func (mngr *ScoreEngineManager) handleRequest(request any) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
-		instanceID, err := mngr.startScoreEngine(ctx, req.Args.contestID, req.Args.terminatedBy)
+		instanceID, err := mngr.startScoreEngine(ctx, req.Args.contestID)
 
 		req.Response <- Response[domain.ScoreEngineInstanceID]{
 			Value: instanceID,
@@ -263,7 +261,7 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) {
 	}
 }
 
-func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID domain.ContestID, terminateBy time.Time) (domain.ScoreEngineInstanceID, error) {
+func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID domain.ContestID) (domain.ScoreEngineInstanceID, error) {
 	if _, ok := mngr.handlers[contestID]; ok {
 		return uuid.Nil, errors.New(ErrAlreadyStarted)
 	}
@@ -279,8 +277,7 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 
 	logger = logger.With(slog.Group("config",
 		"qualifying_problems", contest.QualifyingProblems,
-		"finalists", contest.Finalists)).
-		With("terminated_by", terminateBy)
+		"finalists", contest.Finalists))
 
 	if contest.TimeBegin != nil && contest.TimeBegin.After(now) {
 		logger = logger.With("starting_in", time.Until(*contest.TimeBegin))
@@ -295,7 +292,7 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 	driver := NewScoreEngineDriver(contest.ID, instanceID, mngr.eventBroker)
 	engine := NewDefaultScoreEngine(ranker, rules, store)
 
-	cancellableCtx, stop := context.WithDeadline(context.Background(), terminateBy)
+	cancellableCtx, stop := context.WithCancel(context.Background())
 	wg, installEngine := driver.Run(cancellableCtx)
 
 	hydrationStartTime := time.Now()

@@ -3,7 +3,6 @@ package usecases_test
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
@@ -108,7 +107,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 				ScoreEngineManager: mockedScoreEngineManager,
 			}
 
-			instanceID, err := ucase.StartScoreEngine(context.Background(), fakedContestID, time.Now().Add(time.Hour))
+			instanceID, err := ucase.StartScoreEngine(context.Background(), fakedContestID)
 
 			require.NoError(t, err)
 			assert.Equal(t, fakedInstanceID, instanceID)
@@ -124,7 +123,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 				Authorizer: mockedAuthorizer,
 			}
 
-			instanceID, err := ucase.StartScoreEngine(context.Background(), fakedContestID, time.Now().Add(time.Hour))
+			instanceID, err := ucase.StartScoreEngine(context.Background(), fakedContestID)
 
 			require.ErrorIs(t, err, domain.ErrNoOwnership)
 			assert.Empty(t, instanceID)
@@ -207,7 +206,7 @@ func (m *scoreEngineManagerMock) StopScoreEngine(ctx context.Context, instanceID
 	return args.Error(0)
 }
 
-func (m *scoreEngineManagerMock) StartScoreEngine(ctx context.Context, contestID domain.ContestID, terminatedBy time.Time) (domain.ScoreEngineInstanceID, error) {
-	args := m.Called(ctx, contestID, terminatedBy)
+func (m *scoreEngineManagerMock) StartScoreEngine(ctx context.Context, contestID domain.ContestID) (domain.ScoreEngineInstanceID, error) {
+	args := m.Called(ctx, contestID)
 	return args.Get(0).(domain.ScoreEngineInstanceID), args.Error(1)
 }

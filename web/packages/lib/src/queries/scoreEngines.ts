@@ -6,7 +6,6 @@ import {
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
 import type { ContestID, ScoreEngineInstanceID } from "../models";
-import type { StartScoreEngineArguments } from "../models/rest";
 import { HOUR } from "./constants";
 
 export const getScoreEnginesQuery = (contestId: ContestID) =>
@@ -23,8 +22,7 @@ export const startScoreEngineMutation = (contestId: number) => {
   const client = useQueryClient();
 
   return createMutation({
-    mutationFn: (args: StartScoreEngineArguments) =>
-      ApiClient.getInstance().startScoreEngine(contestId, args),
+    mutationFn: () => ApiClient.getInstance().startScoreEngine(contestId),
     onSuccess: (newEngine) => {
       const queryKey: QueryKey = ["score-engines", { contestId }];
 

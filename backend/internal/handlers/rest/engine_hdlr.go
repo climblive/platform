@@ -2,9 +2,7 @@ package rest
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
-	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/google/uuid"
@@ -13,7 +11,7 @@ import (
 type scoreEngineUseCase interface {
 	ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreEngineInstanceID, error)
 	StopScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) error
-	StartScoreEngine(ctx context.Context, contestID domain.ContestID, terminatedBy time.Time) (domain.ScoreEngineInstanceID, error)
+	StartScoreEngine(ctx context.Context, contestID domain.ContestID) (domain.ScoreEngineInstanceID, error)
 }
 
 type scoreEngineHandler struct {
@@ -73,14 +71,7 @@ func (hdlr *scoreEngineHandler) StartScoreEngine(w http.ResponseWriter, r *http.
 		return
 	}
 
-	var arguments StartScoreEngineArguments
-	err = json.NewDecoder(r.Body).Decode(&arguments)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	instanceID, err := hdlr.scoreEngineUseCase.StartScoreEngine(r.Context(), contestID, arguments.TerminatedBy)
+	instanceID, err := hdlr.scoreEngineUseCase.StartScoreEngine(r.Context(), contestID)
 	if err != nil {
 		handleError(w, err)
 		return
