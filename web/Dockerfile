@@ -1,5 +1,4 @@
 FROM node:20 AS base
-RUN corepack --version
 RUN npm install -g corepack@latest
 RUN corepack enable
 COPY . /app
