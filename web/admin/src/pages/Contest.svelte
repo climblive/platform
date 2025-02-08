@@ -5,6 +5,7 @@
     startScoreEngineMutation,
     stopScoreEngineMutation,
   } from "@climblive/lib/queries";
+  import { add } from "date-fns";
 
   interface Props {
     contestId: number;
@@ -35,7 +36,8 @@
     </div>
   {/each}
   <sl-button
-    onclick={() => $startScoreEngine.mutate({ terminatedBy: new Date() })}
+    onclick={() =>
+      $startScoreEngine.mutate({ terminatedBy: add(new Date(), { hours: 1 }) })}
     loading={$startScoreEngine.isPending}
     disabled={scoreEngines.length > 0}>Start engine</sl-button
   >
