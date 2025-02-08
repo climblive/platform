@@ -20,14 +20,12 @@ func TestScoreEngineUseCase(t *testing.T) {
 		OrganizerID: randomResourceID[domain.OrganizerID](),
 	}
 
+	now := time.Now()
+
 	makeMocks := func() (*repositoryMock, *authorizerMock, *scoreEngineManagerMock) {
 		mockedRepo := new(repositoryMock)
 		mockedAuthorizer := new(authorizerMock)
 		mockedScoreEngineManager := new(scoreEngineManagerMock)
-
-		mockedRepo.
-			On("GetContest", mock.Anything, nil, fakedContestID).
-			Return(domain.Contest{ID: fakedContestID, Ownership: fakedOwnership}, nil)
 
 		return mockedRepo, mockedAuthorizer, mockedScoreEngineManager
 	}
@@ -35,6 +33,10 @@ func TestScoreEngineUseCase(t *testing.T) {
 	t.Run("ListScoreEngines", func(t *testing.T) {
 		t.Run("HappyCase", func(t *testing.T) {
 			mockedRepo, mockedAuthorizer, mockedScoreEngineManager := makeMocks()
+
+			mockedRepo.
+				On("GetContest", mock.Anything, nil, fakedContestID).
+				Return(domain.Contest{ID: fakedContestID, Ownership: fakedOwnership}, nil)
 
 			mockedAuthorizer.On("HasOwnership", mock.Anything, fakedOwnership).Return(domain.OrganizerRole, nil)
 
@@ -76,6 +78,10 @@ func TestScoreEngineUseCase(t *testing.T) {
 		t.Run("BadCredentials", func(t *testing.T) {
 			mockedRepo, mockedAuthorizer, _ := makeMocks()
 
+			mockedRepo.
+				On("GetContest", mock.Anything, nil, fakedContestID).
+				Return(domain.Contest{ID: fakedContestID, Ownership: fakedOwnership}, nil)
+
 			mockedAuthorizer.On("HasOwnership", mock.Anything, fakedOwnership).Return(domain.NilRole, domain.ErrNoOwnership)
 
 			ucase := usecases.ScoreEngineUseCase{
@@ -94,12 +100,23 @@ func TestScoreEngineUseCase(t *testing.T) {
 		t.Run("HappyCase", func(t *testing.T) {
 			mockedRepo, mockedAuthorizer, mockedScoreEngineManager := makeMocks()
 
+			endTime := now.Add(time.Hour)
+
+			mockedRepo.
+				On("GetContest", mock.Anything, nil, fakedContestID).
+				Return(domain.Contest{
+					ID:        fakedContestID,
+					Ownership: fakedOwnership,
+					TimeBegin: &now,
+					TimeEnd:   &endTime,
+				}, nil)
+
 			mockedAuthorizer.On("HasOwnership", mock.Anything, fakedOwnership).Return(domain.OrganizerRole, nil)
 
 			fakedInstanceID := domain.ScoreEngineInstanceID(uuid.New())
 
 			mockedScoreEngineManager.
-				On("StartScoreEngine", mock.Anything, fakedContestID).
+				On("StartScoreEngine", mock.Anything, fakedContestID, endTime.Add(time.Hour)).
 				Return(fakedInstanceID, nil)
 
 			ucase := usecases.ScoreEngineUseCase{
@@ -108,14 +125,140 @@ func TestScoreEngineUseCase(t *testing.T) {
 				ScoreEngineManager: mockedScoreEngineManager,
 			}
 
-			instanceID, err := ucase.StartScoreEngine(context.Background(), fakedContestID, time.Now().Add(time.Hour))
+			instanceID, err := ucase.StartScoreEngine(context.Background(), fakedContestID, endTime.Add(time.Hour))
 
 			require.NoError(t, err)
 			assert.Equal(t, fakedInstanceID, instanceID)
 		})
 
+		t.Run("CannotStartEngineForContestWithoutStartOrEndTime", func(t *testing.T) {
+			mockedRepo, mockedAuthorizer, _ := makeMocks()
+
+			mockedRepo.
+				On("GetContest", mock.Anything, nil, fakedContestID).
+				Return(domain.Contest{
+					ID:        fakedContestID,
+					Ownership: fakedOwnership,
+				}, nil)
+
+			mockedAuthorizer.On("HasOwnership", mock.Anything, fakedOwnership).Return(domain.OrganizerRole, nil)
+
+			ucase := usecases.ScoreEngineUseCase{
+				Repo:       mockedRepo,
+				Authorizer: mockedAuthorizer,
+			}
+
+			_, err := ucase.StartScoreEngine(context.Background(), fakedContestID, time.Now().Add(time.Hour))
+
+			require.ErrorIs(t, err, domain.ErrNotAllowed)
+		})
+
+		t.Run("WithinPermittedTimeIntervals", func(t *testing.T) {
+			type scenario struct {
+				name         string
+				timeBegin    time.Time
+				timeEnd      time.Time
+				terminatedBy time.Time
+				expected     error
+			}
+
+			scenarios := []scenario{
+				{
+					name:         "TerminationTimeBeforeContestEndTime",
+					timeBegin:    now,
+					timeEnd:      now.Add(24 * time.Hour),
+					terminatedBy: now.Add(24 * time.Hour).Add(-1 * time.Nanosecond),
+					expected:     domain.ErrNotAllowed,
+				},
+				{
+					name:         "StartScoreEngineMoreThanOneHourBeforeContestStart",
+					timeBegin:    now.Add(time.Hour).Add(time.Second),
+					timeEnd:      now.Add(2 * time.Hour),
+					terminatedBy: now.Add(3 * time.Hour),
+					expected:     domain.ErrNotAllowed,
+				},
+				{
+					name:         "StartScoreEngineWithinOneHourOfContestStart",
+					timeBegin:    now.Add(time.Hour),
+					timeEnd:      now.Add(2 * time.Hour),
+					terminatedBy: now.Add(3 * time.Hour),
+					expected:     nil,
+				},
+				{
+					name:         "RunningContest_TerminationTimeWithin12HoursPastEndTime",
+					timeBegin:    now.Add(-1 * time.Hour),
+					timeEnd:      now.Add(12 * time.Hour),
+					terminatedBy: now.Add(24 * time.Hour),
+					expected:     nil,
+				},
+				{
+					name:         "RunningContest_TerminationTimeMoreThan12HoursPastEndTime",
+					timeBegin:    now.Add(-1 * time.Hour),
+					timeEnd:      now.Add(12 * time.Hour),
+					terminatedBy: now.Add(24 * time.Hour).Add(time.Nanosecond),
+					expected:     domain.ErrNotAllowed,
+				},
+				{
+					name:         "EndedContest_TerminationTimeWithinOneHourFromNow",
+					timeBegin:    now.Add(-24 * time.Hour),
+					timeEnd:      now.Add(-12 * time.Hour),
+					terminatedBy: now.Add(time.Hour),
+					expected:     nil,
+				},
+				{
+					name:         "EndedContest_TerminationTimePastOneHourFromNow",
+					timeBegin:    now.Add(-24 * time.Hour),
+					timeEnd:      now.Add(-12 * time.Hour),
+					terminatedBy: now.Add(time.Hour).Add(time.Second),
+					expected:     domain.ErrNotAllowed,
+				},
+			}
+
+			for _, scenario := range scenarios {
+				mockedRepo, mockedAuthorizer, mockedScoreEngineManager := makeMocks()
+
+				t.Run(scenario.name, func(t *testing.T) {
+					mockedRepo.
+						On("GetContest", mock.Anything, nil, fakedContestID).
+						Return(domain.Contest{
+							ID:        fakedContestID,
+							Ownership: fakedOwnership,
+							TimeBegin: &scenario.timeBegin,
+							TimeEnd:   &scenario.timeEnd,
+						}, nil)
+
+					mockedAuthorizer.On("HasOwnership", mock.Anything, fakedOwnership).Return(domain.OrganizerRole, nil)
+
+					fakedInstanceID := domain.ScoreEngineInstanceID(uuid.New())
+
+					mockedScoreEngineManager.
+						On("StartScoreEngine", mock.Anything, fakedContestID, scenario.terminatedBy).
+						Return(fakedInstanceID, nil)
+
+					ucase := usecases.ScoreEngineUseCase{
+						Repo:               mockedRepo,
+						Authorizer:         mockedAuthorizer,
+						ScoreEngineManager: mockedScoreEngineManager,
+					}
+
+					instanceID, err := ucase.StartScoreEngine(context.Background(), fakedContestID, scenario.terminatedBy)
+
+					if scenario.expected == nil {
+						require.NoError(t, err)
+						assert.Equal(t, fakedInstanceID, instanceID)
+					} else {
+						assert.ErrorIs(t, err, scenario.expected)
+					}
+				})
+			}
+		})
+
 		t.Run("BadCredentials", func(t *testing.T) {
 			mockedRepo, mockedAuthorizer, _ := makeMocks()
+
+			mockedRepo.
+				On("GetContest", mock.Anything, nil, fakedContestID).
+				Return(domain.Contest{ID: fakedContestID, Ownership: fakedOwnership}, nil)
 
 			mockedAuthorizer.On("HasOwnership", mock.Anything, fakedOwnership).Return(domain.NilRole, domain.ErrNoOwnership)
 
@@ -134,6 +277,10 @@ func TestScoreEngineUseCase(t *testing.T) {
 	t.Run("StopScoreEngine", func(t *testing.T) {
 		t.Run("HappyCase", func(t *testing.T) {
 			mockedRepo, mockedAuthorizer, mockedScoreEngineManager := makeMocks()
+
+			mockedRepo.
+				On("GetContest", mock.Anything, nil, fakedContestID).
+				Return(domain.Contest{ID: fakedContestID, Ownership: fakedOwnership}, nil)
 
 			mockedAuthorizer.On("HasOwnership", mock.Anything, fakedOwnership).Return(domain.OrganizerRole, nil)
 
@@ -163,6 +310,10 @@ func TestScoreEngineUseCase(t *testing.T) {
 
 		t.Run("BadCredentials", func(t *testing.T) {
 			mockedRepo, mockedAuthorizer, mockedScoreEngineManager := makeMocks()
+
+			mockedRepo.
+				On("GetContest", mock.Anything, nil, fakedContestID).
+				Return(domain.Contest{ID: fakedContestID, Ownership: fakedOwnership}, nil)
 
 			mockedAuthorizer.On("HasOwnership", mock.Anything, fakedOwnership).Return(domain.NilRole, domain.ErrNoOwnership)
 
