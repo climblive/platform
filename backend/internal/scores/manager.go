@@ -263,7 +263,7 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) {
 	}
 }
 
-func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID domain.ContestID, terminateBy time.Time) (domain.ScoreEngineInstanceID, error) {
+func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID domain.ContestID, terminatedBy time.Time) (domain.ScoreEngineInstanceID, error) {
 	if _, ok := mngr.handlers[contestID]; ok {
 		return uuid.Nil, errors.New(ErrAlreadyStarted)
 	}
@@ -280,7 +280,7 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 	logger = logger.With(slog.Group("config",
 		"qualifying_problems", contest.QualifyingProblems,
 		"finalists", contest.Finalists)).
-		With("terminated_by", terminateBy)
+		With("terminated_by", terminatedBy)
 
 	if contest.TimeBegin != nil && contest.TimeBegin.After(now) {
 		logger = logger.With("starting_in", time.Until(*contest.TimeBegin))
@@ -295,7 +295,7 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 	driver := NewScoreEngineDriver(contest.ID, instanceID, mngr.eventBroker)
 	engine := NewDefaultScoreEngine(ranker, rules, store)
 
-	cancellableCtx, stop := context.WithDeadline(context.Background(), terminateBy)
+	cancellableCtx, stop := context.WithDeadline(context.Background(), terminatedBy)
 	wg, installEngine := driver.Run(cancellableCtx)
 
 	hydrationStartTime := time.Now()
