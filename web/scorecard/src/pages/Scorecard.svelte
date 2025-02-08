@@ -78,23 +78,29 @@
 
   let orderProblemsBy = $state<"number" | "points">("number");
 
-  let sortedProblems = $derived.by(() => {
+  let sortedProblems = $derived.by<Problem[]>(() => {
+    const clonedProblems = [...(problems ?? [])];
+
     switch (orderProblemsBy) {
       case "number":
-        return problems?.toSorted(
+        clonedProblems.sort(
           (p1: Problem, p2: Problem) => p1.number - p2.number,
         );
+
+        break;
       case "points":
-        return problems?.toSorted(
+        clonedProblems.sort(
           (p1: Problem, p2: Problem) =>
             p1.pointsTop +
             (p1.flashBonus ?? 0) -
             p2.pointsTop -
             (p2.flashBonus ?? 0),
         );
-      default:
-        return problems;
+
+        break;
     }
+
+    return clonedProblems;
   });
 
   $effect(() => {
