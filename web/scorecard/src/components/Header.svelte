@@ -67,7 +67,7 @@
   header {
     background: linear-gradient(
       45deg,
-      var(--sl-color-primary-200),
+      var(--sl-color-primary-100),
       var(--sl-color-primary-300)
     );
     border: 1px solid var(--sl-color-primary-300);
