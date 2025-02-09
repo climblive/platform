@@ -160,8 +160,8 @@
     justify-content: center;
     align-items: center;
     border-color: var(--sl-color-primary-600);
-    border-width: 1px;
-    border-style: solid;
+    border-width: 2px;
+    border-style: dotted;
     border-radius: var(--sl-border-radius-small);
   }
 
