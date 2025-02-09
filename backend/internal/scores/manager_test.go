@@ -81,7 +81,9 @@ func TestScoreEngineManager(t *testing.T) {
 			On("Unsubscribe", fakedSubscriptionID).
 			Return()
 
-		mockedEventBroker.On("Dispatch", fakedContestID, mock.AnythingOfType("domain.ScoreEngineStartedEvent"))
+		mockedEventBroker.
+			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.ScoreEngineStartedEvent")).
+			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.ScoreEngineStoppedEvent"))
 
 		mockedStoreHydrator.
 			On("Hydrate", mock.Anything, fakedContestID, mock.AnythingOfType("*scores.MemoryStore")).
