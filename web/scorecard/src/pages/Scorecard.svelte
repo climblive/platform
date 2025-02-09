@@ -103,6 +103,12 @@
     return clonedProblems;
   });
 
+  let maxProblemNumber = $derived(
+    problems?.reduce((max, cur) => {
+      return Math.max(max, cur.number);
+    }, 0) ?? 0,
+  );
+
   $effect(() => {
     if (contender) {
       score = contender.score?.score ?? 0;
@@ -250,6 +256,7 @@
                 {problem}
                 tick={ticks.find(({ problemId }) => problemId === problem.id)}
                 disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
+                {maxProblemNumber}
               />
             {/each}
           </sl-tab-panel>

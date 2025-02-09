@@ -159,8 +159,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border-color: var(--sl-color-primary-900);
-    border-width: var(--sl-input-border-width);
+    border-color: var(--sl-color-primary-600);
+    border-width: 1px;
     border-style: solid;
     border-radius: var(--sl-border-radius-small);
   }

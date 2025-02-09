@@ -9,11 +9,29 @@
     problem: Problem;
     tick?: Tick | undefined;
     disabled: boolean;
+    maxProblemNumber: number;
   }
 
-  let { problem, tick, disabled }: Props = $props();
+  let { problem, tick, disabled, maxProblemNumber }: Props = $props();
 
   let pointValue = $derived(calculateProblemScore(problem, tick));
+
+  let padding = $derived.by(() => {
+    const length =
+      maxProblemNumber.toString().length - problem.number.toString().length;
+
+    if (length <= 0) {
+      return "";
+    }
+
+    let padding = "";
+
+    for (let k = 0; k < length; k++) {
+      padding += "0";
+    }
+
+    return padding;
+  });
 </script>
 
 <section
@@ -21,7 +39,9 @@
   data-flashed={tick?.attemptsTop === 1}
   aria-label={`Problem ${problem.number}`}
 >
-  <span class="number">#{problem.number}</span>
+  <span class="number"
+    >№ <span class="padding">{padding}</span>{problem.number}</span
+  >
   <HoldColorIndicator
     primary={problem.holdColorPrimary}
     secondary={problem.holdColorSecondary}
@@ -53,8 +73,9 @@
     padding-left: var(--sl-spacing-small);
     padding-right: var(--sl-spacing-2x-small);
     color: var(--sl-color-primary-950);
+
     display: grid;
-    grid-template-columns: 1rem 1.25rem 1fr 1fr 2.5rem;
+    grid-template-columns: max-content 1rem 1fr 1fr 2.5rem;
     grid-template-rows: 1fr;
     gap: var(--sl-spacing-x-small);
     align-items: center;
@@ -63,6 +84,11 @@
 
   .number {
     font-size: var(--sl-font-size-x-small);
+    text-wrap: nowrap;
+  }
+
+  .padding {
+    visibility: hidden;
   }
 
   .points {
