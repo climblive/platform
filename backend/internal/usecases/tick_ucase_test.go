@@ -102,7 +102,7 @@ func TestCreateTick(t *testing.T) {
 		ContenderID: &fakedContenderID,
 	}
 
-	makeMocks := func(timeEnd time.Time) (*repositoryMock, *eventBrokerMock) {
+	makeMocks := func(timeBegin, timeEnd time.Time) (*repositoryMock, *eventBrokerMock) {
 		mockedRepo := new(repositoryMock)
 		mockedEventBroker := new(eventBrokerMock)
 
@@ -127,15 +127,16 @@ func TestCreateTick(t *testing.T) {
 		mockedRepo.
 			On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
 			Return(domain.CompClass{
-				ID:      fakedCompClassID,
-				TimeEnd: timeEnd,
+				ID:        fakedCompClassID,
+				TimeBegin: timeBegin,
+				TimeEnd:   timeEnd,
 			}, nil)
 
 		return mockedRepo, mockedEventBroker
 	}
 
 	t.Run("HappyPath", func(t *testing.T) {
-		mockedRepo, mockedEventBroker := makeMocks(time.Now())
+		mockedRepo, mockedEventBroker := makeMocks(time.Now(), time.Now())
 		mockedAuthorizer := new(authorizerMock)
 
 		fakedTickID := randomResourceID[domain.TickID]()
@@ -220,8 +221,37 @@ func TestCreateTick(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
+	t.Run("CannotRegisterAscentBeforeContestStarts", func(t *testing.T) {
+		mockedRepo, mockedEventBroker := makeMocks(time.Now().Add(time.Minute), time.Now().Add(time.Hour))
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.ContenderRole, nil)
+
+		ucase := usecases.TickUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		tick, err := ucase.CreateTick(context.Background(), fakedContenderID, domain.Tick{
+			ProblemID:    fakedProblemID,
+			Top:          true,
+			AttemptsTop:  5,
+			Zone:         true,
+			AttemptsZone: 2,
+		})
+
+		assert.ErrorIs(t, err, domain.ErrContestNotStarted)
+		assert.Empty(t, tick)
+
+		mockedRepo.AssertExpectations(t)
+		mockedEventBroker.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
 	t.Run("ContenderCannotRegisterAscentAfterGracePeriod", func(t *testing.T) {
-		mockedRepo, mockedEventBroker := makeMocks(time.Now().Add(-1 * gracePeriod))
+		mockedRepo, mockedEventBroker := makeMocks(time.Now().Add(-1*time.Hour), time.Now().Add(-1*gracePeriod))
 		mockedAuthorizer := new(authorizerMock)
 
 		mockedAuthorizer.
@@ -250,7 +280,7 @@ func TestCreateTick(t *testing.T) {
 	})
 
 	t.Run("ProblemBelongsToDifferentContest", func(t *testing.T) {
-		mockedRepo, mockedEventBroker := makeMocks(time.Now())
+		mockedRepo, mockedEventBroker := makeMocks(time.Now(), time.Now())
 		mockedAuthorizer := new(authorizerMock)
 
 		fakedOtherProblemID := fakedProblemID + 1
@@ -288,7 +318,7 @@ func TestCreateTick(t *testing.T) {
 	})
 
 	t.Run("OrganizerCanRegisterAscentAfterGracePeriod", func(t *testing.T) {
-		mockedRepo, mockedEventBroker := makeMocks(time.Now().Add(-1 * gracePeriod))
+		mockedRepo, mockedEventBroker := makeMocks(time.Now().Add(-1*time.Hour), time.Now().Add(-1*gracePeriod))
 		mockedAuthorizer := new(authorizerMock)
 
 		fakedTickID := randomResourceID[domain.TickID]()
