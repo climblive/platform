@@ -233,15 +233,6 @@
                 }
               }}
             >
-              <sl-radio-button value="points" variant="danger">
-                <sl-icon
-                  slot="prefix"
-                  name="sort-down-alt"
-                  label="Sort by points"
-                ></sl-icon>
-                Sort by points
-              </sl-radio-button>
-
               <sl-radio-button value="number">
                 <sl-icon
                   slot="prefix"
@@ -249,6 +240,15 @@
                   label="Sort by number"
                 ></sl-icon>
                 Sort by number
+              </sl-radio-button>
+
+              <sl-radio-button value="points" variant="danger">
+                <sl-icon
+                  slot="prefix"
+                  name="sort-down-alt"
+                  label="Sort by points"
+                ></sl-icon>
+                Sort by points
               </sl-radio-button>
             </sl-radio-group>
             {#each sortedProblems as problem}

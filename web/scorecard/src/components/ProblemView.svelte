@@ -62,9 +62,10 @@
   }
 
   .number {
-    font-size: var(--sl-font-size-x-small);
+    font-size: var(--sl-font-size-small);
     text-wrap: nowrap;
     justify-self: start;
+    font-weight: var(--sl-font-weight-bold);
   }
 
   .points {
