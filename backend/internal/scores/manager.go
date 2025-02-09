@@ -182,7 +182,7 @@ func (mngr *ScoreEngineManager) run(ctx context.Context, wg *sync.WaitGroup) {
 		case terminatedInstanceID := <-mngr.terminations:
 			for contestID, handler := range mngr.handlers {
 				if handler.instanceID == terminatedInstanceID {
-					slog.Warn("removing crashed score engine", "instance_id", terminatedInstanceID)
+					slog.Info("removing terminated score engine", "instance_id", terminatedInstanceID)
 					delete(mngr.handlers, contestID)
 
 					break
@@ -259,7 +259,7 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) {
 			continue
 		}
 
-		_, _ = mngr.startScoreEngine(ctx, contest.ID, (*contest.TimeEnd).Add(12*time.Hour))
+		//_, _ = mngr.startScoreEngine(ctx, contest.ID, (*contest.TimeEnd).Add(12*time.Hour))
 	}
 }
 
