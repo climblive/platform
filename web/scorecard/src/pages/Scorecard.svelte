@@ -227,7 +227,7 @@
                 }
               }}
             >
-              <sl-radio-button value="points">
+              <sl-radio-button value="points" variant="danger">
                 <sl-icon
                   slot="prefix"
                   name="sort-down-alt"
@@ -293,7 +293,7 @@
     left: 0;
     right: 0;
     z-index: 10;
-    background-color: var(--sl-color-neutral-50);
+    background-color: #fefefe;
     padding: var(--sl-spacing-small);
   }
 
@@ -316,5 +316,11 @@
 
   sl-radio-button {
     flex-grow: 1;
+
+    &::part(button--checked) {
+      border-color: var(--sl-color-primary-300);
+      background-color: var(--sl-color-primary-200);
+      color: var(--sl-color-primary-950);
+    }
   }
 </style>

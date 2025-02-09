@@ -3,27 +3,27 @@
 :root {
   /*
       Generator: https://uicolors.app/create
-      Input: #bc5656
-      Hue shift: -10
+      Input: #ce5c4c
     */
-  --sl-color-primary-50: #fcf5f4;
-  --sl-color-primary-100: #f9ecea;
-  --sl-color-primary-200: #f3dbd8;
-  --sl-color-primary-300: #e9bdb8;
-  --sl-color-primary-400: #dd948f;
-  --sl-color-primary-500: #cc6c67;
-  --sl-color-primary-600: #bc5656;
-  --sl-color-primary-700: #98383a;
-  --sl-color-primary-800: #803136;
-  --sl-color-primary-900: #6e2d33;
-  --sl-color-primary-950: #3c1517;
+  --sl-color-primary-50: #fdf4f3;
+  --sl-color-primary-100: #fbe8e5;
+  --sl-color-primary-200: #f9d4cf;
+  --sl-color-primary-300: #f3b6ae;
+  --sl-color-primary-400: #ea8c7f;
+  --sl-color-primary-500: #dd6756;
+  --sl-color-primary-600: #ce5c4c;
+  --sl-color-primary-700: #a83c2d;
+  --sl-color-primary-800: #8c3428;
+  --sl-color-primary-900: #753127;
+  --sl-color-primary-950: #3f1610;
 
   --sl-input-focus-ring-color: var(--sl-color-primary-400);
 }
 
 body {
   font-family: "Noto Sans", sans-serif;
-  background-color: var(--sl-color-neutral-50);
+  background-color: #fefefe;
+  color: #27272a;
 
   font-weight: var(--sl-font-weight-normal);
 }

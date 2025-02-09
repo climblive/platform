@@ -67,12 +67,12 @@
   header {
     background: linear-gradient(
       45deg,
-      var(--sl-color-primary-500),
-      var(--sl-color-primary-700)
+      var(--sl-color-primary-200),
+      var(--sl-color-primary-300)
     );
+    border: 1px solid var(--sl-color-primary-300);
     border-radius: var(--sl-border-radius-small);
     padding: var(--sl-spacing-small);
-    color: var(--sl-color-primary-100);
     position: relative;
 
     & sl-icon-button {
