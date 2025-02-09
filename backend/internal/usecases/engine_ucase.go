@@ -90,19 +90,15 @@ func (uc *ScoreEngineUseCase) StartScoreEngine(ctx context.Context, contestID do
 
 	now := time.Now()
 
-	if terminatedBy.Before(*contest.TimeEnd) {
-		return uuid.Nil, errors.Wrap(domain.ErrNotAllowed, 0)
-	}
-
 	if now.Before((*contest.TimeBegin).Add(-1 * time.Hour)) {
 		return uuid.Nil, errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 
-	if now.Before(*contest.TimeEnd) && terminatedBy.After(contest.TimeEnd.Add(12*time.Hour)) {
+	if terminatedBy.Before(now) {
 		return uuid.Nil, errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 
-	if contest.TimeEnd.Before(now) && terminatedBy.After(now.Add(time.Hour)) {
+	if terminatedBy.Sub(now) > 12*time.Hour {
 		return uuid.Nil, errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 

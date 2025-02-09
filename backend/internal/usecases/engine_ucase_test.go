@@ -164,13 +164,6 @@ func TestScoreEngineUseCase(t *testing.T) {
 
 			scenarios := []scenario{
 				{
-					name:         "TerminationTimeBeforeContestEndTime",
-					timeBegin:    now,
-					timeEnd:      now.Add(24 * time.Hour),
-					terminatedBy: now.Add(24 * time.Hour).Add(-1 * time.Nanosecond),
-					expected:     domain.ErrNotAllowed,
-				},
-				{
 					name:         "StartScoreEngineMoreThanOneHourBeforeContestStart",
 					timeBegin:    now.Add(time.Hour).Add(time.Second),
 					timeEnd:      now.Add(2 * time.Hour),
@@ -185,31 +178,24 @@ func TestScoreEngineUseCase(t *testing.T) {
 					expected:     nil,
 				},
 				{
-					name:         "RunningContest_TerminationTimeWithin12HoursPastEndTime",
-					timeBegin:    now.Add(-1 * time.Hour),
-					timeEnd:      now.Add(12 * time.Hour),
-					terminatedBy: now.Add(24 * time.Hour),
-					expected:     nil,
-				},
-				{
-					name:         "RunningContest_TerminationTimeMoreThan12HoursPastEndTime",
-					timeBegin:    now.Add(-1 * time.Hour),
-					timeEnd:      now.Add(12 * time.Hour),
-					terminatedBy: now.Add(24 * time.Hour).Add(time.Nanosecond),
+					name:         "TerminationBeforeCurrentTime",
+					timeBegin:    now,
+					timeEnd:      now.Add(time.Hour),
+					terminatedBy: now,
 					expected:     domain.ErrNotAllowed,
 				},
 				{
-					name:         "EndedContest_TerminationTimeWithinOneHourFromNow",
-					timeBegin:    now.Add(-24 * time.Hour),
-					timeEnd:      now.Add(-12 * time.Hour),
-					terminatedBy: now.Add(time.Hour),
+					name:         "TerminationTimeWithin12HoursFromNow",
+					timeBegin:    now,
+					timeEnd:      now.Add(time.Hour),
+					terminatedBy: now.Add(12 * time.Hour),
 					expected:     nil,
 				},
 				{
-					name:         "EndedContest_TerminationTimePastOneHourFromNow",
-					timeBegin:    now.Add(-24 * time.Hour),
-					timeEnd:      now.Add(-12 * time.Hour),
-					terminatedBy: now.Add(time.Hour).Add(time.Second),
+					name:         "TerminationTimePast12HoursFromNow",
+					timeBegin:    now,
+					timeEnd:      now.Add(time.Hour),
+					terminatedBy: now.Add(12 * time.Hour).Add(time.Second),
 					expected:     domain.ErrNotAllowed,
 				},
 			}
