@@ -186,6 +186,7 @@ PreLoop:
 	for event := range slices.Values(d.pendingEvents) {
 		d.handleEvent(event)
 	}
+	d.pendingEvents = nil
 
 	ticker := time.Tick(100 * time.Millisecond)
 
