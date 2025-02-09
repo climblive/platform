@@ -221,7 +221,7 @@ func TestCreateTick(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
-	t.Run("CannotRegisterAscentBeforeContestStarts", func(t *testing.T) {
+	t.Run("CannotRegisterAscentBeforeContestStart", func(t *testing.T) {
 		mockedRepo, mockedEventBroker := makeMocks(time.Now().Add(time.Minute), time.Now().Add(time.Hour))
 		mockedAuthorizer := new(authorizerMock)
 
