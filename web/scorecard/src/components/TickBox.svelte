@@ -119,23 +119,25 @@
     {/if}
   </button>
 
-  <sl-popup
-    bind:this={popup}
-    placement="left"
-    active={open}
-    arrow
-    strategy="fixed"
-    distance="4"
-  >
-    <sl-button size="small" onclick={(e: MouseEvent) => handleTick(e, false)}>
-      <sl-icon slot="prefix" name="check2-all"></sl-icon>
-      Top
-    </sl-button>
-    <sl-button size="small" onclick={(e: MouseEvent) => handleTick(e, true)}>
-      <sl-icon slot="prefix" name="lightning-charge"></sl-icon>
-      Flash
-    </sl-button>
-  </sl-popup>
+  <div class="overlay" data-enabled={open}>
+    <sl-popup
+      bind:this={popup}
+      placement="left"
+      active={open}
+      arrow
+      strategy="fixed"
+      distance="10"
+    >
+      <sl-button size="small" onclick={(e: MouseEvent) => handleTick(e, false)}>
+        <sl-icon slot="prefix" name="check2-all"></sl-icon>
+        Top
+      </sl-button>
+      <sl-button size="small" onclick={(e: MouseEvent) => handleTick(e, true)}>
+        <sl-icon slot="prefix" name="lightning-charge"></sl-icon>
+        Flash
+      </sl-button>
+    </sl-popup>
+  </div>
 </div>
 
 <style>
@@ -239,5 +241,17 @@
   sl-popup[active]::part(popup) {
     display: flex;
     gap: var(--sl-spacing-2x-small);
+  }
+
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: var(--sl-overlay-background-color);
+    z-index: var(--sl-z-index-dialog);
+  }
+
+  .overlay[data-enabled="true"] {
+    display: block;
   }
 </style>
