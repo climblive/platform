@@ -27,6 +27,9 @@ jobs:
       - run: pnpm --filter=* lint
         working-directory: web
 
+      - run: pnpm --filter=* check
+        working-directory: web
+
   build-web:
     name: Build web
     runs-on: ubuntu-24.04
@@ -97,7 +100,7 @@ jobs:
 
       - uses: sqlc-dev/setup-sqlc@v3
         with:
-          sqlc-version: "1.27.0"
+          sqlc-version: "1.28.0"
 
       - run: sqlc diff
         working-directory: backend

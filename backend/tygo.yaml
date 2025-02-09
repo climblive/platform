@@ -10,3 +10,11 @@ packages:
       time.Duration: "number"
     preserve_comments: none
     optional_type: undefined
+  - path: "github.com/climblive/platform/backend/internal/handlers/rest"
+    include_files:
+      - "public.go"
+    output_path: "../web/packages/lib/src/models/rest.ts"
+    type_mappings:
+      time.Time: "Date"
+    preserve_comments: none
+    optional_type: undefined

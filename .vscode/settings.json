@@ -1,6 +1,6 @@
 {
     "html.customData": [
-        "./node_modules/@shoelace-style/shoelace/dist/vscode.html-custom-data.json"
+        "web/packages/lib/node_modules/@shoelace-style/shoelace/dist/vscode.html-custom-data.json"
     ],
     "editor.codeActionsOnSave": {
         "source.organizeImports": "explicit"

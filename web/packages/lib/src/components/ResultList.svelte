@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { ScoreboardEntry } from "@climblive/lib/models";
   import "@shoelace-style/shoelace/dist/components/progress-bar/progress-bar.js";
   import "@shoelace-style/shoelace/dist/components/skeleton/skeleton.js";
   import { onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
+  import type { ScoreboardEntry } from "../models";
   import Floater from "./Floater.svelte";
   import ResultEntry from "./ResultEntry.svelte";
 
