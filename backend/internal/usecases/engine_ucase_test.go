@@ -178,7 +178,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 					expected:     nil,
 				},
 				{
-					name:         "TerminationBeforeCurrentTime",
+					name:         "TerminationTimeBeforeCurrentTime",
 					timeBegin:    now,
 					timeEnd:      now.Add(time.Hour),
 					terminatedBy: now,
