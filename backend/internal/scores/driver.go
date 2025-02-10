@@ -66,11 +66,51 @@ func NewScoreEngineDriver(
 	}
 }
 
-func (d *ScoreEngineDriver) Run(ctx context.Context) (*sync.WaitGroup, func(ScoreEngine)) {
+func (d *ScoreEngineDriver) Run(ctx context.Context, safe bool) (*sync.WaitGroup, func(ScoreEngine)) {
 	wg := new(sync.WaitGroup)
 	ready := make(chan struct{}, 1)
 
 	wg.Add(1)
+
+	engineReceiver := make(chan ScoreEngine, 1)
+
+	installEngine := func(engine ScoreEngine) {
+		engineReceiver <- engine
+		close(engineReceiver)
+	}
+
+	go func() {
+		defer func() {
+			if !safe {
+				return
+			}
+
+			if r := recover(); r != nil {
+				d.logger.Error("score engine panicked", "error", r)
+			}
+		}()
+
+		defer wg.Done()
+
+		d.run(ctx, ready, engineReceiver)
+	}()
+
+	<-ready
+
+	return wg, installEngine
+}
+
+func (d *ScoreEngineDriver) run(
+	ctx context.Context,
+	ready chan<- struct{},
+	engineReceiver chan ScoreEngine,
+) {
+	defer func() {
+		close(d.sideQuests)
+
+		for range d.sideQuests {
+		}
+	}()
 
 	filter := domain.NewEventFilter(
 		d.contestID,
@@ -85,42 +125,6 @@ func (d *ScoreEngineDriver) Run(ctx context.Context) (*sync.WaitGroup, func(Scor
 		"ASCENT_DEREGISTERED",
 		"PROBLEM_ADDED",
 	)
-
-	engineReceiver := make(chan ScoreEngine, 1)
-
-	installEngine := func(engine ScoreEngine) {
-		engineReceiver <- engine
-		close(engineReceiver)
-	}
-
-	go d.run(ctx, filter, wg, ready, engineReceiver)
-
-	<-ready
-
-	return wg, installEngine
-}
-
-func (d *ScoreEngineDriver) run(
-	ctx context.Context,
-	filter domain.EventFilter,
-	wg *sync.WaitGroup,
-	ready chan<- struct{},
-	engineReceiver chan ScoreEngine,
-) {
-	defer func() {
-		if r := recover(); r != nil {
-			d.logger.Error("score engine panicked", "error", r)
-		}
-	}()
-
-	defer wg.Done()
-
-	defer func() {
-		close(d.sideQuests)
-
-		for range d.sideQuests {
-		}
-	}()
 
 	subscriptionID, eventReader := d.eventBroker.Subscribe(filter, 0)
 	d.logger.Info("score engine subscribed", "subscription_id", subscriptionID)

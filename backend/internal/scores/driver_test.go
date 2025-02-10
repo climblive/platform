@@ -74,7 +74,7 @@ func TestEngineDriver(t *testing.T) {
 
 		ctx, cancel := context.WithCancel(context.Background())
 
-		wg, _ := f.driver.Run(ctx)
+		wg, _ := f.driver.Run(ctx, false)
 
 		cancel()
 
@@ -96,7 +96,7 @@ func TestEngineDriver(t *testing.T) {
 		})
 		require.ErrorIs(t, err, events.ErrBufferFull)
 
-		wg, _ := f.driver.Run(context.Background())
+		wg, _ := f.driver.Run(context.Background(), false)
 
 		wg.Wait()
 
@@ -107,7 +107,7 @@ func TestEngineDriver(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
 		ctx, cancel := context.WithCancel(context.Background())
-		wg, installEngine := f.driver.Run(ctx)
+		wg, installEngine := f.driver.Run(ctx, false)
 
 		mockedEngine := new(scoreEngineMock)
 
@@ -127,7 +127,7 @@ func TestEngineDriver(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
 		ctx, cancel := context.WithCancel(context.Background())
-		wg, installEngine := f.driver.Run(ctx)
+		wg, installEngine := f.driver.Run(ctx, false)
 
 		err := f.subscription.Post(domain.EventEnvelope{
 			Data: domain.AscentRegisteredEvent{
@@ -198,7 +198,7 @@ func TestEngineDriver(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
 		ctx, cancel := context.WithCancel(context.Background())
-		wg, installEngine := f.driver.Run(ctx)
+		wg, installEngine := f.driver.Run(ctx, false)
 
 		events := []any{}
 
@@ -306,7 +306,7 @@ func TestEngineDriver(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
 		ctx, cancel := context.WithCancel(context.Background())
-		wg, installEngine := f.driver.Run(ctx)
+		wg, installEngine := f.driver.Run(ctx, false)
 
 		mockedEngine := new(scoreEngineMock)
 
@@ -336,7 +336,7 @@ func TestEngineDriver(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
 		ctx, cancel := context.WithCancel(context.Background())
-		wg, installEngine := f.driver.Run(ctx)
+		wg, installEngine := f.driver.Run(ctx, false)
 
 		mockedEngine := new(scoreEngineMock)
 
@@ -366,7 +366,7 @@ func TestEngineDriver(t *testing.T) {
 		f, awaitExpectations := makeFixture(0)
 
 		ctx, cancel := context.WithCancel(context.Background())
-		wg, installEngine := f.driver.Run(ctx)
+		wg, installEngine := f.driver.Run(ctx, false)
 
 		now := time.Now()
 

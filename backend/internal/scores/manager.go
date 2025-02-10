@@ -296,7 +296,7 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 	engine := NewDefaultScoreEngine(ranker, rules, store)
 
 	cancellableCtx, stop := context.WithDeadline(context.Background(), terminatedBy)
-	wg, installEngine := driver.Run(cancellableCtx)
+	wg, installEngine := driver.Run(cancellableCtx, true)
 
 	hydrationStartTime := time.Now()
 	err = mngr.engineStoreHydrator.Hydrate(ctx, contestID, store)
