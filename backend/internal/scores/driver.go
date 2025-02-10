@@ -66,7 +66,22 @@ func NewScoreEngineDriver(
 	}
 }
 
-func (d *ScoreEngineDriver) Run(ctx context.Context, safe bool) (*sync.WaitGroup, func(ScoreEngine)) {
+type runOptions struct {
+	recoverPanics bool
+}
+
+func WithPanicRecovery() func(*runOptions) {
+	return func(s *runOptions) {
+		s.recoverPanics = true
+	}
+}
+
+func (d *ScoreEngineDriver) Run(ctx context.Context, options ...func(*runOptions)) (*sync.WaitGroup, func(ScoreEngine)) {
+	config := &runOptions{}
+	for _, opt := range options {
+		opt(config)
+	}
+
 	wg := new(sync.WaitGroup)
 	ready := make(chan struct{}, 1)
 
@@ -81,7 +96,7 @@ func (d *ScoreEngineDriver) Run(ctx context.Context, safe bool) (*sync.WaitGroup
 
 	go func() {
 		defer func() {
-			if !safe {
+			if !config.recoverPanics {
 				return
 			}
 
