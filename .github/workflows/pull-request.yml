@@ -119,7 +119,7 @@ jobs:
         with:
           go-version-file: "backend/go.mod"
 
-      - run: go test -race -v ./...
+      - run: go test -race ./...
         working-directory: backend
 
   build-backend:
