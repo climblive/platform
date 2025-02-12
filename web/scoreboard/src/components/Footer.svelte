@@ -3,8 +3,7 @@
 </script>
 
 <footer>
-  <img src={imgUrl} />
-
+  <img src={imgUrl} alt="ClimbLive" />
   Powered by ClimbLive
 </footer>
 
