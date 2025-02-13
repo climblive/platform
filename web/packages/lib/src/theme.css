@@ -17,12 +17,24 @@
   --sl-color-primary-900: #753127;
   --sl-color-primary-950: #3f1610;
 
+  --sl-color-stone-50: oklch(0.985 0.001 106.423);
+  --sl-color-stone-100: oklch(0.97 0.001 106.424);
+  --sl-color-stone-200: oklch(0.923 0.003 48.717);
+  --sl-color-stone-300: oklch(0.869 0.005 56.366);
+  --sl-color-stone-400: oklch(0.709 0.01 56.259);
+  --sl-color-stone-500: oklch(0.553 0.013 58.071);
+  --sl-color-stone-600: oklch(0.444 0.011 73.639);
+  --sl-color-stone-700: oklch(0.374 0.01 67.558);
+  --sl-color-stone-800: oklch(0.268 0.007 34.298);
+  --sl-color-stone-900: oklch(0.216 0.006 56.043);
+  --sl-color-stone-950: oklch(0.147 0.004 49.25);
+
   --sl-input-focus-ring-color: var(--sl-color-primary-400);
 }
 
 body {
   font-family: "Noto Sans", sans-serif;
-  background-color: #fefefe;
+  background-color: white;
   color: #27272a;
 
   font-weight: var(--sl-font-weight-normal);

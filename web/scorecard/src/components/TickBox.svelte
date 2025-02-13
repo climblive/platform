@@ -161,7 +161,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border-color: var(--sl-color-primary-600);
+    border-color: var(--sl-color-stone-600);
     border-width: 2px;
     border-style: dotted;
     border-radius: var(--sl-border-radius-small);

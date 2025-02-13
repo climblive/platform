@@ -66,8 +66,8 @@
   section {
     padding: var(--sl-spacing-medium);
     color: var(--sl-color-neutral-950);
-    background-color: var(--sl-color-primary-50);
-    border: solid 1px var(--sl-color-primary-300);
+    background-color: var(--sl-color-stone-50);
+    border: solid 1px var(--sl-color-stone-300);
     border-radius: var(--sl-border-radius-small);
     font-size: var(--sl-font-size-small);
 
@@ -78,8 +78,8 @@
 
   sl-details::part(base) {
     margin-top: var(--sl-spacing-small);
-    background-color: var(--sl-color-primary-50);
-    border-color: var(--sl-color-primary-300);
+    background-color: var(--sl-color-stone-50);
+    border-color: var(--sl-color-stone-300);
     font-size: var(--sl-font-size-small);
   }
 

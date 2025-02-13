@@ -2,5 +2,6 @@ packages:
   - scorecard
   - scoreboard
   - admin
+  - sales
   - "packages/*"
   - e2e

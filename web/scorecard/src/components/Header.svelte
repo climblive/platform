@@ -67,11 +67,12 @@
   header {
     background: linear-gradient(
       45deg,
-      var(--sl-color-primary-100),
-      var(--sl-color-primary-300)
+      var(--sl-color-primary-400),
+      var(--sl-color-primary-700)
     );
-    border: 1px solid var(--sl-color-primary-300);
+    border: 1px solid var(--sl-color-primary-700);
     border-radius: var(--sl-border-radius-small);
+    color: white;
     padding: var(--sl-spacing-small);
     position: relative;
 

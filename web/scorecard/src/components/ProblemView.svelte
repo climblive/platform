@@ -46,12 +46,11 @@
 <style>
   section {
     height: 3rem;
-    background-color: var(--sl-color-primary-50);
+    background-color: var(--sl-color-stone-50);
     border-radius: var(--sl-border-radius-small);
-    border: solid 1px var(--sl-color-primary-300);
+    border: solid 1px var(--sl-color-stone-300);
     padding-left: var(--sl-spacing-small);
     padding-right: var(--sl-spacing-2x-small);
-    color: var(--sl-color-primary-950);
 
     display: grid;
     grid-template-columns: var(--number-length) 1rem 1fr 1fr 2.5rem;
