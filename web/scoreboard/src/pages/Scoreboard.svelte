@@ -1,11 +1,12 @@
 <script lang="ts">
-  import Header from "@/components/Header.svelte";
   import { ResultList, ScoreboardProvider } from "@climblive/lib/components";
   import { getCompClassesQuery, getContestQuery } from "@climblive/lib/queries";
   import { SlSelect } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/select/select.js";
   import { onMount } from "svelte";
+  import Footer from "../components/Footer.svelte";
+  import Header from "../components/Header.svelte";
   import Loading from "./Loading.svelte";
 
   interface Props {
@@ -106,6 +107,7 @@
           {/each}
         </div>
       </main>
+      <Footer />
     {/snippet}
   </ScoreboardProvider>
 {/if}
@@ -131,7 +133,7 @@
   main {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: calc(100% - 3rem);
     padding: var(--sl-spacing-small);
     gap: var(--sl-spacing-small);
   }
