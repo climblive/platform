@@ -81,16 +81,20 @@ func TestKeeper(t *testing.T) {
 		wg := keeper.Run(ctx)
 
 		for k := 1; k <= 5; k++ {
+			score := domain.Score{
+				Timestamp:   now,
+				ContenderID: domain.ContenderID(k),
+				Score:       k * 100,
+				Placement:   k,
+				Finalist:    true,
+				RankOrder:   k - 1,
+			}
+
 			err := subscription.Post(domain.EventEnvelope{
-				Data: domain.ContenderScoreUpdatedEvent{
-					Timestamp:   now,
-					ContenderID: domain.ContenderID(k),
-					Score:       k * 100,
-					Placement:   k,
-					Finalist:    true,
-					RankOrder:   k - 1,
-				},
+				Data: domain.ContenderScoreUpdatedEvent(score),
 			})
+
+			mockedRepo.On("StoreScore", mock.Anything, nil, score).Return(nil)
 
 			require.NoError(t, err)
 		}
