@@ -120,6 +120,10 @@ func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.Conten
 		return domain.Tick{}, errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
 	}
 
+	if time.Now().Before(compClass.TimeBegin) {
+		return domain.Tick{}, errors.New(domain.ErrContestNotStarted)
+	}
+
 	gracePeriodEnd := compClass.TimeEnd.Add(contest.GracePeriod)
 
 	switch {

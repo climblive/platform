@@ -99,8 +99,8 @@ func main() {
 	scoreEngineManager := scores.NewScoreEngineManager(repo, scoreEngineStoreHydrator, eventBroker)
 
 	barriers = append(barriers,
-		scoreKeeper.Run(ctx),
-		scoreEngineManager.Run(ctx))
+		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
+		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()))
 
 	mux := setupMux(repo, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
 

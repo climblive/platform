@@ -34,33 +34,44 @@ func NewScoreKeeper(eventBroker domain.EventBroker, repo keeperRepository) *Keep
 	}
 }
 
-func (k *Keeper) Run(ctx context.Context) *sync.WaitGroup {
+func (k *Keeper) Run(ctx context.Context, options ...func(*runOptions)) *sync.WaitGroup {
+	config := &runOptions{}
+	for _, opt := range options {
+		opt(config)
+	}
+
 	wg := new(sync.WaitGroup)
 	ready := make(chan struct{}, 1)
 
-	filter := domain.NewEventFilter(
-		0,
-		0,
-		"CONTENDER_SCORE_UPDATED",
-	)
-
 	wg.Add(1)
 
-	go k.run(ctx, filter, wg, ready)
+	go func() {
+		defer func() {
+			if !config.recoverPanics {
+				return
+			}
+
+			if r := recover(); r != nil {
+				slog.Error("score keeper panicked", "error", r)
+			}
+		}()
+
+		defer wg.Done()
+
+		k.run(ctx, ready)
+	}()
 
 	<-ready
 
 	return wg
 }
 
-func (k *Keeper) run(ctx context.Context, filter domain.EventFilter, wg *sync.WaitGroup, ready chan<- struct{}) {
-	defer func() {
-		if r := recover(); r != nil {
-			slog.Error("score keeper panicked", "error", r)
-		}
-	}()
-
-	defer wg.Done()
+func (k *Keeper) run(ctx context.Context, ready chan<- struct{}) {
+	filter := domain.NewEventFilter(
+		0,
+		0,
+		"CONTENDER_SCORE_UPDATED",
+	)
 
 	subscriptionID, eventReader := k.eventBroker.Subscribe(filter, 0)
 	defer k.eventBroker.Unsubscribe(subscriptionID)

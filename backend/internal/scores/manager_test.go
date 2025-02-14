@@ -81,6 +81,10 @@ func TestScoreEngineManager(t *testing.T) {
 			On("Unsubscribe", fakedSubscriptionID).
 			Return()
 
+		mockedEventBroker.
+			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.ScoreEngineStartedEvent")).
+			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.ScoreEngineStoppedEvent"))
+
 		mockedStoreHydrator.
 			On("Hydrate", mock.Anything, fakedContestID, mock.AnythingOfType("*scores.MemoryStore")).
 			Run(func(args mock.Arguments) {
@@ -146,12 +150,12 @@ func TestScoreEngineManager(t *testing.T) {
 
 		wg := mngr.Run(ctx)
 
-		instanceID, err := mngr.StartScoreEngine(context.Background(), fakedContestID)
+		instanceID, err := mngr.StartScoreEngine(context.Background(), fakedContestID, time.Now().Add(time.Hour))
 
 		require.NoError(t, err)
 		assert.NotEmpty(t, instanceID)
 
-		_, err = mngr.StartScoreEngine(context.Background(), fakedContestID)
+		_, err = mngr.StartScoreEngine(context.Background(), fakedContestID, time.Now().Add(time.Hour))
 
 		require.ErrorIs(t, err, scores.ErrAlreadyStarted)
 

@@ -111,13 +111,11 @@ func TestEngineDriver(t *testing.T) {
 
 		mockedEngine := new(scoreEngineMock)
 
-		mockedEngine.On("Start").Return()
+		mockedEngine.On("Start").Run(func(args mock.Arguments) { cancel() }).Return()
 		mockedEngine.On("Stop").Return()
 		mockedEngine.On("GetDirtyScores").Return([]domain.Score{})
 
 		installEngine(mockedEngine)
-
-		cancel()
 
 		wg.Wait()
 

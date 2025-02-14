@@ -12,6 +12,7 @@ import {
 import { compClassSchema } from "./models/compClass";
 import { contenderSchema } from "./models/contender";
 import { problemSchema } from "./models/problem";
+import type { StartScoreEngineArguments } from "./models/rest";
 import { tickSchema } from "./models/tick";
 import { getApiUrl } from "./utils/config";
 
@@ -176,10 +177,13 @@ export class ApiClient {
     return z.array(z.string().uuid()).parse(result.data);
   };
 
-  startScoreEngine = async (contestId: ContestID) => {
+  startScoreEngine = async (
+    contestId: ContestID,
+    args: StartScoreEngineArguments,
+  ) => {
     const endpoint = `/contests/${contestId}/score-engines`;
 
-    const result = await this.axiosInstance.post(endpoint, undefined, {
+    const result = await this.axiosInstance.post(endpoint, args, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 
