@@ -104,12 +104,17 @@ func main() {
 
 	mux := setupMux(repo, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
 
+	protocols := &http.Protocols{}
+	protocols.SetHTTP1(true)
+	protocols.SetUnencryptedHTTP2(true)
+
 	httpServer := &http.Server{
 		Addr:    "0.0.0.0:8090",
 		Handler: mux,
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
 		},
+		Protocols: protocols,
 	}
 
 	context.AfterFunc(ctx, func() {
