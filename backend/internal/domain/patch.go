@@ -1,19 +1,38 @@
 package domain
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	"github.com/go-errors/errors"
+)
 
 type Patch[T any] struct {
+	Valid bool
 	Value T
 }
 
-func NewPatch[T any](v T) *Patch[T] {
-	return &Patch[T]{Value: v}
+func NewPatch[T any](v T) Patch[T] {
+	return Patch[T]{
+		Valid: true,
+		Value: v,
+	}
 }
 
-func (p *Patch[T]) MarshalJSON() ([]byte, error) {
+func (p Patch[T]) MarshalJSON() ([]byte, error) {
 	return json.Marshal(p.Value)
 }
 
 func (p *Patch[T]) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data, &p.Value)
+	err := json.Unmarshal(data, &p.Value)
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	p.Valid = true
+
+	return nil
+}
+
+func (p *Patch[T]) IsZero() bool {
+	return p.Valid
 }
