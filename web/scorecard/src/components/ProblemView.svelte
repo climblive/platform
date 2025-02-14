@@ -46,9 +46,9 @@
 <style>
   section {
     height: 3rem;
-    background-color: var(--sl-color-stone-50);
+    background-color: var(--sl-color-neutral-50);
     border-radius: var(--sl-border-radius-small);
-    border: solid 1px var(--sl-color-stone-300);
+    border: solid 1px var(--sl-color-neutral-300);
     padding-left: var(--sl-spacing-small);
     padding-right: var(--sl-spacing-2x-small);
 

@@ -14,7 +14,7 @@
     left: 0;
     right: 0;
     height: 3rem;
-    background-color: var(--sl-color-primary-300);
+    background-color: var(--sl-color-neutral-300);
     display: flex;
     align-items: center;
     justify-content: center;

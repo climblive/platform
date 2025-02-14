@@ -325,8 +325,8 @@
     flex-grow: 1;
 
     &::part(button--checked) {
-      border-color: var(--sl-color-stone-300);
-      background-color: var(--sl-color-stone-200);
+      border-color: var(--sl-color-neutral-300);
+      background-color: var(--sl-color-neutral-200);
       color: inherit;
     }
   }

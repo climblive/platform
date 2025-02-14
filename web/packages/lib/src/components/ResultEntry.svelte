@@ -34,8 +34,8 @@
 <style>
   section {
     height: 2.25rem;
-    background-color: var(--sl-color-primary-500);
-    color: white;
+    background-color: var(--sl-color-neutral-50);
+    border: 1px solid var(--sl-color-neutral-300);
     display: grid;
     padding-inline: var(--sl-spacing-small);
     border-radius: var(--sl-border-radius-medium);
@@ -52,13 +52,14 @@
   section[data-finalist="true"] {
     background: linear-gradient(
       45deg,
-      var(--sl-color-yellow-800),
-      var(--sl-color-yellow-500)
+      var(--sl-color-amber-50),
+      var(--sl-color-amber-50)
     );
+    border: 1px solid var(--sl-color-amber-300);
+    color: var(--sl-color-amber-900);
     background-size: 150%;
     background-position: left;
     animation: shine 5s infinite;
-    color: white;
   }
 
   @keyframes shine {
@@ -96,5 +97,9 @@
     text-align: right;
     font-weight: var(--sl-font-weight-bold);
     font-size: var(--sl-font-size-medium);
+
+    & sl-icon {
+      color: var(--sl-color-amber-600);
+    }
   }
 </style>

@@ -46,7 +46,7 @@
     background-color: var(--sl-color-primary-600);
     border-radius: var(--sl-border-radius-medium);
 
-    color: var(--sl-color-primary-100);
+    color: white;
 
     display: grid;
     grid-template-columns: 1fr max-content;
@@ -85,7 +85,7 @@
       border-radius: 0 var(--sl-border-radius-medium) 0
         var(--sl-border-radius-medium);
 
-      background-color: var(--sl-color-primary-50);
+      background-color: white;
       color: var(--sl-color-primary-700);
       font-size: var(--sl-font-size-small);
       font-weight: var(--sl-font-weight-bold);

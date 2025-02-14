@@ -104,6 +104,8 @@
 
 <svelte:body on:click|capture={handleClickOutside} />
 
+<div class="overlay" data-enabled={open}></div>
+
 <div data-variant={variant} bind:this={container}>
   <button
     disabled={disabled || loading}
@@ -119,25 +121,24 @@
     {/if}
   </button>
 
-  <div class="overlay" data-enabled={open}>
-    <sl-popup
-      bind:this={popup}
-      placement="left"
-      active={open}
-      arrow
-      strategy="fixed"
-      distance="10"
-    >
-      <sl-button size="small" onclick={(e: MouseEvent) => handleTick(e, false)}>
-        <sl-icon slot="prefix" name="check2-all"></sl-icon>
-        Top
-      </sl-button>
-      <sl-button size="small" onclick={(e: MouseEvent) => handleTick(e, true)}>
-        <sl-icon slot="prefix" name="lightning-charge"></sl-icon>
-        Flash
-      </sl-button>
-    </sl-popup>
-  </div>
+  <sl-popup
+    bind:this={popup}
+    placement="left"
+    active={open}
+    arrow
+    strategy="absolute"
+    distance="10"
+    flip
+  >
+    <sl-button size="small" onclick={(e: MouseEvent) => handleTick(e, true)}>
+      <sl-icon slot="prefix" name="lightning-charge"></sl-icon>
+      Flash
+    </sl-button>
+    <sl-button size="small" onclick={(e: MouseEvent) => handleTick(e, false)}>
+      <sl-icon slot="prefix" name="check2-all"></sl-icon>
+      Top
+    </sl-button>
+  </sl-popup>
 </div>
 
 <style>
@@ -161,7 +162,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border-color: var(--sl-color-stone-600);
+    border-color: var(--sl-color-neutral-600);
     border-width: 2px;
     border-style: dotted;
     border-radius: var(--sl-border-radius-small);
@@ -240,7 +241,8 @@
 
   sl-popup[active]::part(popup) {
     display: flex;
-    gap: var(--sl-spacing-2x-small);
+    flex-direction: column;
+    gap: var(--sl-spacing-x-small);
   }
 
   .overlay {
