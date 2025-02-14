@@ -34,5 +34,5 @@ func (p *Patch[T]) UnmarshalJSON(data []byte) error {
 }
 
 func (p *Patch[T]) IsZero() bool {
-	return p.Valid
+	return !p.Valid
 }
