@@ -7,14 +7,14 @@ import (
 )
 
 type Patch[T any] struct {
-	Valid bool
-	Value T
+	Present bool
+	Value   T
 }
 
 func NewPatch[T any](v T) Patch[T] {
 	return Patch[T]{
-		Valid: true,
-		Value: v,
+		Present: true,
+		Value:   v,
 	}
 }
 
@@ -28,11 +28,11 @@ func (p *Patch[T]) UnmarshalJSON(data []byte) error {
 		return errors.Wrap(err, 0)
 	}
 
-	p.Valid = true
+	p.Present = true
 
 	return nil
 }
 
 func (p *Patch[T]) IsZero() bool {
-	return !p.Valid
+	return !p.Present
 }

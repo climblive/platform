@@ -55,7 +55,7 @@ func TestPatchUnmarshal(t *testing.T) {
 		err := json.Unmarshal([]byte(encoded), &data)
 
 		require.NoError(t, err)
-		assert.True(t, data.Data.Valid)
+		assert.True(t, data.Data.Present)
 		assert.Equal(t, "Hello, World!", data.Data.Value)
 	})
 
@@ -67,7 +67,7 @@ func TestPatchUnmarshal(t *testing.T) {
 		err := json.Unmarshal([]byte(encoded), &data)
 
 		require.NoError(t, err)
-		assert.False(t, data.Data.Valid)
+		assert.False(t, data.Data.Present)
 		assert.Empty(t, data.Data.Value)
 	})
 
@@ -79,7 +79,7 @@ func TestPatchUnmarshal(t *testing.T) {
 		err := json.Unmarshal([]byte(encoded), &data)
 
 		require.NoError(t, err)
-		assert.True(t, data.Data.Valid)
+		assert.True(t, data.Data.Present)
 		assert.Nil(t, data.Data.Value)
 	})
 
@@ -91,7 +91,7 @@ func TestPatchUnmarshal(t *testing.T) {
 		err := json.Unmarshal([]byte(encoded), &data)
 
 		require.NoError(t, err)
-		assert.True(t, data.Data.Valid)
+		assert.True(t, data.Data.Present)
 		require.NotNil(t, data.Data.Value)
 		assert.Equal(t, 5, *data.Data.Value)
 	})
