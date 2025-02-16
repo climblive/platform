@@ -9,7 +9,7 @@
   import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path.js";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
-  import { setContext } from "svelte";
+  import { onMount, setContext } from "svelte";
   import { Route, Router, navigate } from "svelte-routing";
   import { writable } from "svelte/store";
   import { ZodError } from "zod";
@@ -68,6 +68,18 @@
   };
 
   parseCodeFromUrl();
+
+  const setAppHeight = () =>
+    document.documentElement.style.setProperty(
+      "--app-height",
+      `${window.innerHeight}px`,
+    );
+
+  onMount(() => {
+    window.addEventListener("resize", setAppHeight);
+
+    setAppHeight();
+  });
 </script>
 
 <QueryClientProvider client={queryClient}>
