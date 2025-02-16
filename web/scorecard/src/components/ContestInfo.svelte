@@ -65,7 +65,6 @@
 <style>
   section {
     padding: var(--sl-spacing-medium);
-    color: var(--sl-color-neutral-950);
     background-color: var(--sl-color-neutral-50);
     border: solid 1px var(--sl-color-neutral-300);
     border-radius: var(--sl-border-radius-small);

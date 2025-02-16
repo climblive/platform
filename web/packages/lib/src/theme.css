@@ -5,17 +5,17 @@
       Generator: https://uicolors.app/create
       Input: #ce5c4c
     */
-  --sl-color-primary-50: #fdf4f3;
-  --sl-color-primary-100: #fbe8e5;
-  --sl-color-primary-200: #f9d4cf;
-  --sl-color-primary-300: #f3b6ae;
-  --sl-color-primary-400: #ea8c7f;
-  --sl-color-primary-500: #dd6756;
-  --sl-color-primary-600: #ce5c4c;
-  --sl-color-primary-700: #a83c2d;
-  --sl-color-primary-800: #8c3428;
-  --sl-color-primary-900: #753127;
-  --sl-color-primary-950: #3f1610;
+  --sl-color-primary-50: #fcfbf3;
+  --sl-color-primary-100: #f9f7eb;
+  --sl-color-primary-200: #f3ead8;
+  --sl-color-primary-300: #e9d1b9;
+  --sl-color-primary-400: #dca88e;
+  --sl-color-primary-500: #cc7966;
+  --sl-color-primary-600: #bc5757;
+  --sl-color-primary-700: #993847;
+  --sl-color-primary-800: #81314c;
+  --sl-color-primary-900: #6d2c4d;
+  --sl-color-primary-950: #3c152c;
 
   --sl-color-neutral-50: oklch(0.985 0 0);
   --sl-color-neutral-100: oklch(0.967 0.001 286.375);

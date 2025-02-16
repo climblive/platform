@@ -104,8 +104,6 @@
 
 <svelte:body on:click|capture={handleClickOutside} />
 
-<div class="overlay" data-enabled={open}></div>
-
 <div data-variant={variant} bind:this={container}>
   <button
     disabled={disabled || loading}
@@ -126,17 +124,16 @@
     placement="left"
     active={open}
     arrow
-    strategy="absolute"
+    strategy="fixed"
     distance="10"
-    flip
   >
-    <sl-button size="small" onclick={(e: MouseEvent) => handleTick(e, true)}>
-      <sl-icon slot="prefix" name="lightning-charge"></sl-icon>
-      Flash
-    </sl-button>
     <sl-button size="small" onclick={(e: MouseEvent) => handleTick(e, false)}>
       <sl-icon slot="prefix" name="check2-all"></sl-icon>
       Top
+    </sl-button>
+    <sl-button size="small" onclick={(e: MouseEvent) => handleTick(e, true)}>
+      <sl-icon slot="prefix" name="lightning-charge"></sl-icon>
+      Flash
     </sl-button>
   </sl-popup>
 </div>
@@ -241,19 +238,6 @@
 
   sl-popup[active]::part(popup) {
     display: flex;
-    flex-direction: column;
-    gap: var(--sl-spacing-x-small);
-  }
-
-  .overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background-color: var(--sl-overlay-background-color);
-    z-index: var(--sl-z-index-dialog);
-  }
-
-  .overlay[data-enabled="true"] {
-    display: block;
+    gap: var(--sl-spacing-2x-small);
   }
 </style>

@@ -242,7 +242,7 @@
                 Sort by number
               </sl-radio-button>
 
-              <sl-radio-button value="points" variant="danger">
+              <sl-radio-button value="points">
                 <sl-icon
                   slot="prefix"
                   name="sort-down-alt"
@@ -300,7 +300,7 @@
     left: 0;
     right: 0;
     z-index: 10;
-    background-color: #fefefe;
+    background-color: white;
     padding: var(--sl-spacing-small);
   }
 
