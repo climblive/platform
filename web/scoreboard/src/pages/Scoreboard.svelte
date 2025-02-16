@@ -1,4 +1,5 @@
 <script lang="ts">
+  import imgUrl from "@/static/logo.svg";
   import { ResultList, ScoreboardProvider } from "@climblive/lib/components";
   import { getCompClassesQuery, getContestQuery } from "@climblive/lib/queries";
   import { SlSelect } from "@shoelace-style/shoelace";
@@ -6,7 +7,6 @@
   import "@shoelace-style/shoelace/dist/components/select/select.js";
   import { onMount } from "svelte";
   import Header from "../components/Header.svelte";
-  import PoweredBy from "../components/PoweredBy.svelte";
   import Loading from "./Loading.svelte";
 
   interface Props {
@@ -68,7 +68,9 @@
         <h1>
           {contest.name}
         </h1>
-        <PoweredBy />
+        <p class="logo">
+          <img src={imgUrl} alt="ClimbLive" />
+        </p>
         {#if compClasses.length > 1}
           <sl-select
             bind:this={compClassSelector}
@@ -170,6 +172,14 @@
     display: none;
   }
 
+  .logo {
+    text-align: center;
+
+    & img {
+      height: var(--sl-font-size-x-large);
+    }
+  }
+
   @media screen and (max-width: 512px) {
     h1 {
       font-size: var(--sl-font-size-x-large);
@@ -185,6 +195,12 @@
 
     .class[data-selected="false"] {
       display: none;
+    }
+
+    .logo {
+      & img {
+        height: var(--sl-font-size-large);
+      }
     }
   }
 </style>
