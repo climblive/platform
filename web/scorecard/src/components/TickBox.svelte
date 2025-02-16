@@ -205,7 +205,7 @@
   }
 
   sl-popup {
-    --arrow-color: var(--sl-color-primary-800);
+    --arrow-color: var(--sl-color-primary-600);
 
     & sl-button::part(base) {
       width: 2.5rem;
@@ -227,7 +227,7 @@
   }
 
   sl-popup::part(popup) {
-    background-color: var(--sl-color-primary-800);
+    background-color: var(--sl-color-primary-600);
     box-shadow:
       rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
       rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;

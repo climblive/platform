@@ -17,13 +17,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--sl-color-primary-950);
-    font-size: var(--sl-font-size-small);
+    background-color: var(--sl-color-neutral-50);
+    font-size: var(--sl-font-size-medium);
   }
 
   img {
-    width: 1.5rem;
-    width: 1.5rem;
+    width: 1.25rem;
+    width: 1.25rem;
     margin-right: var(--sl-spacing-x-small);
   }
 </style>

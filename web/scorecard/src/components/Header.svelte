@@ -66,7 +66,7 @@
 <style>
   header {
     background-color: var(--sl-color-primary-600);
-    border: 1px solid var(--sl-color-primary-700);
+    border: 1px solid var(--sl-color-primary-500);
     border-radius: var(--sl-border-radius-small);
     padding: var(--sl-spacing-small);
     color: white;

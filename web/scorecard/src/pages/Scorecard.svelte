@@ -324,7 +324,8 @@
   sl-radio-button {
     flex-grow: 1;
 
-    &::part(button--checked) {
+    &::part(button--checked),
+    &::part(button):hover {
       border-color: var(--sl-color-neutral-300);
       background-color: var(--sl-color-neutral-200);
       color: inherit;

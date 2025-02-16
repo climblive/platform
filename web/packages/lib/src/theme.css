@@ -30,12 +30,14 @@
   --sl-color-neutral-950: oklch(0.141 0.005 285.823);
 
   --sl-input-focus-ring-color: var(--sl-color-primary-400);
+
+  --color: #27272a;
 }
 
 body {
   font-family: "Noto Sans", sans-serif;
   background-color: white;
-  color: #27272a;
+  color: var(--color);
 
   font-weight: var(--sl-font-weight-normal);
 }
