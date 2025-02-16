@@ -1,5 +1,5 @@
 <script lang="ts">
-  import imgUrl from "@/static/logo.svg";
+  import logoUrl from "@/static/logo.svg";
   import { ResultList, ScoreboardProvider } from "@climblive/lib/components";
   import { getCompClassesQuery, getContestQuery } from "@climblive/lib/queries";
   import { SlSelect } from "@shoelace-style/shoelace";
@@ -69,7 +69,7 @@
           {contest.name}
         </h1>
         <p class="logo">
-          <img src={imgUrl} alt="ClimbLive" />
+          <img src={logoUrl} alt="ClimbLive" />
         </p>
         {#if compClasses.length > 1}
           <sl-select

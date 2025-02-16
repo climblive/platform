@@ -1,5 +1,5 @@
 <script lang="ts">
-  import imgUrl from "@/static/logo.svg";
+  import logoUrl from "@/static/logo.svg";
   import { type ScorecardSession } from "@/types";
   import { authenticateContender, readStoredSessions } from "@/utils/auth";
   import { serialize } from "@shoelace-style/shoelace";
@@ -131,7 +131,7 @@
     </section>
   {/each}
   <footer>
-    <img src={imgUrl} alt="ClimbLive" />
+    <img src={logoUrl} alt="ClimbLive" />
   </footer>
 </main>
 
