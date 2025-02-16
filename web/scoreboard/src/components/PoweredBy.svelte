@@ -2,22 +2,16 @@
   import imgUrl from "@/static/logo.svg";
 </script>
 
-<footer>
+<p>
   <img src={imgUrl} alt="ClimbLive" />
   Powered by ClimbLive
-</footer>
+</p>
 
 <style>
-  footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 3rem;
+  p {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--sl-color-neutral-50);
     font-size: var(--sl-font-size-medium);
   }
 
