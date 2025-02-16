@@ -140,7 +140,7 @@
     display: flex;
     flex-direction: column;
     padding-inline: var(--sl-spacing-large);
-    min-height: 100vh;
+    min-height: var(--app-height);
   }
 
   header {
@@ -168,7 +168,7 @@
     padding-block: var(--sl-spacing-medium);
 
     & img {
-      height: var(--sl-font-size-large);
+      height: var(--sl-font-size-x-large);
     }
   }
 
