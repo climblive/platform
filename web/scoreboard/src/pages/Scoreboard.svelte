@@ -197,7 +197,7 @@
       display: none;
     }
 
-    .logo > img
+    .logo > img {
       height: var(--sl-font-size-large);
     }
   }
