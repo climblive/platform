@@ -86,13 +86,11 @@
 
     .size {
       align-self: start;
-      margin: var(--sl-spacing-x-small) var(--sl-spacing-x-small) 0 0;
-      padding: var(--sl-spacing-x-small);
-      border-radius: var(--sl-border-radius-medium);
+      margin: var(--sl-spacing-small) var(--sl-spacing-small) 0 0;
 
-      background-color: white;
-      color: var(--color);
+      color: white;
       font-size: var(--sl-font-size-small);
+      font-weight: var(--sl-font-weight-semibold);
     }
   }
 </style>
