@@ -38,7 +38,7 @@
       </div>
       {#if classSize > 0}
         <div class="size">
-          {classSize} / {totalSize}
+          <strong>{classSize}</strong>/{totalSize}
         </div>
       {/if}
     </header>
@@ -91,6 +91,10 @@
       color: white;
       font-size: var(--sl-font-size-small);
       font-weight: var(--sl-font-weight-semibold);
+
+      & strong {
+        font-size: 1.5em;
+      }
     }
   }
 </style>
