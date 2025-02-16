@@ -9,9 +9,10 @@
     problem: Problem;
     tick?: Tick | undefined;
     disabled: boolean;
+    highestProblemNumber: number;
   }
 
-  let { problem, tick, disabled }: Props = $props();
+  let { problem, tick, disabled, highestProblemNumber }: Props = $props();
 
   let pointValue = $derived(calculateProblemScore(problem, tick));
 </script>
@@ -20,8 +21,9 @@
   data-ticked={!!tick}
   data-flashed={tick?.attemptsTop === 1}
   aria-label={`Problem ${problem.number}`}
+  style="--number-length: {highestProblemNumber.toString().length + 2}ch"
 >
-  <span class="number">#{problem.number}</span>
+  <span class="number">№ {problem.number}</span>
   <HoldColorIndicator
     primary={problem.holdColorPrimary}
     secondary={problem.holdColorSecondary}
@@ -31,10 +33,7 @@
       {problem.pointsTop}p
     </span>
     {#if problem.flashBonus}
-      <span class="flash">
-        {problem.flashBonus}p
-        <sl-icon name="lightning-charge"></sl-icon>
-      </span>
+      <sl-icon name="lightning-charge"></sl-icon>
     {/if}
   </span>
   <div class="score">
@@ -47,15 +46,14 @@
 <style>
   section {
     height: 3rem;
-    background-color: var(--sl-color-primary-100);
+    background-color: var(--sl-color-neutral-50);
     border-radius: var(--sl-border-radius-small);
-    border: solid 1px
-      color-mix(in srgb, var(--sl-color-primary-300), transparent 50%);
+    border: solid 1px var(--sl-color-neutral-300);
     padding-left: var(--sl-spacing-small);
     padding-right: var(--sl-spacing-2x-small);
-    color: var(--sl-color-primary-900);
+
     display: grid;
-    grid-template-columns: 1rem 1.25rem 1fr 1fr 2.5rem;
+    grid-template-columns: var(--number-length) 1rem 1fr 1fr 2.5rem;
     grid-template-rows: 1fr;
     gap: var(--sl-spacing-x-small);
     align-items: center;
@@ -63,24 +61,19 @@
   }
 
   .number {
-    font-size: var(--sl-font-size-x-small);
+    font-size: var(--sl-font-size-small);
+    text-wrap: nowrap;
+    justify-self: start;
+    font-weight: var(--sl-font-weight-bold);
   }
 
   .points {
     margin-right: auto;
     white-space: nowrap;
 
-    & .top {
-      font-weight: var(--sl-font-weight-semibold);
-    }
-
-    & .flash {
-      font-size: var(--sl-font-size-small);
-
-      & sl-icon {
-        font-size: var(--sl-font-size-x-small);
-        color: var(--sl-color-yellow-500);
-      }
+    & sl-icon {
+      font-size: var(--sl-font-size-x-small);
+      color: var(--sl-color-yellow-500);
     }
   }
 

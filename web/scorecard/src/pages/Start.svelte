@@ -103,7 +103,7 @@
   </form>
 
   {#if restoredSessions.length > 0}
-    <sl-divider style="--color: var(--sl-color-primary-600);"></sl-divider>
+    <sl-divider></sl-divider>
   {/if}
 
   {#each restoredSessions as restoredSession (restoredSession.registrationCode)}
@@ -164,15 +164,14 @@
     font-weight: var(--sl-font-weight-semibold);
     line-height: 4rem;
     font-size: var(--sl-font-size-x-small);
-    color: var(--sl-color-primary-900);
   }
 
   .restoredSession {
-    background-color: var(--sl-color-primary-600);
+    background-color: var(--sl-color-primary-50);
+    border: 1px solid var(--sl-color-primary-300);
     border-radius: var(--sl-border-radius-medium);
     padding: var(--sl-spacing-small);
     text-align: left;
-    color: white;
 
     & h3 {
       margin: 0;

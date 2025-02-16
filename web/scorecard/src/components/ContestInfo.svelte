@@ -65,10 +65,8 @@
 <style>
   section {
     padding: var(--sl-spacing-medium);
-    color: var(--sl-color-neutral-700);
-    background-color: var(--sl-color-primary-100);
-    border: solid 1px
-      color-mix(in srgb, var(--sl-color-primary-300), transparent 50%);
+    background-color: var(--sl-color-neutral-50);
+    border: solid 1px var(--sl-color-neutral-300);
     border-radius: var(--sl-border-radius-small);
     font-size: var(--sl-font-size-small);
 
@@ -79,7 +77,8 @@
 
   sl-details::part(base) {
     margin-top: var(--sl-spacing-small);
-    background-color: var(--sl-color-primary-100);
+    background-color: var(--sl-color-neutral-50);
+    border-color: var(--sl-color-neutral-300);
     font-size: var(--sl-font-size-small);
   }
 

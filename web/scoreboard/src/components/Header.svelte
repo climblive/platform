@@ -14,6 +14,11 @@
   let { name, compClassId, startTime, endTime, scoreboard }: Props = $props();
 
   let classSize = $derived(($scoreboard.get(compClassId) ?? []).length);
+  let totalSize = $derived.by(() => {
+    let total = 0;
+    $scoreboard.forEach((entry) => (total += entry.length));
+    return total;
+  });
 </script>
 
 <ContestStateProvider {startTime} {endTime}>
@@ -33,7 +38,7 @@
       </div>
       {#if classSize > 0}
         <div class="size">
-          #{classSize}
+          <strong>{classSize}</strong>/{totalSize}
         </div>
       {/if}
     </header>
@@ -46,7 +51,7 @@
     background-color: var(--sl-color-primary-600);
     border-radius: var(--sl-border-radius-medium);
 
-    color: var(--sl-color-primary-100);
+    color: white;
 
     display: grid;
     grid-template-columns: 1fr max-content;
@@ -81,14 +86,15 @@
 
     .size {
       align-self: start;
-      padding: var(--sl-spacing-x-small);
-      border-radius: 0 var(--sl-border-radius-medium) 0
-        var(--sl-border-radius-medium);
+      margin: var(--sl-spacing-small) var(--sl-spacing-small) 0 0;
 
-      background-color: var(--sl-color-primary-50);
-      color: var(--sl-color-primary-700);
+      color: white;
       font-size: var(--sl-font-size-small);
-      font-weight: var(--sl-font-weight-bold);
+      font-weight: var(--sl-font-weight-semibold);
+
+      & strong {
+        font-size: 1.5em;
+      }
     }
   }
 </style>

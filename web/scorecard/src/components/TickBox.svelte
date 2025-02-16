@@ -125,7 +125,7 @@
     active={open}
     arrow
     strategy="fixed"
-    distance="4"
+    distance="10"
   >
     <sl-button size="small" onclick={(e: MouseEvent) => handleTick(e, false)}>
       <sl-icon slot="prefix" name="check2-all"></sl-icon>
@@ -159,9 +159,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border-color: var(--sl-color-primary-900);
-    border-width: var(--sl-input-border-width);
-    border-style: solid;
+    border-color: var(--sl-color-neutral-600);
+    border-width: 2px;
+    border-style: dotted;
     border-radius: var(--sl-border-radius-small);
   }
 
@@ -205,7 +205,7 @@
   }
 
   sl-popup {
-    --arrow-color: var(--sl-color-primary-800);
+    --arrow-color: var(--sl-color-primary-600);
 
     & sl-button::part(base) {
       width: 2.5rem;
@@ -227,7 +227,7 @@
   }
 
   sl-popup::part(popup) {
-    background-color: var(--sl-color-primary-800);
+    background-color: var(--sl-color-primary-600);
     box-shadow:
       rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
       rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
