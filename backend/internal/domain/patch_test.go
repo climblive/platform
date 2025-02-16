@@ -13,6 +13,13 @@ type data[T any] struct {
 	Data domain.Patch[T] `json:"data,omitzero"`
 }
 
+func TestNewPatch(t *testing.T) {
+	patch := domain.NewPatch("Hello, World!")
+
+	assert.True(t, patch.Present)
+	assert.Equal(t, "Hello, World!", patch.Value)
+}
+
 func TestPatchMarshal(t *testing.T) {
 	t.Run("WithPatchValue", func(t *testing.T) {
 		data := data[string]{
