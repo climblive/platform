@@ -197,10 +197,8 @@
       display: none;
     }
 
-    .logo {
-      & img {
-        height: var(--sl-font-size-large);
-      }
+    .logo > img
+      height: var(--sl-font-size-large);
     }
   }
 </style>
