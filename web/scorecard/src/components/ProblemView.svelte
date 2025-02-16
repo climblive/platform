@@ -9,10 +9,10 @@
     problem: Problem;
     tick?: Tick | undefined;
     disabled: boolean;
-    maxProblemNumber: number;
+    highestProblemNumber: number;
   }
 
-  let { problem, tick, disabled, maxProblemNumber }: Props = $props();
+  let { problem, tick, disabled, highestProblemNumber }: Props = $props();
 
   let pointValue = $derived(calculateProblemScore(problem, tick));
 </script>
@@ -21,7 +21,7 @@
   data-ticked={!!tick}
   data-flashed={tick?.attemptsTop === 1}
   aria-label={`Problem ${problem.number}`}
-  style="--number-length: {maxProblemNumber.toString().length + 2}ch"
+  style="--number-length: {highestProblemNumber.toString().length + 2}ch"
 >
   <span class="number">№ {problem.number}</span>
   <HoldColorIndicator

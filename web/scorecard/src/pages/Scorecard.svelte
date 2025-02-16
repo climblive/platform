@@ -103,7 +103,7 @@
     return clonedProblems;
   });
 
-  let maxProblemNumber = $derived(
+  let highestProblemNumber = $derived(
     problems?.reduce((max, cur) => {
       return Math.max(max, cur.number);
     }, 0) ?? 0,
@@ -256,7 +256,7 @@
                 {problem}
                 tick={ticks.find(({ problemId }) => problemId === problem.id)}
                 disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
-                {maxProblemNumber}
+                {highestProblemNumber}
               />
             {/each}
           </sl-tab-panel>
