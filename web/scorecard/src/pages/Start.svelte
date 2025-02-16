@@ -140,7 +140,7 @@
     display: flex;
     flex-direction: column;
     padding-inline: var(--sl-spacing-large);
-    height: 100vh;
+    min-height: 100vh;
   }
 
   header {
