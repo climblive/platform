@@ -26,7 +26,7 @@ type Contender struct {
 	Name                string        `json:"name,omitempty"`
 	PublicName          string        `json:"publicName,omitempty"`
 	ClubName            string        `json:"clubName,omitempty"`
-	Entered             *time.Time    `json:"entered,omitzero"`
+	Entered             *time.Time    `json:"entered"`
 	WithdrawnFromFinals bool          `json:"withdrawnFromFinals"`
 	Disqualified        bool          `json:"disqualified"`
 	Score               *Score        `json:"score,omitempty"`

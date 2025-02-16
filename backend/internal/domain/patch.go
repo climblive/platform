@@ -33,6 +33,6 @@ func (p *Patch[T]) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (p *Patch[T]) IsZero() bool {
+func (p Patch[T]) IsZero() bool {
 	return !p.Present
 }
