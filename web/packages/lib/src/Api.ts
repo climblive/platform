@@ -112,6 +112,14 @@ export class ApiClient {
     return contestSchema.parse(result.data);
   };
 
+  getContestsByOrganizer = async (organizerId: number) => {
+    const endpoint = `/organizers/${organizerId}/contests`;
+
+    const result = await this.axiosInstance.get(endpoint);
+
+    return z.array(contestSchema).parse(result.data);
+  };
+
   getProblems = async (contestId: number) => {
     const endpoint = `/contests/${contestId}/problems`;
 

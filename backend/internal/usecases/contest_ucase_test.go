@@ -155,3 +155,7 @@ func TestGetScoreboard_Empty(t *testing.T) {
 
 	mockedRepo.AssertExpectations(t)
 }
+
+func TestGetContestsByOrganizer(t *testing.T) {
+
+}

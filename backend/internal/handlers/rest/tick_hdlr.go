@@ -1,17 +1,24 @@
 package rest
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/domain"
 )
 
-type tickHandler struct {
-	tickUseCase domain.TickUseCase
+type tickUseCase interface {
+	GetTicksByContender(ctx context.Context, contenderID domain.ContenderID) ([]domain.Tick, error)
+	DeleteTick(ctx context.Context, tickID domain.TickID) error
+	CreateTick(ctx context.Context, contenderID domain.ContenderID, tick domain.Tick) (domain.Tick, error)
 }
 
-func InstallTickHandler(mux *Mux, tickUseCase domain.TickUseCase) {
+type tickHandler struct {
+	tickUseCase tickUseCase
+}
+
+func InstallTickHandler(mux *Mux, tickUseCase tickUseCase) {
 	handler := &tickHandler{
 		tickUseCase: tickUseCase,
 	}

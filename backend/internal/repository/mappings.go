@@ -137,6 +137,17 @@ func userToDomain(record database.User) domain.User {
 	}
 }
 
+func organizerToDomain(record database.Organizer) domain.Organizer {
+	return domain.Organizer{
+		ID: domain.OrganizerID(record.ID),
+		Ownership: domain.OwnershipData{
+			OrganizerID: domain.OrganizerID(record.ID),
+		},
+		Name:     record.Name,
+		Homepage: record.Homepage.String,
+	}
+}
+
 func makeNullString(value string) sql.NullString {
 	if value == "" {
 		return sql.NullString{}

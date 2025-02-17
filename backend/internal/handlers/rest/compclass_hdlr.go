@@ -1,16 +1,21 @@
 package rest
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/domain"
 )
 
-type compClassHandler struct {
-	compClassUseCase domain.CompClassUseCase
+type compClassUseCase interface {
+	GetCompClassesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.CompClass, error)
 }
 
-func InstallCompClassHandler(mux *Mux, compClassUseCase domain.CompClassUseCase) {
+type compClassHandler struct {
+	compClassUseCase compClassUseCase
+}
+
+func InstallCompClassHandler(mux *Mux, compClassUseCase compClassUseCase) {
 	handler := &compClassHandler{
 		compClassUseCase: compClassUseCase,
 	}

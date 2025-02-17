@@ -25,15 +25,3 @@ func (uc *CompClassUseCase) GetCompClassesByContest(ctx context.Context, contest
 
 	return compClasses, nil
 }
-
-func (uc *CompClassUseCase) UpdateCompClass(ctx context.Context, compClassID domain.CompClassID, compClass domain.CompClass) (domain.CompClass, error) {
-	panic("not implemented")
-}
-
-func (uc *CompClassUseCase) DeleteCompClass(ctx context.Context, compClassID domain.CompClassID) error {
-	panic("not implemented")
-}
-
-func (uc *CompClassUseCase) CreateCompClass(ctx context.Context, contestID domain.ContestID, compClass domain.CompClass) (domain.CompClass, error) {
-	panic("not implemented")
-}
