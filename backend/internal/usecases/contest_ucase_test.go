@@ -157,5 +157,75 @@ func TestGetScoreboard_Empty(t *testing.T) {
 }
 
 func TestGetContestsByOrganizer(t *testing.T) {
+	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedOwnership := domain.OwnershipData{
+		OrganizerID: fakedOrganizerID,
+	}
 
+	makeMocks := func() (*repositoryMock, *authorizerMock) {
+		mockedRepo := new(repositoryMock)
+
+		mockedRepo.
+			On("GetOrganizer", mock.Anything, nil, fakedOrganizerID).
+			Return(domain.Organizer{
+				ID:        fakedOrganizerID,
+				Ownership: fakedOwnership,
+			}, nil)
+
+		mockedAuthorizer := new(authorizerMock)
+
+		return mockedRepo, mockedAuthorizer
+	}
+
+	t.Run("HappyCase", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		mockedRepo.
+			On("GetContestsByOrganizer", mock.Anything, nil, fakedOrganizerID).
+			Return([]domain.Contest{
+				{
+					ID:        fakedContestID,
+					Ownership: fakedOwnership,
+				},
+			}, nil)
+
+		ucase := usecases.ContestUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		contests, err := ucase.GetContestsByOrganizer(context.Background(), fakedOrganizerID)
+
+		require.NoError(t, err)
+		require.Len(t, contests, 1)
+		assert.Equal(t, fakedContestID, contests[0].ID)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		ucase := usecases.ContestUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.GetContestsByOrganizer(context.Background(), fakedOrganizerID)
+
+		require.ErrorIs(t, err, domain.ErrNoOwnership)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
 }
