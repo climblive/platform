@@ -102,4 +102,24 @@ func TestPatchUnmarshal(t *testing.T) {
 		require.NotNil(t, data.Data.Value)
 		assert.Equal(t, 5, *data.Data.Value)
 	})
+
+	t.Run("WithNestedPatch", func(t *testing.T) {
+		encoded := `{"data":{"data":{"data":5}}}`
+
+		var data data[data[data[int]]]
+
+		err := json.Unmarshal([]byte(encoded), &data)
+
+		require.NoError(t, err)
+		assert.True(t, data.Data.Present)
+
+		nested1 := data.Data.Value
+
+		assert.True(t, nested1.Data.Present)
+
+		nested2 := nested1.Data.Value
+
+		assert.True(t, nested2.Data.Present)
+		assert.Equal(t, 5, nested2.Data.Value)
+	})
 }
