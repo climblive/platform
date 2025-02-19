@@ -58,6 +58,18 @@ type Contest struct {
 	TimeEnd            *time.Time    `json:"timeEnd,omitempty"`
 }
 
+type ContestTemplate struct {
+	Location           string        `json:"location,omitempty"`
+	SeriesID           SeriesID      `json:"seriesId,omitempty"`
+	Name               string        `json:"name"`
+	Description        string        `json:"description,omitempty"`
+	FinalsEnabled      bool          `json:"finalsEnabled"`
+	QualifyingProblems int           `json:"qualifyingProblems"`
+	Finalists          int           `json:"finalists"`
+	Rules              string        `json:"rules,omitempty"`
+	GracePeriod        time.Duration `json:"gracePeriod"`
+}
+
 type Organizer struct {
 	ID        OrganizerID   `json:"id"`
 	Ownership OwnershipData `json:"-"`

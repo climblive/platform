@@ -14,6 +14,7 @@ type contestUseCaseRepository interface {
 	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error)
 	GetContestsByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.Contest, error)
 	GetOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) (domain.Organizer, error)
+	CreateContest(ctx context.Context, tx domain.Transaction, contest domain.Contest) (domain.Contest, error)
 }
 
 type ContestUseCase struct {
@@ -80,4 +81,38 @@ func (uc *ContestUseCase) GetScoreboard(ctx context.Context, contestID domain.Co
 	}
 
 	return entries, nil
+}
+
+func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.OrganizerID, tmpl domain.ContestTemplate) (domain.Contest, error) {
+	organizer, err := uc.Repo.GetOrganizer(ctx, nil, organizerID)
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	if _, err := uc.Authorizer.HasOwnership(ctx, organizer.Ownership); err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	contest := domain.Contest{
+		Ownership: domain.OwnershipData{
+			OrganizerID: organizerID,
+		},
+		Location:           tmpl.Location,
+		SeriesID:           tmpl.SeriesID,
+		Protected:          false,
+		Name:               tmpl.Name,
+		Description:        tmpl.Description,
+		FinalsEnabled:      tmpl.FinalsEnabled,
+		QualifyingProblems: tmpl.QualifyingProblems,
+		Finalists:          tmpl.Finalists,
+		Rules:              tmpl.Rules,
+		GracePeriod:        tmpl.GracePeriod,
+	}
+
+	contest, err = uc.Repo.CreateContest(ctx, nil, contest)
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	return contest, nil
 }
