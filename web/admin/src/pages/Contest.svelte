@@ -38,7 +38,7 @@
   <sl-button
     onclick={() =>
       $startScoreEngine.mutate({
-        terminatedBy: add(new Date(), { minutes: 1 }),
+        terminatedBy: add(new Date(), { hours: 6 }),
       })}
     loading={$startScoreEngine.isPending}
     disabled={scoreEngines.length > 0}>Start engine</sl-button
