@@ -66,11 +66,11 @@ func (hdlr *contestHandler) GetContestsByOrganizer(w http.ResponseWriter, r *htt
 		return
 	}
 
-	contest, err := hdlr.contestUseCase.GetContestsByOrganizer(r.Context(), organizerID)
+	contests, err := hdlr.contestUseCase.GetContestsByOrganizer(r.Context(), organizerID)
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	writeResponse(w, http.StatusOK, contest)
+	writeResponse(w, http.StatusOK, contests)
 }
