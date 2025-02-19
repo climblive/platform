@@ -34,10 +34,7 @@ func (d *Database) GetContest(ctx context.Context, tx domain.Transaction, contes
 
 func (d *Database) GetContestsByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.Contest, error) {
 	records, err := d.WithTx(tx).GetContestsByOrganizer(ctx, int32(organizerID))
-	switch {
-	case errors.Is(err, sql.ErrNoRows):
-		return nil, errors.Wrap(domain.ErrNotFound, 0)
-	case err != nil:
+	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
 
