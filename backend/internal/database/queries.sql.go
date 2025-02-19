@@ -362,6 +362,58 @@ func (q *Queries) GetContest(ctx context.Context, id int32) (GetContestRow, erro
 	return i, err
 }
 
+const getContestsByOrganizer = `-- name: GetContestsByOrganizer :many
+SELECT contest.id, contest.organizer_id, contest.protected, contest.series_id, contest.name, contest.description, contest.location, contest.final_enabled, contest.qualifying_problems, contest.finalists, contest.rules, contest.grace_period, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+FROM contest
+LEFT JOIN comp_class cc ON cc.contest_id = contest.id
+WHERE contest.organizer_id = ?
+GROUP BY contest.id
+`
+
+type GetContestsByOrganizerRow struct {
+	Contest   Contest
+	TimeBegin interface{}
+	TimeEnd   interface{}
+}
+
+func (q *Queries) GetContestsByOrganizer(ctx context.Context, organizerID int32) ([]GetContestsByOrganizerRow, error) {
+	rows, err := q.db.QueryContext(ctx, getContestsByOrganizer, organizerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetContestsByOrganizerRow
+	for rows.Next() {
+		var i GetContestsByOrganizerRow
+		if err := rows.Scan(
+			&i.Contest.ID,
+			&i.Contest.OrganizerID,
+			&i.Contest.Protected,
+			&i.Contest.SeriesID,
+			&i.Contest.Name,
+			&i.Contest.Description,
+			&i.Contest.Location,
+			&i.Contest.FinalEnabled,
+			&i.Contest.QualifyingProblems,
+			&i.Contest.Finalists,
+			&i.Contest.Rules,
+			&i.Contest.GracePeriod,
+			&i.TimeBegin,
+			&i.TimeEnd,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getContestsCurrentlyRunningOrByStartTime = `-- name: GetContestsCurrentlyRunningOrByStartTime :many
 SELECT
 	id, organizer_id, protected, series_id, name, description, location, final_enabled, qualifying_problems, finalists, rules, grace_period, time_begin, time_end
@@ -433,6 +485,19 @@ func (q *Queries) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context, 
 		return nil, err
 	}
 	return items, nil
+}
+
+const getOrganizer = `-- name: GetOrganizer :one
+SELECT id, name, homepage
+FROM organizer
+WHERE id = ?
+`
+
+func (q *Queries) GetOrganizer(ctx context.Context, id int32) (Organizer, error) {
+	row := q.db.QueryRowContext(ctx, getOrganizer, id)
+	var i Organizer
+	err := row.Scan(&i.ID, &i.Name, &i.Homepage)
+	return i, err
 }
 
 const getProblem = `-- name: GetProblem :one

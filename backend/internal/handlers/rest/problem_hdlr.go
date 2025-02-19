@@ -1,16 +1,21 @@
 package rest
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/domain"
 )
 
-type problemHandler struct {
-	problemUseCase domain.ProblemUseCase
+type problemUseCase interface {
+	GetProblemsByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Problem, error)
 }
 
-func InstallProblemHandler(mux *Mux, problemUseCase domain.ProblemUseCase) {
+type problemHandler struct {
+	problemUseCase problemUseCase
+}
+
+func InstallProblemHandler(mux *Mux, problemUseCase problemUseCase) {
 	handler := &problemHandler{
 		problemUseCase: problemUseCase,
 	}
