@@ -115,7 +115,9 @@ export class ApiClient {
   getContestsByOrganizer = async (organizerId: number) => {
     const endpoint = `/organizers/${organizerId}/contests`;
 
-    const result = await this.axiosInstance.get(endpoint);
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
 
     return z.array(contestSchema).parse(result.data);
   };
