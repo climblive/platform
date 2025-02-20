@@ -73,17 +73,15 @@ func contestToDomain(record database.Contest) domain.Contest {
 		},
 		Location:           record.Location.String,
 		SeriesID:           domain.SeriesID(record.SeriesID.Int32),
-		Protected:          record.Protected,
 		Name:               record.Name,
 		Description:        record.Description.String,
-		FinalsEnabled:      record.FinalEnabled,
 		QualifyingProblems: int(record.QualifyingProblems),
 		Finalists:          int(record.Finalists),
 		Rules:              record.Rules.String,
 		GracePeriod:        time.Duration(record.GracePeriod) * time.Minute,
 	}
 
-	if !contest.FinalsEnabled {
+	if !record.FinalEnabled {
 		contest.Finalists = 0
 	}
 

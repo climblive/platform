@@ -46,10 +46,8 @@ type Contest struct {
 	Ownership          OwnershipData `json:"-"`
 	Location           string        `json:"location,omitempty"`
 	SeriesID           SeriesID      `json:"seriesId,omitempty"`
-	Protected          bool          `json:"protected"`
 	Name               string        `json:"name"`
 	Description        string        `json:"description,omitempty"`
-	FinalsEnabled      bool          `json:"finalsEnabled"`
 	QualifyingProblems int           `json:"qualifyingProblems"`
 	Finalists          int           `json:"finalists"`
 	Rules              string        `json:"rules,omitempty"`

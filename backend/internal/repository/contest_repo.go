@@ -97,3 +97,30 @@ func (d *Database) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context,
 
 	return contests, nil
 }
+
+func (d *Database) StoreContest(ctx context.Context, tx domain.Transaction, contest domain.Contest) (domain.Contest, error) {
+	params := database.UpsertContestParams{
+		ID:                 int32(contest.ID),
+		OrganizerID:        int32(contest.Ownership.OrganizerID),
+		SeriesID:           makeNullInt32(int32(contest.SeriesID)),
+		Name:               contest.Name,
+		Description:        makeNullString(contest.Description),
+		Location:           makeNullString(contest.Location),
+		FinalEnabled:       contest.Finalists > 0,
+		QualifyingProblems: int32(contest.QualifyingProblems),
+		Finalists:          int32(contest.Finalists),
+		Rules:              makeNullString(contest.Rules),
+		GracePeriod:        int32(contest.GracePeriod),
+	}
+
+	insertID, err := d.WithTx(tx).UpsertContest(ctx, params)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	if insertID != 0 {
+		contest.ID = domain.ContestID(insertID)
+	}
+
+	return contest, err
+}
