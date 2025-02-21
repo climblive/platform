@@ -803,12 +803,11 @@ func (q *Queries) UpsertContender(ctx context.Context, arg UpsertContenderParams
 
 const upsertContest = `-- name: UpsertContest :execlastid
 INSERT INTO 
-	contest (id, organizer_id, protected, series_id, name, description, location, final_enabled, qualifying_problems, finalists, rules, grace_period)
+	contest (id, organizer_id, series_id, name, description, location, final_enabled, qualifying_problems, finalists, rules, grace_period)
 VALUES 
-	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
-    protected = VALUES(protected),
     series_id = VALUES(series_id),
     name = VALUES(name),
     description = VALUES(description),
@@ -823,7 +822,6 @@ ON DUPLICATE KEY UPDATE
 type UpsertContestParams struct {
 	ID                 int32
 	OrganizerID        int32
-	Protected          bool
 	SeriesID           sql.NullInt32
 	Name               string
 	Description        sql.NullString
@@ -839,7 +837,6 @@ func (q *Queries) UpsertContest(ctx context.Context, arg UpsertContestParams) (i
 	result, err := q.db.ExecContext(ctx, upsertContest,
 		arg.ID,
 		arg.OrganizerID,
-		arg.Protected,
 		arg.SeriesID,
 		arg.Name,
 		arg.Description,
