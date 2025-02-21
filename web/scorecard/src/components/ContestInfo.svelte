@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { CompClass, Contest, Problem } from "@climblive/lib/models";
   import type { SlDetails } from "@shoelace-style/shoelace";
+  import "@shoelace-style/shoelace/dist/components/details/details.js";
   import { format } from "date-fns";
   import { sv } from "date-fns/locale";
   import LabeledText from "./LabeledText.svelte";
@@ -59,7 +60,17 @@
   </LabeledText>
 </section>
 {#if contest.rules}
-  <sl-details bind:this={details} summary="Rules"> </sl-details>
+  <sl-details
+    onsl-after-show={() =>
+      details?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+        inline: "nearest",
+      })}
+    bind:this={details}
+    summary="Rules"
+  >
+  </sl-details>
 {/if}
 
 <style>
