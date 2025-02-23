@@ -61,7 +61,6 @@ type ContestTemplate struct {
 	SeriesID           SeriesID      `json:"seriesId,omitempty"`
 	Name               string        `json:"name"`
 	Description        string        `json:"description,omitempty"`
-	FinalsEnabled      bool          `json:"finalsEnabled"`
 	QualifyingProblems int           `json:"qualifyingProblems"`
 	Finalists          int           `json:"finalists"`
 	Rules              string        `json:"rules,omitempty"`

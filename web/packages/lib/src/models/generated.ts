@@ -70,7 +70,6 @@ export interface ContestTemplate {
   seriesId?: SeriesID;
   name: string;
   description?: string;
-  finalsEnabled: boolean;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
   rules?: string;

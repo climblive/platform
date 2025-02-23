@@ -2,6 +2,7 @@ package rest
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -11,6 +12,7 @@ type contestUseCase interface {
 	GetContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error)
 	GetContestsByOrganizer(ctx context.Context, organizerID domain.OrganizerID) ([]domain.Contest, error)
 	GetScoreboard(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreboardEntry, error)
+	CreateContest(ctx context.Context, organizerID domain.OrganizerID, template domain.ContestTemplate) (domain.Contest, error)
 }
 
 type contestHandler struct {
@@ -25,6 +27,7 @@ func InstallContestHandler(mux *Mux, contestUseCase contestUseCase) {
 	mux.HandleFunc("GET /contests/{contestID}", handler.GetContest)
 	mux.HandleFunc("GET /contests/{contestID}/scoreboard", handler.GetScoreboard)
 	mux.HandleFunc("GET /organizers/{organizerID}/contests", handler.GetContestsByOrganizer)
+	mux.HandleFunc("POST /organizers/{organizerID}/contests", handler.CreateContest)
 }
 
 func (hdlr *contestHandler) GetContest(w http.ResponseWriter, r *http.Request) {
@@ -73,4 +76,27 @@ func (hdlr *contestHandler) GetContestsByOrganizer(w http.ResponseWriter, r *htt
 	}
 
 	writeResponse(w, http.StatusOK, contests)
+}
+
+func (hdlr *contestHandler) CreateContest(w http.ResponseWriter, r *http.Request) {
+	organizerID, err := parseResourceID[domain.OrganizerID](r.PathValue("organizerID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	var tmpl domain.ContestTemplate
+	err = json.NewDecoder(r.Body).Decode(&tmpl)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	createdContest, err := hdlr.contestUseCase.CreateContest(r.Context(), organizerID, tmpl)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusCreated, createdContest)
 }
