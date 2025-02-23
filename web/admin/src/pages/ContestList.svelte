@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getContestsByOrganizerQuery } from "@climblive/lib/queries";
-  import { Link } from "svelte-routing";
+  import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import { Link, navigate } from "svelte-routing";
 
   interface Props {
     organizerId: number;
@@ -12,6 +13,13 @@
 
   let contests = $derived($contestsQuery.data);
 </script>
+
+<sl-button
+  size="large"
+  variant="primary"
+  onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
+  >Create</sl-button
+>
 
 <ul>
   {#if contests}
