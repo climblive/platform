@@ -105,6 +105,23 @@ SELECT sqlc.embed(problem)
 FROM problem
 WHERE contest_id = ?;
 
+-- name: UpsertProblem :execlastid
+INSERT INTO 
+	problem (id, organizer_id, contest_id, number, hold_color_primary, hold_color_secondary, name, description, points, flash_bonus)
+VALUES 
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    id = VALUES(id),
+    organizer_id = VALUES(organizer_id),
+    contest_id = VALUES(contest_id),
+    number = VALUES(number),
+    hold_color_primary = VALUES(hold_color_primary),
+    hold_color_secondary = VALUES(hold_color_secondary),
+    name = VALUES(name),
+    description = VALUES(description),
+    points = VALUES(points),
+    flash_bonus = VALUES(flash_bonus);
+
 -- name: GetTick :one
 SELECT sqlc.embed(tick)
 FROM tick
