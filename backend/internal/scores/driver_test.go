@@ -528,6 +528,10 @@ func (m *scoreEngineMock) HandleProblemAdded(event domain.ProblemAddedEvent) {
 	m.Called(event)
 }
 
+func (m *scoreEngineMock) HandleProblemUpdated(event domain.ProblemUpdatedEvent) {
+	m.Called(event)
+}
+
 func (m *scoreEngineMock) GetDirtyScores() []domain.Score {
 	args := m.Called()
 	return args.Get(0).([]domain.Score)
