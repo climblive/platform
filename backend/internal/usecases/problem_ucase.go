@@ -43,6 +43,13 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 		return mty, errors.Wrap(err, 0)
 	}
 
+	problemUpdatedEventBaseline := domain.ProblemUpdatedEvent{
+		ProblemID:  problemID,
+		PointsTop:  problem.PointsTop,
+		PointsZone: problem.PointsZone,
+		FlashBonus: problem.FlashBonus,
+	}
+
 	if patch.Number.Present {
 		problem.Number = patch.Number.Value
 	}
@@ -79,12 +86,16 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 		return mty, errors.Wrap(err, 0)
 	}
 
-	uc.EventBroker.Dispatch(problem.ContestID, domain.ProblemUpdatedEvent{
+	event := domain.ProblemUpdatedEvent{
 		ProblemID:  problemID,
 		PointsTop:  problem.PointsTop,
 		PointsZone: problem.PointsZone,
 		FlashBonus: problem.FlashBonus,
-	})
+	}
+
+	if event != problemUpdatedEventBaseline {
+		uc.EventBroker.Dispatch(problem.ContestID, event)
+	}
 
 	return problem, nil
 }
