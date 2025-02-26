@@ -13,6 +13,8 @@ import (
 	"github.com/google/uuid"
 )
 
+const scoreEngineMaxLifeTime = 30 * time.Minute
+
 var ErrAlreadyStarted = errors.New("already started")
 
 type ScoreEngineDescriptor struct {
@@ -288,10 +290,10 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 
 	logger := slog.New(slog.Default().Handler()).With("contest_id", contestID)
 
-	latestTerminationTime := time.Now().Add(24 * time.Hour)
+	latestTerminationTime := time.Now().Add(scoreEngineMaxLifeTime)
 
 	if terminatedBy.After(latestTerminationTime) {
-		logger.Warn("capping score engine life-time", "orig_terminated_by", terminatedBy, "new_terminated_by", latestTerminationTime)
+		logger.Warn("capping score engine life-time", "limit", scoreEngineMaxLifeTime, "orig_terminated_by", terminatedBy, "new_terminated_by", latestTerminationTime)
 
 		terminatedBy = latestTerminationTime
 	}
