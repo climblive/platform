@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"strings"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
@@ -55,19 +56,19 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 	}
 
 	if patch.HoldColorPrimary.Present {
-		problem.HoldColorPrimary = patch.HoldColorPrimary.Value
+		problem.HoldColorPrimary = strings.TrimSpace(patch.HoldColorPrimary.Value)
 	}
 
 	if patch.HoldColorSecondary.Present {
-		problem.HoldColorSecondary = patch.HoldColorSecondary.Value
+		problem.HoldColorSecondary = strings.TrimSpace(patch.HoldColorSecondary.Value)
 	}
 
 	if patch.Name.Present {
-		problem.Name = patch.Name.Value
+		problem.Name = strings.TrimSpace(patch.Name.Value)
 	}
 
 	if patch.Description.Present {
-		problem.Description = patch.Description.Value
+		problem.Description = strings.TrimSpace(patch.Description.Value)
 	}
 
 	if patch.PointsTop.Present {
