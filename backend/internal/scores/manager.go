@@ -270,9 +270,7 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) {
 			continue
 		}
 
-		terminatedBy := (*contest.TimeEnd).Add(12 * time.Hour)
-
-		_, _ = mngr.startScoreEngine(ctx, contest.ID, terminatedBy)
+		_, _ = mngr.startScoreEngine(ctx, contest.ID, (*contest.TimeEnd).Add(12*time.Hour))
 	}
 }
 
