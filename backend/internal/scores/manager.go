@@ -238,7 +238,7 @@ func (mngr *ScoreEngineManager) handleRequest(request any) {
 
 func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) {
 	now := time.Now()
-	contests, err := mngr.repo.GetContestsCurrentlyRunningOrByStartTime(ctx, nil, now, now.Add(time.Hour))
+	contests, err := mngr.repo.GetContestsCurrentlyRunningOrByStartTime(ctx, nil, now, now.Add(5*time.Minute))
 	if err != nil {
 		slog.Error("score engine manager failed to complete periodic check", "error", err)
 
@@ -270,7 +270,9 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) {
 			continue
 		}
 
-		_, _ = mngr.startScoreEngine(ctx, contest.ID, (*contest.TimeEnd).Add(12*time.Hour))
+		terminatedBy := (*contest.TimeEnd).Add(12 * time.Hour)
+
+		_, _ = mngr.startScoreEngine(ctx, contest.ID, terminatedBy)
 	}
 }
 
@@ -287,6 +289,14 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 	}
 
 	logger := slog.New(slog.Default().Handler()).With("contest_id", contestID)
+
+	latestTerminationTime := time.Now().Add(24 * time.Hour)
+
+	if terminatedBy.After(latestTerminationTime) {
+		logger.Warn("capping score engine life-time", "orig_terminated_by", terminatedBy, "new_terminated_by", latestTerminationTime)
+
+		terminatedBy = latestTerminationTime
+	}
 
 	logger = logger.With(slog.Group("config",
 		"qualifying_problems", contest.QualifyingProblems,
