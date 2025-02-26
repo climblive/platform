@@ -111,7 +111,6 @@ INSERT INTO
 VALUES 
 	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
-    id = VALUES(id),
     organizer_id = VALUES(organizer_id),
     contest_id = VALUES(contest_id),
     number = VALUES(number),
