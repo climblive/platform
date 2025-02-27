@@ -13,8 +13,6 @@ import (
 	"github.com/google/uuid"
 )
 
-const scoreEngineMaxLifeTime = 30 * time.Minute
-
 var ErrAlreadyStarted = errors.New("already started")
 
 type ScoreEngineDescriptor struct {
@@ -76,12 +74,13 @@ type scoreEngineManagerRepository interface {
 }
 
 type ScoreEngineManager struct {
-	repo                scoreEngineManagerRepository
-	engineStoreHydrator EngineStoreHydrator
-	eventBroker         domain.EventBroker
-	handlers            map[domain.ContestID]*engineHandler
-	requests            chan any
-	terminations        chan domain.ScoreEngineInstanceID
+	repo                   scoreEngineManagerRepository
+	engineStoreHydrator    EngineStoreHydrator
+	eventBroker            domain.EventBroker
+	handlers               map[domain.ContestID]*engineHandler
+	requests               chan any
+	terminations           chan domain.ScoreEngineInstanceID
+	scoreEngineMaxLifeTime time.Duration
 }
 
 type engineHandler struct {
@@ -93,14 +92,15 @@ type engineHandler struct {
 	qualifyingProblems int
 }
 
-func NewScoreEngineManager(repo scoreEngineManagerRepository, engineStoreHydrator EngineStoreHydrator, eventBroker domain.EventBroker) ScoreEngineManager {
+func NewScoreEngineManager(repo scoreEngineManagerRepository, engineStoreHydrator EngineStoreHydrator, eventBroker domain.EventBroker, scoreEngineMaxLifetime time.Duration) ScoreEngineManager {
 	return ScoreEngineManager{
-		repo:                repo,
-		engineStoreHydrator: engineStoreHydrator,
-		eventBroker:         eventBroker,
-		handlers:            make(map[domain.ContestID]*engineHandler),
-		requests:            make(chan any),
-		terminations:        make(chan domain.ScoreEngineInstanceID),
+		repo:                   repo,
+		engineStoreHydrator:    engineStoreHydrator,
+		eventBroker:            eventBroker,
+		handlers:               make(map[domain.ContestID]*engineHandler),
+		requests:               make(chan any),
+		terminations:           make(chan domain.ScoreEngineInstanceID),
+		scoreEngineMaxLifeTime: scoreEngineMaxLifetime,
 	}
 }
 
@@ -290,10 +290,10 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 
 	logger := slog.New(slog.Default().Handler()).With("contest_id", contestID)
 
-	latestTerminationTime := time.Now().Add(scoreEngineMaxLifeTime)
+	latestTerminationTime := time.Now().Add(mngr.scoreEngineMaxLifeTime)
 
 	if terminatedBy.After(latestTerminationTime) {
-		logger.Warn("capping score engine life-time", "limit", scoreEngineMaxLifeTime, "orig_terminated_by", terminatedBy, "new_terminated_by", latestTerminationTime)
+		logger.Warn("capping score engine lifetime", "limit", mngr.scoreEngineMaxLifeTime, "orig_terminated_by", terminatedBy, "new_terminated_by", latestTerminationTime)
 
 		terminatedBy = latestTerminationTime
 	}
