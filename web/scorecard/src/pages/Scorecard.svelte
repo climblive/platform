@@ -218,9 +218,7 @@
         <sl-tab-group bind:this={tabGroup} onsl-tab-show={handleShowTab}>
           <sl-tab slot="nav" panel="problems">Scorecard</sl-tab>
           <sl-tab slot="nav" panel="results">Results</sl-tab>
-          {#if contest.rules}
-            <sl-tab slot="nav" panel="info">Info</sl-tab>
-          {/if}
+          <sl-tab slot="nav" panel="info">Info</sl-tab>
 
           <sl-tab-panel name="problems">
             <sl-radio-group
