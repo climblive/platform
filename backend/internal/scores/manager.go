@@ -290,12 +290,12 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 
 	logger := slog.New(slog.Default().Handler()).With("contest_id", contestID)
 
-	latestTerminationTime := time.Now().Add(mngr.scoreEngineMaxLifeTime)
+	latestPermittedTerminationTime := time.Now().Add(mngr.scoreEngineMaxLifeTime)
 
-	if terminatedBy.After(latestTerminationTime) {
-		logger.Warn("capping score engine lifetime", "limit", mngr.scoreEngineMaxLifeTime, "orig_terminated_by", terminatedBy, "new_terminated_by", latestTerminationTime)
+	if terminatedBy.After(latestPermittedTerminationTime) {
+		logger.Warn("capping score engine lifetime", "limit", mngr.scoreEngineMaxLifeTime, "orig_terminated_by", terminatedBy, "new_terminated_by", latestPermittedTerminationTime)
 
-		terminatedBy = latestTerminationTime
+		terminatedBy = latestPermittedTerminationTime
 	}
 
 	logger = logger.With(slog.Group("config",
