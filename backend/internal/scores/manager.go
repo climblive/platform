@@ -80,7 +80,7 @@ type ScoreEngineManager struct {
 	handlers               map[domain.ContestID]*engineHandler
 	requests               chan any
 	terminations           chan domain.ScoreEngineInstanceID
-	scoreEngineMaxLifeTime time.Duration
+	scoreEngineMaxLifetime time.Duration
 }
 
 type engineHandler struct {
@@ -100,7 +100,7 @@ func NewScoreEngineManager(repo scoreEngineManagerRepository, engineStoreHydrato
 		handlers:               make(map[domain.ContestID]*engineHandler),
 		requests:               make(chan any),
 		terminations:           make(chan domain.ScoreEngineInstanceID),
-		scoreEngineMaxLifeTime: scoreEngineMaxLifetime,
+		scoreEngineMaxLifetime: scoreEngineMaxLifetime,
 	}
 }
 
@@ -290,10 +290,10 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 
 	logger := slog.New(slog.Default().Handler()).With("contest_id", contestID)
 
-	latestPermittedTerminationTime := time.Now().Add(mngr.scoreEngineMaxLifeTime)
+	latestPermittedTerminationTime := time.Now().Add(mngr.scoreEngineMaxLifetime)
 
 	if terminatedBy.After(latestPermittedTerminationTime) {
-		logger.Warn("capping score engine lifetime", "limit", mngr.scoreEngineMaxLifeTime, "orig_terminated_by", terminatedBy, "new_terminated_by", latestPermittedTerminationTime)
+		logger.Warn("capping score engine lifetime", "limit", mngr.scoreEngineMaxLifetime, "orig_terminated_by", terminatedBy, "new_terminated_by", latestPermittedTerminationTime)
 
 		terminatedBy = latestPermittedTerminationTime
 	}
