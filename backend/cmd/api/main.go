@@ -180,7 +180,9 @@ func setupMux(
 	}
 
 	problemUseCase := usecases.ProblemUseCase{
-		Repo: repo,
+		Repo:        repo,
+		Authorizer:  authorizer,
+		EventBroker: eventBroker,
 	}
 
 	tickUseCase := usecases.TickUseCase{

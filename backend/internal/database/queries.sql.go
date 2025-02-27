@@ -825,6 +825,55 @@ func (q *Queries) UpsertOrganizer(ctx context.Context, arg UpsertOrganizerParams
 	return result.LastInsertId()
 }
 
+const upsertProblem = `-- name: UpsertProblem :execlastid
+INSERT INTO 
+	problem (id, organizer_id, contest_id, number, hold_color_primary, hold_color_secondary, name, description, points, flash_bonus)
+VALUES 
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    organizer_id = VALUES(organizer_id),
+    contest_id = VALUES(contest_id),
+    number = VALUES(number),
+    hold_color_primary = VALUES(hold_color_primary),
+    hold_color_secondary = VALUES(hold_color_secondary),
+    name = VALUES(name),
+    description = VALUES(description),
+    points = VALUES(points),
+    flash_bonus = VALUES(flash_bonus)
+`
+
+type UpsertProblemParams struct {
+	ID                 int32
+	OrganizerID        int32
+	ContestID          int32
+	Number             int32
+	HoldColorPrimary   string
+	HoldColorSecondary sql.NullString
+	Name               sql.NullString
+	Description        sql.NullString
+	Points             int32
+	FlashBonus         sql.NullInt32
+}
+
+func (q *Queries) UpsertProblem(ctx context.Context, arg UpsertProblemParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, upsertProblem,
+		arg.ID,
+		arg.OrganizerID,
+		arg.ContestID,
+		arg.Number,
+		arg.HoldColorPrimary,
+		arg.HoldColorSecondary,
+		arg.Name,
+		arg.Description,
+		arg.Points,
+		arg.FlashBonus,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
+}
+
 const upsertScore = `-- name: UpsertScore :exec
 INSERT INTO
     score (contender_id, timestamp, score, placement, finalist, rank_order)
