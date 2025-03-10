@@ -248,7 +248,7 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) {
 	}
 
 	for contest := range slices.Values(contests) {
-		if contest.TimeEnd == nil {
+		if contest.TimeEnd.IsZero() {
 			continue
 		}
 
@@ -272,7 +272,7 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) {
 			continue
 		}
 
-		_, _ = mngr.startScoreEngine(ctx, contest.ID, (*contest.TimeEnd).Add(12*time.Hour))
+		_, _ = mngr.startScoreEngine(ctx, contest.ID, contest.TimeEnd.Add(12*time.Hour))
 	}
 }
 
@@ -303,8 +303,8 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 		"finalists", contest.Finalists)).
 		With("terminated_by", terminatedBy)
 
-	if contest.TimeBegin != nil && contest.TimeBegin.After(now) {
-		logger = logger.With("starting_in", time.Until(*contest.TimeBegin))
+	if contest.TimeBegin.After(now) {
+		logger = logger.With("starting_in", time.Until(contest.TimeBegin))
 	}
 
 	logger.Info("spinning up score engine")
