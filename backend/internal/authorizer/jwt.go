@@ -74,7 +74,7 @@ func (d *StandardJWTDecoder) Decode(jwt string) (Claims, error) {
 	}
 
 	if time.Unix(claims.Expiration, 0).Before(time.Now()) {
-		slog.Warn("turning a blind eye to expired credentials", "expiration", claims.Expiration)
+		return Claims{}, errors.Wrap(ErrExpiredCredentials, 0)
 	}
 
 	return claims, nil
