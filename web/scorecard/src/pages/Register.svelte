@@ -23,7 +23,7 @@
   let contender = $derived($contenderQuery.data);
 
   const gotoScorecard = () => {
-    navigate(`/${contender?.registrationCode}`);
+    navigate(`/${contender?.registrationCode}`, { replace: true });
   };
 
   const handleSubmit = (form: ContenderPatch) => {

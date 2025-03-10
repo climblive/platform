@@ -107,8 +107,8 @@ func TestScoreEngineUseCase(t *testing.T) {
 				Return(domain.Contest{
 					ID:        fakedContestID,
 					Ownership: fakedOwnership,
-					TimeBegin: &now,
-					TimeEnd:   &endTime,
+					TimeBegin: now,
+					TimeEnd:   endTime,
 				}, nil)
 
 			mockedAuthorizer.On("HasOwnership", mock.Anything, fakedOwnership).Return(domain.OrganizerRole, nil)
@@ -209,8 +209,8 @@ func TestScoreEngineUseCase(t *testing.T) {
 						Return(domain.Contest{
 							ID:        fakedContestID,
 							Ownership: fakedOwnership,
-							TimeBegin: &scenario.timeBegin,
-							TimeEnd:   &scenario.timeEnd,
+							TimeBegin: scenario.timeBegin,
+							TimeEnd:   scenario.timeEnd,
 						}, nil)
 
 					mockedAuthorizer.On("HasOwnership", mock.Anything, fakedOwnership).Return(domain.OrganizerRole, nil)

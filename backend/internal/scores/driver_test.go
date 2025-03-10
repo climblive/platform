@@ -42,6 +42,7 @@ func TestEngineDriver(t *testing.T) {
 			"ASCENT_REGISTERED",
 			"ASCENT_DEREGISTERED",
 			"PROBLEM_ADDED",
+			"PROBLEM_UPDATED",
 		)
 
 		mockedEventBroker.On("Subscribe", filter, 0).Return(subscriptionID, subscription)
@@ -525,6 +526,10 @@ func (m *scoreEngineMock) HandleAscentDeregistered(event domain.AscentDeregister
 }
 
 func (m *scoreEngineMock) HandleProblemAdded(event domain.ProblemAddedEvent) {
+	m.Called(event)
+}
+
+func (m *scoreEngineMock) HandleProblemUpdated(event domain.ProblemUpdatedEvent) {
 	m.Called(event)
 }
 

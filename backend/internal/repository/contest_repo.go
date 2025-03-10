@@ -22,11 +22,11 @@ func (d *Database) GetContest(ctx context.Context, tx domain.Transaction, contes
 	contest := contestToDomain(record.Contest)
 
 	if timeBegin, ok := record.TimeBegin.(time.Time); ok {
-		contest.TimeBegin = &timeBegin
+		contest.TimeBegin = timeBegin
 	}
 
 	if timeEnd, ok := record.TimeEnd.(time.Time); ok {
-		contest.TimeEnd = &timeEnd
+		contest.TimeEnd = timeEnd
 	}
 
 	return contest, nil
@@ -44,11 +44,11 @@ func (d *Database) GetContestsByOrganizer(ctx context.Context, tx domain.Transac
 		contest := contestToDomain(record.Contest)
 
 		if timeBegin, ok := record.TimeBegin.(time.Time); ok {
-			contest.TimeBegin = &timeBegin
+			contest.TimeBegin = timeBegin
 		}
 
 		if timeEnd, ok := record.TimeEnd.(time.Time); ok {
-			contest.TimeEnd = &timeEnd
+			contest.TimeEnd = timeEnd
 		}
 
 		contests = append(contests, contest)
@@ -85,11 +85,11 @@ func (d *Database) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context,
 		})
 
 		if timeBegin, ok := record.TimeBegin.(time.Time); ok {
-			contest.TimeBegin = &timeBegin
+			contest.TimeBegin = timeBegin
 		}
 
 		if timeEnd, ok := record.TimeEnd.(time.Time); ok {
-			contest.TimeEnd = &timeEnd
+			contest.TimeEnd = timeEnd
 		}
 
 		contests = append(contests, contest)

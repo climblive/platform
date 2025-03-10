@@ -2,6 +2,7 @@ package rest
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -9,6 +10,7 @@ import (
 
 type problemUseCase interface {
 	GetProblemsByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Problem, error)
+	PatchProblem(ctx context.Context, problemID domain.ProblemID, patch domain.ProblemPatch) (domain.Problem, error)
 }
 
 type problemHandler struct {
@@ -21,6 +23,7 @@ func InstallProblemHandler(mux *Mux, problemUseCase problemUseCase) {
 	}
 
 	mux.HandleFunc("GET /contests/{contestID}/problems", handler.GetProblemsByContest)
+	mux.HandleFunc("PATCH /problems/{problemID}", handler.PatchProblem)
 }
 
 func (hdlr *problemHandler) GetProblemsByContest(w http.ResponseWriter, r *http.Request) {
@@ -37,4 +40,27 @@ func (hdlr *problemHandler) GetProblemsByContest(w http.ResponseWriter, r *http.
 	}
 
 	writeResponse(w, http.StatusOK, problems)
+}
+
+func (hdlr *problemHandler) PatchProblem(w http.ResponseWriter, r *http.Request) {
+	problemID, err := parseResourceID[domain.ProblemID](r.PathValue("problemID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	var patch domain.ProblemPatch
+	err = json.NewDecoder(r.Body).Decode(&patch)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	updatedProblem, err := hdlr.problemUseCase.PatchProblem(r.Context(), problemID, patch)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusOK, updatedProblem)
 }
