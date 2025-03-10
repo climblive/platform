@@ -80,14 +80,14 @@ type Problem struct {
 }
 
 type ProblemPatch struct {
-	Number             Patch[int]    `json:"number,omitempty,omitzero" tstype:"number"`
-	HoldColorPrimary   Patch[string] `json:"holdColorPrimary,omitempty,omitzero" tstype:"string"`
-	HoldColorSecondary Patch[string] `json:"holdColorSecondary,omitempty,omitzero" tstype:"string"`
-	Name               Patch[string] `json:"name,omitempty,omitzero" tstype:"string"`
-	Description        Patch[string] `json:"description,omitempty,omitzero" tstype:"string"`
-	PointsTop          Patch[int]    `json:"pointsTop,omitempty,omitzero" tstype:"number"`
-	PointsZone         Patch[int]    `json:"pointsZone,omitempty,omitzero" tstype:"number"`
-	FlashBonus         Patch[int]    `json:"flashBonus,omitempty,omitzero" tstype:"number"`
+	Number             Patch[int]    `json:"number,omitzero" tstype:"number"`
+	HoldColorPrimary   Patch[string] `json:"holdColorPrimary,omitzero" tstype:"string"`
+	HoldColorSecondary Patch[string] `json:"holdColorSecondary,omitzero" tstype:"string"`
+	Name               Patch[string] `json:"name,omitzero" tstype:"string"`
+	Description        Patch[string] `json:"description,omitzero" tstype:"string"`
+	PointsTop          Patch[int]    `json:"pointsTop,omitzero" tstype:"number"`
+	PointsZone         Patch[int]    `json:"pointsZone,omitzero" tstype:"number"`
+	FlashBonus         Patch[int]    `json:"flashBonus,omitzero" tstype:"number"`
 }
 
 type Raffle struct {
