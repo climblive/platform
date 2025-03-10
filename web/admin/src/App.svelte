@@ -1,5 +1,6 @@
 <script lang="ts">
   import { ApiClient, OrganizerCredentialsProvider } from "@climblive/lib";
+  import { ErrorBoundary } from "@climblive/lib/components";
   import configData from "@climblive/lib/config.json";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
@@ -71,27 +72,29 @@
   };
 </script>
 
-{#await authenticate()}
-  <sl-spinner></sl-spinner>
-{:then}
-  <QueryClientProvider client={queryClient}>
-    {#if !authenticated}
-      <sl-button variant="primary" onclick={login}>Login</sl-button>
-    {/if}
-    <Router basepath="/admin">
-      <Route path="/organizers/:organizerId">
-        {#snippet children({ params }: { params: { organizerId: number } })}
-          <ContestList organizerId={Number(params.organizerId)} />
-        {/snippet}
-      </Route>
-      <Route path="/contests/:contestId">
-        {#snippet children({ params }: { params: { contestId: number } })}
-          <Contest contestId={Number(params.contestId)} />
-        {/snippet}
-      </Route>
-    </Router>
-    {#if import.meta.env.DEV}
-      <SvelteQueryDevtools />
-    {/if}
-  </QueryClientProvider>
-{/await}
+<ErrorBoundary>
+  {#await authenticate()}
+    <sl-spinner></sl-spinner>
+  {:then}
+    <QueryClientProvider client={queryClient}>
+      {#if !authenticated}
+        <sl-button variant="primary" onclick={login}>Login</sl-button>
+      {/if}
+      <Router basepath="/admin">
+        <Route path="/organizers/:organizerId">
+          {#snippet children({ params }: { params: { organizerId: number } })}
+            <ContestList organizerId={Number(params.organizerId)} />
+          {/snippet}
+        </Route>
+        <Route path="/contests/:contestId">
+          {#snippet children({ params }: { params: { contestId: number } })}
+            <Contest contestId={Number(params.contestId)} />
+          {/snippet}
+        </Route>
+      </Router>
+      {#if import.meta.env.DEV}
+        <SvelteQueryDevtools />
+      {/if}
+    </QueryClientProvider>
+  {/await}
+</ErrorBoundary>
