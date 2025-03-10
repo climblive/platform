@@ -142,7 +142,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 		}
 	}
 
-	if patch.CompClassID != nil && contender.CompClassID != patch.CompClassID.Value {
+	if patch.CompClassID.Present && contender.CompClassID != patch.CompClassID.Value {
 		if patch.CompClassID.Value == 0 {
 			return mty, errors.Wrap(domain.ErrNotAllowed, 0)
 		}
@@ -185,7 +185,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 		return mty, errors.New(domain.ErrNotRegistered)
 	}
 
-	if patch.Name != nil {
+	if patch.Name.Present {
 		contender.Name = strings.TrimSpace(patch.Name.Value)
 
 		if contender.Name == "" {
@@ -193,7 +193,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 		}
 	}
 
-	if patch.PublicName != nil {
+	if patch.PublicName.Present {
 		contender.PublicName = strings.TrimSpace(patch.PublicName.Value)
 
 		if contender.PublicName == "" {
@@ -201,11 +201,11 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 		}
 	}
 
-	if patch.ClubName != nil {
+	if patch.ClubName.Present {
 		contender.ClubName = strings.TrimSpace(patch.ClubName.Value)
 	}
 
-	if patch.WithdrawnFromFinals != nil && contender.WithdrawnFromFinals != patch.WithdrawnFromFinals.Value {
+	if patch.WithdrawnFromFinals.Present && contender.WithdrawnFromFinals != patch.WithdrawnFromFinals.Value {
 		if patch.WithdrawnFromFinals.Value {
 			events = append(events, domain.ContenderWithdrewFromFinalsEvent{
 				ContenderID: contenderID,
@@ -219,7 +219,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 		contender.WithdrawnFromFinals = patch.WithdrawnFromFinals.Value
 	}
 
-	if patch.Disqualified != nil && contender.Disqualified != patch.Disqualified.Value {
+	if patch.Disqualified.Present && contender.Disqualified != patch.Disqualified.Value {
 		if !role.OneOf(domain.AdminRole, domain.OrganizerRole) {
 			return mty, errors.Wrap(domain.ErrInsufficientRole, 0)
 		}

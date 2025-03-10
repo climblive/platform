@@ -12,9 +12,12 @@ type contestUseCaseRepository interface {
 
 	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
 	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error)
+	GetContestsByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.Contest, error)
+	GetOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) (domain.Organizer, error)
 }
 
 type ContestUseCase struct {
+	Authorizer  domain.Authorizer
 	Repo        contestUseCaseRepository
 	ScoreKeeper domain.ScoreKeeper
 }
@@ -29,23 +32,21 @@ func (uc *ContestUseCase) GetContest(ctx context.Context, contestID domain.Conte
 }
 
 func (uc *ContestUseCase) GetContestsByOrganizer(ctx context.Context, organizerID domain.OrganizerID) ([]domain.Contest, error) {
-	panic("not implemented")
-}
+	organizer, err := uc.Repo.GetOrganizer(ctx, nil, organizerID)
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
 
-func (uc *ContestUseCase) UpdateContest(ctx context.Context, contestID domain.ContestID, contest domain.Contest) (domain.Contest, error) {
-	panic("not implemented")
-}
+	if _, err := uc.Authorizer.HasOwnership(ctx, organizer.Ownership); err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
 
-func (uc *ContestUseCase) DeleteContest(ctx context.Context, contestID domain.ContestID) error {
-	panic("not implemented")
-}
+	contests, err := uc.Repo.GetContestsByOrganizer(ctx, nil, organizerID)
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
 
-func (uc *ContestUseCase) DuplicateContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error) {
-	panic("not implemented")
-}
-
-func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.OrganizerID, contest domain.Contest) (domain.Contest, error) {
-	panic("not implemented")
+	return contests, nil
 }
 
 func (uc *ContestUseCase) GetScoreboard(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreboardEntry, error) {

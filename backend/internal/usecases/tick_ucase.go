@@ -45,10 +45,6 @@ func (uc *TickUseCase) GetTicksByContender(ctx context.Context, contenderID doma
 	return ticks, nil
 }
 
-func (uc *TickUseCase) GetTicksByProblem(ctx context.Context, problemID domain.ProblemID) ([]domain.Tick, error) {
-	panic("not implemented")
-}
-
 func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.TickID) error {
 	tick, err := uc.Repo.GetTick(ctx, nil, tickID)
 	if err != nil {

@@ -103,6 +103,12 @@
     return clonedProblems;
   });
 
+  let highestProblemNumber = $derived(
+    problems?.reduce((max, cur) => {
+      return Math.max(max, cur.number);
+    }, 0) ?? 0,
+  );
+
   $effect(() => {
     if (contender) {
       score = contender.score?.score ?? 0;
@@ -212,9 +218,7 @@
         <sl-tab-group bind:this={tabGroup} onsl-tab-show={handleShowTab}>
           <sl-tab slot="nav" panel="problems">Scorecard</sl-tab>
           <sl-tab slot="nav" panel="results">Results</sl-tab>
-          {#if contest.rules}
-            <sl-tab slot="nav" panel="info">Info</sl-tab>
-          {/if}
+          <sl-tab slot="nav" panel="info">Info</sl-tab>
 
           <sl-tab-panel name="problems">
             <sl-radio-group
@@ -250,6 +254,7 @@
                 {problem}
                 tick={ticks.find(({ problemId }) => problemId === problem.id)}
                 disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
+                {highestProblemNumber}
               />
             {/each}
           </sl-tab-panel>
@@ -293,7 +298,7 @@
     left: 0;
     right: 0;
     z-index: 10;
-    background-color: var(--sl-color-primary-200);
+    background-color: white;
     padding: var(--sl-spacing-small);
   }
 
@@ -316,5 +321,12 @@
 
   sl-radio-button {
     flex-grow: 1;
+
+    &::part(button--checked),
+    &::part(button):hover {
+      border-color: var(--sl-color-neutral-300);
+      background-color: var(--sl-color-neutral-200);
+      color: inherit;
+    }
   }
 </style>

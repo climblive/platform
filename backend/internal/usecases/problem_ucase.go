@@ -25,15 +25,3 @@ func (uc *ProblemUseCase) GetProblemsByContest(ctx context.Context, contestID do
 
 	return problems, nil
 }
-
-func (uc *ProblemUseCase) UpdateProblem(ctx context.Context, problemID domain.ProblemID, problem domain.Problem) (domain.Problem, error) {
-	panic("not implemented")
-}
-
-func (uc *ProblemUseCase) DeleteProblem(ctx context.Context, problemID domain.ProblemID) error {
-	panic("not implemented")
-}
-
-func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.ContestID, problem domain.Problem) (domain.Problem, error) {
-	panic("not implemented")
-}

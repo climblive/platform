@@ -25,7 +25,7 @@ func TestScoreEngineManager(t *testing.T) {
 			On("GetContestsCurrentlyRunningOrByStartTime", mock.Anything, mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
 			Return([]domain.Contest{}, nil)
 
-		mngr := scores.NewScoreEngineManager(mockedRepo, mockedStoreHydrator, mockedEventBroker)
+		mngr := scores.NewScoreEngineManager(mockedRepo, mockedStoreHydrator, mockedEventBroker, time.Hour)
 
 		ctx, cancel := context.WithCancel(context.Background())
 
@@ -92,7 +92,7 @@ func TestScoreEngineManager(t *testing.T) {
 			}).
 			Return(nil)
 
-		mngr := scores.NewScoreEngineManager(mockedRepo, mockedStoreHydrator, mockedEventBroker)
+		mngr := scores.NewScoreEngineManager(mockedRepo, mockedStoreHydrator, mockedEventBroker, time.Hour)
 
 		wg := mngr.Run(ctx)
 
@@ -146,7 +146,7 @@ func TestScoreEngineManager(t *testing.T) {
 			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.ScoreEngineStartedEvent")).Return().
 			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.ScoreEngineStoppedEvent")).Return()
 
-		mngr := scores.NewScoreEngineManager(mockedRepo, mockedStoreHydrator, mockedEventBroker)
+		mngr := scores.NewScoreEngineManager(mockedRepo, mockedStoreHydrator, mockedEventBroker, time.Hour)
 
 		wg := mngr.Run(ctx)
 

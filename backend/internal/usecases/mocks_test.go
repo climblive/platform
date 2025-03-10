@@ -88,6 +88,11 @@ func (m *repositoryMock) GetContest(ctx context.Context, tx domain.Transaction, 
 	return args.Get(0).(domain.Contest), args.Error(1)
 }
 
+func (m *repositoryMock) GetContestsByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.Contest, error) {
+	args := m.Called(ctx, tx, organizerID)
+	return args.Get(0).([]domain.Contest), args.Error(1)
+}
+
 func (m *repositoryMock) GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error) {
 	args := m.Called(ctx, tx, compClassID)
 	return args.Get(0).(domain.CompClass), args.Error(1)
@@ -136,6 +141,11 @@ func (m *repositoryMock) StoreTick(ctx context.Context, tx domain.Transaction, t
 func (m *repositoryMock) GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) (domain.Problem, error) {
 	args := m.Called(ctx, tx, problemID)
 	return args.Get(0).(domain.Problem), args.Error(1)
+}
+
+func (m *repositoryMock) GetOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) (domain.Organizer, error) {
+	args := m.Called(ctx, tx, organizerID)
+	return args.Get(0).(domain.Organizer), args.Error(1)
 }
 
 type authorizerMock struct {

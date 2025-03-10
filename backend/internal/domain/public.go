@@ -33,12 +33,12 @@ type Contender struct {
 }
 
 type ContenderPatch struct {
-	CompClassID         *Patch[CompClassID] `json:"compClassId" tstype:"CompClassID"`
-	Name                *Patch[string]      `json:"name" tstype:"string"`
-	PublicName          *Patch[string]      `json:"publicName" tstype:"string"`
-	ClubName            *Patch[string]      `json:"clubName" tstype:"string"`
-	WithdrawnFromFinals *Patch[bool]        `json:"withdrawnFromFinals" tstype:"boolean"`
-	Disqualified        *Patch[bool]        `json:"disqualified" tstype:"boolean"`
+	CompClassID         Patch[CompClassID] `json:"compClassId,omitzero" tstype:"CompClassID"`
+	Name                Patch[string]      `json:"name,omitzero" tstype:"string"`
+	PublicName          Patch[string]      `json:"publicName,omitzero" tstype:"string"`
+	ClubName            Patch[string]      `json:"clubName,omitzero" tstype:"string"`
+	WithdrawnFromFinals Patch[bool]        `json:"withdrawnFromFinals,omitzero" tstype:"boolean"`
+	Disqualified        Patch[bool]        `json:"disqualified,omitzero" tstype:"boolean"`
 }
 
 type Contest struct {

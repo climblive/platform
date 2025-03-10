@@ -10,3 +10,13 @@ export const getContestQuery = (contestId: number) =>
     gcTime: 12 * HOUR,
     staleTime: 12 * HOUR,
   });
+
+export const getContestsByOrganizerQuery = (organizerId: number) =>
+  createQuery({
+    queryKey: ["contests", { organizerId }],
+    queryFn: async () =>
+      ApiClient.getInstance().getContestsByOrganizer(organizerId),
+    retry: false,
+    gcTime: 12 * HOUR,
+    staleTime: 12 * HOUR,
+  });

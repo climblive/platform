@@ -74,12 +74,13 @@ type scoreEngineManagerRepository interface {
 }
 
 type ScoreEngineManager struct {
-	repo                scoreEngineManagerRepository
-	engineStoreHydrator EngineStoreHydrator
-	eventBroker         domain.EventBroker
-	handlers            map[domain.ContestID]*engineHandler
-	requests            chan any
-	terminations        chan domain.ScoreEngineInstanceID
+	repo                   scoreEngineManagerRepository
+	engineStoreHydrator    EngineStoreHydrator
+	eventBroker            domain.EventBroker
+	handlers               map[domain.ContestID]*engineHandler
+	requests               chan any
+	terminations           chan domain.ScoreEngineInstanceID
+	scoreEngineMaxLifetime time.Duration
 }
 
 type engineHandler struct {
@@ -91,14 +92,15 @@ type engineHandler struct {
 	qualifyingProblems int
 }
 
-func NewScoreEngineManager(repo scoreEngineManagerRepository, engineStoreHydrator EngineStoreHydrator, eventBroker domain.EventBroker) ScoreEngineManager {
+func NewScoreEngineManager(repo scoreEngineManagerRepository, engineStoreHydrator EngineStoreHydrator, eventBroker domain.EventBroker, scoreEngineMaxLifetime time.Duration) ScoreEngineManager {
 	return ScoreEngineManager{
-		repo:                repo,
-		engineStoreHydrator: engineStoreHydrator,
-		eventBroker:         eventBroker,
-		handlers:            make(map[domain.ContestID]*engineHandler),
-		requests:            make(chan any),
-		terminations:        make(chan domain.ScoreEngineInstanceID),
+		repo:                   repo,
+		engineStoreHydrator:    engineStoreHydrator,
+		eventBroker:            eventBroker,
+		handlers:               make(map[domain.ContestID]*engineHandler),
+		requests:               make(chan any),
+		terminations:           make(chan domain.ScoreEngineInstanceID),
+		scoreEngineMaxLifetime: scoreEngineMaxLifetime,
 	}
 }
 
@@ -238,7 +240,7 @@ func (mngr *ScoreEngineManager) handleRequest(request any) {
 
 func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) {
 	now := time.Now()
-	contests, err := mngr.repo.GetContestsCurrentlyRunningOrByStartTime(ctx, nil, now, now.Add(time.Hour))
+	contests, err := mngr.repo.GetContestsCurrentlyRunningOrByStartTime(ctx, nil, now, now.Add(5*time.Minute))
 	if err != nil {
 		slog.Error("score engine manager failed to complete periodic check", "error", err)
 
@@ -287,6 +289,14 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 	}
 
 	logger := slog.New(slog.Default().Handler()).With("contest_id", contestID)
+
+	latestPermittedTerminationTime := time.Now().Add(mngr.scoreEngineMaxLifetime)
+
+	if terminatedBy.After(latestPermittedTerminationTime) {
+		logger.Warn("capping score engine lifetime", "limit", mngr.scoreEngineMaxLifetime, "orig_terminated_by", terminatedBy, "new_terminated_by", latestPermittedTerminationTime)
+
+		terminatedBy = latestPermittedTerminationTime
+	}
 
 	logger = logger.With(slog.Group("config",
 		"qualifying_problems", contest.QualifyingProblems,

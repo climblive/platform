@@ -66,7 +66,7 @@ func compClassToDomain(record database.CompClass) domain.CompClass {
 }
 
 func contestToDomain(record database.Contest) domain.Contest {
-	return domain.Contest{
+	contest := domain.Contest{
 		ID: domain.ContestID(record.ID),
 		Ownership: domain.OwnershipData{
 			OrganizerID: domain.OrganizerID(record.OrganizerID),
@@ -82,6 +82,12 @@ func contestToDomain(record database.Contest) domain.Contest {
 		Rules:              record.Rules.String,
 		GracePeriod:        time.Duration(record.GracePeriod) * time.Minute,
 	}
+
+	if !contest.FinalsEnabled {
+		contest.Finalists = 0
+	}
+
+	return contest
 }
 
 func problemToDomain(record database.Problem) domain.Problem {
@@ -134,6 +140,17 @@ func userToDomain(record database.User) domain.User {
 		Username:   record.Username,
 		Admin:      record.Admin,
 		Organizers: make([]domain.OrganizerID, 0),
+	}
+}
+
+func organizerToDomain(record database.Organizer) domain.Organizer {
+	return domain.Organizer{
+		ID: domain.OrganizerID(record.ID),
+		Ownership: domain.OwnershipData{
+			OrganizerID: domain.OrganizerID(record.ID),
+		},
+		Name:     record.Name,
+		Homepage: record.Homepage.String,
 	}
 }
 

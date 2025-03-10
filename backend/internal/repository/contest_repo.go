@@ -32,6 +32,31 @@ func (d *Database) GetContest(ctx context.Context, tx domain.Transaction, contes
 	return contest, nil
 }
 
+func (d *Database) GetContestsByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.Contest, error) {
+	records, err := d.WithTx(tx).GetContestsByOrganizer(ctx, int32(organizerID))
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	contests := make([]domain.Contest, 0)
+
+	for _, record := range records {
+		contest := contestToDomain(record.Contest)
+
+		if timeBegin, ok := record.TimeBegin.(time.Time); ok {
+			contest.TimeBegin = &timeBegin
+		}
+
+		if timeEnd, ok := record.TimeEnd.(time.Time); ok {
+			contest.TimeEnd = &timeEnd
+		}
+
+		contests = append(contests, contest)
+	}
+
+	return contests, nil
+}
+
 func (d *Database) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context, tx domain.Transaction, earliestStartTime, latestStartTime time.Time) ([]domain.Contest, error) {
 	records, err := d.WithTx(tx).GetContestsCurrentlyRunningOrByStartTime(ctx, database.GetContestsCurrentlyRunningOrByStartTimeParams{
 		EarliestStartTime: earliestStartTime,

@@ -9,6 +9,7 @@
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { navigate, Route, Router } from "svelte-routing";
   import Contest from "./pages/Contest.svelte";
+  import ContestList from "./pages/ContestList.svelte";
   import { exchangeCode, refreshSession } from "./utils/cognito";
 
   setBasePath("/shoelace");
@@ -80,6 +81,11 @@
         <sl-button variant="primary" onclick={login}>Login</sl-button>
       {/if}
       <Router basepath="/admin">
+        <Route path="/organizers/:organizerId">
+          {#snippet children({ params }: { params: { organizerId: number } })}
+            <ContestList organizerId={Number(params.organizerId)} />
+          {/snippet}
+        </Route>
         <Route path="/contests/:contestId">
           {#snippet children({ params }: { params: { contestId: number } })}
             <Contest contestId={Number(params.contestId)} />

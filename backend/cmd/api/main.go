@@ -26,6 +26,8 @@ import (
 	"github.com/mattn/go-isatty"
 )
 
+const defaultScoreEngineMaxLifetime = 24 * time.Hour
+
 type registrationCodeGenerator struct {
 }
 
@@ -96,7 +98,11 @@ func main() {
 	eventBroker := events.NewBroker()
 	scoreKeeper := scores.NewScoreKeeper(eventBroker, repo)
 	scoreEngineStoreHydrator := &scores.StandardEngineStoreHydrator{Repo: repo}
-	scoreEngineManager := scores.NewScoreEngineManager(repo, scoreEngineStoreHydrator, eventBroker)
+
+	scoreEngineMaxLifetime := getScoreEngineMaxLifetime()
+	slog.Info("score engine maximum lifetime cap enabled", "max_lifetime", scoreEngineMaxLifetime)
+
+	scoreEngineManager := scores.NewScoreEngineManager(repo, scoreEngineStoreHydrator, eventBroker, scoreEngineMaxLifetime)
 
 	barriers = append(barriers,
 		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
@@ -132,6 +138,22 @@ func main() {
 	}
 }
 
+func getScoreEngineMaxLifetime() time.Duration {
+	env := "SCORE_ENGINE_MAX_LIFETIME"
+	maxLifetime := defaultScoreEngineMaxLifetime
+
+	if value, present := os.LookupEnv(env); present {
+		lifetime, err := strconv.ParseInt(value, 10, 64)
+		if err != nil {
+			slog.Warn("discarding non-numeric environment variable", "env", env, "error", err)
+		} else {
+			maxLifetime = time.Duration(lifetime) * time.Second
+		}
+	}
+
+	return maxLifetime
+}
+
 func setupMux(
 	repo *repository.Database,
 	authorizer *authorizer.Authorizer,
@@ -148,6 +170,7 @@ func setupMux(
 	}
 
 	contestUseCase := usecases.ContestUseCase{
+		Authorizer:  authorizer,
 		Repo:        repo,
 		ScoreKeeper: scoreKeeper,
 	}

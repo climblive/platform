@@ -1,11 +1,11 @@
 <script lang="ts">
+  import logoUrl from "@/static/logo.svg";
   import { ResultList, ScoreboardProvider } from "@climblive/lib/components";
   import { getCompClassesQuery, getContestQuery } from "@climblive/lib/queries";
   import { SlSelect } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/select/select.js";
   import { onMount } from "svelte";
-  import Footer from "../components/Footer.svelte";
   import Header from "../components/Header.svelte";
   import Loading from "./Loading.svelte";
 
@@ -65,7 +65,12 @@
         <sl-icon name="cloud-slash-fill"></sl-icon>Offline
       </header>
       <main>
-        <h1>{contest.name}</h1>
+        <h1>
+          {contest.name}
+        </h1>
+        <p class="logo">
+          <img src={logoUrl} alt="ClimbLive" />
+        </p>
         {#if compClasses.length > 1}
           <sl-select
             bind:this={compClassSelector}
@@ -107,7 +112,6 @@
           {/each}
         </div>
       </main>
-      <Footer />
     {/snippet}
   </ScoreboardProvider>
 {/if}
@@ -133,18 +137,19 @@
   main {
     display: flex;
     flex-direction: column;
-    height: calc(100% - 3rem);
+    height: 100%;
     padding: var(--sl-spacing-small);
-    gap: var(--sl-spacing-small);
   }
 
   h1 {
     text-align: center;
     line-height: 1;
     color: black;
+    margin-bottom: 0;
   }
 
   .container {
+    margin-top: var(--sl-spacing-small);
     flex-grow: 1;
     display: grid;
     grid-template-columns: repeat(
@@ -167,6 +172,14 @@
     display: none;
   }
 
+  .logo {
+    text-align: center;
+
+    & img {
+      height: var(--sl-font-size-x-large);
+    }
+  }
+
   @media screen and (max-width: 512px) {
     h1 {
       font-size: var(--sl-font-size-x-large);
@@ -182,6 +195,10 @@
 
     .class[data-selected="false"] {
       display: none;
+    }
+
+    .logo > img {
+      height: var(--sl-font-size-large);
     }
   }
 </style>

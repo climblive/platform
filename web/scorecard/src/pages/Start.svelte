@@ -1,4 +1,5 @@
 <script lang="ts">
+  import logoUrl from "@/static/logo.svg";
   import { type ScorecardSession } from "@/types";
   import { authenticateContender, readStoredSessions } from "@/utils/auth";
   import { serialize } from "@shoelace-style/shoelace";
@@ -103,7 +104,7 @@
   </form>
 
   {#if restoredSessions.length > 0}
-    <sl-divider style="--color: var(--sl-color-primary-600);"></sl-divider>
+    <sl-divider></sl-divider>
   {/if}
 
   {#each restoredSessions as restoredSession (restoredSession.registrationCode)}
@@ -129,7 +130,9 @@
       </sl-button>
     </section>
   {/each}
-  <footer>by ClimbLive™</footer>
+  <footer>
+    <img src={logoUrl} alt="ClimbLive" />
+  </footer>
 </main>
 
 <style>
@@ -137,6 +140,7 @@
     display: flex;
     flex-direction: column;
     padding-inline: var(--sl-spacing-large);
+    min-height: 100vh;
   }
 
   header {
@@ -161,18 +165,19 @@
   footer {
     margin-top: auto;
     text-align: center;
-    font-weight: var(--sl-font-weight-semibold);
-    line-height: 4rem;
-    font-size: var(--sl-font-size-x-small);
-    color: var(--sl-color-primary-900);
+    padding-block: var(--sl-spacing-medium);
+
+    & img {
+      height: var(--sl-font-size-large);
+    }
   }
 
   .restoredSession {
-    background-color: var(--sl-color-primary-600);
+    background-color: var(--sl-color-neutral-50);
+    border: 1px solid var(--sl-color-neutral-300);
     border-radius: var(--sl-border-radius-medium);
     padding: var(--sl-spacing-small);
     text-align: left;
-    color: white;
 
     & h3 {
       margin: 0;
