@@ -14,17 +14,8 @@ export type RaffleWinnerID = ResourceID;
 export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
-export type ResourceIDType =
-  | CompClassID
-  | ContenderID
-  | ContestID
-  | OrganizerID
-  | ProblemID
-  | RaffleID
-  | RaffleWinnerID
-  | SeriesID
-  | UserID
-  | TickID;
+export type ResourceIDType = 
+    CompClassID | ContenderID | ContestID | OrganizerID | ProblemID | RaffleID | RaffleWinnerID | SeriesID | UserID | TickID;
 export type ScoreEngineInstanceID = string;
 
 //////////
@@ -65,16 +56,24 @@ export interface Contest {
   id: ContestID;
   location?: string;
   seriesId?: SeriesID;
-  protected: boolean;
   name: string;
   description?: string;
-  finalsEnabled: boolean;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
   rules?: string;
   gracePeriod: number;
   timeBegin?: Date;
   timeEnd?: Date;
+}
+export interface ContestTemplate {
+  location?: string;
+  seriesId?: SeriesID;
+  name: string;
+  description?: string;
+  qualifyingProblems: number /* int */;
+  finalists: number /* int */;
+  rules?: string;
+  gracePeriod: number;
 }
 export interface Organizer {
   id: OrganizerID;
