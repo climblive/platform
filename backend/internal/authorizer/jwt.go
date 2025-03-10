@@ -2,7 +2,6 @@ package authorizer
 
 import (
 	"encoding/json"
-	"log/slog"
 	"time"
 
 	_ "embed"
