@@ -58,8 +58,8 @@ func TestScoreEngineManager(t *testing.T) {
 					ID:                 fakedContestID,
 					QualifyingProblems: 10,
 					Finalists:          7,
-					TimeBegin:          &now,
-					TimeEnd:            &now,
+					TimeBegin:          now,
+					TimeEnd:            now,
 				},
 			}, nil)
 
@@ -69,8 +69,8 @@ func TestScoreEngineManager(t *testing.T) {
 				ID:                 fakedContestID,
 				QualifyingProblems: 10,
 				Finalists:          7,
-				TimeBegin:          &now,
-				TimeEnd:            &now,
+				TimeBegin:          now,
+				TimeEnd:            now,
 			}, nil)
 
 		mockedEventBroker.
@@ -126,8 +126,8 @@ func TestScoreEngineManager(t *testing.T) {
 				ID:                 fakedContestID,
 				QualifyingProblems: 10,
 				Finalists:          7,
-				TimeBegin:          &now,
-				TimeEnd:            &now,
+				TimeBegin:          now,
+				TimeEnd:            now,
 			}, nil)
 
 		mockedEventBroker.
