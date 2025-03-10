@@ -92,7 +92,7 @@ FROM (
     JOIN comp_class cc ON cc.contest_id = contest.id
     GROUP BY contest.id) AS sub
 WHERE
-    NOW() BETWEEN sub.time_begin AND DATE_ADD(sub.time_end, INTERVAL sub.grace_period MINUTE)
+    NOW() BETWEEN sub.time_begin AND DATE_ADD(sub.time_end, INTERVAL (sub.grace_period + 15) MINUTE)
 	OR sub.time_begin BETWEEN sqlc.arg(earliest_start_time) AND sqlc.arg(latest_start_time);
 
 -- name: GetProblem :one

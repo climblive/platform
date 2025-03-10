@@ -8,14 +8,6 @@ import (
 	"github.com/climblive/platform/backend/internal/domain"
 )
 
-func nullTimeToTime(time sql.NullTime) *time.Time {
-	if time.Valid {
-		return &time.Time
-	}
-
-	return nil
-}
-
 func contenderToDomain(record database.GetContenderRow) domain.Contender {
 	contender := domain.Contender{
 		ID: domain.ContenderID(record.Contender.ID),
@@ -29,7 +21,7 @@ func contenderToDomain(record database.GetContenderRow) domain.Contender {
 		Name:                record.Contender.Name.String,
 		PublicName:          record.Contender.Name.String,
 		ClubName:            record.Contender.Club.String,
-		Entered:             nullTimeToTime(record.Contender.Entered),
+		Entered:             record.Contender.Entered.Time,
 		WithdrawnFromFinals: record.Contender.WithdrawnFromFinals,
 		Disqualified:        record.Contender.Disqualified,
 	}
@@ -176,13 +168,13 @@ func makeNullInt32(value int32) sql.NullInt32 {
 	}
 }
 
-func makeNullTime(value *time.Time) sql.NullTime {
-	if value == nil {
+func makeNullTime(value time.Time) sql.NullTime {
+	if value.IsZero() {
 		return sql.NullTime{}
 	}
 
 	return sql.NullTime{
 		Valid: true,
-		Time:  *value,
+		Time:  value,
 	}
 }
