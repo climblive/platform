@@ -93,6 +93,16 @@ export interface Problem {
   pointsZone: number /* int */;
   flashBonus?: number /* int */;
 }
+export interface ProblemPatch {
+  number?: number;
+  holdColorPrimary?: string;
+  holdColorSecondary?: string;
+  name?: string;
+  description?: string;
+  pointsTop?: number;
+  pointsZone?: number;
+  flashBonus?: number;
+}
 export interface Raffle {
   id: RaffleID;
   contestId: ContestID;

@@ -79,6 +79,17 @@ type Problem struct {
 	FlashBonus         int           `json:"flashBonus,omitempty"`
 }
 
+type ProblemPatch struct {
+	Number             Patch[int]    `json:"number,omitzero" tstype:"number"`
+	HoldColorPrimary   Patch[string] `json:"holdColorPrimary,omitzero" tstype:"string"`
+	HoldColorSecondary Patch[string] `json:"holdColorSecondary,omitzero" tstype:"string"`
+	Name               Patch[string] `json:"name,omitzero" tstype:"string"`
+	Description        Patch[string] `json:"description,omitzero" tstype:"string"`
+	PointsTop          Patch[int]    `json:"pointsTop,omitzero" tstype:"number"`
+	PointsZone         Patch[int]    `json:"pointsZone,omitzero" tstype:"number"`
+	FlashBonus         Patch[int]    `json:"flashBonus,omitzero" tstype:"number"`
+}
+
 type Raffle struct {
 	ID        RaffleID      `json:"id"`
 	Ownership OwnershipData `json:"-"`
