@@ -1,6 +1,6 @@
 <script lang="ts">
+  import { GenericForm, name, value } from "@climblive/lib/forms";
   import { type ContestTemplate } from "@climblive/lib/models";
-  import { serialize } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import "@shoelace-style/shoelace/dist/components/option/option.js";
   import "@shoelace-style/shoelace/dist/components/select/select.js";
@@ -26,56 +26,9 @@
   }
 
   let { data, submit, children }: Props = $props();
-
-  let form: HTMLFormElement | undefined = $state();
-
-  const handleSubmit = (event: SubmitEvent) => {
-    event.preventDefault();
-
-    if (!form) {
-      return;
-    }
-
-    const data = serialize(form);
-    const result = formSchema.safeParse(data);
-
-    if (result.success) {
-      submit(result.data);
-    } else {
-      for (const issue of result.error.issues) {
-        setCustomValidity(issue.path, issue.message);
-      }
-    }
-
-    form?.reportValidity();
-  };
-
-  const setCustomValidity = (path: (string | number)[], message: string) => {
-    const input = form?.querySelector(`[name="${path}"]`);
-    input?.setCustomValidity(message);
-  };
-
-  const resetCustomValidation = () => {
-    const inputs = form?.querySelectorAll(`[name]`);
-    for (const input of inputs) {
-      input?.setCustomValidity("");
-    }
-  };
-
-  const value = (node: HTMLElement, value: string | number | undefined) => {
-    $effect(() => {
-      node.setAttribute("value", value?.toString() ?? "");
-    });
-  };
-
-  const name = (node: HTMLElement, value: string | number | undefined) => {
-    $effect(() => {
-      node.setAttribute("name", value?.toString() ?? "");
-    });
-  };
 </script>
 
-<form bind:this={form} onsubmit={handleSubmit} oninput={resetCustomValidation}>
+<GenericForm schema={formSchema} {submit}>
   <sl-input
     size="small"
     use:name={"name"}
@@ -139,13 +92,4 @@
     use:value={data.rules}
   ></sl-textarea>
   {@render children?.()}
-</form>
-
-<style>
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sl-spacing-small);
-    padding: var(--sl-spacing-medium);
-  }
-</style>
+</GenericForm>
