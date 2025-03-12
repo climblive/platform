@@ -175,9 +175,8 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 
 		contender.CompClassID = patch.CompClassID.Value
 
-		if contender.Entered == nil {
-			timestamp := time.Now()
-			contender.Entered = &timestamp
+		if contender.Entered.IsZero() {
+			contender.Entered = time.Now()
 		}
 	}
 

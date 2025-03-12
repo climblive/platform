@@ -84,13 +84,13 @@ func (uc *ScoreEngineUseCase) StartScoreEngine(ctx context.Context, contestID do
 		return uuid.Nil, errors.Wrap(err, 0)
 	}
 
-	if contest.TimeBegin == nil || contest.TimeEnd == nil {
+	if contest.TimeBegin.IsZero() || contest.TimeEnd.IsZero() {
 		return uuid.Nil, errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 
 	now := time.Now()
 
-	if now.Before((*contest.TimeBegin).Add(-1 * time.Hour)) {
+	if now.Before(contest.TimeBegin.Add(-1 * time.Hour)) {
 		return uuid.Nil, errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 

@@ -672,7 +672,7 @@ func TestPatchContender(t *testing.T) {
 			Name:                "John Doe",
 			PublicName:          "John",
 			ClubName:            "Testers' Climbing Club",
-			Entered:             &currentTime,
+			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
 		}
@@ -748,7 +748,7 @@ func TestPatchContender(t *testing.T) {
 			Name:                "John Doe",
 			PublicName:          "John",
 			ClubName:            "Testers' Climbing Club",
-			Entered:             &currentTime,
+			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        true,
 		}
@@ -797,7 +797,7 @@ func TestPatchContender(t *testing.T) {
 			Name:                "",
 			PublicName:          "",
 			ClubName:            "",
-			Entered:             nil,
+			Entered:             time.Time{},
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
 		}
@@ -844,8 +844,7 @@ func TestPatchContender(t *testing.T) {
 		assert.Equal(t, "John Doe", contender.Name)
 		assert.Equal(t, "John", contender.PublicName)
 		assert.Equal(t, "Testers' Climbing Club", contender.ClubName)
-		require.NotNil(t, contender.Entered)
-		assert.WithinDuration(t, time.Now(), *contender.Entered, time.Minute)
+		assert.WithinDuration(t, time.Now(), contender.Entered, time.Minute)
 
 		mockedEventBroker.AssertCalled(t, "Dispatch", fakedContestID, domain.ContenderEnteredEvent{
 			ContenderID: fakedContenderID,
@@ -879,7 +878,7 @@ func TestPatchContender(t *testing.T) {
 			Name:                "",
 			PublicName:          "",
 			ClubName:            "",
-			Entered:             nil,
+			Entered:             time.Time{},
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
 		}
@@ -916,7 +915,7 @@ func TestPatchContender(t *testing.T) {
 			Name:                "John Doe",
 			PublicName:          "John",
 			ClubName:            "Testers' Climbing Club",
-			Entered:             &currentTime,
+			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
 		}
@@ -965,7 +964,7 @@ func TestPatchContender(t *testing.T) {
 			Name:                "John Doe",
 			PublicName:          "John",
 			ClubName:            "Testers' Climbing Club",
-			Entered:             &currentTime,
+			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
 		}
@@ -1026,7 +1025,7 @@ func TestPatchContender(t *testing.T) {
 		assert.Equal(t, "Space Climbers", contender.ClubName)
 		assert.Equal(t, true, contender.WithdrawnFromFinals)
 		assert.Equal(t, true, contender.Disqualified)
-		assert.Equal(t, currentTime, *contender.Entered)
+		assert.Equal(t, currentTime, contender.Entered)
 
 		mockedEventBroker.AssertCalled(t, "Dispatch", fakedContestID, domain.ContenderSwitchedClassEvent{
 			ContenderID: fakedContenderID,
@@ -1068,7 +1067,7 @@ func TestPatchContender(t *testing.T) {
 			Name:                "John Doe",
 			PublicName:          "John",
 			ClubName:            "Testers' Climbing Club",
-			Entered:             &currentTime,
+			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
 		}
@@ -1118,7 +1117,7 @@ func TestPatchContender(t *testing.T) {
 			Name:                "John Doe",
 			PublicName:          "John",
 			ClubName:            "Testers' Climbing Club",
-			Entered:             &currentTime,
+			Entered:             currentTime,
 			WithdrawnFromFinals: true,
 			Disqualified:        false,
 		}
@@ -1183,7 +1182,7 @@ func TestPatchContender(t *testing.T) {
 			Name:                "John Doe",
 			PublicName:          "John",
 			ClubName:            "Testers' Climbing Club",
-			Entered:             &currentTime,
+			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        true,
 		}
@@ -1250,7 +1249,7 @@ func TestPatchContender(t *testing.T) {
 			Name:                "John Doe",
 			PublicName:          "John",
 			ClubName:            "Testers' Climbing Club",
-			Entered:             &currentTime,
+			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
 		}
@@ -1313,7 +1312,7 @@ func TestPatchContender(t *testing.T) {
 			Name:                "John Doe",
 			PublicName:          "John",
 			ClubName:            "Testers' Climbing Club",
-			Entered:             &currentTime,
+			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
 		}
@@ -1371,7 +1370,7 @@ func TestPatchContender(t *testing.T) {
 			Name:                "John Doe",
 			PublicName:          "John",
 			ClubName:            "Testers' Climbing Club",
-			Entered:             &currentTime,
+			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
 		}
