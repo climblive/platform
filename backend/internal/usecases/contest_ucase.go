@@ -100,7 +100,6 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 			OrganizerID: organizerID,
 		},
 		Location:           strings.TrimSpace(tmpl.Location),
-		SeriesID:           tmpl.SeriesID,
 		Name:               strings.TrimSpace(tmpl.Name),
 		Description:        strings.TrimSpace(tmpl.Description),
 		QualifyingProblems: tmpl.QualifyingProblems,
