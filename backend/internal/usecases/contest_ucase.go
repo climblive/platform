@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"strings"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
@@ -97,10 +98,10 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		Ownership: domain.OwnershipData{
 			OrganizerID: organizerID,
 		},
-		Location:           tmpl.Location,
+		Location:           strings.TrimSpace(tmpl.Location),
 		SeriesID:           tmpl.SeriesID,
-		Name:               tmpl.Name,
-		Description:        tmpl.Description,
+		Name:               strings.TrimSpace(tmpl.Name),
+		Description:        strings.TrimSpace(tmpl.Description),
 		QualifyingProblems: tmpl.QualifyingProblems,
 		Finalists:          tmpl.Finalists,
 		Rules:              tmpl.Rules,
