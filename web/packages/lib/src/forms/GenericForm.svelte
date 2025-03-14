@@ -1,7 +1,9 @@
-<script lang="ts" generics="T">
+<script lang="ts">
   import { serialize } from "@shoelace-style/shoelace";
   import { type Snippet } from "svelte";
   import * as z from "zod";
+
+  type T = $$Generic<unknown>;
 
   interface Props {
     schema: z.ZodType<T, z.ZodTypeDef, T>;
