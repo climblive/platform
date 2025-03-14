@@ -1,9 +1,5 @@
 <script lang="ts" generics="T">
   import { serialize } from "@shoelace-style/shoelace";
-  import "@shoelace-style/shoelace/dist/components/input/input.js";
-  import "@shoelace-style/shoelace/dist/components/option/option.js";
-  import "@shoelace-style/shoelace/dist/components/select/select.js";
-  import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import { type Snippet } from "svelte";
   import * as z from "zod";
 
