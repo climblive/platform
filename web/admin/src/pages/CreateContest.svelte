@@ -37,7 +37,7 @@
     name: "Test",
     finalists: 7,
     qualifyingProblems: 10,
-    gracePeriod: 150,
+    gracePeriod: 15,
   }}
 >
   <div class="controls">
