@@ -46,7 +46,6 @@
       size="small"
       type="submit"
       loading={$createContest.isPending}
-      disabled={false}
       variant="primary"
       >Create
     </sl-button>
