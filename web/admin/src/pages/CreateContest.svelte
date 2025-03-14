@@ -41,7 +41,12 @@
   }}
 >
   <div class="controls">
-    <sl-button size="small" type="button" variant="text">Cancel</sl-button>
+    <sl-button
+      size="small"
+      type="button"
+      variant="text"
+      onclick={history.back()}>Cancel</sl-button
+    >
     <sl-button
       size="small"
       type="submit"
