@@ -1,4 +1,9 @@
-import { createMutation, createQuery, useQueryClient, type QueryKey } from "@tanstack/svelte-query";
+import {
+  createMutation,
+  createQuery,
+  useQueryClient,
+  type QueryKey,
+} from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
 import type { Contest, ContestTemplate } from "../models";
 import { HOUR } from "./constants";
@@ -37,7 +42,7 @@ export const createContestMutation = (organizerId: number) => {
 
       queryKey = ["contest", { id: newContest.id }];
 
-      client.setQueryData<Contest>(queryKey, newContest)
+      client.setQueryData<Contest>(queryKey, newContest);
     },
   });
 };

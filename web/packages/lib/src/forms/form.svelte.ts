@@ -7,10 +7,7 @@ export const value = (
   });
 };
 
-export const name = (
-  node: HTMLElement,
-  value: string | number | undefined,
-) => {
+export const name = (node: HTMLElement, value: string | number | undefined) => {
   $effect(() => {
     node.setAttribute("name", value?.toString() ?? "");
   });
