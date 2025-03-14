@@ -28,8 +28,8 @@ export default [
       },
       globals: {
         ...globals.browser,
-        $$Generic: 'readonly',
-        NodeListOf: 'readonly',
+        $$Generic: "readonly",
+        NodeListOf: "readonly",
       },
     },
     rules: {
