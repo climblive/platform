@@ -13,7 +13,7 @@
     qualifyingProblems: z.coerce.number().min(0),
     finalists: z.coerce.number().min(0),
     rules: z.string().optional(),
-    gracePeriod: z.coerce.number().max(60),
+    gracePeriod: z.coerce.number().min(0).max(60),
   });
 
   interface Props {
