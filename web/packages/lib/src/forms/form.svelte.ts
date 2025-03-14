@@ -15,3 +15,13 @@ export const name = (
     node.setAttribute("name", value?.toString() ?? "");
   });
 };
+
+export const checked = (node: HTMLElement, value: boolean | undefined) => {
+  $effect(() => {
+    if (value) {
+      node.setAttribute("checked", "");
+    } else {
+      node.removeAttribute("checked");
+    }
+  });
+};

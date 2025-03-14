@@ -45,6 +45,10 @@ form {
   line-height: var(--sl-line-height-normal);
 }
 
+fieldset {
+  border: none;
+}
+
 sl-input,
 sl-select,
 sl-checkbox {
