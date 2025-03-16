@@ -9,6 +9,7 @@
   import { navigate, Route, Router } from "svelte-routing";
   import Contest from "./pages/Contest.svelte";
   import ContestList from "./pages/ContestList.svelte";
+  import CreateContest from "./pages/CreateContest.svelte";
   import { exchangeCode, refreshSession } from "./utils/cognito";
 
   setBasePath("/shoelace");
@@ -82,6 +83,11 @@
       <Route path="/organizers/:organizerId">
         {#snippet children({ params }: { params: { organizerId: number } })}
           <ContestList organizerId={Number(params.organizerId)} />
+        {/snippet}
+      </Route>
+      <Route path="/organizers/:organizerId/contests/new">
+        {#snippet children({ params }: { params: { organizerId: number } })}
+          <CreateContest organizerId={Number(params.organizerId)} />
         {/snippet}
       </Route>
       <Route path="/contests/:contestId">

@@ -6,6 +6,7 @@ import {
   scoreboardEntrySchema,
   type ContenderPatch,
   type ContestID,
+  type ContestTemplate,
   type ScoreEngineInstanceID,
   type Tick,
 } from "./models";
@@ -108,6 +109,16 @@ export class ApiClient {
     const endpoint = `/contests/${id}`;
 
     const result = await this.axiosInstance.get(endpoint);
+
+    return contestSchema.parse(result.data);
+  };
+
+  createContest = async (organizerId: number, template: ContestTemplate) => {
+    const endpoint = `/organizers/${organizerId}/contests`;
+
+    const result = await this.axiosInstance.post(endpoint, template, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
 
     return contestSchema.parse(result.data);
   };

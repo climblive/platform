@@ -65,16 +65,24 @@ export interface Contest {
   id: ContestID;
   location?: string;
   seriesId?: SeriesID;
-  protected: boolean;
   name: string;
   description?: string;
-  finalsEnabled: boolean;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
   rules?: string;
   gracePeriod: number;
   timeBegin?: Date;
   timeEnd?: Date;
+}
+export interface ContestTemplate {
+  location?: string;
+  seriesId?: SeriesID;
+  name: string;
+  description?: string;
+  qualifyingProblems: number /* int */;
+  finalists: number /* int */;
+  rules?: string;
+  gracePeriod: number;
 }
 export interface Organizer {
   id: OrganizerID;

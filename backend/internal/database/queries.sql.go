@@ -801,6 +801,58 @@ func (q *Queries) UpsertContender(ctx context.Context, arg UpsertContenderParams
 	return result.LastInsertId()
 }
 
+const upsertContest = `-- name: UpsertContest :execlastid
+INSERT INTO 
+	contest (id, organizer_id, series_id, name, description, location, final_enabled, qualifying_problems, finalists, rules, grace_period)
+VALUES 
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    organizer_id = VALUES(organizer_id),
+    series_id = VALUES(series_id),
+    name = VALUES(name),
+    description = VALUES(description),
+    location = VALUES(location),
+    final_enabled = VALUES(final_enabled),
+    qualifying_problems = VALUES(qualifying_problems),
+    finalists = VALUES(finalists),
+    rules = VALUES(rules),
+    grace_period = VALUES(grace_period)
+`
+
+type UpsertContestParams struct {
+	ID                 int32
+	OrganizerID        int32
+	SeriesID           sql.NullInt32
+	Name               string
+	Description        sql.NullString
+	Location           sql.NullString
+	FinalEnabled       bool
+	QualifyingProblems int32
+	Finalists          int32
+	Rules              sql.NullString
+	GracePeriod        int32
+}
+
+func (q *Queries) UpsertContest(ctx context.Context, arg UpsertContestParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, upsertContest,
+		arg.ID,
+		arg.OrganizerID,
+		arg.SeriesID,
+		arg.Name,
+		arg.Description,
+		arg.Location,
+		arg.FinalEnabled,
+		arg.QualifyingProblems,
+		arg.Finalists,
+		arg.Rules,
+		arg.GracePeriod,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
+}
+
 const upsertOrganizer = `-- name: UpsertOrganizer :execlastid
 INSERT INTO
     organizer (id, name, homepage)

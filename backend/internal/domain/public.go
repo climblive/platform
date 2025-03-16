@@ -46,16 +46,25 @@ type Contest struct {
 	Ownership          OwnershipData `json:"-"`
 	Location           string        `json:"location,omitempty"`
 	SeriesID           SeriesID      `json:"seriesId,omitempty"`
-	Protected          bool          `json:"protected"`
 	Name               string        `json:"name"`
 	Description        string        `json:"description,omitempty"`
-	FinalsEnabled      bool          `json:"finalsEnabled"`
 	QualifyingProblems int           `json:"qualifyingProblems"`
 	Finalists          int           `json:"finalists"`
 	Rules              string        `json:"rules,omitempty"`
 	GracePeriod        time.Duration `json:"gracePeriod"`
 	TimeBegin          time.Time     `json:"timeBegin,omitzero"`
 	TimeEnd            time.Time     `json:"timeEnd,omitzero"`
+}
+
+type ContestTemplate struct {
+	Location           string        `json:"location,omitempty"`
+	SeriesID           SeriesID      `json:"seriesId,omitempty"`
+	Name               string        `json:"name"`
+	Description        string        `json:"description,omitempty"`
+	QualifyingProblems int           `json:"qualifyingProblems"`
+	Finalists          int           `json:"finalists"`
+	Rules              string        `json:"rules,omitempty"`
+	GracePeriod        time.Duration `json:"gracePeriod"`
 }
 
 type Organizer struct {
