@@ -95,6 +95,17 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
+	switch {
+	case len(tmpl.Name) < 1:
+		fallthrough
+	case tmpl.Finalists < 0:
+		fallthrough
+	case tmpl.QualifyingProblems < 0:
+		fallthrough
+	case tmpl.GracePeriod < 0 || tmpl.GracePeriod > time.Hour:
+		return domain.Contest{}, domain.ErrInvalidData
+	}
+
 	contest := domain.Contest{
 		Ownership: domain.OwnershipData{
 			OrganizerID: organizerID,
@@ -106,17 +117,6 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		Finalists:          tmpl.Finalists,
 		Rules:              tmpl.Rules,
 		GracePeriod:        tmpl.GracePeriod,
-	}
-
-	switch {
-	case len(contest.Name) < 1:
-		fallthrough
-	case contest.Finalists < 0:
-		fallthrough
-	case contest.QualifyingProblems < 0:
-		fallthrough
-	case contest.GracePeriod < 0 || contest.GracePeriod > time.Hour:
-		return domain.Contest{}, domain.ErrInvalidData
 	}
 
 	contest, err = uc.Repo.StoreContest(ctx, nil, contest)
