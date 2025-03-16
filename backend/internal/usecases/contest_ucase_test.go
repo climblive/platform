@@ -303,7 +303,7 @@ func TestCreateContest(t *testing.T) {
 
 		require.NoError(t, err)
 		assert.Equal(t, fakedContestID, contest.ID)
-		assert.Equal(t, fakedOrganizerID, contest.Ownership.OrganizerID)
+		assert.Equal(t, fakedOwnership, contest.Ownership)
 		assert.Equal(t, "The garage", contest.Location)
 		assert.Equal(t, "Swedish Championships", contest.Name)
 		assert.Equal(t, "Who is the best climber in Sweden?", contest.Description)
