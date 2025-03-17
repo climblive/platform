@@ -5,6 +5,7 @@
     getContendersByContestQuery,
   } from "@climblive/lib/queries";
   import "@shoelace-style/shoelace/dist/components/range/range.js";
+  import type SlRange from "@shoelace-style/shoelace/dist/components/range/range.js";
   import type { CreateContendersArguments } from "node_modules/@climblive/lib/src/models/rest";
   import * as z from "zod";
 
@@ -14,6 +15,7 @@
 
   let { contestId }: Props = $props();
 
+  let range = $state<SlRange | undefined>();
   const contendersQuery = getContendersByContestQuery(contestId);
   const createContenders = createContendersMutation(contestId);
 
@@ -31,17 +33,28 @@
         .max(remainingCodes ?? 0),
     }),
   );
+
+  const handleSubmit = async (args: CreateContendersArguments) => {
+    $createContenders.mutate(args, {
+      onSuccess: () => {
+        if (range) {
+          range.value = 0;
+        }
+      },
+    });
+  };
 </script>
 
 {#if contenders}
-  <GenericForm {schema} submit={(v) => $createContenders.mutate(v)}>
+  <GenericForm {schema} submit={handleSubmit}>
     <sl-range
+      bind:this={range}
       label="Number of registration codes"
       help-text={`You have ${remainingCodes} codes remaining`}
       min={0}
       max={remainingCodes}
       use:name={"number"}
-      disabled={remainingCodes === undefined}
+      disabled={remainingCodes === undefined || remainingCodes === 0}
       step="10"
     ></sl-range>
     <sl-button
