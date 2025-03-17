@@ -13,7 +13,7 @@ import {
 import { compClassSchema } from "./models/compClass";
 import { contenderSchema } from "./models/contender";
 import { problemSchema } from "./models/problem";
-import type { StartScoreEngineArguments } from "./models/rest";
+import type { CreateContendersArguments, StartScoreEngineArguments } from "./models/rest";
 import { tickSchema } from "./models/tick";
 import { getApiUrl } from "./utils/config";
 
@@ -95,6 +95,16 @@ export class ApiClient {
     return contenderSchema.parse(result.data);
   };
 
+  getContendersByContest = async (contestId: number) => {
+    const endpoint = `/contests/${contestId}/contenders`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(contenderSchema).parse(result.data);
+  };
+
   patchContender = async (id: number, patch: ContenderPatch) => {
     const endpoint = `/contenders/${id}`;
 
@@ -103,6 +113,16 @@ export class ApiClient {
     });
 
     return contenderSchema.parse(result.data);
+  };
+
+  createContenders = async (contestId: number, args: CreateContendersArguments) => {
+    const endpoint = `/contests/${contestId}/contenders`;
+
+    const result = await this.axiosInstance.post(endpoint, args, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(contenderSchema).parse(result.data);
   };
 
   getContest = async (id: number) => {

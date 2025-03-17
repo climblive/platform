@@ -6,6 +6,7 @@
     stopScoreEngineMutation,
   } from "@climblive/lib/queries";
   import { add } from "date-fns";
+  import ContendersList from "./ContendersList.svelte";
 
   interface Props {
     contestId: number;
@@ -22,25 +23,35 @@
   let scoreEngines = $derived($scoreEnginesQuery.data);
 </script>
 
-{#if contest && scoreEngines}
-  <h1>{contest.name}</h1>
-  <h2>Score Engines</h2>
-  {#each scoreEngines as engineInstanceId}
-    <div>
-      <h3>{engineInstanceId}</h3>
-      <sl-button
-        variant="danger"
-        onclick={() => $stopScoreEngine.mutate(engineInstanceId)}
-        loading={$stopScoreEngine.isPending}>Stop</sl-button
-      >
-    </div>
-  {/each}
-  <sl-button
-    onclick={() =>
-      $startScoreEngine.mutate({
-        terminatedBy: add(new Date(), { hours: 6 }),
-      })}
-    loading={$startScoreEngine.isPending}
-    disabled={scoreEngines.length > 0}>Start engine</sl-button
-  >
-{/if}
+<main>
+  {#if contest && scoreEngines}
+    <h1>{contest.name}</h1>
+    <h2>Score Engines</h2>
+    {#each scoreEngines as engineInstanceId}
+      <div>
+        <h3>{engineInstanceId}</h3>
+        <sl-button
+          variant="danger"
+          onclick={() => $stopScoreEngine.mutate(engineInstanceId)}
+          loading={$stopScoreEngine.isPending}>Stop</sl-button
+        >
+      </div>
+    {/each}
+    <sl-button
+      onclick={() =>
+        $startScoreEngine.mutate({
+          terminatedBy: add(new Date(), { hours: 6 }),
+        })}
+      loading={$startScoreEngine.isPending}
+      disabled={scoreEngines.length > 0}>Start engine</sl-button
+    >
+    <h2>Contenders</h2>
+    <ContendersList {contestId} />
+  {/if}
+</main>
+
+<style>
+  main {
+    padding: var(--sl-spacing-medium);
+  }
+</style>
