@@ -1,13 +1,12 @@
 <script lang="ts">
-  import { GenericForm, name } from "@climblive/lib/forms";
+  import type { CreateContendersArguments } from "@climblive/lib/models";
   import {
     createContendersMutation,
     getContendersByContestQuery,
   } from "@climblive/lib/queries";
-  import "@shoelace-style/shoelace/dist/components/range/range.js";
+  import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import type SlRange from "@shoelace-style/shoelace/dist/components/range/range.js";
-  import type { CreateContendersArguments } from "node_modules/@climblive/lib/src/models/rest";
-  import * as z from "zod";
 
   interface Props {
     contestId: number;
@@ -25,16 +24,9 @@
     contenders === undefined ? undefined : 500 - contenders.length,
   );
 
-  const schema: z.ZodType<CreateContendersArguments> = $derived(
-    z.object({
-      number: z.coerce
-        .number()
-        .min(1)
-        .max(remainingCodes ?? 0),
-    }),
-  );
+  const increments = [1, 10, 100];
 
-  const handleSubmit = async (args: CreateContendersArguments) => {
+  const addContenders = async (args: CreateContendersArguments) => {
     $createContenders.mutate(args, {
       onSuccess: () => {
         if (range) {
@@ -46,25 +38,24 @@
 </script>
 
 {#if contenders}
-  <GenericForm {schema} submit={handleSubmit}>
-    <sl-range
-      bind:this={range}
-      label="Number of registration codes"
-      help-text={`You have ${remainingCodes} codes remaining`}
-      min={0}
-      max={remainingCodes}
-      use:name={"number"}
-      disabled={remainingCodes === undefined || remainingCodes === 0}
-      step="10"
-    ></sl-range>
-    <sl-button
-      size="small"
-      type="submit"
-      variant="primary"
-      loading={$createContenders.isPending}
-      >Create
-    </sl-button>
-  </GenericForm>
+  <p>
+    You have {remainingCodes} codes remaining out of your maximum 500.
+  </p>
+  <section>
+    {#each increments as increment (increment)}
+      <sl-button
+        size="small"
+        type="button"
+        variant="primary"
+        loading={$createContenders.isPending}
+        disabled={!remainingCodes || remainingCodes < increment}
+        onclick={() => addContenders({ number: increment })}
+      >
+        <sl-icon slot="prefix" name="plus-lg"></sl-icon>
+        Add {increment} code{#if increment != 1}s{/if}
+      </sl-button>
+    {/each}
+  </section>
 
   <ul>
     {#each contenders as contender (contender.id)}
@@ -74,7 +65,8 @@
 {/if}
 
 <style>
-  sl-range {
-    --track-color-active: var(--sl-color-primary-600);
+  section {
+    display: flex;
+    gap: var(--sl-spacing-x-small);
   }
 </style>
