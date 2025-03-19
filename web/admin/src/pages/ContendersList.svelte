@@ -4,9 +4,9 @@
     createContendersMutation,
     getContendersByContestQuery,
   } from "@climblive/lib/queries";
+  import { toastError } from "@climblive/lib/utils";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import type SlRange from "@shoelace-style/shoelace/dist/components/range/range.js";
 
   interface Props {
     contestId: number;
@@ -14,7 +14,6 @@
 
   let { contestId }: Props = $props();
 
-  let range = $state<SlRange | undefined>();
   const contendersQuery = getContendersByContestQuery(contestId);
   const createContenders = createContendersMutation(contestId);
 
@@ -28,11 +27,7 @@
 
   const addContenders = async (args: CreateContendersArguments) => {
     $createContenders.mutate(args, {
-      onSuccess: () => {
-        if (range) {
-          range.value = 0;
-        }
-      },
+      onError: () => toastError("Failed to create contenders."),
     });
   };
 </script>
