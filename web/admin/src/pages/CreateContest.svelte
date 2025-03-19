@@ -1,5 +1,5 @@
 <script lang="ts">
-  import CreateContestForm from "@/forms/CreateContestForm.svelte";
+  import ContestForm from "@/forms/ContestForm.svelte";
   import type { Contest, ContestTemplate } from "@climblive/lib/models";
   import { createContestMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
@@ -31,7 +31,7 @@
   };
 </script>
 
-<CreateContestForm
+<ContestForm
   submit={handleSubmit}
   data={{
     name: "Test",
@@ -55,4 +55,4 @@
       >Create
     </sl-button>
   </div>
-</CreateContestForm>
+</ContestForm>

@@ -6,7 +6,8 @@
     stopScoreEngineMutation,
   } from "@climblive/lib/queries";
   import { add } from "date-fns";
-  import ContendersList from "./ContendersList.svelte";
+  import CompClassList from "./CompClassList.svelte";
+  import ContenderList from "./ContenderList.svelte";
 
   interface Props {
     contestId: number;
@@ -45,8 +46,10 @@
       loading={$startScoreEngine.isPending}
       disabled={scoreEngines.length > 0}>Start engine</sl-button
     >
+    <h2>Classes</h2>
+    <CompClassList {contestId} />
     <h2>Contenders</h2>
-    <ContendersList {contestId} />
+    <ContenderList {contestId} />
   {/if}
 </main>
 
