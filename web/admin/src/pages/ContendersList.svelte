@@ -34,7 +34,7 @@
 
 {#if contenders}
   <p>
-    You have {remainingCodes} codes remaining out of your maximum 500.
+    You have {remainingCodes} codes remaining out of your maximum allotted 500.
   </p>
   <section>
     {#each increments as increment (increment)}
