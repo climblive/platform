@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   contestSchema,
   scoreboardEntrySchema,
+  type CompClassTemplate,
   type ContenderPatch,
   type ContestID,
   type ContestTemplate,
@@ -147,6 +148,16 @@ export class ApiClient {
     const result = await this.axiosInstance.get(endpoint);
 
     return z.array(compClassSchema).parse(result.data);
+  };
+
+  createCompClass = async (contestId: number, template: CompClassTemplate) => {
+    const endpoint = `/contests/${contestId}/comp-classes`;
+
+    const result = await this.axiosInstance.post(endpoint, template, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return compClassSchema.parse(result.data);
   };
 
   getTicks = async (contenderId: number) => {
