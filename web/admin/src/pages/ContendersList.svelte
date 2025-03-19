@@ -7,6 +7,7 @@
   import { toastError } from "@climblive/lib/utils";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import "@shoelace-style/shoelace/dist/components/qr-code/qr-code.js";
 
   interface Props {
     contestId: number;
@@ -54,7 +55,13 @@
 
   <ul>
     {#each contenders as contender (contender.id)}
-      <li>{contender.registrationCode}</li>
+      <li>
+        <a href={`/${contender.registrationCode}`}>
+          {contender.registrationCode}
+        </a>
+        <sl-qr-code value={`/${contender.registrationCode}`} fill="black"
+        ></sl-qr-code>
+      </li>
     {/each}
   </ul>
 {/if}
