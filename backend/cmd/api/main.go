@@ -176,7 +176,8 @@ func setupMux(
 	}
 
 	compClassUseCase := usecases.CompClassUseCase{
-		Repo: repo,
+		Authorizer: authorizer,
+		Repo:       repo,
 	}
 
 	problemUseCase := usecases.ProblemUseCase{

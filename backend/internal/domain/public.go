@@ -12,9 +12,15 @@ type CompClass struct {
 	ContestID   ContestID     `json:"contestId"`
 	Name        string        `json:"name"`
 	Description string        `json:"description,omitempty"`
-	Color       ColorRGB      `json:"color,omitempty"`
 	TimeBegin   time.Time     `json:"timeBegin"`
 	TimeEnd     time.Time     `json:"timeEnd"`
+}
+
+type CompClassTemplate struct {
+	Name        string    `json:"name"`
+	Description string    `json:"description,omitempty"`
+	TimeBegin   time.Time `json:"timeBegin"`
+	TimeEnd     time.Time `json:"timeEnd"`
 }
 
 type Contender struct {

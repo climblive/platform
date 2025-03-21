@@ -752,6 +752,49 @@ func (q *Queries) InsertTick(ctx context.Context, arg InsertTickParams) (int64, 
 	return result.LastInsertId()
 }
 
+const upsertCompClass = `-- name: UpsertCompClass :execlastid
+INSERT INTO 
+	comp_class (id, organizer_id, contest_id, name, description, color, time_begin, time_end)
+VALUES 
+	(?, ?, ?, ?, ?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    organizer_id = VALUES(organizer_id),
+    contest_id = VALUES(contest_id),
+    name = VALUES(name),
+    description = VALUES(description),
+    color = VALUES(color),
+    time_begin = VALUES(time_begin),
+    time_end = VALUES(time_end)
+`
+
+type UpsertCompClassParams struct {
+	ID          int32
+	OrganizerID int32
+	ContestID   int32
+	Name        string
+	Description sql.NullString
+	Color       sql.NullString
+	TimeBegin   time.Time
+	TimeEnd     time.Time
+}
+
+func (q *Queries) UpsertCompClass(ctx context.Context, arg UpsertCompClassParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, upsertCompClass,
+		arg.ID,
+		arg.OrganizerID,
+		arg.ContestID,
+		arg.Name,
+		arg.Description,
+		arg.Color,
+		arg.TimeBegin,
+		arg.TimeEnd,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
+}
+
 const upsertContender = `-- name: UpsertContender :execlastid
 INSERT INTO 
 	contender (id, organizer_id, contest_id, registration_code, name, club, class_id, entered, disqualified, withdrawn_from_finals)

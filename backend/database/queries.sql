@@ -69,6 +69,20 @@ SELECT sqlc.embed(comp_class)
 FROM comp_class
 WHERE contest_id = ?;
 
+-- name: UpsertCompClass :execlastid
+INSERT INTO 
+	comp_class (id, organizer_id, contest_id, name, description, color, time_begin, time_end)
+VALUES 
+	(?, ?, ?, ?, ?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    organizer_id = VALUES(organizer_id),
+    contest_id = VALUES(contest_id),
+    name = VALUES(name),
+    description = VALUES(description),
+    color = VALUES(color),
+    time_begin = VALUES(time_begin),
+    time_end = VALUES(time_end);
+
 -- name: GetContest :one
 SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
 FROM contest

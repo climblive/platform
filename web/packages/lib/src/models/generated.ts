@@ -14,17 +14,8 @@ export type RaffleWinnerID = ResourceID;
 export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
-export type ResourceIDType =
-  | CompClassID
-  | ContenderID
-  | ContestID
-  | OrganizerID
-  | ProblemID
-  | RaffleID
-  | RaffleWinnerID
-  | SeriesID
-  | UserID
-  | TickID;
+export type ResourceIDType = 
+    CompClassID | ContenderID | ContestID | OrganizerID | ProblemID | RaffleID | RaffleWinnerID | SeriesID | UserID | TickID;
 export type ScoreEngineInstanceID = string;
 
 //////////
@@ -36,7 +27,12 @@ export interface CompClass {
   contestId: ContestID;
   name: string;
   description?: string;
-  color?: ColorRGB;
+  timeBegin: Date;
+  timeEnd: Date;
+}
+export interface CompClassTemplate {
+  name: string;
+  description?: string;
   timeBegin: Date;
   timeEnd: Date;
 }
