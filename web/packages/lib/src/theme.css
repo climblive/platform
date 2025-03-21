@@ -47,6 +47,7 @@ form {
 
 fieldset {
   border: none;
+  padding: 0;
 }
 
 sl-input,

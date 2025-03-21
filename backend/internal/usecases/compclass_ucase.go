@@ -43,8 +43,6 @@ func (uc *CompClassUseCase) CreateCompClass(ctx context.Context, contestID domai
 	switch {
 	case len(tmpl.Name) < 1:
 		fallthrough
-	case tmpl.TimeBegin.Before(time.Now()):
-		fallthrough
 	case tmpl.TimeEnd.Before(tmpl.TimeBegin):
 		fallthrough
 	case tmpl.TimeEnd.Sub(tmpl.TimeBegin) > 12*time.Hour:

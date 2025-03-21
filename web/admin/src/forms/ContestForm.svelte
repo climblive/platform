@@ -98,6 +98,5 @@
     display: flex;
     flex-direction: column;
     gap: var(--sl-spacing-small);
-    padding: var(--sl-spacing-medium);
   }
 </style>
