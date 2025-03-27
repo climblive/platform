@@ -28,7 +28,7 @@
       if (data.timeEnd <= data.timeBegin) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "End time cannot occur before begin time",
+          message: "Time must be in chronological order",
           path: ["timeEnd"],
         });
       }
