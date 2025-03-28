@@ -14,6 +14,7 @@ type problemUseCaseRepository interface {
 	GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Problem, error)
 	StoreProblem(ctx context.Context, tx domain.Transaction, problem domain.Problem) (domain.Problem, error)
 	GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) (domain.Problem, error)
+	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
 }
 
 type ProblemUseCase struct {
@@ -99,4 +100,35 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 	}
 
 	return problem, nil
+}
+
+func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.ContestID, tmpl domain.ProblemTemplate) (domain.Problem, error) {
+	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
+	if err != nil {
+		return domain.Problem{}, errors.Wrap(err, 0)
+	}
+
+	if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+		return domain.Problem{}, errors.Wrap(err, 0)
+	}
+
+	problem := domain.Problem{
+		Ownership:          contest.Ownership,
+		ContestID:          contestID,
+		Number:             tmpl.Number,
+		HoldColorPrimary:   tmpl.HoldColorPrimary,
+		HoldColorSecondary: tmpl.HoldColorSecondary,
+		Name:               tmpl.Name,
+		Description:        tmpl.Description,
+		PointsTop:          tmpl.PointsTop,
+		PointsZone:         tmpl.PointsZone,
+		FlashBonus:         tmpl.FlashBonus,
+	}
+
+	createdProblem, err := uc.Repo.StoreProblem(ctx, nil, problem)
+	if err != nil {
+		return domain.Problem{}, errors.Wrap(err, 0)
+	}
+
+	return createdProblem, nil
 }
