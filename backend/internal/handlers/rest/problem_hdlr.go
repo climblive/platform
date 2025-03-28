@@ -25,6 +25,7 @@ func InstallProblemHandler(mux *Mux, problemUseCase problemUseCase) {
 
 	mux.HandleFunc("GET /contests/{contestID}/problems", handler.GetProblemsByContest)
 	mux.HandleFunc("PATCH /problems/{problemID}", handler.PatchProblem)
+	mux.HandleFunc("POST /contests/{contestID}/problems", handler.CreateProblem)
 }
 
 func (hdlr *problemHandler) GetProblemsByContest(w http.ResponseWriter, r *http.Request) {
