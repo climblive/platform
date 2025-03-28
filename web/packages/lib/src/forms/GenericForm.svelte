@@ -55,10 +55,6 @@
     stash.set(input.name, input.getAttribute("help-text"));
 
     input.setAttribute("help-text", message);
-
-    input.addEventListener("sl-invalid", (e) => {
-      e.preventDefault();
-    });
   };
 
   const resetCustomValidation = () => {
