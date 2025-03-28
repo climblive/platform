@@ -106,6 +106,16 @@ export interface Problem {
   pointsZone: number /* int */;
   flashBonus?: number /* int */;
 }
+export interface ProblemTemplate {
+  number: number /* int */;
+  holdColorPrimary: string;
+  holdColorSecondary?: string;
+  name?: string;
+  description?: string;
+  pointsTop: number /* int */;
+  pointsZone: number /* int */;
+  flashBonus?: number /* int */;
+}
 export interface ProblemPatch {
   number?: number;
   holdColorPrimary?: string;

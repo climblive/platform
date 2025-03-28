@@ -11,6 +11,7 @@ import (
 type problemUseCase interface {
 	GetProblemsByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Problem, error)
 	PatchProblem(ctx context.Context, problemID domain.ProblemID, patch domain.ProblemPatch) (domain.Problem, error)
+	CreateProblem(ctx context.Context, contestID domain.ContestID, tmpl domain.ProblemTemplate) (domain.Problem, error)
 }
 
 type problemHandler struct {
@@ -63,4 +64,27 @@ func (hdlr *problemHandler) PatchProblem(w http.ResponseWriter, r *http.Request)
 	}
 
 	writeResponse(w, http.StatusOK, updatedProblem)
+}
+
+func (hdlr *problemHandler) CreateProblem(w http.ResponseWriter, r *http.Request) {
+	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	var tmpl domain.ProblemTemplate
+	err = json.NewDecoder(r.Body).Decode(&tmpl)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	createdProblem, err := hdlr.problemUseCase.CreateProblem(r.Context(), contestID, tmpl)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusCreated, createdProblem)
 }
