@@ -1,8 +1,5 @@
 <script lang="ts">
   import { getCompClassesQuery } from "@climblive/lib/queries";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
-  import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import "@shoelace-style/shoelace/dist/components/qr-code/qr-code.js";
 
   interface Props {
     contestId: number;
