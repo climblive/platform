@@ -15,6 +15,8 @@
 
   let form: HTMLFormElement | undefined = $state();
 
+  const stash = new Map<string, string | null>();
+
   const handleSubmit = (event: SubmitEvent) => {
     event.preventDefault();
 
@@ -37,11 +39,22 @@
   };
 
   const setCustomValidity = (path: (string | number)[], message: string) => {
-    const input = form?.querySelector(`[name="${path}"]`) as
+    const name = `${path[0]}`;
+
+    const input = form?.querySelector(`[name="${name}"]`) as
       | HTMLInputElement
       | null
       | undefined;
-    input?.setCustomValidity(message);
+
+    if (!input) {
+      return;
+    }
+
+    input.setCustomValidity(message);
+
+    stash.set(input.name, input.getAttribute("help-text"));
+
+    input.setAttribute("help-text", message);
   };
 
   const resetCustomValidation = () => {
@@ -54,7 +67,21 @@
     }
 
     for (const input of inputs) {
-      input?.setCustomValidity("");
+      input.setCustomValidity("");
+
+      const stashedHelpText = stash.get(input.name);
+
+      switch (stashedHelpText) {
+        case undefined:
+          break;
+        case null:
+          input.removeAttribute("help-text");
+          break;
+        default:
+          input.setAttribute("help-text", stashedHelpText);
+      }
+
+      stash.delete(input.name);
     }
   };
 </script>

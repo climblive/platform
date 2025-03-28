@@ -36,7 +36,12 @@ export interface CompClass {
   contestId: ContestID;
   name: string;
   description?: string;
-  color?: ColorRGB;
+  timeBegin: Date;
+  timeEnd: Date;
+}
+export interface CompClassTemplate {
+  name: string;
+  description?: string;
   timeBegin: Date;
   timeEnd: Date;
 }

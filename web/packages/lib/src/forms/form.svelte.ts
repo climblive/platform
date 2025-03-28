@@ -8,6 +8,8 @@ export const value = (
 };
 
 export const name = (node: HTMLElement, value: string | number | undefined) => {
+  node.addEventListener("sl-invalid", (e) => e.preventDefault());
+
   $effect(() => {
     node.setAttribute("name", value?.toString() ?? "");
   });

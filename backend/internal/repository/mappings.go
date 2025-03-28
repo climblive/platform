@@ -51,7 +51,6 @@ func compClassToDomain(record database.CompClass) domain.CompClass {
 		ContestID:   domain.ContestID(record.ContestID),
 		Name:        record.Name,
 		Description: record.Description.String,
-		Color:       domain.ColorRGB(record.Color.String),
 		TimeBegin:   record.TimeBegin,
 		TimeEnd:     record.TimeEnd,
 	}
