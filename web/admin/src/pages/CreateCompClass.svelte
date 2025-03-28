@@ -4,7 +4,6 @@
   import { createCompClassMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
-  import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/qr-code/qr-code.js";
   import { add, roundToNearestHours } from "date-fns";
 
