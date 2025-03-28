@@ -1,4 +1,9 @@
-import { createMutation, createQuery, useQueryClient, type QueryKey } from "@tanstack/svelte-query";
+import {
+  createMutation,
+  createQuery,
+  useQueryClient,
+  type QueryKey,
+} from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
 import type { CompClass, CompClassTemplate } from "../models";
 import { HOUR } from "./constants";
