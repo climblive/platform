@@ -8,7 +8,7 @@
 
   const formSchema: z.ZodType<ProblemTemplate> = z.object({
     number: z.coerce.number(),
-    holdColorPrimary: z.string(),
+    holdColorPrimary: z.string().regex(/^#([0-9a-fA-F]{3}){1,2}$/),
     holdColorSecondary: z.string().optional(),
     name: z.string().optional(),
     description: z.string().optional(),
@@ -55,7 +55,6 @@
           size="small"
           use:name={"holdColorSecondary"}
           label="Secondary hold color"
-          required
           swatches="
       #d0021b; #f5a623; #f8e71c; #8b572a; #7ed321; #417505; #bd10e0; #9013fe;
       #4a90e2; #50e3c2; #b8e986; #000; #444; #888; #ccc; #fff;
