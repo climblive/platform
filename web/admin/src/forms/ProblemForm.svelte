@@ -1,6 +1,7 @@
 <script lang="ts">
   import { GenericForm, name, value } from "@climblive/lib/forms";
   import { type ProblemTemplate } from "@climblive/lib/models";
+  import "@shoelace-style/shoelace/dist/components/color-picker/color-picker.js";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import { type Snippet } from "svelte";
   import * as z from "zod";
@@ -35,21 +36,35 @@
       required
       use:value={data.number}
     ></sl-input>
-    <sl-input
-      size="small"
-      use:name={"holdColorPrimary"}
-      label="Primary hold color"
-      type="text"
-      required
-      use:value={data.holdColorPrimary}
-    ></sl-input>
-    <sl-input
-      size="small"
-      use:name={"holdColorSecondary"}
-      label="Secondary hold color"
-      type="text"
-      use:value={data.holdColorSecondary}
-    ></sl-input>
+    <div class="colors">
+      <span>Hold colors</span>
+      <div class="pickers">
+        <sl-color-picker
+          size="small"
+          use:name={"holdColorPrimary"}
+          label="Primary hold color"
+          required
+          swatches="
+      #d0021b; #f5a623; #f8e71c; #8b572a; #7ed321; #417505; #bd10e0; #9013fe;
+      #4a90e2; #50e3c2; #b8e986; #000; #444; #888; #ccc; #fff;
+    "
+          use:value={data.holdColorPrimary}
+          no-format-toggle
+        ></sl-color-picker>
+        <sl-color-picker
+          size="small"
+          use:name={"holdColorSecondary"}
+          label="Secondary hold color"
+          required
+          swatches="
+      #d0021b; #f5a623; #f8e71c; #8b572a; #7ed321; #417505; #bd10e0; #9013fe;
+      #4a90e2; #50e3c2; #b8e986; #000; #444; #888; #ccc; #fff;
+    "
+          use:value={data.holdColorSecondary}
+          no-format-toggle
+        ></sl-color-picker>
+      </div>
+    </div>
     <sl-input
       size="small"
       use:name={"name"}
@@ -96,5 +111,16 @@
     display: flex;
     flex-direction: column;
     gap: var(--sl-spacing-small);
+  }
+
+  .colors {
+    span {
+      font-size: var(--sl-input-label-font-size-small);
+    }
+
+    & .pickers {
+      display: flex;
+      gap: var(--sl-spacing-x-small);
+    }
   }
 </style>
