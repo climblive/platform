@@ -46,7 +46,7 @@ func (uc *CompClassUseCase) CreateCompClass(ctx context.Context, contestID domai
 	case tmpl.TimeEnd.Before(tmpl.TimeBegin):
 		fallthrough
 	case tmpl.TimeEnd.Sub(tmpl.TimeBegin) > 12*time.Hour:
-		return domain.CompClass{}, domain.ErrInvalidData
+		return domain.CompClass{}, errors.Wrap(domain.ErrInvalidData, 0)
 	}
 
 	compClass := domain.CompClass{

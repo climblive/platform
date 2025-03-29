@@ -2,11 +2,14 @@ package usecases
 
 import (
 	"context"
+	"regexp"
 	"strings"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
 )
+
+var validHexColor *regexp.Regexp = regexp.MustCompile(`^#([0-9a-fA-F]{3}){1,2}$`)
 
 type problemUseCaseRepository interface {
 	domain.Transactor
@@ -14,6 +17,7 @@ type problemUseCaseRepository interface {
 	GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Problem, error)
 	StoreProblem(ctx context.Context, tx domain.Transaction, problem domain.Problem) (domain.Problem, error)
 	GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) (domain.Problem, error)
+	GetProblemByNumber(ctx context.Context, tx domain.Transaction, contestID domain.ContestID, problemNumber int) (domain.Problem, error)
 	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
 }
 
@@ -53,15 +57,32 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 	}
 
 	if patch.Number.Present {
+		_, err = uc.Repo.GetProblemByNumber(ctx, nil, problem.ContestID, patch.Number.Value)
+		switch {
+		case err == nil:
+			return domain.Problem{}, errors.Wrap(domain.ErrDuplicate, 0)
+		case errors.Is(err, domain.ErrNotFound):
+		default:
+			return domain.Problem{}, errors.Wrap(err, 0)
+		}
+
 		problem.Number = patch.Number.Value
 	}
 
 	if patch.HoldColorPrimary.Present {
 		problem.HoldColorPrimary = strings.TrimSpace(patch.HoldColorPrimary.Value)
+
+		if !validHexColor.MatchString(problem.HoldColorPrimary) {
+			return domain.Problem{}, errors.Wrap(domain.ErrInvalidData, 0)
+		}
 	}
 
 	if patch.HoldColorSecondary.Present {
 		problem.HoldColorSecondary = strings.TrimSpace(patch.HoldColorSecondary.Value)
+
+		if !validHexColor.MatchString(problem.HoldColorSecondary) {
+			return domain.Problem{}, errors.Wrap(domain.ErrInvalidData, 0)
+		}
 	}
 
 	if patch.Name.Present {
@@ -112,17 +133,33 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 		return domain.Problem{}, errors.Wrap(err, 0)
 	}
 
+	_, err = uc.Repo.GetProblemByNumber(ctx, nil, contestID, tmpl.Number)
+	switch {
+	case err == nil:
+		return domain.Problem{}, errors.Wrap(domain.ErrDuplicate, 0)
+	case errors.Is(err, domain.ErrNotFound):
+	default:
+		return domain.Problem{}, errors.Wrap(err, 0)
+	}
+
 	problem := domain.Problem{
 		Ownership:          contest.Ownership,
 		ContestID:          contestID,
 		Number:             tmpl.Number,
-		HoldColorPrimary:   tmpl.HoldColorPrimary,
-		HoldColorSecondary: tmpl.HoldColorSecondary,
-		Name:               tmpl.Name,
-		Description:        tmpl.Description,
+		HoldColorPrimary:   strings.TrimSpace(tmpl.HoldColorPrimary),
+		HoldColorSecondary: strings.TrimSpace(tmpl.HoldColorSecondary),
+		Name:               strings.TrimSpace(tmpl.Name),
+		Description:        strings.TrimSpace(tmpl.Description),
 		PointsTop:          tmpl.PointsTop,
 		PointsZone:         tmpl.PointsZone,
 		FlashBonus:         tmpl.FlashBonus,
+	}
+
+	switch {
+	case !validHexColor.MatchString(problem.HoldColorPrimary):
+		fallthrough
+	case len(problem.HoldColorSecondary) > 0 && !validHexColor.MatchString(tmpl.HoldColorSecondary):
+		return domain.Problem{}, errors.Wrap(domain.ErrInvalidData, 0)
 	}
 
 	createdProblem, err := uc.Repo.StoreProblem(ctx, nil, problem)

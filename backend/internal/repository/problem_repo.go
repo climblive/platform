@@ -36,6 +36,21 @@ func (d *Database) GetProblem(ctx context.Context, tx domain.Transaction, proble
 	return problemToDomain(record.Problem), nil
 }
 
+func (d *Database) GetProblemByNumber(ctx context.Context, tx domain.Transaction, contestID domain.ContestID, problemNumber int) (domain.Problem, error) {
+	record, err := d.WithTx(tx).GetProblemByNumber(ctx, database.GetProblemByNumberParams{
+		ContestID: int32(contestID),
+		Number:    int32(problemNumber),
+	})
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return domain.Problem{}, errors.Wrap(domain.ErrNotFound, 0)
+	case err != nil:
+		return domain.Problem{}, errors.Wrap(err, 0)
+	}
+
+	return problemToDomain(record.Problem), nil
+}
+
 func (d *Database) StoreProblem(ctx context.Context, tx domain.Transaction, problem domain.Problem) (domain.Problem, error) {
 	params := database.UpsertProblemParams{
 		ID:                 int32(problem.ID),
