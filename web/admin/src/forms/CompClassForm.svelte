@@ -2,7 +2,6 @@
   import { GenericForm, name, value } from "@climblive/lib/forms";
   import { type CompClassTemplate } from "@climblive/lib/models";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
-  import "@shoelace-style/shoelace/dist/components/range/range.js";
   import { format } from "date-fns";
   import { type Snippet } from "svelte";
   import * as z from "zod";
@@ -36,7 +35,7 @@
 
   interface Props {
     data: Partial<CompClassTemplate>;
-    submit: (patch: CompClassTemplate) => void;
+    submit: (value: CompClassTemplate) => void;
     children?: Snippet;
   }
 

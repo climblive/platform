@@ -103,7 +103,7 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 	case tmpl.QualifyingProblems < 0:
 		fallthrough
 	case tmpl.GracePeriod < 0 || tmpl.GracePeriod > time.Hour:
-		return domain.Contest{}, domain.ErrInvalidData
+		return domain.Contest{}, errors.Wrap(domain.ErrInvalidData, 0)
 	}
 
 	contest := domain.Contest{

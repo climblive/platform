@@ -153,6 +153,11 @@ func (m *repositoryMock) GetProblem(ctx context.Context, tx domain.Transaction, 
 	return args.Get(0).(domain.Problem), args.Error(1)
 }
 
+func (m *repositoryMock) GetProblemByNumber(ctx context.Context, tx domain.Transaction, contestID domain.ContestID, problemNumber int) (domain.Problem, error) {
+	args := m.Called(ctx, tx, contestID, problemNumber)
+	return args.Get(0).(domain.Problem), args.Error(1)
+}
+
 func (m *repositoryMock) StoreProblem(ctx context.Context, tx domain.Transaction, problem domain.Problem) (domain.Problem, error) {
 	args := m.Called(ctx, tx, problem)
 	return args.Get(0).(domain.Problem), args.Error(1)

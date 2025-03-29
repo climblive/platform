@@ -131,6 +131,11 @@ SELECT sqlc.embed(problem)
 FROM problem
 WHERE id = ?;
 
+-- name: GetProblemByNumber :one
+SELECT sqlc.embed(problem)
+FROM problem
+WHERE contest_id = ? AND number = ?;
+
 -- name: GetProblemsByContest :many
 SELECT sqlc.embed(problem)
 FROM problem

@@ -18,7 +18,7 @@
 
   interface Props {
     data: Partial<ContestTemplate>;
-    submit: (patch: ContestTemplate) => void;
+    submit: (value: ContestTemplate) => void;
     children?: Snippet;
   }
 
