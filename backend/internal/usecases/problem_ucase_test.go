@@ -148,6 +148,35 @@ func TestPatchProblem(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
+	t.Run("InvalidData", func(t *testing.T) {
+		mockedRepo, mockedEventBroker, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		ucase := usecases.ProblemUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.PatchProblem(context.Background(), fakedProblemID, domain.ProblemPatch{
+			HoldColorPrimary: domain.NewPatch("invalid"),
+		})
+
+		require.ErrorIs(t, err, domain.ErrInvalidData)
+
+		_, err = ucase.PatchProblem(context.Background(), fakedProblemID, domain.ProblemPatch{
+			HoldColorSecondary: domain.NewPatch("invalid"),
+		})
+
+		require.ErrorIs(t, err, domain.ErrInvalidData)
+
+		mockedRepo.AssertExpectations(t)
+		mockedEventBroker.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
 	t.Run("NumberAlreadyTaken", func(t *testing.T) {
 		mockedRepo, mockedEventBroker, mockedAuthorizer := makeMocks()
 
