@@ -90,7 +90,7 @@ func TestPatchProblem(t *testing.T) {
 				ContestID:          fakedContestID,
 				Number:             20,
 				HoldColorPrimary:   "#ff0000",
-				HoldColorSecondary: "",
+				HoldColorSecondary: "#00ff00",
 				Description:        "The twentieth boulder",
 				PointsTop:          1000,
 				PointsZone:         500,
@@ -102,7 +102,7 @@ func TestPatchProblem(t *testing.T) {
 				ContestID:          fakedContestID,
 				Number:             20,
 				HoldColorPrimary:   "#ff0000",
-				HoldColorSecondary: "",
+				HoldColorSecondary: "#00ff00",
 				Description:        "The twentieth boulder",
 				PointsTop:          1000,
 				PointsZone:         500,
@@ -126,7 +126,7 @@ func TestPatchProblem(t *testing.T) {
 		problem, err := ucase.PatchProblem(context.Background(), fakedProblemID, domain.ProblemPatch{
 			Number:             domain.NewPatch(20),
 			HoldColorPrimary:   domain.NewPatch("#ff0000"),
-			HoldColorSecondary: domain.NewPatch(""),
+			HoldColorSecondary: domain.NewPatch("#00ff00"),
 			Name:               domain.NewPatch("Boulder #20"),
 			Description:        domain.NewPatch("The twentieth boulder"),
 			PointsTop:          domain.NewPatch(1000),
@@ -137,7 +137,7 @@ func TestPatchProblem(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, 20, problem.Number)
 		assert.Equal(t, "#ff0000", problem.HoldColorPrimary)
-		assert.Equal(t, "", problem.HoldColorSecondary)
+		assert.Equal(t, "#00ff00", problem.HoldColorSecondary)
 		assert.Equal(t, "The twentieth boulder", problem.Description)
 		assert.Equal(t, 1000, problem.PointsTop)
 		assert.Equal(t, 500, problem.PointsZone)
