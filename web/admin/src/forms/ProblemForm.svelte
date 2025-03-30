@@ -24,6 +24,21 @@
   }
 
   let { data, submit, children }: Props = $props();
+
+  const swatches = [
+    "#F44336",
+    "#4CAF50",
+    "#1790D2",
+    "#E410EB",
+    "#FFEB3B",
+    "#050505",
+    "#FF9800",
+    "#F628A5",
+    "#FAFAFA",
+    "#654321",
+    "#cccccc",
+    "#00FFEF",
+  ].join("; ");
 </script>
 
 <GenericForm schema={formSchema} {submit}>
@@ -44,10 +59,7 @@
           use:name={"holdColorPrimary"}
           label="Primary hold color"
           required
-          swatches="
-      #d0021b; #f5a623; #f8e71c; #8b572a; #7ed321; #417505; #bd10e0; #9013fe;
-      #4a90e2; #50e3c2; #b8e986; #000; #444; #888; #ccc; #fff;
-    "
+          {swatches}
           use:value={data.holdColorPrimary}
           no-format-toggle
         ></sl-color-picker>
@@ -55,10 +67,7 @@
           size="small"
           use:name={"holdColorSecondary"}
           label="Secondary hold color"
-          swatches="
-      #d0021b; #f5a623; #f8e71c; #8b572a; #7ed321; #417505; #bd10e0; #9013fe;
-      #4a90e2; #50e3c2; #b8e986; #000; #444; #888; #ccc; #fff;
-    "
+          {swatches}
           use:value={data.holdColorSecondary}
           no-format-toggle
         ></sl-color-picker>
