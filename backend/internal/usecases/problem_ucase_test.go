@@ -80,6 +80,10 @@ func TestPatchProblem(t *testing.T) {
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
+			On("GetProblemByNumber", mock.Anything, nil, fakedContestID, 20).
+			Return(domain.Problem{}, domain.ErrNotFound)
+
+		mockedRepo.
 			On("StoreProblem", mock.Anything, nil, domain.Problem{
 				ID:                 fakedProblemID,
 				Ownership:          fakedOwnership,
@@ -138,6 +142,33 @@ func TestPatchProblem(t *testing.T) {
 		assert.Equal(t, 1000, problem.PointsTop)
 		assert.Equal(t, 500, problem.PointsZone)
 		assert.Equal(t, 25, problem.FlashBonus)
+
+		mockedRepo.AssertExpectations(t)
+		mockedEventBroker.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("NumberAlreadyTaken", func(t *testing.T) {
+		mockedRepo, mockedEventBroker, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		mockedRepo.
+			On("GetProblemByNumber", mock.Anything, nil, fakedContestID, 20).
+			Return(domain.Problem{}, nil)
+
+		ucase := usecases.ProblemUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.PatchProblem(context.Background(), fakedProblemID, domain.ProblemPatch{
+			Number: domain.NewPatch(20),
+		})
+
+		require.ErrorIs(t, err, domain.ErrDuplicate)
 
 		mockedRepo.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)

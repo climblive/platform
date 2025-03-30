@@ -80,7 +80,7 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 	if patch.HoldColorSecondary.Present {
 		problem.HoldColorSecondary = strings.TrimSpace(patch.HoldColorSecondary.Value)
 
-		if !validHexColor.MatchString(problem.HoldColorSecondary) {
+		if len(problem.HoldColorSecondary) > 0 && !validHexColor.MatchString(problem.HoldColorSecondary) {
 			return domain.Problem{}, errors.Wrap(domain.ErrInvalidData, 0)
 		}
 	}
