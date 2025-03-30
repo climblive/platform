@@ -8,6 +8,7 @@ import {
   type ContenderPatch,
   type ContestID,
   type ContestTemplate,
+  type ProblemTemplate,
   type ScoreEngineInstanceID,
   type Tick,
 } from "./models";
@@ -166,6 +167,16 @@ export class ApiClient {
     const result = await this.axiosInstance.get(endpoint);
 
     return z.array(problemSchema).parse(result.data);
+  };
+
+  createProblem = async (contestId: number, template: ProblemTemplate) => {
+    const endpoint = `/contests/${contestId}/problems`;
+
+    const result = await this.axiosInstance.post(endpoint, template, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return problemSchema.parse(result.data);
   };
 
   getCompClasses = async (contestId: number) => {

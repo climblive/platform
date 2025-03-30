@@ -89,7 +89,6 @@ func problemToDomain(record database.Problem) domain.Problem {
 		Number:             int(record.Number),
 		HoldColorPrimary:   record.HoldColorPrimary,
 		HoldColorSecondary: record.HoldColorSecondary.String,
-		Name:               record.Name.String,
 		Description:        record.Description.String,
 		PointsTop:          int(record.Points),
 		PointsZone:         0,
