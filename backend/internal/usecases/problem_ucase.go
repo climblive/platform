@@ -85,10 +85,6 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 		}
 	}
 
-	if patch.Name.Present {
-		problem.Name = strings.TrimSpace(patch.Name.Value)
-	}
-
 	if patch.Description.Present {
 		problem.Description = strings.TrimSpace(patch.Description.Value)
 	}
@@ -148,7 +144,6 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 		Number:             tmpl.Number,
 		HoldColorPrimary:   strings.TrimSpace(tmpl.HoldColorPrimary),
 		HoldColorSecondary: strings.TrimSpace(tmpl.HoldColorSecondary),
-		Name:               strings.TrimSpace(tmpl.Name),
 		Description:        strings.TrimSpace(tmpl.Description),
 		PointsTop:          tmpl.PointsTop,
 		PointsZone:         tmpl.PointsZone,
@@ -166,6 +161,15 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 	if err != nil {
 		return domain.Problem{}, errors.Wrap(err, 0)
 	}
+
+	event := domain.ProblemAddedEvent{
+		ProblemID:  createdProblem.ID,
+		PointsTop:  problem.PointsTop,
+		PointsZone: problem.PointsZone,
+		FlashBonus: problem.FlashBonus,
+	}
+
+	uc.EventBroker.Dispatch(problem.ContestID, event)
 
 	return createdProblem, nil
 }

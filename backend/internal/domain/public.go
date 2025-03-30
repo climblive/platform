@@ -87,7 +87,6 @@ type Problem struct {
 	Number             int           `json:"number"`
 	HoldColorPrimary   string        `json:"holdColorPrimary"`
 	HoldColorSecondary string        `json:"holdColorSecondary,omitempty"`
-	Name               string        `json:"name,omitempty"`
 	Description        string        `json:"description,omitempty"`
 	PointsTop          int           `json:"pointsTop"`
 	PointsZone         int           `json:"pointsZone"`
@@ -98,7 +97,6 @@ type ProblemTemplate struct {
 	Number             int    `json:"number"`
 	HoldColorPrimary   string `json:"holdColorPrimary"`
 	HoldColorSecondary string `json:"holdColorSecondary,omitempty"`
-	Name               string `json:"name,omitempty"`
 	Description        string `json:"description,omitempty"`
 	PointsTop          int    `json:"pointsTop"`
 	PointsZone         int    `json:"pointsZone"`

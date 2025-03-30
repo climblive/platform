@@ -59,7 +59,6 @@ func (d *Database) StoreProblem(ctx context.Context, tx domain.Transaction, prob
 		Number:             int32(problem.Number),
 		HoldColorPrimary:   problem.HoldColorPrimary,
 		HoldColorSecondary: makeNullString(problem.HoldColorSecondary),
-		Name:               makeNullString(problem.Name),
 		Description:        makeNullString(problem.Description),
 		Points:             int32(problem.PointsTop),
 		FlashBonus:         makeNullInt32(int32(problem.FlashBonus)),

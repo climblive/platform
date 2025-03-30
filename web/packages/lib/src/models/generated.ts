@@ -100,7 +100,6 @@ export interface Problem {
   number: number /* int */;
   holdColorPrimary: string;
   holdColorSecondary?: string;
-  name?: string;
   description?: string;
   pointsTop: number /* int */;
   pointsZone: number /* int */;
@@ -110,7 +109,6 @@ export interface ProblemTemplate {
   number: number /* int */;
   holdColorPrimary: string;
   holdColorSecondary?: string;
-  name?: string;
   description?: string;
   pointsTop: number /* int */;
   pointsZone: number /* int */;

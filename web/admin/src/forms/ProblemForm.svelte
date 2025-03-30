@@ -75,13 +75,6 @@
     </div>
     <sl-input
       size="small"
-      use:name={"name"}
-      label="Name"
-      type="text"
-      use:value={data.name}
-    ></sl-input>
-    <sl-input
-      size="small"
       use:name={"description"}
       label="Description"
       type="text"
