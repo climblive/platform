@@ -10,7 +10,6 @@
     number: z.coerce.number(),
     holdColorPrimary: z.string().regex(/^#([0-9a-fA-F]{3}){1,2}$/),
     holdColorSecondary: z.string().optional(),
-    name: z.string().optional(),
     description: z.string().optional(),
     pointsTop: z.coerce.number(),
     pointsZone: z.coerce.number(),
