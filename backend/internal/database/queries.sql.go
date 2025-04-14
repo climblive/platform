@@ -528,6 +528,39 @@ func (q *Queries) GetProblem(ctx context.Context, id int32) (GetProblemRow, erro
 	return i, err
 }
 
+const getProblemByNumber = `-- name: GetProblemByNumber :one
+SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.name, problem.description, problem.points, problem.flash_bonus
+FROM problem
+WHERE contest_id = ? AND number = ?
+`
+
+type GetProblemByNumberParams struct {
+	ContestID int32
+	Number    int32
+}
+
+type GetProblemByNumberRow struct {
+	Problem Problem
+}
+
+func (q *Queries) GetProblemByNumber(ctx context.Context, arg GetProblemByNumberParams) (GetProblemByNumberRow, error) {
+	row := q.db.QueryRowContext(ctx, getProblemByNumber, arg.ContestID, arg.Number)
+	var i GetProblemByNumberRow
+	err := row.Scan(
+		&i.Problem.ID,
+		&i.Problem.OrganizerID,
+		&i.Problem.ContestID,
+		&i.Problem.Number,
+		&i.Problem.HoldColorPrimary,
+		&i.Problem.HoldColorSecondary,
+		&i.Problem.Name,
+		&i.Problem.Description,
+		&i.Problem.Points,
+		&i.Problem.FlashBonus,
+	)
+	return i, err
+}
+
 const getProblemsByContest = `-- name: GetProblemsByContest :many
 SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.name, problem.description, problem.points, problem.flash_bonus
 FROM problem

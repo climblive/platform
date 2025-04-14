@@ -9,6 +9,7 @@
   import CompClassList from "./CompClassList.svelte";
   import ContenderList from "./ContenderList.svelte";
   import CreateCompClass from "./CreateCompClass.svelte";
+  import CreateProblem from "./CreateProblem.svelte";
 
   interface Props {
     contestId: number;
@@ -52,6 +53,9 @@
     <h2>Classes</h2>
     <CreateCompClass {contestId} />
     <CompClassList {contestId} />
+
+    <h2>Problems</h2>
+    <CreateProblem {contestId} />
 
     <h2>Contenders</h2>
     <ContenderList {contestId} />
