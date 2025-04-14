@@ -127,7 +127,6 @@ func TestPatchProblem(t *testing.T) {
 			Number:             domain.NewPatch(20),
 			HoldColorPrimary:   domain.NewPatch("#ff0000"),
 			HoldColorSecondary: domain.NewPatch("#00ff00"),
-			Name:               domain.NewPatch("Boulder #20"),
 			Description:        domain.NewPatch("The twentieth boulder"),
 			PointsTop:          domain.NewPatch(1000),
 			PointsZone:         domain.NewPatch(500),
