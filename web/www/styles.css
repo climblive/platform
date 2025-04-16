@@ -20,7 +20,7 @@ body {
 .sales-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 1.25rem;
+    padding-inline: 1.25rem;
 }
 
 .hero-section {
