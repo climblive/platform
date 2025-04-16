@@ -25,7 +25,7 @@ body {
 
 .hero-section {
     background-color: var(--light-bg);
-    padding: 3.75rem 0;
+    padding-block: 3.75rem;
     text-align: center;
 }
 
