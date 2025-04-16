@@ -44,6 +44,13 @@
             "cwd": "${workspaceFolder}/web/admin",
         },
         {
+            "name": "WWW",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "python3 -m http.server 8080",
+            "cwd": "${workspaceFolder}/web/www",
+        },
+        {
             "name": "Simulator",
             "type": "go",
             "request": "launch",

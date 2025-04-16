@@ -1,8 +1,7 @@
 #!/bin/bash
 set -e
 
-for app in admin scorecard scoreboard; do
-    BASE="../web/$app/public"
+for BASE in ../web/admin/public ../web/scorecard/public ../web/scoreboard/public ../web/www; do
     cp favicon.svg $BASE
     inkscape -w 192 -h 192 favicon.svg -o $BASE/android-chrome-192x192.png
     inkscape -w 512 -h 512 favicon.svg -o $BASE/android-chrome-512x512.png
