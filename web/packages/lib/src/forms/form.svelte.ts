@@ -1,10 +1,12 @@
 export const value = (
   node: HTMLElement,
-  value: string | number | undefined,
+  _: string | number | undefined,
 ) => {
-  $effect(() => {
-    node.setAttribute("value", value?.toString() ?? "");
-  });
+  return {
+    update: (value: string | number | undefined) => {
+      node.setAttribute("value", value?.toString() ?? "");
+    }
+  }
 };
 
 export const name = (node: HTMLElement, value: string | number | undefined) => {

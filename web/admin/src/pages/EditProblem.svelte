@@ -1,18 +1,21 @@
 <script lang="ts">
   import ProblemForm from "@/forms/ProblemForm.svelte";
-  import type { ProblemTemplate } from "@climblive/lib/models";
-  import { createProblemMutation } from "@climblive/lib/queries";
+  import type { ProblemPatch } from "@climblive/lib/models";
+  import {
+    getProblemQuery,
+    patchProblemMutation,
+  } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import * as z from "zod";
 
   interface Props {
-    contestId: number;
+    problemId: number;
   }
 
-  let { contestId }: Props = $props();
+  let { problemId }: Props = $props();
 
-  const formSchema: z.ZodType<ProblemTemplate> = z.object({
+  const formSchema: z.ZodType<ProblemPatch> = z.object({
     number: z.coerce.number(),
     holdColorPrimary: z.string().regex(/^#([0-9a-fA-F]{3}){1,2}$/),
     holdColorSecondary: z.string().optional(),
@@ -22,11 +25,14 @@
     flashBonus: z.coerce.number().optional(),
   });
 
-  const createProblem = createProblemMutation(contestId);
+  const problemQuery = getProblemQuery(problemId);
+  const patchProblem = patchProblemMutation(problemId);
 
-  const handleSubmit = async (tmpl: ProblemTemplate) => {
-    $createProblem.mutate(tmpl, {
-      onError: () => toastError("Failed to create problem."),
+  const problem = $derived($problemQuery.data);
+
+  const handleSubmit = async (tmpl: ProblemPatch) => {
+    $patchProblem.mutate(tmpl, {
+      onError: () => toastError("Failed to save problem."),
     });
   };
 </script>
@@ -34,19 +40,15 @@
 <ProblemForm
   submit={handleSubmit}
   data={{
-    number: 1,
-    holdColorPrimary: "#000000",
-    pointsTop: 100,
-    pointsZone: 0,
-    flashBonus: 0,
+    ...problem,
   }}
   schema={formSchema}
 >
   <sl-button
     size="small"
     type="submit"
-    loading={$createProblem.isPending}
+    loading={$patchProblem.isPending}
     variant="primary"
-    >Create
+    >Save
   </sl-button>
 </ProblemForm>

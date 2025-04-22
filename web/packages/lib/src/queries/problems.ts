@@ -5,8 +5,17 @@ import {
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import type { Problem, ProblemTemplate } from "../models";
+import type { Problem, ProblemPatch, ProblemTemplate } from "../models";
 import { HOUR } from "./constants";
+
+export const getProblemQuery = (problemId: number) =>
+  createQuery({
+    queryKey: ["problem", { id: problemId }],
+    queryFn: async () => ApiClient.getInstance().getProblem(problemId),
+    retry: false,
+    gcTime: 12 * HOUR,
+    staleTime: 12 * HOUR,
+  });
 
 export const getProblemsQuery = (contestId: number) =>
   createQuery({
@@ -33,6 +42,26 @@ export const createProblemMutation = (contestId: number) => {
       queryKey = ["problem", { id: newProblem.id }];
 
       client.setQueryData<Problem>(queryKey, newProblem);
+    },
+  });
+};
+
+export const patchProblemMutation = (problemId: number) => {
+  const client = useQueryClient();
+
+  return createMutation({
+    mutationFn: (template: ProblemPatch) =>
+      ApiClient.getInstance().patchProblem(problemId, template),
+    onSuccess: (patchedProblem) => {
+      let queryKey: QueryKey = ["problems", { contestId: patchedProblem.contestId }];
+
+      client.setQueryData<Problem[]>(queryKey, (oldProblems) => {
+        return [...(oldProblems ?? []), patchedProblem];
+      });
+
+      queryKey = ["problem", { id: problemId }];
+
+      client.setQueryData<Problem>(queryKey, patchedProblem);
     },
   });
 };

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { getProblemsQuery } from "@climblive/lib/queries";
+  import { navigate } from "svelte-routing";
 
   interface Props {
     contestId: number;
@@ -16,7 +17,13 @@
   {#if problems}
     <ul>
       {#each problems as problem (problem.id)}
-        <li>{problem.number}</li>
+        <li>
+          {problem.number}
+          <sl-button
+            onclick={() => navigate(`/admin/problems/${problem.id}/edit`)}
+            >Edit</sl-button
+          >
+        </li>
       {/each}
     </ul>
   {/if}

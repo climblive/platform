@@ -1,28 +1,21 @@
 <script lang="ts">
   import { GenericForm, name, value } from "@climblive/lib/forms";
-  import { type ProblemTemplate } from "@climblive/lib/models";
+  import { type Problem } from "@climblive/lib/models";
   import "@shoelace-style/shoelace/dist/components/color-picker/color-picker.js";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import { type Snippet } from "svelte";
   import * as z from "zod";
 
-  const formSchema: z.ZodType<ProblemTemplate> = z.object({
-    number: z.coerce.number(),
-    holdColorPrimary: z.string().regex(/^#([0-9a-fA-F]{3}){1,2}$/),
-    holdColorSecondary: z.string().optional(),
-    description: z.string().optional(),
-    pointsTop: z.coerce.number(),
-    pointsZone: z.coerce.number(),
-    flashBonus: z.coerce.number().optional(),
-  });
+  type T = $$Generic<Partial<Problem>>;
 
   interface Props {
-    data: Partial<ProblemTemplate>;
-    submit: (value: ProblemTemplate) => void;
+    data: Partial<T>;
+    schema: z.ZodType<T, z.ZodTypeDef, T>;
+    submit: (value: T) => void;
     children?: Snippet;
   }
 
-  let { data, submit, children }: Props = $props();
+  let { data, schema, submit, children }: Props = $props();
 
   const swatches = [
     "#F44336",
@@ -40,7 +33,7 @@
   ].join("; ");
 </script>
 
-<GenericForm schema={formSchema} {submit}>
+<GenericForm {schema} {submit}>
   <fieldset>
     <sl-input
       size="small"

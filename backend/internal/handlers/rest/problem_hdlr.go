@@ -9,6 +9,7 @@ import (
 )
 
 type problemUseCase interface {
+	GetProblem(ctx context.Context, problemID domain.ProblemID) (domain.Problem, error)
 	GetProblemsByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Problem, error)
 	PatchProblem(ctx context.Context, problemID domain.ProblemID, patch domain.ProblemPatch) (domain.Problem, error)
 	CreateProblem(ctx context.Context, contestID domain.ContestID, tmpl domain.ProblemTemplate) (domain.Problem, error)
@@ -23,9 +24,26 @@ func InstallProblemHandler(mux *Mux, problemUseCase problemUseCase) {
 		problemUseCase: problemUseCase,
 	}
 
+	mux.HandleFunc("GET /problems/{problemID}", handler.GetProblem)
 	mux.HandleFunc("GET /contests/{contestID}/problems", handler.GetProblemsByContest)
 	mux.HandleFunc("PATCH /problems/{problemID}", handler.PatchProblem)
 	mux.HandleFunc("POST /contests/{contestID}/problems", handler.CreateProblem)
+}
+
+func (hdlr *problemHandler) GetProblem(w http.ResponseWriter, r *http.Request) {
+	problemID, err := parseResourceID[domain.ProblemID](r.PathValue("problemID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	problem, err := hdlr.problemUseCase.GetProblem(r.Context(), problemID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusOK, problem)
 }
 
 func (hdlr *problemHandler) GetProblemsByContest(w http.ResponseWriter, r *http.Request) {

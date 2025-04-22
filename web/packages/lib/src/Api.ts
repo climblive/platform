@@ -8,6 +8,7 @@ import {
   type ContenderPatch,
   type ContestID,
   type ContestTemplate,
+  type ProblemPatch,
   type ProblemTemplate,
   type ScoreEngineInstanceID,
   type Tick,
@@ -161,6 +162,14 @@ export class ApiClient {
     return z.array(contestSchema).parse(result.data);
   };
 
+  getProblem = async (problemId: number) => {
+    const endpoint = `/problems/${problemId}`;
+
+    const result = await this.axiosInstance.get(endpoint);
+
+    return problemSchema.parse(result.data);
+  };
+
   getProblems = async (contestId: number) => {
     const endpoint = `/contests/${contestId}/problems`;
 
@@ -173,6 +182,16 @@ export class ApiClient {
     const endpoint = `/contests/${contestId}/problems`;
 
     const result = await this.axiosInstance.post(endpoint, template, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return problemSchema.parse(result.data);
+  };
+
+  patchProblem = async (id: number, patch: ProblemPatch) => {
+    const endpoint = `/problems/${id}`;
+
+    const result = await this.axiosInstance.patch(endpoint, patch, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 

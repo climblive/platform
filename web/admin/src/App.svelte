@@ -10,6 +10,7 @@
   import Contest from "./pages/Contest.svelte";
   import ContestList from "./pages/ContestList.svelte";
   import CreateContest from "./pages/CreateContest.svelte";
+  import EditProblem from "./pages/EditProblem.svelte";
   import { exchangeCode, refreshSession } from "./utils/cognito";
 
   setBasePath("/shoelace");
@@ -93,6 +94,11 @@
       <Route path="/contests/:contestId">
         {#snippet children({ params }: { params: { contestId: number } })}
           <Contest contestId={Number(params.contestId)} />
+        {/snippet}
+      </Route>
+      <Route path="/problems/:problemId/edit">
+        {#snippet children({ params }: { params: { problemId: number } })}
+          <EditProblem problemId={Number(params.problemId)} />
         {/snippet}
       </Route>
     </Router>
