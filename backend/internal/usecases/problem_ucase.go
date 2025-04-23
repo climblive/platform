@@ -65,7 +65,7 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 		FlashBonus: problem.FlashBonus,
 	}
 
-	if patch.Number.Present {
+	if patch.Number.PresentAndDistinct(problem.Number) {
 		_, err = uc.Repo.GetProblemByNumber(ctx, nil, problem.ContestID, patch.Number.Value)
 		switch {
 		case err == nil:
