@@ -1,28 +1,36 @@
 export const value = (
   node: HTMLElement,
-  _: string | number | undefined,
+  value: string | number | undefined,
 ) => {
+  const update = (value: string | number | undefined) => {
+    node.setAttribute("value", value?.toString() ?? "");
+  }
+
+  update(value);
+
   return {
-    update: (value: string | number | undefined) => {
-      node.setAttribute("value", value?.toString() ?? "");
-    }
+    update
   }
 };
 
 export const name = (node: HTMLElement, value: string | number | undefined) => {
   node.addEventListener("sl-invalid", (e) => e.preventDefault());
 
-  $effect(() => {
-    node.setAttribute("name", value?.toString() ?? "");
-  });
+  node.setAttribute("name", value?.toString() ?? "");
 };
 
 export const checked = (node: HTMLElement, value: boolean | undefined) => {
-  $effect(() => {
+  const update = (value: boolean | undefined) => {
     if (value) {
       node.setAttribute("checked", "");
     } else {
       node.removeAttribute("checked");
     }
-  });
+  }
+
+  update(value);
+
+  return {
+    update
+  }
 };
