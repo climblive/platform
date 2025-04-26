@@ -53,7 +53,10 @@ export const patchProblemMutation = (problemId: number) => {
     mutationFn: (template: ProblemPatch) =>
       ApiClient.getInstance().patchProblem(problemId, template),
     onSuccess: (patchedProblem) => {
-      let queryKey: QueryKey = ["problems", { contestId: patchedProblem.contestId }];
+      let queryKey: QueryKey = [
+        "problems",
+        { contestId: patchedProblem.contestId },
+      ];
 
       client.setQueryData<Problem[]>(queryKey, (oldProblems) => {
         if (oldProblems === undefined) {

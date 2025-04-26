@@ -4,13 +4,13 @@ export const value = (
 ) => {
   const update = (value: string | number | undefined) => {
     node.setAttribute("value", value?.toString() ?? "");
-  }
+  };
 
   update(value);
 
   return {
-    update
-  }
+    update,
+  };
 };
 
 export const name = (node: HTMLElement, value: string | number | undefined) => {
@@ -26,11 +26,11 @@ export const checked = (node: HTMLElement, value: boolean | undefined) => {
     } else {
       node.removeAttribute("checked");
     }
-  }
+  };
 
   update(value);
 
   return {
-    update
-  }
+    update,
+  };
 };
