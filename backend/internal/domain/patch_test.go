@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type data[T any] struct {
+type data[T comparable] struct {
 	Data domain.Patch[T] `json:"data,omitzero"`
 }
 
@@ -18,6 +18,19 @@ func TestNewPatch(t *testing.T) {
 
 	assert.True(t, patch.Present)
 	assert.Equal(t, "Hello, World!", patch.Value)
+}
+
+func TestDistinct(t *testing.T) {
+	patch := domain.NewPatch("Hello, World!")
+
+	assert.False(t, patch.PresentAndDistinct("Hello, World!"))
+	assert.True(t, patch.PresentAndDistinct("Hello, Universe!"))
+}
+
+func TestDistinct_Empty(t *testing.T) {
+	patch := domain.Patch[string]{}
+
+	assert.False(t, patch.PresentAndDistinct("Anything"))
 }
 
 func TestPatchMarshal(t *testing.T) {

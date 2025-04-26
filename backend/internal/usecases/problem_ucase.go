@@ -27,6 +27,15 @@ type ProblemUseCase struct {
 	EventBroker domain.EventBroker
 }
 
+func (uc *ProblemUseCase) GetProblem(ctx context.Context, problemID domain.ProblemID) (domain.Problem, error) {
+	problem, err := uc.Repo.GetProblem(ctx, nil, problemID)
+	if err != nil {
+		return domain.Problem{}, errors.Wrap(err, 0)
+	}
+
+	return problem, nil
+}
+
 func (uc *ProblemUseCase) GetProblemsByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Problem, error) {
 	problems, err := uc.Repo.GetProblemsByContest(ctx, nil, contestID)
 	if err != nil {
@@ -56,7 +65,7 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 		FlashBonus: problem.FlashBonus,
 	}
 
-	if patch.Number.Present {
+	if patch.Number.PresentAndDistinct(problem.Number) {
 		_, err = uc.Repo.GetProblemByNumber(ctx, nil, problem.ContestID, patch.Number.Value)
 		switch {
 		case err == nil:

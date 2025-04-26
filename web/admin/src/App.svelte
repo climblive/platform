@@ -10,6 +10,7 @@
   import Contest from "./pages/Contest.svelte";
   import ContestList from "./pages/ContestList.svelte";
   import CreateContest from "./pages/CreateContest.svelte";
+  import EditProblem from "./pages/EditProblem.svelte";
   import { exchangeCode, refreshSession } from "./utils/cognito";
 
   setBasePath("/shoelace");
@@ -79,25 +80,38 @@
     {#if !authenticated}
       <sl-button variant="primary" onclick={login}>Login</sl-button>
     {/if}
-    <Router basepath="/admin">
-      <Route path="/organizers/:organizerId">
-        {#snippet children({ params }: { params: { organizerId: number } })}
-          <ContestList organizerId={Number(params.organizerId)} />
-        {/snippet}
-      </Route>
-      <Route path="/organizers/:organizerId/contests/new">
-        {#snippet children({ params }: { params: { organizerId: number } })}
-          <CreateContest organizerId={Number(params.organizerId)} />
-        {/snippet}
-      </Route>
-      <Route path="/contests/:contestId">
-        {#snippet children({ params }: { params: { contestId: number } })}
-          <Contest contestId={Number(params.contestId)} />
-        {/snippet}
-      </Route>
-    </Router>
+    <main>
+      <Router basepath="/admin">
+        <Route path="/organizers/:organizerId">
+          {#snippet children({ params }: { params: { organizerId: number } })}
+            <ContestList organizerId={Number(params.organizerId)} />
+          {/snippet}
+        </Route>
+        <Route path="/organizers/:organizerId/contests/new">
+          {#snippet children({ params }: { params: { organizerId: number } })}
+            <CreateContest organizerId={Number(params.organizerId)} />
+          {/snippet}
+        </Route>
+        <Route path="/contests/:contestId">
+          {#snippet children({ params }: { params: { contestId: number } })}
+            <Contest contestId={Number(params.contestId)} />
+          {/snippet}
+        </Route>
+        <Route path="/problems/:problemId/edit">
+          {#snippet children({ params }: { params: { problemId: number } })}
+            <EditProblem problemId={Number(params.problemId)} />
+          {/snippet}
+        </Route>
+      </Router>
+    </main>
     {#if import.meta.env.DEV}
       <SvelteQueryDevtools />
     {/if}
   </QueryClientProvider>
 {/await}
+
+<style>
+  main {
+    padding: var(--sl-spacing-medium);
+  }
+</style>
