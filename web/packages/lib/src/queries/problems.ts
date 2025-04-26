@@ -56,7 +56,17 @@ export const patchProblemMutation = (problemId: number) => {
       let queryKey: QueryKey = ["problems", { contestId: patchedProblem.contestId }];
 
       client.setQueryData<Problem[]>(queryKey, (oldProblems) => {
-        return [...(oldProblems ?? []), patchedProblem];
+        if (oldProblems === undefined) {
+          return undefined;
+        }
+
+        return oldProblems.map((problem) => {
+          if (problem.id === patchedProblem.id) {
+            return patchedProblem;
+          }
+
+          return problem;
+        });
       });
 
       queryKey = ["problem", { id: problemId }];
