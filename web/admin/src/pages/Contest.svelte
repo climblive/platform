@@ -9,11 +9,9 @@
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
   import { add } from "date-fns";
-  import { Link } from "svelte-routing";
+  import { Link, navigate } from "svelte-routing";
   import CompClassList from "./CompClassList.svelte";
   import ContenderList from "./ContenderList.svelte";
-  import CreateCompClass from "./CreateCompClass.svelte";
-  import CreateProblem from "./CreateProblem.svelte";
   import ProblemList from "./ProblemList.svelte";
 
   interface Props {
@@ -64,13 +62,21 @@
         >
 
         <h2>Classes</h2>
-        <CreateCompClass {contestId} />
+        <sl-button
+          variant="primary"
+          onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
+          >Create</sl-button
+        >
         <CompClassList {contestId} />
       </sl-tab-panel>
 
       <sl-tab-panel name="problems">
         <h2>Problems</h2>
-        <CreateProblem {contestId} />
+        <sl-button
+          variant="primary"
+          onclick={() => navigate(`contests/${contestId}/new-problem`)}
+          >Create</sl-button
+        >
         <ProblemList {contestId} />
       </sl-tab-panel>
 
@@ -81,9 +87,3 @@
     </sl-tab-group>
   {/if}
 </main>
-
-<style>
-  main {
-    padding: var(--sl-spacing-medium);
-  }
-</style>
