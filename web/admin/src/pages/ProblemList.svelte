@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Table } from "@climblive/lib/components";
   import { getProblemsQuery } from "@climblive/lib/queries";
   import { navigate } from "svelte-routing";
 
@@ -14,19 +15,18 @@
 </script>
 
 <section>
-  {#if problems}
-    <ul>
+  <Table columns={["Number", "Color", "Points"]}>
+    {#if problems}
       {#each problems as problem (problem.id)}
-        <li>
-          {problem.number}
-          <sl-button
-            onclick={() => navigate(`/admin/problems/${problem.id}/edit`)}
-            >Edit</sl-button
-          >
-        </li>
+        <span>№ {problem.number}</span>
+        <span>{problem.holdColorPrimary}</span>
+        <sl-button
+          onclick={() => navigate(`/admin/problems/${problem.id}/edit`)}
+          >Edit</sl-button
+        >
       {/each}
-    </ul>
-  {/if}
+    {/if}
+  </Table>
 </section>
 
 <style>

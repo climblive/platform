@@ -9,7 +9,7 @@
   const { columns, children }: Props = $props();
 </script>
 
-<div>
+<div style={`--columns: ${columns.length}`}>
   {#each columns as column}
     <div class="header">{column}</div>
   {/each}
@@ -18,8 +18,9 @@
 
 <style>
   div {
+    width: 100%;
     display: grid;
-    grid-template-columns: repeat(3, minmax(100px, 1fr));
+    grid-template-columns: repeat(var(--columns), minmax(100px, 1fr));
   }
 
   .header {
