@@ -9,21 +9,37 @@
   const { columns, children }: Props = $props();
 </script>
 
-<div style={`--columns: ${columns.length}`}>
-  {#each columns as column}
-    <div class="header">{column}</div>
-  {/each}
+<div class="table" style={`--columns: ${columns.length}`}>
+  <div class="header">
+    {#each columns as column}
+      <div>{column}</div>
+    {/each}
+  </div>
   {@render children()}
 </div>
 
 <style>
-  div {
+  .table {
+    margin-top: 1rem;
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(var(--columns), minmax(100px, 1fr));
+    grid-template-columns: repeat(var(--columns), minmax(min-content, 1fr));
   }
 
   .header {
-    border-bottom: 1px solid #ccc;
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    grid-template-rows: 1fr;
+
+    height: 2rem;
+    align-items: center;
+    padding-inline: 2rem;
+
+    font-weight: var(--sl-font-weight-bold);
+    background-color: var(--sl-color-primary-600);
+    border-top-left-radius: var(--sl-border-radius-medium);
+    border-top-right-radius: var(--sl-border-radius-medium);
+    color: white;
   }
 </style>

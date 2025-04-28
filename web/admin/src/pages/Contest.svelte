@@ -87,3 +87,6 @@
     </sl-tab-group>
   {/if}
 </main>
+
+<style>
+</style>

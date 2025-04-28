@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { Table } from "@climblive/lib/components";
+  import { Table, TableRow } from "@climblive/lib/components";
   import { getProblemsQuery } from "@climblive/lib/queries";
+  import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -15,15 +16,19 @@
 </script>
 
 <section>
-  <Table columns={["Number", "Color", "Points"]}>
+  <Table columns={["Number", "Color", "Points", ""]}>
     {#if problems}
       {#each problems as problem (problem.id)}
-        <span>№ {problem.number}</span>
-        <span>{problem.holdColorPrimary}</span>
-        <sl-button
-          onclick={() => navigate(`/admin/problems/${problem.id}/edit`)}
-          >Edit</sl-button
-        >
+        <TableRow>
+          <span>№ {problem.number}</span>
+          <span>{problem.holdColorPrimary}</span>
+          <span>{problem.pointsTop}</span>
+          <sl-icon-button
+            onclick={() => navigate(`/admin/problems/${problem.id}/edit`)}
+            name="pencil"
+            label="Edit"
+          ></sl-icon-button>
+        </TableRow>
       {/each}
     {/if}
   </Table>

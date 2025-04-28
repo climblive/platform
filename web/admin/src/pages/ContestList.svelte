@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Table } from "@climblive/lib/components";
+  import { Table, TableRow } from "@climblive/lib/components";
   import type { Contest } from "@climblive/lib/models";
   import { getContestsByOrganizerQuery } from "@climblive/lib/queries";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
@@ -50,17 +50,19 @@
   <h2>{heading}</h2>
   <Table columns={["Name", "Start Date", "End Date"]}>
     {#each contests as contest (contest.id)}
-      <Link to="contests/{contest.id}">{contest.name}</Link>
-      <span>
-        {#if contest.timeBegin}
-          {format(contest.timeBegin, "yyyy-MM-dd HH:mm")}
-        {/if}
-      </span>
-      <span>
-        {#if contest.timeEnd}
-          {format(contest.timeEnd, "yyyy-MM-dd HH:mm")}
-        {/if}
-      </span>
+      <TableRow>
+        <Link to="contests/{contest.id}">{contest.name}</Link>
+        <span>
+          {#if contest.timeBegin}
+            {format(contest.timeBegin, "yyyy-MM-dd HH:mm")}
+          {/if}
+        </span>
+        <span>
+          {#if contest.timeEnd}
+            {format(contest.timeEnd, "yyyy-MM-dd HH:mm")}
+          {/if}
+        </span>
+      </TableRow>
     {/each}
   </Table>
 {/snippet}
