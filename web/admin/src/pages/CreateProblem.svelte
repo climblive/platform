@@ -42,11 +42,19 @@
   }}
   schema={formSchema}
 >
-  <sl-button
-    size="small"
-    type="submit"
-    loading={$createProblem.isPending}
-    variant="primary"
-    >Create
-  </sl-button>
+  <div class="controls">
+    <sl-button
+      size="small"
+      type="button"
+      variant="text"
+      onclick={history.back()}>Cancel</sl-button
+    >
+    <sl-button
+      size="small"
+      type="submit"
+      loading={$createProblem.isPending}
+      variant="primary"
+      >Create
+    </sl-button>
+  </div>
 </ProblemForm>

@@ -29,11 +29,19 @@
     timeEnd: roundToNearestHours(add(new Date(), { hours: 4 })),
   }}
 >
-  <sl-button
-    size="small"
-    type="submit"
-    loading={$createCompClass.isPending}
-    variant="primary"
-    >Create
-  </sl-button>
+  <div class="controls">
+    <sl-button
+      size="small"
+      type="button"
+      variant="text"
+      onclick={history.back()}>Cancel</sl-button
+    >
+    <sl-button
+      size="small"
+      type="submit"
+      loading={$createCompClass.isPending}
+      variant="primary"
+      >Create
+    </sl-button>
+  </div>
 </CompClassForm>
