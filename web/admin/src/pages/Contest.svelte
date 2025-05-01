@@ -5,7 +5,9 @@
     startScoreEngineMutation,
     stopScoreEngineMutation,
   } from "@climblive/lib/queries";
+  import type { SlTabShowEvent } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
+  import type SlTabGroup from "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
   import { add } from "date-fns";
@@ -20,6 +22,8 @@
 
   let { contestId }: Props = $props();
 
+  let tabGroup: SlTabGroup | undefined = $state();
+
   const contestQuery = getContestQuery(contestId);
   const scoreEnginesQuery = getScoreEnginesQuery(contestId);
   const startScoreEngine = startScoreEngineMutation(contestId);
@@ -27,6 +31,21 @@
 
   let contest = $derived($contestQuery.data);
   let scoreEngines = $derived($scoreEnginesQuery.data);
+
+  $effect(() => {
+    const hash = window.location.hash.substring(1);
+
+    if (tabGroup) {
+      setTimeout(() => tabGroup?.show(hash));
+    }
+  });
+
+  const handleTabShow = (event: SlTabShowEvent) => {
+    const { name } = event.detail;
+    if (name) {
+      window.location.hash = name;
+    }
+  };
 </script>
 
 <main>
@@ -35,7 +54,7 @@
   {#if contest && scoreEngines}
     <h1>{contest.name}</h1>
 
-    <sl-tab-group>
+    <sl-tab-group bind:this={tabGroup} onsl-tab-show={handleTabShow}>
       <sl-tab slot="nav" panel="contest">Contest</sl-tab>
       <sl-tab slot="nav" panel="contenders">Contenders</sl-tab>
       <sl-tab slot="nav" panel="problems">Problems</sl-tab>
