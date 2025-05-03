@@ -48,7 +48,7 @@
 
 {#snippet listing(heading: string, contests: Contest[])}
   <h2>{heading}</h2>
-  <Table columns={["Name", "Start Date", "End Date"]}>
+  <Table columns={["Name", "Start Time", "End Time"]}>
     {#each contests as contest (contest.id)}
       <TableRow>
         <TableCell>

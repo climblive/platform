@@ -38,7 +38,6 @@
 
   thead {
     height: 2rem;
-    text-align: left;
 
     background-color: var(--sl-color-primary-600);
     color: white;

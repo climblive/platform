@@ -14,12 +14,11 @@
 
 <style>
   tr {
-    padding-inline: 2rem;
     height: 2rem;
     cursor: pointer;
   }
 
-  tr:nth-child(odd) {
+  tr:nth-child(even) {
     background-color: var(--sl-color-neutral-50);
   }
 
