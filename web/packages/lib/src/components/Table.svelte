@@ -33,7 +33,6 @@
     overflow: hidden;
     border-spacing: 0;
     border-radius: var(--sl-border-radius-medium);
-    text-align: left;
   }
 
   thead {
