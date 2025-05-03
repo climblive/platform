@@ -5,6 +5,7 @@
   import { toastError } from "@climblive/lib/utils";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { add, roundToNearestHours } from "date-fns";
+  import { navigate } from "svelte-routing";
 
   interface Props {
     contestId: number;
@@ -16,6 +17,7 @@
 
   const handleSubmit = async (tmpl: CompClassTemplate) => {
     $createCompClass.mutate(tmpl, {
+      onSuccess: () => navigate(`/admin/contests/${contestId}`),
       onError: () => toastError("Failed to create class."),
     });
   };
