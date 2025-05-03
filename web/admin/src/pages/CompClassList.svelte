@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { Table, TableCell, TableRow } from "@climblive/lib/components";
   import { getCompClassesQuery } from "@climblive/lib/queries";
+  import { format } from "date-fns";
 
   interface Props {
     contestId: number;
@@ -13,13 +15,21 @@
 </script>
 
 <section>
-  {#if compClasses}
-    <ul>
+  <Table columns={["Name", "Start time", "End time"]}>
+    {#if compClasses}
       {#each compClasses as compClass (compClass.id)}
-        <li>{compClass.name}</li>
+        <TableRow>
+          <TableCell>{compClass.name}</TableCell>
+          <TableCell>
+            {format(compClass.timeBegin, "yyyy-MM-dd HH:mm")}
+          </TableCell>
+          <TableCell>
+            {format(compClass.timeEnd, "yyyy-MM-dd HH:mm")}
+          </TableCell>
+        </TableRow>
       {/each}
-    </ul>
-  {/if}
+    {/if}
+  </Table>
 </section>
 
 <style>

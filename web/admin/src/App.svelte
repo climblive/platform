@@ -9,7 +9,9 @@
   import { navigate, Route, Router } from "svelte-routing";
   import Contest from "./pages/Contest.svelte";
   import ContestList from "./pages/ContestList.svelte";
+  import CreateCompClass from "./pages/CreateCompClass.svelte";
   import CreateContest from "./pages/CreateContest.svelte";
+  import CreateProblem from "./pages/CreateProblem.svelte";
   import EditProblem from "./pages/EditProblem.svelte";
   import { exchangeCode, refreshSession } from "./utils/cognito";
 
@@ -95,6 +97,16 @@
         <Route path="/contests/:contestId">
           {#snippet children({ params }: { params: { contestId: number } })}
             <Contest contestId={Number(params.contestId)} />
+          {/snippet}
+        </Route>
+        <Route path="/contests/:contestId/new-comp-class">
+          {#snippet children({ params }: { params: { contestId: number } })}
+            <CreateCompClass contestId={Number(params.contestId)} />
+          {/snippet}
+        </Route>
+        <Route path="/contests/:contestId/new-problem">
+          {#snippet children({ params }: { params: { contestId: number } })}
+            <CreateProblem contestId={Number(params.contestId)} />
           {/snippet}
         </Route>
         <Route path="/problems/:problemId/edit">

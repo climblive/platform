@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Table, TableCell, TableRow } from "@climblive/lib/components";
   import type { CreateContendersArguments } from "@climblive/lib/models";
   import {
     createContendersMutation,
@@ -53,17 +54,20 @@
     {/each}
   </section>
 
-  <ul>
+  <Table columns={["Code", "Name", "Placement", "Score"]}>
     {#each contenders as contender (contender.id)}
-      <li>
-        <a href={`/${contender.registrationCode}`}>
-          {contender.registrationCode}
-        </a>
-        <sl-qr-code value={`/${contender.registrationCode}`} fill="black"
-        ></sl-qr-code>
-      </li>
+      <TableRow>
+        <TableCell>
+          <a href={`/${contender.registrationCode}`}>
+            {contender.registrationCode}
+          </a>
+        </TableCell>
+        <TableCell>{contender.name}</TableCell>
+        <TableCell>{contender.score?.placement}</TableCell>
+        <TableCell>{contender.score?.score}</TableCell>
+      </TableRow>
     {/each}
-  </ul>
+  </Table>
 {/if}
 
 <style>

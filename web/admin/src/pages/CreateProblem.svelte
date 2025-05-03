@@ -4,6 +4,7 @@
   import { createProblemMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import { navigate } from "svelte-routing";
   import * as z from "zod";
 
   interface Props {
@@ -26,6 +27,7 @@
 
   const handleSubmit = async (tmpl: ProblemTemplate) => {
     $createProblem.mutate(tmpl, {
+      onSuccess: () => navigate(`/admin/contests/${contestId}#problems`),
       onError: () => toastError("Failed to create problem."),
     });
   };
@@ -42,11 +44,19 @@
   }}
   schema={formSchema}
 >
-  <sl-button
-    size="small"
-    type="submit"
-    loading={$createProblem.isPending}
-    variant="primary"
-    >Create
-  </sl-button>
+  <div class="controls">
+    <sl-button
+      size="small"
+      type="button"
+      variant="text"
+      onclick={history.back()}>Cancel</sl-button
+    >
+    <sl-button
+      size="small"
+      type="submit"
+      loading={$createProblem.isPending}
+      variant="primary"
+      >Create
+    </sl-button>
+  </div>
 </ProblemForm>
