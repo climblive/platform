@@ -399,6 +399,39 @@ func TestCreateContest(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
+	t.Run("RulesAreSanitized", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		mockedRepo.
+			On("StoreContest", mock.Anything, nil, mock.AnythingOfType("domain.Contest")).
+			Return(mirrorInstruction{}, nil)
+
+		ucase := usecases.ContestUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		contest, err := ucase.CreateContest(context.Background(), fakedOrganizerID, domain.ContestTemplate{
+			Location:           "The garage",
+			Name:               "Swedish Championships",
+			Description:        "Who is the best climber in Sweden?",
+			QualifyingProblems: 10,
+			Finalists:          7,
+			Rules:              `<a href="javascript:alert('XSS1')" onmouseover="alert('XSS2')">XSS<a>`,
+			GracePeriod:        time.Hour,
+		})
+
+		require.NoError(t, err)
+		assert.Equal(t, "XSS", contest.Rules)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
 	t.Run("BadCredentials", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 

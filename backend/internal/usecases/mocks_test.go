@@ -90,7 +90,12 @@ func (m *repositoryMock) GetContest(ctx context.Context, tx domain.Transaction, 
 
 func (m *repositoryMock) StoreContest(ctx context.Context, tx domain.Transaction, contest domain.Contest) (domain.Contest, error) {
 	args := m.Called(ctx, tx, contest)
-	return args.Get(0).(domain.Contest), args.Error(1)
+
+	if _, ok := args.Get(0).(mirrorInstruction); ok {
+		return contest, nil
+	} else {
+		return args.Get(0).(domain.Contest), args.Error(1)
+	}
 }
 
 func (m *repositoryMock) GetContestsByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.Contest, error) {

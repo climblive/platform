@@ -7,6 +7,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
+	"github.com/microcosm-cc/bluemonday"
 )
 
 type contestUseCaseRepository interface {
@@ -24,6 +25,8 @@ type ContestUseCase struct {
 	Repo        contestUseCaseRepository
 	ScoreKeeper domain.ScoreKeeper
 }
+
+var sanitizationPolicy = bluemonday.UGCPolicy()
 
 func (uc *ContestUseCase) GetContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error) {
 	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
@@ -115,7 +118,7 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		Description:        strings.TrimSpace(tmpl.Description),
 		QualifyingProblems: tmpl.QualifyingProblems,
 		Finalists:          tmpl.Finalists,
-		Rules:              tmpl.Rules,
+		Rules:              sanitizationPolicy.Sanitize(tmpl.Rules),
 		GracePeriod:        tmpl.GracePeriod,
 	}
 
