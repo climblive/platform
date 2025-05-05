@@ -141,6 +141,10 @@ SELECT sqlc.embed(problem)
 FROM problem
 WHERE contest_id = ?;
 
+-- name: DeleteProblem :exec
+DELETE FROM problem
+WHERE id = ?;
+
 -- name: UpsertProblem :execlastid
 INSERT INTO 
 	problem (id, organizer_id, contest_id, number, hold_color_primary, hold_color_secondary, name, description, points, flash_bonus)
@@ -171,6 +175,11 @@ WHERE contender_id = ?;
 SELECT sqlc.embed(tick)
 FROM tick
 WHERE contest_id = ?;
+
+-- name: GetTicksByProblem :many
+SELECT sqlc.embed(tick)
+FROM tick
+WHERE problem_id = ?;
 
 -- name: DeleteTick :exec
 DELETE

@@ -75,3 +75,12 @@ func (d *Database) StoreProblem(ctx context.Context, tx domain.Transaction, prob
 
 	return problem, err
 }
+
+func (d *Database) DeleteProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) error {
+	err := d.WithTx(tx).DeleteProblem(ctx, int32(problemID))
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	return nil
+}
