@@ -14,6 +14,7 @@ type compClassUseCaseRepository interface {
 	GetCompClassesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.CompClass, error)
 	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
 	StoreCompClass(ctx context.Context, tx domain.Transaction, compClass domain.CompClass) (domain.CompClass, error)
+	StoreCompClass(ctx context.Context, tx domain.Transaction, compClass domain.CompClass) (domain.CompClass, error)
 }
 
 type CompClassUseCase struct {
@@ -64,4 +65,24 @@ func (uc *CompClassUseCase) CreateCompClass(ctx context.Context, contestID domai
 	}
 
 	return createdCompClass, nil
+}
+
+func (uc *CompClassUseCase) PatchCompClass(ctx context.Context, compClassID domain.CompClassID, patch domain.CompClassPatch) (domain.CompClass, error) {
+	var mty domain.CompClass
+
+	compClass, err := uc.Repo.GetProblem(ctx, nil, compClassID)
+	if err != nil {
+		return mty, errors.Wrap(err, 0)
+	}
+
+	_, err = uc.Authorizer.HasOwnership(ctx, compClass.Ownership)
+	if err != nil {
+		return mty, errors.Wrap(err, 0)
+	}
+
+	if _, err = uc.Repo.StoreCompClass(ctx, nil, compClass); err != nil {
+		return mty, errors.Wrap(err, 0)
+	}
+
+	return compClass, nil
 }
