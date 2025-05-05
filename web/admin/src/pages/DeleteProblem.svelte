@@ -16,8 +16,6 @@
   const deleteProblem = deleteProblemMutation(problemID);
 
   const handleDelete = async () => {
-    console.log("Deleting problem with ID:", problemID);
-
     dialog?.show();
   };
 
