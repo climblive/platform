@@ -12,7 +12,7 @@
 <table border="0">
   <thead>
     <tr>
-      {#each columns as column}
+      {#each columns as column (column)}
         <th>{column}</th>
       {/each}
     </tr>
