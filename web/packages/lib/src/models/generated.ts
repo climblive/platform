@@ -36,7 +36,12 @@ export interface CompClass {
   contestId: ContestID;
   name: string;
   description?: string;
-  color?: ColorRGB;
+  timeBegin: Date;
+  timeEnd: Date;
+}
+export interface CompClassTemplate {
+  name: string;
+  description?: string;
   timeBegin: Date;
   timeEnd: Date;
 }
@@ -65,16 +70,24 @@ export interface Contest {
   id: ContestID;
   location?: string;
   seriesId?: SeriesID;
-  protected: boolean;
   name: string;
   description?: string;
-  finalsEnabled: boolean;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
   rules?: string;
   gracePeriod: number;
   timeBegin?: Date;
   timeEnd?: Date;
+}
+export interface ContestTemplate {
+  location?: string;
+  seriesId?: SeriesID;
+  name: string;
+  description?: string;
+  qualifyingProblems: number /* int */;
+  finalists: number /* int */;
+  rules?: string;
+  gracePeriod: number;
 }
 export interface Organizer {
   id: OrganizerID;
@@ -87,11 +100,29 @@ export interface Problem {
   number: number /* int */;
   holdColorPrimary: string;
   holdColorSecondary?: string;
-  name?: string;
   description?: string;
   pointsTop: number /* int */;
   pointsZone: number /* int */;
   flashBonus?: number /* int */;
+}
+export interface ProblemTemplate {
+  number: number /* int */;
+  holdColorPrimary: string;
+  holdColorSecondary?: string;
+  description?: string;
+  pointsTop: number /* int */;
+  pointsZone: number /* int */;
+  flashBonus?: number /* int */;
+}
+export interface ProblemPatch {
+  number?: number;
+  holdColorPrimary?: string;
+  holdColorSecondary?: string;
+  name?: string;
+  description?: string;
+  pointsTop?: number;
+  pointsZone?: number;
+  flashBonus?: number;
 }
 export interface Raffle {
   id: RaffleID;

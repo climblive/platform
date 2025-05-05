@@ -42,7 +42,7 @@ func TestHydrate(t *testing.T) {
 				CompClassID:         fakedCompClassID,
 				Disqualified:        true,
 				WithdrawnFromFinals: true,
-				Entered:             &now,
+				Entered:             now,
 			},
 			{
 				ID:          fakedContenderID + 1,

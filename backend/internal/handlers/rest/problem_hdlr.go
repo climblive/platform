@@ -2,13 +2,17 @@ package rest
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/domain"
 )
 
 type problemUseCase interface {
+	GetProblem(ctx context.Context, problemID domain.ProblemID) (domain.Problem, error)
 	GetProblemsByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Problem, error)
+	PatchProblem(ctx context.Context, problemID domain.ProblemID, patch domain.ProblemPatch) (domain.Problem, error)
+	CreateProblem(ctx context.Context, contestID domain.ContestID, tmpl domain.ProblemTemplate) (domain.Problem, error)
 }
 
 type problemHandler struct {
@@ -20,7 +24,26 @@ func InstallProblemHandler(mux *Mux, problemUseCase problemUseCase) {
 		problemUseCase: problemUseCase,
 	}
 
+	mux.HandleFunc("GET /problems/{problemID}", handler.GetProblem)
 	mux.HandleFunc("GET /contests/{contestID}/problems", handler.GetProblemsByContest)
+	mux.HandleFunc("PATCH /problems/{problemID}", handler.PatchProblem)
+	mux.HandleFunc("POST /contests/{contestID}/problems", handler.CreateProblem)
+}
+
+func (hdlr *problemHandler) GetProblem(w http.ResponseWriter, r *http.Request) {
+	problemID, err := parseResourceID[domain.ProblemID](r.PathValue("problemID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	problem, err := hdlr.problemUseCase.GetProblem(r.Context(), problemID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusOK, problem)
 }
 
 func (hdlr *problemHandler) GetProblemsByContest(w http.ResponseWriter, r *http.Request) {
@@ -37,4 +60,50 @@ func (hdlr *problemHandler) GetProblemsByContest(w http.ResponseWriter, r *http.
 	}
 
 	writeResponse(w, http.StatusOK, problems)
+}
+
+func (hdlr *problemHandler) PatchProblem(w http.ResponseWriter, r *http.Request) {
+	problemID, err := parseResourceID[domain.ProblemID](r.PathValue("problemID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	var patch domain.ProblemPatch
+	err = json.NewDecoder(r.Body).Decode(&patch)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	updatedProblem, err := hdlr.problemUseCase.PatchProblem(r.Context(), problemID, patch)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusOK, updatedProblem)
+}
+
+func (hdlr *problemHandler) CreateProblem(w http.ResponseWriter, r *http.Request) {
+	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	var tmpl domain.ProblemTemplate
+	err = json.NewDecoder(r.Body).Decode(&tmpl)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	createdProblem, err := hdlr.problemUseCase.CreateProblem(r.Context(), contestID, tmpl)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusCreated, createdProblem)
 }

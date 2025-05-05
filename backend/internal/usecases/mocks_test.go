@@ -88,6 +88,11 @@ func (m *repositoryMock) GetContest(ctx context.Context, tx domain.Transaction, 
 	return args.Get(0).(domain.Contest), args.Error(1)
 }
 
+func (m *repositoryMock) StoreContest(ctx context.Context, tx domain.Transaction, contest domain.Contest) (domain.Contest, error) {
+	args := m.Called(ctx, tx, contest)
+	return args.Get(0).(domain.Contest), args.Error(1)
+}
+
 func (m *repositoryMock) GetContestsByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.Contest, error) {
 	args := m.Called(ctx, tx, organizerID)
 	return args.Get(0).([]domain.Contest), args.Error(1)
@@ -101,6 +106,11 @@ func (m *repositoryMock) GetCompClass(ctx context.Context, tx domain.Transaction
 func (m *repositoryMock) GetCompClassesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.CompClass, error) {
 	args := m.Called(ctx, tx, contestID)
 	return args.Get(0).([]domain.CompClass), args.Error(1)
+}
+
+func (m *repositoryMock) StoreCompClass(ctx context.Context, tx domain.Transaction, compClass domain.CompClass) (domain.CompClass, error) {
+	args := m.Called(ctx, tx, compClass)
+	return args.Get(0).(domain.CompClass), args.Error(1)
 }
 
 func (m *repositoryMock) GetNumberOfContenders(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (int, error) {
@@ -140,6 +150,16 @@ func (m *repositoryMock) StoreTick(ctx context.Context, tx domain.Transaction, t
 
 func (m *repositoryMock) GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) (domain.Problem, error) {
 	args := m.Called(ctx, tx, problemID)
+	return args.Get(0).(domain.Problem), args.Error(1)
+}
+
+func (m *repositoryMock) GetProblemByNumber(ctx context.Context, tx domain.Transaction, contestID domain.ContestID, problemNumber int) (domain.Problem, error) {
+	args := m.Called(ctx, tx, contestID, problemNumber)
+	return args.Get(0).(domain.Problem), args.Error(1)
+}
+
+func (m *repositoryMock) StoreProblem(ctx context.Context, tx domain.Transaction, problem domain.Problem) (domain.Problem, error) {
+	args := m.Called(ctx, tx, problem)
 	return args.Get(0).(domain.Problem), args.Error(1)
 }
 

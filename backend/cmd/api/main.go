@@ -176,11 +176,14 @@ func setupMux(
 	}
 
 	compClassUseCase := usecases.CompClassUseCase{
-		Repo: repo,
+		Authorizer: authorizer,
+		Repo:       repo,
 	}
 
 	problemUseCase := usecases.ProblemUseCase{
-		Repo: repo,
+		Repo:        repo,
+		Authorizer:  authorizer,
+		EventBroker: eventBroker,
 	}
 
 	tickUseCase := usecases.TickUseCase{

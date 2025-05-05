@@ -12,9 +12,15 @@ type CompClass struct {
 	ContestID   ContestID     `json:"contestId"`
 	Name        string        `json:"name"`
 	Description string        `json:"description,omitempty"`
-	Color       ColorRGB      `json:"color,omitempty"`
 	TimeBegin   time.Time     `json:"timeBegin"`
 	TimeEnd     time.Time     `json:"timeEnd"`
+}
+
+type CompClassTemplate struct {
+	Name        string    `json:"name"`
+	Description string    `json:"description,omitempty"`
+	TimeBegin   time.Time `json:"timeBegin"`
+	TimeEnd     time.Time `json:"timeEnd"`
 }
 
 type Contender struct {
@@ -26,7 +32,7 @@ type Contender struct {
 	Name                string        `json:"name,omitempty"`
 	PublicName          string        `json:"publicName,omitempty"`
 	ClubName            string        `json:"clubName,omitempty"`
-	Entered             *time.Time    `json:"entered,omitempty"`
+	Entered             time.Time     `json:"entered,omitzero"`
 	WithdrawnFromFinals bool          `json:"withdrawnFromFinals"`
 	Disqualified        bool          `json:"disqualified"`
 	Score               *Score        `json:"score,omitempty"`
@@ -46,16 +52,25 @@ type Contest struct {
 	Ownership          OwnershipData `json:"-"`
 	Location           string        `json:"location,omitempty"`
 	SeriesID           SeriesID      `json:"seriesId,omitempty"`
-	Protected          bool          `json:"protected"`
 	Name               string        `json:"name"`
 	Description        string        `json:"description,omitempty"`
-	FinalsEnabled      bool          `json:"finalsEnabled"`
 	QualifyingProblems int           `json:"qualifyingProblems"`
 	Finalists          int           `json:"finalists"`
 	Rules              string        `json:"rules,omitempty"`
 	GracePeriod        time.Duration `json:"gracePeriod"`
-	TimeBegin          *time.Time    `json:"timeBegin,omitempty"`
-	TimeEnd            *time.Time    `json:"timeEnd,omitempty"`
+	TimeBegin          time.Time     `json:"timeBegin,omitzero"`
+	TimeEnd            time.Time     `json:"timeEnd,omitzero"`
+}
+
+type ContestTemplate struct {
+	Location           string        `json:"location,omitempty"`
+	SeriesID           SeriesID      `json:"seriesId,omitempty"`
+	Name               string        `json:"name"`
+	Description        string        `json:"description,omitempty"`
+	QualifyingProblems int           `json:"qualifyingProblems"`
+	Finalists          int           `json:"finalists"`
+	Rules              string        `json:"rules,omitempty"`
+	GracePeriod        time.Duration `json:"gracePeriod"`
 }
 
 type Organizer struct {
@@ -72,11 +87,30 @@ type Problem struct {
 	Number             int           `json:"number"`
 	HoldColorPrimary   string        `json:"holdColorPrimary"`
 	HoldColorSecondary string        `json:"holdColorSecondary,omitempty"`
-	Name               string        `json:"name,omitempty"`
 	Description        string        `json:"description,omitempty"`
 	PointsTop          int           `json:"pointsTop"`
 	PointsZone         int           `json:"pointsZone"`
 	FlashBonus         int           `json:"flashBonus,omitempty"`
+}
+
+type ProblemTemplate struct {
+	Number             int    `json:"number"`
+	HoldColorPrimary   string `json:"holdColorPrimary"`
+	HoldColorSecondary string `json:"holdColorSecondary,omitempty"`
+	Description        string `json:"description,omitempty"`
+	PointsTop          int    `json:"pointsTop"`
+	PointsZone         int    `json:"pointsZone"`
+	FlashBonus         int    `json:"flashBonus,omitempty"`
+}
+
+type ProblemPatch struct {
+	Number             Patch[int]    `json:"number,omitzero" tstype:"number"`
+	HoldColorPrimary   Patch[string] `json:"holdColorPrimary,omitzero" tstype:"string"`
+	HoldColorSecondary Patch[string] `json:"holdColorSecondary,omitzero" tstype:"string"`
+	Description        Patch[string] `json:"description,omitzero" tstype:"string"`
+	PointsTop          Patch[int]    `json:"pointsTop,omitzero" tstype:"number"`
+	PointsZone         Patch[int]    `json:"pointsZone,omitzero" tstype:"number"`
+	FlashBonus         Patch[int]    `json:"flashBonus,omitzero" tstype:"number"`
 }
 
 type Raffle struct {

@@ -528,6 +528,39 @@ func (q *Queries) GetProblem(ctx context.Context, id int32) (GetProblemRow, erro
 	return i, err
 }
 
+const getProblemByNumber = `-- name: GetProblemByNumber :one
+SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.name, problem.description, problem.points, problem.flash_bonus
+FROM problem
+WHERE contest_id = ? AND number = ?
+`
+
+type GetProblemByNumberParams struct {
+	ContestID int32
+	Number    int32
+}
+
+type GetProblemByNumberRow struct {
+	Problem Problem
+}
+
+func (q *Queries) GetProblemByNumber(ctx context.Context, arg GetProblemByNumberParams) (GetProblemByNumberRow, error) {
+	row := q.db.QueryRowContext(ctx, getProblemByNumber, arg.ContestID, arg.Number)
+	var i GetProblemByNumberRow
+	err := row.Scan(
+		&i.Problem.ID,
+		&i.Problem.OrganizerID,
+		&i.Problem.ContestID,
+		&i.Problem.Number,
+		&i.Problem.HoldColorPrimary,
+		&i.Problem.HoldColorSecondary,
+		&i.Problem.Name,
+		&i.Problem.Description,
+		&i.Problem.Points,
+		&i.Problem.FlashBonus,
+	)
+	return i, err
+}
+
 const getProblemsByContest = `-- name: GetProblemsByContest :many
 SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.name, problem.description, problem.points, problem.flash_bonus
 FROM problem
@@ -752,6 +785,49 @@ func (q *Queries) InsertTick(ctx context.Context, arg InsertTickParams) (int64, 
 	return result.LastInsertId()
 }
 
+const upsertCompClass = `-- name: UpsertCompClass :execlastid
+INSERT INTO 
+	comp_class (id, organizer_id, contest_id, name, description, color, time_begin, time_end)
+VALUES 
+	(?, ?, ?, ?, ?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    organizer_id = VALUES(organizer_id),
+    contest_id = VALUES(contest_id),
+    name = VALUES(name),
+    description = VALUES(description),
+    color = VALUES(color),
+    time_begin = VALUES(time_begin),
+    time_end = VALUES(time_end)
+`
+
+type UpsertCompClassParams struct {
+	ID          int32
+	OrganizerID int32
+	ContestID   int32
+	Name        string
+	Description sql.NullString
+	Color       sql.NullString
+	TimeBegin   time.Time
+	TimeEnd     time.Time
+}
+
+func (q *Queries) UpsertCompClass(ctx context.Context, arg UpsertCompClassParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, upsertCompClass,
+		arg.ID,
+		arg.OrganizerID,
+		arg.ContestID,
+		arg.Name,
+		arg.Description,
+		arg.Color,
+		arg.TimeBegin,
+		arg.TimeEnd,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
+}
+
 const upsertContender = `-- name: UpsertContender :execlastid
 INSERT INTO 
 	contender (id, organizer_id, contest_id, registration_code, name, club, class_id, entered, disqualified, withdrawn_from_finals)
@@ -801,6 +877,58 @@ func (q *Queries) UpsertContender(ctx context.Context, arg UpsertContenderParams
 	return result.LastInsertId()
 }
 
+const upsertContest = `-- name: UpsertContest :execlastid
+INSERT INTO 
+	contest (id, organizer_id, series_id, name, description, location, final_enabled, qualifying_problems, finalists, rules, grace_period)
+VALUES 
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    organizer_id = VALUES(organizer_id),
+    series_id = VALUES(series_id),
+    name = VALUES(name),
+    description = VALUES(description),
+    location = VALUES(location),
+    final_enabled = VALUES(final_enabled),
+    qualifying_problems = VALUES(qualifying_problems),
+    finalists = VALUES(finalists),
+    rules = VALUES(rules),
+    grace_period = VALUES(grace_period)
+`
+
+type UpsertContestParams struct {
+	ID                 int32
+	OrganizerID        int32
+	SeriesID           sql.NullInt32
+	Name               string
+	Description        sql.NullString
+	Location           sql.NullString
+	FinalEnabled       bool
+	QualifyingProblems int32
+	Finalists          int32
+	Rules              sql.NullString
+	GracePeriod        int32
+}
+
+func (q *Queries) UpsertContest(ctx context.Context, arg UpsertContestParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, upsertContest,
+		arg.ID,
+		arg.OrganizerID,
+		arg.SeriesID,
+		arg.Name,
+		arg.Description,
+		arg.Location,
+		arg.FinalEnabled,
+		arg.QualifyingProblems,
+		arg.Finalists,
+		arg.Rules,
+		arg.GracePeriod,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
+}
+
 const upsertOrganizer = `-- name: UpsertOrganizer :execlastid
 INSERT INTO
     organizer (id, name, homepage)
@@ -819,6 +947,55 @@ type UpsertOrganizerParams struct {
 
 func (q *Queries) UpsertOrganizer(ctx context.Context, arg UpsertOrganizerParams) (int64, error) {
 	result, err := q.db.ExecContext(ctx, upsertOrganizer, arg.ID, arg.Name, arg.Homepage)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
+}
+
+const upsertProblem = `-- name: UpsertProblem :execlastid
+INSERT INTO 
+	problem (id, organizer_id, contest_id, number, hold_color_primary, hold_color_secondary, name, description, points, flash_bonus)
+VALUES 
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    organizer_id = VALUES(organizer_id),
+    contest_id = VALUES(contest_id),
+    number = VALUES(number),
+    hold_color_primary = VALUES(hold_color_primary),
+    hold_color_secondary = VALUES(hold_color_secondary),
+    name = VALUES(name),
+    description = VALUES(description),
+    points = VALUES(points),
+    flash_bonus = VALUES(flash_bonus)
+`
+
+type UpsertProblemParams struct {
+	ID                 int32
+	OrganizerID        int32
+	ContestID          int32
+	Number             int32
+	HoldColorPrimary   string
+	HoldColorSecondary sql.NullString
+	Name               sql.NullString
+	Description        sql.NullString
+	Points             int32
+	FlashBonus         sql.NullInt32
+}
+
+func (q *Queries) UpsertProblem(ctx context.Context, arg UpsertProblemParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, upsertProblem,
+		arg.ID,
+		arg.OrganizerID,
+		arg.ContestID,
+		arg.Number,
+		arg.HoldColorPrimary,
+		arg.HoldColorSecondary,
+		arg.Name,
+		arg.Description,
+		arg.Points,
+		arg.FlashBonus,
+	)
 	if err != nil {
 		return 0, err
 	}

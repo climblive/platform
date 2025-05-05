@@ -8,14 +8,6 @@ import (
 	"github.com/climblive/platform/backend/internal/domain"
 )
 
-func nullTimeToTime(time sql.NullTime) *time.Time {
-	if time.Valid {
-		return &time.Time
-	}
-
-	return nil
-}
-
 func contenderToDomain(record database.GetContenderRow) domain.Contender {
 	contender := domain.Contender{
 		ID: domain.ContenderID(record.Contender.ID),
@@ -29,7 +21,7 @@ func contenderToDomain(record database.GetContenderRow) domain.Contender {
 		Name:                record.Contender.Name.String,
 		PublicName:          record.Contender.Name.String,
 		ClubName:            record.Contender.Club.String,
-		Entered:             nullTimeToTime(record.Contender.Entered),
+		Entered:             record.Contender.Entered.Time,
 		WithdrawnFromFinals: record.Contender.WithdrawnFromFinals,
 		Disqualified:        record.Contender.Disqualified,
 	}
@@ -59,7 +51,6 @@ func compClassToDomain(record database.CompClass) domain.CompClass {
 		ContestID:   domain.ContestID(record.ContestID),
 		Name:        record.Name,
 		Description: record.Description.String,
-		Color:       domain.ColorRGB(record.Color.String),
 		TimeBegin:   record.TimeBegin,
 		TimeEnd:     record.TimeEnd,
 	}
@@ -73,17 +64,15 @@ func contestToDomain(record database.Contest) domain.Contest {
 		},
 		Location:           record.Location.String,
 		SeriesID:           domain.SeriesID(record.SeriesID.Int32),
-		Protected:          record.Protected,
 		Name:               record.Name,
 		Description:        record.Description.String,
-		FinalsEnabled:      record.FinalEnabled,
 		QualifyingProblems: int(record.QualifyingProblems),
 		Finalists:          int(record.Finalists),
 		Rules:              record.Rules.String,
 		GracePeriod:        time.Duration(record.GracePeriod) * time.Minute,
 	}
 
-	if !contest.FinalsEnabled {
+	if !record.FinalEnabled {
 		contest.Finalists = 0
 	}
 
@@ -100,7 +89,6 @@ func problemToDomain(record database.Problem) domain.Problem {
 		Number:             int(record.Number),
 		HoldColorPrimary:   record.HoldColorPrimary,
 		HoldColorSecondary: record.HoldColorSecondary.String,
-		Name:               record.Name.String,
 		Description:        record.Description.String,
 		PointsTop:          int(record.Points),
 		PointsZone:         0,
@@ -176,13 +164,13 @@ func makeNullInt32(value int32) sql.NullInt32 {
 	}
 }
 
-func makeNullTime(value *time.Time) sql.NullTime {
-	if value == nil {
+func makeNullTime(value time.Time) sql.NullTime {
+	if value.IsZero() {
 		return sql.NullTime{}
 	}
 
 	return sql.NullTime{
 		Valid: true,
-		Time:  *value,
+		Time:  value,
 	}
 }

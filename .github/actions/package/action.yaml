@@ -30,6 +30,11 @@ runs:
 
     - uses: actions/download-artifact@v4
       with:
+        name: www
+        path: www
+
+    - uses: actions/download-artifact@v4
+      with:
         name: backend
         path: backend
 
@@ -41,6 +46,7 @@ runs:
         mv scorecard packageroot/usr/share/climblive/
         mv scoreboard packageroot/usr/share/climblive/
         mv admin packageroot/usr/share/climblive/
+        mv www packageroot/usr/share/climblive/
         mv backend/climblive packageroot/usr/bin
         chmod +x packageroot/usr/bin/climblive
         sed -i "s/VERSION/${{ inputs.version }}/g" packageroot/DEBIAN/control

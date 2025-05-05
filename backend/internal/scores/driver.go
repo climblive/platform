@@ -27,6 +27,7 @@ type ScoreEngine interface {
 	HandleAscentRegistered(event domain.AscentRegisteredEvent)
 	HandleAscentDeregistered(event domain.AscentDeregisteredEvent)
 	HandleProblemAdded(event domain.ProblemAddedEvent)
+	HandleProblemUpdated(event domain.ProblemUpdatedEvent)
 
 	GetDirtyScores() []domain.Score
 }
@@ -139,6 +140,7 @@ func (d *ScoreEngineDriver) run(
 		"ASCENT_REGISTERED",
 		"ASCENT_DEREGISTERED",
 		"PROBLEM_ADDED",
+		"PROBLEM_UPDATED",
 	)
 
 	subscriptionID, eventReader := d.eventBroker.Subscribe(filter, 0)
@@ -279,6 +281,8 @@ func (d *ScoreEngineDriver) handleEvent(event domain.EventEnvelope) {
 		d.engine.HandleAscentDeregistered(ev)
 	case domain.ProblemAddedEvent:
 		d.engine.HandleProblemAdded(ev)
+	case domain.ProblemUpdatedEvent:
+		d.engine.HandleProblemUpdated(ev)
 	}
 }
 
