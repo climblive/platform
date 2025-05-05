@@ -78,3 +78,8 @@ sl-checkbox:focus-within[data-user-invalid]::part(control) {
   border-color: var(--sl-color-danger-600);
   box-shadow: 0 0 0 var(--sl-focus-ring-width) var(--sl-color-danger-300);
 }
+
+sl-dialog::part(body),
+sl-dialog::part(footer) {
+  text-align: left;
+}
