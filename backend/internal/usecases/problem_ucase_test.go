@@ -476,3 +476,110 @@ func TestCreateProblem(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 }
+
+func TestDeleteProblem(t *testing.T) {
+	fakedProblemID := randomResourceID[domain.ProblemID]()
+	fakedOwnership := domain.OwnershipData{
+		OrganizerID: randomResourceID[domain.OrganizerID](),
+	}
+	fakedContestID := randomResourceID[domain.ContestID]()
+
+	fakedProblem := domain.Problem{
+		ID:        fakedProblemID,
+		Ownership: fakedOwnership,
+		ContestID: fakedContestID,
+	}
+
+	makeMocks := func() (*repositoryMock, *eventBrokerMock, *authorizerMock) {
+		mockedRepo := new(repositoryMock)
+
+		mockedRepo.
+			On("GetProblem", mock.Anything, nil, fakedProblemID).
+			Return(fakedProblem, nil)
+
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedEventBroker := new(eventBrokerMock)
+
+		return mockedRepo, mockedEventBroker, mockedAuthorizer
+	}
+
+	t.Run("HappyCase", func(t *testing.T) {
+		mockedRepo, mockedEventBroker, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		mockedRepo.
+			On("GetTicksByProblem", mock.Anything, nil, fakedProblemID).
+			Return([]domain.Tick{}, nil)
+
+		mockedRepo.
+			On("DeleteProblem", mock.Anything, nil, fakedProblemID).
+			Return(nil)
+
+		mockedEventBroker.
+			On("Dispatch", fakedContestID, domain.ProblemDeletedEvent{
+				ProblemID: fakedProblemID,
+			}).Return()
+
+		ucase := usecases.ProblemUseCase{
+			Repo:        mockedRepo,
+			Authorizer:  mockedAuthorizer,
+			EventBroker: mockedEventBroker,
+		}
+
+		err := ucase.DeleteProblem(context.Background(), fakedProblemID)
+
+		require.NoError(t, err)
+
+		mockedRepo.AssertExpectations(t)
+		mockedEventBroker.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("ProblemHasTicks", func(t *testing.T) {
+		mockedRepo, _, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		mockedRepo.
+			On("GetTicksByProblem", mock.Anything, nil, fakedProblemID).
+			Return([]domain.Tick{{}}, nil)
+
+		ucase := usecases.ProblemUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		err := ucase.DeleteProblem(context.Background(), fakedProblemID)
+
+		require.ErrorIs(t, err, domain.ErrNotAllowed)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockedRepo, _, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		ucase := usecases.ProblemUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		err := ucase.DeleteProblem(context.Background(), fakedProblemID)
+
+		require.ErrorIs(t, err, domain.ErrNoOwnership)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+}
