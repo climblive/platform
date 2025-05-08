@@ -2,6 +2,9 @@
   import { deleteProblemMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import type { SlDialog } from "@shoelace-style/shoelace";
+  import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
+  import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import type { Snippet } from "svelte";
 
   type Props = {
