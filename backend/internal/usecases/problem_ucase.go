@@ -19,6 +19,8 @@ type problemUseCaseRepository interface {
 	GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) (domain.Problem, error)
 	GetProblemByNumber(ctx context.Context, tx domain.Transaction, contestID domain.ContestID, problemNumber int) (domain.Problem, error)
 	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
+	DeleteProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) error
+	GetTicksByProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) ([]domain.Tick, error)
 }
 
 type ProblemUseCase struct {
@@ -181,4 +183,37 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 	uc.EventBroker.Dispatch(problem.ContestID, event)
 
 	return createdProblem, nil
+}
+
+func (uc *ProblemUseCase) DeleteProblem(ctx context.Context, problemID domain.ProblemID) error {
+	problem, err := uc.Repo.GetProblem(ctx, nil, problemID)
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	if _, err := uc.Authorizer.HasOwnership(ctx, problem.Ownership); err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	ticks, err := uc.Repo.GetTicksByProblem(ctx, nil, problemID)
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	if len(ticks) > 0 {
+		return errors.Wrap(domain.ErrNotAllowed, 0)
+	}
+
+	err = uc.Repo.DeleteProblem(ctx, nil, problemID)
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	event := domain.ProblemDeletedEvent{
+		ProblemID: problem.ID,
+	}
+
+	uc.EventBroker.Dispatch(problem.ContestID, event)
+
+	return nil
 }

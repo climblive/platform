@@ -198,6 +198,14 @@ export class ApiClient {
     return problemSchema.parse(result.data);
   };
 
+  deleteProblem = async (id: number) => {
+    const endpoint = `/problems/${id}`;
+
+    await this.axiosInstance.delete(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+  };
+
   getCompClasses = async (contestId: number) => {
     const endpoint = `/contests/${contestId}/comp-classes`;
 

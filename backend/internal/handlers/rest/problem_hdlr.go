@@ -13,6 +13,7 @@ type problemUseCase interface {
 	GetProblemsByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Problem, error)
 	PatchProblem(ctx context.Context, problemID domain.ProblemID, patch domain.ProblemPatch) (domain.Problem, error)
 	CreateProblem(ctx context.Context, contestID domain.ContestID, tmpl domain.ProblemTemplate) (domain.Problem, error)
+	DeleteProblem(ctx context.Context, problemID domain.ProblemID) error
 }
 
 type problemHandler struct {
@@ -28,6 +29,7 @@ func InstallProblemHandler(mux *Mux, problemUseCase problemUseCase) {
 	mux.HandleFunc("GET /contests/{contestID}/problems", handler.GetProblemsByContest)
 	mux.HandleFunc("PATCH /problems/{problemID}", handler.PatchProblem)
 	mux.HandleFunc("POST /contests/{contestID}/problems", handler.CreateProblem)
+	mux.HandleFunc("DELETE /problems/{problemID}", handler.DeleteProblem)
 }
 
 func (hdlr *problemHandler) GetProblem(w http.ResponseWriter, r *http.Request) {
@@ -106,4 +108,20 @@ func (hdlr *problemHandler) CreateProblem(w http.ResponseWriter, r *http.Request
 	}
 
 	writeResponse(w, http.StatusCreated, createdProblem)
+}
+
+func (hdlr *problemHandler) DeleteProblem(w http.ResponseWriter, r *http.Request) {
+	problemID, err := parseResourceID[domain.ProblemID](r.PathValue("problemID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	err = hdlr.problemUseCase.DeleteProblem(r.Context(), problemID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusNoContent, nil)
 }

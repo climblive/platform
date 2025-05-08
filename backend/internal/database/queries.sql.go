@@ -51,6 +51,16 @@ func (q *Queries) DeleteContender(ctx context.Context, id int32) error {
 	return err
 }
 
+const deleteProblem = `-- name: DeleteProblem :exec
+DELETE FROM problem
+WHERE id = ?
+`
+
+func (q *Queries) DeleteProblem(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deleteProblem, id)
+	return err
+}
+
 const deleteTick = `-- name: DeleteTick :exec
 DELETE
 FROM tick
@@ -690,6 +700,47 @@ func (q *Queries) GetTicksByContest(ctx context.Context, contestID int32) ([]Get
 	var items []GetTicksByContestRow
 	for rows.Next() {
 		var i GetTicksByContestRow
+		if err := rows.Scan(
+			&i.Tick.ID,
+			&i.Tick.OrganizerID,
+			&i.Tick.ContestID,
+			&i.Tick.ContenderID,
+			&i.Tick.ProblemID,
+			&i.Tick.Flash,
+			&i.Tick.Timestamp,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getTicksByProblem = `-- name: GetTicksByProblem :many
+SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.flash, tick.timestamp
+FROM tick
+WHERE problem_id = ?
+`
+
+type GetTicksByProblemRow struct {
+	Tick Tick
+}
+
+func (q *Queries) GetTicksByProblem(ctx context.Context, problemID int32) ([]GetTicksByProblemRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTicksByProblem, problemID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTicksByProblemRow
+	for rows.Next() {
+		var i GetTicksByProblemRow
 		if err := rows.Scan(
 			&i.Tick.ID,
 			&i.Tick.OrganizerID,

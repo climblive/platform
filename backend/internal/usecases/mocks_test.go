@@ -153,6 +153,11 @@ func (m *repositoryMock) StoreTick(ctx context.Context, tx domain.Transaction, t
 	}
 }
 
+func (m *repositoryMock) GetTicksByProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) ([]domain.Tick, error) {
+	args := m.Called(ctx, tx, problemID)
+	return args.Get(0).([]domain.Tick), args.Error(1)
+}
+
 func (m *repositoryMock) GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) (domain.Problem, error) {
 	args := m.Called(ctx, tx, problemID)
 	return args.Get(0).(domain.Problem), args.Error(1)
@@ -166,6 +171,11 @@ func (m *repositoryMock) GetProblemByNumber(ctx context.Context, tx domain.Trans
 func (m *repositoryMock) StoreProblem(ctx context.Context, tx domain.Transaction, problem domain.Problem) (domain.Problem, error) {
 	args := m.Called(ctx, tx, problem)
 	return args.Get(0).(domain.Problem), args.Error(1)
+}
+
+func (m *repositoryMock) DeleteProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) error {
+	args := m.Called(ctx, tx, problemID)
+	return args.Error(0)
 }
 
 func (m *repositoryMock) GetOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) (domain.Organizer, error) {

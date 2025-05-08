@@ -3,6 +3,7 @@
   import { getProblemsQuery } from "@climblive/lib/queries";
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import { navigate } from "svelte-routing";
+  import DeleteProblem from "./DeleteProblem.svelte";
 
   interface Props {
     contestId: number;
@@ -29,6 +30,15 @@
               name="pencil"
               label="Edit"
             ></sl-icon-button>
+            <DeleteProblem problemID={problem.id}>
+              {#snippet children({ deleteProblem })}
+                <sl-icon-button
+                  onclick={deleteProblem}
+                  name="trash"
+                  label={`Delete problem ${problem.id}`}
+                ></sl-icon-button>
+              {/snippet}
+            </DeleteProblem>
           </TableCell>
         </TableRow>
       {/each}
