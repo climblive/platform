@@ -58,3 +58,12 @@ func (d *Database) StoreCompClass(ctx context.Context, tx domain.Transaction, co
 
 	return compClass, err
 }
+
+func (d *Database) DeleteCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) error {
+	err := d.WithTx(tx).DeleteCompClass(ctx, int32(compClassID))
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	return nil
+}

@@ -41,6 +41,16 @@ func (q *Queries) CountContenders(ctx context.Context, contestID int32) (int64, 
 	return count, err
 }
 
+const deleteCompClass = `-- name: DeleteCompClass :exec
+DELETE FROM comp_class
+WHERE id = ?
+`
+
+func (q *Queries) DeleteCompClass(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deleteCompClass, id)
+	return err
+}
+
 const deleteContender = `-- name: DeleteContender :exec
 DELETE FROM contender
 WHERE id = ?

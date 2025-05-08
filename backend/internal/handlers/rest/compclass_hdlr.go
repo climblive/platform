@@ -11,6 +11,7 @@ import (
 type compClassUseCase interface {
 	GetCompClassesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.CompClass, error)
 	CreateCompClass(ctx context.Context, contestID domain.ContestID, tmpl domain.CompClassTemplate) (domain.CompClass, error)
+	DeleteCompClass(ctx context.Context, compClassID domain.CompClassID) error
 }
 
 type compClassHandler struct {
@@ -24,6 +25,7 @@ func InstallCompClassHandler(mux *Mux, compClassUseCase compClassUseCase) {
 
 	mux.HandleFunc("GET /contests/{contestID}/comp-classes", handler.GetCompClassesByContest)
 	mux.HandleFunc("POST /contests/{contestID}/comp-classes", handler.CreateCompClass)
+	mux.HandleFunc("DELETE /comp-classes/{compClassID}", handler.DeleteCompClass)
 }
 
 func (hdlr *compClassHandler) GetCompClassesByContest(w http.ResponseWriter, r *http.Request) {
@@ -63,4 +65,20 @@ func (hdlr *compClassHandler) CreateCompClass(w http.ResponseWriter, r *http.Req
 	}
 
 	writeResponse(w, http.StatusCreated, createdCompClass)
+}
+
+func (hdlr *compClassHandler) DeleteCompClass(w http.ResponseWriter, r *http.Request) {
+	compClassID, err := parseResourceID[domain.CompClassID](r.PathValue("compClassID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	err = hdlr.compClassUseCase.DeleteCompClass(r.Context(), compClassID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

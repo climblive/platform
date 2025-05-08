@@ -113,6 +113,11 @@ func (m *repositoryMock) GetCompClassesByContest(ctx context.Context, tx domain.
 	return args.Get(0).([]domain.CompClass), args.Error(1)
 }
 
+func (m *repositoryMock) DeleteCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) error {
+	args := m.Called(ctx, tx, compClassID)
+	return args.Error(0)
+}
+
 func (m *repositoryMock) StoreCompClass(ctx context.Context, tx domain.Transaction, compClass domain.CompClass) (domain.CompClass, error) {
 	args := m.Called(ctx, tx, compClass)
 	return args.Get(0).(domain.CompClass), args.Error(1)

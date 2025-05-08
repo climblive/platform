@@ -69,6 +69,10 @@ SELECT sqlc.embed(comp_class)
 FROM comp_class
 WHERE contest_id = ?;
 
+-- name: DeleteCompClass :exec
+DELETE FROM comp_class
+WHERE id = ?;
+
 -- name: UpsertCompClass :execlastid
 INSERT INTO 
 	comp_class (id, organizer_id, contest_id, name, description, color, time_begin, time_end)
