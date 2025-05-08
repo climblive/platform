@@ -16,12 +16,6 @@
 
   let details: SlDetails | undefined = $state();
 
-  $effect(() => {
-    if (details && contest.rules) {
-      details.innerHTML = contest.rules;
-    }
-  });
-
   const scoreboardUrl = `${location.protocol}//${location.host}/scoreboard/${contest.id}`;
 </script>
 
@@ -70,6 +64,7 @@
     bind:this={details}
     summary="Rules"
   >
+    {@html contest.rules}
   </sl-details>
 {/if}
 

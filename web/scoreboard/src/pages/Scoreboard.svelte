@@ -82,13 +82,13 @@
               selectedCompClassId = Number(compClassSelector?.value);
             }}
           >
-            {#each compClasses as compClass}
+            {#each compClasses as compClass (compClass.id)}
               <sl-option value={compClass.id}>{compClass.name}</sl-option>
             {/each}
           </sl-select>
         {/if}
         <div class="container" style="--num-columns: {compClasses.length}">
-          {#each compClasses as compClass}
+          {#each compClasses as compClass (compClass.id)}
             <section
               class="class"
               data-selected={compClass.id === selectedCompClassId

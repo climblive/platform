@@ -61,7 +61,7 @@
 
       <sl-tab-panel name="contest">
         <h2>Score Engines</h2>
-        {#each scoreEngines as engineInstanceId}
+        {#each scoreEngines as engineInstanceId (engineInstanceId)}
           <div>
             <h3>{engineInstanceId}</h3>
             <sl-button

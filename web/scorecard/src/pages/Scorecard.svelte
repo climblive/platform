@@ -249,7 +249,7 @@
                 Sort by points
               </sl-radio-button>
             </sl-radio-group>
-            {#each sortedProblems as problem}
+            {#each sortedProblems as problem (problem.id)}
               <ProblemView
                 {problem}
                 tick={ticks.find(({ problemId }) => problemId === problem.id)}
