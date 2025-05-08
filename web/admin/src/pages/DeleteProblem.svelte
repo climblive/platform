@@ -9,7 +9,7 @@
 
   type Props = {
     problemID: number;
-    children: Snippet<[{ onDelete: () => void }]>;
+    children: Snippet<[{ deleteProblem: () => void }]>;
   };
 
   let dialog: SlDialog | undefined = $state();
@@ -29,7 +29,7 @@
   };
 </script>
 
-{@render children({ onDelete: handleDelete })}
+{@render children({ deleteProblem: handleDelete })}
 
 <sl-dialog bind:this={dialog} no-header>
   <p>

@@ -31,8 +31,11 @@
               label="Edit"
             ></sl-icon-button>
             <DeleteProblem problemID={problem.id}>
-              {#snippet children({ onDelete })}
-                <sl-icon-button onclick={onDelete} name="trash" label={`Delete problem ${problem.id}`}
+              {#snippet children({ deleteProblem })}
+                <sl-icon-button
+                  onclick={deleteProblem}
+                  name="trash"
+                  label={`Delete problem ${problem.id}`}
                 ></sl-icon-button>
               {/snippet}
             </DeleteProblem>
