@@ -45,6 +45,12 @@ export interface CompClassTemplate {
   timeBegin: Date;
   timeEnd: Date;
 }
+export interface CompClassPatch {
+  name?: string;
+  description?: string;
+  timeBegin?: Date;
+  timeEnd?: Date;
+}
 export interface Contender {
   id: ContenderID;
   contestId: ContestID;
@@ -118,7 +124,6 @@ export interface ProblemPatch {
   number?: number;
   holdColorPrimary?: string;
   holdColorSecondary?: string;
-  name?: string;
   description?: string;
   pointsTop?: number;
   pointsZone?: number;

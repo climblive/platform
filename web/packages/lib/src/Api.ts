@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   contestSchema,
   scoreboardEntrySchema,
+  type CompClassPatch,
   type CompClassTemplate,
   type ContenderPatch,
   type ContestID,
@@ -230,6 +231,16 @@ export class ApiClient {
     await this.axiosInstance.delete(endpoint, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
+  };
+
+  patchCompClass = async (id: number, patch: CompClassPatch) => {
+    const endpoint = `/comp-classes/${id}`;
+
+    const result = await this.axiosInstance.patch(endpoint, patch, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return compClassSchema.parse(result.data);
   };
 
   getTicks = async (contenderId: number) => {
