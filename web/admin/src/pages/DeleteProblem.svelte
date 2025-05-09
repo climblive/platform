@@ -14,9 +14,9 @@
 
   let dialog: SlDialog | undefined = $state();
 
-  let { problemId: problemID, children }: Props = $props();
+  let { problemId, children }: Props = $props();
 
-  const deleteProblem = deleteProblemMutation(problemID);
+  const deleteProblem = deleteProblemMutation(problemId);
 
   const handleDelete = async () => {
     dialog?.show();
