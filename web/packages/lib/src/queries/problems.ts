@@ -78,3 +78,29 @@ export const patchProblemMutation = (problemId: number) => {
     },
   });
 };
+
+export const deleteProblemMutation = (problemId: number) => {
+  const client = useQueryClient();
+
+  return createMutation({
+    mutationFn: () => ApiClient.getInstance().deleteProblem(problemId),
+    onSuccess: () => {
+      let queryKey: QueryKey = ["problems"];
+
+      client.setQueriesData<Problem[]>(
+        { queryKey, exact: false },
+        (oldProblems) => {
+          if (oldProblems === undefined) {
+            return undefined;
+          }
+
+          return oldProblems.filter(({ id }) => id !== problemId);
+        },
+      );
+
+      queryKey = ["problem", { id: problemId }];
+
+      client.removeQueries({ queryKey });
+    },
+  });
+};

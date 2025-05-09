@@ -1,5 +1,6 @@
 <script lang="ts">
   import { ApiClient, OrganizerCredentialsProvider } from "@climblive/lib";
+  import { ErrorBoundary } from "@climblive/lib/components";
   import configData from "@climblive/lib/config.json";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
@@ -9,7 +10,9 @@
   import { navigate, Route, Router } from "svelte-routing";
   import Contest from "./pages/Contest.svelte";
   import ContestList from "./pages/ContestList.svelte";
+  import CreateCompClass from "./pages/CreateCompClass.svelte";
   import CreateContest from "./pages/CreateContest.svelte";
+  import CreateProblem from "./pages/CreateProblem.svelte";
   import EditProblem from "./pages/EditProblem.svelte";
   import { exchangeCode, refreshSession } from "./utils/cognito";
 
@@ -73,42 +76,54 @@
   };
 </script>
 
-{#await authenticate()}
-  <sl-spinner></sl-spinner>
-{:then}
-  <QueryClientProvider client={queryClient}>
-    {#if !authenticated}
-      <sl-button variant="primary" onclick={login}>Login</sl-button>
-    {/if}
-    <main>
-      <Router basepath="/admin">
-        <Route path="/organizers/:organizerId">
-          {#snippet children({ params }: { params: { organizerId: number } })}
-            <ContestList organizerId={Number(params.organizerId)} />
-          {/snippet}
-        </Route>
-        <Route path="/organizers/:organizerId/contests/new">
-          {#snippet children({ params }: { params: { organizerId: number } })}
-            <CreateContest organizerId={Number(params.organizerId)} />
-          {/snippet}
-        </Route>
-        <Route path="/contests/:contestId">
-          {#snippet children({ params }: { params: { contestId: number } })}
-            <Contest contestId={Number(params.contestId)} />
-          {/snippet}
-        </Route>
-        <Route path="/problems/:problemId/edit">
-          {#snippet children({ params }: { params: { problemId: number } })}
-            <EditProblem problemId={Number(params.problemId)} />
-          {/snippet}
-        </Route>
-      </Router>
-    </main>
-    {#if import.meta.env.DEV}
-      <SvelteQueryDevtools />
-    {/if}
-  </QueryClientProvider>
-{/await}
+<ErrorBoundary>
+  {#await authenticate()}
+    <sl-spinner></sl-spinner>
+  {:then}
+    <QueryClientProvider client={queryClient}>
+      {#if !authenticated}
+        <sl-button variant="primary" onclick={login}>Login</sl-button>
+      {/if}
+      <main>
+        <Router basepath="/admin">
+          <Route path="/organizers/:organizerId">
+            {#snippet children({ params }: { params: { organizerId: number } })}
+              <ContestList organizerId={Number(params.organizerId)} />
+            {/snippet}
+          </Route>
+          <Route path="/organizers/:organizerId/contests/new">
+            {#snippet children({ params }: { params: { organizerId: number } })}
+              <CreateContest organizerId={Number(params.organizerId)} />
+            {/snippet}
+          </Route>
+          <Route path="/contests/:contestId">
+            {#snippet children({ params }: { params: { contestId: number } })}
+              <Contest contestId={Number(params.contestId)} />
+            {/snippet}
+          </Route>
+          <Route path="/contests/:contestId/new-comp-class">
+            {#snippet children({ params }: { params: { contestId: number } })}
+              <CreateCompClass contestId={Number(params.contestId)} />
+            {/snippet}
+          </Route>
+          <Route path="/contests/:contestId/new-problem">
+            {#snippet children({ params }: { params: { contestId: number } })}
+              <CreateProblem contestId={Number(params.contestId)} />
+            {/snippet}
+          </Route>
+          <Route path="/problems/:problemId/edit">
+            {#snippet children({ params }: { params: { problemId: number } })}
+              <EditProblem problemId={Number(params.problemId)} />
+            {/snippet}
+          </Route>
+        </Router>
+      </main>
+      {#if import.meta.env.DEV}
+        <SvelteQueryDevtools />
+      {/if}
+    </QueryClientProvider>
+  {/await}
+</ErrorBoundary>
 
 <style>
   main {

@@ -1,6 +1,9 @@
 <script lang="ts">
+  import { Table, TableCell, TableRow } from "@climblive/lib/components";
   import { getProblemsQuery } from "@climblive/lib/queries";
+  import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import { navigate } from "svelte-routing";
+  import DeleteProblem from "./DeleteProblem.svelte";
 
   interface Props {
     contestId: number;
@@ -14,19 +17,33 @@
 </script>
 
 <section>
-  {#if problems}
-    <ul>
+  <Table columns={["Number", "Color", "Points", ""]}>
+    {#if problems}
       {#each problems as problem (problem.id)}
-        <li>
-          {problem.number}
-          <sl-button
-            onclick={() => navigate(`/admin/problems/${problem.id}/edit`)}
-            >Edit</sl-button
-          >
-        </li>
+        <TableRow>
+          <TableCell>№ {problem.number}</TableCell>
+          <TableCell>{problem.holdColorPrimary}</TableCell>
+          <TableCell>{problem.pointsTop}</TableCell>
+          <TableCell align="right">
+            <sl-icon-button
+              onclick={() => navigate(`/admin/problems/${problem.id}/edit`)}
+              name="pencil"
+              label="Edit"
+            ></sl-icon-button>
+            <DeleteProblem problemId={problem.id}>
+              {#snippet children({ deleteProblem })}
+                <sl-icon-button
+                  onclick={deleteProblem}
+                  name="trash"
+                  label={`Delete problem ${problem.id}`}
+                ></sl-icon-button>
+              {/snippet}
+            </DeleteProblem>
+          </TableCell>
+        </TableRow>
       {/each}
-    </ul>
-  {/if}
+    {/if}
+  </Table>
 </section>
 
 <style>

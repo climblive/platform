@@ -36,3 +36,29 @@ export const createCompClassMutation = (contestId: number) => {
     },
   });
 };
+
+export const deleteCompClassMutation = (compClassId: number) => {
+  const client = useQueryClient();
+
+  return createMutation({
+    mutationFn: () => ApiClient.getInstance().deleteCompClass(compClassId),
+    onSuccess: () => {
+      let queryKey: QueryKey = ["comp-classes"];
+
+      client.setQueriesData<CompClass[]>(
+        { queryKey, exact: false },
+        (oldCompClasses) => {
+          if (oldCompClasses === undefined) {
+            return undefined;
+          }
+
+          return oldCompClasses.filter(({ id }) => id !== compClassId);
+        },
+      );
+
+      queryKey = ["comp-class", { id: compClassId }];
+
+      client.removeQueries({ queryKey });
+    },
+  });
+};

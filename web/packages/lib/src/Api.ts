@@ -198,6 +198,14 @@ export class ApiClient {
     return problemSchema.parse(result.data);
   };
 
+  deleteProblem = async (id: number) => {
+    const endpoint = `/problems/${id}`;
+
+    await this.axiosInstance.delete(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+  };
+
   getCompClasses = async (contestId: number) => {
     const endpoint = `/contests/${contestId}/comp-classes`;
 
@@ -214,6 +222,14 @@ export class ApiClient {
     });
 
     return compClassSchema.parse(result.data);
+  };
+
+  deleteCompClass = async (id: number) => {
+    const endpoint = `/comp-classes/${id}`;
+
+    await this.axiosInstance.delete(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
   };
 
   getTicks = async (contenderId: number) => {

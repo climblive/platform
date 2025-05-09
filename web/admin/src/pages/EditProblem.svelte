@@ -1,12 +1,13 @@
 <script lang="ts">
   import ProblemForm from "@/forms/ProblemForm.svelte";
-  import type { ProblemPatch } from "@climblive/lib/models";
+  import type { Problem, ProblemPatch } from "@climblive/lib/models";
   import {
     getProblemQuery,
     patchProblemMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import { navigate } from "svelte-routing";
   import * as z from "zod";
 
   interface Props {
@@ -32,6 +33,8 @@
 
   const handleSubmit = async (tmpl: ProblemPatch) => {
     $patchProblem.mutate(tmpl, {
+      onSuccess: (problem: Problem) =>
+        navigate(`/admin/contests/${problem.contestId}#problems`),
       onError: () => toastError("Failed to save problem."),
     });
   };

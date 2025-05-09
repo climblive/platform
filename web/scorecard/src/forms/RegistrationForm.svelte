@@ -57,7 +57,7 @@
         required
         use:value={data.compClassId}
       >
-        {#each $compClassesQuery.data as compClass}
+        {#each $compClassesQuery.data as compClass (compClass.id)}
           <sl-option
             value={compClass.id}
             disabled={isAfter(new Date(), compClass.timeEnd)}
