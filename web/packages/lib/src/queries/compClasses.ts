@@ -41,8 +41,7 @@ export const deleteCompClassMutation = (compClassId: number) => {
   const client = useQueryClient();
 
   return createMutation({
-    mutationFn: () =>
-      ApiClient.getInstance().deleteCompClass(compClassId),
+    mutationFn: () => ApiClient.getInstance().deleteCompClass(compClassId),
     onSuccess: () => {
       let queryKey: QueryKey = ["comp-classes"];
 
@@ -62,4 +61,4 @@ export const deleteCompClassMutation = (compClassId: number) => {
       client.removeQueries({ queryKey });
     },
   });
-}
+};
