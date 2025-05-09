@@ -5,7 +5,7 @@ import {
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import type { CompClass, CompClassTemplate } from "../models";
+import type { CompClass, CompClassPatch, CompClassTemplate } from "../models";
 import { HOUR } from "./constants";
 
 export const getCompClassesQuery = (contestId: number) =>
@@ -33,6 +33,39 @@ export const createCompClassMutation = (contestId: number) => {
       queryKey = ["comp-class", { id: newCompClass.id }];
 
       client.setQueryData<CompClass>(queryKey, newCompClass);
+    },
+  });
+};
+
+export const patchCompClassMutation = (compClassId: number) => {
+  const client = useQueryClient();
+
+  return createMutation({
+    mutationFn: (template: CompClassPatch) =>
+      ApiClient.getInstance().patchCompClass(compClassId, template),
+    onSuccess: (patchedCompClass) => {
+      let queryKey: QueryKey = [
+        "comp-classes",
+        { contestId: patchedCompClass.contestId },
+      ];
+
+      client.setQueryData<CompClass[]>(queryKey, (oldCompClasses) => {
+        if (oldCompClasses === undefined) {
+          return undefined;
+        }
+
+        return oldCompClasses.map((compClass) => {
+          if (compClass.id === patchedCompClass.id) {
+            return patchedCompClass;
+          }
+
+          return compClass;
+        });
+      });
+
+      queryKey = ["comp-class", { id: compClassId }];
+
+      client.setQueryData<CompClass>(queryKey, patchedCompClass);
     },
   });
 };
