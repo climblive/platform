@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { deleteProblemMutation } from "@climblive/lib/queries";
+  import { deleteCompClassMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import type { SlDialog } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
@@ -8,34 +8,34 @@
   import type { Snippet } from "svelte";
 
   type Props = {
-    problemId: number;
-    children: Snippet<[{ deleteProblem: () => void }]>;
+    compClassId: number;
+    children: Snippet<[{ deleteCompClass: () => void }]>;
   };
 
   let dialog: SlDialog | undefined = $state();
 
-  let { problemId: problemID, children }: Props = $props();
+  let { compClassId, children }: Props = $props();
 
-  const deleteProblem = deleteProblemMutation(problemID);
+  const deleteCompClass = deleteCompClassMutation(compClassId);
 
   const handleDelete = async () => {
     dialog?.show();
   };
 
   const confirmDelete = () => {
-    $deleteProblem.mutate(undefined, {
-      onError: () => toastError("Failed to delete problem."),
+    $deleteCompClass.mutate(undefined, {
+      onError: () => toastError("Failed to delete comp class."),
     });
   };
 </script>
 
-{@render children({ deleteProblem: handleDelete })}
+{@render children({ deleteCompClass: handleDelete })}
 
 <sl-dialog bind:this={dialog} no-header>
   <p>
     <strong>Are you sure?</strong>
   </p>
-  <p>A problem is deleted permanently and cannot be restored.</p>
+  <p>A comp class is deleted permanently and cannot be restored.</p>
   <sl-button slot="footer" variant="text" onclick={() => dialog?.hide()}
     >Cancel</sl-button
   >

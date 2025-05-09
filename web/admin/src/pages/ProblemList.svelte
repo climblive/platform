@@ -30,7 +30,7 @@
               name="pencil"
               label="Edit"
             ></sl-icon-button>
-            <DeleteProblem problemID={problem.id}>
+            <DeleteProblem problemId={problem.id}>
               {#snippet children({ deleteProblem })}
                 <sl-icon-button
                   onclick={deleteProblem}

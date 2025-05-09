@@ -2,6 +2,7 @@
   import { Table, TableCell, TableRow } from "@climblive/lib/components";
   import { getCompClassesQuery } from "@climblive/lib/queries";
   import { format } from "date-fns";
+  import DeleteCompClass from "./DeleteCompClass.svelte";
 
   interface Props {
     contestId: number;
@@ -15,7 +16,7 @@
 </script>
 
 <section>
-  <Table columns={["Name", "Start time", "End time"]}>
+  <Table columns={["Name", "Start time", "End time", ""]}>
     {#if compClasses}
       {#each compClasses as compClass (compClass.id)}
         <TableRow>
@@ -25,6 +26,17 @@
           </TableCell>
           <TableCell>
             {format(compClass.timeEnd, "yyyy-MM-dd HH:mm")}
+          </TableCell>
+          <TableCell align="right">
+            <DeleteCompClass compClassId={compClass.id}>
+              {#snippet children({ deleteCompClass })}
+                <sl-icon-button
+                  onclick={deleteCompClass}
+                  name="trash"
+                  label={`Delete comp class ${compClass.id}`}
+                ></sl-icon-button>
+              {/snippet}
+            </DeleteCompClass>
           </TableCell>
         </TableRow>
       {/each}

@@ -43,6 +43,7 @@
 
     & th {
       font-weight: var(--sl-font-weight-normal);
+      text-align: left;
     }
 
     & th:first-of-type {
