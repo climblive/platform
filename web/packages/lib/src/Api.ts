@@ -224,6 +224,14 @@ export class ApiClient {
     return compClassSchema.parse(result.data);
   };
 
+  deleteCompClass = async (id: number) => {
+    const endpoint = `/comp-classes/${id}`;
+
+    await this.axiosInstance.delete(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+  };
+
   getTicks = async (contenderId: number) => {
     const endpoint = `/contenders/${contenderId}/ticks`;
 

@@ -199,3 +199,100 @@ func TestCreateCompClass(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 }
+
+func TestDeleteCompClass(t *testing.T) {
+	t.Parallel()
+
+	fakedCompClassID := randomResourceID[domain.CompClassID]()
+	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOwnership := domain.OwnershipData{
+		OrganizerID: fakedOrganizerID,
+	}
+
+	makeMocks := func() (*repositoryMock, *authorizerMock) {
+		mockedRepo := new(repositoryMock)
+
+		mockedRepo.
+			On("GetCompClass", mock.Anything, nil, fakedCompClassID).
+			Return(domain.CompClass{
+				ID:        fakedCompClassID,
+				Ownership: fakedOwnership,
+			}, nil)
+
+		mockedAuthorizer := new(authorizerMock)
+
+		return mockedRepo, mockedAuthorizer
+	}
+
+	t.Run("HappyCase", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		mockedRepo.
+			On("GetContendersByCompClass", mock.Anything, nil, fakedCompClassID).
+			Return([]domain.Contender{}, nil)
+
+		mockedRepo.
+			On("DeleteCompClass", mock.Anything, nil, fakedCompClassID).
+			Return(nil)
+
+		ucase := usecases.CompClassUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		err := ucase.DeleteCompClass(context.Background(), fakedCompClassID)
+
+		require.NoError(t, err)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("CompClassHasContenders", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		mockedRepo.
+			On("GetContendersByCompClass", mock.Anything, nil, fakedCompClassID).
+			Return([]domain.Contender{{}}, nil)
+
+		ucase := usecases.CompClassUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		err := ucase.DeleteCompClass(context.Background(), fakedCompClassID)
+
+		assert.ErrorIs(t, err, domain.ErrNotAllowed)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		ucase := usecases.CompClassUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		err := ucase.DeleteCompClass(context.Background(), fakedCompClassID)
+
+		assert.ErrorIs(t, err, domain.ErrNoOwnership)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+}

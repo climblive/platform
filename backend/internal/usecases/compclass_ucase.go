@@ -14,6 +14,9 @@ type compClassUseCaseRepository interface {
 	GetCompClassesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.CompClass, error)
 	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
 	StoreCompClass(ctx context.Context, tx domain.Transaction, compClass domain.CompClass) (domain.CompClass, error)
+	DeleteCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) error
+	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error)
+	GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) ([]domain.Contender, error)
 }
 
 type CompClassUseCase struct {
@@ -64,4 +67,31 @@ func (uc *CompClassUseCase) CreateCompClass(ctx context.Context, contestID domai
 	}
 
 	return createdCompClass, nil
+}
+
+func (uc *CompClassUseCase) DeleteCompClass(ctx context.Context, compClassID domain.CompClassID) error {
+	compClass, err := uc.Repo.GetCompClass(ctx, nil, compClassID)
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	if _, err := uc.Authorizer.HasOwnership(ctx, compClass.Ownership); err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	contenders, err := uc.Repo.GetContendersByCompClass(ctx, nil, compClassID)
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	if len(contenders) > 0 {
+		return errors.Wrap(domain.ErrNotAllowed, 0)
+	}
+
+	err = uc.Repo.DeleteCompClass(ctx, nil, compClassID)
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	return nil
 }
