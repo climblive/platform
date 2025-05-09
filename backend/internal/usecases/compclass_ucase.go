@@ -43,15 +43,6 @@ func (uc *CompClassUseCase) CreateCompClass(ctx context.Context, contestID domai
 		return domain.CompClass{}, errors.Wrap(err, 0)
 	}
 
-	switch {
-	case len(tmpl.Name) < 1:
-		fallthrough
-	case tmpl.TimeEnd.Before(tmpl.TimeBegin):
-		fallthrough
-	case tmpl.TimeEnd.Sub(tmpl.TimeBegin) > 12*time.Hour:
-		return domain.CompClass{}, errors.Wrap(domain.ErrInvalidData, 0)
-	}
-
 	compClass := domain.CompClass{
 		Ownership:   contest.Ownership,
 		ContestID:   contestID,
@@ -59,6 +50,10 @@ func (uc *CompClassUseCase) CreateCompClass(ctx context.Context, contestID domai
 		Description: tmpl.Description,
 		TimeBegin:   tmpl.TimeBegin,
 		TimeEnd:     tmpl.TimeEnd,
+	}
+
+	if err := (CompClassValidator{}).Validate(compClass); err != nil {
+		return domain.CompClass{}, errors.Wrap(err, 0)
 	}
 
 	createdCompClass, err := uc.Repo.StoreCompClass(ctx, nil, compClass)
@@ -109,9 +104,51 @@ func (uc *CompClassUseCase) PatchCompClass(ctx context.Context, compClassID doma
 		return mty, errors.Wrap(err, 0)
 	}
 
+	if patch.Name.Present {
+		compClass.Name = patch.Name.Value
+	}
+
+	if patch.Description.Present {
+		compClass.Description = patch.Description.Value
+	}
+
+	if patch.TimeBegin.Present {
+		compClass.TimeBegin = patch.TimeBegin.Value
+	}
+
+	if patch.TimeEnd.Present {
+		compClass.TimeEnd = patch.TimeEnd.Value
+	}
+
+	if err := (CompClassValidator{}).Validate(compClass); err != nil {
+		return domain.CompClass{}, errors.Wrap(err, 0)
+	}
+
 	if _, err = uc.Repo.StoreCompClass(ctx, nil, compClass); err != nil {
 		return mty, errors.Wrap(err, 0)
 	}
 
 	return compClass, nil
+}
+
+var __INTERNAL_errCompClassInvalid = errors.New("")
+
+type CompClassValidator struct {
+}
+
+func (v CompClassValidator) Validate(compClass domain.CompClass) error {
+	switch {
+	case len(compClass.Name) < 1:
+		fallthrough
+	case compClass.TimeEnd.Before(compClass.TimeBegin):
+		fallthrough
+	case compClass.TimeEnd.Sub(compClass.TimeBegin) > 12*time.Hour:
+		return errors.Errorf("%w: %w", domain.ErrInvalidData, __INTERNAL_errCompClassInvalid)
+	}
+
+	return nil
+}
+
+func (v CompClassValidator) IsValidationError(err error) bool {
+	return errors.Is(err, __INTERNAL_errCompClassInvalid)
 }

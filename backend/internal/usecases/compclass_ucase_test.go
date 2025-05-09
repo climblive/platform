@@ -119,61 +119,22 @@ func TestCreateCompClass(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
-	t.Run("InvalidData", func(t *testing.T) {
+	t.Run("ValidatorIsInvoked", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.OrganizerRole, nil)
 
-		mockedRepo.
-			On("StoreCompClass", mock.Anything, nil, mock.AnythingOfType("domain.CompClass")).
-			Return(domain.CompClass{}, nil)
-
 		ucase := usecases.CompClassUseCase{
 			Repo:       mockedRepo,
 			Authorizer: mockedAuthorizer,
 		}
 
-		validTemplate := func() domain.CompClassTemplate {
-			return domain.CompClassTemplate{
-				Name:        "Females",
-				Description: "Female climbers",
-				TimeBegin:   now,
-				TimeEnd:     now.Add(time.Hour),
-			}
-		}
+		_, err := ucase.CreateCompClass(context.Background(), fakedContestID, domain.CompClassTemplate{})
 
-		_, err := ucase.CreateCompClass(context.Background(), fakedContestID, validTemplate())
-
-		require.NoError(t, err)
-
-		t.Run("EmptyName", func(t *testing.T) {
-			tmpl := validTemplate()
-			tmpl.Name = ""
-
-			_, err := ucase.CreateCompClass(context.Background(), fakedContestID, tmpl)
-
-			assert.ErrorIs(t, err, domain.ErrInvalidData)
-		})
-
-		t.Run("TimeEndBeforeTimeBegin", func(t *testing.T) {
-			tmpl := validTemplate()
-			tmpl.TimeEnd = tmpl.TimeBegin.Add(-time.Nanosecond)
-
-			_, err := ucase.CreateCompClass(context.Background(), fakedContestID, tmpl)
-
-			assert.ErrorIs(t, err, domain.ErrInvalidData)
-		})
-
-		t.Run("TotalDurationExceedingTwelveHours", func(t *testing.T) {
-			tmpl := validTemplate()
-			tmpl.TimeEnd = tmpl.TimeBegin.Add(12*time.Hour + time.Nanosecond)
-
-			_, err := ucase.CreateCompClass(context.Background(), fakedContestID, tmpl)
-
-			assert.ErrorIs(t, err, domain.ErrInvalidData)
-		})
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, usecases.CompClassValidator{}.IsValidationError(err))
 
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
@@ -294,5 +255,55 @@ func TestDeleteCompClass(t *testing.T) {
 
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
+	})
+}
+
+func TestCompClassValidator(t *testing.T) {
+	now := time.Now()
+
+	validator := usecases.CompClassValidator{}
+
+	validCompClass := func() domain.CompClass {
+		return domain.CompClass{
+			Name:        "Females",
+			Description: "Female climbers",
+			TimeBegin:   now,
+			TimeEnd:     now.Add(time.Hour),
+		}
+	}
+
+	t.Run("ValidData", func(t *testing.T) {
+		err := validator.Validate(validCompClass())
+		assert.NoError(t, err)
+	})
+
+	t.Run("EmptyName", func(t *testing.T) {
+		compClass := validCompClass()
+		compClass.Name = ""
+
+		err := validator.Validate(compClass)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("TimeEndBeforeTimeBegin", func(t *testing.T) {
+		compClass := validCompClass()
+		compClass.TimeEnd = compClass.TimeBegin.Add(-time.Nanosecond)
+
+		err := validator.Validate(compClass)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("TotalDurationExceedingTwelveHours", func(t *testing.T) {
+		compClass := validCompClass()
+		compClass.TimeEnd = compClass.TimeBegin.Add(12*time.Hour + time.Nanosecond)
+
+		err := validator.Validate(compClass)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
 	})
 }
