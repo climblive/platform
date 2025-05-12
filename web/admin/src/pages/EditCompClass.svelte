@@ -1,22 +1,24 @@
 <script lang="ts">
   import CompClassForm from "@/forms/CompClassForm.svelte";
-  import type { CompClassTemplate } from "@climblive/lib/models";
-  import { createCompClassMutation } from "@climblive/lib/queries";
+  import type { CompClassPatch } from "@climblive/lib/models";
+  import {
+    getCompClassQuery,
+    patchCompClassMutation,
+  } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
-  import { add, roundToNearestHours } from "date-fns";
   import { navigate } from "svelte-routing";
   import * as z from "zod";
 
   const twelveHours = 12 * 60 * 60 * 1_000;
 
   interface Props {
-    contestId: number;
+    compClassId: number;
   }
 
-  let { contestId }: Props = $props();
+  let { compClassId }: Props = $props();
 
-  const formSchema: z.ZodType<CompClassTemplate> = z
+  const formSchema: z.ZodType<CompClassPatch> = z
     .object({
       name: z.string().min(1),
       description: z.string().optional(),
@@ -41,12 +43,16 @@
       }
     });
 
-  const createCompClass = createCompClassMutation(contestId);
+  const compClassQuery = getCompClassQuery(compClassId);
+  const patchCompClass = patchCompClassMutation(compClassId);
 
-  const handleSubmit = async (tmpl: CompClassTemplate) => {
-    $createCompClass.mutate(tmpl, {
-      onSuccess: () => navigate(`/admin/contests/${contestId}`),
-      onError: () => toastError("Failed to create class."),
+  const compClass = $derived($compClassQuery.data);
+
+  const handleSubmit = async (patch: CompClassPatch) => {
+    $patchCompClass.mutate(patch, {
+      onSuccess: (compClass) =>
+        navigate(`/admin/contests/${compClass.contestId}#comp-classes`),
+      onError: () => toastError("Failed to save comp class."),
     });
   };
 </script>
@@ -54,9 +60,7 @@
 <CompClassForm
   submit={handleSubmit}
   data={{
-    name: "Males",
-    timeBegin: roundToNearestHours(add(new Date(), { hours: 1 })),
-    timeEnd: roundToNearestHours(add(new Date(), { hours: 4 })),
+    ...compClass,
   }}
   schema={formSchema}
 >
@@ -70,9 +74,9 @@
     <sl-button
       size="small"
       type="submit"
-      loading={$createCompClass.isPending}
+      loading={$patchCompClass.isPending}
       variant="primary"
-      >Create
+      >Save
     </sl-button>
   </div>
 </CompClassForm>

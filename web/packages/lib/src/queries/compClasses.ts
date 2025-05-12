@@ -8,6 +8,15 @@ import { ApiClient } from "../Api";
 import type { CompClass, CompClassPatch, CompClassTemplate } from "../models";
 import { HOUR } from "./constants";
 
+export const getCompClassQuery = (compClassId: number) =>
+  createQuery({
+    queryKey: ["comp-class", { id: compClassId }],
+    queryFn: async () => ApiClient.getInstance().getCompClass(compClassId),
+    retry: false,
+    gcTime: 12 * HOUR,
+    staleTime: 12 * HOUR,
+  });
+
 export const getCompClassesQuery = (contestId: number) =>
   createQuery({
     queryKey: ["comp-classes", { contestId }],

@@ -207,6 +207,14 @@ export class ApiClient {
     });
   };
 
+  getCompClass = async (compClassId: number) => {
+    const endpoint = `/comp-classes/${compClassId}`;
+
+    const result = await this.axiosInstance.get(endpoint);
+
+    return compClassSchema.parse(result.data);
+  };
+
   getCompClasses = async (contestId: number) => {
     const endpoint = `/contests/${contestId}/comp-classes`;
 

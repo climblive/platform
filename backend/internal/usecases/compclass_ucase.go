@@ -24,6 +24,15 @@ type CompClassUseCase struct {
 	Authorizer domain.Authorizer
 }
 
+func (uc *CompClassUseCase) GetCompClass(ctx context.Context, compClassID domain.CompClassID) (domain.CompClass, error) {
+	compClass, err := uc.Repo.GetCompClass(ctx, nil, compClassID)
+	if err != nil {
+		return domain.CompClass{}, errors.Wrap(err, 0)
+	}
+
+	return compClass, nil
+}
+
 func (uc *CompClassUseCase) GetCompClassesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.CompClass, error) {
 	compClasses, err := uc.Repo.GetCompClassesByContest(ctx, nil, contestID)
 	if err != nil {
