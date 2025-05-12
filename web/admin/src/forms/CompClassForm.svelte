@@ -1,5 +1,6 @@
 <script lang="ts">
   import { GenericForm, name, value } from "@climblive/lib/forms";
+  import type { CompClass } from "@climblive/lib/models";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import { format } from "date-fns";
   import { type Snippet } from "svelte";
