@@ -50,8 +50,8 @@ export const patchCompClassMutation = (compClassId: number) => {
   const client = useQueryClient();
 
   return createMutation({
-    mutationFn: (template: CompClassPatch) =>
-      ApiClient.getInstance().patchCompClass(compClassId, template),
+    mutationFn: (patch: CompClassPatch) =>
+      ApiClient.getInstance().patchCompClass(compClassId, patch),
     onSuccess: (patchedCompClass) => {
       let queryKey: QueryKey = [
         "comp-classes",

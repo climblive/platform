@@ -13,7 +13,7 @@ type compClassUseCase interface {
 	CreateCompClass(ctx context.Context, contestID domain.ContestID, tmpl domain.CompClassTemplate) (domain.CompClass, error)
 	DeleteCompClass(ctx context.Context, compClassID domain.CompClassID) error
 	GetCompClass(ctx context.Context, compClassID domain.CompClassID) (domain.CompClass, error)
-	PatchCompClass(ctx context.Context, compClassID domain.CompClassID, tmpl domain.CompClassPatch) (domain.CompClass, error)
+	PatchCompClass(ctx context.Context, compClassID domain.CompClassID, patch domain.CompClassPatch) (domain.CompClass, error)
 }
 
 type compClassHandler struct {

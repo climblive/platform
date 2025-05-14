@@ -101,16 +101,13 @@ func (uc *CompClassUseCase) DeleteCompClass(ctx context.Context, compClassID dom
 }
 
 func (uc *CompClassUseCase) PatchCompClass(ctx context.Context, compClassID domain.CompClassID, patch domain.CompClassPatch) (domain.CompClass, error) {
-	var mty domain.CompClass
-
 	compClass, err := uc.Repo.GetCompClass(ctx, nil, compClassID)
 	if err != nil {
-		return mty, errors.Wrap(err, 0)
+		return domain.CompClass{}, errors.Wrap(err, 0)
 	}
 
-	_, err = uc.Authorizer.HasOwnership(ctx, compClass.Ownership)
-	if err != nil {
-		return mty, errors.Wrap(err, 0)
+	if _, err = uc.Authorizer.HasOwnership(ctx, compClass.Ownership); err != nil {
+		return domain.CompClass{}, errors.Wrap(err, 0)
 	}
 
 	if patch.Name.Present {
@@ -134,7 +131,7 @@ func (uc *CompClassUseCase) PatchCompClass(ctx context.Context, compClassID doma
 	}
 
 	if _, err = uc.Repo.StoreCompClass(ctx, nil, compClass); err != nil {
-		return mty, errors.Wrap(err, 0)
+		return domain.CompClass{}, errors.Wrap(err, 0)
 	}
 
 	return compClass, nil
