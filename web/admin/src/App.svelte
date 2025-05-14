@@ -13,6 +13,7 @@
   import CreateCompClass from "./pages/CreateCompClass.svelte";
   import CreateContest from "./pages/CreateContest.svelte";
   import CreateProblem from "./pages/CreateProblem.svelte";
+  import EditCompClass from "./pages/EditCompClass.svelte";
   import EditProblem from "./pages/EditProblem.svelte";
   import { exchangeCode, refreshSession } from "./utils/cognito";
 
@@ -114,6 +115,11 @@
           <Route path="/problems/:problemId/edit">
             {#snippet children({ params }: { params: { problemId: number } })}
               <EditProblem problemId={Number(params.problemId)} />
+            {/snippet}
+          </Route>
+          <Route path="/comp-classes/:compClassId/edit">
+            {#snippet children({ params }: { params: { compClassId: number } })}
+              <EditCompClass compClassId={Number(params.compClassId)} />
             {/snippet}
           </Route>
         </Router>

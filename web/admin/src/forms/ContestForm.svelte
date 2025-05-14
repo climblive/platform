@@ -1,11 +1,7 @@
-<script lang="ts">
-  import { GenericForm, name, value } from "@climblive/lib/forms";
-  import { type ContestTemplate } from "@climblive/lib/models";
-  import "@shoelace-style/shoelace/dist/components/input/input.js";
-  import { type Snippet } from "svelte";
+<script lang="ts" module>
   import * as z from "zod";
 
-  const formSchema: z.ZodType<ContestTemplate> = z.object({
+  const formSchema = z.object({
     location: z.string().optional(),
     seriesId: z.coerce.number().optional(),
     name: z.string().min(1),
@@ -15,6 +11,13 @@
     rules: z.string().optional(),
     gracePeriod: z.coerce.number().min(0).max(60),
   });
+</script>
+
+<script lang="ts">
+  import { GenericForm, name, value } from "@climblive/lib/forms";
+  import { type ContestTemplate } from "@climblive/lib/models";
+  import "@shoelace-style/shoelace/dist/components/input/input.js";
+  import { type Snippet } from "svelte";
 
   interface Props {
     data: Partial<ContestTemplate>;

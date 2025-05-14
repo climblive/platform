@@ -1,5 +1,5 @@
 <script lang="ts">
-  import CompClassForm from "@/forms/CompClassForm.svelte";
+  import CompClassForm, { formSchema } from "@/forms/CompClassForm.svelte";
   import type { CompClassTemplate } from "@climblive/lib/models";
   import { createCompClassMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
@@ -30,6 +30,7 @@
     timeBegin: roundToNearestHours(add(new Date(), { hours: 1 })),
     timeEnd: roundToNearestHours(add(new Date(), { hours: 4 })),
   }}
+  schema={formSchema}
 >
   <div class="controls">
     <sl-button

@@ -7,10 +7,43 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/usecases"
+	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
+
+func TestGetCompClass(t *testing.T) {
+	t.Parallel()
+
+	fakedCompClassID := randomResourceID[domain.CompClassID]()
+	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOwnership := domain.OwnershipData{
+		OrganizerID: fakedOrganizerID,
+	}
+
+	fakedCompClass := domain.CompClass{
+		ID:        fakedCompClassID,
+		Ownership: fakedOwnership,
+	}
+
+	mockedRepo := new(repositoryMock)
+
+	mockedRepo.
+		On("GetCompClass", mock.Anything, nil, fakedCompClassID).
+		Return(fakedCompClass, nil)
+
+	ucase := usecases.CompClassUseCase{
+		Repo: mockedRepo,
+	}
+
+	compClass, err := ucase.GetCompClass(context.Background(), fakedCompClassID)
+
+	require.NoError(t, err)
+	assert.Equal(t, fakedCompClass, compClass)
+
+	mockedRepo.AssertExpectations(t)
+}
 
 func TestGetCompClassesByContest(t *testing.T) {
 	t.Parallel()
@@ -119,61 +152,22 @@ func TestCreateCompClass(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
-	t.Run("InvalidData", func(t *testing.T) {
+	t.Run("ValidatorIsInvoked", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.OrganizerRole, nil)
 
-		mockedRepo.
-			On("StoreCompClass", mock.Anything, nil, mock.AnythingOfType("domain.CompClass")).
-			Return(domain.CompClass{}, nil)
-
 		ucase := usecases.CompClassUseCase{
 			Repo:       mockedRepo,
 			Authorizer: mockedAuthorizer,
 		}
 
-		validTemplate := func() domain.CompClassTemplate {
-			return domain.CompClassTemplate{
-				Name:        "Females",
-				Description: "Female climbers",
-				TimeBegin:   now,
-				TimeEnd:     now.Add(time.Hour),
-			}
-		}
+		_, err := ucase.CreateCompClass(context.Background(), fakedContestID, domain.CompClassTemplate{})
 
-		_, err := ucase.CreateCompClass(context.Background(), fakedContestID, validTemplate())
-
-		require.NoError(t, err)
-
-		t.Run("EmptyName", func(t *testing.T) {
-			tmpl := validTemplate()
-			tmpl.Name = ""
-
-			_, err := ucase.CreateCompClass(context.Background(), fakedContestID, tmpl)
-
-			assert.ErrorIs(t, err, domain.ErrInvalidData)
-		})
-
-		t.Run("TimeEndBeforeTimeBegin", func(t *testing.T) {
-			tmpl := validTemplate()
-			tmpl.TimeEnd = tmpl.TimeBegin.Add(-time.Nanosecond)
-
-			_, err := ucase.CreateCompClass(context.Background(), fakedContestID, tmpl)
-
-			assert.ErrorIs(t, err, domain.ErrInvalidData)
-		})
-
-		t.Run("TotalDurationExceedingTwelveHours", func(t *testing.T) {
-			tmpl := validTemplate()
-			tmpl.TimeEnd = tmpl.TimeBegin.Add(12*time.Hour + time.Nanosecond)
-
-			_, err := ucase.CreateCompClass(context.Background(), fakedContestID, tmpl)
-
-			assert.ErrorIs(t, err, domain.ErrInvalidData)
-		})
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validators.CompClassValidator{}.IsValidationError(err))
 
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)

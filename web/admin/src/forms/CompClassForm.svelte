@@ -1,14 +1,9 @@
-<script lang="ts">
-  import { GenericForm, name, value } from "@climblive/lib/forms";
-  import { type CompClassTemplate } from "@climblive/lib/models";
-  import "@shoelace-style/shoelace/dist/components/input/input.js";
-  import { format } from "date-fns";
-  import { type Snippet } from "svelte";
+<script lang="ts" module>
   import * as z from "zod";
 
   const twelveHours = 12 * 60 * 60 * 1_000;
 
-  const formSchema: z.ZodType<CompClassTemplate> = z
+  export const formSchema = z
     .object({
       name: z.string().min(1),
       description: z.string().optional(),
@@ -32,17 +27,28 @@
         });
       }
     });
+</script>
+
+<script lang="ts">
+  import { GenericForm, name, value } from "@climblive/lib/forms";
+  import type { CompClass } from "@climblive/lib/models";
+  import "@shoelace-style/shoelace/dist/components/input/input.js";
+  import { format } from "date-fns";
+  import { type Snippet } from "svelte";
+
+  type T = $$Generic<Partial<CompClass>>;
 
   interface Props {
-    data: Partial<CompClassTemplate>;
-    submit: (value: CompClassTemplate) => void;
+    data: Partial<T>;
+    schema: z.ZodType<T, z.ZodTypeDef, T>;
+    submit: (value: T) => void;
     children?: Snippet;
   }
 
-  let { data, submit, children }: Props = $props();
+  let { data, schema, submit, children }: Props = $props();
 </script>
 
-<GenericForm schema={formSchema} {submit}>
+<GenericForm {schema} {submit}>
   <fieldset>
     <sl-input
       size="small"
