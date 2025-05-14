@@ -2,9 +2,9 @@ package usecases
 
 import (
 	"context"
-	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/go-errors/errors"
 )
 
@@ -61,7 +61,7 @@ func (uc *CompClassUseCase) CreateCompClass(ctx context.Context, contestID domai
 		TimeEnd:     tmpl.TimeEnd,
 	}
 
-	if err := (CompClassValidator{}).Validate(compClass); err != nil {
+	if err := (validators.CompClassValidator{}).Validate(compClass); err != nil {
 		return domain.CompClass{}, errors.Wrap(err, 0)
 	}
 
@@ -126,7 +126,7 @@ func (uc *CompClassUseCase) PatchCompClass(ctx context.Context, compClassID doma
 		compClass.TimeEnd = patch.TimeEnd.Value
 	}
 
-	if err := (CompClassValidator{}).Validate(compClass); err != nil {
+	if err := (validators.CompClassValidator{}).Validate(compClass); err != nil {
 		return domain.CompClass{}, errors.Wrap(err, 0)
 	}
 
@@ -135,26 +135,4 @@ func (uc *CompClassUseCase) PatchCompClass(ctx context.Context, compClassID doma
 	}
 
 	return compClass, nil
-}
-
-var __INTERNAL_errCompClassInvalid = errors.New("")
-
-type CompClassValidator struct {
-}
-
-func (v CompClassValidator) Validate(compClass domain.CompClass) error {
-	switch {
-	case len(compClass.Name) < 1:
-		fallthrough
-	case compClass.TimeEnd.Before(compClass.TimeBegin):
-		fallthrough
-	case compClass.TimeEnd.Sub(compClass.TimeBegin) > 12*time.Hour:
-		return errors.Errorf("%w: %w", domain.ErrInvalidData, __INTERNAL_errCompClassInvalid)
-	}
-
-	return nil
-}
-
-func (v CompClassValidator) IsValidationError(err error) bool {
-	return errors.Is(err, __INTERNAL_errCompClassInvalid)
 }

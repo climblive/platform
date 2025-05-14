@@ -7,6 +7,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/usecases"
+	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -134,7 +135,7 @@ func TestCreateCompClass(t *testing.T) {
 		_, err := ucase.CreateCompClass(context.Background(), fakedContestID, domain.CompClassTemplate{})
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
-		assert.True(t, usecases.CompClassValidator{}.IsValidationError(err))
+		assert.True(t, validators.CompClassValidator{}.IsValidationError(err))
 
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
@@ -255,55 +256,5 @@ func TestDeleteCompClass(t *testing.T) {
 
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
-	})
-}
-
-func TestCompClassValidator(t *testing.T) {
-	now := time.Now()
-
-	validator := usecases.CompClassValidator{}
-
-	validCompClass := func() domain.CompClass {
-		return domain.CompClass{
-			Name:        "Females",
-			Description: "Female climbers",
-			TimeBegin:   now,
-			TimeEnd:     now.Add(time.Hour),
-		}
-	}
-
-	t.Run("ValidData", func(t *testing.T) {
-		err := validator.Validate(validCompClass())
-		assert.NoError(t, err)
-	})
-
-	t.Run("EmptyName", func(t *testing.T) {
-		compClass := validCompClass()
-		compClass.Name = ""
-
-		err := validator.Validate(compClass)
-
-		assert.ErrorIs(t, err, domain.ErrInvalidData)
-		assert.True(t, validator.IsValidationError(err))
-	})
-
-	t.Run("TimeEndBeforeTimeBegin", func(t *testing.T) {
-		compClass := validCompClass()
-		compClass.TimeEnd = compClass.TimeBegin.Add(-time.Nanosecond)
-
-		err := validator.Validate(compClass)
-
-		assert.ErrorIs(t, err, domain.ErrInvalidData)
-		assert.True(t, validator.IsValidationError(err))
-	})
-
-	t.Run("TotalDurationExceedingTwelveHours", func(t *testing.T) {
-		compClass := validCompClass()
-		compClass.TimeEnd = compClass.TimeBegin.Add(12*time.Hour + time.Nanosecond)
-
-		err := validator.Validate(compClass)
-
-		assert.ErrorIs(t, err, domain.ErrInvalidData)
-		assert.True(t, validator.IsValidationError(err))
 	})
 }
