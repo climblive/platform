@@ -13,6 +13,38 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestGetCompClass(t *testing.T) {
+	t.Parallel()
+
+	fakedCompClassID := randomResourceID[domain.CompClassID]()
+	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOwnership := domain.OwnershipData{
+		OrganizerID: fakedOrganizerID,
+	}
+
+	fakedCompClass := domain.CompClass{
+		ID:        fakedCompClassID,
+		Ownership: fakedOwnership,
+	}
+
+	mockedRepo := new(repositoryMock)
+
+	mockedRepo.
+		On("GetCompClass", mock.Anything, nil, fakedCompClassID).
+		Return(fakedCompClass, nil)
+
+	ucase := usecases.CompClassUseCase{
+		Repo: mockedRepo,
+	}
+
+	compClass, err := ucase.GetCompClass(context.Background(), fakedCompClassID)
+
+	require.NoError(t, err)
+	assert.Equal(t, fakedCompClass, compClass)
+
+	mockedRepo.AssertExpectations(t)
+}
+
 func TestGetCompClassesByContest(t *testing.T) {
 	t.Parallel()
 
