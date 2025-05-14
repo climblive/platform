@@ -1,10 +1,40 @@
+<script lang="ts" module>
+  import * as z from "zod";
+
+  const twelveHours = 12 * 60 * 60 * 1_000;
+
+  export const formSchema = z
+    .object({
+      name: z.string().min(1),
+      description: z.string().optional(),
+      timeBegin: z.coerce.date(),
+      timeEnd: z.coerce.date(),
+    })
+    .superRefine((data, ctx) => {
+      if (data.timeEnd.getTime() - data.timeBegin.getTime() > twelveHours) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Total duration must not exceed 12 hours",
+          path: ["timeEnd"],
+        });
+      }
+
+      if (data.timeEnd <= data.timeBegin) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Time must follow chronological order",
+          path: ["timeEnd"],
+        });
+      }
+    });
+</script>
+
 <script lang="ts">
   import { GenericForm, name, value } from "@climblive/lib/forms";
   import type { CompClass } from "@climblive/lib/models";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import { format } from "date-fns";
   import { type Snippet } from "svelte";
-  import * as z from "zod";
 
   type T = $$Generic<Partial<CompClass>>;
 
