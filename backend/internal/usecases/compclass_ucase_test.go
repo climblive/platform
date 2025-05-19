@@ -387,7 +387,7 @@ func TestPatchCompClass(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
-	t.Run("ValidationFails", func(t *testing.T) {
+	t.Run("ValidatorIsInvoked", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 
 		mockedAuthorizer.
