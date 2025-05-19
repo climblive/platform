@@ -232,3 +232,12 @@ VALUES
 SELECT *
 FROM organizer
 WHERE id = ?;
+
+-- name: UpsertRaffle :execlastid
+INSERT INTO
+    raffle (id, organizer_id, contest_id)
+VALUES
+    (?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    organizer_id = VALUES(organizer_id),
+    contest_id = VALUES(contest_id);
