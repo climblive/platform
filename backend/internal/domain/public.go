@@ -23,6 +23,13 @@ type CompClassTemplate struct {
 	TimeEnd     time.Time `json:"timeEnd"`
 }
 
+type CompClassPatch struct {
+	Name        Patch[string]    `json:"name,omitempty" tstype:"string"`
+	Description Patch[string]    `json:"description,omitempty" tstype:"string"`
+	TimeBegin   Patch[time.Time] `json:"timeBegin,omitempty" tstype:"Date"`
+	TimeEnd     Patch[time.Time] `json:"timeEnd,omitempty" tstype:"Date"`
+}
+
 type Contender struct {
 	ID                  ContenderID   `json:"id"`
 	Ownership           OwnershipData `json:"-"`

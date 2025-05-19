@@ -1,10 +1,23 @@
+<script lang="ts" module>
+  import * as z from "zod";
+
+  export const formSchema = z.object({
+    number: z.coerce.number(),
+    holdColorPrimary: z.string().regex(/^#([0-9a-fA-F]{3}){1,2}$/),
+    holdColorSecondary: z.string().optional(),
+    description: z.string().optional(),
+    pointsTop: z.coerce.number(),
+    pointsZone: z.coerce.number(),
+    flashBonus: z.coerce.number().optional(),
+  });
+</script>
+
 <script lang="ts">
   import { GenericForm, name, value } from "@climblive/lib/forms";
   import { type Problem } from "@climblive/lib/models";
   import "@shoelace-style/shoelace/dist/components/color-picker/color-picker.js";
   import "@shoelace-style/shoelace/dist/components/input/input.js";
   import { type Snippet } from "svelte";
-  import * as z from "zod";
 
   type T = $$Generic<Partial<Problem>>;
 

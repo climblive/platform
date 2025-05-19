@@ -1,27 +1,16 @@
 <script lang="ts">
-  import ProblemForm from "@/forms/ProblemForm.svelte";
+  import ProblemForm, { formSchema } from "@/forms/ProblemForm.svelte";
   import type { ProblemTemplate } from "@climblive/lib/models";
   import { createProblemMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { navigate } from "svelte-routing";
-  import * as z from "zod";
 
   interface Props {
     contestId: number;
   }
 
   let { contestId }: Props = $props();
-
-  const formSchema: z.ZodType<ProblemTemplate> = z.object({
-    number: z.coerce.number(),
-    holdColorPrimary: z.string().regex(/^#([0-9a-fA-F]{3}){1,2}$/),
-    holdColorSecondary: z.string().optional(),
-    description: z.string().optional(),
-    pointsTop: z.coerce.number(),
-    pointsZone: z.coerce.number(),
-    flashBonus: z.coerce.number().optional(),
-  });
 
   const createProblem = createProblemMutation(contestId);
 

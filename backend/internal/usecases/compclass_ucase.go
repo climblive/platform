@@ -2,9 +2,9 @@ package usecases
 
 import (
 	"context"
-	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/go-errors/errors"
 )
 
@@ -22,6 +22,15 @@ type compClassUseCaseRepository interface {
 type CompClassUseCase struct {
 	Repo       compClassUseCaseRepository
 	Authorizer domain.Authorizer
+}
+
+func (uc *CompClassUseCase) GetCompClass(ctx context.Context, compClassID domain.CompClassID) (domain.CompClass, error) {
+	compClass, err := uc.Repo.GetCompClass(ctx, nil, compClassID)
+	if err != nil {
+		return domain.CompClass{}, errors.Wrap(err, 0)
+	}
+
+	return compClass, nil
 }
 
 func (uc *CompClassUseCase) GetCompClassesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.CompClass, error) {
@@ -43,15 +52,6 @@ func (uc *CompClassUseCase) CreateCompClass(ctx context.Context, contestID domai
 		return domain.CompClass{}, errors.Wrap(err, 0)
 	}
 
-	switch {
-	case len(tmpl.Name) < 1:
-		fallthrough
-	case tmpl.TimeEnd.Before(tmpl.TimeBegin):
-		fallthrough
-	case tmpl.TimeEnd.Sub(tmpl.TimeBegin) > 12*time.Hour:
-		return domain.CompClass{}, errors.Wrap(domain.ErrInvalidData, 0)
-	}
-
 	compClass := domain.CompClass{
 		Ownership:   contest.Ownership,
 		ContestID:   contestID,
@@ -59,6 +59,10 @@ func (uc *CompClassUseCase) CreateCompClass(ctx context.Context, contestID domai
 		Description: tmpl.Description,
 		TimeBegin:   tmpl.TimeBegin,
 		TimeEnd:     tmpl.TimeEnd,
+	}
+
+	if err := (validators.CompClassValidator{}).Validate(compClass); err != nil {
+		return domain.CompClass{}, errors.Wrap(err, 0)
 	}
 
 	createdCompClass, err := uc.Repo.StoreCompClass(ctx, nil, compClass)
@@ -94,4 +98,41 @@ func (uc *CompClassUseCase) DeleteCompClass(ctx context.Context, compClassID dom
 	}
 
 	return nil
+}
+
+func (uc *CompClassUseCase) PatchCompClass(ctx context.Context, compClassID domain.CompClassID, patch domain.CompClassPatch) (domain.CompClass, error) {
+	compClass, err := uc.Repo.GetCompClass(ctx, nil, compClassID)
+	if err != nil {
+		return domain.CompClass{}, errors.Wrap(err, 0)
+	}
+
+	if _, err = uc.Authorizer.HasOwnership(ctx, compClass.Ownership); err != nil {
+		return domain.CompClass{}, errors.Wrap(err, 0)
+	}
+
+	if patch.Name.Present {
+		compClass.Name = patch.Name.Value
+	}
+
+	if patch.Description.Present {
+		compClass.Description = patch.Description.Value
+	}
+
+	if patch.TimeBegin.Present {
+		compClass.TimeBegin = patch.TimeBegin.Value
+	}
+
+	if patch.TimeEnd.Present {
+		compClass.TimeEnd = patch.TimeEnd.Value
+	}
+
+	if err := (validators.CompClassValidator{}).Validate(compClass); err != nil {
+		return domain.CompClass{}, errors.Wrap(err, 0)
+	}
+
+	if _, err = uc.Repo.StoreCompClass(ctx, nil, compClass); err != nil {
+		return domain.CompClass{}, errors.Wrap(err, 0)
+	}
+
+	return compClass, nil
 }
