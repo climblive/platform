@@ -290,3 +290,121 @@ func TestDeleteCompClass(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 }
+func TestPatchCompClass(t *testing.T) {
+	t.Parallel()
+
+	fakedCompClassID := randomResourceID[domain.CompClassID]()
+	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOwnership := domain.OwnershipData{
+		OrganizerID: fakedOrganizerID,
+	}
+
+	now := time.Now()
+
+	makeMocks := func() (*repositoryMock, *authorizerMock) {
+		mockedRepo := new(repositoryMock)
+
+		mockedRepo.
+			On("GetCompClass", mock.Anything, nil, fakedCompClassID).
+			Return(domain.CompClass{
+				ID:        fakedCompClassID,
+				Ownership: fakedOwnership,
+			}, nil)
+
+		mockedAuthorizer := new(authorizerMock)
+
+		return mockedRepo, mockedAuthorizer
+	}
+
+	t.Run("HappyCase", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		mockedRepo.
+			On("StoreCompClass", mock.Anything, nil,
+				domain.CompClass{
+					ID:          fakedCompClassID,
+					Ownership:   fakedOwnership,
+					Name:        "Females",
+					Description: "Female climbers",
+					TimeBegin:   now,
+					TimeEnd:     now.Add(time.Hour),
+				},
+			).
+			Return(domain.CompClass{
+				ID:          fakedCompClassID,
+				Ownership:   fakedOwnership,
+				Name:        "Females",
+				Description: "Female climbers",
+				TimeBegin:   now,
+				TimeEnd:     now.Add(time.Hour),
+			}, nil)
+
+		ucase := usecases.CompClassUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		patch := domain.CompClassPatch{
+			Name:        domain.NewPatch("Females"),
+			Description: domain.NewPatch("Female climbers"),
+			TimeBegin:   domain.NewPatch(now),
+			TimeEnd:     domain.NewPatch(now.Add(time.Hour)),
+		}
+
+		compClass, err := ucase.PatchCompClass(context.Background(), fakedCompClassID, patch)
+
+		require.NoError(t, err)
+		assert.Equal(t, "Females", compClass.Name)
+		assert.Equal(t, "Female climbers", compClass.Description)
+		assert.Equal(t, now, compClass.TimeBegin)
+		assert.Equal(t, now.Add(time.Hour), compClass.TimeEnd)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		ucase := usecases.CompClassUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.PatchCompClass(context.Background(), fakedCompClassID, domain.CompClassPatch{})
+
+		assert.ErrorIs(t, err, domain.ErrNoOwnership)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("ValidationFails", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		ucase := usecases.CompClassUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.PatchCompClass(context.Background(), fakedCompClassID, domain.CompClassPatch{})
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validators.CompClassValidator{}.IsValidationError(err))
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+}
