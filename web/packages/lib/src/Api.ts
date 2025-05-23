@@ -11,12 +11,14 @@ import {
   type ContestTemplate,
   type ProblemPatch,
   type ProblemTemplate,
+  type RaffleTemplate,
   type ScoreEngineInstanceID,
   type Tick,
 } from "./models";
 import { compClassSchema } from "./models/compClass";
 import { contenderSchema } from "./models/contender";
 import { problemSchema } from "./models/problem";
+import { raffleSchema } from "./models/raffle";
 import type {
   CreateContendersArguments,
   StartScoreEngineArguments,
@@ -319,5 +321,15 @@ export class ApiClient {
     await this.axiosInstance.delete(endpoint, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
+  };
+
+  createRaffle = async (contestId: number, template: RaffleTemplate) => {
+    const endpoint = `/contests/${contestId}/raffles`;
+
+    const result = await this.axiosInstance.post(endpoint, template, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return raffleSchema.parse(result.data);
   };
 }

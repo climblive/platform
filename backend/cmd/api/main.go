@@ -198,6 +198,11 @@ func setupMux(
 		ScoreEngineManager: scoreEngineManager,
 	}
 
+	raffleUseCase := usecases.RaffleUseCase{
+		Repo:       repo,
+		Authorizer: authorizer,
+	}
+
 	mux := rest.NewMux()
 	mux.RegisterMiddleware(rest.CORS)
 	mux.RegisterMiddleware(authorizer.Middleware)
@@ -211,6 +216,7 @@ func setupMux(
 	rest.InstallTickHandler(mux, &tickUseCase)
 	rest.InstallEventHandler(mux, eventBroker, 10*time.Second)
 	rest.InstallScoreEngineHandler(mux, &scoreEngineUseCase)
+	rest.InstallRaffleHandler(mux, &raffleUseCase)
 
 	return mux
 }

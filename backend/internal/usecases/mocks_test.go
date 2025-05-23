@@ -188,6 +188,11 @@ func (m *repositoryMock) GetOrganizer(ctx context.Context, tx domain.Transaction
 	return args.Get(0).(domain.Organizer), args.Error(1)
 }
 
+func (m *repositoryMock) StoreRaffle(ctx context.Context, tx domain.Transaction, raffle domain.Raffle) (domain.Raffle, error) {
+	args := m.Called(ctx, tx, raffle)
+	return args.Get(0).(domain.Raffle), args.Error(1)
+}
+
 type authorizerMock struct {
 	mock.Mock
 }
