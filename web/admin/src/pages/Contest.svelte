@@ -52,15 +52,10 @@
   };
 
   const handleCreateRaffle = () => {
-    $createRaffle.mutate(
-      {
-        contestId,
-      },
-      {
-        onSuccess: (raffle: Raffle) => navigate(`/admin/raffles/${raffle.id}`),
-        onError: () => toastError("Failed to create raffle."),
-      },
-    );
+    $createRaffle.mutate(undefined, {
+      onSuccess: (raffle: Raffle) => navigate(`/admin/raffles/${raffle.id}`),
+      onError: () => toastError("Failed to create raffle."),
+    });
   };
 </script>
 

@@ -11,7 +11,6 @@ import {
   type ContestTemplate,
   type ProblemPatch,
   type ProblemTemplate,
-  type RaffleTemplate,
   type ScoreEngineInstanceID,
   type Tick,
 } from "./models";
@@ -323,10 +322,10 @@ export class ApiClient {
     });
   };
 
-  createRaffle = async (contestId: number, template: RaffleTemplate) => {
+  createRaffle = async (contestId: number) => {
     const endpoint = `/contests/${contestId}/raffles`;
 
-    const result = await this.axiosInstance.post(endpoint, template, {
+    const result = await this.axiosInstance.post(endpoint, undefined, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 

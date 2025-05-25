@@ -2,14 +2,13 @@ package rest
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/domain"
 )
 
 type raffleUseCase interface {
-	CreateRaffle(ctx context.Context, contestID domain.ContestID, tmpl domain.RaffleTemplate) (domain.Raffle, error)
+	CreateRaffle(ctx context.Context, contestID domain.ContestID) (domain.Raffle, error)
 }
 
 type raffleHandler struct {
@@ -31,14 +30,7 @@ func (hdlr *raffleHandler) CreateRaffle(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	var tmpl domain.RaffleTemplate
-	err = json.NewDecoder(r.Body).Decode(&tmpl)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	createdRaffle, err := hdlr.raffleUseCase.CreateRaffle(r.Context(), contestID, tmpl)
+	createdRaffle, err := hdlr.raffleUseCase.CreateRaffle(r.Context(), contestID)
 	if err != nil {
 		handleError(w, err)
 		return

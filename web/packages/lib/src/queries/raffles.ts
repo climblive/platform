@@ -4,14 +4,13 @@ import {
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import type { Raffle, RaffleTemplate } from "../models";
+import type { Raffle } from "../models";
 
 export const createRaffleMutation = (contestId: number) => {
   const client = useQueryClient();
 
   return createMutation({
-    mutationFn: (template: RaffleTemplate) =>
-      ApiClient.getInstance().createRaffle(contestId, template),
+    mutationFn: () => ApiClient.getInstance().createRaffle(contestId),
     onSuccess: (newRaffle) => {
       let queryKey: QueryKey = ["raffles", { contestId }];
 

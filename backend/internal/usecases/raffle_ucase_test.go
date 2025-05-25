@@ -37,8 +37,6 @@ func TestCreateRaffle(t *testing.T) {
 	t.Run("HappyCase", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 
-		mockedEventBroker := new(eventBrokerMock)
-
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.OrganizerRole, nil)
@@ -62,18 +60,15 @@ func TestCreateRaffle(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		problem, err := ucase.CreateRaffle(context.Background(), fakedContestID, domain.RaffleTemplate{
-			ContestID: fakedContestID,
-		})
+		raffle, err := ucase.CreateRaffle(context.Background(), fakedContestID)
 
 		require.NoError(t, err)
-		assert.Equal(t, fakedRaffleID, problem.ID)
-		assert.Equal(t, fakedOwnership, problem.Ownership)
-		assert.Equal(t, fakedContestID, problem.ContestID)
+		assert.Equal(t, fakedRaffleID, raffle.ID)
+		assert.Equal(t, fakedOwnership, raffle.Ownership)
+		assert.Equal(t, fakedContestID, raffle.ContestID)
 
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
-		mockedEventBroker.AssertExpectations(t)
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {
@@ -88,7 +83,7 @@ func TestCreateRaffle(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		_, err := ucase.CreateRaffle(context.Background(), fakedContestID, domain.RaffleTemplate{})
+		_, err := ucase.CreateRaffle(context.Background(), fakedContestID)
 
 		require.ErrorIs(t, err, domain.ErrNoOwnership)
 

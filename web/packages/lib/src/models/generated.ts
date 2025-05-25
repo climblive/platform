@@ -133,9 +133,6 @@ export interface Raffle {
   id: RaffleID;
   contestId: ContestID;
 }
-export interface RaffleTemplate {
-  contestId: ContestID;
-}
 export interface RaffleWinner {
   id: RaffleWinnerID;
   raffleId: RaffleID;

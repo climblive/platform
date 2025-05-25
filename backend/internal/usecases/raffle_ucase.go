@@ -19,7 +19,7 @@ type RaffleUseCase struct {
 	Repo       raffleUseCaseRepository
 }
 
-func (uc *RaffleUseCase) CreateRaffle(ctx context.Context, contestID domain.ContestID, tmpl domain.RaffleTemplate) (domain.Raffle, error) {
+func (uc *RaffleUseCase) CreateRaffle(ctx context.Context, contestID domain.ContestID) (domain.Raffle, error) {
 	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
 	if err != nil {
 		return domain.Raffle{}, errors.Wrap(err, 0)
