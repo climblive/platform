@@ -124,7 +124,6 @@ type Raffle struct {
 	ID        RaffleID      `json:"id"`
 	Ownership OwnershipData `json:"-"`
 	ContestID ContestID     `json:"contestId"`
-	Active    bool          `json:"active"`
 }
 
 type RaffleWinner struct {

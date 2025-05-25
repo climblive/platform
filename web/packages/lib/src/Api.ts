@@ -17,6 +17,7 @@ import {
 import { compClassSchema } from "./models/compClass";
 import { contenderSchema } from "./models/contender";
 import { problemSchema } from "./models/problem";
+import { raffleSchema } from "./models/raffle";
 import type {
   CreateContendersArguments,
   StartScoreEngineArguments,
@@ -319,5 +320,15 @@ export class ApiClient {
     await this.axiosInstance.delete(endpoint, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
+  };
+
+  createRaffle = async (contestId: number) => {
+    const endpoint = `/contests/${contestId}/raffles`;
+
+    const result = await this.axiosInstance.post(endpoint, undefined, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return raffleSchema.parse(result.data);
   };
 }

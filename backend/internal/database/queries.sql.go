@@ -1063,6 +1063,30 @@ func (q *Queries) UpsertProblem(ctx context.Context, arg UpsertProblemParams) (i
 	return result.LastInsertId()
 }
 
+const upsertRaffle = `-- name: UpsertRaffle :execlastid
+INSERT INTO
+    raffle (id, organizer_id, contest_id)
+VALUES
+    (?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    organizer_id = VALUES(organizer_id),
+    contest_id = VALUES(contest_id)
+`
+
+type UpsertRaffleParams struct {
+	ID          int32
+	OrganizerID int32
+	ContestID   int32
+}
+
+func (q *Queries) UpsertRaffle(ctx context.Context, arg UpsertRaffleParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, upsertRaffle, arg.ID, arg.OrganizerID, arg.ContestID)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
+}
+
 const upsertScore = `-- name: UpsertScore :exec
 INSERT INTO
     score (contender_id, timestamp, score, placement, finalist, rank_order)

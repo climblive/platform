@@ -132,7 +132,6 @@ export interface ProblemPatch {
 export interface Raffle {
   id: RaffleID;
   contestId: ContestID;
-  active: boolean;
 }
 export interface RaffleWinner {
   id: RaffleWinnerID;
