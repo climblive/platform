@@ -1,10 +1,13 @@
 <script lang="ts">
+  import type { Raffle } from "@climblive/lib/models";
   import {
+    createRaffleMutation,
     getContestQuery,
     getScoreEnginesQuery,
     startScoreEngineMutation,
     stopScoreEngineMutation,
   } from "@climblive/lib/queries";
+  import { toastError } from "@climblive/lib/utils";
   import type { SlTabShowEvent } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import type SlTabGroup from "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
@@ -28,6 +31,7 @@
   const scoreEnginesQuery = getScoreEnginesQuery(contestId);
   const startScoreEngine = startScoreEngineMutation(contestId);
   const stopScoreEngine = stopScoreEngineMutation();
+  const createRaffle = createRaffleMutation(contestId);
 
   let contest = $derived($contestQuery.data);
   let scoreEngines = $derived($scoreEnginesQuery.data);
@@ -46,6 +50,18 @@
       window.location.hash = name;
     }
   };
+
+  const handleCreateRaffle = () => {
+    $createRaffle.mutate(
+      {
+        contestId,
+      },
+      {
+        onSuccess: (raffle: Raffle) => navigate(`/admin/raffles/${raffle.id}`),
+        onError: () => toastError("Failed to create raffle."),
+      },
+    );
+  };
 </script>
 
 <main>
@@ -58,6 +74,7 @@
       <sl-tab slot="nav" panel="contest">Contest</sl-tab>
       <sl-tab slot="nav" panel="contenders">Contenders</sl-tab>
       <sl-tab slot="nav" panel="problems">Problems</sl-tab>
+      <sl-tab slot="nav" panel="raffles">Raffles</sl-tab>
 
       <sl-tab-panel name="contest">
         <h2>Score Engines</h2>
@@ -102,6 +119,13 @@
       <sl-tab-panel name="contenders">
         <h2>Contenders</h2>
         <ContenderList {contestId} />
+      </sl-tab-panel>
+
+      <sl-tab-panel name="raffles">
+        <h2>Raffles</h2>
+        <sl-button variant="primary" onclick={handleCreateRaffle}
+          >Create</sl-button
+        >
       </sl-tab-panel>
     </sl-tab-group>
   {/if}
