@@ -13,12 +13,14 @@
   let raffle = $derived($raffleQuery.data);
 </script>
 
-<section>
-  <h1>Raffle {raffleId}</h1>
-  <sl-button variant="primary" onclick={() => alert("Not implemented.")}
-    >Draw winner</sl-button
-  >
-</section>
+{#if raffle}
+  <section>
+    <h1>Raffle {raffle.id}</h1>
+    <sl-button variant="primary" onclick={() => alert("Not implemented.")}
+      >Draw winner</sl-button
+    >
+  </section>
+{/if}
 
 <style>
   section {
