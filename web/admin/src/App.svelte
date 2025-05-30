@@ -15,6 +15,7 @@
   import CreateProblem from "./pages/CreateProblem.svelte";
   import EditCompClass from "./pages/EditCompClass.svelte";
   import EditProblem from "./pages/EditProblem.svelte";
+  import RaffleView from "./pages/RaffleView.svelte";
   import { exchangeCode, refreshSession } from "./utils/cognito";
 
   setBasePath("/shoelace");
@@ -120,6 +121,11 @@
           <Route path="/comp-classes/:compClassId/edit">
             {#snippet children({ params }: { params: { compClassId: number } })}
               <EditCompClass compClassId={Number(params.compClassId)} />
+            {/snippet}
+          </Route>
+          <Route path="/raffles/:raffleId">
+            {#snippet children({ params }: { params: { raffleId: number } })}
+              <RaffleView raffleId={Number(params.raffleId)} />
             {/snippet}
           </Route>
         </Router>

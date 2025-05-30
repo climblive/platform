@@ -142,6 +142,16 @@ func organizerToDomain(record database.Organizer) domain.Organizer {
 	}
 }
 
+func raffleToDomain(record database.Raffle) domain.Raffle {
+	return domain.Raffle{
+		ID: domain.RaffleID(record.ID),
+		Ownership: domain.OwnershipData{
+			OrganizerID: domain.OrganizerID(record.OrganizerID),
+		},
+		ContestID: domain.ContestID(record.ContestID),
+	}
+}
+
 func makeNullString(value string) sql.NullString {
 	if value == "" {
 		return sql.NullString{}

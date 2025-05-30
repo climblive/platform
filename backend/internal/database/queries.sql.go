@@ -625,6 +625,66 @@ func (q *Queries) GetProblemsByContest(ctx context.Context, contestID int32) ([]
 	return items, nil
 }
 
+const getRaffle = `-- name: GetRaffle :one
+SELECT raffle.id, raffle.organizer_id, raffle.contest_id, raffle.active
+FROM raffle
+WHERE id = ?
+`
+
+type GetRaffleRow struct {
+	Raffle Raffle
+}
+
+func (q *Queries) GetRaffle(ctx context.Context, id int32) (GetRaffleRow, error) {
+	row := q.db.QueryRowContext(ctx, getRaffle, id)
+	var i GetRaffleRow
+	err := row.Scan(
+		&i.Raffle.ID,
+		&i.Raffle.OrganizerID,
+		&i.Raffle.ContestID,
+		&i.Raffle.Active,
+	)
+	return i, err
+}
+
+const getRafflesByContest = `-- name: GetRafflesByContest :many
+SELECT raffle.id, raffle.organizer_id, raffle.contest_id, raffle.active
+FROM raffle
+WHERE contest_id = ?
+`
+
+type GetRafflesByContestRow struct {
+	Raffle Raffle
+}
+
+func (q *Queries) GetRafflesByContest(ctx context.Context, contestID int32) ([]GetRafflesByContestRow, error) {
+	rows, err := q.db.QueryContext(ctx, getRafflesByContest, contestID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetRafflesByContestRow
+	for rows.Next() {
+		var i GetRafflesByContestRow
+		if err := rows.Scan(
+			&i.Raffle.ID,
+			&i.Raffle.OrganizerID,
+			&i.Raffle.ContestID,
+			&i.Raffle.Active,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getTick = `-- name: GetTick :one
 SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.flash, tick.timestamp
 FROM tick

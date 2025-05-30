@@ -1,13 +1,10 @@
 <script lang="ts">
-  import type { Raffle } from "@climblive/lib/models";
   import {
-    createRaffleMutation,
     getContestQuery,
     getScoreEnginesQuery,
     startScoreEngineMutation,
     stopScoreEngineMutation,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
   import type { SlTabShowEvent } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import type SlTabGroup from "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
@@ -18,6 +15,7 @@
   import CompClassList from "./CompClassList.svelte";
   import ContenderList from "./ContenderList.svelte";
   import ProblemList from "./ProblemList.svelte";
+  import RaffleList from "./RaffleList.svelte";
 
   interface Props {
     contestId: number;
@@ -31,7 +29,6 @@
   const scoreEnginesQuery = getScoreEnginesQuery(contestId);
   const startScoreEngine = startScoreEngineMutation(contestId);
   const stopScoreEngine = stopScoreEngineMutation();
-  const createRaffle = createRaffleMutation(contestId);
 
   let contest = $derived($contestQuery.data);
   let scoreEngines = $derived($scoreEnginesQuery.data);
@@ -49,13 +46,6 @@
     if (name) {
       window.location.hash = name;
     }
-  };
-
-  const handleCreateRaffle = () => {
-    $createRaffle.mutate(undefined, {
-      onSuccess: (raffle: Raffle) => navigate(`/admin/raffles/${raffle.id}`),
-      onError: () => toastError("Failed to create raffle."),
-    });
   };
 </script>
 
@@ -118,9 +108,7 @@
 
       <sl-tab-panel name="raffles">
         <h2>Raffles</h2>
-        <sl-button variant="primary" onclick={handleCreateRaffle}
-          >Create</sl-button
-        >
+        <RaffleList {contestId} />
       </sl-tab-panel>
     </sl-tab-group>
   {/if}

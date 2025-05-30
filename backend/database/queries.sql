@@ -233,6 +233,16 @@ SELECT *
 FROM organizer
 WHERE id = ?;
 
+-- name: GetRaffle :one
+SELECT sqlc.embed(raffle)
+FROM raffle
+WHERE id = ?;
+
+-- name: GetRafflesByContest :many
+SELECT sqlc.embed(raffle)
+FROM raffle
+WHERE contest_id = ?;
+
 -- name: UpsertRaffle :execlastid
 INSERT INTO
     raffle (id, organizer_id, contest_id)
