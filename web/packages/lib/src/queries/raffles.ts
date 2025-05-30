@@ -1,10 +1,30 @@
 import {
   createMutation,
+  createQuery,
   useQueryClient,
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
 import type { Raffle } from "../models";
+import { HOUR } from "./constants";
+
+export const getRaffleQuery = (raffleId: number) =>
+  createQuery({
+    queryKey: ["raffle", { id: raffleId }],
+    queryFn: async () => ApiClient.getInstance().getRaffle(raffleId),
+    retry: false,
+    gcTime: 12 * HOUR,
+    staleTime: 12 * HOUR,
+  });
+
+export const getRafflesQuery = (contestId: number) =>
+  createQuery({
+    queryKey: ["raffles", { contestId }],
+    queryFn: async () => ApiClient.getInstance().getRaffles(contestId),
+    retry: false,
+    gcTime: 12 * HOUR,
+    staleTime: 12 * HOUR,
+  });
 
 export const createRaffleMutation = (contestId: number) => {
   const client = useQueryClient();

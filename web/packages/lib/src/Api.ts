@@ -322,6 +322,26 @@ export class ApiClient {
     });
   };
 
+  getRaffle = async (raffleId: number) => {
+    const endpoint = `/raffles/${raffleId}`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return raffleSchema.parse(result.data);
+  };
+
+  getRaffles = async (contestId: number) => {
+    const endpoint = `/contests/${contestId}/raffles`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(raffleSchema).parse(result.data);
+  };
+
   createRaffle = async (contestId: number) => {
     const endpoint = `/contests/${contestId}/raffles`;
 
