@@ -251,3 +251,20 @@ VALUES
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     contest_id = VALUES(contest_id);
+
+-- name: GetRaffleWinners :many
+SELECT sqlc.embed(raffle_winner), contender.name
+FROM raffle_winner
+JOIN contender ON contender.id = raffle_winner.contender_id
+WHERE raffle_id = ?;
+
+-- name: UpsertRaffleWinner :execlastid
+INSERT INTO
+    raffle_winner (id, organizer_id, raffle_id, contender_id, timestamp)
+VALUES
+    (?, ?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    organizer_id = VALUES(organizer_id),
+    raffle_id = VALUES(raffle_id),
+    contender_id = VALUES(contender_id),
+    timestamp = VALUES(timestamp); 

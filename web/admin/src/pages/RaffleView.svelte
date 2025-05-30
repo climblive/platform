@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { getRaffleQuery } from "@climblive/lib/queries";
+  import {
+    drawRaffleWinnerMutation,
+    getRaffleQuery,
+  } from "@climblive/lib/queries";
+  import { toastError } from "@climblive/lib/utils";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
 
   interface Props {
@@ -9,14 +13,26 @@
   let { raffleId }: Props = $props();
 
   const raffleQuery = getRaffleQuery(raffleId);
+  const drawRaffleWinner = drawRaffleWinnerMutation(raffleId);
 
   let raffle = $derived($raffleQuery.data);
+
+  const handleDrawWinner = () => {
+    $drawRaffleWinner.mutate(undefined, {
+      onSuccess: (winner) => {
+        alert(`Winner is: ${winner.contenderName}`);
+      },
+      onError: (error) => {
+        toastError("Failed to draw winner.");
+      },
+    });
+  };
 </script>
 
 {#if raffle}
   <section>
     <h1>Raffle {raffle.id}</h1>
-    <sl-button variant="primary" onclick={() => alert("Not implemented.")}
+    <sl-button variant="primary" onclick={handleDrawWinner}
       >Draw winner</sl-button
     >
   </section>

@@ -203,6 +203,16 @@ func (m *repositoryMock) StoreRaffle(ctx context.Context, tx domain.Transaction,
 	return args.Get(0).(domain.Raffle), args.Error(1)
 }
 
+func (m *repositoryMock) GetRaffleWinners(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) ([]domain.RaffleWinner, error) {
+	args := m.Called(ctx, tx, raffleID)
+	return args.Get(0).([]domain.RaffleWinner), args.Error(1)
+}
+
+func (m *repositoryMock) StoreRaffleWinner(ctx context.Context, tx domain.Transaction, winner domain.RaffleWinner) (domain.RaffleWinner, error) {
+	args := m.Called(ctx, tx, winner)
+	return args.Get(0).(domain.RaffleWinner), args.Error(1)
+}
+
 type authorizerMock struct {
 	mock.Mock
 }

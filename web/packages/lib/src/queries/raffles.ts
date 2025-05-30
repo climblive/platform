@@ -5,7 +5,7 @@ import {
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import type { Raffle } from "../models";
+import type { Raffle, RaffleWinner } from "../models";
 import { HOUR } from "./constants";
 
 export const getRaffleQuery = (raffleId: number) =>
@@ -44,3 +44,21 @@ export const createRaffleMutation = (contestId: number) => {
     },
   });
 };
+
+export const drawRaffleWinnerMutation = (raffleId: number) => {
+  const client = useQueryClient();
+
+  return createMutation({
+    mutationFn: () => ApiClient.getInstance().drawRaffleWinner(raffleId),
+    onSuccess: (newWinner) => {
+      const queryKey: QueryKey = ["raffle-winners", { raffleId }];
+
+      client.setQueryData<RaffleWinner[]>(queryKey, (oldWinners) => {
+        return [
+          ...(oldWinners ?? []),
+          newWinner,
+        ];
+      });
+    },
+  });
+}
