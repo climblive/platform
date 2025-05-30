@@ -50,13 +50,13 @@ func (hdlr *raffleHandler) GetRaffles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	createdRaffle, err := hdlr.raffleUseCase.GetRafflesByContest(r.Context(), contestID)
+	raffles, err := hdlr.raffleUseCase.GetRafflesByContest(r.Context(), contestID)
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	writeResponse(w, http.StatusOK, createdRaffle)
+	writeResponse(w, http.StatusOK, raffles)
 }
 
 func (hdlr *raffleHandler) CreateRaffle(w http.ResponseWriter, r *http.Request) {
