@@ -97,7 +97,7 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 	}
 
 	if len(contenders) == 0 {
-		return domain.RaffleWinner{}, errors.New("no contenders available for the raffle")
+		return domain.RaffleWinner{}, domain.ErrAllWinnersDrawn
 	}
 
 	winners, err := uc.Repo.GetRaffleWinners(ctx, nil, raffleID)
@@ -123,7 +123,7 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 	}
 
 	if len(candidates) == 0 {
-		return domain.RaffleWinner{}, errors.New("no candidates left for the raffle")
+		return domain.RaffleWinner{}, domain.ErrAllWinnersDrawn
 	}
 
 	winnerIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(candidates))))
