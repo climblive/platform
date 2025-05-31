@@ -647,6 +647,48 @@ func (q *Queries) GetRaffle(ctx context.Context, id int32) (GetRaffleRow, error)
 	return i, err
 }
 
+const getRaffleWinners = `-- name: GetRaffleWinners :many
+SELECT raffle_winner.id, raffle_winner.organizer_id, raffle_winner.raffle_id, raffle_winner.contender_id, raffle_winner.timestamp, contender.name
+FROM raffle_winner
+JOIN contender ON contender.id = raffle_winner.contender_id
+WHERE raffle_id = ?
+`
+
+type GetRaffleWinnersRow struct {
+	RaffleWinner RaffleWinner
+	Name         sql.NullString
+}
+
+func (q *Queries) GetRaffleWinners(ctx context.Context, raffleID int32) ([]GetRaffleWinnersRow, error) {
+	rows, err := q.db.QueryContext(ctx, getRaffleWinners, raffleID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetRaffleWinnersRow
+	for rows.Next() {
+		var i GetRaffleWinnersRow
+		if err := rows.Scan(
+			&i.RaffleWinner.ID,
+			&i.RaffleWinner.OrganizerID,
+			&i.RaffleWinner.RaffleID,
+			&i.RaffleWinner.ContenderID,
+			&i.RaffleWinner.Timestamp,
+			&i.Name,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getRafflesByContest = `-- name: GetRafflesByContest :many
 SELECT raffle.id, raffle.organizer_id, raffle.contest_id, raffle.active
 FROM raffle
@@ -1141,6 +1183,40 @@ type UpsertRaffleParams struct {
 
 func (q *Queries) UpsertRaffle(ctx context.Context, arg UpsertRaffleParams) (int64, error) {
 	result, err := q.db.ExecContext(ctx, upsertRaffle, arg.ID, arg.OrganizerID, arg.ContestID)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
+}
+
+const upsertRaffleWinner = `-- name: UpsertRaffleWinner :execlastid
+INSERT INTO
+    raffle_winner (id, organizer_id, raffle_id, contender_id, timestamp)
+VALUES
+    (?, ?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    organizer_id = VALUES(organizer_id),
+    raffle_id = VALUES(raffle_id),
+    contender_id = VALUES(contender_id),
+    timestamp = VALUES(timestamp)
+`
+
+type UpsertRaffleWinnerParams struct {
+	ID          int32
+	OrganizerID int32
+	RaffleID    int32
+	ContenderID int32
+	Timestamp   time.Time
+}
+
+func (q *Queries) UpsertRaffleWinner(ctx context.Context, arg UpsertRaffleWinnerParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, upsertRaffleWinner,
+		arg.ID,
+		arg.OrganizerID,
+		arg.RaffleID,
+		arg.ContenderID,
+		arg.Timestamp,
+	)
 	if err != nil {
 		return 0, err
 	}

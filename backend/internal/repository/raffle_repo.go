@@ -54,3 +54,39 @@ func (d *Database) StoreRaffle(ctx context.Context, tx domain.Transaction, raffl
 
 	return raffle, err
 }
+
+func (d *Database) GetRaffleWinners(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) ([]domain.RaffleWinner, error) {
+	records, err := d.WithTx(tx).GetRaffleWinners(ctx, int32(raffleID))
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	winners := make([]domain.RaffleWinner, 0)
+
+	for _, record := range records {
+		winners = append(winners, raffleWinnerToDomain(record.RaffleWinner, record.Name.String))
+	}
+
+	return winners, nil
+}
+
+func (d *Database) StoreRaffleWinner(ctx context.Context, tx domain.Transaction, winner domain.RaffleWinner) (domain.RaffleWinner, error) {
+	params := database.UpsertRaffleWinnerParams{
+		ID:          int32(winner.ID),
+		RaffleID:    int32(winner.RaffleID),
+		OrganizerID: int32(winner.Ownership.OrganizerID),
+		ContenderID: int32(winner.ContenderID),
+		Timestamp:   winner.Timestamp,
+	}
+
+	insertID, err := d.WithTx(tx).UpsertRaffleWinner(ctx, params)
+	if err != nil {
+		return domain.RaffleWinner{}, errors.Wrap(err, 0)
+	}
+
+	if insertID != 0 {
+		winner.ID = domain.RaffleWinnerID(insertID)
+	}
+
+	return winner, nil
+}
