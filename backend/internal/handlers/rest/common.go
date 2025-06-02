@@ -45,6 +45,8 @@ func writeResponse(w http.ResponseWriter, status int, data any) {
 
 func handleError(w http.ResponseWriter, err error) {
 	switch {
+	case errors.Is(err, domain.ErrAllWinnersDrawn):
+		fallthrough
 	case errors.Is(err, domain.ErrNotFound):
 		w.WriteHeader(http.StatusNotFound)
 	case errors.Is(err, domain.ErrDuplicate):

@@ -152,6 +152,17 @@ func raffleToDomain(record database.Raffle) domain.Raffle {
 	}
 }
 
+func raffleWinnerToDomain(record database.RaffleWinner, name string) domain.RaffleWinner {
+	return domain.RaffleWinner{
+		ID:            domain.RaffleWinnerID(record.ID),
+		Ownership:     domain.OwnershipData{OrganizerID: domain.OrganizerID(record.OrganizerID)},
+		RaffleID:      domain.RaffleID(record.RaffleID),
+		ContenderID:   domain.ContenderID(record.ContenderID),
+		ContenderName: name,
+		Timestamp:     record.Timestamp,
+	}
+}
+
 func makeNullString(value string) sql.NullString {
 	if value == "" {
 		return sql.NullString{}
