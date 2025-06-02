@@ -23,7 +23,7 @@
   const sortedRaffleWinners = $derived.by(() => {
     const winners = [...($raffleWinnersQuery.data ?? [])];
     winners.sort((a, b) => {
-      return a.timestamp.getTime() - b.timestamp.getTime();
+      return b.timestamp.getTime() - a.timestamp.getTime();
     });
 
     return winners;
