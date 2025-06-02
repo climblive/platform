@@ -146,3 +146,21 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 
 	return createdWinner, nil
 }
+
+func (uc *RaffleUseCase) GetRaffleWinners(ctx context.Context, raffleID domain.RaffleID) ([]domain.RaffleWinner, error) {
+	raffle, err := uc.Repo.GetRaffle(ctx, nil, raffleID)
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	if _, err := uc.Authorizer.HasOwnership(ctx, raffle.Ownership); err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	winners, err := uc.Repo.GetRaffleWinners(ctx, nil, raffleID)
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	return winners, nil
+}
