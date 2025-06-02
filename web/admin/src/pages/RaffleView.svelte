@@ -20,7 +20,14 @@
   const raffleWinnersQuery = getRaffleWinnersQuery(raffleId);
 
   const raffle = $derived($raffleQuery.data);
-  const raffleWinners = $derived($raffleWinnersQuery.data);
+  const sortedRaffleWinners = $derived(() => {
+    const winners = [...($raffleWinnersQuery.data ?? [])];
+    winners.sort((a, b) => {
+      return a.timestamp.getTime() - b.timestamp.getTime();
+    });
+
+    return winners;
+  });
 
   const handleDrawWinner = () => {
     $drawRaffleWinner.mutate(undefined, {
@@ -38,9 +45,9 @@
       >Draw winner</sl-button
     >
 
-    {#if raffleWinners?.length}
+    {#if sortedRaffleWinners?.length}
       <Table columns={["Name", "Timestamp"]}>
-        {#each raffleWinners as winner (winner.id)}
+        {#each sortedRaffleWinners as winner (winner.id)}
           <TableRow>
             <TableCell>{winner.contenderName}</TableCell>
             <TableCell>{format(winner.timestamp, "yyyy-MM-dd HH:mm")}</TableCell
