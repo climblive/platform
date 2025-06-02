@@ -238,6 +238,7 @@ func TestGetRafflesByContest(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 }
+
 func TestDrawRaffleWinner(t *testing.T) {
 	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
