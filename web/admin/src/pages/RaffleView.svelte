@@ -19,9 +19,6 @@
 
   const handleDrawWinner = () => {
     $drawRaffleWinner.mutate(undefined, {
-      onSuccess: (winner) => {
-        alert(`Winner is: ${winner.contenderName}`);
-      },
       onError: (error) => {
         toastError("Failed to draw winner.");
       },
