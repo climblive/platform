@@ -370,5 +370,5 @@ export class ApiClient {
     });
 
     return z.array(raffleWinnerSchema).parse(result.data);
-  }
+  };
 }
