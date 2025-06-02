@@ -1,10 +1,13 @@
 <script lang="ts">
+  import { Table, TableCell, TableRow } from "@climblive/lib/components";
   import {
     drawRaffleWinnerMutation,
     getRaffleQuery,
+    getRaffleWinnersQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import { format } from "date-fns";
 
   interface Props {
     raffleId: number;
@@ -14,8 +17,10 @@
 
   const raffleQuery = getRaffleQuery(raffleId);
   const drawRaffleWinner = drawRaffleWinnerMutation(raffleId);
+  const raffleWinnersQuery = getRaffleWinnersQuery(raffleId);
 
-  let raffle = $derived($raffleQuery.data);
+  const raffle = $derived($raffleQuery.data);
+  const raffleWinners = $derived($raffleWinnersQuery.data);
 
   const handleDrawWinner = () => {
     $drawRaffleWinner.mutate(undefined, {
@@ -32,6 +37,18 @@
     <sl-button variant="primary" onclick={handleDrawWinner}
       >Draw winner</sl-button
     >
+
+    {#if raffleWinners?.length}
+      <Table columns={["Name", "Timestamp"]}>
+        {#each raffleWinners as winner (winner.id)}
+          <TableRow>
+            <TableCell>{winner.contenderName}</TableCell>
+            <TableCell>{format(winner.timestamp, "yyyy-MM-dd HH:mm")}</TableCell
+            >
+          </TableRow>
+        {/each}
+      </Table>
+    {/if}
   </section>
 {/if}
 

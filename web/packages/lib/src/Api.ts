@@ -361,4 +361,14 @@ export class ApiClient {
 
     return raffleWinnerSchema.parse(result.data);
   };
+
+  getRaffleWinners = async (raffleId: number) => {
+    const endpoint = `/raffles/${raffleId}/winners`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(raffleWinnerSchema).parse(result.data);
+  }
 }
