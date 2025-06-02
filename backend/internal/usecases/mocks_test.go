@@ -210,7 +210,12 @@ func (m *repositoryMock) GetRaffleWinners(ctx context.Context, tx domain.Transac
 
 func (m *repositoryMock) StoreRaffleWinner(ctx context.Context, tx domain.Transaction, winner domain.RaffleWinner) (domain.RaffleWinner, error) {
 	args := m.Called(ctx, tx, winner)
-	return args.Get(0).(domain.RaffleWinner), args.Error(1)
+
+	if _, ok := args.Get(0).(mirrorInstruction); ok {
+		return winner, nil
+	} else {
+		return args.Get(0).(domain.RaffleWinner), args.Error(1)
+	}
 }
 
 type authorizerMock struct {
