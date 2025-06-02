@@ -54,11 +54,8 @@ export const drawRaffleWinnerMutation = (raffleId: number) => {
       const queryKey: QueryKey = ["raffle-winners", { raffleId }];
 
       client.setQueryData<RaffleWinner[]>(queryKey, (oldWinners) => {
-        return [
-          ...(oldWinners ?? []),
-          newWinner,
-        ];
+        return [...(oldWinners ?? []), newWinner];
       });
     },
   });
-}
+};

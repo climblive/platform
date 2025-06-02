@@ -360,5 +360,5 @@ export class ApiClient {
     });
 
     return raffleWinnerSchema.parse(result.data);
-  }
+  };
 }
