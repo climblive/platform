@@ -7,7 +7,7 @@ import (
 	_ "embed"
 
 	"github.com/go-errors/errors"
-	"gopkg.in/square/go-jose.v2"
+	"github.com/go-jose/go-jose/v4"
 )
 
 var ErrUnexpectedIssuer = errors.New("unexpected issuer")
@@ -48,7 +48,7 @@ func NewStandardJWTDecoder() (*StandardJWTDecoder, error) {
 }
 
 func (d *StandardJWTDecoder) Decode(jwt string) (Claims, error) {
-	signature, err := jose.ParseSigned(jwt)
+	signature, err := jose.ParseSigned(jwt, []jose.SignatureAlgorithm{jose.RS256})
 	if err != nil {
 		return Claims{}, errors.Wrap(err, 0)
 	}
