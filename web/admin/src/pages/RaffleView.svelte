@@ -19,7 +19,7 @@
 
   const handleDrawWinner = () => {
     $drawRaffleWinner.mutate(undefined, {
-      onError: (error) => {
+      onError: () => {
         toastError("Failed to draw winner.");
       },
     });
