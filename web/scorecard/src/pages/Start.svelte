@@ -12,8 +12,8 @@
   import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
-  import * as z from "zod";
-  import { ZodError } from "zod";
+  import * as z from "zod/v4";
+  import { ZodError } from "zod/v4";
 
   const enterFormSchema = z.object({
     code: z.string().length(8),

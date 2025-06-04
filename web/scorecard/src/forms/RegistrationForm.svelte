@@ -10,7 +10,7 @@
   import { isAfter } from "date-fns";
   import { getContext, type Snippet } from "svelte";
   import type { Readable } from "svelte/store";
-  import * as z from "zod";
+  import * as z from "zod/v4";
 
   const registrationFormSchema: z.ZodType<ContenderPatch> = z.object({
     name: z.string().min(1),

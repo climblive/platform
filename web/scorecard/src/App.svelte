@@ -13,7 +13,7 @@
   import { setContext } from "svelte";
   import { Route, Router, navigate } from "svelte-routing";
   import { writable } from "svelte/store";
-  import { ZodError } from "zod";
+  import { ZodError } from "zod/v4";
 
   let authenticating = $state(true);
 

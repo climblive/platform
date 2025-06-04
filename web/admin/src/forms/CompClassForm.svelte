@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  import * as z from "zod";
+  import * as z from "zod/v4";
 
   const twelveHours = 12 * 60 * 60 * 1_000;
 
@@ -13,7 +13,7 @@
     .superRefine((data, ctx) => {
       if (data.timeEnd.getTime() - data.timeBegin.getTime() > twelveHours) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Total duration must not exceed 12 hours",
           path: ["timeEnd"],
         });
@@ -21,7 +21,7 @@
 
       if (data.timeEnd <= data.timeBegin) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: "custom",
           message: "Time must follow chronological order",
           path: ["timeEnd"],
         });
@@ -40,7 +40,7 @@
 
   interface Props {
     data: Partial<T>;
-    schema: z.ZodType<T, z.ZodTypeDef, T>;
+    schema: z.ZodType<T, T>;
     submit: (value: T) => void;
     children?: Snippet;
   }

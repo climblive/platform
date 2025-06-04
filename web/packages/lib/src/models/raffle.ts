@@ -1,4 +1,4 @@
-import * as z from "zod";
+import * as z from "zod/v4";
 import type { Raffle, RaffleWinner } from "./generated";
 
 export const raffleSchema: z.ZodType<Raffle> = z.object({

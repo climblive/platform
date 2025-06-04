@@ -1,4 +1,4 @@
-import * as z from "zod";
+import * as z from "zod/v4";
 import type { CompClass } from "./generated";
 
 export const compClassSchema: z.ZodType<CompClass> = z.object({
