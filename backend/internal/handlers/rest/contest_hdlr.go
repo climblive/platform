@@ -3,9 +3,12 @@ package rest
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"slices"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/xuri/excelize/v2"
 )
 
 type contestUseCase interface {
@@ -16,18 +19,21 @@ type contestUseCase interface {
 }
 
 type contestHandler struct {
-	contestUseCase contestUseCase
+	contestUseCase   contestUseCase
+	compClassUseCase compClassUseCase
 }
 
-func InstallContestHandler(mux *Mux, contestUseCase contestUseCase) {
+func InstallContestHandler(mux *Mux, contestUseCase contestUseCase, compcompClassUseCase compClassUseCase) {
 	handler := &contestHandler{
-		contestUseCase: contestUseCase,
+		contestUseCase:   contestUseCase,
+		compClassUseCase: compcompClassUseCase,
 	}
 
 	mux.HandleFunc("GET /contests/{contestID}", handler.GetContest)
 	mux.HandleFunc("GET /contests/{contestID}/scoreboard", handler.GetScoreboard)
 	mux.HandleFunc("GET /organizers/{organizerID}/contests", handler.GetContestsByOrganizer)
 	mux.HandleFunc("POST /organizers/{organizerID}/contests", handler.CreateContest)
+	mux.HandleFunc("GET /contests/{contestID}/results", handler.DownloadResults)
 }
 
 func (hdlr *contestHandler) GetContest(w http.ResponseWriter, r *http.Request) {
@@ -99,4 +105,74 @@ func (hdlr *contestHandler) CreateContest(w http.ResponseWriter, r *http.Request
 	}
 
 	writeResponse(w, http.StatusCreated, createdContest)
+}
+
+func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Request) {
+	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	book := excelize.NewFile()
+	defer func() {
+		if err := book.Close(); err != nil {
+			handleError(w, err)
+			return
+		}
+	}()
+
+	book.DeleteSheet("Sheet1")
+
+	compClasses, err := hdlr.compClassUseCase.GetCompClassesByContest(r.Context(), contestID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	scoreboard, err := hdlr.contestUseCase.GetScoreboard(r.Context(), contestID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	slices.SortFunc(scoreboard, func(a, b domain.ScoreboardEntry) int {
+		return a.Score.RankOrder - b.Score.RankOrder
+	})
+
+	for _, compClass := range compClasses {
+		if _, err := book.NewSheet(compClass.Name); err != nil {
+			handleError(w, err)
+			return
+		}
+	}
+
+	counter := 1
+
+	for _, entry := range scoreboard {
+		var sheet string
+
+		for _, compClass := range compClasses {
+			if entry.CompClassID == compClass.ID {
+				sheet = compClass.Name
+
+				break
+			}
+		}
+
+		book.SetCellValue(sheet, fmt.Sprintf("A%d", counter), entry.PublicName)
+		book.SetCellValue(sheet, fmt.Sprintf("B%d", counter), entry.ClubName)
+		book.SetCellValue(sheet, fmt.Sprintf("C%d", counter), entry.Score.Score)
+		book.SetCellValue(sheet, fmt.Sprintf("D%d", counter), entry.Score.Placement)
+
+		counter++
+	}
+
+	w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="contest_%d_results.xlsx"`, contestID))
+	w.WriteHeader(http.StatusOK)
+
+	if _, err := book.WriteTo(w); err != nil {
+		handleError(w, err)
+	}
 }

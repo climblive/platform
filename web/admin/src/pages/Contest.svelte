@@ -5,6 +5,7 @@
     startScoreEngineMutation,
     stopScoreEngineMutation,
   } from "@climblive/lib/queries";
+  import { getApiUrl } from "@climblive/lib/utils";
   import type { SlTabShowEvent } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import type SlTabGroup from "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
@@ -51,6 +52,10 @@
 
 <main>
   <Link to="/admin/contests">Back to contests</Link>
+
+  <a href={`${getApiUrl()}/contests/${contestId}/results`}>
+    Download results
+  </a>
 
   {#if contest && scoreEngines}
     <h1>{contest.name}</h1>
