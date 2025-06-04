@@ -7,6 +7,8 @@ server {
 
 	client_max_body_size 1M;
 
+	set $csp "default-src 'self'; connect-src 'self' clmb.auth.eu-west-1.amazoncognito.com data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'self'";
+
 	location /api {
 		rewrite ^/api(.*)$ $1 break;
 		proxy_pass http://127.0.0.1:8090;
@@ -30,6 +32,9 @@ server {
 		try_files /index.html =404;
 		add_header Cache-Control "no-store";
 		expires 0;
+		add_header Content-Security-Policy $csp;
+		add_header X-Content-Type-Options "nosniff";
+		add_header Referrer-Policy "same-origin";
 	}
 
 	location /scoreboard {
@@ -45,6 +50,9 @@ server {
 		try_files /index.html =404;
 		add_header Cache-Control "no-store";
 		expires 0;
+		add_header Content-Security-Policy $csp;
+		add_header X-Content-Type-Options "nosniff";
+		add_header Referrer-Policy "same-origin";
 	}
 
 	location / {
@@ -60,11 +68,10 @@ server {
 		try_files /index.html =404;
 		add_header Cache-Control "no-store";
 		expires 0;
+		add_header Content-Security-Policy $csp;
+		add_header X-Content-Type-Options "nosniff";
+		add_header Referrer-Policy "same-origin";
 	}
-
-	add_header Content-Security-Policy "default-src 'self'; connect-src 'self' clmb.auth.eu-west-1.amazoncognito.com data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'self'";
-	add_header X-Content-Type-Options "nosniff";
-	add_header Referrer-Policy "same-origin";
 
 	include /etc/nginx/options-ssl.conf;
 
