@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  import * as z from "zod";
+  import * as z from "zod/v4";
 
   const formSchema = z.object({
     location: z.string().optional(),
