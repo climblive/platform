@@ -50,63 +50,63 @@
   <fieldset>
     <sl-input
       size="small"
-      use:name={"number"}
+      {@attach name("number")}
       label="Number"
       type="number"
       required
-      use:value={data.number}
+      {@attach value(data.number)}
     ></sl-input>
     <div class="colors">
       <span>Hold colors</span>
       <div class="pickers">
         <sl-color-picker
           size="small"
-          use:name={"holdColorPrimary"}
+          {@attach name("holdColorPrimary")}
           label="Primary hold color"
           required
           {swatches}
-          use:value={data.holdColorPrimary}
+          {@attach value(data.holdColorPrimary)}
           no-format-toggle
         ></sl-color-picker>
         <sl-color-picker
           size="small"
-          use:name={"holdColorSecondary"}
+          {@attach name("holdColorSecondary")}
           label="Secondary hold color"
           {swatches}
-          use:value={data.holdColorSecondary}
+          {@attach value(data.holdColorSecondary)}
           no-format-toggle
         ></sl-color-picker>
       </div>
     </div>
     <sl-input
       size="small"
-      use:name={"description"}
+      {@attach name("description")}
       label="Description"
       type="text"
-      use:value={data.description}
+      {@attach value(data.description)}
     ></sl-input>
     <sl-input
       size="small"
-      use:name={"pointsTop"}
+      {@attach name("pointsTop")}
       label="Points for top"
       type="number"
       required
-      use:value={data.pointsTop}
+      {@attach value(data.pointsTop)}
     ></sl-input>
     <sl-input
       size="small"
-      use:name={"pointsZone"}
+      {@attach name("pointsZone")}
       label="Points for zone"
       type="number"
       required
-      use:value={data.pointsZone}
+      {@attach value(data.pointsZone)}
     ></sl-input>
     <sl-input
       size="small"
-      use:name={"flashBonus"}
+      {@attach name("flashBonus")}
       label="Flash bonus"
       type="number"
-      use:value={data.flashBonus}
+      {@attach value(data.flashBonus)}
     ></sl-input>
     {@render children?.()}
   </fieldset>

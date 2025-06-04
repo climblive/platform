@@ -1,6 +1,7 @@
 <script lang="ts">
   import logoUrl from "@/static/logo.svg";
   import { ResultList, ScoreboardProvider } from "@climblive/lib/components";
+  import { value } from "@climblive/lib/forms";
   import { getCompClassesQuery, getContestQuery } from "@climblive/lib/queries";
   import { SlSelect } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/option/option.js";
@@ -30,16 +31,6 @@
       selectedCompClassId = compClasses[0].id;
     }
   });
-
-  const value = (node: HTMLElement, value: string | number | undefined) => {
-    node.setAttribute("value", value?.toString() ?? "");
-
-    return {
-      update(value: string | number | undefined) {
-        node.setAttribute("value", value?.toString() ?? "");
-      },
-    };
-  };
 
   const determineOverflowBehaviour = () => {
     overflow = window.innerWidth <= 512 ? "scroll" : "pagination";
@@ -77,7 +68,7 @@
             size="small"
             name="compClassId"
             label="Competition class"
-            use:value={selectedCompClassId}
+            {@attach value(selectedCompClassId)}
             onsl-change={() => {
               selectedCompClassId = Number(compClassSelector?.value);
             }}
