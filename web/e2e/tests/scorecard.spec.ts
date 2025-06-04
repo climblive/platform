@@ -17,7 +17,7 @@ test.describe.configure({ mode: 'serial' });
 test.beforeAll(async () => {
   const network = await new Network().start();
 
-  startedDbContainer = await new MariaDbContainer()
+  startedDbContainer = await new MariaDbContainer("mariadb:11.4")
     .withUsername("climblive")
     .withUserPassword("secretpassword")
     .withDatabase("climblive")
