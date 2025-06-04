@@ -18,6 +18,10 @@ type contestUseCaseRepository interface {
 	GetContestsByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.Contest, error)
 	GetOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) (domain.Organizer, error)
 	StoreContest(ctx context.Context, tx domain.Transaction, contest domain.Contest) (domain.Contest, error)
+	GetCompClassesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.CompClass, error)
+	StoreCompClass(ctx context.Context, tx domain.Transaction, compClass domain.CompClass) (domain.CompClass, error)
+	GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Problem, error)
+	StoreProblem(ctx context.Context, tx domain.Transaction, problem domain.Problem) (domain.Problem, error)
 }
 
 type ContestUseCase struct {
@@ -128,4 +132,69 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 	}
 
 	return contest, nil
+}
+
+func (uc *ContestUseCase) DuplicateContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error) {
+	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	compClasses, err := uc.Repo.GetCompClassesByContest(ctx, nil, contestID)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	problems, err := uc.Repo.GetProblemsByContest(ctx, nil, contestID)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	newContest := contest
+	newContest.ID = 0
+	newContest.Name += " (Copy)"
+
+	tx, err := uc.Repo.Begin()
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	createdContest, err := uc.Repo.StoreContest(ctx, tx, newContest)
+	if err != nil {
+		tx.Rollback()
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	for _, compClass := range compClasses {
+		compClass.ID = 0
+		compClass.ContestID = createdContest.ID
+
+		_, err = uc.Repo.StoreCompClass(ctx, tx, compClass)
+		if err != nil {
+			tx.Rollback()
+			return domain.Contest{}, errors.Wrap(err, 0)
+		}
+	}
+
+	for _, problem := range problems {
+		problem.ID = 0
+		problem.ContestID = createdContest.ID
+
+		_, err = uc.Repo.StoreProblem(ctx, tx, problem)
+		if err != nil {
+			tx.Rollback()
+			return domain.Contest{}, errors.Wrap(err, 0)
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	return createdContest, nil
 }

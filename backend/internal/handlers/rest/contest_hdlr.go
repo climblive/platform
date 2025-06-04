@@ -13,6 +13,7 @@ type contestUseCase interface {
 	GetContestsByOrganizer(ctx context.Context, organizerID domain.OrganizerID) ([]domain.Contest, error)
 	GetScoreboard(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreboardEntry, error)
 	CreateContest(ctx context.Context, organizerID domain.OrganizerID, template domain.ContestTemplate) (domain.Contest, error)
+	DuplicateContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error)
 }
 
 type contestHandler struct {
@@ -28,6 +29,7 @@ func InstallContestHandler(mux *Mux, contestUseCase contestUseCase) {
 	mux.HandleFunc("GET /contests/{contestID}/scoreboard", handler.GetScoreboard)
 	mux.HandleFunc("GET /organizers/{organizerID}/contests", handler.GetContestsByOrganizer)
 	mux.HandleFunc("POST /organizers/{organizerID}/contests", handler.CreateContest)
+	mux.HandleFunc("POST /contests/{contestID}/duplicate", handler.DuplicateContest)
 }
 
 func (hdlr *contestHandler) GetContest(w http.ResponseWriter, r *http.Request) {
@@ -99,4 +101,20 @@ func (hdlr *contestHandler) CreateContest(w http.ResponseWriter, r *http.Request
 	}
 
 	writeResponse(w, http.StatusCreated, createdContest)
+}
+
+func (hdlr *contestHandler) DuplicateContest(w http.ResponseWriter, r *http.Request) {
+	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	duplicatedContest, err := hdlr.contestUseCase.DuplicateContest(r.Context(), contestID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusCreated, duplicatedContest)
 }
