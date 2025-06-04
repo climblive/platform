@@ -6,6 +6,8 @@ jobs:
   build-web:
     name: Build web
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -15,6 +17,8 @@ jobs:
   build-backend:
     name: Build backend
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -26,6 +30,8 @@ jobs:
     runs-on: ubuntu-24.04
     environment: production
     needs: [build-web, build-backend]
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
