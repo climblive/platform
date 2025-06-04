@@ -8,10 +8,10 @@
   "author": "",
   "devDependencies": {
     "@playwright/test": "^1.52.0",
-    "@testcontainers/mariadb": "^10.25.0",
-    "@types/node": "^22.15.3",
+    "@testcontainers/mariadb": "^11.0.0",
+    "@types/node": "^22.15.29",
     "fs": "0.0.1-security",
     "mariadb": "^3.4.2",
-    "testcontainers": "^10.25.0"
+    "testcontainers": "^11.0.0"
   }
 }
