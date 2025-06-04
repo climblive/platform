@@ -77,7 +77,7 @@
             size="small"
             name="compClassId"
             label="Competition class"
-            use:value={selectedCompClassId}
+            {@attach value(selectedCompClassId)}
             onsl-change={() => {
               selectedCompClassId = Number(compClassSelector?.value);
             }}

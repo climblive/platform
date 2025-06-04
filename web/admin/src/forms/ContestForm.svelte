@@ -32,65 +32,65 @@
   <fieldset>
     <sl-input
       size="small"
-      use:name={"name"}
+      {@attach name("name")}
       label="Name"
       type="text"
       required
-      use:value={data.name}
+      {@attach value(data.name)}
     ></sl-input>
     <sl-input
       size="small"
-      use:name={"description"}
+      {@attach name("description")}
       label="Description"
       type="text"
-      use:value={data.description}
+      {@attach value(data.description)}
     ></sl-input>
     <sl-input
       size="small"
-      use:name={"location"}
+      {@attach name("location")}
       label="Location"
       type="text"
-      use:value={data.location}
+      {@attach value(data.location)}
     ></sl-input>
     <sl-input
       size="small"
-      use:name={"finalists"}
+      {@attach name("finalists")}
       label="Finalists"
       help-text="Number of contenders that will proceed to the finals"
       type="number"
       required
-      use:value={data.finalists}
+      {@attach value(data.finalists)}
       min={0}
       valueAsNumber
     ></sl-input>
     <sl-input
       size="small"
-      use:name={"qualifyingProblems"}
+      {@attach name("qualifyingProblems")}
       label="Number of qualifying problems"
       help-text="Number of problems that count towards the score"
       type="number"
       required
-      use:value={data.qualifyingProblems}
+      {@attach value(data.qualifyingProblems)}
       min={0}
       valueAsNumber
     ></sl-input>
     <sl-input
       size="small"
-      use:name={"gracePeriod"}
+      {@attach name("gracePeriod")}
       label="Grace period"
       help-text="Extra time after the end of the contest during which contenders can enter their last results"
       type="number"
       required
       min={0}
       max={60}
-      use:value={data.gracePeriod}
+      {@attach value(data.gracePeriod)}
       valueAsNumber
     ></sl-input>
     <sl-textarea
       size="small"
-      use:name={"rules"}
+      {@attach name("rules")}
       label="Rules"
-      use:value={data.rules}
+      {@attach value(data.rules)}
     ></sl-textarea>
     {@render children?.()}
   </fieldset>

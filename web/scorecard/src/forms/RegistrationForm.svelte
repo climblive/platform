@@ -37,25 +37,25 @@
     <fieldset>
       <sl-input
         size="small"
-        use:name={"name"}
+        {@attach name("name")}
         label="Full name"
         type="text"
         required
-        use:value={data.name}
+        {@attach value(data.name)}
       ></sl-input>
       <sl-input
         size="small"
-        use:name={"clubName"}
+        {@attach name("clubName")}
         label="Club name"
         type="text"
-        use:value={data.clubName}
+        {@attach value(data.clubName)}
       ></sl-input>
       <sl-select
         size="small"
-        use:name={"compClassId"}
+        {@attach name("compClassId")}
         label="Competition class"
         required
-        use:value={data.compClassId}
+        {@attach value(data.compClassId)}
       >
         {#each $compClassesQuery.data as compClass (compClass.id)}
           <sl-option
@@ -67,9 +67,9 @@
       </sl-select>
       <sl-switch
         size="small"
-        use:name={"withdrawnFromFinals"}
+        {@attach name("withdrawnFromFinals")}
         help-text="If you end up in the finals, you'll give up your spot."
-        use:checked={data.withdrawnFromFinals}>Opt out of finals</sl-switch
+        {@attach checked(data.withdrawnFromFinals)}>Opt out of finals</sl-switch
       >
       {@render children?.()}
     </fieldset>
