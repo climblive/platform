@@ -3,15 +3,7 @@ import type { Attachment } from "svelte/attachments";
 export const value =
   (value: string | number | undefined): Attachment =>
   (node: Element) => {
-    const update = (value: string | number | undefined) => {
-      node.setAttribute("value", value?.toString() ?? "");
-    };
-
-    update(value);
-
-    // return {
-    //   update,
-    // };
+    node.setAttribute("value", value?.toString() ?? "");
   };
 
 export const name =
@@ -25,17 +17,9 @@ export const name =
 export const checked =
   (value: boolean | undefined): Attachment =>
   (node: Element) => {
-    const update = (value: boolean | undefined) => {
-      if (value) {
-        node.setAttribute("checked", "");
-      } else {
-        node.removeAttribute("checked");
-      }
-    };
-
-    update(value);
-
-    //  return {
-    //    update,
-    //  };
+    if (value) {
+      node.setAttribute("checked", "");
+    } else {
+      node.removeAttribute("checked");
+    }
   };
