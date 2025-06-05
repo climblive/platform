@@ -122,50 +122,76 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 		}
 	}()
 
-	book.DeleteSheet("Sheet1")
-
-	compClasses, err := hdlr.compClassUseCase.GetCompClassesByContest(r.Context(), contestID)
-	if err != nil {
-		handleError(w, err)
-		return
-	}
-
-	scoreboard, err := hdlr.contestUseCase.GetScoreboard(r.Context(), contestID)
-	if err != nil {
-		handleError(w, err)
-		return
-	}
-
-	slices.SortFunc(scoreboard, func(a, b domain.ScoreboardEntry) int {
-		return a.Score.RankOrder - b.Score.RankOrder
-	})
-
-	for _, compClass := range compClasses {
-		if _, err := book.NewSheet(compClass.Name); err != nil {
-			handleError(w, err)
-			return
+	writeBook := func(book *excelize.File) error {
+		compClasses, err := hdlr.compClassUseCase.GetCompClassesByContest(r.Context(), contestID)
+		if err != nil {
+			return err
 		}
-	}
 
-	counter := 1
+		scoreboard, err := hdlr.contestUseCase.GetScoreboard(r.Context(), contestID)
+		if err != nil {
+			return err
+		}
 
-	for _, entry := range scoreboard {
-		var sheet string
+		slices.SortFunc(scoreboard, func(a, b domain.ScoreboardEntry) int {
+			return a.Score.RankOrder - b.Score.RankOrder
+		})
 
 		for _, compClass := range compClasses {
-			if entry.CompClassID == compClass.ID {
-				sheet = compClass.Name
-
-				break
+			if _, err := book.NewSheet(compClass.Name); err != nil {
+				return err
 			}
 		}
 
-		book.SetCellValue(sheet, fmt.Sprintf("A%d", counter), entry.PublicName)
-		book.SetCellValue(sheet, fmt.Sprintf("B%d", counter), entry.ClubName)
-		book.SetCellValue(sheet, fmt.Sprintf("C%d", counter), entry.Score.Score)
-		book.SetCellValue(sheet, fmt.Sprintf("D%d", counter), entry.Score.Placement)
+		err = book.DeleteSheet("Sheet1")
+		if err != nil {
+			return err
+		}
 
-		counter++
+		rowIndices := make(map[domain.CompClassID]int)
+
+		for _, entry := range scoreboard {
+			var sheet string
+			counter := rowIndices[entry.CompClassID] + 1
+
+			for _, compClass := range compClasses {
+				if entry.CompClassID == compClass.ID {
+					sheet = compClass.Name
+
+					break
+				}
+			}
+
+			err = book.SetCellValue(sheet, fmt.Sprintf("A%d", counter), entry.PublicName)
+			if err != nil {
+				return err
+			}
+
+			err = book.SetCellValue(sheet, fmt.Sprintf("B%d", counter), entry.ClubName)
+			if err != nil {
+				return err
+			}
+
+			err = book.SetCellValue(sheet, fmt.Sprintf("C%d", counter), entry.Score.Score)
+			if err != nil {
+				return err
+			}
+
+			err = book.SetCellValue(sheet, fmt.Sprintf("D%d", counter), entry.Score.Placement)
+			if err != nil {
+				return err
+			}
+
+			rowIndices[entry.CompClassID]++
+		}
+
+		return nil
+	}
+
+	err = writeBook(book)
+	if err != nil {
+		handleError(w, err)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
