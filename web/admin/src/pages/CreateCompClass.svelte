@@ -13,7 +13,7 @@
 
   let { contestId }: Props = $props();
 
-  const createCompClass = createCompClassMutation(contestId);
+  const createCompClass = $derived(createCompClassMutation(contestId));
 
   const handleSubmit = async (tmpl: CompClassTemplate) => {
     $createCompClass.mutate(tmpl, {

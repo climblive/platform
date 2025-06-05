@@ -1,10 +1,12 @@
 <script lang="ts">
+  import { ApiClient } from "@climblive/lib";
   import {
     getContestQuery,
     getScoreEnginesQuery,
     startScoreEngineMutation,
     stopScoreEngineMutation,
   } from "@climblive/lib/queries";
+  import { toastError } from "@climblive/lib/utils";
   import type { SlTabShowEvent } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import type SlTabGroup from "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
@@ -25,10 +27,10 @@
 
   let tabGroup: SlTabGroup | undefined = $state();
 
-  const contestQuery = getContestQuery(contestId);
-  const scoreEnginesQuery = getScoreEnginesQuery(contestId);
-  const startScoreEngine = startScoreEngineMutation(contestId);
-  const stopScoreEngine = stopScoreEngineMutation();
+  const contestQuery = $derived(getContestQuery(contestId));
+  const scoreEnginesQuery = $derived(getScoreEnginesQuery(contestId));
+  const startScoreEngine = $derived(startScoreEngineMutation(contestId));
+  const stopScoreEngine = $derived(stopScoreEngineMutation());
 
   let contest = $derived($contestQuery.data);
   let scoreEngines = $derived($scoreEnginesQuery.data);
@@ -47,6 +49,19 @@
       window.location.hash = name;
     }
   };
+
+  const handleDuplicationRequest = async () => {
+    if (contest) {
+      try {
+        const duplicate = await ApiClient.getInstance().duplicateContest(
+          contest.id,
+        );
+        navigate(`/admin/contests/${duplicate.id}`);
+      } catch {
+        toastError("Failed to duplicate contest.");
+      }
+    }
+  };
 </script>
 
 <main>
@@ -62,6 +77,8 @@
       <sl-tab slot="nav" panel="raffles">Raffles</sl-tab>
 
       <sl-tab-panel name="contest">
+        <sl-button onclick={handleDuplicationRequest}>Duplicate</sl-button>
+
         <h2>Score Engines</h2>
         {#each scoreEngines as engineInstanceId (engineInstanceId)}
           <div>

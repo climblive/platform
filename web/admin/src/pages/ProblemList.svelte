@@ -11,7 +11,7 @@
 
   let { contestId }: Props = $props();
 
-  const problemsQuery = getProblemsQuery(contestId);
+  const problemsQuery = $derived(getProblemsQuery(contestId));
 
   let problems = $derived($problemsQuery.data);
 </script>

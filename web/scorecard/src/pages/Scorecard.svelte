@@ -43,11 +43,11 @@
 
   const queryClient = useQueryClient();
 
-  const contenderQuery = getContenderQuery($session.contenderId);
-  const contestQuery = getContestQuery($session.contestId);
-  const compClassesQuery = getCompClassesQuery($session.contestId);
-  const problemsQuery = getProblemsQuery($session.contestId);
-  const ticksQuery = getTicksQuery($session.contenderId);
+  const contenderQuery = $derived(getContenderQuery($session.contenderId));
+  const contestQuery = $derived(getContestQuery($session.contestId));
+  const compClassesQuery = $derived(getCompClassesQuery($session.contestId));
+  const problemsQuery = $derived(getProblemsQuery($session.contestId));
+  const ticksQuery = $derived(getTicksQuery($session.contenderId));
 
   let resultsConnected = $state(false);
   let tabGroup: SlTabGroup | undefined = $state();

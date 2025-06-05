@@ -15,8 +15,8 @@
 
   let { problemId }: Props = $props();
 
-  const problemQuery = getProblemQuery(problemId);
-  const patchProblem = patchProblemMutation(problemId);
+  const problemQuery = $derived(getProblemQuery(problemId));
+  const patchProblem = $derived(patchProblemMutation(problemId));
 
   const problem = $derived($problemQuery.data);
 

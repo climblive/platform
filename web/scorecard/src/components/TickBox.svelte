@@ -27,8 +27,8 @@
   let popup: SlPopup | undefined = $state();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
-  const createTick = createTickMutation($session.contenderId);
-  const deleteTick = deleteTickMutation();
+  const createTick = $derived(createTickMutation($session.contenderId));
+  const deleteTick = $derived(deleteTickMutation());
 
   let open = $state(false);
 
