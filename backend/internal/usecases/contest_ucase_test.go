@@ -452,6 +452,7 @@ func TestCreateContest(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 }
+
 func TestDuplicateContest(t *testing.T) {
 	fakedContestID := randomResourceID[domain.ContestID]()
 	fakedDuplicatedContestID := randomResourceID[domain.ContestID]()
