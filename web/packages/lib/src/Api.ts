@@ -162,7 +162,7 @@ export class ApiClient {
     });
 
     return contestSchema.parse(result.data);
-  }
+  };
 
   getContestsByOrganizer = async (organizerId: number) => {
     const endpoint = `/organizers/${organizerId}/contests`;
