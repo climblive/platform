@@ -51,8 +51,7 @@ export const duplicateContestMutation = (contestId: number) => {
   const client = useQueryClient();
 
   return createMutation({
-    mutationFn: () =>
-      ApiClient.getInstance().duplicateContest(contestId),
+    mutationFn: () => ApiClient.getInstance().duplicateContest(contestId),
     onSuccess: (duplicatedContest) => {
       let queryKey: QueryKey = [
         "contests",
