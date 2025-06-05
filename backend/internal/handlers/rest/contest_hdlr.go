@@ -166,27 +166,30 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 		for _, compClass := range compClasses {
 			sheetName := compClass.Name
 
+			style, err := book.NewStyle(&excelize.Style{
+				Font: &excelize.Font{
+					Bold:   true,
+					Italic: true,
+					Family: "Times New Roman",
+					Size:   36,
+					Color:  "777777",
+				},
+			})
+			if err != nil {
+				return err
+			}
+
 			err = book.SetColWidth(sheetName, "A", "B", 40)
 			if err != nil {
 				return err
 			}
 
-			err = book.SetCellValue(sheetName, "A1", "Name")
+			book.SetCellStyle(sheetName, "A1", "D1", style)
 			if err != nil {
 				return err
 			}
 
-			err = book.SetCellValue(sheetName, "B1", "Club")
-			if err != nil {
-				return err
-			}
-
-			err = book.SetCellValue(sheetName, "C1", "Score")
-			if err != nil {
-				return err
-			}
-
-			err = book.SetCellValue(sheetName, "D1", "Placement")
+			err = book.SetSheetRow(sheetName, "A1", &[]string{"Name", "Club", "Score", "Placement"})
 			if err != nil {
 				return err
 			}
