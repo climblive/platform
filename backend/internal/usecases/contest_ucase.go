@@ -154,41 +154,48 @@ func (uc *ContestUseCase) DuplicateContest(ctx context.Context, contestID domain
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
-	newContest := contest
-	newContest.ID = 0
-	newContest.Name += " (Copy)"
+	duplicatedContest := contest
+	duplicatedContest.ID = 0
+	duplicatedContest.Name += " (Copy)"
 
 	tx, err := uc.Repo.Begin()
 	if err != nil {
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
-	createdContest, err := uc.Repo.StoreContest(ctx, tx, newContest)
+	duplicate := func() (domain.Contest, error) {
+		createdContest, err := uc.Repo.StoreContest(ctx, tx, duplicatedContest)
+		if err != nil {
+			return domain.Contest{}, err
+		}
+
+		for _, compClass := range compClasses {
+			compClass.ID = 0
+			compClass.ContestID = createdContest.ID
+
+			_, err = uc.Repo.StoreCompClass(ctx, tx, compClass)
+			if err != nil {
+				return domain.Contest{}, err
+			}
+		}
+
+		for _, problem := range problems {
+			problem.ID = 0
+			problem.ContestID = createdContest.ID
+
+			_, err = uc.Repo.StoreProblem(ctx, tx, problem)
+			if err != nil {
+				return domain.Contest{}, err
+			}
+		}
+
+		return createdContest, nil
+	}
+
+	createdContest, err := duplicate()
 	if err != nil {
 		tx.Rollback()
 		return domain.Contest{}, errors.Wrap(err, 0)
-	}
-
-	for _, compClass := range compClasses {
-		compClass.ID = 0
-		compClass.ContestID = createdContest.ID
-
-		_, err = uc.Repo.StoreCompClass(ctx, tx, compClass)
-		if err != nil {
-			tx.Rollback()
-			return domain.Contest{}, errors.Wrap(err, 0)
-		}
-	}
-
-	for _, problem := range problems {
-		problem.ID = 0
-		problem.ContestID = createdContest.ID
-
-		_, err = uc.Repo.StoreProblem(ctx, tx, problem)
-		if err != nil {
-			tx.Rollback()
-			return domain.Contest{}, errors.Wrap(err, 0)
-		}
 	}
 
 	err = tx.Commit()
