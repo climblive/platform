@@ -5,7 +5,7 @@ import {
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import type { Contest, ContestTemplate } from "../models";
+import { type Contest, type ContestTemplate } from "../models";
 import { HOUR } from "./constants";
 
 export const getContestQuery = (contestId: number) =>
@@ -43,6 +43,29 @@ export const createContestMutation = (organizerId: number) => {
       queryKey = ["contest", { id: newContest.id }];
 
       client.setQueryData<Contest>(queryKey, newContest);
+    },
+  });
+};
+
+export const duplicateContestMutation = (contestId: number) => {
+  const client = useQueryClient();
+
+  return createMutation({
+    mutationFn: () =>
+      ApiClient.getInstance().duplicateContest(contestId),
+    onSuccess: (duplicatedContest) => {
+      let queryKey: QueryKey = [
+        "contests",
+        { organizerId: duplicatedContest.ownership.organizerId },
+      ];
+
+      client.setQueryData<Contest[]>(queryKey, (oldContests) => {
+        return [...(oldContests ?? []), duplicatedContest];
+      });
+
+      queryKey = ["contest", { id: duplicatedContest.id }];
+
+      client.setQueryData<Contest>(queryKey, duplicatedContest);
     },
   });
 };

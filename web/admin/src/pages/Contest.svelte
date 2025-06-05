@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { ApiClient } from "@climblive/lib";
   import {
+    duplicateContestMutation,
     getContestQuery,
     getScoreEnginesQuery,
     startScoreEngineMutation,
@@ -31,6 +31,7 @@
   const scoreEnginesQuery = $derived(getScoreEnginesQuery(contestId));
   const startScoreEngine = $derived(startScoreEngineMutation(contestId));
   const stopScoreEngine = $derived(stopScoreEngineMutation());
+  const duplicateContest = $derived(duplicateContestMutation(contestId));
 
   let contest = $derived($contestQuery.data);
   let scoreEngines = $derived($scoreEnginesQuery.data);
@@ -52,14 +53,14 @@
 
   const handleDuplicationRequest = async () => {
     if (contest) {
-      try {
-        const duplicate = await ApiClient.getInstance().duplicateContest(
-          contest.id,
-        );
-        navigate(`/admin/contests/${duplicate.id}`);
-      } catch {
-        toastError("Failed to duplicate contest.");
-      }
+      $duplicateContest.mutate(undefined, {
+        onSuccess: (duplicate) => {
+          navigate(`/admin/contests/${duplicate.id}`);
+        },
+        onError: () => {
+          toastError("Failed to duplicate contest.");
+        },
+      });
     }
   };
 </script>

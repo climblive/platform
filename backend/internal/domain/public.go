@@ -6,6 +6,11 @@ import (
 
 type ColorRGB string
 
+type OwnershipData struct {
+	OrganizerID OrganizerID  `json:"organizerId"`
+	ContenderID *ContenderID `json:"-"`
+}
+
 type CompClass struct {
 	ID          CompClassID   `json:"id"`
 	Ownership   OwnershipData `json:"-"`
@@ -56,7 +61,7 @@ type ContenderPatch struct {
 
 type Contest struct {
 	ID                 ContestID     `json:"id"`
-	Ownership          OwnershipData `json:"-"`
+	Ownership          OwnershipData `json:"ownership"`
 	Location           string        `json:"location,omitempty"`
 	SeriesID           SeriesID      `json:"seriesId,omitempty"`
 	Name               string        `json:"name"`

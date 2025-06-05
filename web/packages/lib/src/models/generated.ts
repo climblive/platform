@@ -31,6 +31,9 @@ export type ScoreEngineInstanceID = string;
 // source: public.go
 
 export type ColorRGB = string;
+export interface OwnershipData {
+  organizerId: OrganizerID;
+}
 export interface CompClass {
   id: CompClassID;
   contestId: ContestID;
@@ -74,6 +77,7 @@ export interface ContenderPatch {
 }
 export interface Contest {
   id: ContestID;
+  ownership: OwnershipData;
   location?: string;
   seriesId?: SeriesID;
   name: string;
