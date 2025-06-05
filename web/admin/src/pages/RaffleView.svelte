@@ -15,9 +15,9 @@
 
   let { raffleId }: Props = $props();
 
-  const raffleQuery = getRaffleQuery(raffleId);
-  const drawRaffleWinner = drawRaffleWinnerMutation(raffleId);
-  const raffleWinnersQuery = getRaffleWinnersQuery(raffleId);
+  const raffleQuery = $derived(getRaffleQuery(raffleId));
+  const drawRaffleWinner = $derived(drawRaffleWinnerMutation(raffleId));
+  const raffleWinnersQuery = $derived(getRaffleWinnersQuery(raffleId));
 
   const raffle = $derived($raffleQuery.data);
   const sortedRaffleWinners = $derived.by(() => {

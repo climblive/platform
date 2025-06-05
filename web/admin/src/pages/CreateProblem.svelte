@@ -12,7 +12,7 @@
 
   let { contestId }: Props = $props();
 
-  const createProblem = createProblemMutation(contestId);
+  const createProblem = $derived(createProblemMutation(contestId));
 
   const handleSubmit = async (tmpl: ProblemTemplate) => {
     $createProblem.mutate(tmpl, {

@@ -16,7 +16,7 @@
 
   let { compClassId, children }: Props = $props();
 
-  const deleteCompClass = deleteCompClassMutation(compClassId);
+  const deleteCompClass = $derived(deleteCompClassMutation(compClassId));
 
   const handleDelete = async () => {
     dialog?.show();

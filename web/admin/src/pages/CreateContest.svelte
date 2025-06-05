@@ -12,7 +12,7 @@
 
   let { organizerId }: Props = $props();
 
-  const createContest = createContestMutation(organizerId);
+  const createContest = $derived(createContestMutation(organizerId));
 
   const handleSubmit = (form: ContestTemplate) => {
     if ($createContest.isPending) {

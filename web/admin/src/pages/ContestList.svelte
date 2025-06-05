@@ -12,7 +12,7 @@
 
   let { organizerId }: Props = $props();
 
-  const contestsQuery = getContestsByOrganizerQuery(organizerId);
+  const contestsQuery = $derived(getContestsByOrganizerQuery(organizerId));
 
   let contests = $derived($contestsQuery.data);
 
@@ -24,7 +24,7 @@
     });
 
     const ongoing = contests?.filter(({ timeBegin, timeEnd }) => {
-      return timeBegin && timeEnd && timeBegin >= now && timeEnd < now;
+      return timeBegin && timeEnd && now >= timeBegin && now < timeEnd;
     });
 
     const upcoming = contests?.filter(({ timeBegin }) => {

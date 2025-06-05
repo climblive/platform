@@ -154,6 +154,16 @@ export class ApiClient {
     return contestSchema.parse(result.data);
   };
 
+  duplicateContest = async (contestId: number) => {
+    const endpoint = `/contests/${contestId}/duplicate`;
+
+    const result = await this.axiosInstance.post(endpoint, undefined, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return contestSchema.parse(result.data);
+  };
+
   getContestsByOrganizer = async (organizerId: number) => {
     const endpoint = `/organizers/${organizerId}/contests`;
 
