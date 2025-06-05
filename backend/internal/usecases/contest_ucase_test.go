@@ -452,3 +452,168 @@ func TestCreateContest(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 }
+
+func TestDuplicateContest(t *testing.T) {
+	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedDuplicatedContestID := randomResourceID[domain.ContestID]()
+	fakedCompClassID := randomResourceID[domain.CompClassID]()
+	fakedProblemID := randomResourceID[domain.ProblemID]()
+	fakedOwnership := domain.OwnershipData{
+		OrganizerID: randomResourceID[domain.OrganizerID](),
+	}
+
+	timeBegin := time.Now()
+	timeEnd := timeBegin.Add(time.Hour)
+
+	fakedContest := domain.Contest{
+		ID:                 fakedContestID,
+		Ownership:          fakedOwnership,
+		Location:           "The garage",
+		SeriesID:           randomResourceID[domain.SeriesID](),
+		Name:               "Original Contest",
+		Description:        "Who is the best climber in Sweden?",
+		QualifyingProblems: 10,
+		Finalists:          7,
+		Rules:              "No rules!",
+		GracePeriod:        time.Hour,
+		TimeBegin:          timeBegin,
+		TimeEnd:            timeEnd,
+	}
+
+	fakedCompClass := domain.CompClass{
+		ID:          fakedCompClassID,
+		Ownership:   fakedOwnership,
+		ContestID:   fakedContestID,
+		Name:        "Males",
+		Description: "Male climbers",
+		TimeBegin:   timeBegin,
+		TimeEnd:     timeEnd,
+	}
+
+	fakedProblem := domain.Problem{
+		ID:                 fakedProblemID,
+		Ownership:          fakedOwnership,
+		ContestID:          fakedContestID,
+		Number:             42,
+		HoldColorPrimary:   "#FF0000",
+		HoldColorSecondary: "#00FF00",
+		Description:        "Test Problem",
+		PointsTop:          100,
+		PointsZone:         50,
+		FlashBonus:         20,
+	}
+
+	makeMocks := func() (*repositoryMock, *authorizerMock) {
+		mockedRepo := new(repositoryMock)
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedRepo.
+			On("GetContest", mock.Anything, nil, fakedContestID).
+			Return(fakedContest, nil)
+
+		return mockedRepo, mockedAuthorizer
+	}
+
+	t.Run("HappyCase", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		fakedDuplicatedContest := fakedContest
+		fakedDuplicatedContest.ID = fakedDuplicatedContestID
+		fakedDuplicatedContest.Name = "Original Contest (Copy)"
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		mockedRepo.
+			On("GetCompClassesByContest", mock.Anything, nil, fakedContestID).
+			Return([]domain.CompClass{fakedCompClass}, nil)
+
+		mockedRepo.
+			On("GetProblemsByContest", mock.Anything, nil, fakedContestID).
+			Return([]domain.Problem{fakedProblem}, nil)
+
+		mockedTx := new(transactionMock)
+
+		mockedRepo.
+			On("Begin").
+			Return(mockedTx, nil)
+
+		mockedRepo.
+			On("StoreContest", mock.Anything, mockedTx, mock.MatchedBy(func(contest domain.Contest) bool {
+				expected := fakedDuplicatedContest
+				expected.ID = 0
+
+				return contest == expected
+			})).
+			Return(fakedDuplicatedContest, nil)
+
+		mockedRepo.
+			On("StoreCompClass", mock.Anything, mockedTx, mock.MatchedBy(func(compClass domain.CompClass) bool {
+				expected := fakedCompClass
+				expected.ID = 0
+				expected.ContestID = fakedDuplicatedContestID
+
+				return compClass == expected
+			})).
+			Return(domain.CompClass{}, nil)
+
+		mockedRepo.
+			On("StoreProblem", mock.Anything, mockedTx, mock.MatchedBy(func(problem domain.Problem) bool {
+				expected := fakedProblem
+				expected.ID = 0
+				expected.ContestID = fakedDuplicatedContestID
+
+				return problem == expected
+			})).
+			Return(domain.Problem{}, nil)
+
+		mockedTx.
+			On("Commit").
+			Return(nil)
+
+		ucase := usecases.ContestUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		duplicatedContest, err := ucase.DuplicateContest(context.Background(), fakedContestID)
+
+		require.NoError(t, err)
+		assert.Equal(t, fakedDuplicatedContestID, duplicatedContest.ID)
+		assert.Equal(t, "Original Contest (Copy)", duplicatedContest.Name)
+		assert.Equal(t, fakedOwnership, duplicatedContest.Ownership)
+		assert.Equal(t, "The garage", duplicatedContest.Location)
+		assert.Equal(t, fakedContest.SeriesID, duplicatedContest.SeriesID)
+		assert.Equal(t, "Who is the best climber in Sweden?", duplicatedContest.Description)
+		assert.Equal(t, 10, duplicatedContest.QualifyingProblems)
+		assert.Equal(t, 7, duplicatedContest.Finalists)
+		assert.Equal(t, "No rules!", duplicatedContest.Rules)
+		assert.Equal(t, time.Hour, duplicatedContest.GracePeriod)
+		assert.Equal(t, timeBegin, duplicatedContest.TimeBegin)
+		assert.NotZero(t, timeEnd, duplicatedContest.TimeEnd)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		ucase := usecases.ContestUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.DuplicateContest(context.Background(), fakedContestID)
+
+		require.ErrorIs(t, err, domain.ErrNoOwnership)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+}

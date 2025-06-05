@@ -20,8 +20,8 @@
   let selectedCompClassId: number | undefined = $state();
   let overflow: "pagination" | "scroll" = $state("scroll");
 
-  const contestQuery = getContestQuery(contestId);
-  const compClassesQuery = getCompClassesQuery(contestId);
+  const contestQuery = $derived(getContestQuery(contestId));
+  const compClassesQuery = $derived(getCompClassesQuery(contestId));
 
   let contest = $derived($contestQuery.data);
   let compClasses = $derived($compClassesQuery.data);

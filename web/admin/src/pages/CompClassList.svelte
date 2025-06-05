@@ -11,7 +11,7 @@
 
   let { contestId }: Props = $props();
 
-  const compClassesQuery = getCompClassesQuery(contestId);
+  const compClassesQuery = $derived(getCompClassesQuery(contestId));
 
   let compClasses = $derived($compClassesQuery.data);
 </script>

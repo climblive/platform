@@ -16,8 +16,8 @@
 
   let { contestId }: Props = $props();
 
-  const contendersQuery = getContendersByContestQuery(contestId);
-  const createContenders = createContendersMutation(contestId);
+  const contendersQuery = $derived(getContendersByContestQuery(contestId));
+  const createContenders = $derived(createContendersMutation(contestId));
 
   let contenders = $derived($contendersQuery.data);
 

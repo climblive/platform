@@ -15,8 +15,8 @@
 
   let { compClassId }: Props = $props();
 
-  const compClassQuery = getCompClassQuery(compClassId);
-  const patchCompClass = patchCompClassMutation(compClassId);
+  const compClassQuery = $derived(getCompClassQuery(compClassId));
+  const patchCompClass = $derived(patchCompClassMutation(compClassId));
 
   const compClass = $derived($compClassQuery.data);
 

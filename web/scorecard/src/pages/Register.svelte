@@ -17,8 +17,8 @@
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
-  const contenderQuery = getContenderQuery($session.contenderId);
-  const patchContender = patchContenderMutation($session.contenderId);
+  const contenderQuery = $derived(getContenderQuery($session.contenderId));
+  const patchContender = $derived(patchContenderMutation($session.contenderId));
 
   let contender = $derived($contenderQuery.data);
 

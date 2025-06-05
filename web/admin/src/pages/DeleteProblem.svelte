@@ -16,7 +16,7 @@
 
   let { problemId, children }: Props = $props();
 
-  const deleteProblem = deleteProblemMutation(problemId);
+  const deleteProblem = $derived(deleteProblemMutation(problemId));
 
   const handleDelete = async () => {
     dialog?.show();
