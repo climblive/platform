@@ -161,46 +161,77 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 			}
 		}
 
-		err = book.DeleteSheet("Sheet1")
-		if err != nil {
-			return err
+		nextRowNumbers := make(map[domain.CompClassID]int)
+
+		for _, compClass := range compClasses {
+			sheetName := compClass.Name
+
+			err = book.SetColWidth(sheetName, "A", "B", 40)
+			if err != nil {
+				return err
+			}
+
+			err = book.SetCellValue(sheetName, "A1", "Name")
+			if err != nil {
+				return err
+			}
+
+			err = book.SetCellValue(sheetName, "B1", "Club")
+			if err != nil {
+				return err
+			}
+
+			err = book.SetCellValue(sheetName, "C1", "Score")
+			if err != nil {
+				return err
+			}
+
+			err = book.SetCellValue(sheetName, "D1", "Placement")
+			if err != nil {
+				return err
+			}
+
+			nextRowNumbers[compClass.ID] = 2
 		}
 
-		rowIndices := make(map[domain.CompClassID]int)
-
 		for _, entry := range scoreboard {
-			var sheet string
-			counter := rowIndices[entry.CompClassID] + 1
+			var sheetName string
+			counter := nextRowNumbers[entry.CompClassID]
 
 			for _, compClass := range compClasses {
 				if entry.CompClassID == compClass.ID {
-					sheet = compClass.Name
+					sheetName = compClass.Name
 
 					break
 				}
 			}
 
-			err = book.SetCellValue(sheet, fmt.Sprintf("A%d", counter), entry.PublicName)
+			err = book.SetCellValue(sheetName, fmt.Sprintf("A%d", counter), entry.PublicName)
 			if err != nil {
 				return err
 			}
 
-			err = book.SetCellValue(sheet, fmt.Sprintf("B%d", counter), entry.ClubName)
+			err = book.SetCellValue(sheetName, fmt.Sprintf("B%d", counter), entry.ClubName)
 			if err != nil {
 				return err
 			}
 
-			err = book.SetCellValue(sheet, fmt.Sprintf("C%d", counter), entry.Score.Score)
+			err = book.SetCellValue(sheetName, fmt.Sprintf("C%d", counter), entry.Score.Score)
 			if err != nil {
 				return err
 			}
 
-			err = book.SetCellValue(sheet, fmt.Sprintf("D%d", counter), entry.Score.Placement)
+			err = book.SetCellValue(sheetName, fmt.Sprintf("D%d", counter), entry.Score.Placement)
 			if err != nil {
 				return err
 			}
 
-			rowIndices[entry.CompClassID]++
+			nextRowNumbers[entry.CompClassID]++
+		}
+
+		err = book.DeleteSheet("Sheet1")
+		if err != nil {
+			return err
 		}
 
 		return nil
