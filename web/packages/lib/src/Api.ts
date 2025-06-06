@@ -94,7 +94,7 @@ export class ApiClient {
     });
 
     return userSchema.parse(result.data);
-  }
+  };
 
   findContender = async (registrationCode: string) => {
     const endpoint = `/codes/${registrationCode}/contender`;
