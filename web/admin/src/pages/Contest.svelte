@@ -68,10 +68,6 @@
 <main>
   <Link to="/admin/contests">Back to contests</Link>
 
-  <a href={`${getApiUrl()}/contests/${contestId}/results`}>
-    Download results
-  </a>
-
   {#if contest && scoreEngines}
     <h1>{contest.name}</h1>
 
@@ -82,7 +78,17 @@
       <sl-tab slot="nav" panel="raffles">Raffles</sl-tab>
 
       <sl-tab-panel name="contest">
-        <sl-button onclick={handleDuplicationRequest}>Duplicate</sl-button>
+        <sl-button onclick={handleDuplicationRequest}
+          >Duplicate
+          <sl-icon name="copy" slot="prefix"></sl-icon>
+        </sl-button>
+
+        <a href={`${getApiUrl()}/contests/${contestId}/results`}>
+          <sl-button
+            >Download results
+            <sl-icon name="download" slot="prefix"></sl-icon>
+          </sl-button>
+        </a>
 
         <h2>Score Engines</h2>
         {#each scoreEngines as engineInstanceId (engineInstanceId)}

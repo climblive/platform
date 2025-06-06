@@ -168,11 +168,7 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 
 			style, err := book.NewStyle(&excelize.Style{
 				Font: &excelize.Font{
-					Bold:   true,
-					Italic: true,
-					Family: "Times New Roman",
-					Size:   36,
-					Color:  "777777",
+					Bold: true,
 				},
 			})
 			if err != nil {
@@ -184,7 +180,12 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 				return err
 			}
 
-			book.SetCellStyle(sheetName, "A1", "D1", style)
+			err = book.SetColWidth(sheetName, "C", "D", 20)
+			if err != nil {
+				return err
+			}
+
+			err = book.SetCellStyle(sheetName, "A1", "D1", style)
 			if err != nil {
 				return err
 			}
@@ -209,22 +210,11 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 				}
 			}
 
-			err = book.SetCellValue(sheetName, fmt.Sprintf("A%d", counter), entry.PublicName)
-			if err != nil {
-				return err
-			}
-
-			err = book.SetCellValue(sheetName, fmt.Sprintf("B%d", counter), entry.ClubName)
-			if err != nil {
-				return err
-			}
-
-			err = book.SetCellValue(sheetName, fmt.Sprintf("C%d", counter), entry.Score.Score)
-			if err != nil {
-				return err
-			}
-
-			err = book.SetCellValue(sheetName, fmt.Sprintf("D%d", counter), entry.Score.Placement)
+			err = book.SetSheetRow(sheetName, fmt.Sprintf("A%d", counter), &[]any{
+				entry.PublicName,
+				entry.ClubName,
+				entry.Score.Score,
+				entry.Score.Placement})
 			if err != nil {
 				return err
 			}
