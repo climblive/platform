@@ -24,7 +24,7 @@
 </script>
 
 <header>
-  {#if self}
+  {#if self && self.organizers.length > 1}
     <sl-select
       bind:this={select}
       size="small"
@@ -45,7 +45,6 @@
     justify-content: end;
     padding: 0.5rem;
     background-color: var(--sl-color-primary-600);
-    color: white;
     height: 3rem;
   }
 </style>
