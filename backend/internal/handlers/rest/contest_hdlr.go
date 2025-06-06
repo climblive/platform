@@ -3,9 +3,12 @@ package rest
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"slices"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/xuri/excelize/v2"
 )
 
 type contestUseCase interface {
@@ -17,12 +20,14 @@ type contestUseCase interface {
 }
 
 type contestHandler struct {
-	contestUseCase contestUseCase
+	contestUseCase   contestUseCase
+	compClassUseCase compClassUseCase
 }
 
-func InstallContestHandler(mux *Mux, contestUseCase contestUseCase) {
+func InstallContestHandler(mux *Mux, contestUseCase contestUseCase, compClassUseCase compClassUseCase) {
 	handler := &contestHandler{
-		contestUseCase: contestUseCase,
+		contestUseCase:   contestUseCase,
+		compClassUseCase: compClassUseCase,
 	}
 
 	mux.HandleFunc("GET /contests/{contestID}", handler.GetContest)
@@ -30,6 +35,7 @@ func InstallContestHandler(mux *Mux, contestUseCase contestUseCase) {
 	mux.HandleFunc("GET /organizers/{organizerID}/contests", handler.GetContestsByOrganizer)
 	mux.HandleFunc("POST /organizers/{organizerID}/contests", handler.CreateContest)
 	mux.HandleFunc("POST /contests/{contestID}/duplicate", handler.DuplicateContest)
+	mux.HandleFunc("GET /contests/{contestID}/results", handler.DownloadResults)
 }
 
 func (hdlr *contestHandler) GetContest(w http.ResponseWriter, r *http.Request) {
@@ -117,4 +123,124 @@ func (hdlr *contestHandler) DuplicateContest(w http.ResponseWriter, r *http.Requ
 	}
 
 	writeResponse(w, http.StatusCreated, duplicatedContest)
+}
+
+func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Request) {
+	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	book := excelize.NewFile()
+	defer func() {
+		if err := book.Close(); err != nil {
+			handleError(w, err)
+			return
+		}
+	}()
+
+	writeBook := func(book *excelize.File) error {
+		compClasses, err := hdlr.compClassUseCase.GetCompClassesByContest(r.Context(), contestID)
+		if err != nil {
+			return err
+		}
+
+		scoreboard, err := hdlr.contestUseCase.GetScoreboard(r.Context(), contestID)
+		if err != nil {
+			return err
+		}
+
+		slices.SortFunc(scoreboard, func(a, b domain.ScoreboardEntry) int {
+			return a.Score.RankOrder - b.Score.RankOrder
+		})
+
+		for _, compClass := range compClasses {
+			if _, err := book.NewSheet(compClass.Name); err != nil {
+				return err
+			}
+		}
+
+		nextRowNumbers := make(map[domain.CompClassID]int)
+
+		for _, compClass := range compClasses {
+			sheetName := compClass.Name
+
+			style, err := book.NewStyle(&excelize.Style{
+				Font: &excelize.Font{
+					Bold: true,
+				},
+			})
+			if err != nil {
+				return err
+			}
+
+			err = book.SetColWidth(sheetName, "A", "B", 40)
+			if err != nil {
+				return err
+			}
+
+			err = book.SetColWidth(sheetName, "C", "D", 20)
+			if err != nil {
+				return err
+			}
+
+			err = book.SetCellStyle(sheetName, "A1", "D1", style)
+			if err != nil {
+				return err
+			}
+
+			err = book.SetSheetRow(sheetName, "A1", &[]string{"Name", "Club", "Score", "Placement"})
+			if err != nil {
+				return err
+			}
+
+			nextRowNumbers[compClass.ID] = 2
+		}
+
+		for _, entry := range scoreboard {
+			var sheetName string
+			counter := nextRowNumbers[entry.CompClassID]
+
+			for _, compClass := range compClasses {
+				if entry.CompClassID == compClass.ID {
+					sheetName = compClass.Name
+
+					break
+				}
+			}
+
+			err = book.SetSheetRow(sheetName, fmt.Sprintf("A%d", counter), &[]any{
+				entry.PublicName,
+				entry.ClubName,
+				entry.Score.Score,
+				entry.Score.Placement})
+			if err != nil {
+				return err
+			}
+
+			nextRowNumbers[entry.CompClassID]++
+		}
+
+		err = book.DeleteSheet("Sheet1")
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	err = writeBook(book)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="contest_%d_results.xlsx"`, contestID))
+	w.WriteHeader(http.StatusOK)
+
+	if _, err := book.WriteTo(w); err != nil {
+		handleError(w, err)
+	}
 }

@@ -6,7 +6,7 @@
     startScoreEngineMutation,
     stopScoreEngineMutation,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { getApiUrl, toastError } from "@climblive/lib/utils";
   import type { SlTabShowEvent } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import type SlTabGroup from "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
@@ -78,7 +78,17 @@
       <sl-tab slot="nav" panel="raffles">Raffles</sl-tab>
 
       <sl-tab-panel name="contest">
-        <sl-button onclick={handleDuplicationRequest}>Duplicate</sl-button>
+        <sl-button onclick={handleDuplicationRequest}
+          >Duplicate
+          <sl-icon name="copy" slot="prefix"></sl-icon>
+        </sl-button>
+
+        <a href={`${getApiUrl()}/contests/${contestId}/results`}>
+          <sl-button
+            >Download results
+            <sl-icon name="download" slot="prefix"></sl-icon>
+          </sl-button>
+        </a>
 
         <h2>Score Engines</h2>
         {#each scoreEngines as engineInstanceId (engineInstanceId)}
