@@ -227,6 +227,11 @@ func (m *authorizerMock) HasOwnership(ctx context.Context, resourceOwnership dom
 	return args.Get(0).(domain.AuthRole), args.Error(1)
 }
 
+func (m *authorizerMock) GetAuthentication(ctx context.Context) (domain.Authentication, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(domain.Authentication), args.Error(1)
+}
+
 type scoreKeeperMock struct {
 	mock.Mock
 }

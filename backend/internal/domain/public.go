@@ -179,7 +179,6 @@ type Tick struct {
 
 type User struct {
 	ID         UserID        `json:"id"`
-	Name       string        `json:"name"`
 	Username   string        `json:"username"`
 	Admin      bool          `json:"admin"`
 	Organizers []OrganizerID `json:"organizers"`

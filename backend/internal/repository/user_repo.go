@@ -11,7 +11,6 @@ import (
 func (d *Database) StoreUser(ctx context.Context, tx domain.Transaction, user domain.User) (domain.User, error) {
 	params := database.UpsertUserParams{
 		ID:       int32(user.ID),
-		Name:     user.Name,
 		Username: user.Username,
 		Admin:    user.Admin,
 	}

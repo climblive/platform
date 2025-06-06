@@ -235,7 +235,6 @@ func TestAuthorizer(t *testing.T) {
 				On("GetUserByUsername", mock.Anything, nil, "john").
 				Return(domain.User{
 					ID:         fakedUserID,
-					Name:       "John Doe",
 					Username:   "john",
 					Admin:      false,
 					Organizers: []domain.OrganizerID{fakedOrganizerID},
@@ -276,7 +275,6 @@ func TestAuthorizer(t *testing.T) {
 				On("GetUserByUsername", mock.Anything, nil, "john").
 				Return(domain.User{
 					ID:         fakedUserID,
-					Name:       "John Doe",
 					Username:   "john",
 					Admin:      true,
 					Organizers: []domain.OrganizerID{},
@@ -317,7 +315,6 @@ func TestAuthorizer(t *testing.T) {
 				On("GetUserByUsername", mock.Anything, nil, "john").
 				Return(domain.User{
 					ID:         fakedUserID,
-					Name:       "John Doe",
 					Username:   "john",
 					Admin:      false,
 					Organizers: []domain.OrganizerID{fakedOrganizerID + 1},
@@ -377,12 +374,10 @@ func TestAuthorizer(t *testing.T) {
 
 			mockedRepo.
 				On("StoreUser", mock.Anything, mockedTx, domain.User{
-					Name:     "john",
 					Username: "john",
 				}).
 				Return(domain.User{
 					ID:       fakedNewUserID,
-					Name:     "john",
 					Username: "john",
 				}, nil)
 

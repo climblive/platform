@@ -23,6 +23,7 @@ import type {
   StartScoreEngineArguments,
 } from "./models/rest";
 import { tickSchema } from "./models/tick";
+import { userSchema } from "./models/user";
 import { getApiUrl } from "./utils/config";
 
 interface ApiCredentialsProvider {
@@ -84,6 +85,16 @@ export class ApiClient {
   setCredentialsProvider = (credentialsProvider: ApiCredentialsProvider) => {
     this.credentialsProvider = credentialsProvider;
   };
+
+  getSelf = async () => {
+    const endpoint = "/users/self";
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return userSchema.parse(result.data);
+  }
 
   findContender = async (registrationCode: string) => {
     const endpoint = `/codes/${registrationCode}/contender`;

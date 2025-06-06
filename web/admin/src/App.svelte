@@ -7,21 +7,19 @@
   import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path.js";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
-  import { navigate, Route, Router } from "svelte-routing";
-  import LastOrganizer from "./components/LastOrganizer.svelte";
-  import Contest from "./pages/Contest.svelte";
-  import CreateCompClass from "./pages/CreateCompClass.svelte";
-  import CreateContest from "./pages/CreateContest.svelte";
-  import CreateProblem from "./pages/CreateProblem.svelte";
-  import EditCompClass from "./pages/EditCompClass.svelte";
-  import EditProblem from "./pages/EditProblem.svelte";
-  import OrganizerView from "./pages/OrganizerView.svelte";
-  import RaffleView from "./pages/RaffleView.svelte";
+  import { onMount, setContext } from "svelte";
+  import { navigate } from "svelte-routing";
+  import { writable } from "svelte/store";
+  import Main from "./Main.svelte";
   import { exchangeCode, refreshSession } from "./utils/cognito";
 
   setBasePath("/shoelace");
 
   let authenticated = $state(false);
+
+  const selectedOrganizer = writable();
+
+  setContext("selectedOrganizer", selectedOrganizer);
 
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -77,6 +75,17 @@
     const url = `https://clmb.auth.eu-west-1.amazoncognito.com/login?response_type=code&client_id=${configData.COGNITO_CLIENT_ID}&redirect_uri=${redirectUri}`;
     window.location.href = url;
   };
+
+  onMount(() => {
+    const regex = /^\/admin\/organizers\/(\d+)$/;
+
+    const match = window.location.pathname.match(regex);
+
+    if (match) {
+      const organizerId = Number(match[1]);
+      $selectedOrganizer = organizerId;
+    }
+  });
 </script>
 
 <ErrorBoundary>
@@ -87,62 +96,10 @@
       {#if !authenticated}
         <sl-button variant="primary" onclick={login}>Login</sl-button>
       {/if}
-      <main>
-        <Router basepath="/admin">
-          <Route path="/">
-            <LastOrganizer />
-          </Route>
-          <Route path="/organizers/:organizerId">
-            {#snippet children({ params }: { params: { organizerId: number } })}
-              <OrganizerView organizerId={Number(params.organizerId)} />
-            {/snippet}
-          </Route>
-          <Route path="/organizers/:organizerId/contests/new">
-            {#snippet children({ params }: { params: { organizerId: number } })}
-              <CreateContest organizerId={Number(params.organizerId)} />
-            {/snippet}
-          </Route>
-          <Route path="/contests/:contestId">
-            {#snippet children({ params }: { params: { contestId: number } })}
-              <Contest contestId={Number(params.contestId)} />
-            {/snippet}
-          </Route>
-          <Route path="/contests/:contestId/new-comp-class">
-            {#snippet children({ params }: { params: { contestId: number } })}
-              <CreateCompClass contestId={Number(params.contestId)} />
-            {/snippet}
-          </Route>
-          <Route path="/contests/:contestId/new-problem">
-            {#snippet children({ params }: { params: { contestId: number } })}
-              <CreateProblem contestId={Number(params.contestId)} />
-            {/snippet}
-          </Route>
-          <Route path="/problems/:problemId/edit">
-            {#snippet children({ params }: { params: { problemId: number } })}
-              <EditProblem problemId={Number(params.problemId)} />
-            {/snippet}
-          </Route>
-          <Route path="/comp-classes/:compClassId/edit">
-            {#snippet children({ params }: { params: { compClassId: number } })}
-              <EditCompClass compClassId={Number(params.compClassId)} />
-            {/snippet}
-          </Route>
-          <Route path="/raffles/:raffleId">
-            {#snippet children({ params }: { params: { raffleId: number } })}
-              <RaffleView raffleId={Number(params.raffleId)} />
-            {/snippet}
-          </Route>
-        </Router>
-      </main>
+      <Main />
       {#if import.meta.env.DEV}
         <SvelteQueryDevtools />
       {/if}
     </QueryClientProvider>
   {/await}
 </ErrorBoundary>
-
-<style>
-  main {
-    padding: var(--sl-spacing-medium);
-  }
-</style>
