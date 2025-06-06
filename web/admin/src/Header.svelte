@@ -31,6 +31,7 @@
       {@attach value($selectedOrganizer)}
       onsl-change={handleChange}
     >
+      <sl-icon name="arrow-left-right" slot="prefix"></sl-icon>
       {#each self.organizers as organizer (organizer.id)}
         <sl-option value={organizer.id}>{organizer.name}</sl-option>
       {/each}
