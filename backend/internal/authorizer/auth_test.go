@@ -237,7 +237,7 @@ func TestAuthorizer(t *testing.T) {
 					ID:         fakedUserID,
 					Username:   "john",
 					Admin:      false,
-					Organizers: []domain.OrganizerID{fakedOrganizerID},
+					Organizers: []domain.Organizer{{ID: fakedOrganizerID}},
 				}, nil)
 
 			mockedJWTDecoder.
@@ -277,7 +277,7 @@ func TestAuthorizer(t *testing.T) {
 					ID:         fakedUserID,
 					Username:   "john",
 					Admin:      true,
-					Organizers: []domain.OrganizerID{},
+					Organizers: []domain.Organizer{},
 				}, nil)
 
 			mockedJWTDecoder.
@@ -317,7 +317,7 @@ func TestAuthorizer(t *testing.T) {
 					ID:         fakedUserID,
 					Username:   "john",
 					Admin:      false,
-					Organizers: []domain.OrganizerID{fakedOrganizerID + 1},
+					Organizers: []domain.Organizer{{ID: fakedOrganizerID + 1}},
 				}, nil)
 
 			mockedJWTDecoder.
