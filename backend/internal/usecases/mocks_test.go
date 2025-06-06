@@ -218,6 +218,11 @@ func (m *repositoryMock) StoreRaffleWinner(ctx context.Context, tx domain.Transa
 	}
 }
 
+func (m *repositoryMock) GetUserByUsername(ctx context.Context, tx domain.Transaction, username string) (domain.User, error) {
+	args := m.Called(ctx, tx, username)
+	return args.Get(0).(domain.User), args.Error(1)
+}
+
 type authorizerMock struct {
 	mock.Mock
 }
@@ -225,6 +230,11 @@ type authorizerMock struct {
 func (m *authorizerMock) HasOwnership(ctx context.Context, resourceOwnership domain.OwnershipData) (domain.AuthRole, error) {
 	args := m.Called(ctx, resourceOwnership)
 	return args.Get(0).(domain.AuthRole), args.Error(1)
+}
+
+func (m *authorizerMock) GetAuthentication(ctx context.Context) (domain.Authentication, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(domain.Authentication), args.Error(1)
 }
 
 type scoreKeeperMock struct {

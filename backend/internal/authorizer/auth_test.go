@@ -34,6 +34,9 @@ func TestAuthorizer(t *testing.T) {
 
 			assert.Equal(t, domain.NilRole, role)
 			assert.ErrorIs(t, err, domain.ErrNotAuthenticated)
+
+			_, err = authorizer.GetAuthentication(r.Context())
+			assert.ErrorIs(t, err, domain.ErrNotAuthenticated)
 		}
 
 		r := httptest.NewRequest("GET", "http://localhost", nil)
@@ -118,6 +121,11 @@ func TestAuthorizer(t *testing.T) {
 
 				assert.Equal(t, domain.ContenderRole, role)
 				assert.NoError(t, err)
+
+				authentication, err := authorizer.GetAuthentication(r.Context())
+				assert.NoError(t, err)
+				assert.Equal(t, "ABCD1234", authentication.Regcode)
+				assert.Empty(t, authentication.Username)
 			}
 
 			r := httptest.NewRequest("GET", "http://localhost", nil)
@@ -206,13 +214,18 @@ func TestAuthorizer(t *testing.T) {
 				On("Decode", "some_jwt").
 				Return(authorizer.Claims{}, authorizer.ErrExpiredCredentials)
 
-			authorizer := authorizer.NewAuthorizer(mockedRepo, mockedJWTDecoder)
+			auth := authorizer.NewAuthorizer(mockedRepo, mockedJWTDecoder)
 
 			dummyHandler := func(w http.ResponseWriter, r *http.Request) {
-				role, err := authorizer.HasOwnership(r.Context(), fakedOwnership)
+				role, err := auth.HasOwnership(r.Context(), fakedOwnership)
 
 				assert.Equal(t, domain.NilRole, role)
 				assert.ErrorIs(t, err, domain.ErrNotAuthenticated)
+				assert.ErrorIs(t, err, authorizer.ErrExpiredCredentials)
+
+				_, err = auth.GetAuthentication(r.Context())
+				assert.ErrorIs(t, err, domain.ErrNotAuthenticated)
+				assert.ErrorIs(t, err, authorizer.ErrExpiredCredentials)
 			}
 
 			r := httptest.NewRequest("GET", "http://localhost", nil)
@@ -220,7 +233,7 @@ func TestAuthorizer(t *testing.T) {
 
 			r.Header.Set("Authorization", "Bearer some_jwt")
 
-			handler := authorizer.Middleware(http.HandlerFunc(dummyHandler))
+			handler := auth.Middleware(http.HandlerFunc(dummyHandler))
 			handler.ServeHTTP(w, r)
 
 			mockedRepo.AssertExpectations(t)
@@ -235,10 +248,9 @@ func TestAuthorizer(t *testing.T) {
 				On("GetUserByUsername", mock.Anything, nil, "john").
 				Return(domain.User{
 					ID:         fakedUserID,
-					Name:       "John Doe",
 					Username:   "john",
 					Admin:      false,
-					Organizers: []domain.OrganizerID{fakedOrganizerID},
+					Organizers: []domain.Organizer{{ID: fakedOrganizerID}},
 				}, nil)
 
 			mockedJWTDecoder.
@@ -254,6 +266,12 @@ func TestAuthorizer(t *testing.T) {
 
 				assert.Equal(t, domain.OrganizerRole, role)
 				assert.NoError(t, err)
+
+				authentication, err := authorizer.GetAuthentication(r.Context())
+
+				assert.NoError(t, err)
+				assert.Equal(t, "john", authentication.Username)
+				assert.Empty(t, authentication.Regcode)
 			}
 
 			r := httptest.NewRequest("GET", "http://localhost", nil)
@@ -276,10 +294,9 @@ func TestAuthorizer(t *testing.T) {
 				On("GetUserByUsername", mock.Anything, nil, "john").
 				Return(domain.User{
 					ID:         fakedUserID,
-					Name:       "John Doe",
 					Username:   "john",
 					Admin:      true,
-					Organizers: []domain.OrganizerID{},
+					Organizers: []domain.Organizer{},
 				}, nil)
 
 			mockedJWTDecoder.
@@ -317,10 +334,9 @@ func TestAuthorizer(t *testing.T) {
 				On("GetUserByUsername", mock.Anything, nil, "john").
 				Return(domain.User{
 					ID:         fakedUserID,
-					Name:       "John Doe",
 					Username:   "john",
 					Admin:      false,
-					Organizers: []domain.OrganizerID{fakedOrganizerID + 1},
+					Organizers: []domain.Organizer{{ID: fakedOrganizerID + 1}},
 				}, nil)
 
 			mockedJWTDecoder.
@@ -377,12 +393,10 @@ func TestAuthorizer(t *testing.T) {
 
 			mockedRepo.
 				On("StoreUser", mock.Anything, mockedTx, domain.User{
-					Name:     "john",
 					Username: "john",
 				}).
 				Return(domain.User{
 					ID:       fakedNewUserID,
-					Name:     "john",
 					Username: "john",
 				}, nil)
 

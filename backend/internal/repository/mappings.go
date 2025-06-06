@@ -124,10 +124,9 @@ func tickToDomain(record database.Tick) domain.Tick {
 func userToDomain(record database.User) domain.User {
 	return domain.User{
 		ID:         domain.UserID(record.ID),
-		Name:       record.Name,
 		Username:   record.Username,
 		Admin:      record.Admin,
-		Organizers: make([]domain.OrganizerID, 0),
+		Organizers: make([]domain.Organizer, 0),
 	}
 }
 
@@ -137,8 +136,7 @@ func organizerToDomain(record database.Organizer) domain.Organizer {
 		Ownership: domain.OwnershipData{
 			OrganizerID: domain.OrganizerID(record.ID),
 		},
-		Name:     record.Name,
-		Homepage: record.Homepage.String,
+		Name: record.Name,
 	}
 }
 

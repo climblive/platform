@@ -216,7 +216,7 @@ ON DUPLICATE KEY UPDATE
     admin = VALUES(admin);
 
 -- name: GetUserByUsername :many
-SELECT sqlc.embed(user), organizer.id AS organizer_id
+SELECT sqlc.embed(user), sqlc.embed(organizer)
 FROM user
 LEFT JOIN user_organizer uo ON uo.user_id = user.id
 LEFT JOIN organizer ON organizer.id = uo.organizer_id

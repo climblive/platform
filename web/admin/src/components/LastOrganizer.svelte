@@ -1,6 +1,9 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
+  import type { Writable } from "svelte/store";
+
+  const selectedOrganizer = getContext<Writable<number>>("selectedOrganizer");
 
   onMount(() => {
     const organizerId = localStorage.getItem("organizerId");
@@ -9,6 +12,8 @@
     }
 
     setTimeout(() => {
+      $selectedOrganizer = Number(organizerId);
+
       navigate(`/admin/organizers/${organizerId}`, {
         replace: true,
       });
