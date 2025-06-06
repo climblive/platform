@@ -218,6 +218,11 @@ func (m *repositoryMock) StoreRaffleWinner(ctx context.Context, tx domain.Transa
 	}
 }
 
+func (m *repositoryMock) GetUserByUsername(ctx context.Context, tx domain.Transaction, username string) (domain.User, error) {
+	args := m.Called(ctx, tx, username)
+	return args.Get(0).(domain.User), args.Error(1)
+}
+
 type authorizerMock struct {
 	mock.Mock
 }
