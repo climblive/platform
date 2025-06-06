@@ -93,7 +93,6 @@ export interface ContestTemplate {
 export interface Organizer {
   id: OrganizerID;
   name: string;
-  homepage?: string;
 }
 export interface Problem {
   id: ProblemID;
@@ -169,7 +168,7 @@ export interface User {
   id: UserID;
   username: string;
   admin: boolean;
-  organizers: OrganizerID[];
+  organizers: Organizer[];
 }
 export interface ContenderEnteredEvent {
   contenderId: ContenderID;

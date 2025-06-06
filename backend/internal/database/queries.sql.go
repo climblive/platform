@@ -876,7 +876,7 @@ func (q *Queries) GetTicksByProblem(ctx context.Context, problemID int32) ([]Get
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :many
-SELECT user.id, user.name, user.username, user.admin, organizer.id AS organizer_id
+SELECT user.id, user.name, user.username, user.admin, organizer.id, organizer.name, organizer.homepage
 FROM user
 LEFT JOIN user_organizer uo ON uo.user_id = user.id
 LEFT JOIN organizer ON organizer.id = uo.organizer_id
@@ -884,8 +884,8 @@ WHERE username = ?
 `
 
 type GetUserByUsernameRow struct {
-	User        User
-	OrganizerID sql.NullInt32
+	User      User
+	Organizer Organizer
 }
 
 func (q *Queries) GetUserByUsername(ctx context.Context, username string) ([]GetUserByUsernameRow, error) {
@@ -902,7 +902,9 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) ([]Get
 			&i.User.Name,
 			&i.User.Username,
 			&i.User.Admin,
-			&i.OrganizerID,
+			&i.Organizer.ID,
+			&i.Organizer.Name,
+			&i.Organizer.Homepage,
 		); err != nil {
 			return nil, err
 		}

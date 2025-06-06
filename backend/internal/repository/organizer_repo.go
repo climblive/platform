@@ -11,9 +11,8 @@ import (
 
 func (d *Database) StoreOrganizer(ctx context.Context, tx domain.Transaction, organizer domain.Organizer) (domain.Organizer, error) {
 	params := database.UpsertOrganizerParams{
-		ID:       int32(organizer.ID),
-		Name:     organizer.Name,
-		Homepage: makeNullString(organizer.Homepage),
+		ID:   int32(organizer.ID),
+		Name: organizer.Name,
 	}
 
 	insertID, err := d.WithTx(tx).UpsertOrganizer(ctx, params)

@@ -31,8 +31,8 @@
       {@attach value($selectedOrganizer)}
       onsl-change={handleChange}
     >
-      {#each self.organizers as organizerId (organizerId)}
-        <sl-option value={organizerId}>{organizerId}</sl-option>
+      {#each self.organizers as organizer (organizer.id)}
+        <sl-option value={organizer.id}>{organizer.name}</sl-option>
       {/each}
     </sl-select>
   {/if}

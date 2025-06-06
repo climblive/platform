@@ -89,7 +89,6 @@ type Organizer struct {
 	ID        OrganizerID   `json:"id"`
 	Ownership OwnershipData `json:"-"`
 	Name      string        `json:"name"`
-	Homepage  string        `json:"homepage,omitempty"`
 }
 
 type Problem struct {
@@ -178,10 +177,10 @@ type Tick struct {
 }
 
 type User struct {
-	ID         UserID        `json:"id"`
-	Username   string        `json:"username"`
-	Admin      bool          `json:"admin"`
-	Organizers []OrganizerID `json:"organizers"`
+	ID         UserID      `json:"id"`
+	Username   string      `json:"username"`
+	Admin      bool        `json:"admin"`
+	Organizers []Organizer `json:"organizers"`
 }
 
 type ContenderEnteredEvent struct {

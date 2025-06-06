@@ -57,9 +57,7 @@ func (d *Database) GetUserByUsername(ctx context.Context, tx domain.Transaction,
 			user = userToDomain(record.User)
 		}
 
-		if record.OrganizerID.Valid {
-			user.Organizers = append(user.Organizers, domain.OrganizerID(record.OrganizerID.Int32))
-		}
+		user.Organizers = append(user.Organizers, organizerToDomain(record.Organizer))
 	}
 
 	return user, nil

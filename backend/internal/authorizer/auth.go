@@ -118,8 +118,8 @@ func (a *Authorizer) authorizeByUsername(ctx context.Context, username string, r
 		return domain.AdminRole, nil
 	}
 
-	for _, organizerID := range user.Organizers {
-		if organizerID == resourceOwnership.OrganizerID {
+	for _, organizer := range user.Organizers {
+		if organizer.ID == resourceOwnership.OrganizerID {
 			return domain.OrganizerRole, nil
 		}
 	}
