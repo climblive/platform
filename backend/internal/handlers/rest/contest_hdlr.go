@@ -24,10 +24,10 @@ type contestHandler struct {
 	compClassUseCase compClassUseCase
 }
 
-func InstallContestHandler(mux *Mux, contestUseCase contestUseCase, compcompClassUseCase compClassUseCase) {
+func InstallContestHandler(mux *Mux, contestUseCase contestUseCase, compClassUseCase compClassUseCase) {
 	handler := &contestHandler{
 		contestUseCase:   contestUseCase,
-		compClassUseCase: compcompClassUseCase,
+		compClassUseCase: compClassUseCase,
 	}
 
 	mux.HandleFunc("GET /contests/{contestID}", handler.GetContest)
