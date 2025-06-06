@@ -48,7 +48,6 @@
 
     & th:first-of-type {
       padding-left: var(--sl-spacing-medium);
-      width: 50%;
     }
   }
 </style>
