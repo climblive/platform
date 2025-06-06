@@ -13,7 +13,7 @@
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
   import { add } from "date-fns";
-  import { Link, navigate } from "svelte-routing";
+  import { navigate } from "svelte-routing";
   import CompClassList from "./CompClassList.svelte";
   import ContenderList from "./ContenderList.svelte";
   import ProblemList from "./ProblemList.svelte";
@@ -66,9 +66,14 @@
 </script>
 
 <main>
-  <Link to="/admin/contests">Back to contests</Link>
-
   {#if contest && scoreEngines}
+    <sl-button
+      variant="text"
+      onclick={() =>
+        navigate(`/admin/organizers/${contest.ownership.organizerId}`)}
+      >Back to contests<sl-icon name="arrow-left" slot="prefix"
+      ></sl-icon></sl-button
+    >
     <h1>{contest.name}</h1>
 
     <sl-tab-group bind:this={tabGroup} onsl-tab-show={handleTabShow}>
