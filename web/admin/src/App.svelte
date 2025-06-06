@@ -95,8 +95,9 @@
     <QueryClientProvider client={queryClient}>
       {#if !authenticated}
         <sl-button variant="primary" onclick={login}>Login</sl-button>
+      {:else}
+        <Main />
       {/if}
-      <Main />
       {#if import.meta.env.DEV}
         <SvelteQueryDevtools />
       {/if}

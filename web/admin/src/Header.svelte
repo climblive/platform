@@ -43,8 +43,8 @@
     display: flex;
     align-items: center;
     justify-content: end;
-    padding: 0.5rem;
+    padding-inline: var(--sl-spacing-small);
     background-color: var(--sl-color-primary-600);
-    height: 3rem;
+    height: 3.25rem;
   }
 </style>
