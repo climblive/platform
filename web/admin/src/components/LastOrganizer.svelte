@@ -8,8 +8,10 @@
       return;
     }
 
-    navigate(`/admin/organizers/${organizerId}`, {
-      replace: true,
+    setTimeout(() => {
+      navigate(`/admin/organizers/${organizerId}`, {
+        replace: true,
+      });
     });
   });
 </script>
