@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
   import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
   import { Route, Router } from "svelte-routing";
   import LastOrganizer from "./components/LastOrganizer.svelte";

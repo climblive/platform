@@ -2,6 +2,9 @@
   import { value } from "@climblive/lib/forms";
   import { getSelfQuery } from "@climblive/lib/queries";
   import type { SlSelect } from "@shoelace-style/shoelace";
+  import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import "@shoelace-style/shoelace/dist/components/option/option.js";
+  import "@shoelace-style/shoelace/dist/components/select/select.js";
   import { getContext } from "svelte";
   import { navigate } from "svelte-routing";
   import { type Writable } from "svelte/store";

@@ -12,19 +12,19 @@ type userUseCase interface {
 }
 
 type userHandler struct {
-	userUseClass userUseCase
+	userUseCase userUseCase
 }
 
 func InstallUserHandler(mux *Mux, userUseCase userUseCase) {
 	handler := &userHandler{
-		userUseClass: userUseCase,
+		userUseCase: userUseCase,
 	}
 
 	mux.HandleFunc("GET /users/self", handler.GetSelf)
 }
 
 func (hdlr *userHandler) GetSelf(w http.ResponseWriter, r *http.Request) {
-	user, err := hdlr.userUseClass.GetSelf(r.Context())
+	user, err := hdlr.userUseCase.GetSelf(r.Context())
 	if err != nil {
 		handleError(w, err)
 		return

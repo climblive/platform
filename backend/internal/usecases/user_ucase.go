@@ -25,7 +25,7 @@ func (uc *UserUseCase) GetSelf(ctx context.Context) (domain.User, error) {
 	}
 
 	if authentication.Username == "" {
-		return domain.User{}, errors.Wrap(domain.ErrNotAuthorized, 0)
+		return domain.User{}, errors.Wrap(domain.ErrNotAuthenticated, 0)
 	}
 
 	user, err := uc.Repo.GetUserByUsername(ctx, nil, authentication.Username)
