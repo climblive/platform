@@ -10,3 +10,4 @@ export { default as Table } from "./Table.svelte";
 export { default as TableCell } from "./TableCell.svelte";
 export { default as TableRow } from "./TableRow.svelte";
 export { default as Timer } from "./Timer.svelte";
+export { default as LabeledText } from "./LabeledText.svelte";
