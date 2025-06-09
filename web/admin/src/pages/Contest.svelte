@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { LabeledText } from "@climblive/lib/components";
   import {
     duplicateContestMutation,
     getContestQuery,
@@ -7,7 +8,10 @@
     stopScoreEngineMutation,
   } from "@climblive/lib/queries";
   import { getApiUrl, toastError } from "@climblive/lib/utils";
-  import type { SlTabShowEvent } from "@shoelace-style/shoelace";
+  import type { SlDetails, SlTabShowEvent } from "@shoelace-style/shoelace";
+  import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import "@shoelace-style/shoelace/dist/components/details/details.js";
+  import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import type SlTabGroup from "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
@@ -26,6 +30,7 @@
   let { contestId }: Props = $props();
 
   let tabGroup: SlTabGroup | undefined = $state();
+  let details: SlDetails | undefined = $state();
 
   const contestQuery = $derived(getContestQuery(contestId));
   const scoreEnginesQuery = $derived(getScoreEnginesQuery(contestId));
@@ -95,6 +100,35 @@
           </sl-button>
         </a>
 
+        <article>
+          <LabeledText label="Description">
+            {contest.description}
+          </LabeledText>
+          <LabeledText label="Location">
+            {contest.location}
+          </LabeledText>
+          <LabeledText label="Finalists">
+            {contest.finalists}
+          </LabeledText>
+          <LabeledText label="Qualifying problems">
+            {contest.qualifyingProblems}
+          </LabeledText>
+          {#if contest.rules}
+            <sl-details
+              onsl-after-show={() =>
+                details?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                  inline: "nearest",
+                })}
+              bind:this={details}
+              summary="Rules"
+            >
+              {@html contest.rules}
+            </sl-details>
+          {/if}
+        </article>
+
         <h2>Score Engines</h2>
         {#each scoreEngines as engineInstanceId (engineInstanceId)}
           <div>
@@ -102,18 +136,22 @@
             <sl-button
               variant="danger"
               onclick={() => $stopScoreEngine.mutate(engineInstanceId)}
-              loading={$stopScoreEngine.isPending}>Stop</sl-button
-            >
+              loading={$stopScoreEngine.isPending}
+              >Stop
+              <sl-icon name="stop" slot="prefix"></sl-icon>
+            </sl-button>
           </div>
         {/each}
-        <sl-button
-          onclick={() =>
-            $startScoreEngine.mutate({
-              terminatedBy: add(new Date(), { hours: 6 }),
-            })}
-          loading={$startScoreEngine.isPending}
-          disabled={scoreEngines.length > 0}>Start engine</sl-button
-        >
+        {#if scoreEngines.length === 0}
+          <sl-button
+            onclick={() =>
+              $startScoreEngine.mutate({
+                terminatedBy: add(new Date(), { hours: 6 }),
+              })}
+            loading={$startScoreEngine.isPending}
+            disabled={scoreEngines.length > 0}>Start engine</sl-button
+          >
+        {/if}
 
         <h2>Classes</h2>
         <sl-button
@@ -148,4 +186,10 @@
 </main>
 
 <style>
+  article {
+    padding-block: var(--sl-spacing-medium);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sl-spacing-small);
+  }
 </style>
