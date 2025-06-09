@@ -16,8 +16,8 @@
 
 <style>
   svg {
-    height: 100%;
-    width: 100%;
+    height: var(--height, 100%);
+    width: var(--width, 100%);
     transform: rotate(-45deg);
   }
 </style>

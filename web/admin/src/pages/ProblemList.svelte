@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { Table, TableCell, TableRow } from "@climblive/lib/components";
+  import {
+    HoldColorIndicator,
+    Table,
+    TableCell,
+    TableRow,
+  } from "@climblive/lib/components";
   import { getProblemsQuery } from "@climblive/lib/queries";
   import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import { navigate } from "svelte-routing";
@@ -22,7 +27,14 @@
       {#each problems as problem (problem.id)}
         <TableRow>
           <TableCell>№ {problem.number}</TableCell>
-          <TableCell>{problem.holdColorPrimary}</TableCell>
+          <TableCell
+            ><HoldColorIndicator
+              --height="1.25rem"
+              --width="1.25rem"
+              primary={problem.holdColorPrimary}
+              secondary={problem.holdColorSecondary}
+            /></TableCell
+          >
           <TableCell>{problem.pointsTop}</TableCell>
           <TableCell align="right">
             <sl-icon-button
