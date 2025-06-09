@@ -1,10 +1,10 @@
 <script lang="ts">
+  import { LabeledText } from "@climblive/lib/components";
   import type { CompClass, Contest, Problem } from "@climblive/lib/models";
   import type { SlDetails } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/details/details.js";
   import { format } from "date-fns";
   import { sv } from "date-fns/locale";
-  import LabeledText from "./LabeledText.svelte";
 
   interface Props {
     contest: Contest;
