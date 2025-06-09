@@ -36,10 +36,10 @@ func TestGetSelf(t *testing.T) {
 		Authorizer: mockedAuthorizer,
 	}
 
-	contender, err := ucase.GetSelf(context.Background())
+	user, err := ucase.GetSelf(context.Background())
 
 	require.NoError(t, err)
-	assert.Equal(t, fakedUser, contender)
+	assert.Equal(t, fakedUser, user)
 
 	mockedRepo.AssertExpectations(t)
 	mockedAuthorizer.AssertExpectations(t)
