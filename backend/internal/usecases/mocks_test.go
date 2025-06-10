@@ -88,6 +88,21 @@ func (m *repositoryMock) GetContest(ctx context.Context, tx domain.Transaction, 
 	return args.Get(0).(domain.Contest), args.Error(1)
 }
 
+func (m *repositoryMock) StoreContest(ctx context.Context, tx domain.Transaction, contest domain.Contest) (domain.Contest, error) {
+	args := m.Called(ctx, tx, contest)
+
+	if _, ok := args.Get(0).(mirrorInstruction); ok {
+		return contest, nil
+	} else {
+		return args.Get(0).(domain.Contest), args.Error(1)
+	}
+}
+
+func (m *repositoryMock) GetContestsByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.Contest, error) {
+	args := m.Called(ctx, tx, organizerID)
+	return args.Get(0).([]domain.Contest), args.Error(1)
+}
+
 func (m *repositoryMock) GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error) {
 	args := m.Called(ctx, tx, compClassID)
 	return args.Get(0).(domain.CompClass), args.Error(1)
@@ -96,6 +111,16 @@ func (m *repositoryMock) GetCompClass(ctx context.Context, tx domain.Transaction
 func (m *repositoryMock) GetCompClassesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.CompClass, error) {
 	args := m.Called(ctx, tx, contestID)
 	return args.Get(0).([]domain.CompClass), args.Error(1)
+}
+
+func (m *repositoryMock) DeleteCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) error {
+	args := m.Called(ctx, tx, compClassID)
+	return args.Error(0)
+}
+
+func (m *repositoryMock) StoreCompClass(ctx context.Context, tx domain.Transaction, compClass domain.CompClass) (domain.CompClass, error) {
+	args := m.Called(ctx, tx, compClass)
+	return args.Get(0).(domain.CompClass), args.Error(1)
 }
 
 func (m *repositoryMock) GetNumberOfContenders(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (int, error) {
@@ -133,9 +158,69 @@ func (m *repositoryMock) StoreTick(ctx context.Context, tx domain.Transaction, t
 	}
 }
 
+func (m *repositoryMock) GetTicksByProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) ([]domain.Tick, error) {
+	args := m.Called(ctx, tx, problemID)
+	return args.Get(0).([]domain.Tick), args.Error(1)
+}
+
 func (m *repositoryMock) GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) (domain.Problem, error) {
 	args := m.Called(ctx, tx, problemID)
 	return args.Get(0).(domain.Problem), args.Error(1)
+}
+
+func (m *repositoryMock) GetProblemByNumber(ctx context.Context, tx domain.Transaction, contestID domain.ContestID, problemNumber int) (domain.Problem, error) {
+	args := m.Called(ctx, tx, contestID, problemNumber)
+	return args.Get(0).(domain.Problem), args.Error(1)
+}
+
+func (m *repositoryMock) StoreProblem(ctx context.Context, tx domain.Transaction, problem domain.Problem) (domain.Problem, error) {
+	args := m.Called(ctx, tx, problem)
+	return args.Get(0).(domain.Problem), args.Error(1)
+}
+
+func (m *repositoryMock) DeleteProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) error {
+	args := m.Called(ctx, tx, problemID)
+	return args.Error(0)
+}
+
+func (m *repositoryMock) GetOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) (domain.Organizer, error) {
+	args := m.Called(ctx, tx, organizerID)
+	return args.Get(0).(domain.Organizer), args.Error(1)
+}
+
+func (m *repositoryMock) GetRaffle(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) (domain.Raffle, error) {
+	args := m.Called(ctx, tx, raffleID)
+	return args.Get(0).(domain.Raffle), args.Error(1)
+}
+
+func (m *repositoryMock) GetRafflesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Raffle, error) {
+	args := m.Called(ctx, tx, contestID)
+	return args.Get(0).([]domain.Raffle), args.Error(1)
+}
+
+func (m *repositoryMock) StoreRaffle(ctx context.Context, tx domain.Transaction, raffle domain.Raffle) (domain.Raffle, error) {
+	args := m.Called(ctx, tx, raffle)
+	return args.Get(0).(domain.Raffle), args.Error(1)
+}
+
+func (m *repositoryMock) GetRaffleWinners(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) ([]domain.RaffleWinner, error) {
+	args := m.Called(ctx, tx, raffleID)
+	return args.Get(0).([]domain.RaffleWinner), args.Error(1)
+}
+
+func (m *repositoryMock) StoreRaffleWinner(ctx context.Context, tx domain.Transaction, winner domain.RaffleWinner) (domain.RaffleWinner, error) {
+	args := m.Called(ctx, tx, winner)
+
+	if _, ok := args.Get(0).(mirrorInstruction); ok {
+		return winner, nil
+	} else {
+		return args.Get(0).(domain.RaffleWinner), args.Error(1)
+	}
+}
+
+func (m *repositoryMock) GetUserByUsername(ctx context.Context, tx domain.Transaction, username string) (domain.User, error) {
+	args := m.Called(ctx, tx, username)
+	return args.Get(0).(domain.User), args.Error(1)
 }
 
 type authorizerMock struct {
@@ -145,6 +230,11 @@ type authorizerMock struct {
 func (m *authorizerMock) HasOwnership(ctx context.Context, resourceOwnership domain.OwnershipData) (domain.AuthRole, error) {
 	args := m.Called(ctx, resourceOwnership)
 	return args.Get(0).(domain.AuthRole), args.Error(1)
+}
+
+func (m *authorizerMock) GetAuthentication(ctx context.Context) (domain.Authentication, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(domain.Authentication), args.Error(1)
 }
 
 type scoreKeeperMock struct {

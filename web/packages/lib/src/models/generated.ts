@@ -25,22 +25,37 @@ export type ResourceIDType =
   | SeriesID
   | UserID
   | TickID;
+export type ScoreEngineInstanceID = string;
 
 //////////
 // source: public.go
 
 export type ColorRGB = string;
+export interface OwnershipData {
+  organizerId: OrganizerID;
+}
 export interface CompClass {
-  id?: CompClassID;
+  id: CompClassID;
   contestId: ContestID;
   name: string;
   description?: string;
-  color?: ColorRGB;
   timeBegin: Date;
   timeEnd: Date;
 }
+export interface CompClassTemplate {
+  name: string;
+  description?: string;
+  timeBegin: Date;
+  timeEnd: Date;
+}
+export interface CompClassPatch {
+  name?: string;
+  description?: string;
+  timeBegin?: Date;
+  timeEnd?: Date;
+}
 export interface Contender {
-  id?: ContenderID;
+  id: ContenderID;
   contestId: ContestID;
   compClassId?: CompClassID;
   registrationCode: string;
@@ -61,13 +76,12 @@ export interface ContenderPatch {
   disqualified?: boolean;
 }
 export interface Contest {
-  id?: ContestID;
+  id: ContestID;
+  ownership: OwnershipData;
   location?: string;
   seriesId?: SeriesID;
-  protected: boolean;
   name: string;
   description?: string;
-  finalsEnabled: boolean;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
   rules?: string;
@@ -75,30 +89,55 @@ export interface Contest {
   timeBegin?: Date;
   timeEnd?: Date;
 }
-export interface Organizer {
-  id?: OrganizerID;
+export interface ContestTemplate {
+  location?: string;
+  seriesId?: SeriesID;
   name: string;
-  homepage?: string;
+  description?: string;
+  qualifyingProblems: number /* int */;
+  finalists: number /* int */;
+  rules?: string;
+  gracePeriod: number;
+}
+export interface Organizer {
+  id: OrganizerID;
+  name: string;
 }
 export interface Problem {
-  id?: ProblemID;
+  id: ProblemID;
   contestId: ContestID;
   number: number /* int */;
   holdColorPrimary: string;
   holdColorSecondary?: string;
-  name?: string;
   description?: string;
   pointsTop: number /* int */;
   pointsZone: number /* int */;
   flashBonus?: number /* int */;
 }
+export interface ProblemTemplate {
+  number: number /* int */;
+  holdColorPrimary: string;
+  holdColorSecondary?: string;
+  description?: string;
+  pointsTop: number /* int */;
+  pointsZone: number /* int */;
+  flashBonus?: number /* int */;
+}
+export interface ProblemPatch {
+  number?: number;
+  holdColorPrimary?: string;
+  holdColorSecondary?: string;
+  description?: string;
+  pointsTop?: number;
+  pointsZone?: number;
+  flashBonus?: number;
+}
 export interface Raffle {
-  id?: RaffleID;
+  id: RaffleID;
   contestId: ContestID;
-  active: boolean;
 }
 export interface RaffleWinner {
-  id?: RaffleWinnerID;
+  id: RaffleWinnerID;
   raffleId: RaffleID;
   contenderId: ContenderID;
   readonly contenderName: string;
@@ -113,7 +152,7 @@ export interface Score {
   rankOrder: number /* int */;
 }
 export interface Series {
-  id?: SeriesID;
+  id: SeriesID;
   name: string;
 }
 export interface ScoreboardEntry {
@@ -126,7 +165,7 @@ export interface ScoreboardEntry {
   score?: Score;
 }
 export interface Tick {
-  id?: TickID;
+  id: TickID;
   timestamp: Date;
   problemId: ProblemID;
   top: boolean;
@@ -135,11 +174,10 @@ export interface Tick {
   attemptsZone: number /* int */;
 }
 export interface User {
-  id?: UserID;
-  name: string;
+  id: UserID;
   username: string;
   admin: boolean;
-  organizers: OrganizerID[];
+  organizers: Organizer[];
 }
 export interface ContenderEnteredEvent {
   contenderId: ContenderID;
@@ -162,6 +200,8 @@ export interface ContenderRequalifiedEvent {
   contenderId: ContenderID;
 }
 export interface AscentRegisteredEvent {
+  tickId: TickID;
+  timestamp: Date;
   contenderId: ContenderID;
   problemId: ProblemID;
   top: boolean;
@@ -170,6 +210,7 @@ export interface AscentRegisteredEvent {
   attemptsZone: number /* int */;
 }
 export interface AscentDeregisteredEvent {
+  tickId: TickID;
   contenderId: ContenderID;
   problemId: ProblemID;
 }
@@ -203,4 +244,10 @@ export interface ContenderScoreUpdatedEvent {
   placement: number /* int */;
   finalist: boolean;
   rankOrder: number /* int */;
+}
+export interface ScoreEngineStartedEvent {
+  instanceId: ScoreEngineInstanceID;
+}
+export interface ScoreEngineStoppedEvent {
+  instanceId: ScoreEngineInstanceID;
 }

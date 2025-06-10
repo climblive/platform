@@ -28,10 +28,13 @@ export default [
       },
       globals: {
         ...globals.browser,
+        $$Generic: "readonly",
+        NodeListOf: "readonly",
       },
     },
     rules: {
       "svelte/valid-compile": "off",
+      "svelte/no-at-html-tags": "off",
     },
   },
 ];

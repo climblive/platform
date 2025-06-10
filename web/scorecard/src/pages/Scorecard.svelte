@@ -8,19 +8,32 @@
     ResultList,
     ScoreboardProvider,
   } from "@climblive/lib/components";
-  import { contenderScoreUpdatedEventSchema } from "@climblive/lib/models";
+  import {
+    ascentDeregisteredEventSchema,
+    ascentRegisteredEventSchema,
+    contenderScoreUpdatedEventSchema,
+    type Problem,
+    type Tick,
+  } from "@climblive/lib/models";
   import {
     getCompClassesQuery,
     getContenderQuery,
     getContestQuery,
     getProblemsQuery,
     getTicksQuery,
+    removeTickFromQueryCache,
+    updateTickInQueryCache,
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
-  import type { SlTabGroup, SlTabShowEvent } from "@shoelace-style/shoelace";
+  import type {
+    SlRadioGroup,
+    SlTabGroup,
+    SlTabShowEvent,
+  } from "@shoelace-style/shoelace";
   import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
+  import { useQueryClient } from "@tanstack/svelte-query";
   import { add } from "date-fns/add";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
@@ -28,14 +41,17 @@
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
-  const contenderQuery = getContenderQuery($session.contenderId);
-  const contestQuery = getContestQuery($session.contestId);
-  const compClassesQuery = getCompClassesQuery($session.contestId);
-  const problemsQuery = getProblemsQuery($session.contestId);
-  const ticksQuery = getTicksQuery($session.contenderId);
+  const queryClient = useQueryClient();
+
+  const contenderQuery = $derived(getContenderQuery($session.contenderId));
+  const contestQuery = $derived(getContestQuery($session.contestId));
+  const compClassesQuery = $derived(getCompClassesQuery($session.contestId));
+  const problemsQuery = $derived(getProblemsQuery($session.contestId));
+  const ticksQuery = $derived(getTicksQuery($session.contenderId));
 
   let resultsConnected = $state(false);
   let tabGroup: SlTabGroup | undefined = $state();
+  let radioGroup: SlRadioGroup | undefined = $state();
   let eventSource: EventSource | undefined;
   let score: number = $state(0);
   let placement: number | undefined = $state();
@@ -58,6 +74,39 @@
     add(endTime, {
       minutes: (contest?.gracePeriod ?? 0) / (1_000_000_000 * 60),
     }),
+  );
+
+  let orderProblemsBy = $state<"number" | "points">("number");
+
+  let sortedProblems = $derived.by<Problem[]>(() => {
+    const clonedProblems = [...(problems ?? [])];
+
+    switch (orderProblemsBy) {
+      case "number":
+        clonedProblems.sort(
+          (p1: Problem, p2: Problem) => p1.number - p2.number,
+        );
+
+        break;
+      case "points":
+        clonedProblems.sort(
+          (p1: Problem, p2: Problem) =>
+            p1.pointsTop +
+            (p1.flashBonus ?? 0) -
+            p2.pointsTop -
+            (p2.flashBonus ?? 0),
+        );
+
+        break;
+    }
+
+    return clonedProblems;
+  });
+
+  let highestProblemNumber = $derived(
+    problems?.reduce((max, cur) => {
+      return Math.max(max, cur.number);
+    }, 0) ?? 0,
   );
 
   $effect(() => {
@@ -101,6 +150,28 @@
         placement = event.placement;
       }
     });
+
+    eventSource.addEventListener("ASCENT_REGISTERED", (e) => {
+      const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
+
+      const newTick: Tick = {
+        id: event.tickId,
+        timestamp: event.timestamp,
+        problemId: event.problemId,
+        top: event.top,
+        attemptsTop: event.attemptsTop,
+        zone: event.zone,
+        attemptsZone: event.attemptsZone,
+      };
+
+      updateTickInQueryCache(queryClient, $session.contenderId, newTick);
+    });
+
+    eventSource.addEventListener("ASCENT_DEREGISTERED", (e) => {
+      const event = ascentDeregisteredEventSchema.parse(JSON.parse(e.data));
+
+      removeTickFromQueryCache(queryClient, event.tickId);
+    });
   };
 
   const tearDown = () => {
@@ -124,7 +195,7 @@
 
 <svelte:window onvisibilitychange={handleVisibilityChange} />
 
-{#if !contender || !contest || !compClasses || !problems || !ticks || !selectedCompClass}
+{#if !contender || !contest || !compClasses || !sortedProblems || !ticks || !selectedCompClass}
   <Loading />
 {:else}
   <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime}>
@@ -147,25 +218,52 @@
         <sl-tab-group bind:this={tabGroup} onsl-tab-show={handleShowTab}>
           <sl-tab slot="nav" panel="problems">Scorecard</sl-tab>
           <sl-tab slot="nav" panel="results">Results</sl-tab>
-          {#if contest.rules}
-            <sl-tab slot="nav" panel="info">Info</sl-tab>
-          {/if}
+          <sl-tab slot="nav" panel="info">Info</sl-tab>
 
           <sl-tab-panel name="problems">
-            {#each problems as problem}
+            <sl-radio-group
+              size="small"
+              bind:this={radioGroup}
+              value={orderProblemsBy}
+              onsl-change={() => {
+                if (radioGroup) {
+                  orderProblemsBy = radioGroup.value as typeof orderProblemsBy;
+                }
+              }}
+            >
+              <sl-radio-button value="number">
+                <sl-icon
+                  slot="prefix"
+                  name="sort-numeric-down"
+                  label="Sort by number"
+                ></sl-icon>
+                Sort by number
+              </sl-radio-button>
+
+              <sl-radio-button value="points">
+                <sl-icon
+                  slot="prefix"
+                  name="sort-down-alt"
+                  label="Sort by points"
+                ></sl-icon>
+                Sort by points
+              </sl-radio-button>
+            </sl-radio-group>
+            {#each sortedProblems as problem (problem.id)}
               <ProblemView
                 {problem}
                 tick={ticks.find(({ problemId }) => problemId === problem.id)}
                 disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
+                {highestProblemNumber}
               />
             {/each}
           </sl-tab-panel>
           <sl-tab-panel name="results">
-            {#if resultsConnected && contender.compClassId}
+            {#if resultsConnected}
               <ScoreboardProvider contestId={$session.contestId}>
                 {#snippet children({ scoreboard, loading })}
                   <ResultList
-                    compClassId={contender.compClassId}
+                    compClassId={selectedCompClass.id}
                     {scoreboard}
                     {loading}
                   />
@@ -174,7 +272,7 @@
             {/if}
           </sl-tab-panel>
           <sl-tab-panel name="info">
-            <ContestInfo {contest} {problems} {compClasses} />
+            <ContestInfo {contest} problems={sortedProblems} {compClasses} />
           </sl-tab-panel>
         </sl-tab-group>
       </main>
@@ -200,7 +298,7 @@
     left: 0;
     right: 0;
     z-index: 10;
-    background-color: var(--sl-color-primary-200);
+    background-color: white;
     padding: var(--sl-spacing-small);
   }
 
@@ -215,5 +313,20 @@
     flex-direction: column;
     gap: var(--sl-spacing-x-small);
     width: 100%;
+  }
+
+  sl-radio-group::part(button-group) {
+    width: 100%;
+  }
+
+  sl-radio-button {
+    flex-grow: 1;
+
+    &::part(button--checked),
+    &::part(button):hover {
+      border-color: var(--sl-color-neutral-300);
+      background-color: var(--sl-color-neutral-200);
+      color: inherit;
+    }
   }
 </style>

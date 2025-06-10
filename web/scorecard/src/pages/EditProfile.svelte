@@ -1,10 +1,10 @@
 <script lang="ts">
   import RegistrationForm from "@/forms/RegistrationForm.svelte";
   import type { ScorecardSession } from "@/types";
-  import type { RegistrationFormData } from "@climblive/lib/models";
+  import type { ContenderPatch } from "@climblive/lib/models";
   import {
     getContenderQuery,
-    updateContenderMutation,
+    patchContenderMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
@@ -15,8 +15,8 @@
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
-  const contenderQuery = getContenderQuery($session.contenderId);
-  const updateContender = updateContenderMutation($session.contenderId);
+  const contenderQuery = $derived(getContenderQuery($session.contenderId));
+  const patchContender = $derived(patchContenderMutation($session.contenderId));
 
   let contender = $derived($contenderQuery.data);
 
@@ -24,14 +24,12 @@
     navigate(`/${contender?.registrationCode}`);
   };
 
-  const handleSubmit = ({
-    detail: form,
-  }: CustomEvent<RegistrationFormData>) => {
-    if (!contender || $updateContender.isPending) {
+  const handleSubmit = (form: ContenderPatch) => {
+    if (!contender || $patchContender.isPending) {
       return;
     }
 
-    $updateContender.mutate(
+    $patchContender.mutate(
       {
         ...form,
         publicName: form.name,
@@ -48,7 +46,7 @@
   <Loading />
 {:else}
   <RegistrationForm
-    on:submit={handleSubmit}
+    submit={handleSubmit}
     data={{
       name: contender.name,
       clubName: contender.clubName,
@@ -67,7 +65,7 @@
       <sl-button
         size="small"
         type="submit"
-        loading={$updateContender.isPending}
+        loading={$patchContender.isPending}
         disabled={false}
         variant="primary"
         >Save

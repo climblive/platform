@@ -1,11 +1,29 @@
 import type { AxiosInstance, RawAxiosRequestHeaders } from "axios";
 import axios from "axios";
 import { z } from "zod";
-import { contestSchema, scoreboardEntrySchema } from "./models";
+import {
+  contestSchema,
+  scoreboardEntrySchema,
+  type CompClassPatch,
+  type CompClassTemplate,
+  type ContenderPatch,
+  type ContestID,
+  type ContestTemplate,
+  type ProblemPatch,
+  type ProblemTemplate,
+  type ScoreEngineInstanceID,
+  type Tick,
+} from "./models";
 import { compClassSchema } from "./models/compClass";
-import { contenderSchema, type ContenderPatch } from "./models/contender";
+import { contenderSchema } from "./models/contender";
 import { problemSchema } from "./models/problem";
-import { tickSchema, type Tick } from "./models/tick";
+import { raffleSchema, raffleWinnerSchema } from "./models/raffle";
+import type {
+  CreateContendersArguments,
+  StartScoreEngineArguments,
+} from "./models/rest";
+import { tickSchema } from "./models/tick";
+import { userSchema } from "./models/user";
 import { getApiUrl } from "./utils/config";
 
 interface ApiCredentialsProvider {
@@ -23,6 +41,22 @@ export class ContenderCredentialsProvider implements ApiCredentialsProvider {
     const headers: RawAxiosRequestHeaders = {};
 
     headers["Authorization"] = `Regcode ${this.registrationCode}`;
+
+    return headers;
+  };
+}
+
+export class OrganizerCredentialsProvider implements ApiCredentialsProvider {
+  private jwt: string;
+
+  constructor(jwt: string) {
+    this.jwt = jwt;
+  }
+
+  getAuthHeaders = (): RawAxiosRequestHeaders => {
+    const headers: RawAxiosRequestHeaders = {};
+
+    headers["Authorization"] = `Bearer ${this.jwt}`;
 
     return headers;
   };
@@ -52,6 +86,16 @@ export class ApiClient {
     this.credentialsProvider = credentialsProvider;
   };
 
+  getSelf = async () => {
+    const endpoint = "/users/self";
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return userSchema.parse(result.data);
+  };
+
   findContender = async (registrationCode: string) => {
     const endpoint = `/codes/${registrationCode}/contender`;
 
@@ -70,7 +114,17 @@ export class ApiClient {
     return contenderSchema.parse(result.data);
   };
 
-  updateContender = async (id: number, patch: ContenderPatch) => {
+  getContendersByContest = async (contestId: number) => {
+    const endpoint = `/contests/${contestId}/contenders`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(contenderSchema).parse(result.data);
+  };
+
+  patchContender = async (id: number, patch: ContenderPatch) => {
     const endpoint = `/contenders/${id}`;
 
     const result = await this.axiosInstance.patch(endpoint, patch, {
@@ -78,6 +132,19 @@ export class ApiClient {
     });
 
     return contenderSchema.parse(result.data);
+  };
+
+  createContenders = async (
+    contestId: number,
+    args: CreateContendersArguments,
+  ) => {
+    const endpoint = `/contests/${contestId}/contenders`;
+
+    const result = await this.axiosInstance.post(endpoint, args, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(contenderSchema).parse(result.data);
   };
 
   getContest = async (id: number) => {
@@ -88,6 +155,44 @@ export class ApiClient {
     return contestSchema.parse(result.data);
   };
 
+  createContest = async (organizerId: number, template: ContestTemplate) => {
+    const endpoint = `/organizers/${organizerId}/contests`;
+
+    const result = await this.axiosInstance.post(endpoint, template, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return contestSchema.parse(result.data);
+  };
+
+  duplicateContest = async (contestId: number) => {
+    const endpoint = `/contests/${contestId}/duplicate`;
+
+    const result = await this.axiosInstance.post(endpoint, undefined, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return contestSchema.parse(result.data);
+  };
+
+  getContestsByOrganizer = async (organizerId: number) => {
+    const endpoint = `/organizers/${organizerId}/contests`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(contestSchema).parse(result.data);
+  };
+
+  getProblem = async (problemId: number) => {
+    const endpoint = `/problems/${problemId}`;
+
+    const result = await this.axiosInstance.get(endpoint);
+
+    return problemSchema.parse(result.data);
+  };
+
   getProblems = async (contestId: number) => {
     const endpoint = `/contests/${contestId}/problems`;
 
@@ -96,12 +201,76 @@ export class ApiClient {
     return z.array(problemSchema).parse(result.data);
   };
 
+  createProblem = async (contestId: number, template: ProblemTemplate) => {
+    const endpoint = `/contests/${contestId}/problems`;
+
+    const result = await this.axiosInstance.post(endpoint, template, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return problemSchema.parse(result.data);
+  };
+
+  patchProblem = async (id: number, patch: ProblemPatch) => {
+    const endpoint = `/problems/${id}`;
+
+    const result = await this.axiosInstance.patch(endpoint, patch, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return problemSchema.parse(result.data);
+  };
+
+  deleteProblem = async (id: number) => {
+    const endpoint = `/problems/${id}`;
+
+    await this.axiosInstance.delete(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+  };
+
+  getCompClass = async (compClassId: number) => {
+    const endpoint = `/comp-classes/${compClassId}`;
+
+    const result = await this.axiosInstance.get(endpoint);
+
+    return compClassSchema.parse(result.data);
+  };
+
   getCompClasses = async (contestId: number) => {
-    const endpoint = `/contests/${contestId}/compClasses`;
+    const endpoint = `/contests/${contestId}/comp-classes`;
 
     const result = await this.axiosInstance.get(endpoint);
 
     return z.array(compClassSchema).parse(result.data);
+  };
+
+  createCompClass = async (contestId: number, template: CompClassTemplate) => {
+    const endpoint = `/contests/${contestId}/comp-classes`;
+
+    const result = await this.axiosInstance.post(endpoint, template, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return compClassSchema.parse(result.data);
+  };
+
+  deleteCompClass = async (id: number) => {
+    const endpoint = `/comp-classes/${id}`;
+
+    await this.axiosInstance.delete(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+  };
+
+  patchCompClass = async (id: number, patch: CompClassPatch) => {
+    const endpoint = `/comp-classes/${id}`;
+
+    const result = await this.axiosInstance.patch(endpoint, patch, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return compClassSchema.parse(result.data);
   };
 
   getTicks = async (contenderId: number) => {
@@ -141,5 +310,86 @@ export class ApiClient {
     const result = await this.axiosInstance.get(endpoint);
 
     return z.array(scoreboardEntrySchema).parse(result.data);
+  };
+
+  getScoreEngines = async (contestId: ContestID) => {
+    const endpoint = `/contests/${contestId}/score-engines`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(z.string().uuid()).parse(result.data);
+  };
+
+  startScoreEngine = async (
+    contestId: ContestID,
+    args: StartScoreEngineArguments,
+  ) => {
+    const endpoint = `/contests/${contestId}/score-engines`;
+
+    const result = await this.axiosInstance.post(endpoint, args, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.string().uuid().parse(result.data);
+  };
+
+  stopScoreEngine = async (instanceId: ScoreEngineInstanceID) => {
+    const endpoint = `/score-engines/${instanceId}`;
+
+    await this.axiosInstance.delete(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+  };
+
+  getRaffle = async (raffleId: number) => {
+    const endpoint = `/raffles/${raffleId}`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return raffleSchema.parse(result.data);
+  };
+
+  getRaffles = async (contestId: number) => {
+    const endpoint = `/contests/${contestId}/raffles`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(raffleSchema).parse(result.data);
+  };
+
+  createRaffle = async (contestId: number) => {
+    const endpoint = `/contests/${contestId}/raffles`;
+
+    const result = await this.axiosInstance.post(endpoint, undefined, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return raffleSchema.parse(result.data);
+  };
+
+  drawRaffleWinner = async (raffleId: number) => {
+    const endpoint = `/raffles/${raffleId}/winners`;
+
+    const result = await this.axiosInstance.post(endpoint, undefined, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return raffleWinnerSchema.parse(result.data);
+  };
+
+  getRaffleWinners = async (raffleId: number) => {
+    const endpoint = `/raffles/${raffleId}/winners`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(raffleWinnerSchema).parse(result.data);
   };
 }

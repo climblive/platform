@@ -15,15 +15,20 @@ import (
 	"sync"
 	"time"
 
+	_ "embed"
+
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-faker/faker/v4"
 )
+
+//go:embed codes.txt
+var codes string
 
 const (
 	APIURL     = "http://localhost:8090"
 	ITERATIONS = 10
 	MAX_SLEEP  = 10_000 * time.Millisecond
-	CONTENDERS = 10
+	CONTENDERS = 200
 )
 
 type SimulatorEvent int
@@ -34,11 +39,7 @@ const (
 )
 
 func main() {
-	var registrationCodes []string
-
-	for n := range CONTENDERS {
-		registrationCodes = append(registrationCodes, fmt.Sprintf("ABCD%04d", n+1))
-	}
+	var registrationCodes []string = strings.Split(codes, "\n")
 
 	var wg sync.WaitGroup
 	var metricsMutex sync.Mutex
@@ -104,20 +105,22 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 	r.contender = r.GetContender()
 	compClasses := r.GetCompClasses(r.contender.ContestID)
 
+	patch := domain.ContenderPatch{}
+
 	selectedCompClass := compClasses[rand.Int()%len(compClasses)]
 
 	switch selectedCompClass.Name {
 	case "Males":
-		r.contender.Name = fmt.Sprintf("%s %s (%d)", faker.FirstNameMale(), faker.LastName(), r.contender.ID)
+		patch.Name = domain.NewPatch(fmt.Sprintf("%s %s (%d)", faker.FirstNameMale(), faker.LastName(), r.contender.ID))
 	case "Females":
-		r.contender.Name = fmt.Sprintf("%s %s (%d)", faker.FirstNameFemale(), faker.LastName(), r.contender.ID)
+		patch.Name = domain.NewPatch(fmt.Sprintf("%s %s (%d)", faker.FirstNameFemale(), faker.LastName(), r.contender.ID))
 	}
 
-	r.contender.PublicName = r.contender.Name
-	r.contender.CompClassID = selectedCompClass.ID
-	r.contender.ClubName = faker.ChineseName()
+	patch.PublicName = domain.NewPatch(patch.Name.Value)
+	patch.CompClassID = domain.NewPatch(selectedCompClass.ID)
+	patch.ClubName = domain.NewPatch(faker.ChineseName())
 
-	r.UpdateContender(r.contender)
+	r.PatchContender(r.contender.ID, patch)
 
 	problems := r.GetProblems(r.contender.ContestID)
 	ticks := r.GetTicks(r.contender.ID)
@@ -138,7 +141,7 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 		} else {
 			tick := domain.Tick{
 				ProblemID:    problem.ID,
-				AttemptsTop:  1,
+				AttemptsTop:  rand.Int() % 5,
 				Top:          true,
 				AttemptsZone: 1,
 				Zone:         true,
@@ -172,14 +175,14 @@ func (r *ContenderRunner) GetContender() domain.Contender {
 	return contender
 }
 
-func (r *ContenderRunner) UpdateContender(contender domain.Contender) domain.Contender {
+func (r *ContenderRunner) PatchContender(contenderID domain.ContenderID, patch domain.ContenderPatch) domain.Contender {
 	buf := new(bytes.Buffer)
-	err := json.NewEncoder(buf).Encode(contender)
+	err := json.NewEncoder(buf).Encode(patch)
 	if err != nil {
 		panic(err)
 	}
 
-	req, err := http.NewRequest(http.MethodPatch, fmt.Sprintf("%s/contenders/%d", APIURL, contender.ID), buf)
+	req, err := http.NewRequest(http.MethodPatch, fmt.Sprintf("%s/contenders/%d", APIURL, contenderID), buf)
 	if err != nil {
 		panic(err)
 	}
@@ -195,6 +198,8 @@ func (r *ContenderRunner) UpdateContender(contender domain.Contender) domain.Con
 
 	defer resp.Body.Close()
 
+	var contender domain.Contender
+
 	err = json.NewDecoder(resp.Body).Decode(&contender)
 	if err != nil {
 		panic(err)
@@ -204,7 +209,7 @@ func (r *ContenderRunner) UpdateContender(contender domain.Contender) domain.Con
 }
 
 func (r *ContenderRunner) GetCompClasses(contestID domain.ContestID) []domain.CompClass {
-	resp, err := http.Get(fmt.Sprintf("%s/contests/%d/compClasses", APIURL, contestID))
+	resp, err := http.Get(fmt.Sprintf("%s/contests/%d/comp-classes", APIURL, contestID))
 	if err != nil {
 		panic(err)
 	}

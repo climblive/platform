@@ -6,6 +6,7 @@
   import Start from "@/pages/Start.svelte";
   import { type ScorecardSession } from "@/types";
   import { authenticateContender } from "@/utils/auth";
+  import { ErrorBoundary } from "@climblive/lib/components";
   import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path.js";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
@@ -70,18 +71,20 @@
   parseCodeFromUrl();
 </script>
 
-<QueryClientProvider client={queryClient}>
-  {#if authenticating}
-    <Loading />
-  {:else}
-    <Router>
-      <Route path="/:code/register"><Register /></Route>
-      <Route path="/:code/edit"><EditProfile /></Route>
-      <Route path="/:code"><Scorecard /></Route>
-      <Route path="/"><Start /></Route>
-    </Router>
-  {/if}
-  {#if import.meta.env.DEV && false}
-    <SvelteQueryDevtools />
-  {/if}
-</QueryClientProvider>
+<ErrorBoundary>
+  <QueryClientProvider client={queryClient}>
+    {#if authenticating}
+      <Loading />
+    {:else}
+      <Router>
+        <Route path="/:code/register"><Register /></Route>
+        <Route path="/:code/edit"><EditProfile /></Route>
+        <Route path="/:code"><Scorecard /></Route>
+        <Route path="/"><Start /></Route>
+      </Router>
+    {/if}
+    {#if import.meta.env.DEV}
+      <SvelteQueryDevtools />
+    {/if}
+  </QueryClientProvider>
+</ErrorBoundary>

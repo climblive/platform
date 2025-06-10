@@ -16,6 +16,7 @@ import (
 
 func TestEngineDriver(t *testing.T) {
 	fakedContestID := domain.ContestID(rand.Int())
+	fakedInstanceID := uuid.New()
 
 	type fixture struct {
 		broker       *eventBrokerMock
@@ -41,13 +42,22 @@ func TestEngineDriver(t *testing.T) {
 			"ASCENT_REGISTERED",
 			"ASCENT_DEREGISTERED",
 			"PROBLEM_ADDED",
+			"PROBLEM_UPDATED",
 		)
 
 		mockedEventBroker.On("Subscribe", filter, 0).Return(subscriptionID, subscription)
 
 		mockedEventBroker.On("Unsubscribe", subscriptionID).Return()
 
-		driver := scores.NewScoreEngineDriver(fakedContestID, mockedEventBroker)
+		mockedEventBroker.On("Dispatch", fakedContestID, domain.ScoreEngineStartedEvent{
+			InstanceID: fakedInstanceID,
+		}).Return()
+
+		mockedEventBroker.On("Dispatch", fakedContestID, domain.ScoreEngineStoppedEvent{
+			InstanceID: fakedInstanceID,
+		}).Return()
+
+		driver := scores.NewScoreEngineDriver(fakedContestID, fakedInstanceID, mockedEventBroker)
 
 		awaitExpectations := func(t *testing.T) {
 			mockedEventBroker.AssertExpectations(t)
@@ -102,13 +112,11 @@ func TestEngineDriver(t *testing.T) {
 
 		mockedEngine := new(scoreEngineMock)
 
-		mockedEngine.On("Start").Return()
+		mockedEngine.On("Start").Run(func(args mock.Arguments) { cancel() }).Return()
 		mockedEngine.On("Stop").Return()
 		mockedEngine.On("GetDirtyScores").Return([]domain.Score{})
 
 		installEngine(mockedEngine)
-
-		cancel()
 
 		wg.Wait()
 
@@ -518,6 +526,10 @@ func (m *scoreEngineMock) HandleAscentDeregistered(event domain.AscentDeregister
 }
 
 func (m *scoreEngineMock) HandleProblemAdded(event domain.ProblemAddedEvent) {
+	m.Called(event)
+}
+
+func (m *scoreEngineMock) HandleProblemUpdated(event domain.ProblemUpdatedEvent) {
 	m.Called(event)
 }
 

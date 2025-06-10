@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
 )
@@ -33,4 +34,36 @@ func (d *Database) GetCompClassesByContest(ctx context.Context, tx domain.Transa
 	}
 
 	return compClasses, nil
+}
+
+func (d *Database) StoreCompClass(ctx context.Context, tx domain.Transaction, compClass domain.CompClass) (domain.CompClass, error) {
+	params := database.UpsertCompClassParams{
+		ID:          int32(compClass.ID),
+		OrganizerID: int32(compClass.Ownership.OrganizerID),
+		ContestID:   int32(compClass.ContestID),
+		Name:        compClass.Name,
+		Description: makeNullString(compClass.Description),
+		TimeBegin:   compClass.TimeBegin,
+		TimeEnd:     compClass.TimeEnd,
+	}
+
+	insertID, err := d.WithTx(tx).UpsertCompClass(ctx, params)
+	if err != nil {
+		return domain.CompClass{}, errors.Wrap(err, 0)
+	}
+
+	if insertID != 0 {
+		compClass.ID = domain.CompClassID(insertID)
+	}
+
+	return compClass, err
+}
+
+func (d *Database) DeleteCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) error {
+	err := d.WithTx(tx).DeleteCompClass(ctx, int32(compClassID))
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	return nil
 }

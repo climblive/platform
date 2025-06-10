@@ -83,7 +83,9 @@ func (e *DefaultScoreEngine) Start() {
 			}
 		}
 
-		contender.Score = e.rules.CalculateScore(Points(scoredTicks))
+		if !contender.Disqualified {
+			contender.Score = e.rules.CalculateScore(Points(scoredTicks))
+		}
 		e.store.SaveContender(contender)
 	}
 
@@ -239,6 +241,19 @@ func (e *DefaultScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) 
 	}
 
 	e.store.SaveProblem(problem)
+}
+
+func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEvent) {
+	problem := Problem{
+		ID:         event.ProblemID,
+		PointsTop:  event.PointsTop,
+		PointsZone: event.PointsZone,
+		FlashBonus: event.FlashBonus,
+	}
+
+	e.store.SaveProblem(problem)
+
+	e.Start()
 }
 
 func (e *DefaultScoreEngine) GetDirtyScores() []domain.Score {

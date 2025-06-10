@@ -7,11 +7,11 @@
   "keywords": [],
   "author": "",
   "devDependencies": {
-    "@playwright/test": "^1.48.2",
-    "@testcontainers/mariadb": "^10.14.0",
-    "@types/node": "^22.9.0",
+    "@playwright/test": "^1.52.0",
+    "@testcontainers/mariadb": "^11.0.0",
+    "@types/node": "^22.15.29",
     "fs": "0.0.1-security",
-    "mariadb": "^3.4.0",
-    "testcontainers": "^10.14.0"
+    "mariadb": "^3.4.2",
+    "testcontainers": "^11.0.0"
   }
 }

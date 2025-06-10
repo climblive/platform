@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="ClimbLive" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>ClimbLive</title>
+    <meta
+      name="description"
+      content="A free community platform for scoring bouldering competitions."
+    />
+    <meta
+      name="keywords"
+      content="climbing, bouldering, competition, climbing competition, bouldering competition, scoring, qualifiers, free"
+    />
+    <meta name="author" content="ClimbLive" />
+
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <section class="hero-section">
+      <div class="sales-container">
+        <div class="hero-content">
+          <div class="logo-container">
+            <img src="logo.svg" alt="ClimbLive Logo" class="logo" />
+          </div>
+          <h1>A free community platform for scoring bouldering competitions</h1>
+          <p class="tagline">
+            Sign-up for a free account and set up your first event in just
+            minutes using our intuitive admin console.
+          </p>
+          <div>
+            <a href="https://admin.climblive.app" class="cta-button"
+              >Let's get started</a
+            >
+            <a href="https://climblive.app" class="secondary-button"
+              >Go to scoring app</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="features-section">
+      <div class="sales-container">
+        <h2 class="section-title">Feature Overview</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3 class="feature-title">Web App for Self-Scoring</h3>
+            <p>
+              Simple and intuitive interface for competitors to record their own
+              scores.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🚫</div>
+            <h3 class="feature-title">No Account Required</h3>
+            <p>
+              Competitors can participate without going through the hassle of
+              creating a user account.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3 class="feature-title">Live Results</h3>
+            <p>
+              See competition standing updates in real-time without refreshing
+              the page.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🎁</div>
+            <h3 class="feature-title">Prize Raffles</h3>
+            <p>
+              Easily organize and manage prize raffles for your competition
+              participants.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">🎨</div>
+            <h3 class="feature-title">Hold Color Tracking</h3>
+            <p>
+              Clear identification of hold colors on problems to avoid mix-ups
+              during the competition.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="description-section">
+      <div class="sales-container">
+        <div class="description-content">
+          <h2 class="section-title">Why Choose ClimbLive?</h2>
+          <p>
+            ClimbLive is built by climbers for climbers. Our platform
+            streamlines the entire competition process, saving organizers hours
+            from dealing with pen and paper and giving competitors a smooth
+            experience.
+          </p>
+          <p>
+            Whether you're running a small community event or a larger gym
+            competition, our platform scales to your needs.
+          </p>
+          <div class="cta-container">
+            <a href="https://admin.climblive.app" class="cta-button"
+              >Host your first event</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="sales-container">
+        <p>
+          © 2019 - <span id="current-year"></span> ClimbLive. The free
+          community platform for bouldering competitions.
+        </p>
+        <div class="footer-links">
+          <a href="https://admin.climblive.app">Admin Console</a>
+          <a href="https://climblive.app">Scoring App</a>
+          <a href="mailto:info@climblive.com">Contact Us</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("current-year").textContent =
+        new Date().getFullYear();
+    </script>
+  </body>
+</html>

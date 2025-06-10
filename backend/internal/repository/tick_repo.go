@@ -50,7 +50,10 @@ func (d *Database) StoreTick(ctx context.Context, tx domain.Transaction, tick do
 	}
 
 	insertID, err := d.WithTx(tx).InsertTick(ctx, params)
-	if err != nil {
+	switch {
+	case mysqlDuplicateKeyConstraintViolation.Is(err):
+		return domain.Tick{}, errors.New(domain.ErrDuplicate)
+	case err != nil:
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
@@ -78,4 +81,19 @@ func (d *Database) GetTick(ctx context.Context, tx domain.Transaction, tickID do
 	}
 
 	return tickToDomain(record.Tick), nil
+}
+
+func (d *Database) GetTicksByProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) ([]domain.Tick, error) {
+	records, err := d.WithTx(tx).GetTicksByProblem(ctx, int32(problemID))
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	ticks := make([]domain.Tick, 0)
+
+	for _, record := range records {
+		ticks = append(ticks, tickToDomain(record.Tick))
+	}
+
+	return ticks, nil
 }

@@ -1,4 +1,5 @@
 FROM node:20 AS base
+RUN npm install -g corepack@latest
 RUN corepack enable
 COPY . /app
 WORKDIR /app

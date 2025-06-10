@@ -26,6 +26,8 @@ import (
 	"github.com/mattn/go-isatty"
 )
 
+const defaultScoreEngineMaxLifetime = 24 * time.Hour
+
 type registrationCodeGenerator struct {
 }
 
@@ -96,13 +98,17 @@ func main() {
 	eventBroker := events.NewBroker()
 	scoreKeeper := scores.NewScoreKeeper(eventBroker, repo)
 	scoreEngineStoreHydrator := &scores.StandardEngineStoreHydrator{Repo: repo}
-	scoreEngineManager := scores.NewScoreEngineManager(repo, scoreEngineStoreHydrator, eventBroker)
+
+	scoreEngineMaxLifetime := getScoreEngineMaxLifetime()
+	slog.Info("score engine maximum lifetime cap enabled", "max_lifetime", scoreEngineMaxLifetime)
+
+	scoreEngineManager := scores.NewScoreEngineManager(repo, scoreEngineStoreHydrator, eventBroker, scoreEngineMaxLifetime)
 
 	barriers = append(barriers,
-		scoreKeeper.Run(ctx),
-		scoreEngineManager.Run(ctx))
+		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
+		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()))
 
-	mux := setupMux(repo, authorizer, eventBroker, scoreKeeper)
+	mux := setupMux(repo, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
 
 	httpServer := &http.Server{
 		Addr:    "0.0.0.0:8090",
@@ -132,11 +138,28 @@ func main() {
 	}
 }
 
+func getScoreEngineMaxLifetime() time.Duration {
+	env := "SCORE_ENGINE_MAX_LIFETIME"
+	maxLifetime := defaultScoreEngineMaxLifetime
+
+	if value, present := os.LookupEnv(env); present {
+		lifetime, err := strconv.ParseInt(value, 10, 64)
+		if err != nil {
+			slog.Warn("discarding non-numeric environment variable", "env", env, "error", err)
+		} else {
+			maxLifetime = time.Duration(lifetime) * time.Second
+		}
+	}
+
+	return maxLifetime
+}
+
 func setupMux(
 	repo *repository.Database,
 	authorizer *authorizer.Authorizer,
 	eventBroker domain.EventBroker,
 	scoreKeeper domain.ScoreKeeper,
+	scoreEngineManager *scores.ScoreEngineManager,
 ) *rest.Mux {
 	contenderUseCase := usecases.ContenderUseCase{
 		Repo:                      repo,
@@ -147,22 +170,42 @@ func setupMux(
 	}
 
 	contestUseCase := usecases.ContestUseCase{
+		Authorizer:  authorizer,
 		Repo:        repo,
 		ScoreKeeper: scoreKeeper,
 	}
 
 	compClassUseCase := usecases.CompClassUseCase{
-		Repo: repo,
+		Authorizer: authorizer,
+		Repo:       repo,
 	}
 
 	problemUseCase := usecases.ProblemUseCase{
-		Repo: repo,
+		Repo:        repo,
+		Authorizer:  authorizer,
+		EventBroker: eventBroker,
 	}
 
 	tickUseCase := usecases.TickUseCase{
 		Repo:        repo,
 		Authorizer:  authorizer,
 		EventBroker: eventBroker,
+	}
+
+	scoreEngineUseCase := usecases.ScoreEngineUseCase{
+		Repo:               repo,
+		Authorizer:         authorizer,
+		ScoreEngineManager: scoreEngineManager,
+	}
+
+	raffleUseCase := usecases.RaffleUseCase{
+		Repo:       repo,
+		Authorizer: authorizer,
+	}
+
+	userUseCase := usecases.UserUseCase{
+		Repo:       repo,
+		Authorizer: authorizer,
 	}
 
 	mux := rest.NewMux()
@@ -172,11 +215,14 @@ func setupMux(
 	mux.HandleFunc("OPTIONS /", HandleCORSPreFlight)
 
 	rest.InstallContenderHandler(mux, &contenderUseCase)
-	rest.InstallContestHandler(mux, &contestUseCase)
+	rest.InstallContestHandler(mux, &contestUseCase, &compClassUseCase)
 	rest.InstallCompClassHandler(mux, &compClassUseCase)
 	rest.InstallProblemHandler(mux, &problemUseCase)
 	rest.InstallTickHandler(mux, &tickUseCase)
 	rest.InstallEventHandler(mux, eventBroker, 10*time.Second)
+	rest.InstallScoreEngineHandler(mux, &scoreEngineUseCase)
+	rest.InstallRaffleHandler(mux, &raffleUseCase)
+	rest.InstallUserHandler(mux, &userUseCase)
 
 	return mux
 }

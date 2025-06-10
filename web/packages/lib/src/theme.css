@@ -3,8 +3,6 @@
 :root {
   /*
       Generator: https://uicolors.app/create
-      Input: #bc5656
-      Hue shift: -10
     */
   --sl-color-primary-50: #fcfbf3;
   --sl-color-primary-100: #f9f7eb;
@@ -18,12 +16,38 @@
   --sl-color-primary-900: #6d2c4d;
   --sl-color-primary-950: #3c152c;
 
+  --sl-color-neutral-50: #fafafa;
+  --sl-color-neutral-100: #f4f4f5;
+  --sl-color-neutral-200: #e4e4e7;
+  --sl-color-neutral-300: #d4d4d8;
+  --sl-color-neutral-400: #a1a1aa;
+  --sl-color-neutral-500: #71717a;
+  --sl-color-neutral-600: #52525b;
+  --sl-color-neutral-700: #3f3f46;
+  --sl-color-neutral-800: #27272a;
+  --sl-color-neutral-900: #18181b;
+  --sl-color-neutral-950: #09090b;
+
   --sl-input-focus-ring-color: var(--sl-color-primary-400);
+
+  --color: #27272a;
 }
 
 body {
   font-family: "Noto Sans", sans-serif;
-  background-color: var(--sl-color-primary-200);
+  background-color: white;
+  color: var(--color);
+
+  font-weight: var(--sl-font-weight-normal);
+}
+
+form {
+  line-height: var(--sl-line-height-normal);
+}
+
+fieldset {
+  border: none;
+  padding: 0;
 }
 
 sl-input,
@@ -53,4 +77,9 @@ sl-select:focus-within[data-user-invalid]::part(combobox),
 sl-checkbox:focus-within[data-user-invalid]::part(control) {
   border-color: var(--sl-color-danger-600);
   box-shadow: 0 0 0 var(--sl-focus-ring-width) var(--sl-color-danger-300);
+}
+
+sl-dialog::part(body),
+sl-dialog::part(footer) {
+  text-align: left;
 }

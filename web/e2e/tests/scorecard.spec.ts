@@ -17,7 +17,7 @@ test.describe.configure({ mode: 'serial' });
 test.beforeAll(async () => {
   const network = await new Network().start();
 
-  startedDbContainer = await new MariaDbContainer()
+  startedDbContainer = await new MariaDbContainer("mariadb:11.4")
     .withUsername("climblive")
     .withUserPassword("secretpassword")
     .withDatabase("climblive")
@@ -51,7 +51,7 @@ test.beforeAll(async () => {
     })
     .withNetwork(network)
     .withExposedPorts({ container: 8090, host: 8090 })
-    .withWaitStrategy(Wait.forLogMessage(/score engine store hydration complete/))
+    .withWaitStrategy(Wait.forLogMessage(/score engine started/))
 
   const webContainer = new GenericContainer("climblive-web:latest")
     .withNetwork(network)
@@ -76,8 +76,10 @@ test('enter contest by entering registration code', async ({ page }) => {
 
   await expect(page).toHaveTitle(/ClimbLive/);
 
-  const pinInput = page.getByRole("textbox", { name: "Pin character 1 out of 8" })
-  await pinInput.pressSequentially("abcd0002");
+  const codeInput = page.getByRole("textbox", { name: "Registration code *" })
+  await codeInput.pressSequentially("abcd0002");
+
+  await page.getByRole("button", { name: "Enter" }).click()
 
   await page.waitForURL('/ABCD0002/register');
 
@@ -98,8 +100,10 @@ test('registration code is saved in local storage for 12 hours', async ({ page }
   await page.clock.install({ time: new Date() });
   await page.goto('/');
 
-  const pinInput = page.getByRole("textbox", { name: "Pin character 1 out of 8" })
-  await pinInput.pressSequentially("abcd0001");
+  const codeInput = page.getByRole("textbox", { name: "Registration code *" })
+  await codeInput.pressSequentially("abcd0001");
+
+  await page.getByRole("button", { name: "Enter" }).click()
 
   await page.waitForURL('/ABCD0001');
   await expect(page.getByText("Albert Einstein")).toBeVisible();
@@ -107,16 +111,9 @@ test('registration code is saved in local storage for 12 hours', async ({ page }
   await page.goto('/');
   await page.waitForURL('/');
 
-  await expect(page.getByRole("textbox", { name: "Pin character 1 out of 8" })).toHaveValue("A");
-  await expect(page.getByRole("textbox", { name: "Pin character 2 out of 8" })).toHaveValue("B");
-  await expect(page.getByRole("textbox", { name: "Pin character 3 out of 8" })).toHaveValue("C");
-  await expect(page.getByRole("textbox", { name: "Pin character 4 out of 8" })).toHaveValue("D");
-  await expect(page.getByRole("textbox", { name: "Pin character 5 out of 8" })).toHaveValue("0");
-  await expect(page.getByRole("textbox", { name: "Pin character 6 out of 8" })).toHaveValue("0");
-  await expect(page.getByRole("textbox", { name: "Pin character 7 out of 8" })).toHaveValue("0");
-  await expect(page.getByRole("textbox", { name: "Pin character 8 out of 8" })).toHaveValue("1");
+  const region = await page.getByRole("region", { name: "Saved session ABCD0001" });
 
-  await page.getByRole("button", { name: "Enter" }).click()
+  await region.getByRole("button", { name: "Restore" }).click()
 
   await page.waitForURL('/ABCD0001');
   await expect(page.getByText("Albert Einstein")).toBeVisible();
@@ -126,14 +123,27 @@ test('registration code is saved in local storage for 12 hours', async ({ page }
   await page.goto('/');
   await page.waitForURL('/');
 
-  await expect(page.getByRole("textbox", { name: "Pin character 1 out of 8" })).toHaveValue("");
-  await expect(page.getByRole("textbox", { name: "Pin character 2 out of 8" })).toHaveValue("");
-  await expect(page.getByRole("textbox", { name: "Pin character 3 out of 8" })).toHaveValue("");
-  await expect(page.getByRole("textbox", { name: "Pin character 4 out of 8" })).toHaveValue("");
-  await expect(page.getByRole("textbox", { name: "Pin character 5 out of 8" })).toHaveValue("");
-  await expect(page.getByRole("textbox", { name: "Pin character 6 out of 8" })).toHaveValue("");
-  await expect(page.getByRole("textbox", { name: "Pin character 7 out of 8" })).toHaveValue("");
-  await expect(page.getByRole("textbox", { name: "Pin character 8 out of 8" })).toHaveValue("");
+  await expect(page.getByRole("button", { name: "Restore" })).not.toBeVisible();
+});
+
+test('the three most recently used registration codes can be restored', async ({ page }) => {
+  await page.clock.install({ time: new Date() });
+
+  for (const code of ["ABCD0001", "ABCD0002", "ABCD0003", "ABCD0004"]) {
+    await page.goto(`/${code}`);
+    await page.waitForURL(`/${code}`);
+
+    await page.clock.fastForward("00:00:01");
+  }
+
+  await page.goto('/');
+  await page.waitForURL('/');
+
+  await expect(page.getByRole("region", { name: "Saved session ABCD0001" })).not.toBeVisible();
+
+  await expect(page.getByRole("region", { name: "Saved session ABCD0002" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Saved session ABCD0003" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Saved session ABCD0004" })).toBeVisible();
 });
 
 test('deep link into scorecard', async ({ page }) => {
@@ -145,11 +155,11 @@ test('deep link into scorecard', async ({ page }) => {
 test('garbage session value in local storage is thrown out', async ({ page }) => {
   await page.goto('/');
 
-  await page.evaluate(() => localStorage.setItem('session', 'bad_data'))
+  await page.evaluate(() => localStorage.setItem('sessions', 'bad_data'))
 
   await page.goto('/');
 
-  await expect(page.getByRole("textbox", { name: "Pin character 1 out of 8" })).toHaveValue("");
+  await expect(page.getByRole("textbox", { name: "Registration code *" })).toHaveValue("");
 });
 
 test('edit profile', async ({ page }) => {
@@ -308,7 +318,7 @@ test.describe("contest states", () => {
     await page.clock.setFixedTime(new Date('2024-01-01T00:00:00'));
 
     const timer = page.getByRole("timer", { name: "Time remaining" })
-    await expect(timer).toHaveText("about 1 year")
+    await expect(timer).toHaveText("almost 2 years")
 
     await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
 
@@ -321,7 +331,7 @@ test.describe("contest states", () => {
   test("during grace period", async ({ page }) => {
     await page.goto('/ABCD0001');
 
-    await page.clock.setFixedTime(new Date('2025-02-01T00:00:00'));
+    await page.clock.setFixedTime(new Date('2026-01-01T00:00:00'));
 
     const timer = page.getByRole("timer", { name: "Time remaining" })
     await expect(timer).toHaveText("00:00:00")
@@ -337,7 +347,7 @@ test.describe("contest states", () => {
   test("after contest has ended", async ({ page }) => {
     await page.goto('/ABCD0001');
 
-    await page.clock.setFixedTime(new Date('2025-02-01T00:05:00'));
+    await page.clock.setFixedTime(new Date('2026-01-01T00:05:00'));
 
     const timer = page.getByRole("timer", { name: "Time remaining" })
     await expect(timer).toHaveText("00:00:00")

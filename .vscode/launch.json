@@ -10,34 +10,45 @@
             "request": "launch",
             "mode": "auto",
             "program": "backend/cmd/api/main.go",
+            "buildFlags": [
+                "-race"
+            ],
             "env": {
                 "DB_USERNAME": "climblive",
                 "DB_PASSWORD": "secretpassword",
                 "DB_HOST": "localhost",
                 "DB_PORT": "3306",
                 "DB_DATABASE": "climblive",
+                "SCORE_ENGINE_MAX_LIFETIME": "600"
             }
         },
         {
             "name": "Scorecard",
             "type": "node-terminal",
             "request": "launch",
-            "command": "pnpm i && pnpm build && pnpm run dev",
+            "command": "pnpm i && pnpm build && pnpm run dev --port 5173",
             "cwd": "${workspaceFolder}/web/scorecard",
         },
         {
             "name": "Scoreboard",
             "type": "node-terminal",
             "request": "launch",
-            "command": "pnpm i && pnpm build && pnpm run dev",
+            "command": "pnpm i && pnpm build && pnpm run dev --port 5174",
             "cwd": "${workspaceFolder}/web/scoreboard",
         },
         {
             "name": "Admin",
             "type": "node-terminal",
             "request": "launch",
-            "command": "pnpm i && pnpm build && pnpm run dev",
+            "command": "pnpm i && pnpm build && pnpm run dev --port 5175",
             "cwd": "${workspaceFolder}/web/admin",
+        },
+        {
+            "name": "WWW",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "python3 -m http.server 8080",
+            "cwd": "${workspaceFolder}/web/www",
         },
         {
             "name": "Simulator",

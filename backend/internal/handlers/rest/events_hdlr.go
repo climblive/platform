@@ -52,6 +52,8 @@ func (hdlr *eventHandler) HandleSubscribeContestEvents(w http.ResponseWriter, r 
 		0,
 		"CONTENDER_PUBLIC_INFO_UPDATED",
 		"[]CONTENDER_SCORE_UPDATED",
+		"SCORE_ENGINE_STARTED",
+		"SCORE_ENGINE_STOPPED",
 	)
 
 	hdlr.subscribe(w, r, filter, logger)
@@ -71,6 +73,8 @@ func (hdlr *eventHandler) HandleSubscribeContenderEvents(w http.ResponseWriter, 
 		contenderID,
 		"CONTENDER_PUBLIC_INFO_UPDATED",
 		"CONTENDER_SCORE_UPDATED",
+		"ASCENT_REGISTERED",
+		"ASCENT_DEREGISTERED",
 	)
 
 	hdlr.subscribe(w, r, filter, logger)
@@ -87,7 +91,7 @@ func (hdlr *eventHandler) subscribe(
 	w.Header().Set("Cache-Control", "no-store")
 	w.Header().Set("Connection", "keep-alive")
 
-	logger.Info("starting event subscription")
+	logger.Debug("starting event subscription")
 	subscriptionID, eventReader := hdlr.eventBroker.Subscribe(filter, bufferCapacity)
 
 	defer hdlr.eventBroker.Unsubscribe(subscriptionID)
@@ -116,7 +120,7 @@ ConsumeEvents:
 		case <-keepAlive:
 			write(w, ":\n\n")
 		case <-r.Context().Done():
-			logger.Info("subscription closed", "reason", r.Context().Err())
+			logger.Debug("subscription closed", "reason", r.Context().Err())
 			break ConsumeEvents
 		}
 	}

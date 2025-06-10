@@ -26,9 +26,10 @@ func (role AuthRole) OneOf(roles ...AuthRole) bool {
 
 type Authorizer interface {
 	HasOwnership(ctx context.Context, resourceOwnership OwnershipData) (AuthRole, error)
+	GetAuthentication(ctx context.Context) (Authentication, error)
 }
 
-type OwnershipData struct {
-	OrganizerID OrganizerID
-	ContenderID *ContenderID
+type Authentication struct {
+	Regcode  string
+	Username string
 }

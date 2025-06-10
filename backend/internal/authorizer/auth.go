@@ -70,6 +70,22 @@ func (a *Authorizer) HasOwnership(ctx context.Context, resourceOwnership domain.
 	return domain.NilRole, domain.ErrNoOwnership
 }
 
+func (a *Authorizer) GetAuthentication(ctx context.Context) (domain.Authentication, error) {
+	authenticationResult, ok := ctx.Value(contextKey{}).(authenticationResult)
+	if !ok {
+		return domain.Authentication{}, domain.ErrNotAuthenticated
+	}
+
+	if authenticationResult.err != nil {
+		return domain.Authentication{}, errors.Errorf("%w: %w", domain.ErrNotAuthenticated, authenticationResult.err)
+	}
+
+	return domain.Authentication{
+		Regcode:  authenticationResult.regcode,
+		Username: authenticationResult.username,
+	}, nil
+}
+
 func (a *Authorizer) authorizeByRegCode(ctx context.Context, regcode string, resourceOwnership domain.OwnershipData) (domain.AuthRole, error) {
 	contender, err := a.repo.GetContenderByCode(ctx, nil, strings.ToUpper(regcode))
 	if err != nil {
@@ -102,8 +118,8 @@ func (a *Authorizer) authorizeByUsername(ctx context.Context, username string, r
 		return domain.AdminRole, nil
 	}
 
-	for _, organizerID := range user.Organizers {
-		if organizerID == resourceOwnership.OrganizerID {
+	for _, organizer := range user.Organizers {
+		if organizer.ID == resourceOwnership.OrganizerID {
 			return domain.OrganizerRole, nil
 		}
 	}
@@ -126,7 +142,6 @@ func (a *Authorizer) createUser(ctx context.Context, username string) error {
 		}
 
 		user, err := a.repo.StoreUser(ctx, tx, domain.User{
-			Name:     username,
 			Username: username,
 		})
 		if err != nil {

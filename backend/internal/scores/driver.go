@@ -27,13 +27,15 @@ type ScoreEngine interface {
 	HandleAscentRegistered(event domain.AscentRegisteredEvent)
 	HandleAscentDeregistered(event domain.AscentDeregisteredEvent)
 	HandleProblemAdded(event domain.ProblemAddedEvent)
+	HandleProblemUpdated(event domain.ProblemUpdatedEvent)
 
 	GetDirtyScores() []domain.Score
 }
 
 type ScoreEngineDriver struct {
-	logger    *slog.Logger
-	contestID domain.ContestID
+	logger     *slog.Logger
+	contestID  domain.ContestID
+	instanceID domain.ScoreEngineInstanceID
 
 	eventBroker   domain.EventBroker
 	pendingEvents []domain.EventEnvelope
@@ -42,28 +44,89 @@ type ScoreEngineDriver struct {
 
 	running    atomic.Bool
 	sideQuests chan func()
+
+	publishToken bool
 }
 
 func NewScoreEngineDriver(
 	contestID domain.ContestID,
+	instanceID domain.ScoreEngineInstanceID,
 	eventBroker domain.EventBroker,
 ) *ScoreEngineDriver {
-	logger := slog.New(slog.Default().Handler()).With("contest_id", contestID)
+	logger := slog.New(slog.Default().Handler()).
+		With("contest_id", contestID).
+		With("instance_id", instanceID)
 
 	return &ScoreEngineDriver{
 		logger:        logger,
 		contestID:     contestID,
+		instanceID:    instanceID,
 		eventBroker:   eventBroker,
 		pendingEvents: make([]domain.EventEnvelope, 0),
 		sideQuests:    make(chan func()),
 	}
 }
 
-func (d *ScoreEngineDriver) Run(ctx context.Context) (*sync.WaitGroup, func(ScoreEngine)) {
+type runOptions struct {
+	recoverPanics bool
+}
+
+func WithPanicRecovery() func(*runOptions) {
+	return func(s *runOptions) {
+		s.recoverPanics = true
+	}
+}
+
+func (d *ScoreEngineDriver) Run(ctx context.Context, options ...func(*runOptions)) (*sync.WaitGroup, func(ScoreEngine)) {
+	config := &runOptions{}
+	for _, opt := range options {
+		opt(config)
+	}
+
 	wg := new(sync.WaitGroup)
 	ready := make(chan struct{}, 1)
 
 	wg.Add(1)
+
+	engineReceiver := make(chan ScoreEngine, 1)
+
+	installEngine := func(engine ScoreEngine) {
+		engineReceiver <- engine
+		close(engineReceiver)
+	}
+
+	go func() {
+		defer func() {
+			if !config.recoverPanics {
+				return
+			}
+
+			if r := recover(); r != nil {
+				d.logger.Error("score engine panicked", "error", r)
+			}
+		}()
+
+		defer wg.Done()
+
+		d.run(ctx, ready, engineReceiver)
+	}()
+
+	<-ready
+
+	return wg, installEngine
+}
+
+func (d *ScoreEngineDriver) run(
+	ctx context.Context,
+	ready chan<- struct{},
+	engineReceiver chan ScoreEngine,
+) {
+	defer func() {
+		close(d.sideQuests)
+
+		for range d.sideQuests {
+		}
+	}()
 
 	filter := domain.NewEventFilter(
 		d.contestID,
@@ -77,43 +140,8 @@ func (d *ScoreEngineDriver) Run(ctx context.Context) (*sync.WaitGroup, func(Scor
 		"ASCENT_REGISTERED",
 		"ASCENT_DEREGISTERED",
 		"PROBLEM_ADDED",
+		"PROBLEM_UPDATED",
 	)
-
-	engineReceiver := make(chan ScoreEngine, 1)
-
-	installEngine := func(engine ScoreEngine) {
-		engineReceiver <- engine
-		close(engineReceiver)
-	}
-
-	go d.run(ctx, filter, wg, ready, engineReceiver)
-
-	<-ready
-
-	return wg, installEngine
-}
-
-func (d *ScoreEngineDriver) run(
-	ctx context.Context,
-	filter domain.EventFilter,
-	wg *sync.WaitGroup,
-	ready chan<- struct{},
-	engineReceiver chan ScoreEngine,
-) {
-	defer func() {
-		if r := recover(); r != nil {
-			d.logger.Error("score engine panicked", "error", r)
-		}
-	}()
-
-	defer wg.Done()
-
-	defer func() {
-		close(d.sideQuests)
-
-		for range d.sideQuests {
-		}
-	}()
 
 	subscriptionID, eventReader := d.eventBroker.Subscribe(filter, 0)
 	d.logger.Info("score engine subscribed", "subscription_id", subscriptionID)
@@ -121,6 +149,14 @@ func (d *ScoreEngineDriver) run(
 	defer d.eventBroker.Unsubscribe(subscriptionID)
 
 	close(ready)
+
+	d.eventBroker.Dispatch(d.contestID, domain.ScoreEngineStartedEvent{
+		InstanceID: d.instanceID,
+	})
+
+	defer d.eventBroker.Dispatch(d.contestID, domain.ScoreEngineStoppedEvent{
+		InstanceID: d.instanceID,
+	})
 
 	events := eventReader.EventsChan(ctx)
 
@@ -171,6 +207,7 @@ PreLoop:
 	for event := range slices.Values(d.pendingEvents) {
 		d.handleEvent(event)
 	}
+	d.pendingEvents = nil
 
 	ticker := time.Tick(100 * time.Millisecond)
 
@@ -183,11 +220,23 @@ PreLoop:
 
 			d.handleEvent(event)
 		case <-ticker:
-			d.publishUpdatedScores()
+			d.publishToken = false
+
+			n := d.publishUpdatedScores()
+			if n == 0 {
+				d.publishToken = true
+			}
 		case f := <-d.sideQuests:
 			f()
 		case <-ctx.Done():
 			return
+		}
+
+		if d.publishToken {
+			n := d.publishUpdatedScores()
+			if n > 0 {
+				d.publishToken = false
+			}
 		}
 	}
 }
@@ -232,10 +281,12 @@ func (d *ScoreEngineDriver) handleEvent(event domain.EventEnvelope) {
 		d.engine.HandleAscentDeregistered(ev)
 	case domain.ProblemAddedEvent:
 		d.engine.HandleProblemAdded(ev)
+	case domain.ProblemUpdatedEvent:
+		d.engine.HandleProblemUpdated(ev)
 	}
 }
 
-func (d *ScoreEngineDriver) publishUpdatedScores() {
+func (d *ScoreEngineDriver) publishUpdatedScores() int {
 	scores := d.engine.GetDirtyScores()
 
 	var batch []domain.ContenderScoreUpdatedEvent
@@ -249,4 +300,6 @@ func (d *ScoreEngineDriver) publishUpdatedScores() {
 	if len(batch) > 0 {
 		d.eventBroker.Dispatch(d.contestID, batch)
 	}
+
+	return len(scores)
 }

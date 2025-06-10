@@ -11,6 +11,7 @@
   import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import "@shoelace-style/shoelace/dist/components/popup/popup.js";
   import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
+  import { AxiosError } from "axios";
   import { getContext } from "svelte";
   import type { Readable } from "svelte/store";
 
@@ -26,8 +27,8 @@
   let popup: SlPopup | undefined = $state();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
-  const createTick = createTickMutation($session.contenderId);
-  const deleteTick = deleteTickMutation();
+  const createTick = $derived(createTickMutation($session.contenderId));
+  const deleteTick = $derived(deleteTickMutation());
 
   let open = $state(false);
 
@@ -49,7 +50,13 @@
   const handleCheck = () => {
     if (tick?.id) {
       $deleteTick.mutate(tick.id, {
-        onError: () => toastError("Failed to remove ascent."),
+        onError: (error) => {
+          if (error instanceof AxiosError && error.status === 404) {
+            toastError("Ascent is already removed.");
+          } else {
+            toastError("Failed to remove ascent.");
+          }
+        },
       });
     } else {
       open = true;
@@ -71,7 +78,13 @@
         attemptsZone: flash ? 1 : 999,
       },
       {
-        onError: () => toastError("Failed to register ascent."),
+        onError: (error) => {
+          if (error instanceof AxiosError && error.status === 409) {
+            toastError("Ascent is already registered.");
+          } else {
+            toastError("Failed to register ascent.");
+          }
+        },
       },
     );
   };
@@ -79,6 +92,12 @@
   $effect(() => {
     if (popup && container) {
       popup.anchor = container;
+    }
+  });
+
+  $effect(() => {
+    if (tick !== undefined) {
+      open = false;
     }
   });
 </script>
@@ -106,13 +125,13 @@
     active={open}
     arrow
     strategy="fixed"
-    distance="4"
+    distance="10"
   >
-    <sl-button size="small" onclick={(e) => handleTick(e, false)}>
+    <sl-button size="small" onclick={(e: MouseEvent) => handleTick(e, false)}>
       <sl-icon slot="prefix" name="check2-all"></sl-icon>
       Top
     </sl-button>
-    <sl-button size="small" onclick={(e) => handleTick(e, true)}>
+    <sl-button size="small" onclick={(e: MouseEvent) => handleTick(e, true)}>
       <sl-icon slot="prefix" name="lightning-charge"></sl-icon>
       Flash
     </sl-button>
@@ -140,9 +159,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border-color: var(--sl-color-primary-900);
-    border-width: var(--sl-input-border-width);
-    border-style: solid;
+    border-color: var(--sl-color-neutral-600);
+    border-width: 2px;
+    border-style: dotted;
     border-radius: var(--sl-border-radius-small);
   }
 
@@ -186,7 +205,7 @@
   }
 
   sl-popup {
-    --arrow-color: var(--sl-color-primary-800);
+    --arrow-color: var(--sl-color-primary-600);
 
     & sl-button::part(base) {
       width: 2.5rem;
@@ -208,7 +227,7 @@
   }
 
   sl-popup::part(popup) {
-    background-color: var(--sl-color-primary-800);
+    background-color: var(--sl-color-primary-600);
     box-shadow:
       rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
       rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;

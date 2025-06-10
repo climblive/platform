@@ -45,10 +45,6 @@ func (uc *TickUseCase) GetTicksByContender(ctx context.Context, contenderID doma
 	return ticks, nil
 }
 
-func (uc *TickUseCase) GetTicksByProblem(ctx context.Context, problemID domain.ProblemID) ([]domain.Tick, error) {
-	panic("not implemented")
-}
-
 func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.TickID) error {
 	tick, err := uc.Repo.GetTick(ctx, nil, tickID)
 	if err != nil {
@@ -91,6 +87,7 @@ func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.TickID) err
 	}
 
 	uc.EventBroker.Dispatch(contest.ID, domain.AscentDeregisteredEvent{
+		TickID:      tickID,
 		ContenderID: contender.ID,
 		ProblemID:   tick.ProblemID,
 	})
@@ -117,6 +114,10 @@ func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.Conten
 	compClass, err := uc.Repo.GetCompClass(ctx, nil, contender.CompClassID)
 	if err != nil {
 		return domain.Tick{}, errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
+	}
+
+	if time.Now().Before(compClass.TimeBegin) {
+		return domain.Tick{}, errors.New(domain.ErrContestNotStarted)
 	}
 
 	gracePeriodEnd := compClass.TimeEnd.Add(contest.GracePeriod)
@@ -153,6 +154,8 @@ func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.Conten
 	}
 
 	uc.EventBroker.Dispatch(contest.ID, domain.AscentRegisteredEvent{
+		TickID:       tick.ID,
+		Timestamp:    tick.Timestamp,
 		ContenderID:  contender.ID,
 		ProblemID:    problem.ID,
 		Top:          tick.Top,
