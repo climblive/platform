@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Ticket from "@/components/Ticket.svelte";
   import {
     getContendersByContestQuery,
     getContestQuery,
@@ -21,18 +22,24 @@
 
   const contest = $derived($contestQuery.data);
   const contenders = $derived($contendersQuery.data);
+
+  let printDialogOpened = $state(false);
+
+  $effect(() => {
+    if (contenders && !printDialogOpened) {
+      printDialogOpened = true;
+
+      setTimeout(() => {
+        window.print();
+      });
+    }
+  });
 </script>
 
 <main>
   {#if contest && contenders}
     {#each contenders as contender (contender.id)}
-      <section>
-        <sl-qr-code
-          size="64"
-          value={`${location.protocol}//${location.host}/${contender.registrationCode}`}
-        ></sl-qr-code>
-        {contender.registrationCode}
-      </section>
+      <Ticket registrationCode={contender.registrationCode} />
     {/each}
   {/if}
 </main>
@@ -41,16 +48,5 @@
   @page {
     size: a4 portrait;
     margin: 2cm;
-  }
-
-  section {
-    border: 1px solid var(--sl-color-primary-600);
-    border-radius: var(--sl-border-radius-medium);
-    margin-block: var(--sl-spacing-medium);
-    padding: var(--sl-spacing-medium);
-  }
-
-  section:nth-child(7n) {
-    break-after: page;
   }
 </style>
