@@ -11,6 +11,7 @@
   import EditProblem from "./pages/EditProblem.svelte";
   import OrganizerView from "./pages/OrganizerView.svelte";
   import RaffleView from "./pages/RaffleView.svelte";
+  import TicketList from "./pages/TicketList.svelte";
 </script>
 
 <Header />
@@ -60,11 +61,22 @@
         <RaffleView raffleId={Number(params.raffleId)} />
       {/snippet}
     </Route>
+    <Route path="/contests/:contestId/tickets">
+      {#snippet children({ params }: { params: { contestId: number } })}
+        <TicketList contestId={Number(params.contestId)} />
+      {/snippet}
+    </Route>
   </Router>
 </main>
 
 <style>
   main {
     padding: var(--sl-spacing-medium);
+  }
+
+  @media print {
+    main {
+      padding: 0;
+    }
   }
 </style>

@@ -51,4 +51,10 @@
     background-color: var(--sl-color-primary-600);
     height: 3.25rem;
   }
+
+  @media print {
+    header {
+      display: none;
+    }
+  }
 </style>
