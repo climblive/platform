@@ -1,30 +1,21 @@
 <script lang="ts">
   import logoUrl from "@/static/logo.svg";
-  import QRCode from "qrcode-svg";
+  import SvgQR from "@svelte-put/qr/svg/QR.svelte";
 
   type Props = {
     registrationCode: string;
   };
 
   let { registrationCode }: Props = $props();
-
-  const svg = $derived(
-    new QRCode({
-      content: `${location.protocol}//${location.host}/${registrationCode}`,
-      padding: 0,
-      width: 64,
-      height: 64,
-      color: "#000000",
-      background: "#ffffff",
-      ecl: "M",
-    }).svg(),
-  );
 </script>
 
 <section>
   <img src={logoUrl} alt="ClimbLive Logo" height="32" />
   {registrationCode}
-  {@html svg}
+  <SvgQR
+    data={`${location.protocol}//${location.host}/${registrationCode}`}
+    width={64}
+  />
 </section>
 
 <style>
