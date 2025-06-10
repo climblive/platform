@@ -1,4 +1,5 @@
 <script lang="ts">
+  import logoUrl from "@/static/logo.svg";
   import QRCode from "qrcode-svg";
 
   type Props = {
@@ -21,8 +22,9 @@
 </script>
 
 <section>
-  {@html svg}
+  <img src={logoUrl} alt="ClimbLive Logo" height="32" />
   {registrationCode}
+  {@html svg}
 </section>
 
 <style>
@@ -31,6 +33,9 @@
     border-radius: var(--sl-border-radius-medium);
     margin-block: var(--sl-spacing-medium);
     padding: var(--sl-spacing-medium);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   section:nth-of-type(7n) {
