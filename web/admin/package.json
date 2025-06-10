@@ -16,6 +16,7 @@
     "@sveltejs/vite-plugin-svelte": "^5.1.0",
     "@tanstack/svelte-query-devtools": "^5.80.2",
     "@tsconfig/svelte": "^5.0.4",
+    "@types/qrcode-svg": "^1.1.5",
     "rollup-plugin-copy": "^3.5.0",
     "svelte": "^5.33.14",
     "svelte-check": "^4.2.1",
@@ -30,6 +31,7 @@
     "axios": "^1.9.0",
     "date-fns": "^4.1.0",
     "normalize.css": "^8.0.1",
+    "qrcode-svg": "^1.1.0",
     "svelte-routing": "^2.13.0",
     "zod": "^3.25.51"
   }
