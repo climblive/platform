@@ -13,9 +13,7 @@
 <section>
   <div class="left">
     <h1>{contestName}</h1>
-    <span class="link"
-      >Register at {location.protocol}//{location.host}</span
-    >
+    <span class="link">Register at {location.protocol}//{location.host}</span>
     <span class="code">{registrationCode}</span>
   </div>
   <img src={logoUrl} alt="ClimbLive Logo" />
