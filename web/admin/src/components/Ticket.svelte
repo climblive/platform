@@ -18,7 +18,7 @@
     >
     <span class="code">{registrationCode}</span>
   </div>
-  <img src={logoUrl} alt="ClimbLive Logo" height="32" />
+  <img src={logoUrl} alt="ClimbLive Logo" />
   <SvgQR
     data={`${location.protocol}//${location.host}/${registrationCode}`}
     width={80}
