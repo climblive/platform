@@ -16,6 +16,9 @@ importers:
       '@shoelace-style/shoelace':
         specifier: ^2.20.1
         version: 2.20.1(@floating-ui/utils@0.2.9)(@types/react@18.2.46)
+      '@svelte-put/qr':
+        specifier: ^2.1.0
+        version: 2.1.0(svelte@5.33.14)
       '@tanstack/svelte-query':
         specifier: ^5.80.2
         version: 5.80.2(svelte@5.33.14)
@@ -719,6 +722,11 @@ packages:
     resolution: {integrity: sha512-FSghU95jZPGbwr/mybVvk66qRZYpx5FkXL+vLNpy1Vp8UsdwSxXjIHE3fsvMbKWTKi9UFfewHTkc5e7jAqRYoQ==}
     engines: {node: '>=14.17.0'}
 
+  '@svelte-put/qr@2.1.0':
+    resolution: {integrity: sha512-7HzQjoNZI9k6J4R6tnMi0ZGtRQKIFmZqzeo2GtkKZkumtPYByuqjGcB/ApFkxfg+J5mARKezWzKiq9EDJ6htRg==}
+    peerDependencies:
+      svelte: ^5.1.0
+
   '@sveltejs/acorn-typescript@1.0.5':
     resolution: {integrity: sha512-IwQk4yfwLdibDlrXVE04jTZYlLnwsTT2PIOQQGNLWfjavGifnk1JD1LcZjZaBTRcxZu2FfPfNLOE04DSu9lqtQ==}
     peerDependencies:
@@ -1416,6 +1424,9 @@ packages:
   hasown@2.0.2:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
+
+  headless-qr@1.0.3:
+    resolution: {integrity: sha512-HHVwf1i++Ho2vFstHxAdfP0OjB7Di44nGXbh3VXciuzwkuFb1oeFDCrfOLjFgHip/Kbc/wq2GOaSTiKQ81K/Yg==}
 
   iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
@@ -2498,6 +2509,11 @@ snapshots:
       - '@floating-ui/utils'
       - '@types/react'
 
+  '@svelte-put/qr@2.1.0(svelte@5.33.14)':
+    dependencies:
+      headless-qr: 1.0.3
+      svelte: 5.33.14
+
   '@sveltejs/acorn-typescript@1.0.5(acorn@8.14.1)':
     dependencies:
       acorn: 8.14.1
@@ -3286,6 +3302,8 @@ snapshots:
   hasown@2.0.2:
     dependencies:
       function-bind: 1.1.2
+
+  headless-qr@1.0.3: {}
 
   iconv-lite@0.6.3:
     dependencies:

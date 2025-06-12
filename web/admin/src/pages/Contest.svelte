@@ -17,7 +17,7 @@
   import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
   import "@shoelace-style/shoelace/dist/components/tab/tab.js";
   import { add } from "date-fns";
-  import { navigate } from "svelte-routing";
+  import { Link, navigate } from "svelte-routing";
   import CompClassList from "./CompClassList.svelte";
   import ContenderList from "./ContenderList.svelte";
   import ProblemList from "./ProblemList.svelte";
@@ -99,6 +99,13 @@
             <sl-icon name="download" slot="prefix"></sl-icon>
           </sl-button>
         </a>
+
+        <Link to={`/admin/contests/${contestId}/tickets`}>
+          <sl-button
+            >Print tickets
+            <sl-icon name="printer" slot="prefix"></sl-icon>
+          </sl-button>
+        </Link>
 
         <article>
           <LabeledText label="Description">
