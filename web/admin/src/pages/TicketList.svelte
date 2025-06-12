@@ -39,7 +39,10 @@
 <main>
   {#if contest && contenders}
     {#each contenders as contender (contender.id)}
-      <Ticket registrationCode={contender.registrationCode} />
+      <Ticket
+        contestName={contest.name}
+        registrationCode={contender.registrationCode}
+      />
     {/each}
   {/if}
 </main>
