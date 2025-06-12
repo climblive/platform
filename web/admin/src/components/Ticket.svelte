@@ -14,7 +14,7 @@
   <div class="left">
     <h1>{contestName}</h1>
     <span class="link"
-      >Register at <em>{location.protocol}//{location.host}</em></span
+      >Register at {location.protocol}//{location.host}</span
     >
     <span class="code">{registrationCode}</span>
   </div>
