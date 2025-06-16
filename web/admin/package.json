@@ -28,6 +28,7 @@
     "@shoelace-style/shoelace": "^2.20.1",
     "@svelte-put/qr": "^2.1.0",
     "@tanstack/svelte-query": "^5.80.2",
+    "@tanstack/table-core": "^8.21.3",
     "axios": "^1.9.0",
     "date-fns": "^4.1.0",
     "normalize.css": "^8.0.1",
