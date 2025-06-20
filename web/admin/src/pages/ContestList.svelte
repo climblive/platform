@@ -1,16 +1,41 @@
 <script lang="ts">
-  import { Table, TableCell, TableRow } from "@climblive/lib/components";
+  import DataTable from "@/components/DataTable.svelte";
   import type { Contest } from "@climblive/lib/models";
   import { getContestsByOrganizerQuery } from "@climblive/lib/queries";
   import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import type { ColumnDef } from "@tanstack/table-core";
   import { format } from "date-fns";
-  import { Link, navigate } from "svelte-routing";
+  import { navigate } from "svelte-routing";
 
   interface Props {
     organizerId: number;
   }
 
   let { organizerId }: Props = $props();
+
+  export const columns: ColumnDef<Contest>[] = [
+    {
+      accessorKey: "name",
+      header: "Name",
+    },
+    {
+      accessorKey: "timeBegin",
+      header: "Start",
+      cell: ({ row }) => {
+        const timeBegin = row.getValue<Date | undefined>("timeBegin");
+        return timeBegin ? format(timeBegin, "yyyy-MM-dd HH:mm") : undefined;
+      },
+    },
+    {
+      accessorKey: "timeEnd",
+      header: "End",
+      cell: ({ row }) => {
+        const timeBegin = row.getValue<Date | undefined>("timeEnd");
+        return timeBegin ? format(timeBegin, "yyyy-MM-dd HH:mm") : undefined;
+      },
+      enableHiding: true,
+    },
+  ];
 
   const contestsQuery = $derived(getContestsByOrganizerQuery(organizerId));
 
@@ -48,25 +73,7 @@
 
 {#snippet listing(heading: string, contests: Contest[])}
   <h2>{heading}</h2>
-  <Table columns={["Name", "Start Time", "End Time"]}>
-    {#each contests as contest (contest.id)}
-      <TableRow>
-        <TableCell>
-          <Link to="contests/{contest.id}">{contest.name}</Link>
-        </TableCell>
-        <TableCell>
-          {#if contest.timeBegin}
-            {format(contest.timeBegin, "yyyy-MM-dd HH:mm")}
-          {/if}
-        </TableCell>
-        <TableCell>
-          {#if contest.timeEnd}
-            {format(contest.timeEnd, "yyyy-MM-dd HH:mm")}
-          {/if}
-        </TableCell>
-      </TableRow>
-    {/each}
-  </Table>
+  <DataTable data={contests} {columns} />
 {/snippet}
 
 {#if drafts?.length}

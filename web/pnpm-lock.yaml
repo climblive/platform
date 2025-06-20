@@ -22,6 +22,9 @@ importers:
       '@tanstack/svelte-query':
         specifier: ^5.80.2
         version: 5.80.2(svelte@5.33.14)
+      '@tanstack/table-core':
+        specifier: ^8.21.3
+        version: 8.21.3
       axios:
         specifier: ^1.9.0
         version: 1.9.0
@@ -763,6 +766,10 @@ packages:
     resolution: {integrity: sha512-4DMT+EOK8zk0BDK3KkjZEdwqN50kOVBBl7hHVrRYRKpnYcHppeeI9mGIGSzFGHXvYPkrrcC7iOabyjAQfofB1w==}
     peerDependencies:
       svelte: ^3.54.0 || ^4.0.0 || ^5.0.0
+
+  '@tanstack/table-core@8.21.3':
+    resolution: {integrity: sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg==}
+    engines: {node: '>=12'}
 
   '@testcontainers/mariadb@11.0.0':
     resolution: {integrity: sha512-KgeXvUrtnneuLnhAKOk7zBufXOzD4QC8PACiYnXj8ciXT8A/wKeRx+PtvlzTFE61OcKcMidffFuN3IgvzUEUlg==}
@@ -2555,6 +2562,8 @@ snapshots:
     dependencies:
       '@tanstack/query-core': 5.80.2
       svelte: 5.33.14
+
+  '@tanstack/table-core@8.21.3': {}
 
   '@testcontainers/mariadb@11.0.0':
     dependencies:
