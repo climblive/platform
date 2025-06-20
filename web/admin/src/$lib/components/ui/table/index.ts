@@ -6,15 +6,16 @@ import Row from "./table-row.svelte";
 import Root from "./table.svelte";
 
 export {
-	Body,
-	Cell,
-	Head,
-	Header, Root, Row,
-	Root as Table,
-	Body as TableBody,
-	Cell as TableCell,
-	Head as TableHead,
-	Header as TableHeader,
-	Row as TableRow
+  Body,
+  Cell,
+  Head,
+  Header,
+  Root,
+  Row,
+  Root as Table,
+  Body as TableBody,
+  Cell as TableCell,
+  Head as TableHead,
+  Header as TableHeader,
+  Row as TableRow,
 };
-
