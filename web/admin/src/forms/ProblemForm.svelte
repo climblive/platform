@@ -121,7 +121,7 @@
 
   .colors {
     span {
-      font-size: var(--wa-input-label-font-size-small);
+      font-size: var(--wa-input-label-font-size-s);
     }
 
     & .pickers {

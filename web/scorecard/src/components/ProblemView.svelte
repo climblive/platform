@@ -46,7 +46,7 @@
   section {
     height: 3rem;
     background-color: var(--wa-color-gray-50);
-    border-radius: var(--wa-border-radius-small);
+    border-radius: var(--wa-border-radius-s);
     border: solid 1px var(--wa-color-gray-300);
     padding-left: var(--wa-space-s);
     padding-right: var(--wa-space-2xs);
@@ -60,7 +60,7 @@
   }
 
   .number {
-    font-size: var(--wa-font-size-small);
+    font-size: var(--wa-font-size-s);
     text-wrap: nowrap;
     justify-self: start;
     font-weight: var(--wa-font-weight-bold);
@@ -71,7 +71,7 @@
     white-space: nowrap;
 
     & wa-icon {
-      font-size: var(--wa-font-size-x-small);
+      font-size: var(--wa-font-size-xs);
       color: var(--wa-color-yellow-500);
     }
   }

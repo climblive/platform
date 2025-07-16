@@ -158,7 +158,7 @@
     border-color: var(--wa-color-gray-600);
     border-width: 2px;
     border-style: dotted;
-    border-radius: var(--wa-border-radius-small);
+    border-radius: var(--wa-border-radius-s);
   }
 
   button:disabled {
@@ -212,11 +212,11 @@
     }
 
     & wa-button::part(prefix) {
-      font-size: var(--wa-font-size-small);
+      font-size: var(--wa-font-size-s);
     }
 
     & wa-button::part(label) {
-      font-size: var(--wa-font-size-2x-small);
+      font-size: var(--wa-font-size-2xs);
       line-height: var(--wa-line-height-dense);
       padding: 0;
     }
@@ -227,7 +227,7 @@
     box-shadow:
       rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
       rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
-    border-radius: var(--wa-border-radius-medium);
+    border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-s);
     cursor: default;
   }

@@ -19,7 +19,7 @@
 <style>
   strong {
     display: block;
-    font-size: var(--wa-font-size-x-small);
+    font-size: var(--wa-font-size-xs);
     line-height: var(--wa-line-height-normal);
   }
 

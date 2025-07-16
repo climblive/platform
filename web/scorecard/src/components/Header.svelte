@@ -67,7 +67,7 @@
   header {
     background-color: var(--wa-color-primary-600);
     border: 1px solid var(--wa-color-primary-500);
-    border-radius: var(--wa-border-radius-small);
+    border-radius: var(--wa-border-radius-s);
     padding: var(--wa-space-s);
     color: white;
     position: relative;
@@ -76,7 +76,7 @@
       position: absolute;
       top: var(--wa-space-m);
       right: var(--wa-space-s);
-      font-size: var(--wa-font-size-medium);
+      font-size: var(--wa-font-size-m);
       color: inherit;
     }
 
@@ -94,7 +94,7 @@
 
     & h1 {
       margin: 0;
-      font-size: var(--wa-font-size-large);
+      font-size: var(--wa-font-size-l);
       width: calc(100% - 2rem);
       line-height: var(--wa-line-height-dense);
     }
@@ -106,22 +106,22 @@
     }
 
     & .contender-club {
-      font-size: var(--wa-font-size-x-small);
+      font-size: var(--wa-font-size-xs);
     }
 
     & .contender-class {
       font-weight: var(--wa-font-weight-bold);
-      font-size: var(--wa-font-size-x-small);
+      font-size: var(--wa-font-size-xs);
     }
 
     & .score {
       & > span {
         font-weight: var(--wa-font-weight-bold);
-        font-size: var(--wa-font-size-large);
+        font-size: var(--wa-font-size-l);
       }
 
       & > :not(span) {
-        font-size: var(--wa-font-size-x-small);
+        font-size: var(--wa-font-size-xs);
         font-weight: var(--wa-font-weight-normal);
       }
     }

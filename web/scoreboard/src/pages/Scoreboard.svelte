@@ -118,7 +118,7 @@
     gap: var(--wa-space-xs);
     color: white;
     font-weight: var(--wa-font-weight-semibold);
-    font-size: var(--wa-font-size-small);
+    font-size: var(--wa-font-size-s);
 
     &[data-online="true"] {
       display: none;
@@ -167,13 +167,13 @@
     text-align: center;
 
     & img {
-      height: var(--wa-font-size-x-large);
+      height: var(--wa-font-size-x-l);
     }
   }
 
   @media screen and (max-width: 512px) {
     h1 {
-      font-size: var(--wa-font-size-x-large);
+      font-size: var(--wa-font-size-x-l);
     }
 
     wa-select {
@@ -189,7 +189,7 @@
     }
 
     .logo > img {
-      height: var(--wa-font-size-large);
+      height: var(--wa-font-size-l);
     }
   }
 </style>

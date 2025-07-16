@@ -72,8 +72,8 @@
     padding: var(--wa-space-m);
     background-color: var(--wa-color-gray-50);
     border: solid 1px var(--wa-color-gray-300);
-    border-radius: var(--wa-border-radius-small);
-    font-size: var(--wa-font-size-small);
+    border-radius: var(--wa-border-radius-s);
+    font-size: var(--wa-font-size-s);
 
     display: flex;
     flex-direction: column;
@@ -84,7 +84,7 @@
     margin-top: var(--wa-space-s);
     background-color: var(--wa-color-gray-50);
     border-color: var(--wa-color-gray-300);
-    font-size: var(--wa-font-size-small);
+    font-size: var(--wa-font-size-s);
   }
 
   wa-details::part(content) {

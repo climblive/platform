@@ -49,7 +49,7 @@
   header {
     margin-bottom: var(--wa-space-s);
     background-color: var(--wa-color-primary-600);
-    border-radius: var(--wa-border-radius-medium);
+    border-radius: var(--wa-border-radius-m);
 
     color: white;
 
@@ -89,7 +89,7 @@
       margin: var(--wa-space-s) var(--wa-space-s) 0 0;
 
       color: white;
-      font-size: var(--wa-font-size-small);
+      font-size: var(--wa-font-size-s);
       font-weight: var(--wa-font-weight-semibold);
 
       & strong {

@@ -30,7 +30,7 @@
   section {
     width: 18cm;
     border: 1px solid var(--wa-color-primary-600);
-    border-radius: var(--wa-border-radius-small);
+    border-radius: var(--wa-border-radius-s);
     margin-block: var(--wa-space-m);
     padding: var(--wa-space-m);
     display: flex;
@@ -45,16 +45,16 @@
     }
 
     & h1 {
-      font-size: var(--wa-font-size-large);
+      font-size: var(--wa-font-size-l);
       margin: 0;
     }
 
     & .link {
-      font-size: var(--wa-font-size-small);
+      font-size: var(--wa-font-size-s);
     }
 
     & .code {
-      font-size: var(--wa-font-size-x-large);
+      font-size: var(--wa-font-size-x-l);
       font-weight: bold;
       font-family: monospace;
       letter-spacing: 0.2rem;

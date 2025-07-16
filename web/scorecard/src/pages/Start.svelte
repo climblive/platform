@@ -168,14 +168,14 @@
     padding-block: var(--wa-space-m);
 
     & img {
-      height: var(--wa-font-size-large);
+      height: var(--wa-font-size-l);
     }
   }
 
   .restoredSession {
     background-color: var(--wa-color-gray-50);
     border: 1px solid var(--wa-color-gray-300);
-    border-radius: var(--wa-border-radius-medium);
+    border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-s);
     text-align: left;
 
@@ -185,7 +185,7 @@
     }
 
     & .timestamp {
-      font-size: var(--wa-font-size-x-small);
+      font-size: var(--wa-font-size-xs);
     }
 
     & wa-button {

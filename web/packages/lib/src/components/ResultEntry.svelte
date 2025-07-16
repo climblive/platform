@@ -38,13 +38,13 @@
     color: white;
     display: grid;
     padding-inline: var(--wa-space-s);
-    border-radius: var(--wa-border-radius-medium);
+    border-radius: var(--wa-border-radius-m);
     grid-template-columns: 2rem 1fr max-content;
     grid-template-rows: 1fr;
     gap: var(--wa-space-xs);
     align-items: center;
     justify-items: start;
-    font-size: var(--wa-font-size-medium);
+    font-size: var(--wa-font-size-m);
     font-weight: var(--wa-font-weight-semibold);
     user-select: none;
   }
@@ -79,7 +79,7 @@
   }
 
   .number {
-    font-size: var(--wa-font-size-x-small);
+    font-size: var(--wa-font-size-xs);
   }
 
   .name {
@@ -95,6 +95,6 @@
 
     text-align: right;
     font-weight: var(--wa-font-weight-bold);
-    font-size: var(--wa-font-size-medium);
+    font-size: var(--wa-font-size-m);
   }
 </style>

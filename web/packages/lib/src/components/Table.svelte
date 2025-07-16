@@ -32,7 +32,7 @@
     border-collapse: separate;
     overflow: hidden;
     border-spacing: 0;
-    border-radius: var(--wa-border-radius-medium);
+    border-radius: var(--wa-border-radius-m);
   }
 
   thead {
