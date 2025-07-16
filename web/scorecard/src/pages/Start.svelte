@@ -5,6 +5,7 @@
   import { serialize } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import { useQueryClient } from "@tanstack/svelte-query";
@@ -98,7 +99,7 @@
       </wa-callout>
     {/if}
     <wa-button variant="brand" type="submit" loading={loadingContender}>
-      <wa-icon slot="start" name="box-arrow-in-right"></wa-icon>
+      <wa-icon slot="start" name="arrow-right-to-bracket"></wa-icon>
       Enter
     </wa-button>
   </form>
@@ -126,7 +127,9 @@
         }}
         loading={loadingContender}
         size="small"
+        appearance="outlined filled"
         >Restore
+        <wa-icon slot="start" name="arrow-right-to-bracket"></wa-icon>
       </wa-button>
     </section>
   {/each}
@@ -173,8 +176,8 @@
   }
 
   .restoredSession {
-    background-color: var(--wa-color-gray-95);
-    border: 1px solid var(--wa-color-gray-70);
+    background-color: var(--wa-color-surface-default);
+    border: var(--wa-border-width-s) solid var(--wa-color-surface-border);
     border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-s);
     text-align: left;

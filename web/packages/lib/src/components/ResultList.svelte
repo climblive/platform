@@ -120,12 +120,12 @@
 
 <style>
   wa-skeleton {
-    --color: var(--wa-color-brand-60);
-    --sheen-color: var(--wa-color-brand-70);
-    --border-radius: var(--wa-border-radius-m);
-
     margin-bottom: var(--wa-space-xs);
     height: 2.25rem;
+  }
+
+  wa-skeleton::part(indicator) {
+    border-radius: var(--wa-border-radius-m);
   }
 
   .container {
