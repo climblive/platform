@@ -4,7 +4,9 @@
   import ProblemView from "@/components/ProblemView.svelte";
   import type { ScorecardSession } from "@/types";
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
+  import "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
   import type WaRadioGroup from "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
+  import "@awesome.me/webawesome/dist/components/radio/radio.js";
   import "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
   import type WaTabGroup from "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
   import "@awesome.me/webawesome/dist/components/tab-panel/tab-panel.js";
@@ -220,6 +222,7 @@
 
           <wa-tab-panel name="problems">
             <wa-radio-group
+              orientation="horizontal"
               size="small"
               bind:this={radioGroup}
               value={orderProblemsBy}
@@ -229,23 +232,16 @@
                 }
               }}
             >
-              <wa-radio-button value="number">
-                <wa-icon
-                  slot="start"
-                  name="sort-numeric-down"
-                  label="Sort by number"
-                ></wa-icon>
+              <wa-radio value="number" appearance="button">
+                <wa-icon name="arrow-down-1-9" label="Sort by number"></wa-icon>
                 Sort by number
-              </wa-radio-button>
+              </wa-radio>
 
-              <wa-radio-button value="points">
-                <wa-icon
-                  slot="start"
-                  name="sort-down-alt"
-                  label="Sort by points"
+              <wa-radio value="points" appearance="button">
+                <wa-icon name="arrow-up-short-wide" label="Sort by points"
                 ></wa-icon>
                 Sort by points
-              </wa-radio-button>
+              </wa-radio>
             </wa-radio-group>
             {#each sortedProblems as problem (problem.id)}
               <ProblemView
@@ -301,7 +297,6 @@
   }
 
   wa-tab-group {
-    --track-color: transparent;
     padding-inline: var(--wa-space-s);
     padding-bottom: var(--wa-space-s);
   }
@@ -310,21 +305,15 @@
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-xs);
-    width: 100%;
   }
 
-  wa-radio-group::part(button-group) {
-    width: 100%;
-  }
-
-  wa-radio-button {
+  wa-radio {
     flex-grow: 1;
+  }
 
-    &::part(button--checked),
-    &::part(button):hover {
-      border-color: var(--wa-color-gray-70);
-      background-color: var(--wa-color-gray-80);
-      color: inherit;
-    }
+  wa-radio::part(label) {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-xs);
   }
 </style>

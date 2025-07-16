@@ -48,10 +48,11 @@
 <style>
   header {
     margin-bottom: var(--wa-space-s);
-    background-color: var(--wa-color-brand-40);
+    background-color: var(--wa-color-brand-fill-normal);
     border-radius: var(--wa-border-radius-m);
+    border: var(--wa-border-width-s) solid var(--wa-color-brand-border-normal);
 
-    color: white;
+    color: var(--wa-color-brand-on-normal);
 
     display: grid;
     grid-template-columns: 1fr max-content;
@@ -88,7 +89,6 @@
       align-self: start;
       margin: var(--wa-space-s) var(--wa-space-s) 0 0;
 
-      color: white;
       font-size: var(--wa-font-size-s);
       font-weight: var(--wa-font-weight-semibold);
 

@@ -36,14 +36,15 @@
     <wa-button
       size="small"
       type="button"
-      variant="text"
+      appearance="plain"
       onclick={history.back()}>Cancel</wa-button
     >
     <wa-button
       size="small"
       type="submit"
       loading={$createCompClass.isPending}
-      variant="primary"
+      variant="brand"
+      appearance="accent"
       >Create
     </wa-button>
   </div>

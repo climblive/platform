@@ -58,8 +58,8 @@
       <wa-button
         size="small"
         type="button"
-        variant="text"
         onclick={gotoScorecard}
+        appearance="plain"
         >Cancel
       </wa-button>
       <wa-button
@@ -67,7 +67,8 @@
         type="submit"
         loading={$patchContender.isPending}
         disabled={false}
-        variant="primary"
+        variant="brand"
+        appearance="accent"
         >Save
       </wa-button>
     </div>

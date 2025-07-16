@@ -31,6 +31,7 @@
     <wa-select
       bind:this={select}
       size="small"
+      appearance="filled"
       {@attach value($selectedOrganizer)}
       onchange={handleChange}
     >
@@ -48,7 +49,7 @@
     align-items: center;
     justify-content: end;
     padding-inline: var(--wa-space-s);
-    background-color: var(--wa-color-brand-40);
+    background-color: var(--wa-color-brand-fill-normal);
     height: 3.25rem;
   }
 

@@ -44,7 +44,7 @@
       size="small"
       type="submit"
       loading={$createProblem.isPending}
-      variant="primary"
+      variant="brand"
       >Create
     </wa-button>
   </div>

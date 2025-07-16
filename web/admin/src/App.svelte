@@ -94,7 +94,7 @@
   {:then}
     <QueryClientProvider client={queryClient}>
       {#if !authenticated}
-        <wa-button variant="primary" onclick={login}>Login</wa-button>
+        <wa-button variant="brand" onclick={login}>Login</wa-button>
       {:else}
         <Main />
       {/if}

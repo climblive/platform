@@ -34,8 +34,9 @@
 <style>
   section {
     height: 2.25rem;
-    background-color: var(--wa-color-brand-50);
-    color: white;
+    background-color: var(--wa-color-neutral-fill-normal);
+    color: var(--wa-color-neutral-on-normal);
+    border: var(--wa-border-width-s) solid var(--wa-color-neutral-border-normal);
     display: grid;
     padding-inline: var(--wa-space-s);
     border-radius: var(--wa-border-radius-m);
@@ -47,17 +48,6 @@
     font-size: var(--wa-font-size-m);
     font-weight: var(--wa-font-weight-semibold);
     user-select: none;
-  }
-
-  section[data-finalist="true"] {
-    background: linear-gradient(
-      45deg,
-      var(--wa-color-yellow-30),
-      var(--wa-color-yellow-80)
-    );
-    background-size: 150%;
-    background-position: left;
-    color: white;
   }
 
   section > div {

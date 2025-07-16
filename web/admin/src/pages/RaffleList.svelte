@@ -28,7 +28,9 @@
   };
 </script>
 
-<wa-button variant="primary" onclick={handleCreateRaffle}>Create</wa-button>
+<wa-button variant="brand" appearance="accent" onclick={handleCreateRaffle}
+  >Create</wa-button
+>
 
 <section>
   <Table columns={["Name"]}>

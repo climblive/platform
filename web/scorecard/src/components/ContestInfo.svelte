@@ -71,9 +71,9 @@
 <style>
   section {
     padding: var(--wa-space-m);
-    background-color: var(--wa-color-gray-95);
-    border: solid 1px var(--wa-color-gray-70);
-    border-radius: var(--wa-border-radius-s);
+    background-color: var(--wa-color-surface-default);
+    border: solid 1px var(--wa-color-surface-border);
+    border-radius: var(--wa-border-radius-m);
     font-size: var(--wa-font-size-s);
 
     display: flex;
@@ -83,9 +83,8 @@
 
   wa-details::part(base) {
     margin-top: var(--wa-space-s);
-    background-color: var(--wa-color-gray-95);
-    border-color: var(--wa-color-gray-70);
     font-size: var(--wa-font-size-s);
+    border-radius: var(--wa-border-radius-m);
   }
 
   wa-details::part(content) {
@@ -93,6 +92,6 @@
   }
 
   a {
-    color: var(--wa-color-brand-30);
+    color: var(--wa-color-text-link);
   }
 </style>

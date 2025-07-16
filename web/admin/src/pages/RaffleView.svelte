@@ -41,8 +41,7 @@
 {#if raffle}
   <section>
     <h1>Raffle {raffle.id}</h1>
-    <wa-button variant="primary" onclick={handleDrawWinner}
-      >Draw winner</wa-button
+    <wa-button variant="brand" onclick={handleDrawWinner}>Draw winner</wa-button
     >
 
     {#if sortedRaffleWinners?.length}

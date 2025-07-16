@@ -74,10 +74,10 @@
 <main>
   {#if contest && scoreEngines}
     <wa-button
-      variant="text"
+      appearance="plain"
       onclick={() =>
         navigate(`/admin/organizers/${contest.ownership.organizerId}`)}
-      >Back to contests<wa-icon name="arrow-left" slot="slot"
+      >Back to contests<wa-icon name="arrow-left" slot="start"
       ></wa-icon></wa-button
     >
     <h1>{contest.name}</h1>
@@ -89,20 +89,20 @@
       <wa-tab slot="nav" panel="raffles">Raffles</wa-tab>
 
       <wa-tab-panel name="contest">
-        <wa-button onclick={handleDuplicationRequest}
+        <wa-button onclick={handleDuplicationRequest} appearance="outlined"
           >Duplicate
           <wa-icon name="copy" slot="start"></wa-icon>
         </wa-button>
 
         <a href={`${getApiUrl()}/contests/${contestId}/results`}>
-          <wa-button
+          <wa-button appearance="outlined"
             >Download results
             <wa-icon name="download" slot="start"></wa-icon>
           </wa-button>
         </a>
 
         <Link to={`/admin/contests/${contestId}/tickets`}>
-          <wa-button
+          <wa-button appearance="outlined"
             >Print tickets
             <wa-icon name="print" slot="start"></wa-icon>
           </wa-button>
@@ -152,6 +152,7 @@
         {/each}
         {#if scoreEngines.length === 0}
           <wa-button
+            appearance="outlined"
             onclick={() =>
               $startScoreEngine.mutate({
                 terminatedBy: add(new Date(), { hours: 6 }),
@@ -163,7 +164,8 @@
 
         <h2>Classes</h2>
         <wa-button
-          variant="primary"
+          variant="brand"
+          appearance="accent"
           onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
           >Create</wa-button
         >
@@ -173,7 +175,8 @@
       <wa-tab-panel name="problems">
         <h2>Problems</h2>
         <wa-button
-          variant="primary"
+          variant="brand"
+          appearance="accent"
           onclick={() => navigate(`contests/${contestId}/new-problem`)}
           >Create</wa-button
         >

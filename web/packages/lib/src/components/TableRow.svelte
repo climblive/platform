@@ -14,7 +14,7 @@
 
 <style>
   tr {
-    height: 2rem;
+    height: 3rem;
     cursor: pointer;
   }
 

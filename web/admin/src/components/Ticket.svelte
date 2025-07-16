@@ -29,8 +29,8 @@
 <style>
   section {
     width: 18cm;
-    border: 1px solid var(--wa-color-brand-40);
-    border-radius: var(--wa-border-radius-s);
+    border: var(--wa-border-width-s) solid var(--wa-color-brand-border-normal);
+    border-radius: var(--wa-border-radius-m);
     margin-block: var(--wa-space-m);
     padding: var(--wa-space-m);
     display: flex;
@@ -54,7 +54,7 @@
     }
 
     & .code {
-      font-size: var(--wa-font-size-x-l);
+      font-size: var(--wa-font-size-xl);
       font-weight: bold;
       font-family: monospace;
       letter-spacing: 0.2rem;

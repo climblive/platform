@@ -41,7 +41,7 @@
 
 <wa-button
   size="large"
-  variant="primary"
+  variant="brand"
   onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
   >Create</wa-button
 >

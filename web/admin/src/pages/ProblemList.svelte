@@ -38,6 +38,7 @@
           <TableCell align="right">
             <wa-button
               size="small"
+              appearance="plain"
               onclick={() => navigate(`/admin/problems/${problem.id}/edit`)}
               label="Edit"
             >
@@ -47,6 +48,8 @@
               {#snippet children({ deleteProblem })}
                 <wa-button
                   size="small"
+                  variant="danger"
+                  appearance="plain"
                   onclick={deleteProblem}
                   label={`Delete problem ${problem.id}`}
                 >

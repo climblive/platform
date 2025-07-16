@@ -109,9 +109,9 @@
     {#if loading}
       <wa-spinner></wa-spinner>
     {:else if variant === "flashed"}
-      <wa-icon name="lightning-charge"></wa-icon>
+      <wa-icon name="bolt"></wa-icon>
     {:else if variant === "ticked"}
-      <wa-icon name="check2-all"></wa-icon>
+      <wa-icon name="check-double"></wa-icon>
     {/if}
   </button>
 
@@ -124,11 +124,11 @@
     distance="10"
   >
     <wa-button size="small" onclick={(e: MouseEvent) => handleTick(e, false)}>
-      <wa-icon slot="prefix" name="check2-all"></wa-icon>
+      <wa-icon slot="start" name="check-double"></wa-icon>
       Top
     </wa-button>
     <wa-button size="small" onclick={(e: MouseEvent) => handleTick(e, true)}>
-      <wa-icon slot="prefix" name="lightning-charge"></wa-icon>
+      <wa-icon slot="start" name="bolt"></wa-icon>
       Flash
     </wa-button>
   </wa-popup>
@@ -156,20 +156,14 @@
     justify-content: center;
     align-items: center;
     border-color: var(--wa-color-gray-40);
-    border-width: 2px;
-    border-style: dotted;
+    border-width: var(--wa-border-width-s);
+    border-style: solid;
     border-radius: var(--wa-border-radius-s);
   }
 
   button:disabled {
     cursor: not-allowed;
     border: 0;
-  }
-
-  div[data-variant] {
-    & > button {
-      border-width: calc(2 * var(--wa-input-border-width));
-    }
   }
 
   div[data-variant="ticked"] {
@@ -187,16 +181,16 @@
   }
 
   div[data-variant="flashed"] {
-    background-color: var(--wa-color-yellow-90);
+    background-color: var(--wa-color-yellow-95);
 
     & wa-spinner {
-      --track-color: var(--wa-color-yellow-50);
+      --track-color: var(--wa-color-yellow-60);
       --indicator-color: var(--wa-color-yellow-90);
     }
 
     & > button {
-      border-color: var(--wa-color-yellow-50);
-      color: var(--wa-color-yellow-50);
+      border-color: var(--wa-color-yellow-60);
+      color: var(--wa-color-yellow-60);
     }
   }
 
@@ -206,19 +200,19 @@
     & wa-button::part(base) {
       width: 2.5rem;
       height: 2.5rem;
+      display: flex;
       flex-direction: column;
       align-items: center;
       padding: 0;
     }
 
-    & wa-button::part(prefix) {
-      font-size: var(--wa-font-size-s);
+    & wa-button > wa-icon {
+      margin: 0;
     }
 
     & wa-button::part(label) {
       font-size: var(--wa-font-size-2xs);
-      line-height: var(--wa-line-height-dense);
-      padding: 0;
+      line-height: var(--wa-line-height-condensed);
     }
   }
 

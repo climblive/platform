@@ -41,17 +41,15 @@
   }}
 >
   <div class="controls">
-    <wa-button
-      size="small"
-      type="button"
-      variant="text"
-      onclick={history.back()}>Cancel</wa-button
+    <wa-button size="small" appearance="plain" onclick={history.back()}
+      >Cancel</wa-button
     >
     <wa-button
       size="small"
       type="submit"
       loading={$createContest.isPending}
-      variant="primary"
+      variant="brand"
+      appearance="accent"
       >Create
     </wa-button>
   </div>

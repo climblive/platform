@@ -97,7 +97,7 @@
         The registration code is not valid.
       </wa-callout>
     {/if}
-    <wa-button variant="primary" type="submit" loading={loadingContender}>
+    <wa-button variant="brand" type="submit" loading={loadingContender}>
       <wa-icon slot="start" name="box-arrow-in-right"></wa-icon>
       Enter
     </wa-button>

@@ -32,14 +32,13 @@
     border-collapse: separate;
     overflow: hidden;
     border-spacing: 0;
-    border-radius: var(--wa-border-radius-m);
   }
 
   thead {
-    height: 2rem;
+    height: 3rem;
 
-    background-color: var(--wa-color-brand-40);
-    color: white;
+    background-color: var(--wa-color-brand-fill-normal);
+    color: var(--wa-color-brand-on-normal);
 
     & th {
       font-weight: var(--wa-font-weight-normal);

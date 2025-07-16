@@ -37,6 +37,7 @@
     label="Edit"
     onclick={() => navigate(`/${registrationCode}/edit`)}
     disabled={contestState === "ENDED"}
+    appearance="filled"
   >
     <wa-icon name="gear"></wa-icon>
   </wa-button>
@@ -66,11 +67,11 @@
 
 <style>
   header {
-    background-color: var(--wa-color-brand-40);
-    border: 1px solid var(--wa-color-brand-50);
-    border-radius: var(--wa-border-radius-s);
+    background-color: var(--wa-color-brand-fill-normal);
+    border: var(--wa-border-width-s) solid var(--wa-color-brand-border-normal);
+    border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-s);
-    color: white;
+    color: var(--wa-color-brand-on-normal);
     position: relative;
 
     & wa-button {
@@ -96,13 +97,13 @@
       margin: 0;
       font-size: var(--wa-font-size-l);
       width: calc(100% - 2rem);
-      line-height: var(--wa-line-height-dense);
+      line-height: var(--wa-line-height-condensed);
     }
 
     & .contender-name,
     & .contender-club {
       margin: 0;
-      line-height: var(--wa-line-height-dense);
+      line-height: var(--wa-line-height-condensed);
     }
 
     & .contender-club {

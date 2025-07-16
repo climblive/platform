@@ -167,13 +167,13 @@
     text-align: center;
 
     & img {
-      height: var(--wa-font-size-x-l);
+      height: var(--wa-font-size-xl);
     }
   }
 
   @media screen and (max-width: 512px) {
     h1 {
-      font-size: var(--wa-font-size-x-l);
+      font-size: var(--wa-font-size-xl);
     }
 
     wa-select {

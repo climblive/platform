@@ -42,8 +42,8 @@
     {#each increments as increment (increment)}
       <wa-button
         size="small"
-        type="button"
-        variant="primary"
+        variant="brand"
+        appearance="accent"
         loading={$createContenders.isPending}
         disabled={!remainingCodes || remainingCodes < increment}
         onclick={() => addContenders({ number: increment })}
