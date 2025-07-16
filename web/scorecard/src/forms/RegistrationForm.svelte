@@ -80,7 +80,7 @@
   fieldset {
     display: flex;
     flex-direction: column;
-    gap: var(--wa-spacing-small);
-    padding: var(--wa-spacing-medium);
+    gap: var(--wa-space-s);
+    padding: var(--wa-space-m);
   }
 </style>

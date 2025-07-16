@@ -116,7 +116,7 @@
   fieldset {
     display: flex;
     flex-direction: column;
-    gap: var(--wa-spacing-small);
+    gap: var(--wa-space-s);
   }
 
   .colors {
@@ -126,7 +126,7 @@
 
     & .pickers {
       display: flex;
-      gap: var(--wa-spacing-x-small);
+      gap: var(--wa-space-xs);
     }
   }
 </style>

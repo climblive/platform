@@ -48,13 +48,13 @@
     background-color: var(--wa-color-gray-50);
     border-radius: var(--wa-border-radius-small);
     border: solid 1px var(--wa-color-gray-300);
-    padding-left: var(--wa-spacing-small);
-    padding-right: var(--wa-spacing-2x-small);
+    padding-left: var(--wa-space-s);
+    padding-right: var(--wa-space-2xs);
 
     display: grid;
     grid-template-columns: var(--number-length) 1rem 1fr 1fr 2.5rem;
     grid-template-rows: 1fr;
-    gap: var(--wa-spacing-x-small);
+    gap: var(--wa-space-xs);
     align-items: center;
     justify-items: end;
   }

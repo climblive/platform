@@ -54,6 +54,6 @@
 <style>
   section {
     display: flex;
-    gap: var(--wa-spacing-x-small);
+    gap: var(--wa-space-xs);
   }
 </style>

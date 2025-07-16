@@ -139,7 +139,7 @@
   main {
     display: flex;
     flex-direction: column;
-    padding-inline: var(--wa-spacing-large);
+    padding-inline: var(--wa-space-l);
     min-height: 100vh;
   }
 
@@ -151,7 +151,7 @@
     display: flex;
     flex-direction: column;
     text-align: left;
-    gap: var(--wa-spacing-small);
+    gap: var(--wa-space-s);
 
     & wa-input::part(input) {
       text-transform: uppercase;
@@ -165,7 +165,7 @@
   footer {
     margin-top: auto;
     text-align: center;
-    padding-block: var(--wa-spacing-medium);
+    padding-block: var(--wa-space-m);
 
     & img {
       height: var(--wa-font-size-large);
@@ -176,7 +176,7 @@
     background-color: var(--wa-color-gray-50);
     border: 1px solid var(--wa-color-gray-300);
     border-radius: var(--wa-border-radius-medium);
-    padding: var(--wa-spacing-small);
+    padding: var(--wa-space-s);
     text-align: left;
 
     & h3 {
@@ -199,6 +199,6 @@
   }
 
   .restoredSession:not(:last-of-type) {
-    margin-bottom: var(--wa-spacing-small);
+    margin-bottom: var(--wa-space-s);
   }
 </style>

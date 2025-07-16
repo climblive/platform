@@ -71,7 +71,7 @@
 
 <style>
   main {
-    padding: var(--wa-spacing-medium);
+    padding: var(--wa-space-m);
   }
 
   @media print {

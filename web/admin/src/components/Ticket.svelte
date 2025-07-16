@@ -31,8 +31,8 @@
     width: 18cm;
     border: 1px solid var(--wa-color-primary-600);
     border-radius: var(--wa-border-radius-small);
-    margin-block: var(--wa-spacing-medium);
-    padding: var(--wa-spacing-medium);
+    margin-block: var(--wa-space-m);
+    padding: var(--wa-space-m);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -41,7 +41,7 @@
       flex-grow: 1;
       display: flex;
       flex-direction: column;
-      gap: var(--wa-spacing-x-small);
+      gap: var(--wa-space-xs);
     }
 
     & h1 {
@@ -62,7 +62,7 @@
 
     & img {
       height: 1.5rem;
-      margin: auto var(--wa-spacing-medium) var(--wa-spacing-2x-small) auto;
+      margin: auto var(--wa-space-m) var(--wa-space-2xs) auto;
     }
   }
 

@@ -31,13 +31,13 @@
   pre {
     border: 1px solid var(--wa-color-primary-300);
     background-color: white;
-    padding: var(--wa-spacing-small);
+    padding: var(--wa-space-s);
     overflow: scroll;
     border-radius: var(--wa-border-radius-small);
     font-size: var(--wa-font-size-small);
   }
 
   main {
-    padding: var(--wa-spacing-small);
+    padding: var(--wa-space-s);
   }
 </style>

@@ -195,9 +195,9 @@
 
 <style>
   article {
-    padding-block: var(--wa-spacing-medium);
+    padding-block: var(--wa-space-m);
     display: flex;
     flex-direction: column;
-    gap: var(--wa-spacing-small);
+    gap: var(--wa-space-s);
   }
 </style>

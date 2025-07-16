@@ -69,7 +69,7 @@
 
 <style>
   section {
-    padding: var(--wa-spacing-medium);
+    padding: var(--wa-space-m);
     background-color: var(--wa-color-gray-50);
     border: solid 1px var(--wa-color-gray-300);
     border-radius: var(--wa-border-radius-small);
@@ -77,11 +77,11 @@
 
     display: flex;
     flex-direction: column;
-    gap: var(--wa-spacing-medium);
+    gap: var(--wa-space-m);
   }
 
   wa-details::part(base) {
-    margin-top: var(--wa-spacing-small);
+    margin-top: var(--wa-space-s);
     background-color: var(--wa-color-gray-50);
     border-color: var(--wa-color-gray-300);
     font-size: var(--wa-font-size-small);

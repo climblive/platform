@@ -22,7 +22,7 @@
     transform: translateY(
       calc(
         (var(--order) - var(--page-index) * var(--page-size)) *
-          (2.25rem + var(--wa-spacing-x-small))
+          (2.25rem + var(--wa-space-xs))
       )
     );
   }

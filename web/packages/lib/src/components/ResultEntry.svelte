@@ -37,11 +37,11 @@
     background-color: var(--wa-color-primary-500);
     color: white;
     display: grid;
-    padding-inline: var(--wa-spacing-small);
+    padding-inline: var(--wa-space-s);
     border-radius: var(--wa-border-radius-medium);
     grid-template-columns: 2rem 1fr max-content;
     grid-template-rows: 1fr;
-    gap: var(--wa-spacing-x-small);
+    gap: var(--wa-space-xs);
     align-items: center;
     justify-items: start;
     font-size: var(--wa-font-size-medium);
@@ -91,7 +91,7 @@
 
     display: flex;
     align-items: center;
-    gap: var(--wa-spacing-x-small);
+    gap: var(--wa-space-xs);
 
     text-align: right;
     font-weight: var(--wa-font-weight-bold);

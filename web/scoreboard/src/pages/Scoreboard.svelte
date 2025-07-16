@@ -115,7 +115,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(--wa-spacing-x-small);
+    gap: var(--wa-space-xs);
     color: white;
     font-weight: var(--wa-font-weight-semibold);
     font-size: var(--wa-font-size-small);
@@ -129,7 +129,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: var(--wa-spacing-small);
+    padding: var(--wa-space-s);
   }
 
   h1 {
@@ -140,7 +140,7 @@
   }
 
   .container {
-    margin-top: var(--wa-spacing-small);
+    margin-top: var(--wa-space-s);
     flex-grow: 1;
     display: grid;
     grid-template-columns: repeat(
@@ -149,7 +149,7 @@
     );
     grid-template-rows: 1fr;
     padding-top: 0;
-    gap: var(--wa-spacing-small);
+    gap: var(--wa-space-s);
 
     justify-content: center;
   }

@@ -78,6 +78,6 @@
   .controls {
     display: flex;
     justify-content: end;
-    gap: var(--wa-spacing-small);
+    gap: var(--wa-space-s);
   }
 </style>

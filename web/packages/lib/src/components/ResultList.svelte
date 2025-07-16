@@ -124,7 +124,7 @@
     --sheen-color: var(--wa-color-primary-300);
     --border-radius: var(--wa-border-radius-medium);
 
-    margin-bottom: var(--wa-spacing-x-small);
+    margin-bottom: var(--wa-space-xs);
     height: 2.25rem;
   }
 
@@ -139,13 +139,13 @@
       0px 100%
         calc(
           var(--page-size) * 2.25rem + (var(--page-size) - 1) *
-            var(--wa-spacing-x-small)
+            var(--wa-space-xs)
         )
         0px
     );
   }
 
   .container[data-overflow="scroll"] {
-    height: calc(var(--page-size) * (2.25rem + var(--wa-spacing-x-small)));
+    height: calc(var(--page-size) * (2.25rem + var(--wa-space-xs)));
   }
 </style>

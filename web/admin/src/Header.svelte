@@ -47,7 +47,7 @@
     display: flex;
     align-items: center;
     justify-content: end;
-    padding-inline: var(--wa-spacing-small);
+    padding-inline: var(--wa-space-s);
     background-color: var(--wa-color-primary-600);
     height: 3.25rem;
   }

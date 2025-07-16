@@ -47,7 +47,7 @@
     }
 
     & th:first-of-type {
-      padding-left: var(--wa-spacing-medium);
+      padding-left: var(--wa-space-m);
     }
   }
 </style>

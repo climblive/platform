@@ -68,14 +68,14 @@
     background-color: var(--wa-color-primary-600);
     border: 1px solid var(--wa-color-primary-500);
     border-radius: var(--wa-border-radius-small);
-    padding: var(--wa-spacing-small);
+    padding: var(--wa-space-s);
     color: white;
     position: relative;
 
     & wa-button {
       position: absolute;
-      top: var(--wa-spacing-medium);
-      right: var(--wa-spacing-small);
+      top: var(--wa-space-m);
+      right: var(--wa-space-s);
       font-size: var(--wa-font-size-medium);
       color: inherit;
     }

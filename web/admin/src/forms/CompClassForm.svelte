@@ -93,6 +93,6 @@
   fieldset {
     display: flex;
     flex-direction: column;
-    gap: var(--wa-spacing-small);
+    gap: var(--wa-space-s);
   }
 </style>

@@ -140,7 +140,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: calc(100% - 2 * var(--wa-spacing-2x-small));
+    height: calc(100% - 2 * var(--wa-space-2xs));
     aspect-ratio: 1 / 1;
   }
 
@@ -228,12 +228,12 @@
       rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
       rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
     border-radius: var(--wa-border-radius-medium);
-    padding: var(--wa-spacing-small);
+    padding: var(--wa-space-s);
     cursor: default;
   }
 
   wa-popup[active]::part(popup) {
     display: flex;
-    gap: var(--wa-spacing-2x-small);
+    gap: var(--wa-space-2xs);
   }
 </style>

@@ -280,7 +280,7 @@
 
 <style>
   wa-tab-panel::part(base) {
-    padding-top: var(--wa-spacing-small);
+    padding-top: var(--wa-space-s);
     padding-bottom: 0;
   }
 
@@ -297,19 +297,19 @@
     right: 0;
     z-index: 10;
     background-color: white;
-    padding: var(--wa-spacing-small);
+    padding: var(--wa-space-s);
   }
 
   wa-tab-group {
     --track-color: transparent;
-    padding-inline: var(--wa-spacing-small);
-    padding-bottom: var(--wa-spacing-small);
+    padding-inline: var(--wa-space-s);
+    padding-bottom: var(--wa-space-s);
   }
 
   wa-tab-panel[name="problems"]::part(base) {
     display: flex;
     flex-direction: column;
-    gap: var(--wa-spacing-x-small);
+    gap: var(--wa-space-xs);
     width: 100%;
   }
 

@@ -47,7 +47,7 @@
 
 <style>
   header {
-    margin-bottom: var(--wa-spacing-small);
+    margin-bottom: var(--wa-space-s);
     background-color: var(--wa-color-primary-600);
     border-radius: var(--wa-border-radius-medium);
 
@@ -60,10 +60,10 @@
     .left {
       display: flex;
       flex-direction: column;
-      gap: var(--wa-spacing-x-small);
+      gap: var(--wa-space-xs);
       align-items: start;
 
-      padding: var(--wa-spacing-small);
+      padding: var(--wa-space-s);
     }
 
     .title {
@@ -86,7 +86,7 @@
 
     .size {
       align-self: start;
-      margin: var(--wa-spacing-small) var(--wa-spacing-small) 0 0;
+      margin: var(--wa-space-s) var(--wa-space-s) 0 0;
 
       color: white;
       font-size: var(--wa-font-size-small);
