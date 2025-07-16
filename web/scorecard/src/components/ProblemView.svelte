@@ -45,9 +45,9 @@
 <style>
   section {
     height: 3rem;
-    background-color: var(--wa-color-neutral-50);
+    background-color: var(--wa-color-gray-50);
     border-radius: var(--wa-border-radius-small);
-    border: solid 1px var(--wa-color-neutral-300);
+    border: solid 1px var(--wa-color-gray-300);
     padding-left: var(--wa-spacing-small);
     padding-right: var(--wa-spacing-2x-small);
 

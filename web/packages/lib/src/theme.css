@@ -16,19 +16,7 @@
   --wa-color-primary-900: #6d2c4d;
   --wa-color-primary-950: #3c152c;
 
-  --wa-color-neutral-50: #fafafa;
-  --wa-color-neutral-100: #f4f4f5;
-  --wa-color-neutral-200: #e4e4e7;
-  --wa-color-neutral-300: #d4d4d8;
-  --wa-color-neutral-400: #a1a1aa;
-  --wa-color-neutral-500: #71717a;
-  --wa-color-neutral-600: #52525b;
-  --wa-color-neutral-700: #3f3f46;
-  --wa-color-neutral-800: #27272a;
-  --wa-color-neutral-900: #18181b;
-  --wa-color-neutral-950: #09090b;
-
-  --wa-input-focus-ring-color: var(--wa-color-primary-400);
+  /* --wa-input-focus-ring-color: var(--wa-color-primary-400); */
 
   --color: #27272a;
 }

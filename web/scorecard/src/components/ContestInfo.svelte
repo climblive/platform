@@ -70,8 +70,8 @@
 <style>
   section {
     padding: var(--wa-spacing-medium);
-    background-color: var(--wa-color-neutral-50);
-    border: solid 1px var(--wa-color-neutral-300);
+    background-color: var(--wa-color-gray-50);
+    border: solid 1px var(--wa-color-gray-300);
     border-radius: var(--wa-border-radius-small);
     font-size: var(--wa-font-size-small);
 
@@ -82,8 +82,8 @@
 
   wa-details::part(base) {
     margin-top: var(--wa-spacing-small);
-    background-color: var(--wa-color-neutral-50);
-    border-color: var(--wa-color-neutral-300);
+    background-color: var(--wa-color-gray-50);
+    border-color: var(--wa-color-gray-300);
     font-size: var(--wa-font-size-small);
   }
 

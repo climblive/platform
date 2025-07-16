@@ -155,7 +155,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border-color: var(--wa-color-neutral-600);
+    border-color: var(--wa-color-gray-600);
     border-width: 2px;
     border-style: dotted;
     border-radius: var(--wa-border-radius-small);

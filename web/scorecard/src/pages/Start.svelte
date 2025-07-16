@@ -173,8 +173,8 @@
   }
 
   .restoredSession {
-    background-color: var(--wa-color-neutral-50);
-    border: 1px solid var(--wa-color-neutral-300);
+    background-color: var(--wa-color-gray-50);
+    border: 1px solid var(--wa-color-gray-300);
     border-radius: var(--wa-border-radius-medium);
     padding: var(--wa-spacing-small);
     text-align: left;

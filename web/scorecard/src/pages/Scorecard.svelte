@@ -322,8 +322,8 @@
 
     &::part(button--checked),
     &::part(button):hover {
-      border-color: var(--wa-color-neutral-300);
-      background-color: var(--wa-color-neutral-200);
+      border-color: var(--wa-color-gray-300);
+      background-color: var(--wa-color-gray-200);
       color: inherit;
     }
   }
