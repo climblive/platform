@@ -48,7 +48,7 @@
 <style>
   header {
     margin-bottom: var(--wa-space-s);
-    background-color: var(--wa-color-primary-600);
+    background-color: var(--wa-color-brand-40);
     border-radius: var(--wa-border-radius-m);
 
     color: white;

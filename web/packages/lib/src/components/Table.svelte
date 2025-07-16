@@ -38,7 +38,7 @@
   thead {
     height: 2rem;
 
-    background-color: var(--wa-color-primary-600);
+    background-color: var(--wa-color-brand-40);
     color: white;
 
     & th {

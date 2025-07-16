@@ -71,8 +71,8 @@
 <style>
   section {
     padding: var(--wa-space-m);
-    background-color: var(--wa-color-gray-50);
-    border: solid 1px var(--wa-color-gray-300);
+    background-color: var(--wa-color-gray-95);
+    border: solid 1px var(--wa-color-gray-70);
     border-radius: var(--wa-border-radius-s);
     font-size: var(--wa-font-size-s);
 
@@ -83,8 +83,8 @@
 
   wa-details::part(base) {
     margin-top: var(--wa-space-s);
-    background-color: var(--wa-color-gray-50);
-    border-color: var(--wa-color-gray-300);
+    background-color: var(--wa-color-gray-95);
+    border-color: var(--wa-color-gray-70);
     font-size: var(--wa-font-size-s);
   }
 
@@ -93,6 +93,6 @@
   }
 
   a {
-    color: var(--wa-color-primary-700);
+    color: var(--wa-color-brand-30);
   }
 </style>

@@ -30,6 +30,7 @@
           </TableCell>
           <TableCell align="right">
             <wa-button
+              size="small"
               onclick={() =>
                 navigate(`/admin/comp-classes/${compClass.id}/edit`)}
               label="Edit"
@@ -39,6 +40,7 @@
             <DeleteCompClass compClassId={compClass.id}>
               {#snippet children({ deleteCompClass })}
                 <wa-button
+                  size="small"
                   onclick={deleteCompClass}
                   label={`Delete comp class ${compClass.id}`}
                 >

@@ -66,8 +66,8 @@
 
 <style>
   header {
-    background-color: var(--wa-color-primary-600);
-    border: 1px solid var(--wa-color-primary-500);
+    background-color: var(--wa-color-brand-40);
+    border: 1px solid var(--wa-color-brand-50);
     border-radius: var(--wa-border-radius-s);
     padding: var(--wa-space-s);
     color: white;
@@ -77,7 +77,6 @@
       position: absolute;
       top: var(--wa-space-m);
       right: var(--wa-space-s);
-      font-size: var(--wa-font-size-m);
       color: inherit;
     }
 

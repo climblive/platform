@@ -29,7 +29,7 @@
 <style>
   section {
     width: 18cm;
-    border: 1px solid var(--wa-color-primary-600);
+    border: 1px solid var(--wa-color-brand-40);
     border-radius: var(--wa-border-radius-s);
     margin-block: var(--wa-space-m);
     padding: var(--wa-space-m);

@@ -120,8 +120,8 @@
 
 <style>
   wa-skeleton {
-    --color: var(--wa-color-primary-400);
-    --sheen-color: var(--wa-color-primary-300);
+    --color: var(--wa-color-brand-60);
+    --sheen-color: var(--wa-color-brand-70);
     --border-radius: var(--wa-border-radius-m);
 
     margin-bottom: var(--wa-space-xs);

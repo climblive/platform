@@ -155,7 +155,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border-color: var(--wa-color-gray-600);
+    border-color: var(--wa-color-gray-40);
     border-width: 2px;
     border-style: dotted;
     border-radius: var(--wa-border-radius-s);
@@ -173,35 +173,35 @@
   }
 
   div[data-variant="ticked"] {
-    background-color: var(--wa-color-green-100);
+    background-color: var(--wa-color-green-90);
 
     & wa-spinner {
-      --track-color: var(--wa-color-green-600);
-      --indicator-color: var(--wa-color-green-100);
+      --track-color: var(--wa-color-green-40);
+      --indicator-color: var(--wa-color-green-90);
     }
 
     & > button {
-      border-color: var(--wa-color-green-600);
-      color: var(--wa-color-green-600);
+      border-color: var(--wa-color-green-40);
+      color: var(--wa-color-green-40);
     }
   }
 
   div[data-variant="flashed"] {
-    background-color: var(--wa-color-yellow-100);
+    background-color: var(--wa-color-yellow-90);
 
     & wa-spinner {
-      --track-color: var(--wa-color-yellow-500);
-      --indicator-color: var(--wa-color-yellow-100);
+      --track-color: var(--wa-color-yellow-50);
+      --indicator-color: var(--wa-color-yellow-90);
     }
 
     & > button {
-      border-color: var(--wa-color-yellow-500);
-      color: var(--wa-color-yellow-500);
+      border-color: var(--wa-color-yellow-50);
+      color: var(--wa-color-yellow-50);
     }
   }
 
   wa-popup {
-    --arrow-color: var(--wa-color-primary-600);
+    --arrow-color: var(--wa-color-brand-40);
 
     & wa-button::part(base) {
       width: 2.5rem;
@@ -223,7 +223,7 @@
   }
 
   wa-popup::part(popup) {
-    background-color: var(--wa-color-primary-600);
+    background-color: var(--wa-color-brand-40);
     box-shadow:
       rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
       rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;

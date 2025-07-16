@@ -4,19 +4,17 @@
   /*
       Generator: https://uicolors.app/create
     */
-  --wa-color-primary-50: #fcfbf3;
-  --wa-color-primary-100: #f9f7eb;
-  --wa-color-primary-200: #f3ead8;
-  --wa-color-primary-300: #e9d1b9;
-  --wa-color-primary-400: #dca88e;
-  --wa-color-primary-500: #cc7966;
-  --wa-color-primary-600: #bc5757;
-  --wa-color-primary-700: #993847;
-  --wa-color-primary-800: #81314c;
-  --wa-color-primary-900: #6d2c4d;
-  --wa-color-primary-950: #3c152c;
-
-  /* --wa-input-focus-ring-color: var(--wa-color-primary-400); */
+  --wa-color-brand-95: #fcfbf3;
+  --wa-color-brand-90: #f9f7eb;
+  --wa-color-brand-80: #f3ead8;
+  --wa-color-brand-70: #e9d1b9;
+  --wa-color-brand-60: #dca88e;
+  --wa-color-brand-50: #cc7966;
+  --wa-color-brand-40: #bc5757;
+  --wa-color-brand-30: #993847;
+  --wa-color-brand-20: #81314c;
+  --wa-color-brand-10: #6d2c4d;
+  --wa-color-brand-05: #3c152c;
 
   --color: #27272a;
 }

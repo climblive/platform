@@ -34,7 +34,7 @@
       {@attach value($selectedOrganizer)}
       onchange={handleChange}
     >
-      <wa-icon name="arrow-left-right" slot="start"></wa-icon>
+      <wa-icon name="id-badge" slot="start"></wa-icon>
       {#each self.organizers as organizer (organizer.id)}
         <wa-option value={organizer.id}>{organizer.name}</wa-option>
       {/each}
@@ -48,7 +48,7 @@
     align-items: center;
     justify-content: end;
     padding-inline: var(--wa-space-s);
-    background-color: var(--wa-color-primary-600);
+    background-color: var(--wa-color-brand-40);
     height: 3.25rem;
   }
 

@@ -34,7 +34,7 @@
 <style>
   section {
     height: 2.25rem;
-    background-color: var(--wa-color-primary-500);
+    background-color: var(--wa-color-brand-50);
     color: white;
     display: grid;
     padding-inline: var(--wa-space-s);
@@ -52,23 +52,12 @@
   section[data-finalist="true"] {
     background: linear-gradient(
       45deg,
-      var(--wa-color-yellow-800),
-      var(--wa-color-yellow-500)
+      var(--wa-color-yellow-30),
+      var(--wa-color-yellow-80)
     );
     background-size: 150%;
     background-position: left;
-    animation: shine 5s infinite;
     color: white;
-  }
-
-  @keyframes shine {
-    0%,
-    100% {
-      background-position: left;
-    }
-    50% {
-      background-position: right;
-    }
   }
 
   section > div {
