@@ -1,5 +1,5 @@
 <script lang="ts">
-  import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
+  import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
   import { Route, Router } from "svelte-routing";
   import LastOrganizer from "./components/LastOrganizer.svelte";
   import Header from "./Header.svelte";
@@ -71,7 +71,7 @@
 
 <style>
   main {
-    padding: var(--sl-spacing-medium);
+    padding: var(--wa-spacing-medium);
   }
 
   @media print {

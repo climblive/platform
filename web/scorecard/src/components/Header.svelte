@@ -32,13 +32,13 @@
 </script>
 
 <header>
-  <sl-icon-button
+  <wa-icon-button
     name="gear"
     label="Edit"
     onclick={() => navigate(`/${registrationCode}/edit`)}
     disabled={contestState === "ENDED"}
   >
-  </sl-icon-button>
+  </wa-icon-button>
   <h1>{contestName}</h1>
   <p class="contender-name">
     {contenderName} <span class="contender-class">{compClassName}</span>
@@ -65,22 +65,22 @@
 
 <style>
   header {
-    background-color: var(--sl-color-primary-600);
-    border: 1px solid var(--sl-color-primary-500);
-    border-radius: var(--sl-border-radius-small);
-    padding: var(--sl-spacing-small);
+    background-color: var(--wa-color-primary-600);
+    border: 1px solid var(--wa-color-primary-500);
+    border-radius: var(--wa-border-radius-small);
+    padding: var(--wa-spacing-small);
     color: white;
     position: relative;
 
-    & sl-icon-button {
+    & wa-icon-button {
       position: absolute;
-      top: var(--sl-spacing-medium);
-      right: var(--sl-spacing-small);
-      font-size: var(--sl-font-size-medium);
+      top: var(--wa-spacing-medium);
+      right: var(--wa-spacing-small);
+      font-size: var(--wa-font-size-medium);
       color: inherit;
     }
 
-    & sl-icon-button::part(base) {
+    & wa-icon-button::part(base) {
       padding: 0;
     }
 
@@ -94,35 +94,35 @@
 
     & h1 {
       margin: 0;
-      font-size: var(--sl-font-size-large);
+      font-size: var(--wa-font-size-large);
       width: calc(100% - 2rem);
-      line-height: var(--sl-line-height-dense);
+      line-height: var(--wa-line-height-dense);
     }
 
     & .contender-name,
     & .contender-club {
       margin: 0;
-      line-height: var(--sl-line-height-dense);
+      line-height: var(--wa-line-height-dense);
     }
 
     & .contender-club {
-      font-size: var(--sl-font-size-x-small);
+      font-size: var(--wa-font-size-x-small);
     }
 
     & .contender-class {
-      font-weight: var(--sl-font-weight-bold);
-      font-size: var(--sl-font-size-x-small);
+      font-weight: var(--wa-font-weight-bold);
+      font-size: var(--wa-font-size-x-small);
     }
 
     & .score {
       & > span {
-        font-weight: var(--sl-font-weight-bold);
-        font-size: var(--sl-font-size-large);
+        font-weight: var(--wa-font-weight-bold);
+        font-size: var(--wa-font-size-large);
       }
 
       & > :not(span) {
-        font-size: var(--sl-font-size-x-small);
-        font-weight: var(--sl-font-weight-normal);
+        font-size: var(--wa-font-size-x-small);
+        font-weight: var(--wa-font-weight-normal);
       }
     }
 

@@ -1,8 +1,8 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import { Table, TableCell, TableRow } from "@climblive/lib/components";
   import type { Contest } from "@climblive/lib/models";
   import { getContestsByOrganizerQuery } from "@climblive/lib/queries";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { format } from "date-fns";
   import { Link, navigate } from "svelte-routing";
 
@@ -39,11 +39,11 @@
   });
 </script>
 
-<sl-button
+<wa-button
   size="large"
   variant="primary"
   onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
-  >Create</sl-button
+  >Create</wa-button
 >
 
 {#snippet listing(heading: string, contests: Contest[])}

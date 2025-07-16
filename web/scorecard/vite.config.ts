@@ -20,7 +20,7 @@ export default defineConfig({
         {
           src: path.resolve(
             __dirname,
-            "node_modules/@shoelace-style/shoelace/dist/assets",
+            "node_modules/@awesome.me/webawesome/dist/assets",
           ),
           dest: path.resolve(__dirname, "public/shoelace"),
         },

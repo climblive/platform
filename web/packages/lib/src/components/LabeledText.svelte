@@ -19,8 +19,8 @@
 <style>
   strong {
     display: block;
-    font-size: var(--sl-font-size-x-small);
-    line-height: var(--sl-line-height-normal);
+    font-size: var(--wa-font-size-x-small);
+    line-height: var(--wa-line-height-normal);
   }
 
   p {

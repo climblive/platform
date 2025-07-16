@@ -29,19 +29,19 @@
             {format(compClass.timeEnd, "yyyy-MM-dd HH:mm")}
           </TableCell>
           <TableCell align="right">
-            <sl-icon-button
+            <wa-icon-button
               onclick={() =>
                 navigate(`/admin/comp-classes/${compClass.id}/edit`)}
               name="pencil"
               label="Edit"
-            ></sl-icon-button>
+            ></wa-icon-button>
             <DeleteCompClass compClassId={compClass.id}>
               {#snippet children({ deleteCompClass })}
-                <sl-icon-button
+                <wa-icon-button
                   onclick={deleteCompClass}
                   name="trash"
                   label={`Delete comp class ${compClass.id}`}
-                ></sl-icon-button>
+                ></wa-icon-button>
               {/snippet}
             </DeleteCompClass>
           </TableCell>
@@ -54,6 +54,6 @@
 <style>
   section {
     display: flex;
-    gap: var(--sl-spacing-x-small);
+    gap: var(--wa-spacing-x-small);
   }
 </style>

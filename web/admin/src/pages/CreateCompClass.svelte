@@ -1,9 +1,9 @@
 <script lang="ts">
   import CompClassForm, { formSchema } from "@/forms/CompClassForm.svelte";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { CompClassTemplate } from "@climblive/lib/models";
   import { createCompClassMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { add, roundToNearestHours } from "date-fns";
   import { navigate } from "svelte-routing";
 
@@ -33,18 +33,18 @@
   schema={formSchema}
 >
   <div class="controls">
-    <sl-button
+    <wa-button
       size="small"
       type="button"
       variant="text"
-      onclick={history.back()}>Cancel</sl-button
+      onclick={history.back()}>Cancel</wa-button
     >
-    <sl-button
+    <wa-button
       size="small"
       type="submit"
       loading={$createCompClass.isPending}
       variant="primary"
       >Create
-    </sl-button>
+    </wa-button>
   </div>
 </CompClassForm>

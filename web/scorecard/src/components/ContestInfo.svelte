@@ -1,8 +1,7 @@
 <script lang="ts">
+  import type WaDetails from "@awesome.me/webawesome/dist/components/details/details.js";
   import { LabeledText } from "@climblive/lib/components";
   import type { CompClass, Contest, Problem } from "@climblive/lib/models";
-  import type { SlDetails } from "@shoelace-style/shoelace";
-  import "@shoelace-style/shoelace/dist/components/details/details.js";
   import { format } from "date-fns";
   import { sv } from "date-fns/locale";
 
@@ -14,7 +13,7 @@
 
   let { contest, compClasses, problems }: Props = $props();
 
-  let details: SlDetails | undefined = $state();
+  let details: WaDetails | undefined = $state();
 
   const scoreboardUrl = `${location.protocol}//${location.host}/scoreboard/${contest.id}`;
 </script>
@@ -54,8 +53,8 @@
   </LabeledText>
 </section>
 {#if contest.rules}
-  <sl-details
-    onsl-after-show={() =>
+  <wa-details
+    onwa-after-show={() =>
       details?.scrollIntoView({
         behavior: "smooth",
         block: "start",
@@ -65,34 +64,34 @@
     summary="Rules"
   >
     {@html contest.rules}
-  </sl-details>
+  </wa-details>
 {/if}
 
 <style>
   section {
-    padding: var(--sl-spacing-medium);
-    background-color: var(--sl-color-neutral-50);
-    border: solid 1px var(--sl-color-neutral-300);
-    border-radius: var(--sl-border-radius-small);
-    font-size: var(--sl-font-size-small);
+    padding: var(--wa-spacing-medium);
+    background-color: var(--wa-color-neutral-50);
+    border: solid 1px var(--wa-color-neutral-300);
+    border-radius: var(--wa-border-radius-small);
+    font-size: var(--wa-font-size-small);
 
     display: flex;
     flex-direction: column;
-    gap: var(--sl-spacing-medium);
+    gap: var(--wa-spacing-medium);
   }
 
-  sl-details::part(base) {
-    margin-top: var(--sl-spacing-small);
-    background-color: var(--sl-color-neutral-50);
-    border-color: var(--sl-color-neutral-300);
-    font-size: var(--sl-font-size-small);
+  wa-details::part(base) {
+    margin-top: var(--wa-spacing-small);
+    background-color: var(--wa-color-neutral-50);
+    border-color: var(--wa-color-neutral-300);
+    font-size: var(--wa-font-size-small);
   }
 
-  sl-details::part(content) {
+  wa-details::part(content) {
     padding-top: 0;
   }
 
   a {
-    color: var(--sl-color-primary-700);
+    color: var(--wa-color-primary-700);
   }
 </style>

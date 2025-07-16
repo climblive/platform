@@ -1,5 +1,5 @@
 <script lang="ts">
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { Snippet } from "svelte";
 
   interface Props {
@@ -20,8 +20,8 @@
     <main>
       <h1>Oopsie!</h1>
       <pre onclick={() => copyToClipboard(error)}>{error}</pre>
-      <sl-button size="small" variant="primary" onclick={reset}
-        >Try again</sl-button
+      <wa-button size="small" variant="primary" onclick={reset}
+        >Try again</wa-button
       >
     </main>
   {/snippet}
@@ -29,15 +29,15 @@
 
 <style>
   pre {
-    border: 1px solid var(--sl-color-primary-300);
+    border: 1px solid var(--wa-color-primary-300);
     background-color: white;
-    padding: var(--sl-spacing-small);
+    padding: var(--wa-spacing-small);
     overflow: scroll;
-    border-radius: var(--sl-border-radius-small);
-    font-size: var(--sl-font-size-small);
+    border-radius: var(--wa-border-radius-small);
+    font-size: var(--wa-font-size-small);
   }
 
   main {
-    padding: var(--sl-spacing-small);
+    padding: var(--wa-spacing-small);
   }
 </style>

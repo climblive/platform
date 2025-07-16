@@ -9,7 +9,7 @@ export const value =
 export const name =
   (value: string | number | undefined): Attachment =>
   (node: Element) => {
-    node.addEventListener("sl-invalid", (e) => e.preventDefault());
+    node.addEventListener("wa-invalid", (e) => e.preventDefault());
 
     node.setAttribute("name", value?.toString() ?? "");
   };

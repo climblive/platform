@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { serialize } from "@shoelace-style/shoelace";
+  import { serialize } from "@awesome.me/webawesome";
   import { type Snippet } from "svelte";
   import * as z from "zod";
 

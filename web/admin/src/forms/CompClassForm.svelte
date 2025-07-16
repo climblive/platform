@@ -30,9 +30,9 @@
 </script>
 
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/input/input.js";
   import { GenericForm, name, value } from "@climblive/lib/forms";
   import type { CompClass } from "@climblive/lib/models";
-  import "@shoelace-style/shoelace/dist/components/input/input.js";
   import { format } from "date-fns";
   import { type Snippet } from "svelte";
 
@@ -50,22 +50,22 @@
 
 <GenericForm {schema} {submit}>
   <fieldset>
-    <sl-input
+    <wa-input
       size="small"
       {@attach name("name")}
       label="Name"
       type="text"
       required
       {@attach value(data.name)}
-    ></sl-input>
-    <sl-input
+    ></wa-input>
+    <wa-input
       size="small"
       {@attach name("description")}
       label="Description"
       type="text"
       {@attach value(data.description)}
-    ></sl-input>
-    <sl-input
+    ></wa-input>
+    <wa-input
       size="small"
       {@attach name("timeBegin")}
       label="Start time"
@@ -75,8 +75,8 @@
           ? format(data.timeBegin, "yyyy-MM-dd'T'HH:mm")
           : undefined,
       )}
-    ></sl-input>
-    <sl-input
+    ></wa-input>
+    <wa-input
       size="small"
       {@attach name("timeEnd")}
       label="End time"
@@ -84,7 +84,7 @@
       {@attach value(
         data.timeEnd ? format(data.timeEnd, "yyyy-MM-dd'T'HH:mm") : undefined,
       )}
-    ></sl-input>
+    ></wa-input>
     {@render children?.()}
   </fieldset>
 </GenericForm>
@@ -93,6 +93,6 @@
   fieldset {
     display: flex;
     flex-direction: column;
-    gap: var(--sl-spacing-small);
+    gap: var(--wa-spacing-small);
   }
 </style>

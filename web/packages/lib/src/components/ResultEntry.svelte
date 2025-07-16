@@ -1,5 +1,5 @@
 <script lang="ts">
-  import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import type { ScoreboardEntry } from "../models";
   import { ordinalSuperscript } from "../utils";
   import Score from "./Score.svelte";
@@ -26,7 +26,7 @@
       -
     {:else}
       <Score value={score.score} />
-      <sl-icon name={score?.finalist ? "trophy" : "dash"}></sl-icon>
+      <wa-icon name={score?.finalist ? "trophy" : "dash"}></wa-icon>
     {/if}
   </div>
 </section>
@@ -34,26 +34,26 @@
 <style>
   section {
     height: 2.25rem;
-    background-color: var(--sl-color-primary-500);
+    background-color: var(--wa-color-primary-500);
     color: white;
     display: grid;
-    padding-inline: var(--sl-spacing-small);
-    border-radius: var(--sl-border-radius-medium);
+    padding-inline: var(--wa-spacing-small);
+    border-radius: var(--wa-border-radius-medium);
     grid-template-columns: 2rem 1fr max-content;
     grid-template-rows: 1fr;
-    gap: var(--sl-spacing-x-small);
+    gap: var(--wa-spacing-x-small);
     align-items: center;
     justify-items: start;
-    font-size: var(--sl-font-size-medium);
-    font-weight: var(--sl-font-weight-semibold);
+    font-size: var(--wa-font-size-medium);
+    font-weight: var(--wa-font-weight-semibold);
     user-select: none;
   }
 
   section[data-finalist="true"] {
     background: linear-gradient(
       45deg,
-      var(--sl-color-yellow-800),
-      var(--sl-color-yellow-500)
+      var(--wa-color-yellow-800),
+      var(--wa-color-yellow-500)
     );
     background-size: 150%;
     background-position: left;
@@ -79,7 +79,7 @@
   }
 
   .number {
-    font-size: var(--sl-font-size-x-small);
+    font-size: var(--wa-font-size-x-small);
   }
 
   .name {
@@ -91,10 +91,10 @@
 
     display: flex;
     align-items: center;
-    gap: var(--sl-spacing-x-small);
+    gap: var(--wa-spacing-x-small);
 
     text-align: right;
-    font-weight: var(--sl-font-weight-bold);
-    font-size: var(--sl-font-size-medium);
+    font-weight: var(--wa-font-weight-bold);
+    font-size: var(--wa-font-size-medium);
   }
 </style>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import { Table, TableCell, TableRow } from "@climblive/lib/components";
   import type { Raffle } from "@climblive/lib/models";
   import {
@@ -6,7 +7,6 @@
     getRafflesQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { Link, navigate } from "svelte-routing";
 
   interface Props {
@@ -28,7 +28,7 @@
   };
 </script>
 
-<sl-button variant="primary" onclick={handleCreateRaffle}>Create</sl-button>
+<wa-button variant="primary" onclick={handleCreateRaffle}>Create</wa-button>
 
 <section>
   <Table columns={["Name"]}>
@@ -48,6 +48,6 @@
 <style>
   section {
     display: flex;
-    gap: var(--sl-spacing-x-small);
+    gap: var(--wa-spacing-x-small);
   }
 </style>

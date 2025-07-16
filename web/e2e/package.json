@@ -13,5 +13,8 @@
     "fs": "0.0.1-security",
     "mariadb": "^3.4.2",
     "testcontainers": "^11.0.0"
+  },
+  "dependencies": {
+    "@awesome.me/webawesome": "3.0.0-beta.2"
   }
 }

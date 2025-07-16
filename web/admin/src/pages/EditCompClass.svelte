@@ -1,12 +1,12 @@
 <script lang="ts">
   import CompClassForm, { formSchema } from "@/forms/CompClassForm.svelte";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { CompClassPatch } from "@climblive/lib/models";
   import {
     getCompClassQuery,
     patchCompClassMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -37,18 +37,18 @@
   schema={formSchema}
 >
   <div class="controls">
-    <sl-button
+    <wa-button
       size="small"
       type="button"
       variant="text"
-      onclick={history.back()}>Cancel</sl-button
+      onclick={history.back()}>Cancel</wa-button
     >
-    <sl-button
+    <wa-button
       size="small"
       type="submit"
       loading={$patchCompClass.isPending}
       variant="primary"
       >Save
-    </sl-button>
+    </wa-button>
   </div>
 </CompClassForm>

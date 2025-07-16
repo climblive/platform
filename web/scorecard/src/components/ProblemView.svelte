@@ -32,7 +32,7 @@
       {problem.pointsTop}p
     </span>
     {#if problem.flashBonus}
-      <sl-icon name="lightning-charge"></sl-icon>
+      <wa-icon name="lightning-charge"></wa-icon>
     {/if}
   </span>
   <div class="score">
@@ -45,34 +45,34 @@
 <style>
   section {
     height: 3rem;
-    background-color: var(--sl-color-neutral-50);
-    border-radius: var(--sl-border-radius-small);
-    border: solid 1px var(--sl-color-neutral-300);
-    padding-left: var(--sl-spacing-small);
-    padding-right: var(--sl-spacing-2x-small);
+    background-color: var(--wa-color-neutral-50);
+    border-radius: var(--wa-border-radius-small);
+    border: solid 1px var(--wa-color-neutral-300);
+    padding-left: var(--wa-spacing-small);
+    padding-right: var(--wa-spacing-2x-small);
 
     display: grid;
     grid-template-columns: var(--number-length) 1rem 1fr 1fr 2.5rem;
     grid-template-rows: 1fr;
-    gap: var(--sl-spacing-x-small);
+    gap: var(--wa-spacing-x-small);
     align-items: center;
     justify-items: end;
   }
 
   .number {
-    font-size: var(--sl-font-size-small);
+    font-size: var(--wa-font-size-small);
     text-wrap: nowrap;
     justify-self: start;
-    font-weight: var(--sl-font-weight-bold);
+    font-weight: var(--wa-font-weight-bold);
   }
 
   .points {
     margin-right: auto;
     white-space: nowrap;
 
-    & sl-icon {
-      font-size: var(--sl-font-size-x-small);
-      color: var(--sl-color-yellow-500);
+    & wa-icon {
+      font-size: var(--wa-font-size-x-small);
+      color: var(--wa-color-yellow-500);
     }
   }
 

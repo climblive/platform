@@ -47,9 +47,9 @@
 
 <style>
   header {
-    margin-bottom: var(--sl-spacing-small);
-    background-color: var(--sl-color-primary-600);
-    border-radius: var(--sl-border-radius-medium);
+    margin-bottom: var(--wa-spacing-small);
+    background-color: var(--wa-color-primary-600);
+    border-radius: var(--wa-border-radius-medium);
 
     color: white;
 
@@ -60,10 +60,10 @@
     .left {
       display: flex;
       flex-direction: column;
-      gap: var(--sl-spacing-x-small);
+      gap: var(--wa-spacing-x-small);
       align-items: start;
 
-      padding: var(--sl-spacing-small);
+      padding: var(--wa-spacing-small);
     }
 
     .title {
@@ -77,7 +77,7 @@
       inset: 0;
 
       margin: 0;
-      font-weight: var(--sl-font-weight-semibold);
+      font-weight: var(--wa-font-weight-semibold);
 
       white-space: nowrap;
       overflow: hidden;
@@ -86,11 +86,11 @@
 
     .size {
       align-self: start;
-      margin: var(--sl-spacing-small) var(--sl-spacing-small) 0 0;
+      margin: var(--wa-spacing-small) var(--wa-spacing-small) 0 0;
 
       color: white;
-      font-size: var(--sl-font-size-small);
-      font-weight: var(--sl-font-weight-semibold);
+      font-size: var(--wa-font-size-small);
+      font-weight: var(--wa-font-weight-semibold);
 
       & strong {
         font-size: 1.5em;

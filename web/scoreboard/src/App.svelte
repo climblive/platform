@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ErrorBoundary } from "@climblive/lib/components";
-  import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path.js";
+  import { setBasePath } from "@awesome.me/webawesome/dist/utilities/base-path.js";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { Route, Router } from "svelte-routing";

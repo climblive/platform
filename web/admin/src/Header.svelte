@@ -1,10 +1,10 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import "@awesome.me/webawesome/dist/components/option/option.js";
+  import "@awesome.me/webawesome/dist/components/select/select.js";
+  import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import { value } from "@climblive/lib/forms";
   import { getSelfQuery } from "@climblive/lib/queries";
-  import type { SlSelect } from "@shoelace-style/shoelace";
-  import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import "@shoelace-style/shoelace/dist/components/option/option.js";
-  import "@shoelace-style/shoelace/dist/components/select/select.js";
   import { getContext } from "svelte";
   import { navigate } from "svelte-routing";
   import { type Writable } from "svelte/store";
@@ -15,7 +15,7 @@
 
   const selectedOrganizer = getContext<Writable<number>>("selectedOrganizer");
 
-  let select: SlSelect | undefined = $state();
+  let select: WaSelect | undefined = $state();
 
   const handleChange = () => {
     if (select) {
@@ -28,17 +28,17 @@
 
 <header>
   {#if self && self.organizers.length > 1}
-    <sl-select
+    <wa-select
       bind:this={select}
       size="small"
       {@attach value($selectedOrganizer)}
-      onsl-change={handleChange}
+      onchange={handleChange}
     >
-      <sl-icon name="arrow-left-right" slot="prefix"></sl-icon>
+      <wa-icon name="arrow-left-right" slot="prefix"></wa-icon>
       {#each self.organizers as organizer (organizer.id)}
-        <sl-option value={organizer.id}>{organizer.name}</sl-option>
+        <wa-option value={organizer.id}>{organizer.name}</wa-option>
       {/each}
-    </sl-select>
+    </wa-select>
   {/if}
 </header>
 
@@ -47,8 +47,8 @@
     display: flex;
     align-items: center;
     justify-content: end;
-    padding-inline: var(--sl-spacing-small);
-    background-color: var(--sl-color-primary-600);
+    padding-inline: var(--wa-spacing-small);
+    background-color: var(--wa-color-primary-600);
     height: 3.25rem;
   }
 

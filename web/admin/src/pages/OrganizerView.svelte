@@ -1,5 +1,5 @@
 <script lang="ts">
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import { onMount } from "svelte";
   import ContestList from "./ContestList.svelte";
 

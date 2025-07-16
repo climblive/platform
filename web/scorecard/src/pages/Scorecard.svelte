@@ -3,6 +3,12 @@
   import Header from "@/components/Header.svelte";
   import ProblemView from "@/components/ProblemView.svelte";
   import type { ScorecardSession } from "@/types";
+  import type { WaTabShowEvent } from "@awesome.me/webawesome";
+  import type WaRadioGroup from "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
+  import "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
+  import type WaTabGroup from "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
+  import "@awesome.me/webawesome/dist/components/tab-panel/tab-panel.js";
+  import "@awesome.me/webawesome/dist/components/tab/tab.js";
   import {
     ContestStateProvider,
     ResultList,
@@ -25,14 +31,6 @@
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
-  import type {
-    SlRadioGroup,
-    SlTabGroup,
-    SlTabShowEvent,
-  } from "@shoelace-style/shoelace";
-  import "@shoelace-style/shoelace/dist/components/tab-group/tab-group.js";
-  import "@shoelace-style/shoelace/dist/components/tab-panel/tab-panel.js";
-  import "@shoelace-style/shoelace/dist/components/tab/tab.js";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { add } from "date-fns/add";
   import { getContext, onDestroy, onMount } from "svelte";
@@ -50,8 +48,8 @@
   const ticksQuery = $derived(getTicksQuery($session.contenderId));
 
   let resultsConnected = $state(false);
-  let tabGroup: SlTabGroup | undefined = $state();
-  let radioGroup: SlRadioGroup | undefined = $state();
+  let tabGroup: WaTabGroup | undefined = $state();
+  let radioGroup: WaRadioGroup | undefined = $state();
   let eventSource: EventSource | undefined;
   let score: number = $state(0);
   let placement: number | undefined = $state();
@@ -116,7 +114,7 @@
     }
   });
 
-  const handleShowTab = ({ detail }: SlTabShowEvent) => {
+  const handleShowTab = ({ detail }: WaTabShowEvent) => {
     if (detail.name === "results") {
       resultsConnected = true;
     }
@@ -215,40 +213,40 @@
             {endTime}
           />
         </div>
-        <sl-tab-group bind:this={tabGroup} onsl-tab-show={handleShowTab}>
-          <sl-tab slot="nav" panel="problems">Scorecard</sl-tab>
-          <sl-tab slot="nav" panel="results">Results</sl-tab>
-          <sl-tab slot="nav" panel="info">Info</sl-tab>
+        <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleShowTab}>
+          <wa-tab slot="nav" panel="problems">Scorecard</wa-tab>
+          <wa-tab slot="nav" panel="results">Results</wa-tab>
+          <wa-tab slot="nav" panel="info">Info</wa-tab>
 
-          <sl-tab-panel name="problems">
-            <sl-radio-group
+          <wa-tab-panel name="problems">
+            <wa-radio-group
               size="small"
               bind:this={radioGroup}
               value={orderProblemsBy}
-              onsl-change={() => {
+              onchange={() => {
                 if (radioGroup) {
                   orderProblemsBy = radioGroup.value as typeof orderProblemsBy;
                 }
               }}
             >
-              <sl-radio-button value="number">
-                <sl-icon
+              <wa-radio-button value="number">
+                <wa-icon
                   slot="prefix"
                   name="sort-numeric-down"
                   label="Sort by number"
-                ></sl-icon>
+                ></wa-icon>
                 Sort by number
-              </sl-radio-button>
+              </wa-radio-button>
 
-              <sl-radio-button value="points">
-                <sl-icon
+              <wa-radio-button value="points">
+                <wa-icon
                   slot="prefix"
                   name="sort-down-alt"
                   label="Sort by points"
-                ></sl-icon>
+                ></wa-icon>
                 Sort by points
-              </sl-radio-button>
-            </sl-radio-group>
+              </wa-radio-button>
+            </wa-radio-group>
             {#each sortedProblems as problem (problem.id)}
               <ProblemView
                 {problem}
@@ -257,8 +255,8 @@
                 {highestProblemNumber}
               />
             {/each}
-          </sl-tab-panel>
-          <sl-tab-panel name="results">
+          </wa-tab-panel>
+          <wa-tab-panel name="results">
             {#if resultsConnected}
               <ScoreboardProvider contestId={$session.contestId}>
                 {#snippet children({ scoreboard, loading })}
@@ -270,19 +268,19 @@
                 {/snippet}
               </ScoreboardProvider>
             {/if}
-          </sl-tab-panel>
-          <sl-tab-panel name="info">
+          </wa-tab-panel>
+          <wa-tab-panel name="info">
             <ContestInfo {contest} problems={sortedProblems} {compClasses} />
-          </sl-tab-panel>
-        </sl-tab-group>
+          </wa-tab-panel>
+        </wa-tab-group>
       </main>
     {/snippet}
   </ContestStateProvider>
 {/if}
 
 <style>
-  sl-tab-panel::part(base) {
-    padding-top: var(--sl-spacing-small);
+  wa-tab-panel::part(base) {
+    padding-top: var(--wa-spacing-small);
     padding-bottom: 0;
   }
 
@@ -299,33 +297,33 @@
     right: 0;
     z-index: 10;
     background-color: white;
-    padding: var(--sl-spacing-small);
+    padding: var(--wa-spacing-small);
   }
 
-  sl-tab-group {
+  wa-tab-group {
     --track-color: transparent;
-    padding-inline: var(--sl-spacing-small);
-    padding-bottom: var(--sl-spacing-small);
+    padding-inline: var(--wa-spacing-small);
+    padding-bottom: var(--wa-spacing-small);
   }
 
-  sl-tab-panel[name="problems"]::part(base) {
+  wa-tab-panel[name="problems"]::part(base) {
     display: flex;
     flex-direction: column;
-    gap: var(--sl-spacing-x-small);
+    gap: var(--wa-spacing-x-small);
     width: 100%;
   }
 
-  sl-radio-group::part(button-group) {
+  wa-radio-group::part(button-group) {
     width: 100%;
   }
 
-  sl-radio-button {
+  wa-radio-button {
     flex-grow: 1;
 
     &::part(button--checked),
     &::part(button):hover {
-      border-color: var(--sl-color-neutral-300);
-      background-color: var(--sl-color-neutral-200);
+      border-color: var(--wa-color-neutral-300);
+      background-color: var(--wa-color-neutral-200);
       color: inherit;
     }
   }

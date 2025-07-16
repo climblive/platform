@@ -14,9 +14,9 @@
 </script>
 
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/input/input.js";
   import { GenericForm, name, value } from "@climblive/lib/forms";
   import { type ContestTemplate } from "@climblive/lib/models";
-  import "@shoelace-style/shoelace/dist/components/input/input.js";
   import { type Snippet } from "svelte";
 
   interface Props {
@@ -30,29 +30,29 @@
 
 <GenericForm schema={formSchema} {submit}>
   <fieldset>
-    <sl-input
+    <wa-input
       size="small"
       {@attach name("name")}
       label="Name"
       type="text"
       required
       {@attach value(data.name)}
-    ></sl-input>
-    <sl-input
+    ></wa-input>
+    <wa-input
       size="small"
       {@attach name("description")}
       label="Description"
       type="text"
       {@attach value(data.description)}
-    ></sl-input>
-    <sl-input
+    ></wa-input>
+    <wa-input
       size="small"
       {@attach name("location")}
       label="Location"
       type="text"
       {@attach value(data.location)}
-    ></sl-input>
-    <sl-input
+    ></wa-input>
+    <wa-input
       size="small"
       {@attach name("finalists")}
       label="Finalists"
@@ -62,8 +62,8 @@
       {@attach value(data.finalists)}
       min={0}
       valueAsNumber
-    ></sl-input>
-    <sl-input
+    ></wa-input>
+    <wa-input
       size="small"
       {@attach name("qualifyingProblems")}
       label="Number of qualifying problems"
@@ -73,8 +73,8 @@
       {@attach value(data.qualifyingProblems)}
       min={0}
       valueAsNumber
-    ></sl-input>
-    <sl-input
+    ></wa-input>
+    <wa-input
       size="small"
       {@attach name("gracePeriod")}
       label="Grace period"
@@ -85,13 +85,13 @@
       max={60}
       {@attach value(data.gracePeriod)}
       valueAsNumber
-    ></sl-input>
-    <sl-textarea
+    ></wa-input>
+    <wa-textarea
       size="small"
       {@attach name("rules")}
       label="Rules"
       {@attach value(data.rules)}
-    ></sl-textarea>
+    ></wa-textarea>
     {@render children?.()}
   </fieldset>
 </GenericForm>
@@ -100,6 +100,6 @@
   fieldset {
     display: flex;
     flex-direction: column;
-    gap: var(--sl-spacing-small);
+    gap: var(--wa-spacing-small);
   }
 </style>
