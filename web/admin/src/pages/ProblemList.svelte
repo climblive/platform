@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/icon-button/icon-button.js";
   import {
     HoldColorIndicator,
     Table,
@@ -37,18 +36,18 @@
           >
           <TableCell>{problem.pointsTop}</TableCell>
           <TableCell align="right">
-            <wa-icon-button
+            <wa-button
               onclick={() => navigate(`/admin/problems/${problem.id}/edit`)}
               name="pencil"
               label="Edit"
-            ></wa-icon-button>
+            ></wa-button>
             <DeleteProblem problemId={problem.id}>
               {#snippet children({ deleteProblem })}
-                <wa-icon-button
+                <wa-button
                   onclick={deleteProblem}
                   name="trash"
                   label={`Delete problem ${problem.id}`}
-                ></wa-icon-button>
+                ></wa-button>
               {/snippet}
             </DeleteProblem>
           </TableCell>

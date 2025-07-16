@@ -4,31 +4,31 @@
   /*
       Generator: https://uicolors.app/create
     */
-  --sl-color-primary-50: #fcfbf3;
-  --sl-color-primary-100: #f9f7eb;
-  --sl-color-primary-200: #f3ead8;
-  --sl-color-primary-300: #e9d1b9;
-  --sl-color-primary-400: #dca88e;
-  --sl-color-primary-500: #cc7966;
-  --sl-color-primary-600: #bc5757;
-  --sl-color-primary-700: #993847;
-  --sl-color-primary-800: #81314c;
-  --sl-color-primary-900: #6d2c4d;
-  --sl-color-primary-950: #3c152c;
+  --wa-color-primary-50: #fcfbf3;
+  --wa-color-primary-100: #f9f7eb;
+  --wa-color-primary-200: #f3ead8;
+  --wa-color-primary-300: #e9d1b9;
+  --wa-color-primary-400: #dca88e;
+  --wa-color-primary-500: #cc7966;
+  --wa-color-primary-600: #bc5757;
+  --wa-color-primary-700: #993847;
+  --wa-color-primary-800: #81314c;
+  --wa-color-primary-900: #6d2c4d;
+  --wa-color-primary-950: #3c152c;
 
-  --sl-color-neutral-50: #fafafa;
-  --sl-color-neutral-100: #f4f4f5;
-  --sl-color-neutral-200: #e4e4e7;
-  --sl-color-neutral-300: #d4d4d8;
-  --sl-color-neutral-400: #a1a1aa;
-  --sl-color-neutral-500: #71717a;
-  --sl-color-neutral-600: #52525b;
-  --sl-color-neutral-700: #3f3f46;
-  --sl-color-neutral-800: #27272a;
-  --sl-color-neutral-900: #18181b;
-  --sl-color-neutral-950: #09090b;
+  --wa-color-neutral-50: #fafafa;
+  --wa-color-neutral-100: #f4f4f5;
+  --wa-color-neutral-200: #e4e4e7;
+  --wa-color-neutral-300: #d4d4d8;
+  --wa-color-neutral-400: #a1a1aa;
+  --wa-color-neutral-500: #71717a;
+  --wa-color-neutral-600: #52525b;
+  --wa-color-neutral-700: #3f3f46;
+  --wa-color-neutral-800: #27272a;
+  --wa-color-neutral-900: #18181b;
+  --wa-color-neutral-950: #09090b;
 
-  --sl-input-focus-ring-color: var(--sl-color-primary-400);
+  --wa-input-focus-ring-color: var(--wa-color-primary-400);
 
   --color: #27272a;
 }
@@ -38,11 +38,11 @@ body {
   background-color: white;
   color: var(--color);
 
-  font-weight: var(--sl-font-weight-normal);
+  font-weight: var(--wa-font-weight-normal);
 }
 
 form {
-  line-height: var(--sl-line-height-normal);
+  line-height: var(--wa-line-height-normal);
 }
 
 fieldset {
@@ -59,13 +59,13 @@ sl-checkbox {
 sl-input[data-user-invalid]::part(base),
 sl-select[data-user-invalid]::part(combobox),
 sl-checkbox[data-user-invalid]::part(control) {
-  border-color: var(--sl-color-danger-600);
+  border-color: var(--wa-color-danger-600);
 }
 
 [data-user-invalid]::part(form-control-label),
 [data-user-invalid]::part(form-control-help-text),
 sl-checkbox[data-user-invalid]::part(label) {
-  color: var(--sl-color-danger-700);
+  color: var(--wa-color-danger-700);
 }
 
 sl-checkbox[data-user-invalid]::part(control) {
@@ -75,8 +75,8 @@ sl-checkbox[data-user-invalid]::part(control) {
 sl-input:focus-within[data-user-invalid]::part(base),
 sl-select:focus-within[data-user-invalid]::part(combobox),
 sl-checkbox:focus-within[data-user-invalid]::part(control) {
-  border-color: var(--sl-color-danger-600);
-  box-shadow: 0 0 0 var(--sl-focus-ring-width) var(--sl-color-danger-300);
+  border-color: var(--wa-color-danger-600);
+  box-shadow: 0 0 0 var(--wa-focus-ring-width) var(--wa-color-danger-300);
 }
 
 sl-dialog::part(body),

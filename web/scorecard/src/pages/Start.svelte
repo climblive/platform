@@ -3,8 +3,8 @@
   import { type ScorecardSession } from "@/types";
   import { authenticateContender, readStoredSessions } from "@/utils/auth";
   import { serialize } from "@awesome.me/webawesome";
-  import "@awesome.me/webawesome/dist/components/alert/alert.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import { useQueryClient } from "@tanstack/svelte-query";
@@ -92,10 +92,10 @@
       <wa-icon name="key" slot="prefix"></wa-icon>
     </wa-input>
     {#if loadingFailed}
-      <wa-alert open variant="danger">
+      <wa-callout open variant="danger">
         <wa-icon slot="icon" name="exclamation-octagon"></wa-icon>
         The registration code is not valid.
-      </wa-alert>
+      </wa-callout>
     {/if}
     <wa-button variant="primary" type="submit" loading={loadingContender}>
       <wa-icon slot="prefix" name="box-arrow-in-right"></wa-icon>

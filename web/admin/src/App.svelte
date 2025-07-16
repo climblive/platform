@@ -1,7 +1,7 @@
 <script lang="ts">
+  import { setBasePath } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
-  import { setBasePath } from "@awesome.me/webawesome/dist/utilities/base-path.js";
   import { ApiClient, OrganizerCredentialsProvider } from "@climblive/lib";
   import { ErrorBoundary } from "@climblive/lib/components";
   import configData from "@climblive/lib/config.json";

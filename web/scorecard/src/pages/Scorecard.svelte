@@ -174,7 +174,7 @@
 
   const tearDown = () => {
     resultsConnected = false;
-    tabGroup?.show("problems");
+    tabGroup?.setAttribute("active", "problems");
 
     eventSource?.close();
     eventSource = undefined;

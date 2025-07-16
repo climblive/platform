@@ -1,7 +1,6 @@
 <script lang="ts">
   import RegistrationForm from "@/forms/RegistrationForm.svelte";
   import type { ScorecardSession } from "@/types";
-  import "@awesome.me/webawesome/dist/components/alert/alert.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import type { ContenderPatch } from "@climblive/lib/models";

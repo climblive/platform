@@ -32,13 +32,13 @@
 </script>
 
 <header>
-  <wa-icon-button
+  <wa-button
     name="gear"
     label="Edit"
     onclick={() => navigate(`/${registrationCode}/edit`)}
     disabled={contestState === "ENDED"}
   >
-  </wa-icon-button>
+  </wa-button>
   <h1>{contestName}</h1>
   <p class="contender-name">
     {contenderName} <span class="contender-class">{compClassName}</span>
@@ -72,7 +72,7 @@
     color: white;
     position: relative;
 
-    & wa-icon-button {
+    & wa-button {
       position: absolute;
       top: var(--wa-spacing-medium);
       right: var(--wa-spacing-small);
@@ -80,7 +80,7 @@
       color: inherit;
     }
 
-    & wa-icon-button::part(base) {
+    & wa-button::part(base) {
       padding: 0;
     }
 

@@ -6,8 +6,8 @@
   import Start from "@/pages/Start.svelte";
   import { type ScorecardSession } from "@/types";
   import { authenticateContender } from "@/utils/auth";
+  import { setBasePath } from "@awesome.me/webawesome";
   import { ErrorBoundary } from "@climblive/lib/components";
-  import { setBasePath } from "@awesome.me/webawesome/dist/utilities/base-path.js";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { setContext } from "svelte";

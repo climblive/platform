@@ -19,7 +19,7 @@
   const deleteProblem = $derived(deleteProblemMutation(problemId));
 
   const handleDelete = async () => {
-    dialog?.show();
+    dialog?.setAttribute("open", "true");
   };
 
   const confirmDelete = () => {
@@ -36,8 +36,10 @@
     <strong>Are you sure?</strong>
   </p>
   <p>A problem is deleted permanently and cannot be restored.</p>
-  <wa-button slot="footer" variant="text" onclick={() => dialog?.hide()}
-    >Cancel</wa-button
+  <wa-button
+    slot="footer"
+    variant="text"
+    onclick={() => dialog?.setAttribute("open", "false")}>Cancel</wa-button
   >
   <wa-button slot="footer" variant="danger" onclick={confirmDelete}
     >Remove

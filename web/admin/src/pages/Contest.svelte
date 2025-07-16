@@ -46,7 +46,7 @@
     const hash = window.location.hash.substring(1);
 
     if (tabGroup) {
-      setTimeout(() => tabGroup?.show(hash));
+      setTimeout(() => tabGroup?.setAttribute("active", hash));
     }
   });
 
