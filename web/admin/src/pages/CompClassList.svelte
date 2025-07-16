@@ -32,16 +32,18 @@
             <wa-button
               onclick={() =>
                 navigate(`/admin/comp-classes/${compClass.id}/edit`)}
-              name="pencil"
               label="Edit"
-            ></wa-button>
+            >
+              <wa-icon name="pencil"></wa-icon>
+            </wa-button>
             <DeleteCompClass compClassId={compClass.id}>
               {#snippet children({ deleteCompClass })}
                 <wa-button
                   onclick={deleteCompClass}
-                  name="trash"
                   label={`Delete comp class ${compClass.id}`}
-                ></wa-button>
+                >
+                  <wa-icon name="trash"></wa-icon>
+                </wa-button>
               {/snippet}
             </DeleteCompClass>
           </TableCell>

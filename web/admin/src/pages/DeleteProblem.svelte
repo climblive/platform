@@ -43,6 +43,6 @@
   >
   <wa-button slot="footer" variant="danger" onclick={confirmDelete}
     >Remove
-    <wa-icon slot="prefix" name="trash"></wa-icon>
+    <wa-icon slot="start" name="trash"></wa-icon>
   </wa-button>
 </wa-dialog>

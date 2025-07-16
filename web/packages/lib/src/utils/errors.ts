@@ -7,7 +7,7 @@ export const toastError = (message: string, duration = 5000) => {
     closable: true,
     duration: duration,
     innerHTML: `
-        <wa-icon name="exclamation-octagon" slot="icon"></wa-icon>
+        <wa-icon name="circle-exclamation" slot="icon"></wa-icon>
         <strong>An unexpected error occurred</strong><br />
         ${message}
       `,

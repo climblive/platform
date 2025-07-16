@@ -231,7 +231,7 @@
             >
               <wa-radio-button value="number">
                 <wa-icon
-                  slot="prefix"
+                  slot="start"
                   name="sort-numeric-down"
                   label="Sort by number"
                 ></wa-icon>
@@ -240,7 +240,7 @@
 
               <wa-radio-button value="points">
                 <wa-icon
-                  slot="prefix"
+                  slot="start"
                   name="sort-down-alt"
                   label="Sort by points"
                 ></wa-icon>

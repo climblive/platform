@@ -89,7 +89,7 @@
       minlength="8"
       maxlength="8"
     >
-      <wa-icon name="key" slot="prefix"></wa-icon>
+      <wa-icon name="key" slot="start"></wa-icon>
     </wa-input>
     {#if loadingFailed}
       <wa-callout open variant="danger">
@@ -98,7 +98,7 @@
       </wa-callout>
     {/if}
     <wa-button variant="primary" type="submit" loading={loadingContender}>
-      <wa-icon slot="prefix" name="box-arrow-in-right"></wa-icon>
+      <wa-icon slot="start" name="box-arrow-in-right"></wa-icon>
       Enter
     </wa-button>
   </form>

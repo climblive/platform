@@ -33,11 +33,12 @@
 
 <header>
   <wa-button
-    name="gear"
+    size="small"
     label="Edit"
     onclick={() => navigate(`/${registrationCode}/edit`)}
     disabled={contestState === "ENDED"}
   >
+    <wa-icon name="gear"></wa-icon>
   </wa-button>
   <h1>{contestName}</h1>
   <p class="contender-name">

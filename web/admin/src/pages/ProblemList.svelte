@@ -38,16 +38,18 @@
           <TableCell align="right">
             <wa-button
               onclick={() => navigate(`/admin/problems/${problem.id}/edit`)}
-              name="pencil"
               label="Edit"
-            ></wa-button>
+            >
+              <wa-icon name="pencil"></wa-icon>
+            </wa-button>
             <DeleteProblem problemId={problem.id}>
               {#snippet children({ deleteProblem })}
                 <wa-button
                   onclick={deleteProblem}
-                  name="trash"
                   label={`Delete problem ${problem.id}`}
-                ></wa-button>
+                >
+                  <wa-icon name="trash"></wa-icon>
+                </wa-button>
               {/snippet}
             </DeleteProblem>
           </TableCell>

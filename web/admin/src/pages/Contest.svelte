@@ -77,7 +77,7 @@
       variant="text"
       onclick={() =>
         navigate(`/admin/organizers/${contest.ownership.organizerId}`)}
-      >Back to contests<wa-icon name="arrow-left" slot="prefix"
+      >Back to contests<wa-icon name="arrow-left" slot="slot"
       ></wa-icon></wa-button
     >
     <h1>{contest.name}</h1>
@@ -91,20 +91,20 @@
       <wa-tab-panel name="contest">
         <wa-button onclick={handleDuplicationRequest}
           >Duplicate
-          <wa-icon name="copy" slot="prefix"></wa-icon>
+          <wa-icon name="copy" slot="start"></wa-icon>
         </wa-button>
 
         <a href={`${getApiUrl()}/contests/${contestId}/results`}>
           <wa-button
             >Download results
-            <wa-icon name="download" slot="prefix"></wa-icon>
+            <wa-icon name="download" slot="start"></wa-icon>
           </wa-button>
         </a>
 
         <Link to={`/admin/contests/${contestId}/tickets`}>
           <wa-button
             >Print tickets
-            <wa-icon name="printer" slot="prefix"></wa-icon>
+            <wa-icon name="print" slot="start"></wa-icon>
           </wa-button>
         </Link>
 
@@ -146,7 +146,7 @@
               onclick={() => $stopScoreEngine.mutate(engineInstanceId)}
               loading={$stopScoreEngine.isPending}
               >Stop
-              <wa-icon name="stop" slot="prefix"></wa-icon>
+              <wa-icon name="stop" slot="start"></wa-icon>
             </wa-button>
           </div>
         {/each}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/details/details.js";
   import type WaDetails from "@awesome.me/webawesome/dist/components/details/details.js";
   import { LabeledText } from "@climblive/lib/components";
   import type { CompClass, Contest, Problem } from "@climblive/lib/models";

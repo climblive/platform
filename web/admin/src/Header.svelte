@@ -34,7 +34,7 @@
       {@attach value($selectedOrganizer)}
       onchange={handleChange}
     >
-      <wa-icon name="arrow-left-right" slot="prefix"></wa-icon>
+      <wa-icon name="arrow-left-right" slot="start"></wa-icon>
       {#each self.organizers as organizer (organizer.id)}
         <wa-option value={organizer.id}>{organizer.name}</wa-option>
       {/each}
