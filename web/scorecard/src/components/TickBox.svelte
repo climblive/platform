@@ -142,6 +142,7 @@
     align-items: center;
     height: calc(100% - 2 * var(--wa-space-2xs));
     aspect-ratio: 1 / 1;
+    border-radius: var(--wa-border-radius-s);
   }
 
   button {
@@ -195,7 +196,7 @@
   }
 
   wa-popup {
-    --arrow-color: var(--wa-color-brand-40);
+    --arrow-color: var(--wa-color-brand-fill-loud);
 
     & wa-button::part(base) {
       width: 2.5rem;
@@ -217,7 +218,7 @@
   }
 
   wa-popup::part(popup) {
-    background-color: var(--wa-color-brand-40);
+    background-color: var(--wa-color-brand-fill-loud);
     box-shadow:
       rgba(50, 50, 93, 0.25) 0px 13px 27px -5px,
       rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;

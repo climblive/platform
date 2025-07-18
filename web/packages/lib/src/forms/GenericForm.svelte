@@ -24,8 +24,12 @@
       return;
     }
 
+    const formData = new FormData(form);
+
     const data = serialize(form);
     const result = schema.safeParse(data);
+
+    console.log([...formData.entries()], data, result);
 
     if (result.success) {
       submit(result.data);
@@ -52,9 +56,9 @@
 
     input.setCustomValidity(message);
 
-    stash.set(input.name, input.getAttribute("help-text"));
+    stash.set(input.name, input.getAttribute("hint"));
 
-    input.setAttribute("help-text", message);
+    input.setAttribute("hint", message);
   };
 
   const resetCustomValidation = () => {
@@ -75,10 +79,10 @@
         case undefined:
           break;
         case null:
-          input.removeAttribute("help-text");
+          input.removeAttribute("hint");
           break;
         default:
-          input.setAttribute("help-text", stashedHelpText);
+          input.setAttribute("hint", stashedHelpText);
       }
 
       stash.delete(input.name);

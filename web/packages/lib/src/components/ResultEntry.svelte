@@ -34,9 +34,8 @@
 <style>
   section {
     height: 2.25rem;
-    background-color: var(--wa-color-neutral-fill-normal);
-    color: var(--wa-color-neutral-on-normal);
-    border: var(--wa-border-width-s) solid var(--wa-color-neutral-border-normal);
+    background-color: var(--wa-color-surface-raised);
+    border: var(--wa-border-width-s) solid var(--wa-color-neutral-border-quiet);
     display: grid;
     padding-inline: var(--wa-space-s);
     border-radius: var(--wa-border-radius-m);

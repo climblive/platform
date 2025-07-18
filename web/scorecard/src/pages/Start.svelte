@@ -84,7 +84,7 @@
       required
       placeholder="ABCD1234"
       label="Registration code"
-      help-text="Input your 8 digit registration code"
+      hint="Input your 8 digit registration code"
       name="code"
       type="text"
       minlength="8"

@@ -37,7 +37,7 @@
     <wa-button
       size="small"
       type="button"
-      variant="text"
+      appearance="plain"
       onclick={history.back()}>Cancel</wa-button
     >
     <wa-button

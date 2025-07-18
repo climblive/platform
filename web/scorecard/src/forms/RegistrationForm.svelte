@@ -68,7 +68,7 @@
       <wa-switch
         size="small"
         {@attach name("withdrawnFromFinals")}
-        help-text="If you end up in the finals, you'll give up your spot."
+        hint="If you end up in the finals, you'll give up your spot."
         {@attach checked(data.withdrawnFromFinals)}>Opt out of finals</wa-switch
       >
       {@render children?.()}

@@ -56,7 +56,7 @@
       size="small"
       {@attach name("finalists")}
       label="Finalists"
-      help-text="Number of contenders that will proceed to the finals"
+      hint="Number of contenders that will proceed to the finals"
       type="number"
       required
       {@attach value(data.finalists)}
@@ -67,7 +67,7 @@
       size="small"
       {@attach name("qualifyingProblems")}
       label="Number of qualifying problems"
-      help-text="Number of problems that count towards the score"
+      hint="Number of problems that count towards the score"
       type="number"
       required
       {@attach value(data.qualifyingProblems)}
@@ -78,7 +78,7 @@
       size="small"
       {@attach name("gracePeriod")}
       label="Grace period"
-      help-text="Extra time after the end of the contest during which contenders can enter their last results"
+      hint="Extra time after the end of the contest during which contenders can enter their last results"
       type="number"
       required
       min={0}

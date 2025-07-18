@@ -78,7 +78,7 @@
       inset: 0;
 
       margin: 0;
-      font-weight: var(--wa-font-weight-semibold);
+      font-weight: var(--wa-font-weight-bold);
 
       white-space: nowrap;
       overflow: hidden;

@@ -19,7 +19,15 @@
   const deleteCompClass = $derived(deleteCompClassMutation(compClassId));
 
   const handleDelete = async () => {
-    dialog?.setAttribute("open", "true");
+    if (dialog) {
+      dialog.open = true;
+    }
+  };
+
+  const handleCancel = () => {
+    if (dialog) {
+      dialog.open = false;
+    }
   };
 
   const confirmDelete = () => {
@@ -31,17 +39,10 @@
 
 {@render children({ deleteCompClass: handleDelete })}
 
-<wa-dialog bind:this={dialog} no-header>
-  <p>
-    <strong>Are you sure?</strong>
-  </p>
-  <p>A comp class is deleted permanently and cannot be restored.</p>
-  <wa-button
-    slot="footer"
-    variant="text"
-    onclick={() => dialog?.setAttribute("open", "false")}
-  >
-    >Cancel</wa-button
+<wa-dialog bind:this={dialog} label="Are you sure?">
+  A comp class is deleted permanently and cannot be restored.
+  <wa-button slot="footer" appearance="plain" onclick={handleCancel}>
+    Cancel</wa-button
   >
   <wa-button slot="footer" variant="danger" onclick={confirmDelete}
     >Remove

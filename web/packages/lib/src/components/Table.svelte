@@ -41,7 +41,7 @@
     color: var(--wa-color-brand-on-normal);
 
     & th {
-      font-weight: var(--wa-font-weight-normal);
+      font-weight: var(--wa-font-weight-bold);
       text-align: left;
     }
 

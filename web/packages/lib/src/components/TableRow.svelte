@@ -19,10 +19,10 @@
   }
 
   tr:nth-child(even) {
-    background-color: var(--wa-color-gray-95);
+    background-color: var(--wa-color-surface-raised);
   }
 
   tr:hover {
-    background-color: var(--wa-color-gray-90);
+    background-color: var(--wa-color-surface-raised);
   }
 </style>

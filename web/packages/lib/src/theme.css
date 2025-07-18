@@ -12,20 +12,13 @@
   --wa-color-brand-20: #981935;
   --wa-color-brand-10: #831833;
   --wa-color-brand-05: #490816;
-
-  --color: #27272a;
 }
 
 body {
   font-family: "Noto Sans", sans-serif;
-  background-color: white;
-  color: var(--color);
-
+  background-color: var(--wa-color-surface-default);
+  color: var(--wa-color-text-normal);
   font-weight: var(--wa-font-weight-normal);
-}
-
-form {
-  line-height: var(--wa-line-height-normal);
 }
 
 fieldset {
@@ -38,36 +31,25 @@ a {
   text-decoration: none;
 }
 
-sl-input,
-sl-select,
-sl-checkbox {
+wa-input,
+wa-select,
+wa-checkbox {
   display: block;
 }
 
-sl-input[data-user-invalid]::part(base),
-sl-select[data-user-invalid]::part(combobox),
-sl-checkbox[data-user-invalid]::part(control) {
-  border-color: var(--wa-color-danger-600);
+wa-input:user-invalid::part(input),
+wa-select:user-invalid::part(form-control-input),
+wa-checkbox:user-invalid::part(control) {
+  border-color: var(--wa-color-danger-border-loud);
 }
 
-[data-user-invalid]::part(form-control-label),
-[data-user-invalid]::part(form-control-help-text),
-sl-checkbox[data-user-invalid]::part(label) {
-  color: var(--wa-color-danger-700);
+:user-invalid::part(label),
+:user-invalid::part(hint) {
+  color: var(--wa-color-danger-fill-loud);
 }
 
-sl-checkbox[data-user-invalid]::part(control) {
-  outline: none;
-}
-
-sl-input:focus-within[data-user-invalid]::part(base),
-sl-select:focus-within[data-user-invalid]::part(combobox),
-sl-checkbox:focus-within[data-user-invalid]::part(control) {
-  border-color: var(--wa-color-danger-600);
-  box-shadow: 0 0 0 var(--wa-focus-ring-width) var(--wa-color-danger-300);
-}
-
-sl-dialog::part(body),
-sl-dialog::part(footer) {
+wa-dialog::part(body),
+wa-dialog::part(header),
+wa-dialog::part(footer) {
   text-align: left;
 }

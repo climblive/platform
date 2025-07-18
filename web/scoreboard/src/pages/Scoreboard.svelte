@@ -135,7 +135,7 @@
   h1 {
     text-align: center;
     line-height: 1;
-    color: black;
+    color: var(--wa-color-text-normal);
     margin-bottom: 0;
   }
 

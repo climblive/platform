@@ -38,7 +38,7 @@
   <p>A problem is deleted permanently and cannot be restored.</p>
   <wa-button
     slot="footer"
-    variant="text"
+    appearance="plain"
     onclick={() => dialog?.setAttribute("open", "false")}>Cancel</wa-button
   >
   <wa-button slot="footer" variant="danger" onclick={confirmDelete}
