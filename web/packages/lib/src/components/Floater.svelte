@@ -18,7 +18,7 @@
     position: absolute;
     left: 0;
     right: 0;
-    transition: transform 0.3s ease-out;
+    transition: transform var(--wa-transition-slow) var(--wa-transition-easing);
     transform: translateY(
       calc(
         (var(--order) - var(--page-index) * var(--page-size)) *

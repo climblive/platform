@@ -185,7 +185,7 @@
 
     & h3 {
       margin: 0;
-      font-weight: normal;
+      font-weight: var(--wa-font-weight-normal);
     }
 
     & .timestamp {
@@ -198,7 +198,7 @@
 
     & .code {
       text-transform: uppercase;
-      font-weight: bold;
+      font-weight: var(--wa-font-weight-bold);
     }
   }
 

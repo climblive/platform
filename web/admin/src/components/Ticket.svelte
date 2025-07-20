@@ -56,7 +56,7 @@
 
     & .code {
       font-size: var(--wa-font-size-xl);
-      font-weight: bold;
+      font-weight: var(--wa-font-weight-bold);
       font-family: monospace;
       letter-spacing: 0.2rem;
     }
