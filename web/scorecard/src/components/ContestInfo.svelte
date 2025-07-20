@@ -72,7 +72,8 @@
   section {
     padding: var(--wa-space-m);
     background-color: var(--wa-color-surface-default);
-    border: solid 1px var(--wa-color-surface-border);
+    border: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-surface-border);
     border-radius: var(--wa-border-radius-m);
     font-size: var(--wa-font-size-s);
 

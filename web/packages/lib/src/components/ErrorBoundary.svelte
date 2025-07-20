@@ -29,7 +29,8 @@
 
 <style>
   pre {
-    border: 1px solid var(--wa-color-brand-70);
+    border: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-brand-70);
     background-color: white;
     padding: var(--wa-space-s);
     overflow: scroll;

@@ -29,26 +29,22 @@
   };
 </script>
 
-<CompClassForm
-  submit={handleSubmit}
-  data={{
-    ...compClass,
-  }}
-  schema={formSchema}
->
-  <div class="controls">
-    <wa-button
-      size="small"
-      type="button"
-      appearance="plain"
-      onclick={history.back()}>Cancel</wa-button
-    >
-    <wa-button
-      size="small"
-      type="submit"
-      loading={$patchCompClass.isPending}
-      variant="brand"
-      >Save
-    </wa-button>
-  </div>
-</CompClassForm>
+{#if compClass}
+  <CompClassForm submit={handleSubmit} data={compClass} schema={formSchema}>
+    <div class="controls">
+      <wa-button
+        size="small"
+        type="button"
+        appearance="plain"
+        onclick={history.back()}>Cancel</wa-button
+      >
+      <wa-button
+        size="small"
+        type="submit"
+        loading={$patchCompClass.isPending}
+        variant="brand"
+        >Save
+      </wa-button>
+    </div>
+  </CompClassForm>
+{/if}

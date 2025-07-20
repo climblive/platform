@@ -177,7 +177,8 @@
 
   .restoredSession {
     background-color: var(--wa-color-surface-default);
-    border: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+    border: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-surface-border);
     border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-s);
     text-align: left;

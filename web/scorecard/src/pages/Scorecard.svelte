@@ -312,8 +312,9 @@
   }
 
   wa-radio::part(label) {
+    margin: 0 auto;
     display: flex;
     align-items: center;
-    gap: var(--wa-space-xs);
+    gap: var(--wa-space-2xs);
   }
 </style>

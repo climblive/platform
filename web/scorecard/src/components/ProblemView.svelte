@@ -47,7 +47,8 @@
     height: 3rem;
     background-color: var(--wa-color-surface-raised);
     border-radius: var(--wa-border-radius-m);
-    border: solid 1px var(--wa-color-surface-border);
+    border: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-surface-border);
     padding-left: var(--wa-space-s);
     padding-right: var(--wa-space-2xs);
 

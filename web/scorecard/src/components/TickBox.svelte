@@ -156,9 +156,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border-color: var(--wa-color-gray-40);
+    border-color: var(--wa-color-neutral-border-loud);
     border-width: var(--wa-border-width-s);
-    border-style: solid;
+    border-style: var(--wa-border-style);
     border-radius: var(--wa-border-radius-s);
   }
 
