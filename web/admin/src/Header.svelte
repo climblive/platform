@@ -3,6 +3,7 @@
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
+  import { FullLogo } from "@climblive/lib/components";
   import { value } from "@climblive/lib/forms";
   import { getSelfQuery } from "@climblive/lib/queries";
   import { getContext } from "svelte";
@@ -27,6 +28,9 @@
 </script>
 
 <header>
+  <p class="logo">
+    <FullLogo />
+  </p>
   {#if self && self.organizers.length > 1}
     <wa-select
       bind:this={select}
@@ -47,10 +51,17 @@
   header {
     display: flex;
     align-items: center;
-    justify-content: end;
-    padding-inline: var(--wa-space-s);
-    background-color: var(--wa-color-brand-fill-normal);
-    height: 3.25rem;
+    justify-content: space-between;
+    padding-inline: var(--wa-space-xs);
+    background-color: var(--wa-color-surface-lowered);
+    height: 3.5rem;
+  }
+
+  .logo {
+    text-align: left;
+    height: var(--wa-font-size-xl);
+    color: white;
+    padding-left: var(--wa-space-xs);
   }
 
   @media print {

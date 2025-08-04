@@ -1,9 +1,12 @@
 <script lang="ts">
-  import logoUrl from "@/static/logo.svg";
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
-  import { ResultList, ScoreboardProvider } from "@climblive/lib/components";
+  import {
+    FullLogo,
+    ResultList,
+    ScoreboardProvider,
+  } from "@climblive/lib/components";
   import { value } from "@climblive/lib/forms";
   import { getCompClassesQuery, getContestQuery } from "@climblive/lib/queries";
   import { onMount } from "svelte";
@@ -60,7 +63,7 @@
           {contest.name}
         </h1>
         <p class="logo">
-          <img src={logoUrl} alt="ClimbLive" />
+          <FullLogo />
         </p>
         {#if compClasses.length > 1}
           <wa-select
@@ -165,10 +168,8 @@
 
   .logo {
     text-align: center;
-
-    & img {
-      height: var(--wa-font-size-xl);
-    }
+    height: var(--wa-font-size-xl);
+    color: white;
   }
 
   @media screen and (max-width: 512px) {
@@ -186,10 +187,6 @@
 
     .class[data-selected="false"] {
       display: none;
-    }
-
-    .logo > img {
-      height: var(--wa-font-size-l);
     }
   }
 </style>

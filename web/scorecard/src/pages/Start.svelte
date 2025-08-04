@@ -1,5 +1,4 @@
 <script lang="ts">
-  import logoUrl from "@/static/logo.svg";
   import { type ScorecardSession } from "@/types";
   import { authenticateContender, readStoredSessions } from "@/utils/auth";
   import { serialize } from "@awesome.me/webawesome";
@@ -8,6 +7,7 @@
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
+  import { FullLogo } from "@climblive/lib/components";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { format } from "date-fns";
   import { getContext, onMount } from "svelte";
@@ -134,7 +134,9 @@
     </section>
   {/each}
   <footer>
-    <img src={logoUrl} alt="ClimbLive" />
+    <p class="logo">
+      <FullLogo />
+    </p>
   </footer>
 </main>
 
@@ -170,8 +172,9 @@
     text-align: center;
     padding-block: var(--wa-space-m);
 
-    & img {
-      height: var(--wa-font-size-l);
+    & .logo {
+      height: var(--wa-font-size-xl);
+      color: white;
     }
   }
 
