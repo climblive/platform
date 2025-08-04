@@ -174,7 +174,7 @@
 
     & .logo {
       height: var(--wa-font-size-xl);
-      color: white;
+      color: var(--wa-font-weight-normal);
     }
   }
 

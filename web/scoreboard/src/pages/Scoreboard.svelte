@@ -169,7 +169,7 @@
   .logo {
     text-align: center;
     height: var(--wa-font-size-xl);
-    color: white;
+    color: var(--wa-font-weight-normal);
   }
 
   @media screen and (max-width: 512px) {

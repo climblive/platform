@@ -7,7 +7,7 @@
   <defs>
     <style>
       .cls-1 {
-        fill: var(--wa-color-brand-fill-normal);
+        fill: #ea384c;
       }
       .cls-2 {
         fill: white;
