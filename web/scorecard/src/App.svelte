@@ -6,7 +6,6 @@
   import Start from "@/pages/Start.svelte";
   import { type ScorecardSession } from "@/types";
   import { authenticateContender } from "@/utils/auth";
-  import { setBasePath } from "@awesome.me/webawesome";
   import { ErrorBoundary } from "@climblive/lib/components";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
@@ -16,8 +15,6 @@
   import { ZodError } from "zod";
 
   let authenticating = $state(true);
-
-  setBasePath("/shoelace");
 
   const session = writable<ScorecardSession>({
     contenderId: NaN,

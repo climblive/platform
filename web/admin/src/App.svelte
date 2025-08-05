@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { setBasePath } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
   import { ApiClient, OrganizerCredentialsProvider } from "@climblive/lib";
@@ -12,8 +11,6 @@
   import { writable } from "svelte/store";
   import Main from "./Main.svelte";
   import { exchangeCode, refreshSession } from "./utils/cognito";
-
-  setBasePath("/shoelace");
 
   let authenticated = $state(false);
 

@@ -1,12 +1,9 @@
 <script lang="ts">
-  import { setBasePath } from "@awesome.me/webawesome";
   import { ErrorBoundary } from "@climblive/lib/components";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { Route, Router } from "svelte-routing";
   import Scoreboard from "./pages/Scoreboard.svelte";
-
-  setBasePath("/shoelace");
 
   const queryClient = new QueryClient({
     defaultOptions: {
