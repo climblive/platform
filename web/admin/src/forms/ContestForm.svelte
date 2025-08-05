@@ -15,7 +15,7 @@
 
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/input/input.js";
-  import { GenericForm, name, value } from "@climblive/lib/forms";
+  import { GenericForm, name } from "@climblive/lib/forms";
   import { type ContestTemplate } from "@climblive/lib/models";
   import { type Snippet } from "svelte";
 
@@ -36,21 +36,21 @@
       label="Name"
       type="text"
       required
-      {@attach value(data.name)}
+      value={data.name}
     ></wa-input>
     <wa-input
       size="small"
       {@attach name("description")}
       label="Description"
       type="text"
-      {@attach value(data.description)}
+      value={data.description}
     ></wa-input>
     <wa-input
       size="small"
       {@attach name("location")}
       label="Location"
       type="text"
-      {@attach value(data.location)}
+      value={data.location}
     ></wa-input>
     <wa-input
       size="small"
@@ -59,9 +59,8 @@
       hint="Number of contenders that will proceed to the finals"
       type="number"
       required
-      {@attach value(data.finalists)}
+      value={data.finalists}
       min={0}
-      valueAsNumber
     ></wa-input>
     <wa-input
       size="small"
@@ -70,9 +69,8 @@
       hint="Number of problems that count towards the score"
       type="number"
       required
-      {@attach value(data.qualifyingProblems)}
+      value={data.qualifyingProblems}
       min={0}
-      valueAsNumber
     ></wa-input>
     <wa-input
       size="small"
@@ -83,14 +81,13 @@
       required
       min={0}
       max={60}
-      {@attach value(data.gracePeriod)}
-      valueAsNumber
+      value={data.gracePeriod}
     ></wa-input>
     <wa-textarea
       size="small"
       {@attach name("rules")}
       label="Rules"
-      {@attach value(data.rules)}
+      value={data.rules}
     ></wa-textarea>
     {@render children?.()}
   </fieldset>

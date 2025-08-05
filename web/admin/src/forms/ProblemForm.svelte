@@ -15,7 +15,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/color-picker/color-picker.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
-  import { GenericForm, name, value } from "@climblive/lib/forms";
+  import { GenericForm, name } from "@climblive/lib/forms";
   import { type Problem } from "@climblive/lib/models";
   import { type Snippet } from "svelte";
 
@@ -54,10 +54,9 @@
       label="Number"
       type="number"
       required
-      {@attach value(data.number)}
+      value={data.number}
     ></wa-input>
     <div class="colors">
-      <span>Hold colors</span>
       <div class="pickers">
         <wa-color-picker
           size="small"
@@ -65,16 +64,16 @@
           label="Primary hold color"
           required
           {swatches}
-          {@attach value(data.holdColorPrimary)}
-          no-format-toggle
+          value={data.holdColorPrimary}
+          without-format-toggle
         ></wa-color-picker>
         <wa-color-picker
           size="small"
           {@attach name("holdColorSecondary")}
           label="Secondary hold color"
           {swatches}
-          {@attach value(data.holdColorSecondary)}
-          no-format-toggle
+          value={data.holdColorSecondary}
+          without-format-toggle
         ></wa-color-picker>
       </div>
     </div>
@@ -83,7 +82,7 @@
       {@attach name("description")}
       label="Description"
       type="text"
-      {@attach value(data.description)}
+      value={data.description}
     ></wa-input>
     <wa-input
       size="small"
@@ -91,7 +90,7 @@
       label="Points for top"
       type="number"
       required
-      {@attach value(data.pointsTop)}
+      value={data.pointsTop}
     ></wa-input>
     <wa-input
       size="small"
@@ -99,14 +98,14 @@
       label="Points for zone"
       type="number"
       required
-      {@attach value(data.pointsZone)}
+      value={data.pointsZone}
     ></wa-input>
     <wa-input
       size="small"
       {@attach name("flashBonus")}
       label="Flash bonus"
       type="number"
-      {@attach value(data.flashBonus)}
+      value={data.flashBonus}
     ></wa-input>
     {@render children?.()}
   </fieldset>
@@ -120,13 +119,9 @@
   }
 
   .colors {
-    span {
-      font-size: var(--wa-input-label-font-size-s);
-    }
-
     & .pickers {
       display: flex;
-      gap: var(--wa-space-xs);
+      gap: var(--wa-space-s);
     }
   }
 </style>
