@@ -4,7 +4,7 @@
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import { checked, GenericForm, name, value } from "@climblive/lib/forms";
+  import { GenericForm, name } from "@climblive/lib/forms";
   import { type ContenderPatch } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
   import { isAfter } from "date-fns";
@@ -41,21 +41,21 @@
         label="Full name"
         type="text"
         required
-        {@attach value(data.name)}
+        value={data.name}
       ></wa-input>
       <wa-input
         size="small"
         {@attach name("clubName")}
         label="Club name"
         type="text"
-        {@attach value(data.clubName)}
+        value={data.clubName}
       ></wa-input>
       <wa-select
         size="small"
         {@attach name("compClassId")}
         label="Competition class"
         required
-        {@attach value(data.compClassId)}
+        value={data.compClassId}
       >
         {#each $compClassesQuery.data as compClass (compClass.id)}
           <wa-option
@@ -69,7 +69,7 @@
         size="small"
         {@attach name("withdrawnFromFinals")}
         hint="If you end up in the finals, you'll give up your spot."
-        {@attach checked(data.withdrawnFromFinals)}>Opt out of finals</wa-switch
+        checked={data.withdrawnFromFinals}>Opt out of finals</wa-switch
       >
       {@render children?.()}
     </fieldset>
