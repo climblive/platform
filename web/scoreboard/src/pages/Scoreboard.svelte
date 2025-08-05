@@ -55,7 +55,7 @@
   <ScoreboardProvider {contestId}>
     {#snippet children({ scoreboard, loading, online })}
       <header data-online={online}>
-        <wa-icon name="cloud-slash-fill"></wa-icon>Offline
+        <wa-icon name="triangle-exclamation"></wa-icon>Offline
       </header>
       <main>
         <h1>
