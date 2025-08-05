@@ -26,7 +26,7 @@
       -
     {:else}
       <Score value={score.score} />
-      <wa-icon name={score?.finalist ? "trophy" : "dash"}></wa-icon>
+      <wa-icon name={score?.finalist ? "medal" : "minus"}></wa-icon>
     {/if}
   </div>
 </section>

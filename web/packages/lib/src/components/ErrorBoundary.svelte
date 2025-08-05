@@ -30,7 +30,7 @@
 <style>
   pre {
     border: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-color-brand-70);
+      var(--wa-color-brand-border-normal);
     background-color: white;
     padding: var(--wa-space-s);
     overflow: scroll;
