@@ -1,5 +1,5 @@
 <script lang="ts">
-  import logoUrl from "@/static/logo.svg";
+  import { FullLogo } from "@climblive/lib/components";
   import SvgQR from "@svelte-put/qr/svg/QR.svelte";
 
   type Props = {
@@ -16,7 +16,9 @@
     <span class="link">Register at {location.protocol}//{location.host}</span>
     <span class="code">{registrationCode}</span>
   </div>
-  <img src={logoUrl} alt="ClimbLive Logo" />
+  <p class="logo">
+    <FullLogo />
+  </p>
   <SvgQR
     data={`${location.protocol}//${location.host}/${registrationCode}`}
     width={80}
@@ -61,9 +63,10 @@
       letter-spacing: 0.2rem;
     }
 
-    & img {
-      height: 1.5rem;
+    & .logo {
+      height: var(--wa-font-size-xl);
       margin: auto var(--wa-space-m) var(--wa-space-2xs) auto;
+      color: var(--wa-color-text-normal);
     }
   }
 
