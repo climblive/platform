@@ -168,16 +168,16 @@
   }
 
   div[data-variant="ticked"] {
-    background-color: var(--wa-color-green-90);
+    background-color: var(--wa-color-green-95);
 
     & wa-spinner {
-      --track-color: var(--wa-color-green-40);
+      --track-color: var(--wa-color-green-50);
       --indicator-color: var(--wa-color-green-90);
     }
 
     & > button {
-      border-color: var(--wa-color-green-40);
-      color: var(--wa-color-green-40);
+      border-color: var(--wa-color-green-50);
+      color: var(--wa-color-green-50);
     }
   }
 
@@ -185,13 +185,13 @@
     background-color: var(--wa-color-yellow-95);
 
     & wa-spinner {
-      --track-color: var(--wa-color-yellow-60);
+      --track-color: var(--wa-color-yellow-50);
       --indicator-color: var(--wa-color-yellow-90);
     }
 
     & > button {
-      border-color: var(--wa-color-yellow-60);
-      color: var(--wa-color-yellow-60);
+      border-color: var(--wa-color-yellow-50);
+      color: var(--wa-color-yellow-50);
     }
   }
 
