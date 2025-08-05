@@ -91,8 +91,4 @@
   wa-details::part(content) {
     padding-top: 0;
   }
-
-  a {
-    color: var(--wa-color-text-link);
-  }
 </style>

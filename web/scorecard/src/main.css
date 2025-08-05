@@ -18,11 +18,3 @@ body {
   margin: 0 auto;
   max-width: 640px;
 }
-
-.wa-toast-stack {
-  left: auto;
-  right: auto;
-  bottom: 0;
-  top: auto;
-  width: 640px;
-}

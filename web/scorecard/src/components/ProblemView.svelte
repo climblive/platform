@@ -73,7 +73,6 @@
 
     & wa-icon {
       font-size: var(--wa-font-size-xs);
-      color: var(--wa-color-yellow-500);
     }
   }
 

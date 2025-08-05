@@ -167,7 +167,7 @@
   .logo {
     text-align: center;
     height: var(--wa-font-size-xl);
-    color: var(--wa-font-weight-normal);
+    color: var(--wa-color-text-normal);
   }
 
   @media screen and (max-width: 512px) {
