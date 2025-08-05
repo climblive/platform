@@ -111,14 +111,14 @@
 
 <style>
   header {
-    background-color: var(--wa-color-danger-600);
+    background-color: var(--wa-color-danger-fill-loud);
     width: 100%;
     height: 2rem;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: var(--wa-space-xs);
-    color: white;
+    color: var(--wa-color-danger-on-loud);
     font-weight: var(--wa-font-weight-semibold);
     font-size: var(--wa-font-size-s);
 
@@ -136,7 +136,7 @@
 
   h1 {
     text-align: center;
-    line-height: 1;
+    line-height: var(--wa-line-height-condensed);
     color: var(--wa-color-text-normal);
     margin-bottom: 0;
   }
@@ -152,7 +152,6 @@
     grid-template-rows: 1fr;
     padding-top: 0;
     gap: var(--wa-space-s);
-
     justify-content: center;
   }
 
