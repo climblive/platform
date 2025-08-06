@@ -68,9 +68,9 @@
 <style>
   header {
     background-color: var(--wa-color-brand-fill-normal);
-    border: var(--wa-panel-border-width) var(--wa-panel-border-style)
+    border: var(--wa-border-width-s) var(--wa-border-style)
       var(--wa-color-brand-border-normal);
-    border-radius: var(--wa-panel-border-radius);
+    border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-s);
     color: var(--wa-color-brand-on-normal);
     position: relative;
