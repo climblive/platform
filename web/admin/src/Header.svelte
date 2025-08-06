@@ -4,6 +4,7 @@
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import { FullLogo } from "@climblive/lib/components";
+  import { value } from "@climblive/lib/forms";
   import { getSelfQuery } from "@climblive/lib/queries";
   import { getContext } from "svelte";
   import { navigate } from "svelte-routing";
@@ -35,7 +36,7 @@
       bind:this={select}
       size="small"
       appearance="filled"
-      value={$selectedOrganizer}
+      {@attach value($selectedOrganizer)}
       onchange={handleChange}
     >
       <wa-icon name="id-badge" slot="start"></wa-icon>

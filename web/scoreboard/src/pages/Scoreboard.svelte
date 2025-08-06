@@ -7,6 +7,7 @@
     ResultList,
     ScoreboardProvider,
   } from "@climblive/lib/components";
+  import { value } from "@climblive/lib/forms";
   import { getCompClassesQuery, getContestQuery } from "@climblive/lib/queries";
   import { onMount } from "svelte";
   import Header from "../components/Header.svelte";
@@ -70,7 +71,7 @@
             size="small"
             name="compClassId"
             label="Competition class"
-            value={selectedCompClassId}
+            {@attach value(selectedCompClassId)}
             onchange={() => {
               selectedCompClassId = Number(compClassSelector?.value);
             }}
