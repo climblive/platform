@@ -4,7 +4,7 @@
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import { GenericForm, name } from "@climblive/lib/forms";
+  import { GenericForm, name, value } from "@climblive/lib/forms";
   import { type ContenderPatch } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
   import { isAfter } from "date-fns";
@@ -55,7 +55,7 @@
         {@attach name("compClassId")}
         label="Competition class"
         required
-        value={data.compClassId}
+        {@attach value(data.compClassId)}
       >
         {#each $compClassesQuery.data as compClass (compClass.id)}
           <wa-option
