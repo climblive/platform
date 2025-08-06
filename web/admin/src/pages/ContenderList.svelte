@@ -48,7 +48,7 @@
         disabled={!remainingCodes || remainingCodes < increment}
         onclick={() => addContenders({ number: increment })}
       >
-        <wa-icon slot="slot" name="plus-lg"></wa-icon>
+        <wa-icon slot="start" name="plus-lg"></wa-icon>
         Add {increment} code{#if increment != 1}s{/if}
       </wa-button>
     {/each}

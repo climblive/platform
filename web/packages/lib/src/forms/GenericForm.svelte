@@ -24,12 +24,8 @@
       return;
     }
 
-    const formData = new FormData(form);
-
     const data = serialize(form);
     const result = schema.safeParse(data);
-
-    console.log([...formData.entries()], data, result);
 
     if (result.success) {
       submit(result.data);
