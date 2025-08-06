@@ -41,8 +41,13 @@
     appearance="plain"
     onclick={() => dialog?.setAttribute("open", "false")}>Cancel</wa-button
   >
-  <wa-button slot="footer" variant="danger" onclick={confirmDelete}
-    >Remove
+  <wa-button
+    slot="footer"
+    variant="danger"
+    onclick={confirmDelete}
+    loading={$deleteProblem.isPending}
+  >
+    Remove
     <wa-icon slot="start" name="trash"></wa-icon>
   </wa-button>
 </wa-dialog>

@@ -16,3 +16,19 @@ body {
   overflow: scroll;
   overscroll-behavior-y: none;
 }
+
+#callout-stack {
+  z-index: 1;
+  position: fixed;
+  left: auto;
+  right: 0;
+  bottom: 0;
+  top: auto;
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  flex-flow: column-reverse;
+  padding: var(--wa-space-s);
+  gap: var(--wa-space-s);
+}

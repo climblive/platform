@@ -44,8 +44,13 @@
   <wa-button slot="footer" appearance="plain" onclick={handleCancel}>
     Cancel</wa-button
   >
-  <wa-button slot="footer" variant="danger" onclick={confirmDelete}
-    >Remove
+  <wa-button
+    slot="footer"
+    variant="danger"
+    onclick={confirmDelete}
+    loading={$deleteCompClass.isPending}
+  >
+    Remove
     <wa-icon slot="start" name="trash"></wa-icon>
   </wa-button>
 </wa-dialog>

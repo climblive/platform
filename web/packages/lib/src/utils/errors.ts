@@ -13,5 +13,9 @@ export const toastError = (message: string, duration = 5000) => {
       `,
   });
 
-  document.body.append(alert);
+  document.getElementById("callout-stack")?.append(alert);
+
+  setTimeout(() => {
+    alert.remove();
+  }, duration);
 };
