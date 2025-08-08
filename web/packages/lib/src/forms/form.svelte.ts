@@ -13,3 +13,13 @@ export const name =
 
     node.setAttribute("name", value?.toString() ?? "");
   };
+
+export const checked =
+  (value: boolean | undefined): Attachment =>
+  (node: Element) => {
+    if (value) {
+      node.setAttribute("checked", "");
+    } else {
+      node.removeAttribute("checked");
+    }
+  };

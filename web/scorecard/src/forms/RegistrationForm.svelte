@@ -4,7 +4,7 @@
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import { GenericForm, name, value } from "@climblive/lib/forms";
+  import { checked, GenericForm, name, value } from "@climblive/lib/forms";
   import { type ContenderPatch } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
   import { isAfter } from "date-fns";
@@ -69,7 +69,7 @@
         size="small"
         {@attach name("withdrawnFromFinals")}
         hint="If you end up in the finals, you'll give up your spot."
-        checked={data.withdrawnFromFinals}>Opt out of finals</wa-switch
+        {@attach checked(data.withdrawnFromFinals)}>Opt out of finals</wa-switch
       >
       {@render children?.()}
     </fieldset>
