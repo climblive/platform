@@ -11,8 +11,8 @@ importers:
   admin:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.0.0-beta.2
-        version: 3.0.0-beta.2(@floating-ui/utils@0.2.9)
+        specifier: 3.0.0-beta.4
+        version: 3.0.0-beta.4(@floating-ui/utils@0.2.9)(@types/react@19.1.9)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -269,10 +269,6 @@ packages:
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
-
-  '@awesome.me/webawesome@3.0.0-beta.2':
-    resolution: {integrity: sha512-NPQzydbl78iJU3YPeJez06W+V/1NNTUKoG8qw6plqrbOt/L4tqbAd9+WcAQIY1lMomrqkCCaYKVTzkhAf7mBzg==}
-    engines: {node: '>=14.17.0'}
 
   '@awesome.me/webawesome@3.0.0-beta.4':
     resolution: {integrity: sha512-CTqy016SZQvGsyYTeQCE6t4JrnL26bugaNXkY1y+nXHfVtcxS+gXze36Y89t82Z2MJ8d30IZHdoTq1Ac2jOZYw==}
@@ -2180,19 +2176,6 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
-
-  '@awesome.me/webawesome@3.0.0-beta.2(@floating-ui/utils@0.2.9)':
-    dependencies:
-      '@ctrl/tinycolor': 4.1.0
-      '@floating-ui/dom': 1.7.1
-      '@shoelace-style/animations': 1.2.0
-      '@shoelace-style/localize': 3.2.1
-      composed-offset-position: 0.0.6(@floating-ui/utils@0.2.9)
-      lit: 3.3.0
-      qr-creator: 1.0.0
-      style-observer: 0.0.7
-    transitivePeerDependencies:
-      - '@floating-ui/utils'
 
   '@awesome.me/webawesome@3.0.0-beta.4(@floating-ui/utils@0.2.9)(@types/react@19.1.9)':
     dependencies:
