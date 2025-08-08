@@ -9,6 +9,5 @@ export { default as ResultList } from "./ResultList.svelte";
 export { default as Score } from "./Score.svelte";
 export { default as ScoreboardProvider } from "./ScoreboardProvider.svelte";
 export { default as Table } from "./Table.svelte";
-export { default as TableCell } from "./TableCell.svelte";
-export { default as TableRow } from "./TableRow.svelte";
 export { default as Timer } from "./Timer.svelte";
+
