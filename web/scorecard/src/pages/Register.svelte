@@ -1,15 +1,14 @@
 <script lang="ts">
   import RegistrationForm from "@/forms/RegistrationForm.svelte";
   import type { ScorecardSession } from "@/types";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import type { ContenderPatch } from "@climblive/lib/models";
   import {
     getContenderQuery,
     patchContenderMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import "@shoelace-style/shoelace/dist/components/alert/alert.js";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
-  import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import { getContext } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Readable } from "svelte/store";
@@ -56,12 +55,13 @@
       withdrawnFromFinals: contender.withdrawnFromFinals,
     }}
   >
-    <sl-button
+    <wa-button
       size="small"
       type="submit"
       loading={$patchContender.isPending}
-      variant="primary"
+      variant="brand"
+      appearance="accent"
       >Register
-    </sl-button>
+    </wa-button>
   </RegistrationForm>
 {/if}

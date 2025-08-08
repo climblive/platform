@@ -1,9 +1,9 @@
 <script lang="ts">
-  import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
+  import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
 </script>
 
 <main>
-  <sl-spinner></sl-spinner>
+  <wa-spinner></wa-spinner>
 </main>
 
 <style>
@@ -13,7 +13,7 @@
     align-items: center;
   }
 
-  sl-spinner {
+  wa-spinner {
     --track-width: 0.75rem;
 
     display: flex;

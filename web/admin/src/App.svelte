@@ -1,10 +1,9 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
   import { ApiClient, OrganizerCredentialsProvider } from "@climblive/lib";
   import { ErrorBoundary } from "@climblive/lib/components";
   import configData from "@climblive/lib/config.json";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
-  import "@shoelace-style/shoelace/dist/components/spinner/spinner.js";
-  import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path.js";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { onMount, setContext } from "svelte";
@@ -12,8 +11,6 @@
   import { writable } from "svelte/store";
   import Main from "./Main.svelte";
   import { exchangeCode, refreshSession } from "./utils/cognito";
-
-  setBasePath("/shoelace");
 
   let authenticated = $state(false);
 
@@ -90,11 +87,11 @@
 
 <ErrorBoundary>
   {#await authenticate()}
-    <sl-spinner></sl-spinner>
+    <wa-spinner></wa-spinner>
   {:then}
     <QueryClientProvider client={queryClient}>
       {#if !authenticated}
-        <sl-button variant="primary" onclick={login}>Login</sl-button>
+        <wa-button variant="brand" onclick={login}>Login</wa-button>
       {:else}
         <Main />
       {/if}

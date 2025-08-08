@@ -1,6 +1,6 @@
 <script lang="ts">
-  import "@shoelace-style/shoelace/dist/components/progress-bar/progress-bar.js";
-  import "@shoelace-style/shoelace/dist/components/skeleton/skeleton.js";
+  import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
+  import "@awesome.me/webawesome/dist/components/skeleton/skeleton.js";
   import { onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
   import type { ScoreboardEntry } from "../models";
@@ -105,7 +105,7 @@
 >
   {#if loading}
     {#each [...Array(overflow === "pagination" ? pageSize : SCROLLABLE_SKELETON_ENTRIES).keys()] as i (i)}
-      <sl-skeleton effect="sheen"></sl-skeleton>
+      <wa-skeleton effect="sheen"></wa-skeleton>
     {/each}
   {:else}
     {#each results as scoreboardEntry (scoreboardEntry.contenderId)}
@@ -119,13 +119,13 @@
 </div>
 
 <style>
-  sl-skeleton {
-    --color: var(--sl-color-primary-400);
-    --sheen-color: var(--sl-color-primary-300);
-    --border-radius: var(--sl-border-radius-medium);
-
-    margin-bottom: var(--sl-spacing-x-small);
+  wa-skeleton {
+    margin-bottom: var(--wa-space-xs);
     height: 2.25rem;
+  }
+
+  wa-skeleton::part(indicator) {
+    border-radius: var(--wa-border-radius-m);
   }
 
   .container {
@@ -139,13 +139,13 @@
       0px 100%
         calc(
           var(--page-size) * 2.25rem + (var(--page-size) - 1) *
-            var(--sl-spacing-x-small)
+            var(--wa-space-xs)
         )
         0px
     );
   }
 
   .container[data-overflow="scroll"] {
-    height: calc(var(--page-size) * (2.25rem + var(--sl-spacing-x-small)));
+    height: calc(var(--page-size) * (2.25rem + var(--wa-space-xs)));
   }
 </style>

@@ -15,7 +15,7 @@
 
 <style>
   td:first-of-type {
-    padding-left: var(--sl-spacing-medium);
+    padding-left: var(--wa-space-m);
   }
 
   td[data-align="right"] {

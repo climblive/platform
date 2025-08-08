@@ -169,7 +169,7 @@ test('edit profile', async ({ page }) => {
   await expect(page.getByText("Scranton Climbing Club")).toBeVisible()
   await expect(page.getByText("Males", { exact: true })).toBeVisible()
 
-  await page.getByRole("button", { name: "Edit" }).click();
+  await page.getByRole("button", { name: "Edit" }).click({ force: true });
 
   await page.waitForURL('/ABCD0003/edit');
 
@@ -206,7 +206,7 @@ test('withdraw from finals and reenter', async ({ page }) => {
 
   await page.waitForURL('/ABCD0003');
 
-  await page.getByRole("button", { name: "Edit" }).click();
+  await page.getByRole("button", { name: "Edit" }).click({ force: true });
 
   await expect(page.getByRole("switch", { name: "Opt out of finals" })).toBeChecked();
   await page.getByRole("switch", { name: "Opt out of finals" }).uncheck({ force: true });
@@ -215,7 +215,7 @@ test('withdraw from finals and reenter', async ({ page }) => {
 
   await page.waitForURL('/ABCD0003');
 
-  await page.getByRole("button", { name: "Edit" }).click();
+  await page.getByRole("button", { name: "Edit" }).click({ force: true });
 
   await expect(page.getByRole("switch", { name: "Opt out of finals" })).not.toBeChecked();
 });

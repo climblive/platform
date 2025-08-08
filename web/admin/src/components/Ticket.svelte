@@ -1,5 +1,5 @@
 <script lang="ts">
-  import logoUrl from "@/static/logo.svg";
+  import { FullLogo } from "@climblive/lib/components";
   import SvgQR from "@svelte-put/qr/svg/QR.svelte";
 
   type Props = {
@@ -16,7 +16,9 @@
     <span class="link">Register at {location.protocol}//{location.host}</span>
     <span class="code">{registrationCode}</span>
   </div>
-  <img src={logoUrl} alt="ClimbLive Logo" />
+  <p class="logo">
+    <FullLogo />
+  </p>
   <SvgQR
     data={`${location.protocol}//${location.host}/${registrationCode}`}
     width={80}
@@ -29,10 +31,11 @@
 <style>
   section {
     width: 18cm;
-    border: 1px solid var(--sl-color-primary-600);
-    border-radius: var(--sl-border-radius-small);
-    margin-block: var(--sl-spacing-medium);
-    padding: var(--sl-spacing-medium);
+    border: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-brand-border-normal);
+    border-radius: var(--wa-border-radius-m);
+    margin-block: var(--wa-space-m);
+    padding: var(--wa-space-m);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -41,28 +44,29 @@
       flex-grow: 1;
       display: flex;
       flex-direction: column;
-      gap: var(--sl-spacing-x-small);
+      gap: var(--wa-space-xs);
     }
 
     & h1 {
-      font-size: var(--sl-font-size-large);
+      font-size: var(--wa-font-size-l);
       margin: 0;
     }
 
     & .link {
-      font-size: var(--sl-font-size-small);
+      font-size: var(--wa-font-size-s);
     }
 
     & .code {
-      font-size: var(--sl-font-size-x-large);
-      font-weight: bold;
+      font-size: var(--wa-font-size-xl);
+      font-weight: var(--wa-font-weight-bold);
       font-family: monospace;
       letter-spacing: 0.2rem;
     }
 
-    & img {
-      height: 1.5rem;
-      margin: auto var(--sl-spacing-medium) var(--sl-spacing-2x-small) auto;
+    & .logo {
+      height: var(--wa-font-size-xl);
+      margin: auto var(--wa-space-m) var(--wa-space-2xs) auto;
+      color: var(--wa-color-text-normal);
     }
   }
 

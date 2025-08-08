@@ -47,11 +47,13 @@
 
 <style>
   header {
-    margin-bottom: var(--sl-spacing-small);
-    background-color: var(--sl-color-primary-600);
-    border-radius: var(--sl-border-radius-medium);
+    margin-bottom: var(--wa-space-s);
+    background-color: var(--wa-color-brand-fill-normal);
+    border-radius: var(--wa-border-radius-m);
+    border: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-brand-border-normal);
 
-    color: white;
+    color: var(--wa-color-brand-on-normal);
 
     display: grid;
     grid-template-columns: 1fr max-content;
@@ -60,10 +62,10 @@
     .left {
       display: flex;
       flex-direction: column;
-      gap: var(--sl-spacing-x-small);
+      gap: var(--wa-space-xs);
       align-items: start;
 
-      padding: var(--sl-spacing-small);
+      padding: var(--wa-space-s);
     }
 
     .title {
@@ -77,7 +79,7 @@
       inset: 0;
 
       margin: 0;
-      font-weight: var(--sl-font-weight-semibold);
+      font-weight: var(--wa-font-weight-bold);
 
       white-space: nowrap;
       overflow: hidden;
@@ -86,11 +88,10 @@
 
     .size {
       align-self: start;
-      margin: var(--sl-spacing-small) var(--sl-spacing-small) 0 0;
+      margin: var(--wa-space-s) var(--wa-space-s) 0 0;
 
-      color: white;
-      font-size: var(--sl-font-size-small);
-      font-weight: var(--sl-font-weight-semibold);
+      font-size: var(--wa-font-size-s);
+      font-weight: var(--wa-font-weight-semibold);
 
       & strong {
         font-size: 1.5em;

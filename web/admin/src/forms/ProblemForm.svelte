@@ -13,10 +13,10 @@
 </script>
 
 <script lang="ts">
-  import { GenericForm, name, value } from "@climblive/lib/forms";
+  import "@awesome.me/webawesome/dist/components/color-picker/color-picker.js";
+  import "@awesome.me/webawesome/dist/components/input/input.js";
+  import { GenericForm, name } from "@climblive/lib/forms";
   import { type Problem } from "@climblive/lib/models";
-  import "@shoelace-style/shoelace/dist/components/color-picker/color-picker.js";
-  import "@shoelace-style/shoelace/dist/components/input/input.js";
   import { type Snippet } from "svelte";
 
   type T = $$Generic<Partial<Problem>>;
@@ -48,66 +48,65 @@
 
 <GenericForm {schema} {submit}>
   <fieldset>
-    <sl-input
+    <wa-input
       size="small"
       {@attach name("number")}
       label="Number"
       type="number"
       required
-      {@attach value(data.number)}
-    ></sl-input>
+      value={data.number}
+    ></wa-input>
     <div class="colors">
-      <span>Hold colors</span>
       <div class="pickers">
-        <sl-color-picker
+        <wa-color-picker
           size="small"
           {@attach name("holdColorPrimary")}
           label="Primary hold color"
           required
           {swatches}
-          {@attach value(data.holdColorPrimary)}
-          no-format-toggle
-        ></sl-color-picker>
-        <sl-color-picker
+          value={data.holdColorPrimary}
+          without-format-toggle
+        ></wa-color-picker>
+        <wa-color-picker
           size="small"
           {@attach name("holdColorSecondary")}
           label="Secondary hold color"
           {swatches}
-          {@attach value(data.holdColorSecondary)}
-          no-format-toggle
-        ></sl-color-picker>
+          value={data.holdColorSecondary}
+          without-format-toggle
+        ></wa-color-picker>
       </div>
     </div>
-    <sl-input
+    <wa-input
       size="small"
       {@attach name("description")}
       label="Description"
       type="text"
-      {@attach value(data.description)}
-    ></sl-input>
-    <sl-input
+      value={data.description}
+    ></wa-input>
+    <wa-input
       size="small"
       {@attach name("pointsTop")}
       label="Points for top"
       type="number"
       required
-      {@attach value(data.pointsTop)}
-    ></sl-input>
-    <sl-input
+      value={data.pointsTop}
+    ></wa-input>
+    <wa-input
       size="small"
       {@attach name("pointsZone")}
       label="Points for zone"
       type="number"
       required
-      {@attach value(data.pointsZone)}
-    ></sl-input>
-    <sl-input
+      value={data.pointsZone}
+    ></wa-input>
+    <wa-input
       size="small"
       {@attach name("flashBonus")}
       label="Flash bonus"
       type="number"
-      {@attach value(data.flashBonus)}
-    ></sl-input>
+      value={data.flashBonus}
+    ></wa-input>
     {@render children?.()}
   </fieldset>
 </GenericForm>
@@ -116,17 +115,13 @@
   fieldset {
     display: flex;
     flex-direction: column;
-    gap: var(--sl-spacing-small);
+    gap: var(--wa-space-s);
   }
 
   .colors {
-    span {
-      font-size: var(--sl-input-label-font-size-small);
-    }
-
     & .pickers {
       display: flex;
-      gap: var(--sl-spacing-x-small);
+      gap: var(--wa-space-s);
     }
   }
 </style>

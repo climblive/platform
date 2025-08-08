@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import { Table, TableCell, TableRow } from "@climblive/lib/components";
   import {
     drawRaffleWinnerMutation,
@@ -6,7 +7,6 @@
     getRaffleWinnersQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { format } from "date-fns";
 
   interface Props {
@@ -41,8 +41,7 @@
 {#if raffle}
   <section>
     <h1>Raffle {raffle.id}</h1>
-    <sl-button variant="primary" onclick={handleDrawWinner}
-      >Draw winner</sl-button
+    <wa-button variant="brand" onclick={handleDrawWinner}>Draw winner</wa-button
     >
 
     {#if sortedRaffleWinners?.length}
@@ -62,7 +61,7 @@
 <style>
   section {
     display: flex;
-    gap: var(--sl-spacing-x-small);
+    gap: var(--wa-space-xs);
     flex-direction: column;
   }
 </style>

@@ -1,12 +1,12 @@
 <script lang="ts">
   import ProblemForm, { formSchema } from "@/forms/ProblemForm.svelte";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { Problem, ProblemPatch } from "@climblive/lib/models";
   import {
     getProblemQuery,
     patchProblemMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -37,19 +37,19 @@
   schema={formSchema}
 >
   <div class="controls">
-    <sl-button
+    <wa-button
       size="small"
       type="button"
-      variant="text"
-      onclick={history.back()}>Cancel</sl-button
+      appearance="plain"
+      onclick={history.back()}>Cancel</wa-button
     >
-    <sl-button
+    <wa-button
       size="small"
       type="submit"
       loading={$patchProblem.isPending}
-      variant="primary"
+      variant="brand"
       >Save
-    </sl-button>
+    </wa-button>
   </div>
 </ProblemForm>
 

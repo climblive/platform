@@ -14,9 +14,9 @@
 </script>
 
 <script lang="ts">
-  import { GenericForm, name, value } from "@climblive/lib/forms";
+  import "@awesome.me/webawesome/dist/components/input/input.js";
+  import { GenericForm, name } from "@climblive/lib/forms";
   import { type ContestTemplate } from "@climblive/lib/models";
-  import "@shoelace-style/shoelace/dist/components/input/input.js";
   import { type Snippet } from "svelte";
 
   interface Props {
@@ -30,68 +30,65 @@
 
 <GenericForm schema={formSchema} {submit}>
   <fieldset>
-    <sl-input
+    <wa-input
       size="small"
       {@attach name("name")}
       label="Name"
       type="text"
       required
-      {@attach value(data.name)}
-    ></sl-input>
-    <sl-input
+      value={data.name}
+    ></wa-input>
+    <wa-input
       size="small"
       {@attach name("description")}
       label="Description"
       type="text"
-      {@attach value(data.description)}
-    ></sl-input>
-    <sl-input
+      value={data.description}
+    ></wa-input>
+    <wa-input
       size="small"
       {@attach name("location")}
       label="Location"
       type="text"
-      {@attach value(data.location)}
-    ></sl-input>
-    <sl-input
+      value={data.location}
+    ></wa-input>
+    <wa-input
       size="small"
       {@attach name("finalists")}
       label="Finalists"
-      help-text="Number of contenders that will proceed to the finals"
+      hint="Number of contenders that will proceed to the finals"
       type="number"
       required
-      {@attach value(data.finalists)}
+      value={data.finalists}
       min={0}
-      valueAsNumber
-    ></sl-input>
-    <sl-input
+    ></wa-input>
+    <wa-input
       size="small"
       {@attach name("qualifyingProblems")}
       label="Number of qualifying problems"
-      help-text="Number of problems that count towards the score"
+      hint="Number of problems that count towards the score"
       type="number"
       required
-      {@attach value(data.qualifyingProblems)}
+      value={data.qualifyingProblems}
       min={0}
-      valueAsNumber
-    ></sl-input>
-    <sl-input
+    ></wa-input>
+    <wa-input
       size="small"
       {@attach name("gracePeriod")}
       label="Grace period"
-      help-text="Extra time after the end of the contest during which contenders can enter their last results"
+      hint="Extra time after the end of the contest during which contenders can enter their last results"
       type="number"
       required
       min={0}
       max={60}
-      {@attach value(data.gracePeriod)}
-      valueAsNumber
-    ></sl-input>
-    <sl-textarea
+      value={data.gracePeriod}
+    ></wa-input>
+    <wa-textarea
       size="small"
       {@attach name("rules")}
       label="Rules"
-      {@attach value(data.rules)}
-    ></sl-textarea>
+      value={data.rules}
+    ></wa-textarea>
     {@render children?.()}
   </fieldset>
 </GenericForm>
@@ -100,6 +97,6 @@
   fieldset {
     display: flex;
     flex-direction: column;
-    gap: var(--sl-spacing-small);
+    gap: var(--wa-space-s);
   }
 </style>

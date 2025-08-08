@@ -1,5 +1,5 @@
 @import url("normalize.css/normalize.css");
-@import url("@shoelace-style/shoelace/dist/themes/light.css");
+@import url("@awesome.me/webawesome/dist/styles/themes/default.css");
 @import url("@climblive/lib/theme.css");
 
 html {
@@ -19,10 +19,17 @@ body {
   max-width: 640px;
 }
 
-.sl-toast-stack {
+#callout-stack {
+  z-index: 1;
+  position: fixed;
   left: auto;
   right: auto;
   bottom: 0;
   top: auto;
-  width: 640px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-flow: column-reverse;
+  padding: var(--wa-space-s);
+  gap: var(--wa-space-s);
 }

@@ -1,9 +1,9 @@
 <script lang="ts">
   import ContestForm from "@/forms/ContestForm.svelte";
+  import "@awesome.me/webawesome/dist/components/input/input.js";
   import type { Contest, ContestTemplate } from "@climblive/lib/models";
   import { createContestMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import "@shoelace-style/shoelace/dist/components/input/input.js";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -41,18 +41,16 @@
   }}
 >
   <div class="controls">
-    <sl-button
-      size="small"
-      type="button"
-      variant="text"
-      onclick={history.back()}>Cancel</sl-button
+    <wa-button size="small" appearance="plain" onclick={history.back()}
+      >Cancel</wa-button
     >
-    <sl-button
+    <wa-button
       size="small"
       type="submit"
       loading={$createContest.isPending}
-      variant="primary"
+      variant="brand"
+      appearance="accent"
       >Create
-    </sl-button>
+    </wa-button>
   </div>
 </ContestForm>

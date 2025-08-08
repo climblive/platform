@@ -14,15 +14,15 @@
 
 <style>
   tr {
-    height: 2rem;
+    height: 3rem;
     cursor: pointer;
   }
 
   tr:nth-child(even) {
-    background-color: var(--sl-color-neutral-50);
+    background-color: var(--wa-color-surface-raised);
   }
 
   tr:hover {
-    background-color: var(--sl-color-neutral-100);
+    background-color: var(--wa-color-surface-raised);
   }
 </style>

@@ -1,12 +1,12 @@
 <script lang="ts">
   import CompClassForm, { formSchema } from "@/forms/CompClassForm.svelte";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { CompClassPatch } from "@climblive/lib/models";
   import {
     getCompClassQuery,
     patchCompClassMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -23,32 +23,28 @@
   const handleSubmit = async (patch: CompClassPatch) => {
     $patchCompClass.mutate(patch, {
       onSuccess: (compClass) =>
-        navigate(`/admin/contests/${compClass.contestId}#comp-classes`),
+        navigate(`/admin/contests/${compClass.contestId}#contest`),
       onError: () => toastError("Failed to save comp class."),
     });
   };
 </script>
 
-<CompClassForm
-  submit={handleSubmit}
-  data={{
-    ...compClass,
-  }}
-  schema={formSchema}
->
-  <div class="controls">
-    <sl-button
-      size="small"
-      type="button"
-      variant="text"
-      onclick={history.back()}>Cancel</sl-button
-    >
-    <sl-button
-      size="small"
-      type="submit"
-      loading={$patchCompClass.isPending}
-      variant="primary"
-      >Save
-    </sl-button>
-  </div>
-</CompClassForm>
+{#if compClass}
+  <CompClassForm submit={handleSubmit} data={compClass} schema={formSchema}>
+    <div class="controls">
+      <wa-button
+        size="small"
+        type="button"
+        appearance="plain"
+        onclick={history.back()}>Cancel</wa-button
+      >
+      <wa-button
+        size="small"
+        type="submit"
+        loading={$patchCompClass.isPending}
+        variant="brand"
+        >Save
+      </wa-button>
+    </div>
+  </CompClassForm>
+{/if}

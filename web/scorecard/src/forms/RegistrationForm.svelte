@@ -1,12 +1,12 @@
 <script lang="ts">
   import type { ScorecardSession } from "@/types";
+  import "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/option/option.js";
+  import "@awesome.me/webawesome/dist/components/select/select.js";
+  import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { checked, GenericForm, name, value } from "@climblive/lib/forms";
   import { type ContenderPatch } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
-  import "@shoelace-style/shoelace/dist/components/input/input.js";
-  import "@shoelace-style/shoelace/dist/components/option/option.js";
-  import "@shoelace-style/shoelace/dist/components/select/select.js";
-  import "@shoelace-style/shoelace/dist/components/switch/switch.js";
   import { isAfter } from "date-fns";
   import { getContext, type Snippet } from "svelte";
   import type { Readable } from "svelte/store";
@@ -35,22 +35,22 @@
 {#if $compClassesQuery.data}
   <GenericForm schema={registrationFormSchema} {submit}>
     <fieldset>
-      <sl-input
+      <wa-input
         size="small"
         {@attach name("name")}
         label="Full name"
         type="text"
         required
-        {@attach value(data.name)}
-      ></sl-input>
-      <sl-input
+        value={data.name}
+      ></wa-input>
+      <wa-input
         size="small"
         {@attach name("clubName")}
         label="Club name"
         type="text"
-        {@attach value(data.clubName)}
-      ></sl-input>
-      <sl-select
+        value={data.clubName}
+      ></wa-input>
+      <wa-select
         size="small"
         {@attach name("compClassId")}
         label="Competition class"
@@ -58,18 +58,18 @@
         {@attach value(data.compClassId)}
       >
         {#each $compClassesQuery.data as compClass (compClass.id)}
-          <sl-option
+          <wa-option
             value={compClass.id}
             disabled={isAfter(new Date(), compClass.timeEnd)}
-            >{compClass.name}</sl-option
+            >{compClass.name}</wa-option
           >
         {/each}
-      </sl-select>
-      <sl-switch
+      </wa-select>
+      <wa-switch
         size="small"
         {@attach name("withdrawnFromFinals")}
-        help-text="If you end up in the finals, you'll give up your spot."
-        {@attach checked(data.withdrawnFromFinals)}>Opt out of finals</sl-switch
+        hint="If you end up in the finals, you'll give up your spot."
+        {@attach checked(data.withdrawnFromFinals)}>Opt out of finals</wa-switch
       >
       {@render children?.()}
     </fieldset>
@@ -80,7 +80,7 @@
   fieldset {
     display: flex;
     flex-direction: column;
-    gap: var(--sl-spacing-small);
-    padding: var(--sl-spacing-medium);
+    gap: var(--wa-space-s);
+    padding: var(--wa-space-m);
   }
 </style>

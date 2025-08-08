@@ -32,22 +32,21 @@
     border-collapse: separate;
     overflow: hidden;
     border-spacing: 0;
-    border-radius: var(--sl-border-radius-medium);
   }
 
   thead {
-    height: 2rem;
+    height: 3rem;
 
-    background-color: var(--sl-color-primary-600);
-    color: white;
+    background-color: var(--wa-color-brand-fill-normal);
+    color: var(--wa-color-brand-on-normal);
 
     & th {
-      font-weight: var(--sl-font-weight-normal);
+      font-weight: var(--wa-font-weight-bold);
       text-align: left;
     }
 
     & th:first-of-type {
-      padding-left: var(--sl-spacing-medium);
+      padding-left: var(--wa-space-m);
     }
   }
 </style>

@@ -1,10 +1,10 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+  import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { deleteProblemMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import type { SlDialog } from "@shoelace-style/shoelace";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
-  import "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
-  import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import type { Snippet } from "svelte";
 
   type Props = {
@@ -12,14 +12,14 @@
     children: Snippet<[{ deleteProblem: () => void }]>;
   };
 
-  let dialog: SlDialog | undefined = $state();
+  let dialog: WaDialog | undefined = $state();
 
   let { problemId, children }: Props = $props();
 
   const deleteProblem = $derived(deleteProblemMutation(problemId));
 
   const handleDelete = async () => {
-    dialog?.show();
+    dialog?.setAttribute("open", "true");
   };
 
   const confirmDelete = () => {
@@ -31,16 +31,23 @@
 
 {@render children({ deleteProblem: handleDelete })}
 
-<sl-dialog bind:this={dialog} no-header>
+<wa-dialog bind:this={dialog} no-header>
   <p>
     <strong>Are you sure?</strong>
   </p>
   <p>A problem is deleted permanently and cannot be restored.</p>
-  <sl-button slot="footer" variant="text" onclick={() => dialog?.hide()}
-    >Cancel</sl-button
+  <wa-button
+    slot="footer"
+    appearance="plain"
+    onclick={() => dialog?.setAttribute("open", "false")}>Cancel</wa-button
   >
-  <sl-button slot="footer" variant="danger" onclick={confirmDelete}
-    >Remove
-    <sl-icon slot="prefix" name="trash"></sl-icon>
-  </sl-button>
-</sl-dialog>
+  <wa-button
+    slot="footer"
+    variant="danger"
+    onclick={confirmDelete}
+    loading={$deleteProblem.isPending}
+  >
+    Remove
+    <wa-icon slot="start" name="trash"></wa-icon>
+  </wa-button>
+</wa-dialog>

@@ -6,7 +6,6 @@
     TableRow,
   } from "@climblive/lib/components";
   import { getProblemsQuery } from "@climblive/lib/queries";
-  import "@shoelace-style/shoelace/dist/components/icon-button/icon-button.js";
   import { navigate } from "svelte-routing";
   import DeleteProblem from "./DeleteProblem.svelte";
 
@@ -37,18 +36,25 @@
           >
           <TableCell>{problem.pointsTop}</TableCell>
           <TableCell align="right">
-            <sl-icon-button
+            <wa-button
+              size="small"
+              appearance="plain"
               onclick={() => navigate(`/admin/problems/${problem.id}/edit`)}
-              name="pencil"
               label="Edit"
-            ></sl-icon-button>
+            >
+              <wa-icon name="pencil"></wa-icon>
+            </wa-button>
             <DeleteProblem problemId={problem.id}>
               {#snippet children({ deleteProblem })}
-                <sl-icon-button
+                <wa-button
+                  size="small"
+                  variant="danger"
+                  appearance="plain"
                   onclick={deleteProblem}
-                  name="trash"
                   label={`Delete problem ${problem.id}`}
-                ></sl-icon-button>
+                >
+                  <wa-icon name="trash"></wa-icon>
+                </wa-button>
               {/snippet}
             </DeleteProblem>
           </TableCell>
@@ -61,6 +67,6 @@
 <style>
   section {
     display: flex;
-    gap: var(--sl-spacing-x-small);
+    gap: var(--wa-space-xs);
   }
 </style>
