@@ -24,7 +24,7 @@
     "vite": "^6.3.5"
   },
   "dependencies": {
-    "@awesome.me/webawesome": "3.0.0-beta.2",
+    "@awesome.me/webawesome": "3.0.0-beta.4",
     "@climblive/lib": "workspace:*",
     "@tanstack/svelte-query": "^5.80.2",
     "date-fns": "^4.1.0",
