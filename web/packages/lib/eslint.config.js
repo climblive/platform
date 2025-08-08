@@ -35,6 +35,7 @@ export default [
     rules: {
       "svelte/valid-compile": "off",
       "svelte/no-at-html-tags": "off",
+      "svelte/prefer-svelte-reactivity": "off",
     },
   },
 ];
