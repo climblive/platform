@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { Table } from "@climblive/lib/components";
+  import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { CompClass } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
   import { format } from "date-fns";
-  import type { ColumnDefinition } from "node_modules/@climblive/lib/src/components/Table.svelte";
   import { navigate } from "svelte-routing";
   import DeleteCompClass from "./DeleteCompClass.svelte";
 

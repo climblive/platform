@@ -1,10 +1,9 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import { Table } from "@climblive/lib/components";
+  import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { Contest } from "@climblive/lib/models";
   import { getContestsByOrganizerQuery } from "@climblive/lib/queries";
   import { format } from "date-fns";
-  import type { ColumnDefinition } from "node_modules/@climblive/lib/src/components/Table.svelte";
   import { Link, navigate } from "svelte-routing";
 
   interface Props {
