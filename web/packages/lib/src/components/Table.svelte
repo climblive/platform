@@ -1,24 +1,48 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
 
-  type Props = {
-    columns: string[];
-    children: Snippet;
+  type T = $$Generic<unknown>;
+
+  export type ColumnDefinition<T> = {
+    label?: string;
+    mobile: boolean;
+    render: (row: T, mobile: boolean) => ReturnType<Snippet>;
+    align?: "left" | "right";
   };
 
-  const { columns, children }: Props = $props();
+  type Props<T> = {
+    columns: ColumnDefinition<T>[];
+    data: T[];
+    getId: (row: T) => string | number;
+  };
+
+  const mobile = $state(false);
+
+  const { columns, data, getId }: Props<T> = $props();
 </script>
 
 <table border="0">
   <thead>
     <tr>
       {#each columns as column (column)}
-        <th>{column}</th>
+        {#if !mobile || (mobile && column.mobile)}
+          <th>{column.label}</th>
+        {/if}
       {/each}
     </tr>
   </thead>
   <tbody>
-    {@render children()}
+    {#each data as row (getId(row))}
+      <tr>
+        {#each columns as column, index (index)}
+          {#if !mobile || (mobile && column.mobile)}
+            <td data-align={column.align ?? "left"}>
+              {@render column.render(row, mobile)}
+            </td>
+          {/if}
+        {/each}
+      </tr>
+    {/each}
   </tbody>
 </table>
 
@@ -48,5 +72,26 @@
     & th:first-of-type {
       padding-left: var(--wa-space-m);
     }
+  }
+
+  tr {
+    height: 3rem;
+    cursor: pointer;
+  }
+
+  tr:nth-child(even) {
+    background-color: var(--wa-color-surface-raised);
+  }
+
+  tr:hover {
+    background-color: var(--wa-color-surface-raised);
+  }
+
+  td:first-of-type {
+    padding-left: var(--wa-space-m);
+  }
+
+  td[data-align="right"] {
+    text-align: right;
   }
 </style>

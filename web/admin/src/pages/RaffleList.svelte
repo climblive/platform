@@ -1,6 +1,6 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import { Table, TableCell, TableRow } from "@climblive/lib/components";
+  import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { Raffle } from "@climblive/lib/models";
   import {
     createRaffleMutation,
@@ -26,25 +26,28 @@
       onError: () => toastError("Failed to create raffle."),
     });
   };
+
+  const columns: ColumnDefinition<Raffle>[] = [
+    {
+      label: "Name",
+      mobile: true,
+      render: renderName,
+    },
+  ];
 </script>
+
+{#snippet renderName({ id }: Raffle)}
+  <Link to={`/admin/raffles/${id}`}>Raffle {id}</Link>
+{/snippet}
 
 <wa-button variant="brand" appearance="accent" onclick={handleCreateRaffle}
   >Create</wa-button
 >
 
 <section>
-  <Table columns={["Name"]}>
-    {#if raffles}
-      {#each raffles as raffle (raffle.id)}
-        <TableRow>
-          <TableCell
-            ><Link to={`/admin/raffles/${raffle.id}`}>Raffle {raffle.id}</Link
-            ></TableCell
-          >
-        </TableRow>
-      {/each}
-    {/if}
-  </Table>
+  {#if raffles}
+    <Table {columns} data={raffles} getId={({ id }) => id}></Table>
+  {/if}
 </section>
 
 <style>

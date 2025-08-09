@@ -1,6 +1,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import { Table, TableCell, TableRow } from "@climblive/lib/components";
+  import { Table, type ColumnDefinition } from "@climblive/lib/components";
+  import type { RaffleWinner } from "@climblive/lib/models";
   import {
     drawRaffleWinnerMutation,
     getRaffleQuery,
@@ -36,7 +37,28 @@
       },
     });
   };
+
+  const columns: ColumnDefinition<RaffleWinner>[] = [
+    {
+      label: "Name",
+      mobile: true,
+      render: renderName,
+    },
+    {
+      label: "Timestamp",
+      mobile: true,
+      render: renderTimestamp,
+    },
+  ];
 </script>
+
+{#snippet renderName({ contenderName }: RaffleWinner)}
+  {contenderName}
+{/snippet}
+
+{#snippet renderTimestamp({ timestamp }: RaffleWinner)}
+  {format(timestamp, "yyyy-MM-dd HH:mm")}
+{/snippet}
 
 {#if raffle}
   <section>
@@ -45,15 +67,11 @@
     >
 
     {#if sortedRaffleWinners?.length}
-      <Table columns={["Name", "Timestamp"]}>
-        {#each sortedRaffleWinners as winner (winner.id)}
-          <TableRow>
-            <TableCell>{winner.contenderName}</TableCell>
-            <TableCell>{format(winner.timestamp, "yyyy-MM-dd HH:mm")}</TableCell
-            >
-          </TableRow>
-        {/each}
-      </Table>
+      <Table
+        {columns}
+        data={sortedRaffleWinners}
+        getId={({ contenderId }) => contenderId}
+      ></Table>
     {/if}
   </section>
 {/if}
