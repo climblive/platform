@@ -11,7 +11,7 @@
     createContendersMutation,
     getContendersByContestQuery,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { ordinalSuperscript, toastError } from "@climblive/lib/utils";
 
   interface Props {
     contestId: number;
@@ -67,7 +67,9 @@
 
 {#snippet renderScore({ score }: Contender)}
   {#if score}
-    {score.placement} ({score.score})
+    {score.score} / {score.placement}<sup
+      >{ordinalSuperscript(score.placement)}</sup
+    >
   {/if}
 {/snippet}
 
