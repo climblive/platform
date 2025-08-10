@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Snippet } from "svelte";
+  import { onMount, type Snippet } from "svelte";
 
   type T = $$Generic<unknown>;
 
@@ -16,10 +16,20 @@
     getId: (row: T) => string | number;
   };
 
-  const mobile = $state(false);
+  let mobile = $state(false);
 
   const { columns, data, getId }: Props<T> = $props();
+
+  function handleResize() {
+    mobile = window.innerWidth < 768;
+  }
+
+  onMount(() => {
+    handleResize();
+  });
 </script>
+
+<svelte:window onresize={handleResize} />
 
 <table border="0">
   <thead>
