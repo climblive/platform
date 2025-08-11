@@ -33,7 +33,7 @@
       width: "minmax(max-content, 1fr)",
     },
     {
-      label: "Flash bonus",
+      label: "Flash",
       mobile: true,
       render: renderFlashBonus,
       width: "minmax(max-content, 1fr)",
@@ -64,12 +64,12 @@
 {/snippet}
 
 {#snippet renderPoints({ pointsTop }: Problem)}
-  {pointsTop}
+  {pointsTop} pts
 {/snippet}
 
 {#snippet renderFlashBonus({ flashBonus }: Problem)}
   {#if flashBonus}
-    {flashBonus}
+    {flashBonus} pts
   {:else}
     -
   {/if}
