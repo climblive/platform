@@ -2,7 +2,10 @@
   import ProblemForm, { formSchema } from "@/forms/ProblemForm.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { ProblemTemplate } from "@climblive/lib/models";
-  import { createProblemMutation } from "@climblive/lib/queries";
+  import {
+    createProblemMutation,
+    getProblemsQuery,
+  } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
@@ -11,6 +14,12 @@
   }
 
   let { contestId }: Props = $props();
+
+  const problemsQuery = $derived(getProblemsQuery(contestId));
+
+  let highestProblemNumber = $derived(
+    Math.max(...($problemsQuery.data?.map(({ number }) => number) ?? [])),
+  );
 
   const createProblem = $derived(createProblemMutation(contestId));
 
@@ -22,30 +31,32 @@
   };
 </script>
 
-<ProblemForm
-  submit={handleSubmit}
-  data={{
-    number: 1,
-    holdColorPrimary: "#000000",
-    pointsTop: 100,
-    pointsZone: 0,
-    flashBonus: 0,
-  }}
-  schema={formSchema}
->
-  <div class="controls">
-    <wa-button
-      size="small"
-      type="button"
-      appearance="plain"
-      onclick={history.back()}>Cancel</wa-button
-    >
-    <wa-button
-      size="small"
-      type="submit"
-      loading={$createProblem.isPending}
-      variant="brand"
-      >Create
-    </wa-button>
-  </div>
-</ProblemForm>
+{#if highestProblemNumber}
+  <ProblemForm
+    submit={handleSubmit}
+    data={{
+      number: highestProblemNumber + 1,
+      holdColorPrimary: "#000000",
+      pointsTop: 100,
+      pointsZone: 0,
+      flashBonus: 0,
+    }}
+    schema={formSchema}
+  >
+    <div class="controls">
+      <wa-button
+        size="small"
+        type="button"
+        appearance="plain"
+        onclick={history.back()}>Cancel</wa-button
+      >
+      <wa-button
+        size="small"
+        type="submit"
+        loading={$createProblem.isPending}
+        variant="brand"
+        >Create
+      </wa-button>
+    </div>
+  </ProblemForm>
+{/if}

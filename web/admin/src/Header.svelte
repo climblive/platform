@@ -55,6 +55,7 @@
     padding-inline: var(--wa-space-xs);
     background-color: var(--wa-color-surface-lowered);
     height: 3.5rem;
+    gap: var(--wa-space-m);
   }
 
   .logo {
@@ -62,6 +63,7 @@
     height: var(--wa-font-size-xl);
     color: var(--wa-color-text-normal);
     padding-left: var(--wa-space-xs);
+    flex-shrink: 0;
   }
 
   @media print {

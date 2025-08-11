@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/details/details.js";
-  import type WaDetails from "@awesome.me/webawesome/dist/components/details/details.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import "@awesome.me/webawesome/dist/components/scroller/scroller.js";
   import "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
   import type WaTabGroup from "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
   import "@awesome.me/webawesome/dist/components/tab-panel/tab-panel.js";
@@ -18,7 +18,7 @@
   } from "@climblive/lib/queries";
   import { getApiUrl, toastError } from "@climblive/lib/utils";
   import { add } from "date-fns";
-  import { Link, navigate } from "svelte-routing";
+  import { navigate } from "svelte-routing";
   import CompClassList from "./CompClassList.svelte";
   import ContenderList from "./ContenderList.svelte";
   import ProblemList from "./ProblemList.svelte";
@@ -31,7 +31,6 @@
   let { contestId }: Props = $props();
 
   let tabGroup: WaTabGroup | undefined = $state();
-  let details: WaDetails | undefined = $state();
 
   const contestQuery = $derived(getContestQuery(contestId));
   const scoreEnginesQuery = $derived(getScoreEnginesQuery(contestId));
@@ -89,24 +88,19 @@
       <wa-tab slot="nav" panel="raffles">Raffles</wa-tab>
 
       <wa-tab-panel name="contest">
-        <wa-button onclick={handleDuplicationRequest} appearance="outlined"
-          >Duplicate
-          <wa-icon name="copy" slot="start"></wa-icon>
-        </wa-button>
-
-        <a href={`${getApiUrl()}/contests/${contestId}/results`}>
-          <wa-button appearance="outlined"
-            >Download results
-            <wa-icon name="download" slot="start"></wa-icon>
+        <div class="actions">
+          <wa-button onclick={handleDuplicationRequest} appearance="outlined"
+            >Duplicate
+            <wa-icon name="copy" slot="start"></wa-icon>
           </wa-button>
-        </a>
 
-        <Link to={`/admin/contests/${contestId}/tickets`}>
-          <wa-button appearance="outlined"
-            >Print tickets
-            <wa-icon name="print" slot="start"></wa-icon>
-          </wa-button>
-        </Link>
+          <a href={`${getApiUrl()}/contests/${contestId}/results`}>
+            <wa-button appearance="outlined"
+              >Download results
+              <wa-icon name="download" slot="start"></wa-icon>
+            </wa-button>
+          </a>
+        </div>
 
         <article>
           <LabeledText label="Description">
@@ -122,45 +116,13 @@
             {contest.qualifyingProblems}
           </LabeledText>
           {#if contest.rules}
-            <wa-details
-              onwa-after-show={() =>
-                details?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                  inline: "nearest",
-                })}
-              bind:this={details}
-              summary="Rules"
-            >
-              {@html contest.rules}
-            </wa-details>
+            <LabeledText label="Rules">
+              <wa-scroller orientation="vertical" style="max-height: 150px;">
+                {@html contest.rules}
+              </wa-scroller>
+            </LabeledText>
           {/if}
         </article>
-
-        <h2>Score Engines</h2>
-        {#each scoreEngines as engineInstanceId (engineInstanceId)}
-          <div>
-            <h3>{engineInstanceId}</h3>
-            <wa-button
-              variant="danger"
-              onclick={() => $stopScoreEngine.mutate(engineInstanceId)}
-              loading={$stopScoreEngine.isPending}
-              >Stop
-              <wa-icon name="stop" slot="start"></wa-icon>
-            </wa-button>
-          </div>
-        {/each}
-        {#if scoreEngines.length === 0}
-          <wa-button
-            appearance="outlined"
-            onclick={() =>
-              $startScoreEngine.mutate({
-                terminatedBy: add(new Date(), { hours: 6 }),
-              })}
-            loading={$startScoreEngine.isPending}
-            disabled={scoreEngines.length > 0}>Start engine</wa-button
-          >
-        {/if}
 
         <h2>Classes</h2>
         <wa-button
@@ -170,6 +132,40 @@
           >Create</wa-button
         >
         <CompClassList {contestId} />
+
+        <h2>Score Engines</h2>
+        <wa-callout variant="warning">
+          <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
+          <strong>Score engines are managed automatically</strong><br />
+          During an active contest, score engines are initiated and maintained without
+          manual intervention. Manual initiation of a score engine is typically only
+          necessary for re-scoring results after a contest has ended.
+        </wa-callout>
+        <br />
+
+        {#each scoreEngines as engineInstanceId (engineInstanceId)}
+          <wa-button
+            variant="danger"
+            onclick={() => $stopScoreEngine.mutate(engineInstanceId)}
+            loading={$stopScoreEngine.isPending}
+            >Stop engine
+            <wa-icon name="stop" slot="start"></wa-icon>
+          </wa-button>
+        {/each}
+        {#if scoreEngines.length === 0}
+          <wa-button
+            appearance="outlined"
+            variant="warning"
+            onclick={() =>
+              $startScoreEngine.mutate({
+                terminatedBy: add(new Date(), { hours: 6 }),
+              })}
+            loading={$startScoreEngine.isPending}
+            disabled={scoreEngines.length > 0}
+            >Start engine manually
+            <wa-icon name="play" slot="start"></wa-icon>
+          </wa-button>
+        {/if}
       </wa-tab-panel>
 
       <wa-tab-panel name="problems">
@@ -202,5 +198,10 @@
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-s);
+  }
+
+  .actions {
+    display: flex;
+    gap: var(--wa-space-xs);
   }
 </style>

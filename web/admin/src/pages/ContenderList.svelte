@@ -1,6 +1,9 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import "@awesome.me/webawesome/dist/components/input/input.js";
+  import type WaInput from "@awesome.me/webawesome/dist/components/input/input.js";
   import "@awesome.me/webawesome/dist/components/qr-code/qr-code.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type {
@@ -12,12 +15,16 @@
     getContendersByContestQuery,
   } from "@climblive/lib/queries";
   import { ordinalSuperscript, toastError } from "@climblive/lib/utils";
+  import { Link } from "svelte-routing";
 
   interface Props {
     contestId: number;
   }
 
   let { contestId }: Props = $props();
+
+  let dialog: WaDialog | undefined = $state();
+  let numberInput: WaInput | undefined = $state();
 
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
   const createContenders = $derived(createContendersMutation(contestId));
@@ -28,12 +35,16 @@
     contenders === undefined ? undefined : 500 - contenders.length,
   );
 
-  const increments = [1, 10, 100];
+  const handleOpenCreateDialog = async () => {
+    if (dialog) {
+      dialog.open = true;
+    }
+  };
 
-  const addContenders = async (args: CreateContendersArguments) => {
-    $createContenders.mutate(args, {
-      onError: () => toastError("Failed to create contenders."),
-    });
+  const closeDialog = () => {
+    if (dialog) {
+      dialog.open = false;
+    }
   };
 
   const columns: ColumnDefinition<Contender>[] = [
@@ -62,6 +73,19 @@
       width: "max-content",
     },
   ];
+
+  const handleCreate = () => {
+    if (numberInput) {
+      const args: CreateContendersArguments = {
+        number: Number(numberInput.value),
+      };
+
+      $createContenders.mutate(args, {
+        onSuccess: closeDialog,
+        onError: () => toastError("Failed to create contenders."),
+      });
+    }
+  };
 </script>
 
 {#snippet renderRegistrationCode({ registrationCode }: Contender)}
@@ -90,27 +114,68 @@
   <p>
     You have {remainingCodes} codes remaining out of your maximum allotted 500.
   </p>
-  <section>
-    {#each increments as increment (increment)}
-      <wa-button
-        size="small"
-        variant="brand"
-        appearance="accent"
-        loading={$createContenders.isPending}
-        disabled={!remainingCodes || remainingCodes < increment}
-        onclick={() => addContenders({ number: increment })}
-      >
-        <wa-icon slot="start" name="plus-lg"></wa-icon>
-        Add {increment} code{#if increment != 1}s{/if}
+  <wa-dialog bind:this={dialog} label="Create contender tickets">
+    <div class="dialog-content">
+      <wa-callout variant="neutral">
+        <wa-icon slot="icon" name="circle-exclamation"></wa-icon>
+        You have {remainingCodes} codes remaining out of your maximum allotted 500.
+      </wa-callout>
+
+      <wa-input
+        bind:this={numberInput}
+        name="number"
+        type="number"
+        value="100"
+        min="1"
+        max={remainingCodes}
+      ></wa-input>
+    </div>
+
+    <wa-button slot="footer" appearance="plain" onclick={closeDialog}
+      >Cancel</wa-button
+    >
+    <wa-button
+      slot="footer"
+      size="small"
+      variant="brand"
+      appearance="accent"
+      loading={$createContenders.isPending}
+      onclick={handleCreate}
+      type="submit"
+    >
+      Create
+    </wa-button>
+  </wa-dialog>
+
+  <div class="actions">
+    <wa-button
+      size="small"
+      variant="brand"
+      appearance="accent"
+      onclick={handleOpenCreateDialog}
+    >
+      <wa-icon slot="start" name="plus"></wa-icon>
+      Create tickets</wa-button
+    >
+    <Link to={`/admin/contests/${contestId}/tickets`}>
+      <wa-button appearance="outlined" size="small"
+        >Print tickets
+        <wa-icon name="print" slot="start"></wa-icon>
       </wa-button>
-    {/each}
-  </section>
+    </Link>
+  </div>
 
   <Table {columns} data={contenders} getId={({ id }) => id}></Table>
 {/if}
 
 <style>
-  section {
+  .dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-s);
+  }
+
+  .actions {
     display: flex;
     gap: var(--wa-space-xs);
   }
