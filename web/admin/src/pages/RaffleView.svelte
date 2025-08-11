@@ -43,11 +43,13 @@
       label: "Name",
       mobile: true,
       render: renderName,
+      width: "1fr",
     },
     {
       label: "Timestamp",
       mobile: true,
       render: renderTimestamp,
+      width: "max-content",
     },
   ];
 </script>

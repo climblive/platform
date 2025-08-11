@@ -24,16 +24,25 @@
       label: "Number",
       mobile: true,
       render: renderNumberAndColor,
+      width: "minmax(max-content, 3fr)",
     },
     {
       label: "Points",
       mobile: true,
       render: renderPoints,
+      width: "minmax(max-content, 1fr)",
+    },
+    {
+      label: "Flash bonus",
+      mobile: true,
+      render: renderFlashBonus,
+      width: "minmax(max-content, 1fr)",
     },
     {
       mobile: true,
       render: renderControls,
       align: "right",
+      width: "max-content",
     },
   ];
 </script>
@@ -43,17 +52,27 @@
   holdColorPrimary,
   holdColorSecondary,
 }: Problem)}
-  <HoldColorIndicator
-    --height="1.25rem"
-    --width="1.25rem"
-    primary={holdColorPrimary}
-    secondary={holdColorSecondary}
-  />
-  № {number}
+  <div class="number">
+    <HoldColorIndicator
+      --height="1.25rem"
+      --width="1.25rem"
+      primary={holdColorPrimary}
+      secondary={holdColorSecondary}
+    />
+    № {number}
+  </div>
 {/snippet}
 
 {#snippet renderPoints({ pointsTop }: Problem)}
   {pointsTop}
+{/snippet}
+
+{#snippet renderFlashBonus({ flashBonus }: Problem)}
+  {#if flashBonus}
+    {flashBonus}
+  {:else}
+    -
+  {/if}
 {/snippet}
 
 {#snippet renderControls({ id }: Problem)}
@@ -90,5 +109,11 @@
   section {
     display: flex;
     gap: var(--wa-space-xs);
+  }
+
+  .number {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-s);
   }
 </style>

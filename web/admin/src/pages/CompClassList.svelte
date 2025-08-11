@@ -1,4 +1,7 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/format-date/format-date.js";
+  import "@awesome.me/webawesome/dist/components/relative-time/relative-time.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { CompClass } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
@@ -10,7 +13,7 @@
     contestId: number;
   }
 
-  let { contestId }: Props = $props();
+  const { contestId }: Props = $props();
 
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
 
@@ -21,21 +24,25 @@
       label: "Name",
       mobile: true,
       render: renderName,
+      width: "1fr",
     },
     {
       label: "Start time",
       mobile: true,
       render: renderTimeBegin,
+      width: "max-content",
     },
     {
       label: "End time",
       mobile: false,
       render: renderTimeEnd,
+      width: "max-content",
     },
     {
       mobile: true,
       render: renderControls,
       align: "right",
+      width: "max-content",
     },
   ];
 </script>
@@ -53,27 +60,27 @@
 {/snippet}
 
 {#snippet renderControls({ id }: CompClass)}
-  <wa-button
-    size="small"
-    appearance="plain"
-    onclick={() => navigate(`/admin/comp-classes/${id}/edit`)}
-    label="Edit"
-  >
-    <wa-icon name="pencil"></wa-icon>
-  </wa-button>
-  <DeleteCompClass compClassId={id}>
-    {#snippet children({ deleteCompClass })}
-      <wa-button
-        size="small"
-        variant="danger"
-        appearance="plain"
-        onclick={deleteCompClass}
-        label={`Delete comp class ${id}`}
-      >
-        <wa-icon name="trash"></wa-icon>
-      </wa-button>
-    {/snippet}
-  </DeleteCompClass>
+  <div class="controls">
+    <wa-button
+      size="small"
+      appearance="plain"
+      onclick={() => navigate(`/admin/comp-classes/${id}/edit`)}
+    >
+      <wa-icon name="pencil" label="Edit"></wa-icon>
+    </wa-button>
+    <DeleteCompClass compClassId={id}>
+      {#snippet children({ deleteCompClass })}
+        <wa-button
+          size="small"
+          variant="danger"
+          appearance="plain"
+          onclick={deleteCompClass}
+        >
+          <wa-icon name="trash" label={`Delete comp class ${id}`}></wa-icon>
+        </wa-button>
+      {/snippet}
+    </DeleteCompClass>
+  </div>
 {/snippet}
 
 <section>
@@ -86,5 +93,9 @@
   section {
     display: flex;
     gap: var(--wa-space-xs);
+  }
+
+  .controls {
+    display: flex;
   }
 </style>

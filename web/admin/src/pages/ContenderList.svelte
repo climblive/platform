@@ -38,19 +38,28 @@
 
   const columns: ColumnDefinition<Contender>[] = [
     {
-      label: "Code",
-      mobile: true,
-      render: renderRegistrationCode,
-    },
-    {
       label: "Name",
       mobile: true,
       render: renderName,
+      width: "3fr",
     },
     {
       label: "Score",
       mobile: true,
       render: renderScore,
+      width: "max-content",
+    },
+    {
+      label: "Placement",
+      mobile: true,
+      render: renderPlacement,
+      width: "max-content",
+    },
+    {
+      label: "Code",
+      mobile: false,
+      render: renderRegistrationCode,
+      width: "max-content",
     },
   ];
 </script>
@@ -67,9 +76,13 @@
 
 {#snippet renderScore({ score }: Contender)}
   {#if score}
-    {score.score} / {score.placement}<sup
-      >{ordinalSuperscript(score.placement)}</sup
-    >
+    {score.score}
+  {/if}
+{/snippet}
+
+{#snippet renderPlacement({ score }: Contender)}
+  {#if score}
+    {score.placement}<sup>{ordinalSuperscript(score.placement)}</sup>
   {/if}
 {/snippet}
 

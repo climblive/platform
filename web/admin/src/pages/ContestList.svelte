@@ -43,16 +43,19 @@
       label: "Name",
       mobile: true,
       render: renderName,
+      width: "1fr",
     },
     {
       label: "Start time",
       mobile: true,
       render: renderTimeBegin,
+      width: "max-content",
     },
     {
       label: "End time",
       mobile: false,
       render: renderTimeEnd,
+      width: "max-content",
     },
   ];
 </script>
@@ -63,7 +66,7 @@
 
 {#snippet renderTimeBegin({ timeBegin }: Contest, mobile: boolean)}
   {#if timeBegin}
-    {format(timeBegin, mobile ? "HH:mm" : "yyyy-MM-dd HH:mm")}
+    {format(timeBegin, "yyyy-MM-dd HH:mm")}
   {/if}
 {/snippet}
 
