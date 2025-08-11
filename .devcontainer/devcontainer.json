@@ -21,7 +21,7 @@
     },
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
     "ghcr.io/devcontainers/features/node:1": {
-      "version": "20",
+      "version": "22",
       "pnpmVersion": "9.14.4"
     }
   },
