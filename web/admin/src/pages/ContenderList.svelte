@@ -128,6 +128,7 @@
         value="100"
         min="1"
         max={remainingCodes}
+        label="Number of tickets to create"
       ></wa-input>
     </div>
 
