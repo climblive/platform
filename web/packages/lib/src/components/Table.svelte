@@ -98,10 +98,6 @@
     }
   }
 
-  td {
-    padding-block: var(--wa-space-xs);
-  }
-
   th:first-of-type,
   td:first-of-type {
     padding-inline-start: var(--wa-space-s);
