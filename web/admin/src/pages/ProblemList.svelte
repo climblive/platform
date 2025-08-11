@@ -36,7 +36,7 @@
       label: "Flash",
       mobile: true,
       render: renderFlashBonus,
-      width: "minmax(max-content, 1fr)",
+      width: "max-content",
     },
     {
       mobile: true,
