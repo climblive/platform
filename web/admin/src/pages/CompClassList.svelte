@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { Table, TableCell, TableRow } from "@climblive/lib/components";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import { Table, type ColumnDefinition } from "@climblive/lib/components";
+  import type { CompClass } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
   import { format } from "date-fns";
   import { navigate } from "svelte-routing";
@@ -9,58 +11,89 @@
     contestId: number;
   }
 
-  let { contestId }: Props = $props();
+  const { contestId }: Props = $props();
 
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
 
   let compClasses = $derived($compClassesQuery.data);
+
+  const columns: ColumnDefinition<CompClass>[] = [
+    {
+      label: "Name",
+      mobile: true,
+      render: renderName,
+      width: "1fr",
+    },
+    {
+      label: "Start time",
+      mobile: true,
+      render: renderTimeBegin,
+      width: "max-content",
+    },
+    {
+      label: "End time",
+      mobile: false,
+      render: renderTimeEnd,
+      width: "max-content",
+    },
+    {
+      mobile: true,
+      render: renderControls,
+      align: "right",
+      width: "max-content",
+    },
+  ];
 </script>
 
+{#snippet renderName({ name }: CompClass)}
+  {name}
+{/snippet}
+
+{#snippet renderTimeBegin({ timeBegin }: CompClass)}
+  {format(timeBegin, "yyyy-MM-dd HH:mm")}
+{/snippet}
+
+{#snippet renderTimeEnd({ timeEnd }: CompClass)}
+  {format(timeEnd, "yyyy-MM-dd HH:mm")}
+{/snippet}
+
+{#snippet renderControls({ id }: CompClass)}
+  <div class="controls">
+    <wa-button
+      size="small"
+      appearance="plain"
+      onclick={() => navigate(`/admin/comp-classes/${id}/edit`)}
+    >
+      <wa-icon name="pencil" label="Edit"></wa-icon>
+    </wa-button>
+    <DeleteCompClass compClassId={id}>
+      {#snippet children({ deleteCompClass })}
+        <wa-button
+          size="small"
+          variant="danger"
+          appearance="plain"
+          onclick={deleteCompClass}
+        >
+          <wa-icon name="trash" label={`Delete comp class ${id}`}></wa-icon>
+        </wa-button>
+      {/snippet}
+    </DeleteCompClass>
+  </div>
+{/snippet}
+
 <section>
-  <Table columns={["Name", "Start time", "End time", ""]}>
-    {#if compClasses}
-      {#each compClasses as compClass (compClass.id)}
-        <TableRow>
-          <TableCell>{compClass.name}</TableCell>
-          <TableCell>
-            {format(compClass.timeBegin, "yyyy-MM-dd HH:mm")}
-          </TableCell>
-          <TableCell>
-            {format(compClass.timeEnd, "yyyy-MM-dd HH:mm")}
-          </TableCell>
-          <TableCell align="right">
-            <wa-button
-              size="small"
-              appearance="plain"
-              onclick={() =>
-                navigate(`/admin/comp-classes/${compClass.id}/edit`)}
-              label="Edit"
-            >
-              <wa-icon name="pencil"></wa-icon>
-            </wa-button>
-            <DeleteCompClass compClassId={compClass.id}>
-              {#snippet children({ deleteCompClass })}
-                <wa-button
-                  size="small"
-                  variant="danger"
-                  appearance="plain"
-                  onclick={deleteCompClass}
-                  label={`Delete comp class ${compClass.id}`}
-                >
-                  <wa-icon name="trash"></wa-icon>
-                </wa-button>
-              {/snippet}
-            </DeleteCompClass>
-          </TableCell>
-        </TableRow>
-      {/each}
-    {/if}
-  </Table>
+  {#if compClasses}
+    <Table {columns} data={compClasses} getId={({ id }) => id}></Table>
+  {/if}
 </section>
 
 <style>
   section {
     display: flex;
     gap: var(--wa-space-xs);
+  }
+
+  .controls {
+    display: flex;
   }
 </style>
