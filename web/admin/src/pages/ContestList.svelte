@@ -64,7 +64,7 @@
   <Link to="contests/{id}">{name}</Link>
 {/snippet}
 
-{#snippet renderTimeBegin({ timeBegin }: Contest, mobile: boolean)}
+{#snippet renderTimeBegin({ timeBegin }: Contest)}
   {#if timeBegin}
     {format(timeBegin, "yyyy-MM-dd HH:mm")}
   {/if}
