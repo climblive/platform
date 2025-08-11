@@ -30,7 +30,7 @@
       label: "Points",
       mobile: true,
       render: renderPoints,
-      width: "minmax(max-content, 1fr)",
+      width: "max-content",
     },
     {
       label: "Flash",
