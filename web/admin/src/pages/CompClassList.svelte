@@ -1,7 +1,5 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/format-date/format-date.js";
-  import "@awesome.me/webawesome/dist/components/relative-time/relative-time.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { CompClass } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
