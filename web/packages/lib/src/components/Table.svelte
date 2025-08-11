@@ -79,8 +79,32 @@
     border-collapse: separate;
     overflow: hidden;
     border-spacing: 0;
-    display: grid;
-    grid-template-rows: 1fr;
+  }
+
+  @supports (grid-template-columns: subgrid) {
+    table {
+      display: grid;
+      grid-template-rows: 1fr;
+    }
+
+    tbody,
+    thead,
+    tr {
+      display: grid;
+      grid-column: 1 / -1;
+      grid-template-columns: subgrid;
+      column-gap: var(--wa-space-m);
+      align-items: center;
+    }
+  }
+
+  td {
+    padding-block: var(--wa-space-xs);
+  }
+
+  th:first-of-type,
+  td:first-of-type {
+    padding-left: var(--wa-space-s);
   }
 
   thead {
@@ -94,23 +118,8 @@
     }
   }
 
-  tr {
-    padding-block: var(--wa-space-xs);
-    padding-inline: var(--wa-space-s);
-  }
-
   tbody tr {
-    min-height: 3.5rem;
-  }
-
-  tbody,
-  thead,
-  tr {
-    display: grid;
-    grid-column: 1 / -1;
-    grid-template-columns: subgrid;
-    column-gap: var(--wa-space-m);
-    align-items: center;
+    height: 3.5rem;
   }
 
   tr:nth-child(even) {
