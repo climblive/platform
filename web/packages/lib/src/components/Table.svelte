@@ -127,8 +127,10 @@
     height: 3.5rem;
   }
 
-  tr:nth-child(even) {
-    background-color: var(--wa-color-surface-raised);
+  tbody tr:not(:last-of-type) {
+    height: 3.5rem;
+    border-bottom: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-surface-raised);
   }
 
   tbody tr:hover {
