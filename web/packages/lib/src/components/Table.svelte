@@ -104,7 +104,12 @@
 
   th:first-of-type,
   td:first-of-type {
-    padding-left: var(--wa-space-s);
+    padding-inline-start: var(--wa-space-s);
+  }
+
+  th:last-of-type,
+  td:last-of-type {
+    padding-inline-end: var(--wa-space-s);
   }
 
   thead {
@@ -126,7 +131,7 @@
     background-color: var(--wa-color-surface-raised);
   }
 
-  tr:hover {
+  tbody tr:hover {
     background-color: var(--wa-color-surface-raised);
   }
 
