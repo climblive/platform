@@ -83,8 +83,8 @@
 
     <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleTabShow}>
       <wa-tab slot="nav" panel="contest">Contest</wa-tab>
-      <wa-tab slot="nav" panel="contenders">Contenders</wa-tab>
       <wa-tab slot="nav" panel="problems">Problems</wa-tab>
+      <wa-tab slot="nav" panel="results">Results</wa-tab>
       <wa-tab slot="nav" panel="raffles">Raffles</wa-tab>
 
       <wa-tab-panel name="contest">
@@ -179,8 +179,8 @@
         <ProblemList {contestId} />
       </wa-tab-panel>
 
-      <wa-tab-panel name="contenders">
-        <h2>Contenders</h2>
+      <wa-tab-panel name="results">
+        <h2>Results</h2>
         <ContenderList {contestId} />
       </wa-tab-panel>
 
