@@ -75,12 +75,19 @@
 
       <wa-tab-panel name="contest">
         <article>
-          <LabeledText label="Description">
-            {contest.description}
+          <LabeledText label="Name">
+            {contest.name}
           </LabeledText>
-          <LabeledText label="Location">
-            {contest.location}
-          </LabeledText>
+          {#if contest.description}
+            <LabeledText label="Description">
+              {contest.description}
+            </LabeledText>
+          {/if}
+          {#if contest.location}
+            <LabeledText label="Location">
+              {contest.location}
+            </LabeledText>
+          {/if}
           <LabeledText label="Finalists">
             {contest.finalists}
           </LabeledText>
