@@ -49,7 +49,7 @@
 </script>
 
 {#snippet renderRegistrationCode({ registrationCode }: Contender)}
-  <a href={`/${registrationCode}`} target="blank">
+  <a href={`/${registrationCode}`} target="_blank">
     {registrationCode}
   </a>
 {/snippet}
