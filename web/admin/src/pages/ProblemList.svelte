@@ -100,7 +100,7 @@
 {/snippet}
 
 <section>
-  {#if problems}
+  {#if problems?.length}
     <Table {columns} data={problems} getId={({ id }) => id}></Table>
   {/if}
 </section>

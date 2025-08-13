@@ -87,7 +87,7 @@
     divided into Males and Females. The contest duration is defined by the start
     and end times of these classes.
   </p>
-  {#if compClasses}
+  {#if compClasses?.length}
     <Table {columns} data={compClasses} getId={({ id }) => id}></Table>
   {/if}
 </section>
