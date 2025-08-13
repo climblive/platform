@@ -11,7 +11,6 @@
     getContendersByContestQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import { Link } from "svelte-routing";
 
   interface Props {
     contestId: number;
@@ -127,12 +126,12 @@
       <wa-icon slot="start" name="plus"></wa-icon>
       Create tickets</wa-button
     >
-    <Link to={`/admin/contests/${contestId}/tickets`}>
+    <a href={`/admin/contests/${contestId}/tickets?noheader`} target="_blank">
       <wa-button appearance="outlined" size="small"
         >Print tickets
         <wa-icon name="print" slot="start"></wa-icon>
       </wa-button>
-    </Link>
+    </a>
   </div>
 
   <p>
