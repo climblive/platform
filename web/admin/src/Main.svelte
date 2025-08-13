@@ -10,8 +10,8 @@
   import EditCompClass from "./pages/EditCompClass.svelte";
   import EditProblem from "./pages/EditProblem.svelte";
   import OrganizerView from "./pages/OrganizerView.svelte";
+  import PrintableTicketList from "./pages/PrintableTicketList.svelte";
   import RaffleView from "./pages/RaffleView.svelte";
-  import TicketList from "./pages/TicketList.svelte";
 </script>
 
 <Header />
@@ -63,7 +63,7 @@
     </Route>
     <Route path="/contests/:contestId/tickets">
       {#snippet children({ params }: { params: { contestId: number } })}
-        <TicketList contestId={Number(params.contestId)} />
+        <PrintableTicketList contestId={Number(params.contestId)} />
       {/snippet}
     </Route>
   </Router>
