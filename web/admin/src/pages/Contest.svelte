@@ -10,16 +10,15 @@
   import "@awesome.me/webawesome/dist/components/tab/tab.js";
   import { LabeledText } from "@climblive/lib/components";
   import {
-    duplicateContestMutation,
     getContestQuery,
     getScoreEnginesQuery,
     startScoreEngineMutation,
     stopScoreEngineMutation,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
   import { add } from "date-fns";
   import { navigate } from "svelte-routing";
   import CompClassList from "./CompClassList.svelte";
+  import DuplicateContest from "./DuplicateContest.svelte";
   import ProblemList from "./ProblemList.svelte";
   import RaffleList from "./RaffleList.svelte";
   import ResultsList from "./ResultsList.svelte";
@@ -37,7 +36,6 @@
   const scoreEnginesQuery = $derived(getScoreEnginesQuery(contestId));
   const startScoreEngine = $derived(startScoreEngineMutation(contestId));
   const stopScoreEngine = $derived(stopScoreEngineMutation());
-  const duplicateContest = $derived(duplicateContestMutation(contestId));
 
   let contest = $derived($contestQuery.data);
   let scoreEngines = $derived($scoreEnginesQuery.data);
@@ -54,19 +52,6 @@
     const { name } = event.detail;
     if (name) {
       window.location.hash = name;
-    }
-  };
-
-  const handleDuplicationRequest = async () => {
-    if (contest) {
-      $duplicateContest.mutate(undefined, {
-        onSuccess: (duplicate) => {
-          navigate(`/admin/contests/${duplicate.id}`);
-        },
-        onError: () => {
-          toastError("Failed to duplicate contest.");
-        },
-      });
     }
   };
 </script>
@@ -139,12 +124,7 @@
 
         <h2>Advanced</h2>
         <h3>Actions</h3>
-        <div class="actions">
-          <wa-button onclick={handleDuplicationRequest} appearance="outlined"
-            >Duplicate
-            <wa-icon name="copy" slot="start"></wa-icon>
-          </wa-button>
-        </div>
+        <DuplicateContest {contestId} />
         <h3>Score Engines</h3>
         <p>
           An active score engine collects all results during a contest and

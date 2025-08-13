@@ -39,8 +39,8 @@
 
 {@render children({ deleteProblem: handleDelete })}
 
-<wa-dialog bind:this={dialog} label="Are you sure?">
-  A problem is deleted permanently and cannot be restored.
+<wa-dialog bind:this={dialog} label="Delete problem">
+  Deleting a problem will permanently remove it and it cannot be restored.
   <wa-button slot="footer" appearance="plain" onclick={handleCancel}
     >Cancel</wa-button
   >
