@@ -16,13 +16,14 @@
     startScoreEngineMutation,
     stopScoreEngineMutation,
   } from "@climblive/lib/queries";
-  import { getApiUrl, toastError } from "@climblive/lib/utils";
+  import { toastError } from "@climblive/lib/utils";
   import { add } from "date-fns";
   import { navigate } from "svelte-routing";
   import CompClassList from "./CompClassList.svelte";
-  import ContenderList from "./ContenderList.svelte";
   import ProblemList from "./ProblemList.svelte";
   import RaffleList from "./RaffleList.svelte";
+  import ResultsList from "./ResultsList.svelte";
+  import TicketsList from "./TicketsList.svelte";
 
   interface Props {
     contestId: number;
@@ -88,20 +89,6 @@
       <wa-tab slot="nav" panel="raffles">Raffles</wa-tab>
 
       <wa-tab-panel name="contest">
-        <div class="actions">
-          <wa-button onclick={handleDuplicationRequest} appearance="outlined"
-            >Duplicate
-            <wa-icon name="copy" slot="start"></wa-icon>
-          </wa-button>
-
-          <a href={`${getApiUrl()}/contests/${contestId}/results`}>
-            <wa-button appearance="outlined"
-              >Download results
-              <wa-icon name="download" slot="start"></wa-icon>
-            </wa-button>
-          </a>
-        </div>
-
         <article>
           <LabeledText label="Description">
             {contest.description}
@@ -133,19 +120,48 @@
         >
         <CompClassList {contestId} />
 
-        <h2>Score Engines</h2>
+        <h2>Problems</h2>
+        <p>
+          Problems are created and managed under the <a
+            href="#problems"
+            onclick={(e: MouseEvent) => {
+              if (tabGroup) {
+                tabGroup.active = "problems";
+              }
+
+              e.preventDefault();
+            }}>Problems</a
+          > tab.
+        </p>
+
+        <h2>Tickets</h2>
+        <TicketsList {contestId} />
+
+        <h2>Advanced</h2>
+        <h3>Actions</h3>
+        <div class="actions">
+          <wa-button onclick={handleDuplicationRequest} appearance="outlined"
+            >Duplicate
+            <wa-icon name="copy" slot="start"></wa-icon>
+          </wa-button>
+        </div>
+        <h3>Score Engines</h3>
+        <p>
+          An active score engine collects all results during a contest and
+          computes scores and rankings for all participants.
+        </p>
         <wa-callout variant="warning">
           <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
           <strong>Score engines are managed automatically</strong><br />
-          During an active contest, score engines are initiated and maintained without
-          manual intervention. Manual initiation of a score engine is typically only
-          necessary for re-scoring results after a contest has ended.
+          Score engines are started automatically, and manual intervention is typically
+          only required for re-scoring results long after a contest has concluded.
         </wa-callout>
         <br />
 
         {#each scoreEngines as engineInstanceId (engineInstanceId)}
           <wa-button
-            variant="danger"
+            appearance="outlined"
+            variant="warning"
             onclick={() => $stopScoreEngine.mutate(engineInstanceId)}
             loading={$stopScoreEngine.isPending}
             >Stop engine
@@ -181,7 +197,7 @@
 
       <wa-tab-panel name="results">
         <h2>Results</h2>
-        <ContenderList {contestId} />
+        <ResultsList {contestId} />
       </wa-tab-panel>
 
       <wa-tab-panel name="raffles">
@@ -203,5 +219,9 @@
   .actions {
     display: flex;
     gap: var(--wa-space-xs);
+  }
+
+  wa-tab-panel::part(base) {
+    padding-top: var(--wa-space-s);
   }
 </style>

@@ -82,17 +82,17 @@
 {/snippet}
 
 <section>
+  <p>
+    Classes represent the categories in which contenders compete, typically
+    divided into Males and Females. The contest duration is defined by the start
+    and end times of these classes.
+  </p>
   {#if compClasses}
     <Table {columns} data={compClasses} getId={({ id }) => id}></Table>
   {/if}
 </section>
 
 <style>
-  section {
-    display: flex;
-    gap: var(--wa-space-xs);
-  }
-
   .controls {
     display: flex;
   }
