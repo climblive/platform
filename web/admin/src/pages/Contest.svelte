@@ -104,12 +104,6 @@
         </article>
 
         <h2>Classes</h2>
-        <wa-button
-          variant="brand"
-          appearance="accent"
-          onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
-          >Create</wa-button
-        >
         <CompClassList {contestId} />
 
         <h2>Problems</h2>
