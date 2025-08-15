@@ -128,7 +128,7 @@
         <wa-icon slot="start" name="plus"></wa-icon>
         Create tickets</wa-button
       >
-      <a href={`/admin/contests/${contestId}/tickets?noheader`} target="_blank">
+      <a href={`/admin/contests/${contestId}/tickets?print`} target="_blank">
         <wa-button appearance="outlined" size="small"
           >Print tickets
           <wa-icon name="print" slot="start"></wa-icon>

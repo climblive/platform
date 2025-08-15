@@ -7,10 +7,14 @@ import {
 } from "@climblive/lib/utils";
 import { mount } from "svelte";
 
-watchColorSchemeChanges((prefersDarkColorScheme) =>
-  updateTheme(prefersDarkColorScheme),
-);
-updateTheme(prefersDarkColorScheme());
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get("print") === null) {
+  watchColorSchemeChanges((prefersDarkColorScheme) =>
+    updateTheme(prefersDarkColorScheme),
+  );
+
+  updateTheme(prefersDarkColorScheme());
+}
 
 const app = mount(App, {
   target: document.body,

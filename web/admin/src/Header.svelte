@@ -18,7 +18,7 @@
 
   let select: WaSelect | undefined = $state();
 
-  let noHeader = $state(false);
+  let print = $state(false);
 
   const handleChange = () => {
     if (select) {
@@ -30,14 +30,13 @@
 
   onMount(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    console.log("asd", urlParams);
-    if (urlParams.get("noheader") !== null) {
-      noHeader = true;
+    if (urlParams.get("print") !== null) {
+      print = true;
     }
   });
 </script>
 
-{#if !noHeader}
+{#if !print}
   <header>
     <p class="logo">
       <FullLogo />
