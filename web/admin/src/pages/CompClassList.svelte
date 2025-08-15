@@ -1,5 +1,6 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/card/card.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { CompClass } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
@@ -82,22 +83,24 @@
 {/snippet}
 
 <section>
-  {#if compClasses?.length}
-    <wa-button
-      variant="brand"
-      appearance="accent"
-      onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
-      >Create</wa-button
-    >
+  <wa-card class="card-header">
+    {#if compClasses?.length}
+      <wa-button
+        variant="brand"
+        appearance="accent"
+        onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
+        >Create</wa-button
+      >
 
-    <p class="copy">
-      Classes represent the categories in which contenders compete, typically
-      divided into Males and Females. The contest duration is defined by the
-      start and end times of these classes.
-    </p>
+      <p class="copy">
+        Classes represent the categories in which contenders compete, typically
+        divided into Males and Females. The contest duration is defined by the
+        start and end times of these classes.
+      </p>
 
-    <Table {columns} data={compClasses} getId={({ id }) => id}></Table>
-  {/if}
+      <Table {columns} data={compClasses} getId={({ id }) => id}></Table>
+    {/if}
+  </wa-card>
 </section>
 
 <style>

@@ -1,5 +1,6 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/card/card.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
@@ -71,72 +72,74 @@
 </script>
 
 {#if contenders}
-  <p>
-    Tickets hold unique registration codes, granting contenders access to your
-    contest. These tickets may be printed on paper and distributed to the
-    contenders on site.
-    {#if contenders.length > 0}
-      Out of the {contenders.length}
-      tickets that you have created, {registeredContenders} have already been used.
-    {/if}
-  </p>
+  <wa-card class="card-header">
+    <p>
+      Tickets hold unique registration codes, granting contenders access to your
+      contest. These tickets may be printed on paper and distributed to the
+      contenders on site.
+      {#if contenders.length > 0}
+        Out of the {contenders.length}
+        tickets that you have created, {registeredContenders} have already been used.
+      {/if}
+    </p>
 
-  <wa-dialog bind:this={dialog} label="Create contender tickets">
-    <div class="dialog-content">
-      <wa-callout variant="neutral">
-        <wa-icon slot="icon" name="circle-exclamation"></wa-icon>
-        You have {remainingCodes} tickets remaining out of your maximum allotted
-        500.
-      </wa-callout>
+    <wa-dialog bind:this={dialog} label="Create contender tickets">
+      <div class="dialog-content">
+        <wa-callout variant="neutral">
+          <wa-icon slot="icon" name="circle-exclamation"></wa-icon>
+          You have {remainingCodes} tickets remaining out of your maximum allotted
+          500.
+        </wa-callout>
 
-      <wa-input
-        bind:this={numberInput}
-        name="number"
-        type="number"
-        value="100"
-        min="1"
-        max={remainingCodes}
-        label="Number of tickets to create"
-      ></wa-input>
+        <wa-input
+          bind:this={numberInput}
+          name="number"
+          type="number"
+          value="100"
+          min="1"
+          max={remainingCodes}
+          label="Number of tickets to create"
+        ></wa-input>
+      </div>
+
+      <wa-button slot="footer" appearance="plain" onclick={closeDialog}
+        >Cancel</wa-button
+      >
+      <wa-button
+        slot="footer"
+        size="small"
+        variant="brand"
+        appearance="accent"
+        loading={$createContenders.isPending}
+        onclick={handleCreate}
+        type="submit"
+      >
+        Create
+      </wa-button>
+    </wa-dialog>
+
+    <div class="actions">
+      <wa-button
+        size="small"
+        variant="brand"
+        appearance="accent"
+        onclick={handleOpenCreateDialog}
+      >
+        <wa-icon slot="start" name="plus"></wa-icon>
+        Create tickets</wa-button
+      >
+      <a href={`/admin/contests/${contestId}/tickets?noheader`} target="_blank">
+        <wa-button appearance="outlined" size="small"
+          >Print tickets
+          <wa-icon name="print" slot="start"></wa-icon>
+        </wa-button>
+      </a>
     </div>
 
-    <wa-button slot="footer" appearance="plain" onclick={closeDialog}
-      >Cancel</wa-button
-    >
-    <wa-button
-      slot="footer"
-      size="small"
-      variant="brand"
-      appearance="accent"
-      loading={$createContenders.isPending}
-      onclick={handleCreate}
-      type="submit"
-    >
-      Create
-    </wa-button>
-  </wa-dialog>
-
-  <div class="actions">
-    <wa-button
-      size="small"
-      variant="brand"
-      appearance="accent"
-      onclick={handleOpenCreateDialog}
-    >
-      <wa-icon slot="start" name="plus"></wa-icon>
-      Create tickets</wa-button
-    >
-    <a href={`/admin/contests/${contestId}/tickets?noheader`} target="_blank">
-      <wa-button appearance="outlined" size="small"
-        >Print tickets
-        <wa-icon name="print" slot="start"></wa-icon>
-      </wa-button>
-    </a>
-  </div>
-
-  <p>
-    You may create {remainingCodes} more tickets.
-  </p>
+    <p>
+      You may create {remainingCodes} more tickets.
+    </p>
+  </wa-card>
 {/if}
 
 <style>
