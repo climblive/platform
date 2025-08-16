@@ -39,7 +39,7 @@ const (
 )
 
 func main() {
-	var registrationCodes []string = strings.Split(codes, "\n")
+	registrationCodes := strings.Split(codes, "\n")
 
 	var wg sync.WaitGroup
 	var metricsMutex sync.Mutex
@@ -163,7 +163,7 @@ func (r *ContenderRunner) GetContender() domain.Contender {
 
 	r.events <- RequestSent
 
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	contender := domain.Contender{}
 
@@ -196,7 +196,7 @@ func (r *ContenderRunner) PatchContender(contenderID domain.ContenderID, patch d
 
 	r.events <- RequestSent
 
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	var contender domain.Contender
 
@@ -216,7 +216,7 @@ func (r *ContenderRunner) GetCompClasses(contestID domain.ContestID) []domain.Co
 
 	r.events <- RequestSent
 
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	compClasses := []domain.CompClass{}
 
@@ -236,7 +236,7 @@ func (r *ContenderRunner) GetProblems(contestID domain.ContestID) []domain.Probl
 
 	r.events <- RequestSent
 
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	problems := []domain.Problem{}
 
@@ -263,7 +263,7 @@ func (r *ContenderRunner) GetTicks(contenderID domain.ContenderID) []domain.Tick
 
 	r.events <- RequestSent
 
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	ticks := []domain.Tick{}
 
@@ -290,7 +290,7 @@ func (r *ContenderRunner) DeleteTick(tickID domain.TickID) {
 
 	r.events <- RequestSent
 
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 }
 
 func (r *ContenderRunner) AddTick(contenderID domain.ContenderID, tick domain.Tick) domain.Tick {
@@ -314,7 +314,7 @@ func (r *ContenderRunner) AddTick(contenderID domain.ContenderID, tick domain.Ti
 
 	r.events <- RequestSent
 
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	err = json.NewDecoder(resp.Body).Decode(&tick)
 	if err != nil {
@@ -339,7 +339,7 @@ func (r *ContenderRunner) ReadEvents(contenderID domain.ContenderID) {
 
 	r.events <- RequestSent
 
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	reader := bufio.NewReader(resp.Body)
 
