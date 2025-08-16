@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/card/card.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
@@ -21,6 +22,8 @@
 
   let dialog: WaDialog | undefined = $state();
   let numberInput: WaInput | undefined = $state();
+
+  let newTicketsAvailableForPrint = $state(false);
 
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
   const createContenders = $derived(createContendersMutation(contestId));
@@ -64,7 +67,10 @@
       };
 
       $createContenders.mutate(args, {
-        onSuccess: closeDialog,
+        onSuccess: () => {
+          newTicketsAvailableForPrint = true;
+          closeDialog();
+        },
         onError: () => toastError("Failed to create contenders."),
       });
     }
@@ -128,12 +134,19 @@
         <wa-icon slot="start" name="plus"></wa-icon>
         Create tickets</wa-button
       >
-      <a href={`/admin/contests/${contestId}/tickets?print`} target="_blank">
-        <wa-button appearance="outlined" size="small"
-          >Print tickets
-          <wa-icon name="print" slot="start"></wa-icon>
-        </wa-button>
-      </a>
+      {#if contenders.length > 0}
+        <a href={`/admin/contests/${contestId}/tickets?print`} target="_blank">
+          <wa-button appearance="outlined" size="small"
+            >Print tickets
+            <wa-icon name="print" slot="start"></wa-icon>
+            <wa-badge
+              variant="neutral"
+              attention={newTicketsAvailableForPrint ? "pulse" : undefined}
+              pill>{contenders.length}</wa-badge
+            >
+          </wa-button>
+        </a>
+      {/if}
     </div>
 
     <p>
