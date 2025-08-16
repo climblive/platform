@@ -23,7 +23,7 @@
   import ProblemList from "./ProblemList.svelte";
   import RaffleList from "./RaffleList.svelte";
   import ResultsList from "./ResultsList.svelte";
-  import TicketsList from "./TicketsList.svelte";
+  import TicketList from "./TicketList.svelte";
 
   interface Props {
     contestId: number;
@@ -104,11 +104,10 @@
           {/if}
         </article>
 
-        <h2>Classes</h2>
         <CompClassList {contestId} />
 
-        <h2>Problems</h2>
         <wa-card>
+          <h2 slot="header">Problems</h2>
           <p>
             Problems are created and managed under the <a
               href="#problems"
@@ -123,11 +122,10 @@
           </p>
         </wa-card>
 
-        <h2>Tickets</h2>
-        <TicketsList {contestId} />
+        <TicketList {contestId} />
 
-        <h2>Advanced</h2>
         <wa-card>
+          <h2 slot="header">Advanced</h2>
           <h3>Actions</h3>
           <DuplicateContest {contestId} />
           <h3>Score Engines</h3>
@@ -202,12 +200,13 @@
     gap: var(--wa-space-s);
   }
 
-  .actions {
-    display: flex;
-    gap: var(--wa-space-xs);
-  }
-
   wa-tab-panel::part(base) {
     padding-top: var(--wa-space-s);
+  }
+
+  wa-tab-panel[name="contest"]::part(base) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-l);
   }
 </style>

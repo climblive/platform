@@ -79,7 +79,9 @@
 
 {#if contenders}
   <wa-card class="card-header">
-    <p>
+    <h2 slot="header">Tickets</h2>
+
+    <p slot="header" class="copy">
       Tickets hold unique registration codes, granting contenders access to your
       contest. These tickets may be printed on paper and distributed to the
       contenders on site.
@@ -165,5 +167,9 @@
   .actions {
     display: flex;
     gap: var(--wa-space-xs);
+  }
+
+  .copy {
+    color: var(--wa-color-text-quiet);
   }
 </style>
