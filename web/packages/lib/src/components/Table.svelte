@@ -79,6 +79,9 @@
     border-collapse: separate;
     overflow: hidden;
     border-spacing: 0;
+    border: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-neutral-border-quiet);
+    border-radius: var(--wa-border-radius-m);
   }
 
   @supports (grid-template-columns: subgrid) {
@@ -109,9 +112,9 @@
   }
 
   thead {
-    height: 2.5rem;
-    background-color: var(--wa-color-brand-fill-normal);
-    color: var(--wa-color-brand-on-normal);
+    height: 3rem;
+    background-color: var(--wa-color-neutral-fill-quiet);
+    color: var(--wa-color-neutral-on-normal);
 
     & th {
       font-weight: var(--wa-font-weight-bold);
