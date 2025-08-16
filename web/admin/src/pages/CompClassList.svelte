@@ -84,20 +84,20 @@
 
 <section>
   <wa-card class="card-header">
+    <wa-button
+      variant="brand"
+      appearance="accent"
+      onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
+      >Create</wa-button
+    >
+
+    <p class="copy">
+      Classes represent the categories in which contenders compete, typically
+      divided into Males and Females. The contest duration is defined by the
+      start and end times of these classes.
+    </p>
+
     {#if compClasses?.length}
-      <wa-button
-        variant="brand"
-        appearance="accent"
-        onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
-        >Create</wa-button
-      >
-
-      <p class="copy">
-        Classes represent the categories in which contenders compete, typically
-        divided into Males and Females. The contest duration is defined by the
-        start and end times of these classes.
-      </p>
-
       <Table {columns} data={compClasses} getId={({ id }) => id}></Table>
     {/if}
   </wa-card>
