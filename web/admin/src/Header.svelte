@@ -6,7 +6,7 @@
   import { FullLogo } from "@climblive/lib/components";
   import { value } from "@climblive/lib/forms";
   import { getSelfQuery } from "@climblive/lib/queries";
-  import { getContext } from "svelte";
+  import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import { type Writable } from "svelte/store";
 
@@ -18,6 +18,8 @@
 
   let select: WaSelect | undefined = $state();
 
+  let print = $state(false);
+
   const handleChange = () => {
     if (select) {
       const organizerId = Number(select.value);
@@ -25,27 +27,36 @@
       navigate(`/admin/organizers/${organizerId}`);
     }
   };
+
+  onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("print") !== null) {
+      print = true;
+    }
+  });
 </script>
 
-<header>
-  <p class="logo">
-    <FullLogo />
-  </p>
-  {#if self && self.organizers.length > 1}
-    <wa-select
-      bind:this={select}
-      size="small"
-      appearance="filled"
-      {@attach value($selectedOrganizer)}
-      onchange={handleChange}
-    >
-      <wa-icon name="id-badge" slot="start"></wa-icon>
-      {#each self.organizers as organizer (organizer.id)}
-        <wa-option value={organizer.id}>{organizer.name}</wa-option>
-      {/each}
-    </wa-select>
-  {/if}
-</header>
+{#if !print}
+  <header>
+    <p class="logo">
+      <FullLogo />
+    </p>
+    {#if self && self.organizers.length > 1}
+      <wa-select
+        bind:this={select}
+        size="small"
+        appearance="filled"
+        {@attach value($selectedOrganizer)}
+        onchange={handleChange}
+      >
+        <wa-icon name="id-badge" slot="start"></wa-icon>
+        {#each self.organizers as organizer (organizer.id)}
+          <wa-option value={organizer.id}>{organizer.name}</wa-option>
+        {/each}
+      </wa-select>
+    {/if}
+  </header>
+{/if}
 
 <style>
   header {
@@ -55,6 +66,7 @@
     padding-inline: var(--wa-space-xs);
     background-color: var(--wa-color-surface-lowered);
     height: 3.5rem;
+    gap: var(--wa-space-m);
   }
 
   .logo {
@@ -62,6 +74,7 @@
     height: var(--wa-font-size-xl);
     color: var(--wa-color-text-normal);
     padding-left: var(--wa-space-xs);
+    flex-shrink: 0;
   }
 
   @media print {

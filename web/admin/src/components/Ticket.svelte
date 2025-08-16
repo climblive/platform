@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { FullLogo } from "@climblive/lib/components";
+  import logoUrl from "@/assets/logo.svg";
   import SvgQR from "@svelte-put/qr/svg/QR.svelte";
 
   type Props = {
@@ -16,15 +16,16 @@
     <span class="link">Register at {location.protocol}//{location.host}</span>
     <span class="code">{registrationCode}</span>
   </div>
-  <p class="logo">
-    <FullLogo />
-  </p>
   <SvgQR
     data={`${location.protocol}//${location.host}/${registrationCode}`}
     width={80}
     margin={0}
     shape="circle"
     errorCorrectionLevel="Q"
+    logo={logoUrl}
+    anchorOuterFill="black"
+    moduleFill="black"
+    anchorInnerFill="#ea384c"
   />
 </section>
 
@@ -33,9 +34,9 @@
     width: 18cm;
     border: var(--wa-border-width-s) var(--wa-border-style)
       var(--wa-color-brand-border-normal);
-    border-radius: var(--wa-border-radius-m);
+    border-radius: var(--wa-border-radius-s);
     margin-block: var(--wa-space-m);
-    padding: var(--wa-space-m);
+    padding: var(--wa-space-s);
     display: flex;
     justify-content: space-between;
     align-items: center;
