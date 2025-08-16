@@ -59,7 +59,7 @@ func TestEventsHandler(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, "retry: 5000", string(line))
 
-		resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		server.Close()
 
@@ -99,7 +99,7 @@ func TestEventsHandler(t *testing.T) {
 
 		assert.Equal(t, []string{"retry: 5000", "", ":"}, lines)
 
-		resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		server.Close()
 
@@ -156,7 +156,7 @@ func TestEventsHandler(t *testing.T) {
 			`data: {"timestamp":"2024-12-01T00:00:00Z","contenderId":1,"score":100,"placement":10,"finalist":true,"rankOrder":9}`,
 		}, lines)
 
-		resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		server.Close()
 
@@ -218,7 +218,7 @@ func TestEventsHandler(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-		resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		server.Close()
 
