@@ -90,7 +90,7 @@
       label="Points for top"
       type="number"
       required
-      value={data.pointsTop}
+      value={data.pointsTop?.toString() ?? ""}
     ></wa-input>
     <wa-input
       size="small"
@@ -98,14 +98,14 @@
       label="Points for zone"
       type="number"
       required
-      value={data.pointsZone}
+      value={data.pointsZone?.toString() ?? ""}
     ></wa-input>
     <wa-input
       size="small"
       {@attach name("flashBonus")}
       label="Flash bonus"
       type="number"
-      value={data.flashBonus}
+      value={data.flashBonus?.toString() ?? ""}
     ></wa-input>
     {@render children?.()}
   </fieldset>
