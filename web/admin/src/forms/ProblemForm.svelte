@@ -7,7 +7,6 @@
     holdColorSecondary: z.string().optional(),
     description: z.string().optional(),
     pointsTop: z.coerce.number(),
-    pointsZone: z.coerce.number(),
     flashBonus: z.coerce.number().optional(),
   });
 </script>
@@ -91,14 +90,6 @@
       type="number"
       required
       value={data.pointsTop?.toString() ?? ""}
-    ></wa-input>
-    <wa-input
-      size="small"
-      {@attach name("pointsZone")}
-      label="Points for zone"
-      type="number"
-      required
-      value={data.pointsZone?.toString() ?? ""}
     ></wa-input>
     <wa-input
       size="small"
