@@ -113,8 +113,7 @@
 
   thead {
     height: 3rem;
-    background-color: var(--wa-color-neutral-fill-quiet);
-    color: var(--wa-color-neutral-on-quiet);
+    background-color: transparent;
 
     & th {
       font-weight: var(--wa-font-weight-bold);
@@ -126,10 +125,11 @@
     height: 3.5rem;
   }
 
+  thead,
   tbody tr:not(:last-of-type) {
     height: 3.5rem;
     border-bottom: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-color-surface-raised);
+      var(--wa-color-neutral-border-quiet);
   }
 
   tbody tr:hover {
