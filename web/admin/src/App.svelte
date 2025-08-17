@@ -14,7 +14,27 @@
 
   let authenticated = $state(false);
 
-  const selectedOrganizer = writable();
+  const selectedOrganizer = writable<number | undefined>();
+
+  const organizerId = localStorage.getItem("organizerId");
+  if (organizerId !== null) {
+    $selectedOrganizer = Number(organizerId);
+  }
+
+  $effect(() => {
+    if ($selectedOrganizer !== undefined) {
+      localStorage.setItem("organizerId", $selectedOrganizer.toString());
+    }
+  });
+
+  const handleStorageEvent = (e: StorageEvent) => {
+    if (e.key !== "organizerId") {
+      return;
+    }
+
+    $selectedOrganizer = Number(e.newValue);
+    navigate(`/admin/organizers/${e.newValue}`);
+  };
 
   setContext("selectedOrganizer", selectedOrganizer);
 
@@ -84,6 +104,8 @@
     }
   });
 </script>
+
+<svelte:window onstorage={handleStorageEvent} />
 
 <ErrorBoundary>
   {#await authenticate()}
