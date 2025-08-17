@@ -23,11 +23,14 @@
 
   const createProblem = $derived(createProblemMutation(contestId));
 
-  const handleSubmit = async (tmpl: ProblemTemplate) => {
-    $createProblem.mutate(tmpl, {
-      onSuccess: () => navigate(`/admin/contests/${contestId}#problems`),
-      onError: () => toastError("Failed to create problem."),
-    });
+  const handleSubmit = async (tmpl: Omit<ProblemTemplate, "pointsZone">) => {
+    $createProblem.mutate(
+      { ...tmpl, pointsZone: 0 },
+      {
+        onSuccess: () => navigate(`/admin/contests/${contestId}#problems`),
+        onError: () => toastError("Failed to create problem."),
+      },
+    );
   };
 </script>
 
@@ -38,7 +41,6 @@
       number: highestProblemNumber + 1,
       holdColorPrimary: "#000000",
       pointsTop: 100,
-      pointsZone: 0,
       flashBonus: 0,
     }}
     schema={formSchema}

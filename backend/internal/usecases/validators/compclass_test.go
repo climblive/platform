@@ -48,9 +48,9 @@ func TestCompClassValidator(t *testing.T) {
 		assert.True(t, validator.IsValidationError(err))
 	})
 
-	t.Run("TotalDurationExceedingTwelveHours", func(t *testing.T) {
+	t.Run("TotalDurationExceeding31Days", func(t *testing.T) {
 		compClass := validCompClass()
-		compClass.TimeEnd = compClass.TimeBegin.Add(12*time.Hour + time.Nanosecond)
+		compClass.TimeEnd = compClass.TimeBegin.Add(31*24*time.Hour + time.Nanosecond)
 
 		err := validator.Validate(compClass)
 
