@@ -1,6 +1,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import { onMount } from "svelte";
+  import { getContext, onMount } from "svelte";
+  import type { Writable } from "svelte/store";
   import ContestList from "./ContestList.svelte";
 
   interface Props {
@@ -9,8 +10,10 @@
 
   let { organizerId }: Props = $props();
 
+  const selectedOrganizer = getContext<Writable<number>>("selectedOrganizer");
+
   onMount(() => {
-    localStorage.setItem("organizerId", String(organizerId));
+    $selectedOrganizer = organizerId;
   });
 </script>
 
