@@ -1,7 +1,6 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
   import { Route, Router } from "svelte-routing";
-  import LastOrganizer from "./components/LastOrganizer.svelte";
   import Header from "./Header.svelte";
   import Contest from "./pages/Contest.svelte";
   import CreateCompClass from "./pages/CreateCompClass.svelte";
@@ -12,6 +11,7 @@
   import OrganizerView from "./pages/OrganizerView.svelte";
   import PrintableTicketList from "./pages/PrintableTicketList.svelte";
   import RaffleView from "./pages/RaffleView.svelte";
+  import Root from "./pages/Root.svelte";
 </script>
 
 <Header />
@@ -19,7 +19,7 @@
 <main>
   <Router basepath="/admin">
     <Route path="/">
-      <LastOrganizer />
+      <Root />
     </Route>
     <Route path="/organizers/:organizerId">
       {#snippet children({ params }: { params: { organizerId: number } })}
