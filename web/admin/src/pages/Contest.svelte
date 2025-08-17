@@ -168,6 +168,7 @@
 
   wa-tab-panel::part(base) {
     padding-top: var(--wa-space-s);
+    padding-inline: var(--wa-space-xs);
   }
 
   wa-tab-panel[name="contest"] h2 {
