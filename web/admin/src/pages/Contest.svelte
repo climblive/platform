@@ -2,7 +2,6 @@
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
-  import "@awesome.me/webawesome/dist/components/card/card.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/scroller/scroller.js";
   import "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
@@ -104,68 +103,74 @@
           {/if}
         </article>
 
+        <h2>Classes</h2>
+        <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
+        ></wa-divider>
         <CompClassList {contestId} />
 
-        <wa-card>
-          <h2 slot="header">Problems</h2>
-          <p>
-            Problems are created and managed under the <a
-              href="#problems"
-              onclick={(e: MouseEvent) => {
-                if (tabGroup) {
-                  tabGroup.active = "problems";
-                }
+        <h2>Problems</h2>
+        <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
+        ></wa-divider>
+        <p>
+          Problems are created and managed under the <a
+            href="#problems"
+            onclick={(e: MouseEvent) => {
+              if (tabGroup) {
+                tabGroup.active = "problems";
+              }
 
-                e.preventDefault();
-              }}>Problems</a
-            > tab.
-          </p>
-        </wa-card>
+              e.preventDefault();
+            }}>Problems</a
+          > tab.
+        </p>
 
+        <h2>Tickets</h2>
+        <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
+        ></wa-divider>
         <TicketList {contestId} />
 
-        <wa-card>
-          <h2 slot="header">Advanced</h2>
-          <h3>Actions</h3>
-          <DuplicateContest {contestId} />
-          <h3>Score Engines</h3>
-          <p>
-            An active score engine collects all results during a contest and
-            computes scores and rankings for all participants.
-          </p>
-          <wa-callout variant="warning">
-            <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
-            <strong>Score engines are managed automatically</strong><br />
-            Score engines are started automatically, and manual intervention is typically
-            only required for re-scoring results long after a contest has concluded.
-          </wa-callout>
-          <br />
+        <h2>Advanced</h2>
+        <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
+        ></wa-divider>
+        <h3>Actions</h3>
+        <DuplicateContest {contestId} />
+        <h3>Score Engines</h3>
+        <p>
+          An active score engine collects all results during a contest and
+          computes scores and rankings for all participants.
+        </p>
+        <wa-callout variant="warning">
+          <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
+          <strong>Score engines are managed automatically</strong><br />
+          Score engines are started automatically, and manual intervention is typically
+          only required for re-scoring results long after a contest has concluded.
+        </wa-callout>
+        <br />
 
-          {#each scoreEngines as engineInstanceId (engineInstanceId)}
-            <wa-button
-              appearance="outlined"
-              variant="warning"
-              onclick={() => $stopScoreEngine.mutate(engineInstanceId)}
-              loading={$stopScoreEngine.isPending}
-              >Stop engine
-              <wa-icon name="stop" slot="start"></wa-icon>
-            </wa-button>
-          {/each}
-          {#if scoreEngines.length === 0}
-            <wa-button
-              appearance="outlined"
-              variant="warning"
-              onclick={() =>
-                $startScoreEngine.mutate({
-                  terminatedBy: add(new Date(), { hours: 6 }),
-                })}
-              loading={$startScoreEngine.isPending}
-              disabled={scoreEngines.length > 0}
-              >Start engine manually
-              <wa-icon name="play" slot="start"></wa-icon>
-            </wa-button>
-          {/if}
-        </wa-card>
+        {#each scoreEngines as engineInstanceId (engineInstanceId)}
+          <wa-button
+            appearance="outlined"
+            variant="warning"
+            onclick={() => $stopScoreEngine.mutate(engineInstanceId)}
+            loading={$stopScoreEngine.isPending}
+            >Stop engine
+            <wa-icon name="stop" slot="start"></wa-icon>
+          </wa-button>
+        {/each}
+        {#if scoreEngines.length === 0}
+          <wa-button
+            appearance="outlined"
+            variant="warning"
+            onclick={() =>
+              $startScoreEngine.mutate({
+                terminatedBy: add(new Date(), { hours: 6 }),
+              })}
+            loading={$startScoreEngine.isPending}
+            disabled={scoreEngines.length > 0}
+            >Start engine manually
+            <wa-icon name="play" slot="start"></wa-icon>
+          </wa-button>
+        {/if}
       </wa-tab-panel>
 
       <wa-tab-panel name="problems">
@@ -204,9 +209,7 @@
     padding-top: var(--wa-space-s);
   }
 
-  wa-tab-panel[name="contest"]::part(base) {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wa-space-l);
+  wa-tab-panel[name="contest"] h2 {
+    margin-top: var(--wa-space-2xl);
   }
 </style>

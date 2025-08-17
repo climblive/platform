@@ -114,7 +114,7 @@
   thead {
     height: 3rem;
     background-color: var(--wa-color-neutral-fill-quiet);
-    color: var(--wa-color-neutral-on-normal);
+    color: var(--wa-color-neutral-on-quiet);
 
     & th {
       font-weight: var(--wa-font-weight-bold);
