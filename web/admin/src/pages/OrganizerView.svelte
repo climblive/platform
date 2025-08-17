@@ -10,7 +10,8 @@
 
   let { organizerId }: Props = $props();
 
-  const selectedOrganizer = getContext<Writable<number | undefined>>("selectedOrganizer");
+  const selectedOrganizer =
+    getContext<Writable<number | undefined>>("selectedOrganizer");
 
   onMount(() => {
     $selectedOrganizer = organizerId;
