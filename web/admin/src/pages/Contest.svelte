@@ -9,19 +9,14 @@
   import "@awesome.me/webawesome/dist/components/tab-panel/tab-panel.js";
   import "@awesome.me/webawesome/dist/components/tab/tab.js";
   import { LabeledText } from "@climblive/lib/components";
-  import {
-    getContestQuery,
-    getScoreEnginesQuery,
-    startScoreEngineMutation,
-    stopScoreEngineMutation,
-  } from "@climblive/lib/queries";
-  import { add } from "date-fns";
+  import { getContestQuery } from "@climblive/lib/queries";
   import { navigate } from "svelte-routing";
   import CompClassList from "./CompClassList.svelte";
   import DuplicateContest from "./DuplicateContest.svelte";
   import ProblemList from "./ProblemList.svelte";
   import RaffleList from "./RaffleList.svelte";
   import ResultsList from "./ResultsList.svelte";
+  import ScoreEngine from "./ScoreEngine.svelte";
   import TicketList from "./TicketList.svelte";
 
   interface Props {
@@ -33,12 +28,8 @@
   let tabGroup: WaTabGroup | undefined = $state();
 
   const contestQuery = $derived(getContestQuery(contestId));
-  const scoreEnginesQuery = $derived(getScoreEnginesQuery(contestId));
-  const startScoreEngine = $derived(startScoreEngineMutation(contestId));
-  const stopScoreEngine = $derived(stopScoreEngineMutation());
 
   let contest = $derived($contestQuery.data);
-  let scoreEngines = $derived($scoreEnginesQuery.data);
 
   $effect(() => {
     const hash = window.location.hash.substring(1);
@@ -57,7 +48,7 @@
 </script>
 
 <main>
-  {#if contest && scoreEngines}
+  {#if contest}
     <wa-button
       appearance="plain"
       onclick={() =>
@@ -139,38 +130,8 @@
           An active score engine collects all results during a contest and
           computes scores and rankings for all participants.
         </p>
-        <wa-callout variant="warning">
-          <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
-          <strong>Score engines are managed automatically</strong><br />
-          Score engines are started automatically, and manual intervention is typically
-          only required for re-scoring results long after a contest has concluded.
-        </wa-callout>
-        <br />
 
-        {#each scoreEngines as engineInstanceId (engineInstanceId)}
-          <wa-button
-            appearance="outlined"
-            variant="warning"
-            onclick={() => $stopScoreEngine.mutate(engineInstanceId)}
-            loading={$stopScoreEngine.isPending}
-            >Stop engine
-            <wa-icon name="stop" slot="start"></wa-icon>
-          </wa-button>
-        {/each}
-        {#if scoreEngines.length === 0}
-          <wa-button
-            appearance="outlined"
-            variant="warning"
-            onclick={() =>
-              $startScoreEngine.mutate({
-                terminatedBy: add(new Date(), { hours: 6 }),
-              })}
-            loading={$startScoreEngine.isPending}
-            disabled={scoreEngines.length > 0}
-            >Start engine manually
-            <wa-icon name="play" slot="start"></wa-icon>
-          </wa-button>
-        {/if}
+        <ScoreEngine {contestId} />
       </wa-tab-panel>
 
       <wa-tab-panel name="problems">
