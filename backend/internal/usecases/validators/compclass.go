@@ -18,7 +18,7 @@ func (v CompClassValidator) Validate(compClass domain.CompClass) error {
 		fallthrough
 	case compClass.TimeEnd.Before(compClass.TimeBegin):
 		fallthrough
-	case compClass.TimeEnd.Sub(compClass.TimeBegin) > 12*time.Hour:
+	case compClass.TimeEnd.Sub(compClass.TimeBegin) > 31*24*time.Hour:
 		return errors.Errorf("%w: %w", domain.ErrInvalidData, errCompClassConstraintViolation)
 	}
 
