@@ -36,6 +36,20 @@
       width: "max-content",
       align: "right",
     },
+    {
+      label: "Withdrawn from finals",
+      mobile: false,
+      render: renderWithdrawnFromFinals,
+      width: "max-content",
+      align: "right",
+    },
+    {
+      label: "Disqualified",
+      mobile: false,
+      render: renderDisqualified,
+      width: "max-content",
+      align: "right",
+    },
   ];
 </script>
 
@@ -53,6 +67,14 @@
   {#if score}
     {score.placement}<sup>{ordinalSuperscript(score.placement)}</sup>
   {/if}
+{/snippet}
+
+{#snippet renderWithdrawnFromFinals({ withdrawnFromFinals }: ScoreboardEntry)}
+  {withdrawnFromFinals}
+{/snippet}
+
+{#snippet renderDisqualified({ disqualified }: ScoreboardEntry)}
+  {disqualified}
 {/snippet}
 
 <Table
