@@ -17,9 +17,17 @@
 
   const problemsQuery = $derived(getProblemsQuery(contestId));
 
-  let highestProblemNumber = $derived(
-    Math.max(...($problemsQuery.data?.map(({ number }) => number) ?? [])),
-  );
+  let highestProblemNumber = $derived.by(() => {
+    if ($problemsQuery.data === undefined) {
+      return undefined;
+    } else if ($problemsQuery.data.length > 0) {
+      return Math.max(
+        ...($problemsQuery.data?.map(({ number }) => number) ?? []),
+      );
+    } else {
+      return 0;
+    }
+  });
 
   const createProblem = $derived(createProblemMutation(contestId));
 
@@ -34,7 +42,7 @@
   };
 </script>
 
-{#if highestProblemNumber}
+{#if highestProblemNumber !== undefined}
   <ProblemForm
     submit={handleSubmit}
     data={{
