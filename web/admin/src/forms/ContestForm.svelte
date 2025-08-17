@@ -15,6 +15,7 @@
 
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
   import { GenericForm, name } from "@climblive/lib/forms";
   import { type ContestTemplate } from "@climblive/lib/models";
   import { type Snippet } from "svelte";
@@ -75,14 +76,15 @@
     <wa-input
       size="small"
       {@attach name("gracePeriod")}
-      label="Grace period"
+      label="Grace period (minutes)"
       hint="Extra time after the end of the contest during which contenders can enter their last results"
       type="number"
       required
       min={0}
       max={60}
       value={data.gracePeriod}
-    ></wa-input>
+    >
+    </wa-input>
     <wa-textarea
       size="small"
       {@attach name("rules")}

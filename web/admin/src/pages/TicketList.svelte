@@ -13,6 +13,8 @@
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
 
+  const maxTickets = 500;
+
   interface Props {
     contestId: number;
   }
@@ -30,7 +32,7 @@
   let contenders = $derived($contendersQuery.data);
 
   let remainingCodes = $derived(
-    contenders === undefined ? undefined : 500 - contenders.length,
+    contenders === undefined ? undefined : maxTickets - contenders.length,
   );
 
   let registeredContenders = $derived.by(() => {
@@ -92,7 +94,7 @@
       <wa-callout variant="neutral">
         <wa-icon slot="icon" name="circle-exclamation"></wa-icon>
         You have {remainingCodes} tickets remaining out of your maximum allotted
-        500.
+        {maxTickets}.
       </wa-callout>
 
       <wa-input
@@ -148,7 +150,11 @@
   </div>
 
   <p>
-    You may create {remainingCodes} more tickets.
+    {#if remainingCodes === maxTickets}
+      You may create up to {maxTickets} tickets.
+    {:else}
+      You may create {remainingCodes} more tickets.
+    {/if}
   </p>
 {/if}
 

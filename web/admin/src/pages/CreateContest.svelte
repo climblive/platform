@@ -38,6 +38,7 @@
     finalists: 7,
     qualifyingProblems: 10,
     gracePeriod: 15,
+    rules: "",
   }}
 >
   <div class="controls">

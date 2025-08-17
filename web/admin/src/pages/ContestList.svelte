@@ -80,7 +80,7 @@
   size="large"
   variant="brand"
   onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
-  >Create</wa-button
+  >New contest</wa-button
 >
 
 {#snippet listing(heading: string, contests: Contest[])}

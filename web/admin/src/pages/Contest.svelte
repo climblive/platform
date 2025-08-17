@@ -108,6 +108,11 @@
         ></wa-divider>
         <CompClassList {contestId} />
 
+        <h2>Tickets</h2>
+        <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
+        ></wa-divider>
+        <TicketList {contestId} />
+
         <h2>Problems</h2>
         <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
         ></wa-divider>
@@ -123,11 +128,6 @@
             }}>Problems</a
           > tab.
         </p>
-
-        <h2>Tickets</h2>
-        <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
-        ></wa-divider>
-        <TicketList {contestId} />
 
         <h2>Advanced</h2>
         <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
