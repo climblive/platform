@@ -1,7 +1,7 @@
 <script lang="ts" module>
   import * as z from "zod";
 
-  const twelveHours = 12 * 60 * 60 * 1_000;
+  const oneMonth = 31 * 24 * 60 * 60 * 1_000;
 
   export const formSchema = z
     .object({
@@ -11,10 +11,10 @@
       timeEnd: z.coerce.date(),
     })
     .superRefine((data, ctx) => {
-      if (data.timeEnd.getTime() - data.timeBegin.getTime() > twelveHours) {
+      if (data.timeEnd.getTime() - data.timeBegin.getTime() > oneMonth) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Total duration must not exceed 12 hours",
+          message: "Total duration must not exceed 31 days",
           path: ["timeEnd"],
         });
       }
