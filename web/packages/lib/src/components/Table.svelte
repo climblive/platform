@@ -121,13 +121,17 @@
     }
   }
 
+  thead,
   tbody tr {
     height: 3.5rem;
   }
 
-  thead,
+  tbody tr:first-of-type {
+    border-top: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-neutral-border-quiet);
+  }
+
   tbody tr:not(:last-of-type) {
-    height: 3.5rem;
     border-bottom: var(--wa-border-width-s) var(--wa-border-style)
       var(--wa-color-neutral-border-quiet);
   }
