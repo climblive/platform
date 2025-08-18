@@ -54,3 +54,9 @@
     <wa-icon slot="start" name="trash"></wa-icon>
   </wa-button>
 </wa-dialog>
+
+<style>
+  wa-dialog {
+    white-space: normal;
+  }
+</style>
