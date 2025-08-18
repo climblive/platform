@@ -89,7 +89,7 @@
     {/if}
   </p>
 
-  <wa-dialog bind:this={dialog} label="Create contender tickets">
+  <wa-dialog bind:this={dialog} label="Create tickets">
     <div class="dialog-content">
       <wa-callout variant="neutral">
         <wa-icon slot="icon" name="circle-exclamation"></wa-icon>
