@@ -45,7 +45,7 @@
       <wa-select
         bind:this={select}
         size="small"
-        appearance="filled"
+        appearance="outlined filled"
         {@attach value($selectedOrganizer)}
         onchange={handleChange}
       >
