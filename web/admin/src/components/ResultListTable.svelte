@@ -4,16 +4,17 @@
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import "@awesome.me/webawesome/dist/components/qr-code/qr-code.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
-  import type { ScoreboardEntry } from "@climblive/lib/models";
+  import type { Contender, ScoreboardEntry } from "@climblive/lib/models";
   import { ordinalSuperscript } from "@climblive/lib/utils";
   import type { Readable } from "svelte/store";
 
   interface Props {
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
+    contenders: Map<number, Contender>;
     compClassId: number;
   }
 
-  const { scoreboard, compClassId }: Props = $props();
+  const { scoreboard, contenders, compClassId }: Props = $props();
 
   const columns: ColumnDefinition<ScoreboardEntry>[] = [
     {
@@ -37,24 +38,32 @@
       align: "right",
     },
     {
-      label: "Withdrawn from finals",
+      label: "Finalist",
       mobile: false,
-      render: renderWithdrawnFromFinals,
-      width: "max-content",
-      align: "right",
-    },
-    {
-      label: "Disqualified",
-      mobile: false,
-      render: renderDisqualified,
+      render: renderFinalist,
       width: "max-content",
       align: "right",
     },
   ];
+
+  $effect(() => console.log($scoreboard));
 </script>
 
-{#snippet renderName({ publicName }: ScoreboardEntry)}
-  {publicName}
+{#snippet renderName({
+  contenderId,
+  publicName,
+  disqualified,
+}: ScoreboardEntry)}
+  {@const contender = contenders.get(contenderId)}
+  {#if contender}
+    <a href={`/${contender.registrationCode}`} target="_blank">
+      {#if disqualified}
+        <strike>{publicName}</strike>
+      {:else}
+        {publicName}
+      {/if}
+    </a>
+  {/if}
 {/snippet}
 
 {#snippet renderScore({ score }: ScoreboardEntry)}
@@ -69,12 +78,8 @@
   {/if}
 {/snippet}
 
-{#snippet renderWithdrawnFromFinals({ withdrawnFromFinals }: ScoreboardEntry)}
-  {withdrawnFromFinals}
-{/snippet}
-
-{#snippet renderDisqualified({ disqualified }: ScoreboardEntry)}
-  {disqualified}
+{#snippet renderFinalist({ score, withdrawnFromFinals }: ScoreboardEntry)}
+  <wa-icon name={score?.finalist ? "medal" : "minus"}></wa-icon>
 {/snippet}
 
 <Table

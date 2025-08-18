@@ -26,7 +26,12 @@
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
 
-  let contenders = $derived($contendersQuery.data);
+  let contenders = $derived(
+    new Map(
+      $contendersQuery.data?.map((contender) => [contender.id, contender]) ??
+        [],
+    ),
+  );
   let compClasses = $derived($compClassesQuery.data);
 
   let selectedCompClassId: number | undefined = $state();
@@ -42,14 +47,12 @@
   });
 </script>
 
-{#if contenders?.length}
-  <a href={`${getApiUrl()}/contests/${contestId}/results`}>
-    <wa-button appearance="outlined"
-      >Download results
-      <wa-icon name="download" slot="start"></wa-icon>
-    </wa-button>
-  </a>
-{/if}
+<a href={`${getApiUrl()}/contests/${contestId}/results`}>
+  <wa-button appearance="outlined"
+    >Download results
+    <wa-icon name="download" slot="start"></wa-icon>
+  </wa-button>
+</a>
 
 {#if compClasses && compClasses.length > 1}
   <wa-select
@@ -71,7 +74,10 @@
 <ScoreboardProvider {contestId}>
   {#snippet children({ scoreboard })}
     {#if selectedCompClassId}
-      <ResultListTable {scoreboard} compClassId={selectedCompClassId}
+      <ResultListTable
+        {scoreboard}
+        {contenders}
+        compClassId={selectedCompClassId}
       ></ResultListTable>
     {/if}
   {/snippet}
