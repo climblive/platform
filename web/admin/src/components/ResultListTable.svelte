@@ -16,6 +16,8 @@
 
   const { scoreboard, contenders, compClassId }: Props = $props();
 
+  const data = $derived($scoreboard.get(compClassId) ?? []);
+
   const columns: ColumnDefinition<ScoreboardEntry>[] = [
     {
       label: "Name",
@@ -78,12 +80,10 @@
   {/if}
 {/snippet}
 
-{#snippet renderFinalist({ score, withdrawnFromFinals }: ScoreboardEntry)}
+{#snippet renderFinalist({ score }: ScoreboardEntry)}
   <wa-icon name={score?.finalist ? "medal" : "minus"}></wa-icon>
 {/snippet}
 
-<Table
-  {columns}
-  data={$scoreboard.get(compClassId) ?? []}
-  getId={({ contenderId }) => contenderId}
-></Table>
+{#if data && data.length > 0}
+  <Table {columns} {data} getId={({ contenderId }) => contenderId}></Table>
+{/if}
