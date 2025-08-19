@@ -96,7 +96,7 @@
   <p class="copy">
     Classes represent the categories in which the contenders compete, typically
     divided into Males and Females. The contest duration is defined by the start
-    and end times of these classes.
+    and end times of your classes.
   </p>
 
   <wa-button
