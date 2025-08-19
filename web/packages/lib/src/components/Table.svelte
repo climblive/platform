@@ -112,7 +112,6 @@
   }
 
   thead {
-    height: 3rem;
     background-color: transparent;
 
     & th {
