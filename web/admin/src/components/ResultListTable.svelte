@@ -16,7 +16,14 @@
 
   const { scoreboard, contenders, compClassId }: Props = $props();
 
-  const data = $derived($scoreboard.get(compClassId) ?? []);
+  const data = $derived.by(() => {
+    const scores = [...($scoreboard.get(compClassId) ?? [])];
+    scores.sort(
+      (a: ScoreboardEntry, b: ScoreboardEntry) =>
+        (a.score?.rankOrder ?? Infinity) - (b.score?.rankOrder ?? Infinity),
+    );
+    return scores;
+  });
 
   const columns: ColumnDefinition<ScoreboardEntry>[] = [
     {
