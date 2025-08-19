@@ -25,13 +25,13 @@
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
 
-  let contenders = $derived(
+  const contenders = $derived(
     new Map(
       $contendersQuery.data?.map((contender) => [contender.id, contender]) ??
         [],
     ),
   );
-  let compClasses = $derived($compClassesQuery.data);
+  const compClasses = $derived($compClassesQuery.data);
 
   let selectedCompClassId: number | undefined = $state();
 
