@@ -33,7 +33,9 @@
     </Route>
     <Route path="/contests/:contestId">
       {#snippet children({ params }: { params: { contestId: number } })}
-        <Contest contestId={Number(params.contestId)} />
+        {#key params.contestId}
+          <Contest contestId={Number(params.contestId)} />
+        {/key}
       {/snippet}
     </Route>
     <Route path="/contests/:contestId/new-comp-class">

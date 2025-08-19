@@ -32,6 +32,7 @@
   const confirmDuplication = () => {
     $duplicateContest.mutate(undefined, {
       onSuccess: (duplicate) => {
+        handleCancel();
         navigate(`/admin/contests/${duplicate.id}`);
       },
       onError: () => {
