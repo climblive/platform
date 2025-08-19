@@ -93,6 +93,12 @@
     window.location.href = url;
   };
 
+  const signup = () => {
+    const redirectUri = encodeURIComponent(window.location.origin + "/admin");
+    const url = `https://clmb.auth.eu-west-1.amazoncognito.com/signup?response_type=code&client_id=${configData.COGNITO_CLIENT_ID}&redirect_uri=${redirectUri}`;
+    window.location.href = url;
+  };
+
   onMount(() => {
     const regex = /^\/admin\/organizers\/(\d+)$/;
 
@@ -109,11 +115,24 @@
 
 <ErrorBoundary>
   {#await authenticate()}
-    <wa-spinner></wa-spinner>
+    <main>
+      <wa-spinner></wa-spinner>
+    </main>
   {:then}
     <QueryClientProvider client={queryClient}>
       {#if !authenticated}
-        <wa-button variant="brand" onclick={login}>Login</wa-button>
+        <main>
+          <section>
+            <h1>Hi!</h1>
+            <p>
+              Welcome to the <em>brand new</em> admin console for ClimbLive.
+            </p>
+            <wa-button variant="brand" onclick={login}>Login</wa-button>
+            <wa-button variant="brand" appearance="plain" onclick={signup}
+              >Sign up</wa-button
+            >
+          </section>
+        </main>
       {:else}
         <Main />
       {/if}
@@ -123,3 +142,16 @@
     </QueryClientProvider>
   {/await}
 </ErrorBoundary>
+
+<style>
+  main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  wa-spinner {
+    font-size: 5rem;
+  }
+</style>
