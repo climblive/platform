@@ -66,6 +66,10 @@
       return;
     }
 
+    refreshTokens();
+  };
+
+  const refreshTokens = async () => {
     try {
       const refreshToken = localStorage.getItem("refresh_token");
 
@@ -84,6 +88,12 @@
       }
     } catch {
       localStorage.removeItem("refresh_token");
+    }
+  };
+
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === "visible") {
+      refreshTokens();
     }
   };
 
@@ -111,7 +121,10 @@
   });
 </script>
 
-<svelte:window onstorage={handleStorageEvent} />
+<svelte:window
+  onstorage={handleStorageEvent}
+  onvisibilitychange={handleVisibilityChange}
+/>
 
 <ErrorBoundary>
   {#await authenticate()}
