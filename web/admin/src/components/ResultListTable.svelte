@@ -1,8 +1,4 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import "@awesome.me/webawesome/dist/components/input/input.js";
-  import "@awesome.me/webawesome/dist/components/qr-code/qr-code.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { Contender, ScoreboardEntry } from "@climblive/lib/models";
   import { ordinalSuperscript } from "@climblive/lib/utils";
