@@ -99,5 +99,6 @@
   .controls {
     display: flex;
     gap: var(--wa-space-xs);
+    flex-wrap: wrap;
   }
 </style>
