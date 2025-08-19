@@ -26,6 +26,12 @@
       width: "1fr",
     },
     {
+      label: "Description",
+      mobile: false,
+      render: renderDescription,
+      width: "1fr",
+    },
+    {
       label: "Start time",
       mobile: true,
       render: renderTimeBegin,
@@ -48,6 +54,10 @@
 
 {#snippet renderName({ name }: CompClass)}
   {name}
+{/snippet}
+
+{#snippet renderDescription({ description }: CompClass)}
+  {description}
 {/snippet}
 
 {#snippet renderTimeBegin({ timeBegin }: CompClass)}
