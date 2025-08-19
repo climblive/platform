@@ -76,6 +76,7 @@
   {/if}
 {/snippet}
 
+<h1>Contests</h1>
 <wa-button
   variant="brand"
   onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
