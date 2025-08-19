@@ -5,7 +5,7 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import type WaInput from "@awesome.me/webawesome/dist/components/input/input.js";
-  import "@awesome.me/webawesome/dist/components/qr-code/qr-code.js";
+  import { value } from "@climblive/lib/forms";
   import type { CreateContendersArguments } from "@climblive/lib/models";
   import {
     createContendersMutation,
@@ -36,7 +36,9 @@
   );
 
   let registeredContenders = $derived.by(() => {
-    if (!contenders) { return undefined; }
+    if (!contenders) {
+      return undefined;
+    }
 
     let count = 0;
 
@@ -101,7 +103,7 @@
         bind:this={numberInput}
         name="number"
         type="number"
-        value="100"
+        {@attach value(Math.min(100, remainingCodes ?? 0))}
         min="1"
         max={remainingCodes}
         label="Number of tickets to create"

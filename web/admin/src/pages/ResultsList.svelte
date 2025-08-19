@@ -4,7 +4,6 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import "@awesome.me/webawesome/dist/components/option/option.js";
-  import "@awesome.me/webawesome/dist/components/qr-code/qr-code.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import { ScoreboardProvider } from "@climblive/lib/components";
