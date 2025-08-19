@@ -30,7 +30,7 @@
     },
     {
       label: "Score",
-      mobile: true,
+      mobile: false,
       render: renderScore,
       width: "max-content",
       align: "right",
