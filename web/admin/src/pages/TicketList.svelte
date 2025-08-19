@@ -130,6 +130,7 @@
       variant="brand"
       appearance="accent"
       onclick={handleOpenCreateDialog}
+      disabled={remainingCodes === 0}
     >
       <wa-icon slot="start" name="plus"></wa-icon>
       Create tickets</wa-button
