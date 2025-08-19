@@ -54,8 +54,6 @@
       align: "right",
     },
   ];
-
-  $effect(() => console.log($scoreboard));
 </script>
 
 {#snippet renderName({
