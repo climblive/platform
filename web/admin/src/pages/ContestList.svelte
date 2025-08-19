@@ -77,7 +77,6 @@
 {/snippet}
 
 <wa-button
-  size="large"
   variant="brand"
   onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
   >New contest</wa-button
