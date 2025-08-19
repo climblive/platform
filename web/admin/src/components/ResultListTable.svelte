@@ -66,11 +66,14 @@
   {@const contender = contenders.get(contenderId)}
   {#if contender}
     <a href={`/${contender.registrationCode}`} target="_blank">
-      {#if disqualified}
-        <strike>{publicName}</strike>
-      {:else}
-        {publicName}
-      {/if}
+      <wa-button appearance="plain" variant="brand" size="small">
+        <wa-icon slot="start" name="arrow-up-right-from-square"></wa-icon>
+        {#if disqualified}
+          <strike>{publicName}</strike>
+        {:else}
+          {publicName}
+        {/if}
+      </wa-button>
     </a>
   {/if}
 {/snippet}
