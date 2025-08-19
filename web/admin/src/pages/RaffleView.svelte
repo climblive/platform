@@ -8,7 +8,9 @@
     getRaffleWinnersQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
+  import { AxiosError } from "axios";
   import { format } from "date-fns";
+  import { navigate } from "svelte-routing";
 
   interface Props {
     raffleId: number;
@@ -32,8 +34,12 @@
 
   const handleDrawWinner = () => {
     $drawRaffleWinner.mutate(undefined, {
-      onError: () => {
-        toastError("Failed to draw winner.");
+      onError: (error) => {
+        if (error instanceof AxiosError && error.status === 404) {
+          toastError("All winners have been drawn.");
+        } else {
+          toastError("Failed to draw winner.");
+        }
       },
     });
   };
@@ -63,6 +69,12 @@
 {/snippet}
 
 {#if raffle}
+  <wa-button
+    appearance="plain"
+    onclick={() => navigate(`/admin/contests/${raffle.contestId}#raffles`)}
+    >Back to raffles<wa-icon name="arrow-left" slot="start"
+    ></wa-icon></wa-button
+  >
   <section>
     <h1>Raffle {raffle.id}</h1>
     <wa-button variant="brand" onclick={handleDrawWinner}>Draw winner</wa-button
@@ -80,8 +92,7 @@
 
 <style>
   section {
-    display: flex;
     gap: var(--wa-space-xs);
-    flex-direction: column;
+    justify-content: start;
   }
 </style>

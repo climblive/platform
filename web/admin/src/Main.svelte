@@ -9,9 +9,9 @@
   import EditCompClass from "./pages/EditCompClass.svelte";
   import EditProblem from "./pages/EditProblem.svelte";
   import OrganizerView from "./pages/OrganizerView.svelte";
+  import PrintableTicketList from "./pages/PrintableTicketList.svelte";
   import RaffleView from "./pages/RaffleView.svelte";
   import Root from "./pages/Root.svelte";
-  import TicketList from "./pages/TicketList.svelte";
 </script>
 
 <Header />
@@ -33,7 +33,9 @@
     </Route>
     <Route path="/contests/:contestId">
       {#snippet children({ params }: { params: { contestId: number } })}
-        <Contest contestId={Number(params.contestId)} />
+        {#key params.contestId}
+          <Contest contestId={Number(params.contestId)} />
+        {/key}
       {/snippet}
     </Route>
     <Route path="/contests/:contestId/new-comp-class">
@@ -63,7 +65,7 @@
     </Route>
     <Route path="/contests/:contestId/tickets">
       {#snippet children({ params }: { params: { contestId: number } })}
-        <TicketList contestId={Number(params.contestId)} />
+        <PrintableTicketList contestId={Number(params.contestId)} />
       {/snippet}
     </Route>
   </Router>
@@ -72,6 +74,8 @@
 <style>
   main {
     padding: var(--wa-space-m);
+    margin: 0 auto;
+    max-width: 1024px;
   }
 
   @media print {

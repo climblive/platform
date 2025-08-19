@@ -1,28 +1,24 @@
 <script lang="ts">
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/details/details.js";
-  import type WaDetails from "@awesome.me/webawesome/dist/components/details/details.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import "@awesome.me/webawesome/dist/components/scroller/scroller.js";
   import "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
   import type WaTabGroup from "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
   import "@awesome.me/webawesome/dist/components/tab-panel/tab-panel.js";
   import "@awesome.me/webawesome/dist/components/tab/tab.js";
   import { LabeledText } from "@climblive/lib/components";
-  import {
-    duplicateContestMutation,
-    getContestQuery,
-    getScoreEnginesQuery,
-    startScoreEngineMutation,
-    stopScoreEngineMutation,
-  } from "@climblive/lib/queries";
-  import { getApiUrl, toastError } from "@climblive/lib/utils";
-  import { add } from "date-fns";
-  import { Link, navigate } from "svelte-routing";
+  import { getContestQuery } from "@climblive/lib/queries";
+  import { navigate } from "svelte-routing";
   import CompClassList from "./CompClassList.svelte";
-  import ContenderList from "./ContenderList.svelte";
+  import DuplicateContest from "./DuplicateContest.svelte";
   import ProblemList from "./ProblemList.svelte";
   import RaffleList from "./RaffleList.svelte";
+  import ResultsList from "./ResultsList.svelte";
+  import ScoreEngine from "./ScoreEngine.svelte";
+  import TicketList from "./TicketList.svelte";
 
   interface Props {
     contestId: number;
@@ -31,16 +27,10 @@
   let { contestId }: Props = $props();
 
   let tabGroup: WaTabGroup | undefined = $state();
-  let details: WaDetails | undefined = $state();
 
   const contestQuery = $derived(getContestQuery(contestId));
-  const scoreEnginesQuery = $derived(getScoreEnginesQuery(contestId));
-  const startScoreEngine = $derived(startScoreEngineMutation(contestId));
-  const stopScoreEngine = $derived(stopScoreEngineMutation());
-  const duplicateContest = $derived(duplicateContestMutation(contestId));
 
   let contest = $derived($contestQuery.data);
-  let scoreEngines = $derived($scoreEnginesQuery.data);
 
   $effect(() => {
     const hash = window.location.hash.substring(1);
@@ -56,23 +46,10 @@
       window.location.hash = name;
     }
   };
-
-  const handleDuplicationRequest = async () => {
-    if (contest) {
-      $duplicateContest.mutate(undefined, {
-        onSuccess: (duplicate) => {
-          navigate(`/admin/contests/${duplicate.id}`);
-        },
-        onError: () => {
-          toastError("Failed to duplicate contest.");
-        },
-      });
-    }
-  };
 </script>
 
 <main>
-  {#if contest && scoreEngines}
+  {#if contest}
     <wa-button
       appearance="plain"
       onclick={() =>
@@ -84,37 +61,25 @@
 
     <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleTabShow}>
       <wa-tab slot="nav" panel="contest">Contest</wa-tab>
-      <wa-tab slot="nav" panel="contenders">Contenders</wa-tab>
       <wa-tab slot="nav" panel="problems">Problems</wa-tab>
+      <wa-tab slot="nav" panel="results">Results</wa-tab>
       <wa-tab slot="nav" panel="raffles">Raffles</wa-tab>
 
       <wa-tab-panel name="contest">
-        <wa-button onclick={handleDuplicationRequest} appearance="outlined"
-          >Duplicate
-          <wa-icon name="copy" slot="start"></wa-icon>
-        </wa-button>
-
-        <a href={`${getApiUrl()}/contests/${contestId}/results`}>
-          <wa-button appearance="outlined"
-            >Download results
-            <wa-icon name="download" slot="start"></wa-icon>
-          </wa-button>
-        </a>
-
-        <Link to={`/admin/contests/${contestId}/tickets`}>
-          <wa-button appearance="outlined"
-            >Print tickets
-            <wa-icon name="print" slot="start"></wa-icon>
-          </wa-button>
-        </Link>
-
         <article>
-          <LabeledText label="Description">
-            {contest.description}
+          <LabeledText label="Name">
+            {contest.name}
           </LabeledText>
-          <LabeledText label="Location">
-            {contest.location}
-          </LabeledText>
+          {#if contest.description}
+            <LabeledText label="Description">
+              {contest.description}
+            </LabeledText>
+          {/if}
+          {#if contest.location}
+            <LabeledText label="Location">
+              {contest.location}
+            </LabeledText>
+          {/if}
           <LabeledText label="Finalists">
             {contest.finalists}
           </LabeledText>
@@ -122,54 +87,52 @@
             {contest.qualifyingProblems}
           </LabeledText>
           {#if contest.rules}
-            <wa-details
-              onwa-after-show={() =>
-                details?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                  inline: "nearest",
-                })}
-              bind:this={details}
-              summary="Rules"
-            >
-              {@html contest.rules}
-            </wa-details>
+            <wa-scroller orientation="vertical">
+              <LabeledText label="Rules">
+                {@html contest.rules}
+              </LabeledText>
+            </wa-scroller>
           {/if}
         </article>
 
-        <h2>Score Engines</h2>
-        {#each scoreEngines as engineInstanceId (engineInstanceId)}
-          <div>
-            <h3>{engineInstanceId}</h3>
-            <wa-button
-              variant="danger"
-              onclick={() => $stopScoreEngine.mutate(engineInstanceId)}
-              loading={$stopScoreEngine.isPending}
-              >Stop
-              <wa-icon name="stop" slot="start"></wa-icon>
-            </wa-button>
-          </div>
-        {/each}
-        {#if scoreEngines.length === 0}
-          <wa-button
-            appearance="outlined"
-            onclick={() =>
-              $startScoreEngine.mutate({
-                terminatedBy: add(new Date(), { hours: 6 }),
-              })}
-            loading={$startScoreEngine.isPending}
-            disabled={scoreEngines.length > 0}>Start engine</wa-button
-          >
-        {/if}
-
         <h2>Classes</h2>
-        <wa-button
-          variant="brand"
-          appearance="accent"
-          onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
-          >Create</wa-button
-        >
+        <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
+        ></wa-divider>
         <CompClassList {contestId} />
+
+        <h2>Tickets</h2>
+        <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
+        ></wa-divider>
+        <TicketList {contestId} />
+
+        <h2>Problems</h2>
+        <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
+        ></wa-divider>
+        <p>
+          Problems are created and managed under the <a
+            href="#problems"
+            onclick={(e: MouseEvent) => {
+              if (tabGroup) {
+                tabGroup.active = "problems";
+              }
+
+              e.preventDefault();
+            }}>Problems</a
+          > tab.
+        </p>
+
+        <h2>Advanced</h2>
+        <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
+        ></wa-divider>
+        <h3>Actions</h3>
+        <DuplicateContest {contestId} />
+        <h3>Score Engines</h3>
+        <p>
+          An active score engine collects all results during a contest and
+          computes scores and rankings for all participants.
+        </p>
+
+        <ScoreEngine {contestId} />
       </wa-tab-panel>
 
       <wa-tab-panel name="problems">
@@ -183,9 +146,9 @@
         <ProblemList {contestId} />
       </wa-tab-panel>
 
-      <wa-tab-panel name="contenders">
-        <h2>Contenders</h2>
-        <ContenderList {contestId} />
+      <wa-tab-panel name="results">
+        <h2>Results</h2>
+        <ResultsList {contestId} />
       </wa-tab-panel>
 
       <wa-tab-panel name="raffles">
@@ -202,5 +165,18 @@
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-s);
+  }
+
+  wa-tab-panel::part(base) {
+    padding-top: var(--wa-space-s);
+    padding-inline: var(--wa-space-2xs);
+  }
+
+  wa-tab-panel[name="contest"] h2 {
+    margin-top: var(--wa-space-2xl);
+  }
+
+  wa-scroller {
+    max-height: 10rem;
   }
 </style>

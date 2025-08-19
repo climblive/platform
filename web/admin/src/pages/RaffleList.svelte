@@ -45,7 +45,7 @@
 >
 
 <section>
-  {#if raffles}
+  {#if raffles?.length}
     <Table {columns} data={raffles} getId={({ id }) => id}></Table>
   {/if}
 </section>

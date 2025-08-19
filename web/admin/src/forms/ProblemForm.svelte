@@ -30,18 +30,17 @@
   let { data, schema, submit, children }: Props = $props();
 
   const swatches = [
-    "#F44336",
-    "#4CAF50",
-    "#1790D2",
-    "#E410EB",
-    "#FFEB3B",
-    "#050505",
-    "#FF9800",
-    "#F628A5",
-    "#FAFAFA",
-    "#654321",
-    "#cccccc",
-    "#00FFEF",
+    "#6f3601",
+    "#dc3146",
+    "#f46a45",
+    "#fac22b",
+    "#00ac49",
+    "#2fbedc",
+    "#0071ec",
+    "#9951db",
+    "#e66ba3",
+    "#9194a2",
+    "#000",
   ].join("; ");
 </script>
 
