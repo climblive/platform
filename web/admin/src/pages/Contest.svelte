@@ -86,11 +86,11 @@
             {contest.qualifyingProblems}
           </LabeledText>
           {#if contest.rules}
-            <LabeledText label="Rules">
-              <wa-scroller orientation="vertical" style="max-height: 150px;">
+            <wa-scroller orientation="vertical">
+              <LabeledText label="Rules">
                 {@html contest.rules}
-              </wa-scroller>
-            </LabeledText>
+              </LabeledText>
+            </wa-scroller>
           {/if}
         </article>
 
@@ -173,5 +173,9 @@
 
   wa-tab-panel[name="contest"] h2 {
     margin-top: var(--wa-space-2xl);
+  }
+
+  wa-scroller {
+    max-height: 10rem;
   }
 </style>
