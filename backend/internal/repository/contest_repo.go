@@ -110,7 +110,7 @@ func (d *Database) StoreContest(ctx context.Context, tx domain.Transaction, cont
 		QualifyingProblems: int32(contest.QualifyingProblems),
 		Finalists:          int32(contest.Finalists),
 		Rules:              makeNullString(contest.Rules),
-		GracePeriod:        int32(contest.GracePeriod),
+		GracePeriod:        int32(contest.GracePeriod / time.Minute),
 	}
 
 	insertID, err := d.WithTx(tx).UpsertContest(ctx, params)
