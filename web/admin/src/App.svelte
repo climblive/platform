@@ -147,8 +147,9 @@
   main {
     display: flex;
     justify-content: center;
-    align-items: center;
     height: 100vh;
+    padding: var(--wa-space-l);
+    padding-top: 20vh;
   }
 
   wa-spinner {
