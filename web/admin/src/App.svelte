@@ -15,6 +15,7 @@
   let authenticated = $state(false);
 
   const selectedOrganizer = writable<number | undefined>();
+  let accessTokenExpiry = $state<Date>();
 
   const organizerId = localStorage.getItem("organizerId");
   if (organizerId !== null) {
@@ -70,6 +71,13 @@
   };
 
   const refreshTokens = async () => {
+    if (
+      accessTokenExpiry !== undefined &&
+      accessTokenExpiry.getTime() - new Date().getTime() >= 15 * 1_000
+    ) {
+      return;
+    }
+
     try {
       const refreshToken = localStorage.getItem("refresh_token");
 
@@ -79,6 +87,9 @@
 
       if (refreshToken) {
         const { access_token } = await refreshSession(refreshToken);
+
+        const jwtPayload = JSON.parse(window.atob(access_token.split(".")[1]));
+        accessTokenExpiry = new Date(jwtPayload.exp * 1_000);
 
         ApiClient.getInstance().setCredentialsProvider(
           new OrganizerCredentialsProvider(access_token),
@@ -95,7 +106,6 @@
 
   const handleVisibilityChange = () => {
     if (document.visibilityState === "visible") {
-      refreshTokens();
       refreshTokensTimer = setInterval(refreshTokens, 5 * 1_000);
     } else {
       clearInterval(refreshTokensTimer);
