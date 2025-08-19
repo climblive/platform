@@ -44,7 +44,7 @@
     },
     {
       label: "Finalist",
-      mobile: false,
+      mobile: true,
       render: renderFinalist,
       width: "max-content",
       align: "right",
