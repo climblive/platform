@@ -72,7 +72,7 @@
           newTicketsAvailableForPrint = true;
           closeDialog();
         },
-        onError: () => toastError("Failed to create contenders."),
+        onError: () => toastError("Failed to create tickets."),
       });
     }
   };
