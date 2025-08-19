@@ -1,6 +1,5 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { CompClass } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
