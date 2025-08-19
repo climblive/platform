@@ -36,7 +36,7 @@
   );
 
   let registeredContenders = $derived.by(() => {
-    if (!contenders) return undefined;
+    if (!contenders) { return undefined; }
 
     let count = 0;
 
