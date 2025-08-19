@@ -94,7 +94,7 @@
 
 <section>
   <p class="copy">
-    Classes represent the categories in which contenders compete, typically
+    Classes represent the categories in which the contenders compete, typically
     divided into Males and Females. The contest duration is defined by the start
     and end times of these classes.
   </p>
