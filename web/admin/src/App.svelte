@@ -91,9 +91,15 @@
     }
   };
 
+  let refreshTokensTimer: number;
+
   const handleVisibilityChange = () => {
     if (document.visibilityState === "visible") {
       refreshTokens();
+      refreshTokensTimer = setInterval(refreshTokens, 5 * 1_000);
+    } else {
+      clearInterval(refreshTokensTimer);
+      refreshTokensTimer = 0;
     }
   };
 
