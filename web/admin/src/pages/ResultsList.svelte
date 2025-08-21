@@ -54,7 +54,7 @@
       return;
     }
 
-    live = Boolean(liveSwitch.value);
+    live = Boolean(liveSwitch.checked);
   };
 </script>
 
