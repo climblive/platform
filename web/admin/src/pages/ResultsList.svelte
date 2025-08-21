@@ -49,7 +49,7 @@
     }
   });
 
-  const handleLive = () => {
+  const toggleLive = () => {
     if (!liveSwitch) {
       return;
     }
@@ -95,7 +95,7 @@
   <wa-switch
     bind:this={liveSwitch}
     {@attach checked(live)}
-    onchange={handleLive}>Live</wa-switch
+    onchange={toggleLive}>Live</wa-switch
   >
 
   <ScoreboardProvider {contestId}>
