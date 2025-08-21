@@ -6,8 +6,10 @@
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
+  import "@awesome.me/webawesome/dist/components/switch/switch.js";
+  import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { ScoreboardProvider } from "@climblive/lib/components";
-  import { value } from "@climblive/lib/forms";
+  import { checked, value } from "@climblive/lib/forms";
   import {
     getCompClassesQuery,
     getContendersByContestQuery,
@@ -34,6 +36,8 @@
   const compClasses = $derived($compClassesQuery.data);
 
   let selectedCompClassId: number | undefined = $state();
+  let liveSwitch: WaSwitch | undefined = $state();
+  let live = $state(true);
 
   $effect(() => {
     if (
@@ -44,6 +48,14 @@
       selectedCompClassId = compClasses[0].id;
     }
   });
+
+  const handleLive = () => {
+    if (!liveSwitch) {
+      return;
+    }
+
+    live = Boolean(liveSwitch.value);
+  };
 </script>
 
 <div class="controls">
@@ -79,6 +91,10 @@
   </wa-select>
 {/if}
 
+<wa-switch bind:this={liveSwitch} {@attach checked(live)} onchange={handleLive}
+  >Live</wa-switch
+>
+
 <ScoreboardProvider {contestId}>
   {#snippet children({ scoreboard })}
     {#if selectedCompClassId}
@@ -86,12 +102,14 @@
         {scoreboard}
         {contenders}
         compClassId={selectedCompClassId}
+        {live}
       ></ResultListTable>
     {/if}
   {/snippet}
 </ScoreboardProvider>
 
 <style>
+  wa-switch,
   wa-select {
     margin-top: var(--wa-space-m);
   }

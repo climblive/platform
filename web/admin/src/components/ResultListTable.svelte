@@ -8,17 +8,25 @@
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
     contenders: Map<number, Contender>;
     compClassId: number;
+    live: boolean;
   }
 
-  const { scoreboard, contenders, compClassId }: Props = $props();
+  const { scoreboard, contenders, compClassId, live }: Props = $props();
 
-  const data = $derived.by(() => {
+  let data = $state<ScoreboardEntry[]>([]);
+
+  $effect(() => {
+    if (!live) {
+      return;
+    }
+
     const scores = [...($scoreboard.get(compClassId) ?? [])];
     scores.sort(
       (a: ScoreboardEntry, b: ScoreboardEntry) =>
         (a.score?.rankOrder ?? Infinity) - (b.score?.rankOrder ?? Infinity),
     );
-    return scores;
+
+    data = scores;
   });
 
   const columns: ColumnDefinition<ScoreboardEntry>[] = [
