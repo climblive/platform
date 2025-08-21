@@ -137,12 +137,6 @@
 
       <wa-tab-panel name="problems">
         <h2>Problems</h2>
-        <wa-button
-          variant="brand"
-          appearance="accent"
-          onclick={() => navigate(`contests/${contestId}/new-problem`)}
-          >Create</wa-button
-        >
         <ProblemList {contestId} />
       </wa-tab-panel>
 
