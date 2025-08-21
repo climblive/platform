@@ -67,7 +67,7 @@
       return;
     }
 
-    refreshTokens();
+    await refreshTokens();
   };
 
   const refreshTokens = async () => {
