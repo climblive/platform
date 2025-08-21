@@ -118,4 +118,11 @@
   .copy {
     color: var(--wa-color-text-quiet);
   }
+
+  section {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: var(--wa-space-m);
+  }
 </style>

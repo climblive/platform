@@ -100,6 +100,13 @@
 {/snippet}
 
 <section>
+  <wa-button
+    variant="brand"
+    appearance="accent"
+    onclick={() => navigate(`contests/${contestId}/new-problem`)}
+    >Create</wa-button
+  >
+
   {#if problems?.length}
     <Table {columns} data={problems} getId={({ id }) => id}></Table>
   {/if}
@@ -115,5 +122,12 @@
     display: flex;
     align-items: center;
     gap: var(--wa-space-s);
+  }
+
+  section {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: var(--wa-space-m);
   }
 </style>

@@ -71,7 +71,6 @@
 
 <style>
   table {
-    margin-top: 1rem;
     width: 100%;
     table-layout: fixed;
 
