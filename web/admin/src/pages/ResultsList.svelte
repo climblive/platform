@@ -50,7 +50,7 @@
   <a href={`${getApiUrl()}/contests/${contestId}/results`}>
     <wa-button appearance="outlined"
       >Download results
-      <wa-icon name="download" slot="start"></wa-icon>
+      <wa-icon name="file-excel" slot="start"></wa-icon>
     </wa-button>
   </a>
 
