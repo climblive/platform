@@ -75,8 +75,8 @@
     >Back to raffles<wa-icon name="arrow-left" slot="start"
     ></wa-icon></wa-button
   >
+  <h1>Raffle {raffle.id}</h1>
   <section>
-    <h1>Raffle {raffle.id}</h1>
     <wa-button variant="brand" onclick={handleDrawWinner}>Draw winner</wa-button
     >
 
@@ -94,5 +94,11 @@
   section {
     gap: var(--wa-space-xs);
     justify-content: start;
+  }
+
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-m);
   }
 </style>
