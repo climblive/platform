@@ -5,6 +5,7 @@ import {
   updateTheme,
   watchColorSchemeChanges,
 } from "@climblive/lib/utils";
+import "element-internals-polyfill";
 import { mount } from "svelte";
 
 watchColorSchemeChanges((prefersDarkColorScheme) =>
