@@ -26,7 +26,6 @@
 <CompClassForm
   submit={handleSubmit}
   data={{
-    name: "Males",
     timeBegin: roundToNearestHours(add(new Date(), { hours: 1 })),
     timeEnd: roundToNearestHours(add(new Date(), { hours: 4 })),
   }}

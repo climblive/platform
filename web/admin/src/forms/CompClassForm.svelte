@@ -57,6 +57,7 @@
       type="text"
       required
       value={data.name}
+      placeholder="Males"
     ></wa-input>
     <wa-input
       size="small"
