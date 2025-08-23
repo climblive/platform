@@ -1,7 +1,4 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import "@awesome.me/webawesome/dist/components/option/option.js";
-  import "@awesome.me/webawesome/dist/components/select/select.js";
   import { FullLogo } from "@climblive/lib/components";
   import { onMount } from "svelte";
 
