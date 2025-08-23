@@ -41,7 +41,7 @@
 <h1>Welcome!</h1>
 
 {#if self && self.organizers.length > 1}
-  <p>You can manage contests as multiple different organizers.</p>
+  <p>You can manage contests as multiple organizers.</p>
 
   <wa-select
     bind:this={select}
