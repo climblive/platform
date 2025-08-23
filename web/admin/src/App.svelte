@@ -1,21 +1,17 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
-  import { ApiClient, OrganizerCredentialsProvider } from "@climblive/lib";
   import { ErrorBoundary } from "@climblive/lib/components";
-  import configData from "@climblive/lib/config.json";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
-  import { onMount, setContext } from "svelte";
+  import { onDestroy, onMount, setContext } from "svelte";
   import { navigate } from "svelte-routing";
   import { writable } from "svelte/store";
+  import { Authenticator } from "./authenticator.svelte";
   import Main from "./Main.svelte";
-  import { exchangeCode, refreshSession } from "./utils/cognito";
-
-  let authenticated = $state(false);
 
   const selectedOrganizer = writable<number | undefined>();
-  let accessTokenExpiry = $state<Date>();
+  const authenticator = new Authenticator();
 
   const organizerId = localStorage.getItem("organizerId");
   if (organizerId !== null) {
@@ -47,82 +43,12 @@
     },
   });
 
-  const authenticate = async () => {
-    const query = new URLSearchParams(location.search);
-    const code = query.get("code");
-
-    if (code != null) {
-      const { access_token, refresh_token } = await exchangeCode(code);
-
-      ApiClient.getInstance().setCredentialsProvider(
-        new OrganizerCredentialsProvider(access_token),
-      );
-
-      localStorage.setItem("refresh_token", refresh_token);
-
-      authenticated = true;
-
-      navigate("./", { replace: true });
-
-      return;
-    }
-
-    await refreshTokens();
-  };
-
-  const refreshTokens = async () => {
-    if (
-      accessTokenExpiry !== undefined &&
-      accessTokenExpiry.getTime() - new Date().getTime() >= 15 * 1_000
-    ) {
-      return;
-    }
-
-    try {
-      const refreshToken = localStorage.getItem("refresh_token");
-
-      if (!refreshToken) {
-        return;
-      }
-
-      if (refreshToken) {
-        const { access_token } = await refreshSession(refreshToken);
-
-        const jwtPayload = JSON.parse(window.atob(access_token.split(".")[1]));
-        accessTokenExpiry = new Date(jwtPayload.exp * 1_000);
-
-        ApiClient.getInstance().setCredentialsProvider(
-          new OrganizerCredentialsProvider(access_token),
-        );
-
-        authenticated = true;
-      }
-    } catch {
-      localStorage.removeItem("refresh_token");
-    }
-  };
-
-  let refreshTokensTimer: number;
-
   const handleVisibilityChange = () => {
     if (document.visibilityState === "visible") {
-      refreshTokensTimer = setInterval(refreshTokens, 5 * 1_000);
+      authenticator.startKeepAlive();
     } else {
-      clearInterval(refreshTokensTimer);
-      refreshTokensTimer = 0;
+      authenticator.stopKeepAlive();
     }
-  };
-
-  const login = () => {
-    const redirectUri = encodeURIComponent(window.location.origin + "/admin");
-    const url = `https://clmb.auth.eu-west-1.amazoncognito.com/login?response_type=code&client_id=${configData.COGNITO_CLIENT_ID}&redirect_uri=${redirectUri}`;
-    window.location.href = url;
-  };
-
-  const signup = () => {
-    const redirectUri = encodeURIComponent(window.location.origin + "/admin");
-    const url = `https://clmb.auth.eu-west-1.amazoncognito.com/signup?response_type=code&client_id=${configData.COGNITO_CLIENT_ID}&redirect_uri=${redirectUri}`;
-    window.location.href = url;
   };
 
   onMount(() => {
@@ -135,6 +61,10 @@
       $selectedOrganizer = organizerId;
     }
   });
+
+  onMount(authenticator.startKeepAlive);
+
+  onDestroy(authenticator.stopKeepAlive);
 </script>
 
 <svelte:window
@@ -143,22 +73,26 @@
 />
 
 <ErrorBoundary>
-  {#await authenticate()}
+  {#await authenticator.authenticate()}
     <main>
       <wa-spinner></wa-spinner>
     </main>
   {:then}
     <QueryClientProvider client={queryClient}>
-      {#if !authenticated}
+      {#if !authenticator.isAuthenticated()}
         <main>
           <section>
             <h1>Hi!</h1>
             <p>
               Welcome to the <em>brand new</em> admin console for ClimbLive.
             </p>
-            <wa-button variant="brand" onclick={login}>Login</wa-button>
-            <wa-button variant="brand" appearance="plain" onclick={signup}
-              >Sign up</wa-button
+            <wa-button variant="brand" onclick={authenticator.redirectLogin}
+              >Login</wa-button
+            >
+            <wa-button
+              variant="brand"
+              appearance="plain"
+              onclick={authenticator.redirectSignup}>Sign up</wa-button
             >
           </section>
         </main>
