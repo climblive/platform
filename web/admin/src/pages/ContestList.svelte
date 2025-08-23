@@ -76,7 +76,7 @@
   {/if}
 {/snippet}
 
-<h1>Contests</h1>
+<h2>Contests</h2>
 <wa-button
   variant="brand"
   onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
@@ -84,7 +84,7 @@
 >
 
 {#snippet listing(heading: string, contests: Contest[])}
-  <h2>{heading}</h2>
+  <h3>{heading}</h3>
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
 {/snippet}
 
