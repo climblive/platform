@@ -8,9 +8,14 @@ const checkTokensInterval = 60 * 1_000;
 const minimumUsableTokenRemainingLifetime = 15 * 60 * 1_000;
 
 export class Authenticator {
-  private authenticated = $state(false);
+  private authenticated: boolean;
   private accessTokenExpiry: SvelteDate | undefined;
-  private checkTokensIntervalTimer: number = 0;
+  private checkTokensIntervalTimer: number;
+
+  constructor() {
+    this.authenticated = $state(false);
+    this.checkTokensIntervalTimer = 0;
+  }
 
   public isAuthenticated = (): boolean => this.authenticated;
 
@@ -98,6 +103,15 @@ export class Authenticator {
   public redirectSignup = () => {
     const redirectUri = encodeURIComponent(window.location.origin + "/admin");
     const url = `https://clmb.auth.eu-west-1.amazoncognito.com/signup?response_type=code&client_id=${configData.COGNITO_CLIENT_ID}&redirect_uri=${redirectUri}`;
+    window.location.href = url;
+  };
+
+  public logout = () => {
+    this.authenticated = false;
+    localStorage.removeItem("refresh_token");
+
+    const redirectUri = encodeURIComponent(window.location.origin + "/admin");
+    const url = `https://clmb.auth.eu-west-1.amazoncognito.com/logout?client_id=${configData.COGNITO_CLIENT_ID}&logout_uri=${redirectUri}`;
     window.location.href = url;
   };
 }

@@ -12,6 +12,7 @@
 
   const selectedOrganizer = writable<number | undefined>();
   const authenticator = new Authenticator();
+  setContext("authenticator", authenticator);
 
   const organizerId = localStorage.getItem("organizerId");
   if (organizerId !== null) {
@@ -87,7 +88,7 @@
               Welcome to the <em>brand new</em> admin console for ClimbLive.
             </p>
             <wa-button variant="brand" onclick={authenticator.redirectLogin}
-              >Login</wa-button
+              >Sign in</wa-button
             >
             <wa-button
               variant="brand"

@@ -1,8 +1,11 @@
 <script lang="ts">
   import { FullLogo } from "@climblive/lib/components";
-  import { onMount } from "svelte";
+  import { getContext, onMount } from "svelte";
+  import type { Authenticator } from "./authenticator.svelte";
 
   let print = $state(false);
+
+  const authenticator = getContext<Authenticator>("authenticator");
 
   onMount(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -18,6 +21,14 @@
       <p class="logo">
         <FullLogo />
       </p>
+      <wa-button
+        size="small"
+        appearance="outlined"
+        onclick={authenticator.logout}
+      >
+        Sign out<wa-icon slot="start" name="right-from-bracket"
+        ></wa-icon></wa-button
+      >
     </div>
   </header>
 {/if}
