@@ -41,7 +41,7 @@ export class Authenticator {
   private refreshTokens = async () => {
     if (
       this.accessTokenExpiry !== undefined &&
-      this.accessTokenExpiry.getTime() - new Date().getTime() >=
+      this.accessTokenExpiry.getTime() - new SvelteDate().getTime() >=
         minimumUsableTokenRemainingLifetime
     ) {
       return;
