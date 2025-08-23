@@ -63,12 +63,6 @@
       font-family: monospace;
       letter-spacing: 0.2rem;
     }
-
-    & .logo {
-      height: var(--wa-font-size-xl);
-      margin: auto var(--wa-space-m) var(--wa-space-2xs) auto;
-      color: var(--wa-color-text-normal);
-    }
   }
 
   section:nth-of-type(7n) {
