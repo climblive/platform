@@ -8,7 +8,7 @@ const minimumUsableTokenRemainingLifetime = 15 * 60 * 1_000;
 
 export class Authenticator {
   private authenticated = $state(false);
-  private accessTokenExpiry: Date | undefined;
+  private accessTokenExpiry = $state(Date);
   private checkTokensIntervalTimer: number = 0;
 
   public isAuthenticated = (): boolean => this.authenticated;
