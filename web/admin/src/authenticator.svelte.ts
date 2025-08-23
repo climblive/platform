@@ -1,6 +1,7 @@
 import { ApiClient, OrganizerCredentialsProvider } from "@climblive/lib";
 import configData from "@climblive/lib/config.json";
 import { navigate } from "svelte-routing";
+import { SvelteDate } from "svelte/reactivity";
 import { exchangeCode, refreshSession } from "./utils/cognito";
 
 const checkTokensInterval = 60 * 1_000;
@@ -8,7 +9,7 @@ const minimumUsableTokenRemainingLifetime = 15 * 60 * 1_000;
 
 export class Authenticator {
   private authenticated = $state(false);
-  private accessTokenExpiry = $state(Date);
+  private accessTokenExpiry: SvelteDate | undefined;
   private checkTokensIntervalTimer: number = 0;
 
   public isAuthenticated = (): boolean => this.authenticated;
