@@ -38,7 +38,6 @@
       }
     }
 
-    console.log(ascentsByProblem);
     return ascentsByProblem;
   });
 
