@@ -35,8 +35,21 @@
       return timeEnd && now > timeEnd;
     });
 
-    return [drafts, ongoing, upcoming, past];
+    return [
+      drafts,
+      ongoing?.sort(sortContests),
+      upcoming?.sort(sortContests),
+      past?.sort(sortContests),
+    ];
   });
+
+  const sortContests = (c1: Contest, c2: Contest) => {
+    if (c1.timeBegin && c2.timeBegin) {
+      return c2.timeBegin.getTime() - c1.timeBegin.getTime();
+    }
+
+    return 0;
+  };
 
   const columns: ColumnDefinition<Contest>[] = [
     {
