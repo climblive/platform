@@ -138,7 +138,7 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 	}
 
 	if err := (validators.ContestValidator{}).Validate(contest); err != nil {
-		return domain.Contest{}, errors.Wrap(err, 0)
+		return mty, errors.Wrap(err, 0)
 	}
 
 	if _, err = uc.Repo.StoreContest(ctx, nil, contest); err != nil {
