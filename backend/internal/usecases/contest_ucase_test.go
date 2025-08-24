@@ -8,6 +8,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/usecases"
+	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -318,82 +319,22 @@ func TestCreateContest(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
-	t.Run("InvalidData", func(t *testing.T) {
+	t.Run("ValidatorIsInvoked", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.OrganizerRole, nil)
 
-		mockedRepo.
-			On("StoreContest", mock.Anything, nil, mock.AnythingOfType("domain.Contest")).
-			Return(domain.Contest{}, nil)
-
 		ucase := usecases.ContestUseCase{
 			Repo:       mockedRepo,
 			Authorizer: mockedAuthorizer,
 		}
 
-		validTemplate := func() domain.ContestTemplate {
-			return domain.ContestTemplate{
-				Location:           "The garage",
-				Name:               "Swedish Championships",
-				Description:        "Who is the best climber in Sweden?",
-				QualifyingProblems: 10,
-				Finalists:          7,
-				Rules:              "No rules!",
-				GracePeriod:        time.Hour,
-			}
-		}
+		_, err := ucase.CreateContest(context.Background(), fakedOrganizerID, domain.ContestTemplate{})
 
-		_, err := ucase.CreateContest(context.Background(), fakedOrganizerID, validTemplate())
-
-		require.NoError(t, err)
-
-		t.Run("EmptyName", func(t *testing.T) {
-			tmpl := validTemplate()
-			tmpl.Name = ""
-
-			_, err := ucase.CreateContest(context.Background(), fakedOrganizerID, tmpl)
-
-			assert.ErrorIs(t, err, domain.ErrInvalidData)
-		})
-
-		t.Run("NegativeFinalists", func(t *testing.T) {
-			tmpl := validTemplate()
-			tmpl.Finalists = -1
-
-			_, err := ucase.CreateContest(context.Background(), fakedOrganizerID, tmpl)
-
-			assert.ErrorIs(t, err, domain.ErrInvalidData)
-		})
-
-		t.Run("NegativeQualifyingProblems", func(t *testing.T) {
-			tmpl := validTemplate()
-			tmpl.QualifyingProblems = -1
-
-			_, err := ucase.CreateContest(context.Background(), fakedOrganizerID, tmpl)
-
-			assert.ErrorIs(t, err, domain.ErrInvalidData)
-		})
-
-		t.Run("NegativeGracePeriod", func(t *testing.T) {
-			tmpl := validTemplate()
-			tmpl.GracePeriod = -1 * time.Nanosecond
-
-			_, err := ucase.CreateContest(context.Background(), fakedOrganizerID, tmpl)
-
-			assert.ErrorIs(t, err, domain.ErrInvalidData)
-		})
-
-		t.Run("GracePeriodLongerThanOneHour", func(t *testing.T) {
-			tmpl := validTemplate()
-			tmpl.GracePeriod = time.Hour + time.Nanosecond
-
-			_, err := ucase.CreateContest(context.Background(), fakedOrganizerID, tmpl)
-
-			assert.ErrorIs(t, err, domain.ErrInvalidData)
-		})
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validators.ContestValidator{}.IsValidationError(err))
 
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
