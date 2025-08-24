@@ -28,8 +28,8 @@ server {
 
 	include /etc/nginx/options-ssl.conf;
 
-	ssl_certificate /etc/letsencrypt/live/labs.climblive.app/fullchain.pem;
-	ssl_certificate_key /etc/letsencrypt/live/labs.climblive.app/privkey.pem;
+	ssl_certificate /etc/nginx/ssl/cloudflare/climblive.com/cert.pem;
+	ssl_certificate_key /etc/nginx/ssl/cloudflare/climblive.com/privkey.pem;
 }
 
 server {
