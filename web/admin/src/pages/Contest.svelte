@@ -95,11 +95,13 @@
             {contest.qualifyingProblems}
           </LabeledText>
           {#if contest.rules}
-            <wa-scroller orientation="vertical">
-              <LabeledText label="Rules">
-                {@html contest.rules}
-              </LabeledText>
-            </wa-scroller>
+            <LabeledText label="Rules">
+              <div class="rules">
+                <wa-scroller orientation="vertical" without-shadow>
+                  {@html contest.rules}
+                </wa-scroller>
+              </div>
+            </LabeledText>
           {/if}
         </article>
 
@@ -163,7 +165,7 @@
 
 <style>
   article {
-    padding-block: var(--wa-space-m);
+    padding-block-start: var(--wa-space-m);
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-s);
@@ -180,5 +182,12 @@
 
   wa-scroller {
     max-height: 10rem;
+  }
+
+  .rules {
+    border: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-neutral-border-normal);
+    border-radius: var(--wa-border-radius-m);
+    padding: var(--wa-space-s);
   }
 </style>
