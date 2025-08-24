@@ -2,7 +2,7 @@ package rest
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/v2"
 	"net/http"
 	"time"
 
@@ -74,7 +74,7 @@ func (hdlr *scoreEngineHandler) StartScoreEngine(w http.ResponseWriter, r *http.
 	}
 
 	var arguments StartScoreEngineArguments
-	err = json.NewDecoder(r.Body).Decode(&arguments)
+	err = json.UnmarshalRead(r.Body, &arguments)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
