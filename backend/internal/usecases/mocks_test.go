@@ -138,6 +138,11 @@ func (m *repositoryMock) GetTicksByContender(ctx context.Context, tx domain.Tran
 	return args.Get(0).([]domain.Tick), args.Error(1)
 }
 
+func (m *repositoryMock) GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error) {
+	args := m.Called(ctx, tx, contestID)
+	return args.Get(0).([]domain.Tick), args.Error(1)
+}
+
 func (m *repositoryMock) DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) error {
 	args := m.Called(ctx, tx, tickID)
 	return args.Error(0)
