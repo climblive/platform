@@ -2,7 +2,7 @@ package rest
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/v2"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -52,7 +52,7 @@ func (hdlr *tickHandler) CreateTick(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var tick domain.Tick
-	err = json.NewDecoder(r.Body).Decode(&tick)
+	err = json.UnmarshalRead(r.Body, &tick)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return

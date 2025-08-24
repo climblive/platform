@@ -1,7 +1,7 @@
 package authorizer
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"time"
 
 	_ "embed"
@@ -21,9 +21,11 @@ type StandardJWTDecoder struct {
 	keys jose.JSONWebKeySet
 }
 
+type Value []byte
+
 func NewStandardJWTDecoder() (*StandardJWTDecoder, error) {
 	var keyList struct {
-		Keys []json.RawMessage `json:"keys"`
+		Keys []Value `json:"keys"`
 	}
 
 	err := json.Unmarshal(jwks, &keyList)

@@ -1,7 +1,7 @@
 package domain_test
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 	"testing"
 
 	"github.com/climblive/platform/backend/internal/domain"
