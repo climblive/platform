@@ -11,6 +11,7 @@ type userUseCaseRepository interface {
 	domain.Transactor
 
 	GetUserByUsername(ctx context.Context, tx domain.Transaction, username string) (domain.User, error)
+	GetAllOrganizers(ctx context.Context, tx domain.Transaction) ([]domain.Organizer, error)
 }
 
 type UserUseCase struct {
@@ -31,6 +32,15 @@ func (uc *UserUseCase) GetSelf(ctx context.Context) (domain.User, error) {
 	user, err := uc.Repo.GetUserByUsername(ctx, nil, authentication.Username)
 	if err != nil {
 		return domain.User{}, errors.Wrap(err, 0)
+	}
+
+	if user.Admin {
+		organizers, err := uc.Repo.GetAllOrganizers(ctx, nil)
+		if err != nil {
+			return domain.User{}, errors.Wrap(err, 0)
+		}
+
+		user.Organizers = organizers
 	}
 
 	return user, nil

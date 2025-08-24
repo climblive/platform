@@ -233,6 +233,10 @@ SELECT *
 FROM organizer
 WHERE id = ?;
 
+-- name: GetAllOrganizers :many
+SELECT *
+FROM organizer;
+
 -- name: GetRaffle :one
 SELECT sqlc.embed(raffle)
 FROM raffle

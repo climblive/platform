@@ -36,3 +36,21 @@ func (d *Database) GetOrganizer(ctx context.Context, tx domain.Transaction, orga
 
 	return organizerToDomain(record), nil
 }
+
+func (d *Database) GetAllOrganizers(ctx context.Context, tx domain.Transaction) ([]domain.Organizer, error) {
+	records, err := d.WithTx(tx).GetAllOrganizers(ctx)
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return nil, errors.Wrap(domain.ErrNotFound, 0)
+	case err != nil:
+		return nil, errors.Wrap(err, 0)
+	}
+
+	organizers := make([]domain.Organizer, 0)
+
+	for _, record := range records {
+		organizers = append(organizers, organizerToDomain(record))
+	}
+
+	return organizers, nil
+}
