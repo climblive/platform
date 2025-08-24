@@ -5,7 +5,11 @@ import {
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import { type Contest, type ContestPatch, type ContestTemplate } from "../models";
+import {
+  type Contest,
+  type ContestPatch,
+  type ContestTemplate,
+} from "../models";
 import { HOUR } from "./constants";
 
 export const getContestQuery = (contestId: number) =>
