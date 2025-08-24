@@ -19,6 +19,7 @@
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
   import { GenericForm, name } from "@climblive/lib/forms";
+  import type { Contest } from "@climblive/lib/models";
   import { type Snippet } from "svelte";
 
   type T = $$Generic<Partial<Contest>>;
