@@ -1,5 +1,8 @@
 <script lang="ts">
-  import ContestForm from "@/forms/ContestForm.svelte";
+  import ContestForm, {
+    formSchema,
+    minuteInNanoseconds,
+  } from "@/forms/ContestForm.svelte";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import type { Contest, ContestTemplate } from "@climblive/lib/models";
   import { createContestMutation } from "@climblive/lib/queries";
@@ -22,6 +25,7 @@
     $createContest.mutate(
       {
         ...form,
+        gracePeriod: form.gracePeriod * minuteInNanoseconds,
       },
       {
         onSuccess: (contest: Contest) => navigate(`contests/${contest.id}`),
@@ -34,11 +38,13 @@
 <ContestForm
   submit={handleSubmit}
   data={{
-    name: "Test",
+    name: "",
     finalists: 7,
     qualifyingProblems: 10,
-    gracePeriod: 15,
+    gracePeriod: 15 * minuteInNanoseconds,
+    rules: "",
   }}
+  schema={formSchema}
 >
   <div class="controls">
     <wa-button size="small" appearance="plain" onclick={history.back()}

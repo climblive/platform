@@ -31,7 +31,7 @@
   pre {
     border: var(--wa-border-width-s) var(--wa-border-style)
       var(--wa-color-brand-border-normal);
-    background-color: white;
+    background-color: var(--wa-color-surface-lowered);
     padding: var(--wa-space-s);
     overflow: scroll;
     border-radius: var(--wa-border-radius-s);

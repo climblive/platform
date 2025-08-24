@@ -17,7 +17,9 @@
 
   const problemsQuery = $derived(getProblemsQuery(contestId));
 
-  let problems = $derived($problemsQuery.data);
+  const sortedProblems = $derived(
+    $problemsQuery.data?.sort((p1, p2) => p1.number - p2.number),
+  );
 
   const columns: ColumnDefinition<Problem>[] = [
     {
@@ -100,8 +102,15 @@
 {/snippet}
 
 <section>
-  {#if problems}
-    <Table {columns} data={problems} getId={({ id }) => id}></Table>
+  <wa-button
+    variant="brand"
+    appearance="accent"
+    onclick={() => navigate(`contests/${contestId}/new-problem`)}
+    >Create</wa-button
+  >
+
+  {#if sortedProblems?.length}
+    <Table {columns} data={sortedProblems} getId={({ id }) => id}></Table>
   {/if}
 </section>
 
@@ -115,5 +124,12 @@
     display: flex;
     align-items: center;
     gap: var(--wa-space-s);
+  }
+
+  section {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: var(--wa-space-m);
   }
 </style>

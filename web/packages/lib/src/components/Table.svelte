@@ -71,7 +71,6 @@
 
 <style>
   table {
-    margin-top: 1rem;
     width: 100%;
     table-layout: fixed;
 
@@ -79,6 +78,9 @@
     border-collapse: separate;
     overflow: hidden;
     border-spacing: 0;
+    border: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-neutral-border-quiet);
+    border-radius: var(--wa-border-radius-m);
   }
 
   @supports (grid-template-columns: subgrid) {
@@ -109,9 +111,7 @@
   }
 
   thead {
-    height: 2.5rem;
-    background-color: var(--wa-color-brand-fill-normal);
-    color: var(--wa-color-brand-on-normal);
+    background-color: transparent;
 
     & th {
       font-weight: var(--wa-font-weight-bold);
@@ -119,14 +119,19 @@
     }
   }
 
+  thead,
   tbody tr {
     height: 3.5rem;
   }
 
+  tbody tr:first-of-type {
+    border-top: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-neutral-border-quiet);
+  }
+
   tbody tr:not(:last-of-type) {
-    height: 3.5rem;
     border-bottom: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-color-surface-raised);
+      var(--wa-color-neutral-border-quiet);
   }
 
   tbody tr:hover {

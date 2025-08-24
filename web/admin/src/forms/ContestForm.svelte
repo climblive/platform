@@ -1,34 +1,40 @@
 <script lang="ts" module>
   import * as z from "zod";
 
-  const formSchema = z.object({
+  export const formSchema = z.object({
     location: z.string().optional(),
     seriesId: z.coerce.number().optional(),
     name: z.string().min(1),
     description: z.string().optional(),
-    qualifyingProblems: z.coerce.number().min(0),
-    finalists: z.coerce.number().min(0),
+    qualifyingProblems: z.coerce.number().min(0).max(65536),
+    finalists: z.coerce.number().min(0).max(65536),
     rules: z.string().optional(),
     gracePeriod: z.coerce.number().min(0).max(60),
   });
+
+  export const minuteInNanoseconds = 60 * 1_000_000_000;
 </script>
 
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
   import { GenericForm, name } from "@climblive/lib/forms";
-  import { type ContestTemplate } from "@climblive/lib/models";
+  import type { Contest } from "@climblive/lib/models";
   import { type Snippet } from "svelte";
 
+  type T = $$Generic<Partial<Contest>>;
+
   interface Props {
-    data: Partial<ContestTemplate>;
-    submit: (value: ContestTemplate) => void;
+    data: Partial<T>;
+    schema: z.ZodType<T, z.ZodTypeDef, T>;
+    submit: (value: T) => void;
     children?: Snippet;
   }
 
-  let { data, submit, children }: Props = $props();
+  let { data, schema, submit, children }: Props = $props();
 </script>
 
-<GenericForm schema={formSchema} {submit}>
+<GenericForm {schema} {submit}>
   <fieldset>
     <wa-input
       size="small"
@@ -61,6 +67,7 @@
       required
       value={data.finalists}
       min={0}
+      max={65536}
     ></wa-input>
     <wa-input
       size="small"
@@ -71,23 +78,25 @@
       required
       value={data.qualifyingProblems}
       min={0}
+      max={65536}
     ></wa-input>
     <wa-input
       size="small"
       {@attach name("gracePeriod")}
-      label="Grace period"
+      label="Grace period (minutes)"
       hint="Extra time after the end of the contest during which contenders can enter their last results"
       type="number"
       required
       min={0}
       max={60}
-      value={data.gracePeriod}
-    ></wa-input>
+      value={Math.floor((data.gracePeriod ?? 0) / minuteInNanoseconds)}
+    >
+    </wa-input>
     <wa-textarea
       size="small"
       {@attach name("rules")}
       label="Rules"
-      value={data.rules}
+      value={data.rules ?? ""}
     ></wa-textarea>
     {@render children?.()}
   </fieldset>

@@ -25,6 +25,12 @@
       width: "1fr",
     },
     {
+      label: "Description",
+      mobile: false,
+      render: renderDescription,
+      width: "1fr",
+    },
+    {
       label: "Start time",
       mobile: true,
       render: renderTimeBegin,
@@ -47,6 +53,10 @@
 
 {#snippet renderName({ name }: CompClass)}
   {name}
+{/snippet}
+
+{#snippet renderDescription({ description }: CompClass)}
+  {description}
 {/snippet}
 
 {#snippet renderTimeBegin({ timeBegin }: CompClass)}
@@ -82,18 +92,37 @@
 {/snippet}
 
 <section>
-  {#if compClasses}
+  <p class="copy">
+    Classes represent the categories in which the contenders compete, typically
+    divided into Males and Females. The contest duration is defined by the start
+    and end times of your classes.
+  </p>
+
+  <wa-button
+    variant="brand"
+    appearance="accent"
+    onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
+    >Create</wa-button
+  >
+
+  {#if compClasses?.length}
     <Table {columns} data={compClasses} getId={({ id }) => id}></Table>
   {/if}
 </section>
 
 <style>
-  section {
-    display: flex;
-    gap: var(--wa-space-xs);
-  }
-
   .controls {
     display: flex;
+  }
+
+  .copy {
+    color: var(--wa-color-text-quiet);
+  }
+
+  section {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: var(--wa-space-m);
   }
 </style>

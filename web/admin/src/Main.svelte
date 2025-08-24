@@ -1,17 +1,18 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
   import { Route, Router } from "svelte-routing";
-  import LastOrganizer from "./components/LastOrganizer.svelte";
   import Header from "./Header.svelte";
   import Contest from "./pages/Contest.svelte";
   import CreateCompClass from "./pages/CreateCompClass.svelte";
   import CreateContest from "./pages/CreateContest.svelte";
   import CreateProblem from "./pages/CreateProblem.svelte";
   import EditCompClass from "./pages/EditCompClass.svelte";
+  import EditContest from "./pages/EditContest.svelte";
   import EditProblem from "./pages/EditProblem.svelte";
   import OrganizerView from "./pages/OrganizerView.svelte";
+  import PrintableTicketList from "./pages/PrintableTicketList.svelte";
   import RaffleView from "./pages/RaffleView.svelte";
-  import TicketList from "./pages/TicketList.svelte";
+  import Root from "./pages/Root.svelte";
 </script>
 
 <Header />
@@ -19,7 +20,7 @@
 <main>
   <Router basepath="/admin">
     <Route path="/">
-      <LastOrganizer />
+      <Root />
     </Route>
     <Route path="/organizers/:organizerId">
       {#snippet children({ params }: { params: { organizerId: number } })}
@@ -33,7 +34,14 @@
     </Route>
     <Route path="/contests/:contestId">
       {#snippet children({ params }: { params: { contestId: number } })}
-        <Contest contestId={Number(params.contestId)} />
+        {#key params.contestId}
+          <Contest contestId={Number(params.contestId)} />
+        {/key}
+      {/snippet}
+    </Route>
+    <Route path="/contests/:contestId/edit">
+      {#snippet children({ params }: { params: { contestId: number } })}
+        <EditContest contestId={Number(params.contestId)} />
       {/snippet}
     </Route>
     <Route path="/contests/:contestId/new-comp-class">
@@ -63,7 +71,7 @@
     </Route>
     <Route path="/contests/:contestId/tickets">
       {#snippet children({ params }: { params: { contestId: number } })}
-        <TicketList contestId={Number(params.contestId)} />
+        <PrintableTicketList contestId={Number(params.contestId)} />
       {/snippet}
     </Route>
   </Router>
@@ -72,6 +80,8 @@
 <style>
   main {
     padding: var(--wa-space-m);
+    margin: 0 auto;
+    max-width: 1024px;
   }
 
   @media print {

@@ -40,12 +40,12 @@
   <Link to={`/admin/raffles/${id}`}>Raffle {id}</Link>
 {/snippet}
 
-<wa-button variant="brand" appearance="accent" onclick={handleCreateRaffle}
-  >Create</wa-button
->
-
 <section>
-  {#if raffles}
+  <wa-button variant="brand" appearance="accent" onclick={handleCreateRaffle}
+    >Create</wa-button
+  >
+
+  {#if raffles?.length}
     <Table {columns} data={raffles} getId={({ id }) => id}></Table>
   {/if}
 </section>
@@ -53,6 +53,8 @@
 <style>
   section {
     display: flex;
-    gap: var(--wa-space-xs);
+    flex-direction: column;
+    align-items: start;
+    gap: var(--wa-space-m);
   }
 </style>

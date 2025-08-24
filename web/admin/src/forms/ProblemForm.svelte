@@ -5,9 +5,7 @@
     number: z.coerce.number(),
     holdColorPrimary: z.string().regex(/^#([0-9a-fA-F]{3}){1,2}$/),
     holdColorSecondary: z.string().optional(),
-    description: z.string().optional(),
     pointsTop: z.coerce.number(),
-    pointsZone: z.coerce.number(),
     flashBonus: z.coerce.number().optional(),
   });
 </script>
@@ -31,18 +29,17 @@
   let { data, schema, submit, children }: Props = $props();
 
   const swatches = [
-    "#F44336",
-    "#4CAF50",
-    "#1790D2",
-    "#E410EB",
-    "#FFEB3B",
-    "#050505",
-    "#FF9800",
-    "#F628A5",
-    "#FAFAFA",
-    "#654321",
-    "#cccccc",
-    "#00FFEF",
+    "#6f3601",
+    "#dc3146",
+    "#f46a45",
+    "#fac22b",
+    "#00ac49",
+    "#2fbedc",
+    "#0071ec",
+    "#9951db",
+    "#e66ba3",
+    "#9194a2",
+    "#000",
   ].join("; ");
 </script>
 
@@ -79,33 +76,18 @@
     </div>
     <wa-input
       size="small"
-      {@attach name("description")}
-      label="Description"
-      type="text"
-      value={data.description}
-    ></wa-input>
-    <wa-input
-      size="small"
       {@attach name("pointsTop")}
       label="Points for top"
       type="number"
       required
-      value={data.pointsTop}
-    ></wa-input>
-    <wa-input
-      size="small"
-      {@attach name("pointsZone")}
-      label="Points for zone"
-      type="number"
-      required
-      value={data.pointsZone}
+      value={data.pointsTop?.toString() ?? ""}
     ></wa-input>
     <wa-input
       size="small"
       {@attach name("flashBonus")}
       label="Flash bonus"
       type="number"
-      value={data.flashBonus}
+      value={data.flashBonus?.toString() ?? ""}
     ></wa-input>
     {@render children?.()}
   </fieldset>
