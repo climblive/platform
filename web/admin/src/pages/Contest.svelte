@@ -67,6 +67,14 @@
 
       <wa-tab-panel name="contest">
         <article>
+          <wa-button
+            size="small"
+            appearance="outlined"
+            onclick={() => navigate(`/admin/contests/${contest.id}/edit`)}
+          >
+            Edit
+            <wa-icon slot="start" name="pencil"></wa-icon>
+          </wa-button>
           <LabeledText label="Name">
             {contest.name}
           </LabeledText>

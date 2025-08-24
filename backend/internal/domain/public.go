@@ -85,6 +85,17 @@ type ContestTemplate struct {
 	GracePeriod        time.Duration `json:"gracePeriod"`
 }
 
+type ContestPatch struct {
+	Location           Patch[string]        `json:"location,omitzero" tstype:"string"`
+	SeriesID           Patch[SeriesID]      `json:"seriesId,omitzero" tstype:"number"`
+	Name               Patch[string]        `json:"name,omitzero" tstype:"string"`
+	Description        Patch[string]        `json:"description,omitzero" tstype:"string"`
+	QualifyingProblems Patch[int]           `json:"qualifyingProblems,omitzero" tstype:"number"`
+	Finalists          Patch[int]           `json:"finalists,omitzero" tstype:"number"`
+	Rules              Patch[string]        `json:"rules,omitzero" tstype:"string"`
+	GracePeriod        Patch[time.Duration] `json:"gracePeriod,omitzero" tstype:"number"`
+}
+
 type Organizer struct {
 	ID        OrganizerID   `json:"id"`
 	Ownership OwnershipData `json:"-"`

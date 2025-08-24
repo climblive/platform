@@ -3,9 +3,9 @@ package usecases
 import (
 	"context"
 	"strings"
-	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/go-errors/errors"
 	"github.com/microcosm-cc/bluemonday"
 )
@@ -92,6 +92,62 @@ func (uc *ContestUseCase) GetScoreboard(ctx context.Context, contestID domain.Co
 	return entries, nil
 }
 
+func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.ContestID, patch domain.ContestPatch) (domain.Contest, error) {
+	var mty domain.Contest
+
+	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
+	if err != nil {
+		return mty, errors.Wrap(err, 0)
+	}
+
+	_, err = uc.Authorizer.HasOwnership(ctx, contest.Ownership)
+	if err != nil {
+		return mty, errors.Wrap(err, 0)
+	}
+
+	if patch.Location.Present {
+		contest.Location = strings.TrimSpace(patch.Location.Value)
+	}
+
+	if patch.SeriesID.Present {
+		contest.SeriesID = patch.SeriesID.Value
+	}
+
+	if patch.Name.Present {
+		contest.Name = strings.TrimSpace(patch.Name.Value)
+	}
+
+	if patch.Description.Present {
+		contest.Description = strings.TrimSpace(patch.Description.Value)
+	}
+
+	if patch.QualifyingProblems.Present {
+		contest.QualifyingProblems = patch.QualifyingProblems.Value
+	}
+
+	if patch.Finalists.Present {
+		contest.Finalists = patch.Finalists.Value
+	}
+
+	if patch.Rules.Present {
+		contest.Rules = sanitizationPolicy.Sanitize(patch.Rules.Value)
+	}
+
+	if patch.GracePeriod.Present {
+		contest.GracePeriod = patch.GracePeriod.Value
+	}
+
+	if err := (validators.ContestValidator{}).Validate(contest); err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	if _, err = uc.Repo.StoreContest(ctx, nil, contest); err != nil {
+		return mty, errors.Wrap(err, 0)
+	}
+
+	return contest, nil
+}
+
 func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.OrganizerID, tmpl domain.ContestTemplate) (domain.Contest, error) {
 	organizer, err := uc.Repo.GetOrganizer(ctx, nil, organizerID)
 	if err != nil {
@@ -100,17 +156,6 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 
 	if _, err := uc.Authorizer.HasOwnership(ctx, organizer.Ownership); err != nil {
 		return domain.Contest{}, errors.Wrap(err, 0)
-	}
-
-	switch {
-	case len(tmpl.Name) < 1:
-		fallthrough
-	case tmpl.Finalists < 0:
-		fallthrough
-	case tmpl.QualifyingProblems < 0:
-		fallthrough
-	case tmpl.GracePeriod < 0 || tmpl.GracePeriod > time.Hour:
-		return domain.Contest{}, errors.Wrap(domain.ErrInvalidData, 0)
 	}
 
 	contest := domain.Contest{
@@ -124,6 +169,10 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		Finalists:          tmpl.Finalists,
 		Rules:              sanitizationPolicy.Sanitize(tmpl.Rules),
 		GracePeriod:        tmpl.GracePeriod,
+	}
+
+	if err := (validators.ContestValidator{}).Validate(contest); err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
 	contest, err = uc.Repo.StoreContest(ctx, nil, contest)
