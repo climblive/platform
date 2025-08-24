@@ -7,6 +7,7 @@
   import CreateContest from "./pages/CreateContest.svelte";
   import CreateProblem from "./pages/CreateProblem.svelte";
   import EditCompClass from "./pages/EditCompClass.svelte";
+  import EditContest from "./pages/EditContest.svelte";
   import EditProblem from "./pages/EditProblem.svelte";
   import OrganizerView from "./pages/OrganizerView.svelte";
   import PrintableTicketList from "./pages/PrintableTicketList.svelte";
@@ -36,6 +37,11 @@
         {#key params.contestId}
           <Contest contestId={Number(params.contestId)} />
         {/key}
+      {/snippet}
+    </Route>
+    <Route path="/contests/:contestId/edit">
+      {#snippet children({ params }: { params: { contestId: number } })}
+        <EditContest contestId={Number(params.contestId)} />
       {/snippet}
     </Route>
     <Route path="/contests/:contestId/new-comp-class">

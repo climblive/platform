@@ -99,6 +99,16 @@ export interface ContestTemplate {
   rules?: string;
   gracePeriod: number;
 }
+export interface ContestPatch {
+  location?: string;
+  seriesId?: number;
+  name?: string;
+  description?: string;
+  qualifyingProblems?: number;
+  finalists?: number;
+  rules?: string;
+  gracePeriod?: number;
+}
 export interface Organizer {
   id: OrganizerID;
   name: string;

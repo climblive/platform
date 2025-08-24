@@ -8,6 +8,7 @@ import {
   type CompClassTemplate,
   type ContenderPatch,
   type ContestID,
+  type ContestPatch,
   type ContestTemplate,
   type ProblemPatch,
   type ProblemTemplate,
@@ -159,6 +160,16 @@ export class ApiClient {
     const endpoint = `/organizers/${organizerId}/contests`;
 
     const result = await this.axiosInstance.post(endpoint, template, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return contestSchema.parse(result.data);
+  };
+
+  patchContest = async (id: number, patch: ContestPatch) => {
+    const endpoint = `/contests/${id}`;
+
+    const result = await this.axiosInstance.patch(endpoint, patch, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 
