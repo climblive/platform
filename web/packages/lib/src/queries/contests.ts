@@ -55,8 +55,8 @@ export const patchContestMutation = (contestId: number) => {
   const client = useQueryClient();
 
   return createMutation({
-    mutationFn: (template: ContestPatch) =>
-      ApiClient.getInstance().patchContest(contestId, template),
+    mutationFn: (patch: ContestPatch) =>
+      ApiClient.getInstance().patchContest(contestId, patch),
     onSuccess: (patchedContest) => {
       let queryKey: QueryKey = [
         "contests",
