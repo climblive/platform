@@ -1,13 +1,9 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/option/option.js";
-  import "@awesome.me/webawesome/dist/components/select/select.js";
-  import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import {
     FullLogo,
     ResultList,
     ScoreboardProvider,
   } from "@climblive/lib/components";
-  import { value } from "@climblive/lib/forms";
   import { getCompClassesQuery, getContestQuery } from "@climblive/lib/queries";
   import { onMount } from "svelte";
   import Header from "../components/Header.svelte";
@@ -19,7 +15,6 @@
 
   let { contestId }: Props = $props();
 
-  let compClassSelector: WaSelect | undefined = $state();
   let selectedCompClassId: number | undefined = $state();
   let overflow: "pagination" | "scroll" = $state("scroll");
 
@@ -65,22 +60,6 @@
         <p class="logo">
           <FullLogo />
         </p>
-        {#if compClasses.length > 1}
-          <wa-select
-            bind:this={compClassSelector}
-            size="small"
-            name="compClassId"
-            label="Competition class"
-            {@attach value(selectedCompClassId)}
-            onchange={() => {
-              selectedCompClassId = Number(compClassSelector?.value);
-            }}
-          >
-            {#each compClasses as compClass (compClass.id)}
-              <wa-option value={compClass.id}>{compClass.name}</wa-option>
-            {/each}
-          </wa-select>
-        {/if}
         <div class="container" style="--num-columns: {compClasses.length}">
           {#each compClasses as compClass (compClass.id)}
             <section
