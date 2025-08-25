@@ -168,6 +168,7 @@
       oninput={() => {
         filterText = quickFilter?.value ?? "";
       }}
+      with-clear
     ></wa-input>
     <wa-select
       bind:this={compClassSelector}
