@@ -79,7 +79,7 @@
       const search = filterText.toLowerCase();
 
       scores = scores.filter(({ publicName }) =>
-        publicName.toLocaleLowerCase().includes(search),
+        publicName.toLowerCase().includes(search),
       );
     }
 
