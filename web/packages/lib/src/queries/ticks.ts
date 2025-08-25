@@ -9,10 +9,21 @@ import { ApiClient } from "../Api";
 import type { Tick } from "../models";
 import { HOUR } from "./constants";
 
-export const getTicksQuery = (contenderId: number) =>
+export const getTicksByContenderQuery = (contenderId: number) =>
   createQuery({
     queryKey: ["ticks", { contenderId }],
-    queryFn: async () => ApiClient.getInstance().getTicks(contenderId),
+    queryFn: async () =>
+      ApiClient.getInstance().getTicksByContender(contenderId),
+    retry: false,
+    gcTime: 12 * HOUR,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+  });
+
+export const getTicksByContestQuery = (contestId: number) =>
+  createQuery({
+    queryKey: ["ticks", { contestId }],
+    queryFn: async () => ApiClient.getInstance().getTicksByContest(contestId),
     retry: false,
     gcTime: 12 * HOUR,
     staleTime: 0,

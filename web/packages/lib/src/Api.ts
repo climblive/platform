@@ -284,8 +284,18 @@ export class ApiClient {
     return compClassSchema.parse(result.data);
   };
 
-  getTicks = async (contenderId: number) => {
+  getTicksByContender = async (contenderId: number) => {
     const endpoint = `/contenders/${contenderId}/ticks`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(tickSchema).parse(result.data);
+  };
+
+  getTicksByContest = async (contestId: number) => {
+    const endpoint = `/contests/${contestId}/ticks`;
 
     const result = await this.axiosInstance.get(endpoint, {
       headers: this.credentialsProvider?.getAuthHeaders(),
