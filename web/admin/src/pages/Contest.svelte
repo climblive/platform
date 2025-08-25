@@ -2,9 +2,9 @@
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import "@awesome.me/webawesome/dist/components/details/details.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import "@awesome.me/webawesome/dist/components/scroller/scroller.js";
   import "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
   import type WaTabGroup from "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
   import "@awesome.me/webawesome/dist/components/tab-panel/tab-panel.js";
@@ -95,13 +95,9 @@
             {contest.qualifyingProblems}
           </LabeledText>
           {#if contest.rules}
-            <LabeledText label="Rules">
-              <div class="rules">
-                <wa-scroller orientation="vertical" without-shadow>
-                  {@html contest.rules}
-                </wa-scroller>
-              </div>
-            </LabeledText>
+            <wa-details summary="Rules">
+              {@html contest.rules}
+            </wa-details>
           {/if}
         </article>
 
@@ -180,14 +176,7 @@
     margin-top: var(--wa-space-2xl);
   }
 
-  wa-scroller {
-    max-height: 10rem;
-  }
-
-  .rules {
-    border: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-color-neutral-border-normal);
-    border-radius: var(--wa-border-radius-m);
-    padding: var(--wa-space-s);
+  wa-details {
+    margin-top: var(--wa-space-m);
   }
 </style>
