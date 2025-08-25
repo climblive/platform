@@ -88,6 +88,81 @@ func TestGetTicksByContender(t *testing.T) {
 	})
 }
 
+func TestGetTicksByContest(t *testing.T) {
+	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedOwnership := domain.OwnershipData{
+		OrganizerID: randomResourceID[domain.OrganizerID](),
+	}
+
+	makeMocks := func() (*repositoryMock, *authorizerMock) {
+		mockedRepo := new(repositoryMock)
+		mockedAuthorizer := new(authorizerMock)
+
+		fakedContest := domain.Contest{
+			ID:        fakedContestID,
+			Ownership: fakedOwnership,
+		}
+
+		mockedRepo.
+			On("GetContest", mock.Anything, mock.Anything, fakedContestID).
+			Return(fakedContest, nil)
+
+		return mockedRepo, mockedAuthorizer
+	}
+
+	t.Run("HappyPath", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		fakedTicks := []domain.Tick{
+			{
+				ID: randomResourceID[domain.TickID](),
+			},
+		}
+
+		mockedRepo.
+			On("GetTicksByContest", mock.Anything, mock.Anything, fakedContestID).
+			Return(fakedTicks, nil)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.ContenderRole, nil)
+
+		ucase := usecases.TickUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		ticks, err := ucase.GetTicksByContest(context.Background(), fakedContestID)
+
+		require.NoError(t, err)
+		assert.Equal(t, fakedTicks, ticks)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		ucase := usecases.TickUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		ticks, err := ucase.GetTicksByContest(context.Background(), fakedContestID)
+
+		assert.ErrorIs(t, err, domain.ErrNoOwnership)
+		assert.Nil(t, ticks)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+}
+
 func TestCreateTick(t *testing.T) {
 	fakedContenderID := randomResourceID[domain.ContenderID]()
 	fakedContestID := randomResourceID[domain.ContestID]()
