@@ -2,9 +2,7 @@
   import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
 </script>
 
-<main>
-  <wa-spinner></wa-spinner>
-</main>
+<main></main>
 
 <style>
   main {
