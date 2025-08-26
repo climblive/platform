@@ -26,7 +26,7 @@
   const problems = $derived(
     new Map($problemsQuery.data?.map((problem) => [problem.id, problem]) ?? []),
   );
-  let ticks = $derived($ticksQuery.data);
+  const ticks = $derived($ticksQuery.data);
 
   type TickAndProblem = { tick: Tick; problem: Problem };
 
