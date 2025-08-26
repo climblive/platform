@@ -33,7 +33,7 @@
     getCompClassesQuery(contestId, { enabled: !!contestId }),
   );
 
-  let compClasses = $derived($compClassesQuery.data);
+  const compClasses = $derived($compClassesQuery.data);
 
   let withdrawFromFinalsToggle: WaSwitch | undefined = $state();
 
