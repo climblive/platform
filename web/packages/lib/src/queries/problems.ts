@@ -17,8 +17,12 @@ export const getProblemQuery = (problemId: number) =>
     staleTime: 12 * HOUR,
   });
 
-export const getProblemsQuery = (contestId: number) =>
+export const getProblemsQuery = (
+  contestId: number,
+  options?: Partial<Parameters<typeof createQuery<Problem[]>>[0]>,
+) =>
   createQuery({
+    ...options,
     queryKey: ["problems", { contestId }],
     queryFn: async () => ApiClient.getInstance().getProblems(contestId),
     retry: false,

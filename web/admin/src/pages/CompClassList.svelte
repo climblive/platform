@@ -91,13 +91,13 @@
   </div>
 {/snippet}
 
-<section>
-  <p class="copy">
-    Classes represent the categories in which the contenders compete, typically
-    divided into Males and Females. The contest duration is defined by the start
-    and end times of your classes.
-  </p>
+<p class="copy">
+  Classes represent the categories in which the contenders compete, typically
+  divided into Males and Females. The contest duration is defined by the start
+  and end times of your classes.
+</p>
 
+<section>
   <wa-button
     variant="brand"
     appearance="accent"
