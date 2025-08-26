@@ -5,8 +5,7 @@
   import "@awesome.me/webawesome/dist/components/copy-button/copy-button.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import "@awesome.me/webawesome/dist/components/option/option.js";
-  import "@awesome.me/webawesome/dist/components/select/select.js";
+  import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { LabeledText } from "@climblive/lib/components";
   import { checked } from "@climblive/lib/forms";
