@@ -43,7 +43,7 @@
           problem,
         };
       })
-      .filter((problem) => problem !== undefined)
+      .filter((entry) => entry !== undefined)
       .sort(
         (t1: TickAndProblem, t2: TickAndProblem) =>
           t1.problem.number - t2.problem.number,
