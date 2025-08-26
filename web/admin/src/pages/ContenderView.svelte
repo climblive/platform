@@ -137,7 +137,9 @@
     <h2>Ticks</h2>
     <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
     ></wa-divider>
-    <p class="copy">All ticks registered by the contender.</p>
+    <p class="copy">
+      All ticks registered by the contender during the contest.
+    </p>
     <TickList contenderId={contender.id} contestId={contender.contestId}
     ></TickList>
   {/if}

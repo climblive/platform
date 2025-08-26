@@ -97,13 +97,12 @@
 {/snippet}
 
 {#snippet renderFlash({ tick }: TickAndProblem)}
-  {#if tick.top && tick.attemptsTop === 1}
-    <wa-icon name="bolt"></wa-icon>
-  {/if}
+  <wa-icon name={tick.top && tick.attemptsTop === 1 ? "bolt" : "minus"}
+  ></wa-icon>
 {/snippet}
 
 {#snippet renderPoints({ tick, problem }: TickAndProblem)}
-  {calculateProblemScore(problem, tick)}
+  {calculateProblemScore(problem, tick)} pts
 {/snippet}
 
 {#snippet renderTimestamp({ tick }: TickAndProblem)}
