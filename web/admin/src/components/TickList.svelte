@@ -23,7 +23,7 @@
   const problemsQuery = $derived(getProblemsQuery(contestId));
   const ticksQuery = $derived(getTicksByContenderQuery(contenderId));
 
-  let problems = $derived(
+  const problems = $derived(
     new Map($problemsQuery.data?.map((problem) => [problem.id, problem]) ?? []),
   );
   let ticks = $derived($ticksQuery.data);
