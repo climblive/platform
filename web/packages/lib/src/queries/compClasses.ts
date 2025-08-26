@@ -17,8 +17,12 @@ export const getCompClassQuery = (compClassId: number) =>
     staleTime: 12 * HOUR,
   });
 
-export const getCompClassesQuery = (contestId: number) =>
+export const getCompClassesQuery = (
+  contestId: number,
+  options?: Partial<Parameters<typeof createQuery<CompClass[]>>[0]>,
+) =>
   createQuery({
+    ...options,
     queryKey: ["comp-classes", { contestId }],
     queryFn: async () => ApiClient.getInstance().getCompClasses(contestId),
     retry: false,

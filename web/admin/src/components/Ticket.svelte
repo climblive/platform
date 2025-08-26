@@ -1,6 +1,5 @@
 <script lang="ts">
-  import logoUrl from "@/assets/logo.svg";
-  import SvgQR from "@svelte-put/qr/svg/QR.svelte";
+  import QrCode from "./QrCode.svelte";
 
   type Props = {
     contestName: string;
@@ -16,17 +15,7 @@
     <span class="link">Register at {location.protocol}//{location.host}</span>
     <span class="code">{registrationCode}</span>
   </div>
-  <SvgQR
-    data={`${location.protocol}//${location.host}/${registrationCode}`}
-    width={80}
-    margin={0}
-    shape="circle"
-    errorCorrectionLevel="Q"
-    logo={logoUrl}
-    anchorOuterFill="black"
-    moduleFill="black"
-    anchorInnerFill="#ea384c"
-  />
+  <QrCode {registrationCode} width={80}></QrCode>
 </section>
 
 <style>

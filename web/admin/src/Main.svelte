@@ -2,6 +2,7 @@
   import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
   import { Route, Router } from "svelte-routing";
   import Header from "./Header.svelte";
+  import ContenderView from "./pages/ContenderView.svelte";
   import Contest from "./pages/Contest.svelte";
   import CreateCompClass from "./pages/CreateCompClass.svelte";
   import CreateContest from "./pages/CreateContest.svelte";
@@ -72,6 +73,11 @@
     <Route path="/contests/:contestId/tickets">
       {#snippet children({ params }: { params: { contestId: number } })}
         <PrintableTicketList contestId={Number(params.contestId)} />
+      {/snippet}
+    </Route>
+    <Route path="/contenders/:contenderId">
+      {#snippet children({ params }: { params: { contenderId: number } })}
+        <ContenderView contenderId={Number(params.contenderId)} />
       {/snippet}
     </Route>
   </Router>

@@ -9,8 +9,12 @@ import { ApiClient } from "../Api";
 import type { Tick } from "../models";
 import { HOUR } from "./constants";
 
-export const getTicksByContenderQuery = (contenderId: number) =>
-  createQuery({
+export const getTicksByContenderQuery = (
+  contenderId: number,
+  options?: Partial<Parameters<typeof createQuery<Tick[]>>[0]>,
+) =>
+  createQuery<Tick[]>({
+    ...options,
     queryKey: ["ticks", { contenderId }],
     queryFn: async () =>
       ApiClient.getInstance().getTicksByContender(contenderId),
