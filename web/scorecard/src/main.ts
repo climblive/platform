@@ -1,4 +1,3 @@
-import App from "@/App.svelte";
 import "@/main.css";
 import {
   prefersDarkColorScheme,
@@ -6,6 +5,7 @@ import {
   watchColorSchemeChanges,
 } from "@climblive/lib/utils";
 import { mount } from "svelte";
+import App from "./App.svelte";
 import Fallback from "./Fallback.svelte";
 
 watchColorSchemeChanges((prefersDarkColorScheme) =>
@@ -30,13 +30,12 @@ const checkCompat = () => {
 
   const internals = element.attachInternals();
 
-
   if (internals.states === undefined) {
     return false;
   }
 
   return true;
-}
+};
 
 const appComponent = checkCompat() ? App : Fallback;
 
