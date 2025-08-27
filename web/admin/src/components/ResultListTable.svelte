@@ -11,11 +11,9 @@
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import { checked, value } from "@climblive/lib/forms";
   import type { ScoreboardEntry } from "@climblive/lib/models";
-  import {
-    getCompClassesQuery,
-    getContendersByContestQuery,
-  } from "@climblive/lib/queries";
+  import { getCompClassesQuery } from "@climblive/lib/queries";
   import { ordinalSuperscript } from "@climblive/lib/utils";
+  import { Link } from "svelte-routing";
   import type { Readable } from "svelte/store";
 
   interface Props {
@@ -30,15 +28,8 @@
   let compClassSelector: WaSelect | undefined = $state();
   let quickFilter: WaInput | undefined = $state();
 
-  const contendersQuery = $derived(getContendersByContestQuery(contestId));
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
 
-  const contenders = $derived(
-    new Map(
-      $contendersQuery.data?.map((contender) => [contender.id, contender]) ??
-        [],
-    ),
-  );
   const compClasses = $derived($compClassesQuery.data);
 
   let filterText = $state<string>();
@@ -127,19 +118,15 @@
   publicName,
   disqualified,
 }: ScoreboardEntry)}
-  {@const contender = contenders.get(contenderId)}
-  {#if contender}
-    <a href={`/${contender.registrationCode}`} target="_blank">
-      <wa-button appearance="plain" variant="brand" size="small">
-        <wa-icon slot="start" name="arrow-up-right-from-square"></wa-icon>
-        {#if disqualified}
-          <strike>{publicName}</strike>
-        {:else}
-          {publicName}
-        {/if}
-      </wa-button>
-    </a>
-  {/if}
+  <Link to={`./contenders/${contenderId}`}>
+    <wa-button appearance="plain" variant="brand" size="small">
+      {#if disqualified}
+        <strike>{publicName}</strike>
+      {:else}
+        {publicName}
+      {/if}
+    </wa-button>
+  </Link>
 {/snippet}
 
 {#snippet renderScore({ score }: ScoreboardEntry)}
