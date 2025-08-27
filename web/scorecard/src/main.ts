@@ -22,6 +22,13 @@ class CompatElement extends HTMLElement {
 window.customElements.define("cl-compat", CompatElement);
 
 const checkCompat = () => {
+  const query = new URLSearchParams(location.search);
+  const force = query.get("force-compat");
+
+  if (force === "true") {
+    return true;
+  }
+
   const element: CompatElement = document.createElement("cl-compat");
 
   if (element.attachInternals === undefined) {
