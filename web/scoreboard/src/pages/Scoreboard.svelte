@@ -50,9 +50,7 @@
 {:else}
   <ScoreboardProvider {contestId}>
     {#snippet children({ scoreboard, loading, online })}
-      <header data-online={online}>
-        <wa-icon name="triangle-exclamation"></wa-icon>Offline
-      </header>
+      <header data-online={online}></header>
       <main>
         <h1>
           {contest.name}

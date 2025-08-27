@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import type { ScoreboardEntry } from "../models";
   import { ordinalSuperscript } from "../utils";
   import Score from "./Score.svelte";
