@@ -1,24 +1,30 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/styles/native.css";
+  import App from "./App.svelte";
+
+  let force = $state(false);
 </script>
 
-<main>
-  <section>
-    <h1>Sorry!</h1>
-    <p>
-      Your browser is too old to run this app. Upgrade you browser to the latest
-      version or borrow your friends phone.
-    </p>
-    <p>
-      If you are using an iPhone or iPad you'll need to <a
-        href="https://support.apple.com/en-us/118575"
-        >update to the latest version of iOS</a
-      >. Note that if your device is older than iPhone XR you wont be able to
-      upgrade to the latest version.
-    </p>
-    <button>Try failsafe version</button>
-  </section>
-</main>
+{#if force}
+  <App></App>
+{:else}
+  <main>
+    <section>
+      <h1>Sorry!</h1>
+      <p>
+        Your browser version is outdated and may not support this application.
+        We recommend you to upgrade your browser or borrow your friends phone.
+      </p>
+      <p>
+        If you are using an iPhone or iPad, please ensure you <a
+          href="https://support.apple.com/en-us/118575"
+          >update to the latest version of iOS</a
+        >. Please note that devices older than the iPhone XR may not be
+        upgradable.
+      </p>
+      <button onclick={() => (force = true)}>Try anyway</button>
+    </section>
+  </main>
+{/if}
 
 <style>
   main {
