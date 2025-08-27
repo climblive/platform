@@ -16,17 +16,16 @@
       >. Note that if your device is older than iPhone XR you wont be able to
       upgrade to the latest version.
     </p>
-    <button>Try failsafe</button>
+    <button>Try failsafe version</button>
   </section>
 </main>
 
 <style>
   main {
-    width: 100%;
+    padding: var(--wa-space-m);
   }
 
   section {
-    margin: var(--wa-space-m);
     padding: var(--wa-space-m);
     background-color: var(--wa-surface-raised);
   }

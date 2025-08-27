@@ -70,9 +70,9 @@
 
   <h1>
     {#if contender.disqualified}
-      <strike>
+      <del>
         {contenderName}
-      </strike>
+      </del>
     {:else}
       {contenderName}
     {/if}

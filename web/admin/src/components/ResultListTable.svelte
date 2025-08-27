@@ -121,7 +121,7 @@
   <Link to={`./contenders/${contenderId}`}>
     <wa-button appearance="plain" variant="brand" size="small">
       {#if disqualified}
-        <strike>{publicName}</strike>
+        <del>{publicName}</del>
       {:else}
         {publicName}
       {/if}
