@@ -1,7 +1,10 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
 </script>
 
-<main></main>
+<main>
+  <wa-spinner></wa-spinner>
+</main>
 
 <style>
   main {

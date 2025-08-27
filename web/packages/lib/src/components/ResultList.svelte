@@ -1,4 +1,6 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
+  import "@awesome.me/webawesome/dist/components/skeleton/skeleton.js";
   import { onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
   import type { ScoreboardEntry } from "../models";
