@@ -4,8 +4,19 @@
 
 <main>
   <section>
-    <p>Your browser is too old.</p>
-    <button>Failsafe</button>
+    <h1>Sorry!</h1>
+    <p>
+      Your browser is too old to run this app. Upgrade you browser to the latest
+      version or borrow your friends phone.
+    </p>
+    <p>
+      If you are using an iPhone or iPad you'll need to <a
+        href="https://support.apple.com/en-us/118575"
+        >update to the latest version of iOS</a
+      >. Note that if your device is older than iPhone XR you wont be able to
+      upgrade to the latest version.
+    </p>
+    <button>Try failsafe</button>
   </section>
 </main>
 
@@ -18,8 +29,5 @@
     margin: var(--wa-space-m);
     padding: var(--wa-space-m);
     background-color: var(--wa-surface-raised);
-    border: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-color-neutral-border-normal);
-    border-radius: var(--wa-border-radius-m);
   }
 </style>
