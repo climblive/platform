@@ -1,13 +1,20 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/styles/native.css";
+  import nativeStyles from "@awesome.me/webawesome/dist/styles/native.css?inline";
   import App from "./App.svelte";
 
   let force = $state(false);
+
+  const sheet = new CSSStyleSheet();
+  sheet.replaceSync(nativeStyles);
+  window.document.adoptedStyleSheets.push(sheet);
 </script>
 
 {#if force}
   <App></App>
 {:else}
+  <style>
+  {@html nativeStyles}
+  </style>
   <main>
     <section>
       <h1>Sorry!</h1>
