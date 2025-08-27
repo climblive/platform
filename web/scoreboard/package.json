@@ -28,7 +28,6 @@
     "@climblive/lib": "workspace:*",
     "@tanstack/svelte-query": "^5.83.1",
     "date-fns": "^4.1.0",
-    "normalize.css": "^8.0.1",
     "svelte-routing": "^2.13.0",
     "zod": "^3.25.76"
   }
