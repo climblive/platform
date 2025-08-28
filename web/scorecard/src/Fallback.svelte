@@ -1,8 +1,27 @@
 <script lang="ts">
   import nativeStylesUrl from "@awesome.me/webawesome/dist/styles/native.css?url";
-  import App from "./App.svelte";
+  import type { Component } from "svelte";
+
+  type Props = {
+    missingFeatures?: string[];
+    app: Component;
+  };
+
+  const { missingFeatures = [], app: App }: Props = $props();
 
   let force = $state(false);
+  let showMissingFeatures = $state(false);
+  let tapCount = $state(0);
+
+  const handleTap = () => {
+    tapCount += 1;
+
+    console.log(tapCount);
+
+    if (tapCount >= 5) {
+      showMissingFeatures = true;
+    }
+  };
 </script>
 
 {#if force}
@@ -11,11 +30,27 @@
   <link rel="stylesheet" href={nativeStylesUrl} />
   <main>
     <section>
-      <h1>Sorry!</h1>
+      <h1 onclickcapture={handleTap}>Sorry!</h1>
       <p>
         Your browser version is outdated and may not support this application.
         We recommend you to upgrade your browser or borrow your friends phone.
       </p>
+
+      {#if showMissingFeatures}
+        <p>
+          {#each missingFeatures as feature, index}
+            {#if index !== 0}
+              ,&nbsp
+            {/if}
+            <code>{feature}</code>
+          {/each}.
+        </p>
+      {/if}
+
+      <button onclick={() => (force = true)} class="wa-danger wa-size-s"
+        >Continue anyway</button
+      >
+
       <p>
         If you are using an iPhone or iPad, please ensure you <a
           href="https://support.apple.com/en-us/118575"
@@ -23,14 +58,21 @@
         >. Please note that devices older than the iPhone XR may not be
         upgradable.
       </p>
-      <button onclick={() => (force = true)}>Try anyway</button>
     </section>
   </main>
 {/if}
 
 <style>
+  h1 {
+    user-select: none;
+  }
+
   main {
     padding: var(--wa-space-m);
+  }
+
+  button {
+    margin-block-end: var(--wa-space-l);
   }
 
   section {

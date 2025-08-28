@@ -2,7 +2,7 @@ import "@/main.css";
 import {
   prefersDarkColorScheme,
   updateTheme,
-  watchColorSchemeChanges,
+  watchColorSchemeChanges
 } from "@climblive/lib/utils";
 import { mount } from "svelte";
 import App from "./App.svelte";
@@ -13,34 +13,18 @@ watchColorSchemeChanges((prefersDarkColorScheme) =>
 );
 updateTheme(prefersDarkColorScheme());
 
-class CompatElement extends HTMLElement {
-  constructor() {
-    super();
-  }
+const [compatible, missingFeatures] = [false, ["ElementInternals", "CustomElementRegistry", "CustomStateSet"]]// checkCompat();
+
+if (compatible) {
+  mount(App, {
+    target: document.body,
+  })
+} else {
+  mount(Fallback, {
+    target: document.body,
+    props: {
+      missingFeatures,
+      app: App
+    },
+  });
 }
-
-window.customElements.define("cl-compat", CompatElement);
-
-const checkCompat = () => {
-  const element: CompatElement = document.createElement("cl-compat");
-
-  if (element.attachInternals === undefined) {
-    return false;
-  }
-
-  const internals = element.attachInternals();
-
-  if (internals.states === undefined) {
-    return false;
-  }
-
-  return true;
-};
-
-const appComponent = checkCompat() ? App : Fallback;
-
-const app = mount(appComponent, {
-  target: document.body,
-});
-
-export default app;
