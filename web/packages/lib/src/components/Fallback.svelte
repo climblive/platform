@@ -34,7 +34,7 @@
         We recommend you to upgrade your browser or borrow your friends phone.
       </p>
 
-      {#if showMissingFeatures}
+      {#if showMissingFeatures && missingFeatures.length > 0}
         <p>
           {#each missingFeatures as feature, index (index)}
             {#if index !== 0}
