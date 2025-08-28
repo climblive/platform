@@ -1,5 +1,6 @@
 export { default as ContestStateProvider } from "./ContestStateProvider.svelte";
 export { default as ErrorBoundary } from "./ErrorBoundary.svelte";
+export { default as Fallback } from "./Fallback.svelte";
 export { default as Floater } from "./Floater.svelte";
 export { default as FullLogo } from "./FullLogo.svelte";
 export { default as HoldColorIndicator } from "./HoldColorIndicator.svelte";
