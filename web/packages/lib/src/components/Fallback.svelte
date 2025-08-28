@@ -72,6 +72,5 @@
 
   section {
     padding: var(--wa-space-m);
-    background-color: var(--wa-surface-raised);
   }
 </style>
