@@ -1,13 +1,13 @@
 <script lang="ts">
-  import nativeStylesUrl from "@awesome.me/webawesome/dist/styles/native.css?url";
   import type { Component } from "svelte";
 
   type Props = {
     missingFeatures?: string[];
     app: Component;
+    styles: Component;
   };
 
-  const { missingFeatures = [], app: App }: Props = $props();
+  const { missingFeatures = [], app: App, styles: Styles }: Props = $props();
 
   let force = $state(false);
   let showMissingFeatures = $state(false);
@@ -15,8 +15,6 @@
 
   const handleTap = () => {
     tapCount += 1;
-
-    console.log(tapCount);
 
     if (tapCount >= 5) {
       showMissingFeatures = true;
@@ -27,7 +25,7 @@
 {#if force}
   <App></App>
 {:else}
-  <link rel="stylesheet" href={nativeStylesUrl} />
+  <Styles />
   <main>
     <section>
       <h1 onclickcapture={handleTap}>Sorry!</h1>

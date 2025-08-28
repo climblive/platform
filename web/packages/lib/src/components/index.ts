@@ -12,4 +12,3 @@ export { default as ScoreboardProvider } from "./ScoreboardProvider.svelte";
 export { default as Table } from "./Table.svelte";
 export type { ColumnDefinition } from "./Table.svelte";
 export { default as Timer } from "./Timer.svelte";
-
