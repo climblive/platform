@@ -16,10 +16,6 @@
 
   const handleTap = () => {
     tapCount += 1;
-
-    if (tapCount >= 5) {
-      showMissingFeatures = true;
-    }
   };
 </script>
 
