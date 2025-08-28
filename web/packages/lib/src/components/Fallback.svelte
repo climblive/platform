@@ -36,7 +36,7 @@
 
       {#if showMissingFeatures}
         <p>
-          {#each missingFeatures as feature, index}
+          {#each missingFeatures as feature, index (index)}
             {#if index !== 0}
               ,&nbsp
             {/if}
