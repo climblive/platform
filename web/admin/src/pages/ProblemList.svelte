@@ -4,8 +4,11 @@
     Table,
     type ColumnDefinition,
   } from "@climblive/lib/components";
-  import type { Problem } from "@climblive/lib/models";
-  import { getProblemsQuery } from "@climblive/lib/queries";
+  import { type Problem, type ProblemID } from "@climblive/lib/models";
+  import {
+    getProblemsQuery,
+    getTicksByContestQuery,
+  } from "@climblive/lib/queries";
   import { navigate } from "svelte-routing";
   import DeleteProblem from "./DeleteProblem.svelte";
 
@@ -16,10 +19,44 @@
   let { contestId }: Props = $props();
 
   const problemsQuery = $derived(getProblemsQuery(contestId));
+  const ticksQuery = $derived(getTicksByContestQuery(contestId));
 
-  let problems = $derived($problemsQuery.data);
+  const ascentsByProblem = $derived.by(() => {
+    const ascentsByProblem = new Map<ProblemID, number>();
 
-  const columns: ColumnDefinition<Problem>[] = [
+    if ($ticksQuery.data === undefined) {
+      return ascentsByProblem;
+    }
+
+    for (const { problemId } of $ticksQuery.data) {
+      const ascents = ascentsByProblem.get(problemId);
+
+      if (ascents !== undefined) {
+        ascentsByProblem.set(problemId, ascents + 1);
+      } else {
+        ascentsByProblem.set(problemId, 1);
+      }
+    }
+
+    return ascentsByProblem;
+  });
+
+  type ProblemWithAscents = Problem & { ascents: number };
+
+  const sortedProblemsWithAscents = $derived.by(() => {
+    if ($problemsQuery.data === undefined) {
+      return undefined;
+    }
+
+    const problems = $problemsQuery.data.map<ProblemWithAscents>((problem) => ({
+      ...problem,
+      ascents: ascentsByProblem.get(problem.id) ?? 0,
+    }));
+
+    return problems?.sort((p1, p2) => p1.number - p2.number);
+  });
+
+  const columns: ColumnDefinition<ProblemWithAscents>[] = [
     {
       label: "Number",
       mobile: true,
@@ -36,6 +73,13 @@
       label: "Flash",
       mobile: true,
       render: renderFlashBonus,
+      width: "max-content",
+    },
+    {
+      label: "Tops",
+      mobile: false,
+      render: renderAscents,
+      align: "right",
       width: "max-content",
     },
     {
@@ -63,11 +107,11 @@
   </div>
 {/snippet}
 
-{#snippet renderPoints({ pointsTop }: Problem)}
+{#snippet renderPoints({ pointsTop }: ProblemWithAscents)}
   {pointsTop} pts
 {/snippet}
 
-{#snippet renderFlashBonus({ flashBonus }: Problem)}
+{#snippet renderFlashBonus({ flashBonus }: ProblemWithAscents)}
   {#if flashBonus}
     {flashBonus} pts
   {:else}
@@ -75,7 +119,7 @@
   {/if}
 {/snippet}
 
-{#snippet renderControls({ id }: Problem)}
+{#snippet renderControls({ id }: ProblemWithAscents)}
   <wa-button
     size="small"
     appearance="plain"
@@ -99,6 +143,10 @@
   </DeleteProblem>
 {/snippet}
 
+{#snippet renderAscents({ ascents }: ProblemWithAscents)}
+  {ascents}
+{/snippet}
+
 <section>
   <wa-button
     variant="brand"
@@ -107,8 +155,9 @@
     >Create</wa-button
   >
 
-  {#if problems?.length}
-    <Table {columns} data={problems} getId={({ id }) => id}></Table>
+  {#if sortedProblemsWithAscents?.length}
+    <Table {columns} data={sortedProblemsWithAscents} getId={({ id }) => id}
+    ></Table>
   {/if}
 </section>
 

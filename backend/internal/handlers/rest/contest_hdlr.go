@@ -15,6 +15,7 @@ type contestUseCase interface {
 	GetContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error)
 	GetContestsByOrganizer(ctx context.Context, organizerID domain.OrganizerID) ([]domain.Contest, error)
 	GetScoreboard(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreboardEntry, error)
+	PatchContest(ctx context.Context, contestID domain.ContestID, patch domain.ContestPatch) (domain.Contest, error)
 	CreateContest(ctx context.Context, organizerID domain.OrganizerID, template domain.ContestTemplate) (domain.Contest, error)
 	DuplicateContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error)
 }
@@ -36,6 +37,7 @@ func InstallContestHandler(mux *Mux, contestUseCase contestUseCase, compClassUse
 	mux.HandleFunc("POST /organizers/{organizerID}/contests", handler.CreateContest)
 	mux.HandleFunc("POST /contests/{contestID}/duplicate", handler.DuplicateContest)
 	mux.HandleFunc("GET /contests/{contestID}/results", handler.DownloadResults)
+	mux.HandleFunc("PATCH /contests/{contestID}", handler.PatchContest)
 }
 
 func (hdlr *contestHandler) GetContest(w http.ResponseWriter, r *http.Request) {
@@ -84,6 +86,29 @@ func (hdlr *contestHandler) GetContestsByOrganizer(w http.ResponseWriter, r *htt
 	}
 
 	writeResponse(w, http.StatusOK, contests)
+}
+
+func (hdlr *contestHandler) PatchContest(w http.ResponseWriter, r *http.Request) {
+	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	var patch domain.ContestPatch
+	err = json.NewDecoder(r.Body).Decode(&patch)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	updatedContest, err := hdlr.contestUseCase.PatchContest(r.Context(), contestID, patch)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusOK, updatedContest)
 }
 
 func (hdlr *contestHandler) CreateContest(w http.ResponseWriter, r *http.Request) {

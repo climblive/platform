@@ -21,6 +21,8 @@
     display: block;
     font-size: var(--wa-font-size-xs);
     line-height: var(--wa-line-height-normal);
+    margin-block-end: var(--wa-space-2xs);
+    color: var(--wa-color-text-quiet);
   }
 
   p {

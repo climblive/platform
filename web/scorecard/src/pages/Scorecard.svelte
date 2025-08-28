@@ -28,7 +28,7 @@
     getContenderQuery,
     getContestQuery,
     getProblemsQuery,
-    getTicksQuery,
+    getTicksByContenderQuery,
     removeTickFromQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
@@ -47,7 +47,7 @@
   const contestQuery = $derived(getContestQuery($session.contestId));
   const compClassesQuery = $derived(getCompClassesQuery($session.contestId));
   const problemsQuery = $derived(getProblemsQuery($session.contestId));
-  const ticksQuery = $derived(getTicksQuery($session.contenderId));
+  const ticksQuery = $derived(getTicksByContenderQuery($session.contenderId));
 
   let resultsConnected = $state(false);
   let tabGroup: WaTabGroup | undefined = $state();

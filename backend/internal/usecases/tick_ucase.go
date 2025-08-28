@@ -13,6 +13,7 @@ type tickUseCaseRepository interface {
 
 	GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error)
 	GetTicksByContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) ([]domain.Tick, error)
+	GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error)
 	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
 	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error)
 	GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) (domain.Problem, error)
@@ -38,6 +39,24 @@ func (uc *TickUseCase) GetTicksByContender(ctx context.Context, contenderID doma
 	}
 
 	ticks, err := uc.Repo.GetTicksByContender(ctx, nil, contenderID)
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	return ticks, nil
+}
+
+func (uc *TickUseCase) GetTicksByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Tick, error) {
+	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	ticks, err := uc.Repo.GetTicksByContest(ctx, nil, contestID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}

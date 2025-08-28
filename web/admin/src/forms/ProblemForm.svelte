@@ -5,7 +5,6 @@
     number: z.coerce.number(),
     holdColorPrimary: z.string().regex(/^#([0-9a-fA-F]{3}){1,2}$/),
     holdColorSecondary: z.string().optional(),
-    description: z.string().optional(),
     pointsTop: z.coerce.number(),
     flashBonus: z.coerce.number().optional(),
   });
@@ -75,13 +74,6 @@
         ></wa-color-picker>
       </div>
     </div>
-    <wa-input
-      size="small"
-      {@attach name("description")}
-      label="Description"
-      type="text"
-      value={data.description}
-    ></wa-input>
     <wa-input
       size="small"
       {@attach name("pointsTop")}

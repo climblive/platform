@@ -138,6 +138,11 @@ func (m *repositoryMock) GetTicksByContender(ctx context.Context, tx domain.Tran
 	return args.Get(0).([]domain.Tick), args.Error(1)
 }
 
+func (m *repositoryMock) GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error) {
+	args := m.Called(ctx, tx, contestID)
+	return args.Get(0).([]domain.Tick), args.Error(1)
+}
+
 func (m *repositoryMock) DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) error {
 	args := m.Called(ctx, tx, tickID)
 	return args.Error(0)
@@ -221,6 +226,11 @@ func (m *repositoryMock) StoreRaffleWinner(ctx context.Context, tx domain.Transa
 func (m *repositoryMock) GetUserByUsername(ctx context.Context, tx domain.Transaction, username string) (domain.User, error) {
 	args := m.Called(ctx, tx, username)
 	return args.Get(0).(domain.User), args.Error(1)
+}
+
+func (m *repositoryMock) GetAllOrganizers(ctx context.Context, tx domain.Transaction) ([]domain.Organizer, error) {
+	args := m.Called(ctx, tx)
+	return args.Get(0).([]domain.Organizer), args.Error(1)
 }
 
 type authorizerMock struct {

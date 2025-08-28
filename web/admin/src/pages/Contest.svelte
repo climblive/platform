@@ -2,9 +2,9 @@
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import "@awesome.me/webawesome/dist/components/details/details.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import "@awesome.me/webawesome/dist/components/scroller/scroller.js";
   import "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
   import type WaTabGroup from "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
   import "@awesome.me/webawesome/dist/components/tab-panel/tab-panel.js";
@@ -67,6 +67,14 @@
 
       <wa-tab-panel name="contest">
         <article>
+          <wa-button
+            size="small"
+            appearance="outlined"
+            onclick={() => navigate(`/admin/contests/${contest.id}/edit`)}
+          >
+            Edit
+            <wa-icon slot="start" name="pencil"></wa-icon>
+          </wa-button>
           <LabeledText label="Name">
             {contest.name}
           </LabeledText>
@@ -87,11 +95,9 @@
             {contest.qualifyingProblems}
           </LabeledText>
           {#if contest.rules}
-            <wa-scroller orientation="vertical">
-              <LabeledText label="Rules">
-                {@html contest.rules}
-              </LabeledText>
-            </wa-scroller>
+            <wa-details summary="Rules">
+              {@html contest.rules}
+            </wa-details>
           {/if}
         </article>
 
@@ -155,7 +161,7 @@
 
 <style>
   article {
-    padding-block: var(--wa-space-m);
+    padding-block-start: var(--wa-space-m);
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-s);
@@ -170,7 +176,7 @@
     margin-top: var(--wa-space-2xl);
   }
 
-  wa-scroller {
-    max-height: 10rem;
+  wa-details {
+    margin-top: var(--wa-space-m);
   }
 </style>

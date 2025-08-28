@@ -10,7 +10,7 @@ func nillableIntToResourceID[T domain.ResourceIDType](value *int32) *T {
 		return nil
 	}
 
-	var out T = T(*value)
+	out := T(*value)
 	return &out
 }
 

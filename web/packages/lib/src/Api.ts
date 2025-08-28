@@ -8,6 +8,7 @@ import {
   type CompClassTemplate,
   type ContenderPatch,
   type ContestID,
+  type ContestPatch,
   type ContestTemplate,
   type ProblemPatch,
   type ProblemTemplate,
@@ -165,6 +166,16 @@ export class ApiClient {
     return contestSchema.parse(result.data);
   };
 
+  patchContest = async (id: number, patch: ContestPatch) => {
+    const endpoint = `/contests/${id}`;
+
+    const result = await this.axiosInstance.patch(endpoint, patch, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return contestSchema.parse(result.data);
+  };
+
   duplicateContest = async (contestId: number) => {
     const endpoint = `/contests/${contestId}/duplicate`;
 
@@ -273,8 +284,18 @@ export class ApiClient {
     return compClassSchema.parse(result.data);
   };
 
-  getTicks = async (contenderId: number) => {
+  getTicksByContender = async (contenderId: number) => {
     const endpoint = `/contenders/${contenderId}/ticks`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(tickSchema).parse(result.data);
+  };
+
+  getTicksByContest = async (contestId: number) => {
+    const endpoint = `/contests/${contestId}/ticks`;
 
     const result = await this.axiosInstance.get(endpoint, {
       headers: this.credentialsProvider?.getAuthHeaders(),

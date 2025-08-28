@@ -35,8 +35,21 @@
       return timeEnd && now > timeEnd;
     });
 
-    return [drafts, ongoing, upcoming, past];
+    return [
+      drafts,
+      ongoing?.sort(sortContests),
+      upcoming?.sort(sortContests),
+      past?.sort(sortContests),
+    ];
   });
+
+  const sortContests = (c1: Contest, c2: Contest) => {
+    if (c1.timeBegin && c2.timeBegin) {
+      return c2.timeBegin.getTime() - c1.timeBegin.getTime();
+    }
+
+    return 0;
+  };
 
   const columns: ColumnDefinition<Contest>[] = [
     {
@@ -76,7 +89,7 @@
   {/if}
 {/snippet}
 
-<h1>Contests</h1>
+<h2>Contests</h2>
 <wa-button
   variant="brand"
   onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
@@ -84,7 +97,7 @@
 >
 
 {#snippet listing(heading: string, contests: Contest[])}
-  <h2>{heading}</h2>
+  <h3>{heading}</h3>
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
 {/snippet}
 

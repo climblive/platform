@@ -222,7 +222,7 @@ func TestKeeper(t *testing.T) {
 	t.Run("PersistScores_KeepInMemoryOnFailure", func(t *testing.T) {
 		mockedRepo, mockedEventBroker, subscription := makeMocks(0)
 		keeper := scores.NewScoreKeeper(mockedEventBroker, mockedRepo)
-		var errMock error = errors.New("mock error")
+		errMock := errors.New("mock error")
 
 		mockedRepo.On("StoreScore", mock.Anything, nil, mock.AnythingOfType("domain.Score")).Return(errMock)
 
