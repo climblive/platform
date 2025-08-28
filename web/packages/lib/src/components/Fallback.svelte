@@ -10,8 +10,9 @@
   const { missingFeatures = [], app: App, styles: Styles }: Props = $props();
 
   let force = $state(false);
-  let showMissingFeatures = $state(false);
   let tapCount = $state(0);
+  let showMissingFeatures = $derived(tapCount >= 5);
+
 
   const handleTap = () => {
     tapCount += 1;
