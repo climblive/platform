@@ -13,7 +13,6 @@
   let tapCount = $state(0);
   let showMissingFeatures = $derived(tapCount >= 5);
 
-
   const handleTap = () => {
     tapCount += 1;
   };
