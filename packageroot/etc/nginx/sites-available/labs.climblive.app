@@ -7,7 +7,7 @@ server {
 
 	client_max_body_size 1M;
 
-	set $csp "default-src 'self'; connect-src 'self' clmb.auth.eu-west-1.amazoncognito.com *.fontawesome.com data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'self'; img-src 'self' data:; script-src-elem 'self' cdn.skypack.dev";
+	set $csp "default-src 'self'; connect-src 'self' clmb.auth.eu-west-1.amazoncognito.com *.fontawesome.com data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'self'; img-src 'self' data:";
 
 	location /api {
 		rewrite ^/api(.*)$ $1 break;
