@@ -29,29 +29,25 @@
   };
 </script>
 
-<ProblemForm
-  submit={handleSubmit}
-  data={{
-    ...problem,
-  }}
-  schema={formSchema}
->
-  <div class="controls">
-    <wa-button
-      size="small"
-      type="button"
-      appearance="plain"
-      onclick={history.back()}>Cancel</wa-button
-    >
-    <wa-button
-      size="small"
-      type="submit"
-      loading={$patchProblem.isPending}
-      variant="brand"
-      >Save
-    </wa-button>
-  </div>
-</ProblemForm>
+{#if problem}
+  <ProblemForm submit={handleSubmit} data={problem} schema={formSchema}>
+    <div class="controls">
+      <wa-button
+        size="small"
+        type="button"
+        appearance="plain"
+        onclick={history.back()}>Cancel</wa-button
+      >
+      <wa-button
+        size="small"
+        type="submit"
+        loading={$patchProblem.isPending}
+        variant="brand"
+        >Save
+      </wa-button>
+    </div>
+  </ProblemForm>
+{/if}
 
 <style>
   .controls {
