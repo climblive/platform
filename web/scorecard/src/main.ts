@@ -8,26 +8,33 @@ import {
 } from "@climblive/lib/utils";
 import { mount } from "svelte";
 import App from "./App.svelte";
+import FailsafeApp from "./FailsafeApp.svelte";
 import NativeStyles from "./NativeStyles.svelte";
 
-watchColorSchemeChanges((prefersDarkColorScheme) =>
-  updateTheme(prefersDarkColorScheme),
-);
-updateTheme(prefersDarkColorScheme());
-
-const [compatible, missingFeatures] = checkCompat();
-
-if (compatible) {
-  mount(App, {
+if (location.pathname.startsWith("/failsafe")) {
+  mount(FailsafeApp, {
     target: document.body,
   });
 } else {
-  mount(Fallback, {
-    target: document.body,
-    props: {
-      missingFeatures,
-      app: App,
-      styles: NativeStyles,
-    },
-  });
+  watchColorSchemeChanges((prefersDarkColorScheme) =>
+    updateTheme(prefersDarkColorScheme),
+  );
+  updateTheme(prefersDarkColorScheme());
+
+  const [compatible, missingFeatures] = checkCompat();
+
+  if (compatible) {
+    mount(App, {
+      target: document.body,
+    });
+  } else {
+    mount(Fallback, {
+      target: document.body,
+      props: {
+        missingFeatures,
+        app: App,
+        styles: NativeStyles,
+      },
+    });
+  }
 }
