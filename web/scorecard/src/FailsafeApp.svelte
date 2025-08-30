@@ -11,9 +11,15 @@
       },
     },
   });
+
+  const handleError = (event: ErrorEvent) => {
+    alert(event.message);
+  };
 </script>
 
 <NativeStyles />
+
+<svelte:window onerror={handleError} />
 
 <ErrorBoundary>
   <QueryClientProvider client={queryClient}>
