@@ -100,6 +100,7 @@
 
     &::placeholder {
       text-transform: none;
+      letter-spacing: normal;
     }
   }
 </style>
