@@ -108,7 +108,7 @@
 
   {#if compClasses === undefined}
     <Loader />
-  {:else if compClasses?.length > 0}
+  {:else if compClasses.length > 0}
     <Table {columns} data={compClasses} getId={({ id }) => id}></Table>
   {/if}
 </section>
