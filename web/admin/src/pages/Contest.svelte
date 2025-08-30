@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
@@ -49,7 +50,9 @@
 </script>
 
 <main>
-  {#if contest}
+  {#if contest === undefined}
+    <Loader />
+  {:else}
     <wa-button
       appearance="plain"
       onclick={() =>

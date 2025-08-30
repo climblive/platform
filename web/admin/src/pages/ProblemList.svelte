@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import {
     HoldColorIndicator,
     Table,
@@ -155,7 +156,9 @@
     >Create</wa-button
   >
 
-  {#if sortedProblemsWithAscents?.length}
+  {#if sortedProblemsWithAscents === undefined}
+    <Loader />
+  {:else if sortedProblemsWithAscents.length > 0}
     <Table {columns} data={sortedProblemsWithAscents} getId={({ id }) => id}
     ></Table>
   {/if}

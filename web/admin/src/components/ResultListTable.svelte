@@ -15,13 +15,15 @@
   import { ordinalSuperscript } from "@climblive/lib/utils";
   import { Link } from "svelte-routing";
   import type { Readable } from "svelte/store";
+  import Loader from "./Loader.svelte";
 
   interface Props {
     contestId: number;
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
+    loading: boolean;
   }
 
-  const { contestId, scoreboard }: Props = $props();
+  const { contestId, scoreboard, loading }: Props = $props();
 
   let tableData = $state<ScoreboardEntry[]>([]);
 
@@ -177,7 +179,9 @@
   >Live</wa-switch
 >
 
-{#if tableData && tableData.length > 0}
+{#if loading}
+  <Loader />
+{:else if tableData.length > 0}
   <Table {columns} data={tableData} getId={({ contenderId }) => contenderId}
   ></Table>
 {/if}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { RaffleWinner } from "@climblive/lib/models";
@@ -80,7 +81,9 @@
     <wa-button variant="brand" onclick={handleDrawWinner}>Draw winner</wa-button
     >
 
-    {#if sortedRaffleWinners?.length}
+    {#if sortedRaffleWinners === undefined}
+      <Loader />
+    {:else if sortedRaffleWinners.length > 0}
       <Table
         {columns}
         data={sortedRaffleWinners}
