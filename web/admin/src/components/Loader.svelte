@@ -2,6 +2,7 @@
 
 <style>
   .loader {
+    margin-block: var(--wa-space-s);
     width: 60px;
     aspect-ratio: 4;
     --gradient: no-repeat
