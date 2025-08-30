@@ -3,7 +3,6 @@ package authorizer
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"net/http"
 	"regexp"
 	"strings"
@@ -105,7 +104,6 @@ func (a *Authorizer) authorizeByUsername(ctx context.Context, username string, r
 
 	switch {
 	case errors.Is(err, domain.ErrNotFound):
-		slog.Error("Creating user for the first time", "username", username)
 		err := a.createUser(ctx, username)
 		if err != nil {
 			return domain.NilRole, errors.Wrap(err, 0)
@@ -113,7 +111,6 @@ func (a *Authorizer) authorizeByUsername(ctx context.Context, username string, r
 
 		return domain.NilRole, domain.ErrNoOwnership
 	case err != nil:
-		slog.Error("Failed to get user by username", "username", username, "error", err)
 		return domain.NilRole, errors.Wrap(err, 0)
 	}
 
