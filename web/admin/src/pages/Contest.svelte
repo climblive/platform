@@ -50,7 +50,7 @@
 </script>
 
 <main>
-  {#if !contest}
+  {#if contest === undefined}
     <Loader />
   {:else}
     <wa-button
