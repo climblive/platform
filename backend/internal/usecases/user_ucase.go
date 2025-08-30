@@ -29,6 +29,8 @@ func (uc *UserUseCase) GetSelf(ctx context.Context) (domain.User, error) {
 		return domain.User{}, errors.Wrap(domain.ErrNotAuthenticated, 0)
 	}
 
+	_, _ = uc.Authorizer.HasOwnership(ctx, domain.OwnershipData{})
+
 	user, err := uc.Repo.GetUserByUsername(ctx, nil, authentication.Username)
 	if err != nil {
 		return domain.User{}, errors.Wrap(err, 0)
