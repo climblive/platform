@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import ProblemForm, { formSchema } from "@/forms/ProblemForm.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { Problem, ProblemPatch } from "@climblive/lib/models";
@@ -29,7 +30,9 @@
   };
 </script>
 
-{#if problem}
+{#if problem === undefined}
+  <Loader />
+{:else}
   <ProblemForm submit={handleSubmit} data={problem} schema={formSchema}>
     <div class="controls">
       <wa-button

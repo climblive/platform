@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import CompClassForm, { formSchema } from "@/forms/CompClassForm.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { CompClassPatch } from "@climblive/lib/models";
@@ -29,7 +30,9 @@
   };
 </script>
 
-{#if compClass}
+{#if compClass === undefined}
+  <Loader />
+{:else}
   <CompClassForm submit={handleSubmit} data={compClass} schema={formSchema}>
     <div class="controls">
       <wa-button
