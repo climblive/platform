@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import ContestForm, {
     formSchema,
     minuteInNanoseconds,
@@ -41,7 +42,9 @@
   };
 </script>
 
-{#if contest}
+{#if contest === undefined}
+  <Loader />
+{:else}
   <ContestForm submit={handleSubmit} data={contest} schema={formSchema}>
     <div class="controls">
       <wa-button

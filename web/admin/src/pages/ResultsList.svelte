@@ -30,8 +30,8 @@
   </div>
 
   <ScoreboardProvider {contestId}>
-    {#snippet children({ scoreboard })}
-      <ResultListTable {contestId} {scoreboard}></ResultListTable>
+    {#snippet children({ scoreboard, loading })}
+      <ResultListTable {contestId} {scoreboard} {loading}></ResultListTable>
     {/snippet}
   </ScoreboardProvider>
 </section>

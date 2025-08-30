@@ -107,7 +107,6 @@ export class Authenticator {
   };
 
   public logout = () => {
-    this.authenticated = false;
     localStorage.removeItem("refresh_token");
 
     const redirectUri = encodeURIComponent(window.location.origin + "/admin");

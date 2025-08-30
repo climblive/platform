@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import ProblemForm, { formSchema } from "@/forms/ProblemForm.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { Problem, ProblemPatch } from "@climblive/lib/models";
@@ -29,29 +30,27 @@
   };
 </script>
 
-<ProblemForm
-  submit={handleSubmit}
-  data={{
-    ...problem,
-  }}
-  schema={formSchema}
->
-  <div class="controls">
-    <wa-button
-      size="small"
-      type="button"
-      appearance="plain"
-      onclick={history.back()}>Cancel</wa-button
-    >
-    <wa-button
-      size="small"
-      type="submit"
-      loading={$patchProblem.isPending}
-      variant="brand"
-      >Save
-    </wa-button>
-  </div>
-</ProblemForm>
+{#if problem === undefined}
+  <Loader />
+{:else}
+  <ProblemForm submit={handleSubmit} data={problem} schema={formSchema}>
+    <div class="controls">
+      <wa-button
+        size="small"
+        type="button"
+        appearance="plain"
+        onclick={history.back()}>Cancel</wa-button
+      >
+      <wa-button
+        size="small"
+        type="submit"
+        loading={$patchProblem.isPending}
+        variant="brand"
+        >Save
+      </wa-button>
+    </div>
+  </ProblemForm>
+{/if}
 
 <style>
   .controls {

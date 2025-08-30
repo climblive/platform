@@ -15,13 +15,15 @@
   import { ordinalSuperscript } from "@climblive/lib/utils";
   import { Link } from "svelte-routing";
   import type { Readable } from "svelte/store";
+  import Loader from "./Loader.svelte";
 
   interface Props {
     contestId: number;
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
+    loading: boolean;
   }
 
-  const { contestId, scoreboard }: Props = $props();
+  const { contestId, scoreboard, loading }: Props = $props();
 
   let tableData = $state<ScoreboardEntry[]>([]);
 
@@ -108,7 +110,7 @@
       mobile: true,
       render: renderFinalist,
       width: "max-content",
-      align: "right",
+      align: "left",
     },
   ];
 </script>
@@ -145,7 +147,7 @@
   <wa-icon name={score?.finalist ? "medal" : "minus"}></wa-icon>
 {/snippet}
 
-{#if compClasses && compClasses.length > 1}
+{#if compClasses}
   <div class="controls">
     <wa-input
       bind:this={quickFilter}
@@ -177,7 +179,9 @@
   >Live</wa-switch
 >
 
-{#if tableData && tableData.length > 0}
+{#if loading}
+  <Loader />
+{:else}
   <Table {columns} data={tableData} getId={({ contenderId }) => contenderId}
   ></Table>
 {/if}

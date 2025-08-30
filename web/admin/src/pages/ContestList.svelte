@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { Contest } from "@climblive/lib/models";
@@ -101,18 +102,28 @@
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
 {/snippet}
 
-{#if drafts?.length}
-  {@render listing("Drafts", drafts)}
+{#if !drafts || !ongoing || !upcoming || !past}
+  <Loader />
+{:else}
+  {#if drafts?.length}
+    {@render listing("Drafts", drafts)}
+  {/if}
+
+  {#if ongoing?.length}
+    {@render listing("Ongoing", ongoing)}
+  {/if}
+
+  {#if upcoming?.length}
+    {@render listing("Upcoming", upcoming)}
+  {/if}
+
+  {#if past?.length}
+    {@render listing("Past", past)}
+  {/if}
 {/if}
 
-{#if ongoing?.length}
-  {@render listing("Ongoing", ongoing)}
-{/if}
-
-{#if upcoming?.length}
-  {@render listing("Upcoming", upcoming)}
-{/if}
-
-{#if past?.length}
-  {@render listing("Past", past)}
-{/if}
+<style>
+  wa-button {
+    margin-block-end: var(--wa-space-m);
+  }
+</style>

@@ -80,86 +80,88 @@
   };
 </script>
 
-{#if contenders}
-  <p class="copy">
-    Tickets hold unique registration codes, granting contenders access to your
-    contest. These tickets may be printed on paper and distributed to the
-    contenders on site.
-    {#if contenders.length > 0}
-      Out of the {contenders.length}
-      tickets that you have created, {registeredContenders} have already been used.
-    {/if}
-  </p>
+<p class="copy">
+  Tickets hold unique registration codes, granting contenders access to your
+  contest. These tickets may be printed on paper and distributed to the
+  contenders on site.
+  {#if contenders && contenders.length > 0}
+    Out of the {contenders.length}
+    tickets that you have created, {registeredContenders} have already been used.
+  {/if}
+</p>
 
-  <wa-dialog bind:this={dialog} label="Create tickets">
-    <div class="dialog-content">
-      <wa-callout variant="neutral">
-        <wa-icon slot="icon" name="circle-exclamation"></wa-icon>
-        You have {remainingCodes} tickets remaining out of your maximum allotted
-        {maxTickets}.
-      </wa-callout>
+<wa-dialog bind:this={dialog} label="Create tickets">
+  <div class="dialog-content">
+    <wa-callout variant="neutral">
+      <wa-icon slot="icon" name="circle-exclamation"></wa-icon>
+      You have {remainingCodes} tickets remaining out of your maximum allotted
+      {maxTickets}.
+    </wa-callout>
 
-      <wa-input
-        bind:this={numberInput}
-        name="number"
-        type="number"
-        {@attach value(Math.min(100, remainingCodes ?? 0))}
-        min="1"
-        max={remainingCodes}
-        label="Number of tickets to create"
-      ></wa-input>
-    </div>
-
-    <wa-button slot="footer" appearance="plain" onclick={closeDialog}
-      >Cancel</wa-button
-    >
-    <wa-button
-      slot="footer"
-      size="small"
-      variant="brand"
-      appearance="accent"
-      loading={$createContenders.isPending}
-      onclick={handleCreate}
-      type="submit"
-    >
-      Create
-    </wa-button>
-  </wa-dialog>
-
-  <div class="actions">
-    <wa-button
-      size="small"
-      variant="brand"
-      appearance="accent"
-      onclick={handleOpenCreateDialog}
-      disabled={remainingCodes === 0}
-    >
-      <wa-icon slot="start" name="plus"></wa-icon>
-      Create tickets</wa-button
-    >
-    {#if contenders.length > 0}
-      <a href={`/admin/contests/${contestId}/tickets?print`} target="_blank">
-        <wa-button appearance="outlined" size="small"
-          >Print tickets
-          <wa-icon name="print" slot="start"></wa-icon>
-          <wa-badge
-            variant="neutral"
-            attention={newTicketsAvailableForPrint ? "pulse" : undefined}
-            pill>{contenders.length}</wa-badge
-          >
-        </wa-button>
-      </a>
-    {/if}
+    <wa-input
+      bind:this={numberInput}
+      name="number"
+      type="number"
+      {@attach value(Math.min(100, remainingCodes ?? 0))}
+      min="1"
+      max={remainingCodes}
+      label="Number of tickets to create"
+    ></wa-input>
   </div>
 
-  <p>
-    {#if remainingCodes === maxTickets}
-      You may create up to {maxTickets} tickets.
-    {:else}
-      You may create {remainingCodes} more tickets.
-    {/if}
-  </p>
-{/if}
+  <wa-button slot="footer" appearance="plain" onclick={closeDialog}
+    >Cancel</wa-button
+  >
+  <wa-button
+    slot="footer"
+    size="small"
+    variant="brand"
+    appearance="accent"
+    loading={$createContenders.isPending}
+    onclick={handleCreate}
+    type="submit"
+  >
+    Create
+  </wa-button>
+</wa-dialog>
+
+<div class="actions">
+  <wa-button
+    size="small"
+    variant="brand"
+    appearance="accent"
+    onclick={handleOpenCreateDialog}
+    disabled={remainingCodes === undefined || remainingCodes === 0}
+  >
+    <wa-icon slot="start" name="plus"></wa-icon>
+    Create tickets</wa-button
+  >
+  <a href={`/admin/contests/${contestId}/tickets?print`} target="_blank">
+    <wa-button
+      appearance="outlined"
+      size="small"
+      loading={$contendersQuery.isLoading}
+      disabled={!contenders || contenders.length === 0}
+      >Print tickets
+      <wa-icon name="print" slot="start"></wa-icon>
+      {#if contenders && contenders.length > 0}
+        <wa-badge
+          variant="neutral"
+          attention={newTicketsAvailableForPrint ? "pulse" : undefined}
+          pill>{contenders.length}</wa-badge
+        >
+      {/if}
+    </wa-button>
+  </a>
+</div>
+
+<p>
+  {#if remainingCodes === maxTickets}
+    You may create up to {maxTickets} tickets.
+  {:else}
+    You may create {remainingCodes} more tickets.
+  {/if}
+</p>
 
 <style>
   .dialog-content {

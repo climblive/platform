@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { Raffle } from "@climblive/lib/models";
@@ -45,7 +46,9 @@
     >Create</wa-button
   >
 
-  {#if raffles?.length}
+  {#if raffles === undefined}
+    <Loader />
+  {:else if raffles.length > 0}
     <Table {columns} data={raffles} getId={({ id }) => id}></Table>
   {/if}
 </section>

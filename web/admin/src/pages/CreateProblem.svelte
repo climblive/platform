@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import ProblemForm, { formSchema } from "@/forms/ProblemForm.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { ProblemTemplate } from "@climblive/lib/models";
@@ -42,7 +43,9 @@
   };
 </script>
 
-{#if highestProblemNumber !== undefined}
+{#if highestProblemNumber === undefined}
+  <Loader />
+{:else}
   <ProblemForm
     submit={handleSubmit}
     data={{

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { CompClass } from "@climblive/lib/models";
@@ -105,7 +106,9 @@
     >Create</wa-button
   >
 
-  {#if compClasses?.length}
+  {#if compClasses === undefined}
+    <Loader />
+  {:else if compClasses.length > 0}
     <Table {columns} data={compClasses} getId={({ id }) => id}></Table>
   {/if}
 </section>

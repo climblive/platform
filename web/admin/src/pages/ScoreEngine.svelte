@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import {
     getContestQuery,
     getScoreEnginesQuery,
@@ -35,7 +36,9 @@
 </wa-callout>
 <br />
 
-{#if scoreEngines}
+{#if scoreEngines === undefined}
+  <Loader />
+{:else}
   {#each scoreEngines as engineInstanceId (engineInstanceId)}
     <wa-button
       appearance="outlined"
