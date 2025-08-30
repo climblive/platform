@@ -181,7 +181,7 @@
 
 {#if loading}
   <Loader />
-{:else if tableData.length > 0}
+{:else}
   <Table {columns} data={tableData} getId={({ contenderId }) => contenderId}
   ></Table>
 {/if}
