@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
@@ -41,12 +42,15 @@ func (d *Database) AddUserToOrganizer(ctx context.Context, tx domain.Transaction
 }
 
 func (d *Database) GetUserByUsername(ctx context.Context, tx domain.Transaction, username string) (domain.User, error) {
+	slog.Error("GetUserByUsername", "username", username)
 	records, err := d.WithTx(tx).GetUserByUsername(ctx, username)
 	if err != nil {
+		slog.Error("GetUserByUsername failed", "username", username, "error", err)
 		return domain.User{}, errors.Wrap(err, 0)
 	}
 
 	if len(records) == 0 {
+		slog.Error("GetUserByUsername: no records", "username", username)
 		return domain.User{}, errors.Wrap(domain.ErrNotFound, 0)
 	}
 
