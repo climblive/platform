@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
@@ -29,6 +30,7 @@ func (uc *UserUseCase) GetSelf(ctx context.Context) (domain.User, error) {
 		return domain.User{}, errors.Wrap(domain.ErrNotAuthenticated, 0)
 	}
 
+	slog.Debug("GetSelf", "username", authentication.Username)
 	user, err := uc.Repo.GetUserByUsername(ctx, nil, authentication.Username)
 	if err != nil {
 		return domain.User{}, errors.Wrap(err, 0)
