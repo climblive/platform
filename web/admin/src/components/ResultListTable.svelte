@@ -110,7 +110,7 @@
       mobile: true,
       render: renderFinalist,
       width: "max-content",
-      align: "right",
+      align: "left",
     },
   ];
 </script>
@@ -147,7 +147,7 @@
   <wa-icon name={score?.finalist ? "medal" : "minus"}></wa-icon>
 {/snippet}
 
-{#if compClasses && compClasses.length > 1}
+{#if compClasses}
   <div class="controls">
     <wa-input
       bind:this={quickFilter}
