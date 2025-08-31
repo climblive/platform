@@ -69,7 +69,7 @@ type Contest struct {
 	QualifyingProblems int           `json:"qualifyingProblems"`
 	Finalists          int           `json:"finalists"`
 	Rules              string        `json:"rules,omitempty"`
-	GracePeriod        time.Duration `json:"gracePeriod"`
+	GracePeriod        time.Duration `json:"gracePeriod,format:sec"`
 	TimeBegin          time.Time     `json:"timeBegin,omitzero"`
 	TimeEnd            time.Time     `json:"timeEnd,omitzero"`
 }

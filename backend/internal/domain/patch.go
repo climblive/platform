@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"encoding/json"
+	"encoding/json/v2"
 
 	"github.com/go-errors/errors"
 )
