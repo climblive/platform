@@ -73,6 +73,14 @@
     {#if authenticating}
       <Loading />
     {:else}
+      <button
+        type="button"
+        onclick={() => {
+          throw new Error("This is your first error!");
+        }}
+      >
+        Break the world
+      </button>
       <Router>
         <Route path="/:code/register"><Register /></Route>
         <Route path="/:code/edit"><EditProfile /></Route>
