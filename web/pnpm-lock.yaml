@@ -92,6 +92,9 @@ importers:
       '@awesome.me/webawesome':
         specifier: 3.0.0-beta.4
         version: 3.0.0-beta.4(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
+      '@sentry/svelte':
+        specifier: ^10.8.0
+        version: 10.8.0(svelte@5.38.0)
       '@tanstack/svelte-query':
         specifier: ^5.83.1
         version: 5.83.1(svelte@5.38.0)

@@ -116,6 +116,8 @@
     }
   });
 
+  const dummy: { info: string }[] = [];
+
   const handleShowTab = ({ detail }: WaTabShowEvent) => {
     if (detail.name === "results") {
       resultsConnected = true;
@@ -191,6 +193,8 @@
   onDestroy(() => {
     tearDown();
   });
+
+  let crash = $state(false);
 </script>
 
 <svelte:window onvisibilitychange={handleVisibilityChange} />
@@ -202,6 +206,10 @@
     {#snippet children({ contestState })}
       <main>
         <div class="sticky">
+          <button onclick={() => (crash = true)}>Crash</button>
+          {#if crash}
+            {dummy[0].info}
+          {/if}
           <Header
             registrationCode={$session.registrationCode}
             contestName={contest.name}
