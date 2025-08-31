@@ -1,4 +1,8 @@
 name: "Build web"
+inputs:
+  sentry-auth-token:
+    description: "Sentry auth token"
+    required: true
 runs:
   using: "composite"
   steps:
@@ -23,6 +27,8 @@ runs:
     - run: pnpm --filter=* build
       shell: bash
       working-directory: web
+      env:
+        SENTRY_AUTH_TOKEN: ${{ sentry-auth-token }}
 
     - uses: actions/upload-artifact@v4
       with:
