@@ -15,6 +15,7 @@ jobs:
       - uses: ./.github/actions/build-web
         with:
           sentry-auth-token: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          sentry-environment: production
 
   build-backend:
     name: Build backend
