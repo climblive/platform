@@ -16,6 +16,9 @@ importers:
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
+      '@sentry/svelte':
+        specifier: ^10.8.0
+        version: 10.8.0(svelte@5.38.0)
       '@svelte-put/qr':
         specifier: ^2.1.0
         version: 2.1.0(svelte@5.38.0)
@@ -162,6 +165,9 @@ importers:
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
+      '@sentry/svelte':
+        specifier: ^10.8.0
+        version: 10.8.0(svelte@5.38.0)
       '@tanstack/svelte-query':
         specifier: ^5.83.1
         version: 5.83.1(svelte@5.38.0)

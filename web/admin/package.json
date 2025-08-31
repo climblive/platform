@@ -26,6 +26,7 @@
   "dependencies": {
     "@awesome.me/webawesome": "3.0.0-beta.4",
     "@climblive/lib": "workspace:*",
+    "@sentry/svelte": "^10.8.0",
     "@svelte-put/qr": "^2.1.0",
     "@tanstack/svelte-query": "^5.83.1",
     "axios": "^1.11.0",
