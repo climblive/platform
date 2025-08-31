@@ -28,7 +28,7 @@ runs:
       shell: bash
       working-directory: web
       env:
-        SENTRY_AUTH_TOKEN: ${{ sentry-auth-token }}
+        SENTRY_AUTH_TOKEN: ${{ inputs.sentry-auth-token }}
 
     - uses: actions/upload-artifact@v4
       with:
