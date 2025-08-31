@@ -14,8 +14,6 @@
   };
 
   const reportError = (error: unknown) => {
-    console.log("Reporting error:", error);
-
     Sentry.captureException(error);
   };
 </script>
