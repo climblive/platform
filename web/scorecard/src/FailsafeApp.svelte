@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ErrorBoundary } from "@climblive/lib/components";
+  import { ErrorBoundary, loadNativeStyles } from "@climblive/lib/components";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { onMount } from "svelte";
   import Start from "./failsafe/Start.svelte";
@@ -13,11 +13,7 @@
   });
 
   onMount(async () => {
-    const NativeStyles = (await import("./DummyStyles.svelte")).default;
-
-    new NativeStyles({
-      target: document.body,
-    });
+    loadNativeStyles();
   });
 </script>
 

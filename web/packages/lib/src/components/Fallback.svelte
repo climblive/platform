@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Component } from "svelte";
+  import { type Component } from "svelte";
 
   type Props = {
     missingFeatures?: string[];
@@ -29,9 +29,18 @@
     <section>
       <h1 onclickcapture={handleTap}>Sorry!</h1>
       <p>
-        Your browser version is outdated and may not support this application.
-        We recommend you to upgrade your browser or borrow your friends phone.
+        Your browser version is outdated and will most likely not support this
+        app. We recommend you to upgrade your browser or borrow your friends
+        phone.
       </p>
+
+      <small>
+        If you are using an iPhone or iPad, please ensure you <a
+          href="https://support.apple.com/en-us/118575"
+          >update to the latest version of iOS</a
+        >. Please note that devices older than the iPhone XR may not be
+        upgradable.
+      </small>
 
       {#if showMissingFeatures && missingFeatures.length > 0}
         <p>
@@ -44,20 +53,16 @@
         </p>
       {/if}
 
-      <button onclick={() => (force = true)} class="wa-danger wa-size-s"
-        >Continue anyway</button
-      >
-
       {#if Alternative}
         <Alternative />
       {/if}
 
       <p>
-        If you are using an iPhone or iPad, please ensure you <a
-          href="https://support.apple.com/en-us/118575"
-          >update to the latest version of iOS</a
-        >. Please note that devices older than the iPhone XR may not be
-        upgradable.
+        You may try your luck and <a
+          href="#"
+          onclick={() => (force = true)}
+          class="wa-danger wa-size-s">continue anyway</a
+        >, but be aware that the app might not work as expected.
       </p>
     </section>
   </main>
@@ -70,10 +75,6 @@
 
   main {
     padding: var(--wa-space-m);
-  }
-
-  button {
-    margin-block-end: var(--wa-space-l);
   }
 
   section {

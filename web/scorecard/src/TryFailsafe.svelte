@@ -17,6 +17,10 @@
   });
 </script>
 
+<p>
+  We offer a simplified version of the app that includes only the most basic
+  features.
+</p>
 <a href={code ? `/failsafe/${code}` : "/failsafe"}
   ><button>Use simplified version</button></a
 >
