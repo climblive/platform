@@ -1,13 +1,10 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/styles/native.css";
   import type { Component } from "svelte";
 
   type Props = {
     missingFeatures?: string[];
     app: Component;
   };
-
-  const NativeStyles = () => import("./NativeStyles.svelte");
 
   const { missingFeatures = [], app: App }: Props = $props();
 
@@ -23,7 +20,6 @@
 {#if force}
   <App></App>
 {:else}
-  <NativeStyles />
   <main>
     <section>
       <h1 onclickcapture={handleTap}>Sorry!</h1>
