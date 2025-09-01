@@ -9,7 +9,6 @@ import {
 import { mount } from "svelte";
 import App from "./App.svelte";
 import FailsafeApp from "./FailsafeApp.svelte";
-import NativeStyles from "./NativeStyles.svelte";
 
 if (location.pathname.startsWith("/failsafe")) {
   mount(FailsafeApp, {
@@ -33,7 +32,6 @@ if (location.pathname.startsWith("/failsafe")) {
       props: {
         missingFeatures,
         app: App,
-        styles: NativeStyles,
       },
     });
   }

@@ -8,7 +8,6 @@ import {
   watchColorSchemeChanges,
 } from "@climblive/lib/utils";
 import { mount } from "svelte";
-import NativeStyles from "./NativeStyles.svelte";
 
 watchColorSchemeChanges((prefersDarkColorScheme) =>
   updateTheme(prefersDarkColorScheme),
@@ -27,7 +26,6 @@ if (compatible) {
     props: {
       missingFeatures,
       app: App,
-      styles: NativeStyles,
     },
   });
 }

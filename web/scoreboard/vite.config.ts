@@ -6,6 +6,7 @@ export default defineConfig({
   base: "./",
   build: {
     minify: true,
+    cssCodeSplit: true,
   },
   resolve: {
     alias: {

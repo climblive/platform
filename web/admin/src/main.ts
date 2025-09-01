@@ -8,7 +8,6 @@ import {
   watchColorSchemeChanges,
 } from "@climblive/lib/utils";
 import { mount } from "svelte";
-import NativeStyles from "./NativeStyles.svelte";
 
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get("print") === null) {
@@ -31,7 +30,6 @@ if (compatible) {
     props: {
       missingFeatures,
       app: App,
-      styles: NativeStyles,
     },
   });
 }
