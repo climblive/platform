@@ -14,7 +14,7 @@
 
   onMount(async () => {
     if (false) {
-      const NativeStyles = (await import("./NativeStyles.svelte")).default;
+      const NativeStyles = (await import("./DummyStyles.svelte")).default;
 
       new NativeStyles({
         target: document.body,
