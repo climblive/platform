@@ -13,11 +13,13 @@
   });
 
   onMount(async () => {
-    const NativeStyles = (await import("./NativeStyles.svelte")).default;
+    if (false) {
+      const NativeStyles = (await import("./NativeStyles.svelte")).default;
 
-    new NativeStyles({
-      target: document.body,
-    });
+      new NativeStyles({
+        target: document.body,
+      });
+    }
   });
 </script>
 
