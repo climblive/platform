@@ -33,16 +33,14 @@
     const code = formData.get("code")?.toString().trim();
 
     if (code && code.length === 8) {
-      try {
-        contender = await authenticate(code);
+      contender = await authenticate(code);
 
-        queryClient.setQueryData(
-          ["contender", { id: contender.id }],
-          () => contender,
-        );
+      queryClient.setQueryData(
+        ["contender", { id: contender.id }],
+        () => contender,
+      );
 
-        history.replaceState({}, "", `/failsafe/${code}`);
-      } catch {}
+      history.replaceState({}, "", `/failsafe/${code}`);
     }
   };
 
