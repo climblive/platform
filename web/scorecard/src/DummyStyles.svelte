@@ -1,10 +1,3 @@
 <script lang="ts">
+  import "./native.css";
 </script>
-
-<div></div>
-
-<style>
-  div {
-    color: aliceblue;
-  }
-</style>

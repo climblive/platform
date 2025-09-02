@@ -1,0 +1,1001 @@
+@layer wa-native {
+    html {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        tab-size: 4;
+        background-color: var(--wa-color-surface-default)
+    }
+
+    *,
+    *:before,
+    *:after {
+        box-sizing: inherit
+    }
+
+    body {
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        color: var(--wa-color-text-normal);
+        font-family: var(--wa-font-family-body);
+        font-size: var(--wa-font-size-m);
+        font-weight: var(--wa-font-weight-body);
+        line-height: var(--wa-line-height-normal);
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-font-smoothing: antialiased;
+        text-size-adjust: none;
+        -moz-text-size-adjust: none;
+        -webkit-text-size-adjust: none
+    }
+
+    address,
+    audio,
+    blockquote,
+    dd,
+    details,
+    dl,
+    fieldset,
+    figure,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    hr,
+    iframe,
+    ol,
+    p,
+    pre,
+    table,
+    ul,
+    video {
+        margin: 0
+    }
+
+    :is(address, audio, blockquote, dd, details, dl, fieldset, figure, h1, h2, h3, h4, h5, h6, hr, iframe, ol, p, pre, table, ul, video):has(+*) {
+        margin-block-end: var(--wa-content-spacing)
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: var(--wa-font-family-heading);
+        font-weight: var(--wa-font-weight-heading);
+        line-height: var(--wa-line-height-condensed);
+        text-wrap: balance
+    }
+
+    h1 {
+        font-size: var(--wa-font-size-3xl)
+    }
+
+    h2 {
+        font-size: var(--wa-font-size-2xl)
+    }
+
+    h3 {
+        font-size: var(--wa-font-size-xl)
+    }
+
+    h4 {
+        font-size: var(--wa-font-size-l)
+    }
+
+    h5 {
+        font-size: var(--wa-font-size-m)
+    }
+
+    h6 {
+        font-size: var(--wa-font-size-s)
+    }
+
+    p {
+        text-wrap: pretty
+    }
+
+    blockquote {
+        padding: var(--wa-space-xl);
+        font-family: var(--wa-font-family-longform);
+        font-size: var(--wa-font-size-l);
+        border-inline-start: var(--wa-border-style) var(--wa-border-width-l) var(--wa-color-neutral-border-quiet)
+    }
+
+    hr {
+        margin: var(--wa-content-spacing) 0;
+        border: none;
+        border-bottom: solid var(--wa-border-width-s) var(--wa-color-surface-border)
+    }
+
+    ul,
+    ol {
+        padding: 0
+    }
+
+    li>ul,
+    li>ol {
+        margin-inline-start: .25em
+    }
+
+    ul {
+        list-style: disc
+    }
+
+    li {
+        margin-inline-start: 1.125em;
+        padding: 0
+    }
+
+    dt,
+    strong,
+    b {
+        font-weight: var(--wa-font-weight-bold)
+    }
+
+    em,
+    i {
+        font-style: italic
+    }
+
+    u {
+        text-decoration-line: underline;
+        text-decoration-thickness: .09375em;
+        text-underline-offset: .125em
+    }
+
+    s {
+        text-decoration-line: line-through;
+        text-decoration-thickness: .09375em
+    }
+
+    ins {
+        text-decoration-color: var(--wa-color-success-on-quiet);
+        text-decoration-line: underline;
+        text-decoration-thickness: .09375em;
+        text-underline-offset: .125em
+    }
+
+    del {
+        color: color-mix(in oklab, currentColor, transparent 10%);
+        text-decoration-color: var(--wa-color-danger-on-quiet);
+        text-decoration-line: line-through;
+        text-decoration-thickness: .09375em
+    }
+
+    mark {
+        padding: .125em .25em;
+        color: var(--wa-color-warning-on-quiet);
+        background-color: var(--wa-color-warning-fill-quiet);
+        border-radius: var(--wa-border-radius-s)
+    }
+
+    small {
+        font-size: var(--wa-font-size-smaller)
+    }
+
+    sub,
+    sup {
+        font-size: var(--wa-font-size-smaller);
+        line-height: 0
+    }
+
+    sub {
+        vertical-align: sub
+    }
+
+    sup {
+        vertical-align: super
+    }
+
+    abbr[title] {
+        text-decoration-line: underline;
+        text-decoration-style: dotted;
+        text-decoration-thickness: .09375em;
+        text-underline-offset: .125em;
+        cursor: help
+    }
+
+    kbd {
+        padding: .125em .25em;
+        font-family: var(--wa-font-family-code);
+        font-size: var(--wa-font-size-smaller);
+        border: solid var(--wa-border-width-s) color-mix(in oklab, currentColor, transparent 50%);
+        border-radius: var(--wa-border-radius-s);
+        box-shadow: 0 .125em color-mix(in oklab, currentColor, transparent 50%)
+    }
+
+    kbd wa-icon {
+        vertical-align: -2px
+    }
+
+    a {
+        color: var(--wa-color-text-link);
+        text-decoration: var(--wa-link-decoration-default);
+        -webkit-text-decoration: var(--wa-link-decoration-default);
+        text-decoration-thickness: .09375em;
+        text-underline-offset: .125em
+    }
+
+    *:is([appearance~=accent], .wa-accent) a,
+    *:is([appearance~=accent], .wa-accent) a:hover {
+        color: currentColor
+    }
+
+    a:hover {
+        color: color-mix(in oklab, var(--wa-color-text-link), var(--wa-color-mix-hover));
+        text-decoration: var(--wa-link-decoration-hover);
+        -webkit-text-decoration: var(--wa-link-decoration-hover)
+    }
+
+    a:focus,
+    button:focus {
+        outline: none
+    }
+
+    a:focus-visible,
+    button:focus-visible {
+        outline: var(--wa-focus-ring);
+        outline-offset: var(--wa-focus-ring-offset)
+    }
+
+    code,
+    samp,
+    var {
+        padding: .125em .25em;
+        font-family: var(--wa-font-family-code);
+        font-size: var(--wa-font-size-smaller);
+        background-color: var(--wa-color-overlay-inline);
+        border-radius: var(--wa-border-radius-s)
+    }
+
+    pre {
+        padding: var(--wa-space-m);
+        font-family: var(--wa-font-family-code);
+        font-size: var(--wa-font-size-smaller);
+        white-space: pre;
+        background-color: var(--wa-color-overlay-inline);
+        border-radius: var(--wa-border-radius-m)
+    }
+
+    pre code,
+    pre samp,
+    pre var {
+        padding: 0;
+        font-size: 1em;
+        background-color: transparent
+    }
+
+    @media print {
+        pre {
+            background: none;
+            border: solid var(--wa-border-width-s) var(--wa-color-surface-border)
+        }
+    }
+
+    img,
+    svg,
+    picture,
+    video {
+        max-width: 100%;
+        height: auto;
+        border-radius: var(--wa-border-radius-m)
+    }
+
+    embed,
+    iframe,
+    object {
+        max-width: 100%
+    }
+
+    iframe {
+        border: none
+    }
+
+    table {
+        width: 100%;
+        border: none;
+        border-collapse: collapse
+    }
+
+    caption {
+        color: var(--wa-color-text-quiet);
+        font-size: var(--wa-font-size-smaller)
+    }
+
+    caption:has(+*) {
+        margin-block-end: .75em
+    }
+
+    tbody tr {
+        border-top: solid var(--wa-border-width-s) var(--wa-color-border-quiet)
+    }
+
+    :where(table.wa-zebra-rows) :is(tbody tr):nth-child(odd) {
+        background-color: color-mix(in oklab, var(--wa-color-fill-quiet) 60%, transparent)
+    }
+
+    @media (hover: hover) {
+        :where(table.wa-hover-rows) :is(tbody tr):hover {
+            background-color: var(--wa-color-fill-quiet)
+        }
+
+        :where(table.wa-hover-rows) :is(tbody tr):hover,
+        :where(table.wa-hover-rows) :is(tbody tr):hover+tr {
+            border-top-color: var(--wa-color-border-normal)
+        }
+    }
+
+    td,
+    th {
+        padding: .75em;
+        text-align: start;
+        vertical-align: top
+    }
+
+    th {
+        padding-block: .75em;
+        font-size: var(--wa-font-size-smaller);
+        font-weight: var(--wa-font-weight-bold)
+    }
+
+    details {
+        padding: 0;
+        background-color: var(--wa-color-surface-default);
+        border: var(--wa-panel-border-width) var(--wa-color-surface-border) var(--wa-panel-border-style);
+        border-radius: var(--wa-panel-border-radius);
+        overflow-anchor: none
+    }
+
+    details summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--wa-space-m);
+        cursor: pointer;
+        user-select: none;
+        -webkit-user-select: none
+    }
+
+    details summary>* {
+        margin: 0
+    }
+
+    details summary:focus {
+        outline: none
+    }
+
+    details summary:focus-visible {
+        outline: var(--wa-focus-ring);
+        outline-offset: var(--wa-focus-ring-offset)
+    }
+
+    details[open] {
+        padding: 0 var(--wa-space-m) var(--wa-space-m) var(--wa-space-m)
+    }
+
+    details[open] summary {
+        margin-inline: calc(-1 * var(--wa-space-m))
+    }
+
+    @media print {
+        details {
+            background: none;
+            border: solid var(--wa-border-width-s) var(--wa-color-surface-border)
+        }
+
+        details summary {
+            list-style: none
+        }
+    }
+
+    details summary::marker,
+    details summary::-webkit-details-marker {
+        display: none
+    }
+
+    details summary:after {
+        content: "";
+        background-color: var(--wa-color-text-quiet);
+        mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="16" width="10" viewBox="0 0 320 512"><path d="M310.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-192 192c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L242.7 256 73.4 86.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l192 192z"/></svg>') center no-repeat;
+        width: 1rem;
+        height: 1rem;
+        rotate: 0deg
+    }
+
+    details summary:dir(rtl):after {
+        rotate: 180deg
+    }
+
+    details[open] summary:after {
+        rotate: 90deg
+    }
+
+    dialog {
+        flex-direction: column;
+        align-items: start;
+        width: 32rem;
+        max-width: calc(100% - var(--wa-space-l));
+        padding: var(--wa-space-l);
+        background-color: var(--wa-color-surface-raised);
+        border-radius: var(--wa-panel-border-radius);
+        border: none;
+        box-shadow: var(--wa-shadow-l);
+        transition: var(--wa-transition-slow, .2s) var(--wa-transition-easing);
+        margin: auto;
+        inset: 0
+    }
+
+    dialog[open] {
+        display: flex
+    }
+
+    dialog:focus {
+        outline: none
+    }
+
+    dialog::backdrop {
+        background-color: var(--wa-color-overlay-modal, rgb(0 0 0 / .25))
+    }
+
+    label {
+        display: inline-block;
+        position: relative;
+        color: var(--wa-form-control-label-color);
+        font-weight: var(--wa-form-control-label-font-weight);
+        line-height: var(--wa-form-control-label-line-height)
+    }
+
+    label:has(input:not([type=button], [type=checkbox], [type=color], [type=file], [type=hidden], [type=image], [type=radio], [type=reset], [type=submit]), textarea, select) {
+        width: 100%
+    }
+
+    label+:is(input:not([type=checkbox], [type=radio]), textarea, select),
+    label>:is(input:not([type=checkbox], [type=radio]), textarea, select) {
+        margin-block-start: .5em
+    }
+
+    fieldset {
+        padding: var(--wa-space-l);
+        padding-block-start: calc(var(--wa-space-l) - .5em);
+        border: solid 1px var(--wa-color-surface-border);
+        border-radius: var(--wa-border-radius-m)
+    }
+
+    legend {
+        padding: 0;
+        padding-inline: var(--wa-space-xs);
+        font-weight: var(--wa-form-control-label-font-weight)
+    }
+
+    button,
+    input[type=button],
+    input[type=reset],
+    input[type=submit] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: var(--wa-form-control-height);
+        padding: 0 var(--wa-form-control-padding-inline);
+        color: var(--wa-color-on-loud, var(--wa-color-neutral-on-loud));
+        font-family: inherit;
+        font-size: var(--wa-form-control-value-font-size);
+        font-weight: var(--wa-font-weight-action);
+        line-height: calc(var(--wa-form-control-height) - var(--border-width) * 2);
+        text-decoration: none;
+        vertical-align: middle;
+        white-space: nowrap;
+        background-color: var(--wa-color-fill-loud, var(--wa-color-neutral-fill-loud));
+        border-color: transparent;
+        border-style: var(--wa-border-style);
+        border-width: max(1px, var(--wa-form-control-border-width));
+        border-radius: var(--wa-form-control-border-radius);
+        transition-property: background, border, box-shadow, color;
+        transition-duration: var(--wa-transition-fast);
+        transition-timing-function: var(--wa-transition-easing);
+        cursor: pointer;
+        user-select: none;
+        -webkit-user-select: none
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]).wa-plain {
+        color: var(--wa-color-on-quiet, var(--wa-color-neutral-on-quiet));
+        background-color: transparent;
+        border-color: transparent
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]).wa-plain:not(:disabled):hover {
+        color: var(--wa-color-on-quiet, var(--wa-color-neutral-on-quiet));
+        background-color: var(--wa-color-fill-quiet, var(--wa-color-neutral-fill-quiet))
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]).wa-plain:not(:disabled):active {
+        color: var(--wa-color-on-quiet, var(--wa-color-neutral-on-quiet));
+        background-color: color-mix(in oklab, var(--wa-color-fill-quiet, var(--wa-color-neutral-fill-quiet)), var(--wa-color-mix-active))
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]).wa-outlined {
+        color: var(--wa-color-on-quiet, var(--wa-color-neutral-on-quiet));
+        background-color: transparent;
+        border-color: var(--wa-color-border-loud, var(--wa-color-neutral-border-loud))
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]).wa-outlined:not(:disabled):hover {
+        color: var(--wa-color-on-quiet, var(--wa-color-neutral-on-quiet));
+        background-color: var(--wa-color-fill-quiet, var(--wa-color-neutral-fill-quiet))
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]).wa-outlined:not(:disabled):active {
+        color: var(--wa-color-on-quiet, var(--wa-color-neutral-on-quiet));
+        background-color: color-mix(in oklab, var(--wa-color-fill-quiet, var(--wa-color-neutral-fill-quiet)), var(--wa-color-mix-active))
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]).wa-filled {
+        color: var(--wa-color-on-normal, var(--wa-color-neutral-on-normal));
+        background-color: var(--wa-color-fill-normal, var(--wa-color-neutral-fill-normal));
+        border-color: transparent
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]).wa-filled:not(:disabled):hover {
+        color: var(--wa-color-on-normal, var(--wa-color-neutral-on-normal));
+        background-color: color-mix(in oklab, var(--wa-color-fill-normal, var(--wa-color-neutral-fill-normal)), var(--wa-color-mix-hover))
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]).wa-filled:not(:disabled):active {
+        color: var(--wa-color-on-normal, var(--wa-color-neutral-on-normal));
+        background-color: color-mix(in oklab, var(--wa-color-fill-normal, var(--wa-color-neutral-fill-normal)), var(--wa-color-mix-active))
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]).wa-filled.wa-outlined {
+        border-color: var(--wa-color-border-normal, var(--wa-color-neutral-border-normal))
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]).wa-accent {
+        color: var(--wa-color-on-loud, var(--wa-color-neutral-on-loud));
+        background-color: var(--wa-color-fill-loud, var(--wa-color-neutral-fill-loud));
+        border-color: transparent
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]).wa-accent:not(:disabled):hover {
+        background-color: color-mix(in oklab, var(--wa-color-fill-loud, var(--wa-color-neutral-fill-loud)), var(--wa-color-mix-hover))
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]).wa-accent:not(:disabled):active {
+        background-color: color-mix(in oklab, var(--wa-color-fill-loud, var(--wa-color-neutral-fill-loud)), var(--wa-color-mix-active))
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]):focus {
+        outline: none
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]):focus-visible {
+        outline: var(--wa-focus-ring);
+        outline-offset: var(--wa-focus-ring-offset)
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]):is(::-moz-focus-inner) {
+        border: 0
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]):disabled {
+        opacity: .5;
+        cursor: not-allowed
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]):disabled * {
+        pointer-events: none
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit]).wa-pill {
+        border-radius: var(--wa-border-radius-pill)
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit])>wa-icon:has(+*) {
+        margin-inline-end: .75em
+    }
+
+    :is(button, input[type=button], input[type=reset], input[type=submit])>*+wa-icon {
+        margin-inline-start: .75em
+    }
+
+    input[type=checkbox],
+    label:has(input[type=checkbox]),
+    input[type=radio],
+    label:has(input[type=radio]) {
+        display: inline-flex;
+        width: fit-content;
+        color: var(--wa-form-control-value-color);
+        font-family: inherit;
+        font-size: var(--wa-form-control-value-font-size);
+        font-weight: var(--wa-form-control-value-font-weight);
+        line-height: var(--wa-form-control-value-line-height);
+        user-select: none;
+        -webkit-user-select: none
+    }
+
+    :is(input[type=checkbox], label:has(input[type=checkbox]), input[type=radio], label:has(input[type=radio])),
+    :is(input[type=checkbox], label:has(input[type=checkbox]), input[type=radio], label:has(input[type=radio]))+label {
+        cursor: pointer
+    }
+
+    :is(input[type=checkbox], label:has(input[type=checkbox]), input[type=radio], label:has(input[type=radio])):disabled,
+    :is(input[type=checkbox], label:has(input[type=checkbox]), input[type=radio], label:has(input[type=radio])):has(:disabled) {
+        opacity: .5;
+        cursor: not-allowed
+    }
+
+    input[type=checkbox],
+    input[type=radio] {
+        appearance: none;
+        position: relative;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        width: var(--wa-form-control-toggle-size);
+        height: var(--wa-form-control-toggle-size);
+        margin: 0;
+        margin-inline-end: .5em;
+        background-color: var(--wa-form-control-background-color);
+        border-color: var(--wa-form-control-border-color);
+        border-style: var(--wa-border-style);
+        border-width: var(--wa-form-control-border-width);
+        transition: background var(--wa-transition-normal), border-color var(--wa-transition-fast), box-shadow var(--wa-transition-fast), color var(--wa-transition-fast);
+        transition-timing-function: var(--wa-transition-easing)
+    }
+
+    :is(input[type=checkbox], input[type=radio]):focus-visible {
+        outline: var(--wa-focus-ring);
+        outline-offset: var(--wa-focus-ring-offset)
+    }
+
+    input[type=checkbox] {
+        --checked-icon-color: var(--wa-color-brand-on-loud);
+        --checked-icon-scale: .8;
+        border-radius: min(calc(var(--wa-form-control-toggle-size) * .375), var(--wa-border-radius-s))
+    }
+
+    input[type=checkbox]:checked,
+    input[type=checkbox]:indeterminate {
+        color: var(--checked-icon-color);
+        background-color: var(--wa-form-control-activated-color);
+        border-color: var(--wa-form-control-activated-color)
+    }
+
+    input[type=checkbox]:checked:after,
+    input[type=checkbox]:indeterminate:after {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        content: "";
+        background-color: currentColor;
+        scale: var(--checked-icon-scale)
+    }
+
+    input[type=checkbox]:checked:after {
+        mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z"/></svg>') center no-repeat
+    }
+
+    input[type=checkbox]:indeterminate:after {
+        mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="16" width="14" viewBox="0 0 448 512"><path d="M431 256c0 17.7-14.3 32-32 32H49c-17.7 0-32-14.3-32-32s14.3-32 32-32h350c17.7 0 32 14.3 32 32z"/></svg>') center no-repeat
+    }
+
+    input[type=radio] {
+        --checked-icon-color: var(--wa-form-control-activated-color);
+        --checked-icon-scale: .75;
+        color: transparent;
+        border-radius: 50%
+    }
+
+    input[type=radio]:checked {
+        color: var(--checked-icon-color);
+        border-color: var(--wa-form-control-activated-color)
+    }
+
+    input[type=radio]:checked:after {
+        content: "";
+        aspect-ratio: 1;
+        width: round(calc(100% * var(--checked-icon-scale)), 1px);
+        background-color: currentColor;
+        border-radius: 50%
+    }
+
+    input:not([type=button], [type=checkbox], [type=color], [type=file], [type=hidden], [type=image], [type=radio], [type=range], [type=reset], [type=submit]),
+    textarea,
+    select {
+        width: 100%;
+        height: var(--wa-form-control-height);
+        padding: 0 var(--wa-form-control-padding-inline);
+        color: var(--wa-form-control-value-color);
+        font-size: var(--wa-form-control-value-size);
+        font-family: inherit;
+        font-weight: var(--wa-form-control-value-font-weight);
+        line-height: var(--wa-form-control-value-line-height);
+        vertical-align: middle;
+        background-color: var(--wa-form-control-background-color);
+        border-color: var(--wa-form-control-border-color);
+        border-style: var(--wa-form-control-border-style);
+        border-width: var(--wa-form-control-border-width);
+        border-radius: var(--wa-form-control-border-radius);
+        transition: background-color var(--wa-transition-normal), border var(--wa-transition-normal), outline var(--wa-transition-fast);
+        transition-timing-function: var(--wa-transition-easing);
+        cursor: text
+    }
+
+    :is(input:not([type=button], [type=checkbox], [type=color], [type=file], [type=hidden], [type=image], [type=radio], [type=range], [type=reset], [type=submit]), textarea, select)::placeholder {
+        color: var(--wa-form-control-placeholder-color);
+        user-select: none;
+        -webkit-user-select: none
+    }
+
+    :is(input:not([type=button], [type=checkbox], [type=color], [type=file], [type=hidden], [type=image], [type=radio], [type=range], [type=reset], [type=submit]), textarea, select):focus {
+        outline: none
+    }
+
+    :is(input:not([type=button], [type=checkbox], [type=color], [type=file], [type=hidden], [type=image], [type=radio], [type=range], [type=reset], [type=submit]), textarea, select):focus-visible {
+        outline: var(--wa-focus-ring);
+        outline-offset: var(--wa-focus-ring-offset)
+    }
+
+    :is(input:not([type=button], [type=checkbox], [type=color], [type=file], [type=hidden], [type=image], [type=radio], [type=range], [type=reset], [type=submit]), textarea, select):disabled {
+        opacity: .5;
+        cursor: not-allowed
+    }
+
+    :is(input:not([type=button], [type=checkbox], [type=color], [type=file], [type=hidden], [type=image], [type=radio], [type=range], [type=reset], [type=submit]), textarea, select).wa-outlined {
+        background-color: var(--wa-form-control-background-color);
+        border-color: var(--wa-form-control-border-color)
+    }
+
+    :is(input:not([type=button], [type=checkbox], [type=color], [type=file], [type=hidden], [type=image], [type=radio], [type=range], [type=reset], [type=submit]), textarea, select).wa-filled {
+        background-color: var(--wa-color-neutral-fill-quiet);
+        border-color: var(--wa-color-neutral-fill-quiet)
+    }
+
+    :is(input:not([type=button], [type=checkbox], [type=color], [type=file], [type=hidden], [type=image], [type=radio], [type=range], [type=reset], [type=submit]), textarea, select).wa-filled.wa-outlined {
+        border-color: var(--wa-form-control-border-color)
+    }
+
+    :is(input:not([type=button], [type=checkbox], [type=color], [type=file], [type=hidden], [type=image], [type=radio], [type=range], [type=reset], [type=submit]), textarea, select).wa-pill {
+        border-radius: var(--wa-border-radius-pill)
+    }
+
+    textarea {
+        height: auto;
+        min-height: var(--wa-form-control-height);
+        padding: calc(var(--wa-form-control-padding-block) - ((1lh - 1em) / 2)) var(--wa-form-control-padding-inline);
+        line-height: var(--wa-line-height-normal);
+        resize: vertical
+    }
+
+    select {
+        --icon-caret: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><path fill="rgb(180 180 200)" d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></svg>');
+        appearance: none;
+        position: relative;
+        min-width: 0;
+        overflow: hidden;
+        background-image: var(--icon-caret), var(--icon-caret);
+        background-repeat: no-repeat;
+        background-position: center right var(--wa-form-control-padding-inline);
+        background-blend-mode: hue, difference;
+        cursor: pointer
+    }
+
+    input[type=color] {
+        display: block;
+        block-size: var(--wa-form-control-height);
+        inline-size: var(--wa-form-control-height);
+        padding: calc(var(--wa-form-control-border-width) * 2);
+        font-size: 1em;
+        background: transparent;
+        border: var(--wa-form-control-border-width) var(--wa-border-style) var(--wa-form-control-border-color);
+        border-radius: var(--wa-form-control-border-radius);
+        cursor: pointer;
+        forced-color-adjust: none
+    }
+
+    input[type=color]::-webkit-color-swatch-wrapper {
+        padding: 0;
+        border-radius: inherit
+    }
+
+    input[type=color]::-webkit-color-swatch {
+        border: none;
+        border-radius: calc(var(--wa-form-control-border-radius) - var(--wa-form-control-border-width) * 3)
+    }
+
+    input[type=color]::-moz-color-swatch {
+        border: none;
+        border-radius: calc(var(--wa-form-control-border-radius) - var(--wa-form-control-border-width) * 3)
+    }
+
+    input[type=color]:focus-visible {
+        outline: var(--wa-focus-ring);
+        outline-offset: var(--wa-focus-ring-offset)
+    }
+
+    input[type=range] {
+        --thumb-width: 1.4em;
+        --thumb-height: 1.4em;
+        --track-size: .5em;
+        -webkit-appearance: none;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        width: 100%;
+        height: var(--track-size);
+        margin: 0;
+        font-size: inherit;
+        line-height: var(--wa-form-control-height);
+        vertical-align: middle;
+        background-color: var(--wa-color-neutral-fill-normal);
+        border-radius: calc(var(--track-size) / 2)
+    }
+
+    input[type=range]::-webkit-slider-runnable-track {
+        width: 100%;
+        height: var(--track-size);
+        border: none;
+        border-radius: 999px
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: var(--thumb-width);
+        height: var(--thumb-height);
+        margin-top: calc(var(--thumb-height) / -2 + var(--track-size) / 2);
+        background-color: var(--wa-form-control-activated-color);
+        border: solid .125em var(--wa-color-surface-default);
+        border-radius: 50%;
+        transition-property: background-color, border-color, box-shadow, color;
+        transition-duration: var(--wa-transition-normal);
+        transition-timing-function: var(--wa-transition-easing)
+    }
+
+    input[type=range]:enabled:focus-visible::-webkit-slider-thumb {
+        outline: var(--wa-focus-ring);
+        outline-offset: var(--wa-focus-ring-offset)
+    }
+
+    input[type=range]:enabled::-webkit-slider-thumb {
+        cursor: pointer
+    }
+
+    input[type=range]:enabled::-webkit-slider-thumb:active {
+        cursor: grabbing
+    }
+
+    input[type=range]::-moz-focus-outer {
+        border: 0
+    }
+
+    input[type=range]::-moz-range-progress {
+        height: var(--track-size);
+        background-color: var(--wa-color-neutral-fill-normal);
+        border-radius: 3px
+    }
+
+    input[type=range]::-moz-range-track {
+        width: 100%;
+        height: var(--track-size);
+        background-color: var(--wa-color-neutral-fill-normal);
+        border: none;
+        border-radius: 999px
+    }
+
+    input[type=range]::-moz-range-thumb {
+        width: var(--thumb-width);
+        height: var(--thumb-height);
+        background-color: var(--wa-form-control-activated-color);
+        border: solid .125em var(--wa-color-surface-default);
+        border-radius: 50%;
+        transition-property: background-color, border-color, box-shadow, color;
+        transition-duration: var(--wa-transition-normal);
+        transition-timing-function: var(--wa-transition-easing)
+    }
+
+    input[type=range]:enabled:focus-visible::-moz-range-thumb {
+        outline: var(--wa-focus-ring);
+        outline-offset: var(--wa-focus-ring-offset)
+    }
+
+    input[type=range]:enabled::-moz-range-thumb {
+        cursor: pointer
+    }
+
+    input[type=range]:enabled::-moz-range-thumb:active {
+        cursor: grabbing
+    }
+
+    label>input[type=range] {
+        margin-block-start: 1em
+    }
+
+    input[type=range]:focus {
+        outline: none
+    }
+
+    input[type=range]:disabled {
+        opacity: .5;
+        cursor: not-allowed
+    }
+
+    input[type=range]:disabled::-webkit-slider-thumb {
+        cursor: not-allowed
+    }
+
+    input[type=range]:disabled::-moz-range-thumb {
+        cursor: not-allowed
+    }
+
+    progress {
+        --indicator-color: var(--wa-color-brand-fill-loud);
+        width: 100%;
+        height: 1rem;
+        overflow: hidden;
+        color: var(--wa-color-brand-on-loud);
+        background-color: var(--wa-color-neutral-fill-normal);
+        border-radius: var(--wa-border-radius-pill)
+    }
+
+    progress::-webkit-progress-bar {
+        background: transparent
+    }
+
+    progress[value]::-webkit-progress-value {
+        background-color: var(--indicator-color)
+    }
+
+    progress::-moz-progress-bar {
+        background-color: var(--indicator-color)
+    }
+
+    progress:not([value]) {
+        padding-left: var(--inset-inline-start);
+        animation: wa-progress-indeterminate 2.5s infinite cubic-bezier(.37, 0, .63, 1)
+    }
+
+    progress:not([value])::-webkit-progress-bar {
+        background-color: var(--indicator-color)
+    }
+
+    @keyframes wa-fade-in {
+        0% {
+            opacity: 0
+        }
+    }
+
+    @keyframes wa-progress-indeterminate {
+        0% {
+            padding-inline-end: 100%
+        }
+
+        25%,
+        to {
+            padding-inline-end: 0%
+        }
+
+        75%,
+        to {
+            padding-inline-start: 100%
+        }
+    }
+
+    .wa-invalid {
+        --wa-form-control-border-color: var(--wa-color-danger-border-loud);
+        --wa-form-control-activated-color: var(--wa-color-danger-fill-loud);
+        --wa-form-control-value-color: var(--wa-color-danger-on-quiet);
+        --wa-color-focus: var(--wa-color-danger-border-loud);
+        --wa-color-text-quiet: var(--wa-color-danger-on-quiet)
+    }
+
+    .wa-valid {
+        --wa-form-control-border-color: var(--wa-color-success-border-loud);
+        --wa-form-control-activated-color: var(--wa-color-success-fill-loud);
+        --wa-form-control-value-color: var(--wa-color-success-on-quiet);
+        --wa-color-focus: var(--wa-color-success-border-loud);
+        --wa-color-text-quiet: var(--wa-color-success-on-quiet)
+    }
+}
