@@ -64,7 +64,7 @@
   <h2>Profile</h2>
   <EditProfile contestId={contender.contestId} contenderId={contender.id} />
 
-  {#if contender?.entered}
+  {#if contender?.entered && false}
     <h2>Scorecard</h2>
     <Scorecard contestId={contender.contestId} contenderId={contender.id}
     ></Scorecard>
