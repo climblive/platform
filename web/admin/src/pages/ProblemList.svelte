@@ -150,10 +150,10 @@
 
 <section>
   <wa-button
-    variant="brand"
+    variant="neutral"
     appearance="accent"
     onclick={() => navigate(`contests/${contestId}/new-problem`)}
-    >Create</wa-button
+    >Create problem</wa-button
   >
 
   {#if sortedProblemsWithAscents === undefined}

@@ -42,7 +42,7 @@
       size="small"
       type="submit"
       loading={$createCompClass.isPending}
-      variant="brand"
+      variant="neutral"
       appearance="accent"
       >Create
     </wa-button>

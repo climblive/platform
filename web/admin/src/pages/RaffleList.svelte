@@ -42,8 +42,8 @@
 {/snippet}
 
 <section>
-  <wa-button variant="brand" appearance="accent" onclick={handleCreateRaffle}
-    >Create</wa-button
+  <wa-button variant="neutral" appearance="accent" onclick={handleCreateRaffle}
+    >Start new raffle</wa-button
   >
 
   {#if raffles === undefined}

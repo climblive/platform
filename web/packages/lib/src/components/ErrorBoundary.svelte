@@ -25,7 +25,7 @@
     <main>
       <h1>Oopsie!</h1>
       <pre onclick={() => copyToClipboard(error)}>{error}</pre>
-      <wa-button size="small" variant="brand" onclick={reset}
+      <wa-button size="small" variant="neutral" onclick={reset}
         >Try again</wa-button
       >
     </main>

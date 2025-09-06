@@ -115,7 +115,7 @@
   <wa-button
     slot="footer"
     size="small"
-    variant="brand"
+    variant="neutral"
     appearance="accent"
     loading={$createContenders.isPending}
     onclick={handleCreate}
@@ -128,7 +128,7 @@
 <div class="actions">
   <wa-button
     size="small"
-    variant="brand"
+    variant="neutral"
     appearance="accent"
     onclick={handleOpenCreateDialog}
     disabled={remainingCodes === undefined || remainingCodes === 0}

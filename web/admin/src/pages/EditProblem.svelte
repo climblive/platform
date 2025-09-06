@@ -45,7 +45,7 @@
         size="small"
         type="submit"
         loading={$patchProblem.isPending}
-        variant="brand"
+        variant="neutral"
         >Save
       </wa-button>
     </div>
