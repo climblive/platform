@@ -13,5 +13,9 @@ export const checkCompat = (): [boolean, string[]] => {
     missingFeatures.push("CustomStateSet");
   }
 
+  if (CSS.supports("selector(&)") === false) {
+    missingFeatures.push("@supports selector(&)");
+  }
+
   return [missingFeatures.length === 0, missingFeatures];
 };
