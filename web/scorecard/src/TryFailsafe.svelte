@@ -18,5 +18,5 @@
 </script>
 
 <a href={code ? `/failsafe/${code}` : "/failsafe"}
-  ><button>Try failsafe version</button></a
+  ><button>Use simplified version</button></a
 >
