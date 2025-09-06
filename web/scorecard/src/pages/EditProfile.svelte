@@ -67,7 +67,7 @@
         type="submit"
         loading={$patchContender.isPending}
         disabled={false}
-        variant="brand"
+        variant="neutral"
         appearance="accent"
         >Save
       </wa-button>

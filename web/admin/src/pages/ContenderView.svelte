@@ -123,7 +123,7 @@
         href={`/${contender.registrationCode}`}
         target="_blank"
         appearance="plain"
-        variant="brand"
+        variant="neutral"
         size="large"
       >
         <wa-icon slot="start" name="arrow-up-right-from-square"></wa-icon>
@@ -148,7 +148,7 @@
   <div class="controls">
     <wa-switch
       bind:this={withdrawFromFinalsToggle}
-      hint="The contender does not wish to take part in the finals"
+      hint="In case the contender does not wish to take part in the finals."
       {@attach checked(contender.withdrawnFromFinals)}
       onchange={handleToggleWithdrawFromFinals}
       disabled={contender.disqualified || $patchContender.isPending}
