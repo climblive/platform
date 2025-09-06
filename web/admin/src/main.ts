@@ -9,7 +9,6 @@ import {
 } from "@climblive/lib/utils";
 import * as Sentry from "@sentry/svelte";
 import { mount } from "svelte";
-import NativeStyles from "./NativeStyles.svelte";
 
 if (import.meta.env.PROD) {
   Sentry.init({
@@ -40,7 +39,6 @@ if (compatible) {
     props: {
       missingFeatures,
       app: App,
-      styles: NativeStyles,
     },
   });
 }

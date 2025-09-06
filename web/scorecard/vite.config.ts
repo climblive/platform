@@ -7,6 +7,7 @@ export default defineConfig({
   build: {
     minify: true,
     sourcemap: true,
+    cssCodeSplit: true,
   },
   resolve: {
     alias: {

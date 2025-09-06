@@ -4,10 +4,14 @@
   type Props = {
     missingFeatures?: string[];
     app: Component;
-    styles: Component;
+    alternative?: Component;
   };
 
-  const { missingFeatures = [], app: App, styles: Styles }: Props = $props();
+  const {
+    missingFeatures = [],
+    app: App,
+    alternative: Alternative,
+  }: Props = $props();
 
   let force = $state(false);
   let tapCount = $state(0);
@@ -21,7 +25,6 @@
 {#if force}
   <App></App>
 {:else}
-  <Styles />
   <main>
     <section>
       <h1 onclickcapture={handleTap}>Sorry!</h1>
@@ -44,6 +47,10 @@
       <button onclick={() => (force = true)} class="wa-danger wa-size-s"
         >Continue anyway</button
       >
+
+      {#if Alternative}
+        <Alternative />
+      {/if}
 
       <p>
         If you are using an iPhone or iPad, please ensure you <a

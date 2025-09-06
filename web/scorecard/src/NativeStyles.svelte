@@ -1,5 +1,3 @@
 <script lang="ts">
-  import nativeStylesUrl from "@awesome.me/webawesome/dist/styles/native.css?url";
+  import "@awesome.me/webawesome/dist/styles/native.css";
 </script>
-
-<link rel="stylesheet" href={nativeStylesUrl} />
