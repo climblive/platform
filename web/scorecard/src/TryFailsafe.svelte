@@ -20,7 +20,24 @@
 <p>
   We offer a simplified version of the app that includes only the most basic
   features.
+  <br />
+
+  <a href={code ? `/failsafe/${code}` : "/failsafe"}
+    ><button>Use simplified version</button></a
+  >
 </p>
-<a href={code ? `/failsafe/${code}` : "/failsafe"}
-  ><button>Use simplified version</button></a
->
+
+<style>
+  p {
+    margin-block-start: var(--wa-space-m);
+    border: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-success-border-loud);
+    padding: var(--wa-space-m);
+    border-radius: var(--wa-border-radius-m);
+  }
+
+  a {
+    display: block;
+    margin-block-start: var(--wa-space-m);
+  }
+</style>

@@ -32,7 +32,7 @@ if (location.pathname.startsWith("/failsafe")) {
 
   const [compatible, missingFeatures] = checkCompat();
 
-  if (compatible) {
+  if (!compatible) {
     mount(App, {
       target: document.body,
     });

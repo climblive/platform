@@ -1,5 +1,6 @@
 <script lang="ts">
   import { type Component } from "svelte";
+  import { importNativeStyles } from "./styles";
 
   type Props = {
     missingFeatures?: string[];
@@ -25,22 +26,17 @@
 {#if force}
   <App></App>
 {:else}
+  {#await importNativeStyles() then styles}
+    <svelte:component this={styles.default} />
+  {/await}
   <main>
     <section>
       <h1 onclickcapture={handleTap}>Sorry!</h1>
       <p>
         Your browser version is outdated and will most likely not support this
-        app. We recommend you to upgrade your browser or borrow your friends
-        phone.
+        app. We recommend you to upgrade your browser<sup>*</sup> or borrow your
+        friends phone.
       </p>
-
-      <small>
-        If you are using an iPhone or iPad, please ensure you <a
-          href="https://support.apple.com/en-us/118575"
-          >update to the latest version of iOS</a
-        >. Please note that devices older than the iPhone XR may not be
-        upgradable.
-      </small>
 
       {#if showMissingFeatures && missingFeatures.length > 0}
         <p>
@@ -58,11 +54,22 @@
       {/if}
 
       <p>
-        You may try your luck and <a
-          href="#"
-          onclick={() => (force = true)}
-          class="wa-danger wa-size-s">continue anyway</a
-        >, but be aware that the app might not work as expected.
+        <small>
+          You may try your luck and
+          <a href="#" onclick={() => (force = true)} class="wa-danger wa-size-s"
+            >continue anyway</a
+          >, but be aware that the app might not work as expected.
+        </small>
+      </p>
+
+      <p>
+        <small>
+          <sup>*</sup>If you are using an iPhone or iPad, please ensure you
+          <a href="https://support.apple.com/en-us/118575"
+            >update to the latest version of iOS</a
+          >. Please note that devices older than the iPhone XR may not be
+          upgradable.
+        </small>
       </p>
     </section>
   </main>

@@ -1,7 +1,3 @@
-export const loadNativeStyles = async () => {
-  const NativeStyles = (await import("./NativeStyles.svelte")).default;
-
-  new NativeStyles({
-    target: document.body,
-  });
+export const importNativeStyles = async () => {
+    return import("./NativeStyles.svelte");
 };

@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { ErrorBoundary, loadNativeStyles } from "@climblive/lib/components";
+  import { ErrorBoundary, importNativeStyles } from "@climblive/lib/components";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
-  import { onMount } from "svelte";
   import Start from "./failsafe/Start.svelte";
 
   const queryClient = new QueryClient({
@@ -11,13 +10,13 @@
       },
     },
   });
-
-  onMount(async () => {
-    loadNativeStyles();
-  });
 </script>
 
 <ErrorBoundary>
+  {#await importNativeStyles() then styles}
+    <svelte:component this={styles.default} />
+  {/await}
+
   <QueryClientProvider client={queryClient}>
     <main>
       <Start />
