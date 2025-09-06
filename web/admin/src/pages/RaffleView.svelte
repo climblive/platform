@@ -78,7 +78,8 @@
   >
   <h1>Raffle {raffle.id}</h1>
   <section>
-    <wa-button variant="brand" onclick={handleDrawWinner}>Draw winner</wa-button
+    <wa-button variant="neutral" onclick={handleDrawWinner}
+      >Draw winner</wa-button
     >
 
     {#if sortedRaffleWinners === undefined}

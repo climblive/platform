@@ -54,7 +54,7 @@
       size="small"
       type="submit"
       loading={$createContest.isPending}
-      variant="brand"
+      variant="neutral"
       appearance="accent"
       >Create
     </wa-button>

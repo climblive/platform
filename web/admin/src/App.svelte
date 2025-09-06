@@ -87,11 +87,11 @@
             <p>
               Welcome to the <em>brand new</em> admin console for ClimbLive.
             </p>
-            <wa-button variant="brand" onclick={authenticator.redirectLogin}
+            <wa-button variant="neutral" onclick={authenticator.redirectLogin}
               >Sign in</wa-button
             >
             <wa-button
-              variant="brand"
+              variant="neutral"
               appearance="plain"
               onclick={authenticator.redirectSignup}>Sign up</wa-button
             >

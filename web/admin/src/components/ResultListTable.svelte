@@ -121,13 +121,11 @@
   disqualified,
 }: ScoreboardEntry)}
   <Link to={`./contenders/${contenderId}`}>
-    <wa-button appearance="plain" variant="brand" size="small">
-      {#if disqualified}
-        <del>{publicName}</del>
-      {:else}
-        {publicName}
-      {/if}
-    </wa-button>
+    {#if disqualified}
+      <del>{publicName}</del>
+    {:else}
+      {publicName}
+    {/if}
   </Link>
 {/snippet}
 

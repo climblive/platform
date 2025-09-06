@@ -59,7 +59,7 @@
       size="small"
       type="submit"
       loading={$patchContender.isPending}
-      variant="brand"
+      variant="neutral"
       appearance="accent"
       >Register
     </wa-button>

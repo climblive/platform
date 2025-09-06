@@ -92,7 +92,7 @@
 
 <h2>Contests</h2>
 <wa-button
-  variant="brand"
+  variant="neutral"
   onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
   >New contest</wa-button
 >
