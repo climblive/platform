@@ -38,7 +38,6 @@ if (compatible) {
     target: document.body,
     props: {
       missingFeatures,
-      app: App,
     },
   });
 }

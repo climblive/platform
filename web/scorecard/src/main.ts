@@ -32,7 +32,10 @@ if (location.pathname.startsWith("/failsafe")) {
 
   const [compatible, missingFeatures] = checkCompat();
 
-  if (!compatible) {
+  const urlParams = new URLSearchParams(window.location.search);
+  const force = urlParams.get("force") === "true";
+
+  if (compatible || force) {
     mount(App, {
       target: document.body,
     });
@@ -41,7 +44,6 @@ if (location.pathname.startsWith("/failsafe")) {
       target: document.body,
       props: {
         missingFeatures,
-        app: App,
         alternative: TryFailsafe,
       },
     });
