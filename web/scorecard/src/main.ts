@@ -7,6 +7,7 @@ import {
   watchColorSchemeChanges,
 } from "@climblive/lib/utils";
 import * as Sentry from "@sentry/svelte";
+import "element-internals-polyfill";
 import { mount } from "svelte";
 import App from "./App.svelte";
 import FailsafeApp from "./FailsafeApp.svelte";
