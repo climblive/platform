@@ -70,7 +70,7 @@
 {:else}
   <form bind:this={form} onsubmit={handleEnter}>
     <input
-      placeholder="Registration code"
+      placeholder="ABCD0001"
       name="code"
       type="text"
       value={code}
@@ -84,6 +84,7 @@
 <style>
   form {
     display: flex;
+    flex-direction: column;
     gap: var(--wa-space-m);
     margin: 2rem auto;
   }
@@ -95,10 +96,5 @@
   input {
     text-transform: uppercase;
     letter-spacing: 0.25rem;
-
-    &::placeholder {
-      text-transform: none;
-      letter-spacing: normal;
-    }
   }
 </style>

@@ -7,7 +7,6 @@
   } from "@climblive/lib/queries";
   import BoltIcon from "./BoltIcon.svelte";
   import DoubleCheckIcon from "./DoubleCheckIcon.svelte";
-  import MinusIcon from "./MinusIcon.svelte";
 
   type Props = {
     problem: Problem;
@@ -16,8 +15,6 @@
   };
 
   const { problem, tick, contenderId }: Props = $props();
-
-  let select: HTMLSelectElement | undefined = $state();
 
   const createTick = $derived(createTickMutation(contenderId));
   const deleteTick = $derived(deleteTickMutation());
@@ -79,8 +76,6 @@
       <BoltIcon />
     {:else if tick?.top === true}
       <DoubleCheckIcon />
-    {:else}
-      <MinusIcon />
     {/if}
   </span>
   {#if tick}
