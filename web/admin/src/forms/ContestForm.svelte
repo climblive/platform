@@ -73,7 +73,7 @@
       size="small"
       {@attach name("qualifyingProblems")}
       label="Number of qualifying problems"
-      hint="Number of the hardest problems that will count towards the score."
+      hint="Number of the hardest problems that will count towards each contender's score."
       type="number"
       required
       value={data.qualifyingProblems}
