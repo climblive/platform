@@ -238,6 +238,9 @@ importers:
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
+      element-internals-polyfill:
+        specifier: ^3.0.2
+        version: 3.0.2
       svelte-routing:
         specifier: ^2.13.0
         version: 2.13.0
@@ -1372,6 +1375,9 @@ packages:
 
   electron-to-chromium@1.5.211:
     resolution: {integrity: sha512-IGBvimJkotaLzFnwIVgW9/UD/AOJ2tByUmeOrtqBfACSbAw5b1G0XpvdaieKyc7ULmbwXVx+4e4Be8pOPBrYkw==}
+
+  element-internals-polyfill@3.0.2:
+    resolution: {integrity: sha512-uB0/Qube3lkwh8SmkTnGIyUgJ9YdqVSzIoHMRCEQjAbD4Y5UzsVbch1tIxjTgUe5k3gy1U0ZMKMJ90A81lqwig==}
 
   emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
@@ -3561,6 +3567,8 @@ snapshots:
   eastasianwidth@0.2.0: {}
 
   electron-to-chromium@1.5.211: {}
+
+  element-internals-polyfill@3.0.2: {}
 
   emoji-regex@8.0.0: {}
 
