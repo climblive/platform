@@ -103,7 +103,7 @@
     variant="neutral"
     appearance="accent"
     onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
-    >Add class</wa-button
+    >Create class</wa-button
   >
 
   {#if compClasses === undefined}

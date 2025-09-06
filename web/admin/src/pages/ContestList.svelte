@@ -94,7 +94,7 @@
 <wa-button
   variant="neutral"
   onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
-  >New contest</wa-button
+  >Create new contest</wa-button
 >
 
 {#snippet listing(heading: string, contests: Contest[])}

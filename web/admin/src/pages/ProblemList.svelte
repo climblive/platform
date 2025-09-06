@@ -153,7 +153,7 @@
     variant="neutral"
     appearance="accent"
     onclick={() => navigate(`contests/${contestId}/new-problem`)}
-    >Add problem</wa-button
+    >Create problem</wa-button
   >
 
   {#if sortedProblemsWithAscents === undefined}
