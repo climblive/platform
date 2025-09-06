@@ -26,6 +26,8 @@
   <HoldColorIndicator
     primary={problem.holdColorPrimary}
     secondary={problem.holdColorSecondary}
+    --height="1.25rem"
+    --width="1.25rem"
   />
   <span class="points">
     <span class="top">
