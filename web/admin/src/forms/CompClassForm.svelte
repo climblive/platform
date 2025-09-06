@@ -69,13 +69,10 @@
       }
 
       end = new Date(timeEndInput.value);
+      const diff = end.getTime() - previousTimeBegin.getTime();
 
-      const diff = begin.getTime() - previousTimeBegin.getTime();
-      console.log("diff", diff);
-      if (diff > 0) {
-        end.setTime(end.getTime() + diff);
-        timeEndInput.value = format(end, "yyyy-MM-dd'T'HH:mm");
-      }
+      end.setTime(begin.getTime() + diff);
+      timeEndInput.value = format(end, "yyyy-MM-dd'T'HH:mm");
     } finally {
       previousTimeBegin = begin;
     }
