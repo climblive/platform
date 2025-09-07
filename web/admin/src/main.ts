@@ -29,7 +29,9 @@ if (urlParams.get("print") === null) {
 
 const [compatible, missingFeatures] = checkCompat();
 
-if (compatible) {
+const ignoreCompat = urlParams.get("compat") === "ignore";
+
+if (compatible || ignoreCompat) {
   mount(App, {
     target: document.body,
   });

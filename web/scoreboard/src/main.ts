@@ -25,7 +25,10 @@ updateTheme(prefersDarkColorScheme());
 
 const [compatible, missingFeatures] = checkCompat();
 
-if (compatible) {
+const urlParams = new URLSearchParams(window.location.search);
+const ignoreCompat = urlParams.get("compat") === "ignore";
+
+if (compatible || ignoreCompat) {
   mount(App, {
     target: document.body,
   });
