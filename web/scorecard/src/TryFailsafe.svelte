@@ -18,8 +18,8 @@
 </script>
 
 <p>
-  We offer a simplified version of the app that includes only the most basic
-  features.
+  Alternatively you can use a simplified version of the app that includes only
+  the most basic features.
   <br />
 
   <a href={code ? `/failsafe/${code}` : "/failsafe"}
