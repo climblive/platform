@@ -9,7 +9,7 @@
   import { ErrorBoundary } from "@climblive/lib/components";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
-  import { setContext } from "svelte";
+  import { onMount, setContext } from "svelte";
   import { Route, Router, navigate } from "svelte-routing";
   import { writable } from "svelte/store";
   import { ZodError } from "zod";
@@ -66,10 +66,37 @@
   };
 
   parseCodeFromUrl();
+
+  let compatibilityIgnored = $state(false);
+  let code = $state<string>();
+
+  const extractCodeFromPath = () => {
+    const match = window.location.pathname.match(/\/([A-Z0-9]{8})/i);
+    return match ? match[1] : null;
+  };
+
+  onMount(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    compatibilityIgnored = urlParams.get("compat") === "ignore";
+
+    const extractedCode = extractCodeFromPath();
+
+    if (extractedCode) {
+      code = extractedCode;
+    }
+  });
 </script>
 
 <ErrorBoundary>
   <QueryClientProvider client={queryClient}>
+    {#if compatibilityIgnored}
+      <p>
+        If you experience issues with the app you can
+        <a href={code ? `/failsafe/${code}` : "/failsafe"}
+          >switch to the simplified version</a
+        >.
+      </p>
+    {/if}
     {#if authenticating}
       <Loading />
     {:else}
@@ -85,3 +112,9 @@
     {/if}
   </QueryClientProvider>
 </ErrorBoundary>
+
+<style>
+  p {
+    padding-inline: var(--wa-space-m);
+  }
+</style>
