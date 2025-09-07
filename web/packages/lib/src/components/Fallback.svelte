@@ -32,7 +32,7 @@
     <h1 onclickcapture={handleTap}>Sorry!</h1>
     <p>
       Your browser version is outdated and will most likely not support this
-      app. We recommend you to upgrade your browser<sup>*</sup> or borrow your friends
+      app. We recommend you to upgrade<sup>*</sup> your browser or borrow your friends
       phone.
     </p>
 
