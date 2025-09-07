@@ -208,4 +208,9 @@
   .restoredSession:not(:last-of-type) {
     margin-bottom: var(--wa-space-s);
   }
+
+  wa-input::part(base) {
+    text-transform: uppercase;
+    letter-spacing: 0.25rem;
+  }
 </style>
