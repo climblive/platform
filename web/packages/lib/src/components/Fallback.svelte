@@ -18,7 +18,7 @@
 
   const handleForce = () => {
     const url = new URL(window.location.href);
-    url.searchParams.set("force", "true");
+    url.searchParams.set("compat", "ignore");
 
     window.location.href = url.toString();
   };

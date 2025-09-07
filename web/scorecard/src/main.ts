@@ -33,7 +33,7 @@ if (location.pathname.startsWith("/failsafe")) {
   const [compatible, missingFeatures] = checkCompat();
 
   const urlParams = new URLSearchParams(window.location.search);
-  const force = urlParams.get("force") === "true";
+  const force = urlParams.get("compat") === "ignore";
 
   if (compatible || force) {
     mount(App, {
