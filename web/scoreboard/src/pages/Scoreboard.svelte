@@ -62,9 +62,9 @@
         <h1>
           {contest.name}
         </h1>
-        <p class="logo">
+        <div class="logo">
           <FullLogo />
-        </p>
+        </div>
         {#if compClasses.length > 1}
           <wa-select
             bind:this={compClassSelector}
