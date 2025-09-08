@@ -121,27 +121,29 @@
 {/snippet}
 
 {#snippet renderControls({ id }: ProblemWithAscents)}
-  <wa-button
-    size="small"
-    appearance="plain"
-    onclick={() => navigate(`/admin/problems/${id}/edit`)}
-    label="Edit"
-  >
-    <wa-icon name="pencil"></wa-icon>
-  </wa-button>
-  <DeleteProblem problemId={id}>
-    {#snippet children({ deleteProblem })}
-      <wa-button
-        size="small"
-        variant="danger"
-        appearance="plain"
-        onclick={deleteProblem}
-        label={`Delete problem ${id}`}
-      >
-        <wa-icon name="trash"></wa-icon>
-      </wa-button>
-    {/snippet}
-  </DeleteProblem>
+  <div class="controls">
+    <wa-button
+      size="small"
+      appearance="plain"
+      onclick={() => navigate(`/admin/problems/${id}/edit`)}
+      label="Edit"
+    >
+      <wa-icon name="pencil"></wa-icon>
+    </wa-button>
+    <DeleteProblem problemId={id}>
+      {#snippet children({ deleteProblem })}
+        <wa-button
+          size="small"
+          variant="danger"
+          appearance="plain"
+          onclick={deleteProblem}
+          label={`Delete problem ${id}`}
+        >
+          <wa-icon name="trash"></wa-icon>
+        </wa-button>
+      {/snippet}
+    </DeleteProblem>
+  </div>
 {/snippet}
 
 {#snippet renderAscents({ ascents }: ProblemWithAscents)}
@@ -165,7 +167,7 @@
 </section>
 
 <style>
-  section {
+  .controls {
     display: flex;
     gap: var(--wa-space-xs);
   }
