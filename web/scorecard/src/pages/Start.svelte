@@ -134,9 +134,9 @@
     </section>
   {/each}
   <footer>
-    <p class="logo">
+    <div class="logo">
       <FullLogo />
-    </p>
+    </div>
   </footer>
 </main>
 
