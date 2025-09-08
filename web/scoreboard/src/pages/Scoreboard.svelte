@@ -132,7 +132,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: var(--wa-space-s);
+    padding: var(--wa-space-m);
   }
 
   h1 {
@@ -169,6 +169,7 @@
     text-align: center;
     height: var(--wa-font-size-xl);
     color: var(--wa-color-text-normal);
+    margin-block: var(--wa-space-s);
   }
 
   @media screen and (max-width: 512px) {
