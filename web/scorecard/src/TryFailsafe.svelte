@@ -18,26 +18,23 @@
 </script>
 
 <p>
-  Alternatively you can use a simplified version of the app that includes only
-  the most basic features.
+  If none of that is possible, you can use a basic version of the app instead.
   <br />
 
   <a href={code ? `/failsafe/${code}` : "/failsafe"}
-    ><button>Use simplified version</button></a
+    ><button class="wa-success">Use basic version</button></a
   >
 </p>
 
-<style>
-  p {
-    margin-block-start: var(--wa-space-m);
-    border: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-color-success-border-loud);
-    padding: var(--wa-space-m);
-    border-radius: var(--wa-border-radius-m);
-  }
+<hr />
 
+<style>
   a {
     display: block;
     margin-block-start: var(--wa-space-m);
+  }
+
+  button {
+    width: 100%;
   }
 </style>

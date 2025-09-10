@@ -37,8 +37,8 @@
     <h1 onclickcapture={handleTap}>Sorry!</h1>
     <p>
       Your browser version is outdated and will most likely not support this
-      app. We recommend you to upgrade your browser or borrow your friends
-      phone.<sup>*</sup>
+      app. We recommend you to <em>upgrade your browser</em> or borrow your
+      friends phone.<sup>*</sup>
     </p>
 
     {#if showMissingFeatures && missingFeatures.length > 0}
