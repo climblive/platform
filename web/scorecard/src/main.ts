@@ -17,6 +17,7 @@ if (import.meta.env.PROD) {
     dsn: "https://019099d850441f60cea5d465e217f768@o4509937603641344.ingest.de.sentry.io/4509937616093264",
     sendDefaultPii: false,
     environment: import.meta.env.VITE_SENTRY_ENVIRONMENT,
+    integrations: [Sentry.captureConsoleIntegration({ levels: ['error'] })],
   });
 }
 

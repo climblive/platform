@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type Component } from "svelte";
+  import { onMount, type Component } from "svelte";
   import { importNativeStyles } from "./styles";
 
   type Props = {
@@ -19,6 +19,14 @@
   const url = new URL(window.location.href);
   url.searchParams.set("compat", "ignore");
   const ignoreCompatUrl = url.toString();
+
+  onMount(() => {
+    if (missingFeatures.length > 0) {
+      console.error(
+        `Failed to detected browser features: [${missingFeatures.join(", ")}]`,
+      );
+    }
+  });
 </script>
 
 {#await importNativeStyles() then styles}
