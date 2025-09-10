@@ -79,15 +79,21 @@
     {/if}
   </span>
   {#if tick}
-    <button onclick={removeTick} class="wa-danger wa-small wa-pill"
-      >Unsend</button
+    <button
+      onclick={removeTick}
+      class="wa-danger wa-small wa-pill"
+      disabled={$deleteTick.isPending}>Unsend</button
     >
   {:else}
-    <button onclick={addTick("top")} class="wa-danger wa-small wa-pill"
-      >Top</button
+    <button
+      onclick={addTick("top")}
+      class="wa-danger wa-small wa-pill"
+      disabled={$createTick.isPending}>Top</button
     >
-    <button onclick={addTick("flash")} class="wa-danger wa-small wa-pill"
-      >Flash</button
+    <button
+      onclick={addTick("flash")}
+      class="wa-danger wa-small wa-pill"
+      disabled={$createTick.isPending}>Flash</button
     >
   {/if}
 </div>

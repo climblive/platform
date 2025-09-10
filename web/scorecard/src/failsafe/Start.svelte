@@ -9,7 +9,7 @@
   let code = $state<string>();
   let contender = $state<Contender>();
 
-  let form: HTMLFormElement | undefined;
+  let form: HTMLFormElement | undefined = $state();
 
   const queryClient = useQueryClient();
 
@@ -33,15 +33,19 @@
     const code = formData.get("code")?.toString().trim();
 
     if (code && code.length === 8) {
-      contender = await authenticate(code);
-
-      queryClient.setQueryData(
-        ["contender", { id: contender.id }],
-        () => contender,
-      );
-
-      history.replaceState({}, "", `/failsafe/${code}`);
+      tryEnter(code);
     }
+  };
+
+  const tryEnter = async (code: string) => {
+    contender = await authenticate(code);
+
+    queryClient.setQueryData(
+      ["contender", { id: contender.id }],
+      () => contender,
+    );
+
+    history.replaceState({}, "", `/failsafe/${code}`);
   };
 
   const extractCodeFromPath = () => {
@@ -54,6 +58,8 @@
 
     if (extractedCode) {
       code = extractedCode;
+
+      tryEnter(extractedCode);
     }
   });
 </script>

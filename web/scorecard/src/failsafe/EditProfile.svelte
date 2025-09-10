@@ -59,7 +59,9 @@
         <option value={compClass.id}>{compClass.name}</option>
       {/each}
     </select>
-    <button type="submit">{contender.entered ? "Update" : "Register"}</button>
+    <button type="submit" disabled={$patchContender.isPending}
+      >{contender.entered ? "Update" : "Register"}</button
+    >
   </form>
 {/if}
 
