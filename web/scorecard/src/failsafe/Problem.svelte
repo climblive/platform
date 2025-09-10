@@ -6,7 +6,7 @@
     deleteTickMutation,
   } from "@climblive/lib/queries";
   import BoltIcon from "./BoltIcon.svelte";
-  import DoubleCheckIcon from "./DoubleCheckIcon.svelte";
+  import CheckIcon from "./CheckIcon.svelte";
 
   type Props = {
     problem: Problem;
@@ -72,11 +72,13 @@
       secondary={problem.holdColorSecondary}
     />
     № {problem.number}
-    {#if tick?.top === true && tick?.attemptsTop === 1}
-      <BoltIcon />
-    {:else if tick?.top === true}
-      <DoubleCheckIcon />
-    {/if}
+    <div class="icon">
+      {#if tick?.top === true && tick?.attemptsTop === 1}
+        <BoltIcon />
+      {:else if tick?.top === true}
+        <CheckIcon />
+      {/if}
+    </div>
   </span>
   {#if tick}
     <button
@@ -111,10 +113,18 @@
 
     &[data-tick="top"] {
       border-color: var(--wa-color-green-50);
+
+      & .icon {
+        color: var(--wa-color-green-50);
+      }
     }
 
     &[data-tick="flash"] {
       border-color: var(--wa-color-yellow-50);
+
+      & .icon {
+        color: var(--wa-color-yellow-50);
+      }
     }
 
     & span {
