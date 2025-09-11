@@ -11,8 +11,8 @@ importers:
   admin:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.0.0-beta.4
-        version: 3.0.0-beta.4(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
+        specifier: 3.0.0-beta.5
+        version: 3.0.0-beta.5(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -93,8 +93,8 @@ importers:
   packages/lib:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.0.0-beta.4
-        version: 3.0.0-beta.4(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
+        specifier: 3.0.0-beta.5
+        version: 3.0.0-beta.5(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
       '@sentry/svelte':
         specifier: ^10.8.0
         version: 10.8.0(svelte@5.38.0)
@@ -166,8 +166,8 @@ importers:
   scoreboard:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.0.0-beta.4
-        version: 3.0.0-beta.4(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
+        specifier: 3.0.0-beta.5
+        version: 3.0.0-beta.5(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -221,8 +221,8 @@ importers:
   scorecard:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.0.0-beta.4
-        version: 3.0.0-beta.4(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
+        specifier: 3.0.0-beta.5
+        version: 3.0.0-beta.5(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -285,8 +285,8 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
-  '@awesome.me/webawesome@3.0.0-beta.4':
-    resolution: {integrity: sha512-CTqy016SZQvGsyYTeQCE6t4JrnL26bugaNXkY1y+nXHfVtcxS+gXze36Y89t82Z2MJ8d30IZHdoTq1Ac2jOZYw==}
+  '@awesome.me/webawesome@3.0.0-beta.5':
+    resolution: {integrity: sha512-R71gPf88Zcm3Q7C+P1Y2fiMHixX+BUNkntF+GnTRluD82VQAnNIaBkPZ4BL0zVAxXFw/F1+H0DVdHaeJYtcesg==}
     engines: {node: '>=14.17.0'}
 
   '@babel/code-frame@7.27.1':
@@ -2497,7 +2497,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.12
       '@jridgewell/trace-mapping': 0.3.29
 
-  '@awesome.me/webawesome@3.0.0-beta.4(@floating-ui/utils@0.2.10)(@types/react@19.1.9)':
+  '@awesome.me/webawesome@3.0.0-beta.5(@floating-ui/utils@0.2.10)(@types/react@19.1.9)':
     dependencies:
       '@ctrl/tinycolor': 4.1.0
       '@floating-ui/dom': 1.7.3
