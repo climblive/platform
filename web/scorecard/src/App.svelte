@@ -6,6 +6,7 @@
   import Start from "@/pages/Start.svelte";
   import { type ScorecardSession } from "@/types";
   import { authenticateContender } from "@/utils/auth";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import { ErrorBoundary } from "@climblive/lib/components";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
@@ -90,12 +91,13 @@
 <ErrorBoundary>
   <QueryClientProvider client={queryClient}>
     {#if compatibilityIgnored}
-      <p>
+      <wa-callout variant="neutral" appearance="outlined filled">
+        <wa-icon slot="icon" name="life-ring"></wa-icon>
         If you experience issues with the app you can
         <a href={code ? `/failsafe/${code}` : "/failsafe"}
           >switch to a basic version</a
         >.
-      </p>
+      </wa-callout>
     {/if}
     {#if authenticating}
       <Loading />
@@ -114,7 +116,8 @@
 </ErrorBoundary>
 
 <style>
-  p {
-    padding-inline: var(--wa-space-m);
+  wa-callout {
+    margin: var(--wa-space-s);
+    margin-block-end: 0;
   }
 </style>
