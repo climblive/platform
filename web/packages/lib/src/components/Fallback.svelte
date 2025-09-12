@@ -1,4 +1,5 @@
 <script lang="ts">
+  import * as Sentry from "@sentry/svelte";
   import { onMount, type Component } from "svelte";
   import { importNativeStyles } from "./styles";
 
@@ -23,9 +24,10 @@
 
   onMount(() => {
     if (missingFeatures.length > 0) {
-      console.error(
-        `Failed to detect browser features: [${missingFeatures.join(", ")}]`,
-      );
+      Sentry.captureMessage("Failed to detect required browser features", {
+        extra: { missingFeatures },
+        level: "warning",
+      });
     }
   });
 </script>
