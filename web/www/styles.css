@@ -26,7 +26,6 @@ body {
 .hero-section {
     background-color: var(--light-bg);
     padding-block: 3.75rem;
-    text-align: center;
 }
 
 .hero-content {
