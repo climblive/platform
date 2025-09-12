@@ -95,8 +95,8 @@
         <wa-icon slot="icon" name="life-ring"></wa-icon>
         If you experience issues with the app you can
         <a href={code ? `/failsafe/${code}` : "/failsafe"}
-          >switch to a basic version</a
-        >.
+          >try a basic version</a
+        > instead.
       </wa-callout>
     {/if}
     {#if authenticating}
