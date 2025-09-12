@@ -59,7 +59,7 @@
     <p>
       <small>
         You may try your luck and
-        <a href={ignoreCompatUrl} class="wa-danger wa-size-s">continue anyway</a
+        <a href={ignoreCompatUrl}>continue anyway</a
         >, but be aware that the app might not work as expected.
       </small>
     </p>
