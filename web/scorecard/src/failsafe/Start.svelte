@@ -92,7 +92,6 @@
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-m);
-    margin: 2rem auto;
   }
 
   h2:not(:first-of-type) {
