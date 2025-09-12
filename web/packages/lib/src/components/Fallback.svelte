@@ -1,7 +1,6 @@
 <script lang="ts">
   import * as Sentry from "@sentry/svelte";
   import { onMount, type Component } from "svelte";
-  import { importNativeStyles } from "./styles";
 
   type Props = {
     missingFeatures?: string[];
@@ -32,9 +31,6 @@
   });
 </script>
 
-{#await importNativeStyles() then styles}
-  <svelte:component this={styles.default} />
-{/await}
 <main>
   <section>
     <h1 onclickcapture={handleTap}>Sorry!</h1>
