@@ -30,7 +30,7 @@ if (urlParams.get("print") === null) {
 
 const [compatible, missingFeatures] = checkCompat();
 
-const ignoreCompat = urlParams.get("compat") === "ignore";
+const ignoreCompat = sessionStorage.getItem("compat") === "ignore";
 
 if (compatible || ignoreCompat) {
   mount(App, {

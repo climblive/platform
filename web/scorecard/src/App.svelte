@@ -77,8 +77,7 @@
   };
 
   onMount(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    compatibilityIgnored = urlParams.get("compat") === "ignore";
+    compatibilityIgnored = sessionStorage.getItem("compat") === "ignore";
 
     const extractedCode = extractCodeFromPath();
 

@@ -16,9 +16,10 @@
     tapCount += 1;
   };
 
-  const url = new URL(window.location.href);
-  url.searchParams.set("compat", "ignore");
-  const ignoreCompatUrl = url.toString();
+  const handleIgnoreCompat = () => {
+    sessionStorage.setItem("compat", "ignore");
+    location.reload();
+  };
 
   onMount(() => {
     if (missingFeatures.length > 0) {
@@ -61,8 +62,8 @@
     <p>
       <small>
         You may try your luck and
-        <a href={ignoreCompatUrl}>continue anyway</a>, but be aware that the app
-        might not work as expected.
+        <a onclick={handleIgnoreCompat}>continue anyway</a>, but be aware that
+        the app might not work as expected.
       </small>
     </p>
 
