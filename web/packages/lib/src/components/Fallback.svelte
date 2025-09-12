@@ -56,11 +56,13 @@
       <Alternative />
     {/if}
 
+    <hr />
+
     <p>
       <small>
         You may try your luck and
-        <a href={ignoreCompatUrl}>continue anyway</a
-        >, but be aware that the app might not work as expected.
+        <a href={ignoreCompatUrl}>continue anyway</a>, but be aware that the app
+        might not work as expected.
       </small>
     </p>
 

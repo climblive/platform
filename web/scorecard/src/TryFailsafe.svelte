@@ -25,8 +25,6 @@
   >
 </p>
 
-<hr />
-
 <style>
   a {
     display: block;
