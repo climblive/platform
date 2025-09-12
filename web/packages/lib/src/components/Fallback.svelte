@@ -91,4 +91,8 @@
   section {
     padding: var(--wa-space-m);
   }
+
+  a {
+    cursor: pointer;
+  }
 </style>

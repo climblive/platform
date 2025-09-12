@@ -74,15 +74,19 @@
     ></Scorecard>
   {/if}
 {:else}
+  <h2>Welcome!</h2>
   <form bind:this={form} onsubmit={handleEnter}>
-    <input
-      placeholder="ABCD0001"
-      name="code"
-      type="text"
-      value={code}
-      minlength="8"
-      maxlength="8"
-    />
+    <div>
+      <input
+        placeholder="ABCD0001"
+        name="code"
+        type="text"
+        value={code}
+        minlength="8"
+        maxlength="8"
+      />
+      <small>Input your 8 digit registration code.</small>
+    </div>
     <button type="submit">Enter</button>
   </form>
 {/if}
@@ -94,7 +98,7 @@
     gap: var(--wa-space-m);
   }
 
-  h2:not(:first-of-type) {
+  h2 {
     margin-top: var(--wa-space-m);
   }
 
