@@ -103,6 +103,8 @@
   }
 
   input {
+    width: 100%;
+    display: block;
     text-transform: uppercase;
     letter-spacing: 0.25rem;
   }
