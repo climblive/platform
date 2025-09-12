@@ -77,6 +77,7 @@
   <h2>Welcome!</h2>
   <form bind:this={form} onsubmit={handleEnter}>
     <div>
+      <small>Input your 8 digit registration code.</small>
       <input
         placeholder="ABCD0001"
         name="code"
@@ -85,7 +86,6 @@
         minlength="8"
         maxlength="8"
       />
-      <small>Input your 8 digit registration code.</small>
     </div>
     <button type="submit">Enter</button>
   </form>
@@ -100,6 +100,11 @@
 
   h2 {
     margin-top: var(--wa-space-m);
+  }
+
+  small {
+    display: block;
+    margin-block-end: var(--wa-space-xs);
   }
 
   input {
