@@ -23,7 +23,7 @@
   onMount(() => {
     if (missingFeatures.length > 0) {
       console.error(
-        `Failed to detected browser features: [${missingFeatures.join(", ")}]`,
+        `Failed to detect browser features: [${missingFeatures.join(", ")}]`,
       );
     }
   });
