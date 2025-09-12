@@ -19,7 +19,6 @@
 
 <p>
   If none of that is possible, you can use a basic version of the app instead.
-  <br />
 
   <a href={code ? `/failsafe/${code}` : "/failsafe"}
     ><button class="wa-success">Use basic version</button></a
