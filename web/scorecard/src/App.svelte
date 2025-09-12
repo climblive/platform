@@ -8,6 +8,7 @@
   import { authenticateContender } from "@/utils/auth";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import { ErrorBoundary } from "@climblive/lib/components";
+  import { extractCodeFromPath } from "@climblive/lib/utils";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { onMount, setContext } from "svelte";
@@ -70,11 +71,6 @@
 
   let compatibilityIgnored = $state(false);
   let code = $state<string>();
-
-  const extractCodeFromPath = () => {
-    const match = window.location.pathname.match(/\/([A-Z0-9]{8})/i);
-    return match ? match[1] : null;
-  };
 
   onMount(() => {
     compatibilityIgnored = sessionStorage.getItem("compat") === "ignore";

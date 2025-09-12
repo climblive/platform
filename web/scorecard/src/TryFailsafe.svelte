@@ -1,12 +1,8 @@
 <script lang="ts">
+  import { extractCodeFromPath } from "@climblive/lib/utils";
   import { onMount } from "svelte";
 
   let code = $state<string>();
-
-  const extractCodeFromPath = () => {
-    const match = window.location.pathname.match(/\/([A-Z0-9]{8})/i);
-    return match ? match[1] : null;
-  };
 
   onMount(() => {
     const extractedCode = extractCodeFromPath();
