@@ -63,7 +63,7 @@
 
     <p>
       <small>
-        You may try your luck and
+        You may also try your luck and
         <a onclick={handleIgnoreCompat}>continue anyway</a>, but be aware that
         the app might not work as expected.
       </small>
