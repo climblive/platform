@@ -93,7 +93,7 @@
       <p>
         If you experience issues with the app you can
         <a href={code ? `/failsafe/${code}` : "/failsafe"}
-          >switch to the simplified version</a
+          >switch to a basic version</a
         >.
       </p>
     {/if}
