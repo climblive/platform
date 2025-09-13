@@ -361,25 +361,25 @@ test.describe("contest states", () => {
   })
 })
 
-test.describe("failsafe mode", () => {
+test.describe.only("failsafe mode", () => {
   test('enter contest by entering registration code', async ({ page }) => {
     await page.goto('/failsafe');
 
-    await page.getByRole("heading", { name: "Welcome!" })
+    await expect(page.getByRole("heading", { name: "Welcome!" })).toBeVisible();
 
     const codeInput = page.getByRole("textbox", { name: "Registration code" })
     await codeInput.pressSequentially("abcd0005");
 
     await page.getByRole("button", { name: "Enter" }).click()
 
-    await page.getByRole("heading", { name: "Profile" })
+    await expect(page.getByRole("heading", { name: "Profile" })).toBeVisible();
 
     await page.getByRole("textbox", { name: "Name" }).pressSequentially("Andy Bernard")
     await page.getByRole("combobox", { name: "Competition class" }).selectOption({ label: "Females" });
 
     await page.getByRole("button", { name: "Register" }).click()
 
-    await page.getByRole("heading", { name: "Scorecard" })
+    await expect(page.getByRole("heading", { name: "Scorecard" })).toBeVisible();
   });
 
   test('deep link into scorecard', async ({ page }) => {
