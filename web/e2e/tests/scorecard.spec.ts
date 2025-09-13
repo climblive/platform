@@ -361,7 +361,7 @@ test.describe("contest states", () => {
   })
 })
 
-test.describe.only("failsafe mode", () => {
+test.describe("failsafe mode", () => {
   test('enter contest by entering registration code', async ({ page }) => {
     await page.goto('/failsafe');
 
