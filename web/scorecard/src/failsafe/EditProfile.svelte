@@ -53,8 +53,14 @@
       name="name"
       type="text"
       value={contender.name}
+      aria-label="Name"
     />
-    <select name="compClassId" required value={selectedCompClass?.id}>
+    <select
+      name="compClassId"
+      required
+      value={selectedCompClass?.id}
+      aria-label="Competition class"
+    >
       {#each compClasses as compClass (compClass.id)}
         <option value={compClass.id}>{compClass.name}</option>
       {/each}

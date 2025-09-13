@@ -85,6 +85,7 @@
         value={code}
         minlength="8"
         maxlength="8"
+        aria-label="Registration code"
       />
     </div>
     <button type="submit">Enter</button>

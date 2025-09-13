@@ -63,7 +63,11 @@
   };
 </script>
 
-<div class="problem" data-tick={tickType(tick)}>
+<section
+  aria-label={`Problem ${problem.number}`}
+  class="problem"
+  data-tick={tickType(tick)}
+>
   <span>
     <HoldColorIndicator
       --height="1.25rem"
@@ -98,7 +102,7 @@
       disabled={$createTick.isPending}>Flash</button
     >
   {/if}
-</div>
+</section>
 
 <style>
   .problem {

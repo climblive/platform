@@ -359,4 +359,57 @@ test.describe("contest states", () => {
 
     await expect(problem.getByRole("button", { name: "Tick" })).toBeDisabled();
   })
-});
+})
+
+test.describe.only("failsafe mode", () => {
+  test('enter contest by entering registration code', async ({ page }) => {
+    await page.goto('/failsafe');
+
+    await page.getByRole("heading", { name: "Welcome!" })
+
+    const codeInput = page.getByRole("textbox", { name: "Registration code" })
+    await codeInput.pressSequentially("abcd0005");
+
+    await page.getByRole("button", { name: "Enter" }).click()
+
+    await page.getByRole("heading", { name: "Profile" })
+
+    await page.getByRole("textbox", { name: "Name" }).pressSequentially("Andy Bernard")
+    await page.getByRole("combobox", { name: "Competition class" }).selectOption({ label: "Females" });
+
+    await page.getByRole("button", { name: "Register" }).click()
+
+    await page.getByRole("heading", { name: "Scorecard" })
+  });
+
+  test('deep link into scorecard', async ({ page }) => {
+    await page.goto('/failsafe/abcd0005');
+
+    await expect(page.getByRole("textbox", { name: "Name" })).toHaveValue("Andy Bernard");
+    await expect(page.getByRole("combobox", { name: "Competition class" })).toHaveValue("2");
+  });
+
+  test("tick and untick all problems", async ({ page }) => {
+    await page.goto('/failsafe/ABCD0005');
+
+    for (let p = 1; p <= 5; p++) {
+      const problem = page.getByRole("region", { name: `Problem ${p}` });
+      await expect(problem).toBeVisible();
+
+      await expect(problem.getByRole("button", { name: "Flash" })).toBeVisible();
+      await problem.getByRole("button", { name: "Top" }).click();
+
+      await expect(problem.getByRole("button", { name: "Unsend" })).toBeVisible();
+    }
+
+    for (let p = 1; p <= 5; p++) {
+      const problem = page.getByRole("region", { name: `Problem ${p}` });
+      await expect(problem).toBeVisible();
+
+      await problem.getByRole("button", { name: "Unsend" }).click();
+
+      await expect(problem.getByRole("button", { name: "Top" })).toBeVisible();
+      await expect(problem.getByRole("button", { name: "Flash" })).toBeVisible();
+    }
+  })
+})
