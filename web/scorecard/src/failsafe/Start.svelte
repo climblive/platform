@@ -3,7 +3,6 @@
   import type { Contender } from "@climblive/lib/models";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { onMount } from "svelte";
-  import EditProfile from "./EditProfile.svelte";
   import Scorecard from "./Scorecard.svelte";
 
   let code = $state<string>();
@@ -65,14 +64,7 @@
 </script>
 
 {#if contender}
-  <h2>Profile</h2>
-  <EditProfile contestId={contender.contestId} contenderId={contender.id} />
-
-  {#if contender?.entered}
-    <h2>Scorecard</h2>
-    <Scorecard contestId={contender.contestId} contenderId={contender.id}
-    ></Scorecard>
-  {/if}
+  <Scorecard contestId={contender.contestId} contenderId={contender.id} />
 {:else}
   <h2>Welcome!</h2>
   <form bind:this={form} onsubmit={handleEnter}>
