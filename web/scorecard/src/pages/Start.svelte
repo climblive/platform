@@ -84,7 +84,7 @@
       required
       placeholder="ABCD1234"
       label="Registration code"
-      hint="Input your 8 digit registration code"
+      hint="Input your 8 digit registration code."
       name="code"
       type="text"
       minlength="8"
@@ -207,5 +207,10 @@
 
   .restoredSession:not(:last-of-type) {
     margin-bottom: var(--wa-space-s);
+  }
+
+  wa-input::part(base) {
+    text-transform: uppercase;
+    letter-spacing: 0.25rem;
   }
 </style>

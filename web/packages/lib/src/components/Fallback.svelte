@@ -1,60 +1,81 @@
 <script lang="ts">
-  import type { Component } from "svelte";
+  import * as Sentry from "@sentry/svelte";
+  import { onMount, type Component } from "svelte";
 
   type Props = {
     missingFeatures?: string[];
-    app: Component;
-    styles: Component;
+    alternative?: Component;
   };
 
-  const { missingFeatures = [], app: App, styles: Styles }: Props = $props();
+  const { missingFeatures = [], alternative: Alternative }: Props = $props();
 
-  let force = $state(false);
   let tapCount = $state(0);
   let showMissingFeatures = $derived(tapCount >= 5);
 
   const handleTap = () => {
     tapCount += 1;
   };
+
+  const handleIgnoreCompat = () => {
+    sessionStorage.setItem("compat", "ignore");
+    location.reload();
+  };
+
+  onMount(() => {
+    if (missingFeatures.length > 0) {
+      Sentry.captureMessage("Failed to detect required browser features", {
+        extra: { missingFeatures },
+        level: "warning",
+      });
+    }
+  });
 </script>
 
-{#if force}
-  <App></App>
-{:else}
-  <Styles />
-  <main>
-    <section>
-      <h1 onclickcapture={handleTap}>Sorry!</h1>
+<main>
+  <section>
+    <h1 onclickcapture={handleTap}>Sorry!</h1>
+    <p>
+      Your browser version is outdated and will most likely not support this
+      app. We recommend you to <em>upgrade your browser</em> or borrow your
+      friends phone.<sup>*</sup>
+    </p>
+
+    {#if showMissingFeatures && missingFeatures.length > 0}
       <p>
-        Your browser version is outdated and may not support this application.
-        We recommend you to upgrade your browser or borrow your friends phone.
+        {#each missingFeatures as feature, index (index)}
+          {#if index !== 0}
+            ,&nbsp
+          {/if}
+          <code>{feature}</code>
+        {/each}.
       </p>
+    {/if}
 
-      {#if showMissingFeatures && missingFeatures.length > 0}
-        <p>
-          {#each missingFeatures as feature, index (index)}
-            {#if index !== 0}
-              ,&nbsp
-            {/if}
-            <code>{feature}</code>
-          {/each}.
-        </p>
-      {/if}
+    {#if Alternative}
+      <Alternative />
+    {/if}
 
-      <button onclick={() => (force = true)} class="wa-danger wa-size-s"
-        >Continue anyway</button
-      >
+    <hr />
 
-      <p>
-        If you are using an iPhone or iPad, please ensure you <a
-          href="https://support.apple.com/en-us/118575"
+    <p>
+      <small>
+        You may also try your luck and
+        <a onclick={handleIgnoreCompat}>continue anyway</a>, but be aware that
+        the app might not work as expected.
+      </small>
+    </p>
+
+    <p>
+      <small>
+        <sup>*</sup>If you are using an iPhone or iPad, please ensure you
+        <a href="https://support.apple.com/en-us/118575"
           >update to the latest version of iOS</a
         >. Please note that devices older than the iPhone XR may not be
         upgradable.
-      </p>
-    </section>
-  </main>
-{/if}
+      </small>
+    </p>
+  </section>
+</main>
 
 <style>
   h1 {
@@ -65,11 +86,11 @@
     padding: var(--wa-space-m);
   }
 
-  button {
-    margin-block-end: var(--wa-space-l);
-  }
-
   section {
     padding: var(--wa-space-m);
+  }
+
+  a {
+    cursor: pointer;
   }
 </style>

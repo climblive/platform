@@ -14,6 +14,16 @@
   --wa-color-brand-20: #981935;
   --wa-color-brand-10: #831833;
   --wa-color-brand-05: #490816;
+
+  --wa-font-size-2xs: 0.6875rem;
+  --wa-font-size-xs: 0.75rem;
+  --wa-font-size-s: 0.875rem;
+  --wa-font-size-m: 1rem;
+  --wa-font-size-l: 1.25rem;
+  --wa-font-size-xl: 1.5625rem;
+  --wa-font-size-2xl: 2rem;
+  --wa-font-size-3xl: 2.5625rem;
+  --wa-font-size-4xl: 3.25rem;
 }
 
 body {

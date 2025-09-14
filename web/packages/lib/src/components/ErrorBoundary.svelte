@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/button/button.js";
   import * as Sentry from "@sentry/svelte";
   import type { Snippet } from "svelte";
 
@@ -25,9 +24,7 @@
     <main>
       <h1>Oopsie!</h1>
       <pre onclick={() => copyToClipboard(error)}>{error}</pre>
-      <wa-button size="small" variant="neutral" onclick={reset}
-        >Try again</wa-button
-      >
+      <button onclick={reset}>Try again</button>
     </main>
   {/snippet}
 </svelte:boundary>

@@ -111,7 +111,7 @@
     {:else if variant === "flashed"}
       <wa-icon name="bolt"></wa-icon>
     {:else if variant === "ticked"}
-      <wa-icon name="check-double"></wa-icon>
+      <wa-icon name="check"></wa-icon>
     {/if}
   </button>
 
@@ -124,7 +124,7 @@
     distance="10"
   >
     <wa-button size="small" onclick={(e: MouseEvent) => handleTick(e, false)}>
-      <wa-icon slot="start" name="check-double"></wa-icon>
+      <wa-icon slot="start" name="check"></wa-icon>
       Top
     </wa-button>
     <wa-button size="small" onclick={(e: MouseEvent) => handleTick(e, true)}>
