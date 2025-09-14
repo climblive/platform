@@ -87,7 +87,6 @@
   {#if tick}
     <button
       onclick={removeTick}
-      class="wa-danger wa-small wa-pill"
       disabled={$deleteTick.isPending}>Unsend</button
     >
   {:else}
