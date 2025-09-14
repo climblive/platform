@@ -92,7 +92,6 @@
   {:else}
     <button
       onclick={addTick("top")}
-      class="wa-danger wa-small wa-pill"
       disabled={$createTick.isPending}>Top</button
     >
     <button
