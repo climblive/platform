@@ -96,7 +96,6 @@
     >
     <button
       onclick={addTick("flash")}
-      class="wa-danger wa-small wa-pill"
       disabled={$createTick.isPending}>Flash</button
     >
   {/if}
