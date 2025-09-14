@@ -39,6 +39,7 @@
       $patchContender.mutate({
         ...contender,
         name,
+        publicName: name,
         compClassId: Number(compClassId),
       });
     }
