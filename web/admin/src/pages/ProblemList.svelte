@@ -57,6 +57,12 @@
     return problems?.sort((p1, p2) => p1.number - p2.number);
   });
 
+  let showLimit = $state<number | undefined>(3);
+
+  const showAll = () => {
+    showLimit = undefined;
+  };
+
   const columns: ColumnDefinition<ProblemWithAscents>[] = [
     {
       label: "Number",
@@ -161,8 +167,19 @@
   {#if sortedProblemsWithAscents === undefined}
     <Loader />
   {:else if sortedProblemsWithAscents.length > 0}
-    <Table {columns} data={sortedProblemsWithAscents} getId={({ id }) => id}
+    <Table
+      {columns}
+      data={showLimit
+        ? sortedProblemsWithAscents.slice(0, showLimit)
+        : sortedProblemsWithAscents}
+      getId={({ id }) => id}
     ></Table>
+  {/if}
+
+  {#if showLimit !== undefined}
+    <wa-button class="show-more" appearance="plain" onclick={showAll}
+      >Show all</wa-button
+    >
   {/if}
 </section>
 
@@ -183,5 +200,9 @@
     flex-direction: column;
     align-items: start;
     gap: var(--wa-space-m);
+  }
+
+  wa-button.show-more {
+    align-self: center;
   }
 </style>

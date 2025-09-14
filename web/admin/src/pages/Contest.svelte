@@ -64,7 +64,6 @@
 
     <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleTabShow}>
       <wa-tab slot="nav" panel="contest">Contest</wa-tab>
-      <wa-tab slot="nav" panel="problems">Problems</wa-tab>
       <wa-tab slot="nav" panel="results">Results</wa-tab>
       <wa-tab slot="nav" panel="raffles">Raffles</wa-tab>
 
@@ -117,18 +116,7 @@
         <h2>Problems</h2>
         <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
         ></wa-divider>
-        <p>
-          Problems are created and managed under the <a
-            href="#problems"
-            onclick={(e: MouseEvent) => {
-              if (tabGroup) {
-                tabGroup.active = "problems";
-              }
-
-              e.preventDefault();
-            }}>Problems</a
-          > tab.
-        </p>
+        <ProblemList {contestId} />
 
         <h2>Advanced</h2>
         <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
@@ -142,11 +130,6 @@
         </p>
 
         <ScoreEngine {contestId} />
-      </wa-tab-panel>
-
-      <wa-tab-panel name="problems">
-        <h2>Problems</h2>
-        <ProblemList {contestId} />
       </wa-tab-panel>
 
       <wa-tab-panel name="results">
