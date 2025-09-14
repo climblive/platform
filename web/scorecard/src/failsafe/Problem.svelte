@@ -85,18 +85,14 @@
     </div>
   </span>
   {#if tick}
-    <button
-      onclick={removeTick}
-      disabled={$deleteTick.isPending}>Unsend</button
+    <button onclick={removeTick} disabled={$deleteTick.isPending}>Unsend</button
     >
   {:else}
-    <button
-      onclick={addTick("top")}
-      disabled={$createTick.isPending}>Top</button
+    <button onclick={addTick("top")} disabled={$createTick.isPending}
+      >Top</button
     >
-    <button
-      onclick={addTick("flash")}
-      disabled={$createTick.isPending}>Flash</button
+    <button onclick={addTick("flash")} disabled={$createTick.isPending}
+      >Flash</button
     >
   {/if}
 </section>
