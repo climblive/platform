@@ -54,14 +54,12 @@
           break;
       }
 
-      setTimeout(
-        () =>
-          scrollElement?.scrollIntoView({
-            behavior: "instant",
-            block: "start",
-            inline: "nearest",
-          }),
-        100,
+      requestIdleCallback(() =>
+        scrollElement?.scrollIntoView({
+          behavior: "instant",
+          block: "start",
+          inline: "nearest",
+        }),
       );
     }
   });
