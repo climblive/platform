@@ -36,7 +36,7 @@
     $createProblem.mutate(
       { ...tmpl, pointsZone: 0 },
       {
-        onSuccess: () => navigate(`/admin/contests/${contestId}#contest`),
+        onSuccess: () => navigate(`/admin/contests/${contestId}#problems`),
         onError: () => toastError("Failed to create problem."),
       },
     );
