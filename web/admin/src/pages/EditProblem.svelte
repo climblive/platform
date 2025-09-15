@@ -39,7 +39,9 @@
         size="small"
         type="button"
         appearance="plain"
-        onclick={history.back()}>Cancel</wa-button
+        onclick={() =>
+          navigate(`/admin/contests/${problem.contestId}#problems`)}
+        >Cancel</wa-button
       >
       <wa-button
         size="small"

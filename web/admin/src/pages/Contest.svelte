@@ -28,6 +28,8 @@
   let { contestId }: Props = $props();
 
   let tabGroup: WaTabGroup | undefined = $state();
+  let problemsHeading: HTMLHeadingElement | undefined = $state();
+  let compClassesHeading: HTMLHeadingElement | undefined = $state();
 
   const contestQuery = $derived(getContestQuery(contestId));
 
@@ -37,7 +39,30 @@
     const hash = window.location.hash.substring(1);
 
     if (tabGroup) {
-      setTimeout(() => tabGroup?.setAttribute("active", hash));
+      if (["contest", "results", "raffles"].includes(hash)) {
+        setTimeout(() => tabGroup?.setAttribute("active", hash));
+      }
+
+      let scrollElement: HTMLElement | undefined;
+
+      switch (hash) {
+        case "problems":
+          scrollElement = problemsHeading;
+          break;
+        case "comp-classes":
+          scrollElement = compClassesHeading;
+          break;
+      }
+
+      setTimeout(
+        () =>
+          scrollElement?.scrollIntoView({
+            behavior: "instant",
+            block: "start",
+            inline: "nearest",
+          }),
+        100,
+      );
     }
   });
 
@@ -103,7 +128,7 @@
           {/if}
         </article>
 
-        <h2>Classes</h2>
+        <h2 bind:this={compClassesHeading}>Classes</h2>
         <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
         ></wa-divider>
         <CompClassList {contestId} />
@@ -113,7 +138,7 @@
         ></wa-divider>
         <TicketList {contestId} />
 
-        <h2>Problems</h2>
+        <h2 bind:this={problemsHeading}>Problems</h2>
         <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
         ></wa-divider>
         <ProblemList {contestId} />

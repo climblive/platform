@@ -19,6 +19,8 @@
 
   let { contestId }: Props = $props();
 
+  let tableLimit = $state<number | undefined>(3);
+
   const problemsQuery = $derived(getProblemsQuery(contestId));
   const ticksQuery = $derived(getTicksByContestQuery(contestId));
 
@@ -56,8 +58,6 @@
 
     return problems?.sort((p1, p2) => p1.number - p2.number);
   });
-
-  let tableLimit = $state<number | undefined>(3);
 
   const showAll = () => {
     tableLimit = undefined;
@@ -132,9 +132,8 @@
       size="small"
       appearance="plain"
       onclick={() => navigate(`/admin/problems/${id}/edit`)}
-      label="Edit"
     >
-      <wa-icon name="pencil"></wa-icon>
+      <wa-icon name="pencil" label="Edit"></wa-icon>
     </wa-button>
     <DeleteProblem problemId={id}>
       {#snippet children({ deleteProblem })}
@@ -143,9 +142,8 @@
           variant="danger"
           appearance="plain"
           onclick={deleteProblem}
-          label={`Delete problem ${id}`}
         >
-          <wa-icon name="trash"></wa-icon>
+          <wa-icon name="trash" label={`Delete problem ${id}`}></wa-icon>
         </wa-button>
       {/snippet}
     </DeleteProblem>
