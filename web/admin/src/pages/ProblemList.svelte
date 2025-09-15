@@ -57,10 +57,10 @@
     return problems?.sort((p1, p2) => p1.number - p2.number);
   });
 
-  let showLimit = $state<number | undefined>(3);
+  let tableLimit = $state<number | undefined>(3);
 
   const showAll = () => {
-    showLimit = undefined;
+    tableLimit = undefined;
   };
 
   const columns: ColumnDefinition<ProblemWithAscents>[] = [
@@ -169,14 +169,14 @@
   {:else if sortedProblemsWithAscents.length > 0}
     <Table
       {columns}
-      data={showLimit
-        ? sortedProblemsWithAscents.slice(0, showLimit)
+      data={tableLimit
+        ? sortedProblemsWithAscents.slice(0, tableLimit)
         : sortedProblemsWithAscents}
       getId={({ id }) => id}
     ></Table>
   {/if}
 
-  {#if showLimit !== undefined}
+  {#if sortedProblemsWithAscents !== undefined && tableLimit !== undefined && tableLimit < sortedProblemsWithAscents.length}
     <wa-button class="show-more" appearance="plain" onclick={showAll}
       >Show all</wa-button
     >
