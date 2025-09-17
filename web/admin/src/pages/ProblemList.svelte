@@ -19,7 +19,7 @@
 
   let { contestId }: Props = $props();
 
-  let tableLimit = $state<number | undefined>(3);
+  let tableLimit = $state<number | undefined>(8);
 
   const problemsQuery = $derived(getProblemsQuery(contestId));
   const ticksQuery = $derived(getTicksByContestQuery(contestId));
