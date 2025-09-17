@@ -74,3 +74,10 @@
     </div>
   </ProblemForm>
 {/if}
+
+<style>
+  .controls {
+    display: flex;
+    gap: var(--wa-space-xs);
+  }
+</style>

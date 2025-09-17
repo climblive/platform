@@ -49,3 +49,10 @@
     </wa-button>
   </div>
 </CompClassForm>
+
+<style>
+  .controls {
+    display: flex;
+    gap: var(--wa-space-xs);
+  }
+</style>
