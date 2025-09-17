@@ -148,7 +148,12 @@
         <h2 bind:this={problemsHeading}>Problems</h2>
         <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
         ></wa-divider>
-        <ProblemList {contestId} />
+        <ProblemList
+          {contestId}
+          tableLimit={window.location.hash.substring(1) === "problems"
+            ? undefined
+            : 8}
+        />
 
         <h2>Advanced</h2>
         <wa-divider style="--color: var(--wa-color-brand-fill-normal);"

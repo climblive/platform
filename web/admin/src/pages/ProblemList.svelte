@@ -15,11 +15,12 @@
 
   interface Props {
     contestId: number;
+    tableLimit: number | undefined;
   }
 
-  let { contestId }: Props = $props();
+  let { contestId, ...props }: Props = $props();
 
-  let tableLimit = $state<number | undefined>(8);
+  let tableLimit = $state<number | undefined>(props.tableLimit);
 
   const problemsQuery = $derived(getProblemsQuery(contestId));
   const ticksQuery = $derived(getTicksByContestQuery(contestId));
