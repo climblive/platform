@@ -30,7 +30,7 @@
   let compClasses = $derived($compClassesQuery.data);
 
   $effect(() => {
-    if (compClasses && !selectedCompClassId) {
+    if (compClasses && compClasses.length > 0 && !selectedCompClassId) {
       selectedCompClassId = compClasses[0].id;
     }
   });
