@@ -54,13 +54,22 @@
           break;
       }
 
-      requestIdleCallback(() =>
-        scrollElement?.scrollIntoView({
+      if (scrollElement === undefined) {
+        return;
+      }
+
+      const cb = () =>
+        scrollElement.scrollIntoView({
           behavior: "instant",
           block: "start",
           inline: "nearest",
-        }),
-      );
+        });
+
+      if (window.requestIdleCallback !== undefined) {
+        requestIdleCallback(cb);
+      } else {
+        setTimeout(cb, 250);
+      }
     }
   });
 
