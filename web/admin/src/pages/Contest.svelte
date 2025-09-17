@@ -39,7 +39,7 @@
     const hash = window.location.hash.substring(1);
 
     if (tabGroup) {
-      if (["contest", "results", "raffles"].includes(hash)) {
+      if (["results", "raffles"].includes(hash)) {
         setTimeout(() => tabGroup?.setAttribute("active", hash));
       }
 
