@@ -24,7 +24,7 @@
   const handleSubmit = async (patch: CompClassPatch) => {
     $patchCompClass.mutate(patch, {
       onSuccess: (compClass) =>
-        navigate(`/admin/contests/${compClass.contestId}#contest`),
+        navigate(`/admin/contests/${compClass.contestId}#comp-classes`),
       onError: () => toastError("Failed to save comp class."),
     });
   };
@@ -39,7 +39,9 @@
         size="small"
         type="button"
         appearance="plain"
-        onclick={history.back()}>Cancel</wa-button
+        onclick={() =>
+          navigate(`/admin/contests/${compClass.contestId}#comp-classes`)}
+        >Cancel</wa-button
       >
       <wa-button
         size="small"
@@ -51,3 +53,10 @@
     </div>
   </CompClassForm>
 {/if}
+
+<style>
+  .controls {
+    display: flex;
+    gap: var(--wa-space-xs);
+  }
+</style>

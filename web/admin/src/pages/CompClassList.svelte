@@ -116,7 +116,10 @@
 <style>
   .controls {
     display: flex;
-    gap: var(--wa-space-xs);
+
+    & wa-button:not(:last-of-type) {
+      margin-inline-end: var(--wa-space-xs);
+    }
   }
 
   .copy {

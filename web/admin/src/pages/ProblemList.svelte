@@ -15,9 +15,12 @@
 
   interface Props {
     contestId: number;
+    tableLimit: number | undefined;
   }
 
-  let { contestId }: Props = $props();
+  let { contestId, ...props }: Props = $props();
+
+  let tableLimit = $state<number | undefined>(props.tableLimit);
 
   const problemsQuery = $derived(getProblemsQuery(contestId));
   const ticksQuery = $derived(getTicksByContestQuery(contestId));
@@ -56,6 +59,10 @@
 
     return problems?.sort((p1, p2) => p1.number - p2.number);
   });
+
+  const showAll = () => {
+    tableLimit = undefined;
+  };
 
   const columns: ColumnDefinition<ProblemWithAscents>[] = [
     {
@@ -126,9 +133,8 @@
       size="small"
       appearance="plain"
       onclick={() => navigate(`/admin/problems/${id}/edit`)}
-      label="Edit"
     >
-      <wa-icon name="pencil"></wa-icon>
+      <wa-icon name="pencil" label="Edit"></wa-icon>
     </wa-button>
     <DeleteProblem problemId={id}>
       {#snippet children({ deleteProblem })}
@@ -137,9 +143,8 @@
           variant="danger"
           appearance="plain"
           onclick={deleteProblem}
-          label={`Delete problem ${id}`}
         >
-          <wa-icon name="trash"></wa-icon>
+          <wa-icon name="trash" label={`Delete problem ${id}`}></wa-icon>
         </wa-button>
       {/snippet}
     </DeleteProblem>
@@ -161,15 +166,29 @@
   {#if sortedProblemsWithAscents === undefined}
     <Loader />
   {:else if sortedProblemsWithAscents.length > 0}
-    <Table {columns} data={sortedProblemsWithAscents} getId={({ id }) => id}
+    <Table
+      {columns}
+      data={tableLimit
+        ? sortedProblemsWithAscents.slice(0, tableLimit)
+        : sortedProblemsWithAscents}
+      getId={({ id }) => id}
     ></Table>
+  {/if}
+
+  {#if sortedProblemsWithAscents !== undefined && tableLimit !== undefined && tableLimit < sortedProblemsWithAscents.length}
+    <wa-button class="show-more" appearance="plain" onclick={showAll}
+      >Show all</wa-button
+    >
   {/if}
 </section>
 
 <style>
   .controls {
     display: flex;
-    gap: var(--wa-space-xs);
+
+    & wa-button:not(:last-of-type) {
+      margin-inline-end: var(--wa-space-xs);
+    }
   }
 
   .number {
@@ -183,5 +202,9 @@
     flex-direction: column;
     align-items: start;
     gap: var(--wa-space-m);
+  }
+
+  wa-button.show-more {
+    align-self: center;
   }
 </style>

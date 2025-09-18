@@ -47,7 +47,10 @@
   schema={formSchema}
 >
   <div class="controls">
-    <wa-button size="small" appearance="plain" onclick={history.back()}
+    <wa-button
+      size="small"
+      appearance="plain"
+      onclick={() => navigate(`/admin/organizers/${organizerId}`)}
       >Cancel</wa-button
     >
     <wa-button

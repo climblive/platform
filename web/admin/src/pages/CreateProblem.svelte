@@ -61,7 +61,8 @@
         size="small"
         type="button"
         appearance="plain"
-        onclick={history.back()}>Cancel</wa-button
+        onclick={() => navigate(`/admin/contests/${contestId}#problems`)}
+        >Cancel</wa-button
       >
       <wa-button
         size="small"
@@ -73,3 +74,10 @@
     </div>
   </ProblemForm>
 {/if}
+
+<style>
+  .controls {
+    display: flex;
+    gap: var(--wa-space-xs);
+  }
+</style>

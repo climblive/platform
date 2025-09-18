@@ -17,7 +17,7 @@
 
   const handleSubmit = async (tmpl: CompClassTemplate) => {
     $createCompClass.mutate(tmpl, {
-      onSuccess: () => navigate(`/admin/contests/${contestId}`),
+      onSuccess: () => navigate(`/admin/contests/${contestId}#comp-classes`),
       onError: () => toastError("Failed to create class."),
     });
   };
@@ -36,7 +36,8 @@
       size="small"
       type="button"
       appearance="plain"
-      onclick={history.back()}>Cancel</wa-button
+      onclick={() => navigate(`/admin/contests/${contestId}#comp-classes`)}
+      >Cancel</wa-button
     >
     <wa-button
       size="small"
@@ -48,3 +49,10 @@
     </wa-button>
   </div>
 </CompClassForm>
+
+<style>
+  .controls {
+    display: flex;
+    gap: var(--wa-space-xs);
+  }
+</style>
