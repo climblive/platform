@@ -32,7 +32,7 @@ type registrationCodeGenerator struct {
 }
 
 func (g *registrationCodeGenerator) Generate(length int) string {
-	const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	const characters = "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789"
 	var code []rune
 
 	for range length {
