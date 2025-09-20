@@ -1,6 +1,7 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/relative-time/relative-time.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { Contest } from "@climblive/lib/models";
   import { getContestsByOrganizerQuery } from "@climblive/lib/queries";
@@ -78,9 +79,13 @@
   <Link to="contests/{id}">{name}</Link>
 {/snippet}
 
-{#snippet renderTimeBegin({ timeBegin }: Contest)}
+{#snippet renderTimeBegin({ timeBegin, timeEnd }: Contest)}
   {#if timeBegin}
-    {format(timeBegin, "yyyy-MM-dd HH:mm")}
+    {#if timeEnd && new Date() > timeEnd}
+      {format(timeBegin, "yyyy-MM-dd HH:mm")}
+    {:else}
+      <wa-relative-time date={timeBegin} format="long"></wa-relative-time>
+    {/if}
   {/if}
 {/snippet}
 
