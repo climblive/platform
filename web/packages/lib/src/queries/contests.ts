@@ -21,6 +21,15 @@ export const getContestQuery = (contestId: number) =>
     staleTime: 12 * HOUR,
   });
 
+export const getAllContestsQuery = (
+  options?: Partial<Parameters<typeof createQuery<Contest[]>>[0]>,
+) =>
+  createQuery({
+    ...options,
+    queryKey: ["contest"],
+    queryFn: async () => ApiClient.getInstance().getAllContests(),
+  });
+
 export const getContestsByOrganizerQuery = (organizerId: number) =>
   createQuery({
     queryKey: ["contests", { organizerId }],

@@ -3,7 +3,11 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { Contest } from "@climblive/lib/models";
-  import { getContestsByOrganizerQuery } from "@climblive/lib/queries";
+  import {
+    getAllContestsQuery,
+    getContestsByOrganizerQuery,
+    getSelfQuery,
+  } from "@climblive/lib/queries";
   import { format } from "date-fns";
   import { Link, navigate } from "svelte-routing";
 
@@ -13,9 +17,16 @@
 
   let { organizerId }: Props = $props();
 
+  const selfQuery = $derived(getSelfQuery());
   const contestsQuery = $derived(getContestsByOrganizerQuery(organizerId));
+  const allContestsQuery = $derived(getAllContestsQuery({ enabled: true }));
 
-  let contests = $derived($contestsQuery.data);
+  let showAll = $state(false);
+
+  const self = $derived($selfQuery.data);
+  const contests = $derived(
+    showAll ? $allContestsQuery.data : $contestsQuery.data,
+  );
 
   const [drafts, ongoing, upcoming, past] = $derived.by(() => {
     const now = new Date();
@@ -72,6 +83,10 @@
       width: "max-content",
     },
   ];
+
+  const toggleShowAll = () => {
+    showAll = true;
+  };
 </script>
 
 {#snippet renderName({ id, name }: Contest)}
@@ -105,6 +120,7 @@
 {#if !drafts || !ongoing || !upcoming || !past}
   <Loader />
 {:else}
+  <wa-button onclick={toggleShowAll}>Show all</wa-button>
   {#if drafts?.length}
     {@render listing("Drafts", drafts)}
   {/if}
