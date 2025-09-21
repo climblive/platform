@@ -43,6 +43,17 @@ func (uc *ContestUseCase) GetContest(ctx context.Context, contestID domain.Conte
 }
 
 func (uc *ContestUseCase) GetAllContests(ctx context.Context) ([]domain.Contest, error) {
+	var role domain.AuthRole
+	var err error
+
+	if role, err = uc.Authorizer.HasOwnership(ctx, domain.OwnershipData{}); err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	if role != domain.AdminRole {
+		return nil, domain.ErrNotAuthorized
+	}
+
 	contests, err := uc.Repo.GetAllContests(ctx, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)

@@ -39,9 +39,6 @@ export const getContestsByOrganizerQuery = (
     queryKey: ["contests", { organizerId }],
     queryFn: async () =>
       ApiClient.getInstance().getContestsByOrganizer(organizerId),
-    retry: false,
-    gcTime: 12 * HOUR,
-    staleTime: 12 * HOUR,
   });
 
 export const createContestMutation = (organizerId: number) => {
