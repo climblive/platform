@@ -88,6 +88,11 @@ func (m *repositoryMock) GetContest(ctx context.Context, tx domain.Transaction, 
 	return args.Get(0).(domain.Contest), args.Error(1)
 }
 
+func (m *repositoryMock) GetAllContests(ctx context.Context, tx domain.Transaction) ([]domain.Contest, error) {
+	args := m.Called(ctx, tx)
+	return args.Get(0).([]domain.Contest), args.Error(1)
+}
+
 func (m *repositoryMock) StoreContest(ctx context.Context, tx domain.Transaction, contest domain.Contest) (domain.Contest, error) {
 	args := m.Called(ctx, tx, contest)
 
