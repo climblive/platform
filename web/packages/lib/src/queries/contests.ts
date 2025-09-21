@@ -12,8 +12,7 @@ import {
 } from "../models";
 import { HOUR } from "./constants";
 
-export const getContestQuery = (contestId: number,
-) =>
+export const getContestQuery = (contestId: number) =>
   createQuery({
     queryKey: ["contest", { id: contestId }],
     queryFn: async () => ApiClient.getInstance().getContest(contestId),
@@ -31,7 +30,8 @@ export const getAllContestsQuery = (
     queryFn: async () => ApiClient.getInstance().getAllContests(),
   });
 
-export const getContestsByOrganizerQuery = (organizerId: number,
+export const getContestsByOrganizerQuery = (
+  organizerId: number,
   options?: Partial<Parameters<typeof createQuery<Contest[]>>[0]>,
 ) =>
   createQuery({
