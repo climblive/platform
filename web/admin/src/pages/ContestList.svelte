@@ -125,7 +125,9 @@
 {#if !drafts || !ongoing || !upcoming || !past}
   <Loader />
 {:else}
-  <wa-button onclick={toggleShowAll}>Show all</wa-button>
+  {#if self?.admin}
+    <wa-button onclick={toggleShowAll}>Show all</wa-button>
+  {/if}
   {#if drafts?.length}
     {@render listing("Drafts", drafts)}
   {/if}
