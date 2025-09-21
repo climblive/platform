@@ -83,15 +83,9 @@
 
 <style>
   .controls {
-    width: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: stretch;
     gap: var(--wa-space-m);
-
-    & > wa-select {
-      flex-grow: 1;
-    }
 
     & > wa-switch {
       align-self: flex-end;
