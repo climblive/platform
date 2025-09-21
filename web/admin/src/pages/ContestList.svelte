@@ -7,26 +7,27 @@
   import {
     getAllContestsQuery,
     getContestsByOrganizerQuery,
-    getSelfQuery,
   } from "@climblive/lib/queries";
   import { format } from "date-fns";
   import { Link, navigate } from "svelte-routing";
 
   interface Props {
-    organizerId: number;
+    organizerId: number | undefined;
   }
 
   let { organizerId }: Props = $props();
 
-  const selfQuery = $derived(getSelfQuery());
-  const contestsQuery = $derived(getContestsByOrganizerQuery(organizerId));
-  const allContestsQuery = $derived(getAllContestsQuery({ enabled: true }));
+  const contestsQuery = $derived(
+    getContestsByOrganizerQuery(organizerId ?? 0, {
+      enabled: organizerId !== undefined,
+    }),
+  );
+  const allContestsQuery = $derived(
+    getAllContestsQuery({ enabled: organizerId === undefined }),
+  );
 
-  let showAll = $state(false);
-
-  const self = $derived($selfQuery.data);
   const contests = $derived(
-    showAll ? $allContestsQuery.data : $contestsQuery.data,
+    organizerId === undefined ? $allContestsQuery.data : $contestsQuery.data,
   );
 
   const [drafts, ongoing, upcoming, past] = $derived.by(() => {
@@ -84,10 +85,6 @@
       width: "max-content",
     },
   ];
-
-  const toggleShowAll = () => {
-    showAll = true;
-  };
 </script>
 
 {#snippet renderName({ id, name }: Contest)}
@@ -125,9 +122,6 @@
 {#if !drafts || !ongoing || !upcoming || !past}
   <Loader />
 {:else}
-  {#if self?.admin}
-    <wa-button onclick={toggleShowAll}>Show all</wa-button>
-  {/if}
   {#if drafts?.length}
     {@render listing("Drafts", drafts)}
   {/if}
