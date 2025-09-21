@@ -4,19 +4,31 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { Contest } from "@climblive/lib/models";
-  import { getContestsByOrganizerQuery } from "@climblive/lib/queries";
+  import {
+    getAllContestsQuery,
+    getContestsByOrganizerQuery,
+  } from "@climblive/lib/queries";
   import { format } from "date-fns";
   import { Link, navigate } from "svelte-routing";
 
   interface Props {
-    organizerId: number;
+    organizerId: number | undefined;
   }
 
   let { organizerId }: Props = $props();
 
-  const contestsQuery = $derived(getContestsByOrganizerQuery(organizerId));
+  const contestsQuery = $derived(
+    getContestsByOrganizerQuery(organizerId ?? 0, {
+      enabled: organizerId !== undefined,
+    }),
+  );
+  const allContestsQuery = $derived(
+    getAllContestsQuery({ enabled: organizerId === undefined }),
+  );
 
-  let contests = $derived($contestsQuery.data);
+  const contests = $derived(
+    organizerId === undefined ? $allContestsQuery.data : $contestsQuery.data,
+  );
 
   const [drafts, ongoing, upcoming, past] = $derived.by(() => {
     const now = new Date();

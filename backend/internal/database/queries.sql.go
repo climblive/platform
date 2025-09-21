@@ -82,6 +82,57 @@ func (q *Queries) DeleteTick(ctx context.Context, id int32) error {
 	return err
 }
 
+const getAllContests = `-- name: GetAllContests :many
+SELECT contest.id, contest.organizer_id, contest.protected, contest.series_id, contest.name, contest.description, contest.location, contest.final_enabled, contest.qualifying_problems, contest.finalists, contest.rules, contest.grace_period, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+FROM contest
+LEFT JOIN comp_class cc ON cc.contest_id = contest.id
+GROUP BY contest.id
+`
+
+type GetAllContestsRow struct {
+	Contest   Contest
+	TimeBegin interface{}
+	TimeEnd   interface{}
+}
+
+func (q *Queries) GetAllContests(ctx context.Context) ([]GetAllContestsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllContests)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllContestsRow
+	for rows.Next() {
+		var i GetAllContestsRow
+		if err := rows.Scan(
+			&i.Contest.ID,
+			&i.Contest.OrganizerID,
+			&i.Contest.Protected,
+			&i.Contest.SeriesID,
+			&i.Contest.Name,
+			&i.Contest.Description,
+			&i.Contest.Location,
+			&i.Contest.FinalEnabled,
+			&i.Contest.QualifyingProblems,
+			&i.Contest.Finalists,
+			&i.Contest.Rules,
+			&i.Contest.GracePeriod,
+			&i.TimeBegin,
+			&i.TimeEnd,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getAllOrganizers = `-- name: GetAllOrganizers :many
 SELECT id, name, homepage
 FROM organizer

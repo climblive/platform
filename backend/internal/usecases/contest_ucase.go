@@ -14,6 +14,7 @@ type contestUseCaseRepository interface {
 	domain.Transactor
 
 	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
+	GetAllContests(ctx context.Context, tx domain.Transaction) ([]domain.Contest, error)
 	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error)
 	GetContestsByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.Contest, error)
 	GetOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) (domain.Organizer, error)
@@ -39,6 +40,26 @@ func (uc *ContestUseCase) GetContest(ctx context.Context, contestID domain.Conte
 	}
 
 	return contest, nil
+}
+
+func (uc *ContestUseCase) GetAllContests(ctx context.Context) ([]domain.Contest, error) {
+	var role domain.AuthRole
+	var err error
+
+	if role, err = uc.Authorizer.HasOwnership(ctx, domain.OwnershipData{}); err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	if role != domain.AdminRole {
+		return nil, domain.ErrNotAuthorized
+	}
+
+	contests, err := uc.Repo.GetAllContests(ctx, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	return contests, nil
 }
 
 func (uc *ContestUseCase) GetContestsByOrganizer(ctx context.Context, organizerID domain.OrganizerID) ([]domain.Contest, error) {

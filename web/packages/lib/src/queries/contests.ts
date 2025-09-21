@@ -21,14 +21,24 @@ export const getContestQuery = (contestId: number) =>
     staleTime: 12 * HOUR,
   });
 
-export const getContestsByOrganizerQuery = (organizerId: number) =>
+export const getAllContestsQuery = (
+  options?: Partial<Parameters<typeof createQuery<Contest[]>>[0]>,
+) =>
   createQuery({
+    ...options,
+    queryKey: ["contests"],
+    queryFn: async () => ApiClient.getInstance().getAllContests(),
+  });
+
+export const getContestsByOrganizerQuery = (
+  organizerId: number,
+  options?: Partial<Parameters<typeof createQuery<Contest[]>>[0]>,
+) =>
+  createQuery({
+    ...options,
     queryKey: ["contests", { organizerId }],
     queryFn: async () =>
       ApiClient.getInstance().getContestsByOrganizer(organizerId),
-    retry: false,
-    gcTime: 12 * HOUR,
-    staleTime: 12 * HOUR,
   });
 
 export const createContestMutation = (organizerId: number) => {

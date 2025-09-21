@@ -231,6 +231,92 @@ func TestGetContestsByOrganizer(t *testing.T) {
 	})
 }
 
+func TestGetAllContests(t *testing.T) {
+	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedOwnership := domain.OwnershipData{
+		OrganizerID: fakedOrganizerID,
+	}
+
+	makeMocks := func() (*repositoryMock, *authorizerMock) {
+		mockedRepo := new(repositoryMock)
+
+		mockedAuthorizer := new(authorizerMock)
+
+		return mockedRepo, mockedAuthorizer
+	}
+
+	t.Run("HappyCase", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.AnythingOfType("domain.OwnershipData")).
+			Return(domain.AdminRole, nil)
+
+		mockedRepo.
+			On("GetAllContests", mock.Anything, nil).
+			Return([]domain.Contest{
+				{
+					ID:        fakedContestID,
+					Ownership: fakedOwnership,
+				},
+			}, nil)
+
+		ucase := usecases.ContestUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		contests, err := ucase.GetAllContests(context.Background())
+
+		require.NoError(t, err)
+		require.Len(t, contests, 1)
+		assert.Equal(t, fakedContestID, contests[0].ID)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.AnythingOfType("domain.OwnershipData")).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		ucase := usecases.ContestUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.GetAllContests(context.Background())
+
+		require.ErrorIs(t, err, domain.ErrNoOwnership)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("NotAdmin", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.AnythingOfType("domain.OwnershipData")).
+			Return(domain.OrganizerRole, nil)
+
+		ucase := usecases.ContestUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.GetAllContests(context.Background())
+
+		require.ErrorIs(t, err, domain.ErrNotAuthorized)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+}
 func TestCreateContest(t *testing.T) {
 	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{

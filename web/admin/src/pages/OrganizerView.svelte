@@ -4,6 +4,7 @@
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
+  import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { value } from "@climblive/lib/forms";
   import { getSelfQuery } from "@climblive/lib/queries";
   import { getContext, onMount } from "svelte";
@@ -16,6 +17,9 @@
   }
 
   let { organizerId }: Props = $props();
+
+  let showAll = $state(false);
+  let showAllToggle: WaSwitch | undefined = $state();
 
   const selfQuery = $derived(getSelfQuery());
   const self = $derived($selfQuery.data);
@@ -36,6 +40,14 @@
       navigate(`/admin/organizers/${organizerId}`);
     }
   };
+
+  const toggleShowAll = () => {
+    if (!showAllToggle) {
+      return;
+    }
+
+    showAll = showAllToggle.checked;
+  };
 </script>
 
 <h1>Welcome!</h1>
@@ -43,18 +55,40 @@
 {#if self && self.organizers.length > 1}
   <p>You can manage contests as multiple organizers.</p>
 
-  <wa-select
-    bind:this={select}
-    size="small"
-    appearance="outlined filled"
-    {@attach value($selectedOrganizer)}
-    onchange={handleChange}
-  >
-    <wa-icon name="id-badge" slot="start"></wa-icon>
-    {#each self.organizers as organizer (organizer.id)}
-      <wa-option value={organizer.id}>{organizer.name}</wa-option>
-    {/each}
-  </wa-select>
+  <div class="controls">
+    {#if self?.admin}
+      <wa-switch bind:this={showAllToggle} onchange={toggleShowAll}
+        >Show all</wa-switch
+      >
+    {/if}
+
+    {#if !showAll}
+      <wa-select
+        bind:this={select}
+        size="small"
+        appearance="outlined filled"
+        {@attach value($selectedOrganizer)}
+        onchange={handleChange}
+      >
+        <wa-icon name="id-badge" slot="start"></wa-icon>
+        {#each self.organizers as organizer (organizer.id)}
+          <wa-option value={organizer.id}>{organizer.name}</wa-option>
+        {/each}
+      </wa-select>
+    {/if}
+  </div>
 {/if}
 
-<ContestList organizerId={Number(organizerId)} />
+<ContestList organizerId={showAll ? undefined : Number(organizerId)} />
+
+<style>
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-m);
+
+    & > wa-switch {
+      align-self: flex-end;
+    }
+  }
+</style>
