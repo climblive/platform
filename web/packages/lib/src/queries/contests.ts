@@ -26,7 +26,7 @@ export const getAllContestsQuery = (
 ) =>
   createQuery({
     ...options,
-    queryKey: ["contest"],
+    queryKey: ["contests"],
     queryFn: async () => ApiClient.getInstance().getAllContests(),
   });
 
