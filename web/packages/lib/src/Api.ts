@@ -10,6 +10,7 @@ import {
   type ContestID,
   type ContestPatch,
   type ContestTemplate,
+  type OrganizerInviteID,
   type ProblemPatch,
   type ProblemTemplate,
   type ScoreEngineInstanceID,
@@ -435,7 +436,7 @@ export class ApiClient {
     return z.array(organizerInviteSchema).parse(result.data);
   };
 
-  getOrganizerInvite = async (inviteId: number) => {
+  getOrganizerInvite = async (inviteId: OrganizerInviteID) => {
     const endpoint = `/invites/${inviteId}`;
 
     const result = await this.axiosInstance.get(endpoint, {
@@ -445,7 +446,7 @@ export class ApiClient {
     return organizerInviteSchema.parse(result.data);
   };
 
-  deleteOrganizerInvite = async (inviteId: number) => {
+  deleteOrganizerInvite = async (inviteId: OrganizerInviteID) => {
     const endpoint = `/invites/${inviteId}`;
 
     const result = await this.axiosInstance.delete(endpoint, {
@@ -455,7 +456,7 @@ export class ApiClient {
     return organizerInviteSchema.parse(result.data);
   };
 
-  acceptOrganizerInvite = async (inviteId: number) => {
+  acceptOrganizerInvite = async (inviteId: OrganizerInviteID) => {
     const endpoint = `/invites/${inviteId}/accept`;
 
     await this.axiosInstance.post(endpoint, {
