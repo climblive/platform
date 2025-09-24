@@ -54,6 +54,12 @@ type Organizer struct {
 	Homepage sql.NullString
 }
 
+type OrganizerInvite struct {
+	ID          string
+	OrganizerID int32
+	ExpiresAt   time.Time
+}
+
 type Problem struct {
 	ID                 int32
 	OrganizerID        int32

@@ -278,3 +278,26 @@ ON DUPLICATE KEY UPDATE
     raffle_id = VALUES(raffle_id),
     contender_id = VALUES(contender_id),
     timestamp = VALUES(timestamp); 
+
+-- name: GetOrganizerInvitesByOrganizer :many
+SELECT sqlc.embed(organizer_invite)
+FROM organizer_invite
+WHERE organizer_id = ?;
+
+-- name: GetOrganizerInvite :one
+SELECT sqlc.embed(organizer_invite)
+FROM organizer_invite
+WHERE id = ?;
+
+-- name: UpsertOrganizerInvite :exec
+INSERT INTO
+    organizer_invite (id, organizer_id, expires_at)
+VALUES
+    (?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    organizer_id = VALUES(organizer_id),
+    expires_at = VALUES(expires_at);
+
+-- name: DeleteOrganizerInvite :exec
+DELETE FROM organizer_invite
+WHERE id = ?;

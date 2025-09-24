@@ -102,6 +102,12 @@ type Organizer struct {
 	Name      string        `json:"name"`
 }
 
+type OrganizerInvite struct {
+	ID          OrganizerInviteID `json:"id"`
+	OrganizerID OrganizerID       `json:"organizerId"`
+	ExpiresAt   time.Time         `json:"expiresAt"`
+}
+
 type Problem struct {
 	ID                 ProblemID     `json:"id"`
 	Ownership          OwnershipData `json:"-"`
