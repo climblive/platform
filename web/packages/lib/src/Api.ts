@@ -452,8 +452,6 @@ export class ApiClient {
     const result = await this.axiosInstance.delete(endpoint, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
-
-    return organizerInviteSchema.parse(result.data);
   };
 
   acceptOrganizerInvite = async (inviteId: OrganizerInviteID) => {

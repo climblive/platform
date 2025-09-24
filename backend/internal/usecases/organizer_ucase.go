@@ -82,7 +82,7 @@ func (uc *OrganizerUseCase) DeleteOrganizerInvite(ctx context.Context, inviteID 
 		return errors.Wrap(err, 0)
 	}
 
-	uc.Repo.DeleteOrganizerInvite(ctx, nil, inviteID)
+	err = uc.Repo.DeleteOrganizerInvite(ctx, nil, inviteID)
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
