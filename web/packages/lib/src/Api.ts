@@ -459,7 +459,7 @@ export class ApiClient {
   acceptOrganizerInvite = async (inviteId: OrganizerInviteID) => {
     const endpoint = `/invites/${inviteId}/accept`;
 
-    await this.axiosInstance.post(endpoint, {
+    await this.axiosInstance.post(endpoint, undefined, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
   };
@@ -467,7 +467,7 @@ export class ApiClient {
   createOrganizerInvite = async (organizerId: number) => {
     const endpoint = `/organizers/${organizerId}/invites`;
 
-    const result = await this.axiosInstance.post(endpoint, {
+    const result = await this.axiosInstance.post(endpoint, undefined, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 

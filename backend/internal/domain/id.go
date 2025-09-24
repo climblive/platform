@@ -15,11 +15,7 @@ type SeriesID ResourceID
 type UserID ResourceID
 type TickID ResourceID
 
-type OrganizerInviteID uuid.UUID
-
-func (id OrganizerInviteID) String() string {
-	return uuid.UUID(id).String()
-}
+type OrganizerInviteID = uuid.UUID
 
 type ResourceIDType interface {
 	CompClassID |

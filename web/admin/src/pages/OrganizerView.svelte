@@ -11,6 +11,7 @@
   import { navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
   import ContestList from "./ContestList.svelte";
+  import InviteList from "./InviteList.svelte";
 
   interface Props {
     organizerId: number;
@@ -77,6 +78,8 @@
       </wa-select>
     {/if}
   </div>
+
+  <InviteList {organizerId} />
 {/if}
 
 <ContestList organizerId={showAll ? undefined : Number(organizerId)} />
