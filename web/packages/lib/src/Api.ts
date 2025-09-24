@@ -17,6 +17,7 @@ import {
 } from "./models";
 import { compClassSchema } from "./models/compClass";
 import { contenderSchema } from "./models/contender";
+import { organizerInviteSchema } from "./models/organizerInvite";
 import { problemSchema } from "./models/problem";
 import { raffleSchema, raffleWinnerSchema } from "./models/raffle";
 import type {
@@ -422,5 +423,53 @@ export class ApiClient {
     });
 
     return z.array(raffleWinnerSchema).parse(result.data);
+  };
+
+  getOrganizerInvites = async (organizerId: number) => {
+    const endpoint = `/organizers/${organizerId}/invites`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(organizerInviteSchema).parse(result.data);
+  };
+
+  getOrganizerInvite = async (inviteId: number) => {
+    const endpoint = `/invites/${inviteId}`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return organizerInviteSchema.parse(result.data);
+  };
+
+  deleteOrganizerInvite = async (inviteId: number) => {
+    const endpoint = `/invites/${inviteId}`;
+
+    const result = await this.axiosInstance.delete(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return organizerInviteSchema.parse(result.data);
+  };
+
+  acceptOrganizerInvite = async (inviteId: number) => {
+    const endpoint = `/invites/${inviteId}/accept`;
+
+    await this.axiosInstance.post(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+  };
+
+  createOrganizerInvite = async (organizerId: number) => {
+    const endpoint = `/organizers/${organizerId}/invites`;
+
+    const result = await this.axiosInstance.post(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return organizerInviteSchema.parse(result.data);
   };
 }

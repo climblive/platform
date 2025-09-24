@@ -25,8 +25,8 @@ func InstallOrganizerHandler(mux *Mux, organizerUseCase organizerUseCase) {
 		organizerUseCase: organizerUseCase,
 	}
 
-	mux.HandleFunc("GET /organizer/{organizerID}/invites", handler.GetOrganizerInvites)
-	mux.HandleFunc("POST /organizer/{organizerID}/invites", handler.CreateOrganizerInvite)
+	mux.HandleFunc("GET /organizers/{organizerID}/invites", handler.GetOrganizerInvites)
+	mux.HandleFunc("POST /organizers/{organizerID}/invites", handler.CreateOrganizerInvite)
 	mux.HandleFunc("GET /invites/{inviteID}", handler.GetOrganizerInvite)
 	mux.HandleFunc("DELETE /invites/{inviteID}", handler.DeleteOrganizerInvite)
 	mux.HandleFunc("POST /invites/{inviteID}/accept", handler.AcceptOrganizerInvite)

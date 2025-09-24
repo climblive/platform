@@ -14,17 +14,9 @@ export type RaffleWinnerID = ResourceID;
 export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
-export type ResourceIDType =
-  | CompClassID
-  | ContenderID
-  | ContestID
-  | OrganizerID
-  | ProblemID
-  | RaffleID
-  | RaffleWinnerID
-  | SeriesID
-  | UserID
-  | TickID;
+export type OrganizerInviteID = string;
+export type ResourceIDType = 
+    CompClassID | ContenderID | ContestID | OrganizerID | ProblemID | RaffleID | RaffleWinnerID | SeriesID | UserID | TickID;
 export type ScoreEngineInstanceID = string;
 
 //////////
@@ -112,6 +104,11 @@ export interface ContestPatch {
 export interface Organizer {
   id: OrganizerID;
   name: string;
+}
+export interface OrganizerInvite {
+  id: OrganizerInviteID;
+  organizerId: OrganizerID;
+  expiresAt: Date;
 }
 export interface Problem {
   id: ProblemID;
