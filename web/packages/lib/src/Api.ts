@@ -471,4 +471,14 @@ export class ApiClient {
 
     return organizerInviteSchema.parse(result.data);
   };
+
+  getUsersByOrganizer = async (organizerId: number) => {
+    const endpoint = `/organizers/${organizerId}/users`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(userSchema).parse(result.data);
+  };
 }

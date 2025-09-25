@@ -228,6 +228,12 @@ LEFT JOIN user_organizer uo ON uo.user_id = user.id
 LEFT JOIN organizer ON organizer.id = uo.organizer_id
 WHERE username = ?;
 
+-- name: GetUsersByOrganizer :many
+SELECT sqlc.embed(user)
+FROM user
+LEFT JOIN user_organizer uo ON uo.user_id = user.id
+WHERE uo.organizer_id = ?;
+
 -- name: AddUserToOrganizer :exec
 INSERT INTO
     user_organizer (user_id, organizer_id)
@@ -280,14 +286,16 @@ ON DUPLICATE KEY UPDATE
     timestamp = VALUES(timestamp); 
 
 -- name: GetOrganizerInvitesByOrganizer :many
-SELECT sqlc.embed(organizer_invite)
+SELECT sqlc.embed(organizer_invite), organizer.name
 FROM organizer_invite
+JOIN organizer ON organizer.id = organizer_invite.organizer_id
 WHERE organizer_id = ?;
 
 -- name: GetOrganizerInvite :one
-SELECT sqlc.embed(organizer_invite)
+SELECT sqlc.embed(organizer_invite), organizer.name
 FROM organizer_invite
-WHERE id = ?;
+JOIN organizer ON organizer.id = organizer_invite.organizer_id
+WHERE organizer_invite.id = ?;
 
 -- name: UpsertOrganizerInvite :exec
 INSERT INTO

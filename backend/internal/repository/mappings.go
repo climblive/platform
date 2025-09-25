@@ -162,11 +162,12 @@ func raffleWinnerToDomain(record database.RaffleWinner, name string) domain.Raff
 	}
 }
 
-func organizerInviteToDomain(record database.OrganizerInvite) domain.OrganizerInvite {
+func organizerInviteToDomain(record database.OrganizerInvite, organizerName string) domain.OrganizerInvite {
 	return domain.OrganizerInvite{
-		ID:          domain.OrganizerInviteID(uuid.MustParse(record.ID)),
-		OrganizerID: domain.OrganizerID(record.OrganizerID),
-		ExpiresAt:   record.ExpiresAt,
+		ID:            domain.OrganizerInviteID(uuid.MustParse(record.ID)),
+		OrganizerID:   domain.OrganizerID(record.OrganizerID),
+		OrganizerName: organizerName,
+		ExpiresAt:     record.ExpiresAt,
 	}
 }
 

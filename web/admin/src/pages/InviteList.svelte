@@ -10,6 +10,7 @@
     getOrganizerInvitesQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
+  import { navigate } from "svelte-routing";
   import DeleteInvite from "./DeleteInvite.svelte";
 
   interface Props {
@@ -75,6 +76,12 @@
     {/snippet}
   </DeleteInvite>
 {/snippet}
+
+<wa-button
+  appearance="plain"
+  onclick={() => navigate(`./organizers/${organizerId}`)}
+  >Back<wa-icon name="arrow-left" slot="start"></wa-icon></wa-button
+>
 
 <section>
   <wa-button

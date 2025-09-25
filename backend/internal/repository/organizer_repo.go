@@ -67,7 +67,7 @@ func (d *Database) GetOrganizerInvitesByOrganizer(ctx context.Context, tx domain
 	invites := make([]domain.OrganizerInvite, 0)
 
 	for _, record := range records {
-		invites = append(invites, organizerInviteToDomain(record.OrganizerInvite))
+		invites = append(invites, organizerInviteToDomain(record.OrganizerInvite, record.Name))
 	}
 
 	return invites, nil
@@ -82,7 +82,7 @@ func (d *Database) GetOrganizerInvite(ctx context.Context, tx domain.Transaction
 		return domain.OrganizerInvite{}, errors.Wrap(err, 0)
 	}
 
-	return organizerInviteToDomain(record.OrganizerInvite), nil
+	return organizerInviteToDomain(record.OrganizerInvite, record.Name), nil
 
 }
 

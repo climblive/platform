@@ -108,6 +108,7 @@ export interface Organizer {
 export interface OrganizerInvite {
   id: OrganizerInviteID;
   organizerId: OrganizerID;
+  organizerName: string;
   expiresAt: Date;
 }
 export interface Problem {

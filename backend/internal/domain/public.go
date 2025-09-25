@@ -103,9 +103,10 @@ type Organizer struct {
 }
 
 type OrganizerInvite struct {
-	ID          OrganizerInviteID `json:"id"`
-	OrganizerID OrganizerID       `json:"organizerId"`
-	ExpiresAt   time.Time         `json:"expiresAt"`
+	ID            OrganizerInviteID `json:"id"`
+	OrganizerID   OrganizerID       `json:"organizerId"`
+	OrganizerName string            `json:"organizerName"`
+	ExpiresAt     time.Time         `json:"expiresAt"`
 }
 
 type Problem struct {

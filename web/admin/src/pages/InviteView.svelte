@@ -48,7 +48,11 @@
 </script>
 
 {#if invite}
-  <p>You have been invited to be part of the organizer {invite.id}.</p>
+  <p>
+    You have been invited to be a member of <strong
+      >{invite.organizerName}</strong
+    >.
+  </p>
   <section>
     <wa-button
       variant="danger"
