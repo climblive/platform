@@ -133,7 +133,7 @@
         size="small"
         onclick={() => navigate(`./organizers/${organizerId}/invites`)}
         >View invites
-        <wa-badge variant="neutral" pill>8</wa-badge>
+        <wa-badge variant="neutral" pill>?</wa-badge>
       </wa-button>
     </div>
   </wa-card>
