@@ -233,6 +233,11 @@ func (m *repositoryMock) GetUserByUsername(ctx context.Context, tx domain.Transa
 	return args.Get(0).(domain.User), args.Error(1)
 }
 
+func (m *repositoryMock) GetUsersByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.User, error) {
+	args := m.Called(ctx, tx, organizerID)
+	return args.Get(0).([]domain.User), args.Error(1)
+}
+
 func (m *repositoryMock) GetAllOrganizers(ctx context.Context, tx domain.Transaction) ([]domain.Organizer, error) {
 	args := m.Called(ctx, tx)
 	return args.Get(0).([]domain.Organizer), args.Error(1)
