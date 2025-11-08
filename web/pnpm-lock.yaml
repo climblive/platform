@@ -11,8 +11,8 @@ importers:
   admin:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.0.0-beta.5
-        version: 3.0.0-beta.5(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
+        specifier: 3.0.0
+        version: 3.0.0(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -93,8 +93,8 @@ importers:
   packages/lib:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.0.0-beta.5
-        version: 3.0.0-beta.5(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
+        specifier: 3.0.0
+        version: 3.0.0(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
       '@sentry/svelte':
         specifier: ^10.8.0
         version: 10.8.0(svelte@5.38.0)
@@ -166,8 +166,8 @@ importers:
   scoreboard:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.0.0-beta.5
-        version: 3.0.0-beta.5(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
+        specifier: 3.0.0
+        version: 3.0.0(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -221,8 +221,8 @@ importers:
   scorecard:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.0.0-beta.5
-        version: 3.0.0-beta.5(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
+        specifier: 3.0.0
+        version: 3.0.0(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -285,8 +285,8 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
-  '@awesome.me/webawesome@3.0.0-beta.5':
-    resolution: {integrity: sha512-R71gPf88Zcm3Q7C+P1Y2fiMHixX+BUNkntF+GnTRluD82VQAnNIaBkPZ4BL0zVAxXFw/F1+H0DVdHaeJYtcesg==}
+  '@awesome.me/webawesome@3.0.0':
+    resolution: {integrity: sha512-KLxAiSV9hH+bB8OkpaZUA9zNgBu6G1cXirsE0VWmdS/jtpup1Wf1aC7yGYjPSi/61BVUqk8geA4oylt4oLdmlQ==}
     engines: {node: '>=14.17.0'}
 
   '@babel/code-frame@7.27.1':
@@ -2241,9 +2241,6 @@ packages:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
 
-  style-observer@0.0.7:
-    resolution: {integrity: sha512-t75H3CRy+vd5q3yqyrf/De4tkz33hPQTiCcfh0NTesI5G7kJnZ227LEYTwqjKTtaFOCJvqZcYFHpJlF8bsk3bQ==}
-
   supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
@@ -2497,7 +2494,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.12
       '@jridgewell/trace-mapping': 0.3.29
 
-  '@awesome.me/webawesome@3.0.0-beta.5(@floating-ui/utils@0.2.10)(@types/react@19.1.9)':
+  '@awesome.me/webawesome@3.0.0(@floating-ui/utils@0.2.10)(@types/react@19.1.9)':
     dependencies:
       '@ctrl/tinycolor': 4.1.0
       '@floating-ui/dom': 1.7.3
@@ -2508,7 +2505,6 @@ snapshots:
       lit: 3.3.1
       nanoid: 5.1.5
       qr-creator: 1.0.0
-      style-observer: 0.0.7
     transitivePeerDependencies:
       - '@floating-ui/utils'
       - '@types/react'
@@ -4433,8 +4429,6 @@ snapshots:
       ansi-regex: 6.1.0
 
   strip-json-comments@3.1.1: {}
-
-  style-observer@0.0.7: {}
 
   supports-color@7.2.0:
     dependencies:
