@@ -49,14 +49,14 @@ wa-checkbox {
   display: block;
 }
 
-wa-input:user-invalid::part(input),
-wa-select:user-invalid::part(form-control-input),
-wa-checkbox:user-invalid::part(control) {
+wa-input:state(user-invalid)::part(input),
+wa-select:state(user-invalid)::part(form-control-input),
+wa-checkbox:state(user-invalid)::part(control) {
   border-color: var(--wa-color-danger-border-loud);
 }
 
-:user-invalid::part(label),
-:user-invalid::part(hint) {
+:state(user-invalid)::part(label),
+:state(user-invalid)::part(hint) {
   color: var(--wa-color-danger-fill-loud);
 }
 
