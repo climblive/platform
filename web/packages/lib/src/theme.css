@@ -49,7 +49,7 @@ wa-checkbox {
   display: block;
 }
 
-wa-input:state(user-invalid)::part(input),
+wa-input:state(user-invalid)::part(base),
 wa-select:state(user-invalid)::part(form-control-input),
 wa-checkbox:state(user-invalid)::part(control) {
   border-color: var(--wa-color-danger-border-loud);
