@@ -50,7 +50,7 @@ wa-checkbox {
 }
 
 wa-input:state(user-invalid)::part(base),
-wa-select:state(user-invalid)::part(form-control-input),
+wa-select:state(user-invalid)::part(combobox),
 wa-checkbox:state(user-invalid)::part(control) {
   border-color: var(--wa-color-danger-border-loud);
 }
