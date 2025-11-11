@@ -30,27 +30,30 @@
     organizerId === undefined ? $allContestsQuery.data : $contestsQuery.data,
   );
 
-  const [drafts, ongoing, upcoming, past] = $derived.by(() => {
+  const [ongoing, upcoming, past] = $derived.by(() => {
     const now = new Date();
 
-    const drafts = contests?.filter(({ timeBegin }) => {
-      return !timeBegin;
-    });
+    const ongoing: Contest[] = [];
+    const upcoming: Contest[] = [];
+    const past: Contest[] = [];
 
-    const ongoing = contests?.filter(({ timeBegin, timeEnd }) => {
-      return timeBegin && timeEnd && now >= timeBegin && now < timeEnd;
-    });
+    contests?.forEach((contest) => {
+      const { timeBegin, timeEnd } = contest;
 
-    const upcoming = contests?.filter(({ timeBegin }) => {
-      return timeBegin && timeBegin > now;
-    });
+      if (!timeBegin) {
+        return;
+      }
 
-    const past = contests?.filter(({ timeEnd }) => {
-      return timeEnd && now > timeEnd;
+      if (timeBegin && timeEnd && now >= timeBegin && now < timeEnd) {
+        ongoing.push(contest);
+      } else if (timeEnd && now > timeEnd) {
+        past.push(contest);
+      } else {
+        upcoming.push(contest);
+      }
     });
 
     return [
-      drafts,
       ongoing?.sort(sortContests),
       upcoming?.sort(sortContests),
       past?.sort(sortContests),
@@ -119,13 +122,9 @@
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
 {/snippet}
 
-{#if !drafts || !ongoing || !upcoming || !past}
+{#if !ongoing || !upcoming || !past}
   <Loader />
 {:else}
-  {#if drafts?.length}
-    {@render listing("Drafts", drafts)}
-  {/if}
-
   {#if ongoing?.length}
     {@render listing("Ongoing", ongoing)}
   {/if}
