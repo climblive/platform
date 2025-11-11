@@ -52,7 +52,7 @@
     return [
       drafts,
       ongoing?.sort(sortContests),
-      upcoming?.sort(sortContests),
+      upcoming?.sort(sortContests).reverse(),
       past?.sort(sortContests),
     ];
   });
