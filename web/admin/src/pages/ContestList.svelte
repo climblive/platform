@@ -40,10 +40,6 @@
     contests?.forEach((contest) => {
       const { timeBegin, timeEnd } = contest;
 
-      if (!timeBegin) {
-        return;
-      }
-
       if (timeBegin && timeEnd && now >= timeBegin && now < timeEnd) {
         ongoing.push(contest);
       } else if (timeEnd && now > timeEnd) {
@@ -53,11 +49,11 @@
       }
     });
 
-    return [
-      ongoing?.sort(sortContests),
-      upcoming?.sort(sortContests),
-      past?.sort(sortContests),
-    ];
+    ongoing?.sort(sortContests);
+    upcoming?.sort(sortContests);
+    past?.sort(sortContests);
+
+    return [ongoing, upcoming, past];
   });
 
   const sortContests = (c1: Contest, c2: Contest) => {
