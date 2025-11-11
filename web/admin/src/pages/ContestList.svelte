@@ -2,6 +2,7 @@
   import Loader from "@/components/Loader.svelte";
   import RelativeTime from "@/components/RelativeTime.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/tag/tag.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { Contest } from "@climblive/lib/models";
   import {
@@ -97,12 +98,20 @@
     {:else}
       <RelativeTime time={timeBegin} />
     {/if}
+  {:else}
+    <wa-tag size="small" variant="warning" appearance="filled-outlined" pill
+      >TBD</wa-tag
+    >
   {/if}
 {/snippet}
 
 {#snippet renderTimeEnd({ timeEnd }: Contest)}
   {#if timeEnd}
     {format(timeEnd, "yyyy-MM-dd HH:mm")}
+  {:else}
+    <wa-tag size="small" variant="warning" appearance="filled-outlined" pill
+      >TBD</wa-tag
+    >
   {/if}
 {/snippet}
 
