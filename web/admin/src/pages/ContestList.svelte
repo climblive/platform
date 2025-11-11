@@ -99,9 +99,7 @@
       <RelativeTime time={timeBegin} />
     {/if}
   {:else}
-    <wa-tag size="small" variant="warning" appearance="filled-outlined" pill
-      >TBD</wa-tag
-    >
+    -
   {/if}
 {/snippet}
 
@@ -109,9 +107,7 @@
   {#if timeEnd}
     {format(timeEnd, "yyyy-MM-dd HH:mm")}
   {:else}
-    <wa-tag size="small" variant="warning" appearance="filled-outlined" pill
-      >TBD</wa-tag
-    >
+    -
   {/if}
 {/snippet}
 
