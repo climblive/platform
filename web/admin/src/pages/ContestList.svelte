@@ -30,31 +30,30 @@
     organizerId === undefined ? $allContestsQuery.data : $contestsQuery.data,
   );
 
-  const [drafts, ongoing, upcoming, past] = $derived.by(() => {
+  const [ongoing, upcoming, past] = $derived.by(() => {
     const now = new Date();
 
-    const drafts = contests?.filter(({ timeBegin }) => {
-      return !timeBegin;
+    const ongoing: Contest[] = [];
+    const upcoming: Contest[] = [];
+    const past: Contest[] = [];
+
+    contests?.forEach((contest) => {
+      const { timeBegin, timeEnd } = contest;
+
+      if (timeBegin && timeEnd && now >= timeBegin && now < timeEnd) {
+        ongoing.push(contest);
+      } else if (timeEnd && now > timeEnd) {
+        past.push(contest);
+      } else {
+        upcoming.push(contest);
+      }
     });
 
-    const ongoing = contests?.filter(({ timeBegin, timeEnd }) => {
-      return timeBegin && timeEnd && now >= timeBegin && now < timeEnd;
-    });
+    ongoing?.sort(sortContests);
+    upcoming?.sort(sortContests);
+    past?.sort(sortContests);
 
-    const upcoming = contests?.filter(({ timeBegin }) => {
-      return timeBegin && timeBegin > now;
-    });
-
-    const past = contests?.filter(({ timeEnd }) => {
-      return timeEnd && now > timeEnd;
-    });
-
-    return [
-      drafts,
-      ongoing?.sort(sortContests),
-      upcoming?.sort(sortContests),
-      past?.sort(sortContests),
-    ];
+    return [ongoing, upcoming, past];
   });
 
   const sortContests = (c1: Contest, c2: Contest) => {
@@ -98,12 +97,16 @@
     {:else}
       <RelativeTime time={timeBegin} />
     {/if}
+  {:else}
+    -
   {/if}
 {/snippet}
 
 {#snippet renderTimeEnd({ timeEnd }: Contest)}
   {#if timeEnd}
     {format(timeEnd, "yyyy-MM-dd HH:mm")}
+  {:else}
+    -
   {/if}
 {/snippet}
 
@@ -119,13 +122,9 @@
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
 {/snippet}
 
-{#if !drafts || !ongoing || !upcoming || !past}
+{#if !ongoing || !upcoming || !past}
   <Loader />
 {:else}
-  {#if drafts?.length}
-    {@render listing("Drafts", drafts)}
-  {/if}
-
   {#if ongoing?.length}
     {@render listing("Ongoing", ongoing)}
   {/if}
