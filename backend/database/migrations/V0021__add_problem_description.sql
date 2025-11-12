@@ -1,0 +1,1 @@
+ALTER TABLE problem ADD description varchar(1024) COLLATE utf8mb4_unicode_ci DEFAULT NULL AFTER name;

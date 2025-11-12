@@ -1,0 +1,30 @@
+ALTER TABLE `raffle_winner` ADD COLUMN `organizer_id` int NOT NULL AFTER `id`;
+ALTER TABLE `problem` ADD COLUMN `organizer_id` int NOT NULL AFTER `id`;
+ALTER TABLE `raffle` ADD COLUMN `organizer_id` int NOT NULL AFTER `id`;
+ALTER TABLE `tick` ADD COLUMN `organizer_id` int NOT NULL AFTER `id`, ADD COLUMN `contest_id` int NOT NULL AFTER `organizer_id`;
+ALTER TABLE `comp_class` ADD COLUMN `organizer_id` int NOT NULL AFTER `id`;
+ALTER TABLE `contender` ADD COLUMN `organizer_id` int NOT NULL AFTER `id`;
+
+UPDATE raffle_winner INNER JOIN contender ON contender.id = contender_id INNER JOIN contest ON contest.id = contender.contest_id SET raffle_winner.organizer_id = contest.organizer_id;
+UPDATE problem INNER JOIN contest ON contest.id = contest_id SET problem.organizer_id = contest.organizer_id;
+UPDATE raffle INNER JOIN contest ON contest.id = contest_id SET raffle.organizer_id = contest.organizer_id;
+UPDATE tick INNER JOIN contender ON contender.id = contender_id INNER JOIN contest ON contest.id = contender.contest_id SET tick.organizer_id = contest.organizer_id, tick.contest_id = contest.id;
+UPDATE comp_class INNER JOIN contest ON contest.id = contest_id SET comp_class.organizer_id = contest.organizer_id;
+UPDATE contender INNER JOIN contest ON contest.id = contender.contest_id SET contender.organizer_id = contest.organizer_id;
+
+ALTER TABLE `raffle_winner` DROP KEY `fk_raffle_winner_1_idx`, ADD KEY `fk_raffle_winner_1_idx` (`raffle_id`,`organizer_id`), DROP KEY `fk_raffle_winner_2_idx`, ADD KEY `fk_raffle_winner_2_idx` (`contender_id`,`organizer_id`), DROP FOREIGN KEY `fk_raffle_winner_1`, DROP FOREIGN KEY `fk_raffle_winner_2`;
+ALTER TABLE `problem` DROP KEY `fk_problem_1_idx`, ADD KEY `fk_problem_1_idx` (`contest_id`,`organizer_id`), ADD KEY `index5` (`id`,`organizer_id`,`contest_id`), DROP FOREIGN KEY `fk_problem_1`;
+ALTER TABLE `location` ADD KEY `index3` (`id`,`organizer_id`);
+ALTER TABLE `raffle` DROP KEY `fk_raffle_1_idx`, ADD KEY `fk_raffle_1_idx` (`contest_id`,`organizer_id`), ADD KEY `index3` (`id`,`organizer_id`), DROP FOREIGN KEY `fk_raffle_1`;
+ALTER TABLE `series` ADD KEY `index3` (`id`,`organizer_id`);
+ALTER TABLE `tick` DROP KEY `fk_tick_1_idx`, ADD KEY `fk_tick_1_idx` (`problem_id`,`organizer_id`,`contest_id`), DROP KEY `fk_tick_2_idx`, ADD KEY `fk_tick_2_idx` (`contender_id`,`organizer_id`,`contest_id`), DROP FOREIGN KEY `fk_tick_1`, DROP FOREIGN KEY `fk_tick_2`;
+ALTER TABLE `comp_class` DROP KEY `index2`, ADD KEY `fk_comp_class_1_idx` (`contest_id`,`organizer_id`), DROP FOREIGN KEY `fk_comp_class_1`;
+ALTER TABLE `contender` DROP KEY `fk_contender_2_idx`, ADD KEY `fk_contender_2_idx` (`contest_id`,`organizer_id`), ADD KEY `index5` (`id`,`organizer_id`,`contest_id`), DROP FOREIGN KEY `fk_contender_2`;
+ALTER TABLE `contest` DROP KEY `fk_contest_1_idx`, ADD KEY `fk_contest_1_idx` (`location_id`,`organizer_id`), DROP KEY `fk_contest_3`, ADD KEY `fk_contest_3` (`series_id`,`organizer_id`), ADD KEY `index5` (`id`,`organizer_id`), DROP FOREIGN KEY `fk_contest_3`, DROP FOREIGN KEY `fk_contest_1`;
+ALTER TABLE `raffle_winner` ADD CONSTRAINT `fk_raffle_winner_1` FOREIGN KEY (`raffle_id`, `organizer_id`) REFERENCES `raffle` (`id`, `organizer_id`), ADD CONSTRAINT `fk_raffle_winner_2` FOREIGN KEY (`contender_id`, `organizer_id`) REFERENCES `contender` (`id`, `organizer_id`);
+ALTER TABLE `problem` ADD CONSTRAINT `fk_problem_1` FOREIGN KEY (`contest_id`, `organizer_id`) REFERENCES `contest` (`id`, `organizer_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `raffle` ADD CONSTRAINT `fk_raffle_1` FOREIGN KEY (`contest_id`, `organizer_id`) REFERENCES `contest` (`id`, `organizer_id`);
+ALTER TABLE `tick` ADD CONSTRAINT `fk_tick_1` FOREIGN KEY (`problem_id`, `organizer_id`, `contest_id`) REFERENCES `problem` (`id`, `organizer_id`, `contest_id`) ON DELETE RESTRICT ON UPDATE RESTRICT, ADD CONSTRAINT `fk_tick_2` FOREIGN KEY (`contender_id`, `organizer_id`, `contest_id`) REFERENCES `contender` (`id`, `organizer_id`, `contest_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `comp_class` ADD CONSTRAINT `fk_comp_class_1` FOREIGN KEY (`contest_id`, `organizer_id`) REFERENCES `contest` (`id`, `organizer_id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `contender` ADD CONSTRAINT `fk_contender_2` FOREIGN KEY (`contest_id`, `organizer_id`) REFERENCES `contest` (`id`, `organizer_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `contest` ADD CONSTRAINT `fk_contest_3` FOREIGN KEY (`series_id`, `organizer_id`) REFERENCES `series` (`id`, `organizer_id`) ON DELETE RESTRICT ON UPDATE RESTRICT, ADD CONSTRAINT `fk_contest_1` FOREIGN KEY (`location_id`, `organizer_id`) REFERENCES `location` (`id`, `organizer_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
