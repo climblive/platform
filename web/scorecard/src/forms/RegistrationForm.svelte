@@ -32,7 +32,7 @@
   let compClassesQuery = $derived(getCompClassesQuery($session.contestId));
 </script>
 
-{#if $compClassesQuery.data}
+{#if compClassesQuery.data}
   <GenericForm schema={registrationFormSchema} {submit}>
     <fieldset>
       <wa-input
@@ -57,7 +57,7 @@
         required
         {@attach value(data.compClassId)}
       >
-        {#each $compClassesQuery.data as compClass (compClass.id)}
+        {#each compClassesQuery.data as compClass (compClass.id)}
           <wa-option
             value={compClass.id}
             disabled={isAfter(new Date(), compClass.timeEnd)}

@@ -31,7 +31,7 @@
   };
 
   const confirmDelete = () => {
-    $deleteProblem.mutate(undefined, {
+    deleteProblem.mutate(undefined, {
       onError: () => toastError("Failed to delete problem."),
     });
   };
@@ -48,7 +48,7 @@
     slot="footer"
     variant="danger"
     onclick={confirmDelete}
-    loading={$deleteProblem.isPending}
+    loading={deleteProblem.isPending}
   >
     Remove
     <wa-icon slot="start" name="trash"></wa-icon>

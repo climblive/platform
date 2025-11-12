@@ -32,7 +32,7 @@
 
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
 
-  const compClasses = $derived($compClassesQuery.data);
+  const compClasses = $derived(compClassesQuery.data);
 
   let filterText = $state<string>();
   let selectedCompClassId: number | undefined = $state();

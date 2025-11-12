@@ -22,10 +22,10 @@
   const contestQuery = $derived(getContestQuery(contestId));
   const patchContest = $derived(patchContestMutation(contestId));
 
-  const contest = $derived($contestQuery.data);
+  const contest = $derived(contestQuery.data);
 
   const handleSubmit = async (tmpl: ContestPatch) => {
-    $patchContest.mutate(
+    patchContest.mutate(
       {
         ...tmpl,
         gracePeriod:
@@ -56,7 +56,7 @@
       <wa-button
         size="small"
         type="submit"
-        loading={$patchContest.isPending}
+        loading={patchContest.isPending}
         variant="neutral"
         >Save
       </wa-button>
