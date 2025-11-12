@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"log"
 	"log/slog"
 	"math/rand"
@@ -24,7 +25,12 @@ import (
 	"github.com/climblive/platform/backend/internal/utils"
 	"github.com/lmittmann/tint"
 	"github.com/mattn/go-isatty"
+
+	"github.com/pressly/goose/v3"
 )
+
+//go:embed database/migrations/*.sql
+var embedMigrations embed.FS
 
 const defaultScoreEngineMaxLifetime = 24 * time.Hour
 
@@ -71,7 +77,7 @@ func main() {
 
 	dbPort, _ := strconv.Atoi(os.Getenv("DB_PORT"))
 
-	repo, err := repository.NewDatabase(
+	database, err := repository.NewDatabase(
 		os.Getenv("DB_USERNAME"),
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_HOST"),
@@ -85,6 +91,16 @@ func main() {
 		panic(err)
 	}
 
+	goose.SetBaseFS(embedMigrations)
+
+	if err := goose.SetDialect("mysql"); err != nil {
+		panic(err)
+	}
+
+	if err := goose.Up(database.Handle, "migrations"); err != nil {
+		panic(err)
+	}
+
 	jwtDecoder, err := authorizer.NewStandardJWTDecoder()
 	if err != nil {
 		if stack := utils.GetErrorStack(err); stack != "" {
@@ -94,21 +110,21 @@ func main() {
 		panic(err)
 	}
 
-	authorizer := authorizer.NewAuthorizer(repo, jwtDecoder)
+	authorizer := authorizer.NewAuthorizer(database, jwtDecoder)
 	eventBroker := events.NewBroker()
-	scoreKeeper := scores.NewScoreKeeper(eventBroker, repo)
-	scoreEngineStoreHydrator := &scores.StandardEngineStoreHydrator{Repo: repo}
+	scoreKeeper := scores.NewScoreKeeper(eventBroker, database)
+	scoreEngineStoreHydrator := &scores.StandardEngineStoreHydrator{Repo: database}
 
 	scoreEngineMaxLifetime := getScoreEngineMaxLifetime()
 	slog.Info("score engine maximum lifetime cap enabled", "max_lifetime", scoreEngineMaxLifetime)
 
-	scoreEngineManager := scores.NewScoreEngineManager(repo, scoreEngineStoreHydrator, eventBroker, scoreEngineMaxLifetime)
+	scoreEngineManager := scores.NewScoreEngineManager(database, scoreEngineStoreHydrator, eventBroker, scoreEngineMaxLifetime)
 
 	barriers = append(barriers,
 		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
 		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()))
 
-	mux := setupMux(repo, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
+	mux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
 
 	httpServer := &http.Server{
 		Addr:    "0.0.0.0:8090",
