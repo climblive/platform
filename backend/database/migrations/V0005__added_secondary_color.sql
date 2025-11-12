@@ -1,3 +1,4 @@
+-- +goose Up
 ALTER TABLE `color`
     CHANGE COLUMN `rgb` `rgb_primary` VARCHAR(7) NOT NULL,
     ADD COLUMN `rgb_secondary` VARCHAR(7) NULL AFTER `rgb_primary`;

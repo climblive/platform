@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE `raffle` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `contest_id` INT NOT NULL,

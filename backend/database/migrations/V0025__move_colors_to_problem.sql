@@ -1,3 +1,4 @@
+-- +goose Up
 ALTER TABLE problem ADD COLUMN `hold_color_primary` VARCHAR(7) NOT NULL AFTER number;
 ALTER TABLE problem ADD COLUMN `hold_color_secondary` VARCHAR(7) NULL DEFAULT NULL AFTER hold_color_primary;
 

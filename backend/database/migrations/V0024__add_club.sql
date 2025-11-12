@@ -1,1 +1,2 @@
+-- +goose Up
 ALTER TABLE contender ADD COLUMN club VARCHAR(128) NULL DEFAULT NULL AFTER name;

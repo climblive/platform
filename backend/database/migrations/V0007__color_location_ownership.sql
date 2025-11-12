@@ -1,3 +1,4 @@
+-- +goose Up
 ALTER TABLE `location`
     ADD COLUMN `organizer_id` INT NOT NULL AFTER `id`;
 

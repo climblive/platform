@@ -1,3 +1,4 @@
+-- +goose Up
 ALTER TABLE `color`
     ADD COLUMN `shared` TINYINT(1) NOT NULL AFTER `rgb_secondary`,
     DROP INDEX `name_UNIQUE`,

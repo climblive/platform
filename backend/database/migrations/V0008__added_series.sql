@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE `series` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `organizer_id` INT NOT NULL,

@@ -1,3 +1,4 @@
+-- +goose Up
 ALTER TABLE `raffle_winner` ADD COLUMN `organizer_id` int NOT NULL AFTER `id`;
 ALTER TABLE `problem` ADD COLUMN `organizer_id` int NOT NULL AFTER `id`;
 ALTER TABLE `raffle` ADD COLUMN `organizer_id` int NOT NULL AFTER `id`;

@@ -1,3 +1,4 @@
+-- +goose Up
 ALTER TABLE `comp_class`
     CHANGE COLUMN `time_begin` `time_begin` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CHANGE COLUMN `time_end` `time_end` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;

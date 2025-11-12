@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE IF NOT EXISTS `location` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(32) NOT NULL,

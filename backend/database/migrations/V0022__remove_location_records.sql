@@ -1,3 +1,4 @@
+-- +goose Up
 ALTER TABLE contest ADD COLUMN `location` varchar(1024) DEFAULT NULL AFTER location_id;
 
 UPDATE contest JOIN location ON contest.location_id = location.id SET location = location.name;
