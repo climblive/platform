@@ -15,6 +15,8 @@ type SeriesID ResourceID
 type UserID ResourceID
 type TickID ResourceID
 
+type OrganizerInviteID = uuid.UUID
+
 type ResourceIDType interface {
 	CompClassID |
 		ContenderID |
