@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE IF NOT EXISTS `score` (
   `contender_id` INT NOT NULL,
   `timestamp` TIMESTAMP NOT NULL,
