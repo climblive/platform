@@ -23,9 +23,9 @@
   const drawRaffleWinner = $derived(drawRaffleWinnerMutation(raffleId));
   const raffleWinnersQuery = $derived(getRaffleWinnersQuery(raffleId));
 
-  const raffle = $derived($raffleQuery.data);
+  const raffle = $derived(raffleQuery.data);
   const sortedRaffleWinners = $derived.by(() => {
-    const winners = [...($raffleWinnersQuery.data ?? [])];
+    const winners = [...(raffleWinnersQuery.data ?? [])];
     winners.sort((a, b) => {
       return b.timestamp.getTime() - a.timestamp.getTime();
     });
@@ -34,7 +34,7 @@
   });
 
   const handleDrawWinner = () => {
-    $drawRaffleWinner.mutate(undefined, {
+    drawRaffleWinner.mutate(undefined, {
       onError: (error) => {
         if (error instanceof AxiosError && error.status === 404) {
           toastError("All winners have been drawn.");

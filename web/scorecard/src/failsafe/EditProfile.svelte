@@ -18,8 +18,8 @@
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
   const patchContender = $derived(patchContenderMutation(contenderId));
 
-  let contender = $derived($contenderQuery.data);
-  let compClasses = $derived($compClassesQuery.data);
+  let contender = $derived(contenderQuery.data);
+  let compClasses = $derived(compClassesQuery.data);
   let selectedCompClass = $derived(
     compClasses?.find(({ id }) => id === contender?.compClassId),
   );
@@ -36,7 +36,7 @@
     const compClassId = formData.get("compClassId")?.toString().trim();
 
     if (name && compClassId) {
-      $patchContender.mutate({
+      patchContender.mutate({
         ...contender,
         name,
         publicName: name,
@@ -66,7 +66,7 @@
         <option value={compClass.id}>{compClass.name}</option>
       {/each}
     </select>
-    <button type="submit" disabled={$patchContender.isPending}
+    <button type="submit" disabled={patchContender.isPending}
       >{contender.entered ? "Update" : "Register"}</button
     >
   </form>

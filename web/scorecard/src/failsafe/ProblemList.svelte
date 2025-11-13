@@ -17,12 +17,12 @@
   const ticksQuery = $derived(getTicksByContenderQuery(contenderId));
 
   let problems = $derived(
-    $problemsQuery.data
-      ? [...$problemsQuery.data]?.sort((a, b) => a.number - b.number)
+    problemsQuery.data
+      ? [...problemsQuery.data]?.sort((a, b) => a.number - b.number)
       : undefined,
   );
   let ticksByProblem = $derived<Map<number, Tick>>(
-    new Map($ticksQuery.data?.map((tick) => [tick.problemId, tick]) ?? []),
+    new Map(ticksQuery.data?.map((tick) => [tick.problemId, tick]) ?? []),
   );
 </script>
 

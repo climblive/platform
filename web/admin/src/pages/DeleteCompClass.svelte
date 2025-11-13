@@ -31,7 +31,7 @@
   };
 
   const confirmDelete = () => {
-    $deleteCompClass.mutate(undefined, {
+    deleteCompClass.mutate(undefined, {
       onError: () => toastError("Failed to delete comp class."),
     });
   };
@@ -48,7 +48,7 @@
     slot="footer"
     variant="danger"
     onclick={confirmDelete}
-    loading={$deleteCompClass.isPending}
+    loading={deleteCompClass.isPending}
   >
     Remove
     <wa-icon slot="start" name="trash"></wa-icon>
