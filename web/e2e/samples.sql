@@ -14,3 +14,14 @@ INSERT INTO problem VALUES (NULL, 1, 1, 3, '#84cc16', NULL, NULL, NULL, 300, 10)
 INSERT INTO problem VALUES (NULL, 1, 1, 4, '#0ea5e9', NULL, NULL, NULL, 400, 10);
 INSERT INTO problem VALUES (NULL, 1, 1, 5, '#8b5cf6', NULL, NULL, NULL, 500, NULL);
 INSERT INTO tick VALUES (NULL, 1, 1, 1, 1, FALSE, '2024-01-01 00:00:00');
+
+CREATE TABLE `goose_db_version` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `version_id` bigint(20) NOT NULL,
+  `is_applied` tinyint(1) NOT NULL,
+  `tstamp` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO goose_db_version SELECT NULL, seq, 1, NOW() FROM seq_1_to_27;
+
