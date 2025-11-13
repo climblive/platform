@@ -27,7 +27,7 @@
   );
 
   const contests = $derived(
-    organizerId === undefined ? $allContestsQuery.data : $contestsQuery.data,
+    organizerId === undefined ? allContestsQuery.data : contestsQuery.data,
   );
 
   const [ongoing, upcoming, past] = $derived.by(() => {

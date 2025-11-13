@@ -18,11 +18,11 @@
   const createContest = $derived(createContestMutation(organizerId));
 
   const handleSubmit = (form: ContestTemplate) => {
-    if ($createContest.isPending) {
+    if (createContest.isPending) {
       return;
     }
 
-    $createContest.mutate(
+    createContest.mutate(
       {
         ...form,
         gracePeriod: form.gracePeriod * minuteInNanoseconds,
@@ -56,7 +56,7 @@
     <wa-button
       size="small"
       type="submit"
-      loading={$createContest.isPending}
+      loading={createContest.isPending}
       variant="neutral"
       appearance="accent"
       >Create

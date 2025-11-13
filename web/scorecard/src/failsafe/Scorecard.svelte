@@ -12,7 +12,7 @@
 
   const contenderQuery = $derived(getContenderQuery(contenderId));
 
-  const contender = $derived($contenderQuery.data);
+  const contender = $derived(contenderQuery.data);
 </script>
 
 <h2>Profile</h2>

@@ -30,7 +30,7 @@
   };
 
   const confirmDuplication = () => {
-    $duplicateContest.mutate(undefined, {
+    duplicateContest.mutate(undefined, {
       onSuccess: (duplicate) => {
         handleCancel();
         navigate(`/admin/contests/${duplicate.id}`);
@@ -59,7 +59,7 @@
     slot="footer"
     variant="warning"
     onclick={confirmDuplication}
-    loading={$duplicateContest.isPending}
+    loading={duplicateContest.isPending}
   >
     Duplicate
     <wa-icon slot="start" name="copy"></wa-icon>

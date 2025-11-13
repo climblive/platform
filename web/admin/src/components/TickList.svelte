@@ -24,9 +24,9 @@
   const ticksQuery = $derived(getTicksByContenderQuery(contenderId));
 
   const problems = $derived(
-    new Map($problemsQuery.data?.map((problem) => [problem.id, problem]) ?? []),
+    new Map(problemsQuery.data?.map((problem) => [problem.id, problem]) ?? []),
   );
-  const ticks = $derived($ticksQuery.data);
+  const ticks = $derived(ticksQuery.data);
 
   type TickAndProblem = { tick: Tick; problem: Problem };
 

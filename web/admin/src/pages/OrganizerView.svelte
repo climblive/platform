@@ -22,7 +22,7 @@
   let showAllToggle: WaSwitch | undefined = $state();
 
   const selfQuery = $derived(getSelfQuery());
-  const self = $derived($selfQuery.data);
+  const self = $derived(selfQuery.data);
 
   let select: WaSelect | undefined = $state();
 
