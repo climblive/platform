@@ -848,7 +848,7 @@ func TestPatchContender(t *testing.T) {
 		mockedEventBroker.AssertCalled(t, "Dispatch", fakedContestID, domain.ContenderPublicInfoUpdatedEvent{
 			ContenderID:         fakedContenderID,
 			CompClassID:         fakedCompClassID,
-			Name:                "John",
+			Name:                "John Doe",
 			ClubName:            "Testers' Climbing Club",
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
@@ -1024,7 +1024,7 @@ func TestPatchContender(t *testing.T) {
 		mockedEventBroker.AssertCalled(t, "Dispatch", fakedContestID, domain.ContenderPublicInfoUpdatedEvent{
 			ContenderID:         fakedContenderID,
 			CompClassID:         fakedOtherCompClass.ID,
-			Name:                "Jane",
+			Name:                "Jane Doe",
 			ClubName:            "Space Climbers",
 			WithdrawnFromFinals: true,
 			Disqualified:        true,
