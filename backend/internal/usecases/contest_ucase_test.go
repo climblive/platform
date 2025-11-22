@@ -56,7 +56,7 @@ func TestGetScoreboard(t *testing.T) {
 		fakedContender := domain.Contender{
 			ID:                  contenderID,
 			CompClassID:         fakedCompClassID,
-			PublicName:          fmt.Sprintf("Climber %d", i),
+			Name:                fmt.Sprintf("Climber %d", i),
 			ClubName:            "Testers' Climbing Club",
 			WithdrawnFromFinals: true,
 			Disqualified:        true,
@@ -103,7 +103,7 @@ func TestGetScoreboard(t *testing.T) {
 
 	assert.Equal(t, domain.ContenderID(1), scoreboard[0].ContenderID)
 	assert.Equal(t, fakedCompClassID, scoreboard[0].CompClassID)
-	assert.Equal(t, "Climber 1", scoreboard[0].PublicName)
+	assert.Equal(t, "Climber 1", scoreboard[0].Name)
 	assert.Equal(t, "Testers' Climbing Club", scoreboard[0].ClubName)
 	assert.Equal(t, true, scoreboard[0].WithdrawnFromFinals)
 	assert.Equal(t, true, scoreboard[0].Disqualified)
@@ -119,7 +119,7 @@ func TestGetScoreboard(t *testing.T) {
 
 		assert.Equal(t, domain.ContenderID(i), entry.ContenderID)
 		assert.Equal(t, fakedCompClassID, entry.CompClassID)
-		assert.Equal(t, fmt.Sprintf("Climber %d", i), entry.PublicName)
+		assert.Equal(t, fmt.Sprintf("Climber %d", i), entry.Name)
 		assert.Equal(t, "Testers' Climbing Club", entry.ClubName)
 		assert.Equal(t, true, entry.WithdrawnFromFinals)
 		assert.Equal(t, true, entry.Disqualified)

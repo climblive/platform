@@ -14,17 +14,8 @@ export type RaffleWinnerID = ResourceID;
 export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
-export type ResourceIDType =
-  | CompClassID
-  | ContenderID
-  | ContestID
-  | OrganizerID
-  | ProblemID
-  | RaffleID
-  | RaffleWinnerID
-  | SeriesID
-  | UserID
-  | TickID;
+export type ResourceIDType = 
+    CompClassID | ContenderID | ContestID | OrganizerID | ProblemID | RaffleID | RaffleWinnerID | SeriesID | UserID | TickID;
 export type ScoreEngineInstanceID = string;
 
 //////////
@@ -60,7 +51,6 @@ export interface Contender {
   compClassId?: CompClassID;
   registrationCode: string;
   name?: string;
-  publicName?: string;
   clubName?: string;
   entered?: Date;
   withdrawnFromFinals: boolean;
@@ -70,7 +60,6 @@ export interface Contender {
 export interface ContenderPatch {
   compClassId?: CompClassID;
   name?: string;
-  publicName?: string;
   clubName?: string;
   withdrawnFromFinals?: boolean;
   disqualified?: boolean;
@@ -168,7 +157,7 @@ export interface Series {
 export interface ScoreboardEntry {
   contenderId: ContenderID;
   compClassId: CompClassID;
-  publicName: string;
+  name: string;
   clubName?: string;
   withdrawnFromFinals: boolean;
   disqualified: boolean;
@@ -242,7 +231,7 @@ export interface ProblemDeletedEvent {
 export interface ContenderPublicInfoUpdatedEvent {
   contenderId: ContenderID;
   compClassId: CompClassID;
-  publicName: string;
+  name: string;
   clubName?: string;
   withdrawnFromFinals: boolean;
   disqualified: boolean;
