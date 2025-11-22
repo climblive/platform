@@ -8,7 +8,6 @@ export const contenderSchema: z.ZodType<Contender> = z.object({
   compClassId: z.number().optional(),
   registrationCode: z.string(),
   name: z.string().optional(),
-  publicName: z.string().optional(),
   clubName: z.string().optional(),
   entered: z.coerce.date().optional(),
   withdrawnFromFinals: z.boolean(),

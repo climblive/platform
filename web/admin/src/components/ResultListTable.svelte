@@ -71,9 +71,7 @@
     if (filterText) {
       const search = filterText.toLowerCase();
 
-      scores = scores.filter(({ publicName }) =>
-        publicName.toLowerCase().includes(search),
-      );
+      scores = scores.filter(({ name }) => name.toLowerCase().includes(search));
     }
 
     scores.sort(
@@ -115,16 +113,12 @@
   ];
 </script>
 
-{#snippet renderName({
-  contenderId,
-  publicName,
-  disqualified,
-}: ScoreboardEntry)}
+{#snippet renderName({ contenderId, name, disqualified }: ScoreboardEntry)}
   <Link to={`./contenders/${contenderId}`}>
     {#if disqualified}
-      <del>{publicName}</del>
+      <del>{name}</del>
     {:else}
-      {publicName}
+      {name}
     {/if}
   </Link>
 {/snippet}

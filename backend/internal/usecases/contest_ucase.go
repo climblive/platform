@@ -96,7 +96,7 @@ func (uc *ContestUseCase) GetScoreboard(ctx context.Context, contestID domain.Co
 		entry := domain.ScoreboardEntry{
 			ContenderID:         contender.ID,
 			CompClassID:         contender.CompClassID,
-			PublicName:          contender.PublicName,
+			Name:                contender.Name,
 			ClubName:            contender.ClubName,
 			WithdrawnFromFinals: contender.WithdrawnFromFinals,
 			Disqualified:        contender.Disqualified,

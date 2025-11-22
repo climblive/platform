@@ -116,7 +116,6 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 		patch.Name = domain.NewPatch(fmt.Sprintf("%s %s (%d)", faker.FirstNameFemale(), faker.LastName(), r.contender.ID))
 	}
 
-	patch.PublicName = domain.NewPatch(patch.Name.Value)
 	patch.CompClassID = domain.NewPatch(selectedCompClass.ID)
 	patch.ClubName = domain.NewPatch(faker.ChineseName())
 

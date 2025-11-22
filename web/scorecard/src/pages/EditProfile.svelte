@@ -32,7 +32,6 @@
     patchContender.mutate(
       {
         ...form,
-        publicName: form.name,
       },
       {
         onSuccess: gotoScorecard,

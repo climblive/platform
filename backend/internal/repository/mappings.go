@@ -19,7 +19,6 @@ func contenderToDomain(record database.GetContenderRow) domain.Contender {
 		CompClassID:         domain.CompClassID(record.Contender.ClassID.Int32),
 		RegistrationCode:    record.Contender.RegistrationCode,
 		Name:                record.Contender.Name.String,
-		PublicName:          record.Contender.Name.String,
 		ClubName:            record.Contender.Club.String,
 		Entered:             record.Contender.Entered.Time,
 		WithdrawnFromFinals: record.Contender.WithdrawnFromFinals,

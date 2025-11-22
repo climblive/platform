@@ -248,7 +248,7 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 			}
 
 			err = book.SetSheetRow(sheetName, fmt.Sprintf("A%d", counter), &[]any{
-				entry.PublicName,
+				entry.Name,
 				entry.ClubName,
 				entry.Score.Score,
 				entry.Score.Placement})
