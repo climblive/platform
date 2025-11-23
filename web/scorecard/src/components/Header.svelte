@@ -9,7 +9,6 @@
     contestName: string;
     compClassName: string | undefined;
     contenderName: string | undefined;
-    contenderClub: string | undefined;
     score: number;
     placement: number | undefined;
     contestState: ContestState;
@@ -22,7 +21,6 @@
     contestName,
     compClassName,
     contenderName,
-    contenderClub,
     score,
     placement,
     contestState,
@@ -44,7 +42,6 @@
   <p class="contender-name">
     {contenderName} <span class="contender-class">{compClassName}</span>
   </p>
-  <p class="contender-club">{contenderClub ?? "No club"}</p>
   <div class="lower">
     <div class="score">
       <span>
@@ -86,8 +83,7 @@
     }
 
     & h1,
-    & .contender-name,
-    & .contender-club {
+    & .contender-name {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -100,14 +96,9 @@
       line-height: var(--wa-line-height-condensed);
     }
 
-    & .contender-name,
-    & .contender-club {
+    & .contender-name {
       margin: 0;
       line-height: var(--wa-line-height-condensed);
-    }
-
-    & .contender-club {
-      font-size: var(--wa-font-size-xs);
     }
 
     & .contender-class {

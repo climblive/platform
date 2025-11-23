@@ -227,7 +227,7 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 				return err
 			}
 
-			err = book.SetSheetRow(sheetName, "A1", &[]string{"Name", "Club", "Score", "Placement"})
+			err = book.SetSheetRow(sheetName, "A1", &[]string{"Name", "Score", "Placement"})
 			if err != nil {
 				return err
 			}
