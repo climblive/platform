@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import ProblemForm, { formSchema } from "@/forms/ProblemForm.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { ProblemTemplate } from "@climblive/lib/models";
@@ -18,11 +19,11 @@
   const problemsQuery = $derived(getProblemsQuery(contestId));
 
   let highestProblemNumber = $derived.by(() => {
-    if ($problemsQuery.data === undefined) {
+    if (problemsQuery.data === undefined) {
       return undefined;
-    } else if ($problemsQuery.data.length > 0) {
+    } else if (problemsQuery.data.length > 0) {
       return Math.max(
-        ...($problemsQuery.data?.map(({ number }) => number) ?? []),
+        ...(problemsQuery.data?.map(({ number }) => number) ?? []),
       );
     } else {
       return 0;
@@ -32,7 +33,7 @@
   const createProblem = $derived(createProblemMutation(contestId));
 
   const handleSubmit = async (tmpl: Omit<ProblemTemplate, "pointsZone">) => {
-    $createProblem.mutate(
+    createProblem.mutate(
       { ...tmpl, pointsZone: 0 },
       {
         onSuccess: () => navigate(`/admin/contests/${contestId}#problems`),
@@ -42,7 +43,9 @@
   };
 </script>
 
-{#if highestProblemNumber !== undefined}
+{#if highestProblemNumber === undefined}
+  <Loader />
+{:else}
   <ProblemForm
     submit={handleSubmit}
     data={{
@@ -58,15 +61,23 @@
         size="small"
         type="button"
         appearance="plain"
-        onclick={history.back()}>Cancel</wa-button
+        onclick={() => navigate(`/admin/contests/${contestId}#problems`)}
+        >Cancel</wa-button
       >
       <wa-button
         size="small"
         type="submit"
-        loading={$createProblem.isPending}
-        variant="brand"
+        loading={createProblem.isPending}
+        variant="neutral"
         >Create
       </wa-button>
     </div>
   </ProblemForm>
 {/if}
+
+<style>
+  .controls {
+    display: flex;
+    gap: var(--wa-space-xs);
+  }
+</style>

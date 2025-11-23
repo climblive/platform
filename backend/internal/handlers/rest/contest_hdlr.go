@@ -13,6 +13,7 @@ import (
 
 type contestUseCase interface {
 	GetContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error)
+	GetAllContests(ctx context.Context) ([]domain.Contest, error)
 	GetContestsByOrganizer(ctx context.Context, organizerID domain.OrganizerID) ([]domain.Contest, error)
 	GetScoreboard(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreboardEntry, error)
 	PatchContest(ctx context.Context, contestID domain.ContestID, patch domain.ContestPatch) (domain.Contest, error)
@@ -32,6 +33,7 @@ func InstallContestHandler(mux *Mux, contestUseCase contestUseCase, compClassUse
 	}
 
 	mux.HandleFunc("GET /contests/{contestID}", handler.GetContest)
+	mux.HandleFunc("GET /contests", handler.GetAllContests)
 	mux.HandleFunc("GET /contests/{contestID}/scoreboard", handler.GetScoreboard)
 	mux.HandleFunc("GET /organizers/{organizerID}/contests", handler.GetContestsByOrganizer)
 	mux.HandleFunc("POST /organizers/{organizerID}/contests", handler.CreateContest)
@@ -54,6 +56,16 @@ func (hdlr *contestHandler) GetContest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeResponse(w, http.StatusOK, contest)
+}
+
+func (hdlr *contestHandler) GetAllContests(w http.ResponseWriter, r *http.Request) {
+	contests, err := hdlr.contestUseCase.GetAllContests(r.Context())
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusOK, contests)
 }
 
 func (hdlr *contestHandler) GetScoreboard(w http.ResponseWriter, r *http.Request) {
@@ -236,7 +248,7 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 			}
 
 			err = book.SetSheetRow(sheetName, fmt.Sprintf("A%d", counter), &[]any{
-				entry.PublicName,
+				entry.Name,
 				entry.ClubName,
 				entry.Score.Score,
 				entry.Score.Placement})

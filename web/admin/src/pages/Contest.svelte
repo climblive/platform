@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
@@ -27,16 +28,48 @@
   let { contestId }: Props = $props();
 
   let tabGroup: WaTabGroup | undefined = $state();
+  let problemsHeading: HTMLHeadingElement | undefined = $state();
+  let compClassesHeading: HTMLHeadingElement | undefined = $state();
 
   const contestQuery = $derived(getContestQuery(contestId));
 
-  let contest = $derived($contestQuery.data);
+  let contest = $derived(contestQuery.data);
 
   $effect(() => {
     const hash = window.location.hash.substring(1);
 
     if (tabGroup) {
-      setTimeout(() => tabGroup?.setAttribute("active", hash));
+      if (["results", "raffles"].includes(hash)) {
+        setTimeout(() => tabGroup?.setAttribute("active", hash));
+      }
+
+      let scrollElement: HTMLElement | undefined;
+
+      switch (hash) {
+        case "problems":
+          scrollElement = problemsHeading;
+          break;
+        case "comp-classes":
+          scrollElement = compClassesHeading;
+          break;
+      }
+
+      if (scrollElement === undefined) {
+        return;
+      }
+
+      const cb = () =>
+        scrollElement.scrollIntoView({
+          behavior: "instant",
+          block: "start",
+          inline: "nearest",
+        });
+
+      if (window.requestIdleCallback !== undefined) {
+        requestIdleCallback(cb);
+      } else {
+        setTimeout(cb, 250);
+      }
     }
   });
 
@@ -49,7 +82,9 @@
 </script>
 
 <main>
-  {#if contest}
+  {#if contest === undefined}
+    <Loader />
+  {:else}
     <wa-button
       appearance="plain"
       onclick={() =>
@@ -61,7 +96,6 @@
 
     <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleTabShow}>
       <wa-tab slot="nav" panel="contest">Contest</wa-tab>
-      <wa-tab slot="nav" panel="problems">Problems</wa-tab>
       <wa-tab slot="nav" panel="results">Results</wa-tab>
       <wa-tab slot="nav" panel="raffles">Raffles</wa-tab>
 
@@ -101,7 +135,7 @@
           {/if}
         </article>
 
-        <h2>Classes</h2>
+        <h2 bind:this={compClassesHeading}>Classes</h2>
         <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
         ></wa-divider>
         <CompClassList {contestId} />
@@ -111,21 +145,15 @@
         ></wa-divider>
         <TicketList {contestId} />
 
-        <h2>Problems</h2>
+        <h2 bind:this={problemsHeading}>Problems</h2>
         <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
         ></wa-divider>
-        <p>
-          Problems are created and managed under the <a
-            href="#problems"
-            onclick={(e: MouseEvent) => {
-              if (tabGroup) {
-                tabGroup.active = "problems";
-              }
-
-              e.preventDefault();
-            }}>Problems</a
-          > tab.
-        </p>
+        <ProblemList
+          {contestId}
+          tableLimit={window.location.hash.substring(1) === "problems"
+            ? undefined
+            : 8}
+        />
 
         <h2>Advanced</h2>
         <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
@@ -139,11 +167,6 @@
         </p>
 
         <ScoreEngine {contestId} />
-      </wa-tab-panel>
-
-      <wa-tab-panel name="problems">
-        <h2>Problems</h2>
-        <ProblemList {contestId} />
       </wa-tab-panel>
 
       <wa-tab-panel name="results">

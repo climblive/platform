@@ -94,6 +94,12 @@ LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 WHERE contest.id = ?
 GROUP BY contest.id;
 
+-- name: GetAllContests :many
+SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+FROM contest
+LEFT JOIN comp_class cc ON cc.contest_id = contest.id
+GROUP BY contest.id;
+
 -- name: UpsertContest :execlastid
 INSERT INTO 
 	contest (id, organizer_id, series_id, name, description, location, final_enabled, qualifying_problems, finalists, rules, grace_period)

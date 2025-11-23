@@ -84,7 +84,7 @@
       required
       placeholder="ABCD1234"
       label="Registration code"
-      hint="Input your 8 digit registration code"
+      hint="Input your 8 digit registration code."
       name="code"
       type="text"
       minlength="8"
@@ -98,7 +98,7 @@
         The registration code is not valid.
       </wa-callout>
     {/if}
-    <wa-button variant="brand" type="submit" loading={loadingContender}>
+    <wa-button variant="neutral" type="submit" loading={loadingContender}>
       <wa-icon slot="start" name="arrow-right-to-bracket"></wa-icon>
       Enter
     </wa-button>
@@ -134,9 +134,9 @@
     </section>
   {/each}
   <footer>
-    <p class="logo">
+    <div class="logo">
       <FullLogo />
-    </p>
+    </div>
   </footer>
 </main>
 
@@ -207,5 +207,10 @@
 
   .restoredSession:not(:last-of-type) {
     margin-bottom: var(--wa-space-s);
+  }
+
+  wa-input::part(base) {
+    text-transform: uppercase;
+    letter-spacing: 0.25rem;
   }
 </style>

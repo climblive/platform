@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import {
     getContestQuery,
     getScoreEnginesQuery,
@@ -18,8 +19,8 @@
   const startScoreEngine = $derived(startScoreEngineMutation(contestId));
   const stopScoreEngine = $derived(stopScoreEngineMutation());
 
-  let contest = $derived($contestQuery.data);
-  let scoreEngines = $derived($scoreEnginesQuery.data);
+  let contest = $derived(contestQuery.data);
+  let scoreEngines = $derived(scoreEnginesQuery.data);
 
   const startPossible = $derived(
     contest?.timeBegin &&
@@ -35,13 +36,15 @@
 </wa-callout>
 <br />
 
-{#if scoreEngines}
+{#if scoreEngines === undefined}
+  <Loader />
+{:else}
   {#each scoreEngines as engineInstanceId (engineInstanceId)}
     <wa-button
       appearance="outlined"
       variant="warning"
-      onclick={() => $stopScoreEngine.mutate(engineInstanceId)}
-      loading={$stopScoreEngine.isPending}
+      onclick={() => stopScoreEngine.mutate(engineInstanceId)}
+      loading={stopScoreEngine.isPending}
       >Stop engine
       <wa-icon name="stop" slot="start"></wa-icon>
     </wa-button>
@@ -51,10 +54,10 @@
       appearance="outlined"
       variant="warning"
       onclick={() =>
-        $startScoreEngine.mutate({
+        startScoreEngine.mutate({
           terminatedBy: add(new Date(), { hours: 6 }),
         })}
-      loading={$startScoreEngine.isPending}
+      loading={startScoreEngine.isPending}
       disabled={!startPossible}
       >Start engine manually
       <wa-icon name="play" slot="start"></wa-icon>

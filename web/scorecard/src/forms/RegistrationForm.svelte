@@ -32,7 +32,7 @@
   let compClassesQuery = $derived(getCompClassesQuery($session.contestId));
 </script>
 
-{#if $compClassesQuery.data}
+{#if compClassesQuery.data}
   <GenericForm schema={registrationFormSchema} {submit}>
     <fieldset>
       <wa-input
@@ -57,7 +57,7 @@
         required
         {@attach value(data.compClassId)}
       >
-        {#each $compClassesQuery.data as compClass (compClass.id)}
+        {#each compClassesQuery.data as compClass (compClass.id)}
           <wa-option
             value={compClass.id}
             disabled={isAfter(new Date(), compClass.timeEnd)}
@@ -68,7 +68,7 @@
       <wa-switch
         size="small"
         {@attach name("withdrawnFromFinals")}
-        hint="If you end up in the finals, you'll give up your spot."
+        hint="If you do not wish to participate in the finals, you can give up your spot."
         {@attach checked(data.withdrawnFromFinals)}>Opt out of finals</wa-switch
       >
       {@render children?.()}

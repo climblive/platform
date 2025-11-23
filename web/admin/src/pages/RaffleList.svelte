@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { Raffle } from "@climblive/lib/models";
@@ -18,10 +19,10 @@
   const rafflesQuery = $derived(getRafflesQuery(contestId));
   const createRaffle = $derived(createRaffleMutation(contestId));
 
-  let raffles = $derived($rafflesQuery.data);
+  let raffles = $derived(rafflesQuery.data);
 
   const handleCreateRaffle = () => {
-    $createRaffle.mutate(undefined, {
+    createRaffle.mutate(undefined, {
       onSuccess: (raffle: Raffle) => navigate(`/admin/raffles/${raffle.id}`),
       onError: () => toastError("Failed to create raffle."),
     });
@@ -41,11 +42,13 @@
 {/snippet}
 
 <section>
-  <wa-button variant="brand" appearance="accent" onclick={handleCreateRaffle}
-    >Create</wa-button
+  <wa-button variant="neutral" appearance="accent" onclick={handleCreateRaffle}
+    >Start new raffle</wa-button
   >
 
-  {#if raffles?.length}
+  {#if raffles === undefined}
+    <Loader />
+  {:else if raffles.length > 0}
     <Table {columns} data={raffles} getId={({ id }) => id}></Table>
   {/if}
 </section>

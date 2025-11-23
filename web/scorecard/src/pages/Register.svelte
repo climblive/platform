@@ -6,6 +6,7 @@
   import type { ContenderPatch } from "@climblive/lib/models";
   import {
     getContenderQuery,
+    getContestQuery,
     patchContenderMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
@@ -17,23 +18,24 @@
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
   const contenderQuery = $derived(getContenderQuery($session.contenderId));
+  const contestQuery = $derived(getContestQuery($session.contestId));
   const patchContender = $derived(patchContenderMutation($session.contenderId));
 
-  let contender = $derived($contenderQuery.data);
+  const contender = $derived(contenderQuery.data);
+  const contest = $derived(contestQuery.data);
 
   const gotoScorecard = () => {
     navigate(`/${contender?.registrationCode}`, { replace: true });
   };
 
   const handleSubmit = (form: ContenderPatch) => {
-    if (!contender || $patchContender.isPending) {
+    if (!contender || patchContender.isPending) {
       return;
     }
 
-    $patchContender.mutate(
+    patchContender.mutate(
       {
         ...form,
-        publicName: form.name,
       },
       {
         onSuccess: gotoScorecard,
@@ -43,9 +45,10 @@
   };
 </script>
 
-{#if !contender}
+{#if !contender || !contest}
   <Loading />
 {:else}
+  <h1>{contest.name}</h1>
   <RegistrationForm
     submit={handleSubmit}
     data={{
@@ -58,10 +61,18 @@
     <wa-button
       size="small"
       type="submit"
-      loading={$patchContender.isPending}
-      variant="brand"
+      loading={patchContender.isPending}
+      variant="neutral"
       appearance="accent"
       >Register
     </wa-button>
   </RegistrationForm>
 {/if}
+
+<style>
+  h1 {
+    font-size: var(--wa-font-size-l);
+    padding: var(--wa-space-m);
+    padding-block-end: 0;
+  }
+</style>

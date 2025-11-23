@@ -1,5 +1,5 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import * as Sentry from "@sentry/svelte";
   import type { Snippet } from "svelte";
 
   interface Props {
@@ -11,18 +11,20 @@
   const copyToClipboard = async (error: unknown) => {
     await navigator.clipboard.writeText(error as string);
   };
+
+  const reportError = (error: unknown) => {
+    Sentry.captureException(error);
+  };
 </script>
 
-<svelte:boundary>
+<svelte:boundary onerror={(e) => reportError(e)}>
   {@render children?.()}
 
   {#snippet failed(error, reset)}
     <main>
       <h1>Oopsie!</h1>
       <pre onclick={() => copyToClipboard(error)}>{error}</pre>
-      <wa-button size="small" variant="brand" onclick={reset}
-        >Try again</wa-button
-      >
+      <button onclick={reset}>Try again</button>
     </main>
   {/snippet}
 </svelte:boundary>

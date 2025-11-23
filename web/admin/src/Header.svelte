@@ -20,9 +20,9 @@
 {#if !print}
   <header>
     <div>
-      <p class="logo">
+      <div class="logo">
         <FullLogo />
-      </p>
+      </div>
       <wa-button
         size="small"
         appearance="outlined"

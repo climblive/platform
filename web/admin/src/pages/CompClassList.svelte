@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { CompClass } from "@climblive/lib/models";
@@ -15,7 +16,7 @@
 
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
 
-  let compClasses = $derived($compClassesQuery.data);
+  let compClasses = $derived(compClassesQuery.data);
 
   const columns: ColumnDefinition<CompClass>[] = [
     {
@@ -99,13 +100,15 @@
 
 <section>
   <wa-button
-    variant="brand"
+    variant="neutral"
     appearance="accent"
     onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
-    >Create</wa-button
+    >Create class</wa-button
   >
 
-  {#if compClasses?.length}
+  {#if compClasses === undefined}
+    <Loader />
+  {:else if compClasses.length > 0}
     <Table {columns} data={compClasses} getId={({ id }) => id}></Table>
   {/if}
 </section>
@@ -113,6 +116,10 @@
 <style>
   .controls {
     display: flex;
+
+    & wa-button:not(:last-of-type) {
+      margin-inline-end: var(--wa-space-xs);
+    }
   }
 
   .copy {

@@ -26,13 +26,15 @@
   <HoldColorIndicator
     primary={problem.holdColorPrimary}
     secondary={problem.holdColorSecondary}
+    --height="1.25rem"
+    --width="1.25rem"
   />
   <span class="points">
     <span class="top">
       {problem.pointsTop}p
     </span>
     {#if problem.flashBonus}
-      <wa-icon name="lightning-charge"></wa-icon>
+      <wa-icon name="bolt"></wa-icon>
     {/if}
   </span>
   <div class="score">

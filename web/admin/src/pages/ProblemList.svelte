@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import {
     HoldColorIndicator,
     Table,
@@ -14,9 +15,12 @@
 
   interface Props {
     contestId: number;
+    tableLimit: number | undefined;
   }
 
-  let { contestId }: Props = $props();
+  let { contestId, ...props }: Props = $props();
+
+  let tableLimit = $state<number | undefined>(props.tableLimit);
 
   const problemsQuery = $derived(getProblemsQuery(contestId));
   const ticksQuery = $derived(getTicksByContestQuery(contestId));
@@ -24,11 +28,11 @@
   const ascentsByProblem = $derived.by(() => {
     const ascentsByProblem = new Map<ProblemID, number>();
 
-    if ($ticksQuery.data === undefined) {
+    if (ticksQuery.data === undefined) {
       return ascentsByProblem;
     }
 
-    for (const { problemId } of $ticksQuery.data) {
+    for (const { problemId } of ticksQuery.data) {
       const ascents = ascentsByProblem.get(problemId);
 
       if (ascents !== undefined) {
@@ -44,17 +48,21 @@
   type ProblemWithAscents = Problem & { ascents: number };
 
   const sortedProblemsWithAscents = $derived.by(() => {
-    if ($problemsQuery.data === undefined) {
+    if (problemsQuery.data === undefined) {
       return undefined;
     }
 
-    const problems = $problemsQuery.data.map<ProblemWithAscents>((problem) => ({
+    const problems = problemsQuery.data.map<ProblemWithAscents>((problem) => ({
       ...problem,
       ascents: ascentsByProblem.get(problem.id) ?? 0,
     }));
 
     return problems?.sort((p1, p2) => p1.number - p2.number);
   });
+
+  const showAll = () => {
+    tableLimit = undefined;
+  };
 
   const columns: ColumnDefinition<ProblemWithAscents>[] = [
     {
@@ -120,51 +128,72 @@
 {/snippet}
 
 {#snippet renderControls({ id }: ProblemWithAscents)}
-  <wa-button
-    size="small"
-    appearance="plain"
-    onclick={() => navigate(`/admin/problems/${id}/edit`)}
-    label="Edit"
-  >
-    <wa-icon name="pencil"></wa-icon>
-  </wa-button>
-  <DeleteProblem problemId={id}>
-    {#snippet children({ deleteProblem })}
-      <wa-button
-        size="small"
-        variant="danger"
-        appearance="plain"
-        onclick={deleteProblem}
-        label={`Delete problem ${id}`}
-      >
-        <wa-icon name="trash"></wa-icon>
-      </wa-button>
-    {/snippet}
-  </DeleteProblem>
+  <div class="controls">
+    <wa-button
+      size="small"
+      appearance="plain"
+      onclick={() => navigate(`/admin/problems/${id}/edit`)}
+    >
+      <wa-icon name="pencil" label="Edit"></wa-icon>
+    </wa-button>
+    <DeleteProblem problemId={id}>
+      {#snippet children({ deleteProblem })}
+        <wa-button
+          size="small"
+          variant="danger"
+          appearance="plain"
+          onclick={deleteProblem}
+        >
+          <wa-icon name="trash" label={`Delete problem ${id}`}></wa-icon>
+        </wa-button>
+      {/snippet}
+    </DeleteProblem>
+  </div>
 {/snippet}
 
 {#snippet renderAscents({ ascents }: ProblemWithAscents)}
   {ascents}
 {/snippet}
 
+<p class="copy">
+  Problems refer to the boulder problems that the contenders will attempt during
+  the contest, each of which can have its own point value.
+</p>
+
 <section>
   <wa-button
-    variant="brand"
+    variant="neutral"
     appearance="accent"
     onclick={() => navigate(`contests/${contestId}/new-problem`)}
-    >Create</wa-button
+    >Create problem</wa-button
   >
 
-  {#if sortedProblemsWithAscents?.length}
-    <Table {columns} data={sortedProblemsWithAscents} getId={({ id }) => id}
+  {#if sortedProblemsWithAscents === undefined}
+    <Loader />
+  {:else if sortedProblemsWithAscents.length > 0}
+    <Table
+      {columns}
+      data={tableLimit
+        ? sortedProblemsWithAscents.slice(0, tableLimit)
+        : sortedProblemsWithAscents}
+      getId={({ id }) => id}
     ></Table>
+  {/if}
+
+  {#if sortedProblemsWithAscents !== undefined && tableLimit !== undefined && tableLimit < sortedProblemsWithAscents.length}
+    <wa-button class="show-more" appearance="plain" onclick={showAll}
+      >Show all</wa-button
+    >
   {/if}
 </section>
 
 <style>
-  section {
+  .controls {
     display: flex;
-    gap: var(--wa-space-xs);
+
+    & wa-button:not(:last-of-type) {
+      margin-inline-end: var(--wa-space-xs);
+    }
   }
 
   .number {
@@ -178,5 +207,13 @@
     flex-direction: column;
     align-items: start;
     gap: var(--wa-space-m);
+  }
+
+  wa-button.show-more {
+    align-self: center;
+  }
+
+  .copy {
+    color: var(--wa-color-text-quiet);
   }
 </style>

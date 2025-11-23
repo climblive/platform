@@ -28,7 +28,7 @@
 
   let open = $state(false);
 
-  let loading = $derived($createTick.isPending || $deleteTick.isPending);
+  let loading = $derived(createTick.isPending || deleteTick.isPending);
   let variant = $derived(
     tick ? (tick.attemptsTop === 1 ? "flashed" : "ticked") : undefined,
   );
@@ -45,7 +45,7 @@
 
   const handleCheck = () => {
     if (tick?.id) {
-      $deleteTick.mutate(tick.id, {
+      deleteTick.mutate(tick.id, {
         onError: (error) => {
           if (error instanceof AxiosError && error.status === 404) {
             toastError("Ascent is already removed.");
@@ -65,7 +65,7 @@
     navigator.vibrate?.(50);
     open = false;
 
-    $createTick.mutate(
+    createTick.mutate(
       {
         problemId: problem.id,
         top: true,
@@ -111,7 +111,7 @@
     {:else if variant === "flashed"}
       <wa-icon name="bolt"></wa-icon>
     {:else if variant === "ticked"}
-      <wa-icon name="check-double"></wa-icon>
+      <wa-icon name="check"></wa-icon>
     {/if}
   </button>
 
@@ -124,7 +124,7 @@
     distance="10"
   >
     <wa-button size="small" onclick={(e: MouseEvent) => handleTick(e, false)}>
-      <wa-icon slot="start" name="check-double"></wa-icon>
+      <wa-icon slot="start" name="check"></wa-icon>
       Top
     </wa-button>
     <wa-button size="small" onclick={(e: MouseEvent) => handleTick(e, true)}>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { RaffleWinner } from "@climblive/lib/models";
@@ -22,9 +23,9 @@
   const drawRaffleWinner = $derived(drawRaffleWinnerMutation(raffleId));
   const raffleWinnersQuery = $derived(getRaffleWinnersQuery(raffleId));
 
-  const raffle = $derived($raffleQuery.data);
+  const raffle = $derived(raffleQuery.data);
   const sortedRaffleWinners = $derived.by(() => {
-    const winners = [...($raffleWinnersQuery.data ?? [])];
+    const winners = [...(raffleWinnersQuery.data ?? [])];
     winners.sort((a, b) => {
       return b.timestamp.getTime() - a.timestamp.getTime();
     });
@@ -33,7 +34,7 @@
   });
 
   const handleDrawWinner = () => {
-    $drawRaffleWinner.mutate(undefined, {
+    drawRaffleWinner.mutate(undefined, {
       onError: (error) => {
         if (error instanceof AxiosError && error.status === 404) {
           toastError("All winners have been drawn.");
@@ -77,10 +78,13 @@
   >
   <h1>Raffle {raffle.id}</h1>
   <section>
-    <wa-button variant="brand" onclick={handleDrawWinner}>Draw winner</wa-button
+    <wa-button variant="neutral" onclick={handleDrawWinner}
+      >Draw winner</wa-button
     >
 
-    {#if sortedRaffleWinners?.length}
+    {#if sortedRaffleWinners === undefined}
+      <Loader />
+    {:else if sortedRaffleWinners.length > 0}
       <Table
         {columns}
         data={sortedRaffleWinners}

@@ -26,11 +26,11 @@
   const contestQuery = $derived(getContestQuery(contestId));
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
 
-  let contest = $derived($contestQuery.data);
-  let compClasses = $derived($compClassesQuery.data);
+  let contest = $derived(contestQuery.data);
+  let compClasses = $derived(compClassesQuery.data);
 
   $effect(() => {
-    if (compClasses && !selectedCompClassId) {
+    if (compClasses && compClasses.length > 0 && !selectedCompClassId) {
       selectedCompClassId = compClasses[0].id;
     }
   });
@@ -62,9 +62,9 @@
         <h1>
           {contest.name}
         </h1>
-        <p class="logo">
+        <div class="logo">
           <FullLogo />
-        </p>
+        </div>
         {#if compClasses.length > 1}
           <wa-select
             bind:this={compClassSelector}
@@ -132,7 +132,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: var(--wa-space-s);
+    padding: var(--wa-space-m);
   }
 
   h1 {
@@ -169,6 +169,7 @@
     text-align: center;
     height: var(--wa-font-size-xl);
     color: var(--wa-color-text-normal);
+    margin-block: var(--wa-space-s);
   }
 
   @media screen and (max-width: 512px) {

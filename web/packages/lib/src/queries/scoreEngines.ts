@@ -10,19 +10,19 @@ import type { StartScoreEngineArguments } from "../models/rest";
 import { HOUR } from "./constants";
 
 export const getScoreEnginesQuery = (contestId: ContestID) =>
-  createQuery({
+  createQuery(() => ({
     queryKey: ["score-engines", { contestId }],
     queryFn: async () => ApiClient.getInstance().getScoreEngines(contestId),
     retry: false,
     gcTime: 12 * HOUR,
     staleTime: 0,
     refetchOnWindowFocus: true,
-  });
+  }));
 
 export const startScoreEngineMutation = (contestId: number) => {
   const client = useQueryClient();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: (args: StartScoreEngineArguments) =>
       ApiClient.getInstance().startScoreEngine(contestId, args),
     onSuccess: (newEngine) => {
@@ -32,13 +32,13 @@ export const startScoreEngineMutation = (contestId: number) => {
         oldEngines ? [...oldEngines, newEngine] : [newEngine],
       );
     },
-  });
+  }));
 };
 
 export const stopScoreEngineMutation = () => {
   const client = useQueryClient();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: (instanceId: ScoreEngineInstanceID) =>
       ApiClient.getInstance().stopScoreEngine(instanceId),
     onSuccess: (...args) => {
@@ -55,5 +55,5 @@ export const stopScoreEngineMutation = () => {
             : undefined,
       );
     },
-  });
+  }));
 };

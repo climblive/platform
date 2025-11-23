@@ -25,7 +25,7 @@
 
   const contenderQuery = $derived(getContenderQuery(contenderId));
   const patchContender = $derived(patchContenderMutation(contenderId));
-  const contender = $derived($contenderQuery.data);
+  const contender = $derived(contenderQuery.data);
   const contenderName = $derived(contender?.name ?? "Unregistered");
   const contestId = $derived(contender?.contestId ?? 0);
 
@@ -33,7 +33,7 @@
     getCompClassesQuery(contestId, { enabled: !!contestId }),
   );
 
-  const compClasses = $derived($compClassesQuery.data);
+  const compClasses = $derived(compClassesQuery.data);
 
   let withdrawFromFinalsToggle: WaSwitch | undefined = $state();
 
@@ -42,19 +42,19 @@
       return;
     }
 
-    $patchContender.mutate({
+    patchContender.mutate({
       withdrawnFromFinals: withdrawFromFinalsToggle.checked,
     });
   };
 
   const handleDisqualify = () => {
-    $patchContender.mutate({
+    patchContender.mutate({
       disqualified: true,
     });
   };
 
   const handleRequalify = () => {
-    $patchContender.mutate({
+    patchContender.mutate({
       disqualified: false,
     });
   };
@@ -70,9 +70,9 @@
 
   <h1>
     {#if contender.disqualified}
-      <strike>
+      <del>
         {contenderName}
-      </strike>
+      </del>
     {:else}
       {contenderName}
     {/if}
@@ -123,7 +123,7 @@
         href={`/${contender.registrationCode}`}
         target="_blank"
         appearance="plain"
-        variant="brand"
+        variant="neutral"
         size="large"
       >
         <wa-icon slot="start" name="arrow-up-right-from-square"></wa-icon>
@@ -148,17 +148,17 @@
   <div class="controls">
     <wa-switch
       bind:this={withdrawFromFinalsToggle}
-      hint="The contender does not wish to take part in the finals"
+      hint="In case the contender does not wish to take part in the finals."
       {@attach checked(contender.withdrawnFromFinals)}
       onchange={handleToggleWithdrawFromFinals}
-      disabled={contender.disqualified || $patchContender.isPending}
+      disabled={contender.disqualified || patchContender.isPending}
       >Withdraw from finals</wa-switch
     >
 
     {#if contender.disqualified}
       <wa-button
         onclick={handleRequalify}
-        loading={$patchContender.isPending}
+        loading={patchContender.isPending}
         appearance="outlined"
         >Requalify contender<wa-icon slot="start" name="right-to-bracket"
         ></wa-icon></wa-button
@@ -167,7 +167,7 @@
       <wa-button
         variant="danger"
         onclick={handleDisqualify}
-        loading={$patchContender.isPending}
+        loading={patchContender.isPending}
         >Disqualify contender<wa-icon slot="start" name="skull-crossbones"
         ></wa-icon></wa-button
       >

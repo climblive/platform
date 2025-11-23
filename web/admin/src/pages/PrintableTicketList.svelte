@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import Ticket from "@/components/Ticket.svelte";
   import {
     getContendersByContestQuery,
@@ -14,13 +15,13 @@
   const contestQuery = $derived(getContestQuery(contestId));
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
 
-  const contest = $derived($contestQuery.data);
-  const contenders = $derived($contendersQuery.data);
+  const contest = $derived(contestQuery.data);
+  const contenders = $derived(contendersQuery.data);
 
   let printDialogOpened = $state(false);
 
   $effect(() => {
-    if (contenders && !printDialogOpened) {
+    if (contest && contenders && !printDialogOpened) {
       printDialogOpened = true;
 
       setTimeout(() => {
@@ -31,7 +32,9 @@
 </script>
 
 <main>
-  {#if contest && contenders}
+  {#if !contest || !contenders}
+    <Loader />
+  {:else}
     {#each contenders as contender (contender.id)}
       <Ticket
         contestName={contest.name}

@@ -14,7 +14,7 @@
 
 <section>
   <div class="controls">
-    <a href={`${getApiUrl()}/contests/${contestId}/results`}>
+    <a href={`${getApiUrl()}/contests/${contestId}/results`} target="_blank">
       <wa-button appearance="outlined"
         >Download results
         <wa-icon name="file-excel" slot="start"></wa-icon>
@@ -30,8 +30,8 @@
   </div>
 
   <ScoreboardProvider {contestId}>
-    {#snippet children({ scoreboard })}
-      <ResultListTable {contestId} {scoreboard}></ResultListTable>
+    {#snippet children({ scoreboard, loading })}
+      <ResultListTable {contestId} {scoreboard} {loading}></ResultListTable>
     {/snippet}
   </ScoreboardProvider>
 </section>

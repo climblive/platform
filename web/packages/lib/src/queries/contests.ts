@@ -13,28 +13,38 @@ import {
 import { HOUR } from "./constants";
 
 export const getContestQuery = (contestId: number) =>
-  createQuery({
+  createQuery(() => ({
     queryKey: ["contest", { id: contestId }],
     queryFn: async () => ApiClient.getInstance().getContest(contestId),
     retry: false,
     gcTime: 12 * HOUR,
     staleTime: 12 * HOUR,
-  });
+  }));
 
-export const getContestsByOrganizerQuery = (organizerId: number) =>
-  createQuery({
+export const getAllContestsQuery = (
+  options?: Partial<Parameters<typeof createQuery<Contest[]>>[0]>,
+) =>
+  createQuery(() => ({
+    ...options,
+    queryKey: ["contests"],
+    queryFn: async () => ApiClient.getInstance().getAllContests(),
+  }));
+
+export const getContestsByOrganizerQuery = (
+  organizerId: number,
+  options?: Partial<Parameters<typeof createQuery<Contest[]>>[0]>,
+) =>
+  createQuery(() => ({
+    ...options,
     queryKey: ["contests", { organizerId }],
     queryFn: async () =>
       ApiClient.getInstance().getContestsByOrganizer(organizerId),
-    retry: false,
-    gcTime: 12 * HOUR,
-    staleTime: 12 * HOUR,
-  });
+  }));
 
 export const createContestMutation = (organizerId: number) => {
   const client = useQueryClient();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: (template: ContestTemplate) =>
       ApiClient.getInstance().createContest(organizerId, template),
     onSuccess: (newContest) => {
@@ -48,13 +58,13 @@ export const createContestMutation = (organizerId: number) => {
 
       client.setQueryData<Contest>(queryKey, newContest);
     },
-  });
+  }));
 };
 
 export const patchContestMutation = (contestId: number) => {
   const client = useQueryClient();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: (patch: ContestPatch) =>
       ApiClient.getInstance().patchContest(contestId, patch),
     onSuccess: (patchedContest) => {
@@ -81,13 +91,13 @@ export const patchContestMutation = (contestId: number) => {
 
       client.setQueryData<Contest>(queryKey, patchedContest);
     },
-  });
+  }));
 };
 
 export const duplicateContestMutation = (contestId: number) => {
   const client = useQueryClient();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: () => ApiClient.getInstance().duplicateContest(contestId),
     onSuccess: (duplicatedContest) => {
       let queryKey: QueryKey = [
@@ -103,5 +113,5 @@ export const duplicateContestMutation = (contestId: number) => {
 
       client.setQueryData<Contest>(queryKey, duplicatedContest);
     },
-  });
+  }));
 };

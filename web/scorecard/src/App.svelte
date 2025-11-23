@@ -6,10 +6,12 @@
   import Start from "@/pages/Start.svelte";
   import { type ScorecardSession } from "@/types";
   import { authenticateContender } from "@/utils/auth";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import { ErrorBoundary } from "@climblive/lib/components";
+  import { extractCodeFromPath } from "@climblive/lib/utils";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
-  import { setContext } from "svelte";
+  import { onMount, setContext } from "svelte";
   import { Route, Router, navigate } from "svelte-routing";
   import { writable } from "svelte/store";
   import { ZodError } from "zod";
@@ -66,10 +68,32 @@
   };
 
   parseCodeFromUrl();
+
+  let compatibilityIgnored = $state(false);
+  let code = $state<string>();
+
+  onMount(() => {
+    compatibilityIgnored = sessionStorage.getItem("compat") === "ignore";
+
+    const extractedCode = extractCodeFromPath();
+
+    if (extractedCode) {
+      code = extractedCode;
+    }
+  });
 </script>
 
 <ErrorBoundary>
   <QueryClientProvider client={queryClient}>
+    {#if compatibilityIgnored}
+      <wa-callout variant="neutral" appearance="outlined filled">
+        <wa-icon slot="icon" name="life-ring"></wa-icon>
+        If you experience issues with the app you can
+        <a href={code ? `/failsafe/${code}` : "/failsafe"}
+          >try a basic version</a
+        > instead.
+      </wa-callout>
+    {/if}
     {#if authenticating}
       <Loading />
     {:else}
@@ -85,3 +109,10 @@
     {/if}
   </QueryClientProvider>
 </ErrorBoundary>
+
+<style>
+  wa-callout {
+    margin: var(--wa-space-s);
+    margin-block-end: 0;
+  }
+</style>

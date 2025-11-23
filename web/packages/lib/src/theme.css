@@ -1,3 +1,5 @@
+@import url("normalize.css/normalize.css");
+@import url("@awesome.me/webawesome/dist/styles/themes/default.css");
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
 :root {
@@ -12,6 +14,16 @@
   --wa-color-brand-20: #981935;
   --wa-color-brand-10: #831833;
   --wa-color-brand-05: #490816;
+
+  --wa-font-size-2xs: 0.6875rem;
+  --wa-font-size-xs: 0.75rem;
+  --wa-font-size-s: 0.875rem;
+  --wa-font-size-m: 1rem;
+  --wa-font-size-l: 1.25rem;
+  --wa-font-size-xl: 1.5625rem;
+  --wa-font-size-2xl: 2rem;
+  --wa-font-size-3xl: 2.5625rem;
+  --wa-font-size-4xl: 3.25rem;
 }
 
 body {
@@ -37,14 +49,14 @@ wa-checkbox {
   display: block;
 }
 
-wa-input:user-invalid::part(input),
-wa-select:user-invalid::part(form-control-input),
-wa-checkbox:user-invalid::part(control) {
+wa-input:state(user-invalid)::part(base),
+wa-select:state(user-invalid)::part(combobox),
+wa-checkbox:state(user-invalid)::part(control) {
   border-color: var(--wa-color-danger-border-loud);
 }
 
-:user-invalid::part(label),
-:user-invalid::part(hint) {
+:state(user-invalid)::part(label),
+:state(user-invalid)::part(hint) {
   color: var(--wa-color-danger-fill-loud);
 }
 

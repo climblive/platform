@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import ContestForm, {
     formSchema,
     minuteInNanoseconds,
@@ -21,10 +22,10 @@
   const contestQuery = $derived(getContestQuery(contestId));
   const patchContest = $derived(patchContestMutation(contestId));
 
-  const contest = $derived($contestQuery.data);
+  const contest = $derived(contestQuery.data);
 
   const handleSubmit = async (tmpl: ContestPatch) => {
-    $patchContest.mutate(
+    patchContest.mutate(
       {
         ...tmpl,
         gracePeriod:
@@ -41,7 +42,9 @@
   };
 </script>
 
-{#if contest}
+{#if contest === undefined}
+  <Loader />
+{:else}
   <ContestForm submit={handleSubmit} data={contest} schema={formSchema}>
     <div class="controls">
       <wa-button
@@ -53,8 +56,8 @@
       <wa-button
         size="small"
         type="submit"
-        loading={$patchContest.isPending}
-        variant="brand"
+        loading={patchContest.isPending}
+        variant="neutral"
         >Save
       </wa-button>
     </div>

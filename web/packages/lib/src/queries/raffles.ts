@@ -8,21 +8,21 @@ import { ApiClient } from "../Api";
 import type { Raffle, RaffleWinner } from "../models";
 
 export const getRaffleQuery = (raffleId: number) =>
-  createQuery({
+  createQuery(() => ({
     queryKey: ["raffle", { id: raffleId }],
     queryFn: async () => ApiClient.getInstance().getRaffle(raffleId),
-  });
+  }));
 
 export const getRafflesQuery = (contestId: number) =>
-  createQuery({
+  createQuery(() => ({
     queryKey: ["raffles", { contestId }],
     queryFn: async () => ApiClient.getInstance().getRaffles(contestId),
-  });
+  }));
 
 export const createRaffleMutation = (contestId: number) => {
   const client = useQueryClient();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: () => ApiClient.getInstance().createRaffle(contestId),
     onSuccess: (newRaffle) => {
       let queryKey: QueryKey = ["raffles", { contestId }];
@@ -35,13 +35,13 @@ export const createRaffleMutation = (contestId: number) => {
 
       client.setQueryData<Raffle>(queryKey, newRaffle);
     },
-  });
+  }));
 };
 
 export const drawRaffleWinnerMutation = (raffleId: number) => {
   const client = useQueryClient();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: () => ApiClient.getInstance().drawRaffleWinner(raffleId),
     onSuccess: (newWinner) => {
       const queryKey: QueryKey = ["raffle-winners", { raffleId }];
@@ -50,11 +50,11 @@ export const drawRaffleWinnerMutation = (raffleId: number) => {
         return [...(oldWinners ?? []), newWinner];
       });
     },
-  });
+  }));
 };
 
 export const getRaffleWinnersQuery = (raffleId: number) =>
-  createQuery({
+  createQuery(() => ({
     queryKey: ["raffle-winners", { raffleId }],
     queryFn: async () => ApiClient.getInstance().getRaffleWinners(raffleId),
-  });
+  }));

@@ -1,46 +1,59 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
+  import RelativeTime from "@/components/RelativeTime.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { Contest } from "@climblive/lib/models";
-  import { getContestsByOrganizerQuery } from "@climblive/lib/queries";
+  import {
+    getAllContestsQuery,
+    getContestsByOrganizerQuery,
+  } from "@climblive/lib/queries";
   import { format } from "date-fns";
   import { Link, navigate } from "svelte-routing";
 
   interface Props {
-    organizerId: number;
+    organizerId: number | undefined;
   }
 
   let { organizerId }: Props = $props();
 
-  const contestsQuery = $derived(getContestsByOrganizerQuery(organizerId));
+  const contestsQuery = $derived(
+    getContestsByOrganizerQuery(organizerId ?? 0, {
+      enabled: organizerId !== undefined,
+    }),
+  );
+  const allContestsQuery = $derived(
+    getAllContestsQuery({ enabled: organizerId === undefined }),
+  );
 
-  let contests = $derived($contestsQuery.data);
+  const contests = $derived(
+    organizerId === undefined ? allContestsQuery.data : contestsQuery.data,
+  );
 
-  const [drafts, ongoing, upcoming, past] = $derived.by(() => {
+  const [ongoing, upcoming, past] = $derived.by(() => {
     const now = new Date();
 
-    const drafts = contests?.filter(({ timeBegin }) => {
-      return !timeBegin;
+    const ongoing: Contest[] = [];
+    const upcoming: Contest[] = [];
+    const past: Contest[] = [];
+
+    contests?.forEach((contest) => {
+      const { timeBegin, timeEnd } = contest;
+
+      if (timeBegin && timeEnd && now >= timeBegin && now < timeEnd) {
+        ongoing.push(contest);
+      } else if (timeEnd && now > timeEnd) {
+        past.push(contest);
+      } else {
+        upcoming.push(contest);
+      }
     });
 
-    const ongoing = contests?.filter(({ timeBegin, timeEnd }) => {
-      return timeBegin && timeEnd && now >= timeBegin && now < timeEnd;
-    });
+    ongoing?.sort(sortContests);
+    upcoming?.sort(sortContests).reverse();
+    past?.sort(sortContests);
 
-    const upcoming = contests?.filter(({ timeBegin }) => {
-      return timeBegin && timeBegin > now;
-    });
-
-    const past = contests?.filter(({ timeEnd }) => {
-      return timeEnd && now > timeEnd;
-    });
-
-    return [
-      drafts,
-      ongoing?.sort(sortContests),
-      upcoming?.sort(sortContests),
-      past?.sort(sortContests),
-    ];
+    return [ongoing, upcoming, past];
   });
 
   const sortContests = (c1: Contest, c2: Contest) => {
@@ -77,23 +90,31 @@
   <Link to="contests/{id}">{name}</Link>
 {/snippet}
 
-{#snippet renderTimeBegin({ timeBegin }: Contest)}
+{#snippet renderTimeBegin({ timeBegin, timeEnd }: Contest)}
   {#if timeBegin}
-    {format(timeBegin, "yyyy-MM-dd HH:mm")}
+    {#if timeEnd && new Date() > timeEnd}
+      {format(timeBegin, "yyyy-MM-dd HH:mm")}
+    {:else}
+      <RelativeTime time={timeBegin} />
+    {/if}
+  {:else}
+    -
   {/if}
 {/snippet}
 
 {#snippet renderTimeEnd({ timeEnd }: Contest)}
   {#if timeEnd}
     {format(timeEnd, "yyyy-MM-dd HH:mm")}
+  {:else}
+    -
   {/if}
 {/snippet}
 
 <h2>Contests</h2>
 <wa-button
-  variant="brand"
+  variant="neutral"
   onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
-  >New contest</wa-button
+  >Create new contest</wa-button
 >
 
 {#snippet listing(heading: string, contests: Contest[])}
@@ -101,18 +122,24 @@
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
 {/snippet}
 
-{#if drafts?.length}
-  {@render listing("Drafts", drafts)}
+{#if !ongoing || !upcoming || !past}
+  <Loader />
+{:else}
+  {#if ongoing?.length}
+    {@render listing("Ongoing", ongoing)}
+  {/if}
+
+  {#if upcoming?.length}
+    {@render listing("Upcoming", upcoming)}
+  {/if}
+
+  {#if past?.length}
+    {@render listing("Past", past)}
+  {/if}
 {/if}
 
-{#if ongoing?.length}
-  {@render listing("Ongoing", ongoing)}
-{/if}
-
-{#if upcoming?.length}
-  {@render listing("Upcoming", upcoming)}
-{/if}
-
-{#if past?.length}
-  {@render listing("Past", past)}
-{/if}
+<style>
+  wa-button {
+    margin-block-end: var(--wa-space-m);
+  }
+</style>

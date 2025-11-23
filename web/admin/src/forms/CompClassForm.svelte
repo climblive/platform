@@ -31,6 +31,7 @@
 
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/input/input.js";
+  import type WaInput from "@awesome.me/webawesome/dist/components/input/input.js";
   import { GenericForm, name } from "@climblive/lib/forms";
   import type { CompClass } from "@climblive/lib/models";
   import { format } from "date-fns";
@@ -46,6 +47,36 @@
   }
 
   let { data, schema, submit, children }: Props = $props();
+
+  let previousTimeBegin = $derived(data.timeBegin);
+
+  let timeBeginInput: WaInput | undefined = $state();
+  let timeEndInput: WaInput | undefined = $state();
+
+  function handleTimeBeginChange() {
+    let begin: Date;
+    let end: Date;
+
+    if (timeBeginInput && timeBeginInput.value) {
+      begin = new Date(timeBeginInput.value);
+    } else {
+      return;
+    }
+
+    try {
+      if (!timeEndInput || !timeEndInput.value || !previousTimeBegin) {
+        return;
+      }
+
+      end = new Date(timeEndInput.value);
+      const diff = end.getTime() - previousTimeBegin.getTime();
+
+      end.setTime(begin.getTime() + diff);
+      timeEndInput.value = format(end, "yyyy-MM-dd'T'HH:mm");
+    } finally {
+      previousTimeBegin = begin;
+    }
+  }
 </script>
 
 <GenericForm {schema} {submit}>
@@ -57,7 +88,7 @@
       type="text"
       required
       value={data.name}
-      placeholder="Males"
+      placeholder="Males or Females"
     ></wa-input>
     <wa-input
       size="small"
@@ -67,7 +98,9 @@
       value={data.description}
     ></wa-input>
     <wa-input
+      bind:this={timeBeginInput}
       size="small"
+      onchange={handleTimeBeginChange}
       {@attach name("timeBegin")}
       label="Start time"
       type="datetime-local"
@@ -76,6 +109,7 @@
         : undefined}
     ></wa-input>
     <wa-input
+      bind:this={timeEndInput}
       size="small"
       {@attach name("timeEnd")}
       label="End time"

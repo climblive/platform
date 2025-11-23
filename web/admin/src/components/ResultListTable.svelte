@@ -15,13 +15,15 @@
   import { ordinalSuperscript } from "@climblive/lib/utils";
   import { Link } from "svelte-routing";
   import type { Readable } from "svelte/store";
+  import Loader from "./Loader.svelte";
 
   interface Props {
     contestId: number;
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
+    loading: boolean;
   }
 
-  const { contestId, scoreboard }: Props = $props();
+  const { contestId, scoreboard, loading }: Props = $props();
 
   let tableData = $state<ScoreboardEntry[]>([]);
 
@@ -30,7 +32,7 @@
 
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
 
-  const compClasses = $derived($compClassesQuery.data);
+  const compClasses = $derived(compClassesQuery.data);
 
   let filterText = $state<string>();
   let selectedCompClassId: number | undefined = $state();
@@ -69,9 +71,7 @@
     if (filterText) {
       const search = filterText.toLowerCase();
 
-      scores = scores.filter(({ publicName }) =>
-        publicName.toLowerCase().includes(search),
-      );
+      scores = scores.filter(({ name }) => name.toLowerCase().includes(search));
     }
 
     scores.sort(
@@ -108,24 +108,18 @@
       mobile: true,
       render: renderFinalist,
       width: "max-content",
-      align: "right",
+      align: "left",
     },
   ];
 </script>
 
-{#snippet renderName({
-  contenderId,
-  publicName,
-  disqualified,
-}: ScoreboardEntry)}
+{#snippet renderName({ contenderId, name, disqualified }: ScoreboardEntry)}
   <Link to={`./contenders/${contenderId}`}>
-    <wa-button appearance="plain" variant="brand" size="small">
-      {#if disqualified}
-        <strike>{publicName}</strike>
-      {:else}
-        {publicName}
-      {/if}
-    </wa-button>
+    {#if disqualified}
+      <del>{name}</del>
+    {:else}
+      {name}
+    {/if}
   </Link>
 {/snippet}
 
@@ -145,7 +139,7 @@
   <wa-icon name={score?.finalist ? "medal" : "minus"}></wa-icon>
 {/snippet}
 
-{#if compClasses && compClasses.length > 1}
+{#if compClasses}
   <div class="controls">
     <wa-input
       bind:this={quickFilter}
@@ -177,7 +171,9 @@
   >Live</wa-switch
 >
 
-{#if tableData && tableData.length > 0}
+{#if loading}
+  <Loader />
+{:else}
   <Table {columns} data={tableData} getId={({ contenderId }) => contenderId}
   ></Table>
 {/if}

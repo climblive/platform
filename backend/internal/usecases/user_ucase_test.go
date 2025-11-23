@@ -31,6 +31,10 @@ func TestGetSelf(t *testing.T) {
 			Username: "john",
 		}, nil)
 
+	mockedAuthorizer.
+		On("HasOwnership", mock.Anything, mock.AnythingOfType("domain.OwnershipData")).
+		Return(domain.NilRole, domain.ErrNoOwnership)
+
 	ucase := usecases.UserUseCase{
 		Repo:       mockedRepo,
 		Authorizer: mockedAuthorizer,

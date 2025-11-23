@@ -156,6 +156,16 @@ export class ApiClient {
     return contestSchema.parse(result.data);
   };
 
+  getAllContests = async () => {
+    const endpoint = `/contests`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(contestSchema).parse(result.data);
+  };
+
   createContest = async (organizerId: number, template: ContestTemplate) => {
     const endpoint = `/organizers/${organizerId}/contests`;
 

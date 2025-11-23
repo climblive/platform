@@ -13,7 +13,7 @@ export const getTicksByContenderQuery = (
   contenderId: number,
   options?: Partial<Parameters<typeof createQuery<Tick[]>>[0]>,
 ) =>
-  createQuery<Tick[]>({
+  createQuery<Tick[]>(() => ({
     ...options,
     queryKey: ["ticks", { contenderId }],
     queryFn: async () =>
@@ -22,41 +22,41 @@ export const getTicksByContenderQuery = (
     gcTime: 12 * HOUR,
     staleTime: 0,
     refetchOnWindowFocus: true,
-  });
+  }));
 
 export const getTicksByContestQuery = (contestId: number) =>
-  createQuery({
+  createQuery(() => ({
     queryKey: ["ticks", { contestId }],
     queryFn: async () => ApiClient.getInstance().getTicksByContest(contestId),
     retry: false,
     gcTime: 12 * HOUR,
     staleTime: 0,
     refetchOnWindowFocus: true,
-  });
+  }));
 
 export const createTickMutation = (contenderId: number) => {
   const client = useQueryClient();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: (tick: Omit<Tick, "id" | "timestamp">) =>
       ApiClient.getInstance().createTick(contenderId, tick),
     onSuccess: (newTick) => {
       updateTickInQueryCache(client, contenderId, newTick);
     },
-  });
+  }));
 };
 
 export const deleteTickMutation = () => {
   const client = useQueryClient();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: (tickId: number) => ApiClient.getInstance().deleteTick(tickId),
     onSuccess: (...args) => {
       const [, tickId] = args;
 
       removeTickFromQueryCache(client, tickId);
     },
-  });
+  }));
 };
 
 export const updateTickInQueryCache = (

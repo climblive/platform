@@ -18,21 +18,20 @@
   const contenderQuery = $derived(getContenderQuery($session.contenderId));
   const patchContender = $derived(patchContenderMutation($session.contenderId));
 
-  let contender = $derived($contenderQuery.data);
+  let contender = $derived(contenderQuery.data);
 
   const gotoScorecard = () => {
     navigate(`/${contender?.registrationCode}`);
   };
 
   const handleSubmit = (form: ContenderPatch) => {
-    if (!contender || $patchContender.isPending) {
+    if (!contender || patchContender.isPending) {
       return;
     }
 
-    $patchContender.mutate(
+    patchContender.mutate(
       {
         ...form,
-        publicName: form.name,
       },
       {
         onSuccess: gotoScorecard,
@@ -65,9 +64,9 @@
       <wa-button
         size="small"
         type="submit"
-        loading={$patchContender.isPending}
+        loading={patchContender.isPending}
         disabled={false}
-        variant="brand"
+        variant="neutral"
         appearance="accent"
         >Save
       </wa-button>

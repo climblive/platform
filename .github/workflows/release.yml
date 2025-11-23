@@ -13,6 +13,9 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: ./.github/actions/build-web
+        with:
+          sentry-auth-token: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          sentry-environment: production
 
   build-backend:
     name: Build backend
@@ -63,7 +66,7 @@ jobs:
       - uses: ./.github/actions/deploy
         with:
           package-file-name: ${{ steps.build-pkg.outputs.package-file-name }}
-          deploy-host: ${{ vars.DEPLOY_HOST }}
+          deploy-host: ${{ vars.DEPLOY_SSH_HOST }}
           deploy-user: ${{ vars.DEPLOY_SSH_USER }}
           database-password: ${{ secrets.DATABASE_PASSWORD }}
           ssh-auth-sock: ${{ steps.start-agent.outputs.ssh-auth-sock }}
