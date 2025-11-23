@@ -207,7 +207,6 @@
             contestName={contest.name}
             compClassName={selectedCompClass?.name}
             contenderName={contender.name}
-            contenderClub={contender.clubName}
             {score}
             {placement}
             {contestState}

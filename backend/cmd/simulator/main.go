@@ -117,7 +117,6 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 	}
 
 	patch.CompClassID = domain.NewPatch(selectedCompClass.ID)
-	patch.ClubName = domain.NewPatch(faker.ChineseName())
 
 	r.PatchContender(r.contender.ID, patch)
 

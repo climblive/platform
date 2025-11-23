@@ -212,17 +212,17 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 				return err
 			}
 
-			err = book.SetColWidth(sheetName, "A", "B", 40)
+			err = book.SetColWidth(sheetName, "A", "A", 40)
 			if err != nil {
 				return err
 			}
 
-			err = book.SetColWidth(sheetName, "C", "D", 20)
+			err = book.SetColWidth(sheetName, "B", "C", 20)
 			if err != nil {
 				return err
 			}
 
-			err = book.SetCellStyle(sheetName, "A1", "D1", style)
+			err = book.SetCellStyle(sheetName, "A1", "C1", style)
 			if err != nil {
 				return err
 			}
@@ -249,7 +249,6 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 
 			err = book.SetSheetRow(sheetName, fmt.Sprintf("A%d", counter), &[]any{
 				entry.Name,
-				entry.ClubName,
 				entry.Score.Score,
 				entry.Score.Placement})
 			if err != nil {

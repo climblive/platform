@@ -14,7 +14,6 @@
 
   const registrationFormSchema: z.ZodType<ContenderPatch> = z.object({
     name: z.string().min(1),
-    clubName: z.string().optional(),
     compClassId: z.coerce.number().gt(0, { message: "" }),
     withdrawnFromFinals: z.coerce.boolean(),
   });
@@ -42,13 +41,6 @@
         type="text"
         required
         value={data.name}
-      ></wa-input>
-      <wa-input
-        size="small"
-        {@attach name("clubName")}
-        label="Club name"
-        type="text"
-        value={data.clubName}
       ></wa-input>
       <wa-select
         size="small"

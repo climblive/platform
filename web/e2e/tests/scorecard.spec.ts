@@ -177,12 +177,6 @@ test('edit profile', async ({ page }) => {
   await nameInput.fill("")
   await nameInput.pressSequentially("Phyllis Lapin-Vance")
 
-  const clubNameInput = page.getByRole("textbox", {
-    name: "Club name"
-  })
-  await clubNameInput.fill("")
-  await clubNameInput.pressSequentially("Dunder Mifflin Climbing Club")
-
   const compClass = page.getByRole("combobox", { name: "Competition class *" })
   await compClass.click()
   await page.getByRole("option", { name: "Females", exact: true }).click()

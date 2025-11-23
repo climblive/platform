@@ -83,7 +83,6 @@
         >{compClasses.find(({ id }) => id === contender.compClassId)?.name ??
           "-"}</LabeledText
       >
-      <LabeledText label="Club">{contender.clubName ?? "-"}</LabeledText>
       {#if contender.entered}
         <LabeledText label="Entered"
           >{format(contender.entered, "yyyy-MM-dd HH:mm")}</LabeledText
