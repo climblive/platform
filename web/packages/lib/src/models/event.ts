@@ -11,7 +11,6 @@ export const contenderPublicInfoUpdatedEventSchema: z.ZodType<ContenderPublicInf
     contenderId: z.number(),
     compClassId: z.number(),
     name: z.string(),
-    clubName: z.string().optional(),
     withdrawnFromFinals: z.boolean(),
     disqualified: z.boolean(),
   });

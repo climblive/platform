@@ -33,15 +33,14 @@ WHERE contest_id = ?;
 
 -- name: UpsertContender :execlastid
 INSERT INTO 
-	contender (id, organizer_id, contest_id, registration_code, name, club, class_id, entered, disqualified, withdrawn_from_finals)
+	contender (id, organizer_id, contest_id, registration_code, name, class_id, entered, disqualified, withdrawn_from_finals)
 VALUES 
-	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	(?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     contest_id = VALUES(contest_id),
     registration_code = VALUES(registration_code),
     name = VALUES(name),
-    club = VALUES(club),
     class_id = VALUES(class_id),
     entered = VALUES(entered),
     disqualified = VALUES(disqualified),

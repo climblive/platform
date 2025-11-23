@@ -42,7 +42,6 @@ type Contender struct {
 	CompClassID         CompClassID   `json:"compClassId,omitempty"`
 	RegistrationCode    string        `json:"registrationCode"`
 	Name                string        `json:"name,omitempty"`
-	ClubName            string        `json:"clubName,omitempty"`
 	Entered             time.Time     `json:"entered,omitzero"`
 	WithdrawnFromFinals bool          `json:"withdrawnFromFinals"`
 	Disqualified        bool          `json:"disqualified"`
@@ -52,7 +51,6 @@ type Contender struct {
 type ContenderPatch struct {
 	CompClassID         Patch[CompClassID] `json:"compClassId,omitzero" tstype:"CompClassID"`
 	Name                Patch[string]      `json:"name,omitzero" tstype:"string"`
-	ClubName            Patch[string]      `json:"clubName,omitzero" tstype:"string"`
 	WithdrawnFromFinals Patch[bool]        `json:"withdrawnFromFinals,omitzero" tstype:"boolean"`
 	Disqualified        Patch[bool]        `json:"disqualified,omitzero" tstype:"boolean"`
 }
@@ -167,7 +165,6 @@ type ScoreboardEntry struct {
 	ContenderID         ContenderID `json:"contenderId"`
 	CompClassID         CompClassID `json:"compClassId"`
 	Name                string      `json:"name"`
-	ClubName            string      `json:"clubName,omitempty"`
 	WithdrawnFromFinals bool        `json:"withdrawnFromFinals"`
 	Disqualified        bool        `json:"disqualified"`
 	Score               *Score      `json:"score,omitempty"`
@@ -257,7 +254,6 @@ type ContenderPublicInfoUpdatedEvent struct {
 	ContenderID         ContenderID `json:"contenderId"`
 	CompClassID         CompClassID `json:"compClassId"`
 	Name                string      `json:"name"`
-	ClubName            string      `json:"clubName,omitempty"`
 	WithdrawnFromFinals bool        `json:"withdrawnFromFinals"`
 	Disqualified        bool        `json:"disqualified"`
 }

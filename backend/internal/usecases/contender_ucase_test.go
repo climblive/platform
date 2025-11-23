@@ -670,7 +670,6 @@ func TestPatchContender(t *testing.T) {
 			CompClassID:         fakedCompClassID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
-			ClubName:            "Testers' Climbing Club",
 			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
@@ -721,7 +720,6 @@ func TestPatchContender(t *testing.T) {
 		assert.Equal(t, fakedContender.CompClassID, contender.CompClassID)
 		assert.Equal(t, fakedContender.RegistrationCode, contender.RegistrationCode)
 		assert.Equal(t, fakedContender.Name, contender.Name)
-		assert.Equal(t, fakedContender.ClubName, contender.ClubName)
 		assert.Equal(t, fakedContender.Entered, contender.Entered)
 		assert.Equal(t, fakedContender.WithdrawnFromFinals, contender.WithdrawnFromFinals)
 		assert.Equal(t, fakedContender.Disqualified, contender.Disqualified)
@@ -744,7 +742,6 @@ func TestPatchContender(t *testing.T) {
 			CompClassID:         fakedCompClassID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
-			ClubName:            "Testers' Climbing Club",
 			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        true,
@@ -792,7 +789,6 @@ func TestPatchContender(t *testing.T) {
 			CompClassID:         0,
 			RegistrationCode:    "ABCD1234",
 			Name:                "",
-			ClubName:            "",
 			Entered:             time.Time{},
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
@@ -830,14 +826,12 @@ func TestPatchContender(t *testing.T) {
 		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
 			CompClassID: domain.NewPatch(fakedCompClassID),
 			Name:        domain.NewPatch("John Doe"),
-			ClubName:    domain.NewPatch("Testers' Climbing Club"),
 		})
 
 		require.NoError(t, err)
 
 		assert.Equal(t, fakedCompClassID, contender.CompClassID)
 		assert.Equal(t, "John Doe", contender.Name)
-		assert.Equal(t, "Testers' Climbing Club", contender.ClubName)
 		assert.WithinDuration(t, time.Now(), contender.Entered, time.Minute)
 
 		mockedEventBroker.AssertCalled(t, "Dispatch", fakedContestID, domain.ContenderEnteredEvent{
@@ -849,7 +843,6 @@ func TestPatchContender(t *testing.T) {
 			ContenderID:         fakedContenderID,
 			CompClassID:         fakedCompClassID,
 			Name:                "John Doe",
-			ClubName:            "Testers' Climbing Club",
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
 		})
@@ -870,7 +863,6 @@ func TestPatchContender(t *testing.T) {
 			CompClassID:         0,
 			RegistrationCode:    "ABCD1234",
 			Name:                "",
-			ClubName:            "",
 			Entered:             time.Time{},
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
@@ -906,7 +898,6 @@ func TestPatchContender(t *testing.T) {
 			CompClassID:         fakedCompClassID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
-			ClubName:            "Testers' Climbing Club",
 			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
@@ -954,7 +945,6 @@ func TestPatchContender(t *testing.T) {
 			CompClassID:         fakedCompClassID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
-			ClubName:            "Testers' Climbing Club",
 			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
@@ -1002,7 +992,6 @@ func TestPatchContender(t *testing.T) {
 		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
 			CompClassID:         domain.NewPatch(fakedOtherCompClass.ID),
 			Name:                domain.NewPatch("Jane Doe"),
-			ClubName:            domain.NewPatch("Space Climbers"),
 			WithdrawnFromFinals: domain.NewPatch(true),
 			Disqualified:        domain.NewPatch(true),
 		})
@@ -1011,7 +1000,6 @@ func TestPatchContender(t *testing.T) {
 
 		assert.Equal(t, fakedOtherCompClass.ID, contender.CompClassID)
 		assert.Equal(t, "Jane Doe", contender.Name)
-		assert.Equal(t, "Space Climbers", contender.ClubName)
 		assert.Equal(t, true, contender.WithdrawnFromFinals)
 		assert.Equal(t, true, contender.Disqualified)
 		assert.Equal(t, currentTime, contender.Entered)
@@ -1025,7 +1013,6 @@ func TestPatchContender(t *testing.T) {
 			ContenderID:         fakedContenderID,
 			CompClassID:         fakedOtherCompClass.ID,
 			Name:                "Jane Doe",
-			ClubName:            "Space Climbers",
 			WithdrawnFromFinals: true,
 			Disqualified:        true,
 		})
@@ -1054,7 +1041,6 @@ func TestPatchContender(t *testing.T) {
 			CompClassID:         fakedCompClassID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
-			ClubName:            "Testers' Climbing Club",
 			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
@@ -1103,7 +1089,6 @@ func TestPatchContender(t *testing.T) {
 			CompClassID:         fakedCompClassID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
-			ClubName:            "Testers' Climbing Club",
 			Entered:             currentTime,
 			WithdrawnFromFinals: true,
 			Disqualified:        false,
@@ -1167,7 +1152,6 @@ func TestPatchContender(t *testing.T) {
 			CompClassID:         fakedCompClassID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
-			ClubName:            "Testers' Climbing Club",
 			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        true,
@@ -1233,7 +1217,6 @@ func TestPatchContender(t *testing.T) {
 			CompClassID:         fakedCompClassID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
-			ClubName:            "Testers' Climbing Club",
 			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
@@ -1295,7 +1278,6 @@ func TestPatchContender(t *testing.T) {
 			CompClassID:         fakedOtherCompClass.ID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
-			ClubName:            "Testers' Climbing Club",
 			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
@@ -1352,7 +1334,6 @@ func TestPatchContender(t *testing.T) {
 			CompClassID:         fakedSecondCompClass.ID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
-			ClubName:            "Testers' Climbing Club",
 			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
