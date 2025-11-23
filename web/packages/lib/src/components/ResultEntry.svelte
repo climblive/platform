@@ -20,7 +20,7 @@
       -
     {/if}
   </div>
-  <div class="name">{scoreboardEntry.publicName}</div>
+  <div class="name">{scoreboardEntry.name}</div>
   <div class="score">
     {#if score === undefined || score.score === 0}
       -

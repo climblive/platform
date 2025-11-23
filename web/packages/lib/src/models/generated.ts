@@ -60,8 +60,6 @@ export interface Contender {
   compClassId?: CompClassID;
   registrationCode: string;
   name?: string;
-  publicName?: string;
-  clubName?: string;
   entered?: Date;
   withdrawnFromFinals: boolean;
   disqualified: boolean;
@@ -70,8 +68,6 @@ export interface Contender {
 export interface ContenderPatch {
   compClassId?: CompClassID;
   name?: string;
-  publicName?: string;
-  clubName?: string;
   withdrawnFromFinals?: boolean;
   disqualified?: boolean;
 }
@@ -168,8 +164,7 @@ export interface Series {
 export interface ScoreboardEntry {
   contenderId: ContenderID;
   compClassId: CompClassID;
-  publicName: string;
-  clubName?: string;
+  name: string;
   withdrawnFromFinals: boolean;
   disqualified: boolean;
   score?: Score;
@@ -242,8 +237,7 @@ export interface ProblemDeletedEvent {
 export interface ContenderPublicInfoUpdatedEvent {
   contenderId: ContenderID;
   compClassId: CompClassID;
-  publicName: string;
-  clubName?: string;
+  name: string;
   withdrawnFromFinals: boolean;
   disqualified: boolean;
 }

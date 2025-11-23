@@ -34,7 +34,7 @@
   const addTick = (type: "top" | "flash") => () => {
     switch (type) {
       case "top":
-        $createTick.mutate({
+        createTick.mutate({
           problemId: problem.id,
           top: true,
           attemptsTop: 999,
@@ -44,7 +44,7 @@
 
         break;
       case "flash":
-        $createTick.mutate({
+        createTick.mutate({
           problemId: problem.id,
           top: true,
           attemptsTop: 1,
@@ -58,7 +58,7 @@
 
   const removeTick = () => {
     if (tick?.id) {
-      $deleteTick.mutate(tick.id);
+      deleteTick.mutate(tick.id);
     }
   };
 </script>
@@ -85,13 +85,11 @@
     </div>
   </span>
   {#if tick}
-    <button onclick={removeTick} disabled={$deleteTick.isPending}>Unsend</button
-    >
+    <button onclick={removeTick} disabled={deleteTick.isPending}>Unsend</button>
   {:else}
-    <button onclick={addTick("top")} disabled={$createTick.isPending}
-      >Top</button
+    <button onclick={addTick("top")} disabled={createTick.isPending}>Top</button
     >
-    <button onclick={addTick("flash")} disabled={$createTick.isPending}
+    <button onclick={addTick("flash")} disabled={createTick.isPending}
       >Flash</button
     >
   {/if}

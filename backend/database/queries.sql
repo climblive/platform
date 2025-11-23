@@ -33,15 +33,14 @@ WHERE contest_id = ?;
 
 -- name: UpsertContender :execlastid
 INSERT INTO 
-	contender (id, organizer_id, contest_id, registration_code, name, club, class_id, entered, disqualified, withdrawn_from_finals)
+	contender (id, organizer_id, contest_id, registration_code, name, class_id, entered, disqualified, withdrawn_from_finals)
 VALUES 
-	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	(?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     contest_id = VALUES(contest_id),
     registration_code = VALUES(registration_code),
     name = VALUES(name),
-    club = VALUES(club),
     class_id = VALUES(class_id),
     entered = VALUES(entered),
     disqualified = VALUES(disqualified),
@@ -92,6 +91,12 @@ SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) A
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 WHERE contest.id = ?
+GROUP BY contest.id;
+
+-- name: GetAllContests :many
+SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+FROM contest
+LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 GROUP BY contest.id;
 
 -- name: UpsertContest :execlastid

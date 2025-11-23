@@ -14,7 +14,6 @@
 
   const registrationFormSchema: z.ZodType<ContenderPatch> = z.object({
     name: z.string().min(1),
-    clubName: z.string().optional(),
     compClassId: z.coerce.number().gt(0, { message: "" }),
     withdrawnFromFinals: z.coerce.boolean(),
   });
@@ -32,7 +31,7 @@
   let compClassesQuery = $derived(getCompClassesQuery($session.contestId));
 </script>
 
-{#if $compClassesQuery.data}
+{#if compClassesQuery.data}
   <GenericForm schema={registrationFormSchema} {submit}>
     <fieldset>
       <wa-input
@@ -43,13 +42,6 @@
         required
         value={data.name}
       ></wa-input>
-      <wa-input
-        size="small"
-        {@attach name("clubName")}
-        label="Club name"
-        type="text"
-        value={data.clubName}
-      ></wa-input>
       <wa-select
         size="small"
         {@attach name("compClassId")}
@@ -57,7 +49,7 @@
         required
         {@attach value(data.compClassId)}
       >
-        {#each $compClassesQuery.data as compClass (compClass.id)}
+        {#each compClassesQuery.data as compClass (compClass.id)}
           <wa-option
             value={compClass.id}
             disabled={isAfter(new Date(), compClass.timeEnd)}

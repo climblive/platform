@@ -14,7 +14,7 @@
 
 <section>
   <div class="controls">
-    <a href={`${getApiUrl()}/contests/${contestId}/results`}>
+    <a href={`${getApiUrl()}/contests/${contestId}/results`} target="_blank">
       <wa-button appearance="outlined"
         >Download results
         <wa-icon name="file-excel" slot="start"></wa-icon>

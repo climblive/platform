@@ -6,7 +6,7 @@
 
   const selfQuery = $derived(getSelfQuery());
 
-  const self = $derived($selfQuery.data);
+  const self = $derived(selfQuery.data);
 
   const selectedOrganizer =
     getContext<Writable<number | undefined>>("selectedOrganizer");

@@ -28,11 +28,11 @@
   const ascentsByProblem = $derived.by(() => {
     const ascentsByProblem = new Map<ProblemID, number>();
 
-    if ($ticksQuery.data === undefined) {
+    if (ticksQuery.data === undefined) {
       return ascentsByProblem;
     }
 
-    for (const { problemId } of $ticksQuery.data) {
+    for (const { problemId } of ticksQuery.data) {
       const ascents = ascentsByProblem.get(problemId);
 
       if (ascents !== undefined) {
@@ -48,11 +48,11 @@
   type ProblemWithAscents = Problem & { ascents: number };
 
   const sortedProblemsWithAscents = $derived.by(() => {
-    if ($problemsQuery.data === undefined) {
+    if (problemsQuery.data === undefined) {
       return undefined;
     }
 
-    const problems = $problemsQuery.data.map<ProblemWithAscents>((problem) => ({
+    const problems = problemsQuery.data.map<ProblemWithAscents>((problem) => ({
       ...problem,
       ascents: ascentsByProblem.get(problem.id) ?? 0,
     }));
@@ -155,6 +155,11 @@
   {ascents}
 {/snippet}
 
+<p class="copy">
+  Problems refer to the boulder problems that the contenders will attempt during
+  the contest, each of which can have its own point value.
+</p>
+
 <section>
   <wa-button
     variant="neutral"
@@ -206,5 +211,9 @@
 
   wa-button.show-more {
     align-self: center;
+  }
+
+  .copy {
+    color: var(--wa-color-text-quiet);
   }
 </style>

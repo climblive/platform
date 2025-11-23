@@ -56,8 +56,7 @@ func TestGetScoreboard(t *testing.T) {
 		fakedContender := domain.Contender{
 			ID:                  contenderID,
 			CompClassID:         fakedCompClassID,
-			PublicName:          fmt.Sprintf("Climber %d", i),
-			ClubName:            "Testers' Climbing Club",
+			Name:                fmt.Sprintf("Climber %d", i),
 			WithdrawnFromFinals: true,
 			Disqualified:        true,
 			Score: &domain.Score{
@@ -103,8 +102,7 @@ func TestGetScoreboard(t *testing.T) {
 
 	assert.Equal(t, domain.ContenderID(1), scoreboard[0].ContenderID)
 	assert.Equal(t, fakedCompClassID, scoreboard[0].CompClassID)
-	assert.Equal(t, "Climber 1", scoreboard[0].PublicName)
-	assert.Equal(t, "Testers' Climbing Club", scoreboard[0].ClubName)
+	assert.Equal(t, "Climber 1", scoreboard[0].Name)
 	assert.Equal(t, true, scoreboard[0].WithdrawnFromFinals)
 	assert.Equal(t, true, scoreboard[0].Disqualified)
 	assert.NotNil(t, scoreboard[0].Score)
@@ -119,8 +117,7 @@ func TestGetScoreboard(t *testing.T) {
 
 		assert.Equal(t, domain.ContenderID(i), entry.ContenderID)
 		assert.Equal(t, fakedCompClassID, entry.CompClassID)
-		assert.Equal(t, fmt.Sprintf("Climber %d", i), entry.PublicName)
-		assert.Equal(t, "Testers' Climbing Club", entry.ClubName)
+		assert.Equal(t, fmt.Sprintf("Climber %d", i), entry.Name)
 		assert.Equal(t, true, entry.WithdrawnFromFinals)
 		assert.Equal(t, true, entry.Disqualified)
 		assert.NotNil(t, entry.Score)
@@ -231,6 +228,92 @@ func TestGetContestsByOrganizer(t *testing.T) {
 	})
 }
 
+func TestGetAllContests(t *testing.T) {
+	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedOwnership := domain.OwnershipData{
+		OrganizerID: fakedOrganizerID,
+	}
+
+	makeMocks := func() (*repositoryMock, *authorizerMock) {
+		mockedRepo := new(repositoryMock)
+
+		mockedAuthorizer := new(authorizerMock)
+
+		return mockedRepo, mockedAuthorizer
+	}
+
+	t.Run("HappyCase", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.AnythingOfType("domain.OwnershipData")).
+			Return(domain.AdminRole, nil)
+
+		mockedRepo.
+			On("GetAllContests", mock.Anything, nil).
+			Return([]domain.Contest{
+				{
+					ID:        fakedContestID,
+					Ownership: fakedOwnership,
+				},
+			}, nil)
+
+		ucase := usecases.ContestUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		contests, err := ucase.GetAllContests(context.Background())
+
+		require.NoError(t, err)
+		require.Len(t, contests, 1)
+		assert.Equal(t, fakedContestID, contests[0].ID)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.AnythingOfType("domain.OwnershipData")).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		ucase := usecases.ContestUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.GetAllContests(context.Background())
+
+		require.ErrorIs(t, err, domain.ErrNoOwnership)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("NotAdmin", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, mock.AnythingOfType("domain.OwnershipData")).
+			Return(domain.OrganizerRole, nil)
+
+		ucase := usecases.ContestUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.GetAllContests(context.Background())
+
+		require.ErrorIs(t, err, domain.ErrNotAuthorized)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+}
 func TestCreateContest(t *testing.T) {
 	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{

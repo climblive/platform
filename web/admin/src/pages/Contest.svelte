@@ -33,7 +33,7 @@
 
   const contestQuery = $derived(getContestQuery(contestId));
 
-  let contest = $derived($contestQuery.data);
+  let contest = $derived(contestQuery.data);
 
   $effect(() => {
     const hash = window.location.hash.substring(1);

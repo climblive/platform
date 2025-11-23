@@ -56,11 +56,11 @@
   let score: number = $state(0);
   let placement: number | undefined = $state();
 
-  let contender = $derived($contenderQuery.data);
-  let contest = $derived($contestQuery.data);
-  let compClasses = $derived($compClassesQuery.data);
-  let problems = $derived($problemsQuery.data);
-  let ticks = $derived($ticksQuery.data);
+  let contender = $derived(contenderQuery.data);
+  let contest = $derived(contestQuery.data);
+  let compClasses = $derived(compClassesQuery.data);
+  let problems = $derived(problemsQuery.data);
+  let ticks = $derived(ticksQuery.data);
   let selectedCompClass = $derived(
     compClasses?.find(({ id }) => id === contender?.compClassId),
   );
@@ -207,7 +207,6 @@
             contestName={contest.name}
             compClassName={selectedCompClass?.name}
             contenderName={contender.name}
-            contenderClub={contender.clubName}
             {score}
             {placement}
             {contestState}

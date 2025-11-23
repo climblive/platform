@@ -13,7 +13,7 @@ import (
 )
 
 type Database struct {
-	db      *sql.DB
+	Handle  *sql.DB
 	queries *database.Queries
 }
 
@@ -38,13 +38,13 @@ func NewDatabase(username, password, host string, port int, databaseName string)
 	db.SetConnMaxLifetime(time.Hour)
 
 	return &Database{
-		db:      db,
+		Handle:  db,
 		queries: queries,
 	}, nil
 }
 
 func (d *Database) Begin() (domain.Transaction, error) {
-	tx, err := d.db.Begin()
+	tx, err := d.Handle.Begin()
 	if err != nil {
 		return nil, err
 	}

@@ -84,9 +84,6 @@ test('enter contest by entering registration code', async ({ page }) => {
   await page.waitForURL('/ABCD0002/register');
 
   await page.getByRole("textbox", { name: "Full name *" }).pressSequentially("Dwight Schrute")
-  await page.getByRole("textbox", {
-    name: "Club name"
-  }).pressSequentially("Scranton Climbing Club")
   const compClass = page.getByRole("combobox", { name: "Competition class *" })
   await compClass.click()
   await page.getByRole("option", { name: "Males", exact: true }).click()
@@ -166,7 +163,6 @@ test('edit profile', async ({ page }) => {
   await page.goto('/ABCD0003');
 
   await expect(page.getByText("Michael Scott")).toBeVisible()
-  await expect(page.getByText("Scranton Climbing Club")).toBeVisible()
   await expect(page.getByText("Males", { exact: true })).toBeVisible()
 
   await page.getByRole("button", { name: "Edit" }).click({ force: true });
@@ -177,12 +173,6 @@ test('edit profile', async ({ page }) => {
   await nameInput.fill("")
   await nameInput.pressSequentially("Phyllis Lapin-Vance")
 
-  const clubNameInput = page.getByRole("textbox", {
-    name: "Club name"
-  })
-  await clubNameInput.fill("")
-  await clubNameInput.pressSequentially("Dunder Mifflin Climbing Club")
-
   const compClass = page.getByRole("combobox", { name: "Competition class *" })
   await compClass.click()
   await page.getByRole("option", { name: "Females", exact: true }).click()
@@ -192,7 +182,6 @@ test('edit profile', async ({ page }) => {
   await page.waitForURL('/ABCD0003');
 
   await expect(page.getByText("Phyllis Lapin-Vance")).toBeVisible()
-  await expect(page.getByText("Dunder Mifflin Climbing Club")).toBeVisible()
   await expect(page.getByText("Females", { exact: true })).toBeVisible()
 });
 

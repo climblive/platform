@@ -114,8 +114,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 	publicInfoEvent := domain.ContenderPublicInfoUpdatedEvent{
 		ContenderID:         contenderID,
 		CompClassID:         contender.CompClassID,
-		PublicName:          contender.PublicName,
-		ClubName:            contender.ClubName,
+		Name:                contender.Name,
 		WithdrawnFromFinals: contender.WithdrawnFromFinals,
 		Disqualified:        contender.Disqualified,
 	}
@@ -192,18 +191,6 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 		}
 	}
 
-	if patch.PublicName.Present {
-		contender.PublicName = strings.TrimSpace(patch.PublicName.Value)
-
-		if contender.PublicName == "" {
-			contender.PublicName = contender.Name
-		}
-	}
-
-	if patch.ClubName.Present {
-		contender.ClubName = strings.TrimSpace(patch.ClubName.Value)
-	}
-
 	if patch.WithdrawnFromFinals.Present && contender.WithdrawnFromFinals != patch.WithdrawnFromFinals.Value {
 		if patch.WithdrawnFromFinals.Value {
 			events = append(events, domain.ContenderWithdrewFromFinalsEvent{
@@ -237,8 +224,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 	}
 
 	publicInfoEvent.CompClassID = contender.CompClassID
-	publicInfoEvent.PublicName = contender.PublicName
-	publicInfoEvent.ClubName = contender.ClubName
+	publicInfoEvent.Name = contender.Name
 	publicInfoEvent.WithdrawnFromFinals = contender.WithdrawnFromFinals
 	publicInfoEvent.Disqualified = contender.Disqualified
 
