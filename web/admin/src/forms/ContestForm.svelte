@@ -23,7 +23,7 @@
   import type WaTextarea from "@awesome.me/webawesome/dist/components/textarea/textarea.js";
   import { GenericForm, name } from "@climblive/lib/forms";
   import type { Contest } from "@climblive/lib/models";
-  import { Editor } from "@tiptap/core";
+  import { ChainedCommands, Editor } from "@tiptap/core";
   import { StarterKit } from "@tiptap/starter-kit";
   import { onDestroy, onMount, type Snippet } from "svelte";
 
@@ -59,6 +59,26 @@
     editor?.destroy();
   });
 </script>
+
+{#snippet richTextModifier(
+  editor: Editor,
+  action: (chain: ChainedCommands) => ChainedCommands,
+  isActive: (editor: Editor) => boolean,
+  iconName: string,
+)}
+  <wa-button
+    size="small"
+    onclick={(e: MouseEvent) => {
+      e.preventDefault();
+
+      const chain = editor.chain().focus();
+      action(chain).run;
+    }}
+    class:active={isActive(editor)}
+  >
+    <wa-icon name={iconName}></wa-icon>
+  </wa-button>
+{/snippet}
 
 <GenericForm {schema} {submit}>
   <fieldset>
@@ -128,66 +148,42 @@
       ></wa-textarea>
       {#if editor}
         <wa-button-group>
-          <wa-button
-            size="small"
-            onclick={(e: MouseEvent) => {
-              e.preventDefault();
-              editor?.chain().focus().toggleHeading({ level: 1 }).run();
-            }}
-            class:active={editor.isActive("heading", { level: 1 })}
-          >
-            <wa-icon name="heading"></wa-icon>
-          </wa-button>
-          <wa-button
-            size="small"
-            onclick={(e: MouseEvent) => {
-              e.preventDefault();
-              editor?.chain().focus().setParagraph().run();
-            }}
-            class:active={editor.isActive("paragraph")}
-          >
-            <wa-icon name="paragraph"></wa-icon>
-          </wa-button>
-          <wa-button
-            size="small"
-            onclick={(e: MouseEvent) => {
-              e.preventDefault();
-              editor?.chain().focus().setItalic().run();
-            }}
-            class:active={editor.isActive("paragraph")}
-          >
-            <wa-icon name="italic"></wa-icon>
-          </wa-button>
-          <wa-button
-            size="small"
-            onclick={(e: MouseEvent) => {
-              e.preventDefault();
-              editor?.chain().focus().setBold().run();
-            }}
-            class:active={editor.isActive("paragraph")}
-          >
-            <wa-icon name="bold"></wa-icon>
-          </wa-button>
-          <wa-button
-            size="small"
-            onclick={(e: MouseEvent) => {
-              e.preventDefault();
-              editor?.chain().focus().setUnderline().run();
-            }}
-            class:active={editor.isActive("paragraph")}
-          >
-            <wa-icon name="underline"></wa-icon>
-          </wa-button>
-          <wa-button
-            size="small"
-            onclick={(e: MouseEvent) => {
-              e.preventDefault();
-              editor?.chain().focus().setStrike().run();
-            }}
-            class:active={editor.isActive("paragraph")}
-          >
-            <wa-icon name="strikethrough"></wa-icon>
-          </wa-button>
+          {@render richTextModifier(
+            editor,
+            (chain) => chain.toggleHeading({ level: 1 }),
+            (editor) => editor.isActive("heading", { level: 1 }),
+            "heading",
+          )}
+          {@render richTextModifier(
+            editor,
+            (chain) => chain.setParagraph(),
+            (editor) => editor.isActive("paragraph"),
+            "paragraph",
+          )}
+          {@render richTextModifier(
+            editor,
+            (chain) => chain.setItalic(),
+            (editor) => editor.isActive("italic"),
+            "italic",
+          )}
+          {@render richTextModifier(
+            editor,
+            (chain) => chain.setBold(),
+            (editor) => editor.isActive("bold"),
+            "bold",
+          )}
+          {@render richTextModifier(
+            editor,
+            (chain) => chain.setUnderline(),
+            (editor) => editor.isActive("underline"),
+            "underline",
+          )}
+          {@render richTextModifier(
+            editor,
+            (chain) => chain.setStrike(),
+            (editor) => editor.isActive("strike"),
+            "strikethrough",
+          )}
         </wa-button-group>
       {/if}
       <div bind:this={element} class="rules"></div>
