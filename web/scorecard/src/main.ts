@@ -11,6 +11,7 @@ import { mount } from "svelte";
 import App from "./App.svelte";
 import FailsafeApp from "./FailsafeApp.svelte";
 import TryFailsafe from "./TryFailsafe.svelte";
+import "element-internals-polyfill";
 
 if (import.meta.env.PROD) {
   Sentry.init({
