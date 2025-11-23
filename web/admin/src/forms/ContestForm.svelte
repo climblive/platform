@@ -23,7 +23,7 @@
   import type WaTextarea from "@awesome.me/webawesome/dist/components/textarea/textarea.js";
   import { GenericForm, name } from "@climblive/lib/forms";
   import type { Contest } from "@climblive/lib/models";
-  import { ChainedCommands, Editor } from "@tiptap/core";
+  import { type ChainedCommands, Editor } from "@tiptap/core";
   import { StarterKit } from "@tiptap/starter-kit";
   import { onDestroy, onMount, type Snippet } from "svelte";
 
@@ -72,7 +72,7 @@
       e.preventDefault();
 
       const chain = editor.chain().focus();
-      action(chain).run;
+      action(chain).run();
     }}
     class:active={isActive(editor)}
   >
@@ -183,6 +183,18 @@
             (chain) => chain.setStrike(),
             (editor) => editor.isActive("strike"),
             "strikethrough",
+          )}
+          {@render richTextModifier(
+            editor,
+            (chain) => chain.toggleBulletList(),
+            (editor) => editor.isActive("bulletList"),
+            "list-ul",
+          )}
+          {@render richTextModifier(
+            editor,
+            (chain) => chain.toggleOrderedList(),
+            (editor) => editor.isActive("orderedList"),
+            "list-ol",
           )}
         </wa-button-group>
       {/if}
