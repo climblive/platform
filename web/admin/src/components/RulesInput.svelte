@@ -151,7 +151,7 @@
     }
 
     &::part(base) {
-      gap: 0.125rem;
+      gap: 0.0625rem;
     }
   }
 
