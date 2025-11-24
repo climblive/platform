@@ -10,7 +10,7 @@
     rules: string | undefined;
   }
 
-  let { rules }: Props = $props();
+  const { rules }: Props = $props();
 
   let rulesElement: HTMLElement | undefined = $state();
   let hiddenElement: HTMLInputElement | undefined = $state();
