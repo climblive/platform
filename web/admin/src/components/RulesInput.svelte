@@ -149,6 +149,14 @@
     &:not(:last-of-type) {
       margin-inline-end: var(--wa-space-xs);
     }
+
+    &::part(base) {
+      gap: 0.125rem;
+    }
+  }
+
+  wa-button::part(base) {
+    border-color: var(--wa-color-border-loud);
   }
 
   label {
