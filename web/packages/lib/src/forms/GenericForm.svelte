@@ -67,7 +67,7 @@
     }
 
     for (const input of inputs) {
-      if (!input.hasOwnProperty("setCustomValidity")) {
+      if (!Object.hasOwn(input, "setCustomValidity")) {
         continue;
       }
 
