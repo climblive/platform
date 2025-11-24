@@ -31,6 +31,9 @@
     "@svelte-put/qr": "^2.1.1",
     "@tanstack/svelte-query": "^6.0.6",
     "axios": "^1.13.2",
+    "@tiptap/core": "^3.4.4",
+    "@tiptap/pm": "^3.4.4",
+    "@tiptap/starter-kit": "^3.4.4",
     "date-fns": "^4.1.0",
     "svelte-routing": "^2.13.0",
     "zod": "^3.25.76"
