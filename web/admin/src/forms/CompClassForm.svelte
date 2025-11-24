@@ -30,11 +30,12 @@
 </script>
 
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import type WaInput from "@awesome.me/webawesome/dist/components/input/input.js";
   import { GenericForm, name } from "@climblive/lib/forms";
   import type { CompClass } from "@climblive/lib/models";
-  import { format } from "date-fns";
+  import { addSeconds, format } from "date-fns";
   import { type Snippet } from "svelte";
 
   type T = $$Generic<Partial<CompClass>>;
@@ -77,6 +78,18 @@
       previousTimeBegin = begin;
     }
   }
+
+  const extendTimeEnd = (minutes: number) => {
+    if (!timeEndInput || !timeEndInput.value) {
+      return;
+    }
+
+    const end = new Date(timeEndInput.value);
+    timeEndInput.value = format(
+      addSeconds(end, minutes * 60),
+      "yyyy-MM-dd'T'HH:mm",
+    );
+  };
 </script>
 
 <GenericForm {schema} {submit}>
@@ -118,6 +131,14 @@
         ? format(data.timeEnd, "yyyy-MM-dd'T'HH:mm")
         : undefined}
     ></wa-input>
+    <div class="quick-controls">
+      <wa-button pill size="small" onclick={() => extendTimeEnd(5)}
+        >+5 min</wa-button
+      >
+      <wa-button pill size="small" onclick={() => extendTimeEnd(15)}
+        >+15 min</wa-button
+      >
+    </div>
     {@render children?.()}
   </fieldset>
 </GenericForm>
@@ -127,5 +148,10 @@
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-s);
+  }
+
+  .quick-controls {
+    display: flex;
+    gap: var(--wa-space-xs);
   }
 </style>
