@@ -1,8 +1,6 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button-group/button-group.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
-  import type WaTextarea from "@awesome.me/webawesome/dist/components/textarea/textarea.js";
   import { name } from "@climblive/lib/forms";
   import { type ChainedCommands, Editor } from "@tiptap/core";
   import { StarterKit } from "@tiptap/starter-kit";
@@ -14,109 +12,126 @@
 
   let { rules }: Props = $props();
 
-  let element: HTMLElement | undefined = $state();
-  let rulesElement: WaTextarea | undefined = $state();
-  let editor = $state<Editor>();
+  let rulesElement: HTMLElement | undefined = $state();
+  let hiddenElement: HTMLInputElement | undefined = $state();
+  let editorState = $state<{ editor: Editor | null }>({ editor: null });
+
+  const id = $props.id();
 
   onMount(() => {
-    editor = new Editor({
-      element: element,
+    editorState.editor = new Editor({
+      element: rulesElement,
       extensions: [StarterKit],
       content: rules,
-
+      editorProps: {
+        attributes: {
+          "aria-labelledby": id,
+          "aria-multiline": "true",
+        },
+      },
       onUpdate: ({ editor }) => {
-        if (rulesElement) {
-          rulesElement.value = editor.getHTML();
+        if (hiddenElement) {
+          hiddenElement.value = editor.getHTML();
         }
+      },
+      onTransaction: ({ editor }) => {
+        editorState = { editor };
       },
     });
   });
+
   onDestroy(() => {
-    editor?.destroy();
+    editorState.editor?.destroy();
   });
 </script>
 
-{#snippet richTextModifier(
-  editor: Editor,
-  action: (chain: ChainedCommands) => ChainedCommands,
-  isActive: (editor: Editor) => boolean,
-  iconName: string,
-)}
+{#snippet richTextModifier(options: {
+  editor: Editor;
+  action: (chain: ChainedCommands) => ChainedCommands;
+  isActive: (editor: Editor) => boolean;
+  iconName: string;
+})}
   <wa-button
     size="small"
     onclick={(e: MouseEvent) => {
       e.preventDefault();
 
-      const chain = editor.chain().focus();
-      action(chain).run();
+      const chain = options.editor.chain().focus();
+      options.action(chain).run();
     }}
-    class:active={isActive(editor)}
+    class:active={options.isActive(options.editor)}
+    appearance={options.isActive(options.editor)
+      ? "filled-outlined"
+      : "outlined"}
   >
-    <wa-icon name={iconName}></wa-icon>
+    <wa-icon name={options.iconName}></wa-icon>
   </wa-button>
 {/snippet}
 
 <div>
-  <wa-textarea
-    size="small"
-    {@attach name("rules")}
-    label="Rules"
-    value={rules ?? ""}
-    bind:this={rulesElement}
-  ></wa-textarea>
-  {#if editor}
+  <!-- svelte-ignore a11y_label_has_associated_control -->
+  <label {id}>Rules</label>
+  <input type="hidden" {@attach name("rules")} bind:this={hiddenElement} />
+  {#if editorState.editor}
     <wa-button-group>
-      {@render richTextModifier(
-        editor,
-        (chain) => chain.toggleHeading({ level: 2 }),
-        (editor) => editor.isActive("heading", { level: 2 }),
-        "heading",
-      )}
-      {@render richTextModifier(
-        editor,
-        (chain) => chain.setParagraph(),
-        (editor) => editor.isActive("paragraph"),
-        "paragraph",
-      )}
-      {@render richTextModifier(
-        editor,
-        (chain) => chain.toggleItalic(),
-        (editor) => editor.isActive("italic"),
-        "italic",
-      )}
-      {@render richTextModifier(
-        editor,
-        (chain) => chain.toggleBold(),
-        (editor) => editor.isActive("bold"),
-        "bold",
-      )}
-      {@render richTextModifier(
-        editor,
-        (chain) => chain.toggleUnderline(),
-        (editor) => editor.isActive("underline"),
-        "underline",
-      )}
-      {@render richTextModifier(
-        editor,
-        (chain) => chain.toggleStrike(),
-        (editor) => editor.isActive("strike"),
-        "strikethrough",
-      )}
-      {@render richTextModifier(
-        editor,
-        (chain) => chain.toggleBulletList(),
-        (editor) => editor.isActive("bulletList"),
-        "list-ul",
-      )}
-      {@render richTextModifier(
-        editor,
-        (chain) => chain.toggleOrderedList(),
-        (editor) => editor.isActive("orderedList"),
-        "list-ol",
-      )}
+      {@render richTextModifier({
+        editor: editorState.editor,
+        action: (chain: ChainedCommands) => chain.setHeading({ level: 2 }),
+        isActive: (editor: Editor) => editor.isActive("heading", { level: 2 }),
+        iconName: "heading",
+      })}
+      {@render richTextModifier({
+        editor: editorState.editor,
+        action: (chain: ChainedCommands) => chain.setParagraph(),
+        isActive: (editor: Editor) => editor.isActive("paragraph"),
+        iconName: "paragraph",
+      })}
+    </wa-button-group>
+
+    <wa-button-group>
+      {@render richTextModifier({
+        editor: editorState.editor,
+        action: (chain: ChainedCommands) => chain.toggleItalic(),
+        isActive: (editor: Editor) => editor.isActive("italic"),
+        iconName: "italic",
+      })}
+      {@render richTextModifier({
+        editor: editorState.editor,
+        action: (chain: ChainedCommands) => chain.toggleBold(),
+        isActive: (editor: Editor) => editor.isActive("bold"),
+        iconName: "bold",
+      })}
+      {@render richTextModifier({
+        editor: editorState.editor,
+        action: (chain: ChainedCommands) => chain.toggleUnderline(),
+        isActive: (editor: Editor) => editor.isActive("underline"),
+        iconName: "underline",
+      })}
+      {@render richTextModifier({
+        editor: editorState.editor,
+        action: (chain: ChainedCommands) => chain.toggleStrike(),
+        isActive: (editor: Editor) => editor.isActive("strike"),
+        iconName: "strikethrough",
+      })}
+    </wa-button-group>
+
+    <wa-button-group>
+      {@render richTextModifier({
+        editor: editorState.editor,
+        action: (chain: ChainedCommands) => chain.toggleBulletList(),
+        isActive: (editor: Editor) => editor.isActive("bulletList"),
+        iconName: "list-ul",
+      })}
+      {@render richTextModifier({
+        editor: editorState.editor,
+        action: (chain: ChainedCommands) => chain.toggleOrderedList(),
+        isActive: (editor: Editor) => editor.isActive("orderedList"),
+        iconName: "list-ol",
+      })}
     </wa-button-group>
   {/if}
-  <div bind:this={element} class="rules"></div>
+
+  <div bind:this={rulesElement} class="rules"></div>
 </div>
 
 <style>
@@ -128,11 +143,21 @@
     padding: 0 var(--wa-form-control-padding-inline);
   }
 
-  wa-textarea::part(base) {
-    display: none;
-  }
-
   wa-button-group {
     margin-block-end: var(--wa-space-xs);
+
+    &:not(:last-of-type) {
+      margin-inline-end: var(--wa-space-xs);
+    }
+  }
+
+  label {
+    display: block;
+    font-size: var(--wa-font-size-s);
+    color: var(--wa-form-control-label-color);
+    font-weight: var(--wa-form-control-label-font-weight);
+    line-height: var(--wa-form-control-label-line-height);
+    margin-block-start: 0;
+    margin-block-end: 0.5em;
   }
 </style>

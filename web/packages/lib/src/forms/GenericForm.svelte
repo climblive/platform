@@ -67,6 +67,10 @@
     }
 
     for (const input of inputs) {
+      if (!input.hasOwnProperty("setCustomValidity")) {
+        continue;
+      }
+
       input.setCustomValidity("");
 
       const stashedHelpText = stash.get(input.name);
