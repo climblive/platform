@@ -201,9 +201,5 @@
 
   wa-details {
     margin-top: var(--wa-space-m);
-
-    &::part(content) {
-      padding-block: 0;
-    }
   }
 </style>
