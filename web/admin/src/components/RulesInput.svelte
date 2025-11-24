@@ -59,7 +59,6 @@
       const chain = options.editor.chain().focus();
       options.action(chain).run();
     }}
-    class:active={options.isActive(options.editor)}
     appearance={options.isActive(options.editor)
       ? "filled-outlined"
       : "outlined"}
