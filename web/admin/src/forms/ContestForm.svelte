@@ -17,8 +17,6 @@
 
 <script lang="ts">
   import RulesInput from "@/components/RulesInput.svelte";
-  import "@awesome.me/webawesome/dist/components/button-group/button-group.js";
-  import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
   import { GenericForm, name } from "@climblive/lib/forms";
