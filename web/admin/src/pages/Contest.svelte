@@ -1,6 +1,8 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
+  import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
+  import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/details/details.js";
@@ -85,13 +87,15 @@
   {#if contest === undefined}
     <Loader />
   {:else}
-    <wa-button
-      appearance="plain"
-      onclick={() =>
-        navigate(`/admin/organizers/${contest.ownership.organizerId}`)}
-      >Back to contests<wa-icon name="arrow-left" slot="start"
-      ></wa-icon></wa-button
-    >
+    <wa-breadcrumb>
+      <wa-breadcrumb-item
+        onclick={() =>
+          navigate(`/admin/organizers/${contest.ownership.organizerId}`)}
+        ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
+      >
+      <wa-breadcrumb-item>{contest.name}</wa-breadcrumb-item>
+    </wa-breadcrumb>
+
     <h1>{contest.name}</h1>
 
     <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleTabShow}>
