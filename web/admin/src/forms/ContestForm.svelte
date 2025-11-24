@@ -150,8 +150,8 @@
         <wa-button-group>
           {@render richTextModifier(
             editor,
-            (chain) => chain.toggleHeading({ level: 1 }),
-            (editor) => editor.isActive("heading", { level: 1 }),
+            (chain) => chain.toggleHeading({ level: 2 }),
+            (editor) => editor.isActive("heading", { level: 2 }),
             "heading",
           )}
           {@render richTextModifier(
@@ -162,25 +162,25 @@
           )}
           {@render richTextModifier(
             editor,
-            (chain) => chain.setItalic(),
+            (chain) => chain.toggleItalic(),
             (editor) => editor.isActive("italic"),
             "italic",
           )}
           {@render richTextModifier(
             editor,
-            (chain) => chain.setBold(),
+            (chain) => chain.toggleBold(),
             (editor) => editor.isActive("bold"),
             "bold",
           )}
           {@render richTextModifier(
             editor,
-            (chain) => chain.setUnderline(),
+            (chain) => chain.toggleUnderline(),
             (editor) => editor.isActive("underline"),
             "underline",
           )}
           {@render richTextModifier(
             editor,
-            (chain) => chain.setStrike(),
+            (chain) => chain.toggleStrike(),
             (editor) => editor.isActive("strike"),
             "strikethrough",
           )}
