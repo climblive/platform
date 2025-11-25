@@ -39,7 +39,7 @@
   const contestQuery = $derived(
     raffle?.contestId ? getContestQuery(raffle.contestId) : undefined,
   );
-  let contest = $derived(contestQuery?.data);
+  const contest = $derived(contestQuery?.data);
 
   const handleDrawWinner = () => {
     drawRaffleWinner.mutate(undefined, {
