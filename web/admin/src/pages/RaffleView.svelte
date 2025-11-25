@@ -5,6 +5,7 @@
   import type { RaffleWinner } from "@climblive/lib/models";
   import {
     drawRaffleWinnerMutation,
+    getContestQuery,
     getRaffleQuery,
     getRaffleWinnersQuery,
   } from "@climblive/lib/queries";
@@ -32,6 +33,11 @@
 
     return winners;
   });
+
+  const contestQuery = $derived(
+    raffle?.contestId ? getContestQuery(raffle.contestId) : undefined,
+  );
+  let contest = $derived(contestQuery?.data);
 
   const handleDrawWinner = () => {
     drawRaffleWinner.mutate(undefined, {
@@ -69,13 +75,23 @@
   {format(timestamp, "yyyy-MM-dd HH:mm")}
 {/snippet}
 
-{#if raffle}
-  <wa-button
-    appearance="plain"
-    onclick={() => navigate(`/admin/contests/${raffle.contestId}#raffles`)}
-    >Back to raffles<wa-icon name="arrow-left" slot="start"
-    ></wa-icon></wa-button
-  >
+{#if contest && raffle}
+  <wa-breadcrumb>
+    <wa-breadcrumb-item
+      onclick={() =>
+        navigate(`/admin/organizers/${contest.ownership.organizerId}`)}
+      ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
+    >
+    <wa-breadcrumb-item
+      onclick={() => navigate(`/admin/contests/${raffle.contestId}`)}
+      >{contest.name}</wa-breadcrumb-item
+    >
+    <wa-breadcrumb-item
+      onclick={() => navigate(`/admin/contests/${raffle.contestId}#raffles`)}
+      >Raffles</wa-breadcrumb-item
+    >
+  </wa-breadcrumb>
+
   <h1>Raffle {raffle.id}</h1>
   <section>
     <wa-button variant="neutral" onclick={handleDrawWinner}
