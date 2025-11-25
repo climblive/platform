@@ -1,5 +1,7 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
+  import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
+  import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { RaffleWinner } from "@climblive/lib/models";
