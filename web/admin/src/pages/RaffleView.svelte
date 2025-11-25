@@ -1,10 +1,13 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
+  import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
+  import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { RaffleWinner } from "@climblive/lib/models";
   import {
     drawRaffleWinnerMutation,
+    getContestQuery,
     getRaffleQuery,
     getRaffleWinnersQuery,
   } from "@climblive/lib/queries";
@@ -32,6 +35,11 @@
 
     return winners;
   });
+
+  const contestQuery = $derived(
+    raffle?.contestId ? getContestQuery(raffle.contestId) : undefined,
+  );
+  const contest = $derived(contestQuery?.data);
 
   const handleDrawWinner = () => {
     drawRaffleWinner.mutate(undefined, {
@@ -69,13 +77,23 @@
   {format(timestamp, "yyyy-MM-dd HH:mm")}
 {/snippet}
 
-{#if raffle}
-  <wa-button
-    appearance="plain"
-    onclick={() => navigate(`/admin/contests/${raffle.contestId}#raffles`)}
-    >Back to raffles<wa-icon name="arrow-left" slot="start"
-    ></wa-icon></wa-button
-  >
+{#if contest && raffle}
+  <wa-breadcrumb>
+    <wa-breadcrumb-item
+      onclick={() =>
+        navigate(`/admin/organizers/${contest.ownership.organizerId}`)}
+      ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
+    >
+    <wa-breadcrumb-item
+      onclick={() => navigate(`/admin/contests/${raffle.contestId}`)}
+      >{contest.name}</wa-breadcrumb-item
+    >
+    <wa-breadcrumb-item
+      onclick={() => navigate(`/admin/contests/${raffle.contestId}#raffles`)}
+      >Raffles</wa-breadcrumb-item
+    >
+  </wa-breadcrumb>
+
   <h1>Raffle {raffle.id}</h1>
   <section>
     <wa-button variant="neutral" onclick={handleDrawWinner}
