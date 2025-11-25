@@ -1,5 +1,8 @@
+<h1>Support</h1>
+
 <p>
-  Please feel free to drop us an email at <a href="mailto:info@climblive.com"
+  If you require assistance or have any questions or feedback, please feel free
+  to reach out to us via email at <a href="mailto:info@climblive.com"
     >info@climblive.com</a
   >.
 </p>
