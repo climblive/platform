@@ -24,12 +24,21 @@ type contestUseCase interface {
 type contestHandler struct {
 	contestUseCase   contestUseCase
 	compClassUseCase compClassUseCase
+	tickUseCase      tickUseCase
+	problemUseCase   problemUseCase
 }
 
-func InstallContestHandler(mux *Mux, contestUseCase contestUseCase, compClassUseCase compClassUseCase) {
+func InstallContestHandler(
+	mux *Mux,
+	contestUseCase contestUseCase,
+	compClassUseCase compClassUseCase,
+	tickUseCase tickUseCase,
+	problemUseCase problemUseCase) {
 	handler := &contestHandler{
 		contestUseCase:   contestUseCase,
 		compClassUseCase: compClassUseCase,
+		tickUseCase:      tickUseCase,
+		problemUseCase:   problemUseCase,
 	}
 
 	mux.HandleFunc("GET /contests/{contestID}", handler.GetContest)
@@ -188,8 +197,34 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 			return err
 		}
 
+		problems, err := hdlr.problemUseCase.GetProblemsByContest(r.Context(), contestID)
+		if err != nil {
+			return err
+		}
+
+		problemsLookup := make(map[domain.ProblemID]domain.Problem)
+		for _, problem := range problems {
+			problemsLookup[problem.ID] = problem
+		}
+
+		ticks, err := hdlr.tickUseCase.GetTicksByContest(r.Context(), contestID)
+		if err != nil {
+			return err
+		}
+
 		slices.SortFunc(scoreboard, func(a, b domain.ScoreboardEntry) int {
 			return a.Score.RankOrder - b.Score.RankOrder
+		})
+
+		slices.SortFunc(problems, func(a, b domain.Problem) int {
+			return a.Number - b.Number
+		})
+
+		slices.SortFunc(ticks, func(a, b domain.Tick) int {
+			problemA := problemsLookup[a.ProblemID]
+			problemB := problemsLookup[b.ProblemID]
+
+			return problemA.Number - problemB.Number
 		})
 
 		for _, compClass := range compClasses {
@@ -232,6 +267,16 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 				return err
 			}
 
+			problemNumbers := make([]string, 0)
+			for _, problem := range problems {
+				problemNumbers = append(problemNumbers, string(problem.Number))
+			}
+
+			err = book.SetSheetRow(sheetName, "D1", &problemNumbers)
+			if err != nil {
+				return err
+			}
+
 			nextRowNumbers[compClass.ID] = 2
 		}
 
@@ -251,6 +296,28 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 				entry.Name,
 				entry.Score.Score,
 				entry.Score.Placement})
+			if err != nil {
+				return err
+			}
+
+			problemResults := make([]string, 0)
+			for _, tick := range ticks {
+				if *tick.Ownership.ContenderID == entry.ContenderID {
+					result := ""
+
+					switch {
+
+					case tick.Top && tick.AttemptsTop == 1:
+						result = "f"
+					case tick.Top:
+						result = "t"
+					}
+
+					problemResults = append(problemResults, result)
+				}
+			}
+
+			err = book.SetSheetRow(sheetName, fmt.Sprintf("D%d", counter), &problemResults)
 			if err != nil {
 				return err
 			}
