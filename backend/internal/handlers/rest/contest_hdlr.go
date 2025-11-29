@@ -202,11 +202,6 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 			return err
 		}
 
-		problemsLookup := make(map[domain.ProblemID]domain.Problem)
-		for _, problem := range problems {
-			problemsLookup[problem.ID] = problem
-		}
-
 		ticks, err := hdlr.tickUseCase.GetTicksByContest(r.Context(), contestID)
 		if err != nil {
 			return err
@@ -218,13 +213,6 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 
 		slices.SortFunc(problems, func(a, b domain.Problem) int {
 			return a.Number - b.Number
-		})
-
-		slices.SortFunc(ticks, func(a, b domain.Tick) int {
-			problemA := problemsLookup[a.ProblemID]
-			problemB := problemsLookup[b.ProblemID]
-
-			return problemA.Number - problemB.Number
 		})
 
 		for _, compClass := range compClasses {
@@ -257,7 +245,7 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 				return err
 			}
 
-			err = book.SetCellStyle(sheetName, "A1", "C1", style)
+			err = book.SetCellStyle(sheetName, "A1", "AZ1", style)
 			if err != nil {
 				return err
 			}
@@ -269,7 +257,7 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 
 			problemNumbers := make([]string, 0)
 			for _, problem := range problems {
-				problemNumbers = append(problemNumbers, string(problem.Number))
+				problemNumbers = append(problemNumbers, fmt.Sprintf("P'%03d'", problem.Number))
 			}
 
 			err = book.SetSheetRow(sheetName, "D1", &problemNumbers)
@@ -300,7 +288,7 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 				return err
 			}
 
-			problemResults := make([]string, 0)
+			problemResults := make(map[domain.ProblemID]string, 0)
 			for _, tick := range ticks {
 				if *tick.Ownership.ContenderID == entry.ContenderID {
 					result := ""
@@ -308,16 +296,21 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 					switch {
 
 					case tick.Top && tick.AttemptsTop == 1:
-						result = "f"
+						result = "F"
 					case tick.Top:
-						result = "t"
+						result = "T"
 					}
 
-					problemResults = append(problemResults, result)
+					problemResults[tick.ProblemID] = result
 				}
 			}
 
-			err = book.SetSheetRow(sheetName, fmt.Sprintf("D%d", counter), &problemResults)
+			resultsRow := make([]string, 0)
+			for _, problem := range problems {
+				resultsRow = append(resultsRow, problemResults[problem.ID])
+			}
+
+			err = book.SetSheetRow(sheetName, fmt.Sprintf("D%d", counter), &resultsRow)
 			if err != nil {
 				return err
 			}
