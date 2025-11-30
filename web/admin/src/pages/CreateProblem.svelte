@@ -79,5 +79,6 @@
   .controls {
     display: flex;
     gap: var(--wa-space-xs);
+    justify-content: end;
   }
 </style>
