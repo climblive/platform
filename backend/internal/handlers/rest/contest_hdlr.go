@@ -262,7 +262,7 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 
 			problemNumbers := make([]string, 0)
 			for _, problem := range problems {
-				problemNumbers = append(problemNumbers, fmt.Sprintf("P%03d", problem.Number))
+				problemNumbers = append(problemNumbers, fmt.Sprintf("P%d", problem.Number))
 			}
 
 			err = book.SetSheetRow(sheetName, "D1", &problemNumbers)
