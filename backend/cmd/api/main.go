@@ -231,7 +231,7 @@ func setupMux(
 	mux.HandleFunc("OPTIONS /", HandleCORSPreFlight)
 
 	rest.InstallContenderHandler(mux, &contenderUseCase)
-	rest.InstallContestHandler(mux, &contestUseCase, &compClassUseCase)
+	rest.InstallContestHandler(mux, &contestUseCase, &compClassUseCase, &tickUseCase, &problemUseCase)
 	rest.InstallCompClassHandler(mux, &compClassUseCase)
 	rest.InstallProblemHandler(mux, &problemUseCase)
 	rest.InstallTickHandler(mux, &tickUseCase)
