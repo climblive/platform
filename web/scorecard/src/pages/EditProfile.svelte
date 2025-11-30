@@ -4,8 +4,8 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { ContenderPatch } from "@climblive/lib/models";
   import {
-      getContenderQuery,
-      patchContenderMutation,
+    getContenderQuery,
+    patchContenderMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import { getContext } from "svelte";

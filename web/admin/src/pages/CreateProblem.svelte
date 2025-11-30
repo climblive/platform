@@ -4,8 +4,8 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { ProblemTemplate } from "@climblive/lib/models";
   import {
-      createProblemMutation,
-      getProblemsQuery,
+    createProblemMutation,
+    getProblemsQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
