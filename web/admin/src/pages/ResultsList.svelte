@@ -20,7 +20,7 @@
 
     const url = window.URL.createObjectURL(blob);
     a.href = url;
-    a.download = "untitled.xls";
+    a.download = `contest_${contestId}_results.xlsx`;
     a.click();
 
     window.URL.revokeObjectURL(url);
