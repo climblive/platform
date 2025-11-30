@@ -4,6 +4,7 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { ApiClient } from "@climblive/lib";
   import { ScoreboardProvider } from "@climblive/lib/components";
+  import { toastError } from "@climblive/lib/utils";
 
   interface Props {
     contestId: number;
@@ -12,18 +13,22 @@
   let { contestId }: Props = $props();
 
   const handleDownloadResults = async () => {
-    const blob = await ApiClient.getInstance().downloadResults(contestId);
+    try {
+      const blob = await ApiClient.getInstance().downloadResults(contestId);
 
-    const a = document.createElement("a");
-    document.body.appendChild(a);
-    a.setAttribute("style", "display: none");
+      const a = document.createElement("a");
+      document.body.appendChild(a);
+      a.setAttribute("style", "display: none");
 
-    const url = window.URL.createObjectURL(blob);
-    a.href = url;
-    a.download = `contest_${contestId}_results.xlsx`;
-    a.click();
+      const url = window.URL.createObjectURL(blob);
+      a.href = url;
+      a.download = `contest_${contestId}_results.xlsx`;
+      a.click();
 
-    window.URL.revokeObjectURL(url);
+      window.URL.revokeObjectURL(url);
+    } catch {
+      toastError("Failed to download results.");
+    }
   };
 </script>
 
