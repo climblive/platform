@@ -1,14 +1,14 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import ContestForm, {
-    formSchema,
-    minuteInNanoseconds,
+      formSchema,
+      minuteInNanoseconds,
   } from "@/forms/ContestForm.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
   import {
-    getContestQuery,
-    patchContestMutation,
+      getContestQuery,
+      patchContestMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
@@ -67,6 +67,7 @@
 <style>
   .controls {
     display: flex;
-    justify-content: start;
+    justify-content: end;
+    gap: var(--wa-space-xs);
   }
 </style>

@@ -4,8 +4,8 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { ContenderPatch } from "@climblive/lib/models";
   import {
-    getContenderQuery,
-    patchContenderMutation,
+      getContenderQuery,
+      patchContenderMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import { getContext } from "svelte";
@@ -77,6 +77,6 @@
   .controls {
     display: flex;
     justify-content: end;
-    gap: var(--wa-space-s);
+    gap: var(--wa-space-xs);
   }
 </style>
