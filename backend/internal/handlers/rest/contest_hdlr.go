@@ -294,7 +294,6 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 					result := ""
 
 					switch {
-
 					case tick.Top && tick.AttemptsTop == 1:
 						result = "F"
 					case tick.Top:
