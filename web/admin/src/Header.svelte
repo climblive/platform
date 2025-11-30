@@ -21,7 +21,8 @@
 {#if !print}
   <header>
     <div>
-      <div class="logo">
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div class="logo" onclick={() => navigate("./")}>
         <FullLogo />
       </div>
       <wa-button
@@ -66,6 +67,7 @@
     padding-left: var(--wa-space-xs);
     flex-shrink: 0;
     margin-inline-start: var(--wa-space-xs);
+    cursor: pointer;
   }
 
   @media print {
