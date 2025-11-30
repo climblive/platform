@@ -245,7 +245,12 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 				return err
 			}
 
-			err = book.SetCellStyle(sheetName, "A1", "AZ1", style)
+			lastStyledCell, err := excelize.CoordinatesToCellName(3+len(problems), 1)
+			if err != nil {
+				return err
+			}
+
+			err = book.SetCellStyle(sheetName, "A1", lastStyledCell, style)
 			if err != nil {
 				return err
 			}
