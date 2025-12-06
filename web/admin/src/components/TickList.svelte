@@ -58,6 +58,13 @@
       width: "3fr",
     },
     {
+      label: "Result",
+      mobile: true,
+      render: renderResult,
+      width: "max-content",
+      align: "left",
+    },
+    {
       label: "Flash",
       mobile: true,
       render: renderFlash,
@@ -89,6 +96,18 @@
     />
     № {problem.number}
   </div>
+{/snippet}
+
+{#snippet renderResult({ tick }: TickAndProblem)}
+  {#if tick.top && false}
+    T
+  {:else if tick.zone2}
+    Z2
+  {:else if tick.zone1}
+    Z1
+  {:else}
+    <wa-icon name="minus"></wa-icon>
+  {/if}
 {/snippet}
 
 {#snippet renderFlash({ tick }: TickAndProblem)}
