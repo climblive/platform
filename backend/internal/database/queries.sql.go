@@ -600,7 +600,7 @@ func (q *Queries) GetOrganizer(ctx context.Context, id int32) (Organizer, error)
 }
 
 const getProblem = `-- name: GetProblem :one
-SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.name, problem.description, problem.points, problem.flash_bonus
+SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.name, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
 FROM problem
 WHERE id = ?
 `
@@ -620,15 +620,19 @@ func (q *Queries) GetProblem(ctx context.Context, id int32) (GetProblemRow, erro
 		&i.Problem.HoldColorPrimary,
 		&i.Problem.HoldColorSecondary,
 		&i.Problem.Name,
+		&i.Problem.Zone1Enabled,
+		&i.Problem.Zone2Enabled,
 		&i.Problem.Description,
-		&i.Problem.Points,
+		&i.Problem.PointsZone1,
+		&i.Problem.PointsZone2,
+		&i.Problem.PointsTop,
 		&i.Problem.FlashBonus,
 	)
 	return i, err
 }
 
 const getProblemByNumber = `-- name: GetProblemByNumber :one
-SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.name, problem.description, problem.points, problem.flash_bonus
+SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.name, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
 FROM problem
 WHERE contest_id = ? AND number = ?
 `
@@ -653,15 +657,19 @@ func (q *Queries) GetProblemByNumber(ctx context.Context, arg GetProblemByNumber
 		&i.Problem.HoldColorPrimary,
 		&i.Problem.HoldColorSecondary,
 		&i.Problem.Name,
+		&i.Problem.Zone1Enabled,
+		&i.Problem.Zone2Enabled,
 		&i.Problem.Description,
-		&i.Problem.Points,
+		&i.Problem.PointsZone1,
+		&i.Problem.PointsZone2,
+		&i.Problem.PointsTop,
 		&i.Problem.FlashBonus,
 	)
 	return i, err
 }
 
 const getProblemsByContest = `-- name: GetProblemsByContest :many
-SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.name, problem.description, problem.points, problem.flash_bonus
+SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.name, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
 FROM problem
 WHERE contest_id = ?
 `
@@ -687,8 +695,12 @@ func (q *Queries) GetProblemsByContest(ctx context.Context, contestID int32) ([]
 			&i.Problem.HoldColorPrimary,
 			&i.Problem.HoldColorSecondary,
 			&i.Problem.Name,
+			&i.Problem.Zone1Enabled,
+			&i.Problem.Zone2Enabled,
 			&i.Problem.Description,
-			&i.Problem.Points,
+			&i.Problem.PointsZone1,
+			&i.Problem.PointsZone2,
+			&i.Problem.PointsTop,
 			&i.Problem.FlashBonus,
 		); err != nil {
 			return nil, err
@@ -807,7 +819,7 @@ func (q *Queries) GetRafflesByContest(ctx context.Context, contestID int32) ([]G
 }
 
 const getTick = `-- name: GetTick :one
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.flash, tick.timestamp
+SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.top, tick.attempts_top, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2
 FROM tick
 WHERE id = ?
 `
@@ -825,14 +837,19 @@ func (q *Queries) GetTick(ctx context.Context, id int32) (GetTickRow, error) {
 		&i.Tick.ContestID,
 		&i.Tick.ContenderID,
 		&i.Tick.ProblemID,
-		&i.Tick.Flash,
 		&i.Tick.Timestamp,
+		&i.Tick.Top,
+		&i.Tick.AttemptsTop,
+		&i.Tick.Zone1,
+		&i.Tick.AttemptsZone1,
+		&i.Tick.Zone2,
+		&i.Tick.AttemptsZone2,
 	)
 	return i, err
 }
 
 const getTicksByContender = `-- name: GetTicksByContender :many
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.flash, tick.timestamp
+SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.top, tick.attempts_top, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2
 FROM tick
 WHERE contender_id = ?
 `
@@ -856,8 +873,13 @@ func (q *Queries) GetTicksByContender(ctx context.Context, contenderID int32) ([
 			&i.Tick.ContestID,
 			&i.Tick.ContenderID,
 			&i.Tick.ProblemID,
-			&i.Tick.Flash,
 			&i.Tick.Timestamp,
+			&i.Tick.Top,
+			&i.Tick.AttemptsTop,
+			&i.Tick.Zone1,
+			&i.Tick.AttemptsZone1,
+			&i.Tick.Zone2,
+			&i.Tick.AttemptsZone2,
 		); err != nil {
 			return nil, err
 		}
@@ -873,7 +895,7 @@ func (q *Queries) GetTicksByContender(ctx context.Context, contenderID int32) ([
 }
 
 const getTicksByContest = `-- name: GetTicksByContest :many
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.flash, tick.timestamp
+SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.top, tick.attempts_top, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2
 FROM tick
 WHERE contest_id = ?
 `
@@ -897,8 +919,13 @@ func (q *Queries) GetTicksByContest(ctx context.Context, contestID int32) ([]Get
 			&i.Tick.ContestID,
 			&i.Tick.ContenderID,
 			&i.Tick.ProblemID,
-			&i.Tick.Flash,
 			&i.Tick.Timestamp,
+			&i.Tick.Top,
+			&i.Tick.AttemptsTop,
+			&i.Tick.Zone1,
+			&i.Tick.AttemptsZone1,
+			&i.Tick.Zone2,
+			&i.Tick.AttemptsZone2,
 		); err != nil {
 			return nil, err
 		}
@@ -914,7 +941,7 @@ func (q *Queries) GetTicksByContest(ctx context.Context, contestID int32) ([]Get
 }
 
 const getTicksByProblem = `-- name: GetTicksByProblem :many
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.flash, tick.timestamp
+SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.top, tick.attempts_top, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2
 FROM tick
 WHERE problem_id = ?
 `
@@ -938,8 +965,13 @@ func (q *Queries) GetTicksByProblem(ctx context.Context, problemID int32) ([]Get
 			&i.Tick.ContestID,
 			&i.Tick.ContenderID,
 			&i.Tick.ProblemID,
-			&i.Tick.Flash,
 			&i.Tick.Timestamp,
+			&i.Tick.Top,
+			&i.Tick.AttemptsTop,
+			&i.Tick.Zone1,
+			&i.Tick.AttemptsZone1,
+			&i.Tick.Zone2,
+			&i.Tick.AttemptsZone2,
 		); err != nil {
 			return nil, err
 		}
@@ -1000,18 +1032,23 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) ([]Get
 
 const insertTick = `-- name: InsertTick :execlastid
 INSERT INTO
-    tick (organizer_id, contest_id, contender_id, problem_id, flash, timestamp)
+    tick (organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
 VALUES
-    (?, ?, ?, ?, ?, ?)
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 type InsertTickParams struct {
-	OrganizerID int32
-	ContestID   int32
-	ContenderID int32
-	ProblemID   int32
-	Flash       bool
-	Timestamp   time.Time
+	OrganizerID   int32
+	ContestID     int32
+	ContenderID   int32
+	ProblemID     int32
+	Timestamp     time.Time
+	Top           bool
+	AttemptsTop   int32
+	Zone1         bool
+	AttemptsZone1 int32
+	Zone2         bool
+	AttemptsZone2 int32
 }
 
 func (q *Queries) InsertTick(ctx context.Context, arg InsertTickParams) (int64, error) {
@@ -1020,8 +1057,13 @@ func (q *Queries) InsertTick(ctx context.Context, arg InsertTickParams) (int64, 
 		arg.ContestID,
 		arg.ContenderID,
 		arg.ProblemID,
-		arg.Flash,
 		arg.Timestamp,
+		arg.Top,
+		arg.AttemptsTop,
+		arg.Zone1,
+		arg.AttemptsZone1,
+		arg.Zone2,
+		arg.AttemptsZone2,
 	)
 	if err != nil {
 		return 0, err
@@ -1196,9 +1238,9 @@ func (q *Queries) UpsertOrganizer(ctx context.Context, arg UpsertOrganizerParams
 
 const upsertProblem = `-- name: UpsertProblem :execlastid
 INSERT INTO 
-	problem (id, organizer_id, contest_id, number, hold_color_primary, hold_color_secondary, name, description, points, flash_bonus)
+	problem (id, organizer_id, contest_id, number, hold_color_primary, hold_color_secondary, name, zone_1_enabled, zone_2_enabled, description, points_zone_1, points_zone_2, points_top, flash_bonus)
 VALUES 
-	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     contest_id = VALUES(contest_id),
@@ -1206,8 +1248,12 @@ ON DUPLICATE KEY UPDATE
     hold_color_primary = VALUES(hold_color_primary),
     hold_color_secondary = VALUES(hold_color_secondary),
     name = VALUES(name),
+    zone_1_enabled = VALUES(zone_1_enabled),
+    zone_2_enabled = VALUES(zone_2_enabled),
     description = VALUES(description),
-    points = VALUES(points),
+    points_zone_1 = VALUES(points_zone_1),
+    points_zone_2 = VALUES(points_zone_2),
+    points_top = VALUES(points_top),
     flash_bonus = VALUES(flash_bonus)
 `
 
@@ -1219,8 +1265,12 @@ type UpsertProblemParams struct {
 	HoldColorPrimary   string
 	HoldColorSecondary sql.NullString
 	Name               sql.NullString
+	Zone1Enabled       bool
+	Zone2Enabled       bool
 	Description        sql.NullString
-	Points             int32
+	PointsZone1        sql.NullInt32
+	PointsZone2        sql.NullInt32
+	PointsTop          int32
 	FlashBonus         sql.NullInt32
 }
 
@@ -1233,8 +1283,12 @@ func (q *Queries) UpsertProblem(ctx context.Context, arg UpsertProblemParams) (i
 		arg.HoldColorPrimary,
 		arg.HoldColorSecondary,
 		arg.Name,
+		arg.Zone1Enabled,
+		arg.Zone2Enabled,
 		arg.Description,
-		arg.Points,
+		arg.PointsZone1,
+		arg.PointsZone2,
+		arg.PointsTop,
 		arg.FlashBonus,
 	)
 	if err != nil {

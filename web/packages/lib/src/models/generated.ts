@@ -14,17 +14,8 @@ export type RaffleWinnerID = ResourceID;
 export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
-export type ResourceIDType =
-  | CompClassID
-  | ContenderID
-  | ContestID
-  | OrganizerID
-  | ProblemID
-  | RaffleID
-  | RaffleWinnerID
-  | SeriesID
-  | UserID
-  | TickID;
+export type ResourceIDType = 
+    CompClassID | ContenderID | ContestID | OrganizerID | ProblemID | RaffleID | RaffleWinnerID | SeriesID | UserID | TickID;
 export type ScoreEngineInstanceID = string;
 
 //////////
@@ -116,8 +107,11 @@ export interface Problem {
   holdColorPrimary: string;
   holdColorSecondary?: string;
   description?: string;
+  zone1Enabled: boolean;
+  zone2Enabled: boolean;
+  pointsZone1: number /* int */;
+  pointsZone2: number /* int */;
   pointsTop: number /* int */;
-  pointsZone: number /* int */;
   flashBonus?: number /* int */;
 }
 export interface ProblemTemplate {
@@ -125,8 +119,11 @@ export interface ProblemTemplate {
   holdColorPrimary: string;
   holdColorSecondary?: string;
   description?: string;
+  zone1Enabled: boolean;
+  zone2Enabled: boolean;
+  pointsZone1: number /* int */;
+  pointsZone2: number /* int */;
   pointsTop: number /* int */;
-  pointsZone: number /* int */;
   flashBonus?: number /* int */;
 }
 export interface ProblemPatch {
@@ -134,8 +131,11 @@ export interface ProblemPatch {
   holdColorPrimary?: string;
   holdColorSecondary?: string;
   description?: string;
+  zone1Enabled?: boolean;
+  zone2Enabled?: boolean;
+  pointsZone1?: number;
+  pointsZone2?: number;
   pointsTop?: number;
-  pointsZone?: number;
   flashBonus?: number;
 }
 export interface Raffle {
@@ -173,10 +173,12 @@ export interface Tick {
   id: TickID;
   timestamp: Date;
   problemId: ProblemID;
+  zone1: boolean;
+  attemptsZone1: number /* int */;
+  zone2: boolean;
+  attemptsZone2: number /* int */;
   top: boolean;
   attemptsTop: number /* int */;
-  zone: boolean;
-  attemptsZone: number /* int */;
 }
 export interface User {
   id: UserID;
