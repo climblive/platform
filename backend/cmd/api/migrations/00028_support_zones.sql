@@ -13,10 +13,13 @@ ALTER TABLE `tick` ADD COLUMN `zone_2` TINYINT(1) NOT NULL DEFAULT 0 AFTER `atte
 ALTER TABLE `tick` ADD COLUMN `attempts_zone_2` INT NOT NULL DEFAULT 0 AFTER `zone_2`;
 
 UPDATE `tick`
-    SET `top` = TRUE;
-
-UPDATE `tick`
-    SET `attempts_top` = CASE WHEN `flash` = 1 THEN 1 ELSE 0 END;
+    SET
+        `zone_1` = TRUE,
+        `zone_2` = TRUE,
+        `top` = TRUE,
+        `attempts_zone_1` = CASE WHEN `flash` = 1 THEN 1 ELSE 999 END,
+        `attempts_zone_2` = CASE WHEN `flash` = 1 THEN 1 ELSE 999 END,
+        `attempts_top` = CASE WHEN `flash` = 1 THEN 1 ELSE 999 END;
 
 ALTER TABLE `tick` DROP COLUMN `flash`;
 
