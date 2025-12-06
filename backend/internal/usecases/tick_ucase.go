@@ -157,14 +157,16 @@ func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.Conten
 	}
 
 	newTick := domain.Tick{
-		Ownership:    contender.Ownership,
-		Timestamp:    time.Now(),
-		ContestID:    contest.ID,
-		ProblemID:    problem.ID,
-		Top:          tick.Top,
-		AttemptsTop:  tick.AttemptsTop,
-		Zone:         tick.Zone,
-		AttemptsZone: tick.AttemptsZone,
+		Ownership:     contender.Ownership,
+		Timestamp:     time.Now(),
+		ContestID:     contest.ID,
+		ProblemID:     problem.ID,
+		Top:           tick.Top,
+		AttemptsTop:   tick.AttemptsTop,
+		Zone1:         tick.Zone1,
+		AttemptsZone1: tick.AttemptsZone1,
+		Zone2:         tick.Zone2,
+		AttemptsZone2: tick.AttemptsZone2,
 	}
 
 	tick, err = uc.Repo.StoreTick(ctx, nil, newTick)
@@ -173,14 +175,16 @@ func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.Conten
 	}
 
 	uc.EventBroker.Dispatch(contest.ID, domain.AscentRegisteredEvent{
-		TickID:       tick.ID,
-		Timestamp:    tick.Timestamp,
-		ContenderID:  contender.ID,
-		ProblemID:    problem.ID,
-		Top:          tick.Top,
-		AttemptsTop:  tick.AttemptsTop,
-		Zone:         tick.Zone,
-		AttemptsZone: tick.AttemptsZone,
+		TickID:        tick.ID,
+		Timestamp:     tick.Timestamp,
+		ContenderID:   contender.ID,
+		ProblemID:     problem.ID,
+		Top:           tick.Top,
+		AttemptsTop:   tick.AttemptsTop,
+		Zone1:         tick.Zone1,
+		AttemptsZone1: tick.AttemptsZone1,
+		Zone2:         tick.Zone2,
+		AttemptsZone2: tick.AttemptsZone2,
 	})
 
 	return tick, nil

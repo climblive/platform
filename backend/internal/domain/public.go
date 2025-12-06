@@ -227,14 +227,16 @@ type ContenderRequalifiedEvent struct {
 }
 
 type AscentRegisteredEvent struct {
-	TickID       TickID      `json:"tickId"`
-	Timestamp    time.Time   `json:"timestamp"`
-	ContenderID  ContenderID `json:"contenderId"`
-	ProblemID    ProblemID   `json:"problemId"`
-	Top          bool        `json:"top"`
-	AttemptsTop  int         `json:"attemptsTop"`
-	Zone         bool        `json:"zone"`
-	AttemptsZone int         `json:"attemptsZone"`
+	TickID        TickID      `json:"tickId"`
+	Timestamp     time.Time   `json:"timestamp"`
+	ContenderID   ContenderID `json:"contenderId"`
+	ProblemID     ProblemID   `json:"problemId"`
+	Zone1         bool        `json:"zone1"`
+	AttemptsZone1 int         `json:"attemptsZone1"`
+	Zone2         bool        `json:"zone2"`
+	AttemptsZone2 int         `json:"attemptsZone2"`
+	Top           bool        `json:"top"`
+	AttemptsTop   int         `json:"attemptsTop"`
 }
 
 type AscentDeregisteredEvent struct {
@@ -244,17 +246,19 @@ type AscentDeregisteredEvent struct {
 }
 
 type ProblemAddedEvent struct {
-	ProblemID  ProblemID `json:"problemId"`
-	PointsTop  int       `json:"pointsTop"`
-	PointsZone int       `json:"pointsZone"`
-	FlashBonus int       `json:"flashBonus"`
+	ProblemID   ProblemID `json:"problemId"`
+	PointsZone1 int       `json:"pointsZone1"`
+	PointsZone2 int       `json:"pointsZone2"`
+	PointsTop   int       `json:"pointsTop"`
+	FlashBonus  int       `json:"flashBonus"`
 }
 
 type ProblemUpdatedEvent struct {
-	ProblemID  ProblemID `json:"problemId"`
-	PointsTop  int       `json:"pointsTop"`
-	PointsZone int       `json:"pointsZone"`
-	FlashBonus int       `json:"flashBonus"`
+	ProblemID   ProblemID `json:"problemId"`
+	PointsZone1 int       `json:"pointsZone1"`
+	PointsZone2 int       `json:"pointsZone2"`
+	PointsTop   int       `json:"pointsTop"`
+	FlashBonus  int       `json:"flashBonus"`
 }
 
 type ProblemDeletedEvent struct {
