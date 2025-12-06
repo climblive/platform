@@ -158,10 +158,12 @@
         id: event.tickId,
         timestamp: event.timestamp,
         problemId: event.problemId,
+        zone1: event.zone1,
+        attemptsZone1: event.attemptsZone1,
+        zone2: event.zone2,
+        attemptsZone2: event.attemptsZone2,
         top: event.top,
         attemptsTop: event.attemptsTop,
-        zone: event.zone,
-        attemptsZone: event.attemptsZone,
       };
 
       updateTickInQueryCache(queryClient, $session.contenderId, newTick);

@@ -109,8 +109,8 @@ export interface Problem {
   description?: string;
   zone1Enabled: boolean;
   zone2Enabled: boolean;
-  pointsZone1: number /* int */;
-  pointsZone2: number /* int */;
+  pointsZone1?: number /* int */;
+  pointsZone2?: number /* int */;
   pointsTop: number /* int */;
   flashBonus?: number /* int */;
 }
@@ -121,8 +121,8 @@ export interface ProblemTemplate {
   description?: string;
   zone1Enabled: boolean;
   zone2Enabled: boolean;
-  pointsZone1: number /* int */;
-  pointsZone2: number /* int */;
+  pointsZone1?: number /* int */;
+  pointsZone2?: number /* int */;
   pointsTop: number /* int */;
   flashBonus?: number /* int */;
 }
@@ -211,10 +211,12 @@ export interface AscentRegisteredEvent {
   timestamp: Date;
   contenderId: ContenderID;
   problemId: ProblemID;
+  zone1: boolean;
+  attemptsZone1: number /* int */;
+  zone2: boolean;
+  attemptsZone2: number /* int */;
   top: boolean;
   attemptsTop: number /* int */;
-  zone: boolean;
-  attemptsZone: number /* int */;
 }
 export interface AscentDeregisteredEvent {
   tickId: TickID;
@@ -223,14 +225,16 @@ export interface AscentDeregisteredEvent {
 }
 export interface ProblemAddedEvent {
   problemId: ProblemID;
+  pointsZone1: number /* int */;
+  pointsZone2: number /* int */;
   pointsTop: number /* int */;
-  pointsZone: number /* int */;
   flashBonus: number /* int */;
 }
 export interface ProblemUpdatedEvent {
   problemId: ProblemID;
+  pointsZone1: number /* int */;
+  pointsZone2: number /* int */;
   pointsTop: number /* int */;
-  pointsZone: number /* int */;
   flashBonus: number /* int */;
 }
 export interface ProblemDeletedEvent {

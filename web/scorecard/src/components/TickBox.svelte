@@ -68,10 +68,12 @@
     createTick.mutate(
       {
         problemId: problem.id,
+        zone1: true,
+        attemptsZone1: flash ? 1 : 999,
+        zone2: true,
+        attemptsZone2: flash ? 1 : 999,
         top: true,
         attemptsTop: flash ? 1 : 999,
-        zone: true,
-        attemptsZone: flash ? 1 : 999,
       },
       {
         onError: (error) => {

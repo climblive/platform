@@ -108,8 +108,8 @@ type Problem struct {
 	Description        string        `json:"description,omitempty"`
 	Zone1Enabled       bool          `json:"zone1Enabled"`
 	Zone2Enabled       bool          `json:"zone2Enabled"`
-	PointsZone1        int           `json:"pointsZone1"`
-	PointsZone2        int           `json:"pointsZone2"`
+	PointsZone1        int           `json:"pointsZone1,omitempty"`
+	PointsZone2        int           `json:"pointsZone2,omitempty"`
 	PointsTop          int           `json:"pointsTop"`
 	FlashBonus         int           `json:"flashBonus,omitempty"`
 }
@@ -121,8 +121,8 @@ type ProblemTemplate struct {
 	Description        string `json:"description,omitempty"`
 	Zone1Enabled       bool   `json:"zone1Enabled"`
 	Zone2Enabled       bool   `json:"zone2Enabled"`
-	PointsZone1        int    `json:"pointsZone1"`
-	PointsZone2        int    `json:"pointsZone2"`
+	PointsZone1        int    `json:"pointsZone1,omitempty"`
+	PointsZone2        int    `json:"pointsZone2,omitempty"`
 	PointsTop          int    `json:"pointsTop"`
 	FlashBonus         int    `json:"flashBonus,omitempty"`
 }

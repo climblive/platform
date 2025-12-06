@@ -36,20 +36,24 @@
       case "top":
         createTick.mutate({
           problemId: problem.id,
+          zone1: true,
+          attemptsZone1: 999,
+          zone2: true,
+          attemptsZone2: 999,
           top: true,
           attemptsTop: 999,
-          zone: true,
-          attemptsZone: 999,
         });
 
         break;
       case "flash":
         createTick.mutate({
           problemId: problem.id,
+          zone1: true,
+          attemptsZone1: 1,
+          zone2: true,
+          attemptsZone2: 1,
           top: true,
           attemptsTop: 1,
-          zone: true,
-          attemptsZone: 1,
         });
 
         break;
