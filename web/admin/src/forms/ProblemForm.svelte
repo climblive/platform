@@ -5,6 +5,10 @@
     number: z.coerce.number(),
     holdColorPrimary: z.string().regex(/^#([0-9a-fA-F]{3}){1,2}$/),
     holdColorSecondary: z.string().optional(),
+    zone1Enabled: z.coerce.boolean().optional(),
+    zone2Enabled: z.coerce.boolean().optional(),
+    pointsZone1: z.coerce.number().optional(),
+    pointsZone2: z.coerce.number().optional(),
     pointsTop: z.coerce.number(),
     flashBonus: z.coerce.number().optional(),
   });
@@ -12,8 +16,11 @@
 
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/color-picker/color-picker.js";
+  import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
-  import { GenericForm, name } from "@climblive/lib/forms";
+  import "@awesome.me/webawesome/dist/components/switch/switch.js";
+  import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
+  import { checked, GenericForm, name } from "@climblive/lib/forms";
   import { type Problem } from "@climblive/lib/models";
   import { type Snippet } from "svelte";
 
@@ -27,6 +34,9 @@
   }
 
   let { data, schema, submit, children }: Props = $props();
+
+  let zone1Enabled = $derived(data.zone1Enabled);
+  let zone2Enabled = $derived(data.zone2Enabled);
 
   const swatches = [
     "#6f3601",
@@ -42,6 +52,16 @@
     "#000",
     "#fff",
   ].join("; ");
+
+  const handleZone1Toggle = (event: InputEvent) => {
+    const target = event.target as WaSwitch;
+    zone1Enabled = target.checked;
+  };
+
+  const handleZone2Toggle = (event: InputEvent) => {
+    const target = event.target as WaSwitch;
+    zone2Enabled = target.checked;
+  };
 </script>
 
 <GenericForm {schema} {submit}>
@@ -78,7 +98,8 @@
     <wa-input
       size="small"
       {@attach name("pointsTop")}
-      label="Points for top"
+      label="Points top"
+      hint="Points for top"
       type="number"
       required
       value={data.pointsTop?.toString() ?? ""}
@@ -90,6 +111,47 @@
       type="number"
       value={data.flashBonus?.toString() ?? ""}
     ></wa-input>
+
+    <wa-divider></wa-divider>
+
+    <div class="zones">
+      <wa-switch
+        size="small"
+        {@attach name("zone1Enabled")}
+        hint="Add a zone"
+        onchange={handleZone1Toggle}
+        {@attach checked(data.zone1Enabled)}>Enable zone Z1</wa-switch
+      >
+    </div>
+    {#if zone1Enabled}
+      <wa-input
+        size="small"
+        {@attach name("pointsZone1")}
+        label="Points Z1"
+        hint="Points for first zone"
+        type="number"
+        value={data.pointsZone1?.toString() ?? ""}
+      ></wa-input>
+      <wa-switch
+        size="small"
+        {@attach name("zone2Enabled")}
+        hint="Add a second zone"
+        onchange={handleZone2Toggle}
+        disabled={!zone1Enabled}
+        {@attach checked(data.zone2Enabled)}>Enable zone Z2</wa-switch
+      >
+    {/if}
+    {#if zone2Enabled}
+      <wa-input
+        size="small"
+        {@attach name("pointsZone2")}
+        label="Points Z2"
+        hint="Points for second zone"
+        type="number"
+        value={data.pointsZone2?.toString() ?? ""}
+      ></wa-input>
+    {/if}
+
     {@render children?.()}
   </fieldset>
 </GenericForm>
@@ -106,5 +168,10 @@
       display: flex;
       gap: var(--wa-space-s);
     }
+  }
+
+  .zones {
+    display: flex;
+    gap: var(--wa-space-m);
   }
 </style>

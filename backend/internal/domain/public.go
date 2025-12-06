@@ -119,8 +119,8 @@ type ProblemTemplate struct {
 	HoldColorPrimary   string `json:"holdColorPrimary"`
 	HoldColorSecondary string `json:"holdColorSecondary,omitempty"`
 	Description        string `json:"description,omitempty"`
-	Zone1Enabled       bool   `json:"zone1Enabled"`
-	Zone2Enabled       bool   `json:"zone2Enabled"`
+	Zone1Enabled       bool   `json:"zone1Enabled,omitempty"`
+	Zone2Enabled       bool   `json:"zone2Enabled,omitempty"`
 	PointsZone1        int    `json:"pointsZone1,omitempty"`
 	PointsZone2        int    `json:"pointsZone2,omitempty"`
 	PointsTop          int    `json:"pointsTop"`

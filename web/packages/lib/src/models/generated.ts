@@ -119,8 +119,8 @@ export interface ProblemTemplate {
   holdColorPrimary: string;
   holdColorSecondary?: string;
   description?: string;
-  zone1Enabled: boolean;
-  zone2Enabled: boolean;
+  zone1Enabled?: boolean;
+  zone2Enabled?: boolean;
   pointsZone1?: number /* int */;
   pointsZone2?: number /* int */;
   pointsTop: number /* int */;
