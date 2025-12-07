@@ -141,20 +141,24 @@
     strategy="fixed"
     distance="10"
   >
-    <wa-button
-      size="small"
-      onclick={(e: MouseEvent) => handleTick(e, "zone1", false)}
-    >
-      <wa-icon slot="start" name="check"></wa-icon>
-      Zone 1
-    </wa-button>
-    <wa-button
-      size="small"
-      onclick={(e: MouseEvent) => handleTick(e, "zone2", false)}
-    >
-      <wa-icon slot="start" name="check"></wa-icon>
-      Zone 2
-    </wa-button>
+    {#if problem.zone1Enabled}
+      <wa-button
+        size="small"
+        onclick={(e: MouseEvent) => handleTick(e, "zone1", false)}
+      >
+        <wa-icon slot="start" name="check"></wa-icon>
+        Zone 1
+      </wa-button>
+    {/if}
+    {#if problem.zone2Enabled}
+      <wa-button
+        size="small"
+        onclick={(e: MouseEvent) => handleTick(e, "zone2", false)}
+      >
+        <wa-icon slot="start" name="check"></wa-icon>
+        Zone 2
+      </wa-button>
+    {/if}
     <wa-button
       size="small"
       onclick={(e: MouseEvent) => handleTick(e, "top", false)}
