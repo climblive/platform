@@ -108,12 +108,12 @@ type Tick struct {
 	ContenderID   int32
 	ProblemID     int32
 	Timestamp     time.Time
-	Top           bool
-	AttemptsTop   int32
 	Zone1         bool
 	AttemptsZone1 int32
 	Zone2         bool
 	AttemptsZone2 int32
+	Top           bool
+	AttemptsTop   int32
 }
 
 type User struct {

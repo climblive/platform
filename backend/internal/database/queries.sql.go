@@ -819,7 +819,7 @@ func (q *Queries) GetRafflesByContest(ctx context.Context, contestID int32) ([]G
 }
 
 const getTick = `-- name: GetTick :one
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.top, tick.attempts_top, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2
+SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick
 WHERE id = ?
 `
@@ -838,18 +838,18 @@ func (q *Queries) GetTick(ctx context.Context, id int32) (GetTickRow, error) {
 		&i.Tick.ContenderID,
 		&i.Tick.ProblemID,
 		&i.Tick.Timestamp,
-		&i.Tick.Top,
-		&i.Tick.AttemptsTop,
 		&i.Tick.Zone1,
 		&i.Tick.AttemptsZone1,
 		&i.Tick.Zone2,
 		&i.Tick.AttemptsZone2,
+		&i.Tick.Top,
+		&i.Tick.AttemptsTop,
 	)
 	return i, err
 }
 
 const getTicksByContender = `-- name: GetTicksByContender :many
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.top, tick.attempts_top, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2
+SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick
 WHERE contender_id = ?
 `
@@ -874,12 +874,12 @@ func (q *Queries) GetTicksByContender(ctx context.Context, contenderID int32) ([
 			&i.Tick.ContenderID,
 			&i.Tick.ProblemID,
 			&i.Tick.Timestamp,
-			&i.Tick.Top,
-			&i.Tick.AttemptsTop,
 			&i.Tick.Zone1,
 			&i.Tick.AttemptsZone1,
 			&i.Tick.Zone2,
 			&i.Tick.AttemptsZone2,
+			&i.Tick.Top,
+			&i.Tick.AttemptsTop,
 		); err != nil {
 			return nil, err
 		}
@@ -895,7 +895,7 @@ func (q *Queries) GetTicksByContender(ctx context.Context, contenderID int32) ([
 }
 
 const getTicksByContest = `-- name: GetTicksByContest :many
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.top, tick.attempts_top, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2
+SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick
 WHERE contest_id = ?
 `
@@ -920,12 +920,12 @@ func (q *Queries) GetTicksByContest(ctx context.Context, contestID int32) ([]Get
 			&i.Tick.ContenderID,
 			&i.Tick.ProblemID,
 			&i.Tick.Timestamp,
-			&i.Tick.Top,
-			&i.Tick.AttemptsTop,
 			&i.Tick.Zone1,
 			&i.Tick.AttemptsZone1,
 			&i.Tick.Zone2,
 			&i.Tick.AttemptsZone2,
+			&i.Tick.Top,
+			&i.Tick.AttemptsTop,
 		); err != nil {
 			return nil, err
 		}
@@ -941,7 +941,7 @@ func (q *Queries) GetTicksByContest(ctx context.Context, contestID int32) ([]Get
 }
 
 const getTicksByProblem = `-- name: GetTicksByProblem :many
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.top, tick.attempts_top, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2
+SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick
 WHERE problem_id = ?
 `
@@ -966,12 +966,12 @@ func (q *Queries) GetTicksByProblem(ctx context.Context, problemID int32) ([]Get
 			&i.Tick.ContenderID,
 			&i.Tick.ProblemID,
 			&i.Tick.Timestamp,
-			&i.Tick.Top,
-			&i.Tick.AttemptsTop,
 			&i.Tick.Zone1,
 			&i.Tick.AttemptsZone1,
 			&i.Tick.Zone2,
 			&i.Tick.AttemptsZone2,
+			&i.Tick.Top,
+			&i.Tick.AttemptsTop,
 		); err != nil {
 			return nil, err
 		}
