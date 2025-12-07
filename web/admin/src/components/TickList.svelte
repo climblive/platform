@@ -99,7 +99,7 @@
 {/snippet}
 
 {#snippet renderResult({ tick }: TickAndProblem)}
-  {#if tick.top && false}
+  {#if tick.top}
     T
   {:else if tick.zone2}
     Z2

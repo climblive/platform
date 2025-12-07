@@ -59,32 +59,48 @@
     }
   };
 
-  const handleTick = (event: MouseEvent, flash: boolean) => {
+  const handleTick = (
+    event: MouseEvent,
+    feature: "zone1" | "zone2" | "top",
+    flash: boolean,
+  ) => {
     event.stopPropagation();
 
     navigator.vibrate?.(50);
     open = false;
 
-    createTick.mutate(
-      {
-        problemId: problem.id,
-        zone1: true,
-        attemptsZone1: flash ? 1 : 999,
-        zone2: true,
-        attemptsZone2: flash ? 1 : 999,
-        top: true,
-        attemptsTop: flash ? 1 : 999,
+    const tick: Omit<Tick, "id" | "timestamp"> = {
+      problemId: problem.id,
+      top: false,
+      zone2: false,
+      zone1: false,
+      attemptsTop: flash ? 1 : 999,
+      attemptsZone2: flash ? 1 : 999,
+      attemptsZone1: flash ? 1 : 999,
+    };
+
+    switch (feature) {
+      case "top":
+        tick.top = true;
+        tick.zone2 = true;
+        tick.zone1 = true;
+        break;
+      case "zone2":
+        tick.zone2 = true;
+        tick.zone1 = true;
+      case "zone1":
+        tick.zone1 = true;
+    }
+
+    createTick.mutate(tick, {
+      onError: (error) => {
+        if (error instanceof AxiosError && error.status === 409) {
+          toastError("Ascent is already registered.");
+        } else {
+          toastError("Failed to register ascent.");
+        }
       },
-      {
-        onError: (error) => {
-          if (error instanceof AxiosError && error.status === 409) {
-            toastError("Ascent is already registered.");
-          } else {
-            toastError("Failed to register ascent.");
-          }
-        },
-      },
-    );
+    });
   };
 
   $effect(() => {
@@ -125,11 +141,31 @@
     strategy="fixed"
     distance="10"
   >
-    <wa-button size="small" onclick={(e: MouseEvent) => handleTick(e, false)}>
+    <wa-button
+      size="small"
+      onclick={(e: MouseEvent) => handleTick(e, "zone1", false)}
+    >
+      <wa-icon slot="start" name="check"></wa-icon>
+      Zone 1
+    </wa-button>
+    <wa-button
+      size="small"
+      onclick={(e: MouseEvent) => handleTick(e, "zone2", false)}
+    >
+      <wa-icon slot="start" name="check"></wa-icon>
+      Zone 2
+    </wa-button>
+    <wa-button
+      size="small"
+      onclick={(e: MouseEvent) => handleTick(e, "top", false)}
+    >
       <wa-icon slot="start" name="check"></wa-icon>
       Top
     </wa-button>
-    <wa-button size="small" onclick={(e: MouseEvent) => handleTick(e, true)}>
+    <wa-button
+      size="small"
+      onclick={(e: MouseEvent) => handleTick(e, "top", true)}
+    >
       <wa-icon slot="start" name="bolt"></wa-icon>
       Flash
     </wa-button>

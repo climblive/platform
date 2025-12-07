@@ -5,12 +5,12 @@ ALTER TABLE `problem` ADD COLUMN `points_zone_1` INT NULL AFTER `description`;
 ALTER TABLE `problem` ADD COLUMN `points_zone_2` INT NULL AFTER `points_zone_1`;
 ALTER TABLE `problem` CHANGE `points` `points_top` INT NOT NULL AFTER `points_zone_2`;
 
-ALTER TABLE `tick` ADD COLUMN `top` TINYINT(1) NOT NULL DEFAULT 0  AFTER `timestamp`;
-ALTER TABLE `tick` ADD COLUMN `attempts_top` INT NOT NULL DEFAULT 0 AFTER `top`;
-ALTER TABLE `tick` ADD COLUMN `zone_1` TINYINT(1) NOT NULL DEFAULT 0 AFTER `attempts_top`;
+ALTER TABLE `tick` ADD COLUMN `zone_1` TINYINT(1) NOT NULL DEFAULT 0 AFTER `timestamp`;
 ALTER TABLE `tick` ADD COLUMN `attempts_zone_1` INT NOT NULL DEFAULT 0 AFTER `zone_1`;
 ALTER TABLE `tick` ADD COLUMN `zone_2` TINYINT(1) NOT NULL DEFAULT 0 AFTER `attempts_zone_1`;
 ALTER TABLE `tick` ADD COLUMN `attempts_zone_2` INT NOT NULL DEFAULT 0 AFTER `zone_2`;
+ALTER TABLE `tick` ADD COLUMN `top` TINYINT(1) NOT NULL DEFAULT 0  AFTER `attempts_zone_2`;
+ALTER TABLE `tick` ADD COLUMN `attempts_top` INT NOT NULL DEFAULT 0 AFTER `top`;
 
 UPDATE `tick`
     SET
