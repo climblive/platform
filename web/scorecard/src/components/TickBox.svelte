@@ -30,10 +30,19 @@
 
   let open = $state(false);
 
-  let loading = $derived(createTick.isPending || deleteTick.isPending);
-  let variant = $derived(
-    tick ? (tick.attemptsTop === 1 ? "flashed" : "ticked") : undefined,
-  );
+  const loading = $derived(createTick.isPending || deleteTick.isPending);
+  const variant = $derived.by(() => {
+    switch (true) {
+      case tick?.top === true && tick.attemptsTop === 1:
+        return "flash";
+      case tick?.top === true:
+        return "top";
+      case tick?.zone2 === true:
+        return "zone2";
+      case tick?.zone1 === true:
+        return "zone1";
+    }
+  });
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
@@ -125,10 +134,14 @@
   >
     {#if loading}
       <wa-spinner></wa-spinner>
-    {:else if variant === "flashed"}
+    {:else if variant === "flash"}
       <wa-icon name="bolt"></wa-icon>
-    {:else if variant === "ticked"}
-      <wa-icon name="check"></wa-icon>
+    {:else if variant === "top"}
+      T
+    {:else if variant === "zone2"}
+      Z2
+    {:else if variant === "zone1"}
+      Z1
     {/if}
   </button>
 
@@ -205,8 +218,22 @@
     background: none;
     cursor: pointer;
     width: max-content;
+    font-size: var(--wa-font-size-s);
+    font-weight: var(--wa-font-weight-bold);
 
     &[data-variant] {
+      background-color: var(--wa-color-gray-95);
+
+      & wa-spinner {
+        --track-color: var(--wa-color-gray-50);
+        --indicator-color: var(--wa-color-gray-90);
+      }
+
+      border-color: var(--wa-color-gray-50);
+      color: var(--wa-color-gray-50);
+    }
+
+    &[data-variant="top"] {
       background-color: var(--wa-color-green-95);
 
       & wa-spinner {
@@ -218,7 +245,7 @@
       color: var(--wa-color-green-50);
     }
 
-    &[data-variant="flashed"] {
+    &[data-variant="flash"] {
       background-color: var(--wa-color-yellow-95);
 
       & wa-spinner {
