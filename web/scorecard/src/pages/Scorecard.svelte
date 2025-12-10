@@ -294,18 +294,22 @@
     right: 0;
     z-index: 10;
     background-color: var(--wa-color-surface-default);
-    padding: var(--wa-space-s);
+    padding: var(--wa-space-m);
   }
 
   wa-tab-group {
-    padding-inline: var(--wa-space-s);
-    padding-bottom: var(--wa-space-s);
+    padding-inline: var(--wa-space-m);
+    padding-bottom: var(--wa-space-m);
   }
 
   wa-tab-panel[name="problems"]::part(base) {
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-xs);
+  }
+
+  wa-radio-group {
+    margin-block-end: var(--wa-space-xs);
   }
 
   wa-radio {

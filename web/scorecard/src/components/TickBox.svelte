@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { ScorecardSession } from "@/types";
-  import type WaPopup from "@awesome.me/webawesome/dist/components/popup/popup.js";
+  import WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+  import "@awesome.me/webawesome/dist/components/divider/divider.js";
+  import { HoldColorIndicator } from "@climblive/lib/components";
   import type { Problem, Tick } from "@climblive/lib/models";
   import {
     createTickMutation,
@@ -10,6 +12,7 @@
   import { AxiosError } from "axios";
   import { getContext } from "svelte";
   import type { Readable } from "svelte/store";
+  import TickButton from "./TickButton.svelte";
 
   interface Props {
     problem: Problem;
@@ -19,8 +22,8 @@
 
   let { problem, tick, disabled = false }: Props = $props();
 
-  let container: HTMLDivElement | undefined = $state();
-  let popup: WaPopup | undefined = $state();
+  let button: HTMLButtonElement | undefined = $state();
+  let dialog: WaDialog | undefined = $state();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
   const createTick = $derived(createTickMutation($session.contenderId));
@@ -35,9 +38,9 @@
 
   const handleClickOutside = (event: MouseEvent) => {
     if (
-      popup &&
+      dialog &&
       event.target instanceof Node &&
-      !popup.contains(event.target)
+      !dialog.contains(event.target)
     ) {
       open = false;
     }
@@ -104,12 +107,6 @@
   };
 
   $effect(() => {
-    if (popup && container) {
-      popup.anchor = container;
-    }
-  });
-
-  $effect(() => {
     if (tick !== undefined) {
       open = false;
     }
@@ -118,8 +115,10 @@
 
 <svelte:body on:click|capture={handleClickOutside} />
 
-<div data-variant={variant} bind:this={container}>
+<div class="container">
   <button
+    data-variant={variant}
+    bind:this={button}
     disabled={disabled || loading}
     onclick={handleCheck}
     aria-label={tick?.id ? "Untick" : "Tick"}
@@ -133,75 +132,115 @@
     {/if}
   </button>
 
-  <wa-popup
-    bind:this={popup}
-    placement="left"
-    active={open}
-    arrow
-    strategy="fixed"
-    distance="10"
+  <wa-dialog
+    label="Problem number {problem.number}"
+    bind:this={dialog}
+    {open}
+    light-dismiss
   >
-    {#if problem.zone1Enabled}
-      <wa-button
-        size="small"
-        onclick={(e: MouseEvent) => handleTick(e, "zone1", false)}
-      >
-        <wa-icon slot="start" name="check"></wa-icon>
-        Zone 1
-      </wa-button>
-    {/if}
+    <div class="label" slot="label">
+      <HoldColorIndicator
+        --height="1.25em"
+        --width="1.25em"
+        primary={problem.holdColorPrimary}
+        secondary={problem.holdColorSecondary}
+      /> Problem № {problem.number}
+    </div>
+
+    <div class="horizontal">
+      <TickButton
+        iconName="check"
+        label="Top"
+        className="top"
+        onClick={(e: MouseEvent) => handleTick(e, "top", false)}
+        points={problem.pointsTop}
+      />
+
+      <TickButton
+        iconName="bolt"
+        label="Flash"
+        className="flash"
+        onClick={(e: MouseEvent) => handleTick(e, "top", true)}
+        points={problem.pointsTop + (problem.flashBonus ?? 0)}
+        flash
+      />
+    </div>
+
     {#if problem.zone2Enabled}
-      <wa-button
-        size="small"
-        onclick={(e: MouseEvent) => handleTick(e, "zone2", false)}
-      >
-        <wa-icon slot="start" name="check"></wa-icon>
-        Zone 2
-      </wa-button>
+      <wa-divider></wa-divider>
+
+      <TickButton
+        iconName="check"
+        label="Zone 2"
+        onClick={(e: MouseEvent) => handleTick(e, "zone2", false)}
+        points={problem.pointsZone2}
+      />
     {/if}
-    <wa-button
-      size="small"
-      onclick={(e: MouseEvent) => handleTick(e, "top", false)}
-    >
-      <wa-icon slot="start" name="check"></wa-icon>
-      Top
-    </wa-button>
-    <wa-button
-      size="small"
-      onclick={(e: MouseEvent) => handleTick(e, "top", true)}
-    >
-      <wa-icon slot="start" name="bolt"></wa-icon>
-      Flash
-    </wa-button>
-  </wa-popup>
+
+    {#if problem.zone1Enabled}
+      <wa-divider></wa-divider>
+
+      <TickButton
+        iconName="check"
+        label="Zone 1"
+        onClick={(e: MouseEvent) => handleTick(e, "zone1", false)}
+        points={problem.pointsZone1}
+      />
+    {/if}
+  </wa-dialog>
 </div>
 
 <style>
-  div {
-    position: relative;
+  .container {
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: calc(100% - 2 * var(--wa-space-2xs));
-    aspect-ratio: 1 / 1;
-    border-radius: var(--wa-border-radius-s);
   }
 
   button {
-    box-sizing: content-box;
-    border: none;
-    background: none;
-    padding: 0;
-    width: 1.5rem;
-    height: 1.5rem;
-    cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-color: var(--wa-color-neutral-border-loud);
-    border-width: var(--wa-border-width-s);
-    border-style: var(--wa-border-style);
-    border-radius: var(--wa-border-radius-s);
+    height: calc(100% - 2 * var(--wa-space-xs));
+    aspect-ratio: 1 / 1;
+    border: var(--wa-border-style) var(--wa-border-width-m)
+      var(--wa-color-neutral-border-loud);
+    border-radius: var(--wa-border-radius-l);
+    background: none;
+    cursor: pointer;
+    width: max-content;
+
+    &[data-variant] {
+      background-color: var(--wa-color-green-95);
+
+      & wa-spinner {
+        --track-color: var(--wa-color-green-50);
+        --indicator-color: var(--wa-color-green-90);
+      }
+
+      border-color: var(--wa-color-green-50);
+      color: var(--wa-color-green-50);
+    }
+
+    &[data-variant="flashed"] {
+      background-color: var(--wa-color-yellow-95);
+
+      & wa-spinner {
+        --track-color: var(--wa-color-yellow-50);
+        --indicator-color: var(--wa-color-yellow-90);
+      }
+
+      border-color: var(--wa-color-yellow-50);
+      color: var(--wa-color-yellow-50);
+    }
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-s);
   }
 
   button:disabled {
@@ -209,66 +248,16 @@
     border: 0;
   }
 
-  div[data-variant="ticked"] {
-    background-color: var(--wa-color-green-95);
-
-    & wa-spinner {
-      --track-color: var(--wa-color-green-50);
-      --indicator-color: var(--wa-color-green-90);
-    }
-
-    & > button {
-      border-color: var(--wa-color-green-50);
-      color: var(--wa-color-green-50);
-    }
-  }
-
-  div[data-variant="flashed"] {
-    background-color: var(--wa-color-yellow-95);
-
-    & wa-spinner {
-      --track-color: var(--wa-color-yellow-50);
-      --indicator-color: var(--wa-color-yellow-90);
-    }
-
-    & > button {
-      border-color: var(--wa-color-yellow-50);
-      color: var(--wa-color-yellow-50);
-    }
-  }
-
-  wa-popup {
-    --arrow-color: var(--wa-color-brand-fill-loud);
-
-    & wa-button::part(base) {
-      width: 2.5rem;
-      height: 2.5rem;
+  wa-dialog {
+    &::part(body) {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      padding: 0;
+      gap: var(--wa-space-m);
     }
 
-    & wa-button > wa-icon {
-      margin: 0;
+    & .horizontal {
+      display: flex;
+      gap: var(--wa-space-s);
     }
-
-    & wa-button::part(label) {
-      font-size: var(--wa-font-size-2xs);
-      line-height: var(--wa-line-height-condensed);
-    }
-  }
-
-  wa-popup::part(popup) {
-    background-color: var(--wa-color-brand-fill-loud);
-    box-shadow: var(--wa-shadow-l);
-    border-radius: var(--wa-border-radius-m);
-    padding: var(--wa-space-s);
-    cursor: default;
-  }
-
-  wa-popup[active]::part(popup) {
-    display: flex;
-    gap: var(--wa-space-2xs);
   }
 </style>
