@@ -1,14 +1,14 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import {
-      HoldColorIndicator,
-      Table,
-      type ColumnDefinition,
+    HoldColorIndicator,
+    Table,
+    type ColumnDefinition,
   } from "@climblive/lib/components";
   import { type Problem, type ProblemID } from "@climblive/lib/models";
   import {
-      getProblemsQuery,
-      getTicksByContestQuery,
+    getProblemsQuery,
+    getTicksByContestQuery,
   } from "@climblive/lib/queries";
   import { navigate } from "svelte-routing";
   import DeleteProblem from "./DeleteProblem.svelte";
@@ -115,7 +115,11 @@
   </div>
 {/snippet}
 
-{#snippet renderPoints({ pointsZone1, pointsZone2, pointsTop }: ProblemWithAscents)}
+{#snippet renderPoints({
+  pointsZone1,
+  pointsZone2,
+  pointsTop,
+}: ProblemWithAscents)}
   {[pointsZone1, pointsZone2, pointsTop].join(" / ")} pts
 {/snippet}
 
