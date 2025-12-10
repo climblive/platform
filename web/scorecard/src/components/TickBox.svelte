@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { ScorecardSession } from "@/types";
   import WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
-  import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import { HoldColorIndicator } from "@climblive/lib/components";
   import type { Problem, Tick } from "@climblive/lib/models";
   import {
@@ -165,8 +164,6 @@
     </div>
 
     {#if problem.zone2Enabled}
-      <wa-divider></wa-divider>
-
       <TickButton
         iconName="check"
         label="Zone 2"
@@ -176,8 +173,6 @@
     {/if}
 
     {#if problem.zone1Enabled}
-      <wa-divider></wa-divider>
-
       <TickButton
         iconName="check"
         label="Zone 1"
@@ -250,7 +245,7 @@
     &::part(body) {
       display: flex;
       flex-direction: column;
-      gap: var(--wa-space-m);
+      gap: var(--wa-space-l);
     }
 
     & .horizontal {
