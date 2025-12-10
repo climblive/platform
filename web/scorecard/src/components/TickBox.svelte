@@ -90,6 +90,7 @@
       case "zone2":
         tick.zone2 = true;
         tick.zone1 = true;
+        break;
       case "zone1":
         tick.zone1 = true;
     }
