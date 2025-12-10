@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 **/public/shoelace
+.pnpm-store
+__debug*
 
 # Editor directories and files
 !.vscode/extensions.json

@@ -1,14 +1,14 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import {
-    HoldColorIndicator,
-    Table,
-    type ColumnDefinition,
+      HoldColorIndicator,
+      Table,
+      type ColumnDefinition,
   } from "@climblive/lib/components";
   import { type Problem, type ProblemID } from "@climblive/lib/models";
   import {
-    getProblemsQuery,
-    getTicksByContestQuery,
+      getProblemsQuery,
+      getTicksByContestQuery,
   } from "@climblive/lib/queries";
   import { navigate } from "svelte-routing";
   import DeleteProblem from "./DeleteProblem.svelte";
@@ -78,7 +78,7 @@
       width: "max-content",
     },
     {
-      label: "Flash",
+      label: "Flash bonus",
       mobile: true,
       render: renderFlashBonus,
       width: "max-content",
@@ -115,13 +115,13 @@
   </div>
 {/snippet}
 
-{#snippet renderPoints({ pointsTop }: ProblemWithAscents)}
-  {pointsTop} pts
+{#snippet renderPoints({ pointsZone1, pointsZone2, pointsTop }: ProblemWithAscents)}
+  {[pointsZone1, pointsZone2, pointsTop].join(" / ")} pts
 {/snippet}
 
 {#snippet renderFlashBonus({ flashBonus }: ProblemWithAscents)}
   {#if flashBonus}
-    {flashBonus} pts
+    +{flashBonus} pts
   {:else}
     -
   {/if}

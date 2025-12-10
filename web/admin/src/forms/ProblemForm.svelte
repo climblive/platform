@@ -99,7 +99,7 @@
       size="small"
       {@attach name("pointsTop")}
       label="Points top"
-      hint="Points for top"
+      hint="Points for reaching the top."
       type="number"
       required
       value={data.pointsTop?.toString() ?? ""}
@@ -108,6 +108,7 @@
       size="small"
       {@attach name("flashBonus")}
       label="Flash bonus"
+      hint="Bonus points awarded for a flash ascent, added to the total."
       type="number"
       value={data.flashBonus?.toString() ?? ""}
     ></wa-input>
@@ -118,7 +119,7 @@
       <wa-switch
         size="small"
         {@attach name("zone1Enabled")}
-        hint="Add a zone"
+        hint="Add a zone."
         onchange={handleZone1Toggle}
         {@attach checked(data.zone1Enabled)}>Enable zone Z1</wa-switch
       >
@@ -128,14 +129,14 @@
         size="small"
         {@attach name("pointsZone1")}
         label="Points Z1"
-        hint="Points for first zone"
+        hint="Points for reaching the first zone."
         type="number"
         value={data.pointsZone1?.toString() ?? ""}
       ></wa-input>
       <wa-switch
         size="small"
         {@attach name("zone2Enabled")}
-        hint="Add a second zone"
+        hint="Add a second zone."
         onchange={handleZone2Toggle}
         disabled={!zone1Enabled}
         {@attach checked(data.zone2Enabled)}>Enable zone Z2</wa-switch
@@ -146,7 +147,7 @@
         size="small"
         {@attach name("pointsZone2")}
         label="Points Z2"
-        hint="Points for second zone"
+        hint="Points for reaching the second zone."
         type="number"
         value={data.pointsZone2?.toString() ?? ""}
       ></wa-input>
