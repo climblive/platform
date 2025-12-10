@@ -151,7 +151,6 @@
       <TickButton
         iconName="check"
         label="Top"
-        className="top"
         onClick={(e: MouseEvent) => handleTick(e, "top", false)}
         points={problem.pointsTop}
       />
@@ -159,7 +158,6 @@
       <TickButton
         iconName="bolt"
         label="Flash"
-        className="flash"
         onClick={(e: MouseEvent) => handleTick(e, "top", true)}
         points={problem.pointsTop + (problem.flashBonus ?? 0)}
         flash

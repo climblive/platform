@@ -3,23 +3,15 @@
     onClick: (e: MouseEvent) => void;
     iconName: string;
     label: string;
-    className?: string;
     points?: number;
     flash?: boolean;
   };
 
-  const { onClick, iconName, label, className, points, flash }: Props =
-    $props();
+  const { onClick, iconName, label, points, flash }: Props = $props();
 </script>
 
 <div data-flash={flash}>
-  <wa-button
-    size="small"
-    appearance="outlined"
-    class={className}
-    onclick={onClick}
-    pill
-  >
+  <wa-button size="small" appearance="outlined" onclick={onClick} pill>
     <wa-icon slot="start" name={iconName}></wa-icon>
     {label}
   </wa-button>
@@ -38,16 +30,7 @@
     display: flex;
     flex-direction: column;
     align-items: start;
-    gap: var(--wa-space-2xs);
-
-    &[data-flash="true"] wa-button {
-      --wa-color-fill-quiet: var(--wa-color-yellow-10);
-      --wa-color-border-loud: var(--wa-color-yellow-40);
-      --wa-color-border-normal: var(--wa-color-yellow-30);
-      --wa-color-border-quiet: var(--wa-color-yellow-20);
-      --wa-color-on-normal: var(--wa-color-yellow-70);
-      --wa-color-on-quiet: var(--wa-color-yellow-60);
-    }
+    gap: var(--wa-space-xs);
   }
 
   span {
