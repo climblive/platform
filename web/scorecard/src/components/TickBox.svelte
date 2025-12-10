@@ -137,11 +137,11 @@
     {:else if variant === "flash"}
       <wa-icon name="bolt"></wa-icon>
     {:else if variant === "top"}
-      T
+      <pre>T</pre>
     {:else if variant === "zone2"}
-      Z2
+      <pre>Z2</pre>
     {:else if variant === "zone1"}
-      Z1
+      <pre>Z1</pre>
     {/if}
   </button>
 
