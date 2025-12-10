@@ -213,12 +213,14 @@ func TestMemoryStore(t *testing.T) {
 		store := scores.NewMemoryStore()
 
 		t1 := scores.Tick{
-			ProblemID:    1,
-			Top:          true,
-			AttemptsTop:  7,
-			Zone:         true,
-			AttemptsZone: 2,
-			Points:       1337,
+			ProblemID:     1,
+			Top:           true,
+			AttemptsTop:   7,
+			Zone1:         true,
+			AttemptsZone1: 2,
+			Zone2:         true,
+			AttemptsZone2: 3,
+			Points:        1337,
 		}
 
 		store.SaveTick(1, t1)
@@ -226,12 +228,14 @@ func TestMemoryStore(t *testing.T) {
 		assert.ElementsMatch(t, []scores.Tick{t1}, slices.Collect(store.GetTicks(1)))
 
 		t2 := scores.Tick{
-			ProblemID:    2,
-			Top:          false,
-			AttemptsTop:  5,
-			Zone:         true,
-			AttemptsZone: 1,
-			Points:       100,
+			ProblemID:     2,
+			Top:           false,
+			AttemptsTop:   5,
+			Zone1:         false,
+			AttemptsZone1: 1,
+			Zone2:         true,
+			AttemptsZone2: 2,
+			Points:        100,
 		}
 
 		store.SaveTick(1, t2)
@@ -296,10 +300,11 @@ func TestMemoryStore(t *testing.T) {
 		store := scores.NewMemoryStore()
 
 		problem := scores.Problem{
-			ID:         domain.ProblemID(rand.Int()),
-			PointsTop:  200,
-			PointsZone: 100,
-			FlashBonus: 25,
+			ID:          domain.ProblemID(rand.Int()),
+			PointsTop:   200,
+			PointsZone1: 100,
+			PointsZone2: 150,
+			FlashBonus:  25,
 		}
 
 		store.SaveProblem(problem)
