@@ -135,7 +135,7 @@
     {#if loading}
       <wa-spinner></wa-spinner>
     {:else if variant === "flash"}
-      <wa-icon name="bolt"></wa-icon>
+      <pre>F</pre>
     {:else if variant === "top"}
       <pre>T</pre>
     {:else if variant === "zone2"}
@@ -218,7 +218,7 @@
     background: none;
     cursor: pointer;
     width: max-content;
-    font-size: var(--wa-font-size-s);
+    font-size: var(--wa-font-size-m);
     font-weight: var(--wa-font-weight-bold);
 
     &[data-variant] {
