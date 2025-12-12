@@ -34,7 +34,7 @@
     size="small"
     onclick={() => navigate(`/${registrationCode}/edit`)}
     disabled={contestState === "ENDED"}
-    appearance="filled"
+    appearance="plain"
   >
     <wa-icon name="gear" label="Edit"></wa-icon>
   </wa-button>
@@ -76,6 +76,10 @@
       top: var(--wa-space-m);
       right: var(--wa-space-s);
       color: inherit;
+
+      &::part(label) {
+        color: var(--wa-color-brand-on-normal);
+      }
     }
 
     & wa-button::part(base) {
