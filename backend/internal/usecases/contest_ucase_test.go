@@ -523,7 +523,8 @@ func TestDuplicateContest(t *testing.T) {
 		HoldColorSecondary: "#00FF00",
 		Description:        "Test Problem",
 		PointsTop:          100,
-		PointsZone:         50,
+		PointsZone1:        50,
+		PointsZone2:        75,
 		FlashBonus:         20,
 	}
 

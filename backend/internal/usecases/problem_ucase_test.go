@@ -54,7 +54,8 @@ func TestPatchProblem(t *testing.T) {
 		HoldColorSecondary: "#000000",
 		Description:        "The tenth boulder",
 		PointsTop:          100,
-		PointsZone:         50,
+		PointsZone1:        50,
+		PointsZone2:        75,
 		FlashBonus:         10,
 	}
 
@@ -93,7 +94,8 @@ func TestPatchProblem(t *testing.T) {
 				HoldColorSecondary: "#00ff00",
 				Description:        "The twentieth boulder",
 				PointsTop:          1000,
-				PointsZone:         500,
+				PointsZone1:        500,
+				PointsZone2:        750,
 				FlashBonus:         25,
 			}).
 			Return(domain.Problem{
@@ -105,16 +107,18 @@ func TestPatchProblem(t *testing.T) {
 				HoldColorSecondary: "#00ff00",
 				Description:        "The twentieth boulder",
 				PointsTop:          1000,
-				PointsZone:         500,
+				PointsZone1:        500,
+				PointsZone2:        750,
 				FlashBonus:         25,
 			}, nil)
 
 		mockedEventBroker.
 			On("Dispatch", fakedContestID, domain.ProblemUpdatedEvent{
-				ProblemID:  fakedProblemID,
-				PointsTop:  1000,
-				PointsZone: 500,
-				FlashBonus: 25,
+				ProblemID:   fakedProblemID,
+				PointsTop:   1000,
+				PointsZone1: 500,
+				PointsZone2: 750,
+				FlashBonus:  25,
 			}).Return()
 
 		ucase := usecases.ProblemUseCase{
@@ -129,7 +133,8 @@ func TestPatchProblem(t *testing.T) {
 			HoldColorSecondary: domain.NewPatch("#00ff00"),
 			Description:        domain.NewPatch("The twentieth boulder"),
 			PointsTop:          domain.NewPatch(1000),
-			PointsZone:         domain.NewPatch(500),
+			PointsZone1:        domain.NewPatch(500),
+			PointsZone2:        domain.NewPatch(750),
 			FlashBonus:         domain.NewPatch(25),
 		})
 
@@ -139,7 +144,8 @@ func TestPatchProblem(t *testing.T) {
 		assert.Equal(t, "#00ff00", problem.HoldColorSecondary)
 		assert.Equal(t, "The twentieth boulder", problem.Description)
 		assert.Equal(t, 1000, problem.PointsTop)
-		assert.Equal(t, 500, problem.PointsZone)
+		assert.Equal(t, 500, problem.PointsZone1)
+		assert.Equal(t, 750, problem.PointsZone2)
 		assert.Equal(t, 25, problem.FlashBonus)
 
 		mockedRepo.AssertExpectations(t)
@@ -220,9 +226,10 @@ func TestPatchProblem(t *testing.T) {
 		}
 
 		_, err := ucase.PatchProblem(context.Background(), fakedProblemID, domain.ProblemPatch{
-			PointsTop:  domain.NewPatch(100),
-			PointsZone: domain.NewPatch(50),
-			FlashBonus: domain.NewPatch(10),
+			PointsTop:   domain.NewPatch(100),
+			PointsZone1: domain.NewPatch(50),
+			PointsZone2: domain.NewPatch(75),
+			FlashBonus:  domain.NewPatch(10),
 		})
 
 		require.NoError(t, err)
@@ -283,10 +290,11 @@ func TestCreateProblem(t *testing.T) {
 
 		mockedEventBroker.
 			On("Dispatch", fakedContestID, domain.ProblemAddedEvent{
-				ProblemID:  fakedProblemID,
-				PointsTop:  100,
-				PointsZone: 50,
-				FlashBonus: 15,
+				ProblemID:   fakedProblemID,
+				PointsTop:   100,
+				PointsZone1: 50,
+				PointsZone2: 75,
+				FlashBonus:  15,
 			}).
 			Return()
 
@@ -308,7 +316,8 @@ func TestCreateProblem(t *testing.T) {
 					HoldColorSecondary: "#000",
 					Description:        "Crack volumes are included",
 					PointsTop:          100,
-					PointsZone:         50,
+					PointsZone1:        50,
+					PointsZone2:        75,
 					FlashBonus:         15,
 				},
 			).
@@ -322,7 +331,8 @@ func TestCreateProblem(t *testing.T) {
 					HoldColorSecondary: "#000",
 					Description:        "Crack volumes are included",
 					PointsTop:          100,
-					PointsZone:         50,
+					PointsZone1:        50,
+					PointsZone2:        75,
 					FlashBonus:         15,
 				}, nil)
 
@@ -338,7 +348,8 @@ func TestCreateProblem(t *testing.T) {
 			HoldColorSecondary: "#000",
 			Description:        "Crack volumes are included",
 			PointsTop:          100,
-			PointsZone:         50,
+			PointsZone1:        50,
+			PointsZone2:        75,
 			FlashBonus:         15,
 		})
 
@@ -351,7 +362,8 @@ func TestCreateProblem(t *testing.T) {
 		assert.Equal(t, "#000", problem.HoldColorSecondary)
 		assert.Equal(t, "Crack volumes are included", problem.Description)
 		assert.Equal(t, 100, problem.PointsTop)
-		assert.Equal(t, 50, problem.PointsZone)
+		assert.Equal(t, 50, problem.PointsZone1)
+		assert.Equal(t, 75, problem.PointsZone2)
 		assert.Equal(t, 15, problem.FlashBonus)
 
 		mockedRepo.AssertExpectations(t)
@@ -381,7 +393,8 @@ func TestCreateProblem(t *testing.T) {
 			HoldColorSecondary: "#000",
 			Description:        "Crack volumes are included",
 			PointsTop:          100,
-			PointsZone:         50,
+			PointsZone1:        50,
+			PointsZone2:        75,
 			FlashBonus:         15,
 		})
 
@@ -424,7 +437,8 @@ func TestCreateProblem(t *testing.T) {
 				HoldColorSecondary: "#000",
 				Description:        "Crack volumes are included",
 				PointsTop:          100,
-				PointsZone:         50,
+				PointsZone1:        50,
+				PointsZone2:        75,
 				FlashBonus:         15,
 			}
 		}
