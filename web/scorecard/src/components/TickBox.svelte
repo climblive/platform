@@ -218,7 +218,7 @@
     background: none;
     cursor: pointer;
     width: max-content;
-    font-size: var(--wa-font-size-m);
+    font-size: var(--wa-font-size-s);
     font-weight: var(--wa-font-weight-bold);
 
     &[data-variant] {
