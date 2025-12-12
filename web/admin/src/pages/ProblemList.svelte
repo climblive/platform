@@ -120,7 +120,9 @@
   pointsZone2,
   pointsTop,
 }: ProblemWithAscents)}
-  {[pointsZone1, pointsZone2, pointsTop].join(" / ")} pts
+  {[pointsZone1, pointsZone2, pointsTop]
+    .filter((value) => value !== undefined)
+    .join(" / ")} pts
 {/snippet}
 
 {#snippet renderFlashBonus({ flashBonus }: ProblemWithAscents)}
