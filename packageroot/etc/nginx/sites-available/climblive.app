@@ -2,9 +2,6 @@ server {
 	listen 443 ssl http2;
 	server_name __SERVER_NAME__ www.__SERVER_NAME__;
 
-	# Gzip Settings
-	include snippets/gzip.conf;
-
 	client_max_body_size 1M;
 
 	set $csp "default-src 'self'; connect-src 'self' clmb.auth.eu-west-1.amazoncognito.com *.fontawesome.com *.sentry.io data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'self'; img-src 'self' data:; report-uri https://o4509937603641344.ingest.de.sentry.io/api/4509937616093264/security/?sentry_key=019099d850441f60cea5d465e217f768";
@@ -72,8 +69,6 @@ server {
 		add_header X-Content-Type-Options "nosniff";
 		add_header Referrer-Policy "same-origin";
 	}
-
-	include /etc/nginx/options-ssl.conf;
 
 	ssl_certificate /etc/nginx/ssl/cloudflare/climblive.app/cert.pem;
 	ssl_certificate_key /etc/nginx/ssl/cloudflare/climblive.app/privkey.pem;
