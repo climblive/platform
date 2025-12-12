@@ -118,7 +118,7 @@
 
 {#snippet renderPoints(
   { pointsZone1, pointsZone2, pointsTop, flashBonus }: ProblemWithAscents,
-  mobile: true,
+  mobile: boolean,
 )}
   {@const values = [pointsZone1, pointsZone2, pointsTop].filter(isDefined)}
 
