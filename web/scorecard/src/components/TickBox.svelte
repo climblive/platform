@@ -256,6 +256,10 @@
       border-color: var(--wa-color-yellow-50);
       color: var(--wa-color-yellow-50);
     }
+
+    & pre {
+      margin: 0;
+    }
   }
 
   .label {
