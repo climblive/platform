@@ -90,7 +90,7 @@ func TestHydrate(t *testing.T) {
 		Zone1:         true,
 		AttemptsZone1: 1,
 		Zone2:         true,
-		AttemptsZone2: 1,
+		AttemptsZone2: 2,
 	}).Return()
 
 	hydrator := &scores.StandardEngineStoreHydrator{Repo: mockedRepo}
