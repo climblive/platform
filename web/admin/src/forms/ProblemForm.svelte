@@ -98,13 +98,6 @@
     </div>
     <wa-input
       size="small"
-      {@attach name("description")}
-      label="Description"
-      type="text"
-      value={data.description}
-    ></wa-input>
-    <wa-input
-      size="small"
       {@attach name("pointsTop")}
       label="Points top"
       hint="Points for reaching the top."
