@@ -43,8 +43,8 @@ test.beforeAll(async () => {
   const schema = await readFile("../../backend/database/climblive.sql", "utf8");
   const samples = await readFile("./samples.sql", "utf8");
 
-  dbConnection.query(schema);
-  dbConnection.query(samples);
+  await dbConnection.query(schema);
+  await dbConnection.query(samples);
 
   const apiContainer = new GenericContainer("climblive-api:latest")
     .withEnvironment({
