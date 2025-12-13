@@ -2,8 +2,8 @@
   import { HoldColorIndicator } from "@climblive/lib/components";
   import type { Problem, Tick } from "@climblive/lib/models";
   import {
-      createTickMutation,
-      deleteTickMutation,
+    createTickMutation,
+    deleteTickMutation,
   } from "@climblive/lib/queries";
 
   type Props = {
@@ -30,32 +30,35 @@
   };
 
   const addTick = (type: "zone1" | "zone2" | "top" | "flash") => () => {
+    const attempts = type === "flash" ? 1 : 999;
+
+    const tick: Omit<Tick, "id" | "timestamp"> = {
+      problemId: problem.id,
+      top: false,
+      zone2: false,
+      zone1: false,
+      attemptsTop: attempts,
+      attemptsZone2: attempts,
+      attemptsZone1: attempts,
+    };
+
     switch (type) {
-      case "top":
-        createTick.mutate({
-          problemId: problem.id,
-          zone1: true,
-          attemptsZone1: 999,
-          zone2: true,
-          attemptsZone2: 999,
-          top: true,
-          attemptsTop: 999,
-        });
-
-        break;
       case "flash":
-        createTick.mutate({
-          problemId: problem.id,
-          zone1: true,
-          attemptsZone1: 1,
-          zone2: true,
-          attemptsZone2: 1,
-          top: true,
-          attemptsTop: 1,
-        });
-
+      case "top":
+        tick.top = true;
+        tick.zone2 = true;
+        tick.zone1 = true;
+        break;
+      case "zone2":
+        tick.zone2 = true;
+        tick.zone1 = true;
+        break;
+      case "zone1":
+        tick.zone1 = true;
         break;
     }
+
+    createTick.mutate(tick);
   };
 
   const removeTick = () => {
@@ -83,32 +86,37 @@
         F
       {:else if tick?.top}
         T
-      {:else if tick?.zone1}
-        Z1
       {:else if tick?.zone2}
         Z2
+      {:else if tick?.zone1}
+        Z1
       {/if}
     </div>
   </span>
-  {#if tick}
-    <button onclick={removeTick} disabled={deleteTick.isPending}>Unsend</button>
-  {:else}
-    {#if problem.zone1Enabled}
-      <button onclick={addTick("zone1")} disabled={createTick.isPending}
-        >Zone 1</button
+  <div class="controls">
+    {#if tick}
+      <button onclick={removeTick} disabled={deleteTick.isPending}
+        >Unsend</button
+      >
+    {:else}
+      {#if problem.zone1Enabled}
+        <button onclick={addTick("zone1")} disabled={createTick.isPending}
+          >Zone 1</button
+        >
+      {/if}
+      {#if problem.zone2Enabled}
+        <button onclick={addTick("zone2")} disabled={createTick.isPending}
+          >Zone 2</button
+        >
+      {/if}
+      <button onclick={addTick("top")} disabled={createTick.isPending}
+        >Top</button
+      >
+      <button onclick={addTick("flash")} disabled={createTick.isPending}
+        >Flash</button
       >
     {/if}
-    {#if problem.zone2Enabled}
-      <button onclick={addTick("zone2")} disabled={createTick.isPending}
-        >Zone 2</button
-      >
-    {/if}
-    <button onclick={addTick("top")} disabled={createTick.isPending}>Top</button
-    >
-    <button onclick={addTick("flash")} disabled={createTick.isPending}
-      >Flash</button
-    >
-  {/if}
+  </div>
 </section>
 
 <style>
@@ -150,5 +158,17 @@
         flex-shrink: 0;
       }
     }
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-xs);
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  button {
+    white-space: nowrap;
   }
 </style>
