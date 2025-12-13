@@ -476,6 +476,12 @@ test.describe("failsafe mode", () => {
       await expect(problem).toBeVisible();
 
       await expect(
+        problem.getByRole("button", { name: "Zone 1" }),
+      ).toBeVisible();
+      await expect(
+        problem.getByRole("button", { name: "Zone 2" }),
+      ).toBeVisible();
+      await expect(
         problem.getByRole("button", { name: "Flash" }),
       ).toBeVisible();
       await problem.getByRole("button", { name: "Top" }).click();
