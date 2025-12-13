@@ -2,11 +2,9 @@
   import { HoldColorIndicator } from "@climblive/lib/components";
   import type { Problem, Tick } from "@climblive/lib/models";
   import {
-    createTickMutation,
-    deleteTickMutation,
+      createTickMutation,
+      deleteTickMutation,
   } from "@climblive/lib/queries";
-  import BoltIcon from "./BoltIcon.svelte";
-  import CheckIcon from "./CheckIcon.svelte";
 
   type Props = {
     problem: Problem;
@@ -31,7 +29,7 @@
     return "no-top";
   };
 
-  const addTick = (type: "top" | "flash") => () => {
+  const addTick = (type: "zone1" | "zone2" | "top" | "flash") => () => {
     switch (type) {
       case "top":
         createTick.mutate({
@@ -81,16 +79,30 @@
     />
     № {problem.number}
     <div class="icon">
-      {#if tick?.top === true && tick?.attemptsTop === 1}
-        <BoltIcon />
-      {:else if tick?.top === true}
-        <CheckIcon />
+      {#if tick?.top && tick?.attemptsTop === 1}
+        F
+      {:else if tick?.top}
+        T
+      {:else if tick?.zone1}
+        Z1
+      {:else if tick?.zone2}
+        Z2
       {/if}
     </div>
   </span>
   {#if tick}
     <button onclick={removeTick} disabled={deleteTick.isPending}>Unsend</button>
   {:else}
+    {#if problem.zone1Enabled}
+      <button onclick={addTick("zone1")} disabled={createTick.isPending}
+        >Zone 1</button
+      >
+    {/if}
+    {#if problem.zone2Enabled}
+      <button onclick={addTick("zone2")} disabled={createTick.isPending}
+        >Zone 2</button
+      >
+    {/if}
     <button onclick={addTick("top")} disabled={createTick.isPending}>Top</button
     >
     <button onclick={addTick("flash")} disabled={createTick.isPending}
