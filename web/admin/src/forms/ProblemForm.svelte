@@ -139,7 +139,6 @@
         {@attach name("zone2Enabled")}
         hint="Add a second zone."
         onchange={handleZone2Toggle}
-        disabled={!zone1Enabled}
         {@attach checked(data.zone2Enabled)}>Enable zone Z2</wa-switch
       >
     {/if}
