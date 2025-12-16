@@ -156,9 +156,9 @@ WHERE id = ?;
 
 -- name: UpsertProblem :execlastid
 INSERT INTO 
-	problem (id, organizer_id, contest_id, number, hold_color_primary, hold_color_secondary, name, description, points, flash_bonus)
+	problem (id, organizer_id, contest_id, number, hold_color_primary, hold_color_secondary, name, zone_1_enabled, zone_2_enabled, description, points_zone_1, points_zone_2, points_top, flash_bonus)
 VALUES 
-	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     contest_id = VALUES(contest_id),
@@ -166,8 +166,12 @@ ON DUPLICATE KEY UPDATE
     hold_color_primary = VALUES(hold_color_primary),
     hold_color_secondary = VALUES(hold_color_secondary),
     name = VALUES(name),
+    zone_1_enabled = VALUES(zone_1_enabled),
+    zone_2_enabled = VALUES(zone_2_enabled),
     description = VALUES(description),
-    points = VALUES(points),
+    points_zone_1 = VALUES(points_zone_1),
+    points_zone_2 = VALUES(points_zone_2),
+    points_top = VALUES(points_top),
     flash_bonus = VALUES(flash_bonus);
 
 -- name: GetTick :one
@@ -197,9 +201,9 @@ WHERE id = ?;
 
 -- name: InsertTick :execlastid
 INSERT INTO
-    tick (organizer_id, contest_id, contender_id, problem_id, flash, timestamp)
+    tick (organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
 VALUES
-    (?, ?, ?, ?, ?, ?);
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 -- name: UpsertOrganizer :execlastid
 INSERT INTO

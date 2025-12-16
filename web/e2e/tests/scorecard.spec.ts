@@ -286,7 +286,7 @@ test("tick and untick all problems", async ({ page }) => {
   await expect(page.getByText("1st")).toBeVisible();
 });
 
-test("flash a problem", async ({ page }) => {
+test("tick a problem as a flash", async ({ page }) => {
   await page.goto("/ABCD0003");
 
   const problem = page.getByRole("region", { name: "Problem 1" });
@@ -300,6 +300,38 @@ test("flash a problem", async ({ page }) => {
   await problem.getByRole("button", { name: "Untick" }).click();
 
   await expect(problem.getByText("+110p")).not.toBeVisible();
+});
+
+test("tick the first zone", async ({ page }) => {
+  await page.goto("/ABCD0003");
+
+  const problem = page.getByRole("region", { name: "Problem 1" });
+  await expect(problem).toBeVisible();
+
+  await problem.getByRole("button", { name: "Tick" }).click();
+  await problem.getByRole("button", { name: "Zone 1" }).click();
+
+  await expect(problem.getByText("+10p")).toBeVisible();
+
+  await problem.getByRole("button", { name: "Untick" }).click();
+
+  await expect(problem.getByText("+10p")).not.toBeVisible();
+});
+
+test("tick the second zone", async ({ page }) => {
+  await page.goto("/ABCD0003");
+
+  const problem = page.getByRole("region", { name: "Problem 1" });
+  await expect(problem).toBeVisible();
+
+  await problem.getByRole("button", { name: "Tick" }).click();
+  await problem.getByRole("button", { name: "Zone 2" }).click();
+
+  await expect(problem.getByText("+20p")).toBeVisible();
+
+  await problem.getByRole("button", { name: "Untick" }).click();
+
+  await expect(problem.getByText("+20p")).not.toBeVisible();
 });
 
 test("info tab", async ({ page }) => {
@@ -443,6 +475,12 @@ test.describe("failsafe mode", () => {
       const problem = page.getByRole("region", { name: `Problem ${p}` });
       await expect(problem).toBeVisible();
 
+      await expect(
+        problem.getByRole("button", { name: "Zone 1" }),
+      ).toBeVisible();
+      await expect(
+        problem.getByRole("button", { name: "Zone 2" }),
+      ).toBeVisible();
       await expect(
         problem.getByRole("button", { name: "Flash" }),
       ).toBeVisible();

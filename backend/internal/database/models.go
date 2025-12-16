@@ -62,8 +62,12 @@ type Problem struct {
 	HoldColorPrimary   string
 	HoldColorSecondary sql.NullString
 	Name               sql.NullString
+	Zone1Enabled       bool
+	Zone2Enabled       bool
 	Description        sql.NullString
-	Points             int32
+	PointsZone1        sql.NullInt32
+	PointsZone2        sql.NullInt32
+	PointsTop          int32
 	FlashBonus         sql.NullInt32
 }
 
@@ -98,13 +102,18 @@ type Series struct {
 }
 
 type Tick struct {
-	ID          int32
-	OrganizerID int32
-	ContestID   int32
-	ContenderID int32
-	ProblemID   int32
-	Flash       bool
-	Timestamp   time.Time
+	ID            int32
+	OrganizerID   int32
+	ContestID     int32
+	ContenderID   int32
+	ProblemID     int32
+	Timestamp     time.Time
+	Zone1         bool
+	AttemptsZone1 int32
+	Zone2         bool
+	AttemptsZone2 int32
+	Top           bool
+	AttemptsTop   int32
 }
 
 type User struct {
