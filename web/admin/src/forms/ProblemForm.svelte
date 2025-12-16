@@ -116,15 +116,13 @@
 
     <wa-divider></wa-divider>
 
-    <div class="zones">
-      <wa-switch
-        size="small"
-        {@attach name("zone1Enabled")}
-        hint="Add a zone."
-        onchange={handleZone1Toggle}
-        {@attach checked(data.zone1Enabled)}>Enable zone Z1</wa-switch
-      >
-    </div>
+    <wa-switch
+      size="small"
+      {@attach name("zone1Enabled")}
+      hint="Add a zone."
+      onchange={handleZone1Toggle}
+      {@attach checked(data.zone1Enabled)}>Enable zone Z1</wa-switch
+    >
     {#if zone1Enabled}
       <wa-input
         size="small"
@@ -169,10 +167,5 @@
       display: flex;
       gap: var(--wa-space-s);
     }
-  }
-
-  .zones {
-    display: flex;
-    gap: var(--wa-space-m);
   }
 </style>
