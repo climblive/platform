@@ -454,6 +454,8 @@ func TestCreateProblem(t *testing.T) {
 				HoldColorPrimary:   "#ffffff",
 				HoldColorSecondary: "#000",
 				Description:        "Crack volumes are included",
+				Zone1Enabled:       true,
+				Zone2Enabled:       true,
 				PointsTop:          100,
 				PointsZone1:        50,
 				PointsZone2:        75,
