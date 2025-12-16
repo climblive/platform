@@ -24,8 +24,6 @@
   --wa-font-size-2xl: 2rem;
   --wa-font-size-3xl: 2.5625rem;
   --wa-font-size-4xl: 3.25rem;
-
-  --wa-border-width-s: var(--wa-border-width-m);
 }
 
 body {
