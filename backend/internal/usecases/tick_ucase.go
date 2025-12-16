@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/go-errors/errors"
 )
 
@@ -167,6 +168,10 @@ func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.Conten
 		AttemptsZone1: tick.AttemptsZone1,
 		Zone2:         tick.Zone2,
 		AttemptsZone2: tick.AttemptsZone2,
+	}
+
+	if err := (validators.TickValidator{}).Validate(newTick); err != nil {
+		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
 	tick, err = uc.Repo.StoreTick(ctx, nil, newTick)

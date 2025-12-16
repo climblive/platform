@@ -7,6 +7,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/usecases"
+	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -522,6 +523,41 @@ func TestCreateTick(t *testing.T) {
 		assert.Empty(t, tick)
 
 		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("ValidatorIsInvoked", func(t *testing.T) {
+		mockedRepo, mockedEventBroker := makeMocks(time.Now(), time.Now())
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.ContenderRole, nil)
+
+		mockedRepo.
+			On("GetProblem", mock.Anything, mock.Anything, fakedProblemID).
+			Return(domain.Problem{
+				ID:        fakedProblemID,
+				ContestID: fakedContestID,
+			}, nil)
+
+		ucase := usecases.TickUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.CreateTick(context.Background(), fakedContenderID, domain.Tick{
+			ProblemID: fakedProblemID,
+			Top:       true,
+			Zone2:     false,
+			Zone1:     false,
+		})
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validators.TickValidator{}.IsValidationError(err))
+
+		mockedRepo.AssertExpectations(t)
+		mockedEventBroker.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
 	})
 }
