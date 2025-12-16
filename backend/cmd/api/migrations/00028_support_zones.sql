@@ -33,7 +33,7 @@ ALTER TABLE `problem` CHANGE `points_top` `points` INT NOT NULL AFTER `descripti
 ALTER TABLE `tick` ADD COLUMN `flash` TINYINT(1) NOT NULL DEFAULT 0 AFTER `problem_id`;
 
 UPDATE `tick`
-    SET `flash` = CASE WHEN attempts_top = 1 THEN 1 ELSE 0 END;
+    SET `flash` = CASE WHEN top = 1 AND attempts_top = 1 THEN 1 ELSE 0 END;
 
 ALTER TABLE `tick` DROP COLUMN `top`;
 ALTER TABLE `tick` DROP COLUMN `attempts_top`;
