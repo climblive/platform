@@ -232,9 +232,9 @@ func TestMemoryStore(t *testing.T) {
 			Top:           false,
 			AttemptsTop:   5,
 			Zone1:         false,
-			AttemptsZone1: 1,
-			Zone2:         true,
-			AttemptsZone2: 2,
+			AttemptsZone1: 4,
+			Zone2:         false,
+			AttemptsZone2: 3,
 			Points:        100,
 		}
 
