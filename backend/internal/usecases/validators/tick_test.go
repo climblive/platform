@@ -36,44 +36,44 @@ func TestTickValidator(t *testing.T) {
 	})
 
 	t.Run("AttemptsZone1ExceedsAttemptsZone2", func(t *testing.T) {
-		contest := validTick()
-		contest.AttemptsZone1 = 21
+		tick := validTick()
+		tick.AttemptsZone1 = 21
 
-		err := validator.Validate(contest)
+		err := validator.Validate(tick)
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
 		assert.True(t, validator.IsValidationError(err))
 	})
 
 	t.Run("AttemptsZone2ExceedsAttemptsTop", func(t *testing.T) {
-		contest := validTick()
-		contest.AttemptsZone2 = 31
+		tick := validTick()
+		tick.AttemptsZone2 = 31
 
-		err := validator.Validate(contest)
+		err := validator.Validate(tick)
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
 		assert.True(t, validator.IsValidationError(err))
 	})
 
 	t.Run("TopWithoutZones", func(t *testing.T) {
-		contest := validTick()
-		contest.Top = true
-		contest.Zone2 = false
-		contest.Zone1 = false
+		tick := validTick()
+		tick.Top = true
+		tick.Zone2 = false
+		tick.Zone1 = false
 
-		err := validator.Validate(contest)
+		err := validator.Validate(tick)
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
 		assert.True(t, validator.IsValidationError(err))
 	})
 
 	t.Run("Zone2WithoutZone1", func(t *testing.T) {
-		contest := validTick()
-		contest.Top = false
-		contest.Zone2 = true
-		contest.Zone1 = false
+		tick := validTick()
+		tick.Top = false
+		tick.Zone2 = true
+		tick.Zone1 = false
 
-		err := validator.Validate(contest)
+		err := validator.Validate(tick)
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
 		assert.True(t, validator.IsValidationError(err))
