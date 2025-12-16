@@ -4,10 +4,9 @@
     iconName: string;
     label: string;
     points?: number;
-    flash?: boolean;
   };
 
-  const { onClick, iconName, label, points, flash }: Props = $props();
+  const { onClick, iconName, label, points }: Props = $props();
 </script>
 
 <div>

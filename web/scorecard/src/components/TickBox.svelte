@@ -160,7 +160,6 @@
         label="Flash"
         onClick={(e: MouseEvent) => handleTick(e, "top", true)}
         points={problem.pointsTop + (problem.flashBonus ?? 0)}
-        flash
       />
     </div>
 
