@@ -33,13 +33,13 @@
   const loading = $derived(createTick.isPending || deleteTick.isPending);
   const variant = $derived.by(() => {
     switch (true) {
-      case tick?.top === true && tick.attemptsTop === 1:
+      case tick?.top && tick.attemptsTop === 1:
         return "flash";
-      case tick?.top === true:
+      case tick?.top:
         return "top";
-      case tick?.zone2 === true:
+      case tick?.zone2:
         return "zone2";
-      case tick?.zone1 === true:
+      case tick?.zone1:
         return "zone1";
     }
   });
