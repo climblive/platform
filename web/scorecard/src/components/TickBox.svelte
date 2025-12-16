@@ -212,7 +212,7 @@
     align-items: center;
     height: calc(100% - 2 * var(--wa-space-xs));
     aspect-ratio: 1 / 1;
-    border: var(--wa-border-style) var(--wa-border-width-m)
+    border: var(--wa-border-style) var(--wa-border-width-s)
       var(--wa-color-neutral-border-loud);
     border-radius: var(--wa-border-radius-l);
     background: none;
