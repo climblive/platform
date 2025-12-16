@@ -10,7 +10,7 @@
   const { onClick, iconName, label, points, flash }: Props = $props();
 </script>
 
-<div data-flash={flash}>
+<div>
   <wa-button size="small" appearance="outlined" onclick={onClick} pill>
     <wa-icon slot="start" name={iconName}></wa-icon>
     {label}
