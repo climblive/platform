@@ -21,7 +21,6 @@
 
   let { problem, tick, disabled = false }: Props = $props();
 
-  let button: HTMLButtonElement | undefined = $state();
   let dialog: WaDialog | undefined = $state();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
@@ -43,16 +42,6 @@
         return "zone1";
     }
   });
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (
-      dialog &&
-      event.target instanceof Node &&
-      !dialog.contains(event.target)
-    ) {
-      open = false;
-    }
-  };
 
   const handleCheck = () => {
     if (tick?.id) {
@@ -122,12 +111,9 @@
   });
 </script>
 
-<svelte:body on:click|capture={handleClickOutside} />
-
 <div class="container">
   <button
     data-variant={variant}
-    bind:this={button}
     disabled={disabled || loading}
     onclick={handleCheck}
     aria-label={tick?.id ? "Untick" : "Tick"}
@@ -150,6 +136,7 @@
     bind:this={dialog}
     {open}
     light-dismiss
+    onwa-hide={() => (open = false)}
   >
     <div class="label" slot="label">
       <HoldColorIndicator
