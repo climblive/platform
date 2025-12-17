@@ -87,11 +87,12 @@
   // Scroll to highlighted contender when tableData is updated
   $effect(() => {
     if (highlightedContenderId && tableData.length > 0 && tableContainer) {
-      // Wait for DOM to update
+      // Wait for DOM to update and render the table with the highlighted attribute
+      const DOM_UPDATE_DELAY_MS = 100;
       setTimeout(() => {
         if (!tableContainer) return;
         const highlightedRow = tableContainer.querySelector(
-          `tr[data-highlighted="true"]`,
+          `tbody tr[data-highlighted="true"]`,
         );
         if (highlightedRow) {
           highlightedRow.scrollIntoView({
@@ -99,7 +100,7 @@
             block: "center",
           });
         }
-      }, 100);
+      }, DOM_UPDATE_DELAY_MS);
     }
   });
 
