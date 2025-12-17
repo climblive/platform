@@ -27,6 +27,7 @@
   const { contestId, scoreboard, loading, highlightedContenderId }: Props = $props();
 
   let tableData = $state<ScoreboardEntry[]>([]);
+  let tableContainer: HTMLDivElement | undefined = $state();
 
   let compClassSelector: WaSelect | undefined = $state();
   let quickFilter: WaInput | undefined = $state();
@@ -85,10 +86,11 @@
 
   // Scroll to highlighted contender when tableData is updated
   $effect(() => {
-    if (highlightedContenderId && tableData.length > 0) {
+    if (highlightedContenderId && tableData.length > 0 && tableContainer) {
       // Wait for DOM to update
       setTimeout(() => {
-        const highlightedRow = document.querySelector(
+        if (!tableContainer) return;
+        const highlightedRow = tableContainer.querySelector(
           `tr[data-highlighted="true"]`,
         );
         if (highlightedRow) {
@@ -190,18 +192,20 @@
   >Live</wa-switch
 >
 
-{#if loading}
-  <Loader />
-{:else}
-  <Table
-    {columns}
-    data={tableData}
-    getId={({ contenderId }) => contenderId}
-    getRowAttributes={({ contenderId }) => ({
-      "data-highlighted": highlightedContenderId === contenderId,
-    })}
-  ></Table>
-{/if}
+<div bind:this={tableContainer}>
+  {#if loading}
+    <Loader />
+  {:else}
+    <Table
+      {columns}
+      data={tableData}
+      getId={({ contenderId }) => contenderId}
+      getRowAttributes={({ contenderId }) => ({
+        "data-highlighted": highlightedContenderId === contenderId,
+      })}
+    ></Table>
+  {/if}
+</div>
 
 <style>
   wa-switch {

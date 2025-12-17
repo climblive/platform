@@ -142,7 +142,7 @@
 
   tbody tr[data-highlighted="true"] {
     background-color: var(--wa-color-primary-fill-quiet);
-    animation: highlight-fade 2s ease-in-out;
+    animation: highlight-fade 2s ease-in-out forwards;
   }
 
   @keyframes highlight-fade {

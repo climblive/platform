@@ -47,9 +47,12 @@
     if (queryString) {
       const params = new URLSearchParams(queryString);
       const contenderIdParam = params.get("contenderId");
-      highlightedContenderId = contenderIdParam
-        ? Number(contenderIdParam)
-        : undefined;
+      if (contenderIdParam) {
+        const parsed = parseInt(contenderIdParam, 10);
+        highlightedContenderId = !isNaN(parsed) ? parsed : undefined;
+      } else {
+        highlightedContenderId = undefined;
+      }
     } else {
       highlightedContenderId = undefined;
     }
