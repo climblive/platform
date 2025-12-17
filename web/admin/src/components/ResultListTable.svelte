@@ -201,7 +201,8 @@
       data={tableData}
       getId={({ contenderId }) => contenderId}
       getRowAttributes={({ contenderId }) => ({
-        "data-highlighted": highlightedContenderId === contenderId,
+        "data-highlighted":
+          highlightedContenderId === contenderId ? "true" : "false",
       })}
     ></Table>
   {/if}
