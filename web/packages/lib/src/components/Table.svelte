@@ -15,11 +15,12 @@
     columns: ColumnDefinition<T>[];
     data: T[];
     getId: (row: T) => string | number;
+    getRowAttributes?: (row: T) => Record<string, string | boolean>;
   };
 
   let mobile = $state(false);
 
-  const { columns, data, getId }: Props<T> = $props();
+  const { columns, data, getId, getRowAttributes }: Props<T> = $props();
 
   function handleResize() {
     mobile = window.innerWidth < 768;
@@ -56,7 +57,8 @@
   </thead>
   <tbody>
     {#each data as row (getId(row))}
-      <tr>
+      {@const rowAttributes = getRowAttributes ? getRowAttributes(row) : {}}
+      <tr {...rowAttributes}>
         {#each columns as column, index (index)}
           {#if cellVisible(column)}
             <td data-align={column.align ?? "left"}>
@@ -136,6 +138,20 @@
 
   tbody tr:hover {
     background-color: var(--wa-color-surface-raised);
+  }
+
+  tbody tr[data-highlighted="true"] {
+    background-color: var(--wa-color-primary-fill-quiet);
+    animation: highlight-fade 2s ease-in-out;
+  }
+
+  @keyframes highlight-fade {
+    0% {
+      background-color: var(--wa-color-primary-fill-normal);
+    }
+    100% {
+      background-color: var(--wa-color-primary-fill-quiet);
+    }
   }
 
   th[data-align="right"],

@@ -63,7 +63,7 @@
 {#if contender && compClasses}
   <wa-button
     appearance="plain"
-    onclick={() => navigate(`/admin/contests/${contestId}#results`)}
+    onclick={() => navigate(`/admin/contests/${contestId}#results?contenderId=${contenderId}`)}
     >Back to results<wa-icon name="arrow-left" slot="start"
     ></wa-icon></wa-button
   >

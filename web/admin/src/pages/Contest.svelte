@@ -37,17 +37,31 @@
 
   let contest = $derived(contestQuery.data);
 
+  let highlightedContenderId = $state<number | undefined>(undefined);
+
   $effect(() => {
     const hash = window.location.hash.substring(1);
+    const [tabName, queryString] = hash.split("?");
+
+    // Extract contenderId from query string if present
+    if (queryString) {
+      const params = new URLSearchParams(queryString);
+      const contenderIdParam = params.get("contenderId");
+      highlightedContenderId = contenderIdParam
+        ? Number(contenderIdParam)
+        : undefined;
+    } else {
+      highlightedContenderId = undefined;
+    }
 
     if (tabGroup) {
-      if (["results", "raffles"].includes(hash)) {
-        setTimeout(() => tabGroup?.setAttribute("active", hash));
+      if (["results", "raffles"].includes(tabName)) {
+        setTimeout(() => tabGroup?.setAttribute("active", tabName));
       }
 
       let scrollElement: HTMLElement | undefined;
 
-      switch (hash) {
+      switch (tabName) {
         case "problems":
           scrollElement = problemsHeading;
           break;
@@ -175,7 +189,7 @@
 
       <wa-tab-panel name="results">
         <h2>Results</h2>
-        <ResultsList {contestId} />
+        <ResultsList {contestId} {highlightedContenderId} />
       </wa-tab-panel>
 
       <wa-tab-panel name="raffles">

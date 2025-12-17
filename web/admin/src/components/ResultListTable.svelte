@@ -21,9 +21,10 @@
     contestId: number;
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
     loading: boolean;
+    highlightedContenderId?: number;
   }
 
-  const { contestId, scoreboard, loading }: Props = $props();
+  const { contestId, scoreboard, loading, highlightedContenderId }: Props = $props();
 
   let tableData = $state<ScoreboardEntry[]>([]);
 
@@ -80,6 +81,24 @@
     );
 
     tableData = scores;
+  });
+
+  // Scroll to highlighted contender when tableData is updated
+  $effect(() => {
+    if (highlightedContenderId && tableData.length > 0) {
+      // Wait for DOM to update
+      setTimeout(() => {
+        const highlightedRow = document.querySelector(
+          `tr[data-highlighted="true"]`,
+        );
+        if (highlightedRow) {
+          highlightedRow.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        }
+      }, 100);
+    }
   });
 
   const columns: ColumnDefinition<ScoreboardEntry>[] = [
@@ -174,7 +193,13 @@
 {#if loading}
   <Loader />
 {:else}
-  <Table {columns} data={tableData} getId={({ contenderId }) => contenderId}
+  <Table
+    {columns}
+    data={tableData}
+    getId={({ contenderId }) => contenderId}
+    getRowAttributes={({ contenderId }) => ({
+      "data-highlighted": highlightedContenderId === contenderId,
+    })}
   ></Table>
 {/if}
 
