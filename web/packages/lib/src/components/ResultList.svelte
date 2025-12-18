@@ -26,6 +26,7 @@
   const ITEM_HEIGHT = 36;
   const GAP = 8;
   const SCROLLABLE_SKELETON_ENTRIES = 10;
+  const DOM_UPDATE_DELAY_MS = 100;
 
   let container: HTMLDivElement | undefined = $state();
   let observer: ResizeObserver | undefined;
@@ -100,7 +101,6 @@
 
   $effect(() => {
     if (highlightedContenderId && results.length > 0 && container) {
-      const DOM_UPDATE_DELAY_MS = 100;
       setTimeout(() => {
         if (!container) return;
         const highlightedEntry = container.querySelector(
