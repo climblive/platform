@@ -1,0 +1,33 @@
+on:
+  pull_request:
+    types: [opened, reopened, edited]
+
+jobs:
+  validate-pr-title:
+    name: Validate PR title
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: read
+
+    steps:
+      - name: Validate conventional commits format and lowercase
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+
+          # Check if title is in lowercase
+          if [[ "$TITLE" != "${TITLE,,}" ]]; then
+            echo "❌ PR title must be in all lowercase letters"
+            echo "Current title: $TITLE"
+            exit 1
+          fi
+
+          # Check conventional commits format: type(scope): description or type: description
+          if ! [[ "$TITLE" =~ ^(feat|fix|docs|style|refactor|perf|test|chore|ci|revert)(\(.+\))?:\ .+ ]]; then
+            echo "❌ PR title must follow conventional commits format"
+            echo "Expected format: type(scope): description or type: description"
+            echo "Valid types: feat, fix, docs, style, refactor, perf, test, chore, ci, revert"
+            echo "Current title: $TITLE"
+            exit 1
+          fi
+
+          echo "✅ PR title is valid"
