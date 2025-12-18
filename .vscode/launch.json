@@ -45,7 +45,7 @@
       "name": "WWW",
       "type": "node-terminal",
       "request": "launch",
-      "command": "python3 -m http.server 8080",
+      "command": "pnpm i && pnpm run dev --port 5176",
       "cwd": "${workspaceFolder}/web/www"
     },
     {
@@ -59,7 +59,7 @@
   "compounds": [
     {
       "name": "Service",
-      "configurations": ["Backend", "Scorecard", "Scoreboard", "Admin"],
+      "configurations": ["Backend", "Scorecard", "Scoreboard", "Admin", "WWW"],
       "stopAll": false
     }
   ]
