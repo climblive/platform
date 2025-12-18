@@ -26,7 +26,6 @@
   const ITEM_HEIGHT = 36;
   const GAP = 8;
   const SCROLLABLE_SKELETON_ENTRIES = 10;
-  const DOM_UPDATE_DELAY_MS = 100;
 
   let container: HTMLDivElement | undefined = $state();
   let observer: ResizeObserver | undefined;
@@ -112,7 +111,7 @@
             block: "center",
           });
         }
-      }, DOM_UPDATE_DELAY_MS);
+      });
     }
   });
 </script>

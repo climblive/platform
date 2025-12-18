@@ -61,7 +61,7 @@
 
   @keyframes highlight-fade {
     0% {
-      background-color: var(--wa-color-primary-fill-normal);
+      background-color: var(--wa-color-brand-fill-normal);
     }
     100% {
       background-color: var(--wa-color-primary-fill-quiet);
