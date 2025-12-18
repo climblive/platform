@@ -10,22 +10,19 @@ jobs:
       pull-requests: read
 
     steps:
-      - name: Validate conventional commits format and lowercase
-        run: |
-          TITLE="${{ github.event.pull_request.title }}"
+      run: |
+        TITLE="${{ github.event.pull_request.title }}"
 
-          # Check if title is in lowercase
-          if [[ "$TITLE" != "${TITLE,,}" ]]; then
-            echo "❌ PR title must be in all lowercase letters"
-            exit 1
-          fi
+        if [[ "$TITLE" != "${TITLE,,}" ]]; then
+          echo "❌ PR title must be in all lowercase letters"
+          exit 1
+        fi
 
-          pattern='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z]+\))?!?: .+$'
+        pattern='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z]+\))?!?: .+$'
 
-          # Check conventional commits format: type(scope): description or type: description
-          if ! [[ "$TITLE" =~ $pattern ]]; then
-            echo "❌ PR title must follow conventional commits format"
-            exit 1
-          fi
+        if ! [[ "$TITLE" =~ $pattern ]]; then
+          echo "❌ PR title must follow conventional commits format"
+          exit 1
+        fi
 
-          echo "✅ PR title is valid"
+        echo "✅ PR title is valid"
