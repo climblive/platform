@@ -12,7 +12,12 @@ jobs:
 
     steps:
       - run: |
-          TITLE="${{ github.event.pull_request.title }}"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            TITLE="${{ github.event.pull_request.title }}"
+          else
+            TITLE="${{ github.event.merge_group.head_commit.message }}"
+            TITLE="${TITLE%%$'\n'*}"
+          fi
 
           if [[ "$TITLE" != "${TITLE,,}" ]]; then
             echo "❌ PR title must be in all lowercase letters"
