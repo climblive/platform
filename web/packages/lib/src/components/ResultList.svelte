@@ -12,6 +12,7 @@
     overflow?: "pagination" | "scroll";
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
     loading: boolean;
+    highlightedContenderId?: number;
   }
 
   let {
@@ -19,6 +20,7 @@
     overflow = "scroll",
     scoreboard,
     loading,
+    highlightedContenderId,
   }: Props = $props();
 
   const ITEM_HEIGHT = 36;
@@ -95,6 +97,24 @@
       observer?.observe(container);
     }
   });
+
+  $effect(() => {
+    if (highlightedContenderId && results.length > 0 && container) {
+      const DOM_UPDATE_DELAY_MS = 100;
+      setTimeout(() => {
+        if (!container) return;
+        const highlightedEntry = container.querySelector(
+          `section[data-highlighted="true"]`,
+        );
+        if (highlightedEntry) {
+          highlightedEntry.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        }
+      }, DOM_UPDATE_DELAY_MS);
+    }
+  });
 </script>
 
 <div
@@ -111,7 +131,10 @@
     {#each results as scoreboardEntry (scoreboardEntry.contenderId)}
       {#if scoreboardEntry.score}
         <Floater order={scoreboardEntry.score.rankOrder}>
-          <ResultEntry {scoreboardEntry} />
+          <ResultEntry
+            {scoreboardEntry}
+            highlighted={highlightedContenderId === scoreboardEntry.contenderId}
+          />
         </Floater>
       {/if}
     {/each}

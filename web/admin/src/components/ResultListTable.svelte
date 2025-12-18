@@ -21,13 +21,11 @@
     contestId: number;
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
     loading: boolean;
-    highlightedContenderId?: number;
   }
 
-  const { contestId, scoreboard, loading, highlightedContenderId }: Props = $props();
+  const { contestId, scoreboard, loading }: Props = $props();
 
   let tableData = $state<ScoreboardEntry[]>([]);
-  let tableContainer: HTMLDivElement | undefined = $state();
 
   let compClassSelector: WaSelect | undefined = $state();
   let quickFilter: WaInput | undefined = $state();
@@ -82,26 +80,6 @@
     );
 
     tableData = scores;
-  });
-
-  // Scroll to highlighted contender when tableData is updated
-  $effect(() => {
-    if (highlightedContenderId && tableData.length > 0 && tableContainer) {
-      // Wait for DOM to update and render the table with the highlighted attribute
-      const DOM_UPDATE_DELAY_MS = 100;
-      setTimeout(() => {
-        if (!tableContainer) return;
-        const highlightedRow = tableContainer.querySelector(
-          `tbody tr[data-highlighted="true"]`,
-        );
-        if (highlightedRow) {
-          highlightedRow.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-          });
-        }
-      }, DOM_UPDATE_DELAY_MS);
-    }
   });
 
   const columns: ColumnDefinition<ScoreboardEntry>[] = [
@@ -193,21 +171,12 @@
   >Live</wa-switch
 >
 
-<div bind:this={tableContainer}>
-  {#if loading}
-    <Loader />
-  {:else}
-    <Table
-      {columns}
-      data={tableData}
-      getId={({ contenderId }) => contenderId}
-      getRowAttributes={({ contenderId }) => ({
-        "data-highlighted":
-          highlightedContenderId === contenderId ? "true" : "false",
-      })}
-    ></Table>
-  {/if}
-</div>
+{#if loading}
+  <Loader />
+{:else}
+  <Table {columns} data={tableData} getId={({ contenderId }) => contenderId}
+  ></Table>
+{/if}
 
 <style>
   wa-switch {

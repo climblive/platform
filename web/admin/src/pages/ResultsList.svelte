@@ -8,10 +8,9 @@
 
   interface Props {
     contestId: number;
-    highlightedContenderId?: number;
   }
 
-  let { contestId, highlightedContenderId }: Props = $props();
+  let { contestId }: Props = $props();
 
   const handleDownloadResults = async () => {
     try {
@@ -50,7 +49,7 @@
 
   <ScoreboardProvider {contestId}>
     {#snippet children({ scoreboard, loading })}
-      <ResultListTable {contestId} {scoreboard} {loading} {highlightedContenderId}></ResultListTable>
+      <ResultListTable {contestId} {scoreboard} {loading}></ResultListTable>
     {/snippet}
   </ScoreboardProvider>
 </section>

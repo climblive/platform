@@ -6,13 +6,17 @@
 
   interface Props {
     scoreboardEntry: ScoreboardEntry;
+    highlighted?: boolean;
   }
 
-  let { scoreboardEntry }: Props = $props();
+  let { scoreboardEntry, highlighted = false }: Props = $props();
   let score = $derived(scoreboardEntry.score);
 </script>
 
-<section data-finalist={score?.finalist ?? false}>
+<section
+  data-finalist={score?.finalist ?? false}
+  data-highlighted={highlighted ? "true" : "false"}
+>
   <div class="number">
     {#if score?.placement}
       {score.placement}<sup>{ordinalSuperscript(score.placement)}</sup>
@@ -48,6 +52,20 @@
     font-size: var(--wa-font-size-m);
     font-weight: var(--wa-font-weight-semibold);
     user-select: none;
+  }
+
+  section[data-highlighted="true"] {
+    background-color: var(--wa-color-primary-fill-quiet);
+    animation: highlight-fade 2s ease-in-out forwards;
+  }
+
+  @keyframes highlight-fade {
+    0% {
+      background-color: var(--wa-color-primary-fill-normal);
+    }
+    100% {
+      background-color: var(--wa-color-primary-fill-quiet);
+    }
   }
 
   section > div {
