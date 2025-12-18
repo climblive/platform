@@ -1,6 +1,6 @@
 on:
   pull_request:
-    types: [edited]
+    types: [opened, synchronize, reopened, edited]
 
 jobs:
   validate-pr-title:
