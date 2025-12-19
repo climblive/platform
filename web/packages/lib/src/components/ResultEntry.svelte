@@ -55,17 +55,8 @@
   }
 
   section[data-highlighted="true"] {
-    background-color: var(--wa-color-primary-fill-quiet);
-    animation: highlight-fade 2s ease-in-out forwards;
-  }
-
-  @keyframes highlight-fade {
-    0% {
-      background-color: var(--wa-color-brand-fill-normal);
-    }
-    100% {
-      background-color: var(--wa-color-primary-fill-quiet);
-    }
+    background-color: var(--wa-color-brand-fill-quiet);
+    border-color: var(--wa-color-brand-border-normal);
   }
 
   section > div {
