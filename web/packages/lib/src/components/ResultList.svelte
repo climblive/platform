@@ -38,13 +38,13 @@
 
   const scrollToHighlighted = () => {
     if (!container) {
-      return
-    };
-    
+      return;
+    }
+
     const highlightedEntry = container.querySelector(
       `section[data-highlighted="true"]`,
     );
-    
+
     if (highlightedEntry) {
       highlightedEntry.scrollIntoView({
         behavior: "smooth",
