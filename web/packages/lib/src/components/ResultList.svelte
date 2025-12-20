@@ -30,6 +30,8 @@
   let container: HTMLDivElement | undefined = $state();
   let observer: ResizeObserver | undefined;
   let pageFlipIntervalTimerId: number;
+  let visibilityObserver: IntersectionObserver | undefined;
+  let isVisible = $state(true);
 
   let containerHeight: number = $state(0);
   let pageSize: number = $state(0);
@@ -54,11 +56,25 @@
         }
       }
     });
+
+    visibilityObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            isVisible = true;
+          }
+        }
+      },
+      { threshold: 0.1 }
+    );
   });
 
   onDestroy(() => {
     observer?.disconnect();
     observer = undefined;
+
+    visibilityObserver?.disconnect();
+    visibilityObserver = undefined;
 
     clearInterval(pageFlipIntervalTimerId);
     pageFlipIntervalTimerId = 0;
@@ -99,7 +115,13 @@
   });
 
   $effect(() => {
-    if (highlightedContenderId && results.length > 0 && container) {
+    if (container && visibilityObserver) {
+      visibilityObserver.observe(container);
+    }
+  });
+
+  $effect(() => {
+    if (highlightedContenderId && results.length > 0 && container && isVisible) {
       setTimeout(() => {
         if (!container) return;
         const highlightedEntry = container.querySelector(
@@ -112,6 +134,7 @@
           });
         }
       });
+      isVisible = false;
     }
   });
 </script>
