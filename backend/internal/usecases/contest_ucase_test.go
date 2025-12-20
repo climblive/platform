@@ -7,8 +7,10 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/usecases/validators"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -797,6 +799,8 @@ func TestPatchContest(t *testing.T) {
 	t.Run("ArchiveContest", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 
+		mockedScoreEngineManager := new(scoreEngineManagerMock)
+
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.OrganizerRole, nil)
@@ -825,9 +829,25 @@ func TestPatchContest(t *testing.T) {
 				Name:      "Swedish Championships",
 			}, nil)
 
+		fakedScoreEngineInstanceID := domain.ScoreEngineInstanceID(uuid.New())
+
+		mockedScoreEngineManager.
+			On("ListScoreEnginesByContest", mock.Anything, fakedContestID).
+			Return([]scores.ScoreEngineDescriptor{
+				{
+					InstanceID: fakedScoreEngineInstanceID,
+					ContestID:  fakedContestID,
+				},
+			}, nil)
+
+		mockedScoreEngineManager.
+			On("StopScoreEngine", mock.Anything, fakedScoreEngineInstanceID).
+			Return(nil)
+
 		ucase := usecases.ContestUseCase{
-			Repo:       mockedRepo,
-			Authorizer: mockedAuthorizer,
+			Repo:               mockedRepo,
+			Authorizer:         mockedAuthorizer,
+			ScoreEngineManager: mockedScoreEngineManager,
 		}
 
 		patch := domain.ContestPatch{
@@ -841,6 +861,7 @@ func TestPatchContest(t *testing.T) {
 
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
+		mockedScoreEngineManager.AssertExpectations(t)
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {

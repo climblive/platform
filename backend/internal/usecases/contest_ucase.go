@@ -26,9 +26,10 @@ type contestUseCaseRepository interface {
 }
 
 type ContestUseCase struct {
-	Authorizer  domain.Authorizer
-	Repo        contestUseCaseRepository
-	ScoreKeeper domain.ScoreKeeper
+	Authorizer         domain.Authorizer
+	Repo               contestUseCaseRepository
+	ScoreKeeper        domain.ScoreKeeper
+	ScoreEngineManager scoreEngineManager
 }
 
 var sanitizationPolicy = bluemonday.UGCPolicy()
@@ -134,6 +135,18 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 	}
 
 	if patch.Archived.Present {
+		engines, err := uc.ScoreEngineManager.ListScoreEnginesByContest(ctx, contestID)
+		if err != nil {
+			return mty, errors.Wrap(err, 0)
+		}
+
+		for _, engine := range engines {
+			err = uc.ScoreEngineManager.StopScoreEngine(ctx, engine.InstanceID)
+			if err != nil {
+				return mty, errors.Wrap(err, 0)
+			}
+		}
+
 		contest.Archived = patch.Archived.Value
 	}
 
