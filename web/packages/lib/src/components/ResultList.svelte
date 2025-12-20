@@ -31,7 +31,6 @@
   let observer: ResizeObserver | undefined;
   let pageFlipIntervalTimerId: number;
   let visibilityObserver: IntersectionObserver | undefined;
-  let isVisible = $state(true);
 
   let containerHeight: number = $state(0);
   let pageSize: number = $state(0);
@@ -57,16 +56,24 @@
       }
     });
 
-    visibilityObserver = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            isVisible = true;
-          }
+    visibilityObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting && highlightedContenderId && results.length > 0 && container) {
+          setTimeout(() => {
+            if (!container) return;
+            const highlightedEntry = container.querySelector(
+              `section[data-highlighted="true"]`,
+            );
+            if (highlightedEntry) {
+              highlightedEntry.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              });
+            }
+          });
         }
-      },
-      { threshold: 0.1 }
-    );
+      }
+    });
   });
 
   onDestroy(() => {
@@ -117,24 +124,6 @@
   $effect(() => {
     if (container && visibilityObserver) {
       visibilityObserver.observe(container);
-    }
-  });
-
-  $effect(() => {
-    if (highlightedContenderId && results.length > 0 && container && isVisible) {
-      setTimeout(() => {
-        if (!container) return;
-        const highlightedEntry = container.querySelector(
-          `section[data-highlighted="true"]`,
-        );
-        if (highlightedEntry) {
-          highlightedEntry.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-          });
-        }
-      });
-      isVisible = false;
     }
   });
 </script>
