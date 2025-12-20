@@ -39,6 +39,10 @@ func (uc *ContestUseCase) GetContest(ctx context.Context, contestID domain.Conte
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
+	if contest.Archived {
+		return domain.Contest{}, errors.Wrap(domain.ErrArchived, 0)
+	}
+
 	return contest, nil
 }
 
@@ -123,6 +127,10 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 	_, err = uc.Authorizer.HasOwnership(ctx, contest.Ownership)
 	if err != nil {
 		return mty, errors.Wrap(err, 0)
+	}
+
+	if contest.Archived {
+		return mty, errors.Wrap(domain.ErrArchived, 0)
 	}
 
 	if patch.Location.Present {
@@ -211,6 +219,10 @@ func (uc *ContestUseCase) DuplicateContest(ctx context.Context, contestID domain
 
 	if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
 		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	if contest.Archived {
+		return domain.Contest{}, errors.Wrap(domain.ErrArchived, 0)
 	}
 
 	compClasses, err := uc.Repo.GetCompClassesByContest(ctx, nil, contestID)
