@@ -29,24 +29,33 @@
   };
 </script>
 
-<wa-callout variant="danger" size="small">
-  <wa-icon slot="icon" name="box-archive"></wa-icon>
-  <p>
-    <strong>This contest has been archived.</strong><br />
-    You can restore this contest at any time to make it active again.
-  </p>
+<section>
+  <wa-callout variant="danger" size="small">
+    <wa-icon slot="icon" name="box-archive"></wa-icon>
+    <p>
+      <strong>This contest has been archived.</strong><br />
+      You can restore this contest at any time to make it active again.
+    </p>
+  </wa-callout>
+
   <wa-button
     onclick={handleRestore}
     appearance="filled-outlined"
     variant="success">Restore</wa-button
   >
-</wa-callout>
+</section>
 
 <style>
   wa-callout::part(message) {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: var(--wa-space-m);
+  }
+
+  section {
+    display: flex;
+    flex-direction: column;
     gap: var(--wa-space-m);
   }
 </style>
