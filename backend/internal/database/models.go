@@ -36,6 +36,7 @@ type Contender struct {
 type Contest struct {
 	ID                 int32
 	OrganizerID        int32
+	Archived           bool
 	Protected          bool
 	SeriesID           sql.NullInt32
 	Name               string

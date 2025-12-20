@@ -60,6 +60,7 @@ func contestToDomain(record database.Contest) domain.Contest {
 		Ownership: domain.OwnershipData{
 			OrganizerID: domain.OrganizerID(record.OrganizerID),
 		},
+		Archived:           record.Archived,
 		Location:           record.Location.String,
 		SeriesID:           domain.SeriesID(record.SeriesID.Int32),
 		Name:               record.Name,

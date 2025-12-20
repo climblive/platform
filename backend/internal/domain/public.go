@@ -58,6 +58,7 @@ type ContenderPatch struct {
 type Contest struct {
 	ID                 ContestID     `json:"id"`
 	Ownership          OwnershipData `json:"ownership"`
+	Archived           bool          `json:"archived"`
 	Location           string        `json:"location,omitempty"`
 	SeriesID           SeriesID      `json:"seriesId,omitempty"`
 	Name               string        `json:"name"`
