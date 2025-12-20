@@ -36,6 +36,19 @@
   let pageSize: number = $state(0);
   let pageIndex = $state(0);
 
+  const scrollToHighlighted = () => {
+    if (!container) { return };
+    const highlightedEntry = container.querySelector(
+      `section[data-highlighted="true"]`,
+    );
+    if (highlightedEntry) {
+      highlightedEntry.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  };
+
   onMount(() => {
     pageFlipIntervalTimerId = setInterval(() => {
       if (overflow === "pagination") {
@@ -59,21 +72,14 @@
     visibilityObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (entry.isIntersecting && highlightedContenderId && results.length > 0 && container) {
-          setTimeout(() => {
-            if (!container) return;
-            const highlightedEntry = container.querySelector(
-              `section[data-highlighted="true"]`,
-            );
-            if (highlightedEntry) {
-              highlightedEntry.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
-              });
-            }
-          });
+          setTimeout(scrollToHighlighted);
         }
       }
     });
+
+    if (container && visibilityObserver) {
+      visibilityObserver.observe(container);
+    }
   });
 
   onDestroy(() => {
@@ -118,12 +124,6 @@
   $effect(() => {
     if (container && overflow === "pagination") {
       observer?.observe(container);
-    }
-  });
-
-  $effect(() => {
-    if (container && visibilityObserver) {
-      visibilityObserver.observe(container);
     }
   });
 </script>
