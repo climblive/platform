@@ -14,17 +14,8 @@ export type RaffleWinnerID = ResourceID;
 export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
-export type ResourceIDType =
-  | CompClassID
-  | ContenderID
-  | ContestID
-  | OrganizerID
-  | ProblemID
-  | RaffleID
-  | RaffleWinnerID
-  | SeriesID
-  | UserID
-  | TickID;
+export type ResourceIDType = 
+    CompClassID | ContenderID | ContestID | OrganizerID | ProblemID | RaffleID | RaffleWinnerID | SeriesID | UserID | TickID;
 export type ScoreEngineInstanceID = string;
 
 //////////
@@ -74,6 +65,7 @@ export interface ContenderPatch {
 export interface Contest {
   id: ContestID;
   ownership: OwnershipData;
+  archived: boolean;
   location?: string;
   seriesId?: SeriesID;
   name: string;
@@ -96,6 +88,7 @@ export interface ContestTemplate {
   gracePeriod: number;
 }
 export interface ContestPatch {
+  archived?: boolean;
   location?: string;
   seriesId?: number;
   name?: string;
@@ -128,8 +121,8 @@ export interface ProblemTemplate {
   holdColorPrimary: string;
   holdColorSecondary?: string;
   description?: string;
-  zone1Enabled?: boolean;
-  zone2Enabled?: boolean;
+  zone1Enabled: boolean;
+  zone2Enabled: boolean;
   pointsZone1?: number /* int */;
   pointsZone2?: number /* int */;
   pointsTop: number /* int */;

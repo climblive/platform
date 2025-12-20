@@ -133,6 +133,10 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		return mty, errors.Wrap(domain.ErrArchived, 0)
 	}
 
+	if patch.Archived.Present {
+		contest.Archived = patch.Archived.Value
+	}
+
 	if patch.Location.Present {
 		contest.Location = strings.TrimSpace(patch.Location.Value)
 	}

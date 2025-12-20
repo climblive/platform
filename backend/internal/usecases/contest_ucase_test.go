@@ -794,6 +794,55 @@ func TestPatchContest(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
+	t.Run("ArchiveContest", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		mockedRepo.
+			On("GetContest", mock.Anything, nil, fakedContestID).
+			Return(domain.Contest{
+				ID:        fakedContestID,
+				Ownership: fakedOwnership,
+				Name:      "Swedish Championships",
+			}, nil)
+
+		mockedRepo.
+			On("StoreContest", mock.Anything, nil,
+				domain.Contest{
+					ID:        fakedContestID,
+					Ownership: fakedOwnership,
+					Archived:  true,
+					Name:      "Swedish Championships",
+				},
+			).
+			Return(domain.Contest{
+				ID:        fakedContestID,
+				Ownership: fakedOwnership,
+				Archived:  true,
+				Name:      "Swedish Championships",
+			}, nil)
+
+		ucase := usecases.ContestUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		patch := domain.ContestPatch{
+			Archived: domain.NewPatch(true),
+		}
+
+		contest, err := ucase.PatchContest(context.Background(), fakedContestID, patch)
+
+		require.NoError(t, err)
+		assert.True(t, contest.Archived)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
 	t.Run("BadCredentials", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 
