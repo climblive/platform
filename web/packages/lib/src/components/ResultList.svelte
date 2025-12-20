@@ -76,7 +76,7 @@
     visibilityObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (entry.isIntersecting && highlightedContenderId) {
-          setTimeout(scrollToHighlighted);
+          setTimeout(scrollToHighlighted, 100);
         }
       }
     });
