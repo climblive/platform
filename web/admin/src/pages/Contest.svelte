@@ -15,10 +15,12 @@
   import { LabeledText } from "@climblive/lib/components";
   import { getContestQuery } from "@climblive/lib/queries";
   import { navigate } from "svelte-routing";
+  import ArchiveContest from "./ArchiveContest.svelte";
   import CompClassList from "./CompClassList.svelte";
   import DuplicateContest from "./DuplicateContest.svelte";
   import ProblemList from "./ProblemList.svelte";
   import RaffleList from "./RaffleList.svelte";
+  import RestoreContest from "./RestoreContest.svelte";
   import ResultsList from "./ResultsList.svelte";
   import ScoreEngine from "./ScoreEngine.svelte";
   import TicketList from "./TicketList.svelte";
@@ -35,7 +37,7 @@
 
   const contestQuery = $derived(getContestQuery(contestId));
 
-  let contest = $derived(contestQuery.data);
+  const contest = $derived(contestQuery.data);
 
   $effect(() => {
     const hash = window.location.hash.substring(1);
@@ -96,97 +98,112 @@
       <wa-breadcrumb-item>{contest.name}</wa-breadcrumb-item>
     </wa-breadcrumb>
 
-    <h1>{contest.name}</h1>
+    {#if contest.archived === true}
+      <RestoreContest {contestId} />
+    {/if}
 
-    <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleTabShow}>
-      <wa-tab slot="nav" panel="contest">Contest</wa-tab>
-      <wa-tab slot="nav" panel="results">Results</wa-tab>
-      <wa-tab slot="nav" panel="raffles">Raffles</wa-tab>
+    {#if contest.archived === false}
+      <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleTabShow}>
+        <wa-tab slot="nav" panel="contest">Contest</wa-tab>
+        <wa-tab slot="nav" panel="results">Results</wa-tab>
+        <wa-tab slot="nav" panel="raffles">Raffles</wa-tab>
 
-      <wa-tab-panel name="contest">
-        <article>
-          <wa-button
-            size="small"
-            appearance="outlined"
-            onclick={() => navigate(`/admin/contests/${contest.id}/edit`)}
-          >
-            Edit
-            <wa-icon slot="start" name="pencil"></wa-icon>
-          </wa-button>
-          <LabeledText label="Name">
-            {contest.name}
-          </LabeledText>
-          {#if contest.description}
-            <LabeledText label="Description">
-              {contest.description}
+        <wa-tab-panel name="contest">
+          <article>
+            <wa-button
+              size="small"
+              appearance="outlined"
+              onclick={() => navigate(`/admin/contests/${contest.id}/edit`)}
+            >
+              Edit
+              <wa-icon slot="start" name="pencil"></wa-icon>
+            </wa-button>
+            <LabeledText label="Name">
+              {contest.name}
             </LabeledText>
-          {/if}
-          {#if contest.location}
-            <LabeledText label="Location">
-              {contest.location}
+            {#if contest.description}
+              <LabeledText label="Description">
+                {contest.description}
+              </LabeledText>
+            {/if}
+            {#if contest.location}
+              <LabeledText label="Location">
+                {contest.location}
+              </LabeledText>
+            {/if}
+            <LabeledText label="Finalists">
+              {contest.finalists}
             </LabeledText>
-          {/if}
-          <LabeledText label="Finalists">
-            {contest.finalists}
-          </LabeledText>
-          <LabeledText label="Qualifying problems">
-            {contest.qualifyingProblems}
-          </LabeledText>
-          {#if contest.rules}
-            <wa-details summary="Rules">
-              {@html contest.rules}
-            </wa-details>
-          {/if}
-        </article>
+            <LabeledText label="Qualifying problems">
+              {contest.qualifyingProblems}
+            </LabeledText>
+            {#if contest.rules}
+              <wa-details summary="Rules">
+                {@html contest.rules}
+              </wa-details>
+            {/if}
+          </article>
 
-        <h2 bind:this={compClassesHeading}>Classes</h2>
-        <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
-        ></wa-divider>
-        <CompClassList {contestId} />
+          <h2 bind:this={compClassesHeading}>Classes</h2>
+          <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
+          ></wa-divider>
+          <CompClassList {contestId} />
 
-        <h2>Tickets</h2>
-        <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
-        ></wa-divider>
-        <TicketList {contestId} />
+          <h2>Tickets</h2>
+          <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
+          ></wa-divider>
+          <TicketList {contestId} />
 
-        <h2 bind:this={problemsHeading}>Problems</h2>
-        <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
-        ></wa-divider>
-        <ProblemList
-          {contestId}
-          tableLimit={window.location.hash.substring(1) === "problems"
-            ? undefined
-            : 8}
-        />
+          <h2 bind:this={problemsHeading}>Problems</h2>
+          <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
+          ></wa-divider>
+          <ProblemList
+            {contestId}
+            tableLimit={window.location.hash.substring(1) === "problems"
+              ? undefined
+              : 8}
+          />
 
-        <h2>Advanced</h2>
-        <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
-        ></wa-divider>
-        <h3>Actions</h3>
-        <DuplicateContest {contestId} />
-        <h3>Score Engines</h3>
-        <p>
-          An active score engine collects all results during a contest and
-          computes scores and rankings for all participants.
-        </p>
+          <h2>Advanced</h2>
+          <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
+          ></wa-divider>
+          <h3>Actions</h3>
+          <div class="actions">
+            <DuplicateContest {contestId} />
+            <ArchiveContest
+              {contestId}
+              organizerId={contest.ownership.organizerId}
+            />
+          </div>
+          <h3>Score Engines</h3>
+          <p>
+            An active score engine collects all results during a contest and
+            computes scores and rankings for all participants.
+          </p>
 
-        <ScoreEngine {contestId} />
-      </wa-tab-panel>
+          <ScoreEngine {contestId} />
+        </wa-tab-panel>
 
-      <wa-tab-panel name="results">
-        <h2>Results</h2>
-        <ResultsList {contestId} />
-      </wa-tab-panel>
+        <wa-tab-panel name="results">
+          <h2>Results</h2>
+          <ResultsList {contestId} />
+        </wa-tab-panel>
 
-      <wa-tab-panel name="raffles">
-        <h2>Raffles</h2>
-        <RaffleList {contestId} />
-      </wa-tab-panel>
-    </wa-tab-group>
+        <wa-tab-panel name="raffles">
+          <h2>Raffles</h2>
+          <RaffleList {contestId} />
+        </wa-tab-panel>
+      </wa-tab-group>
+    {/if}
   {/if}
 </main>
 
 <style>
+  wa-breadcrumb {
+    margin-block-end: var(--wa-space-m);
+    display: block;
+  }
+
   article {
     padding-block-start: var(--wa-space-m);
     display: flex;
@@ -205,5 +222,10 @@
 
   wa-details {
     margin-top: var(--wa-space-m);
+  }
+
+  .actions {
+    display: flex;
+    gap: var(--wa-space-xs);
   }
 </style>

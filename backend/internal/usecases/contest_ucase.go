@@ -40,10 +40,6 @@ func (uc *ContestUseCase) GetContest(ctx context.Context, contestID domain.Conte
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
-	if contest.Archived {
-		return domain.Contest{}, errors.Wrap(domain.ErrArchived, 0)
-	}
-
 	return contest, nil
 }
 
@@ -130,24 +126,30 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		return mty, errors.Wrap(err, 0)
 	}
 
-	if contest.Archived {
-		return mty, errors.Wrap(domain.ErrArchived, 0)
-	}
-
 	if patch.Archived.Present {
-		engines, err := uc.ScoreEngineManager.ListScoreEnginesByContest(ctx, contestID)
-		if err != nil {
-			return mty, errors.Wrap(err, 0)
-		}
+		contest.Archived = patch.Archived.Value
 
-		for _, engine := range engines {
-			err = uc.ScoreEngineManager.StopScoreEngine(ctx, engine.InstanceID)
+		if contest.Archived {
+			engines, err := uc.ScoreEngineManager.ListScoreEnginesByContest(ctx, contestID)
 			if err != nil {
 				return mty, errors.Wrap(err, 0)
 			}
-		}
 
-		contest.Archived = patch.Archived.Value
+			for _, engine := range engines {
+				err = uc.ScoreEngineManager.StopScoreEngine(ctx, engine.InstanceID)
+				if err != nil {
+					return mty, errors.Wrap(err, 0)
+				}
+			}
+		}
+	}
+
+	patchAnythingOtherThanArchive := patch != (domain.ContestPatch{}) && patch != domain.ContestPatch{
+		Archived: patch.Archived,
+	}
+
+	if contest.Archived && patchAnythingOtherThanArchive {
+		return mty, errors.Wrap(domain.ErrArchived, 0)
 	}
 
 	if patch.Location.Present {
