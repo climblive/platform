@@ -37,10 +37,14 @@
   let pageIndex = $state(0);
 
   const scrollToHighlighted = () => {
-    if (!container) { return };
+    if (!container) {
+      return
+    };
+    
     const highlightedEntry = container.querySelector(
       `section[data-highlighted="true"]`,
     );
+    
     if (highlightedEntry) {
       highlightedEntry.scrollIntoView({
         behavior: "smooth",
