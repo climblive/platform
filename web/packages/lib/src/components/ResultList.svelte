@@ -76,7 +76,7 @@
     visibilityObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (entry.isIntersecting && highlightedContenderId) {
-          setTimeout(scrollToHighlighted, 100);
+          setTimeout(scrollToHighlighted);
         }
       }
     });
@@ -95,6 +95,12 @@
 
     clearInterval(pageFlipIntervalTimerId);
     pageFlipIntervalTimerId = 0;
+  });
+
+  $effect(() => {
+    if (highlightedContenderId && results.length > 0) {
+      setTimeout(scrollToHighlighted);
+    }
   });
 
   let results = $derived($scoreboard.get(compClassId) ?? []);
