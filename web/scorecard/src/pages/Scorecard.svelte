@@ -261,6 +261,7 @@
                     compClassId={selectedCompClass.id}
                     {scoreboard}
                     {loading}
+                    highlightedContenderId={contender.id}
                   />
                 {/snippet}
               </ScoreboardProvider>
