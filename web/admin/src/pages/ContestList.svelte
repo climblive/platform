@@ -153,7 +153,7 @@
     <wa-switch
       checked={showArchived}
       onchange={handleToggleArchive}
-      size="small">Show archived contests</wa-switch
+      >Show archived contests</wa-switch
     >
   {/if}
 
