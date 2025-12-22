@@ -19,7 +19,7 @@
   const inviteQuery = $derived(getOrganizerInviteQuery(inviteId));
   const deleteInvite = $derived(deleteOrganizerInviteMutation(inviteId));
 
-  const invite = $derived($inviteQuery.data);
+  const invite = $derived(inviteQuery.data);
 
   const handleAccept = async () => {
     if (!invite) {
@@ -36,7 +36,7 @@
   };
 
   const handleDecline = () => {
-    $deleteInvite.mutate(undefined, {
+    deleteInvite.mutate(undefined, {
       onSuccess: () => {
         navigate(`./`);
       },
@@ -58,7 +58,7 @@
       variant="danger"
       appearance="outlined"
       onclick={handleDecline}
-      loading={$deleteInvite.isPending}
+      loading={deleteInvite.isPending}
       >Decline
       <wa-icon slot="start" name="trash"></wa-icon>
     </wa-button>

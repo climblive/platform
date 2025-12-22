@@ -43,10 +43,6 @@
 
   let select: WaSelect | undefined = $state();
 
-  const selectedOrganizer = $derived(
-    self?.organizers.find(({ id }) => id === $selectedOrganizerId),
-  );
-
   onMount(() => {
     $selectedOrganizerId = organizerId;
   });

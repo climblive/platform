@@ -10,9 +10,9 @@
   import EditCompClass from "./pages/EditCompClass.svelte";
   import EditContest from "./pages/EditContest.svelte";
   import EditProblem from "./pages/EditProblem.svelte";
+  import Help from "./pages/Help.svelte";
   import InviteList from "./pages/InviteList.svelte";
   import InviteView from "./pages/InviteView.svelte";
-  import Help from "./pages/Help.svelte";
   import OrganizerView from "./pages/OrganizerView.svelte";
   import PrintableTicketList from "./pages/PrintableTicketList.svelte";
   import RaffleView from "./pages/RaffleView.svelte";
@@ -35,6 +35,7 @@
       {#snippet children({ params }: { params: { inviteId: string } })}
         <InviteView inviteId={params.inviteId} />
       {/snippet}
+    </Route>
     <Route path="/help">
       <Help />
     </Route>

@@ -22,7 +22,7 @@
   const invitesQuery = $derived(getOrganizerInvitesQuery(organizerId));
   const createInvite = $derived(createOrganizerInviteMutation(organizerId));
 
-  let invites = $derived($invitesQuery.data);
+  let invites = $derived(invitesQuery.data);
 
   const columns: ColumnDefinition<OrganizerInvite>[] = [
     {
@@ -46,7 +46,7 @@
   ];
 
   const handleCreateInvite = () => {
-    $createInvite.mutate(undefined, {
+    createInvite.mutate(undefined, {
       onError: () => toastError("Failed to create invite."),
     });
   };
@@ -88,7 +88,7 @@
     variant="neutral"
     appearance="accent"
     onclick={handleCreateInvite}
-    loading={$createInvite.isPending}>Create invite</wa-button
+    loading={createInvite.isPending}>Create invite</wa-button
   >
 
   {#if invites === undefined}

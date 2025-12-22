@@ -8,22 +8,22 @@ import { ApiClient } from "../Api";
 import type { OrganizerInvite, OrganizerInviteID } from "../models";
 
 export const getOrganizerInvitesQuery = (organizerId: number) =>
-  createQuery({
+  createQuery(() => ({
     queryKey: ["organizer-invites", { organizerId }],
     queryFn: async () =>
       ApiClient.getInstance().getOrganizerInvites(organizerId),
-  });
+  }));
 
 export const getOrganizerInviteQuery = (inviteId: OrganizerInviteID) =>
-  createQuery({
+  createQuery(() => ({
     queryKey: ["organizer-invite", { id: inviteId }],
     queryFn: async () => ApiClient.getInstance().getOrganizerInvite(inviteId),
-  });
+  }));
 
 export const createOrganizerInviteMutation = (organizerId: number) => {
   const client = useQueryClient();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: () =>
       ApiClient.getInstance().createOrganizerInvite(organizerId),
     onSuccess: (newInvite) => {
@@ -37,13 +37,13 @@ export const createOrganizerInviteMutation = (organizerId: number) => {
 
       client.setQueryData<OrganizerInvite>(queryKey, newInvite);
     },
-  });
+  }));
 };
 
 export const deleteOrganizerInviteMutation = (inviteId: OrganizerInviteID) => {
   const client = useQueryClient();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: () => ApiClient.getInstance().deleteOrganizerInvite(inviteId),
     onSuccess: () => {
       let queryKey: QueryKey = ["organizer-invites"];
@@ -63,5 +63,5 @@ export const deleteOrganizerInviteMutation = (inviteId: OrganizerInviteID) => {
 
       client.removeQueries({ queryKey });
     },
-  });
+  }));
 };

@@ -32,7 +32,7 @@
   };
 
   const confirmDelete = () => {
-    $deleteInvite.mutate(undefined, {
+    deleteInvite.mutate(undefined, {
       onError: () => toastError("Failed to delete invite."),
     });
   };
@@ -49,7 +49,7 @@
     slot="footer"
     variant="danger"
     onclick={confirmDelete}
-    loading={$deleteInvite.isPending}
+    loading={deleteInvite.isPending}
   >
     Remove
     <wa-icon slot="start" name="trash"></wa-icon>

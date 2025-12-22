@@ -449,7 +449,7 @@ export class ApiClient {
   deleteOrganizerInvite = async (inviteId: OrganizerInviteID) => {
     const endpoint = `/invites/${inviteId}`;
 
-    const result = await this.axiosInstance.delete(endpoint, {
+    await this.axiosInstance.delete(endpoint, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
   };
