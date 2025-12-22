@@ -64,7 +64,7 @@
   };
 </script>
 
-{#if self && self.organizers.length > 1}
+{#if self}
   <div class="controls">
     {#if !showAll}
       <wa-select
@@ -87,43 +87,43 @@
       >
     {/if}
   </div>
-
-  <wa-card appearance="filled">
-    {#if collaborators && collaborators.length > 0}
-      The contests under this organizer are being managed by you and the users
-      {#each collaborators as collaborator, index (collaborator.id)}
-        <strong>{collaborator.username}</strong>
-        {#if index === collaborators.length - 2}
-          &nbsp;and&nbsp;
-        {:else if index < collaborators.length - 2}
-          ,&nbsp;
-        {/if}
-      {/each}.
-    {:else}
-      The contests under this organizer are being managed solely by your self.
-    {/if}
-
-    <br />
-
-    <div class="invite-controls">
-      <wa-button
-        appearance="outlined"
-        size="small"
-        onclick={() => navigate(`./organizers/${organizerId}/invites`)}
-        >Invite a friend
-        <wa-icon name="user-plus" slot="start"></wa-icon>
-      </wa-button>
-
-      <wa-button
-        appearance="outlined"
-        size="small"
-        onclick={() => navigate(`./organizers/${organizerId}/invites`)}
-        >View invites
-        <wa-badge variant="neutral" pill>?</wa-badge>
-      </wa-button>
-    </div>
-  </wa-card>
 {/if}
+
+<wa-card appearance="filled">
+  {#if collaborators && collaborators.length > 0}
+    The contests under this organizer are being managed by you and the users
+    {#each collaborators as collaborator, index (collaborator.id)}
+      <strong>{collaborator.username}</strong>
+      {#if index === collaborators.length - 2}
+        &nbsp;and&nbsp;
+      {:else if index < collaborators.length - 2}
+        ,&nbsp;
+      {/if}
+    {/each}.
+  {:else}
+    The contests under this organizer are being managed solely by your self.
+  {/if}
+
+  <br />
+
+  <div class="invite-controls">
+    <wa-button
+      appearance="outlined"
+      size="small"
+      onclick={() => navigate(`./organizers/${organizerId}/invites`)}
+      >Invite a friend
+      <wa-icon name="user-plus" slot="start"></wa-icon>
+    </wa-button>
+
+    <wa-button
+      appearance="outlined"
+      size="small"
+      onclick={() => navigate(`./organizers/${organizerId}/invites`)}
+      >View invites
+      <wa-badge variant="neutral" pill>?</wa-badge>
+    </wa-button>
+  </div>
+</wa-card>
 
 <ContestList organizerId={showAll ? undefined : Number(organizerId)} />
 
