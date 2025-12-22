@@ -48,6 +48,8 @@ func handleError(w http.ResponseWriter, err error) {
 	case errors.Is(err, domain.ErrAllWinnersDrawn):
 		fallthrough
 	case errors.Is(err, domain.ErrNotFound):
+		fallthrough
+	case errors.Is(err, domain.ErrArchived):
 		w.WriteHeader(http.StatusNotFound)
 	case errors.Is(err, domain.ErrDuplicate):
 		w.WriteHeader(http.StatusConflict)

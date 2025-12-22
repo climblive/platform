@@ -58,6 +58,7 @@ type ContenderPatch struct {
 type Contest struct {
 	ID                 ContestID     `json:"id"`
 	Ownership          OwnershipData `json:"ownership"`
+	Archived           bool          `json:"archived"`
 	Location           string        `json:"location,omitempty"`
 	SeriesID           SeriesID      `json:"seriesId,omitempty"`
 	Name               string        `json:"name"`
@@ -82,6 +83,7 @@ type ContestTemplate struct {
 }
 
 type ContestPatch struct {
+	Archived           Patch[bool]          `json:"archived,omitzero" tstype:"boolean"`
 	Location           Patch[string]        `json:"location,omitzero" tstype:"string"`
 	SeriesID           Patch[SeriesID]      `json:"seriesId,omitzero" tstype:"number"`
 	Name               Patch[string]        `json:"name,omitzero" tstype:"string"`

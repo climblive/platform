@@ -186,9 +186,10 @@ func setupMux(
 	}
 
 	contestUseCase := usecases.ContestUseCase{
-		Authorizer:  authorizer,
-		Repo:        repo,
-		ScoreKeeper: scoreKeeper,
+		Authorizer:         authorizer,
+		Repo:               repo,
+		ScoreKeeper:        scoreKeeper,
+		ScoreEngineManager: scoreEngineManager,
 	}
 
 	compClassUseCase := usecases.CompClassUseCase{

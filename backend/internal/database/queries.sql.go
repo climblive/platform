@@ -83,7 +83,7 @@ func (q *Queries) DeleteTick(ctx context.Context, id int32) error {
 }
 
 const getAllContests = `-- name: GetAllContests :many
-SELECT contest.id, contest.organizer_id, contest.protected, contest.series_id, contest.name, contest.description, contest.location, contest.final_enabled, contest.qualifying_problems, contest.finalists, contest.rules, contest.grace_period, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+SELECT contest.id, contest.organizer_id, contest.archived, contest.protected, contest.series_id, contest.name, contest.description, contest.location, contest.final_enabled, contest.qualifying_problems, contest.finalists, contest.rules, contest.grace_period, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 GROUP BY contest.id
@@ -107,6 +107,7 @@ func (q *Queries) GetAllContests(ctx context.Context) ([]GetAllContestsRow, erro
 		if err := rows.Scan(
 			&i.Contest.ID,
 			&i.Contest.OrganizerID,
+			&i.Contest.Archived,
 			&i.Contest.Protected,
 			&i.Contest.SeriesID,
 			&i.Contest.Name,
@@ -426,7 +427,7 @@ func (q *Queries) GetContendersByContest(ctx context.Context, contestID int32) (
 }
 
 const getContest = `-- name: GetContest :one
-SELECT contest.id, contest.organizer_id, contest.protected, contest.series_id, contest.name, contest.description, contest.location, contest.final_enabled, contest.qualifying_problems, contest.finalists, contest.rules, contest.grace_period, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+SELECT contest.id, contest.organizer_id, contest.archived, contest.protected, contest.series_id, contest.name, contest.description, contest.location, contest.final_enabled, contest.qualifying_problems, contest.finalists, contest.rules, contest.grace_period, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 WHERE contest.id = ?
@@ -445,6 +446,7 @@ func (q *Queries) GetContest(ctx context.Context, id int32) (GetContestRow, erro
 	err := row.Scan(
 		&i.Contest.ID,
 		&i.Contest.OrganizerID,
+		&i.Contest.Archived,
 		&i.Contest.Protected,
 		&i.Contest.SeriesID,
 		&i.Contest.Name,
@@ -462,7 +464,7 @@ func (q *Queries) GetContest(ctx context.Context, id int32) (GetContestRow, erro
 }
 
 const getContestsByOrganizer = `-- name: GetContestsByOrganizer :many
-SELECT contest.id, contest.organizer_id, contest.protected, contest.series_id, contest.name, contest.description, contest.location, contest.final_enabled, contest.qualifying_problems, contest.finalists, contest.rules, contest.grace_period, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+SELECT contest.id, contest.organizer_id, contest.archived, contest.protected, contest.series_id, contest.name, contest.description, contest.location, contest.final_enabled, contest.qualifying_problems, contest.finalists, contest.rules, contest.grace_period, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 WHERE contest.organizer_id = ?
@@ -487,6 +489,7 @@ func (q *Queries) GetContestsByOrganizer(ctx context.Context, organizerID int32)
 		if err := rows.Scan(
 			&i.Contest.ID,
 			&i.Contest.OrganizerID,
+			&i.Contest.Archived,
 			&i.Contest.Protected,
 			&i.Contest.SeriesID,
 			&i.Contest.Name,
@@ -515,11 +518,12 @@ func (q *Queries) GetContestsByOrganizer(ctx context.Context, organizerID int32)
 
 const getContestsCurrentlyRunningOrByStartTime = `-- name: GetContestsCurrentlyRunningOrByStartTime :many
 SELECT
-	id, organizer_id, protected, series_id, name, description, location, final_enabled, qualifying_problems, finalists, rules, grace_period, time_begin, time_end
+	id, organizer_id, archived, protected, series_id, name, description, location, final_enabled, qualifying_problems, finalists, rules, grace_period, time_begin, time_end
 FROM (
-    SELECT contest.id, contest.organizer_id, contest.protected, contest.series_id, contest.name, contest.description, contest.location, contest.final_enabled, contest.qualifying_problems, contest.finalists, contest.rules, contest.grace_period, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+    SELECT contest.id, contest.organizer_id, contest.archived, contest.protected, contest.series_id, contest.name, contest.description, contest.location, contest.final_enabled, contest.qualifying_problems, contest.finalists, contest.rules, contest.grace_period, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
     FROM contest
     JOIN comp_class cc ON cc.contest_id = contest.id
+    WHERE archived = FALSE
     GROUP BY contest.id) AS sub
 WHERE
     NOW() BETWEEN sub.time_begin AND DATE_ADD(sub.time_end, INTERVAL (sub.grace_period + 15) MINUTE)
@@ -534,6 +538,7 @@ type GetContestsCurrentlyRunningOrByStartTimeParams struct {
 type GetContestsCurrentlyRunningOrByStartTimeRow struct {
 	ID                 int32
 	OrganizerID        int32
+	Archived           bool
 	Protected          bool
 	SeriesID           sql.NullInt32
 	Name               string
@@ -560,6 +565,7 @@ func (q *Queries) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context, 
 		if err := rows.Scan(
 			&i.ID,
 			&i.OrganizerID,
+			&i.Archived,
 			&i.Protected,
 			&i.SeriesID,
 			&i.Name,
@@ -1162,11 +1168,12 @@ func (q *Queries) UpsertContender(ctx context.Context, arg UpsertContenderParams
 
 const upsertContest = `-- name: UpsertContest :execlastid
 INSERT INTO 
-	contest (id, organizer_id, series_id, name, description, location, final_enabled, qualifying_problems, finalists, rules, grace_period)
+	contest (id, organizer_id, archived, series_id, name, description, location, final_enabled, qualifying_problems, finalists, rules, grace_period)
 VALUES 
-	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
+    archived = VALUES(archived),
     series_id = VALUES(series_id),
     name = VALUES(name),
     description = VALUES(description),
@@ -1181,6 +1188,7 @@ ON DUPLICATE KEY UPDATE
 type UpsertContestParams struct {
 	ID                 int32
 	OrganizerID        int32
+	Archived           bool
 	SeriesID           sql.NullInt32
 	Name               string
 	Description        sql.NullString
@@ -1196,6 +1204,7 @@ func (q *Queries) UpsertContest(ctx context.Context, arg UpsertContestParams) (i
 	result, err := q.db.ExecContext(ctx, upsertContest,
 		arg.ID,
 		arg.OrganizerID,
+		arg.Archived,
 		arg.SeriesID,
 		arg.Name,
 		arg.Description,
