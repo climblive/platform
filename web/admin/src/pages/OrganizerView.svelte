@@ -8,10 +8,7 @@
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import "@awesome.me/webawesome/dist/components/tag/tag.js";
   import { value } from "@climblive/lib/forms";
-  import {
-    getSelfQuery,
-    getUsersByOrganizerQuery,
-  } from "@climblive/lib/queries";
+  import { getSelfQuery } from "@climblive/lib/queries";
   import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
@@ -21,7 +18,7 @@
     organizerId: number;
   }
 
-  let { organizerId }: Props = $props();
+  const { organizerId }: Props = $props();
 
   const selectedOrganizerId =
     getContext<Writable<number | undefined>>("selectedOrganizer");
@@ -30,16 +27,8 @@
   let showAllToggle: WaSwitch | undefined = $state();
 
   const selfQuery = $derived(getSelfQuery());
-  const usersQuery = $derived(
-    getUsersByOrganizerQuery($selectedOrganizerId ?? 0, {
-      enabled: !!$selectedOrganizerId,
-    }),
-  );
 
   const self = $derived(selfQuery.data);
-  const users = $derived(usersQuery.data);
-
-  const collaborators = $derived(users?.filter(({ id }) => id !== self?.id));
 
   let select: WaSelect | undefined = $state();
 
@@ -51,7 +40,7 @@
     if (select) {
       const organizerId = Number(select.value);
       $selectedOrganizerId = organizerId;
-      navigate(`/admin/organizers/${organizerId}`);
+      navigate(`/admin/organizers/${organizerId}/contests`);
     }
   };
 
@@ -86,59 +75,25 @@
         >Show all</wa-switch
       >
     {/if}
+
+    <wa-button
+      appearance="plain"
+      variant="brand"
+      size="small"
+      onclick={() => navigate(`./organizers/${organizerId}`)}
+      >Organizer settings and invites
+    </wa-button>
   </div>
 {/if}
-
-<wa-card appearance="filled">
-  {#if collaborators && collaborators.length > 0}
-    The contests under this organizer are being managed by you and the users
-    {#each collaborators as collaborator, index (collaborator.id)}
-      <strong>{collaborator.username}</strong>
-      {#if index === collaborators.length - 2}
-        &nbsp;and&nbsp;
-      {:else if index < collaborators.length - 2}
-        ,&nbsp;
-      {/if}
-    {/each}.
-  {:else}
-    The contests under this organizer are being managed solely by your self.
-  {/if}
-
-  <br />
-
-  <div class="invite-controls">
-    <wa-button
-      appearance="outlined"
-      size="small"
-      onclick={() => navigate(`./organizers/${organizerId}/invites`)}
-      >Invite a friend
-      <wa-icon name="user-plus" slot="start"></wa-icon>
-    </wa-button>
-
-    <wa-button
-      appearance="outlined"
-      size="small"
-      onclick={() => navigate(`./organizers/${organizerId}/invites`)}
-      >View invites
-      <wa-badge variant="neutral" pill>?</wa-badge>
-    </wa-button>
-  </div>
-</wa-card>
 
 <ContestList organizerId={showAll ? undefined : Number(organizerId)} />
 
 <style>
-  .invite-controls {
-    display: flex;
-    gap: var(--wa-space-xs);
-    align-items: center;
-    margin-top: var(--wa-space-m);
-  }
-
   .controls {
     display: flex;
     gap: var(--wa-space-m);
-    align-items: center;
+    flex-direction: column;
+    align-items: end;
 
     & wa-select {
       width: 100%;
@@ -147,9 +102,5 @@
     & wa-switch {
       flex-shrink: 0;
     }
-  }
-
-  wa-card {
-    margin-top: var(--wa-space-m);
   }
 </style>
