@@ -225,6 +225,11 @@ func setupMux(
 		Authorizer: authorizer,
 	}
 
+	organizerUseCase := usecases.OrganizerUseCase{
+		Repo:       repo,
+		Authorizer: authorizer,
+	}
+
 	mux := rest.NewMux()
 	mux.RegisterMiddleware(rest.CORS)
 	mux.RegisterMiddleware(authorizer.Middleware)
@@ -240,6 +245,7 @@ func setupMux(
 	rest.InstallScoreEngineHandler(mux, &scoreEngineUseCase)
 	rest.InstallRaffleHandler(mux, &raffleUseCase)
 	rest.InstallUserHandler(mux, &userUseCase)
+	rest.InstallOrganizerHandler(mux, &organizerUseCase)
 
 	return mux
 }

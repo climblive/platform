@@ -1,6 +1,7 @@
 export * from "./compClasses";
 export * from "./contenders";
 export * from "./contests";
+export * from "./organizerInvites";
 export * from "./problems";
 export * from "./raffles";
 export * from "./scoreEngines";

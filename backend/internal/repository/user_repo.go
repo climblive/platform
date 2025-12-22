@@ -62,3 +62,18 @@ func (d *Database) GetUserByUsername(ctx context.Context, tx domain.Transaction,
 
 	return user, nil
 }
+
+func (d *Database) GetUsersByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.User, error) {
+	records, err := d.WithTx(tx).GetUsersByOrganizer(ctx, int32(organizerID))
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	users := make([]domain.User, 0)
+
+	for _, record := range records {
+		users = append(users, userToDomain(record.User))
+	}
+
+	return users, nil
+}
