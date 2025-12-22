@@ -2,8 +2,8 @@
   import Loader from "@/components/Loader.svelte";
   import RelativeTime from "@/components/RelativeTime.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import type WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
+  import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { Contest } from "@climblive/lib/models";
   import {
@@ -94,7 +94,7 @@
   ];
 
   const handleToggleArchive = (event: InputEvent) => {
-    showArchived = (event.target as WaCheckbox).checked;
+    showArchived = (event.target as WaSwitch).checked;
   };
 </script>
 
@@ -150,9 +150,7 @@
   {/if}
 
   {#if archived?.length}
-    <wa-switch
-      checked={showArchived}
-      onchange={handleToggleArchive}
+    <wa-switch checked={showArchived} onchange={handleToggleArchive}
       >Show archived contests</wa-switch
     >
   {/if}

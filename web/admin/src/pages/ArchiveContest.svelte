@@ -54,10 +54,8 @@
 </div>
 
 <wa-dialog bind:this={dialog} label="Archive contest">
-  You are about to archive this contest. Archived contests are hidden from your
-  contest list but are not immediately deleted. However, they may be permanently
-  deleted in the future. Any running score engines will be automatically
-  stopped.
+  This will hide the contest for you and stop any running score engines.
+  Archived contests may be permanently deleted in the future.
   <wa-button slot="footer" appearance="plain" onclick={handleCancel}>
     Cancel</wa-button
   >

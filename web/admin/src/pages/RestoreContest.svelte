@@ -46,13 +46,6 @@
 </section>
 
 <style>
-  wa-callout::part(message) {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--wa-space-m);
-  }
-
   section {
     display: flex;
     flex-direction: column;
