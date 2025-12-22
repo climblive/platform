@@ -21,22 +21,21 @@
   const contestQuery = $derived(getContestQuery($session.contestId));
   const patchContender = $derived(patchContenderMutation($session.contenderId));
 
-  const contender = $derived($contenderQuery.data);
-  const contest = $derived($contestQuery.data);
+  const contender = $derived(contenderQuery.data);
+  const contest = $derived(contestQuery.data);
 
   const gotoScorecard = () => {
     navigate(`/${contender?.registrationCode}`, { replace: true });
   };
 
   const handleSubmit = (form: ContenderPatch) => {
-    if (!contender || $patchContender.isPending) {
+    if (!contender || patchContender.isPending) {
       return;
     }
 
-    $patchContender.mutate(
+    patchContender.mutate(
       {
         ...form,
-        publicName: form.name,
       },
       {
         onSuccess: gotoScorecard,
@@ -54,7 +53,6 @@
     submit={handleSubmit}
     data={{
       name: contender.name,
-      clubName: contender.clubName,
       compClassId: contender.compClassId,
       withdrawnFromFinals: contender.withdrawnFromFinals,
     }}
@@ -62,7 +60,7 @@
     <wa-button
       size="small"
       type="submit"
-      loading={$patchContender.isPending}
+      loading={patchContender.isPending}
       variant="neutral"
       appearance="accent"
       >Register

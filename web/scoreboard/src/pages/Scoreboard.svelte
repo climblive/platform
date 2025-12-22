@@ -26,8 +26,8 @@
   const contestQuery = $derived(getContestQuery(contestId));
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
 
-  let contest = $derived($contestQuery.data);
-  let compClasses = $derived($compClassesQuery.data);
+  let contest = $derived(contestQuery.data);
+  let compClasses = $derived(compClassesQuery.data);
 
   $effect(() => {
     if (compClasses && compClasses.length > 0 && !selectedCompClassId) {

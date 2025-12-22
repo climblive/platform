@@ -16,7 +16,7 @@
   const createCompClass = $derived(createCompClassMutation(contestId));
 
   const handleSubmit = async (tmpl: CompClassTemplate) => {
-    $createCompClass.mutate(tmpl, {
+    createCompClass.mutate(tmpl, {
       onSuccess: () => navigate(`/admin/contests/${contestId}#comp-classes`),
       onError: () => toastError("Failed to create class."),
     });
@@ -42,7 +42,7 @@
     <wa-button
       size="small"
       type="submit"
-      loading={$createCompClass.isPending}
+      loading={createCompClass.isPending}
       variant="neutral"
       appearance="accent"
       >Create
@@ -54,5 +54,6 @@
   .controls {
     display: flex;
     gap: var(--wa-space-xs);
+    justify-content: end;
   }
 </style>

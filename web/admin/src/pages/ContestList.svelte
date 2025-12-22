@@ -2,6 +2,8 @@
   import Loader from "@/components/Loader.svelte";
   import RelativeTime from "@/components/RelativeTime.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/switch/switch.js";
+  import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { Contest } from "@climblive/lib/models";
   import {
@@ -17,6 +19,8 @@
 
   let { organizerId }: Props = $props();
 
+  let showArchived = $state(false);
+
   const contestsQuery = $derived(
     getContestsByOrganizerQuery(organizerId ?? 0, {
       enabled: organizerId !== undefined,
@@ -27,34 +31,37 @@
   );
 
   const contests = $derived(
-    organizerId === undefined ? $allContestsQuery.data : $contestsQuery.data,
+    organizerId === undefined ? allContestsQuery.data : contestsQuery.data,
   );
 
-  const [drafts, ongoing, upcoming, past] = $derived.by(() => {
+  const [ongoing, upcoming, past, archived] = $derived.by(() => {
     const now = new Date();
 
-    const drafts = contests?.filter(({ timeBegin }) => {
-      return !timeBegin;
+    const ongoing: Contest[] = [];
+    const upcoming: Contest[] = [];
+    const past: Contest[] = [];
+    const archived: Contest[] = [];
+
+    contests?.forEach((contest) => {
+      const { timeBegin, timeEnd } = contest;
+
+      if (contest.archived) {
+        archived.push(contest);
+      } else if (timeBegin && timeEnd && now >= timeBegin && now < timeEnd) {
+        ongoing.push(contest);
+      } else if (timeEnd && now > timeEnd) {
+        past.push(contest);
+      } else {
+        upcoming.push(contest);
+      }
     });
 
-    const ongoing = contests?.filter(({ timeBegin, timeEnd }) => {
-      return timeBegin && timeEnd && now >= timeBegin && now < timeEnd;
-    });
+    ongoing?.sort(sortContests);
+    upcoming?.sort(sortContests).reverse();
+    past?.sort(sortContests);
+    archived?.sort(sortContests);
 
-    const upcoming = contests?.filter(({ timeBegin }) => {
-      return timeBegin && timeBegin > now;
-    });
-
-    const past = contests?.filter(({ timeEnd }) => {
-      return timeEnd && now > timeEnd;
-    });
-
-    return [
-      drafts,
-      ongoing?.sort(sortContests),
-      upcoming?.sort(sortContests),
-      past?.sort(sortContests),
-    ];
+    return [ongoing, upcoming, past, archived];
   });
 
   const sortContests = (c1: Contest, c2: Contest) => {
@@ -85,6 +92,10 @@
       width: "max-content",
     },
   ];
+
+  const handleToggleArchive = (event: InputEvent) => {
+    showArchived = (event.target as WaSwitch).checked;
+  };
 </script>
 
 {#snippet renderName({ id, name }: Contest)}
@@ -98,12 +109,16 @@
     {:else}
       <RelativeTime time={timeBegin} />
     {/if}
+  {:else}
+    -
   {/if}
 {/snippet}
 
 {#snippet renderTimeEnd({ timeEnd }: Contest)}
   {#if timeEnd}
     {format(timeEnd, "yyyy-MM-dd HH:mm")}
+  {:else}
+    -
   {/if}
 {/snippet}
 
@@ -119,13 +134,9 @@
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
 {/snippet}
 
-{#if !drafts || !ongoing || !upcoming || !past}
+{#if !ongoing || !upcoming || !past || !archived}
   <Loader />
 {:else}
-  {#if drafts?.length}
-    {@render listing("Drafts", drafts)}
-  {/if}
-
   {#if ongoing?.length}
     {@render listing("Ongoing", ongoing)}
   {/if}
@@ -137,10 +148,25 @@
   {#if past?.length}
     {@render listing("Past", past)}
   {/if}
+
+  {#if archived?.length}
+    <wa-switch checked={showArchived} onchange={handleToggleArchive}
+      >Show archived contests</wa-switch
+    >
+  {/if}
+
+  {#if showArchived}
+    {@render listing("Archived", archived)}
+  {/if}
 {/if}
 
 <style>
   wa-button {
     margin-block-end: var(--wa-space-m);
+  }
+
+  wa-switch {
+    display: block;
+    margin-block-start: var(--wa-space-m);
   }
 </style>

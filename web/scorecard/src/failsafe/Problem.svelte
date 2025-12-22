@@ -5,8 +5,6 @@
     createTickMutation,
     deleteTickMutation,
   } from "@climblive/lib/queries";
-  import BoltIcon from "./BoltIcon.svelte";
-  import CheckIcon from "./CheckIcon.svelte";
 
   type Props = {
     problem: Problem;
@@ -31,34 +29,41 @@
     return "no-top";
   };
 
-  const addTick = (type: "top" | "flash") => () => {
+  const addTick = (type: "zone1" | "zone2" | "top" | "flash") => () => {
+    const attempts = type === "flash" ? 1 : 999;
+
+    const tick: Omit<Tick, "id" | "timestamp"> = {
+      problemId: problem.id,
+      top: false,
+      zone2: false,
+      zone1: false,
+      attemptsTop: attempts,
+      attemptsZone2: attempts,
+      attemptsZone1: attempts,
+    };
+
     switch (type) {
-      case "top":
-        $createTick.mutate({
-          problemId: problem.id,
-          top: true,
-          attemptsTop: 999,
-          zone: true,
-          attemptsZone: 999,
-        });
-
-        break;
       case "flash":
-        $createTick.mutate({
-          problemId: problem.id,
-          top: true,
-          attemptsTop: 1,
-          zone: true,
-          attemptsZone: 1,
-        });
-
+      case "top":
+        tick.top = true;
+        tick.zone2 = true;
+        tick.zone1 = true;
+        break;
+      case "zone2":
+        tick.zone2 = true;
+        tick.zone1 = true;
+        break;
+      case "zone1":
+        tick.zone1 = true;
         break;
     }
+
+    createTick.mutate(tick);
   };
 
   const removeTick = () => {
     if (tick?.id) {
-      $deleteTick.mutate(tick.id);
+      deleteTick.mutate(tick.id);
     }
   };
 </script>
@@ -77,24 +82,41 @@
     />
     № {problem.number}
     <div class="icon">
-      {#if tick?.top === true && tick?.attemptsTop === 1}
-        <BoltIcon />
-      {:else if tick?.top === true}
-        <CheckIcon />
+      {#if tick?.top && tick?.attemptsTop === 1}
+        F
+      {:else if tick?.top}
+        T
+      {:else if tick?.zone2}
+        Z2
+      {:else if tick?.zone1}
+        Z1
       {/if}
     </div>
   </span>
-  {#if tick}
-    <button onclick={removeTick} disabled={$deleteTick.isPending}>Unsend</button
-    >
-  {:else}
-    <button onclick={addTick("top")} disabled={$createTick.isPending}
-      >Top</button
-    >
-    <button onclick={addTick("flash")} disabled={$createTick.isPending}
-      >Flash</button
-    >
-  {/if}
+  <div class="controls">
+    {#if tick}
+      <button onclick={removeTick} disabled={deleteTick.isPending}
+        >Unsend</button
+      >
+    {:else}
+      {#if problem.zone1Enabled}
+        <button onclick={addTick("zone1")} disabled={createTick.isPending}
+          >Zone 1</button
+        >
+      {/if}
+      {#if problem.zone2Enabled}
+        <button onclick={addTick("zone2")} disabled={createTick.isPending}
+          >Zone 2</button
+        >
+      {/if}
+      <button onclick={addTick("top")} disabled={createTick.isPending}
+        >Top</button
+      >
+      <button onclick={addTick("flash")} disabled={createTick.isPending}
+        >Flash</button
+      >
+    {/if}
+  </div>
 </section>
 
 <style>
@@ -136,5 +158,17 @@
         flex-shrink: 0;
       }
     }
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-xs);
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  button {
+    white-space: nowrap;
   }
 </style>

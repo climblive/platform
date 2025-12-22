@@ -29,7 +29,7 @@
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
   const createContenders = $derived(createContendersMutation(contestId));
 
-  let contenders = $derived($contendersQuery.data);
+  let contenders = $derived(contendersQuery.data);
 
   let remainingCodes = $derived(
     contenders === undefined ? undefined : maxTickets - contenders.length,
@@ -69,7 +69,7 @@
         number: Number(numberInput.value),
       };
 
-      $createContenders.mutate(args, {
+      createContenders.mutate(args, {
         onSuccess: () => {
           newTicketsAvailableForPrint = true;
           closeDialog();
@@ -117,7 +117,7 @@
     size="small"
     variant="neutral"
     appearance="accent"
-    loading={$createContenders.isPending}
+    loading={createContenders.isPending}
     onclick={handleCreate}
     type="submit"
   >
@@ -140,7 +140,7 @@
     <wa-button
       appearance="outlined"
       size="small"
-      loading={$contendersQuery.isLoading}
+      loading={contendersQuery.isLoading}
       disabled={!contenders || contenders.length === 0}
       >Print tickets
       <wa-icon name="print" slot="start"></wa-icon>

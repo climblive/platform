@@ -15,8 +15,8 @@
   const contestQuery = $derived(getContestQuery(contestId));
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
 
-  const contest = $derived($contestQuery.data);
-  const contenders = $derived($contendersQuery.data);
+  const contest = $derived(contestQuery.data);
+  const contenders = $derived(contendersQuery.data);
 
   let printDialogOpened = $state(false);
 

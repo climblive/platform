@@ -184,11 +184,13 @@ func (e *DefaultScoreEngine) HandleContenderRequalified(event domain.ContenderRe
 
 func (e *DefaultScoreEngine) HandleAscentRegistered(event domain.AscentRegisteredEvent) {
 	tick := Tick{
-		ProblemID:    event.ProblemID,
-		Top:          event.Top,
-		AttemptsTop:  event.AttemptsTop,
-		Zone:         event.Zone,
-		AttemptsZone: event.AttemptsZone,
+		ProblemID:     event.ProblemID,
+		Zone1:         event.Zone1,
+		AttemptsZone1: event.AttemptsZone1,
+		Zone2:         event.Zone2,
+		AttemptsZone2: event.AttemptsZone2,
+		Top:           event.Top,
+		AttemptsTop:   event.AttemptsTop,
 	}
 
 	contender, found := e.store.GetContender(event.ContenderID)
@@ -234,10 +236,11 @@ func (e *DefaultScoreEngine) HandleAscentDeregistered(event domain.AscentDeregis
 
 func (e *DefaultScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) {
 	problem := Problem{
-		ID:         event.ProblemID,
-		PointsTop:  event.PointsTop,
-		PointsZone: event.PointsZone,
-		FlashBonus: event.FlashBonus,
+		ID:          event.ProblemID,
+		PointsZone1: event.PointsZone1,
+		PointsZone2: event.PointsZone2,
+		PointsTop:   event.PointsTop,
+		FlashBonus:  event.FlashBonus,
 	}
 
 	e.store.SaveProblem(problem)
@@ -245,10 +248,11 @@ func (e *DefaultScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) 
 
 func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEvent) {
 	problem := Problem{
-		ID:         event.ProblemID,
-		PointsTop:  event.PointsTop,
-		PointsZone: event.PointsZone,
-		FlashBonus: event.FlashBonus,
+		ID:          event.ProblemID,
+		PointsZone1: event.PointsZone1,
+		PointsZone2: event.PointsZone2,
+		PointsTop:   event.PointsTop,
+		FlashBonus:  event.FlashBonus,
 	}
 
 	e.store.SaveProblem(problem)

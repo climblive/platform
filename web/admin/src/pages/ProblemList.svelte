@@ -10,6 +10,7 @@
     getProblemsQuery,
     getTicksByContestQuery,
   } from "@climblive/lib/queries";
+  import { isDefined } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
   import DeleteProblem from "./DeleteProblem.svelte";
 
@@ -28,11 +29,11 @@
   const ascentsByProblem = $derived.by(() => {
     const ascentsByProblem = new Map<ProblemID, number>();
 
-    if ($ticksQuery.data === undefined) {
+    if (ticksQuery.data === undefined) {
       return ascentsByProblem;
     }
 
-    for (const { problemId } of $ticksQuery.data) {
+    for (const { problemId } of ticksQuery.data) {
       const ascents = ascentsByProblem.get(problemId);
 
       if (ascents !== undefined) {
@@ -48,11 +49,11 @@
   type ProblemWithAscents = Problem & { ascents: number };
 
   const sortedProblemsWithAscents = $derived.by(() => {
-    if ($problemsQuery.data === undefined) {
+    if (problemsQuery.data === undefined) {
       return undefined;
     }
 
-    const problems = $problemsQuery.data.map<ProblemWithAscents>((problem) => ({
+    const problems = problemsQuery.data.map<ProblemWithAscents>((problem) => ({
       ...problem,
       ascents: ascentsByProblem.get(problem.id) ?? 0,
     }));
@@ -79,7 +80,7 @@
     },
     {
       label: "Flash",
-      mobile: true,
+      mobile: false,
       render: renderFlashBonus,
       width: "max-content",
     },
@@ -115,13 +116,25 @@
   </div>
 {/snippet}
 
-{#snippet renderPoints({ pointsTop }: ProblemWithAscents)}
-  {pointsTop} pts
+{#snippet renderPoints(
+  { pointsZone1, pointsZone2, pointsTop, flashBonus }: ProblemWithAscents,
+  mobile: boolean,
+)}
+  {@const values = [pointsZone1, pointsZone2, pointsTop].filter(isDefined)}
+
+  {#if mobile}
+    {@const min = Math.min(...values)}
+    {@const max = Math.max(...values)}
+
+    {[min, max + (flashBonus ?? 0)].join(" - ")} pts
+  {:else}
+    {values.join(" / ")} pts
+  {/if}
 {/snippet}
 
 {#snippet renderFlashBonus({ flashBonus }: ProblemWithAscents)}
   {#if flashBonus}
-    {flashBonus} pts
+    +{flashBonus} pts
   {:else}
     -
   {/if}

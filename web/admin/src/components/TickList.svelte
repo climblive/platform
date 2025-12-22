@@ -24,9 +24,9 @@
   const ticksQuery = $derived(getTicksByContenderQuery(contenderId));
 
   const problems = $derived(
-    new Map($problemsQuery.data?.map((problem) => [problem.id, problem]) ?? []),
+    new Map(problemsQuery.data?.map((problem) => [problem.id, problem]) ?? []),
   );
-  const ticks = $derived($ticksQuery.data);
+  const ticks = $derived(ticksQuery.data);
 
   type TickAndProblem = { tick: Tick; problem: Problem };
 
@@ -56,6 +56,13 @@
       mobile: true,
       render: renderProblemNumberAndColor,
       width: "3fr",
+    },
+    {
+      label: "Result",
+      mobile: true,
+      render: renderResult,
+      width: "max-content",
+      align: "left",
     },
     {
       label: "Flash",
@@ -89,6 +96,18 @@
     />
     № {problem.number}
   </div>
+{/snippet}
+
+{#snippet renderResult({ tick }: TickAndProblem)}
+  {#if tick.top}
+    T
+  {:else if tick.zone2}
+    Z2
+  {:else if tick.zone1}
+    Z1
+  {:else}
+    <wa-icon name="minus"></wa-icon>
+  {/if}
 {/snippet}
 
 {#snippet renderFlash({ tick }: TickAndProblem)}

@@ -78,7 +78,6 @@ func (d *Database) StoreContender(ctx context.Context, tx domain.Transaction, co
 		ContestID:           int32(contender.ContestID),
 		RegistrationCode:    contender.RegistrationCode,
 		Name:                makeNullString(contender.Name),
-		Club:                makeNullString(contender.ClubName),
 		ClassID:             makeNullInt32(int32(contender.CompClassID)),
 		Entered:             makeNullTime(contender.Entered),
 		Disqualified:        contender.Disqualified,

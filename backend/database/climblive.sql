@@ -52,6 +52,7 @@ CREATE INDEX `index3` ON `series` (`id` ASC, `organizer_id` ASC);
 CREATE TABLE IF NOT EXISTS `contest` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `organizer_id` INT NOT NULL,
+  `archived` TINYINT(1) NOT NULL DEFAULT 0,
   `protected` TINYINT(1) NOT NULL DEFAULT 0,
   `series_id` INT NULL,
   `name` VARCHAR(64) NOT NULL,
@@ -160,8 +161,12 @@ CREATE TABLE IF NOT EXISTS `problem` (
   `hold_color_primary` VARCHAR(7) NOT NULL,
   `hold_color_secondary` VARCHAR(7) NULL DEFAULT NULL,
   `name` VARCHAR(64) NULL,
+  `zone_1_enabled` TINYINT(1) NOT NULL DEFAULT 0,
+  `zone_2_enabled` TINYINT(1) NOT NULL DEFAULT 0,
   `description` VARCHAR(1024) NULL DEFAULT NULL,
-  `points` INT NOT NULL,
+  `points_zone_1` INT NULL,
+  `points_zone_2` INT NULL,
+  `points_top` INT NOT NULL,
   `flash_bonus` INT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_problem_1`
@@ -189,8 +194,13 @@ CREATE TABLE IF NOT EXISTS `tick` (
   `contest_id` INT NOT NULL,
   `contender_id` INT NOT NULL,
   `problem_id` INT NOT NULL,
-  `flash` TINYINT(1) NOT NULL DEFAULT 0,
   `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `zone_1` TINYINT(1) NOT NULL DEFAULT 0,
+  `attempts_zone_1` INT NOT NULL DEFAULT 0,
+  `zone_2` TINYINT(1) NOT NULL DEFAULT 0,
+  `attempts_zone_2` INT NOT NULL DEFAULT 0,
+  `top` TINYINT(1) NOT NULL DEFAULT 0,
+  `attempts_top` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_tick_1`
     FOREIGN KEY (`problem_id` , `organizer_id` , `contest_id`)

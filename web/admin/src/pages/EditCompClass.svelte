@@ -19,10 +19,10 @@
   const compClassQuery = $derived(getCompClassQuery(compClassId));
   const patchCompClass = $derived(patchCompClassMutation(compClassId));
 
-  const compClass = $derived($compClassQuery.data);
+  const compClass = $derived(compClassQuery.data);
 
   const handleSubmit = async (patch: CompClassPatch) => {
-    $patchCompClass.mutate(patch, {
+    patchCompClass.mutate(patch, {
       onSuccess: (compClass) =>
         navigate(`/admin/contests/${compClass.contestId}#comp-classes`),
       onError: () => toastError("Failed to save comp class."),
@@ -46,7 +46,7 @@
       <wa-button
         size="small"
         type="submit"
-        loading={$patchCompClass.isPending}
+        loading={patchCompClass.isPending}
         variant="neutral"
         >Save
       </wa-button>
@@ -58,5 +58,6 @@
   .controls {
     display: flex;
     gap: var(--wa-space-xs);
+    justify-content: right;
   }
 </style>

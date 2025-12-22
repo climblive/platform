@@ -481,4 +481,15 @@ export class ApiClient {
 
     return z.array(userSchema).parse(result.data);
   };
+
+  downloadResults = async (contestId: number) => {
+    const endpoint = `/contests/${contestId}/results`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+      responseType: "blob",
+    });
+
+    return result.data;
+  };
 }

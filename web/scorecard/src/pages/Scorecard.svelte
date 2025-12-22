@@ -56,11 +56,11 @@
   let score: number = $state(0);
   let placement: number | undefined = $state();
 
-  let contender = $derived($contenderQuery.data);
-  let contest = $derived($contestQuery.data);
-  let compClasses = $derived($compClassesQuery.data);
-  let problems = $derived($problemsQuery.data);
-  let ticks = $derived($ticksQuery.data);
+  let contender = $derived(contenderQuery.data);
+  let contest = $derived(contestQuery.data);
+  let compClasses = $derived(compClassesQuery.data);
+  let problems = $derived(problemsQuery.data);
+  let ticks = $derived(ticksQuery.data);
   let selectedCompClass = $derived(
     compClasses?.find(({ id }) => id === contender?.compClassId),
   );
@@ -158,10 +158,12 @@
         id: event.tickId,
         timestamp: event.timestamp,
         problemId: event.problemId,
+        zone1: event.zone1,
+        attemptsZone1: event.attemptsZone1,
+        zone2: event.zone2,
+        attemptsZone2: event.attemptsZone2,
         top: event.top,
         attemptsTop: event.attemptsTop,
-        zone: event.zone,
-        attemptsZone: event.attemptsZone,
       };
 
       updateTickInQueryCache(queryClient, $session.contenderId, newTick);
@@ -207,7 +209,6 @@
             contestName={contest.name}
             compClassName={selectedCompClass?.name}
             contenderName={contender.name}
-            contenderClub={contender.clubName}
             {score}
             {placement}
             {contestState}
@@ -260,6 +261,7 @@
                     compClassId={selectedCompClass.id}
                     {scoreboard}
                     {loading}
+                    highlightedContenderId={contender.id}
                   />
                 {/snippet}
               </ScoreboardProvider>
@@ -293,18 +295,22 @@
     right: 0;
     z-index: 10;
     background-color: var(--wa-color-surface-default);
-    padding: var(--wa-space-s);
+    padding: var(--wa-space-m);
   }
 
   wa-tab-group {
-    padding-inline: var(--wa-space-s);
-    padding-bottom: var(--wa-space-s);
+    padding-inline: var(--wa-space-m);
+    padding-bottom: var(--wa-space-m);
   }
 
   wa-tab-panel[name="problems"]::part(base) {
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-xs);
+  }
+
+  wa-radio-group {
+    margin-block-end: var(--wa-space-xs);
   }
 
   wa-radio {

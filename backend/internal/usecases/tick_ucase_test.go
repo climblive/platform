@@ -7,6 +7,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/usecases"
+	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -232,38 +233,44 @@ func TestCreateTick(t *testing.T) {
 				tick.Timestamp = time.Time{}
 
 				expected := domain.Tick{
-					Ownership:    fakedOwnership,
-					ContestID:    fakedContestID,
-					ProblemID:    fakedProblemID,
-					Top:          true,
-					AttemptsTop:  5,
-					Zone:         true,
-					AttemptsZone: 2,
+					Ownership:     fakedOwnership,
+					ContestID:     fakedContestID,
+					ProblemID:     fakedProblemID,
+					Top:           true,
+					AttemptsTop:   5,
+					Zone1:         true,
+					AttemptsZone1: 2,
+					Zone2:         true,
+					AttemptsZone2: 3,
 				}
 
 				return tick.Timestamp.Sub(now) < time.Second && tick == expected
 			})).
 			Return(domain.Tick{
-				ID:           fakedTickID,
-				Ownership:    fakedOwnership,
-				Timestamp:    now,
-				ContestID:    fakedContestID,
-				ProblemID:    fakedProblemID,
-				Top:          true,
-				AttemptsTop:  5,
-				Zone:         true,
-				AttemptsZone: 2,
+				ID:            fakedTickID,
+				Ownership:     fakedOwnership,
+				Timestamp:     now,
+				ContestID:     fakedContestID,
+				ProblemID:     fakedProblemID,
+				Top:           true,
+				AttemptsTop:   5,
+				Zone1:         true,
+				AttemptsZone1: 2,
+				Zone2:         true,
+				AttemptsZone2: 3,
 			}, nil)
 
 		mockedEventBroker.On("Dispatch", fakedContestID, domain.AscentRegisteredEvent{
-			TickID:       fakedTickID,
-			Timestamp:    now,
-			ContenderID:  fakedContenderID,
-			ProblemID:    fakedProblemID,
-			Top:          true,
-			AttemptsTop:  5,
-			Zone:         true,
-			AttemptsZone: 2,
+			TickID:        fakedTickID,
+			Timestamp:     now,
+			ContenderID:   fakedContenderID,
+			ProblemID:     fakedProblemID,
+			Top:           true,
+			AttemptsTop:   5,
+			Zone1:         true,
+			AttemptsZone1: 2,
+			Zone2:         true,
+			AttemptsZone2: 3,
 		}).Return()
 
 		ucase := usecases.TickUseCase{
@@ -273,11 +280,13 @@ func TestCreateTick(t *testing.T) {
 		}
 
 		tick, err := ucase.CreateTick(context.Background(), fakedContenderID, domain.Tick{
-			ProblemID:    fakedProblemID,
-			Top:          true,
-			AttemptsTop:  5,
-			Zone:         true,
-			AttemptsZone: 2,
+			ProblemID:     fakedProblemID,
+			Top:           true,
+			AttemptsTop:   5,
+			Zone1:         true,
+			AttemptsZone1: 2,
+			Zone2:         true,
+			AttemptsZone2: 3,
 		})
 
 		require.NoError(t, err)
@@ -288,8 +297,10 @@ func TestCreateTick(t *testing.T) {
 		assert.Equal(t, fakedProblemID, tick.ProblemID)
 		assert.Equal(t, true, tick.Top)
 		assert.Equal(t, 5, tick.AttemptsTop)
-		assert.Equal(t, true, tick.Zone)
-		assert.Equal(t, 2, tick.AttemptsZone)
+		assert.Equal(t, true, tick.Zone1)
+		assert.Equal(t, 2, tick.AttemptsZone1)
+		assert.Equal(t, true, tick.Zone2)
+		assert.Equal(t, 3, tick.AttemptsZone2)
 
 		mockedRepo.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)
@@ -310,11 +321,13 @@ func TestCreateTick(t *testing.T) {
 		}
 
 		tick, err := ucase.CreateTick(context.Background(), fakedContenderID, domain.Tick{
-			ProblemID:    fakedProblemID,
-			Top:          true,
-			AttemptsTop:  5,
-			Zone:         true,
-			AttemptsZone: 2,
+			ProblemID:     fakedProblemID,
+			Top:           true,
+			AttemptsTop:   5,
+			Zone1:         true,
+			AttemptsZone1: 2,
+			Zone2:         true,
+			AttemptsZone2: 3,
 		})
 
 		assert.ErrorIs(t, err, domain.ErrContestNotStarted)
@@ -339,11 +352,13 @@ func TestCreateTick(t *testing.T) {
 		}
 
 		tick, err := ucase.CreateTick(context.Background(), fakedContenderID, domain.Tick{
-			ProblemID:    fakedProblemID,
-			Top:          true,
-			AttemptsTop:  5,
-			Zone:         true,
-			AttemptsZone: 2,
+			ProblemID:     fakedProblemID,
+			Top:           true,
+			AttemptsTop:   5,
+			Zone1:         true,
+			AttemptsZone1: 2,
+			Zone2:         true,
+			AttemptsZone2: 3,
 		})
 
 		assert.ErrorIs(t, err, domain.ErrContestEnded)
@@ -377,11 +392,13 @@ func TestCreateTick(t *testing.T) {
 		}
 
 		tick, err := ucase.CreateTick(context.Background(), fakedContenderID, domain.Tick{
-			ProblemID:    fakedOtherProblemID,
-			Top:          true,
-			AttemptsTop:  5,
-			Zone:         true,
-			AttemptsZone: 2,
+			ProblemID:     fakedOtherProblemID,
+			Top:           true,
+			AttemptsTop:   5,
+			Zone1:         true,
+			AttemptsZone1: 2,
+			Zone2:         true,
+			AttemptsZone2: 3,
 		})
 
 		assert.ErrorIs(t, err, domain.ErrProblemNotInContest)
@@ -414,38 +431,44 @@ func TestCreateTick(t *testing.T) {
 				tick.Timestamp = time.Time{}
 
 				expected := domain.Tick{
-					Ownership:    fakedOwnership,
-					ContestID:    fakedContestID,
-					ProblemID:    fakedProblemID,
-					Top:          true,
-					AttemptsTop:  5,
-					Zone:         true,
-					AttemptsZone: 2,
+					Ownership:     fakedOwnership,
+					ContestID:     fakedContestID,
+					ProblemID:     fakedProblemID,
+					Top:           true,
+					AttemptsTop:   5,
+					Zone1:         true,
+					AttemptsZone1: 2,
+					Zone2:         true,
+					AttemptsZone2: 3,
 				}
 
 				return tick.Timestamp.Sub(now) < time.Second && tick == expected
 			})).
 			Return(domain.Tick{
-				ID:           fakedTickID,
-				Ownership:    fakedOwnership,
-				Timestamp:    now,
-				ContestID:    fakedContestID,
-				ProblemID:    fakedProblemID,
-				Top:          true,
-				AttemptsTop:  5,
-				Zone:         true,
-				AttemptsZone: 2,
+				ID:            fakedTickID,
+				Ownership:     fakedOwnership,
+				Timestamp:     now,
+				ContestID:     fakedContestID,
+				ProblemID:     fakedProblemID,
+				Top:           true,
+				AttemptsTop:   5,
+				Zone1:         true,
+				AttemptsZone1: 2,
+				Zone2:         true,
+				AttemptsZone2: 3,
 			}, nil)
 
 		mockedEventBroker.On("Dispatch", fakedContestID, domain.AscentRegisteredEvent{
-			TickID:       fakedTickID,
-			Timestamp:    now,
-			ContenderID:  fakedContenderID,
-			ProblemID:    fakedProblemID,
-			Top:          true,
-			AttemptsTop:  5,
-			Zone:         true,
-			AttemptsZone: 2,
+			TickID:        fakedTickID,
+			Timestamp:     now,
+			ContenderID:   fakedContenderID,
+			ProblemID:     fakedProblemID,
+			Top:           true,
+			AttemptsTop:   5,
+			Zone1:         true,
+			AttemptsZone1: 2,
+			Zone2:         true,
+			AttemptsZone2: 3,
 		}).Return()
 
 		ucase := usecases.TickUseCase{
@@ -455,11 +478,13 @@ func TestCreateTick(t *testing.T) {
 		}
 
 		tick, err := ucase.CreateTick(context.Background(), fakedContenderID, domain.Tick{
-			ProblemID:    fakedProblemID,
-			Top:          true,
-			AttemptsTop:  5,
-			Zone:         true,
-			AttemptsZone: 2,
+			ProblemID:     fakedProblemID,
+			Top:           true,
+			AttemptsTop:   5,
+			Zone1:         true,
+			AttemptsZone1: 2,
+			Zone2:         true,
+			AttemptsZone2: 3,
 		})
 
 		require.NoError(t, err)
@@ -498,6 +523,41 @@ func TestCreateTick(t *testing.T) {
 		assert.Empty(t, tick)
 
 		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("ValidatorIsInvoked", func(t *testing.T) {
+		mockedRepo, mockedEventBroker := makeMocks(time.Now(), time.Now())
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.ContenderRole, nil)
+
+		mockedRepo.
+			On("GetProblem", mock.Anything, mock.Anything, fakedProblemID).
+			Return(domain.Problem{
+				ID:        fakedProblemID,
+				ContestID: fakedContestID,
+			}, nil)
+
+		ucase := usecases.TickUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.CreateTick(context.Background(), fakedContenderID, domain.Tick{
+			ProblemID: fakedProblemID,
+			Top:       true,
+			Zone2:     false,
+			Zone1:     false,
+		})
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validators.TickValidator{}.IsValidationError(err))
+
+		mockedRepo.AssertExpectations(t)
+		mockedEventBroker.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
 	})
 }

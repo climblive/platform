@@ -16,7 +16,7 @@
 
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
 
-  let compClasses = $derived($compClassesQuery.data);
+  let compClasses = $derived(compClassesQuery.data);
 
   const columns: ColumnDefinition<CompClass>[] = [
     {

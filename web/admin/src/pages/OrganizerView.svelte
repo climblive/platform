@@ -36,8 +36,8 @@
     }),
   );
 
-  const self = $derived($selfQuery.data);
-  const users = $derived($usersQuery.data);
+  const self = $derived(selfQuery.data);
+  const users = $derived(usersQuery.data);
 
   const collaborators = $derived(users?.filter(({ id }) => id !== self?.id));
 
@@ -67,16 +67,6 @@
     showAll = showAllToggle.checked;
   };
 </script>
-
-<h1>Welcome!</h1>
-
-{#if selectedOrganizer}
-  <p>
-    You are currently managing contests under <strong
-      >{selectedOrganizer.name}</strong
-    >.
-  </p>
-{/if}
 
 {#if self && self.organizers.length > 1}
   <div class="controls">

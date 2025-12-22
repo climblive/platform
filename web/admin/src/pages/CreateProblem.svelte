@@ -19,11 +19,11 @@
   const problemsQuery = $derived(getProblemsQuery(contestId));
 
   let highestProblemNumber = $derived.by(() => {
-    if ($problemsQuery.data === undefined) {
+    if (problemsQuery.data === undefined) {
       return undefined;
-    } else if ($problemsQuery.data.length > 0) {
+    } else if (problemsQuery.data.length > 0) {
       return Math.max(
-        ...($problemsQuery.data?.map(({ number }) => number) ?? []),
+        ...(problemsQuery.data?.map(({ number }) => number) ?? []),
       );
     } else {
       return 0;
@@ -33,8 +33,8 @@
   const createProblem = $derived(createProblemMutation(contestId));
 
   const handleSubmit = async (tmpl: Omit<ProblemTemplate, "pointsZone">) => {
-    $createProblem.mutate(
-      { ...tmpl, pointsZone: 0 },
+    createProblem.mutate(
+      { ...tmpl },
       {
         onSuccess: () => navigate(`/admin/contests/${contestId}#problems`),
         onError: () => toastError("Failed to create problem."),
@@ -67,7 +67,7 @@
       <wa-button
         size="small"
         type="submit"
-        loading={$createProblem.isPending}
+        loading={createProblem.isPending}
         variant="neutral"
         >Create
       </wa-button>
@@ -79,5 +79,6 @@
   .controls {
     display: flex;
     gap: var(--wa-space-xs);
+    justify-content: end;
   }
 </style>

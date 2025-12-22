@@ -12,6 +12,7 @@
     overflow?: "pagination" | "scroll";
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
     loading: boolean;
+    highlightedContenderId?: number;
   }
 
   let {
@@ -19,6 +20,7 @@
     overflow = "scroll",
     scoreboard,
     loading,
+    highlightedContenderId,
   }: Props = $props();
 
   const ITEM_HEIGHT = 36;
@@ -28,10 +30,28 @@
   let container: HTMLDivElement | undefined = $state();
   let observer: ResizeObserver | undefined;
   let pageFlipIntervalTimerId: number;
+  let visibilityObserver: IntersectionObserver | undefined;
 
   let containerHeight: number = $state(0);
   let pageSize: number = $state(0);
   let pageIndex = $state(0);
+
+  const scrollToHighlighted = () => {
+    if (!container) {
+      return;
+    }
+
+    const highlightedEntry = container.querySelector(
+      `section[data-highlighted="true"]`,
+    );
+
+    if (highlightedEntry) {
+      highlightedEntry.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  };
 
   onMount(() => {
     pageFlipIntervalTimerId = setInterval(() => {
@@ -52,14 +72,35 @@
         }
       }
     });
+
+    visibilityObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting && highlightedContenderId) {
+          setTimeout(scrollToHighlighted);
+        }
+      }
+    });
+
+    if (container) {
+      visibilityObserver.observe(container);
+    }
   });
 
   onDestroy(() => {
     observer?.disconnect();
     observer = undefined;
 
+    visibilityObserver?.disconnect();
+    visibilityObserver = undefined;
+
     clearInterval(pageFlipIntervalTimerId);
     pageFlipIntervalTimerId = 0;
+  });
+
+  $effect(() => {
+    if (highlightedContenderId && results.length > 0) {
+      setTimeout(scrollToHighlighted);
+    }
   });
 
   let results = $derived($scoreboard.get(compClassId) ?? []);
@@ -111,7 +152,10 @@
     {#each results as scoreboardEntry (scoreboardEntry.contenderId)}
       {#if scoreboardEntry.score}
         <Floater order={scoreboardEntry.score.rankOrder}>
-          <ResultEntry {scoreboardEntry} />
+          <ResultEntry
+            {scoreboardEntry}
+            highlighted={highlightedContenderId === scoreboardEntry.contenderId}
+          />
         </Floater>
       {/if}
     {/each}

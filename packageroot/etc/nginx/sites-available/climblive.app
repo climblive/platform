@@ -1,9 +1,6 @@
 server {
 	listen 443 ssl http2;
-	server_name labs.climblive.app www.labs.climblive.app;
-
-	# Gzip Settings
-	include snippets/gzip.conf;
+	server_name __SERVER_NAME__ www.__SERVER_NAME__;
 
 	client_max_body_size 1M;
 
@@ -73,14 +70,12 @@ server {
 		add_header Referrer-Policy "same-origin";
 	}
 
-	include /etc/nginx/options-ssl.conf;
-
-	ssl_certificate /etc/letsencrypt/live/labs.climblive.app/fullchain.pem;
-	ssl_certificate_key /etc/letsencrypt/live/labs.climblive.app/privkey.pem;
+	ssl_certificate /etc/nginx/ssl/cloudflare/climblive.app/cert.pem;
+	ssl_certificate_key /etc/nginx/ssl/cloudflare/climblive.app/privkey.pem;
 }
 
 server {
 	listen 80;
-	server_name labs.climblive.app www.labs.climblive.app;
-	return 301 https://labs.climblive.app$request_uri;
+	server_name __SERVER_NAME__ www.__SERVER_NAME__;
+	return 301 https://__SERVER_NAME__$request_uri;
 }

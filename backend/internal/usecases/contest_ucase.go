@@ -26,9 +26,10 @@ type contestUseCaseRepository interface {
 }
 
 type ContestUseCase struct {
-	Authorizer  domain.Authorizer
-	Repo        contestUseCaseRepository
-	ScoreKeeper domain.ScoreKeeper
+	Authorizer         domain.Authorizer
+	Repo               contestUseCaseRepository
+	ScoreKeeper        domain.ScoreKeeper
+	ScoreEngineManager scoreEngineManager
 }
 
 var sanitizationPolicy = bluemonday.UGCPolicy()
@@ -96,8 +97,7 @@ func (uc *ContestUseCase) GetScoreboard(ctx context.Context, contestID domain.Co
 		entry := domain.ScoreboardEntry{
 			ContenderID:         contender.ID,
 			CompClassID:         contender.CompClassID,
-			PublicName:          contender.PublicName,
-			ClubName:            contender.ClubName,
+			Name:                contender.Name,
 			WithdrawnFromFinals: contender.WithdrawnFromFinals,
 			Disqualified:        contender.Disqualified,
 			Score:               contender.Score,
@@ -124,6 +124,32 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 	_, err = uc.Authorizer.HasOwnership(ctx, contest.Ownership)
 	if err != nil {
 		return mty, errors.Wrap(err, 0)
+	}
+
+	if patch.Archived.Present {
+		contest.Archived = patch.Archived.Value
+
+		if contest.Archived {
+			engines, err := uc.ScoreEngineManager.ListScoreEnginesByContest(ctx, contestID)
+			if err != nil {
+				return mty, errors.Wrap(err, 0)
+			}
+
+			for _, engine := range engines {
+				err = uc.ScoreEngineManager.StopScoreEngine(ctx, engine.InstanceID)
+				if err != nil {
+					return mty, errors.Wrap(err, 0)
+				}
+			}
+		}
+	}
+
+	patchAnythingOtherThanArchive := patch != (domain.ContestPatch{}) && patch != domain.ContestPatch{
+		Archived: patch.Archived,
+	}
+
+	if contest.Archived && patchAnythingOtherThanArchive {
+		return mty, errors.Wrap(domain.ErrArchived, 0)
 	}
 
 	if patch.Location.Present {
@@ -212,6 +238,10 @@ func (uc *ContestUseCase) DuplicateContest(ctx context.Context, contestID domain
 
 	if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
 		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	if contest.Archived {
+		return domain.Contest{}, errors.Wrap(domain.ErrArchived, 0)
 	}
 
 	compClasses, err := uc.Repo.GetCompClassesByContest(ctx, nil, contestID)

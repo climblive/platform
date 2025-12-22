@@ -9,7 +9,6 @@
     contestName: string;
     compClassName: string | undefined;
     contenderName: string | undefined;
-    contenderClub: string | undefined;
     score: number;
     placement: number | undefined;
     contestState: ContestState;
@@ -22,7 +21,6 @@
     contestName,
     compClassName,
     contenderName,
-    contenderClub,
     score,
     placement,
     contestState,
@@ -36,7 +34,7 @@
     size="small"
     onclick={() => navigate(`/${registrationCode}/edit`)}
     disabled={contestState === "ENDED"}
-    appearance="filled"
+    appearance="plain"
   >
     <wa-icon name="gear" label="Edit"></wa-icon>
   </wa-button>
@@ -44,7 +42,6 @@
   <p class="contender-name">
     {contenderName} <span class="contender-class">{compClassName}</span>
   </p>
-  <p class="contender-club">{contenderClub ?? "No club"}</p>
   <div class="lower">
     <div class="score">
       <span>
@@ -79,6 +76,10 @@
       top: var(--wa-space-m);
       right: var(--wa-space-s);
       color: inherit;
+
+      &::part(label) {
+        color: var(--wa-color-brand-on-normal);
+      }
     }
 
     & wa-button::part(base) {
@@ -86,8 +87,7 @@
     }
 
     & h1,
-    & .contender-name,
-    & .contender-club {
+    & .contender-name {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -100,14 +100,9 @@
       line-height: var(--wa-line-height-condensed);
     }
 
-    & .contender-name,
-    & .contender-club {
+    & .contender-name {
       margin: 0;
       line-height: var(--wa-line-height-condensed);
-    }
-
-    & .contender-club {
-      font-size: var(--wa-font-size-xs);
     }
 
     & .contender-class {

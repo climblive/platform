@@ -19,10 +19,10 @@
   const rafflesQuery = $derived(getRafflesQuery(contestId));
   const createRaffle = $derived(createRaffleMutation(contestId));
 
-  let raffles = $derived($rafflesQuery.data);
+  let raffles = $derived(rafflesQuery.data);
 
   const handleCreateRaffle = () => {
-    $createRaffle.mutate(undefined, {
+    createRaffle.mutate(undefined, {
       onSuccess: (raffle: Raffle) => navigate(`/admin/raffles/${raffle.id}`),
       onError: () => toastError("Failed to create raffle."),
     });

@@ -3,15 +3,18 @@
   "version": "0.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
   "keywords": [],
   "author": "",
   "devDependencies": {
-    "@playwright/test": "^1.54.2",
-    "@testcontainers/mariadb": "^11.5.1",
-    "@types/node": "^24.2.1",
+    "@playwright/test": "^1.56.1",
+    "@testcontainers/mariadb": "^11.8.1",
+    "@types/node": "^24.10.1",
     "fs": "0.0.1-security",
     "mariadb": "^3.4.5",
-    "testcontainers": "^11.5.1"
+    "testcontainers": "^11.8.1"
   }
 }

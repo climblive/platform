@@ -116,9 +116,7 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 		patch.Name = domain.NewPatch(fmt.Sprintf("%s %s (%d)", faker.FirstNameFemale(), faker.LastName(), r.contender.ID))
 	}
 
-	patch.PublicName = domain.NewPatch(patch.Name.Value)
 	patch.CompClassID = domain.NewPatch(selectedCompClass.ID)
-	patch.ClubName = domain.NewPatch(faker.ChineseName())
 
 	r.PatchContender(r.contender.ID, patch)
 
@@ -140,11 +138,13 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 			delete(r.ticks, problem.ID)
 		} else {
 			tick := domain.Tick{
-				ProblemID:    problem.ID,
-				AttemptsTop:  rand.Int() % 5,
-				Top:          true,
-				AttemptsZone: 1,
-				Zone:         true,
+				ProblemID:     problem.ID,
+				AttemptsTop:   rand.Int() % 5,
+				Top:           true,
+				AttemptsZone1: 1,
+				Zone1:         true,
+				AttemptsZone2: 1,
+				Zone2:         true,
 			}
 
 			tick = r.AddTick(r.contender.ID, tick)

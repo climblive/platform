@@ -3,6 +3,7 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { FullLogo } from "@climblive/lib/components";
   import { getContext, onMount } from "svelte";
+  import { navigate } from "svelte-routing";
   import type { Authenticator } from "./authenticator.svelte";
 
   let print = $state(false);
@@ -20,9 +21,17 @@
 {#if !print}
   <header>
     <div>
-      <div class="logo">
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <div class="logo" onclick={() => navigate("./")}>
         <FullLogo />
       </div>
+      <wa-button
+        onclick={() => navigate("./help")}
+        size="small"
+        variant="success"
+        appearance="filled-outlined"
+        ><wa-icon name="headset"></wa-icon></wa-button
+      >
       <wa-button
         size="small"
         appearance="outlined"
@@ -48,7 +57,7 @@
     justify-content: space-between;
     padding-inline-end: var(--wa-space-m);
     height: 3.5rem;
-    gap: var(--wa-space-xl);
+    gap: var(--wa-space-xs);
   }
 
   .logo {
@@ -58,6 +67,7 @@
     padding-left: var(--wa-space-xs);
     flex-shrink: 0;
     margin-inline-start: var(--wa-space-xs);
+    cursor: pointer;
   }
 
   @media print {

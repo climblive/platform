@@ -3,7 +3,7 @@ import { ApiClient } from "../Api";
 import type { User } from "../models";
 
 export const getSelfQuery = () =>
-  createQuery({
+  createQuery(() => ({
     queryKey: ["self"],
     queryFn: async () => ApiClient.getInstance().getSelf(),
   });

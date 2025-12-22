@@ -19,10 +19,10 @@
   const problemQuery = $derived(getProblemQuery(problemId));
   const patchProblem = $derived(patchProblemMutation(problemId));
 
-  const problem = $derived($problemQuery.data);
+  const problem = $derived(problemQuery.data);
 
   const handleSubmit = async (tmpl: ProblemPatch) => {
-    $patchProblem.mutate(tmpl, {
+    patchProblem.mutate(tmpl, {
       onSuccess: (problem: Problem) =>
         navigate(`/admin/contests/${problem.contestId}#problems`),
       onError: () => toastError("Failed to save problem."),
@@ -46,7 +46,7 @@
       <wa-button
         size="small"
         type="submit"
-        loading={$patchProblem.isPending}
+        loading={patchProblem.isPending}
         variant="neutral"
         >Save
       </wa-button>
@@ -58,5 +58,6 @@
   .controls {
     display: flex;
     gap: var(--wa-space-xs);
+    justify-content: right;
   }
 </style>
