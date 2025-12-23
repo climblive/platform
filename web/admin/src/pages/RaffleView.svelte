@@ -3,7 +3,11 @@
   import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
   import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import { Table, type ColumnDefinition } from "@climblive/lib/components";
+  import {
+    EmptyState,
+    Table,
+    type ColumnDefinition,
+  } from "@climblive/lib/components";
   import type { RaffleWinner } from "@climblive/lib/models";
   import {
     drawRaffleWinnerMutation,
@@ -77,6 +81,11 @@
   {format(timestamp, "yyyy-MM-dd HH:mm")}
 {/snippet}
 
+{#snippet drawButton()}
+  <wa-button variant="neutral" onclick={handleDrawWinner}>Draw winner</wa-button
+  >
+{/snippet}
+
 {#if contest && raffle}
   <wa-breadcrumb>
     <wa-breadcrumb-item
@@ -96,18 +105,24 @@
 
   <h1>Raffle {raffle.id}</h1>
   <section>
-    <wa-button variant="neutral" onclick={handleDrawWinner}
-      >Draw winner</wa-button
-    >
-
     {#if sortedRaffleWinners === undefined}
       <Loader />
     {:else if sortedRaffleWinners.length > 0}
+      {@render drawButton()}
       <Table
         {columns}
         data={sortedRaffleWinners}
         getId={({ contenderId }) => contenderId}
       ></Table>
+    {:else}
+      <EmptyState
+        title="No winners yet"
+        description="Draw the first winner of your prize raffle."
+      >
+        {#snippet actions()}
+          {@render drawButton()}
+        {/snippet}
+      </EmptyState>
     {/if}
   </section>
 {/if}

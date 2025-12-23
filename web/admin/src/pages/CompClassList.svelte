@@ -1,7 +1,11 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import { Table, type ColumnDefinition } from "@climblive/lib/components";
+  import {
+    EmptyState,
+    Table,
+    type ColumnDefinition,
+  } from "@climblive/lib/components";
   import type { CompClass } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
   import { format } from "date-fns";
@@ -92,6 +96,15 @@
   </div>
 {/snippet}
 
+{#snippet createButton()}
+  <wa-button
+    variant="neutral"
+    appearance="accent"
+    onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
+    >Create class</wa-button
+  >
+{/snippet}
+
 <p class="copy">
   Classes represent the categories in which the contenders compete, typically
   divided into Males and Females. The contest duration is defined by the start
@@ -99,17 +112,20 @@
 </p>
 
 <section>
-  <wa-button
-    variant="neutral"
-    appearance="accent"
-    onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
-    >Create class</wa-button
-  >
-
   {#if compClasses === undefined}
     <Loader />
   {:else if compClasses.length > 0}
+    {@render createButton()}
     <Table {columns} data={compClasses} getId={({ id }) => id}></Table>
+  {:else}
+    <EmptyState
+      title="No classes yet"
+      description="Create classes to define the categories in which contenders will compete."
+    >
+      {#snippet actions()}
+        {@render createButton()}
+      {/snippet}
+    </EmptyState>
   {/if}
 </section>
 

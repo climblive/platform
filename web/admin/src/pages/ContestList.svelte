@@ -4,7 +4,11 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import { Table, type ColumnDefinition } from "@climblive/lib/components";
+  import {
+    EmptyState,
+    Table,
+    type ColumnDefinition,
+  } from "@climblive/lib/components";
   import type { Contest } from "@climblive/lib/models";
   import {
     getAllContestsQuery,
@@ -122,12 +126,18 @@
   {/if}
 {/snippet}
 
+{#snippet createButton()}
+  <wa-button
+    variant="neutral"
+    onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
+    >Create new contest</wa-button
+  >
+{/snippet}
+
 <h2>Contests</h2>
-<wa-button
-  variant="neutral"
-  onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
-  >Create new contest</wa-button
->
+{#if contests && contests.length > 0}
+  {@render createButton()}
+{/if}
 
 {#snippet listing(heading: string, contests: Contest[])}
   <h3>{heading}</h3>
@@ -158,13 +168,20 @@
   {#if showArchived}
     {@render listing("Archived", archived)}
   {/if}
+
+  {#if contests && contests.length === 0}
+    <EmptyState
+      title="No contests yet"
+      description="Create a contest to get started with your first event."
+    >
+      {#snippet actions()}
+        {@render createButton()}
+      {/snippet}
+    </EmptyState>
+  {/if}
 {/if}
 
 <style>
-  wa-button {
-    margin-block-end: var(--wa-space-m);
-  }
-
   wa-switch {
     display: block;
     margin-block-start: var(--wa-space-m);
