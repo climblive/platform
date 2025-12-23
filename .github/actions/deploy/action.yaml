@@ -22,8 +22,8 @@ runs:
       run: |
         export SSH_AUTH_SOCK=${{ inputs.ssh-auth-sock }}
         scp -o StrictHostKeyChecking=accept-new ${{ inputs.package-file-name }} ${{ inputs.deploy-user }}@${{ inputs.deploy-host }}:
-        ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo apt-get install -y ~/${{ inputs.package-file-name }}"
-        ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} 'sudo sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=${{ inputs.database-password }}\"/g" /etc/systemd/system/climblive2.service.d/override.conf'
+        ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo apt-get install -y --allow-downgrades ~/${{ inputs.package-file-name }}"
+        ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} 'sudo sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=${{ inputs.database-password }}\"/g" /etc/systemd/system/climblive.service.d/override.conf'
         ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo systemctl daemon-reload"
-        ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo systemctl restart climblive2"
+        ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo systemctl restart climblive"
         ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo systemctl reload nginx"

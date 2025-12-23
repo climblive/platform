@@ -51,8 +51,6 @@
 </script>
 
 {#if self && self.organizers.length > 1}
-  <p>You can manage contests as multiple organizers.</p>
-
   <div class="controls">
     {#if self?.admin}
       <wa-switch bind:this={showAllToggle} onchange={toggleShowAll}

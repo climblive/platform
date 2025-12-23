@@ -41,12 +41,17 @@ func (d *Database) GetTicksByContest(ctx context.Context, tx domain.Transaction,
 
 func (d *Database) StoreTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error) {
 	params := database.InsertTickParams{
-		OrganizerID: int32(tick.Ownership.OrganizerID),
-		ContestID:   int32(tick.ContestID),
-		ContenderID: int32(*tick.Ownership.ContenderID),
-		ProblemID:   int32(tick.ProblemID),
-		Flash:       tick.Top && tick.AttemptsTop == 1,
-		Timestamp:   tick.Timestamp,
+		OrganizerID:   int32(tick.Ownership.OrganizerID),
+		ContestID:     int32(tick.ContestID),
+		ContenderID:   int32(*tick.Ownership.ContenderID),
+		ProblemID:     int32(tick.ProblemID),
+		Timestamp:     tick.Timestamp,
+		Top:           tick.Top,
+		AttemptsTop:   int32(tick.AttemptsTop),
+		Zone1:         tick.Zone1,
+		AttemptsZone1: int32(tick.AttemptsZone1),
+		Zone2:         tick.Zone2,
+		AttemptsZone2: int32(tick.AttemptsZone2),
 	}
 
 	insertID, err := d.WithTx(tx).InsertTick(ctx, params)

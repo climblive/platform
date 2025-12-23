@@ -28,7 +28,7 @@
   );
 </script>
 
-<wa-callout variant="warning">
+<wa-callout variant="warning" size="small">
   <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
   <strong>Score engines are managed automatically</strong><br />
   Score engines are started automatically, and manual intervention is typically only
