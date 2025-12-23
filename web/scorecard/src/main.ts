@@ -35,13 +35,6 @@ if (location.pathname.startsWith("/failsafe")) {
 
   const ignoreCompat = sessionStorage.getItem("compat") === "ignore";
 
-  if (!compatible && !ignoreCompat) {
-    console.warn(
-      "Incompatible browser detected. Missing features:",
-      missingFeatures,
-    );
-  }
-
   if (missingFeatures.includes("ElementInternals")) {
     await import("element-internals-polyfill");
   }
