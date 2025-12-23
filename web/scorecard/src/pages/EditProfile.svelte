@@ -48,7 +48,6 @@
     submit={handleSubmit}
     data={{
       name: contender.name,
-      clubName: contender.clubName,
       compClassId: contender.compClassId,
       withdrawnFromFinals: contender.withdrawnFromFinals,
     }}
@@ -78,6 +77,6 @@
   .controls {
     display: flex;
     justify-content: end;
-    gap: var(--wa-space-s);
+    gap: var(--wa-space-xs);
   }
 </style>

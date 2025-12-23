@@ -127,6 +127,7 @@ func (d *Database) StoreContest(ctx context.Context, tx domain.Transaction, cont
 	params := database.UpsertContestParams{
 		ID:                 int32(contest.ID),
 		OrganizerID:        int32(contest.Ownership.OrganizerID),
+		Archived:           contest.Archived,
 		SeriesID:           makeNullInt32(int32(contest.SeriesID)),
 		Name:               contest.Name,
 		Description:        makeNullString(contest.Description),

@@ -8,6 +8,7 @@ sudo mariadb -e "GRANT ALL PRIVILEGES ON climblive.* TO climblive@localhost;"
 
 go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 go install github.com/gzuidhof/tygo@latest
+go install github.com/pressly/goose/v3/cmd/goose@latest
 
 if [[ -n "${CODESPACE_NAME}" ]]; then
     API_URL="https://${CODESPACE_NAME}-8090.app.github.dev"

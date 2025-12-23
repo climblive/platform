@@ -60,7 +60,6 @@ export interface Contender {
   compClassId?: CompClassID;
   registrationCode: string;
   name?: string;
-  clubName?: string;
   entered?: Date;
   withdrawnFromFinals: boolean;
   disqualified: boolean;
@@ -69,13 +68,13 @@ export interface Contender {
 export interface ContenderPatch {
   compClassId?: CompClassID;
   name?: string;
-  clubName?: string;
   withdrawnFromFinals?: boolean;
   disqualified?: boolean;
 }
 export interface Contest {
   id: ContestID;
   ownership: OwnershipData;
+  archived: boolean;
   location?: string;
   seriesId?: SeriesID;
   name: string;
@@ -98,6 +97,7 @@ export interface ContestTemplate {
   gracePeriod: number;
 }
 export interface ContestPatch {
+  archived?: boolean;
   location?: string;
   seriesId?: number;
   name?: string;
@@ -118,8 +118,11 @@ export interface Problem {
   holdColorPrimary: string;
   holdColorSecondary?: string;
   description?: string;
+  zone1Enabled: boolean;
+  zone2Enabled: boolean;
+  pointsZone1?: number /* int */;
+  pointsZone2?: number /* int */;
   pointsTop: number /* int */;
-  pointsZone: number /* int */;
   flashBonus?: number /* int */;
 }
 export interface ProblemTemplate {
@@ -127,8 +130,11 @@ export interface ProblemTemplate {
   holdColorPrimary: string;
   holdColorSecondary?: string;
   description?: string;
+  zone1Enabled: boolean;
+  zone2Enabled: boolean;
+  pointsZone1?: number /* int */;
+  pointsZone2?: number /* int */;
   pointsTop: number /* int */;
-  pointsZone: number /* int */;
   flashBonus?: number /* int */;
 }
 export interface ProblemPatch {
@@ -136,8 +142,11 @@ export interface ProblemPatch {
   holdColorPrimary?: string;
   holdColorSecondary?: string;
   description?: string;
+  zone1Enabled?: boolean;
+  zone2Enabled?: boolean;
+  pointsZone1?: number;
+  pointsZone2?: number;
   pointsTop?: number;
-  pointsZone?: number;
   flashBonus?: number;
 }
 export interface Raffle {
@@ -167,7 +176,6 @@ export interface ScoreboardEntry {
   contenderId: ContenderID;
   compClassId: CompClassID;
   name: string;
-  clubName?: string;
   withdrawnFromFinals: boolean;
   disqualified: boolean;
   score?: Score;
@@ -176,10 +184,12 @@ export interface Tick {
   id: TickID;
   timestamp: Date;
   problemId: ProblemID;
+  zone1: boolean;
+  attemptsZone1: number /* int */;
+  zone2: boolean;
+  attemptsZone2: number /* int */;
   top: boolean;
   attemptsTop: number /* int */;
-  zone: boolean;
-  attemptsZone: number /* int */;
 }
 export interface User {
   id: UserID;
@@ -212,10 +222,12 @@ export interface AscentRegisteredEvent {
   timestamp: Date;
   contenderId: ContenderID;
   problemId: ProblemID;
+  zone1: boolean;
+  attemptsZone1: number /* int */;
+  zone2: boolean;
+  attemptsZone2: number /* int */;
   top: boolean;
   attemptsTop: number /* int */;
-  zone: boolean;
-  attemptsZone: number /* int */;
 }
 export interface AscentDeregisteredEvent {
   tickId: TickID;
@@ -224,14 +236,16 @@ export interface AscentDeregisteredEvent {
 }
 export interface ProblemAddedEvent {
   problemId: ProblemID;
+  pointsZone1: number /* int */;
+  pointsZone2: number /* int */;
   pointsTop: number /* int */;
-  pointsZone: number /* int */;
   flashBonus: number /* int */;
 }
 export interface ProblemUpdatedEvent {
   problemId: ProblemID;
+  pointsZone1: number /* int */;
+  pointsZone2: number /* int */;
   pointsTop: number /* int */;
-  pointsZone: number /* int */;
   flashBonus: number /* int */;
 }
 export interface ProblemDeletedEvent {
@@ -241,7 +255,6 @@ export interface ContenderPublicInfoUpdatedEvent {
   contenderId: ContenderID;
   compClassId: CompClassID;
   name: string;
-  clubName?: string;
   withdrawnFromFinals: boolean;
   disqualified: boolean;
 }

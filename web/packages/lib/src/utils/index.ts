@@ -3,6 +3,7 @@ export * from "./compat";
 export * from "./config";
 export * from "./darkmode";
 export * from "./errors";
+export * from "./guards";
 export * from "./scores";
 export * from "./text";
 export * from "./uuid";

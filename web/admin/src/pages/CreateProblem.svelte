@@ -34,7 +34,7 @@
 
   const handleSubmit = async (tmpl: Omit<ProblemTemplate, "pointsZone">) => {
     createProblem.mutate(
-      { ...tmpl, pointsZone: 0 },
+      { ...tmpl },
       {
         onSuccess: () => navigate(`/admin/contests/${contestId}#problems`),
         onError: () => toastError("Failed to create problem."),
@@ -79,5 +79,6 @@
   .controls {
     display: flex;
     gap: var(--wa-space-xs);
+    justify-content: end;
   }
 </style>

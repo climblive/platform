@@ -11,9 +11,9 @@
     highestProblemNumber: number;
   }
 
-  let { problem, tick, disabled, highestProblemNumber }: Props = $props();
+  const { problem, tick, disabled, highestProblemNumber }: Props = $props();
 
-  let pointValue = $derived(calculateProblemScore(problem, tick));
+  const pointValue = $derived(calculateProblemScore(problem, tick));
 </script>
 
 <section
@@ -51,8 +51,8 @@
     border-radius: var(--wa-border-radius-m);
     border: var(--wa-border-width-s) var(--wa-border-style)
       var(--wa-color-surface-border);
-    padding-left: var(--wa-space-s);
-    padding-right: var(--wa-space-2xs);
+    padding-inline-start: var(--wa-space-s);
+    padding-inline-end: var(--wa-space-xs);
 
     display: grid;
     grid-template-columns: var(--number-length) 1rem 1fr 1fr 2.5rem;

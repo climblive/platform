@@ -224,22 +224,25 @@ func TestEngineDriver(t *testing.T) {
 			ContenderID: 1,
 		})
 		events = append(events, domain.AscentRegisteredEvent{
-			ContenderID:  1,
-			ProblemID:    1,
-			Top:          true,
-			AttemptsTop:  999,
-			Zone:         true,
-			AttemptsZone: 42,
+			ContenderID:   1,
+			ProblemID:     1,
+			Top:           true,
+			AttemptsTop:   999,
+			Zone1:         true,
+			AttemptsZone1: 7,
+			Zone2:         true,
+			AttemptsZone2: 42,
 		})
 		events = append(events, domain.AscentDeregisteredEvent{
 			ContenderID: 1,
 			ProblemID:   1,
 		})
 		events = append(events, domain.ProblemAddedEvent{
-			ProblemID:  1,
-			PointsTop:  1000,
-			PointsZone: 500,
-			FlashBonus: 100,
+			ProblemID:   1,
+			PointsTop:   1000,
+			PointsZone1: 500,
+			PointsZone2: 750,
+			FlashBonus:  100,
 		})
 
 		for _, event := range events {
@@ -277,22 +280,25 @@ func TestEngineDriver(t *testing.T) {
 			ContenderID: 1,
 		}).Return()
 		mockedEngine.On("HandleAscentRegistered", domain.AscentRegisteredEvent{
-			ContenderID:  1,
-			ProblemID:    1,
-			Top:          true,
-			AttemptsTop:  999,
-			Zone:         true,
-			AttemptsZone: 42,
+			ContenderID:   1,
+			ProblemID:     1,
+			Top:           true,
+			AttemptsTop:   999,
+			Zone1:         true,
+			AttemptsZone1: 7,
+			Zone2:         true,
+			AttemptsZone2: 42,
 		}).Return()
 		mockedEngine.On("HandleAscentDeregistered", domain.AscentDeregisteredEvent{
 			ContenderID: 1,
 			ProblemID:   1,
 		}).Return()
 		mockedEngine.On("HandleProblemAdded", domain.ProblemAddedEvent{
-			ProblemID:  1,
-			PointsTop:  1000,
-			PointsZone: 500,
-			FlashBonus: 100,
+			ProblemID:   1,
+			PointsTop:   1000,
+			PointsZone1: 500,
+			PointsZone2: 750,
+			FlashBonus:  100,
 		}).Run(func(mock.Arguments) { cancel() }).Return()
 
 		installEngine(mockedEngine)

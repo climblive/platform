@@ -10,6 +10,7 @@
     getProblemsQuery,
     getTicksByContestQuery,
   } from "@climblive/lib/queries";
+  import { isDefined } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
   import DeleteProblem from "./DeleteProblem.svelte";
 
@@ -79,7 +80,7 @@
     },
     {
       label: "Flash",
-      mobile: true,
+      mobile: false,
       render: renderFlashBonus,
       width: "max-content",
     },
@@ -115,13 +116,25 @@
   </div>
 {/snippet}
 
-{#snippet renderPoints({ pointsTop }: ProblemWithAscents)}
-  {pointsTop} pts
+{#snippet renderPoints(
+  { pointsZone1, pointsZone2, pointsTop, flashBonus }: ProblemWithAscents,
+  mobile: boolean,
+)}
+  {@const values = [pointsZone1, pointsZone2, pointsTop].filter(isDefined)}
+
+  {#if mobile}
+    {@const min = Math.min(...values)}
+    {@const max = Math.max(...values)}
+
+    {[min, max + (flashBonus ?? 0)].join(" - ")} pts
+  {:else}
+    {values.join(" / ")} pts
+  {/if}
 {/snippet}
 
 {#snippet renderFlashBonus({ flashBonus }: ProblemWithAscents)}
   {#if flashBonus}
-    {flashBonus} pts
+    +{flashBonus} pts
   {:else}
     -
   {/if}

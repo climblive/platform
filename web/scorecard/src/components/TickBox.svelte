@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ScorecardSession } from "@/types";
-  import type WaPopup from "@awesome.me/webawesome/dist/components/popup/popup.js";
+  import WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+  import { HoldColorIndicator } from "@climblive/lib/components";
   import type { Problem, Tick } from "@climblive/lib/models";
   import {
     createTickMutation,
@@ -10,6 +11,7 @@
   import { AxiosError } from "axios";
   import { getContext } from "svelte";
   import type { Readable } from "svelte/store";
+  import TickButton from "./TickButton.svelte";
 
   interface Props {
     problem: Problem;
@@ -19,8 +21,7 @@
 
   let { problem, tick, disabled = false }: Props = $props();
 
-  let container: HTMLDivElement | undefined = $state();
-  let popup: WaPopup | undefined = $state();
+  let dialog: WaDialog | undefined = $state();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
   const createTick = $derived(createTickMutation($session.contenderId));
@@ -28,20 +29,19 @@
 
   let open = $state(false);
 
-  let loading = $derived(createTick.isPending || deleteTick.isPending);
-  let variant = $derived(
-    tick ? (tick.attemptsTop === 1 ? "flashed" : "ticked") : undefined,
-  );
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (
-      popup &&
-      event.target instanceof Node &&
-      !popup.contains(event.target)
-    ) {
-      open = false;
+  const loading = $derived(createTick.isPending || deleteTick.isPending);
+  const variant = $derived.by(() => {
+    switch (true) {
+      case tick?.top && tick.attemptsTop === 1:
+        return "flash";
+      case tick?.top:
+        return "top";
+      case tick?.zone2:
+        return "zone2";
+      case tick?.zone1:
+        return "zone1";
     }
-  };
+  });
 
   const handleCheck = () => {
     if (tick?.id) {
@@ -59,37 +59,50 @@
     }
   };
 
-  const handleTick = (event: MouseEvent, flash: boolean) => {
+  const handleTick = (
+    event: MouseEvent,
+    feature: "zone1" | "zone2" | "top",
+    flash: boolean,
+  ) => {
     event.stopPropagation();
 
     navigator.vibrate?.(50);
     open = false;
 
-    createTick.mutate(
-      {
-        problemId: problem.id,
-        top: true,
-        attemptsTop: flash ? 1 : 999,
-        zone: true,
-        attemptsZone: flash ? 1 : 999,
-      },
-      {
-        onError: (error) => {
-          if (error instanceof AxiosError && error.status === 409) {
-            toastError("Ascent is already registered.");
-          } else {
-            toastError("Failed to register ascent.");
-          }
-        },
-      },
-    );
-  };
+    const tick: Omit<Tick, "id" | "timestamp"> = {
+      problemId: problem.id,
+      top: false,
+      zone2: false,
+      zone1: false,
+      attemptsTop: flash ? 1 : 999,
+      attemptsZone2: flash ? 1 : 999,
+      attemptsZone1: flash ? 1 : 999,
+    };
 
-  $effect(() => {
-    if (popup && container) {
-      popup.anchor = container;
+    switch (feature) {
+      case "top":
+        tick.top = true;
+        tick.zone2 = true;
+        tick.zone1 = true;
+        break;
+      case "zone2":
+        tick.zone2 = true;
+        tick.zone1 = true;
+        break;
+      case "zone1":
+        tick.zone1 = true;
     }
-  });
+
+    createTick.mutate(tick, {
+      onError: (error) => {
+        if (error instanceof AxiosError && error.status === 409) {
+          toastError("Ascent is already registered.");
+        } else {
+          toastError("Failed to register ascent.");
+        }
+      },
+    });
+  };
 
   $effect(() => {
     if (tick !== undefined) {
@@ -98,68 +111,147 @@
   });
 </script>
 
-<svelte:body on:click|capture={handleClickOutside} />
-
-<div data-variant={variant} bind:this={container}>
+<div class="container">
   <button
+    data-variant={variant}
     disabled={disabled || loading}
     onclick={handleCheck}
     aria-label={tick?.id ? "Untick" : "Tick"}
   >
     {#if loading}
       <wa-spinner></wa-spinner>
-    {:else if variant === "flashed"}
-      <wa-icon name="bolt"></wa-icon>
-    {:else if variant === "ticked"}
-      <wa-icon name="check"></wa-icon>
+    {:else if variant === "flash"}
+      <pre>F</pre>
+    {:else if variant === "top"}
+      <pre>T</pre>
+    {:else if variant === "zone2"}
+      <pre>Z2</pre>
+    {:else if variant === "zone1"}
+      <pre>Z1</pre>
     {/if}
   </button>
 
-  <wa-popup
-    bind:this={popup}
-    placement="left"
-    active={open}
-    arrow
-    strategy="fixed"
-    distance="10"
+  <wa-dialog
+    label="Problem number {problem.number}"
+    bind:this={dialog}
+    {open}
+    light-dismiss
+    onwa-hide={() => (open = false)}
   >
-    <wa-button size="small" onclick={(e: MouseEvent) => handleTick(e, false)}>
-      <wa-icon slot="start" name="check"></wa-icon>
-      Top
-    </wa-button>
-    <wa-button size="small" onclick={(e: MouseEvent) => handleTick(e, true)}>
-      <wa-icon slot="start" name="bolt"></wa-icon>
-      Flash
-    </wa-button>
-  </wa-popup>
+    <div class="label" slot="label">
+      <HoldColorIndicator
+        --height="1.25em"
+        --width="1.25em"
+        primary={problem.holdColorPrimary}
+        secondary={problem.holdColorSecondary}
+      /> Problem № {problem.number}
+    </div>
+
+    <div class="horizontal">
+      <TickButton
+        iconName="check"
+        label="Top"
+        onClick={(e: MouseEvent) => handleTick(e, "top", false)}
+        points={problem.pointsTop}
+      />
+
+      <TickButton
+        iconName="bolt"
+        label="Flash"
+        onClick={(e: MouseEvent) => handleTick(e, "top", true)}
+        points={problem.pointsTop + (problem.flashBonus ?? 0)}
+      />
+    </div>
+
+    {#if problem.zone2Enabled}
+      <TickButton
+        iconName="check"
+        label="Zone 2"
+        onClick={(e: MouseEvent) => handleTick(e, "zone2", false)}
+        points={problem.pointsZone2}
+      />
+    {/if}
+
+    {#if problem.zone1Enabled}
+      <TickButton
+        iconName="check"
+        label="Zone 1"
+        onClick={(e: MouseEvent) => handleTick(e, "zone1", false)}
+        points={problem.pointsZone1}
+      />
+    {/if}
+  </wa-dialog>
 </div>
 
 <style>
-  div {
-    position: relative;
+  .container {
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: calc(100% - 2 * var(--wa-space-2xs));
-    aspect-ratio: 1 / 1;
-    border-radius: var(--wa-border-radius-s);
   }
 
   button {
-    box-sizing: content-box;
-    border: none;
-    background: none;
-    padding: 0;
-    width: 1.5rem;
-    height: 1.5rem;
-    cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-color: var(--wa-color-neutral-border-loud);
-    border-width: var(--wa-border-width-s);
-    border-style: var(--wa-border-style);
-    border-radius: var(--wa-border-radius-s);
+    height: calc(100% - 2 * var(--wa-space-xs));
+    aspect-ratio: 1 / 1;
+    border: var(--wa-border-style) var(--wa-border-width-s)
+      var(--wa-color-neutral-border-loud);
+    border-radius: var(--wa-border-radius-l);
+    background: none;
+    cursor: pointer;
+    width: max-content;
+    font-size: var(--wa-font-size-s);
+    font-weight: var(--wa-font-weight-bold);
+
+    &[data-variant] {
+      background-color: var(--wa-color-gray-95);
+
+      & wa-spinner {
+        --track-color: var(--wa-color-gray-50);
+        --indicator-color: var(--wa-color-gray-90);
+      }
+
+      border-color: var(--wa-color-gray-50);
+      color: var(--wa-color-gray-50);
+    }
+
+    &[data-variant="top"] {
+      background-color: var(--wa-color-green-95);
+
+      & wa-spinner {
+        --track-color: var(--wa-color-green-50);
+        --indicator-color: var(--wa-color-green-90);
+      }
+
+      border-color: var(--wa-color-green-50);
+      color: var(--wa-color-green-50);
+    }
+
+    &[data-variant="flash"] {
+      background-color: var(--wa-color-yellow-95);
+
+      & wa-spinner {
+        --track-color: var(--wa-color-yellow-50);
+        --indicator-color: var(--wa-color-yellow-90);
+      }
+
+      border-color: var(--wa-color-yellow-50);
+      color: var(--wa-color-yellow-50);
+    }
+
+    & pre {
+      margin: 0;
+    }
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-s);
   }
 
   button:disabled {
@@ -167,66 +259,16 @@
     border: 0;
   }
 
-  div[data-variant="ticked"] {
-    background-color: var(--wa-color-green-95);
-
-    & wa-spinner {
-      --track-color: var(--wa-color-green-50);
-      --indicator-color: var(--wa-color-green-90);
-    }
-
-    & > button {
-      border-color: var(--wa-color-green-50);
-      color: var(--wa-color-green-50);
-    }
-  }
-
-  div[data-variant="flashed"] {
-    background-color: var(--wa-color-yellow-95);
-
-    & wa-spinner {
-      --track-color: var(--wa-color-yellow-50);
-      --indicator-color: var(--wa-color-yellow-90);
-    }
-
-    & > button {
-      border-color: var(--wa-color-yellow-50);
-      color: var(--wa-color-yellow-50);
-    }
-  }
-
-  wa-popup {
-    --arrow-color: var(--wa-color-brand-fill-loud);
-
-    & wa-button::part(base) {
-      width: 2.5rem;
-      height: 2.5rem;
+  wa-dialog {
+    &::part(body) {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      padding: 0;
+      gap: var(--wa-space-l);
     }
 
-    & wa-button > wa-icon {
-      margin: 0;
+    & .horizontal {
+      display: flex;
+      gap: var(--wa-space-s);
     }
-
-    & wa-button::part(label) {
-      font-size: var(--wa-font-size-2xs);
-      line-height: var(--wa-line-height-condensed);
-    }
-  }
-
-  wa-popup::part(popup) {
-    background-color: var(--wa-color-brand-fill-loud);
-    box-shadow: var(--wa-shadow-l);
-    border-radius: var(--wa-border-radius-m);
-    padding: var(--wa-space-s);
-    cursor: default;
-  }
-
-  wa-popup[active]::part(popup) {
-    display: flex;
-    gap: var(--wa-space-2xs);
   }
 </style>

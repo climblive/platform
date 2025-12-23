@@ -11,7 +11,6 @@ export const contenderPublicInfoUpdatedEventSchema: z.ZodType<ContenderPublicInf
     contenderId: z.number(),
     compClassId: z.number(),
     name: z.string(),
-    clubName: z.string().optional(),
     withdrawnFromFinals: z.boolean(),
     disqualified: z.boolean(),
   });
@@ -32,10 +31,12 @@ export const ascentRegisteredEventSchema: z.ZodType<AscentRegisteredEvent> =
     timestamp: z.coerce.date(),
     contenderId: z.number(),
     problemId: z.number(),
+    zone1: z.boolean(),
+    attemptsZone1: z.number(),
+    zone2: z.boolean(),
+    attemptsZone2: z.number(),
     top: z.boolean(),
     attemptsTop: z.number(),
-    zone: z.boolean(),
-    attemptsZone: z.number(),
   });
 
 export const ascentDeregisteredEventSchema: z.ZodType<AscentDeregisteredEvent> =

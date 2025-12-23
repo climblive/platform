@@ -159,7 +159,6 @@
 
         contender.compClassId = event.compClassId;
         contender.name = event.name;
-        contender.clubName = event.clubName;
         contender.withdrawnFromFinals = event.withdrawnFromFinals;
         contender.disqualified = event.disqualified;
 
