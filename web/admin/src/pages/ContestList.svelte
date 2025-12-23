@@ -184,10 +184,6 @@
 {/if}
 
 <style>
-  wa-button {
-    margin-block-end: var(--wa-space-m);
-  }
-
   wa-switch {
     display: block;
     margin-block-start: var(--wa-space-m);
