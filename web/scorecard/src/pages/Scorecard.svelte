@@ -235,10 +235,7 @@
               onchange={() => {
                 if (radioGroup) {
                   const newValue = radioGroup.value as typeof orderProblemsBy;
-                  if (newValue === orderProblemsBy) {
-                    // Toggle direction if clicking the same button
-                    sortDirection = sortDirection === "asc" ? "desc" : "asc";
-                  } else {
+                  if (newValue !== orderProblemsBy) {
                     // Reset to ascending for new sort type
                     sortDirection = "asc";
                     orderProblemsBy = newValue;
@@ -246,7 +243,16 @@
                 }
               }}
             >
-              <wa-radio value="number" appearance="button">
+              <wa-radio 
+                value="number" 
+                appearance="button"
+                onclick={() => {
+                  if (orderProblemsBy === "number") {
+                    // Toggle direction if clicking the same button
+                    sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                  }
+                }}
+              >
                 <wa-icon 
                   name={orderProblemsBy === "number" && sortDirection === "desc" ? "arrow-up-9-1" : "arrow-down-1-9"} 
                   label={orderProblemsBy === "number" && sortDirection === "desc" ? "Sort by number descending" : "Sort by number ascending"}
@@ -254,7 +260,16 @@
                 Sort by number
               </wa-radio>
 
-              <wa-radio value="points" appearance="button">
+              <wa-radio 
+                value="points" 
+                appearance="button"
+                onclick={() => {
+                  if (orderProblemsBy === "points") {
+                    // Toggle direction if clicking the same button
+                    sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                  }
+                }}
+              >
                 <wa-icon 
                   name={orderProblemsBy === "points" && sortDirection === "desc" ? "arrow-down-wide-short" : "arrow-up-short-wide"} 
                   label={orderProblemsBy === "points" && sortDirection === "desc" ? "Sort by points descending" : "Sort by points ascending"}
