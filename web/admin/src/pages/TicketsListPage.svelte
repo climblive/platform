@@ -49,7 +49,7 @@
       label: "Registration code",
       mobile: true,
       render: renderRegistrationCode,
-      width: "1fr"
+      width: "1fr",
     },
     {
       label: "Name",
