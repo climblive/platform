@@ -77,6 +77,7 @@
   );
 
   let orderProblemsBy = $state<"number" | "points">("number");
+  let sortDirection = $state<"asc" | "desc">("asc");
 
   let sortedProblems = $derived.by<Problem[]>(() => {
     const clonedProblems = [...(problems ?? [])];
@@ -100,8 +101,36 @@
         break;
     }
 
+    if (sortDirection === "desc") {
+      clonedProblems.reverse();
+    }
+
     return clonedProblems;
   });
+
+  let numberSortIcon = $derived(
+    orderProblemsBy === "number" && sortDirection === "desc"
+      ? "arrow-up-9-1"
+      : "arrow-down-1-9",
+  );
+
+  let numberSortLabel = $derived(
+    orderProblemsBy === "number" && sortDirection === "desc"
+      ? "Sort by number descending"
+      : "Sort by number ascending",
+  );
+
+  let pointsSortIcon = $derived(
+    orderProblemsBy === "points" && sortDirection === "desc"
+      ? "arrow-down-wide-short"
+      : "arrow-up-short-wide",
+  );
+
+  let pointsSortLabel = $derived(
+    orderProblemsBy === "points" && sortDirection === "desc"
+      ? "Sort by points descending"
+      : "Sort by points ascending",
+  );
 
   let highestProblemNumber = $derived(
     problems?.reduce((max, cur) => {
@@ -229,17 +258,38 @@
               value={orderProblemsBy}
               onchange={() => {
                 if (radioGroup) {
-                  orderProblemsBy = radioGroup.value as typeof orderProblemsBy;
+                  const newValue = radioGroup.value as typeof orderProblemsBy;
+                  if (newValue !== orderProblemsBy) {
+                    sortDirection = "asc";
+                    orderProblemsBy = newValue;
+                  }
                 }
               }}
             >
-              <wa-radio value="number" appearance="button">
-                <wa-icon name="arrow-down-1-9" label="Sort by number"></wa-icon>
+              <wa-radio
+                value="number"
+                appearance="button"
+                onclick={() => {
+                  if (orderProblemsBy === "number") {
+                    sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                  }
+                }}
+              >
+                <wa-icon name={numberSortIcon} label={numberSortLabel}
+                ></wa-icon>
                 Sort by number
               </wa-radio>
 
-              <wa-radio value="points" appearance="button">
-                <wa-icon name="arrow-up-short-wide" label="Sort by points"
+              <wa-radio
+                value="points"
+                appearance="button"
+                onclick={() => {
+                  if (orderProblemsBy === "points") {
+                    sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                  }
+                }}
+              >
+                <wa-icon name={pointsSortIcon} label={pointsSortLabel}
                 ></wa-icon>
                 Sort by points
               </wa-radio>
