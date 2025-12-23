@@ -100,13 +100,12 @@
 
   <h1>Raffle {raffle.id}</h1>
   <section>
-    <wa-button variant="neutral" onclick={handleDrawWinner}
-      >Draw winner</wa-button
-    >
-
     {#if sortedRaffleWinners === undefined}
       <Loader />
     {:else if sortedRaffleWinners.length > 0}
+      <wa-button variant="neutral" onclick={handleDrawWinner}
+        >Draw winner</wa-button
+      >
       <Table
         {columns}
         data={sortedRaffleWinners}

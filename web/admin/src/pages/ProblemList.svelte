@@ -175,16 +175,15 @@
 </p>
 
 <section>
-  <wa-button
-    variant="neutral"
-    appearance="accent"
-    onclick={() => navigate(`contests/${contestId}/new-problem`)}
-    >Create problem</wa-button
-  >
-
   {#if sortedProblemsWithAscents === undefined}
     <Loader />
   {:else if sortedProblemsWithAscents.length > 0}
+    <wa-button
+      variant="neutral"
+      appearance="accent"
+      onclick={() => navigate(`contests/${contestId}/new-problem`)}
+      >Create problem</wa-button
+    >
     <Table
       {columns}
       data={tableLimit

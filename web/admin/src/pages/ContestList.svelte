@@ -127,11 +127,6 @@
 {/snippet}
 
 <h2>Contests</h2>
-<wa-button
-  variant="neutral"
-  onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
-  >Create new contest</wa-button
->
 
 {#snippet listing(heading: string, contests: Contest[])}
   <h3>{heading}</h3>
@@ -140,12 +135,11 @@
   {:else}
     <EmptyState
       title="No contests yet"
-      description="Create your first contest to get started with organizing climbing competitions."
+      description="Create your first contest to get started with your first event."
     >
       {#snippet actions()}
         <wa-button
           variant="neutral"
-          appearance="accent"
           onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
           >Create new contest</wa-button
         >

@@ -103,16 +103,15 @@
 </p>
 
 <section>
-  <wa-button
-    variant="neutral"
-    appearance="accent"
-    onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
-    >Create class</wa-button
-  >
-
   {#if compClasses === undefined}
     <Loader />
   {:else if compClasses.length > 0}
+    <wa-button
+      variant="neutral"
+      appearance="accent"
+      onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
+      >Create class</wa-button
+    >
     <Table {columns} data={compClasses} getId={({ id }) => id}></Table>
   {:else}
     <EmptyState

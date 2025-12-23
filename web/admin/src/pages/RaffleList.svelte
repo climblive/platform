@@ -46,13 +46,12 @@
 {/snippet}
 
 <section>
-  <wa-button variant="neutral" appearance="accent" onclick={handleCreateRaffle}
-    >Start new raffle</wa-button
-  >
-
   {#if raffles === undefined}
     <Loader />
   {:else if raffles.length > 0}
+    <wa-button variant="neutral" appearance="accent" onclick={handleCreateRaffle}
+      >Start new raffle</wa-button
+    >
     <Table {columns} data={raffles} getId={({ id }) => id}></Table>
   {:else}
     <EmptyState
