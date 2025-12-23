@@ -135,7 +135,9 @@
 {/snippet}
 
 <h2>Contests</h2>
-{@render createButton()}
+{#if contests && contests.length > 0}
+  {@render createButton()}
+{/if}
 
 {#snippet listing(heading: string, contests: Contest[])}
   <h3>{heading}</h3>
@@ -169,7 +171,7 @@
     {@render listing("Archived", archived)}
   {/if}
 
-  {#if !ongoing?.length && !upcoming?.length && !past?.length && !archived?.length}
+  {#if contests && contests.length === 0}
     <EmptyState
       title="No contests yet"
       description="Create your first contest to get started with your first event."

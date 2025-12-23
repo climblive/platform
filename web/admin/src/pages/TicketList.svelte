@@ -5,7 +5,6 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import type WaInput from "@awesome.me/webawesome/dist/components/input/input.js";
-  import { EmptyState } from "@climblive/lib/components";
   import { value } from "@climblive/lib/forms";
   import type { CreateContendersArguments } from "@climblive/lib/models";
   import {
@@ -13,7 +12,6 @@
     getContendersByContestQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import { Link } from "svelte-routing";
 
   const maxTickets = 500;
 
@@ -138,15 +136,7 @@
     <wa-icon slot="start" name="plus"></wa-icon>
     Create tickets</wa-button
   >
-  {#if contenders && contenders.length > 0}
-    <Link to={`/admin/contests/${contestId}/tickets`}>
-      <wa-button appearance="outlined" size="small"
-        >View all tickets
-        <wa-icon name="list" slot="start"></wa-icon>
-      </wa-button>
-    </Link>
-  {/if}
-  <a href={`/admin/contests/${contestId}/tickets/print`} target="_blank">
+  <a href={`/admin/contests/${contestId}/tickets?print`} target="_blank">
     <wa-button
       appearance="outlined"
       size="small"
@@ -164,25 +154,6 @@
     </wa-button>
   </a>
 </div>
-
-{#if contenders && contenders.length === 0}
-  <EmptyState
-    title="No tickets yet"
-    description="Create tickets with unique registration codes to grant contenders access to your contest."
-  >
-    {#snippet actions()}
-      <wa-button
-        variant="neutral"
-        appearance="accent"
-        onclick={handleOpenCreateDialog}
-        disabled={remainingCodes === undefined || remainingCodes === 0}
-      >
-        <wa-icon slot="start" name="plus"></wa-icon>
-        Create tickets</wa-button
-      >
-    {/snippet}
-  </EmptyState>
-{/if}
 
 <p>
   {#if remainingCodes === maxTickets}
