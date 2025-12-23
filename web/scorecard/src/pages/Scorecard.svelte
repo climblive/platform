@@ -261,7 +261,6 @@
                 if (radioGroup) {
                   const newValue = radioGroup.value as typeof orderProblemsBy;
                   if (newValue !== orderProblemsBy) {
-                    // Reset to ascending for new sort type
                     sortDirection = "asc";
                     orderProblemsBy = newValue;
                   }
