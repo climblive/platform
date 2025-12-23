@@ -145,7 +145,7 @@
       </wa-button>
     </Link>
   {/if}
-  <a href={`/admin/contests/${contestId}/tickets?print`} target="_blank">
+  <a href={`/admin/contests/${contestId}/tickets/print`} target="_blank">
     <wa-button
       appearance="outlined"
       size="small"
