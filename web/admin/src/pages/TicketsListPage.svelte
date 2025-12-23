@@ -107,8 +107,10 @@
 
   <h1>Tickets</h1>
 
-  <wa-switch size="small" checked={showUnusedOnly} onchange={handleToggleUnusedOnly}
-    >Show unused only</wa-switch
+  <wa-switch
+    size="small"
+    checked={showUnusedOnly}
+    onchange={handleToggleUnusedOnly}>Show unused only</wa-switch
   >
 
   {#if filteredContenders === undefined}
