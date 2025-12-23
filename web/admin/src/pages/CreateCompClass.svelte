@@ -22,7 +22,7 @@
 
   const compClasses = $derived(compClassesQuery.data);
 
-  const defaultTimes = $derived(() => {
+  const initialTimes = $derived.by(() => {
     if (!compClasses || compClasses.length === 0) {
       return {
         timeBegin: roundToNearestHours(add(new Date(), { hours: 1 })),
@@ -30,19 +30,11 @@
       };
     }
 
-    const lastClass = compClasses.reduce((latest, current) =>
-      current.timeEnd > latest.timeEnd ? current : latest
-    );
-
-    const duration =
-      lastClass.timeEnd.getTime() - lastClass.timeBegin.getTime();
-
-    const timeBegin = new Date(lastClass.timeEnd);
-    const timeEnd = new Date(timeBegin.getTime() + duration);
+    const lastCompClass = compClasses[compClasses.length - 1];
 
     return {
-      timeBegin,
-      timeEnd,
+      timeBegin: lastCompClass.timeBegin,
+      timeEnd: lastCompClass.timeEnd,
     };
   });
 
@@ -57,7 +49,7 @@
 {#if compClasses === undefined}
   <Loader />
 {:else}
-  <CompClassForm submit={handleSubmit} data={defaultTimes()} schema={formSchema}>
+  <CompClassForm submit={handleSubmit} data={initialTimes} schema={formSchema}>
     <div class="controls">
       <wa-button
         size="small"
