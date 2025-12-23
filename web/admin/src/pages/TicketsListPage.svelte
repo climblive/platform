@@ -4,6 +4,7 @@
   import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
+  import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { Contender } from "@climblive/lib/models";
   import {
@@ -17,7 +18,7 @@
     contestId: number;
   }
 
-  let { contestId }: Props = $props();
+  const { contestId }: Props = $props();
 
   const contestQuery = $derived(getContestQuery(contestId));
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
@@ -32,37 +33,41 @@
       return undefined;
     }
 
-    if (!showUnusedOnly) {
-      return contenders;
+    if (showUnusedOnly) {
+      return contenders.filter(({ entered }) => entered === undefined);
     }
 
-    return contenders.filter((contender) => contender.entered === undefined);
+    return contenders;
   });
 
   const handleToggleUnusedOnly = (event: InputEvent) => {
-    showUnusedOnly = (event.target as HTMLInputElement).checked;
+    showUnusedOnly = (event.target as WaSwitch).checked;
   };
 
   const columns: ColumnDefinition<Contender>[] = [
     {
-      label: "Registration Code",
+      label: "Registration code",
       mobile: true,
       render: renderRegistrationCode,
+      width: "1fr"
     },
     {
       label: "Name",
       mobile: true,
       render: renderName,
+      width: "max-content",
     },
     {
       label: "Used",
       mobile: true,
       render: renderUsed,
+      width: "max-content",
     },
     {
-      label: "Timestamp",
+      label: "Entered",
       mobile: false,
       render: renderTimestamp,
+      width: "max-content",
     },
   ];
 </script>
@@ -79,7 +84,7 @@
   {#if entered}
     <wa-icon name="check"></wa-icon>
   {:else}
-    <wa-icon name="minus"></wa-icon>
+    -
   {/if}
 {/snippet}
 
@@ -102,18 +107,14 @@
 
   <h1>Tickets</h1>
 
-  <div class="controls">
-    <wa-switch checked={showUnusedOnly} onchange={handleToggleUnusedOnly}
-      >Show unused only</wa-switch
-    >
-  </div>
+  <wa-switch size="small" checked={showUnusedOnly} onchange={handleToggleUnusedOnly}
+    >Show unused only</wa-switch
+  >
 
   {#if filteredContenders === undefined}
     <Loader />
   {:else if filteredContenders.length > 0}
     <Table {columns} data={filteredContenders} getId={({ id }) => id}></Table>
-  {:else}
-    <p class="no-tickets">No tickets to display.</p>
   {/if}
 {/if}
 
@@ -123,11 +124,7 @@
     display: block;
   }
 
-  .controls {
+  wa-switch {
     margin-block-end: var(--wa-space-m);
-  }
-
-  .no-tickets {
-    color: var(--wa-color-text-quiet);
   }
 </style>

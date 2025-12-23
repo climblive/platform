@@ -88,7 +88,7 @@
   {#if contenders && contenders.length > 0}
     Out of the {contenders.length}
     tickets that you have created, {registeredContenders} have already been used.
-    <Link to={`/admin/contests/${contestId}/tickets/list`}>View all tickets</Link
+    <Link to={`/admin/contests/${contestId}/tickets`}>View all tickets</Link
     >.
   {/if}
 </p>
@@ -139,16 +139,15 @@
     <wa-icon slot="start" name="plus"></wa-icon>
     Create tickets</wa-button
   >
-  <a href={`/admin/contests/${contestId}/tickets/list`}>
-    <wa-button
-      appearance="outlined"
-      size="small"
-      disabled={!contenders || contenders.length === 0}
-      >View all tickets
-      <wa-icon name="list" slot="start"></wa-icon>
-    </wa-button>
-  </a>
-  <a href={`/admin/contests/${contestId}/tickets?print`} target="_blank">
+  {#if contenders && contenders.length > 0}
+    <Link to={`/admin/contests/${contestId}/tickets`}>
+      <wa-button appearance="outlined" size="small"
+        >View all tickets
+        <wa-icon name="list" slot="start"></wa-icon>
+      </wa-button>
+    </Link>
+  {/if}
+  <a href={`/admin/contests/${contestId}/tickets/print`} target="_blank">
     <wa-button
       appearance="outlined"
       size="small"

@@ -75,12 +75,12 @@
         <RaffleView raffleId={Number(params.raffleId)} />
       {/snippet}
     </Route>
-    <Route path="/contests/:contestId/tickets/list">
+    <Route path="/contests/:contestId/tickets">
       {#snippet children({ params }: { params: { contestId: number } })}
         <TicketsListPage contestId={Number(params.contestId)} />
       {/snippet}
     </Route>
-    <Route path="/contests/:contestId/tickets">
+    <Route path="/contests/:contestId/tickets/print">
       {#snippet children({ params }: { params: { contestId: number } })}
         <PrintableTicketList contestId={Number(params.contestId)} />
       {/snippet}
