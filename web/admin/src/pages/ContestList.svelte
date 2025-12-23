@@ -174,7 +174,7 @@
   {#if contests && contests.length === 0}
     <EmptyState
       title="No contests yet"
-      description="Create your first contest to get started with your first event."
+      description="Create a contest to get started with your first event."
     >
       {#snippet actions()}
         {@render createButton()}
