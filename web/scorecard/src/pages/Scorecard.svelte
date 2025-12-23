@@ -77,6 +77,7 @@
   );
 
   let orderProblemsBy = $state<"number" | "points">("number");
+  let sortDirection = $state<"asc" | "desc">("asc");
 
   let sortedProblems = $derived.by<Problem[]>(() => {
     const clonedProblems = [...(problems ?? [])];
@@ -98,6 +99,10 @@
         );
 
         break;
+    }
+
+    if (sortDirection === "desc") {
+      clonedProblems.reverse();
     }
 
     return clonedProblems;
@@ -229,17 +234,30 @@
               value={orderProblemsBy}
               onchange={() => {
                 if (radioGroup) {
-                  orderProblemsBy = radioGroup.value as typeof orderProblemsBy;
+                  const newValue = radioGroup.value as typeof orderProblemsBy;
+                  if (newValue === orderProblemsBy) {
+                    // Toggle direction if clicking the same button
+                    sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                  } else {
+                    // Reset to ascending for new sort type
+                    sortDirection = "asc";
+                    orderProblemsBy = newValue;
+                  }
                 }
               }}
             >
               <wa-radio value="number" appearance="button">
-                <wa-icon name="arrow-down-1-9" label="Sort by number"></wa-icon>
+                <wa-icon 
+                  name={orderProblemsBy === "number" && sortDirection === "desc" ? "arrow-up-9-1" : "arrow-down-1-9"} 
+                  label={orderProblemsBy === "number" && sortDirection === "desc" ? "Sort by number descending" : "Sort by number ascending"}
+                ></wa-icon>
                 Sort by number
               </wa-radio>
 
               <wa-radio value="points" appearance="button">
-                <wa-icon name="arrow-up-short-wide" label="Sort by points"
+                <wa-icon 
+                  name={orderProblemsBy === "points" && sortDirection === "desc" ? "arrow-down-wide-short" : "arrow-up-short-wide"} 
+                  label={orderProblemsBy === "points" && sortDirection === "desc" ? "Sort by points descending" : "Sort by points ascending"}
                 ></wa-icon>
                 Sort by points
               </wa-radio>
