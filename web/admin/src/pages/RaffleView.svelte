@@ -82,8 +82,7 @@
 {/snippet}
 
 {#snippet drawButton()}
-  <wa-button variant="neutral" onclick={handleDrawWinner}
-    >Draw winner</wa-button
+  <wa-button variant="neutral" onclick={handleDrawWinner}>Draw winner</wa-button
   >
 {/snippet}
 
@@ -118,7 +117,7 @@
     {:else}
       <EmptyState
         title="No winners yet"
-        description="Draw winners to randomly select contenders for prizes."
+        description="Draw the first winner of your prize raffle."
       >
         {#snippet actions()}
           {@render drawButton()}
