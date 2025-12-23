@@ -11,7 +11,6 @@ import { mount } from "svelte";
 import App from "./App.svelte";
 import FailsafeApp from "./FailsafeApp.svelte";
 import TryFailsafe from "./TryFailsafe.svelte";
-import "element-internals-polyfill";
 
 if (import.meta.env.PROD) {
   Sentry.init({
@@ -35,6 +34,17 @@ if (location.pathname.startsWith("/failsafe")) {
   const [compatible, missingFeatures] = checkCompat();
 
   const ignoreCompat = sessionStorage.getItem("compat") === "ignore";
+
+  if (!compatible && !ignoreCompat) {
+    console.warn(
+      "Incompatible browser detected. Missing features:",
+      missingFeatures,
+    );
+  }
+
+  if (missingFeatures.includes("ElementInternals")) {
+    await import("element-internals-polyfill");
+  }
 
   if (compatible || ignoreCompat) {
     mount(App, {
