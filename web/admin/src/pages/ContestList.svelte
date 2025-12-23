@@ -126,25 +126,21 @@
   {/if}
 {/snippet}
 
+{#snippet createButton()}
+  <wa-button
+    variant="neutral"
+    onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
+    >Create new contest</wa-button
+  >
+{/snippet}
+
 <h2>Contests</h2>
+{@render createButton()}
 
 {#snippet listing(heading: string, contests: Contest[])}
   <h3>{heading}</h3>
   {#if contests.length > 0}
     <Table {columns} data={contests} getId={({ id }) => id}></Table>
-  {:else}
-    <EmptyState
-      title="No contests yet"
-      description="Create your first contest to get started with your first event."
-    >
-      {#snippet actions()}
-        <wa-button
-          variant="neutral"
-          onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
-          >Create new contest</wa-button
-        >
-      {/snippet}
-    </EmptyState>
   {/if}
 {/snippet}
 
@@ -171,6 +167,17 @@
 
   {#if showArchived}
     {@render listing("Archived", archived)}
+  {/if}
+
+  {#if !ongoing?.length && !upcoming?.length && !past?.length && !archived?.length}
+    <EmptyState
+      title="No contests yet"
+      description="Create your first contest to get started with your first event."
+    >
+      {#snippet actions()}
+        {@render createButton()}
+      {/snippet}
+    </EmptyState>
   {/if}
 {/if}
 

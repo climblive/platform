@@ -5,11 +5,7 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import {
-    EmptyState,
-    Table,
-    type ColumnDefinition,
-  } from "@climblive/lib/components";
+  import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { Contender } from "@climblive/lib/models";
   import {
     getContendersByContestQuery,
@@ -121,11 +117,6 @@
     <Loader />
   {:else if filteredContenders.length > 0}
     <Table {columns} data={filteredContenders} getId={({ id }) => id}></Table>
-  {:else}
-    <EmptyState
-      title="No tickets yet"
-      description="Create tickets with unique registration codes to grant contenders access to your contest."
-    />
   {/if}
 {/if}
 

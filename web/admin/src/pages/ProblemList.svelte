@@ -169,6 +169,15 @@
   {ascents}
 {/snippet}
 
+{#snippet createButton()}
+  <wa-button
+    variant="neutral"
+    appearance="accent"
+    onclick={() => navigate(`contests/${contestId}/new-problem`)}
+    >Create problem</wa-button
+  >
+{/snippet}
+
 <p class="copy">
   Problems refer to the boulder problems that the contenders will attempt during
   the contest, each of which can have its own point value.
@@ -178,12 +187,7 @@
   {#if sortedProblemsWithAscents === undefined}
     <Loader />
   {:else if sortedProblemsWithAscents.length > 0}
-    <wa-button
-      variant="neutral"
-      appearance="accent"
-      onclick={() => navigate(`contests/${contestId}/new-problem`)}
-      >Create problem</wa-button
-    >
+    {@render createButton()}
     <Table
       {columns}
       data={tableLimit
@@ -197,12 +201,7 @@
       description="Create boulder problems that contenders will attempt during the contest."
     >
       {#snippet actions()}
-        <wa-button
-          variant="neutral"
-          appearance="accent"
-          onclick={() => navigate(`contests/${contestId}/new-problem`)}
-          >Create problem</wa-button
-        >
+        {@render createButton()}
       {/snippet}
     </EmptyState>
   {/if}

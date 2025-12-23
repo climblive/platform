@@ -96,6 +96,15 @@
   </div>
 {/snippet}
 
+{#snippet createButton()}
+  <wa-button
+    variant="neutral"
+    appearance="accent"
+    onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
+    >Create class</wa-button
+  >
+{/snippet}
+
 <p class="copy">
   Classes represent the categories in which the contenders compete, typically
   divided into Males and Females. The contest duration is defined by the start
@@ -106,12 +115,7 @@
   {#if compClasses === undefined}
     <Loader />
   {:else if compClasses.length > 0}
-    <wa-button
-      variant="neutral"
-      appearance="accent"
-      onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
-      >Create class</wa-button
-    >
+    {@render createButton()}
     <Table {columns} data={compClasses} getId={({ id }) => id}></Table>
   {:else}
     <EmptyState
@@ -119,12 +123,7 @@
       description="Create classes to define the categories in which contenders will compete."
     >
       {#snippet actions()}
-        <wa-button
-          variant="neutral"
-          appearance="accent"
-          onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
-          >Create class</wa-button
-        >
+        {@render createButton()}
       {/snippet}
     </EmptyState>
   {/if}

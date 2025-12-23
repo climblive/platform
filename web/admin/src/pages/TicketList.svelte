@@ -5,6 +5,7 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import type WaInput from "@awesome.me/webawesome/dist/components/input/input.js";
+  import { EmptyState } from "@climblive/lib/components";
   import { value } from "@climblive/lib/forms";
   import type { CreateContendersArguments } from "@climblive/lib/models";
   import {
@@ -163,6 +164,25 @@
     </wa-button>
   </a>
 </div>
+
+{#if contenders && contenders.length === 0}
+  <EmptyState
+    title="No tickets yet"
+    description="Create tickets with unique registration codes to grant contenders access to your contest."
+  >
+    {#snippet actions()}
+      <wa-button
+        variant="neutral"
+        appearance="accent"
+        onclick={handleOpenCreateDialog}
+        disabled={remainingCodes === undefined || remainingCodes === 0}
+      >
+        <wa-icon slot="start" name="plus"></wa-icon>
+        Create tickets</wa-button
+      >
+    {/snippet}
+  </EmptyState>
+{/if}
 
 <p>
   {#if remainingCodes === maxTickets}

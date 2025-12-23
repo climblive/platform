@@ -45,13 +45,17 @@
   <Link to={`/admin/raffles/${id}`}>Raffle {id}</Link>
 {/snippet}
 
+{#snippet createButton()}
+  <wa-button variant="neutral" appearance="accent" onclick={handleCreateRaffle}
+    >Start new raffle</wa-button
+  >
+{/snippet}
+
 <section>
   {#if raffles === undefined}
     <Loader />
   {:else if raffles.length > 0}
-    <wa-button variant="neutral" appearance="accent" onclick={handleCreateRaffle}
-      >Start new raffle</wa-button
-    >
+    {@render createButton()}
     <Table {columns} data={raffles} getId={({ id }) => id}></Table>
   {:else}
     <EmptyState
@@ -59,9 +63,7 @@
       description="Start a new raffle to randomly select winners from your contenders."
     >
       {#snippet actions()}
-        <wa-button variant="neutral" appearance="accent" onclick={handleCreateRaffle}
-          >Start new raffle</wa-button
-        >
+        {@render createButton()}
       {/snippet}
     </EmptyState>
   {/if}

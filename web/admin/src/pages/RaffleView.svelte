@@ -81,6 +81,12 @@
   {format(timestamp, "yyyy-MM-dd HH:mm")}
 {/snippet}
 
+{#snippet drawButton()}
+  <wa-button variant="neutral" onclick={handleDrawWinner}
+    >Draw winner</wa-button
+  >
+{/snippet}
+
 {#if contest && raffle}
   <wa-breadcrumb>
     <wa-breadcrumb-item
@@ -103,9 +109,7 @@
     {#if sortedRaffleWinners === undefined}
       <Loader />
     {:else if sortedRaffleWinners.length > 0}
-      <wa-button variant="neutral" onclick={handleDrawWinner}
-        >Draw winner</wa-button
-      >
+      {@render drawButton()}
       <Table
         {columns}
         data={sortedRaffleWinners}
@@ -117,9 +121,7 @@
         description="Draw winners to randomly select contenders for prizes."
       >
         {#snippet actions()}
-          <wa-button variant="neutral" onclick={handleDrawWinner}
-            >Draw winner</wa-button
-          >
+          {@render drawButton()}
         {/snippet}
       </EmptyState>
     {/if}
