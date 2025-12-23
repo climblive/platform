@@ -11,8 +11,8 @@ importers:
   admin:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.0.0
-        version: 3.0.0(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
+        specifier: 3.1.0
+        version: 3.1.0(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -102,8 +102,8 @@ importers:
   packages/lib:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.0.0
-        version: 3.0.0(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
+        specifier: 3.1.0
+        version: 3.1.0(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
       '@sentry/svelte':
         specifier: ^10.25.0
         version: 10.25.0(svelte@5.43.6)
@@ -175,8 +175,8 @@ importers:
   scoreboard:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.0.0
-        version: 3.0.0(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
+        specifier: 3.1.0
+        version: 3.1.0(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -230,8 +230,8 @@ importers:
   scorecard:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.0.0
-        version: 3.0.0(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
+        specifier: 3.1.0
+        version: 3.1.0(@floating-ui/utils@0.2.10)(@types/react@19.1.9)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -302,8 +302,8 @@ importers:
 
 packages:
 
-  '@awesome.me/webawesome@3.0.0':
-    resolution: {integrity: sha512-KLxAiSV9hH+bB8OkpaZUA9zNgBu6G1cXirsE0VWmdS/jtpup1Wf1aC7yGYjPSi/61BVUqk8geA4oylt4oLdmlQ==}
+  '@awesome.me/webawesome@3.1.0':
+    resolution: {integrity: sha512-9XgTxL/6/8Ynb4KvQBjK33RjnsRyqIJO8zYQODu8MDbS/2ecjah+cUOek6DkK0opg1DC6N7X6GStjcrjAuMMyQ==}
     engines: {node: '>=14.17.0'}
 
   '@babel/code-frame@7.27.1':
@@ -2769,7 +2769,7 @@ packages:
 
 snapshots:
 
-  '@awesome.me/webawesome@3.0.0(@floating-ui/utils@0.2.10)(@types/react@19.1.9)':
+  '@awesome.me/webawesome@3.1.0(@floating-ui/utils@0.2.10)(@types/react@19.1.9)':
     dependencies:
       '@ctrl/tinycolor': 4.1.0
       '@floating-ui/dom': 1.7.4
