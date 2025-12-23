@@ -4,9 +4,7 @@
   import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
-  import { checked } from "@climblive/lib/forms";
   import type { Contender } from "@climblive/lib/models";
   import {
     getContendersByContestQuery,
@@ -28,7 +26,6 @@
   const contenders = $derived(contendersQuery.data);
 
   let showUnusedOnly = $state(false);
-  let unusedToggle: WaSwitch | undefined = $state();
 
   const filteredContenders = $derived.by(() => {
     if (!contenders) {
@@ -42,10 +39,8 @@
     return contenders.filter((contender) => contender.entered === undefined);
   });
 
-  const handleToggleUnusedOnly = () => {
-    if (unusedToggle) {
-      showUnusedOnly = unusedToggle.checked;
-    }
+  const handleToggleUnusedOnly = (event: InputEvent) => {
+    showUnusedOnly = (event.target as HTMLInputElement).checked;
   };
 
   const columns: ColumnDefinition<Contender>[] = [
@@ -108,10 +103,7 @@
   <h1>Tickets</h1>
 
   <div class="controls">
-    <wa-switch
-      bind:this={unusedToggle}
-      {@attach checked(showUnusedOnly)}
-      onchange={handleToggleUnusedOnly}
+    <wa-switch checked={showUnusedOnly} onchange={handleToggleUnusedOnly}
       >Show unused only</wa-switch
     >
   </div>
