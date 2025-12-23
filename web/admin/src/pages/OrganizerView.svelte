@@ -7,7 +7,7 @@
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { value } from "@climblive/lib/forms";
   import { getSelfQuery } from "@climblive/lib/queries";
-  import { getContext, onMount } from "svelte";
+  import { getContext } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
   import ContestList from "./ContestList.svelte";
@@ -29,8 +29,14 @@
   const selectedOrganizer =
     getContext<Writable<number | undefined>>("selectedOrganizer");
 
-  onMount(() => {
-    $selectedOrganizer = organizerId;
+  $effect(() => {
+    if (self) {
+      if (self.organizers.some(({ id }) => id === organizerId)) {
+        $selectedOrganizer = organizerId;
+      } else {
+        navigate("./");
+      }
+    }
   });
 
   const handleChange = () => {

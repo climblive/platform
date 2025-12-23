@@ -84,9 +84,7 @@
         <main>
           <section>
             <h1>Hi!</h1>
-            <p>
-              Welcome to the <em>brand new</em> admin console for ClimbLive.
-            </p>
+            <p>Sign-in to manage your competitions on ClimbLive.</p>
             <wa-button variant="neutral" onclick={authenticator.redirectLogin}
               >Sign in</wa-button
             >
@@ -118,5 +116,9 @@
 
   wa-spinner {
     font-size: 5rem;
+  }
+
+  wa-button:last-of-type {
+    margin-left: var(--wa-space-xs);
   }
 </style>
