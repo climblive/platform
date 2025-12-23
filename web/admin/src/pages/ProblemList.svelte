@@ -1,6 +1,7 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import {
+    EmptyState,
     HoldColorIndicator,
     Table,
     type ColumnDefinition,
@@ -191,6 +192,20 @@
         : sortedProblemsWithAscents}
       getId={({ id }) => id}
     ></Table>
+  {:else}
+    <EmptyState
+      title="No problems yet"
+      description="Create boulder problems that contenders will attempt during the contest."
+    >
+      {#snippet actions()}
+        <wa-button
+          variant="neutral"
+          appearance="accent"
+          onclick={() => navigate(`contests/${contestId}/new-problem`)}
+          >Create problem</wa-button
+        >
+      {/snippet}
+    </EmptyState>
   {/if}
 
   {#if sortedProblemsWithAscents !== undefined && tableLimit !== undefined && tableLimit < sortedProblemsWithAscents.length}

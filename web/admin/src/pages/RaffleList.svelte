@@ -1,7 +1,11 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import { Table, type ColumnDefinition } from "@climblive/lib/components";
+  import {
+    EmptyState,
+    Table,
+    type ColumnDefinition,
+  } from "@climblive/lib/components";
   import type { Raffle } from "@climblive/lib/models";
   import {
     createRaffleMutation,
@@ -50,6 +54,17 @@
     <Loader />
   {:else if raffles.length > 0}
     <Table {columns} data={raffles} getId={({ id }) => id}></Table>
+  {:else}
+    <EmptyState
+      title="No raffles yet"
+      description="Start a new raffle to randomly select winners from your contenders."
+    >
+      {#snippet actions()}
+        <wa-button variant="neutral" appearance="accent" onclick={handleCreateRaffle}
+          >Start new raffle</wa-button
+        >
+      {/snippet}
+    </EmptyState>
   {/if}
 </section>
 

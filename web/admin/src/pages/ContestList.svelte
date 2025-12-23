@@ -4,7 +4,11 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import { Table, type ColumnDefinition } from "@climblive/lib/components";
+  import {
+    EmptyState,
+    Table,
+    type ColumnDefinition,
+  } from "@climblive/lib/components";
   import type { Contest } from "@climblive/lib/models";
   import {
     getAllContestsQuery,
@@ -131,7 +135,23 @@
 
 {#snippet listing(heading: string, contests: Contest[])}
   <h3>{heading}</h3>
-  <Table {columns} data={contests} getId={({ id }) => id}></Table>
+  {#if contests.length > 0}
+    <Table {columns} data={contests} getId={({ id }) => id}></Table>
+  {:else}
+    <EmptyState
+      title="No contests yet"
+      description="Create your first contest to get started with organizing climbing competitions."
+    >
+      {#snippet actions()}
+        <wa-button
+          variant="neutral"
+          appearance="accent"
+          onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
+          >Create new contest</wa-button
+        >
+      {/snippet}
+    </EmptyState>
+  {/if}
 {/snippet}
 
 {#if !ongoing || !upcoming || !past || !archived}

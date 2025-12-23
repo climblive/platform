@@ -3,7 +3,11 @@
   import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
   import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import { Table, type ColumnDefinition } from "@climblive/lib/components";
+  import {
+    EmptyState,
+    Table,
+    type ColumnDefinition,
+  } from "@climblive/lib/components";
   import type { RaffleWinner } from "@climblive/lib/models";
   import {
     drawRaffleWinnerMutation,
@@ -108,6 +112,17 @@
         data={sortedRaffleWinners}
         getId={({ contenderId }) => contenderId}
       ></Table>
+    {:else}
+      <EmptyState
+        title="No winners yet"
+        description="Draw winners to randomly select contenders for prizes."
+      >
+        {#snippet actions()}
+          <wa-button variant="neutral" onclick={handleDrawWinner}
+            >Draw winner</wa-button
+          >
+        {/snippet}
+      </EmptyState>
     {/if}
   </section>
 {/if}
