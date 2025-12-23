@@ -88,8 +88,6 @@
   {#if contenders && contenders.length > 0}
     Out of the {contenders.length}
     tickets that you have created, {registeredContenders} have already been used.
-    <Link to={`/admin/contests/${contestId}/tickets`}>View all tickets</Link
-    >.
   {/if}
 </p>
 
