@@ -46,16 +46,16 @@
 
   const columns: ColumnDefinition<Contender>[] = [
     {
-      label: "Registration code",
+      label: "Code",
       mobile: true,
       render: renderRegistrationCode,
-      width: "1fr",
+      width: "max-content",
     },
     {
       label: "Name",
       mobile: true,
       render: renderName,
-      width: "max-content",
+      width: "1fr",
     },
     {
       label: "Used",
