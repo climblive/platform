@@ -44,7 +44,7 @@ backend/
 
 **Key Patterns**:
 
-- **Clean Architecture**: Simplified version in which the innermost layers are made up of the domain followed by the use cases
+- **Clean Architecture**: Innermost layers are made up of the domain followed by the use cases layer
 - **Repository Pattern**: Data access abstracted through repository interfaces
 - **Event Broker**: Pub/sub system for real-time scoring events, etc. (`events.EventBroker`)
 - **Score Engine**: Separate engine that manages score calculations
@@ -64,7 +64,7 @@ backend/
 
 **Framework**: Svelte 5  
 **Build Tool**: Vite  
-**Package Manager**: pnpm
+**Package Manager**: pnpm  
 **Node Version**: ≥20
 
 **Structure**:
@@ -74,7 +74,7 @@ web/
 ├── admin/              # Admin application
 ├── scoreboard/         # Live scoreboard
 ├── scorecard/          # Contender scorecard
-├── www/                # Public marketing website
+├── www/                # Public website (marketing)
 ├── packages/lib/       # Shared library (@climblive/lib)
 └── e2e/                # End-to-end tests (Playwright)
 ```
@@ -91,7 +91,7 @@ web/
 
 **Key Technologies**:
 
-- **State Management**: TanStack Query
+- **Remote State Management**: TanStack Query
 - **Routing**: svelte-routing
 - **UI Components**: @awesome.me/webawesome
 - **Validation**: Zod
@@ -188,7 +188,7 @@ make test
 - **TypeScript**: Strict mode enabled
 - **API Calls**: Use TanStack Query through queries in the shared library
 - **Styling**: Component-scoped styles in plain CSS (prefer nesting)
-- **Tokens**: Use WebAwesome design tokens for all styling (`@awesome.me/webawesome/dist/styles/themes/default.css`)
+- **Tokens**: Use Web Awesome design tokens for all styling (`@awesome.me/webawesome/dist/styles/themes/default.css`)
 - **Theme**: Shared theme in `packages/lib/src/theme.css`
 - **Formatting**: Prettier with project-specific config
 - **Linting**: ESLint with Svelte plugin
@@ -217,7 +217,7 @@ make test
 
 ## Common Tasks
 
-### Modifying Database Schema
+### Modifying database schema
 
 1. Update model in MySQL Workbench and forward export to `backend/database/climblive.sql`
 2. Create a new Goose migration in `backend/cmd/api/migrations/`
@@ -226,7 +226,7 @@ make test
 
 ### Modify domain models
 
-1. Update domain models in `backend/internal/domain/`
+1. Update domain models in `backend/internal/domain/public.go`
 2. Run `tygo generate` to generate updated TypeScript types
 
 ## Authentication
@@ -246,5 +246,5 @@ For questions about specific subsystems, examine existing tests and implementati
 
 ## Pull Requests
 
-- **Title**: Formatted in the Conventional Commits format
-- **Description**: A brief high-level description of the changes
+- **Titles**: Should be formatted in the Conventional Commits format
+- **Descriptions**: Keep descriptions brief and on a high-level
