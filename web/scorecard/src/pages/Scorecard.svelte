@@ -108,6 +108,31 @@
     return clonedProblems;
   });
 
+  let numberSortIcon = $derived(
+    orderProblemsBy === "number" && sortDirection === "desc" 
+      ? "arrow-up-9-1" 
+      : "arrow-down-1-9"
+  );
+
+  let numberSortLabel = $derived(
+    orderProblemsBy === "number" && sortDirection === "desc"
+      ? "Sort by number descending"
+      : "Sort by number ascending"
+  );
+
+  let pointsSortIcon = $derived(
+    orderProblemsBy === "points" && sortDirection === "desc"
+      ? "arrow-down-wide-short"
+      : "arrow-up-short-wide"
+  );
+
+  let pointsSortLabel = $derived(
+    orderProblemsBy === "points" && sortDirection === "desc"
+      ? "Sort by points descending"
+      : "Sort by points ascending"
+  );
+
+
   let highestProblemNumber = $derived(
     problems?.reduce((max, cur) => {
       return Math.max(max, cur.number);
@@ -248,15 +273,11 @@
                 appearance="button"
                 onclick={() => {
                   if (orderProblemsBy === "number") {
-                    // Toggle direction if clicking the same button
                     sortDirection = sortDirection === "asc" ? "desc" : "asc";
                   }
                 }}
               >
-                <wa-icon 
-                  name={orderProblemsBy === "number" && sortDirection === "desc" ? "arrow-up-9-1" : "arrow-down-1-9"} 
-                  label={orderProblemsBy === "number" && sortDirection === "desc" ? "Sort by number descending" : "Sort by number ascending"}
-                ></wa-icon>
+                <wa-icon name={numberSortIcon} label={numberSortLabel}></wa-icon>
                 Sort by number
               </wa-radio>
 
@@ -265,15 +286,11 @@
                 appearance="button"
                 onclick={() => {
                   if (orderProblemsBy === "points") {
-                    // Toggle direction if clicking the same button
                     sortDirection = sortDirection === "asc" ? "desc" : "asc";
                   }
                 }}
               >
-                <wa-icon 
-                  name={orderProblemsBy === "points" && sortDirection === "desc" ? "arrow-down-wide-short" : "arrow-up-short-wide"} 
-                  label={orderProblemsBy === "points" && sortDirection === "desc" ? "Sort by points descending" : "Sort by points ascending"}
-                ></wa-icon>
+                <wa-icon name={pointsSortIcon} label={pointsSortLabel}></wa-icon>
                 Sort by points
               </wa-radio>
             </wa-radio-group>
