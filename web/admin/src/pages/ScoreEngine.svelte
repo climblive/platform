@@ -1,7 +1,5 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
-  import "@awesome.me/webawesome/dist/components/relative-time/relative-time.js";
-  import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
   import {
     getContestQuery,
     getScoreEnginesQuery,
@@ -29,7 +27,7 @@
   const earliestStartTime = $derived(
     contest?.timeBegin
       ? subSeconds(contest.timeBegin.getTime(), 60 * 60)
-      : new Date(8640000000000000),
+      : undefined,
   );
 </script>
 
@@ -38,6 +36,13 @@
   <strong>Score engines are managed automatically</strong><br />
   Score engines are started automatically, and manual intervention is typically only
   required for re-scoring results long after a contest has concluded.
+
+  {#if earliestStartTime && isBefore(new Date(), earliestStartTime)}
+    Manual start is available starting {format(
+      earliestStartTime,
+      "yyyy-MM-dd HH:mm",
+    )}.
+  {/if}
 </wa-callout>
 <br />
 
@@ -55,14 +60,6 @@
     </wa-button>
   {/each}
   {#if scoreEngines.length === 0}
-    {#if isBefore(new Date(), earliestStartTime)}
-      <wa-tooltip for={id} style="--max-width: 600px;"
-        >Earliest manual start time is {format(
-          earliestStartTime,
-          "yyyy-MM-dd HH:mm",
-        )}
-      </wa-tooltip>
-    {/if}
     <wa-button
       {id}
       appearance="outlined"
@@ -72,7 +69,7 @@
           terminatedBy: add(new Date(), { hours: 6 }),
         })}
       loading={startScoreEngine.isPending}
-      disabled={isBefore(new Date(), earliestStartTime)}
+      disabled={earliestStartTime && isBefore(new Date(), earliestStartTime)}
       >Start engine manually
       <wa-icon name="play" slot="start"></wa-icon>
     </wa-button>
