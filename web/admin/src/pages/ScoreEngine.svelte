@@ -14,8 +14,6 @@
 
   let { contestId }: Props = $props();
 
-  const id = $props.id();
-
   const contestQuery = $derived(getContestQuery(contestId));
   const scoreEnginesQuery = $derived(getScoreEnginesQuery(contestId));
   const startScoreEngine = $derived(startScoreEngineMutation(contestId));
@@ -61,7 +59,6 @@
   {/each}
   {#if scoreEngines.length === 0}
     <wa-button
-      {id}
       appearance="outlined"
       variant="warning"
       onclick={() =>
