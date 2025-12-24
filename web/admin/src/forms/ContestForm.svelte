@@ -16,6 +16,7 @@
 </script>
 
 <script lang="ts">
+  import RulesInput from "@/components/RulesInput.svelte";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
   import { GenericForm, name } from "@climblive/lib/forms";
@@ -92,12 +93,7 @@
       value={Math.floor((data.gracePeriod ?? 0) / minuteInNanoseconds)}
     >
     </wa-input>
-    <wa-textarea
-      size="small"
-      {@attach name("rules")}
-      label="Rules"
-      value={data.rules ?? ""}
-    ></wa-textarea>
+    <RulesInput rules={data.rules} />
     {@render children?.()}
   </fieldset>
 </GenericForm>

@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"net/http"
 	"slices"
+	"strings"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/go-errors/errors"
 	"github.com/xuri/excelize/v2"
 )
 
@@ -24,12 +26,21 @@ type contestUseCase interface {
 type contestHandler struct {
 	contestUseCase   contestUseCase
 	compClassUseCase compClassUseCase
+	tickUseCase      tickUseCase
+	problemUseCase   problemUseCase
 }
 
-func InstallContestHandler(mux *Mux, contestUseCase contestUseCase, compClassUseCase compClassUseCase) {
+func InstallContestHandler(
+	mux *Mux,
+	contestUseCase contestUseCase,
+	compClassUseCase compClassUseCase,
+	tickUseCase tickUseCase,
+	problemUseCase problemUseCase) {
 	handler := &contestHandler{
 		contestUseCase:   contestUseCase,
 		compClassUseCase: compClassUseCase,
+		tickUseCase:      tickUseCase,
+		problemUseCase:   problemUseCase,
 	}
 
 	mux.HandleFunc("GET /contests/{contestID}", handler.GetContest)
@@ -177,31 +188,59 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 		}
 	}()
 
+	sanitizeSheetName := func(name string) string {
+		invalidCharacters := ":\\/?*[]"
+
+		for _, char := range invalidCharacters {
+			name = strings.ReplaceAll(name, string(char), "")
+		}
+
+		if len(name) > excelize.MaxSheetNameLength {
+			name = name[0:excelize.MaxSheetNameLength]
+		}
+
+		return name
+	}
+
 	writeBook := func(book *excelize.File) error {
 		compClasses, err := hdlr.compClassUseCase.GetCompClassesByContest(r.Context(), contestID)
 		if err != nil {
-			return err
+			return errors.Wrap(err, 0)
 		}
 
 		scoreboard, err := hdlr.contestUseCase.GetScoreboard(r.Context(), contestID)
 		if err != nil {
-			return err
+			return errors.Wrap(err, 0)
+		}
+
+		problems, err := hdlr.problemUseCase.GetProblemsByContest(r.Context(), contestID)
+		if err != nil {
+			return errors.Wrap(err, 0)
+		}
+
+		ticks, err := hdlr.tickUseCase.GetTicksByContest(r.Context(), contestID)
+		if err != nil {
+			return errors.Wrap(err, 0)
 		}
 
 		slices.SortFunc(scoreboard, func(a, b domain.ScoreboardEntry) int {
 			return a.Score.RankOrder - b.Score.RankOrder
 		})
 
+		slices.SortFunc(problems, func(a, b domain.Problem) int {
+			return a.Number - b.Number
+		})
+
 		for _, compClass := range compClasses {
-			if _, err := book.NewSheet(compClass.Name); err != nil {
-				return err
+			if _, err := book.NewSheet(sanitizeSheetName(compClass.Name)); err != nil {
+				return errors.Wrap(err, 0)
 			}
 		}
 
 		nextRowNumbers := make(map[domain.CompClassID]int)
 
 		for _, compClass := range compClasses {
-			sheetName := compClass.Name
+			sheetName := sanitizeSheetName(compClass.Name)
 
 			style, err := book.NewStyle(&excelize.Style{
 				Font: &excelize.Font{
@@ -209,27 +248,42 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 				},
 			})
 			if err != nil {
-				return err
+				return errors.Wrap(err, 0)
 			}
 
 			err = book.SetColWidth(sheetName, "A", "A", 40)
 			if err != nil {
-				return err
+				return errors.Wrap(err, 0)
 			}
 
 			err = book.SetColWidth(sheetName, "B", "C", 20)
 			if err != nil {
-				return err
+				return errors.Wrap(err, 0)
 			}
 
-			err = book.SetCellStyle(sheetName, "A1", "C1", style)
+			lastStyledCell, err := excelize.CoordinatesToCellName(3+len(problems), 1)
 			if err != nil {
-				return err
+				return errors.Wrap(err, 0)
+			}
+
+			err = book.SetCellStyle(sheetName, "A1", lastStyledCell, style)
+			if err != nil {
+				return errors.Wrap(err, 0)
 			}
 
 			err = book.SetSheetRow(sheetName, "A1", &[]string{"Name", "Score", "Placement"})
 			if err != nil {
-				return err
+				return errors.Wrap(err, 0)
+			}
+
+			problemNumbers := make([]string, 0)
+			for _, problem := range problems {
+				problemNumbers = append(problemNumbers, fmt.Sprintf("P%d", problem.Number))
+			}
+
+			err = book.SetSheetRow(sheetName, "D1", &problemNumbers)
+			if err != nil {
+				return errors.Wrap(err, 0)
 			}
 
 			nextRowNumbers[compClass.ID] = 2
@@ -241,7 +295,7 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 
 			for _, compClass := range compClasses {
 				if entry.CompClassID == compClass.ID {
-					sheetName = compClass.Name
+					sheetName = sanitizeSheetName(compClass.Name)
 
 					break
 				}
@@ -252,7 +306,33 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 				entry.Score.Score,
 				entry.Score.Placement})
 			if err != nil {
-				return err
+				return errors.Wrap(err, 0)
+			}
+
+			problemResults := make(map[domain.ProblemID]string, 0)
+			for _, tick := range ticks {
+				if *tick.Ownership.ContenderID == entry.ContenderID {
+					result := ""
+
+					switch {
+					case tick.Top && tick.AttemptsTop == 1:
+						result = "F"
+					case tick.Top:
+						result = "T"
+					}
+
+					problemResults[tick.ProblemID] = result
+				}
+			}
+
+			resultsRow := make([]string, 0)
+			for _, problem := range problems {
+				resultsRow = append(resultsRow, problemResults[problem.ID])
+			}
+
+			err = book.SetSheetRow(sheetName, fmt.Sprintf("D%d", counter), &resultsRow)
+			if err != nil {
+				return errors.Wrap(err, 0)
 			}
 
 			nextRowNumbers[entry.CompClassID]++
@@ -260,7 +340,7 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 
 		err = book.DeleteSheet("Sheet1")
 		if err != nil {
-			return err
+			return errors.Wrap(err, 0)
 		}
 
 		return nil

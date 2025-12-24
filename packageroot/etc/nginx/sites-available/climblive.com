@@ -2,9 +2,6 @@ server {
 	listen 443 ssl http2;
 	server_name climblive.com;
 
-	# Gzip Settings
-	include snippets/gzip.conf;
-
 	client_max_body_size 1M;
 
 	location / {
@@ -25,8 +22,6 @@ server {
 		add_header X-Content-Type-Options "nosniff";
 		add_header Referrer-Policy "same-origin";
 	}
-
-	include /etc/nginx/options-ssl.conf;
 
 	ssl_certificate /etc/nginx/ssl/cloudflare/climblive.com/cert.pem;
 	ssl_certificate_key /etc/nginx/ssl/cloudflare/climblive.com/privkey.pem;

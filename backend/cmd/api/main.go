@@ -186,9 +186,10 @@ func setupMux(
 	}
 
 	contestUseCase := usecases.ContestUseCase{
-		Authorizer:  authorizer,
-		Repo:        repo,
-		ScoreKeeper: scoreKeeper,
+		Authorizer:         authorizer,
+		Repo:               repo,
+		ScoreKeeper:        scoreKeeper,
+		ScoreEngineManager: scoreEngineManager,
 	}
 
 	compClassUseCase := usecases.CompClassUseCase{
@@ -231,7 +232,7 @@ func setupMux(
 	mux.HandleFunc("OPTIONS /", HandleCORSPreFlight)
 
 	rest.InstallContenderHandler(mux, &contenderUseCase)
-	rest.InstallContestHandler(mux, &contestUseCase, &compClassUseCase)
+	rest.InstallContestHandler(mux, &contestUseCase, &compClassUseCase, &tickUseCase, &problemUseCase)
 	rest.InstallCompClassHandler(mux, &compClassUseCase)
 	rest.InstallProblemHandler(mux, &problemUseCase)
 	rest.InstallTickHandler(mux, &tickUseCase)

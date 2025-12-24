@@ -1,6 +1,7 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import {
+    EmptyState,
     HoldColorIndicator,
     Table,
     type ColumnDefinition,
@@ -10,6 +11,7 @@
     getProblemsQuery,
     getTicksByContestQuery,
   } from "@climblive/lib/queries";
+  import { isDefined } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
   import DeleteProblem from "./DeleteProblem.svelte";
 
@@ -79,7 +81,7 @@
     },
     {
       label: "Flash",
-      mobile: true,
+      mobile: false,
       render: renderFlashBonus,
       width: "max-content",
     },
@@ -115,13 +117,25 @@
   </div>
 {/snippet}
 
-{#snippet renderPoints({ pointsTop }: ProblemWithAscents)}
-  {pointsTop} pts
+{#snippet renderPoints(
+  { pointsZone1, pointsZone2, pointsTop, flashBonus }: ProblemWithAscents,
+  mobile: boolean,
+)}
+  {@const values = [pointsZone1, pointsZone2, pointsTop].filter(isDefined)}
+
+  {#if mobile}
+    {@const min = Math.min(...values)}
+    {@const max = Math.max(...values)}
+
+    {[min, max + (flashBonus ?? 0)].join(" - ")} pts
+  {:else}
+    {values.join(" / ")} pts
+  {/if}
 {/snippet}
 
 {#snippet renderFlashBonus({ flashBonus }: ProblemWithAscents)}
   {#if flashBonus}
-    {flashBonus} pts
+    +{flashBonus} pts
   {:else}
     -
   {/if}
@@ -155,22 +169,25 @@
   {ascents}
 {/snippet}
 
-<p class="copy">
-  Problems refer to the boulder problems that the contenders will attempt during
-  the contest, each of which can have its own point value.
-</p>
-
-<section>
+{#snippet createButton()}
   <wa-button
     variant="neutral"
     appearance="accent"
     onclick={() => navigate(`contests/${contestId}/new-problem`)}
     >Create problem</wa-button
   >
+{/snippet}
 
+<p class="copy">
+  Problems refer to the boulder problems that the contenders will attempt during
+  the contest, each of which can have its own point value.
+</p>
+
+<section>
   {#if sortedProblemsWithAscents === undefined}
     <Loader />
   {:else if sortedProblemsWithAscents.length > 0}
+    {@render createButton()}
     <Table
       {columns}
       data={tableLimit
@@ -178,6 +195,15 @@
         : sortedProblemsWithAscents}
       getId={({ id }) => id}
     ></Table>
+  {:else}
+    <EmptyState
+      title="No problems yet"
+      description="Create boulder problems that contenders will attempt during the contest."
+    >
+      {#snippet actions()}
+        {@render createButton()}
+      {/snippet}
+    </EmptyState>
   {/if}
 
   {#if sortedProblemsWithAscents !== undefined && tableLimit !== undefined && tableLimit < sortedProblemsWithAscents.length}

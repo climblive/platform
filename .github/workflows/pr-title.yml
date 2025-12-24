@@ -1,0 +1,34 @@
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+  merge_group:
+
+jobs:
+  validate-pr-title:
+    name: Validate PR title
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: read
+
+    steps:
+      - run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            TITLE="${{ github.event.pull_request.title }}"
+          else
+            TITLE="${{ github.event.merge_group.head_commit.message }}"
+            TITLE="${TITLE%%$'\n'*}"
+          fi
+
+          if [[ "$TITLE" != "${TITLE,,}" ]]; then
+            echo "❌ PR title must be in all lowercase letters"
+            exit 1
+          fi
+
+          pattern='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([a-z]+\))?!?: .+$'
+
+          if ! [[ "$TITLE" =~ $pattern ]]; then
+            echo "❌ PR title must follow conventional commits format"
+            exit 1
+          fi
+
+          echo "✅ PR title is valid"

@@ -1,6 +1,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
+    EmptyState,
     HoldColorIndicator,
     Table,
     type ColumnDefinition,
@@ -58,6 +59,13 @@
       width: "3fr",
     },
     {
+      label: "Result",
+      mobile: true,
+      render: renderResult,
+      width: "max-content",
+      align: "left",
+    },
+    {
       label: "Flash",
       mobile: true,
       render: renderFlash,
@@ -91,6 +99,18 @@
   </div>
 {/snippet}
 
+{#snippet renderResult({ tick }: TickAndProblem)}
+  {#if tick.top}
+    T
+  {:else if tick.zone2}
+    Z2
+  {:else if tick.zone1}
+    Z1
+  {:else}
+    <wa-icon name="minus"></wa-icon>
+  {/if}
+{/snippet}
+
 {#snippet renderFlash({ tick }: TickAndProblem)}
   <wa-icon name={tick.top && tick.attemptsTop === 1 ? "bolt" : "minus"}
   ></wa-icon>
@@ -106,6 +126,11 @@
 
 {#if tableData && tableData.length > 0}
   <Table {columns} data={tableData} getId={({ tick }) => tick.id}></Table>
+{:else if tableData}
+  <EmptyState
+    title="No ticks yet"
+    description="Ticks will appear here once the contender starts logging their attempts."
+  />
 {/if}
 
 <style>
