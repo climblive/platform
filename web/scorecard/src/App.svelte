@@ -7,7 +7,7 @@
   import { type ScorecardSession } from "@/types";
   import { authenticateContender } from "@/utils/auth";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
-  import { ErrorBoundary } from "@climblive/lib/components";
+  import { ErrorBoundary, SplashScreen } from "@climblive/lib/components";
   import { extractCodeFromPath } from "@climblive/lib/utils";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
@@ -81,34 +81,40 @@
       code = extractedCode;
     }
   });
+
+  let showSplash = $state(true);
 </script>
 
-<ErrorBoundary>
-  <QueryClientProvider client={queryClient}>
-    {#if compatibilityIgnored}
-      <wa-callout variant="neutral" appearance="outlined filled">
-        <wa-icon slot="icon" name="life-ring"></wa-icon>
-        If you experience issues with the app you can
-        <a href={code ? `/failsafe/${code}` : "/failsafe"}
-          >try a basic version</a
-        > instead.
-      </wa-callout>
-    {/if}
-    {#if authenticating}
-      <Loading />
-    {:else}
-      <Router>
-        <Route path="/:code/register"><Register /></Route>
-        <Route path="/:code/edit"><EditProfile /></Route>
-        <Route path="/:code"><Scorecard /></Route>
-        <Route path="/"><Start /></Route>
-      </Router>
-    {/if}
-    {#if import.meta.env.DEV}
-      <SvelteQueryDevtools />
-    {/if}
-  </QueryClientProvider>
-</ErrorBoundary>
+{#if showSplash}
+  <SplashScreen onComplete={() => (showSplash = false)} />
+{:else}
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      {#if compatibilityIgnored}
+        <wa-callout variant="neutral" appearance="outlined filled">
+          <wa-icon slot="icon" name="life-ring"></wa-icon>
+          If you experience issues with the app you can
+          <a href={code ? `/failsafe/${code}` : "/failsafe"}
+            >try a basic version</a
+          > instead.
+        </wa-callout>
+      {/if}
+      {#if authenticating}
+        <Loading />
+      {:else}
+        <Router>
+          <Route path="/:code/register"><Register /></Route>
+          <Route path="/:code/edit"><EditProfile /></Route>
+          <Route path="/:code"><Scorecard /></Route>
+          <Route path="/"><Start /></Route>
+        </Router>
+      {/if}
+      {#if import.meta.env.DEV}
+        <SvelteQueryDevtools />
+      {/if}
+    </QueryClientProvider>
+  </ErrorBoundary>
+{/if}
 
 <style>
   wa-callout {

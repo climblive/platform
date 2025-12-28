@@ -1,5 +1,5 @@
 import "@/main.css";
-import { Fallback, SplashScreen } from "@climblive/lib/components";
+import { Fallback } from "@climblive/lib/components";
 import {
   checkCompat,
   prefersDarkColorScheme,
@@ -7,7 +7,7 @@ import {
   watchColorSchemeChanges,
 } from "@climblive/lib/utils";
 import * as Sentry from "@sentry/svelte";
-import { mount, unmount } from "svelte";
+import { mount } from "svelte";
 import App from "./App.svelte";
 import FailsafeApp from "./FailsafeApp.svelte";
 import TryFailsafe from "./TryFailsafe.svelte";
@@ -35,26 +35,17 @@ if (location.pathname.startsWith("/failsafe")) {
 
   const ignoreCompat = sessionStorage.getItem("compat") === "ignore";
 
-  const splashScreen = mount(SplashScreen, {
-    target: document.body,
-    props: {
-      onComplete: () => {
-        unmount(splashScreen);
-
-        if (compatible || ignoreCompat) {
-          mount(App, {
-            target: document.body,
-          });
-        } else {
-          mount(Fallback, {
-            target: document.body,
-            props: {
-              missingFeatures,
-              alternative: TryFailsafe,
-            },
-          });
-        }
+  if (compatible || ignoreCompat) {
+    mount(App, {
+      target: document.body,
+    });
+  } else {
+    mount(Fallback, {
+      target: document.body,
+      props: {
+        missingFeatures,
+        alternative: TryFailsafe,
       },
-    },
-  });
+    });
+  }
 }

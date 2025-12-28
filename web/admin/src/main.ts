@@ -1,6 +1,6 @@
 import App from "@/App.svelte";
 import "@/main.css";
-import { Fallback, SplashScreen } from "@climblive/lib/components";
+import { Fallback } from "@climblive/lib/components";
 import {
   checkCompat,
   prefersDarkColorScheme,
@@ -8,7 +8,7 @@ import {
   watchColorSchemeChanges,
 } from "@climblive/lib/utils";
 import * as Sentry from "@sentry/svelte";
-import { mount, unmount } from "svelte";
+import { mount } from "svelte";
 
 if (import.meta.env.PROD) {
   Sentry.init({
@@ -32,24 +32,15 @@ const [compatible, missingFeatures] = checkCompat();
 
 const ignoreCompat = sessionStorage.getItem("compat") === "ignore";
 
-const splashScreen = mount(SplashScreen, {
-  target: document.body,
-  props: {
-    onComplete: () => {
-      unmount(splashScreen);
-
-      if (compatible || ignoreCompat) {
-        mount(App, {
-          target: document.body,
-        });
-      } else {
-        mount(Fallback, {
-          target: document.body,
-          props: {
-            missingFeatures,
-          },
-        });
-      }
+if (compatible || ignoreCompat) {
+  mount(App, {
+    target: document.body,
+  });
+} else {
+  mount(Fallback, {
+    target: document.body,
+    props: {
+      missingFeatures,
     },
-  },
-});
+  });
+}
