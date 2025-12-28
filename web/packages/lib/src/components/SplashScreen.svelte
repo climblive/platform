@@ -39,8 +39,8 @@
 </script>
 
 {#if visible}
-  <div class="splash-screen" onanimationend={handleAnimationEnd}>
-    <div class="logo">
+  <div class="splash-screen">
+    <div class="logo" onanimationend={handleAnimationEnd}>
       <FullLogo />
     </div>
   </div>
@@ -58,21 +58,21 @@
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    animation: slide-in 0.5s ease-out;
-  }
-
-  @keyframes slide-in {
-    from {
-      transform: translateY(-100%);
-    }
-    to {
-      transform: translateY(0);
-    }
   }
 
   .logo {
     width: 50%;
     max-width: 600px;
     color: white;
+    animation: slide-in 0.5s ease-out;
+  }
+
+  @keyframes slide-in {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
   }
 </style>
