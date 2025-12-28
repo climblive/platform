@@ -1,17 +1,16 @@
 <script lang="ts">
-  import { onMount } from "svelte";
   import FullLogo from "./FullLogo.svelte";
 
   let { onComplete }: { onComplete?: () => void } = $props();
 
   let visible = $state(true);
-  let startTime: number;
-
-  onMount(() => {
-    startTime = Date.now();
-  });
+  let startTime = Date.now();
+  let completed = false;
 
   const handleAnimationEnd = () => {
+    if (completed) return;
+    completed = true;
+
     const elapsed = Date.now() - startTime;
     const remaining = Math.max(0, 2000 - elapsed);
 
