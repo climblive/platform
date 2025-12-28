@@ -1,13 +1,26 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import FullLogo from "./FullLogo.svelte";
 
   let { onComplete }: { onComplete?: () => void } = $props();
 
   let visible = $state(true);
-  let startTime = Date.now();
+  let startTime: number;
   let completed = false;
 
-  const handleAnimationEnd = () => {
+  onMount(() => {
+    startTime = Date.now();
+
+    const fallbackTimeout = setTimeout(() => {
+      if (!completed) {
+        handleCompletion();
+      }
+    }, 2500);
+
+    return () => clearTimeout(fallbackTimeout);
+  });
+
+  const handleCompletion = () => {
     if (completed) return;
     completed = true;
 
@@ -18,6 +31,10 @@
       visible = false;
       onComplete?.();
     }, remaining);
+  };
+
+  const handleAnimationEnd = () => {
+    handleCompletion();
   };
 </script>
 
