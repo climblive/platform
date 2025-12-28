@@ -1,7 +1,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
-  import { ErrorBoundary } from "@climblive/lib/components";
+  import { ErrorBoundary, SplashScreen } from "@climblive/lib/components";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { onDestroy, onMount, setContext } from "svelte";
@@ -66,6 +66,8 @@
   onMount(authenticator.startKeepAlive);
 
   onDestroy(authenticator.stopKeepAlive);
+
+  let showSplash = $state(true);
 </script>
 
 <svelte:window
@@ -73,37 +75,41 @@
   onvisibilitychange={handleVisibilityChange}
 />
 
-<ErrorBoundary>
-  {#await authenticator.authenticate()}
-    <main>
-      <wa-spinner></wa-spinner>
-    </main>
-  {:then}
-    <QueryClientProvider client={queryClient}>
-      {#if !authenticator.isAuthenticated()}
-        <main>
-          <section>
-            <h1>Hi!</h1>
-            <p>Sign-in to manage your competitions on ClimbLive.</p>
-            <wa-button variant="neutral" onclick={authenticator.redirectLogin}
-              >Sign in</wa-button
-            >
-            <wa-button
-              variant="neutral"
-              appearance="plain"
-              onclick={authenticator.redirectSignup}>Sign up</wa-button
-            >
-          </section>
-        </main>
-      {:else}
-        <Main />
-      {/if}
-      {#if import.meta.env.DEV}
-        <SvelteQueryDevtools />
-      {/if}
-    </QueryClientProvider>
-  {/await}
-</ErrorBoundary>
+{#if showSplash}
+  <SplashScreen onComplete={() => (showSplash = false)} />
+{:else}
+  <ErrorBoundary>
+    {#await authenticator.authenticate()}
+      <main>
+        <wa-spinner></wa-spinner>
+      </main>
+    {:then}
+      <QueryClientProvider client={queryClient}>
+        {#if !authenticator.isAuthenticated()}
+          <main>
+            <section>
+              <h1>Hi!</h1>
+              <p>Sign-in to manage your competitions on ClimbLive.</p>
+              <wa-button variant="neutral" onclick={authenticator.redirectLogin}
+                >Sign in</wa-button
+              >
+              <wa-button
+                variant="neutral"
+                appearance="plain"
+                onclick={authenticator.redirectSignup}>Sign up</wa-button
+              >
+            </section>
+          </main>
+        {:else}
+          <Main />
+        {/if}
+        {#if import.meta.env.DEV}
+          <SvelteQueryDevtools />
+        {/if}
+      </QueryClientProvider>
+    {/await}
+  </ErrorBoundary>
+{/if}
 
 <style>
   main {
