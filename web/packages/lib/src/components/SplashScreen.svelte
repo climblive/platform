@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import FullLogo from "./FullLogo.svelte";
+  import SplashLogo from "./SplashLogo.svelte";
 
   let { onComplete }: { onComplete?: () => void } = $props();
 
@@ -41,7 +41,7 @@
 {#if visible}
   <div class="splash-screen">
     <div class="logo" onanimationend={handleAnimationEnd}>
-      <FullLogo />
+      <SplashLogo />
     </div>
   </div>
 {/if}
