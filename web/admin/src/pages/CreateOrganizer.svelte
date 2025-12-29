@@ -47,7 +47,10 @@
       { name },
       {
         onSuccess: (organizer: Organizer) => {
-          navigate(`./organizers/${organizer.id}/contests`);
+          if (dialog) {
+            dialog.open = false;
+          }
+          navigate(`/admin/organizers/${organizer.id}/contests`);
         },
         onError: () => toastError("Failed to create organizer."),
       },
