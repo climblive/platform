@@ -12,6 +12,7 @@ type organizerUseCaseRepository interface {
 	domain.Transactor
 
 	GetOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) (domain.Organizer, error)
+	StoreOrganizer(ctx context.Context, tx domain.Transaction, organizer domain.Organizer) (domain.Organizer, error)
 	GetOrganizerInvitesByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.OrganizerInvite, error)
 	GetOrganizerInvite(ctx context.Context, tx domain.Transaction, inviteID domain.OrganizerInviteID) (domain.OrganizerInvite, error)
 	StoreOrganizerInvite(ctx context.Context, tx domain.Transaction, invite domain.OrganizerInvite) error
@@ -24,6 +25,48 @@ type OrganizerUseCase struct {
 	Authorizer    domain.Authorizer
 	Repo          organizerUseCaseRepository
 	UUIDGenerator domain.UUIDGenerator
+}
+
+func (uc *OrganizerUseCase) CreateOrganizer(ctx context.Context, template domain.OrganizerTemplate) (domain.Organizer, error) {
+	authentication, err := uc.Authorizer.GetAuthentication(ctx)
+	if err != nil {
+		return domain.Organizer{}, errors.Wrap(err, 0)
+	}
+
+	user, err := uc.Repo.GetUserByUsername(ctx, nil, authentication.Username)
+	if err != nil {
+		return domain.Organizer{}, errors.Wrap(err, 0)
+	}
+
+	organizer := domain.Organizer{
+		Name: template.Name,
+	}
+
+	tx, err := uc.Repo.Begin()
+	if err != nil {
+		return domain.Organizer{}, errors.Wrap(err, 0)
+	}
+
+	organizer, err = uc.Repo.StoreOrganizer(ctx, tx, organizer)
+	if err != nil {
+		tx.Rollback()
+		return domain.Organizer{}, errors.Wrap(err, 0)
+	}
+
+	err = uc.Repo.AddUserToOrganizer(ctx, tx, user.ID, organizer.ID)
+	if err != nil {
+		tx.Rollback()
+		return domain.Organizer{}, errors.Wrap(err, 0)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return domain.Organizer{}, errors.Wrap(err, 0)
+	}
+
+	organizer.Ownership = domain.OwnershipData{OrganizerID: organizer.ID}
+
+	return organizer, nil
 }
 
 func (uc *OrganizerUseCase) GetOrganizer(ctx context.Context, organizerID domain.OrganizerID) (domain.Organizer, error) {

@@ -11,6 +11,7 @@
   import { Link, navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
   import ContestList from "./ContestList.svelte";
+  import CreateOrganizer from "./CreateOrganizer.svelte";
 
   interface Props {
     organizerId: number;
@@ -74,6 +75,20 @@
         <wa-option value={organizer.id}>{organizer.name}</wa-option>
       {/each}
     </wa-select>
+
+    <CreateOrganizer>
+      {#snippet children({ createOrganizer })}
+        <wa-button
+          size="small"
+          variant="neutral"
+          appearance="accent"
+          onclick={createOrganizer}
+        >
+          <wa-icon slot="start" name="plus"></wa-icon>
+          New organizer
+        </wa-button>
+      {/snippet}
+    </CreateOrganizer>
   {/if}
 
   <div class="controls">
@@ -105,6 +120,7 @@
 
   wa-select {
     width: 100%;
+    margin-block-end: var(--wa-space-s);
   }
 
   wa-switch {

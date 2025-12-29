@@ -2,6 +2,7 @@ package rest
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -9,6 +10,7 @@ import (
 )
 
 type organizerUseCase interface {
+	CreateOrganizer(ctx context.Context, template domain.OrganizerTemplate) (domain.Organizer, error)
 	GetOrganizer(ctx context.Context, organizerID domain.OrganizerID) (domain.Organizer, error)
 	GetOrganizerInvitesByOrganizer(ctx context.Context, organizerID domain.OrganizerID) ([]domain.OrganizerInvite, error)
 	GetOrganizerInvite(ctx context.Context, inviteID domain.OrganizerInviteID) (domain.OrganizerInvite, error)
@@ -26,12 +28,30 @@ func InstallOrganizerHandler(mux *Mux, organizerUseCase organizerUseCase) {
 		organizerUseCase: organizerUseCase,
 	}
 
+	mux.HandleFunc("POST /organizers", handler.CreateOrganizer)
 	mux.HandleFunc("GET /organizers/{organizerID}", handler.GetOrganizer)
 	mux.HandleFunc("GET /organizers/{organizerID}/invites", handler.GetOrganizerInvites)
 	mux.HandleFunc("POST /organizers/{organizerID}/invites", handler.CreateOrganizerInvite)
 	mux.HandleFunc("GET /invites/{inviteID}", handler.GetOrganizerInvite)
 	mux.HandleFunc("DELETE /invites/{inviteID}", handler.DeleteOrganizerInvite)
 	mux.HandleFunc("POST /invites/{inviteID}/accept", handler.AcceptOrganizerInvite)
+}
+
+func (hdlr *organizerHandler) CreateOrganizer(w http.ResponseWriter, r *http.Request) {
+	var template domain.OrganizerTemplate
+	err := json.NewDecoder(r.Body).Decode(&template)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	organizer, err := hdlr.organizerUseCase.CreateOrganizer(r.Context(), template)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusCreated, organizer)
 }
 
 func (hdlr *organizerHandler) GetOrganizer(w http.ResponseWriter, r *http.Request) {
