@@ -450,8 +450,7 @@ export class ApiClient {
   getOrganizerInvite = async (inviteId: OrganizerInviteID) => {
     const endpoint = `/invites/${inviteId}`;
 
-    const result = await this.axiosInstance.get(endpoint, {
-    });
+    const result = await this.axiosInstance.get(endpoint, {});
 
     return organizerInviteSchema.parse(result.data);
   };
