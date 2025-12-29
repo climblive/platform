@@ -76,6 +76,6 @@
   section {
     display: flex;
     align-items: start;
-    gap: var(--wa-space-m);
+    gap: var(--wa-space-xs);
   }
 </style>
