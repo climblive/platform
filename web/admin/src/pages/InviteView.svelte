@@ -65,7 +65,6 @@
       variant="success"
       appearance="filled-outlined"
       onclick={handleAccept}
-      loading={false}
       >Accept
       <wa-icon slot="start" name="check"></wa-icon>
     </wa-button>
