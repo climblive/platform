@@ -86,13 +86,13 @@ func (d *Database) GetOrganizerInvite(ctx context.Context, tx domain.Transaction
 }
 
 func (d *Database) StoreOrganizerInvite(ctx context.Context, tx domain.Transaction, invite domain.OrganizerInvite) error {
-	params := database.UpsertOrganizerInviteParams{
+	params := database.InsertOrganizerInviteParams{
 		ID:          invite.ID.String(),
 		OrganizerID: int32(invite.OrganizerID),
 		ExpiresAt:   invite.ExpiresAt,
 	}
 
-	err := d.WithTx(tx).UpsertOrganizerInvite(ctx, params)
+	err := d.WithTx(tx).InsertOrganizerInvite(ctx, params)
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}

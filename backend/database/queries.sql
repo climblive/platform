@@ -293,23 +293,20 @@ ON DUPLICATE KEY UPDATE
 -- name: GetOrganizerInvitesByOrganizer :many
 SELECT sqlc.embed(organizer_invite), organizer.name
 FROM organizer_invite
-LEFT JOIN organizer ON organizer.id = organizer_invite.organizer_id
+JOIN organizer ON organizer.id = organizer_invite.organizer_id
 WHERE organizer_id = ?;
 
 -- name: GetOrganizerInvite :one
 SELECT sqlc.embed(organizer_invite), organizer.name
 FROM organizer_invite
-LEFT JOIN organizer ON organizer.id = organizer_invite.organizer_id
+JOIN organizer ON organizer.id = organizer_invite.organizer_id
 WHERE organizer_invite.id = ?;
 
--- name: UpsertOrganizerInvite :exec
+-- name: InsertOrganizerInvite :exec
 INSERT INTO
     organizer_invite (id, organizer_id, expires_at)
 VALUES
-    (?, ?, ?)
-ON DUPLICATE KEY UPDATE
-    organizer_id = VALUES(organizer_id),
-    expires_at = VALUES(expires_at);
+    (?, ?, ?);
 
 -- name: DeleteOrganizerInvite :exec
 DELETE FROM organizer_invite

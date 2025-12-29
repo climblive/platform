@@ -1149,6 +1149,24 @@ func (q *Queries) GetUsersByOrganizer(ctx context.Context, organizerID int32) ([
 	return items, nil
 }
 
+const insertOrganizerInvite = `-- name: InsertOrganizerInvite :exec
+INSERT INTO
+    organizer_invite (id, organizer_id, expires_at)
+VALUES
+    (?, ?, ?)
+`
+
+type InsertOrganizerInviteParams struct {
+	ID          string
+	OrganizerID int32
+	ExpiresAt   time.Time
+}
+
+func (q *Queries) InsertOrganizerInvite(ctx context.Context, arg InsertOrganizerInviteParams) error {
+	_, err := q.db.ExecContext(ctx, insertOrganizerInvite, arg.ID, arg.OrganizerID, arg.ExpiresAt)
+	return err
+}
+
 const insertTick = `-- name: InsertTick :execlastid
 INSERT INTO
     tick (organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
@@ -1356,27 +1374,6 @@ func (q *Queries) UpsertOrganizer(ctx context.Context, arg UpsertOrganizerParams
 		return 0, err
 	}
 	return result.LastInsertId()
-}
-
-const upsertOrganizerInvite = `-- name: UpsertOrganizerInvite :exec
-INSERT INTO
-    organizer_invite (id, organizer_id, expires_at)
-VALUES
-    (?, ?, ?)
-ON DUPLICATE KEY UPDATE
-    organizer_id = VALUES(organizer_id),
-    expires_at = VALUES(expires_at)
-`
-
-type UpsertOrganizerInviteParams struct {
-	ID          string
-	OrganizerID int32
-	ExpiresAt   time.Time
-}
-
-func (q *Queries) UpsertOrganizerInvite(ctx context.Context, arg UpsertOrganizerInviteParams) error {
-	_, err := q.db.ExecContext(ctx, upsertOrganizerInvite, arg.ID, arg.OrganizerID, arg.ExpiresAt)
-	return err
 }
 
 const upsertProblem = `-- name: UpsertProblem :execlastid
