@@ -93,7 +93,7 @@
 
 <style>
   .controls {
-    margin-block-start: var(--wa-space-s);
+    margin-block-start: var(--wa-space-m);
     width: 100%;
     display: flex;
     justify-content: space-between;
