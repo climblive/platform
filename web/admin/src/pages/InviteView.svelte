@@ -56,7 +56,7 @@
     </wa-callout>
   {:else}
     <p>
-      You have been invited to be a member of <strong
+      You have been invited to be a co-organizer of <strong
         >{invite.organizerName}</strong
       >.
     </p>
