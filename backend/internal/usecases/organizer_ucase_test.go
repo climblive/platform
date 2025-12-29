@@ -295,10 +295,6 @@ func TestAcceptOrganizerInvite(t *testing.T) {
 				On("GetAuthentication", mock.Anything).
 				Return(domain.Authentication{Username: fakedUsername}, nil)
 
-			mockedAuthorizer.
-				On("HasOwnership", mock.Anything, domain.OwnershipData{}).
-				Return(domain.NilRole, nil)
-
 			mockedRepo.
 				On("GetUserByUsername", mock.Anything, mock.Anything, fakedUsername).
 				Return(fakedUser, nil)

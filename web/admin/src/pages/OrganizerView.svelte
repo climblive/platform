@@ -77,11 +77,15 @@
   {/if}
 
   <div class="controls">
-    {#if self?.admin}
-      <wa-switch size="small" bind:this={showAllToggle} onchange={toggleShowAll}
-        >Show all</wa-switch
-      >
-    {/if}
+    <div>
+      {#if self?.admin}
+        <wa-switch
+          size="small"
+          bind:this={showAllToggle}
+          onchange={toggleShowAll}>Show all</wa-switch
+        >
+      {/if}
+    </div>
 
     <Link to={`./organizers/${organizerId}`}
       >Organizer settings and invites</Link

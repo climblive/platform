@@ -120,8 +120,6 @@ func (uc *OrganizerUseCase) AcceptOrganizerInvite(ctx context.Context, inviteID 
 		return errors.Wrap(err, 0)
 	}
 
-	_, _ = uc.Authorizer.HasOwnership(ctx, domain.OwnershipData{})
-
 	user, err := uc.Repo.GetUserByUsername(ctx, nil, authentication.Username)
 	if err != nil {
 		return errors.Wrap(err, 0)
