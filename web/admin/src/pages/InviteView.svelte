@@ -1,6 +1,5 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/copy-button/copy-button.js";
   import { ApiClient } from "@climblive/lib";
   import type { OrganizerInviteID } from "@climblive/lib/models";
   import {
