@@ -20,7 +20,6 @@
   import { toastError } from "@climblive/lib/utils";
   import { isAfter } from "date-fns";
   import { navigate } from "svelte-routing";
-  import CreateOrganizer from "./CreateOrganizer.svelte";
   import DeleteInvite from "./DeleteInvite.svelte";
 
   interface Props {
@@ -135,20 +134,6 @@
         >{organizer.name}</wa-breadcrumb-item
       >
     </wa-breadcrumb>
-
-    <CreateOrganizer>
-      {#snippet children({ createOrganizer })}
-        <wa-button
-          size="small"
-          variant="neutral"
-          appearance="accent"
-          onclick={createOrganizer}
-        >
-          <wa-icon slot="start" name="plus"></wa-icon>
-          New organizer
-        </wa-button>
-      {/snippet}
-    </CreateOrganizer>
 
     <h2>Co-organizers</h2>
     <Table columns={userColumns} data={users} getId={({ id }) => id}></Table>

@@ -11,6 +11,7 @@
   import { Link, navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
   import ContestList from "./ContestList.svelte";
+  import CreateOrganizer from "./CreateOrganizer.svelte";
 
   interface Props {
     organizerId: number;
@@ -62,18 +63,33 @@
 
 {#if self}
   {#if !showAll}
-    <wa-select
-      bind:this={select}
-      size="small"
-      appearance="outlined filled"
-      {@attach value($selectedOrganizerId)}
-      onchange={handleChange}
-    >
-      <wa-icon name="id-badge" slot="start"></wa-icon>
-      {#each self.organizers as organizer (organizer.id)}
-        <wa-option value={organizer.id}>{organizer.name}</wa-option>
-      {/each}
-    </wa-select>
+    <div class="organizer-select">
+      <wa-select
+        bind:this={select}
+        size="small"
+        appearance="outlined filled"
+        {@attach value($selectedOrganizerId)}
+        onchange={handleChange}
+      >
+        <wa-icon name="id-badge" slot="start"></wa-icon>
+        {#each self.organizers as organizer (organizer.id)}
+          <wa-option value={organizer.id}>{organizer.name}</wa-option>
+        {/each}
+      </wa-select>
+
+      <CreateOrganizer>
+        {#snippet children({ createOrganizer })}
+          <wa-button
+            size="small"
+            variant="neutral"
+            appearance="outlined"
+            onclick={createOrganizer}
+          >
+            <wa-icon name="plus"></wa-icon>
+          </wa-button>
+        {/snippet}
+      </CreateOrganizer>
+    </div>
   {/if}
 
   <div class="controls">
@@ -87,7 +103,8 @@
       {/if}
     </div>
 
-    <Link to={`./organizers/${organizerId}`}>Manage organizers and invites</Link
+    <Link to={`./organizers/${organizerId}`}
+      >Organizer settings and invites</Link
     >
   </div>
 {/if}
@@ -95,12 +112,24 @@
 <ContestList organizerId={showAll ? undefined : Number(organizerId)} />
 
 <style>
+  .organizer-select {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: var(--wa-space-xs);
+  }
+
   .controls {
     margin-block-start: var(--wa-space-m);
     width: 100%;
     display: flex;
     justify-content: space-between;
     font-size: var(--wa-font-size-s);
+    align-items: center;
+  }
+
+  wa-button {
+    flex-grow: 0;
   }
 
   wa-select {

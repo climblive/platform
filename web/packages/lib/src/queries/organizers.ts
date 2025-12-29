@@ -4,7 +4,7 @@ import {
   useQueryClient,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import type { OrganizerTemplate } from "../models";
+import type { Organizer, OrganizerTemplate, User } from "../models";
 
 export const createOrganizerMutation = () => {
   const client = useQueryClient();
@@ -12,8 +12,19 @@ export const createOrganizerMutation = () => {
   return createMutation(() => ({
     mutationFn: async (template: OrganizerTemplate) =>
       ApiClient.getInstance().createOrganizer(template),
-    onSuccess: () => {
-      client.invalidateQueries({ queryKey: ["user", "self"] });
+    onSuccess: (newOrganizer: Organizer) => {
+      client.setQueryData<User>(["self"], (current) => {
+        if (!current) {
+          return current;
+        }
+
+        return {
+          ...current,
+          organizers: [...(current.organizers ?? []), newOrganizer],
+        };
+      });
+
+      client.invalidateQueries({ queryKey: ["self"] });
     },
   }));
 };

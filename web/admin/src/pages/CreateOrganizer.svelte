@@ -8,8 +8,8 @@
   import type { Organizer } from "@climblive/lib/models";
   import { createOrganizerMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import { navigate } from "svelte-routing";
   import type { Snippet } from "svelte";
+  import { navigate } from "svelte-routing";
 
   type Props = {
     children: Snippet<[{ createOrganizer: () => void }]>;
@@ -47,10 +47,7 @@
       { name },
       {
         onSuccess: (organizer: Organizer) => {
-          if (dialog) {
-            dialog.open = false;
-          }
-          navigate(`/admin/organizers/${organizer.id}/contests`);
+          navigate(`./organizers/${organizer.id}/contests`);
         },
         onError: () => toastError("Failed to create organizer."),
       },
@@ -58,34 +55,40 @@
   };
 </script>
 
-{@render children({ createOrganizer: handleOpen })}
+<div>
+  {@render children({ createOrganizer: handleOpen })}
 
-<wa-dialog bind:this={dialog} label="Create new organizer">
-  <form onsubmit={handleSubmit}>
-    <wa-input
-      bind:this={nameInput}
-      label="Organizer name"
-      required
-      autofocus
-    ></wa-input>
+  <wa-dialog bind:this={dialog} label="Create new organizer">
+    <form onsubmit={handleSubmit}>
+      <wa-input bind:this={nameInput} label="Organizer name" required
+      ></wa-input>
 
-    <wa-button slot="footer" appearance="plain" onclick={handleCancel} type="button">
-      Cancel
-    </wa-button>
-    <wa-button
-      slot="footer"
-      variant="neutral"
-      appearance="accent"
-      type="submit"
-      loading={createOrganizer.isPending}
-    >
-      Create
-    </wa-button>
-  </form>
-</wa-dialog>
+      <div class="controls">
+        <wa-button appearance="plain" onclick={handleCancel} type="button">
+          Cancel
+        </wa-button>
+        <wa-button
+          variant="neutral"
+          appearance="accent"
+          type="submit"
+          loading={createOrganizer.isPending}
+        >
+          Create
+        </wa-button>
+      </div>
+    </form>
+  </wa-dialog>
+</div>
 
 <style>
   wa-dialog {
     white-space: normal;
+  }
+
+  .controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--wa-space-xs);
+    margin-top: var(--wa-space-m);
   }
 </style>
