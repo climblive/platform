@@ -263,11 +263,6 @@ func (m *repositoryMock) GetOrganizerInvitesByOrganizer(ctx context.Context, tx 
 	return args.Get(0).([]domain.OrganizerInvite), args.Error(1)
 }
 
-func (m *repositoryMock) CreateOrganizerInvite(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID, code string) (domain.OrganizerInvite, error) {
-	args := m.Called(ctx, tx, organizerID, code)
-	return args.Get(0).(domain.OrganizerInvite), args.Error(1)
-}
-
 func (m *repositoryMock) StoreOrganizerInvite(ctx context.Context, tx domain.Transaction, invite domain.OrganizerInvite) error {
 	args := m.Called(ctx, tx, invite)
 	return args.Error(0)
