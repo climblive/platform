@@ -57,10 +57,7 @@ func (d *Database) GetAllOrganizers(ctx context.Context, tx domain.Transaction) 
 
 func (d *Database) GetOrganizerInvitesByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.OrganizerInvite, error) {
 	records, err := d.WithTx(tx).GetOrganizerInvitesByOrganizer(ctx, int32(organizerID))
-	switch {
-	case errors.Is(err, sql.ErrNoRows):
-		return nil, errors.Wrap(domain.ErrNotFound, 0)
-	case err != nil:
+	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
 
