@@ -28,6 +28,10 @@ type OrganizerUseCase struct {
 }
 
 func (uc *OrganizerUseCase) CreateOrganizer(ctx context.Context, template domain.OrganizerTemplate) (domain.Organizer, error) {
+	if template.Name == "" {
+		return domain.Organizer{}, errors.Wrap(domain.ErrInvalidData, 0)
+	}
+
 	authentication, err := uc.Authorizer.GetAuthentication(ctx)
 	if err != nil {
 		return domain.Organizer{}, errors.Wrap(err, 0)
