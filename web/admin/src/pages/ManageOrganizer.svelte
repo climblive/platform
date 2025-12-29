@@ -21,6 +21,7 @@
   import { isAfter } from "date-fns";
   import { navigate } from "svelte-routing";
   import DeleteInvite from "./DeleteInvite.svelte";
+  import EditOrganizer from "./EditOrganizer.svelte";
 
   interface Props {
     organizerId: number;
@@ -135,6 +136,23 @@
       >
     </wa-breadcrumb>
 
+    <div class="header">
+      <h1>{organizer.name}</h1>
+      <EditOrganizer {organizer}>
+        {#snippet children({ editOrganizer })}
+          <wa-button
+            variant="neutral"
+            appearance="plain"
+            size="small"
+            onclick={editOrganizer}
+          >
+            <wa-icon name="pencil" label="Edit organizer"></wa-icon>
+            Edit
+          </wa-button>
+        {/snippet}
+      </EditOrganizer>
+    </div>
+
     <h2>Co-organizers</h2>
     <Table columns={userColumns} data={users} getId={({ id }) => id}></Table>
 
@@ -165,6 +183,17 @@
     flex-direction: column;
     align-items: start;
     gap: var(--wa-space-m);
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-s);
+    width: 100%;
+  }
+
+  .header h1 {
+    margin: 0;
   }
 
   .expired {

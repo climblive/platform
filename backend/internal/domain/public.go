@@ -104,6 +104,10 @@ type OrganizerTemplate struct {
 	Name string `json:"name"`
 }
 
+type OrganizerPatch struct {
+	Name Patch[string] `json:"name,omitempty" tstype:"string"`
+}
+
 type OrganizerInvite struct {
 	ID            OrganizerInviteID `json:"id"`
 	OrganizerID   OrganizerID       `json:"organizerId"`
