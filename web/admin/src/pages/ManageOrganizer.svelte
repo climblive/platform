@@ -45,7 +45,7 @@
 
   const inviteColumns: ColumnDefinition<OrganizerInvite>[] = [
     {
-      label: "Invite",
+      label: "Invite link",
       mobile: true,
       render: renderCopyLink,
       width: "1fr",
