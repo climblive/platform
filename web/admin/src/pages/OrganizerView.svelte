@@ -10,7 +10,7 @@
   import { value } from "@climblive/lib/forms";
   import { getSelfQuery } from "@climblive/lib/queries";
   import { getContext, onMount } from "svelte";
-  import { navigate } from "svelte-routing";
+  import { Link, navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
   import ContestList from "./ContestList.svelte";
 
@@ -76,13 +76,10 @@
       >
     {/if}
 
-    <wa-button
-      appearance="plain"
-      variant="brand"
-      size="small"
-      onclick={() => navigate(`./organizers/${organizerId}`)}
+    <Link
+      to={`./organizers/${organizerId}`}
       >Organizer settings and invites
-    </wa-button>
+    </Link>
   </div>
 {/if}
 
