@@ -15,7 +15,7 @@
 
   let dialog: WaDialog | undefined = $state();
 
-  let { inviteId, children }: Props = $props();
+  const { inviteId, children }: Props = $props();
 
   const deleteInvite = $derived(deleteOrganizerInviteMutation(inviteId));
 
