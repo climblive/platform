@@ -120,7 +120,7 @@
   }
 
   .controls {
-    margin-block-start: var(--wa-space-m);
+    margin-block: var(--wa-space-m) var(--wa-space-xl);
     width: 100%;
     display: flex;
     justify-content: space-between;
