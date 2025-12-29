@@ -299,7 +299,7 @@ WHERE organizer_id = ?;
 -- name: GetOrganizerInvite :one
 SELECT sqlc.embed(organizer_invite), organizer.name
 FROM organizer_invite
-JOIN organizer ON organizer.id = organizer_invite.organizer_id
+LEFT JOIN organizer ON organizer.id = organizer_invite.organizer_id
 WHERE organizer_invite.id = ?;
 
 -- name: UpsertOrganizerInvite :exec
