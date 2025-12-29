@@ -199,6 +199,16 @@ func (m *repositoryMock) GetOrganizer(ctx context.Context, tx domain.Transaction
 	return args.Get(0).(domain.Organizer), args.Error(1)
 }
 
+func (m *repositoryMock) StoreOrganizer(ctx context.Context, tx domain.Transaction, organizer domain.Organizer) (domain.Organizer, error) {
+	args := m.Called(ctx, tx, organizer)
+
+	if _, ok := args.Get(0).(mirrorInstruction); ok {
+		return organizer, nil
+	} else {
+		return args.Get(0).(domain.Organizer), args.Error(1)
+	}
+}
+
 func (m *repositoryMock) GetRaffle(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) (domain.Raffle, error) {
 	args := m.Called(ctx, tx, raffleID)
 	return args.Get(0).(domain.Raffle), args.Error(1)
