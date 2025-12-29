@@ -109,7 +109,9 @@ func (uc *OrganizerUseCase) AcceptOrganizerInvite(ctx context.Context, inviteID 
 		return errors.Wrap(err, 0)
 	}
 
-	if time.Now().After(invite.ExpiresAt) {
+	now := time.Now()
+
+	if now.Equal(invite.ExpiresAt) || now.After(invite.ExpiresAt) {
 		return errors.Wrap(domain.ErrExpired, 0)
 	}
 

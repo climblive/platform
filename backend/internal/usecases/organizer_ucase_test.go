@@ -266,3 +266,97 @@ func TestCreateOrganizerInvite(t *testing.T) {
 		mockedRepo.AssertExpectations(t)
 	})
 }
+
+func TestAcceptOrganizerInvite(t *testing.T) {
+	fakedInviteID := domain.OrganizerInviteID(uuid.New())
+	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedUserID := randomResourceID[domain.UserID]()
+	fakedUsername := "alice"
+
+	t.Run("HappyPath", func(t *testing.T) {
+		synctest.Test(t, func(t *testing.T) {
+			mockedRepo := new(repositoryMock)
+			mockedAuthorizer := new(authorizerMock)
+			mockedTx := new(transactionMock)
+
+			fakedInvite := domain.OrganizerInvite{
+				ID:          fakedInviteID,
+				OrganizerID: fakedOrganizerID,
+				ExpiresAt:   time.Now().Add(time.Nanosecond),
+			}
+
+			fakedUser := domain.User{ID: fakedUserID, Username: fakedUsername}
+
+			mockedRepo.
+				On("GetOrganizerInvite", mock.Anything, mock.Anything, fakedInviteID).
+				Return(fakedInvite, nil)
+
+			mockedAuthorizer.
+				On("GetAuthentication", mock.Anything).
+				Return(domain.Authentication{Username: fakedUsername}, nil)
+
+			mockedAuthorizer.
+				On("HasOwnership", mock.Anything, domain.OwnershipData{}).
+				Return(domain.NilRole, nil)
+
+			mockedRepo.
+				On("GetUserByUsername", mock.Anything, mock.Anything, fakedUsername).
+				Return(fakedUser, nil)
+
+			mockedRepo.
+				On("Begin").
+				Return(mockedTx, nil)
+
+			mockedRepo.
+				On("AddUserToOrganizer", mock.Anything, mockedTx, fakedUserID, fakedOrganizerID).
+				Return(nil)
+
+			mockedRepo.
+				On("DeleteOrganizerInvite", mock.Anything, mockedTx, fakedInviteID).
+				Return(nil)
+
+			mockedTx.
+				On("Commit").
+				Return(nil)
+
+			ucase := usecases.OrganizerUseCase{
+				Repo:       mockedRepo,
+				Authorizer: mockedAuthorizer,
+			}
+
+			err := ucase.AcceptOrganizerInvite(context.Background(), fakedInviteID)
+
+			require.NoError(t, err)
+
+			mockedAuthorizer.AssertExpectations(t)
+			mockedRepo.AssertExpectations(t)
+			mockedTx.AssertExpectations(t)
+		})
+	})
+
+	t.Run("ExpiredInvite", func(t *testing.T) {
+		synctest.Test(t, func(t *testing.T) {
+			mockedRepo := new(repositoryMock)
+
+			fakedInvite := domain.OrganizerInvite{
+				ID:          fakedInviteID,
+				OrganizerID: fakedOrganizerID,
+				ExpiresAt:   time.Now(),
+			}
+
+			mockedRepo.
+				On("GetOrganizerInvite", mock.Anything, mock.Anything, fakedInviteID).
+				Return(fakedInvite, nil)
+
+			ucase := usecases.OrganizerUseCase{
+				Repo: mockedRepo,
+			}
+
+			err := ucase.AcceptOrganizerInvite(context.Background(), fakedInviteID)
+
+			assert.ErrorIs(t, err, domain.ErrExpired)
+
+			mockedRepo.AssertExpectations(t)
+		})
+	})
+}
