@@ -1,5 +1,6 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import { ApiClient } from "@climblive/lib";
   import type { OrganizerInviteID } from "@climblive/lib/models";
   import {
@@ -7,6 +8,7 @@
     getOrganizerInviteQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
+  import { isAfter } from "date-fns";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -47,28 +49,36 @@
 </script>
 
 {#if invite}
-  <p>
-    You have been invited to be a member of <strong
-      >{invite.organizerName}</strong
-    >.
-  </p>
-  <section>
-    <wa-button
-      variant="danger"
-      appearance="outlined"
-      onclick={handleDecline}
-      loading={deleteInvite.isPending}
-      >Decline
-      <wa-icon slot="start" name="trash"></wa-icon>
-    </wa-button>
-    <wa-button
-      variant="success"
-      appearance="filled-outlined"
-      onclick={handleAccept}
-      >Accept
-      <wa-icon slot="start" name="check"></wa-icon>
-    </wa-button>
-  </section>
+  {#if isAfter(new Date(), invite.expiresAt)}
+    <wa-callout variant="danger">
+      <wa-icon slot="icon" name="circle-exclamation"></wa-icon>
+      This invite has expired and can no longer be accepted.
+    </wa-callout>
+  {:else}
+    <p>
+      You have been invited to be a member of <strong
+        >{invite.organizerName}</strong
+      >.
+    </p>
+
+    <section>
+      <wa-button
+        variant="danger"
+        appearance="outlined"
+        onclick={handleDecline}
+        loading={deleteInvite.isPending}
+        >Decline
+        <wa-icon slot="start" name="trash"></wa-icon>
+      </wa-button>
+      <wa-button
+        variant="success"
+        appearance="filled-outlined"
+        onclick={handleAccept}
+        >Accept
+        <wa-icon slot="start" name="check"></wa-icon>
+      </wa-button>
+    </section>
+  {/if}
 {/if}
 
 <style>

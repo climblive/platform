@@ -18,6 +18,7 @@
     getUsersByOrganizerQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
+  import { isAfter } from "date-fns";
   import { navigate } from "svelte-routing";
   import DeleteInvite from "./DeleteInvite.svelte";
 
@@ -89,7 +90,11 @@
 {/snippet}
 
 {#snippet renderExpiresAt({ expiresAt }: OrganizerInvite)}
-  <RelativeTime time={expiresAt} />
+  {@const expired = isAfter(new Date(), expiresAt)}
+
+  <span class={{ expired }}>
+    <RelativeTime time={expiresAt} />
+  </span>
 {/snippet}
 
 {#snippet renderControls({ id }: OrganizerInvite)}
@@ -160,5 +165,9 @@
     flex-direction: column;
     align-items: start;
     gap: var(--wa-space-m);
+  }
+
+  .expired {
+    color: var(--wa-color-danger);
   }
 </style>
