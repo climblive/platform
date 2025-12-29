@@ -50,7 +50,7 @@
     <wa-button
       size="small"
       appearance="plain"
-      onclick={() => navigate(`/admin/organizers/${organizerId}`)}
+      onclick={() => navigate(`./organizers/${organizerId}/contests`)}
       >Cancel</wa-button
     >
     <wa-button
