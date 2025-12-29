@@ -101,9 +101,9 @@ GROUP BY contest.id;
 
 -- name: UpsertContest :execlastid
 INSERT INTO 
-	contest (id, organizer_id, archived, series_id, name, description, location, final_enabled, qualifying_problems, finalists, rules, grace_period)
+	contest (id, organizer_id, archived, series_id, name, description, location, qualifying_problems, finalists, rules, grace_period)
 VALUES 
-	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     archived = VALUES(archived),
@@ -111,7 +111,6 @@ ON DUPLICATE KEY UPDATE
     name = VALUES(name),
     description = VALUES(description),
     location = VALUES(location),
-    final_enabled = VALUES(final_enabled),
     qualifying_problems = VALUES(qualifying_problems),
     finalists = VALUES(finalists),
     rules = VALUES(rules),
@@ -158,16 +157,15 @@ WHERE id = ?;
 
 -- name: UpsertProblem :execlastid
 INSERT INTO 
-	problem (id, organizer_id, contest_id, number, hold_color_primary, hold_color_secondary, name, zone_1_enabled, zone_2_enabled, description, points_zone_1, points_zone_2, points_top, flash_bonus)
+	problem (id, organizer_id, contest_id, number, hold_color_primary, hold_color_secondary, zone_1_enabled, zone_2_enabled, description, points_zone_1, points_zone_2, points_top, flash_bonus)
 VALUES 
-	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     contest_id = VALUES(contest_id),
     number = VALUES(number),
     hold_color_primary = VALUES(hold_color_primary),
     hold_color_secondary = VALUES(hold_color_secondary),
-    name = VALUES(name),
     zone_1_enabled = VALUES(zone_1_enabled),
     zone_2_enabled = VALUES(zone_2_enabled),
     description = VALUES(description),
@@ -209,20 +207,18 @@ VALUES
 
 -- name: UpsertOrganizer :execlastid
 INSERT INTO
-    organizer (id, name, homepage)
+    organizer (id, name)
 VALUES
-    (?, ?, ?)
+    (?, ?)
 ON DUPLICATE KEY UPDATE
-    name = VALUES(name),
-    homepage = VALUES(homepage);
+    name = VALUES(name);
 
 -- name: UpsertUser :execlastid
 INSERT INTO
-    user (id, name, username, admin)
+    user (id, username, admin)
 VALUES
-    (?, ?, ?, ?)
+    (?, ?, ?)
 ON DUPLICATE KEY UPDATE
-    name = VALUES(name),
     username = VALUES(username),
     admin = VALUES(admin);
 
