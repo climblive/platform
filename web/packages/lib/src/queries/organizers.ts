@@ -23,8 +23,6 @@ export const createOrganizerMutation = () => {
           organizers: [...(current.organizers ?? []), newOrganizer],
         };
       });
-
-      client.invalidateQueries({ queryKey: ["self"] });
     },
   }));
 };

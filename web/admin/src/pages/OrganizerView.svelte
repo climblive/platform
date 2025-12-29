@@ -128,10 +128,6 @@
     align-items: center;
   }
 
-  wa-button {
-    flex-grow: 0;
-  }
-
   wa-select {
     width: 100%;
   }
