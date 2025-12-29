@@ -4,7 +4,11 @@
   import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/copy-button/copy-button.js";
-  import { Table, type ColumnDefinition } from "@climblive/lib/components";
+  import {
+    EmptyState,
+    Table,
+    type ColumnDefinition,
+  } from "@climblive/lib/components";
   import type { OrganizerInvite, User } from "@climblive/lib/models";
   import {
     createOrganizerInviteMutation,
@@ -79,9 +83,9 @@
 {/snippet}
 
 {#snippet renderCopyLink({ id }: OrganizerInvite)}
-  <wa-copy-button
-    value={`${location.protocol}//${location.host}/admin/invites/${id}`}
-  ></wa-copy-button>
+  {@const link = `${location.protocol}//${location.host}/admin/invites/${id}`}
+  <wa-copy-button value={link}></wa-copy-button>
+  {link}
 {/snippet}
 
 {#snippet renderExpiresAt({ expiresAt }: OrganizerInvite)}
@@ -103,13 +107,21 @@
   </DeleteInvite>
 {/snippet}
 
+{#snippet createButton()}
+  <wa-button
+    variant="neutral"
+    appearance="accent"
+    onclick={handleCreateInvite}
+    loading={createInvite.isPending}>Create invite</wa-button
+  >
+{/snippet}
+
 <section>
   {#if invites === undefined || users === undefined || organizer === undefined}
     <Loader />
   {:else}
     <wa-breadcrumb>
-      <wa-breadcrumb-item
-        onclick={() => navigate("./")}
+      <wa-breadcrumb-item onclick={() => navigate("./")}
         ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
       >
       <wa-breadcrumb-item
@@ -119,20 +131,25 @@
     </wa-breadcrumb>
 
     <h2>Co-organizers</h2>
-    <wa-button
-      variant="neutral"
-      appearance="accent"
-      onclick={handleCreateInvite}
-      loading={createInvite.isPending}>Create invite</wa-button
-    >
-
     <Table columns={userColumns} data={users} getId={({ id }) => id}></Table>
 
+    <h2>Invites</h2>
     {#if invites.length > 0}
-      <h2>Invites</h2>
+      {@render createButton()}
+    {/if}
 
+    {#if invites.length > 0}
       <Table columns={inviteColumns} data={invites} getId={({ id }) => id}
       ></Table>
+    {:else}
+      <EmptyState
+        title="No invites yet"
+        description="Create invites to allow other users to join as co-organizers."
+      >
+        {#snippet actions()}
+          {@render createButton()}
+        {/snippet}
+      </EmptyState>
     {/if}
   {/if}
 </section>
