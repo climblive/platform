@@ -9,6 +9,7 @@
   import {
     createOrganizerInviteMutation,
     getOrganizerInvitesQuery,
+    getOrganizerQuery,
     getSelfQuery,
     getUsersByOrganizerQuery,
   } from "@climblive/lib/queries";
@@ -26,11 +27,12 @@
   const createInvite = $derived(createOrganizerInviteMutation(organizerId));
   const usersQuery = $derived(getUsersByOrganizerQuery(organizerId));
   const selfQuery = $derived(getSelfQuery());
+  const organizerQuery = $derived(getOrganizerQuery(organizerId));
 
-  const self = $derived(selfQuery.data);
+  const invites = $derived(invitesQuery.data);
   const users = $derived(usersQuery.data);
-
-  let invites = $derived(invitesQuery.data);
+  const self = $derived(selfQuery.data);
+  const organizer = $derived(organizerQuery.data);
 
   const userColumns: ColumnDefinition<User>[] = [
     {
@@ -101,21 +103,21 @@
   </DeleteInvite>
 {/snippet}
 
-<wa-breadcrumb>
-  <wa-breadcrumb-item
-    onclick={() => navigate(`/admin/organizers/${organizerId}`)}
-    ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
-  >
-  <wa-breadcrumb-item
-    onclick={() => navigate(`/admin/organizers/${organizerId}`)}
-    >Organizer #{organizerId}</wa-breadcrumb-item
-  >
-</wa-breadcrumb>
-
 <section>
-  {#if invites === undefined || users === undefined}
+  {#if invites === undefined || users === undefined || organizer === undefined}
     <Loader />
-  {:else if invites.length > 0}
+  {:else}
+    <wa-breadcrumb>
+      <wa-breadcrumb-item
+        onclick={() => navigate(`/admin/organizers/${organizerId}`)}
+        ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
+      >
+      <wa-breadcrumb-item
+        onclick={() => navigate(`/admin/organizers/${organizerId}`)}
+        >{organizer.name}</wa-breadcrumb-item
+      >
+    </wa-breadcrumb>
+
     <h2>Co-organizers</h2>
     <wa-button
       variant="neutral"

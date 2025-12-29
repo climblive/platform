@@ -9,6 +9,7 @@ import (
 )
 
 type organizerUseCase interface {
+	GetOrganizer(ctx context.Context, organizerID domain.OrganizerID) (domain.Organizer, error)
 	GetOrganizerInvitesByOrganizer(ctx context.Context, organizerID domain.OrganizerID) ([]domain.OrganizerInvite, error)
 	GetOrganizerInvite(ctx context.Context, inviteID domain.OrganizerInviteID) (domain.OrganizerInvite, error)
 	CreateOrganizerInvite(ctx context.Context, organizerID domain.OrganizerID) (domain.OrganizerInvite, error)
@@ -25,11 +26,28 @@ func InstallOrganizerHandler(mux *Mux, organizerUseCase organizerUseCase) {
 		organizerUseCase: organizerUseCase,
 	}
 
+	mux.HandleFunc("GET /organizers/{organizerID}", handler.GetOrganizer)
 	mux.HandleFunc("GET /organizers/{organizerID}/invites", handler.GetOrganizerInvites)
 	mux.HandleFunc("POST /organizers/{organizerID}/invites", handler.CreateOrganizerInvite)
 	mux.HandleFunc("GET /invites/{inviteID}", handler.GetOrganizerInvite)
 	mux.HandleFunc("DELETE /invites/{inviteID}", handler.DeleteOrganizerInvite)
 	mux.HandleFunc("POST /invites/{inviteID}/accept", handler.AcceptOrganizerInvite)
+}
+
+func (hdlr *organizerHandler) GetOrganizer(w http.ResponseWriter, r *http.Request) {
+	organizerID, err := parseResourceID[domain.OrganizerID](r.PathValue("organizerID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	organizer, err := hdlr.organizerUseCase.GetOrganizer(r.Context(), organizerID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusOK, organizer)
 }
 
 func (hdlr *organizerHandler) GetOrganizerInvites(w http.ResponseWriter, r *http.Request) {

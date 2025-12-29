@@ -18,6 +18,7 @@ import {
 } from "./models";
 import { compClassSchema } from "./models/compClass";
 import { contenderSchema } from "./models/contender";
+import { organizerSchema } from "./models/organizer";
 import { organizerInviteSchema } from "./models/organizerInvite";
 import { problemSchema } from "./models/problem";
 import { raffleSchema, raffleWinnerSchema } from "./models/raffle";
@@ -424,6 +425,16 @@ export class ApiClient {
     });
 
     return z.array(raffleWinnerSchema).parse(result.data);
+  };
+
+  getOrganizer = async (organizerId: number) => {
+    const endpoint = `/organizers/${organizerId}`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return organizerSchema.parse(result.data);
   };
 
   getOrganizerInvites = async (organizerId: number) => {

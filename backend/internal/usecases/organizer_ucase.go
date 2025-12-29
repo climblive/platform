@@ -26,6 +26,19 @@ type OrganizerUseCase struct {
 	Repo       organizerUseCaseRepository
 }
 
+func (uc *OrganizerUseCase) GetOrganizer(ctx context.Context, organizerID domain.OrganizerID) (domain.Organizer, error) {
+	organizer, err := uc.Repo.GetOrganizer(ctx, nil, organizerID)
+	if err != nil {
+		return domain.Organizer{}, errors.Wrap(err, 0)
+	}
+
+	if _, err := uc.Authorizer.HasOwnership(ctx, organizer.Ownership); err != nil {
+		return domain.Organizer{}, errors.Wrap(err, 0)
+	}
+
+	return organizer, nil
+}
+
 func (uc *OrganizerUseCase) GetOrganizerInvitesByOrganizer(ctx context.Context, organizerID domain.OrganizerID) ([]domain.OrganizerInvite, error) {
 	organizer, err := uc.Repo.GetOrganizer(ctx, nil, organizerID)
 	if err != nil {
