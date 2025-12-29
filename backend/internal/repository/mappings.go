@@ -72,10 +72,6 @@ func contestToDomain(record database.Contest) domain.Contest {
 		GracePeriod:        time.Duration(record.GracePeriod) * time.Minute,
 	}
 
-	if !record.FinalEnabled {
-		contest.Finalists = 0
-	}
-
 	return contest
 }
 
