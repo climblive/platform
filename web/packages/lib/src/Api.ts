@@ -451,7 +451,6 @@ export class ApiClient {
     const endpoint = `/invites/${inviteId}`;
 
     const result = await this.axiosInstance.get(endpoint, {
-      headers: this.credentialsProvider?.getAuthHeaders(),
     });
 
     return organizerInviteSchema.parse(result.data);
