@@ -63,7 +63,7 @@
     </wa-button>
     <wa-button
       variant="success"
-      appearance="outlined filled"
+      appearance="filled-outlined"
       onclick={handleAccept}
       loading={false}
       >Accept
