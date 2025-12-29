@@ -79,7 +79,7 @@ func (hdlr *organizerHandler) CreateOrganizerInvite(w http.ResponseWriter, r *ht
 		return
 	}
 
-	writeResponse(w, http.StatusOK, invite)
+	writeResponse(w, http.StatusCreated, invite)
 }
 
 func (hdlr *organizerHandler) GetOrganizerInvite(w http.ResponseWriter, r *http.Request) {
