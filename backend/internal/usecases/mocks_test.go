@@ -243,6 +243,36 @@ func (m *repositoryMock) GetAllOrganizers(ctx context.Context, tx domain.Transac
 	return args.Get(0).([]domain.Organizer), args.Error(1)
 }
 
+func (m *repositoryMock) AddUserToOrganizer(ctx context.Context, tx domain.Transaction, userID domain.UserID, organizerID domain.OrganizerID) error {
+	args := m.Called(ctx, tx, userID, organizerID)
+	return args.Error(0)
+}
+
+func (m *repositoryMock) DeleteOrganizerInvite(ctx context.Context, tx domain.Transaction, inviteID domain.OrganizerInviteID) error {
+	args := m.Called(ctx, tx, inviteID)
+	return args.Error(0)
+}
+
+func (m *repositoryMock) GetOrganizerInvite(ctx context.Context, tx domain.Transaction, inviteID domain.OrganizerInviteID) (domain.OrganizerInvite, error) {
+	args := m.Called(ctx, tx, inviteID)
+	return args.Get(0).(domain.OrganizerInvite), args.Error(1)
+}
+
+func (m *repositoryMock) GetOrganizerInvitesByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.OrganizerInvite, error) {
+	args := m.Called(ctx, tx, organizerID)
+	return args.Get(0).([]domain.OrganizerInvite), args.Error(1)
+}
+
+func (m *repositoryMock) CreateOrganizerInvite(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID, code string) (domain.OrganizerInvite, error) {
+	args := m.Called(ctx, tx, organizerID, code)
+	return args.Get(0).(domain.OrganizerInvite), args.Error(1)
+}
+
+func (m *repositoryMock) StoreOrganizerInvite(ctx context.Context, tx domain.Transaction, invite domain.OrganizerInvite) error {
+	args := m.Called(ctx, tx, invite)
+	return args.Error(0)
+}
+
 type authorizerMock struct {
 	mock.Mock
 }
