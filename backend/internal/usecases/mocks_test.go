@@ -6,6 +6,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -233,9 +234,39 @@ func (m *repositoryMock) GetUserByUsername(ctx context.Context, tx domain.Transa
 	return args.Get(0).(domain.User), args.Error(1)
 }
 
+func (m *repositoryMock) GetUsersByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.User, error) {
+	args := m.Called(ctx, tx, organizerID)
+	return args.Get(0).([]domain.User), args.Error(1)
+}
+
 func (m *repositoryMock) GetAllOrganizers(ctx context.Context, tx domain.Transaction) ([]domain.Organizer, error) {
 	args := m.Called(ctx, tx)
 	return args.Get(0).([]domain.Organizer), args.Error(1)
+}
+
+func (m *repositoryMock) AddUserToOrganizer(ctx context.Context, tx domain.Transaction, userID domain.UserID, organizerID domain.OrganizerID) error {
+	args := m.Called(ctx, tx, userID, organizerID)
+	return args.Error(0)
+}
+
+func (m *repositoryMock) DeleteOrganizerInvite(ctx context.Context, tx domain.Transaction, inviteID domain.OrganizerInviteID) error {
+	args := m.Called(ctx, tx, inviteID)
+	return args.Error(0)
+}
+
+func (m *repositoryMock) GetOrganizerInvite(ctx context.Context, tx domain.Transaction, inviteID domain.OrganizerInviteID) (domain.OrganizerInvite, error) {
+	args := m.Called(ctx, tx, inviteID)
+	return args.Get(0).(domain.OrganizerInvite), args.Error(1)
+}
+
+func (m *repositoryMock) GetOrganizerInvitesByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.OrganizerInvite, error) {
+	args := m.Called(ctx, tx, organizerID)
+	return args.Get(0).([]domain.OrganizerInvite), args.Error(1)
+}
+
+func (m *repositoryMock) StoreOrganizerInvite(ctx context.Context, tx domain.Transaction, invite domain.OrganizerInvite) error {
+	args := m.Called(ctx, tx, invite)
+	return args.Error(0)
 }
 
 type authorizerMock struct {
@@ -276,4 +307,13 @@ func (m *eventBrokerMock) Subscribe(filter domain.EventFilter, bufferCapacity in
 
 func (m *eventBrokerMock) Unsubscribe(subscriptionID domain.SubscriptionID) {
 	m.Called(subscriptionID)
+}
+
+type uuidGeneratorMock struct {
+	mock.Mock
+}
+
+func (m *uuidGeneratorMock) Generate() uuid.UUID {
+	args := m.Called()
+	return args.Get(0).(uuid.UUID)
 }

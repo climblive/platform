@@ -14,6 +14,7 @@ export type RaffleWinnerID = ResourceID;
 export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
+export type OrganizerInviteID = string;
 export type ResourceIDType =
   | CompClassID
   | ContenderID
@@ -110,6 +111,12 @@ export interface ContestPatch {
 export interface Organizer {
   id: OrganizerID;
   name: string;
+}
+export interface OrganizerInvite {
+  id: OrganizerInviteID;
+  organizerId: OrganizerID;
+  organizerName: string;
+  expiresAt: Date;
 }
 export interface Problem {
   id: ProblemID;

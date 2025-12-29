@@ -61,6 +61,16 @@ func (q *Queries) DeleteContender(ctx context.Context, id int32) error {
 	return err
 }
 
+const deleteOrganizerInvite = `-- name: DeleteOrganizerInvite :exec
+DELETE FROM organizer_invite
+WHERE id = ?
+`
+
+func (q *Queries) DeleteOrganizerInvite(ctx context.Context, id string) error {
+	_, err := q.db.ExecContext(ctx, deleteOrganizerInvite, id)
+	return err
+}
+
 const deleteProblem = `-- name: DeleteProblem :exec
 DELETE FROM problem
 WHERE id = ?
@@ -605,6 +615,70 @@ func (q *Queries) GetOrganizer(ctx context.Context, id int32) (Organizer, error)
 	return i, err
 }
 
+const getOrganizerInvite = `-- name: GetOrganizerInvite :one
+SELECT organizer_invite.id, organizer_invite.organizer_id, organizer_invite.expires_at, organizer.name
+FROM organizer_invite
+JOIN organizer ON organizer.id = organizer_invite.organizer_id
+WHERE organizer_invite.id = ?
+`
+
+type GetOrganizerInviteRow struct {
+	OrganizerInvite OrganizerInvite
+	Name            string
+}
+
+func (q *Queries) GetOrganizerInvite(ctx context.Context, id string) (GetOrganizerInviteRow, error) {
+	row := q.db.QueryRowContext(ctx, getOrganizerInvite, id)
+	var i GetOrganizerInviteRow
+	err := row.Scan(
+		&i.OrganizerInvite.ID,
+		&i.OrganizerInvite.OrganizerID,
+		&i.OrganizerInvite.ExpiresAt,
+		&i.Name,
+	)
+	return i, err
+}
+
+const getOrganizerInvitesByOrganizer = `-- name: GetOrganizerInvitesByOrganizer :many
+SELECT organizer_invite.id, organizer_invite.organizer_id, organizer_invite.expires_at, organizer.name
+FROM organizer_invite
+JOIN organizer ON organizer.id = organizer_invite.organizer_id
+WHERE organizer_id = ?
+`
+
+type GetOrganizerInvitesByOrganizerRow struct {
+	OrganizerInvite OrganizerInvite
+	Name            string
+}
+
+func (q *Queries) GetOrganizerInvitesByOrganizer(ctx context.Context, organizerID int32) ([]GetOrganizerInvitesByOrganizerRow, error) {
+	rows, err := q.db.QueryContext(ctx, getOrganizerInvitesByOrganizer, organizerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetOrganizerInvitesByOrganizerRow
+	for rows.Next() {
+		var i GetOrganizerInvitesByOrganizerRow
+		if err := rows.Scan(
+			&i.OrganizerInvite.ID,
+			&i.OrganizerInvite.OrganizerID,
+			&i.OrganizerInvite.ExpiresAt,
+			&i.Name,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProblem = `-- name: GetProblem :one
 SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.name, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
 FROM problem
@@ -1034,6 +1108,63 @@ func (q *Queries) GetUserByUsername(ctx context.Context, username string) ([]Get
 		return nil, err
 	}
 	return items, nil
+}
+
+const getUsersByOrganizer = `-- name: GetUsersByOrganizer :many
+SELECT user.id, user.name, user.username, user.admin
+FROM user
+LEFT JOIN user_organizer uo ON uo.user_id = user.id
+WHERE uo.organizer_id = ?
+`
+
+type GetUsersByOrganizerRow struct {
+	User User
+}
+
+func (q *Queries) GetUsersByOrganizer(ctx context.Context, organizerID int32) ([]GetUsersByOrganizerRow, error) {
+	rows, err := q.db.QueryContext(ctx, getUsersByOrganizer, organizerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetUsersByOrganizerRow
+	for rows.Next() {
+		var i GetUsersByOrganizerRow
+		if err := rows.Scan(
+			&i.User.ID,
+			&i.User.Name,
+			&i.User.Username,
+			&i.User.Admin,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const insertOrganizerInvite = `-- name: InsertOrganizerInvite :exec
+INSERT INTO
+    organizer_invite (id, organizer_id, expires_at)
+VALUES
+    (?, ?, ?)
+`
+
+type InsertOrganizerInviteParams struct {
+	ID          string
+	OrganizerID int32
+	ExpiresAt   time.Time
+}
+
+func (q *Queries) InsertOrganizerInvite(ctx context.Context, arg InsertOrganizerInviteParams) error {
+	_, err := q.db.ExecContext(ctx, insertOrganizerInvite, arg.ID, arg.OrganizerID, arg.ExpiresAt)
+	return err
 }
 
 const insertTick = `-- name: InsertTick :execlastid
