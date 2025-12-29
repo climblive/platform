@@ -461,3 +461,113 @@ func TestAcceptOrganizerInvite(t *testing.T) {
 		})
 	})
 }
+
+func TestPatchOrganizer(t *testing.T) {
+	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOwnership := domain.OwnershipData{OrganizerID: fakedOrganizerID}
+	fakedOrganizer := domain.Organizer{
+		ID:        fakedOrganizerID,
+		Ownership: fakedOwnership,
+		Name:      "Old Name",
+	}
+
+	t.Run("HappyPath", func(t *testing.T) {
+		mockedRepo := new(repositoryMock)
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedRepo.
+			On("GetOrganizer", mock.Anything, mock.Anything, fakedOrganizerID).
+			Return(fakedOrganizer, nil)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		expectedOrganizer := domain.Organizer{
+			ID:        fakedOrganizerID,
+			Ownership: fakedOwnership,
+			Name:      "New Name",
+		}
+
+		mockedRepo.
+			On("StoreOrganizer", mock.Anything, mock.Anything, expectedOrganizer).
+			Return(expectedOrganizer, nil)
+
+		ucase := usecases.OrganizerUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		patch := domain.OrganizerPatch{
+			Name: domain.Patch[string]{Present: true, Value: "New Name"},
+		}
+
+		organizer, err := ucase.PatchOrganizer(context.Background(), fakedOrganizerID, patch)
+
+		require.NoError(t, err)
+		assert.Equal(t, "New Name", organizer.Name)
+
+		mockedAuthorizer.AssertExpectations(t)
+		mockedRepo.AssertExpectations(t)
+	})
+
+	t.Run("EmptyName", func(t *testing.T) {
+		mockedRepo := new(repositoryMock)
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedRepo.
+			On("GetOrganizer", mock.Anything, mock.Anything, fakedOrganizerID).
+			Return(fakedOrganizer, nil)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		ucase := usecases.OrganizerUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		patch := domain.OrganizerPatch{
+			Name: domain.Patch[string]{Present: true, Value: "   "},
+		}
+
+		organizer, err := ucase.PatchOrganizer(context.Background(), fakedOrganizerID, patch)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.Equal(t, domain.Organizer{}, organizer)
+
+		mockedAuthorizer.AssertExpectations(t)
+		mockedRepo.AssertExpectations(t)
+	})
+
+	t.Run("NoOwnership", func(t *testing.T) {
+		mockedRepo := new(repositoryMock)
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedRepo.
+			On("GetOrganizer", mock.Anything, mock.Anything, fakedOrganizerID).
+			Return(fakedOrganizer, nil)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		ucase := usecases.OrganizerUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		patch := domain.OrganizerPatch{
+			Name: domain.Patch[string]{Present: true, Value: "New Name"},
+		}
+
+		organizer, err := ucase.PatchOrganizer(context.Background(), fakedOrganizerID, patch)
+
+		assert.ErrorIs(t, err, domain.ErrNoOwnership)
+		assert.Equal(t, domain.Organizer{}, organizer)
+
+		mockedAuthorizer.AssertExpectations(t)
+		mockedRepo.AssertExpectations(t)
+	})
+}
