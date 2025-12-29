@@ -87,8 +87,7 @@
       {/if}
     </div>
 
-    <Link to={`./organizers/${organizerId}`}
-      >Organizer settings and invites</Link
+    <Link to={`./organizers/${organizerId}`}>Manage organizers and invites</Link
     >
   </div>
 {/if}
