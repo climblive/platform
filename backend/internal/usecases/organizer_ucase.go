@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -28,7 +29,8 @@ type OrganizerUseCase struct {
 }
 
 func (uc *OrganizerUseCase) CreateOrganizer(ctx context.Context, template domain.OrganizerTemplate) (domain.Organizer, error) {
-	if template.Name == "" {
+	name := strings.TrimSpace(template.Name)
+	if name == "" {
 		return domain.Organizer{}, errors.Wrap(domain.ErrInvalidData, 0)
 	}
 
@@ -43,7 +45,7 @@ func (uc *OrganizerUseCase) CreateOrganizer(ctx context.Context, template domain
 	}
 
 	organizer := domain.Organizer{
-		Name: template.Name,
+		Name: name,
 	}
 
 	tx, err := uc.Repo.Begin()
@@ -67,8 +69,6 @@ func (uc *OrganizerUseCase) CreateOrganizer(ctx context.Context, template domain
 	if err != nil {
 		return domain.Organizer{}, errors.Wrap(err, 0)
 	}
-
-	organizer.Ownership = domain.OwnershipData{OrganizerID: organizer.ID}
 
 	return organizer, nil
 }

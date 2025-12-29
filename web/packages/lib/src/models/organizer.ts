@@ -9,5 +9,3 @@ export const organizerSchema: z.ZodType<Organizer> = z.object({
 export const organizerTemplateSchema: z.ZodType<OrganizerTemplate> = z.object({
   name: z.string(),
 });
-
-export type { OrganizerTemplate };

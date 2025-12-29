@@ -47,10 +47,7 @@
       { name },
       {
         onSuccess: (organizer: Organizer) => {
-          if (dialog) {
-            dialog.open = false;
-          }
-          navigate(`/admin/organizers/${organizer.id}/contests`);
+          navigate(`./organizers/${organizer.id}/contests`);
         },
         onError: () => toastError("Failed to create organizer."),
       },
@@ -69,36 +66,23 @@
       autofocus
     ></wa-input>
 
-    <div class="controls">
-      <wa-button appearance="plain" onclick={handleCancel} type="button">
-        Cancel
-      </wa-button>
-      <wa-button
-        variant="neutral"
-        appearance="accent"
-        type="submit"
-        loading={createOrganizer.isPending}
-      >
-        Create
-      </wa-button>
-    </div>
+    <wa-button slot="footer" appearance="plain" onclick={handleCancel} type="button">
+      Cancel
+    </wa-button>
+    <wa-button
+      slot="footer"
+      variant="neutral"
+      appearance="accent"
+      type="submit"
+      loading={createOrganizer.isPending}
+    >
+      Create
+    </wa-button>
   </form>
 </wa-dialog>
 
 <style>
   wa-dialog {
     white-space: normal;
-  }
-
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wa-space-m);
-  }
-
-  .controls {
-    display: flex;
-    gap: var(--wa-space-s);
-    justify-content: flex-end;
   }
 </style>
