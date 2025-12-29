@@ -30,7 +30,7 @@
     try {
       await ApiClient.getInstance().acceptOrganizerInvite(invite.id);
 
-      navigate(`./organizers/${invite.organizerId}`);
+      navigate(`./organizers/${invite.organizerId}/contests`);
     } catch {
       toastError("Failed to accept invite.");
     }
