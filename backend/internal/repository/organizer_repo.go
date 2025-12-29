@@ -83,7 +83,6 @@ func (d *Database) GetOrganizerInvite(ctx context.Context, tx domain.Transaction
 	}
 
 	return organizerInviteToDomain(record.OrganizerInvite, record.Name), nil
-
 }
 
 func (d *Database) StoreOrganizerInvite(ctx context.Context, tx domain.Transaction, invite domain.OrganizerInvite) error {
