@@ -113,7 +113,7 @@
         ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
       >
       <wa-breadcrumb-item
-        onclick={() => navigate(`/admin/organizers/${organizerId}`)}
+        onclick={() => navigate(`./organizers/${organizerId}`)}
         >{organizer.name}</wa-breadcrumb-item
       >
     </wa-breadcrumb>
