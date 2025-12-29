@@ -130,7 +130,7 @@ func (uc *OrganizerUseCase) AcceptOrganizerInvite(ctx context.Context, inviteID 
 		return errors.Wrap(err, 0)
 	}
 
-	err = uc.Repo.AddUserToOrganizer(ctx, nil, user.ID, invite.OrganizerID)
+	err = uc.Repo.AddUserToOrganizer(ctx, tx, user.ID, invite.OrganizerID)
 	if err != nil {
 		tx.Rollback()
 		return errors.Wrap(err, 0)
