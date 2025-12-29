@@ -11,6 +11,7 @@ import {
   type ContestPatch,
   type ContestTemplate,
   type OrganizerInviteID,
+  type OrganizerTemplate,
   type ProblemPatch,
   type ProblemTemplate,
   type ScoreEngineInstanceID,
@@ -425,6 +426,16 @@ export class ApiClient {
     });
 
     return z.array(raffleWinnerSchema).parse(result.data);
+  };
+
+  createOrganizer = async (template: OrganizerTemplate) => {
+    const endpoint = "/organizers";
+
+    const result = await this.axiosInstance.post(endpoint, template, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return organizerSchema.parse(result.data);
   };
 
   getOrganizer = async (organizerId: number) => {

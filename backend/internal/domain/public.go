@@ -100,6 +100,10 @@ type Organizer struct {
 	Name      string        `json:"name"`
 }
 
+type OrganizerTemplate struct {
+	Name string `json:"name"`
+}
+
 type OrganizerInvite struct {
 	ID            OrganizerInviteID `json:"id"`
 	OrganizerID   OrganizerID       `json:"organizerId"`
