@@ -25,7 +25,7 @@
   let showAllToggle: WaSwitch | undefined = $state();
 
   const selfQuery = $derived(getSelfQuery());
-    
+
   const self = $derived(selfQuery.data);
 
   let select: WaSelect | undefined = $state();
@@ -61,31 +61,31 @@
 </script>
 
 {#if self}
-  <div class="controls">
-    {#if !showAll}
-      <wa-select
-        bind:this={select}
-        size="small"
-        appearance="outlined filled"
-        {@attach value($selectedOrganizerId)}
-        onchange={handleChange}
-      >
-        <wa-icon name="id-badge" slot="start"></wa-icon>
-        {#each self.organizers as organizer (organizer.id)}
-          <wa-option value={organizer.id}>{organizer.name}</wa-option>
-        {/each}
-      </wa-select>
-    {/if}
+  {#if !showAll}
+    <wa-select
+      bind:this={select}
+      size="small"
+      appearance="outlined filled"
+      {@attach value($selectedOrganizerId)}
+      onchange={handleChange}
+    >
+      <wa-icon name="id-badge" slot="start"></wa-icon>
+      {#each self.organizers as organizer (organizer.id)}
+        <wa-option value={organizer.id}>{organizer.name}</wa-option>
+      {/each}
+    </wa-select>
+  {/if}
 
+  <div class="controls">
     {#if self?.admin}
-      <wa-switch bind:this={showAllToggle} onchange={toggleShowAll}
+      <wa-switch size="small" bind:this={showAllToggle} onchange={toggleShowAll}
         >Show all</wa-switch
       >
     {/if}
 
     <Link to={`./organizers/${organizerId}`}
-      >Organizer settings and invites
-    </Link>
+      >Organizer settings and invites</Link
+    >
   </div>
 {/if}
 
@@ -93,17 +93,18 @@
 
 <style>
   .controls {
+    margin-block-start: var(--wa-space-s);
+    width: 100%;
     display: flex;
-    gap: var(--wa-space-m);
-    flex-direction: column;
-    align-items: end;
+    justify-content: space-between;
+    font-size: var(--wa-font-size-s);
+  }
 
-    & wa-select {
-      width: 100%;
-    }
+  wa-select {
+    width: 100%;
+  }
 
-    & wa-switch {
-      flex-shrink: 0;
-    }
+  wa-switch {
+    flex-shrink: 0;
   }
 </style>
