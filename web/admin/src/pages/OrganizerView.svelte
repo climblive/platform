@@ -5,7 +5,6 @@
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import "@awesome.me/webawesome/dist/components/tag/tag.js";
   import { value } from "@climblive/lib/forms";
   import { getSelfQuery } from "@climblive/lib/queries";
   import { getContext } from "svelte";
