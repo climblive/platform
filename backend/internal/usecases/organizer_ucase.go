@@ -6,7 +6,6 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
-	"github.com/google/uuid"
 )
 
 type organizerUseCaseRepository interface {
@@ -22,8 +21,9 @@ type organizerUseCaseRepository interface {
 }
 
 type OrganizerUseCase struct {
-	Authorizer domain.Authorizer
-	Repo       organizerUseCaseRepository
+	Authorizer    domain.Authorizer
+	Repo          organizerUseCaseRepository
+	UUIDGenerator domain.UUIDGenerator
 }
 
 func (uc *OrganizerUseCase) GetOrganizer(ctx context.Context, organizerID domain.OrganizerID) (domain.Organizer, error) {
@@ -77,7 +77,7 @@ func (uc *OrganizerUseCase) CreateOrganizerInvite(ctx context.Context, organizer
 	}
 
 	invite := domain.OrganizerInvite{
-		ID:          domain.OrganizerInviteID(uuid.New()),
+		ID:          domain.OrganizerInviteID(uc.UUIDGenerator.Generate()),
 		OrganizerID: organizerID,
 		ExpiresAt:   time.Now().Add(7 * 24 * time.Hour),
 	}

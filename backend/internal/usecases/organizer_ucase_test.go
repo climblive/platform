@@ -3,6 +3,8 @@ package usecases_test
 import (
 	"context"
 	"testing"
+	"testing/synctest"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/usecases"
@@ -183,6 +185,84 @@ func TestDeleteOrganizerInvite(t *testing.T) {
 
 		require.NoError(t, err)
 
+		mockedRepo.AssertExpectations(t)
+	})
+}
+
+func TestCreateOrganizerInvite(t *testing.T) {
+	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOwnership := domain.OwnershipData{OrganizerID: fakedOrganizerID}
+	fakedOrganizer := domain.Organizer{ID: fakedOrganizerID, Ownership: fakedOwnership}
+	fakedInviteID := domain.OrganizerInviteID(uuid.New())
+
+	t.Run("HappyPath", func(t *testing.T) {
+		synctest.Test(t, func(t *testing.T) {
+			mockedRepo := new(repositoryMock)
+			mockedAuthorizer := new(authorizerMock)
+			mockedUUIDGenerator := new(uuidGeneratorMock)
+
+			mockedRepo.
+				On("GetOrganizer", mock.Anything, mock.Anything, fakedOrganizerID).
+				Return(fakedOrganizer, nil)
+
+			mockedAuthorizer.
+				On("HasOwnership", mock.Anything, fakedOwnership).
+				Return(domain.OrganizerRole, nil)
+
+			mockedUUIDGenerator.
+				On("Generate").
+				Return(uuid.UUID(fakedInviteID))
+
+			mockedRepo.
+				On("StoreOrganizerInvite", mock.Anything, mock.Anything, domain.OrganizerInvite{
+					ID:          fakedInviteID,
+					OrganizerID: fakedOrganizerID,
+					ExpiresAt:   time.Now().Add(7 * 24 * time.Hour),
+				}).
+				Return(nil)
+
+			ucase := usecases.OrganizerUseCase{
+				Repo:          mockedRepo,
+				Authorizer:    mockedAuthorizer,
+				UUIDGenerator: mockedUUIDGenerator,
+			}
+
+			invite, err := ucase.CreateOrganizerInvite(context.Background(), fakedOrganizerID)
+
+			require.NoError(t, err)
+			assert.Equal(t, fakedOrganizerID, invite.OrganizerID)
+			assert.Equal(t, fakedInviteID, invite.ID)
+			assert.Equal(t, time.Now().Add(7*24*time.Hour), invite.ExpiresAt)
+
+			mockedUUIDGenerator.AssertExpectations(t)
+			mockedAuthorizer.AssertExpectations(t)
+			mockedRepo.AssertExpectations(t)
+		})
+	})
+
+	t.Run("NoOwnership", func(t *testing.T) {
+		mockedRepo := new(repositoryMock)
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedRepo.
+			On("GetOrganizer", mock.Anything, mock.Anything, fakedOrganizerID).
+			Return(fakedOrganizer, nil)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		ucase := usecases.OrganizerUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		invite, err := ucase.CreateOrganizerInvite(context.Background(), fakedOrganizerID)
+
+		assert.ErrorIs(t, err, domain.ErrNoOwnership)
+		assert.Equal(t, domain.OrganizerInvite{}, invite)
+
+		mockedAuthorizer.AssertExpectations(t)
 		mockedRepo.AssertExpectations(t)
 	})
 }

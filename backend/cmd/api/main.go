@@ -23,6 +23,7 @@ import (
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/utils"
+	"github.com/google/uuid"
 	"github.com/lmittmann/tint"
 	"github.com/mattn/go-isatty"
 
@@ -46,6 +47,13 @@ func (g *registrationCodeGenerator) Generate(length int) string {
 	}
 
 	return string(code)
+}
+
+type uuidGenerator struct {
+}
+
+func (g *uuidGenerator) Generate() uuid.UUID {
+	return uuid.New()
 }
 
 func HandleCORSPreFlight(w http.ResponseWriter, r *http.Request) {
@@ -226,8 +234,9 @@ func setupMux(
 	}
 
 	organizerUseCase := usecases.OrganizerUseCase{
-		Repo:       repo,
-		Authorizer: authorizer,
+		Repo:          repo,
+		Authorizer:    authorizer,
+		UUIDGenerator: &uuidGenerator{},
 	}
 
 	mux := rest.NewMux()

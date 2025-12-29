@@ -6,6 +6,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -306,4 +307,13 @@ func (m *eventBrokerMock) Subscribe(filter domain.EventFilter, bufferCapacity in
 
 func (m *eventBrokerMock) Unsubscribe(subscriptionID domain.SubscriptionID) {
 	m.Called(subscriptionID)
+}
+
+type uuidGeneratorMock struct {
+	mock.Mock
+}
+
+func (m *uuidGeneratorMock) Generate() uuid.UUID {
+	args := m.Called()
+	return args.Get(0).(uuid.UUID)
 }
