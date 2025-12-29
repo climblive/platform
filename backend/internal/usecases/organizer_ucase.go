@@ -39,6 +39,10 @@ func (uc *OrganizerUseCase) CreateOrganizer(ctx context.Context, template domain
 		return domain.Organizer{}, errors.Wrap(err, 0)
 	}
 
+	if authentication.Username == "" {
+		return domain.Organizer{}, errors.Wrap(domain.ErrNotAuthenticated, 0)
+	}
+
 	user, err := uc.Repo.GetUserByUsername(ctx, nil, authentication.Username)
 	if err != nil {
 		return domain.Organizer{}, errors.Wrap(err, 0)

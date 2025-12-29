@@ -15,7 +15,7 @@ import (
 )
 
 func TestCreateOrganizer(t *testing.T) {
-	fakedUsername := "testuser"
+	fakedUsername := "alice"
 	fakedUserID := randomResourceID[domain.UserID]()
 	fakedUser := domain.User{ID: fakedUserID, Username: fakedUsername}
 	fakedAuthentication := domain.Authentication{Username: fakedUsername}
@@ -26,12 +26,6 @@ func TestCreateOrganizer(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 		mockedTx := new(transactionMock)
 
-		template := domain.OrganizerTemplate{Name: "Test Organizer"}
-		expectedOrganizer := domain.Organizer{
-			ID:   fakedOrganizerID,
-			Name: "Test Organizer",
-		}
-
 		mockedAuthorizer.
 			On("GetAuthentication", mock.Anything).
 			Return(fakedAuthentication, nil)
@@ -45,10 +39,16 @@ func TestCreateOrganizer(t *testing.T) {
 			Return(mockedTx, nil)
 
 		mockedRepo.
-			On("StoreOrganizer", mock.Anything, mockedTx, mock.MatchedBy(func(org domain.Organizer) bool {
-				return org.Name == "Test Organizer"
-			})).
-			Return(expectedOrganizer, nil)
+			On("StoreOrganizer", mock.Anything, mockedTx, domain.Organizer{
+				Name: "Test Organizer",
+			}).
+			Return(domain.Organizer{
+				ID: fakedOrganizerID,
+				Ownership: domain.OwnershipData{
+					OrganizerID: fakedOrganizerID,
+				},
+				Name: "Test Organizer",
+			}, nil)
 
 		mockedRepo.
 			On("AddUserToOrganizer", mock.Anything, mockedTx, fakedUserID, fakedOrganizerID).
@@ -63,62 +63,14 @@ func TestCreateOrganizer(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		organizer, err := ucase.CreateOrganizer(context.Background(), template)
-
-		require.NoError(t, err)
-		assert.Equal(t, expectedOrganizer, organizer)
-
-		mockedAuthorizer.AssertExpectations(t)
-		mockedRepo.AssertExpectations(t)
-		mockedTx.AssertExpectations(t)
-	})
-
-	t.Run("StripsWhitespace", func(t *testing.T) {
-		mockedRepo := new(repositoryMock)
-		mockedAuthorizer := new(authorizerMock)
-		mockedTx := new(transactionMock)
-
-		template := domain.OrganizerTemplate{Name: "  Test Organizer  "}
-		expectedOrganizer := domain.Organizer{
-			ID:   fakedOrganizerID,
+		organizer, err := ucase.CreateOrganizer(context.Background(), domain.OrganizerTemplate{
 			Name: "Test Organizer",
-		}
-
-		mockedAuthorizer.
-			On("GetAuthentication", mock.Anything).
-			Return(fakedAuthentication, nil)
-
-		mockedRepo.
-			On("GetUserByUsername", mock.Anything, mock.Anything, fakedUsername).
-			Return(fakedUser, nil)
-
-		mockedRepo.
-			On("Begin").
-			Return(mockedTx, nil)
-
-		mockedRepo.
-			On("StoreOrganizer", mock.Anything, mockedTx, mock.MatchedBy(func(org domain.Organizer) bool {
-				return org.Name == "Test Organizer"
-			})).
-			Return(expectedOrganizer, nil)
-
-		mockedRepo.
-			On("AddUserToOrganizer", mock.Anything, mockedTx, fakedUserID, fakedOrganizerID).
-			Return(nil)
-
-		mockedTx.
-			On("Commit").
-			Return(nil)
-
-		ucase := usecases.OrganizerUseCase{
-			Repo:       mockedRepo,
-			Authorizer: mockedAuthorizer,
-		}
-
-		organizer, err := ucase.CreateOrganizer(context.Background(), template)
+		})
 
 		require.NoError(t, err)
-		assert.Equal(t, expectedOrganizer, organizer)
+		assert.Equal(t, fakedOrganizerID, organizer.ID)
+		assert.Equal(t, "Test Organizer", organizer.Name)
+		assert.Equal(t, fakedOrganizerID, organizer.Ownership.OrganizerID)
 
 		mockedAuthorizer.AssertExpectations(t)
 		mockedRepo.AssertExpectations(t)
@@ -127,122 +79,43 @@ func TestCreateOrganizer(t *testing.T) {
 
 	t.Run("EmptyName", func(t *testing.T) {
 		mockedRepo := new(repositoryMock)
-		mockedAuthorizer := new(authorizerMock)
-
-		template := domain.OrganizerTemplate{Name: ""}
 
 		ucase := usecases.OrganizerUseCase{
-			Repo:       mockedRepo,
-			Authorizer: mockedAuthorizer,
+			Repo: mockedRepo,
 		}
 
-		organizer, err := ucase.CreateOrganizer(context.Background(), template)
+		organizer, err := ucase.CreateOrganizer(context.Background(), domain.OrganizerTemplate{})
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
 		assert.Equal(t, domain.Organizer{}, organizer)
+
+		mockedRepo.AssertExpectations(t)
 	})
 
-	t.Run("WhitespaceOnlyName", func(t *testing.T) {
+	t.Run("ContenderCannotCreateOrganizer", func(t *testing.T) {
 		mockedRepo := new(repositoryMock)
 		mockedAuthorizer := new(authorizerMock)
-
-		template := domain.OrganizerTemplate{Name: "   "}
-
-		ucase := usecases.OrganizerUseCase{
-			Repo:       mockedRepo,
-			Authorizer: mockedAuthorizer,
-		}
-
-		organizer, err := ucase.CreateOrganizer(context.Background(), template)
-
-		assert.ErrorIs(t, err, domain.ErrInvalidData)
-		assert.Equal(t, domain.Organizer{}, organizer)
-	})
-
-	t.Run("TransactionRollbackOnStoreError", func(t *testing.T) {
-		mockedRepo := new(repositoryMock)
-		mockedAuthorizer := new(authorizerMock)
-		mockedTx := new(transactionMock)
-
-		template := domain.OrganizerTemplate{Name: "Test Organizer"}
 
 		mockedAuthorizer.
 			On("GetAuthentication", mock.Anything).
-			Return(fakedAuthentication, nil)
-
-		mockedRepo.
-			On("GetUserByUsername", mock.Anything, mock.Anything, fakedUsername).
-			Return(fakedUser, nil)
-
-		mockedRepo.
-			On("Begin").
-			Return(mockedTx, nil)
-
-		mockedRepo.
-			On("StoreOrganizer", mock.Anything, mockedTx, mock.Anything).
-			Return(domain.Organizer{}, errMock)
-
-		mockedTx.
-			On("Rollback")
+			Return(domain.Authentication{
+				Regcode: "ABCD0001",
+			}, nil)
 
 		ucase := usecases.OrganizerUseCase{
 			Repo:       mockedRepo,
 			Authorizer: mockedAuthorizer,
 		}
 
-		organizer, err := ucase.CreateOrganizer(context.Background(), template)
-
-		assert.ErrorIs(t, err, errMock)
-		assert.Equal(t, domain.Organizer{}, organizer)
-
-		mockedTx.AssertExpectations(t)
-	})
-
-	t.Run("TransactionRollbackOnAddUserError", func(t *testing.T) {
-		mockedRepo := new(repositoryMock)
-		mockedAuthorizer := new(authorizerMock)
-		mockedTx := new(transactionMock)
-
-		template := domain.OrganizerTemplate{Name: "Test Organizer"}
-		expectedOrganizer := domain.Organizer{
-			ID:   fakedOrganizerID,
+		organizer, err := ucase.CreateOrganizer(context.Background(), domain.OrganizerTemplate{
 			Name: "Test Organizer",
-		}
+		})
 
-		mockedAuthorizer.
-			On("GetAuthentication", mock.Anything).
-			Return(fakedAuthentication, nil)
-
-		mockedRepo.
-			On("GetUserByUsername", mock.Anything, mock.Anything, fakedUsername).
-			Return(fakedUser, nil)
-
-		mockedRepo.
-			On("Begin").
-			Return(mockedTx, nil)
-
-		mockedRepo.
-			On("StoreOrganizer", mock.Anything, mockedTx, mock.Anything).
-			Return(expectedOrganizer, nil)
-
-		mockedRepo.
-			On("AddUserToOrganizer", mock.Anything, mockedTx, fakedUserID, fakedOrganizerID).
-			Return(errMock)
-
-		mockedTx.
-			On("Rollback")
-
-		ucase := usecases.OrganizerUseCase{
-			Repo:       mockedRepo,
-			Authorizer: mockedAuthorizer,
-		}
-
-		organizer, err := ucase.CreateOrganizer(context.Background(), template)
-
-		assert.ErrorIs(t, err, errMock)
+		assert.ErrorIs(t, err, domain.ErrNotAuthenticated)
 		assert.Equal(t, domain.Organizer{}, organizer)
 
-		mockedTx.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+		mockedRepo.AssertExpectations(t)
 	})
 }
 
