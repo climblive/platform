@@ -112,6 +112,9 @@ export interface Organizer {
   id: OrganizerID;
   name: string;
 }
+export interface OrganizerTemplate {
+  name: string;
+}
 export interface OrganizerInvite {
   id: OrganizerInviteID;
   organizerId: OrganizerID;
