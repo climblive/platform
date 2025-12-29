@@ -109,7 +109,7 @@
   {:else}
     <wa-breadcrumb>
       <wa-breadcrumb-item
-        onclick={() => navigate(`/admin/organizers/${organizerId}`)}
+        onclick={() => navigate("./")}
         ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
       >
       <wa-breadcrumb-item
