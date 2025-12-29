@@ -9,7 +9,7 @@
   import "@awesome.me/webawesome/dist/components/tag/tag.js";
   import { value } from "@climblive/lib/forms";
   import { getSelfQuery } from "@climblive/lib/queries";
-  import { getContext, onMount } from "svelte";
+  import { getContext } from "svelte";
   import { Link, navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
   import ContestList from "./ContestList.svelte";
@@ -32,8 +32,17 @@
 
   let select: WaSelect | undefined = $state();
 
-  onMount(() => {
-    $selectedOrganizerId = organizerId;
+  const selectedOrganizer =
+    getContext<Writable<number | undefined>>("selectedOrganizer");
+
+  $effect(() => {
+    if (self) {
+      if (self.organizers.some(({ id }) => id === organizerId)) {
+        $selectedOrganizer = organizerId;
+      } else {
+        navigate("./");
+      }
+    }
   });
 
   const handleChange = () => {

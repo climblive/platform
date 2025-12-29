@@ -6,7 +6,7 @@
     startScoreEngineMutation,
     stopScoreEngineMutation,
   } from "@climblive/lib/queries";
-  import { add } from "date-fns";
+  import { add, format, isBefore, subSeconds } from "date-fns";
 
   interface Props {
     contestId: number;
@@ -22,9 +22,10 @@
   let contest = $derived(contestQuery.data);
   let scoreEngines = $derived(scoreEnginesQuery.data);
 
-  const startPossible = $derived(
-    contest?.timeBegin &&
-      contest.timeBegin.getTime() - new Date().getTime() < 60 * 60 * 1_000,
+  const earliestStartTime = $derived(
+    contest?.timeBegin
+      ? subSeconds(contest.timeBegin.getTime(), 60 * 60)
+      : undefined,
   );
 </script>
 
@@ -33,6 +34,13 @@
   <strong>Score engines are managed automatically</strong><br />
   Score engines are started automatically, and manual intervention is typically only
   required for re-scoring results long after a contest has concluded.
+
+  {#if earliestStartTime && isBefore(new Date(), earliestStartTime)}
+    Manual start is available starting {format(
+      earliestStartTime,
+      "yyyy-MM-dd HH:mm",
+    )}.
+  {/if}
 </wa-callout>
 <br />
 
@@ -58,7 +66,7 @@
           terminatedBy: add(new Date(), { hours: 6 }),
         })}
       loading={startScoreEngine.isPending}
-      disabled={!startPossible}
+      disabled={earliestStartTime && isBefore(new Date(), earliestStartTime)}
       >Start engine manually
       <wa-icon name="play" slot="start"></wa-icon>
     </wa-button>
