@@ -159,3 +159,30 @@ func TestGetOrganizerInvite(t *testing.T) {
 		mockedRepo.AssertExpectations(t)
 	})
 }
+
+func TestDeleteOrganizerInvite(t *testing.T) {
+	fakedInviteID := domain.OrganizerInviteID(uuid.New())
+	fakedInvite := domain.OrganizerInvite{ID: fakedInviteID}
+
+	t.Run("HappyPath", func(t *testing.T) {
+		mockedRepo := new(repositoryMock)
+
+		mockedRepo.
+			On("GetOrganizerInvite", mock.Anything, mock.Anything, fakedInviteID).
+			Return(fakedInvite, nil)
+
+		mockedRepo.
+			On("DeleteOrganizerInvite", mock.Anything, mock.Anything, fakedInviteID).
+			Return(nil)
+
+		ucase := usecases.OrganizerUseCase{
+			Repo: mockedRepo,
+		}
+
+		err := ucase.DeleteOrganizerInvite(context.Background(), fakedInviteID)
+
+		require.NoError(t, err)
+
+		mockedRepo.AssertExpectations(t)
+	})
+}
