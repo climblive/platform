@@ -6,7 +6,7 @@ ALTER TABLE `contender` DROP COLUMN `club`;
 
 UPDATE `problem`
     SET `description` = `name`
-    WHERE `name` IS NOT NULL AND `name` != '' AND `description` IS NOT NULL AND `description` != '';
+    WHERE `description` IS NULL OR `description` = '';
 
 ALTER TABLE `problem` DROP COLUMN `name`;
 
