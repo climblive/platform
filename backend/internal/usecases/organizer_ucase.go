@@ -136,7 +136,7 @@ func (uc *OrganizerUseCase) AcceptOrganizerInvite(ctx context.Context, inviteID 
 		return errors.Wrap(err, 0)
 	}
 
-	err = uc.Repo.DeleteOrganizerInvite(ctx, nil, inviteID)
+	err = uc.Repo.DeleteOrganizerInvite(ctx, tx, inviteID)
 	if err != nil {
 		tx.Rollback()
 		return errors.Wrap(err, 0)
