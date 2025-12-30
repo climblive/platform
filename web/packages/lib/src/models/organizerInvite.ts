@@ -1,4 +1,4 @@
-import * as z from "zod";
+import * as z from "zod/v4";
 import type { OrganizerInvite } from "./generated";
 
 export const organizerInviteSchema: z.ZodType<OrganizerInvite> = z.object({
