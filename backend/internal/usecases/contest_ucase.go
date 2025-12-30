@@ -27,6 +27,8 @@ type contestUseCaseRepository interface {
 	DeleteContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) error
 	DeleteProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) error
 	DeleteCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) error
+	DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) error
+	StoreContender(ctx context.Context, tx domain.Transaction, contender domain.Contender) (domain.Contender, error)
 }
 
 type ContestUseCase struct {
@@ -344,12 +346,24 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
+	contenders, err := uc.Repo.GetContendersByContest(ctx, nil, contestID)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
 	tx, err := uc.Repo.Begin()
 	if err != nil {
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
 	purge := func() error {
+		for _, contender := range contenders {
+			err = uc.Repo.DeleteContender(ctx, tx, contender.ID)
+			if err != nil {
+				return err
+			}
+		}
+
 		for _, problem := range problems {
 			err = uc.Repo.DeleteProblem(ctx, tx, problem.ID)
 			if err != nil {
@@ -392,6 +406,13 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 			}
 		}
 
+		for _, contender := range contenders {
+			_, err = uc.Repo.StoreContender(ctx, tx, contender)
+			if err != nil {
+				return err
+			}
+		}
+
 		return nil
 	}
 
@@ -409,6 +430,10 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 
 	for index := range problems {
 		problems[index].Ownership.OrganizerID = newOrganizerID
+	}
+
+	for index := range contenders {
+		contenders[index].Ownership.OrganizerID = newOrganizerID
 	}
 
 	err = transfer()

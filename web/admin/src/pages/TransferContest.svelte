@@ -11,6 +11,7 @@
     transferContestMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
+  import { navigate } from "svelte-routing";
 
   type Props = {
     contestId: number;
@@ -50,11 +51,11 @@
 
     transferContest.mutate(selectedOrganizerID, {
       onSuccess: () => {
-        toastError("Contest transferred successfully.");
-      },
-      onError: () => {
         handleCancel();
 
+        navigate(`./organizers/${selectedOrganizerID}/contests`);
+      },
+      onError: (error) => {
         toastError("Failed to transfer contest.");
       },
     });
