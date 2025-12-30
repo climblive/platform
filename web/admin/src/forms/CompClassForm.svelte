@@ -42,7 +42,7 @@
 
   interface Props {
     data: Partial<T>;
-    schema: z.ZodType<T, T>;
+    schema: z.ZodType<T, unknown>;
     submit: (value: T) => void;
     children?: Snippet;
   }

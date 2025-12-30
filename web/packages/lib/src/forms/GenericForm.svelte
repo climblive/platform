@@ -6,7 +6,7 @@
   type T = $$Generic<unknown>;
 
   interface Props {
-    schema: z.ZodType<T, T>;
+    schema: z.ZodType<T, unknown>;
     submit: (value: T) => void;
     children?: Snippet;
   }
