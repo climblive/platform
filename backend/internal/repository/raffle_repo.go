@@ -90,3 +90,12 @@ func (d *Database) StoreRaffleWinner(ctx context.Context, tx domain.Transaction,
 
 	return winner, nil
 }
+
+func (d *Database) DeleteRaffle(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) error {
+	err := d.WithTx(tx).DeleteRaffle(ctx, int32(raffleID))
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	return nil
+}

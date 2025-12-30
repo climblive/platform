@@ -29,6 +29,9 @@ type contestUseCaseRepository interface {
 	DeleteCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) error
 	DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) error
 	StoreContender(ctx context.Context, tx domain.Transaction, contender domain.Contender) (domain.Contender, error)
+	GetRafflesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Raffle, error)
+	DeleteRaffle(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) error
+	StoreRaffle(ctx context.Context, tx domain.Transaction, raffle domain.Raffle) (domain.Raffle, error)
 }
 
 type ContestUseCase struct {
@@ -351,12 +354,24 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
+	raffles, err := uc.Repo.GetRafflesByContest(ctx, nil, contestID)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
 	tx, err := uc.Repo.Begin()
 	if err != nil {
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
 	purge := func() error {
+		for _, raffle := range raffles {
+			err = uc.Repo.DeleteRaffle(ctx, tx, raffle.ID)
+			if err != nil {
+				return err
+			}
+		}
+
 		for _, contender := range contenders {
 			err = uc.Repo.DeleteContender(ctx, tx, contender.ID)
 			if err != nil {
@@ -413,6 +428,13 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 			}
 		}
 
+		for _, raffle := range raffles {
+			_, err = uc.Repo.StoreRaffle(ctx, tx, raffle)
+			if err != nil {
+				return err
+			}
+		}
+
 		return nil
 	}
 
@@ -434,6 +456,10 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 
 	for index := range contenders {
 		contenders[index].Ownership.OrganizerID = newOrganizerID
+	}
+
+	for index := range raffles {
+		raffles[index].Ownership.OrganizerID = newOrganizerID
 	}
 
 	err = transfer()

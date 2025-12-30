@@ -91,6 +91,16 @@ func (q *Queries) DeleteProblem(ctx context.Context, id int32) error {
 	return err
 }
 
+const deleteRaffle = `-- name: DeleteRaffle :exec
+DELETE FROM raffle
+WHERE id = ?
+`
+
+func (q *Queries) DeleteRaffle(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deleteRaffle, id)
+	return err
+}
+
 const deleteTick = `-- name: DeleteTick :exec
 DELETE
 FROM tick

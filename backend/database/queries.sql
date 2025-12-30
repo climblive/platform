@@ -274,6 +274,10 @@ ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     contest_id = VALUES(contest_id);
 
+-- name: DeleteRaffle :exec
+DELETE FROM raffle
+WHERE id = ?;
+
 -- name: GetRaffleWinners :many
 SELECT sqlc.embed(raffle_winner), contender.name
 FROM raffle_winner
