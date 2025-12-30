@@ -137,7 +137,7 @@
         </wa-breadcrumb-item>
       </wa-breadcrumb>
 
-      <EditOrganizer {organizer}>
+      <EditOrganizer {organizerId} currentName={organizer.name}>
         {#snippet children({ editOrganizer })}
           <wa-button
             variant="neutral"

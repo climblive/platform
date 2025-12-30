@@ -5,30 +5,26 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import type WaInput from "@awesome.me/webawesome/dist/components/input/input.js";
-  import type { Organizer } from "@climblive/lib/models";
   import { patchOrganizerMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import type { Snippet } from "svelte";
+  import { type Snippet } from "svelte";
 
   type Props = {
-    organizer: Organizer;
+    organizerId: number;
+    currentName: string;
     children: Snippet<[{ editOrganizer: () => void }]>;
   };
 
   let dialog: WaDialog | undefined = $state();
   let nameInput: WaInput | undefined = $state();
 
-  const { organizer, children }: Props = $props();
+  const { organizerId, currentName, children }: Props = $props();
 
-  const patchOrganizer = $derived(patchOrganizerMutation(organizer.id));
+  const patchOrganizer = $derived(patchOrganizerMutation(organizerId));
 
   const handleOpen = () => {
     if (dialog) {
       dialog.open = true;
-
-      if (nameInput) {
-        nameInput.value = organizer.name;
-      }
     }
   };
 
@@ -43,7 +39,7 @@
 
     const name = nameInput?.value?.trim();
 
-    if (!name || name === organizer.name) {
+    if (!name) {
       handleCancel();
       return;
     }
@@ -65,7 +61,7 @@
 
   <wa-dialog bind:this={dialog} label="Edit organizer">
     <form onsubmit={handleSubmit}>
-      <wa-input bind:this={nameInput} label="Organizer name" required
+      <wa-input bind:this={nameInput} value={currentName} label="Name" required
       ></wa-input>
 
       <div class="controls">

@@ -3,9 +3,13 @@ import {
   createQuery,
   useQueryClient,
 } from "@tanstack/svelte-query";
-import type { QueryKey } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import type { Organizer, OrganizerPatch, OrganizerTemplate, User } from "../models";
+import type {
+  Organizer,
+  OrganizerPatch,
+  OrganizerTemplate,
+  User,
+} from "../models";
 
 export const createOrganizerMutation = () => {
   const client = useQueryClient();
@@ -41,8 +45,7 @@ export const patchOrganizerMutation = (organizerId: number) => {
     mutationFn: async (patch: OrganizerPatch) =>
       ApiClient.getInstance().patchOrganizer(organizerId, patch),
     onSuccess: (patchedOrganizer: Organizer) => {
-      let queryKey: QueryKey = ["organizer", { id: organizerId }];
-      client.setQueryData(queryKey, patchedOrganizer);
+      client.setQueryData(["organizer", { id: organizerId }], patchedOrganizer);
 
       client.setQueryData<User>(["self"], (current) => {
         if (!current) {
