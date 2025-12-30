@@ -38,6 +38,7 @@ type contestUseCaseRepository interface {
 	GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error)
 	DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) error
 	StoreTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error)
+	StoreScore(ctx context.Context, tx domain.Transaction, score domain.Score) error
 }
 
 type ContestUseCase struct {
@@ -459,6 +460,16 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 
 		for _, contender := range contenders {
 			_, err = uc.Repo.StoreContender(ctx, tx, contender)
+			if err != nil {
+				return err
+			}
+
+			score := contender.Score
+			if score == nil {
+				continue
+			}
+
+			err := uc.Repo.StoreScore(ctx, tx, *score)
 			if err != nil {
 				return err
 			}
