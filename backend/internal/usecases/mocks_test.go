@@ -289,6 +289,11 @@ func (m *repositoryMock) StoreOrganizerInvite(ctx context.Context, tx domain.Tra
 	return args.Error(0)
 }
 
+func (m *repositoryMock) StoreScore(ctx context.Context, tx domain.Transaction, score domain.Score) error {
+	args := m.Called(ctx, tx, score)
+	return args.Error(0)
+}
+
 type authorizerMock struct {
 	mock.Mock
 }
