@@ -3,7 +3,6 @@
   import RelativeTime from "@/components/RelativeTime.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import {
     EmptyState,
     Table,
@@ -98,8 +97,15 @@
   ];
 
   const handleToggleArchive = (event: InputEvent) => {
-    showArchived = (event.target as WaSwitch).checked;
+    showArchived = !showArchived;
   };
+
+  const numberOfUnarchivedContests = $derived(
+    [ongoing, upcoming, past].reduce(
+      (partialSum, a) => partialSum + a.length,
+      0,
+    ),
+  );
 </script>
 
 {#snippet renderName({ id, name }: Contest)}
@@ -126,8 +132,9 @@
   {/if}
 {/snippet}
 
-{#snippet createButton()}
+{#snippet createButton(className?: string)}
   <wa-button
+    class={className}
     variant="neutral"
     onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
     >Create new contest</wa-button
@@ -135,8 +142,8 @@
 {/snippet}
 
 <h2>Contests</h2>
-{#if contests && contests.length > 0}
-  {@render createButton()}
+{#if numberOfUnarchivedContests > 0}
+  {@render createButton("create-contest-button")}
 {/if}
 
 {#snippet listing(heading: string, contests: Contest[])}
@@ -159,17 +166,7 @@
     {@render listing("Past", past)}
   {/if}
 
-  {#if archived?.length}
-    <wa-switch checked={showArchived} onchange={handleToggleArchive}
-      >Show archived contests</wa-switch
-    >
-  {/if}
-
-  {#if showArchived}
-    {@render listing("Archived", archived)}
-  {/if}
-
-  {#if contests && contests.length === 0}
+  {#if contests && numberOfUnarchivedContests === 0}
     <EmptyState
       title="No contests yet"
       description="Create a contest to get started with your first event."
@@ -179,10 +176,34 @@
       {/snippet}
     </EmptyState>
   {/if}
+
+  {#if showArchived && archived.length > 0}
+    {@render listing("Archived", archived)}
+  {/if}
+
+  {#if archived?.length}
+    <wa-button
+      size="small"
+      appearance="plain"
+      variant="brand"
+      onclick={handleToggleArchive}
+      class="toggle-archived-button"
+    >
+      {#if showArchived}
+        Hide archived contests
+      {:else}
+        Show archived contests ({archived.length})
+      {/if}
+    </wa-button>
+  {/if}
 {/if}
 
 <style>
-  wa-switch {
+  .create-contest-button {
+    margin-block-end: var(--wa-space-m);
+  }
+
+  .toggle-archived-button {
     display: block;
     margin-block-start: var(--wa-space-m);
   }
