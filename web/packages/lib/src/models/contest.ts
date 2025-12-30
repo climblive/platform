@@ -1,4 +1,4 @@
-import * as z from "zod";
+import * as z from "zod/v4";
 import { ownershipDataSchema } from "./common";
 import type { Contest } from "./generated";
 

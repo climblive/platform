@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  import * as z from "zod";
+  import * as z from "zod/v4";
 
   export const formSchema = z.object({
     number: z.coerce.number(),
@@ -29,7 +29,7 @@
 
   interface Props {
     data: Partial<T>;
-    schema: z.ZodType<T, z.ZodTypeDef, T>;
+    schema: z.ZodType<T, unknown>;
     submit: (value: T) => void;
     children?: Snippet;
   }

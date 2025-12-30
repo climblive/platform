@@ -1,12 +1,12 @@
 <script lang="ts">
   import { serialize } from "@awesome.me/webawesome";
   import { type Snippet } from "svelte";
-  import * as z from "zod";
+  import * as z from "zod/v4";
 
   type T = $$Generic<unknown>;
 
   interface Props {
-    schema: z.ZodType<T, z.ZodTypeDef, T>;
+    schema: z.ZodType<T, unknown>;
     submit: (value: T) => void;
     children?: Snippet;
   }
@@ -38,8 +38,8 @@
     form?.reportValidity();
   };
 
-  const setCustomValidity = (path: (string | number)[], message: string) => {
-    const name = `${path[0]}`;
+  const setCustomValidity = (path: PropertyKey[], message: string) => {
+    const name = String(path[0]);
 
     const input = form?.querySelector(`[name="${name}"]`) as
       | HTMLInputElement

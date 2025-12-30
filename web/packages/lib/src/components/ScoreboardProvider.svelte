@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy, onMount, type Snippet } from "svelte";
   import { writable, type Writable } from "svelte/store";
-  import * as z from "zod";
+  import * as z from "zod/v4";
   import { ApiClient } from "../Api";
   import {
     contenderPublicInfoUpdatedEventSchema,
