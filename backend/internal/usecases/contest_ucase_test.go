@@ -696,26 +696,54 @@ func TestTransferContest(t *testing.T) {
 	fakedRaffleID := randomResourceID[domain.RaffleID]()
 	fakedRaffleWinnerID := randomResourceID[domain.RaffleWinnerID]()
 	fakedTickID := randomResourceID[domain.TickID]()
+	fakedSeriesID := randomResourceID[domain.SeriesID]()
 	timestamp := time.Now()
 
 	fakedOldOwnership := domain.OwnershipData{OrganizerID: fakedOldOrganizerID}
 	fakedNewOwnership := domain.OwnershipData{OrganizerID: fakedNewOrganizerID}
 
+	timeBegin := time.Now()
+	timeEnd := timeBegin.Add(2 * time.Hour)
+
 	fakedContest := domain.Contest{
-		ID:        fakedContestID,
-		Ownership: fakedOldOwnership,
+		ID:                 fakedContestID,
+		Ownership:          fakedOldOwnership,
+		Location:           "Stockholm Climbing Center",
+		SeriesID:           fakedSeriesID,
+		Name:               "Swedish Open 2025",
+		Description:        "National bouldering championship",
+		QualifyingProblems: 8,
+		Finalists:          6,
+		Rules:              "Standard IFSC rules apply",
+		GracePeriod:        30 * time.Minute,
+		TimeBegin:          timeBegin,
+		TimeEnd:            timeEnd,
 	}
 
 	fakedCompClass := domain.CompClass{
-		ID:        fakedCompClassID,
-		Ownership: fakedOldOwnership,
-		ContestID: fakedContestID,
+		ID:          fakedCompClassID,
+		Ownership:   fakedOldOwnership,
+		ContestID:   fakedContestID,
+		Name:        "Open Males",
+		Description: "Male competitors",
+		TimeBegin:   timeBegin,
+		TimeEnd:     timeEnd,
 	}
 
 	fakedProblem := domain.Problem{
-		ID:        fakedProblemID,
-		Ownership: fakedOldOwnership,
-		ContestID: fakedContestID,
+		ID:                 fakedProblemID,
+		Ownership:          fakedOldOwnership,
+		ContestID:          fakedContestID,
+		Number:             15,
+		HoldColorPrimary:   "#0000FF",
+		HoldColorSecondary: "#FFFFFF",
+		Description:        "Technical slab problem",
+		Zone1Enabled:       true,
+		Zone2Enabled:       true,
+		PointsTop:          100,
+		PointsZone1:        25,
+		PointsZone2:        50,
+		FlashBonus:         10,
 	}
 
 	fakedScore := domain.Score{
@@ -728,10 +756,16 @@ func TestTransferContest(t *testing.T) {
 	}
 
 	fakedContender := domain.Contender{
-		ID:        fakedContenderID,
-		Ownership: domain.OwnershipData{OrganizerID: fakedOldOrganizerID, ContenderID: &fakedContenderID},
-		ContestID: fakedContestID,
-		Score:     &fakedScore,
+		ID:                  fakedContenderID,
+		Ownership:           domain.OwnershipData{OrganizerID: fakedOldOrganizerID, ContenderID: &fakedContenderID},
+		ContestID:           fakedContestID,
+		CompClassID:         fakedCompClassID,
+		RegistrationCode:    "ABCD1234",
+		Name:                "John Doe",
+		Entered:             timestamp,
+		WithdrawnFromFinals: false,
+		Disqualified:        false,
+		Score:               &fakedScore,
 	}
 
 	fakedRaffle := domain.Raffle{
@@ -741,16 +775,26 @@ func TestTransferContest(t *testing.T) {
 	}
 
 	fakedWinner := domain.RaffleWinner{
-		ID:          fakedRaffleWinnerID,
-		Ownership:   fakedOldOwnership,
-		RaffleID:    fakedRaffleID,
-		ContenderID: fakedContenderID,
+		ID:            fakedRaffleWinnerID,
+		Ownership:     fakedOldOwnership,
+		RaffleID:      fakedRaffleID,
+		ContenderID:   fakedContenderID,
+		ContenderName: "John Doe",
+		Timestamp:     timestamp,
 	}
 
 	fakedTick := domain.Tick{
-		ID:        fakedTickID,
-		Ownership: domain.OwnershipData{OrganizerID: fakedOldOrganizerID, ContenderID: &fakedContenderID},
-		ProblemID: fakedProblemID,
+		ID:            fakedTickID,
+		Ownership:     domain.OwnershipData{OrganizerID: fakedOldOrganizerID, ContenderID: &fakedContenderID},
+		Timestamp:     timestamp,
+		ContestID:     fakedContestID,
+		ProblemID:     fakedProblemID,
+		Zone1:         true,
+		AttemptsZone1: 2,
+		Zone2:         true,
+		AttemptsZone2: 3,
+		Top:           true,
+		AttemptsTop:   5,
 	}
 
 	makeMocks := func() (*repositoryMock, *authorizerMock, *transactionMock) {
@@ -809,32 +853,62 @@ func TestTransferContest(t *testing.T) {
 
 		mockedRepo.
 			On("StoreContest", mock.Anything, mockedTx, domain.Contest{
-				ID:        fakedContestID,
-				Ownership: fakedNewOwnership,
+				ID:                 fakedContestID,
+				Ownership:          fakedNewOwnership,
+				Location:           "Stockholm Climbing Center",
+				SeriesID:           fakedSeriesID,
+				Name:               "Swedish Open 2025",
+				Description:        "National bouldering championship",
+				QualifyingProblems: 8,
+				Finalists:          6,
+				Rules:              "Standard IFSC rules apply",
+				GracePeriod:        30 * time.Minute,
+				TimeBegin:          fakedContest.TimeBegin,
+				TimeEnd:            fakedContest.TimeEnd,
 			}).
 			Return(domain.Contest{}, nil)
 
 		mockedRepo.
 			On("StoreCompClass", mock.Anything, mockedTx, domain.CompClass{
-				ID:        fakedCompClassID,
-				Ownership: fakedNewOwnership,
-				ContestID: fakedContestID,
+				ID:          fakedCompClassID,
+				Ownership:   fakedNewOwnership,
+				ContestID:   fakedContestID,
+				Name:        "Open Males",
+				Description: "Male competitors",
+				TimeBegin:   fakedCompClass.TimeBegin,
+				TimeEnd:     fakedCompClass.TimeEnd,
 			}).
 			Return(domain.CompClass{}, nil)
 
 		mockedRepo.
 			On("StoreProblem", mock.Anything, mockedTx, domain.Problem{
-				ID:        fakedProblemID,
-				Ownership: fakedNewOwnership,
-				ContestID: fakedContestID,
+				ID:                 fakedProblemID,
+				Ownership:          fakedNewOwnership,
+				ContestID:          fakedContestID,
+				Number:             15,
+				HoldColorPrimary:   "#0000FF",
+				HoldColorSecondary: "#FFFFFF",
+				Description:        "Technical slab problem",
+				Zone1Enabled:       true,
+				Zone2Enabled:       true,
+				PointsTop:          100,
+				PointsZone1:        25,
+				PointsZone2:        50,
+				FlashBonus:         10,
 			}).Return(domain.Problem{}, nil)
 
 		mockedRepo.
 			On("StoreContender", mock.Anything, mockedTx, domain.Contender{
-				ID:        fakedContenderID,
-				Ownership: domain.OwnershipData{OrganizerID: fakedNewOrganizerID, ContenderID: &fakedContenderID},
-				ContestID: fakedContestID,
-				Score:     &fakedScore,
+				ID:                  fakedContenderID,
+				Ownership:           domain.OwnershipData{OrganizerID: fakedNewOrganizerID, ContenderID: &fakedContenderID},
+				ContestID:           fakedContestID,
+				CompClassID:         fakedCompClassID,
+				RegistrationCode:    "ABCD1234",
+				Name:                "John Doe",
+				Entered:             fakedContender.Entered,
+				WithdrawnFromFinals: false,
+				Disqualified:        false,
+				Score:               &fakedScore,
 			}).
 			Return(domain.Contender{}, nil)
 
@@ -852,18 +926,28 @@ func TestTransferContest(t *testing.T) {
 
 		mockedRepo.
 			On("StoreRaffleWinner", mock.Anything, mockedTx, domain.RaffleWinner{
-				ID:          fakedRaffleWinnerID,
-				Ownership:   fakedNewOwnership,
-				RaffleID:    fakedRaffleID,
-				ContenderID: fakedContenderID,
+				ID:            fakedRaffleWinnerID,
+				Ownership:     fakedNewOwnership,
+				RaffleID:      fakedRaffleID,
+				ContenderID:   fakedContenderID,
+				ContenderName: "John Doe",
+				Timestamp:     fakedWinner.Timestamp,
 			}).
 			Return(domain.RaffleWinner{}, nil)
 
 		mockedRepo.
 			On("StoreTick", mock.Anything, mockedTx, domain.Tick{
-				ID:        fakedTickID,
-				Ownership: domain.OwnershipData{OrganizerID: fakedNewOrganizerID, ContenderID: &fakedContenderID},
-				ProblemID: fakedProblemID,
+				ID:            fakedTickID,
+				Ownership:     domain.OwnershipData{OrganizerID: fakedNewOrganizerID, ContenderID: &fakedContenderID},
+				Timestamp:     fakedTick.Timestamp,
+				ContestID:     fakedContestID,
+				ProblemID:     fakedProblemID,
+				Zone1:         true,
+				AttemptsZone1: 2,
+				Zone2:         true,
+				AttemptsZone2: 3,
+				Top:           true,
+				AttemptsTop:   5,
 			}).
 			Return(domain.Tick{}, nil)
 
