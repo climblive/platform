@@ -12,7 +12,10 @@
 <section>
   <div class="left">
     <h1>{contestName}</h1>
-    <span class="link">Register at {location.protocol}//{location.host}</span>
+    <span class="link">
+      Scan the QR code or register at {location.protocol}//{location.host}
+      using your <em>secret code:</em></span
+    >
     <span class="code">{registrationCode}</span>
   </div>
   <QrCode {registrationCode} width={80}></QrCode>
@@ -29,6 +32,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: var(--wa-space-m);
 
     & .left {
       flex-grow: 1;
@@ -51,6 +55,10 @@
       font-weight: var(--wa-font-weight-bold);
       font-family: monospace;
       letter-spacing: 0.2rem;
+    }
+
+    :global(& > svg) {
+      flex-shrink: 0;
     }
   }
 
