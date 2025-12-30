@@ -25,6 +25,7 @@
   const handleOpen = () => {
     if (dialog) {
       dialog.open = true;
+
       if (nameInput) {
         nameInput.value = organizer.name;
       }
@@ -85,10 +86,6 @@
 </div>
 
 <style>
-  wa-dialog {
-    white-space: normal;
-  }
-
   .controls {
     display: flex;
     justify-content: flex-end;

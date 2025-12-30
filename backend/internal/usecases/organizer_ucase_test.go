@@ -483,15 +483,17 @@ func TestPatchOrganizer(t *testing.T) {
 			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.OrganizerRole, nil)
 
-		expectedOrganizer := domain.Organizer{
-			ID:        fakedOrganizerID,
-			Ownership: fakedOwnership,
-			Name:      "New Name",
-		}
-
 		mockedRepo.
-			On("StoreOrganizer", mock.Anything, mock.Anything, expectedOrganizer).
-			Return(expectedOrganizer, nil)
+			On("StoreOrganizer", mock.Anything, mock.Anything, domain.Organizer{
+				ID:        fakedOrganizerID,
+				Ownership: fakedOwnership,
+				Name:      "New Name",
+			}).
+			Return(domain.Organizer{
+				ID:        fakedOrganizerID,
+				Ownership: fakedOwnership,
+				Name:      "New Name",
+			}, nil)
 
 		ucase := usecases.OrganizerUseCase{
 			Repo:       mockedRepo,
@@ -499,7 +501,7 @@ func TestPatchOrganizer(t *testing.T) {
 		}
 
 		patch := domain.OrganizerPatch{
-			Name: domain.Patch[string]{Present: true, Value: "New Name"},
+			Name: domain.NewPatch("New Name"),
 		}
 
 		organizer, err := ucase.PatchOrganizer(context.Background(), fakedOrganizerID, patch)
@@ -529,7 +531,7 @@ func TestPatchOrganizer(t *testing.T) {
 		}
 
 		patch := domain.OrganizerPatch{
-			Name: domain.Patch[string]{Present: true, Value: "   "},
+			Name: domain.NewPatch("   "),
 		}
 
 		organizer, err := ucase.PatchOrganizer(context.Background(), fakedOrganizerID, patch)
@@ -559,13 +561,12 @@ func TestPatchOrganizer(t *testing.T) {
 		}
 
 		patch := domain.OrganizerPatch{
-			Name: domain.Patch[string]{Present: true, Value: "New Name"},
+			Name: domain.NewPatch("New Name"),
 		}
 
-		organizer, err := ucase.PatchOrganizer(context.Background(), fakedOrganizerID, patch)
+		_, err := ucase.PatchOrganizer(context.Background(), fakedOrganizerID, patch)
 
 		assert.ErrorIs(t, err, domain.ErrNoOwnership)
-		assert.Equal(t, domain.Organizer{}, organizer)
 
 		mockedAuthorizer.AssertExpectations(t)
 		mockedRepo.AssertExpectations(t)

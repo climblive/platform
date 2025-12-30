@@ -105,7 +105,7 @@ type OrganizerTemplate struct {
 }
 
 type OrganizerPatch struct {
-	Name Patch[string] `json:"name,omitempty" tstype:"string"`
+	Name Patch[string] `json:"name,omitzero" tstype:"string"`
 }
 
 type OrganizerInvite struct {

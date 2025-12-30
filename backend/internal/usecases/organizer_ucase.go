@@ -105,6 +105,7 @@ func (uc *OrganizerUseCase) PatchOrganizer(ctx context.Context, organizerID doma
 		if name == "" {
 			return domain.Organizer{}, errors.Wrap(domain.ErrInvalidData, 0)
 		}
+
 		organizer.Name = name
 	}
 
