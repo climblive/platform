@@ -104,6 +104,11 @@ func (m *repositoryMock) StoreContest(ctx context.Context, tx domain.Transaction
 	}
 }
 
+func (m *repositoryMock) DeleteContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) error {
+	args := m.Called(ctx, tx, contestID)
+	return args.Error(0)
+}
+
 func (m *repositoryMock) GetContestsByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.Contest, error) {
 	args := m.Called(ctx, tx, organizerID)
 	return args.Get(0).([]domain.Contest), args.Error(1)
