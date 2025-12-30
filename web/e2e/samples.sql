@@ -23,4 +23,4 @@ CREATE TABLE `goose_db_version` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO goose_db_version SELECT NULL, seq, 1, NOW() FROM seq_1_to_31;
+INSERT INTO goose_db_version SELECT NULL, seq, 1, NOW() FROM seq_1_to_32;
