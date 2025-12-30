@@ -6,6 +6,7 @@
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
+  import { value } from "@climblive/lib/forms";
   import {
     getSelfQuery,
     transferContestMutation,
@@ -19,7 +20,7 @@
   };
 
   let dialog: WaDialog | undefined = $state();
-  let selectedOrganizerID: number | undefined = $state();
+  let selectedOrganizerId: number | undefined = $state();
 
   const { contestId, organizerId }: Props = $props();
 
@@ -34,7 +35,6 @@
   const handleTransfer = async () => {
     if (dialog) {
       dialog.open = true;
-      selectedOrganizerID = undefined;
     }
   };
 
@@ -45,15 +45,15 @@
   };
 
   const confirmTransfer = () => {
-    if (selectedOrganizerID === undefined) {
+    if (selectedOrganizerId === undefined) {
       return;
     }
 
-    transferContest.mutate(selectedOrganizerID, {
+    transferContest.mutate(selectedOrganizerId, {
       onSuccess: () => {
         handleCancel();
 
-        navigate(`./organizers/${selectedOrganizerID}/contests`);
+        navigate(`./organizers/${selectedOrganizerId}/contests`);
       },
       onError: (error) => {
         toastError("Failed to transfer contest.");
@@ -63,7 +63,7 @@
 
   const handleSelect = (event: Event) => {
     const select = event.target as WaSelect;
-    selectedOrganizerID = Number(select.value);
+    selectedOrganizerId = Number(select.value);
   };
 </script>
 
@@ -80,11 +80,38 @@
 
 <wa-dialog bind:this={dialog} label="Transfer contest">
   Move this contest to one of the other organizers you belong to.
-  <wa-select label="Select new organizer" onchange={handleSelect}>
+  <wa-select
+    label="Select new organizer"
+    hide-label
+    onchange={handleSelect}
+    {@attach value(selectedOrganizerId)}
+  >
     {#each otherOrganizers as organizer (organizer.id)}
       <wa-option value={organizer.id}>{organizer.name}</wa-option>
     {/each}
   </wa-select>
+
+  {#if selectedOrganizerId}
+    {@const currentOrganizer = organizers.find(
+      (organizer) => organizer.id === organizerId,
+    )}
+    {@const newOrganizer = organizers.find(
+      (organizer) => organizer.id === selectedOrganizerId,
+    )}
+
+    {#if currentOrganizer && newOrganizer}
+      <p>
+        This will transfer all contest data from the current organizer
+        <strong>
+          {currentOrganizer.name}
+        </strong>
+        to
+        <strong>
+          {newOrganizer.name}
+        </strong>.
+      </p>
+    {/if}
+  {/if}
 
   <wa-button slot="footer" appearance="plain" onclick={handleCancel}>
     Cancel
@@ -94,7 +121,7 @@
     variant="warning"
     onclick={confirmTransfer}
     loading={transferContest.isPending}
-    disabled={selectedOrganizerID === undefined || otherOrganizers.length === 0}
+    disabled={selectedOrganizerId === undefined || otherOrganizers.length === 0}
   >
     Transfer
     <wa-icon slot="start" name="arrow-right"></wa-icon>
