@@ -70,6 +70,7 @@ func contestToDomain(record database.Contest) domain.Contest {
 		Finalists:          int(record.Finalists),
 		Rules:              record.Rules.String,
 		GracePeriod:        time.Duration(record.GracePeriod) * time.Minute,
+		Created:            record.Created,
 	}
 
 	return contest

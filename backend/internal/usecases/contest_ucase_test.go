@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -339,15 +340,30 @@ func TestCreateContest(t *testing.T) {
 	}
 
 	t.Run("HappyCase", func(t *testing.T) {
-		mockedRepo, mockedAuthorizer := makeMocks()
+		synctest.Test(t, func(t *testing.T) {
+			mockedRepo, mockedAuthorizer := makeMocks()
 
-		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, fakedOwnership).
-			Return(domain.OrganizerRole, nil)
+			mockedAuthorizer.
+				On("HasOwnership", mock.Anything, fakedOwnership).
+				Return(domain.OrganizerRole, nil)
 
-		mockedRepo.
-			On("StoreContest", mock.Anything, nil,
-				domain.Contest{
+			mockedRepo.
+				On("StoreContest", mock.Anything, nil,
+					domain.Contest{
+						Ownership:          fakedOwnership,
+						Location:           "The garage",
+						SeriesID:           0,
+						Name:               "Swedish Championships",
+						Description:        "Who is the best climber in Sweden?",
+						QualifyingProblems: 10,
+						Finalists:          7,
+						Rules:              "No rules!",
+						GracePeriod:        time.Hour,
+						Created:            time.Now(),
+					},
+				).
+				Return(domain.Contest{
+					ID:                 fakedContestID,
 					Ownership:          fakedOwnership,
 					Location:           "The garage",
 					SeriesID:           0,
@@ -357,52 +373,42 @@ func TestCreateContest(t *testing.T) {
 					Finalists:          7,
 					Rules:              "No rules!",
 					GracePeriod:        time.Hour,
-				},
-			).
-			Return(domain.Contest{
-				ID:                 fakedContestID,
-				Ownership:          fakedOwnership,
+					Created:            time.Now(),
+				}, nil)
+
+			ucase := usecases.ContestUseCase{
+				Repo:       mockedRepo,
+				Authorizer: mockedAuthorizer,
+			}
+
+			contest, err := ucase.CreateContest(context.Background(), fakedOrganizerID, domain.ContestTemplate{
 				Location:           "The garage",
-				SeriesID:           0,
 				Name:               "Swedish Championships",
 				Description:        "Who is the best climber in Sweden?",
 				QualifyingProblems: 10,
 				Finalists:          7,
 				Rules:              "No rules!",
 				GracePeriod:        time.Hour,
-			}, nil)
+			})
 
-		ucase := usecases.ContestUseCase{
-			Repo:       mockedRepo,
-			Authorizer: mockedAuthorizer,
-		}
+			require.NoError(t, err)
+			assert.Equal(t, fakedContestID, contest.ID)
+			assert.Equal(t, fakedOwnership, contest.Ownership)
+			assert.False(t, contest.Archived)
+			assert.Equal(t, "The garage", contest.Location)
+			assert.Equal(t, "Swedish Championships", contest.Name)
+			assert.Equal(t, "Who is the best climber in Sweden?", contest.Description)
+			assert.Equal(t, 10, contest.QualifyingProblems)
+			assert.Equal(t, 7, contest.Finalists)
+			assert.Equal(t, "No rules!", contest.Rules)
+			assert.Equal(t, time.Hour, contest.GracePeriod)
+			assert.Empty(t, contest.TimeBegin)
+			assert.Empty(t, contest.TimeEnd)
+			assert.Equal(t, time.Now(), contest.Created)
 
-		contest, err := ucase.CreateContest(context.Background(), fakedOrganizerID, domain.ContestTemplate{
-			Location:           "The garage",
-			Name:               "Swedish Championships",
-			Description:        "Who is the best climber in Sweden?",
-			QualifyingProblems: 10,
-			Finalists:          7,
-			Rules:              "No rules!",
-			GracePeriod:        time.Hour,
+			mockedRepo.AssertExpectations(t)
+			mockedAuthorizer.AssertExpectations(t)
 		})
-
-		require.NoError(t, err)
-		assert.Equal(t, fakedContestID, contest.ID)
-		assert.Equal(t, fakedOwnership, contest.Ownership)
-		assert.False(t, contest.Archived)
-		assert.Equal(t, "The garage", contest.Location)
-		assert.Equal(t, "Swedish Championships", contest.Name)
-		assert.Equal(t, "Who is the best climber in Sweden?", contest.Description)
-		assert.Equal(t, 10, contest.QualifyingProblems)
-		assert.Equal(t, 7, contest.Finalists)
-		assert.Equal(t, "No rules!", contest.Rules)
-		assert.Equal(t, time.Hour, contest.GracePeriod)
-		assert.Empty(t, contest.TimeBegin)
-		assert.Empty(t, contest.TimeEnd)
-
-		mockedRepo.AssertExpectations(t)
-		mockedAuthorizer.AssertExpectations(t)
 	})
 
 	t.Run("ValidatorIsInvoked", func(t *testing.T) {

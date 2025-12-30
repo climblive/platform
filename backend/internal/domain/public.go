@@ -69,6 +69,7 @@ type Contest struct {
 	GracePeriod        time.Duration `json:"gracePeriod"`
 	TimeBegin          time.Time     `json:"timeBegin,omitzero"`
 	TimeEnd            time.Time     `json:"timeEnd,omitzero"`
+	Created            time.Time     `json:"created"`
 }
 
 type ContestTemplate struct {

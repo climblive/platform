@@ -86,6 +86,7 @@ export interface Contest {
   gracePeriod: number;
   timeBegin?: Date;
   timeEnd?: Date;
+  created: Date;
 }
 export interface ContestTemplate {
   location?: string;

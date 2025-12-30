@@ -3,6 +3,7 @@ package usecases
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/usecases/validators"
@@ -216,6 +217,7 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		Finalists:          tmpl.Finalists,
 		Rules:              sanitizationPolicy.Sanitize(tmpl.Rules),
 		GracePeriod:        tmpl.GracePeriod,
+		Created:            time.Now(),
 	}
 
 	if err := (validators.ContestValidator{}).Validate(contest); err != nil {

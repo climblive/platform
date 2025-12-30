@@ -44,6 +44,7 @@ type Contest struct {
 	Finalists          int32
 	Rules              sql.NullString
 	GracePeriod        int32
+	Created            time.Time
 }
 
 type Organizer struct {
