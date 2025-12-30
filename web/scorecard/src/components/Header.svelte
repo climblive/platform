@@ -9,7 +9,6 @@
     contestName: string;
     compClassName: string | undefined;
     contenderName: string | undefined;
-    contenderClub: string | undefined;
     score: number;
     placement: number | undefined;
     contestState: ContestState;
@@ -22,7 +21,6 @@
     contestName,
     compClassName,
     contenderName,
-    contenderClub,
     score,
     placement,
     contestState,
@@ -32,18 +30,18 @@
 </script>
 
 <header>
-  <sl-icon-button
-    name="gear"
-    label="Edit"
+  <wa-button
+    size="small"
     onclick={() => navigate(`/${registrationCode}/edit`)}
     disabled={contestState === "ENDED"}
+    appearance="plain"
   >
-  </sl-icon-button>
+    <wa-icon name="gear" label="Edit"></wa-icon>
+  </wa-button>
   <h1>{contestName}</h1>
   <p class="contender-name">
     {contenderName} <span class="contender-class">{compClassName}</span>
   </p>
-  <p class="contender-club">{contenderClub ?? "No club"}</p>
   <div class="lower">
     <div class="score">
       <span>
@@ -65,28 +63,31 @@
 
 <style>
   header {
-    background-color: var(--sl-color-primary-600);
-    border: 1px solid var(--sl-color-primary-500);
-    border-radius: var(--sl-border-radius-small);
-    padding: var(--sl-spacing-small);
-    color: white;
+    background-color: var(--wa-color-brand-fill-normal);
+    border: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-brand-border-normal);
+    border-radius: var(--wa-border-radius-m);
+    padding: var(--wa-space-s);
+    color: var(--wa-color-brand-on-normal);
     position: relative;
 
-    & sl-icon-button {
+    & wa-button {
       position: absolute;
-      top: var(--sl-spacing-medium);
-      right: var(--sl-spacing-small);
-      font-size: var(--sl-font-size-medium);
+      top: var(--wa-space-m);
+      right: var(--wa-space-s);
       color: inherit;
+
+      &::part(label) {
+        color: var(--wa-color-brand-on-normal);
+      }
     }
 
-    & sl-icon-button::part(base) {
+    & wa-button::part(base) {
       padding: 0;
     }
 
     & h1,
-    & .contender-name,
-    & .contender-club {
+    & .contender-name {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -94,35 +95,30 @@
 
     & h1 {
       margin: 0;
-      font-size: var(--sl-font-size-large);
+      font-size: var(--wa-font-size-l);
       width: calc(100% - 2rem);
-      line-height: var(--sl-line-height-dense);
+      line-height: var(--wa-line-height-condensed);
     }
 
-    & .contender-name,
-    & .contender-club {
+    & .contender-name {
       margin: 0;
-      line-height: var(--sl-line-height-dense);
-    }
-
-    & .contender-club {
-      font-size: var(--sl-font-size-x-small);
+      line-height: var(--wa-line-height-condensed);
     }
 
     & .contender-class {
-      font-weight: var(--sl-font-weight-bold);
-      font-size: var(--sl-font-size-x-small);
+      font-weight: var(--wa-font-weight-bold);
+      font-size: var(--wa-font-size-xs);
     }
 
     & .score {
       & > span {
-        font-weight: var(--sl-font-weight-bold);
-        font-size: var(--sl-font-size-large);
+        font-weight: var(--wa-font-weight-bold);
+        font-size: var(--wa-font-size-l);
       }
 
       & > :not(span) {
-        font-size: var(--sl-font-size-x-small);
-        font-weight: var(--sl-font-weight-normal);
+        font-size: var(--wa-font-size-xs);
+        font-weight: var(--wa-font-weight-normal);
       }
     }
 

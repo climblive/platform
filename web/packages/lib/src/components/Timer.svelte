@@ -73,11 +73,11 @@
     }
 
     & span[role="timer"] {
-      font-weight: var(--sl-font-weight-bold);
+      font-weight: var(--wa-font-weight-bold);
     }
 
     & label {
-      font-weight: var(--sl-font-weight-normal);
+      font-weight: var(--wa-font-weight-normal);
       font-size: 0.75em;
     }
   }

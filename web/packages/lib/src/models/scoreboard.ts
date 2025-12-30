@@ -5,8 +5,7 @@ import { scoreSchema } from "./score";
 export const scoreboardEntrySchema: z.ZodType<ScoreboardEntry> = z.object({
   contenderId: z.number(),
   compClassId: z.number(),
-  publicName: z.string(),
-  clubName: z.string().optional(),
+  name: z.string(),
   withdrawnFromFinals: z.boolean(),
   disqualified: z.boolean(),
   score: scoreSchema.optional(),

@@ -16,12 +16,12 @@
   ],
   "features": {
     "ghcr.io/devcontainers/features/go:1": {
-      "version": "1.24",
-      "golangciLintVersion": "1.64.5"
+      "version": "1.25",
+      "golangciLintVersion": "2.4.0"
     },
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
     "ghcr.io/devcontainers/features/node:1": {
-      "version": "20",
+      "version": "22",
       "pnpmVersion": "9.14.4"
     }
   },

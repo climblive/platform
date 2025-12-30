@@ -1,86 +1,189 @@
 <script lang="ts">
-  import { Table, TableCell, TableRow } from "@climblive/lib/components";
+  import Loader from "@/components/Loader.svelte";
+  import RelativeTime from "@/components/RelativeTime.svelte";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/switch/switch.js";
+  import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
+  import {
+    EmptyState,
+    Table,
+    type ColumnDefinition,
+  } from "@climblive/lib/components";
   import type { Contest } from "@climblive/lib/models";
-  import { getContestsByOrganizerQuery } from "@climblive/lib/queries";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import {
+    getAllContestsQuery,
+    getContestsByOrganizerQuery,
+  } from "@climblive/lib/queries";
   import { format } from "date-fns";
   import { Link, navigate } from "svelte-routing";
 
   interface Props {
-    organizerId: number;
+    organizerId: number | undefined;
   }
 
   let { organizerId }: Props = $props();
 
-  const contestsQuery = getContestsByOrganizerQuery(organizerId);
+  let showArchived = $state(false);
 
-  let contests = $derived($contestsQuery.data);
+  const contestsQuery = $derived(
+    getContestsByOrganizerQuery(organizerId ?? 0, {
+      enabled: organizerId !== undefined,
+    }),
+  );
+  const allContestsQuery = $derived(
+    getAllContestsQuery({ enabled: organizerId === undefined }),
+  );
 
-  const [drafts, ongoing, upcoming, past] = $derived.by(() => {
+  const contests = $derived(
+    organizerId === undefined ? allContestsQuery.data : contestsQuery.data,
+  );
+
+  const [ongoing, upcoming, past, archived] = $derived.by(() => {
     const now = new Date();
 
-    const drafts = contests?.filter(({ timeBegin }) => {
-      return !timeBegin;
+    const ongoing: Contest[] = [];
+    const upcoming: Contest[] = [];
+    const past: Contest[] = [];
+    const archived: Contest[] = [];
+
+    contests?.forEach((contest) => {
+      const { timeBegin, timeEnd } = contest;
+
+      if (contest.archived) {
+        archived.push(contest);
+      } else if (timeBegin && timeEnd && now >= timeBegin && now < timeEnd) {
+        ongoing.push(contest);
+      } else if (timeEnd && now > timeEnd) {
+        past.push(contest);
+      } else {
+        upcoming.push(contest);
+      }
     });
 
-    const ongoing = contests?.filter(({ timeBegin, timeEnd }) => {
-      return timeBegin && timeEnd && timeBegin >= now && timeEnd < now;
-    });
+    ongoing?.sort(sortContests);
+    upcoming?.sort(sortContests).reverse();
+    past?.sort(sortContests);
+    archived?.sort(sortContests);
 
-    const upcoming = contests?.filter(({ timeBegin }) => {
-      return timeBegin && timeBegin > now;
-    });
-
-    const past = contests?.filter(({ timeEnd }) => {
-      return timeEnd && now > timeEnd;
-    });
-
-    return [drafts, ongoing, upcoming, past];
+    return [ongoing, upcoming, past, archived];
   });
+
+  const sortContests = (c1: Contest, c2: Contest) => {
+    if (c1.timeBegin && c2.timeBegin) {
+      return c2.timeBegin.getTime() - c1.timeBegin.getTime();
+    }
+
+    return 0;
+  };
+
+  const columns: ColumnDefinition<Contest>[] = [
+    {
+      label: "Name",
+      mobile: true,
+      render: renderName,
+      width: "1fr",
+    },
+    {
+      label: "Start time",
+      mobile: true,
+      render: renderTimeBegin,
+      width: "max-content",
+    },
+    {
+      label: "End time",
+      mobile: false,
+      render: renderTimeEnd,
+      width: "max-content",
+    },
+  ];
+
+  const handleToggleArchive = (event: InputEvent) => {
+    showArchived = (event.target as WaSwitch).checked;
+  };
 </script>
 
-<sl-button
-  size="large"
-  variant="primary"
-  onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
-  >Create</sl-button
->
-
-{#snippet listing(heading: string, contests: Contest[])}
-  <h2>{heading}</h2>
-  <Table columns={["Name", "Start Time", "End Time"]}>
-    {#each contests as contest (contest.id)}
-      <TableRow>
-        <TableCell>
-          <Link to="contests/{contest.id}">{contest.name}</Link>
-        </TableCell>
-        <TableCell>
-          {#if contest.timeBegin}
-            {format(contest.timeBegin, "yyyy-MM-dd HH:mm")}
-          {/if}
-        </TableCell>
-        <TableCell>
-          {#if contest.timeEnd}
-            {format(contest.timeEnd, "yyyy-MM-dd HH:mm")}
-          {/if}
-        </TableCell>
-      </TableRow>
-    {/each}
-  </Table>
+{#snippet renderName({ id, name }: Contest)}
+  <Link to="contests/{id}">{name}</Link>
 {/snippet}
 
-{#if drafts?.length}
-  {@render listing("Drafts", drafts)}
+{#snippet renderTimeBegin({ timeBegin, timeEnd }: Contest)}
+  {#if timeBegin}
+    {#if timeEnd && new Date() > timeEnd}
+      {format(timeBegin, "yyyy-MM-dd HH:mm")}
+    {:else}
+      <RelativeTime time={timeBegin} />
+    {/if}
+  {:else}
+    -
+  {/if}
+{/snippet}
+
+{#snippet renderTimeEnd({ timeEnd }: Contest)}
+  {#if timeEnd}
+    {format(timeEnd, "yyyy-MM-dd HH:mm")}
+  {:else}
+    -
+  {/if}
+{/snippet}
+
+{#snippet createButton()}
+  <wa-button
+    variant="neutral"
+    onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
+    >Create new contest</wa-button
+  >
+{/snippet}
+
+<h2>Contests</h2>
+{#if contests && contests.length > 0}
+  {@render createButton()}
 {/if}
 
-{#if ongoing?.length}
-  {@render listing("Ongoing", ongoing)}
+{#snippet listing(heading: string, contests: Contest[])}
+  <h3>{heading}</h3>
+  <Table {columns} data={contests} getId={({ id }) => id}></Table>
+{/snippet}
+
+{#if !ongoing || !upcoming || !past || !archived}
+  <Loader />
+{:else}
+  {#if ongoing?.length}
+    {@render listing("Ongoing", ongoing)}
+  {/if}
+
+  {#if upcoming?.length}
+    {@render listing("Upcoming", upcoming)}
+  {/if}
+
+  {#if past?.length}
+    {@render listing("Past", past)}
+  {/if}
+
+  {#if archived?.length}
+    <wa-switch checked={showArchived} onchange={handleToggleArchive}
+      >Show archived contests</wa-switch
+    >
+  {/if}
+
+  {#if showArchived}
+    {@render listing("Archived", archived)}
+  {/if}
+
+  {#if contests && contests.length === 0}
+    <EmptyState
+      title="No contests yet"
+      description="Create a contest to get started with your first event."
+    >
+      {#snippet actions()}
+        {@render createButton()}
+      {/snippet}
+    </EmptyState>
+  {/if}
 {/if}
 
-{#if upcoming?.length}
-  {@render listing("Upcoming", upcoming)}
-{/if}
-
-{#if past?.length}
-  {@render listing("Past", past)}
-{/if}
+<style>
+  wa-switch {
+    display: block;
+    margin-block-start: var(--wa-space-m);
+  }
+</style>

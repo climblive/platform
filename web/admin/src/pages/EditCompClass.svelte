@@ -1,12 +1,13 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import CompClassForm, { formSchema } from "@/forms/CompClassForm.svelte";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { CompClassPatch } from "@climblive/lib/models";
   import {
     getCompClassQuery,
     patchCompClassMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -15,13 +16,13 @@
 
   let { compClassId }: Props = $props();
 
-  const compClassQuery = getCompClassQuery(compClassId);
-  const patchCompClass = patchCompClassMutation(compClassId);
+  const compClassQuery = $derived(getCompClassQuery(compClassId));
+  const patchCompClass = $derived(patchCompClassMutation(compClassId));
 
-  const compClass = $derived($compClassQuery.data);
+  const compClass = $derived(compClassQuery.data);
 
   const handleSubmit = async (patch: CompClassPatch) => {
-    $patchCompClass.mutate(patch, {
+    patchCompClass.mutate(patch, {
       onSuccess: (compClass) =>
         navigate(`/admin/contests/${compClass.contestId}#comp-classes`),
       onError: () => toastError("Failed to save comp class."),
@@ -29,26 +30,34 @@
   };
 </script>
 
-<CompClassForm
-  submit={handleSubmit}
-  data={{
-    ...compClass,
-  }}
-  schema={formSchema}
->
-  <div class="controls">
-    <sl-button
-      size="small"
-      type="button"
-      variant="text"
-      onclick={history.back()}>Cancel</sl-button
-    >
-    <sl-button
-      size="small"
-      type="submit"
-      loading={$patchCompClass.isPending}
-      variant="primary"
-      >Save
-    </sl-button>
-  </div>
-</CompClassForm>
+{#if compClass === undefined}
+  <Loader />
+{:else}
+  <CompClassForm submit={handleSubmit} data={compClass} schema={formSchema}>
+    <div class="controls">
+      <wa-button
+        size="small"
+        type="button"
+        appearance="plain"
+        onclick={() =>
+          navigate(`/admin/contests/${compClass.contestId}#comp-classes`)}
+        >Cancel</wa-button
+      >
+      <wa-button
+        size="small"
+        type="submit"
+        loading={patchCompClass.isPending}
+        variant="neutral"
+        >Save
+      </wa-button>
+    </div>
+  </CompClassForm>
+{/if}
+
+<style>
+  .controls {
+    display: flex;
+    gap: var(--wa-space-xs);
+    justify-content: right;
+  }
+</style>

@@ -1,8 +1,11 @@
 import * as z from "zod/v4";
+import { ownershipDataSchema } from "./common";
 import type { Contest } from "./generated";
 
 export const contestSchema: z.ZodType<Contest> = z.object({
   id: z.number(),
+  ownership: ownershipDataSchema,
+  archived: z.boolean(),
   location: z.string().optional(),
   seriesId: z.number().optional(),
   name: z.string(),

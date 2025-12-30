@@ -1,0 +1,2 @@
+-- +goose Up
+ALTER TABLE `contender` ADD COLUMN `final_placing` INT NULL AFTER `disqualified`;

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"log"
 	"log/slog"
 	"math/rand"
@@ -22,9 +23,15 @@ import (
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/utils"
+	"github.com/google/uuid"
 	"github.com/lmittmann/tint"
 	"github.com/mattn/go-isatty"
+
+	"github.com/pressly/goose/v3"
 )
+
+//go:embed migrations/*.sql
+var embedMigrations embed.FS
 
 const defaultScoreEngineMaxLifetime = 24 * time.Hour
 
@@ -32,7 +39,7 @@ type registrationCodeGenerator struct {
 }
 
 func (g *registrationCodeGenerator) Generate(length int) string {
-	const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	const characters = "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789"
 	var code []rune
 
 	for range length {
@@ -40,6 +47,13 @@ func (g *registrationCodeGenerator) Generate(length int) string {
 	}
 
 	return string(code)
+}
+
+type uuidGenerator struct {
+}
+
+func (g *uuidGenerator) Generate() uuid.UUID {
+	return uuid.New()
 }
 
 func HandleCORSPreFlight(w http.ResponseWriter, r *http.Request) {
@@ -71,7 +85,7 @@ func main() {
 
 	dbPort, _ := strconv.Atoi(os.Getenv("DB_PORT"))
 
-	repo, err := repository.NewDatabase(
+	database, err := repository.NewDatabase(
 		os.Getenv("DB_USERNAME"),
 		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_HOST"),
@@ -85,6 +99,16 @@ func main() {
 		panic(err)
 	}
 
+	goose.SetBaseFS(embedMigrations)
+
+	if err := goose.SetDialect("mysql"); err != nil {
+		panic(err)
+	}
+
+	if err := goose.Up(database.Handle, "migrations"); err != nil {
+		panic(err)
+	}
+
 	jwtDecoder, err := authorizer.NewStandardJWTDecoder()
 	if err != nil {
 		if stack := utils.GetErrorStack(err); stack != "" {
@@ -94,21 +118,21 @@ func main() {
 		panic(err)
 	}
 
-	authorizer := authorizer.NewAuthorizer(repo, jwtDecoder)
+	authorizer := authorizer.NewAuthorizer(database, jwtDecoder)
 	eventBroker := events.NewBroker()
-	scoreKeeper := scores.NewScoreKeeper(eventBroker, repo)
-	scoreEngineStoreHydrator := &scores.StandardEngineStoreHydrator{Repo: repo}
+	scoreKeeper := scores.NewScoreKeeper(eventBroker, database)
+	scoreEngineStoreHydrator := &scores.StandardEngineStoreHydrator{Repo: database}
 
 	scoreEngineMaxLifetime := getScoreEngineMaxLifetime()
 	slog.Info("score engine maximum lifetime cap enabled", "max_lifetime", scoreEngineMaxLifetime)
 
-	scoreEngineManager := scores.NewScoreEngineManager(repo, scoreEngineStoreHydrator, eventBroker, scoreEngineMaxLifetime)
+	scoreEngineManager := scores.NewScoreEngineManager(database, scoreEngineStoreHydrator, eventBroker, scoreEngineMaxLifetime)
 
 	barriers = append(barriers,
 		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
 		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()))
 
-	mux := setupMux(repo, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
+	mux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
 
 	httpServer := &http.Server{
 		Addr:    "0.0.0.0:8090",
@@ -170,9 +194,10 @@ func setupMux(
 	}
 
 	contestUseCase := usecases.ContestUseCase{
-		Authorizer:  authorizer,
-		Repo:        repo,
-		ScoreKeeper: scoreKeeper,
+		Authorizer:         authorizer,
+		Repo:               repo,
+		ScoreKeeper:        scoreKeeper,
+		ScoreEngineManager: scoreEngineManager,
 	}
 
 	compClassUseCase := usecases.CompClassUseCase{
@@ -203,6 +228,17 @@ func setupMux(
 		Authorizer: authorizer,
 	}
 
+	userUseCase := usecases.UserUseCase{
+		Repo:       repo,
+		Authorizer: authorizer,
+	}
+
+	organizerUseCase := usecases.OrganizerUseCase{
+		Repo:          repo,
+		Authorizer:    authorizer,
+		UUIDGenerator: &uuidGenerator{},
+	}
+
 	mux := rest.NewMux()
 	mux.RegisterMiddleware(rest.CORS)
 	mux.RegisterMiddleware(authorizer.Middleware)
@@ -210,13 +246,15 @@ func setupMux(
 	mux.HandleFunc("OPTIONS /", HandleCORSPreFlight)
 
 	rest.InstallContenderHandler(mux, &contenderUseCase)
-	rest.InstallContestHandler(mux, &contestUseCase)
+	rest.InstallContestHandler(mux, &contestUseCase, &compClassUseCase, &tickUseCase, &problemUseCase)
 	rest.InstallCompClassHandler(mux, &compClassUseCase)
 	rest.InstallProblemHandler(mux, &problemUseCase)
 	rest.InstallTickHandler(mux, &tickUseCase)
 	rest.InstallEventHandler(mux, eventBroker, 10*time.Second)
 	rest.InstallScoreEngineHandler(mux, &scoreEngineUseCase)
 	rest.InstallRaffleHandler(mux, &raffleUseCase)
+	rest.InstallUserHandler(mux, &userUseCase)
+	rest.InstallOrganizerHandler(mux, &organizerUseCase)
 
 	return mux
 }

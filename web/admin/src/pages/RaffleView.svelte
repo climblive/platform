@@ -1,13 +1,24 @@
 <script lang="ts">
-  import { Table, TableCell, TableRow } from "@climblive/lib/components";
+  import Loader from "@/components/Loader.svelte";
+  import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
+  import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import {
+    EmptyState,
+    Table,
+    type ColumnDefinition,
+  } from "@climblive/lib/components";
+  import type { RaffleWinner } from "@climblive/lib/models";
   import {
     drawRaffleWinnerMutation,
+    getContestQuery,
     getRaffleQuery,
     getRaffleWinnersQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import { AxiosError } from "axios";
   import { format } from "date-fns";
+  import { navigate } from "svelte-routing";
 
   interface Props {
     raffleId: number;
@@ -15,13 +26,13 @@
 
   let { raffleId }: Props = $props();
 
-  const raffleQuery = getRaffleQuery(raffleId);
-  const drawRaffleWinner = drawRaffleWinnerMutation(raffleId);
-  const raffleWinnersQuery = getRaffleWinnersQuery(raffleId);
+  const raffleQuery = $derived(getRaffleQuery(raffleId));
+  const drawRaffleWinner = $derived(drawRaffleWinnerMutation(raffleId));
+  const raffleWinnersQuery = $derived(getRaffleWinnersQuery(raffleId));
 
-  const raffle = $derived($raffleQuery.data);
+  const raffle = $derived(raffleQuery.data);
   const sortedRaffleWinners = $derived.by(() => {
-    const winners = [...($raffleWinnersQuery.data ?? [])];
+    const winners = [...(raffleWinnersQuery.data ?? [])];
     winners.sort((a, b) => {
       return b.timestamp.getTime() - a.timestamp.getTime();
     });
@@ -29,40 +40,102 @@
     return winners;
   });
 
+  const contestQuery = $derived(
+    raffle?.contestId ? getContestQuery(raffle.contestId) : undefined,
+  );
+  const contest = $derived(contestQuery?.data);
+
   const handleDrawWinner = () => {
-    $drawRaffleWinner.mutate(undefined, {
-      onError: () => {
-        toastError("Failed to draw winner.");
+    drawRaffleWinner.mutate(undefined, {
+      onError: (error) => {
+        if (error instanceof AxiosError && error.status === 404) {
+          toastError("All winners have been drawn.");
+        } else {
+          toastError("Failed to draw winner.");
+        }
       },
     });
   };
+
+  const columns: ColumnDefinition<RaffleWinner>[] = [
+    {
+      label: "Name",
+      mobile: true,
+      render: renderName,
+      width: "1fr",
+    },
+    {
+      label: "Timestamp",
+      mobile: true,
+      render: renderTimestamp,
+      width: "max-content",
+    },
+  ];
 </script>
 
-{#if raffle}
-  <section>
-    <h1>Raffle {raffle.id}</h1>
-    <sl-button variant="primary" onclick={handleDrawWinner}
-      >Draw winner</sl-button
-    >
+{#snippet renderName({ contenderName }: RaffleWinner)}
+  {contenderName}
+{/snippet}
 
-    {#if sortedRaffleWinners?.length}
-      <Table columns={["Name", "Timestamp"]}>
-        {#each sortedRaffleWinners as winner (winner.id)}
-          <TableRow>
-            <TableCell>{winner.contenderName}</TableCell>
-            <TableCell>{format(winner.timestamp, "yyyy-MM-dd HH:mm")}</TableCell
-            >
-          </TableRow>
-        {/each}
-      </Table>
+{#snippet renderTimestamp({ timestamp }: RaffleWinner)}
+  {format(timestamp, "yyyy-MM-dd HH:mm")}
+{/snippet}
+
+{#snippet drawButton()}
+  <wa-button variant="neutral" onclick={handleDrawWinner}>Draw winner</wa-button
+  >
+{/snippet}
+
+{#if contest && raffle}
+  <wa-breadcrumb>
+    <wa-breadcrumb-item
+      onclick={() =>
+        navigate(`/admin/organizers/${contest.ownership.organizerId}`)}
+      ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
+    >
+    <wa-breadcrumb-item
+      onclick={() => navigate(`/admin/contests/${raffle.contestId}`)}
+      >{contest.name}</wa-breadcrumb-item
+    >
+    <wa-breadcrumb-item
+      onclick={() => navigate(`/admin/contests/${raffle.contestId}#raffles`)}
+      >Raffles</wa-breadcrumb-item
+    >
+  </wa-breadcrumb>
+
+  <h1>Raffle {raffle.id}</h1>
+  <section>
+    {#if sortedRaffleWinners === undefined}
+      <Loader />
+    {:else if sortedRaffleWinners.length > 0}
+      {@render drawButton()}
+      <Table
+        {columns}
+        data={sortedRaffleWinners}
+        getId={({ contenderId }) => contenderId}
+      ></Table>
+    {:else}
+      <EmptyState
+        title="No winners yet"
+        description="Draw the first winner of your prize raffle."
+      >
+        {#snippet actions()}
+          {@render drawButton()}
+        {/snippet}
+      </EmptyState>
     {/if}
   </section>
 {/if}
 
 <style>
   section {
+    gap: var(--wa-space-xs);
+    justify-content: start;
+  }
+
+  section {
     display: flex;
-    gap: var(--sl-spacing-x-small);
     flex-direction: column;
+    gap: var(--wa-space-m);
   }
 </style>

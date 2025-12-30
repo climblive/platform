@@ -1,4 +1,6 @@
-on: pull_request
+on:
+  pull_request:
+  merge_group:
 
 jobs:
   check:
@@ -42,6 +44,9 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: ./.github/actions/build-web
+        with:
+          sentry-auth-token: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          sentry-environment: test
 
   run-e2e-tests:
     name: Run E2E tests
@@ -95,9 +100,9 @@ jobs:
           go-version-file: "backend/go.mod"
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         with:
-          version: v1.64.5
+          version: v2.4.0
           working-directory: backend
 
   lint-sql:
@@ -111,7 +116,7 @@ jobs:
 
       - uses: sqlc-dev/setup-sqlc@v3
         with:
-          sqlc-version: "1.28.0"
+          sqlc-version: "1.30.0"
 
       - run: sqlc diff
         working-directory: backend
@@ -173,7 +178,7 @@ jobs:
       - uses: ./.github/actions/deploy
         with:
           package-file-name: ${{ steps.build-pkg.outputs.package-file-name }}
-          deploy-host: ${{ vars.DEPLOY_HOST }}
+          deploy-host: ${{ vars.DEPLOY_SSH_HOST }}
           deploy-user: ${{ vars.DEPLOY_SSH_USER }}
           database-password: ${{ secrets.DATABASE_PASSWORD }}
           ssh-auth-sock: ${{ steps.start-agent.outputs.ssh-auth-sock }}

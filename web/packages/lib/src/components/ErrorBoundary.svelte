@@ -1,5 +1,5 @@
 <script lang="ts">
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
+  import * as Sentry from "@sentry/svelte";
   import type { Snippet } from "svelte";
 
   interface Props {
@@ -11,33 +11,36 @@
   const copyToClipboard = async (error: unknown) => {
     await navigator.clipboard.writeText(error as string);
   };
+
+  const reportError = (error: unknown) => {
+    Sentry.captureException(error);
+  };
 </script>
 
-<svelte:boundary>
+<svelte:boundary onerror={(e) => reportError(e)}>
   {@render children?.()}
 
   {#snippet failed(error, reset)}
     <main>
       <h1>Oopsie!</h1>
       <pre onclick={() => copyToClipboard(error)}>{error}</pre>
-      <sl-button size="small" variant="primary" onclick={reset}
-        >Try again</sl-button
-      >
+      <button onclick={reset}>Try again</button>
     </main>
   {/snippet}
 </svelte:boundary>
 
 <style>
   pre {
-    border: 1px solid var(--sl-color-primary-300);
-    background-color: white;
-    padding: var(--sl-spacing-small);
+    border: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-brand-border-normal);
+    background-color: var(--wa-color-surface-lowered);
+    padding: var(--wa-space-s);
     overflow: scroll;
-    border-radius: var(--sl-border-radius-small);
-    font-size: var(--sl-font-size-small);
+    border-radius: var(--wa-border-radius-s);
+    font-size: var(--wa-font-size-s);
   }
 
   main {
-    padding: var(--sl-spacing-small);
+    padding: var(--wa-space-s);
   }
 </style>

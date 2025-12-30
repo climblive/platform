@@ -6,6 +6,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/google/uuid"
 )
 
 func contenderToDomain(record database.GetContenderRow) domain.Contender {
@@ -19,8 +20,6 @@ func contenderToDomain(record database.GetContenderRow) domain.Contender {
 		CompClassID:         domain.CompClassID(record.Contender.ClassID.Int32),
 		RegistrationCode:    record.Contender.RegistrationCode,
 		Name:                record.Contender.Name.String,
-		PublicName:          record.Contender.Name.String,
-		ClubName:            record.Contender.Club.String,
 		Entered:             record.Contender.Entered.Time,
 		WithdrawnFromFinals: record.Contender.WithdrawnFromFinals,
 		Disqualified:        record.Contender.Disqualified,
@@ -62,6 +61,7 @@ func contestToDomain(record database.Contest) domain.Contest {
 		Ownership: domain.OwnershipData{
 			OrganizerID: domain.OrganizerID(record.OrganizerID),
 		},
+		Archived:           record.Archived,
 		Location:           record.Location.String,
 		SeriesID:           domain.SeriesID(record.SeriesID.Int32),
 		Name:               record.Name,
@@ -70,10 +70,6 @@ func contestToDomain(record database.Contest) domain.Contest {
 		Finalists:          int(record.Finalists),
 		Rules:              record.Rules.String,
 		GracePeriod:        time.Duration(record.GracePeriod) * time.Minute,
-	}
-
-	if !record.FinalEnabled {
-		contest.Finalists = 0
 	}
 
 	return contest
@@ -90,44 +86,40 @@ func problemToDomain(record database.Problem) domain.Problem {
 		HoldColorPrimary:   record.HoldColorPrimary,
 		HoldColorSecondary: record.HoldColorSecondary.String,
 		Description:        record.Description.String,
-		PointsTop:          int(record.Points),
-		PointsZone:         0,
+		Zone1Enabled:       record.Zone1Enabled,
+		Zone2Enabled:       record.Zone2Enabled,
+		PointsZone1:        int(record.PointsZone1.Int32),
+		PointsZone2:        int(record.PointsZone2.Int32),
+		PointsTop:          int(record.PointsTop),
 		FlashBonus:         int(record.FlashBonus.Int32),
 	}
 }
 
 func tickToDomain(record database.Tick) domain.Tick {
-	attempts := func(isFlash bool) int {
-		if isFlash {
-			return 1
-		}
-
-		return 999
-	}
-
 	return domain.Tick{
 		ID: domain.TickID(record.ID),
 		Ownership: domain.OwnershipData{
 			OrganizerID: domain.OrganizerID(record.OrganizerID),
 			ContenderID: nillableIntToResourceID[domain.ContenderID](&record.ContenderID),
 		},
-		Timestamp:    record.Timestamp,
-		ContestID:    domain.ContestID(record.ContestID),
-		ProblemID:    domain.ProblemID(record.ProblemID),
-		Top:          true,
-		AttemptsTop:  attempts(record.Flash),
-		Zone:         true,
-		AttemptsZone: attempts(record.Flash),
+		Timestamp:     record.Timestamp,
+		ContestID:     domain.ContestID(record.ContestID),
+		ProblemID:     domain.ProblemID(record.ProblemID),
+		Zone1:         record.Zone1,
+		AttemptsZone1: int(record.AttemptsZone1),
+		Zone2:         record.Zone2,
+		AttemptsZone2: int(record.AttemptsZone2),
+		Top:           record.Top,
+		AttemptsTop:   int(record.AttemptsTop),
 	}
 }
 
 func userToDomain(record database.User) domain.User {
 	return domain.User{
 		ID:         domain.UserID(record.ID),
-		Name:       record.Name,
 		Username:   record.Username,
 		Admin:      record.Admin,
-		Organizers: make([]domain.OrganizerID, 0),
+		Organizers: make([]domain.Organizer, 0),
 	}
 }
 
@@ -137,8 +129,7 @@ func organizerToDomain(record database.Organizer) domain.Organizer {
 		Ownership: domain.OwnershipData{
 			OrganizerID: domain.OrganizerID(record.ID),
 		},
-		Name:     record.Name,
-		Homepage: record.Homepage.String,
+		Name: record.Name,
 	}
 }
 
@@ -160,6 +151,15 @@ func raffleWinnerToDomain(record database.RaffleWinner, name string) domain.Raff
 		ContenderID:   domain.ContenderID(record.ContenderID),
 		ContenderName: name,
 		Timestamp:     record.Timestamp,
+	}
+}
+
+func organizerInviteToDomain(record database.OrganizerInvite, organizerName string) domain.OrganizerInvite {
+	return domain.OrganizerInvite{
+		ID:            domain.OrganizerInviteID(uuid.MustParse(record.ID)),
+		OrganizerID:   domain.OrganizerID(record.OrganizerID),
+		OrganizerName: organizerName,
+		ExpiresAt:     record.ExpiresAt,
 	}
 }
 

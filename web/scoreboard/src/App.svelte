@@ -1,12 +1,9 @@
 <script lang="ts">
   import { ErrorBoundary } from "@climblive/lib/components";
-  import { setBasePath } from "@shoelace-style/shoelace/dist/utilities/base-path.js";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { Route, Router } from "svelte-routing";
   import Scoreboard from "./pages/Scoreboard.svelte";
-
-  setBasePath("/shoelace");
 
   const queryClient = new QueryClient({
     defaultOptions: {

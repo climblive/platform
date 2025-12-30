@@ -1,12 +1,13 @@
 <script lang="ts">
-  import logoUrl from "@/static/logo.svg";
   import { type ScorecardSession } from "@/types";
   import { authenticateContender, readStoredSessions } from "@/utils/auth";
-  import { serialize } from "@shoelace-style/shoelace";
-  import "@shoelace-style/shoelace/dist/components/alert/alert.js";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
-  import "@shoelace-style/shoelace/dist/components/icon/icon.js";
-  import "@shoelace-style/shoelace/dist/components/input/input.js";
+  import { serialize } from "@awesome.me/webawesome";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import "@awesome.me/webawesome/dist/components/divider/divider.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import "@awesome.me/webawesome/dist/components/input/input.js";
+  import { FullLogo } from "@climblive/lib/components";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { format } from "date-fns";
   import { getContext, onMount } from "svelte";
@@ -79,32 +80,32 @@
     <h1>Welcome!</h1>
   </header>
   <form bind:this={form} onsubmit={handleSubmit}>
-    <sl-input
+    <wa-input
       required
       placeholder="ABCD1234"
       label="Registration code"
-      help-text="Input your 8 digit registration code"
+      hint="Input your 8 digit registration code."
       name="code"
       type="text"
       minlength="8"
       maxlength="8"
     >
-      <sl-icon name="key" slot="prefix"></sl-icon>
-    </sl-input>
+      <wa-icon name="key" slot="start"></wa-icon>
+    </wa-input>
     {#if loadingFailed}
-      <sl-alert open variant="danger">
-        <sl-icon slot="icon" name="exclamation-octagon"></sl-icon>
+      <wa-callout open variant="danger">
+        <wa-icon slot="icon" name="exclamation-octagon"></wa-icon>
         The registration code is not valid.
-      </sl-alert>
+      </wa-callout>
     {/if}
-    <sl-button variant="primary" type="submit" loading={loadingContender}>
-      <sl-icon slot="prefix" name="box-arrow-in-right"></sl-icon>
+    <wa-button variant="neutral" type="submit" loading={loadingContender}>
+      <wa-icon slot="start" name="arrow-right-to-bracket"></wa-icon>
       Enter
-    </sl-button>
+    </wa-button>
   </form>
 
   {#if restoredSessions.length > 0}
-    <sl-divider></sl-divider>
+    <wa-divider></wa-divider>
   {/if}
 
   {#each restoredSessions as restoredSession (restoredSession.registrationCode)}
@@ -118,7 +119,7 @@
         >
       </h3>
       <p class="timestamp">{format(restoredSession.timestamp, "pp")}</p>
-      <sl-button
+      <wa-button
         onclick={() => {
           if (restoredSession) {
             handleEnter(restoredSession.registrationCode);
@@ -126,12 +127,16 @@
         }}
         loading={loadingContender}
         size="small"
+        appearance="outlined filled"
         >Restore
-      </sl-button>
+        <wa-icon slot="start" name="arrow-right-to-bracket"></wa-icon>
+      </wa-button>
     </section>
   {/each}
   <footer>
-    <img src={logoUrl} alt="ClimbLive" />
+    <div class="logo">
+      <FullLogo />
+    </div>
   </footer>
 </main>
 
@@ -139,7 +144,7 @@
   main {
     display: flex;
     flex-direction: column;
-    padding-inline: var(--sl-spacing-large);
+    padding-inline: var(--wa-space-l);
     min-height: 100vh;
   }
 
@@ -151,9 +156,9 @@
     display: flex;
     flex-direction: column;
     text-align: left;
-    gap: var(--sl-spacing-small);
+    gap: var(--wa-space-s);
 
-    & sl-input::part(input) {
+    & wa-input::part(input) {
       text-transform: uppercase;
       font-family: monospace;
       white-space: pre;
@@ -165,40 +170,47 @@
   footer {
     margin-top: auto;
     text-align: center;
-    padding-block: var(--sl-spacing-medium);
+    padding-block: var(--wa-space-m);
 
-    & img {
-      height: var(--sl-font-size-large);
+    & .logo {
+      height: var(--wa-font-size-xl);
+      color: var(--wa-color-text-normal);
     }
   }
 
   .restoredSession {
-    background-color: var(--sl-color-neutral-50);
-    border: 1px solid var(--sl-color-neutral-300);
-    border-radius: var(--sl-border-radius-medium);
-    padding: var(--sl-spacing-small);
+    background-color: var(--wa-color-surface-default);
+    border: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-surface-border);
+    border-radius: var(--wa-border-radius-m);
+    padding: var(--wa-space-s);
     text-align: left;
 
     & h3 {
       margin: 0;
-      font-weight: normal;
+      font-weight: var(--wa-font-weight-normal);
     }
 
     & .timestamp {
-      font-size: var(--sl-font-size-x-small);
+      font-size: var(--wa-font-size-xs);
     }
 
-    & sl-button {
+    & wa-button {
       width: 100%;
     }
 
     & .code {
       text-transform: uppercase;
-      font-weight: bold;
+      font-weight: var(--wa-font-weight-bold);
     }
   }
 
   .restoredSession:not(:last-of-type) {
-    margin-bottom: var(--sl-spacing-small);
+    margin-bottom: var(--wa-space-s);
+  }
+
+  wa-input::part(base) {
+    text-transform: uppercase;
+    letter-spacing: 0.25rem;
   }
 </style>

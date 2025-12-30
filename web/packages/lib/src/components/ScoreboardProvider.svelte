@@ -158,8 +158,7 @@
         }
 
         contender.compClassId = event.compClassId;
-        contender.publicName = event.publicName;
-        contender.clubName = event.clubName;
+        contender.name = event.name;
         contender.withdrawnFromFinals = event.withdrawnFromFinals;
         contender.disqualified = event.disqualified;
 
@@ -198,7 +197,7 @@
   const createEmptyEntry = (contenderId: number): ScoreboardEntry => ({
     contenderId: contenderId,
     compClassId: 0,
-    publicName: "",
+    name: "",
     withdrawnFromFinals: false,
     disqualified: false,
   });

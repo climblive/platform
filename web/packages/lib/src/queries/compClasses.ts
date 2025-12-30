@@ -9,27 +9,31 @@ import type { CompClass, CompClassPatch, CompClassTemplate } from "../models";
 import { HOUR } from "./constants";
 
 export const getCompClassQuery = (compClassId: number) =>
-  createQuery({
+  createQuery(() => ({
     queryKey: ["comp-class", { id: compClassId }],
     queryFn: async () => ApiClient.getInstance().getCompClass(compClassId),
     retry: false,
     gcTime: 12 * HOUR,
     staleTime: 12 * HOUR,
-  });
+  }));
 
-export const getCompClassesQuery = (contestId: number) =>
-  createQuery({
+export const getCompClassesQuery = (
+  contestId: number,
+  options?: Partial<Parameters<typeof createQuery<CompClass[]>>[0]>,
+) =>
+  createQuery(() => ({
+    ...options,
     queryKey: ["comp-classes", { contestId }],
     queryFn: async () => ApiClient.getInstance().getCompClasses(contestId),
     retry: false,
     gcTime: 12 * HOUR,
     staleTime: 12 * HOUR,
-  });
+  }));
 
 export const createCompClassMutation = (contestId: number) => {
   const client = useQueryClient();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: (template: CompClassTemplate) =>
       ApiClient.getInstance().createCompClass(contestId, template),
     onSuccess: (newCompClass) => {
@@ -43,13 +47,13 @@ export const createCompClassMutation = (contestId: number) => {
 
       client.setQueryData<CompClass>(queryKey, newCompClass);
     },
-  });
+  }));
 };
 
 export const patchCompClassMutation = (compClassId: number) => {
   const client = useQueryClient();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: (patch: CompClassPatch) =>
       ApiClient.getInstance().patchCompClass(compClassId, patch),
     onSuccess: (patchedCompClass) => {
@@ -76,13 +80,13 @@ export const patchCompClassMutation = (compClassId: number) => {
 
       client.setQueryData<CompClass>(queryKey, patchedCompClass);
     },
-  });
+  }));
 };
 
 export const deleteCompClassMutation = (compClassId: number) => {
   const client = useQueryClient();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: () => ApiClient.getInstance().deleteCompClass(compClassId),
     onSuccess: () => {
       let queryKey: QueryKey = ["comp-classes"];
@@ -102,5 +106,5 @@ export const deleteCompClassMutation = (compClassId: number) => {
 
       client.removeQueries({ queryKey });
     },
-  });
+  }));
 };

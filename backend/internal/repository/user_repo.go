@@ -11,7 +11,6 @@ import (
 func (d *Database) StoreUser(ctx context.Context, tx domain.Transaction, user domain.User) (domain.User, error) {
 	params := database.UpsertUserParams{
 		ID:       int32(user.ID),
-		Name:     user.Name,
 		Username: user.Username,
 		Admin:    user.Admin,
 	}
@@ -58,10 +57,23 @@ func (d *Database) GetUserByUsername(ctx context.Context, tx domain.Transaction,
 			user = userToDomain(record.User)
 		}
 
-		if record.OrganizerID.Valid {
-			user.Organizers = append(user.Organizers, domain.OrganizerID(record.OrganizerID.Int32))
-		}
+		user.Organizers = append(user.Organizers, organizerToDomain(record.Organizer))
 	}
 
 	return user, nil
+}
+
+func (d *Database) GetUsersByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.User, error) {
+	records, err := d.WithTx(tx).GetUsersByOrganizer(ctx, int32(organizerID))
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	users := make([]domain.User, 0)
+
+	for _, record := range records {
+		users = append(users, userToDomain(record.User))
+	}
+
+	return users, nil
 }

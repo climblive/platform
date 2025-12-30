@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/go-errors/errors"
 )
 
@@ -13,6 +14,7 @@ type tickUseCaseRepository interface {
 
 	GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error)
 	GetTicksByContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) ([]domain.Tick, error)
+	GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error)
 	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
 	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error)
 	GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) (domain.Problem, error)
@@ -38,6 +40,24 @@ func (uc *TickUseCase) GetTicksByContender(ctx context.Context, contenderID doma
 	}
 
 	ticks, err := uc.Repo.GetTicksByContender(ctx, nil, contenderID)
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	return ticks, nil
+}
+
+func (uc *TickUseCase) GetTicksByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Tick, error) {
+	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	ticks, err := uc.Repo.GetTicksByContest(ctx, nil, contestID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -138,14 +158,20 @@ func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.Conten
 	}
 
 	newTick := domain.Tick{
-		Ownership:    contender.Ownership,
-		Timestamp:    time.Now(),
-		ContestID:    contest.ID,
-		ProblemID:    problem.ID,
-		Top:          tick.Top,
-		AttemptsTop:  tick.AttemptsTop,
-		Zone:         tick.Zone,
-		AttemptsZone: tick.AttemptsZone,
+		Ownership:     contender.Ownership,
+		Timestamp:     time.Now(),
+		ContestID:     contest.ID,
+		ProblemID:     problem.ID,
+		Top:           tick.Top,
+		AttemptsTop:   tick.AttemptsTop,
+		Zone1:         tick.Zone1,
+		AttemptsZone1: tick.AttemptsZone1,
+		Zone2:         tick.Zone2,
+		AttemptsZone2: tick.AttemptsZone2,
+	}
+
+	if err := (validators.TickValidator{}).Validate(newTick); err != nil {
+		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
 	tick, err = uc.Repo.StoreTick(ctx, nil, newTick)
@@ -154,14 +180,16 @@ func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.Conten
 	}
 
 	uc.EventBroker.Dispatch(contest.ID, domain.AscentRegisteredEvent{
-		TickID:       tick.ID,
-		Timestamp:    tick.Timestamp,
-		ContenderID:  contender.ID,
-		ProblemID:    problem.ID,
-		Top:          tick.Top,
-		AttemptsTop:  tick.AttemptsTop,
-		Zone:         tick.Zone,
-		AttemptsZone: tick.AttemptsZone,
+		TickID:        tick.ID,
+		Timestamp:     tick.Timestamp,
+		ContenderID:   contender.ID,
+		ProblemID:     problem.ID,
+		Top:           tick.Top,
+		AttemptsTop:   tick.AttemptsTop,
+		Zone1:         tick.Zone1,
+		AttemptsZone1: tick.AttemptsZone1,
+		Zone2:         tick.Zone2,
+		AttemptsZone2: tick.AttemptsZone2,
 	})
 
 	return tick, nil

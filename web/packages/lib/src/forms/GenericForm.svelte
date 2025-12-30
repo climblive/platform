@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { serialize } from "@shoelace-style/shoelace";
+  import { serialize } from "@awesome.me/webawesome";
   import { type Snippet } from "svelte";
   import * as z from "zod/v4";
 
@@ -52,9 +52,9 @@
 
     input.setCustomValidity(message);
 
-    stash.set(input.name, input.getAttribute("help-text"));
+    stash.set(input.name, input.getAttribute("hint"));
 
-    input.setAttribute("help-text", message);
+    input.setAttribute("hint", message);
   };
 
   const resetCustomValidation = () => {
@@ -67,6 +67,10 @@
     }
 
     for (const input of inputs) {
+      if (!Object.hasOwn(input, "setCustomValidity")) {
+        continue;
+      }
+
       input.setCustomValidity("");
 
       const stashedHelpText = stash.get(input.name);
@@ -75,10 +79,10 @@
         case undefined:
           break;
         case null:
-          input.removeAttribute("help-text");
+          input.removeAttribute("hint");
           break;
         default:
-          input.setAttribute("help-text", stashedHelpText);
+          input.setAttribute("hint", stashedHelpText);
       }
 
       stash.delete(input.name);

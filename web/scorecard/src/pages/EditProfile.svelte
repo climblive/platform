@@ -1,13 +1,13 @@
 <script lang="ts">
   import RegistrationForm from "@/forms/RegistrationForm.svelte";
   import type { ScorecardSession } from "@/types";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { ContenderPatch } from "@climblive/lib/models";
   import {
     getContenderQuery,
     patchContenderMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { getContext } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Readable } from "svelte/store";
@@ -15,24 +15,23 @@
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
-  const contenderQuery = getContenderQuery($session.contenderId);
-  const patchContender = patchContenderMutation($session.contenderId);
+  const contenderQuery = $derived(getContenderQuery($session.contenderId));
+  const patchContender = $derived(patchContenderMutation($session.contenderId));
 
-  let contender = $derived($contenderQuery.data);
+  let contender = $derived(contenderQuery.data);
 
   const gotoScorecard = () => {
     navigate(`/${contender?.registrationCode}`);
   };
 
   const handleSubmit = (form: ContenderPatch) => {
-    if (!contender || $patchContender.isPending) {
+    if (!contender || patchContender.isPending) {
       return;
     }
 
-    $patchContender.mutate(
+    patchContender.mutate(
       {
         ...form,
-        publicName: form.name,
       },
       {
         onSuccess: gotoScorecard,
@@ -49,27 +48,27 @@
     submit={handleSubmit}
     data={{
       name: contender.name,
-      clubName: contender.clubName,
       compClassId: contender.compClassId,
       withdrawnFromFinals: contender.withdrawnFromFinals,
     }}
   >
     <div class="controls">
-      <sl-button
+      <wa-button
         size="small"
         type="button"
-        variant="text"
         onclick={gotoScorecard}
+        appearance="plain"
         >Cancel
-      </sl-button>
-      <sl-button
+      </wa-button>
+      <wa-button
         size="small"
         type="submit"
-        loading={$patchContender.isPending}
+        loading={patchContender.isPending}
         disabled={false}
-        variant="primary"
+        variant="neutral"
+        appearance="accent"
         >Save
-      </sl-button>
+      </wa-button>
     </div>
   </RegistrationForm>
 {/if}
@@ -78,6 +77,6 @@
   .controls {
     display: flex;
     justify-content: end;
-    gap: var(--sl-spacing-small);
+    gap: var(--wa-space-xs);
   }
 </style>

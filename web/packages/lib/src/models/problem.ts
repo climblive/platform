@@ -9,7 +9,10 @@ export const problemSchema: z.ZodType<Problem> = z.object({
   holdColorSecondary: z.string().optional(),
   name: z.string().optional(),
   description: z.string().optional(),
+  zone1Enabled: z.boolean(),
+  zone2Enabled: z.boolean(),
+  pointsZone1: z.number().optional(),
+  pointsZone2: z.number().optional(),
   pointsTop: z.number(),
-  pointsZone: z.number(),
   flashBonus: z.number().optional(),
 });

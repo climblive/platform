@@ -1,4 +1,12 @@
 name: "Build web"
+inputs:
+  sentry-auth-token:
+    description: "Sentry auth token"
+    required: true
+  sentry-environment:
+    description: "Sentry environment"
+    required: false
+    default: "production"
 runs:
   using: "composite"
   steps:
@@ -23,6 +31,9 @@ runs:
     - run: pnpm --filter=* build
       shell: bash
       working-directory: web
+      env:
+        SENTRY_AUTH_TOKEN: ${{ inputs.sentry-auth-token }}
+        VITE_SENTRY_ENVIRONMENT: ${{ inputs.sentry-environment }}
 
     - uses: actions/upload-artifact@v4
       with:

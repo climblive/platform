@@ -3,6 +3,7 @@ package domain
 import "errors"
 
 var ErrNotFound = errors.New("not found")
+var ErrArchived = errors.New("archived")
 var ErrDuplicate = errors.New("duplicate")
 var ErrBadState = errors.New("bad state")
 var ErrNotAuthenticated = errors.New("not authenticated")
@@ -19,3 +20,4 @@ var ErrLimitExceeded = errors.New("limit exceeded")
 var ErrNotRegistered = errors.New("not registered")
 var ErrProblemNotInContest = errors.New("problem not in contest")
 var ErrAllWinnersDrawn = errors.New("all winners drawn")
+var ErrExpired = errors.New("expired")

@@ -1,10 +1,10 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+  import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { deleteCompClassMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import type { SlDialog } from "@shoelace-style/shoelace";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
-  import "@shoelace-style/shoelace/dist/components/dialog/dialog.js";
-  import "@shoelace-style/shoelace/dist/components/icon/icon.js";
   import type { Snippet } from "svelte";
 
   type Props = {
@@ -12,18 +12,26 @@
     children: Snippet<[{ deleteCompClass: () => void }]>;
   };
 
-  let dialog: SlDialog | undefined = $state();
+  let dialog: WaDialog | undefined = $state();
 
   let { compClassId, children }: Props = $props();
 
-  const deleteCompClass = deleteCompClassMutation(compClassId);
+  const deleteCompClass = $derived(deleteCompClassMutation(compClassId));
 
   const handleDelete = async () => {
-    dialog?.show();
+    if (dialog) {
+      dialog.open = true;
+    }
+  };
+
+  const handleCancel = () => {
+    if (dialog) {
+      dialog.open = false;
+    }
   };
 
   const confirmDelete = () => {
-    $deleteCompClass.mutate(undefined, {
+    deleteCompClass.mutate(undefined, {
       onError: () => toastError("Failed to delete comp class."),
     });
   };
@@ -31,16 +39,24 @@
 
 {@render children({ deleteCompClass: handleDelete })}
 
-<sl-dialog bind:this={dialog} no-header>
-  <p>
-    <strong>Are you sure?</strong>
-  </p>
-  <p>A comp class is deleted permanently and cannot be restored.</p>
-  <sl-button slot="footer" variant="text" onclick={() => dialog?.hide()}
-    >Cancel</sl-button
+<wa-dialog bind:this={dialog} label="Delete comp class">
+  Deleting a comp class will permanently remove it and it cannot be restored.
+  <wa-button slot="footer" appearance="plain" onclick={handleCancel}>
+    Cancel</wa-button
   >
-  <sl-button slot="footer" variant="danger" onclick={confirmDelete}
-    >Remove
-    <sl-icon slot="prefix" name="trash"></sl-icon>
-  </sl-button>
-</sl-dialog>
+  <wa-button
+    slot="footer"
+    variant="danger"
+    onclick={confirmDelete}
+    loading={deleteCompClass.isPending}
+  >
+    Remove
+    <wa-icon slot="start" name="trash"></wa-icon>
+  </wa-button>
+</wa-dialog>
+
+<style>
+  wa-dialog {
+    white-space: normal;
+  }
+</style>

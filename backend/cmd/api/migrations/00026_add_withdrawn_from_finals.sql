@@ -1,0 +1,2 @@
+-- +goose Up
+ALTER TABLE contender ADD COLUMN `withdrawn_from_finals` TINYINT(1) NOT NULL DEFAULT 0;

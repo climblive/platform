@@ -1,30 +1,76 @@
 <script lang="ts">
-  import type { Snippet } from "svelte";
+  import { onMount, type Snippet } from "svelte";
 
-  type Props = {
-    columns: string[];
-    children: Snippet;
+  type T = $$Generic<unknown>;
+
+  export type ColumnDefinition<T> = {
+    label?: string;
+    mobile: boolean;
+    render: (row: T, mobile: boolean) => ReturnType<Snippet>;
+    align?: "left" | "right";
+    width?: string;
   };
 
-  const { columns, children }: Props = $props();
+  type Props<T> = {
+    columns: ColumnDefinition<T>[];
+    data: T[];
+    getId: (row: T) => string | number;
+  };
+
+  let mobile = $state(false);
+
+  const { columns, data, getId }: Props<T> = $props();
+
+  function handleResize() {
+    mobile = window.innerWidth < 768;
+  }
+
+  onMount(() => {
+    handleResize();
+  });
+
+  const cellVisible = (column: ColumnDefinition<T>) =>
+    !mobile || (mobile && column.mobile);
+
+  const gridTemplateColumns = $derived(
+    columns
+      .map((column) =>
+        cellVisible(column) ? (column.width ?? "1fr") : undefined,
+      )
+      .filter((column) => column !== undefined)
+      .join(" "),
+  );
 </script>
 
-<table border="0">
+<svelte:window onresize={handleResize} />
+
+<table border="0" style="grid-template-columns: {gridTemplateColumns}">
   <thead>
     <tr>
       {#each columns as column (column)}
-        <th>{column}</th>
+        {#if cellVisible(column)}
+          <th data-align={column.align ?? "left"}>{column.label}</th>
+        {/if}
       {/each}
     </tr>
   </thead>
   <tbody>
-    {@render children()}
+    {#each data as row (getId(row))}
+      <tr>
+        {#each columns as column, index (index)}
+          {#if cellVisible(column)}
+            <td data-align={column.align ?? "left"}>
+              {@render column.render(row, mobile)}
+            </td>
+          {/if}
+        {/each}
+      </tr>
+    {/each}
   </tbody>
 </table>
 
 <style>
   table {
-    margin-top: 1rem;
     width: 100%;
     table-layout: fixed;
 
@@ -32,22 +78,74 @@
     border-collapse: separate;
     overflow: hidden;
     border-spacing: 0;
-    border-radius: var(--sl-border-radius-medium);
+    border: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-neutral-border-quiet);
+    border-radius: var(--wa-border-radius-m);
+  }
+
+  @supports (grid-template-columns: subgrid) {
+    table {
+      display: grid;
+      grid-template-rows: 1fr;
+    }
+
+    tbody,
+    thead,
+    tr {
+      display: grid;
+      grid-column: 1 / -1;
+      grid-template-columns: subgrid;
+      column-gap: var(--wa-space-m);
+      align-items: center;
+    }
+  }
+
+  th:first-of-type,
+  td:first-of-type {
+    padding-inline-start: var(--wa-space-s);
+  }
+
+  th:last-of-type,
+  td:last-of-type {
+    padding-inline-end: var(--wa-space-s);
   }
 
   thead {
-    height: 2rem;
-
-    background-color: var(--sl-color-primary-600);
-    color: white;
+    background-color: transparent;
 
     & th {
-      font-weight: var(--sl-font-weight-normal);
+      font-weight: var(--wa-font-weight-bold);
       text-align: left;
     }
+  }
 
-    & th:first-of-type {
-      padding-left: var(--sl-spacing-medium);
-    }
+  thead,
+  tbody tr {
+    height: 3.5rem;
+  }
+
+  tbody tr:first-of-type {
+    border-top: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-neutral-border-quiet);
+  }
+
+  tbody tr:not(:last-of-type) {
+    border-bottom: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-neutral-border-quiet);
+  }
+
+  tbody tr:hover {
+    background-color: var(--wa-color-surface-raised);
+  }
+
+  th[data-align="right"],
+  td[data-align="right"] {
+    text-align: right;
+  }
+
+  td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 </style>

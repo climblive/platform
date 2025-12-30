@@ -60,7 +60,11 @@ func (d *Database) StoreProblem(ctx context.Context, tx domain.Transaction, prob
 		HoldColorPrimary:   problem.HoldColorPrimary,
 		HoldColorSecondary: makeNullString(problem.HoldColorSecondary),
 		Description:        makeNullString(problem.Description),
-		Points:             int32(problem.PointsTop),
+		Zone1Enabled:       problem.Zone1Enabled,
+		Zone2Enabled:       problem.Zone2Enabled,
+		PointsZone1:        makeNullInt32(int32(problem.PointsZone1)),
+		PointsZone2:        makeNullInt32(int32(problem.PointsZone2)),
+		PointsTop:          int32(problem.PointsTop),
 		FlashBonus:         makeNullInt32(int32(problem.FlashBonus)),
 	}
 

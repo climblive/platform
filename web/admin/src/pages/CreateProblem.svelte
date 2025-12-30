@@ -1,9 +1,13 @@
 <script lang="ts">
+  import Loader from "@/components/Loader.svelte";
   import ProblemForm, { formSchema } from "@/forms/ProblemForm.svelte";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { ProblemTemplate } from "@climblive/lib/models";
-  import { createProblemMutation } from "@climblive/lib/queries";
+  import {
+    createProblemMutation,
+    getProblemsQuery,
+  } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -12,40 +16,69 @@
 
   let { contestId }: Props = $props();
 
-  const createProblem = createProblemMutation(contestId);
+  const problemsQuery = $derived(getProblemsQuery(contestId));
 
-  const handleSubmit = async (tmpl: ProblemTemplate) => {
-    $createProblem.mutate(tmpl, {
-      onSuccess: () => navigate(`/admin/contests/${contestId}#problems`),
-      onError: () => toastError("Failed to create problem."),
-    });
+  let highestProblemNumber = $derived.by(() => {
+    if (problemsQuery.data === undefined) {
+      return undefined;
+    } else if (problemsQuery.data.length > 0) {
+      return Math.max(
+        ...(problemsQuery.data?.map(({ number }) => number) ?? []),
+      );
+    } else {
+      return 0;
+    }
+  });
+
+  const createProblem = $derived(createProblemMutation(contestId));
+
+  const handleSubmit = async (tmpl: Omit<ProblemTemplate, "pointsZone">) => {
+    createProblem.mutate(
+      { ...tmpl },
+      {
+        onSuccess: () => navigate(`/admin/contests/${contestId}#problems`),
+        onError: () => toastError("Failed to create problem."),
+      },
+    );
   };
 </script>
 
-<ProblemForm
-  submit={handleSubmit}
-  data={{
-    number: 1,
-    holdColorPrimary: "#000000",
-    pointsTop: 100,
-    pointsZone: 0,
-    flashBonus: 0,
-  }}
-  schema={formSchema}
->
-  <div class="controls">
-    <sl-button
-      size="small"
-      type="button"
-      variant="text"
-      onclick={history.back()}>Cancel</sl-button
-    >
-    <sl-button
-      size="small"
-      type="submit"
-      loading={$createProblem.isPending}
-      variant="primary"
-      >Create
-    </sl-button>
-  </div>
-</ProblemForm>
+{#if highestProblemNumber === undefined}
+  <Loader />
+{:else}
+  <ProblemForm
+    submit={handleSubmit}
+    data={{
+      number: highestProblemNumber + 1,
+      holdColorPrimary: "#000000",
+      pointsTop: 100,
+      flashBonus: 0,
+    }}
+    schema={formSchema}
+  >
+    <div class="controls">
+      <wa-button
+        size="small"
+        type="button"
+        appearance="plain"
+        onclick={() => navigate(`/admin/contests/${contestId}#problems`)}
+        >Cancel</wa-button
+      >
+      <wa-button
+        size="small"
+        type="submit"
+        loading={createProblem.isPending}
+        variant="neutral"
+        >Create
+      </wa-button>
+    </div>
+  </ProblemForm>
+{/if}
+
+<style>
+  .controls {
+    display: flex;
+    gap: var(--wa-space-xs);
+    justify-content: end;
+  }
+</style>

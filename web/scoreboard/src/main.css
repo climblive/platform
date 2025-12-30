@@ -1,5 +1,3 @@
-@import url("normalize.css/normalize.css");
-@import url("@shoelace-style/shoelace/dist/themes/light.css");
 @import url("@climblive/lib/theme.css");
 
 html {

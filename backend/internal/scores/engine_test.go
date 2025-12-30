@@ -126,13 +126,13 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("GetTicks", domain.ContenderID(1)).
 			Return(slices.Values([]scores.Tick{{ProblemID: 1, Top: true}, {ProblemID: 2, Top: true}, {ProblemID: 3, Top: true}})).
 			On("GetTicks", domain.ContenderID(2)).
-			Return(slices.Values([]scores.Tick{{ProblemID: 1, Zone: true}, {ProblemID: 2, Zone: true}}))
+			Return(slices.Values([]scores.Tick{{ProblemID: 1, Zone1: true}, {ProblemID: 2, Zone1: true}}))
 
 		f.store.
 			On("GetProblem", domain.ProblemID(1)).
-			Return(scores.Problem{ID: 1, PointsTop: 100, PointsZone: 10}, true).
+			Return(scores.Problem{ID: 1, PointsTop: 100, PointsZone1: 10}, true).
 			On("GetProblem", domain.ProblemID(2)).
-			Return(scores.Problem{ID: 2, PointsTop: 200, PointsZone: 20}, true).
+			Return(scores.Problem{ID: 2, PointsTop: 200, PointsZone1: 20}, true).
 			On("GetProblem", domain.ProblemID(3)).
 			Return(scores.Problem{ID: 3, PointsTop: 300}, true)
 
@@ -140,8 +140,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("SaveTick", domain.ContenderID(1), scores.Tick{ProblemID: 1, Top: true, Points: 100}).Return().
 			On("SaveTick", domain.ContenderID(1), scores.Tick{ProblemID: 2, Top: true, Points: 200}).Return().
 			On("SaveTick", domain.ContenderID(1), scores.Tick{ProblemID: 3, Top: true, Points: 300}).Return().
-			On("SaveTick", domain.ContenderID(2), scores.Tick{ProblemID: 1, Zone: true, Points: 10}).Return().
-			On("SaveTick", domain.ContenderID(2), scores.Tick{ProblemID: 2, Zone: true, Points: 20}).Return()
+			On("SaveTick", domain.ContenderID(2), scores.Tick{ProblemID: 1, Zone1: true, Points: 10}).Return().
+			On("SaveTick", domain.ContenderID(2), scores.Tick{ProblemID: 2, Zone1: true, Points: 20}).Return()
 
 		f.rules.
 			On("CalculateScore", iterMatcher([]int{100, 200, 300})).
@@ -511,18 +511,20 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("SaveProblem", scores.Problem{
-				ID:         1,
-				PointsTop:  100,
-				PointsZone: 50,
-				FlashBonus: 10,
+				ID:          1,
+				PointsTop:   100,
+				PointsZone1: 50,
+				PointsZone2: 75,
+				FlashBonus:  10,
 			}).
 			Return()
 
 		f.engine.HandleProblemAdded(domain.ProblemAddedEvent{
-			ProblemID:  1,
-			PointsTop:  100,
-			PointsZone: 50,
-			FlashBonus: 10,
+			ProblemID:   1,
+			PointsTop:   100,
+			PointsZone1: 50,
+			PointsZone2: 75,
+			FlashBonus:  10,
 		})
 
 		awaitExpectations(t)
@@ -536,12 +538,14 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(scores.Contender{}, false)
 
 		f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
-			ContenderID:  1,
-			ProblemID:    1,
-			Top:          true,
-			AttemptsTop:  1,
-			Zone:         true,
-			AttemptsZone: 1,
+			ContenderID:   1,
+			ProblemID:     1,
+			Top:           true,
+			AttemptsTop:   3,
+			Zone1:         true,
+			AttemptsZone1: 1,
+			Zone2:         true,
+			AttemptsZone2: 2,
 		})
 
 		awaitExpectations(t)
@@ -562,12 +566,14 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(scores.Problem{}, false)
 
 		f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
-			ContenderID:  1,
-			ProblemID:    1,
-			Top:          true,
-			AttemptsTop:  1,
-			Zone:         true,
-			AttemptsZone: 1,
+			ContenderID:   1,
+			ProblemID:     1,
+			Top:           true,
+			AttemptsTop:   3,
+			Zone1:         true,
+			AttemptsZone1: 1,
+			Zone2:         true,
+			AttemptsZone2: 2,
 		})
 
 		awaitExpectations(t)
@@ -587,30 +593,35 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f.store.
 			On("GetProblem", domain.ProblemID(1)).
 			Return(scores.Problem{
-				ID:         1,
-				PointsTop:  100,
-				PointsZone: 50,
-				FlashBonus: 10,
+				ID:          1,
+				PointsTop:   100,
+				PointsZone1: 50,
+				PointsZone2: 75,
+				FlashBonus:  10,
 			}, true)
 
 		f.store.
 			On("SaveTick", domain.ContenderID(1), scores.Tick{
-				ProblemID:    1,
-				Top:          true,
-				AttemptsTop:  5,
-				Zone:         true,
-				AttemptsZone: 2,
-				Points:       100,
+				ProblemID:     1,
+				Top:           true,
+				AttemptsTop:   5,
+				Zone1:         true,
+				AttemptsZone1: 2,
+				Zone2:         true,
+				AttemptsZone2: 3,
+				Points:        100,
 			}).
 			Return()
 
 		f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
-			ContenderID:  1,
-			ProblemID:    1,
-			Top:          true,
-			AttemptsTop:  5,
-			Zone:         true,
-			AttemptsZone: 2,
+			ContenderID:   1,
+			ProblemID:     1,
+			Top:           true,
+			AttemptsTop:   5,
+			Zone1:         true,
+			AttemptsZone1: 2,
+			Zone2:         true,
+			AttemptsZone2: 3,
 		})
 
 		awaitExpectations(t)
@@ -629,20 +640,23 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f.store.
 			On("GetProblem", domain.ProblemID(1)).
 			Return(scores.Problem{
-				ID:         1,
-				PointsTop:  100,
-				PointsZone: 50,
-				FlashBonus: 10,
+				ID:          1,
+				PointsTop:   100,
+				PointsZone1: 50,
+				PointsZone2: 75,
+				FlashBonus:  10,
 			}, true)
 
 		f.store.
 			On("SaveTick", domain.ContenderID(1), scores.Tick{
-				ProblemID:    1,
-				Top:          true,
-				AttemptsTop:  5,
-				Zone:         true,
-				AttemptsZone: 2,
-				Points:       100,
+				ProblemID:     1,
+				Top:           true,
+				AttemptsTop:   5,
+				Zone1:         true,
+				AttemptsZone1: 2,
+				Zone2:         true,
+				AttemptsZone2: 3,
+				Points:        100,
 			}).
 			Return()
 
@@ -674,12 +688,14 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
 
 		f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
-			ContenderID:  1,
-			ProblemID:    1,
-			Top:          true,
-			AttemptsTop:  5,
-			Zone:         true,
-			AttemptsZone: 2,
+			ContenderID:   1,
+			ProblemID:     1,
+			Top:           true,
+			AttemptsTop:   5,
+			Zone1:         true,
+			AttemptsZone1: 2,
+			Zone2:         true,
+			AttemptsZone2: 3,
 		})
 
 		awaitExpectations(t)

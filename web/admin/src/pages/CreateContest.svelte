@@ -1,9 +1,12 @@
 <script lang="ts">
-  import ContestForm from "@/forms/ContestForm.svelte";
+  import ContestForm, {
+    formSchema,
+    minuteInNanoseconds,
+  } from "@/forms/ContestForm.svelte";
+  import "@awesome.me/webawesome/dist/components/input/input.js";
   import type { Contest, ContestTemplate } from "@climblive/lib/models";
   import { createContestMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import "@shoelace-style/shoelace/dist/components/input/input.js";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -12,16 +15,17 @@
 
   let { organizerId }: Props = $props();
 
-  const createContest = createContestMutation(organizerId);
+  const createContest = $derived(createContestMutation(organizerId));
 
   const handleSubmit = (form: ContestTemplate) => {
-    if ($createContest.isPending) {
+    if (createContest.isPending) {
       return;
     }
 
-    $createContest.mutate(
+    createContest.mutate(
       {
         ...form,
+        gracePeriod: form.gracePeriod * minuteInNanoseconds,
       },
       {
         onSuccess: (contest: Contest) => navigate(`contests/${contest.id}`),
@@ -34,25 +38,28 @@
 <ContestForm
   submit={handleSubmit}
   data={{
-    name: "Test",
+    name: "",
     finalists: 7,
     qualifyingProblems: 10,
-    gracePeriod: 15,
+    gracePeriod: 15 * minuteInNanoseconds,
+    rules: "",
   }}
+  schema={formSchema}
 >
   <div class="controls">
-    <sl-button
+    <wa-button
       size="small"
-      type="button"
-      variant="text"
-      onclick={history.back()}>Cancel</sl-button
+      appearance="plain"
+      onclick={() => navigate(`./organizers/${organizerId}/contests`)}
+      >Cancel</wa-button
     >
-    <sl-button
+    <wa-button
       size="small"
       type="submit"
-      loading={$createContest.isPending}
-      variant="primary"
+      loading={createContest.isPending}
+      variant="neutral"
+      appearance="accent"
       >Create
-    </sl-button>
+    </wa-button>
   </div>
 </ContestForm>

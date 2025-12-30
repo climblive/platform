@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { Score } from "@climblive/lib/components";
+  import { HoldColorIndicator, Score } from "@climblive/lib/components";
   import type { Problem, Tick } from "@climblive/lib/models";
   import { calculateProblemScore } from "@climblive/lib/utils";
-  import HoldColorIndicator from "./HoldColorIndicator.svelte";
   import TickBox from "./TickBox.svelte";
 
   interface Props {
@@ -12,9 +11,9 @@
     highestProblemNumber: number;
   }
 
-  let { problem, tick, disabled, highestProblemNumber }: Props = $props();
+  const { problem, tick, disabled, highestProblemNumber }: Props = $props();
 
-  let pointValue = $derived(calculateProblemScore(problem, tick));
+  const pointValue = $derived(calculateProblemScore(problem, tick));
 </script>
 
 <section
@@ -27,13 +26,15 @@
   <HoldColorIndicator
     primary={problem.holdColorPrimary}
     secondary={problem.holdColorSecondary}
+    --height="1.25rem"
+    --width="1.25rem"
   />
   <span class="points">
     <span class="top">
       {problem.pointsTop}p
     </span>
     {#if problem.flashBonus}
-      <sl-icon name="lightning-charge"></sl-icon>
+      <wa-icon name="bolt"></wa-icon>
     {/if}
   </span>
   <div class="score">
@@ -46,34 +47,34 @@
 <style>
   section {
     height: 3rem;
-    background-color: var(--sl-color-neutral-50);
-    border-radius: var(--sl-border-radius-small);
-    border: solid 1px var(--sl-color-neutral-300);
-    padding-left: var(--sl-spacing-small);
-    padding-right: var(--sl-spacing-2x-small);
+    background-color: var(--wa-color-surface-raised);
+    border-radius: var(--wa-border-radius-m);
+    border: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-surface-border);
+    padding-inline-start: var(--wa-space-s);
+    padding-inline-end: var(--wa-space-xs);
 
     display: grid;
     grid-template-columns: var(--number-length) 1rem 1fr 1fr 2.5rem;
     grid-template-rows: 1fr;
-    gap: var(--sl-spacing-x-small);
+    gap: var(--wa-space-xs);
     align-items: center;
     justify-items: end;
   }
 
   .number {
-    font-size: var(--sl-font-size-small);
+    font-size: var(--wa-font-size-s);
     text-wrap: nowrap;
     justify-self: start;
-    font-weight: var(--sl-font-weight-bold);
+    font-weight: var(--wa-font-weight-bold);
   }
 
   .points {
     margin-right: auto;
     white-space: nowrap;
 
-    & sl-icon {
-      font-size: var(--sl-font-size-x-small);
-      color: var(--sl-color-yellow-500);
+    & wa-icon {
+      font-size: var(--wa-font-size-xs);
     }
   }
 

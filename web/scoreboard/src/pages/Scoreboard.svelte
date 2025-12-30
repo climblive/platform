@@ -1,10 +1,14 @@
 <script lang="ts">
-  import logoUrl from "@/static/logo.svg";
-  import { ResultList, ScoreboardProvider } from "@climblive/lib/components";
+  import "@awesome.me/webawesome/dist/components/option/option.js";
+  import "@awesome.me/webawesome/dist/components/select/select.js";
+  import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
+  import {
+    FullLogo,
+    ResultList,
+    ScoreboardProvider,
+  } from "@climblive/lib/components";
+  import { value } from "@climblive/lib/forms";
   import { getCompClassesQuery, getContestQuery } from "@climblive/lib/queries";
-  import { SlSelect } from "@shoelace-style/shoelace";
-  import "@shoelace-style/shoelace/dist/components/option/option.js";
-  import "@shoelace-style/shoelace/dist/components/select/select.js";
   import { onMount } from "svelte";
   import Header from "../components/Header.svelte";
   import Loading from "./Loading.svelte";
@@ -15,31 +19,21 @@
 
   let { contestId }: Props = $props();
 
-  let compClassSelector: SlSelect | undefined = $state();
+  let compClassSelector: WaSelect | undefined = $state();
   let selectedCompClassId: number | undefined = $state();
   let overflow: "pagination" | "scroll" = $state("scroll");
 
-  const contestQuery = getContestQuery(contestId);
-  const compClassesQuery = getCompClassesQuery(contestId);
+  const contestQuery = $derived(getContestQuery(contestId));
+  const compClassesQuery = $derived(getCompClassesQuery(contestId));
 
-  let contest = $derived($contestQuery.data);
-  let compClasses = $derived($compClassesQuery.data);
+  let contest = $derived(contestQuery.data);
+  let compClasses = $derived(compClassesQuery.data);
 
   $effect(() => {
-    if (compClasses && !selectedCompClassId) {
+    if (compClasses && compClasses.length > 0 && !selectedCompClassId) {
       selectedCompClassId = compClasses[0].id;
     }
   });
-
-  const value = (node: HTMLElement, value: string | number | undefined) => {
-    node.setAttribute("value", value?.toString() ?? "");
-
-    return {
-      update(value: string | number | undefined) {
-        node.setAttribute("value", value?.toString() ?? "");
-      },
-    };
-  };
 
   const determineOverflowBehaviour = () => {
     overflow = window.innerWidth <= 512 ? "scroll" : "pagination";
@@ -62,30 +56,30 @@
   <ScoreboardProvider {contestId}>
     {#snippet children({ scoreboard, loading, online })}
       <header data-online={online}>
-        <sl-icon name="cloud-slash-fill"></sl-icon>Offline
+        <wa-icon name="triangle-exclamation"></wa-icon>Offline
       </header>
       <main>
         <h1>
           {contest.name}
         </h1>
-        <p class="logo">
-          <img src={logoUrl} alt="ClimbLive" />
-        </p>
+        <div class="logo">
+          <FullLogo />
+        </div>
         {#if compClasses.length > 1}
-          <sl-select
+          <wa-select
             bind:this={compClassSelector}
             size="small"
             name="compClassId"
             label="Competition class"
-            use:value={selectedCompClassId}
-            onsl-change={() => {
+            {@attach value(selectedCompClassId)}
+            onchange={() => {
               selectedCompClassId = Number(compClassSelector?.value);
             }}
           >
             {#each compClasses as compClass (compClass.id)}
-              <sl-option value={compClass.id}>{compClass.name}</sl-option>
+              <wa-option value={compClass.id}>{compClass.name}</wa-option>
             {/each}
-          </sl-select>
+          </wa-select>
         {/if}
         <div class="container" style="--num-columns: {compClasses.length}">
           {#each compClasses as compClass (compClass.id)}
@@ -118,16 +112,16 @@
 
 <style>
   header {
-    background-color: var(--sl-color-danger-600);
+    background-color: var(--wa-color-danger-fill-loud);
     width: 100%;
     height: 2rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(--sl-spacing-x-small);
-    color: white;
-    font-weight: var(--sl-font-weight-semibold);
-    font-size: var(--sl-font-size-small);
+    gap: var(--wa-space-xs);
+    color: var(--wa-color-danger-on-loud);
+    font-weight: var(--wa-font-weight-semibold);
+    font-size: var(--wa-font-size-s);
 
     &[data-online="true"] {
       display: none;
@@ -138,18 +132,18 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: var(--sl-spacing-small);
+    padding: var(--wa-space-m);
   }
 
   h1 {
     text-align: center;
-    line-height: 1;
-    color: black;
+    line-height: var(--wa-line-height-condensed);
+    color: var(--wa-color-text-normal);
     margin-bottom: 0;
   }
 
   .container {
-    margin-top: var(--sl-spacing-small);
+    margin-top: var(--wa-space-s);
     flex-grow: 1;
     display: grid;
     grid-template-columns: repeat(
@@ -158,8 +152,7 @@
     );
     grid-template-rows: 1fr;
     padding-top: 0;
-    gap: var(--sl-spacing-small);
-
+    gap: var(--wa-space-s);
     justify-content: center;
   }
 
@@ -168,24 +161,23 @@
     flex-direction: column;
   }
 
-  sl-select {
+  wa-select {
     display: none;
   }
 
   .logo {
     text-align: center;
-
-    & img {
-      height: var(--sl-font-size-x-large);
-    }
+    height: var(--wa-font-size-xl);
+    color: var(--wa-color-text-normal);
+    margin-block: var(--wa-space-s);
   }
 
   @media screen and (max-width: 512px) {
     h1 {
-      font-size: var(--sl-font-size-x-large);
+      font-size: var(--wa-font-size-xl);
     }
 
-    sl-select {
+    wa-select {
       display: block;
     }
 
@@ -195,10 +187,6 @@
 
     .class[data-selected="false"] {
       display: none;
-    }
-
-    .logo > img {
-      height: var(--sl-font-size-large);
     }
   }
 </style>

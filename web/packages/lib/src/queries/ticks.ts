@@ -9,39 +9,54 @@ import { ApiClient } from "../Api";
 import type { Tick } from "../models";
 import { HOUR } from "./constants";
 
-export const getTicksQuery = (contenderId: number) =>
-  createQuery({
+export const getTicksByContenderQuery = (
+  contenderId: number,
+  options?: Partial<Parameters<typeof createQuery<Tick[]>>[0]>,
+) =>
+  createQuery<Tick[]>(() => ({
+    ...options,
     queryKey: ["ticks", { contenderId }],
-    queryFn: async () => ApiClient.getInstance().getTicks(contenderId),
+    queryFn: async () =>
+      ApiClient.getInstance().getTicksByContender(contenderId),
     retry: false,
     gcTime: 12 * HOUR,
     staleTime: 0,
     refetchOnWindowFocus: true,
-  });
+  }));
+
+export const getTicksByContestQuery = (contestId: number) =>
+  createQuery(() => ({
+    queryKey: ["ticks", { contestId }],
+    queryFn: async () => ApiClient.getInstance().getTicksByContest(contestId),
+    retry: false,
+    gcTime: 12 * HOUR,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+  }));
 
 export const createTickMutation = (contenderId: number) => {
   const client = useQueryClient();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: (tick: Omit<Tick, "id" | "timestamp">) =>
       ApiClient.getInstance().createTick(contenderId, tick),
     onSuccess: (newTick) => {
       updateTickInQueryCache(client, contenderId, newTick);
     },
-  });
+  }));
 };
 
 export const deleteTickMutation = () => {
   const client = useQueryClient();
 
-  return createMutation({
+  return createMutation(() => ({
     mutationFn: (tickId: number) => ApiClient.getInstance().deleteTick(tickId),
     onSuccess: (...args) => {
       const [, tickId] = args;
 
       removeTickFromQueryCache(client, tickId);
     },
-  });
+  }));
 };
 
 export const updateTickInQueryCache = (

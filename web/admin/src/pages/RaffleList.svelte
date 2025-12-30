@@ -1,12 +1,17 @@
 <script lang="ts">
-  import { Table, TableCell, TableRow } from "@climblive/lib/components";
+  import Loader from "@/components/Loader.svelte";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import {
+    EmptyState,
+    Table,
+    type ColumnDefinition,
+  } from "@climblive/lib/components";
   import type { Raffle } from "@climblive/lib/models";
   import {
     createRaffleMutation,
     getRafflesQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import "@shoelace-style/shoelace/dist/components/button/button.js";
   import { Link, navigate } from "svelte-routing";
 
   interface Props {
@@ -15,39 +20,60 @@
 
   let { contestId }: Props = $props();
 
-  const rafflesQuery = getRafflesQuery(contestId);
-  const createRaffle = createRaffleMutation(contestId);
+  const rafflesQuery = $derived(getRafflesQuery(contestId));
+  const createRaffle = $derived(createRaffleMutation(contestId));
 
-  let raffles = $derived($rafflesQuery.data);
+  let raffles = $derived(rafflesQuery.data);
 
   const handleCreateRaffle = () => {
-    $createRaffle.mutate(undefined, {
+    createRaffle.mutate(undefined, {
       onSuccess: (raffle: Raffle) => navigate(`/admin/raffles/${raffle.id}`),
       onError: () => toastError("Failed to create raffle."),
     });
   };
+
+  const columns: ColumnDefinition<Raffle>[] = [
+    {
+      label: "Name",
+      mobile: true,
+      render: renderName,
+    },
+  ];
 </script>
 
-<sl-button variant="primary" onclick={handleCreateRaffle}>Create</sl-button>
+{#snippet renderName({ id }: Raffle)}
+  <Link to={`/admin/raffles/${id}`}>Raffle {id}</Link>
+{/snippet}
+
+{#snippet createButton()}
+  <wa-button variant="neutral" appearance="accent" onclick={handleCreateRaffle}
+    >Start new raffle</wa-button
+  >
+{/snippet}
 
 <section>
-  <Table columns={["Name"]}>
-    {#if raffles}
-      {#each raffles as raffle (raffle.id)}
-        <TableRow>
-          <TableCell
-            ><Link to={`/admin/raffles/${raffle.id}`}>Raffle {raffle.id}</Link
-            ></TableCell
-          >
-        </TableRow>
-      {/each}
-    {/if}
-  </Table>
+  {#if raffles === undefined}
+    <Loader />
+  {:else if raffles.length > 0}
+    {@render createButton()}
+    <Table {columns} data={raffles} getId={({ id }) => id}></Table>
+  {:else}
+    <EmptyState
+      title="No raffles yet"
+      description="Start a new raffle to randomly select winners from your contenders."
+    >
+      {#snippet actions()}
+        {@render createButton()}
+      {/snippet}
+    </EmptyState>
+  {/if}
 </section>
 
 <style>
   section {
     display: flex;
-    gap: var(--sl-spacing-x-small);
+    flex-direction: column;
+    align-items: start;
+    gap: var(--wa-space-m);
   }
 </style>

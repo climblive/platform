@@ -6,6 +6,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -88,6 +89,11 @@ func (m *repositoryMock) GetContest(ctx context.Context, tx domain.Transaction, 
 	return args.Get(0).(domain.Contest), args.Error(1)
 }
 
+func (m *repositoryMock) GetAllContests(ctx context.Context, tx domain.Transaction) ([]domain.Contest, error) {
+	args := m.Called(ctx, tx)
+	return args.Get(0).([]domain.Contest), args.Error(1)
+}
+
 func (m *repositoryMock) StoreContest(ctx context.Context, tx domain.Transaction, contest domain.Contest) (domain.Contest, error) {
 	args := m.Called(ctx, tx, contest)
 
@@ -135,6 +141,11 @@ func (m *repositoryMock) GetProblemsByContest(ctx context.Context, tx domain.Tra
 
 func (m *repositoryMock) GetTicksByContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) ([]domain.Tick, error) {
 	args := m.Called(ctx, tx, contenderID)
+	return args.Get(0).([]domain.Tick), args.Error(1)
+}
+
+func (m *repositoryMock) GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error) {
+	args := m.Called(ctx, tx, contestID)
 	return args.Get(0).([]domain.Tick), args.Error(1)
 }
 
@@ -188,6 +199,11 @@ func (m *repositoryMock) GetOrganizer(ctx context.Context, tx domain.Transaction
 	return args.Get(0).(domain.Organizer), args.Error(1)
 }
 
+func (m *repositoryMock) StoreOrganizer(ctx context.Context, tx domain.Transaction, organizer domain.Organizer) (domain.Organizer, error) {
+	args := m.Called(ctx, tx, organizer)
+	return args.Get(0).(domain.Organizer), args.Error(1)
+}
+
 func (m *repositoryMock) GetRaffle(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) (domain.Raffle, error) {
 	args := m.Called(ctx, tx, raffleID)
 	return args.Get(0).(domain.Raffle), args.Error(1)
@@ -218,6 +234,46 @@ func (m *repositoryMock) StoreRaffleWinner(ctx context.Context, tx domain.Transa
 	}
 }
 
+func (m *repositoryMock) GetUserByUsername(ctx context.Context, tx domain.Transaction, username string) (domain.User, error) {
+	args := m.Called(ctx, tx, username)
+	return args.Get(0).(domain.User), args.Error(1)
+}
+
+func (m *repositoryMock) GetUsersByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.User, error) {
+	args := m.Called(ctx, tx, organizerID)
+	return args.Get(0).([]domain.User), args.Error(1)
+}
+
+func (m *repositoryMock) GetAllOrganizers(ctx context.Context, tx domain.Transaction) ([]domain.Organizer, error) {
+	args := m.Called(ctx, tx)
+	return args.Get(0).([]domain.Organizer), args.Error(1)
+}
+
+func (m *repositoryMock) AddUserToOrganizer(ctx context.Context, tx domain.Transaction, userID domain.UserID, organizerID domain.OrganizerID) error {
+	args := m.Called(ctx, tx, userID, organizerID)
+	return args.Error(0)
+}
+
+func (m *repositoryMock) DeleteOrganizerInvite(ctx context.Context, tx domain.Transaction, inviteID domain.OrganizerInviteID) error {
+	args := m.Called(ctx, tx, inviteID)
+	return args.Error(0)
+}
+
+func (m *repositoryMock) GetOrganizerInvite(ctx context.Context, tx domain.Transaction, inviteID domain.OrganizerInviteID) (domain.OrganizerInvite, error) {
+	args := m.Called(ctx, tx, inviteID)
+	return args.Get(0).(domain.OrganizerInvite), args.Error(1)
+}
+
+func (m *repositoryMock) GetOrganizerInvitesByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.OrganizerInvite, error) {
+	args := m.Called(ctx, tx, organizerID)
+	return args.Get(0).([]domain.OrganizerInvite), args.Error(1)
+}
+
+func (m *repositoryMock) StoreOrganizerInvite(ctx context.Context, tx domain.Transaction, invite domain.OrganizerInvite) error {
+	args := m.Called(ctx, tx, invite)
+	return args.Error(0)
+}
+
 type authorizerMock struct {
 	mock.Mock
 }
@@ -225,6 +281,11 @@ type authorizerMock struct {
 func (m *authorizerMock) HasOwnership(ctx context.Context, resourceOwnership domain.OwnershipData) (domain.AuthRole, error) {
 	args := m.Called(ctx, resourceOwnership)
 	return args.Get(0).(domain.AuthRole), args.Error(1)
+}
+
+func (m *authorizerMock) GetAuthentication(ctx context.Context) (domain.Authentication, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(domain.Authentication), args.Error(1)
 }
 
 type scoreKeeperMock struct {
@@ -251,4 +312,13 @@ func (m *eventBrokerMock) Subscribe(filter domain.EventFilter, bufferCapacity in
 
 func (m *eventBrokerMock) Unsubscribe(subscriptionID domain.SubscriptionID) {
 	m.Called(subscriptionID)
+}
+
+type uuidGeneratorMock struct {
+	mock.Mock
+}
+
+func (m *uuidGeneratorMock) Generate() uuid.UUID {
+	args := m.Called()
+	return args.Get(0).(uuid.UUID)
 }
