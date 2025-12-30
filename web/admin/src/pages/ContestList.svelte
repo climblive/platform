@@ -96,7 +96,7 @@
     },
   ];
 
-  const handleToggleArchive = (event: InputEvent) => {
+  const handleToggleArchive = () => {
     showArchived = !showArchived;
   };
 
