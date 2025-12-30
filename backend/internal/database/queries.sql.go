@@ -61,6 +61,16 @@ func (q *Queries) DeleteContender(ctx context.Context, id int32) error {
 	return err
 }
 
+const deleteContest = `-- name: DeleteContest :exec
+DELETE FROM contest
+WHERE id = ?
+`
+
+func (q *Queries) DeleteContest(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deleteContest, id)
+	return err
+}
+
 const deleteOrganizerInvite = `-- name: DeleteOrganizerInvite :exec
 DELETE FROM organizer_invite
 WHERE id = ?

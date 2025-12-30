@@ -117,6 +117,10 @@ ON DUPLICATE KEY UPDATE
     grace_period = VALUES(grace_period),
     created = VALUES(created);
 
+-- name: DeleteContest :exec
+DELETE FROM contest
+WHERE id = ?;
+
 -- name: GetContestsByOrganizer :many
 SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
 FROM contest

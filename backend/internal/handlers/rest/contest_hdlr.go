@@ -21,6 +21,7 @@ type contestUseCase interface {
 	PatchContest(ctx context.Context, contestID domain.ContestID, patch domain.ContestPatch) (domain.Contest, error)
 	CreateContest(ctx context.Context, organizerID domain.OrganizerID, template domain.ContestTemplate) (domain.Contest, error)
 	DuplicateContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error)
+	TransferContest(ctx context.Context, contestID domain.ContestID, newOrganizerID domain.OrganizerID) (domain.Contest, error)
 }
 
 type contestHandler struct {
@@ -49,6 +50,7 @@ func InstallContestHandler(
 	mux.HandleFunc("GET /organizers/{organizerID}/contests", handler.GetContestsByOrganizer)
 	mux.HandleFunc("POST /organizers/{organizerID}/contests", handler.CreateContest)
 	mux.HandleFunc("POST /contests/{contestID}/duplicate", handler.DuplicateContest)
+	mux.HandleFunc("POST /contests/{contestID}/transfer", handler.TransferContest)
 	mux.HandleFunc("GET /contests/{contestID}/results", handler.DownloadResults)
 	mux.HandleFunc("PATCH /contests/{contestID}", handler.PatchContest)
 }
@@ -171,6 +173,29 @@ func (hdlr *contestHandler) DuplicateContest(w http.ResponseWriter, r *http.Requ
 	}
 
 	writeResponse(w, http.StatusCreated, duplicatedContest)
+}
+
+func (hdlr *contestHandler) TransferContest(w http.ResponseWriter, r *http.Request) {
+	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	var req domain.ContestTransferRequest
+	err = json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	transferredContest, err := hdlr.contestUseCase.TransferContest(r.Context(), contestID, req.NewOrganizerID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusOK, transferredContest)
 }
 
 func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Request) {

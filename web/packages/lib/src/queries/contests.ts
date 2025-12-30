@@ -115,3 +115,35 @@ export const duplicateContestMutation = (contestId: number) => {
     },
   }));
 };
+
+export const transferContestMutation = (contestId: number) => {
+  const client = useQueryClient();
+
+  return createMutation(() => ({
+    mutationFn: (newOrganizerID: number) =>
+      ApiClient.getInstance().transferContest(contestId, newOrganizerID),
+    onSuccess: (transferredContest, newOrganizerID) => {
+      const oldOrganizerID = transferredContest.ownership.organizerId;
+
+      let queryKey: QueryKey = ["contests", { organizerId: oldOrganizerID }];
+
+      client.setQueryData<Contest[]>(queryKey, (oldContests) => {
+        if (oldContests === undefined) {
+          return undefined;
+        }
+
+        return oldContests.filter(({ id }) => id !== contestId);
+      });
+
+      queryKey = ["contests", { organizerId: newOrganizerID }];
+
+      client.setQueryData<Contest[]>(queryKey, (oldContests) => {
+        return [...(oldContests ?? []), transferredContest];
+      });
+
+      queryKey = ["contest", { id: contestId }];
+
+      client.setQueryData<Contest>(queryKey, transferredContest);
+    },
+  }));
+};

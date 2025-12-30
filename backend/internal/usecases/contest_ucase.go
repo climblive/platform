@@ -24,6 +24,9 @@ type contestUseCaseRepository interface {
 	StoreCompClass(ctx context.Context, tx domain.Transaction, compClass domain.CompClass) (domain.CompClass, error)
 	GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Problem, error)
 	StoreProblem(ctx context.Context, tx domain.Transaction, problem domain.Problem) (domain.Problem, error)
+	DeleteContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) error
+	DeleteProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) error
+	DeleteCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) error
 }
 
 type ContestUseCase struct {
@@ -306,4 +309,118 @@ func (uc *ContestUseCase) DuplicateContest(ctx context.Context, contestID domain
 	}
 
 	return createdContest, nil
+}
+
+func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.ContestID, newOrganizerID domain.OrganizerID) (domain.Contest, error) {
+	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	newOrganizer, err := uc.Repo.GetOrganizer(ctx, nil, newOrganizerID)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	if _, err := uc.Authorizer.HasOwnership(ctx, newOrganizer.Ownership); err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	if contest.Archived {
+		return domain.Contest{}, errors.Wrap(domain.ErrArchived, 0)
+	}
+
+	compClasses, err := uc.Repo.GetCompClassesByContest(ctx, nil, contestID)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	problems, err := uc.Repo.GetProblemsByContest(ctx, nil, contestID)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	tx, err := uc.Repo.Begin()
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	purge := func() error {
+		for _, problem := range problems {
+			err = uc.Repo.DeleteProblem(ctx, tx, problem.ID)
+			if err != nil {
+				return err
+			}
+		}
+
+		for _, compClass := range compClasses {
+			err = uc.Repo.DeleteCompClass(ctx, tx, compClass.ID)
+			if err != nil {
+				return err
+			}
+		}
+
+		err := uc.Repo.DeleteContest(ctx, tx, contestID)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	transfer := func() error {
+		_, err := uc.Repo.StoreContest(ctx, tx, contest)
+		if err != nil {
+			return err
+		}
+
+		for _, compClass := range compClasses {
+			_, err = uc.Repo.StoreCompClass(ctx, tx, compClass)
+			if err != nil {
+				return err
+			}
+		}
+
+		for _, problem := range problems {
+			_, err = uc.Repo.StoreProblem(ctx, tx, problem)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+
+	err = purge()
+	if err != nil {
+		tx.Rollback()
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	contest.Ownership.OrganizerID = newOrganizerID
+
+	for index := range compClasses {
+		compClasses[index].Ownership.OrganizerID = newOrganizerID
+	}
+
+	for index := range problems {
+		problems[index].Ownership.OrganizerID = newOrganizerID
+	}
+
+	err = transfer()
+	if err != nil {
+		tx.Rollback()
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	return contest, nil
 }
