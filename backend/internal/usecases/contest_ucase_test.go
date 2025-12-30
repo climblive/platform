@@ -697,7 +697,8 @@ func TestTransferContest(t *testing.T) {
 	fakedRaffleWinnerID := randomResourceID[domain.RaffleWinnerID]()
 	fakedTickID := randomResourceID[domain.TickID]()
 	fakedSeriesID := randomResourceID[domain.SeriesID]()
-	timestamp := time.Now()
+
+	now := time.Now()
 
 	fakedOldOwnership := domain.OwnershipData{OrganizerID: fakedOldOrganizerID}
 	fakedNewOwnership := domain.OwnershipData{OrganizerID: fakedNewOrganizerID}
@@ -718,6 +719,7 @@ func TestTransferContest(t *testing.T) {
 		GracePeriod:        30 * time.Minute,
 		TimeBegin:          timeBegin,
 		TimeEnd:            timeEnd,
+		Created:            now,
 	}
 
 	fakedCompClass := domain.CompClass{
@@ -747,12 +749,12 @@ func TestTransferContest(t *testing.T) {
 	}
 
 	fakedScore := domain.Score{
-		Timestamp:   timestamp,
+		Timestamp:   now,
 		ContenderID: fakedContenderID,
 		Score:       10,
-		Placement:   1,
+		Placement:   3,
 		Finalist:    true,
-		RankOrder:   0,
+		RankOrder:   2,
 	}
 
 	fakedContender := domain.Contender{
@@ -762,9 +764,9 @@ func TestTransferContest(t *testing.T) {
 		CompClassID:         fakedCompClassID,
 		RegistrationCode:    "ABCD1234",
 		Name:                "John Doe",
-		Entered:             timestamp,
-		WithdrawnFromFinals: false,
-		Disqualified:        false,
+		Entered:             now,
+		WithdrawnFromFinals: true,
+		Disqualified:        true,
 		Score:               &fakedScore,
 	}
 
@@ -780,13 +782,13 @@ func TestTransferContest(t *testing.T) {
 		RaffleID:      fakedRaffleID,
 		ContenderID:   fakedContenderID,
 		ContenderName: "John Doe",
-		Timestamp:     timestamp,
+		Timestamp:     now,
 	}
 
 	fakedTick := domain.Tick{
 		ID:            fakedTickID,
 		Ownership:     domain.OwnershipData{OrganizerID: fakedOldOrganizerID, ContenderID: &fakedContenderID},
-		Timestamp:     timestamp,
+		Timestamp:     now,
 		ContestID:     fakedContestID,
 		ProblemID:     fakedProblemID,
 		Zone1:         true,
@@ -865,6 +867,7 @@ func TestTransferContest(t *testing.T) {
 				GracePeriod:        30 * time.Minute,
 				TimeBegin:          fakedContest.TimeBegin,
 				TimeEnd:            fakedContest.TimeEnd,
+				Created:            now,
 			}).
 			Return(domain.Contest{}, nil)
 
@@ -906,8 +909,8 @@ func TestTransferContest(t *testing.T) {
 				RegistrationCode:    "ABCD1234",
 				Name:                "John Doe",
 				Entered:             fakedContender.Entered,
-				WithdrawnFromFinals: false,
-				Disqualified:        false,
+				WithdrawnFromFinals: true,
+				Disqualified:        true,
 				Score:               &fakedScore,
 			}).
 			Return(domain.Contender{}, nil)
