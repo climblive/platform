@@ -224,6 +224,11 @@ func (m *repositoryMock) StoreRaffle(ctx context.Context, tx domain.Transaction,
 	return args.Get(0).(domain.Raffle), args.Error(1)
 }
 
+func (m *repositoryMock) DeleteRaffle(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) error {
+	args := m.Called(ctx, tx, raffleID)
+	return args.Error(0)
+}
+
 func (m *repositoryMock) GetRaffleWinners(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) ([]domain.RaffleWinner, error) {
 	args := m.Called(ctx, tx, raffleID)
 	return args.Get(0).([]domain.RaffleWinner), args.Error(1)
@@ -237,6 +242,11 @@ func (m *repositoryMock) StoreRaffleWinner(ctx context.Context, tx domain.Transa
 	} else {
 		return args.Get(0).(domain.RaffleWinner), args.Error(1)
 	}
+}
+
+func (m *repositoryMock) DeleteRaffleWinner(ctx context.Context, tx domain.Transaction, raffleWinnerID domain.RaffleWinnerID) error {
+	args := m.Called(ctx, tx, raffleWinnerID)
+	return args.Error(0)
 }
 
 func (m *repositoryMock) GetUserByUsername(ctx context.Context, tx domain.Transaction, username string) (domain.User, error) {
