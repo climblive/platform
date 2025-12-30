@@ -32,6 +32,9 @@ type contestUseCaseRepository interface {
 	GetRafflesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Raffle, error)
 	DeleteRaffle(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) error
 	StoreRaffle(ctx context.Context, tx domain.Transaction, raffle domain.Raffle) (domain.Raffle, error)
+	GetRaffleWinners(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) ([]domain.RaffleWinner, error)
+	DeleteRaffleWinner(ctx context.Context, tx domain.Transaction, raffleWinnerID domain.RaffleWinnerID) error
+	StoreRaffleWinner(ctx context.Context, tx domain.Transaction, winner domain.RaffleWinner) (domain.RaffleWinner, error)
 }
 
 type ContestUseCase struct {
@@ -359,12 +362,30 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
+	allRaffleWinners := make([]domain.RaffleWinner, 0)
+
+	for _, raffle := range raffles {
+		winners, err := uc.Repo.GetRaffleWinners(ctx, nil, raffle.ID)
+		if err != nil {
+			return domain.Contest{}, errors.Wrap(err, 0)
+		}
+
+		allRaffleWinners = append(allRaffleWinners, winners...)
+	}
+
 	tx, err := uc.Repo.Begin()
 	if err != nil {
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
 	purge := func() error {
+		for _, winner := range allRaffleWinners {
+			err = uc.Repo.DeleteRaffleWinner(ctx, tx, winner.ID)
+			if err != nil {
+				return err
+			}
+		}
+
 		for _, raffle := range raffles {
 			err = uc.Repo.DeleteRaffle(ctx, tx, raffle.ID)
 			if err != nil {
@@ -435,6 +456,13 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 			}
 		}
 
+		for _, winner := range allRaffleWinners {
+			_, err = uc.Repo.StoreRaffleWinner(ctx, tx, winner)
+			if err != nil {
+				return err
+			}
+		}
+
 		return nil
 	}
 
@@ -460,6 +488,10 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 
 	for index := range raffles {
 		raffles[index].Ownership.OrganizerID = newOrganizerID
+	}
+
+	for index := range allRaffleWinners {
+		allRaffleWinners[index].Ownership.OrganizerID = newOrganizerID
 	}
 
 	err = transfer()

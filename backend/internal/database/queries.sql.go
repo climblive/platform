@@ -101,6 +101,16 @@ func (q *Queries) DeleteRaffle(ctx context.Context, id int32) error {
 	return err
 }
 
+const deleteRaffleWinner = `-- name: DeleteRaffleWinner :exec
+DELETE FROM raffle_winner
+WHERE id = ?
+`
+
+func (q *Queries) DeleteRaffleWinner(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deleteRaffleWinner, id)
+	return err
+}
+
 const deleteTick = `-- name: DeleteTick :exec
 DELETE
 FROM tick

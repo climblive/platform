@@ -295,6 +295,10 @@ ON DUPLICATE KEY UPDATE
     contender_id = VALUES(contender_id),
     timestamp = VALUES(timestamp); 
 
+-- name: DeleteRaffleWinner :exec
+DELETE FROM raffle_winner
+WHERE id = ?;
+
 -- name: GetOrganizerInvitesByOrganizer :many
 SELECT sqlc.embed(organizer_invite), organizer.name
 FROM organizer_invite
