@@ -16,4 +16,5 @@ export const contestSchema: z.ZodType<Contest> = z.object({
   gracePeriod: z.number(),
   timeBegin: z.coerce.date().optional(),
   timeEnd: z.coerce.date().optional(),
+  created: z.coerce.date(),
 });
