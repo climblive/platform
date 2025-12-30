@@ -126,18 +126,17 @@
   {#if invites === undefined || users === undefined || organizer === undefined}
     <Loader />
   {:else}
-    <wa-breadcrumb>
-      <wa-breadcrumb-item onclick={() => navigate("./")}
-        ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
-      >
-      <wa-breadcrumb-item
-        onclick={() => navigate(`./organizers/${organizerId}`)}
-        >{organizer.name}</wa-breadcrumb-item
-      >
-    </wa-breadcrumb>
-
     <div class="header">
-      <h1>{organizer.name}</h1>
+      <wa-breadcrumb>
+        <wa-breadcrumb-item onclick={() => navigate("./")}
+          ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
+        >
+        <wa-breadcrumb-item
+          onclick={() => navigate(`./organizers/${organizerId}`)}
+          >{organizer.name}
+        </wa-breadcrumb-item>
+      </wa-breadcrumb>
+
       <EditOrganizer {organizer}>
         {#snippet children({ editOrganizer })}
           <wa-button
@@ -146,8 +145,7 @@
             size="small"
             onclick={editOrganizer}
           >
-            <wa-icon name="pencil" label="Edit organizer"></wa-icon>
-            Edit
+            <wa-icon name="pencil" label="Edit name"></wa-icon>
           </wa-button>
         {/snippet}
       </EditOrganizer>
@@ -188,12 +186,9 @@
   .header {
     display: flex;
     align-items: center;
-    gap: var(--wa-space-s);
+    justify-content: space-between;
+    gap: var(--wa-space-xs);
     width: 100%;
-  }
-
-  .header h1 {
-    margin: 0;
   }
 
   .expired {
