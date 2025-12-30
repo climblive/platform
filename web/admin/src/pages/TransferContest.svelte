@@ -1,5 +1,6 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
@@ -79,12 +80,12 @@
 </div>
 
 <wa-dialog bind:this={dialog} label="Transfer contest">
-  Move this contest to one of the other organizers you belong to.
   <wa-select
     label="Select new organizer"
     hide-label
     onchange={handleSelect}
     {@attach value(selectedOrganizerId)}
+    hint="Select one of the other organizers you belong to."
   >
     {#each otherOrganizers as organizer (organizer.id)}
       <wa-option value={organizer.id}>{organizer.name}</wa-option>
@@ -100,7 +101,8 @@
     )}
 
     {#if currentOrganizer && newOrganizer}
-      <p>
+      <wa-callout variant="warning">
+        <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
         This will transfer all contest data from the current organizer
         <strong>
           {currentOrganizer.name}
@@ -109,7 +111,7 @@
         <strong>
           {newOrganizer.name}
         </strong>.
-      </p>
+      </wa-callout>
     {/if}
   {/if}
 
@@ -129,7 +131,9 @@
 </wa-dialog>
 
 <style>
-  wa-select {
-    margin-block-start: var(--wa-space-m);
+  wa-dialog::part(body) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-m);
   }
 </style>
