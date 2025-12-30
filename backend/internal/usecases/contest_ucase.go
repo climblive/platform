@@ -329,6 +329,10 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
+	if contest.Archived {
+		return domain.Contest{}, errors.Wrap(domain.ErrArchived, 0)
+	}
+
 	if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
@@ -340,10 +344,6 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 
 	if _, err := uc.Authorizer.HasOwnership(ctx, newOrganizer.Ownership); err != nil {
 		return domain.Contest{}, errors.Wrap(err, 0)
-	}
-
-	if contest.Archived {
-		return domain.Contest{}, errors.Wrap(domain.ErrArchived, 0)
 	}
 
 	compClasses, err := uc.Repo.GetCompClassesByContest(ctx, nil, contestID)
