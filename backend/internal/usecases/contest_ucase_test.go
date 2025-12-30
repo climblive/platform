@@ -884,6 +884,30 @@ func TestTransferContest(t *testing.T) {
 		mockedTx.AssertExpectations(t)
 	})
 
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer, _ := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOldOwnership).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		mockedRepo.
+			On("GetContest", mock.Anything, nil, fakedContestID).
+			Return(fakedContest, nil)
+
+		ucase := usecases.ContestUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.TransferContest(context.Background(), fakedContestID, fakedNewOrganizerID)
+
+		assert.ErrorIs(t, err, domain.ErrNoOwnership)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
 	t.Run("NewOrganizerUnauthorized", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer, _ := makeMocks()
 
