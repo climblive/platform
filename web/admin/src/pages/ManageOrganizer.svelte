@@ -21,6 +21,7 @@
   import { isAfter } from "date-fns";
   import { navigate } from "svelte-routing";
   import DeleteInvite from "./DeleteInvite.svelte";
+  import EditOrganizer from "./EditOrganizer.svelte";
 
   interface Props {
     organizerId: number;
@@ -125,15 +126,30 @@
   {#if invites === undefined || users === undefined || organizer === undefined}
     <Loader />
   {:else}
-    <wa-breadcrumb>
-      <wa-breadcrumb-item onclick={() => navigate("./")}
-        ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
-      >
-      <wa-breadcrumb-item
-        onclick={() => navigate(`./organizers/${organizerId}`)}
-        >{organizer.name}</wa-breadcrumb-item
-      >
-    </wa-breadcrumb>
+    <div class="header">
+      <wa-breadcrumb>
+        <wa-breadcrumb-item onclick={() => navigate("./")}
+          ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
+        >
+        <wa-breadcrumb-item
+          onclick={() => navigate(`./organizers/${organizerId}`)}
+          >{organizer.name}
+        </wa-breadcrumb-item>
+      </wa-breadcrumb>
+
+      <EditOrganizer {organizerId} currentName={organizer.name}>
+        {#snippet children({ editOrganizer })}
+          <wa-button
+            variant="neutral"
+            appearance="plain"
+            size="small"
+            onclick={editOrganizer}
+          >
+            <wa-icon name="pencil" label="Edit name"></wa-icon>
+          </wa-button>
+        {/snippet}
+      </EditOrganizer>
+    </div>
 
     <h2>Co-organizers</h2>
     <Table columns={userColumns} data={users} getId={({ id }) => id}></Table>
@@ -165,6 +181,14 @@
     flex-direction: column;
     align-items: start;
     gap: var(--wa-space-m);
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--wa-space-xs);
+    width: 100%;
   }
 
   .expired {

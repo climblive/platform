@@ -115,6 +115,9 @@ export interface Organizer {
 export interface OrganizerTemplate {
   name: string;
 }
+export interface OrganizerPatch {
+  name?: string;
+}
 export interface OrganizerInvite {
   id: OrganizerInviteID;
   organizerId: OrganizerID;

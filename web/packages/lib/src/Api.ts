@@ -11,6 +11,7 @@ import {
   type ContestPatch,
   type ContestTemplate,
   type OrganizerInviteID,
+  type OrganizerPatch,
   type OrganizerTemplate,
   type ProblemPatch,
   type ProblemTemplate,
@@ -442,6 +443,16 @@ export class ApiClient {
     const endpoint = `/organizers/${organizerId}`;
 
     const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return organizerSchema.parse(result.data);
+  };
+
+  patchOrganizer = async (organizerId: number, patch: OrganizerPatch) => {
+    const endpoint = `/organizers/${organizerId}`;
+
+    const result = await this.axiosInstance.patch(endpoint, patch, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 

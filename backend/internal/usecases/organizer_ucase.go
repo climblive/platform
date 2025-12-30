@@ -90,6 +90,33 @@ func (uc *OrganizerUseCase) GetOrganizer(ctx context.Context, organizerID domain
 	return organizer, nil
 }
 
+func (uc *OrganizerUseCase) PatchOrganizer(ctx context.Context, organizerID domain.OrganizerID, patch domain.OrganizerPatch) (domain.Organizer, error) {
+	organizer, err := uc.Repo.GetOrganizer(ctx, nil, organizerID)
+	if err != nil {
+		return domain.Organizer{}, errors.Wrap(err, 0)
+	}
+
+	if _, err := uc.Authorizer.HasOwnership(ctx, organizer.Ownership); err != nil {
+		return domain.Organizer{}, errors.Wrap(err, 0)
+	}
+
+	if patch.Name.Present {
+		name := strings.TrimSpace(patch.Name.Value)
+		if name == "" {
+			return domain.Organizer{}, errors.Wrap(domain.ErrInvalidData, 0)
+		}
+
+		organizer.Name = name
+	}
+
+	organizer, err = uc.Repo.StoreOrganizer(ctx, nil, organizer)
+	if err != nil {
+		return domain.Organizer{}, errors.Wrap(err, 0)
+	}
+
+	return organizer, nil
+}
+
 func (uc *OrganizerUseCase) GetOrganizerInvitesByOrganizer(ctx context.Context, organizerID domain.OrganizerID) ([]domain.OrganizerInvite, error) {
 	organizer, err := uc.Repo.GetOrganizer(ctx, nil, organizerID)
 	if err != nil {
