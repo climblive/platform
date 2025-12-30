@@ -53,12 +53,9 @@
     transferContest.mutate(selectedOrganizerId, {
       onSuccess: () => {
         handleCancel();
-
         navigate(`./organizers/${selectedOrganizerId}/contests`);
       },
-      onError: (error) => {
-        toastError("Failed to transfer contest.");
-      },
+      onError: () => toastError("Failed to transfer contest."),
     });
   };
 
