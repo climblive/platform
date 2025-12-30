@@ -35,6 +35,9 @@ type contestUseCaseRepository interface {
 	GetRaffleWinners(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) ([]domain.RaffleWinner, error)
 	DeleteRaffleWinner(ctx context.Context, tx domain.Transaction, raffleWinnerID domain.RaffleWinnerID) error
 	StoreRaffleWinner(ctx context.Context, tx domain.Transaction, winner domain.RaffleWinner) (domain.RaffleWinner, error)
+	GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error)
+	DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) error
+	StoreTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error)
 }
 
 type ContestUseCase struct {
@@ -373,12 +376,24 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 		allRaffleWinners = append(allRaffleWinners, winners...)
 	}
 
+	ticks, err := uc.Repo.GetTicksByContest(ctx, nil, contestID)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
 	tx, err := uc.Repo.Begin()
 	if err != nil {
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
 	purge := func() error {
+		for _, tick := range ticks {
+			err = uc.Repo.DeleteTick(ctx, tx, tick.ID)
+			if err != nil {
+				return err
+			}
+		}
+
 		for _, winner := range allRaffleWinners {
 			err = uc.Repo.DeleteRaffleWinner(ctx, tx, winner.ID)
 			if err != nil {
@@ -463,6 +478,13 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 			}
 		}
 
+		for _, tick := range ticks {
+			_, err = uc.Repo.StoreTick(ctx, tx, tick)
+			if err != nil {
+				return err
+			}
+		}
+
 		return nil
 	}
 
@@ -492,6 +514,10 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 
 	for index := range allRaffleWinners {
 		allRaffleWinners[index].Ownership.OrganizerID = newOrganizerID
+	}
+
+	for index := range ticks {
+		ticks[index].Ownership.OrganizerID = newOrganizerID
 	}
 
 	err = transfer()
