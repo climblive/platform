@@ -157,7 +157,12 @@
 {/if}
 
 {#snippet listing(heading: string, contests: Contest[])}
-  <h3>{heading} ({contests.length})</h3>
+  {@const totalRegistered = contests.reduce((sum, c) => sum + c.registeredContenders, 0)}
+  <h3>{heading}</h3>
+  <p class="contest-summary">
+    {contests.length} {contests.length === 1 ? "contest" : "contests"} • 
+    {totalRegistered} registered {totalRegistered === 1 ? "contender" : "contenders"}
+  </p>
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
 {/snippet}
 
@@ -216,5 +221,12 @@
   .toggle-archived-button {
     display: block;
     margin-block-start: var(--wa-space-m);
+  }
+
+  .contest-summary {
+    color: var(--wa-color-text-secondary);
+    font-size: var(--wa-font-size-s);
+    margin-block-start: var(--wa-space-xs);
+    margin-block-end: var(--wa-space-m);
   }
 </style>
