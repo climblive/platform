@@ -156,14 +156,16 @@
   {@render createButton("create-contest-button")}
 {/if}
 
-{#snippet listing(heading: string, contests: Contest[])}
+{#snippet listing(heading: string, contests: Contest[], showSummary: boolean = false)}
   {@const totalRegistered = contests.reduce((sum, c) => sum + c.registeredContenders, 0)}
   {@const averageValue = contests.length > 0 ? totalRegistered / contests.length : 0}
   {@const averageRegistered = averageValue.toFixed(1)}
   <h3>{heading} ({contests.length})</h3>
-  <p class="contest-summary">
-    {totalRegistered} {totalRegistered === 1 ? "contender" : "contenders"} in total over {contests.length} {contests.length === 1 ? "contest" : "contests"} averaging {averageRegistered} {averageValue === 1 ? "contender" : "contenders"} per contest
-  </p>
+  {#if showSummary}
+    <p class="contest-summary">
+      {totalRegistered} {totalRegistered === 1 ? "contender" : "contenders"} in total over {contests.length} {contests.length === 1 ? "contest" : "contests"} averaging {averageRegistered} {averageValue === 1 ? "contender" : "contenders"} per contest
+    </p>
+  {/if}
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
 {/snippet}
 
@@ -179,7 +181,7 @@
   {/if}
 
   {#if past?.length}
-    {@render listing("Past", past)}
+    {@render listing("Past", past, true)}
   {/if}
 
   {#if contests && numberOfUnarchivedContests === 0}
