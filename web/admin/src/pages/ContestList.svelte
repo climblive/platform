@@ -147,7 +147,7 @@
 {/if}
 
 {#snippet listing(heading: string, contests: Contest[])}
-  <h3>{heading}</h3>
+  <h3>{heading} ({contests.length})</h3>
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
 {/snippet}
 
