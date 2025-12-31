@@ -158,9 +158,11 @@
 
 {#snippet listing(heading: string, contests: Contest[])}
   {@const totalRegistered = contests.reduce((sum, c) => sum + c.registeredContenders, 0)}
+  {@const averageRegistered = contests.length > 0 ? (totalRegistered / contests.length).toFixed(1) : 0}
   <h3>{heading} ({contests.length})</h3>
   <p class="contest-summary">
     {totalRegistered} registered {totalRegistered === 1 ? "contender" : "contenders"} in total
+    ({averageRegistered} average per contest)
   </p>
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
 {/snippet}
