@@ -223,7 +223,7 @@
   }
 
   .contest-summary {
-    color: var(--wa-color-text-secondary);
+    color: var(--wa-color-text-quiet);
     font-size: var(--wa-font-size-s);
     margin-block-start: var(--wa-space-xs);
     margin-block-end: var(--wa-space-m);
