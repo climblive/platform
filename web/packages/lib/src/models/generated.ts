@@ -15,17 +15,8 @@ export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
 export type OrganizerInviteID = string;
-export type ResourceIDType =
-  | CompClassID
-  | ContenderID
-  | ContestID
-  | OrganizerID
-  | ProblemID
-  | RaffleID
-  | RaffleWinnerID
-  | SeriesID
-  | UserID
-  | TickID;
+export type ResourceIDType = 
+    CompClassID | ContenderID | ContestID | OrganizerID | ProblemID | RaffleID | RaffleWinnerID | SeriesID | UserID | TickID;
 export type ScoreEngineInstanceID = string;
 
 //////////
@@ -87,6 +78,7 @@ export interface Contest {
   timeBegin?: Date;
   timeEnd?: Date;
   created: Date;
+  registeredContenders: number /* int */;
 }
 export interface ContestTemplate {
   location?: string;

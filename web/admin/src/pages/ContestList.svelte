@@ -83,6 +83,12 @@
       width: "1fr",
     },
     {
+      label: "Registered",
+      mobile: false,
+      render: renderRegisteredContenders,
+      width: "max-content",
+    },
+    {
       label: "Start time",
       mobile: true,
       render: renderTimeBegin,
@@ -110,6 +116,10 @@
 
 {#snippet renderName({ id, name }: Contest)}
   <Link to="contests/{id}">{name}</Link>
+{/snippet}
+
+{#snippet renderRegisteredContenders({ registeredContenders }: Contest)}
+  {registeredContenders}
 {/snippet}
 
 {#snippet renderTimeBegin({ timeBegin, timeEnd }: Contest)}
