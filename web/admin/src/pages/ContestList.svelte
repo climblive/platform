@@ -161,7 +161,7 @@
   {@const averageRegistered = contests.length > 0 ? (totalRegistered / contests.length).toFixed(1) : (0).toFixed(1)}
   <h3>{heading} ({contests.length})</h3>
   <p class="contest-summary">
-    {totalRegistered} {totalRegistered === 1 ? "contender" : "contenders"} in total over {contests.length} {contests.length === 1 ? "contest" : "contests"} averaging {averageRegistered} {averageRegistered === "1.0" ? "contender" : "contenders"} per contest
+    {totalRegistered} {totalRegistered === 1 ? "contender" : "contenders"} in total over {contests.length} {contests.length === 1 ? "contest" : "contests"} averaging {averageRegistered} {parseFloat(averageRegistered) === 1 ? "contender" : "contenders"} per contest
   </p>
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
 {/snippet}
