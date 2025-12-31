@@ -158,10 +158,9 @@
 
 {#snippet listing(heading: string, contests: Contest[])}
   {@const totalRegistered = contests.reduce((sum, c) => sum + c.registeredContenders, 0)}
-  <h3>{heading}</h3>
+  <h3>{heading} ({contests.length})</h3>
   <p class="contest-summary">
-    {contests.length} {contests.length === 1 ? "contest" : "contests"} • 
-    {totalRegistered} registered {totalRegistered === 1 ? "contender" : "contenders"}
+    {totalRegistered} registered {totalRegistered === 1 ? "contender" : "contenders"} in total
   </p>
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
 {/snippet}
