@@ -153,17 +153,17 @@ test("the three most recently used registration codes can be restored", async ({
   await page.waitForURL("/");
 
   await expect(
-    page.getByRole("region", { name: "Saved session ABCD0001" }),
+    page.getByRole("region", { name: "Saved session ABCD0001" })
   ).not.toBeVisible();
 
   await expect(
-    page.getByRole("region", { name: "Saved session ABCD0002" }),
+    page.getByRole("region", { name: "Saved session ABCD0002" })
   ).toBeVisible();
   await expect(
-    page.getByRole("region", { name: "Saved session ABCD0003" }),
+    page.getByRole("region", { name: "Saved session ABCD0003" })
   ).toBeVisible();
   await expect(
-    page.getByRole("region", { name: "Saved session ABCD0004" }),
+    page.getByRole("region", { name: "Saved session ABCD0004" })
   ).toBeVisible();
 });
 
@@ -183,7 +183,7 @@ test("garbage session value in local storage is thrown out", async ({
   await page.goto("/");
 
   await expect(
-    page.getByRole("textbox", { name: "Registration code *" }),
+    page.getByRole("textbox", { name: "Registration code *" })
   ).toHaveValue("");
 });
 
@@ -217,7 +217,7 @@ test("withdraw from finals and reenter", async ({ page }) => {
   await page.goto("/ABCD0003/edit");
 
   await expect(
-    page.getByRole("switch", { name: "Opt out of finals" }),
+    page.getByRole("switch", { name: "Opt out of finals" })
   ).not.toBeChecked();
   await page
     .getByRole("switch", { name: "Opt out of finals" })
@@ -230,7 +230,7 @@ test("withdraw from finals and reenter", async ({ page }) => {
   await page.getByRole("button", { name: "Edit" }).click({ force: true });
 
   await expect(
-    page.getByRole("switch", { name: "Opt out of finals" }),
+    page.getByRole("switch", { name: "Opt out of finals" })
   ).toBeChecked();
   await page
     .getByRole("switch", { name: "Opt out of finals" })
@@ -243,7 +243,7 @@ test("withdraw from finals and reenter", async ({ page }) => {
   await page.getByRole("button", { name: "Edit" }).click({ force: true });
 
   await expect(
-    page.getByRole("switch", { name: "Opt out of finals" }),
+    page.getByRole("switch", { name: "Opt out of finals" })
   ).not.toBeChecked();
 });
 
@@ -340,12 +340,10 @@ test("info tab", async ({ page }) => {
   await page.getByRole("tab", { name: "Info" }).click();
 
   await expect(
-    page.getByText("Name World Testing Championships"),
+    page.getByText("Name World Testing Championships")
   ).toBeVisible();
   await expect(
-    page.getByText(
-      "Description The world's number one competition for testing",
-    ),
+    page.getByText("Description The world's number one competition for testing")
   ).toBeVisible();
   await expect(page.getByText("Location On the web")).toBeVisible();
   await expect(page.getByText("Classes Males, Females")).toBeVisible();
@@ -357,8 +355,8 @@ test("info tab", async ({ page }) => {
 
   await expect(
     page.getByText(
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-    ),
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    )
   ).toBeVisible();
 });
 
@@ -400,7 +398,7 @@ test.describe("contest states", () => {
   test("during grace period", async ({ page }) => {
     await page.goto("/ABCD0001");
 
-    await page.clock.setFixedTime(new Date("2026-01-01T00:00:00"));
+    await page.clock.setFixedTime(new Date("2027-01-01T00:00:00"));
 
     const timer = page.getByRole("timer", { name: "Time remaining" });
     await expect(timer).toHaveText("00:00:00");
@@ -416,7 +414,7 @@ test.describe("contest states", () => {
   test("after contest has ended", async ({ page }) => {
     await page.goto("/ABCD0001");
 
-    await page.clock.setFixedTime(new Date("2026-01-01T00:05:00"));
+    await page.clock.setFixedTime(new Date("2027-01-01T00:05:00"));
 
     const timer = page.getByRole("timer", { name: "Time remaining" });
     await expect(timer).toHaveText("00:00:00");
@@ -453,7 +451,7 @@ test.describe("failsafe mode", () => {
     await page.getByRole("button", { name: "Register" }).click();
 
     await expect(
-      page.getByRole("heading", { name: "Scorecard" }),
+      page.getByRole("heading", { name: "Scorecard" })
     ).toBeVisible();
   });
 
@@ -461,10 +459,10 @@ test.describe("failsafe mode", () => {
     await page.goto("/failsafe/abcd0005");
 
     await expect(page.getByRole("textbox", { name: "Name" })).toHaveValue(
-      "Andy Bernard",
+      "Andy Bernard"
     );
     await expect(
-      page.getByRole("combobox", { name: "Competition class" }),
+      page.getByRole("combobox", { name: "Competition class" })
     ).toHaveValue("2");
   });
 
@@ -476,18 +474,18 @@ test.describe("failsafe mode", () => {
       await expect(problem).toBeVisible();
 
       await expect(
-        problem.getByRole("button", { name: "Zone 1" }),
+        problem.getByRole("button", { name: "Zone 1" })
       ).toBeVisible();
       await expect(
-        problem.getByRole("button", { name: "Zone 2" }),
+        problem.getByRole("button", { name: "Zone 2" })
       ).toBeVisible();
       await expect(
-        problem.getByRole("button", { name: "Flash" }),
+        problem.getByRole("button", { name: "Flash" })
       ).toBeVisible();
       await problem.getByRole("button", { name: "Top" }).click();
 
       await expect(
-        problem.getByRole("button", { name: "Unsend" }),
+        problem.getByRole("button", { name: "Unsend" })
       ).toBeVisible();
     }
 
@@ -499,7 +497,7 @@ test.describe("failsafe mode", () => {
 
       await expect(problem.getByRole("button", { name: "Top" })).toBeVisible();
       await expect(
-        problem.getByRole("button", { name: "Flash" }),
+        problem.getByRole("button", { name: "Flash" })
       ).toBeVisible();
     }
   });
