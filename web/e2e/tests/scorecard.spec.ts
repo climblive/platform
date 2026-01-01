@@ -387,7 +387,7 @@ test.describe("contest states", () => {
     await page.clock.setFixedTime(new Date("2024-01-01T00:00:00"));
 
     const timer = page.getByRole("timer", { name: "Time remaining" });
-    await expect(timer).toHaveText("almost 2 years");
+    await expect(timer).toHaveText("almost 3 years");
 
     await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
 
