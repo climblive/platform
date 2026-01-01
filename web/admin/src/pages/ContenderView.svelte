@@ -191,6 +191,11 @@
 {/if}
 
 <style>
+  wa-breadcrumb {
+    margin-block-end: var(--wa-space-m);
+    display: block;
+  }
+
   h2 {
     margin-top: var(--wa-space-2xl);
   }
