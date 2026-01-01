@@ -83,12 +83,6 @@
       width: "1fr",
     },
     {
-      label: "Registered",
-      mobile: false,
-      render: renderRegisteredContenders,
-      width: "max-content",
-    },
-    {
       label: "Start time",
       mobile: true,
       render: renderTimeBegin,
@@ -99,6 +93,13 @@
       mobile: false,
       render: renderTimeEnd,
       width: "max-content",
+    },
+    {
+      label: "Registered",
+      mobile: false,
+      render: renderRegisteredContenders,
+      width: "max-content",
+      align: "right",
     },
   ];
 
@@ -165,9 +166,10 @@
     (sum, c) => sum + c.registeredContenders,
     0,
   )}
-  {@const averageValue =
-    contests.length > 0 ? totalRegistered / contests.length : 0}
-  {@const averageRegistered = Math.floor(averageValue)}
+  {@const averageRegistered = Math.floor(
+    contests.length > 0 ? totalRegistered / contests.length : 0,
+  )}
+
   <h3>{heading} ({contests.length})</h3>
   {#if showSummary}
     <p class="contest-summary">
@@ -241,7 +243,6 @@
   .contest-summary {
     color: var(--wa-color-text-quiet);
     font-size: var(--wa-font-size-s);
-    margin-block-start: var(--wa-space-xs);
-    margin-block-end: var(--wa-space-m);
+    margin-block-start: var(--wa-space-xs) var(--wa-space-m);
   }
 </style>
