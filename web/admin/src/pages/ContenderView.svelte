@@ -1,6 +1,8 @@
 <script lang="ts">
   import QrCode from "@/components/QrCode.svelte";
   import TickList from "@/components/TickList.svelte";
+  import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
+  import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/copy-button/copy-button.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
@@ -12,6 +14,7 @@
   import {
     getCompClassesQuery,
     getContenderQuery,
+    getContestQuery,
     patchContenderMutation,
   } from "@climblive/lib/queries";
   import { format } from "date-fns";
@@ -34,6 +37,11 @@
   );
 
   const compClasses = $derived(compClassesQuery.data);
+
+  const contestQuery = $derived(
+    contestId ? getContestQuery(contestId) : undefined,
+  );
+  const contest = $derived(contestQuery?.data);
 
   let withdrawFromFinalsToggle: WaSwitch | undefined = $state();
 
@@ -60,13 +68,21 @@
   };
 </script>
 
-{#if contender && compClasses}
-  <wa-button
-    appearance="plain"
-    onclick={() => navigate(`/admin/contests/${contestId}#results`)}
-    >Back to results<wa-icon name="arrow-left" slot="start"
-    ></wa-icon></wa-button
-  >
+{#if contender && compClasses && contest}
+  <wa-breadcrumb>
+    <wa-breadcrumb-item
+      onclick={() =>
+        navigate(`/admin/organizers/${contest.ownership.organizerId}/contests`)}
+      ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
+    >
+    <wa-breadcrumb-item onclick={() => navigate(`/admin/contests/${contestId}`)}
+      >{contest.name}</wa-breadcrumb-item
+    >
+    <wa-breadcrumb-item
+      onclick={() => navigate(`/admin/contests/${contestId}#results`)}
+      >Results</wa-breadcrumb-item
+    >
+  </wa-breadcrumb>
 
   <h1>
     {#if contender.disqualified}
