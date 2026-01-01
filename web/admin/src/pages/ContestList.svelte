@@ -159,11 +159,11 @@
 {#snippet listing(heading: string, contests: Contest[], showSummary: boolean = false)}
   {@const totalRegistered = contests.reduce((sum, c) => sum + c.registeredContenders, 0)}
   {@const averageValue = contests.length > 0 ? totalRegistered / contests.length : 0}
-  {@const averageRegistered = averageValue.toFixed(1)}
+  {@const averageRegistered = Math.floor(averageValue)}
   <h3>{heading} ({contests.length})</h3>
   {#if showSummary}
     <p class="contest-summary">
-      {totalRegistered} {totalRegistered === 1 ? "contender" : "contenders"} in total over {contests.length} {contests.length === 1 ? "contest" : "contests"} averaging {averageRegistered} {averageValue === 1 ? "contender" : "contenders"} per contest
+      A total of {totalRegistered} {totalRegistered === 1 ? "contender has" : "contenders have"} participated in {contests.length} {contests.length === 1 ? "contest" : "contests"} averaging {averageRegistered} {averageRegistered === 1 ? "contender" : "contenders"} per contest.
     </p>
   {/if}
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
