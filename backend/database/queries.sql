@@ -87,16 +87,18 @@ ON DUPLICATE KEY UPDATE
     time_end = VALUES(time_end);
 
 -- name: GetContest :one
-SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
+LEFT JOIN contender c ON c.contest_id = contest.id
 WHERE contest.id = ?
 GROUP BY contest.id;
 
 -- name: GetAllContests :many
-SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
+LEFT JOIN contender c ON c.contest_id = contest.id
 GROUP BY contest.id;
 
 -- name: UpsertContest :execlastid
@@ -118,9 +120,10 @@ ON DUPLICATE KEY UPDATE
     created = VALUES(created);
 
 -- name: GetContestsByOrganizer :many
-SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
+LEFT JOIN contender c ON c.contest_id = contest.id
 WHERE contest.organizer_id = ?
 GROUP BY contest.id;
 

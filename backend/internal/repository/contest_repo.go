@@ -29,6 +29,8 @@ func (d *Database) GetContest(ctx context.Context, tx domain.Transaction, contes
 		contest.TimeEnd = timeEnd
 	}
 
+	contest.RegisteredContenders = int(record.RegisteredContenders)
+
 	return contest, nil
 }
 
@@ -50,6 +52,8 @@ func (d *Database) GetAllContests(ctx context.Context, tx domain.Transaction) ([
 		if timeEnd, ok := record.TimeEnd.(time.Time); ok {
 			contest.TimeEnd = timeEnd
 		}
+
+		contest.RegisteredContenders = int(record.RegisteredContenders)
 
 		contests = append(contests, contest)
 	}
@@ -75,6 +79,8 @@ func (d *Database) GetContestsByOrganizer(ctx context.Context, tx domain.Transac
 		if timeEnd, ok := record.TimeEnd.(time.Time); ok {
 			contest.TimeEnd = timeEnd
 		}
+
+		contest.RegisteredContenders = int(record.RegisteredContenders)
 
 		contests = append(contests, contest)
 	}
