@@ -117,12 +117,10 @@
 </script>
 
 {#snippet renderName({ id, name, evaluationMode }: Contest)}
-  <div class="name-cell">
-    <Link to="contests/{id}" class="name-link">{name}</Link>
-    {#if evaluationMode}
-      <wa-badge pill variant="warning" size="small">Evaluation</wa-badge>
-    {/if}
-  </div>
+  <Link to="contests/{id}">{name}</Link>
+  {#if evaluationMode}
+    <wa-badge pill variant="warning" size="small">Evaluation</wa-badge>
+  {/if}
 {/snippet}
 
 {#snippet renderRegisteredContenders({ registeredContenders }: Contest)}
@@ -252,18 +250,22 @@
     margin-block-start: var(--wa-space-xs) var(--wa-space-m);
   }
 
-  .name-cell {
+  :global(tbody tr td:first-of-type) {
+    white-space: normal;
     display: flex;
     align-items: center;
     gap: var(--wa-space-xs);
-    min-width: 0;
   }
 
-  .name-link {
+  :global(tbody tr td:first-of-type a) {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    flex-shrink: 1;
     min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  :global(tbody tr td:first-of-type wa-badge) {
+    flex-shrink: 0;
   }
 </style>
