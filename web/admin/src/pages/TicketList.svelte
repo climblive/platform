@@ -165,7 +165,7 @@
   <div class="dialog-content">
     <wa-callout variant="warning">
       <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
-      Help keep things neat and tidy by only unlocking this for real contests!
+      Help us keep things organized by only unlocking this for real contests.
     </wa-callout>
 
     <p>
