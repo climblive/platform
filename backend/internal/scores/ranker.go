@@ -33,7 +33,23 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 
 	now := time.Now()
 
-	for i, contender := range slices.SortedFunc(contenders, comparator) {
+	sortedContenders := make([]Contender, 0)
+
+	for contender := range contenders {
+		if !contender.Disqualified {
+			sortedContenders = append(sortedContenders, contender)
+		}
+	}
+
+	slices.SortFunc(sortedContenders, comparator)
+
+	for contender := range contenders {
+		if contender.Disqualified {
+			sortedContenders = append(sortedContenders, contender)
+		}
+	}
+
+	for i, contender := range sortedContenders {
 		score := domain.Score{
 			Timestamp:   now,
 			ContenderID: contender.ID,
