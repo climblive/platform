@@ -120,7 +120,7 @@
   <div class="name-cell">
     <Link to="contests/{id}">{name}</Link>
     {#if evaluationMode}
-      <wa-badge variant="warning" size="small">Evaluation</wa-badge>
+      <wa-badge pill variant="warning" size="small">Evaluation</wa-badge>
     {/if}
   </div>
 {/snippet}

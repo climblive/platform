@@ -161,21 +161,16 @@
   </wa-button>
 </wa-dialog>
 
-<wa-dialog bind:this={unlockDialog} label="Unlock evaluation mode">
+<wa-dialog bind:this={unlockDialog} label="Unlock full capacity">
   <div class="dialog-content">
     <wa-callout variant="warning">
       <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
-      <strong>Only unlock for real contests</strong>
+      Help keep things neat and tidy by only unlocking this for real contests!
     </wa-callout>
 
     <p>
-      Evaluation mode limits contests to 10 tickets for testing purposes. Only
-      unlock this for real contests that require more than 10 participants.
-    </p>
-
-    <p>
-      <strong>Are you sure you want to unlock evaluation mode?</strong>
-      This will allow you to create up to 500 tickets for this contest.
+      Evaluation mode limits contests to 10 contenders for testing purposes. By
+      unlocking the full capacity you'll be able to host up to 500 contenders.
     </p>
   </div>
 
