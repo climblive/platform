@@ -83,9 +83,12 @@ func (e *DefaultScoreEngine) Start() {
 			}
 		}
 
-		if !contender.Disqualified {
-			contender.Score = e.rules.CalculateScore(Points(scoredTicks))
+		contender.Score = e.rules.CalculateScore(Points(scoredTicks))
+
+		if contender.Disqualified {
+			contender.Score = 0
 		}
+
 		e.store.SaveContender(contender)
 	}
 
