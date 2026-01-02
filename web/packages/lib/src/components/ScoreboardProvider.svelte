@@ -157,7 +157,7 @@
             placement: 0,
             finalist: false,
             rankOrder,
-            timestamp: new Date(),
+            timestamp: new Date(0),
           };
 
           classEntries.push(contender);
