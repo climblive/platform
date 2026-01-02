@@ -133,7 +133,7 @@
   {#if score?.placement}
     {score.placement}<sup>{ordinalSuperscript(score.placement)}</sup>
   {:else}
-    -
+    <wa-icon name="minus"></wa-icon>
   {/if}
 {/snippet}
 
