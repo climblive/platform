@@ -1,6 +1,8 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
@@ -23,6 +25,7 @@
   let { contestId }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
+  let unlockDialog: WaDialog | undefined = $state();
   let numberInput: WaInput | undefined = $state();
 
   let newTicketsAvailableForPrint = $state(false);
@@ -69,6 +72,18 @@
     }
   };
 
+  const handleOpenUnlockDialog = () => {
+    if (unlockDialog) {
+      unlockDialog.open = true;
+    }
+  };
+
+  const closeUnlockDialog = () => {
+    if (unlockDialog) {
+      unlockDialog.open = false;
+    }
+  };
+
   const handleCreate = () => {
     if (numberInput) {
       const args: CreateContendersArguments = {
@@ -93,6 +108,7 @@
           toastSuccess(
             "Evaluation mode unlocked. You can now create up to 500 tickets.",
           );
+          closeUnlockDialog();
         },
         onError: () => toastError("Failed to unlock evaluation mode."),
       },
@@ -145,6 +161,40 @@
   </wa-button>
 </wa-dialog>
 
+<wa-dialog bind:this={unlockDialog} label="Unlock evaluation mode">
+  <div class="dialog-content">
+    <wa-callout variant="warning">
+      <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
+      <strong>Only unlock for real contests</strong>
+    </wa-callout>
+
+    <p>
+      Evaluation mode limits contests to 10 tickets for testing purposes. Only
+      unlock this for real contests that require more than 10 participants.
+    </p>
+
+    <p>
+      <strong>Are you sure you want to unlock evaluation mode?</strong>
+      This will allow you to create up to 500 tickets for this contest.
+    </p>
+  </div>
+
+  <wa-button slot="footer" appearance="plain" onclick={closeUnlockDialog}
+    >Cancel</wa-button
+  >
+  <wa-button
+    slot="footer"
+    size="small"
+    variant="success"
+    appearance="accent"
+    loading={patchContest.isPending}
+    onclick={handleUnlockEvaluationMode}
+  >
+    <wa-icon slot="start" name="lock-open"></wa-icon>
+    Unlock
+  </wa-button>
+</wa-dialog>
+
 <div class="actions">
   <wa-button
     size="small"
@@ -161,8 +211,7 @@
       size="small"
       variant="success"
       appearance="accent"
-      onclick={handleUnlockEvaluationMode}
-      loading={patchContest.isPending}
+      onclick={handleOpenUnlockDialog}
     >
       <wa-icon slot="start" name="lock-open"></wa-icon>
       Unlock evaluation mode
