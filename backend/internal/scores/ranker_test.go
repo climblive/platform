@@ -154,6 +154,31 @@ func TestBasicRanker(t *testing.T) {
 
 		assert.Equal(t, expected, prettifyAll(scores))
 	})
+
+	t.Run("DisqualifiedContendersLast", func(t *testing.T) {
+		contenders := makeContenders(5)
+		contenders[0].Score = 0
+		contenders[1].Score = 0
+		contenders[2].Score = 0
+		contenders[3].Score = 0
+		contenders[4].Score = 0
+
+		contenders[1].Disqualified = true
+
+		shuffleSlice(contenders)
+
+		scores := ranker.RankContenders(slices.Values(contenders))
+
+		expected := []string{
+			"i:1 p:1 r:0 f:-",
+			"i:3 p:1 r:1 f:-",
+			"i:4 p:1 r:2 f:-",
+			"i:5 p:1 r:3 f:-",
+			"i:2 p:1 r:4 f:-",
+		}
+
+		assert.Equal(t, expected, prettifyAll(scores))
+	})
 }
 
 func shuffleSlice[T any](slice []T) {

@@ -13,6 +13,7 @@
 
   interface Props {
     contestId: number;
+    hideDisqualified?: boolean;
     children?: Snippet<
       [
         {
@@ -24,7 +25,7 @@
     >;
   }
 
-  let { contestId, children }: Props = $props();
+  let { contestId, hideDisqualified = false, children }: Props = $props();
 
   let eventSource: EventSource | undefined;
   let loading = $state(true);
@@ -123,6 +124,10 @@
       if (classEntries === undefined) {
         classEntries = [];
         results.set(contender.compClassId, classEntries);
+      }
+
+      if (hideDisqualified && contender.disqualified) {
+        continue;
       }
 
       if (!contender.score) {
