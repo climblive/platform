@@ -18,6 +18,34 @@ func NewBasicRanker(numberOfFinalists int) *BasicRanker {
 	}
 }
 
+func qualifiedContenders(contenders iter.Seq[Contender]) iter.Seq[Contender] {
+	return func(yield func(Contender) bool) {
+		for contender := range contenders {
+			if contender.Disqualified {
+				continue
+			}
+
+			if !yield(contender) {
+				return
+			}
+		}
+	}
+}
+
+func disqualifiedContenders(contenders iter.Seq[Contender]) iter.Seq[Contender] {
+	return func(yield func(Contender) bool) {
+		for contender := range contenders {
+			if !contender.Disqualified {
+				continue
+			}
+
+			if !yield(contender) {
+				return
+			}
+		}
+	}
+}
+
 func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Score {
 	var scores []domain.Score
 
@@ -33,7 +61,13 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 
 	now := time.Now()
 
-	for i, contender := range slices.SortedFunc(contenders, comparator) {
+	sortedContenders := slices.SortedFunc(qualifiedContenders(contenders), comparator)
+
+	for contender := range disqualifiedContenders(contenders) {
+		sortedContenders = append(sortedContenders, contender)
+	}
+
+	for i, contender := range sortedContenders {
 		score := domain.Score{
 			Timestamp:   now,
 			ContenderID: contender.ID,
