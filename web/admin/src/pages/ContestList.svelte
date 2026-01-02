@@ -118,7 +118,7 @@
 
 {#snippet renderName({ id, name, evaluationMode }: Contest)}
   <div class="name-cell">
-    <Link to="contests/{id}">{name}</Link>
+    <Link to="contests/{id}" class="name-link">{name}</Link>
     {#if evaluationMode}
       <wa-badge pill variant="warning" size="small">Evaluation</wa-badge>
     {/if}
@@ -256,5 +256,14 @@
     display: flex;
     align-items: center;
     gap: var(--wa-space-xs);
+    min-width: 0;
+  }
+
+  .name-link {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 1;
+    min-width: 0;
   }
 </style>

@@ -94,6 +94,26 @@
 
 <UnlockEvaluationModeDialog bind:this={unlockDialog} {contestId} />
 
+{#if contest?.evaluationMode}
+  <wa-callout variant="warning">
+    <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
+    <p>
+      This contest is currently in evaluation mode and is limited to 10
+      contenders. You can unlock the full capacity of 500 contenders by clicking
+      the button below.
+    </p>
+    <wa-button
+      size="small"
+      variant="success"
+      appearance="accent"
+      onclick={handleOpenUnlockDialog}
+    >
+      <wa-icon slot="start" name="lock-open"></wa-icon>
+      Unlock evaluation mode
+    </wa-button>
+  </wa-callout>
+{/if}
+
 <p class="copy">
   Tickets hold unique registration codes, granting contenders access to your
   contest. These tickets may be printed on paper and distributed to the
@@ -150,17 +170,6 @@
     <wa-icon slot="start" name="plus"></wa-icon>
     Create tickets</wa-button
   >
-  {#if contest?.evaluationMode}
-    <wa-button
-      size="small"
-      variant="success"
-      appearance="accent"
-      onclick={handleOpenUnlockDialog}
-    >
-      <wa-icon slot="start" name="lock-open"></wa-icon>
-      Unlock evaluation mode
-    </wa-button>
-  {/if}
   {#if contenders && contenders.length > 0}
     <Link to={`/admin/contests/${contestId}/tickets`}>
       <wa-button appearance="outlined" size="small"
