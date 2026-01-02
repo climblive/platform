@@ -116,12 +116,9 @@
 
   const rebuildStore = () => {
     const results = new Map<number, ScoreboardEntry[]>();
+    const withoutScore: ScoreboardEntry[] = [];
 
     for (const contender of contenders.values()) {
-      if (!contender.score) {
-        continue;
-      }
-
       let classEntries = results.get(contender.compClassId);
 
       if (classEntries === undefined) {
@@ -133,7 +130,41 @@
         continue;
       }
 
-      classEntries.push(contender);
+      if (!contender.score) {
+        withoutScore.push(contender);
+      } else {
+        classEntries.push(contender);
+      }
+    }
+
+    if (withoutScore.length) {
+      for (const [compClassId, classEntries] of results.entries()) {
+        const maxRankOrder = Math.max(
+          ...classEntries.map(({ score }) => score?.rankOrder ?? -1),
+          -1,
+        );
+
+        let rankOrder = maxRankOrder + 1;
+
+        for (const contender of withoutScore) {
+          if (contender.compClassId !== compClassId) {
+            continue;
+          }
+
+          contender.score = {
+            contenderId: contender.contenderId,
+            score: 0,
+            placement: 0,
+            finalist: false,
+            rankOrder,
+            timestamp: new Date(0),
+          };
+
+          classEntries.push(contender);
+
+          rankOrder++;
+        }
+      }
     }
 
     $scoreboard = results;
