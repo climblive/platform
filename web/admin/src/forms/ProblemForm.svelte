@@ -89,6 +89,7 @@
       type="number"
       required
       value={data.number}
+      min={0}
     ></wa-input>
     <div class="colors">
       <div class="pickers">
