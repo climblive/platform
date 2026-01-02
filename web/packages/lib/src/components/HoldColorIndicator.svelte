@@ -12,6 +12,14 @@
   {#if secondary}
     <path d="M0,50 a1,1 0 0,0 100,0" fill={secondary} />
   {/if}
+  <circle
+    cx="50"
+    cy="50"
+    r="45"
+    fill="none"
+    stroke="var(--wa-color-text-normal)"
+    stroke-width="10"
+  />
 </svg>
 
 <style>
