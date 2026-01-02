@@ -156,7 +156,7 @@
             score: 0,
             placement: 0,
             finalist: false,
-            rankOrder: rankOrder,
+            rankOrder,
             timestamp: new Date(),
           };
 
