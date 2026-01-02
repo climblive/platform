@@ -305,7 +305,10 @@
           </wa-tab-panel>
           <wa-tab-panel name="results">
             {#if resultsConnected}
-              <ScoreboardProvider contestId={$session.contestId}>
+              <ScoreboardProvider
+                contestId={$session.contestId}
+                hideDisqualified
+              >
                 {#snippet children({ scoreboard, loading })}
                   <ResultList
                     compClassId={selectedCompClass.id}

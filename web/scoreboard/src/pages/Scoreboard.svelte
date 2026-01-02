@@ -53,7 +53,7 @@
 {#if !contest || !compClasses}
   <Loading />
 {:else}
-  <ScoreboardProvider {contestId}>
+  <ScoreboardProvider {contestId} hideDisqualified>
     {#snippet children({ scoreboard, loading, online })}
       <header data-online={online}>
         <wa-icon name="triangle-exclamation"></wa-icon>Offline
