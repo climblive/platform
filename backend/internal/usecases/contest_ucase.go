@@ -200,6 +200,10 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		contest.GracePeriod = patch.GracePeriod.Value
 	}
 
+	if patch.EvaluationMode.Present {
+		contest.EvaluationMode = patch.EvaluationMode.Value
+	}
+
 	if err := (validators.ContestValidator{}).Validate(contest); err != nil {
 		return mty, errors.Wrap(err, 0)
 	}
@@ -233,6 +237,7 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		Rules:              sanitizationPolicy.Sanitize(tmpl.Rules),
 		GracePeriod:        tmpl.GracePeriod,
 		Created:            time.Now(),
+		EvaluationMode:     tmpl.EvaluationMode,
 	}
 
 	if err := (validators.ContestValidator{}).Validate(contest); err != nil {

@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS `contest` (
   `rules` TEXT NULL,
   `grace_period` INT NOT NULL DEFAULT 300,
   `created` TIMESTAMP NOT NULL DEFAULT '1970-01-01 00:00:01',
+  `evaluation_mode` TINYINT(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_contest_2`
     FOREIGN KEY (`organizer_id`)

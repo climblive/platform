@@ -71,6 +71,7 @@ type Contest struct {
 	TimeEnd              time.Time     `json:"timeEnd,omitzero"`
 	Created              time.Time     `json:"created"`
 	RegisteredContenders int           `json:"registeredContenders"`
+	EvaluationMode       bool          `json:"evaluationMode"`
 }
 
 type ContestTemplate struct {
@@ -82,6 +83,7 @@ type ContestTemplate struct {
 	Finalists          int           `json:"finalists"`
 	Rules              string        `json:"rules,omitempty"`
 	GracePeriod        time.Duration `json:"gracePeriod"`
+	EvaluationMode     bool          `json:"evaluationMode"`
 }
 
 type ContestPatch struct {
@@ -94,6 +96,7 @@ type ContestPatch struct {
 	Finalists          Patch[int]           `json:"finalists,omitzero" tstype:"number"`
 	Rules              Patch[string]        `json:"rules,omitzero" tstype:"string"`
 	GracePeriod        Patch[time.Duration] `json:"gracePeriod,omitzero" tstype:"number"`
+	EvaluationMode     Patch[bool]          `json:"evaluationMode,omitzero" tstype:"boolean"`
 }
 
 type ContestTransferRequest struct {

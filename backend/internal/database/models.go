@@ -45,6 +45,7 @@ type Contest struct {
 	Rules              sql.NullString
 	GracePeriod        int32
 	Created            time.Time
+	EvaluationMode     bool
 }
 
 type Organizer struct {

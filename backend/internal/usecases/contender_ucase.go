@@ -282,7 +282,12 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID doma
 		return nil, errors.Wrap(err, 0)
 	}
 
-	if numberOfContenders+number > 500 {
+	maxContenders := 500
+	if contest.EvaluationMode {
+		maxContenders = 10
+	}
+
+	if numberOfContenders+number > maxContenders {
 		return nil, errors.New(domain.ErrLimitExceeded)
 	}
 
