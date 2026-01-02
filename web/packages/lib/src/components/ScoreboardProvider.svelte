@@ -135,8 +135,8 @@
     if (withoutScore.length) {
       for (const [compClassId, classEntries] of results.entries()) {
         const maxRankOrder = Math.max(
-          ...classEntries.map(({ score }) => score?.rankOrder ?? 0),
-          0,
+          ...classEntries.map(({ score }) => score?.rankOrder ?? -1),
+          -1,
         );
 
         let rankOrder = maxRankOrder + 1;
