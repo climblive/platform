@@ -105,7 +105,7 @@
 </p>
 
 {#if contest?.evaluationMode}
-  <wa-callout variant="warning">
+  <wa-callout variant="warning" class="evaluation-callout">
     <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
     <p>
       This contest is currently in evaluation mode and is limited to 10
@@ -220,5 +220,9 @@
 
   .copy {
     color: var(--wa-color-text-quiet);
+  }
+
+  :global(.evaluation-callout) {
+    margin-block-start: var(--wa-space-m);
   }
 </style>
