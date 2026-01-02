@@ -94,6 +94,16 @@
 
 <UnlockEvaluationModeDialog bind:this={unlockDialog} {contestId} />
 
+<p class="copy">
+  Tickets hold unique registration codes, granting contenders access to your
+  contest. These tickets may be printed on paper and distributed to the
+  contenders on site.
+  {#if contenders && contenders.length > 0}
+    Out of the {contenders.length}
+    tickets that you have created, {registeredContenders} have already been used.
+  {/if}
+</p>
+
 {#if contest?.evaluationMode}
   <wa-callout variant="warning">
     <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
@@ -113,16 +123,6 @@
     </wa-button>
   </wa-callout>
 {/if}
-
-<p class="copy">
-  Tickets hold unique registration codes, granting contenders access to your
-  contest. These tickets may be printed on paper and distributed to the
-  contenders on site.
-  {#if contenders && contenders.length > 0}
-    Out of the {contenders.length}
-    tickets that you have created, {registeredContenders} have already been used.
-  {/if}
-</p>
 
 <wa-dialog bind:this={dialog} label="Create tickets">
   <div class="dialog-content">
