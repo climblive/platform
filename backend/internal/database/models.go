@@ -42,7 +42,7 @@ type Contest struct {
 	Location           sql.NullString
 	QualifyingProblems int32
 	Finalists          int32
-	Rules              sql.NullString
+	Info               sql.NullString
 	GracePeriod        int32
 	Created            time.Time
 }
