@@ -119,6 +119,10 @@ ON DUPLICATE KEY UPDATE
     grace_period = VALUES(grace_period),
     created = VALUES(created);
 
+-- name: DeleteContest :exec
+DELETE FROM contest
+WHERE id = ?;
+
 -- name: GetContestsByOrganizer :many
 SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
 FROM contest
@@ -273,6 +277,10 @@ ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     contest_id = VALUES(contest_id);
 
+-- name: DeleteRaffle :exec
+DELETE FROM raffle
+WHERE id = ?;
+
 -- name: GetRaffleWinners :many
 SELECT sqlc.embed(raffle_winner), contender.name
 FROM raffle_winner
@@ -289,6 +297,10 @@ ON DUPLICATE KEY UPDATE
     raffle_id = VALUES(raffle_id),
     contender_id = VALUES(contender_id),
     timestamp = VALUES(timestamp); 
+
+-- name: DeleteRaffleWinner :exec
+DELETE FROM raffle_winner
+WHERE id = ?;
 
 -- name: GetOrganizerInvitesByOrganizer :many
 SELECT sqlc.embed(organizer_invite), organizer.name

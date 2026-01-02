@@ -201,6 +201,20 @@ export class ApiClient {
     return contestSchema.parse(result.data);
   };
 
+  transferContest = async (contestId: number, newOrganizerId: number) => {
+    const endpoint = `/contests/${contestId}/transfer`;
+
+    const result = await this.axiosInstance.post(
+      endpoint,
+      { newOrganizerId },
+      {
+        headers: this.credentialsProvider?.getAuthHeaders(),
+      },
+    );
+
+    return contestSchema.parse(result.data);
+  };
+
   getContestsByOrganizer = async (organizerId: number) => {
     const endpoint = `/organizers/${organizerId}/contests`;
 

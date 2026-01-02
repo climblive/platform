@@ -61,6 +61,16 @@ func (q *Queries) DeleteContender(ctx context.Context, id int32) error {
 	return err
 }
 
+const deleteContest = `-- name: DeleteContest :exec
+DELETE FROM contest
+WHERE id = ?
+`
+
+func (q *Queries) DeleteContest(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deleteContest, id)
+	return err
+}
+
 const deleteOrganizerInvite = `-- name: DeleteOrganizerInvite :exec
 DELETE FROM organizer_invite
 WHERE id = ?
@@ -78,6 +88,26 @@ WHERE id = ?
 
 func (q *Queries) DeleteProblem(ctx context.Context, id int32) error {
 	_, err := q.db.ExecContext(ctx, deleteProblem, id)
+	return err
+}
+
+const deleteRaffle = `-- name: DeleteRaffle :exec
+DELETE FROM raffle
+WHERE id = ?
+`
+
+func (q *Queries) DeleteRaffle(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deleteRaffle, id)
+	return err
+}
+
+const deleteRaffleWinner = `-- name: DeleteRaffleWinner :exec
+DELETE FROM raffle_winner
+WHERE id = ?
+`
+
+func (q *Queries) DeleteRaffleWinner(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deleteRaffleWinner, id)
 	return err
 }
 

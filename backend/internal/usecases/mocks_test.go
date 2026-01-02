@@ -104,6 +104,11 @@ func (m *repositoryMock) StoreContest(ctx context.Context, tx domain.Transaction
 	}
 }
 
+func (m *repositoryMock) DeleteContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) error {
+	args := m.Called(ctx, tx, contestID)
+	return args.Error(0)
+}
+
 func (m *repositoryMock) GetContestsByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.Contest, error) {
 	args := m.Called(ctx, tx, organizerID)
 	return args.Get(0).([]domain.Contest), args.Error(1)
@@ -219,6 +224,11 @@ func (m *repositoryMock) StoreRaffle(ctx context.Context, tx domain.Transaction,
 	return args.Get(0).(domain.Raffle), args.Error(1)
 }
 
+func (m *repositoryMock) DeleteRaffle(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) error {
+	args := m.Called(ctx, tx, raffleID)
+	return args.Error(0)
+}
+
 func (m *repositoryMock) GetRaffleWinners(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) ([]domain.RaffleWinner, error) {
 	args := m.Called(ctx, tx, raffleID)
 	return args.Get(0).([]domain.RaffleWinner), args.Error(1)
@@ -232,6 +242,11 @@ func (m *repositoryMock) StoreRaffleWinner(ctx context.Context, tx domain.Transa
 	} else {
 		return args.Get(0).(domain.RaffleWinner), args.Error(1)
 	}
+}
+
+func (m *repositoryMock) DeleteRaffleWinner(ctx context.Context, tx domain.Transaction, raffleWinnerID domain.RaffleWinnerID) error {
+	args := m.Called(ctx, tx, raffleWinnerID)
+	return args.Error(0)
 }
 
 func (m *repositoryMock) GetUserByUsername(ctx context.Context, tx domain.Transaction, username string) (domain.User, error) {
@@ -271,6 +286,11 @@ func (m *repositoryMock) GetOrganizerInvitesByOrganizer(ctx context.Context, tx 
 
 func (m *repositoryMock) StoreOrganizerInvite(ctx context.Context, tx domain.Transaction, invite domain.OrganizerInvite) error {
 	args := m.Called(ctx, tx, invite)
+	return args.Error(0)
+}
+
+func (m *repositoryMock) StoreScore(ctx context.Context, tx domain.Transaction, score domain.Score) error {
+	args := m.Called(ctx, tx, score)
 	return args.Error(0)
 }
 

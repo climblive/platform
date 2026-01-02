@@ -24,6 +24,7 @@
   import ResultsList from "./ResultsList.svelte";
   import ScoreEngine from "./ScoreEngine.svelte";
   import TicketList from "./TicketList.svelte";
+  import TransferContest from "./TransferContest.svelte";
 
   interface Props {
     contestId: number;
@@ -171,6 +172,10 @@
           <h3>Actions</h3>
           <div class="actions">
             <DuplicateContest {contestId} />
+            <TransferContest
+              {contestId}
+              organizerId={contest.ownership.organizerId}
+            />
             <ArchiveContest
               {contestId}
               organizerId={contest.ownership.organizerId}
@@ -228,5 +233,6 @@
   .actions {
     display: flex;
     gap: var(--wa-space-xs);
+    flex-wrap: wrap;
   }
 </style>

@@ -96,6 +96,10 @@ type ContestPatch struct {
 	GracePeriod        Patch[time.Duration] `json:"gracePeriod,omitzero" tstype:"number"`
 }
 
+type ContestTransferRequest struct {
+	NewOrganizerID OrganizerID `json:"newOrganizerId"`
+}
+
 type Organizer struct {
 	ID        OrganizerID   `json:"id"`
 	Ownership OwnershipData `json:"-"`

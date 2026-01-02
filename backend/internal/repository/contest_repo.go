@@ -154,3 +154,12 @@ func (d *Database) StoreContest(ctx context.Context, tx domain.Transaction, cont
 
 	return contest, err
 }
+
+func (d *Database) DeleteContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) error {
+	err := d.WithTx(tx).DeleteContest(ctx, int32(contestID))
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	return nil
+}
