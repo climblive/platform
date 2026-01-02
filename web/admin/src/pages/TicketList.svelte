@@ -223,6 +223,6 @@
   }
 
   :global(.evaluation-callout) {
-    margin-block-start: var(--wa-space-m);
+    margin-block-end: var(--wa-space-m);
   }
 </style>
