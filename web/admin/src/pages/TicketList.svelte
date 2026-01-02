@@ -1,4 +1,5 @@
 <script lang="ts">
+  import UnlockEvaluationModeDialog from "@/components/UnlockEvaluationModeDialog.svelte";
   import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
@@ -13,9 +14,8 @@
     createContendersMutation,
     getContendersByContestQuery,
     getContestQuery,
-    patchContestMutation,
   } from "@climblive/lib/queries";
-  import { toastError, toastSuccess } from "@climblive/lib/utils";
+  import { toastError } from "@climblive/lib/utils";
   import { Link } from "svelte-routing";
 
   interface Props {
@@ -25,7 +25,7 @@
   let { contestId }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
-  let unlockDialog: WaDialog | undefined = $state();
+  let unlockDialog: UnlockEvaluationModeDialog | undefined = $state();
   let numberInput: WaInput | undefined = $state();
 
   let newTicketsAvailableForPrint = $state(false);
@@ -33,7 +33,6 @@
   const contestQuery = $derived(getContestQuery(contestId));
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
   const createContenders = $derived(createContendersMutation(contestId));
-  const patchContest = $derived(patchContestMutation(contestId));
 
   let contest = $derived(contestQuery.data);
   let contenders = $derived(contendersQuery.data);
@@ -73,15 +72,7 @@
   };
 
   const handleOpenUnlockDialog = () => {
-    if (unlockDialog) {
-      unlockDialog.open = true;
-    }
-  };
-
-  const closeUnlockDialog = () => {
-    if (unlockDialog) {
-      unlockDialog.open = false;
-    }
+    unlockDialog?.open();
   };
 
   const handleCreate = () => {
@@ -99,22 +90,9 @@
       });
     }
   };
-
-  const handleUnlockEvaluationMode = () => {
-    patchContest.mutate(
-      { evaluationMode: false },
-      {
-        onSuccess: () => {
-          toastSuccess(
-            "Evaluation mode unlocked. You can now create up to 500 tickets.",
-          );
-          closeUnlockDialog();
-        },
-        onError: () => toastError("Failed to unlock evaluation mode."),
-      },
-    );
-  };
 </script>
+
+<UnlockEvaluationModeDialog bind:this={unlockDialog} {contestId} />
 
 <p class="copy">
   Tickets hold unique registration codes, granting contenders access to your
@@ -158,35 +136,6 @@
     type="submit"
   >
     Create
-  </wa-button>
-</wa-dialog>
-
-<wa-dialog bind:this={unlockDialog} label="Unlock full capacity">
-  <div class="dialog-content">
-    <wa-callout variant="warning">
-      <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
-      Help us keep things organized by only unlocking this for real contests.
-    </wa-callout>
-
-    <p>
-      Evaluation mode limits contests to 10 contenders for testing purposes. By
-      unlocking the full capacity you'll be able to host up to 500 contenders.
-    </p>
-  </div>
-
-  <wa-button slot="footer" appearance="plain" onclick={closeUnlockDialog}
-    >Cancel</wa-button
-  >
-  <wa-button
-    slot="footer"
-    size="small"
-    variant="success"
-    appearance="accent"
-    loading={patchContest.isPending}
-    onclick={handleUnlockEvaluationMode}
-  >
-    <wa-icon slot="start" name="lock-open"></wa-icon>
-    Unlock
   </wa-button>
 </wa-dialog>
 
