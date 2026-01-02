@@ -87,6 +87,7 @@ export interface Contest {
   timeBegin?: Date;
   timeEnd?: Date;
   created: Date;
+  registeredContenders: number /* int */;
 }
 export interface ContestTemplate {
   location?: string;

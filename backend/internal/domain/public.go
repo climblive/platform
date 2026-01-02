@@ -56,20 +56,21 @@ type ContenderPatch struct {
 }
 
 type Contest struct {
-	ID                 ContestID     `json:"id"`
-	Ownership          OwnershipData `json:"ownership"`
-	Archived           bool          `json:"archived"`
-	Location           string        `json:"location,omitempty"`
-	SeriesID           SeriesID      `json:"seriesId,omitempty"`
-	Name               string        `json:"name"`
-	Description        string        `json:"description,omitempty"`
-	QualifyingProblems int           `json:"qualifyingProblems"`
-	Finalists          int           `json:"finalists"`
-	Rules              string        `json:"rules,omitempty"`
-	GracePeriod        time.Duration `json:"gracePeriod"`
-	TimeBegin          time.Time     `json:"timeBegin,omitzero"`
-	TimeEnd            time.Time     `json:"timeEnd,omitzero"`
-	Created            time.Time     `json:"created"`
+	ID                   ContestID     `json:"id"`
+	Ownership            OwnershipData `json:"ownership"`
+	Archived             bool          `json:"archived"`
+	Location             string        `json:"location,omitempty"`
+	SeriesID             SeriesID      `json:"seriesId,omitempty"`
+	Name                 string        `json:"name"`
+	Description          string        `json:"description,omitempty"`
+	QualifyingProblems   int           `json:"qualifyingProblems"`
+	Finalists            int           `json:"finalists"`
+	Rules                string        `json:"rules,omitempty"`
+	GracePeriod          time.Duration `json:"gracePeriod"`
+	TimeBegin            time.Time     `json:"timeBegin,omitzero"`
+	TimeEnd              time.Time     `json:"timeEnd,omitzero"`
+	Created              time.Time     `json:"created"`
+	RegisteredContenders int           `json:"registeredContenders"`
 }
 
 type ContestTemplate struct {

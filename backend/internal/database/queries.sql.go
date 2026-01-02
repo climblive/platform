@@ -123,16 +123,18 @@ func (q *Queries) DeleteTick(ctx context.Context, id int32) error {
 }
 
 const getAllContests = `-- name: GetAllContests :many
-SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.qualifying_problems, contest.finalists, contest.rules, contest.grace_period, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.qualifying_problems, contest.finalists, contest.rules, contest.grace_period, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
+LEFT JOIN contender c ON c.contest_id = contest.id
 GROUP BY contest.id
 `
 
 type GetAllContestsRow struct {
-	Contest   Contest
-	TimeBegin interface{}
-	TimeEnd   interface{}
+	Contest              Contest
+	TimeBegin            interface{}
+	TimeEnd              interface{}
+	RegisteredContenders int64
 }
 
 func (q *Queries) GetAllContests(ctx context.Context) ([]GetAllContestsRow, error) {
@@ -159,6 +161,7 @@ func (q *Queries) GetAllContests(ctx context.Context) ([]GetAllContestsRow, erro
 			&i.Contest.Created,
 			&i.TimeBegin,
 			&i.TimeEnd,
+			&i.RegisteredContenders,
 		); err != nil {
 			return nil, err
 		}
@@ -462,17 +465,19 @@ func (q *Queries) GetContendersByContest(ctx context.Context, contestID int32) (
 }
 
 const getContest = `-- name: GetContest :one
-SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.qualifying_problems, contest.finalists, contest.rules, contest.grace_period, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.qualifying_problems, contest.finalists, contest.rules, contest.grace_period, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
+LEFT JOIN contender c ON c.contest_id = contest.id
 WHERE contest.id = ?
 GROUP BY contest.id
 `
 
 type GetContestRow struct {
-	Contest   Contest
-	TimeBegin interface{}
-	TimeEnd   interface{}
+	Contest              Contest
+	TimeBegin            interface{}
+	TimeEnd              interface{}
+	RegisteredContenders int64
 }
 
 func (q *Queries) GetContest(ctx context.Context, id int32) (GetContestRow, error) {
@@ -493,22 +498,25 @@ func (q *Queries) GetContest(ctx context.Context, id int32) (GetContestRow, erro
 		&i.Contest.Created,
 		&i.TimeBegin,
 		&i.TimeEnd,
+		&i.RegisteredContenders,
 	)
 	return i, err
 }
 
 const getContestsByOrganizer = `-- name: GetContestsByOrganizer :many
-SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.qualifying_problems, contest.finalists, contest.rules, contest.grace_period, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.qualifying_problems, contest.finalists, contest.rules, contest.grace_period, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
+LEFT JOIN contender c ON c.contest_id = contest.id
 WHERE contest.organizer_id = ?
 GROUP BY contest.id
 `
 
 type GetContestsByOrganizerRow struct {
-	Contest   Contest
-	TimeBegin interface{}
-	TimeEnd   interface{}
+	Contest              Contest
+	TimeBegin            interface{}
+	TimeEnd              interface{}
+	RegisteredContenders int64
 }
 
 func (q *Queries) GetContestsByOrganizer(ctx context.Context, organizerID int32) ([]GetContestsByOrganizerRow, error) {
@@ -535,6 +543,7 @@ func (q *Queries) GetContestsByOrganizer(ctx context.Context, organizerID int32)
 			&i.Contest.Created,
 			&i.TimeBegin,
 			&i.TimeEnd,
+			&i.RegisteredContenders,
 		); err != nil {
 			return nil, err
 		}

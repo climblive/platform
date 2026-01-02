@@ -94,6 +94,13 @@
       render: renderTimeEnd,
       width: "max-content",
     },
+    {
+      label: "Registered",
+      mobile: false,
+      render: renderRegisteredContenders,
+      width: "max-content",
+      align: "right",
+    },
   ];
 
   const handleToggleArchive = () => {
@@ -110,6 +117,10 @@
 
 {#snippet renderName({ id, name }: Contest)}
   <Link to="contests/{id}">{name}</Link>
+{/snippet}
+
+{#snippet renderRegisteredContenders({ registeredContenders }: Contest)}
+  {registeredContenders}
 {/snippet}
 
 {#snippet renderTimeBegin({ timeBegin, timeEnd }: Contest)}
@@ -146,8 +157,29 @@
   {@render createButton("create-contest-button")}
 {/if}
 
-{#snippet listing(heading: string, contests: Contest[])}
-  <h3>{heading}</h3>
+{#snippet listing(
+  heading: string,
+  contests: Contest[],
+  showSummary: boolean = false,
+)}
+  {@const totalRegistered = contests.reduce(
+    (sum, c) => sum + c.registeredContenders,
+    0,
+  )}
+  {@const averageRegistered = Math.floor(
+    contests.length > 0 ? totalRegistered / contests.length : 0,
+  )}
+
+  <h3>{heading} ({contests.length})</h3>
+  {#if showSummary}
+    <p class="contest-summary">
+      A total of {totalRegistered}
+      {totalRegistered === 1 ? "contender has" : "contenders have"} participated in
+      {contests.length}
+      {contests.length === 1 ? "contest" : "contests"} averaging {averageRegistered}
+      {averageRegistered === 1 ? "contender" : "contenders"} per contest.
+    </p>
+  {/if}
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
 {/snippet}
 
@@ -163,7 +195,7 @@
   {/if}
 
   {#if past?.length}
-    {@render listing("Past", past)}
+    {@render listing("Past", past, true)}
   {/if}
 
   {#if contests && numberOfUnarchivedContests === 0}
@@ -206,5 +238,11 @@
   .toggle-archived-button {
     display: block;
     margin-block-start: var(--wa-space-m);
+  }
+
+  .contest-summary {
+    color: var(--wa-color-text-quiet);
+    font-size: var(--wa-font-size-s);
+    margin-block-start: var(--wa-space-xs) var(--wa-space-m);
   }
 </style>
