@@ -120,25 +120,25 @@ export const transferContestMutation = (contestId: number) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
-    mutationFn: (newOrganizerID: number) =>
-      ApiClient.getInstance().transferContest(contestId, newOrganizerID),
-    onSuccess: (transferredContest, newOrganizerID) => {
-      const oldOrganizerID = transferredContest.ownership.organizerId;
+    mutationFn: (newOrganizerId: number) =>
+      ApiClient.getInstance().transferContest(contestId, newOrganizerId),
+    onSuccess: (transferredContest, newOrganizerId) => {
+      const oldOrganizerId = transferredContest.ownership.organizerId;
 
-      let queryKey: QueryKey = ["contests", { organizerId: oldOrganizerID }];
+      let queryKey: QueryKey = ["contests", { organizerId: oldOrganizerId }];
 
-      client.setQueryData<Contest[]>(queryKey, (oldContests) => {
-        if (oldContests === undefined) {
+      client.setQueryData<Contest[]>(queryKey, (contests) => {
+        if (contests === undefined) {
           return undefined;
         }
 
-        return oldContests.filter(({ id }) => id !== contestId);
+        return contests.filter(({ id }) => id !== contestId);
       });
 
-      queryKey = ["contests", { organizerId: newOrganizerID }];
+      queryKey = ["contests", { organizerId: newOrganizerId }];
 
-      client.setQueryData<Contest[]>(queryKey, (oldContests) => {
-        return [...(oldContests ?? []), transferredContest];
+      client.setQueryData<Contest[]>(queryKey, (contests) => {
+        return [...(contests ?? []), transferredContest];
       });
 
       queryKey = ["contest", { id: contestId }];

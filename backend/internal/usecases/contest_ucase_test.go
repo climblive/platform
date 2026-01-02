@@ -3,6 +3,7 @@ package usecases_test
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"testing"
 	"testing/synctest"
 	"time"
@@ -719,14 +720,14 @@ func TestTransferContest(t *testing.T) {
 		GracePeriod:        30 * time.Minute,
 		TimeBegin:          timeBegin,
 		TimeEnd:            timeEnd,
-		Created:            now,
+		Created:            now.Add(time.Duration(rand.Int())),
 	}
 
 	fakedCompClass := domain.CompClass{
 		ID:          fakedCompClassID,
 		Ownership:   fakedOldOwnership,
 		ContestID:   fakedContestID,
-		Name:        "Open Males",
+		Name:        "Males",
 		Description: "Male competitors",
 		TimeBegin:   timeBegin,
 		TimeEnd:     timeEnd,
@@ -749,7 +750,7 @@ func TestTransferContest(t *testing.T) {
 	}
 
 	fakedScore := domain.Score{
-		Timestamp:   now,
+		Timestamp:   now.Add(time.Duration(rand.Int())),
 		ContenderID: fakedContenderID,
 		Score:       10,
 		Placement:   3,
@@ -764,7 +765,7 @@ func TestTransferContest(t *testing.T) {
 		CompClassID:         fakedCompClassID,
 		RegistrationCode:    "ABCD1234",
 		Name:                "John Doe",
-		Entered:             now,
+		Entered:             now.Add(time.Duration(rand.Int())),
 		WithdrawnFromFinals: true,
 		Disqualified:        true,
 		Score:               &fakedScore,
@@ -782,13 +783,13 @@ func TestTransferContest(t *testing.T) {
 		RaffleID:      fakedRaffleID,
 		ContenderID:   fakedContenderID,
 		ContenderName: "John Doe",
-		Timestamp:     now,
+		Timestamp:     now.Add(time.Duration(rand.Int())),
 	}
 
 	fakedTick := domain.Tick{
 		ID:            fakedTickID,
 		Ownership:     domain.OwnershipData{OrganizerID: fakedOldOrganizerID, ContenderID: &fakedContenderID},
-		Timestamp:     now,
+		Timestamp:     now.Add(time.Duration(rand.Int())),
 		ContestID:     fakedContestID,
 		ProblemID:     fakedProblemID,
 		Zone1:         true,
@@ -867,7 +868,7 @@ func TestTransferContest(t *testing.T) {
 				GracePeriod:        30 * time.Minute,
 				TimeBegin:          fakedContest.TimeBegin,
 				TimeEnd:            fakedContest.TimeEnd,
-				Created:            now,
+				Created:            fakedContest.Created,
 			}).
 			Return(domain.Contest{}, nil)
 
@@ -876,7 +877,7 @@ func TestTransferContest(t *testing.T) {
 				ID:          fakedCompClassID,
 				Ownership:   fakedNewOwnership,
 				ContestID:   fakedContestID,
-				Name:        "Open Males",
+				Name:        "Males",
 				Description: "Male competitors",
 				TimeBegin:   fakedCompClass.TimeBegin,
 				TimeEnd:     fakedCompClass.TimeEnd,

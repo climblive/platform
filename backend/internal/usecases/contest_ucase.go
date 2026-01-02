@@ -438,7 +438,7 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 		return nil
 	}
 
-	transfer := func() error {
+	recreate := func() error {
 		_, err := uc.Repo.StoreContest(ctx, tx, contest)
 		if err != nil {
 			return err
@@ -531,7 +531,7 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 		ticks[index].Ownership.OrganizerID = newOrganizerID
 	}
 
-	err = transfer()
+	err = recreate()
 	if err != nil {
 		tx.Rollback()
 		return domain.Contest{}, errors.Wrap(err, 0)

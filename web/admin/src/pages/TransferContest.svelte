@@ -51,10 +51,7 @@
     }
 
     transferContest.mutate(selectedOrganizerId, {
-      onSuccess: () => {
-        handleCancel();
-        navigate(`./organizers/${selectedOrganizerId}/contests`);
-      },
+      onSuccess: () => navigate(`./organizers/${selectedOrganizerId}/contests`),
       onError: () => toastError("Failed to transfer contest."),
     });
   };
@@ -65,21 +62,18 @@
   };
 </script>
 
-<div class="actions">
-  <wa-button
-    onclick={handleTransfer}
-    appearance="outlined"
-    disabled={otherOrganizers.length === 0}
-  >
-    Transfer
-    <wa-icon name="arrow-right" slot="start"></wa-icon>
-  </wa-button>
-</div>
+<wa-button
+  onclick={handleTransfer}
+  appearance="outlined"
+  disabled={otherOrganizers.length === 0}
+>
+  Transfer
+  <wa-icon name="arrow-right" slot="start"></wa-icon>
+</wa-button>
 
 <wa-dialog bind:this={dialog} label="Transfer contest">
   <wa-select
     label="Select new organizer"
-    hide-label
     onchange={handleSelect}
     {@attach value(selectedOrganizerId)}
     hint="Select one of the other organizers you belong to."
@@ -120,7 +114,7 @@
     variant="warning"
     onclick={confirmTransfer}
     loading={transferContest.isPending}
-    disabled={selectedOrganizerId === undefined || otherOrganizers.length === 0}
+    disabled={selectedOrganizerId === undefined}
   >
     Transfer
     <wa-icon slot="start" name="arrow-right"></wa-icon>
