@@ -155,15 +155,11 @@
             timestamp: new Date(),
           };
 
+          classEntries.push(contender);
+
           rankOrder++;
         }
       }
-    }
-
-    for (const contender of withoutScore) {
-      const classEntries = results.get(contender.compClassId)!;
-
-      classEntries.push(contender);
     }
 
     $scoreboard = results;
