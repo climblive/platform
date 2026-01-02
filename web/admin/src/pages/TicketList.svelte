@@ -90,7 +90,9 @@
       { evaluationMode: false },
       {
         onSuccess: () => {
-          toastSuccess("Evaluation mode unlocked. You can now create up to 500 tickets.");
+          toastSuccess(
+            "Evaluation mode unlocked. You can now create up to 500 tickets.",
+          );
         },
         onError: () => toastError("Failed to unlock evaluation mode."),
       },

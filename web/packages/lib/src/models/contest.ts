@@ -18,4 +18,5 @@ export const contestSchema: z.ZodType<Contest> = z.object({
   timeEnd: z.coerce.date().optional(),
   created: z.coerce.date(),
   registeredContenders: z.number(),
+  evaluationMode: z.boolean(),
 });

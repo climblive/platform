@@ -10,6 +10,7 @@
     finalists: z.coerce.number().min(0).max(65536),
     rules: z.string().optional(),
     gracePeriod: z.coerce.number().min(0).max(60),
+    evaluationMode: z.boolean().default(true),
   });
 
   export const minuteInNanoseconds = 60 * 1_000_000_000;
