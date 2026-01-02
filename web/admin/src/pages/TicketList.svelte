@@ -10,11 +10,11 @@
   import {
     createContendersMutation,
     getContendersByContestQuery,
+    getContestQuery,
+    patchContestMutation,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastError, toastSuccess } from "@climblive/lib/utils";
   import { Link } from "svelte-routing";
-
-  const maxTickets = 500;
 
   interface Props {
     contestId: number;
@@ -27,10 +27,15 @@
 
   let newTicketsAvailableForPrint = $state(false);
 
+  const contestQuery = $derived(getContestQuery(contestId));
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
   const createContenders = $derived(createContendersMutation(contestId));
+  const patchContest = $derived(patchContestMutation(contestId));
 
+  let contest = $derived(contestQuery.data);
   let contenders = $derived(contendersQuery.data);
+
+  let maxTickets = $derived(contest?.evaluationMode ? 10 : 500);
 
   let remainingCodes = $derived(
     contenders === undefined ? undefined : maxTickets - contenders.length,
@@ -78,6 +83,18 @@
         onError: () => toastError("Failed to create tickets."),
       });
     }
+  };
+
+  const handleUnlockEvaluationMode = () => {
+    patchContest.mutate(
+      { evaluationMode: false },
+      {
+        onSuccess: () => {
+          toastSuccess("Evaluation mode unlocked. You can now create up to 500 tickets.");
+        },
+        onError: () => toastError("Failed to unlock evaluation mode."),
+      },
+    );
   };
 </script>
 
@@ -137,6 +154,18 @@
     <wa-icon slot="start" name="plus"></wa-icon>
     Create tickets</wa-button
   >
+  {#if contest?.evaluationMode}
+    <wa-button
+      size="small"
+      variant="success"
+      appearance="accent"
+      onclick={handleUnlockEvaluationMode}
+      loading={patchContest.isPending}
+    >
+      <wa-icon slot="start" name="lock-open"></wa-icon>
+      Unlock evaluation mode
+    </wa-button>
+  {/if}
   {#if contenders && contenders.length > 0}
     <Link to={`/admin/contests/${contestId}/tickets`}>
       <wa-button appearance="outlined" size="small"

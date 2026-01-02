@@ -111,6 +111,13 @@
         <wa-tab slot="nav" panel="raffles">Raffles</wa-tab>
 
         <wa-tab-panel name="contest">
+          {#if contest.evaluationMode}
+            <wa-callout variant="warning">
+              <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
+              This contest is in evaluation mode and is limited to 10 tickets.
+              You can unlock the full capacity of 500 tickets below.
+            </wa-callout>
+          {/if}
           <article>
             <wa-button
               size="small"
