@@ -109,7 +109,7 @@ func (d *Database) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context,
 			Location:           record.Location,
 			QualifyingProblems: record.QualifyingProblems,
 			Finalists:          record.Finalists,
-			Rules:              record.Rules,
+			Info:               record.Info,
 			GracePeriod:        record.GracePeriod,
 		})
 
@@ -138,7 +138,7 @@ func (d *Database) StoreContest(ctx context.Context, tx domain.Transaction, cont
 		Location:           makeNullString(contest.Location),
 		QualifyingProblems: int32(contest.QualifyingProblems),
 		Finalists:          int32(contest.Finalists),
-		Rules:              makeNullString(contest.Rules),
+		Info:               makeNullString(contest.Info),
 		GracePeriod:        int32(contest.GracePeriod / time.Minute),
 		Created:            contest.Created,
 	}

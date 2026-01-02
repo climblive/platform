@@ -192,8 +192,8 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		contest.Finalists = patch.Finalists.Value
 	}
 
-	if patch.Rules.Present {
-		contest.Rules = sanitizationPolicy.Sanitize(patch.Rules.Value)
+	if patch.Info.Present {
+		contest.Info = sanitizationPolicy.Sanitize(patch.Info.Value)
 	}
 
 	if patch.GracePeriod.Present {
@@ -230,7 +230,7 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		Description:        strings.TrimSpace(tmpl.Description),
 		QualifyingProblems: tmpl.QualifyingProblems,
 		Finalists:          tmpl.Finalists,
-		Rules:              sanitizationPolicy.Sanitize(tmpl.Rules),
+		Info:               sanitizationPolicy.Sanitize(tmpl.Info),
 		GracePeriod:        tmpl.GracePeriod,
 		Created:            time.Now(),
 	}

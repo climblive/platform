@@ -12,7 +12,7 @@ export const contestSchema: z.ZodType<Contest> = z.object({
   description: z.string().optional(),
   qualifyingProblems: z.number(),
   finalists: z.number(),
-  rules: z.string().optional(),
+  info: z.string().optional(),
   gracePeriod: z.number(),
   timeBegin: z.coerce.date().optional(),
   timeEnd: z.coerce.date().optional(),
