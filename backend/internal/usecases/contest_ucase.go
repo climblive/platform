@@ -237,7 +237,7 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		Rules:              sanitizationPolicy.Sanitize(tmpl.Rules),
 		GracePeriod:        tmpl.GracePeriod,
 		Created:            time.Now(),
-		EvaluationMode:     tmpl.EvaluationMode,
+		EvaluationMode:     true,
 	}
 
 	if err := (validators.ContestValidator{}).Validate(contest); err != nil {

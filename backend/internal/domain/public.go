@@ -83,7 +83,6 @@ type ContestTemplate struct {
 	Finalists          int           `json:"finalists"`
 	Rules              string        `json:"rules,omitempty"`
 	GracePeriod        time.Duration `json:"gracePeriod"`
-	EvaluationMode     bool          `json:"evaluationMode"`
 }
 
 type ContestPatch struct {

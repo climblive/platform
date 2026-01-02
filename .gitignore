@@ -15,10 +15,6 @@ dist-ssr
 .pnpm-store
 __debug_bin*
 
-# Go binaries
-backend/api
-backend/simulator
-
 # Editor directories and files
 !.vscode/extensions.json
 .idea

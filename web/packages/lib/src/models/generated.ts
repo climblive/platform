@@ -99,7 +99,6 @@ export interface ContestTemplate {
   finalists: number /* int */;
   rules?: string;
   gracePeriod: number;
-  evaluationMode: boolean;
 }
 export interface ContestPatch {
   archived?: boolean;

@@ -43,7 +43,6 @@
     qualifyingProblems: 10,
     gracePeriod: 15 * minuteInNanoseconds,
     rules: "",
-    evaluationMode: true,
   }}
   schema={formSchema}
 >
