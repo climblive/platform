@@ -10,17 +10,10 @@ import (
 	"github.com/go-errors/errors"
 )
 
-func (d *Database) CreateUnlockRequest(ctx context.Context, tx domain.Transaction, template domain.UnlockRequestTemplate, requestedByUserID domain.UserID, organizerID domain.OrganizerID) (domain.UnlockRequestID, error) {
-	reason := sql.NullString{}
-	if template.Reason != "" {
-		reason = sql.NullString{String: template.Reason, Valid: true}
-	}
-
+func (d *Database) CreateUnlockRequest(ctx context.Context, tx domain.Transaction, template domain.UnlockRequestTemplate, organizerID domain.OrganizerID) (domain.UnlockRequestID, error) {
 	id, err := d.WithTx(tx).CreateUnlockRequest(ctx, database.CreateUnlockRequestParams{
-		ContestID:         int32(template.ContestID),
-		OrganizerID:       int32(organizerID),
-		RequestedByUserID: int32(requestedByUserID),
-		Reason:            reason,
+		ContestID:   int32(template.ContestID),
+		OrganizerID: int32(organizerID),
 	})
 	if err != nil {
 		return 0, errors.Wrap(err, 0)
@@ -83,20 +76,13 @@ func (d *Database) GetPendingUnlockRequests(ctx context.Context, tx domain.Trans
 	return requests, nil
 }
 
-func (d *Database) UpdateUnlockRequestStatus(ctx context.Context, tx domain.Transaction, id domain.UnlockRequestID, review domain.UnlockRequestReview, reviewedByUserID domain.UserID) error {
+func (d *Database) UpdateUnlockRequestStatus(ctx context.Context, tx domain.Transaction, id domain.UnlockRequestID, review domain.UnlockRequestReview) error {
 	reviewedAt := sql.NullTime{Time: time.Now(), Valid: true}
-	reviewerID := sql.NullInt32{Int32: int32(reviewedByUserID), Valid: true}
-	reviewNote := sql.NullString{}
-	if review.ReviewNote != "" {
-		reviewNote = sql.NullString{String: review.ReviewNote, Valid: true}
-	}
 
 	err := d.WithTx(tx).UpdateUnlockRequestStatus(ctx, database.UpdateUnlockRequestStatusParams{
-		Status:             database.UnlockRequestStatus(review.Status),
-		ReviewedByUserID:   reviewerID,
-		ReviewedAt:         reviewedAt,
-		ReviewNote:         reviewNote,
-		ID:                 int32(id),
+		Status:     database.UnlockRequestStatus(review.Status),
+		ReviewedAt: reviewedAt,
+		ID:         int32(id),
 	})
 	if err != nil {
 		return errors.Wrap(err, 0)
@@ -116,29 +102,15 @@ func (d *Database) HasApprovedUnlockRequest(ctx context.Context, tx domain.Trans
 
 func unlockRequestToDomain(record database.UnlockRequest) domain.UnlockRequest {
 	request := domain.UnlockRequest{
-		ID:                domain.UnlockRequestID(record.ID),
-		ContestID:         domain.ContestID(record.ContestID),
-		OrganizerID:       domain.OrganizerID(record.OrganizerID),
-		RequestedByUserID: domain.UserID(record.RequestedByUserID),
-		Status:            domain.UnlockRequestStatus(record.Status),
-		CreatedAt:         record.CreatedAt,
-	}
-
-	if record.ReviewedByUserID.Valid {
-		userID := domain.UserID(record.ReviewedByUserID.Int32)
-		request.ReviewedByUserID = &userID
+		ID:          domain.UnlockRequestID(record.ID),
+		ContestID:   domain.ContestID(record.ContestID),
+		OrganizerID: domain.OrganizerID(record.OrganizerID),
+		Status:      domain.UnlockRequestStatus(record.Status),
+		CreatedAt:   record.CreatedAt,
 	}
 
 	if record.ReviewedAt.Valid {
 		request.ReviewedAt = &record.ReviewedAt.Time
-	}
-
-	if record.Reason.Valid {
-		request.Reason = record.Reason.String
-	}
-
-	if record.ReviewNote.Valid {
-		request.ReviewNote = record.ReviewNote.String
 	}
 
 	return request

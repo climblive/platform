@@ -12,13 +12,12 @@ type unlockRequestUseCaseRepository interface {
 
 	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
 	GetOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) (domain.Organizer, error)
-	GetUserByUsername(ctx context.Context, tx domain.Transaction, username string) (domain.User, error)
-	CreateUnlockRequest(ctx context.Context, tx domain.Transaction, template domain.UnlockRequestTemplate, requestedByUserID domain.UserID, organizerID domain.OrganizerID) (domain.UnlockRequestID, error)
+	CreateUnlockRequest(ctx context.Context, tx domain.Transaction, template domain.UnlockRequestTemplate, organizerID domain.OrganizerID) (domain.UnlockRequestID, error)
 	GetUnlockRequest(ctx context.Context, tx domain.Transaction, id domain.UnlockRequestID) (domain.UnlockRequest, error)
 	GetUnlockRequestsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.UnlockRequest, error)
 	GetUnlockRequestsByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.UnlockRequest, error)
 	GetPendingUnlockRequests(ctx context.Context, tx domain.Transaction) ([]domain.UnlockRequest, error)
-	UpdateUnlockRequestStatus(ctx context.Context, tx domain.Transaction, id domain.UnlockRequestID, review domain.UnlockRequestReview, reviewedByUserID domain.UserID) error
+	UpdateUnlockRequestStatus(ctx context.Context, tx domain.Transaction, id domain.UnlockRequestID, review domain.UnlockRequestReview) error
 	HasApprovedUnlockRequest(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) (bool, error)
 	StoreContest(ctx context.Context, tx domain.Transaction, contest domain.Contest) (domain.Contest, error)
 }
@@ -43,20 +42,6 @@ func (uc *UnlockRequestUseCase) CreateUnlockRequest(ctx context.Context, templat
 		return 0, errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 
-	auth, err := uc.Authorizer.GetAuthentication(ctx)
-	if err != nil {
-		return 0, errors.Wrap(err, 0)
-	}
-
-	if auth.Username == "" {
-		return 0, errors.Wrap(domain.ErrNotAuthenticated, 0)
-	}
-
-	user, err := uc.Repo.GetUserByUsername(ctx, nil, auth.Username)
-	if err != nil {
-		return 0, errors.Wrap(err, 0)
-	}
-
 	tx, err := uc.Repo.Begin()
 	if err != nil {
 		return 0, errors.Wrap(err, 0)
@@ -68,17 +53,16 @@ func (uc *UnlockRequestUseCase) CreateUnlockRequest(ctx context.Context, templat
 		return 0, errors.Wrap(err, 0)
 	}
 
-	requestID, err := uc.Repo.CreateUnlockRequest(ctx, tx, template, user.ID, contest.Ownership.OrganizerID)
+	requestID, err := uc.Repo.CreateUnlockRequest(ctx, tx, template, contest.Ownership.OrganizerID)
 	if err != nil {
 		return 0, errors.Wrap(err, 0)
 	}
 
 	if hasApprovedRequest && authRole == domain.OrganizerRole {
 		review := domain.UnlockRequestReview{
-			Status:     domain.UnlockRequestStatusApproved,
-			ReviewNote: "Auto-approved based on previous approval",
+			Status: domain.UnlockRequestStatusApproved,
 		}
-		if err := uc.Repo.UpdateUnlockRequestStatus(ctx, tx, requestID, review, user.ID); err != nil {
+		if err := uc.Repo.UpdateUnlockRequestStatus(ctx, tx, requestID, review); err != nil {
 			return 0, errors.Wrap(err, 0)
 		}
 
@@ -180,20 +164,6 @@ func (uc *UnlockRequestUseCase) ReviewUnlockRequest(ctx context.Context, id doma
 		return domain.ErrNotAuthorized
 	}
 
-	auth, err := uc.Authorizer.GetAuthentication(ctx)
-	if err != nil {
-		return errors.Wrap(err, 0)
-	}
-
-	if auth.Username == "" {
-		return errors.Wrap(domain.ErrNotAuthenticated, 0)
-	}
-
-	user, err := uc.Repo.GetUserByUsername(ctx, nil, auth.Username)
-	if err != nil {
-		return errors.Wrap(err, 0)
-	}
-
 	tx, err := uc.Repo.Begin()
 	if err != nil {
 		return errors.Wrap(err, 0)
@@ -209,7 +179,7 @@ func (uc *UnlockRequestUseCase) ReviewUnlockRequest(ctx context.Context, id doma
 		return errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 
-	if err := uc.Repo.UpdateUnlockRequestStatus(ctx, tx, id, review, user.ID); err != nil {
+	if err := uc.Repo.UpdateUnlockRequestStatus(ctx, tx, id, review); err != nil {
 		return errors.Wrap(err, 0)
 	}
 

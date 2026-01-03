@@ -327,9 +327,9 @@ WHERE id = ?;
 
 -- name: CreateUnlockRequest :execlastid
 INSERT INTO
-    unlock_request (contest_id, organizer_id, requested_by_user_id, reason)
+    unlock_request (contest_id, organizer_id)
 VALUES
-    (?, ?, ?, ?);
+    (?, ?);
 
 -- name: GetUnlockRequest :one
 SELECT *
@@ -358,9 +358,7 @@ ORDER BY created_at ASC;
 UPDATE unlock_request
 SET 
     status = ?,
-    reviewed_by_user_id = ?,
-    reviewed_at = ?,
-    review_note = ?
+    reviewed_at = ?
 WHERE id = ?;
 
 -- name: HasApprovedUnlockRequest :one

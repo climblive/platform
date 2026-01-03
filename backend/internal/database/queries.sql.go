@@ -43,25 +43,18 @@ func (q *Queries) CountContenders(ctx context.Context, contestID int32) (int64, 
 
 const createUnlockRequest = `-- name: CreateUnlockRequest :execlastid
 INSERT INTO
-    unlock_request (contest_id, organizer_id, requested_by_user_id, reason)
+    unlock_request (contest_id, organizer_id)
 VALUES
-    (?, ?, ?, ?)
+    (?, ?)
 `
 
 type CreateUnlockRequestParams struct {
-	ContestID         int32
-	OrganizerID       int32
-	RequestedByUserID int32
-	Reason            sql.NullString
+	ContestID   int32
+	OrganizerID int32
 }
 
 func (q *Queries) CreateUnlockRequest(ctx context.Context, arg CreateUnlockRequestParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, createUnlockRequest,
-		arg.ContestID,
-		arg.OrganizerID,
-		arg.RequestedByUserID,
-		arg.Reason,
-	)
+	result, err := q.db.ExecContext(ctx, createUnlockRequest, arg.ContestID, arg.OrganizerID)
 	if err != nil {
 		return 0, err
 	}
@@ -1414,28 +1407,18 @@ const updateUnlockRequestStatus = `-- name: UpdateUnlockRequestStatus :exec
 UPDATE unlock_request
 SET 
     status = ?,
-    reviewed_by_user_id = ?,
-    reviewed_at = ?,
-    review_note = ?
+    reviewed_at = ?
 WHERE id = ?
 `
 
 type UpdateUnlockRequestStatusParams struct {
-	Status           UnlockRequestStatus
-	ReviewedByUserID sql.NullInt32
-	ReviewedAt       sql.NullTime
-	ReviewNote       sql.NullString
-	ID               int32
+	Status     UnlockRequestStatus
+	ReviewedAt sql.NullTime
+	ID         int32
 }
 
 func (q *Queries) UpdateUnlockRequestStatus(ctx context.Context, arg UpdateUnlockRequestStatusParams) error {
-	_, err := q.db.ExecContext(ctx, updateUnlockRequestStatus,
-		arg.Status,
-		arg.ReviewedByUserID,
-		arg.ReviewedAt,
-		arg.ReviewNote,
-		arg.ID,
-	)
+	_, err := q.db.ExecContext(ctx, updateUnlockRequestStatus, arg.Status, arg.ReviewedAt, arg.ID)
 	return err
 }
 
