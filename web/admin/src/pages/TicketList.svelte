@@ -1,6 +1,9 @@
 <script lang="ts">
+  import RequestFullCapacityDialog from "@/components/RequestFullCapacityDialog.svelte";
   import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
@@ -10,11 +13,11 @@
   import {
     createContendersMutation,
     getContendersByContestQuery,
+    getContestQuery,
+    getUnlockRequestsByContestQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import { Link } from "svelte-routing";
-
-  const maxTickets = 500;
 
   interface Props {
     contestId: number;
@@ -23,14 +26,28 @@
   let { contestId }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
+  let requestDialog: RequestFullCapacityDialog | undefined = $state();
   let numberInput: WaInput | undefined = $state();
 
   let newTicketsAvailableForPrint = $state(false);
 
+  const contestQuery = $derived(getContestQuery(contestId));
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
+  const unlockRequestsQuery = $derived(
+    getUnlockRequestsByContestQuery(contestId),
+  );
   const createContenders = $derived(createContendersMutation(contestId));
 
+  let contest = $derived(contestQuery.data);
   let contenders = $derived(contendersQuery.data);
+  let unlockRequests = $derived(unlockRequestsQuery.data);
+
+  let maxTickets = $derived(contest?.evaluationMode ? 10 : 500);
+
+  let pendingRequest = $derived.by(() => {
+    if (!unlockRequests) return undefined;
+    return unlockRequests.find((req) => req.status === "pending");
+  });
 
   let remainingCodes = $derived(
     contenders === undefined ? undefined : maxTickets - contenders.length,
@@ -64,6 +81,10 @@
     }
   };
 
+  const handleOpenRequestDialog = () => {
+    requestDialog?.open();
+  };
+
   const handleCreate = () => {
     if (numberInput) {
       const args: CreateContendersArguments = {
@@ -81,6 +102,8 @@
   };
 </script>
 
+<RequestFullCapacityDialog bind:this={requestDialog} {contestId} />
+
 <p class="copy">
   Tickets hold unique registration codes, granting contenders access to your
   contest. These tickets may be printed on paper and distributed to the
@@ -90,6 +113,31 @@
     tickets that you have created, {registeredContenders} have already been used.
   {/if}
 </p>
+
+{#if contest?.evaluationMode}
+  <wa-callout variant="warning" class="evaluation-callout">
+    <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
+    <p>
+      This contest is currently in evaluation mode and is limited to 10
+      contenders. You can request full capacity of 500 contenders by clicking the
+      button below.
+    </p>
+    {#if pendingRequest}
+      <wa-badge variant="warning">Request pending</wa-badge>
+      <p>Your request is currently being reviewed.</p>
+    {:else}
+      <wa-button
+        size="small"
+        variant="success"
+        appearance="accent"
+        onclick={handleOpenRequestDialog}
+      >
+        <wa-icon slot="start" name="paper-plane"></wa-icon>
+        Request full capacity
+      </wa-button>
+    {/if}
+  </wa-callout>
+{/if}
 
 <wa-dialog bind:this={dialog} label="Create tickets">
   <div class="dialog-content">
@@ -187,5 +235,9 @@
 
   .copy {
     color: var(--wa-color-text-quiet);
+  }
+
+  :global(.evaluation-callout) {
+    margin-block-end: var(--wa-space-m);
   }
 </style>

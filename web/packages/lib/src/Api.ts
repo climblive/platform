@@ -17,6 +17,8 @@ import {
   type ProblemTemplate,
   type ScoreEngineInstanceID,
   type Tick,
+  type UnlockRequestReview,
+  type UnlockRequestTemplate,
 } from "./models";
 import { compClassSchema } from "./models/compClass";
 import { contenderSchema } from "./models/contender";
@@ -28,6 +30,7 @@ import type {
   CreateContendersArguments,
   StartScoreEngineArguments,
 } from "./models/rest";
+import { unlockRequestSchema } from "./models/unlockRequest";
 import { tickSchema } from "./models/tick";
 import { userSchema } from "./models/user";
 import { getApiUrl } from "./utils/config";
@@ -536,5 +539,58 @@ export class ApiClient {
     });
 
     return result.data;
+  };
+
+  getUnlockRequestsByContest = async (contestId: number) => {
+    const endpoint = `/contests/${contestId}/unlock-requests`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(unlockRequestSchema).parse(result.data);
+  };
+
+  getUnlockRequestsByOrganizer = async (organizerId: number) => {
+    const endpoint = `/organizers/${organizerId}/unlock-requests`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(unlockRequestSchema).parse(result.data);
+  };
+
+  getPendingUnlockRequests = async () => {
+    const endpoint = `/unlock-requests?status=pending`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(unlockRequestSchema).parse(result.data);
+  };
+
+  createUnlockRequest = async (template: UnlockRequestTemplate) => {
+    const endpoint = `/unlock-requests`;
+
+    const result = await this.axiosInstance.post(endpoint, template, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return unlockRequestSchema.parse(result.data);
+  };
+
+  reviewUnlockRequest = async (
+    requestId: number,
+    review: UnlockRequestReview,
+  ) => {
+    const endpoint = `/unlock-requests/${requestId}/review`;
+
+    const result = await this.axiosInstance.patch(endpoint, review, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return unlockRequestSchema.parse(result.data);
   };
 }

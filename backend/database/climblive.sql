@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS `contest` (
   `rules` TEXT NULL,
   `grace_period` INT NOT NULL DEFAULT 300,
   `created` TIMESTAMP NOT NULL DEFAULT '1970-01-01 00:00:01',
+  `evaluation_mode` TINYINT(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_contest_2`
     FOREIGN KEY (`organizer_id`)
@@ -350,6 +351,37 @@ DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
 CREATE INDEX `fk_organizer_invite_1_idx` ON `organizer_invite` (`organizer_id` ASC);
+
+
+-- -----------------------------------------------------
+-- Table `unlock_request`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `unlock_request` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `contest_id` INT NOT NULL,
+  `organizer_id` INT NOT NULL,
+  `status` ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `reviewed_at` TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_unlock_request_contest`
+    FOREIGN KEY (`contest_id`)
+    REFERENCES `contest` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `fk_unlock_request_organizer`
+    FOREIGN KEY (`organizer_id`)
+    REFERENCES `organizer` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT
+) ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_unicode_ci;
+
+CREATE INDEX `fk_unlock_request_contest_idx` ON `unlock_request` (`contest_id` ASC);
+CREATE INDEX `fk_unlock_request_organizer_idx` ON `unlock_request` (`organizer_id` ASC);
+CREATE INDEX `fk_unlock_request_status_idx` ON `unlock_request` (`status` ASC);
+CREATE INDEX `fk_unlock_request_created_idx` ON `unlock_request` (`created_at` DESC);
 
 
 SET SQL_MODE=@OLD_SQL_MODE;

@@ -26,6 +26,14 @@
         <FullLogo />
       </div>
       <wa-button
+        onclick={() => navigate("./unlock-requests")}
+        size="small"
+        variant="warning"
+        appearance="filled-outlined"
+        title="Unlock Requests"
+        ><wa-icon name="lock-open"></wa-icon></wa-button
+      >
+      <wa-button
         onclick={() => navigate("./help")}
         size="small"
         variant="success"

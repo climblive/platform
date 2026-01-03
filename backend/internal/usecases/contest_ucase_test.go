@@ -361,6 +361,7 @@ func TestCreateContest(t *testing.T) {
 						Rules:              "No rules!",
 						GracePeriod:        time.Hour,
 						Created:            time.Now(),
+						EvaluationMode:     true,
 					},
 				).
 				Return(domain.Contest{
@@ -375,6 +376,7 @@ func TestCreateContest(t *testing.T) {
 					Rules:              "No rules!",
 					GracePeriod:        time.Hour,
 					Created:            time.Now(),
+					EvaluationMode:     true,
 				}, nil)
 
 			ucase := usecases.ContestUseCase{

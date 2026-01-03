@@ -1,6 +1,7 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import RelativeTime from "@/components/RelativeTime.svelte";
+  import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import {
@@ -115,8 +116,11 @@
   );
 </script>
 
-{#snippet renderName({ id, name }: Contest)}
+{#snippet renderName({ id, name, evaluationMode }: Contest)}
   <Link to="contests/{id}">{name}</Link>
+  {#if evaluationMode}
+    <wa-badge pill variant="warning" size="small">Evaluation</wa-badge>
+  {/if}
 {/snippet}
 
 {#snippet renderRegisteredContenders({ registeredContenders }: Contest)}
@@ -244,5 +248,24 @@
     color: var(--wa-color-text-quiet);
     font-size: var(--wa-font-size-s);
     margin-block-start: var(--wa-space-xs) var(--wa-space-m);
+  }
+
+  :global(tbody tr td:first-of-type) {
+    white-space: normal;
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-xs);
+  }
+
+  :global(tbody tr td:first-of-type a) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  :global(tbody tr td:first-of-type wa-badge) {
+    flex-shrink: 0;
   }
 </style>
