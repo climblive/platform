@@ -18,6 +18,7 @@
   import RaffleView from "./pages/RaffleView.svelte";
   import Root from "./pages/Root.svelte";
   import TicketsListPage from "./pages/TicketsListPage.svelte";
+  import UnlockRequestsPage from "./pages/UnlockRequestsPage.svelte";
 </script>
 
 <Header />
@@ -39,6 +40,9 @@
     </Route>
     <Route path="/help">
       <Help />
+    </Route>
+    <Route path="/unlock-requests">
+      <UnlockRequestsPage />
     </Route>
     <Route path="/organizers/:organizerId/contests">
       {#snippet children({ params }: { params: { organizerId: number } })}
