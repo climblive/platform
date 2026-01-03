@@ -324,3 +324,46 @@ VALUES
 -- name: DeleteOrganizerInvite :exec
 DELETE FROM organizer_invite
 WHERE id = ?;
+
+-- name: CreateUnlockRequest :execlastid
+INSERT INTO
+    unlock_request (contest_id, organizer_id, requested_by_user_id, reason)
+VALUES
+    (?, ?, ?, ?);
+
+-- name: GetUnlockRequest :one
+SELECT *
+FROM unlock_request
+WHERE id = ?;
+
+-- name: GetUnlockRequestsByContest :many
+SELECT *
+FROM unlock_request
+WHERE contest_id = ?
+ORDER BY created_at DESC;
+
+-- name: GetUnlockRequestsByOrganizer :many
+SELECT *
+FROM unlock_request
+WHERE organizer_id = ?
+ORDER BY created_at DESC;
+
+-- name: GetPendingUnlockRequests :many
+SELECT *
+FROM unlock_request
+WHERE status = 'pending'
+ORDER BY created_at ASC;
+
+-- name: UpdateUnlockRequestStatus :exec
+UPDATE unlock_request
+SET 
+    status = ?,
+    reviewed_by_user_id = ?,
+    reviewed_at = ?,
+    review_note = ?
+WHERE id = ?;
+
+-- name: HasApprovedUnlockRequest :one
+SELECT COUNT(*) > 0 as has_approved
+FROM unlock_request
+WHERE organizer_id = ? AND status = 'approved';

@@ -102,6 +102,40 @@ type ContestTransferRequest struct {
 	NewOrganizerID OrganizerID `json:"newOrganizerId"`
 }
 
+type UnlockRequestStatus string
+
+const (
+	UnlockRequestStatusPending  UnlockRequestStatus = "pending"
+	UnlockRequestStatusApproved UnlockRequestStatus = "approved"
+	UnlockRequestStatusRejected UnlockRequestStatus = "rejected"
+)
+
+type UnlockRequest struct {
+	ID                 UnlockRequestID     `json:"id"`
+	ContestID          ContestID           `json:"contestId"`
+	OrganizerID        OrganizerID         `json:"organizerId"`
+	RequestedByUserID  UserID              `json:"requestedByUserId"`
+	Status             UnlockRequestStatus `json:"status"`
+	ReviewedByUserID   *UserID             `json:"reviewedByUserId,omitempty"`
+	CreatedAt          time.Time           `json:"createdAt"`
+	ReviewedAt         *time.Time          `json:"reviewedAt,omitempty"`
+	Reason             string              `json:"reason,omitempty"`
+	ReviewNote         string              `json:"reviewNote,omitempty"`
+	RequestedByName    string              `json:"requestedByName,omitempty"`
+	ReviewedByName     string              `json:"reviewedByName,omitempty"`
+	ContestName        string              `json:"contestName,omitempty"`
+}
+
+type UnlockRequestTemplate struct {
+	ContestID ContestID `json:"contestId"`
+	Reason    string    `json:"reason,omitempty"`
+}
+
+type UnlockRequestReview struct {
+	Status     UnlockRequestStatus `json:"status"`
+	ReviewNote string              `json:"reviewNote,omitempty"`
+}
+
 type Organizer struct {
 	ID        OrganizerID   `json:"id"`
 	Ownership OwnershipData `json:"-"`

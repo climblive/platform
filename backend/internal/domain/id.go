@@ -14,6 +14,7 @@ type RaffleWinnerID ResourceID
 type SeriesID ResourceID
 type UserID ResourceID
 type TickID ResourceID
+type UnlockRequestID ResourceID
 
 type OrganizerInviteID = uuid.UUID
 
@@ -27,7 +28,8 @@ type ResourceIDType interface {
 		RaffleWinnerID |
 		SeriesID |
 		UserID |
-		TickID
+		TickID |
+		UnlockRequestID
 }
 
 type ScoreEngineInstanceID = uuid.UUID

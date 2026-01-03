@@ -6,8 +6,53 @@ package database
 
 import (
 	"database/sql"
+	"database/sql/driver"
+	"fmt"
 	"time"
 )
+
+type UnlockRequestStatus string
+
+const (
+	UnlockRequestStatusPending  UnlockRequestStatus = "pending"
+	UnlockRequestStatusApproved UnlockRequestStatus = "approved"
+	UnlockRequestStatusRejected UnlockRequestStatus = "rejected"
+)
+
+func (e *UnlockRequestStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = UnlockRequestStatus(s)
+	case string:
+		*e = UnlockRequestStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for UnlockRequestStatus: %T", src)
+	}
+	return nil
+}
+
+type NullUnlockRequestStatus struct {
+	UnlockRequestStatus UnlockRequestStatus
+	Valid               bool // Valid is true if UnlockRequestStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullUnlockRequestStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.UnlockRequestStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.UnlockRequestStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullUnlockRequestStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.UnlockRequestStatus), nil
+}
 
 type CompClass struct {
 	ID          int32
@@ -117,6 +162,19 @@ type Tick struct {
 	AttemptsZone2 int32
 	Top           bool
 	AttemptsTop   int32
+}
+
+type UnlockRequest struct {
+	ID                int32
+	ContestID         int32
+	OrganizerID       int32
+	RequestedByUserID int32
+	Status            UnlockRequestStatus
+	ReviewedByUserID  sql.NullInt32
+	CreatedAt         time.Time
+	ReviewedAt        sql.NullTime
+	Reason            sql.NullString
+	ReviewNote        sql.NullString
 }
 
 type User struct {

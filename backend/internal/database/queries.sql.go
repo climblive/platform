@@ -41,6 +41,33 @@ func (q *Queries) CountContenders(ctx context.Context, contestID int32) (int64, 
 	return count, err
 }
 
+const createUnlockRequest = `-- name: CreateUnlockRequest :execlastid
+INSERT INTO
+    unlock_request (contest_id, organizer_id, requested_by_user_id, reason)
+VALUES
+    (?, ?, ?, ?)
+`
+
+type CreateUnlockRequestParams struct {
+	ContestID         int32
+	OrganizerID       int32
+	RequestedByUserID int32
+	Reason            sql.NullString
+}
+
+func (q *Queries) CreateUnlockRequest(ctx context.Context, arg CreateUnlockRequestParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, createUnlockRequest,
+		arg.ContestID,
+		arg.OrganizerID,
+		arg.RequestedByUserID,
+		arg.Reason,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
+}
+
 const deleteCompClass = `-- name: DeleteCompClass :exec
 DELETE FROM comp_class
 WHERE id = ?
@@ -714,6 +741,47 @@ func (q *Queries) GetOrganizerInvitesByOrganizer(ctx context.Context, organizerI
 	return items, nil
 }
 
+const getPendingUnlockRequests = `-- name: GetPendingUnlockRequests :many
+SELECT id, contest_id, organizer_id, requested_by_user_id, status, reviewed_by_user_id, created_at, reviewed_at, reason, review_note
+FROM unlock_request
+WHERE status = 'pending'
+ORDER BY created_at ASC
+`
+
+func (q *Queries) GetPendingUnlockRequests(ctx context.Context) ([]UnlockRequest, error) {
+	rows, err := q.db.QueryContext(ctx, getPendingUnlockRequests)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []UnlockRequest
+	for rows.Next() {
+		var i UnlockRequest
+		if err := rows.Scan(
+			&i.ID,
+			&i.ContestID,
+			&i.OrganizerID,
+			&i.RequestedByUserID,
+			&i.Status,
+			&i.ReviewedByUserID,
+			&i.CreatedAt,
+			&i.ReviewedAt,
+			&i.Reason,
+			&i.ReviewNote,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getProblem = `-- name: GetProblem :one
 SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
 FROM problem
@@ -1088,6 +1156,112 @@ func (q *Queries) GetTicksByProblem(ctx context.Context, problemID int32) ([]Get
 	return items, nil
 }
 
+const getUnlockRequest = `-- name: GetUnlockRequest :one
+SELECT id, contest_id, organizer_id, requested_by_user_id, status, reviewed_by_user_id, created_at, reviewed_at, reason, review_note
+FROM unlock_request
+WHERE id = ?
+`
+
+func (q *Queries) GetUnlockRequest(ctx context.Context, id int32) (UnlockRequest, error) {
+	row := q.db.QueryRowContext(ctx, getUnlockRequest, id)
+	var i UnlockRequest
+	err := row.Scan(
+		&i.ID,
+		&i.ContestID,
+		&i.OrganizerID,
+		&i.RequestedByUserID,
+		&i.Status,
+		&i.ReviewedByUserID,
+		&i.CreatedAt,
+		&i.ReviewedAt,
+		&i.Reason,
+		&i.ReviewNote,
+	)
+	return i, err
+}
+
+const getUnlockRequestsByContest = `-- name: GetUnlockRequestsByContest :many
+SELECT id, contest_id, organizer_id, requested_by_user_id, status, reviewed_by_user_id, created_at, reviewed_at, reason, review_note
+FROM unlock_request
+WHERE contest_id = ?
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetUnlockRequestsByContest(ctx context.Context, contestID int32) ([]UnlockRequest, error) {
+	rows, err := q.db.QueryContext(ctx, getUnlockRequestsByContest, contestID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []UnlockRequest
+	for rows.Next() {
+		var i UnlockRequest
+		if err := rows.Scan(
+			&i.ID,
+			&i.ContestID,
+			&i.OrganizerID,
+			&i.RequestedByUserID,
+			&i.Status,
+			&i.ReviewedByUserID,
+			&i.CreatedAt,
+			&i.ReviewedAt,
+			&i.Reason,
+			&i.ReviewNote,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUnlockRequestsByOrganizer = `-- name: GetUnlockRequestsByOrganizer :many
+SELECT id, contest_id, organizer_id, requested_by_user_id, status, reviewed_by_user_id, created_at, reviewed_at, reason, review_note
+FROM unlock_request
+WHERE organizer_id = ?
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetUnlockRequestsByOrganizer(ctx context.Context, organizerID int32) ([]UnlockRequest, error) {
+	rows, err := q.db.QueryContext(ctx, getUnlockRequestsByOrganizer, organizerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []UnlockRequest
+	for rows.Next() {
+		var i UnlockRequest
+		if err := rows.Scan(
+			&i.ID,
+			&i.ContestID,
+			&i.OrganizerID,
+			&i.RequestedByUserID,
+			&i.Status,
+			&i.ReviewedByUserID,
+			&i.CreatedAt,
+			&i.ReviewedAt,
+			&i.Reason,
+			&i.ReviewNote,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUserByUsername = `-- name: GetUserByUsername :many
 SELECT user.id, user.username, user.admin, organizer.id, organizer.name
 FROM user
@@ -1164,6 +1338,19 @@ func (q *Queries) GetUsersByOrganizer(ctx context.Context, organizerID int32) ([
 	return items, nil
 }
 
+const hasApprovedUnlockRequest = `-- name: HasApprovedUnlockRequest :one
+SELECT COUNT(*) > 0 as has_approved
+FROM unlock_request
+WHERE organizer_id = ? AND status = 'approved'
+`
+
+func (q *Queries) HasApprovedUnlockRequest(ctx context.Context, organizerID int32) (bool, error) {
+	row := q.db.QueryRowContext(ctx, hasApprovedUnlockRequest, organizerID)
+	var has_approved bool
+	err := row.Scan(&has_approved)
+	return has_approved, err
+}
+
 const insertOrganizerInvite = `-- name: InsertOrganizerInvite :exec
 INSERT INTO
     organizer_invite (id, organizer_id, expires_at)
@@ -1221,6 +1408,35 @@ func (q *Queries) InsertTick(ctx context.Context, arg InsertTickParams) (int64, 
 		return 0, err
 	}
 	return result.LastInsertId()
+}
+
+const updateUnlockRequestStatus = `-- name: UpdateUnlockRequestStatus :exec
+UPDATE unlock_request
+SET 
+    status = ?,
+    reviewed_by_user_id = ?,
+    reviewed_at = ?,
+    review_note = ?
+WHERE id = ?
+`
+
+type UpdateUnlockRequestStatusParams struct {
+	Status           UnlockRequestStatus
+	ReviewedByUserID sql.NullInt32
+	ReviewedAt       sql.NullTime
+	ReviewNote       sql.NullString
+	ID               int32
+}
+
+func (q *Queries) UpdateUnlockRequestStatus(ctx context.Context, arg UpdateUnlockRequestStatusParams) error {
+	_, err := q.db.ExecContext(ctx, updateUnlockRequestStatus,
+		arg.Status,
+		arg.ReviewedByUserID,
+		arg.ReviewedAt,
+		arg.ReviewNote,
+		arg.ID,
+	)
+	return err
 }
 
 const upsertCompClass = `-- name: UpsertCompClass :execlastid
