@@ -14,18 +14,10 @@ export type RaffleWinnerID = ResourceID;
 export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
+export type UnlockRequestID = ResourceID;
 export type OrganizerInviteID = string;
-export type ResourceIDType =
-  | CompClassID
-  | ContenderID
-  | ContestID
-  | OrganizerID
-  | ProblemID
-  | RaffleID
-  | RaffleWinnerID
-  | SeriesID
-  | UserID
-  | TickID;
+export type ResourceIDType = 
+    CompClassID | ContenderID | ContestID | OrganizerID | ProblemID | RaffleID | RaffleWinnerID | SeriesID | UserID | TickID | UnlockRequestID;
 export type ScoreEngineInstanceID = string;
 
 //////////
@@ -114,6 +106,24 @@ export interface ContestPatch {
 }
 export interface ContestTransferRequest {
   newOrganizerId: OrganizerID;
+}
+export type UnlockRequestStatus = string;
+export const UnlockRequestStatusPending: UnlockRequestStatus = "pending";
+export const UnlockRequestStatusApproved: UnlockRequestStatus = "approved";
+export const UnlockRequestStatusRejected: UnlockRequestStatus = "rejected";
+export interface UnlockRequest {
+  id: UnlockRequestID;
+  contestId: ContestID;
+  organizerId: OrganizerID;
+  status: UnlockRequestStatus;
+  createdAt: Date;
+  reviewedAt?: Date;
+}
+export interface UnlockRequestTemplate {
+  contestId: ContestID;
+}
+export interface UnlockRequestReview {
+  status: UnlockRequestStatus;
 }
 export interface Organizer {
   id: OrganizerID;
