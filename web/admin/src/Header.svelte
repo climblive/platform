@@ -42,7 +42,6 @@
             variant="brand"
             pill
             size="small"
-            attention="bounce"
             style="position: absolute; top: -8px; right: -8px;"
           >
             {pendingCount}
