@@ -735,7 +735,7 @@ func (q *Queries) GetOrganizerInvitesByOrganizer(ctx context.Context, organizerI
 }
 
 const getPendingUnlockRequests = `-- name: GetPendingUnlockRequests :many
-SELECT id, contest_id, organizer_id, requested_by_user_id, status, reviewed_by_user_id, created_at, reviewed_at, reason, review_note
+SELECT id, contest_id, organizer_id, status, created_at, reviewed_at
 FROM unlock_request
 WHERE status = 'pending'
 ORDER BY created_at ASC
@@ -754,13 +754,9 @@ func (q *Queries) GetPendingUnlockRequests(ctx context.Context) ([]UnlockRequest
 			&i.ID,
 			&i.ContestID,
 			&i.OrganizerID,
-			&i.RequestedByUserID,
 			&i.Status,
-			&i.ReviewedByUserID,
 			&i.CreatedAt,
 			&i.ReviewedAt,
-			&i.Reason,
-			&i.ReviewNote,
 		); err != nil {
 			return nil, err
 		}
@@ -1150,7 +1146,7 @@ func (q *Queries) GetTicksByProblem(ctx context.Context, problemID int32) ([]Get
 }
 
 const getUnlockRequest = `-- name: GetUnlockRequest :one
-SELECT id, contest_id, organizer_id, requested_by_user_id, status, reviewed_by_user_id, created_at, reviewed_at, reason, review_note
+SELECT id, contest_id, organizer_id, status, created_at, reviewed_at
 FROM unlock_request
 WHERE id = ?
 `
@@ -1162,19 +1158,15 @@ func (q *Queries) GetUnlockRequest(ctx context.Context, id int32) (UnlockRequest
 		&i.ID,
 		&i.ContestID,
 		&i.OrganizerID,
-		&i.RequestedByUserID,
 		&i.Status,
-		&i.ReviewedByUserID,
 		&i.CreatedAt,
 		&i.ReviewedAt,
-		&i.Reason,
-		&i.ReviewNote,
 	)
 	return i, err
 }
 
 const getUnlockRequestsByContest = `-- name: GetUnlockRequestsByContest :many
-SELECT id, contest_id, organizer_id, requested_by_user_id, status, reviewed_by_user_id, created_at, reviewed_at, reason, review_note
+SELECT id, contest_id, organizer_id, status, created_at, reviewed_at
 FROM unlock_request
 WHERE contest_id = ?
 ORDER BY created_at DESC
@@ -1193,13 +1185,9 @@ func (q *Queries) GetUnlockRequestsByContest(ctx context.Context, contestID int3
 			&i.ID,
 			&i.ContestID,
 			&i.OrganizerID,
-			&i.RequestedByUserID,
 			&i.Status,
-			&i.ReviewedByUserID,
 			&i.CreatedAt,
 			&i.ReviewedAt,
-			&i.Reason,
-			&i.ReviewNote,
 		); err != nil {
 			return nil, err
 		}
@@ -1215,7 +1203,7 @@ func (q *Queries) GetUnlockRequestsByContest(ctx context.Context, contestID int3
 }
 
 const getUnlockRequestsByOrganizer = `-- name: GetUnlockRequestsByOrganizer :many
-SELECT id, contest_id, organizer_id, requested_by_user_id, status, reviewed_by_user_id, created_at, reviewed_at, reason, review_note
+SELECT id, contest_id, organizer_id, status, created_at, reviewed_at
 FROM unlock_request
 WHERE organizer_id = ?
 ORDER BY created_at DESC
@@ -1234,13 +1222,9 @@ func (q *Queries) GetUnlockRequestsByOrganizer(ctx context.Context, organizerID 
 			&i.ID,
 			&i.ContestID,
 			&i.OrganizerID,
-			&i.RequestedByUserID,
 			&i.Status,
-			&i.ReviewedByUserID,
 			&i.CreatedAt,
 			&i.ReviewedAt,
-			&i.Reason,
-			&i.ReviewNote,
 		); err != nil {
 			return nil, err
 		}

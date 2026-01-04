@@ -165,16 +165,12 @@ type Tick struct {
 }
 
 type UnlockRequest struct {
-	ID                int32
-	ContestID         int32
-	OrganizerID       int32
-	RequestedByUserID int32
-	Status            UnlockRequestStatus
-	ReviewedByUserID  sql.NullInt32
-	CreatedAt         time.Time
-	ReviewedAt        sql.NullTime
-	Reason            sql.NullString
-	ReviewNote        sql.NullString
+	ID          int32
+	ContestID   int32
+	OrganizerID int32
+	Status      UnlockRequestStatus
+	CreatedAt   time.Time
+	ReviewedAt  sql.NullTime
 }
 
 type User struct {
