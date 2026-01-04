@@ -38,7 +38,7 @@ func (uc *UnlockRequestUseCase) CreateUnlockRequest(ctx context.Context, templat
 		return 0, errors.Wrap(err, 0)
 	}
 
-	if contest.EvaluationMode == false {
+	if !contest.EvaluationMode {
 		return 0, errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 
