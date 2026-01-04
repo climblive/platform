@@ -33,7 +33,7 @@
       <wa-button
         onclick={() => navigate("./unlock-requests")}
         size="small"
-        variant="warning"
+        variant="neutral"
         appearance="filled-outlined"
         title="Unlock Requests"
         style="position: relative;"
@@ -43,6 +43,7 @@
           <wa-badge
             variant="danger"
             size="small"
+            attention="bounce"
             style="position: absolute; top: -8px; right: -8px;"
           >
             {pendingCount}

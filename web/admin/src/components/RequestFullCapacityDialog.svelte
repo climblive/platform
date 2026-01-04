@@ -1,6 +1,5 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
@@ -52,23 +51,16 @@
 </script>
 
 <wa-dialog bind:this={dialog} label="Request full capacity">
-  <div class="dialog-content">
-    <wa-callout variant="warning">
-      <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
-      Help us keep things organized by only requesting this for real contests.
-    </wa-callout>
+  <p>
+    Evaluation mode limits contests to 10 contenders for testing purposes. By
+    requesting full capacity you'll be able to host up to 500 contenders once
+    approved.
+  </p>
 
-    <p>
-      Evaluation mode limits contests to 10 contenders for testing purposes. By
-      requesting full capacity you'll be able to host up to 500 contenders once
-      approved.
-    </p>
-
-    <p>
-      Requests are usually reviewed within 24 hours. If you've been approved
-      before, your request will be automatically approved.
-    </p>
-  </div>
+  <p>
+    Requests are usually reviewed within 24 hours. If you've been approved
+    before, your request will be automatically approved.
+  </p>
 
   <wa-button slot="footer" appearance="plain" onclick={close}>Cancel</wa-button>
   <wa-button
@@ -83,11 +75,3 @@
     Submit request
   </wa-button>
 </wa-dialog>
-
-<style>
-  .dialog-content {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wa-space-s);
-  }
-</style>
