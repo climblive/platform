@@ -30,8 +30,7 @@
         size="small"
         variant="warning"
         appearance="filled-outlined"
-        title="Unlock Requests"
-        ><wa-icon name="lock-open"></wa-icon></wa-button
+        title="Unlock Requests"><wa-icon name="lock-open"></wa-icon></wa-button
       >
       <wa-button
         onclick={() => navigate("./help")}

@@ -16,8 +16,18 @@ export type UserID = ResourceID;
 export type TickID = ResourceID;
 export type UnlockRequestID = ResourceID;
 export type OrganizerInviteID = string;
-export type ResourceIDType = 
-    CompClassID | ContenderID | ContestID | OrganizerID | ProblemID | RaffleID | RaffleWinnerID | SeriesID | UserID | TickID | UnlockRequestID;
+export type ResourceIDType =
+  | CompClassID
+  | ContenderID
+  | ContestID
+  | OrganizerID
+  | ProblemID
+  | RaffleID
+  | RaffleWinnerID
+  | SeriesID
+  | UserID
+  | TickID
+  | UnlockRequestID;
 export type ScoreEngineInstanceID = string;
 
 //////////

@@ -5,7 +5,6 @@ import {
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
 import {
-  type UnlockRequest,
   type UnlockRequestReview,
   type UnlockRequestTemplate,
 } from "../models";

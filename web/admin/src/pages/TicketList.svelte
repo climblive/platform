@@ -119,8 +119,8 @@
     <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
     <p>
       This contest is currently in evaluation mode and is limited to 10
-      contenders. You can request full capacity of 500 contenders by clicking the
-      button below.
+      contenders. You can request full capacity of 500 contenders by clicking
+      the button below.
     </p>
     {#if pendingRequest}
       <wa-badge variant="warning">Request pending</wa-badge>
