@@ -1,7 +1,9 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { FullLogo } from "@climblive/lib/components";
+  import { getPendingUnlockRequestsQuery } from "@climblive/lib/queries";
   import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Authenticator } from "./authenticator.svelte";
@@ -9,6 +11,9 @@
   let print = $state(false);
 
   const authenticator = getContext<Authenticator>("authenticator");
+  const pendingRequestsQuery = $derived(getPendingUnlockRequestsQuery());
+  const pendingRequests = $derived(pendingRequestsQuery.data);
+  const pendingCount = $derived(pendingRequests?.length ?? 0);
 
   onMount(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -30,8 +35,20 @@
         size="small"
         variant="warning"
         appearance="filled-outlined"
-        title="Unlock Requests"><wa-icon name="lock-open"></wa-icon></wa-button
+        title="Unlock Requests"
+        style="position: relative;"
       >
+        <wa-icon name="lock-open"></wa-icon>
+        {#if pendingCount > 0}
+          <wa-badge
+            variant="danger"
+            size="small"
+            style="position: absolute; top: -8px; right: -8px;"
+          >
+            {pendingCount}
+          </wa-badge>
+        {/if}
+      </wa-button>
       <wa-button
         onclick={() => navigate("./help")}
         size="small"

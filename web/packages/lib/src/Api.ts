@@ -572,7 +572,7 @@ export class ApiClient {
   };
 
   createUnlockRequest = async (template: UnlockRequestTemplate) => {
-    const endpoint = `/unlock-requests`;
+    const endpoint = `/contests/${template.contestId}/unlock-requests`;
 
     const result = await this.axiosInstance.post(endpoint, template, {
       headers: this.credentialsProvider?.getAuthHeaders(),

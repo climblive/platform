@@ -1,6 +1,8 @@
 <script lang="ts">
+  import RequestFullCapacityDialog from "@/components/RequestFullCapacityDialog.svelte";
   import Loader from "@/components/Loader.svelte";
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
+  import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
   import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
@@ -13,7 +15,10 @@
   import "@awesome.me/webawesome/dist/components/tab-panel/tab-panel.js";
   import "@awesome.me/webawesome/dist/components/tab/tab.js";
   import { LabeledText } from "@climblive/lib/components";
-  import { getContestQuery } from "@climblive/lib/queries";
+  import {
+    getContestQuery,
+    getUnlockRequestsByContestQuery,
+  } from "@climblive/lib/queries";
   import { navigate } from "svelte-routing";
   import ArchiveContest from "./ArchiveContest.svelte";
   import CompClassList from "./CompClassList.svelte";
@@ -35,10 +40,24 @@
   let tabGroup: WaTabGroup | undefined = $state();
   let problemsHeading: HTMLHeadingElement | undefined = $state();
   let compClassesHeading: HTMLHeadingElement | undefined = $state();
+  let requestDialog: RequestFullCapacityDialog | undefined = $state();
 
   const contestQuery = $derived(getContestQuery(contestId));
+  const unlockRequestsQuery = $derived(
+    getUnlockRequestsByContestQuery(contestId),
+  );
 
   const contest = $derived(contestQuery.data);
+  const unlockRequests = $derived(unlockRequestsQuery.data);
+
+  let pendingRequest = $derived.by(() => {
+    if (!unlockRequests) return undefined;
+    return unlockRequests.find((req) => req.status === "pending");
+  });
+
+  const handleOpenRequestDialog = () => {
+    requestDialog?.open();
+  };
 
   $effect(() => {
     const hash = window.location.hash.substring(1);
@@ -103,6 +122,33 @@
     {#if contest.archived === true}
       <RestoreContest {contestId} />
     {/if}
+
+    {#if contest.evaluationMode}
+      <wa-callout variant="warning" style="margin-block-end: var(--wa-space-m);">
+        <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
+        <p>
+          This contest is currently in evaluation mode and is limited to 10
+          contenders. You can request full capacity of 500 contenders by
+          clicking the button below.
+        </p>
+        {#if pendingRequest}
+          <wa-badge variant="warning">Request pending</wa-badge>
+          <p>Your request is currently being reviewed.</p>
+        {:else}
+          <wa-button
+            size="small"
+            variant="success"
+            appearance="accent"
+            onclick={handleOpenRequestDialog}
+          >
+            <wa-icon slot="start" name="paper-plane"></wa-icon>
+            Request full capacity
+          </wa-button>
+        {/if}
+      </wa-callout>
+    {/if}
+
+    <RequestFullCapacityDialog bind:this={requestDialog} {contestId} />
 
     {#if contest.archived === false}
       <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleTabShow}>

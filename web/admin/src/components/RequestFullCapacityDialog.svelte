@@ -65,8 +65,8 @@
     </p>
 
     <p>
-      If you've been approved before, your request will be automatically
-      approved.
+      Requests are usually reviewed within 24 hours. If you've been approved
+      before, your request will be automatically approved.
     </p>
   </div>
 
