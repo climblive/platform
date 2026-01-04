@@ -1,5 +1,4 @@
 -- +goose Up
--- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS `unlock_request` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `contest_id` INT NOT NULL,
@@ -26,9 +25,6 @@ CREATE INDEX `fk_unlock_request_contest_idx` ON `unlock_request` (`contest_id` A
 CREATE INDEX `fk_unlock_request_organizer_idx` ON `unlock_request` (`organizer_id` ASC);
 CREATE INDEX `fk_unlock_request_status_idx` ON `unlock_request` (`status` ASC);
 CREATE INDEX `fk_unlock_request_created_idx` ON `unlock_request` (`created_at` DESC);
--- +goose StatementEnd
 
 -- +goose Down
--- +goose StatementBegin
 DROP TABLE IF EXISTS `unlock_request`;
--- +goose StatementEnd
