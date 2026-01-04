@@ -60,7 +60,7 @@
     },
     {
       label: "Status",
-      mobile: true,
+      mobile: false,
       render: renderStatus,
       width: "max-content",
     },
@@ -95,19 +95,38 @@
   </wa-badge>
 {/snippet}
 
-{#snippet renderActions(request: UnlockRequest)}
+{#snippet renderActions(request: UnlockRequest, mobile: boolean)}
   {#if request.status === "pending"}
     <div class="actions">
-      <wa-button
-        size="small"
-        variant="success"
-        on:click={() => handleApprove(request)}
-      >
-        Approve
-      </wa-button>
-      <wa-button size="small" variant="danger" on:click={() => handleReject(request)}>
-        Reject
-      </wa-button>
+      {#if mobile}
+        <wa-button
+          size="small"
+          variant="success"
+          appearance="plain"
+          on:click={() => handleApprove(request)}
+        >
+          <wa-icon name="check" label="Approve"></wa-icon>
+        </wa-button>
+        <wa-button
+          size="small"
+          variant="danger"
+          appearance="plain"
+          on:click={() => handleReject(request)}
+        >
+          <wa-icon name="x" label="Reject"></wa-icon>
+        </wa-button>
+      {:else}
+        <wa-button
+          size="small"
+          variant="success"
+          on:click={() => handleApprove(request)}
+        >
+          Approve
+        </wa-button>
+        <wa-button size="small" variant="danger" on:click={() => handleReject(request)}>
+          Reject
+        </wa-button>
+      {/if}
     </div>
   {/if}
 {/snippet}
