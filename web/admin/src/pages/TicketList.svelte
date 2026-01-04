@@ -69,10 +69,6 @@
     }
   };
 
-  const handleOpenRequestDialog = () => {
-    requestDialog?.open();
-  };
-
   const handleCreate = () => {
     if (numberInput) {
       const args: CreateContendersArguments = {

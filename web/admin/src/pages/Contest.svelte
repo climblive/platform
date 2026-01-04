@@ -124,7 +124,10 @@
     {/if}
 
     {#if contest.evaluationMode}
-      <wa-callout variant="warning" style="margin-block-end: var(--wa-space-m);">
+      <wa-callout
+        variant="warning"
+        style="margin-block-end: var(--wa-space-m);"
+      >
         <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
         <p>
           This contest is currently in evaluation mode and is limited to 10
