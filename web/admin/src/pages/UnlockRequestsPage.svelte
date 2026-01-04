@@ -101,11 +101,11 @@
       <wa-button
         size="small"
         variant="success"
-        onclick={() => handleApprove(request)}
+        on:click={() => handleApprove(request)}
       >
         Approve
       </wa-button>
-      <wa-button size="small" variant="danger" onclick={() => handleReject(request)}>
+      <wa-button size="small" variant="danger" on:click={() => handleReject(request)}>
         Reject
       </wa-button>
     </div>

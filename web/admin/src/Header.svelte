@@ -35,13 +35,12 @@
         size="small"
         variant="neutral"
         appearance="filled-outlined"
-        title="Unlock Requests"
-        style="position: relative;"
       >
         <wa-icon name="lock-open"></wa-icon>
         {#if pendingCount > 0}
           <wa-badge
-            variant="danger"
+            variant="brand"
+            pill
             size="small"
             attention="bounce"
             style="position: absolute; top: -8px; right: -8px;"
