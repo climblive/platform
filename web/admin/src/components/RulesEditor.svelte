@@ -54,7 +54,7 @@
 
   <RuleOptionCard
     title="Pooled points"
-    description="Points for completed problems are split by percentages. A boulder worth 1000 points with two tops will give each contender 500 points. If a third contender also tops the boulder, then all three would receive 333 points instead."
+    description="Points for completed problems are split by percentages. A boulder worth 1000 points with two tops will give each contender 500 points. If a third contender also tops the boulder, then all three will receive 333 points instead."
     disabled
     tag="Upcoming"
   >
