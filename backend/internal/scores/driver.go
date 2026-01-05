@@ -15,9 +15,7 @@ type ScoreEngine interface {
 	Start()
 	Stop()
 
-	ReplaceScoringRules(rules ScoringRules)
-	ReplaceRanker(ranker Ranker)
-
+	HandleRulesUpdated(event domain.RulesUpdatedEvent)
 	HandleContenderEntered(event domain.ContenderEnteredEvent)
 	HandleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent)
 	HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent)
@@ -42,8 +40,7 @@ type ScoreEngineDriver struct {
 
 	engine ScoreEngine
 
-	running    atomic.Bool
-	sideQuests chan func()
+	running atomic.Bool
 
 	publishToken bool
 }
@@ -63,7 +60,6 @@ func NewScoreEngineDriver(
 		instanceID:    instanceID,
 		eventBroker:   eventBroker,
 		pendingEvents: make([]domain.EventEnvelope, 0),
-		sideQuests:    make(chan func()),
 	}
 }
 
@@ -121,13 +117,6 @@ func (d *ScoreEngineDriver) run(
 	ready chan<- struct{},
 	engineReceiver chan ScoreEngine,
 ) {
-	defer func() {
-		close(d.sideQuests)
-
-		for range d.sideQuests {
-		}
-	}()
-
 	filter := domain.NewEventFilter(
 		d.contestID,
 		0,
@@ -141,6 +130,7 @@ func (d *ScoreEngineDriver) run(
 		"ASCENT_DEREGISTERED",
 		"PROBLEM_ADDED",
 		"PROBLEM_UPDATED",
+		"RULES_UPDATED",
 	)
 
 	subscriptionID, eventReader := d.eventBroker.Subscribe(filter, 0)
@@ -226,8 +216,6 @@ PreLoop:
 			if n == 0 {
 				d.publishToken = true
 			}
-		case f := <-d.sideQuests:
-			f()
 		case <-ctx.Done():
 			return
 		}
@@ -241,28 +229,10 @@ PreLoop:
 	}
 }
 
-func (d *ScoreEngineDriver) SetScoringRules(rules ScoringRules) {
-	quest := func() {
-		d.engine.ReplaceScoringRules(rules)
-	}
-
-	if d.running.Load() {
-		d.sideQuests <- quest
-	}
-}
-
-func (d *ScoreEngineDriver) SetRanker(ranker Ranker) {
-	quest := func() {
-		d.engine.ReplaceRanker(ranker)
-	}
-
-	if d.running.Load() {
-		d.sideQuests <- quest
-	}
-}
-
 func (d *ScoreEngineDriver) handleEvent(event domain.EventEnvelope) {
 	switch ev := event.Data.(type) {
+	case domain.RulesUpdatedEvent:
+		d.engine.HandleRulesUpdated(ev)
 	case domain.ContenderEnteredEvent:
 		d.engine.HandleContenderEntered(ev)
 	case domain.ContenderSwitchedClassEvent:

@@ -82,7 +82,7 @@ export interface Contest {
   description?: string;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
-  rules?: string;
+  info?: string;
   gracePeriod: number;
   timeBegin?: Date;
   timeEnd?: Date;
@@ -96,7 +96,7 @@ export interface ContestTemplate {
   description?: string;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
-  rules?: string;
+  info?: string;
   gracePeriod: number;
 }
 export interface ContestPatch {
@@ -107,8 +107,11 @@ export interface ContestPatch {
   description?: string;
   qualifyingProblems?: number;
   finalists?: number;
-  rules?: string;
+  info?: string;
   gracePeriod?: number;
+}
+export interface ContestTransferRequest {
+  newOrganizerId: OrganizerID;
 }
 export interface Organizer {
   id: OrganizerID;
@@ -265,6 +268,11 @@ export interface ProblemUpdatedEvent {
 }
 export interface ProblemDeletedEvent {
   problemId: ProblemID;
+}
+export interface RulesUpdatedEvent {
+  contestId: ContestID;
+  qualifyingProblems: number /* int */;
+  finalists: number /* int */;
 }
 export interface ContenderPublicInfoUpdatedEvent {
   contenderId: ContenderID;

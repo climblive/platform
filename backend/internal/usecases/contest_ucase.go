@@ -46,6 +46,7 @@ type ContestUseCase struct {
 	Repo               contestUseCaseRepository
 	ScoreKeeper        domain.ScoreKeeper
 	ScoreEngineManager scoreEngineManager
+	EventBroker        domain.EventBroker
 }
 
 var sanitizationPolicy = bluemonday.UGCPolicy()
@@ -142,6 +143,11 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		return mty, errors.Wrap(err, 0)
 	}
 
+	rulesUpdateEventBaseline := domain.RulesUpdatedEvent{
+		QualifyingProblems: contest.QualifyingProblems,
+		Finalists:          contest.Finalists,
+	}
+
 	if patch.Archived.Present {
 		contest.Archived = patch.Archived.Value
 
@@ -192,8 +198,8 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		contest.Finalists = patch.Finalists.Value
 	}
 
-	if patch.Rules.Present {
-		contest.Rules = sanitizationPolicy.Sanitize(patch.Rules.Value)
+	if patch.Info.Present {
+		contest.Info = sanitizationPolicy.Sanitize(patch.Info.Value)
 	}
 
 	if patch.GracePeriod.Present {
@@ -206,6 +212,15 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 
 	if _, err = uc.Repo.StoreContest(ctx, nil, contest); err != nil {
 		return mty, errors.Wrap(err, 0)
+	}
+
+	event := domain.RulesUpdatedEvent{
+		QualifyingProblems: contest.QualifyingProblems,
+		Finalists:          contest.Finalists,
+	}
+
+	if event != rulesUpdateEventBaseline {
+		uc.EventBroker.Dispatch(contestID, event)
 	}
 
 	return contest, nil
@@ -230,7 +245,7 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		Description:        strings.TrimSpace(tmpl.Description),
 		QualifyingProblems: tmpl.QualifyingProblems,
 		Finalists:          tmpl.Finalists,
-		Rules:              sanitizationPolicy.Sanitize(tmpl.Rules),
+		Info:               sanitizationPolicy.Sanitize(tmpl.Info),
 		GracePeriod:        tmpl.GracePeriod,
 		Created:            time.Now(),
 	}

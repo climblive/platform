@@ -353,7 +353,7 @@ test("info tab", async ({ page }) => {
   await expect(page.getByText("Qualifying problems 10 hardest")).toBeVisible();
   await expect(page.getByText("Number of finalists 7")).toBeVisible();
 
-  await page.getByRole("button", { name: "Rules" }).click();
+  await page.getByRole("button", { name: "General info" }).click();
 
   await expect(
     page.getByText(

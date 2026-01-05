@@ -12,6 +12,14 @@ type HardestProblems struct {
 func (r *HardestProblems) CalculateScore(points iter.Seq[int]) int {
 	score := 0
 
+	if r.Number == 0 {
+		for p := range points {
+			score += p
+		}
+
+		return score
+	}
+
 	n := 0
 	for _, p := range slices.Backward(slices.Sorted(points)) {
 		if n >= r.Number {

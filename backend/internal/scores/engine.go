@@ -7,6 +7,11 @@ import (
 	"github.com/climblive/platform/backend/internal/domain"
 )
 
+type Rules struct {
+	QualifyingProblems int
+	Finalists          int
+}
+
 type ScoringRules interface {
 	CalculateScore(points iter.Seq[int]) int
 }
@@ -16,6 +21,9 @@ type Ranker interface {
 }
 
 type EngineStore interface {
+	GetRules() Rules
+	SaveRules(Rules)
+
 	GetContender(domain.ContenderID) (Contender, bool)
 	GetContendersByCompClass(domain.CompClassID) iter.Seq[Contender]
 	GetAllContenders() iter.Seq[Contender]
@@ -40,29 +48,14 @@ type DefaultScoreEngine struct {
 	store  EngineStore
 }
 
-func NewDefaultScoreEngine(ranker Ranker, rules ScoringRules, store EngineStore) *DefaultScoreEngine {
+func NewDefaultScoreEngine(store EngineStore) *DefaultScoreEngine {
 	return &DefaultScoreEngine{
-		ranker: ranker,
-		rules:  rules,
-		store:  store,
+		store: store,
+		rules: &HardestProblems{
+			Number: store.GetRules().QualifyingProblems,
+		},
+		ranker: NewBasicRanker(store.GetRules().Finalists),
 	}
-}
-
-func (e *DefaultScoreEngine) ReplaceScoringRules(rules ScoringRules) {
-	e.rules = rules
-
-	for contender := range e.store.GetAllContenders() {
-		contender.Score = e.rules.CalculateScore(Points(e.store.GetTicks(contender.ID)))
-		e.store.SaveContender(contender)
-	}
-
-	e.rankCompClasses(e.store.GetCompClassIDs()...)
-}
-
-func (e *DefaultScoreEngine) ReplaceRanker(ranker Ranker) {
-	e.ranker = ranker
-
-	e.rankCompClasses(e.store.GetCompClassIDs()...)
 }
 
 func (e *DefaultScoreEngine) Start() {
@@ -96,6 +89,27 @@ func (e *DefaultScoreEngine) Start() {
 }
 
 func (e *DefaultScoreEngine) Stop() {
+}
+
+func (e *DefaultScoreEngine) HandleRulesUpdated(event domain.RulesUpdatedEvent) {
+	rules := Rules{
+		QualifyingProblems: event.QualifyingProblems,
+		Finalists:          event.Finalists,
+	}
+
+	e.store.SaveRules(rules)
+
+	e.rules = &HardestProblems{
+		Number: rules.QualifyingProblems,
+	}
+	e.ranker = NewBasicRanker(rules.Finalists)
+
+	for contender := range e.store.GetAllContenders() {
+		contender.Score = e.rules.CalculateScore(Points(e.store.GetTicks(contender.ID)))
+		e.store.SaveContender(contender)
+	}
+
+	e.rankCompClasses(e.store.GetCompClassIDs()...)
 }
 
 func (e *DefaultScoreEngine) HandleContenderEntered(event domain.ContenderEnteredEvent) {

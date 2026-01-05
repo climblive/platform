@@ -103,7 +103,7 @@ GROUP BY contest.id;
 
 -- name: UpsertContest :execlastid
 INSERT INTO 
-	contest (id, organizer_id, archived, series_id, name, description, location, qualifying_problems, finalists, rules, grace_period, created)
+	contest (id, organizer_id, archived, series_id, name, description, location, qualifying_problems, finalists, info, grace_period, created)
 VALUES 
 	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
@@ -115,7 +115,7 @@ ON DUPLICATE KEY UPDATE
     location = VALUES(location),
     qualifying_problems = VALUES(qualifying_problems),
     finalists = VALUES(finalists),
-    rules = VALUES(rules),
+    info = VALUES(info),
     grace_period = VALUES(grace_period),
     created = VALUES(created);
 

@@ -358,7 +358,7 @@ func TestCreateContest(t *testing.T) {
 						Description:        "Who is the best climber in Sweden?",
 						QualifyingProblems: 10,
 						Finalists:          7,
-						Rules:              "No rules!",
+						Info:               "No rules!",
 						GracePeriod:        time.Hour,
 						Created:            time.Now(),
 					},
@@ -372,7 +372,7 @@ func TestCreateContest(t *testing.T) {
 					Description:        "Who is the best climber in Sweden?",
 					QualifyingProblems: 10,
 					Finalists:          7,
-					Rules:              "No rules!",
+					Info:               "No rules!",
 					GracePeriod:        time.Hour,
 					Created:            time.Now(),
 				}, nil)
@@ -388,7 +388,7 @@ func TestCreateContest(t *testing.T) {
 				Description:        "Who is the best climber in Sweden?",
 				QualifyingProblems: 10,
 				Finalists:          7,
-				Rules:              "No rules!",
+				Info:               "No rules!",
 				GracePeriod:        time.Hour,
 			})
 
@@ -401,7 +401,7 @@ func TestCreateContest(t *testing.T) {
 			assert.Equal(t, "Who is the best climber in Sweden?", contest.Description)
 			assert.Equal(t, 10, contest.QualifyingProblems)
 			assert.Equal(t, 7, contest.Finalists)
-			assert.Equal(t, "No rules!", contest.Rules)
+			assert.Equal(t, "No rules!", contest.Info)
 			assert.Equal(t, time.Hour, contest.GracePeriod)
 			assert.Empty(t, contest.TimeBegin)
 			assert.Empty(t, contest.TimeEnd)
@@ -433,7 +433,7 @@ func TestCreateContest(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
-	t.Run("RulesAreSanitized", func(t *testing.T) {
+	t.Run("InfoIsSanitized", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 
 		mockedAuthorizer.
@@ -455,12 +455,12 @@ func TestCreateContest(t *testing.T) {
 			Description:        "Who is the best climber in Sweden?",
 			QualifyingProblems: 10,
 			Finalists:          7,
-			Rules:              `<a href="javascript:alert('XSS1')" onmouseover="alert('XSS2')">XSS<a>`,
+			Info:               `<a href="javascript:alert('XSS1')" onmouseover="alert('XSS2')">XSS<a>`,
 			GracePeriod:        time.Hour,
 		})
 
 		require.NoError(t, err)
-		assert.Equal(t, "XSS", contest.Rules)
+		assert.Equal(t, "XSS", contest.Info)
 
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
@@ -508,7 +508,7 @@ func TestDuplicateContest(t *testing.T) {
 		Description:        "Who is the best climber in Sweden?",
 		QualifyingProblems: 10,
 		Finalists:          7,
-		Rules:              "No rules!",
+		Info:               "No rules!",
 		GracePeriod:        time.Hour,
 		TimeBegin:          timeBegin,
 		TimeEnd:            timeEnd,
@@ -625,7 +625,7 @@ func TestDuplicateContest(t *testing.T) {
 		assert.Equal(t, "Who is the best climber in Sweden?", duplicatedContest.Description)
 		assert.Equal(t, 10, duplicatedContest.QualifyingProblems)
 		assert.Equal(t, 7, duplicatedContest.Finalists)
-		assert.Equal(t, "No rules!", duplicatedContest.Rules)
+		assert.Equal(t, "No rules!", duplicatedContest.Info)
 		assert.Equal(t, time.Hour, duplicatedContest.GracePeriod)
 		assert.Equal(t, timeBegin, duplicatedContest.TimeBegin)
 		assert.NotZero(t, timeEnd, duplicatedContest.TimeEnd)
@@ -716,7 +716,7 @@ func TestTransferContest(t *testing.T) {
 		Description:        "National bouldering championship",
 		QualifyingProblems: 8,
 		Finalists:          6,
-		Rules:              "Standard IFSC rules apply",
+		Info:               "Standard IFSC rules apply",
 		GracePeriod:        30 * time.Minute,
 		TimeBegin:          timeBegin,
 		TimeEnd:            timeEnd,
@@ -864,7 +864,7 @@ func TestTransferContest(t *testing.T) {
 				Description:        "National bouldering championship",
 				QualifyingProblems: 8,
 				Finalists:          6,
-				Rules:              "Standard IFSC rules apply",
+				Info:               "Standard IFSC rules apply",
 				GracePeriod:        30 * time.Minute,
 				TimeBegin:          fakedContest.TimeBegin,
 				TimeEnd:            fakedContest.TimeEnd,
@@ -1062,16 +1062,18 @@ func TestPatchContest(t *testing.T) {
 		OrganizerID: fakedOrganizerID,
 	}
 
-	makeMocks := func() (*repositoryMock, *authorizerMock) {
+	makeMocks := func() (*repositoryMock, *authorizerMock, *eventBrokerMock) {
 		mockedRepo := new(repositoryMock)
 
 		mockedAuthorizer := new(authorizerMock)
 
-		return mockedRepo, mockedAuthorizer
+		mockedEventBroker := new(eventBrokerMock)
+
+		return mockedRepo, mockedAuthorizer, mockedEventBroker
 	}
 
 	t.Run("HappyCase", func(t *testing.T) {
-		mockedRepo, mockedAuthorizer := makeMocks()
+		mockedRepo, mockedAuthorizer, mockedEventBroker := makeMocks()
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
@@ -1095,7 +1097,7 @@ func TestPatchContest(t *testing.T) {
 					Description:        "Who is the best climber in Sweden?",
 					QualifyingProblems: 20,
 					Finalists:          5,
-					Rules:              "No rules!",
+					Info:               "No rules!",
 					GracePeriod:        time.Hour,
 				},
 			).
@@ -1108,13 +1110,21 @@ func TestPatchContest(t *testing.T) {
 				Description:        "Who is the best climber in Sweden?",
 				QualifyingProblems: 20,
 				Finalists:          5,
-				Rules:              "No rules!",
+				Info:               "No rules!",
 				GracePeriod:        time.Hour,
 			}, nil)
 
+		mockedEventBroker.
+			On("Dispatch", fakedContestID, domain.RulesUpdatedEvent{
+				QualifyingProblems: 20,
+				Finalists:          5,
+			}).
+			Return(nil)
+
 		ucase := usecases.ContestUseCase{
-			Repo:       mockedRepo,
-			Authorizer: mockedAuthorizer,
+			Repo:        mockedRepo,
+			Authorizer:  mockedAuthorizer,
+			EventBroker: mockedEventBroker,
 		}
 
 		patch := domain.ContestPatch{
@@ -1124,7 +1134,7 @@ func TestPatchContest(t *testing.T) {
 			Description:        domain.NewPatch("Who is the best climber in Sweden?"),
 			QualifyingProblems: domain.NewPatch(20),
 			Finalists:          domain.NewPatch(5),
-			Rules:              domain.NewPatch("No rules!"),
+			Info:               domain.NewPatch("No rules!"),
 			GracePeriod:        domain.NewPatch(time.Hour),
 		}
 
@@ -1137,15 +1147,16 @@ func TestPatchContest(t *testing.T) {
 		assert.Equal(t, "Who is the best climber in Sweden?", contest.Description)
 		assert.Equal(t, 20, contest.QualifyingProblems)
 		assert.Equal(t, 5, contest.Finalists)
-		assert.Equal(t, "No rules!", contest.Rules)
+		assert.Equal(t, "No rules!", contest.Info)
 		assert.Equal(t, time.Hour, contest.GracePeriod)
 
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
+		mockedEventBroker.AssertExpectations(t)
 	})
 
 	t.Run("ArchiveContest", func(t *testing.T) {
-		mockedRepo, mockedAuthorizer := makeMocks()
+		mockedRepo, mockedAuthorizer, _ := makeMocks()
 
 		mockedScoreEngineManager := new(scoreEngineManagerMock)
 
@@ -1213,7 +1224,7 @@ func TestPatchContest(t *testing.T) {
 	})
 
 	t.Run("RestoreContest", func(t *testing.T) {
-		mockedRepo, mockedAuthorizer := makeMocks()
+		mockedRepo, mockedAuthorizer, _ := makeMocks()
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
@@ -1263,7 +1274,7 @@ func TestPatchContest(t *testing.T) {
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {
-		mockedRepo, mockedAuthorizer := makeMocks()
+		mockedRepo, mockedAuthorizer, _ := makeMocks()
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
@@ -1290,7 +1301,7 @@ func TestPatchContest(t *testing.T) {
 	})
 
 	t.Run("ValidatorIsInvoked", func(t *testing.T) {
-		mockedRepo, mockedAuthorizer := makeMocks()
+		mockedRepo, mockedAuthorizer, _ := makeMocks()
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
@@ -1318,7 +1329,7 @@ func TestPatchContest(t *testing.T) {
 	})
 
 	t.Run("ContestIsArchived", func(t *testing.T) {
-		mockedRepo, mockedAuthorizer := makeMocks()
+		mockedRepo, mockedAuthorizer, _ := makeMocks()
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).

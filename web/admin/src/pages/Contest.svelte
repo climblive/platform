@@ -1,5 +1,6 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
+  import RulesEditor from "@/components/RulesEditor.svelte";
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
   import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
@@ -123,28 +124,31 @@
             <LabeledText label="Name">
               {contest.name}
             </LabeledText>
-            {#if contest.description}
-              <LabeledText label="Description">
+            <LabeledText label="Description">
+              {#if contest.description}
                 {contest.description}
-              </LabeledText>
-            {/if}
-            {#if contest.location}
-              <LabeledText label="Location">
+              {:else}
+                -
+              {/if}
+            </LabeledText>
+            <LabeledText label="Location">
+              {#if contest.location}
                 {contest.location}
-              </LabeledText>
-            {/if}
-            <LabeledText label="Finalists">
-              {contest.finalists}
+              {:else}
+                -
+              {/if}
             </LabeledText>
-            <LabeledText label="Qualifying problems">
-              {contest.qualifyingProblems}
-            </LabeledText>
-            {#if contest.rules}
-              <wa-details summary="Rules">
-                {@html contest.rules}
+            {#if contest.info}
+              <wa-details summary="General info">
+                {@html contest.info}
               </wa-details>
             {/if}
           </article>
+
+          <h2>Rules</h2>
+          <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
+          ></wa-divider>
+          <RulesEditor {contest} />
 
           <h2 bind:this={compClassesHeading}>Classes</h2>
           <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
