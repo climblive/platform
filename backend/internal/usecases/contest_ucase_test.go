@@ -433,7 +433,7 @@ func TestCreateContest(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
-	t.Run("RulesAreSanitized", func(t *testing.T) {
+	t.Run("InfoIsSanitized", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 
 		mockedAuthorizer.
@@ -1062,16 +1062,18 @@ func TestPatchContest(t *testing.T) {
 		OrganizerID: fakedOrganizerID,
 	}
 
-	makeMocks := func() (*repositoryMock, *authorizerMock) {
+	makeMocks := func() (*repositoryMock, *authorizerMock, *eventBrokerMock) {
 		mockedRepo := new(repositoryMock)
 
 		mockedAuthorizer := new(authorizerMock)
 
-		return mockedRepo, mockedAuthorizer
+		mockedEventBroker := new(eventBrokerMock)
+
+		return mockedRepo, mockedAuthorizer, mockedEventBroker
 	}
 
 	t.Run("HappyCase", func(t *testing.T) {
-		mockedRepo, mockedAuthorizer := makeMocks()
+		mockedRepo, mockedAuthorizer, mockedEventBroker := makeMocks()
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
@@ -1112,9 +1114,18 @@ func TestPatchContest(t *testing.T) {
 				GracePeriod:        time.Hour,
 			}, nil)
 
+		mockedEventBroker.
+			On("Dispatch", fakedContestID, domain.RulesUpdatedEvent{
+				ContestID:          fakedContestID,
+				QualifyingProblems: 20,
+				Finalists:          5,
+			}).
+			Return(nil)
+
 		ucase := usecases.ContestUseCase{
-			Repo:       mockedRepo,
-			Authorizer: mockedAuthorizer,
+			Repo:        mockedRepo,
+			Authorizer:  mockedAuthorizer,
+			EventBroker: mockedEventBroker,
 		}
 
 		patch := domain.ContestPatch{
@@ -1142,10 +1153,11 @@ func TestPatchContest(t *testing.T) {
 
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
+		mockedEventBroker.AssertExpectations(t)
 	})
 
 	t.Run("ArchiveContest", func(t *testing.T) {
-		mockedRepo, mockedAuthorizer := makeMocks()
+		mockedRepo, mockedAuthorizer, _ := makeMocks()
 
 		mockedScoreEngineManager := new(scoreEngineManagerMock)
 
@@ -1213,7 +1225,7 @@ func TestPatchContest(t *testing.T) {
 	})
 
 	t.Run("RestoreContest", func(t *testing.T) {
-		mockedRepo, mockedAuthorizer := makeMocks()
+		mockedRepo, mockedAuthorizer, _ := makeMocks()
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
@@ -1263,7 +1275,7 @@ func TestPatchContest(t *testing.T) {
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {
-		mockedRepo, mockedAuthorizer := makeMocks()
+		mockedRepo, mockedAuthorizer, _ := makeMocks()
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
@@ -1290,7 +1302,7 @@ func TestPatchContest(t *testing.T) {
 	})
 
 	t.Run("ValidatorIsInvoked", func(t *testing.T) {
-		mockedRepo, mockedAuthorizer := makeMocks()
+		mockedRepo, mockedAuthorizer, _ := makeMocks()
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
@@ -1318,7 +1330,7 @@ func TestPatchContest(t *testing.T) {
 	})
 
 	t.Run("ContestIsArchived", func(t *testing.T) {
-		mockedRepo, mockedAuthorizer := makeMocks()
+		mockedRepo, mockedAuthorizer, _ := makeMocks()
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).

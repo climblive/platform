@@ -46,6 +46,7 @@ type ContestUseCase struct {
 	Repo               contestUseCaseRepository
 	ScoreKeeper        domain.ScoreKeeper
 	ScoreEngineManager scoreEngineManager
+	EventBroker        domain.EventBroker
 }
 
 var sanitizationPolicy = bluemonday.UGCPolicy()
@@ -142,6 +143,12 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		return mty, errors.Wrap(err, 0)
 	}
 
+	rulesUpdateEventBaseline := domain.RulesUpdatedEvent{
+		ContestID:          contestID,
+		QualifyingProblems: contest.QualifyingProblems,
+		Finalists:          contest.Finalists,
+	}
+
 	if patch.Archived.Present {
 		contest.Archived = patch.Archived.Value
 
@@ -206,6 +213,16 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 
 	if _, err = uc.Repo.StoreContest(ctx, nil, contest); err != nil {
 		return mty, errors.Wrap(err, 0)
+	}
+
+	event := domain.RulesUpdatedEvent{
+		ContestID:          contestID,
+		QualifyingProblems: contest.QualifyingProblems,
+		Finalists:          contest.Finalists,
+	}
+
+	if event != rulesUpdateEventBaseline {
+		uc.EventBroker.Dispatch(contestID, event)
 	}
 
 	return contest, nil

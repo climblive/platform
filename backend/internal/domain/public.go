@@ -288,6 +288,12 @@ type ProblemDeletedEvent struct {
 	ProblemID ProblemID `json:"problemId"`
 }
 
+type RulesUpdatedEvent struct {
+	ContestID          ContestID `json:"contestId"`
+	QualifyingProblems int       `json:"qualifyingProblems"`
+	Finalists          int       `json:"finalists"`
+}
+
 type ContenderPublicInfoUpdatedEvent struct {
 	ContenderID         ContenderID `json:"contenderId"`
 	CompClassID         CompClassID `json:"compClassId"`

@@ -260,6 +260,11 @@ export interface ProblemUpdatedEvent {
 export interface ProblemDeletedEvent {
   problemId: ProblemID;
 }
+export interface RulesUpdatedEvent {
+  contestId: ContestID;
+  qualifyingProblems: number /* int */;
+  finalists: number /* int */;
+}
 export interface ContenderPublicInfoUpdatedEvent {
   contenderId: ContenderID;
   compClassId: CompClassID;
