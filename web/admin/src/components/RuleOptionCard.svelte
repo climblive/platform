@@ -1,6 +1,5 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/badge/badge.js";
-  import "@awesome.me/webawesome/dist/components/radio/radio.js";
   import type { Snippet } from "svelte";
 
   interface Props {
