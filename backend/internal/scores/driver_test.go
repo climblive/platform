@@ -43,6 +43,7 @@ func TestEngineDriver(t *testing.T) {
 			"ASCENT_DEREGISTERED",
 			"PROBLEM_ADDED",
 			"PROBLEM_UPDATED",
+			"RULES_UPDATED",
 		)
 
 		mockedEventBroker.On("Subscribe", filter, 0).Return(subscriptionID, subscription)

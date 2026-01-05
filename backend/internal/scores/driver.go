@@ -139,6 +139,7 @@ func (d *ScoreEngineDriver) run(
 		"ASCENT_DEREGISTERED",
 		"PROBLEM_ADDED",
 		"PROBLEM_UPDATED",
+		"RULES_UPDATED",
 	)
 
 	subscriptionID, eventReader := d.eventBroker.Subscribe(filter, 0)
