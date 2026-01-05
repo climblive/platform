@@ -40,8 +40,7 @@ type ScoreEngineDriver struct {
 
 	engine ScoreEngine
 
-	running    atomic.Bool
-	sideQuests chan func()
+	running atomic.Bool
 
 	publishToken bool
 }
@@ -61,7 +60,6 @@ func NewScoreEngineDriver(
 		instanceID:    instanceID,
 		eventBroker:   eventBroker,
 		pendingEvents: make([]domain.EventEnvelope, 0),
-		sideQuests:    make(chan func()),
 	}
 }
 
@@ -119,13 +117,6 @@ func (d *ScoreEngineDriver) run(
 	ready chan<- struct{},
 	engineReceiver chan ScoreEngine,
 ) {
-	defer func() {
-		close(d.sideQuests)
-
-		for range d.sideQuests {
-		}
-	}()
-
 	filter := domain.NewEventFilter(
 		d.contestID,
 		0,
@@ -225,8 +216,6 @@ PreLoop:
 			if n == 0 {
 				d.publishToken = true
 			}
-		case f := <-d.sideQuests:
-			f()
 		case <-ctx.Done():
 			return
 		}
