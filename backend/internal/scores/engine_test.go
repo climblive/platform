@@ -788,24 +788,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 	})
 }
 
-type rankerMock struct {
-	mock.Mock
-}
-
-func (m *rankerMock) RankContenders(contenders iter.Seq[scores.Contender]) []domain.Score {
-	args := m.Called(contenders)
-	return args.Get(0).([]domain.Score)
-}
-
-type scoringRulesMock struct {
-	mock.Mock
-}
-
-func (m *scoringRulesMock) CalculateScore(points iter.Seq[int]) int {
-	args := m.Called(points)
-	return args.Get(0).(int)
-}
-
 type engineStoreMock struct {
 	mock.Mock
 }
@@ -872,25 +854,4 @@ func (m *engineStoreMock) SaveScore(score domain.Score) {
 func (m *engineStoreMock) GetDirtyScores() []domain.Score {
 	args := m.Called()
 	return args.Get(0).([]domain.Score)
-}
-
-type jackpotRules struct{}
-
-func (m *jackpotRules) CalculateScore(points iter.Seq[int]) int {
-	return len(slices.Collect(points)) * 1_000_000
-}
-
-type fakeRanker struct{}
-
-func (r *fakeRanker) RankContenders(contenders iter.Seq[scores.Contender]) []domain.Score {
-	var scores []domain.Score
-
-	for contender := range contenders {
-		scores = append(scores, domain.Score{
-			ContenderID: contender.ID,
-			Placement:   1_000,
-		})
-	}
-
-	return scores
 }
