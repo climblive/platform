@@ -4,7 +4,7 @@
     patch: ContestPatch,
   ) => {
     mutation.mutate(patch, {
-      onError: () => toastError("Failed to update contest rules."),
+      onError: () => toastError("Failed to update rules."),
     });
   };
 </script>
