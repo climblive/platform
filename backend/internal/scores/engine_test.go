@@ -39,77 +39,57 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}, awaitExpectations
 	}
 
-	// t.Run("ReplaceScoringRules", func(t *testing.T) {
-	// 	f, awaitExpectations := makeFixture()
+	t.Run("ReplaceScoringRules", func(t *testing.T) {
+		synctest.Test(t, func(t *testing.T) {
+			f, awaitExpectations := makeFixture()
 
-	// 	f.store.On("GetAllContenders").
-	// 		Return(slices.Values([]scores.Contender{
-	// 			{ID: 1, CompClassID: 1},
-	// 			{ID: 2, CompClassID: 2},
-	// 			{ID: 3, CompClassID: 3},
-	// 		}))
+			f.store.On("SaveRules", scores.Rules{
+				QualifyingProblems: 1,
+				Finalists:          0,
+			}).Return()
 
-	// 	f.store.
-	// 		On("GetTicks", domain.ContenderID(1)).
-	// 		Return(slices.Values([]scores.Tick{{Points: 100}, {Points: 200}, {Points: 300}})).
-	// 		On("GetTicks", domain.ContenderID(2)).
-	// 		Return(slices.Values([]scores.Tick{{Points: 400}, {Points: 500}})).
-	// 		On("GetTicks", domain.ContenderID(3)).
-	// 		Return(slices.Values([]scores.Tick{{Points: 600}}))
+			f.store.On("GetAllContenders").
+				Return(slices.Values([]scores.Contender{
+					{ID: 1, CompClassID: 1},
+					{ID: 2, CompClassID: 2},
+					{ID: 3, CompClassID: 3},
+				}))
 
-	// 	f.store.
-	// 		On("SaveContender", scores.Contender{ID: 1, CompClassID: 1, Score: 3_000_000}).Return().
-	// 		On("SaveContender", scores.Contender{ID: 2, CompClassID: 2, Score: 2_000_000}).Return().
-	// 		On("SaveContender", scores.Contender{ID: 3, CompClassID: 3, Score: 1_000_000}).Return()
+			f.store.
+				On("GetTicks", domain.ContenderID(1)).
+				Return(slices.Values([]scores.Tick{{Points: 100}, {Points: 200}, {Points: 300}})).
+				On("GetTicks", domain.ContenderID(2)).
+				Return(slices.Values([]scores.Tick{{Points: 400}, {Points: 500}})).
+				On("GetTicks", domain.ContenderID(3)).
+				Return(slices.Values([]scores.Tick{{Points: 600}}))
 
-	// 	f.store.On("GetCompClassIDs").Return([]domain.CompClassID{1, 2, 3})
+			f.store.
+				On("SaveContender", scores.Contender{ID: 1, CompClassID: 1, Score: 300}).Return().
+				On("SaveContender", scores.Contender{ID: 2, CompClassID: 2, Score: 500}).Return().
+				On("SaveContender", scores.Contender{ID: 3, CompClassID: 3, Score: 600}).Return()
 
-	// 	f.store.
-	// 		On("GetContendersByCompClass", domain.CompClassID(1)).
-	// 		Return(slices.Values([]scores.Contender{{ID: 1}})).
-	// 		On("GetContendersByCompClass", domain.CompClassID(2)).
-	// 		Return(slices.Values([]scores.Contender{{ID: 2}})).
-	// 		On("GetContendersByCompClass", domain.CompClassID(3)).
-	// 		Return(slices.Values([]scores.Contender{{ID: 3}}))
+			f.store.On("GetCompClassIDs").Return([]domain.CompClassID{1, 2, 3})
 
-	// 	f.ranker.
-	// 		On("RankContenders", iterMatcher([]scores.Contender{{ID: 1}})).
-	// 		Return([]domain.Score{{ContenderID: 1, Placement: 1}}).
-	// 		On("RankContenders", iterMatcher([]scores.Contender{{ID: 2}})).
-	// 		Return([]domain.Score{{ContenderID: 2, Placement: 2}}).
-	// 		On("RankContenders", iterMatcher([]scores.Contender{{ID: 3}})).
-	// 		Return([]domain.Score{{ContenderID: 3, Placement: 3}})
+			f.store.
+				On("GetContendersByCompClass", domain.CompClassID(1)).
+				Return(slices.Values([]scores.Contender{{ID: 1}})).
+				On("GetContendersByCompClass", domain.CompClassID(2)).
+				Return(slices.Values([]scores.Contender{{ID: 2}})).
+				On("GetContendersByCompClass", domain.CompClassID(3)).
+				Return(slices.Values([]scores.Contender{{ID: 3}}))
 
-	// 	f.store.On("SaveScore", domain.Score{ContenderID: 1, Placement: 1}).Return()
-	// 	f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 2}).Return()
-	// 	f.store.On("SaveScore", domain.Score{ContenderID: 3, Placement: 3}).Return()
+			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 1, Placement: 1}).Return()
+			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 2, Placement: 1}).Return()
+			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 3, Placement: 1}).Return()
 
-	// 	f.engine.ReplaceScoringRules(&jackpotRules{})
+			f.engine.HandleRulesUpdated(domain.RulesUpdatedEvent{
+				QualifyingProblems: 1,
+				Finalists:          0,
+			})
 
-	// 	awaitExpectations(t)
-	// })
-
-	// t.Run("ReplaceRanker", func(t *testing.T) {
-	// 	f, awaitExpectations := makeFixture()
-
-	// 	f.store.On("GetCompClassIDs").Return([]domain.CompClassID{1, 2, 3})
-
-	// 	f.store.
-	// 		On("GetContendersByCompClass", domain.CompClassID(1)).
-	// 		Return(slices.Values([]scores.Contender{{ID: 1}})).
-	// 		On("GetContendersByCompClass", domain.CompClassID(2)).
-	// 		Return(slices.Values([]scores.Contender{{ID: 2}})).
-	// 		On("GetContendersByCompClass", domain.CompClassID(3)).
-	// 		Return(slices.Values([]scores.Contender{{ID: 3}}))
-
-	// 	f.store.On("SaveScore", domain.Score{ContenderID: 1, Placement: 1_000}).Return()
-	// 	f.store.On("SaveScore", domain.Score{ContenderID: 2, Placement: 1_000}).Return()
-	// 	f.store.On("SaveScore", domain.Score{ContenderID: 3, Placement: 1_000}).Return()
-
-	// 	f.engine.ReplaceRanker(&fakeRanker{})
-
-	// 	awaitExpectations(t)
-	// })
+			awaitExpectations(t)
+		})
+	})
 
 	t.Run("Start", func(t *testing.T) {
 		synctest.Test(t, func(t *testing.T) {
