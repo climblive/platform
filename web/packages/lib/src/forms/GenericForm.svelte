@@ -8,7 +8,7 @@
   interface Props {
     schema: z.ZodType<T, unknown>;
     submit: (value: T) => void;
-    children?: Snippet;
+    children?: (form: HTMLFormElement) => ReturnType<Snippet>;
   }
 
   let { schema, submit, children }: Props = $props();
@@ -91,5 +91,5 @@
 </script>
 
 <form bind:this={form} onsubmit={handleSubmit} oninput={resetCustomValidation}>
-  {@render children?.()}
+  {@render children?.(form)}
 </form>
