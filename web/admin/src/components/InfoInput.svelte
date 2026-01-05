@@ -7,12 +7,12 @@
   import { onDestroy, onMount } from "svelte";
 
   interface Props {
-    rules: string | undefined;
+    info: string | undefined;
   }
 
-  const { rules }: Props = $props();
+  const { info }: Props = $props();
 
-  let rulesElement: HTMLElement | undefined = $state();
+  let infoElement: HTMLElement | undefined = $state();
   let hiddenElement: HTMLInputElement | undefined = $state();
   let editorState = $state<{ editor: Editor | null }>({ editor: null });
 
@@ -20,9 +20,9 @@
 
   onMount(() => {
     editorState.editor = new Editor({
-      element: rulesElement,
+      element: infoElement,
       extensions: [StarterKit],
-      content: rules,
+      content: info,
       editorProps: {
         attributes: {
           "aria-labelledby": id,
@@ -69,8 +69,8 @@
 
 <div>
   <!-- svelte-ignore a11y_label_has_associated_control -->
-  <label {id}>Rules</label>
-  <input type="hidden" {@attach name("rules")} bind:this={hiddenElement} />
+  <label {id}>Info</label>
+  <input type="hidden" {@attach name("info")} bind:this={hiddenElement} />
   {#if editorState.editor}
     <wa-button-group>
       {@render richTextModifier({
@@ -130,11 +130,11 @@
     </wa-button-group>
   {/if}
 
-  <div bind:this={rulesElement} class="rules"></div>
+  <div bind:this={infoElement} class="info"></div>
 </div>
 
 <style>
-  .rules :global(.tiptap) {
+  .info :global(.tiptap) {
     min-height: 10rem;
     border: var(--wa-form-control-border-style)
       var(--wa-form-control-border-width) var(--wa-form-control-border-color);

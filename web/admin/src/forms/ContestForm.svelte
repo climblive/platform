@@ -6,7 +6,7 @@
     seriesId: z.coerce.number().optional(),
     name: z.string().min(1),
     description: z.string().optional(),
-    rules: z.string().optional(),
+    info: z.string().optional(),
     gracePeriod: z.coerce.number().min(0).max(60),
   });
 
@@ -69,7 +69,7 @@
       value={Math.floor((data.gracePeriod ?? 0) / minuteInNanoseconds)}
     >
     </wa-input>
-    <InfoInput rules={data.info} />
+    <InfoInput info={data.info} />
     {@render children?.()}
   </fieldset>
 </GenericForm>

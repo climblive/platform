@@ -124,18 +124,22 @@
             <LabeledText label="Name">
               {contest.name}
             </LabeledText>
-            {#if contest.description}
-              <LabeledText label="Description">
+            <LabeledText label="Description">
+              {#if contest.description}
                 {contest.description}
-              </LabeledText>
-            {/if}
-            {#if contest.location}
-              <LabeledText label="Location">
+              {:else}
+                -
+              {/if}
+            </LabeledText>
+            <LabeledText label="Location">
+              {#if contest.location}
                 {contest.location}
-              </LabeledText>
-            {/if}
+              {:else}
+                -
+              {/if}
+            </LabeledText>
             {#if contest.info}
-              <wa-details summary="Contest info">
+              <wa-details summary="General info">
                 {@html contest.info}
               </wa-details>
             {/if}
