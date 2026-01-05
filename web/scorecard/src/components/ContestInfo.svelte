@@ -62,7 +62,7 @@
         inline: "nearest",
       })}
     bind:this={details}
-    summary="Info"
+    summary="General info"
   >
     {@html contest.info}
   </wa-details>
