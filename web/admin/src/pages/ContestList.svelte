@@ -183,7 +183,7 @@
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
 {/snippet}
 
-{#if !ongoing || !upcoming || !past || !archived}
+{#if contestsQuery.isLoading || allContestsQuery.isLoading || !ongoing || !upcoming || !past || !archived}
   <Loader />
 {:else}
   {#if ongoing?.length}
