@@ -11,6 +11,7 @@
 
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
+  import "@awesome.me/webawesome/dist/components/radio/radio.js";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
   import { patchContestMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
