@@ -1,7 +1,8 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
-  import "@awesome.me/webawesome/dist/components/switch/switch.js";
+  import "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import { checked, GenericForm, name } from "@climblive/lib/forms";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
   import { patchContestMutation } from "@climblive/lib/queries";
