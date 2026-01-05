@@ -9,23 +9,24 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/scores"
 )
 
 type ScoreEngine interface {
-	Start()
+	Start() ChainEffects
 	Stop()
 
-	HandleRulesUpdated(event domain.RulesUpdatedEvent)
-	HandleContenderEntered(event domain.ContenderEnteredEvent)
-	HandleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent)
-	HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent)
-	HandleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent)
-	HandleContenderDisqualified(event domain.ContenderDisqualifiedEvent)
-	HandleContenderRequalified(event domain.ContenderRequalifiedEvent)
-	HandleAscentRegistered(event domain.AscentRegisteredEvent)
-	HandleAscentDeregistered(event domain.AscentDeregisteredEvent)
-	HandleProblemAdded(event domain.ProblemAddedEvent)
-	HandleProblemUpdated(event domain.ProblemUpdatedEvent)
+	HandleRulesUpdated(event domain.RulesUpdatedEvent) ChainEffects
+	HandleContenderEntered(event domain.ContenderEnteredEvent) ChainEffects
+	HandleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent) ChainEffects
+	HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent) ChainEffects
+	HandleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent) ChainEffects
+	HandleContenderDisqualified(event domain.ContenderDisqualifiedEvent) ChainEffects
+	HandleContenderRequalified(event domain.ContenderRequalifiedEvent) ChainEffects
+	HandleAscentRegistered(event domain.AscentRegisteredEvent) ChainEffects
+	HandleAscentDeregistered(event domain.AscentDeregisteredEvent) ChainEffects
+	HandleProblemAdded(event domain.ProblemAddedEvent) ChainEffects
+	HandleProblemUpdated(event domain.ProblemUpdatedEvent) ChainEffects
 
 	GetDirtyScores() []domain.Score
 }
@@ -230,29 +231,47 @@ PreLoop:
 }
 
 func (d *ScoreEngineDriver) handleEvent(event domain.EventEnvelope) {
+	var effects scores.ChainEffects
+
 	switch ev := event.Data.(type) {
 	case domain.RulesUpdatedEvent:
-		d.engine.HandleRulesUpdated(ev)
+		effects = d.engine.HandleRulesUpdated(ev)
 	case domain.ContenderEnteredEvent:
-		d.engine.HandleContenderEntered(ev)
+		effects = d.engine.HandleContenderEntered(ev)
 	case domain.ContenderSwitchedClassEvent:
-		d.engine.HandleContenderSwitchedClass(ev)
+		effects = d.engine.HandleContenderSwitchedClass(ev)
 	case domain.ContenderWithdrewFromFinalsEvent:
-		d.engine.HandleContenderWithdrewFromFinals(ev)
+		effects = d.engine.HandleContenderWithdrewFromFinals(ev)
 	case domain.ContenderReenteredFinalsEvent:
-		d.engine.HandleContenderReenteredFinals(ev)
+		effects = d.engine.HandleContenderReenteredFinals(ev)
 	case domain.ContenderDisqualifiedEvent:
-		d.engine.HandleContenderDisqualified(ev)
+		effects = d.engine.HandleContenderDisqualified(ev)
 	case domain.ContenderRequalifiedEvent:
-		d.engine.HandleContenderRequalified(ev)
+		effects = d.engine.HandleContenderRequalified(ev)
 	case domain.AscentRegisteredEvent:
-		d.engine.HandleAscentRegistered(ev)
+		effects = d.engine.HandleAscentRegistered(ev)
 	case domain.AscentDeregisteredEvent:
-		d.engine.HandleAscentDeregistered(ev)
+		effects = d.engine.HandleAscentDeregistered(ev)
 	case domain.ProblemAddedEvent:
-		d.engine.HandleProblemAdded(ev)
+		effects = d.engine.HandleProblemAdded(ev)
 	case domain.ProblemUpdatedEvent:
-		d.engine.HandleProblemUpdated(ev)
+		effects = d.engine.HandleProblemUpdated(ev)
+	}
+
+	if effects != nil {
+		for effect := range effects {
+			switch effect.Type {
+			case ChainEffectTypeRankClass:
+				d.logger.Info("re-ranking comp class", "comp_class_id", effect.CompClass)
+				d.engine.RankCompClasses(effect.CompClass)
+			case ChainEffectTypeScoreContender:
+				d.logger.Info("re-scoring contender", "contender_id", effect.ResourceID)
+				d.engine.ScoreContender(domain.ContenderID(effect.ResourceID))
+			case ChainEffectTypeCalculateSpot:
+				d.logger.Info("re-calculating spot", "spot_id", effect.ResourceID)
+				d.engine.CalculateSpot(domain.SpotID(effect.ResourceID))
+			}
+		}
 	}
 }
 

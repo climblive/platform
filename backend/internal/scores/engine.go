@@ -20,6 +20,32 @@ type Ranker interface {
 	RankContenders(contenders iter.Seq[Contender]) []domain.Score
 }
 
+type ChainEffectType int
+
+const (
+	ChainEffectTypeCalculateSpot ChainEffectType = iota
+	ChainEffectTypeScoreContender
+	ChainEffectTypeRankClass
+)
+
+type ChainEffect struct {
+	Type       ChainEffectType
+	ResourceID domain.ResourceID
+	CompClass  domain.CompClassID
+}
+
+type ChainEffects map[ChainEffect]struct{}
+
+func (ce ChainEffects) RankCompClass(compClassID domain.CompClassID) ChainEffects {
+	ce[ChainEffect{
+		Type:       ChainEffectTypeRankClass,
+		ResourceID: domain.ResourceID(compClassID),
+		CompClass:  compClassID,
+	}] = struct{}{}
+
+	return ce
+}
+
 type EngineStore interface {
 	GetRules() Rules
 	SaveRules(Rules)
@@ -145,30 +171,36 @@ func (e *DefaultScoreEngine) HandleContenderSwitchedClass(event domain.Contender
 	e.rankCompClasses(compClassesToReRank...)
 }
 
-func (e *DefaultScoreEngine) HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent) {
+func (e *DefaultScoreEngine) HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent) ChainEffects {
 	contender, found := e.store.GetContender(event.ContenderID)
 	if !found {
-		return
+		return nil
 	}
 
 	contender.WithdrawnFromFinals = true
 
 	e.store.SaveContender(contender)
 
-	e.rankCompClasses(contender.CompClassID)
+	effects := make(ChainEffects)
+	effects.RankCompClass(contender.CompClassID)
+
+	return effects
 }
 
-func (e *DefaultScoreEngine) HandleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent) {
+func (e *DefaultScoreEngine) HandleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent) ChainEffects {
 	contender, found := e.store.GetContender(event.ContenderID)
 	if !found {
-		return
+		return nil
 	}
 
 	contender.WithdrawnFromFinals = false
 
 	e.store.SaveContender(contender)
 
-	e.rankCompClasses(contender.CompClassID)
+	effects := make(ChainEffects)
+	effects.RankCompClass(contender.CompClassID)
+
+	return effects
 }
 
 func (e *DefaultScoreEngine) HandleContenderDisqualified(event domain.ContenderDisqualifiedEvent) {
