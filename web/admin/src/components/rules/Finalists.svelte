@@ -1,8 +1,8 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
-  import "@awesome.me/webawesome/dist/components/button/button.js";
   import { checked, GenericForm, name } from "@climblive/lib/forms";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
   import { patchContestMutation } from "@climblive/lib/queries";
@@ -18,7 +18,7 @@
 
   const patchContest = $derived(patchContestMutation(contest.id));
 
-  let enableFinalists = $derived(contest.finalists > 0);
+  let enabled = $derived(contest.finalists > 0);
 
   const formSchema = z.object({
     finalists: z.coerce.number().min(0).max(65536).optional(),
@@ -40,16 +40,16 @@
           size="small"
           onchange={(event: InputEvent) => {
             const checkbox = event.target as WaCheckbox;
-            enableFinalists = checkbox.checked;
+            enabled = checkbox.checked;
 
             setTimeout(() => form.requestSubmit());
           }}
-          {@attach checked(enableFinalists)}
+          {@attach checked(enabled)}
         ></wa-checkbox>
       {/snippet}
       {#snippet footer()}
         <div class="controls">
-          {#if enableFinalists}
+          {#if enabled}
             <wa-input
               size="small"
               {@attach name("finalists")}
