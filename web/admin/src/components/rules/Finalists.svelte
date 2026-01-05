@@ -59,7 +59,6 @@
               min={0}
               max={65536}
               defaultValue={contest.finalists || 7}
-              disabled={!enableFinalists}
             ></wa-input>
 
             <wa-button
