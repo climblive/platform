@@ -14,7 +14,7 @@ func (r *HardestProblems) CalculateScore(points iter.Seq[int]) int {
 
 	n := 0
 	for _, p := range slices.Backward(slices.Sorted(points)) {
-		if n >= r.Number {
+		if r.Number > 0 && n >= r.Number {
 			break
 		}
 
