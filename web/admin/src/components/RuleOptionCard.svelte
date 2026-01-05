@@ -8,7 +8,7 @@
     description: string;
     disabled?: boolean;
     tag?: string;
-    children: Snippet;
+    header?: Snippet;
     footer?: Snippet;
   }
 
@@ -17,14 +17,16 @@
     description,
     disabled = false,
     tag,
-    children,
+    header,
     footer,
   }: Props = $props();
 </script>
 
 <div class="card" data-disabled={disabled}>
   <div class="header">
-    {@render children()}
+    {#if header}
+      {@render header()}
+    {/if}
     <h3>{title}</h3>
     {#if tag}
       <wa-badge pill variant="neutral">{tag}</wa-badge>
