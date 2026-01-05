@@ -73,8 +73,8 @@
 
     & wa-button {
       position: absolute;
-      top: var(--wa-space-m);
-      right: var(--wa-space-s);
+      top: var(--wa-space-xs);
+      right: var(--wa-space-xs);
       color: inherit;
 
       &::part(label) {
