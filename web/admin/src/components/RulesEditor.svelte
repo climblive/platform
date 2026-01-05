@@ -26,7 +26,7 @@
   const { contest }: Props = $props();
 </script>
 
-<h3>Ranking Method</h3>
+<h3>Ranking method</h3>
 <section>
   <RuleOptionCard
     title="Points"
@@ -50,13 +50,12 @@
 </section>
 
 <h3>Options</h3>
-
 <section>
   <ProblemLimit {contest} />
 
   <RuleOptionCard
     title="Pooled points"
-    description="Points for each boulder are split by percentages among the ascensionists. A boulder worth 1000 points with two tops would give each contender 500 points. If a third contender also tops the boulder, then all three would receive 333 points instead."
+    description="Points for completed problems are split by percentages. A boulder worth 1000 points with two tops will give each contender 500 points. If a third contender also tops the boulder, then all three would receive 333 points instead."
     disabled
     tag="Upcoming"
   >
