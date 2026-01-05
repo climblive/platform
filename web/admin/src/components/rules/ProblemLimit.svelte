@@ -34,7 +34,7 @@
   {#snippet children(form)}
     <RuleOptionCard
       title="Problem limit"
-      description="Only count a configurable number of the hardest problems towards each contenders total score."
+      description="Only count a configurable number of the hardest problems towards each contender's total score."
     >
       {#snippet header()}
         <wa-checkbox
