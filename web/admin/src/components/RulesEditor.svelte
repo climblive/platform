@@ -51,7 +51,6 @@
 </section>
 
 <h3>Options</h3>
-
 <section>
   <GenericForm
     submit={(value) =>
