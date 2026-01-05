@@ -69,7 +69,7 @@
 
 <div>
   <!-- svelte-ignore a11y_label_has_associated_control -->
-  <label {id}>Info</label>
+  <label {id}>General info</label>
   <input type="hidden" {@attach name("info")} bind:this={hiddenElement} />
   {#if editorState.editor}
     <wa-button-group>
