@@ -1116,7 +1116,6 @@ func TestPatchContest(t *testing.T) {
 
 		mockedEventBroker.
 			On("Dispatch", fakedContestID, domain.RulesUpdatedEvent{
-				ContestID:          fakedContestID,
 				QualifyingProblems: 20,
 				Finalists:          5,
 			}).

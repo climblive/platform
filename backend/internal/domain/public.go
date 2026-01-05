@@ -289,9 +289,8 @@ type ProblemDeletedEvent struct {
 }
 
 type RulesUpdatedEvent struct {
-	ContestID          ContestID `json:"contestId"`
-	QualifyingProblems int       `json:"qualifyingProblems"`
-	Finalists          int       `json:"finalists"`
+	QualifyingProblems int `json:"qualifyingProblems"`
+	Finalists          int `json:"finalists"`
 }
 
 type ContenderPublicInfoUpdatedEvent struct {

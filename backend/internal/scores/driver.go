@@ -15,9 +15,7 @@ type ScoreEngine interface {
 	Start()
 	Stop()
 
-	ReplaceScoringRules(rules ScoringRules)
-	ReplaceRanker(ranker Ranker)
-
+	HandleRulesUpdated(event domain.RulesUpdatedEvent)
 	HandleContenderEntered(event domain.ContenderEnteredEvent)
 	HandleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent)
 	HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent)
@@ -241,28 +239,10 @@ PreLoop:
 	}
 }
 
-func (d *ScoreEngineDriver) SetScoringRules(rules ScoringRules) {
-	quest := func() {
-		d.engine.ReplaceScoringRules(rules)
-	}
-
-	if d.running.Load() {
-		d.sideQuests <- quest
-	}
-}
-
-func (d *ScoreEngineDriver) SetRanker(ranker Ranker) {
-	quest := func() {
-		d.engine.ReplaceRanker(ranker)
-	}
-
-	if d.running.Load() {
-		d.sideQuests <- quest
-	}
-}
-
 func (d *ScoreEngineDriver) handleEvent(event domain.EventEnvelope) {
 	switch ev := event.Data.(type) {
+	case domain.RulesUpdatedEvent:
+		d.engine.HandleRulesUpdated(ev)
 	case domain.ContenderEnteredEvent:
 		d.engine.HandleContenderEntered(ev)
 	case domain.ContenderSwitchedClassEvent:
