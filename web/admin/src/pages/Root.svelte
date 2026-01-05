@@ -12,24 +12,24 @@
     getContext<Writable<number | undefined>>("selectedOrganizer");
 
   $effect(() => {
+    if (self === undefined) {
+      return;
+    }
+
+    if (!self.organizers.some(({ id }) => id === $selectedOrganizer)) {
+      $selectedOrganizer = undefined;
+    }
+
+    if ($selectedOrganizer === undefined && self.organizers.length > 0) {
+      $selectedOrganizer = self.organizers[0].id;
+    }
+
     if ($selectedOrganizer !== undefined) {
       setTimeout(() => {
-        navigate(`/admin/organizers/${$selectedOrganizer}`, {
+        navigate(`/admin/organizers/${$selectedOrganizer}/contests`, {
           replace: true,
         });
       });
-    }
-  });
-
-  $effect(() => {
-    if (
-      $selectedOrganizer === undefined &&
-      self !== undefined &&
-      self.organizers.length > 0
-    ) {
-      $selectedOrganizer = self.organizers[0].id;
-
-      return;
     }
   });
 </script>

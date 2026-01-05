@@ -11,6 +11,19 @@ import (
 )
 
 func TestMemoryStore(t *testing.T) {
+	t.Run("SaveRules", func(t *testing.T) {
+		store := scores.NewMemoryStore()
+
+		rules := scores.Rules{
+			QualifyingProblems: 10,
+			Finalists:          7,
+		}
+
+		store.SaveRules(rules)
+
+		assert.Equal(t, rules, store.GetRules())
+	})
+
 	t.Run("GetContender", func(t *testing.T) {
 		store := scores.NewMemoryStore()
 

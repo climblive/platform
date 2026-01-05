@@ -14,6 +14,7 @@ export type RaffleWinnerID = ResourceID;
 export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
+export type OrganizerInviteID = string;
 export type ResourceIDType =
   | CompClassID
   | ContenderID
@@ -74,16 +75,19 @@ export interface ContenderPatch {
 export interface Contest {
   id: ContestID;
   ownership: OwnershipData;
+  archived: boolean;
   location?: string;
   seriesId?: SeriesID;
   name: string;
   description?: string;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
-  rules?: string;
+  info?: string;
   gracePeriod: number;
   timeBegin?: Date;
   timeEnd?: Date;
+  created: Date;
+  registeredContenders: number /* int */;
 }
 export interface ContestTemplate {
   location?: string;
@@ -92,22 +96,38 @@ export interface ContestTemplate {
   description?: string;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
-  rules?: string;
+  info?: string;
   gracePeriod: number;
 }
 export interface ContestPatch {
+  archived?: boolean;
   location?: string;
   seriesId?: number;
   name?: string;
   description?: string;
   qualifyingProblems?: number;
   finalists?: number;
-  rules?: string;
+  info?: string;
   gracePeriod?: number;
+}
+export interface ContestTransferRequest {
+  newOrganizerId: OrganizerID;
 }
 export interface Organizer {
   id: OrganizerID;
   name: string;
+}
+export interface OrganizerTemplate {
+  name: string;
+}
+export interface OrganizerPatch {
+  name?: string;
+}
+export interface OrganizerInvite {
+  id: OrganizerInviteID;
+  organizerId: OrganizerID;
+  organizerName: string;
+  expiresAt: Date;
 }
 export interface Problem {
   id: ProblemID;
@@ -128,8 +148,8 @@ export interface ProblemTemplate {
   holdColorPrimary: string;
   holdColorSecondary?: string;
   description?: string;
-  zone1Enabled?: boolean;
-  zone2Enabled?: boolean;
+  zone1Enabled: boolean;
+  zone2Enabled: boolean;
   pointsZone1?: number /* int */;
   pointsZone2?: number /* int */;
   pointsTop: number /* int */;
@@ -248,6 +268,11 @@ export interface ProblemUpdatedEvent {
 }
 export interface ProblemDeletedEvent {
   problemId: ProblemID;
+}
+export interface RulesUpdatedEvent {
+  contestId: ContestID;
+  qualifyingProblems: number /* int */;
+  finalists: number /* int */;
 }
 export interface ContenderPublicInfoUpdatedEvent {
   contenderId: ContenderID;

@@ -1,6 +1,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
+    EmptyState,
     HoldColorIndicator,
     Table,
     type ColumnDefinition,
@@ -125,6 +126,11 @@
 
 {#if tableData && tableData.length > 0}
   <Table {columns} data={tableData} getId={({ tick }) => tick.id}></Table>
+{:else if tableData}
+  <EmptyState
+    title="No ticks yet"
+    description="Ticks will appear here once the contender starts logging their attempts."
+  />
 {/if}
 
 <style>

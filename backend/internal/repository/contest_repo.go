@@ -29,6 +29,8 @@ func (d *Database) GetContest(ctx context.Context, tx domain.Transaction, contes
 		contest.TimeEnd = timeEnd
 	}
 
+	contest.RegisteredContenders = int(record.RegisteredContenders)
+
 	return contest, nil
 }
 
@@ -50,6 +52,8 @@ func (d *Database) GetAllContests(ctx context.Context, tx domain.Transaction) ([
 		if timeEnd, ok := record.TimeEnd.(time.Time); ok {
 			contest.TimeEnd = timeEnd
 		}
+
+		contest.RegisteredContenders = int(record.RegisteredContenders)
 
 		contests = append(contests, contest)
 	}
@@ -76,6 +80,8 @@ func (d *Database) GetContestsByOrganizer(ctx context.Context, tx domain.Transac
 			contest.TimeEnd = timeEnd
 		}
 
+		contest.RegisteredContenders = int(record.RegisteredContenders)
+
 		contests = append(contests, contest)
 	}
 
@@ -97,15 +103,13 @@ func (d *Database) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context,
 		contest := contestToDomain(database.Contest{
 			ID:                 record.ID,
 			OrganizerID:        record.OrganizerID,
-			Protected:          record.Protected,
 			SeriesID:           record.SeriesID,
 			Name:               record.Name,
 			Description:        record.Description,
 			Location:           record.Location,
-			FinalEnabled:       record.FinalEnabled,
 			QualifyingProblems: record.QualifyingProblems,
 			Finalists:          record.Finalists,
-			Rules:              record.Rules,
+			Info:               record.Info,
 			GracePeriod:        record.GracePeriod,
 		})
 
@@ -127,15 +131,16 @@ func (d *Database) StoreContest(ctx context.Context, tx domain.Transaction, cont
 	params := database.UpsertContestParams{
 		ID:                 int32(contest.ID),
 		OrganizerID:        int32(contest.Ownership.OrganizerID),
+		Archived:           contest.Archived,
 		SeriesID:           makeNullInt32(int32(contest.SeriesID)),
 		Name:               contest.Name,
 		Description:        makeNullString(contest.Description),
 		Location:           makeNullString(contest.Location),
-		FinalEnabled:       contest.Finalists > 0,
 		QualifyingProblems: int32(contest.QualifyingProblems),
 		Finalists:          int32(contest.Finalists),
-		Rules:              makeNullString(contest.Rules),
+		Info:               makeNullString(contest.Info),
 		GracePeriod:        int32(contest.GracePeriod / time.Minute),
+		Created:            contest.Created,
 	}
 
 	insertID, err := d.WithTx(tx).UpsertContest(ctx, params)
@@ -148,4 +153,13 @@ func (d *Database) StoreContest(ctx context.Context, tx domain.Transaction, cont
 	}
 
 	return contest, err
+}
+
+func (d *Database) DeleteContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) error {
+	err := d.WithTx(tx).DeleteContest(ctx, int32(contestID))
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	return nil
 }

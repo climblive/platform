@@ -17,7 +17,9 @@
 
   const createContest = $derived(createContestMutation(organizerId));
 
-  const handleSubmit = (form: ContestTemplate) => {
+  const handleSubmit = (
+    form: Omit<ContestTemplate, "qualifyingProblems" | "finalists">,
+  ) => {
     if (createContest.isPending) {
       return;
     }
@@ -26,6 +28,8 @@
       {
         ...form,
         gracePeriod: form.gracePeriod * minuteInNanoseconds,
+        qualifyingProblems: 0,
+        finalists: 0,
       },
       {
         onSuccess: (contest: Contest) => navigate(`contests/${contest.id}`),
@@ -39,10 +43,8 @@
   submit={handleSubmit}
   data={{
     name: "",
-    finalists: 7,
-    qualifyingProblems: 10,
     gracePeriod: 15 * minuteInNanoseconds,
-    rules: "",
+    info: "",
   }}
   schema={formSchema}
 >
@@ -50,7 +52,7 @@
     <wa-button
       size="small"
       appearance="plain"
-      onclick={() => navigate(`/admin/organizers/${organizerId}`)}
+      onclick={() => navigate(`./organizers/${organizerId}/contests`)}
       >Cancel</wa-button
     >
     <wa-button

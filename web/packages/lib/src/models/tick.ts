@@ -1,4 +1,4 @@
-import * as z from "zod";
+import * as z from "zod/v4";
 import type { Tick } from "./generated";
 
 export const tickSchema: z.ZodType<Tick> = z.object({

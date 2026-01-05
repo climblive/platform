@@ -13,6 +13,7 @@
   import "@awesome.me/webawesome/dist/components/tab/tab.js";
   import {
     ContestStateProvider,
+    EmptyState,
     ResultList,
     ScoreboardProvider,
   } from "@climblive/lib/components";
@@ -77,6 +78,7 @@
   );
 
   let orderProblemsBy = $state<"number" | "points">("number");
+  let sortDirection = $state<"asc" | "desc">("asc");
 
   let sortedProblems = $derived.by<Problem[]>(() => {
     const clonedProblems = [...(problems ?? [])];
@@ -100,8 +102,36 @@
         break;
     }
 
+    if (sortDirection === "desc") {
+      clonedProblems.reverse();
+    }
+
     return clonedProblems;
   });
+
+  let numberSortIcon = $derived(
+    orderProblemsBy === "number" && sortDirection === "desc"
+      ? "arrow-up-9-1"
+      : "arrow-down-1-9",
+  );
+
+  let numberSortLabel = $derived(
+    orderProblemsBy === "number" && sortDirection === "desc"
+      ? "Sort by number descending"
+      : "Sort by number ascending",
+  );
+
+  let pointsSortIcon = $derived(
+    orderProblemsBy === "points" && sortDirection === "desc"
+      ? "arrow-down-wide-short"
+      : "arrow-up-short-wide",
+  );
+
+  let pointsSortLabel = $derived(
+    orderProblemsBy === "points" && sortDirection === "desc"
+      ? "Sort by points descending"
+      : "Sort by points ascending",
+  );
 
   let highestProblemNumber = $derived(
     problems?.reduce((max, cur) => {
@@ -229,38 +259,72 @@
               value={orderProblemsBy}
               onchange={() => {
                 if (radioGroup) {
-                  orderProblemsBy = radioGroup.value as typeof orderProblemsBy;
+                  const newValue = radioGroup.value as typeof orderProblemsBy;
+                  if (newValue !== orderProblemsBy) {
+                    sortDirection = "asc";
+                    orderProblemsBy = newValue;
+                  }
                 }
               }}
             >
-              <wa-radio value="number" appearance="button">
-                <wa-icon name="arrow-down-1-9" label="Sort by number"></wa-icon>
+              <wa-radio
+                value="number"
+                appearance="button"
+                onclick={() => {
+                  if (orderProblemsBy === "number") {
+                    sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                  }
+                }}
+                disabled={problems === undefined || problems.length === 0}
+              >
+                <wa-icon name={numberSortIcon} label={numberSortLabel}
+                ></wa-icon>
                 Sort by number
               </wa-radio>
 
-              <wa-radio value="points" appearance="button">
-                <wa-icon name="arrow-up-short-wide" label="Sort by points"
+              <wa-radio
+                value="points"
+                appearance="button"
+                onclick={() => {
+                  if (orderProblemsBy === "points") {
+                    sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                  }
+                }}
+                disabled={problems === undefined || problems.length === 0}
+              >
+                <wa-icon name={pointsSortIcon} label={pointsSortLabel}
                 ></wa-icon>
                 Sort by points
               </wa-radio>
             </wa-radio-group>
-            {#each sortedProblems as problem (problem.id)}
-              <ProblemView
-                {problem}
-                tick={ticks.find(({ problemId }) => problemId === problem.id)}
-                disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
-                {highestProblemNumber}
+            {#if sortedProblems.length === 0}
+              <EmptyState
+                title="No problems"
+                description="The organizer has not added any problems to this contest yet."
               />
-            {/each}
+            {:else}
+              {#each sortedProblems as problem (problem.id)}
+                <ProblemView
+                  {problem}
+                  tick={ticks.find(({ problemId }) => problemId === problem.id)}
+                  disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
+                  {highestProblemNumber}
+                />
+              {/each}
+            {/if}
           </wa-tab-panel>
           <wa-tab-panel name="results">
             {#if resultsConnected}
-              <ScoreboardProvider contestId={$session.contestId}>
+              <ScoreboardProvider
+                contestId={$session.contestId}
+                hideDisqualified
+              >
                 {#snippet children({ scoreboard, loading })}
                   <ResultList
                     compClassId={selectedCompClass.id}
                     {scoreboard}
                     {loading}
+                    highlightedContenderId={contender.id}
                   />
                 {/snippet}
               </ScoreboardProvider>

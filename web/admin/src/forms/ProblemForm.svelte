@@ -1,17 +1,32 @@
 <script lang="ts" module>
-  import * as z from "zod";
+  import * as z from "zod/v4";
 
   export const formSchema = z.object({
-    number: z.coerce.number(),
+    number: z.coerce.number().min(0),
     holdColorPrimary: z.string().regex(/^#([0-9a-fA-F]{3}){1,2}$/),
     holdColorSecondary: z.string().optional(),
     description: z.string().optional(),
     zone1Enabled: z.coerce.boolean(),
     zone2Enabled: z.coerce.boolean(),
-    pointsZone1: z.coerce.number().optional(),
-    pointsZone2: z.coerce.number().optional(),
-    pointsTop: z.coerce.number(),
-    flashBonus: z.coerce.number().optional(),
+    pointsZone1: z.coerce
+      .number()
+      .min(0)
+      .max(2 ** 31 - 1)
+      .optional(),
+    pointsZone2: z.coerce
+      .number()
+      .min(0)
+      .max(2 ** 31 - 1)
+      .optional(),
+    pointsTop: z.coerce
+      .number()
+      .min(0)
+      .max(2 ** 31 - 1),
+    flashBonus: z.coerce
+      .number()
+      .min(0)
+      .max(2 ** 31 - 1)
+      .optional(),
   });
 </script>
 
@@ -29,7 +44,7 @@
 
   interface Props {
     data: Partial<T>;
-    schema: z.ZodType<T, z.ZodTypeDef, T>;
+    schema: z.ZodType<T, unknown>;
     submit: (value: T) => void;
     children?: Snippet;
   }
@@ -74,6 +89,7 @@
       type="number"
       required
       value={data.number}
+      min={0}
     ></wa-input>
     <div class="colors">
       <div class="pickers">
@@ -104,6 +120,8 @@
       type="number"
       required
       value={data.pointsTop?.toString() ?? ""}
+      min={0}
+      max={2 ** 31 - 1}
     ></wa-input>
     <wa-input
       size="small"
@@ -112,6 +130,8 @@
       hint="Bonus points awarded for a flash ascent, added to the total."
       type="number"
       value={data.flashBonus?.toString() ?? ""}
+      min={0}
+      max={2 ** 31 - 1}
     ></wa-input>
 
     <wa-divider></wa-divider>
@@ -131,6 +151,8 @@
         hint="Points for reaching the first zone."
         type="number"
         value={data.pointsZone1?.toString() ?? ""}
+        min={0}
+        max={2 ** 31 - 1}
       ></wa-input>
       <wa-switch
         size="small"
@@ -148,6 +170,8 @@
         hint="Points for reaching the second zone."
         type="number"
         value={data.pointsZone2?.toString() ?? ""}
+        min={0}
+        max={2 ** 31 - 1}
       ></wa-input>
     {/if}
 

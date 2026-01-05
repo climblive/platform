@@ -353,7 +353,7 @@ test("info tab", async ({ page }) => {
   await expect(page.getByText("Qualifying problems 10 hardest")).toBeVisible();
   await expect(page.getByText("Number of finalists 7")).toBeVisible();
 
-  await page.getByRole("button", { name: "Rules" }).click();
+  await page.getByRole("button", { name: "General info" }).click();
 
   await expect(
     page.getByText(
@@ -387,7 +387,7 @@ test.describe("contest states", () => {
     await page.clock.setFixedTime(new Date("2024-01-01T00:00:00"));
 
     const timer = page.getByRole("timer", { name: "Time remaining" });
-    await expect(timer).toHaveText("almost 2 years");
+    await expect(timer).toHaveText("almost 3 years");
 
     await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
 
@@ -400,7 +400,7 @@ test.describe("contest states", () => {
   test("during grace period", async ({ page }) => {
     await page.goto("/ABCD0001");
 
-    await page.clock.setFixedTime(new Date("2026-01-01T00:00:00"));
+    await page.clock.setFixedTime(new Date("2027-01-01T00:00:00"));
 
     const timer = page.getByRole("timer", { name: "Time remaining" });
     await expect(timer).toHaveText("00:00:00");
@@ -416,7 +416,7 @@ test.describe("contest states", () => {
   test("after contest has ended", async ({ page }) => {
     await page.goto("/ABCD0001");
 
-    await page.clock.setFixedTime(new Date("2026-01-01T00:05:00"));
+    await page.clock.setFixedTime(new Date("2027-01-01T00:05:00"));
 
     const timer = page.getByRole("timer", { name: "Time remaining" });
     await expect(timer).toHaveText("00:00:00");

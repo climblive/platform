@@ -11,10 +11,13 @@
   import EditContest from "./pages/EditContest.svelte";
   import EditProblem from "./pages/EditProblem.svelte";
   import Help from "./pages/Help.svelte";
+  import InviteView from "./pages/InviteView.svelte";
+  import ManageOrganizer from "./pages/ManageOrganizer.svelte";
   import OrganizerView from "./pages/OrganizerView.svelte";
   import PrintableTicketList from "./pages/PrintableTicketList.svelte";
   import RaffleView from "./pages/RaffleView.svelte";
   import Root from "./pages/Root.svelte";
+  import TicketsListPage from "./pages/TicketsListPage.svelte";
 </script>
 
 <Header />
@@ -24,10 +27,20 @@
     <Route path="/">
       <Root />
     </Route>
+    <Route path="/organizers/:organizerId">
+      {#snippet children({ params }: { params: { organizerId: number } })}
+        <ManageOrganizer organizerId={Number(params.organizerId)} />
+      {/snippet}
+    </Route>
+    <Route path="/invites/:inviteId">
+      {#snippet children({ params }: { params: { inviteId: string } })}
+        <InviteView inviteId={params.inviteId} />
+      {/snippet}
+    </Route>
     <Route path="/help">
       <Help />
     </Route>
-    <Route path="/organizers/:organizerId">
+    <Route path="/organizers/:organizerId/contests">
       {#snippet children({ params }: { params: { organizerId: number } })}
         <OrganizerView organizerId={Number(params.organizerId)} />
       {/snippet}
@@ -75,6 +88,11 @@
       {/snippet}
     </Route>
     <Route path="/contests/:contestId/tickets">
+      {#snippet children({ params }: { params: { contestId: number } })}
+        <TicketsListPage contestId={Number(params.contestId)} />
+      {/snippet}
+    </Route>
+    <Route path="/contests/:contestId/tickets/print">
       {#snippet children({ params }: { params: { contestId: number } })}
         <PrintableTicketList contestId={Number(params.contestId)} />
       {/snippet}

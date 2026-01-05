@@ -134,6 +134,10 @@ h1 {
   margin: 0 auto;
 }
 
+.description-content p {
+  margin-bottom: 1.25rem;
+}
+
 .cta-container {
   margin-top: 2.5rem;
 }

@@ -1,6 +1,7 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import {
+    EmptyState,
     HoldColorIndicator,
     Table,
     type ColumnDefinition,
@@ -168,22 +169,25 @@
   {ascents}
 {/snippet}
 
-<p class="copy">
-  Problems refer to the boulder problems that the contenders will attempt during
-  the contest, each of which can have its own point value.
-</p>
-
-<section>
+{#snippet createButton()}
   <wa-button
     variant="neutral"
     appearance="accent"
     onclick={() => navigate(`contests/${contestId}/new-problem`)}
     >Create problem</wa-button
   >
+{/snippet}
 
+<p class="copy">
+  Problems refer to the boulder problems that the contenders will attempt during
+  the contest, each of which can have its own point value.
+</p>
+
+<section>
   {#if sortedProblemsWithAscents === undefined}
     <Loader />
   {:else if sortedProblemsWithAscents.length > 0}
+    {@render createButton()}
     <Table
       {columns}
       data={tableLimit
@@ -191,6 +195,15 @@
         : sortedProblemsWithAscents}
       getId={({ id }) => id}
     ></Table>
+  {:else}
+    <EmptyState
+      title="No problems yet"
+      description="Create boulder problems that contenders will attempt during the contest."
+    >
+      {#snippet actions()}
+        {@render createButton()}
+      {/snippet}
+    </EmptyState>
   {/if}
 
   {#if sortedProblemsWithAscents !== undefined && tableLimit !== undefined && tableLimit < sortedProblemsWithAscents.length}

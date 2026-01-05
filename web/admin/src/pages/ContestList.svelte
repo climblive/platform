@@ -2,7 +2,12 @@
   import Loader from "@/components/Loader.svelte";
   import RelativeTime from "@/components/RelativeTime.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import { Table, type ColumnDefinition } from "@climblive/lib/components";
+  import "@awesome.me/webawesome/dist/components/switch/switch.js";
+  import {
+    EmptyState,
+    Table,
+    type ColumnDefinition,
+  } from "@climblive/lib/components";
   import type { Contest } from "@climblive/lib/models";
   import {
     getAllContestsQuery,
@@ -17,6 +22,8 @@
 
   let { organizerId }: Props = $props();
 
+  let showArchived = $state(false);
+
   const contestsQuery = $derived(
     getContestsByOrganizerQuery(organizerId ?? 0, {
       enabled: organizerId !== undefined,
@@ -30,17 +37,20 @@
     organizerId === undefined ? allContestsQuery.data : contestsQuery.data,
   );
 
-  const [ongoing, upcoming, past] = $derived.by(() => {
+  const [ongoing, upcoming, past, archived] = $derived.by(() => {
     const now = new Date();
 
     const ongoing: Contest[] = [];
     const upcoming: Contest[] = [];
     const past: Contest[] = [];
+    const archived: Contest[] = [];
 
     contests?.forEach((contest) => {
       const { timeBegin, timeEnd } = contest;
 
-      if (timeBegin && timeEnd && now >= timeBegin && now < timeEnd) {
+      if (contest.archived) {
+        archived.push(contest);
+      } else if (timeBegin && timeEnd && now >= timeBegin && now < timeEnd) {
         ongoing.push(contest);
       } else if (timeEnd && now > timeEnd) {
         past.push(contest);
@@ -52,8 +62,9 @@
     ongoing?.sort(sortContests);
     upcoming?.sort(sortContests).reverse();
     past?.sort(sortContests);
+    archived?.sort(sortContests);
 
-    return [ongoing, upcoming, past];
+    return [ongoing, upcoming, past, archived];
   });
 
   const sortContests = (c1: Contest, c2: Contest) => {
@@ -83,11 +94,33 @@
       render: renderTimeEnd,
       width: "max-content",
     },
+    {
+      label: "Registered",
+      mobile: false,
+      render: renderRegisteredContenders,
+      width: "max-content",
+      align: "right",
+    },
   ];
+
+  const handleToggleArchive = () => {
+    showArchived = !showArchived;
+  };
+
+  const numberOfUnarchivedContests = $derived(
+    [ongoing, upcoming, past].reduce(
+      (partialSum, a) => partialSum + a.length,
+      0,
+    ),
+  );
 </script>
 
 {#snippet renderName({ id, name }: Contest)}
   <Link to="contests/{id}">{name}</Link>
+{/snippet}
+
+{#snippet renderRegisteredContenders({ registeredContenders }: Contest)}
+  {registeredContenders}
 {/snippet}
 
 {#snippet renderTimeBegin({ timeBegin, timeEnd }: Contest)}
@@ -110,19 +143,47 @@
   {/if}
 {/snippet}
 
-<h2>Contests</h2>
-<wa-button
-  variant="neutral"
-  onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
-  >Create new contest</wa-button
->
+{#snippet createButton(className?: string)}
+  <wa-button
+    class={className}
+    variant="neutral"
+    onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
+    >Create new contest</wa-button
+  >
+{/snippet}
 
-{#snippet listing(heading: string, contests: Contest[])}
-  <h3>{heading}</h3>
+<h2>Contests</h2>
+{#if numberOfUnarchivedContests > 0}
+  {@render createButton("create-contest-button")}
+{/if}
+
+{#snippet listing(
+  heading: string,
+  contests: Contest[],
+  showSummary: boolean = false,
+)}
+  {@const totalRegistered = contests.reduce(
+    (sum, c) => sum + c.registeredContenders,
+    0,
+  )}
+  {@const averageRegistered = Math.floor(
+    contests.length > 0 ? totalRegistered / contests.length : 0,
+  )}
+
+  <h3>{heading} ({contests.length})</h3>
+  {#if showSummary}
+    <p class="contest-summary">
+      A total of {totalRegistered}
+      {totalRegistered === 1 ? "contender has" : "contenders have"} participated in
+      {contests.length}
+      {contests.length === 1 ? "contest" : "contests"} averaging {averageRegistered}
+      {averageRegistered === 1 ? "contender" : "contenders"} per contest.
+    </p>
+  {/if}
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
 {/snippet}
 
-{#if !ongoing || !upcoming || !past}
+{#if contestsQuery.isLoading || allContestsQuery.isLoading || !ongoing || !upcoming || !past || !archived}
   <Loader />
 {:else}
   {#if ongoing?.length}
@@ -134,12 +195,54 @@
   {/if}
 
   {#if past?.length}
-    {@render listing("Past", past)}
+    {@render listing("Past", past, true)}
+  {/if}
+
+  {#if contests && numberOfUnarchivedContests === 0}
+    <EmptyState
+      title="No contests yet"
+      description="Create a contest to get started with your first event."
+    >
+      {#snippet actions()}
+        {@render createButton()}
+      {/snippet}
+    </EmptyState>
+  {/if}
+
+  {#if showArchived && archived.length > 0}
+    {@render listing("Archived", archived)}
+  {/if}
+
+  {#if archived?.length}
+    <wa-button
+      size="small"
+      appearance="plain"
+      variant="brand"
+      onclick={handleToggleArchive}
+      class="toggle-archived-button"
+    >
+      {#if showArchived}
+        Hide archived contests
+      {:else}
+        Show archived contests ({archived.length})
+      {/if}
+    </wa-button>
   {/if}
 {/if}
 
 <style>
-  wa-button {
+  .create-contest-button {
     margin-block-end: var(--wa-space-m);
+  }
+
+  .toggle-archived-button {
+    display: block;
+    margin-block-start: var(--wa-space-m);
+  }
+
+  .contest-summary {
+    color: var(--wa-color-text-quiet);
+    font-size: var(--wa-font-size-s);
+    margin-block-start: var(--wa-space-xs) var(--wa-space-m);
   }
 </style>

@@ -4,7 +4,7 @@ import type { Contender } from "@climblive/lib/models";
 import type { QueryClient } from "@tanstack/svelte-query";
 import { differenceInHours } from "date-fns";
 import type { Writable } from "svelte/store";
-import * as z from "zod";
+import * as z from "zod/v4";
 
 export const authenticateContender = async (
   code: string,

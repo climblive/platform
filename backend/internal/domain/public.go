@@ -56,18 +56,21 @@ type ContenderPatch struct {
 }
 
 type Contest struct {
-	ID                 ContestID     `json:"id"`
-	Ownership          OwnershipData `json:"ownership"`
-	Location           string        `json:"location,omitempty"`
-	SeriesID           SeriesID      `json:"seriesId,omitempty"`
-	Name               string        `json:"name"`
-	Description        string        `json:"description,omitempty"`
-	QualifyingProblems int           `json:"qualifyingProblems"`
-	Finalists          int           `json:"finalists"`
-	Rules              string        `json:"rules,omitempty"`
-	GracePeriod        time.Duration `json:"gracePeriod"`
-	TimeBegin          time.Time     `json:"timeBegin,omitzero"`
-	TimeEnd            time.Time     `json:"timeEnd,omitzero"`
+	ID                   ContestID     `json:"id"`
+	Ownership            OwnershipData `json:"ownership"`
+	Archived             bool          `json:"archived"`
+	Location             string        `json:"location,omitempty"`
+	SeriesID             SeriesID      `json:"seriesId,omitempty"`
+	Name                 string        `json:"name"`
+	Description          string        `json:"description,omitempty"`
+	QualifyingProblems   int           `json:"qualifyingProblems"`
+	Finalists            int           `json:"finalists"`
+	Info                 string        `json:"info,omitempty"`
+	GracePeriod          time.Duration `json:"gracePeriod"`
+	TimeBegin            time.Time     `json:"timeBegin,omitzero"`
+	TimeEnd              time.Time     `json:"timeEnd,omitzero"`
+	Created              time.Time     `json:"created"`
+	RegisteredContenders int           `json:"registeredContenders"`
 }
 
 type ContestTemplate struct {
@@ -77,25 +80,45 @@ type ContestTemplate struct {
 	Description        string        `json:"description,omitempty"`
 	QualifyingProblems int           `json:"qualifyingProblems"`
 	Finalists          int           `json:"finalists"`
-	Rules              string        `json:"rules,omitempty"`
+	Info               string        `json:"info,omitempty"`
 	GracePeriod        time.Duration `json:"gracePeriod"`
 }
 
 type ContestPatch struct {
+	Archived           Patch[bool]          `json:"archived,omitzero" tstype:"boolean"`
 	Location           Patch[string]        `json:"location,omitzero" tstype:"string"`
 	SeriesID           Patch[SeriesID]      `json:"seriesId,omitzero" tstype:"number"`
 	Name               Patch[string]        `json:"name,omitzero" tstype:"string"`
 	Description        Patch[string]        `json:"description,omitzero" tstype:"string"`
 	QualifyingProblems Patch[int]           `json:"qualifyingProblems,omitzero" tstype:"number"`
 	Finalists          Patch[int]           `json:"finalists,omitzero" tstype:"number"`
-	Rules              Patch[string]        `json:"rules,omitzero" tstype:"string"`
+	Info               Patch[string]        `json:"info,omitzero" tstype:"string"`
 	GracePeriod        Patch[time.Duration] `json:"gracePeriod,omitzero" tstype:"number"`
+}
+
+type ContestTransferRequest struct {
+	NewOrganizerID OrganizerID `json:"newOrganizerId"`
 }
 
 type Organizer struct {
 	ID        OrganizerID   `json:"id"`
 	Ownership OwnershipData `json:"-"`
 	Name      string        `json:"name"`
+}
+
+type OrganizerTemplate struct {
+	Name string `json:"name"`
+}
+
+type OrganizerPatch struct {
+	Name Patch[string] `json:"name,omitzero" tstype:"string"`
+}
+
+type OrganizerInvite struct {
+	ID            OrganizerInviteID `json:"id"`
+	OrganizerID   OrganizerID       `json:"organizerId"`
+	OrganizerName string            `json:"organizerName"`
+	ExpiresAt     time.Time         `json:"expiresAt"`
 }
 
 type Problem struct {
@@ -263,6 +286,11 @@ type ProblemUpdatedEvent struct {
 
 type ProblemDeletedEvent struct {
 	ProblemID ProblemID `json:"problemId"`
+}
+
+type RulesUpdatedEvent struct {
+	QualifyingProblems int `json:"qualifyingProblems"`
+	Finalists          int `json:"finalists"`
 }
 
 type ContenderPublicInfoUpdatedEvent struct {

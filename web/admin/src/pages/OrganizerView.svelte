@@ -7,21 +7,26 @@
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { value } from "@climblive/lib/forms";
   import { getSelfQuery } from "@climblive/lib/queries";
-  import { getContext, onMount } from "svelte";
-  import { navigate } from "svelte-routing";
+  import { getContext } from "svelte";
+  import { Link, navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
   import ContestList from "./ContestList.svelte";
+  import CreateOrganizer from "./CreateOrganizer.svelte";
 
   interface Props {
     organizerId: number;
   }
 
-  let { organizerId }: Props = $props();
+  const { organizerId }: Props = $props();
+
+  const selectedOrganizerId =
+    getContext<Writable<number | undefined>>("selectedOrganizer");
 
   let showAll = $state(false);
   let showAllToggle: WaSwitch | undefined = $state();
 
   const selfQuery = $derived(getSelfQuery());
+
   const self = $derived(selfQuery.data);
 
   let select: WaSelect | undefined = $state();
@@ -29,15 +34,21 @@
   const selectedOrganizer =
     getContext<Writable<number | undefined>>("selectedOrganizer");
 
-  onMount(() => {
-    $selectedOrganizer = organizerId;
+  $effect(() => {
+    if (self) {
+      if (self.organizers.some(({ id }) => id === organizerId)) {
+        $selectedOrganizer = organizerId;
+      } else {
+        navigate("./");
+      }
+    }
   });
 
   const handleChange = () => {
     if (select) {
       const organizerId = Number(select.value);
-      $selectedOrganizer = organizerId;
-      navigate(`/admin/organizers/${organizerId}`);
+      $selectedOrganizerId = organizerId;
+      navigate(`/admin/organizers/${organizerId}/contests`);
     }
   };
 
@@ -50,22 +61,14 @@
   };
 </script>
 
-{#if self && self.organizers.length > 1}
-  <p>You can manage contests as multiple organizers.</p>
-
-  <div class="controls">
-    {#if self?.admin}
-      <wa-switch bind:this={showAllToggle} onchange={toggleShowAll}
-        >Show all</wa-switch
-      >
-    {/if}
-
-    {#if !showAll}
+{#if self}
+  {#if !showAll}
+    <div class="organizer-select">
       <wa-select
         bind:this={select}
         size="small"
         appearance="outlined filled"
-        {@attach value($selectedOrganizer)}
+        {@attach value($selectedOrganizerId)}
         onchange={handleChange}
       >
         <wa-icon name="id-badge" slot="start"></wa-icon>
@@ -73,20 +76,63 @@
           <wa-option value={organizer.id}>{organizer.name}</wa-option>
         {/each}
       </wa-select>
-    {/if}
+
+      <CreateOrganizer>
+        {#snippet children({ createOrganizer })}
+          <wa-button
+            size="small"
+            variant="neutral"
+            appearance="outlined"
+            onclick={createOrganizer}
+          >
+            <wa-icon name="plus"></wa-icon>
+          </wa-button>
+        {/snippet}
+      </CreateOrganizer>
+    </div>
+  {/if}
+
+  <div class="controls">
+    <div>
+      {#if self?.admin}
+        <wa-switch
+          size="small"
+          bind:this={showAllToggle}
+          onchange={toggleShowAll}>Show all</wa-switch
+        >
+      {/if}
+    </div>
+
+    <Link to={`./organizers/${organizerId}`}
+      >Organizer settings and invites</Link
+    >
   </div>
 {/if}
 
 <ContestList organizerId={showAll ? undefined : Number(organizerId)} />
 
 <style>
-  .controls {
+  .organizer-select {
     display: flex;
-    flex-direction: column;
-    gap: var(--wa-space-m);
+    align-items: center;
+    justify-content: end;
+    gap: var(--wa-space-xs);
+  }
 
-    & > wa-switch {
-      align-self: flex-end;
-    }
+  .controls {
+    margin-block: var(--wa-space-m) var(--wa-space-xl);
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--wa-font-size-s);
+    align-items: center;
+  }
+
+  wa-select {
+    width: 100%;
+  }
+
+  wa-switch {
+    flex-shrink: 0;
   }
 </style>

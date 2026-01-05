@@ -30,7 +30,7 @@ func TestCompClassValidator(t *testing.T) {
 
 	t.Run("EmptyName", func(t *testing.T) {
 		compClass := validCompClass()
-		compClass.Name = ""
+		compClass.Name = whitespaceCharacters
 
 		err := validator.Validate(compClass)
 

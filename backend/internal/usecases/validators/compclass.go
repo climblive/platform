@@ -1,6 +1,7 @@
 package validators
 
 import (
+	"strings"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -14,7 +15,7 @@ type CompClassValidator struct {
 
 func (v CompClassValidator) Validate(compClass domain.CompClass) error {
 	switch {
-	case len(compClass.Name) < 1:
+	case len(strings.TrimSpace(compClass.Name)) < 1:
 		fallthrough
 	case compClass.TimeEnd.Before(compClass.TimeBegin):
 		fallthrough

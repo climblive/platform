@@ -4,3 +4,4 @@ packages:
   - admin
   - "packages/*"
   - e2e
+  - www

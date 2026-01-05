@@ -26,7 +26,6 @@ type Contender struct {
 	ContestID           int32
 	RegistrationCode    string
 	Name                sql.NullString
-	Club                sql.NullString
 	ClassID             sql.NullInt32
 	Entered             sql.NullTime
 	Disqualified        bool
@@ -36,22 +35,27 @@ type Contender struct {
 type Contest struct {
 	ID                 int32
 	OrganizerID        int32
-	Protected          bool
+	Archived           bool
 	SeriesID           sql.NullInt32
 	Name               string
 	Description        sql.NullString
 	Location           sql.NullString
-	FinalEnabled       bool
 	QualifyingProblems int32
 	Finalists          int32
-	Rules              sql.NullString
+	Info               sql.NullString
 	GracePeriod        int32
+	Created            time.Time
 }
 
 type Organizer struct {
-	ID       int32
-	Name     string
-	Homepage sql.NullString
+	ID   int32
+	Name string
+}
+
+type OrganizerInvite struct {
+	ID          string
+	OrganizerID int32
+	ExpiresAt   time.Time
 }
 
 type Problem struct {
@@ -61,7 +65,6 @@ type Problem struct {
 	Number             int32
 	HoldColorPrimary   string
 	HoldColorSecondary sql.NullString
-	Name               sql.NullString
 	Zone1Enabled       bool
 	Zone2Enabled       bool
 	Description        sql.NullString
@@ -75,7 +78,6 @@ type Raffle struct {
 	ID          int32
 	OrganizerID int32
 	ContestID   int32
-	Active      bool
 }
 
 type RaffleWinner struct {
@@ -118,7 +120,6 @@ type Tick struct {
 
 type User struct {
 	ID       int32
-	Name     string
 	Username string
 	Admin    bool
 }

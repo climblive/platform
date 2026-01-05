@@ -20,7 +20,7 @@
   data-ticked={!!tick}
   data-flashed={tick?.attemptsTop === 1}
   aria-label={`Problem ${problem.number}`}
-  style="--number-length: {highestProblemNumber.toString().length + 2}ch"
+  style="--number-length: {highestProblemNumber.toString().length + 3}ch"
 >
   <span class="number">№ {problem.number}</span>
   <HoldColorIndicator
