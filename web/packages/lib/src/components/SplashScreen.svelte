@@ -9,16 +9,23 @@
   let completed = false;
 
   onMount(() => {
+    let shouldSkipSplash = false;
+    
     try {
       const hasShown = sessionStorage.getItem("splashShown");
       
-      if (hasShown) {
-        visible = false;
-        onComplete?.();
-        return;
+      if (hasShown === "true") {
+        shouldSkipSplash = true;
       }
     } catch {
       // sessionStorage may be unavailable in private browsing or when disabled
+    }
+
+    // If no callback is provided, show splash anyway (used as loading indicator)
+    if (shouldSkipSplash && onComplete) {
+      visible = false;
+      onComplete();
+      return;
     }
 
     startTime = Date.now();
