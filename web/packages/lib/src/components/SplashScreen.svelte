@@ -9,12 +9,16 @@
   let completed = false;
 
   onMount(() => {
-    const hasShown = sessionStorage.getItem("splashShown");
-    
-    if (hasShown) {
-      visible = false;
-      onComplete?.();
-      return;
+    try {
+      const hasShown = sessionStorage.getItem("splashShown");
+      
+      if (hasShown) {
+        visible = false;
+        onComplete?.();
+        return;
+      }
+    } catch {
+      // sessionStorage may be unavailable in private browsing or when disabled
     }
 
     startTime = Date.now();
@@ -36,7 +40,11 @@
     const remaining = Math.max(0, 2000 - elapsed);
 
     setTimeout(() => {
-      sessionStorage.setItem("splashShown", "true");
+      try {
+        sessionStorage.setItem("splashShown", "true");
+      } catch {
+        // sessionStorage may be unavailable in private browsing or when disabled
+      }
       visible = false;
       onComplete?.();
     }, remaining);
