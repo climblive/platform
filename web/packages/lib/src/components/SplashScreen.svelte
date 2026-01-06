@@ -21,7 +21,8 @@
       // sessionStorage may be unavailable in private browsing or when disabled
     }
 
-    // If already shown and callback provided, show spinner instead
+    // Show spinner instead of splash when already shown in session and callback provided.
+    // Parent will unmount component when loading completes, so no need to call onComplete here.
     if (shouldSkipSplash && onComplete) {
       showSpinner = true;
       return;
@@ -76,20 +77,7 @@
 {/if}
 
 <style>
-  .splash-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: var(--wa-color-brand-50);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-bottom: 10vh;
-    z-index: 9999;
-  }
-
+  .splash-screen,
   .spinner-screen {
     position: fixed;
     top: 0;
@@ -101,6 +89,10 @@
     align-items: center;
     justify-content: center;
     z-index: 9999;
+  }
+
+  .splash-screen {
+    padding-bottom: 10vh;
   }
 
   .spinner-screen wa-spinner {
