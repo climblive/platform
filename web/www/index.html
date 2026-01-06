@@ -22,6 +22,10 @@
     <meta name="author" content="ClimbLive" />
 
     <link rel="stylesheet" href="styles.css" />
+    <script
+      type="module"
+      src="/node_modules/@awesome.me/webawesome/dist/webawesome.loader.js"
+    ></script>
   </head>
 
   <body>
@@ -39,11 +43,18 @@
             minutes.
           </p>
           <div>
-            <a href="https://climblive.app/admin" class="cta-button"
-              >Let's get started</a
+            <wa-button
+              href="https://climblive.app/admin"
+              target="_self"
+              size="large"
+              >Let's get started</wa-button
             >
-            <a href="https://climblive.app" class="secondary-button"
-              >Go to scoring app</a
+            <wa-button
+              href="https://climblive.app"
+              target="_self"
+              variant="neutral"
+              size="large"
+              >Go to scoring app</wa-button
             >
           </div>
         </div>
@@ -127,8 +138,11 @@
             >
           </p>
           <div class="cta-container">
-            <a href="https://climblive.app/admin" class="cta-button"
-              >Host your first event</a
+            <wa-button
+              href="https://climblive.app/admin"
+              target="_self"
+              size="large"
+              >Host your first event</wa-button
             >
           </div>
         </div>
