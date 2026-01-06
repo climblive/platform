@@ -83,6 +83,8 @@ func EventName(event any) string {
 		return "PROBLEM_UPDATED"
 	case domain.ProblemDeletedEvent:
 		return "PROBLEM_DELETED"
+	case domain.RulesUpdatedEvent:
+		return "RULES_UPDATED"
 	case domain.ContenderPublicInfoUpdatedEvent:
 		return "CONTENDER_PUBLIC_INFO_UPDATED"
 	case domain.ContenderScoreUpdatedEvent:

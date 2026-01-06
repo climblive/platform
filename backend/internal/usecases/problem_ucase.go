@@ -2,14 +2,12 @@ package usecases
 
 import (
 	"context"
-	"regexp"
 	"strings"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/go-errors/errors"
 )
-
-var validHexColor *regexp.Regexp = regexp.MustCompile(`^#([0-9a-fA-F]{3}){1,2}$`)
 
 type problemUseCaseRepository interface {
 	domain.Transactor
@@ -83,18 +81,10 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 
 	if patch.HoldColorPrimary.Present {
 		problem.HoldColorPrimary = strings.TrimSpace(patch.HoldColorPrimary.Value)
-
-		if !validHexColor.MatchString(problem.HoldColorPrimary) {
-			return domain.Problem{}, errors.Wrap(domain.ErrInvalidData, 0)
-		}
 	}
 
 	if patch.HoldColorSecondary.Present {
 		problem.HoldColorSecondary = strings.TrimSpace(patch.HoldColorSecondary.Value)
-
-		if len(problem.HoldColorSecondary) > 0 && !validHexColor.MatchString(problem.HoldColorSecondary) {
-			return domain.Problem{}, errors.Wrap(domain.ErrInvalidData, 0)
-		}
 	}
 
 	if patch.Description.Present {
@@ -123,6 +113,10 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 
 	if patch.FlashBonus.Present {
 		problem.FlashBonus = patch.FlashBonus.Value
+	}
+
+	if err := (validators.ProblemValidator{}).Validate(problem); err != nil {
+		return mty, errors.Wrap(err, 0)
 	}
 
 	if _, err = uc.Repo.StoreProblem(ctx, nil, problem); err != nil {
@@ -178,11 +172,8 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 		FlashBonus:         tmpl.FlashBonus,
 	}
 
-	switch {
-	case !validHexColor.MatchString(problem.HoldColorPrimary):
-		fallthrough
-	case len(problem.HoldColorSecondary) > 0 && !validHexColor.MatchString(tmpl.HoldColorSecondary):
-		return domain.Problem{}, errors.Wrap(domain.ErrInvalidData, 0)
+	if err := (validators.ProblemValidator{}).Validate(problem); err != nil {
+		return domain.Problem{}, errors.Wrap(err, 0)
 	}
 
 	createdProblem, err := uc.Repo.StoreProblem(ctx, nil, problem)

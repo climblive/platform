@@ -9,6 +9,7 @@ import (
 )
 
 type MemoryStore struct {
+	rules      Rules
 	problems   map[domain.ProblemID]Problem
 	contenders map[domain.ContenderID]Contender
 	ticks      map[domain.ContenderID][]Tick
@@ -22,6 +23,14 @@ func NewMemoryStore() *MemoryStore {
 		ticks:      make(map[domain.ContenderID][]Tick),
 		scores:     NewDiffMap[domain.ContenderID](CompareScore),
 	}
+}
+
+func (s *MemoryStore) GetRules() Rules {
+	return s.rules
+}
+
+func (s *MemoryStore) SaveRules(rules Rules) {
+	s.rules = rules
 }
 
 func (s *MemoryStore) GetContender(contenderID domain.ContenderID) (Contender, bool) {

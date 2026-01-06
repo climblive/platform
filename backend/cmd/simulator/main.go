@@ -111,9 +111,9 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 
 	switch selectedCompClass.Name {
 	case "Males":
-		patch.Name = domain.NewPatch(fmt.Sprintf("%s %s (%d)", faker.FirstNameMale(), faker.LastName(), r.contender.ID))
+		patch.Name = domain.NewPatch(fmt.Sprintf("%s %s", faker.FirstNameMale(), faker.LastName()))
 	case "Females":
-		patch.Name = domain.NewPatch(fmt.Sprintf("%s %s (%d)", faker.FirstNameFemale(), faker.LastName(), r.contender.ID))
+		patch.Name = domain.NewPatch(fmt.Sprintf("%s %s", faker.FirstNameFemale(), faker.LastName()))
 	}
 
 	patch.CompClassID = domain.NewPatch(selectedCompClass.ID)
@@ -139,7 +139,7 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 		} else {
 			tick := domain.Tick{
 				ProblemID:     problem.ID,
-				AttemptsTop:   rand.Int() % 5,
+				AttemptsTop:   1 + rand.Int()%5,
 				Top:           true,
 				AttemptsZone1: 1,
 				Zone1:         true,

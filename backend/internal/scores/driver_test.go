@@ -43,6 +43,7 @@ func TestEngineDriver(t *testing.T) {
 			"ASCENT_DEREGISTERED",
 			"PROBLEM_ADDED",
 			"PROBLEM_UPDATED",
+			"RULES_UPDATED",
 		)
 
 		mockedEventBroker.On("Subscribe", filter, 0).Return(subscriptionID, subscription)
@@ -203,6 +204,10 @@ func TestEngineDriver(t *testing.T) {
 
 		events := []any{}
 
+		events = append(events, domain.RulesUpdatedEvent{
+			QualifyingProblems: 10,
+			Finalists:          7,
+		})
 		events = append(events, domain.ContenderEnteredEvent{
 			ContenderID: 1,
 			CompClassID: 1,
@@ -259,6 +264,10 @@ func TestEngineDriver(t *testing.T) {
 		mockedEngine.On("Stop").Return()
 		mockedEngine.On("GetDirtyScores").Return([]domain.Score{})
 
+		mockedEngine.On("HandleRulesUpdated", domain.RulesUpdatedEvent{
+			QualifyingProblems: 10,
+			Finalists:          7,
+		}).Return()
 		mockedEngine.On("HandleContenderEntered", domain.ContenderEnteredEvent{
 			ContenderID: 1,
 			CompClassID: 1,
@@ -302,66 +311,6 @@ func TestEngineDriver(t *testing.T) {
 		}).Run(func(mock.Arguments) { cancel() }).Return()
 
 		installEngine(mockedEngine)
-
-		wg.Wait()
-
-		awaitExpectations(t)
-		mockedEngine.AssertExpectations(t)
-	})
-
-	t.Run("SetScoringRules", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		ctx, cancel := context.WithCancel(context.Background())
-		wg, installEngine := f.driver.Run(ctx)
-
-		mockedEngine := new(scoreEngineMock)
-
-		engineIgnition := make(chan struct{})
-
-		mockedEngine.On("Start").Run(func(mock.Arguments) { close(engineIgnition) }).Return()
-		mockedEngine.On("Stop").Return()
-		mockedEngine.On("GetDirtyScores").Return([]domain.Score{})
-
-		newRules := &jackpotRules{}
-
-		mockedEngine.On("ReplaceScoringRules", newRules).Run(func(mock.Arguments) { cancel() }).Return()
-
-		installEngine(mockedEngine)
-
-		<-engineIgnition
-
-		f.driver.SetScoringRules(newRules)
-
-		wg.Wait()
-
-		awaitExpectations(t)
-		mockedEngine.AssertExpectations(t)
-	})
-
-	t.Run("SetRanker", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
-
-		ctx, cancel := context.WithCancel(context.Background())
-		wg, installEngine := f.driver.Run(ctx)
-
-		mockedEngine := new(scoreEngineMock)
-
-		engineIgnition := make(chan struct{})
-
-		mockedEngine.On("Start").Run(func(mock.Arguments) { close(engineIgnition) }).Return()
-		mockedEngine.On("Stop").Return()
-		mockedEngine.On("GetDirtyScores").Return([]domain.Score{})
-
-		newRanker := &fakeRanker{}
-
-		mockedEngine.On("ReplaceRanker", newRanker).Run(func(mock.Arguments) { cancel() }).Return()
-
-		installEngine(mockedEngine)
-
-		<-engineIgnition
-
-		f.driver.SetRanker(newRanker)
 
 		wg.Wait()
 
@@ -491,12 +440,8 @@ func (m *scoreEngineMock) Stop() {
 	m.Called()
 }
 
-func (m *scoreEngineMock) ReplaceScoringRules(rules scores.ScoringRules) {
-	m.Called(rules)
-}
-
-func (m *scoreEngineMock) ReplaceRanker(ranker scores.Ranker) {
-	m.Called(ranker)
+func (m *scoreEngineMock) HandleRulesUpdated(event domain.RulesUpdatedEvent) {
+	m.Called(event)
 }
 
 func (m *scoreEngineMock) HandleContenderEntered(event domain.ContenderEnteredEvent) {

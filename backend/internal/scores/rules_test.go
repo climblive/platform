@@ -31,7 +31,7 @@ func TestHardestProblems(t *testing.T) {
 	assert.Equal(t, 1450, score)
 }
 
-func TestHardestProblemsZero(t *testing.T) {
+func TestHardestProblems_NoLimit(t *testing.T) {
 	rules := scores.HardestProblems{
 		Number: 0,
 	}
@@ -51,5 +51,5 @@ func TestHardestProblemsZero(t *testing.T) {
 
 	score := rules.CalculateScore(slices.Values(tickPointValues))
 
-	assert.Equal(t, 0, score)
+	assert.Equal(t, 1775, score)
 }

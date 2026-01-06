@@ -9,6 +9,7 @@ import (
 )
 
 type standardEngineStoreHydratorRepository interface {
+	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
 	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error)
 	GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Problem, error)
 	GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error)
@@ -19,6 +20,16 @@ type StandardEngineStoreHydrator struct {
 }
 
 func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID domain.ContestID, store EngineStore) error {
+	contest, err := h.Repo.GetContest(ctx, nil, contestID)
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	store.SaveRules(Rules{
+		QualifyingProblems: contest.QualifyingProblems,
+		Finalists:          contest.Finalists,
+	})
+
 	problems, err := h.Repo.GetProblemsByContest(ctx, nil, contestID)
 	if err != nil {
 		return errors.Wrap(err, 0)

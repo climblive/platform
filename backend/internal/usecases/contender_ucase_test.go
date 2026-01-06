@@ -1066,7 +1066,7 @@ func TestPatchContender(t *testing.T) {
 		}
 
 		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
-			Name: domain.NewPatch(""),
+			Name: domain.NewPatch(string(whitespaceCharacters)),
 		})
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)

@@ -96,7 +96,7 @@
   <wa-breadcrumb>
     <wa-breadcrumb-item
       onclick={() =>
-        navigate(`/admin/organizers/${contest.ownership.organizerId}`)}
+        navigate(`/admin/organizers/${contest.ownership.organizerId}/contests`)}
       ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
     >
     <wa-breadcrumb-item onclick={() => navigate(`/admin/contests/${contestId}`)}

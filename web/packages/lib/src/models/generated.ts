@@ -14,6 +14,7 @@ export type RaffleWinnerID = ResourceID;
 export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
+export type OrganizerInviteID = string;
 export type ResourceIDType =
   | CompClassID
   | ContenderID
@@ -81,10 +82,12 @@ export interface Contest {
   description?: string;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
-  rules?: string;
+  info?: string;
   gracePeriod: number;
   timeBegin?: Date;
   timeEnd?: Date;
+  created: Date;
+  registeredContenders: number /* int */;
 }
 export interface ContestTemplate {
   location?: string;
@@ -93,7 +96,7 @@ export interface ContestTemplate {
   description?: string;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
-  rules?: string;
+  info?: string;
   gracePeriod: number;
 }
 export interface ContestPatch {
@@ -104,12 +107,27 @@ export interface ContestPatch {
   description?: string;
   qualifyingProblems?: number;
   finalists?: number;
-  rules?: string;
+  info?: string;
   gracePeriod?: number;
+}
+export interface ContestTransferRequest {
+  newOrganizerId: OrganizerID;
 }
 export interface Organizer {
   id: OrganizerID;
   name: string;
+}
+export interface OrganizerTemplate {
+  name: string;
+}
+export interface OrganizerPatch {
+  name?: string;
+}
+export interface OrganizerInvite {
+  id: OrganizerInviteID;
+  organizerId: OrganizerID;
+  organizerName: string;
+  expiresAt: Date;
 }
 export interface Problem {
   id: ProblemID;
@@ -250,6 +268,11 @@ export interface ProblemUpdatedEvent {
 }
 export interface ProblemDeletedEvent {
   problemId: ProblemID;
+}
+export interface RulesUpdatedEvent {
+  contestId: ContestID;
+  qualifyingProblems: number /* int */;
+  finalists: number /* int */;
 }
 export interface ContenderPublicInfoUpdatedEvent {
   contenderId: ContenderID;
