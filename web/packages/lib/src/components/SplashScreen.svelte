@@ -47,10 +47,13 @@
     const remaining = Math.max(0, 2000 - elapsed);
 
     setTimeout(() => {
-      try {
-        sessionStorage.setItem("splashShown", "true");
-      } catch {
-        // sessionStorage may be unavailable in private browsing or when disabled
+      // Only set sessionStorage flag when there's a callback (not for loading indicators)
+      if (onComplete) {
+        try {
+          sessionStorage.setItem("splashShown", "true");
+        } catch {
+          // sessionStorage may be unavailable in private browsing or when disabled
+        }
       }
       visible = false;
       onComplete?.();
