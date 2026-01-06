@@ -229,10 +229,8 @@
 
 <svelte:window onvisibilitychange={handleVisibilityChange} />
 
-{#if showSplash}
+{#if showSplash || !contender || !contest || !compClasses || !sortedProblems || !ticks || !selectedCompClass}
   <SplashScreen onComplete={() => (showSplash = false)} />
-{:else if !contender || !contest || !compClasses || !sortedProblems || !ticks || !selectedCompClass}
-  <SplashScreen />
 {:else}
   <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime}>
     {#snippet children({ contestState })}

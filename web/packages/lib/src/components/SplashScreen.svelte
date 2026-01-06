@@ -4,7 +4,6 @@
 
   let { onComplete }: { onComplete?: () => void } = $props();
 
-  let visible = $state(true);
   let startTime: number;
   let completed = false;
 
@@ -23,7 +22,6 @@
 
     // If no callback is provided, show splash anyway (used as loading indicator)
     if (shouldSkipSplash && onComplete) {
-      visible = false;
       onComplete();
       return;
     }
@@ -55,7 +53,6 @@
           // sessionStorage may be unavailable in private browsing or when disabled
         }
       }
-      visible = false;
       onComplete?.();
     }, remaining);
   };
@@ -65,13 +62,11 @@
   };
 </script>
 
-{#if visible}
-  <div class="splash-screen">
-    <div class="logo" onanimationend={handleAnimationEnd}>
-      <SplashLogo />
-    </div>
+<div class="splash-screen">
+  <div class="logo" onanimationend={handleAnimationEnd}>
+    <SplashLogo />
   </div>
-{/if}
+</div>
 
 <style>
   .splash-screen {

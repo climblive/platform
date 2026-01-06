@@ -52,10 +52,8 @@
   }}
 />
 
-{#if showSplash}
+{#if showSplash || !contest || !compClasses}
   <SplashScreen onComplete={() => (showSplash = false)} />
-{:else if !contest || !compClasses}
-  <SplashScreen />
 {:else}
   <ScoreboardProvider {contestId} hideDisqualified>
     {#snippet children({ scoreboard, loading, online })}
