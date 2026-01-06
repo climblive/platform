@@ -6,6 +6,7 @@
 
   let startTime: number;
   let completed = false;
+  let showSpinner = $state(false);
 
   onMount(() => {
     let shouldSkipSplash = false;
@@ -20,9 +21,9 @@
       // sessionStorage may be unavailable in private browsing or when disabled
     }
 
-    // If no callback is provided, show splash anyway (used as loading indicator)
+    // If already shown and callback provided, show spinner instead
     if (shouldSkipSplash && onComplete) {
-      onComplete();
+      showSpinner = true;
       return;
     }
 
@@ -62,11 +63,17 @@
   };
 </script>
 
-<div class="splash-screen">
-  <div class="logo" onanimationend={handleAnimationEnd}>
-    <SplashLogo />
+{#if showSpinner}
+  <div class="spinner-screen">
+    <wa-spinner size="xl"></wa-spinner>
   </div>
-</div>
+{:else}
+  <div class="splash-screen">
+    <div class="logo" onanimationend={handleAnimationEnd}>
+      <SplashLogo />
+    </div>
+  </div>
+{/if}
 
 <style>
   .splash-screen {
@@ -79,7 +86,25 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    padding-bottom: 10vh;
     z-index: 9999;
+  }
+
+  .spinner-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--wa-color-brand-50);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  .spinner-screen wa-spinner {
+    --indicator-color: white;
   }
 
   .logo {
