@@ -9,6 +9,14 @@
   let completed = false;
 
   onMount(() => {
+    const hasShown = sessionStorage.getItem("splashShown");
+    
+    if (hasShown) {
+      visible = false;
+      onComplete?.();
+      return;
+    }
+
     startTime = Date.now();
 
     const fallbackTimeout = setTimeout(() => {
@@ -28,6 +36,7 @@
     const remaining = Math.max(0, 2000 - elapsed);
 
     setTimeout(() => {
+      sessionStorage.setItem("splashShown", "true");
       visible = false;
       onComplete?.();
     }, remaining);

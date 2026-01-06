@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ErrorBoundary, SplashScreen } from "@climblive/lib/components";
+  import { ErrorBoundary } from "@climblive/lib/components";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { Route, Router } from "svelte-routing";
@@ -12,25 +12,19 @@
       },
     },
   });
-
-  let showSplash = $state(true);
 </script>
 
-{#if showSplash}
-  <SplashScreen onComplete={() => (showSplash = false)} />
-{:else}
-  <ErrorBoundary>
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <Route path="/scoreboard/:contestId"
-          >{#snippet children({ params }: { params: { contestId: number } })}
-            <Scoreboard contestId={Number(params.contestId)} />
-          {/snippet}
-        </Route>
-      </Router>
-      {#if import.meta.env.DEV}
-        <SvelteQueryDevtools />
-      {/if}
-    </QueryClientProvider>
-  </ErrorBoundary>
-{/if}
+<ErrorBoundary>
+  <QueryClientProvider client={queryClient}>
+    <Router>
+      <Route path="/scoreboard/:contestId"
+        >{#snippet children({ params }: { params: { contestId: number } })}
+          <Scoreboard contestId={Number(params.contestId)} />
+        {/snippet}
+      </Route>
+    </Router>
+    {#if import.meta.env.DEV}
+      <SvelteQueryDevtools />
+    {/if}
+  </QueryClientProvider>
+</ErrorBoundary>

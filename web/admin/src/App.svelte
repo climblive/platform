@@ -80,9 +80,7 @@
 {:else}
   <ErrorBoundary>
     {#await authenticator.authenticate()}
-      <main>
-        <wa-spinner></wa-spinner>
-      </main>
+      <SplashScreen />
     {:then}
       <QueryClientProvider client={queryClient}>
         {#if !authenticator.isAuthenticated()}

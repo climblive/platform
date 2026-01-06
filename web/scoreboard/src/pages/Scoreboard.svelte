@@ -6,12 +6,12 @@
     FullLogo,
     ResultList,
     ScoreboardProvider,
+    SplashScreen,
   } from "@climblive/lib/components";
   import { value } from "@climblive/lib/forms";
   import { getCompClassesQuery, getContestQuery } from "@climblive/lib/queries";
   import { onMount } from "svelte";
   import Header from "../components/Header.svelte";
-  import Loading from "./Loading.svelte";
 
   interface Props {
     contestId: number;
@@ -42,6 +42,8 @@
   onMount(() => {
     determineOverflowBehaviour();
   });
+
+  let showSplash = $state(true);
 </script>
 
 <svelte:window
@@ -50,8 +52,10 @@
   }}
 />
 
-{#if !contest || !compClasses}
-  <Loading />
+{#if showSplash}
+  <SplashScreen onComplete={() => (showSplash = false)} />
+{:else if !contest || !compClasses}
+  <SplashScreen />
 {:else}
   <ScoreboardProvider {contestId} hideDisqualified>
     {#snippet children({ scoreboard, loading, online })}
