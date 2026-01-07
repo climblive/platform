@@ -29,7 +29,7 @@
       } catch {}
 
       onComplete();
-    }, 1_500);
+    }, 2_000);
 
     return () => clearTimeout(fallbackTimeout);
   });
