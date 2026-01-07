@@ -83,6 +83,12 @@
       width: "1fr",
     },
     {
+      label: "Location",
+      mobile: false,
+      render: renderLocation,
+      width: "max-content",
+    },
+    {
       label: "Start time",
       mobile: true,
       render: renderTimeBegin,
@@ -117,6 +123,10 @@
 
 {#snippet renderName({ id, name }: Contest)}
   <Link to="contests/{id}">{name}</Link>
+{/snippet}
+
+{#snippet renderLocation({ location }: Contest)}
+  {location || "-"}
 {/snippet}
 
 {#snippet renderRegisteredContenders({ registeredContenders }: Contest)}
