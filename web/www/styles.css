@@ -137,7 +137,7 @@ blockquote {
   background-color: var(--wa-color-surface-raised);
   border-radius: var(--wa-border-radius-m);
   box-shadow: var(--wa-shadow-m);
-  border-left: calc(var(--wa-border-width-l) * 3) solid
+  border-left: calc(var(--wa-border-width-l) * 2) var(--wa-border-style)
     var(--wa-color-brand-fill-loud);
   text-align: left;
 }
