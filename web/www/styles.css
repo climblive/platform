@@ -51,10 +51,6 @@ h1 {
   font-weight: var(--wa-font-weight-light);
 }
 
-wa-button:not(:last-of-type) {
-  margin-inline-end: var(--wa-space-s);
-}
-
 .features-section {
   padding-block: var(--wa-space-4xl);
 }
@@ -105,7 +101,13 @@ wa-button:not(:last-of-type) {
 }
 
 .cta-container {
-  margin-top: var(--wa-space-3xl);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--wa-space-s);
+}
+
+.cta-container wa-button {
+  width: 100%;
 }
 
 .footer {
@@ -172,9 +174,17 @@ blockquote::before {
   text-decoration: none;
 }
 
+.quote-author + wa-button {
+  margin-top: var(--wa-space-2xl);
+}
+
 @media (max-width: 768px) {
   .hero-section {
     padding-block: var(--wa-space-3xl);
+  }
+
+  .cta-container {
+    grid-template-columns: 1fr;
   }
 
   .features-grid {
@@ -191,10 +201,5 @@ blockquote::before {
 
   h1 {
     font-size: var(--wa-font-size-2xl);
-  }
-
-  wa-button {
-    display: block;
-    margin: var(--wa-space-xs) auto;
   }
 }
