@@ -77,7 +77,7 @@ wa-button:not(:last-of-type) {
   background: var(--wa-color-surface-raised);
   padding: var(--wa-space-xl);
   border-radius: var(--wa-border-radius-m);
-  box-shadow: var(--wa-shadow-s);
+  box-shadow: var(--wa-shadow-m);
   text-align: center;
 }
 
@@ -136,7 +136,7 @@ blockquote {
   padding: var(--wa-space-3xl) var(--wa-space-4xl);
   background-color: var(--wa-color-surface-raised);
   border-radius: var(--wa-border-radius-m);
-  box-shadow: var(--wa-shadow-s);
+  box-shadow: var(--wa-shadow-m);
   border-left: calc(var(--wa-border-width-l) * 3) solid
     var(--wa-color-brand-fill-loud);
   text-align: left;
