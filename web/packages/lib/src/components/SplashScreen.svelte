@@ -15,7 +15,9 @@
       if (hasShown === "true") {
         shouldSkipSplash = true;
       }
-    } catch {}
+    } catch {
+      // sessionStorage may be unavailable (private browsing, disabled storage)
+    }
 
     if (shouldSkipSplash) {
       onComplete();
@@ -26,7 +28,9 @@
     const fallbackTimeout = setTimeout(() => {
       try {
         sessionStorage.setItem("splashShown", "true");
-      } catch {}
+      } catch {
+        // sessionStorage may be unavailable (private browsing, disabled storage)
+      }
 
       onComplete();
     }, 2_000);
