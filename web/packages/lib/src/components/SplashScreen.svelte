@@ -65,6 +65,7 @@
     width: 50%;
     color: white;
     animation: slide-in 0.5s var(--wa-transition-easing);
+    margin-block-end: 10rem;
   }
 
   wa-spinner {
