@@ -1,18 +1,4 @@
-@import url("@awesome.me/webawesome/dist/styles/themes/default.css");
-
-:root {
-  --wa-color-brand-95: #fef2f2;
-  --wa-color-brand-90: #fee5e6;
-  --wa-color-brand-80: #fccfd2;
-  --wa-color-brand-70: #f9a8ad;
-  --wa-color-brand-60: #f57783;
-  --wa-color-brand-50: #ea384c;
-  --wa-color-brand-40: #d82643;
-  --wa-color-brand-30: #b61a37;
-  --wa-color-brand-20: #981935;
-  --wa-color-brand-10: #831833;
-  --wa-color-brand-05: #490816;
-}
+@import url("@climblive/lib/theme.css");
 
 * {
   margin: 0;
@@ -150,7 +136,8 @@ blockquote {
   background-color: var(--wa-color-surface-raised);
   border-radius: var(--wa-border-radius-m);
   box-shadow: var(--wa-shadow-s);
-  border-left: calc(var(--wa-border-width-l) * 3) solid var(--wa-color-brand-fill-loud);
+  border-left: calc(var(--wa-border-width-l) * 3) solid
+    var(--wa-color-brand-fill-loud);
   text-align: left;
 }
 
