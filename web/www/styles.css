@@ -51,8 +51,8 @@ h1 {
   font-weight: var(--wa-font-weight-light);
 }
 
-wa-button {
-  margin: var(--wa-space-xs);
+wa-button:not(:last-of-type) {
+  margin-inline-end: var(--wa-space-s);
 }
 
 .features-section {
