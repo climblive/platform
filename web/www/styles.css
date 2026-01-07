@@ -35,6 +35,7 @@ body {
 
 .logo {
   height: 4rem;
+  color: var(--wa-color-text-normal);
 }
 
 h1 {
