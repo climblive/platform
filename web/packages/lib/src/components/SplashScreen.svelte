@@ -2,77 +2,43 @@
   import { onMount } from "svelte";
   import SplashLogo from "./SplashLogo.svelte";
 
-  let { onComplete }: { onComplete?: () => void } = $props();
+  const { onComplete }: { onComplete: () => void } = $props();
 
-  let startTime: number;
-  let completed = false;
-  let showSpinner = $state(false);
+  let showSplash = $state(true);
 
   onMount(() => {
     let shouldSkipSplash = false;
-    
+
     try {
       const hasShown = sessionStorage.getItem("splashShown");
-      
+
       if (hasShown === "true") {
         shouldSkipSplash = true;
       }
-    } catch {
-      // sessionStorage may be unavailable in private browsing or when disabled
-    }
+    } catch {}
 
-    // Show spinner instead of splash when already shown in session and callback provided.
-    // Parent will unmount component when loading completes, so no need to call onComplete here.
-    if (shouldSkipSplash && onComplete) {
-      showSpinner = true;
+    if (shouldSkipSplash) {
+      showSplash = false;
       return;
     }
 
-    startTime = Date.now();
-
     const fallbackTimeout = setTimeout(() => {
-      if (!completed) {
-        handleCompletion();
-      }
-    }, 2500);
+      onComplete();
+    }, 1_500);
 
     return () => clearTimeout(fallbackTimeout);
   });
-
-  const handleCompletion = () => {
-    if (completed) return;
-    completed = true;
-
-    const elapsed = Date.now() - startTime;
-    const remaining = Math.max(0, 2000 - elapsed);
-
-    setTimeout(() => {
-      // Only set sessionStorage flag when there's a callback (not for loading indicators)
-      if (onComplete) {
-        try {
-          sessionStorage.setItem("splashShown", "true");
-        } catch {
-          // sessionStorage may be unavailable in private browsing or when disabled
-        }
-      }
-      onComplete?.();
-    }, remaining);
-  };
-
-  const handleAnimationEnd = () => {
-    handleCompletion();
-  };
 </script>
 
-{#if showSpinner}
-  <div class="spinner-screen">
-    <wa-spinner size="xl"></wa-spinner>
-  </div>
-{:else}
+{#if showSplash}
   <div class="splash-screen">
-    <div class="logo" onanimationend={handleAnimationEnd}>
+    <div class="logo">
       <SplashLogo />
     </div>
+  </div>
+{:else}
+  <div class="spinner-screen">
+    <wa-spinner size="xl"></wa-spinner>
   </div>
 {/if}
 
@@ -84,19 +50,17 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: var(--wa-color-brand-50);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 9999;
+  }
+
+  .splash-screen {
+    background-color: var(--wa-color-brand-fill-loud);
   }
 
   .splash-screen {
     padding-bottom: 10vh;
-  }
-
-  .spinner-screen wa-spinner {
-    --indicator-color: white;
   }
 
   .logo {
@@ -104,6 +68,10 @@
     max-width: 600px;
     color: white;
     animation: slide-in 0.5s ease-out;
+  }
+
+  wa-spinner {
+    font-size: 5rem;
   }
 
   @keyframes slide-in {

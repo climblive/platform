@@ -10,6 +10,8 @@
   import { Authenticator } from "./authenticator.svelte";
   import Main from "./Main.svelte";
 
+  let authenticated = $state(false);
+
   const selectedOrganizer = writable<number | undefined>();
   const authenticator = new Authenticator();
   setContext("authenticator", authenticator);
@@ -63,7 +65,12 @@
     }
   });
 
-  onMount(authenticator.startKeepAlive);
+  onMount(async () => {
+    authenticator.startKeepAlive();
+
+    await authenticator.authenticate();
+    authenticated = true;
+  });
 
   onDestroy(authenticator.stopKeepAlive);
 
@@ -75,39 +82,35 @@
   onvisibilitychange={handleVisibilityChange}
 />
 
-{#if showSplash}
-  <SplashScreen onComplete={() => (showSplash = false)} />
-{:else}
-  <ErrorBoundary>
-    {#await authenticator.authenticate()}
-      <SplashScreen onComplete={() => {}} />
-    {:then}
-      <QueryClientProvider client={queryClient}>
-        {#if !authenticator.isAuthenticated()}
-          <main>
-            <section>
-              <h1>Hi!</h1>
-              <p>Sign-in to manage your competitions on ClimbLive.</p>
-              <wa-button variant="neutral" onclick={authenticator.redirectLogin}
-                >Sign in</wa-button
-              >
-              <wa-button
-                variant="neutral"
-                appearance="plain"
-                onclick={authenticator.redirectSignup}>Sign up</wa-button
-              >
-            </section>
-          </main>
-        {:else}
-          <Main />
-        {/if}
-        {#if import.meta.env.DEV}
-          <SvelteQueryDevtools />
-        {/if}
-      </QueryClientProvider>
-    {/await}
-  </ErrorBoundary>
-{/if}
+<ErrorBoundary>
+  {#if !authenticated || showSplash}
+    <SplashScreen onComplete={() => (showSplash = false)} />
+  {:else}
+    <QueryClientProvider client={queryClient}>
+      {#if !authenticator.isAuthenticated()}
+        <main>
+          <section>
+            <h1>Hi!</h1>
+            <p>Sign-in to manage your competitions on ClimbLive.</p>
+            <wa-button variant="neutral" onclick={authenticator.redirectLogin}
+              >Sign in</wa-button
+            >
+            <wa-button
+              variant="neutral"
+              appearance="plain"
+              onclick={authenticator.redirectSignup}>Sign up</wa-button
+            >
+          </section>
+        </main>
+      {:else}
+        <Main />
+      {/if}
+      {#if import.meta.env.DEV}
+        <SvelteQueryDevtools />
+      {/if}
+    </QueryClientProvider>
+  {/if}
+</ErrorBoundary>
 
 <style>
   main {
@@ -116,10 +119,6 @@
     height: 100vh;
     padding: var(--wa-space-l);
     padding-top: 20vh;
-  }
-
-  wa-spinner {
-    font-size: 5rem;
   }
 
   wa-button:last-of-type {
