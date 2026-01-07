@@ -29,7 +29,7 @@
       } catch {}
 
       onComplete();
-    }, 1_500);
+    }, 1_500000);
 
     return () => clearTimeout(fallbackTimeout);
   });
@@ -66,9 +66,8 @@
 
   .logo {
     width: 50%;
-    max-width: 600px;
     color: white;
-    animation: slide-in 0.5s ease-out;
+    animation: slide-in 0.5s var(--wa-transition-easing);
   }
 
   wa-spinner {
