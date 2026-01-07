@@ -80,6 +80,12 @@
       label: "Name",
       mobile: true,
       render: renderName,
+      width: "2fr",
+    },
+    {
+      label: "Location",
+      mobile: false,
+      render: renderLocation,
       width: "1fr",
     },
     {
@@ -117,6 +123,10 @@
 
 {#snippet renderName({ id, name }: Contest)}
   <Link to="contests/{id}">{name}</Link>
+{/snippet}
+
+{#snippet renderLocation({ location }: Contest)}
+  {location || "-"}
 {/snippet}
 
 {#snippet renderRegisteredContenders({ registeredContenders }: Contest)}
