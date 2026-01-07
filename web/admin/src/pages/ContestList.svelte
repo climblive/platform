@@ -80,7 +80,7 @@
       label: "Name",
       mobile: true,
       render: renderName,
-      width: "1fr",
+      width: "2fr",
     },
     {
       label: "Location",
