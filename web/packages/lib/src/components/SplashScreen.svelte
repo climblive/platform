@@ -18,11 +18,16 @@
     } catch {}
 
     if (shouldSkipSplash) {
+      onComplete();
       showSplash = false;
       return;
     }
 
     const fallbackTimeout = setTimeout(() => {
+      try {
+        sessionStorage.setItem("splashShown", "true");
+      } catch {}
+
       onComplete();
     }, 1_500);
 
