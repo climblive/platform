@@ -86,7 +86,7 @@
       label: "Location",
       mobile: false,
       render: renderLocation,
-      width: "max-content",
+      width: "1fr",
     },
     {
       label: "Start time",
