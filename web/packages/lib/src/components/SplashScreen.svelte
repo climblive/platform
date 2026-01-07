@@ -64,10 +64,6 @@
     background-color: var(--wa-color-brand-fill-loud);
   }
 
-  .splash-screen {
-    padding-bottom: 10vh;
-  }
-
   .logo {
     width: 50%;
     max-width: 600px;
