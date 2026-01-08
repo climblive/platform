@@ -84,12 +84,10 @@ type ScoreEngineManager struct {
 }
 
 type engineHandler struct {
-	instanceID         domain.ScoreEngineInstanceID
-	driver             *ScoreEngineDriver
-	stop               func()
-	wg                 *sync.WaitGroup
-	finalists          int
-	qualifyingProblems int
+	instanceID domain.ScoreEngineInstanceID
+	driver     *ScoreEngineDriver
+	stop       func()
+	wg         *sync.WaitGroup
 }
 
 func NewScoreEngineManager(repo scoreEngineManagerRepository, engineStoreHydrator EngineStoreHydrator, eventBroker domain.EventBroker, scoreEngineMaxLifetime time.Duration) ScoreEngineManager {
@@ -252,23 +250,7 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) {
 			continue
 		}
 
-		if handler, ok := mngr.handlers[contest.ID]; ok {
-			logger := slog.New(slog.Default().Handler()).
-				With("contest_id", contest.ID).
-				With("instance_id", handler.instanceID)
-
-			if contest.QualifyingProblems != handler.qualifyingProblems {
-				logger.Info("updating scoring rules", "qualifying_problems", contest.QualifyingProblems)
-				handler.driver.SetScoringRules(&HardestProblems{Number: contest.QualifyingProblems})
-				handler.qualifyingProblems = contest.QualifyingProblems
-			}
-
-			if contest.Finalists != handler.finalists {
-				logger.Info("updating ranker", "finalists", contest.Finalists)
-				handler.driver.SetRanker(NewBasicRanker(contest.Finalists))
-				handler.finalists = contest.Finalists
-			}
-
+		if _, found := mngr.handlers[contest.ID]; found {
 			continue
 		}
 
@@ -311,10 +293,8 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 
 	instanceID := uuid.New()
 	store := NewMemoryStore()
-	rules := &HardestProblems{Number: contest.QualifyingProblems}
-	ranker := NewBasicRanker(contest.Finalists)
 	driver := NewScoreEngineDriver(contest.ID, instanceID, mngr.eventBroker)
-	engine := NewDefaultScoreEngine(ranker, rules, store)
+	engine := NewDefaultScoreEngine(store)
 
 	cancellableCtx, stop := context.WithDeadline(context.Background(), terminatedBy)
 	wg, installEngine := driver.Run(cancellableCtx, WithPanicRecovery())
@@ -334,12 +314,10 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 	installEngine(engine)
 
 	mngr.handlers[contestID] = &engineHandler{
-		instanceID:         instanceID,
-		driver:             driver,
-		stop:               stop,
-		wg:                 wg,
-		finalists:          contest.Finalists,
-		qualifyingProblems: contest.QualifyingProblems,
+		instanceID: instanceID,
+		driver:     driver,
+		stop:       stop,
+		wg:         wg,
 	}
 
 	go func() {

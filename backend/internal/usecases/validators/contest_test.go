@@ -28,7 +28,7 @@ func TestContestValidator(t *testing.T) {
 
 	t.Run("EmptyName", func(t *testing.T) {
 		contest := validContest()
-		contest.Name = ""
+		contest.Name = whitespaceCharacters
 
 		err := validator.Validate(contest)
 

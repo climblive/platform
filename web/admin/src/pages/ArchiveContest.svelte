@@ -36,7 +36,7 @@
       {
         onSuccess: () => {
           handleCancel();
-          navigate(`/admin/organizers/${organizerId}`);
+          navigate(`/admin/organizers/${organizerId}/contests`);
         },
         onError: () => {
           toastError("Failed to archive contest.");

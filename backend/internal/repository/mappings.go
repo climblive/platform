@@ -6,6 +6,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/google/uuid"
 )
 
 func contenderToDomain(record database.GetContenderRow) domain.Contender {
@@ -67,12 +68,9 @@ func contestToDomain(record database.Contest) domain.Contest {
 		Description:        record.Description.String,
 		QualifyingProblems: int(record.QualifyingProblems),
 		Finalists:          int(record.Finalists),
-		Rules:              record.Rules.String,
+		Info:               record.Info.String,
 		GracePeriod:        time.Duration(record.GracePeriod) * time.Minute,
-	}
-
-	if !record.FinalEnabled {
-		contest.Finalists = 0
+		Created:            record.Created,
 	}
 
 	return contest
@@ -154,6 +152,15 @@ func raffleWinnerToDomain(record database.RaffleWinner, name string) domain.Raff
 		ContenderID:   domain.ContenderID(record.ContenderID),
 		ContenderName: name,
 		Timestamp:     record.Timestamp,
+	}
+}
+
+func organizerInviteToDomain(record database.OrganizerInvite, organizerName string) domain.OrganizerInvite {
+	return domain.OrganizerInvite{
+		ID:            domain.OrganizerInviteID(uuid.MustParse(record.ID)),
+		OrganizerID:   domain.OrganizerID(record.OrganizerID),
+		OrganizerName: organizerName,
+		ExpiresAt:     record.ExpiresAt,
 	}
 }
 

@@ -6,6 +6,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/usecases"
+	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -163,7 +164,7 @@ func TestPatchProblem(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
-	t.Run("InvalidData", func(t *testing.T) {
+	t.Run("ValidatorIsInvoked", func(t *testing.T) {
 		mockedRepo, mockedEventBroker, mockedAuthorizer := makeMocks()
 
 		mockedAuthorizer.
@@ -180,12 +181,7 @@ func TestPatchProblem(t *testing.T) {
 		})
 
 		require.ErrorIs(t, err, domain.ErrInvalidData)
-
-		_, err = ucase.PatchProblem(context.Background(), fakedProblemID, domain.ProblemPatch{
-			HoldColorSecondary: domain.NewPatch("invalid"),
-		})
-
-		require.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validators.ProblemValidator{}.IsValidationError(err))
 
 		mockedRepo.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)
@@ -422,9 +418,8 @@ func TestCreateProblem(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
-	t.Run("InvalidData", func(t *testing.T) {
+	t.Run("ValidatorIsInvoked", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
-		mockedEventBroker := new(eventBrokerMock)
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
@@ -434,60 +429,21 @@ func TestCreateProblem(t *testing.T) {
 			On("GetProblemByNumber", mock.Anything, nil, fakedContestID, 10).
 			Return(domain.Problem{}, domain.ErrNotFound)
 
-		mockedRepo.
-			On("StoreProblem", mock.Anything, nil, mock.AnythingOfType("domain.Problem")).
-			Return(domain.Problem{}, nil)
-
-		mockedEventBroker.
-			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.ProblemAddedEvent")).
-			Return()
-
 		ucase := usecases.ProblemUseCase{
-			Repo:        mockedRepo,
-			Authorizer:  mockedAuthorizer,
-			EventBroker: mockedEventBroker,
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
 		}
 
-		validTemplate := func() domain.ProblemTemplate {
-			return domain.ProblemTemplate{
-				Number:             10,
-				HoldColorPrimary:   "#ffffff",
-				HoldColorSecondary: "#000",
-				Description:        "Crack volumes are included",
-				Zone1Enabled:       true,
-				Zone2Enabled:       true,
-				PointsTop:          100,
-				PointsZone1:        50,
-				PointsZone2:        75,
-				FlashBonus:         15,
-			}
-		}
-
-		_, err := ucase.CreateProblem(context.Background(), fakedContestID, validTemplate())
-
-		require.NoError(t, err)
-
-		t.Run("BadPrimaryColor", func(t *testing.T) {
-			tmpl := validTemplate()
-			tmpl.HoldColorPrimary = "invalid"
-
-			_, err := ucase.CreateProblem(context.Background(), fakedContestID, tmpl)
-
-			assert.ErrorIs(t, err, domain.ErrInvalidData)
+		_, err := ucase.CreateProblem(context.Background(), fakedContestID, domain.ProblemTemplate{
+			Number:    10,
+			PointsTop: -100,
 		})
 
-		t.Run("BadSecondaryColor", func(t *testing.T) {
-			tmpl := validTemplate()
-			tmpl.HoldColorSecondary = "invalid"
-
-			_, err := ucase.CreateProblem(context.Background(), fakedContestID, tmpl)
-
-			assert.ErrorIs(t, err, domain.ErrInvalidData)
-		})
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validators.ProblemValidator{}.IsValidationError(err))
 
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
-		mockedEventBroker.AssertExpectations(t)
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {

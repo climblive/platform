@@ -13,8 +13,10 @@
   import "@awesome.me/webawesome/dist/components/tab/tab.js";
   import {
     ContestStateProvider,
+    EmptyState,
     ResultList,
     ScoreboardProvider,
+    SplashScreen,
   } from "@climblive/lib/components";
   import {
     ascentDeregisteredEventSchema,
@@ -37,7 +39,6 @@
   import { add } from "date-fns/add";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
-  import Loading from "./Loading.svelte";
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
@@ -222,12 +223,14 @@
   onDestroy(() => {
     tearDown();
   });
+
+  let showSplash = $state(true);
 </script>
 
 <svelte:window onvisibilitychange={handleVisibilityChange} />
 
-{#if !contender || !contest || !compClasses || !sortedProblems || !ticks || !selectedCompClass}
-  <Loading />
+{#if showSplash || !contender || !contest || !compClasses || !sortedProblems || !ticks || !selectedCompClass}
+  <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
   <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime}>
     {#snippet children({ contestState })}
@@ -274,6 +277,7 @@
                     sortDirection = sortDirection === "asc" ? "desc" : "asc";
                   }
                 }}
+                disabled={problems === undefined || problems.length === 0}
               >
                 <wa-icon name={numberSortIcon} label={numberSortLabel}
                 ></wa-icon>
@@ -288,24 +292,35 @@
                     sortDirection = sortDirection === "asc" ? "desc" : "asc";
                   }
                 }}
+                disabled={problems === undefined || problems.length === 0}
               >
                 <wa-icon name={pointsSortIcon} label={pointsSortLabel}
                 ></wa-icon>
                 Sort by points
               </wa-radio>
             </wa-radio-group>
-            {#each sortedProblems as problem (problem.id)}
-              <ProblemView
-                {problem}
-                tick={ticks.find(({ problemId }) => problemId === problem.id)}
-                disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
-                {highestProblemNumber}
+            {#if sortedProblems.length === 0}
+              <EmptyState
+                title="No problems"
+                description="The organizer has not added any problems to this contest yet."
               />
-            {/each}
+            {:else}
+              {#each sortedProblems as problem (problem.id)}
+                <ProblemView
+                  {problem}
+                  tick={ticks.find(({ problemId }) => problemId === problem.id)}
+                  disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
+                  {highestProblemNumber}
+                />
+              {/each}
+            {/if}
           </wa-tab-panel>
           <wa-tab-panel name="results">
             {#if resultsConnected}
-              <ScoreboardProvider contestId={$session.contestId}>
+              <ScoreboardProvider
+                contestId={$session.contestId}
+                hideDisqualified
+              >
                 {#snippet children({ scoreboard, loading })}
                   <ResultList
                     compClassId={selectedCompClass.id}

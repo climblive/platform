@@ -1,6 +1,7 @@
 package validators
 
 import (
+	"strings"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -14,7 +15,7 @@ type ContestValidator struct {
 
 func (v ContestValidator) Validate(contest domain.Contest) error {
 	switch {
-	case len(contest.Name) < 1:
+	case len(strings.TrimSpace(contest.Name)) < 1:
 		fallthrough
 	case contest.Finalists < 0 || contest.Finalists > 65536:
 		fallthrough

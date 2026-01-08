@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  import * as z from "zod";
+  import * as z from "zod/v4";
 
   const oneMonth = 31 * 24 * 60 * 60 * 1_000;
 
@@ -10,19 +10,23 @@
       timeBegin: z.coerce.date(),
       timeEnd: z.coerce.date(),
     })
-    .superRefine((data, ctx) => {
+    .check((ctx) => {
+      const data = ctx.value;
+
       if (data.timeEnd.getTime() - data.timeBegin.getTime() > oneMonth) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+        ctx.issues.push({
+          code: "custom",
           message: "Total duration must not exceed 31 days",
+          input: data,
           path: ["timeEnd"],
         });
       }
 
       if (data.timeEnd <= data.timeBegin) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+        ctx.issues.push({
+          code: "custom",
           message: "Time must follow chronological order",
+          input: data,
           path: ["timeEnd"],
         });
       }
@@ -42,7 +46,7 @@
 
   interface Props {
     data: Partial<T>;
-    schema: z.ZodType<T, z.ZodTypeDef, T>;
+    schema: z.ZodType<T, unknown>;
     submit: (value: T) => void;
     children?: Snippet;
   }
