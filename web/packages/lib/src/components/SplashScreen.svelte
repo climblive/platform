@@ -47,14 +47,14 @@
   </div>
 {:else}
   <div class="spinner-screen">
-    <wa-spinner size="xl"></wa-spinner>
+    <wa-spinner></wa-spinner>
   </div>
 {/if}
 
 <style>
   .splash-screen,
   .spinner-screen {
-    width: 100vw;
+    width: 100%;
     height: 100vh;
     display: flex;
     align-items: center;
@@ -66,7 +66,7 @@
   }
 
   .logo {
-    width: 50%;
+    width: min(20rem, 50%);
     color: white;
     animation: slide-in 0.5s var(--wa-transition-easing);
     margin-block-end: 10rem;
