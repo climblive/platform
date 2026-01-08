@@ -7,7 +7,7 @@
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
-  import { FullLogo } from "@climblive/lib/components";
+  import { FullLogo, SplashScreen } from "@climblive/lib/components";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { format } from "date-fns";
   import { getContext, onMount } from "svelte";
@@ -25,6 +25,7 @@
   let queryClient = useQueryClient();
   let form: HTMLFormElement | undefined = $state();
   let restoredSessions: ScorecardSession[] = $state([]);
+  let showSplash = $state(true);
 
   onMount(() => {
     restoredSessions = readStoredSessions();
@@ -75,70 +76,74 @@
   };
 </script>
 
-<main>
-  <header>
-    <h1>Welcome!</h1>
-  </header>
-  <form bind:this={form} onsubmit={handleSubmit}>
-    <wa-input
-      required
-      placeholder="ABCD1234"
-      label="Registration code"
-      hint="Input your 8 digit registration code."
-      name="code"
-      type="text"
-      minlength="8"
-      maxlength="8"
-    >
-      <wa-icon name="key" slot="start"></wa-icon>
-    </wa-input>
-    {#if loadingFailed}
-      <wa-callout open variant="danger">
-        <wa-icon slot="icon" name="exclamation-octagon"></wa-icon>
-        The registration code is not valid.
-      </wa-callout>
-    {/if}
-    <wa-button variant="neutral" type="submit" loading={loadingContender}>
-      <wa-icon slot="start" name="arrow-right-to-bracket"></wa-icon>
-      Enter
-    </wa-button>
-  </form>
-
-  {#if restoredSessions.length > 0}
-    <wa-divider></wa-divider>
-  {/if}
-
-  {#each restoredSessions as restoredSession (restoredSession.registrationCode)}
-    <section
-      class="restoredSession"
-      aria-label="Saved session {restoredSession.registrationCode}"
-    >
-      <h3>
-        Saved session <span class="code"
-          >{restoredSession.registrationCode}</span
-        >
-      </h3>
-      <p class="timestamp">{format(restoredSession.timestamp, "pp")}</p>
-      <wa-button
-        onclick={() => {
-          if (restoredSession) {
-            handleEnter(restoredSession.registrationCode);
-          }
-        }}
-        loading={loadingContender}
-        size="small"
-        appearance="outlined filled"
-        >Restore
+{#if showSplash}
+  <SplashScreen onComplete={() => (showSplash = false)} />
+{:else}
+  <main>
+    <header>
+      <h1>Welcome!</h1>
+    </header>
+    <form bind:this={form} onsubmit={handleSubmit}>
+      <wa-input
+        required
+        placeholder="ABCD1234"
+        label="Registration code"
+        hint="Input your 8 digit registration code."
+        name="code"
+        type="text"
+        minlength="8"
+        maxlength="8"
+      >
+        <wa-icon name="key" slot="start"></wa-icon>
+      </wa-input>
+      {#if loadingFailed}
+        <wa-callout open variant="danger">
+          <wa-icon slot="icon" name="exclamation-octagon"></wa-icon>
+          The registration code is not valid.
+        </wa-callout>
+      {/if}
+      <wa-button variant="neutral" type="submit" loading={loadingContender}>
         <wa-icon slot="start" name="arrow-right-to-bracket"></wa-icon>
+        Enter
       </wa-button>
-    </section>
-  {/each}
-  <footer>
-    <div class="logo">
-      <FullLogo />
-    </div>
-  </footer>
-</main>
+    </form>
+
+    {#if restoredSessions.length > 0}
+      <wa-divider></wa-divider>
+    {/if}
+
+    {#each restoredSessions as restoredSession (restoredSession.registrationCode)}
+      <section
+        class="restoredSession"
+        aria-label="Saved session {restoredSession.registrationCode}"
+      >
+        <h3>
+          Saved session <span class="code"
+            >{restoredSession.registrationCode}</span
+          >
+        </h3>
+        <p class="timestamp">{format(restoredSession.timestamp, "pp")}</p>
+        <wa-button
+          onclick={() => {
+            if (restoredSession) {
+              handleEnter(restoredSession.registrationCode);
+            }
+          }}
+          loading={loadingContender}
+          size="small"
+          appearance="outlined filled"
+          >Restore
+          <wa-icon slot="start" name="arrow-right-to-bracket"></wa-icon>
+        </wa-button>
+      </section>
+    {/each}
+    <footer>
+      <div class="logo">
+        <FullLogo />
+      </div>
+    </footer>
+  </main>
+{/if}
 
 <style>
   main {

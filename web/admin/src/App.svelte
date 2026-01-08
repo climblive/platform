@@ -1,7 +1,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
-  import { ErrorBoundary } from "@climblive/lib/components";
+  import { ErrorBoundary, SplashScreen } from "@climblive/lib/components";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { onDestroy, onMount, setContext } from "svelte";
@@ -9,6 +9,8 @@
   import { writable } from "svelte/store";
   import { Authenticator } from "./authenticator.svelte";
   import Main from "./Main.svelte";
+
+  let authenticated = $state(false);
 
   const selectedOrganizer = writable<number | undefined>();
   const authenticator = new Authenticator();
@@ -63,9 +65,16 @@
     }
   });
 
-  onMount(authenticator.startKeepAlive);
+  onMount(async () => {
+    authenticator.startKeepAlive();
+
+    await authenticator.authenticate();
+    authenticated = true;
+  });
 
   onDestroy(authenticator.stopKeepAlive);
+
+  let showSplash = $state(true);
 </script>
 
 <svelte:window
@@ -74,11 +83,9 @@
 />
 
 <ErrorBoundary>
-  {#await authenticator.authenticate()}
-    <main>
-      <wa-spinner></wa-spinner>
-    </main>
-  {:then}
+  {#if !authenticated || showSplash}
+    <SplashScreen onComplete={() => (showSplash = false)} />
+  {:else}
     <QueryClientProvider client={queryClient}>
       {#if !authenticator.isAuthenticated()}
         <main>
@@ -102,7 +109,7 @@
         <SvelteQueryDevtools />
       {/if}
     </QueryClientProvider>
-  {/await}
+  {/if}
 </ErrorBoundary>
 
 <style>
@@ -112,10 +119,6 @@
     height: 100vh;
     padding: var(--wa-space-l);
     padding-top: 20vh;
-  }
-
-  wa-spinner {
-    font-size: 5rem;
   }
 
   wa-button:last-of-type {
