@@ -16,7 +16,7 @@
         shouldSkipSplash = true;
       }
     } catch {
-      // sessionStorage may be unavailable (private browsing, disabled storage)
+      /* sessionStorage may be unavailable (private browsing, disabled storage) */
     }
 
     if (shouldSkipSplash) {
@@ -29,7 +29,7 @@
       try {
         sessionStorage.setItem("splashShown", "true");
       } catch {
-        // sessionStorage may be unavailable (private browsing, disabled storage)
+        /* sessionStorage may be unavailable (private browsing, disabled storage) */
       }
 
       onComplete();
