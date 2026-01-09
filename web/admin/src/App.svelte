@@ -74,7 +74,8 @@
 
   onDestroy(authenticator.stopKeepAlive);
 
-  let showSplash = $state(true);
+  const isPrintRoute = window.location.pathname.includes("/tickets/print");
+  let showSplash = $state(!isPrintRoute);
 </script>
 
 <svelte:window
