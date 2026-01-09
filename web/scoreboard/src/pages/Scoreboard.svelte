@@ -79,7 +79,7 @@
             }}
           >
             {#each compClasses as compClass (compClass.id)}
-              <wa-option value={compClass.id}>{compClass.name}</wa-option>
+              <wa-option value={compClass.id}>{compClass.name}{#if compClass.description} - {compClass.description}{/if}</wa-option>
             {/each}
           </wa-select>
         {/if}
