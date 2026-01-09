@@ -244,6 +244,7 @@
 
   wa-tab[panel="results"] wa-badge {
     margin-left: var(--wa-space-2xs);
+    font-size: var(--wa-font-size-2xs);
   }
 
   .actions {
