@@ -74,7 +74,8 @@
 
   onDestroy(authenticator.stopKeepAlive);
 
-  const isPrintRoute = window.location.pathname.includes("/tickets/print");
+  const isPrintRoute =
+    /\/admin\/contests\/\d+\/tickets\/print$/.test(window.location.pathname);
   let showSplash = $state(!isPrintRoute);
 </script>
 
