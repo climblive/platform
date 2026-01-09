@@ -79,7 +79,14 @@
             }}
           >
             {#each compClasses as compClass (compClass.id)}
-              <wa-option value={compClass.id}>{compClass.name}{#if compClass.description} - {compClass.description}{/if}</wa-option>
+              <wa-option value={compClass.id}>
+                <div>
+                  <div>{compClass.name}</div>
+                  {#if compClass.description}
+                    <small>{compClass.description}</small>
+                  {/if}
+                </div>
+              </wa-option>
             {/each}
           </wa-select>
         {/if}
@@ -172,6 +179,13 @@
     height: var(--wa-font-size-xl);
     color: var(--wa-color-text-normal);
     margin-block: var(--wa-space-s);
+  }
+
+  wa-option small {
+    display: block;
+    font-size: 0.875em;
+    color: var(--wa-color-text-subtle);
+    margin-top: 0.125rem;
   }
 
   @media screen and (max-width: 512px) {

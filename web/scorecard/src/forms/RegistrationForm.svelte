@@ -53,8 +53,14 @@
           <wa-option
             value={compClass.id}
             disabled={isAfter(new Date(), compClass.timeEnd)}
-            >{compClass.name}{#if compClass.description} - {compClass.description}{/if}</wa-option
           >
+            <div>
+              <div>{compClass.name}</div>
+              {#if compClass.description}
+                <small>{compClass.description}</small>
+              {/if}
+            </div>
+          </wa-option>
         {/each}
       </wa-select>
       <wa-switch
@@ -74,5 +80,12 @@
     flex-direction: column;
     gap: var(--wa-space-s);
     padding: var(--wa-space-m);
+  }
+
+  wa-option small {
+    display: block;
+    font-size: 0.875em;
+    color: var(--wa-color-text-subtle);
+    margin-top: 0.125rem;
   }
 </style>
