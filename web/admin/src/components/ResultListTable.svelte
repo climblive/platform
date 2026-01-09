@@ -39,6 +39,15 @@
   let liveSwitch: WaSwitch | undefined = $state();
   let live = $state(true);
 
+  const contenderCounts = $derived(
+    new Map(
+      Array.from($scoreboard.entries()).map(([classId, entries]) => [
+        classId,
+        entries.length,
+      ])
+    )
+  );
+
   $effect(() => {
     if (
       compClasses &&
@@ -163,7 +172,9 @@
       }}
     >
       {#each compClasses as compClass (compClass.id)}
-        <wa-option value={compClass.id}>{compClass.name}</wa-option>
+        <wa-option value={compClass.id}>
+          {compClass.name} ({contenderCounts.get(compClass.id) ?? 0})
+        </wa-option>
       {/each}
     </wa-select>
   </div>
