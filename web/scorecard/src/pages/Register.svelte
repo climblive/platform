@@ -3,6 +3,7 @@
   import type { ScorecardSession } from "@/types";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import { SplashScreen } from "@climblive/lib/components";
   import type { ContenderPatch } from "@climblive/lib/models";
   import {
     getContenderQuery,
@@ -43,10 +44,16 @@
       },
     );
   };
+
+  let showSplash = $state(true);
 </script>
 
-{#if !contender || !contest}
-  <Loading />
+{#if showSplash || !contender || !contest}
+  {#if !contender || !contest}
+    <Loading />
+  {:else}
+    <SplashScreen onComplete={() => (showSplash = false)} />
+  {/if}
 {:else}
   <h1>{contest.name}</h1>
   <RegistrationForm
