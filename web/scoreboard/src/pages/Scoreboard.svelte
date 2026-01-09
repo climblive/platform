@@ -181,13 +181,6 @@
     margin-block: var(--wa-space-s);
   }
 
-  wa-option small {
-    display: block;
-    font-size: 0.875em;
-    color: var(--wa-color-text-subtle);
-    margin-top: 0.125rem;
-  }
-
   @media screen and (max-width: 512px) {
     h1 {
       font-size: var(--wa-font-size-xl);
