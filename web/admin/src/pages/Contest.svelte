@@ -242,6 +242,10 @@
     margin-top: var(--wa-space-m);
   }
 
+  wa-tab[panel="results"] wa-badge {
+    margin-left: var(--wa-space-2xs);
+  }
+
   .actions {
     display: flex;
     gap: var(--wa-space-xs);
