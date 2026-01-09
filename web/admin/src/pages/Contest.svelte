@@ -2,6 +2,7 @@
   import Loader from "@/components/Loader.svelte";
   import RulesEditor from "@/components/RulesEditor.svelte";
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
+  import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
   import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
@@ -14,7 +15,7 @@
   import "@awesome.me/webawesome/dist/components/tab-panel/tab-panel.js";
   import "@awesome.me/webawesome/dist/components/tab/tab.js";
   import { LabeledText } from "@climblive/lib/components";
-  import { getContestQuery } from "@climblive/lib/queries";
+  import { getContendersByContestQuery, getContestQuery } from "@climblive/lib/queries";
   import { navigate } from "svelte-routing";
   import ArchiveContest from "./ArchiveContest.svelte";
   import CompClassList from "./CompClassList.svelte";
@@ -38,8 +39,10 @@
   let compClassesHeading: HTMLHeadingElement | undefined = $state();
 
   const contestQuery = $derived(getContestQuery(contestId));
+  const contendersQuery = $derived(getContendersByContestQuery(contestId));
 
   const contest = $derived(contestQuery.data);
+  const contenders = $derived(contendersQuery.data);
 
   $effect(() => {
     const hash = window.location.hash.substring(1);
@@ -108,7 +111,12 @@
     {#if contest.archived === false}
       <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleTabShow}>
         <wa-tab slot="nav" panel="contest">Contest</wa-tab>
-        <wa-tab slot="nav" panel="results">Results</wa-tab>
+        <wa-tab slot="nav" panel="results">
+          Results
+          {#if contenders && contenders.length > 0}
+            <wa-badge variant="neutral" pill>{contenders.length}</wa-badge>
+          {/if}
+        </wa-tab>
         <wa-tab slot="nav" panel="raffles">Raffles</wa-tab>
 
         <wa-tab-panel name="contest">
