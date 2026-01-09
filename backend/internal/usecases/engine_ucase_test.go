@@ -185,17 +185,17 @@ func TestScoreEngineUseCase(t *testing.T) {
 					expected:     domain.ErrNotAllowed,
 				},
 				{
-					name:         "TerminationTimeWithin12HoursFromNow",
+					name:         "TerminationTimeWithin12HoursFromContestEnd",
 					timeBegin:    now,
 					timeEnd:      now.Add(time.Hour),
-					terminatedBy: now.Add(12 * time.Hour),
+					terminatedBy: now.Add(time.Hour).Add(12 * time.Hour),
 					expected:     nil,
 				},
 				{
-					name:         "TerminationTimePast12HoursFromNow",
+					name:         "TerminationTimePast12HoursFromContestEnd",
 					timeBegin:    now,
 					timeEnd:      now.Add(time.Hour),
-					terminatedBy: now.Add(12 * time.Hour).Add(time.Second),
+					terminatedBy: now.Add(time.Hour).Add(12 * time.Hour).Add(time.Second),
 					expected:     domain.ErrNotAllowed,
 				},
 			}
