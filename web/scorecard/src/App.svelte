@@ -23,6 +23,7 @@
     contestId: NaN,
     registrationCode: "",
     timestamp: new Date(0),
+    contestTimeEnd: undefined,
   });
 
   setContext("scorecardSession", session);

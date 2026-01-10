@@ -98,8 +98,7 @@ func (uc *ScoreEngineUseCase) StartScoreEngine(ctx context.Context, contestID do
 		return uuid.Nil, errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 
-	maxTerminatedBy := contest.TimeEnd.Add(12 * time.Hour)
-	if terminatedBy.After(maxTerminatedBy) {
+	if terminatedBy.Sub(now) > 12*time.Hour {
 		return uuid.Nil, errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 

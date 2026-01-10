@@ -12,6 +12,7 @@ export const authenticateContender = async (
   session: Writable<ScorecardSession>,
 ): Promise<Contender> => {
   const contender = await ApiClient.getInstance().findContender(code);
+  const contest = await ApiClient.getInstance().getContest(contender.contestId);
 
   const provider = new ContenderCredentialsProvider(code);
   ApiClient.getInstance().setCredentialsProvider(provider);
@@ -23,6 +24,7 @@ export const authenticateContender = async (
       contestId: contender.contestId,
       registrationCode: code,
       timestamp: new Date(),
+      contestTimeEnd: contest.timeEnd,
     };
 
     let sessions = readStoredSessions();
@@ -54,7 +56,20 @@ export const readStoredSessions = (): ScorecardSession[] => {
       const storedSessions = z.array(scorecardSessionSchema).parse(obj);
 
       for (const storedSession of storedSessions) {
-        if (differenceInHours(new Date(), storedSession.timestamp) < 12) {
+        const now = new Date();
+        let isExpired = false;
+
+        if (storedSession.contestTimeEnd) {
+          const contestEndTime = new Date(storedSession.contestTimeEnd);
+          const expirationTime = new Date(
+            contestEndTime.getTime() + 12 * 60 * 60 * 1000,
+          );
+          isExpired = now > expirationTime;
+        } else {
+          isExpired = differenceInHours(now, storedSession.timestamp) >= 12;
+        }
+
+        if (!isExpired) {
           sessions.push(storedSession);
         }
       }

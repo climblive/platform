@@ -5,6 +5,7 @@ export type ScorecardSession = {
   contestId: number;
   registrationCode: string;
   timestamp: Date;
+  contestTimeEnd?: Date;
 };
 
 export const scorecardSessionSchema: z.ZodType<ScorecardSession> = z.object({
@@ -12,4 +13,5 @@ export const scorecardSessionSchema: z.ZodType<ScorecardSession> = z.object({
   contestId: z.number(),
   registrationCode: z.string().length(8),
   timestamp: z.coerce.date(),
+  contestTimeEnd: z.coerce.date().optional(),
 });
