@@ -14,7 +14,6 @@
   import { getContext } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Readable } from "svelte/store";
-  import Loading from "./Loading.svelte";
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
@@ -49,11 +48,7 @@
 </script>
 
 {#if showSplash || !contender || !contest}
-  {#if !contender || !contest}
-    <Loading />
-  {:else}
-    <SplashScreen onComplete={() => (showSplash = false)} />
-  {/if}
+  <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
   <h1>{contest.name}</h1>
   <RegistrationForm
