@@ -1,7 +1,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
-  import { ErrorBoundary, SplashScreen } from "@climblive/lib/components";
+  import { ErrorBoundary } from "@climblive/lib/components";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { onDestroy, onMount, setContext } from "svelte";
@@ -73,8 +73,6 @@
   });
 
   onDestroy(authenticator.stopKeepAlive);
-
-  let showSplash = $state(true);
 </script>
 
 <svelte:window
@@ -83,8 +81,10 @@
 />
 
 <ErrorBoundary>
-  {#if !authenticated || showSplash}
-    <SplashScreen onComplete={() => (showSplash = false)} />
+  {#if !authenticated}
+    <div class="loading">
+      <wa-spinner></wa-spinner>
+    </div>
   {:else}
     <QueryClientProvider client={queryClient}>
       {#if !authenticator.isAuthenticated()}
@@ -113,6 +113,18 @@
 </ErrorBoundary>
 
 <style>
+  .loading {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .loading wa-spinner {
+    font-size: 5rem;
+  }
+
   main {
     display: flex;
     justify-content: center;
