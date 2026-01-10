@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
@@ -173,7 +174,10 @@
     >
       {#each compClasses as compClass (compClass.id)}
         <wa-option value={compClass.id}>
-          {compClass.name} ({contenderCounts.get(compClass.id) ?? 0})
+          {compClass.name}
+          <wa-badge pill variant="neutral"
+            >{contenderCounts.get(compClass.id) ?? 0}</wa-badge
+          >
         </wa-option>
       {/each}
     </wa-select>
