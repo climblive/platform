@@ -45,8 +45,8 @@
       Array.from($scoreboard.entries()).map(([classId, entries]) => [
         classId,
         entries.length,
-      ])
-    )
+      ]),
+    ),
   );
 
   $effect(() => {
