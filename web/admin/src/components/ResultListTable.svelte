@@ -173,7 +173,7 @@
       }}
     >
       {#each compClasses as compClass (compClass.id)}
-        <wa-option value={compClass.id}>
+        <wa-option value={compClass.id} label={compClass.name}>
           {compClass.name}
           <wa-badge pill variant="neutral"
             >{contenderCounts.get(compClass.id) ?? 0}</wa-badge
@@ -198,6 +198,10 @@
 <style>
   wa-switch {
     margin-left: auto;
+  }
+
+  wa-badge {
+    flex-shrink: 0;
   }
 
   .controls {
