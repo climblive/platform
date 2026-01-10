@@ -54,12 +54,10 @@
             value={compClass.id}
             disabled={isAfter(new Date(), compClass.timeEnd)}
           >
-            <div>
-              <div>{compClass.name}</div>
-              {#if compClass.description}
-                <small>{compClass.description}</small>
-              {/if}
-            </div>
+            <div>{compClass.name}</div>
+            {#if compClass.description}
+              <small>{compClass.description}</small>
+            {/if}
           </wa-option>
         {/each}
       </wa-select>

@@ -164,12 +164,10 @@
     >
       {#each compClasses as compClass (compClass.id)}
         <wa-option value={compClass.id}>
-          <div>
-            <div>{compClass.name}</div>
-            {#if compClass.description}
-              <small>{compClass.description}</small>
-            {/if}
-          </div>
+          <div>{compClass.name}</div>
+          {#if compClass.description}
+            <small>{compClass.description}</small>
+          {/if}
         </wa-option>
       {/each}
     </wa-select>
