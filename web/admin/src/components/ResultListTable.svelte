@@ -7,10 +7,9 @@
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
-  import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
-  import { checked, value } from "@climblive/lib/forms";
+  import { value } from "@climblive/lib/forms";
   import type { ScoreboardEntry } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
   import { ordinalSuperscript } from "@climblive/lib/utils";
@@ -38,7 +37,6 @@
   let filterText = $state<string>();
   let selectedCompClassId: number | undefined = $state();
   let liveSwitch: WaSwitch | undefined = $state();
-  let live = $state(true);
 
   const contenderCounts = $derived(
     new Map(
@@ -59,19 +57,7 @@
     }
   });
 
-  const toggleLive = () => {
-    if (!liveSwitch) {
-      return;
-    }
-
-    live = Boolean(liveSwitch.checked);
-  };
-
   $effect(() => {
-    if (!live) {
-      return;
-    }
-
     if (selectedCompClassId === undefined) {
       return;
     }
@@ -173,20 +159,18 @@
       }}
     >
       {#each compClasses as compClass (compClass.id)}
+        {@const count = contenderCounts.get(compClass.id)}
+
         <wa-option value={compClass.id} label={compClass.name}>
           {compClass.name}
-          <wa-badge pill variant="neutral"
-            >{contenderCounts.get(compClass.id) ?? 0}</wa-badge
-          >
+          {#if count}
+            <wa-badge pill variant="neutral">{count}</wa-badge>
+          {/if}
         </wa-option>
       {/each}
     </wa-select>
   </div>
 {/if}
-
-<wa-switch bind:this={liveSwitch} {@attach checked(live)} onchange={toggleLive}
-  >Live</wa-switch
->
 
 {#if loading}
   <Loader />
@@ -196,12 +180,12 @@
 {/if}
 
 <style>
-  wa-switch {
-    margin-left: auto;
-  }
-
-  wa-badge {
-    flex-shrink: 0;
+  wa-option::part(label) {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: var(--wa-space-xs);
+    flex-grow: 0;
   }
 
   .controls {
