@@ -3,6 +3,7 @@
   import type { ScorecardSession } from "@/types";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import { SplashScreen } from "@climblive/lib/components";
   import type { ContenderPatch } from "@climblive/lib/models";
   import {
     getContenderQuery,
@@ -13,7 +14,6 @@
   import { getContext } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Readable } from "svelte/store";
-  import Loading from "./Loading.svelte";
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
@@ -43,10 +43,12 @@
       },
     );
   };
+
+  let showSplash = $state(true);
 </script>
 
-{#if !contender || !contest}
-  <Loading />
+{#if showSplash || !contender || !contest}
+  <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
   <h1>{contest.name}</h1>
   <RegistrationForm

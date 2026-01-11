@@ -53,7 +53,7 @@
     <a href={scoreboardUrl} target="_blank">{scoreboardUrl}</a>
   </LabeledText>
 </section>
-{#if contest.rules}
+{#if contest.info}
   <wa-details
     onwa-after-show={() =>
       details?.scrollIntoView({
@@ -62,9 +62,9 @@
         inline: "nearest",
       })}
     bind:this={details}
-    summary="Rules"
+    summary="General info"
   >
-    {@html contest.rules}
+    {@html contest.info}
   </wa-details>
 {/if}
 

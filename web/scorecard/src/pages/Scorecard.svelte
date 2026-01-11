@@ -16,6 +16,7 @@
     EmptyState,
     ResultList,
     ScoreboardProvider,
+    SplashScreen,
   } from "@climblive/lib/components";
   import {
     ascentDeregisteredEventSchema,
@@ -38,7 +39,6 @@
   import { add } from "date-fns/add";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
-  import Loading from "./Loading.svelte";
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
@@ -223,12 +223,14 @@
   onDestroy(() => {
     tearDown();
   });
+
+  let showSplash = $state(true);
 </script>
 
 <svelte:window onvisibilitychange={handleVisibilityChange} />
 
-{#if !contender || !contest || !compClasses || !sortedProblems || !ticks || !selectedCompClass}
-  <Loading />
+{#if showSplash || !contender || !contest || !compClasses || !sortedProblems || !ticks || !selectedCompClass}
+  <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
   <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime}>
     {#snippet children({ contestState })}

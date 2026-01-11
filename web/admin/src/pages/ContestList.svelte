@@ -81,6 +81,12 @@
       label: "Name",
       mobile: true,
       render: renderName,
+      width: "2fr",
+    },
+    {
+      label: "Location",
+      mobile: false,
+      render: renderLocation,
       width: "1fr",
     },
     {
@@ -121,6 +127,10 @@
   {#if evaluationMode}
     <wa-badge pill variant="warning" size="small">Evaluation</wa-badge>
   {/if}
+{/snippet}
+
+{#snippet renderLocation({ location }: Contest)}
+  {location || "-"}
 {/snippet}
 
 {#snippet renderRegisteredContenders({ registeredContenders }: Contest)}
@@ -187,7 +197,7 @@
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
 {/snippet}
 
-{#if !ongoing || !upcoming || !past || !archived}
+{#if contestsQuery.isLoading || allContestsQuery.isLoading || !ongoing || !upcoming || !past || !archived}
   <Loader />
 {:else}
   {#if ongoing?.length}

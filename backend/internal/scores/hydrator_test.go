@@ -24,6 +24,14 @@ func TestHydrate(t *testing.T) {
 	now := time.Now()
 
 	mockedRepo.
+		On("GetContest", mock.Anything, nil, fakedContestID).
+		Return(domain.Contest{
+			ID:                 fakedContestID,
+			QualifyingProblems: 10,
+			Finalists:          7,
+		}, nil)
+
+	mockedRepo.
 		On("GetProblemsByContest", mock.Anything, nil, fakedContestID).
 		Return([]domain.Problem{
 			{
@@ -67,6 +75,11 @@ func TestHydrate(t *testing.T) {
 				AttemptsZone2: 2,
 			},
 		}, nil)
+
+	mockedStore.On("SaveRules", scores.Rules{
+		QualifyingProblems: 10,
+		Finalists:          7,
+	}).Return()
 
 	mockedStore.On("SaveProblem", scores.Problem{
 		ID:          fakedProblemID,

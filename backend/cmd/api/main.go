@@ -198,6 +198,7 @@ func setupMux(
 		Repo:               repo,
 		ScoreKeeper:        scoreKeeper,
 		ScoreEngineManager: scoreEngineManager,
+		EventBroker:        eventBroker,
 	}
 
 	compClassUseCase := usecases.CompClassUseCase{

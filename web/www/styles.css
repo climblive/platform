@@ -1,9 +1,4 @@
-:root {
-  --primary-color: #ea384c;
-  --primary-color-dark: #c7293a;
-  --text-color: #333333;
-  --light-bg: #f5f5f5;
-}
+@import url("@climblive/lib/theme.css");
 
 * {
   margin: 0;
@@ -12,20 +7,21 @@
 }
 
 body {
-  font-family: "Roboto", "Segoe UI", "Arial", sans-serif;
-  color: var(--text-color);
-  line-height: 1.6;
+  font-family: var(--wa-font-family-body);
+  color: var(--wa-color-text-normal);
+  background-color: var(--wa-color-surface-default);
+  line-height: var(--wa-line-height-normal);
 }
 
 .sales-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding-inline: 1.25rem;
+  padding-inline: var(--wa-space-l);
 }
 
 .hero-section {
-  background-color: var(--light-bg);
-  padding-block: 3.75rem;
+  background-color: var(--wa-color-surface-lowered);
+  padding-block: var(--wa-space-4xl);
 }
 
 .hero-content {
@@ -34,98 +30,68 @@ body {
 }
 
 .logo-container {
-  margin-bottom: 2rem;
+  margin-bottom: var(--wa-space-2xl);
 }
 
 .logo {
-  height: 5rem;
+  height: 4rem;
+  color: var(--wa-color-text-normal);
 }
 
 h1 {
-  margin-bottom: 1.25rem;
-  color: var(--text-color);
-  font-size: 2.2rem;
+  margin-bottom: var(--wa-space-l);
+  color: var(--wa-color-text-normal);
+  font-size: var(--wa-font-size-3xl);
+  font-weight: var(--wa-font-weight-heading);
 }
 
 .tagline {
-  font-size: 1.4rem;
-  margin-bottom: 2.5rem;
-  font-weight: 300;
-}
-
-.cta-button,
-.secondary-button {
-  display: inline-block;
-  padding: 0.875rem 1.75rem;
-  text-decoration: none;
-  border-radius: 0.375rem;
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin: 0.5rem;
-  transition: background-color 0.3s ease;
-}
-
-.cta-button {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-.cta-button:hover {
-  background-color: var(--primary-color-dark);
-}
-
-.secondary-button {
-  background-color: white;
-  color: var(--primary-color);
-  outline: 2px solid var(--primary-color);
-  outline-offset: -2px;
-}
-
-.secondary-button:hover {
-  background-color: var(--primary-color);
-  color: white;
+  font-size: var(--wa-font-size-xl);
+  margin-bottom: var(--wa-space-3xl);
+  font-weight: var(--wa-font-weight-light);
 }
 
 .features-section {
-  padding-block: 5rem;
+  padding-block: var(--wa-space-4xl);
 }
 
 .section-title {
   text-align: center;
-  font-size: 2rem;
-  margin-bottom: 3.75rem;
-  color: var(--primary-color);
+  font-size: var(--wa-font-size-2xl);
+  margin-bottom: var(--wa-space-4xl);
+  color: var(--wa-color-brand-fill-loud);
+  font-weight: var(--wa-font-weight-heading);
 }
 
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
-  gap: 2rem;
+  gap: var(--wa-space-xl);
 }
 
 .feature-card {
-  background: white;
-  padding: 2rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  background: var(--wa-color-surface-raised);
+  padding: var(--wa-space-xl);
+  border-radius: var(--wa-border-radius-m);
+  box-shadow: var(--wa-shadow-m);
   text-align: center;
 }
 
 .feature-icon {
-  font-size: 2rem;
-  color: var(--primary-color);
-  margin-bottom: 1.25rem;
+  font-size: var(--wa-font-size-3xl);
+  color: var(--wa-color-brand-fill-loud);
+  margin-bottom: var(--wa-space-l);
 }
 
 .feature-title {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  font-weight: 600;
+  font-size: var(--wa-font-size-l);
+  margin-bottom: var(--wa-space-m);
+  font-weight: var(--wa-font-weight-semibold);
 }
 
 .description-section {
-  background-color: var(--light-bg);
-  padding: 5rem 0;
+  background-color: var(--wa-color-surface-lowered);
+  padding: var(--wa-space-4xl) 0;
   text-align: center;
 }
 
@@ -134,38 +100,91 @@ h1 {
   margin: 0 auto;
 }
 
-.description-content p {
-  margin-bottom: 1.25rem;
+.cta-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--wa-space-s);
 }
 
-.cta-container {
-  margin-top: 2.5rem;
+.cta-container wa-button {
+  width: 100%;
 }
 
 .footer {
-  padding-block: 2.5rem;
+  padding-block: var(--wa-space-3xl);
   text-align: center;
-  background-color: var(--text-color);
-  color: white;
+  background-color: var(--wa-color-neutral-fill-loud);
+  color: var(--wa-color-neutral-on-loud);
 }
 
 .footer-links {
-  margin-top: 1.25rem;
+  margin-top: var(--wa-space-l);
 }
 
 .footer-links a {
-  color: white;
+  color: var(--wa-color-neutral-on-loud);
   text-decoration: none;
-  margin-inline: 0.5rem;
+  margin-inline: var(--wa-space-xs);
 }
 
 .footer-links a:hover {
   text-decoration: underline;
 }
 
+blockquote {
+  font-style: italic;
+  margin: var(--wa-space-3xl) auto;
+  position: relative;
+  padding: var(--wa-space-3xl) var(--wa-space-4xl);
+  background-color: var(--wa-color-surface-raised);
+  border-radius: var(--wa-border-radius-m);
+  box-shadow: var(--wa-shadow-m);
+  border-left: calc(var(--wa-border-width-l) * 2) var(--wa-border-style)
+    var(--wa-color-brand-fill-loud);
+  text-align: left;
+}
+
+blockquote p {
+  margin: 0;
+}
+
+blockquote::before {
+  content: '"';
+  font-size: var(--wa-font-size-4xl);
+  color: var(--wa-color-brand-fill-loud);
+  position: absolute;
+  top: var(--wa-space-l);
+  left: var(--wa-space-m);
+  line-height: 1;
+}
+
+.quote-author {
+  text-align: left;
+  padding-left: var(--wa-space-xl);
+  color: var(--wa-color-text-quiet);
+}
+
+.quote-author .name {
+  font-weight: var(--wa-font-weight-semibold);
+  color: var(--wa-color-text-normal);
+}
+
+.quote-author a {
+  color: var(--wa-color-text-link);
+  text-decoration: none;
+}
+
+.quote-author + wa-button {
+  margin-top: var(--wa-space-2xl);
+}
+
 @media (max-width: 768px) {
   .hero-section {
-    padding-block: 2.5rem;
+    padding-block: var(--wa-space-3xl);
+  }
+
+  .cta-container {
+    grid-template-columns: 1fr;
   }
 
   .features-grid {
@@ -173,20 +192,14 @@ h1 {
   }
 
   .logo {
-    height: 3.5rem;
+    height: 3rem;
   }
 
   .tagline {
-    font-size: 1.2rem;
+    font-size: var(--wa-font-size-l);
   }
 
   h1 {
-    font-size: 1.8rem;
-  }
-
-  .cta-button,
-  .secondary-button {
-    display: block;
-    margin: 0.5rem auto;
+    font-size: var(--wa-font-size-2xl);
   }
 }

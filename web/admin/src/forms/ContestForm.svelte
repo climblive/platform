@@ -6,9 +6,7 @@
     seriesId: z.coerce.number().optional(),
     name: z.string().min(1),
     description: z.string().optional(),
-    qualifyingProblems: z.coerce.number().min(0).max(65536),
-    finalists: z.coerce.number().min(0).max(65536),
-    rules: z.string().optional(),
+    info: z.string().optional(),
     gracePeriod: z.coerce.number().min(0).max(60),
   });
 
@@ -16,7 +14,7 @@
 </script>
 
 <script lang="ts">
-  import RulesInput from "@/components/RulesInput.svelte";
+  import InfoInput from "@/components/InfoInput.svelte";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
   import { GenericForm, name } from "@climblive/lib/forms";
@@ -58,28 +56,7 @@
       label="Location"
       type="text"
       value={data.location}
-    ></wa-input>
-    <wa-input
-      size="small"
-      {@attach name("finalists")}
-      label="Finalists"
-      hint="Number of contenders that will proceed to the finals."
-      type="number"
-      required
-      value={data.finalists}
-      min={0}
-      max={65536}
-    ></wa-input>
-    <wa-input
-      size="small"
-      {@attach name("qualifyingProblems")}
-      label="Number of qualifying problems"
-      hint="Number of the hardest problems that will count towards each contender's score."
-      type="number"
-      required
-      value={data.qualifyingProblems}
-      min={0}
-      max={65536}
+      hint="Usually the name of the climbing gym."
     ></wa-input>
     <wa-input
       size="small"
@@ -93,7 +70,7 @@
       value={Math.floor((data.gracePeriod ?? 0) / minuteInNanoseconds)}
     >
     </wa-input>
-    <RulesInput rules={data.rules} />
+    <InfoInput info={data.info} />
     {@render children?.()}
   </fieldset>
 </GenericForm>

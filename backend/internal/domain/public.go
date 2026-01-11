@@ -65,7 +65,7 @@ type Contest struct {
 	Description          string        `json:"description,omitempty"`
 	QualifyingProblems   int           `json:"qualifyingProblems"`
 	Finalists            int           `json:"finalists"`
-	Rules                string        `json:"rules,omitempty"`
+	Info                 string        `json:"info,omitempty"`
 	GracePeriod          time.Duration `json:"gracePeriod"`
 	TimeBegin            time.Time     `json:"timeBegin,omitzero"`
 	TimeEnd              time.Time     `json:"timeEnd,omitzero"`
@@ -81,7 +81,7 @@ type ContestTemplate struct {
 	Description        string        `json:"description,omitempty"`
 	QualifyingProblems int           `json:"qualifyingProblems"`
 	Finalists          int           `json:"finalists"`
-	Rules              string        `json:"rules,omitempty"`
+	Info               string        `json:"info,omitempty"`
 	GracePeriod        time.Duration `json:"gracePeriod"`
 }
 
@@ -93,7 +93,7 @@ type ContestPatch struct {
 	Description        Patch[string]        `json:"description,omitzero" tstype:"string"`
 	QualifyingProblems Patch[int]           `json:"qualifyingProblems,omitzero" tstype:"number"`
 	Finalists          Patch[int]           `json:"finalists,omitzero" tstype:"number"`
-	Rules              Patch[string]        `json:"rules,omitzero" tstype:"string"`
+	Info               Patch[string]        `json:"info,omitzero" tstype:"string"`
 	GracePeriod        Patch[time.Duration] `json:"gracePeriod,omitzero" tstype:"number"`
 	EvaluationMode     Patch[bool]          `json:"evaluationMode,omitzero" tstype:"boolean"`
 }
@@ -313,6 +313,11 @@ type ProblemUpdatedEvent struct {
 
 type ProblemDeletedEvent struct {
 	ProblemID ProblemID `json:"problemId"`
+}
+
+type RulesUpdatedEvent struct {
+	QualifyingProblems int `json:"qualifyingProblems"`
+	Finalists          int `json:"finalists"`
 }
 
 type ContenderPublicInfoUpdatedEvent struct {
