@@ -19,3 +19,21 @@ export const toastError = (message: string, duration = 5000) => {
     alert.remove();
   }, duration);
 };
+
+export const toastSuccess = (message: string, duration = 5000) => {
+  const alert = Object.assign(document.createElement("wa-callout"), {
+    variant: "success",
+    closable: true,
+    duration: duration,
+    innerHTML: `
+        <wa-icon name="circle-check" slot="icon"></wa-icon>
+        ${message}
+      `,
+  });
+
+  document.getElementById("callout-stack")?.append(alert);
+
+  setTimeout(() => {
+    alert.remove();
+  }, duration);
+};

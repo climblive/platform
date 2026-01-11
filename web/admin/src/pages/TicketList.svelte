@@ -1,6 +1,8 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
@@ -10,11 +12,10 @@
   import {
     createContendersMutation,
     getContendersByContestQuery,
+    getContestQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import { Link } from "svelte-routing";
-
-  const maxTickets = 500;
 
   interface Props {
     contestId: number;
@@ -27,10 +28,14 @@
 
   let newTicketsAvailableForPrint = $state(false);
 
+  const contestQuery = $derived(getContestQuery(contestId));
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
   const createContenders = $derived(createContendersMutation(contestId));
 
+  let contest = $derived(contestQuery.data);
   let contenders = $derived(contendersQuery.data);
+
+  let maxTickets = $derived(contest?.evaluationMode ? 10 : 500);
 
   let remainingCodes = $derived(
     contenders === undefined ? undefined : maxTickets - contenders.length,
@@ -187,5 +192,9 @@
 
   .copy {
     color: var(--wa-color-text-quiet);
+  }
+
+  :global(.evaluation-callout) {
+    margin-block-end: var(--wa-space-m);
   }
 </style>

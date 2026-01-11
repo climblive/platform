@@ -103,9 +103,9 @@ GROUP BY contest.id;
 
 -- name: UpsertContest :execlastid
 INSERT INTO 
-	contest (id, organizer_id, archived, series_id, name, description, location, qualifying_problems, finalists, info, grace_period, created)
+	contest (id, organizer_id, archived, series_id, name, description, location, qualifying_problems, finalists, info, grace_period, created, evaluation_mode)
 VALUES 
-	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     archived = VALUES(archived),
@@ -117,7 +117,8 @@ ON DUPLICATE KEY UPDATE
     finalists = VALUES(finalists),
     info = VALUES(info),
     grace_period = VALUES(grace_period),
-    created = VALUES(created);
+    created = VALUES(created),
+    evaluation_mode = VALUES(evaluation_mode);
 
 -- name: DeleteContest :exec
 DELETE FROM contest
@@ -323,3 +324,44 @@ VALUES
 -- name: DeleteOrganizerInvite :exec
 DELETE FROM organizer_invite
 WHERE id = ?;
+
+-- name: CreateUnlockRequest :execlastid
+INSERT INTO
+    unlock_request (contest_id, organizer_id)
+VALUES
+    (?, ?);
+
+-- name: GetUnlockRequest :one
+SELECT *
+FROM unlock_request
+WHERE id = ?;
+
+-- name: GetUnlockRequestsByContest :many
+SELECT *
+FROM unlock_request
+WHERE contest_id = ?
+ORDER BY created_at DESC;
+
+-- name: GetUnlockRequestsByOrganizer :many
+SELECT *
+FROM unlock_request
+WHERE organizer_id = ?
+ORDER BY created_at DESC;
+
+-- name: GetPendingUnlockRequests :many
+SELECT *
+FROM unlock_request
+WHERE status = 'pending'
+ORDER BY created_at ASC;
+
+-- name: UpdateUnlockRequestStatus :exec
+UPDATE unlock_request
+SET 
+    status = ?,
+    reviewed_at = ?
+WHERE id = ?;
+
+-- name: HasApprovedUnlockRequest :one
+SELECT COUNT(*) > 0 as has_approved
+FROM unlock_request
+WHERE organizer_id = ? AND status = 'approved';

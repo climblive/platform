@@ -71,6 +71,7 @@ func contestToDomain(record database.Contest) domain.Contest {
 		Info:               record.Info.String,
 		GracePeriod:        time.Duration(record.GracePeriod) * time.Minute,
 		Created:            record.Created,
+		EvaluationMode:     record.EvaluationMode,
 	}
 
 	return contest

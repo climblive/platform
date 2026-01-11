@@ -240,6 +240,11 @@ func setupMux(
 		UUIDGenerator: &uuidGenerator{},
 	}
 
+	unlockRequestUseCase := usecases.UnlockRequestUseCase{
+		Repo:       repo,
+		Authorizer: authorizer,
+	}
+
 	mux := rest.NewMux()
 	mux.RegisterMiddleware(rest.CORS)
 	mux.RegisterMiddleware(authorizer.Middleware)
@@ -256,6 +261,7 @@ func setupMux(
 	rest.InstallRaffleHandler(mux, &raffleUseCase)
 	rest.InstallUserHandler(mux, &userUseCase)
 	rest.InstallOrganizerHandler(mux, &organizerUseCase)
+	rest.InstallUnlockRequestHandler(mux, &unlockRequestUseCase)
 
 	return mux
 }

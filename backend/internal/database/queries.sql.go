@@ -41,6 +41,26 @@ func (q *Queries) CountContenders(ctx context.Context, contestID int32) (int64, 
 	return count, err
 }
 
+const createUnlockRequest = `-- name: CreateUnlockRequest :execlastid
+INSERT INTO
+    unlock_request (contest_id, organizer_id)
+VALUES
+    (?, ?)
+`
+
+type CreateUnlockRequestParams struct {
+	ContestID   int32
+	OrganizerID int32
+}
+
+func (q *Queries) CreateUnlockRequest(ctx context.Context, arg CreateUnlockRequestParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, createUnlockRequest, arg.ContestID, arg.OrganizerID)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
+}
+
 const deleteCompClass = `-- name: DeleteCompClass :exec
 DELETE FROM comp_class
 WHERE id = ?
@@ -123,7 +143,7 @@ func (q *Queries) DeleteTick(ctx context.Context, id int32) error {
 }
 
 const getAllContests = `-- name: GetAllContests :many
-SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
+SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.created, contest.evaluation_mode, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 LEFT JOIN contender c ON c.contest_id = contest.id
@@ -159,6 +179,7 @@ func (q *Queries) GetAllContests(ctx context.Context) ([]GetAllContestsRow, erro
 			&i.Contest.Info,
 			&i.Contest.GracePeriod,
 			&i.Contest.Created,
+			&i.Contest.EvaluationMode,
 			&i.TimeBegin,
 			&i.TimeEnd,
 			&i.RegisteredContenders,
@@ -465,7 +486,7 @@ func (q *Queries) GetContendersByContest(ctx context.Context, contestID int32) (
 }
 
 const getContest = `-- name: GetContest :one
-SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
+SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.created, contest.evaluation_mode, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 LEFT JOIN contender c ON c.contest_id = contest.id
@@ -496,6 +517,7 @@ func (q *Queries) GetContest(ctx context.Context, id int32) (GetContestRow, erro
 		&i.Contest.Info,
 		&i.Contest.GracePeriod,
 		&i.Contest.Created,
+		&i.Contest.EvaluationMode,
 		&i.TimeBegin,
 		&i.TimeEnd,
 		&i.RegisteredContenders,
@@ -504,7 +526,7 @@ func (q *Queries) GetContest(ctx context.Context, id int32) (GetContestRow, erro
 }
 
 const getContestsByOrganizer = `-- name: GetContestsByOrganizer :many
-SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
+SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.created, contest.evaluation_mode, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 LEFT JOIN contender c ON c.contest_id = contest.id
@@ -541,6 +563,7 @@ func (q *Queries) GetContestsByOrganizer(ctx context.Context, organizerID int32)
 			&i.Contest.Info,
 			&i.Contest.GracePeriod,
 			&i.Contest.Created,
+			&i.Contest.EvaluationMode,
 			&i.TimeBegin,
 			&i.TimeEnd,
 			&i.RegisteredContenders,
@@ -560,9 +583,9 @@ func (q *Queries) GetContestsByOrganizer(ctx context.Context, organizerID int32)
 
 const getContestsCurrentlyRunningOrByStartTime = `-- name: GetContestsCurrentlyRunningOrByStartTime :many
 SELECT
-	id, organizer_id, archived, series_id, name, description, location, qualifying_problems, finalists, info, grace_period, created, time_begin, time_end
+	id, organizer_id, archived, series_id, name, description, location, qualifying_problems, finalists, info, grace_period, created, evaluation_mode, time_begin, time_end
 FROM (
-    SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+    SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.created, contest.evaluation_mode, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
     FROM contest
     JOIN comp_class cc ON cc.contest_id = contest.id
     WHERE archived = FALSE
@@ -590,6 +613,7 @@ type GetContestsCurrentlyRunningOrByStartTimeRow struct {
 	Info               sql.NullString
 	GracePeriod        int32
 	Created            time.Time
+	EvaluationMode     bool
 	TimeBegin          interface{}
 	TimeEnd            interface{}
 }
@@ -616,6 +640,7 @@ func (q *Queries) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context, 
 			&i.Info,
 			&i.GracePeriod,
 			&i.Created,
+			&i.EvaluationMode,
 			&i.TimeBegin,
 			&i.TimeEnd,
 		); err != nil {
@@ -695,6 +720,43 @@ func (q *Queries) GetOrganizerInvitesByOrganizer(ctx context.Context, organizerI
 			&i.OrganizerInvite.OrganizerID,
 			&i.OrganizerInvite.ExpiresAt,
 			&i.Name,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPendingUnlockRequests = `-- name: GetPendingUnlockRequests :many
+SELECT id, contest_id, organizer_id, status, created_at, reviewed_at
+FROM unlock_request
+WHERE status = 'pending'
+ORDER BY created_at ASC
+`
+
+func (q *Queries) GetPendingUnlockRequests(ctx context.Context) ([]UnlockRequest, error) {
+	rows, err := q.db.QueryContext(ctx, getPendingUnlockRequests)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []UnlockRequest
+	for rows.Next() {
+		var i UnlockRequest
+		if err := rows.Scan(
+			&i.ID,
+			&i.ContestID,
+			&i.OrganizerID,
+			&i.Status,
+			&i.CreatedAt,
+			&i.ReviewedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -1083,6 +1145,100 @@ func (q *Queries) GetTicksByProblem(ctx context.Context, problemID int32) ([]Get
 	return items, nil
 }
 
+const getUnlockRequest = `-- name: GetUnlockRequest :one
+SELECT id, contest_id, organizer_id, status, created_at, reviewed_at
+FROM unlock_request
+WHERE id = ?
+`
+
+func (q *Queries) GetUnlockRequest(ctx context.Context, id int32) (UnlockRequest, error) {
+	row := q.db.QueryRowContext(ctx, getUnlockRequest, id)
+	var i UnlockRequest
+	err := row.Scan(
+		&i.ID,
+		&i.ContestID,
+		&i.OrganizerID,
+		&i.Status,
+		&i.CreatedAt,
+		&i.ReviewedAt,
+	)
+	return i, err
+}
+
+const getUnlockRequestsByContest = `-- name: GetUnlockRequestsByContest :many
+SELECT id, contest_id, organizer_id, status, created_at, reviewed_at
+FROM unlock_request
+WHERE contest_id = ?
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetUnlockRequestsByContest(ctx context.Context, contestID int32) ([]UnlockRequest, error) {
+	rows, err := q.db.QueryContext(ctx, getUnlockRequestsByContest, contestID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []UnlockRequest
+	for rows.Next() {
+		var i UnlockRequest
+		if err := rows.Scan(
+			&i.ID,
+			&i.ContestID,
+			&i.OrganizerID,
+			&i.Status,
+			&i.CreatedAt,
+			&i.ReviewedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getUnlockRequestsByOrganizer = `-- name: GetUnlockRequestsByOrganizer :many
+SELECT id, contest_id, organizer_id, status, created_at, reviewed_at
+FROM unlock_request
+WHERE organizer_id = ?
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetUnlockRequestsByOrganizer(ctx context.Context, organizerID int32) ([]UnlockRequest, error) {
+	rows, err := q.db.QueryContext(ctx, getUnlockRequestsByOrganizer, organizerID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []UnlockRequest
+	for rows.Next() {
+		var i UnlockRequest
+		if err := rows.Scan(
+			&i.ID,
+			&i.ContestID,
+			&i.OrganizerID,
+			&i.Status,
+			&i.CreatedAt,
+			&i.ReviewedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUserByUsername = `-- name: GetUserByUsername :many
 SELECT user.id, user.username, user.admin, organizer.id, organizer.name
 FROM user
@@ -1159,6 +1315,19 @@ func (q *Queries) GetUsersByOrganizer(ctx context.Context, organizerID int32) ([
 	return items, nil
 }
 
+const hasApprovedUnlockRequest = `-- name: HasApprovedUnlockRequest :one
+SELECT COUNT(*) > 0 as has_approved
+FROM unlock_request
+WHERE organizer_id = ? AND status = 'approved'
+`
+
+func (q *Queries) HasApprovedUnlockRequest(ctx context.Context, organizerID int32) (bool, error) {
+	row := q.db.QueryRowContext(ctx, hasApprovedUnlockRequest, organizerID)
+	var has_approved bool
+	err := row.Scan(&has_approved)
+	return has_approved, err
+}
+
 const insertOrganizerInvite = `-- name: InsertOrganizerInvite :exec
 INSERT INTO
     organizer_invite (id, organizer_id, expires_at)
@@ -1216,6 +1385,25 @@ func (q *Queries) InsertTick(ctx context.Context, arg InsertTickParams) (int64, 
 		return 0, err
 	}
 	return result.LastInsertId()
+}
+
+const updateUnlockRequestStatus = `-- name: UpdateUnlockRequestStatus :exec
+UPDATE unlock_request
+SET 
+    status = ?,
+    reviewed_at = ?
+WHERE id = ?
+`
+
+type UpdateUnlockRequestStatusParams struct {
+	Status     UnlockRequestStatus
+	ReviewedAt sql.NullTime
+	ID         int32
+}
+
+func (q *Queries) UpdateUnlockRequestStatus(ctx context.Context, arg UpdateUnlockRequestStatusParams) error {
+	_, err := q.db.ExecContext(ctx, updateUnlockRequestStatus, arg.Status, arg.ReviewedAt, arg.ID)
+	return err
 }
 
 const upsertCompClass = `-- name: UpsertCompClass :execlastid
@@ -1309,9 +1497,9 @@ func (q *Queries) UpsertContender(ctx context.Context, arg UpsertContenderParams
 
 const upsertContest = `-- name: UpsertContest :execlastid
 INSERT INTO 
-	contest (id, organizer_id, archived, series_id, name, description, location, qualifying_problems, finalists, info, grace_period, created)
+	contest (id, organizer_id, archived, series_id, name, description, location, qualifying_problems, finalists, info, grace_period, created, evaluation_mode)
 VALUES 
-	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     archived = VALUES(archived),
@@ -1323,7 +1511,8 @@ ON DUPLICATE KEY UPDATE
     finalists = VALUES(finalists),
     info = VALUES(info),
     grace_period = VALUES(grace_period),
-    created = VALUES(created)
+    created = VALUES(created),
+    evaluation_mode = VALUES(evaluation_mode)
 `
 
 type UpsertContestParams struct {
@@ -1339,6 +1528,7 @@ type UpsertContestParams struct {
 	Info               sql.NullString
 	GracePeriod        int32
 	Created            time.Time
+	EvaluationMode     bool
 }
 
 func (q *Queries) UpsertContest(ctx context.Context, arg UpsertContestParams) (int64, error) {
@@ -1355,6 +1545,7 @@ func (q *Queries) UpsertContest(ctx context.Context, arg UpsertContestParams) (i
 		arg.Info,
 		arg.GracePeriod,
 		arg.Created,
+		arg.EvaluationMode,
 	)
 	if err != nil {
 		return 0, err

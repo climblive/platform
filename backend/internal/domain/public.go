@@ -71,6 +71,7 @@ type Contest struct {
 	TimeEnd              time.Time     `json:"timeEnd,omitzero"`
 	Created              time.Time     `json:"created"`
 	RegisteredContenders int           `json:"registeredContenders"`
+	EvaluationMode       bool          `json:"evaluationMode"`
 }
 
 type ContestTemplate struct {
@@ -94,10 +95,36 @@ type ContestPatch struct {
 	Finalists          Patch[int]           `json:"finalists,omitzero" tstype:"number"`
 	Info               Patch[string]        `json:"info,omitzero" tstype:"string"`
 	GracePeriod        Patch[time.Duration] `json:"gracePeriod,omitzero" tstype:"number"`
+	EvaluationMode     Patch[bool]          `json:"evaluationMode,omitzero" tstype:"boolean"`
 }
 
 type ContestTransferRequest struct {
 	NewOrganizerID OrganizerID `json:"newOrganizerId"`
+}
+
+type UnlockRequestStatus string
+
+const (
+	UnlockRequestStatusPending  UnlockRequestStatus = "pending"
+	UnlockRequestStatusApproved UnlockRequestStatus = "approved"
+	UnlockRequestStatusRejected UnlockRequestStatus = "rejected"
+)
+
+type UnlockRequest struct {
+	ID          UnlockRequestID     `json:"id"`
+	ContestID   ContestID           `json:"contestId"`
+	OrganizerID OrganizerID         `json:"organizerId"`
+	Status      UnlockRequestStatus `json:"status"`
+	CreatedAt   time.Time           `json:"createdAt"`
+	ReviewedAt  *time.Time          `json:"reviewedAt,omitempty"`
+}
+
+type UnlockRequestTemplate struct {
+	ContestID ContestID `json:"contestId"`
+}
+
+type UnlockRequestReview struct {
+	Status UnlockRequestStatus `json:"status"`
 }
 
 type Organizer struct {
