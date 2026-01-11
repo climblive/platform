@@ -28,6 +28,10 @@ const [compatible, missingFeatures] = checkCompat();
 
 const ignoreCompat = sessionStorage.getItem("compat") === "ignore";
 
+if (missingFeatures.includes("ElementInternals")) {
+  await import("element-internals-polyfill");
+}
+
 if (compatible || ignoreCompat) {
   mount(App, {
     target: document.body,

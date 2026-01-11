@@ -32,6 +32,7 @@
     "@tanstack/svelte-query": "^6.0.13",
     "axios": "^1.13.2",
     "date-fns": "^4.1.0",
+    "element-internals-polyfill": "^3.0.2",
     "svelte-routing": "^2.13.0",
     "zod": "^4.2.1"
   }
