@@ -7,7 +7,6 @@
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
-  import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import { value } from "@climblive/lib/forms";
   import type { ScoreboardEntry } from "@climblive/lib/models";
@@ -36,7 +35,6 @@
 
   let filterText = $state<string>();
   let selectedCompClassId: number | undefined = $state();
-  let liveSwitch: WaSwitch | undefined = $state();
 
   const contenderCounts = $derived(
     new Map(
