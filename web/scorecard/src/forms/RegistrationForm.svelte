@@ -55,7 +55,7 @@
             disabled={isAfter(new Date(), compClass.timeEnd)}
             label={compClass.name}
           >
-            <div>{compClass.name}</div>
+            {compClass.name}
             {#if compClass.description}
               <small>{compClass.description}</small>
             {/if}
