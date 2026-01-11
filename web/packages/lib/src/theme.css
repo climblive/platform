@@ -67,3 +67,9 @@ wa-dialog::part(header),
 wa-dialog::part(footer) {
   text-align: left;
 }
+
+wa-option small {
+  display: block;
+  font-size: var(--wa-font-size-xs);
+  margin-top: var(--wa-space-2xs);
+}
