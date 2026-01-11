@@ -56,6 +56,7 @@
       label="Location"
       type="text"
       value={data.location}
+      hint="Usually the name of the climbing gym."
     ></wa-input>
     <wa-input
       size="small"
