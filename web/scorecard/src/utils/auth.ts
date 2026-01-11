@@ -2,7 +2,6 @@ import { scorecardSessionSchema, type ScorecardSession } from "@/types";
 import { ApiClient, ContenderCredentialsProvider } from "@climblive/lib";
 import type { Contender } from "@climblive/lib/models";
 import type { QueryClient } from "@tanstack/svelte-query";
-import { differenceInHours } from "date-fns";
 import type { Writable } from "svelte/store";
 import * as z from "zod/v4";
 
@@ -18,13 +17,17 @@ export const authenticateContender = async (
   ApiClient.getInstance().setCredentialsProvider(provider);
 
   session.update((current) => {
+    const contestEndTime = contest.timeEnd || new Date();
+    const expiryTime = new Date(
+      contestEndTime.getTime() + 12 * 60 * 60 * 1000,
+    );
+
     const updatedSession: ScorecardSession = {
       ...current,
       contenderId: contender.id,
       contestId: contender.contestId,
       registrationCode: code,
-      timestamp: new Date(),
-      contestTimeEnd: contest.timeEnd,
+      expiryTime,
     };
 
     let sessions = readStoredSessions();
@@ -55,21 +58,9 @@ export const readStoredSessions = (): ScorecardSession[] => {
       const obj = JSON.parse(data);
       const storedSessions = z.array(scorecardSessionSchema).parse(obj);
 
+      const now = new Date();
       for (const storedSession of storedSessions) {
-        const now = new Date();
-        let isExpired = false;
-
-        if (storedSession.contestTimeEnd) {
-          const contestEndTime = new Date(storedSession.contestTimeEnd);
-          const expirationTime = new Date(
-            contestEndTime.getTime() + 12 * 60 * 60 * 1000,
-          );
-          isExpired = now > expirationTime;
-        } else {
-          isExpired = differenceInHours(now, storedSession.timestamp) >= 12;
-        }
-
-        if (!isExpired) {
+        if (new Date(storedSession.expiryTime) > now) {
           sessions.push(storedSession);
         }
       }
@@ -79,7 +70,7 @@ export const readStoredSessions = (): ScorecardSession[] => {
   }
 
   sessions.sort((s1: ScorecardSession, s2: ScorecardSession) => {
-    return s2.timestamp.getTime() - s1.timestamp.getTime();
+    return s2.expiryTime.getTime() - s1.expiryTime.getTime();
   });
 
   return sessions.slice(0, 3);

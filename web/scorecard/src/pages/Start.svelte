@@ -122,7 +122,7 @@
             >{restoredSession.registrationCode}</span
           >
         </h3>
-        <p class="timestamp">{format(restoredSession.timestamp, "pp")}</p>
+        <p class="timestamp">Expires {format(restoredSession.expiryTime, "Pp")}</p>
         <wa-button
           onclick={() => {
             if (restoredSession) {
