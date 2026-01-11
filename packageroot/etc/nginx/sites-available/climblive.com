@@ -18,7 +18,7 @@ server {
 		add_header Cache-Control "no-store";
 		expires 0;
 
-		add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-jIhoHP5AYEa/rjrf399lCKS/+7hIAc+G1cKDLBSPd7o='; frame-ancestors 'none'; form-action 'none'; base-uri 'self'";
+		add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-jIhoHP5AYEa/rjrf399lCKS/+7hIAc+G1cKDLBSPd7o='; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; form-action 'none'; base-uri 'self'";
 		add_header X-Content-Type-Options "nosniff";
 		add_header Referrer-Policy "same-origin";
 	}

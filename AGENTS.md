@@ -236,15 +236,18 @@ make test
 
 ## When making changes
 
-1. Understand the domain model first (`backend/internal/domain/`)
-2. Follow existing code style and patterns
-3. Ensure database changes include migrations
-4. Update both Go and TypeScript types when modifying models
+1. Follow existing code style and patterns
+2. Ensure database changes include migrations
+3. Run `sqlc generate` if database model or queries are updated
+4. Run `tygo generate` if either of `public.go` or `id.go` is updated
 5. Keep comments to a minimum
+6. Make sure that `golangci-lint run` and `go test ./...` pass
+7. Make sure that `pnpm check` and `pnpm lint` pass
+8. Make sure to format front-end code using `pnpm format`
 
 For questions about specific subsystems, examine existing tests and implementation files in the relevant package.
 
 ## Pull Requests
 
-- **Titles**: Should be formatted in the Conventional Commits format
+- **Titles**: Should be formatted in the Conventional Commits format using only lowercase letters
 - **Descriptions**: Keep descriptions brief and on a high-level
