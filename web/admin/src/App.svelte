@@ -10,8 +10,6 @@
   import { Authenticator } from "./authenticator.svelte";
   import Main from "./Main.svelte";
 
-  let authenticated = $state(false);
-
   const selectedOrganizer = writable<number | undefined>();
   const authenticator = new Authenticator();
   setContext("authenticator", authenticator);
@@ -65,12 +63,7 @@
     }
   });
 
-  onMount(async () => {
-    authenticator.startKeepAlive();
-
-    await authenticator.authenticate();
-    authenticated = true;
-  });
+  onMount(authenticator.startKeepAlive);
 
   onDestroy(authenticator.stopKeepAlive);
 </script>
@@ -81,11 +74,11 @@
 />
 
 <ErrorBoundary>
-  {#if !authenticated}
+  {#await authenticator.authenticate()}
     <div class="loading">
       <wa-spinner></wa-spinner>
     </div>
-  {:else}
+  {:then}
     <QueryClientProvider client={queryClient}>
       {#if !authenticator.isAuthenticated()}
         <main>
@@ -109,7 +102,7 @@
         <SvelteQueryDevtools />
       {/if}
     </QueryClientProvider>
-  {/if}
+  {/await}
 </ErrorBoundary>
 
 <style>
