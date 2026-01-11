@@ -70,7 +70,6 @@ wa-dialog::part(footer) {
 
 wa-option small {
   display: block;
-  font-size: 0.875em;
-  color: var(--wa-color-text-subtle);
-  margin-top: 0.125rem;
+  font-size: var(--wa-font-size-xs);
+  margin-top: var(--wa-space-xs);
 }

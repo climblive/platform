@@ -53,6 +53,7 @@
           <wa-option
             value={compClass.id}
             disabled={isAfter(new Date(), compClass.timeEnd)}
+            label={compClass.name}
           >
             <div>{compClass.name}</div>
             {#if compClass.description}
