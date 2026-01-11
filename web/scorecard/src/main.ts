@@ -10,7 +10,6 @@ import * as Sentry from "@sentry/svelte";
 import { mount } from "svelte";
 import App from "./App.svelte";
 import FailsafeApp from "./FailsafeApp.svelte";
-import TryFailsafe from "./TryFailsafe.svelte";
 
 if (import.meta.env.PROD) {
   Sentry.init({
@@ -48,7 +47,6 @@ if (location.pathname.startsWith("/failsafe")) {
       target: document.body,
       props: {
         missingFeatures,
-        alternative: TryFailsafe,
       },
     });
   }

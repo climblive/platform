@@ -1,5 +1,11 @@
-export const checkCompat = (): [boolean, string[]] => {
-  const missingFeatures: string[] = [];
+type Feature =
+  | "CustomElementRegistry"
+  | "ElementInternals"
+  | "CustomStateSet"
+  | "@supports selector(&)";
+
+export const checkCompat = (): [boolean, Feature[]] => {
+  const missingFeatures: Feature[] = [];
 
   if (window.CustomElementRegistry === undefined) {
     missingFeatures.push("CustomElementRegistry");
