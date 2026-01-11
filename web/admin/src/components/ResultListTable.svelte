@@ -160,9 +160,14 @@
         {@const count = contenderCounts.get(compClass.id)}
 
         <wa-option value={compClass.id} label={compClass.name}>
-          {compClass.name}
-          {#if count}
-            <wa-badge pill variant="neutral">{count}</wa-badge>
+          <div class="label">
+            {compClass.name}
+            {#if count}
+              <wa-badge pill variant="neutral">{count}</wa-badge>
+            {/if}
+          </div>
+          {#if compClass.description}
+            <small>{compClass.description}</small>
           {/if}
         </wa-option>
       {/each}
@@ -178,7 +183,7 @@
 {/if}
 
 <style>
-  wa-option::part(label) {
+  .label {
     display: flex;
     justify-content: start;
     align-items: center;
@@ -191,7 +196,7 @@
     gap: var(--wa-space-m);
     justify-content: space-evenly;
 
-    & * {
+    & > * {
       width: 100%;
     }
   }

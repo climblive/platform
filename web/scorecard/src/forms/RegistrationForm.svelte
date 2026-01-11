@@ -53,8 +53,13 @@
           <wa-option
             value={compClass.id}
             disabled={isAfter(new Date(), compClass.timeEnd)}
-            >{compClass.name}</wa-option
+            label={compClass.name}
           >
+            {compClass.name}
+            {#if compClass.description}
+              <small>{compClass.description}</small>
+            {/if}
+          </wa-option>
         {/each}
       </wa-select>
       <wa-switch
