@@ -18,7 +18,8 @@ export const authenticateContender = async (
 
   const contest = await queryClient.fetchQuery({
     queryKey: ["contest", { id: contender.contestId }],
-    queryFn: async () => ApiClient.getInstance().getContest(contender.contestId),
+    queryFn: async () =>
+      ApiClient.getInstance().getContest(contender.contestId),
   });
 
   const provider = new ContenderCredentialsProvider(code);
