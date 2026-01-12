@@ -2,6 +2,7 @@ import { scorecardSessionSchema, type ScorecardSession } from "@/types";
 import { ApiClient, ContenderCredentialsProvider } from "@climblive/lib";
 import type { Contender } from "@climblive/lib/models";
 import type { QueryClient } from "@tanstack/svelte-query";
+import { add } from "date-fns";
 import type { Writable } from "svelte/store";
 import * as z from "zod/v4";
 
@@ -10,17 +11,22 @@ export const authenticateContender = async (
   queryClient: QueryClient,
   session: Writable<ScorecardSession>,
 ): Promise<Contender> => {
-  const contender = await ApiClient.getInstance().findContender(code);
-  const contest = await ApiClient.getInstance().getContest(contender.contestId);
+  const contender = await queryClient.fetchQuery({
+    queryKey: ["contender", { code }],
+    queryFn: async () => ApiClient.getInstance().findContender(code),
+  });
+
+  const contest = await queryClient.fetchQuery({
+    queryKey: ["contest", { id: contender.contestId }],
+    queryFn: async () => ApiClient.getInstance().getContest(contender.contestId),
+  });
 
   const provider = new ContenderCredentialsProvider(code);
   ApiClient.getInstance().setCredentialsProvider(provider);
 
   session.update((current) => {
     const contestEndTime = contest.timeEnd || new Date();
-    const expiryTime = new Date(
-      contestEndTime.getTime() + 12 * 60 * 60 * 1000,
-    );
+    const expiryTime = add(contestEndTime, { hours: 12 });
 
     const updatedSession: ScorecardSession = {
       ...current,
