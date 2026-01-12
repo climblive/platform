@@ -92,7 +92,7 @@ test("enter contest by entering registration code", async ({ page }) => {
   await page.waitForURL("/ABCD0002/register");
 
   await page
-    .getByRole("textbox", { name: "Full name *" })
+    .getByRole("textbox", { name: "Name *" })
     .pressSequentially("Dwight Schrute");
   const compClass = page.getByRole("combobox", { name: "Competition class *" });
   await compClass.click();
@@ -199,7 +199,7 @@ test("edit profile", async ({ page }) => {
 
   await page.waitForURL("/ABCD0003/edit");
 
-  const nameInput = page.getByRole("textbox", { name: "Full name *" });
+  const nameInput = page.getByRole("textbox", { name: "Name *" });
   await nameInput.fill("");
   await nameInput.pressSequentially("Phyllis Lapin-Vance");
 
