@@ -103,7 +103,8 @@
     >
       {#each countries as country (country.code)}
         <wa-option value={country.code}>
-          {getFlag(country.code)} {country.name}
+          {getFlag(country.code)}
+          {country.name}
         </wa-option>
       {/each}
     </wa-select>
