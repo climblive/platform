@@ -27,11 +27,13 @@ export const countries: Country[] = [
   { code: "JP", name: "Japan" },
 ];
 
+const REGIONAL_INDICATOR_OFFSET = 127397;
+
 export function getFlag(countryCode: string | undefined): string {
   if (!countryCode || countryCode.length !== 2) return "";
   const codePoints = countryCode
     .toUpperCase()
     .split("")
-    .map((char) => 127397 + char.charCodeAt(0));
+    .map((char) => REGIONAL_INDICATOR_OFFSET + char.charCodeAt(0));
   return String.fromCodePoint(...codePoints);
 }
