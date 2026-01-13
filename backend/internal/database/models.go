@@ -40,6 +40,7 @@ type Contest struct {
 	Name               string
 	Description        sql.NullString
 	Location           sql.NullString
+	Country            sql.NullString
 	QualifyingProblems int32
 	Finalists          int32
 	Info               sql.NullString

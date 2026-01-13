@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS `contest` (
   `name` VARCHAR(64) NOT NULL,
   `description` TEXT NULL,
   `location` VARCHAR(1024) NULL DEFAULT NULL,
+  `country` VARCHAR(2) NULL DEFAULT NULL,
   `qualifying_problems` INT NOT NULL,
   `finalists` INT NOT NULL,
   `info` TEXT NULL,

@@ -75,6 +75,15 @@
     return 0;
   };
 
+  function getFlag(countryCode: string | undefined): string {
+    if (!countryCode || countryCode.length !== 2) return "";
+    const codePoints = countryCode
+      .toUpperCase()
+      .split("")
+      .map((char) => 127397 + char.charCodeAt(0));
+    return String.fromCodePoint(...codePoints);
+  }
+
   const columns: ColumnDefinition<Contest>[] = [
     {
       label: "Name",
@@ -125,8 +134,15 @@
   <Link to="contests/{id}">{name}</Link>
 {/snippet}
 
-{#snippet renderLocation({ location }: Contest)}
-  {location || "-"}
+{#snippet renderLocation({ location, country }: Contest)}
+  {#if country}
+    <span class="location-with-flag">
+      <span class="flag">{getFlag(country)}</span>
+      {location || "-"}
+    </span>
+  {:else}
+    {location || "-"}
+  {/if}
 {/snippet}
 
 {#snippet renderRegisteredContenders({ registeredContenders }: Contest)}
@@ -254,5 +270,15 @@
     color: var(--wa-color-text-quiet);
     font-size: var(--wa-font-size-s);
     margin-block-start: var(--wa-space-xs) var(--wa-space-m);
+  }
+
+  .location-with-flag {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-xs);
+  }
+
+  .flag {
+    font-size: 1.2em;
   }
 </style>
