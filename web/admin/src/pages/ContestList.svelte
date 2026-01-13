@@ -13,6 +13,7 @@
     getAllContestsQuery,
     getContestsByOrganizerQuery,
   } from "@climblive/lib/queries";
+  import { getFlag } from "@climblive/lib/utils";
   import { format } from "date-fns";
   import { Link, navigate } from "svelte-routing";
 
@@ -74,15 +75,6 @@
 
     return 0;
   };
-
-  function getFlag(countryCode: string | undefined): string {
-    if (!countryCode || countryCode.length !== 2) return "";
-    const codePoints = countryCode
-      .toUpperCase()
-      .split("")
-      .map((char) => 127397 + char.charCodeAt(0));
-    return String.fromCodePoint(...codePoints);
-  }
 
   const columns: ColumnDefinition<Contest>[] = [
     {

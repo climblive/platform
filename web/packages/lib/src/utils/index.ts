@@ -1,6 +1,7 @@
 export * from "./code";
 export * from "./compat";
 export * from "./config";
+export * from "./countries";
 export * from "./darkmode";
 export * from "./errors";
 export * from "./guards";
