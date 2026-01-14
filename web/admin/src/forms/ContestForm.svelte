@@ -36,11 +36,11 @@
 
   let { data, schema, submit, children }: Props = $props();
 
-  let selectedCountry = $state(data.country || "SE");
+  let selectedCountry = $derived(data.country || "SE");
 
   const handleCountryChange = (event: Event) => {
     const target = event.target as HTMLSelectElement;
-    selectedCountry = target.value;
+    data.country = target.value;
   };
 </script>
 

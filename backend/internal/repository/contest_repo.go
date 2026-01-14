@@ -137,7 +137,7 @@ func (d *Database) StoreContest(ctx context.Context, tx domain.Transaction, cont
 		Name:               contest.Name,
 		Description:        makeNullString(contest.Description),
 		Location:           makeNullString(contest.Location),
-		Country:            makeNullString(contest.Country),
+		Country:            contest.Country,
 		QualifyingProblems: int32(contest.QualifyingProblems),
 		Finalists:          int32(contest.Finalists),
 		Info:               makeNullString(contest.Info),
