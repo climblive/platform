@@ -35,6 +35,13 @@
   }
 
   let { data, schema, submit, children }: Props = $props();
+
+  let selectedCountry = $state(data.country || "SE");
+
+  const handleCountryChange = (event: Event) => {
+    const target = event.target as HTMLSelectElement;
+    selectedCountry = target.value;
+  };
 </script>
 
 <GenericForm {schema} {submit}>
@@ -67,11 +74,13 @@
       {@attach name("country")}
       label="Country"
       value={data.country}
+      onchange={handleCountryChange}
     >
-      <span slot="start">{getFlag(data.country)}</span>
+      <span slot="start">{getFlag(selectedCountry)}</span>
       {#each countries as country (country.code)}
         <wa-option value={country.code} label={country.name}>
           <span slot="start">{getFlag(country.code)}</span>
+          {country.name}
         </wa-option>
       {/each}
     </wa-select>
