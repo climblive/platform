@@ -20,7 +20,7 @@
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
-  import { GenericForm, name } from "@climblive/lib/forms";
+  import { GenericForm, name, value } from "@climblive/lib/forms";
   import type { Contest } from "@climblive/lib/models";
   import { countries, getFlag } from "@climblive/lib/utils";
   import { type Snippet } from "svelte";
@@ -72,8 +72,8 @@
     <wa-select
       size="small"
       {@attach name("country")}
+      {@attach value(data.country)}
       label="Country"
-      value={data.code}
       onchange={handleCountryChange}
     >
       <span slot="start">{getFlag(selectedCountry)}</span>
