@@ -67,7 +67,6 @@
       {@attach name("country")}
       label="Country"
       value={data.country}
-      clearable
     >
       <span slot="start">{getFlag(data.country)}</span>
       {#each countries as country (country.code)}
