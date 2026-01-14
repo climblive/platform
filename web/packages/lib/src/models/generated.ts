@@ -15,17 +15,8 @@ export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
 export type OrganizerInviteID = string;
-export type ResourceIDType =
-  | CompClassID
-  | ContenderID
-  | ContestID
-  | OrganizerID
-  | ProblemID
-  | RaffleID
-  | RaffleWinnerID
-  | SeriesID
-  | UserID
-  | TickID;
+export type ResourceIDType = 
+    CompClassID | ContenderID | ContestID | OrganizerID | ProblemID | RaffleID | RaffleWinnerID | SeriesID | UserID | TickID;
 export type ScoreEngineInstanceID = string;
 
 //////////
@@ -77,7 +68,7 @@ export interface Contest {
   ownership: OwnershipData;
   archived: boolean;
   location?: string;
-  country?: string;
+  country: string;
   seriesId?: SeriesID;
   name: string;
   description?: string;
@@ -92,7 +83,7 @@ export interface Contest {
 }
 export interface ContestTemplate {
   location?: string;
-  country?: string;
+  country: string;
   seriesId?: SeriesID;
   name: string;
   description?: string;

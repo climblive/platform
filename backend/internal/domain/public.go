@@ -60,7 +60,7 @@ type Contest struct {
 	Ownership            OwnershipData `json:"ownership"`
 	Archived             bool          `json:"archived"`
 	Location             string        `json:"location,omitempty"`
-	Country              string        `json:"country,omitempty"`
+	Country              string        `json:"country"`
 	SeriesID             SeriesID      `json:"seriesId,omitempty"`
 	Name                 string        `json:"name"`
 	Description          string        `json:"description,omitempty"`
@@ -76,7 +76,7 @@ type Contest struct {
 
 type ContestTemplate struct {
 	Location           string        `json:"location,omitempty"`
-	Country            string        `json:"country,omitempty"`
+	Country            string        `json:"country"`
 	SeriesID           SeriesID      `json:"seriesId,omitempty"`
 	Name               string        `json:"name"`
 	Description        string        `json:"description,omitempty"`

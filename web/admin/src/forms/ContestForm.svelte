@@ -3,7 +3,7 @@
 
   export const formSchema = z.object({
     location: z.string().optional(),
-    country: z.string().optional(),
+    country: z.string(),
     seriesId: z.coerce.number().optional(),
     name: z.string().min(1),
     description: z.string().optional(),
@@ -69,10 +69,10 @@
       value={data.country}
       clearable
     >
+      <span slot="start">{getFlag(data.country)}</span>
       {#each countries as country (country.code)}
-        <wa-option value={country.code}>
-          {getFlag(country.code)}
-          {country.name}
+        <wa-option value={country.code} label={country.name}>
+          <span slot="start">{getFlag(country.code)}</span>
         </wa-option>
       {/each}
     </wa-select>

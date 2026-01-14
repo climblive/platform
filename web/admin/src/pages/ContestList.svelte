@@ -78,6 +78,12 @@
 
   const columns: ColumnDefinition<Contest>[] = [
     {
+      label: "",
+      mobile: true,
+      render: renderFlag,
+      width: "max-content",
+    },
+    {
       label: "Name",
       mobile: true,
       render: renderName,
@@ -122,19 +128,16 @@
   );
 </script>
 
+{#snippet renderFlag({ country }: Contest)}
+  <span class="flag">{getFlag(country)}</span>
+{/snippet}
+
 {#snippet renderName({ id, name }: Contest)}
   <Link to="contests/{id}">{name}</Link>
 {/snippet}
 
-{#snippet renderLocation({ location, country }: Contest)}
-  {#if country}
-    <span class="location-with-flag">
-      <span class="flag">{getFlag(country)}</span>
-      {location || "-"}
-    </span>
-  {:else}
-    {location || "-"}
-  {/if}
+{#snippet renderLocation({ location }: Contest)}
+  {location || "-"}
 {/snippet}
 
 {#snippet renderRegisteredContenders({ registeredContenders }: Contest)}
@@ -264,13 +267,7 @@
     margin-block-start: var(--wa-space-xs) var(--wa-space-m);
   }
 
-  .location-with-flag {
-    display: flex;
-    align-items: center;
-    gap: var(--wa-space-xs);
-  }
-
   .flag {
-    font-size: 1.2em;
+    font-size: 1.3em;
   }
 </style>
