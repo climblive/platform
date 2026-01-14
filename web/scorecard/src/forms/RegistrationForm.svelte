@@ -37,7 +37,7 @@
       <wa-input
         size="small"
         {@attach name("name")}
-        label="Full name"
+        label="Name"
         type="text"
         required
         value={data.name}
