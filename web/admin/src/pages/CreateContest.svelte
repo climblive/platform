@@ -6,7 +6,7 @@
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import type { Contest, ContestTemplate } from "@climblive/lib/models";
   import { createContestMutation } from "@climblive/lib/queries";
-  import { guessCountryFromTimezone, toastError } from "@climblive/lib/utils";
+  import { toastError } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -43,7 +43,7 @@
   submit={handleSubmit}
   data={{
     name: "",
-    country: guessCountryFromTimezone(),
+    country: "SE",
     gracePeriod: 15 * minuteInNanoseconds,
     info: "",
   }}
