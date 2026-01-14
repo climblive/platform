@@ -3,6 +3,7 @@
   import RelativeTime from "@/components/RelativeTime.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
+  import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
   import {
     EmptyState,
     Table,
@@ -13,7 +14,7 @@
     getAllContestsQuery,
     getContestsByOrganizerQuery,
   } from "@climblive/lib/queries";
-  import { getFlag } from "@climblive/lib/utils";
+  import { getCountryName, getFlag } from "@climblive/lib/utils";
   import { format } from "date-fns";
   import { Link, navigate } from "svelte-routing";
 
@@ -128,8 +129,9 @@
   );
 </script>
 
-{#snippet renderFlag({ country }: Contest)}
-  <span class="flag">{getFlag(country)}</span>
+{#snippet renderFlag({ id, country }: Contest)}
+  <wa-tooltip for="flag-{id}">{getCountryName(country)}</wa-tooltip>
+  <span id="flag-{id}" class="flag">{getFlag(country)}</span>
 {/snippet}
 
 {#snippet renderName({ id, name }: Contest)}

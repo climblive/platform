@@ -265,3 +265,9 @@ export function getFlag(countryCode: string | undefined): string {
     .map((char) => REGIONAL_INDICATOR_OFFSET + char.charCodeAt(0));
   return String.fromCodePoint(...codePoints);
 }
+
+export function getCountryName(countryCode: string | undefined): string {
+  if (!countryCode) return "";
+  const country = countries.find((c) => c.code === countryCode);
+  return country?.name || "";
+}
