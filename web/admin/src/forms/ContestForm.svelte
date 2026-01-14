@@ -72,7 +72,7 @@
     <wa-select
       size="small"
       {@attach name("country")}
-      {@attach value(data.code)}
+      {@attach value(data.country)}
       label="Country"
       onchange={handleCountryChange}
     >
