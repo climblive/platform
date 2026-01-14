@@ -123,7 +123,7 @@ func (q *Queries) DeleteTick(ctx context.Context, id int32) error {
 }
 
 const getAllContests = `-- name: GetAllContests :many
-SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
+SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.created, contest.country, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 LEFT JOIN contender c ON c.contest_id = contest.id
@@ -154,12 +154,12 @@ func (q *Queries) GetAllContests(ctx context.Context) ([]GetAllContestsRow, erro
 			&i.Contest.Name,
 			&i.Contest.Description,
 			&i.Contest.Location,
-			&i.Contest.Country,
 			&i.Contest.QualifyingProblems,
 			&i.Contest.Finalists,
 			&i.Contest.Info,
 			&i.Contest.GracePeriod,
 			&i.Contest.Created,
+			&i.Contest.Country,
 			&i.TimeBegin,
 			&i.TimeEnd,
 			&i.RegisteredContenders,
@@ -466,7 +466,7 @@ func (q *Queries) GetContendersByContest(ctx context.Context, contestID int32) (
 }
 
 const getContest = `-- name: GetContest :one
-SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
+SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.created, contest.country, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 LEFT JOIN contender c ON c.contest_id = contest.id
@@ -492,12 +492,12 @@ func (q *Queries) GetContest(ctx context.Context, id int32) (GetContestRow, erro
 		&i.Contest.Name,
 		&i.Contest.Description,
 		&i.Contest.Location,
-		&i.Contest.Country,
 		&i.Contest.QualifyingProblems,
 		&i.Contest.Finalists,
 		&i.Contest.Info,
 		&i.Contest.GracePeriod,
 		&i.Contest.Created,
+		&i.Contest.Country,
 		&i.TimeBegin,
 		&i.TimeEnd,
 		&i.RegisteredContenders,
@@ -506,7 +506,7 @@ func (q *Queries) GetContest(ctx context.Context, id int32) (GetContestRow, erro
 }
 
 const getContestsByOrganizer = `-- name: GetContestsByOrganizer :many
-SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
+SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.created, contest.country, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 LEFT JOIN contender c ON c.contest_id = contest.id
@@ -538,12 +538,12 @@ func (q *Queries) GetContestsByOrganizer(ctx context.Context, organizerID int32)
 			&i.Contest.Name,
 			&i.Contest.Description,
 			&i.Contest.Location,
-			&i.Contest.Country,
 			&i.Contest.QualifyingProblems,
 			&i.Contest.Finalists,
 			&i.Contest.Info,
 			&i.Contest.GracePeriod,
 			&i.Contest.Created,
+			&i.Contest.Country,
 			&i.TimeBegin,
 			&i.TimeEnd,
 			&i.RegisteredContenders,
@@ -563,9 +563,9 @@ func (q *Queries) GetContestsByOrganizer(ctx context.Context, organizerID int32)
 
 const getContestsCurrentlyRunningOrByStartTime = `-- name: GetContestsCurrentlyRunningOrByStartTime :many
 SELECT
-	id, organizer_id, archived, series_id, name, description, location, country, qualifying_problems, finalists, info, grace_period, created, time_begin, time_end
+	id, organizer_id, archived, series_id, name, description, location, qualifying_problems, finalists, info, grace_period, created, country, time_begin, time_end
 FROM (
-    SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+    SELECT contest.id, contest.organizer_id, contest.archived, contest.series_id, contest.name, contest.description, contest.location, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.created, contest.country, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
     FROM contest
     JOIN comp_class cc ON cc.contest_id = contest.id
     WHERE archived = FALSE
@@ -588,12 +588,12 @@ type GetContestsCurrentlyRunningOrByStartTimeRow struct {
 	Name               string
 	Description        sql.NullString
 	Location           sql.NullString
-	Country            sql.NullString
 	QualifyingProblems int32
 	Finalists          int32
 	Info               sql.NullString
 	GracePeriod        int32
 	Created            time.Time
+	Country            string
 	TimeBegin          interface{}
 	TimeEnd            interface{}
 }
@@ -615,12 +615,12 @@ func (q *Queries) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context, 
 			&i.Name,
 			&i.Description,
 			&i.Location,
-			&i.Country,
 			&i.QualifyingProblems,
 			&i.Finalists,
 			&i.Info,
 			&i.GracePeriod,
 			&i.Created,
+			&i.Country,
 			&i.TimeBegin,
 			&i.TimeEnd,
 		); err != nil {
@@ -1340,7 +1340,7 @@ type UpsertContestParams struct {
 	Name               string
 	Description        sql.NullString
 	Location           sql.NullString
-	Country            sql.NullString
+	Country            string
 	QualifyingProblems int32
 	Finalists          int32
 	Info               sql.NullString
