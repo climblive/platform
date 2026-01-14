@@ -92,7 +92,7 @@ test("enter contest by entering registration code", async ({ page }) => {
   await page.waitForURL("/ABCD0002/register");
 
   await page
-    .getByRole("textbox", { name: "Full name *" })
+    .getByRole("textbox", { name: "Name *" })
     .pressSequentially("Dwight Schrute");
   const compClass = page.getByRole("combobox", { name: "Competition class *" });
   await compClass.click();
@@ -105,7 +105,7 @@ test("enter contest by entering registration code", async ({ page }) => {
   await page.waitForURL("/ABCD0002");
 });
 
-test("registration code is saved in local storage for 12 hours", async ({
+test("registration code is saved until 12 hours after contest ends", async ({
   page,
 }) => {
   await page.clock.install({ time: new Date() });
@@ -131,7 +131,7 @@ test("registration code is saved in local storage for 12 hours", async ({
   await page.waitForURL("/ABCD0001");
   await expect(page.getByText("Albert Einstein")).toBeVisible();
 
-  await page.clock.fastForward("12:00:00");
+  await page.clock.setFixedTime(new Date("2027-01-01T12:00:00"));
 
   await page.goto("/");
   await page.waitForURL("/");
@@ -199,7 +199,7 @@ test("edit profile", async ({ page }) => {
 
   await page.waitForURL("/ABCD0003/edit");
 
-  const nameInput = page.getByRole("textbox", { name: "Full name *" });
+  const nameInput = page.getByRole("textbox", { name: "Name *" });
   await nameInput.fill("");
   await nameInput.pressSequentially("Phyllis Lapin-Vance");
 
