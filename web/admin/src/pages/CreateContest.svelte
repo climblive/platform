@@ -43,6 +43,7 @@
   submit={handleSubmit}
   data={{
     name: "",
+    country: "SE",
     gracePeriod: 15 * minuteInNanoseconds,
     info: "",
   }}
