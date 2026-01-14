@@ -257,6 +257,8 @@ export const countries: Country[] = [
 
 const REGIONAL_INDICATOR_OFFSET = 127397;
 
+const countryMap = new Map(countries.map((c) => [c.code, c.name]));
+
 export function getFlag(countryCode: string | undefined): string {
   if (!countryCode || countryCode.length !== 2) return "";
   const codePoints = countryCode
@@ -268,6 +270,5 @@ export function getFlag(countryCode: string | undefined): string {
 
 export function getCountryName(countryCode: string | undefined): string {
   if (!countryCode) return "";
-  const country = countries.find((c) => c.code === countryCode);
-  return country?.name || "";
+  return countryMap.get(countryCode) || "";
 }
