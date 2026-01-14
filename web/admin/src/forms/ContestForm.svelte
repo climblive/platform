@@ -73,7 +73,7 @@
       size="small"
       {@attach name("country")}
       label="Country"
-      value={data.country}
+      value={data.code}
       onchange={handleCountryChange}
     >
       <span slot="start">{getFlag(selectedCountry)}</span>
