@@ -353,6 +353,7 @@ func TestCreateContest(t *testing.T) {
 					domain.Contest{
 						Ownership:          fakedOwnership,
 						Location:           "The garage",
+						Country:            "SE",
 						SeriesID:           0,
 						Name:               "Swedish Championships",
 						Description:        "Who is the best climber in Sweden?",
@@ -367,6 +368,7 @@ func TestCreateContest(t *testing.T) {
 					ID:                 fakedContestID,
 					Ownership:          fakedOwnership,
 					Location:           "The garage",
+					Country:            "SE",
 					SeriesID:           0,
 					Name:               "Swedish Championships",
 					Description:        "Who is the best climber in Sweden?",
@@ -384,6 +386,7 @@ func TestCreateContest(t *testing.T) {
 
 			contest, err := ucase.CreateContest(context.Background(), fakedOrganizerID, domain.ContestTemplate{
 				Location:           "The garage",
+				Country:            "SE",
 				Name:               "Swedish Championships",
 				Description:        "Who is the best climber in Sweden?",
 				QualifyingProblems: 10,
@@ -451,6 +454,7 @@ func TestCreateContest(t *testing.T) {
 
 		contest, err := ucase.CreateContest(context.Background(), fakedOrganizerID, domain.ContestTemplate{
 			Location:           "The garage",
+			Country:            "SE",
 			Name:               "Swedish Championships",
 			Description:        "Who is the best climber in Sweden?",
 			QualifyingProblems: 10,
@@ -1084,6 +1088,7 @@ func TestPatchContest(t *testing.T) {
 			Return(domain.Contest{
 				ID:        fakedContestID,
 				Ownership: fakedOwnership,
+				Country:   "SE",
 			}, nil)
 
 		mockedRepo.
@@ -1092,6 +1097,7 @@ func TestPatchContest(t *testing.T) {
 					ID:                 fakedContestID,
 					Ownership:          fakedOwnership,
 					Location:           "The garage",
+					Country:            "SE",
 					SeriesID:           domain.SeriesID(1),
 					Name:               "Swedish Championships",
 					Description:        "Who is the best climber in Sweden?",
@@ -1105,6 +1111,7 @@ func TestPatchContest(t *testing.T) {
 				ID:                 fakedContestID,
 				Ownership:          fakedOwnership,
 				Location:           "The garage",
+				Country:            "SE",
 				SeriesID:           domain.SeriesID(1),
 				Name:               "Swedish Championships",
 				Description:        "Who is the best climber in Sweden?",
@@ -1170,6 +1177,7 @@ func TestPatchContest(t *testing.T) {
 				ID:        fakedContestID,
 				Ownership: fakedOwnership,
 				Name:      "Swedish Championships",
+				Country:   "SE",
 			}, nil)
 
 		mockedRepo.
@@ -1179,6 +1187,7 @@ func TestPatchContest(t *testing.T) {
 					Ownership: fakedOwnership,
 					Archived:  true,
 					Name:      "Swedish Championships",
+					Country:   "SE",
 				},
 			).
 			Return(domain.Contest{
@@ -1186,6 +1195,7 @@ func TestPatchContest(t *testing.T) {
 				Ownership: fakedOwnership,
 				Archived:  true,
 				Name:      "Swedish Championships",
+				Country:   "SE",
 			}, nil)
 
 		fakedScoreEngineInstanceID := domain.ScoreEngineInstanceID(uuid.New())
@@ -1236,6 +1246,7 @@ func TestPatchContest(t *testing.T) {
 				ID:        fakedContestID,
 				Ownership: fakedOwnership,
 				Name:      "Swedish Championships",
+				Country:   "SE",
 				Archived:  true,
 			}, nil)
 
@@ -1246,6 +1257,7 @@ func TestPatchContest(t *testing.T) {
 					Ownership: fakedOwnership,
 					Archived:  false,
 					Name:      "Swedish Championships",
+					Country:   "SE",
 				},
 			).
 			Return(domain.Contest{
@@ -1253,6 +1265,7 @@ func TestPatchContest(t *testing.T) {
 				Ownership: fakedOwnership,
 				Archived:  false,
 				Name:      "Swedish Championships",
+				Country:   "SE",
 			}, nil)
 
 		ucase := usecases.ContestUseCase{
@@ -1312,6 +1325,7 @@ func TestPatchContest(t *testing.T) {
 			Return(domain.Contest{
 				ID:        fakedContestID,
 				Ownership: fakedOwnership,
+				Country:   "SE",
 			}, nil)
 
 		ucase := usecases.ContestUseCase{
@@ -1340,6 +1354,7 @@ func TestPatchContest(t *testing.T) {
 			Return(domain.Contest{
 				ID:        fakedContestID,
 				Ownership: fakedOwnership,
+				Country:   "SE",
 				Archived:  true,
 			}, nil)
 

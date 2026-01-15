@@ -15,6 +15,7 @@ func TestContestValidator(t *testing.T) {
 	validContest := func() domain.Contest {
 		return domain.Contest{
 			Name:               "Swedish Championships",
+			Country:            "SE",
 			QualifyingProblems: 10,
 			Finalists:          7,
 			GracePeriod:        time.Minute * 15,
