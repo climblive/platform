@@ -1,5 +1,5 @@
 export interface Country {
-  code: string;
+  code: string; // ISO 3166-1 alpha-2 code
   name: string;
 }
 
@@ -271,4 +271,58 @@ export function getFlag(countryCode: string | undefined): string {
 export function getCountryName(countryCode: string | undefined): string {
   if (!countryCode) return "";
   return countryMap.get(countryCode) || "";
+}
+
+/**
+ * Guesses the user's country based on their browser timezone.
+ * Used to pre-select a default country when creating a new contest.
+ * Falls back to 'AQ' (Antarctica) if timezone is not recognized.
+ */
+export function guessCountryFromTimezone(): string {
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  const timezoneToCountry: Record<string, string> = {
+    "Europe/Stockholm": "SE",
+    "Europe/Oslo": "NO",
+    "Europe/Copenhagen": "DK",
+    "Europe/Helsinki": "FI",
+    "Europe/Berlin": "DE",
+    "Europe/Paris": "FR",
+    "Europe/London": "GB",
+    "Europe/Amsterdam": "NL",
+    "Europe/Brussels": "BE",
+    "Europe/Vienna": "AT",
+    "Europe/Zurich": "CH",
+    "Europe/Rome": "IT",
+    "Europe/Madrid": "ES",
+    "Europe/Lisbon": "PT",
+    "Europe/Warsaw": "PL",
+    "Europe/Prague": "CZ",
+    "Europe/Budapest": "HU",
+    "Europe/Athens": "GR",
+    "Europe/Dublin": "IE",
+    "America/New_York": "US",
+    "America/Chicago": "US",
+    "America/Denver": "US",
+    "America/Los_Angeles": "US",
+    "America/Toronto": "CA",
+    "America/Vancouver": "CA",
+    "America/Mexico_City": "MX",
+    "America/Sao_Paulo": "BR",
+    "America/Buenos_Aires": "AR",
+    "Asia/Tokyo": "JP",
+    "Asia/Seoul": "KR",
+    "Asia/Shanghai": "CN",
+    "Asia/Hong_Kong": "HK",
+    "Asia/Singapore": "SG",
+    "Asia/Bangkok": "TH",
+    "Asia/Dubai": "AE",
+    "Asia/Kolkata": "IN",
+    "Australia/Sydney": "AU",
+    "Australia/Melbourne": "AU",
+    "Australia/Perth": "AU",
+    "Pacific/Auckland": "NZ",
+  };
+
+  return timezoneToCountry[timezone] || "AQ";
 }

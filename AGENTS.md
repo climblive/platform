@@ -224,7 +224,7 @@ make test
 3. Update `backend/database/queries.sql` with new queries
 4. Run `sqlc generate`
 
-**Important:** Always update the MySQL Workbench model file (`.mwb`) when making database schema changes. This ensures the visual model stays in sync with the actual database schema.
+**Important:** Always update the MySQL Workbench model file (`.mwb`) when making database schema changes.
 
 ### Modify domain models
 
