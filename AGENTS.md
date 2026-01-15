@@ -226,6 +226,13 @@ make test
 
 **Important:** Always update the MySQL Workbench model file (`.mwb`) when making database schema changes.
 
+### Country codes
+
+Country codes are stored in `countries.json` at the repository root as the single source of truth:
+- Frontend imports it directly in `web/packages/lib/src/utils/countries.ts`
+- Backend embeds it in `backend/internal/usecases/validators/countries.json` (copy of root file)
+- When updating countries, update the root `countries.json` and copy to backend location
+
 ### Modify domain models
 
 1. Update domain models in `backend/internal/domain/public.go`
