@@ -40,7 +40,7 @@
 
   const handleCountryChange = (event: Event) => {
     const target = event.target as HTMLSelectElement;
-    data.country = target.value;
+    selectedCountry = target.value;
   };
 </script>
 
