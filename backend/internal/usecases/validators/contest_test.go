@@ -96,4 +96,14 @@ func TestContestValidator(t *testing.T) {
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
 		assert.True(t, validator.IsValidationError(err))
 	})
+
+	t.Run("InvalidCountryCode", func(t *testing.T) {
+		contest := validContest()
+		contest.Country = "XYZ"
+
+		err := validator.Validate(contest)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
 }
