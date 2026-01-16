@@ -270,6 +270,6 @@
   }
 
   .flag {
-    font-size: 1.3em;
+    font-size: var(--wa-font-size-larger);
   }
 </style>
