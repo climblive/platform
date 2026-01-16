@@ -400,6 +400,7 @@ func TestCreateContest(t *testing.T) {
 			assert.Equal(t, fakedOwnership, contest.Ownership)
 			assert.False(t, contest.Archived)
 			assert.Equal(t, "The garage", contest.Location)
+			assert.Equal(t, "SE", contest.Country)
 			assert.Equal(t, "Swedish Championships", contest.Name)
 			assert.Equal(t, "Who is the best climber in Sweden?", contest.Description)
 			assert.Equal(t, 10, contest.QualifyingProblems)
