@@ -14,10 +14,10 @@ func contenderToDomain(record database.GetContenderRow) domain.Contender {
 		ID: domain.ContenderID(record.Contender.ID),
 		Ownership: domain.OwnershipData{
 			OrganizerID: domain.OrganizerID(record.Contender.OrganizerID),
-			ContenderID: nillableIntToResourceID[domain.ContenderID](&record.Contender.ID),
+			ContenderID: nillableUUIDToResourceID[domain.ContenderID](record.Contender.ID),
 		},
 		ContestID:           domain.ContestID(record.Contender.ContestID),
-		CompClassID:         domain.CompClassID(record.Contender.ClassID.Int32),
+		CompClassID:         domain.CompClassID(record.Contender.ClassID.UUID),
 		RegistrationCode:    record.Contender.RegistrationCode,
 		Name:                record.Contender.Name.String,
 		Entered:             record.Contender.Entered.Time,
@@ -28,7 +28,7 @@ func contenderToDomain(record database.GetContenderRow) domain.Contender {
 	if record.ContenderID.Valid {
 		score := domain.Score{
 			Timestamp:   record.Timestamp.Time,
-			ContenderID: domain.ContenderID(record.ContenderID.Int32),
+			ContenderID: domain.ContenderID(record.ContenderID.UUID),
 			Score:       int(record.Score.Int32),
 			Placement:   int(record.Placement.Int32),
 			Finalist:    record.Finalist.Bool,
@@ -63,7 +63,7 @@ func contestToDomain(record database.Contest) domain.Contest {
 		},
 		Archived:           record.Archived,
 		Location:           record.Location.String,
-		SeriesID:           domain.SeriesID(record.SeriesID.Int32),
+		SeriesID:           domain.SeriesID(record.SeriesID.UUID),
 		Name:               record.Name,
 		Description:        record.Description.String,
 		QualifyingProblems: int(record.QualifyingProblems),
@@ -101,7 +101,7 @@ func tickToDomain(record database.Tick) domain.Tick {
 		ID: domain.TickID(record.ID),
 		Ownership: domain.OwnershipData{
 			OrganizerID: domain.OrganizerID(record.OrganizerID),
-			ContenderID: nillableIntToResourceID[domain.ContenderID](&record.ContenderID),
+			ContenderID: nillableUUIDToResourceID[domain.ContenderID](record.ContenderID),
 		},
 		Timestamp:     record.Timestamp,
 		ContestID:     domain.ContestID(record.ContestID),
@@ -183,6 +183,17 @@ func makeNullInt32(value int32) sql.NullInt32 {
 	return sql.NullInt32{
 		Valid: true,
 		Int32: value,
+	}
+}
+
+func makeNullUUID(value uuid.UUID) uuid.NullUUID {
+	if value == uuid.Nil {
+		return uuid.NullUUID{}
+	}
+
+	return uuid.NullUUID{
+		Valid: true,
+		UUID:  value,
 	}
 }
 

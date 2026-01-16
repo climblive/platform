@@ -7,10 +7,11 @@ import (
 	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
+	"github.com/google/uuid"
 )
 
 func (d *Database) GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Problem, error) {
-	records, err := d.WithTx(tx).GetProblemsByContest(ctx, int32(contestID))
+	records, err := d.WithTx(tx).GetProblemsByContest(ctx, uuid.UUID(contestID))
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -25,7 +26,7 @@ func (d *Database) GetProblemsByContest(ctx context.Context, tx domain.Transacti
 }
 
 func (d *Database) GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) (domain.Problem, error) {
-	record, err := d.WithTx(tx).GetProblem(ctx, int32(problemID))
+	record, err := d.WithTx(tx).GetProblem(ctx, uuid.UUID(problemID))
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		return domain.Problem{}, errors.Wrap(domain.ErrNotFound, 0)
@@ -38,7 +39,7 @@ func (d *Database) GetProblem(ctx context.Context, tx domain.Transaction, proble
 
 func (d *Database) GetProblemByNumber(ctx context.Context, tx domain.Transaction, contestID domain.ContestID, problemNumber int) (domain.Problem, error) {
 	record, err := d.WithTx(tx).GetProblemByNumber(ctx, database.GetProblemByNumberParams{
-		ContestID: int32(contestID),
+		ContestID: uuid.UUID(contestID),
 		Number:    int32(problemNumber),
 	})
 	switch {
@@ -52,10 +53,14 @@ func (d *Database) GetProblemByNumber(ctx context.Context, tx domain.Transaction
 }
 
 func (d *Database) StoreProblem(ctx context.Context, tx domain.Transaction, problem domain.Problem) (domain.Problem, error) {
+	if uuid.UUID(problem.ID) == uuid.Nil {
+		problem.ID = domain.ProblemID(uuid.New())
+	}
+
 	params := database.UpsertProblemParams{
-		ID:                 int32(problem.ID),
-		OrganizerID:        int32(problem.Ownership.OrganizerID),
-		ContestID:          int32(problem.ContestID),
+		ID:                 uuid.UUID(problem.ID),
+		OrganizerID:        uuid.UUID(problem.Ownership.OrganizerID),
+		ContestID:          uuid.UUID(problem.ContestID),
 		Number:             int32(problem.Number),
 		HoldColorPrimary:   problem.HoldColorPrimary,
 		HoldColorSecondary: makeNullString(problem.HoldColorSecondary),
@@ -68,20 +73,16 @@ func (d *Database) StoreProblem(ctx context.Context, tx domain.Transaction, prob
 		FlashBonus:         makeNullInt32(int32(problem.FlashBonus)),
 	}
 
-	insertID, err := d.WithTx(tx).UpsertProblem(ctx, params)
+	_, err := d.WithTx(tx).UpsertProblem(ctx, params)
 	if err != nil {
 		return domain.Problem{}, errors.Wrap(err, 0)
-	}
-
-	if insertID != 0 {
-		problem.ID = domain.ProblemID(insertID)
 	}
 
 	return problem, err
 }
 
 func (d *Database) DeleteProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) error {
-	err := d.WithTx(tx).DeleteProblem(ctx, int32(problemID))
+	err := d.WithTx(tx).DeleteProblem(ctx, uuid.UUID(problemID))
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}

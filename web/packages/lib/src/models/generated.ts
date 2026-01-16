@@ -3,7 +3,7 @@
 //////////
 // source: id.go
 
-export type ResourceID = number /* int32 */;
+export type ResourceID = string;
 export type CompClassID = ResourceID;
 export type ContenderID = ResourceID;
 export type ContestID = ResourceID;
@@ -15,17 +15,8 @@ export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
 export type OrganizerInviteID = string;
-export type ResourceIDType =
-  | CompClassID
-  | ContenderID
-  | ContestID
-  | OrganizerID
-  | ProblemID
-  | RaffleID
-  | RaffleWinnerID
-  | SeriesID
-  | UserID
-  | TickID;
+export type ResourceIDType = 
+    CompClassID | ContenderID | ContestID | OrganizerID | ProblemID | RaffleID | RaffleWinnerID | SeriesID | UserID | TickID;
 export type ScoreEngineInstanceID = string;
 
 //////////
@@ -270,7 +261,6 @@ export interface ProblemDeletedEvent {
   problemId: ProblemID;
 }
 export interface RulesUpdatedEvent {
-  contestId: ContestID;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
+	"github.com/google/uuid"
 )
 
 const persistInterval = time.Minute
@@ -68,8 +69,8 @@ func (k *Keeper) Run(ctx context.Context, options ...func(*runOptions)) *sync.Wa
 
 func (k *Keeper) run(ctx context.Context, ready chan<- struct{}) {
 	filter := domain.NewEventFilter(
-		0,
-		0,
+		domain.ContestID(uuid.Nil),
+		domain.ContenderID(uuid.Nil),
 		"CONTENDER_SCORE_UPDATED",
 	)
 
@@ -134,8 +135,8 @@ func (k *Keeper) persistScores(ctx context.Context) {
 			break
 		}
 
-		if contenderID == 0 {
-			return 0, domain.Score{}
+		if contenderID == domain.ContenderID(uuid.Nil) {
+			return domain.ContenderID(uuid.Nil), domain.Score{}
 		}
 
 		delete(k.scores, contenderID)
@@ -158,7 +159,7 @@ IterateScores:
 	for ctx.Err() == nil {
 		contenderID, score := takeFirst()
 
-		if contenderID == 0 {
+		if contenderID == domain.ContenderID(uuid.Nil) {
 			break
 		}
 

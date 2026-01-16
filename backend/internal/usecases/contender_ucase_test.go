@@ -8,6 +8,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/usecases"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -176,7 +177,7 @@ func TestGetContendersByCompClass(t *testing.T) {
 		var contenders []domain.Contender
 
 		for k := 1; k <= 10; k++ {
-			contenderID := domain.ContenderID(k)
+			contenderID := randomResourceID[domain.ContenderID]()
 
 			contenders = append(contenders, domain.Contender{
 				ID: contenderID,
@@ -218,14 +219,13 @@ func TestGetContendersByCompClass(t *testing.T) {
 		require.NoError(t, err)
 		assert.Len(t, contenders, 10)
 
-		for i, contender := range contenders {
-			assert.Equal(t, domain.ContenderID(i+1), contender.ID)
-			require.NotNil(t, contender.Score)
-			assert.Equal(t, (i+1)*10, contender.Score.Score)
-			assert.Equal(t, i+1, contender.Score.Placement)
-			assert.Equal(t, i, contender.Score.RankOrder)
-			assert.True(t, contender.Score.Finalist)
-			assert.Equal(t, currentTime, contender.Score.Timestamp)
+		for i := range contenders {
+			require.NotNil(t, contenders[i].Score)
+			assert.Equal(t, (i+1)*10, contenders[i].Score.Score)
+			assert.Equal(t, i+1, contenders[i].Score.Placement)
+			assert.Equal(t, i, contenders[i].Score.RankOrder)
+			assert.True(t, contenders[i].Score.Finalist)
+			assert.Equal(t, currentTime, contenders[i].Score.Timestamp)
 		}
 
 		mockedAuthorizer.AssertExpectations(t)
@@ -278,7 +278,7 @@ func TestGetContendersByContest(t *testing.T) {
 		var contenders []domain.Contender
 
 		for k := 1; k <= 10; k++ {
-			contenderID := domain.ContenderID(k)
+			contenderID := randomResourceID[domain.ContenderID]()
 
 			contenders = append(contenders, domain.Contender{
 				ID: contenderID,
@@ -320,14 +320,13 @@ func TestGetContendersByContest(t *testing.T) {
 		require.NoError(t, err)
 		assert.Len(t, contenders, 10)
 
-		for i, contender := range contenders {
-			assert.Equal(t, domain.ContenderID(i+1), contender.ID)
-			require.NotNil(t, contender.Score)
-			assert.Equal(t, (i+1)*10, contender.Score.Score)
-			assert.Equal(t, i+1, contender.Score.Placement)
-			assert.Equal(t, i, contender.Score.RankOrder)
-			assert.True(t, contender.Score.Finalist)
-			assert.Equal(t, currentTime, contender.Score.Timestamp)
+		for i := range contenders {
+			require.NotNil(t, contenders[i].Score)
+			assert.Equal(t, (i+1)*10, contenders[i].Score.Score)
+			assert.Equal(t, i+1, contenders[i].Score.Placement)
+			assert.Equal(t, i, contenders[i].Score.RankOrder)
+			assert.True(t, contenders[i].Score.Finalist)
+			assert.Equal(t, currentTime, contenders[i].Score.Timestamp)
 		}
 
 		mockedAuthorizer.AssertExpectations(t)
@@ -786,7 +785,7 @@ func TestPatchContender(t *testing.T) {
 			ID:                  fakedContenderID,
 			Ownership:           fakedOwnership,
 			ContestID:           fakedContestID,
-			CompClassID:         0,
+			CompClassID:         domain.CompClassID(uuid.Nil),
 			RegistrationCode:    "ABCD1234",
 			Name:                "",
 			Entered:             time.Time{},
@@ -860,7 +859,7 @@ func TestPatchContender(t *testing.T) {
 			ID:                  fakedContenderID,
 			Ownership:           fakedOwnership,
 			ContestID:           fakedContestID,
-			CompClassID:         0,
+			CompClassID:         domain.CompClassID(uuid.Nil),
 			RegistrationCode:    "ABCD1234",
 			Name:                "",
 			Entered:             time.Time{},
@@ -923,7 +922,7 @@ func TestPatchContender(t *testing.T) {
 		}
 
 		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
-			CompClassID: domain.NewPatch(domain.CompClassID(0)),
+			CompClassID: domain.NewPatch(domain.CompClassID(uuid.Nil)),
 		})
 
 		assert.ErrorIs(t, err, domain.ErrNotAllowed)

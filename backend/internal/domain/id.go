@@ -2,7 +2,7 @@ package domain
 
 import "github.com/google/uuid"
 
-type ResourceID int32
+type ResourceID = uuid.UUID
 
 type CompClassID ResourceID
 type ContenderID ResourceID

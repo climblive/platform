@@ -7,10 +7,11 @@ import (
 	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
+	"github.com/google/uuid"
 )
 
 func (d *Database) GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error) {
-	record, err := d.WithTx(tx).GetCompClass(ctx, int32(compClassID))
+	record, err := d.WithTx(tx).GetCompClass(ctx, uuid.UUID(compClassID))
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		return domain.CompClass{}, errors.Wrap(domain.ErrNotFound, 0)
@@ -22,7 +23,7 @@ func (d *Database) GetCompClass(ctx context.Context, tx domain.Transaction, comp
 }
 
 func (d *Database) GetCompClassesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.CompClass, error) {
-	records, err := d.WithTx(tx).GetCompClassesByContest(ctx, int32(contestID))
+	records, err := d.WithTx(tx).GetCompClassesByContest(ctx, uuid.UUID(contestID))
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -37,30 +38,30 @@ func (d *Database) GetCompClassesByContest(ctx context.Context, tx domain.Transa
 }
 
 func (d *Database) StoreCompClass(ctx context.Context, tx domain.Transaction, compClass domain.CompClass) (domain.CompClass, error) {
+	if uuid.UUID(compClass.ID) == uuid.Nil {
+		compClass.ID = domain.CompClassID(uuid.New())
+	}
+
 	params := database.UpsertCompClassParams{
-		ID:          int32(compClass.ID),
-		OrganizerID: int32(compClass.Ownership.OrganizerID),
-		ContestID:   int32(compClass.ContestID),
+		ID:          uuid.UUID(compClass.ID),
+		OrganizerID: uuid.UUID(compClass.Ownership.OrganizerID),
+		ContestID:   uuid.UUID(compClass.ContestID),
 		Name:        compClass.Name,
 		Description: makeNullString(compClass.Description),
 		TimeBegin:   compClass.TimeBegin,
 		TimeEnd:     compClass.TimeEnd,
 	}
 
-	insertID, err := d.WithTx(tx).UpsertCompClass(ctx, params)
+	_, err := d.WithTx(tx).UpsertCompClass(ctx, params)
 	if err != nil {
 		return domain.CompClass{}, errors.Wrap(err, 0)
-	}
-
-	if insertID != 0 {
-		compClass.ID = domain.CompClassID(insertID)
 	}
 
 	return compClass, err
 }
 
 func (d *Database) DeleteCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) error {
-	err := d.WithTx(tx).DeleteCompClass(ctx, int32(compClassID))
+	err := d.WithTx(tx).DeleteCompClass(ctx, uuid.UUID(compClassID))
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}

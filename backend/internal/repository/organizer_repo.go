@@ -7,26 +7,29 @@ import (
 	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
+	"github.com/google/uuid"
 )
 
 func (d *Database) StoreOrganizer(ctx context.Context, tx domain.Transaction, organizer domain.Organizer) (domain.Organizer, error) {
+	if uuid.UUID(organizer.ID) == uuid.Nil {
+		organizer.ID = domain.OrganizerID(uuid.New())
+	}
+
 	params := database.UpsertOrganizerParams{
-		ID:   int32(organizer.ID),
+		ID:   uuid.UUID(organizer.ID),
 		Name: organizer.Name,
 	}
 
-	insertID, err := d.WithTx(tx).UpsertOrganizer(ctx, params)
+	_, err := d.WithTx(tx).UpsertOrganizer(ctx, params)
 	if err != nil {
 		return domain.Organizer{}, errors.Wrap(err, 0)
 	}
-
-	organizer.ID = domain.OrganizerID(insertID)
 
 	return organizer, nil
 }
 
 func (d *Database) GetOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) (domain.Organizer, error) {
-	record, err := d.WithTx(tx).GetOrganizer(ctx, int32(organizerID))
+	record, err := d.WithTx(tx).GetOrganizer(ctx, uuid.UUID(organizerID))
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		return domain.Organizer{}, errors.Wrap(domain.ErrNotFound, 0)
@@ -56,7 +59,7 @@ func (d *Database) GetAllOrganizers(ctx context.Context, tx domain.Transaction) 
 }
 
 func (d *Database) GetOrganizerInvitesByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.OrganizerInvite, error) {
-	records, err := d.WithTx(tx).GetOrganizerInvitesByOrganizer(ctx, int32(organizerID))
+	records, err := d.WithTx(tx).GetOrganizerInvitesByOrganizer(ctx, uuid.UUID(organizerID))
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -85,7 +88,7 @@ func (d *Database) GetOrganizerInvite(ctx context.Context, tx domain.Transaction
 func (d *Database) StoreOrganizerInvite(ctx context.Context, tx domain.Transaction, invite domain.OrganizerInvite) error {
 	params := database.InsertOrganizerInviteParams{
 		ID:          invite.ID.String(),
-		OrganizerID: int32(invite.OrganizerID),
+		OrganizerID: uuid.UUID(invite.OrganizerID),
 		ExpiresAt:   invite.ExpiresAt,
 	}
 

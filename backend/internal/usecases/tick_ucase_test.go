@@ -7,6 +7,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/usecases"
+"github.com/google/uuid"
 	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -373,7 +374,8 @@ func TestCreateTick(t *testing.T) {
 		mockedRepo, mockedEventBroker := makeMocks(time.Now(), time.Now())
 		mockedAuthorizer := new(authorizerMock)
 
-		fakedOtherProblemID := fakedProblemID + 1
+		fakedOtherProblemID := domain.ProblemID(uuid.New())
+		fakedOtherContestID := domain.ContestID(uuid.New())
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
@@ -383,7 +385,7 @@ func TestCreateTick(t *testing.T) {
 			On("GetProblem", mock.Anything, mock.Anything, fakedOtherProblemID).
 			Return(domain.Problem{
 				ID:        fakedOtherProblemID,
-				ContestID: fakedContestID + 1,
+				ContestID: fakedOtherContestID,
 			}, nil)
 
 		ucase := usecases.TickUseCase{

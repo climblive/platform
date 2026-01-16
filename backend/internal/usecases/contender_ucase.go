@@ -7,6 +7,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
+	"github.com/google/uuid"
 )
 
 type contenderUseCaseRepository interface {
@@ -126,7 +127,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 		return mty, errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
 	}
 
-	if contender.CompClassID != 0 {
+	if uuid.UUID(contender.CompClassID) != uuid.Nil {
 		compClass, err := uc.Repo.GetCompClass(ctx, nil, contender.CompClassID)
 		if err != nil {
 			return mty, errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
@@ -142,7 +143,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 	}
 
 	if patch.CompClassID.Present && contender.CompClassID != patch.CompClassID.Value {
-		if patch.CompClassID.Value == 0 {
+		if uuid.UUID(patch.CompClassID.Value) == uuid.Nil {
 			return mty, errors.Wrap(domain.ErrNotAllowed, 0)
 		}
 
@@ -151,7 +152,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 			return mty, errors.Wrap(err, 0)
 		}
 
-		if contender.CompClassID == 0 {
+		if uuid.UUID(contender.CompClassID) == uuid.Nil {
 			events = append(events, domain.ContenderEnteredEvent{
 				ContenderID: contenderID,
 				CompClassID: patch.CompClassID.Value,
@@ -179,7 +180,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 		}
 	}
 
-	if contender.CompClassID == 0 {
+	if uuid.UUID(contender.CompClassID) == uuid.Nil {
 		return mty, errors.New(domain.ErrNotRegistered)
 	}
 

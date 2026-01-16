@@ -7,10 +7,11 @@ import (
 	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
+	"github.com/google/uuid"
 )
 
 func (d *Database) GetRafflesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Raffle, error) {
-	records, err := d.WithTx(tx).GetRafflesByContest(ctx, int32(contestID))
+	records, err := d.WithTx(tx).GetRafflesByContest(ctx, uuid.UUID(contestID))
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -25,7 +26,7 @@ func (d *Database) GetRafflesByContest(ctx context.Context, tx domain.Transactio
 }
 
 func (d *Database) GetRaffle(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) (domain.Raffle, error) {
-	record, err := d.WithTx(tx).GetRaffle(ctx, int32(raffleID))
+	record, err := d.WithTx(tx).GetRaffle(ctx, uuid.UUID(raffleID))
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		return domain.Raffle{}, errors.Wrap(domain.ErrNotFound, 0)
@@ -37,26 +38,26 @@ func (d *Database) GetRaffle(ctx context.Context, tx domain.Transaction, raffleI
 }
 
 func (d *Database) StoreRaffle(ctx context.Context, tx domain.Transaction, raffle domain.Raffle) (domain.Raffle, error) {
-	params := database.UpsertRaffleParams{
-		ID:          int32(raffle.ID),
-		ContestID:   int32(raffle.ContestID),
-		OrganizerID: int32(raffle.Ownership.OrganizerID),
+	if uuid.UUID(raffle.ID) == uuid.Nil {
+		raffle.ID = domain.RaffleID(uuid.New())
 	}
 
-	insertID, err := d.WithTx(tx).UpsertRaffle(ctx, params)
+	params := database.UpsertRaffleParams{
+		ID:          uuid.UUID(raffle.ID),
+		ContestID:   uuid.UUID(raffle.ContestID),
+		OrganizerID: uuid.UUID(raffle.Ownership.OrganizerID),
+	}
+
+	_, err := d.WithTx(tx).UpsertRaffle(ctx, params)
 	if err != nil {
 		return domain.Raffle{}, errors.Wrap(err, 0)
-	}
-
-	if insertID != 0 {
-		raffle.ID = domain.RaffleID(insertID)
 	}
 
 	return raffle, err
 }
 
 func (d *Database) GetRaffleWinners(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) ([]domain.RaffleWinner, error) {
-	records, err := d.WithTx(tx).GetRaffleWinners(ctx, int32(raffleID))
+	records, err := d.WithTx(tx).GetRaffleWinners(ctx, uuid.UUID(raffleID))
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -71,28 +72,28 @@ func (d *Database) GetRaffleWinners(ctx context.Context, tx domain.Transaction, 
 }
 
 func (d *Database) StoreRaffleWinner(ctx context.Context, tx domain.Transaction, winner domain.RaffleWinner) (domain.RaffleWinner, error) {
+	if uuid.UUID(winner.ID) == uuid.Nil {
+		winner.ID = domain.RaffleWinnerID(uuid.New())
+	}
+
 	params := database.UpsertRaffleWinnerParams{
-		ID:          int32(winner.ID),
-		RaffleID:    int32(winner.RaffleID),
-		OrganizerID: int32(winner.Ownership.OrganizerID),
-		ContenderID: int32(winner.ContenderID),
+		ID:          uuid.UUID(winner.ID),
+		RaffleID:    uuid.UUID(winner.RaffleID),
+		OrganizerID: uuid.UUID(winner.Ownership.OrganizerID),
+		ContenderID: uuid.UUID(winner.ContenderID),
 		Timestamp:   winner.Timestamp,
 	}
 
-	insertID, err := d.WithTx(tx).UpsertRaffleWinner(ctx, params)
+	_, err := d.WithTx(tx).UpsertRaffleWinner(ctx, params)
 	if err != nil {
 		return domain.RaffleWinner{}, errors.Wrap(err, 0)
-	}
-
-	if insertID != 0 {
-		winner.ID = domain.RaffleWinnerID(insertID)
 	}
 
 	return winner, nil
 }
 
 func (d *Database) DeleteRaffle(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) error {
-	err := d.WithTx(tx).DeleteRaffle(ctx, int32(raffleID))
+	err := d.WithTx(tx).DeleteRaffle(ctx, uuid.UUID(raffleID))
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
@@ -101,7 +102,7 @@ func (d *Database) DeleteRaffle(ctx context.Context, tx domain.Transaction, raff
 }
 
 func (d *Database) DeleteRaffleWinner(ctx context.Context, tx domain.Transaction, raffleWinnerID domain.RaffleWinnerID) error {
-	err := d.WithTx(tx).DeleteRaffleWinner(ctx, int32(raffleWinnerID))
+	err := d.WithTx(tx).DeleteRaffleWinner(ctx, uuid.UUID(raffleWinnerID))
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}

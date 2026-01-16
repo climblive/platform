@@ -209,9 +209,9 @@ WHERE id = ?;
 
 -- name: InsertTick :execlastid
 INSERT INTO
-    tick (organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
+    tick (id, organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
 VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 -- name: UpsertOrganizer :execlastid
 INSERT INTO

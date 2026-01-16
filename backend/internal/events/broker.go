@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/google/uuid"
 )
 
 type broker struct {
@@ -123,6 +124,6 @@ func extractContenderID(event any) domain.ContenderID {
 	case domain.ContenderScoreUpdatedEvent:
 		return ev.ContenderID
 	default:
-		return 0
+		return domain.ContenderID(uuid.Nil)
 	}
 }

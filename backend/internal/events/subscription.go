@@ -123,13 +123,13 @@ func (s *Subscription) Post(event domain.EventEnvelope) error {
 
 func (s *Subscription) FilterMatch(contestID domain.ContestID, contenderID domain.ContenderID, eventType string) bool {
 	switch s.filter.ContestID {
-	case 0, contestID:
+	case domain.ContestID(uuid.Nil), contestID:
 	default:
 		return false
 	}
 
 	switch s.filter.ContenderID {
-	case 0, contenderID:
+	case domain.ContenderID(uuid.Nil), contenderID:
 	default:
 		return false
 	}

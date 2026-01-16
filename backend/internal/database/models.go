@@ -7,12 +7,14 @@ package database
 import (
 	"database/sql"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type CompClass struct {
-	ID          int32
-	OrganizerID int32
-	ContestID   int32
+	ID          uuid.UUID
+	OrganizerID uuid.UUID
+	ContestID   uuid.UUID
 	Name        string
 	Description sql.NullString
 	Color       sql.NullString
@@ -21,22 +23,22 @@ type CompClass struct {
 }
 
 type Contender struct {
-	ID                  int32
-	OrganizerID         int32
-	ContestID           int32
+	ID                  uuid.UUID
+	OrganizerID         uuid.UUID
+	ContestID           uuid.UUID
 	RegistrationCode    string
 	Name                sql.NullString
-	ClassID             sql.NullInt32
+	ClassID             uuid.NullUUID
 	Entered             sql.NullTime
 	Disqualified        bool
 	WithdrawnFromFinals bool
 }
 
 type Contest struct {
-	ID                 int32
-	OrganizerID        int32
+	ID                 uuid.UUID
+	OrganizerID        uuid.UUID
 	Archived           bool
-	SeriesID           sql.NullInt32
+	SeriesID           uuid.NullUUID
 	Name               string
 	Description        sql.NullString
 	Location           sql.NullString
@@ -48,20 +50,20 @@ type Contest struct {
 }
 
 type Organizer struct {
-	ID   int32
+	ID   uuid.UUID
 	Name string
 }
 
 type OrganizerInvite struct {
 	ID          string
-	OrganizerID int32
+	OrganizerID uuid.UUID
 	ExpiresAt   time.Time
 }
 
 type Problem struct {
-	ID                 int32
-	OrganizerID        int32
-	ContestID          int32
+	ID                 uuid.UUID
+	OrganizerID        uuid.UUID
+	ContestID          uuid.UUID
 	Number             int32
 	HoldColorPrimary   string
 	HoldColorSecondary sql.NullString
@@ -75,21 +77,21 @@ type Problem struct {
 }
 
 type Raffle struct {
-	ID          int32
-	OrganizerID int32
-	ContestID   int32
+	ID          uuid.UUID
+	OrganizerID uuid.UUID
+	ContestID   uuid.UUID
 }
 
 type RaffleWinner struct {
-	ID          int32
-	OrganizerID int32
-	RaffleID    int32
-	ContenderID int32
+	ID          uuid.UUID
+	OrganizerID uuid.UUID
+	RaffleID    uuid.UUID
+	ContenderID uuid.UUID
 	Timestamp   time.Time
 }
 
 type Score struct {
-	ContenderID int32
+	ContenderID uuid.UUID
 	Timestamp   time.Time
 	Score       int32
 	Placement   int32
@@ -98,17 +100,17 @@ type Score struct {
 }
 
 type Series struct {
-	ID          int32
-	OrganizerID int32
+	ID          uuid.UUID
+	OrganizerID uuid.UUID
 	Name        string
 }
 
 type Tick struct {
-	ID            int32
-	OrganizerID   int32
-	ContestID     int32
-	ContenderID   int32
-	ProblemID     int32
+	ID            uuid.UUID
+	OrganizerID   uuid.UUID
+	ContestID     uuid.UUID
+	ContenderID   uuid.UUID
+	ProblemID     uuid.UUID
 	Timestamp     time.Time
 	Zone1         bool
 	AttemptsZone1 int32
@@ -119,12 +121,12 @@ type Tick struct {
 }
 
 type User struct {
-	ID       int32
+	ID       uuid.UUID
 	Username string
 	Admin    bool
 }
 
 type UserOrganizer struct {
-	UserID      int32
-	OrganizerID int32
+	UserID      uuid.UUID
+	OrganizerID uuid.UUID
 }
