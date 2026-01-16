@@ -1088,7 +1088,6 @@ func TestPatchContest(t *testing.T) {
 			Return(domain.Contest{
 				ID:        fakedContestID,
 				Ownership: fakedOwnership,
-				Country:   "SE",
 			}, nil)
 
 		mockedRepo.
