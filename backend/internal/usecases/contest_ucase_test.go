@@ -1149,6 +1149,7 @@ func TestPatchContest(t *testing.T) {
 
 		require.NoError(t, err)
 		assert.Equal(t, "The garage", contest.Location)
+		assert.Equal(t, "SE", contest.Country)
 		assert.Equal(t, domain.SeriesID(1), contest.SeriesID)
 		assert.Equal(t, "Swedish Championships", contest.Name)
 		assert.Equal(t, "Who is the best climber in Sweden?", contest.Description)
