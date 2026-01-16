@@ -11,8 +11,7 @@ const REGIONAL_INDICATOR_OFFSET = 127397;
 
 const countryMap = new Map(countries.map((c) => [c.code, c.name]));
 
-export function getFlag(countryCode: string | undefined): string {
-  if (!countryCode || countryCode.length !== 2) return "";
+export function getFlag(countryCode: string): string {
   const codePoints = countryCode
     .toUpperCase()
     .split("")
