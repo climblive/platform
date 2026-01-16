@@ -1,4 +1,4 @@
-import countriesData from "../../../../../countries.json";
+import countriesData from "../countries.json";
 
 export interface Country {
   code: string; // ISO 3166-1 alpha-2 code
