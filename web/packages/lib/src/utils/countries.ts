@@ -17,6 +17,7 @@ export function getFlag(countryCode: string | undefined): string {
     .toUpperCase()
     .split("")
     .map((char) => REGIONAL_INDICATOR_OFFSET + char.charCodeAt(0));
+    
   return String.fromCodePoint(...codePoints);
 }
 
