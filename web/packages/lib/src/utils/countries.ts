@@ -16,11 +16,10 @@ export function getFlag(countryCode: string): string {
     .toUpperCase()
     .split("")
     .map((char) => REGIONAL_INDICATOR_OFFSET + char.charCodeAt(0));
-    
+
   return String.fromCodePoint(...codePoints);
 }
 
 export function getCountryName(countryCode: string): string {
   return countryMap.get(countryCode) || "";
 }
-

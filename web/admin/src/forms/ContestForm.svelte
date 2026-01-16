@@ -19,6 +19,7 @@
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
+  import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
   import { GenericForm, name, value } from "@climblive/lib/forms";
   import type { Contest } from "@climblive/lib/models";
@@ -39,8 +40,11 @@
   let selectedCountry = $derived(data.country || "AQ");
 
   const handleCountryChange = (event: Event) => {
-    const target = event.target as WaElement;
-    selectedCountry = target.value;
+    const target = event.target as WaSelect;
+
+    if (typeof target.value === "string") {
+      selectedCountry = target.value;
+    }
   };
 </script>
 
@@ -72,7 +76,7 @@
     <wa-select
       size="small"
       {@attach name("country")}
-      {@attach value(selectedCountry )}
+      {@attach value(selectedCountry)}
       label="Country"
       onchange={handleCountryChange}
     >
