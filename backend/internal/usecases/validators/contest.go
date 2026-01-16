@@ -25,7 +25,7 @@ var validCountryCodes map[string]bool
 func init() {
 	var countries []countryData
 	if err := json.Unmarshal(countriesJSON, &countries); err != nil {
-		panic("failed to load countries.json: " + err.Error())
+		panic(err)
 	}
 
 	validCountryCodes = make(map[string]bool, len(countries))
