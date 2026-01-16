@@ -20,8 +20,7 @@ export function getFlag(countryCode: string | undefined): string {
   return String.fromCodePoint(...codePoints);
 }
 
-export function getCountryName(countryCode: string | undefined): string {
-  if (!countryCode) return "";
+export function getCountryName(countryCode: string): string {
   return countryMap.get(countryCode) || "";
 }
 
