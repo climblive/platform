@@ -1136,6 +1136,7 @@ func TestPatchContest(t *testing.T) {
 
 		patch := domain.ContestPatch{
 			Location:           domain.NewPatch("The garage"),
+			Country:           domain.NewPatch("SE"),
 			SeriesID:           domain.NewPatch(domain.SeriesID(1)),
 			Name:               domain.NewPatch("Swedish Championships"),
 			Description:        domain.NewPatch("Who is the best climber in Sweden?"),
