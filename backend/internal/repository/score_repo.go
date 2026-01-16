@@ -6,11 +6,12 @@ import (
 	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
+	"github.com/google/uuid"
 )
 
 func (d *Database) StoreScore(ctx context.Context, tx domain.Transaction, score domain.Score) error {
 	params := database.UpsertScoreParams{
-		ContenderID: int32(score.ContenderID),
+		ContenderID: uuid.UUID(score.ContenderID),
 		Timestamp:   score.Timestamp,
 		Score:       int32(score.Score),
 		Placement:   int32(score.Placement),

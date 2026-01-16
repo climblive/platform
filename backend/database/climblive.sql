@@ -15,7 +15,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- Table `organizer`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `organizer` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `id` BINARY(16) NOT NULL,
   `name` VARCHAR(32) NOT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB
@@ -27,8 +27,8 @@ COLLATE = utf8mb4_unicode_ci;
 -- Table `series`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `series` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `organizer_id` INT NOT NULL,
+  `id` BINARY(16) NOT NULL,
+  `organizer_id` BINARY(16) NOT NULL,
   `name` VARCHAR(64) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_series_1`
@@ -49,10 +49,10 @@ CREATE INDEX `index3` ON `series` (`id` ASC, `organizer_id` ASC);
 -- Table `contest`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `contest` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `organizer_id` INT NOT NULL,
+  `id` BINARY(16) NOT NULL,
+  `organizer_id` BINARY(16) NOT NULL,
   `archived` TINYINT(1) NOT NULL DEFAULT 0,
-  `series_id` INT NULL,
+  `series_id` BINARY(16) NULL,
   `name` VARCHAR(64) NOT NULL,
   `description` TEXT NULL,
   `location` VARCHAR(1024) NULL DEFAULT NULL,
@@ -87,9 +87,9 @@ CREATE INDEX `index5` ON `contest` (`id` ASC, `organizer_id` ASC);
 -- Table `comp_class`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `comp_class` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `organizer_id` INT NOT NULL,
-  `contest_id` INT NOT NULL,
+  `id` BINARY(16) NOT NULL,
+  `organizer_id` BINARY(16) NOT NULL,
+  `contest_id` BINARY(16) NOT NULL,
   `name` VARCHAR(45) NOT NULL,
   `description` VARCHAR(255) NULL,
   `color` VARCHAR(7) NULL,
@@ -114,12 +114,12 @@ CREATE INDEX `fk_comp_class_1_idx` ON `comp_class` (`contest_id` ASC, `organizer
 -- Table `contender`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `contender` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `organizer_id` INT NOT NULL,
-  `contest_id` INT NOT NULL,
+  `id` BINARY(16) NOT NULL,
+  `organizer_id` BINARY(16) NOT NULL,
+  `contest_id` BINARY(16) NOT NULL,
   `registration_code` VARCHAR(16) NOT NULL,
   `name` VARCHAR(64) NULL,
-  `class_id` INT NULL,
+  `class_id` BINARY(16) NULL,
   `entered` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   `disqualified` TINYINT(1) NOT NULL DEFAULT 0,
   `withdrawn_from_finals` TINYINT(1) NOT NULL DEFAULT 0,
@@ -151,9 +151,9 @@ CREATE INDEX `index5` ON `contender` (`id` ASC, `organizer_id` ASC, `contest_id`
 -- Table `problem`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `problem` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `organizer_id` INT NOT NULL,
-  `contest_id` INT NOT NULL,
+  `id` BINARY(16) NOT NULL,
+  `organizer_id` BINARY(16) NOT NULL,
+  `contest_id` BINARY(16) NOT NULL,
   `number` INT NOT NULL,
   `hold_color_primary` VARCHAR(7) NOT NULL,
   `hold_color_secondary` VARCHAR(7) NULL DEFAULT NULL,
@@ -185,11 +185,11 @@ CREATE INDEX `index5` ON `problem` (`id` ASC, `organizer_id` ASC, `contest_id` A
 -- Table `tick`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `tick` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `organizer_id` INT NOT NULL,
-  `contest_id` INT NOT NULL,
-  `contender_id` INT NOT NULL,
-  `problem_id` INT NOT NULL,
+  `id` BINARY(16) NOT NULL,
+  `organizer_id` BINARY(16) NOT NULL,
+  `contest_id` BINARY(16) NOT NULL,
+  `contender_id` BINARY(16) NOT NULL,
+  `problem_id` BINARY(16) NOT NULL,
   `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `zone_1` TINYINT(1) NOT NULL DEFAULT 0,
   `attempts_zone_1` INT NOT NULL DEFAULT 0,
@@ -223,7 +223,7 @@ CREATE UNIQUE INDEX `index4` ON `tick` (`contender_id` ASC, `problem_id` ASC);
 -- Table `user`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `user` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `id` BINARY(16) NOT NULL,
   `username` VARCHAR(64) NOT NULL,
   `admin` TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`))
@@ -238,8 +238,8 @@ CREATE UNIQUE INDEX `username_UNIQUE` ON `user` (`username` ASC);
 -- Table `user_organizer`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `user_organizer` (
-  `user_id` INT NOT NULL,
-  `organizer_id` INT NOT NULL,
+  `user_id` BINARY(16) NOT NULL,
+  `organizer_id` BINARY(16) NOT NULL,
   PRIMARY KEY (`user_id`, `organizer_id`),
   CONSTRAINT `fk_user_organizer_1`
     FOREIGN KEY (`user_id`)
@@ -262,9 +262,9 @@ CREATE INDEX `fk_user_organizer_2_idx` ON `user_organizer` (`organizer_id` ASC);
 -- Table `raffle`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `raffle` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `organizer_id` INT NOT NULL,
-  `contest_id` INT NOT NULL,
+  `id` BINARY(16) NOT NULL,
+  `organizer_id` BINARY(16) NOT NULL,
+  `contest_id` BINARY(16) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_raffle_1`
     FOREIGN KEY (`contest_id` , `organizer_id`)
@@ -284,10 +284,10 @@ CREATE INDEX `index3` ON `raffle` (`id` ASC, `organizer_id` ASC);
 -- Table `raffle_winner`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `raffle_winner` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `organizer_id` INT NOT NULL,
-  `raffle_id` INT NOT NULL,
-  `contender_id` INT NOT NULL,
+  `id` BINARY(16) NOT NULL,
+  `organizer_id` BINARY(16) NOT NULL,
+  `raffle_id` BINARY(16) NOT NULL,
+  `contender_id` BINARY(16) NOT NULL,
   `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_raffle_winner_1`
@@ -315,7 +315,7 @@ CREATE UNIQUE INDEX `index4` ON `raffle_winner` (`raffle_id` ASC, `contender_id`
 -- Table `score`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `score` (
-  `contender_id` INT NOT NULL,
+  `contender_id` BINARY(16) NOT NULL,
   `timestamp` TIMESTAMP NOT NULL,
   `score` INT NOT NULL,
   `placement` INT NOT NULL,
@@ -337,7 +337,7 @@ COLLATE = utf8mb4_unicode_ci;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `organizer_invite` (
   `id` VARCHAR(36) NOT NULL,
-  `organizer_id` INT NOT NULL,
+  `organizer_id` BINARY(16) NOT NULL,
   `expires_at` TIMESTAMP NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_organizer_invite_1`

@@ -6,29 +6,32 @@ import (
 	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
+	"github.com/google/uuid"
 )
 
 func (d *Database) StoreUser(ctx context.Context, tx domain.Transaction, user domain.User) (domain.User, error) {
+	if uuid.UUID(user.ID) == uuid.Nil {
+		user.ID = domain.UserID(uuid.New())
+	}
+
 	params := database.UpsertUserParams{
-		ID:       int32(user.ID),
+		ID:       uuid.UUID(user.ID),
 		Username: user.Username,
 		Admin:    user.Admin,
 	}
 
-	insertID, err := d.WithTx(tx).UpsertUser(ctx, params)
+	_, err := d.WithTx(tx).UpsertUser(ctx, params)
 	if err != nil {
 		return domain.User{}, errors.Wrap(err, 0)
 	}
-
-	user.ID = domain.UserID(insertID)
 
 	return user, nil
 }
 
 func (d *Database) AddUserToOrganizer(ctx context.Context, tx domain.Transaction, userID domain.UserID, organizerID domain.OrganizerID) error {
 	params := database.AddUserToOrganizerParams{
-		UserID:      int32(userID),
-		OrganizerID: int32(organizerID),
+		UserID:      uuid.UUID(userID),
+		OrganizerID: uuid.UUID(organizerID),
 	}
 
 	err := d.WithTx(tx).AddUserToOrganizer(ctx, params)
@@ -64,7 +67,7 @@ func (d *Database) GetUserByUsername(ctx context.Context, tx domain.Transaction,
 }
 
 func (d *Database) GetUsersByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.User, error) {
-	records, err := d.WithTx(tx).GetUsersByOrganizer(ctx, int32(organizerID))
+	records, err := d.WithTx(tx).GetUsersByOrganizer(ctx, uuid.UUID(organizerID))
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}

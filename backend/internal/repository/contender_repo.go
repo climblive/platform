@@ -7,10 +7,11 @@ import (
 	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
+	"github.com/google/uuid"
 )
 
 func (d *Database) GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error) {
-	record, err := d.WithTx(tx).GetContender(ctx, int32(contenderID))
+	record, err := d.WithTx(tx).GetContender(ctx, uuid.UUID(contenderID))
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		return domain.Contender{}, errors.Wrap(domain.ErrNotFound, 0)
@@ -38,7 +39,7 @@ func (d *Database) GetContenderByCode(ctx context.Context, tx domain.Transaction
 }
 
 func (d *Database) GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) ([]domain.Contender, error) {
-	records, err := d.WithTx(tx).GetContendersByCompClass(ctx, sql.NullInt32{Valid: true, Int32: int32(compClassID)})
+	records, err := d.WithTx(tx).GetContendersByCompClass(ctx, uuid.NullUUID{Valid: true, UUID: uuid.UUID(compClassID)})
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -55,7 +56,7 @@ func (d *Database) GetContendersByCompClass(ctx context.Context, tx domain.Trans
 }
 
 func (d *Database) GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error) {
-	records, err := d.WithTx(tx).GetContendersByContest(ctx, int32(contestID))
+	records, err := d.WithTx(tx).GetContendersByContest(ctx, uuid.UUID(contestID))
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -72,32 +73,32 @@ func (d *Database) GetContendersByContest(ctx context.Context, tx domain.Transac
 }
 
 func (d *Database) StoreContender(ctx context.Context, tx domain.Transaction, contender domain.Contender) (domain.Contender, error) {
+	if uuid.UUID(contender.ID) == uuid.Nil {
+		contender.ID = domain.ContenderID(uuid.New())
+	}
+
 	params := database.UpsertContenderParams{
-		ID:                  int32(contender.ID),
-		OrganizerID:         int32(contender.Ownership.OrganizerID),
-		ContestID:           int32(contender.ContestID),
+		ID:                  uuid.UUID(contender.ID),
+		OrganizerID:         uuid.UUID(contender.Ownership.OrganizerID),
+		ContestID:           uuid.UUID(contender.ContestID),
 		RegistrationCode:    contender.RegistrationCode,
 		Name:                makeNullString(contender.Name),
-		ClassID:             makeNullInt32(int32(contender.CompClassID)),
+		ClassID:             makeNullUUID(uuid.UUID(contender.CompClassID)),
 		Entered:             makeNullTime(contender.Entered),
 		Disqualified:        contender.Disqualified,
 		WithdrawnFromFinals: contender.WithdrawnFromFinals,
 	}
 
-	insertID, err := d.WithTx(tx).UpsertContender(ctx, params)
+	_, err := d.WithTx(tx).UpsertContender(ctx, params)
 	if err != nil {
 		return domain.Contender{}, errors.Wrap(err, 0)
-	}
-
-	if insertID != 0 {
-		contender.ID = domain.ContenderID(insertID)
 	}
 
 	return contender, err
 }
 
 func (d *Database) DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) error {
-	err := d.WithTx(tx).DeleteContender(ctx, int32(contenderID))
+	err := d.WithTx(tx).DeleteContender(ctx, uuid.UUID(contenderID))
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
@@ -106,7 +107,7 @@ func (d *Database) DeleteContender(ctx context.Context, tx domain.Transaction, c
 }
 
 func (d *Database) GetNumberOfContenders(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (int, error) {
-	count, err := d.WithTx(tx).CountContenders(ctx, int32(contestID))
+	count, err := d.WithTx(tx).CountContenders(ctx, uuid.UUID(contestID))
 	if err != nil {
 		return 0, errors.Wrap(err, 0)
 	}

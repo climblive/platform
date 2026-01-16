@@ -3,14 +3,15 @@ package repository
 import (
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-sql-driver/mysql"
+	"github.com/google/uuid"
 )
 
-func nillableIntToResourceID[T domain.ResourceIDType](value *int32) *T {
-	if value == nil {
+func nillableUUIDToResourceID[T domain.ResourceIDType](value uuid.UUID) *T {
+	if value == uuid.Nil {
 		return nil
 	}
 
-	out := T(*value)
+	out := T(value)
 	return &out
 }
 

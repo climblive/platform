@@ -8,10 +8,11 @@ import (
 	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
+	"github.com/google/uuid"
 )
 
 func (d *Database) GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error) {
-	record, err := d.WithTx(tx).GetContest(ctx, int32(contestID))
+	record, err := d.WithTx(tx).GetContest(ctx, uuid.UUID(contestID))
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		return domain.Contest{}, errors.Wrap(domain.ErrNotFound, 0)
@@ -62,7 +63,7 @@ func (d *Database) GetAllContests(ctx context.Context, tx domain.Transaction) ([
 }
 
 func (d *Database) GetContestsByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.Contest, error) {
-	records, err := d.WithTx(tx).GetContestsByOrganizer(ctx, int32(organizerID))
+	records, err := d.WithTx(tx).GetContestsByOrganizer(ctx, uuid.UUID(organizerID))
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -128,11 +129,15 @@ func (d *Database) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context,
 }
 
 func (d *Database) StoreContest(ctx context.Context, tx domain.Transaction, contest domain.Contest) (domain.Contest, error) {
+	if uuid.UUID(contest.ID) == uuid.Nil {
+		contest.ID = domain.ContestID(uuid.New())
+	}
+
 	params := database.UpsertContestParams{
-		ID:                 int32(contest.ID),
-		OrganizerID:        int32(contest.Ownership.OrganizerID),
+		ID:                 uuid.UUID(contest.ID),
+		OrganizerID:        uuid.UUID(contest.Ownership.OrganizerID),
 		Archived:           contest.Archived,
-		SeriesID:           makeNullInt32(int32(contest.SeriesID)),
+		SeriesID:           makeNullUUID(uuid.UUID(contest.SeriesID)),
 		Name:               contest.Name,
 		Description:        makeNullString(contest.Description),
 		Location:           makeNullString(contest.Location),
@@ -143,20 +148,16 @@ func (d *Database) StoreContest(ctx context.Context, tx domain.Transaction, cont
 		Created:            contest.Created,
 	}
 
-	insertID, err := d.WithTx(tx).UpsertContest(ctx, params)
+	_, err := d.WithTx(tx).UpsertContest(ctx, params)
 	if err != nil {
 		return domain.Contest{}, errors.Wrap(err, 0)
-	}
-
-	if insertID != 0 {
-		contest.ID = domain.ContestID(insertID)
 	}
 
 	return contest, err
 }
 
 func (d *Database) DeleteContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) error {
-	err := d.WithTx(tx).DeleteContest(ctx, int32(contestID))
+	err := d.WithTx(tx).DeleteContest(ctx, uuid.UUID(contestID))
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}

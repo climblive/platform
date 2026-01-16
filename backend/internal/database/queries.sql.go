@@ -9,6 +9,8 @@ import (
 	"context"
 	"database/sql"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const addUserToOrganizer = `-- name: AddUserToOrganizer :exec
@@ -19,8 +21,8 @@ VALUES
 `
 
 type AddUserToOrganizerParams struct {
-	UserID      int32
-	OrganizerID int32
+	UserID      uuid.UUID
+	OrganizerID uuid.UUID
 }
 
 func (q *Queries) AddUserToOrganizer(ctx context.Context, arg AddUserToOrganizerParams) error {
@@ -34,7 +36,7 @@ FROM contender
 WHERE contest_id = ?
 `
 
-func (q *Queries) CountContenders(ctx context.Context, contestID int32) (int64, error) {
+func (q *Queries) CountContenders(ctx context.Context, contestID uuid.UUID) (int64, error) {
 	row := q.db.QueryRowContext(ctx, countContenders, contestID)
 	var count int64
 	err := row.Scan(&count)
@@ -46,7 +48,7 @@ DELETE FROM comp_class
 WHERE id = ?
 `
 
-func (q *Queries) DeleteCompClass(ctx context.Context, id int32) error {
+func (q *Queries) DeleteCompClass(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.ExecContext(ctx, deleteCompClass, id)
 	return err
 }
@@ -56,7 +58,7 @@ DELETE FROM contender
 WHERE id = ?
 `
 
-func (q *Queries) DeleteContender(ctx context.Context, id int32) error {
+func (q *Queries) DeleteContender(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.ExecContext(ctx, deleteContender, id)
 	return err
 }
@@ -66,7 +68,7 @@ DELETE FROM contest
 WHERE id = ?
 `
 
-func (q *Queries) DeleteContest(ctx context.Context, id int32) error {
+func (q *Queries) DeleteContest(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.ExecContext(ctx, deleteContest, id)
 	return err
 }
@@ -86,7 +88,7 @@ DELETE FROM problem
 WHERE id = ?
 `
 
-func (q *Queries) DeleteProblem(ctx context.Context, id int32) error {
+func (q *Queries) DeleteProblem(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.ExecContext(ctx, deleteProblem, id)
 	return err
 }
@@ -96,7 +98,7 @@ DELETE FROM raffle
 WHERE id = ?
 `
 
-func (q *Queries) DeleteRaffle(ctx context.Context, id int32) error {
+func (q *Queries) DeleteRaffle(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.ExecContext(ctx, deleteRaffle, id)
 	return err
 }
@@ -106,7 +108,7 @@ DELETE FROM raffle_winner
 WHERE id = ?
 `
 
-func (q *Queries) DeleteRaffleWinner(ctx context.Context, id int32) error {
+func (q *Queries) DeleteRaffleWinner(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.ExecContext(ctx, deleteRaffleWinner, id)
 	return err
 }
@@ -117,7 +119,7 @@ FROM tick
 WHERE id = ?
 `
 
-func (q *Queries) DeleteTick(ctx context.Context, id int32) error {
+func (q *Queries) DeleteTick(ctx context.Context, id uuid.UUID) error {
 	_, err := q.db.ExecContext(ctx, deleteTick, id)
 	return err
 }
@@ -214,7 +216,7 @@ type GetCompClassRow struct {
 	CompClass CompClass
 }
 
-func (q *Queries) GetCompClass(ctx context.Context, id int32) (GetCompClassRow, error) {
+func (q *Queries) GetCompClass(ctx context.Context, id uuid.UUID) (GetCompClassRow, error) {
 	row := q.db.QueryRowContext(ctx, getCompClass, id)
 	var i GetCompClassRow
 	err := row.Scan(
@@ -240,7 +242,7 @@ type GetCompClassesByContestRow struct {
 	CompClass CompClass
 }
 
-func (q *Queries) GetCompClassesByContest(ctx context.Context, contestID int32) ([]GetCompClassesByContestRow, error) {
+func (q *Queries) GetCompClassesByContest(ctx context.Context, contestID uuid.UUID) ([]GetCompClassesByContestRow, error) {
 	rows, err := q.db.QueryContext(ctx, getCompClassesByContest, contestID)
 	if err != nil {
 		return nil, err
@@ -281,7 +283,7 @@ WHERE id = ?
 
 type GetContenderRow struct {
 	Contender   Contender
-	ContenderID sql.NullInt32
+	ContenderID uuid.NullUUID
 	Timestamp   sql.NullTime
 	Score       sql.NullInt32
 	Placement   sql.NullInt32
@@ -289,7 +291,7 @@ type GetContenderRow struct {
 	RankOrder   sql.NullInt32
 }
 
-func (q *Queries) GetContender(ctx context.Context, id int32) (GetContenderRow, error) {
+func (q *Queries) GetContender(ctx context.Context, id uuid.UUID) (GetContenderRow, error) {
 	row := q.db.QueryRowContext(ctx, getContender, id)
 	var i GetContenderRow
 	err := row.Scan(
@@ -321,7 +323,7 @@ WHERE registration_code = ?
 
 type GetContenderByCodeRow struct {
 	Contender   Contender
-	ContenderID sql.NullInt32
+	ContenderID uuid.NullUUID
 	Timestamp   sql.NullTime
 	Score       sql.NullInt32
 	Placement   sql.NullInt32
@@ -361,7 +363,7 @@ WHERE class_id = ?
 
 type GetContendersByCompClassRow struct {
 	Contender   Contender
-	ContenderID sql.NullInt32
+	ContenderID uuid.NullUUID
 	Timestamp   sql.NullTime
 	Score       sql.NullInt32
 	Placement   sql.NullInt32
@@ -369,7 +371,7 @@ type GetContendersByCompClassRow struct {
 	RankOrder   sql.NullInt32
 }
 
-func (q *Queries) GetContendersByCompClass(ctx context.Context, classID sql.NullInt32) ([]GetContendersByCompClassRow, error) {
+func (q *Queries) GetContendersByCompClass(ctx context.Context, classID uuid.NullUUID) ([]GetContendersByCompClassRow, error) {
 	rows, err := q.db.QueryContext(ctx, getContendersByCompClass, classID)
 	if err != nil {
 		return nil, err
@@ -417,7 +419,7 @@ WHERE contest_id = ?
 
 type GetContendersByContestRow struct {
 	Contender   Contender
-	ContenderID sql.NullInt32
+	ContenderID uuid.NullUUID
 	Timestamp   sql.NullTime
 	Score       sql.NullInt32
 	Placement   sql.NullInt32
@@ -425,7 +427,7 @@ type GetContendersByContestRow struct {
 	RankOrder   sql.NullInt32
 }
 
-func (q *Queries) GetContendersByContest(ctx context.Context, contestID int32) ([]GetContendersByContestRow, error) {
+func (q *Queries) GetContendersByContest(ctx context.Context, contestID uuid.UUID) ([]GetContendersByContestRow, error) {
 	rows, err := q.db.QueryContext(ctx, getContendersByContest, contestID)
 	if err != nil {
 		return nil, err
@@ -480,7 +482,7 @@ type GetContestRow struct {
 	RegisteredContenders int64
 }
 
-func (q *Queries) GetContest(ctx context.Context, id int32) (GetContestRow, error) {
+func (q *Queries) GetContest(ctx context.Context, id uuid.UUID) (GetContestRow, error) {
 	row := q.db.QueryRowContext(ctx, getContest, id)
 	var i GetContestRow
 	err := row.Scan(
@@ -519,7 +521,7 @@ type GetContestsByOrganizerRow struct {
 	RegisteredContenders int64
 }
 
-func (q *Queries) GetContestsByOrganizer(ctx context.Context, organizerID int32) ([]GetContestsByOrganizerRow, error) {
+func (q *Queries) GetContestsByOrganizer(ctx context.Context, organizerID uuid.UUID) ([]GetContestsByOrganizerRow, error) {
 	rows, err := q.db.QueryContext(ctx, getContestsByOrganizer, organizerID)
 	if err != nil {
 		return nil, err
@@ -578,10 +580,10 @@ type GetContestsCurrentlyRunningOrByStartTimeParams struct {
 }
 
 type GetContestsCurrentlyRunningOrByStartTimeRow struct {
-	ID                 int32
-	OrganizerID        int32
+	ID                 uuid.UUID
+	OrganizerID        uuid.UUID
 	Archived           bool
-	SeriesID           sql.NullInt32
+	SeriesID           uuid.NullUUID
 	Name               string
 	Description        sql.NullString
 	Location           sql.NullString
@@ -638,7 +640,7 @@ FROM organizer
 WHERE id = ?
 `
 
-func (q *Queries) GetOrganizer(ctx context.Context, id int32) (Organizer, error) {
+func (q *Queries) GetOrganizer(ctx context.Context, id uuid.UUID) (Organizer, error) {
 	row := q.db.QueryRowContext(ctx, getOrganizer, id)
 	var i Organizer
 	err := row.Scan(&i.ID, &i.Name)
@@ -681,7 +683,7 @@ type GetOrganizerInvitesByOrganizerRow struct {
 	Name            string
 }
 
-func (q *Queries) GetOrganizerInvitesByOrganizer(ctx context.Context, organizerID int32) ([]GetOrganizerInvitesByOrganizerRow, error) {
+func (q *Queries) GetOrganizerInvitesByOrganizer(ctx context.Context, organizerID uuid.UUID) ([]GetOrganizerInvitesByOrganizerRow, error) {
 	rows, err := q.db.QueryContext(ctx, getOrganizerInvitesByOrganizer, organizerID)
 	if err != nil {
 		return nil, err
@@ -719,7 +721,7 @@ type GetProblemRow struct {
 	Problem Problem
 }
 
-func (q *Queries) GetProblem(ctx context.Context, id int32) (GetProblemRow, error) {
+func (q *Queries) GetProblem(ctx context.Context, id uuid.UUID) (GetProblemRow, error) {
 	row := q.db.QueryRowContext(ctx, getProblem, id)
 	var i GetProblemRow
 	err := row.Scan(
@@ -747,7 +749,7 @@ WHERE contest_id = ? AND number = ?
 `
 
 type GetProblemByNumberParams struct {
-	ContestID int32
+	ContestID uuid.UUID
 	Number    int32
 }
 
@@ -786,7 +788,7 @@ type GetProblemsByContestRow struct {
 	Problem Problem
 }
 
-func (q *Queries) GetProblemsByContest(ctx context.Context, contestID int32) ([]GetProblemsByContestRow, error) {
+func (q *Queries) GetProblemsByContest(ctx context.Context, contestID uuid.UUID) ([]GetProblemsByContestRow, error) {
 	rows, err := q.db.QueryContext(ctx, getProblemsByContest, contestID)
 	if err != nil {
 		return nil, err
@@ -833,7 +835,7 @@ type GetRaffleRow struct {
 	Raffle Raffle
 }
 
-func (q *Queries) GetRaffle(ctx context.Context, id int32) (GetRaffleRow, error) {
+func (q *Queries) GetRaffle(ctx context.Context, id uuid.UUID) (GetRaffleRow, error) {
 	row := q.db.QueryRowContext(ctx, getRaffle, id)
 	var i GetRaffleRow
 	err := row.Scan(&i.Raffle.ID, &i.Raffle.OrganizerID, &i.Raffle.ContestID)
@@ -852,7 +854,7 @@ type GetRaffleWinnersRow struct {
 	Name         sql.NullString
 }
 
-func (q *Queries) GetRaffleWinners(ctx context.Context, raffleID int32) ([]GetRaffleWinnersRow, error) {
+func (q *Queries) GetRaffleWinners(ctx context.Context, raffleID uuid.UUID) ([]GetRaffleWinnersRow, error) {
 	rows, err := q.db.QueryContext(ctx, getRaffleWinners, raffleID)
 	if err != nil {
 		return nil, err
@@ -892,7 +894,7 @@ type GetRafflesByContestRow struct {
 	Raffle Raffle
 }
 
-func (q *Queries) GetRafflesByContest(ctx context.Context, contestID int32) ([]GetRafflesByContestRow, error) {
+func (q *Queries) GetRafflesByContest(ctx context.Context, contestID uuid.UUID) ([]GetRafflesByContestRow, error) {
 	rows, err := q.db.QueryContext(ctx, getRafflesByContest, contestID)
 	if err != nil {
 		return nil, err
@@ -925,7 +927,7 @@ type GetTickRow struct {
 	Tick Tick
 }
 
-func (q *Queries) GetTick(ctx context.Context, id int32) (GetTickRow, error) {
+func (q *Queries) GetTick(ctx context.Context, id uuid.UUID) (GetTickRow, error) {
 	row := q.db.QueryRowContext(ctx, getTick, id)
 	var i GetTickRow
 	err := row.Scan(
@@ -955,7 +957,7 @@ type GetTicksByContenderRow struct {
 	Tick Tick
 }
 
-func (q *Queries) GetTicksByContender(ctx context.Context, contenderID int32) ([]GetTicksByContenderRow, error) {
+func (q *Queries) GetTicksByContender(ctx context.Context, contenderID uuid.UUID) ([]GetTicksByContenderRow, error) {
 	rows, err := q.db.QueryContext(ctx, getTicksByContender, contenderID)
 	if err != nil {
 		return nil, err
@@ -1001,7 +1003,7 @@ type GetTicksByContestRow struct {
 	Tick Tick
 }
 
-func (q *Queries) GetTicksByContest(ctx context.Context, contestID int32) ([]GetTicksByContestRow, error) {
+func (q *Queries) GetTicksByContest(ctx context.Context, contestID uuid.UUID) ([]GetTicksByContestRow, error) {
 	rows, err := q.db.QueryContext(ctx, getTicksByContest, contestID)
 	if err != nil {
 		return nil, err
@@ -1047,7 +1049,7 @@ type GetTicksByProblemRow struct {
 	Tick Tick
 }
 
-func (q *Queries) GetTicksByProblem(ctx context.Context, problemID int32) ([]GetTicksByProblemRow, error) {
+func (q *Queries) GetTicksByProblem(ctx context.Context, problemID uuid.UUID) ([]GetTicksByProblemRow, error) {
 	rows, err := q.db.QueryContext(ctx, getTicksByProblem, problemID)
 	if err != nil {
 		return nil, err
@@ -1136,7 +1138,7 @@ type GetUsersByOrganizerRow struct {
 	User User
 }
 
-func (q *Queries) GetUsersByOrganizer(ctx context.Context, organizerID int32) ([]GetUsersByOrganizerRow, error) {
+func (q *Queries) GetUsersByOrganizer(ctx context.Context, organizerID uuid.UUID) ([]GetUsersByOrganizerRow, error) {
 	rows, err := q.db.QueryContext(ctx, getUsersByOrganizer, organizerID)
 	if err != nil {
 		return nil, err
@@ -1168,7 +1170,7 @@ VALUES
 
 type InsertOrganizerInviteParams struct {
 	ID          string
-	OrganizerID int32
+	OrganizerID uuid.UUID
 	ExpiresAt   time.Time
 }
 
@@ -1179,16 +1181,17 @@ func (q *Queries) InsertOrganizerInvite(ctx context.Context, arg InsertOrganizer
 
 const insertTick = `-- name: InsertTick :execlastid
 INSERT INTO
-    tick (organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
+    tick (id, organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
 VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 type InsertTickParams struct {
-	OrganizerID   int32
-	ContestID     int32
-	ContenderID   int32
-	ProblemID     int32
+	ID            uuid.UUID
+	OrganizerID   uuid.UUID
+	ContestID     uuid.UUID
+	ContenderID   uuid.UUID
+	ProblemID     uuid.UUID
 	Timestamp     time.Time
 	Top           bool
 	AttemptsTop   int32
@@ -1200,6 +1203,7 @@ type InsertTickParams struct {
 
 func (q *Queries) InsertTick(ctx context.Context, arg InsertTickParams) (int64, error) {
 	result, err := q.db.ExecContext(ctx, insertTick,
+		arg.ID,
 		arg.OrganizerID,
 		arg.ContestID,
 		arg.ContenderID,
@@ -1234,9 +1238,9 @@ ON DUPLICATE KEY UPDATE
 `
 
 type UpsertCompClassParams struct {
-	ID          int32
-	OrganizerID int32
-	ContestID   int32
+	ID          uuid.UUID
+	OrganizerID uuid.UUID
+	ContestID   uuid.UUID
 	Name        string
 	Description sql.NullString
 	Color       sql.NullString
@@ -1278,12 +1282,12 @@ ON DUPLICATE KEY UPDATE
 `
 
 type UpsertContenderParams struct {
-	ID                  int32
-	OrganizerID         int32
-	ContestID           int32
+	ID                  uuid.UUID
+	OrganizerID         uuid.UUID
+	ContestID           uuid.UUID
 	RegistrationCode    string
 	Name                sql.NullString
-	ClassID             sql.NullInt32
+	ClassID             uuid.NullUUID
 	Entered             sql.NullTime
 	Disqualified        bool
 	WithdrawnFromFinals bool
@@ -1327,10 +1331,10 @@ ON DUPLICATE KEY UPDATE
 `
 
 type UpsertContestParams struct {
-	ID                 int32
-	OrganizerID        int32
+	ID                 uuid.UUID
+	OrganizerID        uuid.UUID
 	Archived           bool
-	SeriesID           sql.NullInt32
+	SeriesID           uuid.NullUUID
 	Name               string
 	Description        sql.NullString
 	Location           sql.NullString
@@ -1372,7 +1376,7 @@ ON DUPLICATE KEY UPDATE
 `
 
 type UpsertOrganizerParams struct {
-	ID   int32
+	ID   uuid.UUID
 	Name string
 }
 
@@ -1405,9 +1409,9 @@ ON DUPLICATE KEY UPDATE
 `
 
 type UpsertProblemParams struct {
-	ID                 int32
-	OrganizerID        int32
-	ContestID          int32
+	ID                 uuid.UUID
+	OrganizerID        uuid.UUID
+	ContestID          uuid.UUID
 	Number             int32
 	HoldColorPrimary   string
 	HoldColorSecondary sql.NullString
@@ -1453,9 +1457,9 @@ ON DUPLICATE KEY UPDATE
 `
 
 type UpsertRaffleParams struct {
-	ID          int32
-	OrganizerID int32
-	ContestID   int32
+	ID          uuid.UUID
+	OrganizerID uuid.UUID
+	ContestID   uuid.UUID
 }
 
 func (q *Queries) UpsertRaffle(ctx context.Context, arg UpsertRaffleParams) (int64, error) {
@@ -1479,10 +1483,10 @@ ON DUPLICATE KEY UPDATE
 `
 
 type UpsertRaffleWinnerParams struct {
-	ID          int32
-	OrganizerID int32
-	RaffleID    int32
-	ContenderID int32
+	ID          uuid.UUID
+	OrganizerID uuid.UUID
+	RaffleID    uuid.UUID
+	ContenderID uuid.UUID
 	Timestamp   time.Time
 }
 
@@ -1514,7 +1518,7 @@ ON DUPLICATE KEY UPDATE
 `
 
 type UpsertScoreParams struct {
-	ContenderID int32
+	ContenderID uuid.UUID
 	Timestamp   time.Time
 	Score       int32
 	Placement   int32
@@ -1545,7 +1549,7 @@ ON DUPLICATE KEY UPDATE
 `
 
 type UpsertUserParams struct {
-	ID       int32
+	ID       uuid.UUID
 	Username string
 	Admin    bool
 }

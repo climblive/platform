@@ -7,3 +7,13 @@ sql:
       go:
         package: "database"
         out: "internal/database"
+        overrides:
+          - db_type: "binary"
+            go_type:
+              import: "github.com/google/uuid"
+              type: "UUID"
+          - db_type: "binary"
+            nullable: true
+            go_type:
+              import: "github.com/google/uuid"
+              type: "NullUUID"
