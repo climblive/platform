@@ -68,7 +68,7 @@
   .logo {
     width: min(20rem, 50%);
     color: white;
-    animation: zoom-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    animation: zoom-in 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     margin-block-end: 10rem;
   }
 
