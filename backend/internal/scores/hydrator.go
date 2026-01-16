@@ -6,6 +6,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
+	"github.com/google/uuid"
 )
 
 type standardEngineStoreHydratorRepository interface {
@@ -51,7 +52,7 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 	}
 
 	for contender := range slices.Values(contenders) {
-		if contender.CompClassID == 0 {
+		if contender.CompClassID == domain.CompClassID(uuid.Nil) {
 			continue
 		}
 

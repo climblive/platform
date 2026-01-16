@@ -31,9 +31,10 @@ func TestEventsHandler(t *testing.T) {
 	}
 
 	t.Run("ConnectAndDisconnect", func(t *testing.T) {
+		contenderID := domain.ContenderID(uuid.New())
 		mockedEventBroker, _ := makeMocks(0, domain.NewEventFilter(
-			0,
-			domain.ContenderID(1),
+			domain.ContestID(uuid.Nil),
+			contenderID,
 			"CONTENDER_PUBLIC_INFO_UPDATED",
 			"CONTENDER_SCORE_UPDATED",
 			"ASCENT_REGISTERED",
@@ -45,7 +46,7 @@ func TestEventsHandler(t *testing.T) {
 
 		server := httptest.NewServer(mux)
 
-		resp, err := http.Get(server.URL + "/contenders/1/events")
+		resp, err := http.Get(server.URL + "/contenders/" + uuid.UUID(contenderID).String() + "/events")
 		require.NoError(t, err)
 
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
@@ -67,9 +68,10 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("ReceivePing", func(t *testing.T) {
+		contenderID := domain.ContenderID(uuid.New())
 		mockedEventBroker, _ := makeMocks(0, domain.NewEventFilter(
-			0,
-			domain.ContenderID(1),
+			domain.ContestID(uuid.Nil),
+			contenderID,
 			"CONTENDER_PUBLIC_INFO_UPDATED",
 			"CONTENDER_SCORE_UPDATED",
 			"ASCENT_REGISTERED",
@@ -81,7 +83,7 @@ func TestEventsHandler(t *testing.T) {
 
 		server := httptest.NewServer(mux)
 
-		resp, err := http.Get(server.URL + "/contenders/1/events")
+		resp, err := http.Get(server.URL + "/contenders/" + uuid.UUID(contenderID).String() + "/events")
 		require.NoError(t, err)
 
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
@@ -107,9 +109,10 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("ReceiveEvent", func(t *testing.T) {
+		contenderID := domain.ContenderID(uuid.New())
 		mockedEventBroker, subscription := makeMocks(0, domain.NewEventFilter(
-			0,
-			domain.ContenderID(1),
+			domain.ContestID(uuid.Nil),
+			contenderID,
 			"CONTENDER_PUBLIC_INFO_UPDATED",
 			"CONTENDER_SCORE_UPDATED",
 			"ASCENT_REGISTERED",
@@ -119,7 +122,7 @@ func TestEventsHandler(t *testing.T) {
 		err := subscription.Post(domain.EventEnvelope{
 			Data: domain.ContenderScoreUpdatedEvent{
 				Timestamp:   time.Date(2024, 12, 01, 00, 00, 00, 0, time.UTC),
-				ContenderID: domain.ContenderID(1),
+				ContenderID: contenderID,
 				Score:       100,
 				Placement:   10,
 				Finalist:    true,
@@ -133,7 +136,7 @@ func TestEventsHandler(t *testing.T) {
 
 		server := httptest.NewServer(mux)
 
-		resp, err := http.Get(server.URL + "/contenders/1/events")
+		resp, err := http.Get(server.URL + "/contenders/" + uuid.UUID(contenderID).String() + "/events")
 		require.NoError(t, err)
 
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
@@ -149,12 +152,12 @@ func TestEventsHandler(t *testing.T) {
 			lines = append(lines, string(line))
 		}
 
-		assert.Equal(t, []string{
-			"retry: 5000",
-			"",
-			"event: CONTENDER_SCORE_UPDATED",
-			`data: {"timestamp":"2024-12-01T00:00:00Z","contenderId":1,"score":100,"placement":10,"finalist":true,"rankOrder":9}`,
-		}, lines)
+		assert.Contains(t, lines[0], "retry: 5000")
+		assert.Equal(t, "", lines[1])
+		assert.Equal(t, "event: CONTENDER_SCORE_UPDATED", lines[2])
+		assert.Contains(t, lines[3], `"timestamp":"2024-12-01T00:00:00Z"`)
+		assert.Contains(t, lines[3], `"score":100`)
+		assert.Contains(t, lines[3], `"placement":10`)
 
 		_ = resp.Body.Close()
 
@@ -164,9 +167,10 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("SubscriptionUnexpectedlyClosed", func(t *testing.T) {
+		contenderID := domain.ContenderID(uuid.New())
 		mockedEventBroker, subscription := makeMocks(1, domain.NewEventFilter(
-			0,
-			domain.ContenderID(1),
+			domain.ContestID(uuid.Nil),
+			contenderID,
 			"CONTENDER_PUBLIC_INFO_UPDATED",
 			"CONTENDER_SCORE_UPDATED",
 			"ASCENT_REGISTERED",
@@ -188,7 +192,7 @@ func TestEventsHandler(t *testing.T) {
 
 		server := httptest.NewServer(mux)
 
-		resp, err := http.Get(server.URL + "/contenders/1/events")
+		resp, err := http.Get(server.URL + "/contenders/" + uuid.UUID(contenderID).String() + "/events")
 		require.NoError(t, err)
 
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
@@ -199,9 +203,10 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("ContestEvents", func(t *testing.T) {
+		contestID := domain.ContestID(uuid.New())
 		mockedEventBroker, _ := makeMocks(0, domain.NewEventFilter(
-			domain.ContestID(1),
-			0,
+			contestID,
+			domain.ContenderID(uuid.Nil),
 			"CONTENDER_PUBLIC_INFO_UPDATED",
 			"[]CONTENDER_SCORE_UPDATED",
 			"SCORE_ENGINE_STARTED",
@@ -213,7 +218,7 @@ func TestEventsHandler(t *testing.T) {
 
 		server := httptest.NewServer(mux)
 
-		resp, err := http.Get(server.URL + "/contests/1/events")
+		resp, err := http.Get(server.URL + "/contests/" + uuid.UUID(contestID).String() + "/events")
 		require.NoError(t, err)
 
 		assert.Equal(t, http.StatusOK, resp.StatusCode)

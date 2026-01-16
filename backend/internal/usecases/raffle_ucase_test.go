@@ -266,9 +266,9 @@ func TestDrawRaffleWinner(t *testing.T) {
 	makeContenders := func(count int) []domain.Contender {
 		var contenders []domain.Contender
 
-		for i := range count {
+		for range count {
 			contenders = append(contenders, domain.Contender{
-				ID:      domain.ContenderID(i),
+				ID:      randomResourceID[domain.ContenderID](),
 				Entered: time.Now().Add(-time.Hour),
 			})
 		}
@@ -284,7 +284,7 @@ func TestDrawRaffleWinner(t *testing.T) {
 				ID:            randomResourceID[domain.RaffleWinnerID](),
 				Ownership:     fakedOwnership,
 				RaffleID:      fakedRaffleID,
-				ContenderID:   domain.ContenderID(i),
+				ContenderID:   randomResourceID[domain.ContenderID](),
 				ContenderName: fmt.Sprintf("Winner %d", i),
 				Timestamp:     time.Now(),
 			})
@@ -367,6 +367,8 @@ func TestDrawRaffleWinner(t *testing.T) {
 			On("GetContendersByContest", mock.Anything, nil, fakedContestID).
 			Return(makeContenders(5), nil)
 
+		storedContenders := makeContenders(5)
+
 		mockedRepo.
 			On("GetRaffleWinners", mock.Anything, nil, fakedRaffleID).
 			Return([]domain.RaffleWinner{}, nil)
@@ -384,7 +386,14 @@ func TestDrawRaffleWinner(t *testing.T) {
 			winner, err := ucase.DrawRaffleWinner(context.Background(), fakedRaffleID)
 			require.NoError(t, err)
 
-			assert.Contains(t, []domain.ContenderID{0, 1, 2, 3, 4}, winner.ContenderID)
+			found := false
+			for _, c := range storedContenders {
+				if winner.ContenderID == c.ID {
+					found = true
+					break
+				}
+			}
+			assert.True(t, found, "Winner ID should be one of the valid contender IDs")
 		}
 
 		mockedRepo.AssertExpectations(t)

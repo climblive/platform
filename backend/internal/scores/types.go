@@ -1,6 +1,10 @@
 package scores
 
-import "github.com/climblive/platform/backend/internal/domain"
+import (
+	"bytes"
+
+	"github.com/climblive/platform/backend/internal/domain"
+)
 
 type Contender struct {
 	ID                  domain.ContenderID
@@ -12,7 +16,7 @@ type Contender struct {
 
 func (c Contender) Compare(other Contender) int {
 	if c.Score == other.Score {
-		return int(c.ID) - int(other.ID)
+		return bytes.Compare(c.ID[:], other.ID[:])
 	}
 
 	return other.Score - c.Score

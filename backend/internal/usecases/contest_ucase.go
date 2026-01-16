@@ -8,6 +8,7 @@ import (
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/go-errors/errors"
+	"github.com/google/uuid"
 	"github.com/microcosm-cc/bluemonday"
 )
 
@@ -107,7 +108,7 @@ func (uc *ContestUseCase) GetScoreboard(ctx context.Context, contestID domain.Co
 	entries := make([]domain.ScoreboardEntry, 0)
 
 	for _, contender := range contenders {
-		if contender.CompClassID == 0 {
+		if uuid.UUID(contender.CompClassID) == uuid.Nil {
 			continue
 		}
 
@@ -287,7 +288,7 @@ func (uc *ContestUseCase) DuplicateContest(ctx context.Context, contestID domain
 	}
 
 	duplicatedContest := contest
-	duplicatedContest.ID = 0
+	duplicatedContest.ID = domain.ContestID(uuid.Nil)
 	duplicatedContest.Name += " (Copy)"
 
 	tx, err := uc.Repo.Begin()
@@ -302,7 +303,7 @@ func (uc *ContestUseCase) DuplicateContest(ctx context.Context, contestID domain
 		}
 
 		for _, compClass := range compClasses {
-			compClass.ID = 0
+			compClass.ID = domain.CompClassID(uuid.Nil)
 			compClass.ContestID = createdContest.ID
 
 			_, err = uc.Repo.StoreCompClass(ctx, tx, compClass)
@@ -312,7 +313,7 @@ func (uc *ContestUseCase) DuplicateContest(ctx context.Context, contestID domain
 		}
 
 		for _, problem := range problems {
-			problem.ID = 0
+			problem.ID = domain.ProblemID(uuid.Nil)
 			problem.ContestID = createdContest.ID
 
 			_, err = uc.Repo.StoreProblem(ctx, tx, problem)

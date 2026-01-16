@@ -9,6 +9,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/events"
+	"github.com/google/uuid"
 )
 
 const bufferCapacity = 1_000
@@ -49,7 +50,7 @@ func (hdlr *eventHandler) HandleSubscribeContestEvents(w http.ResponseWriter, r 
 
 	filter := domain.NewEventFilter(
 		contestID,
-		0,
+		domain.ContenderID(uuid.Nil),
 		"CONTENDER_PUBLIC_INFO_UPDATED",
 		"[]CONTENDER_SCORE_UPDATED",
 		"SCORE_ENGINE_STARTED",
@@ -69,7 +70,7 @@ func (hdlr *eventHandler) HandleSubscribeContenderEvents(w http.ResponseWriter, 
 	logger := slog.Default().With("contender_id", contenderID, "remote_addr", readRemoteAddr(r))
 
 	filter := domain.NewEventFilter(
-		0,
+		domain.ContestID(uuid.Nil),
 		contenderID,
 		"CONTENDER_PUBLIC_INFO_UPDATED",
 		"CONTENDER_SCORE_UPDATED",

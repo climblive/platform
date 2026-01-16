@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/google/uuid"
 )
 
 type ScoreEngine interface {
@@ -119,7 +120,7 @@ func (d *ScoreEngineDriver) run(
 ) {
 	filter := domain.NewEventFilter(
 		d.contestID,
-		0,
+		domain.ContenderID(uuid.Nil),
 		"CONTENDER_ENTERED",
 		"CONTENDER_SWITCHED_CLASS",
 		"CONTENDER_WITHDREW_FROM_FINALS",

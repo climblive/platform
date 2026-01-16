@@ -2,7 +2,6 @@ package usecases_test
 
 import (
 	"context"
-	"math/rand"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
@@ -13,7 +12,7 @@ import (
 var errMock = errors.New("mock error")
 
 func randomResourceID[T domain.ResourceIDType]() T {
-	return T(rand.Int())
+	return T(uuid.New())
 }
 
 type mirrorInstruction struct{}

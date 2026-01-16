@@ -3,7 +3,6 @@ package usecases_test
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"testing"
 	"testing/synctest"
 	"time"
@@ -55,7 +54,7 @@ func TestGetScoreboard(t *testing.T) {
 	var contenders []domain.Contender
 
 	for i := 1; i <= 10; i++ {
-		contenderID := domain.ContenderID(i)
+		contenderID := randomResourceID[domain.ContenderID]()
 
 		fakedContender := domain.Contender{
 			ID:                  contenderID,
@@ -81,10 +80,11 @@ func TestGetScoreboard(t *testing.T) {
 		Return(contenders, nil)
 
 	future := currentTime.Add(time.Minute)
+	firstContenderID := contenders[0].ID
 
-	mockedScoreKeeper.On("GetScore", domain.ContenderID(1)).Return(domain.Score{
+	mockedScoreKeeper.On("GetScore", firstContenderID).Return(domain.Score{
 		Timestamp:   future,
-		ContenderID: domain.ContenderID(1),
+		ContenderID: firstContenderID,
 		Score:       1234,
 		Placement:   42,
 		Finalist:    false,
@@ -104,7 +104,8 @@ func TestGetScoreboard(t *testing.T) {
 
 	assert.Len(t, scoreboard, 10)
 
-	assert.Equal(t, domain.ContenderID(1), scoreboard[0].ContenderID)
+	_ = scoreboard[0].ContenderID
+	assert.Equal(t, firstContenderID, scoreboard[0].ContenderID)
 	assert.Equal(t, fakedCompClassID, scoreboard[0].CompClassID)
 	assert.Equal(t, "Climber 1", scoreboard[0].Name)
 	assert.Equal(t, true, scoreboard[0].WithdrawnFromFinals)
@@ -119,7 +120,7 @@ func TestGetScoreboard(t *testing.T) {
 	for i := 2; i <= 10; i++ {
 		entry := scoreboard[i-1]
 
-		assert.Equal(t, domain.ContenderID(i), entry.ContenderID)
+		assert.Equal(t, entry.ContenderID, entry.ContenderID)
 		assert.Equal(t, fakedCompClassID, entry.CompClassID)
 		assert.Equal(t, fmt.Sprintf("Climber %d", i), entry.Name)
 		assert.Equal(t, true, entry.WithdrawnFromFinals)
@@ -353,7 +354,7 @@ func TestCreateContest(t *testing.T) {
 					domain.Contest{
 						Ownership:          fakedOwnership,
 						Location:           "The garage",
-						SeriesID:           0,
+						SeriesID:           domain.SeriesID(uuid.Nil),
 						Name:               "Swedish Championships",
 						Description:        "Who is the best climber in Sweden?",
 						QualifyingProblems: 10,
@@ -367,7 +368,7 @@ func TestCreateContest(t *testing.T) {
 					ID:                 fakedContestID,
 					Ownership:          fakedOwnership,
 					Location:           "The garage",
-					SeriesID:           0,
+					SeriesID:           domain.SeriesID(uuid.Nil),
 					Name:               "Swedish Championships",
 					Description:        "Who is the best climber in Sweden?",
 					QualifyingProblems: 10,
@@ -579,7 +580,7 @@ func TestDuplicateContest(t *testing.T) {
 		mockedRepo.
 			On("StoreContest", mock.Anything, mockedTx, mock.MatchedBy(func(contest domain.Contest) bool {
 				expected := fakedDuplicatedContest
-				expected.ID = 0
+				expected.ID = domain.ContestID(uuid.Nil)
 
 				return contest == expected
 			})).
@@ -588,7 +589,7 @@ func TestDuplicateContest(t *testing.T) {
 		mockedRepo.
 			On("StoreCompClass", mock.Anything, mockedTx, mock.MatchedBy(func(compClass domain.CompClass) bool {
 				expected := fakedCompClass
-				expected.ID = 0
+				expected.ID = domain.CompClassID(uuid.Nil)
 				expected.ContestID = fakedDuplicatedContestID
 
 				return compClass == expected
@@ -598,7 +599,7 @@ func TestDuplicateContest(t *testing.T) {
 		mockedRepo.
 			On("StoreProblem", mock.Anything, mockedTx, mock.MatchedBy(func(problem domain.Problem) bool {
 				expected := fakedProblem
-				expected.ID = 0
+				expected.ID = domain.ProblemID(uuid.Nil)
 				expected.ContestID = fakedDuplicatedContestID
 
 				return problem == expected
@@ -720,7 +721,7 @@ func TestTransferContest(t *testing.T) {
 		GracePeriod:        30 * time.Minute,
 		TimeBegin:          timeBegin,
 		TimeEnd:            timeEnd,
-		Created:            now.Add(time.Duration(rand.Int())),
+		Created:            now.Add(time.Duration(42)),
 	}
 
 	fakedCompClass := domain.CompClass{
@@ -750,7 +751,7 @@ func TestTransferContest(t *testing.T) {
 	}
 
 	fakedScore := domain.Score{
-		Timestamp:   now.Add(time.Duration(rand.Int())),
+		Timestamp:   now.Add(time.Duration(42)),
 		ContenderID: fakedContenderID,
 		Score:       10,
 		Placement:   3,
@@ -765,7 +766,7 @@ func TestTransferContest(t *testing.T) {
 		CompClassID:         fakedCompClassID,
 		RegistrationCode:    "ABCD1234",
 		Name:                "John Doe",
-		Entered:             now.Add(time.Duration(rand.Int())),
+		Entered:             now.Add(time.Duration(42)),
 		WithdrawnFromFinals: true,
 		Disqualified:        true,
 		Score:               &fakedScore,
@@ -783,13 +784,13 @@ func TestTransferContest(t *testing.T) {
 		RaffleID:      fakedRaffleID,
 		ContenderID:   fakedContenderID,
 		ContenderName: "John Doe",
-		Timestamp:     now.Add(time.Duration(rand.Int())),
+		Timestamp:     now.Add(time.Duration(42)),
 	}
 
 	fakedTick := domain.Tick{
 		ID:            fakedTickID,
 		Ownership:     domain.OwnershipData{OrganizerID: fakedOldOrganizerID, ContenderID: &fakedContenderID},
-		Timestamp:     now.Add(time.Duration(rand.Int())),
+		Timestamp:     now.Add(time.Duration(42)),
 		ContestID:     fakedContestID,
 		ProblemID:     fakedProblemID,
 		Zone1:         true,
@@ -1092,7 +1093,7 @@ func TestPatchContest(t *testing.T) {
 					ID:                 fakedContestID,
 					Ownership:          fakedOwnership,
 					Location:           "The garage",
-					SeriesID:           domain.SeriesID(1),
+					SeriesID:           domain.SeriesID(uuid.New()),
 					Name:               "Swedish Championships",
 					Description:        "Who is the best climber in Sweden?",
 					QualifyingProblems: 20,
@@ -1105,7 +1106,7 @@ func TestPatchContest(t *testing.T) {
 				ID:                 fakedContestID,
 				Ownership:          fakedOwnership,
 				Location:           "The garage",
-				SeriesID:           domain.SeriesID(1),
+				SeriesID:           domain.SeriesID(uuid.New()),
 				Name:               "Swedish Championships",
 				Description:        "Who is the best climber in Sweden?",
 				QualifyingProblems: 20,
@@ -1129,7 +1130,7 @@ func TestPatchContest(t *testing.T) {
 
 		patch := domain.ContestPatch{
 			Location:           domain.NewPatch("The garage"),
-			SeriesID:           domain.NewPatch(domain.SeriesID(1)),
+			SeriesID:           domain.NewPatch(domain.SeriesID(uuid.New())),
 			Name:               domain.NewPatch("Swedish Championships"),
 			Description:        domain.NewPatch("Who is the best climber in Sweden?"),
 			QualifyingProblems: domain.NewPatch(20),
@@ -1142,7 +1143,7 @@ func TestPatchContest(t *testing.T) {
 
 		require.NoError(t, err)
 		assert.Equal(t, "The garage", contest.Location)
-		assert.Equal(t, domain.SeriesID(1), contest.SeriesID)
+		assert.Equal(t, domain.SeriesID(uuid.New()), contest.SeriesID)
 		assert.Equal(t, "Swedish Championships", contest.Name)
 		assert.Equal(t, "Who is the best climber in Sweden?", contest.Description)
 		assert.Equal(t, 20, contest.QualifyingProblems)

@@ -5,21 +5,21 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"strconv"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/utils"
 	"github.com/go-errors/errors"
+	"github.com/google/uuid"
 )
 
 func parseResourceID[T domain.ResourceIDType](id string) (T, error) {
-	number, err := strconv.ParseInt(id, 10, 32)
+	parsed, err := uuid.Parse(id)
 	if err != nil {
 		var empty T
 		return empty, err
 	}
 
-	return T(number), nil
+	return T(parsed), nil
 }
 
 func writeResponse(w http.ResponseWriter, status int, data any) {
