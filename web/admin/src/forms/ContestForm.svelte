@@ -39,7 +39,7 @@
   let selectedCountry = $derived(data.country || "AQ");
 
   const handleCountryChange = (event: Event) => {
-    const target = event.target as HTMLSelectElement;
+    const target = event.target as WaElement;
     selectedCountry = target.value;
   };
 </script>
