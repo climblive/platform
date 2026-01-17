@@ -128,6 +128,7 @@
     anchor={triggerButton}
     placement="bottom-start"
     distance={4}
+    active={popup?.active ?? false}
   >
     <div class="popup-content" role="listbox" aria-label="Color selection">
       <div class="color-grid">
@@ -206,8 +207,8 @@
   }
 
   .color-button {
-    background: var(--wa-color-bg-surface);
-    border: 2px solid transparent;
+    background: var(--wa-color-bg-surface, #ffffff);
+    border: 2px solid var(--wa-color-border-normal, #e0e0e0);
     border-radius: var(--wa-radius-s);
     padding: var(--wa-space-3xs);
     cursor: pointer;
