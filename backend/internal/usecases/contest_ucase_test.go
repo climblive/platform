@@ -353,6 +353,7 @@ func TestCreateContest(t *testing.T) {
 					domain.Contest{
 						Ownership:          fakedOwnership,
 						Location:           "The garage",
+						Country:            "SE",
 						SeriesID:           0,
 						Name:               "Swedish Championships",
 						Description:        "Who is the best climber in Sweden?",
@@ -367,6 +368,7 @@ func TestCreateContest(t *testing.T) {
 					ID:                 fakedContestID,
 					Ownership:          fakedOwnership,
 					Location:           "The garage",
+					Country:            "SE",
 					SeriesID:           0,
 					Name:               "Swedish Championships",
 					Description:        "Who is the best climber in Sweden?",
@@ -384,6 +386,7 @@ func TestCreateContest(t *testing.T) {
 
 			contest, err := ucase.CreateContest(context.Background(), fakedOrganizerID, domain.ContestTemplate{
 				Location:           "The garage",
+				Country:            "SE",
 				Name:               "Swedish Championships",
 				Description:        "Who is the best climber in Sweden?",
 				QualifyingProblems: 10,
@@ -397,6 +400,7 @@ func TestCreateContest(t *testing.T) {
 			assert.Equal(t, fakedOwnership, contest.Ownership)
 			assert.False(t, contest.Archived)
 			assert.Equal(t, "The garage", contest.Location)
+			assert.Equal(t, "SE", contest.Country)
 			assert.Equal(t, "Swedish Championships", contest.Name)
 			assert.Equal(t, "Who is the best climber in Sweden?", contest.Description)
 			assert.Equal(t, 10, contest.QualifyingProblems)
@@ -451,6 +455,7 @@ func TestCreateContest(t *testing.T) {
 
 		contest, err := ucase.CreateContest(context.Background(), fakedOrganizerID, domain.ContestTemplate{
 			Location:           "The garage",
+			Country:            "SE",
 			Name:               "Swedish Championships",
 			Description:        "Who is the best climber in Sweden?",
 			QualifyingProblems: 10,
@@ -1092,6 +1097,7 @@ func TestPatchContest(t *testing.T) {
 					ID:                 fakedContestID,
 					Ownership:          fakedOwnership,
 					Location:           "The garage",
+					Country:            "SE",
 					SeriesID:           domain.SeriesID(1),
 					Name:               "Swedish Championships",
 					Description:        "Who is the best climber in Sweden?",
@@ -1105,6 +1111,7 @@ func TestPatchContest(t *testing.T) {
 				ID:                 fakedContestID,
 				Ownership:          fakedOwnership,
 				Location:           "The garage",
+				Country:            "SE",
 				SeriesID:           domain.SeriesID(1),
 				Name:               "Swedish Championships",
 				Description:        "Who is the best climber in Sweden?",
@@ -1129,6 +1136,7 @@ func TestPatchContest(t *testing.T) {
 
 		patch := domain.ContestPatch{
 			Location:           domain.NewPatch("The garage"),
+			Country:            domain.NewPatch("SE"),
 			SeriesID:           domain.NewPatch(domain.SeriesID(1)),
 			Name:               domain.NewPatch("Swedish Championships"),
 			Description:        domain.NewPatch("Who is the best climber in Sweden?"),
@@ -1142,6 +1150,7 @@ func TestPatchContest(t *testing.T) {
 
 		require.NoError(t, err)
 		assert.Equal(t, "The garage", contest.Location)
+		assert.Equal(t, "SE", contest.Country)
 		assert.Equal(t, domain.SeriesID(1), contest.SeriesID)
 		assert.Equal(t, "Swedish Championships", contest.Name)
 		assert.Equal(t, "Who is the best climber in Sweden?", contest.Description)
@@ -1170,6 +1179,7 @@ func TestPatchContest(t *testing.T) {
 				ID:        fakedContestID,
 				Ownership: fakedOwnership,
 				Name:      "Swedish Championships",
+				Country:   "SE",
 			}, nil)
 
 		mockedRepo.
@@ -1179,6 +1189,7 @@ func TestPatchContest(t *testing.T) {
 					Ownership: fakedOwnership,
 					Archived:  true,
 					Name:      "Swedish Championships",
+					Country:   "SE",
 				},
 			).
 			Return(domain.Contest{
@@ -1186,6 +1197,7 @@ func TestPatchContest(t *testing.T) {
 				Ownership: fakedOwnership,
 				Archived:  true,
 				Name:      "Swedish Championships",
+				Country:   "SE",
 			}, nil)
 
 		fakedScoreEngineInstanceID := domain.ScoreEngineInstanceID(uuid.New())
@@ -1236,6 +1248,7 @@ func TestPatchContest(t *testing.T) {
 				ID:        fakedContestID,
 				Ownership: fakedOwnership,
 				Name:      "Swedish Championships",
+				Country:   "SE",
 				Archived:  true,
 			}, nil)
 
@@ -1246,6 +1259,7 @@ func TestPatchContest(t *testing.T) {
 					Ownership: fakedOwnership,
 					Archived:  false,
 					Name:      "Swedish Championships",
+					Country:   "SE",
 				},
 			).
 			Return(domain.Contest{
@@ -1253,6 +1267,7 @@ func TestPatchContest(t *testing.T) {
 				Ownership: fakedOwnership,
 				Archived:  false,
 				Name:      "Swedish Championships",
+				Country:   "SE",
 			}, nil)
 
 		ucase := usecases.ContestUseCase{

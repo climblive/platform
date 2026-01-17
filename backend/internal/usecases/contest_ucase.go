@@ -178,6 +178,10 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		contest.Location = strings.TrimSpace(patch.Location.Value)
 	}
 
+	if patch.Country.Present {
+		contest.Country = strings.TrimSpace(patch.Country.Value)
+	}
+
 	if patch.SeriesID.Present {
 		contest.SeriesID = patch.SeriesID.Value
 	}
@@ -241,6 +245,7 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 			OrganizerID: organizerID,
 		},
 		Location:           strings.TrimSpace(tmpl.Location),
+		Country:            strings.TrimSpace(tmpl.Country),
 		Name:               strings.TrimSpace(tmpl.Name),
 		Description:        strings.TrimSpace(tmpl.Description),
 		QualifyingProblems: tmpl.QualifyingProblems,
