@@ -196,8 +196,11 @@
   </div>
 {/snippet}
 
-{#snippet renderProblemPoints({ pointsZone1, pointsZone2, pointsTop }: Problem)}
-  <ProblemPoints {pointsZone1} {pointsZone2} {pointsTop} />
+{#snippet renderProblemPoints(
+  { pointsZone1, pointsZone2, pointsTop }: Problem,
+  mobile: boolean,
+)}
+  <ProblemPoints {pointsZone1} {pointsZone2} {pointsTop} {mobile} />
 {/snippet}
 
 {#snippet renderSelectButton(contest: Contest)}
