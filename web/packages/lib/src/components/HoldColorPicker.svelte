@@ -37,6 +37,7 @@
 
   let popup: WaPopup | undefined = $state();
   let triggerButton: HTMLElement | undefined = $state();
+  let hiddenInput: HTMLInputElement | undefined = $state();
 
   const handleColorSelect = (color: string) => {
     value = color;
@@ -62,7 +63,9 @@
 <div class="hold-color-picker">
   <label for={name}>{label}</label>
   <input
+    bind:this={hiddenInput}
     type="hidden"
+    id={name}
     {name}
     {required}
     value={value ?? ""}
