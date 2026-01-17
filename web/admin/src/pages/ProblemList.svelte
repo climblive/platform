@@ -13,6 +13,7 @@
   } from "@climblive/lib/queries";
   import { isDefined } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
+  import CopyProblems from "./CopyProblems.svelte";
   import DeleteProblem from "./DeleteProblem.svelte";
 
   interface Props {
@@ -201,7 +202,10 @@
       description="Create boulder problems that contenders will attempt during the contest."
     >
       {#snippet actions()}
-        {@render createButton()}
+        <div class="empty-actions">
+          {@render createButton()}
+          <CopyProblems {contestId} />
+        </div>
       {/snippet}
     </EmptyState>
   {/if}
@@ -241,5 +245,11 @@
 
   .copy {
     color: var(--wa-color-text-quiet);
+  }
+
+  .empty-actions {
+    display: flex;
+    gap: var(--wa-space-s);
+    flex-wrap: wrap;
   }
 </style>
