@@ -20,7 +20,7 @@
     createProblemMutation,
     getProblemsQuery,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastError, isDefined } from "@climblive/lib/utils";
 
   interface Props {
     contestId: number;
@@ -184,9 +184,7 @@
 {/snippet}
 
 {#snippet renderPoints({ pointsZone1, pointsZone2, pointsTop }: Problem)}
-  {@const values = [pointsZone1, pointsZone2, pointsTop].filter(
-    (v) => v !== undefined,
-  )}
+  {@const values = [pointsZone1, pointsZone2, pointsTop].filter(isDefined)}
   {values.join(" / ")} pts
 {/snippet}
 
