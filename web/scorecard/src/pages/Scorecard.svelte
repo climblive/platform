@@ -23,6 +23,7 @@
     ascentDeregisteredEventSchema,
     ascentRegisteredEventSchema,
     contenderScoreUpdatedEventSchema,
+    raffleWinnerDrawnEventSchema,
     type Problem,
     type Tick,
   } from "@climblive/lib/models";
@@ -35,7 +36,7 @@
     removeTickFromQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
-  import { getApiUrl } from "@climblive/lib/utils";
+  import { getApiUrl, toastSuccess } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { add } from "date-fns/add";
   import { getContext, onDestroy, onMount } from "svelte";
@@ -55,6 +56,7 @@
   let tabGroup: WaTabGroup | undefined = $state();
   let radioGroup: WaRadioGroup | undefined = $state();
   let eventSource: EventSource | undefined;
+  let contestEventSource: EventSource | undefined;
   let score: number = $state(0);
   let placement: number | undefined = $state();
 
@@ -205,6 +207,20 @@
 
       removeTickFromQueryCache(queryClient, event.tickId);
     });
+
+    contestEventSource = new EventSource(
+      `${getApiUrl()}/contests/${$session.contestId}/events`,
+    );
+
+    contestEventSource.addEventListener("RAFFLE_WINNER_DRAWN", (e) => {
+      const event = raffleWinnerDrawnEventSchema.parse(JSON.parse(e.data));
+
+      toastSuccess(
+        "🎉 Raffle Winner!",
+        `${event.contenderName} won the raffle!`,
+        10000,
+      );
+    });
   };
 
   const tearDown = () => {
@@ -213,6 +229,9 @@
 
     eventSource?.close();
     eventSource = undefined;
+
+    contestEventSource?.close();
+    contestEventSource = undefined;
 
     stop();
   };
