@@ -127,8 +127,6 @@
         `Failed to copy ${failCount} problem${failCount > 1 ? "s" : ""}`,
       );
     }
-
-    handleClose();
   };
 
   const contestColumns: ColumnDefinition<Contest>[] = [
