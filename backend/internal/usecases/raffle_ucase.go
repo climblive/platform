@@ -164,3 +164,21 @@ func (uc *RaffleUseCase) GetRaffleWinners(ctx context.Context, raffleID domain.R
 
 	return winners, nil
 }
+
+func (uc *RaffleUseCase) GetRaffleWinnersByContest(ctx context.Context, contestID domain.ContestID) ([]domain.RaffleWinner, error) {
+	raffles, err := uc.Repo.GetRafflesByContest(ctx, nil, contestID)
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	allWinners := make([]domain.RaffleWinner, 0)
+	for _, raffle := range raffles {
+		winners, err := uc.Repo.GetRaffleWinners(ctx, nil, raffle.ID)
+		if err != nil {
+			return nil, errors.Wrap(err, 0)
+		}
+		allWinners = append(allWinners, winners...)
+	}
+
+	return allWinners, nil
+}

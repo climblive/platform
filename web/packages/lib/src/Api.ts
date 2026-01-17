@@ -443,6 +443,16 @@ export class ApiClient {
     return z.array(raffleWinnerSchema).parse(result.data);
   };
 
+  getRaffleWinnersByContest = async (contestId: number) => {
+    const endpoint = `/contests/${contestId}/raffle-winners`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(raffleWinnerSchema).parse(result.data);
+  };
+
   createOrganizer = async (template: OrganizerTemplate) => {
     const endpoint = "/organizers";
 

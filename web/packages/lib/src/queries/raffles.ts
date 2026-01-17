@@ -58,3 +58,10 @@ export const getRaffleWinnersQuery = (raffleId: number) =>
     queryKey: ["raffle-winners", { raffleId }],
     queryFn: async () => ApiClient.getInstance().getRaffleWinners(raffleId),
   }));
+
+export const getRaffleWinnersByContestQuery = (contestId: number) =>
+  createQuery(() => ({
+    queryKey: ["raffle-winners-by-contest", { contestId }],
+    queryFn: async () =>
+      ApiClient.getInstance().getRaffleWinnersByContest(contestId),
+  }));

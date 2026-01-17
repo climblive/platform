@@ -13,6 +13,7 @@ type raffleUseCase interface {
 	CreateRaffle(ctx context.Context, contestID domain.ContestID) (domain.Raffle, error)
 	DrawRaffleWinner(ctx context.Context, raffleID domain.RaffleID) (domain.RaffleWinner, error)
 	GetRaffleWinners(ctx context.Context, raffleID domain.RaffleID) ([]domain.RaffleWinner, error)
+	GetRaffleWinnersByContest(ctx context.Context, contestID domain.ContestID) ([]domain.RaffleWinner, error)
 }
 
 type raffleHandler struct {
@@ -29,6 +30,7 @@ func InstallRaffleHandler(mux *Mux, raffleUseCase raffleUseCase) {
 	mux.HandleFunc("POST /contests/{contestID}/raffles", handler.CreateRaffle)
 	mux.HandleFunc("POST /raffles/{raffleID}/winners", handler.DrawRaffleWinner)
 	mux.HandleFunc("GET /raffles/{raffleID}/winners", handler.GetRaffleWinners)
+	mux.HandleFunc("GET /contests/{contestID}/raffle-winners", handler.GetRaffleWinnersByContest)
 }
 
 func (hdlr *raffleHandler) GetRaffle(w http.ResponseWriter, r *http.Request) {
@@ -103,6 +105,22 @@ func (hdlr *raffleHandler) GetRaffleWinners(w http.ResponseWriter, r *http.Reque
 	}
 
 	winners, err := hdlr.raffleUseCase.GetRaffleWinners(r.Context(), raffleID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusOK, winners)
+}
+
+func (hdlr *raffleHandler) GetRaffleWinnersByContest(w http.ResponseWriter, r *http.Request) {
+	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	winners, err := hdlr.raffleUseCase.GetRaffleWinnersByContest(r.Context(), contestID)
 	if err != nil {
 		handleError(w, err)
 		return
