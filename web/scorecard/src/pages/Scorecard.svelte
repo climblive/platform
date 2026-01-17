@@ -2,7 +2,6 @@
   import ContestInfo from "@/components/ContestInfo.svelte";
   import Header from "@/components/Header.svelte";
   import ProblemView from "@/components/ProblemView.svelte";
-  import RaffleWinners from "@/components/RaffleWinners.svelte";
   import type { ScorecardSession } from "@/types";
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
@@ -354,7 +353,6 @@
           </wa-tab-panel>
           <wa-tab-panel name="info">
             <ContestInfo {contest} problems={sortedProblems} {compClasses} />
-            <RaffleWinners contestId={$session.contestId} />
           </wa-tab-panel>
         </wa-tab-group>
       </main>
