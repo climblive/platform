@@ -1,5 +1,6 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
+  import ProblemPoints from "@/components/ProblemPoints.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
@@ -20,7 +21,7 @@
     createProblemMutation,
     getProblemsQuery,
   } from "@climblive/lib/queries";
-  import { toastError, isDefined } from "@climblive/lib/utils";
+  import { toastError } from "@climblive/lib/utils";
 
   interface Props {
     contestId: number;
@@ -39,13 +40,17 @@
   );
 
   const availableContests = $derived.by(() => {
-    if (!contestsQuery.data) return [];
+    if (!contestsQuery.data) {
+      return [];
+    }
     return contestsQuery.data
       .filter((c) => c.id !== contestId && !c.archived)
       .sort((a, b) => b.created.getTime() - a.created.getTime());
   });
 
   const problems = $derived(selectedProblemsQuery?.data);
+
+  const createMutation = createProblemMutation(contestId);
 
   const handleOpen = () => {
     if (dialog) {
@@ -79,34 +84,38 @@
     copyProgress = 0;
     let failCount = 0;
 
-    const createMutation = createProblemMutation(contestId);
-
     for (let i = 0; i < problems.length; i++) {
-      const problem = problems[i];
+      const {
+        number,
+        holdColorPrimary,
+        holdColorSecondary,
+        description,
+        zone1Enabled,
+        zone2Enabled,
+        pointsZone1,
+        pointsZone2,
+        pointsTop,
+        flashBonus,
+      } = problems[i];
+
       const template: ProblemTemplate = {
-        number: problem.number,
-        holdColorPrimary: problem.holdColorPrimary,
-        holdColorSecondary: problem.holdColorSecondary,
-        description: problem.description,
-        zone1Enabled: problem.zone1Enabled,
-        zone2Enabled: problem.zone2Enabled,
-        pointsZone1: problem.pointsZone1,
-        pointsZone2: problem.pointsZone2,
-        pointsTop: problem.pointsTop,
-        flashBonus: problem.flashBonus,
+        number,
+        holdColorPrimary,
+        holdColorSecondary,
+        description,
+        zone1Enabled,
+        zone2Enabled,
+        pointsZone1,
+        pointsZone2,
+        pointsTop,
+        flashBonus,
       };
 
-      await new Promise<void>((resolve) => {
-        createMutation.mutate(template, {
-          onSuccess: () => {
-            resolve();
-          },
-          onError: () => {
-            failCount++;
-            resolve();
-          },
-        });
-      });
+      try {
+        await createMutation.mutateAsync(template);
+      } catch {
+        failCount++;
+      }
 
       copyProgress = ((i + 1) / problems.length) * 100;
     }
@@ -130,9 +139,9 @@
       width: "1fr",
     },
     {
-      label: "Created",
+      label: "Start time",
       mobile: false,
-      render: renderContestCreated,
+      render: renderContestStartTime,
       width: "max-content",
     },
     {
@@ -153,7 +162,7 @@
     {
       label: "Points",
       mobile: true,
-      render: renderPoints,
+      render: renderProblemPoints,
       width: "max-content",
     },
   ];
@@ -163,8 +172,12 @@
   {contest.name}
 {/snippet}
 
-{#snippet renderContestCreated(contest: Contest)}
-  {contest.created.toLocaleDateString()}
+{#snippet renderContestStartTime(contest: Contest)}
+  {#if contest.timeBegin}
+    {contest.timeBegin.toLocaleDateString()}
+  {:else}
+    -
+  {/if}
 {/snippet}
 
 {#snippet renderNumberAndColor({
@@ -183,9 +196,8 @@
   </div>
 {/snippet}
 
-{#snippet renderPoints({ pointsZone1, pointsZone2, pointsTop }: Problem)}
-  {@const values = [pointsZone1, pointsZone2, pointsTop].filter(isDefined)}
-  {values.join(" / ")} pts
+{#snippet renderProblemPoints({ pointsZone1, pointsZone2, pointsTop }: Problem)}
+  <ProblemPoints {pointsZone1} {pointsZone2} {pointsTop} />
 {/snippet}
 
 {#snippet renderSelectButton(contest: Contest)}

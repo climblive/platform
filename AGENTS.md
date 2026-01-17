@@ -181,6 +181,7 @@ make test
 - **Interfaces**: Define dependencies as interfaces; implement in other packages
 - **Testing**: Unit tests alongside implementation files (`*_test.go`)
 - **Logging**: Use structured logging with `slog`
+- **Arrow Functions**: Always use braces for arrow function bodies, even for single-line returns
 
 ### Frontend (Svelte)
 
@@ -192,6 +193,7 @@ make test
 - **Theme**: Shared theme in `packages/lib/src/theme.css`
 - **Formatting**: Prettier with project-specific config
 - **Linting**: ESLint with Svelte plugin
+- **Arrow Functions**: Always use braces for arrow function bodies, even for single-line returns. Never use implicit returns.
 
 **Shared Code**: Common utilities, types, and components belong in `packages/lib` for reuse across apps.
 
