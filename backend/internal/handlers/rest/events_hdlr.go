@@ -54,7 +54,6 @@ func (hdlr *eventHandler) HandleSubscribeContestEvents(w http.ResponseWriter, r 
 		"[]CONTENDER_SCORE_UPDATED",
 		"SCORE_ENGINE_STARTED",
 		"SCORE_ENGINE_STOPPED",
-		"RAFFLE_WINNER_DRAWN",
 	)
 
 	hdlr.subscribe(w, r, filter, logger)
@@ -76,6 +75,7 @@ func (hdlr *eventHandler) HandleSubscribeContenderEvents(w http.ResponseWriter, 
 		"CONTENDER_SCORE_UPDATED",
 		"ASCENT_REGISTERED",
 		"ASCENT_DEREGISTERED",
+		"RAFFLE_WINNER_DRAWN",
 	)
 
 	hdlr.subscribe(w, r, filter, logger)

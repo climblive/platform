@@ -55,7 +55,6 @@
   let tabGroup: WaTabGroup | undefined = $state();
   let radioGroup: WaRadioGroup | undefined = $state();
   let eventSource: EventSource | undefined;
-  let contestEventSource: EventSource | undefined;
   let score: number = $state(0);
   let placement: number | undefined = $state();
 
@@ -207,11 +206,7 @@
       removeTickFromQueryCache(queryClient, event.tickId);
     });
 
-    contestEventSource = new EventSource(
-      `${getApiUrl()}/contests/${$session.contestId}/events`,
-    );
-
-    contestEventSource.addEventListener("RAFFLE_WINNER_DRAWN", (e) => {
+    eventSource.addEventListener("RAFFLE_WINNER_DRAWN", (e) => {
       const event = raffleWinnerDrawnEventSchema.parse(JSON.parse(e.data));
 
       toastSuccess(
@@ -228,9 +223,6 @@
 
     eventSource?.close();
     eventSource = undefined;
-
-    contestEventSource?.close();
-    contestEventSource = undefined;
 
     stop();
   };
