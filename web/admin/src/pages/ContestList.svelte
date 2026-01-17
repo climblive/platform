@@ -3,6 +3,7 @@
   import RelativeTime from "@/components/RelativeTime.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
+  import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
   import {
     EmptyState,
     Table,
@@ -13,6 +14,7 @@
     getAllContestsQuery,
     getContestsByOrganizerQuery,
   } from "@climblive/lib/queries";
+  import { getCountryName, getFlag } from "@climblive/lib/utils";
   import { format } from "date-fns";
   import { Link, navigate } from "svelte-routing";
 
@@ -77,6 +79,12 @@
 
   const columns: ColumnDefinition<Contest>[] = [
     {
+      label: "",
+      mobile: true,
+      render: renderFlag,
+      width: "max-content",
+    },
+    {
       label: "Name",
       mobile: true,
       render: renderName,
@@ -120,6 +128,11 @@
     ),
   );
 </script>
+
+{#snippet renderFlag({ id, country }: Contest)}
+  <wa-tooltip for="flag-{id}">{getCountryName(country)}</wa-tooltip>
+  <span id="flag-{id}" class="flag">{getFlag(country)}</span>
+{/snippet}
 
 {#snippet renderName({ id, name }: Contest)}
   <Link to="contests/{id}">{name}</Link>
@@ -254,5 +267,9 @@
     color: var(--wa-color-text-quiet);
     font-size: var(--wa-font-size-s);
     margin-block-start: var(--wa-space-xs) var(--wa-space-m);
+  }
+
+  .flag {
+    font-size: var(--wa-font-size-larger);
   }
 </style>
