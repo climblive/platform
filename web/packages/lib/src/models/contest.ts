@@ -7,6 +7,7 @@ export const contestSchema: z.ZodType<Contest> = z.object({
   ownership: ownershipDataSchema,
   archived: z.boolean(),
   location: z.string().optional(),
+  country: z.string(),
   seriesId: z.number().optional(),
   name: z.string(),
   description: z.string().optional(),
