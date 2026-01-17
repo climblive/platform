@@ -79,6 +79,8 @@
     copyProgress = 0;
     let failCount = 0;
 
+    const createMutation = createProblemMutation(contestId);
+
     for (let i = 0; i < problems.length; i++) {
       const problem = problems[i];
       const template: ProblemTemplate = {
@@ -94,23 +96,17 @@
         flashBonus: problem.flashBonus,
       };
 
-      const createMutation = createProblemMutation(contestId);
-
-      try {
-        await new Promise<void>((resolve, reject) => {
-          createMutation.mutate(template, {
-            onSuccess: () => {
-              resolve();
-            },
-            onError: (error) => {
-              failCount++;
-              reject(error);
-            },
-          });
+      await new Promise<void>((resolve) => {
+        createMutation.mutate(template, {
+          onSuccess: () => {
+            resolve();
+          },
+          onError: () => {
+            failCount++;
+            resolve();
+          },
         });
-      } catch {
-        // Error already tracked in failCount
-      }
+      });
 
       copyProgress = ((i + 1) / problems.length) * 100;
     }
