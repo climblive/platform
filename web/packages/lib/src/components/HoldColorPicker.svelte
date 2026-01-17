@@ -61,7 +61,7 @@
 </script>
 
 <div class="hold-color-picker">
-  <label for={name}>{label}</label>
+  <label id="{name}-label">{label}</label>
   <input
     bind:this={hiddenInput}
     type="hidden"
@@ -75,6 +75,9 @@
     appearance="plain"
     onclick={handleTriggerClick}
     bind:this={triggerButton}
+    aria-labelledby="{name}-label"
+    aria-haspopup="true"
+    aria-expanded={popup?.active ?? false}
   >
     <div class="trigger-content">
       {#if value}
@@ -91,7 +94,7 @@
     placement="bottom-start"
     distance={4}
   >
-    <div class="popup-content">
+    <div class="popup-content" role="listbox" aria-label="Color selection">
       <div class="color-grid">
         {#each colors as color (color)}
           <button
@@ -99,6 +102,9 @@
             class="color-button"
             class:selected={value === color}
             onclick={() => handleColorSelect(color)}
+            aria-label="Select color {color}"
+            role="option"
+            aria-selected={value === color}
           >
             <HoldColorIndicator primary={color} />
           </button>
@@ -111,6 +117,7 @@
             appearance="plain"
             onclick={handleClear}
             style="width: 100%;"
+            aria-label="Clear color selection"
           >
             Clear
           </wa-button>
