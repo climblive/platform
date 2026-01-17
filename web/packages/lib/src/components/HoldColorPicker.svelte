@@ -72,7 +72,7 @@
       if (!popup || !popup.active) return;
       
       const target = event.target as Node;
-      const popupElement = popup.shadowRoot?.querySelector('.popup') as HTMLElement;
+      const popupElement = popup.shadowRoot?.querySelector('.popup') as HTMLElement | null;
       
       if (
         triggerButton &&
@@ -84,8 +84,14 @@
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        if (typeof document !== 'undefined') {
+          document.removeEventListener('mousedown', handleClickOutside);
+        }
+      };
+    }
   });
 </script>
 
