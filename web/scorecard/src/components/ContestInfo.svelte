@@ -43,12 +43,16 @@
   <LabeledText label="Number of problems">
     {problems.length.toString()}</LabeledText
   >
-  <LabeledText label="Qualifying problems">
-    {`${contest.qualifyingProblems.toString()} hardest`}
-  </LabeledText>
-  <LabeledText label="Number of finalists">
-    {contest.finalists.toString()}
-  </LabeledText>
+  {#if contest.qualifyingProblems > 0}
+    <LabeledText label="Qualifying problems">
+      {`${contest.qualifyingProblems.toString()} hardest`}
+    </LabeledText>
+  {/if}
+  {#if contest.finalists > 0}
+    <LabeledText label="Number of finalists">
+      {contest.finalists.toString()}
+    </LabeledText>
+  {/if}
   <LabeledText label="Scoreboard">
     <a href={scoreboardUrl} target="_blank">{scoreboardUrl}</a>
   </LabeledText>
