@@ -44,12 +44,18 @@
     if (popup) {
       popup.active = false;
     }
+    if (hiddenInput) {
+      hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
   };
 
   const handleClear = () => {
     value = undefined;
     if (popup) {
       popup.active = false;
+    }
+    if (hiddenInput) {
+      hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
     }
   };
 
@@ -58,6 +64,29 @@
       popup.active = !popup.active;
     }
   };
+
+  $effect(() => {
+    if (!popup) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!popup || !popup.active) return;
+      
+      const target = event.target as Node;
+      const popupElement = popup.shadowRoot?.querySelector('.popup') as HTMLElement;
+      
+      if (
+        triggerButton &&
+        !triggerButton.contains(target) &&
+        popupElement &&
+        !popupElement.contains(target)
+      ) {
+        popup.active = false;
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  });
 </script>
 
 <div class="hold-color-picker">
@@ -168,17 +197,16 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: var(--wa-space-xs);
-    margin-bottom: var(--wa-space-xs);
   }
 
   .color-button {
-    background: none;
+    background: var(--wa-color-bg-surface);
     border: 2px solid transparent;
     border-radius: var(--wa-radius-s);
-    padding: var(--wa-space-2xs);
+    padding: var(--wa-space-3xs);
     cursor: pointer;
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -196,12 +224,13 @@
   }
 
   .color-button :global(svg) {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
   }
 
   .clear-section {
     border-top: 1px solid var(--wa-color-border-normal);
     padding-top: var(--wa-space-xs);
+    margin-top: var(--wa-space-xs);
   }
 </style>
