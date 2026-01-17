@@ -31,12 +31,12 @@
 </script>
 
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/color-picker/color-picker.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { checked, GenericForm, name } from "@climblive/lib/forms";
+  import { HoldColorPicker } from "@climblive/lib/components";
   import { type Problem } from "@climblive/lib/models";
   import { type Snippet } from "svelte";
 
@@ -53,21 +53,6 @@
 
   let zone1Enabled = $derived(data.zone1Enabled);
   let zone2Enabled = $derived(data.zone2Enabled);
-
-  const swatches = [
-    "#6f3601",
-    "#dc3146",
-    "#f46a45",
-    "#fac22b",
-    "#00ac49",
-    "#2fbedc",
-    "#0071ec",
-    "#9951db",
-    "#e66ba3",
-    "#9194a2",
-    "#000",
-    "#fff",
-  ].join("; ");
 
   const handleZone1Toggle = (event: InputEvent) => {
     const target = event.target as WaSwitch;
@@ -92,25 +77,18 @@
       min={0}
     ></wa-input>
     <div class="colors">
-      <div class="pickers">
-        <wa-color-picker
-          size="small"
-          {@attach name("holdColorPrimary")}
-          label="Primary hold color"
-          required
-          {swatches}
-          value={data.holdColorPrimary}
-          without-format-toggle
-        ></wa-color-picker>
-        <wa-color-picker
-          size="small"
-          {@attach name("holdColorSecondary")}
-          label="Secondary hold color"
-          {swatches}
-          value={data.holdColorSecondary}
-          without-format-toggle
-        ></wa-color-picker>
-      </div>
+      <HoldColorPicker
+        name="holdColorPrimary"
+        label="Primary hold color"
+        required
+        bind:value={data.holdColorPrimary}
+      />
+      <HoldColorPicker
+        name="holdColorSecondary"
+        label="Secondary hold color"
+        allowClear={true}
+        bind:value={data.holdColorSecondary}
+      />
     </div>
     <wa-input
       size="small"
@@ -187,9 +165,7 @@
   }
 
   .colors {
-    & .pickers {
-      display: flex;
-      gap: var(--wa-space-s);
-    }
+    display: flex;
+    gap: var(--wa-space-s);
   }
 </style>
