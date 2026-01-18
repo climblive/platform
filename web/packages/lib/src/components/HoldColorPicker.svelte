@@ -45,7 +45,7 @@
       popup.active = false;
     }
     if (hiddenInput) {
-      hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
+      hiddenInput.dispatchEvent(new Event("input", { bubbles: true }));
     }
   };
 
@@ -55,7 +55,7 @@
       popup.active = false;
     }
     if (hiddenInput) {
-      hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
+      hiddenInput.dispatchEvent(new Event("input", { bubbles: true }));
     }
   };
 
@@ -70,10 +70,12 @@
 
     const handleClickOutside = (event: MouseEvent) => {
       if (!popup || !popup.active) return;
-      
+
       const target = event.target as Node;
-      const popupElement = popup.shadowRoot?.querySelector('.popup') as HTMLElement | null;
-      
+      const popupElement = popup.shadowRoot?.querySelector(
+        ".popup",
+      ) as HTMLElement | null;
+
       if (
         triggerButton &&
         !triggerButton.contains(target) &&
@@ -84,11 +86,11 @@
       }
     };
 
-    if (typeof document !== 'undefined') {
-      document.addEventListener('mousedown', handleClickOutside);
+    if (typeof document !== "undefined") {
+      document.addEventListener("mousedown", handleClickOutside);
       return () => {
-        if (typeof document !== 'undefined') {
-          document.removeEventListener('mousedown', handleClickOutside);
+        if (typeof document !== "undefined") {
+          document.removeEventListener("mousedown", handleClickOutside);
         }
       };
     }
@@ -150,7 +152,7 @@
         <div class="clear-section">
           <wa-button
             size="small"
-            appearance="plain"
+            appearance="outlined"
             onclick={handleClear}
             style="width: 100%;"
             aria-label="Clear color selection"
@@ -193,11 +195,12 @@
   }
 
   .popup-content {
-    background: var(--wa-color-bg-surface);
-    border: 1px solid var(--wa-color-border-normal);
-    border-radius: var(--wa-radius-m);
+    background: var(--wa-color-surface-border);
+    border: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-border-normal);
+    border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-s);
-    box-shadow: var(--wa-shadow-l);
+    box-shadow: var(--wa-shadow-m);
   }
 
   .color-grid {
@@ -207,9 +210,8 @@
   }
 
   .color-button {
-    background: var(--wa-color-bg-surface, #ffffff);
-    border: 2px solid var(--wa-color-border-normal, #e0e0e0);
-    border-radius: var(--wa-radius-s);
+    border: none;
+    background-color: transparent;
     padding: var(--wa-space-3xs);
     cursor: pointer;
     width: 40px;
