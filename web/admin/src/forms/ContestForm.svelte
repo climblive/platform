@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  import * as z from "zod/v4";
+  import { z } from "@climblive/lib/utils";
 
   export const formSchema = z.object({
     location: z.string().optional(),

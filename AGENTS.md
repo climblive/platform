@@ -192,6 +192,7 @@ make test
 - **Theme**: Shared theme in `packages/lib/src/theme.css`
 - **Formatting**: Prettier with project-specific config
 - **Linting**: ESLint with Svelte plugin
+- **Zod**: Always import as `import { z } from "@climblive/lib/utils"`
 
 **Shared Code**: Common utilities, types, and components belong in `packages/lib` for reuse across apps.
 
