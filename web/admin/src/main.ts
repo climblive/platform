@@ -9,6 +9,9 @@ import {
 } from "@climblive/lib/utils";
 import * as Sentry from "@sentry/svelte";
 import { mount } from "svelte";
+import * as z from "zod/v4";
+
+z.config({ jitless: true });
 
 if (import.meta.env.PROD) {
   Sentry.init({
