@@ -8,3 +8,4 @@ export * from "./guards";
 export * from "./scores";
 export * from "./text";
 export * from "./uuid";
+export * from "./zod";
