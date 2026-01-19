@@ -225,8 +225,9 @@ func setupMux(
 	}
 
 	raffleUseCase := usecases.RaffleUseCase{
-		Repo:       repo,
-		Authorizer: authorizer,
+		Repo:        repo,
+		Authorizer:  authorizer,
+		EventBroker: eventBroker,
 	}
 
 	userUseCase := usecases.UserUseCase{
