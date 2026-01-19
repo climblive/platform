@@ -25,9 +25,10 @@
 
   interface Props {
     contestId: number;
+    openDialog?: () => void;
   }
 
-  let { contestId }: Props = $props();
+  let { contestId, openDialog = $bindable() }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
   let selectedContest: Contest | undefined = $state();
@@ -57,6 +58,10 @@
       dialog.open = true;
     }
   };
+
+  $effect(() => {
+    openDialog = handleOpen;
+  });
 
   const handleClose = () => {
     if (dialog) {
@@ -211,11 +216,6 @@
     <wa-icon name="arrow-right" slot="end"></wa-icon>
   </wa-button>
 {/snippet}
-
-<wa-button onclick={handleOpen} appearance="outlined" variant="neutral">
-  Copy from another contest
-  <wa-icon name="copy" slot="start"></wa-icon>
-</wa-button>
 
 <wa-dialog bind:this={dialog} label="Copy problems from another contest">
   {#if !selectedContest}

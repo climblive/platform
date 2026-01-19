@@ -24,6 +24,7 @@
   let { contestId, ...props }: Props = $props();
 
   let tableLimit = $state<number | undefined>(props.tableLimit);
+  let copyProblemsOpen: () => void = $state(() => {});
 
   const problemsQuery = $derived(getProblemsQuery(contestId));
   const ticksQuery = $derived(getTicksByContestQuery(contestId));
@@ -204,7 +205,7 @@
       {#snippet actions()}
         <div class="empty-actions">
           {@render createButton()}
-          <CopyProblems {contestId} />
+          {@render copyProblemsButton()}
         </div>
       {/snippet}
     </EmptyState>
@@ -216,6 +217,21 @@
     >
   {/if}
 </section>
+
+<CopyProblems {contestId} bind:openDialog={copyProblemsOpen} />
+
+{#snippet copyProblemsButton()}
+  <wa-button
+    onclick={() => {
+      copyProblemsOpen();
+    }}
+    appearance="outlined"
+    variant="neutral"
+  >
+    Copy from another contest
+    <wa-icon name="copy" slot="start"></wa-icon>
+  </wa-button>
+{/snippet}
 
 <style>
   .controls {
