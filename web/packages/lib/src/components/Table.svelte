@@ -15,11 +15,12 @@
     columns: ColumnDefinition<T>[];
     data: T[];
     getId: (row: T) => string | number;
+    hideHeader?: boolean;
   };
 
   let mobile = $state(false);
 
-  const { columns, data, getId }: Props<T> = $props();
+  const { columns, data, getId, hideHeader = false }: Props<T> = $props();
 
   function handleResize() {
     mobile = window.innerWidth < 768;
@@ -45,15 +46,17 @@
 <svelte:window onresize={handleResize} />
 
 <table border="0" style="grid-template-columns: {gridTemplateColumns}">
-  <thead>
-    <tr>
-      {#each columns as column (column)}
-        {#if cellVisible(column)}
-          <th data-align={column.align ?? "left"}>{column.label}</th>
-        {/if}
-      {/each}
-    </tr>
-  </thead>
+  {#if !hideHeader}
+    <thead>
+      <tr>
+        {#each columns as column (column)}
+          {#if cellVisible(column)}
+            <th data-align={column.align ?? "left"}>{column.label}</th>
+          {/if}
+        {/each}
+      </tr>
+    </thead>
+  {/if}
   <tbody>
     {#each data as row (getId(row))}
       <tr>

@@ -34,6 +34,7 @@
   let selectedContest: Contest | undefined = $state();
   let isCopying = $state(false);
   let copyProgress = $state(0);
+  let copyCompleted = $state(false);
 
   const contestsQuery = $derived(getAllContestsQuery());
   const selectedProblemsQuery = $derived(
@@ -66,6 +67,7 @@
       dialog.open = false;
       selectedContest = undefined;
       copyProgress = 0;
+      copyCompleted = false;
     }
   };
 
@@ -85,6 +87,7 @@
 
     isCopying = true;
     copyProgress = 0;
+    copyCompleted = false;
     let failCount = 0;
 
     for (let i = 0; i < problems.length; i++) {
@@ -124,6 +127,7 @@
     }
 
     isCopying = false;
+    copyCompleted = true;
 
     if (failCount > 0) {
       toastError(
@@ -228,6 +232,7 @@
           columns={contestColumns}
           data={availableContests}
           getId={({ id }) => id}
+          hideHeader={true}
         ></Table>
       {/if}
     </div>
@@ -239,41 +244,60 @@
       {#if selectedProblemsQuery?.isPending}
         <Loader />
       {:else if problems && problems.length > 0}
-        <p>
-          {problems.length} problem{problems.length > 1 ? "s" : ""} from "{selectedContest.name}"
-          will be copied:
-        </p>
-        <Table
-          columns={problemColumns}
-          data={problems}
-          getId={({ id }) => id}
-        />
-        {#if isCopying}
+        {#if isCopying || copyCompleted}
+          <p>
+            {#if isCopying}
+              Copying {problems.length} problem{problems.length > 1 ? "s" : ""} from
+              "{selectedContest.name}"...
+            {:else}
+              Successfully copied {problems.length} problem{problems.length > 1
+                ? "s"
+                : ""} from "{selectedContest.name}"
+            {/if}
+          </p>
           <wa-progress-bar value={copyProgress}></wa-progress-bar>
+        {:else}
+          <p>
+            {problems.length} problem{problems.length > 1 ? "s" : ""} from "{selectedContest.name}"
+            will be copied:
+          </p>
+          <Table
+            columns={problemColumns}
+            data={problems}
+            getId={({ id }) => id}
+            hideHeader={true}
+          />
         {/if}
       {:else}
         <p class="empty">No problems found in this contest</p>
       {/if}
     </div>
-    <wa-button
-      slot="footer"
-      appearance="plain"
-      onclick={handleBack}
-      disabled={isCopying}
-    >
-      <wa-icon name="arrow-left" slot="start"></wa-icon>
-      Back
-    </wa-button>
-    <wa-button
-      slot="footer"
-      variant="accent"
-      onclick={handleCopy}
-      disabled={!problems || problems.length === 0 || isCopying}
-      loading={isCopying}
-    >
-      Copy {problems?.length || 0} problem{problems?.length !== 1 ? "s" : ""}
-      <wa-icon slot="start" name="copy"></wa-icon>
-    </wa-button>
+    {#if copyCompleted}
+      <wa-button slot="footer" variant="success" onclick={handleClose}>
+        <wa-icon name="check" slot="start"></wa-icon>
+        Close
+      </wa-button>
+    {:else}
+      <wa-button
+        slot="footer"
+        appearance="plain"
+        onclick={handleBack}
+        disabled={isCopying}
+      >
+        <wa-icon name="arrow-left" slot="start"></wa-icon>
+        Back
+      </wa-button>
+      <wa-button
+        slot="footer"
+        variant="accent"
+        onclick={handleCopy}
+        disabled={!problems || problems.length === 0 || isCopying}
+        loading={isCopying}
+      >
+        Copy {problems?.length || 0} problem{problems?.length !== 1 ? "s" : ""}
+        <wa-icon slot="start" name="copy"></wa-icon>
+      </wa-button>
+    {/if}
   {/if}
 </wa-dialog>
 
