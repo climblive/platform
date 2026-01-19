@@ -53,15 +53,13 @@
 
   const createMutation = createProblemMutation(contestId);
 
-  const handleOpen = () => {
+  function handleOpen() {
     if (dialog) {
       dialog.open = true;
     }
-  };
+  }
 
-  $effect(() => {
-    openDialog = handleOpen;
-  });
+  openDialog = handleOpen;
 
   const handleClose = () => {
     if (dialog) {
