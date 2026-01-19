@@ -45,7 +45,11 @@
 
 <svelte:window onresize={handleResize} />
 
-<table border="0" style="grid-template-columns: {gridTemplateColumns}">
+<table
+  border="0"
+  style="grid-template-columns: {gridTemplateColumns}"
+  class:no-header={hideHeader}
+>
   {#if !hideHeader}
     <thead>
       <tr>
@@ -130,6 +134,10 @@
   tbody tr:first-of-type {
     border-top: var(--wa-border-width-s) var(--wa-border-style)
       var(--wa-color-neutral-border-quiet);
+  }
+
+  table.no-header tbody tr:first-of-type {
+    border-top: none;
   }
 
   tbody tr:not(:last-of-type) {

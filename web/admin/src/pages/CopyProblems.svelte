@@ -6,6 +6,7 @@
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
+  import "@awesome.me/webawesome/dist/components/scroller/scroller.js";
   import {
     HoldColorIndicator,
     Table,
@@ -219,7 +220,7 @@
   </wa-button>
 {/snippet}
 
-<wa-dialog bind:this={dialog} label="Copy problems from another contest">
+<wa-dialog bind:this={dialog} label="Copy problems">
   {#if !selectedContest}
     <div class="dialog-content">
       <p>Select a contest to copy problems from:</p>
@@ -228,12 +229,14 @@
       {:else if availableContests.length === 0}
         <p class="empty">No other contests available</p>
       {:else}
-        <Table
-          columns={contestColumns}
-          data={availableContests}
-          getId={({ id }) => id}
-          hideHeader={true}
-        ></Table>
+        <wa-scroller>
+          <Table
+            columns={contestColumns}
+            data={availableContests}
+            getId={({ id }) => id}
+            hideHeader={true}
+          ></Table>
+        </wa-scroller>
       {/if}
     </div>
     <wa-button slot="footer" appearance="plain" onclick={handleClose}>
@@ -257,16 +260,14 @@
           </p>
           <wa-progress-bar value={copyProgress}></wa-progress-bar>
         {:else}
-          <p>
-            {problems.length} problem{problems.length > 1 ? "s" : ""} from "{selectedContest.name}"
-            will be copied:
-          </p>
-          <Table
-            columns={problemColumns}
-            data={problems}
-            getId={({ id }) => id}
-            hideHeader={true}
-          />
+          <wa-scroller>
+            <Table
+              columns={problemColumns}
+              data={problems}
+              getId={({ id }) => id}
+              hideHeader={true}
+            />
+          </wa-scroller>
         {/if}
       {:else}
         <p class="empty">No problems found in this contest</p>
