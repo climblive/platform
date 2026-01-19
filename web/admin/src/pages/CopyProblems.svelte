@@ -28,7 +28,7 @@
     openDialog?: () => void;
   }
 
-  let { contestId, openDialog = $bindable() }: Props = $props();
+  let { contestId, openDialog = $bindable(() => {}) }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
   let selectedContest: Contest | undefined = $state();
