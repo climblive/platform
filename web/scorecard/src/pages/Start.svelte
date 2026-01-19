@@ -13,7 +13,7 @@
   import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
-  import * as z from "zod/v4";
+  import { z } from "@climblive/lib/utils";
   import { ZodError } from "zod/v4";
 
   const enterFormSchema = z.object({

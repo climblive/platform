@@ -1,4 +1,4 @@
-import * as z from "zod/v4";
+import { z } from "@climblive/lib/utils";
 import type { Raffle, RaffleWinner } from "./generated";
 
 export const raffleSchema: z.ZodType<Raffle> = z.object({

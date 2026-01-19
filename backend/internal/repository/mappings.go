@@ -63,6 +63,7 @@ func contestToDomain(record database.Contest) domain.Contest {
 		},
 		Archived:           record.Archived,
 		Location:           record.Location.String,
+		Country:            record.Country,
 		SeriesID:           domain.SeriesID(record.SeriesID.Int32),
 		Name:               record.Name,
 		Description:        record.Description.String,

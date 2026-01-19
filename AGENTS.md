@@ -194,6 +194,7 @@ make test
 - **Formatting**: Prettier with project-specific config
 - **Linting**: ESLint with Svelte plugin
 - **Arrow Functions**: Always use braces for arrow function bodies, even for single-line returns. Never use implicit returns.
+- **Zod**: Always import as `import { z } from "@climblive/lib/utils"`
 
 **Shared Code**: Common utilities, types, and components belong in `packages/lib` for reuse across apps.
 
@@ -221,10 +222,12 @@ make test
 
 ### Modifying database schema
 
-1. Update model in MySQL Workbench and forward export to `backend/database/climblive.sql`
+1. Update model in MySQL Workbench (`backend/database/climblive.mwb`) and forward export to `backend/database/climblive.sql`
 2. Create a new Goose migration in `backend/cmd/api/migrations/`
 3. Update `backend/database/queries.sql` with new queries
 4. Run `sqlc generate`
+
+**Important:** Always update the MySQL Workbench model file (`.mwb`) when making database schema changes.
 
 ### Modify domain models
 
