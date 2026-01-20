@@ -7,6 +7,7 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
   import "@awesome.me/webawesome/dist/components/scroller/scroller.js";
+  import { EmptyState } from "@climblive/lib/components";
   import {
     HoldColorIndicator,
     Table,
@@ -27,9 +28,14 @@
   interface Props {
     contestId: number;
     openDialog?: () => void;
+    hasAvailableContests?: boolean;
   }
 
-  let { contestId, openDialog = $bindable(() => {}) }: Props = $props();
+  let {
+    contestId,
+    openDialog = $bindable(() => {}),
+    hasAvailableContests = $bindable(false),
+  }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
   let selectedContest: Contest | undefined = $state();
@@ -49,6 +55,10 @@
     return contestsQuery.data
       .filter((c) => c.id !== contestId && !c.archived)
       .sort((a, b) => b.created.getTime() - a.created.getTime());
+  });
+
+  $effect(() => {
+    hasAvailableContests = availableContests.length > 0;
   });
 
   const problems = $derived(selectedProblemsQuery?.data);
@@ -223,11 +233,13 @@
 <wa-dialog bind:this={dialog} label="Copy problems">
   {#if !selectedContest}
     <div class="dialog-content">
-      <p>Select a contest to copy problems from:</p>
       {#if contestsQuery.isPending}
         <Loader />
       {:else if availableContests.length === 0}
-        <p class="empty">No other contests available</p>
+        <EmptyState
+          title="No contests available"
+          description="There are no other contests to copy problems from."
+        />
       {:else}
         <wa-scroller>
           <Table
@@ -248,16 +260,12 @@
         <Loader />
       {:else if problems && problems.length > 0}
         {#if isCopying || copyCompleted}
-          <p>
-            {#if isCopying}
+          {#if isCopying}
+            <p>
               Copying {problems.length} problem{problems.length > 1 ? "s" : ""} from
               "{selectedContest.name}"...
-            {:else}
-              Successfully copied {problems.length} problem{problems.length > 1
-                ? "s"
-                : ""} from "{selectedContest.name}"
-            {/if}
-          </p>
+            </p>
+          {/if}
           <wa-progress-bar value={copyProgress}></wa-progress-bar>
         {:else}
           <wa-scroller>
@@ -270,7 +278,10 @@
           </wa-scroller>
         {/if}
       {:else}
-        <p class="empty">No problems found in this contest</p>
+        <EmptyState
+          title="No problems found"
+          description="This contest has no problems to copy."
+        />
       {/if}
     </div>
     {#if copyCompleted}
@@ -314,12 +325,6 @@
     display: flex;
     align-items: center;
     gap: var(--wa-space-s);
-  }
-
-  .empty {
-    color: var(--wa-color-text-quiet);
-    text-align: center;
-    padding: var(--wa-space-xl);
   }
 
   wa-dialog {

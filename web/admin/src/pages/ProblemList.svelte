@@ -25,6 +25,7 @@
 
   let tableLimit = $state<number | undefined>(props.tableLimit);
   let copyProblemsOpen: () => void = $state(() => {});
+  let hasAvailableContests = $state(false);
 
   const problemsQuery = $derived(getProblemsQuery(contestId));
   const ticksQuery = $derived(getTicksByContestQuery(contestId));
@@ -205,7 +206,9 @@
       {#snippet actions()}
         <div class="empty-actions">
           {@render createButton()}
-          {@render copyProblemsButton()}
+          {#if hasAvailableContests}
+            {@render copyProblemsButton()}
+          {/if}
         </div>
       {/snippet}
     </EmptyState>
@@ -218,7 +221,11 @@
   {/if}
 </section>
 
-<CopyProblems {contestId} bind:openDialog={copyProblemsOpen} />
+<CopyProblems
+  {contestId}
+  bind:openDialog={copyProblemsOpen}
+  bind:hasAvailableContests
+/>
 
 {#snippet copyProblemsButton()}
   <wa-button
