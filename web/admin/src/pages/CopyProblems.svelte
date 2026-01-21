@@ -1,6 +1,5 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
-  import ProblemPoints from "@/components/ProblemPoints.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
@@ -9,13 +8,8 @@
   import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
-  import {
-    EmptyState,
-    HoldColorIndicator,
-    Table,
-    type ColumnDefinition,
-  } from "@climblive/lib/components";
-  import { type Problem, type ProblemTemplate } from "@climblive/lib/models";
+  import { EmptyState } from "@climblive/lib/components";
+  import { type ProblemTemplate } from "@climblive/lib/models";
   import {
     createProblemMutation,
     getAllContestsQuery,
@@ -60,10 +54,23 @@
 
   const createMutation = $derived(createProblemMutation(contestId));
 
+  const problemsSummary = $derived.by(() => {
+    if (!problems || problems.length === 0) {
+      return null;
+    }
+
+    const points = problems.map((p) => p.pointsTop);
+    const minPoints = Math.min(...points);
+    const maxPoints = Math.max(...points);
+
+    return {
+      count: problems.length,
+      minPoints,
+      maxPoints,
+    };
+  });
+
   const handleClose = () => {
-    selectedContestId = undefined;
-    copyProgress = 0;
-    copyCompleted = false;
     open = false;
   };
 
@@ -127,45 +134,7 @@
       );
     }
   };
-
-  const problemColumns: ColumnDefinition<Problem>[] = [
-    {
-      label: "Number",
-      mobile: true,
-      render: renderNumberAndColor,
-      width: "minmax(max-content, 3fr)",
-    },
-    {
-      label: "Points",
-      mobile: true,
-      render: renderProblemPoints,
-      width: "max-content",
-    },
-  ];
 </script>
-
-{#snippet renderNumberAndColor({
-  number,
-  holdColorPrimary,
-  holdColorSecondary,
-}: Problem)}
-  <div class="number">
-    <HoldColorIndicator
-      --height="1.25rem"
-      --width="1.25rem"
-      primary={holdColorPrimary}
-      secondary={holdColorSecondary}
-    />
-    № {number}
-  </div>
-{/snippet}
-
-{#snippet renderProblemPoints(
-  { pointsZone1, pointsZone2, pointsTop }: Problem,
-  mobile: boolean,
-)}
-  <ProblemPoints {pointsZone1} {pointsZone2} {pointsTop} {mobile} />
-{/snippet}
 
 <wa-dialog bind:this={dialog} label="Copy problems" {open}>
   {#if contestsQuery.isPending}
@@ -176,30 +145,32 @@
       description="There are no other contests to copy problems from."
     />
   {:else}
-    <wa-select
-      label="Select contest"
-      placeholder="Select a contest to copy from"
-      onchange={handleContestChange}
-      disabled={isCopying || copyCompleted}
-    >
-      {#each availableContests as contest}
-        <wa-option value={contest.id}>{contest.name}</wa-option>
-      {/each}
-    </wa-select>
+    {#if !isCopying && !copyCompleted}
+      <wa-select
+        label="Select contest"
+        placeholder="Select a contest to copy from"
+        onchange={handleContestChange}
+      >
+        {#each availableContests as contest}
+          <wa-option value={contest.id}>{contest.name}</wa-option>
+        {/each}
+      </wa-select>
+    {/if}
 
     {#if selectedContest}
       {#if selectedProblemsQuery?.isPending}
         <Loader />
-      {:else if problems && problems.length > 0}
+      {:else if problemsSummary}
         {#if isCopying || copyCompleted}
           <wa-progress-bar value={copyProgress}></wa-progress-bar>
         {:else}
-          <Table
-            columns={problemColumns}
-            data={problems}
-            getId={({ id }) => id}
-            hideHeader={true}
-          />
+          <p class="summary">
+            This contest has {problemsSummary.count} problem{problemsSummary.count !==
+            1
+              ? "s"
+              : ""} with point values ranging from {problemsSummary.minPoints} to
+            {problemsSummary.maxPoints}.
+          </p>
         {/if}
       {:else}
         <EmptyState
@@ -235,9 +206,13 @@
 </wa-dialog>
 
 <style>
-  .number {
+  wa-dialog::part(body) {
     display: flex;
-    align-items: center;
-    gap: var(--wa-space-s);
+    flex-direction: column;
+    gap: var(--wa-space-m);
+  }
+
+  .summary {
+    margin: 0;
   }
 </style>
