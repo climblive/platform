@@ -15,12 +15,11 @@
     columns: ColumnDefinition<T>[];
     data: T[];
     getId: (row: T) => string | number;
-    hideHeader?: boolean;
   };
 
   let mobile = $state(false);
 
-  const { columns, data, getId, hideHeader = false }: Props<T> = $props();
+  const { columns, data, getId }: Props<T> = $props();
 
   function handleResize() {
     mobile = window.innerWidth < 768;
@@ -45,22 +44,16 @@
 
 <svelte:window onresize={handleResize} />
 
-<table
-  border="0"
-  style="grid-template-columns: {gridTemplateColumns}"
-  class:no-header={hideHeader}
->
-  {#if !hideHeader}
-    <thead>
-      <tr>
-        {#each columns as column (column)}
-          {#if cellVisible(column)}
-            <th data-align={column.align ?? "left"}>{column.label}</th>
-          {/if}
-        {/each}
-      </tr>
-    </thead>
-  {/if}
+<table border="0" style="grid-template-columns: {gridTemplateColumns}">
+  <thead>
+    <tr>
+      {#each columns as column (column)}
+        {#if cellVisible(column)}
+          <th data-align={column.align ?? "left"}>{column.label}</th>
+        {/if}
+      {/each}
+    </tr>
+  </thead>
   <tbody>
     {#each data as row (getId(row))}
       <tr>
@@ -134,10 +127,6 @@
   tbody tr:first-of-type {
     border-top: var(--wa-border-width-s) var(--wa-border-style)
       var(--wa-color-neutral-border-quiet);
-  }
-
-  table.no-header tbody tr:first-of-type {
-    border-top: none;
   }
 
   tbody tr:not(:last-of-type) {

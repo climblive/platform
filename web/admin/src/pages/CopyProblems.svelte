@@ -90,6 +90,7 @@
     let failCount = 0;
 
     for (let i = 0; i < problems.length; i++) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { id, contestId, ...rest } = problems[i];
 
       const template: ProblemTemplate = {
@@ -131,7 +132,7 @@
         placeholder="Select a contest to copy from"
         onchange={handleContestChange}
       >
-        {#each availableContests as contest}
+        {#each availableContests as contest (contest.id)}
           <wa-option value={contest.id}>{contest.name}</wa-option>
         {/each}
       </wa-select>
