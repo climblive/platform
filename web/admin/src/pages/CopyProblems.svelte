@@ -90,30 +90,10 @@
     let failCount = 0;
 
     for (let i = 0; i < problems.length; i++) {
-      const {
-        number,
-        holdColorPrimary,
-        holdColorSecondary,
-        description,
-        zone1Enabled,
-        zone2Enabled,
-        pointsZone1,
-        pointsZone2,
-        pointsTop,
-        flashBonus,
-      } = problems[i];
+      const { id, contestId, ...rest } = problems[i];
 
       const template: ProblemTemplate = {
-        number,
-        holdColorPrimary,
-        holdColorSecondary,
-        description,
-        zone1Enabled,
-        zone2Enabled,
-        pointsZone1,
-        pointsZone2,
-        pointsTop,
-        flashBonus,
+        ...rest,
       };
 
       try {
