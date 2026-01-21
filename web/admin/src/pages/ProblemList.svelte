@@ -211,7 +211,16 @@
           {@render createButton()}
 
           {#if contests && contests.length > 1}
-            {@render copyProblemsButton()}
+            <wa-button
+              onclick={() => {
+                copyProblemsOpen = true;
+              }}
+              appearance="outlined"
+              variant="neutral"
+            >
+              Copy from another contest
+              <wa-icon name="copy" slot="start"></wa-icon>
+            </wa-button>
           {/if}
         </div>
       {/snippet}
@@ -226,19 +235,6 @@
 </section>
 
 <CopyProblems {contestId} bind:open={copyProblemsOpen} />
-
-{#snippet copyProblemsButton()}
-  <wa-button
-    onclick={() => {
-      copyProblemsOpen = true;
-    }}
-    appearance="outlined"
-    variant="neutral"
-  >
-    Copy from another contest
-    <wa-icon name="copy" slot="start"></wa-icon>
-  </wa-button>
-{/snippet}
 
 <style>
   .controls {
