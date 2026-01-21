@@ -16,6 +16,7 @@
     getProblemsQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
+  import { format } from "date-fns";
 
   interface Props {
     contestId: number;
@@ -133,7 +134,22 @@
         onchange={handleContestChange}
       >
         {#each availableContests as contest (contest.id)}
-          <wa-option value={contest.id}>{contest.name}</wa-option>
+          <wa-option value={contest.id}>
+            {contest.name}
+            {#if contest.timeBegin || contest.timeEnd}
+              <small>
+                {#if contest.timeBegin}
+                  {format(contest.timeBegin, "yyyy-MM-dd HH:mm")}
+                {/if}
+                {#if contest.timeBegin && contest.timeEnd}
+                  -
+                {/if}
+                {#if contest.timeEnd}
+                  {format(contest.timeEnd, "yyyy-MM-dd HH:mm")}
+                {/if}
+              </small>
+            {/if}
+          </wa-option>
         {/each}
       </wa-select>
     {/if}
@@ -168,7 +184,12 @@
       Close
     </wa-button>
   {:else}
-    <wa-button slot="footer" appearance="plain" onclick={handleClose}>
+    <wa-button
+      slot="footer"
+      appearance="plain"
+      onclick={handleClose}
+      disabled={isCopying}
+    >
       Cancel
     </wa-button>
     {#if selectedContest}
