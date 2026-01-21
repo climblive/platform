@@ -5,18 +5,17 @@
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
+  import "@awesome.me/webawesome/dist/components/select/select.js";
+  import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import {
     EmptyState,
     HoldColorIndicator,
     Table,
     type ColumnDefinition,
   } from "@climblive/lib/components";
-  import {
-    type Contest,
-    type Problem,
-    type ProblemTemplate,
-  } from "@climblive/lib/models";
+  import { type Problem, type ProblemTemplate } from "@climblive/lib/models";
   import {
     createProblemMutation,
     getAllContestsQuery,
@@ -32,15 +31,12 @@
   let { contestId, open = $bindable() }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
-  let selectedContest: Contest | undefined = $state();
+  let selectedContestId: number | undefined = $state();
   let isCopying = $state(false);
   let copyProgress = $state(0);
   let copyCompleted = $state(false);
 
   const contestsQuery = $derived(getAllContestsQuery());
-  const selectedProblemsQuery = $derived(
-    selectedContest ? getProblemsQuery(selectedContest.id) : undefined,
-  );
 
   const availableContests = $derived.by(() => {
     if (!contestsQuery.data) {
@@ -52,23 +48,28 @@
       .sort((a, b) => b.created.getTime() - a.created.getTime());
   });
 
+  const selectedContest = $derived(
+    availableContests.find((c) => c.id === selectedContestId),
+  );
+
+  const selectedProblemsQuery = $derived(
+    selectedContest ? getProblemsQuery(selectedContest.id) : undefined,
+  );
+
   const problems = $derived(selectedProblemsQuery?.data);
 
   const createMutation = $derived(createProblemMutation(contestId));
 
   const handleClose = () => {
-    selectedContest = undefined;
+    selectedContestId = undefined;
     copyProgress = 0;
     copyCompleted = false;
     open = false;
   };
 
-  const handleSelectContest = (contest: Contest) => {
-    selectedContest = contest;
-  };
-
-  const handleBack = () => {
-    selectedContest = undefined;
+  const handleContestChange = (e: Event) => {
+    const select = e.target as WaSelect;
+    selectedContestId = select.value ? Number(select.value) : undefined;
   };
 
   const handleCopy = async () => {
@@ -127,21 +128,6 @@
     }
   };
 
-  const contestColumns: ColumnDefinition<Contest>[] = [
-    {
-      label: "Contest",
-      mobile: true,
-      render: renderContestName,
-      width: "1fr",
-    },
-    {
-      mobile: true,
-      render: renderSelectButton,
-      align: "right",
-      width: "max-content",
-    },
-  ];
-
   const problemColumns: ColumnDefinition<Problem>[] = [
     {
       label: "Number",
@@ -157,18 +143,6 @@
     },
   ];
 </script>
-
-{#snippet renderContestName(contest: Contest)}
-  {contest.name}
-{/snippet}
-
-{#snippet renderContestStartTime(contest: Contest)}
-  {#if contest.timeBegin}
-    {contest.timeBegin.toLocaleDateString()}
-  {:else}
-    -
-  {/if}
-{/snippet}
 
 {#snippet renderNumberAndColor({
   number,
@@ -193,72 +167,59 @@
   <ProblemPoints {pointsZone1} {pointsZone2} {pointsTop} {mobile} />
 {/snippet}
 
-{#snippet renderSelectButton(contest: Contest)}
-  <wa-button
-    size="small"
-    appearance="plain"
-    onclick={() => handleSelectContest(contest)}
-  >
-    Select
-    <wa-icon name="arrow-right" slot="end"></wa-icon>
-  </wa-button>
-{/snippet}
-
 <wa-dialog bind:this={dialog} label="Copy problems" {open}>
-  {#if !selectedContest}
-    {#if contestsQuery.isPending}
-      <Loader />
-    {:else if availableContests.length === 0}
-      <EmptyState
-        title="No contests available"
-        description="There are no other contests to copy problems from."
-      />
-    {:else}
-      <Table
-        columns={contestColumns}
-        data={availableContests}
-        getId={({ id }) => id}
-        hideHeader={true}
-      ></Table>
+  {#if contestsQuery.isPending}
+    <Loader />
+  {:else if availableContests.length === 0}
+    <EmptyState
+      title="No contests available"
+      description="There are no other contests to copy problems from."
+    />
+  {:else}
+    <wa-select
+      label="Select contest"
+      placeholder="Select a contest to copy from"
+      onchange={handleContestChange}
+      disabled={isCopying || copyCompleted}
+    >
+      {#each availableContests as contest}
+        <wa-option value={contest.id}>{contest.name}</wa-option>
+      {/each}
+    </wa-select>
+
+    {#if selectedContest}
+      {#if selectedProblemsQuery?.isPending}
+        <Loader />
+      {:else if problems && problems.length > 0}
+        {#if isCopying || copyCompleted}
+          <wa-progress-bar value={copyProgress}></wa-progress-bar>
+        {:else}
+          <Table
+            columns={problemColumns}
+            data={problems}
+            getId={({ id }) => id}
+            hideHeader={true}
+          />
+        {/if}
+      {:else}
+        <EmptyState
+          title="No problems found"
+          description="This contest has no problems to copy."
+        />
+      {/if}
     {/if}
+  {/if}
+
+  {#if copyCompleted}
+    <wa-button slot="footer" variant="success" onclick={handleClose}>
+      <wa-icon name="check" slot="start"></wa-icon>
+      Close
+    </wa-button>
+  {:else}
     <wa-button slot="footer" appearance="plain" onclick={handleClose}>
       Cancel
     </wa-button>
-  {:else}
-    {#if selectedProblemsQuery?.isPending}
-      <Loader />
-    {:else if problems && problems.length > 0}
-      {#if isCopying || copyCompleted}
-        <wa-progress-bar value={copyProgress}></wa-progress-bar>
-      {:else}
-        <Table
-          columns={problemColumns}
-          data={problems}
-          getId={({ id }) => id}
-          hideHeader={true}
-        />
-      {/if}
-    {:else}
-      <EmptyState
-        title="No problems found"
-        description="This contest has no problems to copy."
-      />
-    {/if}
-    {#if copyCompleted}
-      <wa-button slot="footer" variant="success" onclick={handleClose}>
-        <wa-icon name="check" slot="start"></wa-icon>
-        Close
-      </wa-button>
-    {:else}
-      <wa-button
-        slot="footer"
-        appearance="plain"
-        onclick={handleBack}
-        disabled={isCopying}
-      >
-        <wa-icon name="arrow-left" slot="start"></wa-icon>
-        Back
-      </wa-button>
+    {#if selectedContest}
       <wa-button
         slot="footer"
         variant="accent"
