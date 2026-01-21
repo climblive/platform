@@ -6,9 +6,8 @@
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
-  import "@awesome.me/webawesome/dist/components/scroller/scroller.js";
-  import { EmptyState } from "@climblive/lib/components";
   import {
+    EmptyState,
     HoldColorIndicator,
     Table,
     type ColumnDefinition,
@@ -19,23 +18,18 @@
     type ProblemTemplate,
   } from "@climblive/lib/models";
   import {
-    getAllContestsQuery,
     createProblemMutation,
+    getAllContestsQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
 
   interface Props {
     contestId: number;
-    openDialog?: () => void;
-    hasAvailableContests?: boolean;
+    open: boolean;
   }
 
-  let {
-    contestId,
-    openDialog = $bindable(() => {}),
-    hasAvailableContests = $bindable(false),
-  }: Props = $props();
+  let { contestId, open = $bindable() }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
   let selectedContest: Contest | undefined = $state();
@@ -52,34 +46,21 @@
     if (!contestsQuery.data) {
       return [];
     }
-    return contestsQuery.data
-      .filter((c) => c.id !== contestId && !c.archived)
-      .sort((a, b) => b.created.getTime() - a.created.getTime());
-  });
 
-  $effect(() => {
-    hasAvailableContests = availableContests.length > 0;
+    return contestsQuery.data
+      .filter(({ id, archived }) => id !== contestId && !archived)
+      .sort((a, b) => b.created.getTime() - a.created.getTime());
   });
 
   const problems = $derived(selectedProblemsQuery?.data);
 
-  const createMutation = createProblemMutation(contestId);
-
-  function handleOpen() {
-    if (dialog) {
-      dialog.open = true;
-    }
-  }
-
-  openDialog = handleOpen;
+  const createMutation = $derived(createProblemMutation(contestId));
 
   const handleClose = () => {
-    if (dialog) {
-      dialog.open = false;
-      selectedContest = undefined;
-      copyProgress = 0;
-      copyCompleted = false;
-    }
+    selectedContest = undefined;
+    copyProgress = 0;
+    copyCompleted = false;
+    open = false;
   };
 
   const handleSelectContest = (contest: Contest) => {
@@ -92,7 +73,6 @@
 
   const handleCopy = async () => {
     if (!problems || problems.length === 0) {
-      toastError("No problems to copy");
       return;
     }
 
@@ -153,12 +133,6 @@
       mobile: true,
       render: renderContestName,
       width: "1fr",
-    },
-    {
-      label: "Start time",
-      mobile: false,
-      render: renderContestStartTime,
-      width: "max-content",
     },
     {
       mobile: true,
@@ -230,60 +204,46 @@
   </wa-button>
 {/snippet}
 
-<wa-dialog bind:this={dialog} label="Copy problems">
+<wa-dialog bind:this={dialog} label="Copy problems" {open}>
   {#if !selectedContest}
-    <div class="dialog-content">
-      {#if contestsQuery.isPending}
-        <Loader />
-      {:else if availableContests.length === 0}
-        <EmptyState
-          title="No contests available"
-          description="There are no other contests to copy problems from."
-        />
-      {:else}
-        <wa-scroller>
-          <Table
-            columns={contestColumns}
-            data={availableContests}
-            getId={({ id }) => id}
-            hideHeader={true}
-          ></Table>
-        </wa-scroller>
-      {/if}
-    </div>
+    {#if contestsQuery.isPending}
+      <Loader />
+    {:else if availableContests.length === 0}
+      <EmptyState
+        title="No contests available"
+        description="There are no other contests to copy problems from."
+      />
+    {:else}
+      <Table
+        columns={contestColumns}
+        data={availableContests}
+        getId={({ id }) => id}
+        hideHeader={true}
+      ></Table>
+    {/if}
     <wa-button slot="footer" appearance="plain" onclick={handleClose}>
       Cancel
     </wa-button>
   {:else}
-    <div class="dialog-content">
-      {#if selectedProblemsQuery?.isPending}
-        <Loader />
-      {:else if problems && problems.length > 0}
-        {#if isCopying || copyCompleted}
-          {#if isCopying}
-            <p>
-              Copying {problems.length} problem{problems.length > 1 ? "s" : ""} from
-              "{selectedContest.name}"...
-            </p>
-          {/if}
-          <wa-progress-bar value={copyProgress}></wa-progress-bar>
-        {:else}
-          <wa-scroller>
-            <Table
-              columns={problemColumns}
-              data={problems}
-              getId={({ id }) => id}
-              hideHeader={true}
-            />
-          </wa-scroller>
-        {/if}
+    {#if selectedProblemsQuery?.isPending}
+      <Loader />
+    {:else if problems && problems.length > 0}
+      {#if isCopying || copyCompleted}
+        <wa-progress-bar value={copyProgress}></wa-progress-bar>
       {:else}
-        <EmptyState
-          title="No problems found"
-          description="This contest has no problems to copy."
+        <Table
+          columns={problemColumns}
+          data={problems}
+          getId={({ id }) => id}
+          hideHeader={true}
         />
       {/if}
-    </div>
+    {:else}
+      <EmptyState
+        title="No problems found"
+        description="This contest has no problems to copy."
+      />
+    {/if}
     {#if copyCompleted}
       <wa-button slot="footer" variant="success" onclick={handleClose}>
         <wa-icon name="check" slot="start"></wa-icon>
@@ -314,20 +274,9 @@
 </wa-dialog>
 
 <style>
-  .dialog-content {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wa-space-m);
-    min-height: 300px;
-  }
-
   .number {
     display: flex;
     align-items: center;
     gap: var(--wa-space-s);
-  }
-
-  wa-dialog {
-    --width: 600px;
   }
 </style>

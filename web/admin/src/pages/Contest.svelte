@@ -165,6 +165,7 @@
           ></wa-divider>
           <ProblemList
             {contestId}
+            organizerId={contest.ownership.organizerId}
             tableLimit={window.location.hash.substring(1) === "problems"
               ? undefined
               : 8}

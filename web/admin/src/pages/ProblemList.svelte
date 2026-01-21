@@ -8,6 +8,7 @@
   } from "@climblive/lib/components";
   import { type Problem, type ProblemID } from "@climblive/lib/models";
   import {
+    getContestsByOrganizerQuery,
     getProblemsQuery,
     getTicksByContestQuery,
   } from "@climblive/lib/queries";
@@ -18,17 +19,18 @@
 
   interface Props {
     contestId: number;
+    organizerId: number;
     tableLimit: number | undefined;
   }
 
-  let { contestId, ...props }: Props = $props();
-
+  let { contestId, organizerId, ...props }: Props = $props();
   let tableLimit = $state<number | undefined>(props.tableLimit);
-  let copyProblemsOpen: () => void = $state(() => {});
-  let hasAvailableContests = $state(false);
+
+  let copyProblemsOpen = $state(false);
 
   const problemsQuery = $derived(getProblemsQuery(contestId));
   const ticksQuery = $derived(getTicksByContestQuery(contestId));
+  const contestsQuery = $derived(getContestsByOrganizerQuery(organizerId));
 
   const ascentsByProblem = $derived.by(() => {
     const ascentsByProblem = new Map<ProblemID, number>();
@@ -49,6 +51,7 @@
 
     return ascentsByProblem;
   });
+  const contests = $derived(contestsQuery.data);
 
   type ProblemWithAscents = Problem & { ascents: number };
 
@@ -204,9 +207,10 @@
       description="Create boulder problems that contenders will attempt during the contest."
     >
       {#snippet actions()}
-        <div class="empty-actions">
+        <div class="actions">
           {@render createButton()}
-          {#if hasAvailableContests}
+
+          {#if contests && contests.length > 1}
             {@render copyProblemsButton()}
           {/if}
         </div>
@@ -221,16 +225,12 @@
   {/if}
 </section>
 
-<CopyProblems
-  {contestId}
-  bind:openDialog={copyProblemsOpen}
-  bind:hasAvailableContests
-/>
+<CopyProblems {contestId} bind:open={copyProblemsOpen} />
 
 {#snippet copyProblemsButton()}
   <wa-button
     onclick={() => {
-      copyProblemsOpen();
+      copyProblemsOpen = true;
     }}
     appearance="outlined"
     variant="neutral"
@@ -270,9 +270,10 @@
     color: var(--wa-color-text-quiet);
   }
 
-  .empty-actions {
+  .actions {
     display: flex;
-    gap: var(--wa-space-s);
+    gap: var(--wa-space-xs);
     flex-wrap: wrap;
+    justify-content: center;
   }
 </style>
