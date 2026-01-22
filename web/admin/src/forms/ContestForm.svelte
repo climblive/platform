@@ -1,8 +1,9 @@
 <script lang="ts" module>
-  import * as z from "zod/v4";
+  import { z } from "@climblive/lib/utils";
 
   export const formSchema = z.object({
     location: z.string().optional(),
+    country: z.string(),
     seriesId: z.coerce.number().optional(),
     name: z.string().min(1),
     description: z.string().optional(),
@@ -16,9 +17,13 @@
 <script lang="ts">
   import InfoInput from "@/components/InfoInput.svelte";
   import "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/option/option.js";
+  import "@awesome.me/webawesome/dist/components/select/select.js";
+  import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
-  import { GenericForm, name } from "@climblive/lib/forms";
+  import { GenericForm, name, value } from "@climblive/lib/forms";
   import type { Contest } from "@climblive/lib/models";
+  import { countries, getFlag } from "@climblive/lib/utils";
   import { type Snippet } from "svelte";
 
   type T = $$Generic<Partial<Contest>>;
@@ -31,6 +36,16 @@
   }
 
   let { data, schema, submit, children }: Props = $props();
+
+  let selectedCountry = $derived(data.country || "AQ");
+
+  const handleCountryChange = (event: Event) => {
+    const target = event.target as WaSelect;
+
+    if (typeof target.value === "string") {
+      selectedCountry = target.value;
+    }
+  };
 </script>
 
 <GenericForm {schema} {submit}>
@@ -58,6 +73,21 @@
       value={data.location}
       hint="Usually the name of the climbing gym."
     ></wa-input>
+    <wa-select
+      size="small"
+      {@attach name("country")}
+      {@attach value(selectedCountry)}
+      label="Country"
+      onchange={handleCountryChange}
+    >
+      <span slot="start">{getFlag(selectedCountry)}</span>
+      {#each countries as country (country.code)}
+        <wa-option value={country.code} label={country.name}>
+          <span slot="start">{getFlag(country.code)}</span>
+          {country.name}
+        </wa-option>
+      {/each}
+    </wa-select>
     <wa-input
       size="small"
       {@attach name("gracePeriod")}
