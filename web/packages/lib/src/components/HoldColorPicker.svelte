@@ -75,7 +75,9 @@
       {#if value}
         <HoldColorIndicator primary={value} />
       {:else}
-        <span class="placeholder">Select color</span>
+        <div class="placeholder">
+          <span>Select color</span>
+        </div>
       {/if}
     </div>
   </wa-button>
@@ -83,7 +85,7 @@
   <wa-popover
     bind:this={popover}
     for="{name}-trigger"
-    placement="bottom-start"
+    placement="top-start"
     distance={4}
   >
     <div class="popup-content" role="listbox" aria-label="Color selection">
@@ -146,21 +148,43 @@
 
   .placeholder {
     color: var(--wa-color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-xs);
+  }
+
+  .placeholder::before {
+    content: "";
+    width: 24px;
+    height: 24px;
+    background-image: linear-gradient(45deg, #ccc 25%, transparent 25%),
+      linear-gradient(-45deg, #ccc 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #ccc 75%),
+      linear-gradient(-45deg, transparent 75%, #ccc 75%);
+    background-size: 8px 8px;
+    background-position:
+      0 0,
+      0 4px,
+      4px -4px,
+      -4px 0;
+    border: 1px solid var(--wa-color-border-normal);
+    border-radius: var(--wa-radius-xs);
   }
 
   .popup-content {
     background: var(--wa-color-surface-border);
-    padding: var(--wa-space-s);
   }
 
   .color-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: var(--wa-space-xs);
+    padding: var(--wa-space-s);
   }
 
   .color-button {
-    border: none;
+    border: 2px solid transparent;
+    border-radius: var(--wa-radius-s);
     background-color: transparent;
     padding: var(--wa-space-3xs);
     cursor: pointer;
@@ -189,6 +213,7 @@
 
   .clear-section {
     border-top: 1px solid var(--wa-color-border-normal);
+    padding: var(--wa-space-s);
     padding-top: var(--wa-space-xs);
     margin-top: var(--wa-space-xs);
   }
