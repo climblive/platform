@@ -184,7 +184,7 @@
 
   .color-button {
     border: 2px solid transparent;
-    border-radius: var(--wa-radius-s);
+    border-radius: 50%;
     background-color: transparent;
     padding: var(--wa-space-3xs);
     cursor: pointer;
