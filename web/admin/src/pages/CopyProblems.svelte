@@ -1,5 +1,6 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
+  import { type WaHideEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
@@ -118,63 +119,72 @@
   };
 </script>
 
-<wa-dialog bind:this={dialog} label="Copy problems" {open}>
-  {#if contestsQuery.isPending}
-    <Loader />
-  {:else if availableContests.length === 0}
-    <EmptyState
-      title="No contests available"
-      description="There are no other contests to copy problems from."
-    />
-  {:else}
-    {#if !isCopying && !copyCompleted}
+<wa-dialog
+  bind:this={dialog}
+  label="Copy problems"
+  {open}
+  onwa-hide={(e: WaHideEvent) => {
+    if (e.target !== dialog) {
+      return;
+    }
+
+    if (isCopying) {
+      e.preventDefault();
+    } else {
+      handleClose();
+    }
+  }}
+>
+  {#if !(isCopying || copyCompleted)}
+    {#if contestsQuery.isPending}
+      <Loader />
+    {:else if availableContests.length === 0}
+      <EmptyState
+        title="No contests available"
+        description="There are no other contests to copy problems from."
+      />
+    {:else}
       <wa-select
         label="Select contest"
         placeholder="Select a contest to copy from"
         onchange={handleContestChange}
       >
         {#each availableContests as contest (contest.id)}
-          <wa-option value={contest.id}>
+          <wa-option value={contest.id} label={contest.name}>
             {contest.name}
-            {#if contest.timeBegin || contest.timeEnd}
+            {#if contest.timeBegin && contest.timeEnd}
               <small>
-                {#if contest.timeBegin}
-                  {format(contest.timeBegin, "yyyy-MM-dd HH:mm")}
-                {/if}
-                {#if contest.timeBegin && contest.timeEnd}
-                  -
-                {/if}
-                {#if contest.timeEnd}
-                  {format(contest.timeEnd, "yyyy-MM-dd HH:mm")}
-                {/if}
+                {format(contest.timeBegin, "yyyy-MM-dd HH:mm")}
+                -
+                {format(contest.timeEnd, "yyyy-MM-dd HH:mm")}
               </small>
             {/if}
           </wa-option>
         {/each}
       </wa-select>
     {/if}
+  {/if}
 
-    {#if selectedContest}
-      {#if selectedProblemsQuery?.isPending}
-        <Loader />
-      {:else if problemsSummary}
-        {#if isCopying || copyCompleted}
-          <wa-progress-bar value={copyProgress}></wa-progress-bar>
-        {:else}
-          <p class="summary">
-            This contest has {problemsSummary.count} problem{problemsSummary.count !==
-            1
-              ? "s"
-              : ""} with point values ranging from {problemsSummary.minPoints} to
-            {problemsSummary.maxPoints}.
-          </p>
-        {/if}
+  {#if selectedContest}
+    {#if selectedProblemsQuery?.isPending}
+      <Loader />
+    {:else if problemsSummary}
+      {#if isCopying || copyCompleted}
+        <wa-progress-bar value={copyProgress}></wa-progress-bar>
       {:else}
-        <EmptyState
-          title="No problems found"
-          description="This contest has no problems to copy."
-        />
+        <p class="summary">
+          This contest has {problemsSummary.count} problem{problemsSummary.count !==
+          1
+            ? "s"
+            : ""} with point values ranging from {problemsSummary.minPoints} to
+          {problemsSummary.maxPoints}.
+        </p>
       {/if}
+    {:else}
+      <EmptyState
+        title="No problems found"
+        description="This contest has no problems to copy."
+      />
     {/if}
   {/if}
 
