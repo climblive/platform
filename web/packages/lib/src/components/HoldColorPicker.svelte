@@ -1,7 +1,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/popup/popup.js";
-  import type WaPopup from "@awesome.me/webawesome/dist/components/popup/popup.js";
+  import "@awesome.me/webawesome/dist/components/popover/popover.js";
+  import type WaPopover from "@awesome.me/webawesome/dist/components/popover/popover.js";
   import HoldColorIndicator from "./HoldColorIndicator.svelte";
 
   interface Props {
@@ -14,7 +14,7 @@
 
   let {
     label,
-    value = $bindable(),
+    value,
     required = false,
     allowClear = false,
     name,
@@ -35,15 +35,12 @@
     "#fff",
   ];
 
-  let popup: WaPopup | undefined = $state();
-  let triggerButton: HTMLElement | undefined = $state();
+  let popover: WaPopover | undefined = $state();
   let hiddenInput: HTMLInputElement | undefined = $state();
 
   const handleColorSelect = (color: string) => {
     value = color;
-    if (popup) {
-      popup.active = false;
-    }
+    popover?.hide();
     if (hiddenInput) {
       hiddenInput.dispatchEvent(new Event("input", { bubbles: true }));
     }
@@ -51,50 +48,11 @@
 
   const handleClear = () => {
     value = undefined;
-    if (popup) {
-      popup.active = false;
-    }
+    popover?.hide();
     if (hiddenInput) {
       hiddenInput.dispatchEvent(new Event("input", { bubbles: true }));
     }
   };
-
-  const handleTriggerClick = () => {
-    if (popup) {
-      popup.active = !popup.active;
-    }
-  };
-
-  $effect(() => {
-    if (!popup) return;
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!popup || !popup.active) return;
-
-      const target = event.target as Node;
-      const popupElement = popup.shadowRoot?.querySelector(
-        ".popup",
-      ) as HTMLElement | null;
-
-      if (
-        triggerButton &&
-        !triggerButton.contains(target) &&
-        popupElement &&
-        !popupElement.contains(target)
-      ) {
-        popup.active = false;
-      }
-    };
-
-    if (typeof document !== "undefined") {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => {
-        if (typeof document !== "undefined") {
-          document.removeEventListener("mousedown", handleClickOutside);
-        }
-      };
-    }
-  });
 </script>
 
 <div class="hold-color-picker">
@@ -108,13 +66,10 @@
     value={value ?? ""}
   />
   <wa-button
+    id="{name}-trigger"
     size="small"
     appearance="plain"
-    onclick={handleTriggerClick}
-    bind:this={triggerButton}
     aria-labelledby="{name}-label"
-    aria-haspopup="true"
-    aria-expanded={popup?.active ?? false}
   >
     <div class="trigger-content">
       {#if value}
@@ -125,12 +80,12 @@
     </div>
   </wa-button>
 
-  <wa-popup
-    bind:this={popup}
-    anchor={triggerButton}
+  <wa-popover
+    bind:this={popover}
+    for="{name}-trigger"
     placement="bottom-start"
     distance={4}
-    active={popup?.active ?? false}
+    without-arrow
   >
     <div class="popup-content" role="listbox" aria-label="Color selection">
       <div class="color-grid">
@@ -162,7 +117,7 @@
         </div>
       {/if}
     </div>
-  </wa-popup>
+  </wa-popover>
 </div>
 
 <style>
