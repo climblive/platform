@@ -8,24 +8,29 @@
   } from "@climblive/lib/components";
   import { type Problem, type ProblemID } from "@climblive/lib/models";
   import {
+    getContestsByOrganizerQuery,
     getProblemsQuery,
     getTicksByContestQuery,
   } from "@climblive/lib/queries";
   import { isDefined } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
+  import CopyProblems from "./CopyProblems.svelte";
   import DeleteProblem from "./DeleteProblem.svelte";
 
   interface Props {
     contestId: number;
+    organizerId: number;
     tableLimit: number | undefined;
   }
 
-  let { contestId, ...props }: Props = $props();
-
+  let { contestId, organizerId, ...props }: Props = $props();
   let tableLimit = $state<number | undefined>(props.tableLimit);
+
+  let copyProblemsOpen = $state(false);
 
   const problemsQuery = $derived(getProblemsQuery(contestId));
   const ticksQuery = $derived(getTicksByContestQuery(contestId));
+  const contestsQuery = $derived(getContestsByOrganizerQuery(organizerId));
 
   const ascentsByProblem = $derived.by(() => {
     const ascentsByProblem = new Map<ProblemID, number>();
@@ -46,6 +51,7 @@
 
     return ascentsByProblem;
   });
+  const contests = $derived(contestsQuery.data);
 
   type ProblemWithAscents = Problem & { ascents: number };
 
@@ -201,7 +207,22 @@
       description="Create boulder problems that contenders will attempt during the contest."
     >
       {#snippet actions()}
-        {@render createButton()}
+        <div class="actions">
+          {@render createButton()}
+
+          {#if contests && contests.length > 1}
+            <wa-button
+              onclick={() => {
+                copyProblemsOpen = true;
+              }}
+              appearance="outlined"
+              variant="neutral"
+            >
+              Copy from another contest
+              <wa-icon name="copy" slot="start"></wa-icon>
+            </wa-button>
+          {/if}
+        </div>
       {/snippet}
     </EmptyState>
   {/if}
@@ -212,6 +233,8 @@
     >
   {/if}
 </section>
+
+<CopyProblems {contestId} bind:open={copyProblemsOpen} />
 
 <style>
   .controls {
@@ -241,5 +264,12 @@
 
   .copy {
     color: var(--wa-color-text-quiet);
+  }
+
+  .actions {
+    display: flex;
+    gap: var(--wa-space-xs);
+    flex-wrap: wrap;
+    justify-content: center;
   }
 </style>
