@@ -213,8 +213,7 @@
 
   .clear-section {
     border-top: 1px solid var(--wa-color-border-normal);
-    padding: var(--wa-space-s);
-    padding-top: var(--wa-space-xs);
+    padding: var(--wa-space-xs) var(--wa-space-s) var(--wa-space-s) var(--wa-space-s);
     margin-top: var(--wa-space-xs);
   }
 </style>
