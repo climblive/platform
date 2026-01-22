@@ -14,7 +14,7 @@
 
   let {
     label,
-    value,
+    value = $bindable(),
     required = false,
     allowClear = false,
     name,
@@ -85,7 +85,6 @@
     for="{name}-trigger"
     placement="bottom-start"
     distance={4}
-    without-arrow
   >
     <div class="popup-content" role="listbox" aria-label="Color selection">
       <div class="color-grid">
@@ -151,11 +150,7 @@
 
   .popup-content {
     background: var(--wa-color-surface-border);
-    border: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-color-border-normal);
-    border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-s);
-    box-shadow: var(--wa-shadow-m);
   }
 
   .color-grid {
