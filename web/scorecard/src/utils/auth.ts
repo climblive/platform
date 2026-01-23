@@ -28,7 +28,9 @@ export const authenticateContender = async (
   session.update((current) => {
     const now = new Date();
     const contestEndTime = contest.timeEnd || now;
-    const baseTime = contestEndTime > now ? contestEndTime : now;
+    const baseTime = new Date(
+      Math.max(contestEndTime.getTime(), now.getTime()),
+    );
     const expiryTime = add(baseTime, { hours: 12 });
 
     const updatedSession: ScorecardSession = {
