@@ -70,7 +70,7 @@
     padding: var(--wa-space-s);
     color: var(--wa-color-text-normal);
     position: relative;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--wa-shadow-s);
 
     & wa-button {
       position: absolute;

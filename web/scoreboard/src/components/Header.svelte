@@ -54,7 +54,7 @@
       var(--wa-color-surface-border);
 
     color: var(--wa-color-text-normal);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--wa-shadow-s);
 
     display: grid;
     grid-template-columns: 1fr max-content;
