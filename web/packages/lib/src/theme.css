@@ -30,8 +30,8 @@
 
 body {
   font-family: "Noto Sans", sans-serif;
-  background-color: var(--wa-color-brand-fill-normal);
-  color: var(--wa-color-brand-on-normal);
+  background-color: var(--wa-color-brand-fill-loud);
+  color: var(--wa-color-brand-on-loud);
   font-weight: var(--wa-font-weight-normal);
 }
 
