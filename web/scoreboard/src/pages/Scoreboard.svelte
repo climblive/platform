@@ -145,7 +145,7 @@
   h1 {
     text-align: center;
     line-height: var(--wa-line-height-condensed);
-    color: var(--wa-color-text-normal);
+    color: var(--wa-color-brand-on-normal);
     margin-bottom: 0;
   }
 
@@ -175,7 +175,7 @@
   .logo {
     text-align: center;
     height: var(--wa-font-size-xl);
-    color: var(--wa-color-text-normal);
+    color: var(--wa-color-brand-on-normal);
     margin-block: var(--wa-space-s);
   }
 
