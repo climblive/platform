@@ -359,7 +359,7 @@
     left: 0;
     right: 0;
     z-index: 10;
-    background-color: var(--wa-color-brand-fill-loud);
+    background-color: var(--wa-color-surface-default);
     padding: var(--wa-space-m);
   }
 
