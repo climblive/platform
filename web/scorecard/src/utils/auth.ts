@@ -26,8 +26,10 @@ export const authenticateContender = async (
   ApiClient.getInstance().setCredentialsProvider(provider);
 
   session.update((current) => {
-    const contestEndTime = contest.timeEnd || new Date();
-    const expiryTime = add(contestEndTime, { hours: 12 });
+    const now = new Date();
+    const contestEndTime = contest.timeEnd || now;
+    const baseTime = contestEndTime > now ? contestEndTime : now;
+    const expiryTime = add(baseTime, { hours: 12 });
 
     const updatedSession: ScorecardSession = {
       ...current,
