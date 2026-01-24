@@ -46,15 +46,15 @@
     </div>
     <div class="stat">
       <span class="label">Score</span>
-      <span class="value">{score}</span>
+      <span class="value"><strong>{score}</strong></span>
     </div>
     <div class="stat">
       <span class="label">Placement</span>
       <span class="value">
         {#if placement}
-          {placement}<sup>{ordinalSuperscript(placement)}</sup>
+          <strong>{placement}</strong><sup>{ordinalSuperscript(placement)}</sup>
         {:else}
-          -
+          <strong>-</strong>
         {/if}
       </span>
     </div>
