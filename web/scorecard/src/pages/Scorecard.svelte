@@ -255,6 +255,9 @@
           <wa-tab slot="nav" panel="info">Info</wa-tab>
 
           <wa-tab-panel name="problems">
+            {#if ["GRACE_PERIOD", "ENDED"].includes(contestState)}
+              <Summary {ticks} problems={sortedProblems} {score} {placement} />
+            {/if}
             <wa-radio-group
               orientation="horizontal"
               size="small"
@@ -300,9 +303,6 @@
                 Sort by points
               </wa-radio>
             </wa-radio-group>
-            {#if ["GRACE_PERIOD", "ENDED"].includes(contestState)}
-              <Summary {ticks} problems={sortedProblems} {score} {placement} />
-            {/if}
             {#if sortedProblems.length === 0}
               <EmptyState
                 title="No problems"

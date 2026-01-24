@@ -64,10 +64,10 @@
 
 <style>
   .summary {
-    background-color: var(--wa-color-surface-default);
-    border: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-color-border-default);
-    border-radius: var(--wa-border-radius-m);
+    background-color: var(--wa-color-surface-raised);
+    border: var(--wa-border-width-m) var(--wa-border-style)
+      var(--wa-color-surface-border);
+    border-radius: var(--wa-border-radius-l);
     padding: var(--wa-space-m);
     margin-bottom: var(--wa-space-m);
   }
