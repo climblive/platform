@@ -57,6 +57,7 @@
   let eventSource: EventSource | undefined;
   let score: number = $state(0);
   let placement: number | undefined = $state();
+  let finalist: boolean = $state(false);
 
   let contender = $derived(contenderQuery.data);
   let contest = $derived(contestQuery.data);
@@ -179,6 +180,7 @@
       if (event.contenderId === contender?.id) {
         score = event.score;
         placement = event.placement;
+        finalist = event.finalist;
       }
     });
 
@@ -318,7 +320,13 @@
           </wa-tab-panel>
           <wa-tab-panel name="results">
             {#if contestState !== "NOT_STARTED"}
-              <Summary {ticks} problems={sortedProblems} {score} {placement} />
+              <Summary
+                {ticks}
+                problems={sortedProblems}
+                {score}
+                {placement}
+                {finalist}
+              />
             {/if}
             {#if resultsConnected}
               <ScoreboardProvider

@@ -7,9 +7,10 @@
     problems: Problem[];
     score: number;
     placement: number | undefined;
+    finalist: boolean;
   }
 
-  let { ticks, problems, score, placement }: Props = $props();
+  let { ticks, problems, score, placement, finalist }: Props = $props();
 
   let tops = $derived(ticks.filter((tick) => tick.top).length);
 
@@ -59,6 +60,10 @@
           <strong>-</strong>
         {/if}
       </span>
+    </div>
+    <div class="stat">
+      <span class="label">Finalist</span>
+      <span class="value"><strong>{finalist ? "Yes" : "No"}</strong></span>
     </div>
   </div>
 </div>
