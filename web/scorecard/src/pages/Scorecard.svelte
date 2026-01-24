@@ -2,6 +2,7 @@
   import ContestInfo from "@/components/ContestInfo.svelte";
   import Header from "@/components/Header.svelte";
   import ProblemView from "@/components/ProblemView.svelte";
+  import Summary from "@/components/Summary.svelte";
   import type { ScorecardSession } from "@/types";
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
@@ -299,6 +300,9 @@
                 Sort by points
               </wa-radio>
             </wa-radio-group>
+            {#if ["GRACE_PERIOD", "ENDED"].includes(contestState)}
+              <Summary {ticks} problems={sortedProblems} {score} {placement} />
+            {/if}
             {#if sortedProblems.length === 0}
               <EmptyState
                 title="No problems"
