@@ -13,6 +13,10 @@
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
     loading: boolean;
     highlightedContenderId?: number;
+    /**
+     * Whether to automatically scroll the highlighted contender into view.
+     * Defaults to true.
+     */
     scrollToHighlighted?: boolean;
   }
 
