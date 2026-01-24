@@ -51,10 +51,9 @@
     background-color: var(--wa-color-surface-raised);
     border-radius: var(--wa-border-radius-m);
     border: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-color-surface-border);
+      var(--wa-form-control-border-color);
 
     color: var(--wa-color-text-normal);
-    box-shadow: var(--wa-shadow-s);
 
     display: grid;
     grid-template-columns: 1fr max-content;
