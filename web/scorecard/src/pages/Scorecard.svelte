@@ -257,52 +257,53 @@
           <wa-tab-panel name="problems">
             {#if ["GRACE_PERIOD", "ENDED"].includes(contestState)}
               <Summary {ticks} problems={sortedProblems} {score} {placement} />
-            {/if}
-            <wa-radio-group
-              orientation="horizontal"
-              size="small"
-              bind:this={radioGroup}
-              value={orderProblemsBy}
-              onchange={() => {
-                if (radioGroup) {
-                  const newValue = radioGroup.value as typeof orderProblemsBy;
-                  if (newValue !== orderProblemsBy) {
-                    sortDirection = "asc";
-                    orderProblemsBy = newValue;
-                  }
-                }
-              }}
-            >
-              <wa-radio
-                value="number"
-                appearance="button"
-                onclick={() => {
-                  if (orderProblemsBy === "number") {
-                    sortDirection = sortDirection === "asc" ? "desc" : "asc";
+            {:else}
+              <wa-radio-group
+                orientation="horizontal"
+                size="small"
+                bind:this={radioGroup}
+                value={orderProblemsBy}
+                onchange={() => {
+                  if (radioGroup) {
+                    const newValue = radioGroup.value as typeof orderProblemsBy;
+                    if (newValue !== orderProblemsBy) {
+                      sortDirection = "asc";
+                      orderProblemsBy = newValue;
+                    }
                   }
                 }}
-                disabled={problems === undefined || problems.length === 0}
               >
-                <wa-icon name={numberSortIcon} label={numberSortLabel}
-                ></wa-icon>
-                Sort by number
-              </wa-radio>
+                <wa-radio
+                  value="number"
+                  appearance="button"
+                  onclick={() => {
+                    if (orderProblemsBy === "number") {
+                      sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                    }
+                  }}
+                  disabled={problems === undefined || problems.length === 0}
+                >
+                  <wa-icon name={numberSortIcon} label={numberSortLabel}
+                  ></wa-icon>
+                  Sort by number
+                </wa-radio>
 
-              <wa-radio
-                value="points"
-                appearance="button"
-                onclick={() => {
-                  if (orderProblemsBy === "points") {
-                    sortDirection = sortDirection === "asc" ? "desc" : "asc";
-                  }
-                }}
-                disabled={problems === undefined || problems.length === 0}
-              >
-                <wa-icon name={pointsSortIcon} label={pointsSortLabel}
-                ></wa-icon>
-                Sort by points
-              </wa-radio>
-            </wa-radio-group>
+                <wa-radio
+                  value="points"
+                  appearance="button"
+                  onclick={() => {
+                    if (orderProblemsBy === "points") {
+                      sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                    }
+                  }}
+                  disabled={problems === undefined || problems.length === 0}
+                >
+                  <wa-icon name={pointsSortIcon} label={pointsSortLabel}
+                  ></wa-icon>
+                  Sort by points
+                </wa-radio>
+              </wa-radio-group>
+            {/if}
             {#if sortedProblems.length === 0}
               <EmptyState
                 title="No problems"
@@ -310,12 +311,17 @@
               />
             {:else}
               {#each sortedProblems as problem (problem.id)}
-                <ProblemView
-                  {problem}
-                  tick={ticks.find(({ problemId }) => problemId === problem.id)}
-                  disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
-                  {highestProblemNumber}
-                />
+                {@const tick = ticks.find(
+                  ({ problemId }) => problemId === problem.id,
+                )}
+                {#if !["GRACE_PERIOD", "ENDED"].includes(contestState) || tick}
+                  <ProblemView
+                    {problem}
+                    {tick}
+                    disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
+                    {highestProblemNumber}
+                  />
+                {/if}
               {/each}
             {/if}
           </wa-tab-panel>
