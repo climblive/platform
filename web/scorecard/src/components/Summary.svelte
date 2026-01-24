@@ -29,21 +29,20 @@
 </script>
 
 <div class="summary">
-  <h2>Your Results</h2>
   <div class="stats">
     <div class="stat">
       <span class="label">Tops</span>
-      <span class="value">{tops}/{totalProblems}</span>
+      <span class="value"><strong>{tops}</strong>/{totalProblems}</span>
     </div>
     {#if hasZones}
       <div class="stat">
         <span class="label">Zones</span>
-        <span class="value">{zones}/{totalProblems}</span>
+        <span class="value"><strong>{zones}</strong>/{totalProblems}</span>
       </div>
     {/if}
     <div class="stat">
       <span class="label">Flashes</span>
-      <span class="value">{flashes}/{totalProblems}</span>
+      <span class="value"><strong>{flashes}</strong>/{totalProblems}</span>
     </div>
     <div class="stat">
       <span class="label">Score</span>
@@ -72,12 +71,6 @@
     margin-bottom: var(--wa-space-m);
   }
 
-  h2 {
-    margin: 0 0 var(--wa-space-s) 0;
-    font-size: var(--wa-font-size-m);
-    font-weight: var(--wa-font-weight-bold);
-  }
-
   .stats {
     display: flex;
     flex-wrap: wrap;
@@ -98,7 +91,12 @@
   }
 
   .value {
-    font-size: var(--wa-font-size-l);
-    font-weight: var(--wa-font-weight-bold);
+    font-size: 1em;
+    line-height: 1;
+
+    & strong {
+      font-size: 1.5em;
+      font-weight: var(--wa-font-weight-bold);
+    }
   }
 </style>
