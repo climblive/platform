@@ -13,14 +13,16 @@
 
   let tops = $derived(ticks.filter((tick) => tick.top).length);
 
-  let zones = $derived(ticks.filter((tick) => tick.zone2 && !tick.top).length);
+  let zones = $derived(
+    ticks.filter((tick) => !tick.top && (tick.zone1 || tick.zone2)).length,
+  );
 
   let flashes = $derived(
     ticks.filter((tick) => tick.top && tick.attemptsTop === 1).length,
   );
 
   let hasZones = $derived(
-    problems.some((problem) => (problem.pointsZone2 ?? 0) > 0),
+    problems.some((problem) => problem.zone1Enabled || problem.zone2Enabled),
   );
 
   let totalProblems = $derived(problems.length);
