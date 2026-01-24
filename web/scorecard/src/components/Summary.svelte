@@ -29,7 +29,7 @@
 </script>
 
 <div class="summary">
-  <div class="stats">
+  <div class="row">
     <div class="stat">
       <span class="label">Tops</span>
       <span class="value"><strong>{tops}</strong>/{totalProblems}</span>
@@ -44,6 +44,8 @@
       <span class="label">Flashes</span>
       <span class="value"><strong>{flashes}</strong>/{totalProblems}</span>
     </div>
+  </div>
+  <div class="row">
     <div class="stat">
       <span class="label">Score</span>
       <span class="value"><strong>{score}</strong></span>
@@ -69,9 +71,12 @@
     border-radius: var(--wa-border-radius-l);
     padding: var(--wa-space-m);
     margin-bottom: var(--wa-space-m);
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-m);
   }
 
-  .stats {
+  .row {
     display: flex;
     flex-wrap: wrap;
     gap: var(--wa-space-m);
