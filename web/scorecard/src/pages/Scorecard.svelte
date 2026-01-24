@@ -235,6 +235,7 @@
 {:else}
   <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime}>
     {#snippet children({ contestState })}
+      {@const showResults = ["GRACE_PERIOD", "ENDED"].includes(contestState)}
       <main>
         <div class="sticky">
           <Header
@@ -255,7 +256,7 @@
           <wa-tab slot="nav" panel="info">Info</wa-tab>
 
           <wa-tab-panel name="problems">
-            {#if ["GRACE_PERIOD", "ENDED"].includes(contestState)}
+            {#if showResults}
               <Summary {ticks} problems={sortedProblems} {score} {placement} />
             {:else}
               <wa-radio-group
@@ -314,7 +315,7 @@
                 {@const tick = ticks.find(
                   ({ problemId }) => problemId === problem.id,
                 )}
-                {#if !["GRACE_PERIOD", "ENDED"].includes(contestState) || tick}
+                {#if !showResults || tick}
                   <ProblemView
                     {problem}
                     {tick}
