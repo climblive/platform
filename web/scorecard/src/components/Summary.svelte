@@ -50,7 +50,7 @@
   <div class="row">
     <div class="stat">
       <span class="label">Score</span>
-      <span class="value"><strong>{score}</strong></span>
+      <span class="value"><strong>{score}</strong> pts</span>
     </div>
     <div class="stat">
       <span class="label">Placement</span>
