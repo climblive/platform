@@ -80,7 +80,7 @@
   .stat {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-end;
     min-width: 4rem;
   }
 
