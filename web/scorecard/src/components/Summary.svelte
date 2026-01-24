@@ -44,13 +44,11 @@
       <span class="label">Flashes</span>
       <span class="value"><strong>{flashes}</strong>/{totalProblems}</span>
     </div>
-    <div class="stat">
-      <span class="label">Score</span>
-      <span class="value"><strong>{score}</strong></span>
-    </div>
-    <div class="stat">
-      <span class="label">Placement</span>
+    <div class="stat stat-combined">
+      <span class="label">Score / Placement</span>
       <span class="value">
+        <strong>{score}</strong>
+        <span class="separator">/</span>
         {#if placement}
           <strong>{placement}</strong><sup>{ordinalSuperscript(placement)}</sup>
         {:else}
@@ -97,6 +95,10 @@
     & strong {
       font-size: 1.5em;
       font-weight: var(--wa-font-weight-bold);
+    }
+
+    & .separator {
+      margin: 0 0.25em;
     }
   }
 </style>
