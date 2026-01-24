@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import type { Problem, Tick } from "@climblive/lib/models";
   import { ordinalSuperscript } from "@climblive/lib/utils";
 
@@ -63,7 +64,9 @@
     </div>
     <div class="stat">
       <span class="label">Finalist</span>
-      <span class="value"><strong>{finalist ? "Yes" : "No"}</strong></span>
+      <span class="value">
+        <wa-icon name={finalist ? "medal" : "minus"}></wa-icon>
+      </span>
     </div>
   </div>
 </div>
@@ -107,6 +110,10 @@
     & strong {
       font-size: 1.5em;
       font-weight: var(--wa-font-weight-bold);
+    }
+
+    & wa-icon {
+      font-size: 1.5em;
     }
   }
 </style>
