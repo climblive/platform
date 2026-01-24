@@ -13,6 +13,7 @@
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
     loading: boolean;
     highlightedContenderId?: number;
+    scrollToHighlighted?: boolean;
   }
 
   let {
@@ -21,6 +22,7 @@
     scoreboard,
     loading,
     highlightedContenderId,
+    scrollToHighlighted: enableScrollToHighlighted = true,
   }: Props = $props();
 
   const ITEM_HEIGHT = 36;
@@ -75,7 +77,7 @@
 
     visibilityObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
-        if (entry.isIntersecting && highlightedContenderId) {
+        if (entry.isIntersecting && highlightedContenderId && enableScrollToHighlighted) {
           setTimeout(scrollToHighlighted);
         }
       }
@@ -98,7 +100,7 @@
   });
 
   $effect(() => {
-    if (highlightedContenderId && results.length > 0) {
+    if (highlightedContenderId && results.length > 0 && enableScrollToHighlighted) {
       setTimeout(scrollToHighlighted);
     }
   });
