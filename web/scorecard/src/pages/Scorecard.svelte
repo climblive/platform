@@ -145,6 +145,7 @@
     if (contender) {
       score = contender.score?.score ?? 0;
       placement = contender.score?.placement;
+      finalist = contender.score?.finalist ?? false;
     }
   });
 
