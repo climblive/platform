@@ -16,9 +16,7 @@
 
   let tops = $derived(ticks.filter((tick) => tick.top).length);
 
-  let zones = $derived(
-    ticks.filter((tick) => !tick.top && (tick.zone1 || tick.zone2)).length,
-  );
+  let zones = $derived(ticks.filter((tick) => tick.zone1 || tick.zone2).length);
 
   let flashes = $derived(
     ticks.filter((tick) => tick.top && tick.attemptsTop === 1).length,
