@@ -2,6 +2,7 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import type { Problem, Tick } from "@climblive/lib/models";
   import { ordinalSuperscript } from "@climblive/lib/utils";
+  import type { Snippet } from "svelte";
 
   interface Props {
     ticks: Tick[];
@@ -30,41 +31,50 @@
   let totalProblems = $derived(problems.length);
 </script>
 
-<div class="summary">
+{#snippet stat(label: string, value: Snippet)}
   <div class="stat">
-    <span class="label">Tops</span>
-    <span class="value"><strong>{tops}</strong>/{totalProblems}</span>
+    <span class="label">{label}</span>
+    <span class="value">{@render value()}</span>
   </div>
-  {#if hasZones}
-    <div class="stat">
-      <span class="label">Zones</span>
-      <span class="value"><strong>{zones}</strong>/{totalProblems}</span>
-    </div>
+{/snippet}
+
+{#snippet topsValue()}
+  <strong>{tops}</strong>/{totalProblems}
+{/snippet}
+
+{#snippet zonesValue()}
+  <strong>{zones}</strong>/{totalProblems}
+{/snippet}
+
+{#snippet flashesValue()}
+  <strong>{flashes}</strong>/{totalProblems}
+{/snippet}
+
+{#snippet scoreValue()}
+  <strong>{score}</strong> pts
+{/snippet}
+
+{#snippet placementValue()}
+  {#if placement}
+    <strong>{placement}</strong><sup>{ordinalSuperscript(placement)}</sup>
+  {:else}
+    <strong>-</strong>
   {/if}
-  <div class="stat">
-    <span class="label">Flashes</span>
-    <span class="value"><strong>{flashes}</strong>/{totalProblems}</span>
-  </div>
-  <div class="stat">
-    <span class="label">Score</span>
-    <span class="value"><strong>{score}</strong> pts</span>
-  </div>
-  <div class="stat">
-    <span class="label">Placement</span>
-    <span class="value">
-      {#if placement}
-        <strong>{placement}</strong><sup>{ordinalSuperscript(placement)}</sup>
-      {:else}
-        <strong>-</strong>
-      {/if}
-    </span>
-  </div>
-  <div class="stat">
-    <span class="label">Finalist</span>
-    <span class="value">
-      <wa-icon name={finalist ? "medal" : "minus"}></wa-icon>
-    </span>
-  </div>
+{/snippet}
+
+{#snippet finalistValue()}
+  <wa-icon name={finalist ? "medal" : "minus"}></wa-icon>
+{/snippet}
+
+<div class="summary">
+  {@render stat("Tops", topsValue)}
+  {#if hasZones}
+    {@render stat("Zones", zonesValue)}
+  {/if}
+  {@render stat("Flashes", flashesValue)}
+  {@render stat("Score", scoreValue)}
+  {@render stat("Placement", placementValue)}
+  {@render stat("Finalist", finalistValue)}
 </div>
 
 <style>
@@ -72,11 +82,11 @@
     background-color: var(--wa-color-surface-raised);
     border: var(--wa-border-width-m) var(--wa-border-style)
       var(--wa-color-surface-border);
-    border-radius: var(--wa-border-radius-l);
+    border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-m);
     margin-bottom: var(--wa-space-m);
     display: grid;
-    grid-template-columns: repeat(3, minmax(5rem, 1fr));
+    grid-template-columns: 1fr 1fr 1fr;
     gap: var(--wa-space-m);
   }
 
@@ -88,7 +98,7 @@
 
   .label {
     font-size: var(--wa-font-size-xs);
-    color: var(--wa-color-text-weak);
+    color: var(--wa-color-text-quiet);
     margin-bottom: var(--wa-space-2xs);
   }
 
