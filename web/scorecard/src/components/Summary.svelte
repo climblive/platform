@@ -16,21 +16,33 @@
 
   let tops = $derived(ticks.filter((tick) => tick.top).length);
 
-  let zones = $derived(ticks.filter((tick) => tick.zone1 || tick.zone2).length);
+  let zones = $derived(
+    ticks.filter((tick) => {
+      const problem = problems.find(({ id }) => id === tick.problemId);
+
+      if (!(problem?.zone1Enabled || problem?.zone2Enabled)) {
+        return false;
+      }
+
+      return tick.zone1 || tick.zone2;
+    }).length,
+  );
 
   let flashes = $derived(
     ticks.filter((tick) => tick.top && tick.attemptsTop === 1).length,
   );
 
-  let hasZones = $derived(
-    problems.some((problem) => problem.zone1Enabled || problem.zone2Enabled),
+  let problemsWithZones = $derived(
+    problems.filter((problem) => problem.zone1Enabled || problem.zone2Enabled),
   );
+
+  let hasZones = $derived(problemsWithZones.length > 0);
 
   let totalProblems = $derived(problems.length);
 </script>
 
-{#snippet stat(label: string, value: Snippet)}
-  <div class="stat">
+{#snippet stat(label: string, value: Snippet, disabled: boolean = false)}
+  <div class="stat" class:disabled>
     <span class="label">{label}</span>
     <span class="value">{@render value()}</span>
   </div>
@@ -41,7 +53,7 @@
 {/snippet}
 
 {#snippet zonesValue()}
-  <strong>{zones}</strong>/{totalProblems}
+  <strong>{zones}</strong>/{problemsWithZones.length}
 {/snippet}
 
 {#snippet flashesValue()}
@@ -66,9 +78,7 @@
 
 <div class="summary">
   {@render stat("Tops", topsValue)}
-  {#if hasZones}
-    {@render stat("Zones", zonesValue)}
-  {/if}
+  {@render stat("Zones", zonesValue, !hasZones)}
   {@render stat("Flashes", flashesValue)}
   {@render stat("Score", scoreValue)}
   {@render stat("Placement", placementValue)}
@@ -112,5 +122,9 @@
     & wa-icon {
       font-size: 1.5em;
     }
+  }
+
+  .stat.disabled {
+    opacity: 0.4;
   }
 </style>
