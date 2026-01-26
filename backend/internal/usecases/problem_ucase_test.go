@@ -245,6 +245,76 @@ func TestPatchProblem(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
+	t.Run("DisablingZonesClearsZonePoints", func(t *testing.T) {
+		mockedRepo, mockedEventBroker, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		mockedRepo.
+			On("StoreProblem", mock.Anything, nil, domain.Problem{
+				ID:                 fakedProblemID,
+				Ownership:          fakedOwnership,
+				ContestID:          fakedContestID,
+				Number:             10,
+				HoldColorPrimary:   "#ffffff",
+				HoldColorSecondary: "#000000",
+				Description:        "The tenth boulder",
+				Zone1Enabled:       false,
+				Zone2Enabled:       false,
+				PointsTop:          100,
+				PointsZone1:        0,
+				PointsZone2:        0,
+				FlashBonus:         10,
+			}).
+			Return(domain.Problem{
+				ID:                 fakedProblemID,
+				Ownership:          fakedOwnership,
+				ContestID:          fakedContestID,
+				Number:             10,
+				HoldColorPrimary:   "#ffffff",
+				HoldColorSecondary: "#000000",
+				Description:        "The tenth boulder",
+				Zone1Enabled:       false,
+				Zone2Enabled:       false,
+				PointsTop:          100,
+				PointsZone1:        0,
+				PointsZone2:        0,
+				FlashBonus:         10,
+			}, nil)
+
+		mockedEventBroker.
+			On("Dispatch", fakedContestID, domain.ProblemUpdatedEvent{
+				ProblemID:   fakedProblemID,
+				PointsTop:   100,
+				PointsZone1: 0,
+				PointsZone2: 0,
+				FlashBonus:  10,
+			}).Return()
+
+		ucase := usecases.ProblemUseCase{
+			Repo:        mockedRepo,
+			Authorizer:  mockedAuthorizer,
+			EventBroker: mockedEventBroker,
+		}
+
+		problem, err := ucase.PatchProblem(context.Background(), fakedProblemID, domain.ProblemPatch{
+			Zone1Enabled: domain.NewPatch(false),
+			Zone2Enabled: domain.NewPatch(false),
+		})
+
+		require.NoError(t, err)
+		assert.False(t, problem.Zone1Enabled)
+		assert.False(t, problem.Zone2Enabled)
+		assert.Equal(t, 0, problem.PointsZone1)
+		assert.Equal(t, 0, problem.PointsZone2)
+
+		mockedRepo.AssertExpectations(t)
+		mockedEventBroker.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
 	t.Run("BadCredentials", func(t *testing.T) {
 		mockedRepo, _, mockedAuthorizer := makeMocks()
 
