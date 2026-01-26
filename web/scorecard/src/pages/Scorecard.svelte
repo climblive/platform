@@ -340,7 +340,7 @@
                     {scoreboard}
                     {loading}
                     highlightedContenderId={contender.id}
-                    scrollToHighlighted={false}
+                    autoScroll={false}
                   />
                 {/snippet}
               </ScoreboardProvider>

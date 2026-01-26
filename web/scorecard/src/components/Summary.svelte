@@ -12,11 +12,11 @@
     finalist: boolean;
   }
 
-  let { ticks, problems, score, placement, finalist }: Props = $props();
+  const { ticks, problems, score, placement, finalist }: Props = $props();
 
-  let tops = $derived(ticks.filter((tick) => tick.top).length);
+  const tops = $derived(ticks.filter((tick) => tick.top).length);
 
-  let zones = $derived(
+  const zones = $derived(
     ticks.filter((tick) => {
       const problem = problems.find(({ id }) => id === tick.problemId);
 
@@ -28,20 +28,18 @@
     }).length,
   );
 
-  let flashes = $derived(
+  const flashes = $derived(
     ticks.filter((tick) => tick.top && tick.attemptsTop === 1).length,
   );
 
-  let problemsWithZones = $derived(
+  const problemsWithZones = $derived(
     problems.filter((problem) => problem.zone1Enabled || problem.zone2Enabled),
   );
 
-  let hasZones = $derived(problemsWithZones.length > 0);
-
-  let totalProblems = $derived(problems.length);
+  const totalProblems = $derived(problems.length);
 </script>
 
-{#snippet stat(label: string, value: Snippet, disabled: boolean = false)}
+{#snippet entry(label: string, value: Snippet, disabled: boolean = false)}
   <div class="stat" class:disabled>
     <span class="label">{label}</span>
     <span class="value">{@render value()}</span>
@@ -66,7 +64,7 @@
 
 {#snippet placementValue()}
   {#if placement}
-    <strong>{placement}</strong><sup>{ordinalSuperscript(placement)}</sup>
+    <strong>{placement}<sup>{ordinalSuperscript(placement)}</sup></strong>
   {:else}
     <strong>-</strong>
   {/if}
@@ -77,18 +75,18 @@
 {/snippet}
 
 <div class="summary">
-  {@render stat("Tops", topsValue)}
-  {@render stat("Zones", zonesValue, !hasZones)}
-  {@render stat("Flashes", flashesValue)}
-  {@render stat("Score", scoreValue)}
-  {@render stat("Placement", placementValue)}
-  {@render stat("Finalist", finalistValue)}
+  {@render entry("Tops", topsValue)}
+  {@render entry("Zones", zonesValue, problemsWithZones.length === 0)}
+  {@render entry("Flashes", flashesValue)}
+  {@render entry("Score", scoreValue)}
+  {@render entry("Placement", placementValue)}
+  {@render entry("Finalist", finalistValue)}
 </div>
 
 <style>
   .summary {
     background-color: var(--wa-color-surface-raised);
-    border: var(--wa-border-width-m) var(--wa-border-style)
+    border: var(--wa-border-width-s) var(--wa-border-style)
       var(--wa-color-surface-border);
     border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-m);
@@ -125,6 +123,6 @@
   }
 
   .stat.disabled {
-    opacity: 0.4;
+    opacity: 0.5;
   }
 </style>
