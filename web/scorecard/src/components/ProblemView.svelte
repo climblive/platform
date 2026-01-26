@@ -31,7 +31,7 @@
   />
   <span class="points">
     <span class="top">
-      {problem.pointsTop} pts
+      {problem.pointsTop}p
     </span>
     {#if problem.flashBonus}
       <wa-icon name="bolt"></wa-icon>
