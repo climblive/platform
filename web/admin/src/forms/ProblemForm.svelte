@@ -71,7 +71,7 @@
 
   const handleZone1Toggle = (event: InputEvent) => {
     const target = event.target as WaSwitch;
-    zone1Enabled = target.checked;
+    data.zone1Enabled = target.checked;
     if (!target.checked) {
       data.pointsZone1 = 0;
     }
@@ -79,7 +79,7 @@
 
   const handleZone2Toggle = (event: InputEvent) => {
     const target = event.target as WaSwitch;
-    zone2Enabled = target.checked;
+    data.zone2Enabled = target.checked;
     if (!target.checked) {
       data.pointsZone2 = 0;
     }
