@@ -54,6 +54,17 @@
   let zone1Enabled = $derived(data.zone1Enabled);
   let zone2Enabled = $derived(data.zone2Enabled);
 
+  const handleSubmit = (value: T) => {
+    const updatedValue = { ...value };
+    if (!updatedValue.zone1Enabled) {
+      updatedValue.pointsZone1 = 0;
+    }
+    if (!updatedValue.zone2Enabled) {
+      updatedValue.pointsZone2 = 0;
+    }
+    submit(updatedValue);
+  };
+
   const swatches = [
     "#6f3601",
     "#dc3146",
@@ -80,7 +91,7 @@
   };
 </script>
 
-<GenericForm {schema} {submit}>
+<GenericForm {schema} submit={handleSubmit}>
   <fieldset>
     <wa-input
       size="small"

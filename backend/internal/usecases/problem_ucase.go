@@ -93,27 +93,21 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 
 	if patch.Zone1Enabled.Present {
 		problem.Zone1Enabled = patch.Zone1Enabled.Value
-		if !problem.Zone1Enabled {
-			problem.PointsZone1 = 0
-		}
 	}
 
 	if patch.Zone2Enabled.Present {
 		problem.Zone2Enabled = patch.Zone2Enabled.Value
-		if !problem.Zone2Enabled {
-			problem.PointsZone2 = 0
-		}
 	}
 
 	if patch.PointsTop.Present {
 		problem.PointsTop = patch.PointsTop.Value
 	}
 
-	if patch.PointsZone1.Present && problem.Zone1Enabled {
+	if patch.PointsZone1.Present {
 		problem.PointsZone1 = patch.PointsZone1.Value
 	}
 
-	if patch.PointsZone2.Present && problem.Zone2Enabled {
+	if patch.PointsZone2.Present {
 		problem.PointsZone2 = patch.PointsZone2.Value
 	}
 
