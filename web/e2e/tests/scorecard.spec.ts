@@ -271,10 +271,10 @@ test("tick and untick all problems", async ({ page }) => {
     await problem.getByRole("button", { name: "Tick" }).click();
     await problem.getByRole("button", { name: "Top" }).click();
 
-    await expect(problem.getByText(`+${p * 100}p`)).toBeVisible();
+    await expect(problem.getByText(`+${p * 100} pts`)).toBeVisible();
   }
 
-  await expect(page.getByText("1500p")).toBeVisible();
+  await expect(page.getByText("1500 pts")).toBeVisible();
   await expect(page.getByText("1st")).toBeVisible();
 
   for (let p = 1; p <= 5; p++) {
@@ -286,7 +286,7 @@ test("tick and untick all problems", async ({ page }) => {
     await expect(problem.getByText(`+${p * 100}p`)).not.toBeVisible();
   }
 
-  await expect(page.getByText("0p", { exact: true })).toBeVisible();
+  await expect(page.getByText("0 pts", { exact: true })).toBeVisible();
   await expect(page.getByText("1st")).toBeVisible();
 });
 
@@ -299,11 +299,11 @@ test("tick a problem as a flash", async ({ page }) => {
   await problem.getByRole("button", { name: "Tick" }).click();
   await problem.getByRole("button", { name: "Flash" }).click();
 
-  await expect(problem.getByText("+110p")).toBeVisible();
+  await expect(problem.getByText("+110 pts")).toBeVisible();
 
   await problem.getByRole("button", { name: "Untick" }).click();
 
-  await expect(problem.getByText("+110p")).not.toBeVisible();
+  await expect(problem.getByText("+110 pts")).not.toBeVisible();
 });
 
 test("tick the first zone", async ({ page }) => {
@@ -315,11 +315,11 @@ test("tick the first zone", async ({ page }) => {
   await problem.getByRole("button", { name: "Tick" }).click();
   await problem.getByRole("button", { name: "Zone 1" }).click();
 
-  await expect(problem.getByText("+10p")).toBeVisible();
+  await expect(problem.getByText("+10 pts")).toBeVisible();
 
   await problem.getByRole("button", { name: "Untick" }).click();
 
-  await expect(problem.getByText("+10p")).not.toBeVisible();
+  await expect(problem.getByText("+10 pts")).not.toBeVisible();
 });
 
 test("tick the second zone", async ({ page }) => {
@@ -331,11 +331,11 @@ test("tick the second zone", async ({ page }) => {
   await problem.getByRole("button", { name: "Tick" }).click();
   await problem.getByRole("button", { name: "Zone 2" }).click();
 
-  await expect(problem.getByText("+20p")).toBeVisible();
+  await expect(problem.getByText("+20 pts")).toBeVisible();
 
   await problem.getByRole("button", { name: "Untick" }).click();
 
-  await expect(problem.getByText("+20p")).not.toBeVisible();
+  await expect(problem.getByText("+20 pts")).not.toBeVisible();
 });
 
 test("info tab", async ({ page }) => {
