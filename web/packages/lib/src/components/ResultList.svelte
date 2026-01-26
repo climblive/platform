@@ -77,11 +77,7 @@
 
     visibilityObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
-        if (
-          entry.isIntersecting &&
-          highlightedContenderId &&
-          autoScroll
-        ) {
+        if (entry.isIntersecting && highlightedContenderId && autoScroll) {
           setTimeout(scrollToHighlighted);
         }
       }
@@ -104,11 +100,7 @@
   });
 
   $effect(() => {
-    if (
-      highlightedContenderId &&
-      results.length > 0 &&
-      autoScroll
-    ) {
+    if (highlightedContenderId && results.length > 0 && autoScroll) {
       setTimeout(scrollToHighlighted);
     }
   });
