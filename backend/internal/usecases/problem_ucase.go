@@ -109,11 +109,11 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 		problem.PointsTop = patch.PointsTop.Value
 	}
 
-	if patch.PointsZone1.Present {
+	if patch.PointsZone1.Present && problem.Zone1Enabled {
 		problem.PointsZone1 = patch.PointsZone1.Value
 	}
 
-	if patch.PointsZone2.Present {
+	if patch.PointsZone2.Present && problem.Zone2Enabled {
 		problem.PointsZone2 = patch.PointsZone2.Value
 	}
 
