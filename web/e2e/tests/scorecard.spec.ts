@@ -261,7 +261,7 @@ test("cancel edit profile", async ({ page }) => {
   await expect(page.getByText("Albert Einstein")).toBeVisible();
 });
 
-test.only("tick and untick all problems", async ({ page }) => {
+test("tick and untick all problems", async ({ page }) => {
   await page.goto("/ABCD0003");
 
   for (let p = 1; p <= 5; p++) {
