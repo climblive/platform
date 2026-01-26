@@ -10,6 +10,6 @@
 
 <div class="counter" aria-live="polite">
   {#if !(hideZero && value === 0)}
-    {prefix}{value}<span class="suffix"> pts</span>
+    {prefix}{value} <span class="suffix">pts</span>
   {/if}
 </div>
