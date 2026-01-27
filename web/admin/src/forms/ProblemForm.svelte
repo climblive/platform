@@ -73,7 +73,10 @@
     const target = event.target as WaSwitch;
     zone1Enabled = target.checked;
     if (!target.checked) {
-      data.pointsZone1 = 0;
+      const pointsZone1Input = document.querySelector('[name="pointsZone1"]') as HTMLInputElement;
+      if (pointsZone1Input) {
+        pointsZone1Input.value = "0";
+      }
     }
   };
 
@@ -81,7 +84,10 @@
     const target = event.target as WaSwitch;
     zone2Enabled = target.checked;
     if (!target.checked) {
-      data.pointsZone2 = 0;
+      const pointsZone2Input = document.querySelector('[name="pointsZone2"]') as HTMLInputElement;
+      if (pointsZone2Input) {
+        pointsZone2Input.value = "0";
+      }
     }
   };
 </script>
