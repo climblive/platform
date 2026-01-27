@@ -86,6 +86,12 @@
       width: "max-content",
     },
     {
+      label: "Zones",
+      mobile: false,
+      render: renderZones,
+      width: "max-content",
+    },
+    {
       label: "Flash",
       mobile: false,
       render: renderFlashBonus,
@@ -142,6 +148,16 @@
 {#snippet renderFlashBonus({ flashBonus }: ProblemWithAscents)}
   {#if flashBonus}
     +{flashBonus} pts
+  {:else}
+    -
+  {/if}
+{/snippet}
+
+{#snippet renderZones({ zone1Enabled, zone2Enabled }: ProblemWithAscents)}
+  {#if zone1Enabled && zone2Enabled}
+    Z1 + Z2
+  {:else if zone1Enabled}
+    Z1
   {:else}
     -
   {/if}
