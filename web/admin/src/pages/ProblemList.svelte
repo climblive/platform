@@ -80,15 +80,15 @@
       width: "minmax(max-content, 3fr)",
     },
     {
-      label: "Points",
-      mobile: true,
-      render: renderPoints,
-      width: "max-content",
-    },
-    {
       label: "Zones",
       mobile: false,
       render: renderZones,
+      width: "max-content",
+    },
+    {
+      label: "Points",
+      mobile: true,
+      render: renderPoints,
       width: "max-content",
     },
     {
