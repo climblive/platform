@@ -19,5 +19,8 @@
   },
   "[svelte]": {
     "editor.defaultFormatter": "svelte.svelte-vscode"
-  }
+  },
+  "cssVariables.lookupFiles": [
+    "web/scorecard/node_modules/@awesome.me/webawesome/dist/styles/webawesome.css"
+  ]
 }

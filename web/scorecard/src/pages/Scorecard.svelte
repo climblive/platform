@@ -2,6 +2,7 @@
   import ContestInfo from "@/components/ContestInfo.svelte";
   import Header from "@/components/Header.svelte";
   import ProblemView from "@/components/ProblemView.svelte";
+  import Summary from "@/components/Summary.svelte";
   import type { ScorecardSession } from "@/types";
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
@@ -56,6 +57,7 @@
   let eventSource: EventSource | undefined;
   let score: number = $state(0);
   let placement: number | undefined = $state();
+  let finalist: boolean = $state(false);
 
   let contender = $derived(contenderQuery.data);
   let contest = $derived(contestQuery.data);
@@ -143,6 +145,7 @@
     if (contender) {
       score = contender.score?.score ?? 0;
       placement = contender.score?.placement;
+      finalist = contender.score?.finalist ?? false;
     }
   });
 
@@ -178,6 +181,7 @@
       if (event.contenderId === contender?.id) {
         score = event.score;
         placement = event.placement;
+        finalist = event.finalist;
       }
     });
 
@@ -316,6 +320,15 @@
             {/if}
           </wa-tab-panel>
           <wa-tab-panel name="results">
+            {#if contestState !== "NOT_STARTED"}
+              <Summary
+                {ticks}
+                problems={sortedProblems}
+                {score}
+                {placement}
+                {finalist}
+              />
+            {/if}
             {#if resultsConnected}
               <ScoreboardProvider
                 contestId={$session.contestId}
@@ -327,6 +340,7 @@
                     {scoreboard}
                     {loading}
                     highlightedContenderId={contender.id}
+                    autoScroll={false}
                   />
                 {/snippet}
               </ScoreboardProvider>
