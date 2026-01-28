@@ -50,7 +50,7 @@
     background-color: var(--wa-color-surface-raised);
     border-radius: var(--wa-border-radius-m);
     border: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-form-control-border-color);
+      var(--wa-color-surface-border);
     padding-inline-start: var(--wa-space-s);
     padding-inline-end: var(--wa-space-xs);
 

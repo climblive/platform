@@ -65,7 +65,7 @@
   header {
     background-color: var(--wa-color-surface-raised);
     border: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-form-control-border-color);
+      var(--wa-color-surface-border);
     border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-s);
     color: var(--wa-color-text-normal);

@@ -40,7 +40,7 @@
     height: 2.25rem;
     background-color: var(--wa-color-surface-raised);
     border: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-form-control-border-color);
+      var(--wa-color-surface-border);
     display: grid;
     padding-inline: var(--wa-space-s);
     border-radius: var(--wa-border-radius-m);
