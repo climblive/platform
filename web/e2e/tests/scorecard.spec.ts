@@ -274,7 +274,7 @@ test("tick and untick all problems", async ({ page }) => {
     await expect(problem.getByText(`+${p * 100}p`)).toBeVisible();
   }
 
-  await expect(page.getByText("1500 pts")).toBeVisible();
+  await expect(page.getByText("1500p")).toBeVisible();
   await expect(page.getByText("1st")).toBeVisible();
 
   for (let p = 1; p <= 5; p++) {
@@ -286,7 +286,7 @@ test("tick and untick all problems", async ({ page }) => {
     await expect(problem.getByText(`+${p * 100}p`)).not.toBeVisible();
   }
 
-  await expect(page.getByText("0 pts", { exact: true })).toBeVisible();
+  await expect(page.getByText("0p", { exact: true })).toBeVisible();
   await expect(page.getByText("1st")).toBeVisible();
 });
 
