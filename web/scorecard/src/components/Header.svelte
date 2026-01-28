@@ -63,12 +63,12 @@
 
 <style>
   header {
-    background-color: var(--wa-color-surface-raised);
+    background-color: var(--wa-color-brand-fill-normal);
     border: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-color-surface-border);
+      var(--wa-color-brand-border-normal);
     border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-s);
-    color: var(--wa-color-text-normal);
+    color: var(--wa-color-brand-on-normal);
     position: relative;
 
     & wa-button {
@@ -78,7 +78,7 @@
       color: inherit;
 
       &::part(label) {
-        color: var(--wa-color-text-normal);
+        color: var(--wa-color-brand-on-normal);
       }
     }
 
