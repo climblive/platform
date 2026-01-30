@@ -45,8 +45,15 @@
         if (!a.timeBegin && !b.timeBegin) {
           return b.created.getTime() - a.created.getTime();
         }
-        if (!a.timeBegin) return 1;
-        if (!b.timeBegin) return -1;
+
+        if (!a.timeBegin) {
+          return 1;
+        }
+
+        if (!b.timeBegin) {
+          return -1;
+        }
+
         return b.timeBegin.getTime() - a.timeBegin.getTime();
       });
   });
