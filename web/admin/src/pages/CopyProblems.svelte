@@ -13,18 +13,19 @@
   import { type ProblemTemplate } from "@climblive/lib/models";
   import {
     createProblemMutation,
-    getAllContestsQuery,
+    getContestsByOrganizerQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import { format } from "date-fns";
 
   interface Props {
+    organizerId: number;
     contestId: number;
     open: boolean;
   }
 
-  let { contestId, open = $bindable() }: Props = $props();
+  let { organizerId, contestId, open = $bindable() }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
   let selectedContestId: number | undefined = $state();
@@ -32,7 +33,7 @@
   let copyProgress = $state(0);
   let copyCompleted = $state(false);
 
-  const contestsQuery = $derived(getAllContestsQuery());
+  const contestsQuery = $derived(getContestsByOrganizerQuery(organizerId));
 
   const availableContests = $derived.by(() => {
     if (!contestsQuery.data) {

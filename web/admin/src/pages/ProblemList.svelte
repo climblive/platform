@@ -250,7 +250,7 @@
   {/if}
 </section>
 
-<CopyProblems {contestId} bind:open={copyProblemsOpen} />
+<CopyProblems {organizerId} {contestId} bind:open={copyProblemsOpen} />
 
 <style>
   .controls {
