@@ -41,7 +41,21 @@
 
     return contestsQuery.data
       .filter(({ id, archived }) => id !== contestId && !archived)
-      .sort((a, b) => b.created.getTime() - a.created.getTime());
+      .sort((a, b) => {
+        if (!a.timeBegin && !b.timeBegin) {
+          return b.created.getTime() - a.created.getTime();
+        }
+
+        if (!a.timeBegin) {
+          return 1;
+        }
+
+        if (!b.timeBegin) {
+          return -1;
+        }
+
+        return b.timeBegin.getTime() - a.timeBegin.getTime();
+      });
   });
 
   const selectedContest = $derived(
