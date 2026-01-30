@@ -2,6 +2,7 @@
   import Loader from "@/components/Loader.svelte";
   import RulesEditor from "@/components/RulesEditor.svelte";
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
+  import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
   import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
@@ -13,9 +14,11 @@
   import type WaTabGroup from "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
   import "@awesome.me/webawesome/dist/components/tab-panel/tab-panel.js";
   import "@awesome.me/webawesome/dist/components/tab/tab.js";
-  import { LabeledText } from "@climblive/lib/components";
+  import { LabeledText, ScoreboardProvider } from "@climblive/lib/components";
   import { getContestQuery } from "@climblive/lib/queries";
   import { navigate } from "svelte-routing";
+  import type { Writable } from "svelte/store";
+  import type { ScoreboardEntry } from "@climblive/lib/models";
   import ArchiveContest from "./ArchiveContest.svelte";
   import CompClassList from "./CompClassList.svelte";
   import DuplicateContest from "./DuplicateContest.svelte";
@@ -106,10 +109,34 @@
     {/if}
 
     {#if contest.archived === false}
-      <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleTabShow}>
-        <wa-tab slot="nav" panel="contest">Contest</wa-tab>
-        <wa-tab slot="nav" panel="results">Results</wa-tab>
-        <wa-tab slot="nav" panel="raffles">Raffles</wa-tab>
+      <ScoreboardProvider {contestId}>
+        {#snippet children({ scoreboard })}
+          {@const registeredContendersCount = (() => {
+            const contenderIds = new Set<number>();
+            const scoreboardValue = scoreboard;
+            // Subscribe to get the current value
+            let currentScoreboard: Map<number, ScoreboardEntry[]> = new Map();
+            const unsubscribe = scoreboardValue.subscribe(value => {
+              currentScoreboard = value;
+            });
+            unsubscribe();
+            
+            for (const entries of currentScoreboard.values()) {
+              for (const entry of entries) {
+                contenderIds.add(entry.contenderId);
+              }
+            }
+            return contenderIds.size;
+          })()}
+          <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleTabShow}>
+            <wa-tab slot="nav" panel="contest">Contest</wa-tab>
+            <wa-tab slot="nav" panel="results">
+              Results
+              {#if registeredContendersCount > 0}
+                <wa-badge variant="neutral" pill>{registeredContendersCount}</wa-badge>
+              {/if}
+            </wa-tab>
+            <wa-tab slot="nav" panel="raffles">Raffles</wa-tab>
 
         <wa-tab-panel name="contest">
           <article>
@@ -205,6 +232,8 @@
           <RaffleList {contestId} />
         </wa-tab-panel>
       </wa-tab-group>
+        {/snippet}
+      </ScoreboardProvider>
     {/if}
   {/if}
 </main>
@@ -233,6 +262,11 @@
 
   wa-details {
     margin-top: var(--wa-space-m);
+  }
+
+  wa-tab[panel="results"] wa-badge {
+    margin-left: var(--wa-space-2xs);
+    font-size: var(--wa-font-size-2xs);
   }
 
   .actions {
