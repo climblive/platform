@@ -1,6 +1,7 @@
 package scores
 
 import (
+	"encoding/binary"
 	"iter"
 	"slices"
 
@@ -18,6 +19,55 @@ type ScoringRules interface {
 
 type Ranker interface {
 	RankContenders(contenders iter.Seq[Contender]) []domain.Score
+}
+
+type EffectType int8
+
+const (
+	EffectTypeCalculateProblemValue EffectType = iota
+	EffectTypeScoreContender
+	EffectTypeRankClass
+)
+
+type EncodedEffect = [9]byte
+
+type Effect interface {
+	Encode() EncodedEffect
+}
+
+type EffectScoreContender struct {
+	ContenderID domain.ContenderID
+}
+
+func (e EffectScoreContender) Encode() EncodedEffect {
+	var data EncodedEffect
+	data[0] = byte(EffectTypeScoreContender)
+	binary.LittleEndian.PutUint32(data[1:], uint32(e.ContenderID))
+	return data
+}
+
+type EffectRankClass struct {
+	CompClassID domain.CompClassID
+}
+
+func (e EffectRankClass) Encode() EncodedEffect {
+	var data EncodedEffect
+	data[0] = byte(EffectTypeRankClass)
+	binary.LittleEndian.PutUint32(data[1:], uint32(e.CompClassID))
+	return data
+}
+
+type EffectCalculateProblemValue struct {
+	CompClassID domain.CompClassID
+	ProblemID   domain.ProblemID
+}
+
+func (e EffectCalculateProblemValue) Encode() EncodedEffect {
+	var data EncodedEffect
+	data[0] = byte(EffectTypeCalculateProblemValue)
+	binary.LittleEndian.PutUint32(data[1:], uint32(e.ProblemID))
+	binary.LittleEndian.PutUint32(data[5:], uint32(e.CompClassID))
+	return data
 }
 
 type EngineStore interface {
@@ -145,30 +195,34 @@ func (e *DefaultScoreEngine) HandleContenderSwitchedClass(event domain.Contender
 	e.rankCompClasses(compClassesToReRank...)
 }
 
-func (e *DefaultScoreEngine) HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent) {
+func (e *DefaultScoreEngine) HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent) iter.Seq[Effect] {
 	contender, found := e.store.GetContender(event.ContenderID)
 	if !found {
-		return
+		return nil
 	}
 
 	contender.WithdrawnFromFinals = true
 
 	e.store.SaveContender(contender)
 
-	e.rankCompClasses(contender.CompClassID)
+	return func(yield func(Effect) bool) {
+		yield(EffectRankClass{CompClassID: contender.CompClassID})
+	}
 }
 
-func (e *DefaultScoreEngine) HandleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent) {
+func (e *DefaultScoreEngine) HandleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent) iter.Seq[Effect] {
 	contender, found := e.store.GetContender(event.ContenderID)
 	if !found {
-		return
+		return nil
 	}
 
 	contender.WithdrawnFromFinals = false
 
 	e.store.SaveContender(contender)
 
-	e.rankCompClasses(contender.CompClassID)
+	return func(yield func(Effect) bool) {
+		yield(EffectRankClass{CompClassID: contender.CompClassID})
+	}
 }
 
 func (e *DefaultScoreEngine) HandleContenderDisqualified(event domain.ContenderDisqualifiedEvent) {
