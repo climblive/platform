@@ -225,10 +225,10 @@ func (e *DefaultScoreEngine) HandleContenderReenteredFinals(event domain.Contend
 	}
 }
 
-func (e *DefaultScoreEngine) HandleContenderDisqualified(event domain.ContenderDisqualifiedEvent) {
+func (e *DefaultScoreEngine) HandleContenderDisqualified(event domain.ContenderDisqualifiedEvent) iter.Seq[Effect] {
 	contender, found := e.store.GetContender(event.ContenderID)
 	if !found {
-		return
+		return nil
 	}
 
 	contender.Disqualified = true
@@ -236,13 +236,16 @@ func (e *DefaultScoreEngine) HandleContenderDisqualified(event domain.ContenderD
 
 	e.store.SaveContender(contender)
 
-	e.rankCompClasses(contender.CompClassID)
+	return func(yield func(Effect) bool) {
+		yield(EffectScoreContender{ContenderID: contender.ID})
+		yield(EffectRankClass{CompClassID: contender.CompClassID})
+	}
 }
 
-func (e *DefaultScoreEngine) HandleContenderRequalified(event domain.ContenderRequalifiedEvent) {
+func (e *DefaultScoreEngine) HandleContenderRequalified(event domain.ContenderRequalifiedEvent) iter.Seq[Effect] {
 	contender, found := e.store.GetContender(event.ContenderID)
 	if !found {
-		return
+		return nil
 	}
 
 	contender.Disqualified = false
@@ -250,7 +253,10 @@ func (e *DefaultScoreEngine) HandleContenderRequalified(event domain.ContenderRe
 
 	e.store.SaveContender(contender)
 
-	e.rankCompClasses(contender.CompClassID)
+	return func(yield func(Effect) bool) {
+		yield(EffectScoreContender{ContenderID: contender.ID})
+		yield(EffectRankClass{CompClassID: contender.CompClassID})
+	}
 }
 
 func (e *DefaultScoreEngine) HandleAscentRegistered(event domain.AscentRegisteredEvent) {

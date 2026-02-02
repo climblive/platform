@@ -335,6 +335,10 @@ func (r *EffectRunner) Run(effects iter.Seq[Effect]) {
 			chainEffects = r.driver.engine.CalculateProblemValue(effect.CompClassID, effect.ProblemID)
 		}
 
+		if chainEffects == nil {
+			continue
+		}
+
 		for chainEffect := range chainEffects {
 			r.queue[chainEffect.Encode()] = chainEffect
 		}
