@@ -280,10 +280,7 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 		terminatedBy = latestPermittedTerminationTime
 	}
 
-	logger = logger.With(slog.Group("config",
-		"qualifying_problems", contest.QualifyingProblems,
-		"finalists", contest.Finalists)).
-		With("terminated_by", terminatedBy)
+	logger = logger.With("terminated_by", terminatedBy)
 
 	if contest.TimeBegin.After(now) {
 		logger = logger.With("starting_in", time.Until(contest.TimeBegin))

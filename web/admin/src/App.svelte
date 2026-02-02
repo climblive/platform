@@ -75,9 +75,9 @@
 
 <ErrorBoundary>
   {#await authenticator.authenticate()}
-    <main>
+    <div class="loading">
       <wa-spinner></wa-spinner>
-    </main>
+    </div>
   {:then}
     <QueryClientProvider client={queryClient}>
       {#if !authenticator.isAuthenticated()}
@@ -106,16 +106,24 @@
 </ErrorBoundary>
 
 <style>
+  .loading {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .loading wa-spinner {
+    font-size: 5rem;
+  }
+
   main {
     display: flex;
     justify-content: center;
     height: 100vh;
     padding: var(--wa-space-l);
     padding-top: 20vh;
-  }
-
-  wa-spinner {
-    font-size: 5rem;
   }
 
   wa-button:last-of-type {

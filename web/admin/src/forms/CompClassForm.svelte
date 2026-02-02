@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  import * as z from "zod/v4";
+  import { z } from "@climblive/lib/utils";
 
   const oneMonth = 31 * 24 * 60 * 60 * 1_000;
 

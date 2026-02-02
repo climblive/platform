@@ -22,7 +22,7 @@
     contenderId: NaN,
     contestId: NaN,
     registrationCode: "",
-    timestamp: new Date(0),
+    expiryTime: new Date(0),
   });
 
   setContext("scorecardSession", session);

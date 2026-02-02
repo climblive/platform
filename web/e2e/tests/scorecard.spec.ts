@@ -92,18 +92,20 @@ test("enter contest by entering registration code", async ({ page }) => {
   await page.waitForURL("/ABCD0002/register");
 
   await page
-    .getByRole("textbox", { name: "Full name *" })
+    .getByRole("textbox", { name: "Name *" })
     .pressSequentially("Dwight Schrute");
   const compClass = page.getByRole("combobox", { name: "Competition class *" });
   await compClass.click();
-  await page.getByRole("option", { name: "Males", exact: true }).click();
+  await page
+    .getByRole("option", { name: "Males 16 years and older", exact: true })
+    .click();
 
   await page.getByRole("button", { name: "Register" }).click();
 
   await page.waitForURL("/ABCD0002");
 });
 
-test("registration code is saved in local storage for 12 hours", async ({
+test("registration code is saved until 12 hours after contest ends", async ({
   page,
 }) => {
   await page.clock.install({ time: new Date() });
@@ -129,7 +131,7 @@ test("registration code is saved in local storage for 12 hours", async ({
   await page.waitForURL("/ABCD0001");
   await expect(page.getByText("Albert Einstein")).toBeVisible();
 
-  await page.clock.fastForward("12:00:00");
+  await page.clock.setFixedTime(new Date("2027-01-01T12:00:00"));
 
   await page.goto("/");
   await page.waitForURL("/");
@@ -197,13 +199,15 @@ test("edit profile", async ({ page }) => {
 
   await page.waitForURL("/ABCD0003/edit");
 
-  const nameInput = page.getByRole("textbox", { name: "Full name *" });
+  const nameInput = page.getByRole("textbox", { name: "Name *" });
   await nameInput.fill("");
   await nameInput.pressSequentially("Phyllis Lapin-Vance");
 
   const compClass = page.getByRole("combobox", { name: "Competition class *" });
   await compClass.click();
-  await page.getByRole("option", { name: "Females", exact: true }).click();
+  await page
+    .getByRole("option", { name: "Females 16 years and older", exact: true })
+    .click();
 
   await page.getByRole("button", { name: "Save" }).click();
 
@@ -271,7 +275,7 @@ test("tick and untick all problems", async ({ page }) => {
   }
 
   await expect(page.getByText("1500p")).toBeVisible();
-  await expect(page.getByText("1st")).toBeVisible();
+  await expect(page.getByText("1st").first()).toBeVisible();
 
   for (let p = 1; p <= 5; p++) {
     const problem = page.getByRole("region", { name: `Problem ${p}` });
@@ -283,7 +287,7 @@ test("tick and untick all problems", async ({ page }) => {
   }
 
   await expect(page.getByText("0p", { exact: true })).toBeVisible();
-  await expect(page.getByText("1st")).toBeVisible();
+  await expect(page.getByText("1st").first()).toBeVisible();
 });
 
 test("tick a problem as a flash", async ({ page }) => {

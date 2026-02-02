@@ -1,7 +1,7 @@
 <script lang="ts">
   import { serialize } from "@awesome.me/webawesome";
   import { type Snippet } from "svelte";
-  import * as z from "zod/v4";
+  import { z } from "@climblive/lib/utils";
 
   type T = $$Generic<unknown>;
 

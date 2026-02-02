@@ -109,6 +109,13 @@ func NewDefaultScoreEngine(store EngineStore) *DefaultScoreEngine {
 }
 
 func (e *DefaultScoreEngine) Start() {
+	rules := e.store.GetRules()
+
+	e.rules = &HardestProblems{
+		Number: rules.QualifyingProblems,
+	}
+	e.ranker = NewBasicRanker(rules.Finalists)
+
 	for contender := range e.store.GetAllContenders() {
 		ticks := e.store.GetTicks(contender.ID)
 

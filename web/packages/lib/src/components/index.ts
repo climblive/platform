@@ -10,6 +10,7 @@ export { default as ResultEntry } from "./ResultEntry.svelte";
 export { default as ResultList } from "./ResultList.svelte";
 export { default as Score } from "./Score.svelte";
 export { default as ScoreboardProvider } from "./ScoreboardProvider.svelte";
+export { default as SplashScreen } from "./SplashScreen.svelte";
 export { importNativeStyles } from "./styles";
 export { default as Table } from "./Table.svelte";
 export type { ColumnDefinition } from "./Table.svelte";
