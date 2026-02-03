@@ -11,6 +11,7 @@ import (
 type Rules struct {
 	QualifyingProblems int
 	Finalists          int
+	EnablePoints       bool
 }
 
 type ScoringRules interface {
@@ -87,6 +88,8 @@ type EngineStore interface {
 
 	GetProblem(domain.ProblemID) (Problem, bool)
 	SaveProblem(Problem)
+	GetAllProblems() iter.Seq[domain.Problem]
+	GetProblemsByContender(domain.ContenderID) iter.Seq[domain.Problem]
 
 	SaveScore(domain.Score)
 	GetDirtyScores() []domain.Score
@@ -108,7 +111,7 @@ func NewDefaultScoreEngine(store EngineStore) *DefaultScoreEngine {
 	}
 }
 
-func (e *DefaultScoreEngine) Start() {
+func (e *DefaultScoreEngine) Start() iter.Seq[Effect] {
 	rules := e.store.GetRules()
 
 	e.rules = &HardestProblems{
@@ -116,39 +119,25 @@ func (e *DefaultScoreEngine) Start() {
 	}
 	e.ranker = NewBasicRanker(rules.Finalists)
 
-	for contender := range e.store.GetAllContenders() {
-		ticks := e.store.GetTicks(contender.ID)
+	return func(yield func(Effect) bool) {
+		for _, compClassID := range e.store.GetCompClassIDs() {
+			yield(EffectRankClass{CompClassID: compClassID})
 
-		var scoredTicks iter.Seq[Tick] = func(yield func(Tick) bool) {
-			for tick := range ticks {
-				problem, found := e.store.GetProblem(tick.ProblemID)
-				if !found {
-					continue
-				}
-
-				tick.Score(problem)
-				e.store.SaveTick(contender.ID, tick)
-
-				yield(tick)
+			for problem := range e.store.GetAllProblems() {
+				yield(EffectCalculateProblemValue{CompClassID: compClassID, ProblemID: problem.ID})
 			}
 		}
 
-		contender.Score = e.rules.CalculateScore(Points(scoredTicks))
-
-		if contender.Disqualified {
-			contender.Score = 0
+		for contender := range e.store.GetAllContenders() {
+			yield(EffectScoreContender{ContenderID: contender.ID})
 		}
-
-		e.store.SaveContender(contender)
 	}
-
-	e.rankCompClasses(e.store.GetCompClassIDs()...)
 }
 
 func (e *DefaultScoreEngine) Stop() {
 }
 
-func (e *DefaultScoreEngine) HandleRulesUpdated(event domain.RulesUpdatedEvent) {
+func (e *DefaultScoreEngine) HandleRulesUpdated(event domain.RulesUpdatedEvent) iter.Seq[Effect] {
 	rules := Rules{
 		QualifyingProblems: event.QualifyingProblems,
 		Finalists:          event.Finalists,
@@ -161,15 +150,22 @@ func (e *DefaultScoreEngine) HandleRulesUpdated(event domain.RulesUpdatedEvent) 
 	}
 	e.ranker = NewBasicRanker(rules.Finalists)
 
-	for contender := range e.store.GetAllContenders() {
-		contender.Score = e.rules.CalculateScore(Points(e.store.GetTicks(contender.ID)))
-		e.store.SaveContender(contender)
-	}
+	return func(yield func(Effect) bool) {
+		for _, compClassID := range e.store.GetCompClassIDs() {
+			yield(EffectRankClass{CompClassID: compClassID})
 
-	e.rankCompClasses(e.store.GetCompClassIDs()...)
+			for problem := range e.store.GetAllProblems() {
+				yield(EffectCalculateProblemValue{CompClassID: compClassID, ProblemID: problem.ID})
+			}
+		}
+
+		for contender := range e.store.GetAllContenders() {
+			yield(EffectScoreContender{ContenderID: contender.ID})
+		}
+	}
 }
 
-func (e *DefaultScoreEngine) HandleContenderEntered(event domain.ContenderEnteredEvent) {
+func (e *DefaultScoreEngine) HandleContenderEntered(event domain.ContenderEnteredEvent) iter.Seq[Effect] {
 	contender := Contender{
 		ID:          event.ContenderID,
 		CompClassID: event.CompClassID,
@@ -177,29 +173,36 @@ func (e *DefaultScoreEngine) HandleContenderEntered(event domain.ContenderEntere
 
 	e.store.SaveContender(contender)
 
-	e.rankCompClasses(contender.CompClassID)
+	return func(yield func(Effect) bool) {
+		yield(EffectRankClass{CompClassID: contender.CompClassID})
+	}
 }
 
-func (e *DefaultScoreEngine) HandleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent) {
+func (e *DefaultScoreEngine) HandleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent) iter.Seq[Effect] {
 	contender, found := e.store.GetContender(event.ContenderID)
 	if !found {
-		return
+		return nil
 	}
 
 	if contender.CompClassID == event.CompClassID {
-		return
+		return nil
 	}
 
-	compClassesToReRank := []domain.CompClassID{
-		contender.CompClassID,
-		event.CompClassID,
-	}
+	oldCompClassID := contender.CompClassID
 
 	contender.CompClassID = event.CompClassID
 
 	e.store.SaveContender(contender)
 
-	e.rankCompClasses(compClassesToReRank...)
+	return func(yield func(Effect) bool) {
+		for problem := range e.store.GetProblemsByContender(contender.ID) {
+			yield(EffectCalculateProblemValue{CompClassID: oldCompClassID, ProblemID: problem.ID})
+			yield(EffectCalculateProblemValue{CompClassID: event.CompClassID, ProblemID: problem.ID})
+		}
+
+		yield(EffectRankClass{CompClassID: oldCompClassID})
+		yield(EffectRankClass{CompClassID: event.CompClassID})
+	}
 }
 
 func (e *DefaultScoreEngine) HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent) iter.Seq[Effect] {
@@ -245,7 +248,6 @@ func (e *DefaultScoreEngine) HandleContenderDisqualified(event domain.ContenderD
 
 	return func(yield func(Effect) bool) {
 		yield(EffectScoreContender{ContenderID: contender.ID})
-		yield(EffectRankClass{CompClassID: contender.CompClassID})
 	}
 }
 
@@ -262,11 +264,10 @@ func (e *DefaultScoreEngine) HandleContenderRequalified(event domain.ContenderRe
 
 	return func(yield func(Effect) bool) {
 		yield(EffectScoreContender{ContenderID: contender.ID})
-		yield(EffectRankClass{CompClassID: contender.CompClassID})
 	}
 }
 
-func (e *DefaultScoreEngine) HandleAscentRegistered(event domain.AscentRegisteredEvent) {
+func (e *DefaultScoreEngine) HandleAscentRegistered(event domain.AscentRegisteredEvent) iter.Seq[Effect] {
 	tick := Tick{
 		ProblemID:     event.ProblemID,
 		Zone1:         event.Zone1,
@@ -279,46 +280,52 @@ func (e *DefaultScoreEngine) HandleAscentRegistered(event domain.AscentRegistere
 
 	contender, found := e.store.GetContender(event.ContenderID)
 	if !found {
-		return
+		return nil
 	}
 
 	problem, found := e.store.GetProblem(event.ProblemID)
 	if !found {
-		return
+		return nil
 	}
 
 	tick.Score(problem)
 	e.store.SaveTick(event.ContenderID, tick)
 
 	if contender.Disqualified {
-		return
+		return nil
 	}
 
 	contender.Score = e.rules.CalculateScore(Points(e.store.GetTicks(contender.ID)))
 	e.store.SaveContender(contender)
 
-	e.rankCompClasses(contender.CompClassID)
+	return func(yield func(Effect) bool) {
+		yield(EffectCalculateProblemValue{CompClassID: contender.CompClassID, ProblemID: event.ProblemID})
+		yield(EffectScoreContender{ContenderID: contender.ID})
+	}
 }
 
-func (e *DefaultScoreEngine) HandleAscentDeregistered(event domain.AscentDeregisteredEvent) {
+func (e *DefaultScoreEngine) HandleAscentDeregistered(event domain.AscentDeregisteredEvent) iter.Seq[Effect] {
 	contender, found := e.store.GetContender(event.ContenderID)
 	if !found {
-		return
+		return nil
 	}
 
 	e.store.DeleteTick(event.ContenderID, event.ProblemID)
 
 	if contender.Disqualified {
-		return
+		return nil
 	}
 
 	contender.Score = e.rules.CalculateScore(Points(e.store.GetTicks(contender.ID)))
 	e.store.SaveContender(contender)
 
-	e.rankCompClasses(contender.CompClassID)
+	return func(yield func(Effect) bool) {
+		yield(EffectCalculateProblemValue{CompClassID: contender.CompClassID, ProblemID: event.ProblemID})
+		yield(EffectScoreContender{ContenderID: contender.ID})
+	}
 }
 
-func (e *DefaultScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) {
+func (e *DefaultScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) iter.Seq[Effect] {
 	problem := Problem{
 		ID:          event.ProblemID,
 		PointsZone1: event.PointsZone1,
@@ -328,9 +335,11 @@ func (e *DefaultScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) 
 	}
 
 	e.store.SaveProblem(problem)
+
+	return nil
 }
 
-func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEvent) {
+func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEvent) iter.Seq[Effect] {
 	problem := Problem{
 		ID:          event.ProblemID,
 		PointsZone1: event.PointsZone1,
@@ -341,19 +350,78 @@ func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEve
 
 	e.store.SaveProblem(problem)
 
-	e.Start()
+	return func(yield func(Effect) bool) {
+		for _, compClassID := range e.store.GetCompClassIDs() {
+			if !yield(EffectCalculateProblemValue{CompClassID: compClassID, ProblemID: event.ProblemID}) {
+				return
+			}
+		}
+	}
 }
 
 func (e *DefaultScoreEngine) GetDirtyScores() []domain.Score {
 	return e.store.GetDirtyScores()
 }
 
-func (e *DefaultScoreEngine) rankCompClasses(compClassIDs ...domain.CompClassID) {
-	for _, compClassID := range compClassIDs {
-		scores := e.ranker.RankContenders(e.store.GetContendersByCompClass(compClassID))
+func (e *DefaultScoreEngine) CalculateProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect] {
+	var affectedContenders []Contender
 
-		for score := range slices.Values(scores) {
-			e.store.SaveScore(score)
+	return func(yield func(Effect) bool) {
+		for _, contender := range affectedContenders {
+			if !yield(EffectScoreContender{ContenderID: contender.ID}) {
+				return
+			}
 		}
 	}
+}
+
+func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter.Seq[Effect] {
+	contender, found := e.store.GetContender(contenderID)
+	if !found {
+		return nil
+	}
+
+	oldScore := contender.Score
+
+	if contender.Disqualified {
+		contender.Score = 0
+	} else {
+		ticks := e.store.GetTicks(contender.ID)
+
+		var scoredTicks iter.Seq[Tick] = func(yield func(Tick) bool) {
+			for tick := range ticks {
+				problem, found := e.store.GetProblem(tick.ProblemID)
+				if !found {
+					continue
+				}
+
+				tick.Score(problem)
+				e.store.SaveTick(contender.ID, tick)
+
+				yield(tick)
+			}
+		}
+
+		contender.Score = e.rules.CalculateScore(Points(scoredTicks))
+	}
+
+	if contender.Score == oldScore {
+		return nil
+	}
+
+	e.store.SaveContender(contender)
+
+	return func(yield func(Effect) bool) {
+		yield(EffectRankClass{CompClassID: contender.CompClassID})
+	}
+}
+
+func (e *DefaultScoreEngine) RankCompClass(compClassID domain.CompClassID) iter.Seq[Effect] {
+	scores := e.ranker.RankContenders(e.store.GetContendersByCompClass(compClassID))
+
+	for score := range slices.Values(scores) {
+		e.store.SaveScore(score)
+	}
+
+	return nil
 }
