@@ -242,7 +242,6 @@ func (e *DefaultScoreEngine) HandleContenderDisqualified(event domain.ContenderD
 	}
 
 	contender.Disqualified = true
-	contender.Score = 0
 
 	e.store.SaveContender(contender)
 
@@ -258,7 +257,6 @@ func (e *DefaultScoreEngine) HandleContenderRequalified(event domain.ContenderRe
 	}
 
 	contender.Disqualified = false
-	contender.Score = e.rules.CalculateScore(Points(e.store.GetTicks(contender.ID)))
 
 	e.store.SaveContender(contender)
 
@@ -295,7 +293,6 @@ func (e *DefaultScoreEngine) HandleAscentRegistered(event domain.AscentRegistere
 		return nil
 	}
 
-	contender.Score = e.rules.CalculateScore(Points(e.store.GetTicks(contender.ID)))
 	e.store.SaveContender(contender)
 
 	return func(yield func(Effect) bool) {
@@ -316,7 +313,6 @@ func (e *DefaultScoreEngine) HandleAscentDeregistered(event domain.AscentDeregis
 		return nil
 	}
 
-	contender.Score = e.rules.CalculateScore(Points(e.store.GetTicks(contender.ID)))
 	e.store.SaveContender(contender)
 
 	return func(yield func(Effect) bool) {
