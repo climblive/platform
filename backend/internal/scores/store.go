@@ -22,6 +22,10 @@ func NewMemoryStore() *MemoryStore {
 		contenders: make(map[domain.ContenderID]Contender),
 		ticks:      make(map[domain.ContenderID][]Tick),
 		scores:     NewDiffMap[domain.ContenderID](CompareScore),
+		rules: Rules{
+			QualifyingProblems: 0,
+			Finalists:          0,
+		},
 	}
 }
 

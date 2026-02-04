@@ -60,6 +60,9 @@ func NewScoreEngineDriver(
 		instanceID:    instanceID,
 		eventBroker:   eventBroker,
 		pendingEvents: make([]domain.EventEnvelope, 0),
+		engine:        nil,
+		running:       atomic.Bool{},
+		publishToken:  false,
 	}
 }
 
@@ -74,7 +77,9 @@ func WithPanicRecovery() func(*runOptions) {
 }
 
 func (d *ScoreEngineDriver) Run(ctx context.Context, options ...func(*runOptions)) (*sync.WaitGroup, func(ScoreEngine)) {
-	config := &runOptions{}
+	config := &runOptions{
+		recoverPanics: false,
+	}
 	for _, opt := range options {
 		opt(config)
 	}

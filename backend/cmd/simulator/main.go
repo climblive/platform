@@ -80,7 +80,26 @@ func main() {
 	}()
 
 	for _, code := range registrationCodes {
-		runner := ContenderRunner{RegistrationCode: code}
+		runner := ContenderRunner{
+			RegistrationCode: code,
+			contender: domain.Contender{
+				ID: 0,
+				Ownership: domain.OwnershipData{
+					OrganizerID: 0,
+					ContenderID: nil,
+				},
+				ContestID:           0,
+				CompClassID:         0,
+				RegistrationCode:    "",
+				Name:                "",
+				Entered:             time.Time{},
+				WithdrawnFromFinals: false,
+				Disqualified:        false,
+				Score:               nil,
+			},
+			ticks:  nil,
+			events: nil,
+		}
 
 		wg.Add(1)
 		go runner.Run(ITERATIONS, &wg, events)
@@ -105,7 +124,12 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 	r.contender = r.GetContender()
 	compClasses := r.GetCompClasses(r.contender.ContestID)
 
-	patch := domain.ContenderPatch{}
+	patch := domain.ContenderPatch{
+		CompClassID:         domain.Patch[domain.CompClassID]{Present: false, Value: 0},
+		Name:                domain.Patch[string]{Present: false, Value: ""},
+		WithdrawnFromFinals: domain.Patch[bool]{Present: false, Value: false},
+		Disqualified:        domain.Patch[bool]{Present: false, Value: false},
+	}
 
 	selectedCompClass := compClasses[rand.Int()%len(compClasses)]
 
@@ -138,6 +162,13 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 			delete(r.ticks, problem.ID)
 		} else {
 			tick := domain.Tick{
+				ID:        0,
+				Ownership: domain.OwnershipData{
+					OrganizerID: 0,
+					ContenderID: nil,
+				},
+				Timestamp:     time.Time{},
+				ContestID:     0,
 				ProblemID:     problem.ID,
 				AttemptsTop:   1 + rand.Int()%5,
 				Top:           true,
@@ -165,7 +196,21 @@ func (r *ContenderRunner) GetContender() domain.Contender {
 
 	defer func() { _ = resp.Body.Close() }()
 
-	contender := domain.Contender{}
+	contender := domain.Contender{
+		ID: 0,
+		Ownership: domain.OwnershipData{
+			OrganizerID: 0,
+			ContenderID: nil,
+		},
+		ContestID:           0,
+		CompClassID:         0,
+		RegistrationCode:    "",
+		Name:                "",
+		Entered:             time.Time{},
+		WithdrawnFromFinals: false,
+		Disqualified:        false,
+		Score:               nil,
+	}
 
 	err = json.NewDecoder(resp.Body).Decode(&contender)
 	if err != nil {

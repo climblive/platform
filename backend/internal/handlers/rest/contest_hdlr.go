@@ -269,8 +269,26 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 
 			style, err := book.NewStyle(&excelize.Style{
 				Font: &excelize.Font{
-					Bold: true,
+					Bold:         true,
+					Italic:       false,
+					Underline:    "",
+					Family:       "",
+					Size:         0,
+					Strike:       false,
+					Color:        "",
+					ColorIndexed: 0,
+					ColorTheme:   nil,
+					ColorTint:    0,
+					VertAlign:    "",
 				},
+				Border:   nil,
+				Fill:     excelize.Fill{Type: "", Pattern: 0, Color: nil, Shading: 0},
+				Alignment:     nil,
+				Protection:    nil,
+				NumFmt:        0,
+				DecimalPlaces: nil,
+				CustomNumFmt:  nil,
+				NegRed:        false,
 			})
 			if err != nil {
 				return errors.Wrap(err, 0)

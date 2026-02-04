@@ -64,7 +64,10 @@ func (uc *ContestUseCase) GetAllContests(ctx context.Context) ([]domain.Contest,
 	var role domain.AuthRole
 	var err error
 
-	if role, err = uc.Authorizer.HasOwnership(ctx, domain.OwnershipData{}); err != nil {
+	if role, err = uc.Authorizer.HasOwnership(ctx, domain.OwnershipData{
+		OrganizerID: 0,
+		ContenderID: nil,
+	}); err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
 
@@ -166,8 +169,28 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		}
 	}
 
-	patchAnythingOtherThanArchive := patch != (domain.ContestPatch{}) && patch != domain.ContestPatch{
-		Archived: patch.Archived,
+	patchAnythingOtherThanArchive := patch != (domain.ContestPatch{
+		Archived:           domain.Patch[bool]{Present: false, Value: false},
+		Location:           domain.Patch[string]{Present: false, Value: ""},
+		Country:            domain.Patch[string]{Present: false, Value: ""},
+		SeriesID:           domain.Patch[domain.SeriesID]{Present: false, Value: 0},
+		Name:               domain.Patch[string]{Present: false, Value: ""},
+		Description:        domain.Patch[string]{Present: false, Value: ""},
+		QualifyingProblems: domain.Patch[int]{Present: false, Value: 0},
+		Finalists:          domain.Patch[int]{Present: false, Value: 0},
+		Info:               domain.Patch[string]{Present: false, Value: ""},
+		GracePeriod:        domain.Patch[time.Duration]{Present: false, Value: 0},
+	}) && patch != domain.ContestPatch{
+		Archived:           patch.Archived,
+		Location:           domain.Patch[string]{Present: false, Value: ""},
+		Country:            domain.Patch[string]{Present: false, Value: ""},
+		SeriesID:           domain.Patch[domain.SeriesID]{Present: false, Value: 0},
+		Name:               domain.Patch[string]{Present: false, Value: ""},
+		Description:        domain.Patch[string]{Present: false, Value: ""},
+		QualifyingProblems: domain.Patch[int]{Present: false, Value: 0},
+		Finalists:          domain.Patch[int]{Present: false, Value: 0},
+		Info:               domain.Patch[string]{Present: false, Value: ""},
+		GracePeriod:        domain.Patch[time.Duration]{Present: false, Value: 0},
 	}
 
 	if contest.Archived && patchAnythingOtherThanArchive {
@@ -241,9 +264,16 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 	}
 
 	contest := domain.Contest{
+		ID: 0,
 		Ownership: domain.OwnershipData{
 			OrganizerID: organizerID,
+			ContenderID: nil,
 		},
+		Archived:             false,
+		SeriesID:             0,
+		TimeBegin:            time.Time{},
+		TimeEnd:              time.Time{},
+		RegisteredContenders: 0,
 		Location:           strings.TrimSpace(tmpl.Location),
 		Country:            strings.TrimSpace(tmpl.Country),
 		Name:               strings.TrimSpace(tmpl.Name),
