@@ -16,6 +16,7 @@ func contenderToDomain(record database.GetContenderRow) domain.Contender {
 			OrganizerID: domain.OrganizerID(record.Contender.OrganizerID),
 			ContenderID: nillableIntToResourceID[domain.ContenderID](&record.Contender.ID),
 		},
+		Score: nil,
 		ContestID:           domain.ContestID(record.Contender.ContestID),
 		CompClassID:         domain.CompClassID(record.Contender.ClassID.Int32),
 		RegistrationCode:    record.Contender.RegistrationCode,
@@ -46,6 +47,7 @@ func compClassToDomain(record database.CompClass) domain.CompClass {
 		ID: domain.CompClassID(record.ID),
 		Ownership: domain.OwnershipData{
 			OrganizerID: domain.OrganizerID(record.OrganizerID),
+			ContenderID: nil,
 		},
 		ContestID:   domain.ContestID(record.ContestID),
 		Name:        record.Name,
@@ -60,7 +62,11 @@ func contestToDomain(record database.Contest) domain.Contest {
 		ID: domain.ContestID(record.ID),
 		Ownership: domain.OwnershipData{
 			OrganizerID: domain.OrganizerID(record.OrganizerID),
+			ContenderID: nil,
 		},
+		TimeBegin:            time.Time{},
+		TimeEnd:              time.Time{},
+		RegisteredContenders: 0,
 		Archived:           record.Archived,
 		Location:           record.Location.String,
 		Country:            record.Country,
@@ -82,6 +88,7 @@ func problemToDomain(record database.Problem) domain.Problem {
 		ID: domain.ProblemID(record.ID),
 		Ownership: domain.OwnershipData{
 			OrganizerID: domain.OrganizerID(record.OrganizerID),
+			ContenderID: nil,
 		},
 		ContestID:          domain.ContestID(record.ContestID),
 		Number:             int(record.Number),
@@ -130,6 +137,7 @@ func organizerToDomain(record database.Organizer) domain.Organizer {
 		ID: domain.OrganizerID(record.ID),
 		Ownership: domain.OwnershipData{
 			OrganizerID: domain.OrganizerID(record.ID),
+			ContenderID: nil,
 		},
 		Name: record.Name,
 	}
@@ -140,6 +148,7 @@ func raffleToDomain(record database.Raffle) domain.Raffle {
 		ID: domain.RaffleID(record.ID),
 		Ownership: domain.OwnershipData{
 			OrganizerID: domain.OrganizerID(record.OrganizerID),
+			ContenderID: nil,
 		},
 		ContestID: domain.ContestID(record.ContestID),
 	}
@@ -147,8 +156,11 @@ func raffleToDomain(record database.Raffle) domain.Raffle {
 
 func raffleWinnerToDomain(record database.RaffleWinner, name string) domain.RaffleWinner {
 	return domain.RaffleWinner{
-		ID:            domain.RaffleWinnerID(record.ID),
-		Ownership:     domain.OwnershipData{OrganizerID: domain.OrganizerID(record.OrganizerID)},
+		ID: domain.RaffleWinnerID(record.ID),
+		Ownership: domain.OwnershipData{
+			OrganizerID: domain.OrganizerID(record.OrganizerID),
+			ContenderID: nil,
+		},
 		RaffleID:      domain.RaffleID(record.RaffleID),
 		ContenderID:   domain.ContenderID(record.ContenderID),
 		ContenderName: name,
@@ -167,7 +179,10 @@ func organizerInviteToDomain(record database.OrganizerInvite, organizerName stri
 
 func makeNullString(value string) sql.NullString {
 	if value == "" {
-		return sql.NullString{}
+		return sql.NullString{
+			String: "",
+			Valid:  false,
+		}
 	}
 
 	return sql.NullString{
@@ -178,7 +193,10 @@ func makeNullString(value string) sql.NullString {
 
 func makeNullInt32(value int32) sql.NullInt32 {
 	if value == 0 {
-		return sql.NullInt32{}
+		return sql.NullInt32{
+			Int32: 0,
+			Valid: false,
+		}
 	}
 
 	return sql.NullInt32{
@@ -189,7 +207,10 @@ func makeNullInt32(value int32) sql.NullInt32 {
 
 func makeNullTime(value time.Time) sql.NullTime {
 	if value.IsZero() {
-		return sql.NullTime{}
+		return sql.NullTime{
+			Time:  time.Time{},
+			Valid: false,
+		}
 	}
 
 	return sql.NullTime{

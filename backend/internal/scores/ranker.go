@@ -72,6 +72,9 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 			Timestamp:   now,
 			ContenderID: contender.ID,
 			Score:       contender.Score,
+			Placement:   0,
+			Finalist:    false,
+			RankOrder:   0,
 		}
 
 		switch {

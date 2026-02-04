@@ -295,9 +295,16 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID doma
 
 	for range number {
 		contender := domain.Contender{
-			ContestID:        contestID,
-			Ownership:        contest.Ownership,
-			RegistrationCode: uc.RegistrationCodeGenerator.Generate(registrationCodeLength),
+			ID:                  0,
+			ContestID:           contestID,
+			Ownership:           contest.Ownership,
+			CompClassID:         0,
+			RegistrationCode:    uc.RegistrationCodeGenerator.Generate(registrationCodeLength),
+			Name:                "",
+			Entered:             time.Time{},
+			WithdrawnFromFinals: false,
+			Disqualified:        false,
+			Score:               nil,
 		}
 
 		if contender, err = uc.Repo.StoreContender(ctx, tx, contender); err != nil {

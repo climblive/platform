@@ -76,6 +76,8 @@ func main() {
 			Level:      slog.LevelDebug,
 			TimeFormat: time.Kitchen,
 			NoColor:    !isatty.IsTerminal(w.Fd()),
+			AddSource:  false,
+			ReplaceAttr: nil,
 		}),
 	))
 
@@ -135,11 +137,24 @@ func main() {
 	mux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
 
 	httpServer := &http.Server{
-		Addr:    "0.0.0.0:8090",
-		Handler: mux,
+		Addr:                         "0.0.0.0:8090",
+		Handler:                      mux,
+		DisableGeneralOptionsHandler: false,
+		TLSConfig:                    nil,
+		ReadTimeout:                  0,
+		ReadHeaderTimeout:            0,
+		WriteTimeout:                 0,
+		IdleTimeout:                  0,
+		MaxHeaderBytes:               0,
+		TLSNextProto:                 nil,
+		ConnState:                    nil,
+		ErrorLog:                     nil,
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
 		},
+		ConnContext: nil,
+		HTTP2:       nil,
+		Protocols:   nil,
 	}
 
 	context.AfterFunc(ctx, func() {

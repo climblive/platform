@@ -53,6 +53,7 @@ func (uc *CompClassUseCase) CreateCompClass(ctx context.Context, contestID domai
 	}
 
 	compClass := domain.CompClass{
+		ID:          0,
 		Ownership:   contest.Ownership,
 		ContestID:   contestID,
 		Name:        tmpl.Name,

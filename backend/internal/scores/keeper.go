@@ -31,11 +31,14 @@ func NewScoreKeeper(eventBroker domain.EventBroker, repo keeperRepository) *Keep
 		scores:                 make(map[domain.ContenderID]domain.Score),
 		repo:                   repo,
 		externalPersistTrigger: make(chan struct{}, 1),
+		mu:                     sync.RWMutex{},
 	}
 }
 
 func (k *Keeper) Run(ctx context.Context, options ...func(*runOptions)) *sync.WaitGroup {
-	config := &runOptions{}
+	config := &runOptions{
+		recoverPanics: false,
+	}
 	for _, opt := range options {
 		opt(config)
 	}
@@ -135,7 +138,14 @@ func (k *Keeper) persistScores(ctx context.Context) {
 		}
 
 		if contenderID == 0 {
-			return 0, domain.Score{}
+			return 0, domain.Score{
+				Timestamp:   time.Time{},
+				ContenderID: 0,
+				Score:       0,
+				Placement:   0,
+				Finalist:    false,
+				RankOrder:   0,
+			}
 		}
 
 		delete(k.scores, contenderID)

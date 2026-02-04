@@ -135,6 +135,11 @@ func (a *Authorizer) createUser(ctx context.Context, username string) error {
 
 	runTransaction := func() error {
 		organizer, err := a.repo.StoreOrganizer(ctx, tx, domain.Organizer{
+			ID: 0,
+			Ownership: domain.OwnershipData{
+				OrganizerID: 0,
+				ContenderID: nil,
+			},
 			Name: fmt.Sprintf("%s's organizer", username),
 		})
 		if err != nil {
@@ -142,7 +147,10 @@ func (a *Authorizer) createUser(ctx context.Context, username string) error {
 		}
 
 		user, err := a.repo.StoreUser(ctx, tx, domain.User{
-			Username: username,
+			ID:         0,
+			Username:   username,
+			Admin:      false,
+			Organizers: nil,
 		})
 		if err != nil {
 			return errors.Wrap(err, 0)
@@ -182,7 +190,11 @@ func (a *Authorizer) Middleware(next http.Handler) http.Handler {
 
 		matches := a.regcodePattern.FindStringSubmatch(header)
 		if matches != nil {
-			nextCtx = context.WithValue(nextCtx, contextKey{}, authenticationResult{regcode: matches[1]})
+			nextCtx = context.WithValue(nextCtx, contextKey{}, authenticationResult{
+				regcode:  matches[1],
+				username: "",
+				err:      nil,
+			})
 			goto Next
 		}
 
@@ -191,7 +203,11 @@ func (a *Authorizer) Middleware(next http.Handler) http.Handler {
 		}
 
 		claims, err = a.jwtDecoder.Decode(bearer)
-		nextCtx = context.WithValue(nextCtx, contextKey{}, authenticationResult{username: claims.Username, err: err})
+		nextCtx = context.WithValue(nextCtx, contextKey{}, authenticationResult{
+			username: claims.Username,
+			err:      err,
+			regcode:  "",
+		})
 
 	Next:
 		next.ServeHTTP(w, r.WithContext(nextCtx))
