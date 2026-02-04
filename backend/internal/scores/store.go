@@ -22,7 +22,11 @@ type MemoryStore struct {
 
 func NewMemoryStore() *MemoryStore {
 	return &MemoryStore{
-		problems:   make(map[domain.ProblemID]Problem),
+		problems: make(map[domain.ProblemID]Problem),
+		problemValues: NewDiffMap[struct {
+			CompClassID domain.CompClassID
+			ProblemID   domain.ProblemID
+		}](CompareProblemValue),
 		contenders: make(map[domain.ContenderID]Contender),
 		ticks:      make(map[domain.ContenderID][]Tick),
 		scores:     NewDiffMap[domain.ContenderID](CompareScore),
