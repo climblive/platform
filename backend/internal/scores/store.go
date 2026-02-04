@@ -9,8 +9,12 @@ import (
 )
 
 type MemoryStore struct {
-	rules      Rules
-	problems   map[domain.ProblemID]Problem
+	rules         Rules
+	problems      map[domain.ProblemID]Problem
+	problemValues *DiffMap[struct {
+		CompClassID domain.CompClassID
+		ProblemID   domain.ProblemID
+	}, domain.ProblemValue]
 	contenders map[domain.ContenderID]Contender
 	ticks      map[domain.ContenderID][]Tick
 	scores     *DiffMap[domain.ContenderID, domain.Score]
@@ -132,22 +136,23 @@ func (s *MemoryStore) GetAllProblems() iter.Seq[Problem] {
 }
 
 func (s *MemoryStore) GetProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID) (domain.ProblemValue, bool) {
-	problem, ok := s.problems[problemID]
-	if !ok {
-		return domain.ProblemValue{}, false
-	}
+	key := struct {
+		CompClassID domain.CompClassID
+		ProblemID   domain.ProblemID
+	}{compClassID, problemID}
 
-	return problem.ProblemValue, true
+	value, ok := s.problemValues.Get(key)
+
+	return value, ok
 }
 
 func (s *MemoryStore) SaveProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID, value domain.ProblemValue) {
-	problem, ok := s.problems[problemID]
-	if !ok {
-		return
-	}
+	key := struct {
+		CompClassID domain.CompClassID
+		ProblemID   domain.ProblemID
+	}{compClassID, problemID}
 
-	problem.ProblemValue = value
-	s.problems[problemID] = problem
+	s.problemValues.Set(key, value)
 }
 
 func (s *MemoryStore) SaveScore(score domain.Score) {
