@@ -124,6 +124,13 @@ type OrganizerInvite struct {
 	ExpiresAt     time.Time         `json:"expiresAt"`
 }
 
+type ProblemValue struct {
+	PointsZone1 int `json:"pointsZone1,omitempty"`
+	PointsZone2 int `json:"pointsZone2,omitempty"`
+	PointsTop   int `json:"pointsTop"`
+	FlashBonus  int `json:"flashBonus,omitempty"`
+}
+
 type Problem struct {
 	ID                 ProblemID     `json:"id"`
 	Ownership          OwnershipData `json:"-"`
@@ -134,10 +141,8 @@ type Problem struct {
 	Description        string        `json:"description,omitempty"`
 	Zone1Enabled       bool          `json:"zone1Enabled"`
 	Zone2Enabled       bool          `json:"zone2Enabled"`
-	PointsZone1        int           `json:"pointsZone1,omitempty"`
-	PointsZone2        int           `json:"pointsZone2,omitempty"`
-	PointsTop          int           `json:"pointsTop"`
-	FlashBonus         int           `json:"flashBonus,omitempty"`
+
+	ProblemValue
 }
 
 type ProblemTemplate struct {
@@ -147,10 +152,8 @@ type ProblemTemplate struct {
 	Description        string `json:"description,omitempty"`
 	Zone1Enabled       bool   `json:"zone1Enabled"`
 	Zone2Enabled       bool   `json:"zone2Enabled"`
-	PointsZone1        int    `json:"pointsZone1,omitempty"`
-	PointsZone2        int    `json:"pointsZone2,omitempty"`
-	PointsTop          int    `json:"pointsTop"`
-	FlashBonus         int    `json:"flashBonus,omitempty"`
+
+	ProblemValue
 }
 
 type ProblemPatch struct {
@@ -272,19 +275,15 @@ type AscentDeregisteredEvent struct {
 }
 
 type ProblemAddedEvent struct {
-	ProblemID   ProblemID `json:"problemId"`
-	PointsZone1 int       `json:"pointsZone1"`
-	PointsZone2 int       `json:"pointsZone2"`
-	PointsTop   int       `json:"pointsTop"`
-	FlashBonus  int       `json:"flashBonus"`
+	ProblemID ProblemID `json:"problemId"`
+
+	ProblemValue
 }
 
 type ProblemUpdatedEvent struct {
-	ProblemID   ProblemID `json:"problemId"`
-	PointsZone1 int       `json:"pointsZone1"`
-	PointsZone2 int       `json:"pointsZone2"`
-	PointsTop   int       `json:"pointsTop"`
-	FlashBonus  int       `json:"flashBonus"`
+	ProblemID ProblemID `json:"problemId"`
+
+	ProblemValue
 }
 
 type ProblemDeletedEvent struct {
@@ -292,8 +291,10 @@ type ProblemDeletedEvent struct {
 }
 
 type RulesUpdatedEvent struct {
-	QualifyingProblems int `json:"qualifyingProblems"`
-	Finalists          int `json:"finalists"`
+	QualifyingProblems int  `json:"qualifyingProblems"`
+	Finalists          int  `json:"finalists"`
+	UsePoints          bool `json:"usePoints"`
+	PooledPoints       bool `json:"pooledPoints"`
 }
 
 type ContenderPublicInfoUpdatedEvent struct {
@@ -311,6 +312,13 @@ type ContenderScoreUpdatedEvent struct {
 	Placement   int         `json:"placement"`
 	Finalist    bool        `json:"finalist"`
 	RankOrder   int         `json:"rankOrder"`
+}
+
+type ProblemValueUpdatedEvent struct {
+	ProblemID   ProblemID   `json:"problemId"`
+	CompClassID CompClassID `json:"compClassId"`
+
+	ProblemValue
 }
 
 type ScoreEngineStartedEvent struct {

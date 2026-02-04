@@ -37,11 +37,8 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 
 	for problem := range slices.Values(problems) {
 		store.SaveProblem(Problem{
-			ID:          problem.ID,
-			PointsZone1: problem.PointsZone1,
-			PointsZone2: problem.PointsZone2,
-			PointsTop:   problem.PointsTop,
-			FlashBonus:  problem.FlashBonus,
+			ID:           problem.ID,
+			ProblemValue: problem.ProblemValue,
 		})
 	}
 
@@ -70,6 +67,7 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 
 	for tick := range slices.Values(ticks) {
 		store.SaveTick(*tick.Ownership.ContenderID, Tick{
+			ContenderID:   *tick.Ownership.ContenderID,
 			ProblemID:     tick.ProblemID,
 			Zone1:         tick.Zone1,
 			AttemptsZone1: tick.AttemptsZone1,

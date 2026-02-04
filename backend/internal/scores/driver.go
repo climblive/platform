@@ -190,7 +190,7 @@ PreLoop:
 		}
 	}
 
-	defer d.publishUpdatedScores()
+	defer d.publishDirtyUpdates()
 
 	d.running.Store(true)
 	defer d.running.Store(false)
@@ -217,7 +217,7 @@ PreLoop:
 		case <-ticker:
 			d.publishToken = false
 
-			n := d.publishUpdatedScores()
+			n := d.publishDirtyUpdates()
 			if n == 0 {
 				d.publishToken = true
 			}
@@ -226,7 +226,7 @@ PreLoop:
 		}
 
 		if d.publishToken {
-			n := d.publishUpdatedScores()
+			n := d.publishDirtyUpdates()
 			if n > 0 {
 				d.publishToken = false
 			}
@@ -278,7 +278,7 @@ func (r *EffectRunner) RunChainEffects(effects iter.Seq[Effect]) {
 	r.Run(func(yield func(Effect) bool) {
 		for effect := range effects {
 			switch effect.(type) {
-			case EffectCalculateProblemValue:
+			case EffectCalculateProblemSpotValue:
 			default:
 				r.queue[effect.Encode()] = effect
 				continue
@@ -330,7 +330,7 @@ func (r *EffectRunner) Run(effects iter.Seq[Effect]) {
 		case EffectScoreContender:
 			r.driver.logger.Info("re-scoring contender", "contender_id", effect.ContenderID)
 			chainEffects = r.driver.engine.ScoreContender(effect.ContenderID)
-		case EffectCalculateProblemValue:
+		case EffectCalculateProblemSpotValue:
 			r.driver.logger.Info("re-calculating problem value", "comp_class_id", effect.CompClassID, "problem_id", effect.ProblemID)
 			chainEffects = r.driver.engine.CalculateProblemValue(effect.CompClassID, effect.ProblemID)
 		}
@@ -345,13 +345,14 @@ func (r *EffectRunner) Run(effects iter.Seq[Effect]) {
 	}
 }
 
-func (d *ScoreEngineDriver) publishUpdatedScores() int {
-	scores := d.engine.GetDirtyScores()
+func (d *ScoreEngineDriver) publishDirtyUpdates() int {
+	publishCount := 0
 
 	var batch []domain.ContenderScoreUpdatedEvent
 
-	for score := range slices.Values(scores) {
+	for score := range slices.Values(d.engine.GetDirtyScores()) {
 		d.eventBroker.Dispatch(d.contestID, domain.ContenderScoreUpdatedEvent(score))
+		publishCount++
 
 		batch = append(batch, domain.ContenderScoreUpdatedEvent(score))
 	}
@@ -360,5 +361,5 @@ func (d *ScoreEngineDriver) publishUpdatedScores() int {
 		d.eventBroker.Dispatch(d.contestID, batch)
 	}
 
-	return len(scores)
+	return publishCount
 }

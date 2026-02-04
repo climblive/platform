@@ -59,11 +59,8 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 	}
 
 	problemUpdatedEventBaseline := domain.ProblemUpdatedEvent{
-		ProblemID:   problemID,
-		PointsTop:   problem.PointsTop,
-		PointsZone1: problem.PointsZone1,
-		PointsZone2: problem.PointsZone2,
-		FlashBonus:  problem.FlashBonus,
+		ProblemID:    problemID,
+		ProblemValue: problem.ProblemValue,
 	}
 
 	if patch.Number.PresentAndDistinct(problem.Number) {
@@ -124,11 +121,8 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 	}
 
 	event := domain.ProblemUpdatedEvent{
-		ProblemID:   problemID,
-		PointsTop:   problem.PointsTop,
-		PointsZone1: problem.PointsZone1,
-		PointsZone2: problem.PointsZone2,
-		FlashBonus:  problem.FlashBonus,
+		ProblemID:    problemID,
+		ProblemValue: problem.ProblemValue,
 	}
 
 	if event != problemUpdatedEventBaseline {
@@ -166,10 +160,12 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 		Description:        strings.TrimSpace(tmpl.Description),
 		Zone1Enabled:       tmpl.Zone1Enabled,
 		Zone2Enabled:       tmpl.Zone2Enabled,
-		PointsZone1:        tmpl.PointsZone1,
-		PointsZone2:        tmpl.PointsZone2,
-		PointsTop:          tmpl.PointsTop,
-		FlashBonus:         tmpl.FlashBonus,
+		ProblemValue: domain.ProblemValue{
+			PointsZone1: tmpl.PointsZone1,
+			PointsZone2: tmpl.PointsZone2,
+			PointsTop:   tmpl.PointsTop,
+			FlashBonus:  tmpl.FlashBonus,
+		},
 	}
 
 	if err := (validators.ProblemValidator{}).Validate(problem); err != nil {
@@ -182,11 +178,13 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 	}
 
 	event := domain.ProblemAddedEvent{
-		ProblemID:   createdProblem.ID,
-		PointsZone1: problem.PointsZone1,
-		PointsZone2: problem.PointsZone2,
-		PointsTop:   problem.PointsTop,
-		FlashBonus:  problem.FlashBonus,
+		ProblemID: createdProblem.ID,
+		ProblemValue: domain.ProblemValue{
+			PointsZone1: problem.PointsZone1,
+			PointsZone2: problem.PointsZone2,
+			PointsTop:   problem.PointsTop,
+			FlashBonus:  problem.FlashBonus,
+		},
 	}
 
 	uc.EventBroker.Dispatch(problem.ContestID, event)
