@@ -83,6 +83,8 @@ export interface Contest {
   description?: string;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
+  usePoints: boolean;
+  pooledPoints: boolean;
   info?: string;
   gracePeriod: number;
   timeBegin?: Date;
@@ -98,6 +100,8 @@ export interface ContestTemplate {
   description?: string;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
+  usePoints: boolean;
+  pooledPoints: boolean;
   info?: string;
   gracePeriod: number;
 }
@@ -110,6 +114,8 @@ export interface ContestPatch {
   description?: string;
   qualifyingProblems?: number;
   finalists?: number;
+  usePoints?: boolean;
+  pooledPoints?: boolean;
   info?: string;
   gracePeriod?: number;
 }
@@ -132,6 +138,12 @@ export interface OrganizerInvite {
   organizerName: string;
   expiresAt: Date;
 }
+export interface ProblemValue {
+  pointsZone1?: number /* int */;
+  pointsZone2?: number /* int */;
+  pointsTop: number /* int */;
+  flashBonus?: number /* int */;
+}
 export interface Problem {
   id: ProblemID;
   contestId: ContestID;
@@ -141,10 +153,7 @@ export interface Problem {
   description?: string;
   zone1Enabled: boolean;
   zone2Enabled: boolean;
-  pointsZone1?: number /* int */;
-  pointsZone2?: number /* int */;
-  pointsTop: number /* int */;
-  flashBonus?: number /* int */;
+  ProblemValue: ProblemValue;
 }
 export interface ProblemTemplate {
   number: number /* int */;
@@ -153,10 +162,7 @@ export interface ProblemTemplate {
   description?: string;
   zone1Enabled: boolean;
   zone2Enabled: boolean;
-  pointsZone1?: number /* int */;
-  pointsZone2?: number /* int */;
-  pointsTop: number /* int */;
-  flashBonus?: number /* int */;
+  ProblemValue: ProblemValue;
 }
 export interface ProblemPatch {
   number?: number;
@@ -257,17 +263,11 @@ export interface AscentDeregisteredEvent {
 }
 export interface ProblemAddedEvent {
   problemId: ProblemID;
-  pointsZone1: number /* int */;
-  pointsZone2: number /* int */;
-  pointsTop: number /* int */;
-  flashBonus: number /* int */;
+  ProblemValue: ProblemValue;
 }
 export interface ProblemUpdatedEvent {
   problemId: ProblemID;
-  pointsZone1: number /* int */;
-  pointsZone2: number /* int */;
-  pointsTop: number /* int */;
-  flashBonus: number /* int */;
+  ProblemValue: ProblemValue;
 }
 export interface ProblemDeletedEvent {
   problemId: ProblemID;
@@ -275,6 +275,8 @@ export interface ProblemDeletedEvent {
 export interface RulesUpdatedEvent {
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
+  usePoints: boolean;
+  pooledPoints: boolean;
 }
 export interface ContenderPublicInfoUpdatedEvent {
   contenderId: ContenderID;
@@ -290,6 +292,11 @@ export interface ContenderScoreUpdatedEvent {
   placement: number /* int */;
   finalist: boolean;
   rankOrder: number /* int */;
+}
+export interface ProblemValueUpdatedEvent {
+  problemId: ProblemID;
+  compClassId: CompClassID;
+  ProblemValue: ProblemValue;
 }
 export interface ScoreEngineStartedEvent {
   instanceId: ScoreEngineInstanceID;

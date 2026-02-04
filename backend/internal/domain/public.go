@@ -66,6 +66,8 @@ type Contest struct {
 	Description          string        `json:"description,omitempty"`
 	QualifyingProblems   int           `json:"qualifyingProblems"`
 	Finalists            int           `json:"finalists"`
+	UsePoints            bool          `json:"usePoints"`
+	PooledPoints         bool          `json:"pooledPoints"`
 	Info                 string        `json:"info,omitempty"`
 	GracePeriod          time.Duration `json:"gracePeriod"`
 	TimeBegin            time.Time     `json:"timeBegin,omitzero"`
@@ -82,6 +84,8 @@ type ContestTemplate struct {
 	Description        string        `json:"description,omitempty"`
 	QualifyingProblems int           `json:"qualifyingProblems"`
 	Finalists          int           `json:"finalists"`
+	UsePoints          bool          `json:"usePoints"`
+	PooledPoints       bool          `json:"pooledPoints"`
 	Info               string        `json:"info,omitempty"`
 	GracePeriod        time.Duration `json:"gracePeriod"`
 }
@@ -95,6 +99,8 @@ type ContestPatch struct {
 	Description        Patch[string]        `json:"description,omitzero" tstype:"string"`
 	QualifyingProblems Patch[int]           `json:"qualifyingProblems,omitzero" tstype:"number"`
 	Finalists          Patch[int]           `json:"finalists,omitzero" tstype:"number"`
+	UsePoints          Patch[bool]          `json:"usePoints,omitzero" tstype:"boolean"`
+	PooledPoints       Patch[bool]          `json:"pooledPoints,omitzero" tstype:"boolean"`
 	Info               Patch[string]        `json:"info,omitzero" tstype:"string"`
 	GracePeriod        Patch[time.Duration] `json:"gracePeriod,omitzero" tstype:"number"`
 }
