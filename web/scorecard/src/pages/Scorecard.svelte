@@ -23,7 +23,9 @@
     ascentDeregisteredEventSchema,
     ascentRegisteredEventSchema,
     contenderScoreUpdatedEventSchema,
+    problemValueUpdatedEventSchema,
     type Problem,
+    type ProblemValue,
     type Tick,
   } from "@climblive/lib/models";
   import {
@@ -33,6 +35,7 @@
     getProblemsQuery,
     getTicksByContenderQuery,
     removeTickFromQueryCache,
+    updateProblemValueInQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
@@ -207,6 +210,24 @@
       const event = ascentDeregisteredEventSchema.parse(JSON.parse(e.data));
 
       removeTickFromQueryCache(queryClient, event.tickId);
+    });
+
+    eventSource.addEventListener("PROBLEM_VALUE_UPDATED", (e) => {
+      const event = problemValueUpdatedEventSchema.parse(JSON.parse(e.data));
+
+      const problemValue: ProblemValue = {
+        pointsTop: event.pointsTop,
+        pointsZone1: event.pointsZone1,
+        pointsZone2: event.pointsZone2,
+        flashBonus: event.flashBonus,
+      };
+
+      updateProblemValueInQueryCache(
+        queryClient,
+        $session.contestId,
+        event.problemId,
+        problemValue,
+      );
     });
   };
 

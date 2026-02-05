@@ -1,11 +1,17 @@
 import {
   createMutation,
   createQuery,
+  QueryClient,
   useQueryClient,
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import type { Problem, ProblemPatch, ProblemTemplate } from "../models";
+import type {
+  Problem,
+  ProblemPatch,
+  ProblemTemplate,
+  ProblemValue,
+} from "../models";
 import { HOUR } from "./constants";
 
 export const getProblemQuery = (problemId: number) =>
@@ -107,4 +113,27 @@ export const deleteProblemMutation = (problemId: number) => {
       client.removeQueries({ queryKey });
     },
   }));
+};
+
+export const updateProblemValueInQueryCache = (
+  queryClient: QueryClient,
+  contestId: number,
+  problemId: number,
+  updatedProblemValue: ProblemValue,
+) => {
+  const queryKey: QueryKey = ["problems", { contestId }];
+
+  queryClient.setQueryData<Problem[]>(queryKey, (problems) => {
+    const predicate = ({ id }: Problem) => id === problemId;
+
+    const found = (problems ?? []).findIndex(predicate) !== -1;
+
+    if (found) {
+      return (problems ?? []).map((oldProblem) =>
+        predicate(oldProblem)
+          ? { ...oldProblem, ...updatedProblemValue }
+          : oldProblem,
+      );
+    }
+  });
 };
