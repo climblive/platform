@@ -191,6 +191,10 @@
     eventSource.addEventListener("ASCENT_REGISTERED", (e) => {
       const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
 
+      if (event.contenderId !== contender?.id) {
+        return;
+      }
+
       const newTick: Tick = {
         id: event.tickId,
         timestamp: event.timestamp,
@@ -208,6 +212,10 @@
 
     eventSource.addEventListener("ASCENT_DEREGISTERED", (e) => {
       const event = ascentDeregisteredEventSchema.parse(JSON.parse(e.data));
+
+      if (event.contenderId !== contender?.id) {
+        return;
+      }
 
       removeTickFromQueryCache(queryClient, event.tickId);
     });
