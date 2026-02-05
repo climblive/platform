@@ -59,6 +59,8 @@ CREATE TABLE IF NOT EXISTS `contest` (
   `country` VARCHAR(2) NOT NULL DEFAULT 'AQ',
   `qualifying_problems` INT NOT NULL,
   `finalists` INT NOT NULL,
+  `use_points` TINYINT(1) NOT NULL DEFAULT 1,
+  `pooled_points` TINYINT(1) NOT NULL DEFAULT 0,
   `info` TEXT NULL,
   `grace_period` INT NOT NULL DEFAULT 300,
   `created` TIMESTAMP NOT NULL DEFAULT '1970-01-01 00:00:01',
