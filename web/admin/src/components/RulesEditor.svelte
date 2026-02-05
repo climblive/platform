@@ -52,11 +52,11 @@
 
 <h3>Options</h3>
 <section>
-  <ProblemLimit {contest} />
-
   <Finalists {contest} />
 
   <PooledPoints {contest} />
+
+  <ProblemLimit {contest} />
 </section>
 
 <style>
