@@ -246,6 +246,7 @@ func (e *DefaultScoreEngine) HandleContenderRequalified(event domain.ContenderRe
 
 func (e *DefaultScoreEngine) HandleAscentRegistered(event domain.AscentRegisteredEvent) iter.Seq[Effect] {
 	tick := Tick{
+		ContenderID:   event.ContenderID,
 		ProblemID:     event.ProblemID,
 		Zone1:         event.Zone1,
 		AttemptsZone1: event.AttemptsZone1,

@@ -28,6 +28,8 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 	store.SaveRules(Rules{
 		QualifyingProblems: contest.QualifyingProblems,
 		Finalists:          contest.Finalists,
+		UsePoints:          contest.UsePoints,
+		PooledPoints:       contest.PooledPoints,
 	})
 
 	problems, err := h.Repo.GetProblemsByContest(ctx, nil, contestID)
