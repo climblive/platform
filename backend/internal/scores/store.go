@@ -14,7 +14,7 @@ type MemoryStore struct {
 	problemValues *DiffMap[struct {
 		CompClassID domain.CompClassID
 		ProblemID   domain.ProblemID
-	}, domain.ProblemValue]
+	}, ProblemValue]
 	contenders map[domain.ContenderID]Contender
 	ticks      map[domain.ContenderID][]Tick
 	scores     *DiffMap[domain.ContenderID, domain.Score]
@@ -139,7 +139,7 @@ func (s *MemoryStore) GetAllProblems() iter.Seq[Problem] {
 	return maps.Values(s.problems)
 }
 
-func (s *MemoryStore) GetProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID) (domain.ProblemValue, bool) {
+func (s *MemoryStore) GetProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID) (ProblemValue, bool) {
 	key := struct {
 		CompClassID domain.CompClassID
 		ProblemID   domain.ProblemID
@@ -150,7 +150,7 @@ func (s *MemoryStore) GetProblemValue(compClassID domain.CompClassID, problemID 
 	return value, ok
 }
 
-func (s *MemoryStore) SaveProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID, value domain.ProblemValue) {
+func (s *MemoryStore) SaveProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID, value ProblemValue) {
 	key := struct {
 		CompClassID domain.CompClassID
 		ProblemID   domain.ProblemID
@@ -165,4 +165,8 @@ func (s *MemoryStore) SaveScore(score domain.Score) {
 
 func (s *MemoryStore) GetDirtyScores() []domain.Score {
 	return s.scores.Commit()
+}
+
+func (s *MemoryStore) GetDirtyProblemValues() []ProblemValue {
+	return s.problemValues.Commit()
 }

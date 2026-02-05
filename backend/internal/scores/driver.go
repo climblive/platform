@@ -33,6 +33,7 @@ type ScoreEngine interface {
 	CalculateProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect]
 
 	GetDirtyScores() []domain.Score
+	GetDirtyProblemValues() []ProblemValue
 }
 
 type ScoreEngineDriver struct {
@@ -355,6 +356,12 @@ func (d *ScoreEngineDriver) publishDirtyUpdates() int {
 		publishCount++
 
 		batch = append(batch, domain.ContenderScoreUpdatedEvent(score))
+	}
+
+	for problemValue := range slices.Values(d.engine.GetDirtyProblemValues()) {
+		d.eventBroker.Dispatch(d.contestID, domain.ProblemValueUpdatedEvent(problemValue))
+
+		publishCount++
 	}
 
 	if len(batch) > 0 {

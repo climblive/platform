@@ -70,11 +70,12 @@ func (hdlr *eventHandler) HandleSubscribeContenderEvents(w http.ResponseWriter, 
 
 	filter := domain.NewEventFilter(
 		0,
-		contenderID,
+		0,
 		"CONTENDER_PUBLIC_INFO_UPDATED",
 		"CONTENDER_SCORE_UPDATED",
 		"ASCENT_REGISTERED",
 		"ASCENT_DEREGISTERED",
+		"PROBLEM_VALUE_UPDATED",
 	)
 
 	hdlr.subscribe(w, r, filter, logger)

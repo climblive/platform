@@ -91,8 +91,9 @@ type EngineStore interface {
 	SaveProblem(Problem)
 	GetAllProblems() iter.Seq[Problem]
 
-	GetProblemValue(domain.CompClassID, domain.ProblemID) (domain.ProblemValue, bool)
-	SaveProblemValue(domain.CompClassID, domain.ProblemID, domain.ProblemValue)
+	GetProblemValue(domain.CompClassID, domain.ProblemID) (ProblemValue, bool)
+	SaveProblemValue(domain.CompClassID, domain.ProblemID, ProblemValue)
+	GetDirtyProblemValues() []ProblemValue
 
 	SaveScore(domain.Score)
 	GetDirtyScores() []domain.Score
@@ -323,6 +324,10 @@ func (e *DefaultScoreEngine) GetDirtyScores() []domain.Score {
 	return e.store.GetDirtyScores()
 }
 
+func (e *DefaultScoreEngine) GetDirtyProblemValues() []ProblemValue {
+	return e.store.GetDirtyProblemValues()
+}
+
 func (e *DefaultScoreEngine) CalculateProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect] {
 	rules := e.store.GetRules()
 	var affectedContenders []domain.ContenderID
@@ -336,7 +341,11 @@ func (e *DefaultScoreEngine) CalculateProblemValue(compClassID domain.CompClassI
 		return nil
 	}
 
-	value := problem.ProblemValue
+	value := ProblemValue{
+		ProblemID:    problem.ID,
+		CompClassID:  compClassID,
+		ProblemValue: problem.ProblemValue,
+	}
 
 	if rules.PooledPoints {
 		numZone1 := 0
@@ -364,11 +373,16 @@ func (e *DefaultScoreEngine) CalculateProblemValue(compClassID domain.CompClassI
 			affectedContenders = append(affectedContenders, tick.ContenderID)
 		}
 
-		value = domain.ProblemValue{
-			PointsZone1: problem.ProblemValue.PointsZone1 / max(1, numZone1),
-			PointsZone2: problem.ProblemValue.PointsZone2 / max(1, numZone2),
-			PointsTop:   problem.ProblemValue.PointsTop / max(1, numTop),
-			FlashBonus:  problem.ProblemValue.FlashBonus / max(1, numFlash),
+		value = ProblemValue{
+			ProblemID:   problem.ID,
+			CompClassID: compClassID,
+
+			ProblemValue: domain.ProblemValue{
+				PointsZone1: problem.ProblemValue.PointsZone1 / max(1, numZone1),
+				PointsZone2: problem.ProblemValue.PointsZone2 / max(1, numZone2),
+				PointsTop:   problem.ProblemValue.PointsTop / max(1, numTop),
+				FlashBonus:  problem.ProblemValue.FlashBonus / max(1, numFlash),
+			},
 		}
 	}
 

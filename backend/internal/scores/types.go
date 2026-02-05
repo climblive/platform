@@ -30,7 +30,7 @@ type Tick struct {
 	Points        int
 }
 
-func (t *Tick) Score(value domain.ProblemValue) {
+func (t *Tick) Score(value ProblemValue) {
 	t.Points = 0
 
 	if t.Zone1 {
@@ -52,6 +52,13 @@ func (t *Tick) Score(value domain.ProblemValue) {
 
 type Problem struct {
 	ID domain.ProblemID
+
+	domain.ProblemValue
+}
+
+type ProblemValue struct {
+	ProblemID   domain.ProblemID   `json:"problemId"`
+	CompClassID domain.CompClassID `json:"compClassId"`
 
 	domain.ProblemValue
 }

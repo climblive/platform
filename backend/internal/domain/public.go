@@ -148,7 +148,7 @@ type Problem struct {
 	Zone1Enabled       bool          `json:"zone1Enabled"`
 	Zone2Enabled       bool          `json:"zone2Enabled"`
 
-	ProblemValue
+	ProblemValue `tstype:",extends"`
 }
 
 type ProblemTemplate struct {
@@ -159,7 +159,7 @@ type ProblemTemplate struct {
 	Zone1Enabled       bool   `json:"zone1Enabled"`
 	Zone2Enabled       bool   `json:"zone2Enabled"`
 
-	ProblemValue
+	ProblemValue `tstype:",extends"`
 }
 
 type ProblemPatch struct {
@@ -283,13 +283,13 @@ type AscentDeregisteredEvent struct {
 type ProblemAddedEvent struct {
 	ProblemID ProblemID `json:"problemId"`
 
-	ProblemValue
+	ProblemValue `tstype:",extends"`
 }
 
 type ProblemUpdatedEvent struct {
 	ProblemID ProblemID `json:"problemId"`
 
-	ProblemValue
+	ProblemValue `tstype:",extends"`
 }
 
 type ProblemDeletedEvent struct {
@@ -324,7 +324,7 @@ type ProblemValueUpdatedEvent struct {
 	ProblemID   ProblemID   `json:"problemId"`
 	CompClassID CompClassID `json:"compClassId"`
 
-	ProblemValue
+	ProblemValue `tstype:",extends"`
 }
 
 type ScoreEngineStartedEvent struct {
