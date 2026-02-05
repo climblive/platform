@@ -19,6 +19,7 @@ type problemUseCaseRepository interface {
 	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
 	DeleteProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) error
 	GetTicksByProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) ([]domain.Tick, error)
+	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error)
 }
 
 type ProblemUseCase struct {
@@ -38,6 +39,20 @@ func (uc *ProblemUseCase) GetProblem(ctx context.Context, problemID domain.Probl
 
 func (uc *ProblemUseCase) GetProblemsByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Problem, error) {
 	problems, err := uc.Repo.GetProblemsByContest(ctx, nil, contestID)
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	return problems, nil
+}
+
+func (uc *ProblemUseCase) GetProblemsByCompClass(ctx context.Context, compClassID domain.CompClassID) ([]domain.Problem, error) {
+	compClass, err := uc.Repo.GetCompClass(ctx, nil, compClassID)
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	problems, err := uc.Repo.GetProblemsByContest(ctx, nil, compClass.ContestID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}

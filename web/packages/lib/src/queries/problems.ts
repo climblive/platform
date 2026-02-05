@@ -30,7 +30,22 @@ export const getProblemsQuery = (
   createQuery(() => ({
     ...options,
     queryKey: ["problems", { contestId }],
-    queryFn: async () => ApiClient.getInstance().getProblems(contestId),
+    queryFn: async () =>
+      ApiClient.getInstance().getProblemsByContest(contestId),
+    retry: false,
+    gcTime: 12 * HOUR,
+    staleTime: 12 * HOUR,
+  }));
+
+export const getProblemsByCompClassQuery = (
+  compClassId: number,
+  options?: Partial<Parameters<typeof createQuery<Problem[]>>[0]>,
+) =>
+  createQuery(() => ({
+    ...options,
+    queryKey: ["problems", { compClassId }],
+    queryFn: async () =>
+      ApiClient.getInstance().getProblemsByCompClass(compClassId),
     retry: false,
     gcTime: 12 * HOUR,
     staleTime: 12 * HOUR,
@@ -117,11 +132,11 @@ export const deleteProblemMutation = (problemId: number) => {
 
 export const updateProblemValueInQueryCache = (
   queryClient: QueryClient,
-  contestId: number,
+  compClassId: number,
   problemId: number,
   updatedProblemValue: ProblemValue,
 ) => {
-  const queryKey: QueryKey = ["problems", { contestId }];
+  const queryKey: QueryKey = ["problems", { compClassId }];
 
   queryClient.setQueryData<Problem[]>(queryKey, (problems) => {
     const predicate = ({ id }: Problem) => id === problemId;

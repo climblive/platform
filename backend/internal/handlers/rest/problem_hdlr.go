@@ -11,6 +11,7 @@ import (
 type problemUseCase interface {
 	GetProblem(ctx context.Context, problemID domain.ProblemID) (domain.Problem, error)
 	GetProblemsByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Problem, error)
+	GetProblemsByCompClass(ctx context.Context, compClassID domain.CompClassID) ([]domain.Problem, error)
 	PatchProblem(ctx context.Context, problemID domain.ProblemID, patch domain.ProblemPatch) (domain.Problem, error)
 	CreateProblem(ctx context.Context, contestID domain.ContestID, tmpl domain.ProblemTemplate) (domain.Problem, error)
 	DeleteProblem(ctx context.Context, problemID domain.ProblemID) error
@@ -27,6 +28,7 @@ func InstallProblemHandler(mux *Mux, problemUseCase problemUseCase) {
 
 	mux.HandleFunc("GET /problems/{problemID}", handler.GetProblem)
 	mux.HandleFunc("GET /contests/{contestID}/problems", handler.GetProblemsByContest)
+	mux.HandleFunc("GET /comp-classes/{compClassID}/problems", handler.GetProblemsByCompClass)
 	mux.HandleFunc("PATCH /problems/{problemID}", handler.PatchProblem)
 	mux.HandleFunc("POST /contests/{contestID}/problems", handler.CreateProblem)
 	mux.HandleFunc("DELETE /problems/{problemID}", handler.DeleteProblem)
@@ -56,6 +58,22 @@ func (hdlr *problemHandler) GetProblemsByContest(w http.ResponseWriter, r *http.
 	}
 
 	problems, err := hdlr.problemUseCase.GetProblemsByContest(r.Context(), contestID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusOK, problems)
+}
+
+func (hdlr *problemHandler) GetProblemsByCompClass(w http.ResponseWriter, r *http.Request) {
+	compClassID, err := parseResourceID[domain.CompClassID](r.PathValue("compClassID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	problems, err := hdlr.problemUseCase.GetProblemsByCompClass(r.Context(), compClassID)
 	if err != nil {
 		handleError(w, err)
 		return

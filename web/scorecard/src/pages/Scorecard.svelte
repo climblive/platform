@@ -32,7 +32,7 @@
     getCompClassesQuery,
     getContenderQuery,
     getContestQuery,
-    getProblemsQuery,
+    getProblemsByCompClassQuery,
     getTicksByContenderQuery,
     removeTickFromQueryCache,
     updateProblemValueInQueryCache,
@@ -51,7 +51,6 @@
   const contenderQuery = $derived(getContenderQuery($session.contenderId));
   const contestQuery = $derived(getContestQuery($session.contestId));
   const compClassesQuery = $derived(getCompClassesQuery($session.contestId));
-  const problemsQuery = $derived(getProblemsQuery($session.contestId));
   const ticksQuery = $derived(getTicksByContenderQuery($session.contenderId));
 
   let resultsConnected = $state(false);
@@ -65,7 +64,6 @@
   let contender = $derived(contenderQuery.data);
   let contest = $derived(contestQuery.data);
   let compClasses = $derived(compClassesQuery.data);
-  let problems = $derived(problemsQuery.data);
   let ticks = $derived(ticksQuery.data);
   let selectedCompClass = $derived(
     compClasses?.find(({ id }) => id === contender?.compClassId),
@@ -81,6 +79,14 @@
       minutes: (contest?.gracePeriod ?? 0) / (1_000_000_000 * 60),
     }),
   );
+
+  const problemsQuery = $derived(
+    selectedCompClass
+      ? getProblemsByCompClassQuery(selectedCompClass.id)
+      : undefined,
+  );
+
+  let problems = $derived(problemsQuery?.data);
 
   let orderProblemsBy = $state<"number" | "points">("number");
   let sortDirection = $state<"asc" | "desc">("asc");
@@ -232,7 +238,7 @@
 
       updateProblemValueInQueryCache(
         queryClient,
-        $session.contestId,
+        event.compClassId,
         event.problemId,
         problemValue,
       );
