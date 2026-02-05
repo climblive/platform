@@ -23,9 +23,10 @@ type problemUseCaseRepository interface {
 }
 
 type ProblemUseCase struct {
-	Authorizer  domain.Authorizer
-	Repo        problemUseCaseRepository
-	EventBroker domain.EventBroker
+	Authorizer         domain.Authorizer
+	Repo               problemUseCaseRepository
+	EventBroker        domain.EventBroker
+	ProblemValueKeeper domain.ProblemValueKeeper
 }
 
 func (uc *ProblemUseCase) GetProblem(ctx context.Context, problemID domain.ProblemID) (domain.Problem, error) {
@@ -57,7 +58,23 @@ func (uc *ProblemUseCase) GetProblemsByCompClass(ctx context.Context, compClassI
 		return nil, errors.Wrap(err, 0)
 	}
 
+	for i, problem := range problems {
+		problems[i] = withProblemValue(problem, compClassID, uc.ProblemValueKeeper)
+	}
+
 	return problems, nil
+}
+
+func withProblemValue(problem domain.Problem, compClassID domain.CompClassID, keeper domain.ProblemValueKeeper) domain.Problem {
+	if keeper == nil {
+		return problem
+	}
+
+	if value, found := keeper.GetProblemValue(problem.ID, compClassID); found {
+		problem.ProblemValue = value
+	}
+
+	return problem
 }
 
 func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.ProblemID, patch domain.ProblemPatch) (domain.Problem, error) {

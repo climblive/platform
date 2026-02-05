@@ -121,6 +121,7 @@ func main() {
 	authorizer := authorizer.NewAuthorizer(database, jwtDecoder)
 	eventBroker := events.NewBroker()
 	scoreKeeper := scores.NewScoreKeeper(eventBroker, database)
+	problemValueKeeper := scores.NewProblemValueKeeper(eventBroker)
 	scoreEngineStoreHydrator := &scores.StandardEngineStoreHydrator{Repo: database}
 
 	scoreEngineMaxLifetime := getScoreEngineMaxLifetime()
@@ -130,9 +131,10 @@ func main() {
 
 	barriers = append(barriers,
 		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
+		problemValueKeeper.Run(ctx, scores.WithPanicRecovery()),
 		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()))
 
-	mux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
+	mux := setupMux(database, authorizer, eventBroker, scoreKeeper, problemValueKeeper, &scoreEngineManager)
 
 	httpServer := &http.Server{
 		Addr:    "0.0.0.0:8090",
@@ -183,6 +185,7 @@ func setupMux(
 	authorizer *authorizer.Authorizer,
 	eventBroker domain.EventBroker,
 	scoreKeeper domain.ScoreKeeper,
+	problemValueKeeper domain.ProblemValueKeeper,
 	scoreEngineManager *scores.ScoreEngineManager,
 ) *rest.Mux {
 	contenderUseCase := usecases.ContenderUseCase{
@@ -207,9 +210,10 @@ func setupMux(
 	}
 
 	problemUseCase := usecases.ProblemUseCase{
-		Repo:        repo,
-		Authorizer:  authorizer,
-		EventBroker: eventBroker,
+		Repo:               repo,
+		Authorizer:         authorizer,
+		EventBroker:        eventBroker,
+		ProblemValueKeeper: problemValueKeeper,
 	}
 
 	tickUseCase := usecases.TickUseCase{

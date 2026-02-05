@@ -182,8 +182,11 @@ PreLoop:
 		case engine := <-engineReceiver:
 			d.engine = engine
 
-			d.engine.Start()
+			effects := d.engine.Start()
 			defer d.engine.Stop()
+
+			runner := NewEffectRunner(d)
+			runner.RunChainEffects(effects)
 
 			break PreLoop
 		case <-ctx.Done():
@@ -263,16 +266,20 @@ func (d *ScoreEngineDriver) handleEvent(event domain.EventEnvelope) {
 		effects = d.engine.HandleProblemUpdated(ev)
 	}
 
-	runner := &EffectRunner{
-		queue:  make(map[EncodedEffect]Effect),
-		driver: d,
-	}
+	runner := NewEffectRunner(d)
 	runner.RunChainEffects(effects)
 }
 
 type EffectRunner struct {
 	queue  map[EncodedEffect]Effect
 	driver *ScoreEngineDriver
+}
+
+func NewEffectRunner(driver *ScoreEngineDriver) *EffectRunner {
+	return &EffectRunner{
+		queue:  make(map[EncodedEffect]Effect),
+		driver: driver,
+	}
 }
 
 func (r *EffectRunner) RunChainEffects(effects iter.Seq[Effect]) {
