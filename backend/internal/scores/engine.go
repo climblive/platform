@@ -26,7 +26,7 @@ type Ranker interface {
 type EffectType int8
 
 const (
-	EffectTypeCalculateProblemSpotValue EffectType = iota
+	EffectTypeCalculateProblemValue EffectType = iota
 	EffectTypeScoreContender
 	EffectTypeRankClass
 )
@@ -59,14 +59,14 @@ func (e EffectRankClass) Encode() EncodedEffect {
 	return data
 }
 
-type EffectCalculateProblemSpotValue struct {
+type EffectCalculateProblemValue struct {
 	CompClassID domain.CompClassID
 	ProblemID   domain.ProblemID
 }
 
-func (e EffectCalculateProblemSpotValue) Encode() EncodedEffect {
+func (e EffectCalculateProblemValue) Encode() EncodedEffect {
 	var data EncodedEffect
-	data[0] = byte(EffectTypeCalculateProblemSpotValue)
+	data[0] = byte(EffectTypeCalculateProblemValue)
 	binary.LittleEndian.PutUint32(data[1:], uint32(e.ProblemID))
 	binary.LittleEndian.PutUint32(data[5:], uint32(e.CompClassID))
 	return data
@@ -113,7 +113,7 @@ func (e *DefaultScoreEngine) Start() iter.Seq[Effect] {
 	return func(yield func(Effect) bool) {
 		for _, compClassID := range e.store.GetCompClassIDs() {
 			for problem := range e.store.GetAllProblems() {
-				yield(EffectCalculateProblemSpotValue{CompClassID: compClassID, ProblemID: problem.ID})
+				yield(EffectCalculateProblemValue{CompClassID: compClassID, ProblemID: problem.ID})
 			}
 
 			for contender := range e.store.GetContendersByCompClass(compClassID) {
@@ -174,8 +174,8 @@ func (e *DefaultScoreEngine) HandleContenderSwitchedClass(event domain.Contender
 
 	return func(yield func(Effect) bool) {
 		for tick := range e.store.GetTicksByContender(contender.ID) {
-			yield(EffectCalculateProblemSpotValue{CompClassID: oldCompClassID, ProblemID: tick.ProblemID})
-			yield(EffectCalculateProblemSpotValue{CompClassID: event.CompClassID, ProblemID: tick.ProblemID})
+			yield(EffectCalculateProblemValue{CompClassID: oldCompClassID, ProblemID: tick.ProblemID})
+			yield(EffectCalculateProblemValue{CompClassID: event.CompClassID, ProblemID: tick.ProblemID})
 		}
 
 		yield(EffectRankClass{CompClassID: oldCompClassID})
@@ -269,7 +269,7 @@ func (e *DefaultScoreEngine) HandleAscentRegistered(event domain.AscentRegistere
 	}
 
 	return func(yield func(Effect) bool) {
-		yield(EffectCalculateProblemSpotValue{CompClassID: contender.CompClassID, ProblemID: event.ProblemID})
+		yield(EffectCalculateProblemValue{CompClassID: contender.CompClassID, ProblemID: event.ProblemID})
 		yield(EffectScoreContender{ContenderID: contender.ID})
 	}
 }
@@ -287,7 +287,7 @@ func (e *DefaultScoreEngine) HandleAscentDeregistered(event domain.AscentDeregis
 	}
 
 	return func(yield func(Effect) bool) {
-		yield(EffectCalculateProblemSpotValue{CompClassID: contender.CompClassID, ProblemID: event.ProblemID})
+		yield(EffectCalculateProblemValue{CompClassID: contender.CompClassID, ProblemID: event.ProblemID})
 		yield(EffectScoreContender{ContenderID: contender.ID})
 	}
 }
@@ -313,7 +313,7 @@ func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEve
 
 	return func(yield func(Effect) bool) {
 		for _, compClassID := range e.store.GetCompClassIDs() {
-			if !yield(EffectCalculateProblemSpotValue{CompClassID: compClassID, ProblemID: event.ProblemID}) {
+			if !yield(EffectCalculateProblemValue{CompClassID: compClassID, ProblemID: event.ProblemID}) {
 				return
 			}
 		}

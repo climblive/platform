@@ -286,7 +286,7 @@ func (r *EffectRunner) RunChainEffects(effects iter.Seq[Effect]) {
 	r.Run(func(yield func(Effect) bool) {
 		for effect := range effects {
 			switch effect.(type) {
-			case EffectCalculateProblemSpotValue:
+			case EffectCalculateProblemValue:
 			default:
 				r.queue[effect.Encode()] = effect
 				continue
@@ -338,7 +338,7 @@ func (r *EffectRunner) Run(effects iter.Seq[Effect]) {
 		case EffectScoreContender:
 			r.driver.logger.Info("re-scoring contender", "contender_id", effect.ContenderID)
 			chainEffects = r.driver.engine.ScoreContender(effect.ContenderID)
-		case EffectCalculateProblemSpotValue:
+		case EffectCalculateProblemValue:
 			r.driver.logger.Info("re-calculating problem value", "comp_class_id", effect.CompClassID, "problem_id", effect.ProblemID)
 			chainEffects = r.driver.engine.CalculateProblemValue(effect.CompClassID, effect.ProblemID)
 		}

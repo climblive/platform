@@ -99,11 +99,13 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("GetContender", fakedContenderID).
 			Return(scores.Contender{}, false)
 
-		f.engine.HandleContenderSwitchedClass(
+		effects := f.engine.HandleContenderSwitchedClass(
 			domain.ContenderSwitchedClassEvent{
 				ContenderID: fakedContenderID,
 				CompClassID: fakedCompClassID,
 			})
+
+		assert.Empty(t, effects)
 
 		awaitExpectations(t)
 	})
@@ -121,10 +123,12 @@ func TestDefaultScoreEngine(t *testing.T) {
 				CompClassID: fakedCompClassID,
 			}, true)
 
-		f.engine.HandleContenderSwitchedClass(domain.ContenderSwitchedClassEvent{
+		effects := f.engine.HandleContenderSwitchedClass(domain.ContenderSwitchedClassEvent{
 			ContenderID: fakedContenderID,
 			CompClassID: fakedCompClassID,
 		})
+
+		assert.Empty(t, effects)
 
 		awaitExpectations(t)
 	})
@@ -173,9 +177,11 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("GetContender", fakedContenderID).
 			Return(scores.Contender{}, false)
 
-		f.engine.HandleContenderWithdrewFromFinals(domain.ContenderWithdrewFromFinalsEvent{
+		effects := f.engine.HandleContenderWithdrewFromFinals(domain.ContenderWithdrewFromFinalsEvent{
 			ContenderID: fakedContenderID,
 		})
+
+		assert.Empty(t, effects)
 
 		awaitExpectations(t)
 	})
@@ -204,8 +210,12 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Score:               123,
 			}).Return()
 
-			f.engine.HandleContenderWithdrewFromFinals(domain.ContenderWithdrewFromFinalsEvent{
+			effects := slices.Collect(f.engine.HandleContenderWithdrewFromFinals(domain.ContenderWithdrewFromFinalsEvent{
 				ContenderID: fakedContenderID,
+			}))
+
+			require.ElementsMatch(t, effects, []scores.Effect{
+				scores.EffectRankClass{CompClassID: fakedCompClassID},
 			})
 
 			awaitExpectations(t)
@@ -221,9 +231,11 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("GetContender", fakedContenderID).
 			Return(scores.Contender{}, false)
 
-		f.engine.HandleContenderReenteredFinals(domain.ContenderReenteredFinalsEvent{
+		effects := f.engine.HandleContenderReenteredFinals(domain.ContenderReenteredFinalsEvent{
 			ContenderID: fakedContenderID,
 		})
+
+		assert.Empty(t, effects)
 
 		awaitExpectations(t)
 	})
@@ -253,8 +265,12 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Score:               123,
 			}).Return()
 
-			f.engine.HandleContenderReenteredFinals(domain.ContenderReenteredFinalsEvent{
+			effects := slices.Collect(f.engine.HandleContenderReenteredFinals(domain.ContenderReenteredFinalsEvent{
 				ContenderID: fakedContenderID,
+			}))
+
+			require.ElementsMatch(t, effects, []scores.Effect{
+				scores.EffectRankClass{CompClassID: fakedCompClassID},
 			})
 
 			awaitExpectations(t)
@@ -270,9 +286,11 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("GetContender", fakedContenderID).
 			Return(scores.Contender{}, false)
 
-		f.engine.HandleContenderDisqualified(domain.ContenderDisqualifiedEvent{
+		effects := f.engine.HandleContenderDisqualified(domain.ContenderDisqualifiedEvent{
 			ContenderID: fakedContenderID,
 		})
+
+		assert.Empty(t, effects)
 
 		awaitExpectations(t)
 	})
@@ -284,6 +302,10 @@ func TestDefaultScoreEngine(t *testing.T) {
 			fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 			fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 
+			fakedProblem1ID := testutils.RandomResourceID[domain.ProblemID]()
+			fakedProblem2ID := testutils.RandomResourceID[domain.ProblemID]()
+			fakedProblem3ID := testutils.RandomResourceID[domain.ProblemID]()
+
 			f.store.
 				On("GetContender", fakedContenderID).
 				Return(scores.Contender{
@@ -293,6 +315,20 @@ func TestDefaultScoreEngine(t *testing.T) {
 					Score:               123,
 				}, true)
 
+			f.store.
+				On("GetTicksByContender", fakedContenderID).
+				Return(slices.Values([]scores.Tick{
+					{
+						ProblemID: fakedProblem1ID,
+					},
+					{
+						ProblemID: fakedProblem2ID,
+					},
+					{
+						ProblemID: fakedProblem3ID,
+					},
+				}))
+
 			f.store.On("SaveContender", scores.Contender{
 				ID:                  fakedContenderID,
 				CompClassID:         fakedCompClassID,
@@ -301,8 +337,16 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Score:               123,
 			}).Return()
 
-			f.engine.HandleContenderDisqualified(domain.ContenderDisqualifiedEvent{
+			effects := slices.Collect(f.engine.HandleContenderDisqualified(domain.ContenderDisqualifiedEvent{
 				ContenderID: fakedContenderID,
+			}))
+
+			require.ElementsMatch(t, effects, []scores.Effect{
+				scores.EffectCalculateProblemValue{CompClassID: fakedCompClassID, ProblemID: fakedProblem1ID},
+				scores.EffectCalculateProblemValue{CompClassID: fakedCompClassID, ProblemID: fakedProblem2ID},
+				scores.EffectCalculateProblemValue{CompClassID: fakedCompClassID, ProblemID: fakedProblem3ID},
+				scores.EffectScoreContender{ContenderID: fakedContenderID},
+				scores.EffectRankClass{CompClassID: fakedCompClassID},
 			})
 
 			awaitExpectations(t)
