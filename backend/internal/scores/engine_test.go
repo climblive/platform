@@ -2,6 +2,7 @@ package scores_test
 
 import (
 	"iter"
+	"slices"
 	"testing"
 	"testing/synctest"
 	"time"
@@ -10,6 +11,7 @@ import (
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDefaultScoreEngine(t *testing.T) {
@@ -70,9 +72,13 @@ func TestDefaultScoreEngine(t *testing.T) {
 				CompClassID: 1,
 			}).Return()
 
-			f.engine.HandleContenderEntered(domain.ContenderEnteredEvent{
+			effects := slices.Collect(f.engine.HandleContenderEntered(domain.ContenderEnteredEvent{
 				ContenderID: 1,
 				CompClassID: 1,
+			}))
+
+			require.ElementsMatch(t, effects, []scores.Effect{
+				scores.EffectRankClass{CompClassID: 1},
 			})
 
 			awaitExpectations(t)
