@@ -101,6 +101,7 @@ func TestHydrate(t *testing.T) {
 	}).Return()
 
 	mockedStore.On("SaveTick", fakedContenderID, scores.Tick{
+		ContenderID:   fakedContenderID,
 		ProblemID:     fakedProblemID,
 		Top:           true,
 		AttemptsTop:   999,
