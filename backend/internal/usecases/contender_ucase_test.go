@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/utils/testutils"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -14,9 +15,9 @@ import (
 )
 
 func TestGetContender(t *testing.T) {
-	fakedContenderID := randomResourceID[domain.ContenderID]()
+	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 	fakedOwnership := domain.OwnershipData{
-		OrganizerID: randomResourceID[domain.OrganizerID](),
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 		ContenderID: &fakedContenderID,
 	}
 
@@ -97,9 +98,9 @@ func TestGetContender(t *testing.T) {
 }
 
 func TestGetContenderByCode(t *testing.T) {
-	fakedContenderID := randomResourceID[domain.ContenderID]()
+	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 	fakedOwnership := domain.OwnershipData{
-		OrganizerID: randomResourceID[domain.OrganizerID](),
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 		ContenderID: &fakedContenderID,
 	}
 
@@ -162,9 +163,9 @@ func TestGetContenderByCode(t *testing.T) {
 }
 
 func TestGetContendersByCompClass(t *testing.T) {
-	fakedCompClassID := randomResourceID[domain.CompClassID]()
+	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 	fakedOwnership := domain.OwnershipData{
-		OrganizerID: randomResourceID[domain.OrganizerID](),
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 	}
 	currentTime := time.Now()
 
@@ -264,9 +265,9 @@ func TestGetContendersByCompClass(t *testing.T) {
 }
 
 func TestGetContendersByContest(t *testing.T) {
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 	fakedOwnership := domain.OwnershipData{
-		OrganizerID: randomResourceID[domain.OrganizerID](),
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 	}
 	currentTime := time.Now()
 
@@ -366,9 +367,9 @@ func TestGetContendersByContest(t *testing.T) {
 }
 
 func TestDeleteContender(t *testing.T) {
-	fakedContenderID := randomResourceID[domain.ContenderID]()
+	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 	fakedOwnership := domain.OwnershipData{
-		OrganizerID: randomResourceID[domain.OrganizerID](),
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 		ContenderID: &fakedContenderID,
 	}
 
@@ -455,8 +456,8 @@ func TestDeleteContender(t *testing.T) {
 }
 
 func TestCreateContenders(t *testing.T) {
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
@@ -629,13 +630,13 @@ func TestCreateContenders(t *testing.T) {
 }
 
 func TestPatchContender(t *testing.T) {
-	fakedContenderID := randomResourceID[domain.ContenderID]()
+	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 	fakedOwnership := domain.OwnershipData{
-		OrganizerID: randomResourceID[domain.OrganizerID](),
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 		ContenderID: &fakedContenderID,
 	}
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedCompClassID := randomResourceID[domain.CompClassID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 
 	currentTime := time.Now()
 	gracePeriod := 15 * time.Minute
@@ -973,7 +974,7 @@ func TestPatchContender(t *testing.T) {
 		mockedEventBroker.On("Dispatch", fakedContestID, mock.Anything).Return()
 
 		fakedOtherCompClass := domain.CompClass{
-			ID:        randomResourceID[domain.CompClassID](),
+			ID:        testutils.RandomResourceID[domain.CompClassID](),
 			TimeBegin: currentTime.Add(-1 * time.Hour),
 			TimeEnd:   currentTime,
 		}
@@ -1223,7 +1224,7 @@ func TestPatchContender(t *testing.T) {
 		}
 
 		fakedOtherCompClass := domain.CompClass{
-			ID:        randomResourceID[domain.CompClassID](),
+			ID:        testutils.RandomResourceID[domain.CompClassID](),
 			TimeBegin: currentTime.Add(-1 * time.Hour),
 			TimeEnd:   currentTime.Add(-1 * gracePeriod),
 		}
@@ -1266,7 +1267,7 @@ func TestPatchContender(t *testing.T) {
 			Return(domain.ContenderRole, nil)
 
 		fakedOtherCompClass := domain.CompClass{
-			ID:        randomResourceID[domain.CompClassID](),
+			ID:        testutils.RandomResourceID[domain.CompClassID](),
 			TimeBegin: currentTime.Add(-1 * time.Hour),
 			TimeEnd:   currentTime.Add(-1 * gracePeriod),
 		}
@@ -1316,13 +1317,13 @@ func TestPatchContender(t *testing.T) {
 		mockedEventBroker.On("Dispatch", fakedContestID, mock.Anything).Return()
 
 		fakedSecondCompClass := domain.CompClass{
-			ID:        randomResourceID[domain.CompClassID](),
+			ID:        testutils.RandomResourceID[domain.CompClassID](),
 			TimeBegin: currentTime.Add(-1 * time.Hour),
 			TimeEnd:   currentTime.Add(-1 * gracePeriod),
 		}
 
 		fakedThirdCompClass := domain.CompClass{
-			ID:        randomResourceID[domain.CompClassID](),
+			ID:        testutils.RandomResourceID[domain.CompClassID](),
 			TimeBegin: currentTime.Add(-1 * time.Hour),
 			TimeEnd:   currentTime.Add(-1 * gracePeriod),
 		}

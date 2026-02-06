@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/utils/testutils"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/stretchr/testify/assert"
@@ -13,10 +14,10 @@ import (
 )
 
 func TestGetProblemsByContest(t *testing.T) {
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 	fakedProblems := []domain.Problem{
 		{
-			ID:        randomResourceID[domain.ProblemID](),
+			ID:        testutils.RandomResourceID[domain.ProblemID](),
 			ContestID: fakedContestID,
 		},
 	}
@@ -40,11 +41,11 @@ func TestGetProblemsByContest(t *testing.T) {
 }
 
 func TestPatchProblem(t *testing.T) {
-	fakedProblemID := randomResourceID[domain.ProblemID]()
+	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 	fakedOwnership := domain.OwnershipData{
-		OrganizerID: randomResourceID[domain.OrganizerID](),
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 	}
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 
 	fakedProblem := domain.Problem{
 		ID:                 fakedProblemID,
@@ -267,12 +268,12 @@ func TestPatchProblem(t *testing.T) {
 }
 
 func TestCreateProblem(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedProblemID := randomResourceID[domain.ProblemID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 	makeMocks := func() (*repositoryMock, *authorizerMock) {
 		mockedRepo := new(repositoryMock)
@@ -468,11 +469,11 @@ func TestCreateProblem(t *testing.T) {
 }
 
 func TestDeleteProblem(t *testing.T) {
-	fakedProblemID := randomResourceID[domain.ProblemID]()
+	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 	fakedOwnership := domain.OwnershipData{
-		OrganizerID: randomResourceID[domain.OrganizerID](),
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 	}
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 
 	fakedProblem := domain.Problem{
 		ID:        fakedProblemID,
