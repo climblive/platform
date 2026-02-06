@@ -9,6 +9,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
+	"github.com/climblive/platform/backend/internal/utils/testutils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -67,18 +68,21 @@ func TestDefaultScoreEngine(t *testing.T) {
 		synctest.Test(t, func(t *testing.T) {
 			f, awaitExpectations := makeFixture()
 
+			fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+			fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+
 			f.store.On("SaveContender", scores.Contender{
-				ID:          1,
-				CompClassID: 1,
+				ID:          fakedContenderID,
+				CompClassID: fakedCompClassID,
 			}).Return()
 
 			effects := slices.Collect(f.engine.HandleContenderEntered(domain.ContenderEnteredEvent{
-				ContenderID: 1,
-				CompClassID: 1,
+				ContenderID: fakedContenderID,
+				CompClassID: fakedCompClassID,
 			}))
 
 			require.ElementsMatch(t, effects, []scores.Effect{
-				scores.EffectRankClass{CompClassID: 1},
+				scores.EffectRankClass{CompClassID: fakedCompClassID},
 			})
 
 			awaitExpectations(t)
