@@ -2,7 +2,6 @@ package scores_test
 
 import (
 	"iter"
-	"slices"
 	"testing"
 	"testing/synctest"
 	"time"
@@ -22,11 +21,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 	makeFixture := func() (fixture, func(t *testing.T)) {
 		mockedStore := new(engineStoreMock)
 
-		mockedStore.On("GetRules").Return(scores.Rules{
-			QualifyingProblems: 10,
-			Finalists:          7,
-		})
-
 		engine := scores.NewDefaultScoreEngine(mockedStore)
 
 		awaitExpectations := func(t *testing.T) {
@@ -39,7 +33,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}, awaitExpectations
 	}
 
-	t.Run("ReplaceScoringRules", func(t *testing.T) {
+	t.Run("HandleRulesUpdated", func(t *testing.T) {
 		synctest.Test(t, func(t *testing.T) {
 			f, awaitExpectations := makeFixture()
 
@@ -47,40 +41,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 				QualifyingProblems: 1,
 				Finalists:          0,
 			}).Return()
-
-			f.store.On("GetAllContenders").
-				Return(slices.Values([]scores.Contender{
-					{ID: 1, CompClassID: 1},
-					{ID: 2, CompClassID: 2},
-					{ID: 3, CompClassID: 3},
-				}))
-
-			f.store.
-				On("GetTicks", domain.ContenderID(1)).
-				Return(slices.Values([]scores.Tick{{Points: 100}, {Points: 200}, {Points: 300}})).
-				On("GetTicks", domain.ContenderID(2)).
-				Return(slices.Values([]scores.Tick{{Points: 400}, {Points: 500}})).
-				On("GetTicks", domain.ContenderID(3)).
-				Return(slices.Values([]scores.Tick{{Points: 600}}))
-
-			f.store.
-				On("SaveContender", scores.Contender{ID: 1, CompClassID: 1, Score: 300}).Return().
-				On("SaveContender", scores.Contender{ID: 2, CompClassID: 2, Score: 500}).Return().
-				On("SaveContender", scores.Contender{ID: 3, CompClassID: 3, Score: 600}).Return()
-
-			f.store.On("GetCompClassIDs").Return([]domain.CompClassID{1, 2, 3})
-
-			f.store.
-				On("GetContendersByCompClass", domain.CompClassID(1)).
-				Return(slices.Values([]scores.Contender{{ID: 1}})).
-				On("GetContendersByCompClass", domain.CompClassID(2)).
-				Return(slices.Values([]scores.Contender{{ID: 2}})).
-				On("GetContendersByCompClass", domain.CompClassID(3)).
-				Return(slices.Values([]scores.Contender{{ID: 3}}))
-
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 1, Placement: 1}).Return()
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 2, Placement: 1}).Return()
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 3, Placement: 1}).Return()
 
 			f.engine.HandleRulesUpdated(domain.RulesUpdatedEvent{
 				QualifyingProblems: 1,
@@ -94,51 +54,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 	t.Run("Start", func(t *testing.T) {
 		synctest.Test(t, func(t *testing.T) {
 			f, awaitExpectations := makeFixture()
-
-			f.store.On("GetAllContenders").
-				Return(slices.Values([]scores.Contender{
-					{ID: 1, CompClassID: 1},
-					{ID: 2, CompClassID: 2},
-				}))
-
-			f.store.
-				On("GetTicks", domain.ContenderID(1)).
-				Return(slices.Values([]scores.Tick{{ProblemID: 1, Top: true}, {ProblemID: 2, Top: true}, {ProblemID: 3, Top: true}})).
-				On("GetTicks", domain.ContenderID(2)).
-				Return(slices.Values([]scores.Tick{{ProblemID: 1, Zone1: true}, {ProblemID: 2, Zone1: true}}))
-
-			f.store.
-				On("GetProblem", domain.ProblemID(1)).
-				Return(scores.Problem{ID: 1, ProblemValue: domain.ProblemValue{PointsTop: 100, PointsZone1: 10}}, true).
-				On("GetProblem", domain.ProblemID(2)).
-				Return(scores.Problem{ID: 2, ProblemValue: domain.ProblemValue{PointsTop: 200, PointsZone1: 20}}, true).
-				On("GetProblem", domain.ProblemID(3)).
-				Return(scores.Problem{ID: 3, ProblemValue: domain.ProblemValue{PointsTop: 300}}, true)
-
-			f.store.
-				On("SaveTick", domain.ContenderID(1), scores.Tick{ProblemID: 1, Top: true, Points: 100}).Return().
-				On("SaveTick", domain.ContenderID(1), scores.Tick{ProblemID: 2, Top: true, Points: 200}).Return().
-				On("SaveTick", domain.ContenderID(1), scores.Tick{ProblemID: 3, Top: true, Points: 300}).Return().
-				On("SaveTick", domain.ContenderID(2), scores.Tick{ProblemID: 1, Zone1: true, Points: 10}).Return().
-				On("SaveTick", domain.ContenderID(2), scores.Tick{ProblemID: 2, Zone1: true, Points: 20}).Return()
-
-			f.store.
-				On("SaveContender", scores.Contender{ID: 1, CompClassID: 1, Score: 600}).Return().
-				On("SaveContender", scores.Contender{ID: 2, CompClassID: 2, Score: 30}).Return()
-
-			f.store.On("GetCompClassIDs").Return([]domain.CompClassID{1, 2, 3})
-
-			f.store.
-				On("GetContendersByCompClass", domain.CompClassID(1)).
-				Return(slices.Values([]scores.Contender{{ID: 1, Score: 600}})).
-				On("GetContendersByCompClass", domain.CompClassID(2)).
-				Return(slices.Values([]scores.Contender{{ID: 2, Score: 30}})).
-				On("GetContendersByCompClass", domain.CompClassID(3)).
-				Return(slices.Values([]scores.Contender{{ID: 3, Score: 0}}))
-
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 1, Score: 600, Placement: 1, Finalist: true, RankOrder: 0}).Return()
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 2, Score: 30, Placement: 1, Finalist: true, RankOrder: 0}).Return()
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 3, Score: 0, Placement: 1, Finalist: false, RankOrder: 0}).Return()
 
 			f.engine.Start()
 
@@ -154,14 +69,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ID:          1,
 				CompClassID: 1,
 			}).Return()
-
-			f.store.
-				On("GetContendersByCompClass", domain.CompClassID(1)).
-				Return(slices.Values([]scores.Contender{{ID: 1}, {ID: 2}, {ID: 3}}))
-
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 1, Placement: 1, RankOrder: 0}).Return()
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 2, Placement: 1, RankOrder: 1}).Return()
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 3, Placement: 1, RankOrder: 2}).Return()
 
 			f.engine.HandleContenderEntered(domain.ContenderEnteredEvent{
 				ContenderID: 1,
@@ -228,17 +135,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Score:               123,
 			}).Return()
 
-			f.store.
-				On("GetContendersByCompClass", domain.CompClassID(1)).
-				Return(slices.Values([]scores.Contender{{ID: 1}, {ID: 2}, {ID: 3}})).
-				On("GetContendersByCompClass", domain.CompClassID(2)).
-				Return(slices.Values([]scores.Contender{{ID: 4}}))
-
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 1, Placement: 1, RankOrder: 0}).Return()
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 2, Placement: 1, RankOrder: 1}).Return()
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 3, Placement: 1, RankOrder: 2}).Return()
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 4, Placement: 1, RankOrder: 0}).Return()
-
 			f.engine.HandleContenderSwitchedClass(domain.ContenderSwitchedClassEvent{
 				ContenderID: 4,
 				CompClassID: 2,
@@ -282,13 +178,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 				WithdrawnFromFinals: true,
 				Score:               123,
 			}).Return()
-
-			f.store.
-				On("GetContendersByCompClass", domain.CompClassID(1)).
-				Return(slices.Values([]scores.Contender{{ID: 1}, {ID: 2}}))
-
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 1, Placement: 1, RankOrder: 0}).Return()
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 2, Placement: 1, RankOrder: 1}).Return()
 
 			f.engine.HandleContenderWithdrewFromFinals(domain.ContenderWithdrewFromFinalsEvent{
 				ContenderID: 1,
@@ -334,13 +223,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Score:               123,
 			}).Return()
 
-			f.store.
-				On("GetContendersByCompClass", domain.CompClassID(1)).
-				Return(slices.Values([]scores.Contender{{ID: 1}, {ID: 2}}))
-
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 1, Placement: 1, RankOrder: 0}).Return()
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 2, Placement: 1, RankOrder: 1}).Return()
-
 			f.engine.HandleContenderReenteredFinals(domain.ContenderReenteredFinalsEvent{
 				ContenderID: 1,
 			})
@@ -381,15 +263,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 				CompClassID:         1,
 				Disqualified:        true,
 				WithdrawnFromFinals: true,
-				Score:               0,
+				Score:               123,
 			}).Return()
-
-			f.store.
-				On("GetContendersByCompClass", domain.CompClassID(1)).
-				Return(slices.Values([]scores.Contender{{ID: 1}, {ID: 2}}))
-
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 1, Placement: 1, RankOrder: 0}).Return()
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 2, Placement: 1, RankOrder: 1}).Return()
 
 			f.engine.HandleContenderDisqualified(domain.ContenderDisqualifiedEvent{
 				ContenderID: 1,
@@ -427,24 +302,13 @@ func TestDefaultScoreEngine(t *testing.T) {
 					Score:               0,
 				}, true)
 
-			f.store.
-				On("GetTicks", domain.ContenderID(1)).
-				Return(slices.Values([]scores.Tick{{Points: 100}, {Points: 200}, {Points: 300}}))
-
 			f.store.On("SaveContender", scores.Contender{
 				ID:                  1,
 				CompClassID:         1,
 				Disqualified:        false,
 				WithdrawnFromFinals: true,
-				Score:               600,
+				Score:               0,
 			}).Return()
-
-			f.store.
-				On("GetContendersByCompClass", domain.CompClassID(1)).
-				Return(slices.Values([]scores.Contender{{ID: 1}, {ID: 2}}))
-
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 1, Placement: 1, RankOrder: 0}).Return()
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 2, Placement: 1, RankOrder: 1}).Return()
 
 			f.engine.HandleContenderRequalified(domain.ContenderRequalifiedEvent{
 				ContenderID: 1,
@@ -503,34 +367,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
-	t.Run("AscentRegistered_ProblemNotFound", func(t *testing.T) {
-		f, awaitExpectations := makeFixture()
-
-		f.store.
-			On("GetContender", domain.ContenderID(1)).
-			Return(scores.Contender{
-				ID:          1,
-				CompClassID: 1,
-			}, true)
-
-		f.store.
-			On("GetProblem", domain.ProblemID(1)).
-			Return(scores.Problem{}, false)
-
-		f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
-			ContenderID:   1,
-			ProblemID:     1,
-			Top:           true,
-			AttemptsTop:   3,
-			Zone1:         true,
-			AttemptsZone1: 1,
-			Zone2:         true,
-			AttemptsZone2: 2,
-		})
-
-		awaitExpectations(t)
-	})
-
 	t.Run("AscentRegistered_Disqualified", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
@@ -543,19 +379,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 			}, true)
 
 		f.store.
-			On("GetProblem", domain.ProblemID(1)).
-			Return(scores.Problem{
-				ID: 1,
-				ProblemValue: domain.ProblemValue{
-					PointsTop:   100,
-					PointsZone1: 50,
-					PointsZone2: 75,
-					FlashBonus:  10,
-				},
-			}, true)
-
-		f.store.
 			On("SaveTick", domain.ContenderID(1), scores.Tick{
+				ContenderID:   1,
 				ProblemID:     1,
 				Top:           true,
 				AttemptsTop:   5,
@@ -563,7 +388,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 				AttemptsZone1: 2,
 				Zone2:         true,
 				AttemptsZone2: 3,
-				Points:        100,
 			}).
 			Return()
 
@@ -593,19 +417,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 				}, true)
 
 			f.store.
-				On("GetProblem", domain.ProblemID(1)).
-				Return(scores.Problem{
-					ID: 1,
-					ProblemValue: domain.ProblemValue{
-						PointsTop:   100,
-						PointsZone1: 50,
-						PointsZone2: 75,
-						FlashBonus:  10,
-					},
-				}, true)
-
-			f.store.
 				On("SaveTick", domain.ContenderID(1), scores.Tick{
+					ContenderID:   1,
 					ProblemID:     1,
 					Top:           true,
 					AttemptsTop:   5,
@@ -613,28 +426,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 					AttemptsZone1: 2,
 					Zone2:         true,
 					AttemptsZone2: 3,
-					Points:        100,
 				}).
 				Return()
-
-			f.store.
-				On("GetTicks", domain.ContenderID(1)).
-				Return(slices.Values([]scores.Tick{{Points: 100}, {Points: 200}, {Points: 300}}))
-
-			f.store.
-				On("SaveContender", scores.Contender{
-					ID:          1,
-					CompClassID: 1,
-					Score:       600,
-				}).
-				Return()
-
-			f.store.
-				On("GetContendersByCompClass", domain.CompClassID(1)).
-				Return(slices.Values([]scores.Contender{{ID: 1}, {ID: 2}}))
-
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 1, Placement: 1, RankOrder: 0}).Return()
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 2, Placement: 1, RankOrder: 1}).Return()
 
 			f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
 				ContenderID:   1,
@@ -703,25 +496,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 			f.store.
 				On("DeleteTick", domain.ContenderID(1), domain.ProblemID(1)).
 				Return()
-
-			f.store.
-				On("GetTicks", domain.ContenderID(1)).
-				Return(slices.Values([]scores.Tick{{Points: 100}, {Points: 200}, {Points: 300}}))
-
-			f.store.
-				On("SaveContender", scores.Contender{
-					ID:          1,
-					CompClassID: 1,
-					Score:       600,
-				}).
-				Return()
-
-			f.store.
-				On("GetContendersByCompClass", domain.CompClassID(1)).
-				Return(slices.Values([]scores.Contender{{ID: 1}, {ID: 2}}))
-
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 1, Placement: 1, RankOrder: 0}).Return()
-			f.store.On("SaveScore", domain.Score{Timestamp: time.Now(), ContenderID: 2, Placement: 1, RankOrder: 1}).Return()
 
 			f.engine.HandleAscentDeregistered(domain.AscentDeregisteredEvent{
 				ContenderID: 1,
