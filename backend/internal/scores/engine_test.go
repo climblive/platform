@@ -362,9 +362,11 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("GetContender", fakedContenderID).
 			Return(scores.Contender{}, false)
 
-		f.engine.HandleContenderRequalified(domain.ContenderRequalifiedEvent{
+		effects := f.engine.HandleContenderRequalified(domain.ContenderRequalifiedEvent{
 			ContenderID: fakedContenderID,
 		})
+
+		assert.Empty(t, effects)
 
 		awaitExpectations(t)
 	})
@@ -376,6 +378,10 @@ func TestDefaultScoreEngine(t *testing.T) {
 			fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 			fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 
+			fakedProblem1ID := testutils.RandomResourceID[domain.ProblemID]()
+			fakedProblem2ID := testutils.RandomResourceID[domain.ProblemID]()
+			fakedProblem3ID := testutils.RandomResourceID[domain.ProblemID]()
+
 			f.store.
 				On("GetContender", fakedContenderID).
 				Return(scores.Contender{
@@ -386,6 +392,20 @@ func TestDefaultScoreEngine(t *testing.T) {
 					Score:               0,
 				}, true)
 
+			f.store.
+				On("GetTicksByContender", fakedContenderID).
+				Return(slices.Values([]scores.Tick{
+					{
+						ProblemID: fakedProblem1ID,
+					},
+					{
+						ProblemID: fakedProblem2ID,
+					},
+					{
+						ProblemID: fakedProblem3ID,
+					},
+				}))
+
 			f.store.On("SaveContender", scores.Contender{
 				ID:                  fakedContenderID,
 				CompClassID:         fakedCompClassID,
@@ -394,8 +414,16 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Score:               0,
 			}).Return()
 
-			f.engine.HandleContenderRequalified(domain.ContenderRequalifiedEvent{
+			effects := slices.Collect(f.engine.HandleContenderRequalified(domain.ContenderRequalifiedEvent{
 				ContenderID: fakedContenderID,
+			}))
+
+			require.ElementsMatch(t, effects, []scores.Effect{
+				scores.EffectCalculateProblemValue{CompClassID: fakedCompClassID, ProblemID: fakedProblem1ID},
+				scores.EffectCalculateProblemValue{CompClassID: fakedCompClassID, ProblemID: fakedProblem2ID},
+				scores.EffectCalculateProblemValue{CompClassID: fakedCompClassID, ProblemID: fakedProblem3ID},
+				scores.EffectScoreContender{ContenderID: fakedContenderID},
+				scores.EffectRankClass{CompClassID: fakedCompClassID},
 			})
 
 			awaitExpectations(t)
