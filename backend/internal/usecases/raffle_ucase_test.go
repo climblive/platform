@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/utils/testutils"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -14,12 +15,12 @@ import (
 )
 
 func TestCreateRaffle(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedRaffleID := randomResourceID[domain.RaffleID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedRaffleID := testutils.RandomResourceID[domain.RaffleID]()
 
 	makeMocks := func() (*repositoryMock, *authorizerMock) {
 		mockedRepo := new(repositoryMock)
@@ -95,12 +96,12 @@ func TestCreateRaffle(t *testing.T) {
 }
 
 func TestGetRaffle(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedRaffleID := randomResourceID[domain.RaffleID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedRaffleID := testutils.RandomResourceID[domain.RaffleID]()
 
 	makeMocks := func() (*repositoryMock, *authorizerMock) {
 		mockedRepo := new(repositoryMock)
@@ -163,16 +164,16 @@ func TestGetRaffle(t *testing.T) {
 }
 
 func TestGetRafflesByContest(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 
 	var fakedRaffles []domain.Raffle
 	for range 3 {
 		fakedRaffles = append(fakedRaffles, domain.Raffle{
-			ID:        randomResourceID[domain.RaffleID](),
+			ID:        testutils.RandomResourceID[domain.RaffleID](),
 			Ownership: fakedOwnership,
 			ContestID: fakedContestID,
 		})
@@ -240,12 +241,12 @@ func TestGetRafflesByContest(t *testing.T) {
 }
 
 func TestDrawRaffleWinner(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedRaffleID := randomResourceID[domain.RaffleID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedRaffleID := testutils.RandomResourceID[domain.RaffleID]()
 
 	makeMocks := func() (*repositoryMock, *authorizerMock) {
 		mockedRepo := new(repositoryMock)
@@ -281,7 +282,7 @@ func TestDrawRaffleWinner(t *testing.T) {
 
 		for i := range count {
 			winners = append(winners, domain.RaffleWinner{
-				ID:            randomResourceID[domain.RaffleWinnerID](),
+				ID:            testutils.RandomResourceID[domain.RaffleWinnerID](),
 				Ownership:     fakedOwnership,
 				RaffleID:      fakedRaffleID,
 				ContenderID:   domain.ContenderID(i),
@@ -296,7 +297,7 @@ func TestDrawRaffleWinner(t *testing.T) {
 	t.Run("SingleContenderInRaffle", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 
-		fakedContenderID := randomResourceID[domain.ContenderID]()
+		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 		now := time.Now()
 
 		mockedAuthorizer.
@@ -398,7 +399,7 @@ func TestDrawRaffleWinner(t *testing.T) {
 			On("GetContendersByContest", mock.Anything, nil, fakedContestID).
 			Return([]domain.Contender{
 				{
-					ID: randomResourceID[domain.ContenderID](),
+					ID: testutils.RandomResourceID[domain.ContenderID](),
 				},
 			}, nil)
 
@@ -472,12 +473,12 @@ func TestDrawRaffleWinner(t *testing.T) {
 }
 
 func TestGetRaffleWinners(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedRaffleID := randomResourceID[domain.RaffleID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedRaffleID := testutils.RandomResourceID[domain.RaffleID]()
 
 	makeMocks := func() (*repositoryMock, *authorizerMock) {
 		mockedRepo := new(repositoryMock)
@@ -504,16 +505,16 @@ func TestGetRaffleWinners(t *testing.T) {
 
 		fakedWinners := []domain.RaffleWinner{
 			{
-				ID:            randomResourceID[domain.RaffleWinnerID](),
+				ID:            testutils.RandomResourceID[domain.RaffleWinnerID](),
 				RaffleID:      fakedRaffleID,
-				ContenderID:   randomResourceID[domain.ContenderID](),
+				ContenderID:   testutils.RandomResourceID[domain.ContenderID](),
 				ContenderName: "Winner 1",
 				Timestamp:     time.Now(),
 			},
 			{
-				ID:            randomResourceID[domain.RaffleWinnerID](),
+				ID:            testutils.RandomResourceID[domain.RaffleWinnerID](),
 				RaffleID:      fakedRaffleID,
-				ContenderID:   randomResourceID[domain.ContenderID](),
+				ContenderID:   testutils.RandomResourceID[domain.ContenderID](),
 				ContenderName: "Winner 2",
 				Timestamp:     time.Now(),
 			},

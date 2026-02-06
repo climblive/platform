@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/utils/testutils"
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/usecases/validators"
@@ -19,7 +20,7 @@ import (
 )
 
 func TestGetContest(t *testing.T) {
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 
 	fakedContest := domain.Contest{
 		ID: fakedContestID,
@@ -44,8 +45,8 @@ func TestGetContest(t *testing.T) {
 }
 
 func TestGetScoreboard(t *testing.T) {
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedCompClassID := randomResourceID[domain.CompClassID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 
 	mockedRepo := new(repositoryMock)
 	mockedScoreKeeper := new(scoreKeeperMock)
@@ -137,7 +138,7 @@ func TestGetScoreboard(t *testing.T) {
 }
 
 func TestGetScoreboard_Empty(t *testing.T) {
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 
 	mockedRepo := new(repositoryMock)
 
@@ -159,8 +160,8 @@ func TestGetScoreboard_Empty(t *testing.T) {
 }
 
 func TestGetContestsByOrganizer(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
@@ -233,8 +234,8 @@ func TestGetContestsByOrganizer(t *testing.T) {
 }
 
 func TestGetAllContests(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
@@ -319,11 +320,11 @@ func TestGetAllContests(t *testing.T) {
 	})
 }
 func TestCreateContest(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 
 	makeMocks := func() (*repositoryMock, *authorizerMock) {
 		mockedRepo := new(repositoryMock)
@@ -493,12 +494,12 @@ func TestCreateContest(t *testing.T) {
 }
 
 func TestDuplicateContest(t *testing.T) {
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedDuplicatedContestID := randomResourceID[domain.ContestID]()
-	fakedCompClassID := randomResourceID[domain.CompClassID]()
-	fakedProblemID := randomResourceID[domain.ProblemID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedDuplicatedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 	fakedOwnership := domain.OwnershipData{
-		OrganizerID: randomResourceID[domain.OrganizerID](),
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 	}
 
 	timeBegin := time.Now()
@@ -508,7 +509,7 @@ func TestDuplicateContest(t *testing.T) {
 		ID:                 fakedContestID,
 		Ownership:          fakedOwnership,
 		Location:           "The garage",
-		SeriesID:           randomResourceID[domain.SeriesID](),
+		SeriesID:           testutils.RandomResourceID[domain.SeriesID](),
 		Name:               "Original Contest",
 		Description:        "Who is the best climber in Sweden?",
 		QualifyingProblems: 10,
@@ -695,16 +696,16 @@ func TestDuplicateContest(t *testing.T) {
 }
 
 func TestTransferContest(t *testing.T) {
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedOldOrganizerID := randomResourceID[domain.OrganizerID]()
-	fakedNewOrganizerID := randomResourceID[domain.OrganizerID]()
-	fakedCompClassID := randomResourceID[domain.CompClassID]()
-	fakedProblemID := randomResourceID[domain.ProblemID]()
-	fakedContenderID := randomResourceID[domain.ContenderID]()
-	fakedRaffleID := randomResourceID[domain.RaffleID]()
-	fakedRaffleWinnerID := randomResourceID[domain.RaffleWinnerID]()
-	fakedTickID := randomResourceID[domain.TickID]()
-	fakedSeriesID := randomResourceID[domain.SeriesID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedOldOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
+	fakedNewOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
+	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
+	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+	fakedRaffleID := testutils.RandomResourceID[domain.RaffleID]()
+	fakedRaffleWinnerID := testutils.RandomResourceID[domain.RaffleWinnerID]()
+	fakedTickID := testutils.RandomResourceID[domain.TickID]()
+	fakedSeriesID := testutils.RandomResourceID[domain.SeriesID]()
 
 	now := time.Now()
 
@@ -1067,8 +1068,8 @@ func TestTransferContest(t *testing.T) {
 func TestPatchContest(t *testing.T) {
 	t.Parallel()
 
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}

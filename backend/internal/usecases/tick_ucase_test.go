@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/utils/testutils"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/stretchr/testify/assert"
@@ -14,9 +15,9 @@ import (
 )
 
 func TestGetTicksByContender(t *testing.T) {
-	fakedContenderID := randomResourceID[domain.ContenderID]()
+	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 	fakedOwnership := domain.OwnershipData{
-		OrganizerID: randomResourceID[domain.OrganizerID](),
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 		ContenderID: &fakedContenderID,
 	}
 
@@ -41,7 +42,7 @@ func TestGetTicksByContender(t *testing.T) {
 
 		fakedTicks := []domain.Tick{
 			{
-				ID: randomResourceID[domain.TickID](),
+				ID: testutils.RandomResourceID[domain.TickID](),
 			},
 		}
 
@@ -90,9 +91,9 @@ func TestGetTicksByContender(t *testing.T) {
 }
 
 func TestGetTicksByContest(t *testing.T) {
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 	fakedOwnership := domain.OwnershipData{
-		OrganizerID: randomResourceID[domain.OrganizerID](),
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 	}
 
 	makeMocks := func() (*repositoryMock, *authorizerMock) {
@@ -116,7 +117,7 @@ func TestGetTicksByContest(t *testing.T) {
 
 		fakedTicks := []domain.Tick{
 			{
-				ID: randomResourceID[domain.TickID](),
+				ID: testutils.RandomResourceID[domain.TickID](),
 			},
 		}
 
@@ -165,16 +166,16 @@ func TestGetTicksByContest(t *testing.T) {
 }
 
 func TestCreateTick(t *testing.T) {
-	fakedContenderID := randomResourceID[domain.ContenderID]()
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedCompClassID := randomResourceID[domain.CompClassID]()
-	fakedProblemID := randomResourceID[domain.ProblemID]()
+	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 	now := time.Now()
 	gracePeriod := 15 * time.Minute
 
 	fakedOwnership := domain.OwnershipData{
-		OrganizerID: randomResourceID[domain.OrganizerID](),
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 		ContenderID: &fakedContenderID,
 	}
 
@@ -215,7 +216,7 @@ func TestCreateTick(t *testing.T) {
 		mockedRepo, mockedEventBroker := makeMocks(time.Now(), time.Now())
 		mockedAuthorizer := new(authorizerMock)
 
-		fakedTickID := randomResourceID[domain.TickID]()
+		fakedTickID := testutils.RandomResourceID[domain.TickID]()
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
@@ -413,7 +414,7 @@ func TestCreateTick(t *testing.T) {
 		mockedRepo, mockedEventBroker := makeMocks(time.Now().Add(-1*time.Hour), time.Now().Add(-1*gracePeriod))
 		mockedAuthorizer := new(authorizerMock)
 
-		fakedTickID := randomResourceID[domain.TickID]()
+		fakedTickID := testutils.RandomResourceID[domain.TickID]()
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
@@ -563,16 +564,16 @@ func TestCreateTick(t *testing.T) {
 }
 
 func TestDeleteTick(t *testing.T) {
-	fakedTickID := randomResourceID[domain.TickID]()
-	fakedContenderID := randomResourceID[domain.ContenderID]()
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedCompClassID := randomResourceID[domain.CompClassID]()
-	fakedProblemID := randomResourceID[domain.ProblemID]()
+	fakedTickID := testutils.RandomResourceID[domain.TickID]()
+	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 	gracePeriod := 15 * time.Minute
 
 	fakedOwnership := domain.OwnershipData{
-		OrganizerID: randomResourceID[domain.OrganizerID](),
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 		ContenderID: &fakedContenderID,
 	}
 
