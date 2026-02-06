@@ -3,16 +3,19 @@ package scores_test
 import (
 	"testing"
 
+	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestScoreTick(t *testing.T) {
-	problem := scores.Problem{
-		PointsTop:   100,
-		PointsZone1: 50,
-		PointsZone2: 75,
-		FlashBonus:  10,
+	problem := scores.ProblemValue{
+		ProblemValue: domain.ProblemValue{
+			PointsTop:   100,
+			PointsZone1: 50,
+			PointsZone2: 75,
+			FlashBonus:  10,
+		},
 	}
 
 	t.Run("NoAttempts", func(t *testing.T) {

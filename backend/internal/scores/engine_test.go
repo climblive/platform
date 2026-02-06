@@ -109,11 +109,11 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 			f.store.
 				On("GetProblem", domain.ProblemID(1)).
-				Return(scores.Problem{ID: 1, PointsTop: 100, PointsZone1: 10}, true).
+				Return(scores.Problem{ID: 1, ProblemValue: domain.ProblemValue{PointsTop: 100, PointsZone1: 10}}, true).
 				On("GetProblem", domain.ProblemID(2)).
-				Return(scores.Problem{ID: 2, PointsTop: 200, PointsZone1: 20}, true).
+				Return(scores.Problem{ID: 2, ProblemValue: domain.ProblemValue{PointsTop: 200, PointsZone1: 20}}, true).
 				On("GetProblem", domain.ProblemID(3)).
-				Return(scores.Problem{ID: 3, PointsTop: 300}, true)
+				Return(scores.Problem{ID: 3, ProblemValue: domain.ProblemValue{PointsTop: 300}}, true)
 
 			f.store.
 				On("SaveTick", domain.ContenderID(1), scores.Tick{ProblemID: 1, Top: true, Points: 100}).Return().
@@ -459,20 +459,24 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("SaveProblem", scores.Problem{
-				ID:          1,
-				PointsTop:   100,
-				PointsZone1: 50,
-				PointsZone2: 75,
-				FlashBonus:  10,
+				ID: 1,
+				ProblemValue: domain.ProblemValue{
+					PointsTop:   100,
+					PointsZone1: 50,
+					PointsZone2: 75,
+					FlashBonus:  10,
+				},
 			}).
 			Return()
 
 		f.engine.HandleProblemAdded(domain.ProblemAddedEvent{
-			ProblemID:   1,
-			PointsTop:   100,
-			PointsZone1: 50,
-			PointsZone2: 75,
-			FlashBonus:  10,
+			ProblemID: 1,
+			ProblemValue: domain.ProblemValue{
+				PointsTop:   100,
+				PointsZone1: 50,
+				PointsZone2: 75,
+				FlashBonus:  10,
+			},
 		})
 
 		awaitExpectations(t)
@@ -541,11 +545,13 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f.store.
 			On("GetProblem", domain.ProblemID(1)).
 			Return(scores.Problem{
-				ID:          1,
-				PointsTop:   100,
-				PointsZone1: 50,
-				PointsZone2: 75,
-				FlashBonus:  10,
+				ID: 1,
+				ProblemValue: domain.ProblemValue{
+					PointsTop:   100,
+					PointsZone1: 50,
+					PointsZone2: 75,
+					FlashBonus:  10,
+				},
 			}, true)
 
 		f.store.
@@ -589,11 +595,13 @@ func TestDefaultScoreEngine(t *testing.T) {
 			f.store.
 				On("GetProblem", domain.ProblemID(1)).
 				Return(scores.Problem{
-					ID:          1,
-					PointsTop:   100,
-					PointsZone1: 50,
-					PointsZone2: 75,
-					FlashBonus:  10,
+					ID: 1,
+					ProblemValue: domain.ProblemValue{
+						PointsTop:   100,
+						PointsZone1: 50,
+						PointsZone2: 75,
+						FlashBonus:  10,
+					},
 				}, true)
 
 			f.store.
@@ -805,8 +813,13 @@ func (m *engineStoreMock) GetCompClassIDs() []domain.CompClassID {
 	return args.Get(0).([]domain.CompClassID)
 }
 
-func (m *engineStoreMock) GetTicks(contenderID domain.ContenderID) iter.Seq[scores.Tick] {
+func (m *engineStoreMock) GetTicksByContender(contenderID domain.ContenderID) iter.Seq[scores.Tick] {
 	args := m.Called(contenderID)
+	return args.Get(0).(iter.Seq[scores.Tick])
+}
+
+func (m *engineStoreMock) GetTicksByProblem(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[scores.Tick] {
+	args := m.Called(compClassID, problemID)
 	return args.Get(0).(iter.Seq[scores.Tick])
 }
 
@@ -825,6 +838,25 @@ func (m *engineStoreMock) GetProblem(problemID domain.ProblemID) (scores.Problem
 
 func (m *engineStoreMock) SaveProblem(problem scores.Problem) {
 	m.Called(problem)
+}
+
+func (m *engineStoreMock) GetAllProblems() iter.Seq[scores.Problem] {
+	args := m.Called()
+	return args.Get(0).(iter.Seq[scores.Problem])
+}
+
+func (m *engineStoreMock) GetProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID) (scores.ProblemValue, bool) {
+	args := m.Called(compClassID, problemID)
+	return args.Get(0).(scores.ProblemValue), args.Bool(1)
+}
+
+func (m *engineStoreMock) SaveProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID, value scores.ProblemValue) {
+	m.Called(compClassID, problemID, value)
+}
+
+func (m *engineStoreMock) GetDirtyProblemValues() []scores.ProblemValue {
+	args := m.Called()
+	return args.Get(0).([]scores.ProblemValue)
 }
 
 func (m *engineStoreMock) SaveScore(score domain.Score) {
