@@ -396,16 +396,11 @@ func (e *DefaultScoreEngine) CalculateProblemValue(compClassID domain.CompClassI
 			affectedContenders = append(affectedContenders, tick.ContenderID)
 		}
 
-		value = ProblemValue{
-			ProblemID:   problem.ID,
-			CompClassID: compClassID,
-
-			ProblemValue: domain.ProblemValue{
-				PointsZone1: problem.PointsZone1 / max(1, numZone1),
-				PointsZone2: problem.PointsZone2 / max(1, numZone2),
-				PointsTop:   problem.PointsTop / max(1, numTop),
-				FlashBonus:  problem.FlashBonus / max(1, numFlash),
-			},
+		value.ProblemValue = domain.ProblemValue{
+			PointsZone1: problem.PointsZone1 / max(1, numZone1),
+			PointsZone2: problem.PointsZone2 / max(1, numZone2),
+			PointsTop:   problem.PointsTop / max(1, numTop),
+			FlashBonus:  problem.FlashBonus / max(1, numFlash),
 		}
 	}
 
