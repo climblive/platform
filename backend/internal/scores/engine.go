@@ -359,6 +359,8 @@ func (e *DefaultScoreEngine) CalculateProblemValue(compClassID domain.CompClassI
 		ProblemValue: problem.ProblemValue,
 	}
 
+	oldValue := value
+
 	if rules.PooledPoints {
 		numZone1 := 0
 		numZone2 := 0
@@ -366,6 +368,15 @@ func (e *DefaultScoreEngine) CalculateProblemValue(compClassID domain.CompClassI
 		numFlash := 0
 
 		for tick := range e.store.GetTicksByProblem(compClassID, problemID) {
+			contender, found := e.store.GetContender(tick.ContenderID)
+			if !found {
+				continue
+			}
+
+			if contender.Disqualified {
+				continue
+			}
+
 			if tick.Zone1 {
 				numZone1++
 			}
@@ -399,6 +410,10 @@ func (e *DefaultScoreEngine) CalculateProblemValue(compClassID domain.CompClassI
 	}
 
 	e.store.SaveProblemValue(compClassID, problemID, value)
+
+	if value == oldValue {
+		return nil
+	}
 
 	return func(yield func(Effect) bool) {
 		for _, contenderID := range affectedContenders {
@@ -460,7 +475,7 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 	}
 }
 
-func (e *DefaultScoreEngine) RankCompClass(compClassID domain.CompClassID) iter.Seq[Effect] {
+func (e *DefaultScoreEngine) RankCompClass(compClassID domain.CompClassID) {
 	ranker := NewBasicRanker(e.store.GetRules().Finalists)
 
 	scores := ranker.RankContenders(e.store.GetContendersByCompClass(compClassID))
@@ -468,6 +483,4 @@ func (e *DefaultScoreEngine) RankCompClass(compClassID domain.CompClassID) iter.
 	for score := range slices.Values(scores) {
 		e.store.SaveScore(score)
 	}
-
-	return nil
 }

@@ -688,6 +688,383 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		awaitExpectations(t)
 	})
+
+	t.Run("CalculateProblemValue_UsePointsFalse", func(t *testing.T) {
+		f, awaitExpectations := makeFixture()
+
+		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
+
+		f.store.
+			On("GetRules").
+			Return(scores.Rules{
+				UsePoints: false,
+			})
+
+		effects := f.engine.CalculateProblemValue(fakedCompClassID, fakedProblemID)
+
+		assert.Nil(t, effects)
+
+		awaitExpectations(t)
+	})
+
+	t.Run("CalculateProblemValue_ProblemNotFound", func(t *testing.T) {
+		f, awaitExpectations := makeFixture()
+
+		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
+
+		f.store.
+			On("GetRules").
+			Return(scores.Rules{
+				UsePoints: true,
+			})
+
+		f.store.
+			On("GetProblem", fakedProblemID).
+			Return(scores.Problem{}, false)
+
+		effects := f.engine.CalculateProblemValue(fakedCompClassID, fakedProblemID)
+
+		assert.Nil(t, effects)
+
+		awaitExpectations(t)
+	})
+
+	t.Run("CalculateProblemValue_NonPooledPoints", func(t *testing.T) {
+		f, awaitExpectations := makeFixture()
+
+		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
+
+		f.store.
+			On("GetRules").
+			Return(scores.Rules{
+				UsePoints:    true,
+				PooledPoints: false,
+			})
+
+		f.store.
+			On("GetProblem", fakedProblemID).
+			Return(scores.Problem{
+				ID: fakedProblemID,
+				ProblemValue: domain.ProblemValue{
+					PointsZone1: 100,
+					PointsZone2: 200,
+					PointsTop:   500,
+					FlashBonus:  50,
+				},
+			}, true)
+
+		f.store.
+			On("SaveProblemValue", fakedCompClassID, fakedProblemID, scores.ProblemValue{
+				ProblemID:   fakedProblemID,
+				CompClassID: fakedCompClassID,
+				ProblemValue: domain.ProblemValue{
+					PointsZone1: 100,
+					PointsZone2: 200,
+					PointsTop:   500,
+					FlashBonus:  50,
+				},
+			}).Return()
+
+		effects := f.engine.CalculateProblemValue(fakedCompClassID, fakedProblemID)
+
+		assert.Nil(t, effects)
+
+		awaitExpectations(t)
+	})
+
+	t.Run("CalculateProblemValue_PooledPoints_ValueUnchanged", func(t *testing.T) {
+		f, awaitExpectations := makeFixture()
+
+		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
+
+		fakedContender1ID := testutils.RandomResourceID[domain.ContenderID]()
+
+		f.store.
+			On("GetRules").
+			Return(scores.Rules{
+				UsePoints:    true,
+				PooledPoints: true,
+			})
+
+		f.store.
+			On("GetProblem", fakedProblemID).
+			Return(scores.Problem{
+				ID: fakedProblemID,
+				ProblemValue: domain.ProblemValue{
+					PointsZone1: 100,
+					PointsZone2: 200,
+					PointsTop:   500,
+					FlashBonus:  100,
+				},
+			}, true)
+
+		f.store.
+			On("GetTicksByProblem", fakedCompClassID, fakedProblemID).
+			Return(slices.Values([]scores.Tick{
+				{
+					ContenderID: fakedContender1ID,
+					ProblemID:   fakedProblemID,
+					Zone1:       true,
+					Zone2:       true,
+					Top:         true,
+					AttemptsTop: 1,
+				},
+			}))
+
+		f.store.
+			On("GetContender", fakedContender1ID).
+			Return(scores.Contender{
+				ID:           fakedContender1ID,
+				Disqualified: false,
+			}, true)
+
+		f.store.
+			On("SaveProblemValue", fakedCompClassID, fakedProblemID, scores.ProblemValue{
+				ProblemID:   fakedProblemID,
+				CompClassID: fakedCompClassID,
+				ProblemValue: domain.ProblemValue{
+					PointsZone1: 100,
+					PointsZone2: 200,
+					PointsTop:   500,
+					FlashBonus:  100,
+				},
+			}).Return()
+
+		effects := f.engine.CalculateProblemValue(fakedCompClassID, fakedProblemID)
+
+		require.Nil(t, effects)
+
+		awaitExpectations(t)
+	})
+
+	t.Run("CalculateProblemValue_PooledPoints_UpdatedValue", func(t *testing.T) {
+		f, awaitExpectations := makeFixture()
+
+		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
+
+		fakedContender1ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedContender2ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedContender3ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedContender4ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedContender5ID := testutils.RandomResourceID[domain.ContenderID]()
+
+		f.store.
+			On("GetRules").
+			Return(scores.Rules{
+				UsePoints:    true,
+				PooledPoints: true,
+			})
+
+		f.store.
+			On("GetProblem", fakedProblemID).
+			Return(scores.Problem{
+				ID: fakedProblemID,
+				ProblemValue: domain.ProblemValue{
+					PointsZone1: 50,
+					PointsZone2: 100,
+					PointsTop:   500,
+					FlashBonus:  100,
+				},
+			}, true)
+
+		f.store.
+			On("GetTicksByProblem", fakedCompClassID, fakedProblemID).
+			Return(slices.Values([]scores.Tick{
+				{
+					ContenderID: fakedContender1ID,
+					ProblemID:   fakedProblemID,
+					Zone1:       true,
+					Zone2:       true,
+					Top:         true,
+					AttemptsTop: 1,
+				},
+				{
+					ContenderID: fakedContender2ID,
+					ProblemID:   fakedProblemID,
+					Zone1:       true,
+					Zone2:       true,
+					Top:         true,
+					AttemptsTop: 1,
+				},
+				{
+					ContenderID: fakedContender3ID,
+					ProblemID:   fakedProblemID,
+					Zone1:       true,
+					Zone2:       true,
+					Top:         true,
+					AttemptsTop: 999,
+				},
+				{
+					ContenderID: fakedContender4ID,
+					ProblemID:   fakedProblemID,
+					Zone1:       true,
+					Zone2:       true,
+					Top:         false,
+					AttemptsTop: 999,
+				},
+				{
+					ContenderID: fakedContender5ID,
+					ProblemID:   fakedProblemID,
+					Zone1:       true,
+					Zone2:       false,
+					Top:         false,
+					AttemptsTop: 999,
+				},
+			}))
+
+		f.store.
+			On("GetContender", fakedContender1ID).
+			Return(scores.Contender{
+				ID:           fakedContender1ID,
+				Disqualified: false,
+			}, true).
+			On("GetContender", fakedContender2ID).
+			Return(scores.Contender{
+				ID:           fakedContender2ID,
+				Disqualified: false,
+			}, true).
+			On("GetContender", fakedContender3ID).
+			Return(scores.Contender{
+				ID:           fakedContender3ID,
+				Disqualified: false,
+			}, true).
+			On("GetContender", fakedContender4ID).
+			Return(scores.Contender{
+				ID:           fakedContender4ID,
+				Disqualified: false,
+			}, true).
+			On("GetContender", fakedContender5ID).
+			Return(scores.Contender{
+				ID:           fakedContender5ID,
+				Disqualified: false,
+			}, true)
+
+		f.store.
+			On("SaveProblemValue", fakedCompClassID, fakedProblemID, scores.ProblemValue{
+				ProblemID:   fakedProblemID,
+				CompClassID: fakedCompClassID,
+				ProblemValue: domain.ProblemValue{
+					PointsZone1: 10,
+					PointsZone2: 25,
+					PointsTop:   166,
+					FlashBonus:  50,
+				},
+			}).Return()
+
+		effects := slices.Collect(f.engine.CalculateProblemValue(fakedCompClassID, fakedProblemID))
+
+		require.ElementsMatch(t, effects, []scores.Effect{
+			scores.EffectScoreContender{ContenderID: fakedContender1ID},
+			scores.EffectScoreContender{ContenderID: fakedContender2ID},
+			scores.EffectScoreContender{ContenderID: fakedContender3ID},
+			scores.EffectScoreContender{ContenderID: fakedContender4ID},
+			scores.EffectScoreContender{ContenderID: fakedContender5ID},
+		})
+
+		awaitExpectations(t)
+	})
+
+	t.Run("CalculateProblemValue_PooledPoints_ExcludeDisqualified", func(t *testing.T) {
+		f, awaitExpectations := makeFixture()
+
+		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
+
+		fakedContender1ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedContender2ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedContender3ID := testutils.RandomResourceID[domain.ContenderID]()
+
+		f.store.
+			On("GetRules").
+			Return(scores.Rules{
+				UsePoints:    true,
+				PooledPoints: true,
+			})
+
+		f.store.
+			On("GetProblem", fakedProblemID).
+			Return(scores.Problem{
+				ID: fakedProblemID,
+				ProblemValue: domain.ProblemValue{
+					PointsZone1: 50,
+					PointsZone2: 100,
+					PointsTop:   500,
+					FlashBonus:  25,
+				},
+			}, true)
+
+		f.store.
+			On("GetTicksByProblem", fakedCompClassID, fakedProblemID).
+			Return(slices.Values([]scores.Tick{
+				{
+					ContenderID: fakedContender1ID,
+					ProblemID:   fakedProblemID,
+					Zone1:       true,
+					Zone2:       true,
+					Top:         true,
+					AttemptsTop: 1,
+				},
+				{
+					ContenderID: fakedContender2ID,
+					ProblemID:   fakedProblemID,
+					Zone1:       true,
+					Zone2:       true,
+					Top:         true,
+					AttemptsTop: 1,
+				},
+				{
+					ContenderID: fakedContender3ID,
+					ProblemID:   fakedProblemID,
+					Zone1:       true,
+					Zone2:       true,
+					Top:         true,
+					AttemptsTop: 1,
+				},
+			}))
+
+		f.store.
+			On("GetContender", fakedContender1ID).
+			Return(scores.Contender{
+				ID:           fakedContender1ID,
+				Disqualified: false,
+			}, true).
+			On("GetContender", fakedContender2ID).
+			Return(scores.Contender{
+				ID:           fakedContender2ID,
+				Disqualified: false,
+			}, true).
+			On("GetContender", fakedContender3ID).
+			Return(scores.Contender{
+				ID:           fakedContender3ID,
+				Disqualified: true,
+			}, true)
+
+		f.store.
+			On("SaveProblemValue", fakedCompClassID, fakedProblemID, scores.ProblemValue{
+				ProblemID:   fakedProblemID,
+				CompClassID: fakedCompClassID,
+				ProblemValue: domain.ProblemValue{
+					PointsZone1: 25,
+					PointsZone2: 50,
+					PointsTop:   250,
+					FlashBonus:  12,
+				},
+			}).Return()
+
+		effects := slices.Collect(f.engine.CalculateProblemValue(fakedCompClassID, fakedProblemID))
+
+		require.ElementsMatch(t, effects, []scores.Effect{
+			scores.EffectScoreContender{ContenderID: fakedContender1ID},
+			scores.EffectScoreContender{ContenderID: fakedContender2ID},
+		})
+
+		awaitExpectations(t)
+	})
 }
 
 type engineStoreMock struct {

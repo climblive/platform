@@ -28,7 +28,7 @@ type ScoreEngine interface {
 	HandleProblemAdded(event domain.ProblemAddedEvent) iter.Seq[Effect]
 	HandleProblemUpdated(event domain.ProblemUpdatedEvent) iter.Seq[Effect]
 
-	RankCompClass(compClassID domain.CompClassID) iter.Seq[Effect]
+	RankCompClass(compClassID domain.CompClassID)
 	ScoreContender(contenderID domain.ContenderID) iter.Seq[Effect]
 	CalculateProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect]
 
@@ -334,7 +334,7 @@ func (r *EffectRunner) Run(effects iter.Seq[Effect]) {
 		switch effect := e.(type) {
 		case EffectRankClass:
 			r.driver.logger.Info("re-ranking comp class", "comp_class_id", effect.CompClassID)
-			chainEffects = r.driver.engine.RankCompClass(effect.CompClassID)
+			r.driver.engine.RankCompClass(effect.CompClassID)
 		case EffectScoreContender:
 			r.driver.logger.Info("re-scoring contender", "contender_id", effect.ContenderID)
 			chainEffects = r.driver.engine.ScoreContender(effect.ContenderID)

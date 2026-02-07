@@ -501,9 +501,8 @@ func (m *scoreEngineMock) HandleProblemUpdated(event domain.ProblemUpdatedEvent)
 	return args.Get(0).(iter.Seq[scores.Effect])
 }
 
-func (m *scoreEngineMock) RankCompClass(compClassID domain.CompClassID) iter.Seq[scores.Effect] {
-	args := m.Called(compClassID)
-	return args.Get(0).(iter.Seq[scores.Effect])
+func (m *scoreEngineMock) RankCompClass(compClassID domain.CompClassID) {
+	m.Called(compClassID)
 }
 
 func (m *scoreEngineMock) ScoreContender(contenderID domain.ContenderID) iter.Seq[scores.Effect] {
