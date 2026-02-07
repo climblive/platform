@@ -46,9 +46,6 @@ export const getProblemsByCompClassQuery = (
     queryKey: ["problems", { compClassId }],
     queryFn: async () =>
       ApiClient.getInstance().getProblemsByCompClass(compClassId),
-    retry: false,
-    gcTime: 12 * HOUR,
-    staleTime: 12 * HOUR,
   }));
 
 export const createProblemMutation = (contestId: number) => {
