@@ -189,7 +189,7 @@ func TestMemoryStore(t *testing.T) {
 		assert.ElementsMatch(t, []domain.CompClassID{1, 2, 3}, store.GetCompClassIDs())
 	})
 
-	t.Run("GetTicks", func(t *testing.T) {
+	t.Run("GetTicksByContender", func(t *testing.T) {
 		store := scores.NewMemoryStore()
 
 		contenderID := domain.ContenderID(1)
@@ -218,8 +218,8 @@ func TestMemoryStore(t *testing.T) {
 		store.SaveTick(otherContenderID, t4)
 		store.SaveTick(otherContenderID, t5)
 
-		assert.ElementsMatch(t, []scores.Tick{t1, t2, t3}, slices.Collect(store.GetTicks(contenderID)))
-		assert.ElementsMatch(t, []scores.Tick{t4, t5}, slices.Collect(store.GetTicks(otherContenderID)))
+		assert.ElementsMatch(t, []scores.Tick{t1, t2, t3}, slices.Collect(store.GetTicksByContender(contenderID)))
+		assert.ElementsMatch(t, []scores.Tick{t4, t5}, slices.Collect(store.GetTicksByContender(otherContenderID)))
 	})
 
 	t.Run("SaveTick", func(t *testing.T) {
@@ -238,7 +238,7 @@ func TestMemoryStore(t *testing.T) {
 
 		store.SaveTick(1, t1)
 
-		assert.ElementsMatch(t, []scores.Tick{t1}, slices.Collect(store.GetTicks(1)))
+		assert.ElementsMatch(t, []scores.Tick{t1}, slices.Collect(store.GetTicksByContender(1)))
 
 		t2 := scores.Tick{
 			ProblemID:     2,
@@ -253,12 +253,12 @@ func TestMemoryStore(t *testing.T) {
 
 		store.SaveTick(1, t2)
 
-		assert.ElementsMatch(t, []scores.Tick{t1, t2}, slices.Collect(store.GetTicks(1)))
+		assert.ElementsMatch(t, []scores.Tick{t1, t2}, slices.Collect(store.GetTicksByContender(1)))
 
 		t2.Points = 123
 		store.SaveTick(1, t2)
 
-		assert.ElementsMatch(t, []scores.Tick{t1, t2}, slices.Collect(store.GetTicks(1)))
+		assert.ElementsMatch(t, []scores.Tick{t1, t2}, slices.Collect(store.GetTicksByContender(1)))
 	})
 
 	t.Run("DeleteTick", func(t *testing.T) {
@@ -280,11 +280,11 @@ func TestMemoryStore(t *testing.T) {
 		store.SaveTick(contenderID, t2)
 		store.SaveTick(contenderID, t3)
 
-		assert.ElementsMatch(t, []scores.Tick{t1, t2, t3}, slices.Collect(store.GetTicks(contenderID)))
+		assert.ElementsMatch(t, []scores.Tick{t1, t2, t3}, slices.Collect(store.GetTicksByContender(contenderID)))
 
 		store.DeleteTick(contenderID, t2.ProblemID)
 
-		assert.ElementsMatch(t, []scores.Tick{t1, t3}, slices.Collect(store.GetTicks(contenderID)))
+		assert.ElementsMatch(t, []scores.Tick{t1, t3}, slices.Collect(store.GetTicksByContender(contenderID)))
 	})
 
 	t.Run("GetProblem", func(t *testing.T) {
@@ -313,11 +313,13 @@ func TestMemoryStore(t *testing.T) {
 		store := scores.NewMemoryStore()
 
 		problem := scores.Problem{
-			ID:          domain.ProblemID(rand.Int()),
-			PointsTop:   200,
-			PointsZone1: 100,
-			PointsZone2: 150,
-			FlashBonus:  25,
+			ID: domain.ProblemID(rand.Int()),
+			ProblemValue: domain.ProblemValue{
+				PointsTop:   200,
+				PointsZone1: 100,
+				PointsZone2: 150,
+				FlashBonus:  25,
+			},
 		}
 
 		store.SaveProblem(problem)

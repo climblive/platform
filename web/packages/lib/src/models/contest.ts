@@ -12,6 +12,8 @@ export const contestSchema: z.ZodType<Contest> = z.object({
   name: z.string(),
   description: z.string().optional(),
   qualifyingProblems: z.number(),
+  usePoints: z.boolean(),
+  pooledPoints: z.boolean(),
   finalists: z.number(),
   info: z.string().optional(),
   gracePeriod: z.number(),

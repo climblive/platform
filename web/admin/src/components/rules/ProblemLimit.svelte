@@ -1,7 +1,9 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import { checked, GenericForm, name } from "@climblive/lib/forms";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
@@ -51,6 +53,13 @@
       {#snippet footer()}
         <div class="controls">
           {#if enabled}
+            {#if contest.pooledPoints}
+              <wa-callout variant="warning" size="small">
+                <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
+                This setting in combination with pooled points may lead to unintuitive
+                scoring results.
+              </wa-callout>
+            {/if}
             <wa-input
               size="small"
               {@attach name("qualifyingProblems")}
@@ -80,8 +89,14 @@
     width: 100%;
   }
 
+  wa-callout {
+    width: 100%;
+    margin-bottom: var(--wa-space-xs);
+  }
+
   .controls {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--wa-space-xs);
     align-items: end;
   }

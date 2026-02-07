@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/utils/testutils"
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/google/uuid"
@@ -15,9 +16,9 @@ import (
 )
 
 func TestScoreEngineUseCase(t *testing.T) {
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 	fakedOwnership := domain.OwnershipData{
-		OrganizerID: randomResourceID[domain.OrganizerID](),
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 	}
 
 	now := time.Now()

@@ -43,6 +43,8 @@ type Contest struct {
 	Country            string
 	QualifyingProblems int32
 	Finalists          int32
+	UsePoints          bool
+	PooledPoints       bool
 	Info               sql.NullString
 	GracePeriod        int32
 	Created            time.Time

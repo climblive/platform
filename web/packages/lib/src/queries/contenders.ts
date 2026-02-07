@@ -2,6 +2,7 @@ import {
   createMutation,
   createQuery,
   useQueryClient,
+  type QueryClient,
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
@@ -55,4 +56,21 @@ export const createContendersMutation = (contestId: number) => {
       });
     },
   }));
+};
+
+export const updateContenderPublicInfoInQueryCache = (
+  queryClient: QueryClient,
+  contenderId: number,
+  updatedPublicInfo: Pick<
+    Contender,
+    "compClassId" | "name" | "withdrawnFromFinals" | "disqualified"
+  >,
+) => {
+  const queryKey: QueryKey = ["contender", { id: contenderId }];
+
+  queryClient.setQueryData<Contender>(queryKey, (contender) => {
+    if (contender) {
+      return { ...contender, ...updatedPublicInfo };
+    }
+  });
 };

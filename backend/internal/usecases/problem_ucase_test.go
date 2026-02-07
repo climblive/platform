@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/utils/testutils"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/stretchr/testify/assert"
@@ -13,10 +14,10 @@ import (
 )
 
 func TestGetProblemsByContest(t *testing.T) {
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 	fakedProblems := []domain.Problem{
 		{
-			ID:        randomResourceID[domain.ProblemID](),
+			ID:        testutils.RandomResourceID[domain.ProblemID](),
 			ContestID: fakedContestID,
 		},
 	}
@@ -40,11 +41,11 @@ func TestGetProblemsByContest(t *testing.T) {
 }
 
 func TestPatchProblem(t *testing.T) {
-	fakedProblemID := randomResourceID[domain.ProblemID]()
+	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 	fakedOwnership := domain.OwnershipData{
-		OrganizerID: randomResourceID[domain.OrganizerID](),
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 	}
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 
 	fakedProblem := domain.Problem{
 		ID:                 fakedProblemID,
@@ -56,10 +57,12 @@ func TestPatchProblem(t *testing.T) {
 		Description:        "The tenth boulder",
 		Zone1Enabled:       false,
 		Zone2Enabled:       false,
-		PointsTop:          100,
-		PointsZone1:        50,
-		PointsZone2:        75,
-		FlashBonus:         10,
+		ProblemValue: domain.ProblemValue{
+			PointsTop:   100,
+			PointsZone1: 50,
+			PointsZone2: 75,
+			FlashBonus:  10,
+		},
 	}
 
 	makeMocks := func() (*repositoryMock, *eventBrokerMock, *authorizerMock) {
@@ -98,10 +101,12 @@ func TestPatchProblem(t *testing.T) {
 				Description:        "The twentieth boulder",
 				Zone1Enabled:       true,
 				Zone2Enabled:       true,
-				PointsTop:          1000,
-				PointsZone1:        500,
-				PointsZone2:        750,
-				FlashBonus:         25,
+				ProblemValue: domain.ProblemValue{
+					PointsTop:   1000,
+					PointsZone1: 500,
+					PointsZone2: 750,
+					FlashBonus:  25,
+				},
 			}).
 			Return(domain.Problem{
 				ID:                 fakedProblemID,
@@ -113,19 +118,23 @@ func TestPatchProblem(t *testing.T) {
 				Description:        "The twentieth boulder",
 				Zone1Enabled:       true,
 				Zone2Enabled:       true,
-				PointsTop:          1000,
-				PointsZone1:        500,
-				PointsZone2:        750,
-				FlashBonus:         25,
+				ProblemValue: domain.ProblemValue{
+					PointsTop:   1000,
+					PointsZone1: 500,
+					PointsZone2: 750,
+					FlashBonus:  25,
+				},
 			}, nil)
 
 		mockedEventBroker.
 			On("Dispatch", fakedContestID, domain.ProblemUpdatedEvent{
-				ProblemID:   fakedProblemID,
-				PointsTop:   1000,
-				PointsZone1: 500,
-				PointsZone2: 750,
-				FlashBonus:  25,
+				ProblemID: fakedProblemID,
+				ProblemValue: domain.ProblemValue{
+					PointsTop:   1000,
+					PointsZone1: 500,
+					PointsZone2: 750,
+					FlashBonus:  25,
+				},
 			}).Return()
 
 		ucase := usecases.ProblemUseCase{
@@ -267,12 +276,12 @@ func TestPatchProblem(t *testing.T) {
 }
 
 func TestCreateProblem(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedProblemID := randomResourceID[domain.ProblemID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 	makeMocks := func() (*repositoryMock, *authorizerMock) {
 		mockedRepo := new(repositoryMock)
@@ -296,11 +305,13 @@ func TestCreateProblem(t *testing.T) {
 
 		mockedEventBroker.
 			On("Dispatch", fakedContestID, domain.ProblemAddedEvent{
-				ProblemID:   fakedProblemID,
-				PointsTop:   100,
-				PointsZone1: 50,
-				PointsZone2: 75,
-				FlashBonus:  15,
+				ProblemID: fakedProblemID,
+				ProblemValue: domain.ProblemValue{
+					PointsTop:   100,
+					PointsZone1: 50,
+					PointsZone2: 75,
+					FlashBonus:  15,
+				},
 			}).
 			Return()
 
@@ -323,10 +334,12 @@ func TestCreateProblem(t *testing.T) {
 					Description:        "Crack volumes are included",
 					Zone1Enabled:       true,
 					Zone2Enabled:       true,
-					PointsTop:          100,
-					PointsZone1:        50,
-					PointsZone2:        75,
-					FlashBonus:         15,
+					ProblemValue: domain.ProblemValue{
+						PointsTop:   100,
+						PointsZone1: 50,
+						PointsZone2: 75,
+						FlashBonus:  15,
+					},
 				},
 			).
 			Return(
@@ -340,10 +353,12 @@ func TestCreateProblem(t *testing.T) {
 					Description:        "Crack volumes are included",
 					Zone1Enabled:       true,
 					Zone2Enabled:       true,
-					PointsTop:          100,
-					PointsZone1:        50,
-					PointsZone2:        75,
-					FlashBonus:         15,
+					ProblemValue: domain.ProblemValue{
+						PointsTop:   100,
+						PointsZone1: 50,
+						PointsZone2: 75,
+						FlashBonus:  15,
+					},
 				}, nil)
 
 		ucase := usecases.ProblemUseCase{
@@ -359,10 +374,12 @@ func TestCreateProblem(t *testing.T) {
 			Description:        "Crack volumes are included",
 			Zone1Enabled:       true,
 			Zone2Enabled:       true,
-			PointsTop:          100,
-			PointsZone1:        50,
-			PointsZone2:        75,
-			FlashBonus:         15,
+			ProblemValue: domain.ProblemValue{
+				PointsTop:   100,
+				PointsZone1: 50,
+				PointsZone2: 75,
+				FlashBonus:  15,
+			},
 		})
 
 		require.NoError(t, err)
@@ -406,10 +423,12 @@ func TestCreateProblem(t *testing.T) {
 			HoldColorPrimary:   "#ffffff",
 			HoldColorSecondary: "#000",
 			Description:        "Crack volumes are included",
-			PointsTop:          100,
-			PointsZone1:        50,
-			PointsZone2:        75,
-			FlashBonus:         15,
+			ProblemValue: domain.ProblemValue{
+				PointsTop:   100,
+				PointsZone1: 50,
+				PointsZone2: 75,
+				FlashBonus:  15,
+			},
 		})
 
 		require.ErrorIs(t, err, domain.ErrDuplicate)
@@ -435,8 +454,10 @@ func TestCreateProblem(t *testing.T) {
 		}
 
 		_, err := ucase.CreateProblem(context.Background(), fakedContestID, domain.ProblemTemplate{
-			Number:    10,
-			PointsTop: -100,
+			Number: 10,
+			ProblemValue: domain.ProblemValue{
+				PointsTop: -100,
+			},
 		})
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
@@ -468,11 +489,11 @@ func TestCreateProblem(t *testing.T) {
 }
 
 func TestDeleteProblem(t *testing.T) {
-	fakedProblemID := randomResourceID[domain.ProblemID]()
+	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 	fakedOwnership := domain.OwnershipData{
-		OrganizerID: randomResourceID[domain.OrganizerID](),
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 	}
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 
 	fakedProblem := domain.Problem{
 		ID:        fakedProblemID,
