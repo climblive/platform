@@ -22,6 +22,7 @@
   import {
     ascentDeregisteredEventSchema,
     ascentRegisteredEventSchema,
+    contenderPublicInfoUpdatedEventSchema,
     contenderScoreUpdatedEventSchema,
     problemValueUpdatedEventSchema,
     type Problem,
@@ -35,6 +36,7 @@
     getProblemsByCompClassQuery,
     getTicksByContenderQuery,
     removeTickFromQueryCache,
+    updateContenderPublicInfoInQueryCache,
     updateProblemValueInQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
@@ -184,6 +186,23 @@
       `${getApiUrl()}/contenders/${$session.contenderId}/events`,
     );
 
+    eventSource.addEventListener("CONTENDER_PUBLIC_INFO_UPDATED", (e) => {
+      const event = contenderPublicInfoUpdatedEventSchema.parse(
+        JSON.parse(e.data),
+      );
+
+      if (event.contenderId !== contender?.id) {
+        return;
+      }
+
+      updateContenderPublicInfoInQueryCache(queryClient, event.contenderId, {
+        compClassId: event.compClassId,
+        name: event.name,
+        withdrawnFromFinals: event.withdrawnFromFinals,
+        disqualified: event.disqualified,
+      });
+    });
+
     eventSource.addEventListener("CONTENDER_SCORE_UPDATED", (e) => {
       const event = contenderScoreUpdatedEventSchema.parse(JSON.parse(e.data));
 
@@ -285,6 +304,7 @@
             {contestState}
             {startTime}
             {endTime}
+            disqualified={contender.disqualified}
           />
         </div>
         <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleShowTab}>
@@ -350,6 +370,7 @@
                   tick={ticks.find(({ problemId }) => problemId === problem.id)}
                   disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
                   {highestProblemNumber}
+                  disqualified={contender.disqualified}
                 />
               {/each}
             {/if}

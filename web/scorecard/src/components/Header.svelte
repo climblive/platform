@@ -14,6 +14,7 @@
     contestState: ContestState;
     startTime: Date;
     endTime: Date;
+    disqualified: boolean;
   }
 
   let {
@@ -26,6 +27,7 @@
     contestState,
     startTime,
     endTime,
+    disqualified,
   }: Props = $props();
 </script>
 
@@ -45,7 +47,9 @@
   <div class="lower">
     <div class="score">
       <span>
-        {#if placement}
+        {#if disqualified}
+          Disqualified
+        {:else if placement}
           {placement}<sup>{ordinalSuperscript(placement)}</sup>
         {:else}
           -
