@@ -141,6 +141,10 @@ func TestDefaultScoreEngine(t *testing.T) {
 			fakedOldCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 			fakedNewCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 
+			fakedProblem1ID := testutils.RandomResourceID[domain.ProblemID]()
+			fakedProblem2ID := testutils.RandomResourceID[domain.ProblemID]()
+			fakedProblem3ID := testutils.RandomResourceID[domain.ProblemID]()
+
 			f.store.
 				On("GetContender", fakedContenderID).
 				Return(scores.Contender{
@@ -159,9 +163,35 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Score:               123,
 			}).Return()
 
-			f.engine.HandleContenderSwitchedClass(domain.ContenderSwitchedClassEvent{
+			f.store.On("GetTicksByContender", fakedContenderID).
+				Return(slices.Values([]scores.Tick{
+					{
+						ProblemID: fakedProblem1ID,
+					},
+					{
+						ProblemID: fakedProblem2ID,
+					},
+					{
+						ProblemID: fakedProblem3ID,
+					},
+				}))
+
+			effects := slices.Collect(f.engine.HandleContenderSwitchedClass(domain.ContenderSwitchedClassEvent{
 				ContenderID: fakedContenderID,
 				CompClassID: fakedNewCompClassID,
+			}))
+
+			require.ElementsMatch(t, effects, []scores.Effect{
+				scores.EffectCalculateProblemValue{CompClassID: fakedOldCompClassID, ProblemID: fakedProblem1ID},
+				scores.EffectCalculateProblemValue{CompClassID: fakedOldCompClassID, ProblemID: fakedProblem2ID},
+				scores.EffectCalculateProblemValue{CompClassID: fakedOldCompClassID, ProblemID: fakedProblem3ID},
+
+				scores.EffectCalculateProblemValue{CompClassID: fakedNewCompClassID, ProblemID: fakedProblem1ID},
+				scores.EffectCalculateProblemValue{CompClassID: fakedNewCompClassID, ProblemID: fakedProblem2ID},
+				scores.EffectCalculateProblemValue{CompClassID: fakedNewCompClassID, ProblemID: fakedProblem3ID},
+
+				scores.EffectRankClass{CompClassID: fakedOldCompClassID},
+				scores.EffectRankClass{CompClassID: fakedNewCompClassID},
 			})
 
 			awaitExpectations(t)
