@@ -4,6 +4,7 @@ import (
 	"context"
 	"iter"
 	"math/rand"
+	"slices"
 	"testing"
 	"time"
 
@@ -114,9 +115,10 @@ func TestEngineDriver(t *testing.T) {
 
 		mockedEngine := new(scoreEngineMock)
 
-		mockedEngine.On("Start").Run(func(args mock.Arguments) { cancel() }).Return()
+		mockedEngine.On("Start").Run(func(args mock.Arguments) { cancel() }).Return(slices.Values([]scores.Effect{}))
 		mockedEngine.On("Stop").Return()
 		mockedEngine.On("GetDirtyScores").Return([]domain.Score{})
+		mockedEngine.On("GetDirtyProblemValues").Return([]scores.ProblemValue{})
 
 		installEngine(mockedEngine)
 
