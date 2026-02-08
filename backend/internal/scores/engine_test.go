@@ -116,7 +116,65 @@ func TestDefaultScoreEngine(t *testing.T) {
 	t.Run("Start", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		f.engine.Start()
+		fakedCompClass1ID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompClass2ID := testutils.RandomResourceID[domain.CompClassID]()
+
+		fakedProblem1ID := testutils.RandomResourceID[domain.ProblemID]()
+		fakedProblem2ID := testutils.RandomResourceID[domain.ProblemID]()
+
+		fakedContender1ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedContender2ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedContender3ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedContender4ID := testutils.RandomResourceID[domain.ContenderID]()
+
+		f.store.On("GetCompClassIDs").Return([]domain.CompClassID{
+			fakedCompClass1ID,
+			fakedCompClass2ID,
+		})
+
+		f.store.On("GetAllProblems").Return(slices.Values([]scores.Problem{
+			{
+				ID: fakedProblem1ID,
+			},
+			{
+				ID: fakedProblem2ID,
+			},
+		}))
+
+		f.store.
+			On("GetContendersByCompClass", fakedCompClass1ID).Return(slices.Values([]scores.Contender{
+			{
+				ID: fakedContender1ID,
+			},
+			{
+				ID: fakedContender2ID,
+			},
+		})).
+			On("GetContendersByCompClass", fakedCompClass2ID).Return(slices.Values([]scores.Contender{
+			{
+				ID: fakedContender3ID,
+			},
+			{
+				ID: fakedContender4ID,
+			},
+		}))
+
+		effects := slices.Collect(f.engine.Start())
+
+		require.ElementsMatch(t, effects, []scores.Effect{
+			scores.EffectCalculateProblemValue{CompClassID: fakedCompClass1ID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculateProblemValue{CompClassID: fakedCompClass1ID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculateProblemValue{CompClassID: fakedCompClass2ID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculateProblemValue{CompClassID: fakedCompClass2ID, ProblemID: fakedProblem2ID},
+
+			scores.EffectScoreContender{ContenderID: fakedContender1ID},
+			scores.EffectScoreContender{ContenderID: fakedContender2ID},
+			scores.EffectScoreContender{ContenderID: fakedContender3ID},
+			scores.EffectScoreContender{ContenderID: fakedContender4ID},
+
+			scores.EffectRankClass{CompClassID: fakedCompClass1ID},
+			scores.EffectRankClass{CompClassID: fakedCompClass2ID},
+		})
 
 		awaitExpectations(t)
 	})
