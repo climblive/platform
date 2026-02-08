@@ -4,6 +4,7 @@ import (
 	"iter"
 	"slices"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -1559,6 +1560,77 @@ func TestDefaultScoreEngine(t *testing.T) {
 		})
 
 		awaitExpectations(t)
+	})
+
+	t.Run("RankCompClass", func(t *testing.T) {
+		synctest.Test(t, func(t *testing.T) {
+			f, awaitExpectations := makeFixture()
+
+			fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+			fakedContender1ID := testutils.RandomResourceID[domain.ContenderID]()
+			fakedContender2ID := testutils.RandomResourceID[domain.ContenderID]()
+			fakedContender3ID := testutils.RandomResourceID[domain.ContenderID]()
+
+			f.store.
+				On("GetRules").
+				Return(scores.Rules{
+					Finalists: 2,
+				})
+
+			f.store.
+				On("GetContendersByCompClass", fakedCompClassID).
+				Return(slices.Values([]scores.Contender{
+					{
+						ID:          fakedContender1ID,
+						CompClassID: fakedCompClassID,
+						Score:       100,
+					},
+					{
+						ID:          fakedContender2ID,
+						CompClassID: fakedCompClassID,
+						Score:       200,
+					},
+					{
+						ID:          fakedContender3ID,
+						CompClassID: fakedCompClassID,
+						Score:       150,
+					},
+				}))
+
+			f.store.
+				On("SaveScore", domain.Score{
+					ContenderID: fakedContender2ID,
+					Score:       200,
+					Placement:   1,
+					RankOrder:   0,
+					Finalist:    true,
+					Timestamp:   time.Now(),
+				}).Return()
+
+			f.store.
+				On("SaveScore", domain.Score{
+					ContenderID: fakedContender3ID,
+					Score:       150,
+					Placement:   2,
+					RankOrder:   1,
+					Finalist:    true,
+					Timestamp:   time.Now(),
+				}).Return()
+
+			f.store.
+				On("SaveScore", domain.Score{
+					ContenderID: fakedContender1ID,
+					Score:       100,
+					Placement:   3,
+					RankOrder:   2,
+					Finalist:    false,
+					Timestamp:   time.Now(),
+				}).Return()
+
+			f.engine.RankCompClass(fakedCompClassID)
+
+			awaitExpectations(t)
+		})
 	})
 }
 
