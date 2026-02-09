@@ -33,8 +33,8 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/color-picker/color-picker.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
-  import "@awesome.me/webawesome/dist/components/input/input.js";
-  import type WaInput from "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
+  import type WaNumberInput from "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { checked, GenericForm, name } from "@climblive/lib/forms";
@@ -55,8 +55,8 @@
   let zone1Enabled = $derived(data.zone1Enabled);
   let zone2Enabled = $derived(data.zone2Enabled);
 
-  let pointsZone1Input = $state<WaInput>();
-  let pointsZone2Input = $state<WaInput>();
+  let pointsZone1Input = $state<WaNumberInput>();
+  let pointsZone2Input = $state<WaNumberInput>();
 
   const swatches = [
     "#6f3601",
@@ -109,15 +109,14 @@
 
 <GenericForm {schema} {submit}>
   <fieldset>
-    <wa-input
+    <wa-number-input
       size="small"
       {@attach name("number")}
       label="Number"
-      type="number"
       required
       value={data.number}
       min={0}
-    ></wa-input>
+    ></wa-number-input>
     <div class="colors">
       <div class="pickers">
         <wa-color-picker
@@ -139,27 +138,29 @@
         ></wa-color-picker>
       </div>
     </div>
-    <wa-input
+    <wa-number-input
       size="small"
       {@attach name("pointsTop")}
       label="Points top"
       hint="Points for reaching the top."
-      type="number"
       required
       value={data.pointsTop?.toString() ?? ""}
       min={0}
       max={2 ** 31 - 1}
-    ></wa-input>
-    <wa-input
+    >
+      <span slot="end">pts</span>
+    </wa-number-input>
+    <wa-number-input
       size="small"
       {@attach name("flashBonus")}
       label="Flash bonus"
       hint="Bonus points awarded for a flash ascent, added to the total."
-      type="number"
       value={data.flashBonus?.toString() ?? ""}
       min={0}
       max={2 ** 31 - 1}
-    ></wa-input>
+    >
+      <span slot="end">pts</span>
+    </wa-number-input>
 
     <wa-divider></wa-divider>
 
@@ -170,20 +171,21 @@
       onchange={handleZone1Toggle}
       {@attach checked(zone1Enabled)}>Enable zone Z1</wa-switch
     >
-    <wa-input
+    <wa-number-input
       bind:this={pointsZone1Input}
       size="small"
       {@attach name("pointsZone1")}
       label="Points Z1"
       hint="Points for reaching the first zone."
-      type="number"
       value={data.pointsZone1?.toString() ?? ""}
       min={0}
       max={2 ** 31 - 1}
       class={{
         hidden: !zone1Enabled,
       }}
-    ></wa-input>
+    >
+      <span slot="end">pts</span>
+    </wa-number-input>
     {#if zone1Enabled}
       <wa-switch
         size="small"
@@ -193,20 +195,21 @@
         {@attach checked(zone2Enabled)}>Enable zone Z2</wa-switch
       >
     {/if}
-    <wa-input
+    <wa-number-input
       bind:this={pointsZone2Input}
       size="small"
       {@attach name("pointsZone2")}
       label="Points Z2"
       hint="Points for reaching the second zone."
-      type="number"
       value={data.pointsZone2?.toString() ?? ""}
       min={0}
       max={2 ** 31 - 1}
       class={{
         hidden: !zone2Enabled,
       }}
-    ></wa-input>
+    >
+      <span slot="end">pts</span>
+    </wa-number-input>
 
     {@render children?.()}
   </fieldset>

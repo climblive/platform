@@ -146,23 +146,19 @@
           </article>
 
           <h2>Rules</h2>
-          <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
-          ></wa-divider>
+          <wa-divider></wa-divider>
           <RulesEditor {contest} />
 
           <h2 bind:this={compClassesHeading}>Classes</h2>
-          <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
-          ></wa-divider>
+          <wa-divider></wa-divider>
           <CompClassList {contestId} />
 
           <h2>Tickets</h2>
-          <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
-          ></wa-divider>
+          <wa-divider></wa-divider>
           <TicketList {contestId} />
 
           <h2 bind:this={problemsHeading}>Problems</h2>
-          <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
-          ></wa-divider>
+          <wa-divider></wa-divider>
           <ProblemList
             {contestId}
             organizerId={contest.ownership.organizerId}
@@ -172,8 +168,7 @@
           />
 
           <h2>Advanced</h2>
-          <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
-          ></wa-divider>
+          <wa-divider></wa-divider>
           <h3>Actions</h3>
           <div class="actions">
             <DuplicateContest {contestId} />
@@ -233,6 +228,10 @@
 
   wa-details {
     margin-top: var(--wa-space-m);
+  }
+
+  wa-divider {
+    --color: var(--wa-color-brand-fill-normal);
   }
 
   .actions {
