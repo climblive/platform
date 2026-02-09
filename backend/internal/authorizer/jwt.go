@@ -34,16 +34,7 @@ func NewStandardJWTDecoder() (*StandardJWTDecoder, error) {
 	var keys jose.JSONWebKeySet
 
 	for _, jsonKey := range keyList.Keys {
-		k := jose.JSONWebKey{
-			Key:                         nil,
-			KeyID:                       "",
-			Algorithm:                   "",
-			Use:                         "",
-			Certificates:                nil,
-			CertificatesURL:             nil,
-			CertificateThumbprintSHA1:   nil,
-			CertificateThumbprintSHA256: nil,
-		}
+		k := jose.JSONWebKey{}
 		if err := k.UnmarshalJSON(jsonKey); err != nil {
 			return nil, errors.Wrap(err, 0)
 		}

@@ -97,9 +97,7 @@ func (s *Subscription) popQueueUnsafe() (domain.EventEnvelope, bool) {
 		return event, true
 	}
 
-	return domain.EventEnvelope{
-		Data: nil,
-	}, false
+	return domain.EventEnvelope{}, false
 }
 
 func (s *Subscription) Terminate() {

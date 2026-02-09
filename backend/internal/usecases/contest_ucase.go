@@ -64,10 +64,7 @@ func (uc *ContestUseCase) GetAllContests(ctx context.Context) ([]domain.Contest,
 	var role domain.AuthRole
 	var err error
 
-	if role, err = uc.Authorizer.HasOwnership(ctx, domain.OwnershipData{
-		OrganizerID: 0,
-		ContenderID: nil,
-	}); err != nil {
+	if role, err = uc.Authorizer.HasOwnership(ctx, domain.OwnershipData{}); err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
 

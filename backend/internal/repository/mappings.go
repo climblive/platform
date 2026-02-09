@@ -179,10 +179,7 @@ func organizerInviteToDomain(record database.OrganizerInvite, organizerName stri
 
 func makeNullString(value string) sql.NullString {
 	if value == "" {
-		return sql.NullString{
-			String: "",
-			Valid:  false,
-		}
+		return sql.NullString{}
 	}
 
 	return sql.NullString{
@@ -193,10 +190,7 @@ func makeNullString(value string) sql.NullString {
 
 func makeNullInt32(value int32) sql.NullInt32 {
 	if value == 0 {
-		return sql.NullInt32{
-			Int32: 0,
-			Valid: false,
-		}
+		return sql.NullInt32{}
 	}
 
 	return sql.NullInt32{
@@ -207,10 +201,7 @@ func makeNullInt32(value int32) sql.NullInt32 {
 
 func makeNullTime(value time.Time) sql.NullTime {
 	if value.IsZero() {
-		return sql.NullTime{
-			Time:  time.Time{},
-			Valid: false,
-		}
+		return sql.NullTime{}
 	}
 
 	return sql.NullTime{

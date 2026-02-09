@@ -138,14 +138,7 @@ func (k *Keeper) persistScores(ctx context.Context) {
 		}
 
 		if contenderID == 0 {
-			return 0, domain.Score{
-				Timestamp:   time.Time{},
-				ContenderID: 0,
-				Score:       0,
-				Placement:   0,
-				Finalist:    false,
-				RankOrder:   0,
-			}
+			return 0, domain.Score{}
 		}
 
 		delete(k.scores, contenderID)
