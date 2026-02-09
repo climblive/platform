@@ -1,4 +1,4 @@
-import * as z from "zod/v4";
+import { z } from "@climblive/lib/utils";
 import { ownershipDataSchema } from "./common";
 import type { Contest } from "./generated";
 

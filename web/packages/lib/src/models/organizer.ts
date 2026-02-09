@@ -1,4 +1,4 @@
-import * as z from "zod/v4";
+import { z } from "@climblive/lib/utils";
 import type { Organizer } from "./generated";
 
 export const organizerSchema: z.ZodType<Organizer> = z.object({

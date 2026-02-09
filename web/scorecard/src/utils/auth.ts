@@ -1,10 +1,10 @@
 import { scorecardSessionSchema, type ScorecardSession } from "@/types";
 import { ApiClient, ContenderCredentialsProvider } from "@climblive/lib";
 import type { Contender } from "@climblive/lib/models";
+import { z } from "@climblive/lib/utils";
 import type { QueryClient } from "@tanstack/svelte-query";
 import { add } from "date-fns";
 import type { Writable } from "svelte/store";
-import * as z from "zod/v4";
 
 export const authenticateContender = async (
   code: string,
@@ -26,8 +26,12 @@ export const authenticateContender = async (
   ApiClient.getInstance().setCredentialsProvider(provider);
 
   session.update((current) => {
-    const contestEndTime = contest.timeEnd || new Date();
-    const expiryTime = add(contestEndTime, { hours: 12 });
+    const now = new Date();
+    const contestEndTime = contest.timeEnd || now;
+    const baseTime = new Date(
+      Math.max(contestEndTime.getTime(), now.getTime()),
+    );
+    const expiryTime = add(baseTime, { hours: 12 });
 
     const updatedSession: ScorecardSession = {
       ...current,
