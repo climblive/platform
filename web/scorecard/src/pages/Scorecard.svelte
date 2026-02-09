@@ -4,6 +4,10 @@
   import ProblemView from "@/components/ProblemView.svelte";
   import type { ScorecardSession } from "@/types";
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+  import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
   import type WaRadioGroup from "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
   import "@awesome.me/webawesome/dist/components/radio/radio.js";
@@ -35,7 +39,7 @@
     removeTickFromQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
-  import { getApiUrl, toastSuccess } from "@climblive/lib/utils";
+  import { getApiUrl } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { add } from "date-fns/add";
   import { getContext, onDestroy, onMount } from "svelte";
@@ -54,6 +58,7 @@
   let resultsConnected = $state(false);
   let tabGroup: WaTabGroup | undefined = $state();
   let radioGroup: WaRadioGroup | undefined = $state();
+  let raffleWinnerDialog: WaDialog | undefined = $state();
   let eventSource: EventSource | undefined;
   let score: number = $state(0);
   let placement: number | undefined = $state();
@@ -209,11 +214,10 @@
     eventSource.addEventListener("RAFFLE_WINNER_DRAWN", (e) => {
       const event = raffleWinnerDrawnEventSchema.parse(JSON.parse(e.data));
 
-      toastSuccess(
-        "🎉 Raffle Winner!",
-        `${event.contenderName} won the raffle!`,
-        10000,
-      );
+      // Only show dialog if current contender is the winner
+      if (event.contenderId === contender?.id && raffleWinnerDialog) {
+        raffleWinnerDialog.open = true;
+      }
     });
   };
 
@@ -352,6 +356,23 @@
   </ContestStateProvider>
 {/if}
 
+<wa-dialog bind:this={raffleWinnerDialog} label="🎉 Congratulations!">
+  <div class="raffle-winner-content">
+    <p>You won the raffle!</p>
+  </div>
+  <wa-button
+    slot="footer"
+    variant="success"
+    appearance="accent"
+    onclick={() => {
+      if (raffleWinnerDialog) raffleWinnerDialog.open = false;
+    }}
+  >
+    Awesome!
+    <wa-icon slot="start" name="party-horn"></wa-icon>
+  </wa-button>
+</wa-dialog>
+
 <style>
   wa-tab-panel::part(base) {
     padding-top: var(--wa-space-s);
@@ -372,6 +393,17 @@
     z-index: 10;
     background-color: var(--wa-color-surface-default);
     padding: var(--wa-space-m);
+  }
+
+  .raffle-winner-content {
+    text-align: center;
+    padding: var(--wa-space-l);
+    font-size: var(--wa-font-size-xl);
+    font-weight: var(--wa-font-weight-semibold);
+  }
+
+  wa-dialog {
+    white-space: normal;
   }
 
   wa-tab-group {
