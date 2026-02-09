@@ -357,7 +357,6 @@
 
 <wa-dialog
   bind:this={raffleWinnerDialog}
-  label=""
   without-header
   class="raffle-winner-dialog"
 >
