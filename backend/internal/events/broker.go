@@ -122,6 +122,8 @@ func extractContenderID(event any) domain.ContenderID {
 		return ev.ContenderID
 	case domain.ContenderScoreUpdatedEvent:
 		return ev.ContenderID
+	case domain.RaffleWinnerDrawnEvent:
+		return ev.ContenderID
 	default:
 		return 0
 	}
