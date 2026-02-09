@@ -214,7 +214,6 @@
     eventSource.addEventListener("RAFFLE_WINNER_DRAWN", (e) => {
       const event = raffleWinnerDrawnEventSchema.parse(JSON.parse(e.data));
 
-      // Only show dialog if current contender is the winner
       if (event.contenderId === contender?.id && raffleWinnerDialog) {
         raffleWinnerDialog.open = true;
       }
