@@ -355,20 +355,27 @@
   </ContestStateProvider>
 {/if}
 
-<wa-dialog bind:this={raffleWinnerDialog} label="🎉 Congratulations!">
-  <div class="raffle-winner-content">
-    <p>You won the raffle!</p>
-  </div>
+<wa-dialog
+  bind:this={raffleWinnerDialog}
+  label=""
+  without-header
+  class="raffle-winner-dialog"
+>
+  <h2>Congratulations!</h2>
+  <p>You just won a prize in a raffle!</p>
   <wa-button
     slot="footer"
     variant="success"
     appearance="accent"
+    size="small"
     onclick={() => {
-      if (raffleWinnerDialog) raffleWinnerDialog.open = false;
+      if (raffleWinnerDialog) {
+        raffleWinnerDialog.open = false;
+      }
     }}
   >
     Awesome!
-    <wa-icon slot="start" name="party-horn"></wa-icon>
+    <wa-icon slot="start" name="gift"></wa-icon>
   </wa-button>
 </wa-dialog>
 
@@ -392,17 +399,6 @@
     z-index: 10;
     background-color: var(--wa-color-surface-default);
     padding: var(--wa-space-m);
-  }
-
-  .raffle-winner-content {
-    text-align: center;
-    padding: var(--wa-space-l);
-    font-size: var(--wa-font-size-xl);
-    font-weight: var(--wa-font-weight-semibold);
-  }
-
-  wa-dialog {
-    white-space: normal;
   }
 
   wa-tab-group {
@@ -429,5 +425,15 @@
     display: flex;
     align-items: center;
     gap: var(--wa-space-2xs);
+  }
+
+  .raffle-winner-dialog {
+    &::part(body) {
+      text-align: center;
+    }
+
+    & wa-button {
+      width: 100%;
+    }
   }
 </style>

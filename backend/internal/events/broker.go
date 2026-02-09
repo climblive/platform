@@ -95,6 +95,8 @@ func EventName(event any) string {
 		return "SCORE_ENGINE_STARTED"
 	case domain.ScoreEngineStoppedEvent:
 		return "SCORE_ENGINE_STOPPED"
+	case domain.RaffleWinnerDrawnEvent:
+		return "RAFFLE_WINNER_DRAWN"
 	default:
 		return "UNKNOWN"
 	}
