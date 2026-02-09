@@ -6,3 +6,6 @@ run:
 linters:
   enable:
     - exhaustruct
+  settings:
+    exhaustruct:
+      allow-empty: true

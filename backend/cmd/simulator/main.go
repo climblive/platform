@@ -124,12 +124,7 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 	r.contender = r.GetContender()
 	compClasses := r.GetCompClasses(r.contender.ContestID)
 
-	patch := domain.ContenderPatch{
-		CompClassID:         domain.Patch[domain.CompClassID]{Present: false, Value: 0},
-		Name:                domain.Patch[string]{Present: false, Value: ""},
-		WithdrawnFromFinals: domain.Patch[bool]{Present: false, Value: false},
-		Disqualified:        domain.Patch[bool]{Present: false, Value: false},
-	}
+	patch := domain.ContenderPatch{}
 
 	selectedCompClass := compClasses[rand.Int()%len(compClasses)]
 
@@ -162,7 +157,7 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 			delete(r.ticks, problem.ID)
 		} else {
 			tick := domain.Tick{
-				ID:        0,
+				ID: 0,
 				Ownership: domain.OwnershipData{
 					OrganizerID: 0,
 					ContenderID: nil,
@@ -196,21 +191,7 @@ func (r *ContenderRunner) GetContender() domain.Contender {
 
 	defer func() { _ = resp.Body.Close() }()
 
-	contender := domain.Contender{
-		ID: 0,
-		Ownership: domain.OwnershipData{
-			OrganizerID: 0,
-			ContenderID: nil,
-		},
-		ContestID:           0,
-		CompClassID:         0,
-		RegistrationCode:    "",
-		Name:                "",
-		Entered:             time.Time{},
-		WithdrawnFromFinals: false,
-		Disqualified:        false,
-		Score:               nil,
-	}
+	contender := domain.Contender{}
 
 	err = json.NewDecoder(resp.Body).Decode(&contender)
 	if err != nil {
