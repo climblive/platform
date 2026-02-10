@@ -49,7 +49,9 @@ func (uc *OrganizerUseCase) CreateOrganizer(ctx context.Context, template domain
 	}
 
 	organizer := domain.Organizer{
-		Name: name,
+		ID:        0,
+		Ownership: domain.OwnershipData{},
+		Name:      name,
 	}
 
 	tx, err := uc.Repo.Begin()
@@ -155,9 +157,10 @@ func (uc *OrganizerUseCase) CreateOrganizerInvite(ctx context.Context, organizer
 	}
 
 	invite := domain.OrganizerInvite{
-		ID:          domain.OrganizerInviteID(uc.UUIDGenerator.Generate()),
-		OrganizerID: organizerID,
-		ExpiresAt:   time.Now().Add(7 * 24 * time.Hour),
+		ID:            domain.OrganizerInviteID(uc.UUIDGenerator.Generate()),
+		OrganizerID:   organizerID,
+		OrganizerName: "",
+		ExpiresAt:     time.Now().Add(7 * 24 * time.Hour),
 	}
 
 	if err := uc.Repo.StoreOrganizerInvite(ctx, nil, invite); err != nil {

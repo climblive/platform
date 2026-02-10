@@ -70,6 +70,7 @@ func (uc *RaffleUseCase) CreateRaffle(ctx context.Context, contestID domain.Cont
 	}
 
 	raffle := domain.Raffle{
+		ID:        0,
 		Ownership: contest.Ownership,
 		ContestID: contestID,
 	}
@@ -133,6 +134,7 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 	}
 
 	winner := domain.RaffleWinner{
+		ID:            0,
 		Ownership:     raffle.Ownership,
 		RaffleID:      raffle.ID,
 		ContenderID:   candidates[winnerIndex.Int64()].ID,
