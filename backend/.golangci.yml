@@ -4,6 +4,7 @@ run:
   tests: false
 
 linters:
+  default: standard
   enable:
     - exhaustruct
   settings:
