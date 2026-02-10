@@ -284,6 +284,7 @@ func TestDrawRaffleWinner(t *testing.T) {
 
 		for i := range count {
 			winners = append(winners, domain.RaffleWinner{
+				ID:            randomResourceID[domain.RaffleWinnerID](),
 				Ownership:     fakedOwnership,
 				RaffleID:      fakedRaffleID,
 				ContenderID:   domain.ContenderID(i),
