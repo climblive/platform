@@ -23,6 +23,7 @@ func NewProblemValueKeeper(eventBroker domain.EventBroker) *ProblemValueKeeper {
 	return &ProblemValueKeeper{
 		eventBroker:   eventBroker,
 		problemValues: make(map[problemValueKey]domain.ProblemValue),
+		mu:            sync.RWMutex{},
 	}
 }
 

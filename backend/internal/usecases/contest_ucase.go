@@ -270,6 +270,8 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		Description:          strings.TrimSpace(tmpl.Description),
 		QualifyingProblems:   tmpl.QualifyingProblems,
 		Finalists:            tmpl.Finalists,
+		UsePoints:            tmpl.UsePoints,
+		PooledPoints:         tmpl.PooledPoints,
 		Info:                 sanitizationPolicy.Sanitize(tmpl.Info),
 		GracePeriod:          tmpl.GracePeriod,
 		Created:              time.Now(),
