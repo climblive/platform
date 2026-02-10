@@ -40,7 +40,9 @@
     {/if}
   </span>
   <div class="score">
-    <Score value={disqualified ? 0 : pointValue} hideZero prefix="+" />
+    {#if tick}
+      <Score value={disqualified ? 0 : pointValue} prefix="+" />
+    {/if}
   </div>
 
   <TickBox {problem} {tick} {disabled} />
