@@ -166,28 +166,8 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		}
 	}
 
-	patchAnythingOtherThanArchive := patch != (domain.ContestPatch{
-		Archived:           domain.Patch[bool]{Present: false, Value: false},
-		Location:           domain.Patch[string]{Present: false, Value: ""},
-		Country:            domain.Patch[string]{Present: false, Value: ""},
-		SeriesID:           domain.Patch[domain.SeriesID]{Present: false, Value: 0},
-		Name:               domain.Patch[string]{Present: false, Value: ""},
-		Description:        domain.Patch[string]{Present: false, Value: ""},
-		QualifyingProblems: domain.Patch[int]{Present: false, Value: 0},
-		Finalists:          domain.Patch[int]{Present: false, Value: 0},
-		Info:               domain.Patch[string]{Present: false, Value: ""},
-		GracePeriod:        domain.Patch[time.Duration]{Present: false, Value: 0},
-	}) && patch != domain.ContestPatch{
-		Archived:           patch.Archived,
-		Location:           domain.Patch[string]{Present: false, Value: ""},
-		Country:            domain.Patch[string]{Present: false, Value: ""},
-		SeriesID:           domain.Patch[domain.SeriesID]{Present: false, Value: 0},
-		Name:               domain.Patch[string]{Present: false, Value: ""},
-		Description:        domain.Patch[string]{Present: false, Value: ""},
-		QualifyingProblems: domain.Patch[int]{Present: false, Value: 0},
-		Finalists:          domain.Patch[int]{Present: false, Value: 0},
-		Info:               domain.Patch[string]{Present: false, Value: ""},
-		GracePeriod:        domain.Patch[time.Duration]{Present: false, Value: 0},
+	patchAnythingOtherThanArchive := patch != (domain.ContestPatch{}) && patch != domain.ContestPatch{
+		Archived: patch.Archived,
 	}
 
 	if contest.Archived && patchAnythingOtherThanArchive {
@@ -271,15 +251,15 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		TimeBegin:            time.Time{},
 		TimeEnd:              time.Time{},
 		RegisteredContenders: 0,
-		Location:           strings.TrimSpace(tmpl.Location),
-		Country:            strings.TrimSpace(tmpl.Country),
-		Name:               strings.TrimSpace(tmpl.Name),
-		Description:        strings.TrimSpace(tmpl.Description),
-		QualifyingProblems: tmpl.QualifyingProblems,
-		Finalists:          tmpl.Finalists,
-		Info:               sanitizationPolicy.Sanitize(tmpl.Info),
-		GracePeriod:        tmpl.GracePeriod,
-		Created:            time.Now(),
+		Location:             strings.TrimSpace(tmpl.Location),
+		Country:              strings.TrimSpace(tmpl.Country),
+		Name:                 strings.TrimSpace(tmpl.Name),
+		Description:          strings.TrimSpace(tmpl.Description),
+		QualifyingProblems:   tmpl.QualifyingProblems,
+		Finalists:            tmpl.Finalists,
+		Info:                 sanitizationPolicy.Sanitize(tmpl.Info),
+		GracePeriod:          tmpl.GracePeriod,
+		Created:              time.Now(),
 	}
 
 	if err := (validators.ContestValidator{}).Validate(contest); err != nil {
