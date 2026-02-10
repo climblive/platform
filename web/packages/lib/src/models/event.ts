@@ -49,7 +49,6 @@ export const ascentDeregisteredEventSchema: z.ZodType<AscentDeregisteredEvent> =
 
 export const raffleWinnerDrawnEventSchema: z.ZodType<RaffleWinnerDrawnEvent> =
   z.object({
-    winnerId: z.number(),
     raffleId: z.number(),
     contenderId: z.number(),
     contenderName: z.string(),
