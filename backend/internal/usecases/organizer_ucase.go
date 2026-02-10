@@ -49,12 +49,9 @@ func (uc *OrganizerUseCase) CreateOrganizer(ctx context.Context, template domain
 	}
 
 	organizer := domain.Organizer{
-		ID: 0,
-		Ownership: domain.OwnershipData{
-			OrganizerID: 0,
-			ContenderID: nil,
-		},
-		Name: name,
+		ID:        0,
+		Ownership: domain.OwnershipData{},
+		Name:      name,
 	}
 
 	tx, err := uc.Repo.Begin()

@@ -77,9 +77,7 @@ func WithPanicRecovery() func(*runOptions) {
 }
 
 func (d *ScoreEngineDriver) Run(ctx context.Context, options ...func(*runOptions)) (*sync.WaitGroup, func(ScoreEngine)) {
-	config := &runOptions{
-		recoverPanics: false,
-	}
+	config := &runOptions{}
 	for _, opt := range options {
 		opt(config)
 	}

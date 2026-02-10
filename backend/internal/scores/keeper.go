@@ -36,9 +36,7 @@ func NewScoreKeeper(eventBroker domain.EventBroker, repo keeperRepository) *Keep
 }
 
 func (k *Keeper) Run(ctx context.Context, options ...func(*runOptions)) *sync.WaitGroup {
-	config := &runOptions{
-		recoverPanics: false,
-	}
+	config := &runOptions{}
 	for _, opt := range options {
 		opt(config)
 	}

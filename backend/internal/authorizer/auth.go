@@ -135,12 +135,9 @@ func (a *Authorizer) createUser(ctx context.Context, username string) error {
 
 	runTransaction := func() error {
 		organizer, err := a.repo.StoreOrganizer(ctx, tx, domain.Organizer{
-			ID: 0,
-			Ownership: domain.OwnershipData{
-				OrganizerID: 0,
-				ContenderID: nil,
-			},
-			Name: fmt.Sprintf("%s's organizer", username),
+			ID:        0,
+			Ownership: domain.OwnershipData{},
+			Name:      fmt.Sprintf("%s's organizer", username),
 		})
 		if err != nil {
 			return errors.Wrap(err, 0)
