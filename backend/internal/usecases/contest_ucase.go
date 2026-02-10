@@ -166,6 +166,7 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		}
 	}
 
+	//nolint:exhaustruct
 	patchAnythingOtherThanArchive := patch != (domain.ContestPatch{}) && patch != domain.ContestPatch{
 		Archived: patch.Archived,
 	}
