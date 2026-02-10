@@ -5,6 +5,7 @@ import type {
   ContenderPublicInfoUpdatedEvent,
   ContenderScoreUpdatedEvent,
   ProblemValueUpdatedEvent,
+  RaffleWinnerDrawnEvent,
 } from "./generated";
 import { problemValueSchema } from "./problem";
 
@@ -52,4 +53,12 @@ export const problemValueUpdatedEventSchema: z.ZodType<ProblemValueUpdatedEvent>
   problemValueSchema.extend({
     problemId: z.number(),
     compClassId: z.number(),
+  });
+
+export const raffleWinnerDrawnEventSchema: z.ZodType<RaffleWinnerDrawnEvent> =
+  z.object({
+    raffleId: z.number(),
+    contenderId: z.number(),
+    contenderName: z.string(),
+    timestamp: z.coerce.date(),
   });

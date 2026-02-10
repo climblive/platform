@@ -23,8 +23,9 @@ type raffleUseCaseRepository interface {
 }
 
 type RaffleUseCase struct {
-	Authorizer domain.Authorizer
-	Repo       raffleUseCaseRepository
+	Authorizer  domain.Authorizer
+	Repo        raffleUseCaseRepository
+	EventBroker domain.EventBroker
 }
 
 func (uc *RaffleUseCase) GetRaffle(ctx context.Context, raffleID domain.RaffleID) (domain.Raffle, error) {
@@ -69,6 +70,7 @@ func (uc *RaffleUseCase) CreateRaffle(ctx context.Context, contestID domain.Cont
 	}
 
 	raffle := domain.Raffle{
+		ID:        0,
 		Ownership: contest.Ownership,
 		ContestID: contestID,
 	}
@@ -132,6 +134,7 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 	}
 
 	winner := domain.RaffleWinner{
+		ID:            0,
 		Ownership:     raffle.Ownership,
 		RaffleID:      raffle.ID,
 		ContenderID:   candidates[winnerIndex.Int64()].ID,
@@ -143,6 +146,13 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 	if err != nil {
 		return domain.RaffleWinner{}, errors.Wrap(err, 0)
 	}
+
+	uc.EventBroker.Dispatch(raffle.ContestID, domain.RaffleWinnerDrawnEvent{
+		RaffleID:      createdWinner.RaffleID,
+		ContenderID:   createdWinner.ContenderID,
+		ContenderName: createdWinner.ContenderName,
+		Timestamp:     createdWinner.Timestamp,
+	})
 
 	return createdWinner, nil
 }

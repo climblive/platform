@@ -5,6 +5,7 @@
   import WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import { checked, GenericForm, name } from "@climblive/lib/forms";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
   import { patchContestMutation } from "@climblive/lib/queries";
@@ -60,16 +61,16 @@
                 scoring results.
               </wa-callout>
             {/if}
-            <wa-input
+
+            <wa-number-input
               size="small"
               {@attach name("qualifyingProblems")}
               label="Limit"
-              type="number"
               required
               min={0}
               max={65536}
               defaultValue={contest.qualifyingProblems || 10}
-            ></wa-input>
+            ></wa-number-input>
 
             <wa-button
               type="submit"
@@ -85,7 +86,7 @@
 </GenericForm>
 
 <style>
-  wa-input {
+  wa-number-input {
     width: 100%;
   }
 

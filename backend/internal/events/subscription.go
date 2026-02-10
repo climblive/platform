@@ -30,6 +30,10 @@ func NewSubscription(
 		ID:             uuid.New(),
 		filter:         filter,
 		bufferCapacity: bufferCapacity,
+		mu:             sync.Mutex{},
+		cond:           nil,
+		buffer:         nil,
+		closeReason:    nil,
 	}
 
 	sub.cond = sync.NewCond(&sub.mu)

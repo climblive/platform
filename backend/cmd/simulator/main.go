@@ -80,7 +80,12 @@ func main() {
 	}()
 
 	for _, code := range registrationCodes {
-		runner := ContenderRunner{RegistrationCode: code}
+		runner := ContenderRunner{
+			RegistrationCode: code,
+			contender:        domain.Contender{},
+			ticks:            nil,
+			events:           nil,
+		}
 
 		wg.Add(1)
 		go runner.Run(ITERATIONS, &wg, events)
@@ -138,6 +143,10 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 			delete(r.ticks, problem.ID)
 		} else {
 			tick := domain.Tick{
+				ID:            0,
+				Ownership:     domain.OwnershipData{},
+				Timestamp:     time.Time{},
+				ContestID:     0,
 				ProblemID:     problem.ID,
 				AttemptsTop:   1 + rand.Int()%5,
 				Top:           true,

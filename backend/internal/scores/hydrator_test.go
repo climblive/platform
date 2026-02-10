@@ -2,12 +2,12 @@ package scores_test
 
 import (
 	"context"
-	"math/rand"
 	"testing"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
+	"github.com/climblive/platform/backend/internal/testutils"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
@@ -16,10 +16,10 @@ func TestHydrate(t *testing.T) {
 	mockedRepo := new(repositoryMock)
 	mockedStore := new(engineStoreMock)
 
-	fakedContestID := domain.ContestID(rand.Int())
-	fakedProblemID := domain.ProblemID(rand.Int())
-	fakedContenderID := domain.ContenderID(rand.Int())
-	fakedCompClassID := domain.CompClassID(rand.Int())
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
+	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 
 	now := time.Now()
 

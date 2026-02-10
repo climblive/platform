@@ -184,6 +184,7 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 	}
 
 	problem := domain.Problem{
+		ID:                 0,
 		Ownership:          contest.Ownership,
 		ContestID:          contestID,
 		Number:             tmpl.Number,
