@@ -17,6 +17,7 @@
 <script lang="ts">
   import InfoInput from "@/components/InfoInput.svelte";
   import "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
@@ -88,18 +89,18 @@
         </wa-option>
       {/each}
     </wa-select>
-    <wa-input
+    <wa-number-input
       size="small"
       {@attach name("gracePeriod")}
-      label="Grace period (minutes)"
+      label="Grace period"
       hint="Extra time after the end of the contest during which contenders can enter their last results."
-      type="number"
       required
       min={0}
       max={60}
       value={Math.floor((data.gracePeriod ?? 0) / minuteInNanoseconds)}
     >
-    </wa-input>
+      <span slot="end">minutes</span>
+    </wa-number-input>
     <InfoInput info={data.info} />
     {@render children?.()}
   </fieldset>

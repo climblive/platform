@@ -320,3 +320,10 @@ type ScoreEngineStartedEvent struct {
 type ScoreEngineStoppedEvent struct {
 	InstanceID ScoreEngineInstanceID `json:"instanceId"`
 }
+
+type RaffleWinnerDrawnEvent struct {
+	RaffleID      RaffleID    `json:"raffleId"`
+	ContenderID   ContenderID `json:"contenderId"`
+	ContenderName string      `json:"contenderName"`
+	Timestamp     time.Time   `json:"timestamp"`
+}
