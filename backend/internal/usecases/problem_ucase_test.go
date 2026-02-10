@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/climblive/platform/backend/internal/domain"
-	"github.com/climblive/platform/backend/internal/testutils"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/usecases/validators"
+	"github.com/climblive/platform/backend/internal/utils/testutils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -57,10 +57,12 @@ func TestPatchProblem(t *testing.T) {
 		Description:        "The tenth boulder",
 		Zone1Enabled:       false,
 		Zone2Enabled:       false,
-		PointsTop:          100,
-		PointsZone1:        50,
-		PointsZone2:        75,
-		FlashBonus:         10,
+		ProblemValue: domain.ProblemValue{
+			PointsTop:   100,
+			PointsZone1: 50,
+			PointsZone2: 75,
+			FlashBonus:  10,
+		},
 	}
 
 	makeMocks := func() (*repositoryMock, *eventBrokerMock, *authorizerMock) {
@@ -99,10 +101,12 @@ func TestPatchProblem(t *testing.T) {
 				Description:        "The twentieth boulder",
 				Zone1Enabled:       true,
 				Zone2Enabled:       true,
-				PointsTop:          1000,
-				PointsZone1:        500,
-				PointsZone2:        750,
-				FlashBonus:         25,
+				ProblemValue: domain.ProblemValue{
+					PointsTop:   1000,
+					PointsZone1: 500,
+					PointsZone2: 750,
+					FlashBonus:  25,
+				},
 			}).
 			Return(domain.Problem{
 				ID:                 fakedProblemID,
@@ -114,19 +118,23 @@ func TestPatchProblem(t *testing.T) {
 				Description:        "The twentieth boulder",
 				Zone1Enabled:       true,
 				Zone2Enabled:       true,
-				PointsTop:          1000,
-				PointsZone1:        500,
-				PointsZone2:        750,
-				FlashBonus:         25,
+				ProblemValue: domain.ProblemValue{
+					PointsTop:   1000,
+					PointsZone1: 500,
+					PointsZone2: 750,
+					FlashBonus:  25,
+				},
 			}, nil)
 
 		mockedEventBroker.
 			On("Dispatch", fakedContestID, domain.ProblemUpdatedEvent{
-				ProblemID:   fakedProblemID,
-				PointsTop:   1000,
-				PointsZone1: 500,
-				PointsZone2: 750,
-				FlashBonus:  25,
+				ProblemID: fakedProblemID,
+				ProblemValue: domain.ProblemValue{
+					PointsTop:   1000,
+					PointsZone1: 500,
+					PointsZone2: 750,
+					FlashBonus:  25,
+				},
 			}).Return()
 
 		ucase := usecases.ProblemUseCase{
@@ -297,11 +305,13 @@ func TestCreateProblem(t *testing.T) {
 
 		mockedEventBroker.
 			On("Dispatch", fakedContestID, domain.ProblemAddedEvent{
-				ProblemID:   fakedProblemID,
-				PointsTop:   100,
-				PointsZone1: 50,
-				PointsZone2: 75,
-				FlashBonus:  15,
+				ProblemID: fakedProblemID,
+				ProblemValue: domain.ProblemValue{
+					PointsTop:   100,
+					PointsZone1: 50,
+					PointsZone2: 75,
+					FlashBonus:  15,
+				},
 			}).
 			Return()
 
@@ -324,10 +334,12 @@ func TestCreateProblem(t *testing.T) {
 					Description:        "Crack volumes are included",
 					Zone1Enabled:       true,
 					Zone2Enabled:       true,
-					PointsTop:          100,
-					PointsZone1:        50,
-					PointsZone2:        75,
-					FlashBonus:         15,
+					ProblemValue: domain.ProblemValue{
+						PointsTop:   100,
+						PointsZone1: 50,
+						PointsZone2: 75,
+						FlashBonus:  15,
+					},
 				},
 			).
 			Return(
@@ -341,10 +353,12 @@ func TestCreateProblem(t *testing.T) {
 					Description:        "Crack volumes are included",
 					Zone1Enabled:       true,
 					Zone2Enabled:       true,
-					PointsTop:          100,
-					PointsZone1:        50,
-					PointsZone2:        75,
-					FlashBonus:         15,
+					ProblemValue: domain.ProblemValue{
+						PointsTop:   100,
+						PointsZone1: 50,
+						PointsZone2: 75,
+						FlashBonus:  15,
+					},
 				}, nil)
 
 		ucase := usecases.ProblemUseCase{
@@ -360,10 +374,12 @@ func TestCreateProblem(t *testing.T) {
 			Description:        "Crack volumes are included",
 			Zone1Enabled:       true,
 			Zone2Enabled:       true,
-			PointsTop:          100,
-			PointsZone1:        50,
-			PointsZone2:        75,
-			FlashBonus:         15,
+			ProblemValue: domain.ProblemValue{
+				PointsTop:   100,
+				PointsZone1: 50,
+				PointsZone2: 75,
+				FlashBonus:  15,
+			},
 		})
 
 		require.NoError(t, err)
@@ -407,10 +423,12 @@ func TestCreateProblem(t *testing.T) {
 			HoldColorPrimary:   "#ffffff",
 			HoldColorSecondary: "#000",
 			Description:        "Crack volumes are included",
-			PointsTop:          100,
-			PointsZone1:        50,
-			PointsZone2:        75,
-			FlashBonus:         15,
+			ProblemValue: domain.ProblemValue{
+				PointsTop:   100,
+				PointsZone1: 50,
+				PointsZone2: 75,
+				FlashBonus:  15,
+			},
 		})
 
 		require.ErrorIs(t, err, domain.ErrDuplicate)
@@ -436,8 +454,10 @@ func TestCreateProblem(t *testing.T) {
 		}
 
 		_, err := ucase.CreateProblem(context.Background(), fakedContestID, domain.ProblemTemplate{
-			Number:    10,
-			PointsTop: -100,
+			Number: 10,
+			ProblemValue: domain.ProblemValue{
+				PointsTop: -100,
+			},
 		})
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)

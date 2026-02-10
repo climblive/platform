@@ -26,18 +26,23 @@
   import {
     ascentDeregisteredEventSchema,
     ascentRegisteredEventSchema,
+    contenderPublicInfoUpdatedEventSchema,
     contenderScoreUpdatedEventSchema,
+    problemValueUpdatedEventSchema,
     raffleWinnerDrawnEventSchema,
     type Problem,
+    type ProblemValue,
     type Tick,
   } from "@climblive/lib/models";
   import {
     getCompClassesQuery,
     getContenderQuery,
     getContestQuery,
-    getProblemsQuery,
+    getProblemsByCompClassQuery,
     getTicksByContenderQuery,
     removeTickFromQueryCache,
+    updateContenderPublicInfoInQueryCache,
+    updateProblemValueInQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
@@ -53,7 +58,6 @@
   const contenderQuery = $derived(getContenderQuery($session.contenderId));
   const contestQuery = $derived(getContestQuery($session.contestId));
   const compClassesQuery = $derived(getCompClassesQuery($session.contestId));
-  const problemsQuery = $derived(getProblemsQuery($session.contestId));
   const ticksQuery = $derived(getTicksByContenderQuery($session.contenderId));
 
   let resultsConnected = $state(false);
@@ -68,7 +72,6 @@
   let contender = $derived(contenderQuery.data);
   let contest = $derived(contestQuery.data);
   let compClasses = $derived(compClassesQuery.data);
-  let problems = $derived(problemsQuery.data);
   let ticks = $derived(ticksQuery.data);
   let selectedCompClass = $derived(
     compClasses?.find(({ id }) => id === contender?.compClassId),
@@ -84,6 +87,14 @@
       minutes: (contest?.gracePeriod ?? 0) / (1_000_000_000 * 60),
     }),
   );
+
+  const problemsQuery = $derived(
+    selectedCompClass
+      ? getProblemsByCompClassQuery(selectedCompClass.id)
+      : undefined,
+  );
+
+  let problems = $derived(problemsQuery?.data);
 
   let orderProblemsBy = $state<"number" | "points">("number");
   let sortDirection = $state<"asc" | "desc">("asc");
@@ -181,6 +192,23 @@
       `${getApiUrl()}/contenders/${$session.contenderId}/events`,
     );
 
+    eventSource.addEventListener("CONTENDER_PUBLIC_INFO_UPDATED", (e) => {
+      const event = contenderPublicInfoUpdatedEventSchema.parse(
+        JSON.parse(e.data),
+      );
+
+      if (event.contenderId !== contender?.id) {
+        return;
+      }
+
+      updateContenderPublicInfoInQueryCache(queryClient, event.contenderId, {
+        compClassId: event.compClassId,
+        name: event.name,
+        withdrawnFromFinals: event.withdrawnFromFinals,
+        disqualified: event.disqualified,
+      });
+    });
+
     eventSource.addEventListener("CONTENDER_SCORE_UPDATED", (e) => {
       const event = contenderScoreUpdatedEventSchema.parse(JSON.parse(e.data));
 
@@ -193,6 +221,10 @@
 
     eventSource.addEventListener("ASCENT_REGISTERED", (e) => {
       const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
+
+      if (event.contenderId !== contender?.id) {
+        return;
+      }
 
       const newTick: Tick = {
         id: event.tickId,
@@ -212,7 +244,29 @@
     eventSource.addEventListener("ASCENT_DEREGISTERED", (e) => {
       const event = ascentDeregisteredEventSchema.parse(JSON.parse(e.data));
 
+      if (event.contenderId !== contender?.id) {
+        return;
+      }
+
       removeTickFromQueryCache(queryClient, event.tickId);
+    });
+
+    eventSource.addEventListener("PROBLEM_VALUE_UPDATED", (e) => {
+      const event = problemValueUpdatedEventSchema.parse(JSON.parse(e.data));
+
+      const problemValue: ProblemValue = {
+        pointsTop: event.pointsTop,
+        pointsZone1: event.pointsZone1,
+        pointsZone2: event.pointsZone2,
+        flashBonus: event.flashBonus,
+      };
+
+      updateProblemValueInQueryCache(
+        queryClient,
+        event.compClassId,
+        event.problemId,
+        problemValue,
+      );
     });
 
     eventSource.addEventListener("RAFFLE_WINNER_DRAWN", (e) => {
@@ -264,6 +318,7 @@
             {contestState}
             {startTime}
             {endTime}
+            disqualified={contender.disqualified}
           />
         </div>
         <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleShowTab}>
@@ -329,6 +384,7 @@
                   tick={ticks.find(({ problemId }) => problemId === problem.id)}
                   disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
                   {highestProblemNumber}
+                  disqualified={contender.disqualified}
                 />
               {/each}
             {/if}

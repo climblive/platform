@@ -4,8 +4,10 @@ import type {
   AscentRegisteredEvent,
   ContenderPublicInfoUpdatedEvent,
   ContenderScoreUpdatedEvent,
+  ProblemValueUpdatedEvent,
   RaffleWinnerDrawnEvent,
 } from "./generated";
+import { problemValueSchema } from "./problem";
 
 export const contenderPublicInfoUpdatedEventSchema: z.ZodType<ContenderPublicInfoUpdatedEvent> =
   z.object({
@@ -45,6 +47,12 @@ export const ascentDeregisteredEventSchema: z.ZodType<AscentDeregisteredEvent> =
     tickId: z.number(),
     contenderId: z.number(),
     problemId: z.number(),
+  });
+
+export const problemValueUpdatedEventSchema: z.ZodType<ProblemValueUpdatedEvent> =
+  problemValueSchema.extend({
+    problemId: z.number(),
+    compClassId: z.number(),
   });
 
 export const raffleWinnerDrawnEventSchema: z.ZodType<RaffleWinnerDrawnEvent> =

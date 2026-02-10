@@ -9,18 +9,26 @@ import (
 )
 
 type MemoryStore struct {
-	rules      Rules
-	problems   map[domain.ProblemID]Problem
+	rules         Rules
+	problems      map[domain.ProblemID]Problem
+	problemValues *DiffMap[struct {
+		CompClassID domain.CompClassID
+		ProblemID   domain.ProblemID
+	}, ProblemValue]
 	contenders map[domain.ContenderID]Contender
-	ticks      map[domain.ContenderID][]Tick
+	ticks      map[domain.ContenderID]map[domain.ProblemID]Tick
 	scores     *DiffMap[domain.ContenderID, domain.Score]
 }
 
 func NewMemoryStore() *MemoryStore {
 	return &MemoryStore{
-		problems:   make(map[domain.ProblemID]Problem),
+		problems: make(map[domain.ProblemID]Problem),
+		problemValues: NewDiffMap[struct {
+			CompClassID domain.CompClassID
+			ProblemID   domain.ProblemID
+		}](CompareProblemValue),
 		contenders: make(map[domain.ContenderID]Contender),
-		ticks:      make(map[domain.ContenderID][]Tick),
+		ticks:      make(map[domain.ContenderID]map[domain.ProblemID]Tick),
 		scores:     NewDiffMap[domain.ContenderID](CompareScore),
 		rules:      Rules{},
 	}
@@ -71,30 +79,51 @@ func (s *MemoryStore) GetCompClassIDs() []domain.CompClassID {
 	return slices.Collect(maps.Keys(compClassIDs))
 }
 
-func (s *MemoryStore) GetTicks(contenderID domain.ContenderID) iter.Seq[Tick] {
-	return slices.Values(s.ticks[contenderID])
+func (s *MemoryStore) GetTicksByContender(contenderID domain.ContenderID) iter.Seq[Tick] {
+	return maps.Values(s.ticks[contenderID])
+}
+
+func (s *MemoryStore) GetTicksByProblem(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Tick] {
+	return func(yield func(Tick) bool) {
+		for _, contender := range s.contenders {
+			if contender.CompClassID != compClassID {
+				continue
+			}
+
+			contenderTicks := s.ticks[contender.ID]
+
+			if contenderTicks == nil {
+				continue
+			}
+
+			tick, found := contenderTicks[problemID]
+
+			if !found {
+				continue
+			}
+
+			if !yield(tick) {
+				return
+			}
+		}
+	}
 }
 
 func (s *MemoryStore) SaveTick(contenderID domain.ContenderID, tick Tick) {
-	cmp := func(t Tick) bool {
-		return t.ProblemID == tick.ProblemID
-	}
-
 	contenderTicks := s.ticks[contenderID]
 
-	if i := slices.IndexFunc(contenderTicks, cmp); i != -1 {
-		contenderTicks[i] = tick
-	} else {
-		s.ticks[contenderID] = append(contenderTicks, tick)
+	if contenderTicks == nil {
+		contenderTicks = make(map[domain.ProblemID]Tick)
+		s.ticks[contenderID] = contenderTicks
 	}
+
+	contenderTicks[tick.ProblemID] = tick
 }
 
 func (s *MemoryStore) DeleteTick(contenderID domain.ContenderID, problemID domain.ProblemID) {
-	cmp := func(t Tick) bool {
-		return t.ProblemID == problemID
-	}
+	contenderTicks := s.ticks[contenderID]
 
-	s.ticks[contenderID] = slices.DeleteFunc(s.ticks[contenderID], cmp)
+	delete(contenderTicks, problemID)
 }
 
 func (s *MemoryStore) GetProblem(problemID domain.ProblemID) (Problem, bool) {
@@ -106,10 +135,38 @@ func (s *MemoryStore) SaveProblem(problem Problem) {
 	s.problems[problem.ID] = problem
 }
 
+func (s *MemoryStore) GetAllProblems() iter.Seq[Problem] {
+	return maps.Values(s.problems)
+}
+
+func (s *MemoryStore) GetProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID) (ProblemValue, bool) {
+	key := struct {
+		CompClassID domain.CompClassID
+		ProblemID   domain.ProblemID
+	}{compClassID, problemID}
+
+	value, ok := s.problemValues.Get(key)
+
+	return value, ok
+}
+
+func (s *MemoryStore) SaveProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID, value ProblemValue) {
+	key := struct {
+		CompClassID domain.CompClassID
+		ProblemID   domain.ProblemID
+	}{compClassID, problemID}
+
+	s.problemValues.Set(key, value)
+}
+
 func (s *MemoryStore) SaveScore(score domain.Score) {
 	s.scores.Set(score.ContenderID, score)
 }
 
 func (s *MemoryStore) GetDirtyScores() []domain.Score {
 	return s.scores.Commit()
+}
+
+func (s *MemoryStore) GetDirtyProblemValues() []ProblemValue {
+	return s.problemValues.Commit()
 }

@@ -9,9 +9,11 @@
     tick?: Tick | undefined;
     disabled: boolean;
     highestProblemNumber: number;
+    disqualified: boolean;
   }
 
-  const { problem, tick, disabled, highestProblemNumber }: Props = $props();
+  const { problem, tick, disabled, highestProblemNumber, disqualified }: Props =
+    $props();
 
   const pointValue = $derived(calculateProblemScore(problem, tick));
 </script>
@@ -38,7 +40,7 @@
     {/if}
   </span>
   <div class="score">
-    <Score value={pointValue} hideZero prefix="+" />
+    <Score value={disqualified ? 0 : pointValue} hideZero prefix="+" />
   </div>
 
   <TickBox {problem} {tick} {disabled} />
