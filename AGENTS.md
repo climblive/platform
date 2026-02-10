@@ -19,7 +19,7 @@ The platform manages bouldering climbing competitions, calculates scores in real
 
 ### Backend (`/backend`)
 
-**Language**: Go 1.25  
+**Language**: Go 1.26  
 **Database**: MySQL  
 **Key Features**: Event-driven architecture, real-time score calculation, JWT authentication
 
