@@ -146,7 +146,6 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 	}
 
 	uc.EventBroker.Dispatch(raffle.ContestID, domain.RaffleWinnerDrawnEvent{
-		WinnerID:      createdWinner.ID,
 		RaffleID:      createdWinner.RaffleID,
 		ContenderID:   createdWinner.ContenderID,
 		ContenderName: createdWinner.ContenderName,

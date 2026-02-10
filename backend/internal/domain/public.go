@@ -322,9 +322,8 @@ type ScoreEngineStoppedEvent struct {
 }
 
 type RaffleWinnerDrawnEvent struct {
-	WinnerID      RaffleWinnerID `json:"winnerId"`
-	RaffleID      RaffleID       `json:"raffleId"`
-	ContenderID   ContenderID    `json:"contenderId"`
-	ContenderName string         `json:"contenderName"`
-	Timestamp     time.Time      `json:"timestamp"`
+	RaffleID      RaffleID    `json:"raffleId"`
+	ContenderID   ContenderID `json:"contenderId"`
+	ContenderName string      `json:"contenderName"`
+	Timestamp     time.Time   `json:"timestamp"`
 }
