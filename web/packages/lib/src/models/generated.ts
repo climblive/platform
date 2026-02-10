@@ -298,7 +298,6 @@ export interface ScoreEngineStoppedEvent {
   instanceId: ScoreEngineInstanceID;
 }
 export interface RaffleWinnerDrawnEvent {
-  winnerId: RaffleWinnerID;
   raffleId: RaffleID;
   contenderId: ContenderID;
   contenderName: string;
