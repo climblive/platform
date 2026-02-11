@@ -52,13 +52,9 @@ func (s *scrubberRunner) run(ctx context.Context) *sync.WaitGroup {
 		defer wg.Done()
 
 		for {
-			now := time.Now().UTC()
-			next := time.Date(now.Year(), now.Month(), now.Day()+1, 2, 0, 0, 0, time.UTC)
-			if now.Hour() >= 2 {
-				next = next.AddDate(0, 0, 1)
-			}
+			next := time.Now().Add(s.interval).Round(time.Hour)
 
-			delay := next.Sub(now)
+			delay := next.Sub(time.Now())
 			slog.Info("scrubber scheduled", "next_run", next, "delay", delay, "interval", s.interval)
 
 			select {
@@ -178,7 +174,7 @@ func main() {
 	scoreEngineManager := scores.NewScoreEngineManager(database, scoreEngineStoreHydrator, eventBroker, scoreEngineMaxLifetime)
 
 	scrubberUseCase := usecases.ScrubberUseCase{Repo: database}
-	scrubInterval := getScrubInterval()
+	scrubInterval := time.Hour
 	slog.Info("contender scrubber interval configured", "interval", scrubInterval)
 	scrubberRunner := newScrubberRunner(&scrubberUseCase, scrubInterval)
 
@@ -244,22 +240,6 @@ func getScoreEngineMaxLifetime() time.Duration {
 	}
 
 	return maxLifetime
-}
-
-func getScrubInterval() time.Duration {
-	env := "SCRUB_INTERVAL_DAYS"
-	interval := 90 * 24 * time.Hour
-
-	if value, present := os.LookupEnv(env); present {
-		days, err := strconv.ParseInt(value, 10, 64)
-		if err != nil {
-			slog.Warn("discarding non-numeric environment variable", "env", env, "error", err)
-		} else {
-			interval = time.Duration(days) * 24 * time.Hour
-		}
-	}
-
-	return interval
 }
 
 func setupMux(
