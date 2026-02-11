@@ -101,7 +101,7 @@ web/
 
 ### Prerequisites
 
-- Go 1.25+
+- Go 1.26+
 - Node.js 20+
 - pnpm
 - MySQL database
