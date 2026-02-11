@@ -18,7 +18,6 @@ __debug_bin*
 # Go build artifacts
 backend/api
 backend/simulator
-backend/climblive
 
 # Editor directories and files
 !.vscode/extensions.json
