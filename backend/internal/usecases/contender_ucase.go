@@ -305,6 +305,8 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID doma
 			Entered:             time.Time{},
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
+			ScrubbedAt:          time.Time{},
+			ScrubBefore:         time.Time{},
 			Score:               nil,
 		}
 
