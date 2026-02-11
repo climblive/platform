@@ -116,8 +116,8 @@
       {@attach name("nameRetentionTime")}
       {@attach value(selectedRetention)}
       orientation="horizontal"
-      label="Name retention time"
-      hint="How long after the end of the contest contender names are retained."
+      label="Retention time"
+      hint="How long contender names are retained after the contest ends before results are anonymized."
     >
       {#each retentionOptions as option (option.value)}
         <wa-radio appearance="button" value={String(option.value)}
