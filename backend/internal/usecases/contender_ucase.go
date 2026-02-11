@@ -173,6 +173,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 		}
 
 		contender.CompClassID = patch.CompClassID.Value
+		contender.ScrubBefore = compClass.TimeEnd.Add(contest.NameRetentionTime)
 
 		if contender.Entered.IsZero() {
 			contender.Entered = time.Now()

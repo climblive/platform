@@ -211,6 +211,10 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		contest.GracePeriod = patch.GracePeriod.Value
 	}
 
+	if patch.NameRetentionTime.Present {
+		contest.NameRetentionTime = patch.NameRetentionTime.Value
+	}
+
 	if err := (validators.ContestValidator{}).Validate(contest); err != nil {
 		return mty, errors.Wrap(err, 0)
 	}
@@ -260,6 +264,7 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		Finalists:            tmpl.Finalists,
 		Info:                 sanitizationPolicy.Sanitize(tmpl.Info),
 		GracePeriod:          tmpl.GracePeriod,
+		NameRetentionTime:    tmpl.NameRetentionTime,
 		Created:              time.Now(),
 	}
 

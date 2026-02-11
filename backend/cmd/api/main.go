@@ -35,6 +35,53 @@ var embedMigrations embed.FS
 
 const defaultScoreEngineMaxLifetime = 24 * time.Hour
 
+type scrubberRunner struct {
+	useCase  *usecases.ScrubberUseCase
+	interval time.Duration
+}
+
+func newScrubberRunner(useCase *usecases.ScrubberUseCase, interval time.Duration) *scrubberRunner {
+	return &scrubberRunner{useCase: useCase, interval: interval}
+}
+
+func (s *scrubberRunner) run(ctx context.Context) *sync.WaitGroup {
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+
+		for {
+			now := time.Now().UTC()
+			next := time.Date(now.Year(), now.Month(), now.Day()+1, 2, 0, 0, 0, time.UTC)
+			if now.Hour() >= 2 {
+				next = next.AddDate(0, 0, 1)
+			}
+
+			delay := next.Sub(now)
+			slog.Info("scrubber scheduled", "next_run", next, "delay", delay, "interval", s.interval)
+
+			select {
+			case <-ctx.Done():
+				return
+			case <-time.After(delay):
+				slog.Info("running contender scrubber")
+				count, err := s.useCase.ScrubOldContenders(ctx)
+				if err != nil {
+					if stack := utils.GetErrorStack(err); stack != "" {
+						slog.Error("scrubber error", "stack", stack)
+					}
+					slog.Error("failed to scrub contenders", "error", err)
+				} else {
+					slog.Info("contender scrubber completed", "count", count)
+				}
+			}
+		}
+	}()
+
+	return &wg
+}
+
 type registrationCodeGenerator struct {
 }
 
@@ -73,10 +120,10 @@ func main() {
 
 	slog.SetDefault(slog.New(
 		tint.NewHandler(w, &tint.Options{
-			Level:      slog.LevelDebug,
-			TimeFormat: time.Kitchen,
-			NoColor:    !isatty.IsTerminal(w.Fd()),
-			AddSource:  false,
+			Level:       slog.LevelDebug,
+			TimeFormat:  time.Kitchen,
+			NoColor:     !isatty.IsTerminal(w.Fd()),
+			AddSource:   false,
 			ReplaceAttr: nil,
 		}),
 	))
@@ -130,9 +177,15 @@ func main() {
 
 	scoreEngineManager := scores.NewScoreEngineManager(database, scoreEngineStoreHydrator, eventBroker, scoreEngineMaxLifetime)
 
+	scrubberUseCase := usecases.ScrubberUseCase{Repo: database}
+	scrubInterval := getScrubInterval()
+	slog.Info("contender scrubber interval configured", "interval", scrubInterval)
+	scrubberRunner := newScrubberRunner(&scrubberUseCase, scrubInterval)
+
 	barriers = append(barriers,
 		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
-		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()))
+		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()),
+		scrubberRunner.run(ctx))
 
 	mux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
 
@@ -191,6 +244,22 @@ func getScoreEngineMaxLifetime() time.Duration {
 	}
 
 	return maxLifetime
+}
+
+func getScrubInterval() time.Duration {
+	env := "SCRUB_INTERVAL_DAYS"
+	interval := 90 * 24 * time.Hour
+
+	if value, present := os.LookupEnv(env); present {
+		days, err := strconv.ParseInt(value, 10, 64)
+		if err != nil {
+			slog.Warn("discarding non-numeric environment variable", "env", env, "error", err)
+		} else {
+			interval = time.Duration(days) * 24 * time.Hour
+		}
+	}
+
+	return interval
 }
 
 func setupMux(

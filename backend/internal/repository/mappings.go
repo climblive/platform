@@ -24,6 +24,8 @@ func contenderToDomain(record database.GetContenderRow) domain.Contender {
 		Entered:             record.Contender.Entered.Time,
 		WithdrawnFromFinals: record.Contender.WithdrawnFromFinals,
 		Disqualified:        record.Contender.Disqualified,
+		ScrubbedAt:          record.Contender.ScrubbedAt.Time,
+		ScrubBefore:         record.Contender.ScrubBefore.Time,
 	}
 
 	if record.ContenderID.Valid {
@@ -77,6 +79,7 @@ func contestToDomain(record database.Contest) domain.Contest {
 		Finalists:          int(record.Finalists),
 		Info:               record.Info.String,
 		GracePeriod:        time.Duration(record.GracePeriod) * time.Minute,
+		NameRetentionTime:  time.Duration(record.NameRetentionTime) * time.Second,
 		Created:            record.Created,
 	}
 

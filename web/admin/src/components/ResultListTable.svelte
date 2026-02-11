@@ -7,7 +7,11 @@
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
-  import { Table, type ColumnDefinition } from "@climblive/lib/components";
+  import {
+    ContenderName,
+    Table,
+    type ColumnDefinition,
+  } from "@climblive/lib/components";
   import { value } from "@climblive/lib/forms";
   import type { ScoreboardEntry } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
@@ -110,9 +114,9 @@
 {#snippet renderName({ contenderId, name, disqualified }: ScoreboardEntry)}
   <Link to={`./contenders/${contenderId}`}>
     {#if disqualified}
-      <del>{name}</del>
+      <del><ContenderName id={contenderId} {name} /></del>
     {:else}
-      {name}
+      <ContenderName id={contenderId} {name} />
     {/if}
   </Link>
 {/snippet}

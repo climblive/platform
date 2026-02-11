@@ -9,9 +9,17 @@
     description: z.string().optional(),
     info: z.string().optional(),
     gracePeriod: z.coerce.number().min(0).max(60),
+    nameRetentionTime: z.coerce.number(),
   });
 
   export const minuteInNanoseconds = 60 * 1_000_000_000;
+  export const secondInNanoseconds = 1_000_000_000;
+
+  export const retentionOptions = [
+    { label: "1 week", value: 7 * 24 * 60 * 60 * secondInNanoseconds },
+    { label: "2 weeks", value: 14 * 24 * 60 * 60 * secondInNanoseconds },
+    { label: "1 month", value: 30 * 24 * 60 * 60 * secondInNanoseconds },
+  ];
 </script>
 
 <script lang="ts">
@@ -19,6 +27,7 @@
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import "@awesome.me/webawesome/dist/components/option/option.js";
+  import "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
@@ -39,6 +48,7 @@
   let { data, schema, submit, children }: Props = $props();
 
   let selectedCountry = $derived(data.country || "AQ");
+  let selectedRetention = $derived(data.nameRetentionTime);
 
   const handleCountryChange = (event: Event) => {
     const target = event.target as WaSelect;
@@ -101,6 +111,20 @@
     >
       <span slot="end">minutes</span>
     </wa-number-input>
+    <wa-radio-group
+      size="small"
+      {@attach name("nameRetentionTime")}
+      {@attach value(selectedRetention)}
+      orientation="horizontal"
+      label="Name retention time"
+      hint="How long after the end of the contest contender names are retained."
+    >
+      {#each retentionOptions as option (option.value)}
+        <wa-radio appearance="button" value={String(option.value)}
+          >{option.label}</wa-radio
+        >
+      {/each}
+    </wa-radio-group>
     <InfoInput info={data.info} />
     {@render children?.()}
   </fieldset>

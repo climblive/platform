@@ -2,6 +2,7 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import type { ScoreboardEntry } from "../models";
   import { ordinalSuperscript } from "../utils";
+  import ContenderName from "./ContenderName.svelte";
   import Score from "./Score.svelte";
 
   interface Props {
@@ -24,7 +25,12 @@
       -
     {/if}
   </div>
-  <div class="name">{scoreboardEntry.name}</div>
+  <div class="name">
+    <ContenderName
+      id={scoreboardEntry.contenderId}
+      name={scoreboardEntry.name}
+    />
+  </div>
   <div class="score">
     {#if score === undefined || score.score === 0}
       -

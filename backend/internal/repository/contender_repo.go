@@ -82,6 +82,8 @@ func (d *Database) StoreContender(ctx context.Context, tx domain.Transaction, co
 		Entered:             makeNullTime(contender.Entered),
 		Disqualified:        contender.Disqualified,
 		WithdrawnFromFinals: contender.WithdrawnFromFinals,
+		ScrubbedAt:          makeNullTime(contender.ScrubbedAt),
+		ScrubBefore:         makeNullTime(contender.ScrubBefore),
 	}
 
 	insertID, err := d.WithTx(tx).UpsertContender(ctx, params)

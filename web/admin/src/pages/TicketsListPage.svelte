@@ -5,7 +5,11 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import { Table, type ColumnDefinition } from "@climblive/lib/components";
+  import {
+    ContenderName,
+    Table,
+    type ColumnDefinition,
+  } from "@climblive/lib/components";
   import type { Contender } from "@climblive/lib/models";
   import {
     getContendersByContestQuery,
@@ -76,8 +80,8 @@
   <Link to={`/admin/contenders/${id}`}>{registrationCode}</Link>
 {/snippet}
 
-{#snippet renderName({ name }: Contender)}
-  {name ?? "-"}
+{#snippet renderName({ id, name, scrubbedAt }: Contender)}
+  <ContenderName {id} {name} {scrubbedAt} />
 {/snippet}
 
 {#snippet renderUsed({ entered }: Contender)}

@@ -45,6 +45,8 @@ type Contender struct {
 	Entered             time.Time     `json:"entered,omitzero"`
 	WithdrawnFromFinals bool          `json:"withdrawnFromFinals"`
 	Disqualified        bool          `json:"disqualified"`
+	ScrubbedAt          time.Time     `json:"scrubbedAt,omitzero"`
+	ScrubBefore         time.Time     `json:"scrubBefore,omitzero"`
 	Score               *Score        `json:"score,omitempty"`
 }
 
@@ -68,6 +70,7 @@ type Contest struct {
 	Finalists            int           `json:"finalists"`
 	Info                 string        `json:"info,omitempty"`
 	GracePeriod          time.Duration `json:"gracePeriod"`
+	NameRetentionTime    time.Duration `json:"nameRetentionTime"`
 	TimeBegin            time.Time     `json:"timeBegin,omitzero"`
 	TimeEnd              time.Time     `json:"timeEnd,omitzero"`
 	Created              time.Time     `json:"created"`
@@ -84,6 +87,7 @@ type ContestTemplate struct {
 	Finalists          int           `json:"finalists"`
 	Info               string        `json:"info,omitempty"`
 	GracePeriod        time.Duration `json:"gracePeriod"`
+	NameRetentionTime  time.Duration `json:"nameRetentionTime"`
 }
 
 type ContestPatch struct {
@@ -97,6 +101,7 @@ type ContestPatch struct {
 	Finalists          Patch[int]           `json:"finalists,omitzero" tstype:"number"`
 	Info               Patch[string]        `json:"info,omitzero" tstype:"string"`
 	GracePeriod        Patch[time.Duration] `json:"gracePeriod,omitzero" tstype:"number"`
+	NameRetentionTime  Patch[time.Duration] `json:"nameRetentionTime,omitzero" tstype:"number"`
 }
 
 type ContestTransferRequest struct {

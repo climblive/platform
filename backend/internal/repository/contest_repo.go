@@ -114,6 +114,7 @@ func (d *Database) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context,
 			Finalists:          record.Finalists,
 			Info:               record.Info,
 			GracePeriod:        record.GracePeriod,
+			NameRetentionTime:  record.NameRetentionTime,
 		})
 
 		if timeBegin, ok := record.TimeBegin.(time.Time); ok {
@@ -144,6 +145,7 @@ func (d *Database) StoreContest(ctx context.Context, tx domain.Transaction, cont
 		Finalists:          int32(contest.Finalists),
 		Info:               makeNullString(contest.Info),
 		GracePeriod:        int32(contest.GracePeriod / time.Minute),
+		NameRetentionTime:  int32(contest.NameRetentionTime / time.Second),
 		Created:            contest.Created,
 	}
 

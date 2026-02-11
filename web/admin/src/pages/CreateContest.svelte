@@ -2,6 +2,7 @@
   import ContestForm, {
     formSchema,
     minuteInNanoseconds,
+    secondInNanoseconds,
   } from "@/forms/ContestForm.svelte";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import type { Contest, ContestTemplate } from "@climblive/lib/models";
@@ -45,6 +46,7 @@
     name: "",
     country: "AQ",
     gracePeriod: 15 * minuteInNanoseconds,
+    nameRetentionTime: 604800 * secondInNanoseconds,
     info: "",
   }}
   schema={formSchema}

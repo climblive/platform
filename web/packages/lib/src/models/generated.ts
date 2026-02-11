@@ -64,6 +64,8 @@ export interface Contender {
   entered?: Date;
   withdrawnFromFinals: boolean;
   disqualified: boolean;
+  scrubbedAt?: Date;
+  scrubBefore?: Date;
   score?: Score;
 }
 export interface ContenderPatch {
@@ -85,6 +87,7 @@ export interface Contest {
   finalists: number /* int */;
   info?: string;
   gracePeriod: number;
+  nameRetentionTime: number;
   timeBegin?: Date;
   timeEnd?: Date;
   created: Date;
@@ -100,6 +103,7 @@ export interface ContestTemplate {
   finalists: number /* int */;
   info?: string;
   gracePeriod: number;
+  nameRetentionTime: number;
 }
 export interface ContestPatch {
   archived?: boolean;
@@ -112,6 +116,7 @@ export interface ContestPatch {
   finalists?: number;
   info?: string;
   gracePeriod?: number;
+  nameRetentionTime?: number;
 }
 export interface ContestTransferRequest {
   newOrganizerId: OrganizerID;

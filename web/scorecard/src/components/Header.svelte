@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Score, Timer } from "@climblive/lib/components";
+  import { ContenderName, Score, Timer } from "@climblive/lib/components";
   import { type ContestState } from "@climblive/lib/types";
   import { ordinalSuperscript } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
@@ -8,7 +8,9 @@
     registrationCode: string;
     contestName: string;
     compClassName: string | undefined;
+    contenderId: number;
     contenderName: string | undefined;
+    contenderScrubbedAt: Date | undefined;
     score: number;
     placement: number | undefined;
     contestState: ContestState;
@@ -20,7 +22,9 @@
     registrationCode,
     contestName,
     compClassName,
+    contenderId,
     contenderName,
+    contenderScrubbedAt,
     score,
     placement,
     contestState,
@@ -40,7 +44,11 @@
   </wa-button>
   <h1>{contestName}</h1>
   <p class="contender-name">
-    {contenderName} <span class="contender-class">{compClassName}</span>
+    <ContenderName
+      id={contenderId}
+      name={contenderName}
+      scrubbedAt={contenderScrubbedAt}
+    /> <span class="contender-class">{compClassName}</span>
   </p>
   <div class="lower">
     <div class="score">

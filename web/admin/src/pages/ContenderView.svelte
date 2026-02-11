@@ -9,7 +9,7 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import { LabeledText } from "@climblive/lib/components";
+  import { ContenderName, LabeledText } from "@climblive/lib/components";
   import { checked } from "@climblive/lib/forms";
   import {
     getCompClassesQuery,
@@ -29,7 +29,6 @@
   const contenderQuery = $derived(getContenderQuery(contenderId));
   const patchContender = $derived(patchContenderMutation(contenderId));
   const contender = $derived(contenderQuery.data);
-  const contenderName = $derived(contender?.name ?? "Unregistered");
   const contestId = $derived(contender?.contestId ?? 0);
 
   const compClassesQuery = $derived(
@@ -87,10 +86,18 @@
   <h1>
     {#if contender.disqualified}
       <del>
-        {contenderName}
+        <ContenderName
+          id={contender.id}
+          name={contender.name}
+          scrubbedAt={contender.scrubbedAt}
+        />
       </del>
     {:else}
-      {contenderName}
+      <ContenderName
+        id={contender.id}
+        name={contender.name}
+        scrubbedAt={contender.scrubbedAt}
+      />
     {/if}
   </h1>
   <section>
