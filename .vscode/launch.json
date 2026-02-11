@@ -10,7 +10,6 @@
       "request": "launch",
       "mode": "auto",
       "program": "backend/cmd/api/main.go",
-      "buildFlags": ["-race"],
       "preLaunchTask": "Start MariaDB",
       "env": {
         "DB_USERNAME": "climblive",
