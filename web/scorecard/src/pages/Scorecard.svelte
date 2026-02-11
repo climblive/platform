@@ -362,6 +362,7 @@
                 {score}
                 {placement}
                 {finalist}
+                disqualified={contender.disqualified}
               />
             {/if}
             {#if resultsConnected}
