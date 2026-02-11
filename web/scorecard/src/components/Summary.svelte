@@ -66,7 +66,7 @@
 
 {#snippet placementValue()}
   {#if disqualified}
-    Disqualified
+    <strong>Disqualified</strong>
   {:else if placement}
     <strong>{placement}<sup>{ordinalSuperscript(placement)}</sup></strong>
   {:else}
