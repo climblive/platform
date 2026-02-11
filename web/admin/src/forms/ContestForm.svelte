@@ -120,9 +120,7 @@
       hint="How long contender names are retained after the contest ends before results are anonymized."
     >
       {#each retentionOptions as option (option.value)}
-        <wa-radio appearance="button" value={String(option.value)}
-          >{option.label}</wa-radio
-        >
+        <wa-radio value={String(option.value)}>{option.label}</wa-radio>
       {/each}
     </wa-radio-group>
     <InfoInput info={data.info} />
