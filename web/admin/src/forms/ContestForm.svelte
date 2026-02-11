@@ -68,6 +68,7 @@
       type="text"
       required
       value={data.name}
+      hint="The name of the contest as shown to contenders."
     ></wa-input>
     <wa-input
       size="small"
@@ -75,6 +76,7 @@
       label="Description"
       type="text"
       value={data.description}
+      hint="A short description or tagline for the contest."
     ></wa-input>
     <wa-input
       size="small"
@@ -89,6 +91,7 @@
       {@attach name("country")}
       {@attach value(selectedCountry)}
       label="Country"
+      hint="The country where the contest is held."
       onchange={handleCountryChange}
     >
       <span slot="start">{getFlag(selectedCountry)}</span>
