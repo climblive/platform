@@ -936,8 +936,8 @@ func (q *Queries) GetRafflesByContest(ctx context.Context, contestID int32) ([]G
 const getScrubEligibleContenders = `-- name: GetScrubEligibleContenders :many
 SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before
 FROM contender
-WHERE contender.name != '' 
-  AND contender.scrubbed_at IS NULL 
+WHERE (contender.name != '' 
+  OR contender.scrubbed_at IS NULL)
   AND contender.scrub_before IS NOT NULL
   AND contender.scrub_before < DATE_ADD(NOW(), INTERVAL 1 HOUR)
 `

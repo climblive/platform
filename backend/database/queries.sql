@@ -331,7 +331,7 @@ WHERE id = ?;
 SELECT sqlc.embed(contender)
 FROM contender
 WHERE (contender.name != '' 
-  OR contender.scrubbed_at IS NUL)
+  OR contender.scrubbed_at IS NULL)
   AND contender.scrub_before IS NOT NULL
   AND contender.scrub_before < DATE_ADD(NOW(), INTERVAL 1 HOUR);
 
