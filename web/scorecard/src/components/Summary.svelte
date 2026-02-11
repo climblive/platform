@@ -10,9 +10,11 @@
     score: number;
     placement: number | undefined;
     finalist: boolean;
+    disqualified: boolean;
   }
 
-  const { ticks, problems, score, placement, finalist }: Props = $props();
+  const { ticks, problems, score, placement, finalist, disqualified }: Props =
+    $props();
 
   const tops = $derived(ticks.filter((tick) => tick.top).length);
 
@@ -63,7 +65,9 @@
 {/snippet}
 
 {#snippet placementValue()}
-  {#if placement}
+  {#if disqualified}
+    Disqualified
+  {:else if placement}
     <strong>{placement}<sup>{ordinalSuperscript(placement)}</sup></strong>
   {:else}
     <strong>-</strong>
