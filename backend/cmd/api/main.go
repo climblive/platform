@@ -62,7 +62,7 @@ func (s *scrubberRunner) run(ctx context.Context) *sync.WaitGroup {
 				return
 			case <-time.After(delay):
 				slog.Info("running contender scrubber")
-				count, err := s.useCase.ScrubOldContenders(ctx)
+				count, err := s.useCase.ScrubContenders(ctx, time.Now().Add(s.interval).Round(time.Hour))
 				if err != nil {
 					if stack := utils.GetErrorStack(err); stack != "" {
 						slog.Error("scrubber error", "stack", stack)

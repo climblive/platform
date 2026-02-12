@@ -13,7 +13,7 @@ import (
 type scrubberRepository interface {
 	domain.Transactor
 
-	GetScrubEligibleContenders(ctx context.Context) ([]database.GetScrubEligibleContendersRow, error)
+	GetScrubEligibleContenders(ctx context.Context, deadline time.Time) ([]database.GetScrubEligibleContendersRow, error)
 	UpdateContenderScrubbed(ctx context.Context, arg database.UpdateContenderScrubbedParams) error
 }
 
@@ -21,8 +21,8 @@ type ScrubberUseCase struct {
 	Repo scrubberRepository
 }
 
-func (uc *ScrubberUseCase) ScrubOldContenders(ctx context.Context) (int, error) {
-	contenders, err := uc.Repo.GetScrubEligibleContenders(ctx)
+func (uc *ScrubberUseCase) ScrubContenders(ctx context.Context, deadline time.Time) (int, error) {
+	contenders, err := uc.Repo.GetScrubEligibleContenders(ctx, deadline)
 	if err != nil {
 		return 0, errors.Wrap(err, 0)
 	}

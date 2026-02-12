@@ -2,13 +2,14 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/database"
 	"github.com/go-errors/errors"
 )
 
-func (d *Database) GetScrubEligibleContenders(ctx context.Context) ([]database.GetScrubEligibleContendersRow, error) {
-	contenders, err := d.queries.GetScrubEligibleContenders(ctx)
+func (d *Database) GetScrubEligibleContenders(ctx context.Context, deadline time.Time) ([]database.GetScrubEligibleContendersRow, error) {
+	contenders, err := d.queries.GetScrubEligibleContenders(ctx, makeNullTime(deadline))
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}

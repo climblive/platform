@@ -327,13 +327,14 @@ VALUES
 -- name: DeleteOrganizerInvite :exec
 DELETE FROM organizer_invite
 WHERE id = ?;
+
 -- name: GetScrubEligibleContenders :many
 SELECT sqlc.embed(contender)
 FROM contender
 WHERE (contender.name != '' 
   OR contender.scrubbed_at IS NULL)
   AND contender.scrub_before IS NOT NULL
-  AND contender.scrub_before < DATE_ADD(NOW(), INTERVAL 1 HOUR);
+  AND contender.scrub_before < ?;
 
 -- name: UpdateContenderScrubbed :exec
 UPDATE contender

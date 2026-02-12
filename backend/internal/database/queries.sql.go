@@ -939,15 +939,15 @@ FROM contender
 WHERE (contender.name != '' 
   OR contender.scrubbed_at IS NULL)
   AND contender.scrub_before IS NOT NULL
-  AND contender.scrub_before < DATE_ADD(NOW(), INTERVAL 1 HOUR)
+  AND contender.scrub_before < ?
 `
 
 type GetScrubEligibleContendersRow struct {
 	Contender Contender
 }
 
-func (q *Queries) GetScrubEligibleContenders(ctx context.Context) ([]GetScrubEligibleContendersRow, error) {
-	rows, err := q.db.QueryContext(ctx, getScrubEligibleContenders)
+func (q *Queries) GetScrubEligibleContenders(ctx context.Context, scrubBefore sql.NullTime) ([]GetScrubEligibleContendersRow, error) {
+	rows, err := q.db.QueryContext(ctx, getScrubEligibleContenders, scrubBefore)
 	if err != nil {
 		return nil, err
 	}
