@@ -12,13 +12,12 @@
     nameRetentionTime: z.coerce.number(),
   });
 
-  export const minuteInNanoseconds = 60 * 1_000_000_000;
-  export const secondInNanoseconds = 1_000_000_000;
+  export const nanosecondsInMinute = 60 * 1_000_000_000;
 
   export const retentionOptions = [
-    { label: "1 week", value: 7 * 24 * 60 * 60 * secondInNanoseconds },
-    { label: "2 weeks", value: 14 * 24 * 60 * 60 * secondInNanoseconds },
-    { label: "1 month", value: 30 * 24 * 60 * 60 * secondInNanoseconds },
+    { label: "1 week", value: 7 * 24 * 60 * nanosecondsInMinute },
+    { label: "2 weeks", value: 14 * 24 * 60 * nanosecondsInMinute },
+    { label: "1 month", value: 30 * 24 * 60 * nanosecondsInMinute },
   ];
 </script>
 
@@ -110,7 +109,7 @@
       required
       min={0}
       max={60}
-      value={Math.floor((data.gracePeriod ?? 0) / minuteInNanoseconds)}
+      value={Math.floor((data.gracePeriod ?? 0) / nanosecondsInMinute)}
     >
       <span slot="end">minutes</span>
     </wa-number-input>

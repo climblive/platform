@@ -145,7 +145,7 @@ func (d *Database) StoreContest(ctx context.Context, tx domain.Transaction, cont
 		Finalists:          int32(contest.Finalists),
 		Info:               makeNullString(contest.Info),
 		GracePeriod:        int32(contest.GracePeriod / time.Minute),
-		NameRetentionTime:  int32(contest.NameRetentionTime / time.Second),
+		NameRetentionTime:  int32(contest.NameRetentionTime / time.Minute),
 		Created:            contest.Created,
 	}
 
