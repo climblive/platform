@@ -8,7 +8,7 @@ export function maskScrubbedName(contenderId: number): string {
   const lastNameLength = 4 + (Math.abs(hash >> 8) % 10);
 
   const firstName = "●".repeat(firstNameLength);
-  const lastName = "●".repeat(lastNameLength);
+  const lastName = "*".repeat(lastNameLength);
 
   return `${firstName} ${lastName}`;
 }
