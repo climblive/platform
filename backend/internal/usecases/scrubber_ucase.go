@@ -18,7 +18,8 @@ type scrubberRepository interface {
 }
 
 type ScrubberUseCase struct {
-	Repo scrubberRepository
+	Repo        scrubberRepository
+	EventBroker domain.EventBroker
 }
 
 func (uc *ScrubberUseCase) ScrubContenders(ctx context.Context, deadline time.Time) (int, error) {
@@ -51,6 +52,16 @@ func (uc *ScrubberUseCase) ScrubContenders(ctx context.Context, deadline time.Ti
 
 	if err := tx.Commit(); err != nil {
 		return 0, errors.Wrap(err, 0)
+	}
+
+	for _, contender := range contenders {
+		uc.EventBroker.Dispatch(domain.ContestID(contender.Contender.ContestID), domain.ContenderPublicInfoUpdatedEvent{
+			ContenderID:         domain.ContenderID(contender.Contender.ID),
+			CompClassID:         domain.CompClassID(contender.Contender.ClassID.Int32),
+			Name:                "",
+			WithdrawnFromFinals: contender.Contender.WithdrawnFromFinals,
+			Disqualified:        contender.Contender.Disqualified,
+		})
 	}
 
 	return len(contenders), nil

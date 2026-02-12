@@ -173,7 +173,7 @@ func main() {
 
 	scoreEngineManager := scores.NewScoreEngineManager(database, scoreEngineStoreHydrator, eventBroker, scoreEngineMaxLifetime)
 
-	scrubberUseCase := usecases.ScrubberUseCase{Repo: database}
+	scrubberUseCase := usecases.ScrubberUseCase{Repo: database, EventBroker: eventBroker}
 	scrubInterval := time.Hour
 	slog.Info("contender scrubber interval configured", "interval", scrubInterval)
 	scrubberRunner := newScrubberRunner(&scrubberUseCase, scrubInterval)
