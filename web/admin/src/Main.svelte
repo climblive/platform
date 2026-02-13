@@ -1,7 +1,6 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
   import { Route, Router } from "svelte-routing";
-  import Header from "./Header.svelte";
   import ContenderView from "./pages/ContenderView.svelte";
   import Contest from "./pages/Contest.svelte";
   import CreateCompClass from "./pages/CreateCompClass.svelte";
@@ -19,8 +18,6 @@
   import Root from "./pages/Root.svelte";
   import TicketsListPage from "./pages/TicketsListPage.svelte";
 </script>
-
-<Header />
 
 <main>
   <Router basepath="/admin">

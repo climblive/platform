@@ -8,6 +8,7 @@
   import { navigate } from "svelte-routing";
   import { writable } from "svelte/store";
   import { Authenticator } from "./authenticator.svelte";
+  import Header from "./Header.svelte";
   import Main from "./Main.svelte";
 
   const selectedOrganizer = writable<number | undefined>();
@@ -80,6 +81,7 @@
     </div>
   {:then}
     <QueryClientProvider client={queryClient}>
+      <Header />
       {#if !authenticator.isAuthenticated()}
         <main>
           <section>
