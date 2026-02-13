@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
@@ -114,4 +115,21 @@ func (d *Database) GetNumberOfContenders(ctx context.Context, tx domain.Transact
 	}
 
 	return int(count), nil
+}
+
+func (d *Database) GetScrubEligibleContenders(ctx context.Context, deadline time.Time) ([]domain.Contender, error) {
+	records, err := d.queries.GetScrubEligibleContenders(ctx, makeNullTime(deadline))
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	contenders := make([]domain.Contender, 0)
+
+	for _, record := range records {
+		contender := contenderToDomain(database.GetContenderRow(record))
+
+		contenders = append(contenders, contender)
+	}
+
+	return contenders, nil
 }
