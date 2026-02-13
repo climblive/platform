@@ -76,11 +76,11 @@
       return;
     }
 
-    const value = Array.isArray(compClassSelect.value)
+    const selectedValue = Array.isArray(compClassSelect.value)
       ? compClassSelect.value[0]
       : compClassSelect.value;
 
-    const newCompClassId = parseInt(value, 10);
+    const newCompClassId = parseInt(selectedValue, 10);
     if (!isNaN(newCompClassId) && newCompClassId !== contender?.compClassId) {
       patchContender.mutate({
         compClassId: newCompClassId,
