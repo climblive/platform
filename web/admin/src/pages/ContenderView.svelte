@@ -186,7 +186,7 @@
       bind:this={compClassSelect}
       label="Competition class"
       hint="Change the class for this contender."
-      {@attach value(contender.compClassId)}
+      {@attach value(String(contender.compClassId))}
       onchange={handleCompClassChange}
       disabled={contender.disqualified || patchContender.isPending}
     >
