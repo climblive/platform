@@ -2,10 +2,8 @@ package usecases
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
-	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
 )
@@ -14,7 +12,7 @@ type scrubberRepository interface {
 	domain.Transactor
 
 	GetScrubEligibleContenders(ctx context.Context, deadline time.Time) ([]domain.Contender, error)
-	UpdateContenderScrubbed(ctx context.Context, arg database.UpdateContenderScrubbedParams) error
+	StoreContender(ctx context.Context, tx domain.Transaction, contender domain.Contender) (domain.Contender, error)
 }
 
 type ScrubberUseCase struct {
@@ -38,14 +36,11 @@ func (uc *ScrubberUseCase) ScrubContenders(ctx context.Context, deadline time.Ti
 	}
 	defer tx.Rollback()
 
-	now := sql.NullTime{Time: time.Now(), Valid: true}
-	for _, contender := range contenders {
-		params := database.UpdateContenderScrubbedParams{
-			ScrubbedAt: now,
-			ID:         int32(contender.ID),
-		}
+	for i := range contenders {
+		contenders[i].Name = ""
+		contenders[i].ScrubbedAt = time.Now()
 
-		if err := uc.Repo.UpdateContenderScrubbed(ctx, params); err != nil {
+		if _, err := uc.Repo.StoreContender(ctx, tx, contenders[i]); err != nil {
 			return 0, errors.Wrap(err, 0)
 		}
 	}

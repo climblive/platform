@@ -1297,22 +1297,6 @@ func (q *Queries) InsertTick(ctx context.Context, arg InsertTickParams) (int64, 
 	return result.LastInsertId()
 }
 
-const updateContenderScrubbed = `-- name: UpdateContenderScrubbed :exec
-UPDATE contender
-SET name = '', scrubbed_at = ?
-WHERE id = ?
-`
-
-type UpdateContenderScrubbedParams struct {
-	ScrubbedAt sql.NullTime
-	ID         int32
-}
-
-func (q *Queries) UpdateContenderScrubbed(ctx context.Context, arg UpdateContenderScrubbedParams) error {
-	_, err := q.db.ExecContext(ctx, updateContenderScrubbed, arg.ScrubbedAt, arg.ID)
-	return err
-}
-
 const upsertCompClass = `-- name: UpsertCompClass :execlastid
 INSERT INTO 
 	comp_class (id, organizer_id, contest_id, name, description, color, time_begin, time_end)

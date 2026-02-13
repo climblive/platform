@@ -337,7 +337,3 @@ WHERE (contender.name != ''
   AND contender.scrub_before IS NOT NULL
   AND contender.scrub_before < ?;
 
--- name: UpdateContenderScrubbed :exec
-UPDATE contender
-SET name = '', scrubbed_at = ?
-WHERE id = ?;
