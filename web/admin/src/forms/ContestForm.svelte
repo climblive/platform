@@ -47,7 +47,6 @@
   let { data, schema, submit, children }: Props = $props();
 
   let selectedCountry = $derived(data.country || "AQ");
-  let selectedRetention = $derived(data.nameRetentionTime);
 
   const handleCountryChange = (event: Event) => {
     const target = event.target as WaSelect;
@@ -116,7 +115,7 @@
     <wa-radio-group
       size="small"
       {@attach name("nameRetentionTime")}
-      {@attach value(selectedRetention)}
+      {@attach value(data.nameRetentionTime)}
       orientation="horizontal"
       label="Retention time"
       hint="How long contender names are retained after the contest ends before results are anonymized."
