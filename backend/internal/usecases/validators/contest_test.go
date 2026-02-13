@@ -19,6 +19,7 @@ func TestContestValidator(t *testing.T) {
 			QualifyingProblems: 10,
 			Finalists:          7,
 			GracePeriod:        time.Minute * 15,
+			NameRetentionTime:  7 * 24 * time.Hour,
 		}
 	}
 
@@ -100,6 +101,27 @@ func TestContestValidator(t *testing.T) {
 	t.Run("InvalidCountryCode", func(t *testing.T) {
 		contest := validContest()
 		contest.Country = "XYZ"
+
+		err := validator.Validate(contest)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("ValidNameRetentionTimes", func(t *testing.T) {
+		for _, nrt := range []time.Duration{7 * 24 * time.Hour, 14 * 24 * time.Hour, 28 * 24 * time.Hour} {
+			contest := validContest()
+			contest.NameRetentionTime = nrt
+
+			err := validator.Validate(contest)
+
+			assert.NoError(t, err)
+		}
+	})
+
+	t.Run("NameRetentionTimeInvalid", func(t *testing.T) {
+		contest := validContest()
+		contest.NameRetentionTime = 0
 
 		err := validator.Validate(contest)
 
