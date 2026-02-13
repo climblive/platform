@@ -72,12 +72,16 @@
   };
 
   const handleCompClassChange = () => {
-    if (!compClassSelect) {
+    if (!compClassSelect || !compClassSelect.value) {
       return;
     }
 
-    const newCompClassId = Number(compClassSelect.value);
-    if (newCompClassId && newCompClassId !== contender?.compClassId) {
+    const value = Array.isArray(compClassSelect.value)
+      ? compClassSelect.value[0]
+      : compClassSelect.value;
+
+    const newCompClassId = parseInt(value, 10);
+    if (!isNaN(newCompClassId) && newCompClassId !== contender?.compClassId) {
       patchContender.mutate({
         compClassId: newCompClassId,
       });
