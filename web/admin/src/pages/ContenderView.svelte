@@ -191,7 +191,7 @@
       disabled={contender.disqualified || patchContender.isPending}
     >
       {#each compClasses as compClass (compClass.id)}
-        <wa-option value={compClass.id} label={compClass.name}>
+        <wa-option value={String(compClass.id)} label={compClass.name}>
           {compClass.name}
           {#if compClass.description}
             <small>{compClass.description}</small>
