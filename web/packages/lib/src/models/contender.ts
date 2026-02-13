@@ -11,5 +11,7 @@ export const contenderSchema: z.ZodType<Contender> = z.object({
   entered: z.coerce.date().optional(),
   withdrawnFromFinals: z.boolean(),
   disqualified: z.boolean(),
+  scrubbedAt: z.coerce.date().optional(),
+  scrubBefore: z.coerce.date().optional(),
   score: scoreSchema.optional(),
 });
