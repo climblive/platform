@@ -7,10 +7,13 @@
   import "@awesome.me/webawesome/dist/components/copy-button/copy-button.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import "@awesome.me/webawesome/dist/components/option/option.js";
+  import "@awesome.me/webawesome/dist/components/select/select.js";
+  import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { LabeledText } from "@climblive/lib/components";
-  import { checked } from "@climblive/lib/forms";
+  import { checked, value } from "@climblive/lib/forms";
   import {
     getCompClassesQuery,
     getContenderQuery,
@@ -44,6 +47,7 @@
   const contest = $derived(contestQuery?.data);
 
   let withdrawFromFinalsToggle: WaSwitch | undefined = $state();
+  let compClassSelect: WaSelect | undefined = $state();
 
   const handleToggleWithdrawFromFinals = () => {
     if (!withdrawFromFinalsToggle) {
@@ -65,6 +69,19 @@
     patchContender.mutate({
       disqualified: false,
     });
+  };
+
+  const handleCompClassChange = () => {
+    if (!compClassSelect) {
+      return;
+    }
+
+    const newCompClassId = Number(compClassSelect.value);
+    if (newCompClassId && newCompClassId !== contender?.compClassId) {
+      patchContender.mutate({
+        compClassId: newCompClassId,
+      });
+    }
   };
 </script>
 
@@ -161,6 +178,24 @@
   <h2>Settings</h2>
   <wa-divider style="--color: var(--wa-color-brand-fill-normal);"></wa-divider>
   <div class="controls">
+    <wa-select
+      bind:this={compClassSelect}
+      label="Competition class"
+      hint="Change the class for this contender."
+      {@attach value(contender.compClassId)}
+      onchange={handleCompClassChange}
+      disabled={contender.disqualified || patchContender.isPending}
+    >
+      {#each compClasses as compClass (compClass.id)}
+        <wa-option value={compClass.id} label={compClass.name}>
+          {compClass.name}
+          {#if compClass.description}
+            <small>{compClass.description}</small>
+          {/if}
+        </wa-option>
+      {/each}
+    </wa-select>
+
     <wa-switch
       bind:this={withdrawFromFinalsToggle}
       hint="In case the contender does not wish to take part in the finals."
