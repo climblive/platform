@@ -13,7 +13,7 @@ import (
 type scrubberRepository interface {
 	domain.Transactor
 
-	GetScrubEligibleContenders(ctx context.Context, deadline time.Time) ([]database.GetScrubEligibleContendersRow, error)
+	GetScrubEligibleContenders(ctx context.Context, deadline time.Time) ([]domain.Contender, error)
 	UpdateContenderScrubbed(ctx context.Context, arg database.UpdateContenderScrubbedParams) error
 }
 
@@ -42,7 +42,7 @@ func (uc *ScrubberUseCase) ScrubContenders(ctx context.Context, deadline time.Ti
 	for _, contender := range contenders {
 		params := database.UpdateContenderScrubbedParams{
 			ScrubbedAt: now,
-			ID:         contender.Contender.ID,
+			ID:         int32(contender.ID),
 		}
 
 		if err := uc.Repo.UpdateContenderScrubbed(ctx, params); err != nil {
@@ -55,12 +55,12 @@ func (uc *ScrubberUseCase) ScrubContenders(ctx context.Context, deadline time.Ti
 	}
 
 	for _, contender := range contenders {
-		uc.EventBroker.Dispatch(domain.ContestID(contender.Contender.ContestID), domain.ContenderPublicInfoUpdatedEvent{
-			ContenderID:         domain.ContenderID(contender.Contender.ID),
-			CompClassID:         domain.CompClassID(contender.Contender.ClassID.Int32),
+		uc.EventBroker.Dispatch(contender.ContestID, domain.ContenderPublicInfoUpdatedEvent{
+			ContenderID:         contender.ID,
+			CompClassID:         contender.CompClassID,
 			Name:                "",
-			WithdrawnFromFinals: contender.Contender.WithdrawnFromFinals,
-			Disqualified:        contender.Contender.Disqualified,
+			WithdrawnFromFinals: contender.WithdrawnFromFinals,
+			Disqualified:        contender.Disqualified,
 		})
 	}
 
