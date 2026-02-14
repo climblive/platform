@@ -201,7 +201,8 @@
   }
 
   .colors {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: var(--wa-space-s);
   }
 
