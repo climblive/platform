@@ -11,6 +11,7 @@
     required?: boolean;
     allowClear?: boolean;
     name?: string;
+    placement: "top" | "bottom" | "left" | "right";
   }
 
   let {
@@ -18,6 +19,7 @@
     required = false,
     allowClear = false,
     name,
+    placement,
     ...rest
   }: Props = $props();
 
@@ -79,7 +81,7 @@
     <HoldColorIndicator --height="2rem" --width="2rem" primary={value} />
   </button>
 
-  <wa-popover bind:this={popover} for={id} placement="right" distance={10}>
+  <wa-popover bind:this={popover} for={id} {placement} distance={10}>
     <div class="popup-content" role="listbox" aria-label="Color selection">
       <div class="color-grid">
         {#each colors as color (color)}

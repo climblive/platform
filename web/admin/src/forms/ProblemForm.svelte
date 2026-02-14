@@ -108,12 +108,14 @@
         label="Primary hold color"
         required
         value={data.holdColorPrimary}
+        placement="right"
       />
       <HoldColorPicker
         name="holdColorSecondary"
         label="Secondary hold color"
         allowClear={true}
         value={data.holdColorSecondary}
+        placement="bottom"
       />
     </div>
     <wa-number-input
