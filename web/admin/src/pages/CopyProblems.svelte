@@ -13,18 +13,19 @@
   import { type ProblemTemplate } from "@climblive/lib/models";
   import {
     createProblemMutation,
-    getAllContestsQuery,
+    getContestsByOrganizerQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import { format } from "date-fns";
 
   interface Props {
+    organizerId: number;
     contestId: number;
     open: boolean;
   }
 
-  let { contestId, open = $bindable() }: Props = $props();
+  let { organizerId, contestId, open = $bindable() }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
   let selectedContestId: number | undefined = $state();
@@ -32,7 +33,7 @@
   let copyProgress = $state(0);
   let copyCompleted = $state(false);
 
-  const contestsQuery = $derived(getAllContestsQuery());
+  const contestsQuery = $derived(getContestsByOrganizerQuery(organizerId));
 
   const availableContests = $derived.by(() => {
     if (!contestsQuery.data) {
@@ -41,7 +42,21 @@
 
     return contestsQuery.data
       .filter(({ id, archived }) => id !== contestId && !archived)
-      .sort((a, b) => b.created.getTime() - a.created.getTime());
+      .sort((a, b) => {
+        if (!a.timeBegin && !b.timeBegin) {
+          return b.created.getTime() - a.created.getTime();
+        }
+
+        if (!a.timeBegin) {
+          return 1;
+        }
+
+        if (!b.timeBegin) {
+          return -1;
+        }
+
+        return b.timeBegin.getTime() - a.timeBegin.getTime();
+      });
   });
 
   const selectedContest = $derived(

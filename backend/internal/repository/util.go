@@ -14,5 +14,13 @@ func nillableIntToResourceID[T domain.ResourceIDType](value *int32) *T {
 	return &out
 }
 
-var mysqlForeignKeyConstraintViolation = mysql.MySQLError{Number: 1452}
-var mysqlDuplicateKeyConstraintViolation = mysql.MySQLError{Number: 1062}
+var mysqlForeignKeyConstraintViolation = mysql.MySQLError{
+	Number:   1452,
+	SQLState: [5]byte{},
+	Message:  "",
+}
+var mysqlDuplicateKeyConstraintViolation = mysql.MySQLError{
+	Number:   1062,
+	SQLState: [5]byte{},
+	Message:  "",
+}

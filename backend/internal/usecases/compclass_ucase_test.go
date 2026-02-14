@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/testutils"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/stretchr/testify/assert"
@@ -16,8 +17,8 @@ import (
 func TestGetCompClass(t *testing.T) {
 	t.Parallel()
 
-	fakedCompClassID := randomResourceID[domain.CompClassID]()
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
@@ -48,10 +49,10 @@ func TestGetCompClass(t *testing.T) {
 func TestGetCompClassesByContest(t *testing.T) {
 	t.Parallel()
 
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 
 	fakedCompClasses := []domain.CompClass{{
-		ID:        randomResourceID[domain.CompClassID](),
+		ID:        testutils.RandomResourceID[domain.CompClassID](),
 		ContestID: fakedContestID,
 	},
 	}
@@ -75,12 +76,12 @@ func TestGetCompClassesByContest(t *testing.T) {
 }
 
 func TestCreateCompClass(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedCompClassID := randomResourceID[domain.CompClassID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 
 	now := time.Now()
 
@@ -197,8 +198,8 @@ func TestCreateCompClass(t *testing.T) {
 func TestDeleteCompClass(t *testing.T) {
 	t.Parallel()
 
-	fakedCompClassID := randomResourceID[domain.CompClassID]()
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
@@ -293,8 +294,8 @@ func TestDeleteCompClass(t *testing.T) {
 func TestPatchCompClass(t *testing.T) {
 	t.Parallel()
 
-	fakedCompClassID := randomResourceID[domain.CompClassID]()
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
