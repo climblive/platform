@@ -14,11 +14,13 @@
 
   let {
     label,
-    value = $bindable(),
+    value,
     required = false,
     allowClear = false,
     name,
   }: Props = $props();
+
+  const id = $props.id();
 
   const colors = [
     "#6f3601",
@@ -39,15 +41,24 @@
   let hiddenInput: HTMLInputElement | undefined = $state();
 
   const handleColorSelect = (color: string) => {
-    value = color;
+    if (!hiddenInput) {
+      return;
+    }
+
+    hiddenInput.value = color;
     popover?.hide();
+
     if (hiddenInput) {
       hiddenInput.dispatchEvent(new Event("input", { bubbles: true }));
     }
   };
 
   const handleClear = () => {
-    value = undefined;
+    if (!hiddenInput) {
+      return;
+    }
+
+    hiddenInput.value = "";
     popover?.hide();
     if (hiddenInput) {
       hiddenInput.dispatchEvent(new Event("input", { bubbles: true }));
@@ -56,21 +67,17 @@
 </script>
 
 <div class="hold-color-picker">
-  <label id="{name}-label">{label}</label>
+  <label for={id}>{label}</label>
   <input
     bind:this={hiddenInput}
     type="hidden"
-    id={name}
+    {id}
     {name}
     {required}
     value={value ?? ""}
   />
-  <wa-button
-    id="{name}-trigger"
-    size="small"
-    appearance="plain"
-    aria-labelledby="{name}-label"
-  >
+
+  <wa-button size="small" appearance="plain" aria-labelledby={id}>
     <div class="trigger-content">
       {#if value}
         <HoldColorIndicator primary={value} />
@@ -157,7 +164,8 @@
     content: "";
     width: 24px;
     height: 24px;
-    background-image: linear-gradient(45deg, #ccc 25%, transparent 25%),
+    background-image:
+      linear-gradient(45deg, #ccc 25%, transparent 25%),
       linear-gradient(-45deg, #ccc 25%, transparent 25%),
       linear-gradient(45deg, transparent 75%, #ccc 75%),
       linear-gradient(-45deg, transparent 75%, #ccc 75%);
