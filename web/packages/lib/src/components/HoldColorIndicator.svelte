@@ -1,6 +1,6 @@
 <script lang="ts">
   interface Props {
-    primary: string;
+    primary?: string;
     secondary?: string | undefined;
   }
 
