@@ -183,6 +183,7 @@
   <wa-divider style="--color: var(--wa-color-brand-fill-normal);"></wa-divider>
   <div class="controls">
     <wa-select
+      size="small"
       bind:this={compClassSelect}
       label="Competition class"
       hint="Change the class for this contender."
@@ -201,6 +202,7 @@
     </wa-select>
 
     <wa-switch
+      size="small"
       bind:this={withdrawFromFinalsToggle}
       hint="In case the contender does not wish to take part in the finals."
       {@attach checked(contender.withdrawnFromFinals)}
@@ -219,10 +221,11 @@
       >
     {:else}
       <wa-button
+        size="small"
         variant="danger"
         onclick={handleDisqualify}
         loading={patchContender.isPending}
-        >Disqualify contender<wa-icon slot="start" name="skull-crossbones"
+        >Disqualify contender<wa-icon slot="start" name="user-slash"
         ></wa-icon></wa-button
       >
     {/if}
