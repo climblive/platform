@@ -75,7 +75,7 @@
   <input bind:this={hiddenInput} type="hidden" {name} {required} {value} />
 
   <button {id} class="trigger-button" type="button">
-    <HoldColorIndicator --height="1.25rem" --width="1.25rem" primary={value} />
+    <HoldColorIndicator --height="2rem" --width="2rem" primary={value} />
   </button>
 
   <wa-popover
