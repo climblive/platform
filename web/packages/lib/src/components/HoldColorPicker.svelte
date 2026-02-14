@@ -74,11 +74,17 @@
   <label for={id}>{label}</label>
   <input bind:this={hiddenInput} type="hidden" {name} {required} {value} />
 
-  <wa-button size="small" appearance="plain" {id}>
+  <button {id} class="trigger-button" type="button">
     <HoldColorIndicator --height="1.25rem" --width="1.25rem" primary={value} />
-  </wa-button>
+  </button>
 
-  <wa-popover bind:this={popover} for={id} placement="top" istance={4}>
+  <wa-popover
+    bind:this={popover}
+    for={id}
+    placement="top"
+    istance={4}
+    skidding={20}
+  >
     <div class="popup-content" role="listbox" aria-label="Color selection">
       <div class="color-grid">
         {#each colors as color (color)}
@@ -127,6 +133,13 @@
     font-weight: var(--wa-form-control-label-font-weight);
     color: var(--wa-form-control-label-color);
     line-height: var(--wa-form-control-label-line-height);
+  }
+
+  .trigger-button {
+    border: none;
+    background: transparent;
+    width: max-content;
+    cursor: pointer;
   }
 
   wa-popover::part(body) {
