@@ -124,19 +124,17 @@
           >{format(contender.entered, "yyyy-MM-dd HH:mm")}</LabeledText
         >
       {/if}
-      {#if contender.disqualified}
-        <LabeledText label="Disqualified">Yes</LabeledText>
-      {/if}
-      {#if !contender.disqualified}
-        <LabeledText label="Placement"
-          >{contender.score?.placement ?? "-"}</LabeledText
-        >
-        <LabeledText label="Score">{contender.score?.score ?? "-"}</LabeledText>
-        <LabeledText label="Finalist">
-          <wa-icon name={contender.score?.finalist ? "medal" : "minus"}
-          ></wa-icon>
-        </LabeledText>
-      {/if}
+      <LabeledText label="Placement">
+        {#if contender.disqualified}
+          Disqualified
+        {:else}
+          {contender.score?.placement ?? "-"}
+        {/if}
+      </LabeledText>
+      <LabeledText label="Score">{contender.score?.score ?? "-"}</LabeledText>
+      <LabeledText label="Finalist">
+        <wa-icon name={contender.score?.finalist ? "medal" : "minus"}></wa-icon>
+      </LabeledText>
 
       <LabeledText label="Registration code">
         {contender.registrationCode}
