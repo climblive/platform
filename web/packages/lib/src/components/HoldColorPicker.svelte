@@ -1,5 +1,6 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/popover/popover.js";
   import type WaPopover from "@awesome.me/webawesome/dist/components/popover/popover.js";
   import HoldColorIndicator from "./HoldColorIndicator.svelte";
@@ -108,6 +109,7 @@
           aria-label="Clear color selection"
         >
           Clear
+          <wa-icon slot="start" name="xmark"></wa-icon>
         </wa-button>
       {/if}
     </div>
