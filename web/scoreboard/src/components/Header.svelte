@@ -36,11 +36,9 @@
           <Timer {endTime} label="Time remaining" />
         {/if}
       </div>
-      {#if classSize > 0}
-        <div class="size">
-          <strong>{classSize}</strong>/{totalSize}
-        </div>
-      {/if}
+      <div class="size">
+        <strong>{classSize}</strong>/{totalSize}
+      </div>
     </header>
   {/snippet}
 </ContestStateProvider>
