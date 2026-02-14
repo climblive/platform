@@ -76,16 +76,15 @@
       return;
     }
 
-    const selectedValue = Array.isArray(compClassSelect.value)
-      ? compClassSelect.value[0]
-      : compClassSelect.value;
-
-    const newCompClassId = parseInt(selectedValue, 10);
-    if (!isNaN(newCompClassId) && newCompClassId !== contender?.compClassId) {
-      patchContender.mutate({
-        compClassId: newCompClassId,
-      });
+    if (typeof compClassSelect.value !== "string") {
+      return;
     }
+
+    const newCompClassId = parseInt(compClassSelect.value, 10);
+
+    patchContender.mutate({
+      compClassId: newCompClassId,
+    });
   };
 </script>
 
@@ -187,12 +186,12 @@
       bind:this={compClassSelect}
       label="Competition class"
       hint="Change the class for this contender."
-      {@attach value(String(contender.compClassId))}
+      {@attach value(contender.compClassId)}
       onchange={handleCompClassChange}
       disabled={contender.disqualified || patchContender.isPending}
     >
       {#each compClasses as compClass (compClass.id)}
-        <wa-option value={String(compClass.id)} label={compClass.name}>
+        <wa-option value={compClass.id} label={compClass.name}>
           {compClass.name}
           {#if compClass.description}
             <small>{compClass.description}</small>
