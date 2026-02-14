@@ -29,6 +29,7 @@
     border-radius: var(--wa-border-radius-pill);
     border: var(--wa-form-control-border-width)
       var(--wa-form-control-border-style) var(--wa-form-control-border-color);
+    padding: var(--wa-space-3xs);
     box-sizing: border-box;
     overflow: hidden;
   }
