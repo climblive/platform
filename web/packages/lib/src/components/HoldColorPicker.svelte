@@ -93,8 +93,8 @@
             aria-selected={value === color}
           >
             <HoldColorIndicator
-              --height="1.25rem"
-              --width="1.25rem"
+              --height="2rem"
+              --width="2rem"
               primary={color}
             />
           </button>
