@@ -72,7 +72,7 @@
 </script>
 
 <div class="hold-color-picker">
-  <label for={id}>{label}</label>
+  <label for={id} class:required>{label}</label>
   <input bind:this={hiddenInput} type="hidden" {name} {required} {value} />
 
   <button {id} class="trigger-button" type="button">
@@ -129,6 +129,12 @@
     font-weight: var(--wa-form-control-label-font-weight);
     color: var(--wa-form-control-label-color);
     line-height: var(--wa-form-control-label-line-height);
+  }
+
+  label.required::after {
+    content: var(--wa-form-control-required-content);
+    color: var(--wa-form-control-required-content-color);
+    margin-inline-start: var(--wa-form-control-required-content-offset);
   }
 
   .trigger-button {
