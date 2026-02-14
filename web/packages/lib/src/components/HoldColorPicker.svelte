@@ -78,13 +78,7 @@
     <HoldColorIndicator --height="2rem" --width="2rem" primary={value} />
   </button>
 
-  <wa-popover
-    bind:this={popover}
-    for={id}
-    placement="top"
-    istance={4}
-    skidding={20}
-  >
+  <wa-popover bind:this={popover} for={id} placement="right" distance={10}>
     <div class="popup-content" role="listbox" aria-label="Color selection">
       <div class="color-grid">
         {#each colors as color (color)}
