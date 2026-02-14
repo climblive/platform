@@ -7,25 +7,66 @@
   let { primary, secondary }: Props = $props();
 </script>
 
-<svg viewBox="0 0 100 100">
-  <circle cx="50" cy="50" r="50" fill={primary} />
-  {#if secondary}
-    <path d="M0,50 a1,1 0 0,0 100,0" fill={secondary} />
-  {/if}
-  <circle
-    cx="50"
-    cy="50"
-    r="45"
-    fill="none"
-    stroke="var(--wa-color-text-normal)"
-    stroke-width="10"
-  />
-</svg>
+<div class="indicator" class:checkerboard={!primary}>
+  <svg viewBox="0 0 100 100">
+    {#if primary}
+      <circle cx="50" cy="50" r="50" fill={primary} />
+    {/if}
+    {#if secondary}
+      <path d="M0,50 a1,1 0 0,0 100,0" fill={secondary} />
+    {/if}
+    <circle
+      cx="50"
+      cy="50"
+      r="45"
+      fill="none"
+      stroke="var(--wa-color-text-normal)"
+      stroke-width="10"
+    />
+  </svg>
+</div>
 
 <style>
-  svg {
+  .indicator {
     height: var(--height, 100%);
     width: var(--width, 100%);
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  .checkerboard {
+    background-image:
+      linear-gradient(
+        45deg,
+        var(--wa-color-neutral-fill-normal) 25%,
+        transparent 25%
+      ),
+      linear-gradient(
+        45deg,
+        transparent 75%,
+        var(--wa-color-neutral-fill-normal) 75%
+      ),
+      linear-gradient(
+        45deg,
+        transparent 75%,
+        var(--wa-color-neutral-fill-normal) 75%
+      ),
+      linear-gradient(
+        45deg,
+        var(--wa-color-neutral-fill-normal) 25%,
+        transparent 25%
+      );
+    background-size: 8px 8px;
+    background-position:
+      0 0,
+      0 0,
+      -4px -4px,
+      4px 4px;
+  }
+
+  svg {
+    height: 100%;
+    width: 100%;
     transform: rotate(-45deg);
   }
 </style>
