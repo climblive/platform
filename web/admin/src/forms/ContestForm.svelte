@@ -16,8 +16,8 @@
 
   export const retentionOptions = [
     { label: "1 week", value: 7 * 24 * 60 * nanosecondsInMinute },
-    { label: "2 weeks", value: 14 * 24 * 60 * nanosecondsInMinute },
-    { label: "1 month", value: 30 * 24 * 60 * nanosecondsInMinute },
+    { label: "2 weeks", value: 2 * 7 * 24 * 60 * nanosecondsInMinute },
+    { label: "4 weeks", value: 4 * 7 * 24 * 60 * nanosecondsInMinute },
   ];
 </script>
 

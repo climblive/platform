@@ -7,10 +7,12 @@
   import { checked, GenericForm, name, value } from "@climblive/lib/forms";
   import { type ContenderPatch } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
-  import { isAfter } from "date-fns";
+  import { z } from "@climblive/lib/utils";
+  import { add, formatDistance, isAfter } from "date-fns";
   import { getContext, type Snippet } from "svelte";
   import type { Readable } from "svelte/store";
-  import { z } from "@climblive/lib/utils";
+
+  export const nanosecondsInMinute = 60 * 1_000_000_000;
 
   const registrationFormSchema: z.ZodType<ContenderPatch> = z.object({
     name: z.string().min(1),
@@ -20,15 +22,26 @@
 
   interface Props {
     data: Partial<ContenderPatch>;
+    nameRetentionTime: number;
     submit: (patch: ContenderPatch) => void;
     children?: Snippet;
   }
 
-  let { data, submit, children }: Props = $props();
+  let { data, nameRetentionTime, submit, children }: Props = $props();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
   let compClassesQuery = $derived(getCompClassesQuery($session.contestId));
+
+  const retentionDuration = $derived.by(() => {
+    const base = new Date(0);
+    return formatDistance(
+      add(base, {
+        minutes: nameRetentionTime / nanosecondsInMinute,
+      }),
+      base,
+    );
+  });
 </script>
 
 {#if compClassesQuery.data}
@@ -38,6 +51,7 @@
         size="small"
         {@attach name("name")}
         label="Name"
+        hint="Your name will be anonymized {retentionDuration} after the contest ends."
         type="text"
         required
         value={data.name}

@@ -5,6 +5,7 @@
   import type { ContenderPatch } from "@climblive/lib/models";
   import {
     getContenderQuery,
+    getContestQuery,
     patchContenderMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
@@ -16,9 +17,11 @@
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
   const contenderQuery = $derived(getContenderQuery($session.contenderId));
+  const contestQuery = $derived(getContestQuery($session.contestId));
   const patchContender = $derived(patchContenderMutation($session.contenderId));
 
   let contender = $derived(contenderQuery.data);
+  let contest = $derived(contestQuery.data);
 
   const gotoScorecard = () => {
     navigate(`/${contender?.registrationCode}`);
@@ -41,11 +44,12 @@
   };
 </script>
 
-{#if !contender}
+{#if !contender || !contest}
   <Loading />
 {:else}
   <RegistrationForm
     submit={handleSubmit}
+    nameRetentionTime={contest.nameRetentionTime}
     data={{
       name: contender.name,
       compClassId: contender.compClassId,
