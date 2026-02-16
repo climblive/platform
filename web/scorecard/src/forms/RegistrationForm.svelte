@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { ScorecardSession } from "@/types";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
@@ -51,11 +53,15 @@
         size="small"
         {@attach name("name")}
         label="Name"
-        hint="Your name will be anonymized {retentionDuration} after the contest ends."
         type="text"
         required
         value={data.name}
       ></wa-input>
+      <wa-callout variant="neutral" size="small" open>
+        <wa-icon slot="icon" name="circle-info"></wa-icon>
+        Your name will be removed and your results anonymized
+        {retentionDuration} after the contest ends.
+      </wa-callout>
       <wa-select
         size="small"
         {@attach name("compClassId")}
