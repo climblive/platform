@@ -14,7 +14,7 @@
     placement: "top" | "bottom" | "left" | "right";
   }
 
-  let {
+  const {
     label,
     required = false,
     allowClear = false,
