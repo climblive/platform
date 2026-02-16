@@ -117,6 +117,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 		Name:                contender.Name,
 		WithdrawnFromFinals: contender.WithdrawnFromFinals,
 		Disqualified:        contender.Disqualified,
+		ScrubbedAt:          contender.ScrubbedAt,
 	}
 
 	publicInfoEventBaseline := publicInfoEvent

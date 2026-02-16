@@ -8,5 +8,6 @@ export const scoreboardEntrySchema: z.ZodType<ScoreboardEntry> = z.object({
   name: z.string(),
   withdrawnFromFinals: z.boolean(),
   disqualified: z.boolean(),
+  scrubbedAt: z.coerce.date().optional(),
   score: scoreSchema.optional(),
 });

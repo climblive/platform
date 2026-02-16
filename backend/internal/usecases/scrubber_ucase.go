@@ -56,6 +56,7 @@ func (uc *ScrubberUseCase) ScrubContenders(ctx context.Context, deadline time.Ti
 			Name:                "",
 			WithdrawnFromFinals: contender.WithdrawnFromFinals,
 			Disqualified:        contender.Disqualified,
+			ScrubbedAt:          contender.ScrubbedAt,
 		})
 	}
 

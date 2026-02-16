@@ -197,6 +197,7 @@
         name: event.name,
         withdrawnFromFinals: event.withdrawnFromFinals,
         disqualified: event.disqualified,
+        scrubbedAt: event.scrubbedAt,
       });
     });
 

@@ -207,6 +207,7 @@ type ScoreboardEntry struct {
 	Name                string      `json:"name"`
 	WithdrawnFromFinals bool        `json:"withdrawnFromFinals"`
 	Disqualified        bool        `json:"disqualified"`
+	ScrubbedAt          time.Time   `json:"scrubbedAt,omitzero"`
 	Score               *Score      `json:"score,omitempty"`
 }
 
@@ -307,6 +308,7 @@ type ContenderPublicInfoUpdatedEvent struct {
 	Name                string      `json:"name"`
 	WithdrawnFromFinals bool        `json:"withdrawnFromFinals"`
 	Disqualified        bool        `json:"disqualified"`
+	ScrubbedAt          time.Time   `json:"scrubbedAt,omitzero"`
 }
 
 type ContenderScoreUpdatedEvent struct {

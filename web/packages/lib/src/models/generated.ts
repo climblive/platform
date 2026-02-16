@@ -15,17 +15,8 @@ export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
 export type OrganizerInviteID = string;
-export type ResourceIDType =
-  | CompClassID
-  | ContenderID
-  | ContestID
-  | OrganizerID
-  | ProblemID
-  | RaffleID
-  | RaffleWinnerID
-  | SeriesID
-  | UserID
-  | TickID;
+export type ResourceIDType = 
+    CompClassID | ContenderID | ContestID | OrganizerID | ProblemID | RaffleID | RaffleWinnerID | SeriesID | UserID | TickID;
 export type ScoreEngineInstanceID = string;
 
 //////////
@@ -204,6 +195,7 @@ export interface ScoreboardEntry {
   name: string;
   withdrawnFromFinals: boolean;
   disqualified: boolean;
+  scrubbedAt?: Date;
   score?: Score;
 }
 export interface Tick {
@@ -287,6 +279,7 @@ export interface ContenderPublicInfoUpdatedEvent {
   name: string;
   withdrawnFromFinals: boolean;
   disqualified: boolean;
+  scrubbedAt?: Date;
 }
 export interface ContenderScoreUpdatedEvent {
   timestamp: Date;

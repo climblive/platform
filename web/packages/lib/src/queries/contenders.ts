@@ -63,7 +63,11 @@ export const updateContenderPublicInfoInQueryCache = (
   contenderId: number,
   updatedPublicInfo: Pick<
     Contender,
-    "compClassId" | "name" | "withdrawnFromFinals" | "disqualified"
+    | "compClassId"
+    | "name"
+    | "withdrawnFromFinals"
+    | "disqualified"
+    | "scrubbedAt"
   >,
 ) => {
   const queryKey: QueryKey = ["contender", { id: contenderId }];

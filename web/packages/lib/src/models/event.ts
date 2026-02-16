@@ -14,6 +14,7 @@ export const contenderPublicInfoUpdatedEventSchema: z.ZodType<ContenderPublicInf
     name: z.string(),
     withdrawnFromFinals: z.boolean(),
     disqualified: z.boolean(),
+    scrubbedAt: z.coerce.date().optional(),
   });
 
 export const contenderScoreUpdatedEventSchema: z.ZodType<ContenderScoreUpdatedEvent> =

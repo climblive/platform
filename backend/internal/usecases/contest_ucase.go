@@ -117,6 +117,7 @@ func (uc *ContestUseCase) GetScoreboard(ctx context.Context, contestID domain.Co
 			Name:                contender.Name,
 			WithdrawnFromFinals: contender.WithdrawnFromFinals,
 			Disqualified:        contender.Disqualified,
+			ScrubbedAt:          contender.ScrubbedAt,
 			Score:               contender.Score,
 		}
 
