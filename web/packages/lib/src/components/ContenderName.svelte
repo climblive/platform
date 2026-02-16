@@ -20,7 +20,7 @@
 
 {#if scrubbedAt}
   <wa-tooltip for={tooltipId}
-    >Name was scrubbed on {format(scrubbedAt, "yyyy-MM-dd HH:mm")}</wa-tooltip
+    >Anonymized on {format(scrubbedAt, "yyyy-MM-dd HH:mm")}</wa-tooltip
   >
 {/if}
 
