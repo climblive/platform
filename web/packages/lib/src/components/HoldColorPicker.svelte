@@ -10,7 +10,7 @@
     value?: string;
     required?: boolean;
     allowClear?: boolean;
-    name?: string;
+    name: string;
     placement: "top" | "bottom" | "left" | "right";
   }
 
