@@ -21,6 +21,7 @@ import (
 	"github.com/climblive/platform/backend/internal/handlers/rest"
 	"github.com/climblive/platform/backend/internal/repository"
 	"github.com/climblive/platform/backend/internal/scores"
+	"github.com/climblive/platform/backend/internal/scrubber"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/utils"
 	"github.com/google/uuid"
@@ -34,49 +35,6 @@ import (
 var embedMigrations embed.FS
 
 const defaultScoreEngineMaxLifetime = 24 * time.Hour
-
-type scrubberRunner struct {
-	useCase  *usecases.ScrubberUseCase
-	interval time.Duration
-}
-
-func newScrubberRunner(useCase *usecases.ScrubberUseCase, interval time.Duration) *scrubberRunner {
-	return &scrubberRunner{useCase: useCase, interval: interval}
-}
-
-func (s *scrubberRunner) run(ctx context.Context) *sync.WaitGroup {
-	var wg sync.WaitGroup
-	wg.Add(1)
-
-	go func() {
-		defer wg.Done()
-
-		for {
-			next := time.Now().Add(s.interval).Round(time.Hour)
-
-			delay := time.Until(next)
-			slog.Info("scrubber scheduled", "next_run", next, "delay", delay, "interval", s.interval)
-
-			select {
-			case <-ctx.Done():
-				return
-			case <-time.After(delay):
-				slog.Info("running contender scrubber")
-				count, err := s.useCase.ScrubContenders(ctx, time.Now().Add(s.interval).Round(time.Hour))
-				if err != nil {
-					if stack := utils.GetErrorStack(err); stack != "" {
-						slog.Error("scrubber error", "stack", stack)
-					}
-					slog.Error("failed to scrub contenders", "error", err)
-				} else {
-					slog.Info("contender scrubber completed", "count", count)
-				}
-			}
-		}
-	}()
-
-	return &wg
-}
 
 type registrationCodeGenerator struct {
 }
@@ -176,12 +134,12 @@ func main() {
 	scrubberUseCase := usecases.ScrubberUseCase{Repo: database, EventBroker: eventBroker}
 	scrubInterval := time.Hour
 	slog.Info("contender scrubber interval configured", "interval", scrubInterval)
-	scrubberRunner := newScrubberRunner(&scrubberUseCase, scrubInterval)
+	scrubberRunner := scrubber.New(&scrubberUseCase, scrubInterval)
 
 	barriers = append(barriers,
 		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
 		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()),
-		scrubberRunner.run(ctx))
+		scrubberRunner.Run(ctx))
 
 	mux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
 
