@@ -248,6 +248,38 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 	return withScore(contender, uc.ScoreKeeper), nil
 }
 
+func (uc *ContenderUseCase) ScrubContender(ctx context.Context, contenderID domain.ContenderID) (domain.Contender, error) {
+	var mty domain.Contender
+
+	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
+	if err != nil {
+		return mty, errors.Wrap(err, 0)
+	}
+
+	if _, err := uc.Authorizer.HasOwnership(ctx, contender.Ownership); err != nil {
+		return mty, errors.Wrap(err, 0)
+	}
+
+	contender.Name = ""
+	contender.ScrubbedAt = time.Now()
+
+	contender, err = uc.Repo.StoreContender(ctx, nil, contender)
+	if err != nil {
+		return mty, errors.Wrap(err, 0)
+	}
+
+	uc.EventBroker.Dispatch(contender.ContestID, domain.ContenderPublicInfoUpdatedEvent{
+		ContenderID:         contender.ID,
+		CompClassID:         contender.CompClassID,
+		Name:                "",
+		WithdrawnFromFinals: contender.WithdrawnFromFinals,
+		Disqualified:        contender.Disqualified,
+		ScrubbedAt:          contender.ScrubbedAt,
+	})
+
+	return withScore(contender, uc.ScoreKeeper), nil
+}
+
 func (uc *ContenderUseCase) DeleteContender(ctx context.Context, contenderID domain.ContenderID) error {
 	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
 	if err != nil {

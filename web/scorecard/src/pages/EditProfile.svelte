@@ -2,11 +2,15 @@
   import RegistrationForm from "@/forms/RegistrationForm.svelte";
   import type { ScorecardSession } from "@/types";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+  import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import type { ContenderPatch } from "@climblive/lib/models";
   import {
     getContenderQuery,
     getContestQuery,
     patchContenderMutation,
+    scrubContenderMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import { getContext } from "svelte";
@@ -19,9 +23,12 @@
   const contenderQuery = $derived(getContenderQuery($session.contenderId));
   const contestQuery = $derived(getContestQuery($session.contestId));
   const patchContender = $derived(patchContenderMutation($session.contenderId));
+  const scrubContender = $derived(scrubContenderMutation($session.contenderId));
 
   let contender = $derived(contenderQuery.data);
   let contest = $derived(contestQuery.data);
+
+  let scrubDialog: WaDialog | undefined = $state();
 
   const gotoScorecard = () => {
     navigate(`/${contender?.registrationCode}`);
@@ -42,6 +49,13 @@
       },
     );
   };
+
+  const handleScrub = () => {
+    scrubContender.mutate(undefined, {
+      onSuccess: gotoScorecard,
+      onError: () => toastError("Failed to remove your name."),
+    });
+  };
 </script>
 
 {#if !contender || !contest}
@@ -57,6 +71,23 @@
     }}
   >
     <div class="controls">
+      {#if !contender.scrubbedAt}
+        <wa-button
+          class="scrub-button"
+          size="small"
+          type="button"
+          variant="danger"
+          appearance="plain"
+          onclick={() => {
+            if (scrubDialog) {
+              scrubDialog.open = true;
+            }
+          }}
+        >
+          <wa-icon slot="start" name="user-slash"></wa-icon>
+          Remove my name
+        </wa-button>
+      {/if}
       <wa-button
         size="small"
         type="button"
@@ -75,6 +106,33 @@
       </wa-button>
     </div>
   </RegistrationForm>
+
+  <wa-dialog bind:this={scrubDialog} label="Remove your name?">
+    Your name will be permanently removed and your results will be anonymized.
+    <br /><br />
+    Be aware that without a name, you may lose your chance at finals or prizes in
+    raffles since your results will be unidentifiable.
+    <wa-button
+      size="small"
+      slot="footer"
+      appearance="plain"
+      onclick={() => {
+        if (scrubDialog) {
+          scrubDialog.open = false;
+        }
+      }}>Cancel</wa-button
+    >
+    <wa-button
+      size="small"
+      slot="footer"
+      variant="danger"
+      loading={scrubContender.isPending}
+      onclick={handleScrub}
+    >
+      <wa-icon slot="start" name="user-slash"></wa-icon>
+      Anonymize
+    </wa-button>
+  </wa-dialog>
 {/if}
 
 <style>
@@ -82,5 +140,9 @@
     display: flex;
     justify-content: end;
     gap: var(--wa-space-xs);
+
+    & > .scrub-button {
+      margin-right: auto;
+    }
   }
 </style>
