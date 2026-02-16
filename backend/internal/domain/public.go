@@ -178,12 +178,13 @@ type Raffle struct {
 }
 
 type RaffleWinner struct {
-	ID            RaffleWinnerID `json:"id"`
-	Ownership     OwnershipData  `json:"-"`
-	RaffleID      RaffleID       `json:"raffleId"`
-	ContenderID   ContenderID    `json:"contenderId"`
-	ContenderName string         `json:"contenderName" tstype:"string,readonly"`
-	Timestamp     time.Time      `json:"timestamp"`
+	ID                  RaffleWinnerID `json:"id"`
+	Ownership           OwnershipData  `json:"-"`
+	RaffleID            RaffleID       `json:"raffleId"`
+	ContenderID         ContenderID    `json:"contenderId"`
+	ContenderName       string         `json:"contenderName" tstype:"string,readonly"`
+	ContenderScrubbedAt time.Time      `json:"contenderScrubbedAt,omitzero" tstype:"Date,readonly"`
+	Timestamp           time.Time      `json:"timestamp"`
 }
 
 type Score struct {
@@ -329,8 +330,7 @@ type ScoreEngineStoppedEvent struct {
 }
 
 type RaffleWinnerDrawnEvent struct {
-	RaffleID      RaffleID    `json:"raffleId"`
-	ContenderID   ContenderID `json:"contenderId"`
-	ContenderName string      `json:"contenderName"`
-	Timestamp     time.Time   `json:"timestamp"`
+	RaffleID    RaffleID    `json:"raffleId"`
+	ContenderID ContenderID `json:"contenderId"`
+	Timestamp   time.Time   `json:"timestamp"`
 }

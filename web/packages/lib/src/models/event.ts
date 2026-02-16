@@ -52,6 +52,5 @@ export const raffleWinnerDrawnEventSchema: z.ZodType<RaffleWinnerDrawnEvent> =
   z.object({
     raffleId: z.number(),
     contenderId: z.number(),
-    contenderName: z.string(),
     timestamp: z.coerce.date(),
   });

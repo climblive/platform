@@ -134,12 +134,13 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 	}
 
 	winner := domain.RaffleWinner{
-		ID:            0,
-		Ownership:     raffle.Ownership,
-		RaffleID:      raffle.ID,
-		ContenderID:   candidates[winnerIndex.Int64()].ID,
-		ContenderName: candidates[winnerIndex.Int64()].Name,
-		Timestamp:     time.Now(),
+		ID:                  0,
+		Ownership:           raffle.Ownership,
+		RaffleID:            raffle.ID,
+		ContenderID:         candidates[winnerIndex.Int64()].ID,
+		ContenderName:       candidates[winnerIndex.Int64()].Name,
+		ContenderScrubbedAt: candidates[winnerIndex.Int64()].ScrubbedAt,
+		Timestamp:           time.Now(),
 	}
 
 	createdWinner, err := uc.Repo.StoreRaffleWinner(ctx, nil, winner)
@@ -148,10 +149,9 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 	}
 
 	uc.EventBroker.Dispatch(raffle.ContestID, domain.RaffleWinnerDrawnEvent{
-		RaffleID:      createdWinner.RaffleID,
-		ContenderID:   createdWinner.ContenderID,
-		ContenderName: createdWinner.ContenderName,
-		Timestamp:     createdWinner.Timestamp,
+		RaffleID:    createdWinner.RaffleID,
+		ContenderID: createdWinner.ContenderID,
+		Timestamp:   createdWinner.Timestamp,
 	})
 
 	return createdWinner, nil

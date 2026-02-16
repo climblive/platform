@@ -175,6 +175,7 @@ export interface RaffleWinner {
   raffleId: RaffleID;
   contenderId: ContenderID;
   readonly contenderName: string;
+  readonly contenderScrubbedAt?: Date;
   timestamp: Date;
 }
 export interface Score {
@@ -298,6 +299,5 @@ export interface ScoreEngineStoppedEvent {
 export interface RaffleWinnerDrawnEvent {
   raffleId: RaffleID;
   contenderId: ContenderID;
-  contenderName: string;
   timestamp: Date;
 }

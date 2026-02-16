@@ -341,10 +341,9 @@ func TestDrawRaffleWinner(t *testing.T) {
 
 			mockedEventBroker.
 				On("Dispatch", fakedContestID, domain.RaffleWinnerDrawnEvent{
-					RaffleID:      fakedRaffleID,
-					ContenderID:   fakedContenderID,
-					ContenderName: "John Doe",
-					Timestamp:     time.Now(),
+					RaffleID:    fakedRaffleID,
+					ContenderID: fakedContenderID,
+					Timestamp:   time.Now(),
 				}).
 				Return()
 

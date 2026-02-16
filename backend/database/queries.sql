@@ -286,7 +286,7 @@ DELETE FROM raffle
 WHERE id = ?;
 
 -- name: GetRaffleWinners :many
-SELECT sqlc.embed(raffle_winner), contender.name
+SELECT sqlc.embed(raffle_winner), contender.name, contender.scrubbed_at
 FROM raffle_winner
 JOIN contender ON contender.id = raffle_winner.contender_id
 WHERE raffle_id = ?;

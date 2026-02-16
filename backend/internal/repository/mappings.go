@@ -157,17 +157,18 @@ func raffleToDomain(record database.Raffle) domain.Raffle {
 	}
 }
 
-func raffleWinnerToDomain(record database.RaffleWinner, name string) domain.RaffleWinner {
+func raffleWinnerToDomain(record database.RaffleWinner, name string, scrubbedAt time.Time) domain.RaffleWinner {
 	return domain.RaffleWinner{
 		ID: domain.RaffleWinnerID(record.ID),
 		Ownership: domain.OwnershipData{
 			OrganizerID: domain.OrganizerID(record.OrganizerID),
 			ContenderID: nil,
 		},
-		RaffleID:      domain.RaffleID(record.RaffleID),
-		ContenderID:   domain.ContenderID(record.ContenderID),
-		ContenderName: name,
-		Timestamp:     record.Timestamp,
+		RaffleID:            domain.RaffleID(record.RaffleID),
+		ContenderID:         domain.ContenderID(record.ContenderID),
+		ContenderName:       name,
+		ContenderScrubbedAt: scrubbedAt,
+		Timestamp:           record.Timestamp,
 	}
 }
 

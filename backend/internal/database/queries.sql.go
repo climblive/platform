@@ -859,7 +859,7 @@ func (q *Queries) GetRaffle(ctx context.Context, id int32) (GetRaffleRow, error)
 }
 
 const getRaffleWinners = `-- name: GetRaffleWinners :many
-SELECT raffle_winner.id, raffle_winner.organizer_id, raffle_winner.raffle_id, raffle_winner.contender_id, raffle_winner.timestamp, contender.name
+SELECT raffle_winner.id, raffle_winner.organizer_id, raffle_winner.raffle_id, raffle_winner.contender_id, raffle_winner.timestamp, contender.name, contender.scrubbed_at
 FROM raffle_winner
 JOIN contender ON contender.id = raffle_winner.contender_id
 WHERE raffle_id = ?
@@ -868,6 +868,7 @@ WHERE raffle_id = ?
 type GetRaffleWinnersRow struct {
 	RaffleWinner RaffleWinner
 	Name         sql.NullString
+	ScrubbedAt   sql.NullTime
 }
 
 func (q *Queries) GetRaffleWinners(ctx context.Context, raffleID int32) ([]GetRaffleWinnersRow, error) {
@@ -886,6 +887,7 @@ func (q *Queries) GetRaffleWinners(ctx context.Context, raffleID int32) ([]GetRa
 			&i.RaffleWinner.ContenderID,
 			&i.RaffleWinner.Timestamp,
 			&i.Name,
+			&i.ScrubbedAt,
 		); err != nil {
 			return nil, err
 		}
