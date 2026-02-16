@@ -64,6 +64,7 @@ func TestGetScoreboard(t *testing.T) {
 			Name:                fmt.Sprintf("Climber %d", i),
 			WithdrawnFromFinals: true,
 			Disqualified:        true,
+			ScrubbedAt:          currentTime,
 			Score: &domain.Score{
 				ContenderID: contenderID,
 				Score:       i * 10,
@@ -110,6 +111,7 @@ func TestGetScoreboard(t *testing.T) {
 	assert.Equal(t, "Climber 1", scoreboard[0].Name)
 	assert.Equal(t, true, scoreboard[0].WithdrawnFromFinals)
 	assert.Equal(t, true, scoreboard[0].Disqualified)
+	assert.Equal(t, currentTime, scoreboard[0].ScrubbedAt)
 	assert.NotNil(t, scoreboard[0].Score)
 	assert.Equal(t, future, scoreboard[0].Score.Timestamp)
 	assert.Equal(t, 1234, scoreboard[0].Score.Score)
@@ -125,6 +127,7 @@ func TestGetScoreboard(t *testing.T) {
 		assert.Equal(t, fmt.Sprintf("Climber %d", i), entry.Name)
 		assert.Equal(t, true, entry.WithdrawnFromFinals)
 		assert.Equal(t, true, entry.Disqualified)
+		assert.Equal(t, currentTime, entry.ScrubbedAt)
 		assert.NotNil(t, entry.Score)
 		assert.Equal(t, currentTime, entry.Score.Timestamp)
 		assert.Equal(t, i*10, entry.Score.Score)
