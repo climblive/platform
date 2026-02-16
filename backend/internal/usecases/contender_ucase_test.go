@@ -640,11 +640,13 @@ func TestPatchContender(t *testing.T) {
 
 	currentTime := time.Now()
 	gracePeriod := 15 * time.Minute
+	fakedNameRetentionTime := 7 * 24 * time.Hour
 
 	makeMockedRepo := func(contender domain.Contender) *repositoryMock {
 		fakedContest := domain.Contest{
-			ID:          fakedContestID,
-			GracePeriod: gracePeriod,
+			ID:                fakedContestID,
+			GracePeriod:       gracePeriod,
+			NameRetentionTime: fakedNameRetentionTime,
 		}
 
 		mockedRepo := new(repositoryMock)
@@ -834,6 +836,7 @@ func TestPatchContender(t *testing.T) {
 		assert.Equal(t, fakedCompClassID, contender.CompClassID)
 		assert.Equal(t, "John Doe", contender.Name)
 		assert.WithinDuration(t, time.Now(), contender.Entered, time.Minute)
+		assert.Equal(t, currentTime.Add(time.Hour).Add(fakedNameRetentionTime), contender.ScrubBefore)
 
 		mockedEventBroker.AssertCalled(t, "Dispatch", fakedContestID, domain.ContenderEnteredEvent{
 			ContenderID: fakedContenderID,
@@ -949,6 +952,7 @@ func TestPatchContender(t *testing.T) {
 			Entered:             currentTime,
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
+			ScrubBefore:         currentTime.Add(42 * time.Hour),
 		}
 
 		mockedRepo := makeMockedRepo(fakedContender)
@@ -1004,6 +1008,7 @@ func TestPatchContender(t *testing.T) {
 		assert.Equal(t, true, contender.WithdrawnFromFinals)
 		assert.Equal(t, true, contender.Disqualified)
 		assert.Equal(t, currentTime, contender.Entered)
+		assert.Equal(t, currentTime.Add(42*time.Hour), contender.ScrubBefore)
 
 		mockedEventBroker.AssertCalled(t, "Dispatch", fakedContestID, domain.ContenderSwitchedClassEvent{
 			ContenderID: fakedContenderID,
