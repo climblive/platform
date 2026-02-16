@@ -192,9 +192,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 			return mty, errors.Errorf("%w: %w", domain.ErrInvalidData, domain.ErrEmptyName)
 		}
 
-		if !contender.ScrubbedAt.IsZero() {
-			contender.ScrubbedAt = time.Time{}
-		}
+		contender.ScrubbedAt = time.Time{}
 	}
 
 	if patch.WithdrawnFromFinals.Present && contender.WithdrawnFromFinals != patch.WithdrawnFromFinals.Value {
