@@ -54,7 +54,7 @@ func (s *scrubberRunner) run(ctx context.Context) *sync.WaitGroup {
 		for {
 			next := time.Now().Add(s.interval).Round(time.Hour)
 
-			delay := next.Sub(time.Now())
+			delay := time.Until(next)
 			slog.Info("scrubber scheduled", "next_run", next, "delay", delay, "interval", s.interval)
 
 			select {
