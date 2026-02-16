@@ -19,7 +19,7 @@
     disqualified: boolean;
   }
 
-  let {
+  const {
     registrationCode,
     contestName,
     compClassName,

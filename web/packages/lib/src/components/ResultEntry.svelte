@@ -29,6 +29,7 @@
     <ContenderName
       id={scoreboardEntry.contenderId}
       name={scoreboardEntry.name}
+      scrubbedAt={scoreboardEntry.scrubbedAt}
     />
   </div>
   <div class="score">

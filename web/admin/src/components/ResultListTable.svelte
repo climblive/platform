@@ -111,12 +111,17 @@
   ];
 </script>
 
-{#snippet renderName({ contenderId, name, disqualified }: ScoreboardEntry)}
+{#snippet renderName({
+  contenderId,
+  name,
+  disqualified,
+  scrubbedAt,
+}: ScoreboardEntry)}
   <Link to={`./contenders/${contenderId}`}>
     {#if disqualified}
-      <del><ContenderName id={contenderId} {name} /></del>
+      <del><ContenderName id={contenderId} {name} {scrubbedAt} /></del>
     {:else}
-      <ContenderName id={contenderId} {name} />
+      <ContenderName id={contenderId} {name} {scrubbedAt} />
     {/if}
   </Link>
 {/snippet}
