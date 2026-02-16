@@ -110,8 +110,8 @@
   <wa-dialog bind:this={scrubDialog} label="Remove your name?">
     Your name will be permanently removed and your results will be anonymized.
     <br /><br />
-    Be aware that without a name, you may lose your chance at finals or prizes in
-    raffles since your results will be unidentifiable.
+    Be aware that without a name, you may lose your chance at finals or any prizes
+    in raffles since you will become anonymous.
     <wa-button
       size="small"
       slot="footer"
