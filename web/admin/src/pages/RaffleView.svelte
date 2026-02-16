@@ -74,8 +74,16 @@
   ];
 </script>
 
-{#snippet renderName({ contenderName, contenderId, contenderScrubbedAt }: RaffleWinner)}
-  <ContenderName id={contenderId} name={contenderName} scrubbedAt={contenderScrubbedAt} />
+{#snippet renderName({
+  contenderName,
+  contenderId,
+  contenderScrubbedAt,
+}: RaffleWinner)}
+  <ContenderName
+    id={contenderId}
+    name={contenderName}
+    scrubbedAt={contenderScrubbedAt}
+  />
 {/snippet}
 
 {#snippet renderTimestamp({ timestamp }: RaffleWinner)}
