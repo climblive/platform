@@ -468,6 +468,38 @@ func TestDrawRaffleWinner(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
+	t.Run("AllContendersScrubbed", func(t *testing.T) {
+		mockedRepo, _, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		contenders := makeContenders(5)
+		for i := range contenders {
+			contenders[i].ScrubbedAt = time.Now()
+		}
+
+		mockedRepo.
+			On("GetContendersByContest", mock.Anything, nil, fakedContestID).
+			Return(contenders, nil)
+
+		mockedRepo.
+			On("GetRaffleWinners", mock.Anything, nil, fakedRaffleID).
+			Return([]domain.RaffleWinner{}, nil)
+
+		ucase := usecases.RaffleUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.DrawRaffleWinner(context.Background(), fakedRaffleID)
+		require.ErrorIs(t, err, domain.ErrAllWinnersDrawn)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
 	t.Run("BadCredentials", func(t *testing.T) {
 		mockedRepo, _, mockedAuthorizer := makeMocks()
 
