@@ -119,6 +119,10 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 			continue
 		}
 
+		if !contender.ScrubbedAt.IsZero() {
+			continue
+		}
+
 		if _, alreadyDrawn := winnersSet[contender.ID]; !alreadyDrawn {
 			candidates = append(candidates, contender)
 		}
