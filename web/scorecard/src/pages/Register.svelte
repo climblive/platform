@@ -53,6 +53,7 @@
   <h1>{contest.name}</h1>
   <RegistrationForm
     submit={handleSubmit}
+    nameRetentionTime={contest.nameRetentionTime}
     data={{
       name: contender.name,
       compClassId: contender.compClassId,

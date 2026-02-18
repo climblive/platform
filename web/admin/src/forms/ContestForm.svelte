@@ -9,9 +9,16 @@
     description: z.string().optional(),
     info: z.string().optional(),
     gracePeriod: z.coerce.number().min(0).max(60),
+    nameRetentionTime: z.coerce.number(),
   });
 
-  export const minuteInNanoseconds = 60 * 1_000_000_000;
+  export const nanosecondsInMinute = 60 * 1_000_000_000;
+
+  export const retentionOptions = [
+    { label: "1 week", value: 7 * 24 * 60 * nanosecondsInMinute },
+    { label: "2 weeks", value: 2 * 7 * 24 * 60 * nanosecondsInMinute },
+    { label: "4 weeks", value: 4 * 7 * 24 * 60 * nanosecondsInMinute },
+  ];
 </script>
 
 <script lang="ts">
@@ -19,6 +26,7 @@
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import "@awesome.me/webawesome/dist/components/option/option.js";
+  import "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
@@ -58,6 +66,7 @@
       type="text"
       required
       value={data.name}
+      hint="The name of the contest as shown to contenders."
     ></wa-input>
     <wa-input
       size="small"
@@ -65,6 +74,7 @@
       label="Description"
       type="text"
       value={data.description}
+      hint="A short description or tagline for the contest."
     ></wa-input>
     <wa-input
       size="small"
@@ -79,6 +89,7 @@
       {@attach name("country")}
       {@attach value(selectedCountry)}
       label="Country"
+      hint="The country where the contest is held."
       onchange={handleCountryChange}
     >
       <span slot="start">{getFlag(selectedCountry)}</span>
@@ -97,10 +108,22 @@
       required
       min={0}
       max={60}
-      value={Math.floor((data.gracePeriod ?? 0) / minuteInNanoseconds)}
+      value={Math.floor((data.gracePeriod ?? 0) / nanosecondsInMinute)}
     >
       <span slot="end">minutes</span>
     </wa-number-input>
+    <wa-radio-group
+      size="small"
+      {@attach name("nameRetentionTime")}
+      {@attach value(data.nameRetentionTime)}
+      orientation="horizontal"
+      label="Retention time"
+      hint="How long contender names are retained after the contest ends before results are anonymized."
+    >
+      {#each retentionOptions as option (option.value)}
+        <wa-radio value={String(option.value)}>{option.label}</wa-radio>
+      {/each}
+    </wa-radio-group>
     <InfoInput info={data.info} />
     {@render children?.()}
   </fieldset>

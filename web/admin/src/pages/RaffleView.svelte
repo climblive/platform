@@ -4,6 +4,7 @@
   import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import {
+    ContenderName,
     EmptyState,
     Table,
     type ColumnDefinition,
@@ -73,8 +74,16 @@
   ];
 </script>
 
-{#snippet renderName({ contenderName }: RaffleWinner)}
-  {contenderName}
+{#snippet renderName({
+  contenderName,
+  contenderId,
+  contenderScrubbedAt,
+}: RaffleWinner)}
+  <ContenderName
+    id={contenderId}
+    name={contenderName}
+    scrubbedAt={contenderScrubbedAt}
+  />
 {/snippet}
 
 {#snippet renderTimestamp({ timestamp }: RaffleWinner)}

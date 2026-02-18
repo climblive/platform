@@ -48,6 +48,8 @@ func (v ContestValidator) Validate(contest domain.Contest) error {
 	case contest.QualifyingProblems < 0 || contest.QualifyingProblems > 65536:
 		fallthrough
 	case contest.GracePeriod < 0 || contest.GracePeriod > time.Hour:
+		fallthrough
+	case !isValidNameRetentionTime(contest.NameRetentionTime):
 		return errors.Errorf("%w: %w", domain.ErrInvalidData, errContestConstraintViolation)
 	}
 
@@ -56,4 +58,15 @@ func (v ContestValidator) Validate(contest domain.Contest) error {
 
 func (v ContestValidator) IsValidationError(err error) bool {
 	return errors.Is(err, errContestConstraintViolation)
+}
+
+func isValidNameRetentionTime(d time.Duration) bool {
+	switch d {
+	case 7 * 24 * time.Hour,
+		14 * 24 * time.Hour,
+		28 * 24 * time.Hour:
+		return true
+	default:
+		return false
+	}
 }
