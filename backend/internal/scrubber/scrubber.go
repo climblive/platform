@@ -11,11 +11,11 @@ import (
 )
 
 type scrubber struct {
-	useCase  *usecases.ScrubberUseCase
+	useCase  *usecases.ContenderUseCase
 	interval time.Duration
 }
 
-func New(useCase *usecases.ScrubberUseCase, interval time.Duration) *scrubber {
+func New(useCase *usecases.ContenderUseCase, interval time.Duration) *scrubber {
 	return &scrubber{useCase: useCase, interval: interval}
 }
 

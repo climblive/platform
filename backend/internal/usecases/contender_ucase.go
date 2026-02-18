@@ -21,6 +21,7 @@ type contenderUseCaseRepository interface {
 	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
 	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error)
 	GetNumberOfContenders(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (int, error)
+	GetScrubEligibleContenders(ctx context.Context, deadline time.Time) ([]domain.Contender, error)
 }
 
 type ContenderUseCase struct {
@@ -365,4 +366,47 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID doma
 	}
 
 	return contenders, err
+}
+
+func (uc *ContenderUseCase) ScrubContenders(ctx context.Context, deadline time.Time) (int, error) {
+	contenders, err := uc.Repo.GetScrubEligibleContenders(ctx, deadline)
+	if err != nil {
+		return 0, errors.Wrap(err, 0)
+	}
+
+	if len(contenders) == 0 {
+		return 0, nil
+	}
+
+	tx, err := uc.Repo.Begin()
+	if err != nil {
+		return 0, errors.Wrap(err, 0)
+	}
+	defer tx.Rollback()
+
+	for i := range contenders {
+		contenders[i].Name = ""
+		contenders[i].ScrubbedAt = time.Now()
+
+		if _, err := uc.Repo.StoreContender(ctx, tx, contenders[i]); err != nil {
+			return 0, errors.Wrap(err, 0)
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return 0, errors.Wrap(err, 0)
+	}
+
+	for _, contender := range contenders {
+		uc.EventBroker.Dispatch(contender.ContestID, domain.ContenderPublicInfoUpdatedEvent{
+			ContenderID:         contender.ID,
+			CompClassID:         contender.CompClassID,
+			Name:                "",
+			WithdrawnFromFinals: contender.WithdrawnFromFinals,
+			Disqualified:        contender.Disqualified,
+			ScrubbedAt:          contender.ScrubbedAt,
+		})
+	}
+
+	return len(contenders), nil
 }
