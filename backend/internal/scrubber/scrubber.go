@@ -6,16 +6,19 @@ import (
 	"sync"
 	"time"
 
-	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/utils"
 )
 
+type contenderScrubber interface {
+	ScrubContenders(ctx context.Context, deadline time.Time) (int, error)
+}
+
 type scrubber struct {
-	useCase  *usecases.ContenderUseCase
+	useCase  contenderScrubber
 	interval time.Duration
 }
 
-func New(useCase *usecases.ContenderUseCase, interval time.Duration) *scrubber {
+func New(useCase contenderScrubber, interval time.Duration) *scrubber {
 	return &scrubber{useCase: useCase, interval: interval}
 }
 
