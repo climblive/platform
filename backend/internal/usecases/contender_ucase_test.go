@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -1505,5 +1506,114 @@ func TestPatchContender(t *testing.T) {
 
 		mockedAuthorizer.AssertExpectations(t)
 		mockedRepo.AssertExpectations(t)
+	})
+}
+
+func TestScrubContenders(t *testing.T) {
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedDeadline := time.Date(2025, 6, 15, 12, 0, 0, 0, time.UTC)
+
+	t.Run("HappyPath", func(t *testing.T) {
+		synctest.Test(t, func(t *testing.T) {
+			mockedRepo := new(repositoryMock)
+			mockedEventBroker := new(eventBrokerMock)
+			mockedTx := new(transactionMock)
+
+			fakedContenders := []domain.Contender{
+				{
+					ID:                  testutils.RandomResourceID[domain.ContenderID](),
+					ContestID:           fakedContestID,
+					CompClassID:         testutils.RandomResourceID[domain.CompClassID](),
+					Name:                "Alice",
+					WithdrawnFromFinals: false,
+					Disqualified:        false,
+				},
+				{
+					ID:                  testutils.RandomResourceID[domain.ContenderID](),
+					ContestID:           fakedContestID,
+					CompClassID:         testutils.RandomResourceID[domain.CompClassID](),
+					Name:                "Bob",
+					WithdrawnFromFinals: true,
+					Disqualified:        false,
+				},
+			}
+
+			mockedRepo.
+				On("GetScrubEligibleContenders", mock.Anything, fakedDeadline).
+				Return(fakedContenders, nil)
+
+			mockedRepo.On("Begin").Return(mockedTx, nil)
+
+			mockedRepo.
+				On("StoreContender", mock.Anything, mockedTx, domain.Contender{
+					ID:          fakedContenders[0].ID,
+					ContestID:   fakedContestID,
+					CompClassID: fakedContenders[0].CompClassID,
+					ScrubbedAt:  time.Now(),
+				}).
+				Return(domain.Contender{}, nil).Once()
+
+			mockedRepo.
+				On("StoreContender", mock.Anything, mockedTx, domain.Contender{
+					ID:                  fakedContenders[1].ID,
+					ContestID:           fakedContestID,
+					CompClassID:         fakedContenders[1].CompClassID,
+					WithdrawnFromFinals: true,
+					ScrubbedAt:          time.Now(),
+				}).
+				Return(domain.Contender{}, nil).Once()
+
+			mockedTx.On("Commit").Return(nil)
+			mockedTx.On("Rollback").Return()
+
+			mockedEventBroker.
+				On("Dispatch", fakedContestID, domain.ContenderPublicInfoUpdatedEvent{
+					ContenderID: fakedContenders[0].ID,
+					CompClassID: fakedContenders[0].CompClassID,
+					ScrubbedAt:  time.Now(),
+				}).Return()
+
+			mockedEventBroker.
+				On("Dispatch", fakedContestID, domain.ContenderPublicInfoUpdatedEvent{
+					ContenderID:         fakedContenders[1].ID,
+					CompClassID:         fakedContenders[1].CompClassID,
+					WithdrawnFromFinals: true,
+					ScrubbedAt:          time.Now(),
+				}).Return()
+
+			ucase := usecases.ContenderUseCase{
+				Repo:        mockedRepo,
+				EventBroker: mockedEventBroker,
+			}
+
+			count, err := ucase.ScrubContenders(context.Background(), fakedDeadline)
+
+			require.NoError(t, err)
+			assert.Equal(t, 2, count)
+
+			mockedRepo.AssertExpectations(t)
+			mockedEventBroker.AssertExpectations(t)
+			mockedTx.AssertExpectations(t)
+		})
+	})
+
+	t.Run("NoEligibleContenders", func(t *testing.T) {
+		mockedRepo := new(repositoryMock)
+
+		mockedRepo.
+			On("GetScrubEligibleContenders", mock.Anything, fakedDeadline).
+			Return([]domain.Contender{}, nil)
+
+		ucase := usecases.ContenderUseCase{
+			Repo: mockedRepo,
+		}
+
+		count, err := ucase.ScrubContenders(context.Background(), fakedDeadline)
+
+		require.NoError(t, err)
+		assert.Equal(t, 0, count)
+
+		mockedRepo.AssertExpectations(t)
+		mockedRepo.AssertNotCalled(t, "Begin")
 	})
 }
