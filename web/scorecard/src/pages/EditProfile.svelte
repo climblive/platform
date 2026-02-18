@@ -77,13 +77,14 @@
           size="small"
           type="button"
           variant="danger"
-          appearance="plain"
+          appearance="outlined"
           onclick={() => {
             if (scrubDialog) {
               scrubDialog.open = true;
             }
           }}
         >
+          <wa-icon slot="start" name="user-slash"></wa-icon>
           Remove my name
         </wa-button>
       {/if}
