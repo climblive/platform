@@ -84,7 +84,6 @@
             }
           }}
         >
-          <wa-icon slot="start" name="user-slash"></wa-icon>
           Remove my name
         </wa-button>
       {/if}
@@ -130,7 +129,7 @@
       onclick={handleScrub}
     >
       <wa-icon slot="start" name="user-slash"></wa-icon>
-      Anonymize
+      Remove name
     </wa-button>
   </wa-dialog>
 {/if}
