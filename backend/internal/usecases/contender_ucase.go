@@ -262,6 +262,7 @@ func (uc *ContenderUseCase) ScrubContender(ctx context.Context, contenderID doma
 
 	contender.Name = ""
 	contender.ScrubbedAt = time.Now()
+	contender.WithdrawnFromFinals = true
 
 	contender, err = uc.Repo.StoreContender(ctx, nil, contender)
 	if err != nil {
@@ -275,6 +276,10 @@ func (uc *ContenderUseCase) ScrubContender(ctx context.Context, contenderID doma
 		WithdrawnFromFinals: contender.WithdrawnFromFinals,
 		Disqualified:        contender.Disqualified,
 		ScrubbedAt:          contender.ScrubbedAt,
+	})
+
+	uc.EventBroker.Dispatch(contender.ContestID, domain.ContenderWithdrewFromFinalsEvent{
+		ContenderID: contenderID,
 	})
 
 	return withScore(contender, uc.ScoreKeeper), nil
