@@ -107,7 +107,7 @@
     </div>
   </RegistrationForm>
 
-  <wa-dialog bind:this={scrubDialog} label="Remove your name?">
+  <wa-dialog bind:this={scrubDialog} label="Remove your name">
     Your name will be permanently removed and your results will be anonymized.
     <br /><br />
     Be aware that without a name, you will lose your chance at the finals and any
@@ -130,7 +130,7 @@
       onclick={handleScrub}
     >
       <wa-icon slot="start" name="user-slash"></wa-icon>
-      Remove name
+      Remove my name anyway
     </wa-button>
   </wa-dialog>
 {/if}
