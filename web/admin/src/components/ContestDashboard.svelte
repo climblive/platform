@@ -1,11 +1,11 @@
 <script lang="ts">
   import {
     getCompClassesQuery,
-    getContendersByContestQuery,
     getContestQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
   import { getCountryName, getFlag } from "@climblive/lib/utils";
+  import { format } from "date-fns";
   import { navigate } from "svelte-routing";
 
   type Props = {
@@ -17,7 +17,6 @@
   const contestQuery = $derived(getContestQuery(contestId));
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
   const problemsQuery = $derived(getProblemsQuery(contestId));
-  const contendersQuery = $derived(getContendersByContestQuery(contestId));
 
   const contest = $derived(contestQuery.data);
   const compClassCount = $derived(compClassesQuery.data?.length ?? 0);
@@ -30,11 +29,9 @@
     return contest.timeBegin.toDateString() !== contest.timeEnd.toDateString();
   });
 
-  const formatDateTime = (date: Date) =>
-    date.toLocaleString(undefined, {
-      dateStyle: "medium",
-      timeStyle: "short",
-    });
+  const formatDateTime = (date: Date) => format(date, "MMM d, yyyy HH:mm");
+  const formatDate = (date: Date) => format(date, "MMM d, yyyy");
+  const formatTime = (date: Date) => format(date, "HH:mm");
 </script>
 
 {#if contest}
@@ -67,29 +64,21 @@
     {#if contest.timeBegin && !contestSpansMultipleDays}
       <span>
         <wa-icon name="calendar"></wa-icon>
-
-        {new Date(contest.timeBegin).toLocaleDateString(undefined, {
-          dateStyle: "medium",
-        })}
+        {formatDate(new Date(contest.timeBegin))}
       </span>
     {/if}
 
     {#if contest.timeBegin && contest.timeEnd}
       <span>
         <wa-icon name="clock"></wa-icon>
-
         {#if contestSpansMultipleDays}
           {formatDateTime(new Date(contest.timeBegin))} – {formatDateTime(
             new Date(contest.timeEnd),
           )}
         {:else}
-          {new Date(contest.timeBegin).toLocaleTimeString(undefined, {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}–{new Date(contest.timeEnd).toLocaleTimeString(undefined, {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
+          {formatTime(new Date(contest.timeBegin))} – {formatTime(
+            new Date(contest.timeEnd),
+          )}
         {/if}
       </span>
     {/if}
