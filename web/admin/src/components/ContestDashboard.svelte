@@ -118,6 +118,5 @@
     flex-wrap: wrap;
     gap: var(--wa-space-xs);
     margin-block-start: var(--wa-space-xs);
-    font-size: var(--wa-font-size-s);
   }
 </style>
