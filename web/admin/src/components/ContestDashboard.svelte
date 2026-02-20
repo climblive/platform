@@ -90,9 +90,10 @@
       {contest.registeredContenders}
       {contest.registeredContenders === 1 ? "contender" : "contenders"}
     </span>
-    •
+    <span>•</span>
     {compClassCount}
-    {compClassCount === 1 ? "class" : "classes"} •
+    {compClassCount === 1 ? "class" : "classes"}
+    <span>•</span>
     {problemCount}
     {problemCount === 1 ? "problem" : "problems"}
   </div>
