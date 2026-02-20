@@ -61,7 +61,9 @@
 {/snippet}
 
 {#snippet scoreValue()}
-  <strong>{score}</strong> pts
+  <span class="score">
+    <strong>{score}</strong> pts
+  </span>
 {/snippet}
 
 {#snippet placementValue()}
@@ -128,5 +130,9 @@
 
   .stat.disabled {
     opacity: 0.5;
+  }
+
+  .score {
+    white-space: nowrap;
   }
 </style>
