@@ -83,20 +83,16 @@
       </span>
     {/if}
   </div>
-
-  <div class="meta">
-    <span>
-      <wa-icon name="users"></wa-icon>
-      {contest.registeredContenders}
-      {contest.registeredContenders === 1 ? "contender" : "contenders"}
-    </span>
-    <span>•</span>
-    {compClassCount}
-    {compClassCount === 1 ? "class" : "classes"}
-    <span>•</span>
-    {problemCount}
-    {problemCount === 1 ? "problem" : "problems"}
-  </div>
+  <br />
+  <span class="summary">
+    {contest.registeredContenders} contender{contest.registeredContenders === 1
+      ? ""
+      : "s"}
+    across {compClassCount} class{compClassCount === 1 ? "" : "es"}
+    competing in a contest with {problemCount} problem{problemCount === 1
+      ? ""
+      : "s"}.
+  </span>
 {/if}
 
 <style>
