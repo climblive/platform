@@ -22,7 +22,6 @@
   const contest = $derived(contestQuery.data);
   const compClassCount = $derived(compClassesQuery.data?.length ?? 0);
   const problemCount = $derived(problemsQuery.data?.length ?? 0);
-  const ticketCount = $derived(contendersQuery.data?.length ?? 0);
   const contestSpansMultipleDays = $derived.by(() => {
     if (contest?.timeBegin === undefined || contest?.timeEnd === undefined) {
       return false;
@@ -97,10 +96,15 @@
   </div>
 
   <div class="meta">
-    <wa-icon name="users"></wa-icon>
-    {contest.registeredContenders} / {ticketCount} contenders •
-    {compClassCount} classes •
-    {problemCount} problems
+    <span>
+      <wa-icon name="users"></wa-icon>
+      {contest.registeredContenders}
+      {contest.registeredContenders === 1 ? "contender" : "contenders"} •
+    </span>
+    {compClassCount}
+    {compClassCount === 1 ? "class" : "classes"} •
+    {problemCount}
+    {problemCount === 1 ? "problem" : "problems"}
   </div>
 {/if}
 

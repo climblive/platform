@@ -89,7 +89,6 @@
       <div class="results-section">
         <wa-button
           size="small"
-          class="view-results-button"
           appearance="outlined"
           variant="brand"
           onclick={() => navigate(`/admin/contests/${contest.id}/results`)}
@@ -171,10 +170,6 @@
     gap: var(--wa-space-m);
     flex-wrap: wrap;
     margin-block-start: var(--wa-space-l);
-  }
-
-  .view-results-button {
-    margin-inline-start: auto;
   }
 
   .actions {
