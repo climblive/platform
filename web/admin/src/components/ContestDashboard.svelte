@@ -89,9 +89,7 @@
       ? ""
       : "s"}
     across {compClassCount} class{compClassCount === 1 ? "" : "es"}
-    competing in a contest with {problemCount} problem{problemCount === 1
-      ? ""
-      : "s"}.
+    competed on {problemCount} problem{problemCount === 1 ? "" : "s"}.
   </span>
 {/if}
 
