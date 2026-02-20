@@ -88,8 +88,9 @@
     <span>
       <wa-icon name="users"></wa-icon>
       {contest.registeredContenders}
-      {contest.registeredContenders === 1 ? "contender" : "contenders"} •
+      {contest.registeredContenders === 1 ? "contender" : "contenders"}
     </span>
+    •
     {compClassCount}
     {compClassCount === 1 ? "class" : "classes"} •
     {problemCount}
