@@ -16,6 +16,7 @@
   import OrganizerView from "./pages/OrganizerView.svelte";
   import PrintableTicketList from "./pages/PrintableTicketList.svelte";
   import RaffleView from "./pages/RaffleView.svelte";
+  import ResultsPage from "./pages/ResultsPage.svelte";
   import Root from "./pages/Root.svelte";
   import TicketsListPage from "./pages/TicketsListPage.svelte";
 </script>
@@ -85,6 +86,11 @@
     <Route path="/raffles/:raffleId">
       {#snippet children({ params }: { params: { raffleId: number } })}
         <RaffleView raffleId={Number(params.raffleId)} />
+      {/snippet}
+    </Route>
+    <Route path="/contests/:contestId/results">
+      {#snippet children({ params }: { params: { contestId: number } })}
+        <ResultsPage contestId={Number(params.contestId)} />
       {/snippet}
     </Route>
     <Route path="/contests/:contestId/tickets">

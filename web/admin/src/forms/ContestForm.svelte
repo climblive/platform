@@ -47,6 +47,8 @@
       selectedCountry = target.value;
     }
   };
+
+  let showGeneralInfo = $derived(data.info !== undefined);
 </script>
 
 <GenericForm {schema} {submit}>
@@ -101,7 +103,18 @@
     >
       <span slot="end">minutes</span>
     </wa-number-input>
-    <InfoInput info={data.info} />
+    {#if showGeneralInfo}
+      <InfoInput info={data.info} />
+    {:else}
+      <wa-button
+        size="small"
+        appearance="outlined"
+        onclick={() => (showGeneralInfo = true)}
+      >
+        <wa-icon slot="start" name="plus"></wa-icon>
+        Add general info
+      </wa-button>
+    {/if}
     {@render children?.()}
   </fieldset>
 </GenericForm>
