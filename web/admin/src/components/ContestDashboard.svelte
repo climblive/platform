@@ -55,7 +55,7 @@
     <span>
       <wa-icon name="location-dot"></wa-icon>
       {#if contest.location}
-        {contest.location}, 
+        {contest.location},
       {/if}
       {getCountryName(contest.country)}
       {getFlag(contest.country)}
@@ -83,14 +83,14 @@
       </span>
     {/if}
   </div>
-  <br />
-  <span class="summary">
+
+  <div class="summary">
     {contest.registeredContenders} contender{contest.registeredContenders === 1
       ? ""
       : "s"}
     across {compClassCount} class{compClassCount === 1 ? "" : "es"}
     attempted {problemCount} problem{problemCount === 1 ? "" : "s"}.
-  </span>
+  </div>
 {/if}
 
 <style>
@@ -118,5 +118,9 @@
     flex-wrap: wrap;
     gap: var(--wa-space-xs);
     margin-block-start: var(--wa-space-xs);
+  }
+
+  .summary {
+    margin-block-start: var(--wa-space-m);
   }
 </style>
