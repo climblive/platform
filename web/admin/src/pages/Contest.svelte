@@ -82,11 +82,10 @@
 
     {#if contest.archived === true}
       <RestoreContest {contestId} />
-    {/if}
-
-    {#if contest.archived === false}
+    {:else}
       <ContestDashboard contestId={contest.id} />
-      <div class="results-section">
+
+      <div class="results">
         <wa-button
           size="small"
           appearance="outlined"
@@ -163,18 +162,13 @@
     --color: var(--wa-color-brand-fill-normal);
   }
 
-  .results-section {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--wa-space-m);
-    flex-wrap: wrap;
-    margin-block-start: var(--wa-space-l);
-  }
-
   .actions {
     display: flex;
     gap: var(--wa-space-xs);
     flex-wrap: wrap;
+  }
+
+  .results {
+    margin-block-start: var(--wa-space-m);
   }
 </style>
