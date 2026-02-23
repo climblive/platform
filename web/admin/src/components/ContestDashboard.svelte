@@ -55,8 +55,8 @@
     <span>
       <wa-icon name="location-dot"></wa-icon>
       {#if contest.location}
-        {contest.location}
-      {/if},
+        {contest.location}, 
+      {/if}
       {getCountryName(contest.country)}
       {getFlag(contest.country)}
     </span>
