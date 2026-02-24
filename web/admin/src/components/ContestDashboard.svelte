@@ -78,7 +78,7 @@
     <p class="description">{contest.description}</p>
   {/if}
   <div class="meta">
-    <span>
+    <span class="location">
       <wa-icon name="location-dot"></wa-icon>
       {#if contest.location}
         {contest.location},
@@ -127,6 +127,10 @@
 <style>
   wa-divider {
     --color: var(--wa-color-brand-fill-normal);
+  }
+
+  .location {
+    width: 100%;
   }
 
   .heading {
