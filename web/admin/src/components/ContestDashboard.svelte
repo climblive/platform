@@ -60,7 +60,9 @@
 
 {#if contest}
   <div class="heading">
-    <h2>{contest.name}</h2>
+    <h2>
+      {contest.name}
+    </h2>
     <wa-button
       size="small"
       appearance="plain"
@@ -104,15 +106,18 @@
             new Date(contest.timeEnd),
           )}
         {/if}
-        <ContestStateProvider
-          startTime={contest.timeBegin}
-          endTime={contest.timeEnd}
-        >
-          {#snippet children({ contestState })}
-            <wa-badge pill>{contestStateToString(contestState)}</wa-badge>
-          {/snippet}
-        </ContestStateProvider>
       </span>
+    {/if}
+
+    {#if contest.timeBegin && contest.timeEnd}
+      <ContestStateProvider
+        startTime={contest.timeBegin}
+        endTime={contest.timeEnd}
+      >
+        {#snippet children({ contestState })}
+          <wa-badge pill>{contestStateToString(contestState)}</wa-badge>
+        {/snippet}
+      </ContestStateProvider>
     {/if}
   </div>
 
@@ -141,6 +146,7 @@
 
   .meta {
     display: flex;
+    align-items: center;
     flex-wrap: wrap;
     gap: var(--wa-space-xs);
     margin-block-start: var(--wa-space-xs);
