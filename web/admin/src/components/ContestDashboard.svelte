@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { ContestStateProvider } from "@climblive/lib/components";
   import {
     getCompClassesQuery,
     getContestQuery,
@@ -33,6 +34,27 @@
   const formatDate = (date: Date) => format(date, "MMM d, yyyy");
   const formatTime = (date: Date) => format(date, "HH:mm");
 </script>
+
+{#snippet summary()}
+  {@const registeredContenders = contest?.registeredContenders ?? 0}
+
+  {@const contenderStr = (count: number) =>
+    count === 1 ? "1 contender" : `${count} contenders`}
+
+  {@const compClassStr = (count: number) =>
+    count === 1 ? "1 comp class" : `${count} comp classes`}
+
+  {@const problemStr = (count: number) =>
+    count === 1 ? "1 problem" : `${count} problems`}
+
+  <div class="summary">
+    <ul>
+      <li>{contenderStr(registeredContenders)}</li>
+      <li>{compClassStr(compClassCount)}</li>
+      <li>{problemStr(problemCount)}</li>
+    </ul>
+  </div>
+{/snippet}
 
 {#if contest}
   <div class="heading">
@@ -81,16 +103,18 @@
           )}
         {/if}
       </span>
+      <ContestStateProvider
+        startTime={contest.timeBegin}
+        endTime={contest.timeEnd}
+      >
+        {#snippet children({ contestState })}
+          <wa-badge>{contestState}</wa-badge>
+        {/snippet}
+      </ContestStateProvider>
     {/if}
   </div>
 
-  <div class="summary">
-    {contest.registeredContenders} contender{contest.registeredContenders === 1
-      ? ""
-      : "s"}
-    across {compClassCount} class{compClassCount === 1 ? "" : "es"}
-    attempted {problemCount} problem{problemCount === 1 ? "" : "s"}.
-  </div>
+  <div class="summary">{@render summary()}</div>
 {/if}
 
 <style>
@@ -122,5 +146,22 @@
 
   .summary {
     margin-block-start: var(--wa-space-m);
+
+    & ul {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      flex-wrap: wrap;
+    }
+
+    & li {
+      white-space: nowrap;
+    }
+
+    & li:not(:last-of-type)::after {
+      content: "●";
+      margin-inline: var(--wa-space-xs);
+    }
   }
 </style>
