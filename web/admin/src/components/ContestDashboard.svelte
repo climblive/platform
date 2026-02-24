@@ -166,4 +166,8 @@
       margin-inline: var(--wa-space-xs);
     }
   }
+
+  wa-badge {
+    font-size: var(--wa-font-size-xs);
+  }
 </style>
