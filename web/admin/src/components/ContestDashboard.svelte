@@ -1,10 +1,12 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import { ContestStateProvider } from "@climblive/lib/components";
   import {
     getCompClassesQuery,
     getContestQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
+  import { contestStateToString } from "@climblive/lib/types";
   import { getCountryName, getFlag } from "@climblive/lib/utils";
   import { format } from "date-fns";
   import { navigate } from "svelte-routing";
@@ -102,15 +104,15 @@
             new Date(contest.timeEnd),
           )}
         {/if}
+        <ContestStateProvider
+          startTime={contest.timeBegin}
+          endTime={contest.timeEnd}
+        >
+          {#snippet children({ contestState })}
+            <wa-badge pill>{contestStateToString(contestState)}</wa-badge>
+          {/snippet}
+        </ContestStateProvider>
       </span>
-      <ContestStateProvider
-        startTime={contest.timeBegin}
-        endTime={contest.timeEnd}
-      >
-        {#snippet children({ contestState })}
-          <wa-badge>{contestState}</wa-badge>
-        {/snippet}
-      </ContestStateProvider>
     {/if}
   </div>
 
