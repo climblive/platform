@@ -6,7 +6,7 @@
     getContestQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
-  import { contestStateToString } from "@climblive/lib/types";
+  import type { ContestState } from "@climblive/lib/types";
   import { getCountryName, getFlag } from "@climblive/lib/utils";
   import { format } from "date-fns";
   import { navigate } from "svelte-routing";
@@ -35,6 +35,18 @@
   const formatDateTime = (date: Date) => format(date, "MMM d, yyyy HH:mm");
   const formatDate = (date: Date) => format(date, "MMM d, yyyy");
   const formatTime = (date: Date) => format(date, "HH:mm");
+
+  const contestStateToString = (state: ContestState): string => {
+    switch (state) {
+      case "NOT_STARTED":
+        return "Upcoming";
+      case "RUNNING":
+        return "Ongoing";
+      case "GRACE_PERIOD":
+      case "ENDED":
+        return "Ended";
+    }
+  };
 </script>
 
 {#snippet summary()}
@@ -84,7 +96,7 @@
         {contest.location},
       {/if}
       {getCountryName(contest.country)}
-      {getFlag(contest.country)}
+      <span class="flag">{getFlag(contest.country)}</span>
     </span>
 
     {#if contest.timeBegin && !contestSpansMultipleDays}
@@ -131,6 +143,13 @@
 
   .location {
     width: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .flag {
+    font-size: var(--wa-font-size-larger);
+    margin-inline-start: var(--wa-space-2xs);
   }
 
   .heading {
@@ -172,7 +191,7 @@
     }
 
     & li:not(:last-of-type)::after {
-      content: "●";
+      content: "•";
       margin-inline: var(--wa-space-xs);
     }
   }
