@@ -56,7 +56,7 @@
     count === 1 ? "1 contender" : `${count} contenders`}
 
   {@const compClassStr = (count: number) =>
-    count === 1 ? "1 comp class" : `${count} comp classes`}
+    count === 1 ? "1 class" : `${count} classes`}
 
   {@const problemStr = (count: number) =>
     count === 1 ? "1 problem" : `${count} problems`}
