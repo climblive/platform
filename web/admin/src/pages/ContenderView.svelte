@@ -98,7 +98,7 @@
       >{contest.name}</wa-breadcrumb-item
     >
     <wa-breadcrumb-item
-      onclick={() => navigate(`/admin/contests/${contestId}#results`)}
+      onclick={() => navigate(`/admin/contests/${contestId}/results`)}
       >Results</wa-breadcrumb-item
     >
   </wa-breadcrumb>
