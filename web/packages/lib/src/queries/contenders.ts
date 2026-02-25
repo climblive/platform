@@ -47,8 +47,7 @@ export const scrubContenderMutation = (contenderId: number) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
-    mutationFn: async () =>
-      ApiClient.getInstance().scrubContender(contenderId),
+    mutationFn: async () => ApiClient.getInstance().scrubContender(contenderId),
     onSuccess: (updatedContender) => {
       const queryKey: QueryKey = ["contender", { id: contenderId }];
       client.setQueryData<Contender>(queryKey, updatedContender);
