@@ -32,9 +32,9 @@
     return contest.timeBegin.toDateString() !== contest.timeEnd.toDateString();
   });
 
-  const formatDateTime = (date: Date) => format(date, "MMM d, yyyy HH:mm");
-  const formatDate = (date: Date) => format(date, "MMM d, yyyy");
-  const formatTime = (date: Date) => format(date, "HH:mm");
+  const formatDateTime = (date: Date) => format(date, "PPpp");
+  const formatDate = (date: Date) => format(date, "PP");
+  const formatTime = (date: Date) => format(date, "pp");
 
   const contestStateToString = (state: ContestState): string => {
     switch (state) {
