@@ -126,7 +126,6 @@
         <wa-radio value={String(option.value)}>{option.label}</wa-radio>
       {/each}
     </wa-radio-group>
-    <InfoInput info={data.info} />
     {#if showGeneralInfo}
       <InfoInput info={data.info} />
     {:else}
