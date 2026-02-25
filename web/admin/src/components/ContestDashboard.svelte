@@ -89,12 +89,15 @@
   {#if contest.description}
     <p class="description">{contest.description}</p>
   {/if}
+
   <div class="meta">
     <span class="location">
       <wa-icon name="location-dot"></wa-icon>
+
       {#if contest.location}
         {contest.location},
       {/if}
+
       {getCountryName(contest.country)}
       <span class="flag">{getFlag(contest.country)}</span>
     </span>
@@ -102,6 +105,7 @@
     {#if contest.timeBegin && !contestSpansMultipleDays}
       <span>
         <wa-icon name="calendar"></wa-icon>
+
         {formatDate(new Date(contest.timeBegin))}
       </span>
     {/if}
@@ -109,6 +113,7 @@
     {#if contest.timeBegin && contest.timeEnd}
       <span>
         <wa-icon name="clock"></wa-icon>
+
         {#if contestSpansMultipleDays}
           {formatDateTime(new Date(contest.timeBegin))} – {formatDateTime(
             new Date(contest.timeEnd),
@@ -143,13 +148,10 @@
 
   .location {
     width: 100%;
-    display: flex;
-    align-items: center;
   }
 
   .flag {
     font-size: var(--wa-font-size-larger);
-    margin-inline-start: var(--wa-space-2xs);
   }
 
   .heading {
@@ -161,10 +163,6 @@
     & > h2 {
       margin: 0;
     }
-  }
-
-  .description {
-    margin-block-start: var(--wa-space-xs);
   }
 
   .meta {
