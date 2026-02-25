@@ -10,7 +10,7 @@
     children?: Snippet<[{ contestState: ContestState }]>;
   }
 
-  let {
+  const {
     startTime,
     endTime,
     gracePeriodEndTime = undefined,
