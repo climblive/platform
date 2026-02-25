@@ -51,6 +51,11 @@
   >
 {/snippet}
 
+<p class="copy">
+  Raffles are used to randomly select prize winners, typically after the contest
+  has ended.
+</p>
+
 <section>
   {#if raffles === undefined}
     <Loader />
@@ -75,5 +80,9 @@
     flex-direction: column;
     align-items: start;
     gap: var(--wa-space-m);
+  }
+
+  .copy {
+    color: var(--wa-color-text-quiet);
   }
 </style>
