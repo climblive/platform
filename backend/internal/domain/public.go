@@ -45,6 +45,8 @@ type Contender struct {
 	Entered             time.Time     `json:"entered,omitzero"`
 	WithdrawnFromFinals bool          `json:"withdrawnFromFinals"`
 	Disqualified        bool          `json:"disqualified"`
+	ScrubbedAt          time.Time     `json:"scrubbedAt,omitzero"`
+	ScrubBefore         time.Time     `json:"scrubBefore,omitzero"`
 	Score               *Score        `json:"score,omitempty"`
 }
 
@@ -68,6 +70,7 @@ type Contest struct {
 	Finalists            int           `json:"finalists"`
 	Info                 string        `json:"info,omitempty"`
 	GracePeriod          time.Duration `json:"gracePeriod"`
+	NameRetentionTime    time.Duration `json:"nameRetentionTime"`
 	TimeBegin            time.Time     `json:"timeBegin,omitzero"`
 	TimeEnd              time.Time     `json:"timeEnd,omitzero"`
 	Created              time.Time     `json:"created"`
@@ -84,6 +87,7 @@ type ContestTemplate struct {
 	Finalists          int           `json:"finalists"`
 	Info               string        `json:"info,omitempty"`
 	GracePeriod        time.Duration `json:"gracePeriod"`
+	NameRetentionTime  time.Duration `json:"nameRetentionTime"`
 }
 
 type ContestPatch struct {
@@ -97,6 +101,7 @@ type ContestPatch struct {
 	Finalists          Patch[int]           `json:"finalists,omitzero" tstype:"number"`
 	Info               Patch[string]        `json:"info,omitzero" tstype:"string"`
 	GracePeriod        Patch[time.Duration] `json:"gracePeriod,omitzero" tstype:"number"`
+	NameRetentionTime  Patch[time.Duration] `json:"nameRetentionTime,omitzero" tstype:"number"`
 }
 
 type ContestTransferRequest struct {
@@ -173,12 +178,13 @@ type Raffle struct {
 }
 
 type RaffleWinner struct {
-	ID            RaffleWinnerID `json:"id"`
-	Ownership     OwnershipData  `json:"-"`
-	RaffleID      RaffleID       `json:"raffleId"`
-	ContenderID   ContenderID    `json:"contenderId"`
-	ContenderName string         `json:"contenderName" tstype:"string,readonly"`
-	Timestamp     time.Time      `json:"timestamp"`
+	ID                  RaffleWinnerID `json:"id"`
+	Ownership           OwnershipData  `json:"-"`
+	RaffleID            RaffleID       `json:"raffleId"`
+	ContenderID         ContenderID    `json:"contenderId"`
+	ContenderName       string         `json:"contenderName" tstype:"string,readonly"`
+	ContenderScrubbedAt time.Time      `json:"contenderScrubbedAt,omitzero" tstype:"Date,readonly"`
+	Timestamp           time.Time      `json:"timestamp"`
 }
 
 type Score struct {
@@ -202,6 +208,7 @@ type ScoreboardEntry struct {
 	Name                string      `json:"name"`
 	WithdrawnFromFinals bool        `json:"withdrawnFromFinals"`
 	Disqualified        bool        `json:"disqualified"`
+	ScrubbedAt          time.Time   `json:"scrubbedAt,omitzero"`
 	Score               *Score      `json:"score,omitempty"`
 }
 
@@ -302,6 +309,7 @@ type ContenderPublicInfoUpdatedEvent struct {
 	Name                string      `json:"name"`
 	WithdrawnFromFinals bool        `json:"withdrawnFromFinals"`
 	Disqualified        bool        `json:"disqualified"`
+	ScrubbedAt          time.Time   `json:"scrubbedAt,omitzero"`
 }
 
 type ContenderScoreUpdatedEvent struct {
@@ -322,8 +330,7 @@ type ScoreEngineStoppedEvent struct {
 }
 
 type RaffleWinnerDrawnEvent struct {
-	RaffleID      RaffleID    `json:"raffleId"`
-	ContenderID   ContenderID `json:"contenderId"`
-	ContenderName string      `json:"contenderName"`
-	Timestamp     time.Time   `json:"timestamp"`
+	RaffleID    RaffleID    `json:"raffleId"`
+	ContenderID ContenderID `json:"contenderId"`
+	Timestamp   time.Time   `json:"timestamp"`
 }

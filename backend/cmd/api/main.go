@@ -21,6 +21,7 @@ import (
 	"github.com/climblive/platform/backend/internal/handlers/rest"
 	"github.com/climblive/platform/backend/internal/repository"
 	"github.com/climblive/platform/backend/internal/scores"
+	"github.com/climblive/platform/backend/internal/scrubber"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/utils"
 	"github.com/google/uuid"
@@ -73,10 +74,10 @@ func main() {
 
 	slog.SetDefault(slog.New(
 		tint.NewHandler(w, &tint.Options{
-			Level:      slog.LevelDebug,
-			TimeFormat: time.Kitchen,
-			NoColor:    !isatty.IsTerminal(w.Fd()),
-			AddSource:  false,
+			Level:       slog.LevelDebug,
+			TimeFormat:  time.Kitchen,
+			NoColor:     !isatty.IsTerminal(w.Fd()),
+			AddSource:   false,
 			ReplaceAttr: nil,
 		}),
 	))
@@ -130,9 +131,15 @@ func main() {
 
 	scoreEngineManager := scores.NewScoreEngineManager(database, scoreEngineStoreHydrator, eventBroker, scoreEngineMaxLifetime)
 
+	scrubberUseCase := usecases.ContenderUseCase{Repo: database, EventBroker: eventBroker}
+	scrubInterval := time.Hour
+	slog.Info("contender scrubber interval configured", "interval", scrubInterval)
+	scrubberRunner := scrubber.New(&scrubberUseCase, scrubInterval)
+
 	barriers = append(barriers,
 		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
-		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()))
+		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()),
+		scrubberRunner.Run(ctx))
 
 	mux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
 

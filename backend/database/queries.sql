@@ -33,9 +33,9 @@ WHERE contest_id = ?;
 
 -- name: UpsertContender :execlastid
 INSERT INTO 
-	contender (id, organizer_id, contest_id, registration_code, name, class_id, entered, disqualified, withdrawn_from_finals)
+	contender (id, organizer_id, contest_id, registration_code, name, class_id, entered, disqualified, withdrawn_from_finals, scrubbed_at, scrub_before)
 VALUES 
-	(?, ?, ?, ?, ?, ?, ?, ?, ?)
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     contest_id = VALUES(contest_id),
@@ -44,7 +44,9 @@ ON DUPLICATE KEY UPDATE
     class_id = VALUES(class_id),
     entered = VALUES(entered),
     disqualified = VALUES(disqualified),
-    withdrawn_from_finals = VALUES(withdrawn_from_finals);
+    withdrawn_from_finals = VALUES(withdrawn_from_finals),
+    scrubbed_at = VALUES(scrubbed_at),
+    scrub_before = VALUES(scrub_before);
 
 -- name: UpsertScore :exec
 INSERT INTO
@@ -103,9 +105,9 @@ GROUP BY contest.id;
 
 -- name: UpsertContest :execlastid
 INSERT INTO 
-	contest (id, organizer_id, archived, series_id, name, description, location, country, qualifying_problems, finalists, info, grace_period, created)
+	contest (id, organizer_id, archived, series_id, name, description, location, country, qualifying_problems, finalists, info, grace_period, name_retention_time, created)
 VALUES 
-	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     archived = VALUES(archived),
@@ -118,6 +120,7 @@ ON DUPLICATE KEY UPDATE
     finalists = VALUES(finalists),
     info = VALUES(info),
     grace_period = VALUES(grace_period),
+    name_retention_time = VALUES(name_retention_time),
     created = VALUES(created);
 
 -- name: DeleteContest :exec
@@ -283,7 +286,7 @@ DELETE FROM raffle
 WHERE id = ?;
 
 -- name: GetRaffleWinners :many
-SELECT sqlc.embed(raffle_winner), contender.name
+SELECT sqlc.embed(raffle_winner), contender.name, contender.scrubbed_at
 FROM raffle_winner
 JOIN contender ON contender.id = raffle_winner.contender_id
 WHERE raffle_id = ?;
@@ -324,3 +327,13 @@ VALUES
 -- name: DeleteOrganizerInvite :exec
 DELETE FROM organizer_invite
 WHERE id = ?;
+
+-- name: GetScrubEligibleContenders :many
+SELECT sqlc.embed(contender), score.*
+FROM contender
+LEFT JOIN score ON score.contender_id = id
+WHERE (contender.name != '' 
+  OR contender.scrubbed_at IS NULL)
+  AND contender.scrub_before IS NOT NULL
+  AND contender.scrub_before < ?;
+

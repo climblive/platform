@@ -197,6 +197,7 @@
         name: event.name,
         withdrawnFromFinals: event.withdrawnFromFinals,
         disqualified: event.disqualified,
+        scrubbedAt: event.scrubbedAt,
       });
     });
 
@@ -277,7 +278,9 @@
             registrationCode={$session.registrationCode}
             contestName={contest.name}
             compClassName={selectedCompClass?.name}
+            contenderId={contender.id}
             contenderName={contender.name}
+            contenderScrubbedAt={contender.scrubbedAt}
             {score}
             {placement}
             {contestState}

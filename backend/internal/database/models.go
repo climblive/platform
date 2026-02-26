@@ -30,6 +30,8 @@ type Contender struct {
 	Entered             sql.NullTime
 	Disqualified        bool
 	WithdrawnFromFinals bool
+	ScrubbedAt          sql.NullTime
+	ScrubBefore         sql.NullTime
 }
 
 type Contest struct {
@@ -45,6 +47,7 @@ type Contest struct {
 	Finalists          int32
 	Info               sql.NullString
 	GracePeriod        int32
+	NameRetentionTime  int32
 	Created            time.Time
 }
 

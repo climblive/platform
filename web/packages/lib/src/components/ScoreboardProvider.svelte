@@ -1,7 +1,7 @@
 <script lang="ts">
+  import { z } from "@climblive/lib/utils";
   import { onDestroy, onMount, type Snippet } from "svelte";
   import { writable, type Writable } from "svelte/store";
-  import { z } from "@climblive/lib/utils";
   import { ApiClient } from "../Api";
   import {
     contenderPublicInfoUpdatedEventSchema,
@@ -197,6 +197,7 @@
         contender.name = event.name;
         contender.withdrawnFromFinals = event.withdrawnFromFinals;
         contender.disqualified = event.disqualified;
+        contender.scrubbedAt = event.scrubbedAt;
 
         contenders.set(event.contenderId, { ...contender });
       });

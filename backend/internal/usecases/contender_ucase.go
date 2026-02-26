@@ -21,6 +21,7 @@ type contenderUseCaseRepository interface {
 	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
 	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error)
 	GetNumberOfContenders(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (int, error)
+	GetScrubEligibleContenders(ctx context.Context, deadline time.Time) ([]domain.Contender, error)
 }
 
 type ContenderUseCase struct {
@@ -117,6 +118,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 		Name:                contender.Name,
 		WithdrawnFromFinals: contender.WithdrawnFromFinals,
 		Disqualified:        contender.Disqualified,
+		ScrubbedAt:          contender.ScrubbedAt,
 	}
 
 	publicInfoEventBaseline := publicInfoEvent
@@ -176,6 +178,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 
 		if contender.Entered.IsZero() {
 			contender.Entered = time.Now()
+			contender.ScrubBefore = compClass.TimeEnd.Add(contest.NameRetentionTime)
 		}
 	}
 
@@ -189,6 +192,8 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 		if contender.Name == "" {
 			return mty, errors.Errorf("%w: %w", domain.ErrInvalidData, domain.ErrEmptyName)
 		}
+
+		contender.ScrubbedAt = time.Time{}
 	}
 
 	if patch.WithdrawnFromFinals.Present && contender.WithdrawnFromFinals != patch.WithdrawnFromFinals.Value {
@@ -227,6 +232,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 	publicInfoEvent.Name = contender.Name
 	publicInfoEvent.WithdrawnFromFinals = contender.WithdrawnFromFinals
 	publicInfoEvent.Disqualified = contender.Disqualified
+	publicInfoEvent.ScrubbedAt = contender.ScrubbedAt
 
 	if publicInfoEvent != publicInfoEventBaseline {
 		events = append(events, publicInfoEvent)
@@ -239,6 +245,43 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 	for _, event := range events {
 		uc.EventBroker.Dispatch(contest.ID, event)
 	}
+
+	return withScore(contender, uc.ScoreKeeper), nil
+}
+
+func (uc *ContenderUseCase) ScrubContender(ctx context.Context, contenderID domain.ContenderID) (domain.Contender, error) {
+	var mty domain.Contender
+
+	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
+	if err != nil {
+		return mty, errors.Wrap(err, 0)
+	}
+
+	if _, err := uc.Authorizer.HasOwnership(ctx, contender.Ownership); err != nil {
+		return mty, errors.Wrap(err, 0)
+	}
+
+	contender.Name = ""
+	contender.ScrubbedAt = time.Now()
+	contender.WithdrawnFromFinals = true
+
+	contender, err = uc.Repo.StoreContender(ctx, nil, contender)
+	if err != nil {
+		return mty, errors.Wrap(err, 0)
+	}
+
+	uc.EventBroker.Dispatch(contender.ContestID, domain.ContenderPublicInfoUpdatedEvent{
+		ContenderID:         contender.ID,
+		CompClassID:         contender.CompClassID,
+		Name:                "",
+		WithdrawnFromFinals: contender.WithdrawnFromFinals,
+		Disqualified:        contender.Disqualified,
+		ScrubbedAt:          contender.ScrubbedAt,
+	})
+
+	uc.EventBroker.Dispatch(contender.ContestID, domain.ContenderWithdrewFromFinalsEvent{
+		ContenderID: contenderID,
+	})
 
 	return withScore(contender, uc.ScoreKeeper), nil
 }
@@ -304,6 +347,8 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID doma
 			Entered:             time.Time{},
 			WithdrawnFromFinals: false,
 			Disqualified:        false,
+			ScrubbedAt:          time.Time{},
+			ScrubBefore:         time.Time{},
 			Score:               nil,
 		}
 
@@ -321,4 +366,47 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, contestID doma
 	}
 
 	return contenders, err
+}
+
+func (uc *ContenderUseCase) ScrubContenders(ctx context.Context, deadline time.Time) (int, error) {
+	contenders, err := uc.Repo.GetScrubEligibleContenders(ctx, deadline)
+	if err != nil {
+		return 0, errors.Wrap(err, 0)
+	}
+
+	if len(contenders) == 0 {
+		return 0, nil
+	}
+
+	tx, err := uc.Repo.Begin()
+	if err != nil {
+		return 0, errors.Wrap(err, 0)
+	}
+	defer tx.Rollback()
+
+	for i := range contenders {
+		contenders[i].Name = ""
+		contenders[i].ScrubbedAt = time.Now()
+
+		if _, err := uc.Repo.StoreContender(ctx, tx, contenders[i]); err != nil {
+			return 0, errors.Wrap(err, 0)
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return 0, errors.Wrap(err, 0)
+	}
+
+	for _, contender := range contenders {
+		uc.EventBroker.Dispatch(contender.ContestID, domain.ContenderPublicInfoUpdatedEvent{
+			ContenderID:         contender.ID,
+			CompClassID:         contender.CompClassID,
+			Name:                "",
+			WithdrawnFromFinals: contender.WithdrawnFromFinals,
+			Disqualified:        contender.Disqualified,
+			ScrubbedAt:          contender.ScrubbedAt,
+		})
+	}
+
+	return len(contenders), nil
 }

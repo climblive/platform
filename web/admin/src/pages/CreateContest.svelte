@@ -1,7 +1,7 @@
 <script lang="ts">
   import ContestForm, {
     formSchema,
-    minuteInNanoseconds,
+    nanosecondsInMinute,
   } from "@/forms/ContestForm.svelte";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import type { Contest, ContestTemplate } from "@climblive/lib/models";
@@ -27,7 +27,7 @@
     createContest.mutate(
       {
         ...form,
-        gracePeriod: form.gracePeriod * minuteInNanoseconds,
+        gracePeriod: form.gracePeriod * nanosecondsInMinute,
         qualifyingProblems: 0,
         finalists: 0,
       },
@@ -44,7 +44,8 @@
   data={{
     name: "",
     country: "AQ",
-    gracePeriod: 15 * minuteInNanoseconds,
+    gracePeriod: 15 * nanosecondsInMinute,
+    nameRetentionTime: 10080 * nanosecondsInMinute,
   }}
   schema={formSchema}
 >

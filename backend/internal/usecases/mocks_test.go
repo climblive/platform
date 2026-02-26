@@ -2,6 +2,7 @@ package usecases_test
 
 import (
 	"context"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
@@ -77,6 +78,11 @@ func (m *repositoryMock) StoreContender(ctx context.Context, tx domain.Transacti
 func (m *repositoryMock) DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) error {
 	args := m.Called(ctx, tx, contenderID)
 	return args.Error(0)
+}
+
+func (m *repositoryMock) GetScrubEligibleContenders(ctx context.Context, deadline time.Time) ([]domain.Contender, error) {
+	args := m.Called(ctx, deadline)
+	return args.Get(0).([]domain.Contender), args.Error(1)
 }
 
 func (m *repositoryMock) GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error) {

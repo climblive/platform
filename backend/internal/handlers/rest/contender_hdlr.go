@@ -14,6 +14,7 @@ type contenderUseCase interface {
 	GetContendersByCompClass(ctx context.Context, compClassID domain.CompClassID) ([]domain.Contender, error)
 	GetContendersByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Contender, error)
 	PatchContender(ctx context.Context, contenderID domain.ContenderID, patch domain.ContenderPatch) (domain.Contender, error)
+	ScrubContender(ctx context.Context, contenderID domain.ContenderID) (domain.Contender, error)
 	DeleteContender(ctx context.Context, contenderID domain.ContenderID) error
 	CreateContenders(ctx context.Context, contestID domain.ContestID, number int) ([]domain.Contender, error)
 }
@@ -32,6 +33,7 @@ func InstallContenderHandler(mux *Mux, contenderUseCase contenderUseCase) {
 	mux.HandleFunc("GET /compClasses/{compClassID}/contenders", handler.GetContendersByCompClass)
 	mux.HandleFunc("GET /contests/{contestID}/contenders", handler.GetContendersByContest)
 	mux.HandleFunc("PATCH /contenders/{contenderID}", handler.PatchContender)
+	mux.HandleFunc("POST /contenders/{contenderID}/scrub", handler.ScrubContender)
 	mux.HandleFunc("DELETE /contenders/{contenderID}", handler.DeleteContender)
 	mux.HandleFunc("POST /contests/{contestID}/contenders", handler.CreateContenders)
 }
@@ -133,6 +135,22 @@ func (hdlr *contenderHandler) DeleteContender(w http.ResponseWriter, r *http.Req
 	}
 
 	writeResponse(w, http.StatusNoContent, nil)
+}
+
+func (hdlr *contenderHandler) ScrubContender(w http.ResponseWriter, r *http.Request) {
+	contenderID, err := parseResourceID[domain.ContenderID](r.PathValue("contenderID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	contender, err := hdlr.contenderUseCase.ScrubContender(r.Context(), contenderID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusOK, contender)
 }
 
 func (hdlr *contenderHandler) CreateContenders(w http.ResponseWriter, r *http.Request) {
