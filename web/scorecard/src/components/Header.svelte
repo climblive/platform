@@ -39,7 +39,6 @@
   <wa-button
     size="small"
     onclick={() => navigate(`/${registrationCode}/edit`)}
-    disabled={contestState === "ENDED"}
     appearance="plain"
   >
     <wa-icon name="gear" label="Edit"></wa-icon>

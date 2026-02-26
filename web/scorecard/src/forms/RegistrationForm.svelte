@@ -9,6 +9,7 @@
   import { checked, GenericForm, name, value } from "@climblive/lib/forms";
   import { type ContenderPatch } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
+  import type { ContestState } from "@climblive/lib/types";
   import { z } from "@climblive/lib/utils";
   import { add, formatDistance, isAfter } from "date-fns";
   import { getContext, type Snippet } from "svelte";
@@ -27,9 +28,11 @@
     nameRetentionTime: number;
     submit: (patch: ContenderPatch) => void;
     children?: Snippet;
+    contestState: ContestState;
   }
 
-  let { data, nameRetentionTime, submit, children }: Props = $props();
+  let { data, nameRetentionTime, submit, children, contestState }: Props =
+    $props();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
@@ -47,6 +50,8 @@
 </script>
 
 {#if compClassesQuery.data}
+  {@const disabled = contestState === "ENDED"}
+
   <GenericForm schema={registrationFormSchema} {submit}>
     <fieldset>
       <wa-input
@@ -56,6 +61,7 @@
         type="text"
         required
         value={data.name}
+        {disabled}
       ></wa-input>
       <wa-callout variant="neutral" size="small" open>
         <wa-icon slot="icon" name="circle-info"></wa-icon>
@@ -68,6 +74,7 @@
         label="Competition class"
         required
         {@attach value(data.compClassId)}
+        {disabled}
       >
         {#each compClassesQuery.data as compClass (compClass.id)}
           <wa-option
@@ -86,6 +93,7 @@
         size="small"
         {@attach name("withdrawnFromFinals")}
         hint="If you do not wish to participate in the finals, you can give up your spot."
+        {disabled}
         {@attach checked(data.withdrawnFromFinals)}>Opt out of finals</wa-switch
       >
       {@render children?.()}

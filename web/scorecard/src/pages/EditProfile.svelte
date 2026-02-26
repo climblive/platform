@@ -5,6 +5,7 @@
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import { ContestStateProvider } from "@climblive/lib/components";
   import type { ContenderPatch } from "@climblive/lib/models";
   import {
     getContenderQuery,
@@ -13,6 +14,7 @@
     scrubContenderMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
+  import { add } from "date-fns";
   import { getContext } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Readable } from "svelte/store";
@@ -56,56 +58,71 @@
       onError: () => toastError("Failed to remove your name."),
     });
   };
+
+  const startTime = $derived(contest?.timeBegin ?? new Date(8640000000000000));
+  const endTime = $derived(contest?.timeEnd ?? new Date(-8640000000000000));
+  const gracePeriodEndTime = $derived(
+    add(endTime, {
+      minutes: (contest?.gracePeriod ?? 0) / (1_000_000_000 * 60),
+    }),
+  );
 </script>
 
-{#if !contender || !contest}
+{#if !contender || !contest || !startTime || !endTime}
   <Loading />
 {:else}
-  <RegistrationForm
-    submit={handleSubmit}
-    nameRetentionTime={contest.nameRetentionTime}
-    data={{
-      name: contender.name,
-      compClassId: contender.compClassId,
-      withdrawnFromFinals: contender.withdrawnFromFinals,
-    }}
-  >
-    <div class="controls">
-      {#if !contender.scrubbedAt}
-        <wa-button
-          class="scrub-button"
-          size="small"
-          type="button"
-          variant="danger"
-          appearance="outlined"
-          onclick={() => {
-            if (scrubDialog) {
-              scrubDialog.open = true;
-            }
-          }}
-        >
-          <wa-icon slot="start" name="user-slash"></wa-icon>
-          Remove my name
-        </wa-button>
-      {/if}
-      <wa-button
-        size="small"
-        type="button"
-        onclick={gotoScorecard}
-        appearance="plain"
-        >Cancel
-      </wa-button>
-      <wa-button
-        size="small"
-        type="submit"
-        loading={patchContender.isPending}
-        disabled={false}
-        variant="neutral"
-        appearance="accent"
-        >Save
-      </wa-button>
-    </div>
-  </RegistrationForm>
+  <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime}>
+    {#snippet children({ contestState })}
+      {@const disabled = contestState === "ENDED"}
+
+      <RegistrationForm
+        submit={handleSubmit}
+        nameRetentionTime={contest.nameRetentionTime}
+        data={{
+          name: contender.name,
+          compClassId: contender.compClassId,
+          withdrawnFromFinals: contender.withdrawnFromFinals,
+        }}
+        {contestState}
+      >
+        <div class="controls">
+          {#if !contender.scrubbedAt}
+            <wa-button
+              class="scrub-button"
+              size="small"
+              type="button"
+              variant="danger"
+              appearance="outlined"
+              onclick={() => {
+                if (scrubDialog) {
+                  scrubDialog.open = true;
+                }
+              }}
+            >
+              <wa-icon slot="start" name="user-slash"></wa-icon>
+              Remove my name
+            </wa-button>
+          {/if}
+          <wa-button
+            size="small"
+            type="button"
+            onclick={gotoScorecard}
+            appearance="plain"
+            >Cancel
+          </wa-button>
+          <wa-button
+            size="small"
+            type="submit"
+            loading={patchContender.isPending}
+            variant="neutral"
+            appearance="accent"
+            {disabled}
+            >Save
+          </wa-button>
+        </div>
+      </RegistrationForm>
+    {/snippet}
+  </ContestStateProvider>
 
   <wa-dialog bind:this={scrubDialog} label="Remove your name">
     Your name will be permanently removed and your results will be anonymized.
