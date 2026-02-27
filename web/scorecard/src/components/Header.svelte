@@ -71,12 +71,11 @@
 
 <style>
   header {
-    background-color: var(--wa-color-brand-fill-normal);
+    background-color: var(--wa-color-surface-raised);
     border: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-color-brand-border-normal);
+      var(--wa-color-surface-border);
     border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-s);
-    color: var(--wa-color-brand-on-normal);
 
     & .title-row {
       display: flex;
