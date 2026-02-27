@@ -84,10 +84,6 @@
 
       & wa-button {
         color: inherit;
-
-        &::part(label) {
-          color: var(--wa-color-brand-on-normal);
-        }
       }
     }
 
