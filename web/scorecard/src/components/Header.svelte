@@ -89,6 +89,7 @@
 
       & wa-button {
         color: inherit;
+        margin-inline-start: auto;
       }
     }
 
