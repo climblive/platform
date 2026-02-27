@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Score, Timer } from "@climblive/lib/components";
+  import { Logo, Score, Timer } from "@climblive/lib/components";
   import { type ContestState } from "@climblive/lib/types";
   import { ordinalSuperscript } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
@@ -33,7 +33,11 @@
 
 <header>
   <div class="title-row">
-    <h1>{contestName}</h1>
+    <div class="logo"><Logo /></div>
+
+    <h1>
+      {contestName}
+    </h1>
 
     <wa-button
       size="small"
@@ -81,7 +85,7 @@
     & .title-row {
       display: flex;
       align-items: center;
-      gap: var(--wa-space-s);
+      gap: var(--wa-space-xs);
 
       & wa-button {
         color: inherit;
@@ -98,7 +102,6 @@
     & h1 {
       margin: 0;
       font-size: var(--wa-font-size-l);
-      width: calc(100% - 2rem);
       line-height: var(--wa-line-height-condensed);
     }
 
@@ -130,5 +133,11 @@
       justify-content: space-between;
       align-items: end;
     }
+  }
+
+  .logo {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
   }
 </style>
