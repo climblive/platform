@@ -44,8 +44,8 @@
       <wa-icon name="gear" label="Edit"></wa-icon>
     </wa-button>
   </div>
-  <p class="contender-name">
-    {contenderName} • <span class="contender-class">{compClassName}</span>
+  <p class="subtitle-row">
+    <span class="contender-name">{contenderName}</span> • {compClassName}
   </p>
   <div class="lower">
     <div class="score">
@@ -72,7 +72,7 @@
   header {
     background-color: var(--wa-color-brand-fill-normal);
     border: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-form-control-activated-color);
+      var(--wa-color-brand-border-normal);
     border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-s);
     color: var(--wa-color-brand-on-normal);
@@ -105,14 +105,13 @@
       line-height: var(--wa-line-height-condensed);
     }
 
-    & .contender-name {
+    & .subtitle-row {
       margin: 0;
       line-height: var(--wa-line-height-condensed);
     }
 
-    & .contender-class {
+    & .contender-name {
       font-weight: var(--wa-font-weight-bold);
-      font-size: var(--wa-font-size-xs);
     }
 
     & .score {
