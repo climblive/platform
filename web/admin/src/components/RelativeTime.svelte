@@ -12,4 +12,4 @@
 </script>
 
 <wa-tooltip for={id}>{format(time, "yyyy-MM-dd HH:mm")}</wa-tooltip>
-<wa-relative-time {id} date={time} format="long"></wa-relative-time>
+<wa-relative-time {id} date={time} format="long" sync></wa-relative-time>
