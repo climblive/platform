@@ -109,7 +109,7 @@
     & .subtitle-row {
       margin: 0;
       line-height: var(--wa-line-height-condensed);
-      margin-inline-start: calc(-1 * var(--wa-space-s));
+      margin-block-start: calc(-1 * var(--wa-space-2xs));
     }
 
     & .contender-name {
