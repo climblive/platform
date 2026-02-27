@@ -453,6 +453,11 @@
 
   wa-radio {
     flex-grow: 1;
+
+    &[appearance="button"]:state(checked) {
+      border-color: var(--wa-color-neutral-border-loud);
+      background-color: var(--wa-color-neutral-fill-quiet);
+    }
   }
 
   wa-radio::part(label) {
