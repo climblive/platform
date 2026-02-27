@@ -5,6 +5,7 @@ export * from "./countries";
 export * from "./darkmode";
 export * from "./errors";
 export * from "./guards";
+export * from "./now.svelte";
 export * from "./scores";
 export * from "./text";
 export * from "./uuid";

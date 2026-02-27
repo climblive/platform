@@ -14,8 +14,9 @@
     getAllContestsQuery,
     getContestsByOrganizerQuery,
   } from "@climblive/lib/queries";
-  import { getCountryName, getFlag } from "@climblive/lib/utils";
+  import { getCountryName, getFlag, SyncedTime } from "@climblive/lib/utils";
   import { format } from "date-fns";
+  import { onMount } from "svelte";
   import { Link, navigate } from "svelte-routing";
 
   interface Props {
@@ -25,6 +26,14 @@
   let { organizerId }: Props = $props();
 
   let showArchived = $state(false);
+
+  const time = new SyncedTime(60_000);
+
+  onMount(() => {
+    time.start();
+
+    return () => time.stop();
+  });
 
   const contestsQuery = $derived(
     getContestsByOrganizerQuery(organizerId ?? 0, {
@@ -40,7 +49,7 @@
   );
 
   const [ongoing, upcoming, past, archived] = $derived.by(() => {
-    const now = new Date();
+    const now = time.current;
 
     const ongoing: Contest[] = [];
     const upcoming: Contest[] = [];
