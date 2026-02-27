@@ -32,17 +32,20 @@
 </script>
 
 <header>
-  <wa-button
-    size="small"
-    onclick={() => navigate(`/${registrationCode}/edit`)}
-    disabled={contestState === "ENDED"}
-    appearance="plain"
-  >
-    <wa-icon name="gear" label="Edit"></wa-icon>
-  </wa-button>
-  <h1>{contestName}</h1>
+  <div class="title-row">
+    <h1>{contestName}</h1>
+
+    <wa-button
+      size="small"
+      onclick={() => navigate(`/${registrationCode}/edit`)}
+      disabled={contestState === "ENDED"}
+      appearance="plain"
+    >
+      <wa-icon name="gear" label="Edit"></wa-icon>
+    </wa-button>
+  </div>
   <p class="contender-name">
-    {contenderName} <span class="contender-class">{compClassName}</span>
+    {contenderName} • <span class="contender-class">{compClassName}</span>
   </p>
   <div class="lower">
     <div class="score">
@@ -69,25 +72,23 @@
   header {
     background-color: var(--wa-color-brand-fill-normal);
     border: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-color-brand-border-normal);
+      var(--wa-form-control-activated-color);
     border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-s);
     color: var(--wa-color-brand-on-normal);
-    position: relative;
 
-    & wa-button {
-      position: absolute;
-      top: var(--wa-space-xs);
-      right: var(--wa-space-xs);
-      color: inherit;
+    & .title-row {
+      display: flex;
+      align-items: center;
+      gap: var(--wa-space-s);
 
-      &::part(label) {
-        color: var(--wa-color-brand-on-normal);
+      & wa-button {
+        color: inherit;
+
+        &::part(label) {
+          color: var(--wa-color-brand-on-normal);
+        }
       }
-    }
-
-    & wa-button::part(base) {
-      padding: 0;
     }
 
     & h1,
