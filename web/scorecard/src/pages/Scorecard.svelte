@@ -292,49 +292,53 @@
           <wa-tab slot="nav" panel="info">Info</wa-tab>
 
           <wa-tab-panel name="problems">
-            <wa-radio-group
-              orientation="horizontal"
-              size="small"
-              bind:this={radioGroup}
-              value={orderProblemsBy}
-              onchange={() => {
-                if (radioGroup) {
-                  const newValue = radioGroup.value as typeof orderProblemsBy;
-                  if (newValue !== orderProblemsBy) {
-                    sortDirection = "asc";
-                    orderProblemsBy = newValue;
-                  }
-                }
-              }}
-            >
-              <wa-radio
-                value="number"
-                appearance="button"
-                onclick={() => {
-                  if (orderProblemsBy === "number") {
-                    sortDirection = sortDirection === "asc" ? "desc" : "asc";
+            <div class="filters">
+              <wa-radio-group
+                orientation="horizontal"
+                size="small"
+                bind:this={radioGroup}
+                value={orderProblemsBy}
+                onchange={() => {
+                  if (radioGroup) {
+                    const newValue = radioGroup.value as typeof orderProblemsBy;
+                    if (newValue !== orderProblemsBy) {
+                      sortDirection = "asc";
+                      orderProblemsBy = newValue;
+                    }
                   }
                 }}
-                disabled={problems === undefined || problems.length === 0}
               >
-                <wa-icon name={numberSortIcon} label={numberSortLabel}
-                ></wa-icon>
-              </wa-radio>
+                <wa-radio
+                  value="number"
+                  appearance="button"
+                  onclick={() => {
+                    if (orderProblemsBy === "number") {
+                      sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                    }
+                  }}
+                  disabled={problems === undefined || problems.length === 0}
+                >
+                  <wa-icon name={numberSortIcon} label={numberSortLabel}
+                  ></wa-icon>
+                </wa-radio>
 
-              <wa-radio
-                value="points"
-                appearance="button"
-                onclick={() => {
-                  if (orderProblemsBy === "points") {
-                    sortDirection = sortDirection === "asc" ? "desc" : "asc";
-                  }
-                }}
-                disabled={problems === undefined || problems.length === 0}
-              >
-                <wa-icon name={pointsSortIcon} label={pointsSortLabel}
-                ></wa-icon>
-              </wa-radio>
-            </wa-radio-group>
+                <wa-radio
+                  value="points"
+                  appearance="button"
+                  onclick={() => {
+                    if (orderProblemsBy === "points") {
+                      sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                    }
+                  }}
+                  disabled={problems === undefined || problems.length === 0}
+                >
+                  <wa-icon name={pointsSortIcon} label={pointsSortLabel}
+                  ></wa-icon>
+                </wa-radio>
+              </wa-radio-group>
+
+              <wa-switch size="small">Hide completed</wa-switch>
+            </div>
             {#if sortedProblems.length === 0}
               <EmptyState
                 title="No problems"
@@ -460,7 +464,6 @@
     margin: 0 auto;
     display: flex;
     align-items: center;
-    gap: var(--wa-space-2xs);
   }
 
   .raffle-winner-dialog {
@@ -471,5 +474,12 @@
     & wa-button {
       width: 100%;
     }
+  }
+
+  .filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--wa-space-s);
   }
 </style>
