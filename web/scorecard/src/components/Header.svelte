@@ -45,7 +45,8 @@
     </wa-button>
   </div>
   <p class="subtitle-row">
-    <span class="contender-name">{contenderName}</span> • {compClassName}
+    <span class="contender-name">{contenderName}</span> •
+    <span class="contender-class">{compClassName}</span>
   </p>
   <div class="lower">
     <div class="score">
@@ -108,6 +109,7 @@
     & .subtitle-row {
       margin: 0;
       line-height: var(--wa-line-height-condensed);
+      margin-inline-start: calc(-1 * var(--wa-space-s));
     }
 
     & .contender-name {
