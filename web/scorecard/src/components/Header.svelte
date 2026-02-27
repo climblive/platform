@@ -76,6 +76,7 @@
       var(--wa-color-surface-border);
     border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-s);
+    box-shadow: var(--wa-shadow-s);
 
     & .title-row {
       display: flex;
