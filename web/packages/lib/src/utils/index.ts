@@ -7,5 +7,6 @@ export * from "./errors";
 export * from "./guards";
 export * from "./scores";
 export * from "./text";
+export * from "./time.svelte";
 export * from "./uuid";
 export * from "./zod";
