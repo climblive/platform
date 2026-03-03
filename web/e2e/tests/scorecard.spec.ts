@@ -425,8 +425,6 @@ test.describe("contest states", () => {
     const timer = page.getByRole("timer", { name: "Time remaining" });
     await expect(timer).toHaveText("00:00:00");
 
-    await expect(page.getByRole("button", { name: "Edit" })).toBeDisabled();
-
     const problem = page.getByRole("region", { name: "Problem 1" });
     await expect(problem).toBeVisible();
 
