@@ -110,7 +110,7 @@
           id={contender.id}
           name={contender.name}
           scrubbedAt={contender.scrubbedAt}
-          tooltip
+          withTooltip
         />
       </del>
     {:else}
@@ -118,7 +118,7 @@
         id={contender.id}
         name={contender.name}
         scrubbedAt={contender.scrubbedAt}
-        tooltip
+        withTooltip
       />
     {/if}
   </h1>
