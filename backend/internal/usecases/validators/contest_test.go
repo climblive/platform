@@ -19,7 +19,7 @@ func TestContestValidator(t *testing.T) {
 			QualifyingProblems: 10,
 			Finalists:          7,
 			GracePeriod:        time.Minute * 15,
-			NameRetentionTime:  7 * 24 * time.Hour,
+			NameRetentionTime:  14 * 24 * time.Hour,
 		}
 	}
 
@@ -109,7 +109,7 @@ func TestContestValidator(t *testing.T) {
 	})
 
 	t.Run("ValidNameRetentionTimes", func(t *testing.T) {
-		for _, nrt := range []time.Duration{7 * 24 * time.Hour, 14 * 24 * time.Hour, 28 * 24 * time.Hour} {
+		for _, nrt := range []time.Duration{14 * 24 * time.Hour, 30 * 24 * time.Hour, 90 * 24 * time.Hour} {
 			contest := validContest()
 			contest.NameRetentionTime = nrt
 

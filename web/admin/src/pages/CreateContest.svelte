@@ -45,7 +45,7 @@
     name: "",
     country: "AQ",
     gracePeriod: 15 * nanosecondsInMinute,
-    nameRetentionTime: 10080 * nanosecondsInMinute,
+    nameRetentionTime: 43200 * nanosecondsInMinute,
   }}
   schema={formSchema}
 >

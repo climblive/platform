@@ -15,9 +15,9 @@
   export const nanosecondsInMinute = 60 * 1_000_000_000;
 
   export const retentionOptions = [
-    { label: "1 week", value: 7 * 24 * 60 * nanosecondsInMinute },
-    { label: "2 weeks", value: 2 * 7 * 24 * 60 * nanosecondsInMinute },
-    { label: "4 weeks", value: 4 * 7 * 24 * 60 * nanosecondsInMinute },
+    { label: "14 days", value: 14 * 24 * 60 * nanosecondsInMinute },
+    { label: "30 days", value: 30 * 24 * 60 * nanosecondsInMinute },
+    { label: "90 days", value: 90 * 24 * 60 * nanosecondsInMinute },
   ];
 </script>
 

@@ -62,9 +62,9 @@ func (v ContestValidator) IsValidationError(err error) bool {
 
 func isValidNameRetentionTime(d time.Duration) bool {
 	switch d {
-	case 7 * 24 * time.Hour,
-		14 * 24 * time.Hour,
-		28 * 24 * time.Hour:
+	case 14 * 24 * time.Hour,
+		30 * 24 * time.Hour,
+		90 * 24 * time.Hour:
 		return true
 	default:
 		return false
