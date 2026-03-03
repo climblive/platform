@@ -66,3 +66,9 @@
     </wa-button>
   </div>
 </ContestForm>
+
+<style>
+  .controls {
+    margin-inline-start: auto;
+  }
+</style>

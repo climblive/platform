@@ -78,30 +78,32 @@
       value={data.description}
       hint="A short description or tagline for the contest."
     ></wa-input>
-    <wa-input
-      size="small"
-      {@attach name("location")}
-      label="Location"
-      type="text"
-      value={data.location}
-      hint="Usually the name of the climbing gym."
-    ></wa-input>
-    <wa-select
-      size="small"
-      {@attach name("country")}
-      {@attach value(selectedCountry)}
-      label="Country"
-      hint="The country where the contest is held."
-      onchange={handleCountryChange}
-    >
-      <span slot="start">{getFlag(selectedCountry)}</span>
-      {#each countries as country (country.code)}
-        <wa-option value={country.code} label={country.name}>
-          <span slot="start">{getFlag(country.code)}</span>
-          {country.name}
-        </wa-option>
-      {/each}
-    </wa-select>
+    <div class="location">
+      <wa-input
+        size="small"
+        {@attach name("location")}
+        label="Location"
+        type="text"
+        value={data.location}
+        hint="Usually the name of the climbing gym."
+      ></wa-input>
+      <wa-select
+        size="small"
+        {@attach name("country")}
+        {@attach value(selectedCountry)}
+        label="Country"
+        hint="The country where the contest is held."
+        onchange={handleCountryChange}
+      >
+        <span slot="start">{getFlag(selectedCountry)}</span>
+        {#each countries as country (country.code)}
+          <wa-option value={country.code} label={country.name}>
+            <span slot="start">{getFlag(country.code)}</span>
+            {country.name}
+          </wa-option>
+        {/each}
+      </wa-select>
+    </div>
     <wa-number-input
       size="small"
       {@attach name("gracePeriod")}
@@ -147,5 +149,21 @@
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-s);
+  }
+
+  .location {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--wa-space-s);
+  }
+
+  @media screen and (max-width: 768px) {
+    .location {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  wa-button {
+    align-self: start;
   }
 </style>
