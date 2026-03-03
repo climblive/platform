@@ -4,6 +4,7 @@
   import { type Readable } from "svelte/store";
 
   interface Props {
+    contestId: number;
     name: string;
     compClassId: number;
     startTime: Date;
@@ -11,7 +12,8 @@
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
   }
 
-  let { name, compClassId, startTime, endTime, scoreboard }: Props = $props();
+  let { contestId, name, compClassId, startTime, endTime, scoreboard }: Props =
+    $props();
 
   let classSize = $derived(($scoreboard.get(compClassId) ?? []).length);
   let totalSize = $derived.by(() => {
@@ -21,7 +23,7 @@
   });
 </script>
 
-<ContestStateProvider {startTime} {endTime}>
+<ContestStateProvider {contestId} {compClassId}>
   {#snippet children({ contestState })}
     <header>
       <div class="left">

@@ -14,7 +14,6 @@
     scrubContenderMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import { add } from "date-fns";
   import { getContext } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Readable } from "svelte/store";
@@ -58,20 +57,15 @@
       onError: () => toastError("Failed to remove your name."),
     });
   };
-
-  const startTime = $derived(contest?.timeBegin ?? new Date(8640000000000000));
-  const endTime = $derived(contest?.timeEnd ?? new Date(-8640000000000000));
-  const gracePeriodEndTime = $derived(
-    add(endTime, {
-      minutes: (contest?.gracePeriod ?? 0) / (1_000_000_000 * 60),
-    }),
-  );
 </script>
 
-{#if !contender || !contest || !startTime || !endTime}
+{#if !contender || !contest}
   <Loading />
 {:else}
-  <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime}>
+  <ContestStateProvider
+    contestId={contest.id}
+    compClassId={contender.compClassId}
+  >
     {#snippet children({ contestState })}
       {@const disabled = contestState === "ENDED"}
 
