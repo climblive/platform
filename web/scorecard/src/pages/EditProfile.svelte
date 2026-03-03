@@ -86,7 +86,7 @@
         {contestState}
       >
         <div class="controls">
-          {#if !contender.scrubbedAt}
+          {#if !!contender.name}
             <wa-button
               class="scrub-button"
               size="small"
