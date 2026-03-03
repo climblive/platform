@@ -131,10 +131,16 @@ func main() {
 
 	scoreEngineManager := scores.NewScoreEngineManager(database, scoreEngineStoreHydrator, eventBroker, scoreEngineMaxLifetime)
 
-	scrubberUseCase := usecases.ContenderUseCase{Repo: database, EventBroker: eventBroker}
+	contenderUseCase := usecases.ContenderUseCase{
+		Repo:                      database,
+		Authorizer:                authorizer,
+		EventBroker:               eventBroker,
+		ScoreKeeper:               scoreKeeper,
+		RegistrationCodeGenerator: &registrationCodeGenerator{}}
+
 	scrubInterval := time.Hour
 	slog.Info("contender scrubber interval configured", "interval", scrubInterval)
-	scrubberRunner := scrubber.New(&scrubberUseCase, scrubInterval)
+	scrubberRunner := scrubber.New(&contenderUseCase, scrubInterval)
 
 	barriers = append(barriers,
 		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
