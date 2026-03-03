@@ -37,6 +37,8 @@
 <style>
   wa-popover {
     --max-width: 300px;
+
+    font-weight: var(--wa-font-weight-normal);
   }
 
   wa-popover::part(body) {
