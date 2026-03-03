@@ -140,6 +140,16 @@ export class ApiClient {
     return contenderSchema.parse(result.data);
   };
 
+  scrubContender = async (id: number) => {
+    const endpoint = `/contenders/${id}/scrub`;
+
+    const result = await this.axiosInstance.post(endpoint, null, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return contenderSchema.parse(result.data);
+  };
+
   createContenders = async (
     contestId: number,
     args: CreateContendersArguments,

@@ -3,7 +3,10 @@
   import type { ScorecardSession } from "@/types";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { SplashScreen } from "@climblive/lib/components";
+  import {
+    ContestStateProvider,
+    SplashScreen,
+  } from "@climblive/lib/components";
   import type { ContenderPatch } from "@climblive/lib/models";
   import {
     getContenderQuery,
@@ -51,23 +54,32 @@
   <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
   <h1>{contest.name}</h1>
-  <RegistrationForm
-    submit={handleSubmit}
-    data={{
-      name: contender.name,
-      compClassId: contender.compClassId,
-      withdrawnFromFinals: contender.withdrawnFromFinals,
-    }}
+  <ContestStateProvider
+    contestId={contest.id}
+    compClassId={contender.compClassId}
   >
-    <wa-button
-      size="small"
-      type="submit"
-      loading={patchContender.isPending}
-      variant="neutral"
-      appearance="accent"
-      >Register
-    </wa-button>
-  </RegistrationForm>
+    {#snippet children({ contestState })}
+      <RegistrationForm
+        submit={handleSubmit}
+        nameRetentionTime={contest.nameRetentionTime}
+        data={{
+          name: contender.name,
+          compClassId: contender.compClassId,
+          withdrawnFromFinals: contender.withdrawnFromFinals,
+        }}
+        {contestState}
+      >
+        <wa-button
+          size="small"
+          type="submit"
+          loading={patchContender.isPending}
+          variant="neutral"
+          appearance="accent"
+          >Register
+        </wa-button>
+      </RegistrationForm>
+    {/snippet}
+  </ContestStateProvider>
 {/if}
 
 <style>

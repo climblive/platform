@@ -44,7 +44,6 @@
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
-  import { add } from "date-fns/add";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
 
@@ -80,11 +79,6 @@
   );
   let endTime = $derived(
     selectedCompClass?.timeEnd ?? new Date(-8640000000000000),
-  );
-  let gracePeriodEndTime = $derived(
-    add(endTime, {
-      minutes: (contest?.gracePeriod ?? 0) / (1_000_000_000 * 60),
-    }),
   );
 
   let orderProblemsBy = $state<"number" | "points">("number");
@@ -197,6 +191,7 @@
         name: event.name,
         withdrawnFromFinals: event.withdrawnFromFinals,
         disqualified: event.disqualified,
+        scrubbedAt: event.scrubbedAt,
       });
     });
 
@@ -269,7 +264,10 @@
 {#if showSplash || !contender || !contest || !compClasses || !sortedProblems || !ticks || !selectedCompClass}
   <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
-  <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime}>
+  <ContestStateProvider
+    contestId={$session.contestId}
+    compClassId={selectedCompClass.id}
+  >
     {#snippet children({ contestState })}
       <main>
         <div class="sticky">
@@ -277,7 +275,9 @@
             registrationCode={$session.registrationCode}
             contestName={contest.name}
             compClassName={selectedCompClass?.name}
+            contenderId={contender.id}
             contenderName={contender.name}
+            contenderScrubbedAt={contender.scrubbedAt}
             {score}
             {placement}
             {contestState}
