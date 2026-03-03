@@ -83,6 +83,7 @@
     id={contenderId}
     name={contenderName}
     scrubbedAt={contenderScrubbedAt}
+    tooltip
   />
 {/snippet}
 

@@ -81,7 +81,7 @@
 {/snippet}
 
 {#snippet renderName({ id, name, scrubbedAt }: Contender)}
-  <ContenderName {id} {name} {scrubbedAt} />
+  <ContenderName {id} {name} {scrubbedAt} tooltip />
 {/snippet}
 
 {#snippet renderUsed({ entered }: Contender)}

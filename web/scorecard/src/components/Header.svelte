@@ -49,6 +49,7 @@
       id={contenderId}
       name={contenderName}
       scrubbedAt={contenderScrubbedAt}
+      tooltip
     /> <span class="contender-class">{compClassName}</span>
   </p>
   <div class="lower">

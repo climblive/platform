@@ -7,9 +7,10 @@
     id: number;
     name: string | undefined;
     scrubbedAt: Date | undefined;
+    withTooltip?: boolean;
   }
 
-  const { id, name, scrubbedAt }: Props = $props();
+  const { id, name, scrubbedAt, withTooltip = false }: Props = $props();
 
   const displayName = $derived(
     scrubbedAt ? maskScrubbedName(id) : (name ?? ""),
@@ -18,9 +19,9 @@
   const tooltipId = $props.id();
 </script>
 
-{#if scrubbedAt}
+{#if scrubbedAt && withTooltip}
   <wa-popover for={tooltipId}>
-    The name of the contender was removed and anonymized on {format(
+    The contender name was removed and anonymized on {format(
       scrubbedAt,
       "yyyy-MM-dd HH:mm",
     )}.
