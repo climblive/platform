@@ -1,28 +1,24 @@
-import { SvelteDate } from "svelte/reactivity";
-
 export class SyncedTime {
   #interval: number;
   #time: Date;
-  #tickCb: ((time: Date) => void) | undefined;
   #intervalTimerId: number | undefined;
-  #enabled: boolean;
+  ticking: boolean;
 
-  constructor(interval: number = 1_000, tickCb?: (time: Date) => void) {
+  constructor(interval: number = 1_000) {
     this.#interval = interval;
     // eslint-disable-next-line svelte/prefer-svelte-reactivity
     this.#time = $state(new Date());
-    this.#tickCb = tickCb;
-    this.#enabled = false;
+    this.ticking = false;
   }
 
   start() {
-    this.#enabled = true;
+    this.ticking = true;
 
     this.tick();
   }
 
   stop() {
-    this.#enabled = false;
+    this.ticking = false;
 
     if (this.#intervalTimerId !== undefined) {
       clearTimeout(this.#intervalTimerId);
@@ -34,16 +30,18 @@ export class SyncedTime {
   }
 
   private tick = () => {
-    if (!this.#enabled) {
+    if (!this.ticking) {
       return;
     }
 
-    this.#time = new SvelteDate();
-    this.#tickCb?.(this.#time);
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
+    const now = new Date();
+
+    this.#time = now;
 
     const firefoxEarlyWakeUpCompensation = 1;
 
-    const drift = Date.now() % this.#interval;
+    const drift = now.getTime() % this.#interval;
     const next = this.#interval - drift + firefoxEarlyWakeUpCompensation;
 
     this.#intervalTimerId = setTimeout(this.tick, next);
