@@ -1,5 +1,6 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
+  import { type WaSelectEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
   import {
     EmptyState,
@@ -167,17 +168,23 @@
 {#snippet renderControls({ id }: ProblemWithAscents)}
   <DeleteProblem problemId={id}>
     {#snippet children({ deleteProblem })}
-      <wa-dropdown>
+      <wa-dropdown
+        onwa-select={(e: WaSelectEvent) => {
+          if (e.detail.item.getAttribute("value") === "delete") {
+            deleteProblem();
+          } else {
+            navigate(`/admin/problems/${id}/edit`);
+          }
+        }}
+      >
         <wa-button slot="trigger" size="small" appearance="plain">
           <wa-icon name="ellipsis-vertical" label="Actions"></wa-icon>
         </wa-button>
-        <wa-dropdown-item
-          onclick={() => navigate(`/admin/problems/${id}/edit`)}
-        >
+        <wa-dropdown-item value="edit">
           <wa-icon slot="icon" name="pencil"></wa-icon>
           Edit
         </wa-dropdown-item>
-        <wa-dropdown-item variant="danger" onclick={deleteProblem}>
+        <wa-dropdown-item value="delete" variant="danger">
           <wa-icon slot="icon" name="trash"></wa-icon>
           Delete
         </wa-dropdown-item>
