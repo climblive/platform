@@ -2,6 +2,7 @@
   import Loader from "@/components/Loader.svelte";
   import { type WaSelectEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import WaDropdownItem from "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
   import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
   import {
     EmptyState,
@@ -79,7 +80,7 @@
     {#snippet children({ deleteCompClass })}
       <wa-dropdown
         onwa-select={(event: WaSelectEvent) => {
-          if (event.detail.item.value === "delete") {
+          if ((event.detail.item as WaDropdownItem).value === "delete") {
             deleteCompClass();
           } else {
             navigate(`/admin/comp-classes/${id}/edit`);

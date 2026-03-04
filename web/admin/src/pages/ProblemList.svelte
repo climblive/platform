@@ -1,6 +1,7 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import { type WaSelectEvent } from "@awesome.me/webawesome";
+  import WaDropdownItem from "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
   import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
   import {
     EmptyState,
@@ -170,7 +171,7 @@
     {#snippet children({ deleteProblem })}
       <wa-dropdown
         onwa-select={(event: WaSelectEvent) => {
-          if (event.detail.item.value === "delete") {
+          if ((event.detail.item as WaDropdownItem).value === "delete") {
             deleteProblem();
           } else {
             navigate(`/admin/problems/${id}/edit`);
