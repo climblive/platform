@@ -32,11 +32,23 @@
 
   const createProblem = $derived(createProblemMutation(contestId));
 
+  let addAnother = $state(false);
+  let formKey = $state(0);
+
   const handleSubmit = async (tmpl: Omit<ProblemTemplate, "pointsZone">) => {
+    const shouldAddAnother = addAnother;
+    addAnother = false;
+
     createProblem.mutate(
       { ...tmpl },
       {
-        onSuccess: () => navigate(`/admin/contests/${contestId}#problems`),
+        onSuccess: () => {
+          if (shouldAddAnother) {
+            formKey++;
+          } else {
+            navigate(`/admin/contests/${contestId}#problems`);
+          }
+        },
         onError: () => toastError("Failed to create problem."),
       },
     );
@@ -46,33 +58,44 @@
 {#if highestProblemNumber === undefined}
   <Loader />
 {:else}
-  <ProblemForm
-    submit={handleSubmit}
-    data={{
-      number: highestProblemNumber + 1,
-      holdColorPrimary: "#000000",
-      pointsTop: 100,
-      flashBonus: 0,
-    }}
-    schema={formSchema}
-  >
-    <div class="controls">
-      <wa-button
-        size="small"
-        type="button"
-        appearance="plain"
-        onclick={() => navigate(`/admin/contests/${contestId}#problems`)}
-        >Cancel</wa-button
-      >
-      <wa-button
-        size="small"
-        type="submit"
-        loading={createProblem.isPending}
-        variant="neutral"
-        >Create
-      </wa-button>
-    </div>
-  </ProblemForm>
+  {#key formKey}
+    <ProblemForm
+      submit={handleSubmit}
+      data={{
+        number: highestProblemNumber + 1,
+        holdColorPrimary: "#000000",
+        pointsTop: 100,
+        flashBonus: 0,
+      }}
+      schema={formSchema}
+    >
+      <div class="controls">
+        <wa-button
+          size="small"
+          type="button"
+          appearance="plain"
+          onclick={() => navigate(`/admin/contests/${contestId}#problems`)}
+          >Cancel</wa-button
+        >
+        <wa-button
+          size="small"
+          type="submit"
+          loading={createProblem.isPending}
+          variant="neutral"
+          onclick={() => (addAnother = false)}
+          >Create
+        </wa-button>
+        <wa-button
+          size="small"
+          type="submit"
+          loading={createProblem.isPending}
+          variant="neutral"
+          onclick={() => (addAnother = true)}
+          >Create and add another
+        </wa-button>
+      </div>
+    </ProblemForm>
+  {/key}
 {/if}
 
 <style>
