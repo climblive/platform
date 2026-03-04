@@ -194,7 +194,7 @@
 {#snippet createButton()}
   <wa-button
     variant="neutral"
-    appearance="accent"
+    appearance="outlined"
     onclick={() => navigate(`contests/${contestId}/new-problem`)}
     >Create problem</wa-button
   >

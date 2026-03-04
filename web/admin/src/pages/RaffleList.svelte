@@ -46,7 +46,7 @@
 {/snippet}
 
 {#snippet createButton()}
-  <wa-button variant="neutral" appearance="accent" onclick={handleCreateRaffle}
+  <wa-button variant="neutral" appearance="outlined" onclick={handleCreateRaffle}
     >Start new raffle</wa-button
   >
 {/snippet}

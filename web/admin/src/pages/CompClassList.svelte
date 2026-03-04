@@ -99,7 +99,7 @@
 {#snippet createButton()}
   <wa-button
     variant="neutral"
-    appearance="accent"
+    appearance="outlined"
     onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
     >Create class</wa-button
   >

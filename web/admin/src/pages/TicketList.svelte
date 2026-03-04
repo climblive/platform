@@ -129,7 +129,7 @@
   <wa-button
     size="small"
     variant="neutral"
-    appearance="accent"
+    appearance="outlined"
     onclick={handleOpenCreateDialog}
     disabled={remainingCodes === undefined || remainingCodes === 0}
   >
