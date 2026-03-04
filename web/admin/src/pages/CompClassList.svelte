@@ -86,9 +86,9 @@
           }
         }}
       >
-        <wa-button slot="trigger" with-caret
-          ><wa-icon name="pen"></wa-icon></wa-button
-        >
+        <wa-button slot="trigger" size="small" appearance="plain">
+          <wa-icon name="ellipsis-vertical" label="Actions"></wa-icon>
+        </wa-button>
         <wa-dropdown-item value="edit">
           <wa-icon slot="icon" name="pencil"></wa-icon>
           Edit
@@ -122,7 +122,12 @@
     <Loader />
   {:else if compClasses.length > 0}
     {@render createButton()}
-    <Table {columns} data={compClasses} getId={({ id }) => id}></Table>
+    <Table
+      {columns}
+      data={compClasses}
+      getId={({ id }) => id}
+      onRowClick={({ id }) => navigate(`/admin/comp-classes/${id}/edit`)}
+    ></Table>
   {:else}
     <EmptyState
       title="No classes yet"
