@@ -2,6 +2,8 @@
   import Loader from "@/components/Loader.svelte";
   import ProblemForm, { formSchema } from "@/forms/ProblemForm.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
+  import "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
   import type { ProblemTemplate } from "@climblive/lib/models";
   import {
     createProblemMutation,
@@ -69,31 +71,45 @@
       }}
       schema={formSchema}
     >
-      <div class="controls">
-        <wa-button
-          size="small"
-          type="button"
-          appearance="plain"
-          onclick={() => navigate(`/admin/contests/${contestId}#problems`)}
-          >Cancel</wa-button
-        >
-        <wa-button
-          size="small"
-          type="submit"
-          loading={createProblem.isPending}
-          variant="neutral"
-          onclick={() => (addAnother = false)}
-          >Create
-        </wa-button>
-        <wa-button
-          size="small"
-          type="submit"
-          loading={createProblem.isPending}
-          variant="neutral"
-          onclick={() => (addAnother = true)}
-          >Create and add another
-        </wa-button>
-      </div>
+      {#snippet children(form)}
+        <div class="controls">
+          <wa-button
+            size="small"
+            type="button"
+            appearance="plain"
+            onclick={() => navigate(`/admin/contests/${contestId}#problems`)}
+            >Cancel</wa-button
+          >
+          <div class="split-button">
+            <wa-button
+              class="create-btn"
+              size="small"
+              type="submit"
+              loading={createProblem.isPending}
+              variant="neutral"
+              onclick={() => (addAnother = false)}
+              >Create
+            </wa-button>
+            <wa-dropdown placement="bottom-end">
+              <wa-button
+                class="caret-btn"
+                slot="trigger"
+                size="small"
+                type="button"
+                variant="neutral"
+                loading={createProblem.isPending}
+                with-caret
+              ></wa-button>
+              <wa-dropdown-item
+                onclick={() => {
+                  addAnother = true;
+                  form?.requestSubmit();
+                }}>Create and add another</wa-dropdown-item
+              >
+            </wa-dropdown>
+          </div>
+        </div>
+      {/snippet}
     </ProblemForm>
   {/key}
 {/if}
@@ -103,5 +119,19 @@
     display: flex;
     gap: var(--wa-space-xs);
     justify-content: end;
+  }
+
+  .split-button {
+    display: inline-flex;
+  }
+
+  .split-button .create-btn::part(base) {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+  }
+
+  .split-button .caret-btn::part(base) {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
   }
 </style>
