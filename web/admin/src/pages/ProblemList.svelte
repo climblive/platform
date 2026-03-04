@@ -169,8 +169,8 @@
   <DeleteProblem problemId={id}>
     {#snippet children({ deleteProblem })}
       <wa-dropdown
-        onwa-select={(e: WaSelectEvent) => {
-          if (e.detail.item.getAttribute("value") === "delete") {
+        onwa-select={(event: WaSelectEvent) => {
+          if (event.detail.item.value === "delete") {
             deleteProblem();
           } else {
             navigate(`/admin/problems/${id}/edit`);

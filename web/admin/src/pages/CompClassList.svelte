@@ -78,8 +78,8 @@
   <DeleteCompClass compClassId={id}>
     {#snippet children({ deleteCompClass })}
       <wa-dropdown
-        onwa-select={(e: WaSelectEvent) => {
-          if (e.detail.item.getAttribute("value") === "delete") {
+        onwa-select={(event: WaSelectEvent) => {
+          if (event.detail.item.value === "delete") {
             deleteCompClass();
           } else {
             navigate(`/admin/comp-classes/${id}/edit`);
