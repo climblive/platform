@@ -222,7 +222,6 @@
         ? sortedProblemsWithAscents.slice(0, tableLimit)
         : sortedProblemsWithAscents}
       getId={({ id }) => id}
-      onRowClick={({ id }) => navigate(`/admin/problems/${id}/edit`)}
     ></Table>
   {:else}
     <EmptyState

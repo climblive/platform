@@ -15,12 +15,11 @@
     columns: ColumnDefinition<T>[];
     data: T[];
     getId: (row: T) => string | number;
-    onRowClick?: (row: T) => void;
   };
 
   let mobile = $state(false);
 
-  const { columns, data, getId, onRowClick }: Props<T> = $props();
+  const { columns, data, getId }: Props<T> = $props();
 
   function handleResize() {
     mobile = window.innerWidth < 768;
@@ -57,7 +56,7 @@
   </thead>
   <tbody>
     {#each data as row (getId(row))}
-      <tr onclick={() => onRowClick?.(row)} data-clickable={onRowClick !== undefined}>
+      <tr>
         {#each columns as column, index (index)}
           {#if cellVisible(column)}
             <td data-align={column.align ?? "left"}>
@@ -137,10 +136,6 @@
 
   tbody tr:hover {
     background-color: var(--wa-color-surface-raised);
-  }
-
-  tbody tr[data-clickable="true"] {
-    cursor: pointer;
   }
 
   th[data-align="right"],

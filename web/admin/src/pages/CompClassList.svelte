@@ -122,12 +122,7 @@
     <Loader />
   {:else if compClasses.length > 0}
     {@render createButton()}
-    <Table
-      {columns}
-      data={compClasses}
-      getId={({ id }) => id}
-      onRowClick={({ id }) => navigate(`/admin/comp-classes/${id}/edit`)}
-    ></Table>
+    <Table {columns} data={compClasses} getId={({ id }) => id}></Table>
   {:else}
     <EmptyState
       title="No classes yet"
