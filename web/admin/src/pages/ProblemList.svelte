@@ -177,9 +177,9 @@
           }
         }}
       >
-        <wa-button slot="trigger" size="small" appearance="plain">
-          <wa-icon name="ellipsis-vertical" label="Actions"></wa-icon>
-        </wa-button>
+        <wa-button slot="trigger" with-caret
+          ><wa-icon name="pen"></wa-icon></wa-button
+        >
         <wa-dropdown-item value="edit">
           <wa-icon slot="icon" name="pencil"></wa-icon>
           Edit
