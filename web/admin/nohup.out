@@ -1,6 +1,0 @@
-
-> admin@0.0.0 preview /home/runner/work/platform/platform/web/admin
-> vite preview "--port" "5174"
-
-  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5174[22m/[39m
-[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
