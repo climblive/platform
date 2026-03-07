@@ -2,26 +2,27 @@ export class SyncedTime {
   #interval: number;
   #time: Date;
   #intervalTimerId: number | undefined;
-  ticking: boolean;
+  #ticking: boolean;
 
   constructor(interval: number = 1_000) {
     this.#interval = interval;
     // eslint-disable-next-line svelte/prefer-svelte-reactivity
     this.#time = $state(new Date());
-    this.ticking = false;
+    this.#ticking = false;
   }
 
   start() {
-    this.ticking = true;
+    this.#ticking = true;
 
     this.tick();
   }
 
   stop() {
-    this.ticking = false;
+    this.#ticking = false;
 
     if (this.#intervalTimerId !== undefined) {
       clearTimeout(this.#intervalTimerId);
+      this.#intervalTimerId = undefined;
     }
   }
 
@@ -30,7 +31,7 @@ export class SyncedTime {
   }
 
   private tick = () => {
-    if (!this.ticking) {
+    if (!this.#ticking) {
       return;
     }
 
