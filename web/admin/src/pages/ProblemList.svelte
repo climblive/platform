@@ -1,5 +1,8 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
+  import { type WaSelectEvent } from "@awesome.me/webawesome";
+  import WaDropdownItem from "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
+  import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
   import {
     EmptyState,
     HoldColorIndicator,
@@ -164,27 +167,31 @@
 {/snippet}
 
 {#snippet renderControls({ id }: ProblemWithAscents)}
-  <div class="controls">
-    <wa-button
-      size="small"
-      appearance="plain"
-      onclick={() => navigate(`/admin/problems/${id}/edit`)}
-    >
-      <wa-icon name="pencil" label="Edit"></wa-icon>
-    </wa-button>
-    <DeleteProblem problemId={id}>
-      {#snippet children({ deleteProblem })}
-        <wa-button
-          size="small"
-          variant="danger"
-          appearance="plain"
-          onclick={deleteProblem}
-        >
-          <wa-icon name="trash" label={`Delete problem ${id}`}></wa-icon>
+  <DeleteProblem problemId={id}>
+    {#snippet children({ deleteProblem })}
+      <wa-dropdown
+        onwa-select={(event: WaSelectEvent) => {
+          if ((event.detail.item as WaDropdownItem).value === "delete") {
+            deleteProblem();
+          } else {
+            navigate(`/admin/problems/${id}/edit`);
+          }
+        }}
+      >
+        <wa-button slot="trigger" size="small" appearance="plain">
+          <wa-icon name="ellipsis-vertical" label="Actions"></wa-icon>
         </wa-button>
-      {/snippet}
-    </DeleteProblem>
-  </div>
+        <wa-dropdown-item value="edit">
+          <wa-icon slot="icon" name="pencil"></wa-icon>
+          Edit
+        </wa-dropdown-item>
+        <wa-dropdown-item value="delete" variant="danger">
+          <wa-icon slot="icon" name="trash"></wa-icon>
+          Delete
+        </wa-dropdown-item>
+      </wa-dropdown>
+    {/snippet}
+  </DeleteProblem>
 {/snippet}
 
 {#snippet renderAscents({ ascents }: ProblemWithAscents)}
@@ -253,14 +260,6 @@
 <CopyProblems {organizerId} {contestId} bind:open={copyProblemsOpen} />
 
 <style>
-  .controls {
-    display: flex;
-
-    & wa-button:not(:last-of-type) {
-      margin-inline-end: var(--wa-space-xs);
-    }
-  }
-
   .number {
     display: flex;
     align-items: center;

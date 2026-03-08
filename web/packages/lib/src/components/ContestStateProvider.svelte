@@ -1,8 +1,9 @@
 <script lang="ts">
   import { add, isBefore } from "date-fns";
-  import { onDestroy, type Snippet } from "svelte";
+  import { onMount, type Snippet } from "svelte";
   import { getCompClassQuery, getContestQuery } from "../queries";
   import type { ContestState } from "../types";
+  import { SyncedTime } from "../utils";
 
   interface Props {
     contestId: number;
@@ -34,18 +35,16 @@
       : undefined,
   );
 
-  let contestState: ContestState = $state("NOT_STARTED");
-  let intervalTimerId: number;
+  const time = new SyncedTime(1_000);
 
-  $effect(() => {
-    if (startTime && endTime) {
-      clearTimeout(intervalTimerId);
-      tick();
-    }
+  onMount(() => {
+    time.start();
+
+    return () => time.stop();
   });
 
   const computeState = (): ContestState => {
-    const now = new Date();
+    const now = new Date(time.current);
     now.setMilliseconds(0);
 
     switch (true) {
@@ -60,20 +59,7 @@
     }
   };
 
-  const tick = () => {
-    contestState = computeState();
-
-    const firefoxEarlyWakeUpCompensation = 1;
-
-    const drift = Date.now() % 1_000;
-    const next = 1_000 - drift + firefoxEarlyWakeUpCompensation;
-
-    intervalTimerId = setTimeout(tick, next);
-  };
-
-  onDestroy(() => {
-    clearTimeout(intervalTimerId);
-  });
+  const contestState: ContestState = $derived(computeState());
 </script>
 
 {@render children?.({ contestState })}
