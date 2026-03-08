@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/popover/popover.js";
   import { format } from "date-fns";
   import { maskScrubbedName } from "../utils";
