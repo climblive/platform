@@ -31,12 +31,12 @@
 </script>
 
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/color-picker/color-picker.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import type WaNumberInput from "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
+  import { HoldColorPicker } from "@climblive/lib/components";
   import { checked, GenericForm, name } from "@climblive/lib/forms";
   import { type Problem } from "@climblive/lib/models";
   import { type Snippet } from "svelte";
@@ -57,21 +57,6 @@
 
   let pointsZone1Input = $state<WaNumberInput>();
   let pointsZone2Input = $state<WaNumberInput>();
-
-  const swatches = [
-    "#6f3601",
-    "#dc3146",
-    "#f46a45",
-    "#fac22b",
-    "#00ac49",
-    "#2fbedc",
-    "#0071ec",
-    "#9951db",
-    "#e66ba3",
-    "#9194a2",
-    "#000",
-    "#fff",
-  ].join("; ");
 
   const clearZone1Points = () => {
     if (pointsZone1Input) {
@@ -118,25 +103,20 @@
       min={0}
     ></wa-number-input>
     <div class="colors">
-      <div class="pickers">
-        <wa-color-picker
-          size="small"
-          {@attach name("holdColorPrimary")}
-          label="Primary hold color"
-          required
-          {swatches}
-          value={data.holdColorPrimary}
-          without-format-toggle
-        ></wa-color-picker>
-        <wa-color-picker
-          size="small"
-          {@attach name("holdColorSecondary")}
-          label="Secondary hold color"
-          {swatches}
-          value={data.holdColorSecondary}
-          without-format-toggle
-        ></wa-color-picker>
-      </div>
+      <HoldColorPicker
+        name="holdColorPrimary"
+        label="Primary hold color"
+        required
+        value={data.holdColorPrimary}
+        placement="right"
+      />
+      <HoldColorPicker
+        name="holdColorSecondary"
+        label="Secondary hold color"
+        allowClear={true}
+        value={data.holdColorSecondary}
+        placement="bottom"
+      />
     </div>
     <wa-number-input
       size="small"
@@ -223,10 +203,9 @@
   }
 
   .colors {
-    & .pickers {
-      display: flex;
-      gap: var(--wa-space-s);
-    }
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--wa-space-s);
   }
 
   .hidden {
