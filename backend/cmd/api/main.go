@@ -139,7 +139,6 @@ func main() {
 		RegistrationCodeGenerator: &registrationCodeGenerator{}}
 
 	scrubInterval := time.Hour
-	slog.Info("contender scrubber interval configured", "interval", scrubInterval)
 	scrubberRunner := scrubber.New(&contenderUseCase, scrubInterval)
 
 	barriers = append(barriers,
