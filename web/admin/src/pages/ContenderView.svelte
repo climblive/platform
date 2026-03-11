@@ -104,7 +104,9 @@
   </wa-breadcrumb>
 
   <h1>
-    {#if contender.disqualified}
+    {#if !contender.entered}
+      Unregistered
+    {:else if contender.disqualified}
       <del>
         <ContenderName
           id={contender.id}
