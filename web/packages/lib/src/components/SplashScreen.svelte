@@ -62,7 +62,7 @@
   }
 
   .splash-screen {
-    background-color: var(--wa-color-brand-fill-loud);
+    background-color: #ea384c;
   }
 
   .logo {
