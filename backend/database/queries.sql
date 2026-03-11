@@ -329,9 +329,8 @@ DELETE FROM organizer_invite
 WHERE id = ?;
 
 -- name: GetScrubEligibleContenders :many
-SELECT sqlc.embed(contender), score.*
+SELECT sqlc.embed(contender)
 FROM contender
-LEFT JOIN score ON score.contender_id = id
 WHERE (contender.name != '' 
   OR contender.scrubbed_at IS NULL)
   AND contender.scrub_before IS NOT NULL
