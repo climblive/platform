@@ -1,7 +1,7 @@
 -- +goose Up
 ALTER TABLE `contest` ADD COLUMN `name_retention_time` INT NOT NULL DEFAULT 20160 AFTER `grace_period`;
 ALTER TABLE `contender` ADD COLUMN `scrub_before` TIMESTAMP NULL DEFAULT NULL AFTER `withdrawn_from_finals`;
-ALTER TABLE `contender` ADD COLUMN `scrubbed_at` TIMESTAMP NULL DEFAULT NULL;
+ALTER TABLE `contender` ADD COLUMN `scrubbed_at` TIMESTAMP NULL DEFAULT NULL AFTER `withdrawn_from_finals`;
 
 CREATE INDEX `index6` ON `contender` (`scrubbed_at` ASC, `scrub_before` ASC, `name` ASC);
 
