@@ -266,7 +266,7 @@
 {:else}
   <ContestStateProvider
     contestId={$session.contestId}
-    compClassId={selectedCompClass.id}
+    compClassId={contender?.compClassId}
   >
     {#snippet children({ contestState })}
       <main>

@@ -31,7 +31,7 @@
     contestState: ContestState;
   }
 
-  let { data, nameRetentionTime, submit, children, contestState }: Props =
+  const { data, nameRetentionTime, submit, children, contestState }: Props =
     $props();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
@@ -63,7 +63,7 @@
         value={data.name}
         {disabled}
       ></wa-input>
-      <wa-callout variant="neutral" size="small" open>
+      <wa-callout variant="neutral" size="small">
         <wa-icon slot="icon" name="circle-info"></wa-icon>
         Your name will be removed and your results anonymized
         {retentionDuration} after the contest ends.

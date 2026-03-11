@@ -11,7 +11,7 @@
     children?: Snippet<[{ contestState: ContestState }]>;
   }
 
-  const { contestId, compClassId = undefined, children }: Props = $props();
+  const { contestId, compClassId, children }: Props = $props();
 
   const contestQuery = $derived(getContestQuery(contestId));
   const compClassQuery = $derived(

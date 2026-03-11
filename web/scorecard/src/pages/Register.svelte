@@ -54,10 +54,7 @@
   <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
   <h1>{contest.name}</h1>
-  <ContestStateProvider
-    contestId={contest.id}
-    compClassId={contender.compClassId}
-  >
+  <ContestStateProvider contestId={contest.id}>
     {#snippet children({ contestState })}
       <RegistrationForm
         submit={handleSubmit}
