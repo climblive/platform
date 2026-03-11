@@ -3,29 +3,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
 :root {
-  --wa-color-brand-95: #fef2f2;
-  --wa-color-brand-90: #fee5e6;
-  --wa-color-brand-80: #fccfd2;
-  --wa-color-brand-70: #f9a8ad;
-  --wa-color-brand-60: #f57783;
-  --wa-color-brand-50: #ea384c;
-  --wa-color-brand-40: #d82643;
-  --wa-color-brand-30: #b61a37;
-  --wa-color-brand-20: #981935;
-  --wa-color-brand-10: #831833;
-  --wa-color-brand-05: #490816;
-
-  --wa-color-complementary-95: #f2fefe;
-  --wa-color-complementary-90: #e5fefd;
-  --wa-color-complementary-80: #cffcf9;
-  --wa-color-complementary-70: #a8f9f4;
-  --wa-color-complementary-60: #77f5e9;
-  --wa-color-complementary-50: #38ead6;
-  --wa-color-complementary-40: #26d8bb;
-  --wa-color-complementary-30: #1ab699;
-  --wa-color-complementary-20: #19987c;
-  --wa-color-complementary-10: #188368;
-  --wa-color-complementary-05: #08493b;
+  --wa-color-brand-95: #f2fefe;
+  --wa-color-brand-90: #e5fefd;
+  --wa-color-brand-80: #cffcf9;
+  --wa-color-brand-70: #a8f9f4;
+  --wa-color-brand-60: #77f5e9;
+  --wa-color-brand-50: #38ead6;
+  --wa-color-brand-40: #26d8bb;
+  --wa-color-brand-30: #1ab699;
+  --wa-color-brand-20: #19987c;
+  --wa-color-brand-10: #188368;
+  --wa-color-brand-05: #08493b;
 
   --wa-font-size-2xs: 0.6875rem;
   --wa-font-size-xs: 0.75rem;
