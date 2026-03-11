@@ -6,6 +6,7 @@ export { default as Floater } from "./Floater.svelte";
 export { default as FullLogo } from "./FullLogo.svelte";
 export { default as HoldColorIndicator } from "./HoldColorIndicator.svelte";
 export { default as LabeledText } from "./LabeledText.svelte";
+export { default as Logo } from "./Logo.svelte";
 export { default as ResultEntry } from "./ResultEntry.svelte";
 export { default as ResultList } from "./ResultList.svelte";
 export { default as Score } from "./Score.svelte";
