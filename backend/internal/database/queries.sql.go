@@ -936,23 +936,15 @@ func (q *Queries) GetRafflesByContest(ctx context.Context, contestID int32) ([]G
 }
 
 const getScrubEligibleContenders = `-- name: GetScrubEligibleContenders :many
-SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, score.contender_id, score.timestamp, score.score, score.placement, score.finalist, score.rank_order
+SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before
 FROM contender
-LEFT JOIN score ON score.contender_id = id
-WHERE (contender.name != '' 
-  OR contender.scrubbed_at IS NULL)
+WHERE contender.name != ''
   AND contender.scrub_before IS NOT NULL
   AND contender.scrub_before < ?
 `
 
 type GetScrubEligibleContendersRow struct {
-	Contender   Contender
-	ContenderID sql.NullInt32
-	Timestamp   sql.NullTime
-	Score       sql.NullInt32
-	Placement   sql.NullInt32
-	Finalist    sql.NullBool
-	RankOrder   sql.NullInt32
+	Contender Contender
 }
 
 func (q *Queries) GetScrubEligibleContenders(ctx context.Context, scrubBefore sql.NullTime) ([]GetScrubEligibleContendersRow, error) {
@@ -976,12 +968,6 @@ func (q *Queries) GetScrubEligibleContenders(ctx context.Context, scrubBefore sq
 			&i.Contender.WithdrawnFromFinals,
 			&i.Contender.ScrubbedAt,
 			&i.Contender.ScrubBefore,
-			&i.ContenderID,
-			&i.Timestamp,
-			&i.Score,
-			&i.Placement,
-			&i.Finalist,
-			&i.RankOrder,
 		); err != nil {
 			return nil, err
 		}
