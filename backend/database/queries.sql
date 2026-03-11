@@ -331,8 +331,7 @@ WHERE id = ?;
 -- name: GetScrubEligibleContenders :many
 SELECT sqlc.embed(contender)
 FROM contender
-WHERE (contender.name != '' 
-  OR contender.scrubbed_at IS NULL)
+WHERE contender.name != ''
   AND contender.scrub_before IS NOT NULL
   AND contender.scrub_before < ?;
 
