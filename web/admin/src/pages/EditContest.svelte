@@ -45,7 +45,12 @@
 {#if contest === undefined}
   <Loader />
 {:else}
-  <ContestForm submit={handleSubmit} data={contest} schema={formSchema}>
+  <ContestForm
+    submit={handleSubmit}
+    data={contest}
+    schema={formSchema}
+    disableNameRetentionTime
+  >
     <div class="controls">
       <wa-button
         size="small"

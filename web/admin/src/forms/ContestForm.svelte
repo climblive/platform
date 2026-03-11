@@ -43,9 +43,16 @@
     schema: z.ZodType<T, unknown>;
     submit: (value: T) => void;
     children?: Snippet;
+    disableNameRetentionTime?: boolean;
   }
 
-  let { data, schema, submit, children }: Props = $props();
+  const {
+    data,
+    schema,
+    submit,
+    children,
+    disableNameRetentionTime = false,
+  }: Props = $props();
 
   let selectedCountry = $derived(data.country || "AQ");
 
@@ -124,6 +131,7 @@
       orientation="horizontal"
       label="Retention time"
       hint="How long contender names are retained after the contest ends before results are anonymized."
+      disabled={disableNameRetentionTime}
     >
       {#each retentionOptions as option (option.value)}
         <wa-radio value={String(option.value)}>{option.label}</wa-radio>
