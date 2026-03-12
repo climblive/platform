@@ -106,37 +106,38 @@
 
 <GenericForm {schema} {submit}>
   <fieldset>
+    <wa-number-input
+      size="small"
+      {@attach name("number")}
+      label="Number"
+      required
+      value={data.number}
+      min={0}
+    ></wa-number-input>
+    <div class="colors">
+      <div class="pickers">
+        <wa-color-picker
+          size="small"
+          {@attach name("holdColorPrimary")}
+          label="Primary hold color"
+          required
+          {swatches}
+          value={data.holdColorPrimary}
+          without-format-toggle
+        ></wa-color-picker>
+        <wa-color-picker
+          size="small"
+          {@attach name("holdColorSecondary")}
+          label="Secondary hold color"
+          {swatches}
+          value={data.holdColorSecondary}
+          without-format-toggle
+        ></wa-color-picker>
+      </div>
+    </div>
+
     <div class="card">
       <h3>Top</h3>
-      <wa-number-input
-        size="small"
-        {@attach name("number")}
-        label="Number"
-        required
-        value={data.number}
-        min={0}
-      ></wa-number-input>
-      <div class="colors">
-        <div class="pickers">
-          <wa-color-picker
-            size="small"
-            {@attach name("holdColorPrimary")}
-            label="Primary hold color"
-            required
-            {swatches}
-            value={data.holdColorPrimary}
-            without-format-toggle
-          ></wa-color-picker>
-          <wa-color-picker
-            size="small"
-            {@attach name("holdColorSecondary")}
-            label="Secondary hold color"
-            {swatches}
-            value={data.holdColorSecondary}
-            without-format-toggle
-          ></wa-color-picker>
-        </div>
-      </div>
       <wa-number-input
         size="small"
         {@attach name("pointsTop")}
