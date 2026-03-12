@@ -163,7 +163,7 @@
       </wa-number-input>
     </div>
 
-    <div class="card">
+    <div class="card card-zone">
       <div class="card-header">
         <h3>Z2</h3>
         {#if zone2Enabled}
@@ -204,7 +204,7 @@
       </wa-number-input>
     </div>
 
-    <div class="card">
+    <div class="card card-zone">
       <div class="card-header">
         <h3>Z1</h3>
         {#if zone1Enabled}
@@ -268,6 +268,11 @@
       margin: 0;
       font-size: var(--wa-font-size-m);
     }
+  }
+
+  .card-zone {
+    padding: var(--wa-space-xs) var(--wa-space-s);
+    gap: var(--wa-space-xs);
   }
 
   .card-header {
