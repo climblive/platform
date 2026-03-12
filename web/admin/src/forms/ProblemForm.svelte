@@ -31,13 +31,11 @@
 </script>
 
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/color-picker/color-picker.js";
-  import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import type WaNumberInput from "@awesome.me/webawesome/dist/components/number-input/number-input.js";
-  import "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import { checked, GenericForm, name } from "@climblive/lib/forms";
+  import { GenericForm, name } from "@climblive/lib/forms";
   import { type Problem } from "@climblive/lib/models";
   import { type Snippet } from "svelte";
 
@@ -52,8 +50,8 @@
 
   let { data, schema, submit, children }: Props = $props();
 
-  let zone1Enabled = $derived(data.zone1Enabled);
-  let zone2Enabled = $derived(data.zone2Enabled);
+  let zone1Enabled = $state(data.zone1Enabled ?? false);
+  let zone2Enabled = $state(data.zone2Enabled ?? false);
 
   let pointsZone1Input = $state<WaNumberInput>();
   let pointsZone2Input = $state<WaNumberInput>();
@@ -85,131 +83,165 @@
     }
   };
 
-  const handleZone1Toggle = (event: InputEvent) => {
-    const target = event.target as WaSwitch;
-    zone1Enabled = target.checked;
-
-    if (!zone1Enabled) {
-      clearZone1Points();
-
-      zone2Enabled = false;
-      clearZone2Points();
-    }
+  const addZone1 = () => {
+    zone1Enabled = true;
   };
 
-  const handleZone2Toggle = (event: InputEvent) => {
-    const target = event.target as WaSwitch;
-    zone2Enabled = target.checked;
+  const removeZone1 = () => {
+    zone1Enabled = false;
+    clearZone1Points();
+    zone2Enabled = false;
+    clearZone2Points();
+  };
 
-    if (!zone2Enabled) {
-      clearZone2Points();
-    }
+  const addZone2 = () => {
+    zone2Enabled = true;
+  };
+
+  const removeZone2 = () => {
+    zone2Enabled = false;
+    clearZone2Points();
   };
 </script>
 
 <GenericForm {schema} {submit}>
   <fieldset>
-    <wa-number-input
-      size="small"
-      {@attach name("number")}
-      label="Number"
-      required
-      value={data.number}
-      min={0}
-    ></wa-number-input>
-    <div class="colors">
-      <div class="pickers">
-        <wa-color-picker
-          size="small"
-          {@attach name("holdColorPrimary")}
-          label="Primary hold color"
-          required
-          {swatches}
-          value={data.holdColorPrimary}
-          without-format-toggle
-        ></wa-color-picker>
-        <wa-color-picker
-          size="small"
-          {@attach name("holdColorSecondary")}
-          label="Secondary hold color"
-          {swatches}
-          value={data.holdColorSecondary}
-          without-format-toggle
-        ></wa-color-picker>
-      </div>
-    </div>
-    <wa-number-input
-      size="small"
-      {@attach name("pointsTop")}
-      label="Points top"
-      hint="Points for reaching the top."
-      required
-      value={data.pointsTop?.toString() ?? ""}
-      min={0}
-      max={2 ** 31 - 1}
-    >
-      <span slot="end">pts</span>
-    </wa-number-input>
-    <wa-number-input
-      size="small"
-      {@attach name("flashBonus")}
-      label="Flash bonus"
-      hint="Bonus points awarded for a flash ascent, added to the total."
-      value={data.flashBonus?.toString() ?? ""}
-      min={0}
-      max={2 ** 31 - 1}
-    >
-      <span slot="end">pts</span>
-    </wa-number-input>
-
-    <wa-divider></wa-divider>
-
-    <wa-switch
-      size="small"
-      {@attach name("zone1Enabled")}
-      hint="Add a zone."
-      onchange={handleZone1Toggle}
-      {@attach checked(zone1Enabled)}>Enable zone Z1</wa-switch
-    >
-    <wa-number-input
-      bind:this={pointsZone1Input}
-      size="small"
-      {@attach name("pointsZone1")}
-      label="Points Z1"
-      hint="Points for reaching the first zone."
-      value={data.pointsZone1?.toString() ?? ""}
-      min={0}
-      max={2 ** 31 - 1}
-      class={{
-        hidden: !zone1Enabled,
-      }}
-    >
-      <span slot="end">pts</span>
-    </wa-number-input>
-    {#if zone1Enabled}
-      <wa-switch
+    <div class="card">
+      <h3>Top</h3>
+      <wa-number-input
         size="small"
-        {@attach name("zone2Enabled")}
-        hint="Add a second zone."
-        onchange={handleZone2Toggle}
-        {@attach checked(zone2Enabled)}>Enable zone Z2</wa-switch
+        {@attach name("number")}
+        label="Number"
+        required
+        value={data.number}
+        min={0}
+      ></wa-number-input>
+      <div class="colors">
+        <div class="pickers">
+          <wa-color-picker
+            size="small"
+            {@attach name("holdColorPrimary")}
+            label="Primary hold color"
+            required
+            {swatches}
+            value={data.holdColorPrimary}
+            without-format-toggle
+          ></wa-color-picker>
+          <wa-color-picker
+            size="small"
+            {@attach name("holdColorSecondary")}
+            label="Secondary hold color"
+            {swatches}
+            value={data.holdColorSecondary}
+            without-format-toggle
+          ></wa-color-picker>
+        </div>
+      </div>
+      <wa-number-input
+        size="small"
+        {@attach name("pointsTop")}
+        label="Points top"
+        hint="Points for reaching the top."
+        required
+        value={data.pointsTop?.toString() ?? ""}
+        min={0}
+        max={2 ** 31 - 1}
       >
-    {/if}
-    <wa-number-input
-      bind:this={pointsZone2Input}
-      size="small"
-      {@attach name("pointsZone2")}
-      label="Points Z2"
-      hint="Points for reaching the second zone."
-      value={data.pointsZone2?.toString() ?? ""}
-      min={0}
-      max={2 ** 31 - 1}
-      class={{
-        hidden: !zone2Enabled,
-      }}
-    >
-      <span slot="end">pts</span>
-    </wa-number-input>
+        <span slot="end">pts</span>
+      </wa-number-input>
+      <wa-number-input
+        size="small"
+        {@attach name("flashBonus")}
+        label="Flash bonus"
+        hint="Bonus points awarded for a flash ascent, added to the total."
+        value={data.flashBonus?.toString() ?? ""}
+        min={0}
+        max={2 ** 31 - 1}
+      >
+        <span slot="end">pts</span>
+      </wa-number-input>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>Z2</h3>
+        {#if zone2Enabled}
+          <wa-button
+            size="small"
+            type="button"
+            appearance="outlined"
+            variant="danger"
+            onclick={removeZone2}>Remove</wa-button
+          >
+        {:else}
+          <wa-button
+            size="small"
+            type="button"
+            appearance="outlined"
+            onclick={addZone2}
+            disabled={!zone1Enabled}>Add</wa-button
+          >
+        {/if}
+      </div>
+      <input
+        type="hidden"
+        name="zone2Enabled"
+        value={zone2Enabled ? "on" : ""}
+      />
+      <wa-number-input
+        bind:this={pointsZone2Input}
+        size="small"
+        {@attach name("pointsZone2")}
+        label="Points Z2"
+        hint="Points for reaching the second zone."
+        value={data.pointsZone2?.toString() ?? ""}
+        min={0}
+        max={2 ** 31 - 1}
+        class={{ hidden: !zone2Enabled }}
+      >
+        <span slot="end">pts</span>
+      </wa-number-input>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h3>Z1</h3>
+        {#if zone1Enabled}
+          <wa-button
+            size="small"
+            type="button"
+            appearance="outlined"
+            variant="danger"
+            onclick={removeZone1}>Remove</wa-button
+          >
+        {:else}
+          <wa-button
+            size="small"
+            type="button"
+            appearance="outlined"
+            onclick={addZone1}>Add</wa-button
+          >
+        {/if}
+      </div>
+      <input
+        type="hidden"
+        name="zone1Enabled"
+        value={zone1Enabled ? "on" : ""}
+      />
+      <wa-number-input
+        bind:this={pointsZone1Input}
+        size="small"
+        {@attach name("pointsZone1")}
+        label="Points Z1"
+        hint="Points for reaching the first zone."
+        value={data.pointsZone1?.toString() ?? ""}
+        min={0}
+        max={2 ** 31 - 1}
+        class={{ hidden: !zone1Enabled }}
+      >
+        <span slot="end">pts</span>
+      </wa-number-input>
+    </div>
 
     {@render children?.()}
   </fieldset>
@@ -220,6 +252,30 @@
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-s);
+  }
+
+  .card {
+    border: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-neutral-border-normal);
+    border-radius: var(--wa-border-radius-m);
+    padding: var(--wa-space-m);
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-s);
+
+    & h3 {
+      margin: 0;
+      font-size: var(--wa-font-size-m);
+    }
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+
+    & wa-button {
+      margin-inline-start: auto;
+    }
   }
 
   .colors {
