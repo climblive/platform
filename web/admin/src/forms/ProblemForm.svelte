@@ -49,7 +49,7 @@
     data: Partial<T>;
     schema: z.ZodType<T, unknown>;
     submit: (value: T) => void;
-    children?: Snippet;
+    children?: Snippet<[boolean]>;
   }
 
   let { data, schema, submit, children }: Props = $props();
@@ -238,7 +238,7 @@
       </wa-callout>
     {/if}
 
-    {@render children?.()}
+    {@render children?.(showZonePointsWarning)}
   </fieldset>
 </GenericForm>
 

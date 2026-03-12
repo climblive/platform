@@ -56,22 +56,24 @@
     }}
     schema={formSchema}
   >
-    <div class="controls">
-      <wa-button
-        size="small"
-        type="button"
-        appearance="plain"
-        onclick={() => navigate(`/admin/contests/${contestId}#problems`)}
-        >Cancel</wa-button
-      >
-      <wa-button
-        size="small"
-        type="submit"
-        loading={createProblem.isPending}
-        variant="neutral"
-        >Create
-      </wa-button>
-    </div>
+    {#snippet children(showZonePointsWarning)}
+      <div class="controls">
+        <wa-button
+          size="small"
+          type="button"
+          appearance="plain"
+          onclick={() => navigate(`/admin/contests/${contestId}#problems`)}
+          >Cancel</wa-button
+        >
+        <wa-button
+          size="small"
+          type="submit"
+          loading={createProblem.isPending}
+          variant={showZonePointsWarning ? "warning" : "neutral"}
+          >Create
+        </wa-button>
+      </div>
+    {/snippet}
   </ProblemForm>
 {/if}
 
