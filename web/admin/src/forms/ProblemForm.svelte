@@ -31,15 +31,17 @@
 </script>
 
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/color-picker/color-picker.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import type WaNumberInput from "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { checked, GenericForm, name } from "@climblive/lib/forms";
   import { type Problem } from "@climblive/lib/models";
-  import { type Snippet } from "svelte";
+  import { type Snippet, untrack } from "svelte";
 
   type T = $$Generic<Partial<Problem>>;
 
@@ -57,6 +59,13 @@
 
   let pointsZone1Input = $state<WaNumberInput>();
   let pointsZone2Input = $state<WaNumberInput>();
+
+  let pointsZone1 = $state(untrack(() => data.pointsZone1 ?? 0));
+  let pointsZone2 = $state(untrack(() => data.pointsZone2 ?? 0));
+
+  let showZonePointsWarning = $derived(
+    zone2Enabled === true && pointsZone2 < pointsZone1,
+  );
 
   const swatches = [
     "#6f3601",
@@ -76,12 +85,14 @@
   const clearZone1Points = () => {
     if (pointsZone1Input) {
       pointsZone1Input.value = "0";
+      pointsZone1 = 0;
     }
   };
 
   const clearZone2Points = () => {
     if (pointsZone2Input) {
       pointsZone2Input.value = "0";
+      pointsZone2 = 0;
     }
   };
 
@@ -104,6 +115,14 @@
     if (!zone2Enabled) {
       clearZone2Points();
     }
+  };
+
+  const handlePointsZone1Input = (event: InputEvent) => {
+    pointsZone1 = Number((event.target as WaNumberInput).value) || 0;
+  };
+
+  const handlePointsZone2Input = (event: InputEvent) => {
+    pointsZone2 = Number((event.target as WaNumberInput).value) || 0;
   };
 </script>
 
@@ -180,6 +199,7 @@
       value={data.pointsZone1?.toString() ?? ""}
       min={0}
       max={2 ** 31 - 1}
+      oninput={handlePointsZone1Input}
       class={{
         hidden: !zone1Enabled,
       }}
@@ -204,12 +224,19 @@
       value={data.pointsZone2?.toString() ?? ""}
       min={0}
       max={2 ** 31 - 1}
+      oninput={handlePointsZone2Input}
       class={{
         hidden: !zone2Enabled,
       }}
     >
       <span slot="end">pts</span>
     </wa-number-input>
+    {#if showZonePointsWarning}
+      <wa-callout variant="warning" size="small">
+        <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
+        Points for Z2 are less than points for Z1.
+      </wa-callout>
+    {/if}
 
     {@render children?.()}
   </fieldset>
