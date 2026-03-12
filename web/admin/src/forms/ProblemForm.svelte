@@ -33,6 +33,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/color-picker/color-picker.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import type WaNumberInput from "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import { GenericForm, name } from "@climblive/lib/forms";
@@ -163,64 +164,75 @@
       </wa-number-input>
     </div>
 
-    <div class="card card-zone">
-      <div class="card-header">
-        <h3>Z2</h3>
-        {#if zone2Enabled}
-          <wa-button
-            size="small"
-            type="button"
-            appearance="outlined"
-            variant="danger"
-            onclick={removeZone2}>Remove</wa-button
-          >
-        {:else}
-          <wa-button
-            size="small"
-            type="button"
-            appearance="outlined"
-            onclick={addZone2}
-            disabled={!zone1Enabled}>Add</wa-button
-          >
-        {/if}
+    {#if zone1Enabled}
+      <div class="card card-zone">
+        <div class="card-header">
+          <div class="card-label">
+            <h3>Z2</h3>
+            <span>Second zone</span>
+          </div>
+          {#if zone2Enabled}
+            <wa-button
+              size="small"
+              type="button"
+              appearance="plain"
+              variant="danger"
+              onclick={removeZone2}
+              ><wa-icon name="xmark" label="Remove Z2"></wa-icon></wa-button
+            >
+          {:else}
+            <wa-button
+              size="small"
+              type="button"
+              appearance="plain"
+              onclick={addZone2}
+              ><wa-icon name="plus" label="Add Z2"></wa-icon></wa-button
+            >
+          {/if}
+        </div>
+        <input
+          type="hidden"
+          name="zone2Enabled"
+          value={zone2Enabled ? "on" : ""}
+        />
+        <wa-number-input
+          bind:this={pointsZone2Input}
+          size="small"
+          {@attach name("pointsZone2")}
+          label="Points Z2"
+          hint="Points for reaching the second zone."
+          value={data.pointsZone2?.toString() ?? ""}
+          min={0}
+          max={2 ** 31 - 1}
+          class={{ hidden: !zone2Enabled }}
+        >
+          <span slot="end">pts</span>
+        </wa-number-input>
       </div>
-      <input
-        type="hidden"
-        name="zone2Enabled"
-        value={zone2Enabled ? "on" : ""}
-      />
-      <wa-number-input
-        bind:this={pointsZone2Input}
-        size="small"
-        {@attach name("pointsZone2")}
-        label="Points Z2"
-        hint="Points for reaching the second zone."
-        value={data.pointsZone2?.toString() ?? ""}
-        min={0}
-        max={2 ** 31 - 1}
-        class={{ hidden: !zone2Enabled }}
-      >
-        <span slot="end">pts</span>
-      </wa-number-input>
-    </div>
+    {/if}
 
     <div class="card card-zone">
       <div class="card-header">
-        <h3>Z1</h3>
+        <div class="card-label">
+          <h3>Z1</h3>
+          <span>First zone</span>
+        </div>
         {#if zone1Enabled}
           <wa-button
             size="small"
             type="button"
-            appearance="outlined"
+            appearance="plain"
             variant="danger"
-            onclick={removeZone1}>Remove</wa-button
+            onclick={removeZone1}
+            ><wa-icon name="xmark" label="Remove Z1"></wa-icon></wa-button
           >
         {:else}
           <wa-button
             size="small"
             type="button"
-            appearance="outlined"
-            onclick={addZone1}>Add</wa-button
+            appearance="plain"
+            onclick={addZone1}
+            ><wa-icon name="plus" label="Add Z1"></wa-icon></wa-button
           >
         {/if}
       </div>
@@ -281,6 +293,21 @@
 
     & wa-button {
       margin-inline-start: auto;
+    }
+  }
+
+  .card-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+
+    & h3 {
+      margin: 0;
+    }
+
+    & span {
+      font-size: var(--wa-font-size-xs);
+      color: var(--wa-color-text-quiet);
     }
   }
 
