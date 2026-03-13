@@ -72,7 +72,7 @@
       var(--wa-color-brand-border-normal);
     border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-s);
-    color: var(--wa-color-brand-on-normal);
+    color: var(--wa-color-text-normal);
     position: relative;
 
     & wa-button {
@@ -82,7 +82,7 @@
       color: inherit;
 
       &::part(label) {
-        color: var(--wa-color-brand-on-normal);
+        color: var(--wa-color-text-normal);
       }
     }
 

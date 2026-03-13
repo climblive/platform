@@ -51,7 +51,7 @@
     border: var(--wa-border-width-s) var(--wa-border-style)
       var(--wa-color-brand-border-normal);
 
-    color: var(--wa-color-brand-on-normal);
+    color: var(--wa-color-text-normal);
 
     display: grid;
     grid-template-columns: 1fr max-content;
