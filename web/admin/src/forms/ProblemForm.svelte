@@ -31,8 +31,10 @@
 </script>
 
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/color-picker/color-picker.js";
+  import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+  import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
@@ -53,6 +55,9 @@
   }
 
   let { data, schema, submit, children }: Props = $props();
+
+  let dialog: WaDialog | undefined = $state();
+  let pendingValue: T | undefined = $state(undefined);
 
   let zone1Enabled = $derived(data.zone1Enabled);
   let zone2Enabled = $derived(data.zone2Enabled);
@@ -81,6 +86,27 @@
     "#000",
     "#fff",
   ].join("; ");
+
+  const handleSubmit = (value: T) => {
+    if (unrecommendedPointDistribution) {
+      pendingValue = value;
+      if (dialog) dialog.open = true;
+    } else {
+      submit(value);
+    }
+  };
+
+  const handleConfirmDialog = () => {
+    if (pendingValue !== undefined) {
+      submit(pendingValue);
+    }
+    if (dialog) dialog.open = false;
+  };
+
+  const handleCancelDialog = () => {
+    pendingValue = undefined;
+    if (dialog) dialog.open = false;
+  };
 
   const clearZone1Points = () => {
     if (pointsZone1Input) {
@@ -126,7 +152,7 @@
   };
 </script>
 
-<GenericForm {schema} {submit}>
+<GenericForm {schema} submit={handleSubmit}>
   <fieldset>
     <wa-number-input
       size="small"
@@ -231,17 +257,21 @@
     >
       <span slot="end">pts</span>
     </wa-number-input>
-    {#if unrecommendedPointDistribution}
-      <wa-callout variant="warning" size="small">
-        <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
-        Z2 points are lower than Z1 points, so contenders will lose points when reaching
-        the second zone.
-      </wa-callout>
-    {/if}
 
     {@render children?.(unrecommendedPointDistribution)}
   </fieldset>
 </GenericForm>
+
+<wa-dialog bind:this={dialog} label="Inconsistent zone points">
+  Z2 points are lower than Z1 points. Contenders will lose points when reaching
+  the second zone. Save anyway?
+  <wa-button slot="footer" appearance="plain" onclick={handleCancelDialog}
+    >Cancel</wa-button
+  >
+  <wa-button slot="footer" variant="warning" onclick={handleConfirmDialog}>
+    Save anyway
+  </wa-button>
+</wa-dialog>
 
 <style>
   fieldset {
@@ -263,5 +293,9 @@
 
   .hidden {
     display: none;
+  }
+
+  wa-dialog {
+    white-space: normal;
   }
 </style>
