@@ -34,25 +34,23 @@
   <Loader />
 {:else}
   <ProblemForm submit={handleSubmit} data={problem} schema={formSchema}>
-    {#snippet children(warning)}
-      <div class="controls">
-        <wa-button
-          size="small"
-          type="button"
-          appearance="plain"
-          onclick={() =>
-            navigate(`/admin/contests/${problem.contestId}#problems`)}
-          >Cancel</wa-button
-        >
-        <wa-button
-          size="small"
-          type="submit"
-          loading={patchProblem.isPending}
-          variant={warning ? "warning" : "neutral"}
-          >Save
-        </wa-button>
-      </div>
-    {/snippet}
+    <div class="controls">
+      <wa-button
+        size="small"
+        type="button"
+        appearance="plain"
+        onclick={() =>
+          navigate(`/admin/contests/${problem.contestId}#problems`)}
+        >Cancel</wa-button
+      >
+      <wa-button
+        size="small"
+        type="submit"
+        loading={patchProblem.isPending}
+        variant="neutral"
+        >Save
+      </wa-button>
+    </div>
   </ProblemForm>
 {/if}
 
