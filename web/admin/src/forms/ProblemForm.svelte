@@ -250,6 +250,10 @@
     gap: var(--wa-space-s);
   }
 
+  wa-switch {
+    width: fit-content;
+  }
+
   .colors {
     & .pickers {
       display: flex;
