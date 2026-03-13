@@ -263,12 +263,12 @@
 </GenericForm>
 
 <wa-dialog bind:this={dialog} label="Inconsistent zone points">
-  Z2 points are lower than Z1 points. Contenders will lose points when reaching
-  the second zone. Save anyway?
+  Points for the second zone are lower than points for the first zone. Contenders will
+  lose points when reaching the second zone.
   <wa-button slot="footer" appearance="plain" onclick={handleCancelDialog}
     >Cancel</wa-button
   >
-  <wa-button slot="footer" variant="warning" onclick={handleConfirmDialog}>
+  <wa-button slot="footer" onclick={handleConfirmDialog}>
     Save anyway
   </wa-button>
 </wa-dialog>
