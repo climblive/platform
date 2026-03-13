@@ -34,7 +34,7 @@
   <Loader />
 {:else}
   <ProblemForm submit={handleSubmit} data={problem} schema={formSchema}>
-    {#snippet children(showZonePointsWarning)}
+    {#snippet children(warning)}
       <div class="controls">
         <wa-button
           size="small"
@@ -48,7 +48,7 @@
           size="small"
           type="submit"
           loading={patchProblem.isPending}
-          variant={showZonePointsWarning ? "warning" : "neutral"}
+          variant={warning ? "warning" : "neutral"}
           >Save
         </wa-button>
       </div>

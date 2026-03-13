@@ -41,7 +41,7 @@
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { checked, GenericForm, name } from "@climblive/lib/forms";
   import { type Problem } from "@climblive/lib/models";
-  import { type Snippet, untrack } from "svelte";
+  import { type Snippet } from "svelte";
 
   type T = $$Generic<Partial<Problem>>;
 
@@ -60,10 +60,10 @@
   let pointsZone1Input = $state<WaNumberInput>();
   let pointsZone2Input = $state<WaNumberInput>();
 
-  let pointsZone1 = $state(untrack(() => data.pointsZone1 ?? 0));
-  let pointsZone2 = $state(untrack(() => data.pointsZone2 ?? 0));
+  let pointsZone1 = $derived(data.pointsZone1 ?? 0);
+  let pointsZone2 = $derived(data.pointsZone2 ?? 0);
 
-  let showZonePointsWarning = $derived(
+  const unrecommendedPointDistribution = $derived(
     zone2Enabled === true && pointsZone2 < pointsZone1,
   );
 
@@ -231,15 +231,15 @@
     >
       <span slot="end">pts</span>
     </wa-number-input>
-    {#if showZonePointsWarning}
+    {#if unrecommendedPointDistribution}
       <wa-callout variant="warning" size="small">
         <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
-        Points for Z2 are less than points for Z1. Contenders will lose points when
-        reaching the second zone.
+        Z2 points are lower than Z1 points, so contenders will lose points when reaching
+        the second zone.
       </wa-callout>
     {/if}
 
-    {@render children?.(showZonePointsWarning)}
+    {@render children?.(unrecommendedPointDistribution)}
   </fieldset>
 </GenericForm>
 

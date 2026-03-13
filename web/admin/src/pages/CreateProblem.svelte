@@ -56,7 +56,7 @@
     }}
     schema={formSchema}
   >
-    {#snippet children(showZonePointsWarning)}
+    {#snippet children(warning)}
       <div class="controls">
         <wa-button
           size="small"
@@ -69,7 +69,7 @@
           size="small"
           type="submit"
           loading={createProblem.isPending}
-          variant={showZonePointsWarning ? "warning" : "neutral"}
+          variant={warning ? "warning" : "neutral"}
           >Create
         </wa-button>
       </div>
