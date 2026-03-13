@@ -234,8 +234,8 @@
     {#if showZonePointsWarning}
       <wa-callout variant="warning" size="small">
         <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
-        Points for Z2 are less than points for Z1. Contenders will lose points
-        when reaching the second zone.
+        Points for Z2 are less than points for Z1. Contenders will lose points when
+        reaching the second zone.
       </wa-callout>
     {/if}
 
