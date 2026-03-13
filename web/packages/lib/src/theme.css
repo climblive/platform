@@ -3,17 +3,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
 :root {
-  --wa-color-brand-95: #fef2f2;
-  --wa-color-brand-90: #fee5e6;
-  --wa-color-brand-80: #fccfd2;
-  --wa-color-brand-70: #f9a8ad;
-  --wa-color-brand-60: #f57783;
-  --wa-color-brand-50: #ea384c;
-  --wa-color-brand-40: #d82643;
-  --wa-color-brand-30: #b61a37;
-  --wa-color-brand-20: #981935;
-  --wa-color-brand-10: #831833;
-  --wa-color-brand-05: #490816;
+  --wa-color-brand-95: #f0fdfa;
+  --wa-color-brand-90: #ccfbf1;
+  --wa-color-brand-80: #99f6e4;
+  --wa-color-brand-70: #5eead4;
+  --wa-color-brand-60: #2dd4bf;
+  --wa-color-brand-50: #14b8a6;
+  --wa-color-brand-40: #0d9488;
+  --wa-color-brand-30: #0f766e;
+  --wa-color-brand-20: #115e59;
+  --wa-color-brand-10: #134e4a;
+  --wa-color-brand-05: #042f2e;
 
   --wa-font-size-2xs: 0.6875rem;
   --wa-font-size-xs: 0.75rem;
