@@ -65,13 +65,6 @@
   let pointsZone1Input = $state<WaNumberInput>();
   let pointsZone2Input = $state<WaNumberInput>();
 
-  let pointsZone1 = $derived(data.pointsZone1 ?? 0);
-  let pointsZone2 = $derived(data.pointsZone2 ?? 0);
-
-  const unrecommendedPointDistribution = $derived(
-    zone2Enabled === true && pointsZone2 < pointsZone1,
-  );
-
   const swatches = [
     "#6f3601",
     "#dc3146",
@@ -88,9 +81,18 @@
   ].join("; ");
 
   const handleSubmit = (value: T) => {
+    const pointsZone1 = value.pointsZone1 ?? 0;
+    const pointsZone2 = value.pointsZone2 ?? 0;
+
+    const unrecommendedPointDistribution =
+      value.zone2Enabled === true && pointsZone2 < pointsZone1;
+
     if (unrecommendedPointDistribution) {
       pendingValue = value;
-      if (dialog) dialog.open = true;
+
+      if (dialog) {
+        dialog.open = true;
+      }
     } else {
       submit(value);
     }
@@ -100,25 +102,29 @@
     if (pendingValue !== undefined) {
       submit(pendingValue);
     }
-    if (dialog) dialog.open = false;
+
+    if (dialog) {
+      dialog.open = false;
+    }
   };
 
   const handleCancelDialog = () => {
     pendingValue = undefined;
-    if (dialog) dialog.open = false;
+
+    if (dialog) {
+      dialog.open = false;
+    }
   };
 
   const clearZone1Points = () => {
     if (pointsZone1Input) {
       pointsZone1Input.value = "0";
-      pointsZone1 = 0;
     }
   };
 
   const clearZone2Points = () => {
     if (pointsZone2Input) {
       pointsZone2Input.value = "0";
-      pointsZone2 = 0;
     }
   };
 
@@ -141,14 +147,6 @@
     if (!zone2Enabled) {
       clearZone2Points();
     }
-  };
-
-  const handlePointsZone1Input = (event: InputEvent) => {
-    pointsZone1 = Number((event.target as WaNumberInput).value) || 0;
-  };
-
-  const handlePointsZone2Input = (event: InputEvent) => {
-    pointsZone2 = Number((event.target as WaNumberInput).value) || 0;
   };
 </script>
 
@@ -225,7 +223,6 @@
       value={data.pointsZone1?.toString() ?? ""}
       min={0}
       max={2 ** 31 - 1}
-      oninput={handlePointsZone1Input}
       class={{
         hidden: !zone1Enabled,
       }}
@@ -250,7 +247,6 @@
       value={data.pointsZone2?.toString() ?? ""}
       min={0}
       max={2 ** 31 - 1}
-      oninput={handlePointsZone2Input}
       class={{
         hidden: !zone2Enabled,
       }}
