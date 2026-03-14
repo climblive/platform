@@ -94,7 +94,7 @@
   }
 
   .big-value {
-    font-size: var(--wa-font-size-3xl);
+    font-size: var(--wa-font-size-xl);
     font-weight: var(--wa-font-weight-bold);
     line-height: var(--wa-line-height-condensed);
     margin-bottom: var(--wa-space-xs);
@@ -116,7 +116,7 @@
   }
 
   .card :global(.timer span[role="timer"]) {
-    font-size: var(--wa-font-size-3xl);
+    font-size: var(--wa-font-size-xl);
     font-weight: var(--wa-font-weight-bold);
     line-height: var(--wa-line-height-condensed);
   }

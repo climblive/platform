@@ -314,9 +314,9 @@
             <div class="problems-header">
               <span class="problems-label">Problems</span>
               <div class="sort-buttons">
-                <wa-button
-                  size="small"
-                  appearance={orderProblemsBy === "number" ? "tinted" : "plain"}
+                <button
+                  class="sort-btn"
+                  class:active={orderProblemsBy === "number"}
                   onclick={() => {
                     if (orderProblemsBy === "number") {
                       sortDirection = sortDirection === "asc" ? "desc" : "asc";
@@ -330,10 +330,10 @@
                   <wa-icon name={numberSortIcon} label={numberSortLabel}
                   ></wa-icon>
                   #
-                </wa-button>
-                <wa-button
-                  size="small"
-                  appearance={orderProblemsBy === "points" ? "tinted" : "plain"}
+                </button>
+                <button
+                  class="sort-btn"
+                  class:active={orderProblemsBy === "points"}
                   onclick={() => {
                     if (orderProblemsBy === "points") {
                       sortDirection = sortDirection === "asc" ? "desc" : "asc";
@@ -347,7 +347,7 @@
                   <wa-icon name={pointsSortIcon} label={pointsSortLabel}
                   ></wa-icon>
                   Pts
-                </wa-button>
+                </button>
               </div>
             </div>
             {#if sortedProblems.length === 0}
@@ -473,12 +473,30 @@
     gap: var(--wa-space-3xs);
   }
 
-  .sort-buttons wa-button::part(label) {
-    display: flex;
+  .sort-btn {
+    display: inline-flex;
     align-items: center;
     gap: var(--wa-space-3xs);
+    font-family: inherit;
     font-size: var(--wa-font-size-2xs);
-    padding: 0 var(--wa-space-2xs);
+    font-weight: var(--wa-font-weight-semibold);
+    line-height: 1;
+    padding: var(--wa-space-3xs) var(--wa-space-2xs);
+    border: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+    border-radius: var(--wa-border-radius-s);
+    background: transparent;
+    color: var(--wa-color-text-quiet);
+    cursor: pointer;
+  }
+
+  .sort-btn.active {
+    background: var(--wa-color-neutral-fill-quiet-hover);
+    color: var(--wa-color-text-default);
+  }
+
+  .sort-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
   }
 
   .problems-header {
