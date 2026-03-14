@@ -2,7 +2,7 @@
   import Loader from "@/components/Loader.svelte";
   import ContestForm, {
     formSchema,
-    minuteInNanoseconds,
+    nanosecondsInMinute,
   } from "@/forms/ContestForm.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
@@ -30,7 +30,7 @@
         ...tmpl,
         gracePeriod:
           tmpl.gracePeriod !== undefined
-            ? tmpl.gracePeriod * minuteInNanoseconds
+            ? tmpl.gracePeriod * nanosecondsInMinute
             : undefined,
       },
       {
@@ -45,7 +45,12 @@
 {#if contest === undefined}
   <Loader />
 {:else}
-  <ContestForm submit={handleSubmit} data={contest} schema={formSchema}>
+  <ContestForm
+    submit={handleSubmit}
+    data={contest}
+    schema={formSchema}
+    disableNameRetentionTime
+  >
     <div class="controls">
       <wa-button
         size="small"

@@ -9,9 +9,16 @@
     description: z.string().optional(),
     info: z.string().optional(),
     gracePeriod: z.coerce.number().min(0).max(60),
+    nameRetentionTime: z.coerce.number(),
   });
 
-  export const minuteInNanoseconds = 60 * 1_000_000_000;
+  export const nanosecondsInMinute = 60 * 1_000_000_000;
+
+  export const retentionOptions = [
+    { label: "14 days", value: 14 * 24 * 60 * nanosecondsInMinute },
+    { label: "30 days", value: 30 * 24 * 60 * nanosecondsInMinute },
+    { label: "90 days", value: 90 * 24 * 60 * nanosecondsInMinute },
+  ];
 </script>
 
 <script lang="ts">
@@ -19,6 +26,8 @@
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import "@awesome.me/webawesome/dist/components/option/option.js";
+  import "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
+  import "@awesome.me/webawesome/dist/components/radio/radio.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
@@ -34,9 +43,16 @@
     schema: z.ZodType<T, unknown>;
     submit: (value: T) => void;
     children?: Snippet;
+    disableNameRetentionTime?: boolean;
   }
 
-  let { data, schema, submit, children }: Props = $props();
+  const {
+    data,
+    schema,
+    submit,
+    children,
+    disableNameRetentionTime = false,
+  }: Props = $props();
 
   let selectedCountry = $derived(data.country || "AQ");
 
@@ -60,6 +76,7 @@
       type="text"
       required
       value={data.name}
+      hint="The name of the contest as shown to contenders."
     ></wa-input>
     <wa-input
       size="small"
@@ -67,6 +84,7 @@
       label="Description"
       type="text"
       value={data.description}
+      hint="A short description or tagline for the contest."
     ></wa-input>
     <div class="location">
       <wa-input
@@ -82,6 +100,7 @@
         {@attach name("country")}
         {@attach value(selectedCountry)}
         label="Country"
+        hint="The country where the contest is held."
         onchange={handleCountryChange}
       >
         <span slot="start">{getFlag(selectedCountry)}</span>
@@ -101,10 +120,23 @@
       required
       min={0}
       max={60}
-      value={Math.floor((data.gracePeriod ?? 0) / minuteInNanoseconds)}
+      value={Math.floor((data.gracePeriod ?? 0) / nanosecondsInMinute)}
     >
       <span slot="end">minutes</span>
     </wa-number-input>
+    <wa-radio-group
+      size="small"
+      {@attach name("nameRetentionTime")}
+      {@attach value(data.nameRetentionTime)}
+      orientation="horizontal"
+      label="Retention time"
+      hint="How long contender names are retained after the contest ends before results are anonymized."
+      disabled={disableNameRetentionTime}
+    >
+      {#each retentionOptions as option (option.value)}
+        <wa-radio value={String(option.value)}>{option.label}</wa-radio>
+      {/each}
+    </wa-radio-group>
     {#if showGeneralInfo}
       <InfoInput info={data.info} />
     {:else}
