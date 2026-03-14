@@ -290,8 +290,4 @@
   .hidden {
     display: none;
   }
-
-  wa-dialog {
-    white-space: normal;
-  }
 </style>
