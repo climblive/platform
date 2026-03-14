@@ -10,38 +10,35 @@
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
-  import type WaRadioGroup from "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
-  import "@awesome.me/webawesome/dist/components/radio/radio.js";
   import "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
   import type WaTabGroup from "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
   import "@awesome.me/webawesome/dist/components/tab-panel/tab-panel.js";
   import "@awesome.me/webawesome/dist/components/tab/tab.js";
   import {
-    ContestStateProvider,
-    EmptyState,
-    ResultList,
-    ScoreboardProvider,
-    SplashScreen,
+      ContestStateProvider,
+      EmptyState,
+      ResultList,
+      ScoreboardProvider,
+      SplashScreen,
   } from "@climblive/lib/components";
   import {
-    ascentDeregisteredEventSchema,
-    ascentRegisteredEventSchema,
-    contenderPublicInfoUpdatedEventSchema,
-    contenderScoreUpdatedEventSchema,
-    raffleWinnerDrawnEventSchema,
-    type Problem,
-    type Tick,
+      ascentDeregisteredEventSchema,
+      ascentRegisteredEventSchema,
+      contenderPublicInfoUpdatedEventSchema,
+      contenderScoreUpdatedEventSchema,
+      raffleWinnerDrawnEventSchema,
+      type Problem,
+      type Tick,
   } from "@climblive/lib/models";
   import {
-    getCompClassesQuery,
-    getContenderQuery,
-    getContestQuery,
-    getProblemsQuery,
-    getTicksByContenderQuery,
-    removeTickFromQueryCache,
-    updateContenderPublicInfoInQueryCache,
-    updateTickInQueryCache,
+      getCompClassesQuery,
+      getContenderQuery,
+      getContestQuery,
+      getProblemsQuery,
+      getTicksByContenderQuery,
+      removeTickFromQueryCache,
+      updateContenderPublicInfoInQueryCache,
+      updateTickInQueryCache,
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
@@ -61,7 +58,6 @@
 
   let resultsConnected = $state(false);
   let tabGroup: WaTabGroup | undefined = $state();
-  let radioGroup: WaRadioGroup | undefined = $state();
   let raffleWinnerDialog: WaDialog | undefined = $state();
   let stickyHeader: HTMLDivElement | undefined = $state();
   let eventSource: EventSource | undefined;
@@ -300,11 +296,11 @@
           />
         </div>
         <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleShowTab}>
-          <wa-tab slot="nav" panel="problems">Results</wa-tab>
-          <wa-tab slot="nav" panel="results">Scoreboard</wa-tab>
+          <wa-tab slot="nav" panel="problems">Scorecard</wa-tab>
+          <wa-tab slot="nav" panel="results">Results</wa-tab>
           <wa-tab slot="nav" panel="info">Info</wa-tab>
 
-          <div class="summary-cards">
+          <wa-tab-panel name="problems">
             <SummaryCards
               {score}
               {placement}
@@ -315,32 +311,18 @@
               {ticks}
               totalProblems={sortedProblems.length}
             />
-          </div>
-
-          <wa-tab-panel name="problems">
             <div class="problems-header">
               <span class="problems-label">Problems</span>
-              <wa-radio-group
-                orientation="horizontal"
-                size="small"
-                bind:this={radioGroup}
-                value={orderProblemsBy}
-                onchange={() => {
-                  if (radioGroup) {
-                    const newValue = radioGroup.value as typeof orderProblemsBy;
-                    if (newValue !== orderProblemsBy) {
-                      sortDirection = "asc";
-                      orderProblemsBy = newValue;
-                    }
-                  }
-                }}
-              >
-                <wa-radio
-                  value="number"
-                  appearance="button"
+              <div class="sort-buttons">
+                <wa-button
+                  size="small"
+                  appearance={orderProblemsBy === "number" ? "tinted" : "plain"}
                   onclick={() => {
                     if (orderProblemsBy === "number") {
                       sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                    } else {
+                      sortDirection = "asc";
+                      orderProblemsBy = "number";
                     }
                   }}
                   disabled={problems === undefined || problems.length === 0}
@@ -348,14 +330,16 @@
                   <wa-icon name={numberSortIcon} label={numberSortLabel}
                   ></wa-icon>
                   #
-                </wa-radio>
-
-                <wa-radio
-                  value="points"
-                  appearance="button"
+                </wa-button>
+                <wa-button
+                  size="small"
+                  appearance={orderProblemsBy === "points" ? "tinted" : "plain"}
                   onclick={() => {
                     if (orderProblemsBy === "points") {
                       sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                    } else {
+                      sortDirection = "asc";
+                      orderProblemsBy = "points";
                     }
                   }}
                   disabled={problems === undefined || problems.length === 0}
@@ -363,8 +347,8 @@
                   <wa-icon name={pointsSortIcon} label={pointsSortLabel}
                   ></wa-icon>
                   Pts
-                </wa-radio>
-              </wa-radio-group>
+                </wa-button>
+              </div>
             </div>
             {#if sortedProblems.length === 0}
               <EmptyState
@@ -445,7 +429,7 @@
 
 <style>
   wa-tab-panel::part(base) {
-    padding-top: var(--wa-space-s);
+    padding-top: var(--wa-space-m);
     padding-bottom: 0;
   }
 
@@ -463,10 +447,6 @@
     z-index: 11;
     background-color: var(--wa-color-surface-default);
     padding: 0 var(--wa-space-m);
-  }
-
-  .summary-cards {
-    padding: var(--wa-space-s) 0;
   }
 
   wa-tab-group {
@@ -488,25 +468,17 @@
     gap: var(--wa-space-xs);
   }
 
-  wa-radio-group {
-    margin-block-end: 0;
+  .sort-buttons {
+    display: flex;
+    gap: var(--wa-space-3xs);
   }
 
-  wa-radio {
-    flex-grow: 0;
-  }
-
-  wa-radio::part(button--checked) {
-    background-color: var(--wa-color-neutral-fill-quiet-hover);
-  }
-
-  wa-radio::part(label) {
-    margin: 0;
+  .sort-buttons wa-button::part(label) {
     display: flex;
     align-items: center;
     gap: var(--wa-space-3xs);
     font-size: var(--wa-font-size-2xs);
-    padding: var(--wa-space-3xs) var(--wa-space-xs);
+    padding: 0 var(--wa-space-2xs);
   }
 
   .problems-header {

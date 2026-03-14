@@ -36,7 +36,7 @@
     disabled={contestState === "ENDED"}
     appearance="plain"
   >
-    <wa-icon name="circle-user" label="Edit profile"></wa-icon>
+    <wa-icon name="gear" label="Settings"></wa-icon>
   </wa-button>
 </header>
 

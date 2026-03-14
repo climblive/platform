@@ -36,8 +36,8 @@
   );
 </script>
 
-<div class="cards">
-  <div class="card">
+<div class="card">
+  <div class="card-section">
     <span class="label">Points</span>
     <span class="big-value">{formatScore(score)}</span>
     <span class="label">Placement</span>
@@ -51,7 +51,7 @@
       {/if}
     </span>
   </div>
-  <div class="card">
+  <div class="card-section">
     {#if contestState === "NOT_STARTED"}
       <Timer endTime={startTime} label="Time until start" />
     {:else}
@@ -70,18 +70,18 @@
 </div>
 
 <style>
-  .cards {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--wa-space-s);
-  }
-
   .card {
     background-color: var(--wa-color-surface-raised);
     border: var(--wa-border-width-s) var(--wa-border-style)
       var(--wa-color-surface-border);
     border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-m);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--wa-space-m);
+  }
+
+  .card-section {
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-3xs);
@@ -90,9 +90,7 @@
   .label {
     font-size: var(--wa-font-size-2xs);
     font-weight: var(--wa-font-weight-bold);
-    text-transform: uppercase;
     color: var(--wa-color-text-quiet);
-    letter-spacing: 0.05em;
   }
 
   .big-value {
@@ -126,9 +124,7 @@
   .card :global(.timer label) {
     font-size: var(--wa-font-size-2xs);
     font-weight: var(--wa-font-weight-bold);
-    text-transform: uppercase;
     color: var(--wa-color-text-quiet);
-    letter-spacing: 0.05em;
     order: -1;
   }
 </style>
