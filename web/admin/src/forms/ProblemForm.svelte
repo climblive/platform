@@ -207,28 +207,6 @@
 
     <wa-divider></wa-divider>
 
-    <wa-switch
-      size="small"
-      {@attach name("zone1Enabled")}
-      hint="Add a zone."
-      onchange={handleZone1Toggle}
-      {@attach checked(zone1Enabled)}>Enable zone Z1</wa-switch
-    >
-    <wa-number-input
-      bind:this={pointsZone1Input}
-      size="small"
-      {@attach name("pointsZone1")}
-      label="Points Z1"
-      hint="Points for reaching the first zone."
-      value={data.pointsZone1?.toString() ?? ""}
-      min={0}
-      max={2 ** 31 - 1}
-      class={{
-        hidden: !zone1Enabled,
-      }}
-    >
-      <span slot="end">pts</span>
-    </wa-number-input>
     {#if zone1Enabled}
       <wa-switch
         size="small"
@@ -249,6 +227,29 @@
       max={2 ** 31 - 1}
       class={{
         hidden: !zone2Enabled,
+      }}
+    >
+      <span slot="end">pts</span>
+    </wa-number-input>
+
+    <wa-switch
+      size="small"
+      {@attach name("zone1Enabled")}
+      hint="Add a zone."
+      onchange={handleZone1Toggle}
+      {@attach checked(zone1Enabled)}>Enable zone Z1</wa-switch
+    >
+    <wa-number-input
+      bind:this={pointsZone1Input}
+      size="small"
+      {@attach name("pointsZone1")}
+      label="Points Z1"
+      hint="Points for reaching the first zone."
+      value={data.pointsZone1?.toString() ?? ""}
+      min={0}
+      max={2 ** 31 - 1}
+      class={{
+        hidden: !zone1Enabled,
       }}
     >
       <span slot="end">pts</span>
