@@ -63,6 +63,7 @@
   let tabGroup: WaTabGroup | undefined = $state();
   let radioGroup: WaRadioGroup | undefined = $state();
   let raffleWinnerDialog: WaDialog | undefined = $state();
+  let stickyHeader: HTMLDivElement | undefined = $state();
   let eventSource: EventSource | undefined;
   let score: number = $state(0);
   let placement: number | undefined = $state();
@@ -262,6 +263,22 @@
     tearDown();
   });
 
+  $effect(() => {
+    if (!stickyHeader) return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      const height = entry.borderBoxSize[0].blockSize;
+      stickyHeader!.parentElement?.style.setProperty(
+        "--header-height",
+        `${height}px`,
+      );
+    });
+
+    observer.observe(stickyHeader);
+
+    return () => observer.disconnect();
+  });
+
   let showSplash = $state(true);
 </script>
 
@@ -273,7 +290,7 @@
   <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime}>
     {#snippet children({ contestState })}
       <main>
-        <div class="sticky">
+        <div class="sticky" bind:this={stickyHeader}>
           <Header
             registrationCode={$session.registrationCode}
             contestName={contest.name}
@@ -282,69 +299,73 @@
             {contestState}
           />
         </div>
-        <div class="summary-cards">
-          <SummaryCards
-            {score}
-            {placement}
-            disqualified={contender.disqualified}
-            {contestState}
-            {startTime}
-            {endTime}
-            {ticks}
-            totalProblems={sortedProblems.length}
-          />
-        </div>
         <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleShowTab}>
           <wa-tab slot="nav" panel="problems">Results</wa-tab>
           <wa-tab slot="nav" panel="results">Scoreboard</wa-tab>
           <wa-tab slot="nav" panel="info">Info</wa-tab>
 
-          <wa-tab-panel name="problems">
-            <wa-radio-group
-              orientation="horizontal"
-              size="small"
-              bind:this={radioGroup}
-              value={orderProblemsBy}
-              onchange={() => {
-                if (radioGroup) {
-                  const newValue = radioGroup.value as typeof orderProblemsBy;
-                  if (newValue !== orderProblemsBy) {
-                    sortDirection = "asc";
-                    orderProblemsBy = newValue;
-                  }
-                }
-              }}
-            >
-              <wa-radio
-                value="number"
-                appearance="button"
-                onclick={() => {
-                  if (orderProblemsBy === "number") {
-                    sortDirection = sortDirection === "asc" ? "desc" : "asc";
-                  }
-                }}
-                disabled={problems === undefined || problems.length === 0}
-              >
-                <wa-icon name={numberSortIcon} label={numberSortLabel}
-                ></wa-icon>
-                Sort by number
-              </wa-radio>
+          <div class="summary-cards">
+            <SummaryCards
+              {score}
+              {placement}
+              disqualified={contender.disqualified}
+              {contestState}
+              {startTime}
+              {endTime}
+              {ticks}
+              totalProblems={sortedProblems.length}
+            />
+          </div>
 
-              <wa-radio
-                value="points"
-                appearance="button"
-                onclick={() => {
-                  if (orderProblemsBy === "points") {
-                    sortDirection = sortDirection === "asc" ? "desc" : "asc";
+          <wa-tab-panel name="problems">
+            <div class="problems-header">
+              <span class="problems-label">Problems</span>
+              <wa-radio-group
+                orientation="horizontal"
+                size="small"
+                bind:this={radioGroup}
+                value={orderProblemsBy}
+                onchange={() => {
+                  if (radioGroup) {
+                    const newValue = radioGroup.value as typeof orderProblemsBy;
+                    if (newValue !== orderProblemsBy) {
+                      sortDirection = "asc";
+                      orderProblemsBy = newValue;
+                    }
                   }
                 }}
-                disabled={problems === undefined || problems.length === 0}
               >
-                <wa-icon name={pointsSortIcon} label={pointsSortLabel}
-                ></wa-icon>
-                Sort by points
-              </wa-radio>
-            </wa-radio-group>
+                <wa-radio
+                  value="number"
+                  appearance="button"
+                  onclick={() => {
+                    if (orderProblemsBy === "number") {
+                      sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                    }
+                  }}
+                  disabled={problems === undefined || problems.length === 0}
+                >
+                  <wa-icon name={numberSortIcon} label={numberSortLabel}
+                  ></wa-icon>
+                  #
+                </wa-radio>
+
+                <wa-radio
+                  value="points"
+                  appearance="button"
+                  onclick={() => {
+                    if (orderProblemsBy === "points") {
+                      sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                    }
+                  }}
+                  disabled={problems === undefined || problems.length === 0}
+                >
+                  <wa-icon name={pointsSortIcon} label={pointsSortLabel}
+                  ></wa-icon>
+                  Pts
+                </wa-radio>
+              </wa-radio-group>
+            </div>
             {#if sortedProblems.length === 0}
               <EmptyState
                 title="No problems"
@@ -439,18 +460,26 @@
     top: 0;
     left: 0;
     right: 0;
-    z-index: 10;
+    z-index: 11;
     background-color: var(--wa-color-surface-default);
     padding: 0 var(--wa-space-m);
   }
 
   .summary-cards {
-    padding: 0 var(--wa-space-m) var(--wa-space-s);
+    padding: var(--wa-space-s) 0;
   }
 
   wa-tab-group {
+    --track-width: 2px;
     padding-inline: var(--wa-space-m);
     padding-bottom: var(--wa-space-m);
+  }
+
+  wa-tab-group::part(nav) {
+    position: sticky;
+    top: var(--header-height, 0px);
+    z-index: 10;
+    background-color: var(--wa-color-surface-default);
   }
 
   wa-tab-panel[name="problems"]::part(base) {
@@ -460,18 +489,39 @@
   }
 
   wa-radio-group {
-    margin-block-end: var(--wa-space-xs);
+    margin-block-end: 0;
   }
 
   wa-radio {
-    flex-grow: 1;
+    flex-grow: 0;
+  }
+
+  wa-radio::part(button--checked) {
+    background-color: var(--wa-color-neutral-fill-quiet-hover);
   }
 
   wa-radio::part(label) {
-    margin: 0 auto;
+    margin: 0;
     display: flex;
     align-items: center;
-    gap: var(--wa-space-2xs);
+    gap: var(--wa-space-3xs);
+    font-size: var(--wa-font-size-2xs);
+    padding: var(--wa-space-3xs) var(--wa-space-xs);
+  }
+
+  .problems-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--wa-space-xs);
+  }
+
+  .problems-label {
+    font-size: var(--wa-font-size-xs);
+    font-weight: var(--wa-font-weight-bold);
+    text-transform: uppercase;
+    color: var(--wa-color-text-quiet);
+    letter-spacing: 0.05em;
   }
 
   .raffle-winner-dialog {
