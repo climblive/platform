@@ -479,9 +479,9 @@
     font-size: var(--wa-font-size-2xs);
     font-weight: var(--wa-font-weight-semibold);
     line-height: 1;
-    padding: var(--wa-space-3xs) var(--wa-space-2xs);
+    padding: var(--wa-space-2xs) var(--wa-space-xs);
     border: var(--wa-border-width-s) solid var(--wa-color-surface-border);
-    border-radius: var(--wa-border-radius-s);
+    border-radius: var(--wa-border-radius-m);
     background: transparent;
     color: var(--wa-color-text-quiet);
     cursor: pointer;
