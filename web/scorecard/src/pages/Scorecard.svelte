@@ -15,30 +15,30 @@
   import "@awesome.me/webawesome/dist/components/tab-panel/tab-panel.js";
   import "@awesome.me/webawesome/dist/components/tab/tab.js";
   import {
-      ContestStateProvider,
-      EmptyState,
-      ResultList,
-      ScoreboardProvider,
-      SplashScreen,
+    ContestStateProvider,
+    EmptyState,
+    ResultList,
+    ScoreboardProvider,
+    SplashScreen,
   } from "@climblive/lib/components";
   import {
-      ascentDeregisteredEventSchema,
-      ascentRegisteredEventSchema,
-      contenderPublicInfoUpdatedEventSchema,
-      contenderScoreUpdatedEventSchema,
-      raffleWinnerDrawnEventSchema,
-      type Problem,
-      type Tick,
+    ascentDeregisteredEventSchema,
+    ascentRegisteredEventSchema,
+    contenderPublicInfoUpdatedEventSchema,
+    contenderScoreUpdatedEventSchema,
+    raffleWinnerDrawnEventSchema,
+    type Problem,
+    type Tick,
   } from "@climblive/lib/models";
   import {
-      getCompClassesQuery,
-      getContenderQuery,
-      getContestQuery,
-      getProblemsQuery,
-      getTicksByContenderQuery,
-      removeTickFromQueryCache,
-      updateContenderPublicInfoInQueryCache,
-      updateTickInQueryCache,
+    getCompClassesQuery,
+    getContenderQuery,
+    getContestQuery,
+    getProblemsQuery,
+    getTicksByContenderQuery,
+    removeTickFromQueryCache,
+    updateContenderPublicInfoInQueryCache,
+    updateTickInQueryCache,
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
@@ -501,7 +501,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: var(--wa-space-xs);
+    margin-block: var(--wa-space-2xs);
   }
 
   .problems-label {
