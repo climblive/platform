@@ -31,8 +31,12 @@
 </script>
 
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/color-picker/color-picker.js";
+  import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+  import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import type WaNumberInput from "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
@@ -51,6 +55,9 @@
   }
 
   let { data, schema, submit, children }: Props = $props();
+
+  let dialog: WaDialog | undefined = $state();
+  let pendingValue: T | undefined = $state(undefined);
 
   let zone1Enabled = $derived(data.zone1Enabled);
   let zone2Enabled = $derived(data.zone2Enabled);
@@ -72,6 +79,42 @@
     "#000",
     "#fff",
   ].join("; ");
+
+  const handleSubmit = (value: T) => {
+    const pointsZone1 = value.pointsZone1 ?? 0;
+    const pointsZone2 = value.pointsZone2 ?? 0;
+
+    const unrecommendedPointDistribution =
+      value.zone2Enabled === true && pointsZone2 < pointsZone1;
+
+    if (unrecommendedPointDistribution) {
+      pendingValue = value;
+
+      if (dialog) {
+        dialog.open = true;
+      }
+    } else {
+      submit(value);
+    }
+  };
+
+  const handleConfirmDialog = () => {
+    if (pendingValue !== undefined) {
+      submit(pendingValue);
+    }
+
+    if (dialog) {
+      dialog.open = false;
+    }
+  };
+
+  const handleCancelDialog = () => {
+    pendingValue = undefined;
+
+    if (dialog) {
+      dialog.open = false;
+    }
+  };
 
   const clearZone1Points = () => {
     if (pointsZone1Input) {
@@ -107,7 +150,7 @@
   };
 </script>
 
-<GenericForm {schema} {submit}>
+<GenericForm {schema} submit={handleSubmit}>
   <fieldset>
     <wa-number-input
       size="small"
@@ -215,11 +258,26 @@
   </fieldset>
 </GenericForm>
 
+<wa-dialog bind:this={dialog} label="Inconsistent zone points">
+  Points for the second zone are lower than points for the first zone.
+  Contenders will lose points when reaching the second zone.
+  <wa-button slot="footer" appearance="plain" onclick={handleCancelDialog}
+    >Cancel</wa-button
+  >
+  <wa-button slot="footer" variant="warning" onclick={handleConfirmDialog}>
+    Save anyway
+  </wa-button>
+</wa-dialog>
+
 <style>
   fieldset {
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-s);
+  }
+
+  wa-switch {
+    width: fit-content;
   }
 
   .colors {
