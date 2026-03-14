@@ -24,7 +24,6 @@
   const formatScore = (value: number) => {
     return value.toLocaleString("en", { useGrouping: true }).replace(/,/g, " ");
   };
-
 </script>
 
 <div class="card">
