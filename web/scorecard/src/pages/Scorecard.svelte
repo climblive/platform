@@ -3,6 +3,7 @@
   import Header from "@/components/Header.svelte";
   import ProblemView from "@/components/ProblemView.svelte";
   import Summary from "@/components/Summary.svelte";
+  import SummaryCards from "@/components/SummaryCards.svelte";
   import type { ScorecardSession } from "@/types";
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
@@ -278,17 +279,24 @@
             contestName={contest.name}
             compClassName={selectedCompClass?.name}
             contenderName={contender.name}
+            {contestState}
+          />
+        </div>
+        <div class="summary-cards">
+          <SummaryCards
             {score}
             {placement}
+            disqualified={contender.disqualified}
             {contestState}
             {startTime}
             {endTime}
-            disqualified={contender.disqualified}
+            {ticks}
+            totalProblems={sortedProblems.length}
           />
         </div>
         <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleShowTab}>
-          <wa-tab slot="nav" panel="problems">Scorecard</wa-tab>
-          <wa-tab slot="nav" panel="results">Results</wa-tab>
+          <wa-tab slot="nav" panel="problems">Results</wa-tab>
+          <wa-tab slot="nav" panel="results">Scoreboard</wa-tab>
           <wa-tab slot="nav" panel="info">Info</wa-tab>
 
           <wa-tab-panel name="problems">
@@ -433,7 +441,11 @@
     right: 0;
     z-index: 10;
     background-color: var(--wa-color-surface-default);
-    padding: var(--wa-space-m);
+    padding: 0 var(--wa-space-m);
+  }
+
+  .summary-cards {
+    padding: 0 var(--wa-space-m) var(--wa-space-s);
   }
 
   wa-tab-group {
