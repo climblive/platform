@@ -20,15 +20,20 @@
 </script>
 
 <header>
-  <div class="info">
-    <h1>{contestName}</h1>
-    <p class="subtitle">
-      {contenderName}
-      {#if compClassName}
-        <span class="separator">&middot;</span>
-        <span class="comp-class">{compClassName}</span>
-      {/if}
-    </p>
+  <div class="identity">
+    <img class="logo" src="/favicon.svg" alt="ClimbLive logo" />
+    <div class="info">
+      <div class="title">
+        <h1>{contestName}</h1>
+      </div>
+      <p class="subtitle">
+        {contenderName}
+        {#if compClassName}
+          <span class="separator">&middot;</span>
+          <span class="comp-class">{compClassName}</span>
+        {/if}
+      </p>
+    </div>
   </div>
   <wa-button
     size="small"
@@ -49,8 +54,29 @@
     padding: var(--wa-space-s) 0;
   }
 
+  .identity {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-xs);
+    min-width: 0;
+  }
+
   .info {
     min-width: 0;
+  }
+
+  .title {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-2xs);
+    min-width: 0;
+  }
+
+  .logo {
+    width: calc(var(--wa-font-size-l) * 2);
+    height: calc(var(--wa-font-size-l) * 2);
+    border-radius: var(--wa-border-radius-s);
+    flex-shrink: 0;
   }
 
   h1 {
