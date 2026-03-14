@@ -308,8 +308,6 @@
               {contestState}
               {startTime}
               {endTime}
-              {ticks}
-              totalProblems={sortedProblems.length}
             />
             <div class="problems-header">
               <span class="problems-label">Problems</span>

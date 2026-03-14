@@ -1,6 +1,5 @@
 <script lang="ts">
   import { Timer } from "@climblive/lib/components";
-  import type { Tick } from "@climblive/lib/models";
   import { type ContestState } from "@climblive/lib/types";
   import { ordinalSuperscript } from "@climblive/lib/utils";
 
@@ -11,8 +10,6 @@
     contestState: ContestState;
     startTime: Date;
     endTime: Date;
-    ticks: Tick[];
-    totalProblems: number;
   }
 
   let {
@@ -22,18 +19,12 @@
     contestState,
     startTime,
     endTime,
-    ticks,
-    totalProblems,
   }: Props = $props();
 
   const formatScore = (value: number) => {
     return value.toLocaleString("en", { useGrouping: true }).replace(/,/g, " ");
   };
 
-  const tops = $derived(ticks.filter((tick) => tick.top).length);
-  const flashes = $derived(
-    ticks.filter((tick) => tick.top && tick.attemptsTop === 1).length,
-  );
 </script>
 
 <div class="card">
@@ -57,15 +48,6 @@
     {:else}
       <Timer {endTime} label="Time remaining" />
     {/if}
-    <span class="label">Cleared</span>
-    <span class="value">
-      {tops}/{totalProblems} Problems
-      {#if flashes > 0}
-        <span class="flashes"
-          >({flashes} {flashes === 1 ? "Flash" : "Flashes"})</span
-        >
-      {/if}
-    </span>
   </div>
 </div>
 
@@ -104,11 +86,6 @@
     font-size: var(--wa-font-size-m);
     font-weight: var(--wa-font-weight-bold);
     line-height: var(--wa-line-height-condensed);
-  }
-
-  .flashes {
-    color: var(--wa-color-brand-text-normal);
-    font-weight: var(--wa-font-weight-normal);
   }
 
   .card :global(.timer) {
