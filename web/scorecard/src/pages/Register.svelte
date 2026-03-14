@@ -14,9 +14,12 @@
     patchContenderMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
+  import { add, formatDistance } from "date-fns";
   import { getContext } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Readable } from "svelte/store";
+
+  const nanosecondsInMinute = 60 * 1_000_000_000;
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
@@ -47,6 +50,16 @@
     );
   };
 
+  const retentionDuration = $derived.by(() => {
+    const base = new Date(0);
+    return formatDistance(
+      add(base, {
+        minutes: (contest?.nameRetentionTime ?? 0) / nanosecondsInMinute,
+      }),
+      base,
+    );
+  });
+
   let showSplash = $state(true);
 </script>
 
@@ -58,12 +71,12 @@
     {#snippet children({ contestState })}
       <RegistrationForm
         submit={handleSubmit}
-        nameRetentionTime={contest.nameRetentionTime}
         data={{
           name: contender.name,
           compClassId: contender.compClassId,
           withdrawnFromFinals: contender.withdrawnFromFinals,
         }}
+        callout={registerCallout}
         {contestState}
       >
         <wa-button
@@ -75,6 +88,14 @@
           >Register
         </wa-button>
       </RegistrationForm>
+
+      {#snippet registerCallout()}
+        <wa-callout variant="neutral" size="small">
+          <wa-icon slot="icon" name="circle-info"></wa-icon>
+          Your name will be stored for {retentionDuration} after the contest ends,
+          after which it will be removed and your results anonymized.
+        </wa-callout>
+      {/snippet}
     {/snippet}
   </ContestStateProvider>
 {/if}

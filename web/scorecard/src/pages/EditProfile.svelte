@@ -13,8 +13,9 @@
     patchContenderMutation,
     scrubContenderMutation,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
-  import { getContext } from "svelte";
+  import { SyncedTime, toastError } from "@climblive/lib/utils";
+  import { formatDistance } from "date-fns";
+  import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Readable } from "svelte/store";
   import Loading from "./Loading.svelte";
@@ -25,9 +26,30 @@
   const contestQuery = $derived(getContestQuery($session.contestId));
   const patchContender = $derived(patchContenderMutation($session.contenderId));
   const scrubContender = $derived(scrubContenderMutation($session.contenderId));
+  const time = new SyncedTime(60_000);
+
+  onMount(() => {
+    time.start();
+
+    return () => time.stop();
+  });
 
   let contender = $derived(contenderQuery.data);
   let contest = $derived(contestQuery.data);
+
+  const retentionDuration = $derived.by(() => {
+    if (!contender?.scrubBefore) {
+      return undefined;
+    }
+
+    const now = time.current;
+
+    if (contender.scrubBefore <= now) {
+      return undefined;
+    }
+
+    return formatDistance(contender.scrubBefore, now);
+  });
 
   let scrubDialog: WaDialog | undefined = $state();
 
@@ -71,12 +93,12 @@
 
       <RegistrationForm
         submit={handleSubmit}
-        nameRetentionTime={contest.nameRetentionTime}
         data={{
           name: contender.name,
           compClassId: contender.compClassId,
           withdrawnFromFinals: contender.withdrawnFromFinals,
         }}
+        callout={profileCallout}
         {contestState}
       >
         <div class="controls">
@@ -115,6 +137,18 @@
           </wa-button>
         </div>
       </RegistrationForm>
+
+      {#snippet profileCallout()}
+        <wa-callout variant="neutral" size="small">
+          <wa-icon slot="icon" name="circle-info"></wa-icon>
+          {#if retentionDuration}
+            Your name will be kept stored for {retentionDuration} from now, after
+            which it will be removed and your results anonymized.
+          {:else}
+            Your name will be removed and your results anonymized shortly.
+          {/if}
+        </wa-callout>
+      {/snippet}
     {/snippet}
   </ContestStateProvider>
 

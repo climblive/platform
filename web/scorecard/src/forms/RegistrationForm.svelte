@@ -1,7 +1,5 @@
 <script lang="ts">
   import type { ScorecardSession } from "@/types";
-  import "@awesome.me/webawesome/dist/components/callout/callout.js";
-  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
@@ -11,11 +9,9 @@
   import { getCompClassesQuery } from "@climblive/lib/queries";
   import type { ContestState } from "@climblive/lib/types";
   import { z } from "@climblive/lib/utils";
-  import { add, formatDistance, isAfter } from "date-fns";
+  import { isAfter } from "date-fns";
   import { getContext, type Snippet } from "svelte";
   import type { Readable } from "svelte/store";
-
-  export const nanosecondsInMinute = 60 * 1_000_000_000;
 
   const registrationFormSchema: z.ZodType<ContenderPatch> = z.object({
     name: z.string().min(1),
@@ -25,28 +21,17 @@
 
   interface Props {
     data: Partial<ContenderPatch>;
-    nameRetentionTime: number;
     submit: (patch: ContenderPatch) => void;
+    callout?: Snippet;
     children?: Snippet;
     contestState: ContestState;
   }
 
-  const { data, nameRetentionTime, submit, children, contestState }: Props =
-    $props();
+  const { data, submit, callout, children, contestState }: Props = $props();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
   let compClassesQuery = $derived(getCompClassesQuery($session.contestId));
-
-  const retentionDuration = $derived.by(() => {
-    const base = new Date(0);
-    return formatDistance(
-      add(base, {
-        minutes: nameRetentionTime / nanosecondsInMinute,
-      }),
-      base,
-    );
-  });
 </script>
 
 {#if compClassesQuery.data}
@@ -63,11 +48,7 @@
         value={data.name}
         {disabled}
       ></wa-input>
-      <wa-callout variant="neutral" size="small">
-        <wa-icon slot="icon" name="circle-info"></wa-icon>
-        Your name will be removed and your results anonymized
-        {retentionDuration} after the contest ends.
-      </wa-callout>
+      {@render callout?.()}
       <wa-select
         size="small"
         {@attach name("compClassId")}
