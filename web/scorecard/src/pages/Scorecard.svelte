@@ -312,9 +312,6 @@
               {endTime}
             />
             <div class="problems-header">
-              <span class="problems-label"
-                >Problems ({problems?.length ?? 0})</span
-              >
               <div class="sort-buttons">
                 <button
                   class="sort-btn"
@@ -383,7 +380,7 @@
                     {scoreboard}
                     {loading}
                     highlightedContenderId={contender.id}
-                    autoScroll={false}
+                    autoScroll
                   />
                 {/snippet}
               </ScoreboardProvider>
@@ -464,6 +461,7 @@
 
   .sort-buttons {
     display: flex;
+    margin-inline-start: auto;
   }
 
   .sort-btn {
@@ -497,13 +495,6 @@
     align-items: center;
     justify-content: space-between;
     margin-block: var(--wa-space-2xs);
-  }
-
-  .problems-label {
-    font-size: var(--wa-font-size-xs);
-    font-weight: var(--wa-font-weight-bold);
-    text-transform: uppercase;
-    color: var(--wa-color-text-quiet);
   }
 
   .raffle-winner-dialog {
