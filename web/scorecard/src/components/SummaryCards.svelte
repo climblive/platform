@@ -21,10 +21,6 @@
     startTime,
     endTime,
   }: Props = $props();
-
-  const formatScore = (value: number) => {
-    return value.toLocaleString("en", { useGrouping: true }).replace(/,/g, " ");
-  };
 </script>
 
 {#snippet entry(label: string, value: Snippet, disabled: boolean = false)}
@@ -35,7 +31,7 @@
 {/snippet}
 
 {#snippet pointsValue()}
-  <strong>{formatScore(score)}</strong>
+  <strong>{score}p</strong>
 {/snippet}
 
 {#snippet placementValue()}
@@ -57,7 +53,7 @@
 {/snippet}
 
 <div class="summary">
-  {@render entry("Points", pointsValue)}
+  {@render entry("Score", pointsValue)}
   {@render entry("Placement", placementValue)}
 
   {#if contestState === "NOT_STARTED"}
