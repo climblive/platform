@@ -302,8 +302,11 @@
 
           <wa-tab-panel name="problems">
             <SummaryCards
+              ticks={ticks ?? []}
+              problems={problems ?? []}
               {score}
               {placement}
+              {finalist}
               disqualified={contender.disqualified}
               {contestState}
               {startTime}
