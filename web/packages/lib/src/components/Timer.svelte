@@ -1,15 +1,14 @@
 <script lang="ts">
   import { formatDistanceToNow, intervalToDuration } from "date-fns";
   import { onMount } from "svelte";
-  import { SyncedTime, uuidv4 } from "../utils";
+  import { SyncedTime } from "../utils";
 
   interface Props {
     endTime: Date;
-    label: string;
     align?: "left" | "right";
   }
 
-  let { endTime, label, align = "left" }: Props = $props();
+  let { endTime, align = "left" }: Props = $props();
 
   const time = new SyncedTime(1_000);
 
@@ -18,8 +17,6 @@
 
     return () => time.stop();
   });
-
-  const labelId = uuidv4();
 
   const formatTimeRemaining = () => {
     const now = new Date(time.current);
@@ -45,10 +42,7 @@
 </script>
 
 <div class="timer" data-alignment={align}>
-  <span role="timer" aria-live="off" aria-labelledby={labelId}
-    >{displayValue}</span
-  >
-  <label for="" id={labelId}>{label}</label>
+  <span role="timer" aria-live="off">{displayValue}</span>
 </div>
 
 <style>
@@ -62,11 +56,6 @@
 
     & span[role="timer"] {
       font-weight: var(--wa-font-weight-bold);
-    }
-
-    & label {
-      font-weight: var(--wa-font-weight-normal);
-      font-size: 0.75em;
     }
   }
 

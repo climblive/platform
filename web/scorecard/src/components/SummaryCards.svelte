@@ -2,6 +2,7 @@
   import { Timer } from "@climblive/lib/components";
   import { type ContestState } from "@climblive/lib/types";
   import { ordinalSuperscript } from "@climblive/lib/utils";
+  import type { Snippet } from "svelte";
 
   interface Props {
     score: number;
@@ -12,7 +13,7 @@
     endTime: Date;
   }
 
-  let {
+  const {
     score,
     placement,
     disqualified,
@@ -26,81 +27,98 @@
   };
 </script>
 
-<div class="card">
-  <div class="card-section">
-    <span class="label">Points</span>
-    <span class="big-value">{formatScore(score)}</span>
-    <span class="label">Placement</span>
-    <span class="value">
-      {#if disqualified}
-        Disqualified
-      {:else if placement}
-        {placement}<sup>{ordinalSuperscript(placement)}</sup>
-      {:else}
-        -
-      {/if}
-    </span>
+{#snippet entry(label: string, value: Snippet, disabled: boolean = false)}
+  <div class="stat" class:disabled>
+    <span class="label">{label}</span>
+    <span class="value">{@render value()}</span>
   </div>
-  <div class="card-section">
-    {#if contestState === "NOT_STARTED"}
-      <Timer endTime={startTime} label="Time until start" />
-    {:else}
-      <Timer {endTime} label="Time remaining" />
-    {/if}
-  </div>
+{/snippet}
+
+{#snippet pointsValue()}
+  <strong>{formatScore(score)}</strong>
+{/snippet}
+
+{#snippet placementValue()}
+  {#if disqualified}
+    <strong>Disqualified</strong>
+  {:else if placement}
+    <strong>{placement}<sup>{ordinalSuperscript(placement)}</sup></strong>
+  {:else}
+    <strong>-</strong>
+  {/if}
+{/snippet}
+
+{#snippet timerValue()}
+  {#if contestState === "NOT_STARTED"}
+    <Timer endTime={startTime} />
+  {:else}
+    <Timer {endTime} />
+  {/if}
+{/snippet}
+
+<div class="summary">
+  {@render entry("Points", pointsValue)}
+  {@render entry("Placement", placementValue)}
+
+  {#if contestState === "NOT_STARTED"}
+    {@render entry("Time until start", timerValue)}
+  {:else}
+    {@render entry("Time remaining", timerValue)}
+  {/if}
 </div>
 
 <style>
-  .card {
+  .summary {
     background-color: var(--wa-color-surface-raised);
     border: var(--wa-border-width-s) var(--wa-border-style)
       var(--wa-color-surface-border);
     border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-m);
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: var(--wa-space-m);
   }
 
-  .card-section {
+  .stat {
     display: flex;
     flex-direction: column;
-    gap: var(--wa-space-3xs);
+    align-items: flex-start;
   }
 
   .label {
-    font-size: var(--wa-font-size-2xs);
-    font-weight: var(--wa-font-weight-bold);
+    font-size: var(--wa-font-size-xs);
     color: var(--wa-color-text-quiet);
-  }
-
-  .big-value {
-    font-size: var(--wa-font-size-xl);
-    font-weight: var(--wa-font-weight-bold);
-    line-height: var(--wa-line-height-condensed);
-    margin-bottom: var(--wa-space-xs);
+    margin-bottom: var(--wa-space-2xs);
   }
 
   .value {
-    font-size: var(--wa-font-size-m);
-    font-weight: var(--wa-font-weight-bold);
-    line-height: var(--wa-line-height-condensed);
+    font-size: 1em;
+    line-height: 1;
+
+    & strong {
+      font-size: 1.5em;
+      font-weight: var(--wa-font-weight-bold);
+    }
   }
 
-  .card :global(.timer) {
-    margin-bottom: var(--wa-space-xs);
+  .stat.disabled {
+    opacity: 0.5;
   }
 
-  .card :global(.timer span[role="timer"]) {
-    font-size: var(--wa-font-size-xl);
-    font-weight: var(--wa-font-weight-bold);
-    line-height: var(--wa-line-height-condensed);
+  .summary :global(.timer) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-2xs);
   }
 
-  .card :global(.timer label) {
-    font-size: var(--wa-font-size-2xs);
-    font-weight: var(--wa-font-weight-bold);
+  .summary :global(.timer label) {
+    font-size: var(--wa-font-size-xs);
     color: var(--wa-color-text-quiet);
-    order: -1;
+  }
+
+  .summary :global(.timer span[role="timer"]) {
+    font-size: 1.5em;
+    font-weight: var(--wa-font-weight-bold);
+    line-height: 1;
   }
 </style>
