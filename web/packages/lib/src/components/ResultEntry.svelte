@@ -37,7 +37,7 @@
 
 <style>
   section {
-    height: 2.25rem;
+    height: 2.75rem;
     background-color: var(--wa-color-surface-raised);
     border: var(--wa-border-width-s) var(--wa-border-style)
       var(--wa-color-neutral-border-quiet);
@@ -62,7 +62,7 @@
     width: 100%;
     white-space: nowrap;
     overflow: hidden;
-    line-height: 2.25rem;
+    line-height: 2.75rem;
   }
 
   .number {
