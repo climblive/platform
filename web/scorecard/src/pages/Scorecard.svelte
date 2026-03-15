@@ -2,7 +2,6 @@
   import ContestInfo from "@/components/ContestInfo.svelte";
   import Header from "@/components/Header.svelte";
   import ProblemView from "@/components/ProblemView.svelte";
-  import Summary from "@/components/Summary.svelte";
   import SummaryCards from "@/components/SummaryCards.svelte";
   import type { ScorecardSession } from "@/types";
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
@@ -369,16 +368,6 @@
             {/if}
           </wa-tab-panel>
           <wa-tab-panel name="results">
-            {#if contestState !== "NOT_STARTED"}
-              <Summary
-                {ticks}
-                problems={sortedProblems}
-                {score}
-                {placement}
-                {finalist}
-                disqualified={contender.disqualified}
-              />
-            {/if}
             {#if resultsConnected}
               <ScoreboardProvider
                 contestId={$session.contestId}
