@@ -97,6 +97,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-weight: var(--wa-font-weight-bold);
   }
 
   .separator {
@@ -104,7 +105,7 @@
   }
 
   .comp-class {
-    font-weight: var(--wa-font-weight-bold);
+    font-weight: var(--wa-font-weight-normal);
   }
 
   wa-button::part(base) {

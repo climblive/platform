@@ -102,35 +102,33 @@
   <wa-icon name={finalist ? "medal" : "minus"}></wa-icon>
 {/snippet}
 
-{#snippet moreValue()}
-  <button
-    type="button"
+<div class="summary">
+  <div class="grid">
+    {@render entry("Score", pointsValue)}
+    {@render entry("Placement", placementValue)}
+
+    {#if contestState === "NOT_STARTED"}
+      {@render entry("Time until start", timerValue)}
+    {:else}
+      {@render entry("Time remaining", timerValue)}
+    {/if}
+
+    {#if showMore}
+      {@render entry("Tops", topsValue)}
+      {@render entry("Zones", zonesValue, problemsWithZones.length === 0)}
+      {@render entry("Flashes", flashesValue)}
+      {@render entry("Finalist", finalistValue)}
+    {/if}
+  </div>
+
+  <a
     class="more-link"
+    href="#"
     onclick={() => (showMore = !showMore)}
     aria-expanded={showMore}
   >
     {showMore ? "Less" : "More"}
-  </button>
-{/snippet}
-
-<div class="summary">
-  {@render entry("Score", pointsValue)}
-  {@render entry("Placement", placementValue)}
-
-  {#if contestState === "NOT_STARTED"}
-    {@render entry("Time until start", timerValue)}
-  {:else}
-    {@render entry("Time remaining", timerValue)}
-  {/if}
-
-  {@render entry("", moreValue)}
-
-  {#if showMore}
-    {@render entry("Tops", topsValue)}
-    {@render entry("Zones", zonesValue, problemsWithZones.length === 0)}
-    {@render entry("Flashes", flashesValue)}
-    {@render entry("Finalist", finalistValue)}
-  {/if}
+  </a>
 </div>
 
 <style>
@@ -140,6 +138,9 @@
       var(--wa-color-surface-border);
     border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-m);
+  }
+
+  .grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: var(--wa-space-m);
@@ -193,12 +194,8 @@
   }
 
   .more-link {
-    border: 0;
-    padding: 0;
-    background: transparent;
-    color: inherit;
-    text-decoration: underline;
-    cursor: pointer;
+    display: block;
+    margin-block-start: var(--wa-space-xs);
     font-size: var(--wa-font-size-s);
   }
 </style>
