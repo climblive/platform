@@ -312,7 +312,9 @@
               {endTime}
             />
             <div class="problems-header">
-              <span class="problems-label">Problems</span>
+              <span class="problems-label"
+                >Problems ({problems?.length ?? 0})</span
+              >
               <div class="sort-buttons">
                 <button
                   class="sort-btn"
@@ -501,7 +503,6 @@
     font-weight: var(--wa-font-weight-bold);
     text-transform: uppercase;
     color: var(--wa-color-text-quiet);
-    letter-spacing: 0.05em;
   }
 
   .raffle-winner-dialog {
