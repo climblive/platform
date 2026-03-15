@@ -24,13 +24,13 @@
   aria-label={`Problem ${problem.number}`}
   style="--number-length: {highestProblemNumber.toString().length + 3}ch"
 >
-  <span class="number">№ {problem.number}</span>
   <HoldColorIndicator
     primary={problem.holdColorPrimary}
     secondary={problem.holdColorSecondary}
     --height="1.25rem"
     --width="1.25rem"
   />
+  <span class="number">№ {problem.number}</span>
   <span class="points">
     <span class="top">
       {problem.pointsTop}p
@@ -59,7 +59,7 @@
     padding-inline-end: var(--wa-space-xs);
 
     display: grid;
-    grid-template-columns: var(--number-length) 1rem 1fr 1fr 2.5rem;
+    grid-template-columns: 1rem var(--number-length) 1fr 1fr 2.5rem;
     grid-template-rows: 1fr;
     gap: var(--wa-space-xs);
     align-items: center;
