@@ -8,12 +8,10 @@
     problem: Problem;
     tick?: Tick | undefined;
     disabled: boolean;
-    highestProblemNumber: number;
     disqualified: boolean;
   }
 
-  const { problem, tick, disabled, highestProblemNumber, disqualified }: Props =
-    $props();
+  const { problem, tick, disabled, disqualified }: Props = $props();
 
   const pointValue = $derived(calculateProblemScore(problem, tick));
 </script>
@@ -22,7 +20,6 @@
   data-ticked={!!tick}
   data-flashed={tick?.attemptsTop === 1}
   aria-label={`Problem ${problem.number}`}
-  style="--number-length: {highestProblemNumber.toString().length + 3}ch"
 >
   <HoldColorIndicator
     primary={problem.holdColorPrimary}
@@ -59,7 +56,9 @@
     padding-inline-end: var(--wa-space-xs);
 
     display: grid;
-    grid-template-columns: 1rem var(--number-length) 1fr 1fr 2.5rem;
+    grid-template-columns: 1rem auto 1fr 1fr 2.5rem;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
     grid-template-rows: 1fr;
     gap: var(--wa-space-xs);
     align-items: center;

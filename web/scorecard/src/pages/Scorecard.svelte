@@ -140,12 +140,6 @@
       : "Sort by points ascending",
   );
 
-  let highestProblemNumber = $derived(
-    problems?.reduce((max, cur) => {
-      return Math.max(max, cur.number);
-    }, 0) ?? 0,
-  );
-
   $effect(() => {
     if (contender) {
       score = contender.score?.score ?? 0;
@@ -357,15 +351,18 @@
                 description="The organizer has not added any problems to this contest yet."
               />
             {:else}
-              {#each sortedProblems as problem (problem.id)}
-                <ProblemView
-                  {problem}
-                  tick={ticks.find(({ problemId }) => problemId === problem.id)}
-                  disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
-                  {highestProblemNumber}
-                  disqualified={contender.disqualified}
-                />
-              {/each}
+              <div class="problems-list">
+                {#each sortedProblems as problem (problem.id)}
+                  <ProblemView
+                    {problem}
+                    tick={ticks.find(
+                      ({ problemId }) => problemId === problem.id,
+                    )}
+                    disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
+                    disqualified={contender.disqualified}
+                  />
+                {/each}
+              </div>
             {/if}
           </wa-tab-panel>
           <wa-tab-panel name="results">
@@ -495,6 +492,13 @@
     align-items: center;
     justify-content: space-between;
     margin-block: var(--wa-space-2xs);
+  }
+
+  .problems-list {
+    display: grid;
+    grid-template-columns: 2rem auto 1fr 1fr 2.5rem;
+    row-gap: var(--wa-space-xs);
+    column-gap: var(--wa-space-xs);
   }
 
   .raffle-winner-dialog {
