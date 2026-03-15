@@ -167,7 +167,7 @@
 <style>
   wa-skeleton {
     margin-bottom: var(--wa-space-xs);
-    height: 2.25rem;
+    height: 2.75rem;
   }
 
   wa-skeleton::part(indicator) {
@@ -184,7 +184,7 @@
     clip-path: rect(
       0px 100%
         calc(
-          var(--page-size) * 2.25rem + (var(--page-size) - 1) *
+          var(--page-size) * 2.75rem + (var(--page-size) - 1) *
             var(--wa-space-xs)
         )
         0px
@@ -192,6 +192,6 @@
   }
 
   .container[data-overflow="scroll"] {
-    height: calc(var(--page-size) * (2.25rem + var(--wa-space-xs)));
+    height: calc(var(--page-size) * (2.75rem + var(--wa-space-xs)));
   }
 </style>

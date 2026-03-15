@@ -1,6 +1,8 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import { Timer } from "@climblive/lib/components";
   import type { Problem, Tick } from "@climblive/lib/models";
+  import { type ContestState } from "@climblive/lib/types";
   import { ordinalSuperscript } from "@climblive/lib/utils";
   import type { Snippet } from "svelte";
 
@@ -11,10 +13,24 @@
     placement: number | undefined;
     finalist: boolean;
     disqualified: boolean;
+    contestState: ContestState;
+    startTime: Date;
+    endTime: Date;
   }
 
-  const { ticks, problems, score, placement, finalist, disqualified }: Props =
-    $props();
+  const {
+    ticks,
+    problems,
+    score,
+    placement,
+    finalist,
+    disqualified,
+    contestState,
+    startTime,
+    endTime,
+  }: Props = $props();
+
+  let showMore = $state(false);
 
   const tops = $derived(ticks.filter((tick) => tick.top).length);
 
@@ -48,22 +64,8 @@
   </div>
 {/snippet}
 
-{#snippet topsValue()}
-  <strong>{tops}</strong>/{totalProblems}
-{/snippet}
-
-{#snippet zonesValue()}
-  <strong>{zones}</strong>/{problemsWithZones.length}
-{/snippet}
-
-{#snippet flashesValue()}
-  <strong>{flashes}</strong>/{totalProblems}
-{/snippet}
-
-{#snippet scoreValue()}
-  <span class="score">
-    <strong>{score}</strong> pts
-  </span>
+{#snippet pointsValue()}
+  <strong>{score}p</strong>
 {/snippet}
 
 {#snippet placementValue()}
@@ -76,17 +78,57 @@
   {/if}
 {/snippet}
 
+{#snippet timerValue()}
+  {#if contestState === "NOT_STARTED"}
+    <Timer endTime={startTime} />
+  {:else}
+    <Timer {endTime} />
+  {/if}
+{/snippet}
+
+{#snippet topsValue()}
+  <strong>{tops}</strong>/{totalProblems}
+{/snippet}
+
+{#snippet zonesValue()}
+  <strong>{zones}</strong>/{problemsWithZones.length}
+{/snippet}
+
+{#snippet flashesValue()}
+  <strong>{flashes}</strong>/{totalProblems}
+{/snippet}
+
 {#snippet finalistValue()}
   <wa-icon name={finalist ? "medal" : "minus"}></wa-icon>
 {/snippet}
 
 <div class="summary">
-  {@render entry("Tops", topsValue)}
-  {@render entry("Zones", zonesValue, problemsWithZones.length === 0)}
-  {@render entry("Flashes", flashesValue)}
-  {@render entry("Score", scoreValue)}
-  {@render entry("Placement", placementValue)}
-  {@render entry("Finalist", finalistValue)}
+  <div class="grid">
+    {@render entry("Score", pointsValue)}
+    {@render entry("Placement", placementValue)}
+
+    {#if contestState === "NOT_STARTED"}
+      {@render entry("Time until start", timerValue)}
+    {:else}
+      {@render entry("Time remaining", timerValue)}
+    {/if}
+
+    {#if showMore}
+      {@render entry("Tops", topsValue)}
+      {@render entry("Zones", zonesValue, problemsWithZones.length === 0)}
+      {@render entry("Flashes", flashesValue)}
+      {@render entry("Finalist", finalistValue)}
+    {/if}
+  </div>
+
+  <a
+    class="more-link"
+    href="#"
+    onclick={() => (showMore = !showMore)}
+    aria-expanded={showMore}
+  >
+    {showMore ? "Less" : "More"}
+  </a>
 </div>
 
 <style>
@@ -96,7 +138,9 @@
       var(--wa-color-surface-border);
     border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-m);
-    margin-bottom: var(--wa-space-m);
+  }
+
+  .grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: var(--wa-space-m);
@@ -132,7 +176,26 @@
     opacity: 0.5;
   }
 
-  .score {
-    white-space: nowrap;
+  .summary :global(.timer) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-2xs);
+  }
+
+  .summary :global(.timer label) {
+    font-size: var(--wa-font-size-xs);
+    color: var(--wa-color-text-quiet);
+  }
+
+  .summary :global(.timer span[role="timer"]) {
+    font-size: 1.5em;
+    font-weight: var(--wa-font-weight-bold);
+    line-height: 1;
+  }
+
+  .more-link {
+    display: block;
+    margin-block-start: var(--wa-space-xs);
+    font-size: var(--wa-font-size-s);
   }
 </style>

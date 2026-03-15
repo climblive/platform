@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { Score, Timer } from "@climblive/lib/components";
   import { type ContestState } from "@climblive/lib/types";
-  import { ordinalSuperscript } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -9,12 +7,7 @@
     contestName: string;
     compClassName: string | undefined;
     contenderName: string | undefined;
-    score: number;
-    placement: number | undefined;
     contestState: ContestState;
-    startTime: Date;
-    endTime: Date;
-    disqualified: boolean;
   }
 
   let {
@@ -22,115 +15,105 @@
     contestName,
     compClassName,
     contenderName,
-    score,
-    placement,
     contestState,
-    startTime,
-    endTime,
-    disqualified,
   }: Props = $props();
 </script>
 
 <header>
+  <div class="identity">
+    <img class="logo" src="/favicon.svg" alt="ClimbLive logo" />
+    <div class="info">
+      <div class="title">
+        <h1>{contestName}</h1>
+      </div>
+      <p class="subtitle">
+        {contenderName}
+        {#if compClassName}
+          <span class="separator">&middot;</span>
+          <span class="comp-class">{compClassName}</span>
+        {/if}
+      </p>
+    </div>
+  </div>
   <wa-button
     size="small"
     onclick={() => navigate(`/${registrationCode}/edit`)}
     disabled={contestState === "ENDED"}
     appearance="plain"
   >
-    <wa-icon name="gear" label="Edit"></wa-icon>
+    <wa-icon name="gear" label="Settings"></wa-icon>
   </wa-button>
-  <h1>{contestName}</h1>
-  <p class="contender-name">
-    {contenderName} <span class="contender-class">{compClassName}</span>
-  </p>
-  <div class="lower">
-    <div class="score">
-      <span>
-        {#if disqualified}
-          Disqualified
-        {:else if placement}
-          {placement}<sup>{ordinalSuperscript(placement)}</sup>
-        {:else}
-          -
-        {/if}
-      </span>
-      <Score value={score} />
-    </div>
-    {#if contestState === "NOT_STARTED"}
-      <Timer align="right" endTime={startTime} label="Time until start" />
-    {:else}
-      <Timer align="right" {endTime} label="Time remaining" />
-    {/if}
-  </div>
 </header>
 
 <style>
   header {
-    background-color: var(--wa-color-brand-fill-normal);
-    border: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-color-brand-border-normal);
-    border-radius: var(--wa-border-radius-m);
-    padding: var(--wa-space-s);
-    color: var(--wa-color-brand-on-normal);
-    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--wa-space-s);
+    padding: var(--wa-space-s) 0;
+  }
 
-    & wa-button {
-      position: absolute;
-      top: var(--wa-space-xs);
-      right: var(--wa-space-xs);
-      color: inherit;
+  .identity {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-xs);
+    min-width: 0;
+  }
 
-      &::part(label) {
-        color: var(--wa-color-brand-on-normal);
-      }
-    }
+  .info {
+    min-width: 0;
+  }
 
-    & wa-button::part(base) {
-      padding: 0;
-    }
+  .title {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-2xs);
+    min-width: 0;
+  }
 
-    & h1,
-    & .contender-name {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+  .logo {
+    width: calc(var(--wa-font-size-l) * 2);
+    height: calc(var(--wa-font-size-l) * 2);
+    border-radius: var(--wa-border-radius-s);
+    flex-shrink: 0;
+  }
 
-    & h1 {
-      margin: 0;
-      font-size: var(--wa-font-size-l);
-      width: calc(100% - 2rem);
-      line-height: var(--wa-line-height-condensed);
-    }
+  h1 {
+    margin: 0;
+    font-size: var(--wa-font-size-l);
+    font-weight: var(--wa-font-weight-bold);
+    line-height: var(--wa-line-height-condensed);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-    & .contender-name {
-      margin: 0;
-      line-height: var(--wa-line-height-condensed);
-    }
+  .subtitle {
+    margin: 0;
+    font-size: var(--wa-font-size-s);
+    color: var(--wa-color-text-quiet);
+    line-height: var(--wa-line-height-condensed);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: var(--wa-font-weight-bold);
+  }
 
-    & .contender-class {
-      font-weight: var(--wa-font-weight-bold);
-      font-size: var(--wa-font-size-xs);
-    }
+  .separator {
+    margin-inline: var(--wa-space-3xs);
+  }
 
-    & .score {
-      & > span {
-        font-weight: var(--wa-font-weight-bold);
-        font-size: var(--wa-font-size-l);
-      }
+  .comp-class {
+    font-weight: var(--wa-font-weight-normal);
+  }
 
-      & > :not(span) {
-        font-size: var(--wa-font-size-xs);
-        font-weight: var(--wa-font-weight-normal);
-      }
-    }
+  wa-button::part(base) {
+    padding: 0;
+  }
 
-    & .lower {
-      margin-top: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: end;
-    }
+  wa-button {
+    font-size: var(--wa-font-size-xl);
+    flex-shrink: 0;
   }
 </style>

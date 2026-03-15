@@ -5,7 +5,7 @@
 
   interface Props {
     endTime: Date;
-    label: string;
+    label?: string;
     align?: "left" | "right";
   }
 
@@ -48,7 +48,9 @@
   <span role="timer" aria-live="off" aria-labelledby={labelId}
     >{displayValue}</span
   >
-  <label for="" id={labelId}>{label}</label>
+  {#if label}
+    <label for="" id={labelId}>{label}</label>
+  {/if}
 </div>
 
 <style>
