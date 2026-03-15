@@ -328,10 +328,11 @@
                     }
                   }}
                   disabled={problems === undefined || problems.length === 0}
+                  aria-label="Sort problems by number"
                 >
                   <wa-icon name={numberSortIcon} label={numberSortLabel}
                   ></wa-icon>
-                  #
+                  Num
                 </button>
                 <button
                   class="sort-btn"
@@ -345,6 +346,7 @@
                     }
                   }}
                   disabled={problems === undefined || problems.length === 0}
+                  aria-label="Sort problems by points"
                 >
                   <wa-icon name={pointsSortIcon} label={pointsSortLabel}
                   ></wa-icon>
@@ -462,7 +464,6 @@
 
   .sort-buttons {
     display: flex;
-    gap: var(--wa-space-3xs);
   }
 
   .sort-btn {
@@ -474,7 +475,7 @@
     font-weight: var(--wa-font-weight-semibold);
     line-height: 1;
     padding: var(--wa-space-2xs) var(--wa-space-xs);
-    border: var(--wa-border-width-s) solid var(--wa-color-surface-border);
+    border: none;
     border-radius: var(--wa-border-radius-m);
     background: transparent;
     color: var(--wa-color-text-quiet);
@@ -483,7 +484,7 @@
 
   .sort-btn.active {
     background: var(--wa-color-neutral-fill-quiet-hover);
-    color: var(--wa-color-text-default);
+    color: var(--wa-color-text-link);
   }
 
   .sort-btn:disabled {
