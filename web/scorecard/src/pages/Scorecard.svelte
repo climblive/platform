@@ -473,7 +473,6 @@
   }
 
   .sort-btn.active {
-    background: var(--wa-color-neutral-fill-quiet-hover);
     color: var(--wa-color-text-link);
   }
 
