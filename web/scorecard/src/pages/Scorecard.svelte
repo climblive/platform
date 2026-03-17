@@ -436,7 +436,6 @@
   }
 
   wa-tab-group {
-    --track-width: 2px;
     padding-inline: var(--wa-space-m);
     padding-bottom: var(--wa-space-m);
   }
