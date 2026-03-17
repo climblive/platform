@@ -176,23 +176,6 @@
     opacity: 0.5;
   }
 
-  .summary :global(.timer) {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wa-space-2xs);
-  }
-
-  .summary :global(.timer label) {
-    font-size: var(--wa-font-size-xs);
-    color: var(--wa-color-text-quiet);
-  }
-
-  .summary :global(.timer span[role="timer"]) {
-    font-size: 1.5em;
-    font-weight: var(--wa-font-weight-bold);
-    line-height: 1;
-  }
-
   .more-link {
     display: block;
     margin-block-start: var(--wa-space-xs);
