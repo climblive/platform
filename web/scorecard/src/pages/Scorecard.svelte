@@ -462,10 +462,8 @@
     display: inline-flex;
     align-items: center;
     gap: var(--wa-space-3xs);
-    font-family: inherit;
     font-size: var(--wa-font-size-2xs);
     font-weight: var(--wa-font-weight-semibold);
-    line-height: 1;
     padding: var(--wa-space-2xs) var(--wa-space-xs);
     border: none;
     border-radius: var(--wa-border-radius-m);
