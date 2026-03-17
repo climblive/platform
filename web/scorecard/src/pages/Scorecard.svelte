@@ -289,11 +289,11 @@
           />
         </div>
         <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleShowTab}>
-          <wa-tab slot="nav" panel="problems">Scorecard</wa-tab>
+          <wa-tab slot="nav" panel="scorecard">Scorecard</wa-tab>
           <wa-tab slot="nav" panel="results">Results</wa-tab>
           <wa-tab slot="nav" panel="info">Info</wa-tab>
 
-          <wa-tab-panel name="problems">
+          <wa-tab-panel name="scorecard">
             <Summary
               ticks={ticks ?? []}
               problems={problems ?? []}
