@@ -56,13 +56,17 @@
     padding-inline-end: var(--wa-space-xs);
 
     display: grid;
-    grid-template-columns: 1rem auto 1fr 1fr 2.5rem;
-    grid-template-columns: subgrid;
+    grid-template-columns: 1rem max-content 1fr 1fr 2.5rem;
     grid-column: 1 / -1;
-    grid-template-rows: 1fr;
     gap: var(--wa-space-xs);
     align-items: center;
     justify-items: end;
+  }
+
+  @supports (grid-template-columns: subgrid) {
+    section {
+      grid-template-columns: subgrid;
+    }
   }
 
   .number {
