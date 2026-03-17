@@ -485,8 +485,7 @@
   .problems-list {
     display: grid;
     grid-template-columns: 2rem auto 1fr 1fr 2.5rem;
-    row-gap: var(--wa-space-xs);
-    column-gap: var(--wa-space-xs);
+    gap: var(--wa-space-xs);
   }
 
   .raffle-winner-dialog {
