@@ -49,7 +49,7 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--wa-space-s);
-    padding: var(--wa-space-s) 0;
+    padding-block-start: var(--wa-space-s);
   }
 
   .identity {
