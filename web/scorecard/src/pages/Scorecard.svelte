@@ -430,7 +430,7 @@
     top: 0;
     left: 0;
     right: 0;
-    z-index: 11;
+    z-index: 10;
     background-color: var(--wa-color-surface-default);
     padding: 0 var(--wa-space-m);
   }
