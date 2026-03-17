@@ -23,9 +23,7 @@
   <div class="identity">
     <img class="logo" src="/favicon.svg" alt="ClimbLive logo" />
     <div class="info">
-      <div class="title">
-        <h1>{contestName}</h1>
-      </div>
+      <h1>{contestName}</h1>
       <p class="subtitle">
         {contenderName}
         {#if compClassName}
@@ -62,13 +60,6 @@
   }
 
   .info {
-    min-width: 0;
-  }
-
-  .title {
-    display: flex;
-    align-items: center;
-    gap: var(--wa-space-2xs);
     min-width: 0;
   }
 
