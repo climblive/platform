@@ -305,45 +305,43 @@
               {startTime}
               {endTime}
             />
-            <div class="problems-header">
-              <div class="sort-buttons">
-                <button
-                  class="sort-btn"
-                  class:active={orderProblemsBy === "number"}
-                  onclick={() => {
-                    if (orderProblemsBy === "number") {
-                      sortDirection = sortDirection === "asc" ? "desc" : "asc";
-                    } else {
-                      sortDirection = "asc";
-                      orderProblemsBy = "number";
-                    }
-                  }}
-                  disabled={problems === undefined || problems.length === 0}
-                  aria-label="Sort problems by number"
-                >
-                  <wa-icon name={numberSortIcon} label={numberSortLabel}
-                  ></wa-icon>
-                  Num
-                </button>
-                <button
-                  class="sort-btn"
-                  class:active={orderProblemsBy === "points"}
-                  onclick={() => {
-                    if (orderProblemsBy === "points") {
-                      sortDirection = sortDirection === "asc" ? "desc" : "asc";
-                    } else {
-                      sortDirection = "asc";
-                      orderProblemsBy = "points";
-                    }
-                  }}
-                  disabled={problems === undefined || problems.length === 0}
-                  aria-label="Sort problems by points"
-                >
-                  <wa-icon name={pointsSortIcon} label={pointsSortLabel}
-                  ></wa-icon>
-                  Pts
-                </button>
-              </div>
+            <div class="sort-buttons">
+              <button
+                class="sort-btn"
+                class:active={orderProblemsBy === "number"}
+                onclick={() => {
+                  if (orderProblemsBy === "number") {
+                    sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                  } else {
+                    sortDirection = "asc";
+                    orderProblemsBy = "number";
+                  }
+                }}
+                disabled={problems === undefined || problems.length === 0}
+                aria-label="Sort problems by number"
+              >
+                <wa-icon name={numberSortIcon} label={numberSortLabel}
+                ></wa-icon>
+                Num
+              </button>
+              <button
+                class="sort-btn"
+                class:active={orderProblemsBy === "points"}
+                onclick={() => {
+                  if (orderProblemsBy === "points") {
+                    sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                  } else {
+                    sortDirection = "asc";
+                    orderProblemsBy = "points";
+                  }
+                }}
+                disabled={problems === undefined || problems.length === 0}
+                aria-label="Sort problems by points"
+              >
+                <wa-icon name={pointsSortIcon} label={pointsSortLabel}
+                ></wa-icon>
+                Pts
+              </button>
             </div>
             {#if sortedProblems.length === 0}
               <EmptyState
@@ -450,7 +448,7 @@
     background-color: var(--wa-color-surface-default);
   }
 
-  wa-tab-panel[name="problems"]::part(base) {
+  wa-tab-panel[name="scorecard"]::part(base) {
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-xs);
@@ -485,13 +483,6 @@
   .sort-btn:disabled {
     opacity: 0.4;
     cursor: default;
-  }
-
-  .problems-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-block: var(--wa-space-2xs);
   }
 
   .problems-list {
