@@ -2,7 +2,7 @@
   import ContestInfo from "@/components/ContestInfo.svelte";
   import Header from "@/components/Header.svelte";
   import ProblemView from "@/components/ProblemView.svelte";
-  import SummaryCards from "@/components/SummaryCards.svelte";
+  import Summary from "@/components/Summary.svelte";
   import type { ScorecardSession } from "@/types";
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
@@ -294,7 +294,7 @@
           <wa-tab slot="nav" panel="info">Info</wa-tab>
 
           <wa-tab-panel name="problems">
-            <SummaryCards
+            <Summary
               ticks={ticks ?? []}
               problems={problems ?? []}
               {score}
