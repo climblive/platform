@@ -469,7 +469,7 @@
 
   .problems-list {
     display: grid;
-    grid-template-columns: 2rem max-content 1fr 1fr 2.5rem;
+    grid-template-columns: max-content max-content 1fr 1fr 2.5rem;
     gap: var(--wa-space-xs);
   }
 

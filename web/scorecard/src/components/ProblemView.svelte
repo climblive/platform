@@ -56,7 +56,7 @@
     padding-inline-end: var(--wa-space-xs);
 
     display: grid;
-    grid-template-columns: 1rem max-content 1fr 1fr 2.5rem;
+    grid-template-columns: max-content max-content 1fr 1fr 2.5rem;
     grid-column: 1 / -1;
     gap: var(--wa-space-xs);
     align-items: center;
