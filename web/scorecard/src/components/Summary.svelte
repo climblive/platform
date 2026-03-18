@@ -83,9 +83,9 @@
 {#snippet timerValue()}
   <strong>
     {#if contestState === "NOT_STARTED"}
-      <Timer endTime={startTime} />
+      <Timer endTime={startTime} label="Starting in" hideLabel />
     {:else}
-      <Timer {endTime} />
+      <Timer {endTime} label="Time left" hideLabel />
     {/if}
   </strong>
 {/snippet}
