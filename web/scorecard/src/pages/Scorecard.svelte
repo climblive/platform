@@ -58,7 +58,6 @@
   let resultsConnected = $state(false);
   let tabGroup: WaTabGroup | undefined = $state();
   let raffleWinnerDialog: WaDialog | undefined = $state();
-  let stickyHeader: HTMLDivElement | undefined = $state();
   let eventSource: EventSource | undefined;
   let score: number = $state(0);
   let placement: number | undefined = $state();
@@ -252,22 +251,6 @@
     tearDown();
   });
 
-  $effect(() => {
-    if (!stickyHeader) return;
-
-    const observer = new ResizeObserver(([entry]) => {
-      const height = entry.borderBoxSize[0].blockSize;
-      stickyHeader!.parentElement?.style.setProperty(
-        "--header-height",
-        `${height}px`,
-      );
-    });
-
-    observer.observe(stickyHeader);
-
-    return () => observer.disconnect();
-  });
-
   let showSplash = $state(true);
 </script>
 
@@ -279,7 +262,7 @@
   <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime}>
     {#snippet children({ contestState })}
       <main>
-        <div class="sticky" bind:this={stickyHeader}>
+        <div class="sticky">
           <Header
             registrationCode={$session.registrationCode}
             contestName={contest.name}
@@ -420,6 +403,8 @@
   }
 
   main {
+    --header-height: 5rem;
+
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -433,6 +418,7 @@
     z-index: 10;
     background-color: var(--wa-color-surface-default);
     padding: 0 var(--wa-space-m);
+    height: var(--header-height);
   }
 
   wa-tab-group {
@@ -442,7 +428,7 @@
 
   wa-tab-group::part(nav) {
     position: sticky;
-    top: var(--header-height, 0px);
+    top: var(--header-height);
     z-index: 10;
     background-color: var(--wa-color-surface-default);
   }
