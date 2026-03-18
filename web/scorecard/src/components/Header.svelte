@@ -71,6 +71,7 @@
 
   h1 {
     margin: 0;
+    margin-block-start: -0.25rem;
     font-size: var(--wa-font-size-l);
     font-weight: var(--wa-font-weight-bold);
     line-height: var(--wa-line-height-condensed);
