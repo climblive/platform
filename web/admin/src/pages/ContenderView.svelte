@@ -176,57 +176,60 @@
     ></TickList>
   {/if}
 
-  <h2>Settings</h2>
-  <wa-divider style="--color: var(--wa-color-brand-fill-normal);"></wa-divider>
-  <div class="controls">
-    <wa-select
-      size="small"
-      bind:this={compClassSelect}
-      label="Competition class"
-      hint="Change the class for this contender."
-      {@attach value(contender.compClassId)}
-      onchange={handleCompClassChange}
-      disabled={contender.disqualified || patchContender.isPending}
-    >
-      {#each compClasses as compClass (compClass.id)}
-        <wa-option value={compClass.id} label={compClass.name}>
-          {compClass.name}
-          {#if compClass.description}
-            <small>{compClass.description}</small>
-          {/if}
-        </wa-option>
-      {/each}
-    </wa-select>
-
-    <wa-switch
-      size="small"
-      bind:this={withdrawFromFinalsToggle}
-      hint="In case the contender does not wish to take part in the finals."
-      {@attach checked(contender.withdrawnFromFinals)}
-      onchange={handleToggleWithdrawFromFinals}
-      disabled={contender.disqualified || patchContender.isPending}
-      >Withdraw from finals</wa-switch
-    >
-
-    {#if contender.disqualified}
-      <wa-button
-        onclick={handleRequalify}
-        loading={patchContender.isPending}
-        appearance="outlined"
-        >Requalify contender<wa-icon slot="start" name="right-to-bracket"
-        ></wa-icon></wa-button
-      >
-    {:else}
-      <wa-button
+  {#if contender.entered}
+    <h2>Settings</h2>
+    <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
+    ></wa-divider>
+    <div class="controls">
+      <wa-select
         size="small"
-        variant="danger"
-        onclick={handleDisqualify}
-        loading={patchContender.isPending}
-        >Disqualify contender<wa-icon slot="start" name="user-slash"
-        ></wa-icon></wa-button
+        bind:this={compClassSelect}
+        label="Competition class"
+        hint="Change the class for this contender."
+        {@attach value(contender.compClassId)}
+        onchange={handleCompClassChange}
+        disabled={contender.disqualified || patchContender.isPending}
       >
-    {/if}
-  </div>
+        {#each compClasses as compClass (compClass.id)}
+          <wa-option value={compClass.id} label={compClass.name}>
+            {compClass.name}
+            {#if compClass.description}
+              <small>{compClass.description}</small>
+            {/if}
+          </wa-option>
+        {/each}
+      </wa-select>
+
+      <wa-switch
+        size="small"
+        bind:this={withdrawFromFinalsToggle}
+        hint="In case the contender does not wish to take part in the finals."
+        {@attach checked(contender.withdrawnFromFinals)}
+        onchange={handleToggleWithdrawFromFinals}
+        disabled={contender.disqualified || patchContender.isPending}
+        >Withdraw from finals</wa-switch
+      >
+
+      {#if contender.disqualified}
+        <wa-button
+          onclick={handleRequalify}
+          loading={patchContender.isPending}
+          appearance="outlined"
+          >Requalify contender<wa-icon slot="start" name="right-to-bracket"
+          ></wa-icon></wa-button
+        >
+      {:else}
+        <wa-button
+          size="small"
+          variant="danger"
+          onclick={handleDisqualify}
+          loading={patchContender.isPending}
+          >Disqualify contender<wa-icon slot="start" name="user-slash"
+          ></wa-icon></wa-button
+        >
+      {/if}
+    </div>
+  {/if}
 {/if}
 
 <style>
