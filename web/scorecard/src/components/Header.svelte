@@ -1,7 +1,7 @@
 <script lang="ts">
   import logoUrl from "@/assets/logo.svg";
   import { type ContestState } from "@climblive/lib/types";
-  import { navigate } from "svelte-routing";
+  import { Link, navigate } from "svelte-routing";
 
   interface Props {
     registrationCode: string;
@@ -22,7 +22,9 @@
 
 <header>
   <div class="identity">
-    <img class="logo" src={logoUrl} alt="ClimbLive logo" />
+    <Link to="/">
+      <img class="logo" src={logoUrl} alt="ClimbLive logo" />
+    </Link>
     <div class="info">
       <h1>{contenderName}</h1>
       <p class="subtitle">
