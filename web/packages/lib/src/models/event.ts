@@ -14,6 +14,7 @@ export const contenderPublicInfoUpdatedEventSchema: z.ZodType<ContenderPublicInf
     name: z.string(),
     withdrawnFromFinals: z.boolean(),
     disqualified: z.boolean(),
+    scrubbedAt: z.coerce.date().optional(),
   });
 
 export const contenderScoreUpdatedEventSchema: z.ZodType<ContenderScoreUpdatedEvent> =
@@ -51,6 +52,5 @@ export const raffleWinnerDrawnEventSchema: z.ZodType<RaffleWinnerDrawnEvent> =
   z.object({
     raffleId: z.number(),
     contenderId: z.number(),
-    contenderName: z.string(),
     timestamp: z.coerce.date(),
   });

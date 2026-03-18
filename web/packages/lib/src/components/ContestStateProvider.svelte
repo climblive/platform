@@ -1,22 +1,39 @@
 <script lang="ts">
-  import { isBefore } from "date-fns";
+  import { add, isBefore } from "date-fns";
   import { onMount, type Snippet } from "svelte";
+  import { getCompClassQuery, getContestQuery } from "../queries";
   import type { ContestState } from "../types";
   import { SyncedTime } from "../utils";
 
   interface Props {
-    startTime: Date;
-    endTime: Date;
-    gracePeriodEndTime?: Date;
+    contestId: number;
+    compClassId?: number;
     children?: Snippet<[{ contestState: ContestState }]>;
   }
 
-  const {
-    startTime,
-    endTime,
-    gracePeriodEndTime = undefined,
-    children,
-  }: Props = $props();
+  const { contestId, compClassId, children }: Props = $props();
+
+  const contestQuery = $derived(getContestQuery(contestId));
+  const compClassQuery = $derived(
+    compClassId ? getCompClassQuery(compClassId) : undefined,
+  );
+
+  const contest = $derived(contestQuery.data);
+  const compClass = $derived(compClassQuery?.data);
+
+  const startTime = $derived(
+    compClass?.timeBegin ?? contest?.timeBegin ?? new Date(8640000000000000),
+  );
+  const endTime = $derived(
+    compClass?.timeEnd ?? contest?.timeEnd ?? new Date(-8640000000000000),
+  );
+  const gracePeriodEndTime = $derived(
+    contest
+      ? add(endTime, {
+          minutes: (contest.gracePeriod ?? 0) / (1_000_000_000 * 60),
+        })
+      : undefined,
+  );
 
   const time = new SyncedTime(1_000);
 
