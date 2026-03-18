@@ -9,4 +9,4 @@ test: images
 
 .PHONY: test-ci
 test-ci: images
-	DEBUG=testcontainers* pnpm exec playwright test --project="Mobile Chrome"
+	DEBUG=testcontainers* pnpm exec playwright test
