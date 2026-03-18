@@ -28,9 +28,8 @@
     <div class="info">
       <h1>{contenderName}</h1>
       <p class="subtitle">
-        {compClassName}
-        <span class="separator">–</span>
-        {contestName}
+        <span>{compClassName}</span><span class="separator">–</span
+        >{contestName}
       </p>
     </div>
   </div>
@@ -40,7 +39,7 @@
     disabled={contestState === "ENDED"}
     appearance="plain"
   >
-    <wa-icon name="gear" label="Settings"></wa-icon>
+    <wa-icon name="gear" label="Edit"></wa-icon>
   </wa-button>
 </header>
 
