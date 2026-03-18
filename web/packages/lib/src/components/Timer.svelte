@@ -7,9 +7,10 @@
     endTime: Date;
     label: string;
     align?: "left" | "right";
+    hideLabel?: boolean;
   }
 
-  let { endTime, label, align = "left" }: Props = $props();
+  let { endTime, label, align = "left", hideLabel = false }: Props = $props();
 
   const time = new SyncedTime(1_000);
 
@@ -48,7 +49,7 @@
   <span role="timer" aria-live="off" aria-labelledby={labelId}
     >{displayValue}</span
   >
-  <label for="" id={labelId}>{label}</label>
+  <label class:hidden={hideLabel} for="" id={labelId}>{label}</label>
 </div>
 
 <style>
@@ -67,6 +68,10 @@
     & label {
       font-weight: var(--wa-font-weight-normal);
       font-size: 0.75em;
+
+      &.hidden {
+        display: none;
+      }
     }
   }
 
