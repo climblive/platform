@@ -31,9 +31,9 @@
           </h2>
         </div>
         {#if contestState === "NOT_STARTED"}
-          <Timer endTime={startTime} label="Time until start" />
+          <Timer endTime={startTime} label="Starting in" />
         {:else}
-          <Timer {endTime} label="Time remaining" />
+          <Timer {endTime} label="Time left" />
         {/if}
       </div>
       <div class="size">

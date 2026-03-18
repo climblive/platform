@@ -81,11 +81,13 @@
 {/snippet}
 
 {#snippet timerValue()}
-  {#if contestState === "NOT_STARTED"}
-    <Timer endTime={startTime} />
-  {:else}
-    <Timer {endTime} />
-  {/if}
+  <strong>
+    {#if contestState === "NOT_STARTED"}
+      <Timer endTime={startTime} />
+    {:else}
+      <Timer {endTime} />
+    {/if}
+  </strong>
 {/snippet}
 
 {#snippet topsValue()}
@@ -110,9 +112,9 @@
     {@render entry("Placement", placementValue)}
 
     {#if contestState === "NOT_STARTED"}
-      {@render entry("Time until start", timerValue)}
+      {@render entry("Starting in", timerValue)}
     {:else}
-      {@render entry("Time remaining", timerValue)}
+      {@render entry("Time left", timerValue)}
     {/if}
 
     {#if showMore}
@@ -162,17 +164,16 @@
   }
 
   .label {
-    font-size: var(--wa-font-size-xs);
+    font-size: var(--wa-font-size-2xs);
     color: var(--wa-color-text-quiet);
-    margin-bottom: var(--wa-space-2xs);
+    margin-block-end: var(--wa-space-2xs);
   }
 
   .value {
-    font-size: 1em;
-    line-height: 1;
+    line-height: var(--wa-line-height-condensed);
 
     & strong {
-      font-size: 1.5em;
+      font-size: 1.25em;
       font-weight: var(--wa-font-weight-bold);
     }
 
