@@ -374,7 +374,7 @@ test.describe("contest states", () => {
   test("before contest has started", async ({ page }) => {
     await page.goto("/ABCD0001");
 
-    const timer = page.getByRole("timer", { name: "Time until start" });
+    const timer = page.getByRole("timer", { name: "Starting in" });
     await expect(timer).toHaveText("2 months");
 
     await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
@@ -390,7 +390,7 @@ test.describe("contest states", () => {
 
     await page.clock.setFixedTime(new Date("2024-01-01T00:00:00"));
 
-    const timer = page.getByRole("timer", { name: "Time remaining" });
+    const timer = page.getByRole("timer", { name: "Time left" });
     await expect(timer).toHaveText("almost 3 years");
 
     await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
@@ -406,7 +406,7 @@ test.describe("contest states", () => {
 
     await page.clock.setFixedTime(new Date("2027-01-01T00:00:00"));
 
-    const timer = page.getByRole("timer", { name: "Time remaining" });
+    const timer = page.getByRole("timer", { name: "Time left" });
     await expect(timer).toHaveText("00:00:00");
 
     await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
@@ -422,7 +422,7 @@ test.describe("contest states", () => {
 
     await page.clock.setFixedTime(new Date("2027-01-01T00:05:00"));
 
-    const timer = page.getByRole("timer", { name: "Time remaining" });
+    const timer = page.getByRole("timer", { name: "Time left" });
     await expect(timer).toHaveText("00:00:00");
 
     await expect(page.getByRole("button", { name: "Edit" })).toBeDisabled();
