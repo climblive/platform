@@ -25,7 +25,7 @@
     autoScroll = true,
   }: Props = $props();
 
-  const ITEM_HEIGHT = 36;
+  const ITEM_HEIGHT = 44;
   const GAP = 8;
   const SCROLLABLE_SKELETON_ENTRIES = 10;
 
