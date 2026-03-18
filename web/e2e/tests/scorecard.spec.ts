@@ -193,7 +193,9 @@ test("edit profile", async ({ page }) => {
   await page.goto("/ABCD0003");
 
   await expect(page.getByText("Michael Scott")).toBeVisible();
-  await expect(page.getByText("Males", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Males–World Testing Championships"),
+  ).toBeVisible();
 
   await page.getByRole("button", { name: "Edit" }).click({ force: true });
 
