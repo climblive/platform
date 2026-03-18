@@ -28,7 +28,7 @@
     <div class="info">
       <h1>{contenderName}</h1>
       <p class="subtitle">
-        <span>{compClassName}</span>
+        {compClassName}
         <span class="separator">–</span>
         {contestName}
       </p>
