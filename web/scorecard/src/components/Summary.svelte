@@ -30,6 +30,8 @@
     endTime,
   }: Props = $props();
 
+  const id = $props.id();
+
   let showMore = $state(false);
 
   const tops = $derived(ticks.filter((tick) => tick.top).length);
@@ -114,10 +116,12 @@
     {/if}
 
     {#if showMore}
-      {@render entry("Tops", topsValue)}
-      {@render entry("Zones", zonesValue, problemsWithZones.length === 0)}
-      {@render entry("Flashes", flashesValue)}
-      {@render entry("Finalist", finalistValue)}
+      <div {id} class="extra">
+        {@render entry("Tops", topsValue)}
+        {@render entry("Zones", zonesValue, problemsWithZones.length === 0)}
+        {@render entry("Flashes", flashesValue)}
+        {@render entry("Finalist", finalistValue)}
+      </div>
     {/if}
   </div>
 
@@ -126,6 +130,7 @@
     href="#"
     onclick={() => (showMore = !showMore)}
     aria-expanded={showMore}
+    aria-controls={id}
   >
     {showMore ? "Less" : "More"}
   </a>
@@ -144,6 +149,10 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: var(--wa-space-m);
+  }
+
+  .extra {
+    display: contents;
   }
 
   .stat {
