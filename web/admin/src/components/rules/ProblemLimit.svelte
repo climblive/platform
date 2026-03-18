@@ -2,11 +2,13 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import { checked, GenericForm, name } from "@climblive/lib/forms";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
   import { patchContestMutation } from "@climblive/lib/queries";
   import { z } from "@climblive/lib/utils";
+  import { onDestroy } from "svelte";
   import RuleOptionCard from "../RuleOptionCard.svelte";
   import { doSubmit } from "../RulesEditor.svelte";
 
@@ -19,15 +21,27 @@
   const patchContest = $derived(patchContestMutation(contest.id));
 
   let enabled = $derived(contest.qualifyingProblems > 0);
+  let saved = $state(false);
+  let savedTimer: ReturnType<typeof setTimeout> | undefined;
+
+  onDestroy(() => clearTimeout(savedTimer));
 
   const formSchema = z.object({
     qualifyingProblems: z.coerce.number().min(0).max(65536).optional(),
   });
 
   const handleSubmit = (value: Partial<ContestPatch>) =>
-    doSubmit(patchContest, {
-      qualifyingProblems: value.qualifyingProblems ?? 0,
-    });
+    doSubmit(
+      patchContest,
+      {
+        qualifyingProblems: value.qualifyingProblems ?? 0,
+      },
+      () => {
+        saved = true;
+        clearTimeout(savedTimer);
+        savedTimer = setTimeout(() => (saved = false), 2000);
+      },
+    );
 </script>
 
 <GenericForm schema={formSchema} submit={handleSubmit}>
@@ -65,7 +79,10 @@
               type="submit"
               size="small"
               appearance="outlined"
-              loading={patchContest.isPending}>Save</wa-button
+              variant={saved ? "success" : undefined}
+              loading={patchContest.isPending}
+              >{#if saved}<wa-icon slot="start" name="check"
+                ></wa-icon>Saved{:else}Save{/if}</wa-button
             >
           {/if}
         </div>
