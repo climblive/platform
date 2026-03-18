@@ -11,7 +11,7 @@
     contestState: ContestState;
   }
 
-  let {
+  const {
     registrationCode,
     contestName,
     compClassName,
@@ -24,18 +24,16 @@
   <div class="identity">
     <img class="logo" src={logoUrl} alt="ClimbLive logo" />
     <div class="info">
-      <h1>{contestName}</h1>
+      <h1>{contenderName}</h1>
       <p class="subtitle">
-        {contenderName}
-        {#if compClassName}
-          <span class="separator">&middot;</span>
-          <span class="comp-class">{compClassName}</span>
-        {/if}
+        {compClassName}
+        <span class="separator">–</span>
+        {contestName}
       </p>
     </div>
   </div>
   <wa-button
-    size="small"
+    size="medium"
     onclick={() => navigate(`/${registrationCode}/edit`)}
     disabled={contestState === "ENDED"}
     appearance="plain"
@@ -50,7 +48,7 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--wa-space-s);
-    padding-block-start: var(--wa-space-s);
+    padding-block-start: var(--wa-space-l);
   }
 
   .identity {
@@ -67,7 +65,6 @@
   .logo {
     width: calc(var(--wa-font-size-l) * 2);
     height: calc(var(--wa-font-size-l) * 2);
-    border-radius: var(--wa-border-radius-s);
     flex-shrink: 0;
   }
 
@@ -89,23 +86,13 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-weight: var(--wa-font-weight-bold);
   }
 
   .separator {
     margin-inline: var(--wa-space-3xs);
   }
 
-  .comp-class {
-    font-weight: var(--wa-font-weight-normal);
-  }
-
-  wa-button::part(base) {
-    padding: 0;
-  }
-
   wa-button {
-    font-size: var(--wa-font-size-xl);
     flex-shrink: 0;
   }
 </style>
