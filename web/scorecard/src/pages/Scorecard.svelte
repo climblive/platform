@@ -7,6 +7,7 @@
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+  import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
@@ -299,53 +300,51 @@
               {startTime}
               {endTime}
             />
-            <div class="sort-buttons">
-              <button
-                class="sort-btn"
-                class:active={orderProblemsBy === "number"}
-                onclick={() => {
-                  if (orderProblemsBy === "number") {
-                    sortDirection = sortDirection === "asc" ? "desc" : "asc";
-                  } else {
-                    sortDirection = "asc";
-                    orderProblemsBy = "number";
-                  }
-                }}
+            <div class="problem-controls">
+              <wa-switch
+                size="small"
+                onchange={() => (hideCompleted = !hideCompleted)}
                 disabled={problems === undefined || problems.length === 0}
-                aria-label="Sort problems by number"
+                >Hide completed</wa-switch
               >
-                <wa-icon name={numberSortIcon} label={numberSortLabel}
-                ></wa-icon>
-                Num
-              </button>
-              <button
-                class="sort-btn"
-                class:active={orderProblemsBy === "points"}
-                onclick={() => {
-                  if (orderProblemsBy === "points") {
-                    sortDirection = sortDirection === "asc" ? "desc" : "asc";
-                  } else {
-                    sortDirection = "asc";
-                    orderProblemsBy = "points";
-                  }
-                }}
-                disabled={problems === undefined || problems.length === 0}
-                aria-label="Sort problems by points"
-              >
-                <wa-icon name={pointsSortIcon} label={pointsSortLabel}
-                ></wa-icon>
-                Pts
-              </button>
-              <button
-                class="sort-btn"
-                class:active={hideCompleted}
-                onclick={() => (hideCompleted = !hideCompleted)}
-                disabled={problems === undefined || problems.length === 0}
-                aria-label="Hide completed problems"
-              >
-                <wa-icon name="circle-check" label="Hide completed"></wa-icon>
-                Hide
-              </button>
+              <div class="sort-buttons">
+                <button
+                  class="sort-btn"
+                  class:active={orderProblemsBy === "number"}
+                  onclick={() => {
+                    if (orderProblemsBy === "number") {
+                      sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                    } else {
+                      sortDirection = "asc";
+                      orderProblemsBy = "number";
+                    }
+                  }}
+                  disabled={problems === undefined || problems.length === 0}
+                  aria-label="Sort problems by number"
+                >
+                  <wa-icon name={numberSortIcon} label={numberSortLabel}
+                  ></wa-icon>
+                  Num
+                </button>
+                <button
+                  class="sort-btn"
+                  class:active={orderProblemsBy === "points"}
+                  onclick={() => {
+                    if (orderProblemsBy === "points") {
+                      sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                    } else {
+                      sortDirection = "asc";
+                      orderProblemsBy = "points";
+                    }
+                  }}
+                  disabled={problems === undefined || problems.length === 0}
+                  aria-label="Sort problems by points"
+                >
+                  <wa-icon name={pointsSortIcon} label={pointsSortLabel}
+                  ></wa-icon>
+                  Pts
+                </button>
+              </div>
             </div>
             {#if visibleProblems.length === 0}
               {#if sortedProblems.length === 0}
@@ -465,6 +464,11 @@
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-xs);
+  }
+
+  .problem-controls {
+    display: flex;
+    align-items: center;
   }
 
   .sort-buttons {
