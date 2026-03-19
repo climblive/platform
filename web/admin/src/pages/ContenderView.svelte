@@ -139,7 +139,7 @@
       <LabeledText label="Registration code">
         {contender.registrationCode}
         <wa-copy-button
-          value={`${location.protocol}//${location.host}/${contender.registrationCode}`}
+          value={contender.registrationCode}
         ></wa-copy-button>
       </LabeledText>
     </article>
