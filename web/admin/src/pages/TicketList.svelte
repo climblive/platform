@@ -11,7 +11,7 @@
     createContendersMutation,
     getContendersByContestQuery,
   } from "@climblive/lib/queries";
-  import { getApiUrl, toastError } from "@climblive/lib/utils";
+  import { toastError } from "@climblive/lib/utils";
   import { Link } from "svelte-routing";
 
   const maxTickets = 500;
@@ -78,30 +78,6 @@
         onError: () => toastError("Failed to create tickets."),
       });
     }
-  };
-
-  const handleDownloadSimulatorConfig = () => {
-    const registrationCodes = contenders?.map((c) => c.registrationCode) ?? [];
-
-    const config = {
-      apiUrl: getApiUrl(),
-      registrationCodes,
-      iterations: 10,
-      maxSleep: 10000,
-    };
-
-    const blob = new Blob([JSON.stringify(config, null, 2)], {
-      type: "application/json",
-    });
-
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `contest_${contestId}_simulator_config.json`;
-    a.click();
-
-    window.URL.revokeObjectURL(url);
   };
 </script>
 
@@ -185,16 +161,6 @@
       {/if}
     </wa-button>
   </a>
-  {#if !location.hostname.endsWith("climblive.app")}
-    <wa-button
-      appearance="outlined"
-      size="small"
-      disabled={!contenders || contenders.length === 0}
-      onclick={handleDownloadSimulatorConfig}
-      >Simulator config
-      <wa-icon name="download" slot="start"></wa-icon>
-    </wa-button>
-  {/if}
 </div>
 
 <p>
