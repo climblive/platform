@@ -85,6 +85,7 @@
 
   let orderProblemsBy = $state<"number" | "points">("number");
   let sortDirection = $state<"asc" | "desc">("asc");
+  let hideCompleted = $state(false);
 
   let sortedProblems = $derived.by<Problem[]>(() => {
     const clonedProblems = [...(problems ?? [])];
@@ -114,6 +115,14 @@
 
     return clonedProblems;
   });
+
+  let visibleProblems = $derived(
+    hideCompleted
+      ? sortedProblems.filter(
+          (problem) => !ticks?.find((t) => t.problemId === problem.id)?.top,
+        )
+      : sortedProblems,
+  );
 
   let numberSortIcon = $derived(
     orderProblemsBy === "number" && sortDirection === "desc"
@@ -327,15 +336,32 @@
                 ></wa-icon>
                 Pts
               </button>
+              <button
+                class="sort-btn"
+                class:active={hideCompleted}
+                onclick={() => (hideCompleted = !hideCompleted)}
+                disabled={problems === undefined || problems.length === 0}
+                aria-label="Hide completed problems"
+              >
+                <wa-icon name="circle-check" label="Hide completed"></wa-icon>
+                Hide
+              </button>
             </div>
-            {#if sortedProblems.length === 0}
-              <EmptyState
-                title="No problems"
-                description="The organizer has not added any problems to this contest yet."
-              />
+            {#if visibleProblems.length === 0}
+              {#if sortedProblems.length === 0}
+                <EmptyState
+                  title="No problems"
+                  description="The organizer has not added any problems to this contest yet."
+                />
+              {:else}
+                <EmptyState
+                  title="All done!"
+                  description="You have topped all problems."
+                />
+              {/if}
             {:else}
               <div class="problems-list">
-                {#each sortedProblems as problem (problem.id)}
+                {#each visibleProblems as problem (problem.id)}
                   <ProblemView
                     {problem}
                     tick={ticks.find(
