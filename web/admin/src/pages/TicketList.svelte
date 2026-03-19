@@ -185,7 +185,7 @@
       {/if}
     </wa-button>
   </a>
-  {#if !import.meta.env.PROD}
+  {#if !location.hostname.endsWith("climblive.app")}
     <wa-button
       appearance="outlined"
       size="small"
