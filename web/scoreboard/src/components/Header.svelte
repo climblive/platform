@@ -41,7 +41,9 @@
       <div class="size">
         <strong>{classSize}</strong>/{totalSize}
       </div>
-      <wa-progress-bar value={progress}></wa-progress-bar>
+      <div class="progress">
+        <wa-progress-bar value={progress}></wa-progress-bar>
+      </div>
     </header>
   {/snippet}
 </ContestStateProvider>
@@ -100,10 +102,13 @@
       }
     }
 
-    wa-progress-bar {
+    .progress {
       grid-column: 1 / -1;
-      --height: 4px;
-      --border-radius: 0 0 var(--wa-border-radius-m) var(--wa-border-radius-m);
+      padding: 0 var(--wa-space-s) var(--wa-space-s);
+    }
+
+    wa-progress-bar {
+      --height: 2px;
     }
   }
 </style>
