@@ -86,6 +86,5 @@
 
   .engine-id {
     font-size: var(--wa-font-size-s);
-    color: var(--wa-color-neutral-fill-loud);
   }
 </style>
