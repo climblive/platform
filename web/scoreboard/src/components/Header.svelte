@@ -22,7 +22,7 @@
 </script>
 
 <ContestStateProvider {startTime} {endTime}>
-  {#snippet children({ contestState })}
+  {#snippet children({ contestState, progress })}
     <header>
       <div class="left">
         <div class="title">
@@ -38,6 +38,9 @@
       </div>
       <div class="size">
         <strong>{classSize}</strong>/{totalSize}
+      </div>
+      <div class="progress">
+        <div class="bar" style="width: {progress}%"></div>
       </div>
     </header>
   {/snippet}
@@ -93,6 +96,20 @@
 
       & strong {
         font-size: 1.5em;
+      }
+    }
+
+    .progress {
+      grid-column: 1 / -1;
+      height: 4px;
+      background-color: var(--wa-color-surface-border);
+      border-radius: 0 0 var(--wa-border-radius-m) var(--wa-border-radius-m);
+      overflow: hidden;
+
+      .bar {
+        height: 100%;
+        background-color: var(--wa-color-brand-fill-normal);
+        transition: width 1s linear;
       }
     }
   }

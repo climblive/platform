@@ -8,7 +8,7 @@
     startTime: Date;
     endTime: Date;
     gracePeriodEndTime?: Date;
-    children?: Snippet<[{ contestState: ContestState }]>;
+    children?: Snippet<[{ contestState: ContestState; progress: number }]>;
   }
 
   const {
@@ -43,6 +43,13 @@
   };
 
   const contestState: ContestState = $derived(computeState());
+
+  const progress = $derived.by(() => {
+    const total = endTime.getTime() - startTime.getTime();
+    if (total <= 0) return 0;
+    const elapsed = time.current.getTime() - startTime.getTime();
+    return Math.min(100, Math.max(0, (elapsed / total) * 100));
+  });
 </script>
 
-{@render children?.({ contestState })}
+{@render children?.({ contestState, progress })}
