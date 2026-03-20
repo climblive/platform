@@ -48,14 +48,17 @@
   <Loader />
 {:else}
   {#each scoreEngines as engineInstanceId (engineInstanceId)}
-    <wa-button
-      appearance="outlined"
-      variant="warning"
-      onclick={() => stopScoreEngine.mutate(engineInstanceId)}
-      loading={stopScoreEngine.isPending}
-      >Stop engine
-      <wa-icon name="stop" slot="start"></wa-icon>
-    </wa-button>
+    <div class="engine">
+      <code class="engine-id">{engineInstanceId}</code>
+      <wa-button
+        appearance="outlined"
+        variant="warning"
+        onclick={() => stopScoreEngine.mutate(engineInstanceId)}
+        loading={stopScoreEngine.isPending}
+        >Stop engine
+        <wa-icon name="stop" slot="start"></wa-icon>
+      </wa-button>
+    </div>
   {/each}
   {#if scoreEngines.length === 0}
     <wa-button
@@ -72,3 +75,17 @@
     </wa-button>
   {/if}
 {/if}
+
+<style>
+  .engine {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-s);
+    margin-bottom: var(--wa-space-s);
+  }
+
+  .engine-id {
+    font-size: var(--wa-font-size-s);
+    color: var(--wa-color-neutral-fill-loud);
+  }
+</style>
