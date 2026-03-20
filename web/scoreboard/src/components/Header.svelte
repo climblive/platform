@@ -108,7 +108,7 @@
     }
 
     wa-progress-bar {
-      --height: 1px;
+      --track-height: 0.5rem;
     }
   }
 </style>
