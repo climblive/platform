@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
   import { ContestStateProvider, Timer } from "@climblive/lib/components";
   import type { ScoreboardEntry } from "@climblive/lib/models";
   import { type Readable } from "svelte/store";
@@ -26,6 +27,7 @@
     <header>
       <div class="left">
         <div class="title">
+          <small>Class</small>
           <h2>
             {name}
           </h2>
@@ -39,9 +41,7 @@
       <div class="size">
         <strong>{classSize}</strong>/{totalSize}
       </div>
-      <div class="progress">
-        <div class="bar" style="width: {progress}%"></div>
-      </div>
+      <wa-progress-bar value={progress}></wa-progress-bar>
     </header>
   {/snippet}
 </ContestStateProvider>
@@ -72,13 +72,14 @@
     .title {
       width: 100%;
       position: relative;
-      height: 2rem;
+
+      small {
+        font-size: var(--wa-font-size-xs);
+        color: var(--wa-color-text-quiet);
+      }
     }
 
     & h2 {
-      position: absolute;
-      inset: 0;
-
       margin: 0;
       font-weight: var(--wa-font-weight-bold);
 
@@ -99,18 +100,10 @@
       }
     }
 
-    .progress {
+    wa-progress-bar {
       grid-column: 1 / -1;
-      height: 4px;
-      background-color: var(--wa-color-surface-border);
-      border-radius: 0 0 var(--wa-border-radius-m) var(--wa-border-radius-m);
-      overflow: hidden;
-
-      .bar {
-        height: 100%;
-        background-color: var(--wa-color-brand-fill-normal);
-        transition: width 1s linear;
-      }
+      --height: 4px;
+      --border-radius: 0 0 var(--wa-border-radius-m) var(--wa-border-radius-m);
     }
   }
 </style>
