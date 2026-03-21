@@ -23,15 +23,6 @@ import (
 	"github.com/go-faker/faker/v4"
 )
 
-//go:embed codes.txt
-var codes string
-
-const (
-	defaultAPIURL     = "http://localhost:8090"
-	defaultIterations = 10
-	defaultMaxSleep   = 10_000 * time.Millisecond
-)
-
 type Config struct {
 	APIUrl            string   `json:"apiUrl"`
 	RegistrationCodes []string `json:"registrationCodes"`
@@ -47,30 +38,19 @@ const (
 )
 
 func main() {
-	configPath := flag.String("config", "", "path to simulator config JSON file")
+	configPath := flag.String("config", "config.json", "path to simulator config JSON file")
 	flag.Parse()
 
-	cfg := Config{
-		APIUrl:            defaultAPIURL,
-		RegistrationCodes: strings.Split(codes, "\n"),
-		Iterations:        defaultIterations,
-		MaxSleep:          int(defaultMaxSleep / time.Millisecond),
+	cfg := Config{}
+
+	f, err := os.Open(*configPath)
+	if err != nil {
+		log.Fatalf("failed to open config file: %v", err)
 	}
+	defer f.Close()
 
-	if *configPath != "" {
-		f, err := os.Open(*configPath)
-		if err != nil {
-			log.Fatalf("failed to open config file: %v", err)
-		}
-		defer func() {
-			if err := f.Close(); err != nil {
-				log.Printf("failed to close config file: %v", err)
-			}
-		}()
-
-		if err := json.NewDecoder(f).Decode(&cfg); err != nil {
-			log.Fatalf("failed to parse config file: %v", err)
-		}
+	if err := json.NewDecoder(f).Decode(&cfg); err != nil {
+		log.Fatalf("failed to parse config file: %v", err)
 	}
 
 	apiURL := cfg.APIUrl
