@@ -2,6 +2,7 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import { checked, GenericForm, name } from "@climblive/lib/forms";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
@@ -39,10 +40,17 @@
 
 <GenericForm submit={handleSubmit} schema={formSchema}>
   {#snippet children(form)}
+    {#snippet indicator()}
+      {#if saved}
+        <wa-icon name="check"></wa-icon>
+        Saved
+      {/if}
+    {/snippet}
     <RuleOptionCard
       title="Finalists"
       description="The number of contenders that will proceed to the finals.
     There might be additional finalists in case of ties."
+      {indicator}
     >
       {#snippet header()}
         <wa-checkbox
@@ -75,7 +83,6 @@
               type="submit"
               size="small"
               appearance="outlined"
-              variant={saved ? "success" : undefined}
               loading={patchContest.isPending}
               >Save</wa-button
             >
