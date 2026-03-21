@@ -8,7 +8,11 @@
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { getContestQuery } from "@climblive/lib/queries";
+  import {
+    getContendersByContestQuery,
+    getContestQuery,
+  } from "@climblive/lib/queries";
+  import { getApiUrl } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
   import ArchiveContest from "./ArchiveContest.svelte";
   import CompClassList from "./CompClassList.svelte";
@@ -64,6 +68,33 @@
       setTimeout(cb, 250);
     }
   });
+
+  const contendersQuery = $derived(getContendersByContestQuery(contestId));
+  const contenders = $derived(contendersQuery.data);
+
+  const handleDownloadSimulatorConfig = () => {
+    const registrationCodes = contenders?.map((c) => c.registrationCode) ?? [];
+
+    const config = {
+      apiUrl: new URL(getApiUrl(), window.location.origin).toString(),
+      registrationCodes,
+      iterations: 10,
+      maxSleep: 10_000,
+    };
+
+    const blob = new Blob([JSON.stringify(config, null, 2)], {
+      type: "application/json",
+    });
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `contest_${contestId}_simulator_config.json`;
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+  };
 </script>
 
 <main>
@@ -137,6 +168,16 @@
           organizerId={contest.ownership.organizerId}
         />
       </div>
+      {#if location.hostname !== "climblive.app"}
+        <h3>Developer tools</h3>
+        <wa-button
+          appearance="outlined"
+          disabled={!contenders || contenders.length === 0}
+          onclick={handleDownloadSimulatorConfig}
+          >Download simulator config
+          <wa-icon name="download" slot="start"></wa-icon>
+        </wa-button>
+      {/if}
       <h3>Score Engines</h3>
       <p>
         An active score engine collects all results during a contest and

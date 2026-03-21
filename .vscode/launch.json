@@ -53,7 +53,8 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "backend/cmd/simulator/main.go"
+      "program": "backend/cmd/simulator/main.go",
+      "args": ["--config=/workspaces/platform/config.json"]
     }
   ],
   "compounds": [
