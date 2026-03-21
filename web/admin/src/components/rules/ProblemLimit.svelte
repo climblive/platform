@@ -46,11 +46,17 @@
 
 <GenericForm schema={formSchema} submit={handleSubmit}>
   {#snippet children(form)}
-    <div class="card-wrapper">
-      <RuleOptionCard
-        title="Problem limit"
-        description="Only count a configurable number of the hardest problems towards each contender's total score."
-      >
+    {#snippet indicator()}
+      {#if saved}
+        <wa-icon name="check"></wa-icon>
+        Saved
+      {/if}
+    {/snippet}
+    <RuleOptionCard
+      title="Problem limit"
+      description="Only count a configurable number of the hardest problems towards each contender's total score."
+      {indicator}
+    >
       {#snippet header()}
         <wa-checkbox
           size="small"
@@ -88,14 +94,7 @@
           {/if}
         </div>
       {/snippet}
-      </RuleOptionCard>
-      {#if saved}
-        <div class="saved-indicator">
-          <wa-icon name="check"></wa-icon>
-          Saved
-        </div>
-      {/if}
-    </div>
+    </RuleOptionCard>
   {/snippet}
 </GenericForm>
 
@@ -108,21 +107,5 @@
     display: flex;
     gap: var(--wa-space-xs);
     align-items: end;
-  }
-
-  .card-wrapper {
-    position: relative;
-  }
-
-  .saved-indicator {
-    position: absolute;
-    top: var(--wa-space-m);
-    right: var(--wa-space-m);
-    display: flex;
-    align-items: center;
-    gap: var(--wa-space-2xs);
-    font-size: var(--wa-font-size-s);
-    color: var(--wa-color-success-on-quiet);
-    pointer-events: none;
   }
 </style>
