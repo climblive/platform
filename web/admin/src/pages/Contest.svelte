@@ -79,7 +79,7 @@
       apiUrl: getApiUrl(),
       registrationCodes,
       iterations: 10,
-      maxSleep: 10000,
+      maxSleep: 10_000,
     };
 
     const blob = new Blob([JSON.stringify(config, null, 2)], {
@@ -167,17 +167,17 @@
           {contestId}
           organizerId={contest.ownership.organizerId}
         />
-        {#if location.hostname !== "climblive.app"}
-          <wa-button
-            appearance="outlined"
-            size="small"
-            disabled={!contenders || contenders.length === 0}
-            onclick={handleDownloadSimulatorConfig}
-            >Simulator config
-            <wa-icon name="download" slot="start"></wa-icon>
-          </wa-button>
-        {/if}
       </div>
+      {#if location.hostname !== "climblive.app"}
+        <h3>Developer tools</h3>
+        <wa-button
+          appearance="outlined"
+          disabled={!contenders || contenders.length === 0}
+          onclick={handleDownloadSimulatorConfig}
+          >Download simulator config
+          <wa-icon name="download" slot="start"></wa-icon>
+        </wa-button>
+      {/if}
       <h3>Score Engines</h3>
       <p>
         An active score engine collects all results during a contest and
