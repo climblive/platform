@@ -40,18 +40,12 @@
 
 <GenericForm submit={handleSubmit} schema={formSchema}>
   {#snippet children(form)}
-    {#snippet indicator()}
-      {#if saved}
-        <wa-icon name="check"></wa-icon>
-        Saved
-      {/if}
-    {/snippet}
-    <RuleOptionCard
-      title="Finalists"
-      description="The number of contenders that will proceed to the finals.
+    <div class="card-wrapper">
+      <RuleOptionCard
+        title="Finalists"
+        description="The number of contenders that will proceed to the finals.
     There might be additional finalists in case of ties."
-      {indicator}
-    >
+      >
       {#snippet header()}
         <wa-checkbox
           size="small"
@@ -89,7 +83,14 @@
           {/if}
         </div>
       {/snippet}
-    </RuleOptionCard>
+      </RuleOptionCard>
+      {#if saved}
+        <div class="saved-indicator">
+          <wa-icon name="check"></wa-icon>
+          Saved
+        </div>
+      {/if}
+    </div>
   {/snippet}
 </GenericForm>
 
@@ -102,5 +103,21 @@
     display: flex;
     gap: var(--wa-space-xs);
     align-items: end;
+  }
+
+  .card-wrapper {
+    position: relative;
+  }
+
+  .saved-indicator {
+    position: absolute;
+    top: var(--wa-space-m);
+    right: var(--wa-space-m);
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-2xs);
+    font-size: var(--wa-font-size-s);
+    color: var(--wa-color-success-on-quiet);
+    pointer-events: none;
   }
 </style>
