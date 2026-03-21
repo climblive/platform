@@ -61,11 +61,13 @@
         <wa-icon name="triangle-exclamation"></wa-icon>Offline
       </header>
       <main>
-        <h1>
-          {contest.name}
-        </h1>
-        <div class="logo">
-          <FullLogo />
+        <div class="banner">
+          <h1>
+            {contest.name}
+          </h1>
+          <div class="logo">
+            <FullLogo />
+          </div>
         </div>
         {#if compClasses.length > 1}
           <wa-select
@@ -142,11 +144,24 @@
     padding: var(--wa-space-m);
   }
 
+  .banner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--wa-space-s);
+    margin-block: var(--wa-space-s) var(--wa-space-m);
+  }
+
   h1 {
     text-align: center;
+    width: 100%;
+    font-size: var(--wa-font-size-2xl);
     line-height: var(--wa-line-height-condensed);
     color: var(--wa-color-text-normal);
-    margin-bottom: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
   }
 
   .container {
@@ -174,15 +189,23 @@
   }
 
   .logo {
-    text-align: center;
     height: var(--wa-font-size-xl);
     color: var(--wa-color-text-normal);
-    margin-block: var(--wa-space-s);
   }
 
   @media screen and (max-width: 512px) {
+    .banner {
+      flex-direction: column-reverse;
+      align-items: start;
+    }
+
     h1 {
       font-size: var(--wa-font-size-xl);
+      text-align: left;
+    }
+
+    .logo {
+      height: var(--wa-font-size-l);
     }
 
     wa-select {
