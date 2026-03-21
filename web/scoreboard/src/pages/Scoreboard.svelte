@@ -152,15 +152,16 @@
   .container {
     margin-top: var(--wa-space-s);
     flex-grow: 1;
+    width: 100%;
     display: grid;
-    grid-template-columns: repeat(
-      var(--num-columns),
-      minmax(max-content, 32rem)
+    margin-inline: auto;
+    max-width: calc(
+      var(--num-columns) * 32rem + (var(--num-columns) - 1) * var(--wa-space-s)
     );
+    grid-template-columns: repeat(var(--num-columns), 1fr);
     grid-template-rows: 1fr;
     padding-top: 0;
     gap: var(--wa-space-s);
-    justify-content: center;
   }
 
   .class {
@@ -190,6 +191,7 @@
 
     .container {
       grid-template-columns: 1fr;
+      max-width: none;
     }
 
     .class[data-selected="false"] {

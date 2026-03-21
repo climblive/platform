@@ -41,9 +41,7 @@
       <div class="size">
         <strong>{classSize}</strong>/{totalSize}
       </div>
-      <div class="progress">
-        <wa-progress-bar value={progress}></wa-progress-bar>
-      </div>
+      <wa-progress-bar value={progress}></wa-progress-bar>
     </header>
   {/snippet}
 </ContestStateProvider>
@@ -55,6 +53,7 @@
     border-radius: var(--wa-border-radius-m);
     border: var(--wa-border-width-s) var(--wa-border-style)
       var(--wa-color-surface-border);
+    min-width: 0;
 
     color: var(--wa-color-text-normal);
 
@@ -67,11 +66,15 @@
       flex-direction: column;
       gap: var(--wa-space-xs);
       align-items: start;
+      min-width: 0;
 
       padding: var(--wa-space-s);
     }
 
     .title {
+      width: 100%;
+      min-width: 0;
+
       small {
         font-size: var(--wa-font-size-xs);
         color: var(--wa-color-text-quiet);
@@ -79,6 +82,7 @@
     }
 
     & h2 {
+      min-width: 0;
       margin: 0;
       font-weight: var(--wa-font-weight-bold);
 
@@ -99,13 +103,11 @@
       }
     }
 
-    .progress {
-      grid-column: 1 / -1;
-      padding: 0 var(--wa-space-s) var(--wa-space-s);
-    }
-
     wa-progress-bar {
       --track-height: 0.5rem;
+
+      grid-column: 1 / -1;
+      padding: 0 var(--wa-space-s) var(--wa-space-s);
     }
   }
 </style>
