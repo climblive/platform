@@ -2,11 +2,13 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import { checked, GenericForm, name } from "@climblive/lib/forms";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
   import { patchContestMutation } from "@climblive/lib/queries";
   import { z } from "@climblive/lib/utils";
+  import { onDestroy } from "svelte";
   import RuleOptionCard from "../RuleOptionCard.svelte";
   import { doSubmit } from "../RulesEditor.svelte";
 
@@ -16,24 +18,39 @@
 
   const { contest }: Props = $props();
 
-  const patchContest = $derived(patchContestMutation(contest.id));
+  const patchContest = patchContestMutation(contest.id);
 
   let enabled = $derived(contest.finalists > 0);
+  let saved = $state(false);
+  let savedTimer: ReturnType<typeof setTimeout> | undefined;
+
+  onDestroy(() => clearTimeout(savedTimer));
 
   const formSchema = z.object({
     finalists: z.coerce.number().min(0).max(65536).optional(),
   });
 
   const handleSubmit = (value: Partial<ContestPatch>) =>
-    doSubmit(patchContest, { finalists: value.finalists ?? 0 });
+    doSubmit(patchContest, { finalists: value.finalists ?? 0 }, () => {
+      saved = true;
+      clearTimeout(savedTimer);
+      savedTimer = setTimeout(() => (saved = false), 2_000);
+    });
 </script>
 
 <GenericForm submit={handleSubmit} schema={formSchema}>
   {#snippet children(form)}
+    {#snippet indicator()}
+      {#if saved}
+        <wa-icon name="check"></wa-icon>
+        Saved
+      {/if}
+    {/snippet}
     <RuleOptionCard
       title="Finalists"
       description="The number of contenders that will proceed to the finals.
     There might be additional finalists in case of ties."
+      {indicator}
     >
       {#snippet header()}
         <wa-checkbox
@@ -41,6 +58,8 @@
           onchange={(event: InputEvent) => {
             const checkbox = event.target as WaCheckbox;
             enabled = checkbox.checked;
+            saved = false;
+            clearTimeout(savedTimer);
 
             setTimeout(() => form.requestSubmit());
           }}
@@ -64,7 +83,8 @@
               type="submit"
               size="small"
               appearance="outlined"
-              loading={patchContest.isPending}>Save</wa-button
+              loading={patchContest.isPending}
+              >Save</wa-button
             >
           {/if}
         </div>

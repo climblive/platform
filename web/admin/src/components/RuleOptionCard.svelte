@@ -9,6 +9,7 @@
     tag?: string;
     header?: Snippet;
     footer?: Snippet;
+    indicator?: Snippet;
   }
 
   const {
@@ -18,6 +19,7 @@
     tag,
     header,
     footer,
+    indicator,
   }: Props = $props();
 </script>
 
@@ -29,6 +31,11 @@
     <h3>{title}</h3>
     {#if tag}
       <wa-badge pill variant="neutral">{tag}</wa-badge>
+    {/if}
+    {#if indicator}
+      <div class="indicator">
+        {@render indicator()}
+      </div>
     {/if}
   </div>
 
@@ -68,6 +75,15 @@
     wa-badge {
       margin-inline-start: auto;
       font-size: var(--wa-font-size-2xs);
+    }
+
+    .indicator {
+      margin-inline-start: auto;
+      display: flex;
+      align-items: center;
+      gap: var(--wa-space-2xs);
+      font-size: var(--wa-font-size-s);
+      color: var(--wa-color-success-on-quiet);
     }
   }
 
