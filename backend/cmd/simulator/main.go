@@ -138,6 +138,8 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 	case "Males":
 		patch.Name = domain.NewPatch(fmt.Sprintf("%s %s", faker.FirstNameMale(), faker.LastName()))
 	case "Females":
+		fallthrough
+	default:
 		patch.Name = domain.NewPatch(fmt.Sprintf("%s %s", faker.FirstNameFemale(), faker.LastName()))
 	}
 
