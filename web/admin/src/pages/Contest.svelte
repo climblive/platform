@@ -76,7 +76,7 @@
     const registrationCodes = contenders?.map((c) => c.registrationCode) ?? [];
 
     const config = {
-      apiUrl: getApiUrl(),
+      apiUrl: new URL(getApiUrl(), window.location.origin).toString(),
       registrationCodes,
       iterations: 10,
       maxSleep: 10_000,
