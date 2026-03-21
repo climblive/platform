@@ -187,6 +187,7 @@ make test
 - **Svelte 5**: Use runes API (`$state`, `$derived`, `$effect`)
 - **TypeScript**: Strict mode enabled
 - **API Calls**: Use TanStack Query through queries in the shared library
+- **Conditionals**: Always use braces for one-line conditionals; do not use shorthand `if (...) return ...` style
 - **Styling**: Component-scoped styles in plain CSS (prefer nesting)
 - **Tokens**: Use Web Awesome design tokens for all styling (`@awesome.me/webawesome/dist/styles/themes/default.css`)
 - **Theme**: Shared theme in `packages/lib/src/theme.css`

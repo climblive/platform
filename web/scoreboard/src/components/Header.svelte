@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
   import { ContestStateProvider, Timer } from "@climblive/lib/components";
   import type { ScoreboardEntry } from "@climblive/lib/models";
   import { type Readable } from "svelte/store";
@@ -22,10 +23,11 @@
 </script>
 
 <ContestStateProvider {startTime} {endTime}>
-  {#snippet children({ contestState })}
+  {#snippet children({ contestState, progress })}
     <header>
       <div class="left">
         <div class="title">
+          <small>Class</small>
           <h2>
             {name}
           </h2>
@@ -39,6 +41,7 @@
       <div class="size">
         <strong>{classSize}</strong>/{totalSize}
       </div>
+      <wa-progress-bar value={progress}></wa-progress-bar>
     </header>
   {/snippet}
 </ContestStateProvider>
@@ -62,20 +65,23 @@
       flex-direction: column;
       gap: var(--wa-space-xs);
       align-items: start;
+      min-width: 0;
 
       padding: var(--wa-space-s);
     }
 
     .title {
       width: 100%;
-      position: relative;
-      height: 2rem;
+      min-width: 0;
+
+      small {
+        font-size: var(--wa-font-size-xs);
+        color: var(--wa-color-text-quiet);
+      }
     }
 
     & h2 {
-      position: absolute;
-      inset: 0;
-
+      min-width: 0;
       margin: 0;
       font-weight: var(--wa-font-weight-bold);
 
@@ -94,6 +100,13 @@
       & strong {
         font-size: 1.5em;
       }
+    }
+
+    wa-progress-bar {
+      --track-height: 0.5rem;
+
+      grid-column: 1 / -1;
+      padding: 0 var(--wa-space-s) var(--wa-space-s);
     }
   }
 </style>
