@@ -18,7 +18,7 @@
 
   const { contest }: Props = $props();
 
-  const patchContest = $derived(patchContestMutation(contest.id));
+  const patchContest = patchContestMutation(contest.id);
 
   let enabled = $derived(contest.finalists > 0);
   let saved = $state(false);
@@ -34,7 +34,7 @@
     doSubmit(patchContest, { finalists: value.finalists ?? 0 }, () => {
       saved = true;
       clearTimeout(savedTimer);
-      savedTimer = setTimeout(() => (saved = false), 2000);
+      savedTimer = setTimeout(() => (saved = false), 2_000);
     });
 </script>
 
@@ -75,9 +75,7 @@
               size="small"
               appearance="outlined"
               variant={saved ? "success" : undefined}
-              loading={patchContest.isPending}
-              >{#if saved}<wa-icon slot="start" name="check"
-                ></wa-icon>Saved{:else}Save{/if}</wa-button
+              loading={patchContest.isPending}>Save</wa-button
             >
           {/if}
         </div>
