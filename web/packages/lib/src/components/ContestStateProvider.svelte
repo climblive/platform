@@ -46,7 +46,10 @@
 
   const progress = $derived.by(() => {
     const total = endTime.getTime() - startTime.getTime();
-    if (total <= 0) return 0;
+    if (total <= 0) {
+      return 0;
+    }
+
     const elapsed = time.current.getTime() - startTime.getTime();
     return Math.min(100, Math.max(0, (elapsed / total) * 100));
   });

@@ -72,9 +72,6 @@
     }
 
     .title {
-      width: 100%;
-      position: relative;
-
       small {
         font-size: var(--wa-font-size-xs);
         color: var(--wa-color-text-quiet);
