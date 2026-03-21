@@ -16,8 +16,8 @@
 
   const contestQuery = $derived(getContestQuery(contestId));
   const scoreEnginesQuery = $derived(getScoreEnginesQuery(contestId));
-  const startScoreEngine = $derived(startScoreEngineMutation(contestId));
-  const stopScoreEngine = $derived(stopScoreEngineMutation());
+  const startScoreEngine = startScoreEngineMutation(contestId);
+  const stopScoreEngine = stopScoreEngineMutation();
 
   let contest = $derived(contestQuery.data);
   let scoreEngines = $derived(scoreEnginesQuery.data);
@@ -49,8 +49,9 @@
 {:else}
   {#each scoreEngines as engineInstanceId (engineInstanceId)}
     <wa-button
+      size="small"
       appearance="outlined"
-      variant="warning"
+      variant="danger"
       onclick={() => stopScoreEngine.mutate(engineInstanceId)}
       loading={stopScoreEngine.isPending}
       >Stop engine
@@ -59,8 +60,9 @@
   {/each}
   {#if scoreEngines.length === 0}
     <wa-button
+      size="small"
       appearance="outlined"
-      variant="warning"
+      variant="neutral"
       onclick={() =>
         startScoreEngine.mutate({
           terminatedBy: add(new Date(), { hours: 6 }),

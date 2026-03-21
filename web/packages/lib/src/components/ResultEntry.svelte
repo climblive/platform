@@ -9,7 +9,7 @@
     highlighted?: boolean;
   }
 
-  let { scoreboardEntry, highlighted = false }: Props = $props();
+  const { scoreboardEntry, highlighted = false }: Props = $props();
   let score = $derived(scoreboardEntry.score);
 </script>
 
@@ -37,7 +37,7 @@
 
 <style>
   section {
-    height: 2.25rem;
+    height: 2.75rem;
     background-color: var(--wa-color-surface-raised);
     border: var(--wa-border-width-s) var(--wa-border-style)
       var(--wa-color-neutral-border-quiet);
@@ -55,15 +55,14 @@
   }
 
   section[data-highlighted="true"] {
-    background-color: var(--wa-color-brand-fill-quiet);
-    border-color: var(--wa-color-brand-border-normal);
+    border-color: var(--wa-color-brand-border-loud);
   }
 
   section > div {
     width: 100%;
     white-space: nowrap;
     overflow: hidden;
-    line-height: 2.25rem;
+    line-height: 2.75rem;
   }
 
   .number {

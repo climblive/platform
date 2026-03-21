@@ -344,10 +344,16 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 				}
 			}
 
+			var score, placement int
+			if entry.Score != nil {
+				score = entry.Score.Score
+				placement = entry.Score.Placement
+			}
+
 			err = book.SetSheetRow(sheetName, fmt.Sprintf("A%d", counter), &[]any{
 				entry.Name,
-				entry.Score.Score,
-				entry.Score.Placement})
+				score,
+				placement})
 			if err != nil {
 				return errors.Wrap(err, 0)
 			}
