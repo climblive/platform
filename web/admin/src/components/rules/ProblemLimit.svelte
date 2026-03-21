@@ -82,7 +82,7 @@
               appearance="outlined"
               variant={saved ? "success" : undefined}
               loading={patchContest.isPending}
-              >{#if saved}Saved{:else}Save{/if}</wa-button
+              >Save</wa-button
             >
           {/if}
         </div>
