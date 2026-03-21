@@ -1,12 +1,11 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import { checked, GenericForm, name } from "@climblive/lib/forms";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
   import { patchContestMutation } from "@climblive/lib/queries";
-  import { z } from "@climblive/lib/utils";
+  import { debounce, z } from "@climblive/lib/utils";
   import RuleOptionCard from "../RuleOptionCard.svelte";
   import { doSubmit } from "../RulesEditor.svelte";
 
@@ -26,6 +25,11 @@
 
   const handleSubmit = (value: Partial<ContestPatch>) =>
     doSubmit(patchContest, { finalists: value.finalists ?? 0 });
+
+  const debouncedSubmit = debounce(
+    (form: HTMLFormElement) => form.requestSubmit(),
+    1000,
+  );
 </script>
 
 <GenericForm submit={handleSubmit} schema={formSchema}>
@@ -58,14 +62,8 @@
               min={0}
               max={65536}
               defaultValue={contest.finalists || 7}
+              oninput={() => debouncedSubmit(form)}
             ></wa-number-input>
-
-            <wa-button
-              type="submit"
-              size="small"
-              appearance="outlined"
-              loading={patchContest.isPending}>Save</wa-button
-            >
           {/if}
         </div>
       {/snippet}
@@ -76,11 +74,5 @@
 <style>
   wa-number-input {
     width: 100%;
-  }
-
-  .controls {
-    display: flex;
-    gap: var(--wa-space-xs);
-    align-items: end;
   }
 </style>
