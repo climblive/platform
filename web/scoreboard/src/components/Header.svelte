@@ -53,7 +53,6 @@
     border-radius: var(--wa-border-radius-m);
     border: var(--wa-border-width-s) var(--wa-border-style)
       var(--wa-color-surface-border);
-    min-width: 0;
 
     color: var(--wa-color-text-normal);
 
