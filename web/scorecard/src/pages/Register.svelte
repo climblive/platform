@@ -29,9 +29,7 @@
   const contest = $derived(contestQuery.data);
 
   const tooLate = $derived(
-    compClassesQuery.data !== undefined &&
-      compClassesQuery.data.length > 0 &&
-      compClassesQuery.data.every((c) => isAfter(new Date(), c.timeEnd)),
+    compClassesQuery.data?.every(({ timeEnd }) => isAfter(new Date(), timeEnd)),
   );
 
   const gotoScorecard = () => {
@@ -57,37 +55,37 @@
   let showSplash = $state(true);
 </script>
 
-{#if showSplash || !contender || !contest || !compClassesQuery.data}
+{#if showSplash || !contender || !contest || tooLate === undefined}
   <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
   <h1>{contest.name}</h1>
-  {#if tooLate}
-    <wa-callout variant="warning" size="small">
-      <wa-icon slot="icon" name="clock"></wa-icon>
-      <p>
-        <strong>Registration is no longer possible.</strong><br />
-        All competition classes have ended.
-      </p>
-    </wa-callout>
-  {:else}
-    <RegistrationForm
-      submit={handleSubmit}
-      data={{
-        name: contender.name,
-        compClassId: contender.compClassId,
-        withdrawnFromFinals: contender.withdrawnFromFinals,
-      }}
-    >
-      <wa-button
-        size="small"
-        type="submit"
-        loading={patchContender.isPending}
-        variant="neutral"
-        appearance="accent"
-        >Register
-      </wa-button>
-    </RegistrationForm>
-  {/if}
+
+  <RegistrationForm
+    submit={handleSubmit}
+    data={{
+      name: contender.name,
+      compClassId: contender.compClassId,
+      withdrawnFromFinals: contender.withdrawnFromFinals,
+    }}
+  >
+    {#if tooLate}
+      <wa-callout variant="warning">
+        <wa-icon slot="icon" name="clock"></wa-icon>
+        <strong>Registration is no longer possible</strong><br />
+        All classes have ended.
+      </wa-callout>
+    {/if}
+
+    <wa-button
+      size="small"
+      type="submit"
+      loading={patchContender.isPending}
+      variant="neutral"
+      appearance="accent"
+      disabled={tooLate}
+      >Register
+    </wa-button>
+  </RegistrationForm>
 {/if}
 
 <style>
@@ -95,9 +93,5 @@
     font-size: var(--wa-font-size-l);
     padding: var(--wa-space-m);
     padding-block-end: 0;
-  }
-
-  wa-callout {
-    margin: var(--wa-space-m);
   }
 </style>
