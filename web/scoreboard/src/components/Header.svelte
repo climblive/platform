@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
   import { ContestStateProvider, Timer } from "@climblive/lib/components";
   import type { ScoreboardEntry } from "@climblive/lib/models";
   import { type Readable } from "svelte/store";
@@ -24,23 +25,25 @@
 </script>
 
 <ContestStateProvider {contestId} {compClassId}>
-  {#snippet children({ contestState })}
+  {#snippet children({ contestState, progress })}
     <header>
       <div class="left">
         <div class="title">
+          <small>Class</small>
           <h2>
             {name}
           </h2>
         </div>
         {#if contestState === "NOT_STARTED"}
-          <Timer endTime={startTime} label="Time until start" />
+          <Timer endTime={startTime} label="Starting in" />
         {:else}
-          <Timer {endTime} label="Time remaining" />
+          <Timer {endTime} label="Time left" />
         {/if}
       </div>
       <div class="size">
         <strong>{classSize}</strong>/{totalSize}
       </div>
+      <wa-progress-bar value={progress}></wa-progress-bar>
     </header>
   {/snippet}
 </ContestStateProvider>
@@ -48,12 +51,12 @@
 <style>
   header {
     margin-bottom: var(--wa-space-s);
-    background-color: var(--wa-color-brand-fill-normal);
+    background-color: var(--wa-color-surface-raised);
     border-radius: var(--wa-border-radius-m);
     border: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-color-brand-border-normal);
+      var(--wa-color-surface-border);
 
-    color: var(--wa-color-brand-on-normal);
+    color: var(--wa-color-text-normal);
 
     display: grid;
     grid-template-columns: 1fr max-content;
@@ -64,20 +67,23 @@
       flex-direction: column;
       gap: var(--wa-space-xs);
       align-items: start;
+      min-width: 0;
 
       padding: var(--wa-space-s);
     }
 
     .title {
       width: 100%;
-      position: relative;
-      height: 2rem;
+      min-width: 0;
+
+      small {
+        font-size: var(--wa-font-size-xs);
+        color: var(--wa-color-text-quiet);
+      }
     }
 
     & h2 {
-      position: absolute;
-      inset: 0;
-
+      min-width: 0;
       margin: 0;
       font-weight: var(--wa-font-weight-bold);
 
@@ -96,6 +102,13 @@
       & strong {
         font-size: 1.5em;
       }
+    }
+
+    wa-progress-bar {
+      --track-height: 0.5rem;
+
+      grid-column: 1 / -1;
+      padding: 0 var(--wa-space-s) var(--wa-space-s);
     }
   }
 </style>
