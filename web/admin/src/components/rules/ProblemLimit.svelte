@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
@@ -7,7 +6,7 @@
   import { checked, GenericForm, name } from "@climblive/lib/forms";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
   import { patchContestMutation } from "@climblive/lib/queries";
-  import { z } from "@climblive/lib/utils";
+  import { debounce, z } from "@climblive/lib/utils";
   import { onDestroy } from "svelte";
   import RuleOptionCard from "../RuleOptionCard.svelte";
   import { doSubmit } from "../RulesEditor.svelte";
@@ -29,6 +28,11 @@
   const formSchema = z.object({
     qualifyingProblems: z.coerce.number().min(0).max(65536).optional(),
   });
+
+  const debouncedSubmit = debounce(
+    (form: HTMLFormElement) => form.requestSubmit(),
+    1000,
+  );
 
   const handleSubmit = (value: Partial<ContestPatch>) =>
     doSubmit(
@@ -81,14 +85,8 @@
               min={0}
               max={65536}
               defaultValue={contest.qualifyingProblems || 10}
+              oninput={() => debouncedSubmit(form)}
             ></wa-number-input>
-
-            <wa-button
-              type="submit"
-              size="small"
-              appearance="outlined"
-              loading={patchContest.isPending}>Save</wa-button
-            >
           {/if}
         </div>
       {/snippet}
