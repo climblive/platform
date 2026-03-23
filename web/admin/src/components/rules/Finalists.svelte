@@ -40,17 +40,10 @@
 
 <GenericForm submit={handleSubmit} schema={formSchema}>
   {#snippet children(form)}
-    {#snippet indicator()}
-      {#if saved}
-        <wa-icon name="check"></wa-icon>
-        Saved
-      {/if}
-    {/snippet}
     <RuleOptionCard
       title="Finalists"
       description="The number of contenders that will proceed to the finals.
     There might be additional finalists in case of ties."
-      {indicator}
     >
       {#snippet header()}
         <wa-checkbox
@@ -65,6 +58,14 @@
           }}
           {@attach checked(enabled)}
         ></wa-checkbox>
+      {/snippet}
+      {#snippet indicator()}
+        {#if saved}
+          <div class="indicator">
+            <wa-icon name="check"></wa-icon>
+            Saved
+          </div>
+        {/if}
       {/snippet}
       {#snippet footer()}
         <div class="controls">
@@ -83,8 +84,7 @@
               type="submit"
               size="small"
               appearance="outlined"
-              loading={patchContest.isPending}
-              >Save</wa-button
+              loading={patchContest.isPending}>Save</wa-button
             >
           {/if}
         </div>
@@ -102,5 +102,15 @@
     display: flex;
     gap: var(--wa-space-xs);
     align-items: end;
+  }
+
+  .indicator {
+    margin-inline-start: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-2xs);
+    font-size: var(--wa-font-size-s);
+    color: var(--wa-color-success-fill-loud);
+    font-weight: var(--wa-font-weight-bold);
   }
 </style>
