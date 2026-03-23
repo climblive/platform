@@ -2,8 +2,10 @@
   export const doSubmit = (
     mutation: ReturnType<typeof patchContestMutation>,
     patch: ContestPatch,
+    onSuccess?: () => void,
   ) => {
     mutation.mutate(patch, {
+      onSuccess,
       onError: () => toastError("Failed to update rules."),
     });
   };
