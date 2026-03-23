@@ -51,8 +51,6 @@
           onchange={(event: InputEvent) => {
             const checkbox = event.target as WaCheckbox;
             enabled = checkbox.checked;
-            saved = false;
-            clearTimeout(savedTimer);
 
             setTimeout(() => form.requestSubmit());
           }}
