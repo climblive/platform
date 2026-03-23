@@ -150,6 +150,8 @@
   const handleShowTab = ({ detail }: WaTabShowEvent) => {
     if (detail.name === "results") {
       resultsConnected = true;
+    } else if (detail.name === "scorecard") {
+      window.scrollTo(0, 0);
     }
   };
 
