@@ -1,4 +1,4 @@
-import * as z from "zod/v4";
+import { z } from "@climblive/lib/utils";
 import type { Tick } from "./generated";
 
 export const tickSchema: z.ZodType<Tick> = z.object({

@@ -269,8 +269,26 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 
 			style, err := book.NewStyle(&excelize.Style{
 				Font: &excelize.Font{
-					Bold: true,
+					Bold:         true,
+					Italic:       false,
+					Underline:    "",
+					Family:       "",
+					Size:         0,
+					Strike:       false,
+					Color:        "",
+					ColorIndexed: 0,
+					ColorTheme:   nil,
+					ColorTint:    0,
+					VertAlign:    "",
 				},
+				Border:        nil,
+				Fill:          excelize.Fill{},
+				Alignment:     nil,
+				Protection:    nil,
+				NumFmt:        0,
+				DecimalPlaces: nil,
+				CustomNumFmt:  nil,
+				NegRed:        false,
 			})
 			if err != nil {
 				return errors.Wrap(err, 0)
@@ -326,10 +344,16 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 				}
 			}
 
+			var score, placement int
+			if entry.Score != nil {
+				score = entry.Score.Score
+				placement = entry.Score.Placement
+			}
+
 			err = book.SetSheetRow(sheetName, fmt.Sprintf("A%d", counter), &[]any{
 				entry.Name,
-				entry.Score.Score,
-				entry.Score.Placement})
+				score,
+				placement})
 			if err != nil {
 				return errors.Wrap(err, 0)
 			}

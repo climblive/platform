@@ -1,12 +1,12 @@
 package scores_test
 
 import (
-	"math/rand"
 	"slices"
 	"testing"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
+	"github.com/climblive/platform/backend/internal/testutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,8 +28,8 @@ func TestMemoryStore(t *testing.T) {
 		store := scores.NewMemoryStore()
 
 		contender := scores.Contender{
-			ID:          domain.ContenderID(rand.Int()),
-			CompClassID: domain.CompClassID(rand.Int()),
+			ID:          testutils.RandomResourceID[domain.ContenderID](),
+			CompClassID: testutils.RandomResourceID[domain.CompClassID](),
 		}
 
 		store.SaveContender(contender)
@@ -140,8 +140,8 @@ func TestMemoryStore(t *testing.T) {
 		store := scores.NewMemoryStore()
 
 		contender := scores.Contender{
-			ID:                  domain.ContenderID(rand.Int()),
-			CompClassID:         domain.CompClassID(rand.Int()),
+			ID:                  testutils.RandomResourceID[domain.ContenderID](),
+			CompClassID:         testutils.RandomResourceID[domain.CompClassID](),
 			WithdrawnFromFinals: true,
 			Disqualified:        true,
 			Score:               123,
@@ -158,31 +158,31 @@ func TestMemoryStore(t *testing.T) {
 		store := scores.NewMemoryStore()
 
 		store.SaveContender(scores.Contender{
-			ID:          domain.ContenderID(rand.Int()),
+			ID:          testutils.RandomResourceID[domain.ContenderID](),
 			CompClassID: 1,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          domain.ContenderID(rand.Int()),
+			ID:          testutils.RandomResourceID[domain.ContenderID](),
 			CompClassID: 1,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          domain.ContenderID(rand.Int()),
+			ID:          testutils.RandomResourceID[domain.ContenderID](),
 			CompClassID: 2,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          domain.ContenderID(rand.Int()),
+			ID:          testutils.RandomResourceID[domain.ContenderID](),
 			CompClassID: 3,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          domain.ContenderID(rand.Int()),
+			ID:          testutils.RandomResourceID[domain.ContenderID](),
 			CompClassID: 1,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          domain.ContenderID(rand.Int()),
+			ID:          testutils.RandomResourceID[domain.ContenderID](),
 			CompClassID: 2,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          domain.ContenderID(rand.Int()),
+			ID:          testutils.RandomResourceID[domain.ContenderID](),
 			CompClassID: 1,
 		})
 
@@ -291,7 +291,7 @@ func TestMemoryStore(t *testing.T) {
 		store := scores.NewMemoryStore()
 
 		problem := scores.Problem{
-			ID: domain.ProblemID(rand.Int()),
+			ID: testutils.RandomResourceID[domain.ProblemID](),
 		}
 
 		store.SaveProblem(problem)
@@ -313,7 +313,7 @@ func TestMemoryStore(t *testing.T) {
 		store := scores.NewMemoryStore()
 
 		problem := scores.Problem{
-			ID:          domain.ProblemID(rand.Int()),
+			ID:          testutils.RandomResourceID[domain.ProblemID](),
 			PointsTop:   200,
 			PointsZone1: 100,
 			PointsZone2: 150,

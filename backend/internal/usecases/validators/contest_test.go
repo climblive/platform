@@ -15,6 +15,7 @@ func TestContestValidator(t *testing.T) {
 	validContest := func() domain.Contest {
 		return domain.Contest{
 			Name:               "Swedish Championships",
+			Country:            "SE",
 			QualifyingProblems: 10,
 			Finalists:          7,
 			GracePeriod:        time.Minute * 15,
@@ -89,6 +90,16 @@ func TestContestValidator(t *testing.T) {
 	t.Run("GracePeriodLongerThanOneHour", func(t *testing.T) {
 		contest := validContest()
 		contest.GracePeriod = time.Hour + time.Nanosecond
+
+		err := validator.Validate(contest)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("InvalidCountryCode", func(t *testing.T) {
+		contest := validContest()
+		contest.Country = "XYZ"
 
 		err := validator.Validate(contest)
 

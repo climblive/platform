@@ -77,6 +77,7 @@ export interface Contest {
   ownership: OwnershipData;
   archived: boolean;
   location?: string;
+  country: string;
   seriesId?: SeriesID;
   name: string;
   description?: string;
@@ -91,6 +92,7 @@ export interface Contest {
 }
 export interface ContestTemplate {
   location?: string;
+  country: string;
   seriesId?: SeriesID;
   name: string;
   description?: string;
@@ -102,6 +104,7 @@ export interface ContestTemplate {
 export interface ContestPatch {
   archived?: boolean;
   location?: string;
+  country?: string;
   seriesId?: number;
   name?: string;
   description?: string;
@@ -270,7 +273,6 @@ export interface ProblemDeletedEvent {
   problemId: ProblemID;
 }
 export interface RulesUpdatedEvent {
-  contestId: ContestID;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
 }
@@ -294,4 +296,10 @@ export interface ScoreEngineStartedEvent {
 }
 export interface ScoreEngineStoppedEvent {
   instanceId: ScoreEngineInstanceID;
+}
+export interface RaffleWinnerDrawnEvent {
+  raffleId: RaffleID;
+  contenderId: ContenderID;
+  contenderName: string;
+  timestamp: Date;
 }

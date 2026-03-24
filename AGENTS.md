@@ -19,7 +19,7 @@ The platform manages bouldering climbing competitions, calculates scores in real
 
 ### Backend (`/backend`)
 
-**Language**: Go 1.25  
+**Language**: Go 1.26  
 **Database**: MySQL  
 **Key Features**: Event-driven architecture, real-time score calculation, JWT authentication
 
@@ -101,7 +101,7 @@ web/
 
 ### Prerequisites
 
-- Go 1.25+
+- Go 1.26+
 - Node.js 20+
 - pnpm
 - MySQL database
@@ -187,11 +187,13 @@ make test
 - **Svelte 5**: Use runes API (`$state`, `$derived`, `$effect`)
 - **TypeScript**: Strict mode enabled
 - **API Calls**: Use TanStack Query through queries in the shared library
+- **Conditionals**: Always use braces for one-line conditionals; do not use shorthand `if (...) return ...` style
 - **Styling**: Component-scoped styles in plain CSS (prefer nesting)
 - **Tokens**: Use Web Awesome design tokens for all styling (`@awesome.me/webawesome/dist/styles/themes/default.css`)
 - **Theme**: Shared theme in `packages/lib/src/theme.css`
 - **Formatting**: Prettier with project-specific config
 - **Linting**: ESLint with Svelte plugin
+- **Zod**: Always import as `import { z } from "@climblive/lib/utils"`
 
 **Shared Code**: Common utilities, types, and components belong in `packages/lib` for reuse across apps.
 
@@ -219,10 +221,12 @@ make test
 
 ### Modifying database schema
 
-1. Update model in MySQL Workbench and forward export to `backend/database/climblive.sql`
+1. Update model in MySQL Workbench (`backend/database/climblive.mwb`) and forward export to `backend/database/climblive.sql`
 2. Create a new Goose migration in `backend/cmd/api/migrations/`
 3. Update `backend/database/queries.sql` with new queries
 4. Run `sqlc generate`
+
+**Important:** Always update the MySQL Workbench model file (`.mwb`) when making database schema changes.
 
 ### Modify domain models
 
@@ -236,15 +240,18 @@ make test
 
 ## When making changes
 
-1. Understand the domain model first (`backend/internal/domain/`)
-2. Follow existing code style and patterns
-3. Ensure database changes include migrations
-4. Update both Go and TypeScript types when modifying models
+1. Follow existing code style and patterns
+2. Ensure database changes include migrations
+3. Run `sqlc generate` if database model or queries are updated
+4. Run `tygo generate` if either of `public.go` or `id.go` is updated
 5. Keep comments to a minimum
+6. Make sure that `golangci-lint run` and `go test ./...` pass
+7. Make sure that `pnpm check` and `pnpm lint` pass
+8. Make sure to format front-end code using `pnpm format`
 
 For questions about specific subsystems, examine existing tests and implementation files in the relevant package.
 
 ## Pull Requests
 
-- **Titles**: Should be formatted in the Conventional Commits format
+- **Titles**: Should be formatted in the Conventional Commits format using only lowercase letters
 - **Descriptions**: Keep descriptions brief and on a high-level

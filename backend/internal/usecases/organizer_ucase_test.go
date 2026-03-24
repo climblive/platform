@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/testutils"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -18,10 +19,10 @@ const whitespaceCharacters = "\u0009\u000A\u000B\u000C\u000D\u0020\u0085\u00A0\u
 
 func TestCreateOrganizer(t *testing.T) {
 	fakedUsername := "alice"
-	fakedUserID := randomResourceID[domain.UserID]()
+	fakedUserID := testutils.RandomResourceID[domain.UserID]()
 	fakedUser := domain.User{ID: fakedUserID, Username: fakedUsername}
 	fakedAuthentication := domain.Authentication{Username: fakedUsername}
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 
 	t.Run("HappyPath", func(t *testing.T) {
 		mockedRepo := new(repositoryMock)
@@ -124,7 +125,7 @@ func TestCreateOrganizer(t *testing.T) {
 }
 
 func TestGetOrganizer(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{OrganizerID: fakedOrganizerID}
 	fakedOrganizer := domain.Organizer{ID: fakedOrganizerID, Ownership: fakedOwnership}
 
@@ -182,7 +183,7 @@ func TestGetOrganizer(t *testing.T) {
 }
 
 func TestGetOrganizerInvitesByOrganizer(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{OrganizerID: fakedOrganizerID}
 	fakedOrganizer := domain.Organizer{ID: fakedOrganizerID, Ownership: fakedOwnership}
 	fakedInvites := []domain.OrganizerInvite{
@@ -299,7 +300,7 @@ func TestDeleteOrganizerInvite(t *testing.T) {
 }
 
 func TestCreateOrganizerInvite(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{OrganizerID: fakedOrganizerID}
 	fakedOrganizer := domain.Organizer{ID: fakedOrganizerID, Ownership: fakedOwnership}
 	fakedInviteID := domain.OrganizerInviteID(uuid.New())
@@ -378,8 +379,8 @@ func TestCreateOrganizerInvite(t *testing.T) {
 
 func TestAcceptOrganizerInvite(t *testing.T) {
 	fakedInviteID := domain.OrganizerInviteID(uuid.New())
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
-	fakedUserID := randomResourceID[domain.UserID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
+	fakedUserID := testutils.RandomResourceID[domain.UserID]()
 	fakedUsername := "alice"
 
 	t.Run("HappyPath", func(t *testing.T) {
@@ -467,7 +468,7 @@ func TestAcceptOrganizerInvite(t *testing.T) {
 }
 
 func TestPatchOrganizer(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{OrganizerID: fakedOrganizerID}
 	fakedOrganizer := domain.Organizer{
 		ID:        fakedOrganizerID,

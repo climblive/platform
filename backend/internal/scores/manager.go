@@ -135,7 +135,10 @@ func (mngr *ScoreEngineManager) ListScoreEnginesByContest(
 	ctx context.Context,
 	contestID domain.ContestID,
 ) ([]ScoreEngineDescriptor, error) {
-	request := Request[listScoreEnginesArguments, []ScoreEngineDescriptor]{Args: listScoreEnginesArguments{contestID: contestID}}
+	request := Request[listScoreEnginesArguments, []ScoreEngineDescriptor]{
+		Args:     listScoreEnginesArguments{contestID: contestID},
+		Response: nil,
+	}
 	return request.Do(ctx, mngr.requests)
 }
 
@@ -143,7 +146,10 @@ func (mngr *ScoreEngineManager) StopScoreEngine(
 	ctx context.Context,
 	instanceID domain.ScoreEngineInstanceID,
 ) error {
-	request := Request[stopScoreEngineArguments, struct{}]{Args: stopScoreEngineArguments{instanceID: instanceID}}
+	request := Request[stopScoreEngineArguments, struct{}]{
+		Args:     stopScoreEngineArguments{instanceID: instanceID},
+		Response: nil,
+	}
 	_, err := request.Do(ctx, mngr.requests)
 
 	return err
@@ -154,15 +160,21 @@ func (mngr *ScoreEngineManager) StartScoreEngine(
 	contestID domain.ContestID,
 	terminatedBy time.Time,
 ) (domain.ScoreEngineInstanceID, error) {
-	request := Request[startScoreEngineArguments, domain.ScoreEngineInstanceID]{Args: startScoreEngineArguments{
-		contestID:    contestID,
-		terminatedBy: terminatedBy,
-	}}
+	request := Request[startScoreEngineArguments, domain.ScoreEngineInstanceID]{
+		Args: startScoreEngineArguments{
+			contestID:    contestID,
+			terminatedBy: terminatedBy,
+		},
+		Response: nil,
+	}
 	return request.Do(ctx, mngr.requests)
 }
 
 func (mngr *ScoreEngineManager) GetScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) (ScoreEngineDescriptor, error) {
-	request := Request[getScoreEngineArguments, ScoreEngineDescriptor]{Args: getScoreEngineArguments{instanceID: instanceID}}
+	request := Request[getScoreEngineArguments, ScoreEngineDescriptor]{
+		Args:     getScoreEngineArguments{instanceID: instanceID},
+		Response: nil,
+	}
 	return request.Do(ctx, mngr.requests)
 }
 
@@ -206,7 +218,10 @@ func (mngr *ScoreEngineManager) run(ctx context.Context) {
 func (mngr *ScoreEngineManager) handleRequest(request any) {
 	switch req := request.(type) {
 	case Request[listScoreEnginesArguments, []ScoreEngineDescriptor]:
-		req.Response <- Response[[]ScoreEngineDescriptor]{Value: mngr.listScoreEnginesByContest(req.Args.contestID)}
+		req.Response <- Response[[]ScoreEngineDescriptor]{
+			Value: mngr.listScoreEnginesByContest(req.Args.contestID),
+			Err:   nil,
+		}
 
 		close(req.Response)
 	case Request[startScoreEngineArguments, domain.ScoreEngineInstanceID]:
@@ -280,10 +295,7 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 		terminatedBy = latestPermittedTerminationTime
 	}
 
-	logger = logger.With(slog.Group("config",
-		"qualifying_problems", contest.QualifyingProblems,
-		"finalists", contest.Finalists)).
-		With("terminated_by", terminatedBy)
+	logger = logger.With("terminated_by", terminatedBy)
 
 	if contest.TimeBegin.After(now) {
 		logger = logger.With("starting_in", time.Until(contest.TimeBegin))

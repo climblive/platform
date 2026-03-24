@@ -60,6 +60,9 @@ func NewScoreEngineDriver(
 		instanceID:    instanceID,
 		eventBroker:   eventBroker,
 		pendingEvents: make([]domain.EventEnvelope, 0),
+		engine:        nil,
+		running:       atomic.Bool{},
+		publishToken:  false,
 	}
 }
 

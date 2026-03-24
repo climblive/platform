@@ -158,6 +158,7 @@ func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.Conten
 	}
 
 	newTick := domain.Tick{
+		ID:            0,
 		Ownership:     contender.Ownership,
 		Timestamp:     time.Now(),
 		ContestID:     contest.ID,

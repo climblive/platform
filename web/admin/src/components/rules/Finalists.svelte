@@ -1,12 +1,13 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
-  import "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import { checked, GenericForm, name } from "@climblive/lib/forms";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
   import { patchContestMutation } from "@climblive/lib/queries";
-  import * as z from "zod/v4";
+  import { debounce, z } from "@climblive/lib/utils";
+  import { onDestroy } from "svelte";
   import RuleOptionCard from "../RuleOptionCard.svelte";
   import { doSubmit } from "../RulesEditor.svelte";
 
@@ -16,16 +17,29 @@
 
   const { contest }: Props = $props();
 
-  const patchContest = $derived(patchContestMutation(contest.id));
+  const patchContest = patchContestMutation(contest.id);
 
   let enabled = $derived(contest.finalists > 0);
+  let saved = $state(false);
+  let savedTimer: ReturnType<typeof setTimeout> | undefined;
+
+  onDestroy(() => clearTimeout(savedTimer));
 
   const formSchema = z.object({
     finalists: z.coerce.number().min(0).max(65536).optional(),
   });
 
+  const debouncedSubmit = debounce(
+    (form: HTMLFormElement) => form.requestSubmit(),
+    1000,
+  );
+
   const handleSubmit = (value: Partial<ContestPatch>) =>
-    doSubmit(patchContest, { finalists: value.finalists ?? 0 });
+    doSubmit(patchContest, { finalists: value.finalists ?? 0 }, () => {
+      saved = true;
+      clearTimeout(savedTimer);
+      savedTimer = setTimeout(() => (saved = false), 2_000);
+    });
 </script>
 
 <GenericForm submit={handleSubmit} schema={formSchema}>
@@ -47,26 +61,27 @@
           {@attach checked(enabled)}
         ></wa-checkbox>
       {/snippet}
+      {#snippet indicator()}
+        {#if saved}
+          <div class="indicator">
+            <wa-icon name="check"></wa-icon>
+            Saved
+          </div>
+        {/if}
+      {/snippet}
       {#snippet footer()}
         <div class="controls">
           {#if enabled}
-            <wa-input
+            <wa-number-input
               size="small"
               {@attach name("finalists")}
               label="Finalists"
-              type="number"
               required
               min={0}
               max={65536}
               defaultValue={contest.finalists || 7}
-            ></wa-input>
-
-            <wa-button
-              type="submit"
-              size="small"
-              appearance="outlined"
-              loading={patchContest.isPending}>Save</wa-button
-            >
+              oninput={() => debouncedSubmit(form)}
+            ></wa-number-input>
           {/if}
         </div>
       {/snippet}
@@ -75,7 +90,7 @@
 </GenericForm>
 
 <style>
-  wa-input {
+  wa-number-input {
     width: 100%;
   }
 
@@ -83,5 +98,15 @@
     display: flex;
     gap: var(--wa-space-xs);
     align-items: end;
+  }
+
+  .indicator {
+    margin-inline-start: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-2xs);
+    font-size: var(--wa-font-size-s);
+    color: var(--wa-color-success-fill-loud);
+    font-weight: var(--wa-font-weight-bold);
   }
 </style>

@@ -2,13 +2,13 @@ package scores_test
 
 import (
 	"context"
-	"math/rand"
 	"testing"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/events"
 	"github.com/climblive/platform/backend/internal/scores"
+	"github.com/climblive/platform/backend/internal/testutils"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -47,7 +47,7 @@ func TestScoreEngineManager(t *testing.T) {
 		mockedEventBroker := new(eventBrokerMock)
 
 		fakedSubscriptionID := domain.SubscriptionID(uuid.New())
-		fakedContestID := domain.ContestID(rand.Int())
+		fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 
 		now := time.Now()
 
@@ -112,7 +112,7 @@ func TestScoreEngineManager(t *testing.T) {
 		mockedEventBroker := new(eventBrokerMock)
 
 		fakedSubscriptionID := domain.SubscriptionID(uuid.New())
-		fakedContestID := domain.ContestID(rand.Int())
+		fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 
 		now := time.Now()
 

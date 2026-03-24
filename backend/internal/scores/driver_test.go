@@ -2,20 +2,20 @@ package scores_test
 
 import (
 	"context"
-	"math/rand"
 	"testing"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/events"
 	"github.com/climblive/platform/backend/internal/scores"
+	"github.com/climblive/platform/backend/internal/testutils"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
 func TestEngineDriver(t *testing.T) {
-	fakedContestID := domain.ContestID(rand.Int())
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 	fakedInstanceID := uuid.New()
 
 	type fixture struct {

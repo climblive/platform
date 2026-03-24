@@ -10,7 +10,7 @@
   import { isAfter } from "date-fns";
   import { getContext, type Snippet } from "svelte";
   import type { Readable } from "svelte/store";
-  import * as z from "zod/v4";
+  import { z } from "@climblive/lib/utils";
 
   const registrationFormSchema: z.ZodType<ContenderPatch> = z.object({
     name: z.string().min(1),
@@ -37,7 +37,7 @@
       <wa-input
         size="small"
         {@attach name("name")}
-        label="Full name"
+        label="Name"
         type="text"
         required
         value={data.name}
@@ -53,8 +53,13 @@
           <wa-option
             value={compClass.id}
             disabled={isAfter(new Date(), compClass.timeEnd)}
-            >{compClass.name}</wa-option
+            label={compClass.name}
           >
+            {compClass.name}
+            {#if compClass.description}
+              <small>{compClass.description}</small>
+            {/if}
+          </wa-option>
         {/each}
       </wa-select>
       <wa-switch

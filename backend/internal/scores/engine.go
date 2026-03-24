@@ -59,6 +59,13 @@ func NewDefaultScoreEngine(store EngineStore) *DefaultScoreEngine {
 }
 
 func (e *DefaultScoreEngine) Start() {
+	rules := e.store.GetRules()
+
+	e.rules = &HardestProblems{
+		Number: rules.QualifyingProblems,
+	}
+	e.ranker = NewBasicRanker(rules.Finalists)
+
 	for contender := range e.store.GetAllContenders() {
 		ticks := e.store.GetTicks(contender.ID)
 
@@ -114,8 +121,11 @@ func (e *DefaultScoreEngine) HandleRulesUpdated(event domain.RulesUpdatedEvent) 
 
 func (e *DefaultScoreEngine) HandleContenderEntered(event domain.ContenderEnteredEvent) {
 	contender := Contender{
-		ID:          event.ContenderID,
-		CompClassID: event.CompClassID,
+		ID:                  event.ContenderID,
+		CompClassID:         event.CompClassID,
+		Disqualified:        false,
+		WithdrawnFromFinals: false,
+		Score:               0,
 	}
 
 	e.store.SaveContender(contender)
@@ -206,6 +216,7 @@ func (e *DefaultScoreEngine) HandleAscentRegistered(event domain.AscentRegistere
 		AttemptsZone1: event.AttemptsZone1,
 		Zone2:         event.Zone2,
 		AttemptsZone2: event.AttemptsZone2,
+		Points:        0,
 		Top:           event.Top,
 		AttemptsTop:   event.AttemptsTop,
 	}

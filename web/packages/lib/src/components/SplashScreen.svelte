@@ -68,7 +68,7 @@
   .logo {
     width: min(20rem, 50%);
     color: white;
-    animation: slide-in 0.5s var(--wa-transition-easing);
+    animation: zoom-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     margin-block-end: 10rem;
   }
 
@@ -76,12 +76,19 @@
     font-size: 5rem;
   }
 
-  @keyframes slide-in {
-    from {
-      transform: translateX(-100%);
+  @keyframes zoom-in {
+    0% {
+      transform: scale(0.3);
+      opacity: 0;
     }
-    to {
-      transform: translateX(0);
+    50% {
+      opacity: 1;
+    }
+    70% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
     }
   }
 </style>

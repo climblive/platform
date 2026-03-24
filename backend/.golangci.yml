@@ -1,0 +1,12 @@
+version: "2"
+
+run:
+  tests: false
+
+linters:
+  default: standard
+  enable:
+    - exhaustruct
+  settings:
+    exhaustruct:
+      allow-empty: true

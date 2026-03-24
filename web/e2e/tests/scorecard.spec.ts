@@ -92,18 +92,20 @@ test("enter contest by entering registration code", async ({ page }) => {
   await page.waitForURL("/ABCD0002/register");
 
   await page
-    .getByRole("textbox", { name: "Full name *" })
+    .getByRole("textbox", { name: "Name *" })
     .pressSequentially("Dwight Schrute");
   const compClass = page.getByRole("combobox", { name: "Competition class *" });
   await compClass.click();
-  await page.getByRole("option", { name: "Males", exact: true }).click();
+  await page
+    .getByRole("option", { name: "Males 16 years and older", exact: true })
+    .click();
 
   await page.getByRole("button", { name: "Register" }).click();
 
   await page.waitForURL("/ABCD0002");
 });
 
-test("registration code is saved in local storage for 12 hours", async ({
+test("registration code is saved until 12 hours after contest ends", async ({
   page,
 }) => {
   await page.clock.install({ time: new Date() });
@@ -129,7 +131,7 @@ test("registration code is saved in local storage for 12 hours", async ({
   await page.waitForURL("/ABCD0001");
   await expect(page.getByText("Albert Einstein")).toBeVisible();
 
-  await page.clock.fastForward("12:00:00");
+  await page.clock.setFixedTime(new Date("2027-01-01T12:00:00"));
 
   await page.goto("/");
   await page.waitForURL("/");
@@ -191,19 +193,23 @@ test("edit profile", async ({ page }) => {
   await page.goto("/ABCD0003");
 
   await expect(page.getByText("Michael Scott")).toBeVisible();
-  await expect(page.getByText("Males", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("Males–World Testing Championships"),
+  ).toBeVisible();
 
   await page.getByRole("button", { name: "Edit" }).click({ force: true });
 
   await page.waitForURL("/ABCD0003/edit");
 
-  const nameInput = page.getByRole("textbox", { name: "Full name *" });
+  const nameInput = page.getByRole("textbox", { name: "Name *" });
   await nameInput.fill("");
   await nameInput.pressSequentially("Phyllis Lapin-Vance");
 
   const compClass = page.getByRole("combobox", { name: "Competition class *" });
   await compClass.click();
-  await page.getByRole("option", { name: "Females", exact: true }).click();
+  await page
+    .getByRole("option", { name: "Females 16 years and older", exact: true })
+    .click();
 
   await page.getByRole("button", { name: "Save" }).click();
 
@@ -271,7 +277,7 @@ test("tick and untick all problems", async ({ page }) => {
   }
 
   await expect(page.getByText("1500p")).toBeVisible();
-  await expect(page.getByText("1st")).toBeVisible();
+  await expect(page.getByText("1st").first()).toBeVisible();
 
   for (let p = 1; p <= 5; p++) {
     const problem = page.getByRole("region", { name: `Problem ${p}` });
@@ -283,7 +289,7 @@ test("tick and untick all problems", async ({ page }) => {
   }
 
   await expect(page.getByText("0p", { exact: true })).toBeVisible();
-  await expect(page.getByText("1st")).toBeVisible();
+  await expect(page.getByText("1st").first()).toBeVisible();
 });
 
 test("tick a problem as a flash", async ({ page }) => {
@@ -370,7 +376,7 @@ test.describe("contest states", () => {
   test("before contest has started", async ({ page }) => {
     await page.goto("/ABCD0001");
 
-    const timer = page.getByRole("timer", { name: "Time until start" });
+    const timer = page.getByRole("timer", { name: "Starting in" });
     await expect(timer).toHaveText("2 months");
 
     await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
@@ -386,7 +392,7 @@ test.describe("contest states", () => {
 
     await page.clock.setFixedTime(new Date("2024-01-01T00:00:00"));
 
-    const timer = page.getByRole("timer", { name: "Time remaining" });
+    const timer = page.getByRole("timer", { name: "Time left" });
     await expect(timer).toHaveText("almost 3 years");
 
     await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
@@ -402,7 +408,7 @@ test.describe("contest states", () => {
 
     await page.clock.setFixedTime(new Date("2027-01-01T00:00:00"));
 
-    const timer = page.getByRole("timer", { name: "Time remaining" });
+    const timer = page.getByRole("timer", { name: "Time left" });
     await expect(timer).toHaveText("00:00:00");
 
     await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
@@ -418,7 +424,7 @@ test.describe("contest states", () => {
 
     await page.clock.setFixedTime(new Date("2027-01-01T00:05:00"));
 
-    const timer = page.getByRole("timer", { name: "Time remaining" });
+    const timer = page.getByRole("timer", { name: "Time left" });
     await expect(timer).toHaveText("00:00:00");
 
     await expect(page.getByRole("button", { name: "Edit" })).toBeDisabled();

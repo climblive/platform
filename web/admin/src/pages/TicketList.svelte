@@ -3,8 +3,8 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import "@awesome.me/webawesome/dist/components/input/input.js";
-  import type WaInput from "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
+  import type WaNumberInput from "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import { value } from "@climblive/lib/forms";
   import type { CreateContendersArguments } from "@climblive/lib/models";
   import {
@@ -23,7 +23,7 @@
   let { contestId }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
-  let numberInput: WaInput | undefined = $state();
+  let numberInput: WaNumberInput | undefined = $state();
 
   let newTicketsAvailableForPrint = $state(false);
 
@@ -99,15 +99,14 @@
       {maxTickets}.
     </wa-callout>
 
-    <wa-input
+    <wa-number-input
       bind:this={numberInput}
       name="number"
-      type="number"
       {@attach value(Math.min(100, remainingCodes ?? 0))}
       min="1"
       max={remainingCodes}
       label="Number of tickets to create"
-    ></wa-input>
+    ></wa-number-input>
   </div>
 
   <wa-button slot="footer" appearance="plain" onclick={closeDialog}

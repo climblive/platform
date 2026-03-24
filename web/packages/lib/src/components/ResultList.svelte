@@ -13,6 +13,7 @@
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
     loading: boolean;
     highlightedContenderId?: number;
+    autoScroll?: boolean;
   }
 
   let {
@@ -21,9 +22,10 @@
     scoreboard,
     loading,
     highlightedContenderId,
+    autoScroll = true,
   }: Props = $props();
 
-  const ITEM_HEIGHT = 36;
+  const ITEM_HEIGHT = 44;
   const GAP = 8;
   const SCROLLABLE_SKELETON_ENTRIES = 10;
 
@@ -75,7 +77,7 @@
 
     visibilityObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
-        if (entry.isIntersecting && highlightedContenderId) {
+        if (entry.isIntersecting && highlightedContenderId && autoScroll) {
           setTimeout(scrollToHighlighted);
         }
       }
@@ -98,7 +100,7 @@
   });
 
   $effect(() => {
-    if (highlightedContenderId && results.length > 0) {
+    if (highlightedContenderId && results.length > 0 && autoScroll) {
       setTimeout(scrollToHighlighted);
     }
   });
@@ -165,7 +167,7 @@
 <style>
   wa-skeleton {
     margin-bottom: var(--wa-space-xs);
-    height: 2.25rem;
+    height: 2.75rem;
   }
 
   wa-skeleton::part(indicator) {
@@ -182,7 +184,7 @@
     clip-path: rect(
       0px 100%
         calc(
-          var(--page-size) * 2.25rem + (var(--page-size) - 1) *
+          var(--page-size) * 2.75rem + (var(--page-size) - 1) *
             var(--wa-space-xs)
         )
         0px
@@ -190,6 +192,6 @@
   }
 
   .container[data-overflow="scroll"] {
-    height: calc(var(--page-size) * (2.25rem + var(--wa-space-xs)));
+    height: calc(var(--page-size) * (2.75rem + var(--wa-space-xs)));
   }
 </style>

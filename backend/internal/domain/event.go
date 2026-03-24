@@ -19,6 +19,7 @@ func NewEventFilter(contestID ContestID, contenderID ContenderID, eventTypes ...
 	filter := EventFilter{
 		ContestID:   contestID,
 		ContenderID: contenderID,
+		EventTypes:  nil,
 	}
 
 	if len(eventTypes) > 0 {

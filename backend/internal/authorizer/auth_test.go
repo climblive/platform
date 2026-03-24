@@ -2,21 +2,21 @@ package authorizer_test
 
 import (
 	"context"
-	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/climblive/platform/backend/internal/authorizer"
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/testutils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
 func TestAuthorizer(t *testing.T) {
-	fakedContenderID := domain.ContenderID(rand.Int())
-	fakedOrganizerID := domain.OrganizerID(rand.Int())
-	fakedUserID := domain.UserID(rand.Int())
+	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
+	fakedUserID := testutils.RandomResourceID[domain.UserID]()
 
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,

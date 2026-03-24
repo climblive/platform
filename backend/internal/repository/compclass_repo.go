@@ -43,6 +43,7 @@ func (d *Database) StoreCompClass(ctx context.Context, tx domain.Transaction, co
 		ContestID:   int32(compClass.ContestID),
 		Name:        compClass.Name,
 		Description: makeNullString(compClass.Description),
+		Color:       sql.NullString{String: "", Valid: false},
 		TimeBegin:   compClass.TimeBegin,
 		TimeEnd:     compClass.TimeEnd,
 	}

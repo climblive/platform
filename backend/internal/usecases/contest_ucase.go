@@ -166,6 +166,7 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		}
 	}
 
+	//nolint:exhaustruct
 	patchAnythingOtherThanArchive := patch != (domain.ContestPatch{}) && patch != domain.ContestPatch{
 		Archived: patch.Archived,
 	}
@@ -176,6 +177,10 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 
 	if patch.Location.Present {
 		contest.Location = strings.TrimSpace(patch.Location.Value)
+	}
+
+	if patch.Country.Present {
+		contest.Country = strings.TrimSpace(patch.Country.Value)
 	}
 
 	if patch.SeriesID.Present {
@@ -237,17 +242,25 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 	}
 
 	contest := domain.Contest{
+		ID: 0,
 		Ownership: domain.OwnershipData{
 			OrganizerID: organizerID,
+			ContenderID: nil,
 		},
-		Location:           strings.TrimSpace(tmpl.Location),
-		Name:               strings.TrimSpace(tmpl.Name),
-		Description:        strings.TrimSpace(tmpl.Description),
-		QualifyingProblems: tmpl.QualifyingProblems,
-		Finalists:          tmpl.Finalists,
-		Info:               sanitizationPolicy.Sanitize(tmpl.Info),
-		GracePeriod:        tmpl.GracePeriod,
-		Created:            time.Now(),
+		Archived:             false,
+		SeriesID:             0,
+		TimeBegin:            time.Time{},
+		TimeEnd:              time.Time{},
+		RegisteredContenders: 0,
+		Location:             strings.TrimSpace(tmpl.Location),
+		Country:              strings.TrimSpace(tmpl.Country),
+		Name:                 strings.TrimSpace(tmpl.Name),
+		Description:          strings.TrimSpace(tmpl.Description),
+		QualifyingProblems:   tmpl.QualifyingProblems,
+		Finalists:            tmpl.Finalists,
+		Info:                 sanitizationPolicy.Sanitize(tmpl.Info),
+		GracePeriod:          tmpl.GracePeriod,
+		Created:              time.Now(),
 	}
 
 	if err := (validators.ContestValidator{}).Validate(contest); err != nil {

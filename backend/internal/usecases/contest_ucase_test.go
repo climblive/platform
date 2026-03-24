@@ -10,6 +10,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
+	"github.com/climblive/platform/backend/internal/testutils"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/google/uuid"
@@ -19,7 +20,7 @@ import (
 )
 
 func TestGetContest(t *testing.T) {
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 
 	fakedContest := domain.Contest{
 		ID: fakedContestID,
@@ -44,8 +45,8 @@ func TestGetContest(t *testing.T) {
 }
 
 func TestGetScoreboard(t *testing.T) {
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedCompClassID := randomResourceID[domain.CompClassID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 
 	mockedRepo := new(repositoryMock)
 	mockedScoreKeeper := new(scoreKeeperMock)
@@ -137,7 +138,7 @@ func TestGetScoreboard(t *testing.T) {
 }
 
 func TestGetScoreboard_Empty(t *testing.T) {
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 
 	mockedRepo := new(repositoryMock)
 
@@ -159,8 +160,8 @@ func TestGetScoreboard_Empty(t *testing.T) {
 }
 
 func TestGetContestsByOrganizer(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
@@ -233,8 +234,8 @@ func TestGetContestsByOrganizer(t *testing.T) {
 }
 
 func TestGetAllContests(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
@@ -319,11 +320,11 @@ func TestGetAllContests(t *testing.T) {
 	})
 }
 func TestCreateContest(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedContestID := randomResourceID[domain.ContestID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 
 	makeMocks := func() (*repositoryMock, *authorizerMock) {
 		mockedRepo := new(repositoryMock)
@@ -353,6 +354,7 @@ func TestCreateContest(t *testing.T) {
 					domain.Contest{
 						Ownership:          fakedOwnership,
 						Location:           "The garage",
+						Country:            "SE",
 						SeriesID:           0,
 						Name:               "Swedish Championships",
 						Description:        "Who is the best climber in Sweden?",
@@ -367,6 +369,7 @@ func TestCreateContest(t *testing.T) {
 					ID:                 fakedContestID,
 					Ownership:          fakedOwnership,
 					Location:           "The garage",
+					Country:            "SE",
 					SeriesID:           0,
 					Name:               "Swedish Championships",
 					Description:        "Who is the best climber in Sweden?",
@@ -384,6 +387,7 @@ func TestCreateContest(t *testing.T) {
 
 			contest, err := ucase.CreateContest(context.Background(), fakedOrganizerID, domain.ContestTemplate{
 				Location:           "The garage",
+				Country:            "SE",
 				Name:               "Swedish Championships",
 				Description:        "Who is the best climber in Sweden?",
 				QualifyingProblems: 10,
@@ -397,6 +401,7 @@ func TestCreateContest(t *testing.T) {
 			assert.Equal(t, fakedOwnership, contest.Ownership)
 			assert.False(t, contest.Archived)
 			assert.Equal(t, "The garage", contest.Location)
+			assert.Equal(t, "SE", contest.Country)
 			assert.Equal(t, "Swedish Championships", contest.Name)
 			assert.Equal(t, "Who is the best climber in Sweden?", contest.Description)
 			assert.Equal(t, 10, contest.QualifyingProblems)
@@ -451,6 +456,7 @@ func TestCreateContest(t *testing.T) {
 
 		contest, err := ucase.CreateContest(context.Background(), fakedOrganizerID, domain.ContestTemplate{
 			Location:           "The garage",
+			Country:            "SE",
 			Name:               "Swedish Championships",
 			Description:        "Who is the best climber in Sweden?",
 			QualifyingProblems: 10,
@@ -488,12 +494,12 @@ func TestCreateContest(t *testing.T) {
 }
 
 func TestDuplicateContest(t *testing.T) {
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedDuplicatedContestID := randomResourceID[domain.ContestID]()
-	fakedCompClassID := randomResourceID[domain.CompClassID]()
-	fakedProblemID := randomResourceID[domain.ProblemID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedDuplicatedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 	fakedOwnership := domain.OwnershipData{
-		OrganizerID: randomResourceID[domain.OrganizerID](),
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 	}
 
 	timeBegin := time.Now()
@@ -503,7 +509,7 @@ func TestDuplicateContest(t *testing.T) {
 		ID:                 fakedContestID,
 		Ownership:          fakedOwnership,
 		Location:           "The garage",
-		SeriesID:           randomResourceID[domain.SeriesID](),
+		SeriesID:           testutils.RandomResourceID[domain.SeriesID](),
 		Name:               "Original Contest",
 		Description:        "Who is the best climber in Sweden?",
 		QualifyingProblems: 10,
@@ -688,16 +694,16 @@ func TestDuplicateContest(t *testing.T) {
 }
 
 func TestTransferContest(t *testing.T) {
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedOldOrganizerID := randomResourceID[domain.OrganizerID]()
-	fakedNewOrganizerID := randomResourceID[domain.OrganizerID]()
-	fakedCompClassID := randomResourceID[domain.CompClassID]()
-	fakedProblemID := randomResourceID[domain.ProblemID]()
-	fakedContenderID := randomResourceID[domain.ContenderID]()
-	fakedRaffleID := randomResourceID[domain.RaffleID]()
-	fakedRaffleWinnerID := randomResourceID[domain.RaffleWinnerID]()
-	fakedTickID := randomResourceID[domain.TickID]()
-	fakedSeriesID := randomResourceID[domain.SeriesID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedOldOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
+	fakedNewOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
+	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
+	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+	fakedRaffleID := testutils.RandomResourceID[domain.RaffleID]()
+	fakedRaffleWinnerID := testutils.RandomResourceID[domain.RaffleWinnerID]()
+	fakedTickID := testutils.RandomResourceID[domain.TickID]()
+	fakedSeriesID := testutils.RandomResourceID[domain.SeriesID]()
 
 	now := time.Now()
 
@@ -1056,8 +1062,8 @@ func TestTransferContest(t *testing.T) {
 func TestPatchContest(t *testing.T) {
 	t.Parallel()
 
-	fakedContestID := randomResourceID[domain.ContestID]()
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
@@ -1092,6 +1098,7 @@ func TestPatchContest(t *testing.T) {
 					ID:                 fakedContestID,
 					Ownership:          fakedOwnership,
 					Location:           "The garage",
+					Country:            "SE",
 					SeriesID:           domain.SeriesID(1),
 					Name:               "Swedish Championships",
 					Description:        "Who is the best climber in Sweden?",
@@ -1105,6 +1112,7 @@ func TestPatchContest(t *testing.T) {
 				ID:                 fakedContestID,
 				Ownership:          fakedOwnership,
 				Location:           "The garage",
+				Country:            "SE",
 				SeriesID:           domain.SeriesID(1),
 				Name:               "Swedish Championships",
 				Description:        "Who is the best climber in Sweden?",
@@ -1129,6 +1137,7 @@ func TestPatchContest(t *testing.T) {
 
 		patch := domain.ContestPatch{
 			Location:           domain.NewPatch("The garage"),
+			Country:            domain.NewPatch("SE"),
 			SeriesID:           domain.NewPatch(domain.SeriesID(1)),
 			Name:               domain.NewPatch("Swedish Championships"),
 			Description:        domain.NewPatch("Who is the best climber in Sweden?"),
@@ -1142,6 +1151,7 @@ func TestPatchContest(t *testing.T) {
 
 		require.NoError(t, err)
 		assert.Equal(t, "The garage", contest.Location)
+		assert.Equal(t, "SE", contest.Country)
 		assert.Equal(t, domain.SeriesID(1), contest.SeriesID)
 		assert.Equal(t, "Swedish Championships", contest.Name)
 		assert.Equal(t, "Who is the best climber in Sweden?", contest.Description)
@@ -1170,6 +1180,7 @@ func TestPatchContest(t *testing.T) {
 				ID:        fakedContestID,
 				Ownership: fakedOwnership,
 				Name:      "Swedish Championships",
+				Country:   "SE",
 			}, nil)
 
 		mockedRepo.
@@ -1179,6 +1190,7 @@ func TestPatchContest(t *testing.T) {
 					Ownership: fakedOwnership,
 					Archived:  true,
 					Name:      "Swedish Championships",
+					Country:   "SE",
 				},
 			).
 			Return(domain.Contest{
@@ -1186,6 +1198,7 @@ func TestPatchContest(t *testing.T) {
 				Ownership: fakedOwnership,
 				Archived:  true,
 				Name:      "Swedish Championships",
+				Country:   "SE",
 			}, nil)
 
 		fakedScoreEngineInstanceID := domain.ScoreEngineInstanceID(uuid.New())
@@ -1236,6 +1249,7 @@ func TestPatchContest(t *testing.T) {
 				ID:        fakedContestID,
 				Ownership: fakedOwnership,
 				Name:      "Swedish Championships",
+				Country:   "SE",
 				Archived:  true,
 			}, nil)
 
@@ -1246,6 +1260,7 @@ func TestPatchContest(t *testing.T) {
 					Ownership: fakedOwnership,
 					Archived:  false,
 					Name:      "Swedish Championships",
+					Country:   "SE",
 				},
 			).
 			Return(domain.Contest{
@@ -1253,6 +1268,7 @@ func TestPatchContest(t *testing.T) {
 				Ownership: fakedOwnership,
 				Archived:  false,
 				Name:      "Swedish Championships",
+				Country:   "SE",
 			}, nil)
 
 		ucase := usecases.ContestUseCase{

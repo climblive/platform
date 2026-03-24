@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
@@ -6,10 +7,8 @@
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
-  import "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
-  import { checked, value } from "@climblive/lib/forms";
+  import { value } from "@climblive/lib/forms";
   import type { ScoreboardEntry } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
   import { ordinalSuperscript } from "@climblive/lib/utils";
@@ -36,8 +35,15 @@
 
   let filterText = $state<string>();
   let selectedCompClassId: number | undefined = $state();
-  let liveSwitch: WaSwitch | undefined = $state();
-  let live = $state(true);
+
+  const contenderCounts = $derived(
+    new Map(
+      Array.from($scoreboard.entries()).map(([classId, entries]) => [
+        classId,
+        entries.length,
+      ]),
+    ),
+  );
 
   $effect(() => {
     if (
@@ -49,19 +55,7 @@
     }
   });
 
-  const toggleLive = () => {
-    if (!liveSwitch) {
-      return;
-    }
-
-    live = Boolean(liveSwitch.checked);
-  };
-
   $effect(() => {
-    if (!live) {
-      return;
-    }
-
     if (selectedCompClassId === undefined) {
       return;
     }
@@ -163,15 +157,23 @@
       }}
     >
       {#each compClasses as compClass (compClass.id)}
-        <wa-option value={compClass.id}>{compClass.name}</wa-option>
+        {@const count = contenderCounts.get(compClass.id)}
+
+        <wa-option value={compClass.id} label={compClass.name}>
+          <div class="label">
+            {compClass.name}
+            {#if count}
+              <wa-badge pill variant="neutral">{count}</wa-badge>
+            {/if}
+          </div>
+          {#if compClass.description}
+            <small>{compClass.description}</small>
+          {/if}
+        </wa-option>
       {/each}
     </wa-select>
   </div>
 {/if}
-
-<wa-switch bind:this={liveSwitch} {@attach checked(live)} onchange={toggleLive}
-  >Live</wa-switch
->
 
 {#if loading}
   <Loader />
@@ -181,8 +183,12 @@
 {/if}
 
 <style>
-  wa-switch {
-    margin-left: auto;
+  .label {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: var(--wa-space-xs);
+    flex-grow: 0;
   }
 
   .controls {
@@ -190,7 +196,7 @@
     gap: var(--wa-space-m);
     justify-content: space-evenly;
 
-    & * {
+    & > * {
       width: 100%;
     }
   }

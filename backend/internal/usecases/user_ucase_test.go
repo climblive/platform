@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/testutils"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -12,7 +13,7 @@ import (
 )
 
 func TestGetSelf(t *testing.T) {
-	fakedUserID := randomResourceID[domain.UserID]()
+	fakedUserID := testutils.RandomResourceID[domain.UserID]()
 
 	mockedRepo := new(repositoryMock)
 	mockedAuthorizer := new(authorizerMock)
@@ -50,7 +51,7 @@ func TestGetSelf(t *testing.T) {
 }
 
 func TestGetUsersByOrganizer(t *testing.T) {
-	fakedOrganizerID := randomResourceID[domain.OrganizerID]()
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
@@ -59,8 +60,8 @@ func TestGetUsersByOrganizer(t *testing.T) {
 		Ownership: fakedOwnership,
 	}
 	fakedUsers := []domain.User{
-		{ID: randomResourceID[domain.UserID](), Username: "alice"},
-		{ID: randomResourceID[domain.UserID](), Username: "bob"},
+		{ID: testutils.RandomResourceID[domain.UserID](), Username: "alice"},
+		{ID: testutils.RandomResourceID[domain.UserID](), Username: "bob"},
 	}
 
 	t.Run("HappyPath", func(t *testing.T) {

@@ -43,8 +43,8 @@
   submit={handleSubmit}
   data={{
     name: "",
+    country: "AQ",
     gracePeriod: 15 * minuteInNanoseconds,
-    info: "",
   }}
   schema={formSchema}
 >
@@ -65,3 +65,9 @@
     </wa-button>
   </div>
 </ContestForm>
+
+<style>
+  .controls {
+    margin-inline-start: auto;
+  }
+</style>

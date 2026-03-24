@@ -1,4 +1,4 @@
-import * as z from "zod/v4";
+import { z } from "@climblive/lib/utils";
 import type { Score } from "./generated";
 
 export const scoreSchema: z.ZodType<Score> = z.object({

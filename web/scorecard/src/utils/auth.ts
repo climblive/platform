@@ -1,28 +1,44 @@
 import { scorecardSessionSchema, type ScorecardSession } from "@/types";
 import { ApiClient, ContenderCredentialsProvider } from "@climblive/lib";
 import type { Contender } from "@climblive/lib/models";
+import { z } from "@climblive/lib/utils";
 import type { QueryClient } from "@tanstack/svelte-query";
-import { differenceInHours } from "date-fns";
+import { add } from "date-fns";
 import type { Writable } from "svelte/store";
-import * as z from "zod/v4";
 
 export const authenticateContender = async (
   code: string,
   queryClient: QueryClient,
   session: Writable<ScorecardSession>,
 ): Promise<Contender> => {
-  const contender = await ApiClient.getInstance().findContender(code);
+  const contender = await queryClient.fetchQuery({
+    queryKey: ["contender", { code }],
+    queryFn: async () => ApiClient.getInstance().findContender(code),
+  });
+
+  const contest = await queryClient.fetchQuery({
+    queryKey: ["contest", { id: contender.contestId }],
+    queryFn: async () =>
+      ApiClient.getInstance().getContest(contender.contestId),
+  });
 
   const provider = new ContenderCredentialsProvider(code);
   ApiClient.getInstance().setCredentialsProvider(provider);
 
   session.update((current) => {
+    const now = new Date();
+    const contestEndTime = contest.timeEnd || now;
+    const baseTime = new Date(
+      Math.max(contestEndTime.getTime(), now.getTime()),
+    );
+    const expiryTime = add(baseTime, { hours: 12 });
+
     const updatedSession: ScorecardSession = {
       ...current,
       contenderId: contender.id,
       contestId: contender.contestId,
       registrationCode: code,
-      timestamp: new Date(),
+      expiryTime,
     };
 
     let sessions = readStoredSessions();
@@ -53,8 +69,9 @@ export const readStoredSessions = (): ScorecardSession[] => {
       const obj = JSON.parse(data);
       const storedSessions = z.array(scorecardSessionSchema).parse(obj);
 
+      const now = new Date();
       for (const storedSession of storedSessions) {
-        if (differenceInHours(new Date(), storedSession.timestamp) < 12) {
+        if (new Date(storedSession.expiryTime) > now) {
           sessions.push(storedSession);
         }
       }
@@ -64,7 +81,7 @@ export const readStoredSessions = (): ScorecardSession[] => {
   }
 
   sessions.sort((s1: ScorecardSession, s2: ScorecardSession) => {
-    return s2.timestamp.getTime() - s1.timestamp.getTime();
+    return s2.expiryTime.getTime() - s1.expiryTime.getTime();
   });
 
   return sessions.slice(0, 3);

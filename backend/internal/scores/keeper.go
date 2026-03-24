@@ -31,6 +31,7 @@ func NewScoreKeeper(eventBroker domain.EventBroker, repo keeperRepository) *Keep
 		scores:                 make(map[domain.ContenderID]domain.Score),
 		repo:                   repo,
 		externalPersistTrigger: make(chan struct{}, 1),
+		mu:                     sync.RWMutex{},
 	}
 }
 
