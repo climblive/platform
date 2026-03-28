@@ -23,32 +23,30 @@ manages the container lifecycle the same way it manages the binary today.
 
 ## Changes Required
 
-### 1. Improve the backend Dockerfile
+### 1. Replace the backend Dockerfile
 
-Convert to a multi-stage build so the final image is small and contains only
-the static binary.
+The pipeline already compiles the Go binary, so the Dockerfile only needs to
+lift the pre-built binary into a `scratch` container.
 
 ```dockerfile
-FROM golang:1.26 AS builder
-WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
-COPY cmd ./cmd
-COPY internal ./internal
-RUN CGO_ENABLED=0 GOOS=linux go build -o ./climblive ./cmd/api/main.go
-
-FROM gcr.io/distroless/static-debian12
-COPY --from=builder /app/climblive /climblive
+FROM scratch
+COPY climblive /climblive
 ENTRYPOINT ["/climblive"]
 ```
 
 ### 2. Update the `build-backend` action
 
-Replace the Go toolchain setup and bare `go build` with a Docker build that
-exports the image as a tarball artifact.
+Keep the existing Go toolchain setup and `go build`, then build the container
+image around the compiled binary and export it as a tarball.
 
 ```yaml
 steps:
+  - uses: actions/setup-go@v5
+    with:
+      go-version-file: "backend/go.mod"
+  - run: go build -o climblive cmd/api/main.go
+    shell: bash
+    working-directory: backend
   - run: |
       docker build -t climblive-api:latest backend/
       docker save climblive-api:latest -o climblive-api.tar
@@ -121,7 +119,7 @@ Point the `sed` that injects the database password at
 
 | File | Change |
 |------|--------|
-| `backend/Dockerfile` | Multi-stage build |
+| `backend/Dockerfile` | `scratch` + pre-built binary |
 | `.github/actions/build-backend/action.yaml` | Docker build + save |
 | `.github/actions/package/action.yaml` | Bundle tarball instead of binary |
 | `.github/actions/deploy/action.yaml` | Write password to env file |
