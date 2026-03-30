@@ -1,12 +1,16 @@
 [Unit]
 Description=ClimbLive 2.0
-After=syslog.target
+After=syslog.target docker.service
+Requires=docker.service
 StartLimitIntervalSec=60
 StartLimitBurst=5
 
 [Service]
-User=climblive
-ExecStart=/usr/bin/climblive
+ExecStartPre=-/usr/bin/docker stop climblive-api
+ExecStartPre=-/usr/bin/docker rm climblive-api
+ExecStart=/usr/bin/docker run --name climblive-api --rm --network host \
+  --env-file /etc/climblive/environment climblive-api:latest
+ExecStop=/usr/bin/docker stop climblive-api
 Restart=always
 RestartSec=5
 
