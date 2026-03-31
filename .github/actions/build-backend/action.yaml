@@ -6,7 +6,7 @@ runs:
       with:
         go-version-file: "backend/go.mod"
 
-    - run: CGO_ENABLED=0 GOOS=linux go build -o climblive cmd/api/main.go
+    - run: go build -o climblive cmd/api/main.go
       shell: bash
       working-directory: backend
 
