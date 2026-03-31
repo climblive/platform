@@ -75,7 +75,7 @@
 </script>
 
 {#snippet renderTicketNumber({ id }: Contender)}
-  {ticketNumber(id)}
+  #{ticketNumber(id)}
 {/snippet}
 
 {#snippet renderRegistrationCode({ id, registrationCode }: Contender)}
