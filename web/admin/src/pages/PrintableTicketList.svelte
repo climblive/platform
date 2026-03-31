@@ -54,16 +54,20 @@
     <Loader />
   {:else}
     {#each chunks as chunk, i (i)}
-      <div class="page-header" class:break-before={i > 0}>
-        {ticketNumber(chunk[0].id)} – {ticketNumber(chunk[chunk.length - 1].id)}
+      <div class="chunk" class:break-before={i > 0}>
+        <span class="page-range">
+          {ticketNumber(chunk[0].id)} – {ticketNumber(
+            chunk[chunk.length - 1].id,
+          )}
+        </span>
+        {#each chunk as contender (contender.id)}
+          <Ticket
+            contestName={contest.name}
+            registrationCode={contender.registrationCode}
+            ticketNumber={ticketNumber(contender.id)}
+          />
+        {/each}
       </div>
-      {#each chunk as contender (contender.id)}
-        <Ticket
-          contestName={contest.name}
-          registrationCode={contender.registrationCode}
-          ticketNumber={ticketNumber(contender.id)}
-        />
-      {/each}
     {/each}
   {/if}
 </main>
@@ -74,14 +78,22 @@
     margin: 2cm;
   }
 
-  .page-header {
-    font-size: var(--wa-font-size-s);
-    color: var(--wa-color-text-quiet);
-    font-family: monospace;
-    margin-block-end: var(--wa-space-s);
+  .chunk {
+    position: relative;
   }
 
   .break-before {
     break-before: page;
+  }
+
+  .page-range {
+    position: absolute;
+    top: -1.5cm;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: var(--wa-font-size-s);
+    color: var(--wa-color-text-quiet);
+    font-family: monospace;
   }
 </style>

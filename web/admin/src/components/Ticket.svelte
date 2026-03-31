@@ -12,7 +12,6 @@
 
 <section>
   <div class="left">
-    <span class="ticket-number">#{ticketNumber}</span>
     <h1>{contestName}</h1>
     <span class="link">
       Scan the QR code or register at {location.protocol}//{location.host}
@@ -21,6 +20,7 @@
     <span class="code">{registrationCode}</span>
   </div>
   <QrCode {registrationCode} width={80}></QrCode>
+  <span class="ticket-number">#{ticketNumber}</span>
 </section>
 
 <style>
@@ -48,12 +48,6 @@
       margin: 0;
     }
 
-    & .ticket-number {
-      font-size: var(--wa-font-size-xs);
-      color: var(--wa-color-text-quiet);
-      font-family: monospace;
-    }
-
     & .link {
       font-size: var(--wa-font-size-s);
     }
@@ -68,5 +62,13 @@
     :global(& > svg) {
       flex-shrink: 0;
     }
+  }
+
+  .ticket-number {
+    writing-mode: vertical-rl;
+    font-size: var(--wa-font-size-xs);
+    color: var(--wa-color-text-quiet);
+    font-family: monospace;
+    flex-shrink: 0;
   }
 </style>

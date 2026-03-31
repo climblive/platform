@@ -63,7 +63,7 @@
       label: "Used",
       mobile: true,
       render: renderUsed,
-      width: "max-content",
+      width: "1fr",
     },
     {
       label: "Entered",
