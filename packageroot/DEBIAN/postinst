@@ -2,13 +2,9 @@
 
 set -e
 
-mkdir -p /etc/climblive
-cat > /etc/climblive/environment <<EOF
-DB_USERNAME=climblive
-DB_PASSWORD=climblive
-DB_HOST=localhost
-DB_PORT=3306
-DB_DATABASE=climblive
-EOF
+if [ ! -f /etc/climblive/environment ]; then
+    echo "ERROR: /etc/climblive/environment not found" >&2
+    exit 1
+fi
 
 docker load -i /usr/share/climblive/climblive-api.tar
