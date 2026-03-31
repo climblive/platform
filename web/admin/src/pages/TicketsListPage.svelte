@@ -52,12 +52,6 @@
       width: "max-content",
     },
     {
-      label: "Name",
-      mobile: true,
-      render: renderName,
-      width: "1fr",
-    },
-    {
       label: "Used",
       mobile: true,
       render: renderUsed,
@@ -73,11 +67,10 @@
 </script>
 
 {#snippet renderRegistrationCode({ id, registrationCode }: Contender)}
-  <Link to={`/admin/contenders/${id}`}>{registrationCode}</Link>
-{/snippet}
-
-{#snippet renderName({ name }: Contender)}
-  {name ?? "-"}
+  <Link to={`/admin/contenders/${id}`}>
+    <wa-icon name="qrcode"></wa-icon>
+    {registrationCode}
+  </Link>
 {/snippet}
 
 {#snippet renderUsed({ entered }: Contender)}
