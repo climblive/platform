@@ -2,15 +2,13 @@
 
 set -e
 
-if [ ! -f /etc/climblive/environment ]; then
-    mkdir -p /etc/climblive
-    cat > /etc/climblive/environment <<EOF
+mkdir -p /etc/climblive
+cat > /etc/climblive/environment <<EOF
 DB_USERNAME=climblive
 DB_PASSWORD=climblive
 DB_HOST=localhost
 DB_PORT=3306
 DB_DATABASE=climblive
 EOF
-fi
 
 docker load -i /usr/share/climblive/climblive-api.tar
