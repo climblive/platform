@@ -4,13 +4,15 @@
   type Props = {
     contestName: string;
     registrationCode: string;
+    ticketNumber: string;
   };
 
-  let { contestName, registrationCode }: Props = $props();
+  let { contestName, registrationCode, ticketNumber }: Props = $props();
 </script>
 
 <section>
   <div class="left">
+    <span class="ticket-number">#{ticketNumber}</span>
     <h1>{contestName}</h1>
     <span class="link">
       Scan the QR code or register at {location.protocol}//{location.host}
@@ -46,6 +48,12 @@
       margin: 0;
     }
 
+    & .ticket-number {
+      font-size: var(--wa-font-size-xs);
+      color: var(--wa-color-text-quiet);
+      font-family: monospace;
+    }
+
     & .link {
       font-size: var(--wa-font-size-s);
     }
@@ -60,9 +68,5 @@
     :global(& > svg) {
       flex-shrink: 0;
     }
-  }
-
-  section:nth-of-type(7n) {
-    break-after: page;
   }
 </style>

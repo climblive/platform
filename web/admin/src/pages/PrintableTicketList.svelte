@@ -18,6 +18,24 @@
   const contest = $derived(contestQuery.data);
   const contenders = $derived(contendersQuery.data);
 
+  const ticketsPerPage = 7;
+
+  const ticketNumber = (id: number) => id.toString().padStart(6, "0");
+
+  const chunks = $derived.by(() => {
+    if (!contenders) {
+      return undefined;
+    }
+
+    const result = [];
+
+    for (let i = 0; i < contenders.length; i += ticketsPerPage) {
+      result.push(contenders.slice(i, i + ticketsPerPage));
+    }
+
+    return result;
+  });
+
   let printDialogOpened = $state(false);
 
   $effect(() => {
@@ -32,14 +50,20 @@
 </script>
 
 <main>
-  {#if !contest || !contenders}
+  {#if !contest || !chunks}
     <Loader />
   {:else}
-    {#each contenders as contender (contender.id)}
-      <Ticket
-        contestName={contest.name}
-        registrationCode={contender.registrationCode}
-      />
+    {#each chunks as chunk, i (i)}
+      <div class="page-header" class:break-before={i > 0}>
+        {ticketNumber(chunk[0].id)} – {ticketNumber(chunk[chunk.length - 1].id)}
+      </div>
+      {#each chunk as contender (contender.id)}
+        <Ticket
+          contestName={contest.name}
+          registrationCode={contender.registrationCode}
+          ticketNumber={ticketNumber(contender.id)}
+        />
+      {/each}
     {/each}
   {/if}
 </main>
@@ -48,5 +72,16 @@
   @page {
     size: a4 portrait;
     margin: 2cm;
+  }
+
+  .page-header {
+    font-size: var(--wa-font-size-s);
+    color: var(--wa-color-text-quiet);
+    font-family: monospace;
+    margin-block-end: var(--wa-space-s);
+  }
+
+  .break-before {
+    break-before: page;
   }
 </style>

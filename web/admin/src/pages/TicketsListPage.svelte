@@ -44,7 +44,15 @@
     showUnusedOnly = (event.target as WaSwitch).checked;
   };
 
+  const ticketNumber = (id: number) => id.toString().padStart(6, "0");
+
   const columns: ColumnDefinition<Contender>[] = [
+    {
+      label: "No.",
+      mobile: true,
+      render: renderTicketNumber,
+      width: "max-content",
+    },
     {
       label: "Code",
       mobile: true,
@@ -65,6 +73,10 @@
     },
   ];
 </script>
+
+{#snippet renderTicketNumber({ id }: Contender)}
+  {ticketNumber(id)}
+{/snippet}
 
 {#snippet renderRegistrationCode({ id, registrationCode }: Contender)}
   <Link to={`/admin/contenders/${id}`}>
