@@ -38,23 +38,24 @@
       return undefined;
     }
 
+    const sorted = [...contenders].sort((a, b) => a.id - b.id);
+
     if (showUnusedOnly) {
-      return contenders.filter(({ entered }) => entered === undefined);
+      return sorted.filter(({ entered }) => entered === undefined);
     }
 
-    return contenders;
+    return sorted;
   });
 
   const selectedCount = $derived.by(() => {
-    const startId = selectionStartId;
-    const endId = selectionEndId;
+    const from = selectionStartId;
+    const to = selectionEndId;
 
-    if (startId === undefined || endId === undefined || !filteredContenders) {
+    if (from === undefined || to === undefined || !filteredContenders) {
       return 0;
     }
 
-    return filteredContenders.filter((c) => c.id >= startId && c.id <= endId)
-      .length;
+    return filteredContenders.filter((c) => c.id >= from && c.id <= to).length;
   });
 
   const isSelected = (id: number): boolean => {
@@ -74,37 +75,19 @@
 
   const handleCheckboxChange = (id: number, event: InputEvent) => {
     const checkbox = event.target as WaCheckbox;
-    const wantsChecked = checkbox.checked;
 
-    if (wantsChecked) {
-      if (selectionStartId === undefined || selectionEndId === undefined) {
-        selectionStartId = id;
-        selectionEndId = id;
-      } else {
-        selectionStartId = Math.min(selectionStartId, id);
-        selectionEndId = Math.max(selectionEndId, id);
-      }
+    if (checkbox.checked) {
+      selectionStartId = Math.min(selectionStartId ?? id, id);
+      selectionEndId = Math.max(selectionEndId ?? id, id);
+    } else if (id === selectionStartId && id === selectionEndId) {
+      selectionStartId = undefined;
+      selectionEndId = undefined;
+    } else if (id === selectionStartId) {
+      selectionStartId = filteredContenders?.find((c) => c.id > id)?.id;
+    } else if (id === selectionEndId) {
+      selectionEndId = filteredContenders?.findLast((c) => c.id < id)?.id;
     } else {
-      if (selectionStartId === selectionEndId) {
-        selectionStartId = undefined;
-        selectionEndId = undefined;
-      } else if (id === selectionStartId) {
-        const startId = selectionStartId;
-        const next = filteredContenders?.find((c) => c.id > startId);
-        if (next) {
-          selectionStartId = next.id;
-        }
-      } else if (id === selectionEndId) {
-        const endId = selectionEndId;
-        const prev = [...(filteredContenders ?? [])]
-          .reverse()
-          .find((c) => c.id < endId);
-        if (prev) {
-          selectionEndId = prev.id;
-        }
-      } else {
-        checkbox.checked = true;
-      }
+      checkbox.checked = true;
     }
   };
 
@@ -125,12 +108,11 @@
       return `/admin/contests/${contestId}/tickets/print?from=${selectionStartId}&to=${selectionEndId}`;
     }
 
-    return `/admin/contests/${contestId}/tickets/print`;
+    return undefined;
   });
 
   const columns: ColumnDefinition<Contender>[] = [
     {
-      label: "",
       mobile: true,
       render: renderCheckbox,
       width: "max-content",
@@ -218,7 +200,7 @@
         size="small"
         appearance="outlined"
         onclick={handleDeselectAll}
-        disabled={selectedCount === 0}>Deselect</wa-button
+        disabled={selectedCount === 0}>Deselect all</wa-button
       >
       <a href={printUrl} target="_blank">
         <wa-button
