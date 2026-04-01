@@ -4,9 +4,10 @@
   type Props = {
     contestName: string;
     registrationCode: string;
+    ticketNumber: number;
   };
 
-  let { contestName, registrationCode }: Props = $props();
+  let { contestName, registrationCode, ticketNumber }: Props = $props();
 </script>
 
 <section>
@@ -19,6 +20,7 @@
     <span class="code">{registrationCode}</span>
   </div>
   <QrCode {registrationCode} width={80}></QrCode>
+  <span class="ticket-number">#{ticketNumber.toString().padStart(6, "0")}</span>
 </section>
 
 <style>
@@ -55,6 +57,14 @@
       font-weight: var(--wa-font-weight-bold);
       font-family: monospace;
       letter-spacing: 0.2rem;
+    }
+
+    & .ticket-number {
+      writing-mode: vertical-rl;
+      font-size: var(--wa-font-size-xs);
+      color: var(--wa-color-text-quiet);
+      font-family: monospace;
+      flex-shrink: 0;
     }
 
     :global(& > svg) {
