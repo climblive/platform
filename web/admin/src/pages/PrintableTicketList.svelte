@@ -13,10 +13,8 @@
   let { contestId }: Props = $props();
 
   const urlParams = new URLSearchParams(window.location.search);
-  const fromId = urlParams.get("from")
-    ? Number(urlParams.get("from"))
-    : undefined;
-  const toId = urlParams.get("to") ? Number(urlParams.get("to")) : undefined;
+  const fromId = Number(urlParams.get("from")) || undefined;
+  const toId = Number(urlParams.get("to")) || undefined;
 
   const contestQuery = $derived(getContestQuery(contestId));
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
