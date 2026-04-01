@@ -156,6 +156,7 @@
   <wa-checkbox
     size="small"
     checked={allSelected}
+    indeterminate={selectedCount > 0 && !allSelected}
     onchange={handleToggleSelectAll}
   ></wa-checkbox>
 {/snippet}
