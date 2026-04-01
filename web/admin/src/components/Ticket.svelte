@@ -59,16 +59,20 @@
       letter-spacing: 0.2rem;
     }
 
+    & .ticket-number {
+      writing-mode: vertical-rl;
+      font-size: var(--wa-font-size-xs);
+      color: var(--wa-color-text-quiet);
+      font-family: monospace;
+      flex-shrink: 0;
+    }
+
     :global(& > svg) {
       flex-shrink: 0;
     }
   }
 
-  .ticket-number {
-    writing-mode: vertical-rl;
-    font-size: var(--wa-font-size-xs);
-    color: var(--wa-color-text-quiet);
-    font-family: monospace;
-    flex-shrink: 0;
+  section:nth-of-type(7n) {
+    break-after: page;
   }
 </style>
