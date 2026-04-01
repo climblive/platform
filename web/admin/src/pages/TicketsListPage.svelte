@@ -11,7 +11,6 @@
     getContendersByContestQuery,
     getContestQuery,
   } from "@climblive/lib/queries";
-  import { format } from "date-fns";
   import { Link, navigate } from "svelte-routing";
 
   interface Props {
@@ -64,12 +63,7 @@
       mobile: true,
       render: renderUsed,
       width: "1fr",
-    },
-    {
-      label: "Entered",
-      mobile: false,
-      render: renderTimestamp,
-      width: "max-content",
+      align: "right",
     },
   ];
 </script>
@@ -91,10 +85,6 @@
   {:else}
     -
   {/if}
-{/snippet}
-
-{#snippet renderTimestamp({ entered }: Contender)}
-  {entered ? format(entered, "yyyy-MM-dd HH:mm") : "-"}
 {/snippet}
 
 {#if contest}
