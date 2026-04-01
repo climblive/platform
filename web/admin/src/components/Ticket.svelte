@@ -20,7 +20,7 @@
     <span class="code">{registrationCode}</span>
   </div>
   <QrCode {registrationCode} width={80}></QrCode>
-  <span class="ticket-number">#{ticketNumber}</span>
+  <span class="ticket-number">#{ticketNumber.toString().padStart(6, "0")}</span>
 </section>
 
 <style>
