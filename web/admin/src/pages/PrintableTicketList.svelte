@@ -12,11 +12,29 @@
 
   let { contestId }: Props = $props();
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const fromId = urlParams.get("from")
+    ? Number(urlParams.get("from"))
+    : undefined;
+  const toId = urlParams.get("to") ? Number(urlParams.get("to")) : undefined;
+
   const contestQuery = $derived(getContestQuery(contestId));
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
 
   const contest = $derived(contestQuery.data);
-  const contenders = $derived(contendersQuery.data);
+  const allContenders = $derived(contendersQuery.data);
+
+  const contenders = $derived.by(() => {
+    if (!allContenders) {
+      return undefined;
+    }
+
+    if (fromId !== undefined && toId !== undefined) {
+      return allContenders.filter((c) => c.id >= fromId && c.id <= toId);
+    }
+
+    return allContenders;
+  });
 
   let printDialogOpened = $state(false);
 
