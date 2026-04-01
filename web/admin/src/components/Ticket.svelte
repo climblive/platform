@@ -4,7 +4,7 @@
   type Props = {
     contestName: string;
     registrationCode: string;
-    ticketNumber: string;
+    ticketNumber: number;
   };
 
   let { contestName, registrationCode, ticketNumber }: Props = $props();
