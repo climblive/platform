@@ -67,6 +67,10 @@
     );
   };
 
+  const isLocked = (id: number): boolean => {
+    return isSelected(id) && id !== selectionStartId && id !== selectionEndId;
+  };
+
   const handleToggleUnusedOnly = (event: InputEvent) => {
     showUnusedOnly = (event.target as WaSwitch).checked;
     selectionStartId = undefined;
@@ -86,8 +90,6 @@
       selectionStartId = filteredContenders?.find((c) => c.id > id)?.id;
     } else if (id === selectionEndId) {
       selectionEndId = filteredContenders?.findLast((c) => c.id < id)?.id;
-    } else {
-      checkbox.checked = true;
     }
   };
 
@@ -143,6 +145,7 @@
   <wa-checkbox
     size="small"
     checked={isSelected(contender.id)}
+    disabled={isLocked(contender.id)}
     onchange={(e: InputEvent) => handleCheckboxChange(contender.id, e)}
   ></wa-checkbox>
 {/snippet}
@@ -244,9 +247,5 @@
     display: flex;
     gap: var(--wa-space-xs);
     align-items: center;
-  }
-
-  :global(tbody tr:has(wa-checkbox[checked])) {
-    background-color: var(--wa-color-surface-lowered);
   }
 </style>

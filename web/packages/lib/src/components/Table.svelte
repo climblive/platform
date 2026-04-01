@@ -138,6 +138,10 @@
     background-color: var(--wa-color-surface-raised);
   }
 
+  tbody tr:has([checked]) {
+    background-color: var(--wa-color-surface-lowered);
+  }
+
   th[data-align="right"],
   td[data-align="right"] {
     text-align: right;
