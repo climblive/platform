@@ -11,7 +11,6 @@
     getContendersByContestQuery,
     getContestQuery,
   } from "@climblive/lib/queries";
-  import { format } from "date-fns";
   import { Link, navigate } from "svelte-routing";
 
   interface Props {
@@ -46,38 +45,36 @@
 
   const columns: ColumnDefinition<Contender>[] = [
     {
+      label: "№",
+      mobile: true,
+      render: renderTicketNumber,
+      width: "max-content",
+    },
+    {
       label: "Code",
       mobile: true,
       render: renderRegistrationCode,
       width: "max-content",
     },
     {
-      label: "Name",
-      mobile: true,
-      render: renderName,
-      width: "1fr",
-    },
-    {
       label: "Used",
       mobile: true,
       render: renderUsed,
-      width: "max-content",
-    },
-    {
-      label: "Entered",
-      mobile: false,
-      render: renderTimestamp,
-      width: "max-content",
+      width: "1fr",
+      align: "right",
     },
   ];
 </script>
 
-{#snippet renderRegistrationCode({ id, registrationCode }: Contender)}
-  <Link to={`/admin/contenders/${id}`}>{registrationCode}</Link>
+{#snippet renderTicketNumber({ id }: Contender)}
+  #{id.toString().padStart(6, "0")}
 {/snippet}
 
-{#snippet renderName({ name }: Contender)}
-  {name ?? "-"}
+{#snippet renderRegistrationCode({ id, registrationCode }: Contender)}
+  <Link to={`/admin/contenders/${id}`}>
+    <wa-icon name="qrcode"></wa-icon>
+    {registrationCode}
+  </Link>
 {/snippet}
 
 {#snippet renderUsed({ entered }: Contender)}
@@ -86,10 +83,6 @@
   {:else}
     -
   {/if}
-{/snippet}
-
-{#snippet renderTimestamp({ entered }: Contender)}
-  {entered ? format(entered, "yyyy-MM-dd HH:mm") : "-"}
 {/snippet}
 
 {#if contest}

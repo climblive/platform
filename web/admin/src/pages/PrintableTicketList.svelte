@@ -39,6 +39,7 @@
       <Ticket
         contestName={contest.name}
         registrationCode={contender.registrationCode}
+        ticketNumber={contender.id}
       />
     {/each}
   {/if}
