@@ -47,7 +47,7 @@
 
   const columns: ColumnDefinition<Contender>[] = [
     {
-      label: "No.",
+      label: "№",
       mobile: true,
       render: renderTicketNumber,
       width: "max-content",
