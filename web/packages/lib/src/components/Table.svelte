@@ -4,7 +4,7 @@
   type T = $$Generic<unknown>;
 
   export type ColumnDefinition<T> = {
-    label?: string;
+    label?: string | Snippet;
     mobile: boolean;
     render: (row: T, mobile: boolean) => ReturnType<Snippet>;
     align?: "left" | "right";
@@ -49,7 +49,13 @@
     <tr>
       {#each columns as column (column)}
         {#if cellVisible(column)}
-          <th data-align={column.align ?? "left"}>{column.label}</th>
+          <th data-align={column.align ?? "left"}>
+            {#if typeof column.label === "function"}
+              {@render column.label()}
+            {:else}
+              {column.label}
+            {/if}
+          </th>
         {/if}
       {/each}
     </tr>

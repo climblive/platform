@@ -93,16 +93,26 @@
     }
   };
 
-  const handleSelectAll = () => {
-    if (filteredContenders && filteredContenders.length > 0) {
+  const allSelected = $derived(
+    filteredContenders !== undefined &&
+      filteredContenders.length > 0 &&
+      selectedCount === filteredContenders.length,
+  );
+
+  const handleToggleSelectAll = (event: InputEvent) => {
+    const checkbox = event.target as WaCheckbox;
+
+    if (
+      checkbox.checked &&
+      filteredContenders &&
+      filteredContenders.length > 0
+    ) {
       selectionStartId = filteredContenders[0].id;
       selectionEndId = filteredContenders[filteredContenders.length - 1].id;
+    } else {
+      selectionStartId = undefined;
+      selectionEndId = undefined;
     }
-  };
-
-  const handleDeselectAll = () => {
-    selectionStartId = undefined;
-    selectionEndId = undefined;
   };
 
   const printUrl = $derived.by(() => {
@@ -115,6 +125,7 @@
 
   const columns: ColumnDefinition<Contender>[] = [
     {
+      label: renderSelectAll,
       mobile: true,
       render: renderCheckbox,
       width: "max-content",
@@ -140,6 +151,14 @@
     },
   ];
 </script>
+
+{#snippet renderSelectAll()}
+  <wa-checkbox
+    size="small"
+    checked={allSelected}
+    onchange={handleToggleSelectAll}
+  ></wa-checkbox>
+{/snippet}
 
 {#snippet renderCheckbox(contender: Contender)}
   <wa-checkbox
@@ -192,19 +211,6 @@
     >
 
     <div class="selection-actions">
-      <wa-button
-        size="small"
-        appearance="outlined"
-        onclick={handleSelectAll}
-        disabled={!filteredContenders || filteredContenders.length === 0}
-        >Select all</wa-button
-      >
-      <wa-button
-        size="small"
-        appearance="outlined"
-        onclick={handleDeselectAll}
-        disabled={selectedCount === 0}>Deselect all</wa-button
-      >
       <a href={printUrl} target="_blank">
         <wa-button
           size="small"
