@@ -439,37 +439,63 @@ func TestCreateContest(t *testing.T) {
 	})
 
 	t.Run("InfoIsSanitized", func(t *testing.T) {
-		mockedRepo, mockedAuthorizer := makeMocks()
+		synctest.Test(t, func(t *testing.T) {
+			mockedRepo, mockedAuthorizer := makeMocks()
 
-		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, fakedOwnership).
-			Return(domain.OrganizerRole, nil)
+			mockedAuthorizer.
+				On("HasOwnership", mock.Anything, fakedOwnership).
+				Return(domain.OrganizerRole, nil)
 
-		mockedRepo.
-			On("StoreContest", mock.Anything, nil, mock.AnythingOfType("domain.Contest")).
-			Return(mirrorInstruction{}, nil)
+			mockedRepo.
+				On("StoreContest", mock.Anything, nil,
+					domain.Contest{
+						Ownership:          fakedOwnership,
+						Location:           "The garage",
+						Country:            "SE",
+						Name:               "Swedish Championships",
+						Description:        "Who is the best climber in Sweden?",
+						QualifyingProblems: 10,
+						Finalists:          7,
+						Info:               "XSS",
+						GracePeriod:        time.Hour,
+						Created:            time.Now(),
+					},
+				).
+				Return(domain.Contest{
+					Ownership:          fakedOwnership,
+					Location:           "The garage",
+					Country:            "SE",
+					Name:               "Swedish Championships",
+					Description:        "Who is the best climber in Sweden?",
+					QualifyingProblems: 10,
+					Finalists:          7,
+					Info:               "XSS",
+					GracePeriod:        time.Hour,
+					Created:            time.Now(),
+				}, nil)
 
-		ucase := usecases.ContestUseCase{
-			Repo:       mockedRepo,
-			Authorizer: mockedAuthorizer,
-		}
+			ucase := usecases.ContestUseCase{
+				Repo:       mockedRepo,
+				Authorizer: mockedAuthorizer,
+			}
 
-		contest, err := ucase.CreateContest(context.Background(), fakedOrganizerID, domain.ContestTemplate{
-			Location:           "The garage",
-			Country:            "SE",
-			Name:               "Swedish Championships",
-			Description:        "Who is the best climber in Sweden?",
-			QualifyingProblems: 10,
-			Finalists:          7,
-			Info:               `<a href="javascript:alert('XSS1')" onmouseover="alert('XSS2')">XSS<a>`,
-			GracePeriod:        time.Hour,
+			contest, err := ucase.CreateContest(context.Background(), fakedOrganizerID, domain.ContestTemplate{
+				Location:           "The garage",
+				Country:            "SE",
+				Name:               "Swedish Championships",
+				Description:        "Who is the best climber in Sweden?",
+				QualifyingProblems: 10,
+				Finalists:          7,
+				Info:               `<a href="javascript:alert('XSS1')" onmouseover="alert('XSS2')">XSS<a>`,
+				GracePeriod:        time.Hour,
+			})
+
+			require.NoError(t, err)
+			assert.Equal(t, "XSS", contest.Info)
+
+			mockedRepo.AssertExpectations(t)
+			mockedAuthorizer.AssertExpectations(t)
 		})
-
-		require.NoError(t, err)
-		assert.Equal(t, "XSS", contest.Info)
-
-		mockedRepo.AssertExpectations(t)
-		mockedAuthorizer.AssertExpectations(t)
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {

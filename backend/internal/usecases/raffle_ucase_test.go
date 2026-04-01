@@ -384,9 +384,12 @@ func TestDrawRaffleWinner(t *testing.T) {
 			On("GetRaffleWinners", mock.Anything, nil, fakedRaffleID).
 			Return([]domain.RaffleWinner{}, nil)
 
-		mockedRepo.
+		storeWinnerCall := mockedRepo.
 			On("StoreRaffleWinner", mock.Anything, nil, mock.AnythingOfType("domain.RaffleWinner")).
-			Return(mirrorInstruction{}, nil)
+			Return(domain.RaffleWinner{}, nil)
+		storeWinnerCall.Run(func(args mock.Arguments) {
+			storeWinnerCall.ReturnArguments = mock.Arguments{args.Get(2).(domain.RaffleWinner), nil}
+		})
 
 		mockedEventBroker.
 			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.RaffleWinnerDrawnEvent")).
