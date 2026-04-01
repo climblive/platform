@@ -205,12 +205,6 @@
   <h1>Tickets</h1>
 
   <div class="controls">
-    <wa-switch
-      size="small"
-      checked={showUnusedOnly}
-      onchange={handleToggleUnusedOnly}>Show unused only</wa-switch
-    >
-
     <div class="selection-actions">
       <a href={printUrl} target="_blank">
         <wa-button
@@ -226,6 +220,12 @@
         </wa-button>
       </a>
     </div>
+
+    <wa-switch
+      size="small"
+      checked={showUnusedOnly}
+      onchange={handleToggleUnusedOnly}>Show unused only</wa-switch
+    >
   </div>
 
   {#if filteredContenders === undefined}
