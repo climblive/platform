@@ -263,4 +263,8 @@
     gap: var(--wa-space-xs);
     align-items: center;
   }
+
+  :global(tbody tr:has(wa-checkbox[checked])) {
+    background-color: var(--wa-color-surface-lowered);
+  }
 </style>
