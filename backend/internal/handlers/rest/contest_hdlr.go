@@ -280,6 +280,7 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 					ColorTheme:   nil,
 					ColorTint:    0,
 					VertAlign:    "",
+					Charset:      nil,
 				},
 				Border:        nil,
 				Fill:          excelize.Fill{},
