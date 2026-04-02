@@ -4,18 +4,28 @@
   import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
   import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import type WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
+  import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+  import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
+  import type WaNumberInput from "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
+  import { value } from "@climblive/lib/forms";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
-  import type { Contender } from "@climblive/lib/models";
+  import type { Contender, CreateContendersArguments } from "@climblive/lib/models";
   import {
+    createContendersMutation,
     getContendersByContestQuery,
     getContestQuery,
   } from "@climblive/lib/queries";
+  import { toastError } from "@climblive/lib/utils";
   import { Link, navigate } from "svelte-routing";
+
+  const maxTickets = 500;
 
   interface Props {
     contestId: number;
@@ -25,9 +35,17 @@
 
   const contestQuery = $derived(getContestQuery(contestId));
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
+  const createContenders = createContendersMutation(contestId);
 
   const contest = $derived(contestQuery.data);
   const contenders = $derived(contendersQuery.data);
+
+  let dialog: WaDialog | undefined = $state();
+  let numberInput: WaNumberInput | undefined = $state();
+
+  const remainingCodes = $derived(
+    contenders === undefined ? undefined : maxTickets - contenders.length,
+  );
 
   let showUnusedOnly = $state(false);
   let selectionStartId: number | undefined = $state(undefined);
@@ -123,6 +141,39 @@
     return undefined;
   });
 
+  const handleOpenCreateDialog = async () => {
+    if (dialog) {
+      dialog.open = true;
+    }
+  };
+
+  const closeDialog = () => {
+    if (dialog) {
+      dialog.open = false;
+    }
+  };
+
+  const handleCreate = () => {
+    if (numberInput) {
+      const args: CreateContendersArguments = {
+        number: Number(numberInput.value),
+      };
+
+      createContenders.mutate(args, {
+        onSuccess: (newContenders) => {
+          closeDialog();
+
+          if (newContenders.length > 0) {
+            const ids = newContenders.map((c) => c.id);
+            selectionStartId = Math.min(...ids);
+            selectionEndId = Math.max(...ids);
+          }
+        },
+        onError: () => toastError("Failed to create tickets."),
+      });
+    }
+  };
+
   const columns: ColumnDefinition<Contender>[] = [
     {
       label: renderSelectAll,
@@ -177,7 +228,7 @@
 {#snippet renderRegistrationCode({ id, registrationCode }: Contender)}
   <Link to={`/admin/contenders/${id}`}>
     <wa-icon name="qrcode"></wa-icon>
-    {registrationCode}
+    <span class="regcode">{registrationCode}</span>
   </Link>
 {/snippet}
 
@@ -206,6 +257,16 @@
 
   <div class="controls">
     <div class="selection-actions">
+      <wa-button
+        size="small"
+        variant="neutral"
+        appearance="accent"
+        onclick={handleOpenCreateDialog}
+        disabled={remainingCodes === undefined || remainingCodes === 0}
+      >
+        <wa-icon slot="start" name="plus"></wa-icon>
+        Create tickets</wa-button
+      >
       <a href={printUrl} target="_blank">
         <wa-button
           size="small"
@@ -227,6 +288,40 @@
       onchange={handleToggleUnusedOnly}>Show unused only</wa-switch
     >
   </div>
+
+  <wa-dialog bind:this={dialog} label="Create tickets">
+    <div class="dialog-content">
+      <wa-callout variant="neutral">
+        <wa-icon slot="icon" name="circle-exclamation"></wa-icon>
+        You have {remainingCodes} tickets remaining out of your maximum allotted
+        {maxTickets}.
+      </wa-callout>
+
+      <wa-number-input
+        bind:this={numberInput}
+        name="number"
+        {@attach value(Math.min(100, remainingCodes ?? 0))}
+        min="1"
+        max={remainingCodes}
+        label="Number of tickets to create"
+      ></wa-number-input>
+    </div>
+
+    <wa-button slot="footer" appearance="plain" onclick={closeDialog}
+      >Cancel</wa-button
+    >
+    <wa-button
+      slot="footer"
+      size="small"
+      variant="neutral"
+      appearance="accent"
+      loading={createContenders.isPending}
+      onclick={handleCreate}
+      type="submit"
+    >
+      Create
+    </wa-button>
+  </wa-dialog>
 
   {#if filteredContenders === undefined}
     <Loader />
@@ -254,5 +349,15 @@
     display: flex;
     gap: var(--wa-space-xs);
     align-items: center;
+  }
+
+  .dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-s);
+  }
+
+  .regcode {
+    font-family: monospace;
   }
 </style>
