@@ -16,7 +16,10 @@
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { value } from "@climblive/lib/forms";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
-  import type { Contender, CreateContendersArguments } from "@climblive/lib/models";
+  import type {
+    Contender,
+    CreateContendersArguments,
+  } from "@climblive/lib/models";
   import {
     createContendersMutation,
     getContendersByContestQuery,
@@ -41,6 +44,7 @@
   const contenders = $derived(contendersQuery.data);
 
   let dialog: WaDialog | undefined = $state();
+  let printDialog: WaDialog | undefined = $state();
   let numberInput: WaNumberInput | undefined = $state();
 
   const remainingCodes = $derived(
@@ -153,6 +157,20 @@
     }
   };
 
+  const closePrintDialog = () => {
+    if (printDialog) {
+      printDialog.open = false;
+    }
+  };
+
+  const handlePrintNewTickets = () => {
+    closePrintDialog();
+
+    if (printUrl) {
+      window.open(printUrl, "_blank");
+    }
+  };
+
   const handleCreate = () => {
     if (numberInput) {
       const args: CreateContendersArguments = {
@@ -167,6 +185,10 @@
             const ids = newContenders.map((c) => c.id);
             selectionStartId = Math.min(...ids);
             selectionEndId = Math.max(...ids);
+
+            if (printDialog) {
+              printDialog.open = true;
+            }
           }
         },
         onError: () => toastError("Failed to create tickets."),
@@ -197,7 +219,7 @@
       label: "Used",
       mobile: true,
       render: renderUsed,
-      width: "1fr",
+      width: "minmax(5rem, 1fr)",
       align: "right",
     },
   ];
@@ -323,6 +345,17 @@
     </wa-button>
   </wa-dialog>
 
+  <wa-dialog bind:this={printDialog} label="Print tickets">
+    Do you want to print the newly created tickets?
+    <wa-button slot="footer" appearance="plain" onclick={closePrintDialog}
+      >Later</wa-button
+    >
+    <wa-button slot="footer" variant="neutral" onclick={handlePrintNewTickets}>
+      <wa-icon slot="start" name="print"></wa-icon>
+      Print
+    </wa-button>
+  </wa-dialog>
+
   {#if filteredContenders === undefined}
     <Loader />
   {:else if filteredContenders.length > 0}
@@ -359,5 +392,6 @@
 
   .regcode {
     font-family: monospace;
+    font-size: var(--wa-font-size-m);
   }
 </style>
