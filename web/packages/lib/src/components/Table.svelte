@@ -146,7 +146,7 @@
 
   tbody tr:has(:state(checked)),
   tbody tr:has([checked]) {
-    background-color: var(--wa-color-surface-lowered);
+    background-color: var(--wa-color-surface-raised);
   }
 
   th[data-align="right"],
