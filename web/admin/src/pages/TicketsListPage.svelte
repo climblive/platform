@@ -272,7 +272,9 @@
 
 {#snippet renderUsed({ entered }: Contender)}
   {#if entered}
-    <wa-icon name="check"></wa-icon>
+    <wa-badge variant="success"
+      ><wa-icon slot="start" name="check"></wa-icon>Registered</wa-badge
+    >
   {:else}
     -
   {/if}
@@ -423,5 +425,9 @@
 
   .copy {
     color: var(--wa-color-text-quiet);
+  }
+
+  wa-badge[variant="success"] {
+    font-size: var(--wa-font-size-xs);
   }
 </style>
