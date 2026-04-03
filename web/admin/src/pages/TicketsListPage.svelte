@@ -51,6 +51,22 @@
     contenders === undefined ? undefined : maxTickets - contenders.length,
   );
 
+  let registeredContenders = $derived.by(() => {
+    if (!contenders) {
+      return undefined;
+    }
+
+    let count = 0;
+
+    for (const contender of contenders) {
+      if (contender.entered !== undefined) {
+        count += 1;
+      }
+    }
+
+    return count;
+  });
+
   let showUnusedOnly = $state(false);
   let selectionStartId: number | undefined = $state(undefined);
   let selectionEndId: number | undefined = $state(undefined);
@@ -277,6 +293,16 @@
 
   <h1>Tickets</h1>
 
+  <p class="copy">
+    Tickets hold unique registration codes, granting contenders access to your
+    contest. These tickets may be printed on paper and distributed to the
+    contenders on site.
+    {#if contenders && contenders.length > 0}
+      Out of the {contenders.length}
+      tickets that you have created, {registeredContenders} have already been used.
+    {/if}
+  </p>
+
   <div class="controls">
     <div class="selection-actions">
       <wa-button
@@ -393,5 +419,9 @@
   .regcode {
     font-family: monospace;
     font-size: var(--wa-font-size-m);
+  }
+
+  .copy {
+    color: var(--wa-color-text-quiet);
   }
 </style>
