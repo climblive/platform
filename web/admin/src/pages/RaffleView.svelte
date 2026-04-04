@@ -18,7 +18,8 @@
     getRaffleQuery,
     getRaffleWinnersQuery,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { getApiUrl, toastError } from "@climblive/lib/utils";
+  import { useQueryClient } from "@tanstack/svelte-query";
   import { AxiosError } from "axios";
   import { format } from "date-fns";
   import { navigate } from "svelte-routing";
@@ -28,6 +29,8 @@
   }
 
   let { raffleId }: Props = $props();
+
+  const queryClient = useQueryClient();
 
   const raffleQuery = $derived(getRaffleQuery(raffleId));
   const drawRaffleWinner = $derived(drawRaffleWinnerMutation(raffleId));
@@ -70,6 +73,35 @@
   const allWinnersDrawn = $derived(
     eligibleCount !== undefined && winnersCount >= eligibleCount,
   );
+
+  $effect(() => {
+    const contestId = raffle?.contestId;
+
+    if (contestId === undefined) {
+      return;
+    }
+
+    const eventSource = new EventSource(
+      `${getApiUrl()}/contests/${contestId}/events`,
+    );
+
+    const invalidateContenders = () => {
+      queryClient.invalidateQueries({
+        queryKey: ["contenders", { contestId }],
+      });
+    };
+
+    eventSource.addEventListener("CONTENDER_ENTERED", invalidateContenders);
+    eventSource.addEventListener(
+      "CONTENDER_DISQUALIFIED",
+      invalidateContenders,
+    );
+    eventSource.addEventListener("CONTENDER_REQUALIFIED", invalidateContenders);
+
+    return () => {
+      eventSource.close();
+    };
+  });
 
   const handleDrawWinner = () => {
     drawRaffleWinner.mutate(undefined, {
@@ -116,7 +148,7 @@
   {:else}
     <wa-button variant="neutral" onclick={handleDrawWinner}
       >Draw winner{#if eligibleCount !== undefined}
-        ({winnersCount} / {eligibleCount}){/if}</wa-button
+        {winnersCount + 1} of {eligibleCount}{/if}</wa-button
     >
   {/if}
 {/snippet}
