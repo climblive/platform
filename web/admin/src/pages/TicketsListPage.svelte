@@ -273,7 +273,7 @@
 {#snippet renderUsed({ entered }: Contender)}
   {#if entered}
     <wa-badge variant="success"
-      ><wa-icon slot="start" name="check"></wa-icon>Registered</wa-badge
+      ><wa-icon slot="start" name="user-check"></wa-icon>Registered</wa-badge
     >
   {:else}
     -
