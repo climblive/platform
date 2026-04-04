@@ -232,7 +232,7 @@
       width: "max-content",
     },
     {
-      label: "Used",
+      label: "",
       mobile: true,
       render: renderUsed,
       width: "minmax(5rem, 1fr)",
