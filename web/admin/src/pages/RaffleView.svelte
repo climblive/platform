@@ -3,6 +3,8 @@
   import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
   import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
     EmptyState,
     Table,
@@ -52,20 +54,22 @@
       : undefined,
   );
 
-  const allWinnersDrawn = $derived.by(() => {
+  const eligibleCount = $derived.by(() => {
     const contenders = contendersQuery?.data;
-    const winners = raffleWinnersQuery.data;
 
-    if (contenders === undefined || winners === undefined) {
-      return false;
+    if (contenders === undefined) {
+      return undefined;
     }
 
-    const eligibleCount = contenders.filter(
-      (c) => c.entered !== undefined && !c.disqualified,
-    ).length;
-
-    return winners.length >= eligibleCount;
+    return contenders.filter((c) => c.entered !== undefined && !c.disqualified)
+      .length;
   });
+
+  const winnersCount = $derived(raffleWinnersQuery.data?.length ?? 0);
+
+  const allWinnersDrawn = $derived(
+    eligibleCount !== undefined && winnersCount >= eligibleCount,
+  );
 
   const handleDrawWinner = () => {
     drawRaffleWinner.mutate(undefined, {
@@ -104,11 +108,17 @@
 {/snippet}
 
 {#snippet drawButton()}
-  <wa-button
-    variant="neutral"
-    onclick={handleDrawWinner}
-    disabled={allWinnersDrawn}>Draw winner</wa-button
-  >
+  {#if allWinnersDrawn}
+    <wa-callout variant="success">
+      <wa-icon slot="icon" name="circle-check"></wa-icon>
+      All {eligibleCount} eligible winners have been drawn.
+    </wa-callout>
+  {:else}
+    <wa-button variant="neutral" onclick={handleDrawWinner}
+      >Draw winner{#if eligibleCount !== undefined}
+        ({winnersCount} / {eligibleCount}){/if}</wa-button
+    >
+  {/if}
 {/snippet}
 
 {#if contest && raffle}
