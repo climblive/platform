@@ -106,12 +106,13 @@
 </script>
 
 <p class="copy">
-  Tickets hold unique registration codes, granting contenders access to your
+  Tickets contain registration codes that allow the contenders to enter your
   contest. These tickets may be printed on paper and distributed to the
   contenders on site.
   {#if contenders && contenders.length > 0}
     Out of the {contenders.length}
-    tickets that you have created, {registeredContenders} have already been used.
+    tickets that you have created, {registeredContenders} have already been
+    used.
   {/if}
 </p>
 
@@ -204,5 +205,6 @@
 
   .copy {
     color: var(--wa-color-text-quiet);
+    margin-bottom: var(--wa-space-m);
   }
 </style>
