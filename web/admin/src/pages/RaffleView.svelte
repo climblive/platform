@@ -141,14 +141,13 @@
 
 {#snippet drawButton()}
   {#if allWinnersDrawn}
-    <wa-callout variant="success">
+    <wa-callout variant="neutral">
       <wa-icon slot="icon" name="circle-check"></wa-icon>
-      All {eligibleCount} eligible winners have been drawn.
+      All eligible winners have been drawn.
     </wa-callout>
   {:else}
     <wa-button variant="neutral" onclick={handleDrawWinner}
-      >Draw winner{#if eligibleCount !== undefined}
-        {winnersCount + 1} of {eligibleCount}{/if}</wa-button
+      >Draw winner {#if eligibleCount !== undefined}{winnersCount + 1} of {eligibleCount}{/if}</wa-button
     >
   {/if}
 {/snippet}
@@ -181,6 +180,11 @@
         data={sortedRaffleWinners}
         getId={({ contenderId }) => contenderId}
       ></Table>
+    {:else if eligibleCount === 0}
+      <EmptyState
+        title="No winners yet"
+        description="There are no eligible winners to draw."
+      />
     {:else}
       <EmptyState
         title="No winners yet"
