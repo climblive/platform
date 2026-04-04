@@ -11,6 +11,7 @@
   import type { RaffleWinner } from "@climblive/lib/models";
   import {
     drawRaffleWinnerMutation,
+    getContendersByContestQuery,
     getContestQuery,
     getRaffleQuery,
     getRaffleWinnersQuery,
@@ -44,6 +45,27 @@
     raffle?.contestId ? getContestQuery(raffle.contestId) : undefined,
   );
   const contest = $derived(contestQuery?.data);
+
+  const contendersQuery = $derived(
+    raffle?.contestId
+      ? getContendersByContestQuery(raffle.contestId)
+      : undefined,
+  );
+
+  const allWinnersDrawn = $derived.by(() => {
+    const contenders = contendersQuery?.data;
+    const winners = raffleWinnersQuery.data;
+
+    if (contenders === undefined || winners === undefined) {
+      return false;
+    }
+
+    const eligibleCount = contenders.filter(
+      (c) => c.entered !== undefined && !c.disqualified,
+    ).length;
+
+    return winners.length >= eligibleCount;
+  });
 
   const handleDrawWinner = () => {
     drawRaffleWinner.mutate(undefined, {
@@ -82,7 +104,10 @@
 {/snippet}
 
 {#snippet drawButton()}
-  <wa-button variant="neutral" onclick={handleDrawWinner}>Draw winner</wa-button
+  <wa-button
+    variant="neutral"
+    onclick={handleDrawWinner}
+    disabled={allWinnersDrawn}>Draw winner</wa-button
   >
 {/snippet}
 
