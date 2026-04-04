@@ -276,7 +276,7 @@
       ><wa-icon slot="start" name="user-check"></wa-icon>Registered</wa-badge
     >
   {:else}
-    <wa-badge variant="neutral">Unused</wa-badge>
+    <wa-badge variant="neutral" appearance="filled">Unused</wa-badge>
   {/if}
 {/snippet}
 
