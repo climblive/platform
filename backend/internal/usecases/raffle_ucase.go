@@ -65,8 +65,20 @@ func (uc *RaffleUseCase) CreateRaffle(ctx context.Context, contestID domain.Cont
 		return domain.Raffle{}, errors.Wrap(err, 0)
 	}
 
-	if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+	role, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership)
+	if err != nil {
 		return domain.Raffle{}, errors.Wrap(err, 0)
+	}
+
+	if !role.OneOf(domain.AdminRole) {
+		raffles, err := uc.Repo.GetRafflesByContest(ctx, nil, contestID)
+		if err != nil {
+			return domain.Raffle{}, errors.Wrap(err, 0)
+		}
+
+		if len(raffles) >= 10 {
+			return domain.Raffle{}, errors.New(domain.ErrLimitExceeded)
+		}
 	}
 
 	raffle := domain.Raffle{

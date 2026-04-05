@@ -48,8 +48,20 @@ func (uc *CompClassUseCase) CreateCompClass(ctx context.Context, contestID domai
 		return domain.CompClass{}, errors.Wrap(err, 0)
 	}
 
-	if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+	role, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership)
+	if err != nil {
 		return domain.CompClass{}, errors.Wrap(err, 0)
+	}
+
+	if !role.OneOf(domain.AdminRole) {
+		compClasses, err := uc.Repo.GetCompClassesByContest(ctx, nil, contestID)
+		if err != nil {
+			return domain.CompClass{}, errors.Wrap(err, 0)
+		}
+
+		if len(compClasses) >= 20 {
+			return domain.CompClass{}, errors.New(domain.ErrLimitExceeded)
+		}
 	}
 
 	compClass := domain.CompClass{

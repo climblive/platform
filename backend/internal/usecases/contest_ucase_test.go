@@ -350,6 +350,10 @@ func TestCreateContest(t *testing.T) {
 				Return(domain.OrganizerRole, nil)
 
 			mockedRepo.
+				On("GetContestsByOrganizer", mock.Anything, nil, fakedOrganizerID).
+				Return([]domain.Contest{}, nil)
+
+			mockedRepo.
 				On("StoreContest", mock.Anything, nil,
 					domain.Contest{
 						Ownership:          fakedOwnership,
@@ -424,6 +428,10 @@ func TestCreateContest(t *testing.T) {
 			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.OrganizerRole, nil)
 
+		mockedRepo.
+			On("GetContestsByOrganizer", mock.Anything, nil, fakedOrganizerID).
+			Return([]domain.Contest{}, nil)
+
 		ucase := usecases.ContestUseCase{
 			Repo:       mockedRepo,
 			Authorizer: mockedAuthorizer,
@@ -444,6 +452,10 @@ func TestCreateContest(t *testing.T) {
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.OrganizerRole, nil)
+
+		mockedRepo.
+			On("GetContestsByOrganizer", mock.Anything, nil, fakedOrganizerID).
+			Return([]domain.Contest{}, nil)
 
 		mockedRepo.
 			On("StoreContest", mock.Anything, nil, mock.AnythingOfType("domain.Contest")).
@@ -470,6 +482,119 @@ func TestCreateContest(t *testing.T) {
 
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("LimitExceeded", func(t *testing.T) {
+		synctest.Test(t, func(t *testing.T) {
+			mockedRepo, mockedAuthorizer := makeMocks()
+
+			mockedAuthorizer.
+				On("HasOwnership", mock.Anything, fakedOwnership).
+				Return(domain.OrganizerRole, nil)
+
+			recentContests := make([]domain.Contest, 10)
+			for i := range recentContests {
+				recentContests[i] = domain.Contest{
+					Archived: false,
+					Created:  time.Now(),
+				}
+			}
+			mockedRepo.
+				On("GetContestsByOrganizer", mock.Anything, nil, fakedOrganizerID).
+				Return(recentContests, nil)
+
+			ucase := usecases.ContestUseCase{
+				Repo:       mockedRepo,
+				Authorizer: mockedAuthorizer,
+			}
+
+			_, err := ucase.CreateContest(context.Background(), fakedOrganizerID, domain.ContestTemplate{})
+
+			require.ErrorIs(t, err, domain.ErrLimitExceeded)
+
+			mockedRepo.AssertExpectations(t)
+			mockedAuthorizer.AssertExpectations(t)
+		})
+	})
+
+	t.Run("ArchivedContestsDoNotCountTowardsLimit", func(t *testing.T) {
+		synctest.Test(t, func(t *testing.T) {
+			mockedRepo, mockedAuthorizer := makeMocks()
+
+			mockedAuthorizer.
+				On("HasOwnership", mock.Anything, fakedOwnership).
+				Return(domain.OrganizerRole, nil)
+
+			contests := make([]domain.Contest, 10)
+			for i := range contests {
+				contests[i] = domain.Contest{
+					Archived: true,
+					Created:  time.Now(),
+				}
+			}
+			mockedRepo.
+				On("GetContestsByOrganizer", mock.Anything, nil, fakedOrganizerID).
+				Return(contests, nil)
+
+			mockedRepo.
+				On("StoreContest", mock.Anything, nil, mock.AnythingOfType("domain.Contest")).
+				Return(mirrorInstruction{}, nil)
+
+			ucase := usecases.ContestUseCase{
+				Repo:       mockedRepo,
+				Authorizer: mockedAuthorizer,
+			}
+
+			_, err := ucase.CreateContest(context.Background(), fakedOrganizerID, domain.ContestTemplate{
+				Location:           "The garage",
+				Country:            "SE",
+				Name:               "Swedish Championships",
+				QualifyingProblems: 10,
+				Finalists:          7,
+				GracePeriod:        time.Hour,
+			})
+
+			require.NoError(t, err)
+
+			mockedRepo.AssertExpectations(t)
+			mockedAuthorizer.AssertExpectations(t)
+		})
+	})
+
+	t.Run("AdminCanExceedLimit", func(t *testing.T) {
+		synctest.Test(t, func(t *testing.T) {
+			mockedRepo, mockedAuthorizer := makeMocks()
+
+			mockedAuthorizer.
+				On("HasOwnership", mock.Anything, fakedOwnership).
+				Return(domain.AdminRole, nil)
+
+			mockedRepo.
+				On("StoreContest", mock.Anything, nil, mock.AnythingOfType("domain.Contest")).
+				Return(domain.Contest{
+					ID:        fakedContestID,
+					Ownership: fakedOwnership,
+				}, nil)
+
+			ucase := usecases.ContestUseCase{
+				Repo:       mockedRepo,
+				Authorizer: mockedAuthorizer,
+			}
+
+			_, err := ucase.CreateContest(context.Background(), fakedOrganizerID, domain.ContestTemplate{
+				Location:           "The garage",
+				Country:            "SE",
+				Name:               "Swedish Championships",
+				QualifyingProblems: 10,
+				Finalists:          7,
+				GracePeriod:        time.Hour,
+			})
+
+			require.NoError(t, err)
+
+			mockedRepo.AssertExpectations(t)
+			mockedAuthorizer.AssertExpectations(t)
+		})
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {

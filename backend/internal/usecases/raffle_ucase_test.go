@@ -46,6 +46,10 @@ func TestCreateRaffle(t *testing.T) {
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
+			On("GetRafflesByContest", mock.Anything, nil, fakedContestID).
+			Return([]domain.Raffle{}, nil)
+
+		mockedRepo.
 			On("StoreRaffle", mock.Anything, nil,
 				domain.Raffle{
 					Ownership: fakedOwnership,
@@ -70,6 +74,59 @@ func TestCreateRaffle(t *testing.T) {
 		assert.Equal(t, fakedRaffleID, raffle.ID)
 		assert.Equal(t, fakedOwnership, raffle.Ownership)
 		assert.Equal(t, fakedContestID, raffle.ContestID)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("LimitExceeded", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		raffles := make([]domain.Raffle, 10)
+		mockedRepo.
+			On("GetRafflesByContest", mock.Anything, nil, fakedContestID).
+			Return(raffles, nil)
+
+		ucase := usecases.RaffleUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.CreateRaffle(context.Background(), fakedContestID)
+
+		require.ErrorIs(t, err, domain.ErrLimitExceeded)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("AdminCanExceedLimit", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.AdminRole, nil)
+
+		mockedRepo.
+			On("StoreRaffle", mock.Anything, nil, mock.AnythingOfType("domain.Raffle")).
+			Return(domain.Raffle{
+				ID:        fakedRaffleID,
+				Ownership: fakedOwnership,
+				ContestID: fakedContestID,
+			}, nil)
+
+		ucase := usecases.RaffleUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.CreateRaffle(context.Background(), fakedContestID)
+
+		require.NoError(t, err)
 
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
