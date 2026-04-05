@@ -14,6 +14,8 @@
   import { toastError } from "@climblive/lib/utils";
   import { Link, navigate } from "svelte-routing";
 
+  const maxRaffles = 10;
+
   interface Props {
     contestId: number;
   }
@@ -24,6 +26,10 @@
   const createRaffle = $derived(createRaffleMutation(contestId));
 
   let raffles = $derived(rafflesQuery.data);
+
+  const limitReached = $derived(
+    raffles !== undefined && raffles.length >= maxRaffles,
+  );
 
   const handleCreateRaffle = () => {
     createRaffle.mutate(undefined, {
@@ -46,9 +52,17 @@
 {/snippet}
 
 {#snippet createButton()}
-  <wa-button variant="neutral" appearance="accent" onclick={handleCreateRaffle}
-    >Start new raffle</wa-button
+  <wa-button
+    variant="neutral"
+    appearance="accent"
+    onclick={handleCreateRaffle}
+    disabled={limitReached}>Start new raffle</wa-button
   >
+  {#if limitReached}
+    <wa-callout variant="neutral">
+      You have reached the maximum of {maxRaffles} raffles per contest.
+    </wa-callout>
+  {/if}
 {/snippet}
 
 <p class="copy">

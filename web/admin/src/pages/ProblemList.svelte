@@ -20,6 +20,8 @@
   import CopyProblems from "./CopyProblems.svelte";
   import DeleteProblem from "./DeleteProblem.svelte";
 
+  const maxProblems = 100;
+
   interface Props {
     contestId: number;
     organizerId: number;
@@ -55,6 +57,11 @@
     return ascentsByProblem;
   });
   const contests = $derived(contestsQuery.data);
+
+  const limitReached = $derived(
+    problemsQuery.data !== undefined &&
+      problemsQuery.data.length >= maxProblems,
+  );
 
   type ProblemWithAscents = Problem & { ascents: number };
 
@@ -203,8 +210,13 @@
     variant="neutral"
     appearance="accent"
     onclick={() => navigate(`contests/${contestId}/new-problem`)}
-    >Create problem</wa-button
+    disabled={limitReached}>Create problem</wa-button
   >
+  {#if limitReached}
+    <wa-callout variant="neutral">
+      You have reached the maximum of {maxProblems} problems per contest.
+    </wa-callout>
+  {/if}
 {/snippet}
 
 <p class="copy">

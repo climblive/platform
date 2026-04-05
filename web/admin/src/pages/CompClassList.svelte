@@ -15,6 +15,8 @@
   import { navigate } from "svelte-routing";
   import DeleteCompClass from "./DeleteCompClass.svelte";
 
+  const maxCompClasses = 20;
+
   interface Props {
     contestId: number;
   }
@@ -24,6 +26,10 @@
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
 
   let compClasses = $derived(compClassesQuery.data);
+
+  const limitReached = $derived(
+    compClasses !== undefined && compClasses.length >= maxCompClasses,
+  );
 
   const columns: ColumnDefinition<CompClass>[] = [
     {
@@ -108,8 +114,13 @@
     variant="neutral"
     appearance="accent"
     onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
-    >Create class</wa-button
+    disabled={limitReached}>Create class</wa-button
   >
+  {#if limitReached}
+    <wa-callout variant="neutral">
+      You have reached the maximum of {maxCompClasses} classes per contest.
+    </wa-callout>
+  {/if}
 {/snippet}
 
 <p class="copy">

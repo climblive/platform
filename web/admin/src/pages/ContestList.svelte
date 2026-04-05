@@ -15,9 +15,11 @@
     getContestsByOrganizerQuery,
   } from "@climblive/lib/queries";
   import { getCountryName, getFlag, SyncedTime } from "@climblive/lib/utils";
-  import { format } from "date-fns";
+  import { format, sub } from "date-fns";
   import { onMount } from "svelte";
   import { Link, navigate } from "svelte-routing";
+
+  const maxContestsPerWeek = 10;
 
   interface Props {
     organizerId: number | undefined;
@@ -136,6 +138,19 @@
       0,
     ),
   );
+
+  const limitReached = $derived.by(() => {
+    if (!contests) {
+      return false;
+    }
+
+    const oneWeekAgo = sub(new Date(), { weeks: 1 });
+    const recentCount = contests.filter(
+      (c) => !c.archived && c.created > oneWeekAgo,
+    ).length;
+
+    return recentCount >= maxContestsPerWeek;
+  });
 </script>
 
 {#snippet renderFlag({ id, country }: Contest)}
@@ -180,8 +195,13 @@
     class={className}
     variant="neutral"
     onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
-    >Create new contest</wa-button
+    disabled={limitReached}>Create new contest</wa-button
   >
+  {#if limitReached}
+    <wa-callout variant="neutral">
+      You have reached the maximum of {maxContestsPerWeek} contests per week.
+    </wa-callout>
+  {/if}
 {/snippet}
 
 <h2>Contests</h2>
