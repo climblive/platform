@@ -155,7 +155,7 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 			return domain.Problem{}, errors.Wrap(err, 0)
 		}
 
-		if len(problems) >= 100 {
+		if len(problems) >= domain.MaxProblemsPerContest {
 			return domain.Problem{}, errors.New(domain.ErrLimitExceeded)
 		}
 	}

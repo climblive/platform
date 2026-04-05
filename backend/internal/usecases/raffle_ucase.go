@@ -76,7 +76,7 @@ func (uc *RaffleUseCase) CreateRaffle(ctx context.Context, contestID domain.Cont
 			return domain.Raffle{}, errors.Wrap(err, 0)
 		}
 
-		if len(raffles) >= 10 {
+		if len(raffles) >= domain.MaxRafflesPerContest {
 			return domain.Raffle{}, errors.New(domain.ErrLimitExceeded)
 		}
 	}

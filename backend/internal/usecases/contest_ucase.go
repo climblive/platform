@@ -256,7 +256,7 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 			}
 		}
 
-		if recentCount >= 10 {
+		if recentCount >= domain.MaxContestsPerWeek {
 			return domain.Contest{}, errors.New(domain.ErrLimitExceeded)
 		}
 	}

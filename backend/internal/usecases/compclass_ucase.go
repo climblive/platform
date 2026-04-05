@@ -59,7 +59,7 @@ func (uc *CompClassUseCase) CreateCompClass(ctx context.Context, contestID domai
 			return domain.CompClass{}, errors.Wrap(err, 0)
 		}
 
-		if len(compClasses) >= 20 {
+		if len(compClasses) >= domain.MaxCompClassesPerContest {
 			return domain.CompClass{}, errors.New(domain.ErrLimitExceeded)
 		}
 	}
