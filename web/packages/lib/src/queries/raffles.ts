@@ -58,3 +58,29 @@ export const getRaffleWinnersQuery = (raffleId: number) =>
     queryKey: ["raffle-winners", { raffleId }],
     queryFn: async () => ApiClient.getInstance().getRaffleWinners(raffleId),
   }));
+
+export const deleteRaffleMutation = (raffleId: number) => {
+  const client = useQueryClient();
+
+  return createMutation(() => ({
+    mutationFn: () => ApiClient.getInstance().deleteRaffle(raffleId),
+    onSuccess: () => {
+      let queryKey: QueryKey = ["raffles"];
+
+      client.setQueriesData<Raffle[]>(
+        { queryKey, exact: false },
+        (oldRaffles) => {
+          if (oldRaffles === undefined) {
+            return undefined;
+          }
+
+          return oldRaffles.filter(({ id }) => id !== raffleId);
+        },
+      );
+
+      queryKey = ["raffle", { id: raffleId }];
+
+      client.removeQueries({ queryKey });
+    },
+  }));
+};

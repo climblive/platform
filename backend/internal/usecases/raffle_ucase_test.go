@@ -576,3 +576,72 @@ func TestGetRaffleWinners(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 }
+
+func TestDeleteRaffle(t *testing.T) {
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
+	fakedOwnership := domain.OwnershipData{
+		OrganizerID: fakedOrganizerID,
+	}
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedRaffleID := testutils.RandomResourceID[domain.RaffleID]()
+
+	makeMocks := func() (*repositoryMock, *authorizerMock) {
+		mockedRepo := new(repositoryMock)
+
+		mockedRepo.
+			On("GetRaffle", mock.Anything, nil, fakedRaffleID).
+			Return(domain.Raffle{
+				ID:        fakedRaffleID,
+				Ownership: fakedOwnership,
+				ContestID: fakedContestID,
+			}, nil)
+
+		mockedAuthorizer := new(authorizerMock)
+
+		return mockedRepo, mockedAuthorizer
+	}
+
+	t.Run("HappyCase", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		mockedRepo.
+			On("DeleteRaffle", mock.Anything, nil, fakedRaffleID).
+			Return(nil)
+
+		ucase := usecases.RaffleUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		err := ucase.DeleteRaffle(context.Background(), fakedRaffleID)
+
+		require.NoError(t, err)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		ucase := usecases.RaffleUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		err := ucase.DeleteRaffle(context.Background(), fakedRaffleID)
+
+		require.ErrorIs(t, err, domain.ErrNoOwnership)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+}

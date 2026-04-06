@@ -20,6 +20,7 @@ type raffleUseCaseRepository interface {
 	GetRafflesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Raffle, error)
 	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error)
 	GetRaffleWinners(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) ([]domain.RaffleWinner, error)
+	DeleteRaffle(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) error
 }
 
 type RaffleUseCase struct {
@@ -173,4 +174,22 @@ func (uc *RaffleUseCase) GetRaffleWinners(ctx context.Context, raffleID domain.R
 	}
 
 	return winners, nil
+}
+
+func (uc *RaffleUseCase) DeleteRaffle(ctx context.Context, raffleID domain.RaffleID) error {
+	raffle, err := uc.Repo.GetRaffle(ctx, nil, raffleID)
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	if _, err := uc.Authorizer.HasOwnership(ctx, raffle.Ownership); err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	err = uc.Repo.DeleteRaffle(ctx, nil, raffleID)
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	return nil
 }
