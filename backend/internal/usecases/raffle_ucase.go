@@ -20,6 +20,7 @@ type raffleUseCaseRepository interface {
 	GetRafflesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Raffle, error)
 	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error)
 	GetRaffleWinners(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) ([]domain.RaffleWinner, error)
+	DeleteRaffleWinner(ctx context.Context, tx domain.Transaction, raffleWinnerID domain.RaffleWinnerID) error
 	DeleteRaffle(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) error
 }
 
@@ -186,7 +187,31 @@ func (uc *RaffleUseCase) DeleteRaffle(ctx context.Context, raffleID domain.Raffl
 		return errors.Wrap(err, 0)
 	}
 
-	err = uc.Repo.DeleteRaffle(ctx, nil, raffleID)
+	winners, err := uc.Repo.GetRaffleWinners(ctx, nil, raffleID)
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	tx, err := uc.Repo.Begin()
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	for _, winner := range winners {
+		err = uc.Repo.DeleteRaffleWinner(ctx, tx, winner.ID)
+		if err != nil {
+			tx.Rollback()
+			return errors.Wrap(err, 0)
+		}
+	}
+
+	err = uc.Repo.DeleteRaffle(ctx, tx, raffleID)
+	if err != nil {
+		tx.Rollback()
+		return errors.Wrap(err, 0)
+	}
+
+	err = tx.Commit()
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
