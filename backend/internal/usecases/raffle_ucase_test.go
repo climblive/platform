@@ -628,6 +628,7 @@ func TestDeleteRaffle(t *testing.T) {
 			Return(nil)
 
 		mockedTx.On("Commit").Return(nil)
+		mockedTx.On("Rollback").Return()
 
 		ucase := usecases.RaffleUseCase{
 			Repo:       mockedRepo,

@@ -196,18 +196,17 @@ func (uc *RaffleUseCase) DeleteRaffle(ctx context.Context, raffleID domain.Raffl
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
+	defer tx.Rollback()
 
 	for _, winner := range winners {
 		err = uc.Repo.DeleteRaffleWinner(ctx, tx, winner.ID)
 		if err != nil {
-			tx.Rollback()
 			return errors.Wrap(err, 0)
 		}
 	}
 
 	err = uc.Repo.DeleteRaffle(ctx, tx, raffleID)
 	if err != nil {
-		tx.Rollback()
 		return errors.Wrap(err, 0)
 	}
 
