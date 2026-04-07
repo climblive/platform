@@ -576,3 +576,91 @@ func TestGetRaffleWinners(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 }
+
+func TestDeleteRaffle(t *testing.T) {
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
+	fakedOwnership := domain.OwnershipData{
+		OrganizerID: fakedOrganizerID,
+	}
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedRaffleID := testutils.RandomResourceID[domain.RaffleID]()
+	fakedRaffleWinnerID := testutils.RandomResourceID[domain.RaffleWinnerID]()
+
+	makeMocks := func() (*repositoryMock, *transactionMock, *authorizerMock) {
+		mockedRepo := new(repositoryMock)
+
+		mockedRepo.
+			On("GetRaffle", mock.Anything, nil, fakedRaffleID).
+			Return(domain.Raffle{
+				ID:        fakedRaffleID,
+				Ownership: fakedOwnership,
+				ContestID: fakedContestID,
+			}, nil)
+
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedTx := new(transactionMock)
+
+		return mockedRepo, mockedTx, mockedAuthorizer
+	}
+
+	t.Run("HappyCase", func(t *testing.T) {
+		mockedRepo, mockedTx, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		mockedRepo.
+			On("GetRaffleWinners", mock.Anything, nil, fakedRaffleID).
+			Return([]domain.RaffleWinner{
+				{ID: fakedRaffleWinnerID},
+			}, nil)
+
+		mockedRepo.On("Begin").Return(mockedTx, nil)
+
+		mockedRepo.
+			On("DeleteRaffleWinner", mock.Anything, mockedTx, fakedRaffleWinnerID).
+			Return(nil)
+
+		mockedRepo.
+			On("DeleteRaffle", mock.Anything, mockedTx, fakedRaffleID).
+			Return(nil)
+
+		mockedTx.On("Commit").Return(nil)
+		mockedTx.On("Rollback").Return()
+
+		ucase := usecases.RaffleUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		err := ucase.DeleteRaffle(context.Background(), fakedRaffleID)
+
+		require.NoError(t, err)
+
+		mockedRepo.AssertExpectations(t)
+		mockedTx.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockedRepo, _, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		ucase := usecases.RaffleUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		err := ucase.DeleteRaffle(context.Background(), fakedRaffleID)
+
+		require.ErrorIs(t, err, domain.ErrNoOwnership)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+}
