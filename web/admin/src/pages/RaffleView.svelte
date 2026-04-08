@@ -94,10 +94,6 @@
 
     eventSource.addEventListener("CONTENDER_ENTERED", invalidateContenders);
     eventSource.addEventListener(
-      "CONTENDER_PUBLIC_INFO_UPDATED",
-      invalidateContenders,
-    );
-    eventSource.addEventListener(
       "CONTENDER_DISQUALIFIED",
       invalidateContenders,
     );
