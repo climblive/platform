@@ -71,9 +71,11 @@
 
   const winnersCount = $derived(raffleWinnersQuery.data?.length ?? 0);
 
-  const allWinnersDrawn = $derived(
-    eligibleCount !== undefined && winnersCount >= eligibleCount,
+  const remaining = $derived(
+    eligibleCount !== undefined ? eligibleCount - winnersCount : undefined,
   );
+
+  const allWinnersDrawn = $derived(remaining !== undefined && remaining <= 0);
 
   $effect(() => {
     const contestId = raffle?.contestId;
@@ -148,8 +150,13 @@
     </wa-callout>
   {:else}
     <wa-button variant="neutral" onclick={handleDrawWinner}
-      >Draw winner {#if eligibleCount !== undefined}{winnersCount + 1} of {eligibleCount}{/if}</wa-button
+      >Draw winner</wa-button
     >
+    {#if remaining !== undefined}
+      <small class="remaining"
+        >{remaining} more eligible winners remaining</small
+      >
+    {/if}
   {/if}
 {/snippet}
 
@@ -201,13 +208,13 @@
 
 <style>
   section {
-    gap: var(--wa-space-xs);
-    justify-content: start;
-  }
-
-  section {
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-m);
+    justify-content: start;
+  }
+
+  .remaining {
+    color: var(--wa-color-neutral-600);
   }
 </style>
