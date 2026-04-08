@@ -144,8 +144,7 @@
     background-color: var(--wa-color-surface-raised);
   }
 
-  tbody tr:has(:state(checked)),
-  tbody tr:has([checked]) {
+  :global(tbody tr:has(:state(checked))) {
     background-color: var(--wa-color-surface-raised);
   }
 
