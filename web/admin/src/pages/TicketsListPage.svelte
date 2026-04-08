@@ -238,7 +238,7 @@
   <h1>Tickets</h1>
 
   <p class="copy">
-    Tickets contain registration codes that allow the contenders to enter your
+    Tickets contain registration codes that allow contenders to enter your
     contest. These tickets may be printed on paper and distributed to the
     contenders on site.
     {#if contenders && contenders.length > 0}
