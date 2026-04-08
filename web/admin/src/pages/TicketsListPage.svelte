@@ -14,8 +14,8 @@
   import type WaNumberInput from "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import { value } from "@climblive/lib/forms";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
+  import { value } from "@climblive/lib/forms";
   import type {
     Contender,
     CreateContendersArguments,
@@ -51,7 +51,7 @@
     contenders === undefined ? undefined : maxTickets - contenders.length,
   );
 
-  let registeredContenders = $derived.by(() => {
+  const registeredContenders = $derived.by(() => {
     if (!contenders) {
       return undefined;
     }
@@ -93,7 +93,7 @@
       return 0;
     }
 
-    return filteredContenders.filter((c) => c.id >= from && c.id <= to).length;
+    return filteredContenders.filter(({ id }) => isSelected(id)).length;
   });
 
   const isSelected = (id: number): boolean => {
@@ -154,11 +154,11 @@
   };
 
   const printUrl = $derived.by(() => {
-    if (selectionStartId !== undefined && selectionEndId !== undefined) {
-      return `/admin/contests/${contestId}/tickets/print?from=${selectionStartId}&to=${selectionEndId}`;
+    if (selectionStartId === undefined || selectionEndId === undefined) {
+      return undefined;
     }
 
-    return undefined;
+    return `/admin/contests/${contestId}/tickets/print?from=${selectionStartId}&to=${selectionEndId}`;
   });
 
   const handleOpenCreateDialog = async () => {
@@ -232,10 +232,10 @@
       width: "max-content",
     },
     {
-      label: "",
+      label: "Status",
       mobile: true,
       render: renderUsed,
-      width: "minmax(5rem, 1fr)",
+      width: "1fr",
       align: "right",
     },
   ];
@@ -301,8 +301,7 @@
     contenders on site.
     {#if contenders && contenders.length > 0}
       Out of the {contenders.length}
-      tickets that you have created, {registeredContenders} have already been
-      used.
+      tickets that you have created, {registeredContenders} have already been used.
     {/if}
   </p>
 
@@ -429,7 +428,7 @@
     margin-bottom: var(--wa-space-m);
   }
 
-  wa-badge[variant="success"] {
+  wa-badge {
     font-size: var(--wa-font-size-xs);
   }
 </style>
