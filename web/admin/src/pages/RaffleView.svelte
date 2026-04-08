@@ -154,7 +154,7 @@
     >
     {#if remaining !== undefined}
       <small class="remaining"
-        >{remaining} more eligible winners remaining</small
+        >{remaining} more eligible winners remaining.</small
       >
     {/if}
   {/if}
@@ -215,6 +215,7 @@
   }
 
   .remaining {
-    color: var(--wa-color-neutral-600);
+    color: var(--wa-color-text-quiet);
+    text-align: right;
   }
 </style>
