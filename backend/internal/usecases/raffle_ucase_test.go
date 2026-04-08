@@ -492,8 +492,10 @@ func TestDrawRaffleWinner(t *testing.T) {
 				EventBroker: mockedEventBroker,
 			}
 
-			_, err := ucase.DrawRaffleWinner(context.Background(), fakedRaffleID)
+			winner, err := ucase.DrawRaffleWinner(context.Background(), fakedRaffleID)
 			require.NoError(t, err)
+
+			assert.Equal(t, domain.ContenderID(0), winner.ContenderID)
 
 			mockedRepo.AssertExpectations(t)
 			mockedEventBroker.AssertExpectations(t)
