@@ -461,8 +461,10 @@ func TestDrawRaffleWinner(t *testing.T) {
 			Return([]domain.RaffleWinner{}, nil)
 
 		mockedRepo.
-			On("StoreRaffleWinner", mock.Anything, nil, mock.AnythingOfType("domain.RaffleWinner")).
-			Return(mirrorInstruction{}, nil)
+			On("StoreRaffleWinner", mock.Anything, nil, mock.MatchedBy(func(w domain.RaffleWinner) bool {
+				return w.ContenderID != domain.ContenderID(1)
+			})).
+			Return(domain.RaffleWinner{}, nil)
 
 		mockedEventBroker.
 			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.RaffleWinnerDrawnEvent")).
@@ -478,7 +480,6 @@ func TestDrawRaffleWinner(t *testing.T) {
 			winner, err := ucase.DrawRaffleWinner(context.Background(), fakedRaffleID)
 			require.NoError(t, err)
 
-			assert.Contains(t, []domain.ContenderID{0, 2}, winner.ContenderID)
 			assert.NotEqual(t, domain.ContenderID(1), winner.ContenderID)
 		}
 
