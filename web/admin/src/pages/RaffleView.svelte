@@ -64,8 +64,9 @@
       return undefined;
     }
 
-    return contenders.filter((c) => c.entered !== undefined && !c.disqualified)
-      .length;
+    return contenders.filter(
+      ({ entered, disqualified }) => entered !== undefined && !disqualified,
+    ).length;
   });
 
   const winnersCount = $derived(raffleWinnersQuery.data?.length ?? 0);
