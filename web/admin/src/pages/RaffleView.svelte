@@ -152,11 +152,6 @@
     <wa-button variant="neutral" onclick={handleDrawWinner}
       >Draw winner</wa-button
     >
-    {#if remaining !== undefined}
-      <small class="remaining"
-        >{remaining} more eligible winners remaining.</small
-      >
-    {/if}
   {/if}
 {/snippet}
 
@@ -182,6 +177,11 @@
     {#if sortedRaffleWinners === undefined}
       <Loader />
     {:else if sortedRaffleWinners.length > 0}
+      {#if remaining !== undefined && !allWinnersDrawn}
+        <small class="remaining"
+          >{remaining} more eligible winners remaining.</small
+        >
+      {/if}
       {@render drawButton()}
       <Table
         {columns}
