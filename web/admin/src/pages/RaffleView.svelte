@@ -71,11 +71,9 @@
 
   const winnersCount = $derived(raffleWinnersQuery.data?.length ?? 0);
 
-  const remaining = $derived(
-    eligibleCount !== undefined ? eligibleCount - winnersCount : undefined,
+  const allWinnersDrawn = $derived(
+    eligibleCount !== undefined && winnersCount >= eligibleCount,
   );
-
-  const allWinnersDrawn = $derived(remaining !== undefined && remaining <= 0);
 
   $effect(() => {
     const contestId = raffle?.contestId;
@@ -177,11 +175,6 @@
     {#if sortedRaffleWinners === undefined}
       <Loader />
     {:else if sortedRaffleWinners.length > 0}
-      {#if remaining !== undefined && !allWinnersDrawn}
-        <small class="remaining"
-          >{remaining} more eligible winners remaining.</small
-        >
-      {/if}
       {@render drawButton()}
       <Table
         {columns}
@@ -212,10 +205,5 @@
     flex-direction: column;
     gap: var(--wa-space-m);
     justify-content: start;
-  }
-
-  .remaining {
-    color: var(--wa-color-text-quiet);
-    text-align: right;
   }
 </style>
