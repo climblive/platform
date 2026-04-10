@@ -232,12 +232,14 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 		events = append(events, publicInfoEvent)
 	}
 
-	if contender, err = uc.Repo.StoreContender(ctx, nil, contender); err != nil {
-		return mty, errors.Wrap(err, 0)
-	}
+	if len(events) > 0 {
+		if contender, err = uc.Repo.StoreContender(ctx, nil, contender); err != nil {
+			return mty, errors.Wrap(err, 0)
+		}
 
-	for _, event := range events {
-		uc.EventBroker.Dispatch(contest.ID, event)
+		for _, event := range events {
+			uc.EventBroker.Dispatch(contest.ID, event)
+		}
 	}
 
 	return withScore(contender, uc.ScoreKeeper), nil
