@@ -191,17 +191,21 @@
 {/snippet}
 
 {#snippet createButton(className?: string)}
-  <wa-button
-    class={className}
-    variant="neutral"
-    onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
-    disabled={limitReached}>Create new contest</wa-button
-  >
   {#if limitReached}
-    <wa-callout variant="warning">
-      <wa-icon slot="icon" name="circle-pause"></wa-icon>
-      You have reached the maximum of {maxContestsPerWeek} contests per week.
-    </wa-callout>
+    <wa-tooltip
+      content="Maximum of {maxContestsPerWeek} contests per week reached"
+    >
+      <wa-button class={className} variant="neutral" disabled
+        >Create new contest</wa-button
+      >
+    </wa-tooltip>
+  {:else}
+    <wa-button
+      class={className}
+      variant="neutral"
+      onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
+      >Create new contest</wa-button
+    >
   {/if}
 {/snippet}
 

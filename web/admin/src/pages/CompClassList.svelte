@@ -4,6 +4,7 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import WaDropdownItem from "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
   import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
+  import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
   import {
     EmptyState,
     Table,
@@ -111,10 +112,13 @@
 
 {#snippet createButton()}
   {#if limitReached}
-    <wa-callout variant="warning">
-      <wa-icon slot="icon" name="circle-pause"></wa-icon>
-      You have reached the maximum of {maxCompClasses} classes per contest.
-    </wa-callout>
+    <wa-tooltip
+      content="Maximum of {maxCompClasses} classes per contest reached"
+    >
+      <wa-button variant="neutral" appearance="accent" disabled
+        >Create class</wa-button
+      >
+    </wa-tooltip>
   {:else}
     <wa-button
       variant="neutral"

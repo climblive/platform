@@ -3,6 +3,7 @@
   import { type WaSelectEvent } from "@awesome.me/webawesome";
   import WaDropdownItem from "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
   import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
+  import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
   import {
     EmptyState,
     HoldColorIndicator,
@@ -207,10 +208,11 @@
 
 {#snippet createButton()}
   {#if limitReached}
-    <wa-callout variant="warning">
-      <wa-icon slot="icon" name="circle-pause"></wa-icon>
-      You have reached the maximum of {maxProblems} problems per contest.
-    </wa-callout>
+    <wa-tooltip content="Maximum of {maxProblems} problems per contest reached">
+      <wa-button variant="neutral" appearance="accent" disabled
+        >Create problem</wa-button
+      >
+    </wa-tooltip>
   {:else}
     <wa-button
       variant="neutral"
