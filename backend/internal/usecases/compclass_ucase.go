@@ -8,6 +8,8 @@ import (
 	"github.com/go-errors/errors"
 )
 
+const maxCompClassesPerContest = 20
+
 type compClassUseCaseRepository interface {
 	domain.Transactor
 
@@ -59,7 +61,7 @@ func (uc *CompClassUseCase) CreateCompClass(ctx context.Context, contestID domai
 			return domain.CompClass{}, errors.Wrap(err, 0)
 		}
 
-		if len(compClasses) >= domain.MaxCompClassesPerContest {
+		if len(compClasses) >= maxCompClassesPerContest {
 			return domain.CompClass{}, errors.New(domain.ErrLimitExceeded)
 		}
 	}

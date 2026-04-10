@@ -11,6 +11,8 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 )
 
+const maxContestsPerWeek = 10
+
 type contestUseCaseRepository interface {
 	domain.Transactor
 
@@ -256,7 +258,7 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 			}
 		}
 
-		if recentCount >= domain.MaxContestsPerWeek {
+		if recentCount >= maxContestsPerWeek {
 			return domain.Contest{}, errors.New(domain.ErrLimitExceeded)
 		}
 	}

@@ -10,6 +10,8 @@ import (
 	"github.com/go-errors/errors"
 )
 
+const maxRafflesPerContest = 10
+
 type raffleUseCaseRepository interface {
 	domain.Transactor
 
@@ -78,7 +80,7 @@ func (uc *RaffleUseCase) CreateRaffle(ctx context.Context, contestID domain.Cont
 			return domain.Raffle{}, errors.Wrap(err, 0)
 		}
 
-		if len(raffles) >= domain.MaxRafflesPerContest {
+		if len(raffles) >= maxRafflesPerContest {
 			return domain.Raffle{}, errors.New(domain.ErrLimitExceeded)
 		}
 	}

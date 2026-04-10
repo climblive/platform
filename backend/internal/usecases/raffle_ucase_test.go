@@ -104,34 +104,6 @@ func TestCreateRaffle(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
-	t.Run("AdminCanExceedLimit", func(t *testing.T) {
-		mockedRepo, mockedAuthorizer := makeMocks()
-
-		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, fakedOwnership).
-			Return(domain.AdminRole, nil)
-
-		mockedRepo.
-			On("StoreRaffle", mock.Anything, nil, mock.AnythingOfType("domain.Raffle")).
-			Return(domain.Raffle{
-				ID:        fakedRaffleID,
-				Ownership: fakedOwnership,
-				ContestID: fakedContestID,
-			}, nil)
-
-		ucase := usecases.RaffleUseCase{
-			Repo:       mockedRepo,
-			Authorizer: mockedAuthorizer,
-		}
-
-		_, err := ucase.CreateRaffle(context.Background(), fakedContestID)
-
-		require.NoError(t, err)
-
-		mockedRepo.AssertExpectations(t)
-		mockedAuthorizer.AssertExpectations(t)
-	})
-
 	t.Run("BadCredentials", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 

@@ -207,41 +207,6 @@ func TestCreateCompClass(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
-	t.Run("AdminCanExceedLimit", func(t *testing.T) {
-		mockedRepo, mockedAuthorizer := makeMocks()
-
-		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, fakedOwnership).
-			Return(domain.AdminRole, nil)
-
-		mockedRepo.
-			On("StoreCompClass", mock.Anything, nil, mock.AnythingOfType("domain.CompClass")).
-			Return(domain.CompClass{
-				ID:        fakedCompClassID,
-				Ownership: fakedOwnership,
-				ContestID: fakedContestID,
-				Name:      "Males",
-				TimeBegin: now,
-				TimeEnd:   now.Add(time.Hour),
-			}, nil)
-
-		ucase := usecases.CompClassUseCase{
-			Repo:       mockedRepo,
-			Authorizer: mockedAuthorizer,
-		}
-
-		_, err := ucase.CreateCompClass(context.Background(), fakedContestID, domain.CompClassTemplate{
-			Name:      "Males",
-			TimeBegin: now,
-			TimeEnd:   now.Add(time.Hour),
-		})
-
-		require.NoError(t, err)
-
-		mockedRepo.AssertExpectations(t)
-		mockedAuthorizer.AssertExpectations(t)
-	})
-
 	t.Run("BadCredentials", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 

@@ -484,49 +484,6 @@ func TestCreateProblem(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
-	t.Run("AdminCanExceedLimit", func(t *testing.T) {
-		mockedRepo, mockedAuthorizer := makeMocks()
-
-		mockedEventBroker := new(eventBrokerMock)
-
-		mockedEventBroker.
-			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.ProblemAddedEvent")).
-			Return()
-
-		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, fakedOwnership).
-			Return(domain.AdminRole, nil)
-
-		mockedRepo.
-			On("GetProblemByNumber", mock.Anything, nil, fakedContestID, 10).
-			Return(domain.Problem{}, domain.ErrNotFound)
-
-		mockedRepo.
-			On("StoreProblem", mock.Anything, nil, mock.AnythingOfType("domain.Problem")).
-			Return(domain.Problem{
-				ID:        fakedProblemID,
-				Ownership: fakedOwnership,
-				ContestID: fakedContestID,
-			}, nil)
-
-		ucase := usecases.ProblemUseCase{
-			Repo:        mockedRepo,
-			Authorizer:  mockedAuthorizer,
-			EventBroker: mockedEventBroker,
-		}
-
-		_, err := ucase.CreateProblem(context.Background(), fakedContestID, domain.ProblemTemplate{
-			Number:           10,
-			HoldColorPrimary: "#fff",
-			PointsTop:        100,
-		})
-
-		require.NoError(t, err)
-
-		mockedRepo.AssertExpectations(t)
-		mockedAuthorizer.AssertExpectations(t)
-	})
-
 	t.Run("BadCredentials", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 

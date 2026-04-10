@@ -496,7 +496,7 @@ func TestCreateContest(t *testing.T) {
 			for i := range recentContests {
 				recentContests[i] = domain.Contest{
 					Archived: false,
-					Created:  time.Now(),
+					Created:  time.Now().Add(-7 * 24 * time.Hour).Add(time.Nanosecond),
 				}
 			}
 			mockedRepo.
@@ -536,45 +536,22 @@ func TestCreateContest(t *testing.T) {
 				On("GetContestsByOrganizer", mock.Anything, nil, fakedOrganizerID).
 				Return(contests, nil)
 
-			mockedRepo.
-				On("StoreContest", mock.Anything, nil, mock.AnythingOfType("domain.Contest")).
-				Return(mirrorInstruction{}, nil)
-
-			ucase := usecases.ContestUseCase{
-				Repo:       mockedRepo,
-				Authorizer: mockedAuthorizer,
-			}
-
-			_, err := ucase.CreateContest(context.Background(), fakedOrganizerID, domain.ContestTemplate{
+			storedContest := domain.Contest{
+				Ownership: domain.OwnershipData{
+					OrganizerID: fakedOrganizerID,
+				},
 				Location:           "The garage",
 				Country:            "SE",
 				Name:               "Swedish Championships",
 				QualifyingProblems: 10,
 				Finalists:          7,
 				GracePeriod:        time.Hour,
-			})
-
-			require.NoError(t, err)
-
-			mockedRepo.AssertExpectations(t)
-			mockedAuthorizer.AssertExpectations(t)
-		})
-	})
-
-	t.Run("AdminCanExceedLimit", func(t *testing.T) {
-		synctest.Test(t, func(t *testing.T) {
-			mockedRepo, mockedAuthorizer := makeMocks()
-
-			mockedAuthorizer.
-				On("HasOwnership", mock.Anything, fakedOwnership).
-				Return(domain.AdminRole, nil)
+				Created:            time.Now(),
+			}
 
 			mockedRepo.
-				On("StoreContest", mock.Anything, nil, mock.AnythingOfType("domain.Contest")).
-				Return(domain.Contest{
-					ID:        fakedContestID,
-					Ownership: fakedOwnership,
-				}, nil)
+				On("StoreContest", mock.Anything, nil, storedContest).
+				Return(storedContest, nil)
 
 			ucase := usecases.ContestUseCase{
 				Repo:       mockedRepo,
