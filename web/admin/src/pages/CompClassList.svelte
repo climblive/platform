@@ -110,17 +110,18 @@
 {/snippet}
 
 {#snippet createButton()}
-  <wa-button
-    variant="neutral"
-    appearance="accent"
-    onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
-    disabled={limitReached}>Create class</wa-button
-  >
   {#if limitReached}
     <wa-callout variant="warning">
       <wa-icon slot="icon" name="circle-pause"></wa-icon>
       You have reached the maximum of {maxCompClasses} classes per contest.
     </wa-callout>
+  {:else}
+    <wa-button
+      variant="neutral"
+      appearance="accent"
+      onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
+      >Create class</wa-button
+    >
   {/if}
 {/snippet}
 

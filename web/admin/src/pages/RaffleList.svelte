@@ -84,17 +84,17 @@
 {/snippet}
 
 {#snippet createButton()}
-  <wa-button
-    variant="neutral"
-    appearance="accent"
-    onclick={handleCreateRaffle}
-    disabled={limitReached}>Start new raffle</wa-button
-  >
   {#if limitReached}
     <wa-callout variant="warning">
       <wa-icon slot="icon" name="circle-pause"></wa-icon>
       You have reached the maximum of {maxRaffles} raffles per contest.
     </wa-callout>
+  {:else}
+    <wa-button
+      variant="neutral"
+      appearance="accent"
+      onclick={handleCreateRaffle}>Start new raffle</wa-button
+    >
   {/if}
 {/snippet}
 

@@ -140,7 +140,7 @@
   );
 
   const limitReached = $derived.by(() => {
-    if (!contests) {
+    if (organizerId === undefined || !contests) {
       return false;
     }
 

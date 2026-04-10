@@ -146,20 +146,18 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 		return domain.Problem{}, errors.Wrap(err, 0)
 	}
 
-	role, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership)
+	_, err = uc.Authorizer.HasOwnership(ctx, contest.Ownership)
 	if err != nil {
 		return domain.Problem{}, errors.Wrap(err, 0)
 	}
 
-	if !role.OneOf(domain.AdminRole) {
-		problems, err := uc.Repo.GetProblemsByContest(ctx, nil, contestID)
-		if err != nil {
-			return domain.Problem{}, errors.Wrap(err, 0)
-		}
+	problems, err := uc.Repo.GetProblemsByContest(ctx, nil, contestID)
+	if err != nil {
+		return domain.Problem{}, errors.Wrap(err, 0)
+	}
 
-		if len(problems) >= maxProblemsPerContest {
-			return domain.Problem{}, errors.New(domain.ErrLimitExceeded)
-		}
+	if len(problems) >= maxProblemsPerContest {
+		return domain.Problem{}, errors.New(domain.ErrLimitExceeded)
 	}
 
 	_, err = uc.Repo.GetProblemByNumber(ctx, nil, contestID, tmpl.Number)

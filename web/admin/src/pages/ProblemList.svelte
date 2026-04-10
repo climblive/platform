@@ -206,17 +206,18 @@
 {/snippet}
 
 {#snippet createButton()}
-  <wa-button
-    variant="neutral"
-    appearance="accent"
-    onclick={() => navigate(`contests/${contestId}/new-problem`)}
-    disabled={limitReached}>Create problem</wa-button
-  >
   {#if limitReached}
     <wa-callout variant="warning">
       <wa-icon slot="icon" name="circle-pause"></wa-icon>
       You have reached the maximum of {maxProblems} problems per contest.
     </wa-callout>
+  {:else}
+    <wa-button
+      variant="neutral"
+      appearance="accent"
+      onclick={() => navigate(`contests/${contestId}/new-problem`)}
+      >Create problem</wa-button
+    >
   {/if}
 {/snippet}
 
