@@ -59,7 +59,7 @@
     disabled={limitReached}>Start new raffle</wa-button
   >
   {#if limitReached}
-    <wa-callout variant="neutral">
+    <wa-callout variant="warning">
       You have reached the maximum of {maxRaffles} raffles per contest.
     </wa-callout>
   {/if}

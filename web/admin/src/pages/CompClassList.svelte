@@ -117,7 +117,7 @@
     disabled={limitReached}>Create class</wa-button
   >
   {#if limitReached}
-    <wa-callout variant="neutral">
+    <wa-callout variant="warning">
       You have reached the maximum of {maxCompClasses} classes per contest.
     </wa-callout>
   {/if}

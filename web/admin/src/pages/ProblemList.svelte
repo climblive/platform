@@ -213,7 +213,7 @@
     disabled={limitReached}>Create problem</wa-button
   >
   {#if limitReached}
-    <wa-callout variant="neutral">
+    <wa-callout variant="warning">
       You have reached the maximum of {maxProblems} problems per contest.
     </wa-callout>
   {/if}

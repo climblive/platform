@@ -198,7 +198,7 @@
     disabled={limitReached}>Create new contest</wa-button
   >
   {#if limitReached}
-    <wa-callout variant="neutral">
+    <wa-callout variant="warning">
       You have reached the maximum of {maxContestsPerWeek} contests per week.
     </wa-callout>
   {/if}
