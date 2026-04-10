@@ -92,6 +92,7 @@
   >
   {#if limitReached}
     <wa-callout variant="warning">
+      <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
       You have reached the maximum of {maxRaffles} raffles per contest.
     </wa-callout>
   {/if}
