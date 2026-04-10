@@ -111,20 +111,17 @@
 {/snippet}
 
 {#snippet createButton()}
+  <wa-button
+    id="create-class-btn"
+    variant="neutral"
+    appearance="accent"
+    disabled={limitReached}
+    onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
+    >Create class</wa-button
+  >
   {#if limitReached}
-    <wa-tooltip
-      content="Maximum of {maxCompClasses} classes per contest reached"
-    >
-      <wa-button variant="neutral" appearance="accent" disabled
-        >Create class</wa-button
-      >
-    </wa-tooltip>
-  {:else}
-    <wa-button
-      variant="neutral"
-      appearance="accent"
-      onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
-      >Create class</wa-button
+    <wa-tooltip for="create-class-btn"
+      >Maximum of {maxCompClasses} classes per contest reached</wa-tooltip
     >
   {/if}
 {/snippet}

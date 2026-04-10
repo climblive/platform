@@ -85,17 +85,16 @@
 {/snippet}
 
 {#snippet createButton()}
+  <wa-button
+    id="create-raffle-btn"
+    variant="neutral"
+    appearance="accent"
+    disabled={limitReached}
+    onclick={handleCreateRaffle}>Start new raffle</wa-button
+  >
   {#if limitReached}
-    <wa-tooltip content="Maximum of {maxRaffles} raffles per contest reached">
-      <wa-button variant="neutral" appearance="accent" disabled
-        >Start new raffle</wa-button
-      >
-    </wa-tooltip>
-  {:else}
-    <wa-button
-      variant="neutral"
-      appearance="accent"
-      onclick={handleCreateRaffle}>Start new raffle</wa-button
+    <wa-tooltip for="create-raffle-btn"
+      >Maximum of {maxRaffles} raffles per contest reached</wa-tooltip
     >
   {/if}
 {/snippet}
