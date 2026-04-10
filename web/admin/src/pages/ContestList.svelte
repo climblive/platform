@@ -199,7 +199,7 @@
   >
   {#if limitReached}
     <wa-callout variant="warning">
-      <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
+      <wa-icon slot="icon" name="circle-pause"></wa-icon>
       You have reached the maximum of {maxContestsPerWeek} contests per week.
     </wa-callout>
   {/if}
