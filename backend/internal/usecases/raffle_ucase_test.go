@@ -370,47 +370,53 @@ func TestDrawRaffleWinner(t *testing.T) {
 	})
 
 	t.Run("MultipleContendersInRaffle", func(t *testing.T) {
-		mockedRepo, mockedEventBroker, mockedAuthorizer := makeMocks()
+		synctest.Test(t, func(t *testing.T) {
+			mockedRepo, mockedEventBroker, mockedAuthorizer := makeMocks()
 
-		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, fakedOwnership).
-			Return(domain.OrganizerRole, nil)
+			mockedAuthorizer.
+				On("HasOwnership", mock.Anything, fakedOwnership).
+				Return(domain.OrganizerRole, nil)
 
-		mockedRepo.
-			On("GetContendersByContest", mock.Anything, nil, fakedContestID).
-			Return(makeContenders(5), nil)
+			mockedRepo.
+				On("GetContendersByContest", mock.Anything, nil, fakedContestID).
+				Return(makeContenders(5), nil)
 
-		mockedRepo.
-			On("GetRaffleWinners", mock.Anything, nil, fakedRaffleID).
-			Return([]domain.RaffleWinner{}, nil)
+			mockedRepo.
+				On("GetRaffleWinners", mock.Anything, nil, fakedRaffleID).
+				Return([]domain.RaffleWinner{}, nil)
 
-		storeWinnerCall := mockedRepo.
-			On("StoreRaffleWinner", mock.Anything, nil, mock.AnythingOfType("domain.RaffleWinner")).
-			Return(domain.RaffleWinner{}, nil)
-		storeWinnerCall.Run(func(args mock.Arguments) {
-			storeWinnerCall.ReturnArguments = mock.Arguments{args.Get(2).(domain.RaffleWinner), nil}
+			for k := range 5 {
+				mockedRepo.
+					On("StoreRaffleWinner", mock.Anything, nil, domain.RaffleWinner{
+						Ownership:   fakedOwnership,
+						RaffleID:    fakedRaffleID,
+						ContenderID: domain.ContenderID(k),
+						Timestamp:   time.Now(),
+					}).
+					Return(domain.RaffleWinner{}, nil)
+			}
+
+			mockedEventBroker.
+				On("Dispatch", fakedContestID, mock.AnythingOfType("domain.RaffleWinnerDrawnEvent")).
+				Return()
+
+			ucase := usecases.RaffleUseCase{
+				Repo:        mockedRepo,
+				Authorizer:  mockedAuthorizer,
+				EventBroker: mockedEventBroker,
+			}
+
+			for range 1_000 {
+				winner, err := ucase.DrawRaffleWinner(context.Background(), fakedRaffleID)
+				require.NoError(t, err)
+
+				assert.Contains(t, []domain.ContenderID{0, 1, 2, 3, 4}, winner.ContenderID)
+			}
+
+			mockedRepo.AssertExpectations(t)
+			mockedEventBroker.AssertExpectations(t)
+			mockedAuthorizer.AssertExpectations(t)
 		})
-
-		mockedEventBroker.
-			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.RaffleWinnerDrawnEvent")).
-			Return()
-
-		ucase := usecases.RaffleUseCase{
-			Repo:        mockedRepo,
-			Authorizer:  mockedAuthorizer,
-			EventBroker: mockedEventBroker,
-		}
-
-		for range 100 {
-			winner, err := ucase.DrawRaffleWinner(context.Background(), fakedRaffleID)
-			require.NoError(t, err)
-
-			assert.Contains(t, []domain.ContenderID{0, 1, 2, 3, 4}, winner.ContenderID)
-		}
-
-		mockedRepo.AssertExpectations(t)
-		mockedEventBroker.AssertExpectations(t)
-		mockedAuthorizer.AssertExpectations(t)
 	})
 
 	t.Run("NoRegisteredContenders", func(t *testing.T) {
