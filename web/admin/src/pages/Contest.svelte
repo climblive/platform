@@ -136,10 +136,6 @@
       <wa-divider></wa-divider>
       <CompClassList {contestId} />
 
-      <h2>Tickets</h2>
-      <wa-divider></wa-divider>
-      <TicketList {contestId} />
-
       <h2 bind:this={problemsHeading}>Problems</h2>
       <wa-divider></wa-divider>
       <ProblemList
@@ -149,6 +145,10 @@
           ? undefined
           : 8}
       />
+
+      <h2>Tickets</h2>
+      <wa-divider></wa-divider>
+      <TicketList {contestId} />
 
       <h2>Raffles</h2>
       <wa-divider></wa-divider>

@@ -4,6 +4,7 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import WaDropdownItem from "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
   import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
+  import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
   import {
     EmptyState,
     Table,
@@ -15,6 +16,9 @@
   import { navigate } from "svelte-routing";
   import DeleteCompClass from "./DeleteCompClass.svelte";
 
+  const maxCompClasses = 20;
+  const createButtonId = $props.id();
+
   interface Props {
     contestId: number;
   }
@@ -24,6 +28,10 @@
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
 
   let compClasses = $derived(compClassesQuery.data);
+
+  const limitReached = $derived(
+    compClasses !== undefined && compClasses.length >= maxCompClasses,
+  );
 
   const columns: ColumnDefinition<CompClass>[] = [
     {
@@ -105,11 +113,18 @@
 
 {#snippet createButton()}
   <wa-button
+    id={createButtonId}
     variant="neutral"
     appearance="accent"
+    disabled={limitReached}
     onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
     >Create class</wa-button
   >
+  {#if limitReached}
+    <wa-tooltip for={createButtonId} placement="top-start"
+      >Maximum of {maxCompClasses} classes per contest reached.</wa-tooltip
+    >
+  {/if}
 {/snippet}
 
 <p class="copy">
