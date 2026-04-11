@@ -13,6 +13,7 @@
   import {
     getAllContestsQuery,
     getContestsByOrganizerQuery,
+    getSelfQuery,
   } from "@climblive/lib/queries";
   import { getCountryName, getFlag, SyncedTime } from "@climblive/lib/utils";
   import { format, sub } from "date-fns";
@@ -37,6 +38,8 @@
     return () => time.stop();
   });
 
+  const selfQuery = $derived(getSelfQuery());
+
   const contestsQuery = $derived(
     getContestsByOrganizerQuery(organizerId ?? 0, {
       enabled: organizerId !== undefined,
@@ -46,6 +49,7 @@
     getAllContestsQuery({ enabled: organizerId === undefined }),
   );
 
+  const self = $derived(selfQuery.data);
   const contests = $derived(
     organizerId === undefined ? allContestsQuery.data : contestsQuery.data,
   );
@@ -140,7 +144,11 @@
   );
 
   const limitReached = $derived.by(() => {
-    if (organizerId === undefined || !contests) {
+    if (!contests) {
+      return false;
+    }
+
+    if (self?.admin) {
       return false;
     }
 
