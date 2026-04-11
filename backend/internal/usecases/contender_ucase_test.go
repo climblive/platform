@@ -687,6 +687,32 @@ func TestPatchContender(t *testing.T) {
 				TimeEnd:   currentTime.Add(time.Hour),
 			}, nil)
 
+		mockedRepo.
+			On("StoreContender", mock.Anything, mock.Anything,
+				domain.Contender{
+					ID:                  fakedContenderID,
+					Ownership:           fakedOwnership,
+					ContestID:           fakedContestID,
+					CompClassID:         fakedCompClassID,
+					RegistrationCode:    "ABCD1234",
+					Name:                "John Doe",
+					Entered:             currentTime,
+					WithdrawnFromFinals: false,
+					Disqualified:        false,
+				},
+			).
+			Return(domain.Contender{
+				ID:                  fakedContenderID,
+				Ownership:           fakedOwnership,
+				ContestID:           fakedContestID,
+				CompClassID:         fakedCompClassID,
+				RegistrationCode:    "ABCD1234",
+				Name:                "John Doe",
+				Entered:             currentTime,
+				WithdrawnFromFinals: false,
+				Disqualified:        false,
+			}, nil)
+
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.ContenderRole, nil)
