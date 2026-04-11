@@ -22,6 +22,7 @@
   import DeleteProblem from "./DeleteProblem.svelte";
 
   const maxProblems = 100;
+  const createButtonId = $props.id();
 
   interface Props {
     contestId: number;
@@ -208,7 +209,7 @@
 
 {#snippet createButton()}
   <wa-button
-    id="create-problem-btn"
+    id={createButtonId}
     variant="neutral"
     appearance="accent"
     disabled={limitReached}
@@ -216,8 +217,8 @@
     >Create problem</wa-button
   >
   {#if limitReached}
-    <wa-tooltip for="create-problem-btn" placement="top-start"
-      >Maximum of {maxProblems} problems per contest reached</wa-tooltip
+    <wa-tooltip for={createButtonId} placement="top-start"
+      >Maximum of {maxProblems} problems per contest reached.</wa-tooltip
     >
   {/if}
 {/snippet}

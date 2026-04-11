@@ -20,6 +20,7 @@
   import DeleteRaffle from "./DeleteRaffle.svelte";
 
   const maxRaffles = 10;
+  const createButtonId = $props.id();
 
   interface Props {
     contestId: number;
@@ -86,15 +87,15 @@
 
 {#snippet createButton()}
   <wa-button
-    id="create-raffle-btn"
+    id={createButtonId}
     variant="neutral"
     appearance="accent"
     disabled={limitReached}
     onclick={handleCreateRaffle}>Start new raffle</wa-button
   >
   {#if limitReached}
-    <wa-tooltip for="create-raffle-btn" placement="top-start"
-      >Maximum of {maxRaffles} raffles per contest reached</wa-tooltip
+    <wa-tooltip for={createButtonId} placement="top-start"
+      >Maximum of {maxRaffles} raffles per contest reached.</wa-tooltip
     >
   {/if}
 {/snippet}

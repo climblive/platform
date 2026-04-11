@@ -17,6 +17,7 @@
   import DeleteCompClass from "./DeleteCompClass.svelte";
 
   const maxCompClasses = 20;
+  const createButtonId = $props.id();
 
   interface Props {
     contestId: number;
@@ -112,7 +113,7 @@
 
 {#snippet createButton()}
   <wa-button
-    id="create-class-btn"
+    id={createButtonId}
     variant="neutral"
     appearance="accent"
     disabled={limitReached}
@@ -120,8 +121,8 @@
     >Create class</wa-button
   >
   {#if limitReached}
-    <wa-tooltip for="create-class-btn" placement="top-start"
-      >Maximum of {maxCompClasses} classes per contest reached</wa-tooltip
+    <wa-tooltip for={createButtonId} placement="top-start"
+      >Maximum of {maxCompClasses} classes per contest reached.</wa-tooltip
     >
   {/if}
 {/snippet}

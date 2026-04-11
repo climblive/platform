@@ -21,6 +21,7 @@
   import { Link, navigate } from "svelte-routing";
 
   const maxContestsPerWeek = 10;
+  const createButtonId = $props.id();
 
   interface Props {
     organizerId: number | undefined;
@@ -200,7 +201,7 @@
 
 {#snippet createButton(className?: string)}
   <wa-button
-    id="create-contest-btn"
+    id={createButtonId}
     class={className}
     variant="neutral"
     disabled={limitReached}
@@ -208,8 +209,8 @@
     >Create new contest</wa-button
   >
   {#if limitReached}
-    <wa-tooltip for="create-contest-btn" placement="top-start"
-      >Maximum of {maxContestsPerWeek} contests per week reached</wa-tooltip
+    <wa-tooltip for={createButtonId} placement="top-start"
+      >Maximum of {maxContestsPerWeek} contests per week reached.</wa-tooltip
     >
   {/if}
 {/snippet}
