@@ -4,6 +4,7 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import WaDropdownItem from "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
   import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
+  import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
   import {
     EmptyState,
     Table,
@@ -18,6 +19,9 @@
   import { Link, navigate } from "svelte-routing";
   import DeleteRaffle from "./DeleteRaffle.svelte";
 
+  const maxRaffles = 10;
+  const createButtonId = $props.id();
+
   interface Props {
     contestId: number;
   }
@@ -28,6 +32,10 @@
   const createRaffle = $derived(createRaffleMutation(contestId));
 
   let raffles = $derived(rafflesQuery.data);
+
+  const limitReached = $derived(
+    raffles !== undefined && raffles.length >= maxRaffles,
+  );
 
   const handleCreateRaffle = () => {
     createRaffle.mutate(undefined, {
@@ -78,9 +86,18 @@
 {/snippet}
 
 {#snippet createButton()}
-  <wa-button variant="neutral" appearance="accent" onclick={handleCreateRaffle}
-    >Start new raffle</wa-button
+  <wa-button
+    id={createButtonId}
+    variant="neutral"
+    appearance="accent"
+    disabled={limitReached}
+    onclick={handleCreateRaffle}>Start new raffle</wa-button
   >
+  {#if limitReached}
+    <wa-tooltip for={createButtonId} placement="top-start"
+      >Maximum of {maxRaffles} raffles per contest reached.</wa-tooltip
+    >
+  {/if}
 {/snippet}
 
 <p class="copy">
