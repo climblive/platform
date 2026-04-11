@@ -200,7 +200,7 @@
     >Create new contest</wa-button
   >
   {#if limitReached}
-    <wa-tooltip for="create-contest-btn"
+    <wa-tooltip for="create-contest-btn" placement="top-start"
       >Maximum of {maxContestsPerWeek} contests per week reached</wa-tooltip
     >
   {/if}

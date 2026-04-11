@@ -93,7 +93,7 @@
     onclick={handleCreateRaffle}>Start new raffle</wa-button
   >
   {#if limitReached}
-    <wa-tooltip for="create-raffle-btn"
+    <wa-tooltip for="create-raffle-btn" placement="top-start"
       >Maximum of {maxRaffles} raffles per contest reached</wa-tooltip
     >
   {/if}

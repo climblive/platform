@@ -120,7 +120,7 @@
     >Create class</wa-button
   >
   {#if limitReached}
-    <wa-tooltip for="create-class-btn"
+    <wa-tooltip for="create-class-btn" placement="top-start"
       >Maximum of {maxCompClasses} classes per contest reached</wa-tooltip
     >
   {/if}

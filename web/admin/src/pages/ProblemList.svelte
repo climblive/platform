@@ -216,7 +216,7 @@
     >Create problem</wa-button
   >
   {#if limitReached}
-    <wa-tooltip for="create-problem-btn"
+    <wa-tooltip for="create-problem-btn" placement="top-start"
       >Maximum of {maxProblems} problems per contest reached</wa-tooltip
     >
   {/if}
