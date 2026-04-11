@@ -1,7 +1,12 @@
 <script lang="ts">
+  import CreateTicketsDialog from "@/components/CreateTicketsDialog.svelte";
   import Loader from "@/components/Loader.svelte";
+  import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
   import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
+  import type WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
@@ -11,8 +16,9 @@
     getContendersByContestQuery,
     getContestQuery,
   } from "@climblive/lib/queries";
-  import { format } from "date-fns";
   import { Link, navigate } from "svelte-routing";
+
+  const maxTickets = 500;
 
   interface Props {
     contestId: number;
@@ -26,25 +32,141 @@
   const contest = $derived(contestQuery.data);
   const contenders = $derived(contendersQuery.data);
 
+  let createTicketsDialog: CreateTicketsDialog | undefined = $state();
+
+  const remainingCodes = $derived(
+    contenders === undefined ? undefined : maxTickets - contenders.length,
+  );
+
+  const registeredContenders = $derived.by(() => {
+    if (!contenders) {
+      return undefined;
+    }
+
+    let count = 0;
+
+    for (const contender of contenders) {
+      if (contender.entered !== undefined) {
+        count += 1;
+      }
+    }
+
+    return count;
+  });
+
   let showUnusedOnly = $state(false);
+  let selectionStartId: number | undefined = $state(undefined);
+  let selectionEndId: number | undefined = $state(undefined);
 
   const filteredContenders = $derived.by(() => {
     if (!contenders) {
       return undefined;
     }
 
+    const sorted = [...contenders].sort((a, b) => a.id - b.id);
+
     if (showUnusedOnly) {
-      return contenders.filter(({ entered }) => entered === undefined);
+      return sorted.filter(({ entered }) => entered === undefined);
     }
 
-    return contenders;
+    return sorted;
   });
+
+  const selectedCount = $derived.by(() => {
+    const from = selectionStartId;
+    const to = selectionEndId;
+
+    if (from === undefined || to === undefined || !filteredContenders) {
+      return 0;
+    }
+
+    return filteredContenders.filter(({ id }) => isSelected(id)).length;
+  });
+
+  const isSelected = (id: number): boolean => {
+    return (
+      selectionStartId !== undefined &&
+      selectionEndId !== undefined &&
+      id >= selectionStartId &&
+      id <= selectionEndId
+    );
+  };
+
+  const isLocked = (id: number): boolean => {
+    return isSelected(id) && id !== selectionStartId && id !== selectionEndId;
+  };
 
   const handleToggleUnusedOnly = (event: InputEvent) => {
     showUnusedOnly = (event.target as WaSwitch).checked;
+    selectionStartId = undefined;
+    selectionEndId = undefined;
+  };
+
+  const handleCheckboxChange = (id: number, event: InputEvent) => {
+    const checkbox = event.target as WaCheckbox;
+
+    if (checkbox.checked) {
+      selectionStartId = Math.min(selectionStartId ?? id, id);
+      selectionEndId = Math.max(selectionEndId ?? id, id);
+    } else if (id === selectionStartId && id === selectionEndId) {
+      selectionStartId = undefined;
+      selectionEndId = undefined;
+    } else if (id === selectionStartId) {
+      selectionStartId = filteredContenders?.find((c) => c.id > id)?.id;
+    } else if (id === selectionEndId) {
+      selectionEndId = filteredContenders?.findLast((c) => c.id < id)?.id;
+    }
+  };
+
+  const allSelected = $derived(
+    filteredContenders !== undefined &&
+      filteredContenders.length > 0 &&
+      selectedCount === filteredContenders.length,
+  );
+
+  const handleToggleSelectAll = (event: InputEvent) => {
+    const checkbox = event.target as WaCheckbox;
+
+    if (
+      checkbox.checked &&
+      filteredContenders &&
+      filteredContenders.length > 0
+    ) {
+      selectionStartId = filteredContenders[0].id;
+      selectionEndId = filteredContenders[filteredContenders.length - 1].id;
+    } else {
+      selectionStartId = undefined;
+      selectionEndId = undefined;
+    }
+  };
+
+  const printUrl = $derived.by(() => {
+    if (selectionStartId === undefined || selectionEndId === undefined) {
+      return undefined;
+    }
+
+    return `/admin/contests/${contestId}/tickets/print?from=${selectionStartId}&to=${selectionEndId}`;
+  });
+
+  const handleCreated = (newContenders: Contender[]) => {
+    const ids = newContenders.map(({ id }) => id);
+    selectionStartId = Math.min(...ids);
+    selectionEndId = Math.max(...ids);
   };
 
   const columns: ColumnDefinition<Contender>[] = [
+    {
+      label: renderSelectAll,
+      mobile: true,
+      render: renderCheckbox,
+      width: "max-content",
+    },
+    {
+      label: "№",
+      mobile: true,
+      render: renderTicketNumber,
+      width: "max-content",
+    },
     {
       label: "Code",
       mobile: true,
@@ -52,44 +174,52 @@
       width: "max-content",
     },
     {
-      label: "Name",
-      mobile: true,
-      render: renderName,
-      width: "1fr",
-    },
-    {
-      label: "Used",
+      label: "Status",
       mobile: true,
       render: renderUsed,
-      width: "max-content",
-    },
-    {
-      label: "Entered",
-      mobile: false,
-      render: renderTimestamp,
-      width: "max-content",
+      width: "1fr",
+      align: "right",
     },
   ];
 </script>
 
-{#snippet renderRegistrationCode({ id, registrationCode }: Contender)}
-  <Link to={`/admin/contenders/${id}`}>{registrationCode}</Link>
+{#snippet renderSelectAll()}
+  <wa-checkbox
+    size="small"
+    checked={allSelected}
+    indeterminate={selectedCount > 0 && !allSelected}
+    onchange={handleToggleSelectAll}
+  ></wa-checkbox>
 {/snippet}
 
-{#snippet renderName({ name }: Contender)}
-  {name ?? "-"}
+{#snippet renderCheckbox(contender: Contender)}
+  <wa-checkbox
+    size="small"
+    checked={isSelected(contender.id)}
+    disabled={isLocked(contender.id)}
+    onchange={(e: InputEvent) => handleCheckboxChange(contender.id, e)}
+  ></wa-checkbox>
+{/snippet}
+
+{#snippet renderTicketNumber({ id }: Contender)}
+  #{id.toString().padStart(6, "0")}
+{/snippet}
+
+{#snippet renderRegistrationCode({ id, registrationCode }: Contender)}
+  <Link to={`/admin/contenders/${id}`}>
+    <wa-icon name="qrcode"></wa-icon>
+    <span class="regcode">{registrationCode}</span>
+  </Link>
 {/snippet}
 
 {#snippet renderUsed({ entered }: Contender)}
   {#if entered}
-    <wa-icon name="check"></wa-icon>
+    <wa-badge variant="success"
+      ><wa-icon slot="start" name="user-check"></wa-icon>Registered</wa-badge
+    >
   {:else}
-    -
+    <wa-badge variant="neutral" appearance="filled">Unused</wa-badge>
   {/if}
-{/snippet}
-
-{#snippet renderTimestamp({ entered }: Contender)}
-  {entered ? format(entered, "yyyy-MM-dd HH:mm") : "-"}
 {/snippet}
 
 {#if contest}
@@ -107,11 +237,56 @@
 
   <h1>Tickets</h1>
 
-  <wa-switch
-    size="small"
-    checked={showUnusedOnly}
-    onchange={handleToggleUnusedOnly}>Show unused only</wa-switch
-  >
+  <p class="copy">
+    Tickets contain registration codes that allow contenders to enter your
+    contest. These tickets may be printed on paper and distributed to the
+    contenders on site.
+    {#if contenders && contenders.length > 0}
+      Out of the {contenders.length}
+      tickets that you have created, {registeredContenders} have already been used.
+    {/if}
+  </p>
+
+  <div class="controls">
+    <div class="selection-actions">
+      <wa-button
+        size="small"
+        variant="neutral"
+        appearance="accent"
+        onclick={() => createTicketsDialog?.open()}
+        disabled={remainingCodes === undefined || remainingCodes === 0}
+      >
+        <wa-icon slot="start" name="plus"></wa-icon>
+        Create tickets</wa-button
+      >
+      <a href={printUrl} target="_blank">
+        <wa-button
+          size="small"
+          appearance="outlined"
+          disabled={selectedCount === 0}
+        >
+          <wa-icon name="print" slot="start"></wa-icon>
+          Print selected
+          {#if selectedCount > 0}
+            <wa-badge variant="neutral" pill>{selectedCount}</wa-badge>
+          {/if}
+        </wa-button>
+      </a>
+    </div>
+
+    <wa-switch
+      size="small"
+      checked={showUnusedOnly}
+      onchange={handleToggleUnusedOnly}>Show unused only</wa-switch
+    >
+  </div>
+
+  <CreateTicketsDialog
+    bind:this={createTicketsDialog}
+    {contestId}
+    {remainingCodes}
+    onCreated={handleCreated}
+  />
 
   {#if filteredContenders === undefined}
     <Loader />
@@ -126,7 +301,32 @@
     display: block;
   }
 
-  wa-switch {
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--wa-space-s);
     margin-block-end: var(--wa-space-m);
+  }
+
+  .selection-actions {
+    display: flex;
+    gap: var(--wa-space-xs);
+    align-items: center;
+  }
+
+  .regcode {
+    font-family: monospace;
+    font-size: var(--wa-font-size-m);
+  }
+
+  .copy {
+    color: var(--wa-color-text-quiet);
+    margin-bottom: var(--wa-space-m);
+  }
+
+  wa-badge {
+    font-size: var(--wa-font-size-xs);
   }
 </style>
