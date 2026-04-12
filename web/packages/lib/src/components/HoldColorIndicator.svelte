@@ -36,7 +36,7 @@
   .fill {
     height: 100%;
     width: 100%;
-    border-radius: 50%;
+    border-radius: var(--wa-border-radius-circle);
     overflow: hidden;
   }
 
