@@ -9,6 +9,7 @@
     tag?: string;
     header?: Snippet;
     footer?: Snippet;
+    indicator?: Snippet;
   }
 
   const {
@@ -18,6 +19,7 @@
     tag,
     header,
     footer,
+    indicator,
   }: Props = $props();
 </script>
 
@@ -29,6 +31,9 @@
     <h3>{title}</h3>
     {#if tag}
       <wa-badge pill variant="neutral">{tag}</wa-badge>
+    {/if}
+    {#if indicator}
+      {@render indicator()}
     {/if}
   </div>
 

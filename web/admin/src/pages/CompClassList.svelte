@@ -1,6 +1,10 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
+  import { type WaSelectEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import WaDropdownItem from "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
+  import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
+  import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
   import {
     EmptyState,
     Table,
@@ -12,6 +16,9 @@
   import { navigate } from "svelte-routing";
   import DeleteCompClass from "./DeleteCompClass.svelte";
 
+  const maxCompClasses = 20;
+  const createButtonId = $props.id();
+
   interface Props {
     contestId: number;
   }
@@ -21,6 +28,10 @@
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
 
   let compClasses = $derived(compClassesQuery.data);
+
+  const limitReached = $derived(
+    compClasses !== undefined && compClasses.length >= maxCompClasses,
+  );
 
   const columns: ColumnDefinition<CompClass>[] = [
     {
@@ -73,36 +84,47 @@
 {/snippet}
 
 {#snippet renderControls({ id }: CompClass)}
-  <div class="controls">
-    <wa-button
-      size="small"
-      appearance="plain"
-      onclick={() => navigate(`/admin/comp-classes/${id}/edit`)}
-    >
-      <wa-icon name="pencil" label="Edit"></wa-icon>
-    </wa-button>
-    <DeleteCompClass compClassId={id}>
-      {#snippet children({ deleteCompClass })}
-        <wa-button
-          size="small"
-          variant="danger"
-          appearance="plain"
-          onclick={deleteCompClass}
-        >
-          <wa-icon name="trash" label={`Delete comp class ${id}`}></wa-icon>
+  <DeleteCompClass compClassId={id}>
+    {#snippet children({ deleteCompClass })}
+      <wa-dropdown
+        onwa-select={(event: WaSelectEvent) => {
+          if ((event.detail.item as WaDropdownItem).value === "delete") {
+            deleteCompClass();
+          } else {
+            navigate(`/admin/comp-classes/${id}/edit`);
+          }
+        }}
+      >
+        <wa-button slot="trigger" size="small" appearance="plain">
+          <wa-icon name="ellipsis-vertical" label="Actions"></wa-icon>
         </wa-button>
-      {/snippet}
-    </DeleteCompClass>
-  </div>
+        <wa-dropdown-item value="edit">
+          <wa-icon slot="icon" name="pencil"></wa-icon>
+          Edit
+        </wa-dropdown-item>
+        <wa-dropdown-item value="delete" variant="danger">
+          <wa-icon slot="icon" name="trash"></wa-icon>
+          Delete
+        </wa-dropdown-item>
+      </wa-dropdown>
+    {/snippet}
+  </DeleteCompClass>
 {/snippet}
 
 {#snippet createButton()}
   <wa-button
+    id={createButtonId}
     variant="neutral"
     appearance="accent"
+    disabled={limitReached}
     onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
     >Create class</wa-button
   >
+  {#if limitReached}
+    <wa-tooltip for={createButtonId} placement="top-start"
+      >Maximum of {maxCompClasses} classes per contest reached.</wa-tooltip
+    >
+  {/if}
 {/snippet}
 
 <p class="copy">
@@ -130,14 +152,6 @@
 </section>
 
 <style>
-  .controls {
-    display: flex;
-
-    & wa-button:not(:last-of-type) {
-      margin-inline-end: var(--wa-space-xs);
-    }
-  }
-
   .copy {
     color: var(--wa-color-text-quiet);
   }

@@ -1,6 +1,8 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import { Timer } from "@climblive/lib/components";
   import type { Problem, Tick } from "@climblive/lib/models";
+  import { type ContestState } from "@climblive/lib/types";
   import { ordinalSuperscript } from "@climblive/lib/utils";
   import type { Snippet } from "svelte";
 
@@ -11,10 +13,26 @@
     placement: number | undefined;
     finalist: boolean;
     disqualified: boolean;
+    contestState: ContestState;
+    startTime: Date;
+    endTime: Date;
   }
 
-  const { ticks, problems, score, placement, finalist, disqualified }: Props =
-    $props();
+  const {
+    ticks,
+    problems,
+    score,
+    placement,
+    finalist,
+    disqualified,
+    contestState,
+    startTime,
+    endTime,
+  }: Props = $props();
+
+  const id = $props.id();
+
+  let showMore = $state(false);
 
   const tops = $derived(ticks.filter((tick) => tick.top).length);
 
@@ -48,20 +66,8 @@
   </div>
 {/snippet}
 
-{#snippet topsValue()}
-  <strong>{tops}</strong>/{totalProblems}
-{/snippet}
-
-{#snippet zonesValue()}
-  <strong>{zones}</strong>/{problemsWithZones.length}
-{/snippet}
-
-{#snippet flashesValue()}
-  <strong>{flashes}</strong>/{totalProblems}
-{/snippet}
-
-{#snippet scoreValue()}
-  <strong>{score}</strong> pts
+{#snippet pointsValue()}
+  <strong>{score}p</strong>
 {/snippet}
 
 {#snippet placementValue()}
@@ -74,17 +80,62 @@
   {/if}
 {/snippet}
 
+{#snippet timerValue()}
+  <strong>
+    {#if contestState === "NOT_STARTED"}
+      <Timer endTime={startTime} label="Starting in" hideLabel />
+    {:else}
+      <Timer {endTime} label="Time left" hideLabel />
+    {/if}
+  </strong>
+{/snippet}
+
+{#snippet topsValue()}
+  <strong>{tops}</strong>/{totalProblems}
+{/snippet}
+
+{#snippet zonesValue()}
+  <strong>{zones}</strong>/{problemsWithZones.length}
+{/snippet}
+
+{#snippet flashesValue()}
+  <strong>{flashes}</strong>/{totalProblems}
+{/snippet}
+
 {#snippet finalistValue()}
   <wa-icon name={finalist ? "medal" : "minus"}></wa-icon>
 {/snippet}
 
 <div class="summary">
-  {@render entry("Tops", topsValue)}
-  {@render entry("Zones", zonesValue, problemsWithZones.length === 0)}
-  {@render entry("Flashes", flashesValue)}
-  {@render entry("Score", scoreValue)}
-  {@render entry("Placement", placementValue)}
-  {@render entry("Finalist", finalistValue)}
+  <div class="grid">
+    {@render entry("Score", pointsValue)}
+    {@render entry("Placement", placementValue)}
+
+    {#if contestState === "NOT_STARTED"}
+      {@render entry("Starting in", timerValue)}
+    {:else}
+      {@render entry("Time left", timerValue)}
+    {/if}
+
+    {#if showMore}
+      <div {id} class="extra">
+        {@render entry("Tops", topsValue)}
+        {@render entry("Zones", zonesValue, problemsWithZones.length === 0)}
+        {@render entry("Flashes", flashesValue)}
+        {@render entry("Finalist", finalistValue)}
+      </div>
+    {/if}
+  </div>
+
+  <a
+    class="more-link"
+    href="#"
+    onclick={() => (showMore = !showMore)}
+    aria-expanded={showMore}
+    aria-controls={id}
+  >
+    {showMore ? "Less" : "More"}
+  </a>
 </div>
 
 <style>
@@ -94,10 +145,16 @@
       var(--wa-color-surface-border);
     border-radius: var(--wa-border-radius-m);
     padding: var(--wa-space-m);
-    margin-bottom: var(--wa-space-m);
+  }
+
+  .grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: var(--wa-space-m);
+  }
+
+  .extra {
+    display: contents;
   }
 
   .stat {
@@ -107,17 +164,16 @@
   }
 
   .label {
-    font-size: var(--wa-font-size-xs);
+    font-size: var(--wa-font-size-2xs);
     color: var(--wa-color-text-quiet);
-    margin-bottom: var(--wa-space-2xs);
+    margin-block-end: var(--wa-space-2xs);
   }
 
   .value {
-    font-size: 1em;
-    line-height: 1;
+    line-height: var(--wa-line-height-condensed);
 
     & strong {
-      font-size: 1.5em;
+      font-size: 1.25em;
       font-weight: var(--wa-font-weight-bold);
     }
 
@@ -128,5 +184,11 @@
 
   .stat.disabled {
     opacity: 0.5;
+  }
+
+  .more-link {
+    display: block;
+    margin-block-start: var(--wa-space-xs);
+    font-size: var(--wa-font-size-s);
   }
 </style>

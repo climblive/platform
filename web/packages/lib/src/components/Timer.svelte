@@ -1,21 +1,29 @@
 <script lang="ts">
   import { formatDistanceToNow, intervalToDuration } from "date-fns";
-  import { onDestroy, onMount } from "svelte";
-  import { uuidv4 } from "../utils";
+  import { onMount } from "svelte";
+  import { SyncedTime, uuidv4 } from "../utils";
 
   interface Props {
     endTime: Date;
     label: string;
     align?: "left" | "right";
+    hideLabel?: boolean;
   }
 
-  let { endTime, label, align = "left" }: Props = $props();
+  let { endTime, label, align = "left", hideLabel = false }: Props = $props();
 
-  let intervalTimerId: number;
+  const time = new SyncedTime(1_000);
+
+  onMount(() => {
+    time.start();
+
+    return () => time.stop();
+  });
+
   const labelId = uuidv4();
 
   const formatTimeRemaining = () => {
-    const now = new Date();
+    const now = new Date(time.current);
 
     if (endTime.getTime() - now.getTime() <= 0) {
       return "00:00:00";
@@ -34,33 +42,14 @@
     }
   };
 
-  let displayValue = $state(formatTimeRemaining());
-
-  const tick = () => {
-    displayValue = formatTimeRemaining();
-
-    const firefoxEarlyWakeUpCompensation = 1;
-
-    const drift = Date.now() % 1_000;
-    const next = 1_000 - drift + firefoxEarlyWakeUpCompensation;
-
-    intervalTimerId = setTimeout(tick, next);
-  };
-
-  onMount(() => {
-    tick();
-  });
-
-  onDestroy(() => {
-    clearInterval(intervalTimerId);
-  });
+  const displayValue = $derived(formatTimeRemaining());
 </script>
 
 <div class="timer" data-alignment={align}>
   <span role="timer" aria-live="off" aria-labelledby={labelId}
     >{displayValue}</span
   >
-  <label for="" id={labelId}>{label}</label>
+  <label class:hidden={hideLabel} for="" id={labelId}>{label}</label>
 </div>
 
 <style>
@@ -79,6 +68,10 @@
     & label {
       font-weight: var(--wa-font-weight-normal);
       font-size: 0.75em;
+
+      &.hidden {
+        display: none;
+      }
     }
   }
 

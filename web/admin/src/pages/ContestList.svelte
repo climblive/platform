@@ -13,10 +13,15 @@
   import {
     getAllContestsQuery,
     getContestsByOrganizerQuery,
+    getSelfQuery,
   } from "@climblive/lib/queries";
-  import { getCountryName, getFlag } from "@climblive/lib/utils";
-  import { format } from "date-fns";
+  import { getCountryName, getFlag, SyncedTime } from "@climblive/lib/utils";
+  import { format, sub } from "date-fns";
+  import { onMount } from "svelte";
   import { Link, navigate } from "svelte-routing";
+
+  const maxContestsPerWeek = 10;
+  const createButtonId = $props.id();
 
   interface Props {
     organizerId: number | undefined;
@@ -25,6 +30,16 @@
   let { organizerId }: Props = $props();
 
   let showArchived = $state(false);
+
+  const time = new SyncedTime(60_000);
+
+  onMount(() => {
+    time.start();
+
+    return () => time.stop();
+  });
+
+  const selfQuery = $derived(getSelfQuery());
 
   const contestsQuery = $derived(
     getContestsByOrganizerQuery(organizerId ?? 0, {
@@ -35,12 +50,13 @@
     getAllContestsQuery({ enabled: organizerId === undefined }),
   );
 
+  const self = $derived(selfQuery.data);
   const contests = $derived(
     organizerId === undefined ? allContestsQuery.data : contestsQuery.data,
   );
 
   const [ongoing, upcoming, past, archived] = $derived.by(() => {
-    const now = new Date();
+    const now = time.current;
 
     const ongoing: Contest[] = [];
     const upcoming: Contest[] = [];
@@ -127,6 +143,23 @@
       0,
     ),
   );
+
+  const limitReached = $derived.by(() => {
+    if (!contests) {
+      return false;
+    }
+
+    if (self?.admin) {
+      return false;
+    }
+
+    const oneWeekAgo = sub(new Date(), { weeks: 1 });
+    const recentCount = contests.filter(
+      (c) => !c.archived && c.created > oneWeekAgo,
+    ).length;
+
+    return recentCount >= maxContestsPerWeek;
+  });
 </script>
 
 {#snippet renderFlag({ id, country }: Contest)}
@@ -168,11 +201,18 @@
 
 {#snippet createButton(className?: string)}
   <wa-button
+    id={createButtonId}
     class={className}
     variant="neutral"
+    disabled={limitReached}
     onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
     >Create new contest</wa-button
   >
+  {#if limitReached}
+    <wa-tooltip for={createButtonId} placement="top-start"
+      >Maximum of {maxContestsPerWeek} contests per week reached.</wa-tooltip
+    >
+  {/if}
 {/snippet}
 
 <h2>Contests</h2>

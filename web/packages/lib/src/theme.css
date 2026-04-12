@@ -28,6 +28,8 @@
   --wa-border-width-s: var(--wa-border-width-m);
   --wa-form-control-required-content-color: var(--wa-color-danger-fill-loud);
   --wa-form-control-required-content-offset: 0.1em;
+
+  line-height: var(--wa-line-height-condensed);
 }
 
 body {

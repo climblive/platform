@@ -9,6 +9,8 @@ import (
 	"github.com/go-errors/errors"
 )
 
+const maxProblemsPerContest = 100
+
 type problemUseCaseRepository interface {
 	domain.Transactor
 
@@ -144,8 +146,18 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 		return domain.Problem{}, errors.Wrap(err, 0)
 	}
 
-	if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+	_, err = uc.Authorizer.HasOwnership(ctx, contest.Ownership)
+	if err != nil {
 		return domain.Problem{}, errors.Wrap(err, 0)
+	}
+
+	problems, err := uc.Repo.GetProblemsByContest(ctx, nil, contestID)
+	if err != nil {
+		return domain.Problem{}, errors.Wrap(err, 0)
+	}
+
+	if len(problems) >= maxProblemsPerContest {
+		return domain.Problem{}, errors.New(domain.ErrLimitExceeded)
 	}
 
 	_, err = uc.Repo.GetProblemByNumber(ctx, nil, contestID, tmpl.Number)
