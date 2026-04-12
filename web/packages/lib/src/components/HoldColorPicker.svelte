@@ -14,17 +14,16 @@
     placement: "top" | "bottom" | "left" | "right";
   }
 
-  const {
+  let {
     label,
+    value = $bindable(),
     required = false,
     allowClear = false,
     name,
     placement,
-    ...rest
   }: Props = $props();
 
   const id = $props.id();
-  let value = $state(rest.value);
 
   const colors = [
     "#6f3601",
@@ -74,7 +73,7 @@
 </script>
 
 <div class="hold-color-picker">
-  <label for={id} class:required>{label}</label>
+  <label class:required>{label}</label>
   <input bind:this={hiddenInput} type="hidden" {name} {required} {value} />
 
   <button {id} class="trigger-button" type="button">
@@ -82,7 +81,7 @@
   </button>
 
   <wa-popover bind:this={popover} for={id} {placement} distance={10}>
-    <div class="popup-content" role="listbox" aria-label="Color selection">
+    <div class="popup-content" role="menu" aria-label="Color selection">
       <div class="color-grid">
         {#each colors as color (color)}
           <button
@@ -91,8 +90,7 @@
             class:selected={value === color}
             onclick={() => handleColorSelect(color)}
             aria-label="Select color {color}"
-            role="option"
-            aria-selected={value === color}
+            role="menuitem"
           >
             <HoldColorIndicator
               --height="2rem"
@@ -123,7 +121,7 @@
     display: flex;
     flex-direction: column;
     justify-content: start;
-    gap: var(--wa-space-2xs);
+    gap: var(--wa-space-xs);
   }
 
   label {
@@ -144,6 +142,16 @@
     background: transparent;
     width: max-content;
     cursor: pointer;
+    padding: 0;
+    transition: opacity var(--wa-transition-fast);
+  }
+
+  .trigger-button:hover {
+    opacity: 0.8;
+  }
+
+  .trigger-button:active {
+    opacity: 0.6;
   }
 
   wa-popover::part(body) {

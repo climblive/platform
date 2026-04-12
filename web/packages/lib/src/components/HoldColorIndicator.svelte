@@ -27,10 +27,20 @@
     height: var(--height, 100%);
     width: var(--width, 100%);
     border-radius: var(--wa-border-radius-pill);
-    border: var(--wa-form-control-border-width)
-      var(--wa-form-control-border-style) var(--wa-form-control-border-color);
     box-sizing: border-box;
     overflow: hidden;
+    position: relative;
+  }
+
+  .indicator::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: var(--wa-border-radius-pill);
+    outline: var(--wa-form-control-border-width)
+      var(--wa-form-control-border-style) var(--wa-form-control-border-color);
+    outline-offset: calc(-1 * var(--wa-form-control-border-width));
+    pointer-events: none;
   }
 
   .fill {
