@@ -39,7 +39,9 @@
     border-radius: var(--wa-border-radius-pill);
     outline: var(--wa-form-control-border-width)
       var(--wa-form-control-border-style) var(--wa-form-control-border-color);
-    outline-offset: calc(-1 * var(--wa-form-control-border-width));
+    outline-offset: calc(
+      -1 * var(--wa-form-control-border-width) - var(--wa-space-3xs)
+    );
     pointer-events: none;
   }
 
