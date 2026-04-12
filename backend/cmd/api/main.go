@@ -73,10 +73,10 @@ func main() {
 
 	slog.SetDefault(slog.New(
 		tint.NewHandler(w, &tint.Options{
-			Level:       slog.LevelDebug,
-			TimeFormat:  time.Kitchen,
-			NoColor:     !isatty.IsTerminal(w.Fd()),
-			AddSource:   false,
+			Level:      slog.LevelDebug,
+			TimeFormat: time.Kitchen,
+			NoColor:    !isatty.IsTerminal(w.Fd()),
+			AddSource:  false,
 			ReplaceAttr: nil,
 		}),
 	))
