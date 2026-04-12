@@ -10,7 +10,9 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -89,7 +91,7 @@ func main() {
 
 	database, err := repository.NewDatabase(
 		os.Getenv("DB_USERNAME"),
-		os.Getenv("DB_PASSWORD"),
+		getSecret("DB_PASSWORD"),
 		os.Getenv("DB_HOST"),
 		dbPort,
 		os.Getenv("DB_DATABASE"))
@@ -191,6 +193,17 @@ func getScoreEngineMaxLifetime() time.Duration {
 	}
 
 	return maxLifetime
+}
+
+const secretsDir = "/secrets"
+
+func getSecret(name string) string {
+	data, err := os.ReadFile(filepath.Join(secretsDir, name))
+	if err == nil {
+		return strings.TrimSpace(string(data))
+	}
+
+	return os.Getenv(name)
 }
 
 func setupMux(

@@ -8,8 +8,8 @@ StartLimitBurst=5
 ExecStartPre=-/usr/bin/docker stop climblive-api
 ExecStartPre=-/usr/bin/docker rm climblive-api
 ExecStart=/usr/bin/docker run --name climblive-api --rm --network host \
+  -v /etc/climblive/secrets:/secrets:ro \
   --env DB_USERNAME=${DB_USERNAME} \
-  --env DB_PASSWORD=${DB_PASSWORD} \
   --env DB_HOST=${DB_HOST} \
   --env DB_PORT=${DB_PORT} \
   --env DB_DATABASE=${DB_DATABASE} \
