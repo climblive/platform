@@ -10,9 +10,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"strconv"
-	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -75,10 +73,10 @@ func main() {
 
 	slog.SetDefault(slog.New(
 		tint.NewHandler(w, &tint.Options{
-			Level:      slog.LevelDebug,
-			TimeFormat: time.Kitchen,
-			NoColor:    !isatty.IsTerminal(w.Fd()),
-			AddSource:  false,
+			Level:       slog.LevelDebug,
+			TimeFormat:  time.Kitchen,
+			NoColor:     !isatty.IsTerminal(w.Fd()),
+			AddSource:   false,
 			ReplaceAttr: nil,
 		}),
 	))
@@ -91,7 +89,7 @@ func main() {
 
 	database, err := repository.NewDatabase(
 		os.Getenv("DB_USERNAME"),
-		getSecret("DB_PASSWORD"),
+		os.Getenv("DB_PASSWORD"),
 		os.Getenv("DB_HOST"),
 		dbPort,
 		os.Getenv("DB_DATABASE"))
@@ -193,17 +191,6 @@ func getScoreEngineMaxLifetime() time.Duration {
 	}
 
 	return maxLifetime
-}
-
-const secretsDir = "/secrets"
-
-func getSecret(name string) string {
-	data, err := os.ReadFile(filepath.Join(secretsDir, name))
-	if err == nil {
-		return strings.TrimSpace(string(data))
-	}
-
-	return os.Getenv(name)
 }
 
 func setupMux(
