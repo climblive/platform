@@ -1,6 +1,6 @@
 server {
 	listen 443 ssl http2;
-	server_name climblive.com;
+	server_name climblive.com labs.climblive.com;
 
 	client_max_body_size 1M;
 
@@ -31,4 +31,10 @@ server {
 	listen 80;
 	server_name climblive.com;
 	return 301 https://climblive.com$request_uri;
+}
+
+server {
+	listen 80;
+	server_name labs.climblive.com;
+	return 301 https://labs.climblive.com$request_uri;
 }

@@ -3,6 +3,7 @@
   import { type WaSelectEvent } from "@awesome.me/webawesome";
   import WaDropdownItem from "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
   import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
+  import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
   import {
     EmptyState,
     HoldColorIndicator,
@@ -19,6 +20,9 @@
   import { navigate } from "svelte-routing";
   import CopyProblems from "./CopyProblems.svelte";
   import DeleteProblem from "./DeleteProblem.svelte";
+
+  const maxProblems = 100;
+  const createButtonId = $props.id();
 
   interface Props {
     contestId: number;
@@ -55,6 +59,11 @@
     return ascentsByProblem;
   });
   const contests = $derived(contestsQuery.data);
+
+  const limitReached = $derived(
+    problemsQuery.data !== undefined &&
+      problemsQuery.data.length >= maxProblems,
+  );
 
   type ProblemWithAscents = Problem & { ascents: number };
 
@@ -200,11 +209,18 @@
 
 {#snippet createButton()}
   <wa-button
+    id={createButtonId}
     variant="neutral"
     appearance="accent"
+    disabled={limitReached}
     onclick={() => navigate(`contests/${contestId}/new-problem`)}
     >Create problem</wa-button
   >
+  {#if limitReached}
+    <wa-tooltip for={createButtonId} placement="top-start"
+      >Maximum of {maxProblems} problems per contest reached.</wa-tooltip
+    >
+  {/if}
 {/snippet}
 
 <p class="copy">

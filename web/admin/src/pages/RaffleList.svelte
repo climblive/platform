@@ -1,6 +1,10 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
+  import { type WaSelectEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import WaDropdownItem from "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
+  import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
+  import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
   import {
     EmptyState,
     Table,
@@ -13,6 +17,10 @@
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import { Link, navigate } from "svelte-routing";
+  import DeleteRaffle from "./DeleteRaffle.svelte";
+
+  const maxRaffles = 10;
+  const createButtonId = $props.id();
 
   interface Props {
     contestId: number;
@@ -24,6 +32,10 @@
   const createRaffle = $derived(createRaffleMutation(contestId));
 
   let raffles = $derived(rafflesQuery.data);
+
+  const limitReached = $derived(
+    raffles !== undefined && raffles.length >= maxRaffles,
+  );
 
   const handleCreateRaffle = () => {
     createRaffle.mutate(undefined, {
@@ -38,6 +50,12 @@
       mobile: true,
       render: renderName,
     },
+    {
+      mobile: true,
+      render: renderControls,
+      align: "right",
+      width: "max-content",
+    },
   ];
 </script>
 
@@ -45,10 +63,41 @@
   <Link to={`/admin/raffles/${id}`}>Raffle {id}</Link>
 {/snippet}
 
+{#snippet renderControls({ id }: Raffle)}
+  <DeleteRaffle raffleId={id}>
+    {#snippet children({ deleteRaffle })}
+      <wa-dropdown
+        onwa-select={(event: WaSelectEvent) => {
+          if ((event.detail.item as WaDropdownItem).value === "delete") {
+            deleteRaffle();
+          }
+        }}
+      >
+        <wa-button slot="trigger" size="small" appearance="plain">
+          <wa-icon name="ellipsis-vertical" label="Actions"></wa-icon>
+        </wa-button>
+        <wa-dropdown-item value="delete" variant="danger">
+          <wa-icon slot="icon" name="trash"></wa-icon>
+          Delete
+        </wa-dropdown-item>
+      </wa-dropdown>
+    {/snippet}
+  </DeleteRaffle>
+{/snippet}
+
 {#snippet createButton()}
-  <wa-button variant="neutral" appearance="accent" onclick={handleCreateRaffle}
-    >Start new raffle</wa-button
+  <wa-button
+    id={createButtonId}
+    variant="neutral"
+    appearance="accent"
+    disabled={limitReached}
+    onclick={handleCreateRaffle}>Start new raffle</wa-button
   >
+  {#if limitReached}
+    <wa-tooltip for={createButtonId} placement="top-start"
+      >Maximum of {maxRaffles} raffles per contest reached.</wa-tooltip
+    >
+  {/if}
 {/snippet}
 
 <p class="copy">

@@ -11,6 +11,8 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 )
 
+const maxContestsPerWeek = 10
+
 type contestUseCaseRepository interface {
 	domain.Transactor
 
@@ -238,8 +240,28 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
-	if _, err := uc.Authorizer.HasOwnership(ctx, organizer.Ownership); err != nil {
+	role, err := uc.Authorizer.HasOwnership(ctx, organizer.Ownership)
+	if err != nil {
 		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	if !role.OneOf(domain.AdminRole) {
+		contests, err := uc.Repo.GetContestsByOrganizer(ctx, nil, organizerID)
+		if err != nil {
+			return domain.Contest{}, errors.Wrap(err, 0)
+		}
+
+		oneWeekAgo := time.Now().Add(-7 * 24 * time.Hour)
+		recentCount := 0
+		for _, c := range contests {
+			if !c.Archived && c.Created.After(oneWeekAgo) {
+				recentCount++
+			}
+		}
+
+		if recentCount >= maxContestsPerWeek {
+			return domain.Contest{}, errors.New(domain.ErrLimitExceeded)
+		}
 	}
 
 	contest := domain.Contest{

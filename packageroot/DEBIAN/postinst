@@ -1,5 +1,8 @@
 #!/bin/bash
 
-id -u climblive &>/dev/null || adduser --system --no-create-home climblive
+set -e
 
-chown -R climblive /usr/share/climblive
+docker load -i /usr/share/climblive/climblive-api.tar
+
+chown root:root /etc/climblive/env
+chmod 600 /etc/climblive/env

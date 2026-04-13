@@ -46,6 +46,10 @@ func TestCreateRaffle(t *testing.T) {
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
+			On("GetRafflesByContest", mock.Anything, nil, fakedContestID).
+			Return([]domain.Raffle{}, nil)
+
+		mockedRepo.
 			On("StoreRaffle", mock.Anything, nil,
 				domain.Raffle{
 					Ownership: fakedOwnership,
@@ -70,6 +74,31 @@ func TestCreateRaffle(t *testing.T) {
 		assert.Equal(t, fakedRaffleID, raffle.ID)
 		assert.Equal(t, fakedOwnership, raffle.Ownership)
 		assert.Equal(t, fakedContestID, raffle.ContestID)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("LimitExceeded", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		raffles := make([]domain.Raffle, 10)
+		mockedRepo.
+			On("GetRafflesByContest", mock.Anything, nil, fakedContestID).
+			Return(raffles, nil)
+
+		ucase := usecases.RaffleUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.CreateRaffle(context.Background(), fakedContestID)
+
+		require.ErrorIs(t, err, domain.ErrLimitExceeded)
 
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
@@ -369,44 +398,53 @@ func TestDrawRaffleWinner(t *testing.T) {
 	})
 
 	t.Run("MultipleContendersInRaffle", func(t *testing.T) {
-		mockedRepo, mockedEventBroker, mockedAuthorizer := makeMocks()
+		synctest.Test(t, func(t *testing.T) {
+			mockedRepo, mockedEventBroker, mockedAuthorizer := makeMocks()
 
-		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, fakedOwnership).
-			Return(domain.OrganizerRole, nil)
+			mockedAuthorizer.
+				On("HasOwnership", mock.Anything, fakedOwnership).
+				Return(domain.OrganizerRole, nil)
 
-		mockedRepo.
-			On("GetContendersByContest", mock.Anything, nil, fakedContestID).
-			Return(makeContenders(5), nil)
+			mockedRepo.
+				On("GetContendersByContest", mock.Anything, nil, fakedContestID).
+				Return(makeContenders(5), nil)
 
-		mockedRepo.
-			On("GetRaffleWinners", mock.Anything, nil, fakedRaffleID).
-			Return([]domain.RaffleWinner{}, nil)
+			mockedRepo.
+				On("GetRaffleWinners", mock.Anything, nil, fakedRaffleID).
+				Return([]domain.RaffleWinner{}, nil)
 
-		mockedRepo.
-			On("StoreRaffleWinner", mock.Anything, nil, mock.AnythingOfType("domain.RaffleWinner")).
-			Return(mirrorInstruction{}, nil)
+			for k := range 5 {
+				mockedRepo.
+					On("StoreRaffleWinner", mock.Anything, nil, domain.RaffleWinner{
+						Ownership:   fakedOwnership,
+						RaffleID:    fakedRaffleID,
+						ContenderID: domain.ContenderID(k),
+						Timestamp:   time.Now(),
+					}).
+					Return(domain.RaffleWinner{}, nil)
+			}
 
-		mockedEventBroker.
-			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.RaffleWinnerDrawnEvent")).
-			Return()
+			mockedEventBroker.
+				On("Dispatch", fakedContestID, mock.AnythingOfType("domain.RaffleWinnerDrawnEvent")).
+				Return()
 
-		ucase := usecases.RaffleUseCase{
-			Repo:        mockedRepo,
-			Authorizer:  mockedAuthorizer,
-			EventBroker: mockedEventBroker,
-		}
+			ucase := usecases.RaffleUseCase{
+				Repo:        mockedRepo,
+				Authorizer:  mockedAuthorizer,
+				EventBroker: mockedEventBroker,
+			}
 
-		for range 100 {
-			winner, err := ucase.DrawRaffleWinner(context.Background(), fakedRaffleID)
-			require.NoError(t, err)
+			for range 1_000 {
+				winner, err := ucase.DrawRaffleWinner(context.Background(), fakedRaffleID)
+				require.NoError(t, err)
 
-			assert.Contains(t, []domain.ContenderID{0, 1, 2, 3, 4}, winner.ContenderID)
-		}
+				assert.Contains(t, []domain.ContenderID{0, 1, 2, 3, 4}, winner.ContenderID)
+			}
 
-		mockedRepo.AssertExpectations(t)
-		mockedEventBroker.AssertExpectations(t)
-		mockedAuthorizer.AssertExpectations(t)
+			mockedRepo.AssertExpectations(t)
+			mockedEventBroker.AssertExpectations(t)
+			mockedAuthorizer.AssertExpectations(t)
+		})
 	})
 
 	t.Run("NoRegisteredContenders", func(t *testing.T) {
@@ -435,6 +473,99 @@ func TestDrawRaffleWinner(t *testing.T) {
 
 		_, err := ucase.DrawRaffleWinner(context.Background(), fakedRaffleID)
 
+		require.ErrorIs(t, err, domain.ErrAllWinnersDrawn)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("DisqualifiedContendersExcluded", func(t *testing.T) {
+		synctest.Test(t, func(t *testing.T) {
+			mockedRepo, mockedEventBroker, mockedAuthorizer := makeMocks()
+
+			fakedRaffleWinnerID := testutils.RandomResourceID[domain.RaffleWinnerID]()
+
+			mockedAuthorizer.
+				On("HasOwnership", mock.Anything, fakedOwnership).
+				Return(domain.OrganizerRole, nil)
+
+			contenders := makeContenders(2)
+			contenders[1].Disqualified = true
+
+			mockedRepo.
+				On("GetContendersByContest", mock.Anything, nil, fakedContestID).
+				Return(contenders, nil)
+
+			mockedRepo.
+				On("GetRaffleWinners", mock.Anything, nil, fakedRaffleID).
+				Return([]domain.RaffleWinner{}, nil)
+
+			mockedRepo.
+				On("StoreRaffleWinner", mock.Anything, nil, domain.RaffleWinner{
+					Ownership:   fakedOwnership,
+					RaffleID:    fakedRaffleID,
+					ContenderID: domain.ContenderID(0),
+					Timestamp:   time.Now(),
+				}).
+				Return(domain.RaffleWinner{
+					ID:          fakedRaffleWinnerID,
+					Ownership:   fakedOwnership,
+					RaffleID:    fakedRaffleID,
+					ContenderID: domain.ContenderID(0),
+					Timestamp:   time.Now(),
+				}, nil)
+
+			mockedEventBroker.
+				On("Dispatch", fakedContestID, domain.RaffleWinnerDrawnEvent{
+					RaffleID:    fakedRaffleID,
+					ContenderID: domain.ContenderID(0),
+					Timestamp:   time.Now(),
+				}).
+				Return()
+
+			ucase := usecases.RaffleUseCase{
+				Repo:        mockedRepo,
+				Authorizer:  mockedAuthorizer,
+				EventBroker: mockedEventBroker,
+			}
+
+			winner, err := ucase.DrawRaffleWinner(context.Background(), fakedRaffleID)
+			require.NoError(t, err)
+
+			assert.Equal(t, domain.ContenderID(0), winner.ContenderID)
+
+			mockedRepo.AssertExpectations(t)
+			mockedEventBroker.AssertExpectations(t)
+			mockedAuthorizer.AssertExpectations(t)
+		})
+	})
+
+	t.Run("AllEligibleDisqualified", func(t *testing.T) {
+		mockedRepo, _, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		contenders := makeContenders(3)
+		for i := range contenders {
+			contenders[i].Disqualified = true
+		}
+
+		mockedRepo.
+			On("GetContendersByContest", mock.Anything, nil, fakedContestID).
+			Return(contenders, nil)
+
+		mockedRepo.
+			On("GetRaffleWinners", mock.Anything, nil, fakedRaffleID).
+			Return([]domain.RaffleWinner{}, nil)
+
+		ucase := usecases.RaffleUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.DrawRaffleWinner(context.Background(), fakedRaffleID)
 		require.ErrorIs(t, err, domain.ErrAllWinnersDrawn)
 
 		mockedRepo.AssertExpectations(t)
@@ -600,6 +731,94 @@ func TestGetRaffleWinners(t *testing.T) {
 		}
 
 		_, err := ucase.GetRaffleWinners(context.Background(), fakedRaffleID)
+
+		require.ErrorIs(t, err, domain.ErrNoOwnership)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+}
+
+func TestDeleteRaffle(t *testing.T) {
+	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
+	fakedOwnership := domain.OwnershipData{
+		OrganizerID: fakedOrganizerID,
+	}
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedRaffleID := testutils.RandomResourceID[domain.RaffleID]()
+	fakedRaffleWinnerID := testutils.RandomResourceID[domain.RaffleWinnerID]()
+
+	makeMocks := func() (*repositoryMock, *transactionMock, *authorizerMock) {
+		mockedRepo := new(repositoryMock)
+
+		mockedRepo.
+			On("GetRaffle", mock.Anything, nil, fakedRaffleID).
+			Return(domain.Raffle{
+				ID:        fakedRaffleID,
+				Ownership: fakedOwnership,
+				ContestID: fakedContestID,
+			}, nil)
+
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedTx := new(transactionMock)
+
+		return mockedRepo, mockedTx, mockedAuthorizer
+	}
+
+	t.Run("HappyCase", func(t *testing.T) {
+		mockedRepo, mockedTx, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		mockedRepo.
+			On("GetRaffleWinners", mock.Anything, nil, fakedRaffleID).
+			Return([]domain.RaffleWinner{
+				{ID: fakedRaffleWinnerID},
+			}, nil)
+
+		mockedRepo.On("Begin").Return(mockedTx, nil)
+
+		mockedRepo.
+			On("DeleteRaffleWinner", mock.Anything, mockedTx, fakedRaffleWinnerID).
+			Return(nil)
+
+		mockedRepo.
+			On("DeleteRaffle", mock.Anything, mockedTx, fakedRaffleID).
+			Return(nil)
+
+		mockedTx.On("Commit").Return(nil)
+		mockedTx.On("Rollback").Return()
+
+		ucase := usecases.RaffleUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		err := ucase.DeleteRaffle(context.Background(), fakedRaffleID)
+
+		require.NoError(t, err)
+
+		mockedRepo.AssertExpectations(t)
+		mockedTx.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockedRepo, _, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		ucase := usecases.RaffleUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		err := ucase.DeleteRaffle(context.Background(), fakedRaffleID)
 
 		require.ErrorIs(t, err, domain.ErrNoOwnership)
 

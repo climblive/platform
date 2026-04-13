@@ -3,6 +3,8 @@
   import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
   import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
     ContenderName,
     EmptyState,
@@ -12,11 +14,13 @@
   import type { RaffleWinner } from "@climblive/lib/models";
   import {
     drawRaffleWinnerMutation,
+    getContendersByContestQuery,
     getContestQuery,
     getRaffleQuery,
     getRaffleWinnersQuery,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { getApiUrl, toastError } from "@climblive/lib/utils";
+  import { useQueryClient } from "@tanstack/svelte-query";
   import { AxiosError } from "axios";
   import { format } from "date-fns";
   import { navigate } from "svelte-routing";
@@ -26,6 +30,8 @@
   }
 
   let { raffleId }: Props = $props();
+
+  const queryClient = useQueryClient();
 
   const raffleQuery = $derived(getRaffleQuery(raffleId));
   const drawRaffleWinner = $derived(drawRaffleWinnerMutation(raffleId));
@@ -45,6 +51,68 @@
     raffle?.contestId ? getContestQuery(raffle.contestId) : undefined,
   );
   const contest = $derived(contestQuery?.data);
+
+  const contendersQuery = $derived(
+    raffle?.contestId
+      ? getContendersByContestQuery(raffle.contestId)
+      : undefined,
+  );
+
+  const eligibleCount = $derived.by(() => {
+    const contenders = contendersQuery?.data;
+
+    if (contenders === undefined) {
+      return undefined;
+    }
+
+    return contenders.filter(({ entered, disqualified, scrubbedAt }) => {
+      switch (true) {
+        case entered === undefined:
+          return false;
+        case disqualified:
+          return false;
+        case scrubbedAt !== undefined:
+          return false;
+        default:
+          return true;
+      }
+    }).length;
+  });
+
+  const winnersCount = $derived(raffleWinnersQuery.data?.length ?? 0);
+
+  const allWinnersDrawn = $derived(
+    eligibleCount !== undefined && winnersCount >= eligibleCount,
+  );
+
+  $effect(() => {
+    const contestId = raffle?.contestId;
+
+    if (contestId === undefined) {
+      return;
+    }
+
+    const eventSource = new EventSource(
+      `${getApiUrl()}/contests/${contestId}/events`,
+    );
+
+    const invalidateContenders = () => {
+      queryClient.invalidateQueries({
+        queryKey: ["contenders", { contestId }],
+      });
+    };
+
+    eventSource.addEventListener("CONTENDER_ENTERED", invalidateContenders);
+    eventSource.addEventListener(
+      "CONTENDER_DISQUALIFIED",
+      invalidateContenders,
+    );
+    eventSource.addEventListener("CONTENDER_REQUALIFIED", invalidateContenders);
+
+    return () => {
+      eventSource.close();
+    };
+  });
 
   const handleDrawWinner = () => {
     drawRaffleWinner.mutate(undefined, {
@@ -92,8 +160,16 @@
 {/snippet}
 
 {#snippet drawButton()}
-  <wa-button variant="neutral" onclick={handleDrawWinner}>Draw winner</wa-button
-  >
+  {#if allWinnersDrawn}
+    <wa-callout variant="neutral">
+      <wa-icon slot="icon" name="circle-check"></wa-icon>
+      All eligible winners have been drawn.
+    </wa-callout>
+  {:else}
+    <wa-button variant="neutral" onclick={handleDrawWinner}
+      >Draw winner</wa-button
+    >
+  {/if}
 {/snippet}
 
 {#if contest && raffle}
@@ -124,6 +200,11 @@
         data={sortedRaffleWinners}
         getId={({ contenderId }) => contenderId}
       ></Table>
+    {:else if eligibleCount === 0}
+      <EmptyState
+        title="No winners yet"
+        description="There are no eligible winners to draw."
+      />
     {:else}
       <EmptyState
         title="No winners yet"
@@ -139,13 +220,9 @@
 
 <style>
   section {
-    gap: var(--wa-space-xs);
-    justify-content: start;
-  }
-
-  section {
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-m);
+    justify-content: start;
   }
 </style>

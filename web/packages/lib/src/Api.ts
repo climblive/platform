@@ -433,6 +433,14 @@ export class ApiClient {
     return raffleSchema.parse(result.data);
   };
 
+  deleteRaffle = async (raffleId: number) => {
+    const endpoint = `/raffles/${raffleId}`;
+
+    await this.axiosInstance.delete(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+  };
+
   drawRaffleWinner = async (raffleId: number) => {
     const endpoint = `/raffles/${raffleId}/winners`;
 

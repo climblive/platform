@@ -690,8 +690,30 @@ func TestPatchContender(t *testing.T) {
 			}, nil)
 
 		mockedRepo.
-			On("StoreContender", mock.Anything, mock.Anything, mock.AnythingOfType("domain.Contender")).
-			Return(mirrorInstruction{}, nil)
+			On("StoreContender", mock.Anything, mock.Anything,
+				domain.Contender{
+					ID:                  fakedContenderID,
+					Ownership:           fakedOwnership,
+					ContestID:           fakedContestID,
+					CompClassID:         fakedCompClassID,
+					RegistrationCode:    "ABCD1234",
+					Name:                "John Doe",
+					Entered:             currentTime,
+					WithdrawnFromFinals: false,
+					Disqualified:        false,
+				},
+			).
+			Return(domain.Contender{
+				ID:                  fakedContenderID,
+				Ownership:           fakedOwnership,
+				ContestID:           fakedContestID,
+				CompClassID:         fakedCompClassID,
+				RegistrationCode:    "ABCD1234",
+				Name:                "John Doe",
+				Entered:             currentTime,
+				WithdrawnFromFinals: false,
+				Disqualified:        false,
+			}, nil)
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
@@ -782,80 +804,104 @@ func TestPatchContender(t *testing.T) {
 	})
 
 	t.Run("EnterContest", func(t *testing.T) {
-		mockedAuthorizer := new(authorizerMock)
-		mockedScoreKeeper := new(scoreKeeperMock)
-		mockedEventBroker := new(eventBrokerMock)
+		synctest.Test(t, func(t *testing.T) {
+			mockedAuthorizer := new(authorizerMock)
+			mockedScoreKeeper := new(scoreKeeperMock)
+			mockedEventBroker := new(eventBrokerMock)
 
-		fakedContender := domain.Contender{
-			ID:                  fakedContenderID,
-			Ownership:           fakedOwnership,
-			ContestID:           fakedContestID,
-			CompClassID:         0,
-			RegistrationCode:    "ABCD1234",
-			Name:                "",
-			Entered:             time.Time{},
-			WithdrawnFromFinals: false,
-			Disqualified:        false,
-		}
+			fakedContender := domain.Contender{
+				ID:                  fakedContenderID,
+				Ownership:           fakedOwnership,
+				ContestID:           fakedContestID,
+				CompClassID:         0,
+				RegistrationCode:    "ABCD1234",
+				Name:                "",
+				Entered:             time.Time{},
+				WithdrawnFromFinals: false,
+				Disqualified:        false,
+			}
 
-		mockedRepo := makeMockedRepo(fakedContender)
+			mockedRepo := makeMockedRepo(fakedContender)
 
-		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
-			Return(domain.CompClass{
-				ID:        fakedCompClassID,
-				TimeBegin: currentTime.Add(-1 * time.Hour),
-				TimeEnd:   currentTime.Add(time.Hour),
-			}, nil)
+			mockedRepo.
+				On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
+				Return(domain.CompClass{
+					ID:        fakedCompClassID,
+					TimeBegin: currentTime.Add(-1 * time.Hour),
+					TimeEnd:   currentTime.Add(time.Hour),
+				}, nil)
 
-		mockedRepo.
-			On("StoreContender", mock.Anything, mock.Anything, mock.AnythingOfType("domain.Contender")).
-			Return(mirrorInstruction{}, nil)
+			mockedRepo.
+				On("StoreContender", mock.Anything, mock.Anything,
+					domain.Contender{
+						ID:                  fakedContenderID,
+						Ownership:           fakedOwnership,
+						ContestID:           fakedContestID,
+						CompClassID:         fakedCompClassID,
+						RegistrationCode:    "ABCD1234",
+						Name:                "John Doe",
+						Entered:             time.Now(),
+						WithdrawnFromFinals: false,
+						Disqualified:        false,
+					},
+				).
+				Return(domain.Contender{
+					ID:                  fakedContenderID,
+					Ownership:           fakedOwnership,
+					ContestID:           fakedContestID,
+					CompClassID:         fakedCompClassID,
+					RegistrationCode:    "ABCD1234",
+					Name:                "John Doe",
+					Entered:             time.Now(),
+					WithdrawnFromFinals: false,
+					Disqualified:        false,
+				}, nil)
 
-		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, fakedOwnership).
-			Return(domain.ContenderRole, nil)
+			mockedAuthorizer.
+				On("HasOwnership", mock.Anything, fakedOwnership).
+				Return(domain.ContenderRole, nil)
 
-		mockedScoreKeeper.On("GetScore", fakedContenderID).Return(domain.Score{}, errMock)
+			mockedScoreKeeper.On("GetScore", fakedContenderID).Return(domain.Score{}, errMock)
 
-		mockedEventBroker.On("Dispatch", fakedContestID, mock.Anything).Return()
+			mockedEventBroker.On("Dispatch", fakedContestID, mock.Anything).Return()
 
-		ucase := usecases.ContenderUseCase{
-			Repo:        mockedRepo,
-			Authorizer:  mockedAuthorizer,
-			ScoreKeeper: mockedScoreKeeper,
-			EventBroker: mockedEventBroker,
-		}
+			ucase := usecases.ContenderUseCase{
+				Repo:        mockedRepo,
+				Authorizer:  mockedAuthorizer,
+				ScoreKeeper: mockedScoreKeeper,
+				EventBroker: mockedEventBroker,
+			}
 
-		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
-			CompClassID: domain.NewPatch(fakedCompClassID),
-			Name:        domain.NewPatch("John Doe"),
+			contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
+				CompClassID: domain.NewPatch(fakedCompClassID),
+				Name:        domain.NewPatch("John Doe"),
+			})
+
+			require.NoError(t, err)
+
+			assert.Equal(t, fakedCompClassID, contender.CompClassID)
+			assert.Equal(t, "John Doe", contender.Name)
+			assert.Equal(t, time.Now(), contender.Entered)
+			assert.Equal(t, currentTime.Add(time.Hour).Add(fakedNameRetentionTime), contender.ScrubBefore)
+
+			mockedEventBroker.AssertCalled(t, "Dispatch", fakedContestID, domain.ContenderEnteredEvent{
+				ContenderID: fakedContenderID,
+				CompClassID: fakedCompClassID,
+			})
+
+			mockedEventBroker.AssertCalled(t, "Dispatch", fakedContestID, domain.ContenderPublicInfoUpdatedEvent{
+				ContenderID:         fakedContenderID,
+				CompClassID:         fakedCompClassID,
+				Name:                "John Doe",
+				WithdrawnFromFinals: false,
+				Disqualified:        false,
+			})
+
+			mockedAuthorizer.AssertExpectations(t)
+			mockedScoreKeeper.AssertExpectations(t)
+			mockedEventBroker.AssertExpectations(t)
+			mockedRepo.AssertExpectations(t)
 		})
-
-		require.NoError(t, err)
-
-		assert.Equal(t, fakedCompClassID, contender.CompClassID)
-		assert.Equal(t, "John Doe", contender.Name)
-		assert.WithinDuration(t, time.Now(), contender.Entered, time.Minute)
-		assert.Equal(t, currentTime.Add(time.Hour).Add(fakedNameRetentionTime), contender.ScrubBefore)
-
-		mockedEventBroker.AssertCalled(t, "Dispatch", fakedContestID, domain.ContenderEnteredEvent{
-			ContenderID: fakedContenderID,
-			CompClassID: fakedCompClassID,
-		})
-
-		mockedEventBroker.AssertCalled(t, "Dispatch", fakedContestID, domain.ContenderPublicInfoUpdatedEvent{
-			ContenderID:         fakedContenderID,
-			CompClassID:         fakedCompClassID,
-			Name:                "John Doe",
-			WithdrawnFromFinals: false,
-			Disqualified:        false,
-		})
-
-		mockedAuthorizer.AssertExpectations(t)
-		mockedScoreKeeper.AssertExpectations(t)
-		mockedEventBroker.AssertExpectations(t)
-		mockedRepo.AssertExpectations(t)
 	})
 
 	t.Run("CannotMakeChangesToAnUnregisteredContender", func(t *testing.T) {
@@ -966,9 +1012,37 @@ func TestPatchContender(t *testing.T) {
 				TimeEnd:   currentTime.Add(time.Hour),
 			}, nil)
 
+		fakedOtherCompClass := domain.CompClass{
+			ID:        testutils.RandomResourceID[domain.CompClassID](),
+			TimeBegin: currentTime.Add(-1 * time.Hour),
+			TimeEnd:   currentTime,
+		}
+
 		mockedRepo.
-			On("StoreContender", mock.Anything, mock.Anything, mock.AnythingOfType("domain.Contender")).
-			Return(mirrorInstruction{}, nil)
+			On("StoreContender", mock.Anything, mock.Anything,
+				domain.Contender{
+					ID:                  fakedContenderID,
+					Ownership:           fakedOwnership,
+					ContestID:           fakedContestID,
+					CompClassID:         fakedOtherCompClass.ID,
+					RegistrationCode:    "ABCD1234",
+					Name:                "Jane Doe",
+					Entered:             currentTime,
+					WithdrawnFromFinals: true,
+					Disqualified:        true,
+				},
+			).
+			Return(domain.Contender{
+				ID:                  fakedContenderID,
+				Ownership:           fakedOwnership,
+				ContestID:           fakedContestID,
+				CompClassID:         fakedOtherCompClass.ID,
+				RegistrationCode:    "ABCD1234",
+				Name:                "Jane Doe",
+				Entered:             currentTime,
+				WithdrawnFromFinals: true,
+				Disqualified:        true,
+			}, nil)
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
@@ -977,12 +1051,6 @@ func TestPatchContender(t *testing.T) {
 		mockedScoreKeeper.On("GetScore", fakedContenderID).Return(domain.Score{}, errMock)
 
 		mockedEventBroker.On("Dispatch", fakedContestID, mock.Anything).Return()
-
-		fakedOtherCompClass := domain.CompClass{
-			ID:        testutils.RandomResourceID[domain.CompClassID](),
-			TimeBegin: currentTime.Add(-1 * time.Hour),
-			TimeEnd:   currentTime,
-		}
 
 		mockedRepo.
 			On("GetCompClass", mock.Anything, mock.Anything, fakedOtherCompClass.ID).
@@ -1211,8 +1279,30 @@ func TestPatchContender(t *testing.T) {
 			}, nil)
 
 		mockedRepo.
-			On("StoreContender", mock.Anything, mock.Anything, mock.AnythingOfType("domain.Contender")).
-			Return(mirrorInstruction{}, nil)
+			On("StoreContender", mock.Anything, mock.Anything,
+				domain.Contender{
+					ID:                  fakedContenderID,
+					Ownership:           fakedOwnership,
+					ContestID:           fakedContestID,
+					CompClassID:         fakedCompClassID,
+					RegistrationCode:    "ABCD1234",
+					Name:                "John Doe",
+					Entered:             currentTime,
+					WithdrawnFromFinals: false,
+					Disqualified:        false,
+				},
+			).
+			Return(domain.Contender{
+				ID:                  fakedContenderID,
+				Ownership:           fakedOwnership,
+				ContestID:           fakedContestID,
+				CompClassID:         fakedCompClassID,
+				RegistrationCode:    "ABCD1234",
+				Name:                "John Doe",
+				Entered:             currentTime,
+				WithdrawnFromFinals: false,
+				Disqualified:        false,
+			}, nil)
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
@@ -1274,8 +1364,30 @@ func TestPatchContender(t *testing.T) {
 			}, nil)
 
 		mockedRepo.
-			On("StoreContender", mock.Anything, mock.Anything, mock.AnythingOfType("domain.Contender")).
-			Return(mirrorInstruction{}, nil)
+			On("StoreContender", mock.Anything, mock.Anything,
+				domain.Contender{
+					ID:                  fakedContenderID,
+					Ownership:           fakedOwnership,
+					ContestID:           fakedContestID,
+					CompClassID:         fakedCompClassID,
+					RegistrationCode:    "ABCD1234",
+					Name:                "John Doe",
+					Entered:             currentTime,
+					WithdrawnFromFinals: false,
+					Disqualified:        false,
+				},
+			).
+			Return(domain.Contender{
+				ID:                  fakedContenderID,
+				Ownership:           fakedOwnership,
+				ContestID:           fakedContestID,
+				CompClassID:         fakedCompClassID,
+				RegistrationCode:    "ABCD1234",
+				Name:                "John Doe",
+				Entered:             currentTime,
+				WithdrawnFromFinals: false,
+				Disqualified:        false,
+			}, nil)
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
@@ -1456,8 +1568,30 @@ func TestPatchContender(t *testing.T) {
 			Return(fakedThirdCompClass, nil)
 
 		mockedRepo.
-			On("StoreContender", mock.Anything, mock.Anything, mock.AnythingOfType("domain.Contender")).
-			Return(mirrorInstruction{}, nil)
+			On("StoreContender", mock.Anything, mock.Anything,
+				domain.Contender{
+					ID:                  fakedContenderID,
+					Ownership:           fakedOwnership,
+					ContestID:           fakedContestID,
+					CompClassID:         fakedThirdCompClass.ID,
+					RegistrationCode:    "ABCD1234",
+					Name:                "John Doe",
+					Entered:             currentTime,
+					WithdrawnFromFinals: false,
+					Disqualified:        false,
+				},
+			).
+			Return(domain.Contender{
+				ID:                  fakedContenderID,
+				Ownership:           fakedOwnership,
+				ContestID:           fakedContestID,
+				CompClassID:         fakedThirdCompClass.ID,
+				RegistrationCode:    "ABCD1234",
+				Name:                "John Doe",
+				Entered:             currentTime,
+				WithdrawnFromFinals: false,
+				Disqualified:        false,
+			}, nil)
 
 		ucase := usecases.ContenderUseCase{
 			Repo:        mockedRepo,
