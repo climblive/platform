@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -e
+
+docker stop climblive-api || true
+docker rm climblive-api || true
+docker image rm climblive-api:latest || true
