@@ -183,7 +183,7 @@ type RaffleWinner struct {
 	RaffleID            RaffleID       `json:"raffleId"`
 	ContenderID         ContenderID    `json:"contenderId"`
 	ContenderName       string         `json:"contenderName" tstype:"string,readonly"`
-	ContenderScrubbedAt time.Time      `json:"contenderScrubbedAt,omitzero" tstype:"string,readonly"`
+	ContenderScrubbedAt time.Time      `json:"contenderScrubbedAt,omitzero" tstype:"Date,readonly"`
 	Timestamp           time.Time      `json:"timestamp"`
 }
 

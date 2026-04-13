@@ -184,7 +184,7 @@ export interface RaffleWinner {
   raffleId: RaffleID;
   contenderId: ContenderID;
   readonly contenderName: string;
-  readonly contenderScrubbedAt?: string;
+  readonly contenderScrubbedAt?: Date;
   timestamp: Date;
 }
 export interface Score {
