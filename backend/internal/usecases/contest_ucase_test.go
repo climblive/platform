@@ -477,6 +477,7 @@ func TestCreateContest(t *testing.T) {
 						Finalists:          7,
 						Info:               "XSS",
 						GracePeriod:        time.Hour,
+						NameRetentionTime:  14 * 24 * time.Hour,
 						Created:            time.Now(),
 					},
 				).
@@ -490,6 +491,7 @@ func TestCreateContest(t *testing.T) {
 					Finalists:          7,
 					Info:               "XSS",
 					GracePeriod:        time.Hour,
+					NameRetentionTime:  14 * 24 * time.Hour,
 					Created:            time.Now(),
 				}, nil)
 
@@ -580,6 +582,7 @@ func TestCreateContest(t *testing.T) {
 				QualifyingProblems: 10,
 				Finalists:          7,
 				GracePeriod:        time.Hour,
+				NameRetentionTime:  14 * 24 * time.Hour,
 				Created:            time.Now(),
 			}
 
@@ -599,6 +602,7 @@ func TestCreateContest(t *testing.T) {
 				QualifyingProblems: 10,
 				Finalists:          7,
 				GracePeriod:        time.Hour,
+				NameRetentionTime:  14 * 24 * time.Hour,
 			})
 
 			require.NoError(t, err)
@@ -1224,8 +1228,9 @@ func TestPatchContest(t *testing.T) {
 		mockedRepo.
 			On("GetContest", mock.Anything, nil, fakedContestID).
 			Return(domain.Contest{
-				ID:        fakedContestID,
-				Ownership: fakedOwnership,
+				ID:                fakedContestID,
+				Ownership:         fakedOwnership,
+				NameRetentionTime: 14 * 24 * time.Hour,
 			}, nil)
 
 		mockedRepo.
@@ -1283,7 +1288,6 @@ func TestPatchContest(t *testing.T) {
 			Finalists:          domain.NewPatch(5),
 			Info:               domain.NewPatch("No rules!"),
 			GracePeriod:        domain.NewPatch(time.Hour),
-			NameRetentionTime:  domain.NewPatch(14 * 24 * time.Hour),
 		}
 
 		contest, err := ucase.PatchContest(context.Background(), fakedContestID, patch)

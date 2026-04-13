@@ -843,6 +843,7 @@ func TestPatchContender(t *testing.T) {
 						Entered:             time.Now(),
 						WithdrawnFromFinals: false,
 						Disqualified:        false,
+						ScrubBefore:         currentTime.Add(time.Hour).Add(fakedNameRetentionTime),
 					},
 				).
 				Return(domain.Contender{
@@ -855,6 +856,7 @@ func TestPatchContender(t *testing.T) {
 					Entered:             time.Now(),
 					WithdrawnFromFinals: false,
 					Disqualified:        false,
+					ScrubBefore:         currentTime.Add(time.Hour).Add(fakedNameRetentionTime),
 				}, nil)
 
 			mockedAuthorizer.
@@ -1030,6 +1032,7 @@ func TestPatchContender(t *testing.T) {
 					Entered:             currentTime,
 					WithdrawnFromFinals: true,
 					Disqualified:        true,
+					ScrubBefore:         currentTime.Add(42 * time.Hour),
 				},
 			).
 			Return(domain.Contender{
@@ -1042,6 +1045,7 @@ func TestPatchContender(t *testing.T) {
 				Entered:             currentTime,
 				WithdrawnFromFinals: true,
 				Disqualified:        true,
+				ScrubBefore:         currentTime.Add(42 * time.Hour),
 			}, nil)
 
 		mockedAuthorizer.
