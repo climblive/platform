@@ -1,7 +1,7 @@
 <script lang="ts">
-  import logoUrl from "@/assets/logo.svg";
+  import { FullLogo } from "@climblive/lib/components";
   import { type ContestState } from "@climblive/lib/types";
-  import { Link, navigate } from "svelte-routing";
+  import { navigate } from "svelte-routing";
 
   interface Props {
     registrationCode: string;
@@ -21,10 +21,10 @@
 </script>
 
 <header>
+  <div class="logo">
+    <FullLogo />
+  </div>
   <div class="identity">
-    <Link to="/">
-      <img class="logo" src={logoUrl} alt="ClimbLive logo" />
-    </Link>
     <div class="info">
       <h1>{contenderName}</h1>
       <p class="subtitle">
@@ -32,30 +32,35 @@
         >{contestName}
       </p>
     </div>
+    <wa-button
+      size="medium"
+      onclick={() => navigate(`/${registrationCode}/edit`)}
+      disabled={contestState === "ENDED"}
+      appearance="plain"
+    >
+      <wa-icon name="gear" label="Edit"></wa-icon>
+    </wa-button>
   </div>
-  <wa-button
-    size="medium"
-    onclick={() => navigate(`/${registrationCode}/edit`)}
-    disabled={contestState === "ENDED"}
-    appearance="plain"
-  >
-    <wa-icon name="gear" label="Edit"></wa-icon>
-  </wa-button>
 </header>
 
 <style>
   header {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--wa-space-s);
+    flex-direction: column;
+    gap: var(--wa-space-xs);
     padding-block-start: var(--wa-space-l);
+  }
+
+  .logo {
+    height: var(--wa-font-size-xl);
+    color: var(--wa-color-text-normal);
   }
 
   .identity {
     display: flex;
     align-items: center;
-    gap: var(--wa-space-xs);
+    justify-content: space-between;
+    gap: var(--wa-space-s);
     min-width: 0;
   }
 
@@ -63,15 +68,8 @@
     min-width: 0;
   }
 
-  .logo {
-    width: calc(var(--wa-font-size-l) * 2);
-    height: calc(var(--wa-font-size-l) * 2);
-    flex-shrink: 0;
-  }
-
   h1 {
     margin: 0;
-    margin-block-start: -0.25rem;
     font-size: var(--wa-font-size-l);
     font-weight: var(--wa-font-weight-bold);
     line-height: var(--wa-line-height-condensed);
