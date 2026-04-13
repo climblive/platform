@@ -3,4 +3,6 @@
 set -e
 
 docker load -i /usr/share/climblive/climblive-api.tar
+
+chown root:root /etc/climblive/env
 chmod 600 /etc/climblive/env
