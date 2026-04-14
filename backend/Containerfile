@@ -1,8 +1,0 @@
-FROM scratch
-
-COPY api /api
-
-EXPOSE 443
-EXPOSE 80
-
-ENTRYPOINT ["/api"]

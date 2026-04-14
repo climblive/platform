@@ -62,13 +62,6 @@ func (g *uuidGenerator) Generate() uuid.UUID {
 	return uuid.New()
 }
 
-func HandleCORSPreFlight(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, PATCH")
-	w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
-	w.WriteHeader(http.StatusOK)
-}
-
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -144,7 +137,6 @@ func main() {
 
 	appMux := http.NewServeMux()
 	appMux.Handle("/api/", http.StripPrefix("/api", apiMux))
-	appMux.HandleFunc("OPTIONS /api/", HandleCORSPreFlight)
 	installAppStaticHandlers(appMux)
 
 	wwwMux := http.NewServeMux()
@@ -152,61 +144,34 @@ func main() {
 
 	handler := newHostHandler(appMux, wwwMux)
 
-	tlsConfig, tlsEnabled := loadTLSConfig()
-
-	listenAddr := "0.0.0.0:8090"
-	if tlsEnabled {
-		listenAddr = "0.0.0.0:443"
-	}
+	tlsConfig := loadTLSConfig()
 
 	httpServer := &http.Server{
-		Addr:      listenAddr,
-		Handler:   handler,
-		TLSConfig: tlsConfig,
+		Addr:                         "0.0.0.0:443",
+		Handler:                      handler,
+		DisableGeneralOptionsHandler: false,
+		TLSConfig:                    tlsConfig,
+		ReadTimeout:                  0,
+		ReadHeaderTimeout:            0,
+		WriteTimeout:                 0,
+		IdleTimeout:                  0,
+		MaxHeaderBytes:               0,
+		TLSNextProto:                 nil,
+		ConnState:                    nil,
+		ErrorLog:                     nil,
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
 		},
+		ConnContext: nil,
+		HTTP2:       nil,
+		Protocols:   nil,
 	}
 
 	context.AfterFunc(ctx, func() {
 		_ = httpServer.Shutdown(context.Background())
 	})
 
-	if tlsEnabled {
-		slog.Info("TLS enabled, starting HTTPS server", "addr", listenAddr)
-
-		redirectServer := &http.Server{
-			Addr: "0.0.0.0:80",
-			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				host := r.Host
-				if host == "" {
-					http.Error(w, "Bad Request", http.StatusBadRequest)
-					return
-				}
-
-				target := "https://" + host + r.URL.Path
-				if r.URL.RawQuery != "" {
-					target += "?" + r.URL.RawQuery
-				}
-				http.Redirect(w, r, target, http.StatusMovedPermanently)
-			}),
-		}
-
-		context.AfterFunc(ctx, func() {
-			_ = redirectServer.Shutdown(context.Background())
-		})
-
-		go func() {
-			if err := redirectServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-				slog.Error("HTTP redirect server error", "error", err)
-			}
-		}()
-
-		err = httpServer.ListenAndServeTLS("", "")
-	} else {
-		slog.Info("TLS not configured, starting HTTP server", "addr", listenAddr)
-		err = httpServer.ListenAndServe()
-	}
+	err = httpServer.ListenAndServeTLS("", "")
 
 	switch err {
 	case http.ErrServerClosed:
@@ -320,15 +285,15 @@ func setupAPIMux(
 	return mux
 }
 
-func loadTLSConfig() (*tls.Config, bool) {
+func loadTLSConfig() *tls.Config {
 	type certPair struct {
 		cert string
 		key  string
 	}
 
 	pairs := []certPair{
-		{os.Getenv("TLS_APP_CERT_FILE"), os.Getenv("TLS_APP_KEY_FILE")},
-		{os.Getenv("TLS_WWW_CERT_FILE"), os.Getenv("TLS_WWW_KEY_FILE")},
+		{cert: os.Getenv("TLS_APP_CERT_FILE"), key: os.Getenv("TLS_APP_KEY_FILE")},
+		{cert: os.Getenv("TLS_WWW_CERT_FILE"), key: os.Getenv("TLS_WWW_KEY_FILE")},
 	}
 
 	var certificates []tls.Certificate
@@ -348,13 +313,13 @@ func loadTLSConfig() (*tls.Config, bool) {
 	}
 
 	if len(certificates) == 0 {
-		return nil, false
+		panic("no TLS certificates configured; set TLS_APP_CERT_FILE/TLS_APP_KEY_FILE and/or TLS_WWW_CERT_FILE/TLS_WWW_KEY_FILE")
 	}
 
 	return &tls.Config{
 		Certificates: certificates,
 		MinVersion:   tls.VersionTLS12,
-	}, true
+	}
 }
 
 type hostHandler struct {
@@ -396,8 +361,7 @@ func installAppStaticHandlers(mux *http.ServeMux) {
 	for _, app := range apps {
 		subFS, err := fs.Sub(webAssets, app.subDir)
 		if err != nil {
-			slog.Debug("skipping static handler, directory not found", "path", app.subDir)
-			continue
+			panic(err)
 		}
 
 		rest.InstallStaticHandler(mux, app.basePath, subFS)
@@ -407,8 +371,7 @@ func installAppStaticHandlers(mux *http.ServeMux) {
 func installWWWStaticHandlers(mux *http.ServeMux) {
 	subFS, err := fs.Sub(webAssets, "web/www")
 	if err != nil {
-		slog.Debug("skipping www static handler, directory not found")
-		return
+		panic(err)
 	}
 
 	rest.InstallStaticHandler(mux, "/", subFS)
