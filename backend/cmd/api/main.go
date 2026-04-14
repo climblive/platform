@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"embed"
 	"io/fs"
 	"log"
@@ -12,6 +13,7 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -140,14 +142,17 @@ func main() {
 
 	apiMux := setupAPIMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
 
-	topMux := http.NewServeMux()
-	topMux.Handle("/api/", http.StripPrefix("/api", apiMux))
-	topMux.HandleFunc("OPTIONS /api/", HandleCORSPreFlight)
-	installStaticHandlers(topMux)
+	appMux := http.NewServeMux()
+	appMux.Handle("/api/", http.StripPrefix("/api", apiMux))
+	appMux.HandleFunc("OPTIONS /api/", HandleCORSPreFlight)
+	installAppStaticHandlers(appMux)
 
-	tlsCertFile := os.Getenv("TLS_CERT_FILE")
-	tlsKeyFile := os.Getenv("TLS_KEY_FILE")
-	tlsEnabled := tlsCertFile != "" && tlsKeyFile != ""
+	wwwMux := http.NewServeMux()
+	installWWWStaticHandlers(wwwMux)
+
+	handler := newHostHandler(appMux, wwwMux)
+
+	tlsConfig, tlsEnabled := loadTLSConfig()
 
 	listenAddr := "0.0.0.0:8090"
 	if tlsEnabled {
@@ -155,8 +160,9 @@ func main() {
 	}
 
 	httpServer := &http.Server{
-		Addr:    listenAddr,
-		Handler: topMux,
+		Addr:      listenAddr,
+		Handler:   handler,
+		TLSConfig: tlsConfig,
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
 		},
@@ -196,7 +202,7 @@ func main() {
 			}
 		}()
 
-		err = httpServer.ListenAndServeTLS(tlsCertFile, tlsKeyFile)
+		err = httpServer.ListenAndServeTLS("", "")
 	} else {
 		slog.Info("TLS not configured, starting HTTP server", "addr", listenAddr)
 		err = httpServer.ListenAndServe()
@@ -314,7 +320,69 @@ func setupAPIMux(
 	return mux
 }
 
-func installStaticHandlers(mux *http.ServeMux) {
+func loadTLSConfig() (*tls.Config, bool) {
+	type certPair struct {
+		cert string
+		key  string
+	}
+
+	pairs := []certPair{
+		{os.Getenv("TLS_APP_CERT_FILE"), os.Getenv("TLS_APP_KEY_FILE")},
+		{os.Getenv("TLS_WWW_CERT_FILE"), os.Getenv("TLS_WWW_KEY_FILE")},
+	}
+
+	var certificates []tls.Certificate
+	for _, p := range pairs {
+		if p.cert == "" || p.key == "" {
+			continue
+		}
+
+		cert, err := tls.LoadX509KeyPair(p.cert, p.key)
+		if err != nil {
+			slog.Error("failed to load TLS certificate", "cert", p.cert, "key", p.key, "error", err)
+			panic(err)
+		}
+
+		certificates = append(certificates, cert)
+		slog.Info("loaded TLS certificate", "cert", p.cert)
+	}
+
+	if len(certificates) == 0 {
+		return nil, false
+	}
+
+	return &tls.Config{
+		Certificates: certificates,
+	}, true
+}
+
+type hostHandler struct {
+	appHandler http.Handler
+	wwwHandler http.Handler
+}
+
+func newHostHandler(appHandler, wwwHandler http.Handler) *hostHandler {
+	return &hostHandler{
+		appHandler: appHandler,
+		wwwHandler: wwwHandler,
+	}
+}
+
+func (h *hostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	host := r.Host
+	if colonIdx := strings.LastIndex(host, ":"); colonIdx != -1 {
+		host = host[:colonIdx]
+	}
+
+	if h.wwwHandler != nil && !strings.HasSuffix(host, ".app") {
+		h.wwwHandler.ServeHTTP(w, r)
+		return
+	}
+
+	h.appHandler.ServeHTTP(w, r)
+}
+
+func installAppStaticHandlers(mux *http.ServeMux) {
 	apps := []struct {
 		basePath string
 		subDir   string
@@ -333,4 +401,14 @@ func installStaticHandlers(mux *http.ServeMux) {
 
 		rest.InstallStaticHandler(mux, app.basePath, subFS)
 	}
+}
+
+func installWWWStaticHandlers(mux *http.ServeMux) {
+	subFS, err := fs.Sub(webAssets, "web/www")
+	if err != nil {
+		slog.Debug("skipping www static handler, directory not found")
+		return
+	}
+
+	rest.InstallStaticHandler(mux, "/", subFS)
 }
