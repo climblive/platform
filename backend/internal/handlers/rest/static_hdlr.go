@@ -67,7 +67,7 @@ func (h *SPAHandler) setHeaders(w http.ResponseWriter, filePath string) {
 	}
 }
 
-func InstallStaticHandler(mux *Mux, basePath string, fsys fs.FS) {
+func InstallStaticHandler(mux *http.ServeMux, basePath string, fsys fs.FS) {
 	handler := NewSPAHandler(fsys, basePath)
 
 	pattern := basePath
@@ -75,5 +75,5 @@ func InstallStaticHandler(mux *Mux, basePath string, fsys fs.FS) {
 		pattern += "/"
 	}
 
-	mux.mux.Handle(pattern, http.StripPrefix(basePath, handler))
+	mux.Handle(pattern, http.StripPrefix(basePath, handler))
 }

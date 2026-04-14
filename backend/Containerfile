@@ -2,6 +2,7 @@ FROM scratch
 
 COPY api /api
 
-EXPOSE 8090
+EXPOSE 443
+EXPOSE 80
 
 ENTRYPOINT ["/api"]

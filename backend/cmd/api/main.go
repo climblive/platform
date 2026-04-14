@@ -138,34 +138,61 @@ func main() {
 		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
 		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()))
 
-	mux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
+	apiMux := setupAPIMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
+
+	topMux := http.NewServeMux()
+	topMux.Handle("/api/", http.StripPrefix("/api", apiMux))
+	topMux.HandleFunc("OPTIONS /api/", HandleCORSPreFlight)
+	installStaticHandlers(topMux)
+
+	tlsCertFile := os.Getenv("TLS_CERT_FILE")
+	tlsKeyFile := os.Getenv("TLS_KEY_FILE")
+	tlsEnabled := tlsCertFile != "" && tlsKeyFile != ""
+
+	listenAddr := "0.0.0.0:8090"
+	if tlsEnabled {
+		listenAddr = "0.0.0.0:443"
+	}
 
 	httpServer := &http.Server{
-		Addr:                         "0.0.0.0:8090",
-		Handler:                      mux,
-		DisableGeneralOptionsHandler: false,
-		TLSConfig:                    nil,
-		ReadTimeout:                  0,
-		ReadHeaderTimeout:            0,
-		WriteTimeout:                 0,
-		IdleTimeout:                  0,
-		MaxHeaderBytes:               0,
-		TLSNextProto:                 nil,
-		ConnState:                    nil,
-		ErrorLog:                     nil,
+		Addr:    listenAddr,
+		Handler: topMux,
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
 		},
-		ConnContext: nil,
-		HTTP2:       nil,
-		Protocols:   nil,
 	}
 
 	context.AfterFunc(ctx, func() {
 		_ = httpServer.Shutdown(context.Background())
 	})
 
-	err = httpServer.ListenAndServe()
+	if tlsEnabled {
+		slog.Info("TLS enabled, starting HTTPS server", "addr", listenAddr)
+
+		redirectServer := &http.Server{
+			Addr: "0.0.0.0:80",
+			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				target := "https://" + r.Host + r.URL.RequestURI()
+				http.Redirect(w, r, target, http.StatusMovedPermanently)
+			}),
+		}
+
+		context.AfterFunc(ctx, func() {
+			_ = redirectServer.Shutdown(context.Background())
+		})
+
+		go func() {
+			if err := redirectServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+				slog.Error("HTTP redirect server error", "error", err)
+			}
+		}()
+
+		err = httpServer.ListenAndServeTLS(tlsCertFile, tlsKeyFile)
+	} else {
+		slog.Info("TLS not configured, starting HTTP server", "addr", listenAddr)
+		err = httpServer.ListenAndServe()
+	}
+
 	switch err {
 	case http.ErrServerClosed:
 	default:
@@ -197,7 +224,7 @@ func getScoreEngineMaxLifetime() time.Duration {
 	return maxLifetime
 }
 
-func setupMux(
+func setupAPIMux(
 	repo *repository.Database,
 	authorizer *authorizer.Authorizer,
 	eventBroker domain.EventBroker,
@@ -264,8 +291,6 @@ func setupMux(
 	mux.RegisterMiddleware(rest.CORS)
 	mux.RegisterMiddleware(authorizer.Middleware)
 
-	mux.HandleFunc("OPTIONS /", HandleCORSPreFlight)
-
 	rest.InstallContenderHandler(mux, &contenderUseCase)
 	rest.InstallContestHandler(mux, &contestUseCase, &compClassUseCase, &tickUseCase, &problemUseCase)
 	rest.InstallCompClassHandler(mux, &compClassUseCase)
@@ -277,12 +302,10 @@ func setupMux(
 	rest.InstallUserHandler(mux, &userUseCase)
 	rest.InstallOrganizerHandler(mux, &organizerUseCase)
 
-	installStaticHandlers(mux)
-
 	return mux
 }
 
-func installStaticHandlers(mux *rest.Mux) {
+func installStaticHandlers(mux *http.ServeMux) {
 	apps := []struct {
 		basePath string
 		subDir   string
