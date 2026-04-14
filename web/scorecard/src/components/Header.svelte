@@ -21,25 +21,27 @@
 </script>
 
 <header>
-  <div class="logo">
-    <FullLogo />
-  </div>
-  <div class="identity">
-    <div class="info">
-      <h1>{contenderName}</h1>
-      <p class="subtitle">
-        <span>{compClassName}</span><span class="separator">–</span
-        >{contestName}
-      </p>
+  <div class="top">
+    <div class="logo">
+      <FullLogo />
     </div>
+
     <wa-button
-      size="medium"
+      size="small"
       onclick={() => navigate(`/${registrationCode}/edit`)}
       disabled={contestState === "ENDED"}
       appearance="plain"
     >
       <wa-icon name="gear" label="Edit"></wa-icon>
     </wa-button>
+  </div>
+  <div class="identity">
+    <div class="info">
+      <h1>{contenderName}</h1>
+      <p class="subtitle">
+        {contestName}<span class="separator">•</span>{compClassName}
+      </p>
+    </div>
   </div>
 </header>
 
@@ -52,8 +54,15 @@
   }
 
   .logo {
-    height: var(--wa-font-size-xl);
-    color: var(--wa-color-text-normal);
+    height: var(--wa-font-size-l);
+  }
+
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    overflow-y: visible;
+    height: var(--wa-font-size-l);
   }
 
   .identity {
@@ -89,7 +98,7 @@
   }
 
   .separator {
-    margin-inline: var(--wa-space-3xs);
+    margin-inline: var(--wa-space-2xs);
   }
 
   wa-button {
