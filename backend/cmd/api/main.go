@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"embed"
+	"io/fs"
 	"log"
 	"log/slog"
 	"math/rand"
@@ -32,6 +33,9 @@ import (
 
 //go:embed migrations/*.sql
 var embedMigrations embed.FS
+
+//go:embed all:web
+var webAssets embed.FS
 
 const defaultScoreEngineMaxLifetime = 24 * time.Hour
 
@@ -273,5 +277,28 @@ func setupMux(
 	rest.InstallUserHandler(mux, &userUseCase)
 	rest.InstallOrganizerHandler(mux, &organizerUseCase)
 
+	installStaticHandlers(mux)
+
 	return mux
+}
+
+func installStaticHandlers(mux *rest.Mux) {
+	apps := []struct {
+		basePath string
+		subDir   string
+	}{
+		{"/admin", "web/admin"},
+		{"/scoreboard", "web/scoreboard"},
+		{"/", "web/scorecard"},
+	}
+
+	for _, app := range apps {
+		subFS, err := fs.Sub(webAssets, app.subDir)
+		if err != nil {
+			slog.Debug("skipping static handler, directory not found", "path", app.subDir)
+			continue
+		}
+
+		rest.InstallStaticHandler(mux, app.basePath, subFS)
+	}
 }

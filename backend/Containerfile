@@ -1,0 +1,7 @@
+FROM scratch
+
+COPY api /api
+
+EXPOSE 8090
+
+ENTRYPOINT ["/api"]
