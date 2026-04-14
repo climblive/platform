@@ -3,6 +3,7 @@ package rest
 import (
 	"io/fs"
 	"net/http"
+	"net/url"
 	"path"
 	"strings"
 )
@@ -35,16 +36,10 @@ func (h *SPAHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	file.Close()
 
 	h.setHeaders(w, urlPath)
-	http.FileServer(http.FS(h.fsys)).ServeHTTP(w, &http.Request{
-		Method:     r.Method,
-		URL:        &(*r.URL),
-		Proto:      r.Proto,
-		ProtoMajor: r.ProtoMajor,
-		ProtoMinor: r.ProtoMinor,
-		Header:     r.Header,
-		Body:       r.Body,
-		Host:       r.Host,
-	})
+
+	modifiedReq := r.Clone(r.Context())
+	modifiedReq.URL = &url.URL{Path: "/" + urlPath}
+	http.FileServer(http.FS(h.fsys)).ServeHTTP(w, modifiedReq)
 }
 
 func (h *SPAHandler) serveIndex(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +52,7 @@ func (h *SPAHandler) serveIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Write(content)
+	_, _ = w.Write(content)
 }
 
 func (h *SPAHandler) setHeaders(w http.ResponseWriter, filePath string) {
