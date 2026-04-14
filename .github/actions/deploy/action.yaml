@@ -26,4 +26,3 @@ runs:
         ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} 'sudo sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=${{ inputs.database-password }}\"/g" /etc/systemd/system/climblive.service.d/override.conf'
         ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo systemctl daemon-reload"
         ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo systemctl restart climblive"
-        ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo systemctl reload nginx"
