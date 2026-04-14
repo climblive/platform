@@ -172,7 +172,16 @@ func main() {
 		redirectServer := &http.Server{
 			Addr: "0.0.0.0:80",
 			Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				target := "https://" + r.Host + r.URL.RequestURI()
+				host := r.Host
+				if host == "" {
+					http.Error(w, "Bad Request", http.StatusBadRequest)
+					return
+				}
+
+				target := "https://" + host + r.URL.Path
+				if r.URL.RawQuery != "" {
+					target += "?" + r.URL.RawQuery
+				}
 				http.Redirect(w, r, target, http.StatusMovedPermanently)
 			}),
 		}
