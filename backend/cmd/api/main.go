@@ -353,6 +353,7 @@ func loadTLSConfig() (*tls.Config, bool) {
 
 	return &tls.Config{
 		Certificates: certificates,
+		MinVersion:   tls.VersionTLS12,
 	}, true
 }
 
