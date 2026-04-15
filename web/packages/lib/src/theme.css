@@ -74,3 +74,26 @@ wa-option small {
   font-size: var(--wa-font-size-xs);
   margin-top: var(--wa-space-2xs);
 }
+
+wa-tab-group {
+  --track-color: transparent;
+  --indicator-color: transparent;
+}
+
+wa-tab-group::part(tabs) {
+  background-color: var(--wa-color-neutral-fill-quiet);
+  border-radius: var(--wa-border-radius-pill);
+  padding: var(--wa-space-3xs);
+}
+
+wa-tab::part(base) {
+  border-radius: var(--wa-border-radius-pill);
+}
+
+wa-tab[active] {
+  color: var(--wa-color-brand-on-loud);
+}
+
+wa-tab[active]::part(base) {
+  background-color: var(--wa-color-brand-fill-loud);
+}
