@@ -13,10 +13,6 @@
 
   const { id, name, scrubbedAt, withTooltip = false }: Props = $props();
 
-  const displayName = $derived(
-    scrubbedAt ? maskScrubbedName(id) : (name ?? ""),
-  );
-
   const tooltipId = $props.id();
 </script>
 
@@ -33,7 +29,13 @@
   </wa-popover>
 {/if}
 
-<span id={tooltipId}>{displayName}</span>
+<span id={tooltipId}>
+  {#if scrubbedAt}
+    <pre>{maskScrubbedName(id)}</pre>
+  {:else}
+    {name ?? ""}
+  {/if}
+</span>
 
 <style>
   wa-popover {
