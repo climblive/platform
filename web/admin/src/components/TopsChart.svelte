@@ -76,17 +76,17 @@
     gap: var(--wa-space-xs);
     height: 10rem;
     padding-block-start: var(--wa-space-m);
+    overflow-x: auto;
   }
 
   .bar-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    flex: 1;
+    flex: 0 0 3rem;
     height: 100%;
     justify-content: flex-end;
     gap: 0.25rem;
-    min-width: 0;
   }
 
   .count {
@@ -96,7 +96,6 @@
 
   .bar {
     width: 100%;
-    max-width: 3rem;
     border-radius: var(--wa-border-radius-s) var(--wa-border-radius-s) 0 0;
     background: linear-gradient(
       to bottom,
