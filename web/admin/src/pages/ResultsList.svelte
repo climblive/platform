@@ -1,5 +1,6 @@
 <script lang="ts">
   import ResultListTable from "@/components/ResultListTable.svelte";
+  import TopsChart from "@/components/TopsChart.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { ApiClient } from "@climblive/lib";
@@ -46,6 +47,8 @@
       </wa-button>
     </a>
   </div>
+
+  <TopsChart {contestId} />
 
   <ScoreboardProvider {contestId}>
     {#snippet children({ scoreboard, loading })}
