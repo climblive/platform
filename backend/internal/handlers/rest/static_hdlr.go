@@ -11,12 +11,14 @@ import (
 type SPAHandler struct {
 	fsys     fs.FS
 	basePath string
+	csp      string
 }
 
-func NewSPAHandler(fsys fs.FS, basePath string) *SPAHandler {
+func NewSPAHandler(fsys fs.FS, basePath string, csp string) *SPAHandler {
 	return &SPAHandler{
 		fsys:     fsys,
 		basePath: basePath,
+		csp:      csp,
 	}
 }
 
@@ -25,7 +27,8 @@ func (h *SPAHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	urlPath = strings.TrimPrefix(urlPath, "/")
 
 	if urlPath == "" {
-		urlPath = "index.html"
+		h.serveIndex(w, r)
+		return
 	}
 
 	file, err := h.fsys.Open(urlPath)
@@ -62,13 +65,16 @@ func (h *SPAHandler) setHeaders(w http.ResponseWriter, filePath string) {
 		w.Header().Set("Cache-Control", "no-store")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("Referrer-Policy", "same-origin")
+		if h.csp != "" {
+			w.Header().Set("Content-Security-Policy", h.csp)
+		}
 	} else {
 		w.Header().Set("Cache-Control", "public, max-age=86400")
 	}
 }
 
-func InstallStaticHandler(mux *http.ServeMux, basePath string, fsys fs.FS) {
-	handler := NewSPAHandler(fsys, basePath)
+func InstallStaticHandler(mux *http.ServeMux, basePath string, fsys fs.FS, csp string) {
+	handler := NewSPAHandler(fsys, basePath, csp)
 
 	pattern := basePath
 	if !strings.HasSuffix(pattern, "/") {

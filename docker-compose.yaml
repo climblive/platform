@@ -1,0 +1,40 @@
+services:
+  db:
+    image: mariadb:11
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: climblive
+      MARIADB_USER: climblive
+      MARIADB_PASSWORD: climblive
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - db-data:/var/lib/mysql
+
+  app:
+    build:
+      context: backend
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "443:443"
+    environment:
+      DB_USERNAME: climblive
+      DB_PASSWORD: climblive
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: climblive
+      WWW_HOST: www.localhost
+      TLS_APP_CERT_FILE: /certs/app-cert.pem
+      TLS_APP_KEY_FILE: /certs/app-key.pem
+      TLS_WWW_CERT_FILE: /certs/www-cert.pem
+      TLS_WWW_KEY_FILE: /certs/www-key.pem
+    volumes:
+      - ./.local/certs:/certs:ro
+
+volumes:
+  db-data:

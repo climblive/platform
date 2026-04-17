@@ -41,6 +41,10 @@ var webAssets embed.FS
 
 const defaultScoreEngineMaxLifetime = 24 * time.Hour
 
+const appCSP = "default-src 'self'; connect-src 'self' clmb.auth.eu-west-1.amazoncognito.com *.fontawesome.com *.sentry.io data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'self'; img-src 'self' data:; report-uri https://o4509937603641344.ingest.de.sentry.io/api/4509937616093264/security/?sentry_key=019099d850441f60cea5d465e217f768"
+
+const wwwCSP = "default-src 'self'; script-src 'self' 'sha256-jIhoHP5AYEa/rjrf399lCKS/+7hIAc+G1cKDLBSPd7o='; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'none'; form-action 'none'; base-uri 'self'"
+
 type registrationCodeGenerator struct {
 }
 
@@ -68,19 +72,13 @@ func main() {
 
 	w := os.Stdout
 
-	logger := slog.New(tint.NewHandler(w, nil))
-
 	slog.SetDefault(slog.New(
 		tint.NewHandler(w, &tint.Options{
 			Level:      slog.LevelDebug,
 			TimeFormat: time.Kitchen,
 			NoColor:    !isatty.IsTerminal(w.Fd()),
-			AddSource:  false,
-			ReplaceAttr: nil,
 		}),
 	))
-
-	slog.SetDefault(logger)
 
 	var barriers []*sync.WaitGroup
 
@@ -136,35 +134,25 @@ func main() {
 	apiMux := setupAPIMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
 
 	appMux := http.NewServeMux()
-	appMux.Handle("/api/", http.StripPrefix("/api", apiMux))
+	appMux.Handle("/api/", http.StripPrefix("/api", noCacheHandler(apiMux)))
 	installAppStaticHandlers(appMux)
 
 	wwwMux := http.NewServeMux()
 	installWWWStaticHandlers(wwwMux)
 
-	handler := newHostHandler(appMux, wwwMux)
+	wwwHost := os.Getenv("WWW_HOST")
 
 	tlsConfig := loadTLSConfig()
 
+	handler := maxBytesHandler(newHostHandler(appMux, wwwMux, wwwHost), 1<<20)
+
 	httpServer := &http.Server{
-		Addr:                         "0.0.0.0:443",
-		Handler:                      handler,
-		DisableGeneralOptionsHandler: false,
-		TLSConfig:                    tlsConfig,
-		ReadTimeout:                  0,
-		ReadHeaderTimeout:            0,
-		WriteTimeout:                 0,
-		IdleTimeout:                  0,
-		MaxHeaderBytes:               0,
-		TLSNextProto:                 nil,
-		ConnState:                    nil,
-		ErrorLog:                     nil,
+		Addr:      "0.0.0.0:443",
+		Handler:   handler,
+		TLSConfig: tlsConfig,
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
 		},
-		ConnContext: nil,
-		HTTP2:       nil,
-		Protocols:   nil,
 	}
 
 	context.AfterFunc(ctx, func() {
@@ -323,12 +311,14 @@ func loadTLSConfig() *tls.Config {
 }
 
 type hostHandler struct {
+	wwwHost    string
 	appHandler http.Handler
 	wwwHandler http.Handler
 }
 
-func newHostHandler(appHandler, wwwHandler http.Handler) *hostHandler {
+func newHostHandler(appHandler, wwwHandler http.Handler, wwwHost string) *hostHandler {
 	return &hostHandler{
+		wwwHost:    wwwHost,
 		appHandler: appHandler,
 		wwwHandler: wwwHandler,
 	}
@@ -340,7 +330,7 @@ func (h *hostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		host = host[:colonIdx]
 	}
 
-	if h.wwwHandler != nil && !strings.HasSuffix(host, ".app") {
+	if h.wwwHost != "" && host == h.wwwHost {
 		h.wwwHandler.ServeHTTP(w, r)
 		return
 	}
@@ -364,7 +354,7 @@ func installAppStaticHandlers(mux *http.ServeMux) {
 			panic(err)
 		}
 
-		rest.InstallStaticHandler(mux, app.basePath, subFS)
+		rest.InstallStaticHandler(mux, app.basePath, subFS, appCSP)
 	}
 }
 
@@ -374,5 +364,19 @@ func installWWWStaticHandlers(mux *http.ServeMux) {
 		panic(err)
 	}
 
-	rest.InstallStaticHandler(mux, "/", subFS)
+	rest.InstallStaticHandler(mux, "/", subFS, wwwCSP)
+}
+
+func noCacheHandler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "no-store")
+		next.ServeHTTP(w, r)
+	})
+}
+
+func maxBytesHandler(next http.Handler, maxBytes int64) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.Body = http.MaxBytesReader(w, r.Body, maxBytes)
+		next.ServeHTTP(w, r)
+	})
 }

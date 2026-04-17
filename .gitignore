@@ -19,6 +19,9 @@ __debug_bin*
 backend/api
 backend/simulator
 
+# Local development
+.local/
+
 # Embedded web assets (built in CI)
 backend/cmd/api/web/admin/
 backend/cmd/api/web/scoreboard/
