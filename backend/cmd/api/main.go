@@ -72,6 +72,8 @@ func main() {
 
 	w := os.Stdout
 
+	logger := slog.New(tint.NewHandler(w, nil))
+
 	slog.SetDefault(slog.New(
 		tint.NewHandler(w, &tint.Options{
 			Level:       slog.LevelDebug,
@@ -81,6 +83,8 @@ func main() {
 			ReplaceAttr: nil,
 		}),
 	))
+
+	slog.SetDefault(logger)
 
 	var barriers []*sync.WaitGroup
 
