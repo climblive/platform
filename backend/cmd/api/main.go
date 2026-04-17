@@ -149,13 +149,10 @@ func main() {
 	handler := maxBytesHandler(newHostHandler(appMux, wwwMux, wwwHost), 1<<20)
 
 	httpServer := &http.Server{
-		Addr:      "0.0.0.0:443",
-		Handler:   handler,
-		TLSConfig: tlsConfig,
-		BaseContext: func(_ net.Listener) context.Context {
-			return ctx
-		},
+		Addr:                         "0.0.0.0:443",
+		Handler:                      handler,
 		DisableGeneralOptionsHandler: false,
+		TLSConfig:                    tlsConfig,
 		ReadTimeout:                  0,
 		ReadHeaderTimeout:            0,
 		WriteTimeout:                 0,
@@ -164,9 +161,12 @@ func main() {
 		TLSNextProto:                 nil,
 		ConnState:                    nil,
 		ErrorLog:                     nil,
-		ConnContext:                  nil,
-		HTTP2:                        nil,
-		Protocols:                    nil,
+		BaseContext: func(_ net.Listener) context.Context {
+			return ctx
+		},
+		ConnContext: nil,
+		HTTP2:       nil,
+		Protocols:   nil,
 	}
 
 	context.AfterFunc(ctx, func() {
