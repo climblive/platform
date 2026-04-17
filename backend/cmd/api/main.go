@@ -74,9 +74,11 @@ func main() {
 
 	slog.SetDefault(slog.New(
 		tint.NewHandler(w, &tint.Options{
-			Level:      slog.LevelDebug,
-			TimeFormat: time.Kitchen,
-			NoColor:    !isatty.IsTerminal(w.Fd()),
+			Level:       slog.LevelDebug,
+			TimeFormat:  time.Kitchen,
+			NoColor:     !isatty.IsTerminal(w.Fd()),
+			AddSource:   false,
+			ReplaceAttr: nil,
 		}),
 	))
 
@@ -153,6 +155,18 @@ func main() {
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
 		},
+		DisableGeneralOptionsHandler: false,
+		ReadTimeout:                  0,
+		ReadHeaderTimeout:            0,
+		WriteTimeout:                 0,
+		IdleTimeout:                  0,
+		MaxHeaderBytes:               0,
+		TLSNextProto:                 nil,
+		ConnState:                    nil,
+		ErrorLog:                     nil,
+		ConnContext:                  nil,
+		HTTP2:                        nil,
+		Protocols:                    nil,
 	}
 
 	context.AfterFunc(ctx, func() {
