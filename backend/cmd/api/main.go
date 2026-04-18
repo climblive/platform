@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"os/user"
 	"strconv"
 	"strings"
 	"sync"
@@ -86,6 +87,9 @@ func main() {
 
 	slog.SetDefault(logger)
 
+	tlsConfig := loadTLSConfig()
+	dropPrivileges()
+
 	var barriers []*sync.WaitGroup
 
 	dbPort, _ := strconv.Atoi(os.Getenv("DB_PORT"))
@@ -147,8 +151,6 @@ func main() {
 	installWWWStaticHandlers(wwwMux)
 
 	wwwHost := os.Getenv("WWW_HOST")
-
-	tlsConfig := loadTLSConfig()
 
 	handler := maxBytesHandler(newHostHandler(appMux, wwwMux, wwwHost), 1<<20)
 
@@ -326,6 +328,32 @@ func loadTLSConfig() *tls.Config {
 		Certificates: certificates,
 		MinVersion:   tls.VersionTLS12,
 	}
+}
+
+func dropPrivileges() {
+	u, err := user.Lookup("climblive")
+	if err != nil {
+		panic("failed to look up user 'climblive': " + err.Error())
+	}
+
+	gid, err := strconv.Atoi(u.Gid)
+	if err != nil {
+		panic("failed to convert gid to int: " + err.Error())
+	}
+	uid, err := strconv.Atoi(u.Uid)
+	if err != nil {
+		panic("failed to convert uid to int: " + err.Error())
+	}
+
+	if err := syscall.Setgid(gid); err != nil {
+		panic("failed to set gid: " + err.Error())
+	}
+
+	if err := syscall.Setuid(uid); err != nil {
+		panic("failed to set uid: " + err.Error())
+	}
+
+	slog.Info("dropped privileges", "uid", uid, "gid", gid)
 }
 
 type hostHandler struct {
