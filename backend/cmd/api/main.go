@@ -340,6 +340,7 @@ func dropPrivileges() {
 	if err != nil {
 		panic("failed to convert gid to int: " + err.Error())
 	}
+
 	uid, err := strconv.Atoi(u.Uid)
 	if err != nil {
 		panic("failed to convert uid to int: " + err.Error())
