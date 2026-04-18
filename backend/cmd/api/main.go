@@ -152,7 +152,7 @@ func main() {
 
 	wwwHost := os.Getenv("WWW_HOST")
 
-	handler := maxBytesHandler(newHostHandler(appMux, wwwMux, wwwHost), 1<<20)
+	handler := maxBytesHandler(&hostHandler{appHandler: appMux, wwwHandler: wwwMux, wwwHost: wwwHost}, 1<<20)
 
 	httpServer := &http.Server{
 		Addr:                         "0.0.0.0:443",
@@ -361,14 +361,6 @@ type hostHandler struct {
 	wwwHost    string
 	appHandler http.Handler
 	wwwHandler http.Handler
-}
-
-func newHostHandler(appHandler, wwwHandler http.Handler, wwwHost string) *hostHandler {
-	return &hostHandler{
-		wwwHost:    wwwHost,
-		appHandler: appHandler,
-		wwwHandler: wwwHandler,
-	}
 }
 
 func (h *hostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
