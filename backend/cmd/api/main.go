@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"embed"
+	"fmt"
 	"io/fs"
 	"log"
 	"log/slog"
@@ -14,7 +15,7 @@ import (
 	"os/signal"
 	"os/user"
 	"strconv"
-	"strings"
+
 	"sync"
 	"syscall"
 	"time"
@@ -88,7 +89,9 @@ func main() {
 	slog.SetDefault(logger)
 
 	tlsConfig := loadTLSConfig()
-	dropPrivileges()
+	if err := dropPrivileges("climblive"); err != nil {
+		panic(err)
+	}
 
 	var barriers []*sync.WaitGroup
 
@@ -307,7 +310,7 @@ func loadTLSConfig() *tls.Config {
 	var certificates []tls.Certificate
 	for _, p := range pairs {
 		if p.cert == "" || p.key == "" {
-			continue
+			panic("incomplete TLS certificate pair: cert=" + p.cert + " key=" + p.key)
 		}
 
 		cert, err := tls.LoadX509KeyPair(p.cert, p.key)
@@ -330,31 +333,33 @@ func loadTLSConfig() *tls.Config {
 	}
 }
 
-func dropPrivileges() {
-	u, err := user.Lookup("climblive")
+func dropPrivileges(username string) error {
+	u, err := user.Lookup(username)
 	if err != nil {
-		panic("failed to look up user 'climblive': " + err.Error())
+		return fmt.Errorf("failed to look up user '%s': %w", username, err)
 	}
 
 	gid, err := strconv.Atoi(u.Gid)
 	if err != nil {
-		panic("failed to convert gid to int: " + err.Error())
+		return fmt.Errorf("failed to convert gid to int: %w", err)
 	}
 
 	uid, err := strconv.Atoi(u.Uid)
 	if err != nil {
-		panic("failed to convert uid to int: " + err.Error())
+		return fmt.Errorf("failed to convert uid to int: %w", err)
 	}
 
 	if err := syscall.Setgid(gid); err != nil {
-		panic("failed to set gid: " + err.Error())
+		return fmt.Errorf("failed to set gid: %w", err)
 	}
 
 	if err := syscall.Setuid(uid); err != nil {
-		panic("failed to set uid: " + err.Error())
+		return fmt.Errorf("failed to set uid: %w", err)
 	}
 
 	slog.Info("dropped privileges", "uid", uid, "gid", gid)
+
+	return nil
 }
 
 type hostHandler struct {
@@ -364,9 +369,9 @@ type hostHandler struct {
 }
 
 func (h *hostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	host := r.Host
-	if colonIdx := strings.LastIndex(host, ":"); colonIdx != -1 {
-		host = host[:colonIdx]
+	host, _, err := net.SplitHostPort(r.Host)
+	if err != nil {
+		host = r.Host
 	}
 
 	if h.wwwHost != "" && host == h.wwwHost {

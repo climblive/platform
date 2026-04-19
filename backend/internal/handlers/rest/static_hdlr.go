@@ -9,22 +9,21 @@ import (
 )
 
 type SPAHandler struct {
-	fsys     fs.FS
-	basePath string
-	csp      string
+	fsys       fs.FS
+	fileServer http.Handler
+	csp        string
 }
 
-func NewSPAHandler(fsys fs.FS, basePath string, csp string) *SPAHandler {
+func NewSPAHandler(fsys fs.FS, csp string) *SPAHandler {
 	return &SPAHandler{
-		fsys:     fsys,
-		basePath: basePath,
-		csp:      csp,
+		fsys:       fsys,
+		fileServer: http.FileServer(http.FS(fsys)),
+		csp:        csp,
 	}
 }
 
 func (h *SPAHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	urlPath := strings.TrimPrefix(r.URL.Path, h.basePath)
-	urlPath = strings.TrimPrefix(urlPath, "/")
+	urlPath := strings.TrimPrefix(r.URL.Path, "/")
 
 	if urlPath == "" {
 		h.serveIndex(w, r)
@@ -41,8 +40,8 @@ func (h *SPAHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.setHeaders(w, urlPath)
 
 	modifiedReq := r.Clone(r.Context())
-	modifiedReq.URL = &url.URL{Path: "/" + urlPath}
-	http.FileServer(http.FS(h.fsys)).ServeHTTP(w, modifiedReq)
+	modifiedReq.URL = &url.URL{Path: "/" + urlPath, RawQuery: r.URL.RawQuery}
+	h.fileServer.ServeHTTP(w, modifiedReq)
 }
 
 func (h *SPAHandler) serveIndex(w http.ResponseWriter, r *http.Request) {
@@ -74,7 +73,7 @@ func (h *SPAHandler) setHeaders(w http.ResponseWriter, filePath string) {
 }
 
 func InstallStaticHandler(mux *http.ServeMux, basePath string, fsys fs.FS, csp string) {
-	handler := NewSPAHandler(fsys, basePath, csp)
+	handler := NewSPAHandler(fsys, csp)
 
 	pattern := basePath
 	if !strings.HasSuffix(pattern, "/") {
