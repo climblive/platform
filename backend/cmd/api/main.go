@@ -155,11 +155,9 @@ func main() {
 
 	wwwHost := os.Getenv("WWW_HOST")
 
-	handler := maxBytesHandler(&hostHandler{appHandler: appMux, wwwHandler: wwwMux, wwwHost: wwwHost}, 1<<20)
-
 	httpServer := &http.Server{
 		Addr:                         "0.0.0.0:443",
-		Handler:                      handler,
+		Handler:                      &hostHandler{appHandler: appMux, wwwHandler: wwwMux, wwwHost: wwwHost},
 		DisableGeneralOptionsHandler: false,
 		TLSConfig:                    tlsConfig,
 		ReadTimeout:                  0,
@@ -409,13 +407,6 @@ func installWWWStaticHandlers(mux *http.ServeMux) {
 func noCacheHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-store")
-		next.ServeHTTP(w, r)
-	})
-}
-
-func maxBytesHandler(next http.Handler, maxBytes int64) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		r.Body = http.MaxBytesReader(w, r.Body, maxBytes)
 		next.ServeHTTP(w, r)
 	})
 }
