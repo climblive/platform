@@ -92,6 +92,7 @@
               class="bar-stack"
               id="bar-{problem.id}"
               type="button"
+              aria-label="Show details for problem #{problem.number}"
               style:--bar-color={problem.holdColorPrimary}
             >
               {#if flashPct > 0}
