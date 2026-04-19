@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"embed"
-	"fmt"
 	"io/fs"
 	"log"
 	"log/slog"
@@ -28,6 +27,7 @@ import (
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/utils"
+	"github.com/go-errors/errors"
 	"github.com/google/uuid"
 	"github.com/lmittmann/tint"
 	"github.com/mattn/go-isatty"
@@ -336,25 +336,25 @@ func loadTLSConfig() *tls.Config {
 func dropPrivileges(username string) error {
 	u, err := user.Lookup(username)
 	if err != nil {
-		return fmt.Errorf("failed to look up user '%s': %w", username, err)
+		return errors.Wrap(err, 0)
 	}
 
 	gid, err := strconv.Atoi(u.Gid)
 	if err != nil {
-		return fmt.Errorf("failed to convert gid to int: %w", err)
+		return errors.Wrap(err, 0)
 	}
 
 	uid, err := strconv.Atoi(u.Uid)
 	if err != nil {
-		return fmt.Errorf("failed to convert uid to int: %w", err)
+		return errors.Wrap(err, 0)
 	}
 
 	if err := syscall.Setgid(gid); err != nil {
-		return fmt.Errorf("failed to set gid: %w", err)
+		return errors.Wrap(err, 0)
 	}
 
 	if err := syscall.Setuid(uid); err != nil {
-		return fmt.Errorf("failed to set uid: %w", err)
+		return errors.Wrap(err, 0)
 	}
 
 	slog.Info("dropped privileges", "uid", uid, "gid", gid)
