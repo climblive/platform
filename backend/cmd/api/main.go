@@ -320,6 +320,7 @@ func loadTLSConfig() *tls.Config {
 		slog.Info("loaded TLS certificate", "cert", p.cert)
 	}
 
+	//nolint:exhaustruct // This is a very large struct
 	return &tls.Config{
 		Certificates: certificates,
 		MinVersion:   tls.VersionTLS12,
