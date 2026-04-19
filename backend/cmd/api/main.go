@@ -144,7 +144,7 @@ func main() {
 		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
 		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()))
 
-	apiMux := setupAPIMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
+	apiMux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
 
 	appMux := http.NewServeMux()
 	appMux.Handle("/api/", http.StripPrefix("/api", noCacheHandler(apiMux)))
@@ -215,7 +215,7 @@ func getScoreEngineMaxLifetime() time.Duration {
 	return maxLifetime
 }
 
-func setupAPIMux(
+func setupMux(
 	repo *repository.Database,
 	authorizer *authorizer.Authorizer,
 	eventBroker domain.EventBroker,
