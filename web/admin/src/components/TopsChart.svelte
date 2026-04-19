@@ -83,38 +83,36 @@
         {@const flashPct = pct(stats.flash)}
 
         <div class="bar-container">
-          <div class="bar-track">
-            <div
-              class="bar-background"
-              style:--bar-color={problem.holdColorPrimary}
-            ></div>
-            <button
-              class="bar-stack"
-              id="bar-{problem.id}"
-              type="button"
-              aria-label="Show details for problem #{problem.number}"
-              style:--bar-color={problem.holdColorPrimary}
-            >
-              {#if z1Pct > 0}
-                <div class="sub-bar z1" style:--target-height="{z1Pct}%"></div>
-              {/if}
-              {#if z2Pct > 0}
-                <div class="sub-bar z2" style:--target-height="{z2Pct}%"></div>
-              {/if}
-              {#if topPct > 0}
-                <div
-                  class="sub-bar top-bar"
-                  style:--target-height="{topPct}%"
-                ></div>
-              {/if}
-              {#if flashPct > 0}
-                <div
-                  class="sub-bar flash"
-                  style:--target-height="{flashPct}%"
-                ></div>
-              {/if}
-            </button>
-          </div>
+          <button
+            class="bar-stack"
+            id="bar-{problem.id}"
+            type="button"
+            aria-label="Show details for problem #{problem.number}"
+            style:--bar-color={problem.holdColorPrimary}
+          >
+            <div class="sub-bar-slot">
+              <div class="sub-bar-bg"></div>
+              <div class="sub-bar z1" style:--target-height="{z1Pct}%"></div>
+            </div>
+            <div class="sub-bar-slot">
+              <div class="sub-bar-bg"></div>
+              <div class="sub-bar z2" style:--target-height="{z2Pct}%"></div>
+            </div>
+            <div class="sub-bar-slot">
+              <div class="sub-bar-bg"></div>
+              <div
+                class="sub-bar top-bar"
+                style:--target-height="{topPct}%"
+              ></div>
+            </div>
+            <div class="sub-bar-slot">
+              <div class="sub-bar-bg"></div>
+              <div
+                class="sub-bar flash"
+                style:--target-height="{flashPct}%"
+              ></div>
+            </div>
+          </button>
           <span class="label">#{problem.number}</span>
 
           <wa-popover for="bar-{problem.id}" placement="top">
@@ -143,9 +141,7 @@
 <style>
   .chart {
     display: flex;
-    align-items: flex-end;
     gap: var(--wa-space-xs);
-    height: 10rem;
     padding-block-start: var(--wa-space-m);
   }
 
@@ -154,31 +150,15 @@
     flex-direction: column;
     align-items: center;
     flex: 0 0 2rem;
-    height: 100%;
-    justify-content: flex-end;
-  }
-
-  .bar-track {
-    position: relative;
-    width: 100%;
-    flex: 1;
-  }
-
-  .bar-background {
-    position: absolute;
-    inset: 0;
-    border-radius: var(--wa-border-radius-s) var(--wa-border-radius-s) 0 0;
-    background: var(--bar-color);
-    opacity: 0.15;
   }
 
   .bar-stack {
-    position: absolute;
-    inset: 0;
     display: flex;
     flex-direction: row;
     align-items: flex-end;
     gap: 2px;
+    width: 100%;
+    height: 8rem;
     appearance: none;
     background: none;
     border: none;
@@ -186,12 +166,29 @@
     cursor: pointer;
   }
 
-  .sub-bar {
+  .sub-bar-slot {
     flex: 1;
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .sub-bar-bg {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--wa-border-radius-s) var(--wa-border-radius-s) 0 0;
+    background: var(--bar-color);
+    opacity: 0.15;
+  }
+
+  .sub-bar {
+    width: 100%;
     background: var(--bar-color);
     border-radius: var(--wa-border-radius-s) var(--wa-border-radius-s) 0 0;
     animation: grow 0.6s ease-out forwards;
     height: 0;
+    position: relative;
   }
 
   .sub-bar.z1 {
@@ -211,7 +208,7 @@
     color: var(--wa-color-text-quiet);
     white-space: nowrap;
     writing-mode: vertical-rl;
-    padding-block-start: var(--wa-space-2xs);
+    margin-block-start: var(--wa-space-xs);
   }
 
   .popover-body {
