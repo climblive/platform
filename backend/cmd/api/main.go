@@ -323,10 +323,6 @@ func loadTLSConfig() *tls.Config {
 		slog.Info("loaded TLS certificate", "cert", p.cert)
 	}
 
-	if len(certificates) == 0 {
-		panic("no TLS certificates configured; set TLS_APP_CERT_FILE/TLS_APP_KEY_FILE and/or TLS_WWW_CERT_FILE/TLS_WWW_KEY_FILE")
-	}
-
 	return &tls.Config{
 		Certificates: certificates,
 		MinVersion:   tls.VersionTLS12,
