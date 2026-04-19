@@ -90,18 +90,18 @@
             aria-label="Show details for problem #{problem.number}"
             style:--bar-color={problem.holdColorPrimary}
           >
-            {#if problem.zone1Enabled}
-              <div class="sub-bar-slot">
+            <div class="sub-bar-slot">
+              {#if problem.zone1Enabled}
                 <div class="sub-bar-bg"></div>
                 <div class="sub-bar z1" style:--target-height="{z1Pct}%"></div>
-              </div>
-            {/if}
-            {#if problem.zone2Enabled}
-              <div class="sub-bar-slot">
+              {/if}
+            </div>
+            <div class="sub-bar-slot">
+              {#if problem.zone2Enabled}
                 <div class="sub-bar-bg"></div>
                 <div class="sub-bar z2" style:--target-height="{z2Pct}%"></div>
-              </div>
-            {/if}
+              {/if}
+            </div>
             <div class="sub-bar-slot">
               <div class="sub-bar-bg"></div>
               <div
