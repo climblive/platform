@@ -3,7 +3,6 @@
   import "@awesome.me/webawesome/dist/components/scroller/scroller.js";
   import type { ProblemID } from "@climblive/lib/models";
   import {
-    getContendersByContestQuery,
     getProblemsQuery,
     getTicksByContestQuery,
   } from "@climblive/lib/queries";
@@ -23,9 +22,6 @@
 
   const problemsQuery = $derived(getProblemsQuery(contestId));
   const ticksQuery = $derived(getTicksByContestQuery(contestId));
-  const contendersQuery = $derived(getContendersByContestQuery(contestId));
-
-  const totalContenders = $derived(contendersQuery.data?.length ?? 0);
 
   const statsByProblem = $derived.by(() => {
     const stats = new Map<ProblemID, ProblemStats>();
@@ -56,6 +52,16 @@
     return stats;
   });
 
+  const maxCount = $derived.by(() => {
+    let max = 0;
+
+    for (const s of statsByProblem.values()) {
+      max = Math.max(max, s.zone1, s.zone2, s.top, s.flash);
+    }
+
+    return max;
+  });
+
   const sortedProblems = $derived(
     problemsQuery.data
       ? [...problemsQuery.data].sort((a, b) => a.number - b.number)
@@ -63,7 +69,7 @@
   );
 
   const pct = (count: number) =>
-    totalContenders > 0 ? (count / totalContenders) * 100 : 0;
+    maxCount > 0 ? (count / maxCount) * 100 : 0;
 </script>
 
 {#if sortedProblems && sortedProblems.length > 0}
