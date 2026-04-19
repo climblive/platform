@@ -90,14 +90,18 @@
             aria-label="Show details for problem #{problem.number}"
             style:--bar-color={problem.holdColorPrimary}
           >
-            <div class="sub-bar-slot">
-              <div class="sub-bar-bg"></div>
-              <div class="sub-bar z1" style:--target-height="{z1Pct}%"></div>
-            </div>
-            <div class="sub-bar-slot">
-              <div class="sub-bar-bg"></div>
-              <div class="sub-bar z2" style:--target-height="{z2Pct}%"></div>
-            </div>
+            {#if problem.zone1Enabled}
+              <div class="sub-bar-slot">
+                <div class="sub-bar-bg"></div>
+                <div class="sub-bar z1" style:--target-height="{z1Pct}%"></div>
+              </div>
+            {/if}
+            {#if problem.zone2Enabled}
+              <div class="sub-bar-slot">
+                <div class="sub-bar-bg"></div>
+                <div class="sub-bar z2" style:--target-height="{z2Pct}%"></div>
+              </div>
+            {/if}
             <div class="sub-bar-slot">
               <div class="sub-bar-bg"></div>
               <div
@@ -118,12 +122,12 @@
           <wa-popover for="bar-{problem.id}" placement="top">
             <div class="popover-body">
               <strong>#{problem.number}</strong>
-              {#if stats.zone1 + stats.zone2 + stats.top + stats.flash > 0}
+              {#if problem.zone1Enabled && stats.zone1 + stats.zone2 + stats.top + stats.flash > 0}
                 <div>
                   Zone 1: {stats.zone1 + stats.zone2 + stats.top + stats.flash}
                 </div>
               {/if}
-              {#if stats.zone2 + stats.top + stats.flash > 0}
+              {#if problem.zone2Enabled && stats.zone2 + stats.top + stats.flash > 0}
                 <div>Zone 2: {stats.zone2 + stats.top + stats.flash}</div>
               {/if}
               <div>Tops: {stats.top + stats.flash}</div>
