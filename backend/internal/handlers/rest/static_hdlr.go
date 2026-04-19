@@ -8,21 +8,28 @@ import (
 	"strings"
 )
 
-type SPAHandler struct {
+func InstallStaticHandler(mux *http.ServeMux, basePath string, fsys fs.FS, csp string) {
+	handler := &spaHandler{
+		fsys:       fsys,
+		fileServer: http.FileServer(http.FS(fsys)),
+		csp:        csp,
+	}
+
+	pattern := basePath
+	if !strings.HasSuffix(pattern, "/") {
+		pattern += "/"
+	}
+
+	mux.Handle(pattern, http.StripPrefix(basePath, handler))
+}
+
+type spaHandler struct {
 	fsys       fs.FS
 	fileServer http.Handler
 	csp        string
 }
 
-func NewSPAHandler(fsys fs.FS, csp string) *SPAHandler {
-	return &SPAHandler{
-		fsys:       fsys,
-		fileServer: http.FileServer(http.FS(fsys)),
-		csp:        csp,
-	}
-}
-
-func (h *SPAHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	urlPath := strings.TrimPrefix(r.URL.Path, "/")
 
 	if urlPath == "" {
@@ -44,7 +51,7 @@ func (h *SPAHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.fileServer.ServeHTTP(w, modifiedReq)
 }
 
-func (h *SPAHandler) serveIndex(w http.ResponseWriter, r *http.Request) {
+func (h *spaHandler) serveIndex(w http.ResponseWriter, r *http.Request) {
 	h.setHeaders(w, "index.html")
 
 	content, err := fs.ReadFile(h.fsys, "index.html")
@@ -57,7 +64,7 @@ func (h *SPAHandler) serveIndex(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(content)
 }
 
-func (h *SPAHandler) setHeaders(w http.ResponseWriter, filePath string) {
+func (h *spaHandler) setHeaders(w http.ResponseWriter, filePath string) {
 	ext := path.Ext(filePath)
 
 	if filePath == "index.html" || ext == ".html" {
@@ -70,15 +77,4 @@ func (h *SPAHandler) setHeaders(w http.ResponseWriter, filePath string) {
 	} else {
 		w.Header().Set("Cache-Control", "public, max-age=86400")
 	}
-}
-
-func InstallStaticHandler(mux *http.ServeMux, basePath string, fsys fs.FS, csp string) {
-	handler := NewSPAHandler(fsys, csp)
-
-	pattern := basePath
-	if !strings.HasSuffix(pattern, "/") {
-		pattern += "/"
-	}
-
-	mux.Handle(pattern, http.StripPrefix(basePath, handler))
 }
