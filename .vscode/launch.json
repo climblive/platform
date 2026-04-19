@@ -12,6 +12,7 @@
       "program": "backend/cmd/api/main.go",
       "preLaunchTask": "Start MariaDB",
       "env": {
+        "INSECURE_HTTP": "true",
         "DB_USERNAME": "climblive",
         "DB_PASSWORD": "secretpassword",
         "DB_HOST": "localhost",

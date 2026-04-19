@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"embed"
+	"fmt"
 	"io/fs"
 	"log"
 	"log/slog"
@@ -88,9 +89,23 @@ func main() {
 
 	slog.SetDefault(logger)
 
-	tlsConfig := loadTLSConfig()
-	if err := dropPrivileges("climblive"); err != nil {
-		panic(err)
+	insecureHTTP := os.Getenv("INSECURE_HTTP") == "true"
+	if insecureHTTP {
+		slog.Warn("RUNNING IN INSECURE MODE - TLS DISABLED")
+	}
+
+	var (
+		listenPort int
+		tlsConfig  *tls.Config
+	)
+	if insecureHTTP {
+		listenPort = 8090
+	} else {
+		tlsConfig = loadTLSConfig()
+		if err := dropPrivileges("climblive"); err != nil {
+			panic(err)
+		}
+		listenPort = 8443
 	}
 
 	var barriers []*sync.WaitGroup
@@ -156,7 +171,7 @@ func main() {
 	wwwHost := os.Getenv("WWW_HOST")
 
 	httpServer := &http.Server{
-		Addr:                         "0.0.0.0:443",
+		Addr:                         fmt.Sprintf("0.0.0.0:%d", listenPort),
 		Handler:                      &hostHandler{appHandler: appMux, wwwHandler: wwwMux, wwwHost: wwwHost},
 		DisableGeneralOptionsHandler: false,
 		TLSConfig:                    tlsConfig,
@@ -180,7 +195,11 @@ func main() {
 		_ = httpServer.Shutdown(context.Background())
 	})
 
-	err = httpServer.ListenAndServeTLS("", "")
+	if insecureHTTP {
+		err = httpServer.ListenAndServe()
+	} else {
+		err = httpServer.ListenAndServeTLS("", "")
+	}
 
 	switch err {
 	case http.ErrServerClosed:
