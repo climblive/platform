@@ -1,6 +1,8 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/scroller/scroller.js";
   import type { ProblemID } from "@climblive/lib/models";
   import {
+    getContendersByContestQuery,
     getProblemsQuery,
     getTicksByContestQuery,
   } from "@climblive/lib/queries";
@@ -13,6 +15,9 @@
 
   const problemsQuery = $derived(getProblemsQuery(contestId));
   const ticksQuery = $derived(getTicksByContestQuery(contestId));
+  const contendersQuery = $derived(getContendersByContestQuery(contestId));
+
+  const totalContenders = $derived(contendersQuery.data?.length ?? 0);
 
   const topsByProblem = $derived.by(() => {
     const tops = new Map<ProblemID, number>();
@@ -35,17 +40,6 @@
       ? [...problemsQuery.data].sort((a, b) => a.number - b.number)
       : undefined,
   );
-
-  const maxTops = $derived.by(() => {
-    if (!sortedProblems) {
-      return 0;
-    }
-
-    return Math.max(
-      ...sortedProblems.map((p) => topsByProblem.get(p.id) ?? 0),
-      1,
-    );
-  });
 </script>
 
 {#if sortedProblems && sortedProblems.length > 0}
@@ -53,17 +47,24 @@
     <div class="chart" role="img" aria-label="Tops per problem">
       {#each sortedProblems as problem (problem.id)}
         {@const tops = topsByProblem.get(problem.id) ?? 0}
-        {@const heightPercent = (tops / maxTops) * 100}
+        {@const heightPercent =
+          totalContenders > 0 ? (tops / totalContenders) * 100 : 0}
 
         <div class="bar-container">
           <span class="count">{tops}</span>
-          <div
-            class="bar"
-            style:--target-height="{heightPercent}%"
-            style:--bar-color={problem.holdColorPrimary}
-            style:--bar-color-secondary={problem.holdColorSecondary ||
-              problem.holdColorPrimary}
-          ></div>
+          <div class="bar-track">
+            <div
+              class="bar-background"
+              style:--bar-color={problem.holdColorPrimary}
+            ></div>
+            <div
+              class="bar"
+              style:--target-height="{heightPercent}%"
+              style:--bar-color={problem.holdColorPrimary}
+              style:--bar-color-secondary={problem.holdColorSecondary ||
+                problem.holdColorPrimary}
+            ></div>
+          </div>
           <span class="label">#{problem.number}</span>
         </div>
       {/each}
@@ -95,7 +96,23 @@
     color: var(--wa-color-text-quiet);
   }
 
+  .bar-track {
+    position: relative;
+    width: 100%;
+    flex: 1;
+  }
+
+  .bar-background {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--wa-border-radius-s) var(--wa-border-radius-s) 0 0;
+    background: var(--bar-color);
+    opacity: 0.15;
+  }
+
   .bar {
+    position: absolute;
+    bottom: 0;
     width: 100%;
     border-radius: var(--wa-border-radius-s) var(--wa-border-radius-s) 0 0;
     background: linear-gradient(
