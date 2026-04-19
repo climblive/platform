@@ -217,7 +217,6 @@
     font-size: var(--wa-font-size-xs);
     color: var(--wa-color-text-quiet);
     white-space: nowrap;
-    writing-mode: vertical-rl;
     margin-block-start: var(--wa-space-xs);
   }
 
