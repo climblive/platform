@@ -70,7 +70,10 @@ test.beforeAll(async () => {
     .withWaitStrategy(Wait.forLogMessage(/score engine started/));
 
   startedApiContainer = await apiContainer.start();
-  console.log("Container started on port:", startedApiContainer.getMappedPort(8443));
+  console.log(
+    "Container started on port:",
+    startedApiContainer.getMappedPort(8443),
+  );
   console.log("Container host:", startedApiContainer.getHost());
 });
 
@@ -84,7 +87,9 @@ test("enter contest by entering registration code", async ({ page }) => {
   page.on("console", (msg) => console.log("PAGE LOG:", msg.type(), msg.text()));
   page.on("pageerror", (err) => console.log("PAGE ERROR:", err.message));
   page.on("request", (req) => console.log("REQUEST:", req.url()));
-  page.on("response", (res) => console.log("RESPONSE:", res.status(), res.url()));
+  page.on("response", (res) =>
+    console.log("RESPONSE:", res.status(), res.url()),
+  );
 
   await page.goto("/");
 
