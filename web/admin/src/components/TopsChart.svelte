@@ -49,24 +49,26 @@
 </script>
 
 {#if sortedProblems && sortedProblems.length > 0}
-  <div class="chart" role="img" aria-label="Tops per problem">
-    {#each sortedProblems as problem (problem.id)}
-      {@const tops = topsByProblem.get(problem.id) ?? 0}
-      {@const heightPercent = (tops / maxTops) * 100}
+  <wa-scroller orientation="horizontal">
+    <div class="chart" role="img" aria-label="Tops per problem">
+      {#each sortedProblems as problem (problem.id)}
+        {@const tops = topsByProblem.get(problem.id) ?? 0}
+        {@const heightPercent = (tops / maxTops) * 100}
 
-      <div class="bar-container">
-        <span class="count">{tops}</span>
-        <div
-          class="bar"
-          style:--target-height="{heightPercent}%"
-          style:--bar-color={problem.holdColorPrimary}
-          style:--bar-color-secondary={problem.holdColorSecondary ||
-            problem.holdColorPrimary}
-        ></div>
-        <span class="label">№ {problem.number}</span>
-      </div>
-    {/each}
-  </div>
+        <div class="bar-container">
+          <span class="count">{tops}</span>
+          <div
+            class="bar"
+            style:--target-height="{heightPercent}%"
+            style:--bar-color={problem.holdColorPrimary}
+            style:--bar-color-secondary={problem.holdColorSecondary ||
+              problem.holdColorPrimary}
+          ></div>
+          <span class="label">#{problem.number}</span>
+        </div>
+      {/each}
+    </div>
+  </wa-scroller>
 {/if}
 
 <style>
@@ -76,14 +78,13 @@
     gap: var(--wa-space-xs);
     height: 10rem;
     padding-block-start: var(--wa-space-m);
-    overflow-x: auto;
   }
 
   .bar-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    flex: 0 0 3rem;
+    flex: 0 0 2rem;
     height: 100%;
     justify-content: flex-end;
     gap: 0.25rem;
