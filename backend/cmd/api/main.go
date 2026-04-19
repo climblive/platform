@@ -348,7 +348,7 @@ func loadTLSConfig() *tls.Config {
 		slog.Info("loaded TLS certificate", "cert", p.cert)
 	}
 
-	config := tls.Config{}
+	var config tls.Config
 	config.Certificates = certificates
 	config.MinVersion = tls.VersionTLS12
 
