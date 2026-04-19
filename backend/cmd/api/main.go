@@ -339,11 +339,11 @@ func loadTLSConfig() *tls.Config {
 		slog.Info("loaded TLS certificate", "cert", p.cert)
 	}
 
-	//nolint:exhaustruct // This is a very large struct
-	return &tls.Config{
-		Certificates: certificates,
-		MinVersion:   tls.VersionTLS12,
-	}
+	config := tls.Config{}
+	config.Certificates = certificates
+	config.MinVersion = tls.VersionTLS12
+
+	return &config
 }
 
 func dropPrivileges(username string) error {
