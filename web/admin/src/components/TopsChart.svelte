@@ -68,8 +68,7 @@
       : undefined,
   );
 
-  const pct = (count: number) =>
-    maxCount > 0 ? (count / maxCount) * 100 : 0;
+  const pct = (count: number) => (maxCount > 0 ? (count / maxCount) * 100 : 0);
 </script>
 
 {#if sortedProblems && sortedProblems.length > 0}
@@ -195,7 +194,7 @@
   .sub-bar {
     width: 100%;
     background: var(--bar-color);
-    border-radius: var(--wa-border-radius-s) var(--wa-border-radius-s) 0 0;
+    border-radius: var(--wa-border-radius-s);
     animation: grow 0.6s ease-out forwards;
     height: 0;
     position: relative;
