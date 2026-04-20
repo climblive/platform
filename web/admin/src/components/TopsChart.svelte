@@ -6,6 +6,7 @@
     getProblemsQuery,
     getTicksByContestQuery,
   } from "@climblive/lib/queries";
+  import SubBar from "./SubBar.svelte";
 
   interface Props {
     contestId: number;
@@ -93,34 +94,31 @@
             id="bar-{problem.id}"
             type="button"
             aria-label="Show details for problem #{problem.number}"
-            style:--bar-color={problem.holdColorPrimary}
           >
-            <div class="sub-bar-slot">
-              {#if problem.zone1Enabled}
-                <div class="sub-bar-bg"></div>
-                <div class="sub-bar z1" style:--target-height="{z1Pct}%"></div>
-              {/if}
-            </div>
-            <div class="sub-bar-slot">
-              {#if problem.zone2Enabled}
-                <div class="sub-bar-bg"></div>
-                <div class="sub-bar z2" style:--target-height="{z2Pct}%"></div>
-              {/if}
-            </div>
-            <div class="sub-bar-slot">
-              <div class="sub-bar-bg"></div>
-              <div
-                class="sub-bar top-bar"
-                style:--target-height="{topPct}%"
-              ></div>
-            </div>
-            <div class="sub-bar-slot">
-              <div class="sub-bar-bg"></div>
-              <div
-                class="sub-bar flash"
-                style:--target-height="{flashPct}%"
-              ></div>
-            </div>
+            <SubBar
+              percentage={z1Pct}
+              color={problem.holdColorPrimary}
+              opacity={0.35}
+              visible={problem.zone1Enabled}
+            />
+            <SubBar
+              percentage={z2Pct}
+              color={problem.holdColorPrimary}
+              opacity={0.55}
+              visible={problem.zone2Enabled}
+            />
+            <SubBar
+              percentage={topPct}
+              color={problem.holdColorPrimary}
+              opacity={0.75}
+              visible={true}
+            />
+            <SubBar
+              percentage={flashPct}
+              color={problem.holdColorPrimary}
+              opacity={1}
+              visible={true}
+            />
           </button>
           <span class="label">#{problem.number}</span>
 
@@ -175,43 +173,6 @@
     cursor: pointer;
   }
 
-  .sub-bar-slot {
-    flex: 1;
-    position: relative;
-    height: 100%;
-    display: flex;
-    align-items: flex-end;
-  }
-
-  .sub-bar-bg {
-    position: absolute;
-    inset: 0;
-    border-radius: var(--wa-border-radius-s) var(--wa-border-radius-s) 0 0;
-    background: var(--bar-color);
-    opacity: 0.15;
-  }
-
-  .sub-bar {
-    width: 100%;
-    background: var(--bar-color);
-    border-radius: var(--wa-border-radius-s);
-    animation: grow 0.6s ease-out forwards;
-    height: 0;
-    position: relative;
-  }
-
-  .sub-bar.z1 {
-    opacity: 0.35;
-  }
-
-  .sub-bar.z2 {
-    opacity: 0.55;
-  }
-
-  .sub-bar.top-bar {
-    opacity: 0.75;
-  }
-
   .label {
     font-size: var(--wa-font-size-xs);
     color: var(--wa-color-text-quiet);
@@ -224,11 +185,5 @@
     flex-direction: column;
     gap: var(--wa-space-3xs);
     font-size: var(--wa-font-size-s);
-  }
-
-  @keyframes grow {
-    to {
-      height: var(--target-height);
-    }
   }
 </style>
