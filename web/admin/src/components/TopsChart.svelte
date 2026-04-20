@@ -57,7 +57,7 @@
     let max = 0;
 
     for (const s of statsByProblem.values()) {
-      max = Math.max(max, s.zone1, s.zone2, s.top, s.flash);
+      max = Math.max(max, s.zone1 + s.zone2 + s.top + s.flash);
     }
 
     return max;
@@ -83,9 +83,11 @@
           top: 0,
           flash: 0,
         }}
-        {@const z1Pct = pct(stats.zone1)}
-        {@const z2Pct = pct(stats.zone2)}
-        {@const topPct = pct(stats.top)}
+        {@const z1Pct = pct(
+          stats.zone1 + stats.zone2 + stats.top + stats.flash,
+        )}
+        {@const z2Pct = pct(stats.zone2 + stats.top + stats.flash)}
+        {@const topPct = pct(stats.top + stats.flash)}
         {@const flashPct = pct(stats.flash)}
 
         <div class="bar-container">
