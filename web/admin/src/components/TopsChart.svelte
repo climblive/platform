@@ -99,25 +99,21 @@
               percentage={z1Pct}
               color={problem.holdColorPrimary}
               opacity={0.35}
-              visible={problem.zone1Enabled}
             />
             <SubBar
               percentage={z2Pct}
               color={problem.holdColorPrimary}
               opacity={0.55}
-              visible={problem.zone2Enabled}
             />
             <SubBar
               percentage={topPct}
               color={problem.holdColorPrimary}
               opacity={0.75}
-              visible={true}
             />
             <SubBar
               percentage={flashPct}
               color={problem.holdColorPrimary}
               opacity={1}
-              visible={true}
             />
           </button>
           <span class="label">#{problem.number}</span>

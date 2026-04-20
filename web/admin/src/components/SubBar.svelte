@@ -3,24 +3,19 @@
     percentage: number;
     color: string;
     opacity: number;
-    visible: boolean;
   }
 
-  const { percentage, color, opacity, visible }: Props = $props();
-
-  const minHeight = "2px";
+  const { percentage, color, opacity }: Props = $props();
 </script>
 
 <div class="sub-bar-slot">
-  {#if visible}
-    <div class="sub-bar-bg" style:background={color}></div>
-    <div
-      class="sub-bar"
-      style:--target-height={percentage > 0 ? `${percentage}%` : minHeight}
-      style:background={color}
-      style:opacity
-    ></div>
-  {/if}
+  <div class="sub-bar-bg" style:background={color}></div>
+  <div
+    class="sub-bar"
+    style:--target-height="{percentage}%"
+    style:background={color}
+    style:opacity
+  ></div>
 </div>
 
 <style>
