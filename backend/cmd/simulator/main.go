@@ -114,6 +114,85 @@ func main() {
 	wg.Wait()
 }
 
+type tickOutcome int
+
+const (
+	outcomeFlash tickOutcome = iota
+	outcomeTop
+	outcomeZoneBoth
+	outcomeZone1Only
+)
+
+func pickWeightedProblem(problems []domain.Problem) domain.Problem {
+	weights := make([]float64, len(problems))
+	var total float64
+
+	for i, p := range problems {
+		pts := p.PointsTop
+		if pts <= 0 {
+			pts = 1
+		}
+		w := 1.0 / float64(pts*pts)
+		weights[i] = w
+		total += w
+	}
+
+	r := rand.Float64() * total
+	for i, w := range weights {
+		r -= w
+		if r <= 0 {
+			return problems[i]
+		}
+	}
+
+	return problems[len(problems)-1]
+}
+
+func buildTick(problem domain.Problem) domain.Tick {
+	outcomes := []tickOutcome{outcomeFlash, outcomeTop}
+	if problem.Zone1Enabled && problem.Zone2Enabled {
+		outcomes = append(outcomes, outcomeZoneBoth)
+	}
+	if problem.Zone1Enabled {
+		outcomes = append(outcomes, outcomeZone1Only)
+	}
+
+	outcome := outcomes[rand.Int()%len(outcomes)]
+
+	tick := domain.Tick{
+		ProblemID: problem.ID,
+	}
+
+	attempts := 1 + rand.Int()%4
+
+	switch outcome {
+	case outcomeFlash:
+		tick.Top = true
+		tick.AttemptsTop = 1
+		tick.Zone1 = true
+		tick.AttemptsZone1 = 1
+		tick.Zone2 = true
+		tick.AttemptsZone2 = 1
+	case outcomeTop:
+		tick.Top = true
+		tick.AttemptsTop = attempts
+		tick.Zone1 = true
+		tick.AttemptsZone1 = attempts
+		tick.Zone2 = true
+		tick.AttemptsZone2 = attempts
+	case outcomeZoneBoth:
+		tick.Zone1 = true
+		tick.AttemptsZone1 = attempts
+		tick.Zone2 = true
+		tick.AttemptsZone2 = attempts
+	case outcomeZone1Only:
+		tick.Zone1 = true
+		tick.AttemptsZone1 = attempts
+	}
+
+	return tick
+}
+
 type ContenderRunner struct {
 	RegistrationCode string
 	apiURL           string
@@ -174,26 +253,14 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 	for range requests {
 		r.sleep()
 
-		problem := problems[rand.Int()%len(problems)]
+		problem := pickWeightedProblem(problems)
 
 		tick, ok := r.ticks[problem.ID]
 		if ok {
 			r.DeleteTick(tick.ID)
 			delete(r.ticks, problem.ID)
 		} else {
-			tick := domain.Tick{
-				ID:            0,
-				Ownership:     domain.OwnershipData{},
-				Timestamp:     time.Time{},
-				ContestID:     0,
-				ProblemID:     problem.ID,
-				AttemptsTop:   1 + rand.Int()%5,
-				Top:           true,
-				AttemptsZone1: 1,
-				Zone1:         true,
-				AttemptsZone2: 1,
-				Zone2:         true,
-			}
+			tick := buildTick(problem)
 
 			tick = r.AddTick(r.contender.ID, tick)
 			r.ticks[problem.ID] = tick
