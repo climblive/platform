@@ -132,7 +132,7 @@ func pickWeightedProblem(problems []domain.Problem) domain.Problem {
 		if pts <= 0 {
 			pts = 1
 		}
-		w := 1.0 / float64(pts*pts)
+		w := 1.0 / float64(pts)
 		weights[i] = w
 		total += w
 	}
