@@ -83,11 +83,9 @@
           top: 0,
           flash: 0,
         }}
-        {@const z1Pct = pct(
-          stats.zone1 + stats.zone2 + stats.top + stats.flash,
-        )}
-        {@const z2Pct = pct(stats.zone2 + stats.top + stats.flash)}
-        {@const topPct = pct(stats.top + stats.flash)}
+        {@const z1Pct = pct(stats.zone1)}
+        {@const z2Pct = pct(stats.zone2)}
+        {@const topPct = pct(stats.top)}
         {@const flashPct = pct(stats.flash)}
 
         <div class="bar-container">
@@ -97,26 +95,12 @@
             type="button"
             aria-label="Show details for problem #{problem.number}"
           >
-            <SubBar
-              percentage={z1Pct}
-              color={problem.holdColorPrimary}
-              opacity={0.35}
-            />
-            <SubBar
-              percentage={z2Pct}
-              color={problem.holdColorPrimary}
-              opacity={0.55}
-            />
-            <SubBar
-              percentage={topPct}
-              color={problem.holdColorPrimary}
-              opacity={0.75}
-            />
-            <SubBar
-              percentage={flashPct}
-              color={problem.holdColorPrimary}
-              opacity={1}
-            />
+            <div class="bar-fill" style:--color={problem.holdColorPrimary}>
+              <SubBar percentage={flashPct} opacity={1} />
+              <SubBar percentage={topPct} opacity={0.8} />
+              <SubBar percentage={z2Pct} opacity={0.6} />
+              <SubBar percentage={z1Pct} opacity={0.4} />
+            </div>
           </button>
           <span class="label">#{problem.number}</span>
 
@@ -159,16 +143,34 @@
 
   .bar-stack {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: flex-end;
-    gap: 2px;
+    justify-content: flex-end;
     width: 100%;
     height: 8rem;
     appearance: none;
-    background: none;
+    background: var(--wa-color-surface-raised);
     border: none;
     padding: 0;
     cursor: pointer;
+    border-radius: var(--wa-border-radius-s);
+    box-shadow: var(--wa-shadow-s);
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    --bar-fill-color: color-mix(
+      in oklab,
+      var(--wa-color-surface-raised) 88%,
+      var(--color) 12%
+    );
+
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%;
+    background: var(--bar-fill-color);
   }
 
   .label {
