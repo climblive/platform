@@ -1,11 +1,12 @@
-FROM ubuntu:latest AS usersrc
-RUN useradd -u 10001 climblive
+FROM golang:1.26
 
-FROM scratch
+WORKDIR /app
 
-COPY --from=usersrc /etc/passwd /etc/passwd
+COPY go.mod go.sum ./
+COPY cmd ./cmd
+COPY internal ./internal
 
-USER climblive
+RUN go mod download
+RUN CGO_ENABLED=0 GOOS=linux go build -o ./climblive ./cmd/api/main.go
 
-COPY climblive /climblive
-ENTRYPOINT ["/climblive"]
+ENTRYPOINT [ "./climblive" ]
