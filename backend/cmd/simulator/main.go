@@ -164,6 +164,9 @@ func buildTick(problem domain.Problem) domain.Tick {
 	}
 
 	attempts := 1 + rand.Int()%4
+	tick.AttemptsTop = attempts
+	tick.AttemptsZone1 = attempts
+	tick.AttemptsZone2 = attempts
 
 	switch outcome {
 	case outcomeFlash:
@@ -175,19 +178,13 @@ func buildTick(problem domain.Problem) domain.Tick {
 		tick.AttemptsZone2 = 1
 	case outcomeTop:
 		tick.Top = true
-		tick.AttemptsTop = attempts
 		tick.Zone1 = true
-		tick.AttemptsZone1 = attempts
 		tick.Zone2 = true
-		tick.AttemptsZone2 = attempts
 	case outcomeZoneBoth:
 		tick.Zone1 = true
-		tick.AttemptsZone1 = attempts
 		tick.Zone2 = true
-		tick.AttemptsZone2 = attempts
 	case outcomeZone1Only:
 		tick.Zone1 = true
-		tick.AttemptsZone1 = attempts
 	}
 
 	return tick
