@@ -6,13 +6,13 @@
     getProblemsQuery,
     getTicksByContestQuery,
   } from "@climblive/lib/queries";
-  import SubBar from "./SubBar.svelte";
+  import Bar from "./Bar.svelte";
 
   interface Props {
     contestId: number;
   }
 
-  interface ProblemStats {
+  export interface ProblemStats {
     zone1: number;
     zone2: number;
     top: number;
@@ -32,21 +32,21 @@
     }
 
     for (const tick of ticksQuery.data) {
-      let s = stats.get(tick.problemId);
+      let stat = stats.get(tick.problemId);
 
-      if (!s) {
-        s = { zone1: 0, zone2: 0, top: 0, flash: 0 };
-        stats.set(tick.problemId, s);
+      if (!stat) {
+        stat = { zone1: 0, zone2: 0, top: 0, flash: 0 };
+        stats.set(tick.problemId, stat);
       }
 
       if (tick.top && tick.attemptsTop === 1) {
-        s.flash++;
+        stat.flash++;
       } else if (tick.top) {
-        s.top++;
+        stat.top++;
       } else if (tick.zone2) {
-        s.zone2++;
+        stat.zone2++;
       } else if (tick.zone1) {
-        s.zone1++;
+        stat.zone1++;
       }
     }
 
@@ -56,8 +56,8 @@
   const maxCount = $derived.by(() => {
     let max = 0;
 
-    for (const s of statsByProblem.values()) {
-      max = Math.max(max, s.zone1 + s.zone2 + s.top + s.flash);
+    for (const stat of statsByProblem.values()) {
+      max = Math.max(max, stat.zone1 + stat.zone2 + stat.top + stat.flash);
     }
 
     return max;
@@ -68,14 +68,13 @@
       ? [...problemsQuery.data].sort((a, b) => a.number - b.number)
       : undefined,
   );
-
-  const pct = (count: number) => (maxCount > 0 ? (count / maxCount) * 100 : 0);
 </script>
 
-{#if sortedProblems && sortedProblems.length > 0}
-  <h3>Tops per problem</h3>
-  <wa-scroller orientation="horizontal">
-    <div class="chart" role="img" aria-label="Tops per problem">
+<section>
+  {#if sortedProblems && sortedProblems.length > 0}
+    <h3>Tops per problem</h3>
+    <p>Click on a problem for more details.</p>
+    <wa-scroller orientation="horizontal">
       {#each sortedProblems as problem (problem.id)}
         {@const stats = statsByProblem.get(problem.id) ?? {
           zone1: 0,
@@ -83,107 +82,21 @@
           top: 0,
           flash: 0,
         }}
-        {@const z1Pct = pct(stats.zone1)}
-        {@const z2Pct = pct(stats.zone2)}
-        {@const topPct = pct(stats.top)}
-        {@const flashPct = pct(stats.flash)}
 
-        <div class="bar-container">
-          <button
-            class="bar-stack"
-            id="bar-{problem.id}"
-            type="button"
-            aria-label="Show details for problem #{problem.number}"
-          >
-            <div class="bar-fill" style:--color={problem.holdColorPrimary}>
-              <SubBar percentage={flashPct} opacity={1} />
-              <SubBar percentage={topPct} opacity={0.8} />
-              <SubBar percentage={z2Pct} opacity={0.6} />
-              <SubBar percentage={z1Pct} opacity={0.4} />
-            </div>
-          </button>
-          <span class="label">#{problem.number}</span>
-
-          <wa-popover for="bar-{problem.id}" placement="top">
-            <div class="popover-body">
-              <strong>#{problem.number}</strong>
-              {#if problem.zone1Enabled && stats.zone1 + stats.zone2 + stats.top + stats.flash > 0}
-                <div>
-                  Zone 1: {stats.zone1 + stats.zone2 + stats.top + stats.flash}
-                </div>
-              {/if}
-              {#if problem.zone2Enabled && stats.zone2 + stats.top + stats.flash > 0}
-                <div>Zone 2: {stats.zone2 + stats.top + stats.flash}</div>
-              {/if}
-              <div>Tops: {stats.top + stats.flash}</div>
-              {#if stats.flash > 0}
-                <div>Flashes: {stats.flash}</div>
-              {/if}
-            </div>
-          </wa-popover>
-        </div>
+        <Bar {problem} {stats} {maxCount} />
       {/each}
-    </div>
-  </wa-scroller>
-{/if}
+    </wa-scroller>
+  {/if}
+</section>
 
 <style>
-  .chart {
+  wa-scroller::part(content) {
     display: flex;
     gap: var(--wa-space-xs);
-    padding-block-start: var(--wa-space-m);
   }
 
-  .bar-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 0 0 2rem;
-  }
-
-  .bar-stack {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    justify-content: flex-end;
-    width: 100%;
-    height: 8rem;
-    appearance: none;
-    background: var(--wa-color-surface-raised);
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    border-radius: var(--wa-border-radius-s);
-    box-shadow: var(--wa-shadow-s);
-    overflow: hidden;
-  }
-
-  .bar-fill {
-    --bar-fill-color: color-mix(
-      in oklab,
-      var(--wa-color-surface-raised) 88%,
-      var(--color) 12%
-    );
-
-    display: flex;
-    flex-direction: column-reverse;
-    justify-content: flex-start;
-    width: 100%;
-    height: 100%;
-    background: var(--bar-fill-color);
-  }
-
-  .label {
-    font-size: var(--wa-font-size-xs);
-    color: var(--wa-color-text-quiet);
-    white-space: nowrap;
-    margin-block-start: var(--wa-space-xs);
-  }
-
-  .popover-body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wa-space-3xs);
+  p {
     font-size: var(--wa-font-size-s);
+    color: var(--wa-color-text-quiet);
   }
 </style>
