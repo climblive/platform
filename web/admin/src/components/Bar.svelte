@@ -51,6 +51,7 @@
     display: flex;
     flex-direction: column;
     width: 2rem;
+    flex-shrink: 0;
   }
 
   button {
