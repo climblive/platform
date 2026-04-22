@@ -72,8 +72,11 @@
 
 <section>
   {#if sortedProblems && sortedProblems.length > 0}
-    <h3>Tops per problem</h3>
-    <p>Click on a problem for more details.</p>
+    <h2>Tops per problem</h2>
+    <p>
+      <wa-icon name="lightbulb" variant="regular"></wa-icon> Each problem can be clicked
+      to show more details.
+    </p>
     <wa-scroller orientation="horizontal">
       {#each sortedProblems as problem (problem.id)}
         {@const stats = statsByProblem.get(problem.id) ?? {

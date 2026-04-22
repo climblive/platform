@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Problem } from "@climblive/lib/models";
+  import type { ProblemStats } from "./ProblemsChart.svelte";
   import SubBar from "./SubBar.svelte";
-  import type { ProblemStats } from "./TopsChart.svelte";
 
   type Props = {
     problem: Problem;
@@ -28,7 +28,7 @@
   <span class="label">#{problem.number}</span>
 
   <wa-popover for={id} placement="top">
-    <strong>#{problem.number}</strong>
+    <strong>Problem #{problem.number}</strong>
 
     {#if problem.zone1Enabled}
       <div>
