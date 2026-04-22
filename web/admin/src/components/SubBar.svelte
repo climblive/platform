@@ -14,11 +14,7 @@
 
 <style>
   div {
-    background: color-mix(
-      in oklab,
-      var(--color) var(--fill-weight),
-      var(--bar-fill-color) 0%
-    );
+    background: rgb(from var(--color) r g b / var(--fill-weight));
     animation: grow 0.6s ease-out forwards;
     height: 0;
   }

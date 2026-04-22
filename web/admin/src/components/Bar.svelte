@@ -66,23 +66,15 @@
   }
 
   .fill {
-    --bar-fill-color: color-mix(
-      in oklab,
-      var(--wa-color-text-normal) 0%,
-      var(--color) 2%
-    );
-
     display: flex;
     flex-direction: column-reverse;
-    width: 100%;
     height: 100%;
-    background: var(--bar-fill-color);
+    background: rgb(from var(--color) r g b / 2%);
   }
 
   .label {
     font-size: var(--wa-font-size-xs);
     color: var(--wa-color-text-quiet);
-    white-space: wrap;
     margin-block-start: var(--wa-space-xs);
     text-align: center;
   }
