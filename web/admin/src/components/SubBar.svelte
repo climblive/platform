@@ -15,7 +15,8 @@
 <style>
   div {
     background: rgb(from var(--color) r g b / var(--fill-weight));
-    animation: grow 0.6s ease-out forwards;
+    animation: grow var(--wa-transition-slow) var(--wa-transition-easing)
+      forwards;
     height: 0;
   }
 
