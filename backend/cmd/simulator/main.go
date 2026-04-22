@@ -161,9 +161,8 @@ func buildTick(problem domain.Problem) domain.Tick {
 
 	outcome := outcomes[rand.Int()%len(outcomes)]
 
-	tick := domain.Tick{
-		ProblemID: problem.ID,
-	}
+	var tick domain.Tick
+	tick.ProblemID = problem.ID
 
 	tick.AttemptsTop = 999
 	tick.AttemptsZone1 = 999
