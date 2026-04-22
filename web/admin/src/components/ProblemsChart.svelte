@@ -1,5 +1,5 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/popover/popover.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/scroller/scroller.js";
   import type { ProblemID } from "@climblive/lib/models";
   import {

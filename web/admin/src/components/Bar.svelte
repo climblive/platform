@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/popover/popover.js";
   import type { Problem } from "@climblive/lib/models";
   import type { ProblemStats } from "./ProblemsChart.svelte";
   import SubBar from "./SubBar.svelte";

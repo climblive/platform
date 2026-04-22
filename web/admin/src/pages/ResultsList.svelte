@@ -61,9 +61,4 @@
     gap: var(--wa-space-xs);
     flex-wrap: wrap;
   }
-
-  p {
-    font-size: var(--wa-font-size-s);
-    color: var(--wa-color-text-quiet);
-  }
 </style>
