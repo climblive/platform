@@ -42,11 +42,13 @@ runs:
       id: build-pkg
       run: |
         mkdir -p packageroot/usr/share/climblive
+        mkdir -p packageroot/usr/bin
         mv scorecard packageroot/usr/share/climblive/
         mv scoreboard packageroot/usr/share/climblive/
         mv admin packageroot/usr/share/climblive/
         mv www packageroot/usr/share/climblive/
-        mv backend/climblive-api.tar packageroot/usr/share/climblive/
+        mv backend/climblive packageroot/usr/bin
+        chmod +x packageroot/usr/bin/climblive
         sed -i "s/VERSION/${{ inputs.version }}/g" packageroot/DEBIAN/control
         sed -i "s,__SERVER_NAME__,${{ inputs.deploy-host }},g" packageroot/etc/nginx/sites-available/climblive.app
         dpkg-deb -b packageroot .
