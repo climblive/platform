@@ -119,27 +119,28 @@ type tickOutcome int
 const (
 	outcomeFlash tickOutcome = iota
 	outcomeTop
-	outcomeZoneBoth
-	outcomeZone1Only
+	outcomeZone2
+	outcomeZone1
 )
 
 func pickWeightedProblem(problems []domain.Problem) domain.Problem {
 	weights := make([]float64, len(problems))
 	var total float64
 
-	for i, p := range problems {
-		pts := p.PointsTop
+	for i, problem := range problems {
+		pts := problem.PointsTop
 		if pts <= 0 {
 			pts = 1
 		}
+
 		w := 1.0 / float64(pts)
 		weights[i] = w
 		total += w
 	}
 
 	r := rand.Float64() * total
-	for i, w := range weights {
-		r -= w
+	for i, weight := range weights {
+		r -= weight
 		if r <= 0 {
 			return problems[i]
 		}
@@ -150,11 +151,12 @@ func pickWeightedProblem(problems []domain.Problem) domain.Problem {
 
 func buildTick(problem domain.Problem) domain.Tick {
 	outcomes := []tickOutcome{outcomeFlash, outcomeTop}
+
 	if problem.Zone1Enabled && problem.Zone2Enabled {
-		outcomes = append(outcomes, outcomeZoneBoth)
+		outcomes = append(outcomes, outcomeZone2)
 	}
 	if problem.Zone1Enabled {
-		outcomes = append(outcomes, outcomeZone1Only)
+		outcomes = append(outcomes, outcomeZone1)
 	}
 
 	outcome := outcomes[rand.Int()%len(outcomes)]
@@ -163,10 +165,9 @@ func buildTick(problem domain.Problem) domain.Tick {
 		ProblemID: problem.ID,
 	}
 
-	attempts := 1 + rand.Int()%4
-	tick.AttemptsTop = attempts
-	tick.AttemptsZone1 = attempts
-	tick.AttemptsZone2 = attempts
+	tick.AttemptsTop = 999
+	tick.AttemptsZone1 = 999
+	tick.AttemptsZone2 = 999
 
 	switch outcome {
 	case outcomeFlash:
@@ -180,10 +181,10 @@ func buildTick(problem domain.Problem) domain.Tick {
 		tick.Top = true
 		tick.Zone1 = true
 		tick.Zone2 = true
-	case outcomeZoneBoth:
+	case outcomeZone2:
 		tick.Zone1 = true
 		tick.Zone2 = true
-	case outcomeZone1Only:
+	case outcomeZone1:
 		tick.Zone1 = true
 	}
 
