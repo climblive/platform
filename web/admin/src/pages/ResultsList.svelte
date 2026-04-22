@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ProblemsChart from "@/components/ProblemsChart.svelte";
   import ResultListTable from "@/components/ResultListTable.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
@@ -32,35 +33,29 @@
   };
 </script>
 
-<section>
-  <div class="controls">
-    <wa-button appearance="outlined" onclick={handleDownloadResults}
-      >Download results
-      <wa-icon name="file-excel" slot="start"></wa-icon>
+<div class="controls">
+  <wa-button appearance="outlined" onclick={handleDownloadResults}
+    >Download results
+    <wa-icon name="file-excel" slot="start"></wa-icon>
+  </wa-button>
+
+  <a href={`/scoreboard/${contestId}`} target="_blank">
+    <wa-button appearance="outlined">
+      <wa-icon slot="start" name="arrow-up-right-from-square"></wa-icon>
+      Open public scoreboard
     </wa-button>
+  </a>
+</div>
 
-    <a href={`/scoreboard/${contestId}`} target="_blank">
-      <wa-button appearance="outlined">
-        <wa-icon slot="start" name="arrow-up-right-from-square"></wa-icon>
-        Open public scoreboard
-      </wa-button>
-    </a>
-  </div>
+<ProblemsChart {contestId} />
 
-  <ScoreboardProvider {contestId}>
-    {#snippet children({ scoreboard, loading })}
-      <ResultListTable {contestId} {scoreboard} {loading}></ResultListTable>
-    {/snippet}
-  </ScoreboardProvider>
-</section>
+<ScoreboardProvider {contestId}>
+  {#snippet children({ scoreboard, loading })}
+    <ResultListTable {contestId} {scoreboard} {loading}></ResultListTable>
+  {/snippet}
+</ScoreboardProvider>
 
 <style>
-  section {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wa-space-m);
-  }
-
   .controls {
     display: flex;
     gap: var(--wa-space-xs);
