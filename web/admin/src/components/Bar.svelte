@@ -68,7 +68,6 @@
   }
 
   .fill {
-    overflow: hidden;
     display: flex;
     flex-direction: column-reverse;
     height: 100%;
