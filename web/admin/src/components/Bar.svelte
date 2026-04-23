@@ -23,7 +23,7 @@
   <button {id} aria-label="Show details for problem #{problem.number}">
     <div class="fill" style:--color={problem.holdColorPrimary}>
       <SubBar percentage={flashPct} fillWeight={1} />
-      <SubBar percentage={topPct} fillWeight={0.8} />
+      <SubBar percentage={topPct} fillWeight={0.6} />
     </div>
   </button>
   <span class="label">#{problem.number}</span>
