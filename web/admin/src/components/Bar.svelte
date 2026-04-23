@@ -22,8 +22,10 @@
 <div class="container">
   <button {id} aria-label="Show details for problem #{problem.number}">
     <div class="fill" style:--color={problem.holdColorPrimary}>
-      <SubBar percentage={flashPct} fillWeight={1} />
-      <SubBar percentage={topPct} fillWeight={0.6} />
+      <div class="bars">
+        <SubBar percentage={flashPct} fillWeight={1} />
+        <SubBar percentage={topPct} fillWeight={0.6} />
+      </div>
     </div>
   </button>
   <span class="label">#{problem.number}</span>
@@ -68,10 +70,22 @@
   }
 
   .fill {
+    overflow: hidden;
     display: flex;
     flex-direction: column-reverse;
     height: 100%;
     background: rgb(from var(--color) r g b / 2%);
+  }
+
+  .bars {
+    display: flex;
+    flex-direction: column-reverse;
+    height: 100%;
+    width: 100%;
+    animation: grow var(--wa-transition-slow) var(--wa-transition-easing)
+      forwards;
+    transform: scaleY(0);
+    transform-origin: bottom;
   }
 
   .label {
@@ -86,5 +100,11 @@
     flex-direction: column;
     gap: var(--wa-space-3xs);
     font-size: var(--wa-font-size-s);
+  }
+
+  @keyframes grow {
+    to {
+      transform: scaleY(1);
+    }
   }
 </style>
