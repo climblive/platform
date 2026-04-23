@@ -94,8 +94,6 @@
 
 <style>
   wa-scroller::part(content) {
-    --scrollbar: calc(100vw - 100cqw);
-
     display: flex;
     gap: var(--wa-space-xs);
     padding-block-end: var(--wa-space-s);
