@@ -96,6 +96,7 @@
   wa-scroller::part(content) {
     display: flex;
     gap: var(--wa-space-xs);
+    padding-block-end: var(--wa-space-s);
   }
 
   p {

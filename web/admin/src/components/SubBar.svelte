@@ -15,14 +15,6 @@
 <style>
   div {
     background: rgb(from var(--color) r g b / var(--fill-weight));
-    animation: grow var(--wa-transition-slow) var(--wa-transition-easing)
-      forwards;
-    height: 0;
-  }
-
-  @keyframes grow {
-    to {
-      height: var(--target-height);
-    }
+    height: var(--target-height);
   }
 </style>
