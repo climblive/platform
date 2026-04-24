@@ -2,7 +2,7 @@ CERT_DIR := .local/certs
 WEB_DIR := backend/cmd/api/web
 APPS := admin scoreboard scorecard www
 
-.PHONY: localhost-certs web build run stop clean
+.PHONY: localhost-certs web build run db stop clean
 
 localhost-certs: $(CERT_DIR)/app-cert.pem $(CERT_DIR)/www-cert.pem
 
@@ -32,8 +32,16 @@ web:
 build: web
 	cd backend && CGO_ENABLED=0 go build -o climblive cmd/api/main.go
 
-run: localhost-certs build
-	docker compose up --build
+db:
+	docker compose up -d db
+
+run: localhost-certs build db
+	TLS_APP_CERT_FILE=$(CERT_DIR)/app-cert.pem \
+	TLS_APP_KEY_FILE=$(CERT_DIR)/app-key.pem \
+	TLS_WWW_CERT_FILE=$(CERT_DIR)/www-cert.pem \
+	TLS_WWW_KEY_FILE=$(CERT_DIR)/www-key.pem \
+	DB_HOST=host.docker.internal \
+	./backend/climblive
 
 stop:
 	docker compose down
