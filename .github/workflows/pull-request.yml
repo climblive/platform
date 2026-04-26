@@ -144,11 +144,32 @@ jobs:
   build-backend:
     name: Build backend
     runs-on: ubuntu-24.04
+    needs: [build-web]
     permissions:
       contents: read
 
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: admin
+          path: backend/cmd/api/web/admin
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: scoreboard
+          path: backend/cmd/api/web/scoreboard
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: scorecard
+          path: backend/cmd/api/web/scorecard
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: www
+          path: backend/cmd/api/web/www
 
       - uses: ./.github/actions/build-backend
 
@@ -156,7 +177,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-24.04
     environment: test
-    needs: [build-web, build-backend]
+    needs: [build-backend]
     permissions:
       contents: read
 
@@ -166,7 +187,6 @@ jobs:
       - uses: ./.github/actions/package
         id: build-pkg
         with:
-          deploy-host: ${{ vars.DEPLOY_HOST }}
           version: ${GITHUB_RUN_ID}
 
       - shell: bash
