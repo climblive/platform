@@ -70,11 +70,6 @@ test.beforeAll(async () => {
     .withWaitStrategy(Wait.forLogMessage(/score engine started/));
 
   startedApiContainer = await apiContainer.start();
-  console.log(
-    "Container started on port:",
-    startedApiContainer.getMappedPort(8443),
-  );
-  console.log("Container host:", startedApiContainer.getHost());
 });
 
 test.afterAll(async () => {
