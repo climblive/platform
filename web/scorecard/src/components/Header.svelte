@@ -1,22 +1,24 @@
 <script lang="ts">
   import logoUrl from "@/assets/logo.svg";
-  import { type ContestState } from "@climblive/lib/types";
+  import { ContenderName } from "@climblive/lib/components";
   import { Link, navigate } from "svelte-routing";
 
   interface Props {
     registrationCode: string;
     contestName: string;
     compClassName: string | undefined;
+    contenderId: number;
     contenderName: string | undefined;
-    contestState: ContestState;
+    contenderScrubbedAt: Date | undefined;
   }
 
   const {
     registrationCode,
     contestName,
     compClassName,
+    contenderId,
     contenderName,
-    contestState,
+    contenderScrubbedAt,
   }: Props = $props();
 </script>
 
@@ -26,7 +28,14 @@
       <img class="logo" src={logoUrl} alt="ClimbLive logo" />
     </Link>
     <div class="info">
-      <h1>{contenderName}</h1>
+      <h1>
+        <ContenderName
+          id={contenderId}
+          name={contenderName}
+          scrubbedAt={contenderScrubbedAt}
+          withTooltip
+        />
+      </h1>
       <p class="subtitle">
         <span>{compClassName}</span><span class="separator">–</span
         >{contestName}
@@ -36,7 +45,6 @@
   <wa-button
     size="medium"
     onclick={() => navigate(`/${registrationCode}/edit`)}
-    disabled={contestState === "ENDED"}
     appearance="plain"
   >
     <wa-icon name="gear" label="Edit"></wa-icon>

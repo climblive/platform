@@ -4,7 +4,10 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { SplashScreen } from "@climblive/lib/components";
+  import {
+    ContestStateProvider,
+    SplashScreen,
+  } from "@climblive/lib/components";
   import type { ContenderPatch } from "@climblive/lib/models";
   import {
     getCompClassesQuery,
@@ -13,10 +16,12 @@
     patchContenderMutation,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
-  import { isAfter } from "date-fns";
+  import { add, formatDistance, isAfter } from "date-fns";
   import { getContext } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Readable } from "svelte/store";
+
+  const nanosecondsInMinute = 60 * 1_000_000_000;
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
@@ -52,6 +57,16 @@
     );
   };
 
+  const retentionDuration = $derived.by(() => {
+    const base = new Date(0);
+    return formatDistance(
+      add(base, {
+        minutes: (contest?.nameRetentionTime ?? 0) / nanosecondsInMinute,
+      }),
+      base,
+    );
+  });
+
   let showSplash = $state(true);
 </script>
 
@@ -59,33 +74,44 @@
   <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
   <h1>{contest.name}</h1>
+  <ContestStateProvider contestId={contest.id}>
+    {#snippet children({ contestState })}
+      <RegistrationForm
+        submit={handleSubmit}
+        data={{
+          name: contender.name,
+          compClassId: contender.compClassId,
+          withdrawnFromFinals: contender.withdrawnFromFinals,
+        }}
+        callout={registerCallout}
+        {contestState}
+      >
+        {#if tooLate}
+          <wa-callout variant="warning">
+            <wa-icon slot="icon" name="clock"></wa-icon>
+            <strong>Registration is no longer possible</strong><br />
+            All classes have ended.
+          </wa-callout>
+        {/if}
+        <wa-button
+          size="small"
+          type="submit"
+          loading={patchContender.isPending}
+          variant="neutral"
+          appearance="accent"
+          >Register
+        </wa-button>
+      </RegistrationForm>
 
-  <RegistrationForm
-    submit={handleSubmit}
-    data={{
-      name: contender.name,
-      compClassId: contender.compClassId,
-      withdrawnFromFinals: contender.withdrawnFromFinals,
-    }}
-  >
-    {#if tooLate}
-      <wa-callout variant="warning">
-        <wa-icon slot="icon" name="clock"></wa-icon>
-        <strong>Registration is no longer possible</strong><br />
-        All classes have ended.
-      </wa-callout>
-    {/if}
-
-    <wa-button
-      size="small"
-      type="submit"
-      loading={patchContender.isPending}
-      variant="neutral"
-      appearance="accent"
-      disabled={tooLate}
-      >Register
-    </wa-button>
-  </RegistrationForm>
+      {#snippet registerCallout()}
+        <wa-callout variant="neutral" size="small">
+          <wa-icon slot="icon" name="circle-info"></wa-icon>
+          Your name will be stored for {retentionDuration} after the contest ends,
+          after which it will be removed and your results anonymized.
+        </wa-callout>
+      {/snippet}
+    {/snippet}
+  </ContestStateProvider>
 {/if}
 
 <style>

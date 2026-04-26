@@ -99,6 +99,7 @@
                 : "false"}
             >
               <Header
+                {contestId}
                 compClassId={compClass.id}
                 name={compClass.name}
                 startTime={compClass.timeBegin}

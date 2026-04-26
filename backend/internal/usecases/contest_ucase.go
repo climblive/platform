@@ -119,6 +119,7 @@ func (uc *ContestUseCase) GetScoreboard(ctx context.Context, contestID domain.Co
 			Name:                contender.Name,
 			WithdrawnFromFinals: contender.WithdrawnFromFinals,
 			Disqualified:        contender.Disqualified,
+			ScrubbedAt:          contender.ScrubbedAt,
 			Score:               contender.Score,
 		}
 
@@ -282,6 +283,7 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		Finalists:            tmpl.Finalists,
 		Info:                 sanitizationPolicy.Sanitize(tmpl.Info),
 		GracePeriod:          tmpl.GracePeriod,
+		NameRetentionTime:    tmpl.NameRetentionTime,
 		Created:              time.Now(),
 	}
 
