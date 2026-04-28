@@ -41,7 +41,7 @@
     }
 
     return contestsQuery.data
-      .filter(({ id, archived }) => id !== contestId && !archived)
+      .filter(({ id, archivedAt }) => id !== contestId && archivedAt == null)
       .sort((a, b) => {
         if (!a.timeBegin && !b.timeBegin) {
           return b.created.getTime() - a.created.getTime();

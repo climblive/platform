@@ -66,7 +66,7 @@
     contests?.forEach((contest) => {
       const { timeBegin, timeEnd } = contest;
 
-      if (contest.archived) {
+      if (contest.archivedAt != null) {
         archived.push(contest);
       } else if (timeBegin && timeEnd && now >= timeBegin && now < timeEnd) {
         ongoing.push(contest);
@@ -155,7 +155,7 @@
 
     const oneWeekAgo = sub(new Date(), { weeks: 1 });
     const recentCount = contests.filter(
-      (c) => !c.archived && c.created > oneWeekAgo,
+      (c) => c.archivedAt == null && c.created > oneWeekAgo,
     ).length;
 
     return recentCount >= maxContestsPerWeek;
