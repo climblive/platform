@@ -103,12 +103,12 @@ GROUP BY contest.id;
 
 -- name: UpsertContest :execlastid
 INSERT INTO 
-	contest (id, organizer_id, archived, series_id, name, description, location, country, qualifying_problems, finalists, info, grace_period, created)
+	contest (id, organizer_id, archived_at, series_id, name, description, location, country, qualifying_problems, finalists, info, grace_period, created)
 VALUES 
 	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
-    archived = VALUES(archived),
+    archived_at = VALUES(archived_at),
     series_id = VALUES(series_id),
     name = VALUES(name),
     description = VALUES(description),
@@ -139,7 +139,7 @@ FROM (
     SELECT contest.*, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
     FROM contest
     JOIN comp_class cc ON cc.contest_id = contest.id
-    WHERE archived = FALSE
+    WHERE archived_at IS NULL
     GROUP BY contest.id) AS sub
 WHERE
     NOW() BETWEEN sub.time_begin AND DATE_ADD(sub.time_end, INTERVAL (sub.grace_period + 15) MINUTE)

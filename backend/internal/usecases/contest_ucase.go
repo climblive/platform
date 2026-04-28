@@ -151,9 +151,13 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 	}
 
 	if patch.Archived.Present {
-		contest.Archived = patch.Archived.Value
+		if patch.Archived.Value {
+			contest.ArchivedAt = time.Now()
+		} else {
+			contest.ArchivedAt = time.Time{}
+		}
 
-		if contest.Archived {
+		if !contest.ArchivedAt.IsZero() {
 			engines, err := uc.ScoreEngineManager.ListScoreEnginesByContest(ctx, contestID)
 			if err != nil {
 				return mty, errors.Wrap(err, 0)
@@ -173,7 +177,7 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		Archived: patch.Archived,
 	}
 
-	if contest.Archived && patchAnythingOtherThanArchive {
+	if !contest.ArchivedAt.IsZero() && patchAnythingOtherThanArchive {
 		return mty, errors.Wrap(domain.ErrArchived, 0)
 	}
 
@@ -253,7 +257,7 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		oneWeekAgo := time.Now().Add(-7 * 24 * time.Hour)
 		recentCount := 0
 		for _, c := range contests {
-			if !c.Archived && c.Created.After(oneWeekAgo) {
+			if c.ArchivedAt.IsZero() && c.Created.After(oneWeekAgo) {
 				recentCount++
 			}
 		}
@@ -269,7 +273,6 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 			OrganizerID: organizerID,
 			ContenderID: nil,
 		},
-		Archived:             false,
 		SeriesID:             0,
 		TimeBegin:            time.Time{},
 		TimeEnd:              time.Time{},
@@ -307,7 +310,7 @@ func (uc *ContestUseCase) DuplicateContest(ctx context.Context, contestID domain
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
-	if contest.Archived {
+	if !contest.ArchivedAt.IsZero() {
 		return domain.Contest{}, errors.Wrap(domain.ErrArchived, 0)
 	}
 
@@ -379,7 +382,7 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
-	if contest.Archived {
+	if !contest.ArchivedAt.IsZero() {
 		return domain.Contest{}, errors.Wrap(domain.ErrArchived, 0)
 	}
 

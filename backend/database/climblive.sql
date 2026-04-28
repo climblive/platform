@@ -51,7 +51,7 @@ CREATE INDEX `index3` ON `series` (`id` ASC, `organizer_id` ASC);
 CREATE TABLE IF NOT EXISTS `contest` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `organizer_id` INT NOT NULL,
-  `archived` TINYINT(1) NOT NULL DEFAULT 0,
+  `archived_at` DATETIME NULL DEFAULT NULL,
   `series_id` INT NULL,
   `name` VARCHAR(64) NOT NULL,
   `description` TEXT NULL,

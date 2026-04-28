@@ -75,7 +75,7 @@ export interface ContenderPatch {
 export interface Contest {
   id: ContestID;
   ownership: OwnershipData;
-  archived: boolean;
+  archivedAt?: Date;
   location?: string;
   country: string;
   seriesId?: SeriesID;
