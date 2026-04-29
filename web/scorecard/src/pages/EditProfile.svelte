@@ -101,6 +101,7 @@
         }}
         callout={profileCallout}
         {contestState}
+        {disabled}
       >
         <div class="controls">
           {#if !!contender.name}
