@@ -89,7 +89,8 @@
     compClassId={contender.compClassId}
   >
     {#snippet children({ contestState })}
-      {@const disabled = contender.scrubbedAt || contestState === "ENDED"}
+      {@const disabled =
+        contender.scrubbedAt !== undefined || contestState === "ENDED"}
 
       <RegistrationForm
         submit={handleSubmit}
