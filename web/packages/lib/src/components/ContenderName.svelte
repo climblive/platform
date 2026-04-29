@@ -31,7 +31,7 @@
 
 <span id={tooltipId}>
   {#if scrubbedAt}
-    <pre>{maskScrubbedName(id)}</pre>
+    {maskScrubbedName(id)}
   {:else}
     {name ?? ""}
   {/if}
