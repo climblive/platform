@@ -187,13 +187,15 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 	}
 
 	if patch.Name.Present {
+		if !contender.ScrubbedAt.IsZero() {
+			return mty, errors.Wrap(domain.ErrNotAllowed, 0)
+		}
+
 		contender.Name = strings.TrimSpace(patch.Name.Value)
 
 		if contender.Name == "" {
 			return mty, errors.Errorf("%w: %w", domain.ErrInvalidData, domain.ErrEmptyName)
 		}
-
-		contender.ScrubbedAt = time.Time{}
 	}
 
 	if patch.WithdrawnFromFinals.Present && contender.WithdrawnFromFinals != patch.WithdrawnFromFinals.Value {
