@@ -139,17 +139,17 @@
       </RegistrationForm>
 
       {#snippet profileCallout()}
-        <wa-callout variant="neutral" size="small">
-          <wa-icon slot="icon" name="circle-info"></wa-icon>
-          {#if !contender?.scrubbedAt}
+        {#if !contender?.scrubbedAt}
+          <wa-callout variant="neutral" size="small">
+            <wa-icon slot="icon" name="circle-info"></wa-icon>
             {#if retentionDuration}
               Your name will be kept stored for {retentionDuration} from now, after
               which it will be removed and your results anonymized.
             {:else}
               Your name will be removed and your results anonymized shortly.
             {/if}
-          {/if}
-        </wa-callout>
+          </wa-callout>
+        {/if}
       {/snippet}
     {/snippet}
   </ContestStateProvider>
