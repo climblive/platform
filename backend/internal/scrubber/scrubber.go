@@ -5,8 +5,6 @@ import (
 	"log/slog"
 	"sync"
 	"time"
-
-	"github.com/climblive/platform/backend/internal/utils"
 )
 
 type runOptions struct {
@@ -64,15 +62,13 @@ func (s *scrubber) Run(ctx context.Context, options ...func(*runOptions)) *sync.
 			case <-ctx.Done():
 				return
 			case <-time.After(delay):
-				slog.Info("running contender scrubber")
+				slog.Info("running scrubber")
+
 				count, err := s.useCase.ScrubContenders(ctx, time.Now().Add(s.interval).Round(time.Hour))
 				if err != nil {
-					if stack := utils.GetErrorStack(err); stack != "" {
-						slog.Error("scrubber error", "stack", stack)
-					}
 					slog.Error("failed to scrub contenders", "error", err)
-				} else {
-					slog.Info("contender scrubber completed", "count", count)
+				} else if count > 0 {
+					slog.Info("scrubber completed", "count", count)
 				}
 			}
 		}
