@@ -9,6 +9,16 @@ import (
 	"github.com/climblive/platform/backend/internal/utils"
 )
 
+type runOptions struct {
+	recoverPanics bool
+}
+
+func WithPanicRecovery() func(*runOptions) {
+	return func(s *runOptions) {
+		s.recoverPanics = true
+	}
+}
+
 type contenderScrubberUseCase interface {
 	ScrubContenders(ctx context.Context, deadline time.Time) (int, error)
 }
@@ -22,11 +32,26 @@ func New(useCase contenderScrubberUseCase, interval time.Duration) *scrubber {
 	return &scrubber{useCase: useCase, interval: interval}
 }
 
-func (s *scrubber) Run(ctx context.Context) *sync.WaitGroup {
+func (s *scrubber) Run(ctx context.Context, options ...func(*runOptions)) *sync.WaitGroup {
+	config := &runOptions{}
+	for _, opt := range options {
+		opt(config)
+	}
+
 	var wg sync.WaitGroup
 	wg.Add(1)
 
 	go func() {
+		defer func() {
+			if !config.recoverPanics {
+				return
+			}
+
+			if r := recover(); r != nil {
+				slog.Error("scrubber panicked", "error", r)
+			}
+		}()
+
 		defer wg.Done()
 
 		for {
