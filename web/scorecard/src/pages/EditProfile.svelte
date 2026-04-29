@@ -14,7 +14,7 @@
     scrubContenderMutation,
   } from "@climblive/lib/queries";
   import { SyncedTime, toastError } from "@climblive/lib/utils";
-  import { formatDistance } from "date-fns";
+  import { formatDistance, isBefore } from "date-fns";
   import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Readable } from "svelte/store";
@@ -44,7 +44,7 @@
 
     const now = time.current;
 
-    if (contender.scrubBefore <= now) {
+    if (isBefore(contender.scrubBefore, now)) {
       return undefined;
     }
 
@@ -89,7 +89,7 @@
     compClassId={contender.compClassId}
   >
     {#snippet children({ contestState })}
-      {@const disabled = contestState === "ENDED"}
+      {@const disabled = contender.scrubbedAt || contestState === "ENDED"}
 
       <RegistrationForm
         submit={handleSubmit}
@@ -141,11 +141,13 @@
       {#snippet profileCallout()}
         <wa-callout variant="neutral" size="small">
           <wa-icon slot="icon" name="circle-info"></wa-icon>
-          {#if retentionDuration}
-            Your name will be kept stored for {retentionDuration} from now, after
-            which it will be removed and your results anonymized.
-          {:else}
-            Your name will be removed and your results anonymized shortly.
+          {#if !contender?.scrubbedAt}
+            {#if retentionDuration}
+              Your name will be kept stored for {retentionDuration} from now, after
+              which it will be removed and your results anonymized.
+            {:else}
+              Your name will be removed and your results anonymized shortly.
+            {/if}
           {/if}
         </wa-callout>
       {/snippet}

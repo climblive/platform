@@ -25,18 +25,20 @@
     callout?: Snippet;
     children?: Snippet;
     contestState: ContestState;
+    disabled?: boolean;
   }
 
-  const { data, submit, callout, children, contestState }: Props = $props();
+  const { data, submit, callout, children, contestState, ...rest }: Props =
+    $props();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
   let compClassesQuery = $derived(getCompClassesQuery($session.contestId));
+
+  const disabled = $derived(rest.disabled || contestState === "ENDED");
 </script>
 
 {#if compClassesQuery.data}
-  {@const disabled = contestState === "ENDED"}
-
   <GenericForm schema={registrationFormSchema} {submit}>
     <fieldset>
       <wa-input
