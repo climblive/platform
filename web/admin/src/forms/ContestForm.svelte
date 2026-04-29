@@ -136,6 +136,12 @@
       {#each retentionOptions as option (option.value)}
         <wa-radio value={String(option.value)}>{option.label}</wa-radio>
       {/each}
+
+      {#if data.nameRetentionTime && !retentionOptions.some(({ value }) => value === data.nameRetentionTime)}
+        <wa-radio value={String(data.nameRetentionTime)}>
+          {Math.floor(data.nameRetentionTime / (24 * 60 * nanosecondsInMinute))} days
+        </wa-radio>
+      {/if}
     </wa-radio-group>
     {#if showGeneralInfo}
       <InfoInput info={data.info} />
