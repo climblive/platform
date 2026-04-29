@@ -144,7 +144,7 @@ func main() {
 	barriers = append(barriers,
 		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
 		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()),
-		scrubberRunner.Run(ctx))
+		scrubberRunner.Run(ctx, scrubber.WithPanicRecovery()))
 
 	mux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
 
