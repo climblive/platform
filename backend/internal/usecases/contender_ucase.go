@@ -234,7 +234,6 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 	publicInfoEvent.Name = contender.Name
 	publicInfoEvent.WithdrawnFromFinals = contender.WithdrawnFromFinals
 	publicInfoEvent.Disqualified = contender.Disqualified
-	publicInfoEvent.ScrubbedAt = contender.ScrubbedAt
 
 	if publicInfoEvent != publicInfoEventBaseline {
 		events = append(events, publicInfoEvent)
