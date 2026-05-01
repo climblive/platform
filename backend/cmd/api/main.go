@@ -392,7 +392,7 @@ func (h *hostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		host = r.Host
 	}
 
-	if h.wwwHost != "" && host == h.wwwHost {
+	if host == h.wwwHost {
 		h.wwwHandler.ServeHTTP(w, r)
 		return
 	}
