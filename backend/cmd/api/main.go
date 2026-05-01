@@ -341,7 +341,7 @@ func loadTLSConfig() *tls.Config {
 		}
 
 		certificates = append(certificates, cert)
-		slog.Info("loaded TLS certificate", "cert", p.cert)
+		slog.Info("loaded tls certificate", "cert", p.cert)
 	}
 
 	var config tls.Config
