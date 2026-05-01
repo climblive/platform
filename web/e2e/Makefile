@@ -29,7 +29,7 @@ images: certs web
 	docker build ../../backend -t climblive-api:latest
 
 test: images
-	PW_TEST_HTML_REPORT_OPEN='never' pnpm exec playwright test --project="Mobile Chrome" --ui --ui-host 0.0.0.0 --ui-port 9323
+	PW_TEST_HTML_REPORT_OPEN='never' pnpm exec playwright test --headed --project="Mobile Chrome"
 
 test-ci: images
 	DEBUG=testcontainers* pnpm exec playwright test
