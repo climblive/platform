@@ -54,7 +54,7 @@
 <GenericForm {schema} {submit}>
   <fieldset>
     <wa-input
-      size="small"
+      size="s"
       {@attach name("name")}
       label="Name"
       type="text"
@@ -62,7 +62,7 @@
       value={data.name}
     ></wa-input>
     <wa-input
-      size="small"
+      size="s"
       {@attach name("description")}
       label="Description"
       type="text"
@@ -70,7 +70,7 @@
     ></wa-input>
     <div class="location">
       <wa-input
-        size="small"
+        size="s"
         {@attach name("location")}
         label="Location"
         type="text"
@@ -78,7 +78,7 @@
         hint="Usually the name of the climbing gym."
       ></wa-input>
       <wa-select
-        size="small"
+        size="s"
         {@attach name("country")}
         {@attach value(selectedCountry)}
         label="Country"
@@ -94,7 +94,7 @@
       </wa-select>
     </div>
     <wa-number-input
-      size="small"
+      size="s"
       {@attach name("gracePeriod")}
       label="Grace period"
       hint="Extra time after the end of the contest during which contenders can enter their last results."
@@ -109,7 +109,7 @@
       <InfoInput info={data.info} />
     {:else}
       <wa-button
-        size="small"
+        size="s"
         appearance="outlined"
         onclick={() => (showGeneralInfo = true)}
       >

@@ -10,7 +10,7 @@
 </script>
 
 <div>
-  <wa-button size="small" appearance="outlined" onclick={onClick} pill>
+  <wa-button size="s" appearance="outlined" onclick={onClick} pill>
     <wa-icon slot="start" name={iconName}></wa-icon>
     {label}
   </wa-button>
