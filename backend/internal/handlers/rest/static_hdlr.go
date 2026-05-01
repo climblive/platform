@@ -2,6 +2,7 @@ package rest
 
 import (
 	"io/fs"
+	"log/slog"
 	"net/http"
 	"path"
 	"strings"
@@ -63,7 +64,10 @@ func (h *spaHandler) serveIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	_, _ = w.Write(content)
+	_, err = w.Write(content)
+	if err != nil {
+		slog.Error("failed to write response", "error", err)
+	}
 }
 
 func (h *spaHandler) setHeaders(w http.ResponseWriter, filePath string) {
