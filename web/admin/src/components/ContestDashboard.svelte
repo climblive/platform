@@ -76,7 +76,7 @@
       {contest.name}
     </h2>
     <wa-button
-      size="small"
+      size="s"
       appearance="plain"
       onclick={() => navigate(`/admin/contests/${contest.id}/edit`)}
     >

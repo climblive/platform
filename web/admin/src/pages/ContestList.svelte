@@ -278,7 +278,7 @@
 
   {#if archived?.length}
     <wa-button
-      size="small"
+      size="s"
       appearance="plain"
       variant="brand"
       onclick={handleToggleArchive}

@@ -94,7 +94,7 @@
           </wa-callout>
         {/if}
         <wa-button
-          size="small"
+          size="s"
           type="submit"
           loading={patchContender.isPending}
           variant="neutral"
@@ -104,7 +104,7 @@
       </RegistrationForm>
 
       {#snippet registerCallout()}
-        <wa-callout variant="neutral" size="small">
+        <wa-callout variant="neutral" size="s">
           <wa-icon slot="icon" name="circle-info"></wa-icon>
           Your name will be stored for {retentionDuration} after the contest ends,
           after which it will be removed and your results anonymized.

@@ -107,7 +107,7 @@
           {#if !!contender.name}
             <wa-button
               class="scrub-button"
-              size="small"
+              size="s"
               type="button"
               variant="danger"
               appearance="outlined"
@@ -122,14 +122,14 @@
             </wa-button>
           {/if}
           <wa-button
-            size="small"
+            size="s"
             type="button"
             onclick={gotoScorecard}
             appearance="plain"
             >Cancel
           </wa-button>
           <wa-button
-            size="small"
+            size="s"
             type="submit"
             loading={patchContender.isPending}
             variant="neutral"
@@ -142,7 +142,7 @@
 
       {#snippet profileCallout()}
         {#if !contender?.scrubbedAt}
-          <wa-callout variant="neutral" size="small">
+          <wa-callout variant="neutral" size="s">
             <wa-icon slot="icon" name="circle-info"></wa-icon>
             {#if retentionDuration}
               Your name will be kept stored for {retentionDuration} from now, after
@@ -163,7 +163,7 @@
     Be aware that without a name, you will lose your chance at finals and you cannot
     take part in any prize raffles.
     <wa-button
-      size="small"
+      size="s"
       slot="footer"
       appearance="plain"
       onclick={() => {
@@ -173,7 +173,7 @@
       }}>Cancel</wa-button
     >
     <wa-button
-      size="small"
+      size="s"
       slot="footer"
       variant="danger"
       loading={scrubContender.isPending}

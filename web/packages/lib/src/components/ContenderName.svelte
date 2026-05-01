@@ -23,7 +23,7 @@
       "yyyy-MM-dd HH:mm",
     )}.
 
-    <wa-button data-popover="close" variant="primary" size="small"
+    <wa-button data-popover="close" variant="primary" size="s"
       >Got it!</wa-button
     >
   </wa-popover>

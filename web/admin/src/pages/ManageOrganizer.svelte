@@ -102,7 +102,7 @@
   <DeleteInvite inviteId={id}>
     {#snippet children({ deleteInvite })}
       <wa-button
-        size="small"
+        size="s"
         variant="danger"
         appearance="plain"
         onclick={deleteInvite}
@@ -142,7 +142,7 @@
           <wa-button
             variant="neutral"
             appearance="plain"
-            size="small"
+            size="s"
             onclick={editOrganizer}
           >
             <wa-icon name="pencil" label="Edit name"></wa-icon>

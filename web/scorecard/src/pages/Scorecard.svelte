@@ -385,7 +385,7 @@
     slot="footer"
     variant="success"
     appearance="accent"
-    size="small"
+    size="s"
     onclick={() => {
       if (raffleWinnerDialog) {
         raffleWinnerDialog.open = false;

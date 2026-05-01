@@ -151,7 +151,7 @@
     <div class="controls">
       <wa-input
         bind:this={quickFilter}
-        size="small"
+        size="s"
         label="Quick filter"
         placeholder="Search by name..."
         oninput={() => {
@@ -161,7 +161,7 @@
       ></wa-input>
       <wa-select
         bind:this={compClassSelector}
-        size="small"
+        size="s"
         label="Class filter"
         {@attach value(selectedCompClassId)}
         onchange={() => {

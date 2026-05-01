@@ -43,7 +43,7 @@
     </div>
   </div>
   <wa-button
-    size="medium"
+    size="m"
     onclick={() => navigate(`/${registrationCode}/edit`)}
     appearance="plain"
   >
