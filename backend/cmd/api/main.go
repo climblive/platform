@@ -334,10 +334,6 @@ func loadTLSConfig() *tls.Config {
 
 	var certificates []tls.Certificate
 	for _, p := range pairs {
-		if p.cert == "" || p.key == "" {
-			panic("incomplete TLS certificate pair: cert=" + p.cert + " key=" + p.key)
-		}
-
 		cert, err := tls.LoadX509KeyPair(p.cert, p.key)
 		if err != nil {
 			panic("failed to load TLS certificate: cert=" + p.cert + " key=" + p.key + " error=" + err.Error())
