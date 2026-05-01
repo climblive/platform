@@ -43,8 +43,8 @@ func (h *spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := file.Close(); err != nil {
-		h.serveIndex(w, r)
-		return
+		slog.Error("failed to close file", "urlPath", urlPath, "error", err)
+		panic(err)
 	}
 
 	w.Header().Set("Cache-Control", "public, max-age=86400")
