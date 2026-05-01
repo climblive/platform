@@ -46,7 +46,7 @@ test.beforeAll(async () => {
   await dbConnection.query(schema);
   await dbConnection.query(samples);
 
-  const apiContainer = new GenericContainer("climblive-api:latest")
+  const appContainer = new GenericContainer("climblive-api:latest")
     .withEnvironment({
       DB_USERNAME: "climblive",
       DB_PASSWORD: "secretpassword",
@@ -69,7 +69,7 @@ test.beforeAll(async () => {
     .withExposedPorts({ container: 8443, host: 8443 })
     .withWaitStrategy(Wait.forLogMessage(/score engine started/));
 
-  startedApiContainer = await apiContainer.start();
+  startedApiContainer = await appContainer.start();
 });
 
 test.afterAll(async () => {
