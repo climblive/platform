@@ -58,14 +58,14 @@
   >
     <div class="controls">
       <wa-button
-        size="small"
+        size="s"
         type="button"
         appearance="plain"
         onclick={() => navigate(`/admin/contests/${contestId}#problems`)}
         >Cancel</wa-button
       >
       <wa-button
-        size="small"
+        size="s"
         type="submit"
         loading={createProblem.isPending}
         variant="neutral"

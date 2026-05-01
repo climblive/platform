@@ -48,13 +48,13 @@
   <ContestForm submit={handleSubmit} data={contest} schema={formSchema}>
     <div class="controls">
       <wa-button
-        size="small"
+        size="s"
         type="button"
         appearance="plain"
         onclick={history.back()}>Cancel</wa-button
       >
       <wa-button
-        size="small"
+        size="s"
         type="submit"
         loading={patchContest.isPending}
         variant="neutral"

@@ -132,7 +132,7 @@
             }
           }}
           loading={loadingContender}
-          size="small"
+          size="s"
           appearance="outlined filled"
           >Restore
           <wa-icon slot="start" name="arrow-right-to-bracket"></wa-icon>

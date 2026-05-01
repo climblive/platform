@@ -35,7 +35,7 @@
   <GenericForm schema={registrationFormSchema} {submit}>
     <fieldset>
       <wa-input
-        size="small"
+        size="s"
         {@attach name("name")}
         label="Name"
         type="text"
@@ -43,7 +43,7 @@
         value={data.name}
       ></wa-input>
       <wa-select
-        size="small"
+        size="s"
         {@attach name("compClassId")}
         label="Competition class"
         required
@@ -63,7 +63,7 @@
         {/each}
       </wa-select>
       <wa-switch
-        size="small"
+        size="s"
         {@attach name("withdrawnFromFinals")}
         hint="If you do not wish to participate in the finals, you can give up your spot."
         {@attach checked(data.withdrawnFromFinals)}>Opt out of finals</wa-switch

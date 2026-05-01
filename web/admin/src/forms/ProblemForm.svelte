@@ -153,7 +153,7 @@
 <GenericForm {schema} submit={handleSubmit}>
   <fieldset>
     <wa-number-input
-      size="small"
+      size="s"
       {@attach name("number")}
       label="Number"
       required
@@ -163,7 +163,7 @@
     <div class="colors">
       <div class="pickers">
         <wa-color-picker
-          size="small"
+          size="s"
           {@attach name("holdColorPrimary")}
           label="Primary hold color"
           required
@@ -172,7 +172,7 @@
           without-format-toggle
         ></wa-color-picker>
         <wa-color-picker
-          size="small"
+          size="s"
           {@attach name("holdColorSecondary")}
           label="Secondary hold color"
           {swatches}
@@ -182,7 +182,7 @@
       </div>
     </div>
     <wa-number-input
-      size="small"
+      size="s"
       {@attach name("pointsTop")}
       label="Points top"
       hint="Points for reaching the top."
@@ -194,7 +194,7 @@
       <span slot="end">pts</span>
     </wa-number-input>
     <wa-number-input
-      size="small"
+      size="s"
       {@attach name("flashBonus")}
       label="Flash bonus"
       hint="Bonus points awarded for a flash ascent, added to the total."
@@ -209,7 +209,7 @@
 
     {#if zone1Enabled}
       <wa-switch
-        size="small"
+        size="s"
         {@attach name("zone2Enabled")}
         hint="Add a second zone."
         onchange={handleZone2Toggle}
@@ -218,7 +218,7 @@
     {/if}
     <wa-number-input
       bind:this={pointsZone2Input}
-      size="small"
+      size="s"
       {@attach name("pointsZone2")}
       label="Points Z2"
       hint="Points for reaching the second zone."
@@ -233,7 +233,7 @@
     </wa-number-input>
 
     <wa-switch
-      size="small"
+      size="s"
       {@attach name("zone1Enabled")}
       hint="Add a zone."
       onchange={handleZone1Toggle}
@@ -241,7 +241,7 @@
     >
     <wa-number-input
       bind:this={pointsZone1Input}
-      size="small"
+      size="s"
       {@attach name("pointsZone1")}
       label="Points Z1"
       hint="Points for reaching the first zone."

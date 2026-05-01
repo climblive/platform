@@ -50,13 +50,13 @@
 >
   <div class="controls">
     <wa-button
-      size="small"
+      size="s"
       appearance="plain"
       onclick={() => navigate(`./organizers/${organizerId}/contests`)}
       >Cancel</wa-button
     >
     <wa-button
-      size="small"
+      size="s"
       type="submit"
       loading={createContest.isPending}
       variant="neutral"

@@ -155,7 +155,7 @@
         target="_blank"
         appearance="plain"
         variant="neutral"
-        size="large"
+        size="l"
       >
         <wa-icon slot="start" name="arrow-up-right-from-square"></wa-icon>
         Open scorecard
@@ -180,7 +180,7 @@
     ></wa-divider>
     <div class="controls">
       <wa-select
-        size="small"
+        size="s"
         bind:this={compClassSelect}
         label="Competition class"
         hint="Change the class for this contender."
@@ -199,7 +199,7 @@
       </wa-select>
 
       <wa-switch
-        size="small"
+        size="s"
         bind:this={withdrawFromFinalsToggle}
         hint="In case the contender does not wish to take part in the finals."
         {@attach checked(contender.withdrawnFromFinals)}
@@ -218,7 +218,7 @@
         >
       {:else}
         <wa-button
-          size="small"
+          size="s"
           variant="danger"
           onclick={handleDisqualify}
           loading={patchContender.isPending}

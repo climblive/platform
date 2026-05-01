@@ -34,7 +34,7 @@
     </div>
   </div>
   <wa-button
-    size="medium"
+    size="m"
     onclick={() => navigate(`/${registrationCode}/edit`)}
     disabled={contestState === "ENDED"}
     appearance="plain"

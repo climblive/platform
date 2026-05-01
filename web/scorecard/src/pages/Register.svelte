@@ -77,7 +77,7 @@
     {/if}
 
     <wa-button
-      size="small"
+      size="s"
       type="submit"
       loading={patchContender.isPending}
       variant="neutral"

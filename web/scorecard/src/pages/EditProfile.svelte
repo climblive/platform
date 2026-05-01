@@ -54,14 +54,14 @@
   >
     <div class="controls">
       <wa-button
-        size="small"
+        size="s"
         type="button"
         onclick={gotoScorecard}
         appearance="plain"
         >Cancel
       </wa-button>
       <wa-button
-        size="small"
+        size="s"
         type="submit"
         loading={patchContender.isPending}
         disabled={false}

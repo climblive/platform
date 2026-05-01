@@ -36,7 +36,7 @@
   <ProblemForm submit={handleSubmit} data={problem} schema={formSchema}>
     <div class="controls">
       <wa-button
-        size="small"
+        size="s"
         type="button"
         appearance="plain"
         onclick={() =>
@@ -44,7 +44,7 @@
         >Cancel</wa-button
       >
       <wa-button
-        size="small"
+        size="s"
         type="submit"
         loading={patchProblem.isPending}
         variant="neutral"
