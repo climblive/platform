@@ -168,7 +168,7 @@ func main() {
 	apiMux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
 
 	appMux := http.NewServeMux()
-	appMux.Handle("/api/", http.StripPrefix("/api", noCacheHandler(apiMux)))
+	appMux.Handle("/api/", accessLog(http.StripPrefix("/api", noCacheHandler(apiMux))))
 	installAppStaticHandlers(appMux)
 
 	wwwMux := http.NewServeMux()
@@ -433,5 +433,40 @@ func noCacheHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-store")
 		next.ServeHTTP(w, r)
+	})
+}
+
+type statusWriter struct {
+	http.ResponseWriter
+	status int
+}
+
+func (w *statusWriter) WriteHeader(statusCode int) {
+	w.status = statusCode
+	w.ResponseWriter.WriteHeader(statusCode)
+}
+
+func accessLog(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sw := &statusWriter{ResponseWriter: w}
+
+		start := time.Now()
+		next.ServeHTTP(sw, r)
+		duration := time.Since(start)
+
+		logLevel := slog.LevelInfo
+
+		if duration > time.Second {
+			logLevel = slog.LevelWarn
+		}
+
+		slog.Log(r.Context(), logLevel,
+			"access",
+			"method", r.Method,
+			"path", r.URL.Path,
+			"status", sw.status,
+			"duration", duration,
+			"user_agent", r.UserAgent(),
+		)
 	})
 }
