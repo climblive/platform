@@ -58,7 +58,7 @@ func (h *spaHandler) serveIndex(w http.ResponseWriter, r *http.Request) {
 
 	content, err := fs.ReadFile(h.fsys, "index.html")
 	if err != nil {
-		http.Error(w, "Not Found", http.StatusNotFound)
+		http.NotFound(w, r)
 		return
 	}
 
