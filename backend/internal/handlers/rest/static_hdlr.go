@@ -4,7 +4,6 @@ import (
 	"io/fs"
 	"log/slog"
 	"net/http"
-	"path"
 	"strings"
 )
 
@@ -48,15 +47,13 @@ func (h *spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.setHeaders(w, urlPath)
+	w.Header().Set("Cache-Control", "public, max-age=86400")
 
 	r.URL.Path = "/" + urlPath
 	h.fileServer.ServeHTTP(w, r)
 }
 
 func (h *spaHandler) serveIndex(w http.ResponseWriter, r *http.Request) {
-	h.setHeaders(w, "index.html")
-
 	content, err := fs.ReadFile(h.fsys, "index.html")
 	if err != nil {
 		http.NotFound(w, r)
@@ -64,23 +61,16 @@ func (h *spaHandler) serveIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-store")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.Header().Set("Referrer-Policy", "same-origin")
+
+	if h.csp != "" {
+		w.Header().Set("Content-Security-Policy", h.csp)
+	}
+
 	_, err = w.Write(content)
 	if err != nil {
 		slog.Error("failed to write response", "error", err)
-	}
-}
-
-func (h *spaHandler) setHeaders(w http.ResponseWriter, filePath string) {
-	ext := path.Ext(filePath)
-
-	if filePath == "index.html" || ext == ".html" {
-		w.Header().Set("Cache-Control", "no-store")
-		w.Header().Set("X-Content-Type-Options", "nosniff")
-		w.Header().Set("Referrer-Policy", "same-origin")
-		if h.csp != "" {
-			w.Header().Set("Content-Security-Policy", h.csp)
-		}
-	} else {
-		w.Header().Set("Cache-Control", "public, max-age=86400")
 	}
 }
