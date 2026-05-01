@@ -96,16 +96,16 @@ func main() {
 
 	slog.SetDefault(logger)
 
-	insecureHTTP := os.Getenv("INSECURE_HTTP") == "true"
-	if insecureHTTP {
-		slog.Warn("RUNNING IN INSECURE MODE - TLS DISABLED")
+	noTLS := os.Getenv("NO_TLS") == "true"
+	if noTLS {
+		slog.Warn("running in insecure mode", "tls", "off")
 	}
 
 	var (
 		listenPort int
 		tlsConfig  *tls.Config
 	)
-	if insecureHTTP {
+	if noTLS {
 		listenPort = 8090
 	} else {
 		tlsConfig = loadTLSConfig()
@@ -202,7 +202,7 @@ func main() {
 		_ = httpServer.Shutdown(context.Background())
 	})
 
-	if insecureHTTP {
+	if noTLS {
 		err = httpServer.ListenAndServe()
 	} else {
 		err = httpServer.ListenAndServeTLS("", "")
