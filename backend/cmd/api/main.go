@@ -336,7 +336,8 @@ func loadTLSConfig() *tls.Config {
 	for _, p := range pairs {
 		cert, err := tls.LoadX509KeyPair(p.cert, p.key)
 		if err != nil {
-			panic("failed to load TLS certificate: cert=" + p.cert + " key=" + p.key + " error=" + err.Error())
+			slog.Error("failed to load tls certificate", "cert", p.cert, "error", err)
+			panic(err)
 		}
 
 		certificates = append(certificates, cert)
