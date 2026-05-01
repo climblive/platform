@@ -32,11 +32,7 @@
         appearance="filled-outlined"
         ><wa-icon name="headset"></wa-icon></wa-button
       >
-      <wa-button
-        size="s"
-        appearance="outlined"
-        onclick={authenticator.logout}
-      >
+      <wa-button size="s" appearance="outlined" onclick={authenticator.logout}>
         Sign out<wa-icon slot="start" name="right-from-bracket"
         ></wa-icon></wa-button
       >
