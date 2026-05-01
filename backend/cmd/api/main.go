@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"embed"
-	"fmt"
 	"io/fs"
 	"log"
 	"log/slog"
@@ -178,7 +177,7 @@ func main() {
 	wwwHost := os.Getenv("WWW_HOST")
 
 	httpServer := &http.Server{
-		Addr:                         fmt.Sprintf("0.0.0.0:%d", listenPort),
+		Addr:                         net.JoinHostPort("0.0.0.0", strconv.Itoa(listenPort)),
 		Handler:                      &hostHandler{appHandler: appMux, wwwHandler: wwwMux, wwwHost: wwwHost},
 		DisableGeneralOptionsHandler: false,
 		TLSConfig:                    tlsConfig,
