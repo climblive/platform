@@ -178,7 +178,7 @@ func main() {
 
 	httpServer := &http.Server{
 		Addr:                         net.JoinHostPort("0.0.0.0", strconv.Itoa(listenPort)),
-		Handler:                      &hostHandler{appHandler: appMux, wwwHandler: wwwMux, wwwHost: wwwHost},
+		Handler:                      &httpRouter{appHandler: appMux, wwwHandler: wwwMux, wwwHost: wwwHost},
 		DisableGeneralOptionsHandler: false,
 		TLSConfig:                    tlsConfig,
 		ReadTimeout:                  0,
@@ -380,13 +380,13 @@ func dropPrivileges(username string) error {
 	return nil
 }
 
-type hostHandler struct {
+type httpRouter struct {
 	wwwHost    string
 	appHandler http.Handler
 	wwwHandler http.Handler
 }
 
-func (h *hostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *httpRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	host, _, err := net.SplitHostPort(r.Host)
 	if err != nil {
 		host = r.Host
