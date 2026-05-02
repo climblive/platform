@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -23,6 +24,7 @@ type Keeper struct {
 	scores                 map[domain.ContenderID]domain.Score
 	repo                   keeperRepository
 	externalPersistTrigger chan struct{}
+	lastCheckedAt          int64
 }
 
 func NewScoreKeeper(eventBroker domain.EventBroker, repo keeperRepository) *Keeper {
@@ -79,6 +81,8 @@ func (k *Keeper) run(ctx context.Context, ready chan<- struct{}) {
 
 	close(ready)
 
+	atomic.StoreInt64(&k.lastCheckedAt, time.Now().UnixNano())
+
 	events := eventReader.EventsChan(ctx)
 	ticker := time.Tick(persistInterval)
 
@@ -95,6 +99,7 @@ EventLoop:
 				k.HandleContenderScoreUpdated(ev)
 			}
 		case <-ticker:
+			atomic.StoreInt64(&k.lastCheckedAt, time.Now().UnixNano())
 			k.persistScores(ctx)
 		case <-k.externalPersistTrigger:
 			k.persistScores(ctx)
@@ -219,4 +224,18 @@ func (k *Keeper) GetScore(contenderID domain.ContenderID) (domain.Score, error) 
 	}
 
 	return domain.Score{}, domain.ErrNotFound
+}
+
+func (k *Keeper) GetStatus() domain.RunnerStatus {
+	ns := atomic.LoadInt64(&k.lastCheckedAt)
+	if ns == 0 {
+		return domain.RunnerStatus{}
+	}
+
+	t := time.Unix(0, ns)
+
+	return domain.RunnerStatus{
+		Healthy:   time.Since(t) < 3*persistInterval,
+		CheckedAt: t,
+	}
 }

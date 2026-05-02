@@ -15,17 +15,8 @@ export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
 export type OrganizerInviteID = string;
-export type ResourceIDType =
-  | CompClassID
-  | ContenderID
-  | ContestID
-  | OrganizerID
-  | ProblemID
-  | RaffleID
-  | RaffleWinnerID
-  | SeriesID
-  | UserID
-  | TickID;
+export type ResourceIDType = 
+    CompClassID | ContenderID | ContestID | OrganizerID | ProblemID | RaffleID | RaffleWinnerID | SeriesID | UserID | TickID;
 export type ScoreEngineInstanceID = string;
 
 //////////
@@ -223,6 +214,15 @@ export interface User {
   username: string;
   admin: boolean;
   organizers: Organizer[];
+}
+export interface RunnerStatus {
+  healthy: boolean;
+  checkedAt?: Date;
+}
+export interface HealthStatus {
+  scoreEngineManager: RunnerStatus;
+  scoreKeeper: RunnerStatus;
+  scrubber: RunnerStatus;
 }
 export interface ContenderEnteredEvent {
   contenderId: ContenderID;

@@ -6,6 +6,7 @@ import (
 	"maps"
 	"slices"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -81,6 +82,7 @@ type ScoreEngineManager struct {
 	requests               chan any
 	terminations           chan domain.ScoreEngineInstanceID
 	scoreEngineMaxLifetime time.Duration
+	lastCheckedAt          int64
 }
 
 type engineHandler struct {
@@ -252,6 +254,8 @@ func (mngr *ScoreEngineManager) handleRequest(request any) {
 }
 
 func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) {
+	atomic.StoreInt64(&mngr.lastCheckedAt, time.Now().UnixNano())
+
 	now := time.Now()
 	contests, err := mngr.repo.GetContestsCurrentlyRunningOrByStartTime(ctx, nil, now, now.Add(5*time.Minute))
 	if err != nil {
@@ -382,4 +386,18 @@ func (mngr *ScoreEngineManager) getScoreEngine(instanceID domain.ScoreEngineInst
 	}
 
 	return ScoreEngineDescriptor{}, errors.Wrap(domain.ErrNotFound, 0)
+}
+
+func (mngr *ScoreEngineManager) GetStatus() domain.RunnerStatus {
+	ns := atomic.LoadInt64(&mngr.lastCheckedAt)
+	if ns == 0 {
+		return domain.RunnerStatus{}
+	}
+
+	t := time.Unix(0, ns)
+
+	return domain.RunnerStatus{
+		Healthy:   time.Since(t) < 3*pollInterval,
+		CheckedAt: t,
+	}
 }

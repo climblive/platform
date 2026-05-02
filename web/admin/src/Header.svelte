@@ -2,6 +2,7 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { FullLogo } from "@climblive/lib/components";
+  import { getHealthQuery, getSelfQuery } from "@climblive/lib/queries";
   import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Authenticator } from "./authenticator.svelte";
@@ -9,6 +10,21 @@
   let print = $state(false);
 
   const authenticator = getContext<Authenticator>("authenticator");
+
+  const selfQuery = $derived(getSelfQuery());
+  const self = $derived(selfQuery.data);
+
+  const healthQuery = $derived(
+    self?.admin ? getHealthQuery() : { data: undefined },
+  );
+  const health = $derived(healthQuery.data);
+
+  const hasIssues = $derived(
+    health !== undefined &&
+      (!health.scoreEngineManager.healthy ||
+        !health.scoreKeeper.healthy ||
+        !health.scrubber.healthy),
+  );
 
   onMount(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -25,6 +41,20 @@
       <div class="logo" onclick={() => navigate("./")}>
         <FullLogo />
       </div>
+      {#if self?.admin}
+        <div class="health-btn">
+          <wa-button
+            onclick={() => navigate("./health")}
+            size="s"
+            appearance="plain"
+          >
+            <wa-icon name="heart-pulse"></wa-icon>
+          </wa-button>
+          {#if hasIssues}
+            <span class="issue-badge"></span>
+          {/if}
+        </div>
+      {/if}
       <wa-button
         onclick={() => navigate("./help")}
         size="s"
@@ -64,6 +94,34 @@
     flex-shrink: 0;
     margin-inline-start: var(--wa-space-xs);
     cursor: pointer;
+  }
+
+  .health-btn {
+    position: relative;
+    display: inline-flex;
+  }
+
+  .issue-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--wa-color-danger);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.4);
+    }
   }
 
   @media print {
