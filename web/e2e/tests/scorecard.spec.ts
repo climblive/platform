@@ -436,6 +436,26 @@ test.describe("contest states", () => {
   });
 });
 
+test("scrub name", async ({ page }) => {
+  await page.goto("/ABCD0001");
+
+  await expect(page.getByText("Albert Einstein")).toBeVisible();
+
+  await page.getByRole("button", { name: "Edit" }).click({ force: true });
+
+  await page.waitForURL("/ABCD0001/edit");
+
+  await page
+    .getByRole("button", { name: "Remove my name" })
+    .click({ force: true });
+
+  await page.getByRole("button", { name: "Remove my name anyway" }).click();
+
+  await page.waitForURL("/ABCD0001");
+
+  await expect(page.getByText("anon824515495")).toBeVisible();
+});
+
 test.describe("failsafe mode", () => {
   test("enter contest by entering registration code", async ({ page }) => {
     await page.goto("/failsafe");
