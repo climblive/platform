@@ -181,8 +181,8 @@ type RaffleWinner struct {
 	Ownership           OwnershipData  `json:"-"`
 	RaffleID            RaffleID       `json:"raffleId"`
 	ContenderID         ContenderID    `json:"contenderId"`
-	ContenderName       string         `json:"contenderName" tstype:"string,readonly"`
-	ContenderScrubbedAt time.Time      `json:"contenderScrubbedAt,omitzero" tstype:"Date,readonly"`
+	ContenderName       string         `json:"contenderName"`
+	ContenderScrubbedAt time.Time      `json:"contenderScrubbedAt,omitzero"`
 	Timestamp           time.Time      `json:"timestamp"`
 }
 
