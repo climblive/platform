@@ -45,7 +45,7 @@
       />
     </h1>
     <p class="subtitle">
-      {contestName}<span class="separator">/</span>{compClassName}
+      {contestName}<span class="separator"> / </span>{compClassName}
     </p>
   </div>
 </header>

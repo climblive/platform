@@ -194,7 +194,7 @@ test("edit profile", async ({ page }) => {
 
   await expect(page.getByText("Michael Scott")).toBeVisible();
   await expect(
-    page.getByText("World Testing Championships/Males"),
+    page.getByText("World Testing Championships / Males"),
   ).toBeVisible();
 
   await page.getByRole("button", { name: "Edit" }).click({ force: true });
