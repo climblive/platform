@@ -1,7 +1,7 @@
 <script lang="ts" module>
   import { z } from "@climblive/lib/utils";
 
-  export const formSchema = z.object({
+  export const editFormSchema = z.object({
     location: z.string().optional(),
     country: z.string(),
     seriesId: z.coerce.number().optional(),
@@ -9,6 +9,9 @@
     description: z.string().optional(),
     info: z.string().optional(),
     gracePeriod: z.coerce.number().min(0).max(60),
+  });
+
+  export const formSchema = editFormSchema.extend({
     nameRetentionTime: z.coerce.number(),
   });
 
