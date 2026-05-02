@@ -64,6 +64,7 @@ func TestGetScoreboard(t *testing.T) {
 			Name:                fmt.Sprintf("Climber %d", i),
 			WithdrawnFromFinals: true,
 			Disqualified:        true,
+			ScrubbedAt:          currentTime,
 			Score: &domain.Score{
 				ContenderID: contenderID,
 				Score:       i * 10,
@@ -110,6 +111,7 @@ func TestGetScoreboard(t *testing.T) {
 	assert.Equal(t, "Climber 1", scoreboard[0].Name)
 	assert.Equal(t, true, scoreboard[0].WithdrawnFromFinals)
 	assert.Equal(t, true, scoreboard[0].Disqualified)
+	assert.Equal(t, currentTime, scoreboard[0].ScrubbedAt)
 	assert.NotNil(t, scoreboard[0].Score)
 	assert.Equal(t, future, scoreboard[0].Score.Timestamp)
 	assert.Equal(t, 1234, scoreboard[0].Score.Score)
@@ -125,6 +127,7 @@ func TestGetScoreboard(t *testing.T) {
 		assert.Equal(t, fmt.Sprintf("Climber %d", i), entry.Name)
 		assert.Equal(t, true, entry.WithdrawnFromFinals)
 		assert.Equal(t, true, entry.Disqualified)
+		assert.Equal(t, currentTime, entry.ScrubbedAt)
 		assert.NotNil(t, entry.Score)
 		assert.Equal(t, currentTime, entry.Score.Timestamp)
 		assert.Equal(t, i*10, entry.Score.Score)
@@ -367,6 +370,7 @@ func TestCreateContest(t *testing.T) {
 						Info:               "No rules!",
 						GracePeriod:        time.Hour,
 						Created:            time.Now(),
+						NameRetentionTime:  14 * 24 * time.Hour,
 					},
 				).
 				Return(domain.Contest{
@@ -382,6 +386,7 @@ func TestCreateContest(t *testing.T) {
 					Info:               "No rules!",
 					GracePeriod:        time.Hour,
 					Created:            time.Now(),
+					NameRetentionTime:  14 * 24 * time.Hour,
 				}, nil)
 
 			ucase := usecases.ContestUseCase{
@@ -398,6 +403,7 @@ func TestCreateContest(t *testing.T) {
 				Finalists:          7,
 				Info:               "No rules!",
 				GracePeriod:        time.Hour,
+				NameRetentionTime:  14 * 24 * time.Hour,
 			})
 
 			require.NoError(t, err)
@@ -415,6 +421,7 @@ func TestCreateContest(t *testing.T) {
 			assert.Empty(t, contest.TimeBegin)
 			assert.Empty(t, contest.TimeEnd)
 			assert.Equal(t, time.Now(), contest.Created)
+			assert.Equal(t, 14*24*time.Hour, contest.NameRetentionTime)
 
 			mockedRepo.AssertExpectations(t)
 			mockedAuthorizer.AssertExpectations(t)
@@ -470,6 +477,7 @@ func TestCreateContest(t *testing.T) {
 						Finalists:          7,
 						Info:               "XSS",
 						GracePeriod:        time.Hour,
+						NameRetentionTime:  14 * 24 * time.Hour,
 						Created:            time.Now(),
 					},
 				).
@@ -483,6 +491,7 @@ func TestCreateContest(t *testing.T) {
 					Finalists:          7,
 					Info:               "XSS",
 					GracePeriod:        time.Hour,
+					NameRetentionTime:  14 * 24 * time.Hour,
 					Created:            time.Now(),
 				}, nil)
 
@@ -500,6 +509,7 @@ func TestCreateContest(t *testing.T) {
 				Finalists:          7,
 				Info:               `<a href="javascript:alert('XSS1')" onmouseover="alert('XSS2')">XSS<a>`,
 				GracePeriod:        time.Hour,
+				NameRetentionTime:  14 * 24 * time.Hour,
 			})
 
 			require.NoError(t, err)
@@ -571,6 +581,7 @@ func TestCreateContest(t *testing.T) {
 				QualifyingProblems: 10,
 				Finalists:          7,
 				GracePeriod:        time.Hour,
+				NameRetentionTime:  14 * 24 * time.Hour,
 				Created:            time.Now(),
 			}
 
@@ -590,6 +601,7 @@ func TestCreateContest(t *testing.T) {
 				QualifyingProblems: 10,
 				Finalists:          7,
 				GracePeriod:        time.Hour,
+				NameRetentionTime:  14 * 24 * time.Hour,
 			})
 
 			require.NoError(t, err)
@@ -1215,8 +1227,9 @@ func TestPatchContest(t *testing.T) {
 		mockedRepo.
 			On("GetContest", mock.Anything, nil, fakedContestID).
 			Return(domain.Contest{
-				ID:        fakedContestID,
-				Ownership: fakedOwnership,
+				ID:                fakedContestID,
+				Ownership:         fakedOwnership,
+				NameRetentionTime: 14 * 24 * time.Hour,
 			}, nil)
 
 		mockedRepo.
@@ -1233,6 +1246,7 @@ func TestPatchContest(t *testing.T) {
 					Finalists:          5,
 					Info:               "No rules!",
 					GracePeriod:        time.Hour,
+					NameRetentionTime:  14 * 24 * time.Hour,
 				},
 			).
 			Return(domain.Contest{
@@ -1247,6 +1261,7 @@ func TestPatchContest(t *testing.T) {
 				Finalists:          5,
 				Info:               "No rules!",
 				GracePeriod:        time.Hour,
+				NameRetentionTime:  14 * 24 * time.Hour,
 			}, nil)
 
 		mockedEventBroker.
@@ -1286,6 +1301,7 @@ func TestPatchContest(t *testing.T) {
 		assert.Equal(t, 5, contest.Finalists)
 		assert.Equal(t, "No rules!", contest.Info)
 		assert.Equal(t, time.Hour, contest.GracePeriod)
+		assert.Equal(t, 14*24*time.Hour, contest.NameRetentionTime)
 
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
@@ -1304,10 +1320,11 @@ func TestPatchContest(t *testing.T) {
 		mockedRepo.
 			On("GetContest", mock.Anything, nil, fakedContestID).
 			Return(domain.Contest{
-				ID:        fakedContestID,
-				Ownership: fakedOwnership,
-				Name:      "Swedish Championships",
-				Country:   "SE",
+				ID:                fakedContestID,
+				Ownership:         fakedOwnership,
+				Name:              "Swedish Championships",
+				Country:           "SE",
+				NameRetentionTime: 14 * 24 * time.Hour,
 			}, nil)
 
 		mockedRepo.
@@ -1317,15 +1334,17 @@ func TestPatchContest(t *testing.T) {
 						c.Ownership == fakedOwnership &&
 						c.Name == "Swedish Championships" &&
 						c.Country == "SE" &&
+						c.NameRetentionTime == 14*24*time.Hour &&
 						!c.ArchivedAt.IsZero()
 				}),
 			).
 			Return(domain.Contest{
-				ID:         fakedContestID,
-				Ownership:  fakedOwnership,
-				ArchivedAt: time.Now(),
-				Name:       "Swedish Championships",
-				Country:    "SE",
+				ID:                fakedContestID,
+				Ownership:         fakedOwnership,
+				ArchivedAt:        time.Now(),
+				Name:              "Swedish Championships",
+				Country:           "SE",
+				NameRetentionTime: 14 * 24 * time.Hour,
 			}, nil)
 
 		fakedScoreEngineInstanceID := domain.ScoreEngineInstanceID(uuid.New())
@@ -1373,27 +1392,30 @@ func TestPatchContest(t *testing.T) {
 		mockedRepo.
 			On("GetContest", mock.Anything, nil, fakedContestID).
 			Return(domain.Contest{
-				ID:         fakedContestID,
-				Ownership:  fakedOwnership,
-				Name:       "Swedish Championships",
-				Country:    "SE",
-				ArchivedAt: time.Now(),
+				ID:                fakedContestID,
+				Ownership:         fakedOwnership,
+				Name:              "Swedish Championships",
+				Country:           "SE",
+				ArchivedAt:        time.Now(),
+				NameRetentionTime: 14 * 24 * time.Hour,
 			}, nil)
 
 		mockedRepo.
 			On("StoreContest", mock.Anything, nil,
 				domain.Contest{
-					ID:        fakedContestID,
-					Ownership: fakedOwnership,
-					Name:      "Swedish Championships",
-					Country:   "SE",
+					ID:                fakedContestID,
+					Ownership:         fakedOwnership,
+					Name:              "Swedish Championships",
+					Country:           "SE",
+					NameRetentionTime: 14 * 24 * time.Hour,
 				},
 			).
 			Return(domain.Contest{
-				ID:        fakedContestID,
-				Ownership: fakedOwnership,
-				Name:      "Swedish Championships",
-				Country:   "SE",
+				ID:                fakedContestID,
+				Ownership:         fakedOwnership,
+				Name:              "Swedish Championships",
+				Country:           "SE",
+				NameRetentionTime: 14 * 24 * time.Hour,
 			}, nil)
 
 		ucase := usecases.ContestUseCase{

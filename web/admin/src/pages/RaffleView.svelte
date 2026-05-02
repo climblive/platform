@@ -6,6 +6,7 @@
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
+    ContenderName,
     EmptyState,
     Table,
     type ColumnDefinition,
@@ -64,9 +65,18 @@
       return undefined;
     }
 
-    return contenders.filter(
-      ({ entered, disqualified }) => entered !== undefined && !disqualified,
-    ).length;
+    return contenders.filter(({ entered, disqualified, scrubbedAt }) => {
+      switch (true) {
+        case entered === undefined:
+          return false;
+        case disqualified:
+          return false;
+        case scrubbedAt !== undefined:
+          return false;
+        default:
+          return true;
+      }
+    }).length;
   });
 
   const winnersCount = $derived(raffleWinnersQuery.data?.length ?? 0);
@@ -132,8 +142,17 @@
   ];
 </script>
 
-{#snippet renderName({ contenderName }: RaffleWinner)}
-  {contenderName}
+{#snippet renderName({
+  contenderName,
+  contenderId,
+  contenderScrubbedAt,
+}: RaffleWinner)}
+  <ContenderName
+    id={contenderId}
+    name={contenderName}
+    scrubbedAt={contenderScrubbedAt}
+    withTooltip
+  />
 {/snippet}
 
 {#snippet renderTimestamp({ timestamp }: RaffleWinner)}

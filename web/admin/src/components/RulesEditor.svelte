@@ -35,7 +35,7 @@
     description="Contenders are ranked based on the total points scored across all problems."
   >
     {#snippet header()}
-      <wa-radio size="small" checked></wa-radio>
+      <wa-radio size="s" checked></wa-radio>
     {/snippet}
   </RuleOptionCard>
 
@@ -46,7 +46,7 @@
     tag="Upcoming"
   >
     {#snippet header()}
-      <wa-radio size="small" disabled></wa-radio>
+      <wa-radio size="s" disabled></wa-radio>
     {/snippet}
   </RuleOptionCard>
 </section>
@@ -64,7 +64,7 @@
     tag="Upcoming"
   >
     {#snippet header()}
-      <wa-checkbox size="small" disabled></wa-checkbox>
+      <wa-checkbox size="s" disabled></wa-checkbox>
     {/snippet}
   </RuleOptionCard>
 </section>

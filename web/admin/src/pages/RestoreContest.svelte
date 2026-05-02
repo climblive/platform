@@ -30,7 +30,7 @@
 </script>
 
 <section>
-  <wa-callout variant="danger" size="small">
+  <wa-callout variant="danger" size="s">
     <wa-icon slot="icon" name="box-archive"></wa-icon>
     <p>
       <strong>This contest has been archived.</strong><br />
