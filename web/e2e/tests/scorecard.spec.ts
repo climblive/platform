@@ -192,10 +192,11 @@ test("garbage session value in local storage is thrown out", async ({
 test("edit profile", async ({ page }) => {
   await page.goto("/ABCD0003");
 
-  await expect(page.getByText("Michael Scott")).toBeVisible();
-  await expect(
-    page.getByText("World Testing Championships / Males"),
-  ).toBeVisible();
+  const header = page.locator("main > .sticky header");
+
+  await expect(header).toContainText("Michael Scott");
+  await expect(header).toContainText("World Testing Championships");
+  await expect(header).toContainText("Males");
 
   await page.getByRole("button", { name: "Edit" }).click({ force: true });
 
@@ -215,8 +216,8 @@ test("edit profile", async ({ page }) => {
 
   await page.waitForURL("/ABCD0003");
 
-  await expect(page.getByText("Phyllis Lapin-Vance")).toBeVisible();
-  await expect(page.getByText("Females", { exact: true })).toBeVisible();
+  await expect(header).toContainText("Phyllis Lapin-Vance");
+  await expect(header).toContainText("Females");
 });
 
 test("withdraw from finals and reenter", async ({ page }) => {
