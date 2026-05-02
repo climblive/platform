@@ -7,10 +7,11 @@
   import { checked, GenericForm, name, value } from "@climblive/lib/forms";
   import { type ContenderPatch } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
+  import type { ContestState } from "@climblive/lib/types";
+  import { z } from "@climblive/lib/utils";
   import { isAfter } from "date-fns";
   import { getContext, type Snippet } from "svelte";
   import type { Readable } from "svelte/store";
-  import { z } from "@climblive/lib/utils";
 
   const registrationFormSchema: z.ZodType<ContenderPatch> = z.object({
     name: z.string().min(1),
@@ -21,14 +22,20 @@
   interface Props {
     data: Partial<ContenderPatch>;
     submit: (patch: ContenderPatch) => void;
+    callout?: Snippet;
     children?: Snippet;
+    contestState: ContestState;
+    disabled?: boolean;
   }
 
-  let { data, submit, children }: Props = $props();
+  const { data, submit, callout, children, contestState, ...rest }: Props =
+    $props();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
   let compClassesQuery = $derived(getCompClassesQuery($session.contestId));
+
+  const disabled = $derived(rest.disabled || contestState === "ENDED");
 </script>
 
 {#if compClassesQuery.data}
@@ -41,13 +48,16 @@
         type="text"
         required
         value={data.name}
+        {disabled}
       ></wa-input>
+      {@render callout?.()}
       <wa-select
         size="s"
         {@attach name("compClassId")}
         label="Competition class"
         required
         {@attach value(data.compClassId)}
+        {disabled}
       >
         {#each compClassesQuery.data as compClass (compClass.id)}
           <wa-option
@@ -66,6 +76,7 @@
         size="s"
         {@attach name("withdrawnFromFinals")}
         hint="If you do not wish to participate in the finals, you can give up your spot."
+        {disabled}
         {@attach checked(data.withdrawnFromFinals)}>Opt out of finals</wa-switch
       >
       {@render children?.()}

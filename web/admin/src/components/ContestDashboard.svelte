@@ -127,10 +127,7 @@
     {/if}
 
     {#if contest.timeBegin && contest.timeEnd}
-      <ContestStateProvider
-        startTime={contest.timeBegin}
-        endTime={contest.timeEnd}
-      >
+      <ContestStateProvider contestId={contest.id}>
         {#snippet children({ contestState })}
           <wa-badge pill>{contestStateToString(contestState)}</wa-badge>
         {/snippet}
