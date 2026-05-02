@@ -404,7 +404,7 @@
   }
 
   main {
-    --header-height: 6.5rem;
+    --header-height: 7rem;
 
     height: 100%;
     display: flex;

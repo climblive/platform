@@ -86,7 +86,7 @@
 
   h1 {
     margin: 0;
-    font-size: var(--wa-font-size-l);
+    font-size: var(--wa-font-size-xl);
     font-weight: var(--wa-font-weight-bold);
     line-height: var(--wa-line-height-condensed);
     white-space: nowrap;
@@ -97,7 +97,7 @@
   .subtitle {
     margin: 0;
     margin-block-start: var(--wa-space-2xs);
-    font-size: var(--wa-font-size-s);
+    font-size: var(--wa-font-size-m);
     color: var(--wa-color-text-quiet);
     line-height: var(--wa-line-height-condensed);
     white-space: nowrap;
