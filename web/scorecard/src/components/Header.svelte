@@ -46,7 +46,7 @@
         />
       </h1>
       <p class="subtitle">
-        {contestName}<span class="separator">•</span>{compClassName}
+        {contestName}<span class="separator">/</span>{compClassName}
       </p>
     </div>
   </div>
@@ -96,6 +96,7 @@
 
   .subtitle {
     margin: 0;
+    margin-block-start: var(--wa-space-2xs);
     font-size: var(--wa-font-size-s);
     color: var(--wa-color-text-quiet);
     line-height: var(--wa-line-height-condensed);
