@@ -25,6 +25,7 @@ import (
 	"github.com/climblive/platform/backend/internal/handlers/rest"
 	"github.com/climblive/platform/backend/internal/repository"
 	"github.com/climblive/platform/backend/internal/scores"
+	"github.com/climblive/platform/backend/internal/scrubber"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/utils"
 	"github.com/go-errors/errors"
@@ -161,9 +162,20 @@ func main() {
 
 	scoreEngineManager := scores.NewScoreEngineManager(database, scoreEngineStoreHydrator, eventBroker, scoreEngineMaxLifetime)
 
+	contenderUseCase := usecases.ContenderUseCase{
+		Repo:                      database,
+		Authorizer:                authorizer,
+		EventBroker:               eventBroker,
+		ScoreKeeper:               scoreKeeper,
+		RegistrationCodeGenerator: &registrationCodeGenerator{}}
+
+	scrubInterval := time.Hour
+	scrubberRunner := scrubber.New(&contenderUseCase, scrubInterval)
+
 	barriers = append(barriers,
 		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
-		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()))
+		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()),
+		scrubberRunner.Run(ctx, scrubber.WithPanicRecovery()))
 
 	apiMux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
 

@@ -64,7 +64,7 @@ func (d *Database) GetRaffleWinners(ctx context.Context, tx domain.Transaction, 
 	winners := make([]domain.RaffleWinner, 0)
 
 	for _, record := range records {
-		winners = append(winners, raffleWinnerToDomain(record.RaffleWinner, record.Name.String))
+		winners = append(winners, raffleWinnerToDomain(record.RaffleWinner, record.Name.String, record.ScrubbedAt.Time))
 	}
 
 	return winners, nil

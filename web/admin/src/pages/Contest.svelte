@@ -118,7 +118,7 @@
 
       <div class="results">
         <wa-button
-          size="small"
+          size="s"
           appearance="outlined"
           variant="brand"
           onclick={() => navigate(`/admin/contests/${contest.id}/results`)}

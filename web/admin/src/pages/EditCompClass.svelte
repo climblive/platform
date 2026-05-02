@@ -36,7 +36,7 @@
   <CompClassForm submit={handleSubmit} data={compClass} schema={formSchema}>
     <div class="controls">
       <wa-button
-        size="small"
+        size="s"
         type="button"
         appearance="plain"
         onclick={() =>
@@ -44,7 +44,7 @@
         >Cancel</wa-button
       >
       <wa-button
-        size="small"
+        size="s"
         type="submit"
         loading={patchCompClass.isPending}
         variant="neutral"

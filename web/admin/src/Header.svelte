@@ -27,16 +27,12 @@
       </div>
       <wa-button
         onclick={() => navigate("./help")}
-        size="small"
+        size="s"
         variant="success"
         appearance="filled-outlined"
         ><wa-icon name="headset"></wa-icon></wa-button
       >
-      <wa-button
-        size="small"
-        appearance="outlined"
-        onclick={authenticator.logout}
-      >
+      <wa-button size="s" appearance="outlined" onclick={authenticator.logout}>
         Sign out<wa-icon slot="start" name="right-from-bracket"
         ></wa-icon></wa-button
       >
