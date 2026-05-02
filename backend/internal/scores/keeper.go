@@ -24,7 +24,8 @@ type Keeper struct {
 	scores                 map[domain.ContenderID]domain.Score
 	repo                   keeperRepository
 	externalPersistTrigger chan struct{}
-	lastCheckedAt          int64
+	running                int32
+	lastSeenAt             int64
 }
 
 func NewScoreKeeper(eventBroker domain.EventBroker, repo keeperRepository) *Keeper {
@@ -79,9 +80,13 @@ func (k *Keeper) run(ctx context.Context, ready chan<- struct{}) {
 	subscriptionID, eventReader := k.eventBroker.Subscribe(filter, 0)
 	defer k.eventBroker.Unsubscribe(subscriptionID)
 
-	close(ready)
+	atomic.StoreInt32(&k.running, 1)
+	defer func() {
+		atomic.StoreInt64(&k.lastSeenAt, time.Now().UnixNano())
+		atomic.StoreInt32(&k.running, 0)
+	}()
 
-	atomic.StoreInt64(&k.lastCheckedAt, time.Now().UnixNano())
+	close(ready)
 
 	events := eventReader.EventsChan(ctx)
 	ticker := time.Tick(persistInterval)
@@ -99,7 +104,6 @@ EventLoop:
 				k.HandleContenderScoreUpdated(ev)
 			}
 		case <-ticker:
-			atomic.StoreInt64(&k.lastCheckedAt, time.Now().UnixNano())
 			k.persistScores(ctx)
 		case <-k.externalPersistTrigger:
 			k.persistScores(ctx)
@@ -227,15 +231,17 @@ func (k *Keeper) GetScore(contenderID domain.ContenderID) (domain.Score, error) 
 }
 
 func (k *Keeper) GetStatus() domain.RunnerStatus {
-	ns := atomic.LoadInt64(&k.lastCheckedAt)
+	if atomic.LoadInt32(&k.running) == 1 {
+		return domain.RunnerStatus{Healthy: true, CheckedAt: time.Now()}
+	}
+
+	ns := atomic.LoadInt64(&k.lastSeenAt)
 	if ns == 0 {
 		return domain.RunnerStatus{}
 	}
 
-	t := time.Unix(0, ns)
-
 	return domain.RunnerStatus{
-		Healthy:   time.Since(t) < 3*persistInterval,
-		CheckedAt: t,
+		Healthy:   false,
+		CheckedAt: time.Unix(0, ns),
 	}
 }

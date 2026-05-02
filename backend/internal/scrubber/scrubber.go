@@ -25,9 +25,10 @@ type contenderScrubberUseCase interface {
 }
 
 type scrubber struct {
-	useCase       contenderScrubberUseCase
-	interval      time.Duration
-	lastCheckedAt int64
+	useCase    contenderScrubberUseCase
+	interval   time.Duration
+	running    int32
+	lastSeenAt int64
 }
 
 func New(useCase contenderScrubberUseCase, interval time.Duration) *scrubber {
@@ -56,9 +57,13 @@ func (s *scrubber) Run(ctx context.Context, options ...func(*runOptions)) *sync.
 
 		defer wg.Done()
 
-		for {
-			atomic.StoreInt64(&s.lastCheckedAt, time.Now().UnixNano())
+		atomic.StoreInt32(&s.running, 1)
+		defer func() {
+			atomic.StoreInt64(&s.lastSeenAt, time.Now().UnixNano())
+			atomic.StoreInt32(&s.running, 0)
+		}()
 
+		for {
 			next := time.Now().Add(s.interval).Round(time.Hour)
 
 			delay := time.Until(next)
@@ -84,15 +89,17 @@ func (s *scrubber) Run(ctx context.Context, options ...func(*runOptions)) *sync.
 }
 
 func (s *scrubber) GetStatus() domain.RunnerStatus {
-	ns := atomic.LoadInt64(&s.lastCheckedAt)
+	if atomic.LoadInt32(&s.running) == 1 {
+		return domain.RunnerStatus{Healthy: true, CheckedAt: time.Now()}
+	}
+
+	ns := atomic.LoadInt64(&s.lastSeenAt)
 	if ns == 0 {
 		return domain.RunnerStatus{}
 	}
 
-	t := time.Unix(0, ns)
-
 	return domain.RunnerStatus{
-		Healthy:   time.Since(t) < 3*s.interval,
-		CheckedAt: t,
+		Healthy:   false,
+		CheckedAt: time.Unix(0, ns),
 	}
 }

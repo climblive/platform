@@ -82,7 +82,8 @@ type ScoreEngineManager struct {
 	requests               chan any
 	terminations           chan domain.ScoreEngineInstanceID
 	scoreEngineMaxLifetime time.Duration
-	lastCheckedAt          int64
+	running                int32
+	lastSeenAt             int64
 }
 
 type engineHandler struct {
@@ -181,6 +182,12 @@ func (mngr *ScoreEngineManager) GetScoreEngine(ctx context.Context, instanceID d
 }
 
 func (mngr *ScoreEngineManager) run(ctx context.Context) {
+	atomic.StoreInt32(&mngr.running, 1)
+	defer func() {
+		atomic.StoreInt64(&mngr.lastSeenAt, time.Now().UnixNano())
+		atomic.StoreInt32(&mngr.running, 0)
+	}()
+
 	ticker := time.Tick(pollInterval)
 
 	mngr.runPeriodicCheck(ctx)
@@ -254,8 +261,6 @@ func (mngr *ScoreEngineManager) handleRequest(request any) {
 }
 
 func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) {
-	atomic.StoreInt64(&mngr.lastCheckedAt, time.Now().UnixNano())
-
 	now := time.Now()
 	contests, err := mngr.repo.GetContestsCurrentlyRunningOrByStartTime(ctx, nil, now, now.Add(5*time.Minute))
 	if err != nil {
@@ -389,15 +394,17 @@ func (mngr *ScoreEngineManager) getScoreEngine(instanceID domain.ScoreEngineInst
 }
 
 func (mngr *ScoreEngineManager) GetStatus() domain.RunnerStatus {
-	ns := atomic.LoadInt64(&mngr.lastCheckedAt)
+	if atomic.LoadInt32(&mngr.running) == 1 {
+		return domain.RunnerStatus{Healthy: true, CheckedAt: time.Now()}
+	}
+
+	ns := atomic.LoadInt64(&mngr.lastSeenAt)
 	if ns == 0 {
 		return domain.RunnerStatus{}
 	}
 
-	t := time.Unix(0, ns)
-
 	return domain.RunnerStatus{
-		Healthy:   time.Since(t) < 3*pollInterval,
-		CheckedAt: t,
+		Healthy:   false,
+		CheckedAt: time.Unix(0, ns),
 	}
 }
