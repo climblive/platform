@@ -35,20 +35,18 @@
       <wa-icon name="gear" label="Edit"></wa-icon>
     </wa-button>
   </div>
-  <div class="identity">
-    <div class="info">
-      <h1>
-        <ContenderName
-          id={contenderId}
-          name={contenderName}
-          scrubbedAt={contenderScrubbedAt}
-          withTooltip
-        />
-      </h1>
-      <p class="subtitle">
-        {contestName}<span class="separator">/</span>{compClassName}
-      </p>
-    </div>
+  <div>
+    <h1>
+      <ContenderName
+        id={contenderId}
+        name={contenderName}
+        scrubbedAt={contenderScrubbedAt}
+        withTooltip
+      />
+    </h1>
+    <p class="subtitle">
+      {contestName}<span class="separator">/</span>{compClassName}
+    </p>
   </div>
 </header>
 
@@ -70,18 +68,6 @@
     justify-content: space-between;
     overflow-y: visible;
     height: var(--wa-font-size-l);
-  }
-
-  .identity {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--wa-space-s);
-    min-width: 0;
-  }
-
-  .info {
-    min-width: 0;
   }
 
   h1 {
@@ -108,7 +94,6 @@
   .separator {
     margin-inline: var(--wa-space-2xs);
   }
-
   wa-button {
     flex-shrink: 0;
   }
