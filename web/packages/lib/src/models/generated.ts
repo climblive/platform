@@ -116,7 +116,6 @@ export interface ContestPatch {
   finalists?: number;
   info?: string;
   gracePeriod?: number;
-  nameRetentionTime?: number;
 }
 export interface ContestTransferRequest {
   newOrganizerId: OrganizerID;

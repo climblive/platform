@@ -101,7 +101,6 @@ type ContestPatch struct {
 	Finalists          Patch[int]           `json:"finalists,omitzero" tstype:"number"`
 	Info               Patch[string]        `json:"info,omitzero" tstype:"string"`
 	GracePeriod        Patch[time.Duration] `json:"gracePeriod,omitzero" tstype:"number"`
-	NameRetentionTime  Patch[time.Duration] `json:"nameRetentionTime,omitzero" tstype:"number"`
 }
 
 type ContestTransferRequest struct {

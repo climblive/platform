@@ -274,7 +274,7 @@ func (uc *ContenderUseCase) ScrubContender(ctx context.Context, contenderID doma
 	uc.EventBroker.Dispatch(contender.ContestID, domain.ContenderPublicInfoUpdatedEvent{
 		ContenderID:         contender.ID,
 		CompClassID:         contender.CompClassID,
-		Name:                "",
+		Name:                contender.Name,
 		WithdrawnFromFinals: contender.WithdrawnFromFinals,
 		Disqualified:        contender.Disqualified,
 		ScrubbedAt:          contender.ScrubbedAt,
@@ -402,7 +402,7 @@ func (uc *ContenderUseCase) ScrubContenders(ctx context.Context, deadline time.T
 		uc.EventBroker.Dispatch(contender.ContestID, domain.ContenderPublicInfoUpdatedEvent{
 			ContenderID:         contender.ID,
 			CompClassID:         contender.CompClassID,
-			Name:                "",
+			Name:                contender.Name,
 			WithdrawnFromFinals: contender.WithdrawnFromFinals,
 			Disqualified:        contender.Disqualified,
 			ScrubbedAt:          contender.ScrubbedAt,

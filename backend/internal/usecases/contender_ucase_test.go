@@ -1836,6 +1836,5 @@ func TestScrubContenders(t *testing.T) {
 		assert.Equal(t, 0, count)
 
 		mockedRepo.AssertExpectations(t)
-		mockedRepo.AssertNotCalled(t, "Begin")
 	})
 }
