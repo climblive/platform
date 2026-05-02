@@ -99,6 +99,7 @@
           loading={patchContender.isPending}
           variant="neutral"
           appearance="accent"
+          disabled={tooLate}
           >Register
         </wa-button>
       </RegistrationForm>
