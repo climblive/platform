@@ -99,7 +99,7 @@
 <GenericForm {schema} {submit}>
   <fieldset>
     <wa-input
-      size="small"
+      size="s"
       {@attach name("name")}
       label="Name"
       type="text"
@@ -108,7 +108,7 @@
       placeholder="Males or Females"
     ></wa-input>
     <wa-input
-      size="small"
+      size="s"
       {@attach name("description")}
       label="Description"
       type="text"
@@ -116,7 +116,7 @@
     ></wa-input>
     <wa-input
       bind:this={timeBeginInput}
-      size="small"
+      size="s"
       onchange={handleTimeBeginChange}
       {@attach name("timeBegin")}
       label="Start time"
@@ -127,7 +127,7 @@
     ></wa-input>
     <wa-input
       bind:this={timeEndInput}
-      size="small"
+      size="s"
       {@attach name("timeEnd")}
       label="End time"
       type="datetime-local"
@@ -136,10 +136,10 @@
         : undefined}
     ></wa-input>
     <div class="quick-controls">
-      <wa-button pill size="small" onclick={() => extendTimeEnd(5)}
+      <wa-button pill size="s" onclick={() => extendTimeEnd(5)}
         >+5 min</wa-button
       >
-      <wa-button pill size="small" onclick={() => extendTimeEnd(15)}
+      <wa-button pill size="s" onclick={() => extendTimeEnd(15)}
         >+15 min</wa-button
       >
     </div>

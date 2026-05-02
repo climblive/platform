@@ -52,14 +52,14 @@
   <CompClassForm submit={handleSubmit} data={initialTimes} schema={formSchema}>
     <div class="controls">
       <wa-button
-        size="small"
+        size="s"
         type="button"
         appearance="plain"
         onclick={() => navigate(`/admin/contests/${contestId}#comp-classes`)}
         >Cancel</wa-button
       >
       <wa-button
-        size="small"
+        size="s"
         type="submit"
         loading={createCompClass.isPending}
         variant="neutral"

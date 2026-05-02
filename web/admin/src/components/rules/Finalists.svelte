@@ -51,7 +51,7 @@
     >
       {#snippet header()}
         <wa-checkbox
-          size="small"
+          size="s"
           onchange={(event: InputEvent) => {
             const checkbox = event.target as WaCheckbox;
             enabled = checkbox.checked;
@@ -73,7 +73,7 @@
         <div class="controls">
           {#if enabled}
             <wa-number-input
-              size="small"
+              size="s"
               {@attach name("finalists")}
               label="Finalists"
               required

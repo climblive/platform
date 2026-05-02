@@ -7,17 +7,10 @@ runs:
         go-version-file: "backend/go.mod"
 
     - run: go build -o climblive cmd/api/main.go
-      env:
-        CGO_ENABLED: 0
       shell: bash
       working-directory: backend
-
-    - run: |
-        docker build -t climblive-api:latest backend/
-        docker save climblive-api:latest -o climblive-api.tar
-      shell: bash
 
     - uses: actions/upload-artifact@v4
       with:
         name: backend
-        path: climblive-api.tar
+        path: backend/climblive

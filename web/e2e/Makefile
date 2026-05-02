@@ -1,7 +1,6 @@
 .PHONY: images
 images:
 	docker build .. -t climblive-web:latest
-	(cd ../../backend && CGO_ENABLED=0 go build -o ./climblive ./cmd/api)
 	docker build ../../backend -t climblive-api:latest
 
 .PHONY: test
