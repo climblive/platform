@@ -463,7 +463,7 @@ func accessLog(next http.Handler) http.Handler {
 		}
 
 		slog.Log(r.Context(), logLevel,
-			"access_log",
+			"request handled",
 			"method", r.Method,
 			"path", r.URL.Path,
 			"status", sw.status,
