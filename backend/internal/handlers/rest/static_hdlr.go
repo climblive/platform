@@ -43,7 +43,7 @@ func (h *spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := file.Close(); err != nil {
-		slog.Error("failed to close file", "urlPath", urlPath, "error", err)
+		slog.Error("failed to close file", "url_path", urlPath, "error", err)
 		panic(err)
 	}
 
