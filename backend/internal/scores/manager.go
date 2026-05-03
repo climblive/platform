@@ -82,8 +82,7 @@ type ScoreEngineManager struct {
 	requests               chan any
 	terminations           chan domain.ScoreEngineInstanceID
 	scoreEngineMaxLifetime time.Duration
-	running                int32
-	lastSeenAt             int64
+	running                atomic.Bool
 }
 
 type engineHandler struct {
@@ -182,11 +181,8 @@ func (mngr *ScoreEngineManager) GetScoreEngine(ctx context.Context, instanceID d
 }
 
 func (mngr *ScoreEngineManager) run(ctx context.Context) {
-	atomic.StoreInt32(&mngr.running, 1)
-	defer func() {
-		atomic.StoreInt64(&mngr.lastSeenAt, time.Now().UnixNano())
-		atomic.StoreInt32(&mngr.running, 0)
-	}()
+	mngr.running.Store(true)
+	defer mngr.running.Store(false)
 
 	ticker := time.Tick(pollInterval)
 
@@ -394,17 +390,5 @@ func (mngr *ScoreEngineManager) getScoreEngine(instanceID domain.ScoreEngineInst
 }
 
 func (mngr *ScoreEngineManager) GetStatus() domain.RunnerStatus {
-	if atomic.LoadInt32(&mngr.running) == 1 {
-		return domain.RunnerStatus{Healthy: true, CheckedAt: time.Now()}
-	}
-
-	ns := atomic.LoadInt64(&mngr.lastSeenAt)
-	if ns == 0 {
-		return domain.RunnerStatus{}
-	}
-
-	return domain.RunnerStatus{
-		Healthy:   false,
-		CheckedAt: time.Unix(0, ns),
-	}
+	return domain.RunnerStatus{Healthy: mngr.running.Load()}
 }

@@ -24,8 +24,7 @@ type Keeper struct {
 	scores                 map[domain.ContenderID]domain.Score
 	repo                   keeperRepository
 	externalPersistTrigger chan struct{}
-	running                int32
-	lastSeenAt             int64
+	running                atomic.Bool
 }
 
 func NewScoreKeeper(eventBroker domain.EventBroker, repo keeperRepository) *Keeper {
@@ -80,11 +79,8 @@ func (k *Keeper) run(ctx context.Context, ready chan<- struct{}) {
 	subscriptionID, eventReader := k.eventBroker.Subscribe(filter, 0)
 	defer k.eventBroker.Unsubscribe(subscriptionID)
 
-	atomic.StoreInt32(&k.running, 1)
-	defer func() {
-		atomic.StoreInt64(&k.lastSeenAt, time.Now().UnixNano())
-		atomic.StoreInt32(&k.running, 0)
-	}()
+	k.running.Store(true)
+	defer k.running.Store(false)
 
 	close(ready)
 
@@ -231,17 +227,5 @@ func (k *Keeper) GetScore(contenderID domain.ContenderID) (domain.Score, error) 
 }
 
 func (k *Keeper) GetStatus() domain.RunnerStatus {
-	if atomic.LoadInt32(&k.running) == 1 {
-		return domain.RunnerStatus{Healthy: true, CheckedAt: time.Now()}
-	}
-
-	ns := atomic.LoadInt64(&k.lastSeenAt)
-	if ns == 0 {
-		return domain.RunnerStatus{}
-	}
-
-	return domain.RunnerStatus{
-		Healthy:   false,
-		CheckedAt: time.Unix(0, ns),
-	}
+	return domain.RunnerStatus{Healthy: k.running.Load()}
 }
