@@ -450,7 +450,10 @@ func noCacheHandler(next http.Handler) http.Handler {
 
 func accessLog(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		sw := &statusWriter{ResponseWriter: w}
+		sw := &statusWriter{
+			ResponseWriter: w,
+			status:         0,
+		}
 
 		start := time.Now()
 		next.ServeHTTP(sw, r)
