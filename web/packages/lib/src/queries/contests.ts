@@ -116,6 +116,70 @@ export const duplicateContestMutation = (contestId: number) => {
   }));
 };
 
+export const archiveContestMutation = (contestId: number) => {
+  const client = useQueryClient();
+
+  return createMutation(() => ({
+    mutationFn: () => ApiClient.getInstance().archiveContest(contestId),
+    onSuccess: (archivedContest) => {
+      let queryKey: QueryKey = [
+        "contests",
+        { organizerId: archivedContest.ownership.organizerId },
+      ];
+
+      client.setQueryData<Contest[]>(queryKey, (oldContests) => {
+        if (oldContests === undefined) {
+          return undefined;
+        }
+
+        return oldContests.map((contest) => {
+          if (contest.id === archivedContest.id) {
+            return archivedContest;
+          }
+
+          return contest;
+        });
+      });
+
+      queryKey = ["contest", { id: contestId }];
+
+      client.setQueryData<Contest>(queryKey, archivedContest);
+    },
+  }));
+};
+
+export const restoreContestMutation = (contestId: number) => {
+  const client = useQueryClient();
+
+  return createMutation(() => ({
+    mutationFn: () => ApiClient.getInstance().restoreContest(contestId),
+    onSuccess: (restoredContest) => {
+      let queryKey: QueryKey = [
+        "contests",
+        { organizerId: restoredContest.ownership.organizerId },
+      ];
+
+      client.setQueryData<Contest[]>(queryKey, (oldContests) => {
+        if (oldContests === undefined) {
+          return undefined;
+        }
+
+        return oldContests.map((contest) => {
+          if (contest.id === restoredContest.id) {
+            return restoredContest;
+          }
+
+          return contest;
+        });
+      });
+
+      queryKey = ["contest", { id: contestId }];
+
+      client.setQueryData<Contest>(queryKey, restoredContest);
+    },
+  }));
+};
+
 export const transferContestMutation = (contestId: number) => {
   const client = useQueryClient();
 

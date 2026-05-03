@@ -91,7 +91,6 @@ type ContestTemplate struct {
 }
 
 type ContestPatch struct {
-	Archived           Patch[bool]          `json:"archived,omitzero" tstype:"boolean"`
 	Location           Patch[string]        `json:"location,omitzero" tstype:"string"`
 	Country            Patch[string]        `json:"country,omitzero" tstype:"string"`
 	SeriesID           Patch[SeriesID]      `json:"seriesId,omitzero" tstype:"number"`

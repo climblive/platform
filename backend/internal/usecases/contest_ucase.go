@@ -146,40 +146,13 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		return mty, errors.Wrap(err, 0)
 	}
 
+	if !contest.ArchivedAt.IsZero() {
+		return mty, errors.Wrap(domain.ErrArchived, 0)
+	}
+
 	rulesUpdateEventBaseline := domain.RulesUpdatedEvent{
 		QualifyingProblems: contest.QualifyingProblems,
 		Finalists:          contest.Finalists,
-	}
-
-	if patch.Archived.Present {
-		if patch.Archived.Value {
-			contest.ArchivedAt = time.Now()
-		} else {
-			contest.ArchivedAt = time.Time{}
-		}
-
-		if !contest.ArchivedAt.IsZero() {
-			engines, err := uc.ScoreEngineManager.ListScoreEnginesByContest(ctx, contestID)
-			if err != nil {
-				return mty, errors.Wrap(err, 0)
-			}
-
-			for _, engine := range engines {
-				err = uc.ScoreEngineManager.StopScoreEngine(ctx, engine.InstanceID)
-				if err != nil {
-					return mty, errors.Wrap(err, 0)
-				}
-			}
-		}
-	}
-
-	//nolint:exhaustruct
-	patchAnythingOtherThanArchive := patch != (domain.ContestPatch{}) && patch != domain.ContestPatch{
-		Archived: patch.Archived,
-	}
-
-	if !contest.ArchivedAt.IsZero() && patchAnythingOtherThanArchive {
-		return mty, errors.Wrap(domain.ErrArchived, 0)
 	}
 
 	if patch.Location.Present {
@@ -233,6 +206,57 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 
 	if event != rulesUpdateEventBaseline {
 		uc.EventBroker.Dispatch(contestID, event)
+	}
+
+	return contest, nil
+}
+
+func (uc *ContestUseCase) ArchiveContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error) {
+	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	if _, err = uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	contest.ArchivedAt = time.Now()
+
+	engines, err := uc.ScoreEngineManager.ListScoreEnginesByContest(ctx, contestID)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	for _, engine := range engines {
+		if err = uc.ScoreEngineManager.StopScoreEngine(ctx, engine.InstanceID); err != nil {
+			return domain.Contest{}, errors.Wrap(err, 0)
+		}
+	}
+
+	contest, err = uc.Repo.StoreContest(ctx, nil, contest)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	return contest, nil
+}
+
+func (uc *ContestUseCase) RestoreContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error) {
+	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	if _, err = uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	contest.ArchivedAt = time.Time{}
+
+	contest, err = uc.Repo.StoreContest(ctx, nil, contest)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
 	return contest, nil

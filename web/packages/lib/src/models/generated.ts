@@ -106,7 +106,6 @@ export interface ContestTemplate {
   nameRetentionTime: number;
 }
 export interface ContestPatch {
-  archived?: boolean;
   location?: string;
   country?: string;
   seriesId?: number;

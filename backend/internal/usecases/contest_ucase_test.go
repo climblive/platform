@@ -1368,11 +1368,7 @@ func TestPatchContest(t *testing.T) {
 			ScoreEngineManager: mockedScoreEngineManager,
 		}
 
-		patch := domain.ContestPatch{
-			Archived: domain.NewPatch(true),
-		}
-
-		contest, err := ucase.PatchContest(context.Background(), fakedContestID, patch)
+		contest, err := ucase.ArchiveContest(context.Background(), fakedContestID)
 
 		require.NoError(t, err)
 		assert.False(t, contest.ArchivedAt.IsZero())
@@ -1423,11 +1419,7 @@ func TestPatchContest(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		patch := domain.ContestPatch{
-			Archived: domain.NewPatch(false),
-		}
-
-		contest, err := ucase.PatchContest(context.Background(), fakedContestID, patch)
+		contest, err := ucase.RestoreContest(context.Background(), fakedContestID)
 
 		require.NoError(t, err)
 		assert.True(t, contest.ArchivedAt.IsZero())

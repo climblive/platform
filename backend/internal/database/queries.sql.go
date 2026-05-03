@@ -1397,7 +1397,7 @@ const upsertContest = `-- name: UpsertContest :execlastid
 INSERT INTO 
 	contest (id, organizer_id, archived_at, series_id, name, description, location, country, qualifying_problems, finalists, info, grace_period, name_retention_time, created)
 VALUES 
-	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     archived_at = VALUES(archived_at),
