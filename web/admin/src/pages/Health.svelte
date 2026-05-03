@@ -1,6 +1,7 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import RelativeTime from "@/components/RelativeTime.svelte";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { RunnerStatus } from "@climblive/lib/models";
@@ -41,6 +42,13 @@
           { name: "Scrubber", status: health.scrubber },
         ],
   );
+
+  const allHealthy = $derived(
+    health !== undefined &&
+      health.scoreEngineManager.healthy &&
+      health.scoreKeeper.healthy &&
+      health.scrubber.healthy,
+  );
 </script>
 
 {#snippet renderStatus({ status }: RunnerRow)}
@@ -68,6 +76,17 @@
 {#if health === undefined}
   <Loader />
 {:else}
+  {#if allHealthy}
+    <wa-callout variant="success">
+      <wa-icon slot="icon" name="circle-check"></wa-icon>
+      All services are up and running.
+    </wa-callout>
+  {:else}
+    <wa-callout variant="danger">
+      <wa-icon slot="icon" name="circle-xmark"></wa-icon>
+      One or more services are down.
+    </wa-callout>
+  {/if}
   <Table {columns} data={rows} getId={({ name }) => name}></Table>
 {/if}
 
