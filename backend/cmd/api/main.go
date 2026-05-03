@@ -270,7 +270,6 @@ func setupMux(
 	}
 
 	healthUseCase := usecases.HealthUseCase{
-		Authorizer:         authorizer,
 		ScoreEngineManager: scoreEngineManager,
 		ScoreKeeper:        scoreKeeper,
 		Scrubber:           scrubberStatus,

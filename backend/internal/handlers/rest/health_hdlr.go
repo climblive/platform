@@ -30,5 +30,10 @@ func (hdlr *healthHandler) GetHealth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeResponse(w, http.StatusOK, health)
+	status := http.StatusOK
+	if !health.ScoreEngineManager.Healthy || !health.ScoreKeeper.Healthy || !health.Scrubber.Healthy {
+		status = http.StatusServiceUnavailable
+	}
+
+	writeResponse(w, status, health)
 }
