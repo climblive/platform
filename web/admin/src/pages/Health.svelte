@@ -10,7 +10,6 @@
 
   const columns: ColumnDefinition<RunnerRow>[] = [
     {
-      label: "Status",
       mobile: true,
       render: renderStatus,
       width: "max-content",
