@@ -11,12 +11,12 @@
 
 {#snippet runnerRow(name: string, status: RunnerStatus)}
   <div class="runner">
-    <span class="runner-name">{name}</span>
     {#if status.healthy}
       <wa-icon name="circle-check" class="healthy"></wa-icon>
     {:else}
       <wa-icon name="circle-xmark" class="unhealthy"></wa-icon>
     {/if}
+    <span class="runner-name">{name}</span>
     <span class="checked-at">
       {#if status.checkedAt}
         <RelativeTime time={status.checkedAt} />
@@ -27,14 +27,14 @@
   </div>
 {/snippet}
 
-<h1>System Health</h1>
+<h1>System health</h1>
 
 {#if health === undefined}
   <Loader />
 {:else}
   <div class="runners">
-    {@render runnerRow("Score Engine Manager", health.scoreEngineManager)}
-    {@render runnerRow("Score Keeper", health.scoreKeeper)}
+    {@render runnerRow("Score engine manager", health.scoreEngineManager)}
+    {@render runnerRow("Score keeper", health.scoreKeeper)}
     {@render runnerRow("Scrubber", health.scrubber)}
   </div>
 {/if}
@@ -48,7 +48,7 @@
 
   .runner {
     display: grid;
-    grid-template-columns: 1fr max-content max-content;
+    grid-template-columns: max-content 1fr max-content;
     align-items: center;
     gap: var(--wa-space-m);
     padding: var(--wa-space-s) var(--wa-space-m);

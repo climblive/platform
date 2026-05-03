@@ -41,31 +41,33 @@
       <div class="logo" onclick={() => navigate("./")}>
         <FullLogo />
       </div>
-      {#if self?.admin}
-        <div class="health-btn">
-          <wa-button
-            onclick={() => navigate("./health")}
-            size="s"
-            appearance="plain"
-          >
-            <wa-icon name="heart-pulse"></wa-icon>
-          </wa-button>
-          {#if hasIssues}
-            <span class="issue-badge"></span>
-          {/if}
-        </div>
-      {/if}
-      <wa-button
-        onclick={() => navigate("./help")}
-        size="s"
-        variant="success"
-        appearance="filled-outlined"
-        ><wa-icon name="headset"></wa-icon></wa-button
-      >
-      <wa-button size="s" appearance="outlined" onclick={authenticator.logout}>
-        Sign out<wa-icon slot="start" name="right-from-bracket"
-        ></wa-icon></wa-button
-      >
+      <div class="right-actions">
+        <wa-button
+          onclick={() => navigate("./help")}
+          size="s"
+          variant="success"
+          appearance="filled-outlined"
+          ><wa-icon name="headset"></wa-icon></wa-button
+        >
+        {#if self?.admin}
+          <div class="health-btn">
+            <wa-button
+              onclick={() => navigate("./health")}
+              size="s"
+              appearance="outlined"
+            >
+              <wa-icon name="heart-pulse"></wa-icon>
+            </wa-button>
+            {#if hasIssues}
+              <span class="issue-badge"></span>
+            {/if}
+          </div>
+        {/if}
+        <wa-button size="s" appearance="outlined" onclick={authenticator.logout}>
+          Sign out<wa-icon slot="start" name="right-from-bracket"
+          ></wa-icon></wa-button
+        >
+      </div>
     </div>
   </header>
 {/if}
@@ -94,6 +96,17 @@
     flex-shrink: 0;
     margin-inline-start: var(--wa-space-xs);
     cursor: pointer;
+  }
+
+  .right-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-xs);
+    max-width: unset;
+    margin: unset;
+    height: unset;
+    padding: unset;
+    justify-content: flex-end;
   }
 
   .health-btn {
