@@ -390,5 +390,9 @@ func (mngr *ScoreEngineManager) getScoreEngine(instanceID domain.ScoreEngineInst
 }
 
 func (mngr *ScoreEngineManager) GetStatus() domain.RunnerStatus {
-	return domain.RunnerStatus{Healthy: mngr.running.Load()}
+	if mngr.running.Load() {
+		return domain.RunnerStatus{Healthy: true, CheckedAt: time.Now()}
+	}
+
+	return domain.RunnerStatus{}
 }
