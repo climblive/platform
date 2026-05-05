@@ -1,5 +1,5 @@
 -- +goose Up
-ALTER TABLE contest ADD COLUMN `archived_at` DATETIME NULL DEFAULT NULL AFTER `archived`;
+ALTER TABLE contest ADD COLUMN `archived_at` TIMESTAMP NULL DEFAULT NULL AFTER `archived`;
 UPDATE contest SET archived_at = NOW() WHERE archived = TRUE;
 ALTER TABLE contest DROP COLUMN `archived`;
 
