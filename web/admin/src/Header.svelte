@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { FullLogo } from "@climblive/lib/components";
@@ -50,18 +51,16 @@
           ><wa-icon name="headset"></wa-icon></wa-button
         >
         {#if self?.admin}
-          <div class="health-btn">
-            <wa-button
-              onclick={() => navigate("./health")}
-              size="s"
-              appearance="outlined"
-            >
-              <wa-icon name="heart-pulse"></wa-icon>
-            </wa-button>
+          <wa-button
+            onclick={() => navigate("./health")}
+            size="s"
+            appearance="outlined"
+          >
+            <wa-icon name="heart-pulse"></wa-icon>
             {#if hasIssues}
-              <span class="issue-badge"></span>
+              <wa-badge variant="danger" pill attention="pulse"></wa-badge>
             {/if}
-          </div>
+          </wa-button>
         {/if}
         <wa-button size="s" appearance="outlined" onclick={authenticator.logout}>
           Sign out<wa-icon slot="start" name="right-from-bracket"
@@ -77,7 +76,7 @@
     background-color: var(--wa-color-surface-lowered);
   }
 
-  div {
+  header > div {
     margin: 0 auto;
     max-width: 1024px;
     display: flex;
@@ -102,39 +101,6 @@
     display: flex;
     align-items: center;
     gap: var(--wa-space-xs);
-    max-width: unset;
-    margin: unset;
-    height: unset;
-    padding: unset;
-    justify-content: flex-end;
-  }
-
-  .health-btn {
-    position: relative;
-    display: inline-flex;
-  }
-
-  .issue-badge {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: var(--wa-color-danger);
-    animation: pulse 1.5s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%,
-    100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.5;
-      transform: scale(1.4);
-    }
   }
 
   @media print {
