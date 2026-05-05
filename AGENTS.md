@@ -205,6 +205,7 @@ make test
 - Table-driven tests preferred for multiple test cases
 - Use `stretchr/testify` for assertions
 - Mock interfaces using `stretchr/testify/mock`
+- Use `testing/synctest` (via `synctest.Test`) whenever a test involves `time.Now()`
 
 ### Frontend
 
