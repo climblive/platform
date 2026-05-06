@@ -1,7 +1,7 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import ContestForm, {
-    formSchema,
+    editFormSchema,
     nanosecondsInMinute,
   } from "@/forms/ContestForm.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
@@ -48,7 +48,7 @@
   <ContestForm
     submit={handleSubmit}
     data={contest}
-    schema={formSchema}
+    schema={editFormSchema}
     disableNameRetentionTime
   >
     <div class="controls">
