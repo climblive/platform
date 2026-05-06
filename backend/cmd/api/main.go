@@ -109,9 +109,6 @@ func main() {
 		listenPort = 8090
 	} else {
 		tlsConfig = loadTLSConfig()
-		if err := dropPrivileges("climblive"); err != nil {
-			panic(err)
-		}
 		listenPort = 443
 	}
 
@@ -213,10 +210,24 @@ func main() {
 		_ = httpServer.Shutdown(context.Background())
 	})
 
-	if noTLS {
-		err = httpServer.ListenAndServe()
+	listener, err := net.Listen("tcp", httpServer.Addr)
+	if err != nil {
+		if stack := utils.GetErrorStack(err); stack != "" {
+			log.Println(stack)
+		}
+
+		panic(err)
+	}
+
+	if err := dropPrivileges(dropUser); err != nil {
+		_ = listener.Close()
+		panic(err)
+	}
+
+	if httpServer.TLSConfig != nil {
+		err = httpServer.ServeTLS(listener, "", "")
 	} else {
-		err = httpServer.ListenAndServeTLS("", "")
+		err = httpServer.Serve(listener)
 	}
 
 	switch err {
