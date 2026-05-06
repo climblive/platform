@@ -485,3 +485,7 @@ func (w *statusWriter) WriteHeader(statusCode int) {
 	w.status = statusCode
 	w.ResponseWriter.WriteHeader(statusCode)
 }
+
+func (w *statusWriter) Flush() {
+	w.ResponseWriter.(http.Flusher).Flush()
+}
