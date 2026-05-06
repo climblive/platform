@@ -409,7 +409,7 @@ func TestCreateContest(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, fakedContestID, contest.ID)
 			assert.Equal(t, fakedOwnership, contest.Ownership)
-			assert.True(t, contest.ArchivedAt.IsZero())
+			assert.Zero(t, contest.ArchivedAt)
 			assert.Equal(t, "The garage", contest.Location)
 			assert.Equal(t, "SE", contest.Country)
 			assert.Equal(t, "Swedish Championships", contest.Name)
@@ -1554,7 +1554,7 @@ func TestRestoreContest(t *testing.T) {
 			contest, err := ucase.RestoreContest(context.Background(), fakedContestID)
 
 			require.NoError(t, err)
-			assert.True(t, contest.ArchivedAt.IsZero())
+			assert.Zero(t, contest.ArchivedAt)
 
 			mockedRepo.AssertExpectations(t)
 			mockedAuthorizer.AssertExpectations(t)
