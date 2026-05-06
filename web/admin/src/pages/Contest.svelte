@@ -111,7 +111,7 @@
       <wa-breadcrumb-item>{contest.name}</wa-breadcrumb-item>
     </wa-breadcrumb>
 
-    {#if contest.archived === true}
+    {#if contest.archivedAt != null}
       <RestoreContest {contestId} />
     {:else}
       <ContestDashboard contestId={contest.id} />
