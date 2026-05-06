@@ -298,6 +298,7 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 			OrganizerID: organizerID,
 			ContenderID: nil,
 		},
+		ArchivedAt:           time.Time{},
 		SeriesID:             0,
 		TimeBegin:            time.Time{},
 		TimeEnd:              time.Time{},
