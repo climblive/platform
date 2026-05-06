@@ -1424,14 +1424,14 @@ func TestArchiveContest(t *testing.T) {
 
 			mockedRepo.
 				On("StoreContest", mock.Anything, nil,
-					mock.MatchedBy(func(c domain.Contest) bool {
-						return c.ID == fakedContestID &&
-							c.Ownership == fakedOwnership &&
-							c.Name == "Swedish Championships" &&
-							c.Country == "SE" &&
-							c.NameRetentionTime == 14*24*time.Hour &&
-							c.ArchivedAt == time.Now()
-					}),
+					domain.Contest{
+						ID:                fakedContestID,
+						Ownership:         fakedOwnership,
+						Name:              "Swedish Championships",
+						Country:           "SE",
+						ArchivedAt:        time.Now(),
+						NameRetentionTime: 14 * 24 * time.Hour,
+					},
 				).
 				Return(domain.Contest{
 					ID:                fakedContestID,
