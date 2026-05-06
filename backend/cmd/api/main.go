@@ -112,7 +112,7 @@ func main() {
 		if err := dropPrivileges("climblive"); err != nil {
 			panic(err)
 		}
-		listenPort = 8443
+		listenPort = 443
 	}
 
 	var barriers []*sync.WaitGroup

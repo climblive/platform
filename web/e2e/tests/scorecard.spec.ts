@@ -66,7 +66,7 @@ test.beforeAll(async () => {
         mode: "ro",
       },
     ])
-    .withExposedPorts({ container: 8443, host: 8443 })
+    .withExposedPorts({ container: 443, host: 8443 })
     .withWaitStrategy(Wait.forLogMessage(/score engine started/));
 
   startedApiContainer = await appContainer.start();
