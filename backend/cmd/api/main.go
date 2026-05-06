@@ -219,7 +219,7 @@ func main() {
 		panic(err)
 	}
 
-	if err := dropPrivileges(dropUser); err != nil {
+	if err := dropPrivileges("climblive"); err != nil {
 		_ = listener.Close()
 		panic(err)
 	}
