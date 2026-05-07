@@ -146,36 +146,13 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		return mty, errors.Wrap(err, 0)
 	}
 
+	if !contest.ArchivedAt.IsZero() {
+		return mty, errors.Wrap(domain.ErrArchived, 0)
+	}
+
 	rulesUpdateEventBaseline := domain.RulesUpdatedEvent{
 		QualifyingProblems: contest.QualifyingProblems,
 		Finalists:          contest.Finalists,
-	}
-
-	if patch.Archived.Present {
-		contest.Archived = patch.Archived.Value
-
-		if contest.Archived {
-			engines, err := uc.ScoreEngineManager.ListScoreEnginesByContest(ctx, contestID)
-			if err != nil {
-				return mty, errors.Wrap(err, 0)
-			}
-
-			for _, engine := range engines {
-				err = uc.ScoreEngineManager.StopScoreEngine(ctx, engine.InstanceID)
-				if err != nil {
-					return mty, errors.Wrap(err, 0)
-				}
-			}
-		}
-	}
-
-	//nolint:exhaustruct
-	patchAnythingOtherThanArchive := patch != (domain.ContestPatch{}) && patch != domain.ContestPatch{
-		Archived: patch.Archived,
-	}
-
-	if contest.Archived && patchAnythingOtherThanArchive {
-		return mty, errors.Wrap(domain.ErrArchived, 0)
 	}
 
 	if patch.Location.Present {
@@ -234,6 +211,57 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 	return contest, nil
 }
 
+func (uc *ContestUseCase) ArchiveContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error) {
+	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	if _, err = uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	contest.ArchivedAt = time.Now()
+
+	engines, err := uc.ScoreEngineManager.ListScoreEnginesByContest(ctx, contestID)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	for _, engine := range engines {
+		if err = uc.ScoreEngineManager.StopScoreEngine(ctx, engine.InstanceID); err != nil {
+			return domain.Contest{}, errors.Wrap(err, 0)
+		}
+	}
+
+	contest, err = uc.Repo.StoreContest(ctx, nil, contest)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	return contest, nil
+}
+
+func (uc *ContestUseCase) RestoreContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error) {
+	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	if _, err = uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	contest.ArchivedAt = time.Time{}
+
+	contest, err = uc.Repo.StoreContest(ctx, nil, contest)
+	if err != nil {
+		return domain.Contest{}, errors.Wrap(err, 0)
+	}
+
+	return contest, nil
+}
+
 func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.OrganizerID, tmpl domain.ContestTemplate) (domain.Contest, error) {
 	organizer, err := uc.Repo.GetOrganizer(ctx, nil, organizerID)
 	if err != nil {
@@ -254,7 +282,7 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		oneWeekAgo := time.Now().Add(-7 * 24 * time.Hour)
 		recentCount := 0
 		for _, c := range contests {
-			if !c.Archived && c.Created.After(oneWeekAgo) {
+			if c.ArchivedAt.IsZero() && c.Created.After(oneWeekAgo) {
 				recentCount++
 			}
 		}
@@ -270,7 +298,7 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 			OrganizerID: organizerID,
 			ContenderID: nil,
 		},
-		Archived:             false,
+		ArchivedAt:           time.Time{},
 		SeriesID:             0,
 		TimeBegin:            time.Time{},
 		TimeEnd:              time.Time{},
@@ -309,7 +337,7 @@ func (uc *ContestUseCase) DuplicateContest(ctx context.Context, contestID domain
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
-	if contest.Archived {
+	if !contest.ArchivedAt.IsZero() {
 		return domain.Contest{}, errors.Wrap(domain.ErrArchived, 0)
 	}
 
@@ -381,7 +409,7 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 		return domain.Contest{}, errors.Wrap(err, 0)
 	}
 
-	if contest.Archived {
+	if !contest.ArchivedAt.IsZero() {
 		return domain.Contest{}, errors.Wrap(domain.ErrArchived, 0)
 	}
 

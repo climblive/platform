@@ -212,6 +212,26 @@ export class ApiClient {
     return contestSchema.parse(result.data);
   };
 
+  archiveContest = async (contestId: number) => {
+    const endpoint = `/contests/${contestId}/archive`;
+
+    const result = await this.axiosInstance.post(endpoint, undefined, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return contestSchema.parse(result.data);
+  };
+
+  restoreContest = async (contestId: number) => {
+    const endpoint = `/contests/${contestId}/restore`;
+
+    const result = await this.axiosInstance.post(endpoint, undefined, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return contestSchema.parse(result.data);
+  };
+
   transferContest = async (contestId: number, newOrganizerId: number) => {
     const endpoint = `/contests/${contestId}/transfer`;
 

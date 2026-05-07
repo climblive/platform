@@ -5,7 +5,7 @@ import type { Contest } from "./generated";
 export const contestSchema: z.ZodType<Contest> = z.object({
   id: z.number(),
   ownership: ownershipDataSchema,
-  archived: z.boolean(),
+  archivedAt: z.coerce.date().optional(),
   location: z.string().optional(),
   country: z.string(),
   seriesId: z.number().optional(),

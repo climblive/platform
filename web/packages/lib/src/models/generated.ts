@@ -77,7 +77,7 @@ export interface ContenderPatch {
 export interface Contest {
   id: ContestID;
   ownership: OwnershipData;
-  archived: boolean;
+  archivedAt?: Date;
   location?: string;
   country: string;
   seriesId?: SeriesID;
@@ -106,7 +106,6 @@ export interface ContestTemplate {
   nameRetentionTime: number;
 }
 export interface ContestPatch {
-  archived?: boolean;
   location?: string;
   country?: string;
   seriesId?: number;
