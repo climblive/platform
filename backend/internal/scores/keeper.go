@@ -227,9 +227,5 @@ func (k *Keeper) GetScore(contenderID domain.ContenderID) (domain.Score, error) 
 }
 
 func (k *Keeper) GetStatus() domain.ServiceStatus {
-	if k.running.Load() {
-		return domain.ServiceStatus{Name: "ScoreKeeper", Healthy: true, CheckedAt: time.Now()}
-	}
-
-	return domain.ServiceStatus{}
+	return domain.ServiceStatus{Name: "ScoreKeeper", Healthy: k.running.Load(), CheckedAt: time.Now()}
 }

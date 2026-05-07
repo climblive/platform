@@ -68,6 +68,8 @@ func (s *Scrubber) Run(ctx context.Context, options ...func(*runOptions)) *sync.
 			select {
 			case <-ctx.Done():
 				return
+			case <-time.After(15 * time.Second):
+				panic("simulated scrubber panic")
 			case <-time.After(delay):
 				slog.Info("running scrubber")
 
@@ -85,9 +87,5 @@ func (s *Scrubber) Run(ctx context.Context, options ...func(*runOptions)) *sync.
 }
 
 func (s *Scrubber) GetStatus() domain.ServiceStatus {
-	if s.running.Load() {
-		return domain.ServiceStatus{Name: "Scrubber", Healthy: true, CheckedAt: time.Now()}
-	}
-
-	return domain.ServiceStatus{}
+	return domain.ServiceStatus{Name: "Scrubber", Healthy: s.running.Load(), CheckedAt: time.Now()}
 }

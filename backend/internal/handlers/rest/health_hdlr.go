@@ -21,6 +21,7 @@ func InstallHealthHandler(mux *Mux, healthUseCase healthUseCase) {
 	}
 
 	mux.HandleFunc("GET /health", handler.GetHealth)
+	mux.HandleFunc("GET /health/ok", handler.GetHealthOk)
 }
 
 func (hdlr *healthHandler) GetHealth(w http.ResponseWriter, r *http.Request) {
@@ -31,4 +32,23 @@ func (hdlr *healthHandler) GetHealth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeResponse(w, http.StatusOK, health)
+}
+
+func (hdlr *healthHandler) GetHealthOk(w http.ResponseWriter, r *http.Request) {
+	health, err := hdlr.healthUseCase.GetHealth(r.Context())
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	status := http.StatusOK
+
+	for _, service := range health {
+		if !service.Healthy {
+			status = http.StatusServiceUnavailable
+			break
+		}
+	}
+
+	writeResponse(w, status, nil)
 }
