@@ -18,7 +18,9 @@
   const healthQuery = $derived(self?.admin ? getHealthQuery() : undefined);
   const health = $derived(healthQuery?.data);
 
-  const issues = $derived(health?.filter(({ healthy }) => !healthy).length);
+  const issues = $derived(
+    health?.filter(({ healthy }) => !healthy).length ?? 0,
+  );
 
   onMount(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -39,22 +41,17 @@
         <wa-button
           onclick={() => navigate("./help")}
           size="s"
-          variant="success"
-          appearance="filled-outlined"
-          ><wa-icon name="headset"></wa-icon></wa-button
+          variant="neutral"
+          appearance="outlined"><wa-icon name="headset"></wa-icon></wa-button
         >
         {#if self?.admin}
           <wa-button
             onclick={() => navigate("./health")}
             size="s"
             appearance="outlined"
+            variant={issues > 0 ? "danger" : "neutral"}
           >
             <wa-icon name="heart-pulse"></wa-icon>
-            {#if issues}
-              <wa-badge variant="danger" pill attention="pulse"
-                >{issues}</wa-badge
-              >
-            {/if}
           </wa-button>
         {/if}
         <wa-button
