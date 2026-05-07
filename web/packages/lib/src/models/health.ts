@@ -1,13 +1,8 @@
 import { z } from "@climblive/lib/utils";
-import type { HealthStatus, RunnerStatus } from "./generated";
+import type { ServiceStatus } from "./generated";
 
-export const runnerStatusSchema: z.ZodType<RunnerStatus> = z.object({
+export const serviceStatusSchema: z.ZodType<ServiceStatus> = z.object({
+  name: z.string(),
   healthy: z.boolean(),
-  checkedAt: z.coerce.date().optional(),
-});
-
-export const healthStatusSchema: z.ZodType<HealthStatus> = z.object({
-  scoreEngineManager: runnerStatusSchema,
-  scoreKeeper: runnerStatusSchema,
-  scrubber: runnerStatusSchema,
+  checkedAt: z.coerce.date(),
 });

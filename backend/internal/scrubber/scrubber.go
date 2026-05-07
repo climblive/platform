@@ -24,17 +24,17 @@ type contenderScrubberUseCase interface {
 	ScrubContenders(ctx context.Context, deadline time.Time) (int, error)
 }
 
-type scrubber struct {
+type Scrubber struct {
 	useCase  contenderScrubberUseCase
 	interval time.Duration
 	running  atomic.Bool
 }
 
-func New(useCase contenderScrubberUseCase, interval time.Duration) *scrubber {
-	return &scrubber{useCase: useCase, interval: interval}
+func New(useCase contenderScrubberUseCase, interval time.Duration) *Scrubber {
+	return &Scrubber{useCase: useCase, interval: interval}
 }
 
-func (s *scrubber) Run(ctx context.Context, options ...func(*runOptions)) *sync.WaitGroup {
+func (s *Scrubber) Run(ctx context.Context, options ...func(*runOptions)) *sync.WaitGroup {
 	config := &runOptions{}
 	for _, opt := range options {
 		opt(config)
@@ -84,10 +84,10 @@ func (s *scrubber) Run(ctx context.Context, options ...func(*runOptions)) *sync.
 	return &wg
 }
 
-func (s *scrubber) GetStatus() domain.RunnerStatus {
+func (s *Scrubber) GetStatus() domain.ServiceStatus {
 	if s.running.Load() {
-		return domain.RunnerStatus{Healthy: true, CheckedAt: time.Now()}
+		return domain.ServiceStatus{Healthy: true, CheckedAt: time.Now()}
 	}
 
-	return domain.RunnerStatus{}
+	return domain.ServiceStatus{}
 }

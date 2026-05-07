@@ -226,10 +226,10 @@ func (k *Keeper) GetScore(contenderID domain.ContenderID) (domain.Score, error) 
 	return domain.Score{}, domain.ErrNotFound
 }
 
-func (k *Keeper) GetStatus() domain.RunnerStatus {
+func (k *Keeper) GetStatus() domain.ServiceStatus {
 	if k.running.Load() {
-		return domain.RunnerStatus{Healthy: true, CheckedAt: time.Now()}
+		return domain.ServiceStatus{Healthy: true, CheckedAt: time.Now()}
 	}
 
-	return domain.RunnerStatus{}
+	return domain.ServiceStatus{}
 }

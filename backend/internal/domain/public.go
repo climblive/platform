@@ -232,15 +232,10 @@ type User struct {
 	Organizers []Organizer `json:"organizers"`
 }
 
-type RunnerStatus struct {
+type ServiceStatus struct {
+	Name      string    `json:"name"`
 	Healthy   bool      `json:"healthy"`
-	CheckedAt time.Time `json:"checkedAt,omitzero"`
-}
-
-type HealthStatus struct {
-	ScoreEngineManager RunnerStatus `json:"scoreEngineManager"`
-	ScoreKeeper        RunnerStatus `json:"scoreKeeper"`
-	Scrubber           RunnerStatus `json:"scrubber"`
+	CheckedAt time.Time `json:"checkedAt"`
 }
 
 type ContenderEnteredEvent struct {

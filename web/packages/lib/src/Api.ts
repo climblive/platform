@@ -20,7 +20,7 @@ import {
 } from "./models";
 import { compClassSchema } from "./models/compClass";
 import { contenderSchema } from "./models/contender";
-import { healthStatusSchema } from "./models/health";
+import { serviceStatusSchema } from "./models/health";
 import { organizerSchema } from "./models/organizer";
 import { organizerInviteSchema } from "./models/organizerInvite";
 import { problemSchema } from "./models/problem";
@@ -560,10 +560,8 @@ export class ApiClient {
   getHealth = async () => {
     const endpoint = "/health";
 
-    const result = await this.axiosInstance.get(endpoint, {
-      headers: this.credentialsProvider?.getAuthHeaders(),
-    });
+    const result = await this.axiosInstance.get(endpoint, {});
 
-    return healthStatusSchema.parse(result.data);
+    return z.array(serviceStatusSchema).parse(result.data);
   };
 }

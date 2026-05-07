@@ -4,19 +4,17 @@
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
-  import type { RunnerStatus } from "@climblive/lib/models";
+  import type { ServiceStatus } from "@climblive/lib/models";
   import { getHealthQuery } from "@climblive/lib/queries";
 
-  type RunnerRow = { name: string; status: RunnerStatus };
-
-  const columns: ColumnDefinition<RunnerRow>[] = [
+  const columns: ColumnDefinition<ServiceStatus>[] = [
     {
       mobile: true,
       render: renderStatus,
       width: "max-content",
     },
     {
-      label: "Runner",
+      label: "Service",
       mobile: true,
       render: renderName,
       width: "1fr",
@@ -33,42 +31,23 @@
   const healthQuery = $derived(getHealthQuery());
   const health = $derived(healthQuery.data);
 
-  const rows = $derived<RunnerRow[]>(
-    health === undefined
-      ? []
-      : [
-          { name: "Score engine manager", status: health.scoreEngineManager },
-          { name: "Score keeper", status: health.scoreKeeper },
-          { name: "Scrubber", status: health.scrubber },
-        ],
-  );
-
-  const allHealthy = $derived(
-    health !== undefined &&
-      health.scoreEngineManager.healthy &&
-      health.scoreKeeper.healthy &&
-      health.scrubber.healthy,
-  );
+  const allHealthy = $derived(health?.every(({ healthy }) => healthy));
 </script>
 
-{#snippet renderStatus({ status }: RunnerRow)}
-  {#if status.healthy}
-    <wa-icon name="circle-check" class="healthy"></wa-icon>
+{#snippet renderStatus({ healthy }: ServiceStatus)}
+  {#if healthy}
+    <wa-icon name="carrot" class="healthy"></wa-icon>
   {:else}
-    <wa-icon name="circle-xmark" class="unhealthy"></wa-icon>
+    <wa-icon name="disease" class="unhealthy"></wa-icon>
   {/if}
 {/snippet}
 
-{#snippet renderName({ name }: RunnerRow)}
+{#snippet renderName({ name }: ServiceStatus)}
   {name}
 {/snippet}
 
-{#snippet renderLastSeen({ status }: RunnerRow)}
-  {#if status.checkedAt}
-    <RelativeTime time={status.checkedAt} />
-  {:else}
-    Never
-  {/if}
+{#snippet renderLastSeen({ checkedAt }: ServiceStatus)}
+  <RelativeTime time={checkedAt} />
 {/snippet}
 
 <h1>System health</h1>
@@ -78,12 +57,12 @@
 {:else}
   {#if allHealthy}
     <wa-callout variant="success">
-      <wa-icon slot="icon" name="circle-check"></wa-icon>
+      <wa-icon slot="icon" name="carrot"></wa-icon>
       All services are up and running.
     </wa-callout>
   {:else}
     <wa-callout variant="danger">
-      <wa-icon slot="icon" name="circle-xmark"></wa-icon>
+      <wa-icon slot="icon" name="disease"></wa-icon>
       One or more services are down.
     </wa-callout>
   {/if}
@@ -91,11 +70,11 @@
 {/if}
 
 <style>
-  :global(.healthy) {
+  .healthy {
     color: var(--wa-color-success);
   }
 
-  :global(.unhealthy) {
+  .unhealthy {
     color: var(--wa-color-danger);
   }
 </style>

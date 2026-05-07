@@ -211,7 +211,7 @@ func setupMux(
 	eventBroker domain.EventBroker,
 	scoreKeeper *scores.Keeper,
 	scoreEngineManager *scores.ScoreEngineManager,
-	scrubberStatus domain.StatusReporter,
+	scrubber *scrubber.Scrubber,
 ) *rest.Mux {
 	contenderUseCase := usecases.ContenderUseCase{
 		Repo:                      repo,
@@ -272,7 +272,7 @@ func setupMux(
 	healthUseCase := usecases.HealthUseCase{
 		ScoreEngineManager: scoreEngineManager,
 		ScoreKeeper:        scoreKeeper,
-		Scrubber:           scrubberStatus,
+		Scrubber:           scrubber,
 	}
 
 	mux := rest.NewMux()

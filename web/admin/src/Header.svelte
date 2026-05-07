@@ -15,17 +15,10 @@
   const selfQuery = $derived(getSelfQuery());
   const self = $derived(selfQuery.data);
 
-  const healthQuery = $derived(
-    self?.admin ? getHealthQuery() : { data: undefined },
-  );
-  const health = $derived(healthQuery.data);
+  const healthQuery = $derived(self?.admin ? getHealthQuery() : undefined);
+  const health = $derived(healthQuery?.data);
 
-  const hasIssues = $derived(
-    health !== undefined &&
-      (!health.scoreEngineManager.healthy ||
-        !health.scoreKeeper.healthy ||
-        !health.scrubber.healthy),
-  );
+  const issues = $derived(health?.filter(({ healthy }) => !healthy).length);
 
   onMount(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -57,12 +50,18 @@
             appearance="outlined"
           >
             <wa-icon name="heart-pulse"></wa-icon>
-            {#if hasIssues}
-              <wa-badge variant="danger" pill attention="pulse"></wa-badge>
+            {#if issues}
+              <wa-badge variant="danger" pill attention="pulse"
+                >{issues}</wa-badge
+              >
             {/if}
           </wa-button>
         {/if}
-        <wa-button size="s" appearance="outlined" onclick={authenticator.logout}>
+        <wa-button
+          size="s"
+          appearance="outlined"
+          onclick={authenticator.logout}
+        >
           Sign out<wa-icon slot="start" name="right-from-bracket"
           ></wa-icon></wa-button
         >
