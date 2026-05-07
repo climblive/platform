@@ -30,18 +30,5 @@ func (hdlr *healthHandler) GetHealth(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	status := http.StatusOK
-
-	issues := 0
-	for _, service := range health {
-		if !service.Healthy {
-			issues++
-		}
-	}
-
-	if issues > 0 {
-		status = http.StatusServiceUnavailable
-	}
-
-	writeResponse(w, status, health)
+	writeResponse(w, http.StatusOK, health)
 }
