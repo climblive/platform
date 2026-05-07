@@ -36,7 +36,7 @@
 
 {#snippet renderStatus({ healthy }: ServiceStatus)}
   {#if healthy}
-    <wa-icon name="carrot" class="healthy"></wa-icon>
+    <wa-icon name="heart-circle-check" class="healthy"></wa-icon>
   {:else}
     <wa-icon name="disease" class="unhealthy"></wa-icon>
   {/if}
@@ -57,7 +57,7 @@
 {:else}
   {#if allHealthy}
     <wa-callout variant="success">
-      <wa-icon slot="icon" name="carrot"></wa-icon>
+      <wa-icon slot="icon" name="heart-circle-check"></wa-icon>
       All services are up and running.
     </wa-callout>
   {:else}
@@ -66,7 +66,7 @@
       One or more services are down.
     </wa-callout>
   {/if}
-  <Table {columns} data={rows} getId={({ name }) => name}></Table>
+  <Table {columns} data={health} getId={({ name }) => name}></Table>
 {/if}
 
 <style>
@@ -76,5 +76,9 @@
 
   .unhealthy {
     color: var(--wa-color-danger);
+  }
+
+  wa-callout {
+    margin-block-end: var(--wa-space-m);
   }
 </style>
