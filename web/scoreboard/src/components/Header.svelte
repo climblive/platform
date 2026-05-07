@@ -24,7 +24,7 @@
   });
 </script>
 
-<ContestStateProvider {contestId} {compClassId}>
+<ContestStateProvider {contestId} {startTime} {endTime}>
   {#snippet children({ contestState, progress })}
     <header>
       <div class="left">
