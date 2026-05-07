@@ -1,136 +1,100 @@
 <script lang="ts">
-  import { Score, Timer } from "@climblive/lib/components";
-  import { type ContestState } from "@climblive/lib/types";
-  import { ordinalSuperscript } from "@climblive/lib/utils";
+  import { ContenderName, FullLogo } from "@climblive/lib/components";
   import { navigate } from "svelte-routing";
 
   interface Props {
     registrationCode: string;
     contestName: string;
     compClassName: string | undefined;
+    contenderId: number;
     contenderName: string | undefined;
-    score: number;
-    placement: number | undefined;
-    contestState: ContestState;
-    startTime: Date;
-    endTime: Date;
-    disqualified: boolean;
+    contenderScrubbedAt: Date | undefined;
   }
 
-  let {
+  const {
     registrationCode,
     contestName,
     compClassName,
+    contenderId,
     contenderName,
-    score,
-    placement,
-    contestState,
-    startTime,
-    endTime,
-    disqualified,
+    contenderScrubbedAt,
   }: Props = $props();
 </script>
 
 <header>
-  <wa-button
-    size="small"
-    onclick={() => navigate(`/${registrationCode}/edit`)}
-    disabled={contestState === "ENDED"}
-    appearance="plain"
-  >
-    <wa-icon name="gear" label="Edit"></wa-icon>
-  </wa-button>
-  <h1>{contestName}</h1>
-  <p class="contender-name">
-    {contenderName} <span class="contender-class">{compClassName}</span>
-  </p>
-  <div class="lower">
-    <div class="score">
-      <span>
-        {#if disqualified}
-          Disqualified
-        {:else if placement}
-          {placement}<sup>{ordinalSuperscript(placement)}</sup>
-        {:else}
-          -
-        {/if}
-      </span>
-      <Score value={score} />
+  <div class="top">
+    <div class="logo">
+      <FullLogo />
     </div>
-    {#if contestState === "NOT_STARTED"}
-      <Timer align="right" endTime={startTime} label="Time until start" />
-    {:else}
-      <Timer align="right" {endTime} label="Time remaining" />
-    {/if}
+
+    <wa-button
+      size="small"
+      onclick={() => navigate(`/${registrationCode}/edit`)}
+      appearance="plain"
+    >
+      <wa-icon name="gear" label="Edit"></wa-icon>
+    </wa-button>
+  </div>
+  <div>
+    <h1>
+      <ContenderName
+        id={contenderId}
+        name={contenderName}
+        scrubbedAt={contenderScrubbedAt}
+        withTooltip
+      />
+    </h1>
+    <p class="subtitle">
+      {contestName}<span class="separator"> / </span>{compClassName}
+    </p>
   </div>
 </header>
 
 <style>
   header {
-    background-color: var(--wa-color-brand-fill-normal);
-    border: var(--wa-border-width-s) var(--wa-border-style)
-      var(--wa-color-brand-border-normal);
-    border-radius: var(--wa-border-radius-m);
-    padding: var(--wa-space-s);
-    color: var(--wa-color-brand-on-normal);
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-xs);
+    padding-block-start: var(--wa-space-l);
+  }
 
-    & wa-button {
-      position: absolute;
-      top: var(--wa-space-xs);
-      right: var(--wa-space-xs);
-      color: inherit;
+  .logo {
+    height: var(--wa-font-size-l);
+  }
 
-      &::part(label) {
-        color: var(--wa-color-brand-on-normal);
-      }
-    }
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    overflow-y: visible;
+    height: var(--wa-font-size-l);
+  }
 
-    & wa-button::part(base) {
-      padding: 0;
-    }
+  h1 {
+    margin: 0;
+    font-size: var(--wa-font-size-xl);
+    font-weight: var(--wa-font-weight-bold);
+    line-height: var(--wa-line-height-condensed);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-    & h1,
-    & .contender-name {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+  .subtitle {
+    margin: 0;
+    margin-block-start: var(--wa-space-2xs);
+    font-size: var(--wa-font-size-m);
+    color: var(--wa-color-text-quiet);
+    line-height: var(--wa-line-height-condensed);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-    & h1 {
-      margin: 0;
-      font-size: var(--wa-font-size-l);
-      width: calc(100% - 2rem);
-      line-height: var(--wa-line-height-condensed);
-    }
-
-    & .contender-name {
-      margin: 0;
-      line-height: var(--wa-line-height-condensed);
-    }
-
-    & .contender-class {
-      font-weight: var(--wa-font-weight-bold);
-      font-size: var(--wa-font-size-xs);
-    }
-
-    & .score {
-      & > span {
-        font-weight: var(--wa-font-weight-bold);
-        font-size: var(--wa-font-size-l);
-      }
-
-      & > :not(span) {
-        font-size: var(--wa-font-size-xs);
-        font-weight: var(--wa-font-weight-normal);
-      }
-    }
-
-    & .lower {
-      margin-top: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: end;
-    }
+  .separator {
+    margin-inline: var(--wa-space-2xs);
+  }
+  wa-button {
+    flex-shrink: 0;
   }
 </style>

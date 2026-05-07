@@ -106,7 +106,7 @@ func (d *Database) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context,
 			SeriesID:           record.SeriesID,
 			Name:               record.Name,
 			Description:        record.Description,
-			Archived:           record.Archived,
+			ArchivedAt:         record.ArchivedAt,
 			Created:            record.Created,
 			Location:           record.Location,
 			Country:            record.Country,
@@ -116,6 +116,7 @@ func (d *Database) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context,
 			PooledPoints:       record.PooledPoints,
 			Info:               record.Info,
 			GracePeriod:        record.GracePeriod,
+			NameRetentionTime:  record.NameRetentionTime,
 		})
 
 		if timeBegin, ok := record.TimeBegin.(time.Time); ok {
@@ -136,7 +137,7 @@ func (d *Database) StoreContest(ctx context.Context, tx domain.Transaction, cont
 	params := database.UpsertContestParams{
 		ID:                 int32(contest.ID),
 		OrganizerID:        int32(contest.Ownership.OrganizerID),
-		Archived:           contest.Archived,
+		ArchivedAt:         makeNullTime(contest.ArchivedAt),
 		SeriesID:           makeNullInt32(int32(contest.SeriesID)),
 		Name:               contest.Name,
 		Description:        makeNullString(contest.Description),
@@ -148,6 +149,7 @@ func (d *Database) StoreContest(ctx context.Context, tx domain.Transaction, cont
 		PooledPoints:       contest.PooledPoints,
 		Info:               makeNullString(contest.Info),
 		GracePeriod:        int32(contest.GracePeriod / time.Minute),
+		NameRetentionTime:  int32(contest.NameRetentionTime / time.Minute),
 		Created:            contest.Created,
 	}
 

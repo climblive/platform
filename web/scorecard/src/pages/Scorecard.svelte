@@ -9,9 +9,6 @@
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
-  import type WaRadioGroup from "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
-  import "@awesome.me/webawesome/dist/components/radio/radio.js";
   import "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
   import type WaTabGroup from "@awesome.me/webawesome/dist/components/tab-group/tab-group.js";
   import "@awesome.me/webawesome/dist/components/tab-panel/tab-panel.js";
@@ -47,7 +44,6 @@
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
-  import { add } from "date-fns/add";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
 
@@ -62,7 +58,6 @@
 
   let resultsConnected = $state(false);
   let tabGroup: WaTabGroup | undefined = $state();
-  let radioGroup: WaRadioGroup | undefined = $state();
   let raffleWinnerDialog: WaDialog | undefined = $state();
   let eventSource: EventSource | undefined;
   let score: number = $state(0);
@@ -81,11 +76,6 @@
   );
   let endTime = $derived(
     selectedCompClass?.timeEnd ?? new Date(-8640000000000000),
-  );
-  let gracePeriodEndTime = $derived(
-    add(endTime, {
-      minutes: (contest?.gracePeriod ?? 0) / (1_000_000_000 * 60),
-    }),
   );
 
   const problemsQuery = $derived(
@@ -152,12 +142,6 @@
       : "Sort by points ascending",
   );
 
-  let highestProblemNumber = $derived(
-    problems?.reduce((max, cur) => {
-      return Math.max(max, cur.number);
-    }, 0) ?? 0,
-  );
-
   $effect(() => {
     if (contender) {
       score = contender.score?.score ?? 0;
@@ -169,6 +153,8 @@
   const handleShowTab = ({ detail }: WaTabShowEvent) => {
     if (detail.name === "results") {
       resultsConnected = true;
+    } else if (detail.name === "scorecard") {
+      window.scrollTo(0, 0);
     }
   };
 
@@ -206,6 +192,7 @@
         name: event.name,
         withdrawnFromFinals: event.withdrawnFromFinals,
         disqualified: event.disqualified,
+        scrubbedAt: event.scrubbedAt,
       });
     });
 
@@ -304,7 +291,10 @@
 {#if showSplash || !contender || !contest || !compClasses || !sortedProblems || !ticks || !selectedCompClass}
   <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
-  <ContestStateProvider {startTime} {endTime} {gracePeriodEndTime}>
+  <ContestStateProvider
+    contestId={$session.contestId}
+    compClassId={contender?.compClassId}
+  >
     {#snippet children({ contestState })}
       <main>
         <div class="sticky">
@@ -312,93 +302,87 @@
             registrationCode={$session.registrationCode}
             contestName={contest.name}
             compClassName={selectedCompClass?.name}
+            contenderId={contender.id}
             contenderName={contender.name}
-            {score}
-            {placement}
-            {contestState}
-            {startTime}
-            {endTime}
-            disqualified={contender.disqualified}
+            contenderScrubbedAt={contender.scrubbedAt}
           />
         </div>
         <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleShowTab}>
-          <wa-tab slot="nav" panel="problems">Scorecard</wa-tab>
+          <wa-tab slot="nav" panel="scorecard">Scorecard</wa-tab>
           <wa-tab slot="nav" panel="results">Results</wa-tab>
           <wa-tab slot="nav" panel="info">Info</wa-tab>
 
-          <wa-tab-panel name="problems">
-            <wa-radio-group
-              orientation="horizontal"
-              size="small"
-              bind:this={radioGroup}
-              value={orderProblemsBy}
-              onchange={() => {
-                if (radioGroup) {
-                  const newValue = radioGroup.value as typeof orderProblemsBy;
-                  if (newValue !== orderProblemsBy) {
-                    sortDirection = "asc";
-                    orderProblemsBy = newValue;
-                  }
-                }
-              }}
-            >
-              <wa-radio
-                value="number"
-                appearance="button"
+          <wa-tab-panel name="scorecard">
+            <Summary
+              ticks={ticks ?? []}
+              problems={problems ?? []}
+              {score}
+              {placement}
+              {finalist}
+              disqualified={contender.disqualified}
+              {contestState}
+              {startTime}
+              {endTime}
+            />
+            <div class="sort-buttons">
+              <button
+                class="sort-btn"
+                class:active={orderProblemsBy === "number"}
                 onclick={() => {
                   if (orderProblemsBy === "number") {
                     sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                  } else {
+                    sortDirection = "asc";
+                    orderProblemsBy = "number";
                   }
                 }}
                 disabled={problems === undefined || problems.length === 0}
+                aria-label="Sort problems by number"
               >
                 <wa-icon name={numberSortIcon} label={numberSortLabel}
                 ></wa-icon>
-                Sort by number
-              </wa-radio>
-
-              <wa-radio
-                value="points"
-                appearance="button"
+                Num
+              </button>
+              <button
+                class="sort-btn"
+                class:active={orderProblemsBy === "points"}
                 onclick={() => {
                   if (orderProblemsBy === "points") {
                     sortDirection = sortDirection === "asc" ? "desc" : "asc";
+                  } else {
+                    sortDirection = "asc";
+                    orderProblemsBy = "points";
                   }
                 }}
                 disabled={problems === undefined || problems.length === 0}
+                aria-label="Sort problems by points"
               >
                 <wa-icon name={pointsSortIcon} label={pointsSortLabel}
                 ></wa-icon>
-                Sort by points
-              </wa-radio>
-            </wa-radio-group>
+                Pts
+              </button>
+            </div>
             {#if sortedProblems.length === 0}
               <EmptyState
                 title="No problems"
                 description="The organizer has not added any problems to this contest yet."
               />
             {:else}
-              {#each sortedProblems as problem (problem.id)}
-                <ProblemView
-                  {problem}
-                  tick={ticks.find(({ problemId }) => problemId === problem.id)}
-                  disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
-                  {highestProblemNumber}
-                  disqualified={contender.disqualified}
-                />
-              {/each}
+              <div class="problems-list">
+                {#each sortedProblems as problem (problem.id)}
+                  <ProblemView
+                    {problem}
+                    tick={ticks.find(
+                      ({ problemId }) => problemId === problem.id,
+                    )}
+                    disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
+                    disqualified={contender.disqualified}
+                  />
+                {/each}
+              </div>
             {/if}
           </wa-tab-panel>
           <wa-tab-panel name="results">
-            {#if contestState !== "NOT_STARTED"}
-              <Summary
-                {ticks}
-                problems={sortedProblems}
-                {score}
-                {placement}
-                {finalist}
-              />
-            {/if}
             {#if resultsConnected}
               <ScoreboardProvider
                 contestId={$session.contestId}
@@ -410,7 +394,7 @@
                     {scoreboard}
                     {loading}
                     highlightedContenderId={contender.id}
-                    autoScroll={false}
+                    autoScroll
                   />
                 {/snippet}
               </ScoreboardProvider>
@@ -436,7 +420,7 @@
     slot="footer"
     variant="success"
     appearance="accent"
-    size="small"
+    size="s"
     onclick={() => {
       if (raffleWinnerDialog) {
         raffleWinnerDialog.open = false;
@@ -450,11 +434,13 @@
 
 <style>
   wa-tab-panel::part(base) {
-    padding-top: var(--wa-space-s);
+    padding-top: var(--wa-space-m);
     padding-bottom: 0;
   }
 
   main {
+    --header-height: 7rem;
+
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -467,7 +453,8 @@
     right: 0;
     z-index: 10;
     background-color: var(--wa-color-surface-default);
-    padding: var(--wa-space-m);
+    padding: 0 var(--wa-space-m);
+    height: var(--header-height);
   }
 
   wa-tab-group {
@@ -475,25 +462,51 @@
     padding-bottom: var(--wa-space-m);
   }
 
-  wa-tab-panel[name="problems"]::part(base) {
+  wa-tab-group::part(nav) {
+    position: sticky;
+    top: var(--header-height);
+    z-index: 10;
+    background-color: var(--wa-color-surface-default);
+  }
+
+  wa-tab-panel[name="scorecard"]::part(base) {
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-xs);
   }
 
-  wa-radio-group {
-    margin-block-end: var(--wa-space-xs);
-  }
-
-  wa-radio {
-    flex-grow: 1;
-  }
-
-  wa-radio::part(label) {
-    margin: 0 auto;
+  .sort-buttons {
     display: flex;
+    margin-inline-start: auto;
+  }
+
+  .sort-btn {
+    display: inline-flex;
     align-items: center;
-    gap: var(--wa-space-2xs);
+    gap: var(--wa-space-3xs);
+    font-size: var(--wa-font-size-2xs);
+    font-weight: var(--wa-font-weight-semibold);
+    padding: var(--wa-space-2xs) var(--wa-space-xs);
+    border: none;
+    border-radius: var(--wa-border-radius-m);
+    background: transparent;
+    color: var(--wa-color-text-quiet);
+    cursor: pointer;
+  }
+
+  .sort-btn.active {
+    color: var(--wa-color-text-link);
+  }
+
+  .sort-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .problems-list {
+    display: grid;
+    grid-template-columns: max-content max-content 1fr 1fr 2.5rem;
+    gap: var(--wa-space-xs);
   }
 
   .raffle-winner-dialog {

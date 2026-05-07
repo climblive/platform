@@ -10,6 +10,8 @@ import (
 	"github.com/go-errors/errors"
 )
 
+const maxRafflesPerContest = 10
+
 type raffleUseCaseRepository interface {
 	domain.Transactor
 
@@ -20,6 +22,8 @@ type raffleUseCaseRepository interface {
 	GetRafflesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Raffle, error)
 	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error)
 	GetRaffleWinners(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) ([]domain.RaffleWinner, error)
+	DeleteRaffleWinner(ctx context.Context, tx domain.Transaction, raffleWinnerID domain.RaffleWinnerID) error
+	DeleteRaffle(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) error
 }
 
 type RaffleUseCase struct {
@@ -65,8 +69,18 @@ func (uc *RaffleUseCase) CreateRaffle(ctx context.Context, contestID domain.Cont
 		return domain.Raffle{}, errors.Wrap(err, 0)
 	}
 
-	if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+	_, err = uc.Authorizer.HasOwnership(ctx, contest.Ownership)
+	if err != nil {
 		return domain.Raffle{}, errors.Wrap(err, 0)
+	}
+
+	raffles, err := uc.Repo.GetRafflesByContest(ctx, nil, contestID)
+	if err != nil {
+		return domain.Raffle{}, errors.Wrap(err, 0)
+	}
+
+	if len(raffles) >= maxRafflesPerContest {
+		return domain.Raffle{}, errors.New(domain.ErrLimitExceeded)
 	}
 
 	raffle := domain.Raffle{
@@ -119,6 +133,14 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 			continue
 		}
 
+		if !contender.ScrubbedAt.IsZero() {
+			continue
+		}
+
+		if contender.Disqualified {
+			continue
+		}
+
 		if _, alreadyDrawn := winnersSet[contender.ID]; !alreadyDrawn {
 			candidates = append(candidates, contender)
 		}
@@ -134,12 +156,13 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 	}
 
 	winner := domain.RaffleWinner{
-		ID:            0,
-		Ownership:     raffle.Ownership,
-		RaffleID:      raffle.ID,
-		ContenderID:   candidates[winnerIndex.Int64()].ID,
-		ContenderName: candidates[winnerIndex.Int64()].Name,
-		Timestamp:     time.Now(),
+		ID:                  0,
+		Ownership:           raffle.Ownership,
+		RaffleID:            raffle.ID,
+		ContenderID:         candidates[winnerIndex.Int64()].ID,
+		ContenderName:       candidates[winnerIndex.Int64()].Name,
+		ContenderScrubbedAt: candidates[winnerIndex.Int64()].ScrubbedAt,
+		Timestamp:           time.Now(),
 	}
 
 	createdWinner, err := uc.Repo.StoreRaffleWinner(ctx, nil, winner)
@@ -148,10 +171,9 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 	}
 
 	uc.EventBroker.Dispatch(raffle.ContestID, domain.RaffleWinnerDrawnEvent{
-		RaffleID:      createdWinner.RaffleID,
-		ContenderID:   createdWinner.ContenderID,
-		ContenderName: createdWinner.ContenderName,
-		Timestamp:     createdWinner.Timestamp,
+		RaffleID:    createdWinner.RaffleID,
+		ContenderID: createdWinner.ContenderID,
+		Timestamp:   createdWinner.Timestamp,
 	})
 
 	return createdWinner, nil
@@ -173,4 +195,45 @@ func (uc *RaffleUseCase) GetRaffleWinners(ctx context.Context, raffleID domain.R
 	}
 
 	return winners, nil
+}
+
+func (uc *RaffleUseCase) DeleteRaffle(ctx context.Context, raffleID domain.RaffleID) error {
+	raffle, err := uc.Repo.GetRaffle(ctx, nil, raffleID)
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	if _, err := uc.Authorizer.HasOwnership(ctx, raffle.Ownership); err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	winners, err := uc.Repo.GetRaffleWinners(ctx, nil, raffleID)
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	tx, err := uc.Repo.Begin()
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+	defer tx.Rollback()
+
+	for _, winner := range winners {
+		err = uc.Repo.DeleteRaffleWinner(ctx, tx, winner.ID)
+		if err != nil {
+			return errors.Wrap(err, 0)
+		}
+	}
+
+	err = uc.Repo.DeleteRaffle(ctx, tx, raffleID)
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	return nil
 }

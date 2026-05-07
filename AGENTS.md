@@ -19,7 +19,7 @@ The platform manages bouldering climbing competitions, calculates scores in real
 
 ### Backend (`/backend`)
 
-**Language**: Go 1.25  
+**Language**: Go 1.26  
 **Database**: MySQL  
 **Key Features**: Event-driven architecture, real-time score calculation, JWT authentication
 
@@ -101,7 +101,7 @@ web/
 
 ### Prerequisites
 
-- Go 1.25+
+- Go 1.26+
 - Node.js 20+
 - pnpm
 - MySQL database
@@ -187,6 +187,7 @@ make test
 - **Svelte 5**: Use runes API (`$state`, `$derived`, `$effect`)
 - **TypeScript**: Strict mode enabled
 - **API Calls**: Use TanStack Query through queries in the shared library
+- **Conditionals**: Always use braces for one-line conditionals; do not use shorthand `if (...) return ...` style
 - **Styling**: Component-scoped styles in plain CSS (prefer nesting)
 - **Tokens**: Use Web Awesome design tokens for all styling (`@awesome.me/webawesome/dist/styles/themes/default.css`)
 - **Theme**: Shared theme in `packages/lib/src/theme.css`
@@ -204,6 +205,7 @@ make test
 - Table-driven tests preferred for multiple test cases
 - Use `stretchr/testify` for assertions
 - Mock interfaces using `stretchr/testify/mock`
+- Use `testing/synctest` (via `synctest.Test`) whenever a test involves `time.Now()`
 
 ### Frontend
 

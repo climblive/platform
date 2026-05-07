@@ -1,34 +1,50 @@
 <script lang="ts">
-  import { isBefore } from "date-fns";
-  import { onDestroy, type Snippet } from "svelte";
+  import { add, isBefore } from "date-fns";
+  import { onMount, type Snippet } from "svelte";
+  import { getCompClassQuery, getContestQuery } from "../queries";
   import type { ContestState } from "../types";
+  import { SyncedTime } from "../utils";
 
   interface Props {
-    startTime: Date;
-    endTime: Date;
-    gracePeriodEndTime?: Date;
-    children?: Snippet<[{ contestState: ContestState }]>;
+    contestId: number;
+    compClassId?: number;
+    children?: Snippet<[{ contestState: ContestState; progress: number }]>;
   }
 
-  let {
-    startTime,
-    endTime,
-    gracePeriodEndTime = undefined,
-    children,
-  }: Props = $props();
+  const { contestId, compClassId, children }: Props = $props();
 
-  let contestState: ContestState = $state("NOT_STARTED");
-  let intervalTimerId: number;
+  const contestQuery = $derived(getContestQuery(contestId));
+  const compClassQuery = $derived(
+    compClassId ? getCompClassQuery(compClassId) : undefined,
+  );
 
-  $effect(() => {
-    if (startTime && endTime) {
-      clearInterval(intervalTimerId);
-      tick();
-    }
+  const contest = $derived(contestQuery.data);
+  const compClass = $derived(compClassQuery?.data);
+
+  const startTime = $derived(
+    compClass?.timeBegin ?? contest?.timeBegin ?? new Date(8640000000000000),
+  );
+  const endTime = $derived(
+    compClass?.timeEnd ?? contest?.timeEnd ?? new Date(-8640000000000000),
+  );
+  const gracePeriodEndTime = $derived(
+    contest
+      ? add(endTime, {
+          minutes: (contest.gracePeriod ?? 0) / (1_000_000_000 * 60),
+        })
+      : undefined,
+  );
+
+  const time = new SyncedTime(1_000);
+
+  onMount(() => {
+    time.start();
+
+    return () => time.stop();
   });
 
   const computeState = (): ContestState => {
-    const now = new Date();
+    const now = new Date(time.current);
     now.setMilliseconds(0);
 
     switch (true) {
@@ -43,20 +59,17 @@
     }
   };
 
-  const tick = () => {
-    contestState = computeState();
+  const contestState: ContestState = $derived(computeState());
 
-    const firefoxEarlyWakeUpCompensation = 1;
+  const progress = $derived.by(() => {
+    const total = endTime.getTime() - startTime.getTime();
+    if (total <= 0) {
+      return 0;
+    }
 
-    const drift = Date.now() % 1_000;
-    const next = 1_000 - drift + firefoxEarlyWakeUpCompensation;
-
-    intervalTimerId = setTimeout(tick, next);
-  };
-
-  onDestroy(() => {
-    clearTimeout(intervalTimerId);
+    const elapsed = time.current.getTime() - startTime.getTime();
+    return Math.min(100, Math.max(0, (elapsed / total) * 100));
   });
 </script>
 
-{@render children?.({ contestState })}
+{@render children?.({ contestState, progress })}

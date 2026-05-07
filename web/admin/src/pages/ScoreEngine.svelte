@@ -16,8 +16,8 @@
 
   const contestQuery = $derived(getContestQuery(contestId));
   const scoreEnginesQuery = $derived(getScoreEnginesQuery(contestId));
-  const startScoreEngine = $derived(startScoreEngineMutation(contestId));
-  const stopScoreEngine = $derived(stopScoreEngineMutation());
+  const startScoreEngine = startScoreEngineMutation(contestId);
+  const stopScoreEngine = stopScoreEngineMutation();
 
   let contest = $derived(contestQuery.data);
   let scoreEngines = $derived(scoreEnginesQuery.data);
@@ -29,7 +29,7 @@
   );
 </script>
 
-<wa-callout variant="warning" size="small">
+<wa-callout variant="warning" size="s">
   <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
   <strong>Score engines are managed automatically</strong><br />
   Score engines are started automatically, and manual intervention is typically only
@@ -49,8 +49,9 @@
 {:else}
   {#each scoreEngines as engineInstanceId (engineInstanceId)}
     <wa-button
+      size="s"
       appearance="outlined"
-      variant="warning"
+      variant="danger"
       onclick={() => stopScoreEngine.mutate(engineInstanceId)}
       loading={stopScoreEngine.isPending}
       >Stop engine
@@ -59,8 +60,9 @@
   {/each}
   {#if scoreEngines.length === 0}
     <wa-button
+      size="s"
       appearance="outlined"
-      variant="warning"
+      variant="neutral"
       onclick={() =>
         startScoreEngine.mutate({
           terminatedBy: add(new Date(), { hours: 6 }),

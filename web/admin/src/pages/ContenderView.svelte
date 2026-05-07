@@ -7,10 +7,13 @@
   import "@awesome.me/webawesome/dist/components/copy-button/copy-button.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import "@awesome.me/webawesome/dist/components/option/option.js";
+  import "@awesome.me/webawesome/dist/components/select/select.js";
+  import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import { LabeledText } from "@climblive/lib/components";
-  import { checked } from "@climblive/lib/forms";
+  import { ContenderName, LabeledText } from "@climblive/lib/components";
+  import { checked, value } from "@climblive/lib/forms";
   import {
     getCompClassesQuery,
     getContenderQuery,
@@ -29,7 +32,6 @@
   const contenderQuery = $derived(getContenderQuery(contenderId));
   const patchContender = $derived(patchContenderMutation(contenderId));
   const contender = $derived(contenderQuery.data);
-  const contenderName = $derived(contender?.name ?? "Unregistered");
   const contestId = $derived(contender?.contestId ?? 0);
 
   const compClassesQuery = $derived(
@@ -44,6 +46,7 @@
   const contest = $derived(contestQuery?.data);
 
   let withdrawFromFinalsToggle: WaSwitch | undefined = $state();
+  let compClassSelect: WaSelect | undefined = $state();
 
   const handleToggleWithdrawFromFinals = () => {
     if (!withdrawFromFinalsToggle) {
@@ -66,6 +69,22 @@
       disqualified: false,
     });
   };
+
+  const handleCompClassChange = () => {
+    if (!compClassSelect || !compClassSelect.value) {
+      return;
+    }
+
+    if (typeof compClassSelect.value !== "string") {
+      return;
+    }
+
+    const newCompClassId = parseInt(compClassSelect.value, 10);
+
+    patchContender.mutate({
+      compClassId: newCompClassId,
+    });
+  };
 </script>
 
 {#if contender && compClasses && contest}
@@ -79,18 +98,30 @@
       >{contest.name}</wa-breadcrumb-item
     >
     <wa-breadcrumb-item
-      onclick={() => navigate(`/admin/contests/${contestId}#results`)}
+      onclick={() => navigate(`/admin/contests/${contestId}/results`)}
       >Results</wa-breadcrumb-item
     >
   </wa-breadcrumb>
 
   <h1>
-    {#if contender.disqualified}
+    {#if !contender.entered}
+      Unregistered
+    {:else if contender.disqualified}
       <del>
-        {contenderName}
+        <ContenderName
+          id={contender.id}
+          name={contender.name}
+          scrubbedAt={contender.scrubbedAt}
+          withTooltip
+        />
       </del>
     {:else}
-      {contenderName}
+      <ContenderName
+        id={contender.id}
+        name={contender.name}
+        scrubbedAt={contender.scrubbedAt}
+        withTooltip
+      />
     {/if}
   </h1>
   <section>
@@ -104,19 +135,17 @@
           >{format(contender.entered, "yyyy-MM-dd HH:mm")}</LabeledText
         >
       {/if}
-      {#if contender.disqualified}
-        <LabeledText label="Disqualified">Yes</LabeledText>
-      {/if}
-      {#if !contender.disqualified}
-        <LabeledText label="Placement"
-          >{contender.score?.placement ?? "-"}</LabeledText
-        >
-        <LabeledText label="Score">{contender.score?.score ?? "-"}</LabeledText>
-        <LabeledText label="Finalist">
-          <wa-icon name={contender.score?.finalist ? "medal" : "minus"}
-          ></wa-icon>
-        </LabeledText>
-      {/if}
+      <LabeledText label="Placement">
+        {#if contender.disqualified}
+          Disqualified
+        {:else}
+          {contender.score?.placement ?? "-"}
+        {/if}
+      </LabeledText>
+      <LabeledText label="Score">{contender.score?.score ?? "-"}</LabeledText>
+      <LabeledText label="Finalist">
+        <wa-icon name={contender.score?.finalist ? "medal" : "minus"}></wa-icon>
+      </LabeledText>
 
       <LabeledText label="Registration code">
         {contender.registrationCode}
@@ -137,7 +166,7 @@
         target="_blank"
         appearance="plain"
         variant="neutral"
-        size="large"
+        size="l"
       >
         <wa-icon slot="start" name="arrow-up-right-from-square"></wa-icon>
         Open scorecard
@@ -156,36 +185,60 @@
     ></TickList>
   {/if}
 
-  <h2>Settings</h2>
-  <wa-divider style="--color: var(--wa-color-brand-fill-normal);"></wa-divider>
-  <div class="controls">
-    <wa-switch
-      bind:this={withdrawFromFinalsToggle}
-      hint="In case the contender does not wish to take part in the finals."
-      {@attach checked(contender.withdrawnFromFinals)}
-      onchange={handleToggleWithdrawFromFinals}
-      disabled={contender.disqualified || patchContender.isPending}
-      >Withdraw from finals</wa-switch
-    >
+  {#if contender.entered}
+    <h2>Settings</h2>
+    <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
+    ></wa-divider>
+    <div class="controls">
+      <wa-select
+        size="s"
+        bind:this={compClassSelect}
+        label="Competition class"
+        hint="Change the class for this contender."
+        {@attach value(contender.compClassId)}
+        onchange={handleCompClassChange}
+        disabled={contender.disqualified || patchContender.isPending}
+      >
+        {#each compClasses as compClass (compClass.id)}
+          <wa-option value={compClass.id} label={compClass.name}>
+            {compClass.name}
+            {#if compClass.description}
+              <small>{compClass.description}</small>
+            {/if}
+          </wa-option>
+        {/each}
+      </wa-select>
 
-    {#if contender.disqualified}
-      <wa-button
-        onclick={handleRequalify}
-        loading={patchContender.isPending}
-        appearance="outlined"
-        >Requalify contender<wa-icon slot="start" name="right-to-bracket"
-        ></wa-icon></wa-button
+      <wa-switch
+        size="s"
+        bind:this={withdrawFromFinalsToggle}
+        hint="In case the contender does not wish to take part in the finals."
+        {@attach checked(contender.withdrawnFromFinals)}
+        onchange={handleToggleWithdrawFromFinals}
+        disabled={contender.disqualified || patchContender.isPending}
+        >Withdraw from finals</wa-switch
       >
-    {:else}
-      <wa-button
-        variant="danger"
-        onclick={handleDisqualify}
-        loading={patchContender.isPending}
-        >Disqualify contender<wa-icon slot="start" name="skull-crossbones"
-        ></wa-icon></wa-button
-      >
-    {/if}
-  </div>
+
+      {#if contender.disqualified}
+        <wa-button
+          onclick={handleRequalify}
+          loading={patchContender.isPending}
+          appearance="outlined"
+          >Requalify contender<wa-icon slot="start" name="right-to-bracket"
+          ></wa-icon></wa-button
+        >
+      {:else}
+        <wa-button
+          size="s"
+          variant="danger"
+          onclick={handleDisqualify}
+          loading={patchContender.isPending}
+          >Disqualify contender<wa-icon slot="start" name="user-slash"
+          ></wa-icon></wa-button
+        >
+      {/if}
+    </div>
+  {/if}
 {/if}
 
 <style>

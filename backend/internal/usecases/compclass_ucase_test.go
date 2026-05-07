@@ -108,6 +108,10 @@ func TestCreateCompClass(t *testing.T) {
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
+			On("GetCompClassesByContest", mock.Anything, nil, fakedContestID).
+			Return([]domain.CompClass{}, nil)
+
+		mockedRepo.
 			On("StoreCompClass", mock.Anything, nil,
 				domain.CompClass{
 					Ownership:   fakedOwnership,
@@ -160,6 +164,10 @@ func TestCreateCompClass(t *testing.T) {
 			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.OrganizerRole, nil)
 
+		mockedRepo.
+			On("GetCompClassesByContest", mock.Anything, nil, fakedContestID).
+			Return([]domain.CompClass{}, nil)
+
 		ucase := usecases.CompClassUseCase{
 			Repo:       mockedRepo,
 			Authorizer: mockedAuthorizer,
@@ -169,6 +177,31 @@ func TestCreateCompClass(t *testing.T) {
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
 		assert.True(t, validators.CompClassValidator{}.IsValidationError(err))
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
+	t.Run("LimitExceeded", func(t *testing.T) {
+		mockedRepo, mockedAuthorizer := makeMocks()
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.OrganizerRole, nil)
+
+		compClasses := make([]domain.CompClass, 20)
+		mockedRepo.
+			On("GetCompClassesByContest", mock.Anything, nil, fakedContestID).
+			Return(compClasses, nil)
+
+		ucase := usecases.CompClassUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		_, err := ucase.CreateCompClass(context.Background(), fakedContestID, domain.CompClassTemplate{})
+
+		require.ErrorIs(t, err, domain.ErrLimitExceeded)
 
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)

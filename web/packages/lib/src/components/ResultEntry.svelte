@@ -2,6 +2,7 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import type { ScoreboardEntry } from "../models";
   import { ordinalSuperscript } from "../utils";
+  import ContenderName from "./ContenderName.svelte";
   import Score from "./Score.svelte";
 
   interface Props {
@@ -9,7 +10,7 @@
     highlighted?: boolean;
   }
 
-  let { scoreboardEntry, highlighted = false }: Props = $props();
+  const { scoreboardEntry, highlighted = false }: Props = $props();
   let score = $derived(scoreboardEntry.score);
 </script>
 
@@ -24,7 +25,13 @@
       -
     {/if}
   </div>
-  <div class="name">{scoreboardEntry.name}</div>
+  <div class="name">
+    <ContenderName
+      id={scoreboardEntry.contenderId}
+      name={scoreboardEntry.name}
+      scrubbedAt={scoreboardEntry.scrubbedAt}
+    />
+  </div>
   <div class="score">
     {#if score === undefined || score.score === 0}
       -
@@ -37,7 +44,7 @@
 
 <style>
   section {
-    height: 2.25rem;
+    height: 2.75rem;
     background-color: var(--wa-color-surface-raised);
     border: var(--wa-border-width-s) var(--wa-border-style)
       var(--wa-color-neutral-border-quiet);
@@ -55,15 +62,14 @@
   }
 
   section[data-highlighted="true"] {
-    background-color: var(--wa-color-brand-fill-quiet);
-    border-color: var(--wa-color-brand-border-normal);
+    border-color: var(--wa-color-brand-border-loud);
   }
 
   section > div {
     width: 100%;
     white-space: nowrap;
     overflow: hidden;
-    line-height: 2.25rem;
+    line-height: 2.75rem;
   }
 
   .number {

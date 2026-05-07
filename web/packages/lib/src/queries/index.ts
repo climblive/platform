@@ -1,6 +1,7 @@
 export * from "./compClasses";
 export * from "./contenders";
 export * from "./contests";
+export * from "./health";
 export * from "./organizerInvites";
 export * from "./organizers";
 export * from "./problems";

@@ -66,7 +66,7 @@
     <div class="organizer-select">
       <wa-select
         bind:this={select}
-        size="small"
+        size="s"
         appearance="outlined filled"
         {@attach value($selectedOrganizerId)}
         onchange={handleChange}
@@ -80,7 +80,7 @@
       <CreateOrganizer>
         {#snippet children({ createOrganizer })}
           <wa-button
-            size="small"
+            size="s"
             variant="neutral"
             appearance="outlined"
             onclick={createOrganizer}
@@ -95,10 +95,8 @@
   <div class="controls">
     <div>
       {#if self?.admin}
-        <wa-switch
-          size="small"
-          bind:this={showAllToggle}
-          onchange={toggleShowAll}>Show all</wa-switch
+        <wa-switch size="s" bind:this={showAllToggle} onchange={toggleShowAll}
+          >Show all</wa-switch
         >
       {/if}
     </div>

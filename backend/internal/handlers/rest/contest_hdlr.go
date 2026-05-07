@@ -19,6 +19,8 @@ type contestUseCase interface {
 	GetContestsByOrganizer(ctx context.Context, organizerID domain.OrganizerID) ([]domain.Contest, error)
 	GetScoreboard(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreboardEntry, error)
 	PatchContest(ctx context.Context, contestID domain.ContestID, patch domain.ContestPatch) (domain.Contest, error)
+	ArchiveContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error)
+	RestoreContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error)
 	CreateContest(ctx context.Context, organizerID domain.OrganizerID, template domain.ContestTemplate) (domain.Contest, error)
 	DuplicateContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error)
 	TransferContest(ctx context.Context, contestID domain.ContestID, newOrganizerID domain.OrganizerID) (domain.Contest, error)
@@ -51,6 +53,8 @@ func InstallContestHandler(
 	mux.HandleFunc("POST /organizers/{organizerID}/contests", handler.CreateContest)
 	mux.HandleFunc("POST /contests/{contestID}/duplicate", handler.DuplicateContest)
 	mux.HandleFunc("POST /contests/{contestID}/transfer", handler.TransferContest)
+	mux.HandleFunc("POST /contests/{contestID}/archive", handler.ArchiveContest)
+	mux.HandleFunc("POST /contests/{contestID}/restore", handler.RestoreContest)
 	mux.HandleFunc("GET /contests/{contestID}/results", handler.DownloadResults)
 	mux.HandleFunc("PATCH /contests/{contestID}", handler.PatchContest)
 }
@@ -175,6 +179,38 @@ func (hdlr *contestHandler) DuplicateContest(w http.ResponseWriter, r *http.Requ
 	writeResponse(w, http.StatusCreated, duplicatedContest)
 }
 
+func (hdlr *contestHandler) ArchiveContest(w http.ResponseWriter, r *http.Request) {
+	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	contest, err := hdlr.contestUseCase.ArchiveContest(r.Context(), contestID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusOK, contest)
+}
+
+func (hdlr *contestHandler) RestoreContest(w http.ResponseWriter, r *http.Request) {
+	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	contest, err := hdlr.contestUseCase.RestoreContest(r.Context(), contestID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusOK, contest)
+}
+
 func (hdlr *contestHandler) TransferContest(w http.ResponseWriter, r *http.Request) {
 	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
 	if err != nil {
@@ -280,6 +316,7 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 					ColorTheme:   nil,
 					ColorTint:    0,
 					VertAlign:    "",
+					Charset:      nil,
 				},
 				Border:        nil,
 				Fill:          excelize.Fill{},
@@ -344,10 +381,16 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 				}
 			}
 
+			var score, placement int
+			if entry.Score != nil {
+				score = entry.Score.Score
+				placement = entry.Score.Placement
+			}
+
 			err = book.SetSheetRow(sheetName, fmt.Sprintf("A%d", counter), &[]any{
 				entry.Name,
-				entry.Score.Score,
-				entry.Score.Placement})
+				score,
+				placement})
 			if err != nil {
 				return errors.Wrap(err, 0)
 			}

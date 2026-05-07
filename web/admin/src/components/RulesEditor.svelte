@@ -2,8 +2,10 @@
   export const doSubmit = (
     mutation: ReturnType<typeof patchContestMutation>,
     patch: ContestPatch,
+    onSuccess?: () => void,
   ) => {
     mutation.mutate(patch, {
+      onSuccess,
       onError: () => toastError("Failed to update rules."),
     });
   };
@@ -34,7 +36,7 @@
     description="Contenders are ranked based on the total points scored across all problems."
   >
     {#snippet header()}
-      <wa-radio size="small" checked></wa-radio>
+      <wa-radio size="s" checked></wa-radio>
     {/snippet}
   </RuleOptionCard>
 
@@ -45,7 +47,7 @@
     tag="Upcoming"
   >
     {#snippet header()}
-      <wa-radio size="small" disabled></wa-radio>
+      <wa-radio size="s" disabled></wa-radio>
     {/snippet}
   </RuleOptionCard>
 </section>

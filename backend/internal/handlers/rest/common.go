@@ -65,6 +65,8 @@ func handleError(w http.ResponseWriter, err error) {
 		fallthrough
 	case errors.Is(err, domain.ErrNotAllowed):
 		w.WriteHeader(http.StatusForbidden)
+	case errors.Is(err, domain.ErrLimitExceeded):
+		w.WriteHeader(http.StatusConflict)
 	case errors.Is(err, domain.ErrInvalidData):
 		w.WriteHeader(http.StatusBadRequest)
 	default:

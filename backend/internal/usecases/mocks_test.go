@@ -2,6 +2,7 @@ package usecases_test
 
 import (
 	"context"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
@@ -10,8 +11,6 @@ import (
 )
 
 var errMock = errors.New("mock error")
-
-type mirrorInstruction struct{}
 
 type transactionMock struct {
 	mock.Mock
@@ -66,17 +65,17 @@ func (m *repositoryMock) GetContendersByContest(ctx context.Context, tx domain.T
 
 func (m *repositoryMock) StoreContender(ctx context.Context, tx domain.Transaction, contender domain.Contender) (domain.Contender, error) {
 	args := m.Called(ctx, tx, contender)
-
-	if _, ok := args.Get(0).(mirrorInstruction); ok {
-		return contender, nil
-	} else {
-		return args.Get(0).(domain.Contender), args.Error(1)
-	}
+	return args.Get(0).(domain.Contender), args.Error(1)
 }
 
 func (m *repositoryMock) DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) error {
 	args := m.Called(ctx, tx, contenderID)
 	return args.Error(0)
+}
+
+func (m *repositoryMock) GetScrubEligibleContenders(ctx context.Context, deadline time.Time) ([]domain.Contender, error) {
+	args := m.Called(ctx, deadline)
+	return args.Get(0).([]domain.Contender), args.Error(1)
 }
 
 func (m *repositoryMock) GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error) {
@@ -91,12 +90,7 @@ func (m *repositoryMock) GetAllContests(ctx context.Context, tx domain.Transacti
 
 func (m *repositoryMock) StoreContest(ctx context.Context, tx domain.Transaction, contest domain.Contest) (domain.Contest, error) {
 	args := m.Called(ctx, tx, contest)
-
-	if _, ok := args.Get(0).(mirrorInstruction); ok {
-		return contest, nil
-	} else {
-		return args.Get(0).(domain.Contest), args.Error(1)
-	}
+	return args.Get(0).(domain.Contest), args.Error(1)
 }
 
 func (m *repositoryMock) DeleteContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) error {
@@ -161,12 +155,7 @@ func (m *repositoryMock) GetTick(ctx context.Context, tx domain.Transaction, tic
 
 func (m *repositoryMock) StoreTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error) {
 	args := m.Called(ctx, tx, tick)
-
-	if _, ok := args.Get(0).(mirrorInstruction); ok {
-		return tick, nil
-	} else {
-		return args.Get(0).(domain.Tick), args.Error(1)
-	}
+	return args.Get(0).(domain.Tick), args.Error(1)
 }
 
 func (m *repositoryMock) GetTicksByProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) ([]domain.Tick, error) {
@@ -231,12 +220,7 @@ func (m *repositoryMock) GetRaffleWinners(ctx context.Context, tx domain.Transac
 
 func (m *repositoryMock) StoreRaffleWinner(ctx context.Context, tx domain.Transaction, winner domain.RaffleWinner) (domain.RaffleWinner, error) {
 	args := m.Called(ctx, tx, winner)
-
-	if _, ok := args.Get(0).(mirrorInstruction); ok {
-		return winner, nil
-	} else {
-		return args.Get(0).(domain.RaffleWinner), args.Error(1)
-	}
+	return args.Get(0).(domain.RaffleWinner), args.Error(1)
 }
 
 func (m *repositoryMock) DeleteRaffleWinner(ctx context.Context, tx domain.Transaction, raffleWinnerID domain.RaffleWinnerID) error {

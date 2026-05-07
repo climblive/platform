@@ -5,11 +5,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"slices"
 	"strings"
 	"sync"
@@ -21,15 +23,12 @@ import (
 	"github.com/go-faker/faker/v4"
 )
 
-//go:embed codes.txt
-var codes string
-
-const (
-	APIURL     = "http://localhost:8090"
-	ITERATIONS = 10
-	MAX_SLEEP  = 10_000 * time.Millisecond
-	CONTENDERS = 200
-)
+type Config struct {
+	APIUrl            string   `json:"apiUrl"`
+	RegistrationCodes []string `json:"registrationCodes"`
+	Iterations        int      `json:"iterations"`
+	MaxSleep          int      `json:"maxSleep"`
+}
 
 type SimulatorEvent int
 
@@ -39,7 +38,26 @@ const (
 )
 
 func main() {
-	registrationCodes := strings.Split(codes, "\n")
+	configPath := flag.String("config", "config.json", "path to simulator config JSON file")
+	flag.Parse()
+
+	cfg := Config{}
+
+	f, err := os.Open(*configPath)
+	if err != nil {
+		log.Fatalf("failed to open config file: %v", err)
+	}
+	defer func() {
+		_ = f.Close()
+	}()
+
+	if err := json.NewDecoder(f).Decode(&cfg); err != nil {
+		log.Fatalf("failed to parse config file: %v", err)
+	}
+
+	apiURL := cfg.APIUrl
+	maxSleep := time.Duration(cfg.MaxSleep) * time.Millisecond
+	registrationCodes := cfg.RegistrationCodes
 
 	var wg sync.WaitGroup
 	var metricsMutex sync.Mutex
@@ -82,23 +100,109 @@ func main() {
 	for _, code := range registrationCodes {
 		runner := ContenderRunner{
 			RegistrationCode: code,
+			apiURL:           apiURL,
+			maxSleep:         maxSleep,
 			contender:        domain.Contender{},
 			ticks:            nil,
 			events:           nil,
 		}
 
 		wg.Add(1)
-		go runner.Run(ITERATIONS, &wg, events)
+		go runner.Run(cfg.Iterations, &wg, events)
 	}
 
 	wg.Wait()
 }
 
+type tickOutcome int
+
+const (
+	outcomeFlash tickOutcome = iota
+	outcomeTop
+	outcomeZone2
+	outcomeZone1
+)
+
+func pickWeightedProblem(problems []domain.Problem) domain.Problem {
+	weights := make([]float64, len(problems))
+	var total float64
+
+	for i, problem := range problems {
+		pts := problem.PointsTop
+		if pts <= 0 {
+			pts = 1
+		}
+
+		w := 1.0 / float64(pts)
+		weights[i] = w
+		total += w
+	}
+
+	r := rand.Float64() * total
+	for i, weight := range weights {
+		r -= weight
+		if r <= 0 {
+			return problems[i]
+		}
+	}
+
+	return problems[len(problems)-1]
+}
+
+func buildTick(problem domain.Problem) domain.Tick {
+	outcomes := []tickOutcome{outcomeFlash, outcomeTop}
+
+	if problem.Zone1Enabled && problem.Zone2Enabled {
+		outcomes = append(outcomes, outcomeZone2)
+	}
+	if problem.Zone1Enabled {
+		outcomes = append(outcomes, outcomeZone1)
+	}
+
+	outcome := outcomes[rand.Int()%len(outcomes)]
+
+	var tick domain.Tick
+	tick.ProblemID = problem.ID
+
+	tick.AttemptsTop = 999
+	tick.AttemptsZone1 = 999
+	tick.AttemptsZone2 = 999
+
+	switch outcome {
+	case outcomeFlash:
+		tick.Top = true
+		tick.AttemptsTop = 1
+		tick.Zone1 = true
+		tick.AttemptsZone1 = 1
+		tick.Zone2 = true
+		tick.AttemptsZone2 = 1
+	case outcomeTop:
+		tick.Top = true
+		tick.Zone1 = true
+		tick.Zone2 = true
+	case outcomeZone2:
+		tick.Zone1 = true
+		tick.Zone2 = true
+	case outcomeZone1:
+		tick.Zone1 = true
+	}
+
+	return tick
+}
+
 type ContenderRunner struct {
 	RegistrationCode string
+	apiURL           string
+	maxSleep         time.Duration
 	contender        domain.Contender
 	ticks            map[domain.ProblemID]domain.Tick
 	events           chan<- SimulatorEvent
+}
+
+func mustStatus(resp *http.Response, expected int) {
+	if resp.StatusCode != expected {
+		panic(fmt.Sprintf("unexpected status code: %d", resp.StatusCode))
+	}
 }
 
 func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- SimulatorEvent) {
@@ -107,7 +211,10 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 	r.ticks = make(map[domain.ProblemID]domain.Tick)
 	r.events = events
 
+	r.sleep()
 	r.contender = r.GetContender()
+
+	r.sleep()
 	compClasses := r.GetCompClasses(r.contender.ContestID)
 
 	patch := domain.ContenderPatch{}
@@ -118,14 +225,20 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 	case "Males":
 		patch.Name = domain.NewPatch(fmt.Sprintf("%s %s", faker.FirstNameMale(), faker.LastName()))
 	case "Females":
+		fallthrough
+	default:
 		patch.Name = domain.NewPatch(fmt.Sprintf("%s %s", faker.FirstNameFemale(), faker.LastName()))
 	}
 
 	patch.CompClassID = domain.NewPatch(selectedCompClass.ID)
 
+	r.sleep()
 	r.PatchContender(r.contender.ID, patch)
 
+	r.sleep()
 	problems := r.GetProblems(r.contender.ContestID)
+
+	r.sleep()
 	ticks := r.GetTicks(r.contender.ID)
 
 	for tick := range slices.Values(ticks) {
@@ -135,37 +248,29 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 	go r.ReadEvents(r.contender.ID)
 
 	for range requests {
-		problem := problems[rand.Int()%len(problems)]
+		r.sleep()
+
+		problem := pickWeightedProblem(problems)
 
 		tick, ok := r.ticks[problem.ID]
 		if ok {
 			r.DeleteTick(tick.ID)
 			delete(r.ticks, problem.ID)
 		} else {
-			tick := domain.Tick{
-				ID:            0,
-				Ownership:     domain.OwnershipData{},
-				Timestamp:     time.Time{},
-				ContestID:     0,
-				ProblemID:     problem.ID,
-				AttemptsTop:   1 + rand.Int()%5,
-				Top:           true,
-				AttemptsZone1: 1,
-				Zone1:         true,
-				AttemptsZone2: 1,
-				Zone2:         true,
-			}
+			tick := buildTick(problem)
 
 			tick = r.AddTick(r.contender.ID, tick)
 			r.ticks[problem.ID] = tick
 		}
-
-		time.Sleep(time.Duration(rand.Int() % int(MAX_SLEEP)))
 	}
 }
 
+func (r *ContenderRunner) sleep() {
+	time.Sleep(time.Duration(rand.Int() % int(r.maxSleep)))
+}
+
 func (r *ContenderRunner) GetContender() domain.Contender {
-	resp, err := http.Get(fmt.Sprintf("%s/codes/%s/contender", APIURL, r.RegistrationCode))
+	resp, err := http.Get(fmt.Sprintf("%s/codes/%s/contender", r.apiURL, r.RegistrationCode))
 	if err != nil {
 		panic(err)
 	}
@@ -173,6 +278,8 @@ func (r *ContenderRunner) GetContender() domain.Contender {
 	r.events <- RequestSent
 
 	defer func() { _ = resp.Body.Close() }()
+
+	mustStatus(resp, http.StatusOK)
 
 	contender := domain.Contender{}
 
@@ -191,7 +298,7 @@ func (r *ContenderRunner) PatchContender(contenderID domain.ContenderID, patch d
 		panic(err)
 	}
 
-	req, err := http.NewRequest(http.MethodPatch, fmt.Sprintf("%s/contenders/%d", APIURL, contenderID), buf)
+	req, err := http.NewRequest(http.MethodPatch, fmt.Sprintf("%s/contenders/%d", r.apiURL, contenderID), buf)
 	if err != nil {
 		panic(err)
 	}
@@ -206,6 +313,8 @@ func (r *ContenderRunner) PatchContender(contenderID domain.ContenderID, patch d
 	r.events <- RequestSent
 
 	defer func() { _ = resp.Body.Close() }()
+
+	mustStatus(resp, http.StatusOK)
 
 	var contender domain.Contender
 
@@ -218,7 +327,7 @@ func (r *ContenderRunner) PatchContender(contenderID domain.ContenderID, patch d
 }
 
 func (r *ContenderRunner) GetCompClasses(contestID domain.ContestID) []domain.CompClass {
-	resp, err := http.Get(fmt.Sprintf("%s/contests/%d/comp-classes", APIURL, contestID))
+	resp, err := http.Get(fmt.Sprintf("%s/contests/%d/comp-classes", r.apiURL, contestID))
 	if err != nil {
 		panic(err)
 	}
@@ -226,6 +335,8 @@ func (r *ContenderRunner) GetCompClasses(contestID domain.ContestID) []domain.Co
 	r.events <- RequestSent
 
 	defer func() { _ = resp.Body.Close() }()
+
+	mustStatus(resp, http.StatusOK)
 
 	compClasses := []domain.CompClass{}
 
@@ -238,7 +349,7 @@ func (r *ContenderRunner) GetCompClasses(contestID domain.ContestID) []domain.Co
 }
 
 func (r *ContenderRunner) GetProblems(contestID domain.ContestID) []domain.Problem {
-	resp, err := http.Get(fmt.Sprintf("%s/contests/%d/problems", APIURL, contestID))
+	resp, err := http.Get(fmt.Sprintf("%s/contests/%d/problems", r.apiURL, contestID))
 	if err != nil {
 		panic(err)
 	}
@@ -246,6 +357,8 @@ func (r *ContenderRunner) GetProblems(contestID domain.ContestID) []domain.Probl
 	r.events <- RequestSent
 
 	defer func() { _ = resp.Body.Close() }()
+
+	mustStatus(resp, http.StatusOK)
 
 	problems := []domain.Problem{}
 
@@ -258,7 +371,7 @@ func (r *ContenderRunner) GetProblems(contestID domain.ContestID) []domain.Probl
 }
 
 func (r *ContenderRunner) GetTicks(contenderID domain.ContenderID) []domain.Tick {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/contenders/%d/ticks", APIURL, contenderID), nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/contenders/%d/ticks", r.apiURL, contenderID), nil)
 	if err != nil {
 		panic(err)
 	}
@@ -273,6 +386,8 @@ func (r *ContenderRunner) GetTicks(contenderID domain.ContenderID) []domain.Tick
 	r.events <- RequestSent
 
 	defer func() { _ = resp.Body.Close() }()
+
+	mustStatus(resp, http.StatusOK)
 
 	ticks := []domain.Tick{}
 
@@ -285,7 +400,7 @@ func (r *ContenderRunner) GetTicks(contenderID domain.ContenderID) []domain.Tick
 }
 
 func (r *ContenderRunner) DeleteTick(tickID domain.TickID) {
-	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("%s/ticks/%d", APIURL, tickID), nil)
+	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("%s/ticks/%d", r.apiURL, tickID), nil)
 	if err != nil {
 		panic(err)
 	}
@@ -300,6 +415,8 @@ func (r *ContenderRunner) DeleteTick(tickID domain.TickID) {
 	r.events <- RequestSent
 
 	defer func() { _ = resp.Body.Close() }()
+
+	mustStatus(resp, http.StatusNoContent)
 }
 
 func (r *ContenderRunner) AddTick(contenderID domain.ContenderID, tick domain.Tick) domain.Tick {
@@ -309,7 +426,7 @@ func (r *ContenderRunner) AddTick(contenderID domain.ContenderID, tick domain.Ti
 		panic(err)
 	}
 
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/contenders/%d/ticks", APIURL, contenderID), buf)
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/contenders/%d/ticks", r.apiURL, contenderID), buf)
 	if err != nil {
 		panic(err)
 	}
@@ -324,6 +441,8 @@ func (r *ContenderRunner) AddTick(contenderID domain.ContenderID, tick domain.Ti
 	r.events <- RequestSent
 
 	defer func() { _ = resp.Body.Close() }()
+
+	mustStatus(resp, http.StatusCreated)
 
 	err = json.NewDecoder(resp.Body).Decode(&tick)
 	if err != nil {
@@ -334,7 +453,7 @@ func (r *ContenderRunner) AddTick(contenderID domain.ContenderID, tick domain.Ti
 }
 
 func (r *ContenderRunner) ReadEvents(contenderID domain.ContenderID) {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/contenders/%d/events", APIURL, contenderID), nil)
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/contenders/%d/events", r.apiURL, contenderID), nil)
 	if err != nil {
 		panic(err)
 	}
@@ -349,6 +468,8 @@ func (r *ContenderRunner) ReadEvents(contenderID domain.ContenderID) {
 	r.events <- RequestSent
 
 	defer func() { _ = resp.Body.Close() }()
+
+	mustStatus(resp, http.StatusOK)
 
 	reader := bufio.NewReader(resp.Body)
 

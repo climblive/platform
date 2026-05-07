@@ -1,6 +1,6 @@
 server {
 	listen 443 ssl http2;
-	server_name climblive.com;
+	server_name climblive.com labs.climblive.com;
 
 	client_max_body_size 1M;
 
@@ -18,7 +18,7 @@ server {
 		add_header Cache-Control "no-store";
 		expires 0;
 
-		add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-jIhoHP5AYEa/rjrf399lCKS/+7hIAc+G1cKDLBSPd7o='; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; form-action 'none'; base-uri 'self'";
+		add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'sha256-jIhoHP5AYEa/rjrf399lCKS/+7hIAc+G1cKDLBSPd7o='; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'none'; form-action 'none'; base-uri 'self'";
 		add_header X-Content-Type-Options "nosniff";
 		add_header Referrer-Policy "same-origin";
 	}
@@ -31,4 +31,10 @@ server {
 	listen 80;
 	server_name climblive.com;
 	return 301 https://climblive.com$request_uri;
+}
+
+server {
+	listen 80;
+	server_name labs.climblive.com;
+	return 301 https://labs.climblive.com$request_uri;
 }

@@ -1,7 +1,7 @@
 <script lang="ts">
   import ContestForm, {
     formSchema,
-    minuteInNanoseconds,
+    nanosecondsInMinute,
   } from "@/forms/ContestForm.svelte";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import type { Contest, ContestTemplate } from "@climblive/lib/models";
@@ -30,7 +30,7 @@
     createContest.mutate(
       {
         ...form,
-        gracePeriod: form.gracePeriod * minuteInNanoseconds,
+        gracePeriod: form.gracePeriod * nanosecondsInMinute,
         qualifyingProblems: 0,
         finalists: 0,
         usePoints: true,
@@ -49,20 +49,20 @@
   data={{
     name: "",
     country: "AQ",
-    gracePeriod: 15 * minuteInNanoseconds,
-    info: "",
+    gracePeriod: 15 * nanosecondsInMinute,
+    nameRetentionTime: 43200 * nanosecondsInMinute,
   }}
   schema={formSchema}
 >
   <div class="controls">
     <wa-button
-      size="small"
+      size="s"
       appearance="plain"
       onclick={() => navigate(`./organizers/${organizerId}/contests`)}
       >Cancel</wa-button
     >
     <wa-button
-      size="small"
+      size="s"
       type="submit"
       loading={createContest.isPending}
       variant="neutral"
@@ -71,3 +71,9 @@
     </wa-button>
   </div>
 </ContestForm>
+
+<style>
+  .controls {
+    margin-inline-start: auto;
+  }
+</style>
