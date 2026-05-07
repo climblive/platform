@@ -49,7 +49,7 @@
             onclick={() => navigate("./health")}
             size="s"
             appearance="outlined"
-            variant={issues > 0 ? "danger" : "neutral"}
+            variant={issues > 0 ? "danger" : "success"}
           >
             <wa-icon name="heart-pulse"></wa-icon>
           </wa-button>
