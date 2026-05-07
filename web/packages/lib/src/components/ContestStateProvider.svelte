@@ -8,40 +8,24 @@
   interface Props {
     contestId: number;
     compClassId?: number;
-    startTime?: Date;
-    endTime?: Date;
     children?: Snippet<[{ contestState: ContestState; progress: number }]>;
   }
 
-  const {
-    contestId,
-    compClassId,
-    startTime: startTimeProp,
-    endTime: endTimeProp,
-    children,
-  }: Props = $props();
+  const { contestId, compClassId, children }: Props = $props();
 
   const contestQuery = $derived(getContestQuery(contestId));
   const compClassQuery = $derived(
-    compClassId && !(startTimeProp && endTimeProp)
-      ? getCompClassQuery(compClassId)
-      : undefined,
+    compClassId ? getCompClassQuery(compClassId) : undefined,
   );
 
   const contest = $derived(contestQuery.data);
   const compClass = $derived(compClassQuery?.data);
 
   const startTime = $derived(
-    startTimeProp ??
-      compClass?.timeBegin ??
-      contest?.timeBegin ??
-      new Date(8640000000000000),
+    compClass?.timeBegin ?? contest?.timeBegin ?? new Date(8640000000000000),
   );
   const endTime = $derived(
-    endTimeProp ??
-      compClass?.timeEnd ??
-      contest?.timeEnd ??
-      new Date(-8640000000000000),
+    compClass?.timeEnd ?? contest?.timeEnd ?? new Date(-8640000000000000),
   );
   const gracePeriodEndTime = $derived(
     contest
