@@ -223,6 +223,11 @@ export interface User {
   admin: boolean;
   organizers: Organizer[];
 }
+export interface ServiceStatus {
+  name: string;
+  healthy: boolean;
+  checkedAt: Date;
+}
 export interface ContenderEnteredEvent {
   contenderId: ContenderID;
   compClassId: CompClassID;
