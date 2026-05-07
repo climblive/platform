@@ -34,6 +34,7 @@ func NewScoreKeeper(eventBroker domain.EventBroker, repo keeperRepository) *Keep
 		repo:                   repo,
 		externalPersistTrigger: make(chan struct{}, 1),
 		mu:                     sync.RWMutex{},
+		running:                atomic.Bool{},
 	}
 }
 

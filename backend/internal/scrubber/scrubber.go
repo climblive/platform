@@ -31,7 +31,7 @@ type Scrubber struct {
 }
 
 func New(useCase contenderScrubberUseCase, interval time.Duration) *Scrubber {
-	return &Scrubber{useCase: useCase, interval: interval}
+	return &Scrubber{useCase: useCase, interval: interval, running: atomic.Bool{}}
 }
 
 func (s *Scrubber) Run(ctx context.Context, options ...func(*runOptions)) *sync.WaitGroup {

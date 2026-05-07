@@ -101,6 +101,7 @@ func NewScoreEngineManager(repo scoreEngineManagerRepository, engineStoreHydrato
 		requests:               make(chan any),
 		terminations:           make(chan domain.ScoreEngineInstanceID),
 		scoreEngineMaxLifetime: scoreEngineMaxLifetime,
+		running:                atomic.Bool{},
 	}
 }
 
