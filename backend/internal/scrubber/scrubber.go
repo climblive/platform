@@ -68,8 +68,6 @@ func (s *Scrubber) Run(ctx context.Context, options ...func(*runOptions)) *sync.
 			select {
 			case <-ctx.Done():
 				return
-			case <-time.After(15 * time.Second):
-				panic("simulated scrubber panic")
 			case <-time.After(delay):
 				slog.Info("running scrubber")
 
