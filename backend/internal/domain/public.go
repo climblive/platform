@@ -231,6 +231,12 @@ type User struct {
 	Organizers []Organizer `json:"organizers"`
 }
 
+type ServiceStatus struct {
+	Name      string    `json:"name"`
+	Healthy   bool      `json:"healthy"`
+	CheckedAt time.Time `json:"checkedAt"`
+}
+
 type ContenderEnteredEvent struct {
 	ContenderID ContenderID `json:"contenderId"`
 	CompClassID CompClassID `json:"compClassId"`
