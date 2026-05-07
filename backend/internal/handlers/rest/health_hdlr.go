@@ -8,7 +8,7 @@ import (
 )
 
 type healthUseCase interface {
-	GetHealth(ctx context.Context) (domain.HealthStatus, error)
+	GetHealth(ctx context.Context) ([]domain.ServiceStatus, error)
 }
 
 type healthHandler struct {
@@ -31,7 +31,15 @@ func (hdlr *healthHandler) GetHealth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	status := http.StatusOK
-	if !health.ScoreEngineManager.Healthy || !health.ScoreKeeper.Healthy || !health.Scrubber.Healthy {
+
+	issues := 0
+	for _, service := range health {
+		if !service.Healthy {
+			issues++
+		}
+	}
+
+	if issues > 0 {
 		status = http.StatusServiceUnavailable
 	}
 

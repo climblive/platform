@@ -86,7 +86,7 @@ func (s *Scrubber) Run(ctx context.Context, options ...func(*runOptions)) *sync.
 
 func (s *Scrubber) GetStatus() domain.ServiceStatus {
 	if s.running.Load() {
-		return domain.ServiceStatus{Healthy: true, CheckedAt: time.Now()}
+		return domain.ServiceStatus{Name: "Scrubber", Healthy: true, CheckedAt: time.Now()}
 	}
 
 	return domain.ServiceStatus{}
