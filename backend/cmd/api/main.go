@@ -14,6 +14,7 @@ import (
 	"os/signal"
 	"os/user"
 	"strconv"
+	"strings"
 
 	"sync"
 	"syscall"
@@ -415,7 +416,7 @@ func (h *httpRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		host = r.Host
 	}
 
-	if host == h.wwwHost {
+	if strings.HasSuffix(host, h.wwwHost) {
 		h.wwwHandler.ServeHTTP(w, r)
 		return
 	}
