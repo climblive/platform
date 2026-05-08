@@ -14,6 +14,11 @@
   const id = $props.id();
 
   const pct = (count: number) => (maxCount > 0 ? (count / maxCount) * 100 : 0);
+  const colors = $derived(
+    problem.holdColorSecondary
+      ? [problem.holdColorPrimary, problem.holdColorSecondary]
+      : [problem.holdColorPrimary],
+  );
 
   const topPct = $derived(pct(stats.top));
   const flashPct = $derived(pct(stats.flash));
@@ -21,9 +26,13 @@
 
 <div class="container">
   <button {id} aria-label="Show details for problem #{problem.number}">
-    <div class="fill" style:--color={problem.holdColorPrimary}>
-      <SubBar percentage={flashPct} fillWeight={1} />
-      <SubBar percentage={topPct} fillWeight={0.6} />
+    <div class="fill">
+      {#each colors as color (color)}
+        <div class="side" style:--color={color}>
+          <SubBar percentage={flashPct} fillWeight={1} />
+          <SubBar percentage={topPct} fillWeight={0.6} />
+        </div>
+      {/each}
     </div>
   </button>
   <span class="label">#{problem.number}</span>
@@ -68,14 +77,20 @@
   }
 
   .fill {
+    overflow: hidden;
     display: flex;
-    flex-direction: column-reverse;
     height: 100%;
-    background: rgb(from var(--color) r g b / 2%);
     animation: grow var(--wa-transition-slow) var(--wa-transition-easing)
       forwards;
     transform: scaleY(0);
     transform-origin: bottom;
+  }
+
+  .side {
+    display: flex;
+    flex: 1;
+    flex-direction: column-reverse;
+    background: rgb(from var(--color) r g b / 2%);
   }
 
   .label {
