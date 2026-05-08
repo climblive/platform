@@ -14,28 +14,25 @@
   const id = $props.id();
 
   const pct = (count: number) => (maxCount > 0 ? (count / maxCount) * 100 : 0);
-  const colors = $derived(
-    problem.holdColorSecondary
-      ? [problem.holdColorPrimary, problem.holdColorSecondary]
-      : [problem.holdColorPrimary],
-  );
-
+  const isDual = $derived(problem.holdColorSecondary !== undefined);
   const topPct = $derived(pct(stats.top + stats.flash));
 </script>
 
 <div class="container">
   <button {id} aria-label="Show details for problem #{problem.number}">
     <div
-      class:dual={problem.holdColorSecondary !== undefined}
+      class:dual={isDual}
       class="fill"
       style:--primary-color={problem.holdColorPrimary}
       style:--secondary-color={problem.holdColorSecondary ?? problem.holdColorPrimary}
     >
-      {#each colors as color (color)}
-        <div class="side" style:--color={color}>
+      {#if isDual}
+        <div class="dual-top" style:--target-height="{topPct}%"></div>
+      {:else}
+        <div class="side" style:--color={problem.holdColorPrimary}>
           <SubBar percentage={topPct} fillWeight={1} />
         </div>
-      {/each}
+      {/if}
     </div>
   </button>
   <span class="label">#{problem.number}</span>
@@ -101,6 +98,19 @@
       rgb(from var(--secondary-color) r g b / 2%) 50% 100%
     );
     transform: rotate(-45deg);
+  }
+
+  .dual-top {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 1;
+    height: var(--target-height);
+    background: linear-gradient(
+      135deg,
+      var(--primary-color) 0 50%,
+      var(--secondary-color) 50% 100%
+    );
   }
 
   .side {
