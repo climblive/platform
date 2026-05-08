@@ -20,8 +20,7 @@
       : [problem.holdColorPrimary],
   );
 
-  const topPct = $derived(pct(stats.top));
-  const flashPct = $derived(pct(stats.flash));
+  const topPct = $derived(pct(stats.top + stats.flash));
 </script>
 
 <div class="container">
@@ -29,8 +28,7 @@
     <div class="fill">
       {#each colors as color (color)}
         <div class="side" style:--color={color}>
-          <SubBar percentage={flashPct} fillWeight={1} />
-          <SubBar percentage={topPct} fillWeight={0.6} />
+          <SubBar percentage={topPct} fillWeight={1} />
         </div>
       {/each}
     </div>
