@@ -19,13 +19,18 @@
       ? [problem.holdColorPrimary, problem.holdColorSecondary]
       : [problem.holdColorPrimary],
   );
+  const background = $derived(
+    problem.holdColorSecondary
+      ? `linear-gradient(-45deg, rgb(from ${problem.holdColorPrimary} r g b / 2%) 0 50%, rgb(from ${problem.holdColorSecondary} r g b / 2%) 50% 100%)`
+      : `rgb(from ${problem.holdColorPrimary} r g b / 2%)`,
+  );
 
   const topPct = $derived(pct(stats.top + stats.flash));
 </script>
 
 <div class="container">
   <button {id} aria-label="Show details for problem #{problem.number}">
-    <div class="fill">
+    <div class="fill" style:background={background}>
       {#each colors as color (color)}
         <div class="side" style:--color={color}>
           <SubBar percentage={topPct} fillWeight={1} />
@@ -88,7 +93,6 @@
     display: flex;
     flex: 1;
     flex-direction: column-reverse;
-    background: rgb(from var(--color) r g b / 2%);
   }
 
   .label {
