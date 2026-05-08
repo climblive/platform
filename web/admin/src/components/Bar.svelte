@@ -19,18 +19,18 @@
       ? [problem.holdColorPrimary, problem.holdColorSecondary]
       : [problem.holdColorPrimary],
   );
-  const background = $derived(
-    problem.holdColorSecondary
-      ? `linear-gradient(-45deg, rgb(from ${problem.holdColorPrimary} r g b / 2%) 0 50%, rgb(from ${problem.holdColorSecondary} r g b / 2%) 50% 100%)`
-      : `rgb(from ${problem.holdColorPrimary} r g b / 2%)`,
-  );
 
   const topPct = $derived(pct(stats.top + stats.flash));
 </script>
 
 <div class="container">
   <button {id} aria-label="Show details for problem #{problem.number}">
-    <div class="fill" style:background={background}>
+    <div
+      class:dual={problem.holdColorSecondary !== undefined}
+      class="fill"
+      style:--primary-color={problem.holdColorPrimary}
+      style:--secondary-color={problem.holdColorSecondary ?? problem.holdColorPrimary}
+    >
       {#each colors as color (color)}
         <div class="side" style:--color={color}>
           <SubBar percentage={topPct} fillWeight={1} />
@@ -81,15 +81,31 @@
 
   .fill {
     overflow: hidden;
+    position: relative;
     display: flex;
     height: 100%;
+    background: rgb(from var(--primary-color) r g b / 2%);
     animation: grow var(--wa-transition-slow) var(--wa-transition-easing)
       forwards;
     transform: scaleY(0);
     transform-origin: bottom;
   }
 
+  .fill.dual::before {
+    content: "";
+    position: absolute;
+    inset: -50%;
+    background: linear-gradient(
+      to bottom,
+      rgb(from var(--primary-color) r g b / 2%) 0 50%,
+      rgb(from var(--secondary-color) r g b / 2%) 50% 100%
+    );
+    transform: rotate(-45deg);
+  }
+
   .side {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex: 1;
     flex-direction: column-reverse;
