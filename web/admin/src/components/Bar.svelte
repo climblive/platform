@@ -13,19 +13,17 @@
   const id = $props.id();
 
   const pct = (count: number) => (maxCount > 0 ? (count / maxCount) * 100 : 0);
-  const isDual = $derived(problem.holdColorSecondary !== undefined);
   const topPct = $derived(pct(stats.top + stats.flash));
 </script>
 
 <div class="container">
   <button {id} aria-label="Show details for problem #{problem.number}">
     <div
-      class:dual={isDual}
       class="fill"
       style:--primary-color={problem.holdColorPrimary}
       style:--secondary-color={problem.holdColorSecondary ?? problem.holdColorPrimary}
     >
-      <div class="dual-top" style:--target-height="{topPct}%"></div>
+      <div class="top" style:--target-height="{topPct}%"></div>
     </div>
   </button>
   <span class="label">#{problem.number}</span>
@@ -74,26 +72,18 @@
     position: relative;
     display: flex;
     height: 100%;
-    background: rgb(from var(--primary-color) r g b / 2%);
+    background: linear-gradient(
+      135deg,
+      rgb(from var(--primary-color) r g b / 2%) 0 50%,
+      rgb(from var(--secondary-color) r g b / 2%) 50% 100%
+    );
     animation: grow var(--wa-transition-slow) var(--wa-transition-easing)
       forwards;
     transform: scaleY(0);
     transform-origin: bottom;
   }
 
-  .fill.dual::before {
-    content: "";
-    position: absolute;
-    inset: -50%;
-    background: linear-gradient(
-      to bottom,
-      rgb(from var(--primary-color) r g b / 2%) 0 50%,
-      rgb(from var(--secondary-color) r g b / 2%) 50% 100%
-    );
-    transform: rotate(-45deg);
-  }
-
-  .dual-top {
+  .top {
     position: absolute;
     inset-inline: 0;
     inset-block-end: 0;
