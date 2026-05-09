@@ -21,7 +21,8 @@
     <div
       class="fill"
       style:--primary-color={problem.holdColorPrimary}
-      style:--secondary-color={problem.holdColorSecondary ?? problem.holdColorPrimary}
+      style:--secondary-color={problem.holdColorSecondary ??
+        problem.holdColorPrimary}
     >
       <div class="top" style:--target-height="{topPct}%"></div>
     </div>
@@ -68,15 +69,10 @@
   }
 
   .fill {
-    overflow: hidden;
     position: relative;
     display: flex;
     height: 100%;
-    background: linear-gradient(
-      135deg,
-      rgb(from var(--primary-color) r g b / 2%) 0 50%,
-      rgb(from var(--secondary-color) r g b / 2%) 50% 100%
-    );
+    background: rgb(from var(--color) r g b / 2%);
     animation: grow var(--wa-transition-slow) var(--wa-transition-easing)
       forwards;
     transform: scaleY(0);
@@ -87,7 +83,6 @@
     position: absolute;
     inset-inline: 0;
     inset-block-end: 0;
-    z-index: 1;
     height: var(--target-height);
     background: linear-gradient(
       135deg,
@@ -95,6 +90,7 @@
       var(--secondary-color) 50% 100%
     );
   }
+
   .label {
     font-size: var(--wa-font-size-xs);
     color: var(--wa-color-text-quiet);
