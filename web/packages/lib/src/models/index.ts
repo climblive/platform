@@ -3,6 +3,7 @@ export * from "./contender";
 export * from "./contest";
 export * from "./event";
 export * from "./generated";
+export * from "./health";
 export * from "./organizer";
 export * from "./problem";
 export * from "./rest";

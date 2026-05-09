@@ -175,7 +175,7 @@ func main() {
 		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()),
 		scrubberRunner.Run(ctx, scrubber.WithPanicRecovery()))
 
-	apiMux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
+	apiMux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager, scrubberRunner)
 
 	appMux := http.NewServeMux()
 	appMux.Handle("/api/", accessLog(http.StripPrefix("/api", noCacheHandler(apiMux))))
@@ -266,8 +266,9 @@ func setupMux(
 	repo *repository.Database,
 	authorizer *authorizer.Authorizer,
 	eventBroker domain.EventBroker,
-	scoreKeeper domain.ScoreKeeper,
+	scoreKeeper *scores.Keeper,
 	scoreEngineManager *scores.ScoreEngineManager,
+	scrubber *scrubber.Scrubber,
 ) *rest.Mux {
 	contenderUseCase := usecases.ContenderUseCase{
 		Repo:                      repo,
@@ -325,6 +326,12 @@ func setupMux(
 		UUIDGenerator: &uuidGenerator{},
 	}
 
+	healthUseCase := usecases.HealthUseCase{
+		ScoreEngineManager: scoreEngineManager,
+		ScoreKeeper:        scoreKeeper,
+		Scrubber:           scrubber,
+	}
+
 	mux := rest.NewMux()
 	mux.RegisterMiddleware(rest.CORS)
 	mux.RegisterMiddleware(authorizer.Middleware)
@@ -341,6 +348,7 @@ func setupMux(
 	rest.InstallRaffleHandler(mux, &raffleUseCase)
 	rest.InstallUserHandler(mux, &userUseCase)
 	rest.InstallOrganizerHandler(mux, &organizerUseCase)
+	rest.InstallHealthHandler(mux, &healthUseCase)
 
 	return mux
 }
