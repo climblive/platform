@@ -85,8 +85,6 @@ export interface Contest {
   description?: string;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
-  usePoints: boolean;
-  pooledPoints: boolean;
   info?: string;
   gracePeriod: number;
   nameRetentionTime: number;
@@ -103,8 +101,6 @@ export interface ContestTemplate {
   description?: string;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
-  usePoints: boolean;
-  pooledPoints: boolean;
   info?: string;
   gracePeriod: number;
   nameRetentionTime: number;
@@ -117,8 +113,6 @@ export interface ContestPatch {
   description?: string;
   qualifyingProblems?: number;
   finalists?: number;
-  usePoints?: boolean;
-  pooledPoints?: boolean;
   info?: string;
   gracePeriod?: number;
 }
@@ -281,8 +275,6 @@ export interface ProblemDeletedEvent {
 export interface RulesUpdatedEvent {
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
-  usePoints: boolean;
-  pooledPoints: boolean;
 }
 export interface ContenderPublicInfoUpdatedEvent {
   contenderId: ContenderID;
@@ -299,10 +291,6 @@ export interface ContenderScoreUpdatedEvent {
   placement: number /* int */;
   finalist: boolean;
   rankOrder: number /* int */;
-}
-export interface ProblemValueUpdatedEvent extends ProblemValue {
-  problemId: ProblemID;
-  compClassId: CompClassID;
 }
 export interface ScoreEngineStartedEvent {
   instanceId: ScoreEngineInstanceID;

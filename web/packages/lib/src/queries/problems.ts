@@ -1,17 +1,11 @@
 import {
   createMutation,
   createQuery,
-  QueryClient,
   useQueryClient,
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import type {
-  Problem,
-  ProblemPatch,
-  ProblemTemplate,
-  ProblemValue,
-} from "../models";
+import type { Problem, ProblemPatch, ProblemTemplate } from "../models";
 import { HOUR } from "./constants";
 
 export const getProblemQuery = (problemId: number) =>
@@ -30,22 +24,10 @@ export const getProblemsQuery = (
   createQuery(() => ({
     ...options,
     queryKey: ["problems", { contestId }],
-    queryFn: async () =>
-      ApiClient.getInstance().getProblemsByContest(contestId),
+    queryFn: async () => ApiClient.getInstance().getProblems(contestId),
     retry: false,
     gcTime: 12 * HOUR,
     staleTime: 12 * HOUR,
-  }));
-
-export const getProblemsByCompClassQuery = (
-  compClassId: number,
-  options?: Partial<Parameters<typeof createQuery<Problem[]>>[0]>,
-) =>
-  createQuery(() => ({
-    ...options,
-    queryKey: ["problems", { compClassId }],
-    queryFn: async () =>
-      ApiClient.getInstance().getProblemsByCompClass(compClassId),
   }));
 
 export const createProblemMutation = (contestId: number) => {
@@ -125,27 +107,4 @@ export const deleteProblemMutation = (problemId: number) => {
       client.removeQueries({ queryKey });
     },
   }));
-};
-
-export const updateProblemValueInQueryCache = (
-  queryClient: QueryClient,
-  compClassId: number,
-  problemId: number,
-  updatedProblemValue: ProblemValue,
-) => {
-  const queryKey: QueryKey = ["problems", { compClassId }];
-
-  queryClient.setQueryData<Problem[]>(queryKey, (problems) => {
-    const predicate = ({ id }: Problem) => id === problemId;
-
-    const found = (problems ?? []).findIndex(predicate) !== -1;
-
-    if (found) {
-      return (problems ?? []).map((oldProblem) =>
-        predicate(oldProblem)
-          ? { ...oldProblem, ...updatedProblemValue }
-          : oldProblem,
-      );
-    }
-  });
 };

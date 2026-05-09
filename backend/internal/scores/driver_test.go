@@ -2,8 +2,6 @@ package scores_test
 
 import (
 	"context"
-	"iter"
-	"slices"
 	"testing"
 	"time"
 
@@ -115,10 +113,9 @@ func TestEngineDriver(t *testing.T) {
 
 		mockedEngine := new(scoreEngineMock)
 
-		mockedEngine.On("Start").Run(func(args mock.Arguments) { cancel() }).Return(slices.Values([]scores.Effect{}))
+		mockedEngine.On("Start").Run(func(args mock.Arguments) { cancel() }).Return()
 		mockedEngine.On("Stop").Return()
 		mockedEngine.On("GetDirtyScores").Return([]domain.Score{})
-		mockedEngine.On("GetDirtyProblemValues").Return([]scores.ProblemValue{})
 
 		installEngine(mockedEngine)
 
@@ -439,90 +436,59 @@ type scoreEngineMock struct {
 	mock.Mock
 }
 
-func (m *scoreEngineMock) Start() iter.Seq[scores.Effect] {
-	args := m.Called()
-	return args.Get(0).(iter.Seq[scores.Effect])
+func (m *scoreEngineMock) Start() {
+	m.Called()
 }
 
 func (m *scoreEngineMock) Stop() {
 	m.Called()
 }
 
-func (m *scoreEngineMock) HandleRulesUpdated(event domain.RulesUpdatedEvent) iter.Seq[scores.Effect] {
-	args := m.Called(event)
-	return args.Get(0).(iter.Seq[scores.Effect])
+func (m *scoreEngineMock) HandleRulesUpdated(event domain.RulesUpdatedEvent) {
+	m.Called(event)
 }
 
-func (m *scoreEngineMock) HandleContenderEntered(event domain.ContenderEnteredEvent) iter.Seq[scores.Effect] {
-	args := m.Called(event)
-	return args.Get(0).(iter.Seq[scores.Effect])
+func (m *scoreEngineMock) HandleContenderEntered(event domain.ContenderEnteredEvent) {
+	m.Called(event)
 }
 
-func (m *scoreEngineMock) HandleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent) iter.Seq[scores.Effect] {
-	args := m.Called(event)
-	return args.Get(0).(iter.Seq[scores.Effect])
+func (m *scoreEngineMock) HandleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent) {
+	m.Called(event)
 }
 
-func (m *scoreEngineMock) HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent) iter.Seq[scores.Effect] {
-	args := m.Called(event)
-	return args.Get(0).(iter.Seq[scores.Effect])
+func (m *scoreEngineMock) HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent) {
+	m.Called(event)
 }
 
-func (m *scoreEngineMock) HandleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent) iter.Seq[scores.Effect] {
-	args := m.Called(event)
-	return args.Get(0).(iter.Seq[scores.Effect])
+func (m *scoreEngineMock) HandleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent) {
+	m.Called(event)
 }
 
-func (m *scoreEngineMock) HandleContenderDisqualified(event domain.ContenderDisqualifiedEvent) iter.Seq[scores.Effect] {
-	args := m.Called(event)
-	return args.Get(0).(iter.Seq[scores.Effect])
+func (m *scoreEngineMock) HandleContenderDisqualified(event domain.ContenderDisqualifiedEvent) {
+	m.Called(event)
 }
 
-func (m *scoreEngineMock) HandleContenderRequalified(event domain.ContenderRequalifiedEvent) iter.Seq[scores.Effect] {
-	args := m.Called(event)
-	return args.Get(0).(iter.Seq[scores.Effect])
+func (m *scoreEngineMock) HandleContenderRequalified(event domain.ContenderRequalifiedEvent) {
+	m.Called(event)
 }
 
-func (m *scoreEngineMock) HandleAscentRegistered(event domain.AscentRegisteredEvent) iter.Seq[scores.Effect] {
-	args := m.Called(event)
-	return args.Get(0).(iter.Seq[scores.Effect])
+func (m *scoreEngineMock) HandleAscentRegistered(event domain.AscentRegisteredEvent) {
+	m.Called(event)
 }
 
-func (m *scoreEngineMock) HandleAscentDeregistered(event domain.AscentDeregisteredEvent) iter.Seq[scores.Effect] {
-	args := m.Called(event)
-	return args.Get(0).(iter.Seq[scores.Effect])
+func (m *scoreEngineMock) HandleAscentDeregistered(event domain.AscentDeregisteredEvent) {
+	m.Called(event)
 }
 
-func (m *scoreEngineMock) HandleProblemAdded(event domain.ProblemAddedEvent) iter.Seq[scores.Effect] {
-	args := m.Called(event)
-	return args.Get(0).(iter.Seq[scores.Effect])
+func (m *scoreEngineMock) HandleProblemAdded(event domain.ProblemAddedEvent) {
+	m.Called(event)
 }
 
-func (m *scoreEngineMock) HandleProblemUpdated(event domain.ProblemUpdatedEvent) iter.Seq[scores.Effect] {
-	args := m.Called(event)
-	return args.Get(0).(iter.Seq[scores.Effect])
-}
-
-func (m *scoreEngineMock) RankCompClass(compClassID domain.CompClassID) {
-	m.Called(compClassID)
-}
-
-func (m *scoreEngineMock) ScoreContender(contenderID domain.ContenderID) iter.Seq[scores.Effect] {
-	args := m.Called(contenderID)
-	return args.Get(0).(iter.Seq[scores.Effect])
-}
-
-func (m *scoreEngineMock) CalculateProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[scores.Effect] {
-	args := m.Called(compClassID, problemID)
-	return args.Get(0).(iter.Seq[scores.Effect])
+func (m *scoreEngineMock) HandleProblemUpdated(event domain.ProblemUpdatedEvent) {
+	m.Called(event)
 }
 
 func (m *scoreEngineMock) GetDirtyScores() []domain.Score {
 	args := m.Called()
 	return args.Get(0).([]domain.Score)
-}
-
-func (m *scoreEngineMock) GetDirtyProblemValues() []scores.ProblemValue {
-	args := m.Called()
-	return args.Get(0).([]scores.ProblemValue)
 }

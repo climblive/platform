@@ -153,8 +153,6 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 	rulesUpdateEventBaseline := domain.RulesUpdatedEvent{
 		QualifyingProblems: contest.QualifyingProblems,
 		Finalists:          contest.Finalists,
-		UsePoints:          contest.UsePoints,
-		PooledPoints:       contest.PooledPoints,
 	}
 
 	if patch.Location.Present {
@@ -185,14 +183,6 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		contest.Finalists = patch.Finalists.Value
 	}
 
-	if patch.UsePoints.Present {
-		contest.UsePoints = patch.UsePoints.Value
-	}
-
-	if patch.PooledPoints.Present {
-		contest.PooledPoints = patch.PooledPoints.Value
-	}
-
 	if patch.Info.Present {
 		contest.Info = sanitizationPolicy.Sanitize(patch.Info.Value)
 	}
@@ -212,8 +202,6 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 	event := domain.RulesUpdatedEvent{
 		QualifyingProblems: contest.QualifyingProblems,
 		Finalists:          contest.Finalists,
-		UsePoints:          contest.UsePoints,
-		PooledPoints:       contest.PooledPoints,
 	}
 
 	if event != rulesUpdateEventBaseline {
@@ -321,8 +309,6 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		Description:          strings.TrimSpace(tmpl.Description),
 		QualifyingProblems:   tmpl.QualifyingProblems,
 		Finalists:            tmpl.Finalists,
-		UsePoints:            tmpl.UsePoints,
-		PooledPoints:         tmpl.PooledPoints,
 		Info:                 sanitizationPolicy.Sanitize(tmpl.Info),
 		GracePeriod:          tmpl.GracePeriod,
 		NameRetentionTime:    tmpl.NameRetentionTime,

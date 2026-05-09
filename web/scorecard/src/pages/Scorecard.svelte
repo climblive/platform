@@ -25,21 +25,18 @@
     ascentRegisteredEventSchema,
     contenderPublicInfoUpdatedEventSchema,
     contenderScoreUpdatedEventSchema,
-    problemValueUpdatedEventSchema,
     raffleWinnerDrawnEventSchema,
     type Problem,
-    type ProblemValue,
     type Tick,
   } from "@climblive/lib/models";
   import {
     getCompClassesQuery,
     getContenderQuery,
     getContestQuery,
-    getProblemsByCompClassQuery,
+    getProblemsQuery,
     getTicksByContenderQuery,
     removeTickFromQueryCache,
     updateContenderPublicInfoInQueryCache,
-    updateProblemValueInQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
@@ -54,6 +51,7 @@
   const contenderQuery = $derived(getContenderQuery($session.contenderId));
   const contestQuery = $derived(getContestQuery($session.contestId));
   const compClassesQuery = $derived(getCompClassesQuery($session.contestId));
+  const problemsQuery = $derived(getProblemsQuery($session.contestId));
   const ticksQuery = $derived(getTicksByContenderQuery($session.contenderId));
 
   let resultsConnected = $state(false);
@@ -67,6 +65,7 @@
   let contender = $derived(contenderQuery.data);
   let contest = $derived(contestQuery.data);
   let compClasses = $derived(compClassesQuery.data);
+  let problems = $derived(problemsQuery.data);
   let ticks = $derived(ticksQuery.data);
   let selectedCompClass = $derived(
     compClasses?.find(({ id }) => id === contender?.compClassId),
@@ -77,14 +76,6 @@
   let endTime = $derived(
     selectedCompClass?.timeEnd ?? new Date(-8640000000000000),
   );
-
-  const problemsQuery = $derived(
-    selectedCompClass
-      ? getProblemsByCompClassQuery(selectedCompClass.id)
-      : undefined,
-  );
-
-  let problems = $derived(problemsQuery?.data);
 
   let orderProblemsBy = $state<"number" | "points">("number");
   let sortDirection = $state<"asc" | "desc">("asc");
@@ -209,10 +200,6 @@
     eventSource.addEventListener("ASCENT_REGISTERED", (e) => {
       const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
 
-      if (event.contenderId !== contender?.id) {
-        return;
-      }
-
       const newTick: Tick = {
         id: event.tickId,
         timestamp: event.timestamp,
@@ -231,29 +218,7 @@
     eventSource.addEventListener("ASCENT_DEREGISTERED", (e) => {
       const event = ascentDeregisteredEventSchema.parse(JSON.parse(e.data));
 
-      if (event.contenderId !== contender?.id) {
-        return;
-      }
-
       removeTickFromQueryCache(queryClient, event.tickId);
-    });
-
-    eventSource.addEventListener("PROBLEM_VALUE_UPDATED", (e) => {
-      const event = problemValueUpdatedEventSchema.parse(JSON.parse(e.data));
-
-      const problemValue: ProblemValue = {
-        pointsTop: event.pointsTop,
-        pointsZone1: event.pointsZone1,
-        pointsZone2: event.pointsZone2,
-        flashBonus: event.flashBonus,
-      };
-
-      updateProblemValueInQueryCache(
-        queryClient,
-        event.compClassId,
-        event.problemId,
-        problemValue,
-      );
     });
 
     eventSource.addEventListener("RAFFLE_WINNER_DRAWN", (e) => {

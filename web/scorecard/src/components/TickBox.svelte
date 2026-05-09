@@ -152,12 +152,14 @@
         iconName="check"
         label="Top"
         onClick={(e: MouseEvent) => handleTick(e, "top", false)}
+        points={problem.pointsTop}
       />
 
       <TickButton
         iconName="bolt"
         label="Flash"
         onClick={(e: MouseEvent) => handleTick(e, "top", true)}
+        points={problem.pointsTop + (problem.flashBonus ?? 0)}
       />
     </div>
 
@@ -166,6 +168,7 @@
         iconName="check"
         label="Zone 2"
         onClick={(e: MouseEvent) => handleTick(e, "zone2", false)}
+        points={problem.pointsZone2}
       />
     {/if}
 
@@ -174,6 +177,7 @@
         iconName="check"
         label="Zone 1"
         onClick={(e: MouseEvent) => handleTick(e, "zone1", false)}
+        points={problem.pointsZone1}
       />
     {/if}
   </wa-dialog>

@@ -18,10 +18,7 @@
   const createContest = $derived(createContestMutation(organizerId));
 
   const handleSubmit = (
-    form: Omit<
-      ContestTemplate,
-      "qualifyingProblems" | "finalists" | "usePoints" | "pooledPoints"
-    >,
+    form: Omit<ContestTemplate, "qualifyingProblems" | "finalists">,
   ) => {
     if (createContest.isPending) {
       return;
@@ -33,8 +30,6 @@
         gracePeriod: form.gracePeriod * nanosecondsInMinute,
         qualifyingProblems: 0,
         finalists: 0,
-        usePoints: true,
-        pooledPoints: false,
       },
       {
         onSuccess: (contest: Contest) => navigate(`contests/${contest.id}`),

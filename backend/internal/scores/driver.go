@@ -2,7 +2,6 @@ package scores
 
 import (
 	"context"
-	"iter"
 	"log/slog"
 	"slices"
 	"sync"
@@ -13,27 +12,22 @@ import (
 )
 
 type ScoreEngine interface {
-	Start() iter.Seq[Effect]
+	Start()
 	Stop()
 
-	HandleRulesUpdated(event domain.RulesUpdatedEvent) iter.Seq[Effect]
-	HandleContenderEntered(event domain.ContenderEnteredEvent) iter.Seq[Effect]
-	HandleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent) iter.Seq[Effect]
-	HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent) iter.Seq[Effect]
-	HandleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent) iter.Seq[Effect]
-	HandleContenderDisqualified(event domain.ContenderDisqualifiedEvent) iter.Seq[Effect]
-	HandleContenderRequalified(event domain.ContenderRequalifiedEvent) iter.Seq[Effect]
-	HandleAscentRegistered(event domain.AscentRegisteredEvent) iter.Seq[Effect]
-	HandleAscentDeregistered(event domain.AscentDeregisteredEvent) iter.Seq[Effect]
-	HandleProblemAdded(event domain.ProblemAddedEvent) iter.Seq[Effect]
-	HandleProblemUpdated(event domain.ProblemUpdatedEvent) iter.Seq[Effect]
-
-	RankCompClass(compClassID domain.CompClassID)
-	ScoreContender(contenderID domain.ContenderID) iter.Seq[Effect]
-	CalculateProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect]
+	HandleRulesUpdated(event domain.RulesUpdatedEvent)
+	HandleContenderEntered(event domain.ContenderEnteredEvent)
+	HandleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent)
+	HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent)
+	HandleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent)
+	HandleContenderDisqualified(event domain.ContenderDisqualifiedEvent)
+	HandleContenderRequalified(event domain.ContenderRequalifiedEvent)
+	HandleAscentRegistered(event domain.AscentRegisteredEvent)
+	HandleAscentDeregistered(event domain.AscentDeregisteredEvent)
+	HandleProblemAdded(event domain.ProblemAddedEvent)
+	HandleProblemUpdated(event domain.ProblemUpdatedEvent)
 
 	GetDirtyScores() []domain.Score
-	GetDirtyProblemValues() []ProblemValue
 }
 
 type ScoreEngineDriver struct {
@@ -185,11 +179,8 @@ PreLoop:
 		case engine := <-engineReceiver:
 			d.engine = engine
 
-			effects := d.engine.Start()
+			d.engine.Start()
 			defer d.engine.Stop()
-
-			runner := NewEffectRunner(d)
-			runner.RunChainEffects(effects)
 
 			break PreLoop
 		case <-ctx.Done():
@@ -197,7 +188,7 @@ PreLoop:
 		}
 	}
 
-	defer d.publishDirtyUpdates()
+	defer d.publishUpdatedScores()
 
 	d.running.Store(true)
 	defer d.running.Store(false)
@@ -224,7 +215,7 @@ PreLoop:
 		case <-ticker:
 			d.publishToken = false
 
-			n := d.publishDirtyUpdates()
+			n := d.publishUpdatedScores()
 			if n == 0 {
 				d.publishToken = true
 			}
@@ -233,7 +224,7 @@ PreLoop:
 		}
 
 		if d.publishToken {
-			n := d.publishDirtyUpdates()
+			n := d.publishUpdatedScores()
 			if n > 0 {
 				d.publishToken = false
 			}
@@ -242,141 +233,46 @@ PreLoop:
 }
 
 func (d *ScoreEngineDriver) handleEvent(event domain.EventEnvelope) {
-	var effects iter.Seq[Effect]
-
 	switch ev := event.Data.(type) {
 	case domain.RulesUpdatedEvent:
-		effects = d.engine.HandleRulesUpdated(ev)
+		d.engine.HandleRulesUpdated(ev)
 	case domain.ContenderEnteredEvent:
-		effects = d.engine.HandleContenderEntered(ev)
+		d.engine.HandleContenderEntered(ev)
 	case domain.ContenderSwitchedClassEvent:
-		effects = d.engine.HandleContenderSwitchedClass(ev)
+		d.engine.HandleContenderSwitchedClass(ev)
 	case domain.ContenderWithdrewFromFinalsEvent:
-		effects = d.engine.HandleContenderWithdrewFromFinals(ev)
+		d.engine.HandleContenderWithdrewFromFinals(ev)
 	case domain.ContenderReenteredFinalsEvent:
-		effects = d.engine.HandleContenderReenteredFinals(ev)
+		d.engine.HandleContenderReenteredFinals(ev)
 	case domain.ContenderDisqualifiedEvent:
-		effects = d.engine.HandleContenderDisqualified(ev)
+		d.engine.HandleContenderDisqualified(ev)
 	case domain.ContenderRequalifiedEvent:
-		effects = d.engine.HandleContenderRequalified(ev)
+		d.engine.HandleContenderRequalified(ev)
 	case domain.AscentRegisteredEvent:
-		effects = d.engine.HandleAscentRegistered(ev)
+		d.engine.HandleAscentRegistered(ev)
 	case domain.AscentDeregisteredEvent:
-		effects = d.engine.HandleAscentDeregistered(ev)
+		d.engine.HandleAscentDeregistered(ev)
 	case domain.ProblemAddedEvent:
-		effects = d.engine.HandleProblemAdded(ev)
+		d.engine.HandleProblemAdded(ev)
 	case domain.ProblemUpdatedEvent:
-		effects = d.engine.HandleProblemUpdated(ev)
-	}
-
-	runner := NewEffectRunner(d)
-	runner.RunChainEffects(effects)
-}
-
-type EffectRunner struct {
-	queue  map[EncodedEffect]Effect
-	driver *ScoreEngineDriver
-}
-
-func NewEffectRunner(driver *ScoreEngineDriver) *EffectRunner {
-	return &EffectRunner{
-		queue:  make(map[EncodedEffect]Effect),
-		driver: driver,
+		d.engine.HandleProblemUpdated(ev)
 	}
 }
 
-func (r *EffectRunner) RunChainEffects(effects iter.Seq[Effect]) {
-	r.Run(func(yield func(Effect) bool) {
-		for effect := range effects {
-			switch effect.(type) {
-			case EffectCalculateProblemValue:
-			default:
-				r.queue[effect.Encode()] = effect
-				continue
-			}
-
-			if !yield(effect) {
-				return
-			}
-		}
-	})
-
-	r.Run(func(yield func(Effect) bool) {
-		for _, effect := range r.queue {
-			switch effect.(type) {
-			case EffectScoreContender:
-			default:
-				continue
-			}
-
-			if !yield(effect) {
-				return
-			}
-		}
-	})
-
-	r.Run(func(yield func(Effect) bool) {
-		for _, effect := range r.queue {
-			switch effect.(type) {
-			case EffectRankClass:
-			default:
-				continue
-			}
-
-			if !yield(effect) {
-				return
-			}
-		}
-	})
-}
-
-func (r *EffectRunner) Run(effects iter.Seq[Effect]) {
-	for e := range effects {
-		var chainEffects iter.Seq[Effect]
-
-		switch effect := e.(type) {
-		case EffectRankClass:
-			r.driver.logger.Info("re-ranking comp class", "comp_class_id", effect.CompClassID)
-			r.driver.engine.RankCompClass(effect.CompClassID)
-		case EffectScoreContender:
-			r.driver.logger.Info("re-scoring contender", "contender_id", effect.ContenderID)
-			chainEffects = r.driver.engine.ScoreContender(effect.ContenderID)
-		case EffectCalculateProblemValue:
-			r.driver.logger.Info("re-calculating problem value", "comp_class_id", effect.CompClassID, "problem_id", effect.ProblemID)
-			chainEffects = r.driver.engine.CalculateProblemValue(effect.CompClassID, effect.ProblemID)
-		}
-
-		if chainEffects == nil {
-			continue
-		}
-
-		for chainEffect := range chainEffects {
-			r.queue[chainEffect.Encode()] = chainEffect
-		}
-	}
-}
-
-func (d *ScoreEngineDriver) publishDirtyUpdates() int {
-	publishCount := 0
+func (d *ScoreEngineDriver) publishUpdatedScores() int {
+	scores := d.engine.GetDirtyScores()
 
 	var batch []domain.ContenderScoreUpdatedEvent
 
-	for score := range slices.Values(d.engine.GetDirtyScores()) {
+	for score := range slices.Values(scores) {
 		d.eventBroker.Dispatch(d.contestID, domain.ContenderScoreUpdatedEvent(score))
-		publishCount++
 
 		batch = append(batch, domain.ContenderScoreUpdatedEvent(score))
-	}
-
-	for problemValue := range slices.Values(d.engine.GetDirtyProblemValues()) {
-		d.eventBroker.Dispatch(d.contestID, domain.ProblemValueUpdatedEvent(problemValue))
-
-		publishCount++
 	}
 
 	if len(batch) > 0 {
 		d.eventBroker.Dispatch(d.contestID, batch)
 	}
 
-	return publishCount
+	return len(scores)
 }

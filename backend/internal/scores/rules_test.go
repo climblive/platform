@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestScorerWithProblemLimit(t *testing.T) {
-	rules := scores.Scorer{
-		ProblemLimit: 5,
+func TestHardestProblems(t *testing.T) {
+	rules := scores.HardestProblems{
+		Number: 5,
 	}
 
 	tickPointValues := []int{
@@ -31,9 +31,9 @@ func TestScorerWithProblemLimit(t *testing.T) {
 	assert.Equal(t, 1450, score)
 }
 
-func TestScorer_NoLimit(t *testing.T) {
-	rules := scores.Scorer{
-		ProblemLimit: 0,
+func TestHardestProblems_NoLimit(t *testing.T) {
+	rules := scores.HardestProblems{
+		Number: 0,
 	}
 
 	tickPointValues := []int{

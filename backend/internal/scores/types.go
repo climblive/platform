@@ -19,7 +19,6 @@ func (c Contender) Compare(other Contender) int {
 }
 
 type Tick struct {
-	ContenderID   domain.ContenderID
 	ProblemID     domain.ProblemID
 	Zone1         bool
 	AttemptsZone1 int
@@ -30,35 +29,30 @@ type Tick struct {
 	Points        int
 }
 
-func (t *Tick) Score(value ProblemValue) {
+func (t *Tick) Score(problem Problem) {
 	t.Points = 0
 
 	if t.Zone1 {
-		t.Points = value.PointsZone1
+		t.Points = problem.PointsZone1
 	}
 
 	if t.Zone2 {
-		t.Points = value.PointsZone2
+		t.Points = problem.PointsZone2
 	}
 
 	if t.Top {
-		t.Points = value.PointsTop
+		t.Points = problem.PointsTop
 	}
 
 	if t.Top && t.AttemptsTop == 1 {
-		t.Points += value.FlashBonus
+		t.Points += problem.FlashBonus
 	}
 }
 
 type Problem struct {
-	ID domain.ProblemID
-
-	domain.ProblemValue
-}
-
-type ProblemValue struct {
-	ProblemID   domain.ProblemID   `json:"problemId"`
-	CompClassID domain.CompClassID `json:"compClassId"`
-
-	domain.ProblemValue
+	ID          domain.ProblemID
+	PointsZone1 int
+	PointsZone2 int
+	PointsTop   int
+	FlashBonus  int
 }
