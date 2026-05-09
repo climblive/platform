@@ -127,6 +127,13 @@ type OrganizerInvite struct {
 	ExpiresAt     time.Time         `json:"expiresAt"`
 }
 
+type ProblemValue struct {
+	PointsZone1 int `json:"pointsZone1,omitempty"`
+	PointsZone2 int `json:"pointsZone2,omitempty"`
+	PointsTop   int `json:"pointsTop"`
+	FlashBonus  int `json:"flashBonus,omitempty"`
+}
+
 type Problem struct {
 	ID                 ProblemID     `json:"id"`
 	Ownership          OwnershipData `json:"-"`
@@ -137,10 +144,8 @@ type Problem struct {
 	Description        string        `json:"description,omitempty"`
 	Zone1Enabled       bool          `json:"zone1Enabled"`
 	Zone2Enabled       bool          `json:"zone2Enabled"`
-	PointsZone1        int           `json:"pointsZone1,omitempty"`
-	PointsZone2        int           `json:"pointsZone2,omitempty"`
-	PointsTop          int           `json:"pointsTop"`
-	FlashBonus         int           `json:"flashBonus,omitempty"`
+
+	ProblemValue `tstype:",extends"`
 }
 
 type ProblemTemplate struct {
@@ -150,10 +155,8 @@ type ProblemTemplate struct {
 	Description        string `json:"description,omitempty"`
 	Zone1Enabled       bool   `json:"zone1Enabled"`
 	Zone2Enabled       bool   `json:"zone2Enabled"`
-	PointsZone1        int    `json:"pointsZone1,omitempty"`
-	PointsZone2        int    `json:"pointsZone2,omitempty"`
-	PointsTop          int    `json:"pointsTop"`
-	FlashBonus         int    `json:"flashBonus,omitempty"`
+
+	ProblemValue `tstype:",extends"`
 }
 
 type ProblemPatch struct {
@@ -283,19 +286,15 @@ type AscentDeregisteredEvent struct {
 }
 
 type ProblemAddedEvent struct {
-	ProblemID   ProblemID `json:"problemId"`
-	PointsZone1 int       `json:"pointsZone1"`
-	PointsZone2 int       `json:"pointsZone2"`
-	PointsTop   int       `json:"pointsTop"`
-	FlashBonus  int       `json:"flashBonus"`
+	ProblemID ProblemID `json:"problemId"`
+
+	ProblemValue `tstype:",extends"`
 }
 
 type ProblemUpdatedEvent struct {
-	ProblemID   ProblemID `json:"problemId"`
-	PointsZone1 int       `json:"pointsZone1"`
-	PointsZone2 int       `json:"pointsZone2"`
-	PointsTop   int       `json:"pointsTop"`
-	FlashBonus  int       `json:"flashBonus"`
+	ProblemID ProblemID `json:"problemId"`
+
+	ProblemValue `tstype:",extends"`
 }
 
 type ProblemDeletedEvent struct {
