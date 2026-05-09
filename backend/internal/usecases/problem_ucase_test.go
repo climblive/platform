@@ -466,10 +466,8 @@ func TestCreateProblem(t *testing.T) {
 		}
 
 		_, err := ucase.CreateProblem(context.Background(), fakedContestID, domain.ProblemTemplate{
-			Number: 10,
-			ProblemValue: domain.ProblemValue{
-				PointsTop: -100,
-			},
+			Number:       10,
+			ProblemValue: domain.ProblemValue{PointsTop: -100},
 		})
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)

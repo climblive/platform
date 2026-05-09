@@ -205,12 +205,7 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 		Description:        strings.TrimSpace(tmpl.Description),
 		Zone1Enabled:       tmpl.Zone1Enabled,
 		Zone2Enabled:       tmpl.Zone2Enabled,
-		ProblemValue: domain.ProblemValue{
-			PointsZone1: tmpl.PointsZone1,
-			PointsZone2: tmpl.PointsZone2,
-			PointsTop:   tmpl.PointsTop,
-			FlashBonus:  tmpl.FlashBonus,
-		},
+		ProblemValue:       tmpl.ProblemValue,
 	}
 
 	if err := (validators.ProblemValidator{}).Validate(problem); err != nil {
@@ -223,13 +218,8 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 	}
 
 	event := domain.ProblemAddedEvent{
-		ProblemID: createdProblem.ID,
-		ProblemValue: domain.ProblemValue{
-			PointsZone1: problem.PointsZone1,
-			PointsZone2: problem.PointsZone2,
-			PointsTop:   problem.PointsTop,
-			FlashBonus:  problem.FlashBonus,
-		},
+		ProblemID:    createdProblem.ID,
+		ProblemValue: problem.ProblemValue,
 	}
 
 	uc.EventBroker.Dispatch(problem.ContestID, event)
