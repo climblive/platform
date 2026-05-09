@@ -57,7 +57,7 @@
     let max = 0;
 
     for (const stat of statsByProblem.values()) {
-      max = Math.max(max, stat.zone1 + stat.zone2 + stat.top + stat.flash);
+      max = Math.max(max, stat.top + stat.flash);
     }
 
     return max;
