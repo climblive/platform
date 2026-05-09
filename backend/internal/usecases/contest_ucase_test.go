@@ -679,10 +679,12 @@ func TestDuplicateContest(t *testing.T) {
 		Description:        "Test Problem",
 		Zone1Enabled:       true,
 		Zone2Enabled:       true,
-		PointsTop:          100,
-		PointsZone1:        50,
-		PointsZone2:        75,
-		FlashBonus:         20,
+		ProblemValue: domain.ProblemValue{
+			PointsTop:   100,
+			PointsZone1: 50,
+			PointsZone2: 75,
+			FlashBonus:  20,
+		},
 	}
 
 	makeMocks := func() (*repositoryMock, *authorizerMock) {
@@ -888,10 +890,12 @@ func TestTransferContest(t *testing.T) {
 		Description:        "Technical slab problem",
 		Zone1Enabled:       true,
 		Zone2Enabled:       true,
-		PointsTop:          100,
-		PointsZone1:        25,
-		PointsZone2:        50,
-		FlashBonus:         10,
+		ProblemValue: domain.ProblemValue{
+			PointsTop:   100,
+			PointsZone1: 25,
+			PointsZone2: 50,
+			FlashBonus:  10,
+		},
 	}
 
 	fakedScore := domain.Score{
@@ -1040,10 +1044,12 @@ func TestTransferContest(t *testing.T) {
 				Description:        "Technical slab problem",
 				Zone1Enabled:       true,
 				Zone2Enabled:       true,
-				PointsTop:          100,
-				PointsZone1:        25,
-				PointsZone2:        50,
-				FlashBonus:         10,
+				ProblemValue: domain.ProblemValue{
+					PointsTop:   100,
+					PointsZone1: 25,
+					PointsZone2: 50,
+					FlashBonus:  10,
+				},
 			}).Return(domain.Problem{}, nil)
 
 		mockedRepo.

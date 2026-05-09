@@ -243,11 +243,13 @@ func TestEngineDriver(t *testing.T) {
 			ProblemID:   1,
 		})
 		events = append(events, domain.ProblemAddedEvent{
-			ProblemID:   1,
-			PointsTop:   1000,
-			PointsZone1: 500,
-			PointsZone2: 750,
-			FlashBonus:  100,
+			ProblemID: 1,
+			ProblemValue: domain.ProblemValue{
+				PointsTop:   1000,
+				PointsZone1: 500,
+				PointsZone2: 750,
+				FlashBonus:  100,
+			},
 		})
 
 		for _, event := range events {
@@ -303,11 +305,13 @@ func TestEngineDriver(t *testing.T) {
 			ProblemID:   1,
 		}).Return()
 		mockedEngine.On("HandleProblemAdded", domain.ProblemAddedEvent{
-			ProblemID:   1,
-			PointsTop:   1000,
-			PointsZone1: 500,
-			PointsZone2: 750,
-			FlashBonus:  100,
+			ProblemID: 1,
+			ProblemValue: domain.ProblemValue{
+				PointsTop:   1000,
+				PointsZone1: 500,
+				PointsZone2: 750,
+				FlashBonus:  100,
+			},
 		}).Run(func(mock.Arguments) { cancel() }).Return()
 
 		installEngine(mockedEngine)
