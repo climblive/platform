@@ -2,7 +2,6 @@
   import "@awesome.me/webawesome/dist/components/popover/popover.js";
   import type { Problem } from "@climblive/lib/models";
   import type { ProblemStats } from "./ProblemsChart.svelte";
-  import SubBar from "./SubBar.svelte";
 
   type Props = {
     problem: Problem;
@@ -26,13 +25,7 @@
       style:--primary-color={problem.holdColorPrimary}
       style:--secondary-color={problem.holdColorSecondary ?? problem.holdColorPrimary}
     >
-      {#if isDual}
-        <div class="dual-top" style:--target-height="{topPct}%"></div>
-      {:else}
-        <div class="side" style:--color={problem.holdColorPrimary}>
-          <SubBar percentage={topPct} fillWeight={1} />
-        </div>
-      {/if}
+      <div class="dual-top" style:--target-height="{topPct}%"></div>
     </div>
   </button>
   <span class="label">#{problem.number}</span>
@@ -112,15 +105,6 @@
       var(--secondary-color) 50% 100%
     );
   }
-
-  .side {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex: 1;
-    flex-direction: column-reverse;
-  }
-
   .label {
     font-size: var(--wa-font-size-xs);
     color: var(--wa-color-text-quiet);
