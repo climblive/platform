@@ -72,7 +72,7 @@
     position: relative;
     display: flex;
     height: 100%;
-    background: rgb(from var(--color) r g b / 2%);
+    background: rgb(from var(--primary-color) r g b / 10%);
     animation: grow var(--wa-transition-slow) var(--wa-transition-easing)
       forwards;
     transform: scaleY(0);
