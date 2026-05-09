@@ -2,7 +2,6 @@
   import "@awesome.me/webawesome/dist/components/popover/popover.js";
   import type { Problem } from "@climblive/lib/models";
   import type { ProblemStats } from "./ProblemsChart.svelte";
-  import SubBar from "./SubBar.svelte";
 
   type Props = {
     problem: Problem;
@@ -14,16 +13,18 @@
   const id = $props.id();
 
   const pct = (count: number) => (maxCount > 0 ? (count / maxCount) * 100 : 0);
-
-  const topPct = $derived(pct(stats.top));
-  const flashPct = $derived(pct(stats.flash));
+  const topPct = $derived(pct(stats.top + stats.flash));
 </script>
 
 <div class="container">
   <button {id} aria-label="Show details for problem #{problem.number}">
-    <div class="fill" style:--color={problem.holdColorPrimary}>
-      <SubBar percentage={flashPct} fillWeight={1} />
-      <SubBar percentage={topPct} fillWeight={0.6} />
+    <div
+      class="fill"
+      style:--primary-color={problem.holdColorPrimary}
+      style:--secondary-color={problem.holdColorSecondary ??
+        problem.holdColorPrimary}
+    >
+      <div class="top" style:--target-height="{topPct}%"></div>
     </div>
   </button>
   <span class="label">#{problem.number}</span>
@@ -68,14 +69,26 @@
   }
 
   .fill {
+    position: relative;
     display: flex;
-    flex-direction: column-reverse;
     height: 100%;
-    background: rgb(from var(--color) r g b / 2%);
+    background: rgb(from var(--primary-color) r g b / 10%);
     animation: grow var(--wa-transition-slow) var(--wa-transition-easing)
       forwards;
     transform: scaleY(0);
     transform-origin: bottom;
+  }
+
+  .top {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    height: var(--target-height);
+    background: linear-gradient(
+      135deg,
+      var(--primary-color) 0 50%,
+      var(--secondary-color) 50% 100%
+    );
   }
 
   .label {
