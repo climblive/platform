@@ -72,7 +72,7 @@
   <input bind:this={hiddenInput} type="hidden" id={name} {name} {required} value={initialValue} />
 
   <button {id} class="trigger" type="button" aria-label={label}>
-    <HoldColorIndicator --height="2rem" --width="2rem" primary={selectedColor} />
+    <HoldColorIndicator --height="2rem" --width="2rem" primary={selectedColor} outlined />
   </button>
 
   <wa-popover bind:this={popover} for={id} {placement} distance={10}>
