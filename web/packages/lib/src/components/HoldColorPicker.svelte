@@ -7,7 +7,7 @@
 
   interface Props {
     label: string;
-    value?: string;
+    value: string | undefined;
     required?: boolean;
     allowClear?: boolean;
     name: string;
@@ -16,7 +16,7 @@
 
   let {
     label,
-    value = $bindable(),
+    value,
     required = false,
     allowClear = false,
     name,
@@ -48,7 +48,6 @@
       return;
     }
 
-    value = color;
     hiddenInput.value = color;
     popover?.hide();
 
@@ -62,7 +61,6 @@
       return;
     }
 
-    value = undefined;
     hiddenInput.value = "";
     popover?.hide();
 

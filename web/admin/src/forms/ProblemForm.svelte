@@ -150,14 +150,14 @@
         name="holdColorPrimary"
         label="Primary hold color"
         required
-        bind:value={data.holdColorPrimary}
+        value={data.holdColorPrimary}
         placement="right"
       />
       <HoldColorPicker
         name="holdColorSecondary"
         label="Secondary hold color"
         allowClear
-        bind:value={data.holdColorSecondary}
+        value={data.holdColorSecondary}
         placement="bottom"
       />
     </div>
