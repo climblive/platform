@@ -12,10 +12,10 @@
     {#if primary || secondary}
       <svg viewBox="0 0 100 100">
         {#if primary}
-          <circle cx="50" cy="50" r="50" fill={primary} />
+          <circle cx="50" cy="50" r="49" fill={primary} />
         {/if}
         {#if secondary}
-          <path d="M0,50 a1,1 0 0,0 100,0" fill={secondary} />
+          <path d="M1,50 a1,1 0 0,0 98,0" fill={secondary} />
         {/if}
       </svg>
     {/if}
