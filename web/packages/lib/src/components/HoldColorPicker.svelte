@@ -16,18 +16,12 @@
 
   let {
     label,
-    value: propValue = $bindable(),
+    value = $bindable(),
     required = false,
     allowClear = false,
     name,
     placement,
   }: Props = $props();
-
-  let value = $state(propValue);
-
-  $effect(() => {
-    propValue = value;
-  });
 
   const id = $props.id();
 
@@ -105,7 +99,7 @@
           </button>
         {/each}
       </div>
-      {#if allowClear}
+      {#if allowClear && !required}
         <wa-button
           class="clear-button"
           size="small"
@@ -152,11 +146,11 @@
   }
 
   .trigger:hover {
-    opacity: color-mix(in srgb, currentColor 10%, transparent);
+    opacity: 0.8;
   }
 
   .trigger:active {
-    opacity: color-mix(in srgb, currentColor 25%, transparent);
+    opacity: 0.6;
   }
 
   wa-popover::part(body) {
