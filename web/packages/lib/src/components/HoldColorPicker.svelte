@@ -16,7 +16,7 @@
 
   let {
     label,
-    value,
+    value: initialValue,
     required = false,
     allowClear = false,
     name,
@@ -40,42 +40,39 @@
     "#fff",
   ];
 
+  let selectedColor = $state(initialValue);
   let popover: WaPopover | undefined = $state();
   let hiddenInput: HTMLInputElement | undefined = $state();
 
   const handleColorSelect = (color: string) => {
-    if (!hiddenInput) {
-      return;
-    }
-
-    hiddenInput.value = color;
-    popover?.hide();
-
+    selectedColor = color;
+    
     if (hiddenInput) {
+      hiddenInput.value = color;
       hiddenInput.dispatchEvent(new Event("input", { bubbles: true }));
     }
+    
+    popover?.hide();
   };
 
   const handleClear = () => {
-    if (!hiddenInput) {
-      return;
-    }
-
-    hiddenInput.value = "";
-    popover?.hide();
-
+    selectedColor = undefined;
+    
     if (hiddenInput) {
+      hiddenInput.value = "";
       hiddenInput.dispatchEvent(new Event("input", { bubbles: true }));
     }
+    
+    popover?.hide();
   };
 </script>
 
 <div class="hold-color-picker">
   <label for={name} class:required>{label}</label>
-  <input bind:this={hiddenInput} type="hidden" id={name} {name} {required} {value} />
+  <input bind:this={hiddenInput} type="hidden" id={name} {name} {required} value={initialValue} />
 
   <button {id} class="trigger" type="button" aria-label={label}>
-    <HoldColorIndicator --height="2rem" --width="2rem" primary={value} />
+    <HoldColorIndicator --height="2rem" --width="2rem" primary={selectedColor} />
   </button>
 
   <wa-popover bind:this={popover} for={id} {placement} distance={10}>
@@ -84,7 +81,7 @@
         {#each colors as color (color)}
           <button
             type="button"
-            class:selected={value === color}
+            class:selected={selectedColor === color}
             onclick={() => handleColorSelect(color)}
             aria-label="Select color {color}"
             role="menuitem"
