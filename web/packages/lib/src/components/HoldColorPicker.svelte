@@ -76,7 +76,7 @@
   <label for={name} class:required>{label}</label>
   <input bind:this={hiddenInput} type="hidden" id={name} {name} {required} {value} />
 
-  <button {id} class="trigger" type="button">
+  <button {id} class="trigger" type="button" aria-label={label}>
     <HoldColorIndicator --height="2rem" --width="2rem" primary={value} />
   </button>
 
