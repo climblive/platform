@@ -58,7 +58,7 @@
 
 <div class="actions">
   <wa-button
-    size="small"
+    size="s"
     variant="neutral"
     appearance="accent"
     onclick={() => createTicketsDialog?.open()}
@@ -69,7 +69,7 @@
   >
   {#if contenders && contenders.length > 0}
     <Link to={`/admin/contests/${contestId}/tickets`}>
-      <wa-button appearance="outlined" size="small"
+      <wa-button appearance="outlined" size="s"
         >View and print tickets
         <wa-icon name="list" slot="start"></wa-icon>
       </wa-button>

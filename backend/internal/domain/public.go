@@ -45,6 +45,8 @@ type Contender struct {
 	Entered             time.Time     `json:"entered,omitzero"`
 	WithdrawnFromFinals bool          `json:"withdrawnFromFinals"`
 	Disqualified        bool          `json:"disqualified"`
+	ScrubbedAt          time.Time     `json:"scrubbedAt,omitzero"`
+	ScrubBefore         time.Time     `json:"scrubBefore,omitzero"`
 	Score               *Score        `json:"score,omitempty"`
 }
 
@@ -58,7 +60,7 @@ type ContenderPatch struct {
 type Contest struct {
 	ID                   ContestID     `json:"id"`
 	Ownership            OwnershipData `json:"ownership"`
-	Archived             bool          `json:"archived"`
+	ArchivedAt           time.Time     `json:"archivedAt,omitzero"`
 	Location             string        `json:"location,omitempty"`
 	Country              string        `json:"country"`
 	SeriesID             SeriesID      `json:"seriesId,omitempty"`
@@ -68,6 +70,7 @@ type Contest struct {
 	Finalists            int           `json:"finalists"`
 	Info                 string        `json:"info,omitempty"`
 	GracePeriod          time.Duration `json:"gracePeriod"`
+	NameRetentionTime    time.Duration `json:"nameRetentionTime"`
 	TimeBegin            time.Time     `json:"timeBegin,omitzero"`
 	TimeEnd              time.Time     `json:"timeEnd,omitzero"`
 	Created              time.Time     `json:"created"`
@@ -84,10 +87,10 @@ type ContestTemplate struct {
 	Finalists          int           `json:"finalists"`
 	Info               string        `json:"info,omitempty"`
 	GracePeriod        time.Duration `json:"gracePeriod"`
+	NameRetentionTime  time.Duration `json:"nameRetentionTime"`
 }
 
 type ContestPatch struct {
-	Archived           Patch[bool]          `json:"archived,omitzero" tstype:"boolean"`
 	Location           Patch[string]        `json:"location,omitzero" tstype:"string"`
 	Country            Patch[string]        `json:"country,omitzero" tstype:"string"`
 	SeriesID           Patch[SeriesID]      `json:"seriesId,omitzero" tstype:"number"`
@@ -124,6 +127,13 @@ type OrganizerInvite struct {
 	ExpiresAt     time.Time         `json:"expiresAt"`
 }
 
+type ProblemValue struct {
+	PointsZone1 int `json:"pointsZone1,omitempty"`
+	PointsZone2 int `json:"pointsZone2,omitempty"`
+	PointsTop   int `json:"pointsTop"`
+	FlashBonus  int `json:"flashBonus,omitempty"`
+}
+
 type Problem struct {
 	ID                 ProblemID     `json:"id"`
 	Ownership          OwnershipData `json:"-"`
@@ -134,10 +144,8 @@ type Problem struct {
 	Description        string        `json:"description,omitempty"`
 	Zone1Enabled       bool          `json:"zone1Enabled"`
 	Zone2Enabled       bool          `json:"zone2Enabled"`
-	PointsZone1        int           `json:"pointsZone1,omitempty"`
-	PointsZone2        int           `json:"pointsZone2,omitempty"`
-	PointsTop          int           `json:"pointsTop"`
-	FlashBonus         int           `json:"flashBonus,omitempty"`
+
+	ProblemValue `tstype:",extends"`
 }
 
 type ProblemTemplate struct {
@@ -147,10 +155,8 @@ type ProblemTemplate struct {
 	Description        string `json:"description,omitempty"`
 	Zone1Enabled       bool   `json:"zone1Enabled"`
 	Zone2Enabled       bool   `json:"zone2Enabled"`
-	PointsZone1        int    `json:"pointsZone1,omitempty"`
-	PointsZone2        int    `json:"pointsZone2,omitempty"`
-	PointsTop          int    `json:"pointsTop"`
-	FlashBonus         int    `json:"flashBonus,omitempty"`
+
+	ProblemValue `tstype:",extends"`
 }
 
 type ProblemPatch struct {
@@ -173,12 +179,13 @@ type Raffle struct {
 }
 
 type RaffleWinner struct {
-	ID            RaffleWinnerID `json:"id"`
-	Ownership     OwnershipData  `json:"-"`
-	RaffleID      RaffleID       `json:"raffleId"`
-	ContenderID   ContenderID    `json:"contenderId"`
-	ContenderName string         `json:"contenderName" tstype:"string,readonly"`
-	Timestamp     time.Time      `json:"timestamp"`
+	ID                  RaffleWinnerID `json:"id"`
+	Ownership           OwnershipData  `json:"-"`
+	RaffleID            RaffleID       `json:"raffleId"`
+	ContenderID         ContenderID    `json:"contenderId"`
+	ContenderName       string         `json:"contenderName"`
+	ContenderScrubbedAt time.Time      `json:"contenderScrubbedAt,omitzero"`
+	Timestamp           time.Time      `json:"timestamp"`
 }
 
 type Score struct {
@@ -202,6 +209,7 @@ type ScoreboardEntry struct {
 	Name                string      `json:"name"`
 	WithdrawnFromFinals bool        `json:"withdrawnFromFinals"`
 	Disqualified        bool        `json:"disqualified"`
+	ScrubbedAt          time.Time   `json:"scrubbedAt,omitzero"`
 	Score               *Score      `json:"score,omitempty"`
 }
 
@@ -224,6 +232,12 @@ type User struct {
 	Username   string      `json:"username"`
 	Admin      bool        `json:"admin"`
 	Organizers []Organizer `json:"organizers"`
+}
+
+type ServiceStatus struct {
+	Name      string    `json:"name"`
+	Healthy   bool      `json:"healthy"`
+	CheckedAt time.Time `json:"checkedAt"`
 }
 
 type ContenderEnteredEvent struct {
@@ -272,19 +286,15 @@ type AscentDeregisteredEvent struct {
 }
 
 type ProblemAddedEvent struct {
-	ProblemID   ProblemID `json:"problemId"`
-	PointsZone1 int       `json:"pointsZone1"`
-	PointsZone2 int       `json:"pointsZone2"`
-	PointsTop   int       `json:"pointsTop"`
-	FlashBonus  int       `json:"flashBonus"`
+	ProblemID ProblemID `json:"problemId"`
+
+	ProblemValue `tstype:",extends"`
 }
 
 type ProblemUpdatedEvent struct {
-	ProblemID   ProblemID `json:"problemId"`
-	PointsZone1 int       `json:"pointsZone1"`
-	PointsZone2 int       `json:"pointsZone2"`
-	PointsTop   int       `json:"pointsTop"`
-	FlashBonus  int       `json:"flashBonus"`
+	ProblemID ProblemID `json:"problemId"`
+
+	ProblemValue `tstype:",extends"`
 }
 
 type ProblemDeletedEvent struct {
@@ -302,6 +312,7 @@ type ContenderPublicInfoUpdatedEvent struct {
 	Name                string      `json:"name"`
 	WithdrawnFromFinals bool        `json:"withdrawnFromFinals"`
 	Disqualified        bool        `json:"disqualified"`
+	ScrubbedAt          time.Time   `json:"scrubbedAt,omitzero"`
 }
 
 type ContenderScoreUpdatedEvent struct {
@@ -322,8 +333,7 @@ type ScoreEngineStoppedEvent struct {
 }
 
 type RaffleWinnerDrawnEvent struct {
-	RaffleID      RaffleID    `json:"raffleId"`
-	ContenderID   ContenderID `json:"contenderId"`
-	ContenderName string      `json:"contenderName"`
-	Timestamp     time.Time   `json:"timestamp"`
+	RaffleID    RaffleID    `json:"raffleId"`
+	ContenderID ContenderID `json:"contenderId"`
+	Timestamp   time.Time   `json:"timestamp"`
 }

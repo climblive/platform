@@ -2,7 +2,7 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { patchContestMutation } from "@climblive/lib/queries";
+  import { restoreContestMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
@@ -12,25 +12,22 @@
 
   let { contestId }: Props = $props();
 
-  const patchContest = $derived(patchContestMutation(contestId));
+  const restoreContest = $derived(restoreContestMutation(contestId));
 
   const handleRestore = () => {
-    patchContest.mutate(
-      { archived: false },
-      {
-        onSuccess: () => {
-          navigate(`/admin/contests/${contestId}`);
-        },
-        onError: () => {
-          toastError("Failed to restore contest.");
-        },
+    restoreContest.mutate(undefined, {
+      onSuccess: () => {
+        navigate(`/admin/contests/${contestId}`);
       },
-    );
+      onError: () => {
+        toastError("Failed to restore contest.");
+      },
+    });
   };
 </script>
 
 <section>
-  <wa-callout variant="danger" size="small">
+  <wa-callout variant="danger" size="s">
     <wa-icon slot="icon" name="box-archive"></wa-icon>
     <p>
       <strong>This contest has been archived.</strong><br />

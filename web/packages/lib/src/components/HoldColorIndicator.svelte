@@ -27,7 +27,6 @@
     height: var(--height, 100%);
     width: var(--width, 100%);
     border-radius: var(--wa-border-radius-pill);
-    box-sizing: border-box;
     overflow: hidden;
     position: relative;
   }
@@ -48,8 +47,6 @@
   .fill {
     height: 100%;
     width: 100%;
-    border-radius: var(--wa-border-radius-circle);
-    overflow: hidden;
   }
 
   .checkerboard {

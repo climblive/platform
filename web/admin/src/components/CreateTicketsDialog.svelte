@@ -109,7 +109,7 @@
   >
   <wa-button
     slot="footer"
-    size="small"
+    size="s"
     variant="neutral"
     appearance="accent"
     loading={createContenders.isPending}

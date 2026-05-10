@@ -29,7 +29,7 @@
   );
 </script>
 
-<wa-callout variant="warning" size="small">
+<wa-callout variant="warning" size="s">
   <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
   <strong>Score engines are managed automatically</strong><br />
   Score engines are started automatically, and manual intervention is typically only
@@ -49,7 +49,7 @@
 {:else}
   {#each scoreEngines as engineInstanceId (engineInstanceId)}
     <wa-button
-      size="small"
+      size="s"
       appearance="outlined"
       variant="danger"
       onclick={() => stopScoreEngine.mutate(engineInstanceId)}
@@ -60,7 +60,7 @@
   {/each}
   {#if scoreEngines.length === 0}
     <wa-button
-      size="small"
+      size="s"
       appearance="outlined"
       variant="neutral"
       onclick={() =>

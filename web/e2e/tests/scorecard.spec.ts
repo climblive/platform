@@ -192,10 +192,11 @@ test("garbage session value in local storage is thrown out", async ({
 test("edit profile", async ({ page }) => {
   await page.goto("/ABCD0003");
 
-  await expect(page.getByText("Michael Scott")).toBeVisible();
-  await expect(
-    page.getByText("Males–World Testing Championships"),
-  ).toBeVisible();
+  const header = page.locator("main > .sticky header");
+
+  await expect(header).toContainText("Michael Scott");
+  await expect(header).toContainText("World Testing Championships");
+  await expect(header).toContainText("Males");
 
   await page.getByRole("button", { name: "Edit" }).click({ force: true });
 
@@ -215,8 +216,8 @@ test("edit profile", async ({ page }) => {
 
   await page.waitForURL("/ABCD0003");
 
-  await expect(page.getByText("Phyllis Lapin-Vance")).toBeVisible();
-  await expect(page.getByText("Females", { exact: true })).toBeVisible();
+  await expect(header).toContainText("Phyllis Lapin-Vance");
+  await expect(header).toContainText("Females");
 });
 
 test("withdraw from finals and reenter", async ({ page }) => {
@@ -427,13 +428,33 @@ test.describe("contest states", () => {
     const timer = page.getByRole("timer", { name: "Time left" });
     await expect(timer).toHaveText("00:00:00");
 
-    await expect(page.getByRole("button", { name: "Edit" })).toBeDisabled();
+    await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
 
     const problem = page.getByRole("region", { name: "Problem 1" });
     await expect(problem).toBeVisible();
 
     await expect(problem.getByRole("button", { name: "Tick" })).toBeDisabled();
   });
+});
+
+test("scrub name", async ({ page }) => {
+  await page.goto("/ABCD0001");
+
+  await expect(page.getByText("Albert Einstein")).toBeVisible();
+
+  await page.getByRole("button", { name: "Edit" }).click({ force: true });
+
+  await page.waitForURL("/ABCD0001/edit");
+
+  await page
+    .getByRole("button", { name: "Remove my name" })
+    .click({ force: true });
+
+  await page.getByRole("button", { name: "Remove my name anyway" }).click();
+
+  await page.waitForURL("/ABCD0001");
+
+  await expect(page.getByText("anon824515495")).toBeVisible();
 });
 
 test.describe("failsafe mode", () => {

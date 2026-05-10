@@ -6,6 +6,7 @@ export * from "./darkmode";
 export * from "./debounce";
 export * from "./errors";
 export * from "./guards";
+export * from "./maskName";
 export * from "./scores";
 export * from "./text";
 export * from "./time.svelte";

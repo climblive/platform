@@ -111,14 +111,14 @@
       <wa-breadcrumb-item>{contest.name}</wa-breadcrumb-item>
     </wa-breadcrumb>
 
-    {#if contest.archived === true}
+    {#if contest.archivedAt != null}
       <RestoreContest {contestId} />
     {:else}
       <ContestDashboard contestId={contest.id} />
 
       <div class="results">
         <wa-button
-          size="small"
+          size="s"
           appearance="outlined"
           variant="brand"
           onclick={() => navigate(`/admin/contests/${contest.id}/results`)}

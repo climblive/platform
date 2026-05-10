@@ -52,7 +52,7 @@
   iconName: string;
 })}
   <wa-button
-    size="small"
+    size="s"
     onclick={(e: MouseEvent) => {
       e.preventDefault();
 

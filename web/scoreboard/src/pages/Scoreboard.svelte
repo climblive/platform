@@ -72,7 +72,7 @@
         {#if compClasses.length > 1}
           <wa-select
             bind:this={compClassSelector}
-            size="small"
+            size="s"
             name="compClassId"
             label="Competition class"
             {@attach value(selectedCompClassId)}
@@ -99,6 +99,7 @@
                 : "false"}
             >
               <Header
+                {contestId}
                 compClassId={compClass.id}
                 name={compClass.name}
                 startTime={compClass.timeBegin}

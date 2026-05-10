@@ -3,7 +3,7 @@
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { patchContestMutation } from "@climblive/lib/queries";
+  import { archiveContestMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
@@ -16,7 +16,7 @@
 
   let { contestId, organizerId }: Props = $props();
 
-  const archiveContest = $derived(patchContestMutation(contestId));
+  const archiveContest = $derived(archiveContestMutation(contestId));
 
   const handleArchive = async () => {
     if (dialog) {
@@ -31,18 +31,15 @@
   };
 
   const confirmArchivation = () => {
-    archiveContest.mutate(
-      { archived: true },
-      {
-        onSuccess: () => {
-          handleCancel();
-          navigate(`/admin/organizers/${organizerId}/contests`);
-        },
-        onError: () => {
-          toastError("Failed to archive contest.");
-        },
+    archiveContest.mutate(undefined, {
+      onSuccess: () => {
+        handleCancel();
+        navigate(`/admin/organizers/${organizerId}/contests`);
       },
-    );
+      onError: () => {
+        toastError("Failed to archive contest.");
+      },
+    });
   };
 </script>
 

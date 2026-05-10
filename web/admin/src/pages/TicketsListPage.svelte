@@ -185,7 +185,7 @@
 
 {#snippet renderSelectAll()}
   <wa-checkbox
-    size="small"
+    size="s"
     checked={allSelected}
     indeterminate={selectedCount > 0 && !allSelected}
     onchange={handleToggleSelectAll}
@@ -194,7 +194,7 @@
 
 {#snippet renderCheckbox(contender: Contender)}
   <wa-checkbox
-    size="small"
+    size="s"
     checked={isSelected(contender.id)}
     disabled={isLocked(contender.id)}
     onchange={(e: InputEvent) => handleCheckboxChange(contender.id, e)}
@@ -250,7 +250,7 @@
   <div class="controls">
     <div class="selection-actions">
       <wa-button
-        size="small"
+        size="s"
         variant="neutral"
         appearance="accent"
         onclick={() => createTicketsDialog?.open()}
@@ -261,7 +261,7 @@
       >
       <a href={printUrl} target="_blank">
         <wa-button
-          size="small"
+          size="s"
           appearance="outlined"
           disabled={selectedCount === 0}
         >
@@ -275,7 +275,7 @@
     </div>
 
     <wa-switch
-      size="small"
+      size="s"
       checked={showUnusedOnly}
       onchange={handleToggleUnusedOnly}>Show unused only</wa-switch
     >
