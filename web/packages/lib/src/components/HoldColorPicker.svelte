@@ -16,12 +16,18 @@
 
   let {
     label,
-    value = $bindable(),
+    value: propValue = $bindable(),
     required = false,
     allowClear = false,
     name,
     placement,
   }: Props = $props();
+
+  let value = $state(propValue);
+
+  $effect(() => {
+    propValue = value;
+  });
 
   const id = $props.id();
 
@@ -73,10 +79,10 @@
 </script>
 
 <div class="hold-color-picker">
-  <label class:required>{label}</label>
-  <input bind:this={hiddenInput} type="hidden" {name} {required} {value} />
+  <label for={name} class:required>{label}</label>
+  <input bind:this={hiddenInput} type="hidden" id={name} {name} {required} {value} />
 
-  <button {id} class="trigger-button" type="button">
+  <button {id} class="trigger" type="button">
     <HoldColorIndicator --height="2rem" --width="2rem" primary={value} />
   </button>
 
@@ -86,7 +92,6 @@
         {#each colors as color (color)}
           <button
             type="button"
-            class="color-button"
             class:selected={value === color}
             onclick={() => handleColorSelect(color)}
             aria-label="Select color {color}"
@@ -100,7 +105,7 @@
           </button>
         {/each}
       </div>
-      {#if allowClear && !required}
+      {#if allowClear}
         <wa-button
           class="clear-button"
           size="small"
@@ -137,7 +142,7 @@
     margin-inline-start: var(--wa-form-control-required-content-offset);
   }
 
-  .trigger-button {
+  .trigger {
     border: none;
     background: transparent;
     width: max-content;
@@ -146,12 +151,12 @@
     transition: opacity var(--wa-transition-fast);
   }
 
-  .trigger-button:hover {
-    opacity: 0.8;
+  .trigger:hover {
+    opacity: color-mix(in srgb, currentColor 10%, transparent);
   }
 
-  .trigger-button:active {
-    opacity: 0.6;
+  .trigger:active {
+    opacity: color-mix(in srgb, currentColor 25%, transparent);
   }
 
   wa-popover::part(body) {
@@ -170,13 +175,13 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: var(--wa-space-xs);
-  }
 
-  .color-button {
-    background-color: transparent;
-    cursor: pointer;
-    border: none;
-    padding: var(--wa-space-2xs);
+    button {
+      background-color: transparent;
+      cursor: pointer;
+      border: none;
+      padding: 0;
+    }
   }
 
   .clear-button {
