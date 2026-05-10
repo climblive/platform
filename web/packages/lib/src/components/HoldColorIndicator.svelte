@@ -40,6 +40,8 @@
     outline: var(--wa-form-control-border-width)
       var(--wa-form-control-border-style) var(--wa-form-control-border-color);
     outline-offset: calc(-1 * var(--wa-form-control-border-width));
+    box-shadow: inset 0 0 0 var(--wa-form-control-border-width)
+      var(--wa-form-control-border-color);
     pointer-events: none;
   }
 
