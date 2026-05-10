@@ -43,6 +43,8 @@
     box-shadow: inset 0 0 0 var(--wa-form-control-border-width)
       var(--wa-form-control-border-color);
     pointer-events: none;
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
 
   .fill {
