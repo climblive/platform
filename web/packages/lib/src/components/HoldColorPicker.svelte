@@ -90,6 +90,7 @@
               --height="2rem"
               --width="2rem"
               primary={color}
+              outlined
             />
           </button>
         {/each}

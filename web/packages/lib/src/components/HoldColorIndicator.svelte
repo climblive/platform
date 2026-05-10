@@ -2,12 +2,13 @@
   interface Props {
     primary: string | undefined;
     secondary?: string | undefined;
+    outlined?: boolean;
   }
 
-  let { primary, secondary }: Props = $props();
+  let { primary, secondary, outlined = false }: Props = $props();
 </script>
 
-<div class="indicator">
+<div class="indicator" class:outlined>
   <div class="fill" class:checkerboard={primary === undefined}>
     {#if primary || secondary}
       <svg viewBox="0 0 100 100">
@@ -45,6 +46,10 @@
   .fill {
     height: 100%;
     width: 100%;
+  }
+
+  .outlined svg {
+    padding: calc(2 * var(--wa-form-control-border-width));
   }
 
   .checkerboard {
