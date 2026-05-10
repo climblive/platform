@@ -175,6 +175,11 @@
       cursor: pointer;
       border: none;
       padding: 0;
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 
