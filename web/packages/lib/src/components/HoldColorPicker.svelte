@@ -152,14 +152,6 @@
     transition: opacity var(--wa-transition-fast);
   }
 
-  .trigger:hover {
-    opacity: 0.8;
-  }
-
-  .trigger:active {
-    opacity: 0.6;
-  }
-
   wa-popover::part(body) {
     background-color: var(--wa-color-surface-raised);
     border: var(--wa-border-style) var(--wa-border-width-s)
