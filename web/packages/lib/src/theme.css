@@ -36,7 +36,6 @@ html,
 body {
   transform: translateZ(0);
   will-change: transform;
-  overflow-x: hidden;
 }
 
 body {
