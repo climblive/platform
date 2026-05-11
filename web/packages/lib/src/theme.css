@@ -26,7 +26,16 @@
   --wa-font-size-4xl: 3.25rem;
 
   --wa-border-width-s: var(--wa-border-width-m);
+  --wa-form-control-required-content-color: var(--wa-color-danger-fill-loud);
+  --wa-form-control-required-content-offset: 0.1em;
+
   line-height: var(--wa-line-height-condensed);
+}
+
+html,
+body {
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 body {
