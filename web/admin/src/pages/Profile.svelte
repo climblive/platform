@@ -42,7 +42,7 @@
     size="s"
     appearance="plain"
     aria-label={`Open organizer ${name}`}
-    onclick={() => navigate(`/admin/organizers/${id}/contests`)}
+    onclick={() => navigate(`/admin/organizers/${id}`)}
   >
     Open
     <wa-icon slot="end" name="arrow-right"></wa-icon>
