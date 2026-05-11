@@ -106,7 +106,7 @@
           </button>
         {/each}
       </div>
-      {#if allowClear && !required}
+      {#if allowClear}
         <wa-button
           class="clear-button"
           size="small"
@@ -145,11 +145,10 @@
 
   .trigger {
     border: none;
-    background: transparent;
+    background: none;
     width: max-content;
     cursor: pointer;
     padding: 0;
-    transition: opacity var(--wa-transition-fast);
   }
 
   wa-popover::part(body) {
@@ -170,7 +169,7 @@
     gap: var(--wa-space-xs);
 
     button {
-      background-color: transparent;
+      background: none;
       cursor: pointer;
       border: none;
       padding: 0;
