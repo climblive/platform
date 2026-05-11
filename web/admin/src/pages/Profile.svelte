@@ -20,11 +20,13 @@
 
   const organizerColumns: ColumnDefinition<Organizer>[] = [
     {
+      label: "Name",
       mobile: true,
       render: renderOrganizerName,
       width: "1fr",
     },
     {
+      label: "",
       mobile: true,
       render: renderOrganizerActions,
       width: "max-content",
@@ -44,8 +46,8 @@
     aria-label={`Open settings for organizer ${name}`}
     onclick={() => navigate(`/admin/organizers/${id}`)}
   >
+    <wa-icon slot="start" name="gear"></wa-icon>
     Settings
-    <wa-icon slot="end" name="arrow-right"></wa-icon>
   </wa-button>
 {/snippet}
 
@@ -137,14 +139,6 @@
     display: flex;
     align-items: center;
     gap: var(--wa-space-s);
-  }
-
-  .organizers-table :global(thead) {
-    display: none;
-  }
-
-  .organizers-table :global(tbody tr:first-of-type) {
-    border-top: none;
   }
 
   .remove-account wa-callout {
