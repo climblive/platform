@@ -41,10 +41,10 @@
   <wa-button
     size="s"
     appearance="plain"
-    aria-label={`Open organizer ${name}`}
+    aria-label={`Open settings for organizer ${name}`}
     onclick={() => navigate(`/admin/organizers/${id}`)}
   >
-    Open
+    Settings
     <wa-icon slot="end" name="arrow-right"></wa-icon>
   </wa-button>
 {/snippet}
@@ -63,9 +63,6 @@
     <div class="content">
       <div>
         <h1>Profile</h1>
-        <p class="description">
-          Manage your account details and support options.
-        </p>
       </div>
 
       <div>
@@ -125,11 +122,6 @@
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-xl);
-  }
-
-  .description {
-    margin: 0;
-    color: var(--wa-color-text-quiet);
   }
 
   h1,
