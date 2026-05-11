@@ -62,7 +62,7 @@
           <wa-button
             size="s"
             appearance="outlined"
-            aria-label="Open profile"
+            aria-label="Account profile"
             onclick={() => navigate("/admin/profile")}
           >
             <wa-icon name="circle-user"></wa-icon>
