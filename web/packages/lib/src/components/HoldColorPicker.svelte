@@ -112,7 +112,6 @@
           size="small"
           appearance="outlined"
           onclick={handleClear}
-          aria-label="Clear color selection"
         >
           Clear
           <wa-icon slot="start" name="xmark"></wa-icon>
