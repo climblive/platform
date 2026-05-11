@@ -70,7 +70,18 @@
 
       <div>
         <h2>Username</h2>
-        <p>{self.username}</p>
+        <div class="username-row">
+          <p>{self.username}</p>
+          <wa-button
+            variant="neutral"
+            appearance="outlined"
+            size="s"
+            onclick={authenticator.logout}
+          >
+            <wa-icon slot="start" name="right-from-bracket"></wa-icon>
+            Sign out
+          </wa-button>
+        </div>
       </div>
 
       <div>
@@ -98,15 +109,6 @@
           To remove your account, please contact support at
           <a href="mailto:info@climblive.com">info@climblive.com</a>.
         </wa-callout>
-        <wa-button
-          variant="neutral"
-          appearance="outlined"
-          size="s"
-          onclick={authenticator.logout}
-        >
-          <wa-icon slot="start" name="right-from-bracket"></wa-icon>
-          Sign out
-        </wa-button>
       </div>
     </div>
   </section>
@@ -139,6 +141,12 @@
     margin: 0;
   }
 
+  .username-row {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-s);
+  }
+
   .organizers-table :global(thead) {
     display: none;
   }
@@ -147,8 +155,7 @@
     border-top: none;
   }
 
-  .remove-account wa-callout,
-  .remove-account wa-button {
+  .remove-account wa-callout {
     margin-block-start: var(--wa-space-s);
   }
 </style>
