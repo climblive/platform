@@ -41,7 +41,6 @@
       var(--wa-form-control-border-style) var(--wa-form-control-border-color);
     outline-offset: calc(-1 * var(--wa-form-control-border-width));
     pointer-events: none;
-    transform: translateZ(0);
   }
 
   .fill {

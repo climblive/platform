@@ -32,6 +32,13 @@
   line-height: var(--wa-line-height-condensed);
 }
 
+html,
+body {
+  transform: translateZ(0);
+  will-change: transform;
+  overflow-x: hidden;
+}
+
 body {
   font-family: "Noto Sans", sans-serif;
   background-color: var(--wa-color-surface-default);
