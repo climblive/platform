@@ -62,9 +62,10 @@
           <wa-button
             size="s"
             appearance="outlined"
+            aria-label="Open profile"
             onclick={() => navigate("/admin/profile")}
           >
-            Account<wa-icon slot="start" name="circle-user"></wa-icon>
+            <wa-icon name="circle-user"></wa-icon>
           </wa-button>
           <wa-dropdown
             onwa-select={(event: WaSelectEvent) => {
