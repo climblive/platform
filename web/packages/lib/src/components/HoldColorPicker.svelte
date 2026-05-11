@@ -68,8 +68,8 @@
 </script>
 
 <div class="hold-color-picker">
-  <label for={name} class:required>{label}</label>
-  <input bind:this={hiddenInput} type="hidden" id={name} {name} {required} value={initialValue} />
+  <label for={id} class:required>{label}</label>
+  <input bind:this={hiddenInput} type="hidden" {name} {required} value={initialValue} />
 
   <button {id} class="trigger" type="button" aria-label={label}>
     <HoldColorIndicator --height="2rem" --width="2rem" primary={selectedColor} outlined />
@@ -171,11 +171,6 @@
       cursor: pointer;
       border: none;
       padding: 0;
-      min-width: 44px;
-      min-height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
   }
 

@@ -13,10 +13,10 @@
     {#if primary || secondary}
       <svg viewBox="0 0 100 100">
         {#if primary}
-          <circle cx="50" cy="50" r="49" fill={primary} />
+          <circle cx="50" cy="50" r="50" fill={primary} />
         {/if}
         {#if secondary}
-          <path d="M1,50 a1,1 0 0,0 98,0" fill={secondary} />
+          <path d="M0,50 a1,1 0 0,0 100,0" fill={secondary} />
         {/if}
       </svg>
     {/if}
@@ -40,11 +40,8 @@
     outline: var(--wa-form-control-border-width)
       var(--wa-form-control-border-style) var(--wa-form-control-border-color);
     outline-offset: calc(-1 * var(--wa-form-control-border-width));
-    box-shadow: inset 0 0 0 var(--wa-form-control-border-width)
-      var(--wa-form-control-border-color);
     pointer-events: none;
     transform: translateZ(0);
-    backface-visibility: hidden;
   }
 
   .fill {
