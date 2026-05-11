@@ -27,7 +27,8 @@ export const getCompClassesQuery = (
     ...options,
     queryKey: ["comp-classes", { contestId }],
     queryFn: async () => {
-      const compClasses = await ApiClient.getInstance().getCompClasses(contestId);
+      const compClasses =
+        await ApiClient.getInstance().getCompClasses(contestId);
 
       for (const compClass of compClasses) {
         client.setQueryData<CompClass>(
