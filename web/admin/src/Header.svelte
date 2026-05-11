@@ -68,7 +68,9 @@
           </wa-button>
           <wa-dropdown
             onwa-select={(event: WaSelectEvent) => {
-              if ((event.detail.item as WaDropdownItem).value === "sign-out") {
+              const { item } = event.detail;
+
+              if (item instanceof WaDropdownItem && item.value === "sign-out") {
                 authenticator.logout();
               }
             }}

@@ -7,7 +7,7 @@
     Table,
     type ColumnDefinition,
   } from "@climblive/lib/components";
-  import type { Organizer, User } from "@climblive/lib/models";
+  import type { Organizer } from "@climblive/lib/models";
   import { getSelfQuery } from "@climblive/lib/queries";
   import { navigate } from "svelte-routing";
 
@@ -26,10 +26,6 @@
 
 {#snippet renderOrganizerName({ name }: Organizer)}
   {name}
-{/snippet}
-
-{#snippet renderUsername({ username }: User)}
-  {username}
 {/snippet}
 
 {#if self === undefined}
@@ -53,7 +49,7 @@
 
       <div>
         <h2>Username</h2>
-        <p>{@render renderUsername(self)}</p>
+        <p>{self.username}</p>
       </div>
 
       <div>
