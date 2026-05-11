@@ -126,11 +126,6 @@
     gap: var(--wa-space-xl);
   }
 
-  h1,
-  h2 {
-    margin: 0 0 var(--wa-space-s);
-  }
-
   p {
     margin: 0;
   }
