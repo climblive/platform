@@ -468,11 +468,13 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return()
 
 		f.engine.HandleProblemAdded(domain.ProblemAddedEvent{
-			ProblemID:   1,
-			PointsTop:   100,
-			PointsZone1: 50,
-			PointsZone2: 75,
-			FlashBonus:  10,
+			ProblemID: 1,
+			ProblemValue: domain.ProblemValue{
+				PointsTop:   100,
+				PointsZone1: 50,
+				PointsZone2: 75,
+				FlashBonus:  10,
+			},
 		})
 
 		awaitExpectations(t)
