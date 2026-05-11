@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import Loader from "@/components/Loader.svelte";
@@ -9,23 +10,43 @@
   } from "@climblive/lib/components";
   import type { Organizer } from "@climblive/lib/models";
   import { getSelfQuery } from "@climblive/lib/queries";
+  import { getContext } from "svelte";
   import { navigate } from "svelte-routing";
+  import type { Authenticator } from "../authenticator.svelte";
 
   const selfQuery = $derived(getSelfQuery());
   const self = $derived(selfQuery.data);
+  const authenticator = getContext<Authenticator>("authenticator");
 
   const organizerColumns: ColumnDefinition<Organizer>[] = [
     {
-      label: "Organizer",
       mobile: true,
       render: renderOrganizerName,
       width: "1fr",
+    },
+    {
+      mobile: true,
+      render: renderOrganizerActions,
+      width: "max-content",
+      align: "right",
     },
   ];
 </script>
 
 {#snippet renderOrganizerName({ name }: Organizer)}
   {name}
+{/snippet}
+
+{#snippet renderOrganizerActions({ id, name }: Organizer)}
+  <wa-button
+    size="s"
+    appearance="plain"
+    aria-label={`Open organizer ${name}`}
+    onclick={() => navigate(`/admin/organizers/${id}/contests`)}
+  >
+    Open
+    <wa-icon slot="end" name="arrow-right"></wa-icon>
+  </wa-button>
 {/snippet}
 
 {#if self === undefined}
@@ -55,11 +76,13 @@
       <div>
         <h2>Organizers</h2>
         {#if self.organizers.length > 0}
-          <Table
-            columns={organizerColumns}
-            data={self.organizers}
-            getId={({ id }) => id}
-          ></Table>
+          <div class="organizers-table">
+            <Table
+              columns={organizerColumns}
+              data={self.organizers}
+              getId={({ id }) => id}
+            ></Table>
+          </div>
         {:else}
           <EmptyState
             title="No organizers yet"
@@ -68,13 +91,22 @@
         {/if}
       </div>
 
-      <div>
+      <div class="remove-account">
         <h2>Remove account</h2>
         <wa-callout variant="warning">
           <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
           To remove your account, please contact support at
           <a href="mailto:info@climblive.com">info@climblive.com</a>.
         </wa-callout>
+        <wa-button
+          variant="neutral"
+          appearance="outlined"
+          size="s"
+          onclick={authenticator.logout}
+        >
+          <wa-icon slot="start" name="right-from-bracket"></wa-icon>
+          Sign out
+        </wa-button>
       </div>
     </div>
   </section>
@@ -100,10 +132,23 @@
 
   h1,
   h2 {
-    margin-block: 0;
+    margin: 0 0 var(--wa-space-s);
   }
 
   p {
-    margin-block: var(--wa-space-xs) 0;
+    margin: 0;
+  }
+
+  .organizers-table :global(thead) {
+    display: none;
+  }
+
+  .organizers-table :global(tbody tr:first-of-type) {
+    border-top: none;
+  }
+
+  .remove-account wa-callout,
+  .remove-account wa-button {
+    margin-block-start: var(--wa-space-s);
   }
 </style>
