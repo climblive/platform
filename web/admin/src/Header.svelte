@@ -1,6 +1,10 @@
 <script lang="ts">
+  import { type WaSelectEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/badge/badge.js";
+  import "@awesome.me/webawesome/dist/components/button-group/button-group.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
+  import WaDropdownItem from "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { FullLogo } from "@climblive/lib/components";
   import { getHealthQuery, getSelfQuery } from "@climblive/lib/queries";
@@ -54,14 +58,35 @@
             <wa-icon name="heart-pulse"></wa-icon>
           </wa-button>
         {/if}
-        <wa-button
-          size="s"
-          appearance="outlined"
-          onclick={authenticator.logout}
-        >
-          Sign out<wa-icon slot="start" name="right-from-bracket"
-          ></wa-icon></wa-button
-        >
+        <wa-button-group label="Account actions">
+          <wa-button
+            size="s"
+            appearance="outlined"
+            onclick={() => navigate("/admin/profile")}
+          >
+            Account<wa-icon slot="start" name="circle-user"></wa-icon>
+          </wa-button>
+          <wa-dropdown
+            onwa-select={(event: WaSelectEvent) => {
+              if ((event.detail.item as WaDropdownItem).value === "sign-out") {
+                authenticator.logout();
+              }
+            }}
+          >
+            <wa-button
+              slot="trigger"
+              size="s"
+              appearance="outlined"
+              aria-label="Open account actions"
+            >
+              <wa-icon name="chevron-down"></wa-icon>
+            </wa-button>
+            <wa-dropdown-item value="sign-out" variant="danger">
+              <wa-icon slot="icon" name="right-from-bracket"></wa-icon>
+              Sign out
+            </wa-dropdown-item>
+          </wa-dropdown>
+        </wa-button-group>
       </div>
     </div>
   </header>
