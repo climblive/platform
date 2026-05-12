@@ -5,7 +5,7 @@ packages:
   - "packages/*"
   - e2e
   - www
-allowedBuilds:
+allowBuilds:
   '@sentry/cli': true
   cpu-features: true
   esbuild: true
