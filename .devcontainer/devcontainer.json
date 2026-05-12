@@ -20,7 +20,7 @@
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
     "ghcr.io/devcontainers/features/node:1": {
       "version": "22",
-      "pnpmVersion": "9.14.4"
+      "pnpmVersion": "11.0.0"
     }
   },
   "forwardPorts": [8090],
