@@ -44,7 +44,7 @@ importers:
         specifier: ^2.13.0
         version: 2.13.0
       zod:
-        specifier: ^4.4.3
+        specifier: ^4.3.6
         version: 4.4.3
     devDependencies:
       '@sentry/vite-plugin':
@@ -120,7 +120,7 @@ importers:
         specifier: ^8.0.1
         version: 8.0.1
       zod:
-        specifier: ^4.4.3
+        specifier: ^4.3.6
         version: 4.4.3
     devDependencies:
       '@eslint/js':
@@ -193,7 +193,7 @@ importers:
         specifier: ^2.13.0
         version: 2.13.0
       zod:
-        specifier: ^4.4.3
+        specifier: ^4.3.6
         version: 4.4.3
     devDependencies:
       '@sentry/vite-plugin':
@@ -251,7 +251,7 @@ importers:
         specifier: ^2.13.0
         version: 2.13.0
       zod:
-        specifier: ^4.4.3
+        specifier: ^4.3.6
         version: 4.4.3
     devDependencies:
       '@sentry/vite-plugin':
