@@ -7,7 +7,11 @@
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
-  import { Table, type ColumnDefinition } from "@climblive/lib/components";
+  import {
+    ContenderName,
+    Table,
+    type ColumnDefinition,
+  } from "@climblive/lib/components";
   import { value } from "@climblive/lib/forms";
   import type { ScoreboardEntry } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
@@ -107,12 +111,17 @@
   ];
 </script>
 
-{#snippet renderName({ contenderId, name, disqualified }: ScoreboardEntry)}
+{#snippet renderName({
+  contenderId,
+  name,
+  disqualified,
+  scrubbedAt,
+}: ScoreboardEntry)}
   <Link to={`./contenders/${contenderId}`}>
     {#if disqualified}
-      <del>{name}</del>
+      <del><ContenderName id={contenderId} {name} {scrubbedAt} /></del>
     {:else}
-      {name}
+      <ContenderName id={contenderId} {name} {scrubbedAt} />
     {/if}
   </Link>
 {/snippet}
@@ -135,52 +144,56 @@
   <wa-icon name={score?.finalist ? "medal" : "minus"}></wa-icon>
 {/snippet}
 
-{#if compClasses}
-  <div class="controls">
-    <wa-input
-      bind:this={quickFilter}
-      size="small"
-      label="Quick filter"
-      placeholder="Search by name..."
-      oninput={() => {
-        filterText = quickFilter?.value ?? "";
-      }}
-      with-clear
-    ></wa-input>
-    <wa-select
-      bind:this={compClassSelector}
-      size="small"
-      label="Class filter"
-      {@attach value(selectedCompClassId)}
-      onchange={() => {
-        selectedCompClassId = Number(compClassSelector?.value);
-      }}
-    >
-      {#each compClasses as compClass (compClass.id)}
-        {@const count = contenderCounts.get(compClass.id)}
+<h2>Scores</h2>
 
-        <wa-option value={compClass.id} label={compClass.name}>
-          <div class="label">
-            {compClass.name}
-            {#if count}
-              <wa-badge pill variant="neutral">{count}</wa-badge>
+<section>
+  {#if compClasses}
+    <div class="controls">
+      <wa-input
+        bind:this={quickFilter}
+        size="s"
+        label="Quick filter"
+        placeholder="Search by name..."
+        oninput={() => {
+          filterText = quickFilter?.value ?? "";
+        }}
+        with-clear
+      ></wa-input>
+      <wa-select
+        bind:this={compClassSelector}
+        size="s"
+        label="Class filter"
+        {@attach value(selectedCompClassId)}
+        onchange={() => {
+          selectedCompClassId = Number(compClassSelector?.value);
+        }}
+      >
+        {#each compClasses as compClass (compClass.id)}
+          {@const count = contenderCounts.get(compClass.id)}
+
+          <wa-option value={compClass.id} label={compClass.name}>
+            <div class="label">
+              {compClass.name}
+              {#if count}
+                <wa-badge pill variant="neutral">{count}</wa-badge>
+              {/if}
+            </div>
+            {#if compClass.description}
+              <small>{compClass.description}</small>
             {/if}
-          </div>
-          {#if compClass.description}
-            <small>{compClass.description}</small>
-          {/if}
-        </wa-option>
-      {/each}
-    </wa-select>
-  </div>
-{/if}
+          </wa-option>
+        {/each}
+      </wa-select>
+    </div>
+  {/if}
 
-{#if loading}
-  <Loader />
-{:else}
-  <Table {columns} data={tableData} getId={({ contenderId }) => contenderId}
-  ></Table>
-{/if}
+  {#if loading}
+    <Loader />
+  {:else}
+    <Table {columns} data={tableData} getId={({ contenderId }) => contenderId}
+    ></Table>
+  {/if}
+</section>
 
 <style>
   .label {
@@ -199,5 +212,11 @@
     & > * {
       width: 100%;
     }
+  }
+
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-m);
   }
 </style>

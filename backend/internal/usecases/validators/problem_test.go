@@ -21,10 +21,12 @@ func TestProblemValidator(t *testing.T) {
 			Description:        "First boulder",
 			Zone1Enabled:       true,
 			Zone2Enabled:       true,
-			PointsZone1:        50,
-			PointsZone2:        75,
-			PointsTop:          100,
-			FlashBonus:         10,
+			ProblemValue: domain.ProblemValue{
+				PointsZone1: 50,
+				PointsZone2: 75,
+				PointsTop:   100,
+				FlashBonus:  10,
+			},
 		}
 	}
 

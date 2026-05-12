@@ -73,7 +73,7 @@
           }
         }}
       >
-        <wa-button slot="trigger" size="small" appearance="plain">
+        <wa-button slot="trigger" size="s" appearance="plain">
           <wa-icon name="ellipsis-vertical" label="Actions"></wa-icon>
         </wa-button>
         <wa-dropdown-item value="delete" variant="danger">

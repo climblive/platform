@@ -1,78 +1,78 @@
 <script lang="ts">
-  import logoUrl from "@/assets/logo.svg";
-  import { type ContestState } from "@climblive/lib/types";
-  import { Link, navigate } from "svelte-routing";
+  import { ContenderName, FullLogo } from "@climblive/lib/components";
+  import { navigate } from "svelte-routing";
 
   interface Props {
     registrationCode: string;
     contestName: string;
     compClassName: string | undefined;
+    contenderId: number;
     contenderName: string | undefined;
-    contestState: ContestState;
+    contenderScrubbedAt: Date | undefined;
   }
 
   const {
     registrationCode,
     contestName,
     compClassName,
+    contenderId,
     contenderName,
-    contestState,
+    contenderScrubbedAt,
   }: Props = $props();
 </script>
 
 <header>
-  <div class="identity">
-    <Link to="/">
-      <img class="logo" src={logoUrl} alt="ClimbLive logo" />
-    </Link>
-    <div class="info">
-      <h1>{contenderName}</h1>
-      <p class="subtitle">
-        <span>{compClassName}</span><span class="separator">–</span
-        >{contestName}
-      </p>
+  <div class="top">
+    <div class="logo">
+      <FullLogo />
     </div>
+
+    <wa-button
+      size="small"
+      onclick={() => navigate(`/${registrationCode}/edit`)}
+      appearance="plain"
+    >
+      <wa-icon name="gear" label="Edit"></wa-icon>
+    </wa-button>
   </div>
-  <wa-button
-    size="medium"
-    onclick={() => navigate(`/${registrationCode}/edit`)}
-    disabled={contestState === "ENDED"}
-    appearance="plain"
-  >
-    <wa-icon name="gear" label="Edit"></wa-icon>
-  </wa-button>
+  <div>
+    <h1>
+      <ContenderName
+        id={contenderId}
+        name={contenderName}
+        scrubbedAt={contenderScrubbedAt}
+        withTooltip
+      />
+    </h1>
+    <p class="subtitle">
+      {contestName}<span class="separator"> / </span>{compClassName}
+    </p>
+  </div>
 </header>
 
 <style>
   header {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--wa-space-s);
+    flex-direction: column;
+    gap: var(--wa-space-xs);
     padding-block-start: var(--wa-space-l);
   }
 
-  .identity {
+  .logo {
+    height: var(--wa-font-size-l);
+  }
+
+  .top {
     display: flex;
     align-items: center;
-    gap: var(--wa-space-xs);
-    min-width: 0;
-  }
-
-  .info {
-    min-width: 0;
-  }
-
-  .logo {
-    width: calc(var(--wa-font-size-l) * 2);
-    height: calc(var(--wa-font-size-l) * 2);
-    flex-shrink: 0;
+    justify-content: space-between;
+    overflow-y: visible;
+    height: var(--wa-font-size-l);
   }
 
   h1 {
     margin: 0;
-    margin-block-start: -0.25rem;
-    font-size: var(--wa-font-size-l);
+    font-size: var(--wa-font-size-xl);
     font-weight: var(--wa-font-weight-bold);
     line-height: var(--wa-line-height-condensed);
     white-space: nowrap;
@@ -82,7 +82,8 @@
 
   .subtitle {
     margin: 0;
-    font-size: var(--wa-font-size-s);
+    margin-block-start: var(--wa-space-2xs);
+    font-size: var(--wa-font-size-m);
     color: var(--wa-color-text-quiet);
     line-height: var(--wa-line-height-condensed);
     white-space: nowrap;
@@ -91,9 +92,8 @@
   }
 
   .separator {
-    margin-inline: var(--wa-space-3xs);
+    margin-inline: var(--wa-space-2xs);
   }
-
   wa-button {
     flex-shrink: 0;
   }

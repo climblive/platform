@@ -1,7 +1,7 @@
 <script lang="ts" module>
   import { z } from "@climblive/lib/utils";
 
-  export const formSchema = z.object({
+  export const editFormSchema = z.object({
     location: z.string().optional(),
     country: z.string(),
     seriesId: z.coerce.number().optional(),
@@ -11,7 +11,17 @@
     gracePeriod: z.coerce.number().min(0).max(60),
   });
 
-  export const minuteInNanoseconds = 60 * 1_000_000_000;
+  export const formSchema = editFormSchema.extend({
+    nameRetentionTime: z.coerce.number(),
+  });
+
+  export const nanosecondsInMinute = 60 * 1_000_000_000;
+
+  export const retentionOptions = [
+    { label: "14 days", value: 14 * 24 * 60 * nanosecondsInMinute },
+    { label: "30 days", value: 30 * 24 * 60 * nanosecondsInMinute },
+    { label: "90 days", value: 90 * 24 * 60 * nanosecondsInMinute },
+  ];
 </script>
 
 <script lang="ts">
@@ -19,6 +29,8 @@
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import "@awesome.me/webawesome/dist/components/option/option.js";
+  import "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
+  import "@awesome.me/webawesome/dist/components/radio/radio.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
@@ -34,9 +46,16 @@
     schema: z.ZodType<T, unknown>;
     submit: (value: T) => void;
     children?: Snippet;
+    disableNameRetentionTime?: boolean;
   }
 
-  let { data, schema, submit, children }: Props = $props();
+  const {
+    data,
+    schema,
+    submit,
+    children,
+    disableNameRetentionTime = false,
+  }: Props = $props();
 
   let selectedCountry = $derived(data.country || "AQ");
 
@@ -54,23 +73,25 @@
 <GenericForm {schema} {submit}>
   <fieldset>
     <wa-input
-      size="small"
+      size="s"
       {@attach name("name")}
       label="Name"
       type="text"
       required
       value={data.name}
+      hint="The name of the contest as shown to contenders."
     ></wa-input>
     <wa-input
-      size="small"
+      size="s"
       {@attach name("description")}
       label="Description"
       type="text"
       value={data.description}
+      hint="A short description or tagline for the contest."
     ></wa-input>
     <div class="location">
       <wa-input
-        size="small"
+        size="s"
         {@attach name("location")}
         label="Location"
         type="text"
@@ -78,10 +99,11 @@
         hint="Usually the name of the climbing gym."
       ></wa-input>
       <wa-select
-        size="small"
+        size="s"
         {@attach name("country")}
         {@attach value(selectedCountry)}
         label="Country"
+        hint="The country where the contest is held."
         onchange={handleCountryChange}
       >
         <span slot="start">{getFlag(selectedCountry)}</span>
@@ -94,22 +116,41 @@
       </wa-select>
     </div>
     <wa-number-input
-      size="small"
+      size="s"
       {@attach name("gracePeriod")}
       label="Grace period"
       hint="Extra time after the end of the contest during which contenders can enter their last results."
       required
       min={0}
       max={60}
-      value={Math.floor((data.gracePeriod ?? 0) / minuteInNanoseconds)}
+      value={Math.floor((data.gracePeriod ?? 0) / nanosecondsInMinute)}
     >
       <span slot="end">minutes</span>
     </wa-number-input>
+    <wa-radio-group
+      size="s"
+      {@attach name("nameRetentionTime")}
+      {@attach value(data.nameRetentionTime)}
+      orientation="horizontal"
+      label="Retention time"
+      hint="How long contender names are retained after the contest ends before results are anonymized."
+      disabled={disableNameRetentionTime}
+    >
+      {#each retentionOptions as option (option.value)}
+        <wa-radio value={String(option.value)}>{option.label}</wa-radio>
+      {/each}
+
+      {#if data.nameRetentionTime && !retentionOptions.some(({ value }) => value === data.nameRetentionTime)}
+        <wa-radio value={String(data.nameRetentionTime)}>
+          {Math.floor(data.nameRetentionTime / (24 * 60 * nanosecondsInMinute))} days
+        </wa-radio>
+      {/if}
+    </wa-radio-group>
     {#if showGeneralInfo}
       <InfoInput info={data.info} />
     {:else}
       <wa-button
-        size="small"
+        size="s"
         appearance="outlined"
         onclick={() => (showGeneralInfo = true)}
       >

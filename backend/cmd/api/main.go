@@ -21,6 +21,7 @@ import (
 	"github.com/climblive/platform/backend/internal/handlers/rest"
 	"github.com/climblive/platform/backend/internal/repository"
 	"github.com/climblive/platform/backend/internal/scores"
+	"github.com/climblive/platform/backend/internal/scrubber"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/utils"
 	"github.com/google/uuid"
@@ -73,10 +74,10 @@ func main() {
 
 	slog.SetDefault(slog.New(
 		tint.NewHandler(w, &tint.Options{
-			Level:      slog.LevelDebug,
-			TimeFormat: time.Kitchen,
-			NoColor:    !isatty.IsTerminal(w.Fd()),
-			AddSource:  false,
+			Level:       slog.LevelDebug,
+			TimeFormat:  time.Kitchen,
+			NoColor:     !isatty.IsTerminal(w.Fd()),
+			AddSource:   false,
 			ReplaceAttr: nil,
 		}),
 	))
@@ -130,11 +131,22 @@ func main() {
 
 	scoreEngineManager := scores.NewScoreEngineManager(database, scoreEngineStoreHydrator, eventBroker, scoreEngineMaxLifetime)
 
+	contenderUseCase := usecases.ContenderUseCase{
+		Repo:                      database,
+		Authorizer:                authorizer,
+		EventBroker:               eventBroker,
+		ScoreKeeper:               scoreKeeper,
+		RegistrationCodeGenerator: &registrationCodeGenerator{}}
+
+	scrubInterval := time.Hour
+	scrubberRunner := scrubber.New(&contenderUseCase, scrubInterval)
+
 	barriers = append(barriers,
 		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
-		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()))
+		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()),
+		scrubberRunner.Run(ctx, scrubber.WithPanicRecovery()))
 
-	mux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
+	mux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager, scrubberRunner)
 
 	httpServer := &http.Server{
 		Addr:                         "0.0.0.0:8090",
@@ -197,8 +209,9 @@ func setupMux(
 	repo *repository.Database,
 	authorizer *authorizer.Authorizer,
 	eventBroker domain.EventBroker,
-	scoreKeeper domain.ScoreKeeper,
+	scoreKeeper *scores.Keeper,
 	scoreEngineManager *scores.ScoreEngineManager,
+	scrubber *scrubber.Scrubber,
 ) *rest.Mux {
 	contenderUseCase := usecases.ContenderUseCase{
 		Repo:                      repo,
@@ -256,6 +269,12 @@ func setupMux(
 		UUIDGenerator: &uuidGenerator{},
 	}
 
+	healthUseCase := usecases.HealthUseCase{
+		ScoreEngineManager: scoreEngineManager,
+		ScoreKeeper:        scoreKeeper,
+		Scrubber:           scrubber,
+	}
+
 	mux := rest.NewMux()
 	mux.RegisterMiddleware(rest.CORS)
 	mux.RegisterMiddleware(authorizer.Middleware)
@@ -272,6 +291,7 @@ func setupMux(
 	rest.InstallRaffleHandler(mux, &raffleUseCase)
 	rest.InstallUserHandler(mux, &userUseCase)
 	rest.InstallOrganizerHandler(mux, &organizerUseCase)
+	rest.InstallHealthHandler(mux, &healthUseCase)
 
 	return mux
 }

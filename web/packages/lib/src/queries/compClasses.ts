@@ -20,15 +20,30 @@ export const getCompClassQuery = (compClassId: number) =>
 export const getCompClassesQuery = (
   contestId: number,
   options?: Partial<Parameters<typeof createQuery<CompClass[]>>[0]>,
-) =>
-  createQuery(() => ({
+) => {
+  const client = useQueryClient();
+
+  return createQuery(() => ({
     ...options,
     queryKey: ["comp-classes", { contestId }],
-    queryFn: async () => ApiClient.getInstance().getCompClasses(contestId),
+    queryFn: async () => {
+      const compClasses =
+        await ApiClient.getInstance().getCompClasses(contestId);
+
+      for (const compClass of compClasses) {
+        client.setQueryData<CompClass>(
+          ["comp-class", { id: compClass.id }],
+          compClass,
+        );
+      }
+
+      return compClasses;
+    },
     retry: false,
     gcTime: 12 * HOUR,
     staleTime: 12 * HOUR,
   }));
+};
 
 export const createCompClassMutation = (contestId: number) => {
   const client = useQueryClient();

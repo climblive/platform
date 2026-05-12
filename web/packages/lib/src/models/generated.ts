@@ -64,6 +64,8 @@ export interface Contender {
   entered?: Date;
   withdrawnFromFinals: boolean;
   disqualified: boolean;
+  scrubbedAt?: Date;
+  scrubBefore?: Date;
   score?: Score;
 }
 export interface ContenderPatch {
@@ -75,7 +77,7 @@ export interface ContenderPatch {
 export interface Contest {
   id: ContestID;
   ownership: OwnershipData;
-  archived: boolean;
+  archivedAt?: Date;
   location?: string;
   country: string;
   seriesId?: SeriesID;
@@ -85,6 +87,7 @@ export interface Contest {
   finalists: number /* int */;
   info?: string;
   gracePeriod: number;
+  nameRetentionTime: number;
   timeBegin?: Date;
   timeEnd?: Date;
   created: Date;
@@ -100,9 +103,9 @@ export interface ContestTemplate {
   finalists: number /* int */;
   info?: string;
   gracePeriod: number;
+  nameRetentionTime: number;
 }
 export interface ContestPatch {
-  archived?: boolean;
   location?: string;
   country?: string;
   seriesId?: number;
@@ -132,7 +135,13 @@ export interface OrganizerInvite {
   organizerName: string;
   expiresAt: Date;
 }
-export interface Problem {
+export interface ProblemValue {
+  pointsZone1?: number /* int */;
+  pointsZone2?: number /* int */;
+  pointsTop: number /* int */;
+  flashBonus?: number /* int */;
+}
+export interface Problem extends ProblemValue {
   id: ProblemID;
   contestId: ContestID;
   number: number /* int */;
@@ -141,22 +150,14 @@ export interface Problem {
   description?: string;
   zone1Enabled: boolean;
   zone2Enabled: boolean;
-  pointsZone1?: number /* int */;
-  pointsZone2?: number /* int */;
-  pointsTop: number /* int */;
-  flashBonus?: number /* int */;
 }
-export interface ProblemTemplate {
+export interface ProblemTemplate extends ProblemValue {
   number: number /* int */;
   holdColorPrimary: string;
   holdColorSecondary?: string;
   description?: string;
   zone1Enabled: boolean;
   zone2Enabled: boolean;
-  pointsZone1?: number /* int */;
-  pointsZone2?: number /* int */;
-  pointsTop: number /* int */;
-  flashBonus?: number /* int */;
 }
 export interface ProblemPatch {
   number?: number;
@@ -178,7 +179,8 @@ export interface RaffleWinner {
   id: RaffleWinnerID;
   raffleId: RaffleID;
   contenderId: ContenderID;
-  readonly contenderName: string;
+  contenderName: string;
+  contenderScrubbedAt?: Date;
   timestamp: Date;
 }
 export interface Score {
@@ -199,6 +201,7 @@ export interface ScoreboardEntry {
   name: string;
   withdrawnFromFinals: boolean;
   disqualified: boolean;
+  scrubbedAt?: Date;
   score?: Score;
 }
 export interface Tick {
@@ -217,6 +220,11 @@ export interface User {
   username: string;
   admin: boolean;
   organizers: Organizer[];
+}
+export interface ServiceStatus {
+  name: string;
+  healthy: boolean;
+  checkedAt: Date;
 }
 export interface ContenderEnteredEvent {
   contenderId: ContenderID;
@@ -255,19 +263,11 @@ export interface AscentDeregisteredEvent {
   contenderId: ContenderID;
   problemId: ProblemID;
 }
-export interface ProblemAddedEvent {
+export interface ProblemAddedEvent extends ProblemValue {
   problemId: ProblemID;
-  pointsZone1: number /* int */;
-  pointsZone2: number /* int */;
-  pointsTop: number /* int */;
-  flashBonus: number /* int */;
 }
-export interface ProblemUpdatedEvent {
+export interface ProblemUpdatedEvent extends ProblemValue {
   problemId: ProblemID;
-  pointsZone1: number /* int */;
-  pointsZone2: number /* int */;
-  pointsTop: number /* int */;
-  flashBonus: number /* int */;
 }
 export interface ProblemDeletedEvent {
   problemId: ProblemID;
@@ -282,6 +282,7 @@ export interface ContenderPublicInfoUpdatedEvent {
   name: string;
   withdrawnFromFinals: boolean;
   disqualified: boolean;
+  scrubbedAt?: Date;
 }
 export interface ContenderScoreUpdatedEvent {
   timestamp: Date;
@@ -300,6 +301,5 @@ export interface ScoreEngineStoppedEvent {
 export interface RaffleWinnerDrawnEvent {
   raffleId: RaffleID;
   contenderId: ContenderID;
-  contenderName: string;
   timestamp: Date;
 }

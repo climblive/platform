@@ -32,7 +32,6 @@
 
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/color-picker/color-picker.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
@@ -41,6 +40,7 @@
   import type WaNumberInput from "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
+  import { HoldColorPicker } from "@climblive/lib/components";
   import { checked, GenericForm, name } from "@climblive/lib/forms";
   import { type Problem } from "@climblive/lib/models";
   import { type Snippet } from "svelte";
@@ -64,21 +64,6 @@
 
   let pointsZone1Input = $state<WaNumberInput>();
   let pointsZone2Input = $state<WaNumberInput>();
-
-  const swatches = [
-    "#6f3601",
-    "#dc3146",
-    "#f46a45",
-    "#fac22b",
-    "#00ac49",
-    "#2fbedc",
-    "#0071ec",
-    "#9951db",
-    "#e66ba3",
-    "#9194a2",
-    "#000",
-    "#fff",
-  ].join("; ");
 
   const handleSubmit = (value: T) => {
     const pointsZone1 = value.pointsZone1 ?? 0;
@@ -153,7 +138,7 @@
 <GenericForm {schema} submit={handleSubmit}>
   <fieldset>
     <wa-number-input
-      size="small"
+      size="s"
       {@attach name("number")}
       label="Number"
       required
@@ -161,28 +146,23 @@
       min={0}
     ></wa-number-input>
     <div class="colors">
-      <div class="pickers">
-        <wa-color-picker
-          size="small"
-          {@attach name("holdColorPrimary")}
-          label="Primary hold color"
-          required
-          {swatches}
-          value={data.holdColorPrimary}
-          without-format-toggle
-        ></wa-color-picker>
-        <wa-color-picker
-          size="small"
-          {@attach name("holdColorSecondary")}
-          label="Secondary hold color"
-          {swatches}
-          value={data.holdColorSecondary}
-          without-format-toggle
-        ></wa-color-picker>
-      </div>
+      <HoldColorPicker
+        name="holdColorPrimary"
+        label="Primary hold color"
+        required
+        value={data.holdColorPrimary}
+        placement="right"
+      />
+      <HoldColorPicker
+        name="holdColorSecondary"
+        label="Secondary hold color"
+        allowClear
+        value={data.holdColorSecondary}
+        placement="bottom"
+      />
     </div>
     <wa-number-input
-      size="small"
+      size="s"
       {@attach name("pointsTop")}
       label="Points top"
       hint="Points for reaching the top."
@@ -194,7 +174,7 @@
       <span slot="end">pts</span>
     </wa-number-input>
     <wa-number-input
-      size="small"
+      size="s"
       {@attach name("flashBonus")}
       label="Flash bonus"
       hint="Bonus points awarded for a flash ascent, added to the total."
@@ -209,7 +189,7 @@
 
     {#if zone1Enabled}
       <wa-switch
-        size="small"
+        size="s"
         {@attach name("zone2Enabled")}
         hint="Add a second zone."
         onchange={handleZone2Toggle}
@@ -218,7 +198,7 @@
     {/if}
     <wa-number-input
       bind:this={pointsZone2Input}
-      size="small"
+      size="s"
       {@attach name("pointsZone2")}
       label="Points Z2"
       hint="Points for reaching the second zone."
@@ -233,7 +213,7 @@
     </wa-number-input>
 
     <wa-switch
-      size="small"
+      size="s"
       {@attach name("zone1Enabled")}
       hint="Add a zone."
       onchange={handleZone1Toggle}
@@ -241,7 +221,7 @@
     >
     <wa-number-input
       bind:this={pointsZone1Input}
-      size="small"
+      size="s"
       {@attach name("pointsZone1")}
       label="Points Z1"
       hint="Points for reaching the first zone."
@@ -282,10 +262,9 @@
   }
 
   .colors {
-    & .pickers {
-      display: flex;
-      gap: var(--wa-space-s);
-    }
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--wa-space-s);
   }
 
   .hidden {
