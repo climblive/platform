@@ -5,3 +5,9 @@ packages:
   - "packages/*"
   - e2e
   - www
+allowBuilds:
+  '@sentry/cli': true
+  cpu-features: true
+  esbuild: true
+  protobufjs: true
+  ssh2: true
