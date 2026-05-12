@@ -44,8 +44,8 @@ importers:
         specifier: ^2.13.0
         version: 2.13.0
       zod:
-        specifier: ^4.3.6
-        version: 4.4.3
+        specifier: ~4.3.6
+        version: 4.3.6
     devDependencies:
       '@sentry/vite-plugin':
         specifier: ^5.2.1
@@ -120,8 +120,8 @@ importers:
         specifier: ^8.0.1
         version: 8.0.1
       zod:
-        specifier: ^4.3.6
-        version: 4.4.3
+        specifier: ~4.3.6
+        version: 4.3.6
     devDependencies:
       '@eslint/js':
         specifier: ^10.0.1
@@ -193,8 +193,8 @@ importers:
         specifier: ^2.13.0
         version: 2.13.0
       zod:
-        specifier: ^4.3.6
-        version: 4.4.3
+        specifier: ~4.3.6
+        version: 4.3.6
     devDependencies:
       '@sentry/vite-plugin':
         specifier: ^5.2.1
@@ -251,8 +251,8 @@ importers:
         specifier: ^2.13.0
         version: 2.13.0
       zod:
-        specifier: ^4.3.6
-        version: 4.4.3
+        specifier: ~4.3.6
+        version: 4.3.6
     devDependencies:
       '@sentry/vite-plugin':
         specifier: ^5.2.1
@@ -2948,8 +2948,8 @@ packages:
     resolution: {integrity: sha512-zK7YHHz4ZXpW89AHXUPbQVGKI7uvkd3hzusTdotCg1UxyaVtg0zFJSTfW/Dq5f7OBBVnq6cZIaC8Ti4hb6dtCA==}
     engines: {node: '>= 14'}
 
-  zod@4.4.3:
-    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
+  zod@4.3.6:
+    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
 
 snapshots:
 
@@ -5590,4 +5590,4 @@ snapshots:
       compress-commons: 6.0.2
       readable-stream: 4.7.0
 
-  zod@4.4.3: {}
+  zod@4.3.6: {}
