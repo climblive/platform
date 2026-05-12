@@ -6,7 +6,7 @@ runs:
       with:
         go-version-file: "backend/go.mod"
 
-    - run: go build -o climblive cmd/api/main.go
+    - run: go build -o climblive ./cmd/api
       shell: bash
       working-directory: backend
 

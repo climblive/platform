@@ -1,11 +1,12 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import RelativeTime from "@/components/RelativeTime.svelte";
+  import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { ServiceStatus } from "@climblive/lib/models";
-  import { getHealthQuery } from "@climblive/lib/queries";
+  import { getHealthQuery, getVersionQuery } from "@climblive/lib/queries";
 
   const columns: ColumnDefinition<ServiceStatus>[] = [
     {
@@ -30,6 +31,8 @@
 
   const healthQuery = $derived(getHealthQuery());
   const health = $derived(healthQuery.data);
+  const versionQuery = $derived(getVersionQuery());
+  const version = $derived(versionQuery.data);
 
   const allHealthy = $derived(health?.every(({ healthy }) => healthy));
 </script>
@@ -50,7 +53,12 @@
   <RelativeTime time={checkedAt} />
 {/snippet}
 
-<h1>System health</h1>
+<div class="title">
+  <h1>System health</h1>
+  {#if version !== undefined}
+    <wa-badge pill variant="neutral">{version}</wa-badge>
+  {/if}
+</div>
 
 {#if health === undefined}
   <Loader />
@@ -70,6 +78,21 @@
 {/if}
 
 <style>
+  .title {
+    display: flex;
+    align-items: end;
+    gap: var(--wa-space-m);
+    margin-block: var(--wa-space-l);
+
+    & h1 {
+      margin-block: 0;
+    }
+
+    & wa-badge {
+      font-size: var(--wa-font-size-xs);
+    }
+  }
+
   .healthy {
     color: var(--wa-color-success);
   }
