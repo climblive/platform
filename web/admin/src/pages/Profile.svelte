@@ -3,11 +3,7 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import {
-    EmptyState,
-    Table,
-    type ColumnDefinition,
-  } from "@climblive/lib/components";
+  import { Table, type ColumnDefinition } from "@climblive/lib/components";
   import type { Organizer } from "@climblive/lib/models";
   import { getSelfQuery } from "@climblive/lib/queries";
   import { getContext } from "svelte";
@@ -82,30 +78,19 @@
 
   <div>
     <h2>Organizers</h2>
-    {#if self.organizers.length > 0}
-      <div class="organizers-table">
-        <Table
-          columns={organizerColumns}
-          data={self.organizers}
-          getId={({ id }) => id}
-        ></Table>
-      </div>
-    {:else}
-      <EmptyState
-        title="No organizers yet"
-        description="You are not part of any organizers."
-      />
-    {/if}
+    <Table
+      columns={organizerColumns}
+      data={self.organizers}
+      getId={({ id }) => id}
+    ></Table>
   </div>
 
-  <div class="remove-account">
-    <h2>Remove account</h2>
-    <wa-callout variant="warning">
-      <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
-      To remove your account, please contact support at
-      <a href="mailto:info@climblive.com">info@climblive.com</a>.
-    </wa-callout>
-  </div>
+  <h2>Remove account</h2>
+  <wa-callout variant="warning">
+    <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
+    To remove your account, please contact support at
+    <a href="mailto:info@climblive.com">info@climblive.com</a>.
+  </wa-callout>
 {/if}
 
 <style>
@@ -115,12 +100,8 @@
 
   wa-callout[variant="neutral"]::part(message) {
     display: flex;
-    gap: var(--wa-space-s);
+    gap: var(--wa-space-xs);
     align-items: center;
     justify-content: space-between;
-  }
-
-  .remove-account wa-callout {
-    margin-block-start: var(--wa-space-s);
   }
 </style>
