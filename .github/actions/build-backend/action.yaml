@@ -6,9 +6,6 @@ runs:
       with:
         go-version-file: "backend/go.mod"
 
-    - run: sudo apt update && sudo apt install -y git
-      shell: bash
-
     - run: go build -o climblive cmd/api/main.go
       shell: bash
       working-directory: backend
