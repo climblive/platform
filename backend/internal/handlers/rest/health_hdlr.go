@@ -3,10 +3,11 @@ package rest
 import (
 	"context"
 	"net/http"
-	"runtime/debug"
 
 	"github.com/climblive/platform/backend/internal/domain"
 )
+
+var Version = "dev"
 
 type healthUseCase interface {
 	GetHealth(ctx context.Context) ([]domain.ServiceStatus, error)
@@ -56,14 +57,5 @@ func (hdlr *healthHandler) GetHealthOk(w http.ResponseWriter, r *http.Request) {
 }
 
 func (hdlr *healthHandler) GetVersion(w http.ResponseWriter, _ *http.Request) {
-	if info, ok := debug.ReadBuildInfo(); ok {
-		for _, setting := range info.Settings {
-			if setting.Key == "vcs.revision" {
-				writeResponse(w, http.StatusOK, setting.Value)
-				return
-			}
-		}
-	}
-
-	writeResponse(w, http.StatusInternalServerError, nil)
+	writeResponse(w, http.StatusOK, Version)
 }
