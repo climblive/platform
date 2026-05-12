@@ -71,17 +71,22 @@ func getVersion() string {
 		return Version
 	}
 
+	revision := ""
+
 	for _, setting := range buildInfo.Settings {
-		if setting.Key != "vcs.revision" {
-			continue
+		if setting.Key == "vcs.revision" {
+			revision = setting.Value
+			break
 		}
-
-		if len(setting.Value) <= 7 {
-			return setting.Value
-		}
-
-		return setting.Value[:7]
 	}
 
-	return Version
+	if revision == "" {
+		return Version
+	}
+
+	if len(revision) <= 7 {
+		return revision
+	}
+
+	return revision[:7]
 }
