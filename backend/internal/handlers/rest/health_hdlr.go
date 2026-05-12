@@ -56,11 +56,14 @@ func (hdlr *healthHandler) GetHealthOk(w http.ResponseWriter, r *http.Request) {
 }
 
 func (hdlr *healthHandler) GetVersion(w http.ResponseWriter, _ *http.Request) {
-	buildInfo, ok := debug.ReadBuildInfo()
-	if !ok {
-		writeResponse(w, http.StatusInternalServerError, nil)
-		return
+	if info, ok := debug.ReadBuildInfo(); ok {
+		for _, setting := range info.Settings {
+			if setting.Key == "vcs.revision" {
+				writeResponse(w, http.StatusOK, setting.Value)
+				return
+			}
+		}
 	}
 
-	writeResponse(w, http.StatusOK, buildInfo.GoVersion)
+	writeResponse(w, http.StatusInternalServerError, nil)
 }
