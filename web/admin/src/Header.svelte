@@ -3,8 +3,8 @@
   import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/button-group/button-group.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
   import WaDropdownItem from "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
+  import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { FullLogo } from "@climblive/lib/components";
   import { getHealthQuery, getSelfQuery } from "@climblive/lib/queries";
@@ -62,12 +62,12 @@
           <wa-button
             size="s"
             appearance="outlined"
-            aria-label="Account profile"
             onclick={() => navigate("/admin/profile")}
           >
-            <wa-icon name="circle-user"></wa-icon>
+            <wa-icon name="circle-user" label="Account profile"></wa-icon>
           </wa-button>
           <wa-dropdown
+            placement="bottom-end"
             onwa-select={(event: WaSelectEvent) => {
               const { item } = event.detail;
 
@@ -76,13 +76,9 @@
               }
             }}
           >
-            <wa-button
-              slot="trigger"
-              size="s"
-              appearance="outlined"
-              aria-label="Open account actions"
-            >
-              <wa-icon name="chevron-down"></wa-icon>
+            <wa-button slot="trigger" size="s" appearance="outlined">
+              <wa-icon name="chevron-down" label="Open account actions"
+              ></wa-icon>
             </wa-button>
             <wa-dropdown-item value="sign-out" variant="danger">
               <wa-icon slot="icon" name="right-from-bracket"></wa-icon>
@@ -122,8 +118,8 @@
   }
 
   .right-actions {
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
     gap: var(--wa-space-xs);
   }
 
