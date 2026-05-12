@@ -53,12 +53,10 @@
   <RelativeTime time={checkedAt} />
 {/snippet}
 
-<div class="title">
-  <h1>System health</h1>
-  {#if version !== undefined}
-    <wa-badge pill variant="neutral">{version}</wa-badge>
-  {/if}
-</div>
+<h1>System health</h1>
+{#if version !== undefined}
+  <wa-badge pill variant="neutral">{version}</wa-badge>
+{/if}
 
 {#if health === undefined}
   <Loader />
@@ -90,9 +88,4 @@
     margin-block-end: var(--wa-space-m);
   }
 
-  .title {
-    display: flex;
-    align-items: center;
-    gap: var(--wa-space-m);
-  }
 </style>

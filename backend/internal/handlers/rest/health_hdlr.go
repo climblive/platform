@@ -3,7 +3,6 @@ package rest
 import (
 	"context"
 	"net/http"
-	"runtime"
 	"runtime/debug"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -57,10 +56,11 @@ func (hdlr *healthHandler) GetHealthOk(w http.ResponseWriter, r *http.Request) {
 }
 
 func (hdlr *healthHandler) GetVersion(w http.ResponseWriter, _ *http.Request) {
-	if buildInfo, ok := debug.ReadBuildInfo(); ok {
-		writeResponse(w, http.StatusOK, buildInfo.GoVersion)
+	buildInfo, ok := debug.ReadBuildInfo()
+	if !ok {
+		writeResponse(w, http.StatusInternalServerError, nil)
 		return
 	}
 
-	writeResponse(w, http.StatusOK, runtime.Version())
+	writeResponse(w, http.StatusOK, buildInfo.GoVersion)
 }
