@@ -87,5 +87,4 @@
   wa-callout {
     margin-block-end: var(--wa-space-m);
   }
-
 </style>
