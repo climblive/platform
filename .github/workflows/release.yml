@@ -27,6 +27,8 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: ./.github/actions/build-backend
+        with:
+          version: ${{ github.event.release.tag_name }}
 
   deploy:
     name: Deploy

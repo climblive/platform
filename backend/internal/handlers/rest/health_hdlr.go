@@ -8,6 +8,8 @@ import (
 	"github.com/climblive/platform/backend/internal/domain"
 )
 
+var Version = ""
+
 type healthUseCase interface {
 	GetHealth(ctx context.Context) ([]domain.ServiceStatus, error)
 }
@@ -56,14 +58,33 @@ func (hdlr *healthHandler) GetHealthOk(w http.ResponseWriter, r *http.Request) {
 }
 
 func (hdlr *healthHandler) GetVersion(w http.ResponseWriter, _ *http.Request) {
-	if info, ok := debug.ReadBuildInfo(); ok {
-		for _, setting := range info.Settings {
-			if setting.Key == "vcs.revision" {
-				writeResponse(w, http.StatusOK, setting.Value)
-				return
+	version, found := getVersion()
+	if !found {
+		version = "dev"
+	}
+
+	writeResponse(w, http.StatusOK, version)
+}
+
+func getVersion() (string, bool) {
+	if Version != "" {
+		return Version, true
+	}
+
+	buildInfo, found := debug.ReadBuildInfo()
+	if !found {
+		return "", false
+	}
+
+	for _, setting := range buildInfo.Settings {
+		if setting.Key == "vcs.revision" {
+			if len(setting.Value) <= 7 {
+				return setting.Value, true
 			}
+
+			return setting.Value[:7], true
 		}
 	}
 
-	writeResponse(w, http.StatusInternalServerError, nil)
+	return "", false
 }
