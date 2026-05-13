@@ -172,6 +172,8 @@ jobs:
           path: backend/cmd/api/web/www
 
       - uses: ./.github/actions/build-backend
+        with:
+          version: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || 'dev' }}
 
   deploy:
     name: Deploy
