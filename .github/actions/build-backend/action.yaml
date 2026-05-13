@@ -1,7 +1,7 @@
 name: "Build backend"
 inputs:
   version:
-    description: "Backend version"
+    description: "Version"
     required: false
     default: "dev"
 runs:
