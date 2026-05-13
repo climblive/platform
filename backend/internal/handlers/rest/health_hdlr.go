@@ -78,10 +78,6 @@ func getVersion() (string, bool) {
 
 	for _, setting := range buildInfo.Settings {
 		if setting.Key == "vcs.revision" {
-			if setting.Value == "" {
-				return "", false
-			}
-
 			if len(setting.Value) <= 7 {
 				return setting.Value, true
 			}
