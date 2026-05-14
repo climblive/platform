@@ -77,7 +77,7 @@ export interface ContenderPatch {
 export interface Contest {
   id: ContestID;
   ownership: OwnershipData;
-  archived: boolean;
+  archivedAt?: Date;
   location?: string;
   country: string;
   seriesId?: SeriesID;
@@ -106,7 +106,6 @@ export interface ContestTemplate {
   nameRetentionTime: number;
 }
 export interface ContestPatch {
-  archived?: boolean;
   location?: string;
   country?: string;
   seriesId?: number;
@@ -136,7 +135,13 @@ export interface OrganizerInvite {
   organizerName: string;
   expiresAt: Date;
 }
-export interface Problem {
+export interface ProblemValue {
+  pointsZone1?: number /* int */;
+  pointsZone2?: number /* int */;
+  pointsTop: number /* int */;
+  flashBonus?: number /* int */;
+}
+export interface Problem extends ProblemValue {
   id: ProblemID;
   contestId: ContestID;
   number: number /* int */;
@@ -145,22 +150,14 @@ export interface Problem {
   description?: string;
   zone1Enabled: boolean;
   zone2Enabled: boolean;
-  pointsZone1?: number /* int */;
-  pointsZone2?: number /* int */;
-  pointsTop: number /* int */;
-  flashBonus?: number /* int */;
 }
-export interface ProblemTemplate {
+export interface ProblemTemplate extends ProblemValue {
   number: number /* int */;
   holdColorPrimary: string;
   holdColorSecondary?: string;
   description?: string;
   zone1Enabled: boolean;
   zone2Enabled: boolean;
-  pointsZone1?: number /* int */;
-  pointsZone2?: number /* int */;
-  pointsTop: number /* int */;
-  flashBonus?: number /* int */;
 }
 export interface ProblemPatch {
   number?: number;
@@ -224,6 +221,11 @@ export interface User {
   admin: boolean;
   organizers: Organizer[];
 }
+export interface ServiceStatus {
+  name: string;
+  healthy: boolean;
+  checkedAt: Date;
+}
 export interface ContenderEnteredEvent {
   contenderId: ContenderID;
   compClassId: CompClassID;
@@ -261,19 +263,11 @@ export interface AscentDeregisteredEvent {
   contenderId: ContenderID;
   problemId: ProblemID;
 }
-export interface ProblemAddedEvent {
+export interface ProblemAddedEvent extends ProblemValue {
   problemId: ProblemID;
-  pointsZone1: number /* int */;
-  pointsZone2: number /* int */;
-  pointsTop: number /* int */;
-  flashBonus: number /* int */;
 }
-export interface ProblemUpdatedEvent {
+export interface ProblemUpdatedEvent extends ProblemValue {
   problemId: ProblemID;
-  pointsZone1: number /* int */;
-  pointsZone2: number /* int */;
-  pointsTop: number /* int */;
-  flashBonus: number /* int */;
 }
 export interface ProblemDeletedEvent {
   problemId: ProblemID;

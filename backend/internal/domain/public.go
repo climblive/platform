@@ -60,7 +60,7 @@ type ContenderPatch struct {
 type Contest struct {
 	ID                   ContestID     `json:"id"`
 	Ownership            OwnershipData `json:"ownership"`
-	Archived             bool          `json:"archived"`
+	ArchivedAt           time.Time     `json:"archivedAt,omitzero"`
 	Location             string        `json:"location,omitempty"`
 	Country              string        `json:"country"`
 	SeriesID             SeriesID      `json:"seriesId,omitempty"`
@@ -91,7 +91,6 @@ type ContestTemplate struct {
 }
 
 type ContestPatch struct {
-	Archived           Patch[bool]          `json:"archived,omitzero" tstype:"boolean"`
 	Location           Patch[string]        `json:"location,omitzero" tstype:"string"`
 	Country            Patch[string]        `json:"country,omitzero" tstype:"string"`
 	SeriesID           Patch[SeriesID]      `json:"seriesId,omitzero" tstype:"number"`
@@ -128,6 +127,13 @@ type OrganizerInvite struct {
 	ExpiresAt     time.Time         `json:"expiresAt"`
 }
 
+type ProblemValue struct {
+	PointsZone1 int `json:"pointsZone1,omitempty"`
+	PointsZone2 int `json:"pointsZone2,omitempty"`
+	PointsTop   int `json:"pointsTop"`
+	FlashBonus  int `json:"flashBonus,omitempty"`
+}
+
 type Problem struct {
 	ID                 ProblemID     `json:"id"`
 	Ownership          OwnershipData `json:"-"`
@@ -138,10 +144,8 @@ type Problem struct {
 	Description        string        `json:"description,omitempty"`
 	Zone1Enabled       bool          `json:"zone1Enabled"`
 	Zone2Enabled       bool          `json:"zone2Enabled"`
-	PointsZone1        int           `json:"pointsZone1,omitempty"`
-	PointsZone2        int           `json:"pointsZone2,omitempty"`
-	PointsTop          int           `json:"pointsTop"`
-	FlashBonus         int           `json:"flashBonus,omitempty"`
+
+	ProblemValue `tstype:",extends"`
 }
 
 type ProblemTemplate struct {
@@ -151,10 +155,8 @@ type ProblemTemplate struct {
 	Description        string `json:"description,omitempty"`
 	Zone1Enabled       bool   `json:"zone1Enabled"`
 	Zone2Enabled       bool   `json:"zone2Enabled"`
-	PointsZone1        int    `json:"pointsZone1,omitempty"`
-	PointsZone2        int    `json:"pointsZone2,omitempty"`
-	PointsTop          int    `json:"pointsTop"`
-	FlashBonus         int    `json:"flashBonus,omitempty"`
+
+	ProblemValue `tstype:",extends"`
 }
 
 type ProblemPatch struct {
@@ -232,6 +234,12 @@ type User struct {
 	Organizers []Organizer `json:"organizers"`
 }
 
+type ServiceStatus struct {
+	Name      string    `json:"name"`
+	Healthy   bool      `json:"healthy"`
+	CheckedAt time.Time `json:"checkedAt"`
+}
+
 type ContenderEnteredEvent struct {
 	ContenderID ContenderID `json:"contenderId"`
 	CompClassID CompClassID `json:"compClassId"`
@@ -278,19 +286,15 @@ type AscentDeregisteredEvent struct {
 }
 
 type ProblemAddedEvent struct {
-	ProblemID   ProblemID `json:"problemId"`
-	PointsZone1 int       `json:"pointsZone1"`
-	PointsZone2 int       `json:"pointsZone2"`
-	PointsTop   int       `json:"pointsTop"`
-	FlashBonus  int       `json:"flashBonus"`
+	ProblemID ProblemID `json:"problemId"`
+
+	ProblemValue `tstype:",extends"`
 }
 
 type ProblemUpdatedEvent struct {
-	ProblemID   ProblemID `json:"problemId"`
-	PointsZone1 int       `json:"pointsZone1"`
-	PointsZone2 int       `json:"pointsZone2"`
-	PointsTop   int       `json:"pointsTop"`
-	FlashBonus  int       `json:"flashBonus"`
+	ProblemID ProblemID `json:"problemId"`
+
+	ProblemValue `tstype:",extends"`
 }
 
 type ProblemDeletedEvent struct {

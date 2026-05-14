@@ -66,7 +66,7 @@ test.beforeAll(async () => {
         mode: "ro",
       },
     ])
-    .withExposedPorts({ container: 8443, host: 8443 })
+    .withExposedPorts({ container: 443, host: 8443 })
     .withWaitStrategy(Wait.forLogMessage(/score engine started/));
 
   startedApiContainer = await appContainer.start();
@@ -191,10 +191,11 @@ test("garbage session value in local storage is thrown out", async ({
 test("edit profile", async ({ page }) => {
   await page.goto("/ABCD0003");
 
-  await expect(page.getByText("Michael Scott")).toBeVisible();
-  await expect(
-    page.getByText("Males–World Testing Championships"),
-  ).toBeVisible();
+  const header = page.locator("main > .sticky header");
+
+  await expect(header).toContainText("Michael Scott");
+  await expect(header).toContainText("World Testing Championships");
+  await expect(header).toContainText("Males");
 
   await page.getByRole("button", { name: "Edit" }).click({ force: true });
 
@@ -214,8 +215,8 @@ test("edit profile", async ({ page }) => {
 
   await page.waitForURL("/ABCD0003");
 
-  await expect(page.getByText("Phyllis Lapin-Vance")).toBeVisible();
-  await expect(page.getByText("Females", { exact: true })).toBeVisible();
+  await expect(header).toContainText("Phyllis Lapin-Vance");
+  await expect(header).toContainText("Females");
 });
 
 test("withdraw from finals and reenter", async ({ page }) => {

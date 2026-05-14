@@ -14,6 +14,7 @@ import (
 	"os/signal"
 	"os/user"
 	"strconv"
+	"strings"
 
 	"sync"
 	"syscall"
@@ -109,10 +110,7 @@ func main() {
 		listenPort = 8090
 	} else {
 		tlsConfig = loadTLSConfig()
-		if err := dropPrivileges("climblive"); err != nil {
-			panic(err)
-		}
-		listenPort = 8443
+		listenPort = 443
 	}
 
 	var barriers []*sync.WaitGroup
@@ -177,7 +175,7 @@ func main() {
 		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()),
 		scrubberRunner.Run(ctx, scrubber.WithPanicRecovery()))
 
-	apiMux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager)
+	apiMux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager, scrubberRunner)
 
 	appMux := http.NewServeMux()
 	appMux.Handle("/api/", accessLog(http.StripPrefix("/api", noCacheHandler(apiMux))))
@@ -213,10 +211,24 @@ func main() {
 		_ = httpServer.Shutdown(context.Background())
 	})
 
-	if noTLS {
-		err = httpServer.ListenAndServe()
+	listener, err := net.Listen("tcp", httpServer.Addr)
+	if err != nil {
+		if stack := utils.GetErrorStack(err); stack != "" {
+			log.Println(stack)
+		}
+
+		panic(err)
+	}
+
+	if err := dropPrivileges("climblive"); err != nil {
+		_ = listener.Close()
+		panic(err)
+	}
+
+	if httpServer.TLSConfig != nil {
+		err = httpServer.ServeTLS(listener, "", "")
 	} else {
-		err = httpServer.ListenAndServeTLS("", "")
+		err = httpServer.Serve(listener)
 	}
 
 	switch err {
@@ -254,8 +266,9 @@ func setupMux(
 	repo *repository.Database,
 	authorizer *authorizer.Authorizer,
 	eventBroker domain.EventBroker,
-	scoreKeeper domain.ScoreKeeper,
+	scoreKeeper *scores.Keeper,
 	scoreEngineManager *scores.ScoreEngineManager,
+	scrubber *scrubber.Scrubber,
 ) *rest.Mux {
 	contenderUseCase := usecases.ContenderUseCase{
 		Repo:                      repo,
@@ -313,6 +326,12 @@ func setupMux(
 		UUIDGenerator: &uuidGenerator{},
 	}
 
+	healthUseCase := usecases.HealthUseCase{
+		ScoreEngineManager: scoreEngineManager,
+		ScoreKeeper:        scoreKeeper,
+		Scrubber:           scrubber,
+	}
+
 	mux := rest.NewMux()
 	mux.RegisterMiddleware(rest.CORS)
 	mux.RegisterMiddleware(authorizer.Middleware)
@@ -329,6 +348,7 @@ func setupMux(
 	rest.InstallRaffleHandler(mux, &raffleUseCase)
 	rest.InstallUserHandler(mux, &userUseCase)
 	rest.InstallOrganizerHandler(mux, &organizerUseCase)
+	rest.InstallHealthHandler(mux, &healthUseCase)
 
 	return mux
 }
@@ -404,7 +424,7 @@ func (h *httpRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		host = r.Host
 	}
 
-	if host == h.wwwHost {
+	if strings.HasSuffix(host, h.wwwHost) {
 		h.wwwHandler.ServeHTTP(w, r)
 		return
 	}
@@ -484,4 +504,8 @@ type statusWriter struct {
 func (w *statusWriter) WriteHeader(statusCode int) {
 	w.status = statusCode
 	w.ResponseWriter.WriteHeader(statusCode)
+}
+
+func (w *statusWriter) Flush() {
+	w.ResponseWriter.(http.Flusher).Flush()
 }

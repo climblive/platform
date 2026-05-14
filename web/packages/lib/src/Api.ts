@@ -20,6 +20,7 @@ import {
 } from "./models";
 import { compClassSchema } from "./models/compClass";
 import { contenderSchema } from "./models/contender";
+import { serviceStatusSchema } from "./models/health";
 import { organizerSchema } from "./models/organizer";
 import { organizerInviteSchema } from "./models/organizerInvite";
 import { problemSchema } from "./models/problem";
@@ -203,6 +204,26 @@ export class ApiClient {
 
   duplicateContest = async (contestId: number) => {
     const endpoint = `/contests/${contestId}/duplicate`;
+
+    const result = await this.axiosInstance.post(endpoint, undefined, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return contestSchema.parse(result.data);
+  };
+
+  archiveContest = async (contestId: number) => {
+    const endpoint = `/contests/${contestId}/archive`;
+
+    const result = await this.axiosInstance.post(endpoint, undefined, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return contestSchema.parse(result.data);
+  };
+
+  restoreContest = async (contestId: number) => {
+    const endpoint = `/contests/${contestId}/restore`;
 
     const result = await this.axiosInstance.post(endpoint, undefined, {
       headers: this.credentialsProvider?.getAuthHeaders(),
@@ -554,5 +575,21 @@ export class ApiClient {
     });
 
     return result.data;
+  };
+
+  getHealth = async () => {
+    const endpoint = "/health";
+
+    const result = await this.axiosInstance.get(endpoint, {});
+
+    return z.array(serviceStatusSchema).parse(result.data);
+  };
+
+  getVersion = async () => {
+    const endpoint = "/version";
+
+    const result = await this.axiosInstance.get(endpoint, {});
+
+    return z.string().parse(result.data);
   };
 }

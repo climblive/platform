@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -23,6 +24,7 @@ type Keeper struct {
 	scores                 map[domain.ContenderID]domain.Score
 	repo                   keeperRepository
 	externalPersistTrigger chan struct{}
+	running                atomic.Bool
 }
 
 func NewScoreKeeper(eventBroker domain.EventBroker, repo keeperRepository) *Keeper {
@@ -32,6 +34,7 @@ func NewScoreKeeper(eventBroker domain.EventBroker, repo keeperRepository) *Keep
 		repo:                   repo,
 		externalPersistTrigger: make(chan struct{}, 1),
 		mu:                     sync.RWMutex{},
+		running:                atomic.Bool{},
 	}
 }
 
@@ -76,6 +79,9 @@ func (k *Keeper) run(ctx context.Context, ready chan<- struct{}) {
 
 	subscriptionID, eventReader := k.eventBroker.Subscribe(filter, 0)
 	defer k.eventBroker.Unsubscribe(subscriptionID)
+
+	k.running.Store(true)
+	defer k.running.Store(false)
 
 	close(ready)
 
@@ -219,4 +225,8 @@ func (k *Keeper) GetScore(contenderID domain.ContenderID) (domain.Score, error) 
 	}
 
 	return domain.Score{}, domain.ErrNotFound
+}
+
+func (k *Keeper) GetStatus() domain.ServiceStatus {
+	return domain.ServiceStatus{Name: "ScoreKeeper", Healthy: k.running.Load(), CheckedAt: time.Now()}
 }
