@@ -53,6 +53,7 @@ test.beforeAll(async () => {
       DB_HOST: "e2e",
       DB_PORT: "3306",
       DB_DATABASE: "climblive",
+      RUN_AS_USER: "climblive",
       TLS_APP_CERT_FILE: "/certs/cert.pem",
       TLS_APP_KEY_FILE: "/certs/key.pem",
       TLS_WWW_CERT_FILE: "/certs/cert.pem",
