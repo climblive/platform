@@ -111,13 +111,6 @@ func main() {
 	} else {
 		tlsConfig = loadTLSConfig()
 		listenPort = 443
-		runAsUser := os.Getenv("RUN_AS_USER")
-		if runAsUser == "" {
-			panic("RUN_AS_USER is required when running with TLS")
-		}
-		if err := dropPrivileges(runAsUser); err != nil {
-			panic(err)
-		}
 	}
 
 	var barriers []*sync.WaitGroup
@@ -227,8 +220,11 @@ func main() {
 		panic(err)
 	}
 
-	if err := dropPrivileges("climblive"); err != nil {
-		_ = listener.Close()
+	runAsUser := os.Getenv("RUN_AS_USER")
+	if runAsUser == "" {
+		panic("RUN_AS_USER is required when running with TLS")
+	}
+	if err := dropPrivileges(runAsUser); err != nil {
 		panic(err)
 	}
 
@@ -431,7 +427,7 @@ func (h *httpRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		host = r.Host
 	}
 
-	if strings.HasSuffix(host, h.wwwHost) {
+	if h.wwwHost != "" && strings.HasSuffix(host, h.wwwHost) {
 		h.wwwHandler.ServeHTTP(w, r)
 		return
 	}
