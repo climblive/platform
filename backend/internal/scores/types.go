@@ -18,15 +18,6 @@ func (c Contender) Compare(other Contender) int {
 	return other.Score - c.Score
 }
 
-type PointValue struct {
-	ContenderID domain.ContenderID
-	ProblemID   domain.ProblemID
-	Current     int
-	Maximum     int
-}
-
-type ProblemValue = PointValue
-
 type Tick struct {
 	ContenderID   domain.ContenderID
 	ProblemID     domain.ProblemID

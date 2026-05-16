@@ -33,7 +33,7 @@ type ScoreEngine interface {
 	CalculatePointValues(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect]
 
 	GetDirtyScores() []domain.Score
-	GetDirtyPointValues() []PointValue
+	GetDirtyPointValues() []domain.PointValue
 }
 
 type ScoreEngineDriver struct {

@@ -92,9 +92,9 @@ type EngineStore interface {
 	SaveProblem(Problem)
 	GetAllProblems() iter.Seq[Problem]
 
-	GetPointValue(domain.ContenderID, domain.ProblemID) (PointValue, bool)
-	SavePointValue(domain.ContenderID, domain.ProblemID, PointValue)
-	GetDirtyPointValues() []PointValue
+	GetPointValue(domain.ContenderID, domain.ProblemID) (domain.PointValue, bool)
+	SavePointValue(domain.ContenderID, domain.ProblemID, domain.PointValue)
+	GetDirtyPointValues() []domain.PointValue
 
 	SaveScore(domain.Score)
 	GetDirtyScores() []domain.Score
@@ -398,7 +398,7 @@ func (e *DefaultScoreEngine) GetDirtyScores() []domain.Score {
 	return e.store.GetDirtyScores()
 }
 
-func (e *DefaultScoreEngine) GetDirtyPointValues() []PointValue {
+func (e *DefaultScoreEngine) GetDirtyPointValues() []domain.PointValue {
 	return e.store.GetDirtyPointValues()
 }
 
@@ -530,7 +530,7 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 			tickPtr = &tick
 		}
 
-		pointValue := PointValue{
+		pointValue := domain.PointValue{
 			ContenderID: contender.ID,
 			ProblemID:   problemID,
 			Current:     pointCurrent(value, tickPtr),
@@ -575,7 +575,7 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 	} else {
 		ticks := e.store.GetTicksByContender(contender.ID)
 
-		var pointValues iter.Seq[PointValue] = func(yield func(PointValue) bool) {
+		var pointValues iter.Seq[domain.PointValue] = func(yield func(domain.PointValue) bool) {
 			for tick := range ticks {
 				value, found := e.store.GetPointValue(contender.ID, tick.ProblemID)
 				if !found {

@@ -904,7 +904,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetPointValue", fakedContenderID, fakedProblemID).
-			Return(scores.PointValue{
+			Return(domain.PointValue{
 				ContenderID: fakedContenderID,
 				ProblemID:   fakedProblemID,
 				Current:     550,
@@ -912,7 +912,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			}, true)
 
 		f.store.
-			On("SavePointValue", fakedContenderID, fakedProblemID, scores.PointValue{
+			On("SavePointValue", fakedContenderID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContenderID,
 				ProblemID:   fakedProblemID,
 				Current:     550,
@@ -992,7 +992,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetPointValue", fakedContender1ID, fakedProblemID).
-			Return(scores.PointValue{
+			Return(domain.PointValue{
 				ContenderID: fakedContender1ID,
 				ProblemID:   fakedProblemID,
 				Current:     600,
@@ -1000,7 +1000,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			}, true)
 
 		f.store.
-			On("SavePointValue", fakedContender1ID, fakedProblemID, scores.PointValue{
+			On("SavePointValue", fakedContender1ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender1ID,
 				ProblemID:   fakedProblemID,
 				Current:     600,
@@ -1176,42 +1176,42 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetPointValue", fakedContender1ID, fakedProblemID).
-			Return(scores.PointValue{}, false).
+			Return(domain.PointValue{}, false).
 			On("GetPointValue", fakedContender2ID, fakedProblemID).
-			Return(scores.PointValue{}, false).
+			Return(domain.PointValue{}, false).
 			On("GetPointValue", fakedContender3ID, fakedProblemID).
-			Return(scores.PointValue{}, false).
+			Return(domain.PointValue{}, false).
 			On("GetPointValue", fakedContender4ID, fakedProblemID).
-			Return(scores.PointValue{}, false).
+			Return(domain.PointValue{}, false).
 			On("GetPointValue", fakedContender5ID, fakedProblemID).
-			Return(scores.PointValue{}, false)
+			Return(domain.PointValue{}, false)
 
 		f.store.
-			On("SavePointValue", fakedContender1ID, fakedProblemID, scores.PointValue{
+			On("SavePointValue", fakedContender1ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender1ID,
 				ProblemID:   fakedProblemID,
 				Current:     216,
 				Maximum:     166,
 			}).Return().
-			On("SavePointValue", fakedContender2ID, fakedProblemID, scores.PointValue{
+			On("SavePointValue", fakedContender2ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender2ID,
 				ProblemID:   fakedProblemID,
 				Current:     216,
 				Maximum:     166,
 			}).Return().
-			On("SavePointValue", fakedContender3ID, fakedProblemID, scores.PointValue{
+			On("SavePointValue", fakedContender3ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender3ID,
 				ProblemID:   fakedProblemID,
 				Current:     166,
 				Maximum:     166,
 			}).Return().
-			On("SavePointValue", fakedContender4ID, fakedProblemID, scores.PointValue{
+			On("SavePointValue", fakedContender4ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender4ID,
 				ProblemID:   fakedProblemID,
 				Current:     25,
 				Maximum:     125,
 			}).Return().
-			On("SavePointValue", fakedContender5ID, fakedProblemID, scores.PointValue{
+			On("SavePointValue", fakedContender5ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender5ID,
 				ProblemID:   fakedProblemID,
 				Current:     10,
@@ -1298,10 +1298,10 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetPointValue", fakedContender3ID, fakedProblemID).
-			Return(scores.PointValue{}, false)
+			Return(domain.PointValue{}, false)
 
 		f.store.
-			On("SavePointValue", fakedContender3ID, fakedProblemID, scores.PointValue{
+			On("SavePointValue", fakedContender3ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender3ID,
 				ProblemID:   fakedProblemID,
 				Current:     0,
@@ -1421,18 +1421,18 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetPointValue", fakedContender1ID, fakedProblemID).
-			Return(scores.PointValue{}, false).
+			Return(domain.PointValue{}, false).
 			On("GetPointValue", fakedContender2ID, fakedProblemID).
-			Return(scores.PointValue{}, false)
+			Return(domain.PointValue{}, false)
 
 		f.store.
-			On("SavePointValue", fakedContender1ID, fakedProblemID, scores.PointValue{
+			On("SavePointValue", fakedContender1ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender1ID,
 				ProblemID:   fakedProblemID,
 				Current:     262,
 				Maximum:     250,
 			}).Return().
-			On("SavePointValue", fakedContender2ID, fakedProblemID, scores.PointValue{
+			On("SavePointValue", fakedContender2ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender2ID,
 				ProblemID:   fakedProblemID,
 				Current:     262,
@@ -1554,7 +1554,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetPointValue", fakedContenderID, fakedProblem1ID).
-			Return(scores.PointValue{
+			Return(domain.PointValue{
 				ContenderID: fakedContenderID,
 				ProblemID:   fakedProblem1ID,
 				Current:     110,
@@ -1562,7 +1562,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetPointValue", fakedContenderID, fakedProblem2ID).
-			Return(scores.PointValue{
+			Return(domain.PointValue{
 				ContenderID: fakedContenderID,
 				ProblemID:   fakedProblem2ID,
 				Current:     100,
@@ -1633,7 +1633,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetPointValue", fakedContenderID, fakedProblem1ID).
-			Return(scores.PointValue{
+			Return(domain.PointValue{
 				ContenderID: fakedContenderID,
 				ProblemID:   fakedProblem1ID,
 				Current:     55,
@@ -1641,7 +1641,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetPointValue", fakedContenderID, fakedProblem2ID).
-			Return(scores.PointValue{
+			Return(domain.PointValue{
 				ContenderID: fakedContenderID,
 				ProblemID:   fakedProblem2ID,
 				Current:     110,
@@ -1649,7 +1649,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetPointValue", fakedContenderID, fakedProblem3ID).
-			Return(scores.PointValue{
+			Return(domain.PointValue{
 				ContenderID: fakedContenderID,
 				ProblemID:   fakedProblem3ID,
 				Current:     82,
@@ -1706,7 +1706,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetPointValue", fakedContenderID, fakedProblem1ID).
-			Return(scores.PointValue{
+			Return(domain.PointValue{
 				ContenderID: fakedContenderID,
 				ProblemID:   fakedProblem1ID,
 				Current:     110,
@@ -1761,7 +1761,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetPointValue", fakedContenderID, fakedProblem1ID).
-			Return(scores.PointValue{
+			Return(domain.PointValue{
 				ContenderID: fakedContenderID,
 				ProblemID:   fakedProblem1ID,
 				Current:     110,
@@ -1769,7 +1769,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetPointValue", fakedContenderID, fakedProblem2ID).
-			Return(scores.PointValue{}, false)
+			Return(domain.PointValue{}, false)
 
 		f.store.
 			On("GetRules").
@@ -1940,18 +1940,18 @@ func (m *engineStoreMock) GetAllProblems() iter.Seq[scores.Problem] {
 	return args.Get(0).(iter.Seq[scores.Problem])
 }
 
-func (m *engineStoreMock) GetPointValue(contenderID domain.ContenderID, problemID domain.ProblemID) (scores.PointValue, bool) {
+func (m *engineStoreMock) GetPointValue(contenderID domain.ContenderID, problemID domain.ProblemID) (domain.PointValue, bool) {
 	args := m.Called(contenderID, problemID)
-	return args.Get(0).(scores.PointValue), args.Bool(1)
+	return args.Get(0).(domain.PointValue), args.Bool(1)
 }
 
-func (m *engineStoreMock) SavePointValue(contenderID domain.ContenderID, problemID domain.ProblemID, value scores.PointValue) {
+func (m *engineStoreMock) SavePointValue(contenderID domain.ContenderID, problemID domain.ProblemID, value domain.PointValue) {
 	m.Called(contenderID, problemID, value)
 }
 
-func (m *engineStoreMock) GetDirtyPointValues() []scores.PointValue {
+func (m *engineStoreMock) GetDirtyPointValues() []domain.PointValue {
 	args := m.Called()
-	return args.Get(0).([]scores.PointValue)
+	return args.Get(0).([]domain.PointValue)
 }
 
 func (m *engineStoreMock) SaveScore(score domain.Score) {

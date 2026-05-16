@@ -120,7 +120,7 @@ func TestEngineDriver(t *testing.T) {
 		mockedEngine.On("Start").Run(func(args mock.Arguments) { cancel() }).Return(slices.Values([]scores.Effect{}))
 		mockedEngine.On("Stop").Return()
 		mockedEngine.On("GetDirtyScores").Return([]domain.Score{})
-		mockedEngine.On("GetDirtyPointValues").Return([]scores.PointValue{})
+		mockedEngine.On("GetDirtyPointValues").Return([]domain.PointValue{})
 
 		installEngine(mockedEngine)
 
@@ -169,7 +169,7 @@ func TestEngineDriver(t *testing.T) {
 		}).Return(noEffects)
 		mockedEngine.On("Stop").Return()
 		mockedEngine.On("GetDirtyScores").Return([]domain.Score{})
-		mockedEngine.On("GetDirtyPointValues").Return([]scores.PointValue{})
+		mockedEngine.On("GetDirtyPointValues").Return([]domain.PointValue{})
 
 		mockedEngine.On("HandleAscentRegistered", domain.AscentRegisteredEvent{
 			ContenderID: 1,
@@ -271,7 +271,7 @@ func TestEngineDriver(t *testing.T) {
 		mockedEngine.On("Start").Return(noEffects)
 		mockedEngine.On("Stop").Return()
 		mockedEngine.On("GetDirtyScores").Return([]domain.Score{})
-		mockedEngine.On("GetDirtyPointValues").Return([]scores.PointValue{})
+		mockedEngine.On("GetDirtyPointValues").Return([]domain.PointValue{})
 
 		mockedEngine.On("HandleRulesUpdated", domain.RulesUpdatedEvent{
 			QualifyingProblems: 10,
@@ -367,7 +367,7 @@ func TestEngineDriver(t *testing.T) {
 				Finalist:    false,
 			},
 		})
-		mockedEngine.On("GetDirtyPointValues").Return([]scores.PointValue{})
+			mockedEngine.On("GetDirtyPointValues").Return([]domain.PointValue{})
 
 		f.broker.
 			On("Dispatch", fakedContestID,
@@ -527,7 +527,7 @@ func (m *scoreEngineMock) GetDirtyScores() []domain.Score {
 	return args.Get(0).([]domain.Score)
 }
 
-func (m *scoreEngineMock) GetDirtyPointValues() []scores.PointValue {
+func (m *scoreEngineMock) GetDirtyPointValues() []domain.PointValue {
 	args := m.Called()
-	return args.Get(0).([]scores.PointValue)
+	return args.Get(0).([]domain.PointValue)
 }
