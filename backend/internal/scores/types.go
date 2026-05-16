@@ -36,11 +36,6 @@ type Tick struct {
 	AttemptsZone2 int
 	Top           bool
 	AttemptsTop   int
-	Points        int
-}
-
-func (t *Tick) Score(value PointValue) {
-	t.Points = value.Current
 }
 
 type Problem struct {

@@ -233,7 +233,6 @@ func TestMemoryStore(t *testing.T) {
 			AttemptsZone1: 2,
 			Zone2:         true,
 			AttemptsZone2: 3,
-			Points:        1337,
 		}
 
 		store.SaveTick(1, t1)
@@ -248,14 +247,13 @@ func TestMemoryStore(t *testing.T) {
 			AttemptsZone1: 4,
 			Zone2:         false,
 			AttemptsZone2: 3,
-			Points:        100,
 		}
 
 		store.SaveTick(1, t2)
 
 		assert.ElementsMatch(t, []scores.Tick{t1, t2}, slices.Collect(store.GetTicksByContender(1)))
 
-		t2.Points = 123
+		t2.AttemptsZone2 = 123
 		store.SaveTick(1, t2)
 
 		assert.ElementsMatch(t, []scores.Tick{t1, t2}, slices.Collect(store.GetTicksByContender(1)))

@@ -76,7 +76,6 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 			AttemptsZone1: tick.AttemptsZone1,
 			Zone2:         tick.Zone2,
 			AttemptsZone2: tick.AttemptsZone2,
-			Points:        0,
 			Top:           tick.Top,
 			AttemptsTop:   tick.AttemptsTop,
 		})

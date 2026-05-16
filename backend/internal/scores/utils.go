@@ -18,10 +18,10 @@ func ComparePointValue(pv1, pv2 PointValue) bool {
 	return pv1 == pv2
 }
 
-func Points(ticks iter.Seq[Tick]) iter.Seq[int] {
+func Points(values iter.Seq[PointValue]) iter.Seq[int] {
 	return func(yield func(int) bool) {
-		for tick := range ticks {
-			if !yield(tick.Points) {
+		for value := range values {
+			if !yield(value.Current) {
 				return
 			}
 		}

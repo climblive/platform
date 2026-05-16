@@ -313,7 +313,6 @@ func (e *DefaultScoreEngine) HandleAscentRegistered(event domain.AscentRegistere
 		AttemptsZone1: event.AttemptsZone1,
 		Zone2:         event.Zone2,
 		AttemptsZone2: event.AttemptsZone2,
-		Points:        0,
 		Top:           event.Top,
 		AttemptsTop:   event.AttemptsTop,
 	}
@@ -550,16 +549,14 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 	} else {
 		ticks := e.store.GetTicksByContender(contender.ID)
 
-		var scoredTicks iter.Seq[Tick] = func(yield func(Tick) bool) {
+		var pointValues iter.Seq[PointValue] = func(yield func(PointValue) bool) {
 			for tick := range ticks {
 				value, found := e.store.GetProblemValue(contender.ID, tick.ProblemID)
 				if !found {
 					continue
 				}
 
-				tick.Score(value)
-
-				if !yield(tick) {
+				if !yield(value) {
 					return
 				}
 			}
@@ -574,7 +571,7 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 			ProblemLimit: problemLimit,
 		}
 
-		contender.Score = scorer.CalculateScore(Points(scoredTicks))
+		contender.Score = scorer.CalculateScore(Points(pointValues))
 	}
 
 	if contender.Score == oldScore {

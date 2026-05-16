@@ -1,43 +1,35 @@
-package scores_test
+package scores
 
 import (
 	"testing"
 
 	"github.com/climblive/platform/backend/internal/domain"
-	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestScoreTick(t *testing.T) {
-	problem := scores.ProblemValue{
-		ProblemValue: domain.ProblemValue{
-			PointsTop:   100,
-			PointsZone1: 50,
-			PointsZone2: 75,
-			FlashBonus:  10,
-		},
+func TestPointCurrent(t *testing.T) {
+	problem := domain.ProblemValue{
+		PointsTop:   100,
+		PointsZone1: 50,
+		PointsZone2: 75,
+		FlashBonus:  10,
 	}
 
 	t.Run("NoAttempts", func(t *testing.T) {
-		previousPoints := 1_000
-
-		tick := scores.Tick{
+		tick := &Tick{
 			Top:           false,
 			AttemptsTop:   0,
 			Zone1:         false,
 			AttemptsZone1: 0,
 			Zone2:         false,
 			AttemptsZone2: 0,
-			Points:        previousPoints,
 		}
 
-		tick.Score(problem)
-
-		assert.Equal(t, 0, tick.Points)
+		assert.Equal(t, 0, pointCurrent(problem, tick))
 	})
 
 	t.Run("SingleAttemptNoLuck", func(t *testing.T) {
-		tick := scores.Tick{
+		tick := &Tick{
 			Top:           false,
 			AttemptsTop:   1,
 			Zone1:         false,
@@ -46,13 +38,11 @@ func TestScoreTick(t *testing.T) {
 			AttemptsZone2: 1,
 		}
 
-		tick.Score(problem)
-
-		assert.Equal(t, 0, tick.Points)
+		assert.Equal(t, 0, pointCurrent(problem, tick))
 	})
 
 	t.Run("Flash", func(t *testing.T) {
-		tick := scores.Tick{
+		tick := &Tick{
 			Top:           true,
 			AttemptsTop:   1,
 			Zone1:         true,
@@ -61,13 +51,11 @@ func TestScoreTick(t *testing.T) {
 			AttemptsZone2: 1,
 		}
 
-		tick.Score(problem)
-
-		assert.Equal(t, 110, tick.Points)
+		assert.Equal(t, 110, pointCurrent(problem, tick))
 	})
 
 	t.Run("TopWithSeveralAttempts", func(t *testing.T) {
-		tick := scores.Tick{
+		tick := &Tick{
 			Top:           true,
 			AttemptsTop:   999,
 			Zone1:         true,
@@ -76,13 +64,11 @@ func TestScoreTick(t *testing.T) {
 			AttemptsZone2: 999,
 		}
 
-		tick.Score(problem)
-
-		assert.Equal(t, 100, tick.Points)
+		assert.Equal(t, 100, pointCurrent(problem, tick))
 	})
 
 	t.Run("Zone1WithSeveralAttempts", func(t *testing.T) {
-		tick := scores.Tick{
+		tick := &Tick{
 			Top:           false,
 			AttemptsTop:   999,
 			Zone1:         true,
@@ -91,12 +77,10 @@ func TestScoreTick(t *testing.T) {
 			AttemptsZone2: 999,
 		}
 
-		tick.Score(problem)
-
-		assert.Equal(t, 50, tick.Points)
+		assert.Equal(t, 50, pointCurrent(problem, tick))
 	})
 	t.Run("Zone2WithSeveralAttempts", func(t *testing.T) {
-		tick := scores.Tick{
+		tick := &Tick{
 			Top:           false,
 			AttemptsTop:   999,
 			Zone1:         true,
@@ -105,19 +89,17 @@ func TestScoreTick(t *testing.T) {
 			AttemptsZone2: 999,
 		}
 
-		tick.Score(problem)
-
-		assert.Equal(t, 75, tick.Points)
+		assert.Equal(t, 75, pointCurrent(problem, tick))
 	})
 }
 
 func TestCompareContender(t *testing.T) {
 	t.Run("ByScore", func(t *testing.T) {
-		c1 := scores.Contender{
+		c1 := Contender{
 			Score: 200,
 		}
 
-		c2 := scores.Contender{
+		c2 := Contender{
 			Score: 100,
 		}
 
@@ -126,12 +108,12 @@ func TestCompareContender(t *testing.T) {
 	})
 
 	t.Run("TieBreak", func(t *testing.T) {
-		c1 := scores.Contender{
+		c1 := Contender{
 			ID:    1,
 			Score: 100,
 		}
 
-		c2 := scores.Contender{
+		c2 := Contender{
 			ID:    2,
 			Score: 100,
 		}
