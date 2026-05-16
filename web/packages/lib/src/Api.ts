@@ -17,7 +17,6 @@ import {
   type ProblemTemplate,
   type ScoreEngineInstanceID,
   type Tick,
-  type TickPatch,
 } from "./models";
 import { compClassSchema } from "./models/compClass";
 import { contenderSchema } from "./models/contender";
@@ -365,23 +364,13 @@ export class ApiClient {
     return z.array(tickSchema).parse(result.data);
   };
 
-  createTick = async (
+  putTick = async (
     contenderId: number,
     tick: Omit<Tick, "id" | "timestamp">,
   ) => {
     const endpoint = `/contenders/${contenderId}/ticks`;
 
-    const result = await this.axiosInstance.post(endpoint, tick, {
-      headers: this.credentialsProvider?.getAuthHeaders(),
-    });
-
-    return tickSchema.parse(result.data);
-  };
-
-  updateTick = async (tickId: number, patch: TickPatch) => {
-    const endpoint = `/ticks/${tickId}`;
-
-    const result = await this.axiosInstance.patch(endpoint, patch, {
+    const result = await this.axiosInstance.put(endpoint, tick, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 

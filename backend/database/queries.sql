@@ -191,6 +191,11 @@ SELECT sqlc.embed(tick)
 FROM tick
 WHERE id = ?;
 
+-- name: GetTickByContenderAndProblem :one
+SELECT sqlc.embed(tick)
+FROM tick
+WHERE contender_id = ? AND problem_id = ?;
+
 -- name: GetTicksByContender :many
 SELECT sqlc.embed(tick)
 FROM tick

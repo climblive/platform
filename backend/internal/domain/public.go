@@ -227,15 +227,6 @@ type Tick struct {
 	AttemptsTop   int           `json:"attemptsTop"`
 }
 
-type TickPatch struct {
-	Zone1         Patch[bool] `json:"zone1,omitzero" tstype:"boolean"`
-	AttemptsZone1 Patch[int]  `json:"attemptsZone1,omitzero" tstype:"number"`
-	Zone2         Patch[bool] `json:"zone2,omitzero" tstype:"boolean"`
-	AttemptsZone2 Patch[int]  `json:"attemptsZone2,omitzero" tstype:"number"`
-	Top           Patch[bool] `json:"top,omitzero" tstype:"boolean"`
-	AttemptsTop   Patch[int]  `json:"attemptsTop,omitzero" tstype:"number"`
-}
-
 type User struct {
 	ID         UserID      `json:"id"`
 	Username   string      `json:"username"`

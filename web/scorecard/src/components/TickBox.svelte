@@ -2,12 +2,8 @@
   import type { ScorecardSession } from "@/types";
   import WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import { HoldColorIndicator } from "@climblive/lib/components";
-  import type { Problem, Tick, TickPatch } from "@climblive/lib/models";
-  import {
-    createTickMutation,
-    deleteTickMutation,
-    updateTickMutation,
-  } from "@climblive/lib/queries";
+  import type { Problem, Tick } from "@climblive/lib/models";
+  import { deleteTickMutation, putTickMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import { AxiosError } from "axios";
   import { getContext } from "svelte";
@@ -25,15 +21,12 @@
   let dialog: WaDialog | undefined = $state();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
-  const createTick = $derived(createTickMutation($session.contenderId));
+  const putTick = $derived(putTickMutation($session.contenderId));
   const deleteTick = $derived(deleteTickMutation());
-  const updateTick = $derived(updateTickMutation($session.contenderId));
 
   let open = $state(false);
 
-  const loading = $derived(
-    createTick.isPending || deleteTick.isPending || updateTick.isPending,
-  );
+  const loading = $derived(putTick.isPending || deleteTick.isPending);
   const variant = $derived.by(() => {
     switch (true) {
       case tick?.top && tick.attemptsTop === 1:
@@ -78,73 +71,39 @@
     navigator.vibrate?.(50);
     open = false;
 
-    if (tick !== undefined) {
-      const patch: TickPatch = {
-        top: false,
-        zone2: false,
-        zone1: false,
-        attemptsTop: flash ? 1 : 999,
-        attemptsZone2: flash ? 1 : 999,
-        attemptsZone1: flash ? 1 : 999,
-      };
+    const nextTick: Omit<Tick, "id" | "timestamp"> = {
+      problemId: problem.id,
+      top: false,
+      zone2: false,
+      zone1: false,
+      attemptsTop: flash ? 1 : 999,
+      attemptsZone2: flash ? 1 : 999,
+      attemptsZone1: flash ? 1 : 999,
+    };
 
-      switch (feature) {
-        case "top":
-          patch.top = true;
-          patch.zone2 = true;
-          patch.zone1 = true;
-          break;
-        case "zone2":
-          patch.zone2 = true;
-          patch.zone1 = true;
-          break;
-        case "zone1":
-          patch.zone1 = true;
-      }
-
-      updateTick.mutate(
-        { tickId: tick.id, patch },
-        {
-          onError: () => {
-            toastError("Failed to register ascent.");
-          },
-        },
-      );
-    } else {
-      const newTick: Omit<Tick, "id" | "timestamp"> = {
-        problemId: problem.id,
-        top: false,
-        zone2: false,
-        zone1: false,
-        attemptsTop: flash ? 1 : 999,
-        attemptsZone2: flash ? 1 : 999,
-        attemptsZone1: flash ? 1 : 999,
-      };
-
-      switch (feature) {
-        case "top":
-          newTick.top = true;
-          newTick.zone2 = true;
-          newTick.zone1 = true;
-          break;
-        case "zone2":
-          newTick.zone2 = true;
-          newTick.zone1 = true;
-          break;
-        case "zone1":
-          newTick.zone1 = true;
-      }
-
-      createTick.mutate(newTick, {
-        onError: (error) => {
-          if (error instanceof AxiosError && error.status === 409) {
-            toastError("Ascent is already registered.");
-          } else {
-            toastError("Failed to register ascent.");
-          }
-        },
-      });
+    switch (feature) {
+      case "top":
+        nextTick.top = true;
+        nextTick.zone2 = true;
+        nextTick.zone1 = true;
+        break;
+      case "zone2":
+        nextTick.zone2 = true;
+        nextTick.zone1 = true;
+        break;
+      case "zone1":
+        nextTick.zone1 = true;
     }
+
+    putTick.mutate(nextTick, {
+      onError: (error) => {
+        if (error instanceof AxiosError && error.status === 409) {
+          toastError("Ascent is already registered.");
+        } else {
+          toastError("Failed to register ascent.");
+        }
+      },
+    });
   };
 
   $effect(() => {

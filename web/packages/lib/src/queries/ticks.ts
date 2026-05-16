@@ -6,7 +6,7 @@ import {
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import type { Tick, TickPatch } from "../models";
+import type { Tick } from "../models";
 import { HOUR } from "./constants";
 
 export const getTicksByContenderQuery = (
@@ -34,24 +34,12 @@ export const getTicksByContestQuery = (contestId: number) =>
     refetchOnWindowFocus: true,
   }));
 
-export const createTickMutation = (contenderId: number) => {
+export const putTickMutation = (contenderId: number) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
     mutationFn: (tick: Omit<Tick, "id" | "timestamp">) =>
-      ApiClient.getInstance().createTick(contenderId, tick),
-    onSuccess: (newTick) => {
-      updateTickInQueryCache(client, contenderId, newTick);
-    },
-  }));
-};
-
-export const updateTickMutation = (contenderId: number) => {
-  const client = useQueryClient();
-
-  return createMutation(() => ({
-    mutationFn: ({ tickId, patch }: { tickId: number; patch: TickPatch }) =>
-      ApiClient.getInstance().updateTick(tickId, patch),
+      ApiClient.getInstance().putTick(contenderId, tick),
     onSuccess: (updatedTick) => {
       updateTickInQueryCache(client, contenderId, updatedTick);
     },

@@ -1025,6 +1025,41 @@ func (q *Queries) GetTick(ctx context.Context, id int32) (GetTickRow, error) {
 	return i, err
 }
 
+const getTickByContenderAndProblem = `-- name: GetTickByContenderAndProblem :one
+SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
+FROM tick
+WHERE contender_id = ? AND problem_id = ?
+`
+
+type GetTickByContenderAndProblemParams struct {
+	ContenderID int32
+	ProblemID   int32
+}
+
+type GetTickByContenderAndProblemRow struct {
+	Tick Tick
+}
+
+func (q *Queries) GetTickByContenderAndProblem(ctx context.Context, arg GetTickByContenderAndProblemParams) (GetTickByContenderAndProblemRow, error) {
+	row := q.db.QueryRowContext(ctx, getTickByContenderAndProblem, arg.ContenderID, arg.ProblemID)
+	var i GetTickByContenderAndProblemRow
+	err := row.Scan(
+		&i.Tick.ID,
+		&i.Tick.OrganizerID,
+		&i.Tick.ContestID,
+		&i.Tick.ContenderID,
+		&i.Tick.ProblemID,
+		&i.Tick.Timestamp,
+		&i.Tick.Zone1,
+		&i.Tick.AttemptsZone1,
+		&i.Tick.Zone2,
+		&i.Tick.AttemptsZone2,
+		&i.Tick.Top,
+		&i.Tick.AttemptsTop,
+	)
+	return i, err
+}
+
 const getTicksByContender = `-- name: GetTicksByContender :many
 SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick

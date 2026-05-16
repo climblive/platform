@@ -91,6 +91,21 @@ func (d *Database) GetTick(ctx context.Context, tx domain.Transaction, tickID do
 	return tickToDomain(record.Tick), nil
 }
 
+func (d *Database) GetTickByContenderAndProblem(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID, problemID domain.ProblemID) (domain.Tick, error) {
+	record, err := d.WithTx(tx).GetTickByContenderAndProblem(ctx, database.GetTickByContenderAndProblemParams{
+		ContenderID: int32(contenderID),
+		ProblemID:   int32(problemID),
+	})
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return domain.Tick{}, errors.Wrap(domain.ErrNotFound, 0)
+	case err != nil:
+		return domain.Tick{}, errors.Wrap(err, 0)
+	}
+
+	return tickToDomain(record.Tick), nil
+}
+
 func (d *Database) GetTicksByProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) ([]domain.Tick, error) {
 	records, err := d.WithTx(tx).GetTicksByProblem(ctx, int32(problemID))
 	if err != nil {
