@@ -517,7 +517,7 @@ func (m *scoreEngineMock) ScoreContender(contenderID domain.ContenderID) iter.Se
 	return args.Get(0).(iter.Seq[scores.Effect])
 }
 
-func (m *scoreEngineMock) CalculateProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[scores.Effect] {
+func (m *scoreEngineMock) CalculatePointValues(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[scores.Effect] {
 	args := m.Called(compClassID, problemID)
 	return args.Get(0).(iter.Seq[scores.Effect])
 }

@@ -30,7 +30,7 @@ type ScoreEngine interface {
 
 	RankCompClass(compClassID domain.CompClassID)
 	ScoreContender(contenderID domain.ContenderID) iter.Seq[Effect]
-	CalculateProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect]
+	CalculatePointValues(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect]
 
 	GetDirtyScores() []domain.Score
 	GetDirtyPointValues() []PointValue
@@ -347,7 +347,7 @@ func (r *EffectRunner) Run(effects iter.Seq[Effect]) {
 			chainEffects = r.driver.engine.ScoreContender(effect.ContenderID)
 		case EffectCalculatePointValues:
 			r.driver.logger.Info("re-calculating point values", "comp_class_id", effect.CompClassID, "problem_id", effect.ProblemID)
-			chainEffects = r.driver.engine.CalculateProblemValue(effect.CompClassID, effect.ProblemID)
+			chainEffects = r.driver.engine.CalculatePointValues(effect.CompClassID, effect.ProblemID)
 		}
 
 		if chainEffects == nil {

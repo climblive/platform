@@ -562,10 +562,6 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 	}
 }
 
-func (e *DefaultScoreEngine) CalculateProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect] {
-	return e.CalculatePointValues(compClassID, problemID)
-}
-
 func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter.Seq[Effect] {
 	contender, found := e.store.GetContender(contenderID)
 	if !found {

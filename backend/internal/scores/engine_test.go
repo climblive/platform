@@ -819,7 +819,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
-	t.Run("CalculateProblemValue_UsePointsFalse", func(t *testing.T) {
+	t.Run("CalculatePointValues_UsePointsFalse", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
@@ -831,14 +831,14 @@ func TestDefaultScoreEngine(t *testing.T) {
 				UsePoints: false,
 			})
 
-		effects := f.engine.CalculateProblemValue(fakedCompClassID, fakedProblemID)
+		effects := f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID)
 
 		assert.Nil(t, effects)
 
 		awaitExpectations(t)
 	})
 
-	t.Run("CalculateProblemValue_ProblemNotFound", func(t *testing.T) {
+	t.Run("CalculatePointValues_ProblemNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
@@ -854,14 +854,14 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("GetProblem", fakedProblemID).
 			Return(scores.Problem{}, false)
 
-		effects := f.engine.CalculateProblemValue(fakedCompClassID, fakedProblemID)
+		effects := f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID)
 
 		assert.Nil(t, effects)
 
 		awaitExpectations(t)
 	})
 
-	t.Run("CalculateProblemValue_NonPooledPoints", func(t *testing.T) {
+	t.Run("CalculatePointValues_NonPooledPoints", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
@@ -919,14 +919,14 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Maximum:     500,
 			}).Return()
 
-		effects := f.engine.CalculateProblemValue(fakedCompClassID, fakedProblemID)
+		effects := f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID)
 
 		assert.Nil(t, effects)
 
 		awaitExpectations(t)
 	})
 
-	t.Run("CalculateProblemValue_PooledPoints_ValueUnchanged", func(t *testing.T) {
+	t.Run("CalculatePointValues_PooledPoints_ValueUnchanged", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
@@ -1007,14 +1007,14 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Maximum:     500,
 			}).Return()
 
-		effects := f.engine.CalculateProblemValue(fakedCompClassID, fakedProblemID)
+		effects := f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID)
 
 		require.Nil(t, effects)
 
 		awaitExpectations(t)
 	})
 
-	t.Run("CalculateProblemValue_PooledPoints_UpdatedValue", func(t *testing.T) {
+	t.Run("CalculatePointValues_PooledPoints_UpdatedValue", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
@@ -1218,7 +1218,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Maximum:     125,
 			}).Return()
 
-		effects := slices.Collect(f.engine.CalculateProblemValue(fakedCompClassID, fakedProblemID))
+		effects := slices.Collect(f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
 			scores.EffectScoreContender{ContenderID: fakedContender1ID},
@@ -1231,7 +1231,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
-	t.Run("CalculateProblemValue_PooledPoints_MaximumUsesAdditionalTick", func(t *testing.T) {
+	t.Run("CalculatePointValues_PooledPoints_MaximumUsesAdditionalTick", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
@@ -1308,7 +1308,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Maximum:     33,
 			}).Return()
 
-		effects := slices.Collect(f.engine.CalculateProblemValue(fakedCompClassID, fakedProblemID))
+		effects := slices.Collect(f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
 			scores.EffectScoreContender{ContenderID: fakedContender3ID},
@@ -1317,7 +1317,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
-	t.Run("CalculateProblemValue_PooledPoints_ExcludeDisqualified", func(t *testing.T) {
+	t.Run("CalculatePointValues_PooledPoints_ExcludeDisqualified", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
@@ -1439,7 +1439,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Maximum:     250,
 			}).Return()
 
-		effects := slices.Collect(f.engine.CalculateProblemValue(fakedCompClassID, fakedProblemID))
+		effects := slices.Collect(f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
 			scores.EffectScoreContender{ContenderID: fakedContender1ID},
