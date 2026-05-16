@@ -124,7 +124,7 @@ func main() {
 	authorizer := authorizer.NewAuthorizer(database, jwtDecoder)
 	eventBroker := events.NewBroker()
 	scoreKeeper := scores.NewScoreKeeper(eventBroker, database)
-	problemValueKeeper := scores.NewProblemValueKeeper(eventBroker)
+	pointValueKeeper := scores.NewPointValueKeeper(eventBroker)
 	scoreEngineStoreHydrator := &scores.StandardEngineStoreHydrator{Repo: database}
 
 	scoreEngineMaxLifetime := getScoreEngineMaxLifetime()
@@ -146,9 +146,9 @@ func main() {
 		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
 		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()),
 		scrubberRunner.Run(ctx, scrubber.WithPanicRecovery()),
-		problemValueKeeper.Run(ctx, scores.WithPanicRecovery()))
+		pointValueKeeper.Run(ctx, scores.WithPanicRecovery()))
 
-	mux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager, scrubberRunner, problemValueKeeper)
+	mux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager, scrubberRunner, pointValueKeeper)
 
 	httpServer := &http.Server{
 		Addr:                         "0.0.0.0:8090",
@@ -214,13 +214,14 @@ func setupMux(
 	scoreKeeper *scores.Keeper,
 	scoreEngineManager *scores.ScoreEngineManager,
 	scrubber *scrubber.Scrubber,
-	problemValueKeeper domain.ProblemValueKeeper,
+	pointValueKeeper domain.PointValueKeeper,
 ) *rest.Mux {
 	contenderUseCase := usecases.ContenderUseCase{
 		Repo:                      repo,
 		Authorizer:                authorizer,
 		EventBroker:               eventBroker,
 		ScoreKeeper:               scoreKeeper,
+		PointValueKeeper:          pointValueKeeper,
 		RegistrationCodeGenerator: &registrationCodeGenerator{},
 	}
 
@@ -238,10 +239,9 @@ func setupMux(
 	}
 
 	problemUseCase := usecases.ProblemUseCase{
-		Repo:               repo,
-		Authorizer:         authorizer,
-		EventBroker:        eventBroker,
-		ProblemValueKeeper: problemValueKeeper,
+		Repo:        repo,
+		Authorizer:  authorizer,
+		EventBroker: eventBroker,
 	}
 
 	tickUseCase := usecases.TickUseCase{

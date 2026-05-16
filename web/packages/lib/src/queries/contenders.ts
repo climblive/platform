@@ -6,7 +6,7 @@ import {
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import type { Contender, ContenderPatch } from "../models";
+import type { Contender, ContenderPatch, PointValue } from "../models";
 import type { CreateContendersArguments } from "../models/rest";
 import { HOUR } from "./constants";
 
@@ -28,6 +28,17 @@ export const getContendersByContestQuery = (contestId: number) =>
     retry: false,
     gcTime: 12 * HOUR,
     staleTime: 0,
+  }));
+
+export const getPointValuesByContenderQuery = (contenderId: number) =>
+  createQuery(() => ({
+    queryKey: ["pointValues", { contenderId }],
+    queryFn: async () =>
+      ApiClient.getInstance().getPointValuesByContender(contenderId),
+    retry: false,
+    gcTime: 12 * HOUR,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
   }));
 
 export const patchContenderMutation = (contenderId: number) => {
@@ -88,5 +99,32 @@ export const updateContenderPublicInfoInQueryCache = (
     if (contender) {
       return { ...contender, ...updatedPublicInfo };
     }
+  });
+};
+
+export const updatePointValueInQueryCache = (
+  queryClient: QueryClient,
+  contenderId: number,
+  updatedPointValue: PointValue,
+) => {
+  const queryKey: QueryKey = ["pointValues", { contenderId }];
+
+  queryClient.setQueryData<PointValue[]>(queryKey, (pointValues) => {
+    const values = pointValues ?? [];
+    const index = values.findIndex(
+      ({ problemId }) => problemId === updatedPointValue.problemId,
+    );
+
+    if (index === -1) {
+      return [...values, updatedPointValue];
+    }
+
+    return values.map((pointValue, currentIndex) => {
+      if (currentIndex === index) {
+        return updatedPointValue;
+      }
+
+      return pointValue;
+    });
   });
 };

@@ -1,19 +1,20 @@
 <script lang="ts">
   import { HoldColorIndicator, Score } from "@climblive/lib/components";
-  import type { Problem, Tick } from "@climblive/lib/models";
-  import { calculateProblemScore } from "@climblive/lib/utils";
+  import type { PointValue, Problem, Tick } from "@climblive/lib/models";
   import TickBox from "./TickBox.svelte";
 
+  type ScorecardProblem = Problem & {
+    pointValue?: PointValue;
+  };
+
   interface Props {
-    problem: Problem;
+    problem: ScorecardProblem;
     tick?: Tick | undefined;
     disabled: boolean;
     disqualified: boolean;
   }
 
   const { problem, tick, disabled, disqualified }: Props = $props();
-
-  const pointValue = $derived(calculateProblemScore(problem, tick));
 </script>
 
 <section
@@ -29,16 +30,13 @@
   />
   <span class="number">№ {problem.number}</span>
   <span class="points">
-    <span class="top">
-      {problem.pointsTop}p
-    </span>
-    {#if problem.flashBonus}
-      <wa-icon name="bolt"></wa-icon>
+    {#if problem.pointValue}
+      <span class="top">{problem.pointValue.maximum}p</span>
     {/if}
   </span>
   <div class="score">
-    {#if tick}
-      <Score value={disqualified ? 0 : pointValue} prefix="+" />
+    {#if tick && problem.pointValue}
+      <Score value={disqualified ? 0 : problem.pointValue.current} prefix="+" />
     {/if}
   </div>
 

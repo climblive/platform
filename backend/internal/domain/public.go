@@ -140,6 +140,13 @@ type ProblemValue struct {
 	FlashBonus  int `json:"flashBonus,omitempty"`
 }
 
+type PointValue struct {
+	ContenderID ContenderID `json:"contenderId"`
+	ProblemID   ProblemID   `json:"problemId"`
+	Current     int         `json:"current"`
+	Maximum     int         `json:"maximum"`
+}
+
 type Problem struct {
 	ID                 ProblemID     `json:"id"`
 	Ownership          OwnershipData `json:"-"`
@@ -332,11 +339,11 @@ type ContenderScoreUpdatedEvent struct {
 	RankOrder   int         `json:"rankOrder"`
 }
 
-type ProblemValueUpdatedEvent struct {
+type PointValueUpdatedEvent struct {
+	ContenderID ContenderID `json:"contenderId"`
 	ProblemID   ProblemID   `json:"problemId"`
-	CompClassID CompClassID `json:"compClassId"`
-
-	ProblemValue `tstype:",extends"`
+	Current     int         `json:"current"`
+	Maximum     int         `json:"maximum"`
 }
 
 type ScoreEngineStartedEvent struct {

@@ -25,21 +25,22 @@
     ascentRegisteredEventSchema,
     contenderPublicInfoUpdatedEventSchema,
     contenderScoreUpdatedEventSchema,
-    problemValueUpdatedEventSchema,
+    pointValueUpdatedEventSchema,
     raffleWinnerDrawnEventSchema,
+    type PointValue,
     type Problem,
-    type ProblemValue,
     type Tick,
   } from "@climblive/lib/models";
   import {
     getCompClassesQuery,
     getContenderQuery,
     getContestQuery,
+    getPointValuesByContenderQuery,
     getProblemsByCompClassQuery,
     getTicksByContenderQuery,
     removeTickFromQueryCache,
     updateContenderPublicInfoInQueryCache,
-    updateProblemValueInQueryCache,
+    updatePointValueInQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
@@ -55,6 +56,9 @@
   const contestQuery = $derived(getContestQuery($session.contestId));
   const compClassesQuery = $derived(getCompClassesQuery($session.contestId));
   const ticksQuery = $derived(getTicksByContenderQuery($session.contenderId));
+  const pointValuesQuery = $derived(
+    getPointValuesByContenderQuery($session.contenderId),
+  );
 
   let resultsConnected = $state(false);
   let tabGroup: WaTabGroup | undefined = $state();
@@ -85,28 +89,55 @@
   );
 
   let problems = $derived(problemsQuery?.data);
+  let pointValues = $derived(pointValuesQuery.data);
+
+  type ScorecardProblem = Problem & {
+    pointValue?: PointValue;
+  };
 
   let orderProblemsBy = $state<"number" | "points">("number");
   let sortDirection = $state<"asc" | "desc">("asc");
 
-  let sortedProblems = $derived.by<Problem[]>(() => {
-    const clonedProblems = [...(problems ?? [])];
+  let sortedProblems = $derived.by<ScorecardProblem[]>(() => {
+    const pointValueByProblemId = new Map(
+      (pointValues ?? []).map((pointValue) => [
+        pointValue.problemId,
+        pointValue,
+      ]),
+    );
+
+    const clonedProblems = (problems ?? []).map((problem) => ({
+      ...problem,
+      pointValue: pointValueByProblemId.get(problem.id),
+    }));
 
     switch (orderProblemsBy) {
       case "number":
         clonedProblems.sort(
-          (p1: Problem, p2: Problem) => p1.number - p2.number,
+          (p1: ScorecardProblem, p2: ScorecardProblem) => p1.number - p2.number,
         );
 
         break;
       case "points":
-        clonedProblems.sort(
-          (p1: Problem, p2: Problem) =>
-            p1.pointsTop +
-            (p1.flashBonus ?? 0) -
-            p2.pointsTop -
-            (p2.flashBonus ?? 0),
-        );
+        clonedProblems.sort((p1: ScorecardProblem, p2: ScorecardProblem) => {
+          if (p1.pointValue === undefined && p2.pointValue === undefined) {
+            return p1.number - p2.number;
+          }
+
+          if (p1.pointValue === undefined) {
+            return 1;
+          }
+
+          if (p2.pointValue === undefined) {
+            return -1;
+          }
+
+          if (p1.pointValue.maximum === p2.pointValue.maximum) {
+            return p1.number - p2.number;
+          }
+
+          return p1.pointValue.maximum - p2.pointValue.maximum;
+        });
 
         break;
     }
@@ -238,22 +269,10 @@
       removeTickFromQueryCache(queryClient, event.tickId);
     });
 
-    eventSource.addEventListener("PROBLEM_VALUE_UPDATED", (e) => {
-      const event = problemValueUpdatedEventSchema.parse(JSON.parse(e.data));
+    eventSource.addEventListener("POINT_VALUE_UPDATED", (e) => {
+      const event = pointValueUpdatedEventSchema.parse(JSON.parse(e.data));
 
-      const problemValue: ProblemValue = {
-        pointsTop: event.pointsTop,
-        pointsZone1: event.pointsZone1,
-        pointsZone2: event.pointsZone2,
-        flashBonus: event.flashBonus,
-      };
-
-      updateProblemValueInQueryCache(
-        queryClient,
-        event.compClassId,
-        event.problemId,
-        problemValue,
-      );
+      updatePointValueInQueryCache(queryClient, event.contenderId, event);
     });
 
     eventSource.addEventListener("RAFFLE_WINNER_DRAWN", (e) => {

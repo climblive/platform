@@ -5,6 +5,7 @@ export * from "./event";
 export * from "./generated";
 export * from "./health";
 export * from "./organizer";
+export * from "./pointValue";
 export * from "./problem";
 export * from "./rest";
 export * from "./scoreboard";

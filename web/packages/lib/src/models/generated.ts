@@ -147,6 +147,12 @@ export interface ProblemValue {
   pointsTop: number /* int */;
   flashBonus?: number /* int */;
 }
+export interface PointValue {
+  contenderId: ContenderID;
+  problemId: ProblemID;
+  current: number /* int */;
+  maximum: number /* int */;
+}
 export interface Problem extends ProblemValue {
   id: ProblemID;
   contestId: ContestID;
@@ -300,10 +306,7 @@ export interface ContenderScoreUpdatedEvent {
   finalist: boolean;
   rankOrder: number /* int */;
 }
-export interface ProblemValueUpdatedEvent extends ProblemValue {
-  problemId: ProblemID;
-  compClassId: CompClassID;
-}
+export interface PointValueUpdatedEvent extends PointValue {}
 export interface ScoreEngineStartedEvent {
   instanceId: ScoreEngineInstanceID;
 }

@@ -33,7 +33,7 @@ type ScoreEngine interface {
 	CalculateProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect]
 
 	GetDirtyScores() []domain.Score
-	GetDirtyProblemValues() []ProblemValue
+	GetDirtyProblemValues() []PointValue
 }
 
 type ScoreEngineDriver struct {
@@ -289,7 +289,7 @@ func (r *EffectRunner) RunChainEffects(effects iter.Seq[Effect]) {
 	r.Run(func(yield func(Effect) bool) {
 		for effect := range effects {
 			switch effect.(type) {
-			case EffectCalculateProblemValue:
+			case EffectCalculatePointValues:
 			default:
 				r.queue[effect.Encode()] = effect
 				continue
@@ -341,8 +341,8 @@ func (r *EffectRunner) Run(effects iter.Seq[Effect]) {
 		case EffectScoreContender:
 			r.driver.logger.Info("re-scoring contender", "contender_id", effect.ContenderID)
 			chainEffects = r.driver.engine.ScoreContender(effect.ContenderID)
-		case EffectCalculateProblemValue:
-			r.driver.logger.Info("re-calculating problem value", "comp_class_id", effect.CompClassID, "problem_id", effect.ProblemID)
+		case EffectCalculatePointValues:
+			r.driver.logger.Info("re-calculating point values", "comp_class_id", effect.CompClassID, "problem_id", effect.ProblemID)
 			chainEffects = r.driver.engine.CalculateProblemValue(effect.CompClassID, effect.ProblemID)
 		}
 
@@ -368,8 +368,8 @@ func (d *ScoreEngineDriver) publishDirtyUpdates() int {
 		batch = append(batch, domain.ContenderScoreUpdatedEvent(score))
 	}
 
-	for problemValue := range slices.Values(d.engine.GetDirtyProblemValues()) {
-		d.eventBroker.Dispatch(d.contestID, domain.ProblemValueUpdatedEvent(problemValue))
+	for pointValue := range slices.Values(d.engine.GetDirtyProblemValues()) {
+		d.eventBroker.Dispatch(d.contestID, domain.PointValueUpdatedEvent(pointValue))
 
 		publishCount++
 	}

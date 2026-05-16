@@ -29,6 +29,7 @@ type ContenderUseCase struct {
 	Authorizer                domain.Authorizer
 	EventBroker               domain.EventBroker
 	ScoreKeeper               domain.ScoreKeeper
+	PointValueKeeper          domain.PointValueKeeper
 	RegistrationCodeGenerator domain.CodeGenerator
 }
 
@@ -52,6 +53,23 @@ func (uc *ContenderUseCase) GetContenderByCode(ctx context.Context, registration
 	}
 
 	return withScore(contender, uc.ScoreKeeper), nil
+}
+
+func (uc *ContenderUseCase) GetPointValues(ctx context.Context, contenderID domain.ContenderID) ([]domain.PointValue, error) {
+	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	if _, err := uc.Authorizer.HasOwnership(ctx, contender.Ownership); err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	if uc.PointValueKeeper == nil {
+		return []domain.PointValue{}, nil
+	}
+
+	return uc.PointValueKeeper.GetPointValues(contenderID), nil
 }
 
 func (uc *ContenderUseCase) GetContendersByCompClass(ctx context.Context, compClassID domain.CompClassID) ([]domain.Contender, error) {

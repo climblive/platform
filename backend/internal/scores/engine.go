@@ -26,7 +26,7 @@ type Ranker interface {
 type EffectType int8
 
 const (
-	EffectTypeCalculateProblemValue EffectType = iota
+	EffectTypeCalculatePointValues EffectType = iota
 	EffectTypeScoreContender
 	EffectTypeRankClass
 )
@@ -59,14 +59,16 @@ func (e EffectRankClass) Encode() EncodedEffect {
 	return data
 }
 
-type EffectCalculateProblemValue struct {
+type EffectCalculatePointValues struct {
 	CompClassID domain.CompClassID
 	ProblemID   domain.ProblemID
 }
 
-func (e EffectCalculateProblemValue) Encode() EncodedEffect {
+type EffectCalculateProblemValue = EffectCalculatePointValues
+
+func (e EffectCalculatePointValues) Encode() EncodedEffect {
 	var data EncodedEffect
-	data[0] = byte(EffectTypeCalculateProblemValue)
+	data[0] = byte(EffectTypeCalculatePointValues)
 	binary.LittleEndian.PutUint32(data[1:], uint32(e.ProblemID))
 	binary.LittleEndian.PutUint32(data[5:], uint32(e.CompClassID))
 	return data
@@ -83,6 +85,7 @@ type EngineStore interface {
 	GetCompClassIDs() []domain.CompClassID
 
 	GetTicksByContender(domain.ContenderID) iter.Seq[Tick]
+	GetTick(domain.ContenderID, domain.ProblemID) (Tick, bool)
 	SaveTick(domain.ContenderID, Tick)
 	DeleteTick(domain.ContenderID, domain.ProblemID)
 	GetTicksByProblem(domain.CompClassID, domain.ProblemID) iter.Seq[Tick]
@@ -91,9 +94,9 @@ type EngineStore interface {
 	SaveProblem(Problem)
 	GetAllProblems() iter.Seq[Problem]
 
-	GetProblemValue(domain.CompClassID, domain.ProblemID) (ProblemValue, bool)
-	SaveProblemValue(domain.CompClassID, domain.ProblemID, ProblemValue)
-	GetDirtyProblemValues() []ProblemValue
+	GetProblemValue(domain.ContenderID, domain.ProblemID) (PointValue, bool)
+	SaveProblemValue(domain.ContenderID, domain.ProblemID, PointValue)
+	GetDirtyProblemValues() []PointValue
 
 	SaveScore(domain.Score)
 	GetDirtyScores() []domain.Score
@@ -113,16 +116,22 @@ func (e *DefaultScoreEngine) Start() iter.Seq[Effect] {
 	return func(yield func(Effect) bool) {
 		for _, compClassID := range e.store.GetCompClassIDs() {
 			for problem := range e.store.GetAllProblems() {
-				yield(EffectCalculateProblemValue{CompClassID: compClassID, ProblemID: problem.ID})
+				if !yield(EffectCalculatePointValues{CompClassID: compClassID, ProblemID: problem.ID}) {
+					return
+				}
 			}
 
 			for contender := range e.store.GetContendersByCompClass(compClassID) {
-				yield(EffectScoreContender{ContenderID: contender.ID})
+				if !yield(EffectScoreContender{ContenderID: contender.ID}) {
+					return
+				}
 			}
 		}
 
 		for _, compClassID := range e.store.GetCompClassIDs() {
-			yield(EffectRankClass{CompClassID: compClassID})
+			if !yield(EffectRankClass{CompClassID: compClassID}) {
+				return
+			}
 		}
 	}
 }
@@ -155,7 +164,15 @@ func (e *DefaultScoreEngine) HandleContenderEntered(event domain.ContenderEntere
 	e.store.SaveContender(contender)
 
 	return func(yield func(Effect) bool) {
-		yield(EffectRankClass{CompClassID: contender.CompClassID})
+		for problem := range e.store.GetAllProblems() {
+			if !yield(EffectCalculatePointValues{CompClassID: contender.CompClassID, ProblemID: problem.ID}) {
+				return
+			}
+		}
+
+		if !yield(EffectRankClass{CompClassID: contender.CompClassID}) {
+			return
+		}
 	}
 }
 
@@ -176,13 +193,23 @@ func (e *DefaultScoreEngine) HandleContenderSwitchedClass(event domain.Contender
 	e.store.SaveContender(contender)
 
 	return func(yield func(Effect) bool) {
-		for tick := range e.store.GetTicksByContender(contender.ID) {
-			yield(EffectCalculateProblemValue{CompClassID: oldCompClassID, ProblemID: tick.ProblemID})
-			yield(EffectCalculateProblemValue{CompClassID: event.CompClassID, ProblemID: tick.ProblemID})
+		for problem := range e.store.GetAllProblems() {
+			if !yield(EffectCalculatePointValues{CompClassID: oldCompClassID, ProblemID: problem.ID}) {
+				return
+			}
+
+			if !yield(EffectCalculatePointValues{CompClassID: event.CompClassID, ProblemID: problem.ID}) {
+				return
+			}
 		}
 
-		yield(EffectRankClass{CompClassID: oldCompClassID})
-		yield(EffectRankClass{CompClassID: event.CompClassID})
+		if !yield(EffectRankClass{CompClassID: oldCompClassID}) {
+			return
+		}
+
+		if !yield(EffectRankClass{CompClassID: event.CompClassID}) {
+			return
+		}
 	}
 }
 
@@ -197,7 +224,9 @@ func (e *DefaultScoreEngine) HandleContenderWithdrewFromFinals(event domain.Cont
 	e.store.SaveContender(contender)
 
 	return func(yield func(Effect) bool) {
-		yield(EffectRankClass{CompClassID: contender.CompClassID})
+		if !yield(EffectRankClass{CompClassID: contender.CompClassID}) {
+			return
+		}
 	}
 }
 
@@ -212,7 +241,9 @@ func (e *DefaultScoreEngine) HandleContenderReenteredFinals(event domain.Contend
 	e.store.SaveContender(contender)
 
 	return func(yield func(Effect) bool) {
-		yield(EffectRankClass{CompClassID: contender.CompClassID})
+		if !yield(EffectRankClass{CompClassID: contender.CompClassID}) {
+			return
+		}
 	}
 }
 
@@ -230,11 +261,18 @@ func (e *DefaultScoreEngine) HandleContenderDisqualified(event domain.ContenderD
 
 	return func(yield func(Effect) bool) {
 		for tick := range ticks {
-			yield(EffectCalculateProblemValue{CompClassID: contender.CompClassID, ProblemID: tick.ProblemID})
+			if !yield(EffectCalculatePointValues{CompClassID: contender.CompClassID, ProblemID: tick.ProblemID}) {
+				return
+			}
 		}
 
-		yield(EffectScoreContender{ContenderID: contender.ID})
-		yield(EffectRankClass{CompClassID: contender.CompClassID})
+		if !yield(EffectScoreContender{ContenderID: contender.ID}) {
+			return
+		}
+
+		if !yield(EffectRankClass{CompClassID: contender.CompClassID}) {
+			return
+		}
 	}
 }
 
@@ -252,11 +290,18 @@ func (e *DefaultScoreEngine) HandleContenderRequalified(event domain.ContenderRe
 
 	return func(yield func(Effect) bool) {
 		for tick := range ticks {
-			yield(EffectCalculateProblemValue{CompClassID: contender.CompClassID, ProblemID: tick.ProblemID})
+			if !yield(EffectCalculatePointValues{CompClassID: contender.CompClassID, ProblemID: tick.ProblemID}) {
+				return
+			}
 		}
 
-		yield(EffectScoreContender{ContenderID: contender.ID})
-		yield(EffectRankClass{CompClassID: contender.CompClassID})
+		if !yield(EffectScoreContender{ContenderID: contender.ID}) {
+			return
+		}
+
+		if !yield(EffectRankClass{CompClassID: contender.CompClassID}) {
+			return
+		}
 	}
 }
 
@@ -285,8 +330,13 @@ func (e *DefaultScoreEngine) HandleAscentRegistered(event domain.AscentRegistere
 	}
 
 	return func(yield func(Effect) bool) {
-		yield(EffectCalculateProblemValue{CompClassID: contender.CompClassID, ProblemID: event.ProblemID})
-		yield(EffectScoreContender{ContenderID: contender.ID})
+		if !yield(EffectCalculatePointValues{CompClassID: contender.CompClassID, ProblemID: event.ProblemID}) {
+			return
+		}
+
+		if !yield(EffectScoreContender{ContenderID: contender.ID}) {
+			return
+		}
 	}
 }
 
@@ -303,8 +353,13 @@ func (e *DefaultScoreEngine) HandleAscentDeregistered(event domain.AscentDeregis
 	}
 
 	return func(yield func(Effect) bool) {
-		yield(EffectCalculateProblemValue{CompClassID: contender.CompClassID, ProblemID: event.ProblemID})
-		yield(EffectScoreContender{ContenderID: contender.ID})
+		if !yield(EffectCalculatePointValues{CompClassID: contender.CompClassID, ProblemID: event.ProblemID}) {
+			return
+		}
+
+		if !yield(EffectScoreContender{ContenderID: contender.ID}) {
+			return
+		}
 	}
 }
 
@@ -316,7 +371,13 @@ func (e *DefaultScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) 
 
 	e.store.SaveProblem(problem)
 
-	return nil
+	return func(yield func(Effect) bool) {
+		for _, compClassID := range e.store.GetCompClassIDs() {
+			if !yield(EffectCalculatePointValues{CompClassID: compClassID, ProblemID: event.ProblemID}) {
+				return
+			}
+		}
+	}
 }
 
 func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEvent) iter.Seq[Effect] {
@@ -329,7 +390,7 @@ func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEve
 
 	return func(yield func(Effect) bool) {
 		for _, compClassID := range e.store.GetCompClassIDs() {
-			if !yield(EffectCalculateProblemValue{CompClassID: compClassID, ProblemID: event.ProblemID}) {
+			if !yield(EffectCalculatePointValues{CompClassID: compClassID, ProblemID: event.ProblemID}) {
 				return
 			}
 		}
@@ -340,13 +401,48 @@ func (e *DefaultScoreEngine) GetDirtyScores() []domain.Score {
 	return e.store.GetDirtyScores()
 }
 
-func (e *DefaultScoreEngine) GetDirtyProblemValues() []ProblemValue {
+func (e *DefaultScoreEngine) GetDirtyProblemValues() []PointValue {
 	return e.store.GetDirtyProblemValues()
 }
 
-func (e *DefaultScoreEngine) CalculateProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect] {
+func pointMaximum(value domain.ProblemValue, tick *Tick) int {
+	maximum := value.PointsTop
+
+	if tick == nil {
+		maximum += value.FlashBonus
+	}
+
+	return maximum
+}
+
+func pointCurrent(value domain.ProblemValue, tick *Tick) int {
+	if tick == nil {
+		return 0
+	}
+
+	current := 0
+
+	if tick.Zone1 {
+		current = value.PointsZone1
+	}
+
+	if tick.Zone2 {
+		current = value.PointsZone2
+	}
+
+	if tick.Top {
+		current = value.PointsTop
+
+		if tick.AttemptsTop == 1 {
+			current += value.FlashBonus
+		}
+	}
+
+	return current
+}
+
+func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect] {
 	rules := e.store.GetRules()
-	var affectedContenders []domain.ContenderID
 
 	if !rules.UsePoints {
 		return nil
@@ -357,13 +453,7 @@ func (e *DefaultScoreEngine) CalculateProblemValue(compClassID domain.CompClassI
 		return nil
 	}
 
-	value := ProblemValue{
-		ProblemID:    problem.ID,
-		CompClassID:  compClassID,
-		ProblemValue: problem.ProblemValue,
-	}
-
-	oldValue := value
+	value := problem.ProblemValue
 
 	if rules.PooledPoints {
 		numZone1 := 0
@@ -396,11 +486,9 @@ func (e *DefaultScoreEngine) CalculateProblemValue(compClassID domain.CompClassI
 					numFlash++
 				}
 			}
-
-			affectedContenders = append(affectedContenders, tick.ContenderID)
 		}
 
-		value.ProblemValue = domain.ProblemValue{
+		value = domain.ProblemValue{
 			PointsZone1: problem.PointsZone1 / max(1, numZone1),
 			PointsZone2: problem.PointsZone2 / max(1, numZone2),
 			PointsTop:   problem.PointsTop / max(1, numTop),
@@ -408,9 +496,31 @@ func (e *DefaultScoreEngine) CalculateProblemValue(compClassID domain.CompClassI
 		}
 	}
 
-	e.store.SaveProblemValue(compClassID, problemID, value)
+	affectedContenders := make([]domain.ContenderID, 0)
 
-	if value == oldValue {
+	for contender := range e.store.GetContendersByCompClass(compClassID) {
+		tick, found := e.store.GetTick(contender.ID, problemID)
+		var tickPtr *Tick
+		if found {
+			tickPtr = &tick
+		}
+
+		pointValue := PointValue{
+			ContenderID: contender.ID,
+			ProblemID:   problemID,
+			Current:     pointCurrent(value, tickPtr),
+			Maximum:     pointMaximum(value, tickPtr),
+		}
+
+		oldValue, found := e.store.GetProblemValue(contender.ID, problemID)
+		e.store.SaveProblemValue(contender.ID, problemID, pointValue)
+
+		if !found || !ComparePointValue(oldValue, pointValue) {
+			affectedContenders = append(affectedContenders, contender.ID)
+		}
+	}
+
+	if len(affectedContenders) == 0 {
 		return nil
 	}
 
@@ -421,6 +531,10 @@ func (e *DefaultScoreEngine) CalculateProblemValue(compClassID domain.CompClassI
 			}
 		}
 	}
+}
+
+func (e *DefaultScoreEngine) CalculateProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect] {
+	return e.CalculatePointValues(compClassID, problemID)
 }
 
 func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter.Seq[Effect] {
@@ -438,7 +552,7 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 
 		var scoredTicks iter.Seq[Tick] = func(yield func(Tick) bool) {
 			for tick := range ticks {
-				value, found := e.store.GetProblemValue(contender.CompClassID, tick.ProblemID)
+				value, found := e.store.GetProblemValue(contender.ID, tick.ProblemID)
 				if !found {
 					continue
 				}
