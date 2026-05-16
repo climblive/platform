@@ -32,7 +32,7 @@ export const getContendersByContestQuery = (contestId: number) =>
 
 export const getPointValuesByContenderQuery = (contenderId: number) =>
   createQuery(() => ({
-    queryKey: ["pointValues", { contenderId }],
+    queryKey: ["point-values", { contenderId }],
     queryFn: async () =>
       ApiClient.getInstance().getPointValuesByContender(contenderId),
     retry: false,
@@ -107,7 +107,7 @@ export const updatePointValueInQueryCache = (
   contenderId: number,
   updatedPointValue: PointValue,
 ) => {
-  const queryKey: QueryKey = ["pointValues", { contenderId }];
+  const queryKey: QueryKey = ["point-values", { contenderId }];
 
   queryClient.setQueryData<PointValue[]>(queryKey, (pointValues) => {
     const values = pointValues ?? [];
