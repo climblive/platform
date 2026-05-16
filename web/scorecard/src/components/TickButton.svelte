@@ -4,25 +4,19 @@
     iconName: string;
     label: string;
     points?: number;
-    emphasized?: boolean;
+    variant?: "danger" | "success";
   };
 
-  const { onClick, iconName, label, points, emphasized }: Props = $props();
+  const { onClick, iconName, label, points, variant }: Props = $props();
 </script>
 
 <div>
-  <wa-button
-    size="s"
-    appearance={emphasized ? "outlined" : "outlined"}
-    variant={emphasized ? "brand" : "neutral"}
-    onclick={onClick}
-    pill
-  >
+  <wa-button size="s" appearance="outlined" {variant} onclick={onClick} pill>
     <wa-icon slot="start" name={iconName}></wa-icon>
     {label}
   </wa-button>
   {#if points}
-    <span data-emphasized={emphasized}>+{points} pts</span>
+    <span data-variant={variant}>+{points} pts</span>
   {/if}
 </div>
 
@@ -44,8 +38,12 @@
     color: var(--wa-color-text-quiet);
     margin-inline-start: var(--wa-space-s);
 
-    &[data-emphasized="true"] {
+    &[data-variant="danger"] {
       color: var(--wa-color-brand-fill-loud);
+    }
+
+    &[data-variant="success"] {
+      color: var(--wa-color-success-fill-loud);
     }
   }
 </style>

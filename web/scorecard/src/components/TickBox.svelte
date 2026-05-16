@@ -47,18 +47,25 @@
     }
   });
 
-  const handleCheck = () => {
-    open = true;
+  const handleDelete = (event: MouseEvent) => {
+    if (!tick) {
+      return;
+    }
 
-    // deleteTick.mutate(tick.id, {
-    //   onError: (error) => {
-    //     if (error instanceof AxiosError && error.status === 404) {
-    //       toastError("Ascent is already removed.");
-    //     } else {
-    //       toastError("Failed to remove ascent.");
-    //     }
-    //   },
-    // });
+    event.stopPropagation();
+
+    navigator.vibrate?.(50);
+    open = false;
+
+    deleteTick.mutate(tick.id, {
+      onError: (error) => {
+        if (error instanceof AxiosError && error.status === 404) {
+          toastError("Ascent is already removed.");
+        } else {
+          toastError("Failed to remove ascent.");
+        }
+      },
+    });
   };
 
   const handleTick = (
@@ -151,7 +158,7 @@
   <button
     data-variant={variant}
     disabled={disabled || loading}
-    onclick={handleCheck}
+    onclick={() => (open = true)}
     aria-label={tick?.id ? "Untick" : "Tick"}
   >
     {#if loading}
@@ -182,6 +189,7 @@
         secondary={problem.holdColorSecondary}
       /> Problem № {problem.number}
     </div>
+    {variant}
 
     <div class="horizontal">
       <TickButton
@@ -189,7 +197,7 @@
         label="Top"
         onClick={(e: MouseEvent) => handleTick(e, "top", false)}
         points={problem.pointsTop}
-        emphasized={variant === "top"}
+        variant={variant === "top" ? "success" : undefined}
       />
 
       <TickButton
@@ -197,7 +205,7 @@
         label="Flash"
         onClick={(e: MouseEvent) => handleTick(e, "top", true)}
         points={problem.pointsTop + (problem.flashBonus ?? 0)}
-        emphasized={variant === "flash"}
+        variant={variant === "flash" ? "success" : undefined}
       />
     </div>
 
@@ -207,7 +215,7 @@
         label="Zone 2"
         onClick={(e: MouseEvent) => handleTick(e, "zone2", false)}
         points={problem.pointsZone2}
-        emphasized={variant === "zone2"}
+        variant={variant === "zone2" ? "success" : undefined}
       />
     {/if}
 
@@ -217,7 +225,16 @@
         label="Zone 1"
         onClick={(e: MouseEvent) => handleTick(e, "zone1", false)}
         points={problem.pointsZone1}
-        emphasized={variant === "zone1"}
+        variant={variant === "zone1" ? "success" : undefined}
+      />
+    {/if}
+
+    {#if open && variant !== undefined}
+      <TickButton
+        iconName="trash"
+        label="Unsend"
+        onClick={(e: MouseEvent) => handleDelete(e)}
+        variant="danger"
       />
     {/if}
   </wa-dialog>
