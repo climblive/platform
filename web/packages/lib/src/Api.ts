@@ -595,4 +595,12 @@ export class ApiClient {
 
     return z.array(serviceStatusSchema).parse(result.data);
   };
+
+  getVersion = async () => {
+    const endpoint = "/version";
+
+    const result = await this.axiosInstance.get(endpoint, {});
+
+    return z.string().parse(result.data);
+  };
 }

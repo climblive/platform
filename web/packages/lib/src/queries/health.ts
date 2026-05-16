@@ -9,3 +9,10 @@ export const getHealthQuery = () =>
     refetchInterval: 30 * SECOND,
     retry: false,
   }));
+
+export const getVersionQuery = () =>
+  createQuery(() => ({
+    queryKey: ["version"],
+    queryFn: async () => ApiClient.getInstance().getVersion(),
+    retry: false,
+  }));
