@@ -96,7 +96,7 @@ EventLoop:
 				k.HandlePointValueUpdated(ev)
 			}
 		case <-ticker:
-			k.sweepExpired(time.Now())
+			k.expungeExpired(time.Now())
 		case <-ctx.Done():
 			slog.Info("point value keeper subscription closed", "reason", ctx.Err())
 			break EventLoop
@@ -155,7 +155,7 @@ func (k *PointValueKeeper) GetPointValues(contenderID domain.ContenderID) []doma
 	return pointValues
 }
 
-func (k *PointValueKeeper) sweepExpired(now time.Time) {
+func (k *PointValueKeeper) expungeExpired(now time.Time) {
 	k.mu.Lock()
 	defer k.mu.Unlock()
 
