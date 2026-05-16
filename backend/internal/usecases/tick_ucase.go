@@ -158,67 +158,57 @@ func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.Contender
 		return domain.Tick{}, errors.New(domain.ErrProblemNotInContest)
 	}
 
-	storedTick, err := uc.Repo.GetTickByContenderAndProblem(ctx, nil, contenderID, problem.ID)
+	foundTick := false
+
+	_, err = uc.Repo.GetTickByContenderAndProblem(ctx, nil, contenderID, problem.ID)
 	switch {
 	case err == nil:
+		foundTick = true
 	case errors.Is(err, domain.ErrNotFound):
-		storedTick = domain.Tick{
-			Ownership: contender.Ownership,
-			ContestID: contest.ID,
-			ProblemID: problem.ID,
-		}
 	default:
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
-	existingTick := storedTick
+	tick.Ownership = contender.Ownership
+	tick.ContestID = contest.ID
+	tick.ProblemID = problem.ID
+	tick.Top = tick.Top
+	tick.AttemptsTop = tick.AttemptsTop
+	tick.Zone1 = tick.Zone1
+	tick.AttemptsZone1 = tick.AttemptsZone1
+	tick.Zone2 = tick.Zone2
+	tick.AttemptsZone2 = tick.AttemptsZone2
+	tick.Timestamp = time.Now()
 
-	storedTick.Ownership = contender.Ownership
-	storedTick.ContestID = contest.ID
-	storedTick.ProblemID = problem.ID
-	storedTick.Top = tick.Top
-	storedTick.AttemptsTop = tick.AttemptsTop
-	storedTick.Zone1 = tick.Zone1
-	storedTick.AttemptsZone1 = tick.AttemptsZone1
-	storedTick.Zone2 = tick.Zone2
-	storedTick.AttemptsZone2 = tick.AttemptsZone2
-
-	changed := storedTick.ID == 0 || existingTick.Top != storedTick.Top || existingTick.AttemptsTop != storedTick.AttemptsTop || existingTick.Zone1 != storedTick.Zone1 || existingTick.AttemptsZone1 != storedTick.AttemptsZone1 || existingTick.Zone2 != storedTick.Zone2 || existingTick.AttemptsZone2 != storedTick.AttemptsZone2
-	if !changed {
-		return existingTick, nil
-	}
-
-	storedTick.Timestamp = time.Now()
-
-	if err := (validators.TickValidator{}).Validate(storedTick); err != nil {
+	if err := (validators.TickValidator{}).Validate(tick); err != nil {
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
-	storedTick, err = uc.Repo.StoreTick(ctx, nil, storedTick)
+	tick, err = uc.Repo.StoreTick(ctx, nil, tick)
 	if err != nil {
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
-	if existingTick.ID != 0 {
+	if foundTick {
 		uc.EventBroker.Dispatch(contest.ID, domain.AscentDeregisteredEvent{
-			TickID:      existingTick.ID,
-			ContenderID: contender.ID,
-			ProblemID:   existingTick.ProblemID,
+			TickID:      tick.ID,
+			ContenderID: *tick.Ownership.ContenderID,
+			ProblemID:   tick.ProblemID,
 		})
 	}
 
 	uc.EventBroker.Dispatch(contest.ID, domain.AscentRegisteredEvent{
-		TickID:        storedTick.ID,
-		Timestamp:     storedTick.Timestamp,
-		ContenderID:   contender.ID,
-		ProblemID:     problem.ID,
-		Top:           storedTick.Top,
-		AttemptsTop:   storedTick.AttemptsTop,
-		Zone1:         storedTick.Zone1,
-		AttemptsZone1: storedTick.AttemptsZone1,
-		Zone2:         storedTick.Zone2,
-		AttemptsZone2: storedTick.AttemptsZone2,
+		TickID:        tick.ID,
+		Timestamp:     tick.Timestamp,
+		ContenderID:   *tick.Ownership.ContenderID,
+		ProblemID:     tick.ProblemID,
+		Top:           tick.Top,
+		AttemptsTop:   tick.AttemptsTop,
+		Zone1:         tick.Zone1,
+		AttemptsZone1: tick.AttemptsZone1,
+		Zone2:         tick.Zone2,
+		AttemptsZone2: tick.AttemptsZone2,
 	})
 
-	return storedTick, nil
+	return tick, nil
 }
