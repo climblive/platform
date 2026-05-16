@@ -65,10 +65,6 @@ func (uc *ContenderUseCase) GetPointValues(ctx context.Context, contenderID doma
 		return nil, errors.Wrap(err, 0)
 	}
 
-	if uc.PointValueKeeper == nil {
-		return []domain.PointValue{}, nil
-	}
-
 	return uc.PointValueKeeper.GetPointValues(contenderID), nil
 }
 
