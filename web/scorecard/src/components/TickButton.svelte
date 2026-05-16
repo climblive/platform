@@ -11,7 +11,13 @@
 </script>
 
 <div>
-  <wa-button size="s" appearance="outlined" {variant} onclick={onClick} pill>
+  <wa-button
+    size="s"
+    appearance={variant === "danger" ? "plain" : "outlined"}
+    {variant}
+    onclick={onClick}
+    pill
+  >
     <wa-icon slot="start" name={iconName}></wa-icon>
     {label}
   </wa-button>
