@@ -34,3 +34,59 @@ type Problem struct {
 
 	domain.ProblemValue
 }
+
+type TickPool struct {
+	Zone1 int
+	Zone2 int
+	Top   int
+	Flash int
+}
+
+func (c TickPool) Add(tick Tick) TickPool {
+	if tick.Zone1 {
+		c.Zone1++
+	}
+
+	if tick.Zone2 {
+		c.Zone2++
+	}
+
+	if tick.Top {
+		c.Top++
+
+		if tick.AttemptsTop == 1 {
+			c.Flash++
+		}
+	}
+
+	return c
+}
+
+func (c TickPool) Sub(tick Tick) TickPool {
+	if tick.Zone1 {
+		c.Zone1--
+	}
+
+	if tick.Zone2 {
+		c.Zone2--
+	}
+
+	if tick.Top {
+		c.Top--
+
+		if tick.AttemptsTop == 1 {
+			c.Flash--
+		}
+	}
+
+	return c
+}
+
+func (c TickPool) CalculateProblemValue(value domain.ProblemValue) domain.ProblemValue {
+	return domain.ProblemValue{
+		PointsZone1: value.PointsZone1 / max(1, c.Zone1),
+		PointsZone2: value.PointsZone2 / max(1, c.Zone2),
+		PointsTop:   value.PointsTop / max(1, c.Top),
+		FlashBonus:  value.FlashBonus / max(1, c.Flash),
+	}
+}

@@ -402,52 +402,6 @@ func (e *DefaultScoreEngine) GetDirtyPointValues() []domain.PointValue {
 	return e.store.GetDirtyPointValues()
 }
 
-func pointMaximum(value domain.ProblemValue) int {
-	maximum := value.PointsTop
-
-	maximum += value.FlashBonus
-
-	return maximum
-}
-
-func pointCurrent(value domain.ProblemValue, tick Tick) int {
-	current := 0
-
-	if tick.Zone1 {
-		current = value.PointsZone1
-	}
-
-	if tick.Zone2 {
-		current = value.PointsZone2
-	}
-
-	if tick.Top {
-		current = value.PointsTop
-
-		if tick.AttemptsTop == 1 {
-			current += value.FlashBonus
-		}
-	}
-
-	return current
-}
-
-type pooledCounts struct {
-	Zone1 int
-	Zone2 int
-	Top   int
-	Flash int
-}
-
-func calculatePooledProblemValue(value domain.ProblemValue, counts pooledCounts) domain.ProblemValue {
-	return domain.ProblemValue{
-		PointsZone1: value.PointsZone1 / max(1, counts.Zone1),
-		PointsZone2: value.PointsZone2 / max(1, counts.Zone2),
-		PointsTop:   value.PointsTop / max(1, counts.Top),
-		FlashBonus:  value.FlashBonus / max(1, counts.Flash),
-	}
-}
-
 func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect] {
 	rules := e.store.GetRules()
 
@@ -461,7 +415,7 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 	}
 
 	problemValue := problem.ProblemValue
-	counts := pooledCounts{}
+	tickPool := TickPool{}
 
 	if rules.PooledPoints {
 		for tick := range e.store.GetTicksByProblem(compClassID, problemID) {
@@ -474,69 +428,32 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 				continue
 			}
 
-			if tick.Zone1 {
-				counts.Zone1++
-			}
-
-			if tick.Zone2 {
-				counts.Zone2++
-			}
-
-			if tick.Top {
-				counts.Top++
-
-				if tick.AttemptsTop == 1 {
-					counts.Flash++
-				}
-			}
+			tickPool = tickPool.Add(tick)
 		}
 
-		problemValue = calculatePooledProblemValue(problem.ProblemValue, counts)
+		problemValue = tickPool.CalculateProblemValue(problem.ProblemValue)
 	}
 
 	affectedContenders := make([]domain.ContenderID, 0)
 
 	for contender := range e.store.GetContendersByCompClass(compClassID) {
+		tick, _ := e.store.GetTick(contender.ID, problemID)
+
+		hypotheticalTop := HypotheticalTop(tick)
+
 		pointValue := domain.PointValue{
 			ContenderID: contender.ID,
 			ProblemID:   problemID,
-			Current:     0,
-			Maximum:     pointMaximum(problemValue),
+			Current:     CalculatePoints(problemValue, tick),
 		}
 
-		tick, hasTick := e.store.GetTick(contender.ID, problemID)
-		if hasTick {
-			pointValue.Current = pointCurrent(problemValue, tick)
-		}
+		hypotheticalProblemValue := problemValue
 
 		if rules.PooledPoints {
-			tmpCounts := counts
-
-			if hasTick {
-				if tick.Zone1 {
-					tmpCounts.Zone1--
-				}
-
-				if tick.Zone2 {
-					tmpCounts.Zone2--
-				}
-
-				if tick.Top {
-					tmpCounts.Top--
-
-					if tick.AttemptsTop == 1 {
-						tmpCounts.Flash--
-					}
-				}
-			}
-
-			tmpCounts.Zone1++
-			tmpCounts.Zone2++
-			tmpCounts.Top++
-			tmpCounts.Flash++
-
-			pointValue.Maximum = pointMaximum(calculatePooledProblemValue(problem.ProblemValue, tmpCounts))
+			hypotheticalProblemValue = tickPool.Sub(tick).Add(hypotheticalTop).CalculateProblemValue(problem.ProblemValue)
 		}
+
+		pointValue.Maximum = CalculatePoints(hypotheticalProblemValue, hypotheticalTop)
 
 		oldValue, hasTick := e.store.GetPointValue(contender.ID, problemID)
 		e.store.SavePointValue(contender.ID, problemID, pointValue)
