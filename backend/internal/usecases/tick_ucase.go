@@ -195,3 +195,124 @@ func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.Conten
 
 	return tick, nil
 }
+
+func (uc *TickUseCase) UpdateTick(ctx context.Context, tickID domain.TickID, patch domain.TickPatch) (domain.Tick, error) {
+	existingTick, err := uc.Repo.GetTick(ctx, nil, tickID)
+	if err != nil {
+		return domain.Tick{}, errors.Wrap(err, 0)
+	}
+
+	role, err := uc.Authorizer.HasOwnership(ctx, existingTick.Ownership)
+	if err != nil {
+		return domain.Tick{}, errors.Wrap(err, 0)
+	}
+
+	contenderID := *existingTick.Ownership.ContenderID
+
+	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
+	if err != nil {
+		return domain.Tick{}, errors.Wrap(err, 0)
+	}
+
+	contest, err := uc.Repo.GetContest(ctx, nil, existingTick.ContestID)
+	if err != nil {
+		return domain.Tick{}, errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
+	}
+
+	compClass, err := uc.Repo.GetCompClass(ctx, nil, contender.CompClassID)
+	if err != nil {
+		return domain.Tick{}, errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
+	}
+
+	if time.Now().Before(compClass.TimeBegin) {
+		return domain.Tick{}, errors.New(domain.ErrContestNotStarted)
+	}
+
+	gracePeriodEnd := compClass.TimeEnd.Add(contest.GracePeriod)
+
+	switch {
+	case role.OneOf(domain.OrganizerRole, domain.AdminRole):
+	case time.Now().After(gracePeriodEnd):
+		return domain.Tick{}, errors.New(domain.ErrContestEnded)
+	}
+
+	updatedTick := existingTick
+
+	changed := false
+
+	if patch.Zone1.PresentAndDistinct(updatedTick.Zone1) {
+		updatedTick.Zone1 = patch.Zone1.Value
+		changed = true
+	}
+
+	if patch.AttemptsZone1.PresentAndDistinct(updatedTick.AttemptsZone1) {
+		updatedTick.AttemptsZone1 = patch.AttemptsZone1.Value
+		changed = true
+	}
+
+	if patch.Zone2.PresentAndDistinct(updatedTick.Zone2) {
+		updatedTick.Zone2 = patch.Zone2.Value
+		changed = true
+	}
+
+	if patch.AttemptsZone2.PresentAndDistinct(updatedTick.AttemptsZone2) {
+		updatedTick.AttemptsZone2 = patch.AttemptsZone2.Value
+		changed = true
+	}
+
+	if patch.Top.PresentAndDistinct(updatedTick.Top) {
+		updatedTick.Top = patch.Top.Value
+		changed = true
+	}
+
+	if patch.AttemptsTop.PresentAndDistinct(updatedTick.AttemptsTop) {
+		updatedTick.AttemptsTop = patch.AttemptsTop.Value
+		changed = true
+	}
+
+	if !changed {
+		return existingTick, nil
+	}
+
+	updatedTick.Timestamp = time.Now()
+
+	if err := (validators.TickValidator{}).Validate(updatedTick); err != nil {
+		return domain.Tick{}, errors.Wrap(err, 0)
+	}
+
+	tx, err := uc.Repo.Begin()
+	if err != nil {
+		return domain.Tick{}, errors.Wrap(err, 0)
+	}
+	defer tx.Rollback()
+
+	updatedTick, err = uc.Repo.StoreTick(ctx, tx, updatedTick)
+	if err != nil {
+		return domain.Tick{}, errors.Wrap(err, 0)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return domain.Tick{}, errors.Wrap(err, 0)
+	}
+
+	uc.EventBroker.Dispatch(contest.ID, domain.AscentDeregisteredEvent{
+		TickID:      existingTick.ID,
+		ContenderID: contender.ID,
+		ProblemID:   existingTick.ProblemID,
+	})
+
+	uc.EventBroker.Dispatch(contest.ID, domain.AscentRegisteredEvent{
+		TickID:        updatedTick.ID,
+		Timestamp:     updatedTick.Timestamp,
+		ContenderID:   contender.ID,
+		ProblemID:     updatedTick.ProblemID,
+		Top:           updatedTick.Top,
+		AttemptsTop:   updatedTick.AttemptsTop,
+		Zone1:         updatedTick.Zone1,
+		AttemptsZone1: updatedTick.AttemptsZone1,
+		Zone2:         updatedTick.Zone2,
+		AttemptsZone2: updatedTick.AttemptsZone2,
+	})
+
+	return updatedTick, nil
+}

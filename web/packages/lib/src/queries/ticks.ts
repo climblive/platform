@@ -6,7 +6,7 @@ import {
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import type { Tick } from "../models";
+import type { Tick, TickPatch } from "../models";
 import { HOUR } from "./constants";
 
 export const getTicksByContenderQuery = (
@@ -42,6 +42,18 @@ export const createTickMutation = (contenderId: number) => {
       ApiClient.getInstance().createTick(contenderId, tick),
     onSuccess: (newTick) => {
       updateTickInQueryCache(client, contenderId, newTick);
+    },
+  }));
+};
+
+export const updateTickMutation = (contenderId: number) => {
+  const client = useQueryClient();
+
+  return createMutation(() => ({
+    mutationFn: ({ tickId, tick }: { tickId: number; tick: TickPatch }) =>
+      ApiClient.getInstance().updateTick(tickId, tick),
+    onSuccess: (updatedTick) => {
+      updateTickInQueryCache(client, contenderId, updatedTick);
     },
   }));
 };

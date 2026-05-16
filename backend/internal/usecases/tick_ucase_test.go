@@ -735,3 +735,161 @@ func TestDeleteTick(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 }
+
+func TestUpdateTick(t *testing.T) {
+	fakedTickID := testutils.RandomResourceID[domain.TickID]()
+	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
+
+	now := time.Now()
+	gracePeriod := 15 * time.Minute
+
+	fakedOwnership := domain.OwnershipData{
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
+		ContenderID: &fakedContenderID,
+	}
+
+	t.Run("HappyPath", func(t *testing.T) {
+		mockedRepo := new(repositoryMock)
+		mockedAuthorizer := new(authorizerMock)
+		mockedEventBroker := new(eventBrokerMock)
+		mockedTx := new(transactionMock)
+
+		existingTick := domain.Tick{
+			ID:            fakedTickID,
+			Ownership:     fakedOwnership,
+			Timestamp:     now.Add(-time.Minute),
+			ContestID:     fakedContestID,
+			ProblemID:     fakedProblemID,
+			Zone1:         true,
+			AttemptsZone1: 1,
+		}
+
+		mockedRepo.
+			On("GetTick", mock.Anything, nil, fakedTickID).
+			Return(existingTick, nil)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.ContenderRole, nil)
+
+		mockedRepo.
+			On("GetContender", mock.Anything, nil, fakedContenderID).
+			Return(domain.Contender{
+				ID:          fakedContenderID,
+				ContestID:   fakedContestID,
+				CompClassID: fakedCompClassID,
+			}, nil)
+
+		mockedRepo.
+			On("GetContest", mock.Anything, nil, fakedContestID).
+			Return(domain.Contest{
+				ID:          fakedContestID,
+				GracePeriod: gracePeriod,
+			}, nil)
+
+		mockedRepo.
+			On("GetCompClass", mock.Anything, nil, fakedCompClassID).
+			Return(domain.CompClass{
+				ID:        fakedCompClassID,
+				TimeBegin: now.Add(-time.Hour),
+				TimeEnd:   now.Add(time.Hour),
+			}, nil)
+
+		mockedRepo.
+			On("Begin").
+			Return(mockedTx, nil)
+
+		mockedRepo.
+			On("StoreTick", mock.Anything, mockedTx, mock.MatchedBy(func(tick domain.Tick) bool {
+				tick.Timestamp = time.Time{}
+
+				return tick == domain.Tick{
+					ID:            fakedTickID,
+					Ownership:     fakedOwnership,
+					ContestID:     fakedContestID,
+					ProblemID:     fakedProblemID,
+					Top:           true,
+					AttemptsTop:   2,
+					Zone1:         true,
+					AttemptsZone1: 1,
+					Zone2:         true,
+					AttemptsZone2: 2,
+				}
+			})).
+			Return(domain.Tick{
+				ID:            fakedTickID,
+				Ownership:     fakedOwnership,
+				Timestamp:     now,
+				ContestID:     fakedContestID,
+				ProblemID:     fakedProblemID,
+				Top:           true,
+				AttemptsTop:   2,
+				Zone1:         true,
+				AttemptsZone1: 1,
+				Zone2:         true,
+				AttemptsZone2: 2,
+			}, nil)
+
+		mockedTx.
+			On("Commit").
+			Return(nil)
+
+		mockedTx.
+			On("Rollback").
+			Return()
+
+		mockedEventBroker.
+			On("Dispatch", fakedContestID, domain.AscentDeregisteredEvent{
+				TickID:      fakedTickID,
+				ContenderID: fakedContenderID,
+				ProblemID:   fakedProblemID,
+			}).
+			Return()
+
+		mockedEventBroker.
+			On("Dispatch", fakedContestID, mock.MatchedBy(func(event domain.AscentRegisteredEvent) bool {
+				event.Timestamp = time.Time{}
+
+				return event == domain.AscentRegisteredEvent{
+					TickID:        fakedTickID,
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Top:           true,
+					AttemptsTop:   2,
+					Zone1:         true,
+					AttemptsZone1: 1,
+					Zone2:         true,
+					AttemptsZone2: 2,
+				}
+			})).
+			Return()
+
+		ucase := usecases.TickUseCase{
+			Repo:        mockedRepo,
+			Authorizer:  mockedAuthorizer,
+			EventBroker: mockedEventBroker,
+		}
+
+		updatedTick, err := ucase.UpdateTick(context.Background(), fakedTickID, domain.TickPatch{
+			Top:           domain.NewPatch(true),
+			AttemptsTop:   domain.NewPatch(2),
+			Zone1:         domain.NewPatch(true),
+			AttemptsZone1: domain.NewPatch(1),
+			Zone2:         domain.NewPatch(true),
+			AttemptsZone2: domain.NewPatch(2),
+		})
+
+		require.NoError(t, err)
+		assert.Equal(t, fakedTickID, updatedTick.ID)
+		assert.Equal(t, fakedProblemID, updatedTick.ProblemID)
+		assert.True(t, updatedTick.Top)
+
+		mockedRepo.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+		mockedEventBroker.AssertExpectations(t)
+		mockedTx.AssertExpectations(t)
+	})
+}

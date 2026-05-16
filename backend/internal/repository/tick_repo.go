@@ -40,7 +40,8 @@ func (d *Database) GetTicksByContest(ctx context.Context, tx domain.Transaction,
 }
 
 func (d *Database) StoreTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error) {
-	params := database.InsertTickParams{
+	params := database.UpsertTickParams{
+		ID:            int32(tick.ID),
 		OrganizerID:   int32(tick.Ownership.OrganizerID),
 		ContestID:     int32(tick.ContestID),
 		ContenderID:   int32(*tick.Ownership.ContenderID),
@@ -54,7 +55,7 @@ func (d *Database) StoreTick(ctx context.Context, tx domain.Transaction, tick do
 		AttemptsZone2: int32(tick.AttemptsZone2),
 	}
 
-	insertID, err := d.WithTx(tx).InsertTick(ctx, params)
+	insertID, err := d.WithTx(tx).UpsertTick(ctx, params)
 	switch {
 	case mysqlDuplicateKeyConstraintViolation.Is(err):
 		return domain.Tick{}, errors.New(domain.ErrDuplicate)
@@ -62,7 +63,9 @@ func (d *Database) StoreTick(ctx context.Context, tx domain.Transaction, tick do
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
-	tick.ID = domain.TickID(insertID)
+	if insertID != 0 {
+		tick.ID = domain.TickID(insertID)
+	}
 
 	return tick, nil
 }

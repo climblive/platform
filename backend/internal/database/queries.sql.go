@@ -1257,47 +1257,6 @@ func (q *Queries) InsertOrganizerInvite(ctx context.Context, arg InsertOrganizer
 	return err
 }
 
-const insertTick = `-- name: InsertTick :execlastid
-INSERT INTO
-    tick (organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
-VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-`
-
-type InsertTickParams struct {
-	OrganizerID   int32
-	ContestID     int32
-	ContenderID   int32
-	ProblemID     int32
-	Timestamp     time.Time
-	Top           bool
-	AttemptsTop   int32
-	Zone1         bool
-	AttemptsZone1 int32
-	Zone2         bool
-	AttemptsZone2 int32
-}
-
-func (q *Queries) InsertTick(ctx context.Context, arg InsertTickParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, insertTick,
-		arg.OrganizerID,
-		arg.ContestID,
-		arg.ContenderID,
-		arg.ProblemID,
-		arg.Timestamp,
-		arg.Top,
-		arg.AttemptsTop,
-		arg.Zone1,
-		arg.AttemptsZone1,
-		arg.Zone2,
-		arg.AttemptsZone2,
-	)
-	if err != nil {
-		return 0, err
-	}
-	return result.LastInsertId()
-}
-
 const upsertCompClass = `-- name: UpsertCompClass :execlastid
 INSERT INTO 
 	comp_class (id, organizer_id, contest_id, name, description, color, time_begin, time_end)
@@ -1624,6 +1583,61 @@ func (q *Queries) UpsertScore(ctx context.Context, arg UpsertScoreParams) error 
 		arg.RankOrder,
 	)
 	return err
+}
+
+const upsertTick = `-- name: UpsertTick :execlastid
+INSERT INTO
+    tick (id, organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
+VALUES
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    organizer_id = VALUES(organizer_id),
+    contest_id = VALUES(contest_id),
+    contender_id = VALUES(contender_id),
+    problem_id = VALUES(problem_id),
+    timestamp = VALUES(timestamp),
+    top = VALUES(top),
+    attempts_top = VALUES(attempts_top),
+    zone_1 = VALUES(zone_1),
+    attempts_zone_1 = VALUES(attempts_zone_1),
+    zone_2 = VALUES(zone_2),
+    attempts_zone_2 = VALUES(attempts_zone_2)
+`
+
+type UpsertTickParams struct {
+	ID            int32
+	OrganizerID   int32
+	ContestID     int32
+	ContenderID   int32
+	ProblemID     int32
+	Timestamp     time.Time
+	Top           bool
+	AttemptsTop   int32
+	Zone1         bool
+	AttemptsZone1 int32
+	Zone2         bool
+	AttemptsZone2 int32
+}
+
+func (q *Queries) UpsertTick(ctx context.Context, arg UpsertTickParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, upsertTick,
+		arg.ID,
+		arg.OrganizerID,
+		arg.ContestID,
+		arg.ContenderID,
+		arg.ProblemID,
+		arg.Timestamp,
+		arg.Top,
+		arg.AttemptsTop,
+		arg.Zone1,
+		arg.AttemptsZone1,
+		arg.Zone2,
+		arg.AttemptsZone2,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
 }
 
 const upsertUser = `-- name: UpsertUser :execlastid

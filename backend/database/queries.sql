@@ -211,11 +211,23 @@ DELETE
 FROM tick
 WHERE id = ?;
 
--- name: InsertTick :execlastid
+-- name: UpsertTick :execlastid
 INSERT INTO
-    tick (organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
+    tick (id, organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
 VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    organizer_id = VALUES(organizer_id),
+    contest_id = VALUES(contest_id),
+    contender_id = VALUES(contender_id),
+    problem_id = VALUES(problem_id),
+    timestamp = VALUES(timestamp),
+    top = VALUES(top),
+    attempts_top = VALUES(attempts_top),
+    zone_1 = VALUES(zone_1),
+    attempts_zone_1 = VALUES(attempts_zone_1),
+    zone_2 = VALUES(zone_2),
+    attempts_zone_2 = VALUES(attempts_zone_2);
 
 -- name: UpsertOrganizer :execlastid
 INSERT INTO

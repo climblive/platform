@@ -13,6 +13,7 @@ type tickUseCase interface {
 	GetTicksByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Tick, error)
 	DeleteTick(ctx context.Context, tickID domain.TickID) error
 	CreateTick(ctx context.Context, contenderID domain.ContenderID, tick domain.Tick) (domain.Tick, error)
+	UpdateTick(ctx context.Context, tickID domain.TickID, patch domain.TickPatch) (domain.Tick, error)
 }
 
 type tickHandler struct {
@@ -27,6 +28,7 @@ func InstallTickHandler(mux *Mux, tickUseCase tickUseCase) {
 	mux.HandleFunc("GET /contenders/{contenderID}/ticks", handler.GetTicksByContender)
 	mux.HandleFunc("GET /contests/{contestID}/ticks", handler.GetTicksByContest)
 	mux.HandleFunc("POST /contenders/{contenderID}/ticks", handler.CreateTick)
+	mux.HandleFunc("PATCH /ticks/{tickID}", handler.UpdateTick)
 	mux.HandleFunc("DELETE /ticks/{tickID}", handler.DeleteTick)
 }
 
@@ -83,6 +85,29 @@ func (hdlr *tickHandler) CreateTick(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeResponse(w, http.StatusCreated, createdTick)
+}
+
+func (hdlr *tickHandler) UpdateTick(w http.ResponseWriter, r *http.Request) {
+	tickID, err := parseResourceID[domain.TickID](r.PathValue("tickID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	var patch domain.TickPatch
+	err = json.NewDecoder(r.Body).Decode(&patch)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	updatedTick, err := hdlr.tickUseCase.UpdateTick(r.Context(), tickID, patch)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusOK, updatedTick)
 }
 
 func (hdlr *tickHandler) DeleteTick(w http.ResponseWriter, r *http.Request) {
