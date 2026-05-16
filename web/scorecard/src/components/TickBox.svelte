@@ -189,7 +189,6 @@
         secondary={problem.holdColorSecondary}
       /> Problem № {problem.number}
     </div>
-    {variant}
 
     <div class="horizontal">
       <TickButton
