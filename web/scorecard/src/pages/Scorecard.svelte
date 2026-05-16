@@ -36,7 +36,7 @@
     getContenderQuery,
     getContestQuery,
     getPointValuesByContenderQuery,
-    getProblemsByCompClassQuery,
+    getProblemsQuery,
     getTicksByContenderQuery,
     removeTickFromQueryCache,
     updateContenderPublicInfoInQueryCache,
@@ -82,11 +82,7 @@
     selectedCompClass?.timeEnd ?? new Date(-8640000000000000),
   );
 
-  const problemsQuery = $derived(
-    selectedCompClass
-      ? getProblemsByCompClassQuery(selectedCompClass.id)
-      : undefined,
-  );
+  const problemsQuery = $derived(getProblemsQuery($session.contestId));
 
   let problems = $derived(problemsQuery?.data);
   let pointValues = $derived(pointValuesQuery.data);

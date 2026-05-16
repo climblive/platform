@@ -283,14 +283,6 @@ export class ApiClient {
     return z.array(problemSchema).parse(result.data);
   };
 
-  getProblemsByCompClass = async (compClassId: number) => {
-    const endpoint = `/comp-classes/${compClassId}/problems`;
-
-    const result = await this.axiosInstance.get(endpoint);
-
-    return z.array(problemSchema).parse(result.data);
-  };
-
   createProblem = async (contestId: number, template: ProblemTemplate) => {
     const endpoint = `/contests/${contestId}/problems`;
 
