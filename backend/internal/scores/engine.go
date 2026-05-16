@@ -438,6 +438,43 @@ func pointCurrent(value domain.ProblemValue, tick *Tick) int {
 	return current
 }
 
+type pooledPointCounts struct {
+	Zone1 int
+	Zone2 int
+	Top   int
+	Flash int
+}
+
+func pooledPointValue(value domain.ProblemValue, counts pooledPointCounts) domain.ProblemValue {
+	return domain.ProblemValue{
+		PointsZone1: value.PointsZone1 / max(1, counts.Zone1),
+		PointsZone2: value.PointsZone2 / max(1, counts.Zone2),
+		PointsTop:   value.PointsTop / max(1, counts.Top),
+		FlashBonus:  value.FlashBonus / max(1, counts.Flash),
+	}
+}
+
+func pointMaximumPooled(value domain.ProblemValue, counts pooledPointCounts, tick *Tick) int {
+	hypotheticalCounts := counts
+
+	if tick == nil {
+		hypotheticalCounts.Top++
+		hypotheticalCounts.Flash++
+
+		hypotheticalValue := pooledPointValue(value, hypotheticalCounts)
+
+		return hypotheticalValue.PointsTop + hypotheticalValue.FlashBonus
+	}
+
+	if !tick.Top {
+		hypotheticalCounts.Top++
+	}
+
+	hypotheticalValue := pooledPointValue(value, hypotheticalCounts)
+
+	return hypotheticalValue.PointsTop
+}
+
 func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect] {
 	rules := e.store.GetRules()
 
@@ -451,13 +488,9 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 	}
 
 	value := problem.ProblemValue
+	counts := pooledPointCounts{}
 
 	if rules.PooledPoints {
-		numZone1 := 0
-		numZone2 := 0
-		numTop := 0
-		numFlash := 0
-
 		for tick := range e.store.GetTicksByProblem(compClassID, problemID) {
 			contender, found := e.store.GetContender(tick.ContenderID)
 			if !found {
@@ -469,28 +502,23 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 			}
 
 			if tick.Zone1 {
-				numZone1++
+				counts.Zone1++
 			}
 
 			if tick.Zone2 {
-				numZone2++
+				counts.Zone2++
 			}
 
 			if tick.Top {
-				numTop++
+				counts.Top++
 
 				if tick.AttemptsTop == 1 {
-					numFlash++
+					counts.Flash++
 				}
 			}
 		}
 
-		value = domain.ProblemValue{
-			PointsZone1: problem.PointsZone1 / max(1, numZone1),
-			PointsZone2: problem.PointsZone2 / max(1, numZone2),
-			PointsTop:   problem.PointsTop / max(1, numTop),
-			FlashBonus:  problem.FlashBonus / max(1, numFlash),
-		}
+		value = pooledPointValue(problem.ProblemValue, counts)
 	}
 
 	affectedContenders := make([]domain.ContenderID, 0)
@@ -507,6 +535,10 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 			ProblemID:   problemID,
 			Current:     pointCurrent(value, tickPtr),
 			Maximum:     pointMaximum(value, tickPtr),
+		}
+
+		if rules.PooledPoints {
+			pointValue.Maximum = pointMaximumPooled(problem.ProblemValue, counts, tickPtr)
 		}
 
 		oldValue, found := e.store.GetPointValue(contender.ID, problemID)
