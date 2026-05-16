@@ -50,8 +50,8 @@ export const updateTickMutation = (contenderId: number) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
-    mutationFn: ({ tickId, tick }: { tickId: number; tick: TickPatch }) =>
-      ApiClient.getInstance().updateTick(tickId, tick),
+    mutationFn: ({ tickId, patch }: { tickId: number; patch: TickPatch }) =>
+      ApiClient.getInstance().updateTick(tickId, patch),
     onSuccess: (updatedTick) => {
       updateTickInQueryCache(client, contenderId, updatedTick);
     },
@@ -79,7 +79,8 @@ export const updateTickInQueryCache = (
   const queryKey: QueryKey = ["ticks", { contenderId }];
 
   queryClient.setQueryData<Tick[]>(queryKey, (oldTicks) => {
-    const predicate = ({ id }: Tick) => id === updatedTick.id;
+    const predicate = ({ id, problemId }: Tick) =>
+      id === updatedTick.id || problemId === updatedTick.problemId;
 
     const found = (oldTicks ?? []).findIndex(predicate) !== -1;
 
