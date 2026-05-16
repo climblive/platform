@@ -97,10 +97,10 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectCalculateProblemValue{CompClassID: fakedCompClass1ID, ProblemID: fakedProblem1ID},
-			scores.EffectCalculateProblemValue{CompClassID: fakedCompClass1ID, ProblemID: fakedProblem2ID},
-			scores.EffectCalculateProblemValue{CompClassID: fakedCompClass2ID, ProblemID: fakedProblem1ID},
-			scores.EffectCalculateProblemValue{CompClassID: fakedCompClass2ID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClass1ID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClass1ID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClass2ID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClass2ID, ProblemID: fakedProblem2ID},
 
 			scores.EffectScoreContender{ContenderID: fakedContender1ID},
 			scores.EffectScoreContender{ContenderID: fakedContender2ID},
@@ -163,10 +163,10 @@ func TestDefaultScoreEngine(t *testing.T) {
 		effects := slices.Collect(f.engine.Start())
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectCalculateProblemValue{CompClassID: fakedCompClass1ID, ProblemID: fakedProblem1ID},
-			scores.EffectCalculateProblemValue{CompClassID: fakedCompClass1ID, ProblemID: fakedProblem2ID},
-			scores.EffectCalculateProblemValue{CompClassID: fakedCompClass2ID, ProblemID: fakedProblem1ID},
-			scores.EffectCalculateProblemValue{CompClassID: fakedCompClass2ID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClass1ID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClass1ID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClass2ID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClass2ID, ProblemID: fakedProblem2ID},
 
 			scores.EffectScoreContender{ContenderID: fakedContender1ID},
 			scores.EffectScoreContender{ContenderID: fakedContender2ID},
@@ -295,13 +295,13 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectCalculateProblemValue{CompClassID: fakedOldCompClassID, ProblemID: fakedProblem1ID},
-			scores.EffectCalculateProblemValue{CompClassID: fakedOldCompClassID, ProblemID: fakedProblem2ID},
-			scores.EffectCalculateProblemValue{CompClassID: fakedOldCompClassID, ProblemID: fakedProblem3ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedOldCompClassID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedOldCompClassID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedOldCompClassID, ProblemID: fakedProblem3ID},
 
-			scores.EffectCalculateProblemValue{CompClassID: fakedNewCompClassID, ProblemID: fakedProblem1ID},
-			scores.EffectCalculateProblemValue{CompClassID: fakedNewCompClassID, ProblemID: fakedProblem2ID},
-			scores.EffectCalculateProblemValue{CompClassID: fakedNewCompClassID, ProblemID: fakedProblem3ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedNewCompClassID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedNewCompClassID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedNewCompClassID, ProblemID: fakedProblem3ID},
 
 			scores.EffectRankClass{CompClassID: fakedOldCompClassID},
 			scores.EffectRankClass{CompClassID: fakedNewCompClassID},
@@ -479,9 +479,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectCalculateProblemValue{CompClassID: fakedCompClassID, ProblemID: fakedProblem1ID},
-			scores.EffectCalculateProblemValue{CompClassID: fakedCompClassID, ProblemID: fakedProblem2ID},
-			scores.EffectCalculateProblemValue{CompClassID: fakedCompClassID, ProblemID: fakedProblem3ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblem3ID},
 			scores.EffectScoreContender{ContenderID: fakedContenderID},
 			scores.EffectRankClass{CompClassID: fakedCompClassID},
 		})
@@ -554,9 +554,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectCalculateProblemValue{CompClassID: fakedCompClassID, ProblemID: fakedProblem1ID},
-			scores.EffectCalculateProblemValue{CompClassID: fakedCompClassID, ProblemID: fakedProblem2ID},
-			scores.EffectCalculateProblemValue{CompClassID: fakedCompClassID, ProblemID: fakedProblem3ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblem3ID},
 			scores.EffectScoreContender{ContenderID: fakedContenderID},
 			scores.EffectRankClass{CompClassID: fakedCompClassID},
 		})

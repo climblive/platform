@@ -64,8 +64,6 @@ type EffectCalculatePointValues struct {
 	ProblemID   domain.ProblemID
 }
 
-type EffectCalculateProblemValue = EffectCalculatePointValues
-
 func (e EffectCalculatePointValues) Encode() EncodedEffect {
 	var data EncodedEffect
 	data[0] = byte(EffectTypeCalculatePointValues)
