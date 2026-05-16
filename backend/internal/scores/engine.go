@@ -402,21 +402,15 @@ func (e *DefaultScoreEngine) GetDirtyPointValues() []domain.PointValue {
 	return e.store.GetDirtyPointValues()
 }
 
-func pointMaximum(value domain.ProblemValue, tick *Tick) int {
+func pointMaximum(value domain.ProblemValue) int {
 	maximum := value.PointsTop
 
-	if tick == nil {
-		maximum += value.FlashBonus
-	}
+	maximum += value.FlashBonus
 
 	return maximum
 }
 
-func pointCurrent(value domain.ProblemValue, tick *Tick) int {
-	if tick == nil {
-		return 0
-	}
-
+func pointCurrent(value domain.ProblemValue, tick Tick) int {
 	current := 0
 
 	if tick.Zone1 {
@@ -438,41 +432,20 @@ func pointCurrent(value domain.ProblemValue, tick *Tick) int {
 	return current
 }
 
-type pooledPointCounts struct {
+type pooledCounts struct {
 	Zone1 int
 	Zone2 int
 	Top   int
 	Flash int
 }
 
-func pooledPointValue(value domain.ProblemValue, counts pooledPointCounts) domain.ProblemValue {
+func calculatePooledProblemValue(value domain.ProblemValue, counts pooledCounts) domain.ProblemValue {
 	return domain.ProblemValue{
 		PointsZone1: value.PointsZone1 / max(1, counts.Zone1),
 		PointsZone2: value.PointsZone2 / max(1, counts.Zone2),
 		PointsTop:   value.PointsTop / max(1, counts.Top),
 		FlashBonus:  value.FlashBonus / max(1, counts.Flash),
 	}
-}
-
-func pointMaximumPooled(value domain.ProblemValue, counts pooledPointCounts, tick *Tick) int {
-	hypotheticalCounts := counts
-
-	if tick == nil {
-		hypotheticalCounts.Top++
-		hypotheticalCounts.Flash++
-
-		hypotheticalValue := pooledPointValue(value, hypotheticalCounts)
-
-		return hypotheticalValue.PointsTop + hypotheticalValue.FlashBonus
-	}
-
-	if !tick.Top {
-		hypotheticalCounts.Top++
-	}
-
-	hypotheticalValue := pooledPointValue(value, hypotheticalCounts)
-
-	return hypotheticalValue.PointsTop
 }
 
 func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect] {
@@ -487,8 +460,8 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 		return nil
 	}
 
-	value := problem.ProblemValue
-	counts := pooledPointCounts{}
+	problemValue := problem.ProblemValue
+	counts := pooledCounts{}
 
 	if rules.PooledPoints {
 		for tick := range e.store.GetTicksByProblem(compClassID, problemID) {
@@ -518,33 +491,57 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 			}
 		}
 
-		value = pooledPointValue(problem.ProblemValue, counts)
+		problemValue = calculatePooledProblemValue(problem.ProblemValue, counts)
 	}
 
 	affectedContenders := make([]domain.ContenderID, 0)
 
 	for contender := range e.store.GetContendersByCompClass(compClassID) {
-		tick, found := e.store.GetTick(contender.ID, problemID)
-		var tickPtr *Tick
-		if found {
-			tickPtr = &tick
-		}
-
 		pointValue := domain.PointValue{
 			ContenderID: contender.ID,
 			ProblemID:   problemID,
-			Current:     pointCurrent(value, tickPtr),
-			Maximum:     pointMaximum(value, tickPtr),
+			Current:     0,
+			Maximum:     pointMaximum(problemValue),
+		}
+
+		tick, hasTick := e.store.GetTick(contender.ID, problemID)
+		if hasTick {
+			pointValue.Current = pointCurrent(problemValue, tick)
 		}
 
 		if rules.PooledPoints {
-			pointValue.Maximum = pointMaximumPooled(problem.ProblemValue, counts, tickPtr)
+			tmpCounts := counts
+
+			if hasTick {
+				if tick.Zone1 {
+					tmpCounts.Zone1--
+				}
+
+				if tick.Zone2 {
+					tmpCounts.Zone2--
+				}
+
+				if tick.Top {
+					tmpCounts.Top--
+
+					if tick.AttemptsTop == 1 {
+						tmpCounts.Flash--
+					}
+				}
+			}
+
+			tmpCounts.Zone1++
+			tmpCounts.Zone2++
+			tmpCounts.Top++
+			tmpCounts.Flash++
+
+			pointValue.Maximum = pointMaximum(calculatePooledProblemValue(problem.ProblemValue, tmpCounts))
 		}
 
-		oldValue, found := e.store.GetPointValue(contender.ID, problemID)
+		oldValue, hasTick := e.store.GetPointValue(contender.ID, problemID)
 		e.store.SavePointValue(contender.ID, problemID, pointValue)
 
-		if !found || !ComparePointValue(oldValue, pointValue) {
+		if !hasTick || !ComparePointValue(oldValue, pointValue) {
 			affectedContenders = append(affectedContenders, contender.ID)
 		}
 	}
