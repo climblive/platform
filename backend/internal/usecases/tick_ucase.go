@@ -172,12 +172,6 @@ func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.Contender
 	tick.Ownership = contender.Ownership
 	tick.ContestID = contest.ID
 	tick.ProblemID = problem.ID
-	tick.Top = tick.Top
-	tick.AttemptsTop = tick.AttemptsTop
-	tick.Zone1 = tick.Zone1
-	tick.AttemptsZone1 = tick.AttemptsZone1
-	tick.Zone2 = tick.Zone2
-	tick.AttemptsZone2 = tick.AttemptsZone2
 	tick.Timestamp = time.Now()
 
 	if err := (validators.TickValidator{}).Validate(tick); err != nil {
