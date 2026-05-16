@@ -149,7 +149,7 @@ func (s *MemoryStore) GetAllProblems() iter.Seq[Problem] {
 	return maps.Values(s.problems)
 }
 
-func (s *MemoryStore) GetProblemValue(contenderID domain.ContenderID, problemID domain.ProblemID) (PointValue, bool) {
+func (s *MemoryStore) GetPointValue(contenderID domain.ContenderID, problemID domain.ProblemID) (PointValue, bool) {
 	key := struct {
 		ContenderID domain.ContenderID
 		ProblemID   domain.ProblemID
@@ -160,7 +160,7 @@ func (s *MemoryStore) GetProblemValue(contenderID domain.ContenderID, problemID 
 	return value, ok
 }
 
-func (s *MemoryStore) SaveProblemValue(contenderID domain.ContenderID, problemID domain.ProblemID, value PointValue) {
+func (s *MemoryStore) SavePointValue(contenderID domain.ContenderID, problemID domain.ProblemID, value PointValue) {
 	key := struct {
 		ContenderID domain.ContenderID
 		ProblemID   domain.ProblemID
@@ -177,6 +177,6 @@ func (s *MemoryStore) GetDirtyScores() []domain.Score {
 	return s.scores.Commit()
 }
 
-func (s *MemoryStore) GetDirtyProblemValues() []PointValue {
+func (s *MemoryStore) GetDirtyPointValues() []PointValue {
 	return s.pointValues.Commit()
 }

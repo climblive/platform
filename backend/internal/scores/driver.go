@@ -33,7 +33,7 @@ type ScoreEngine interface {
 	CalculateProblemValue(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect]
 
 	GetDirtyScores() []domain.Score
-	GetDirtyProblemValues() []PointValue
+	GetDirtyPointValues() []PointValue
 }
 
 type ScoreEngineDriver struct {
@@ -286,6 +286,10 @@ func NewEffectRunner(driver *ScoreEngineDriver) *EffectRunner {
 }
 
 func (r *EffectRunner) RunChainEffects(effects iter.Seq[Effect]) {
+	if effects == nil {
+		return
+	}
+
 	r.Run(func(yield func(Effect) bool) {
 		for effect := range effects {
 			switch effect.(type) {
@@ -368,7 +372,7 @@ func (d *ScoreEngineDriver) publishDirtyUpdates() int {
 		batch = append(batch, domain.ContenderScoreUpdatedEvent(score))
 	}
 
-	for pointValue := range slices.Values(d.engine.GetDirtyProblemValues()) {
+	for pointValue := range slices.Values(d.engine.GetDirtyPointValues()) {
 		d.eventBroker.Dispatch(d.contestID, domain.PointValueUpdatedEvent(pointValue))
 
 		publishCount++
