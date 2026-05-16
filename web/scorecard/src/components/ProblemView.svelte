@@ -31,7 +31,7 @@
   <span class="number">№ {problem.number}</span>
   <span class="points">
     {#if problem.pointValue}
-      <span class="top">{problem.pointValue.maximum}p</span>
+      <span class="top">≤ {problem.pointValue.maximum}p</span>
     {/if}
   </span>
   <div class="score">
@@ -77,10 +77,6 @@
   .points {
     margin-right: auto;
     white-space: nowrap;
-
-    & wa-icon {
-      font-size: var(--wa-font-size-xs);
-    }
   }
 
   .score {
