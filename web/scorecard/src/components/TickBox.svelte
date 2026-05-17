@@ -47,7 +47,6 @@
 
     event.stopPropagation();
 
-    navigator.vibrate?.(50);
     open = false;
 
     deleteTick.mutate(tick.id, {
