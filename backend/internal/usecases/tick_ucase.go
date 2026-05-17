@@ -158,9 +158,12 @@ func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.Contender
 		return domain.Tick{}, errors.New(domain.ErrProblemNotInContest)
 	}
 
+	wasPreviouslyTicked := false
+
 	existingTick, err := uc.Repo.GetTickByContenderAndProblem(ctx, nil, contenderID, problem.ID)
 	switch {
 	case err == nil:
+		wasPreviouslyTicked = true
 	case errors.Is(err, domain.ErrNotFound):
 	default:
 		return domain.Tick{}, errors.Wrap(err, 0)
@@ -187,7 +190,7 @@ func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.Contender
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
-	if existingTick.ID != 0 {
+	if wasPreviouslyTicked {
 		uc.EventBroker.Dispatch(contest.ID, domain.AscentDeregisteredEvent{
 			TickID:      existingTick.ID,
 			ContenderID: *existingTick.Ownership.ContenderID,
