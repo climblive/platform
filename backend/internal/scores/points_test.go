@@ -100,65 +100,52 @@ func TestHypotheticalTop(t *testing.T) {
 			input: scores.Tick{},
 			expected: scores.Tick{
 				Zone1:         true,
-				AttemptsZone1: 1,
+				AttemptsZone1: 999,
+				Zone2:         true,
+				AttemptsZone2: 999,
+				Top:           true,
+				AttemptsTop:   999,
+			},
+		},
+		{
+			name: "NormalizesToTop",
+			input: scores.Tick{
+				ContenderID:   1,
+				ProblemID:     2,
+				Zone1:         true,
+				AttemptsZone1: 2,
+				Zone2:         true,
+				AttemptsZone2: 3,
+				AttemptsTop:   4,
+			},
+			expected: scores.Tick{
+				ContenderID:   1,
+				ProblemID:     2,
+				Zone1:         true,
+				AttemptsZone1: 999,
+				Zone2:         true,
+				AttemptsZone2: 999,
+				Top:           true,
+				AttemptsTop:   999,
+			},
+		},
+		{
+			name: "DropsExistingFlashAttemptCounts",
+			input: scores.Tick{
+				Zone1:         true,
+				AttemptsZone1: 2,
 				Zone2:         true,
 				AttemptsZone2: 1,
 				Top:           true,
 				AttemptsTop:   1,
 			},
-		},
-		{
-			name: "AddsMissingTopOnly",
-			input: scores.Tick{
-				Zone1:         true,
-				AttemptsZone1: 2,
-				Zone2:         true,
-				AttemptsZone2: 3,
-				AttemptsTop:   4,
-			},
 			expected: scores.Tick{
 				Zone1:         true,
-				AttemptsZone1: 2,
+				AttemptsZone1: 999,
 				Zone2:         true,
-				AttemptsZone2: 3,
+				AttemptsZone2: 999,
 				Top:           true,
-				AttemptsTop:   5,
-			},
-		},
-		{
-			name: "AddsMissingZonesAndTop",
-			input: scores.Tick{
-				Zone1:         true,
-				AttemptsZone1: 2,
-				AttemptsZone2: 4,
-				AttemptsTop:   6,
-			},
-			expected: scores.Tick{
-				Zone1:         true,
-				AttemptsZone1: 2,
-				Zone2:         true,
-				AttemptsZone2: 5,
-				Top:           true,
-				AttemptsTop:   7,
-			},
-		},
-		{
-			name: "AlreadyCompleted",
-			input: scores.Tick{
-				Zone1:         true,
-				AttemptsZone1: 2,
-				Zone2:         true,
-				AttemptsZone2: 3,
-				Top:           true,
-				AttemptsTop:   4,
-			},
-			expected: scores.Tick{
-				Zone1:         true,
-				AttemptsZone1: 2,
-				Zone2:         true,
-				AttemptsZone2: 3,
-				Top:           true,
-				AttemptsTop:   4,
+				AttemptsTop:   999,
 			},
 		},
 	}
@@ -173,4 +160,39 @@ func TestHypotheticalTop(t *testing.T) {
 			assert.Equal(t, original, tt.input)
 		})
 	}
+}
+
+func TestHypotheticalFlash(t *testing.T) {
+	input := scores.Tick{
+		ContenderID:   1,
+		ProblemID:     2,
+		Zone1:         true,
+		AttemptsZone1: 999,
+		Zone2:         true,
+		AttemptsZone2: 999,
+		Top:           true,
+		AttemptsTop:   999,
+	}
+
+	assert.Equal(t, scores.Tick{
+		ContenderID:   1,
+		ProblemID:     2,
+		Zone1:         true,
+		AttemptsZone1: 1,
+		Zone2:         true,
+		AttemptsZone2: 1,
+		Top:           true,
+		AttemptsTop:   1,
+	}, scores.HypotheticalFlash(input))
+
+	assert.Equal(t, scores.Tick{
+		ContenderID:   1,
+		ProblemID:     2,
+		Zone1:         true,
+		AttemptsZone1: 999,
+		Zone2:         true,
+		AttemptsZone2: 999,
+		Top:           true,
+		AttemptsTop:   999,
+	}, input)
 }

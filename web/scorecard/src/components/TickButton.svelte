@@ -21,8 +21,8 @@
     <wa-icon slot="start" name={iconName}></wa-icon>
     {label}
   </wa-button>
-  {#if points}
-    <span>+{points} pts</span>
+  {#if points !== undefined}
+    <span>{points} pts</span>
   {/if}
 </div>
 

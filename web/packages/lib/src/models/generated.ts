@@ -151,7 +151,10 @@ export interface PointValue {
   contenderId: ContenderID;
   problemId: ProblemID;
   current: number /* int */;
-  maximum: number /* int */;
+  zone1: number /* int */;
+  zone2: number /* int */;
+  top: number /* int */;
+  flash: number /* int */;
 }
 export interface Problem extends ProblemValue {
   id: ProblemID;

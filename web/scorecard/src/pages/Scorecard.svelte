@@ -128,11 +128,11 @@
             return -1;
           }
 
-          if (p1.pointValue.maximum === p2.pointValue.maximum) {
+          if (p1.pointValue.flash === p2.pointValue.flash) {
             return p1.number - p2.number;
           }
 
-          return p1.pointValue.maximum - p2.pointValue.maximum;
+          return p1.pointValue.flash - p2.pointValue.flash;
         });
 
         break;

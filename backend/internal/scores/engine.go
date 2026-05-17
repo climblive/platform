@@ -439,21 +439,39 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 	for contender := range e.store.GetContendersByCompClass(compClassID) {
 		tick, _ := e.store.GetTick(contender.ID, problemID)
 
+		hypotheticalZone1 := HypotheticalZone1(tick)
+		hypotheticalZone2 := HypotheticalZone2(tick)
 		hypotheticalTop := HypotheticalTop(tick)
+		hypotheticalFlash := HypotheticalFlash(tick)
 
 		pointValue := domain.PointValue{
 			ContenderID: contender.ID,
 			ProblemID:   problemID,
 			Current:     CalculatePoints(problemValue, tick),
+			Zone1:       CalculatePoints(problemValue, hypotheticalZone1),
+			Zone2:       CalculatePoints(problemValue, hypotheticalZone2),
+			Top:         CalculatePoints(problemValue, hypotheticalTop),
+			Flash:       CalculatePoints(problemValue, hypotheticalFlash),
 		}
-
-		hypotheticalProblemValue := problemValue
 
 		if rules.PooledPoints {
-			hypotheticalProblemValue = tickPool.Sub(tick).Add(hypotheticalTop).CalculateProblemValue(problem.ProblemValue)
+			pointValue.Zone1 = CalculatePoints(
+				tickPool.Sub(tick).Add(hypotheticalZone1).CalculateProblemValue(problem.ProblemValue),
+				hypotheticalZone1,
+			)
+			pointValue.Zone2 = CalculatePoints(
+				tickPool.Sub(tick).Add(hypotheticalZone2).CalculateProblemValue(problem.ProblemValue),
+				hypotheticalZone2,
+			)
+			pointValue.Top = CalculatePoints(
+				tickPool.Sub(tick).Add(hypotheticalTop).CalculateProblemValue(problem.ProblemValue),
+				hypotheticalTop,
+			)
+			pointValue.Flash = CalculatePoints(
+				tickPool.Sub(tick).Add(hypotheticalFlash).CalculateProblemValue(problem.ProblemValue),
+				hypotheticalFlash,
+			)
 		}
-
-		pointValue.Maximum = CalculatePoints(hypotheticalProblemValue, hypotheticalTop)
 
 		oldValue, hasTick := e.store.GetPointValue(contender.ID, problemID)
 		e.store.SavePointValue(contender.ID, problemID, pointValue)

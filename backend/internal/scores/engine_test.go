@@ -908,7 +908,10 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ContenderID: fakedContenderID,
 				ProblemID:   fakedProblemID,
 				Current:     550,
-				Maximum:     500,
+				Zone1:       100,
+				Zone2:       200,
+				Top:         500,
+				Flash:       550,
 			}, true)
 
 		f.store.
@@ -916,7 +919,10 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ContenderID: fakedContenderID,
 				ProblemID:   fakedProblemID,
 				Current:     550,
-				Maximum:     500,
+				Zone1:       100,
+				Zone2:       200,
+				Top:         500,
+				Flash:       550,
 			}).Return()
 
 		effects := f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID)
@@ -996,7 +1002,10 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ContenderID: fakedContender1ID,
 				ProblemID:   fakedProblemID,
 				Current:     600,
-				Maximum:     500,
+				Zone1:       100,
+				Zone2:       200,
+				Top:         500,
+				Flash:       600,
 			}, true)
 
 		f.store.
@@ -1004,7 +1013,10 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ContenderID: fakedContender1ID,
 				ProblemID:   fakedProblemID,
 				Current:     600,
-				Maximum:     500,
+				Zone1:       100,
+				Zone2:       200,
+				Top:         500,
+				Flash:       600,
 			}).Return()
 
 		effects := f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID)
@@ -1191,31 +1203,46 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ContenderID: fakedContender1ID,
 				ProblemID:   fakedProblemID,
 				Current:     216,
-				Maximum:     166,
+				Zone1:       10,
+				Zone2:       25,
+				Top:         166,
+				Flash:       216,
 			}).Return().
 			On("SavePointValue", fakedContender2ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender2ID,
 				ProblemID:   fakedProblemID,
 				Current:     216,
-				Maximum:     166,
+				Zone1:       10,
+				Zone2:       25,
+				Top:         166,
+				Flash:       216,
 			}).Return().
 			On("SavePointValue", fakedContender3ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender3ID,
 				ProblemID:   fakedProblemID,
 				Current:     166,
-				Maximum:     166,
+				Zone1:       10,
+				Zone2:       25,
+				Top:         166,
+				Flash:       199,
 			}).Return().
 			On("SavePointValue", fakedContender4ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender4ID,
 				ProblemID:   fakedProblemID,
 				Current:     25,
-				Maximum:     125,
+				Zone1:       10,
+				Zone2:       25,
+				Top:         125,
+				Flash:       158,
 			}).Return().
 			On("SavePointValue", fakedContender5ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender5ID,
 				ProblemID:   fakedProblemID,
 				Current:     10,
-				Maximum:     125,
+				Zone1:       10,
+				Zone2:       20,
+				Top:         125,
+				Flash:       158,
 			}).Return()
 
 		effects := slices.Collect(f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID))
@@ -1231,7 +1258,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
-	t.Run("CalculatePointValues_PooledPoints_MaximumUsesAdditionalTick", func(t *testing.T) {
+	t.Run("CalculatePointValues_PooledPoints_FlashUsesAdditionalTick", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
@@ -1305,7 +1332,10 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ContenderID: fakedContender3ID,
 				ProblemID:   fakedProblemID,
 				Current:     0,
-				Maximum:     33,
+				Zone1:       0,
+				Zone2:       0,
+				Top:         33,
+				Flash:       33,
 			}).Return()
 
 		effects := slices.Collect(f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID))
@@ -1430,13 +1460,19 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ContenderID: fakedContender1ID,
 				ProblemID:   fakedProblemID,
 				Current:     262,
-				Maximum:     250,
+				Zone1:       25,
+				Zone2:       50,
+				Top:         250,
+				Flash:       262,
 			}).Return().
 			On("SavePointValue", fakedContender2ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender2ID,
 				ProblemID:   fakedProblemID,
 				Current:     262,
-				Maximum:     250,
+				Zone1:       25,
+				Zone2:       50,
+				Top:         250,
+				Flash:       262,
 			}).Return()
 
 		effects := slices.Collect(f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID))

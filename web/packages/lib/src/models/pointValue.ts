@@ -5,5 +5,8 @@ export const pointValueSchema: z.ZodType<PointValue> = z.object({
   contenderId: z.number(),
   problemId: z.number(),
   current: z.number(),
-  maximum: z.number(),
+  zone1: z.number(),
+  zone2: z.number(),
+  top: z.number(),
+  flash: z.number(),
 });

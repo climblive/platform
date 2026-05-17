@@ -2,7 +2,7 @@
   import type { ScorecardSession } from "@/types";
   import WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import { HoldColorIndicator } from "@climblive/lib/components";
-  import type { Problem, Tick } from "@climblive/lib/models";
+  import type { PointValue, Problem, Tick } from "@climblive/lib/models";
   import { deleteTickMutation, putTickMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import { AxiosError } from "axios";
@@ -14,10 +14,10 @@
     problem: Problem;
     tick: Tick | undefined;
     disabled: boolean | undefined;
-    currentTickValue?: number;
+    pointValue?: PointValue;
   }
 
-  let { problem, tick, disabled = false, currentTickValue }: Props = $props();
+  let { problem, tick, disabled = false, pointValue }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
 
@@ -154,7 +154,7 @@
         iconName="check"
         label="Top"
         onClick={(e: MouseEvent) => handleTick(e, "top", false)}
-        points={currentTickValue}
+        points={pointValue?.top}
         active={variant === "top"}
       />
 
@@ -162,7 +162,7 @@
         iconName="bolt"
         label="Flash"
         onClick={(e: MouseEvent) => handleTick(e, "top", true)}
-        points={currentTickValue}
+        points={pointValue?.flash}
         active={variant === "flash"}
       />
     </div>
@@ -172,7 +172,7 @@
         iconName="check"
         label="Zone 2"
         onClick={(e: MouseEvent) => handleTick(e, "zone2", false)}
-        points={currentTickValue}
+        points={pointValue?.zone2}
         active={variant === "zone2"}
       />
     {/if}
@@ -182,7 +182,7 @@
         iconName="check"
         label="Zone 1"
         onClick={(e: MouseEvent) => handleTick(e, "zone1", false)}
-        points={currentTickValue}
+        points={pointValue?.zone1}
         active={variant === "zone1"}
       />
     {/if}

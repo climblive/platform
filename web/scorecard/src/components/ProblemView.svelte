@@ -31,7 +31,7 @@
   <span class="number">№ {problem.number}</span>
   <span class="points">
     {#if problem.pointValue}
-      <span class="top">≤ {problem.pointValue.maximum}p</span>
+      <span class="top">≤ {problem.pointValue.flash}p</span>
     {/if}
   </span>
   <div class="score">
@@ -40,12 +40,7 @@
     {/if}
   </div>
 
-  <TickBox
-    {problem}
-    {tick}
-    {disabled}
-    currentTickValue={problem.pointValue?.current}
-  />
+  <TickBox {problem} {tick} {disabled} pointValue={problem.pointValue} />
 </section>
 
 <style>

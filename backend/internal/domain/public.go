@@ -144,7 +144,10 @@ type PointValue struct {
 	ContenderID ContenderID `json:"contenderId"`
 	ProblemID   ProblemID   `json:"problemId"`
 	Current     int         `json:"current"`
-	Maximum     int         `json:"maximum"`
+	Zone1       int         `json:"zone1"`
+	Zone2       int         `json:"zone2"`
+	Top         int         `json:"top"`
+	Flash       int         `json:"flash"`
 }
 
 type Problem struct {
@@ -343,7 +346,10 @@ type PointValueUpdatedEvent struct {
 	ContenderID ContenderID `json:"contenderId"`
 	ProblemID   ProblemID   `json:"problemId"`
 	Current     int         `json:"current"`
-	Maximum     int         `json:"maximum"`
+	Zone1       int         `json:"zone1"`
+	Zone2       int         `json:"zone2"`
+	Top         int         `json:"top"`
+	Flash       int         `json:"flash"`
 }
 
 type ScoreEngineStartedEvent struct {
