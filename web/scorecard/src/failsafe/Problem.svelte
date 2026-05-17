@@ -1,10 +1,7 @@
 <script lang="ts">
   import { HoldColorIndicator } from "@climblive/lib/components";
   import type { Problem, Tick } from "@climblive/lib/models";
-  import {
-    createTickMutation,
-    deleteTickMutation,
-  } from "@climblive/lib/queries";
+  import { deleteTickMutation, putTickMutation } from "@climblive/lib/queries";
 
   type Props = {
     problem: Problem;
@@ -14,7 +11,7 @@
 
   const { problem, tick, contenderId }: Props = $props();
 
-  const createTick = $derived(createTickMutation(contenderId));
+  const putTick = $derived(putTickMutation(contenderId));
   const deleteTick = $derived(deleteTickMutation());
 
   const tickType = (tick?: Tick) => {
@@ -58,7 +55,7 @@
         break;
     }
 
-    createTick.mutate(tick);
+    putTick.mutate(tick);
   };
 
   const removeTick = () => {
@@ -100,19 +97,17 @@
       >
     {:else}
       {#if problem.zone1Enabled}
-        <button onclick={addTick("zone1")} disabled={createTick.isPending}
+        <button onclick={addTick("zone1")} disabled={putTick.isPending}
           >Zone 1</button
         >
       {/if}
       {#if problem.zone2Enabled}
-        <button onclick={addTick("zone2")} disabled={createTick.isPending}
+        <button onclick={addTick("zone2")} disabled={putTick.isPending}
           >Zone 2</button
         >
       {/if}
-      <button onclick={addTick("top")} disabled={createTick.isPending}
-        >Top</button
-      >
-      <button onclick={addTick("flash")} disabled={createTick.isPending}
+      <button onclick={addTick("top")} disabled={putTick.isPending}>Top</button>
+      <button onclick={addTick("flash")} disabled={putTick.isPending}
         >Flash</button
       >
     {/if}

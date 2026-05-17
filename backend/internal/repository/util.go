@@ -19,8 +19,3 @@ var mysqlForeignKeyConstraintViolation = mysql.MySQLError{
 	SQLState: [5]byte{},
 	Message:  "",
 }
-var mysqlDuplicateKeyConstraintViolation = mysql.MySQLError{
-	Number:   1062,
-	SQLState: [5]byte{},
-	Message:  "",
-}

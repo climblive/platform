@@ -364,13 +364,13 @@ export class ApiClient {
     return z.array(tickSchema).parse(result.data);
   };
 
-  createTick = async (
+  putTick = async (
     contenderId: number,
     tick: Omit<Tick, "id" | "timestamp">,
   ) => {
     const endpoint = `/contenders/${contenderId}/ticks`;
 
-    const result = await this.axiosInstance.post(endpoint, tick, {
+    const result = await this.axiosInstance.put(endpoint, tick, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 
