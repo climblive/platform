@@ -224,7 +224,7 @@ func TestPutTick(t *testing.T) {
 			Return(domain.ContenderRole, nil)
 
 		mockedRepo.
-			On("GetTickByContenderAndProblem", mock.Anything, mock.Anything, fakedContenderID, fakedProblemID).
+			On("GetTickByContenderAndProblem", mock.Anything, nil, fakedContenderID, fakedProblemID).
 			Return(domain.Tick{}, domain.ErrNotFound)
 
 		mockedRepo.
@@ -426,7 +426,7 @@ func TestPutTick(t *testing.T) {
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
-			On("GetTickByContenderAndProblem", mock.Anything, mock.Anything, fakedContenderID, fakedProblemID).
+			On("GetTickByContenderAndProblem", mock.Anything, nil, fakedContenderID, fakedProblemID).
 			Return(domain.Tick{}, domain.ErrNotFound)
 
 		mockedRepo.
@@ -545,7 +545,7 @@ func TestPutTick(t *testing.T) {
 			Return(domain.ContenderRole, nil)
 
 		mockedRepo.
-			On("GetTickByContenderAndProblem", mock.Anything, mock.Anything, fakedContenderID, fakedProblemID).
+			On("GetTickByContenderAndProblem", mock.Anything, nil, fakedContenderID, fakedProblemID).
 			Return(domain.Tick{}, domain.ErrNotFound)
 
 		mockedRepo.
@@ -582,9 +582,6 @@ func TestPutTick(t *testing.T) {
 			mockedAuthorizer := new(authorizerMock)
 
 			fakedTickID := testutils.RandomResourceID[domain.TickID]()
-			if fakedTickID == 0 {
-				fakedTickID = 1
-			}
 
 			existingTick := domain.Tick{
 				ID:            fakedTickID,
@@ -613,6 +610,7 @@ func TestPutTick(t *testing.T) {
 
 			mockedRepo.
 				On("StoreTick", mock.Anything, nil, domain.Tick{
+					ID:            fakedTickID,
 					Ownership:     fakedOwnership,
 					Timestamp:     now,
 					ContestID:     fakedContestID,
@@ -680,7 +678,13 @@ func TestPutTick(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, fakedTickID, updatedTick.ID)
 			assert.Equal(t, fakedProblemID, updatedTick.ProblemID)
+			assert.Equal(t, fakedContestID, updatedTick.ContestID)
 			assert.True(t, updatedTick.Top)
+			assert.Equal(t, 2, updatedTick.AttemptsTop)
+			assert.True(t, updatedTick.Zone2)
+			assert.Equal(t, 2, updatedTick.AttemptsZone2)
+			assert.True(t, updatedTick.Zone1)
+			assert.Equal(t, 1, updatedTick.AttemptsZone1)
 			assert.Equal(t, now, updatedTick.Timestamp)
 
 			mockedRepo.AssertExpectations(t)
