@@ -188,7 +188,7 @@
 
     {#if open && variant !== undefined}
       <TickButton
-        iconName="trash"
+        iconName="rotate-left"
         label="Unsend"
         onClick={(e: MouseEvent) => handleDelete(e)}
         variant="danger"
