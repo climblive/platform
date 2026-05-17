@@ -455,22 +455,12 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 		}
 
 		if rules.PooledPoints {
-			pointValue.Zone1 = CalculatePoints(
-				tickPool.Sub(tick).Add(hypotheticalZone1).CalculateProblemValue(problem.ProblemValue),
-				hypotheticalZone1,
-			)
-			pointValue.Zone2 = CalculatePoints(
-				tickPool.Sub(tick).Add(hypotheticalZone2).CalculateProblemValue(problem.ProblemValue),
-				hypotheticalZone2,
-			)
-			pointValue.Top = CalculatePoints(
-				tickPool.Sub(tick).Add(hypotheticalTop).CalculateProblemValue(problem.ProblemValue),
-				hypotheticalTop,
-			)
-			pointValue.Flash = CalculatePoints(
-				tickPool.Sub(tick).Add(hypotheticalFlash).CalculateProblemValue(problem.ProblemValue),
-				hypotheticalFlash,
-			)
+			hypotheticalProblemValue := tickPool.Sub(tick).Add(hypotheticalFlash).CalculateProblemValue(problem.ProblemValue)
+
+			pointValue.Zone1 = CalculatePoints(hypotheticalProblemValue, hypotheticalZone1)
+			pointValue.Zone2 = CalculatePoints(hypotheticalProblemValue, hypotheticalZone2)
+			pointValue.Top = CalculatePoints(hypotheticalProblemValue, hypotheticalTop)
+			pointValue.Flash = CalculatePoints(hypotheticalProblemValue, hypotheticalFlash)
 		}
 
 		oldValue, hasTick := e.store.GetPointValue(contender.ID, problemID)
