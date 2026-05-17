@@ -345,6 +345,38 @@ test("tick the second zone", async ({ page }) => {
   await expect(problem.getByText("+20p")).not.toBeVisible();
 });
 
+test("update a problem through all scoring states", async ({ page }) => {
+  await page.goto("/ABCD0003");
+
+  const problem = page.getByRole("region", { name: "Problem 1" });
+  await expect(problem).toBeVisible();
+
+  await problem.getByRole("button", { name: "Tick" }).click();
+  await problem.getByRole("button", { name: "Zone 1" }).click();
+
+  await expect(problem.getByText("+10p")).toBeVisible();
+
+  await problem.getByRole("button", { name: "Edit" }).click();
+  await problem.getByRole("button", { name: "Zone 2" }).click();
+
+  await expect(problem.getByText("+20p")).toBeVisible();
+
+  await problem.getByRole("button", { name: "Edit" }).click();
+  await problem.getByRole("button", { name: "Top" }).click();
+
+  await expect(problem.getByText("+100p")).toBeVisible();
+
+  await problem.getByRole("button", { name: "Edit" }).click();
+  await problem.getByRole("button", { name: "Flash" }).click();
+
+  await expect(problem.getByText("+110p")).toBeVisible();
+
+  await problem.getByRole("button", { name: "Edit" }).click();
+  await problem.getByRole("button", { name: "Unsend" }).click();
+
+  await expect(problem.getByText("+110p")).not.toBeVisible();
+});
+
 test("info tab", async ({ page }) => {
   await page.goto("/ABCD0001");
 
