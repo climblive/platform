@@ -117,7 +117,7 @@
     data-variant={variant}
     disabled={disabled || loading}
     onclick={() => (open = true)}
-    aria-label={tick?.id ? "Untick" : "Tick"}
+    aria-label={tick?.id ? "Edit" : "Tick"}
   >
     {#if loading}
       <wa-spinner></wa-spinner>

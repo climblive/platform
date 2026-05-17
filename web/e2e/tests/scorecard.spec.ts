@@ -284,7 +284,8 @@ test("tick and untick all problems", async ({ page }) => {
     const problem = page.getByRole("region", { name: `Problem ${p}` });
     await expect(problem).toBeVisible();
 
-    await problem.getByRole("button", { name: "Untick" }).click();
+    await problem.getByRole("button", { name: "Edit" }).click();
+    await problem.getByRole("button", { name: "Unsend" }).click();
 
     await expect(problem.getByText(`+${p * 100}p`)).not.toBeVisible();
   }
@@ -304,7 +305,8 @@ test("tick a problem as a flash", async ({ page }) => {
 
   await expect(problem.getByText("+110p")).toBeVisible();
 
-  await problem.getByRole("button", { name: "Untick" }).click();
+  await problem.getByRole("button", { name: "Edit" }).click();
+  await problem.getByRole("button", { name: "Unsend" }).click();
 
   await expect(problem.getByText("+110p")).not.toBeVisible();
 });
@@ -320,7 +322,8 @@ test("tick the first zone", async ({ page }) => {
 
   await expect(problem.getByText("+10p")).toBeVisible();
 
-  await problem.getByRole("button", { name: "Untick" }).click();
+  await problem.getByRole("button", { name: "Edit" }).click();
+  await problem.getByRole("button", { name: "Unsend" }).click();
 
   await expect(problem.getByText("+10p")).not.toBeVisible();
 });
@@ -336,7 +339,8 @@ test("tick the second zone", async ({ page }) => {
 
   await expect(problem.getByText("+20p")).toBeVisible();
 
-  await problem.getByRole("button", { name: "Untick" }).click();
+  await problem.getByRole("button", { name: "Edit" }).click();
+  await problem.getByRole("button", { name: "Unsend" }).click();
 
   await expect(problem.getByText("+20p")).not.toBeVisible();
 });
