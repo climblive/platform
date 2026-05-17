@@ -616,7 +616,7 @@ func TestPutTick(t *testing.T) {
 					ContestID:     fakedContestID,
 					ProblemID:     fakedProblemID,
 					Top:           true,
-					AttemptsTop:   2,
+					AttemptsTop:   3,
 					Zone1:         true,
 					AttemptsZone1: 1,
 					Zone2:         true,
@@ -629,7 +629,7 @@ func TestPutTick(t *testing.T) {
 					ContestID:     fakedContestID,
 					ProblemID:     fakedProblemID,
 					Top:           true,
-					AttemptsTop:   2,
+					AttemptsTop:   3,
 					Zone1:         true,
 					AttemptsZone1: 1,
 					Zone2:         true,
@@ -651,7 +651,7 @@ func TestPutTick(t *testing.T) {
 					ContenderID:   fakedContenderID,
 					ProblemID:     fakedProblemID,
 					Top:           true,
-					AttemptsTop:   2,
+					AttemptsTop:   3,
 					Zone1:         true,
 					AttemptsZone1: 1,
 					Zone2:         true,
@@ -668,7 +668,7 @@ func TestPutTick(t *testing.T) {
 			updatedTick, err := ucase.PutTick(context.Background(), fakedContenderID, domain.Tick{
 				ProblemID:     fakedProblemID,
 				Top:           true,
-				AttemptsTop:   2,
+				AttemptsTop:   3,
 				Zone1:         true,
 				AttemptsZone1: 1,
 				Zone2:         true,
@@ -680,7 +680,7 @@ func TestPutTick(t *testing.T) {
 			assert.Equal(t, fakedProblemID, updatedTick.ProblemID)
 			assert.Equal(t, fakedContestID, updatedTick.ContestID)
 			assert.True(t, updatedTick.Top)
-			assert.Equal(t, 2, updatedTick.AttemptsTop)
+			assert.Equal(t, 3, updatedTick.AttemptsTop)
 			assert.True(t, updatedTick.Zone2)
 			assert.Equal(t, 2, updatedTick.AttemptsZone2)
 			assert.True(t, updatedTick.Zone1)
