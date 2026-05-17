@@ -112,9 +112,9 @@
   <div class="grid">
     {@render entry(
       qualifyingProblems === 1
-        ? "The hardest problem"
+        ? "The hardest"
         : qualifyingProblems > 1
-          ? `${qualifyingProblems} hardest problems`
+          ? `${qualifyingProblems} hardest`
           : "Score",
       pointsValue,
     )}
