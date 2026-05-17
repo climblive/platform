@@ -40,7 +40,12 @@
     {/if}
   </div>
 
-  <TickBox {problem} {tick} {disabled} />
+  <TickBox
+    {problem}
+    {tick}
+    {disabled}
+    currentTickValue={problem.pointValue?.current}
+  />
 </section>
 
 <style>

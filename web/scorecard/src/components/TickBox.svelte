@@ -14,9 +14,10 @@
     problem: Problem;
     tick: Tick | undefined;
     disabled: boolean | undefined;
+    currentTickValue?: number;
   }
 
-  let { problem, tick, disabled = false }: Props = $props();
+  let { problem, tick, disabled = false, currentTickValue }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
 
@@ -153,7 +154,7 @@
         iconName="check"
         label="Top"
         onClick={(e: MouseEvent) => handleTick(e, "top", false)}
-        points={problem.pointsTop}
+        points={currentTickValue}
         active={variant === "top"}
       />
 
@@ -161,7 +162,7 @@
         iconName="bolt"
         label="Flash"
         onClick={(e: MouseEvent) => handleTick(e, "top", true)}
-        points={problem.pointsTop + (problem.flashBonus ?? 0)}
+        points={currentTickValue}
         active={variant === "flash"}
       />
     </div>
@@ -171,7 +172,7 @@
         iconName="check"
         label="Zone 2"
         onClick={(e: MouseEvent) => handleTick(e, "zone2", false)}
-        points={problem.pointsZone2}
+        points={currentTickValue}
         active={variant === "zone2"}
       />
     {/if}
@@ -181,7 +182,7 @@
         iconName="check"
         label="Zone 1"
         onClick={(e: MouseEvent) => handleTick(e, "zone1", false)}
-        points={problem.pointsZone1}
+        points={currentTickValue}
         active={variant === "zone1"}
       />
     {/if}
