@@ -16,6 +16,7 @@
     contestState: ContestState;
     startTime: Date;
     endTime: Date;
+    qualifyingProblems?: number;
   }
 
   const {
@@ -28,6 +29,7 @@
     contestState,
     startTime,
     endTime,
+    qualifyingProblems = 0,
   }: Props = $props();
 
   const id = $props.id();
@@ -108,7 +110,12 @@
 
 <div class="summary">
   <div class="grid">
-    {@render entry("Score", pointsValue)}
+    {@render entry(
+      qualifyingProblems > 0
+        ? `${qualifyingProblems} hardest problems`
+        : "Score",
+      pointsValue,
+    )}
     {@render entry("Placement", placementValue)}
 
     {#if contestState === "NOT_STARTED"}

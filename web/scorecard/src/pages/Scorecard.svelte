@@ -288,6 +288,7 @@
               {contestState}
               {startTime}
               {endTime}
+              qualifyingProblems={contest.qualifyingProblems}
             />
             <div class="sort-buttons">
               <button
