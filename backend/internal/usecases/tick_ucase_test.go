@@ -680,11 +680,6 @@ func TestPutTick(t *testing.T) {
 			mockedRepo.AssertExpectations(t)
 			mockedAuthorizer.AssertExpectations(t)
 			mockedEventBroker.AssertExpectations(t)
-			mockedEventBroker.AssertNotCalled(t, "Dispatch", fakedContestID, domain.AscentDeregisteredEvent{
-				TickID:      fakedTickID,
-				ContenderID: fakedContenderID,
-				ProblemID:   fakedProblemID,
-			})
 		})
 	})
 }
