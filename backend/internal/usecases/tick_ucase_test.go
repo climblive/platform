@@ -584,13 +584,11 @@ func TestPutTick(t *testing.T) {
 			fakedTickID := testutils.RandomResourceID[domain.TickID]()
 
 			existingTick := domain.Tick{
-				ID:            fakedTickID,
-				Ownership:     fakedOwnership,
-				Timestamp:     now.Add(-time.Minute),
-				ContestID:     fakedContestID,
-				ProblemID:     fakedProblemID,
-				Zone1:         true,
-				AttemptsZone1: 1,
+				ID:        fakedTickID,
+				Ownership: fakedOwnership,
+				Timestamp: now.Add(-time.Minute),
+				ContestID: fakedContestID,
+				ProblemID: fakedProblemID,
 			}
 
 			mockedRepo.
