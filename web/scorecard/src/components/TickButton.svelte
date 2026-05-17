@@ -4,19 +4,19 @@
     iconName: string;
     label: string;
     points?: number;
-    variant?: "danger" | "success";
+    active: boolean;
   };
 
-  const { onClick, iconName, label, points, variant }: Props = $props();
+  const { onClick, iconName, label, points, active }: Props = $props();
 </script>
 
-<div data-variant={variant}>
+<div data-active={active}>
   <wa-button
     size="s"
-    appearance={variant === "danger" ? "plain" : "outlined"}
+    appearance="outlined"
     onclick={onClick}
     pill
-    variant={variant === "danger" ? "danger" : undefined}
+    variant="neutral"
   >
     <wa-icon slot="start" name={iconName}></wa-icon>
     {label}
@@ -39,13 +39,7 @@
     gap: var(--wa-space-xs);
   }
 
-  div[data-variant="danger"] {
-    & span {
-      color: var(--wa-color-brand-fill-loud);
-    }
-  }
-
-  div[data-variant="success"] {
+  div[data-active="true"] {
     & span {
       color: var(--wa-color-success-fill-loud);
     }

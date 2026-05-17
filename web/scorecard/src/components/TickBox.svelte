@@ -154,7 +154,7 @@
         label="Top"
         onClick={(e: MouseEvent) => handleTick(e, "top", false)}
         points={problem.pointsTop}
-        variant={variant === "top" ? "success" : undefined}
+        active={variant === "top"}
       />
 
       <TickButton
@@ -162,7 +162,7 @@
         label="Flash"
         onClick={(e: MouseEvent) => handleTick(e, "top", true)}
         points={problem.pointsTop + (problem.flashBonus ?? 0)}
-        variant={variant === "flash" ? "success" : undefined}
+        active={variant === "flash"}
       />
     </div>
 
@@ -172,7 +172,7 @@
         label="Zone 2"
         onClick={(e: MouseEvent) => handleTick(e, "zone2", false)}
         points={problem.pointsZone2}
-        variant={variant === "zone2" ? "success" : undefined}
+        active={variant === "zone2"}
       />
     {/if}
 
@@ -182,17 +182,20 @@
         label="Zone 1"
         onClick={(e: MouseEvent) => handleTick(e, "zone1", false)}
         points={problem.pointsZone1}
-        variant={variant === "zone1" ? "success" : undefined}
+        active={variant === "zone1"}
       />
     {/if}
 
     {#if open && variant !== undefined}
-      <TickButton
-        iconName="rotate-left"
-        label="Unsend"
-        onClick={(e: MouseEvent) => handleDelete(e)}
+      <wa-button
+        size="s"
+        appearance="plain"
+        onclick={(e: MouseEvent) => handleDelete(e)}
         variant="danger"
-      />
+      >
+        <wa-icon slot="start" name="rotate-left"></wa-icon>
+        Unsend
+      </wa-button>
     {/if}
   </wa-dialog>
 </div>
