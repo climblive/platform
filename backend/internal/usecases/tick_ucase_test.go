@@ -635,14 +635,6 @@ func TestPutTick(t *testing.T) {
 				}, nil)
 
 			mockedEventBroker.
-				On("Dispatch", fakedContestID, domain.AscentDeregisteredEvent{
-					TickID:      fakedTickID,
-					ContenderID: fakedContenderID,
-					ProblemID:   fakedProblemID,
-				}).
-				Return()
-
-			mockedEventBroker.
 				On("Dispatch", fakedContestID, domain.AscentRegisteredEvent{
 					TickID:        fakedTickID,
 					Timestamp:     now,
