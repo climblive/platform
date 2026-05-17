@@ -198,7 +198,9 @@ test("edit profile", async ({ page }) => {
   await expect(header).toContainText("World Testing Championships");
   await expect(header).toContainText("Males");
 
-  await page.getByRole("button", { name: "Edit" }).click({ force: true });
+  await page
+    .getByRole("button", { name: "Edit profile" })
+    .click({ force: true });
 
   await page.waitForURL("/ABCD0003/edit");
 
@@ -234,7 +236,9 @@ test("withdraw from finals and reenter", async ({ page }) => {
 
   await page.waitForURL("/ABCD0003");
 
-  await page.getByRole("button", { name: "Edit" }).click({ force: true });
+  await page
+    .getByRole("button", { name: "Edit profile" })
+    .click({ force: true });
 
   await expect(
     page.getByRole("switch", { name: "Opt out of finals" }),
@@ -247,7 +251,9 @@ test("withdraw from finals and reenter", async ({ page }) => {
 
   await page.waitForURL("/ABCD0003");
 
-  await page.getByRole("button", { name: "Edit" }).click({ force: true });
+  await page
+    .getByRole("button", { name: "Edit profile" })
+    .click({ force: true });
 
   await expect(
     page.getByRole("switch", { name: "Opt out of finals" }),
@@ -416,7 +422,9 @@ test.describe("contest states", () => {
     const timer = page.getByRole("timer", { name: "Starting in" });
     await expect(timer).toHaveText("2 months");
 
-    await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
+    await expect(
+      page.getByRole("button", { name: "Edit profile" }),
+    ).toBeEnabled();
 
     const problem = page.getByRole("region", { name: "Problem 1" });
     await expect(problem).toBeVisible();
@@ -432,7 +440,9 @@ test.describe("contest states", () => {
     const timer = page.getByRole("timer", { name: "Time left" });
     await expect(timer).toHaveText("almost 3 years");
 
-    await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
+    await expect(
+      page.getByRole("button", { name: "Edit profile" }),
+    ).toBeEnabled();
 
     const problem = page.getByRole("region", { name: "Problem 1" });
     await expect(problem).toBeVisible();
@@ -448,7 +458,9 @@ test.describe("contest states", () => {
     const timer = page.getByRole("timer", { name: "Time left" });
     await expect(timer).toHaveText("00:00:00");
 
-    await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
+    await expect(
+      page.getByRole("button", { name: "Edit profile" }),
+    ).toBeEnabled();
 
     const problem = page.getByRole("region", { name: "Problem 1" });
     await expect(problem).toBeVisible();
@@ -464,7 +476,9 @@ test.describe("contest states", () => {
     const timer = page.getByRole("timer", { name: "Time left" });
     await expect(timer).toHaveText("00:00:00");
 
-    await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
+    await expect(
+      page.getByRole("button", { name: "Edit profile" }),
+    ).toBeEnabled();
 
     const problem = page.getByRole("region", { name: "Problem 1" });
     await expect(problem).toBeVisible();
@@ -478,7 +492,9 @@ test("scrub name", async ({ page }) => {
 
   await expect(page.getByText("Albert Einstein")).toBeVisible();
 
-  await page.getByRole("button", { name: "Edit" }).click({ force: true });
+  await page
+    .getByRole("button", { name: "Edit profile" })
+    .click({ force: true });
 
   await page.waitForURL("/ABCD0001/edit");
 
