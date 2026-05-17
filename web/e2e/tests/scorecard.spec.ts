@@ -426,7 +426,7 @@ test.describe("contest states", () => {
       page.getByRole("button", { name: "Edit profile" }),
     ).toBeEnabled();
 
-    const problem = page.getByRole("region", { name: "Problem 1" });
+    const problem = page.getByRole("region", { name: "Problem 5" });
     await expect(problem).toBeVisible();
 
     await expect(problem.getByRole("button", { name: "Tick" })).toBeDisabled();
@@ -444,7 +444,7 @@ test.describe("contest states", () => {
       page.getByRole("button", { name: "Edit profile" }),
     ).toBeEnabled();
 
-    const problem = page.getByRole("region", { name: "Problem 1" });
+    const problem = page.getByRole("region", { name: "Problem 5" });
     await expect(problem).toBeVisible();
 
     await expect(problem.getByRole("button", { name: "Tick" })).toBeEnabled();
@@ -462,7 +462,7 @@ test.describe("contest states", () => {
       page.getByRole("button", { name: "Edit profile" }),
     ).toBeEnabled();
 
-    const problem = page.getByRole("region", { name: "Problem 1" });
+    const problem = page.getByRole("region", { name: "Problem 5" });
     await expect(problem).toBeVisible();
 
     await expect(problem.getByRole("button", { name: "Tick" })).toBeEnabled();
@@ -480,7 +480,7 @@ test.describe("contest states", () => {
       page.getByRole("button", { name: "Edit profile" }),
     ).toBeEnabled();
 
-    const problem = page.getByRole("region", { name: "Problem 1" });
+    const problem = page.getByRole("region", { name: "Problem 5" });
     await expect(problem).toBeVisible();
 
     await expect(problem.getByRole("button", { name: "Tick" })).toBeDisabled();
