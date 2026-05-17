@@ -198,7 +198,9 @@ test("edit profile", async ({ page }) => {
   await expect(header).toContainText("World Testing Championships");
   await expect(header).toContainText("Males");
 
-  await page.getByRole("button", { name: "Edit" }).click({ force: true });
+  await page
+    .getByRole("button", { name: "Edit profile" })
+    .click({ force: true });
 
   await page.waitForURL("/ABCD0003/edit");
 
@@ -234,7 +236,9 @@ test("withdraw from finals and reenter", async ({ page }) => {
 
   await page.waitForURL("/ABCD0003");
 
-  await page.getByRole("button", { name: "Edit" }).click({ force: true });
+  await page
+    .getByRole("button", { name: "Edit profile" })
+    .click({ force: true });
 
   await expect(
     page.getByRole("switch", { name: "Opt out of finals" }),
@@ -247,7 +251,9 @@ test("withdraw from finals and reenter", async ({ page }) => {
 
   await page.waitForURL("/ABCD0003");
 
-  await page.getByRole("button", { name: "Edit" }).click({ force: true });
+  await page
+    .getByRole("button", { name: "Edit profile" })
+    .click({ force: true });
 
   await expect(
     page.getByRole("switch", { name: "Opt out of finals" }),
@@ -284,7 +290,8 @@ test("tick and untick all problems", async ({ page }) => {
     const problem = page.getByRole("region", { name: `Problem ${p}` });
     await expect(problem).toBeVisible();
 
-    await problem.getByRole("button", { name: "Untick" }).click();
+    await problem.getByRole("button", { name: "Edit" }).click();
+    await problem.getByRole("button", { name: "Unsend" }).click();
 
     await expect(problem.getByText(`+${p * 100}p`)).not.toBeVisible();
   }
@@ -304,7 +311,8 @@ test("tick a problem as a flash", async ({ page }) => {
 
   await expect(problem.getByText("+110p")).toBeVisible();
 
-  await problem.getByRole("button", { name: "Untick" }).click();
+  await problem.getByRole("button", { name: "Edit" }).click();
+  await problem.getByRole("button", { name: "Unsend" }).click();
 
   await expect(problem.getByText("+110p")).not.toBeVisible();
 });
@@ -320,7 +328,8 @@ test("tick the first zone", async ({ page }) => {
 
   await expect(problem.getByText("+10p")).toBeVisible();
 
-  await problem.getByRole("button", { name: "Untick" }).click();
+  await problem.getByRole("button", { name: "Edit" }).click();
+  await problem.getByRole("button", { name: "Unsend" }).click();
 
   await expect(problem.getByText("+10p")).not.toBeVisible();
 });
@@ -336,9 +345,42 @@ test("tick the second zone", async ({ page }) => {
 
   await expect(problem.getByText("+20p")).toBeVisible();
 
-  await problem.getByRole("button", { name: "Untick" }).click();
+  await problem.getByRole("button", { name: "Edit" }).click();
+  await problem.getByRole("button", { name: "Unsend" }).click();
 
   await expect(problem.getByText("+20p")).not.toBeVisible();
+});
+
+test("update a problem through all scoring states", async ({ page }) => {
+  await page.goto("/ABCD0003");
+
+  const problem = page.getByRole("region", { name: "Problem 1" });
+  await expect(problem).toBeVisible();
+
+  await problem.getByRole("button", { name: "Tick" }).click();
+  await problem.getByRole("button", { name: "Zone 1" }).click();
+
+  await expect(problem.getByText("+10p")).toBeVisible();
+
+  await problem.getByRole("button", { name: "Edit" }).click();
+  await problem.getByRole("button", { name: "Zone 2" }).click();
+
+  await expect(problem.getByText("+20p")).toBeVisible();
+
+  await problem.getByRole("button", { name: "Edit" }).click();
+  await problem.getByRole("button", { name: "Top" }).click();
+
+  await expect(problem.getByText("+100p")).toBeVisible();
+
+  await problem.getByRole("button", { name: "Edit" }).click();
+  await problem.getByRole("button", { name: "Flash" }).click();
+
+  await expect(problem.getByText("+110p")).toBeVisible();
+
+  await problem.getByRole("button", { name: "Edit" }).click();
+  await problem.getByRole("button", { name: "Unsend" }).click();
+
+  await expect(problem.getByText("+110p")).not.toBeVisible();
 });
 
 test("info tab", async ({ page }) => {
@@ -380,9 +422,11 @@ test.describe("contest states", () => {
     const timer = page.getByRole("timer", { name: "Starting in" });
     await expect(timer).toHaveText("2 months");
 
-    await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
+    await expect(
+      page.getByRole("button", { name: "Edit profile" }),
+    ).toBeEnabled();
 
-    const problem = page.getByRole("region", { name: "Problem 1" });
+    const problem = page.getByRole("region", { name: "Problem 5" });
     await expect(problem).toBeVisible();
 
     await expect(problem.getByRole("button", { name: "Tick" })).toBeDisabled();
@@ -396,9 +440,11 @@ test.describe("contest states", () => {
     const timer = page.getByRole("timer", { name: "Time left" });
     await expect(timer).toHaveText("almost 3 years");
 
-    await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
+    await expect(
+      page.getByRole("button", { name: "Edit profile" }),
+    ).toBeEnabled();
 
-    const problem = page.getByRole("region", { name: "Problem 1" });
+    const problem = page.getByRole("region", { name: "Problem 5" });
     await expect(problem).toBeVisible();
 
     await expect(problem.getByRole("button", { name: "Tick" })).toBeEnabled();
@@ -412,9 +458,11 @@ test.describe("contest states", () => {
     const timer = page.getByRole("timer", { name: "Time left" });
     await expect(timer).toHaveText("00:00:00");
 
-    await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
+    await expect(
+      page.getByRole("button", { name: "Edit profile" }),
+    ).toBeEnabled();
 
-    const problem = page.getByRole("region", { name: "Problem 1" });
+    const problem = page.getByRole("region", { name: "Problem 5" });
     await expect(problem).toBeVisible();
 
     await expect(problem.getByRole("button", { name: "Tick" })).toBeEnabled();
@@ -428,9 +476,11 @@ test.describe("contest states", () => {
     const timer = page.getByRole("timer", { name: "Time left" });
     await expect(timer).toHaveText("00:00:00");
 
-    await expect(page.getByRole("button", { name: "Edit" })).toBeEnabled();
+    await expect(
+      page.getByRole("button", { name: "Edit profile" }),
+    ).toBeEnabled();
 
-    const problem = page.getByRole("region", { name: "Problem 1" });
+    const problem = page.getByRole("region", { name: "Problem 5" });
     await expect(problem).toBeVisible();
 
     await expect(problem.getByRole("button", { name: "Tick" })).toBeDisabled();
@@ -442,7 +492,9 @@ test("scrub name", async ({ page }) => {
 
   await expect(page.getByText("Albert Einstein")).toBeVisible();
 
-  await page.getByRole("button", { name: "Edit" }).click({ force: true });
+  await page
+    .getByRole("button", { name: "Edit profile" })
+    .click({ force: true });
 
   await page.waitForURL("/ABCD0001/edit");
 

@@ -32,7 +32,7 @@
       onclick={() => navigate(`/${registrationCode}/edit`)}
       appearance="plain"
     >
-      <wa-icon name="gear" label="Edit"></wa-icon>
+      <wa-icon name="gear" label="Edit profile"></wa-icon>
     </wa-button>
   </div>
   <div>

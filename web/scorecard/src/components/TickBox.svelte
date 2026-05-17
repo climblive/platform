@@ -3,10 +3,7 @@
   import WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import { HoldColorIndicator } from "@climblive/lib/components";
   import type { Problem, Tick } from "@climblive/lib/models";
-  import {
-    createTickMutation,
-    deleteTickMutation,
-  } from "@climblive/lib/queries";
+  import { deleteTickMutation, putTickMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import { AxiosError } from "axios";
   import { getContext } from "svelte";
@@ -24,12 +21,12 @@
   let dialog: WaDialog | undefined = $state();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
-  const createTick = $derived(createTickMutation($session.contenderId));
+  const putTick = $derived(putTickMutation($session.contenderId));
   const deleteTick = $derived(deleteTickMutation());
 
   let open = $state(false);
 
-  const loading = $derived(createTick.isPending || deleteTick.isPending);
+  const loading = $derived(putTick.isPending || deleteTick.isPending);
   const variant = $derived.by(() => {
     switch (true) {
       case tick?.top && tick.attemptsTop === 1:
@@ -43,20 +40,24 @@
     }
   });
 
-  const handleCheck = () => {
-    if (tick?.id) {
-      deleteTick.mutate(tick.id, {
-        onError: (error) => {
-          if (error instanceof AxiosError && error.status === 404) {
-            toastError("Ascent is already removed.");
-          } else {
-            toastError("Failed to remove ascent.");
-          }
-        },
-      });
-    } else {
-      open = true;
+  const handleDelete = (event: MouseEvent) => {
+    if (!tick) {
+      return;
     }
+
+    event.stopPropagation();
+
+    open = false;
+
+    deleteTick.mutate(tick.id, {
+      onError: (error) => {
+        if (error instanceof AxiosError && error.status === 404) {
+          toastError("Ascent is already removed.");
+        } else {
+          toastError("Failed to remove ascent.");
+        }
+      },
+    });
   };
 
   const handleTick = (
@@ -69,7 +70,7 @@
     navigator.vibrate?.(50);
     open = false;
 
-    const tick: Omit<Tick, "id" | "timestamp"> = {
+    const nextTick: Omit<Tick, "id" | "timestamp"> = {
       problemId: problem.id,
       top: false,
       zone2: false,
@@ -81,19 +82,19 @@
 
     switch (feature) {
       case "top":
-        tick.top = true;
-        tick.zone2 = true;
-        tick.zone1 = true;
+        nextTick.top = true;
+        nextTick.zone2 = true;
+        nextTick.zone1 = true;
         break;
       case "zone2":
-        tick.zone2 = true;
-        tick.zone1 = true;
+        nextTick.zone2 = true;
+        nextTick.zone1 = true;
         break;
       case "zone1":
-        tick.zone1 = true;
+        nextTick.zone1 = true;
     }
 
-    createTick.mutate(tick, {
+    putTick.mutate(nextTick, {
       onError: (error) => {
         if (error instanceof AxiosError && error.status === 409) {
           toastError("Ascent is already registered.");
@@ -115,8 +116,8 @@
   <button
     data-variant={variant}
     disabled={disabled || loading}
-    onclick={handleCheck}
-    aria-label={tick?.id ? "Untick" : "Tick"}
+    onclick={() => (open = true)}
+    aria-label={tick?.id ? "Edit" : "Tick"}
   >
     {#if loading}
       <wa-spinner></wa-spinner>
@@ -152,12 +153,16 @@
         iconName="check"
         label="Top"
         onClick={(e: MouseEvent) => handleTick(e, "top", false)}
+        points={problem.pointsTop}
+        active={variant === "top"}
       />
 
       <TickButton
         iconName="bolt"
         label="Flash"
         onClick={(e: MouseEvent) => handleTick(e, "top", true)}
+        points={problem.pointsTop + (problem.flashBonus ?? 0)}
+        active={variant === "flash"}
       />
     </div>
 
@@ -166,6 +171,8 @@
         iconName="check"
         label="Zone 2"
         onClick={(e: MouseEvent) => handleTick(e, "zone2", false)}
+        points={problem.pointsZone2}
+        active={variant === "zone2"}
       />
     {/if}
 
@@ -174,7 +181,21 @@
         iconName="check"
         label="Zone 1"
         onClick={(e: MouseEvent) => handleTick(e, "zone1", false)}
+        points={problem.pointsZone1}
+        active={variant === "zone1"}
       />
+    {/if}
+
+    {#if open && variant !== undefined}
+      <wa-button
+        size="s"
+        appearance="plain"
+        onclick={(e: MouseEvent) => handleDelete(e)}
+        variant="danger"
+      >
+        <wa-icon slot="start" name="rotate-left"></wa-icon>
+        Unsend
+      </wa-button>
     {/if}
   </wa-dialog>
 </div>
