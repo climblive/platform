@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"log/slog"
 	"math/rand"
 	"net/http"
 	"os"
@@ -206,6 +207,12 @@ func mustStatus(resp *http.Response, expected int) {
 }
 
 func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- SimulatorEvent) {
+	defer func() {
+		if err := recover(); err != nil {
+			slog.Error("runner panicked", "code", r.RegistrationCode, "error", err)
+		}
+	}()
+
 	defer wg.Done()
 
 	r.ticks = make(map[domain.ProblemID]domain.Tick)
@@ -259,7 +266,7 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 		} else {
 			tick := buildTick(problem)
 
-			tick = r.AddTick(r.contender.ID, tick)
+			tick = r.PutTick(r.contender.ID, tick)
 			r.ticks[problem.ID] = tick
 		}
 	}
@@ -419,14 +426,14 @@ func (r *ContenderRunner) DeleteTick(tickID domain.TickID) {
 	mustStatus(resp, http.StatusNoContent)
 }
 
-func (r *ContenderRunner) AddTick(contenderID domain.ContenderID, tick domain.Tick) domain.Tick {
+func (r *ContenderRunner) PutTick(contenderID domain.ContenderID, tick domain.Tick) domain.Tick {
 	buf := new(bytes.Buffer)
 	err := json.NewEncoder(buf).Encode(tick)
 	if err != nil {
 		panic(err)
 	}
 
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/contenders/%d/ticks", r.apiURL, contenderID), buf)
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("%s/contenders/%d/ticks", r.apiURL, contenderID), buf)
 	if err != nil {
 		panic(err)
 	}
@@ -442,7 +449,7 @@ func (r *ContenderRunner) AddTick(contenderID domain.ContenderID, tick domain.Ti
 
 	defer func() { _ = resp.Body.Close() }()
 
-	mustStatus(resp, http.StatusCreated)
+	mustStatus(resp, http.StatusOK)
 
 	err = json.NewDecoder(resp.Body).Decode(&tick)
 	if err != nil {
