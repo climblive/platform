@@ -5,7 +5,6 @@ StartLimitIntervalSec=60
 StartLimitBurst=5
 
 [Service]
-User=climblive
 ExecStart=/usr/bin/climblive
 Restart=always
 RestartSec=5
