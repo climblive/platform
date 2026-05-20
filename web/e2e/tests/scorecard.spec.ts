@@ -5,6 +5,7 @@ import {
 } from "@testcontainers/mariadb";
 import { readFile } from "fs/promises";
 import { Connection, createConnection } from "mariadb";
+import path from "path";
 import {
   GenericContainer,
   Network,
@@ -14,8 +15,7 @@ import {
 
 let dbConnection: Connection | undefined;
 let startedDbContainer: StartedMariaDbContainer | undefined;
-let startedApiContainer: StartedTestContainer | undefined;
-let startedWebContainer: StartedTestContainer | undefined;
+let startedAppContainer: StartedTestContainer | undefined;
 
 test.describe.configure({ mode: "serial" });
 
@@ -46,35 +46,35 @@ test.beforeAll(async () => {
   await dbConnection.query(schema);
   await dbConnection.query(samples);
 
-  const apiContainer = new GenericContainer("climblive-api:latest")
+  const appContainer = new GenericContainer("climblive-api:latest")
     .withEnvironment({
       DB_USERNAME: "climblive",
       DB_PASSWORD: "secretpassword",
       DB_HOST: "e2e",
       DB_PORT: "3306",
       DB_DATABASE: "climblive",
+      RUN_AS_USER: "climblive",
+      TLS_APP_CERT_FILE: "/certs/cert.pem",
+      TLS_APP_KEY_FILE: "/certs/key.pem",
+      TLS_WWW_CERT_FILE: "/certs/cert.pem",
+      TLS_WWW_KEY_FILE: "/certs/key.pem",
     })
     .withNetwork(network)
-    .withExposedPorts({ container: 8090, host: 8090 })
+    .withBindMounts([
+      {
+        source: path.resolve(__dirname, "../.local/certs"),
+        target: "/certs",
+        mode: "ro",
+      },
+    ])
+    .withExposedPorts({ container: 443, host: 8443 })
     .withWaitStrategy(Wait.forLogMessage(/score engine started/));
 
-  const webContainer = new GenericContainer("climblive-web:latest")
-    .withNetwork(network)
-    .withExposedPorts({ container: 80, host: 8080 })
-    .withWaitStrategy(Wait.forListeningPorts());
-
-  const startedContainers = await Promise.all([
-    apiContainer.start(),
-    webContainer.start(),
-  ]);
-
-  startedApiContainer = startedContainers[0];
-  startedWebContainer = startedContainers[1];
+  startedAppContainer = await appContainer.start();
 });
 
 test.afterAll(async () => {
-  await startedWebContainer?.stop();
-  await startedApiContainer?.stop();
+  await startedAppContainer?.stop();
   await dbConnection?.end();
   await startedDbContainer?.stop();
 });
