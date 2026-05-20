@@ -15,7 +15,7 @@ import {
 
 let dbConnection: Connection | undefined;
 let startedDbContainer: StartedMariaDbContainer | undefined;
-let startedApiContainer: StartedTestContainer | undefined;
+let startedAppContainer: StartedTestContainer | undefined;
 
 test.describe.configure({ mode: "serial" });
 
@@ -70,11 +70,11 @@ test.beforeAll(async () => {
     .withExposedPorts({ container: 443, host: 8443 })
     .withWaitStrategy(Wait.forLogMessage(/score engine started/));
 
-  startedApiContainer = await appContainer.start();
+  startedAppContainer = await appContainer.start();
 });
 
 test.afterAll(async () => {
-  await startedApiContainer?.stop();
+  await startedAppContainer?.stop();
   await dbConnection?.end();
   await startedDbContainer?.stop();
 });
