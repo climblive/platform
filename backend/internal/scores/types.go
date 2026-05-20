@@ -83,10 +83,22 @@ func (c TickPool) Sub(tick Tick) TickPool {
 }
 
 func (c TickPool) CalculateProblemValue(value domain.ProblemValue) domain.ProblemValue {
+	weightedValue := func(value int, divisor int) int {
+		if divisor == 0 {
+			return value
+		}
+
+		if value == 0 {
+			return 0
+		}
+
+		return max(1, value/divisor)
+	}
+
 	return domain.ProblemValue{
-		PointsZone1: value.PointsZone1 / max(1, c.Zone1),
-		PointsZone2: value.PointsZone2 / max(1, c.Zone2),
-		PointsTop:   value.PointsTop / max(1, c.Top),
-		FlashBonus:  value.FlashBonus / max(1, c.Flash),
+		PointsZone1: weightedValue(value.PointsZone1, c.Zone1),
+		PointsZone2: weightedValue(value.PointsZone2, c.Zone2),
+		PointsTop:   weightedValue(value.PointsTop, c.Top),
+		FlashBonus:  weightedValue(value.FlashBonus, c.Flash),
 	}
 }
