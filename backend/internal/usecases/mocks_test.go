@@ -153,6 +153,11 @@ func (m *repositoryMock) GetTick(ctx context.Context, tx domain.Transaction, tic
 	return args.Get(0).(domain.Tick), args.Error(1)
 }
 
+func (m *repositoryMock) GetTickByContenderAndProblem(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID, problemID domain.ProblemID) (domain.Tick, error) {
+	args := m.Called(ctx, tx, contenderID, problemID)
+	return args.Get(0).(domain.Tick), args.Error(1)
+}
+
 func (m *repositoryMock) StoreTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error) {
 	args := m.Called(ctx, tx, tick)
 	return args.Get(0).(domain.Tick), args.Error(1)

@@ -4,13 +4,20 @@
     iconName: string;
     label: string;
     points?: number;
+    active: boolean;
   };
 
-  const { onClick, iconName, label, points }: Props = $props();
+  const { onClick, iconName, label, points, active }: Props = $props();
 </script>
 
-<div>
-  <wa-button size="s" appearance="outlined" onclick={onClick} pill>
+<div data-active={active}>
+  <wa-button
+    size="s"
+    appearance="outlined"
+    onclick={onClick}
+    pill
+    variant="neutral"
+  >
     <wa-icon slot="start" name={iconName}></wa-icon>
     {label}
   </wa-button>
@@ -30,6 +37,12 @@
     flex-direction: column;
     align-items: start;
     gap: var(--wa-space-xs);
+  }
+
+  div[data-active="true"] {
+    & span {
+      color: var(--wa-color-success-fill-loud);
+    }
   }
 
   span {

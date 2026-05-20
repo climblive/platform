@@ -1025,6 +1025,41 @@ func (q *Queries) GetTick(ctx context.Context, id int32) (GetTickRow, error) {
 	return i, err
 }
 
+const getTickByContenderAndProblem = `-- name: GetTickByContenderAndProblem :one
+SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
+FROM tick
+WHERE contender_id = ? AND problem_id = ?
+`
+
+type GetTickByContenderAndProblemParams struct {
+	ContenderID int32
+	ProblemID   int32
+}
+
+type GetTickByContenderAndProblemRow struct {
+	Tick Tick
+}
+
+func (q *Queries) GetTickByContenderAndProblem(ctx context.Context, arg GetTickByContenderAndProblemParams) (GetTickByContenderAndProblemRow, error) {
+	row := q.db.QueryRowContext(ctx, getTickByContenderAndProblem, arg.ContenderID, arg.ProblemID)
+	var i GetTickByContenderAndProblemRow
+	err := row.Scan(
+		&i.Tick.ID,
+		&i.Tick.OrganizerID,
+		&i.Tick.ContestID,
+		&i.Tick.ContenderID,
+		&i.Tick.ProblemID,
+		&i.Tick.Timestamp,
+		&i.Tick.Zone1,
+		&i.Tick.AttemptsZone1,
+		&i.Tick.Zone2,
+		&i.Tick.AttemptsZone2,
+		&i.Tick.Top,
+		&i.Tick.AttemptsTop,
+	)
+	return i, err
+}
+
 const getTicksByContender = `-- name: GetTicksByContender :many
 SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick
@@ -1255,47 +1290,6 @@ type InsertOrganizerInviteParams struct {
 func (q *Queries) InsertOrganizerInvite(ctx context.Context, arg InsertOrganizerInviteParams) error {
 	_, err := q.db.ExecContext(ctx, insertOrganizerInvite, arg.ID, arg.OrganizerID, arg.ExpiresAt)
 	return err
-}
-
-const insertTick = `-- name: InsertTick :execlastid
-INSERT INTO
-    tick (organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
-VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-`
-
-type InsertTickParams struct {
-	OrganizerID   int32
-	ContestID     int32
-	ContenderID   int32
-	ProblemID     int32
-	Timestamp     time.Time
-	Top           bool
-	AttemptsTop   int32
-	Zone1         bool
-	AttemptsZone1 int32
-	Zone2         bool
-	AttemptsZone2 int32
-}
-
-func (q *Queries) InsertTick(ctx context.Context, arg InsertTickParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, insertTick,
-		arg.OrganizerID,
-		arg.ContestID,
-		arg.ContenderID,
-		arg.ProblemID,
-		arg.Timestamp,
-		arg.Top,
-		arg.AttemptsTop,
-		arg.Zone1,
-		arg.AttemptsZone1,
-		arg.Zone2,
-		arg.AttemptsZone2,
-	)
-	if err != nil {
-		return 0, err
-	}
-	return result.LastInsertId()
 }
 
 const upsertCompClass = `-- name: UpsertCompClass :execlastid
@@ -1624,6 +1618,61 @@ func (q *Queries) UpsertScore(ctx context.Context, arg UpsertScoreParams) error 
 		arg.RankOrder,
 	)
 	return err
+}
+
+const upsertTick = `-- name: UpsertTick :execlastid
+INSERT INTO
+    tick (id, organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
+VALUES
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON DUPLICATE KEY UPDATE
+    organizer_id = VALUES(organizer_id),
+    contest_id = VALUES(contest_id),
+    contender_id = VALUES(contender_id),
+    problem_id = VALUES(problem_id),
+    timestamp = VALUES(timestamp),
+    top = VALUES(top),
+    attempts_top = VALUES(attempts_top),
+    zone_1 = VALUES(zone_1),
+    attempts_zone_1 = VALUES(attempts_zone_1),
+    zone_2 = VALUES(zone_2),
+    attempts_zone_2 = VALUES(attempts_zone_2)
+`
+
+type UpsertTickParams struct {
+	ID            int32
+	OrganizerID   int32
+	ContestID     int32
+	ContenderID   int32
+	ProblemID     int32
+	Timestamp     time.Time
+	Top           bool
+	AttemptsTop   int32
+	Zone1         bool
+	AttemptsZone1 int32
+	Zone2         bool
+	AttemptsZone2 int32
+}
+
+func (q *Queries) UpsertTick(ctx context.Context, arg UpsertTickParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, upsertTick,
+		arg.ID,
+		arg.OrganizerID,
+		arg.ContestID,
+		arg.ContenderID,
+		arg.ProblemID,
+		arg.Timestamp,
+		arg.Top,
+		arg.AttemptsTop,
+		arg.Zone1,
+		arg.AttemptsZone1,
+		arg.Zone2,
+		arg.AttemptsZone2,
+	)
+	if err != nil {
+		return 0, err
+	}
+	return result.LastInsertId()
 }
 
 const upsertUser = `-- name: UpsertUser :execlastid
