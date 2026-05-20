@@ -222,7 +222,7 @@ func main() {
 
 	runAsUser := os.Getenv("RUN_AS_USER")
 	if runAsUser == "" {
-		panic("RUN_AS_USER is required when running with TLS")
+		panic("RUN_AS_USER is required")
 	}
 	if err := dropPrivileges(runAsUser); err != nil {
 		panic(err)
