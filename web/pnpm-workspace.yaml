@@ -6,7 +6,7 @@ packages:
   - e2e
   - www
 allowBuilds:
-  '@sentry/cli': false
+  "@sentry/cli": false
   cpu-features: false
   protobufjs: false
   ssh2: false
