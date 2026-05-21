@@ -122,7 +122,7 @@
       "Score",
       pointsValue,
       false,
-      qualifyingProblems > 1 ? `${qualifyingProblems} hardest` : undefined,
+      qualifyingProblems > 0 ? `${qualifyingProblems} hardest` : undefined,
     )}
     {@render entry("Placement", placementValue)}
 
