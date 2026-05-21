@@ -8,7 +8,6 @@
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import "@awesome.me/webawesome/dist/components/popover/popover.js";
   import {
     getContendersByContestQuery,
     getContestQuery,
@@ -33,7 +32,6 @@
 
   let problemsHeading: HTMLHeadingElement | undefined = $state();
   let compClassesHeading: HTMLHeadingElement | undefined = $state();
-  const sectionHelpId = $props.id();
 
   const contestQuery = $derived(getContestQuery(contestId));
 
@@ -134,48 +132,11 @@
       <wa-divider></wa-divider>
       <RulesEditor {contest} />
 
-      <h2 class="section-heading" bind:this={compClassesHeading}>
-        Classes
-        <wa-button
-          id={`${sectionHelpId}-comp-classes`}
-          size="s"
-          appearance="plain"
-          variant="neutral"
-          aria-label="About classes"
-        >
-          <wa-icon name="lightbulb" variant="regular"></wa-icon>
-        </wa-button>
-      </h2>
-      <wa-popover for={`${sectionHelpId}-comp-classes`}>
-        Classes represent the categories in which the contenders compete,
-        typically divided into Males and Females. The contest duration is
-        defined by the start and end times of your classes.
-        <wa-button data-popover="close" variant="primary" size="s"
-          >Got it!</wa-button
-        >
-      </wa-popover>
+      <h2 bind:this={compClassesHeading}>Classes</h2>
       <wa-divider></wa-divider>
       <CompClassList {contestId} />
 
-      <h2 class="section-heading" bind:this={problemsHeading}>
-        Problems
-        <wa-button
-          id={`${sectionHelpId}-problems`}
-          size="s"
-          appearance="plain"
-          variant="neutral"
-          aria-label="About problems"
-        >
-          <wa-icon name="lightbulb" variant="regular"></wa-icon>
-        </wa-button>
-      </h2>
-      <wa-popover for={`${sectionHelpId}-problems`}>
-        Problems refer to the boulder problems that the contenders will attempt
-        during the contest, each of which can have its own point value.
-        <wa-button data-popover="close" variant="primary" size="s"
-          >Got it!</wa-button
-        >
-      </wa-popover>
+      <h2 bind:this={problemsHeading}>Problems</h2>
       <wa-divider></wa-divider>
       <ProblemList
         {contestId}
@@ -189,25 +150,7 @@
       <wa-divider></wa-divider>
       <TicketList {contestId} />
 
-      <h2 class="section-heading">
-        Raffles
-        <wa-button
-          id={`${sectionHelpId}-raffles`}
-          size="s"
-          appearance="plain"
-          variant="neutral"
-          aria-label="About raffles"
-        >
-          <wa-icon name="lightbulb" variant="regular"></wa-icon>
-        </wa-button>
-      </h2>
-      <wa-popover for={`${sectionHelpId}-raffles`}>
-        Raffles are used to randomly select prize winners, typically after the
-        contest has ended.
-        <wa-button data-popover="close" variant="primary" size="s"
-          >Got it!</wa-button
-        >
-      </wa-popover>
+      <h2>Raffles</h2>
       <wa-divider></wa-divider>
       <RaffleList {contestId} />
 
@@ -256,22 +199,8 @@
     margin-top: var(--wa-space-2xl);
   }
 
-  .section-heading {
-    display: flex;
-    align-items: center;
-    gap: var(--wa-space-2xs);
-  }
-
   wa-divider {
     --color: var(--wa-color-brand-fill-normal);
-  }
-
-  wa-popover {
-    --max-width: 300px;
-  }
-
-  wa-popover wa-button {
-    margin-block-start: var(--wa-space-m);
   }
 
   .actions {

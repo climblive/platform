@@ -127,6 +127,12 @@
   {/if}
 {/snippet}
 
+<p class="copy">
+  Classes represent the categories in which the contenders compete, typically
+  divided into Males and Females. The contest duration is defined by the start
+  and end times of your classes.
+</p>
+
 <section>
   {#if compClasses === undefined}
     <Loader />
@@ -146,6 +152,12 @@
 </section>
 
 <style>
+  .copy {
+    color: var(--wa-color-text-quiet);
+    font-size: var(--wa-font-size-s);
+    margin: 0;
+  }
+
   section {
     display: flex;
     flex-direction: column;

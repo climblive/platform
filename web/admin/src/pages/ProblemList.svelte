@@ -223,6 +223,11 @@
   {/if}
 {/snippet}
 
+<p class="copy">
+  Problems refer to the boulder problems that the contenders will attempt during
+  the contest, each of which can have its own point value.
+</p>
+
 <section>
   {#if sortedProblemsWithAscents === undefined}
     <Loader />
@@ -286,6 +291,12 @@
 
   wa-button.show-more {
     align-self: center;
+  }
+
+  .copy {
+    color: var(--wa-color-text-quiet);
+    font-size: var(--wa-font-size-s);
+    margin: 0;
   }
 
   .actions {
