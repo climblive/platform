@@ -61,10 +61,18 @@
   const totalProblems = $derived(problems.length);
 </script>
 
-{#snippet entry(label: string, value: Snippet, disabled: boolean = false)}
+{#snippet entry(
+  label: string,
+  value: Snippet,
+  disabled: boolean = false,
+  subtitle?: string,
+)}
   <div class="stat" class:disabled>
     <span class="label">{label}</span>
     <span class="value">{@render value()}</span>
+    {#if subtitle}
+      <span class="subtitle">{subtitle}</span>
+    {/if}
   </div>
 {/snippet}
 
@@ -111,12 +119,10 @@
 <div class="summary">
   <div class="grid">
     {@render entry(
-      qualifyingProblems === 1
-        ? "The hardest"
-        : qualifyingProblems > 1
-          ? `${qualifyingProblems} hardest`
-          : "Score",
+      "Score",
       pointsValue,
+      false,
+      qualifyingProblems > 1 ? `${qualifyingProblems} hardest` : undefined,
     )}
     {@render entry("Placement", placementValue)}
 
@@ -176,6 +182,12 @@
     font-size: var(--wa-font-size-2xs);
     color: var(--wa-color-text-quiet);
     margin-block-end: var(--wa-space-2xs);
+  }
+
+  .subtitle {
+    font-size: var(--wa-font-size-3xs);
+    color: var(--wa-color-text-quiet);
+    margin-block-start: var(--wa-space-3xs);
   }
 
   .value {
