@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"embed"
+	"io/fs"
 	"log"
 	"log/slog"
 	"math/rand"
@@ -10,7 +12,10 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"os/user"
 	"strconv"
+	"strings"
+
 	"sync"
 	"syscall"
 	"time"
@@ -24,6 +29,7 @@ import (
 	"github.com/climblive/platform/backend/internal/scrubber"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/utils"
+	"github.com/go-errors/errors"
 	"github.com/google/uuid"
 	"github.com/lmittmann/tint"
 	"github.com/mattn/go-isatty"
@@ -34,7 +40,14 @@ import (
 //go:embed migrations/*.sql
 var embedMigrations embed.FS
 
+//go:embed all:web
+var webAssets embed.FS
+
 const defaultScoreEngineMaxLifetime = 24 * time.Hour
+
+const appCSP = "default-src 'self'; connect-src 'self' clmb.auth.eu-west-1.amazoncognito.com *.fontawesome.com *.sentry.io data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'self'; img-src 'self' data:; report-uri https://o4509937603641344.ingest.de.sentry.io/api/4509937616093264/security/?sentry_key=019099d850441f60cea5d465e217f768"
+
+const wwwCSP = "default-src 'self'; script-src 'self' 'sha256-jIhoHP5AYEa/rjrf399lCKS/+7hIAc+G1cKDLBSPd7o='; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'none'; form-action 'none'; base-uri 'self'"
 
 type registrationCodeGenerator struct {
 }
@@ -83,6 +96,22 @@ func main() {
 	))
 
 	slog.SetDefault(logger)
+
+	noTLS := os.Getenv("NO_TLS") == "true"
+	if noTLS {
+		slog.Warn("running in insecure mode", "tls", "off")
+	}
+
+	var (
+		listenPort int
+		tlsConfig  *tls.Config
+	)
+	if noTLS {
+		listenPort = 8090
+	} else {
+		tlsConfig = loadTLSConfig()
+		listenPort = 443
+	}
 
 	var barriers []*sync.WaitGroup
 
@@ -146,13 +175,22 @@ func main() {
 		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()),
 		scrubberRunner.Run(ctx, scrubber.WithPanicRecovery()))
 
-	mux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager, scrubberRunner)
+	apiMux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager, scrubberRunner)
+
+	appMux := http.NewServeMux()
+	appMux.Handle("/api/", accessLog(http.StripPrefix("/api", noCacheHandler(apiMux))))
+	installAppStaticHandlers(appMux)
+
+	wwwMux := http.NewServeMux()
+	installWWWStaticHandlers(wwwMux)
+
+	wwwHost := os.Getenv("WWW_HOST")
 
 	httpServer := &http.Server{
-		Addr:                         "0.0.0.0:8090",
-		Handler:                      mux,
+		Addr:                         net.JoinHostPort("0.0.0.0", strconv.Itoa(listenPort)),
+		Handler:                      &httpRouter{appHandler: appMux, wwwHandler: wwwMux, wwwHost: wwwHost},
 		DisableGeneralOptionsHandler: false,
-		TLSConfig:                    nil,
+		TLSConfig:                    tlsConfig,
 		ReadTimeout:                  0,
 		ReadHeaderTimeout:            0,
 		WriteTimeout:                 0,
@@ -173,7 +211,29 @@ func main() {
 		_ = httpServer.Shutdown(context.Background())
 	})
 
-	err = httpServer.ListenAndServe()
+	listener, err := net.Listen("tcp", httpServer.Addr)
+	if err != nil {
+		if stack := utils.GetErrorStack(err); stack != "" {
+			log.Println(stack)
+		}
+
+		panic(err)
+	}
+
+	runAsUser := os.Getenv("RUN_AS_USER")
+	if runAsUser == "" {
+		panic("RUN_AS_USER is required")
+	}
+	if err := dropPrivileges(runAsUser); err != nil {
+		panic(err)
+	}
+
+	if httpServer.TLSConfig != nil {
+		err = httpServer.ServeTLS(listener, "", "")
+	} else {
+		err = httpServer.Serve(listener)
+	}
+
 	switch err {
 	case http.ErrServerClosed:
 	default:
@@ -294,4 +354,161 @@ func setupMux(
 	rest.InstallHealthHandler(mux, &healthUseCase)
 
 	return mux
+}
+
+func loadTLSConfig() *tls.Config {
+	type certPair struct {
+		cert string
+		key  string
+	}
+
+	pairs := []certPair{
+		{cert: os.Getenv("TLS_APP_CERT_FILE"), key: os.Getenv("TLS_APP_KEY_FILE")},
+		{cert: os.Getenv("TLS_WWW_CERT_FILE"), key: os.Getenv("TLS_WWW_KEY_FILE")},
+	}
+
+	var certificates []tls.Certificate
+	for _, p := range pairs {
+		cert, err := tls.LoadX509KeyPair(p.cert, p.key)
+		if err != nil {
+			slog.Error("failed to load tls certificate", "cert", p.cert, "error", err)
+			panic(err)
+		}
+
+		certificates = append(certificates, cert)
+		slog.Info("loaded tls certificate", "cert", p.cert)
+	}
+
+	var config tls.Config
+	config.Certificates = certificates
+	config.MinVersion = tls.VersionTLS12
+
+	return &config
+}
+
+func dropPrivileges(username string) error {
+	u, err := user.Lookup(username)
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	gid, err := strconv.Atoi(u.Gid)
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	uid, err := strconv.Atoi(u.Uid)
+	if err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	if err := syscall.Setgid(gid); err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	if err := syscall.Setuid(uid); err != nil {
+		return errors.Wrap(err, 0)
+	}
+
+	slog.Info("dropped privileges", "uid", uid, "gid", gid)
+
+	return nil
+}
+
+type httpRouter struct {
+	wwwHost    string
+	appHandler http.Handler
+	wwwHandler http.Handler
+}
+
+func (h *httpRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	host, _, err := net.SplitHostPort(r.Host)
+	if err != nil {
+		host = r.Host
+	}
+
+	if h.wwwHost != "" && strings.HasSuffix(host, h.wwwHost) {
+		h.wwwHandler.ServeHTTP(w, r)
+		return
+	}
+
+	h.appHandler.ServeHTTP(w, r)
+}
+
+func installAppStaticHandlers(mux *http.ServeMux) {
+	apps := []struct {
+		basePath string
+		subDir   string
+	}{
+		{"/admin", "web/admin"},
+		{"/scoreboard", "web/scoreboard"},
+		{"/", "web/scorecard"},
+	}
+
+	for _, app := range apps {
+		subFS, err := fs.Sub(webAssets, app.subDir)
+		if err != nil {
+			panic(err)
+		}
+
+		rest.InstallStaticHandler(mux, app.basePath, subFS, appCSP)
+	}
+}
+
+func installWWWStaticHandlers(mux *http.ServeMux) {
+	subFS, err := fs.Sub(webAssets, "web/www")
+	if err != nil {
+		panic(err)
+	}
+
+	rest.InstallStaticHandler(mux, "/", subFS, wwwCSP)
+}
+
+func noCacheHandler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "no-store")
+		next.ServeHTTP(w, r)
+	})
+}
+
+func accessLog(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sw := &statusWriter{
+			ResponseWriter: w,
+			status:         0,
+		}
+
+		start := time.Now()
+		next.ServeHTTP(sw, r)
+		duration := time.Since(start)
+
+		logLevel := slog.LevelInfo
+
+		if duration > time.Second {
+			logLevel = slog.LevelWarn
+		}
+
+		slog.Log(r.Context(), logLevel,
+			"request handled",
+			"method", r.Method,
+			"path", r.URL.Path,
+			"status", sw.status,
+			"duration", duration,
+			"user_agent", r.UserAgent(),
+		)
+	})
+}
+
+type statusWriter struct {
+	http.ResponseWriter
+	status int
+}
+
+func (w *statusWriter) WriteHeader(statusCode int) {
+	w.status = statusCode
+	w.ResponseWriter.WriteHeader(statusCode)
+}
+
+func (w *statusWriter) Flush() {
+	w.ResponseWriter.(http.Flusher).Flush()
 }

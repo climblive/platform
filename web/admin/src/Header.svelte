@@ -1,16 +1,12 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { FullLogo } from "@climblive/lib/components";
   import { getHealthQuery, getSelfQuery } from "@climblive/lib/queries";
-  import { getContext, onMount } from "svelte";
+  import { onMount } from "svelte";
   import { navigate } from "svelte-routing";
-  import type { Authenticator } from "./authenticator.svelte";
 
   let print = $state(false);
-
-  const authenticator = getContext<Authenticator>("authenticator");
 
   const selfQuery = $derived(getSelfQuery());
   const self = $derived(selfQuery.data);
@@ -57,11 +53,10 @@
         <wa-button
           size="s"
           appearance="outlined"
-          onclick={authenticator.logout}
+          onclick={() => navigate("/admin/profile")}
         >
-          Sign out<wa-icon slot="start" name="right-from-bracket"
-          ></wa-icon></wa-button
-        >
+          <wa-icon name="circle-user" label="Account profile"></wa-icon>
+        </wa-button>
       </div>
     </div>
   </header>
@@ -94,8 +89,8 @@
   }
 
   .right-actions {
-    display: flex;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
     gap: var(--wa-space-xs);
   }
 

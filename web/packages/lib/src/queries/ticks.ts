@@ -34,14 +34,14 @@ export const getTicksByContestQuery = (contestId: number) =>
     refetchOnWindowFocus: true,
   }));
 
-export const createTickMutation = (contenderId: number) => {
+export const putTickMutation = (contenderId: number) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
     mutationFn: (tick: Omit<Tick, "id" | "timestamp">) =>
-      ApiClient.getInstance().createTick(contenderId, tick),
-    onSuccess: (newTick) => {
-      updateTickInQueryCache(client, contenderId, newTick);
+      ApiClient.getInstance().putTick(contenderId, tick),
+    onSuccess: (updatedTick) => {
+      updateTickInQueryCache(client, contenderId, updatedTick);
     },
   }));
 };

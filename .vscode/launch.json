@@ -9,15 +9,17 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "backend/cmd/api/main.go",
+      "program": "${workspaceFolder}/backend/cmd/api",
       "preLaunchTask": "Start MariaDB",
       "env": {
+        "NO_TLS": "true",
         "DB_USERNAME": "climblive",
         "DB_PASSWORD": "secretpassword",
         "DB_HOST": "localhost",
         "DB_PORT": "3306",
         "DB_DATABASE": "climblive",
-        "SCORE_ENGINE_MAX_LIFETIME": "600"
+        "SCORE_ENGINE_MAX_LIFETIME": "600",
+        "RUN_AS_USER": "vscode"
       }
     },
     {
@@ -53,7 +55,7 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "backend/cmd/simulator/main.go",
+      "program": "${workspaceFolder}/backend/cmd/simulator",
       "args": ["--config=/workspaces/platform/config.json"]
     }
   ],

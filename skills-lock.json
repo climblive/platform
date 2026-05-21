@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "webawesome": {
+      "source": "/workspaces/platform/web/admin/node_modules/@awesome.me/webawesome/dist/skills/webawesome",
+      "sourceType": "local",
+      "computedHash": "adc12bf75522e849b72cb903d18edc07b7691e9264f528cf882d6034cae6e5ba"
+    }
+  }
+}

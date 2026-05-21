@@ -16,6 +16,7 @@
   import ManageOrganizer from "./pages/ManageOrganizer.svelte";
   import OrganizerView from "./pages/OrganizerView.svelte";
   import PrintableTicketList from "./pages/PrintableTicketList.svelte";
+  import Profile from "./pages/Profile.svelte";
   import RaffleView from "./pages/RaffleView.svelte";
   import ResultsPage from "./pages/ResultsPage.svelte";
   import Root from "./pages/Root.svelte";
@@ -41,6 +42,9 @@
     </Route>
     <Route path="/help">
       <Help />
+    </Route>
+    <Route path="/profile">
+      <Profile />
     </Route>
     <Route path="/health">
       <Health />
