@@ -16,7 +16,7 @@
     contestState: ContestState;
     startTime: Date;
     endTime: Date;
-    qualifyingProblems?: number;
+    qualifyingProblems: number;
   }
 
   const {
