@@ -84,7 +84,6 @@
       <div class="logo">
         <FullLogo />
       </div>
-      <h1>Welcome!</h1>
     </header>
     <form bind:this={form} onsubmit={handleSubmit}>
       <wa-input
