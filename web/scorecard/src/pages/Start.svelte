@@ -81,6 +81,9 @@
 {:else}
   <main>
     <header>
+      <div class="logo">
+        <FullLogo />
+      </div>
       <h1>Welcome!</h1>
     </header>
     <form bind:this={form} onsubmit={handleSubmit}>
@@ -139,11 +142,6 @@
         </wa-button>
       </section>
     {/each}
-    <footer>
-      <div class="logo">
-        <FullLogo />
-      </div>
-    </footer>
   </main>
 {/if}
 
@@ -157,6 +155,12 @@
 
   header {
     margin-top: 25%;
+
+    & .logo {
+      height: var(--wa-font-size-xl);
+      color: var(--wa-color-text-normal);
+      margin-bottom: var(--wa-space-s);
+    }
   }
 
   form {
@@ -171,17 +175,6 @@
       white-space: pre;
 
       width: 100%;
-    }
-  }
-
-  footer {
-    margin-top: auto;
-    text-align: center;
-    padding-block: var(--wa-space-m);
-
-    & .logo {
-      height: var(--wa-font-size-xl);
-      color: var(--wa-color-text-normal);
     }
   }
 
