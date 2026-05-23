@@ -90,7 +90,7 @@
     text-align: right;
 
     &.uncounted {
-      color: var(--wa-color-text-quiet);
+      opacity: 0.5;
       text-decoration: line-through;
     }
   }
