@@ -9,9 +9,10 @@
     tick?: Tick | undefined;
     disabled: boolean;
     disqualified: boolean;
+    counted: boolean;
   }
 
-  const { problem, tick, disabled, disqualified }: Props = $props();
+  const { problem, tick, disabled, disqualified, counted }: Props = $props();
 
   const pointValue = $derived(calculateProblemScore(problem, tick));
 </script>
@@ -36,9 +37,12 @@
       <wa-icon name="bolt"></wa-icon>
     {/if}
   </span>
-  <div class="score">
+  <div class="score" class:uncounted={!counted}>
     {#if tick}
-      <Score value={disqualified ? 0 : pointValue} prefix="+" />
+      <Score
+        value={disqualified ? 0 : pointValue}
+        prefix={counted ? "+" : undefined}
+      />
     {/if}
   </div>
 
@@ -87,5 +91,10 @@
 
   .score {
     text-align: right;
+
+    &.uncounted {
+      opacity: 0.3;
+      text-decoration: line-through;
+    }
   }
 </style>

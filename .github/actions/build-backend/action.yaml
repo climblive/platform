@@ -1,4 +1,9 @@
 name: "Build backend"
+inputs:
+  version:
+    description: "Version"
+    required: false
+    default: "dev"
 runs:
   using: "composite"
   steps:
@@ -6,7 +11,7 @@ runs:
       with:
         go-version-file: "backend/go.mod"
 
-    - run: go build -o climblive ./cmd/api
+    - run: go build -ldflags "-X github.com/climblive/platform/backend/internal/handlers/rest.Version=${{ inputs.version }}" -o climblive ./cmd/api
       shell: bash
       working-directory: backend
 

@@ -80,7 +80,7 @@
 <style>
   .title {
     display: flex;
-    align-items: end;
+    align-items: start;
     gap: var(--wa-space-m);
     margin-block: var(--wa-space-l);
 
@@ -89,7 +89,7 @@
     }
 
     & wa-badge {
-      font-size: var(--wa-font-size-xs);
+      font-size: var(--wa-font-size-3xs);
     }
   }
 

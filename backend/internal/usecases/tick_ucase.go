@@ -21,6 +21,7 @@ type tickUseCaseRepository interface {
 	DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) error
 	StoreTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error)
 	GetTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) (domain.Tick, error)
+	GetTickByContenderAndProblem(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID, problemID domain.ProblemID) (domain.Tick, error)
 }
 
 type TickUseCase struct {
@@ -115,7 +116,7 @@ func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.TickID) err
 	return nil
 }
 
-func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.ContenderID, tick domain.Tick) (domain.Tick, error) {
+func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.ContenderID, tick domain.Tick) (domain.Tick, error) {
 	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
 	if err != nil {
 		return domain.Tick{}, errors.Wrap(err, 0)
@@ -157,41 +158,47 @@ func (uc *TickUseCase) CreateTick(ctx context.Context, contenderID domain.Conten
 		return domain.Tick{}, errors.New(domain.ErrProblemNotInContest)
 	}
 
-	newTick := domain.Tick{
-		ID:            0,
-		Ownership:     contender.Ownership,
-		Timestamp:     time.Now(),
-		ContestID:     contest.ID,
-		ProblemID:     problem.ID,
-		Top:           tick.Top,
-		AttemptsTop:   tick.AttemptsTop,
-		Zone1:         tick.Zone1,
-		AttemptsZone1: tick.AttemptsZone1,
-		Zone2:         tick.Zone2,
-		AttemptsZone2: tick.AttemptsZone2,
-	}
-
-	if err := (validators.TickValidator{}).Validate(newTick); err != nil {
+	existingTick, err := uc.Repo.GetTickByContenderAndProblem(ctx, nil, contenderID, problem.ID)
+	switch {
+	case err == nil:
+	case errors.Is(err, domain.ErrNotFound):
+	default:
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
-	tick, err = uc.Repo.StoreTick(ctx, nil, newTick)
+	existingTick.Ownership = contender.Ownership
+	existingTick.ContestID = contest.ID
+	existingTick.ProblemID = problem.ID
+	existingTick.Timestamp = time.Now()
+
+	existingTick.Top = tick.Top
+	existingTick.AttemptsTop = tick.AttemptsTop
+	existingTick.Zone1 = tick.Zone1
+	existingTick.AttemptsZone1 = tick.AttemptsZone1
+	existingTick.Zone2 = tick.Zone2
+	existingTick.AttemptsZone2 = tick.AttemptsZone2
+
+	if err := (validators.TickValidator{}).Validate(existingTick); err != nil {
+		return domain.Tick{}, errors.Wrap(err, 0)
+	}
+
+	existingTick, err = uc.Repo.StoreTick(ctx, nil, existingTick)
 	if err != nil {
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
 	uc.EventBroker.Dispatch(contest.ID, domain.AscentRegisteredEvent{
-		TickID:        tick.ID,
-		Timestamp:     tick.Timestamp,
-		ContenderID:   contender.ID,
-		ProblemID:     problem.ID,
-		Top:           tick.Top,
-		AttemptsTop:   tick.AttemptsTop,
-		Zone1:         tick.Zone1,
-		AttemptsZone1: tick.AttemptsZone1,
-		Zone2:         tick.Zone2,
-		AttemptsZone2: tick.AttemptsZone2,
+		TickID:        existingTick.ID,
+		Timestamp:     existingTick.Timestamp,
+		ContenderID:   *existingTick.Ownership.ContenderID,
+		ProblemID:     existingTick.ProblemID,
+		Top:           existingTick.Top,
+		AttemptsTop:   existingTick.AttemptsTop,
+		Zone1:         existingTick.Zone1,
+		AttemptsZone1: existingTick.AttemptsZone1,
+		Zone2:         existingTick.Zone2,
+		AttemptsZone2: existingTick.AttemptsZone2,
 	})
 
-	return tick, nil
+	return existingTick, nil
 }
