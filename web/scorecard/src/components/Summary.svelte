@@ -16,7 +16,6 @@
     contestState: ContestState;
     startTime: Date;
     endTime: Date;
-    qualifyingProblems: number;
   }
 
   const {
@@ -29,7 +28,6 @@
     contestState,
     startTime,
     endTime,
-    qualifyingProblems = 0,
   }: Props = $props();
 
   const id = $props.id();
@@ -61,18 +59,10 @@
   const totalProblems = $derived(problems.length);
 </script>
 
-{#snippet entry(
-  label: string,
-  value: Snippet,
-  disabled: boolean = false,
-  subtitle?: string,
-)}
+{#snippet entry(label: string, value: Snippet, disabled: boolean = false)}
   <div class="stat" class:disabled>
     <span class="label">{label}</span>
     <span class="value">{@render value()}</span>
-    {#if subtitle}
-      <span class="subtitle">{subtitle}</span>
-    {/if}
   </div>
 {/snippet}
 
@@ -118,12 +108,7 @@
 
 <div class="summary">
   <div class="grid">
-    {@render entry(
-      "Score",
-      pointsValue,
-      false,
-      qualifyingProblems > 0 ? `${qualifyingProblems} hardest` : undefined,
-    )}
+    {@render entry("Score", pointsValue)}
     {@render entry("Placement", placementValue)}
 
     {#if contestState === "NOT_STARTED"}
@@ -182,12 +167,6 @@
     font-size: var(--wa-font-size-2xs);
     color: var(--wa-color-text-quiet);
     margin-block-end: var(--wa-space-2xs);
-  }
-
-  .subtitle {
-    font-size: var(--wa-font-size-3xs);
-    color: var(--wa-color-text-quiet);
-    margin-block-start: var(--wa-space-3xs);
   }
 
   .value {
