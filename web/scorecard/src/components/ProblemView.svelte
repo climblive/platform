@@ -93,7 +93,7 @@
     text-align: right;
 
     &.uncounted {
-      opacity: 0.5;
+      opacity: 0.3;
       text-decoration: line-through;
     }
   }
