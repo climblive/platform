@@ -39,7 +39,10 @@
   </span>
   <div class="score" class:uncounted={!counted}>
     {#if tick}
-      <Score value={disqualified ? 0 : pointValue} prefix={counted ? "+" : ""} />
+      <Score
+        value={disqualified ? 0 : pointValue}
+        prefix={counted ? "+" : undefined}
+      />
     {/if}
   </div>
 
