@@ -4,10 +4,24 @@
     iconName: string;
     label: string;
     points?: number;
+    originalPoints?: number;
     active: boolean;
   };
 
-  const { onClick, iconName, label, points, active }: Props = $props();
+  const { onClick, iconName, label, points, originalPoints, active }: Props =
+    $props();
+
+  const pointsLabel = $derived.by(() => {
+    if (points === undefined) {
+      return undefined;
+    }
+
+    if (originalPoints === undefined || originalPoints === points) {
+      return `${points}p`;
+    }
+
+    return `${points}p / ${originalPoints}p`;
+  });
 </script>
 
 <div data-active={active}>
@@ -21,8 +35,8 @@
     <wa-icon slot="start" name={iconName}></wa-icon>
     {label}
   </wa-button>
-  {#if points !== undefined}
-    <span>{points} pts</span>
+  {#if pointsLabel !== undefined}
+    <span>{pointsLabel}</span>
   {/if}
 </div>
 

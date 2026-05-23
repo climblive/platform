@@ -28,6 +28,13 @@
   let open = $state(false);
 
   const loading = $derived(putTick.isPending || deleteTick.isPending);
+  const originalPoints = $derived({
+    top: problem.pointsTop,
+    flash: problem.pointsTop + (problem.flashBonus ?? 0),
+    zone2: problem.pointsZone2,
+    zone1: problem.pointsZone1,
+  });
+
   const variant = $derived.by(() => {
     switch (true) {
       case tick?.top && tick.attemptsTop === 1:
@@ -155,6 +162,7 @@
         label="Top"
         onClick={(e: MouseEvent) => handleTick(e, "top", false)}
         points={pointValue?.top}
+        originalPoints={originalPoints.top}
         active={variant === "top"}
       />
 
@@ -163,6 +171,7 @@
         label="Flash"
         onClick={(e: MouseEvent) => handleTick(e, "top", true)}
         points={pointValue?.flash}
+        originalPoints={originalPoints.flash}
         active={variant === "flash"}
       />
     </div>
@@ -173,6 +182,7 @@
         label="Zone 2"
         onClick={(e: MouseEvent) => handleTick(e, "zone2", false)}
         points={pointValue?.zone2}
+        originalPoints={originalPoints.zone2}
         active={variant === "zone2"}
       />
     {/if}
@@ -183,6 +193,7 @@
         label="Zone 1"
         onClick={(e: MouseEvent) => handleTick(e, "zone1", false)}
         points={pointValue?.zone1}
+        originalPoints={originalPoints.zone1}
         active={variant === "zone1"}
       />
     {/if}
