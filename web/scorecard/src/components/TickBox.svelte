@@ -27,10 +27,8 @@
   let open = $state(false);
 
   const loading = $derived(putTick.isPending || deleteTick.isPending);
-  const variant = $derived.by((): "flash" | "top" | "zone2" | "zone1" | undefined => {
+  const variant = $derived.by((): "top" | "zone2" | "zone1" | undefined => {
     switch (true) {
-      case tick?.top && tick.attemptsTop === 1:
-        return "flash";
       case tick?.top:
         return "top";
       case tick?.zone2:
@@ -42,7 +40,7 @@
   const attempts = $derived(tick?.attemptsTop ?? 0);
   const hasAttempts = $derived(attempts > 0);
   const displayVariant = $derived.by(
-    (): "attempts" | "flash" | "top" | "zone2" | "zone1" | undefined => {
+    (): "attempts" | "top" | "zone2" | "zone1" | undefined => {
       if (variant !== undefined) {
         return variant;
       }
@@ -52,20 +50,26 @@
       }
     },
   );
-  const isChecked = (buttonVariant: "flash" | "top" | "zone2" | "zone1") =>
-    variant === buttonVariant;
-  const isIndeterminate = (buttonVariant: "top" | "zone2" | "zone1") => {
+  const getAttempts = (buttonVariant: "top" | "zone2" | "zone1") => {
     switch (buttonVariant) {
       case "top":
-        return variant === "flash";
+        return tick?.attemptsTop ?? 0;
       case "zone2":
-        return variant === "flash" || variant === "top";
+        return tick?.attemptsZone2 ?? 0;
       case "zone1":
-        return variant === "flash" || variant === "top" || variant === "zone2";
+        return tick?.attemptsZone1 ?? 0;
+    }
+  };
+  const isChecked = (buttonVariant: "top" | "zone2" | "zone1") => variant === buttonVariant;
+  const isIndeterminate = (buttonVariant: "zone2" | "zone1") => {
+    switch (buttonVariant) {
+      case "zone2":
+        return variant === "top";
+      case "zone1":
+        return variant === "top" || variant === "zone2";
     }
   };
   const canAddAttempt = $derived(!tick?.top);
-  const canFlash = $derived(!hasAttempts);
 
   const getNextTick = (): Omit<Tick, "id" | "timestamp"> => ({
     problemId: problem.id,
@@ -135,11 +139,7 @@
     putNextTick(nextTick);
   };
 
-  const handleTick = (
-    event: MouseEvent,
-    feature: "zone1" | "zone2" | "top",
-    flash: boolean,
-  ) => {
+  const handleTick = (event: MouseEvent, feature: "zone1" | "zone2" | "top") => {
     event.stopPropagation();
 
     navigator.vibrate?.(50);
@@ -147,13 +147,7 @@
 
     const nextTick = getNextTick();
 
-    if (flash) {
-      nextTick.attemptsTop = 1;
-      nextTick.attemptsZone2 = 1;
-      nextTick.attemptsZone1 = 1;
-    } else {
-      incrementAttempts(nextTick);
-    }
+    incrementAttempts(nextTick);
 
     switch (feature) {
       case "top":
@@ -188,8 +182,6 @@
   >
     {#if loading}
       <wa-spinner></wa-spinner>
-    {:else if variant === "flash"}
-      <pre>F</pre>
     {:else if variant === "top"}
       <pre>T</pre>
     {:else if variant === "zone2"}
@@ -217,30 +209,20 @@
       /> Problem № {problem.number}
     </div>
 
-    <div class="horizontal">
-      <TickButton
-        label="Top"
-        onClick={(e: MouseEvent) => handleTick(e, "top", false)}
-        points={problem.pointsTop}
-        checked={isChecked("top")}
-        indeterminate={isIndeterminate("top")}
-        disabled={isIndeterminate("top")}
-      />
-
-      <TickButton
-        label="Flash"
-        onClick={(e: MouseEvent) => handleTick(e, "top", true)}
-        points={problem.pointsTop + (problem.flashBonus ?? 0)}
-        checked={isChecked("flash")}
-        disabled={!canFlash}
-      />
-    </div>
+    <TickButton
+      label="Top"
+      onClick={(e: MouseEvent) => handleTick(e, "top")}
+      points={problem.pointsTop}
+      attempts={getAttempts("top")}
+      checked={isChecked("top")}
+    />
 
     {#if problem.zone2Enabled}
       <TickButton
         label="Zone 2"
-        onClick={(e: MouseEvent) => handleTick(e, "zone2", false)}
+        onClick={(e: MouseEvent) => handleTick(e, "zone2")}
         points={problem.pointsZone2}
+        attempts={getAttempts("zone2")}
         checked={isChecked("zone2")}
         indeterminate={isIndeterminate("zone2")}
         disabled={isIndeterminate("zone2")}
@@ -250,8 +232,9 @@
     {#if problem.zone1Enabled}
       <TickButton
         label="Zone 1"
-        onClick={(e: MouseEvent) => handleTick(e, "zone1", false)}
+        onClick={(e: MouseEvent) => handleTick(e, "zone1")}
         points={problem.pointsZone1}
+        attempts={getAttempts("zone1")}
         checked={isChecked("zone1")}
         indeterminate={isIndeterminate("zone1")}
         disabled={isIndeterminate("zone1")}
@@ -327,18 +310,6 @@
       color: var(--wa-color-green-50);
     }
 
-    &[data-variant="flash"] {
-      background-color: var(--wa-color-yellow-95);
-
-      & wa-spinner {
-        --track-color: var(--wa-color-yellow-50);
-        --indicator-color: var(--wa-color-yellow-90);
-      }
-
-      border-color: var(--wa-color-yellow-50);
-      color: var(--wa-color-yellow-50);
-    }
-
     & pre {
       margin: 0;
     }
@@ -360,12 +331,6 @@
       display: flex;
       flex-direction: column;
       gap: var(--wa-space-l);
-    }
-
-    & .horizontal {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--wa-space-s);
     }
   }
 </style>

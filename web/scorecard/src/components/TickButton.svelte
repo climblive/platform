@@ -5,12 +5,21 @@
     onClick: (e: MouseEvent) => void;
     label: string;
     points?: number;
+    attempts: number;
     checked: boolean;
     indeterminate?: boolean;
     disabled?: boolean;
   };
 
-  const { onClick, label, points, checked, indeterminate = false, disabled = false }: Props =
+  const {
+    onClick,
+    label,
+    points,
+    attempts,
+    checked,
+    indeterminate = false,
+    disabled = false,
+  }: Props =
     $props();
 </script>
 
@@ -32,7 +41,10 @@
   }}
 >
   <span class="content">
-    <span class="label">{label}</span>
+    <span class="details">
+      <span class="label">{label}</span>
+      <span class="attempts">{attempts} {attempts === 1 ? "try" : "tries"}</span>
+    </span>
     {#if points !== undefined}
       <span class="points">{points}p</span>
     {/if}
@@ -80,6 +92,14 @@
     font-weight: var(--wa-font-weight-medium);
   }
 
+  .details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--wa-space-3xs);
+  }
+
+  .attempts,
   .points {
     font-size: var(--wa-font-size-xs);
     color: var(--wa-color-text-quiet);
