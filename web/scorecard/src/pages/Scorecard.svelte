@@ -134,15 +134,16 @@
       : "Sort by points ascending",
   );
 
-  let countedTickIds = $derived.by<Set<TickID>>(() => {
-    const limit = contest?.qualifyingProblems ?? 0;
+  const countedTickIds = $derived.by<Set<TickID>>(() => {
+    const limit = contest?.qualifyingProblems;
 
-    if (limit === 0 || !ticks || !problems) {
+    if (!limit || !ticks || !problems) {
       return new Set<TickID>();
     }
 
     const ticksWithScore = ticks.map((tick) => {
       const problem = problems.find(({ id }) => id === tick.problemId);
+
       return {
         tick,
         pointValue: problem ? calculateProblemScore(problem, tick) : 0,
@@ -153,6 +154,7 @@
       if (b.pointValue !== a.pointValue) {
         return b.pointValue - a.pointValue;
       }
+
       return a.tick.timestamp.getTime() - b.tick.timestamp.getTime();
     });
 
