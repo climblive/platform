@@ -85,24 +85,69 @@ wa-option small {
 }
 
 wa-tab-group {
+  --track-width: 0;
   --track-color: transparent;
   --indicator-color: transparent;
 }
 
+wa-tab-group::part(nav) {
+  width: 100%;
+}
+
 wa-tab-group::part(tabs) {
-  background-color: var(--wa-color-neutral-fill-quiet);
-  border-radius: var(--wa-border-radius-pill);
+  width: 100%;
+  align-items: stretch;
+  gap: var(--wa-space-3xs);
   padding: var(--wa-space-3xs);
+  background-color: var(--wa-color-neutral-fill-quiet);
+  border: var(--wa-border-width-s) var(--wa-border-style)
+    var(--wa-color-neutral-border-quiet);
+  border-radius: var(--wa-border-radius-pill);
+}
+
+wa-tab-group:not([placement="start"]):not([placement="end"]) wa-tab {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+wa-tab {
+  color: var(--wa-color-text-quiet);
 }
 
 wa-tab::part(base) {
-  border-radius: var(--wa-border-radius-pill);
+  width: 100%;
+  justify-content: center;
+  padding: 0.875em 1.25em;
+  border-radius: calc(var(--wa-border-radius-pill) - var(--wa-space-3xs));
+  transition:
+    background-color var(--wa-transition-normal) var(--wa-transition-easing),
+    box-shadow var(--wa-transition-normal) var(--wa-transition-easing),
+    color var(--wa-transition-normal) var(--wa-transition-easing);
+}
+
+wa-tab:not([active]):not([disabled]):hover {
+  color: var(--wa-color-text-normal);
+}
+
+wa-tab:not([active]):not([disabled]):hover::part(base) {
+  background-color: var(--wa-color-neutral-fill-normal);
+}
+
+wa-tab:focus-visible::part(base) {
+  outline: var(--wa-focus-ring);
+  outline-offset: 0;
 }
 
 wa-tab[active] {
-  color: var(--wa-color-brand-on-loud);
+  color: var(--wa-color-brand-on-quiet);
 }
 
 wa-tab[active]::part(base) {
-  background-color: var(--wa-color-brand-fill-loud);
+  background-color: var(--wa-color-brand-fill-quiet);
+  box-shadow: inset 0 0 0 var(--wa-border-width-s)
+    var(--wa-color-brand-border-normal);
+}
+
+wa-tab[active]:not([disabled]):hover::part(base) {
+  background-color: var(--wa-color-brand-fill-normal);
 }
