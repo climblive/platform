@@ -37,9 +37,9 @@
       <wa-icon name="bolt"></wa-icon>
     {/if}
   </span>
-  <div class="score">
-    {#if tick && counted}
-      <Score value={disqualified ? 0 : pointValue} prefix="+" />
+  <div class="score" class:uncounted={!counted}>
+    {#if tick}
+      <Score value={disqualified ? 0 : pointValue} prefix={counted ? "+" : ""} />
     {/if}
   </div>
 
@@ -88,5 +88,10 @@
 
   .score {
     text-align: right;
+
+    &.uncounted {
+      color: var(--wa-color-text-quiet);
+      text-decoration: line-through;
+    }
   }
 </style>
