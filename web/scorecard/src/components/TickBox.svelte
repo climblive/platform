@@ -39,6 +39,19 @@
         return "zone1";
     }
   });
+  const attempts = $derived(tick?.attemptsTop ?? 0);
+  const hasAttempts = $derived(attempts > 0);
+  const displayVariant = $derived.by(
+    (): "attempts" | "flash" | "top" | "zone2" | "zone1" | undefined => {
+      if (variant !== undefined) {
+        return variant;
+      }
+
+      if (hasAttempts) {
+        return "attempts";
+      }
+    },
+  );
   const isChecked = (buttonVariant: "flash" | "top" | "zone2" | "zone1") =>
     variant === buttonVariant;
   const isIndeterminate = (buttonVariant: "top" | "zone2" | "zone1") => {
@@ -50,6 +63,44 @@
       case "zone1":
         return variant === "flash" || variant === "top" || variant === "zone2";
     }
+  };
+  const canAddAttempt = $derived(!tick?.top);
+  const canFlash = $derived(!hasAttempts);
+
+  const getNextTick = (): Omit<Tick, "id" | "timestamp"> => ({
+    problemId: problem.id,
+    top: tick?.top ?? false,
+    zone2: tick?.zone2 ?? false,
+    zone1: tick?.zone1 ?? false,
+    attemptsTop: tick?.attemptsTop ?? 0,
+    attemptsZone2: tick?.attemptsZone2 ?? 0,
+    attemptsZone1: tick?.attemptsZone1 ?? 0,
+  });
+
+  const incrementAttempts = (nextTick: Omit<Tick, "id" | "timestamp">) => {
+    if (!nextTick.top) {
+      nextTick.attemptsTop += 1;
+    }
+
+    if (!nextTick.zone2) {
+      nextTick.attemptsZone2 += 1;
+    }
+
+    if (!nextTick.zone1) {
+      nextTick.attemptsZone1 += 1;
+    }
+  };
+
+  const putNextTick = (nextTick: Omit<Tick, "id" | "timestamp">) => {
+    putTick.mutate(nextTick, {
+      onError: (error) => {
+        if (error instanceof AxiosError && error.status === 409) {
+          toastError("Ascent is already registered.");
+        } else {
+          toastError("Failed to save ascent.");
+        }
+      },
+    });
   };
 
   const handleDelete = (event: MouseEvent) => {
@@ -72,6 +123,18 @@
     });
   };
 
+  const handleAttempt = (event: MouseEvent) => {
+    event.stopPropagation();
+
+    navigator.vibrate?.(50);
+    open = false;
+
+    const nextTick = getNextTick();
+
+    incrementAttempts(nextTick);
+    putNextTick(nextTick);
+  };
+
   const handleTick = (
     event: MouseEvent,
     feature: "zone1" | "zone2" | "top",
@@ -82,15 +145,15 @@
     navigator.vibrate?.(50);
     open = false;
 
-    const nextTick: Omit<Tick, "id" | "timestamp"> = {
-      problemId: problem.id,
-      top: false,
-      zone2: false,
-      zone1: false,
-      attemptsTop: flash ? 1 : 999,
-      attemptsZone2: flash ? 1 : 999,
-      attemptsZone1: flash ? 1 : 999,
-    };
+    const nextTick = getNextTick();
+
+    if (flash) {
+      nextTick.attemptsTop = 1;
+      nextTick.attemptsZone2 = 1;
+      nextTick.attemptsZone1 = 1;
+    } else {
+      incrementAttempts(nextTick);
+    }
 
     switch (feature) {
       case "top":
@@ -106,15 +169,7 @@
         nextTick.zone1 = true;
     }
 
-    putTick.mutate(nextTick, {
-      onError: (error) => {
-        if (error instanceof AxiosError && error.status === 409) {
-          toastError("Ascent is already registered.");
-        } else {
-          toastError("Failed to register ascent.");
-        }
-      },
-    });
+    putNextTick(nextTick);
   };
 
   $effect(() => {
@@ -126,7 +181,7 @@
 
 <div class="container">
   <button
-    data-variant={variant}
+    data-variant={displayVariant}
     disabled={disabled || loading}
     onclick={() => (open = true)}
     aria-label={tick?.id ? "Edit" : "Tick"}
@@ -141,6 +196,8 @@
       <pre>Z2</pre>
     {:else if variant === "zone1"}
       <pre>Z1</pre>
+    {:else if hasAttempts}
+      <pre>{attempts}</pre>
     {/if}
   </button>
 
@@ -175,6 +232,7 @@
         onClick={(e: MouseEvent) => handleTick(e, "top", true)}
         points={problem.pointsTop + (problem.flashBonus ?? 0)}
         checked={isChecked("flash")}
+        disabled={!canFlash}
       />
     </div>
 
@@ -200,7 +258,14 @@
       />
     {/if}
 
-    {#if open && variant !== undefined}
+    {#if open && canAddAttempt}
+      <wa-button size="s" appearance="outlined" onclick={(e: MouseEvent) => handleAttempt(e)}>
+        <wa-icon slot="start" name="plus"></wa-icon>
+        Attempt +1
+      </wa-button>
+    {/if}
+
+    {#if open && tick !== undefined}
       <wa-button
         size="s"
         appearance="plain"
