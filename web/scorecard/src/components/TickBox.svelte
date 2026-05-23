@@ -167,6 +167,7 @@
         points={problem.pointsTop}
         checked={isChecked("top")}
         indeterminate={isIndeterminate("top")}
+        disabled={isIndeterminate("top")}
       />
 
       <TickButton
@@ -184,6 +185,7 @@
         points={problem.pointsZone2}
         checked={isChecked("zone2")}
         indeterminate={isIndeterminate("zone2")}
+        disabled={isIndeterminate("zone2")}
       />
     {/if}
 
@@ -194,6 +196,7 @@
         points={problem.pointsZone1}
         checked={isChecked("zone1")}
         indeterminate={isIndeterminate("zone1")}
+        disabled={isIndeterminate("zone1")}
       />
     {/if}
 

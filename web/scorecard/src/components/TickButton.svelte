@@ -7,17 +7,26 @@
     points?: number;
     checked: boolean;
     indeterminate?: boolean;
+    disabled?: boolean;
   };
 
-  const { onClick, label, points, checked, indeterminate = false }: Props = $props();
+  const { onClick, label, points, checked, indeterminate = false, disabled = false }: Props =
+    $props();
 </script>
 
 <wa-checkbox
+  class:checked-state={checked}
   size="s"
   {checked}
   {indeterminate}
+  {disabled}
   aria-label={label}
   onclick={(event: Event) => {
+    if (disabled) {
+      event.preventDefault();
+      return;
+    }
+
     event.preventDefault();
     onClick(event as MouseEvent);
   }}
@@ -51,6 +60,10 @@
       display: flex;
       align-items: center;
       min-width: 0;
+    }
+
+    &.checked-state::part(base) {
+      border-color: var(--wa-color-green-50);
     }
   }
 
