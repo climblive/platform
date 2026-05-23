@@ -27,7 +27,7 @@
   let open = $state(false);
 
   const loading = $derived(putTick.isPending || deleteTick.isPending);
-  const variant = $derived.by(() => {
+  const variant = $derived.by((): "flash" | "top" | "zone2" | "zone1" | undefined => {
     switch (true) {
       case tick?.top && tick.attemptsTop === 1:
         return "flash";
@@ -39,6 +39,18 @@
         return "zone1";
     }
   });
+  const isChecked = (buttonVariant: "flash" | "top" | "zone2" | "zone1") =>
+    variant === buttonVariant;
+  const isIndeterminate = (buttonVariant: "top" | "zone2" | "zone1") => {
+    switch (buttonVariant) {
+      case "top":
+        return variant === "flash";
+      case "zone2":
+        return variant === "flash" || variant === "top";
+      case "zone1":
+        return variant === "flash" || variant === "top" || variant === "zone2";
+    }
+  };
 
   const handleDelete = (event: MouseEvent) => {
     if (!tick) {
@@ -153,14 +165,15 @@
         label="Top"
         onClick={(e: MouseEvent) => handleTick(e, "top", false)}
         points={problem.pointsTop}
-        active={variant === "top"}
+        checked={isChecked("top")}
+        indeterminate={isIndeterminate("top")}
       />
 
       <TickButton
         label="Flash"
         onClick={(e: MouseEvent) => handleTick(e, "top", true)}
         points={problem.pointsTop + (problem.flashBonus ?? 0)}
-        active={variant === "flash"}
+        checked={isChecked("flash")}
       />
     </div>
 
@@ -169,7 +182,8 @@
         label="Zone 2"
         onClick={(e: MouseEvent) => handleTick(e, "zone2", false)}
         points={problem.pointsZone2}
-        active={variant === "zone2"}
+        checked={isChecked("zone2")}
+        indeterminate={isIndeterminate("zone2")}
       />
     {/if}
 
@@ -178,7 +192,8 @@
         label="Zone 1"
         onClick={(e: MouseEvent) => handleTick(e, "zone1", false)}
         points={problem.pointsZone1}
-        active={variant === "zone1"}
+        checked={isChecked("zone1")}
+        indeterminate={isIndeterminate("zone1")}
       />
     {/if}
 

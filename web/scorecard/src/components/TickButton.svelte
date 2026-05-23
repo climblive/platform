@@ -5,15 +5,17 @@
     onClick: (e: MouseEvent) => void;
     label: string;
     points?: number;
-    active: boolean;
+    checked: boolean;
+    indeterminate?: boolean;
   };
 
-  const { onClick, label, points, active }: Props = $props();
+  const { onClick, label, points, checked, indeterminate = false }: Props = $props();
 </script>
 
 <wa-checkbox
   size="s"
-  checked={active}
+  {checked}
+  {indeterminate}
   aria-label={label}
   onclick={(event: Event) => {
     event.preventDefault();
