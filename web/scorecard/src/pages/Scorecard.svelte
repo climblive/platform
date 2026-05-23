@@ -30,6 +30,7 @@
     type PointValue,
     type Problem,
     type Tick,
+    type TickID,
   } from "@climblive/lib/models";
   import {
     getCompClassesQuery,
@@ -43,7 +44,7 @@
     updatePointValueInQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
-  import { getApiUrl } from "@climblive/lib/utils";
+  import { calculateProblemScore, getApiUrl } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
@@ -168,6 +169,35 @@
       ? "Sort by points descending"
       : "Sort by points ascending",
   );
+
+  const countedTickIds = $derived.by<Set<TickID>>(() => {
+    const limit = contest?.qualifyingProblems;
+
+    if (!limit || !ticks || !problems) {
+      return new Set<TickID>();
+    }
+
+    const ticksWithScore = ticks.map((tick) => {
+      const problem = problems.find(({ id }) => id === tick.problemId);
+
+      return {
+        tick,
+        pointValue: problem ? calculateProblemScore(problem, tick) : 0,
+      };
+    });
+
+    ticksWithScore.sort((a, b) => {
+      if (b.pointValue !== a.pointValue) {
+        return b.pointValue - a.pointValue;
+      }
+
+      return a.tick.timestamp.getTime() - b.tick.timestamp.getTime();
+    });
+
+    return new Set<TickID>(
+      ticksWithScore.slice(0, limit).map(({ tick }) => tick.id),
+    );
+  });
 
   $effect(() => {
     if (contender) {
@@ -385,13 +415,16 @@
             {:else}
               <div class="problems-list">
                 {#each sortedProblems as problem (problem.id)}
+                  {@const tick = ticks.find(
+                    ({ problemId }) => problemId === problem.id,
+                  )}
                   <ProblemView
                     {problem}
-                    tick={ticks.find(
-                      ({ problemId }) => problemId === problem.id,
-                    )}
+                    {tick}
                     disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
                     disqualified={contender.disqualified}
+                    counted={contest.qualifyingProblems === 0 ||
+                      (!!tick && countedTickIds.has(tick.id))}
                   />
                 {/each}
               </div>

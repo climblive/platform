@@ -16,7 +16,7 @@ web:
 	cd .. && pnpm i
 	cd ../packages/lib && cp src/config.json src/config.json.bak \
 		&& sed 's/"API_URL":.*/"API_URL": "",/' src/config.json.bak > src/config.json
-	cd ../.. && pnpm --filter=* build
+	cd .. && pnpm --filter=* build
 	cd ../packages/lib && mv src/config.json.bak src/config.json
 	rm -rf $(WEB_DIR)/admin $(WEB_DIR)/scoreboard $(WEB_DIR)/scorecard $(WEB_DIR)/www
 	cp -r ../admin/dist $(WEB_DIR)/admin

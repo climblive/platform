@@ -12,9 +12,10 @@
     tick?: Tick | undefined;
     disabled: boolean;
     disqualified: boolean;
+    counted: boolean;
   }
 
-  const { problem, tick, disabled, disqualified }: Props = $props();
+  const { problem, tick, disabled, disqualified, counted }: Props = $props();
 </script>
 
 <section
@@ -34,9 +35,12 @@
       <span class="top">≤ {problem.pointValue.flash}p</span>
     {/if}
   </span>
-  <div class="score">
+  <div class="score" class:uncounted={!counted}>
     {#if tick && problem.pointValue}
-      <Score value={disqualified ? 0 : problem.pointValue.current} prefix="+" />
+      <Score
+        value={disqualified ? 0 : problem.pointValue.current}
+        prefix={counted ? "+" : undefined}
+      />
     {/if}
   </div>
 
@@ -81,5 +85,10 @@
 
   .score {
     text-align: right;
+
+    &.uncounted {
+      opacity: 0.3;
+      text-decoration: line-through;
+    }
   }
 </style>
