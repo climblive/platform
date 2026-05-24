@@ -432,7 +432,7 @@
     &::part(body) {
       display: flex;
       flex-direction: column;
-      gap: var(--wa-space-l);
+      gap: var(--wa-space-s);
     }
   }
 </style>

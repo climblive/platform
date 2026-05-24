@@ -50,6 +50,7 @@
   {#if points !== undefined}
     <span class="points">{points}p</span>
   {/if}
+
   <div class="attempt-controls">
     <span class="attempts"
       >{attempts === 1 ? "1 attempt" : `${attempts} attempts`}</span
@@ -83,7 +84,7 @@
     border-radius: var(--wa-border-radius-m);
     background-color: var(--wa-color-surface-raised);
     padding: var(--wa-space-s);
-    gap: var(--wa-space-s);
+    gap: var(--wa-space-2xs);
     align-items: center;
 
     &[data-checked="true"] {
@@ -97,13 +98,12 @@
 
   .attempts {
     font-size: var(--wa-font-size-xs);
+    margin-inline-end: var(--wa-space-s);
   }
 
   .attempt-controls {
     display: flex;
     align-items: center;
-    gap: var(--wa-space-3xs);
-    margin-block-start: var(--wa-space-xs);
-    margin-inline-start: 1.5rem;
+    gap: var(--wa-space-2xs);
   }
 </style>
