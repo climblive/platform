@@ -1,8 +1,10 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
 
   type Props = {
     onClick: (e: MouseEvent) => void;
+    onAdjustAttempts: (e: MouseEvent, delta: number) => void;
     label: string;
     points?: number;
     attempts: number;
@@ -13,6 +15,7 @@
 
   const {
     onClick,
+    onAdjustAttempts,
     label,
     points,
     attempts,
@@ -22,7 +25,7 @@
   }: Props = $props();
 </script>
 
-<section data-disabled={disabled} data-checked={checked}>
+<section data-checked={checked}>
   <wa-checkbox
     class:checked-state={checked}
     size="s"
@@ -46,9 +49,27 @@
   {#if points !== undefined}
     <span class="points">{points}p</span>
   {/if}
-  <span class="attempts"
-    >{attempts === 1 ? "1 attempt" : `${attempts} attempts`}</span
-  >
+  <div class="attempt-controls">
+    <span class="attempts"
+      >{attempts === 1 ? "1 attempt" : `${attempts} attempts`}</span
+    >
+    <wa-button
+      size="s"
+      appearance="plain"
+      aria-label={`Decrease ${label} attempts`}
+      onclick={(event: MouseEvent) => onAdjustAttempts(event, -1)}
+    >
+      -
+    </wa-button>
+    <wa-button
+      size="s"
+      appearance="plain"
+      aria-label={`Increase ${label} attempts`}
+      onclick={(event: MouseEvent) => onAdjustAttempts(event, 1)}
+    >
+      +
+    </wa-button>
+  </div>
 </section>
 
 <style>
@@ -61,12 +82,8 @@
     border-radius: var(--wa-border-radius-m);
     background-color: var(--wa-color-surface-raised);
     padding: var(--wa-space-s);
+    gap: var(--wa-space-s);
     align-items: center;
-
-    &:has(wa-checkbox:disabled) {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
 
     &[data-checked="true"] {
       border-color: var(--wa-color-green-50);
@@ -78,7 +95,19 @@
   }
 
   .attempts {
-    margin-block-start: var(--wa-space-xs);
     font-size: var(--wa-font-size-xs);
+  }
+
+  .attempt-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-3xs);
+    margin-block-start: var(--wa-space-xs);
+    margin-inline-start: 1.5rem;
+  }
+
+  wa-button {
+    --padding-inline: var(--wa-space-2xs);
+    min-width: 0;
   }
 </style>

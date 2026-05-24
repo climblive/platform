@@ -67,6 +67,30 @@
         return tick?.attemptsZone1 ?? 0;
     }
   };
+  const attemptFeatures = ["top", "zone2", "zone1"] as const;
+  const getAttemptField = (feature: (typeof attemptFeatures)[number]) => {
+    switch (feature) {
+      case "top":
+        return "attemptsTop";
+      case "zone2":
+        return "attemptsZone2";
+      case "zone1":
+        return "attemptsZone1";
+    }
+  };
+  const getMinimumAttempts = (
+    nextTick: Omit<Tick, "id" | "timestamp">,
+    feature: (typeof attemptFeatures)[number],
+  ) => {
+    switch (feature) {
+      case "top":
+        return nextTick.top ? 1 : 0;
+      case "zone2":
+        return nextTick.zone2 ? 1 : 0;
+      case "zone1":
+        return nextTick.zone1 ? 1 : 0;
+    }
+  };
   const isChecked = (buttonVariant: "top" | "zone2" | "zone1") =>
     variant === buttonVariant;
   const isIndeterminate = (buttonVariant: "zone2" | "zone1") => {
@@ -103,6 +127,52 @@
     }
   };
 
+  const syncAttemptCounts = (
+    nextTick: Omit<Tick, "id" | "timestamp">,
+    feature: (typeof attemptFeatures)[number],
+  ) => {
+    const featureIndex = attemptFeatures.indexOf(feature);
+    const targetField = getAttemptField(feature);
+
+    nextTick[targetField] = Math.max(
+      getMinimumAttempts(nextTick, feature),
+      nextTick[targetField],
+    );
+
+    for (let index = featureIndex - 1; index >= 0; index -= 1) {
+      const currentField = getAttemptField(attemptFeatures[index]);
+      const belowField = getAttemptField(attemptFeatures[index + 1]);
+
+      nextTick[currentField] = Math.max(
+        nextTick[currentField],
+        nextTick[belowField],
+      );
+    }
+
+    for (
+      let index = featureIndex + 1;
+      index < attemptFeatures.length;
+      index += 1
+    ) {
+      const currentField = getAttemptField(attemptFeatures[index]);
+      const aboveField = getAttemptField(attemptFeatures[index - 1]);
+
+      nextTick[currentField] = Math.min(
+        nextTick[currentField],
+        nextTick[aboveField],
+      );
+    }
+
+    for (const currentFeature of attemptFeatures) {
+      const currentField = getAttemptField(currentFeature);
+
+      nextTick[currentField] = Math.max(
+        getMinimumAttempts(nextTick, currentFeature),
+        nextTick[currentField],
+      );
+    }
+  };
+
   const putNextTick = (nextTick: Omit<Tick, "id" | "timestamp">) => {
     putTick.mutate(nextTick, {
       onError: (error) => {
@@ -123,6 +193,27 @@
     const nextTick = getNextTick();
 
     incrementAttempts(nextTick);
+    putNextTick(nextTick);
+  };
+
+  const handleAdjustAttempts = (
+    event: MouseEvent,
+    feature: (typeof attemptFeatures)[number],
+    delta: number,
+  ) => {
+    event.stopPropagation();
+
+    navigator.vibrate?.(50);
+
+    const nextTick = getNextTick();
+    const attemptField = getAttemptField(feature);
+
+    nextTick[attemptField] = Math.max(
+      getMinimumAttempts(nextTick, feature),
+      nextTick[attemptField] + delta,
+    );
+
+    syncAttemptCounts(nextTick, feature);
     putNextTick(nextTick);
   };
 
@@ -213,6 +304,8 @@
     <TickButton
       label="Top"
       onClick={(e: MouseEvent) => handleTick(e, "top")}
+      onAdjustAttempts={(e: MouseEvent, delta: number) =>
+        handleAdjustAttempts(e, "top", delta)}
       points={problem.pointsTop}
       attempts={getAttempts("top")}
       checked={isChecked("top")}
@@ -222,6 +315,8 @@
       <TickButton
         label="Zone 2"
         onClick={(e: MouseEvent) => handleTick(e, "zone2")}
+        onAdjustAttempts={(e: MouseEvent, delta: number) =>
+          handleAdjustAttempts(e, "zone2", delta)}
         points={problem.pointsZone2}
         attempts={getAttempts("zone2")}
         checked={isChecked("zone2")}
@@ -234,6 +329,8 @@
       <TickButton
         label="Zone 1"
         onClick={(e: MouseEvent) => handleTick(e, "zone1")}
+        onAdjustAttempts={(e: MouseEvent, delta: number) =>
+          handleAdjustAttempts(e, "zone1", delta)}
         points={problem.pointsZone1}
         attempts={getAttempts("zone1")}
         checked={isChecked("zone1")}
