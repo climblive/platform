@@ -67,7 +67,8 @@
         return tick?.attemptsZone1 ?? 0;
     }
   };
-  const isChecked = (buttonVariant: "top" | "zone2" | "zone1") => variant === buttonVariant;
+  const isChecked = (buttonVariant: "top" | "zone2" | "zone1") =>
+    variant === buttonVariant;
   const isIndeterminate = (buttonVariant: "zone2" | "zone1") => {
     switch (buttonVariant) {
       case "zone2":
@@ -125,7 +126,10 @@
     putNextTick(nextTick);
   };
 
-  const handleTick = (event: MouseEvent, feature: "zone1" | "zone2" | "top") => {
+  const handleTick = (
+    event: MouseEvent,
+    feature: "zone1" | "zone2" | "top",
+  ) => {
     event.stopPropagation();
 
     navigator.vibrate?.(50);
@@ -238,9 +242,13 @@
       />
     {/if}
 
-    {#if open && canAddAttempt}
-      <wa-button size="s" appearance="outlined" onclick={(e: MouseEvent) => handleAttempt(e)}>
-        <wa-icon slot="start" name="plus"></wa-icon>
+    {#if open}
+      <wa-button
+        size="s"
+        appearance="outlined"
+        onclick={(e: MouseEvent) => handleAttempt(e)}
+        disabled={!canAddAttempt}
+      >
         Log failed attempt
       </wa-button>
     {/if}

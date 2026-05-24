@@ -22,97 +22,63 @@
   }: Props = $props();
 </script>
 
-<wa-checkbox
-  class:checked-state={checked}
-  size="s"
-  {checked}
-  {indeterminate}
-  {disabled}
-  aria-label={label}
-  onclick={(event: Event) => {
-    if (disabled) {
-      event.preventDefault();
-      return;
-    }
+<section data-disabled={disabled} data-checked={checked}>
+  <wa-checkbox
+    class:checked-state={checked}
+    size="s"
+    {checked}
+    {indeterminate}
+    {disabled}
+    aria-label={label}
+    onclick={(event: Event) => {
+      if (disabled) {
+        event.preventDefault();
+        return;
+      }
 
-    event.preventDefault();
-    onClick(event as MouseEvent);
-  }}
->
-  <span class="content">
-    <span class="label">{label}</span>
-    {#if points !== undefined}
-      <span class="points">{points}p</span>
-    {/if}
-    <span class="attempts"
-      >{attempts === 1 ? "1 attempt" : `${attempts} attempts`}</span
-    >
-  </span>
-</wa-checkbox>
+      event.preventDefault();
+      onClick(event as MouseEvent);
+    }}
+  >
+    {label}
+  </wa-checkbox>
+
+  {#if points !== undefined}
+    <span class="points">{points}p</span>
+  {/if}
+  <span class="attempts"
+    >{attempts === 1 ? "1 attempt" : `${attempts} attempts`}</span
+  >
+</section>
 
 <style>
-  wa-checkbox {
-    width: 100%;
-    display: block;
+  section {
+    display: grid;
+    grid-template-columns: max-content 1fr;
 
-    &::part(base) {
-      border: var(--wa-border-width-s) var(--wa-border-style)
-        var(--wa-color-neutral-border-normal);
-      border-radius: var(--wa-border-radius-m);
-      background-color: var(--wa-color-surface-raised);
-      padding: var(--wa-space-s);
-      min-height: 3rem;
-      box-sizing: border-box;
-      align-items: center;
+    border: var(--wa-border-width-s) var(--wa-border-style)
+      var(--wa-color-neutral-border-normal);
+    border-radius: var(--wa-border-radius-m);
+    background-color: var(--wa-color-surface-raised);
+    padding: var(--wa-space-s);
+    align-items: center;
+
+    &:has(wa-checkbox:disabled) {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
-    &::part(label) {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 0;
-    }
-
-    &.checked-state::part(base) {
+    &[data-checked="true"] {
       border-color: var(--wa-color-green-50);
     }
   }
 
-  .content {
-    width: 100%;
-    display: grid;
-    grid-template-columns: max-content max-content;
-    grid-template-areas:
-      "label points"
-      "attempts points";
-    align-items: center;
-    justify-content: center;
-    column-gap: var(--wa-space-s);
-    row-gap: var(--wa-space-3xs);
-    font-size: var(--wa-font-size-s);
-  }
-
-  .label {
-    grid-area: label;
-    font-weight: var(--wa-font-weight-medium);
-    text-align: center;
+  .points {
+    text-align: right;
   }
 
   .attempts {
-    grid-area: attempts;
-    justify-self: start;
-  }
-
-  .points {
-    grid-area: points;
-    align-self: center;
-  }
-
-  .attempts,
-  .points {
+    margin-block-start: var(--wa-space-xs);
     font-size: var(--wa-font-size-xs);
-    color: var(--wa-color-text-quiet);
-    white-space: nowrap;
   }
 </style>
