@@ -37,12 +37,21 @@
         return "zone1";
     }
   });
+  const scorecardVariant = $derived.by(
+    (): "flash" | "top" | "zone2" | "zone1" | undefined => {
+      if (tick?.top && tick.attemptsTop === 1) {
+        return "flash";
+      }
+
+      return variant;
+    },
+  );
   const attempts = $derived(tick?.attemptsTop ?? 0);
   const hasAttempts = $derived(attempts > 0);
   const displayVariant = $derived.by(
-    (): "attempts" | "top" | "zone2" | "zone1" | undefined => {
-      if (variant !== undefined) {
-        return variant;
+    (): "attempts" | "flash" | "top" | "zone2" | "zone1" | undefined => {
+      if (scorecardVariant !== undefined) {
+        return scorecardVariant;
       }
 
       if (hasAttempts) {
@@ -114,8 +123,6 @@
 
     event.stopPropagation();
 
-    open = false;
-
     deleteTick.mutate(tick.id, {
       onError: (error) => {
         if (error instanceof AxiosError && error.status === 404) {
@@ -131,7 +138,6 @@
     event.stopPropagation();
 
     navigator.vibrate?.(50);
-    open = false;
 
     const nextTick = getNextTick();
 
@@ -143,7 +149,6 @@
     event.stopPropagation();
 
     navigator.vibrate?.(50);
-    open = false;
 
     const nextTick = getNextTick();
 
@@ -165,12 +170,6 @@
 
     putNextTick(nextTick);
   };
-
-  $effect(() => {
-    if (tick !== undefined) {
-      open = false;
-    }
-  });
 </script>
 
 <div class="container">
@@ -182,11 +181,13 @@
   >
     {#if loading}
       <wa-spinner></wa-spinner>
-    {:else if variant === "top"}
+    {:else if scorecardVariant === "flash"}
+      <pre>F</pre>
+    {:else if scorecardVariant === "top"}
       <pre>T</pre>
-    {:else if variant === "zone2"}
+    {:else if scorecardVariant === "zone2"}
       <pre>Z2</pre>
-    {:else if variant === "zone1"}
+    {:else if scorecardVariant === "zone1"}
       <pre>Z1</pre>
     {:else if hasAttempts}
       <pre>{attempts}</pre>
@@ -308,6 +309,18 @@
 
       border-color: var(--wa-color-green-50);
       color: var(--wa-color-green-50);
+    }
+
+    &[data-variant="flash"] {
+      background-color: var(--wa-color-yellow-95);
+
+      & wa-spinner {
+        --track-color: var(--wa-color-yellow-50);
+        --indicator-color: var(--wa-color-yellow-90);
+      }
+
+      border-color: var(--wa-color-yellow-50);
+      color: var(--wa-color-yellow-50);
     }
 
     & pre {
