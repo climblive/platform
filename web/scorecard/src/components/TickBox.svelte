@@ -3,7 +3,7 @@
   import WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import { HoldColorIndicator } from "@climblive/lib/components";
   import type { Problem, Tick } from "@climblive/lib/models";
-  import { deleteTickMutation, putTickMutation } from "@climblive/lib/queries";
+  import { putTickMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import { AxiosError } from "axios";
   import { getContext } from "svelte";
@@ -22,11 +22,9 @@
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
   const putTick = $derived(putTickMutation($session.contenderId));
-  const deleteTick = $derived(deleteTickMutation());
-
   let open = $state(false);
 
-  const loading = $derived(putTick.isPending || deleteTick.isPending);
+  const loading = $derived(putTick.isPending);
   const variant = $derived.by((): "top" | "zone2" | "zone1" | undefined => {
     switch (true) {
       case tick?.top:
@@ -116,24 +114,6 @@
     });
   };
 
-  const handleDelete = (event: MouseEvent) => {
-    if (!tick) {
-      return;
-    }
-
-    event.stopPropagation();
-
-    deleteTick.mutate(tick.id, {
-      onError: (error) => {
-        if (error instanceof AxiosError && error.status === 404) {
-          toastError("Ascent is already removed.");
-        } else {
-          toastError("Failed to remove ascent.");
-        }
-      },
-    });
-  };
-
   const handleAttempt = (event: MouseEvent) => {
     event.stopPropagation();
 
@@ -151,6 +131,22 @@
     navigator.vibrate?.(50);
 
     const nextTick = getNextTick();
+
+    if (isChecked(feature)) {
+      switch (feature) {
+        case "top":
+          nextTick.top = false;
+          break;
+        case "zone2":
+          nextTick.zone2 = false;
+          break;
+        case "zone1":
+          nextTick.zone1 = false;
+      }
+
+      putNextTick(nextTick);
+      return;
+    }
 
     incrementAttempts(nextTick);
 
@@ -245,19 +241,7 @@
     {#if open && canAddAttempt}
       <wa-button size="s" appearance="outlined" onclick={(e: MouseEvent) => handleAttempt(e)}>
         <wa-icon slot="start" name="plus"></wa-icon>
-        Attempt +1
-      </wa-button>
-    {/if}
-
-    {#if open && tick !== undefined}
-      <wa-button
-        size="s"
-        appearance="plain"
-        onclick={(e: MouseEvent) => handleDelete(e)}
-        variant="danger"
-      >
-        <wa-icon slot="start" name="rotate-left"></wa-icon>
-        Unsend
+        Log failed attempt
       </wa-button>
     {/if}
   </wa-dialog>

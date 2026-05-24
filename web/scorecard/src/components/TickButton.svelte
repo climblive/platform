@@ -21,6 +21,7 @@
     disabled = false,
   }: Props =
     $props();
+
 </script>
 
 <wa-checkbox
@@ -41,10 +42,8 @@
   }}
 >
   <span class="content">
-    <span class="details">
-      <span class="label">{label}</span>
-      <span class="attempts">{attempts} {attempts === 1 ? "try" : "tries"}</span>
-    </span>
+    <span class="label">{label}</span>
+    <span class="attempts">{attempts === 1 ? "1 attempt" : `${attempts} attempts`}</span>
     {#if points !== undefined}
       <span class="points">{points}p</span>
     {/if}
@@ -62,15 +61,17 @@
       border-radius: var(--wa-border-radius-m);
       background-color: var(--wa-color-surface-raised);
       padding: var(--wa-space-s);
-      min-height: 3rem;
+      min-height: 5rem;
       box-sizing: border-box;
       align-items: center;
+      justify-content: center;
     }
 
     &::part(label) {
-      flex: 1;
+      flex: 0 1 auto;
       display: flex;
       align-items: center;
+      justify-content: center;
       min-width: 0;
     }
 
@@ -80,23 +81,17 @@
   }
 
   .content {
-    width: 100%;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: var(--wa-space-s);
+    justify-content: center;
+    gap: var(--wa-space-3xs);
     font-size: var(--wa-font-size-s);
+    text-align: center;
   }
 
   .label {
     font-weight: var(--wa-font-weight-medium);
-  }
-
-  .details {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--wa-space-3xs);
   }
 
   .attempts,
