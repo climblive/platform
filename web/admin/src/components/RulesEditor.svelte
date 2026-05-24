@@ -67,6 +67,28 @@
       <wa-checkbox size="s" disabled></wa-checkbox>
     {/snippet}
   </RuleOptionCard>
+
+  <RuleOptionCard
+    title="Max attempts"
+    description="Each contender only has a fixed number of attempts. Any attempts above that limit will yield 0 points."
+    disabled
+    tag="Upcoming"
+  >
+    {#snippet header()}
+      <wa-checkbox size="s" disabled></wa-checkbox>
+    {/snippet}
+  </RuleOptionCard>
+
+  <RuleOptionCard
+    title="Point deduction"
+    description="Deduct points for each failed attempt."
+    disabled
+    tag="Upcoming"
+  >
+    {#snippet header()}
+      <wa-checkbox size="s" disabled></wa-checkbox>
+    {/snippet}
+  </RuleOptionCard>
 </section>
 
 <style>
