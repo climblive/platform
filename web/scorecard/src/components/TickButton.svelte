@@ -1,6 +1,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
 
   type Props = {
     onClick: (e: MouseEvent) => void;
@@ -54,20 +55,20 @@
       >{attempts === 1 ? "1 attempt" : `${attempts} attempts`}</span
     >
     <wa-button
-      size="s"
-      appearance="plain"
+      size="xs"
+      appearance="outlined"
       aria-label={`Decrease ${label} attempts`}
       onclick={(event: MouseEvent) => onAdjustAttempts(event, -1)}
     >
-      -
+      <wa-icon name="minus" label={`Decrease ${label} attempts`}></wa-icon>
     </wa-button>
     <wa-button
-      size="s"
-      appearance="plain"
+      size="xs"
+      appearance="outlined"
       aria-label={`Increase ${label} attempts`}
       onclick={(event: MouseEvent) => onAdjustAttempts(event, 1)}
     >
-      +
+      <wa-icon name="plus" label={`Increase ${label} attempts`}></wa-icon>
     </wa-button>
   </div>
 </section>
@@ -104,10 +105,5 @@
     gap: var(--wa-space-3xs);
     margin-block-start: var(--wa-space-xs);
     margin-inline-start: 1.5rem;
-  }
-
-  wa-button {
-    --padding-inline: var(--wa-space-2xs);
-    min-width: 0;
   }
 </style>
