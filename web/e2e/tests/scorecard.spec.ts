@@ -1,4 +1,4 @@
-import { expect, test, type Locator } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import {
   MariaDbContainer,
   StartedMariaDbContainer,
@@ -21,9 +21,27 @@ test.describe.configure({ mode: "serial" });
 
 const clickTickOption = async (
   problem: Locator,
-  option: "Top" | "Flash" | "Zone 1" | "Zone 2",
+  option: "Top" | "Zone 1" | "Zone 2",
 ) => {
   await problem.locator(`wa-checkbox[aria-label="${option}"]`).click();
+};
+
+const clearTopSelection = async (problem: Locator) => {
+  await clickTickOption(problem, "Top");
+  await clickTickOption(problem, "Zone 2");
+  await clickTickOption(problem, "Zone 1");
+};
+
+const closeTickDialog = async (page: Page) => {
+  await page.keyboard.press("Escape");
+};
+
+const getTopScore = (problemNumber: number) => {
+  if (problemNumber < 5) {
+    return `+${problemNumber * 100 + 10}p`;
+  }
+
+  return `+${problemNumber * 100}p`;
 };
 
 test.beforeAll(async () => {
@@ -287,10 +305,11 @@ test("tick and untick all problems", async ({ page }) => {
     await problem.getByRole("button", { name: "Tick" }).click();
     await clickTickOption(problem, "Top");
 
-    await expect(problem.getByText(`+${p * 100}p`)).toBeVisible();
+    await expect(problem.getByText(getTopScore(p))).toBeVisible();
+    await closeTickDialog(page);
   }
 
-  await expect(page.getByText("1500p")).toBeVisible();
+  await expect(page.getByText("1540p")).toBeVisible();
   await expect(page.getByText("1st").first()).toBeVisible();
 
   for (let p = 1; p <= 5; p++) {
@@ -298,9 +317,10 @@ test("tick and untick all problems", async ({ page }) => {
     await expect(problem).toBeVisible();
 
     await problem.getByRole("button", { name: "Edit" }).click();
-    await problem.getByRole("button", { name: "Unsend" }).click();
+    await clearTopSelection(problem);
 
-    await expect(problem.getByText(`+${p * 100}p`)).not.toBeVisible();
+    await expect(problem.getByText(getTopScore(p))).not.toBeVisible();
+    await closeTickDialog(page);
   }
 
   await expect(page.getByText("0p", { exact: true })).toBeVisible();
@@ -314,14 +334,12 @@ test("tick a problem as a flash", async ({ page }) => {
   await expect(problem).toBeVisible();
 
   await problem.getByRole("button", { name: "Tick" }).click();
-  await clickTickOption(problem, "Flash");
-  await expect(problem.getByRole("checkbox", { name: "Flash" })).toBeChecked();
-  await expect(problem.getByRole("checkbox", { name: "Top" })).not.toBeChecked();
+  await clickTickOption(problem, "Top");
 
   await expect(problem.getByText("+110p")).toBeVisible();
+  await expect(problem.locator('button[data-variant="flash"]')).toBeVisible();
 
-  await problem.getByRole("button", { name: "Edit" }).click();
-  await problem.getByRole("button", { name: "Unsend" }).click();
+  await clearTopSelection(problem);
 
   await expect(problem.getByText("+110p")).not.toBeVisible();
 });
@@ -337,8 +355,7 @@ test("tick the first zone", async ({ page }) => {
 
   await expect(problem.getByText("+10p")).toBeVisible();
 
-  await problem.getByRole("button", { name: "Edit" }).click();
-  await problem.getByRole("button", { name: "Unsend" }).click();
+  await clickTickOption(problem, "Zone 1");
 
   await expect(problem.getByText("+10p")).not.toBeVisible();
 });
@@ -354,8 +371,8 @@ test("tick the second zone", async ({ page }) => {
 
   await expect(problem.getByText("+20p")).toBeVisible();
 
-  await problem.getByRole("button", { name: "Edit" }).click();
-  await problem.getByRole("button", { name: "Unsend" }).click();
+  await clickTickOption(problem, "Zone 2");
+  await clickTickOption(problem, "Zone 1");
 
   await expect(problem.getByText("+20p")).not.toBeVisible();
 });
@@ -371,29 +388,24 @@ test("update a problem through all scoring states", async ({ page }) => {
 
   await expect(problem.getByText("+10p")).toBeVisible();
 
-  await problem.getByRole("button", { name: "Edit" }).click();
   await clickTickOption(problem, "Zone 2");
 
   await expect(problem.getByText("+20p")).toBeVisible();
 
-  await problem.getByRole("button", { name: "Edit" }).click();
   await clickTickOption(problem, "Top");
-  await expect(problem.getByRole("checkbox", { name: "Top" })).toBeChecked();
-  await expect(problem.getByRole("checkbox", { name: "Flash" })).not.toBeChecked();
+  await expect(problem.getByText("+110p")).toBeVisible();
+  await expect(problem.locator('button[data-variant="flash"]')).toBeVisible();
+
+  await clearTopSelection(problem);
+  await problem.getByRole("button", { name: "Log failed attempt" }).click();
+  await clickTickOption(problem, "Top");
 
   await expect(problem.getByText("+100p")).toBeVisible();
+  await expect(problem.locator('button[data-variant="top"]')).toBeVisible();
 
-  await problem.getByRole("button", { name: "Edit" }).click();
-  await clickTickOption(problem, "Flash");
-  await expect(problem.getByRole("checkbox", { name: "Flash" })).toBeChecked();
-  await expect(problem.getByRole("checkbox", { name: "Top" })).not.toBeChecked();
+  await clearTopSelection(problem);
 
-  await expect(problem.getByText("+110p")).toBeVisible();
-
-  await problem.getByRole("button", { name: "Edit" }).click();
-  await problem.getByRole("button", { name: "Unsend" }).click();
-
-  await expect(problem.getByText("+110p")).not.toBeVisible();
+  await expect(problem.getByText("+100p")).not.toBeVisible();
 });
 
 test("info tab", async ({ page }) => {
