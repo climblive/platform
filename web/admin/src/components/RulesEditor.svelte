@@ -70,7 +70,7 @@
 
   <RuleOptionCard
     title="Max attempts"
-    description="Each contender has a fixed number of attempts. Any attempts above that limit yield 0 points."
+    description="Each contender has a fixed number of attempts per problem. Any attempts above that limit yield 0 points for the problem."
     disabled
     tag="Upcoming"
   >
