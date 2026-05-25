@@ -34,10 +34,6 @@
 
   const attemptLabel = $derived.by(() => {
     if (minimumAttempts > 0) {
-      if (attempts === 1) {
-        return "Flash";
-      }
-
       return `${attempts} attempts`;
     }
 
