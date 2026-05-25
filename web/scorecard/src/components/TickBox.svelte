@@ -196,10 +196,10 @@
     putNextTick(nextTick);
   };
 
-  const handleAdjustAttempts = (
+  const handleSetAttempts = (
     event: MouseEvent,
     feature: (typeof attemptFeatures)[number],
-    delta: number,
+    attempts: number,
   ) => {
     event.stopPropagation();
 
@@ -207,10 +207,13 @@
 
     const nextTick = getNextTick();
     const attemptField = getAttemptField(feature);
+    const nextAttempts = Number.isFinite(attempts)
+      ? Math.trunc(attempts)
+      : nextTick[attemptField];
 
     nextTick[attemptField] = Math.max(
       getMinimumAttempts(nextTick, feature),
-      nextTick[attemptField] + delta,
+      nextAttempts,
     );
 
     syncAttemptCounts(nextTick, feature);
@@ -304,10 +307,11 @@
     <TickButton
       label="Top"
       onClick={(e: MouseEvent) => handleTick(e, "top")}
-      onAdjustAttempts={(e: MouseEvent, delta: number) =>
-        handleAdjustAttempts(e, "top", delta)}
+      onSaveAttempts={(e: MouseEvent, attempts: number) =>
+        handleSetAttempts(e, "top", attempts)}
       points={problem.pointsTop}
       attempts={getAttempts("top")}
+      minimumAttempts={getMinimumAttempts(getNextTick(), "top")}
       checked={isChecked("top")}
     />
 
@@ -315,10 +319,11 @@
       <TickButton
         label="Zone 2"
         onClick={(e: MouseEvent) => handleTick(e, "zone2")}
-        onAdjustAttempts={(e: MouseEvent, delta: number) =>
-          handleAdjustAttempts(e, "zone2", delta)}
+        onSaveAttempts={(e: MouseEvent, attempts: number) =>
+          handleSetAttempts(e, "zone2", attempts)}
         points={problem.pointsZone2}
         attempts={getAttempts("zone2")}
+        minimumAttempts={getMinimumAttempts(getNextTick(), "zone2")}
         checked={isChecked("zone2")}
         indeterminate={isIndeterminate("zone2")}
         disabled={isIndeterminate("zone2")}
@@ -329,10 +334,11 @@
       <TickButton
         label="Zone 1"
         onClick={(e: MouseEvent) => handleTick(e, "zone1")}
-        onAdjustAttempts={(e: MouseEvent, delta: number) =>
-          handleAdjustAttempts(e, "zone1", delta)}
+        onSaveAttempts={(e: MouseEvent, attempts: number) =>
+          handleSetAttempts(e, "zone1", attempts)}
         points={problem.pointsZone1}
         attempts={getAttempts("zone1")}
+        minimumAttempts={getMinimumAttempts(getNextTick(), "zone1")}
         checked={isChecked("zone1")}
         indeterminate={isIndeterminate("zone1")}
         disabled={isIndeterminate("zone1")}

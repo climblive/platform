@@ -36,6 +36,22 @@ const openTickDialog = async (problem: Locator) => {
   await problem.getByRole("button", { name: /Tick|Edit/ }).click();
 };
 
+const saveAttempts = async (
+  problem: Locator,
+  option: "Top" | "Zone 1" | "Zone 2",
+  attempts: number,
+) => {
+  await problem.getByRole("button", { name: `Edit ${option} attempts` }).click();
+  await problem
+    .locator(`wa-number-input[aria-label="${option} attempts"]`)
+    .evaluate((element, value) => {
+      const input = element as HTMLElement & { value: string };
+      input.value = String(value);
+      input.dispatchEvent(new CustomEvent("wa-input", { bubbles: true }));
+    }, attempts);
+  await problem.getByRole("button", { name: `Save ${option} attempts` }).click();
+};
+
 const closeTickDialog = async (page: Page) => {
   await page.keyboard.press("Escape");
 };
@@ -412,48 +428,40 @@ test("update a problem through all scoring states", async ({ page }) => {
   await expect(problem.getByText("+100p")).not.toBeVisible();
 });
 
-test("adjust attempts with inline buttons", async ({ page }) => {
+test("adjust attempts with inline editor", async ({ page }) => {
   await page.goto("/ABCD0003");
 
   const problem = page.getByRole("region", { name: "Problem 1" });
   await expect(problem).toBeVisible();
 
   await openTickDialog(problem);
-  await problem
-    .getByRole("button", { name: "Increase Zone 1 attempts" })
-    .click();
-  await expect(problem.getByText("1 attempt")).toHaveCount(3);
+  await saveAttempts(problem, "Zone 1", 1);
+  await expect(problem.getByText("1 failed attempt")).toHaveCount(3);
 
-  await problem
-    .getByRole("button", { name: "Increase Zone 2 attempts" })
-    .click();
-  await expect(problem.getByText("2 attempts")).toHaveCount(2);
-  await expect(problem.getByText("1 attempt")).toHaveCount(1);
+  await saveAttempts(problem, "Zone 2", 2);
+  await expect(problem.getByText("2 failed attempts")).toHaveCount(2);
+  await expect(problem.getByText("1 failed attempt")).toHaveCount(1);
 
-  await problem.getByRole("button", { name: "Increase Top attempts" }).click();
-  await expect(problem.getByText("3 attempts")).toHaveCount(1);
-  await expect(problem.getByText("2 attempts")).toHaveCount(1);
-  await expect(problem.getByText("1 attempt")).toHaveCount(1);
+  await saveAttempts(problem, "Top", 3);
+  await expect(problem.getByText("3 failed attempts")).toHaveCount(1);
+  await expect(problem.getByText("2 failed attempts")).toHaveCount(1);
+  await expect(problem.getByText("1 failed attempt")).toHaveCount(1);
 
-  await problem.getByRole("button", { name: "Decrease Top attempts" }).click();
-  await expect(problem.getByText("2 attempts")).toHaveCount(2);
-  await expect(problem.getByText("1 attempt")).toHaveCount(1);
+  await saveAttempts(problem, "Top", 2);
+  await expect(problem.getByText("2 failed attempts")).toHaveCount(2);
+  await expect(problem.getByText("1 failed attempt")).toHaveCount(1);
 
-  await problem
-    .getByRole("button", { name: "Decrease Zone 2 attempts" })
-    .click();
-  await expect(problem.getByText("2 attempts")).toHaveCount(1);
-  await expect(problem.getByText("1 attempt")).toHaveCount(2);
+  await saveAttempts(problem, "Zone 2", 1);
+  await expect(problem.getByText("2 failed attempts")).toHaveCount(1);
+  await expect(problem.getByText("1 failed attempt")).toHaveCount(2);
 
-  await problem
-    .getByRole("button", { name: "Decrease Zone 1 attempts" })
-    .click();
-  await expect(problem.getByText("2 attempts")).toHaveCount(1);
-  await expect(problem.getByText("1 attempt")).toHaveCount(1);
+  await saveAttempts(problem, "Zone 1", 0);
+  await expect(problem.getByText("2 failed attempts")).toHaveCount(1);
+  await expect(problem.getByText("1 failed attempt")).toHaveCount(1);
   await expect(problem.getByText("0 attempts")).toHaveCount(1);
 
-  await problem.getByRole("button", { name: "Decrease Top attempts" }).click();
-  await expect(problem.getByText("1 attempt")).toHaveCount(2);
+  await saveAttempts(problem, "Top", 1);
+  await expect(problem.getByText("1 failed attempt")).toHaveCount(2);
   await expect(problem.getByText("0 attempts")).toHaveCount(1);
 });
 
