@@ -439,8 +439,14 @@ test("adjust attempts with inline editor", async ({ page }) => {
   await expect(problem).toBeVisible();
 
   await openTickDialog(problem);
+  await expect(
+    problem.getByRole("button", { name: "Edit Top attempts" }),
+  ).toHaveCount(0);
   await saveAttempts(problem, "Zone 1", 1);
   await expect(problem.getByText("1 failed attempt")).toHaveCount(3);
+  await expect(
+    problem.getByRole("button", { name: "Edit Top attempts" }),
+  ).toBeVisible();
 
   await saveAttempts(problem, "Zone 2", 2);
   await expect(problem.getByText("1 failed attempt")).toHaveCount(3);

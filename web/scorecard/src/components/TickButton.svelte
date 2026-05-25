@@ -111,15 +111,19 @@
           Save
         </wa-button>
       {:else}
-        <span class="attempts">{attemptLabel}</span>
-        <wa-button
-          size="xs"
-          appearance="plain"
-          aria-label={`Edit ${label} attempts`}
-          onclick={handleEditAttempts}
-        >
-          <wa-icon name="pen" label={`Edit ${label} attempts`}></wa-icon>
-        </wa-button>
+        <div class="attempt-display">
+          <span class="attempts">{attemptLabel}</span>
+          {#if attempts > 0}
+            <wa-button
+              size="xs"
+              appearance="plain"
+              aria-label={`Edit ${label} attempts`}
+              onclick={handleEditAttempts}
+            >
+              <wa-icon name="pen" label={`Edit ${label} attempts`}></wa-icon>
+            </wa-button>
+          {/if}
+        </div>
       {/if}
     </div>
   </div>
@@ -176,5 +180,11 @@
     gap: var(--wa-space-2xs);
     grid-area: attempts;
     min-width: 0;
+  }
+
+  .attempt-display {
+    display: flex;
+    align-items: center;
+    gap: 0;
   }
 </style>
