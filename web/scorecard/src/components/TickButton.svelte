@@ -100,7 +100,6 @@
         bind:this={attemptInput}
         size="xs"
         appearance="outlined"
-        without-steppers
         min={minimumAttempts}
         step="1"
         value={attempts}
