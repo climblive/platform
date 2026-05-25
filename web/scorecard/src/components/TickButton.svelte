@@ -159,8 +159,4 @@
     align-items: center;
     gap: var(--wa-space-2xs);
   }
-
-  wa-number-input {
-    max-inline-size: 5.5rem;
-  }
 </style>
