@@ -41,7 +41,9 @@ const saveAttempts = async (
   option: "Top" | "Zone 1" | "Zone 2",
   attempts: number,
 ) => {
-  await problem.getByRole("button", { name: `Edit ${option} attempts` }).click();
+  await problem
+    .getByRole("button", { name: `Edit ${option} attempts` })
+    .click();
   await problem
     .locator(`wa-number-input[aria-label="${option} attempts"]`)
     .evaluate((element, value) => {
@@ -49,7 +51,9 @@ const saveAttempts = async (
       input.value = String(value);
       input.dispatchEvent(new CustomEvent("wa-input", { bubbles: true }));
     }, attempts);
-  await problem.getByRole("button", { name: `Save ${option} attempts` }).click();
+  await problem
+    .getByRole("button", { name: `Save ${option} attempts` })
+    .click();
 };
 
 const closeTickDialog = async (page: Page) => {

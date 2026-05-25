@@ -70,67 +70,69 @@
 </script>
 
 <section data-checked={checked}>
-  <wa-checkbox
-    class:checked-state={checked}
-    size="s"
-    {checked}
-    {indeterminate}
-    {disabled}
-    aria-label={label}
-    onclick={(event: Event) => {
-      if (disabled) {
-        event.preventDefault();
-        return;
-      }
+  <div class="details">
+    <wa-checkbox
+      class:checked-state={checked}
+      size="s"
+      {checked}
+      {indeterminate}
+      {disabled}
+      aria-label={label}
+      onclick={(event: Event) => {
+        if (disabled) {
+          event.preventDefault();
+          return;
+        }
 
-      event.preventDefault();
-      onClick(event as MouseEvent);
-    }}
-  >
-    {label}
-  </wa-checkbox>
+        event.preventDefault();
+        onClick(event as MouseEvent);
+      }}
+    >
+      {label}
+    </wa-checkbox>
+
+    <div class="attempt-controls">
+      {#if editingAttempts}
+        <wa-number-input
+          bind:this={attemptInput}
+          size="xs"
+          appearance="outlined"
+          min={minimumAttempts}
+          step="1"
+          value={attempts}
+          aria-label={`${label} attempts`}
+        ></wa-number-input>
+        <wa-button
+          size="xs"
+          appearance="outlined"
+          aria-label={`Save ${label} attempts`}
+          onclick={handleSaveAttempts}
+        >
+          Save
+        </wa-button>
+      {:else}
+        <span class="attempts">{attemptLabel}</span>
+        <wa-button
+          size="xs"
+          appearance="plain"
+          aria-label={`Edit ${label} attempts`}
+          onclick={handleEditAttempts}
+        >
+          <wa-icon name="pen" label={`Edit ${label} attempts`}></wa-icon>
+        </wa-button>
+      {/if}
+    </div>
+  </div>
 
   {#if points !== undefined}
     <span class="points">{points}p</span>
   {/if}
-
-  <div class="attempt-controls">
-    {#if editingAttempts}
-      <wa-number-input
-        bind:this={attemptInput}
-        size="xs"
-        appearance="outlined"
-        min={minimumAttempts}
-        step="1"
-        value={attempts}
-        aria-label={`${label} attempts`}
-      ></wa-number-input>
-      <wa-button
-        size="xs"
-        appearance="outlined"
-        aria-label={`Save ${label} attempts`}
-        onclick={handleSaveAttempts}
-      >
-        Save
-      </wa-button>
-    {:else}
-      <span class="attempts">{attemptLabel}</span>
-      <wa-button
-        size="xs"
-        appearance="plain"
-        aria-label={`Edit ${label} attempts`}
-        onclick={handleEditAttempts}
-      >
-        <wa-icon name="pen" label={`Edit ${label} attempts`}></wa-icon>
-      </wa-button>
-    {/if}
-  </div>
 </section>
 
 <style>
   section {
     display: grid;
-    grid-template-columns: max-content 1fr;
+    grid-template-columns: 1fr max-content;
 
     border: var(--wa-border-width-s) var(--wa-border-style)
       var(--wa-color-neutral-border-normal);
@@ -143,6 +145,20 @@
     &[data-checked="true"] {
       border-color: var(--wa-color-green-50);
     }
+  }
+
+  .details {
+    display: grid;
+    grid-template-columns: 1.5rem 1fr;
+    grid-template-areas:
+      "checkbox checkbox"
+      ". attempts";
+    row-gap: var(--wa-space-2xs);
+    min-width: 0;
+  }
+
+  wa-checkbox {
+    grid-area: checkbox;
   }
 
   .points {
@@ -158,5 +174,7 @@
     display: flex;
     align-items: center;
     gap: var(--wa-space-2xs);
+    grid-area: attempts;
+    min-width: 0;
   }
 </style>
