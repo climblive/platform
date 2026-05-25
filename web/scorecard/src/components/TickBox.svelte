@@ -173,6 +173,36 @@
     }
   };
 
+  const normalizeUnreachedAttempts = (
+    nextTick: Omit<Tick, "id" | "timestamp">,
+  ) => {
+    const unreachedFeatures = attemptFeatures.filter(
+      (feature) => !nextTick[feature],
+    );
+
+    if (unreachedFeatures.length < 2) {
+      return;
+    }
+
+    const sharedAttempts = unreachedFeatures.reduce(
+      (minimum, feature) =>
+        Math.min(minimum, nextTick[getAttemptField(feature)]),
+      Number.POSITIVE_INFINITY,
+    );
+    const minimumSharedAttempts = attemptFeatures
+      .filter((feature) => nextTick[feature])
+      .reduce(
+        (maximum, feature) =>
+          Math.max(maximum, nextTick[getAttemptField(feature)]),
+        0,
+      );
+    const normalizedAttempts = Math.max(sharedAttempts, minimumSharedAttempts);
+
+    for (const feature of unreachedFeatures) {
+      nextTick[getAttemptField(feature)] = normalizedAttempts;
+    }
+  };
+
   const putNextTick = (nextTick: Omit<Tick, "id" | "timestamp">) => {
     putTick.mutate(nextTick, {
       onError: (error) => {
@@ -193,6 +223,7 @@
     const nextTick = getNextTick();
 
     incrementAttempts(nextTick);
+    normalizeUnreachedAttempts(nextTick);
     putNextTick(nextTick);
   };
 
@@ -217,6 +248,7 @@
     );
 
     syncAttemptCounts(nextTick, feature);
+    normalizeUnreachedAttempts(nextTick);
     putNextTick(nextTick);
   };
 
@@ -242,6 +274,7 @@
           nextTick.zone1 = false;
       }
 
+      normalizeUnreachedAttempts(nextTick);
       putNextTick(nextTick);
       return;
     }
@@ -262,6 +295,7 @@
         nextTick.zone1 = true;
     }
 
+    normalizeUnreachedAttempts(nextTick);
     putNextTick(nextTick);
   };
 </script>

@@ -443,30 +443,22 @@ test("adjust attempts with inline editor", async ({ page }) => {
   await expect(problem.getByText("1 failed attempt")).toHaveCount(3);
 
   await saveAttempts(problem, "Zone 2", 2);
+  await expect(problem.getByText("1 failed attempt")).toHaveCount(3);
+
+  await clickTickOption(problem, "Zone 1");
   await expect(problem.getByText("2 failed attempts")).toHaveCount(2);
-  await expect(problem.getByText("1 failed attempt")).toHaveCount(1);
+  await expect(problem.getByText("2 attempts")).toHaveCount(1);
 
   await saveAttempts(problem, "Top", 3);
-  await expect(problem.getByText("3 failed attempts")).toHaveCount(1);
-  await expect(problem.getByText("2 failed attempts")).toHaveCount(1);
-  await expect(problem.getByText("1 failed attempt")).toHaveCount(1);
-
-  await saveAttempts(problem, "Top", 2);
   await expect(problem.getByText("2 failed attempts")).toHaveCount(2);
-  await expect(problem.getByText("1 failed attempt")).toHaveCount(1);
+  await expect(problem.getByText("2 attempts")).toHaveCount(1);
 
-  await saveAttempts(problem, "Zone 2", 1);
-  await expect(problem.getByText("2 failed attempts")).toHaveCount(1);
-  await expect(problem.getByText("1 failed attempt")).toHaveCount(2);
+  await saveAttempts(problem, "Zone 2", 4);
+  await expect(problem.getByText("4 failed attempts")).toHaveCount(2);
+  await expect(problem.getByText("2 attempts")).toHaveCount(1);
 
-  await saveAttempts(problem, "Zone 1", 0);
-  await expect(problem.getByText("2 failed attempts")).toHaveCount(1);
-  await expect(problem.getByText("1 failed attempt")).toHaveCount(1);
-  await expect(problem.getByText("0 attempts")).toHaveCount(1);
-
-  await saveAttempts(problem, "Top", 1);
-  await expect(problem.getByText("1 failed attempt")).toHaveCount(2);
-  await expect(problem.getByText("0 attempts")).toHaveCount(1);
+  await clickTickOption(problem, "Zone 1");
+  await expect(problem.getByText("2 failed attempts")).toHaveCount(3);
 });
 
 test("info tab", async ({ page }) => {
