@@ -59,6 +59,28 @@
   <PooledPoints {contest} />
 
   <ProblemLimit {contest} />
+
+  <RuleOptionCard
+    title="Max attempts"
+    description="Each contender has a fixed number of attempts per problem. Attempts above that limit yield 0 points for that problem."
+    disabled
+    tag="Upcoming"
+  >
+    {#snippet header()}
+      <wa-checkbox size="s" disabled></wa-checkbox>
+    {/snippet}
+  </RuleOptionCard>
+
+  <RuleOptionCard
+    title="Point deduction"
+    description="Deduct points for each failed attempt."
+    disabled
+    tag="Upcoming"
+  >
+    {#snippet header()}
+      <wa-checkbox size="s" disabled></wa-checkbox>
+    {/snippet}
+  </RuleOptionCard>
 </section>
 
 <style>
