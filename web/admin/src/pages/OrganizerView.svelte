@@ -5,7 +5,7 @@
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import { value } from "@climblive/lib/forms";
+  import { checked, value } from "@climblive/lib/forms";
   import { getSelfQuery } from "@climblive/lib/queries";
   import { getContext } from "svelte";
   import { Link, navigate } from "svelte-routing";
@@ -96,7 +96,7 @@
   <div class="controls">
     <div>
       {#if self?.admin}
-        <wa-switch size="s" bind:this={showAllToggle} onchange={toggleShowAll}
+        <wa-switch size="s" bind:this={showAllToggle} {@attach checked(showAll)} onchange={toggleShowAll}
           >Show all</wa-switch
         >
       {/if}
