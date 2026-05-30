@@ -28,6 +28,8 @@
 
   let { organizerId }: Props = $props();
 
+  let showArchived = $state(false);
+
   const time = new SyncedTime(60_000);
 
   onMount(() => {
@@ -51,8 +53,6 @@
   const contests = $derived(
     organizerId === undefined ? allContestsQuery.data : contestsQuery.data,
   );
-
-  let showArchived = $derived(self?.admin ?? false);
 
   const [ongoing, upcoming, past, archived] = $derived.by(() => {
     const now = time.current;
