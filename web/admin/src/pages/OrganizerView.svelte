@@ -96,8 +96,11 @@
   <div class="controls">
     <div>
       {#if self?.admin}
-        <wa-switch size="s" bind:this={showAllToggle} {@attach checked(showAll)} onchange={toggleShowAll}
-          >Show all</wa-switch
+        <wa-switch
+          size="s"
+          bind:this={showAllToggle}
+          {@attach checked(showAll)}
+          onchange={toggleShowAll}>Show all</wa-switch
         >
       {/if}
     </div>
