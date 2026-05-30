@@ -22,12 +22,13 @@
   const selectedOrganizerId =
     getContext<Writable<number | undefined>>("selectedOrganizer");
 
-  let showAll = $state(false);
   let showAllToggle: WaSwitch | undefined = $state();
 
   const selfQuery = $derived(getSelfQuery());
 
   const self = $derived(selfQuery.data);
+
+  let showAll = $derived(self?.admin === true);
 
   let select: WaSelect | undefined = $state();
 

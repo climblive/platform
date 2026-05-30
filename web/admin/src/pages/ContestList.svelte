@@ -2,7 +2,6 @@
   import Loader from "@/components/Loader.svelte";
   import RelativeTime from "@/components/RelativeTime.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
   import {
     EmptyState,
