@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-24.04
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
-      options: --ipc=host --network host
+      options: --ipc=host --add-host=host.docker.internal:host-gateway
     permissions:
       contents: read
 
@@ -85,6 +85,9 @@ jobs:
       - name: Run Playwright tests
         run: make test-ci
         working-directory: web/e2e
+        env:
+          BASE_URL: https://host.docker.internal:8443
+          TESTCONTAINERS_HOST_OVERRIDE: host.docker.internal
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
