@@ -32,7 +32,7 @@ test.beforeAll(async () => {
     .start();
 
   dbConnection = await createConnection({
-    host: "localhost",
+    host: startedDbContainer.getHost(),
     port: startedDbContainer.getMappedPort(3306),
     user: "climblive",
     password: "secretpassword",
