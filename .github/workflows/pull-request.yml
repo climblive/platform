@@ -53,6 +53,7 @@ jobs:
     name: Run E2E tests
     timeout-minutes: 30
     runs-on: ubuntu-24.04
+    needs: [build-backend]
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
       options: --ipc=host --add-host=host.docker.internal:host-gateway
@@ -72,9 +73,12 @@ jobs:
           cache: pnpm
           cache-dependency-path: web/pnpm-lock.yaml
 
-      - uses: actions/setup-go@v5
+      - uses: actions/download-artifact@v4
         with:
-          go-version-file: "backend/go.mod"
+          name: backend
+          path: backend
+
+      - run: chmod +x backend/climblive
 
       - name: Install system dependencies
         run: apt-get update && apt-get install -y docker.io make openssl
@@ -89,7 +93,6 @@ jobs:
           HOME: /root
           BASE_URL: https://host.docker.internal:8443
           TESTCONTAINERS_HOST_OVERRIDE: host.docker.internal
-          GOFLAGS: -buildvcs=false
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
