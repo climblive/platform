@@ -86,6 +86,7 @@ jobs:
         run: make test-ci
         working-directory: web/e2e
         env:
+          HOME: /root
           BASE_URL: https://host.docker.internal:8443
           TESTCONTAINERS_HOST_OVERRIDE: host.docker.internal
           GOFLAGS: -buildvcs=false
