@@ -76,8 +76,8 @@ jobs:
         with:
           go-version-file: "backend/go.mod"
 
-      - name: Install Docker CLI
-        run: apt-get update && apt-get install -y docker.io
+      - name: Install system dependencies
+        run: apt-get update && apt-get install -y docker.io make openssl
 
       - run: pnpm i
         working-directory: web/e2e
