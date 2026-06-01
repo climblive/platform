@@ -9,10 +9,42 @@ import type { ContestID, ScoreEngineInstanceID } from "../models";
 import type { StartScoreEngineArguments } from "../models/rest";
 import { HOUR } from "./constants";
 
+export type RunningScoreEngine = {
+  contestId: ContestID;
+  instanceId: ScoreEngineInstanceID;
+};
+
 export const getScoreEnginesQuery = (contestId: ContestID) =>
   createQuery(() => ({
     queryKey: ["score-engines", { contestId }],
     queryFn: async () => ApiClient.getInstance().getScoreEngines(contestId),
+    retry: false,
+    gcTime: 12 * HOUR,
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+  }));
+
+export const getRunningScoreEnginesQuery = (
+  contestIds: ContestID[] | undefined,
+) =>
+  createQuery(() => ({
+    queryKey: ["score-engines", "all", contestIds ?? []],
+    queryFn: async () => {
+      const scoreEngines = await Promise.all(
+        (contestIds ?? []).map(async (contestId) => ({
+          contestId,
+          instanceIds: await ApiClient.getInstance().getScoreEngines(contestId),
+        })),
+      );
+
+      return scoreEngines.flatMap(({ contestId, instanceIds }) =>
+        instanceIds.map((instanceId) => ({
+          contestId,
+          instanceId,
+        })),
+      );
+    },
+    enabled: contestIds !== undefined,
     retry: false,
     gcTime: 12 * HOUR,
     staleTime: 0,
@@ -30,6 +62,20 @@ export const startScoreEngineMutation = (contestId: number) => {
 
       client.setQueryData<ScoreEngineInstanceID[]>(queryKey, (oldEngines) =>
         oldEngines ? [...oldEngines, newEngine] : [newEngine],
+      );
+
+      client.setQueriesData<RunningScoreEngine[]>(
+        {
+          queryKey: ["score-engines", "all"],
+          exact: false,
+        },
+        (oldEngines) => {
+          if (oldEngines?.some(({ instanceId }) => instanceId === newEngine)) {
+            return oldEngines;
+          }
+
+          return [...(oldEngines ?? []), { contestId, instanceId: newEngine }];
+        },
       );
     },
   }));
@@ -53,6 +99,15 @@ export const stopScoreEngineMutation = () => {
           oldEngines
             ? oldEngines.filter((instanceId) => instanceId !== variables)
             : undefined,
+      );
+
+      client.setQueriesData<RunningScoreEngine[]>(
+        {
+          queryKey: ["score-engines", "all"],
+          exact: false,
+        },
+        (oldEngines) =>
+          oldEngines?.filter(({ instanceId }) => instanceId !== variables),
       );
     },
   }));

@@ -5,6 +5,8 @@ import type {
   ContenderPublicInfoUpdatedEvent,
   ContenderScoreUpdatedEvent,
   RaffleWinnerDrawnEvent,
+  ScoreEngineStartedEvent,
+  ScoreEngineStoppedEvent,
 } from "./generated";
 
 export const contenderPublicInfoUpdatedEventSchema: z.ZodType<ContenderPublicInfoUpdatedEvent> =
@@ -53,4 +55,14 @@ export const raffleWinnerDrawnEventSchema: z.ZodType<RaffleWinnerDrawnEvent> =
     raffleId: z.number(),
     contenderId: z.number(),
     timestamp: z.coerce.date(),
+  });
+
+export const scoreEngineStartedEventSchema: z.ZodType<ScoreEngineStartedEvent> =
+  z.object({
+    instanceId: z.string().uuid(),
+  });
+
+export const scoreEngineStoppedEventSchema: z.ZodType<ScoreEngineStoppedEvent> =
+  z.object({
+    instanceId: z.string().uuid(),
   });
