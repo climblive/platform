@@ -53,6 +53,10 @@ jobs:
     name: Run E2E tests
     timeout-minutes: 30
     runs-on: ubuntu-24.04
+    needs: [build-backend]
+    container:
+      image: mcr.microsoft.com/playwright:v1.59.1-noble
+      options: --ipc=host --add-host=host.docker.internal:host-gateway
     permissions:
       contents: read
 
@@ -69,16 +73,26 @@ jobs:
           cache: pnpm
           cache-dependency-path: web/pnpm-lock.yaml
 
-      - run: pnpm i
-        working-directory: web/e2e
+      - uses: actions/download-artifact@v4
+        with:
+          name: backend
+          path: backend
 
-      - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps
+      - run: chmod +x backend/climblive
+
+      - name: Install system dependencies
+        run: apt-get update && apt-get install -y docker.io make openssl
+
+      - run: pnpm i
         working-directory: web/e2e
 
       - name: Run Playwright tests
         run: make test-ci
         working-directory: web/e2e
+        env:
+          HOME: /root
+          BASE_URL: https://host.docker.internal:8443
+          TESTCONTAINERS_HOST_OVERRIDE: host.docker.internal
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
