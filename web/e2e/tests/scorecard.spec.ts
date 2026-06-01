@@ -81,7 +81,7 @@ test.beforeAll(async () => {
     .start();
 
   dbConnection = await createConnection({
-    host: "localhost",
+    host: startedDbContainer.getHost(),
     port: startedDbContainer.getMappedPort(3306),
     user: "climblive",
     password: "secretpassword",
@@ -109,11 +109,10 @@ test.beforeAll(async () => {
       TLS_WWW_KEY_FILE: "/certs/key.pem",
     })
     .withNetwork(network)
-    .withBindMounts([
+    .withCopyDirectoriesToContainer([
       {
         source: path.resolve(__dirname, "../.local/certs"),
         target: "/certs",
-        mode: "ro",
       },
     ])
     .withExposedPorts({ container: 443, host: 8443 })
