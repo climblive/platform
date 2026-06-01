@@ -24,8 +24,11 @@ web:
 	cp -r ../scorecard/dist $(WEB_DIR)/scorecard
 	cp -r ../www/dist $(WEB_DIR)/www
 
-images: certs web
-	cd ../../backend && CGO_ENABLED=0 go build -o ./climblive ./cmd/api
+images: certs
+	@if [ ! -f ../../backend/climblive ]; then \
+		$(MAKE) web; \
+		cd ../../backend && CGO_ENABLED=0 go build -o ./climblive ./cmd/api; \
+	fi
 	docker build ../../backend -t climblive-api:latest
 
 test: images
