@@ -60,10 +60,11 @@ test.beforeAll(async () => {
       TLS_WWW_KEY_FILE: "/certs/key.pem",
     })
     .withNetwork(network)
-    .withCopyDirectoriesToContainer([
+    .withBindMounts([
       {
         source: path.resolve(__dirname, "../.local/certs"),
         target: "/certs",
+        mode: "ro",
       },
     ])
     .withExposedPorts({ container: 443, host: 8443 })
