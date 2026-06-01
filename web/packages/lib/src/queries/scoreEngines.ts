@@ -24,27 +24,10 @@ export const getScoreEnginesQuery = (contestId: ContestID) =>
     refetchOnWindowFocus: true,
   }));
 
-export const getRunningScoreEnginesQuery = (
-  contestIds: ContestID[] | undefined,
-) =>
+export const getRunningScoreEnginesQuery = () =>
   createQuery(() => ({
-    queryKey: ["score-engines", "all", contestIds ?? []],
-    queryFn: async () => {
-      const scoreEngines = await Promise.all(
-        (contestIds ?? []).map(async (contestId) => ({
-          contestId,
-          instanceIds: await ApiClient.getInstance().getScoreEngines(contestId),
-        })),
-      );
-
-      return scoreEngines.flatMap(({ contestId, instanceIds }) =>
-        instanceIds.map((instanceId) => ({
-          contestId,
-          instanceId,
-        })),
-      );
-    },
-    enabled: contestIds !== undefined,
+    queryKey: ["score-engines", "all"],
+    queryFn: async () => ApiClient.getInstance().getRunningScoreEngines(),
     retry: false,
     gcTime: 12 * HOUR,
     staleTime: 0,

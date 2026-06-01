@@ -5,7 +5,6 @@
   import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { useQueryClient } from "@tanstack/svelte-query";
   import {
     EmptyState,
     Table,
@@ -13,18 +12,13 @@
   } from "@climblive/lib/components";
   import type { Contest, ServiceStatus } from "@climblive/lib/models";
   import {
-    scoreEngineStartedEventSchema,
-    scoreEngineStoppedEventSchema,
-  } from "@climblive/lib/models";
-  import {
-    getAllContestsQuery,
+    getContestsQuery,
     getHealthQuery,
     getRunningScoreEnginesQuery,
     getVersionQuery,
     stopScoreEngineMutation,
     type RunningScoreEngine,
   } from "@climblive/lib/queries";
-  import { getApiUrl } from "@climblive/lib/utils";
   import { Link } from "svelte-routing";
 
   const columns: ColumnDefinition<ServiceStatus>[] = [
@@ -78,14 +72,13 @@
   const health = $derived(healthQuery.data);
   const versionQuery = $derived(getVersionQuery());
   const version = $derived(versionQuery.data);
-  const contestsQuery = $derived(getAllContestsQuery());
-  const contests = $derived(contestsQuery.data);
-
-  const contestIds = $derived(contests?.map(({ id }) => id));
-  const runningScoreEnginesQuery = $derived(
-    getRunningScoreEnginesQuery(contestIds),
-  );
+  const runningScoreEnginesQuery = $derived(getRunningScoreEnginesQuery());
   const runningScoreEngines = $derived(runningScoreEnginesQuery.data);
+  const contestIds = $derived(
+    runningScoreEngines?.map(({ contestId }) => contestId),
+  );
+  const contestsQuery = $derived(getContestsQuery(contestIds));
+  const contests = $derived(contestsQuery.data);
 
   const runningScoreEngineRows = $derived.by(() => {
     const rows = (runningScoreEngines ?? []).map((engine) => ({
@@ -94,12 +87,9 @@
     }));
 
     rows.sort((left, right) => left.contestId - right.contestId);
-
     return rows;
   });
-
   const allHealthy = $derived(health?.every(({ healthy }) => healthy));
-  const queryClient = useQueryClient();
   const stopScoreEngine = stopScoreEngineMutation();
 
   let confirmStopEngineId = $state<string | undefined>(undefined);
@@ -126,75 +116,6 @@
     ) {
       confirmStopEngineId = undefined;
     }
-  });
-
-  $effect(() => {
-    if (!contests) {
-      return;
-    }
-
-    const eventSources = contests.map((contest) => {
-      const eventSource = new EventSource(
-        `${getApiUrl()}/contests/${contest.id}/events`,
-      );
-
-      eventSource.addEventListener("SCORE_ENGINE_STARTED", (event) => {
-        const scoreEngineStartedEvent = scoreEngineStartedEventSchema.parse(
-          JSON.parse((event as MessageEvent<string>).data),
-        );
-
-        queryClient.setQueriesData<RunningScoreEngine[]>(
-          {
-            queryKey: ["score-engines", "all"],
-            exact: false,
-          },
-          (oldEngines) => {
-            if (
-              oldEngines?.some(
-                ({ instanceId }) =>
-                  instanceId === scoreEngineStartedEvent.instanceId,
-              )
-            ) {
-              return oldEngines;
-            }
-
-            return [
-              ...(oldEngines ?? []),
-              {
-                contestId: contest.id,
-                instanceId: scoreEngineStartedEvent.instanceId,
-              },
-            ];
-          },
-        );
-      });
-
-      eventSource.addEventListener("SCORE_ENGINE_STOPPED", (event) => {
-        const scoreEngineStoppedEvent = scoreEngineStoppedEventSchema.parse(
-          JSON.parse((event as MessageEvent<string>).data),
-        );
-
-        queryClient.setQueriesData<RunningScoreEngine[]>(
-          {
-            queryKey: ["score-engines", "all"],
-            exact: false,
-          },
-          (oldEngines) =>
-            oldEngines?.filter(
-              ({ instanceId }) =>
-                instanceId !== scoreEngineStoppedEvent.instanceId,
-            ),
-        );
-      });
-
-      return eventSource;
-    });
-
-    return () => {
-      for (const eventSource of eventSources) {
-        eventSource.close();
-      }
-    };
   });
 </script>
 

@@ -173,6 +173,14 @@ func TestScoreEngineManager(t *testing.T) {
 			ContestID:  fakedContestID,
 		}}, instances)
 
+		allInstances, err := mngr.ListScoreEngines(context.Background())
+
+		require.NoError(t, err)
+		assert.ElementsMatch(t, []scores.ScoreEngineDescriptor{{
+			InstanceID: instanceID,
+			ContestID:  fakedContestID,
+		}}, allInstances)
+
 		err = mngr.StopScoreEngine(context.Background(), instanceID)
 
 		require.NoError(t, err)
@@ -186,6 +194,11 @@ func TestScoreEngineManager(t *testing.T) {
 
 		require.NoError(t, err)
 		require.Len(t, instances, 0)
+
+		allInstances, err = mngr.ListScoreEngines(context.Background())
+
+		require.NoError(t, err)
+		require.Len(t, allInstances, 0)
 
 		cancel()
 

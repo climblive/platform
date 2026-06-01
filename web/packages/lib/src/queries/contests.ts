@@ -30,6 +30,40 @@ export const getAllContestsQuery = (
     queryFn: async () => ApiClient.getInstance().getAllContests(),
   }));
 
+export const getContestsQuery = (
+  contestIds: number[] | undefined,
+  options?: Partial<Parameters<typeof createQuery<Contest[]>>[0]>,
+) => {
+  const client = useQueryClient();
+
+  return createQuery(() => {
+    const ids = [...new Set(contestIds ?? [])];
+
+    return {
+      ...options,
+      queryKey: ["contests", { ids }],
+      queryFn: async () => {
+        const contests = await Promise.all(
+          ids.map((contestId) => ApiClient.getInstance().getContest(contestId)),
+        );
+
+        for (const contest of contests) {
+          client.setQueryData<Contest>(
+            ["contest", { id: contest.id }],
+            contest,
+          );
+        }
+
+        return contests;
+      },
+      enabled: contestIds !== undefined,
+      retry: false,
+      gcTime: 12 * HOUR,
+      staleTime: 12 * HOUR,
+    };
+  });
+};
+
 export const getContestsByOrganizerQuery = (
   organizerId: number,
   options?: Partial<Parameters<typeof createQuery<Contest[]>>[0]>,
