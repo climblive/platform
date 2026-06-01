@@ -11,7 +11,7 @@ runs:
       with:
         go-version-file: "backend/go.mod"
 
-    - run: go build -ldflags "-X github.com/climblive/platform/backend/internal/handlers/rest.Version=${{ inputs.version }}" -o climblive ./cmd/api
+    - run: CGO_ENABLED=0 go build -ldflags "-X github.com/climblive/platform/backend/internal/handlers/rest.Version=${{ inputs.version }}" -o climblive ./cmd/api
       shell: bash
       working-directory: backend
 
