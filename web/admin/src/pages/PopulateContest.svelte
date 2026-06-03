@@ -20,7 +20,6 @@
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
 
-  const buttonId = $props.id();
   const primaryColors = [
     "#ef4444",
     "#f97316",
@@ -42,11 +41,9 @@
 
   type Props = {
     contestId: number;
-    disabled?: boolean;
-    disabledReason?: string;
   };
 
-  let { contestId, disabled = false, disabledReason }: Props = $props();
+  let { contestId }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
   let isRunning = $state(false);
@@ -95,10 +92,6 @@
   };
 
   const openDialog = () => {
-    if (disabled) {
-      return;
-    }
-
     completed = false;
     failed = false;
     progress = 0;
@@ -283,20 +276,10 @@
 </script>
 
 <div class="actions">
-  <wa-button
-    id={buttonId}
-    appearance="outlined"
-    {disabled}
-    onclick={openDialog}
-  >
+  <wa-button appearance="outlined" onclick={openDialog}>
     Populate contest
     <wa-icon name="plus" slot="start"></wa-icon>
   </wa-button>
-  {#if disabled && disabledReason}
-    <wa-tooltip for={buttonId} placement="top-start"
-      >{disabledReason}</wa-tooltip
-    >
-  {/if}
 </div>
 
 <wa-dialog

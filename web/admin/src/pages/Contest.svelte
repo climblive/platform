@@ -9,10 +9,8 @@
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
-    getCompClassesQuery,
     getContendersByContestQuery,
     getContestQuery,
-    getProblemsQuery,
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
@@ -35,15 +33,10 @@
 
   let problemsHeading: HTMLHeadingElement | undefined = $state();
   let compClassesHeading: HTMLHeadingElement | undefined = $state();
-  const populateButtonId = $props.id();
 
   const contestQuery = $derived(getContestQuery(contestId));
-  const compClassesQuery = $derived(getCompClassesQuery(contestId));
-  const problemsQuery = $derived(getProblemsQuery(contestId));
 
   const contest = $derived(contestQuery.data);
-  const compClasses = $derived(compClassesQuery.data);
-  const problems = $derived(problemsQuery.data);
 
   $effect(() => {
     const hash = window.location.hash.substring(1);
@@ -79,28 +72,6 @@
 
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
   const contenders = $derived(contendersQuery.data);
-
-  const populateDisabledReason = $derived.by(() => {
-    if (
-      compClasses === undefined ||
-      problems === undefined ||
-      contenders === undefined
-    ) {
-      return "Checking contest contents.";
-    }
-
-    if (
-      compClasses.length > 0 ||
-      problems.length > 0 ||
-      contenders.length > 0
-    ) {
-      return "Only available for empty contests.";
-    }
-
-    return undefined;
-  });
-
-  const populateDisabled = $derived(populateDisabledReason !== undefined);
 
   const handleDownloadSimulatorConfig = () => {
     const registrationCodes = contenders?.map((c) => c.registrationCode) ?? [];
@@ -208,12 +179,8 @@
             >Download simulator config
             <wa-icon name="download" slot="start"></wa-icon>
           </wa-button>
-          <PopulateContest
-            id={populateButtonId}
-            {contestId}
-            disabled={populateDisabled}
-            disabledReason={populateDisabledReason}
-          />
+
+          <PopulateContest {contestId} />
         </div>
       {/if}
       <h3>Score Engines</h3>
