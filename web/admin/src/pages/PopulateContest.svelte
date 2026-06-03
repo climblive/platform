@@ -4,7 +4,9 @@
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
+  import "@awesome.me/webawesome/dist/components/slider/slider.js";
   import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
   import type {
     CompClassTemplate,
@@ -37,8 +39,6 @@
     "#d946ef",
     "#ec4899",
   ] as const;
-  const totalProblems = 50;
-  const totalSteps = 53;
 
   type Props = {
     contestId: number;
@@ -56,9 +56,43 @@
   let completedSteps = $state(0);
   let status = $state("Ready to create classes, problems, and tickets.");
 
+  let problemCount = $state(50);
+  let ticketCount = $state(200);
+  let problemMinPoints = $state(25);
+  let problemMaxPoints = $state(300);
+  let flashBonusPercentage = $state(5);
+  let zone1Percentage = $state(15);
+  let zone2Percentage = $state(20);
+
+  const totalSteps = $derived(2 + problemCount + (ticketCount > 0 ? 1 : 0));
+
+  const summary = $derived.by(() => {
+    return `This will add 2 classes, ${problemCount} seeded problem${
+      problemCount === 1 ? "" : "s"
+    }, and ${ticketCount} ticket${ticketCount === 1 ? "" : "s"} to this contest.`;
+  });
+
+  const scoringSummary = $derived.by(() => {
+    return `Problems will range from ${problemMinPoints} to ${problemMaxPoints} points, with a ${flashBonusPercentage}% flash bonus on some climbs, ${zone1Percentage}% zone 1 points on some climbs, and ${zone2Percentage}% zone 2 points on some climbs.`;
+  });
+
   const createCompClass = $derived(createCompClassMutation(contestId));
   const createProblem = $derived(createProblemMutation(contestId));
   const createContenders = $derived(createContendersMutation(contestId));
+
+  const clamp = (value: number, min: number, max: number) => {
+    return Math.min(max, Math.max(min, value));
+  };
+
+  const readInteger = (value: string | number, fallback: number) => {
+    const parsed = Number(value);
+
+    if (Number.isNaN(parsed)) {
+      return fallback;
+    }
+
+    return Math.round(parsed);
+  };
 
   const openDialog = () => {
     if (disabled) {
@@ -89,11 +123,26 @@
   const setProgress = (nextStatus: string, nextCompletedSteps: number) => {
     status = nextStatus;
     completedSteps = nextCompletedSteps;
-    progress = (nextCompletedSteps / totalSteps) * 100;
+    progress = totalSteps === 0 ? 100 : (nextCompletedSteps / totalSteps) * 100;
   };
 
   const getProblemPointsTop = (index: number) => {
-    return Math.round(25 + (275 * index) / (totalProblems - 1));
+    if (problemCount <= 1) {
+      return problemMaxPoints;
+    }
+
+    return Math.round(
+      problemMinPoints +
+        ((problemMaxPoints - problemMinPoints) * index) / (problemCount - 1),
+    );
+  };
+
+  const getPointsByPercentage = (pointsTop: number, percentage: number) => {
+    if (percentage <= 0) {
+      return 0;
+    }
+
+    return Math.max(1, Math.round(pointsTop * (percentage / 100)));
   };
 
   const getProblemTemplate = (index: number): ProblemTemplate => {
@@ -115,14 +164,14 @@
       zone1Enabled: hasZone1,
       zone2Enabled: hasZone2,
       pointsZone1: hasZone1
-        ? Math.max(1, Math.round(pointsTop * (hasZone2 ? 0.1 : 0.15)))
+        ? getPointsByPercentage(pointsTop, zone1Percentage)
         : undefined,
       pointsZone2: hasZone2
-        ? Math.max(1, Math.round(pointsTop * 0.2))
+        ? getPointsByPercentage(pointsTop, zone2Percentage)
         : undefined,
       pointsTop,
       flashBonus: hasFlashBonus
-        ? Math.max(1, Math.round(pointsTop * 0.05))
+        ? getPointsByPercentage(pointsTop, flashBonusPercentage)
         : undefined,
     };
   };
@@ -136,6 +185,49 @@
       timeBegin,
       timeEnd,
     }));
+  };
+
+  const handleProblemCountChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    problemCount = clamp(readInteger(target.value, problemCount), 1, 100);
+  };
+
+  const handleTicketCountChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    ticketCount = clamp(readInteger(target.value, ticketCount), 0, 500);
+  };
+
+  const handleFlashBonusChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    flashBonusPercentage = clamp(
+      readInteger(target.value, flashBonusPercentage),
+      0,
+      100,
+    );
+  };
+
+  const handleZone1Change = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    zone1Percentage = clamp(readInteger(target.value, zone1Percentage), 0, 100);
+  };
+
+  const handleZone2Change = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    zone2Percentage = clamp(readInteger(target.value, zone2Percentage), 0, 100);
+  };
+
+  const handleProblemValueRangeChange = (event: Event) => {
+    const target = event.target as HTMLElement & {
+      minValue: number;
+      maxValue: number;
+    };
+
+    problemMinPoints = clamp(Math.round(target.minValue), 0, 1000);
+    problemMaxPoints = clamp(
+      Math.round(target.maxValue),
+      problemMinPoints,
+      1000,
+    );
   };
 
   const handlePopulate = async () => {
@@ -159,20 +251,25 @@
         );
       }
 
-      for (let index = 0; index < totalProblems; index++) {
+      for (let index = 0; index < problemCount; index++) {
         await createProblem.mutateAsync(getProblemTemplate(index));
         setProgress(
-          `Created problem ${index + 1} of ${totalProblems}.`,
+          `Created problem ${index + 1} of ${problemCount}.`,
           compClasses.length + index + 1,
         );
       }
 
-      const args: CreateContendersArguments = {
-        number: 200,
-      };
+      if (ticketCount > 0) {
+        const args: CreateContendersArguments = {
+          number: ticketCount,
+        };
 
-      await createContenders.mutateAsync(args);
-      setProgress("Created 200 tickets.", totalSteps);
+        await createContenders.mutateAsync(args);
+        setProgress(`Created ${ticketCount} tickets.`, totalSteps);
+      } else {
+        setProgress("Skipped ticket creation.", totalSteps);
+      }
+
       completed = true;
       status = "Contest populated with classes, problems, and tickets.";
     } catch {
@@ -223,15 +320,81 @@
     </div>
   {:else}
     <div class="dialog-copy">
+      <p>{summary}</p>
       <p>
-        This will add 2 classes, 50 seeded problems, and 200 tickets to this
-        contest.
+        Both classes will start now and end in 12 hours. {scoringSummary}
       </p>
-      <p>
-        Both classes will start now and end in 12 hours. Problems will use
-        varied colors, point values from 25 to 300, flash bonuses on some
-        climbs, and zone scoring on some climbs.
-      </p>
+
+      <div class="controls">
+        <wa-number-input
+          size="s"
+          label="Number of problems"
+          min="1"
+          max="100"
+          value={problemCount.toString()}
+          onchange={handleProblemCountChange}
+        ></wa-number-input>
+
+        <wa-number-input
+          size="s"
+          label="Number of tickets"
+          min="0"
+          max="500"
+          value={ticketCount.toString()}
+          onchange={handleTicketCountChange}
+        ></wa-number-input>
+
+        <wa-number-input
+          size="s"
+          label="Flash bonus (%)"
+          min="0"
+          max="100"
+          value={flashBonusPercentage.toString()}
+          onchange={handleFlashBonusChange}
+        ></wa-number-input>
+
+        <wa-number-input
+          size="s"
+          label="Zone 1 (%)"
+          min="0"
+          max="100"
+          value={zone1Percentage.toString()}
+          onchange={handleZone1Change}
+        ></wa-number-input>
+
+        <wa-number-input
+          size="s"
+          label="Zone 2 (%)"
+          min="0"
+          max="100"
+          value={zone2Percentage.toString()}
+          onchange={handleZone2Change}
+        ></wa-number-input>
+      </div>
+
+      <div class="range">
+        <div class="range-header">
+          <span>Problem value range</span>
+          <small>{problemMinPoints} - {problemMaxPoints} pts</small>
+        </div>
+
+        <wa-slider
+          label="Problem value range"
+          hint="Set the minimum and maximum top points."
+          range
+          min="0"
+          max="1000"
+          min-value={problemMinPoints}
+          max-value={problemMaxPoints}
+          step="1"
+          with-tooltip
+          oninput={handleProblemValueRangeChange}
+        >
+          <span slot="reference">0</span>
+          <span slot="reference">500</span>
+          <span slot="reference">1000</span>
+        </wa-slider>
+      </div>
     </div>
   {/if}
 
@@ -275,14 +438,29 @@
   }
 
   .progress-content,
-  .dialog-copy {
+  .dialog-copy,
+  .range {
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-s);
   }
 
+  .controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: var(--wa-space-s);
+  }
+
+  .range-header {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--wa-space-s);
+    align-items: baseline;
+  }
+
   p,
-  small {
+  small,
+  span {
     margin: 0;
   }
 </style>
