@@ -7,6 +7,7 @@
   import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
   import "@awesome.me/webawesome/dist/components/slider/slider.js";
   import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
+  import { value } from "@climblive/lib/forms";
   import type {
     CompClassTemplate,
     CreateContendersArguments,
@@ -16,6 +17,8 @@
     createCompClassMutation,
     createContendersMutation,
     createProblemMutation,
+    getContendersByContestQuery,
+    getProblemsQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
 
@@ -44,6 +47,12 @@
 
   let { contestId }: Props = $props();
 
+  const contendersQuery = $derived(getContendersByContestQuery(contestId));
+  const problemsQuery = $derived(getProblemsQuery(contestId));
+
+  const contenders = $derived(contendersQuery.data);
+  const problems = $derived(problemsQuery.data);
+
   let dialog: WaDialog | undefined = $state();
   let isRunning = $state(false);
   let completed = $state(false);
@@ -51,8 +60,8 @@
   let progress = $state(0);
   let completedSteps = $state(0);
 
-  let problemCount = $state(50);
-  let ticketCount = $state(200);
+  let problemCount = $derived(Math.min(50, 100 - (problems?.length ?? 0)));
+  let ticketCount = $derived(Math.min(100, 500 - (contenders?.length ?? 0)));
   let problemMinPoints = $state(50);
   let problemMaxPoints = $state(300);
   let flashBonusPercentage = $state(5);
@@ -267,8 +276,8 @@
         size="s"
         label="Number of problems"
         min="1"
-        max="100"
-        value={problemCount.toString()}
+        max={100 - (problems?.length ?? 0)}
+        {@attach value(problemCount.toString())}
         onchange={handleProblemCountChange}
       ></wa-number-input>
 
@@ -276,8 +285,8 @@
         size="s"
         label="Number of tickets"
         min="0"
-        max="500"
-        value={ticketCount.toString()}
+        max={500 - (contenders?.length ?? 0)}
+        {@attach value(ticketCount.toString())}
         onchange={handleTicketCountChange}
       ></wa-number-input>
 
@@ -286,7 +295,7 @@
         label="Flash bonus"
         min="0"
         max="100"
-        value={flashBonusPercentage.toString()}
+        {@attach value(flashBonusPercentage.toString())}
         onchange={handleFlashBonusChange}
       >
         <span slot="end">%</span>
@@ -297,7 +306,7 @@
         label="Zone 1"
         min="0"
         max="100"
-        value={zone1Percentage.toString()}
+        {@attach value(zone1Percentage.toString())}
         onchange={handleZone1Change}
       >
         <span slot="end">%</span>
@@ -308,7 +317,7 @@
         label="Zone 2"
         min="0"
         max="100"
-        value={zone2Percentage.toString()}
+        {@attach value(zone2Percentage.toString())}
         onchange={handleZone2Change}
       >
         <span slot="end">%</span>
