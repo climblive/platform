@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { type WaHideEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
@@ -51,27 +50,16 @@
   let failed = $state(false);
   let progress = $state(0);
   let completedSteps = $state(0);
-  let status = $state("Ready to create classes, problems, and tickets.");
 
   let problemCount = $state(50);
   let ticketCount = $state(200);
-  let problemMinPoints = $state(25);
+  let problemMinPoints = $state(50);
   let problemMaxPoints = $state(300);
   let flashBonusPercentage = $state(5);
   let zone1Percentage = $state(15);
   let zone2Percentage = $state(20);
 
   const totalSteps = $derived(2 + problemCount + (ticketCount > 0 ? 1 : 0));
-
-  const summary = $derived.by(() => {
-    return `This will add 2 classes, ${problemCount} seeded problem${
-      problemCount === 1 ? "" : "s"
-    }, and ${ticketCount} ticket${ticketCount === 1 ? "" : "s"} to this contest.`;
-  });
-
-  const scoringSummary = $derived.by(() => {
-    return `Problems will range from ${problemMinPoints} to ${problemMaxPoints} points, with a ${flashBonusPercentage}% flash bonus on some climbs, ${zone1Percentage}% zone 1 points on some climbs, and ${zone2Percentage}% zone 2 points on some climbs.`;
-  });
 
   const createCompClass = $derived(createCompClassMutation(contestId));
   const createProblem = $derived(createProblemMutation(contestId));
@@ -96,7 +84,6 @@
     failed = false;
     progress = 0;
     completedSteps = 0;
-    status = "Ready to create classes, problems, and tickets.";
 
     if (dialog) {
       dialog.open = true;
@@ -113,8 +100,7 @@
     }
   };
 
-  const setProgress = (nextStatus: string, nextCompletedSteps: number) => {
-    status = nextStatus;
+  const setProgress = (nextCompletedSteps: number) => {
     completedSteps = nextCompletedSteps;
     progress = totalSteps === 0 ? 100 : (nextCompletedSteps / totalSteps) * 100;
   };
@@ -231,25 +217,19 @@
     isRunning = true;
     completed = false;
     failed = false;
-    setProgress("Creating classes...", 0);
+    setProgress(0);
 
     try {
       const compClasses = getCompClasses();
 
       for (const [index, compClass] of compClasses.entries()) {
         await createCompClass.mutateAsync(compClass);
-        setProgress(
-          `Created class ${index + 1} of ${compClasses.length}.`,
-          index + 1,
-        );
+        setProgress(index + 1);
       }
 
       for (let index = 0; index < problemCount; index++) {
         await createProblem.mutateAsync(getProblemTemplate(index));
-        setProgress(
-          `Created problem ${index + 1} of ${problemCount}.`,
-          compClasses.length + index + 1,
-        );
+        setProgress(compClasses.length + index + 1);
       }
 
       if (ticketCount > 0) {
@@ -258,16 +238,14 @@
         };
 
         await createContenders.mutateAsync(args);
-        setProgress(`Created ${ticketCount} tickets.`, totalSteps);
+        setProgress(totalSteps);
       } else {
-        setProgress("Skipped ticket creation.", totalSteps);
+        setProgress(totalSteps);
       }
 
       completed = true;
-      status = "Contest populated with classes, problems, and tickets.";
     } catch {
       failed = true;
-      status = "Contest population stopped before finishing.";
       toastError("Failed to populate contest.");
     } finally {
       isRunning = false;
@@ -275,110 +253,84 @@
   };
 </script>
 
-<div class="actions">
-  <wa-button appearance="outlined" onclick={openDialog}>
-    Populate contest
-    <wa-icon name="plus" slot="start"></wa-icon>
-  </wa-button>
-</div>
+<wa-button appearance="outlined" onclick={openDialog}>
+  Populate with fake data
+</wa-button>
 
-<wa-dialog
-  bind:this={dialog}
-  label="Populate contest"
-  onwa-hide={(event: WaHideEvent) => {
-    if (event.target !== dialog) {
-      return;
-    }
-
-    if (isRunning) {
-      event.preventDefault();
-    }
-  }}
->
+<wa-dialog bind:this={dialog} label="Populate contest">
   {#if isRunning || completed || failed}
-    <div class="progress-content">
-      <p>{status}</p>
-      <wa-progress-bar value={progress}></wa-progress-bar>
-      <small>{completedSteps} / {totalSteps} steps completed</small>
-    </div>
+    <wa-progress-bar value={progress}></wa-progress-bar>
+    <small>{completedSteps} / {totalSteps} steps completed</small>
   {:else}
-    <div class="dialog-copy">
-      <p>{summary}</p>
-      <p>
-        Both classes will start now and end in 12 hours. {scoringSummary}
-      </p>
+    <div class="controls">
+      <wa-number-input
+        size="s"
+        label="Number of problems"
+        min="1"
+        max="100"
+        value={problemCount.toString()}
+        onchange={handleProblemCountChange}
+      ></wa-number-input>
 
-      <div class="controls">
-        <wa-number-input
-          size="s"
-          label="Number of problems"
-          min="1"
-          max="100"
-          value={problemCount.toString()}
-          onchange={handleProblemCountChange}
-        ></wa-number-input>
+      <wa-number-input
+        size="s"
+        label="Number of tickets"
+        min="0"
+        max="500"
+        value={ticketCount.toString()}
+        onchange={handleTicketCountChange}
+      ></wa-number-input>
 
-        <wa-number-input
-          size="s"
-          label="Number of tickets"
-          min="0"
-          max="500"
-          value={ticketCount.toString()}
-          onchange={handleTicketCountChange}
-        ></wa-number-input>
+      <wa-number-input
+        size="s"
+        label="Flash bonus"
+        min="0"
+        max="100"
+        value={flashBonusPercentage.toString()}
+        onchange={handleFlashBonusChange}
+      >
+        <span slot="end">%</span>
+      </wa-number-input>
 
-        <wa-number-input
-          size="s"
-          label="Flash bonus (%)"
-          min="0"
-          max="100"
-          value={flashBonusPercentage.toString()}
-          onchange={handleFlashBonusChange}
-        ></wa-number-input>
+      <wa-number-input
+        size="s"
+        label="Zone 1"
+        min="0"
+        max="100"
+        value={zone1Percentage.toString()}
+        onchange={handleZone1Change}
+      >
+        <span slot="end">%</span>
+      </wa-number-input>
 
-        <wa-number-input
-          size="s"
-          label="Zone 1 (%)"
-          min="0"
-          max="100"
-          value={zone1Percentage.toString()}
-          onchange={handleZone1Change}
-        ></wa-number-input>
-
-        <wa-number-input
-          size="s"
-          label="Zone 2 (%)"
-          min="0"
-          max="100"
-          value={zone2Percentage.toString()}
-          onchange={handleZone2Change}
-        ></wa-number-input>
-      </div>
-
-      <div class="range">
-        <div class="range-header">
-          <span>Problem value range</span>
-          <small>{problemMinPoints} - {problemMaxPoints} pts</small>
-        </div>
-
-        <wa-slider
-          label="Problem value range"
-          hint="Set the minimum and maximum top points."
-          range
-          min="0"
-          max="1000"
-          min-value={problemMinPoints}
-          max-value={problemMaxPoints}
-          step="1"
-          with-tooltip
-          oninput={handleProblemValueRangeChange}
-        >
-          <span slot="reference">0</span>
-          <span slot="reference">500</span>
-          <span slot="reference">1000</span>
-        </wa-slider>
-      </div>
+      <wa-number-input
+        size="s"
+        label="Zone 2"
+        min="0"
+        max="100"
+        value={zone2Percentage.toString()}
+        onchange={handleZone2Change}
+      >
+        <span slot="end">%</span>
+      </wa-number-input>
     </div>
+
+    <wa-slider
+      label="Point values"
+      hint="Set the minimum and maximum top points."
+      range
+      min="0"
+      max="1000"
+      min-value={problemMinPoints}
+      max-value={problemMaxPoints}
+      step="25"
+      with-tooltip
+      oninput={handleProblemValueRangeChange}
+    >
+      <span slot="reference">0</span>
+      <span slot="reference">500</span>
+      <span slot="reference">1000</span>
+    </wa-slider>
   {/if}
 
   {#if completed || failed}
@@ -387,9 +339,6 @@
       variant={completed ? "success" : "neutral"}
       onclick={closeDialog}
     >
-      {#if completed}
-        <wa-icon name="check" slot="start"></wa-icon>
-      {/if}
       Close
     </wa-button>
   {:else}
@@ -403,12 +352,11 @@
     </wa-button>
     <wa-button
       slot="footer"
-      variant="brand"
+      variant="neutral"
       onclick={handlePopulate}
       loading={isRunning}
     >
       Proceed
-      <wa-icon name="plus" slot="start"></wa-icon>
     </wa-button>
   {/if}
 </wa-dialog>
@@ -420,28 +368,12 @@
     gap: var(--wa-space-m);
   }
 
-  .progress-content,
-  .dialog-copy,
-  .range {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wa-space-s);
-  }
-
   .controls {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
     gap: var(--wa-space-s);
   }
 
-  .range-header {
-    display: flex;
-    justify-content: space-between;
-    gap: var(--wa-space-s);
-    align-items: baseline;
-  }
-
-  p,
   small,
   span {
     margin: 0;
