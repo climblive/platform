@@ -10,33 +10,32 @@
   ] as const;
 
   const classNamesSchema = z
-    .string()
-    .transform((value, ctx) => {
-      try {
-        return JSON.parse(value);
-      } catch {
-        ctx.issues.push({
-          code: "custom",
-          input: value,
-          message: "Select at least one class.",
-        });
-
-        return z.NEVER;
+    .union([z.enum(supportedClassNames), z.array(z.enum(supportedClassNames))])
+    .transform((value) => {
+      if (Array.isArray(value)) {
+        return value;
       }
+
+      return [value];
     })
     .pipe(z.array(z.enum(supportedClassNames)).min(1));
 
-  export const formSchema = z.object({
-    contestLengthHours: z.coerce.number().int(),
-    problemCount: z.coerce.number(),
-    ticketCount: z.coerce.number(),
-    problemMinPoints: z.coerce.number(),
-    problemMaxPoints: z.coerce.number(),
-    flashBonusPercentage: z.coerce.number(),
-    zone1Percentage: z.coerce.number(),
-    zone2Percentage: z.coerce.number(),
-    classNames: classNamesSchema,
-  });
+  export const formSchema = z
+    .object({
+      contestLengthHours: z.coerce.number().int(),
+      problemCount: z.coerce.number(),
+      ticketCount: z.coerce.number(),
+      problemMinPoints: z.coerce.number(),
+      problemMaxPoints: z.coerce.number(),
+      flashBonusPercentage: z.coerce.number(),
+      zone1Percentage: z.coerce.number(),
+      zone2Percentage: z.coerce.number(),
+      className: classNamesSchema,
+    })
+    .transform((value) => ({
+      ...value,
+      classNames: value.className,
+    }));
 
   type PopulateContestFormData = z.infer<typeof formSchema>;
 </script>
@@ -330,11 +329,9 @@
         (name) => !selectedClassNames.includes(name),
       )}
 
-      <input
-        type="hidden"
-        {@attach name("classNames")}
-        value={JSON.stringify(selectedClassNames)}
-      />
+      {#each selectedClassNames as className (className)}
+        <input type="hidden" {@attach name("className")} value={className} />
+      {/each}
       <input
         bind:this={problemMinPointsInput}
         type="hidden"
