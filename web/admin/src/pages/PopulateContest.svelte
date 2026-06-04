@@ -116,7 +116,9 @@
   const defaultTicketCount = $derived(
     Math.min(100, 500 - (contenders?.length ?? 0)),
   );
-  let selectedClassNames = $state(supportedClassNames.slice(0, 2));
+  let selectedClassNames = $state(
+    supportedClassNames.slice(0, Math.min(2, 20 - supportedClassNames.length)),
+  );
 
   const totalSteps = $derived(
     submittedValues === undefined
@@ -346,7 +348,7 @@
         value={defaultProblemMaxPoints}
       />
 
-      <fieldset>
+      <div class="content">
         <h4>Classes</h4>
 
         <div class="tags">
@@ -387,58 +389,56 @@
 
         <h4>Problems</h4>
 
-        <div class="controls">
-          <wa-number-input
-            size="s"
-            {@attach name("problemCount")}
-            label="Number of problems"
-            min="1"
-            max={100 - (problems?.length ?? 0)}
-            {@attach value(defaultProblemCount.toString())}
-          ></wa-number-input>
+        <wa-number-input
+          size="s"
+          {@attach name("problemCount")}
+          label="Number of problems"
+          min="1"
+          max={100 - (problems?.length ?? 0)}
+          {@attach value(defaultProblemCount.toString())}
+        ></wa-number-input>
 
-          <wa-number-input
-            size="s"
-            {@attach name("ticketCount")}
-            label="Number of tickets"
-            min="0"
-            max={500 - (contenders?.length ?? 0)}
-            {@attach value(defaultTicketCount.toString())}
-          ></wa-number-input>
+        <wa-number-input
+          size="s"
+          {@attach name("ticketCount")}
+          label="Number of tickets"
+          min="0"
+          max={500 - (contenders?.length ?? 0)}
+          {@attach value(defaultTicketCount.toString())}
+        ></wa-number-input>
 
-          <wa-number-input
-            size="s"
-            {@attach name("flashBonusPercentage")}
-            label="Flash bonus"
-            min="0"
-            max="100"
-            {@attach value(defaultFlashBonusPercentage.toString())}
-          >
-            <span slot="end">%</span>
-          </wa-number-input>
+        <wa-number-input
+          size="s"
+          {@attach name("flashBonusPercentage")}
+          label="Flash bonus"
+          min="0"
+          max="100"
+          {@attach value(defaultFlashBonusPercentage.toString())}
+        >
+          <span slot="end">%</span>
+        </wa-number-input>
 
-          <wa-number-input
-            size="s"
-            {@attach name("zone1Percentage")}
-            label="Zone 1"
-            min="0"
-            max="100"
-            {@attach value(defaultZone1Percentage.toString())}
-          >
-            <span slot="end">%</span>
-          </wa-number-input>
+        <wa-number-input
+          size="s"
+          {@attach name("zone1Percentage")}
+          label="Zone 1"
+          min="0"
+          max="100"
+          {@attach value(defaultZone1Percentage.toString())}
+        >
+          <span slot="end">%</span>
+        </wa-number-input>
 
-          <wa-number-input
-            size="s"
-            {@attach name("zone2Percentage")}
-            label="Zone 2"
-            min="0"
-            max="100"
-            {@attach value(defaultZone2Percentage.toString())}
-          >
-            <span slot="end">%</span>
-          </wa-number-input>
-        </div>
+        <wa-number-input
+          size="s"
+          {@attach name("zone2Percentage")}
+          label="Zone 2"
+          min="0"
+          max="100"
+          {@attach value(defaultZone2Percentage.toString())}
+        >
+          <span slot="end">%</span>
+        </wa-number-input>
 
         <wa-slider
           label="Point values"
@@ -475,7 +475,7 @@
             Proceed
           </wa-button>
         </div>
-      </fieldset>
+      </div>
     </GenericForm>
   {/if}
 
@@ -491,24 +491,10 @@
 </wa-dialog>
 
 <style>
-  wa-dialog::part(body) {
+  .content {
     display: flex;
     flex-direction: column;
-    gap: var(--wa-space-m);
-  }
-
-  .controls {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
     gap: var(--wa-space-s);
-  }
-
-  fieldset {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wa-space-m);
-    border: 0;
-    padding: 0;
     margin: 0;
   }
 
