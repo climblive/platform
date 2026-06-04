@@ -27,21 +27,8 @@
       ticketCount: z.coerce.number(),
       problemPoints: z
         .union([z.coerce.number(), z.array(z.coerce.number())])
-        .transform((value, ctx) => {
-          const points = Array.isArray(value) ? value : [value];
-
-          if (points.length !== 2) {
-            ctx.issues.push({
-              code: "custom",
-              input: value,
-              message: "Select a minimum and maximum point value.",
-              path: ["problemPoints"],
-            });
-
-            return z.NEVER;
-          }
-
-          return points;
+        .transform((value) => {
+          return Array.isArray(value) ? value : [value];
         }),
       flashBonusPercentage: z.coerce.number(),
       zone1Percentage: z.coerce.number(),
@@ -133,9 +120,11 @@
   const defaultProblemCount = $derived(
     Math.min(50, 100 - (problems?.length ?? 0)),
   );
+
   const defaultTicketCount = $derived(
     Math.min(100, 500 - (contenders?.length ?? 0)),
   );
+
   const contestNotEmpty = $derived.by(() => {
     if (
       compClasses === undefined ||
@@ -149,6 +138,7 @@
       compClasses.length > 0 || problems.length > 0 || contenders.length > 0
     );
   });
+
   const maxExistingProblemNumber = $derived.by(() => {
     if (problems === undefined || problems.length === 0) {
       return 0;
