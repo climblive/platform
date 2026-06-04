@@ -85,6 +85,13 @@
     contestId: number;
   };
 
+  const defaultContestLengthHours = 12;
+  const defaultProblemMinPoints = 50;
+  const defaultProblemMaxPoints = 300;
+  const defaultFlashBonusPercentage = 5;
+  const defaultZone1Percentage = 15;
+  const defaultZone2Percentage = 20;
+
   let { contestId }: Props = $props();
 
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
@@ -99,19 +106,24 @@
   let failed = $state(false);
   let progress = $state(0);
   let completedSteps = $state(0);
+  let submittedValues = $state<PopulateContestFormData>();
+  let problemMinPointsInput = $state<HTMLInputElement>();
+  let problemMaxPointsInput = $state<HTMLInputElement>();
 
-  let problemCount = $derived(Math.min(50, 100 - (problems?.length ?? 0)));
-  let ticketCount = $derived(Math.min(100, 500 - (contenders?.length ?? 0)));
-  let contestLengthHours = $state(12);
-  let problemMinPoints = $state(50);
-  let problemMaxPoints = $state(300);
-  let flashBonusPercentage = $state(5);
-  let zone1Percentage = $state(15);
-  let zone2Percentage = $state(20);
+  const defaultProblemCount = $derived(
+    Math.min(50, 100 - (problems?.length ?? 0)),
+  );
+  const defaultTicketCount = $derived(
+    Math.min(100, 500 - (contenders?.length ?? 0)),
+  );
   let selectedClassNames = $state(supportedClassNames.slice(0, 2));
 
   const totalSteps = $derived(
-    selectedClassNames.length + problemCount + (ticketCount > 0 ? 1 : 0),
+    submittedValues === undefined
+      ? 0
+      : submittedValues.classNames.length +
+          submittedValues.problemCount +
+          (submittedValues.ticketCount > 0 ? 1 : 0),
   );
 
   const createCompClass = $derived(createCompClassMutation(contestId));
@@ -122,22 +134,18 @@
     return Math.min(max, Math.max(min, value));
   };
 
-  const readInteger = (value: string | number, fallback: number) => {
-    const parsed = Number(value);
-
-    if (Number.isNaN(parsed)) {
-      return fallback;
-    }
-
-    return Math.round(parsed);
-  };
-
   const openDialog = () => {
     completed = false;
     failed = false;
     progress = 0;
     completedSteps = 0;
+    submittedValues = undefined;
     selectedClassNames = [...supportedClassNames];
+
+    if (problemMinPointsInput && problemMaxPointsInput) {
+      problemMinPointsInput.value = String(defaultProblemMinPoints);
+      problemMaxPointsInput.value = String(defaultProblemMaxPoints);
+    }
 
     if (dialog) {
       dialog.open = true;
@@ -229,56 +237,22 @@
     }));
   };
 
-  const handleContestLengthChange = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    contestLengthHours = clamp(
-      readInteger(target.value, contestLengthHours),
-      1,
-      72,
-    );
-  };
-
-  const handleProblemCountChange = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    problemCount = clamp(readInteger(target.value, problemCount), 1, 100);
-  };
-
-  const handleTicketCountChange = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    ticketCount = clamp(readInteger(target.value, ticketCount), 0, 500);
-  };
-
-  const handleFlashBonusChange = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    flashBonusPercentage = clamp(
-      readInteger(target.value, flashBonusPercentage),
-      0,
-      100,
-    );
-  };
-
-  const handleZone1Change = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    zone1Percentage = clamp(readInteger(target.value, zone1Percentage), 0, 100);
-  };
-
-  const handleZone2Change = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    zone2Percentage = clamp(readInteger(target.value, zone2Percentage), 0, 100);
-  };
-
   const handleProblemValueRangeChange = (event: Event) => {
     const target = event.target as HTMLElement & {
       minValue: number;
       maxValue: number;
     };
 
-    problemMinPoints = clamp(Math.round(target.minValue), 0, 1000);
-    problemMaxPoints = clamp(
-      Math.round(target.maxValue),
-      problemMinPoints,
-      1000,
-    );
+    const minValue = clamp(Math.round(target.minValue), 0, 1000);
+    const maxValue = clamp(Math.round(target.maxValue), minValue, 1000);
+
+    if (problemMinPointsInput) {
+      problemMinPointsInput.value = String(minValue);
+    }
+
+    if (problemMaxPointsInput) {
+      problemMaxPointsInput.value = String(maxValue);
+    }
   };
 
   const handleRemoveClass = (name: (typeof supportedClassNames)[number]) => {
@@ -303,6 +277,7 @@
     isRunning = true;
     completed = false;
     failed = false;
+    submittedValues = values;
     setProgress(0);
 
     try {
@@ -359,14 +334,16 @@
         value={JSON.stringify(selectedClassNames)}
       />
       <input
+        bind:this={problemMinPointsInput}
         type="hidden"
         {@attach name("problemMinPoints")}
-        value={problemMinPoints}
+        value={defaultProblemMinPoints}
       />
       <input
+        bind:this={problemMaxPointsInput}
         type="hidden"
         {@attach name("problemMaxPoints")}
-        value={problemMaxPoints}
+        value={defaultProblemMaxPoints}
       />
 
       <fieldset>
@@ -403,8 +380,7 @@
           label="Contest length"
           min="1"
           max="72"
-          {@attach value(contestLengthHours.toString())}
-          onchange={handleContestLengthChange}
+          {@attach value(defaultContestLengthHours.toString())}
         >
           <span slot="end">hours</span>
         </wa-number-input>
@@ -418,8 +394,7 @@
             label="Number of problems"
             min="1"
             max={100 - (problems?.length ?? 0)}
-            {@attach value(problemCount.toString())}
-            onchange={handleProblemCountChange}
+            {@attach value(defaultProblemCount.toString())}
           ></wa-number-input>
 
           <wa-number-input
@@ -428,8 +403,7 @@
             label="Number of tickets"
             min="0"
             max={500 - (contenders?.length ?? 0)}
-            {@attach value(ticketCount.toString())}
-            onchange={handleTicketCountChange}
+            {@attach value(defaultTicketCount.toString())}
           ></wa-number-input>
 
           <wa-number-input
@@ -438,8 +412,7 @@
             label="Flash bonus"
             min="0"
             max="100"
-            {@attach value(flashBonusPercentage.toString())}
-            onchange={handleFlashBonusChange}
+            {@attach value(defaultFlashBonusPercentage.toString())}
           >
             <span slot="end">%</span>
           </wa-number-input>
@@ -450,8 +423,7 @@
             label="Zone 1"
             min="0"
             max="100"
-            {@attach value(zone1Percentage.toString())}
-            onchange={handleZone1Change}
+            {@attach value(defaultZone1Percentage.toString())}
           >
             <span slot="end">%</span>
           </wa-number-input>
@@ -462,8 +434,7 @@
             label="Zone 2"
             min="0"
             max="100"
-            {@attach value(zone2Percentage.toString())}
-            onchange={handleZone2Change}
+            {@attach value(defaultZone2Percentage.toString())}
           >
             <span slot="end">%</span>
           </wa-number-input>
@@ -475,8 +446,8 @@
           range
           min="0"
           max="1000"
-          min-value={problemMinPoints}
-          max-value={problemMaxPoints}
+          min-value={defaultProblemMinPoints}
+          max-value={defaultProblemMaxPoints}
           step="25"
           with-tooltip
           oninput={handleProblemValueRangeChange}
