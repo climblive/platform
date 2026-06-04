@@ -6,6 +6,7 @@
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
   import "@awesome.me/webawesome/dist/components/slider/slider.js";
+  import "@awesome.me/webawesome/dist/components/tag/tag.js";
   import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
   import { value } from "@climblive/lib/forms";
   import type {
@@ -22,23 +23,27 @@
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
 
-  const primaryColors = [
-    "#ef4444",
-    "#f97316",
-    "#f59e0b",
-    "#eab308",
-    "#84cc16",
-    "#22c55e",
-    "#10b981",
-    "#14b8a6",
-    "#06b6d4",
-    "#0ea5e9",
-    "#3b82f6",
-    "#6366f1",
-    "#8b5cf6",
-    "#a855f7",
-    "#d946ef",
-    "#ec4899",
+  const holdColors = [
+    "#6f3601",
+    "#dc3146",
+    "#f46a45",
+    "#fac22b",
+    "#00ac49",
+    "#2fbedc",
+    "#0071ec",
+    "#9951db",
+    "#e66ba3",
+    "#9194a2",
+    "#000",
+    "#fff",
+  ] as const;
+
+  const availableClassNames = [
+    "Males",
+    "Females",
+    "Seniors",
+    "Kids",
+    "Juniors",
   ] as const;
 
   type Props = {
@@ -53,7 +58,7 @@
   const contenders = $derived(contendersQuery.data);
   const problems = $derived(problemsQuery.data);
 
-  let dialog: WaDialog | undefined = $state();
+  let dialog = $state<WaDialog>();
   let isRunning = $state(false);
   let completed = $state(false);
   let failed = $state(false);
@@ -62,13 +67,17 @@
 
   let problemCount = $derived(Math.min(50, 100 - (problems?.length ?? 0)));
   let ticketCount = $derived(Math.min(100, 500 - (contenders?.length ?? 0)));
+  let contestLengthHours = $state(12);
   let problemMinPoints = $state(50);
   let problemMaxPoints = $state(300);
   let flashBonusPercentage = $state(5);
   let zone1Percentage = $state(15);
   let zone2Percentage = $state(20);
+  let selectedClassNames = $state(availableClassNames.slice(0, 2));
 
-  const totalSteps = $derived(2 + problemCount + (ticketCount > 0 ? 1 : 0));
+  const totalSteps = $derived(
+    selectedClassNames.length + problemCount + (ticketCount > 0 ? 1 : 0),
+  );
 
   const createCompClass = $derived(createCompClassMutation(contestId));
   const createProblem = $derived(createProblemMutation(contestId));
@@ -93,6 +102,7 @@
     failed = false;
     progress = 0;
     completedSteps = 0;
+    selectedClassNames = [...availableClassNames];
 
     if (dialog) {
       dialog.open = true;
@@ -138,16 +148,11 @@
     const hasFlashBonus = index % 4 === 0;
     const hasZone1 = index % 3 === 0;
     const hasZone2 = index % 6 === 0;
-    const holdColorPrimary = primaryColors[index % primaryColors.length];
-    const holdColorSecondary =
-      index % 2 === 0
-        ? primaryColors[(index + 5) % primaryColors.length]
-        : undefined;
+    const holdColorPrimary = holdColors[index % holdColors.length];
 
     return {
       number: index + 1,
       holdColorPrimary,
-      holdColorSecondary,
       description: `Seeded problem ${index + 1}`,
       zone1Enabled: hasZone1,
       zone2Enabled: hasZone2,
@@ -166,13 +171,24 @@
 
   const getCompClasses = () => {
     const timeBegin = new Date();
-    const timeEnd = new Date(timeBegin.getTime() + 12 * 60 * 60 * 1_000);
+    const timeEnd = new Date(
+      timeBegin.getTime() + contestLengthHours * 60 * 60 * 1_000,
+    );
 
-    return ["Males", "Females"].map<CompClassTemplate>((name) => ({
+    return selectedClassNames.map<CompClassTemplate>((name) => ({
       name,
       timeBegin,
       timeEnd,
     }));
+  };
+
+  const handleContestLengthChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    contestLengthHours = clamp(
+      readInteger(target.value, contestLengthHours),
+      1,
+      72,
+    );
   };
 
   const handleProblemCountChange = (event: Event) => {
@@ -218,8 +234,22 @@
     );
   };
 
+  const handleRemoveClass = (name: (typeof availableClassNames)[number]) => {
+    selectedClassNames = selectedClassNames.filter(
+      (className) => className !== name,
+    );
+  };
+
+  const handleAddClass = (nextClass: (typeof availableClassNames)[number]) => {
+    selectedClassNames = [...selectedClassNames, nextClass];
+  };
+
   const handlePopulate = async () => {
     if (isRunning) {
+      return;
+    }
+
+    if (selectedClassNames.length === 0) {
       return;
     }
 
@@ -266,11 +296,54 @@
   Populate with fake data
 </wa-button>
 
-<wa-dialog bind:this={dialog} label="Populate contest">
+<wa-dialog bind:this={dialog} open label="Populate contest">
   {#if isRunning || completed || failed}
     <wa-progress-bar value={progress}></wa-progress-bar>
     <small>{completedSteps} / {totalSteps} steps completed</small>
   {:else}
+    {@const nextClass = availableClassNames.find(
+      (name) => !selectedClassNames.includes(name),
+    )}
+
+    <h4>Classes</h4>
+
+    <div class="tags">
+      {#each selectedClassNames as className (className)}
+        <wa-tag
+          size="s"
+          variant="neutral"
+          appearance="filled-outlined"
+          with-remove
+          onwa-remove={() => handleRemoveClass(className)}
+        >
+          {className}
+        </wa-tag>
+      {/each}
+
+      {#if nextClass !== undefined}
+        <wa-button
+          appearance="plain"
+          size="s"
+          onclick={() => handleAddClass(nextClass)}
+        >
+          <wa-icon name="plus"></wa-icon>
+        </wa-button>
+      {/if}
+    </div>
+
+    <wa-number-input
+      size="s"
+      label="Contest length"
+      min="1"
+      max="72"
+      {@attach value(contestLengthHours.toString())}
+      onchange={handleContestLengthChange}
+    >
+      <span slot="end">hours</span>
+    </wa-number-input>
+
+    <h4>Problems</h4>
+
     <div class="controls">
       <wa-number-input
         size="s"
@@ -364,6 +437,7 @@
       variant="neutral"
       onclick={handlePopulate}
       loading={isRunning}
+      disabled={selectedClassNames.length === 0}
     >
       Proceed
     </wa-button>
@@ -381,6 +455,17 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
     gap: var(--wa-space-s);
+  }
+
+  h4 {
+    margin: 0;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--wa-space-xs);
+    align-items: center;
   }
 
   small,
