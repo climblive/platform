@@ -166,7 +166,7 @@
     progress = 0;
     completedSteps = 0;
     submittedValues = undefined;
-    selectedClassNames = [...supportedClassNames];
+    selectedClassNames = [...supportedClassNames.slice(0, 2)];
 
     if (problemMinPointsInput && problemMaxPointsInput) {
       problemMinPointsInput.value = String(defaultProblemMinPoints);
