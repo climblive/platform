@@ -60,6 +60,7 @@
     createCompClassMutation,
     createContendersMutation,
     createProblemMutation,
+    getCompClassesQuery,
     getContendersByContestQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
@@ -93,9 +94,11 @@
 
   let { contestId }: Props = $props();
 
+  const compClassesQuery = $derived(getCompClassesQuery(contestId));
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
   const problemsQuery = $derived(getProblemsQuery(contestId));
 
+  const compClasses = $derived(compClassesQuery.data);
   const contenders = $derived(contendersQuery.data);
   const problems = $derived(problemsQuery.data);
 
@@ -115,6 +118,9 @@
   const defaultTicketCount = $derived(
     Math.min(100, 500 - (contenders?.length ?? 0)),
   );
+  const remainingCompClassSlots = $derived(
+    Math.max(0, 20 - (compClasses?.length ?? 0)),
+  );
   const maxExistingProblemNumber = $derived.by(() => {
     if (problems === undefined || problems.length === 0) {
       return 0;
@@ -122,9 +128,7 @@
 
     return Math.max(...problems.map(({ number }) => number));
   });
-  let selectedClassNames = $state(
-    supportedClassNames.slice(0, Math.min(2, 20 - supportedClassNames.length)),
-  );
+  let selectedClassNames = $state<(typeof supportedClassNames)[number][]>([]);
 
   const totalSteps = $derived(
     submittedValues === undefined
@@ -148,7 +152,7 @@
     progress = 0;
     completedSteps = 0;
     submittedValues = undefined;
-    selectedClassNames = [...supportedClassNames];
+    selectedClassNames = supportedClassNames.slice(0, remainingCompClassSlots);
 
     if (problemMinPointsInput && problemMaxPointsInput) {
       problemMinPointsInput.value = String(defaultProblemMinPoints);
@@ -271,6 +275,10 @@
   };
 
   const handleAddClass = (nextClass: (typeof supportedClassNames)[number]) => {
+    if (selectedClassNames.length >= remainingCompClassSlots) {
+      return;
+    }
+
     selectedClassNames = [...selectedClassNames, nextClass];
   };
 
@@ -280,6 +288,11 @@
     }
 
     if (values.classNames.length === 0) {
+      return;
+    }
+
+    if (values.classNames.length > remainingCompClassSlots) {
+      toastError("Failed to populate contest.");
       return;
     }
 
@@ -337,7 +350,9 @@
   {:else}
     <GenericForm schema={formSchema} submit={handlePopulate}>
       {@const nextClass = supportedClassNames.find(
-        (name) => !selectedClassNames.includes(name),
+        (name) =>
+          !selectedClassNames.includes(name) &&
+          selectedClassNames.length < remainingCompClassSlots,
       )}
 
       {#each selectedClassNames as className (className)}
@@ -478,7 +493,8 @@
             variant="neutral"
             type="submit"
             loading={isRunning}
-            disabled={selectedClassNames.length === 0}
+            disabled={selectedClassNames.length === 0 ||
+              remainingCompClassSlots === 0}
           >
             Proceed
           </wa-button>
