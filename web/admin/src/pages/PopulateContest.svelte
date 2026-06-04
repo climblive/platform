@@ -25,8 +25,24 @@
       contestLengthHours: z.coerce.number().int(),
       problemCount: z.coerce.number(),
       ticketCount: z.coerce.number(),
-      problemMinPoints: z.coerce.number(),
-      problemMaxPoints: z.coerce.number(),
+      problemPoints: z
+        .union([z.coerce.number(), z.array(z.coerce.number())])
+        .transform((value, ctx) => {
+          const points = Array.isArray(value) ? value : [value];
+
+          if (points.length !== 2) {
+            ctx.issues.push({
+              code: "custom",
+              input: value,
+              message: "Select a minimum and maximum point value.",
+              path: ["problemPoints"],
+            });
+
+            return z.NEVER;
+          }
+
+          return points;
+        }),
       flashBonusPercentage: z.coerce.number(),
       zone1Percentage: z.coerce.number(),
       zone2Percentage: z.coerce.number(),
@@ -34,6 +50,8 @@
     })
     .transform((value) => ({
       ...value,
+      problemMinPoints: Math.min(...value.problemPoints),
+      problemMaxPoints: Math.max(...value.problemPoints),
       classNames: value.className,
     }));
 
@@ -46,9 +64,10 @@
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
+  import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
+  import "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/slider/slider.js";
-  import "@awesome.me/webawesome/dist/components/tag/tag.js";
   import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
   import { GenericForm, name, value } from "@climblive/lib/forms";
   import type {
@@ -109,8 +128,7 @@
   let progress = $state(0);
   let completedSteps = $state(0);
   let submittedValues = $state<PopulateContestFormData>();
-  let problemMinPointsInput = $state<HTMLInputElement>();
-  let problemMaxPointsInput = $state<HTMLInputElement>();
+  let formVersion = $state(0);
 
   const defaultProblemCount = $derived(
     Math.min(50, 100 - (problems?.length ?? 0)),
@@ -138,7 +156,6 @@
 
     return Math.max(...problems.map(({ number }) => number));
   });
-  let selectedClassNames = $state<(typeof supportedClassNames)[number][]>([]);
 
   const totalSteps = $derived(
     submittedValues === undefined
@@ -152,10 +169,6 @@
   const createProblem = $derived(createProblemMutation(contestId));
   const createContenders = $derived(createContendersMutation(contestId));
 
-  const clamp = (value: number, min: number, max: number) => {
-    return Math.min(max, Math.max(min, value));
-  };
-
   const openDialog = () => {
     if (contestNotEmpty) {
       return;
@@ -166,12 +179,7 @@
     progress = 0;
     completedSteps = 0;
     submittedValues = undefined;
-    selectedClassNames = [...supportedClassNames.slice(0, 2)];
-
-    if (problemMinPointsInput && problemMaxPointsInput) {
-      problemMinPointsInput.value = String(defaultProblemMinPoints);
-      problemMaxPointsInput.value = String(defaultProblemMaxPoints);
-    }
+    formVersion += 1;
 
     if (dialog) {
       dialog.open = true;
@@ -264,34 +272,6 @@
     }));
   };
 
-  const handleProblemValueRangeChange = (event: Event) => {
-    const target = event.target as HTMLElement & {
-      minValue: number;
-      maxValue: number;
-    };
-
-    const minValue = clamp(Math.round(target.minValue), 0, 1000);
-    const maxValue = clamp(Math.round(target.maxValue), minValue, 1000);
-
-    if (problemMinPointsInput) {
-      problemMinPointsInput.value = String(minValue);
-    }
-
-    if (problemMaxPointsInput) {
-      problemMaxPointsInput.value = String(maxValue);
-    }
-  };
-
-  const handleRemoveClass = (name: (typeof supportedClassNames)[number]) => {
-    selectedClassNames = selectedClassNames.filter(
-      (className) => className !== name,
-    );
-  };
-
-  const handleAddClass = (nextClass: (typeof supportedClassNames)[number]) => {
-    selectedClassNames = [...selectedClassNames, nextClass];
-  };
-
   const handlePopulate = async (values: PopulateContestFormData) => {
     if (isRunning) {
       return;
@@ -357,159 +337,126 @@
     <wa-progress-bar value={progress}></wa-progress-bar>
     <small>{completedSteps} / {totalSteps} steps completed</small>
   {:else}
-    <GenericForm schema={formSchema} submit={handlePopulate}>
-      {@const nextClass = supportedClassNames.find(
-        (name) => !selectedClassNames.includes(name),
-      )}
+    {#key formVersion}
+      <GenericForm schema={formSchema} submit={handlePopulate}>
+        <div class="content">
+          <h4>Classes</h4>
 
-      {#each selectedClassNames as className (className)}
-        <input type="hidden" {@attach name("className")} value={className} />
-      {/each}
+          <wa-select
+            size="s"
+            multiple
+            with-clear
+            max-options-visible="3"
+            {@attach name("className")}
+            label="Classes"
+            hint="Select the classes to create."
+          >
+            {#each supportedClassNames as className, index (className)}
+              <wa-option value={className} selected={index < 2}>
+                {className}
+              </wa-option>
+            {/each}
+          </wa-select>
 
-      <input
-        bind:this={problemMinPointsInput}
-        type="hidden"
-        {@attach name("problemMinPoints")}
-        value={defaultProblemMinPoints}
-      />
-      <input
-        bind:this={problemMaxPointsInput}
-        type="hidden"
-        {@attach name("problemMaxPoints")}
-        value={defaultProblemMaxPoints}
-      />
+          <wa-number-input
+            size="s"
+            {@attach name("contestLengthHours")}
+            label="Contest length"
+            min="1"
+            max="72"
+            {@attach value(defaultContestLengthHours.toString())}
+          >
+            <span slot="end">hours</span>
+          </wa-number-input>
 
-      <div class="content">
-        <h4>Classes</h4>
+          <h4>Problems</h4>
 
-        <div class="tags">
-          {#each selectedClassNames as className (className)}
-            <wa-tag
-              size="s"
-              variant="neutral"
-              appearance="filled-outlined"
-              with-remove
-              onwa-remove={() => handleRemoveClass(className)}
-            >
-              {className}
-            </wa-tag>
-          {/each}
+          <wa-number-input
+            size="s"
+            {@attach name("problemCount")}
+            label="Number of problems"
+            min="0"
+            max="100"
+            {@attach value(defaultProblemCount.toString())}
+          ></wa-number-input>
 
-          {#if nextClass !== undefined}
+          <wa-number-input
+            size="s"
+            {@attach name("flashBonusPercentage")}
+            label="Flash bonus"
+            min="0"
+            max="100"
+            {@attach value(defaultFlashBonusPercentage.toString())}
+          >
+            <span slot="end">%</span>
+          </wa-number-input>
+
+          <wa-number-input
+            size="s"
+            {@attach name("zone1Percentage")}
+            label="Zone 1"
+            min="0"
+            max="100"
+            {@attach value(defaultZone1Percentage.toString())}
+          >
+            <span slot="end">%</span>
+          </wa-number-input>
+
+          <wa-number-input
+            size="s"
+            {@attach name("zone2Percentage")}
+            label="Zone 2"
+            min="0"
+            max="100"
+            {@attach value(defaultZone2Percentage.toString())}
+          >
+            <span slot="end">%</span>
+          </wa-number-input>
+
+          <wa-slider
+            {@attach name("problemPoints")}
+            label="Point values"
+            hint="Set the minimum and maximum top points."
+            range
+            min="0"
+            max="1000"
+            min-value={defaultProblemMinPoints}
+            max-value={defaultProblemMaxPoints}
+            step="25"
+            with-tooltip
+          >
+            <span slot="reference">0</span>
+            <span slot="reference">500</span>
+            <span slot="reference">1000</span>
+          </wa-slider>
+
+          <h4>Tickets</h4>
+
+          <wa-number-input
+            size="s"
+            {@attach name("ticketCount")}
+            label="Number of tickets"
+            min="0"
+            max="500"
+            {@attach value(defaultTicketCount.toString())}
+          ></wa-number-input>
+
+          <div class="footer-actions">
             <wa-button
-              type="button"
               appearance="plain"
-              size="s"
-              onclick={() => handleAddClass(nextClass)}
+              type="button"
+              onclick={closeDialog}
+              disabled={isRunning}
             >
-              <wa-icon name="plus"></wa-icon>
+              Cancel
             </wa-button>
-          {/if}
+            <wa-button variant="neutral" type="submit" loading={isRunning}>
+              Proceed
+            </wa-button>
+          </div>
         </div>
-
-        <wa-number-input
-          size="s"
-          {@attach name("contestLengthHours")}
-          label="Contest length"
-          min="1"
-          max="72"
-          {@attach value(defaultContestLengthHours.toString())}
-        >
-          <span slot="end">hours</span>
-        </wa-number-input>
-
-        <h4>Problems</h4>
-
-        <wa-number-input
-          size="s"
-          {@attach name("problemCount")}
-          label="Number of problems"
-          min="0"
-          max="100"
-          {@attach value(defaultProblemCount.toString())}
-        ></wa-number-input>
-
-        <wa-number-input
-          size="s"
-          {@attach name("flashBonusPercentage")}
-          label="Flash bonus"
-          min="0"
-          max="100"
-          {@attach value(defaultFlashBonusPercentage.toString())}
-        >
-          <span slot="end">%</span>
-        </wa-number-input>
-
-        <wa-number-input
-          size="s"
-          {@attach name("zone1Percentage")}
-          label="Zone 1"
-          min="0"
-          max="100"
-          {@attach value(defaultZone1Percentage.toString())}
-        >
-          <span slot="end">%</span>
-        </wa-number-input>
-
-        <wa-number-input
-          size="s"
-          {@attach name("zone2Percentage")}
-          label="Zone 2"
-          min="0"
-          max="100"
-          {@attach value(defaultZone2Percentage.toString())}
-        >
-          <span slot="end">%</span>
-        </wa-number-input>
-
-        <wa-slider
-          label="Point values"
-          hint="Set the minimum and maximum top points."
-          range
-          min="0"
-          max="1000"
-          min-value={defaultProblemMinPoints}
-          max-value={defaultProblemMaxPoints}
-          step="25"
-          with-tooltip
-          oninput={handleProblemValueRangeChange}
-        >
-          <span slot="reference">0</span>
-          <span slot="reference">500</span>
-          <span slot="reference">1000</span>
-        </wa-slider>
-
-        <h4>Tickets</h4>
-
-        <wa-number-input
-          size="s"
-          {@attach name("ticketCount")}
-          label="Number of tickets"
-          min="0"
-          max="500"
-          {@attach value(defaultTicketCount.toString())}
-        ></wa-number-input>
-
-        <div class="footer-actions">
-          <wa-button
-            appearance="plain"
-            type="button"
-            onclick={closeDialog}
-            disabled={isRunning}
-          >
-            Cancel
-          </wa-button>
-          <wa-button
-            variant="neutral"
-            type="submit"
-            disabled={selectedClassNames.length === 0}
-            loading={isRunning}
-          >
-            Proceed
-          </wa-button>
-        </div>
-      </div>
-    </GenericForm>
+      </GenericForm>
+    {/key}
   {/if}
 
   {#if completed || failed}
@@ -533,13 +480,6 @@
 
   h4 {
     margin: 0;
-  }
-
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--wa-space-xs);
-    align-items: center;
   }
 
   .footer-actions {
