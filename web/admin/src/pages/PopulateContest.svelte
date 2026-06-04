@@ -115,6 +115,13 @@
   const defaultTicketCount = $derived(
     Math.min(100, 500 - (contenders?.length ?? 0)),
   );
+  const maxExistingProblemNumber = $derived.by(() => {
+    if (problems === undefined || problems.length === 0) {
+      return 0;
+    }
+
+    return Math.max(...problems.map(({ number }) => number));
+  });
   let selectedClassNames = $state(
     supportedClassNames.slice(0, Math.min(2, 20 - supportedClassNames.length)),
   );
@@ -193,6 +200,7 @@
 
   const getProblemTemplate = (
     index: number,
+    startNumber: number,
     values: PopulateContestFormData,
   ): ProblemTemplate => {
     const pointsTop = getProblemPointsTop(
@@ -205,11 +213,11 @@
     const hasZone1 = index % 3 === 0;
     const hasZone2 = index % 6 === 0;
     const holdColorPrimary = holdColors[index % holdColors.length];
+    const problemNumber = startNumber + index;
 
     return {
-      number: index + 1,
+      number: problemNumber,
       holdColorPrimary,
-      description: `Seeded problem ${index + 1}`,
       zone1Enabled: hasZone1,
       zone2Enabled: hasZone2,
       pointsZone1: hasZone1
@@ -283,6 +291,7 @@
 
     try {
       const compClasses = getCompClasses(values);
+      const firstProblemNumber = maxExistingProblemNumber + 1;
 
       for (const [index, compClass] of compClasses.entries()) {
         await createCompClass.mutateAsync(compClass);
@@ -290,7 +299,9 @@
       }
 
       for (let index = 0; index < values.problemCount; index++) {
-        await createProblem.mutateAsync(getProblemTemplate(index, values));
+        await createProblem.mutateAsync(
+          getProblemTemplate(index, firstProblemNumber, values),
+        );
         setProgress(compClasses.length + index + 1);
       }
 
@@ -390,7 +401,7 @@
           size="s"
           {@attach name("problemCount")}
           label="Number of problems"
-          min="1"
+          min="0"
           max={100 - (problems?.length ?? 0)}
           {@attach value(defaultProblemCount.toString())}
         ></wa-number-input>
