@@ -42,6 +42,7 @@
 
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
@@ -118,8 +119,14 @@
   const defaultTicketCount = $derived(
     Math.min(100, 500 - (contenders?.length ?? 0)),
   );
+  const remainingTicketSlots = $derived(
+    Math.max(0, 500 - (contenders?.length ?? 0)),
+  );
   const remainingCompClassSlots = $derived(
     Math.max(0, 20 - (compClasses?.length ?? 0)),
+  );
+  const remainingProblemSlots = $derived(
+    Math.max(0, 100 - (problems?.length ?? 0)),
   );
   const maxExistingProblemNumber = $derived.by(() => {
     if (problems === undefined || problems.length === 0) {
@@ -358,6 +365,7 @@
       {#each selectedClassNames as className (className)}
         <input type="hidden" {@attach name("className")} value={className} />
       {/each}
+
       <input
         bind:this={problemMinPointsInput}
         type="hidden"
@@ -373,6 +381,13 @@
 
       <div class="content">
         <h4>Classes</h4>
+
+        {#if remainingCompClassSlots === 0}
+          <wa-callout variant="warning">
+            <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
+            Maximum of 20 classes per contest reached.
+          </wa-callout>
+        {/if}
 
         <div class="tags">
           {#each selectedClassNames as className (className)}
@@ -399,86 +414,121 @@
           {/if}
         </div>
 
-        <wa-number-input
-          size="s"
-          {@attach name("contestLengthHours")}
-          label="Contest length"
-          min="1"
-          max="72"
-          {@attach value(defaultContestLengthHours.toString())}
-        >
-          <span slot="end">hours</span>
-        </wa-number-input>
+        {#if remainingCompClassSlots > 0}
+          <wa-number-input
+            size="s"
+            {@attach name("contestLengthHours")}
+            label="Contest length"
+            min="1"
+            max="72"
+            {@attach value(defaultContestLengthHours.toString())}
+          >
+            <span slot="end">hours</span>
+          </wa-number-input>
+        {/if}
 
         <h4>Problems</h4>
 
-        <wa-number-input
-          size="s"
-          {@attach name("problemCount")}
-          label="Number of problems"
-          min="0"
-          max={100 - (problems?.length ?? 0)}
-          {@attach value(defaultProblemCount.toString())}
-        ></wa-number-input>
+        {#if remainingProblemSlots === 0}
+          <wa-callout variant="warning">
+            <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
+            Maximum of 100 problems per contest reached.
+          </wa-callout>
+          <input type="hidden" {@attach name("problemCount")} value="0" />
+          <input
+            type="hidden"
+            {@attach name("flashBonusPercentage")}
+            value={defaultFlashBonusPercentage}
+          />
+          <input
+            type="hidden"
+            {@attach name("zone1Percentage")}
+            value={defaultZone1Percentage}
+          />
+          <input
+            type="hidden"
+            {@attach name("zone2Percentage")}
+            value={defaultZone2Percentage}
+          />
+        {:else}
+          <wa-number-input
+            size="s"
+            {@attach name("problemCount")}
+            label="Number of problems"
+            min="0"
+            max={remainingProblemSlots}
+            {@attach value(defaultProblemCount.toString())}
+          ></wa-number-input>
 
-        <wa-number-input
-          size="s"
-          {@attach name("ticketCount")}
-          label="Number of tickets"
-          min="0"
-          max={500 - (contenders?.length ?? 0)}
-          {@attach value(defaultTicketCount.toString())}
-        ></wa-number-input>
+          <wa-number-input
+            size="s"
+            {@attach name("flashBonusPercentage")}
+            label="Flash bonus"
+            min="0"
+            max="100"
+            {@attach value(defaultFlashBonusPercentage.toString())}
+          >
+            <span slot="end">%</span>
+          </wa-number-input>
 
-        <wa-number-input
-          size="s"
-          {@attach name("flashBonusPercentage")}
-          label="Flash bonus"
-          min="0"
-          max="100"
-          {@attach value(defaultFlashBonusPercentage.toString())}
-        >
-          <span slot="end">%</span>
-        </wa-number-input>
+          <wa-number-input
+            size="s"
+            {@attach name("zone1Percentage")}
+            label="Zone 1"
+            min="0"
+            max="100"
+            {@attach value(defaultZone1Percentage.toString())}
+          >
+            <span slot="end">%</span>
+          </wa-number-input>
 
-        <wa-number-input
-          size="s"
-          {@attach name("zone1Percentage")}
-          label="Zone 1"
-          min="0"
-          max="100"
-          {@attach value(defaultZone1Percentage.toString())}
-        >
-          <span slot="end">%</span>
-        </wa-number-input>
+          <wa-number-input
+            size="s"
+            {@attach name("zone2Percentage")}
+            label="Zone 2"
+            min="0"
+            max="100"
+            {@attach value(defaultZone2Percentage.toString())}
+          >
+            <span slot="end">%</span>
+          </wa-number-input>
 
-        <wa-number-input
-          size="s"
-          {@attach name("zone2Percentage")}
-          label="Zone 2"
-          min="0"
-          max="100"
-          {@attach value(defaultZone2Percentage.toString())}
-        >
-          <span slot="end">%</span>
-        </wa-number-input>
+          <wa-slider
+            label="Point values"
+            hint="Set the minimum and maximum top points."
+            range
+            min="0"
+            max="1000"
+            min-value={defaultProblemMinPoints}
+            max-value={defaultProblemMaxPoints}
+            step="25"
+            with-tooltip
+            oninput={handleProblemValueRangeChange}
+          >
+            <span slot="reference">0</span>
+            <span slot="reference">500</span>
+            <span slot="reference">1000</span>
+          </wa-slider>
+        {/if}
 
-        <wa-slider
-          label="Point values"
-          hint="Set the minimum and maximum top points."
-          range
-          min="0"
-          max="1000"
-          min-value={defaultProblemMinPoints}
-          max-value={defaultProblemMaxPoints}
-          step="25"
-          with-tooltip
-          oninput={handleProblemValueRangeChange}
-        >
-          <span slot="reference">0</span>
-          <span slot="reference">500</span>
-          <span slot="reference">1000</span>
-        </wa-slider>
+        <h4>Tickets</h4>
+
+        {#if remainingTicketSlots === 0}
+          <wa-callout variant="warning">
+            <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
+            Maximum of 500 tickets per contest reached.
+          </wa-callout>
+          <input type="hidden" {@attach name("ticketCount")} value="0" />
+        {:else}
+          <wa-number-input
+            size="s"
+            {@attach name("ticketCount")}
+            label="Number of tickets"
+            min="0"
+            max={remainingTicketSlots}
+            {@attach value(defaultTicketCount.toString())}
+          ></wa-number-input>
+        {/if}
 
         <div class="footer-actions">
           <wa-button
@@ -518,7 +568,7 @@
   .content {
     display: flex;
     flex-direction: column;
-    gap: var(--wa-space-s);
+    gap: var(--wa-space-m);
     margin: 0;
   }
 
