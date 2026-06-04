@@ -26,32 +26,19 @@
     })
     .pipe(z.array(z.enum(supportedClassNames)).min(1));
 
-  export const formSchema = z
-    .object({
-      contestLengthHours: z.coerce.number().int().min(1).max(72),
-      problemCount: z.coerce.number().int().min(1).max(100),
-      ticketCount: z.coerce.number().int().min(0).max(500),
-      problemMinPoints: z.coerce.number().int().min(0).max(1000),
-      problemMaxPoints: z.coerce.number().int().min(0).max(1000),
-      flashBonusPercentage: z.coerce.number().int().min(0).max(100),
-      zone1Percentage: z.coerce.number().int().min(0).max(100),
-      zone2Percentage: z.coerce.number().int().min(0).max(100),
-      classNames: classNamesSchema,
-    })
-    .check((ctx) => {
-      const data = ctx.value;
+  export const formSchema = z.object({
+    contestLengthHours: z.coerce.number().int(),
+    problemCount: z.coerce.number(),
+    ticketCount: z.coerce.number(),
+    problemMinPoints: z.coerce.number(),
+    problemMaxPoints: z.coerce.number(),
+    flashBonusPercentage: z.coerce.number(),
+    zone1Percentage: z.coerce.number(),
+    zone2Percentage: z.coerce.number(),
+    classNames: classNamesSchema,
+  });
 
-      if (data.problemMaxPoints < data.problemMinPoints) {
-        ctx.issues.push({
-          code: "custom",
-          input: data,
-          message: "Maximum points must be at least the minimum points.",
-          path: ["problemMaxPoints"],
-        });
-      }
-    });
-
-  export type PopulateContestFormData = z.infer<typeof formSchema>;
+  type PopulateContestFormData = z.infer<typeof formSchema>;
 </script>
 
 <script lang="ts">
@@ -94,14 +81,6 @@
     "#fff",
   ] as const;
 
-  const availableClassNames = [
-    "Males",
-    "Females",
-    "Seniors",
-    "Kids",
-    "Juniors",
-  ] as const;
-
   type Props = {
     contestId: number;
   };
@@ -129,7 +108,7 @@
   let flashBonusPercentage = $state(5);
   let zone1Percentage = $state(15);
   let zone2Percentage = $state(20);
-  let selectedClassNames = $state(availableClassNames.slice(0, 2));
+  let selectedClassNames = $state(supportedClassNames.slice(0, 2));
 
   const totalSteps = $derived(
     selectedClassNames.length + problemCount + (ticketCount > 0 ? 1 : 0),
@@ -158,7 +137,7 @@
     failed = false;
     progress = 0;
     completedSteps = 0;
-    selectedClassNames = [...availableClassNames];
+    selectedClassNames = [...supportedClassNames];
 
     if (dialog) {
       dialog.open = true;
@@ -302,13 +281,13 @@
     );
   };
 
-  const handleRemoveClass = (name: (typeof availableClassNames)[number]) => {
+  const handleRemoveClass = (name: (typeof supportedClassNames)[number]) => {
     selectedClassNames = selectedClassNames.filter(
       (className) => className !== name,
     );
   };
 
-  const handleAddClass = (nextClass: (typeof availableClassNames)[number]) => {
+  const handleAddClass = (nextClass: (typeof supportedClassNames)[number]) => {
     selectedClassNames = [...selectedClassNames, nextClass];
   };
 
@@ -370,7 +349,7 @@
     <small>{completedSteps} / {totalSteps} steps completed</small>
   {:else}
     <GenericForm schema={formSchema} submit={handlePopulate}>
-      {@const nextClass = availableClassNames.find(
+      {@const nextClass = supportedClassNames.find(
         (name) => !selectedClassNames.includes(name),
       )}
 
