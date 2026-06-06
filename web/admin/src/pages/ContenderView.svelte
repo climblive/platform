@@ -141,6 +141,11 @@
             fill="var(--wa-color-text-normal)"
           ></QrCode>
 
+          <LabeledText label="Registration code">
+            {contender.registrationCode}
+            <wa-copy-button value={contender.registrationCode}></wa-copy-button>
+          </LabeledText>
+
           <wa-button
             href={`/${contender.registrationCode}`}
             target="_blank"
@@ -269,9 +274,10 @@
   }
 
   article {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wa-space-s);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: var(--wa-space-s);
+    column-gap: var(--wa-space-2xl);
   }
 
   .registration {
