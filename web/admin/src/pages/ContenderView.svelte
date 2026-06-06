@@ -12,7 +12,11 @@
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import { ContenderName, LabeledText } from "@climblive/lib/components";
+  import {
+    ContenderName,
+    LabeledText,
+    EmptyState,
+  } from "@climblive/lib/components";
   import { checked, value } from "@climblive/lib/forms";
   import {
     getCompClassesQuery,
@@ -124,68 +128,73 @@
       />
     {/if}
   </h1>
-  <section>
-    <article>
-      <LabeledText label="Class"
-        >{compClasses.find(({ id }) => id === contender.compClassId)?.name ??
-          "-"}</LabeledText
-      >
-      {#if contender.entered}
+  {#if !contender.entered}
+    <EmptyState
+      title="Not registered"
+      description="Scan the QR code to enter the contest and start climbing."
+    >
+      {#snippet actions()}
+        <div class="registration">
+          <QrCode
+            registrationCode={contender.registrationCode}
+            width={200}
+            fill="var(--wa-color-text-normal)"
+          ></QrCode>
+
+          <wa-button
+            href={`/${contender.registrationCode}`}
+            target="_blank"
+            appearance="plain"
+            variant="neutral"
+            size="l"
+          >
+            <wa-icon slot="start" name="arrow-up-right-from-square"></wa-icon>
+            Open scorecard
+          </wa-button>
+        </div>
+      {/snippet}
+    </EmptyState>
+  {:else}
+    <section>
+      <article>
+        <LabeledText label="Class"
+          >{compClasses.find(({ id }) => id === contender.compClassId)?.name ??
+            "-"}</LabeledText
+        >
         <LabeledText label="Entered"
           >{format(contender.entered, "yyyy-MM-dd HH:mm")}</LabeledText
         >
-      {/if}
-      <LabeledText label="Placement">
-        {#if contender.disqualified}
-          Disqualified
-        {:else}
-          {contender.score?.placement ?? "-"}
-        {/if}
-      </LabeledText>
-      <LabeledText label="Score">{contender.score?.score ?? "-"}</LabeledText>
-      <LabeledText label="Finalist">
-        <wa-icon name={contender.score?.finalist ? "medal" : "minus"}></wa-icon>
-      </LabeledText>
+        <LabeledText label="Placement">
+          {#if contender.disqualified}
+            Disqualified
+          {:else}
+            {contender.score?.placement ?? "-"}
+          {/if}
+        </LabeledText>
+        <LabeledText label="Score">{contender.score?.score ?? "-"}</LabeledText>
+        <LabeledText label="Finalist">
+          <wa-icon name={contender.score?.finalist ? "medal" : "minus"}
+          ></wa-icon>
+        </LabeledText>
 
-      <LabeledText label="Registration code">
-        {contender.registrationCode}
-        <wa-copy-button value={contender.registrationCode}></wa-copy-button>
-      </LabeledText>
-    </article>
-    <div class="registration">
-      <QrCode
-        registrationCode={contender.registrationCode}
-        width={200}
-        fill={contender.disqualified
-          ? "var(--wa-color-text-quiet)"
-          : "var(--wa-color-text-normal)"}
-      ></QrCode>
+        <LabeledText label="Registration code">
+          {contender.registrationCode}
+          <wa-copy-button value={contender.registrationCode}></wa-copy-button>
+        </LabeledText>
+      </article>
+    </section>
 
-      <wa-button
-        href={`/${contender.registrationCode}`}
-        target="_blank"
-        appearance="plain"
-        variant="neutral"
-        size="l"
-      >
-        <wa-icon slot="start" name="arrow-up-right-from-square"></wa-icon>
-        Open scorecard
-      </wa-button>
-    </div>
-  </section>
+    {#if !contender.disqualified}
+      <h2>Ticks</h2>
+      <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
+      ></wa-divider>
+      <p class="copy">
+        All ticks registered by the contender during the contest.
+      </p>
+      <TickList contenderId={contender.id} contestId={contender.contestId}
+      ></TickList>
+    {/if}
 
-  {#if !contender.disqualified}
-    <h2>Ticks</h2>
-    <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
-    ></wa-divider>
-    <p class="copy">
-      All ticks registered by the contender during the contest.
-    </p>
-    <TickList contenderId={contender.id} contestId={contender.contestId}
-    ></TickList>
-  {/if}
-
-  {#if contender.entered}
     <h2>Settings</h2>
     <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
     ></wa-divider>
