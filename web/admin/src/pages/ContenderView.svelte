@@ -191,7 +191,7 @@
           {#if contender.disqualified}
             Disqualified
           {:else if contender.score?.placement}
-            {contender.score?.placement}<sup
+            {contender.score.placement}<sup
               >{ordinalSuperscript(contender.score.placement)}</sup
             >
           {:else}
