@@ -172,8 +172,7 @@
 
       <span class="registration-code">
         {contender.registrationCode}
-        <wa-copy-button value={contender.registrationCode} size="l"
-        ></wa-copy-button>
+        <wa-copy-button value={contender.registrationCode}></wa-copy-button>
       </span>
     </div>
 
