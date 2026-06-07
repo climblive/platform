@@ -328,7 +328,7 @@
   .codes {
     margin-block-end: var(--wa-space-m);
     display: flex;
-    gap: var(--wa-space-m);
+    gap: var(--wa-space-s);
     justify-content: space-between;
     align-items: center;
   }
