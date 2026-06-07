@@ -152,11 +152,6 @@
           <wa-icon slot="start" name="arrow-up-right-from-square"></wa-icon>
           Open scorecard
         </wa-button>
-
-        <span class="registration-code">
-          {contender.registrationCode}
-          <wa-copy-button value={contender.registrationCode}></wa-copy-button>
-        </span>
       {/snippet}
     </EmptyState>
   {:else}
@@ -296,6 +291,7 @@
     row-gap: var(--wa-space-s);
     column-gap: var(--wa-space-2xl);
     align-items: start;
+    width: 100%;
   }
 
   .copy {
@@ -322,7 +318,7 @@
 
   .open-scorecard-link {
     display: block;
-    font-size: var(--wa-font-size-s);
+    font-size: var(--wa-font-size-m);
   }
 
   .codes {
