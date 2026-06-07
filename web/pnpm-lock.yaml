@@ -21,8 +21,8 @@ importers:
   admin:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.7.0
-        version: 3.7.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
+        specifier: 3.8.0
+        version: 3.8.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -112,8 +112,8 @@ importers:
   packages/lib:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.7.0
-        version: 3.7.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
+        specifier: 3.8.0
+        version: 3.8.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
       '@sentry/svelte':
         specifier: ^10.52.0
         version: 10.52.0(svelte@5.55.5(@typescript-eslint/types@8.59.2))
@@ -176,8 +176,8 @@ importers:
   scoreboard:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.7.0
-        version: 3.7.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
+        specifier: 3.8.0
+        version: 3.8.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -231,8 +231,8 @@ importers:
   scorecard:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.7.0
-        version: 3.7.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
+        specifier: 3.8.0
+        version: 3.8.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -292,8 +292,8 @@ importers:
   www:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.7.0
-        version: 3.7.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
+        specifier: 3.8.0
+        version: 3.8.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
     devDependencies:
       '@climblive/lib':
         specifier: workspace:*
@@ -307,8 +307,8 @@ importers:
 
 packages:
 
-  '@awesome.me/webawesome@3.7.0':
-    resolution: {integrity: sha512-rAhTpJsJShv/4JWWGh+d7yQZ3pmk9j+YbwZjWWbgnPQPA+9I2/BrTUgNY+bOLehUovIbDd11J6+myGwGh0hl2w==}
+  '@awesome.me/webawesome@3.8.0':
+    resolution: {integrity: sha512-LBu/vkivsVaXoC7SGQAKf579lLoLtgk9zJYstA31mRchrkVPGQsUNH1osoXefOhra0VLk9ZuIRT23+Ynw/xCKw==}
     engines: {node: '>=14.17.0'}
 
   '@babel/code-frame@7.29.0':
@@ -499,11 +499,20 @@ packages:
   '@js-sdsl/ordered-map@4.4.2':
     resolution: {integrity: sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==}
 
+  '@konnorr/qr-creator@1.0.1':
+    resolution: {integrity: sha512-EmRR9rny1ENBtQy7TLOguO/79h1EpzXUmqIdMTGp2BW8NkZtRRPr5hmQcE+n9QXYo4T8NjcaJ14hnZg+s/+K+A==}
+
   '@kwsites/file-exists@1.1.1':
     resolution: {integrity: sha512-m9/5YGR18lIwxSFDwfE3oA7bWuq9kdau6ugN4H2rJeyhFQZcG9AgSHkQtSD15a8WvTgfz9aikZMrKPHvbpqFiw==}
 
-  '@lit-labs/ssr-dom-shim@1.5.1':
-    resolution: {integrity: sha512-Aou5UdlSpr5whQe8AA/bZG0jMj96CoJIWbGfZ91qieWu5AWUMKw8VR/pAkQkJYvBNhmCcWnZlyyk5oze8JIqYA==}
+  '@lit-labs/ssr-client@1.1.8':
+    resolution: {integrity: sha512-PjGh81oKsoI64m3IDjTqqjhC7dr2uC/o0jrllUb5gRAyp/RlAHxapgJrjq9kWz97faCHLQ8jUlTi6tGm+8fgyA==}
+
+  '@lit-labs/ssr-dom-shim@1.6.0':
+    resolution: {integrity: sha512-VHb0ALPMTlgKjM6yIxxoQNnpKyUKLD04VzeQdsiXkMqkvYlAHxq9glGLmgbb889/1GsohSOAjvQYoiBppXFqrQ==}
+
+  '@lit/context@1.1.6':
+    resolution: {integrity: sha512-M26qDE6UkQbZA2mQ3RjJ3Gzd8TxP+/0obMgE5HfkfLhEEyYE3Bui4A5XHiGPjy0MUGAyxB3QgVuw2ciS0kHn6A==}
 
   '@lit/react@1.0.8':
     resolution: {integrity: sha512-p2+YcF+JE67SRX3mMlJ1TKCSTsgyOVdAwd/nxp3NuV1+Cb6MWALbN6nT7Ld4tpmYofcE5kcaSY1YBB9erY+6fw==}
@@ -1932,11 +1941,11 @@ packages:
   lit-element@4.2.2:
     resolution: {integrity: sha512-aFKhNToWxoyhkNDmWZwEva2SlQia+jfG0fjIWV//YeTaWrVnOxD89dPKfigCUspXFmjzOEUQpOkejH5Ly6sG0w==}
 
-  lit-html@3.3.2:
-    resolution: {integrity: sha512-Qy9hU88zcmaxBXcc10ZpdK7cOLXvXpRoBxERdtqV9QOrfpMZZ6pSYP91LhpPtap3sFMUiL7Tw2RImbe0Al2/kw==}
+  lit-html@3.3.3:
+    resolution: {integrity: sha512-el8M6jK2o3RXBnrSHX3ZKrsN8zEV63pSExTO1wYJz7QndGYZ8353e2a5PPX+qHe2aGayfnchQmkAojaWAREOIA==}
 
-  lit@3.3.2:
-    resolution: {integrity: sha512-NF9zbsP79l4ao2SNrH3NkfmFgN/hBYSQo90saIVI1o5GpjAdCPVstVzO1MrLOakHoEhYkrtRjPK6Ob521aoYWQ==}
+  lit@3.3.3:
+    resolution: {integrity: sha512-fycuvZg/hkpozL00lm1pEJH5nN/lr9ZXd6mJI2HSN4+Bzc+LDNdEApJ6HFbPkdFNHLvOplIIuJvxkS4XUxqirw==}
 
   locate-character@3.0.0:
     resolution: {integrity: sha512-SW13ws7BjaeJ6p7Q6CO2nchbYEc3X3J6WrmTTDto7yMPqVSZTUyY5Tjbid+Ab8gLnATtygYtiDIJGQRRn2ZOiA==}
@@ -2263,9 +2272,6 @@ packages:
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
-
-  qr-creator@1.0.0:
-    resolution: {integrity: sha512-C0cqfbS1P5hfqN4NhsYsUXePlk9BO+a45bAQ3xLYjBL3bOIFzoVEjs79Fado9u9BPBD3buHi3+vY+C8tHh4qMQ==}
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
@@ -2685,18 +2691,20 @@ packages:
 
 snapshots:
 
-  '@awesome.me/webawesome@3.7.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)':
+  '@awesome.me/webawesome@3.8.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)':
     dependencies:
       '@ctrl/tinycolor': 4.1.0
       '@floating-ui/dom': 1.7.6
+      '@konnorr/qr-creator': 1.0.1
+      '@lit-labs/ssr-client': 1.1.8
+      '@lit/context': 1.1.6
       '@lit/react': 1.0.8(@types/react@18.2.46)
       '@shoelace-style/animations': 1.2.0
       '@shoelace-style/localize': 3.2.2
       composed-offset-position: 0.0.6(@floating-ui/utils@0.2.11)
-      lit: 3.3.2
+      lit: 3.3.3
       marked: 11.2.0
       nanoid: 5.1.11
-      qr-creator: 1.0.0
     transitivePeerDependencies:
       - '@floating-ui/utils'
       - '@types/react'
@@ -2931,13 +2939,25 @@ snapshots:
 
   '@js-sdsl/ordered-map@4.4.2': {}
 
+  '@konnorr/qr-creator@1.0.1': {}
+
   '@kwsites/file-exists@1.1.1':
     dependencies:
       debug: 4.4.3
     transitivePeerDependencies:
       - supports-color
 
-  '@lit-labs/ssr-dom-shim@1.5.1': {}
+  '@lit-labs/ssr-client@1.1.8':
+    dependencies:
+      '@lit/reactive-element': 2.1.2
+      lit: 3.3.3
+      lit-html: 3.3.3
+
+  '@lit-labs/ssr-dom-shim@1.6.0': {}
+
+  '@lit/context@1.1.6':
+    dependencies:
+      '@lit/reactive-element': 2.1.2
 
   '@lit/react@1.0.8(@types/react@18.2.46)':
     dependencies:
@@ -2945,7 +2965,7 @@ snapshots:
 
   '@lit/reactive-element@2.1.2':
     dependencies:
-      '@lit-labs/ssr-dom-shim': 1.5.1
+      '@lit-labs/ssr-dom-shim': 1.6.0
 
   '@napi-rs/wasm-runtime@1.1.4(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)':
     dependencies:
@@ -4319,19 +4339,19 @@ snapshots:
 
   lit-element@4.2.2:
     dependencies:
-      '@lit-labs/ssr-dom-shim': 1.5.1
+      '@lit-labs/ssr-dom-shim': 1.6.0
       '@lit/reactive-element': 2.1.2
-      lit-html: 3.3.2
+      lit-html: 3.3.3
 
-  lit-html@3.3.2:
+  lit-html@3.3.3:
     dependencies:
       '@types/trusted-types': 2.0.7
 
-  lit@3.3.2:
+  lit@3.3.3:
     dependencies:
       '@lit/reactive-element': 2.1.2
       lit-element: 4.2.2
-      lit-html: 3.3.2
+      lit-html: 3.3.3
 
   locate-character@3.0.0: {}
 
@@ -4647,8 +4667,6 @@ snapshots:
       once: 1.4.0
 
   punycode@2.3.1: {}
-
-  qr-creator@1.0.0: {}
 
   queue-microtask@1.2.3: {}
 
