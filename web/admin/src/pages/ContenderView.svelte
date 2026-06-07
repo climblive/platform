@@ -14,8 +14,8 @@
   import WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import {
     ContenderName,
-    LabeledText,
     EmptyState,
+    LabeledText,
   } from "@climblive/lib/components";
   import { checked, value } from "@climblive/lib/forms";
   import {
@@ -24,6 +24,7 @@
     getContestQuery,
     patchContenderMutation,
   } from "@climblive/lib/queries";
+  import { ordinalSuperscript } from "@climblive/lib/utils";
   import { format } from "date-fns";
   import { navigate } from "svelte-routing";
 
@@ -108,83 +109,100 @@
   </wa-breadcrumb>
 
   <h1>
-    {#if !contender.entered}
-      Unregistered
-    {:else if contender.disqualified}
-      <del>
+    {#if contender.entered}
+      {#if contender.disqualified}
+        <del>
+          <ContenderName
+            id={contender.id}
+            name={contender.name}
+            scrubbedAt={contender.scrubbedAt}
+            withTooltip
+          />
+        </del>
+      {:else}
         <ContenderName
           id={contender.id}
           name={contender.name}
           scrubbedAt={contender.scrubbedAt}
           withTooltip
         />
-      </del>
-    {:else}
-      <ContenderName
-        id={contender.id}
-        name={contender.name}
-        scrubbedAt={contender.scrubbedAt}
-        withTooltip
-      />
+      {/if}
     {/if}
   </h1>
+
   {#if !contender.entered}
     <EmptyState
       title="Not registered"
-      description="Scan the QR code to enter the contest and start climbing."
+      description="Have the contender scan the QR code below to enter the contest and start climbing."
     >
       {#snippet actions()}
-        <div class="registration">
-          <QrCode
-            registrationCode={contender.registrationCode}
-            width={200}
-            fill="var(--wa-color-text-normal)"
-          ></QrCode>
+        <QrCode
+          registrationCode={contender.registrationCode}
+          width={200}
+          fill="var(--wa-color-text-normal)"
+        ></QrCode>
 
-          <LabeledText label="Registration code">
-            {contender.registrationCode}
-            <wa-copy-button value={contender.registrationCode}></wa-copy-button>
-          </LabeledText>
+        <wa-button
+          href={`/${contender.registrationCode}`}
+          target="_blank"
+          appearance="plain"
+          variant="neutral"
+          size="l"
+        >
+          <wa-icon slot="start" name="arrow-up-right-from-square"></wa-icon>
+          Open scorecard
+        </wa-button>
 
-          <wa-button
-            href={`/${contender.registrationCode}`}
-            target="_blank"
-            appearance="plain"
-            variant="neutral"
-            size="l"
-          >
-            <wa-icon slot="start" name="arrow-up-right-from-square"></wa-icon>
-            Open scorecard
-          </wa-button>
-        </div>
+        <span class="registration-code">
+          {contender.registrationCode}
+          <wa-copy-button value={contender.registrationCode}></wa-copy-button>
+        </span>
       {/snippet}
     </EmptyState>
   {:else}
+    <div class="codes">
+      <a
+        href={`/${contender.registrationCode}`}
+        target="_blank"
+        class="open-scorecard-link"
+      >
+        <wa-icon name="arrow-up-right-from-square"></wa-icon>
+        Open scorecard
+      </a>
+
+      <span class="registration-code">
+        {contender.registrationCode}
+        <wa-copy-button value={contender.registrationCode} size="l"
+        ></wa-copy-button>
+      </span>
+    </div>
+
     <section>
       <article>
         <LabeledText label="Class"
           >{compClasses.find(({ id }) => id === contender.compClassId)?.name ??
             "-"}</LabeledText
         >
-        <LabeledText label="Entered"
-          >{format(contender.entered, "yyyy-MM-dd HH:mm")}</LabeledText
+        <span class="entered">
+          <LabeledText label="Entered"
+            >{format(contender.entered, "yyyy-MM-dd HH:mm")}</LabeledText
+          ></span
         >
         <LabeledText label="Placement">
           {#if contender.disqualified}
             Disqualified
+          {:else if contender.score?.placement}
+            {contender.score?.placement}<sup
+              >{ordinalSuperscript(contender.score.placement)}</sup
+            >
           {:else}
-            {contender.score?.placement ?? "-"}
+            -
           {/if}
         </LabeledText>
         <LabeledText label="Score">{contender.score?.score ?? "-"}</LabeledText>
         <LabeledText label="Finalist">
           <wa-icon name={contender.score?.finalist ? "medal" : "minus"}
           ></wa-icon>
-        </LabeledText>
-
-        <LabeledText label="Registration code">
-          {contender.registrationCode}
-          <wa-copy-button value={contender.registrationCode}></wa-copy-button>
         </LabeledText>
       </article>
     </section>
@@ -275,20 +293,10 @@
 
   article {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     row-gap: var(--wa-space-s);
     column-gap: var(--wa-space-2xl);
-  }
-
-  .registration {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wa-space-s);
-    align-items: center;
-
-    & wa-button::part(base) {
-      padding-inline: 0;
-    }
+    align-items: start;
   }
 
   .copy {
@@ -299,5 +307,30 @@
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-l);
+  }
+
+  .registration-code {
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    align-items: center;
+    font-family: monospace;
+    font-size: var(--wa-font-size-m);
+  }
+
+  .entered {
+    grid-column: 2 / span 2;
+  }
+
+  .open-scorecard-link {
+    display: block;
+    font-size: var(--wa-font-size-s);
+  }
+
+  .codes {
+    margin-block-end: var(--wa-space-m);
+    display: flex;
+    gap: var(--wa-space-m);
+    justify-content: space-between;
+    align-items: center;
   }
 </style>
