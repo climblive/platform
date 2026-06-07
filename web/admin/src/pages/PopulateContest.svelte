@@ -4,9 +4,9 @@
   const supportedClassNames = [
     "Males",
     "Females",
+    "Boys",
+    "Girls",
     "Seniors",
-    "Kids",
-    "Juniors",
   ] as const;
 
   const classNamesSchema = z
@@ -370,6 +370,23 @@
             {@attach value(defaultProblemCount.toString())}
           ></wa-number-input>
 
+          <wa-slider
+            {@attach name("problemPoints")}
+            label="Point values"
+            hint="Set the minimum and maximum top points."
+            range
+            min="0"
+            max="1000"
+            min-value={defaultProblemMinPoints}
+            max-value={defaultProblemMaxPoints}
+            step="25"
+            with-tooltip
+          >
+            <span slot="reference">0</span>
+            <span slot="reference">500</span>
+            <span slot="reference">1000</span>
+          </wa-slider>
+
           <wa-number-input
             size="s"
             {@attach name("flashBonusPercentage")}
@@ -402,23 +419,6 @@
           >
             <span slot="end">%</span>
           </wa-number-input>
-
-          <wa-slider
-            {@attach name("problemPoints")}
-            label="Point values"
-            hint="Set the minimum and maximum top points."
-            range
-            min="0"
-            max="1000"
-            min-value={defaultProblemMinPoints}
-            max-value={defaultProblemMaxPoints}
-            step="25"
-            with-tooltip
-          >
-            <span slot="reference">0</span>
-            <span slot="reference">500</span>
-            <span slot="reference">1000</span>
-          </wa-slider>
 
           <h4>Tickets</h4>
 
@@ -470,6 +470,10 @@
 
   h4 {
     margin: 0;
+
+    &:not(:first-of-type) {
+      margin-block-start: var(--wa-space-m);
+    }
   }
 
   .footer-actions {
