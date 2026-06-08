@@ -215,7 +215,10 @@ jobs:
       - uses: ./.github/actions/deploy
         with:
           package-file-name: ${{ steps.build-pkg.outputs.package-file-name }}
-          deploy-host: ${{ vars.DEPLOY_SSH_HOST }}
+          deploy-host: ${{ secrets.DEPLOY_CLOUDFLARE_TUNNEL_HOSTNAME || vars.DEPLOY_SSH_HOST }}
           deploy-user: ${{ vars.DEPLOY_SSH_USER }}
           database-password: ${{ secrets.DATABASE_PASSWORD }}
           ssh-auth-sock: ${{ steps.start-agent.outputs.ssh-auth-sock }}
+          cloudflare-tunnel-enabled: ${{ secrets.DEPLOY_CLOUDFLARE_TUNNEL_HOSTNAME != '' }}
+          cloudflare-access-client-id: ${{ secrets.DEPLOY_CLOUDFLARE_ACCESS_CLIENT_ID }}
+          cloudflare-access-client-secret: ${{ secrets.DEPLOY_CLOUDFLARE_ACCESS_CLIENT_SECRET }}

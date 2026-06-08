@@ -15,14 +15,42 @@ inputs:
   database-password:
     description: "Database password"
     required: true
+  cloudflare-tunnel-enabled:
+    description: "Whether to route SSH through Cloudflare Tunnel"
+    required: false
+    default: "false"
+  cloudflare-access-client-id:
+    description: "Cloudflare Access client ID"
+    required: false
+  cloudflare-access-client-secret:
+    description: "Cloudflare Access client secret"
+    required: false
 runs:
   using: "composite"
   steps:
     - shell: bash
       run: |
+        set -euo pipefail
+
         export SSH_AUTH_SOCK=${{ inputs.ssh-auth-sock }}
-        scp -o StrictHostKeyChecking=accept-new ${{ inputs.package-file-name }} ${{ inputs.deploy-user }}@${{ inputs.deploy-host }}:
-        ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo apt-get install -y --allow-downgrades ~/${{ inputs.package-file-name }}"
-        ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} 'sudo sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=${{ inputs.database-password }}\"/g" /etc/systemd/system/climblive.service.d/override.conf'
-        ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo systemctl daemon-reload"
-        ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo systemctl restart climblive"
+
+        ssh_args=(-o StrictHostKeyChecking=accept-new)
+
+        if [ "${{ inputs.cloudflare-tunnel-enabled }}" = "true" ]; then
+          cloudflared_path="${RUNNER_TEMP:-/tmp}/cloudflared"
+          curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o "$cloudflared_path"
+          chmod +x "$cloudflared_path"
+
+          export CF_ACCESS_CLIENT_ID="${{ inputs.cloudflare-access-client-id }}"
+          export CF_ACCESS_CLIENT_SECRET="${{ inputs.cloudflare-access-client-secret }}"
+
+          ssh_args+=(-o "ProxyCommand=$cloudflared_path access ssh --hostname %h")
+        fi
+
+        deploy_target="${{ inputs.deploy-user }}@${{ inputs.deploy-host }}"
+
+        scp "${ssh_args[@]}" ${{ inputs.package-file-name }} "$deploy_target:"
+        ssh "${ssh_args[@]}" -t "$deploy_target" "sudo apt-get install -y --allow-downgrades ~/${{ inputs.package-file-name }}"
+        ssh "${ssh_args[@]}" -t "$deploy_target" 'sudo sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=${{ inputs.database-password }}\"/g" /etc/systemd/system/climblive.service.d/override.conf'
+        ssh "${ssh_args[@]}" -t "$deploy_target" "sudo systemctl daemon-reload"
+        ssh "${ssh_args[@]}" -t "$deploy_target" "sudo systemctl restart climblive"
