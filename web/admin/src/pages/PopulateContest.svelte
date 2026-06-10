@@ -312,8 +312,8 @@
           label="Classes"
           hint="Select the classes to create."
         >
-          {#each supportedClassNames as className, index (className)}
-            <wa-option value={className} selected={index < 2}>
+          {#each supportedClassNames as className (className)}
+            <wa-option value={className}>
               {className}
             </wa-option>
           {/each}
