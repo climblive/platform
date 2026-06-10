@@ -168,9 +168,9 @@
     }
   };
 
-  const setProgress = (nextCompletedSteps: number) => {
-    completedSteps = nextCompletedSteps;
-    progress = totalSteps === 0 ? 100 : (nextCompletedSteps / totalSteps) * 100;
+  const incrementProgress = () => {
+    completedSteps += 1;
+    progress = totalSteps === 0 ? 100 : (completedSteps / totalSteps) * 100;
   };
 
   const getProblemPointsTop = (
@@ -249,31 +249,29 @@
     completed = false;
     failed = false;
     submittedValues = values;
-    setProgress(0);
 
     try {
       const compClasses = getCompClasses(values);
       const firstProblemNumber = maxExistingProblemNumber + 1;
 
-      for (const [index, compClass] of compClasses.entries()) {
+      for (const compClass of compClasses.values()) {
         await createCompClass.mutateAsync(compClass);
-        setProgress(index + 1);
+        incrementProgress();
       }
 
       for (let index = 0; index < values.problemCount; index++) {
         await createProblem.mutateAsync(
           getProblemTemplate(index, firstProblemNumber, values),
         );
-        setProgress(compClasses.length + index + 1);
+        incrementProgress();
       }
 
       if (values.ticketCount > 0) {
         await createContenders.mutateAsync({
           number: values.ticketCount,
         });
-        setProgress(totalSteps);
-      } else {
-        setProgress(totalSteps);
+
+        incrementProgress();
       }
 
       completed = true;
@@ -297,7 +295,6 @@
 <wa-dialog bind:this={dialog} label="Populate contest">
   {#if isRunning || completed || failed}
     <wa-progress-bar value={progress}></wa-progress-bar>
-    <small>{completedSteps} / {totalSteps} steps completed</small>
   {:else}
     <GenericForm schema={formSchema} submit={handlePopulate}>
       <div class="content">
@@ -452,7 +449,6 @@
     gap: var(--wa-space-xs);
   }
 
-  small,
   span {
     margin: 0;
   }
