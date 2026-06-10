@@ -246,10 +246,6 @@
   };
 
   const handlePopulate = async (values: PopulateContestFormData) => {
-    if (isRunning) {
-      return;
-    }
-
     if (values.classNames.length === 0) {
       return;
     }
