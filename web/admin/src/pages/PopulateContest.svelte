@@ -102,11 +102,11 @@
   const problems = $derived(problemsQuery.data);
 
   let dialog = $state<WaDialog>();
-  let isRunning = $state(false);
-  let completed = $state(false);
-  let failed = $state(false);
-  let progress = $state(0);
   let completedSteps = $state(0);
+
+  let operationState = $state<"idle" | "pending" | "error" | "completed">(
+    "idle",
+  );
 
   const contestNotEmpty = $derived.by(() => {
     if (
@@ -131,31 +131,21 @@
   });
 
   let totalSteps = $state(0);
+  let progress = $derived(
+    totalSteps === 0 ? 100 : (completedSteps / totalSteps) * 100,
+  );
 
   const createCompClass = $derived(createCompClassMutation(contestId));
   const createProblem = $derived(createProblemMutation(contestId));
   const createContenders = $derived(createContendersMutation(contestId));
 
   const openDialog = () => {
-    if (contestNotEmpty) {
-      return;
-    }
-
-    completed = false;
-    failed = false;
-    progress = 0;
-    completedSteps = 0;
-
     if (dialog) {
       dialog.open = true;
     }
   };
 
   const closeDialog = () => {
-    if (isRunning) {
-      return;
-    }
-
     if (dialog) {
       dialog.open = false;
     }
@@ -163,7 +153,6 @@
 
   const incrementProgress = () => {
     completedSteps += 1;
-    progress = totalSteps === 0 ? 100 : (completedSteps / totalSteps) * 100;
   };
 
   const getProblemPointsTop = (
@@ -238,45 +227,50 @@
   };
 
   const handlePopulate = async (formData: PopulateContestFormData) => {
-    isRunning = true;
-    completed = false;
-    failed = false;
+    operationState = "pending";
 
     totalSteps =
       formData.classNames.length +
       formData.problemCount +
       (formData.ticketCount > 0 ? 1 : 0);
 
+    const promises: Promise<unknown>[] = [];
+
     try {
       const compClasses = getCompClasses(formData);
       const firstProblemNumber = maxExistingProblemNumber + 1;
 
       for (const compClass of compClasses.values()) {
-        await createCompClass.mutateAsync(compClass);
-        incrementProgress();
+        promises.push(
+          createCompClass.mutateAsync(compClass).then(incrementProgress),
+        );
       }
 
       for (let index = 0; index < formData.problemCount; index++) {
-        await createProblem.mutateAsync(
-          getProblemTemplate(index, firstProblemNumber, formData),
+        promises.push(
+          createProblem
+            .mutateAsync(
+              getProblemTemplate(index, firstProblemNumber, formData),
+            )
+            .then(incrementProgress),
         );
-        incrementProgress();
       }
 
       if (formData.ticketCount > 0) {
-        await createContenders.mutateAsync({
-          number: formData.ticketCount,
-        });
-
-        incrementProgress();
+        promises.push(
+          createContenders
+            .mutateAsync({
+              number: formData.ticketCount,
+            })
+            .then(incrementProgress),
+        );
       }
 
-      completed = true;
+      await Promise.all(promises);
+      operationState = "completed";
     } catch {
-      failed = true;
+      operationState = "error";
       toastError("Failed to populate contest.");
-    } finally {
-      isRunning = false;
     }
   };
 </script>
@@ -290,11 +284,11 @@
 </wa-button>
 
 <wa-dialog bind:this={dialog} label="Populate contest">
-  {#if isRunning || completed || failed}
+  {#if operationState !== "idle"}
     <wa-progress-bar value={progress}></wa-progress-bar>
     <wa-button
       slot="footer"
-      variant={completed ? "success" : "neutral"}
+      variant={progress === 100 ? "success" : "neutral"}
       onclick={closeDialog}
     >
       Close
@@ -403,17 +397,10 @@
         ></wa-number-input>
 
         <div class="footer-actions">
-          <wa-button
-            appearance="plain"
-            type="button"
-            onclick={closeDialog}
-            disabled={isRunning}
-          >
+          <wa-button appearance="plain" type="button" onclick={closeDialog}>
             Cancel
           </wa-button>
-          <wa-button variant="neutral" type="submit" loading={isRunning}>
-            Proceed
-          </wa-button>
+          <wa-button variant="neutral" type="submit"> Proceed </wa-button>
         </div>
       </div>
     </GenericForm>
@@ -440,9 +427,5 @@
     display: flex;
     justify-content: flex-end;
     gap: var(--wa-space-xs);
-  }
-
-  span {
-    margin: 0;
   }
 </style>
