@@ -18,7 +18,7 @@
 
       return [value];
     })
-    .pipe(z.array(z.enum(supportedClassNames)).min(1));
+    .pipe(z.array(z.enum(supportedClassNames)));
 
   export const formSchema = z
     .object({
@@ -108,7 +108,6 @@
   let progress = $state(0);
   let completedSteps = $state(0);
   let submittedValues = $state<PopulateContestFormData>();
-  let formVersion = $state(0);
 
   const contestNotEmpty = $derived.by(() => {
     if (
@@ -154,7 +153,6 @@
     progress = 0;
     completedSteps = 0;
     submittedValues = undefined;
-    formVersion += 1;
 
     if (dialog) {
       dialog.open = true;
@@ -211,20 +209,20 @@
       values.problemMaxPoints,
     );
     const hasFlashBonus = index % 4 === 0;
-    const hasZone1 = index % 3 === 0;
-    const hasZone2 = index % 6 === 0;
+    const zone1Enabled = index % 3 === 0;
+    const zone2Enabled = index % 6 === 0;
     const holdColorPrimary = holdColors[index % holdColors.length];
     const problemNumber = startNumber + index;
 
     return {
       number: problemNumber,
       holdColorPrimary,
-      zone1Enabled: hasZone1,
-      zone2Enabled: hasZone2,
-      pointsZone1: hasZone1
+      zone1Enabled,
+      zone2Enabled,
+      pointsZone1: zone1Enabled
         ? getPointsByPercentage(pointsTop, values.zone1Percentage)
         : undefined,
-      pointsZone2: hasZone2
+      pointsZone2: zone2Enabled
         ? getPointsByPercentage(pointsTop, values.zone2Percentage)
         : undefined,
       pointsTop,
@@ -312,126 +310,124 @@
     <wa-progress-bar value={progress}></wa-progress-bar>
     <small>{completedSteps} / {totalSteps} steps completed</small>
   {:else}
-    {#key formVersion}
-      <GenericForm schema={formSchema} submit={handlePopulate}>
-        <div class="content">
-          <h4>Classes</h4>
+    <GenericForm schema={formSchema} submit={handlePopulate}>
+      <div class="content">
+        <h4>Classes</h4>
 
-          <wa-select
-            size="s"
-            multiple
-            with-clear
-            max-options-visible="3"
-            {@attach name("className")}
-            label="Classes"
-            hint="Select the classes to create."
+        <wa-select
+          size="s"
+          multiple
+          with-clear
+          max-options-visible="3"
+          {@attach name("className")}
+          label="Classes"
+          hint="Select the classes to create."
+        >
+          {#each supportedClassNames as className, index (className)}
+            <wa-option value={className} selected={index < 2}>
+              {className}
+            </wa-option>
+          {/each}
+        </wa-select>
+
+        <wa-number-input
+          size="s"
+          {@attach name("contestLengthHours")}
+          label="Contest length"
+          min="1"
+          max="72"
+          value="12"
+        >
+          <span slot="end">hours</span>
+        </wa-number-input>
+
+        <h4>Problems</h4>
+
+        <wa-number-input
+          size="s"
+          {@attach name("problemCount")}
+          label="Number of problems"
+          min="0"
+          max="100"
+          value="50"
+        ></wa-number-input>
+
+        <wa-slider
+          {@attach name("problemPoints")}
+          label="Point values"
+          hint="Set the minimum and maximum top points."
+          range
+          min="0"
+          max="1000"
+          min-value="25"
+          max-value="1000"
+          step="25"
+          with-tooltip
+        >
+          <span slot="reference">0</span>
+          <span slot="reference">500</span>
+          <span slot="reference">1000</span>
+        </wa-slider>
+
+        <wa-number-input
+          size="s"
+          {@attach name("flashBonusPercentage")}
+          label="Flash bonus"
+          min="0"
+          max="100"
+          value="5"
+        >
+          <span slot="end">%</span>
+        </wa-number-input>
+
+        <wa-number-input
+          size="s"
+          {@attach name("zone1Percentage")}
+          label="Zone 1"
+          min="0"
+          max="100"
+          value="15"
+        >
+          <span slot="end">%</span>
+        </wa-number-input>
+
+        <wa-number-input
+          size="s"
+          {@attach name("zone2Percentage")}
+          label="Zone 2"
+          min="0"
+          max="100"
+          value="25"
+        >
+          <span slot="end">%</span>
+        </wa-number-input>
+
+        <h4>Tickets</h4>
+
+        <wa-number-input
+          size="s"
+          {@attach name("ticketCount")}
+          label="Number of tickets"
+          min="0"
+          max="500"
+          value="100"
+        ></wa-number-input>
+
+        <div class="footer-actions">
+          <wa-button
+            appearance="plain"
+            type="button"
+            onclick={closeDialog}
+            disabled={isRunning}
           >
-            {#each supportedClassNames as className, index (className)}
-              <wa-option value={className} selected={index < 2}>
-                {className}
-              </wa-option>
-            {/each}
-          </wa-select>
-
-          <wa-number-input
-            size="s"
-            {@attach name("contestLengthHours")}
-            label="Contest length"
-            min="1"
-            max="72"
-            value="12"
-          >
-            <span slot="end">hours</span>
-          </wa-number-input>
-
-          <h4>Problems</h4>
-
-          <wa-number-input
-            size="s"
-            {@attach name("problemCount")}
-            label="Number of problems"
-            min="0"
-            max="100"
-            value="50"
-          ></wa-number-input>
-
-          <wa-slider
-            {@attach name("problemPoints")}
-            label="Point values"
-            hint="Set the minimum and maximum top points."
-            range
-            min="0"
-            max="1000"
-            min-value="25"
-            max-value="1000"
-            step="25"
-            with-tooltip
-          >
-            <span slot="reference">0</span>
-            <span slot="reference">500</span>
-            <span slot="reference">1000</span>
-          </wa-slider>
-
-          <wa-number-input
-            size="s"
-            {@attach name("flashBonusPercentage")}
-            label="Flash bonus"
-            min="0"
-            max="100"
-            value="5"
-          >
-            <span slot="end">%</span>
-          </wa-number-input>
-
-          <wa-number-input
-            size="s"
-            {@attach name("zone1Percentage")}
-            label="Zone 1"
-            min="0"
-            max="100"
-            value="15"
-          >
-            <span slot="end">%</span>
-          </wa-number-input>
-
-          <wa-number-input
-            size="s"
-            {@attach name("zone2Percentage")}
-            label="Zone 2"
-            min="0"
-            max="100"
-            value="25"
-          >
-            <span slot="end">%</span>
-          </wa-number-input>
-
-          <h4>Tickets</h4>
-
-          <wa-number-input
-            size="s"
-            {@attach name("ticketCount")}
-            label="Number of tickets"
-            min="0"
-            max="500"
-            value="100"
-          ></wa-number-input>
-
-          <div class="footer-actions">
-            <wa-button
-              appearance="plain"
-              type="button"
-              onclick={closeDialog}
-              disabled={isRunning}
-            >
-              Cancel
-            </wa-button>
-            <wa-button variant="neutral" type="submit" loading={isRunning}>
-              Proceed
-            </wa-button>
-          </div>
+            Cancel
+          </wa-button>
+          <wa-button variant="neutral" type="submit" loading={isRunning}>
+            Proceed
+          </wa-button>
         </div>
-      </GenericForm>
-    {/key}
+      </div>
+    </GenericForm>
   {/if}
 
   {#if completed || failed}
