@@ -198,7 +198,7 @@
 
   const getProblemTemplate = (
     index: number,
-    startNumber: number,
+    startNumberOffset: number,
     formData: PopulateContestFormData,
   ): ProblemTemplate => {
     const pointsTop = getProblemPointsTop(
@@ -211,7 +211,7 @@
     const zone1Enabled = index % 3 === 0;
     const zone2Enabled = index % 6 === 0;
     const holdColorPrimary = holdColors[index % holdColors.length];
-    const problemNumber = startNumber + index;
+    const problemNumber = startNumberOffset + index;
 
     return {
       number: problemNumber,
