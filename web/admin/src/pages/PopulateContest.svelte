@@ -59,7 +59,6 @@
   import { GenericForm, name } from "@climblive/lib/forms";
   import type {
     CompClassTemplate,
-    CreateContendersArguments,
     ProblemTemplate,
   } from "@climblive/lib/models";
   import {
@@ -269,11 +268,9 @@
       }
 
       if (values.ticketCount > 0) {
-        const args: CreateContendersArguments = {
+        await createContenders.mutateAsync({
           number: values.ticketCount,
-        };
-
-        await createContenders.mutateAsync(args);
+        });
         setProgress(totalSteps);
       } else {
         setProgress(totalSteps);
