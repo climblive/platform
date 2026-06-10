@@ -283,8 +283,9 @@
     <wa-progress-bar value={progress}></wa-progress-bar>
     <wa-button
       slot="footer"
-      variant={progress === 100 ? "success" : "neutral"}
+      variant={populatorState === "settled" ? "success" : "neutral"}
       onclick={closeDialog}
+      disabled={populatorState === "pending"}
     >
       Close
     </wa-button>
