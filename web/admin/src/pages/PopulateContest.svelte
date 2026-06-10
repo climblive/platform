@@ -292,6 +292,13 @@
 <wa-dialog bind:this={dialog} label="Populate contest">
   {#if isRunning || completed || failed}
     <wa-progress-bar value={progress}></wa-progress-bar>
+    <wa-button
+      slot="footer"
+      variant={completed ? "success" : "neutral"}
+      onclick={closeDialog}
+    >
+      Close
+    </wa-button>
   {:else}
     <GenericForm schema={formSchema} submit={handlePopulate}>
       <div class="content">
@@ -411,16 +418,6 @@
         </div>
       </div>
     </GenericForm>
-  {/if}
-
-  {#if completed || failed}
-    <wa-button
-      slot="footer"
-      variant={completed ? "success" : "neutral"}
-      onclick={closeDialog}
-    >
-      Close
-    </wa-button>
   {/if}
 </wa-dialog>
 
