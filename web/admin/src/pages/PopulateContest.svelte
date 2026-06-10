@@ -70,6 +70,7 @@
     getProblemsQuery,
   } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
+  import { add } from "date-fns";
 
   const holdColors = [
     "#6f3601",
@@ -225,9 +226,9 @@
 
   const getCompClasses = (formData: PopulateContestFormData) => {
     const timeBegin = new Date();
-    const timeEnd = new Date(
-      timeBegin.getTime() + formData.contestLengthHours * 60 * 60 * 1_000,
-    );
+    const timeEnd = add(timeBegin.getTime(), {
+      hours: formData.contestLengthHours,
+    });
 
     return formData.classNames.map<CompClassTemplate>((name) => ({
       name,
