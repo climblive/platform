@@ -200,13 +200,13 @@
   const getProblemTemplate = (
     index: number,
     startNumber: number,
-    values: PopulateContestFormData,
+    formData: PopulateContestFormData,
   ): ProblemTemplate => {
     const pointsTop = getProblemPointsTop(
       index,
-      values.problemCount,
-      values.problemMinPoints,
-      values.problemMaxPoints,
+      formData.problemCount,
+      formData.problemMinPoints,
+      formData.problemMaxPoints,
     );
     const hasFlashBonus = index % 4 === 0;
     const zone1Enabled = index % 3 === 0;
@@ -220,25 +220,25 @@
       zone1Enabled,
       zone2Enabled,
       pointsZone1: zone1Enabled
-        ? getPointsByPercentage(pointsTop, values.zone1Percentage)
+        ? getPointsByPercentage(pointsTop, formData.zone1Percentage)
         : undefined,
       pointsZone2: zone2Enabled
-        ? getPointsByPercentage(pointsTop, values.zone2Percentage)
+        ? getPointsByPercentage(pointsTop, formData.zone2Percentage)
         : undefined,
       pointsTop,
       flashBonus: hasFlashBonus
-        ? getPointsByPercentage(pointsTop, values.flashBonusPercentage)
+        ? getPointsByPercentage(pointsTop, formData.flashBonusPercentage)
         : undefined,
     };
   };
 
-  const getCompClasses = (values: PopulateContestFormData) => {
+  const getCompClasses = (formData: PopulateContestFormData) => {
     const timeBegin = new Date();
     const timeEnd = new Date(
-      timeBegin.getTime() + values.contestLengthHours * 60 * 60 * 1_000,
+      timeBegin.getTime() + formData.contestLengthHours * 60 * 60 * 1_000,
     );
 
-    return values.classNames.map<CompClassTemplate>((name) => ({
+    return formData.classNames.map<CompClassTemplate>((name) => ({
       name,
       timeBegin,
       timeEnd,
