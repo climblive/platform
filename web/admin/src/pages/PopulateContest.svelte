@@ -308,7 +308,6 @@
           size="s"
           multiple
           with-clear
-          max-options-visible="3"
           {@attach name("className")}
           label="Classes"
           hint="Select the classes to create."
