@@ -300,6 +300,7 @@
           {@attach name("className")}
           label="Classes"
           hint="Select the classes to create."
+          required
         >
           {#each supportedClassNames as className, index (className)}
             <wa-option value={className} selected={index < 2}>
@@ -315,6 +316,7 @@
           min="1"
           max="72"
           value="12"
+          required
         >
           <span slot="end">hours</span>
         </wa-number-input>
@@ -328,6 +330,7 @@
           min="0"
           max="100"
           value="50"
+          required
         ></wa-number-input>
 
         <wa-slider
@@ -341,6 +344,8 @@
           max-value="300"
           step="25"
           with-tooltip
+          required
+          size="s"
         >
           <span slot="reference">0</span>
           <span slot="reference">500</span>
@@ -354,6 +359,7 @@
           min="0"
           max="100"
           value="5"
+          required
         >
           <span slot="end">%</span>
         </wa-number-input>
@@ -365,6 +371,7 @@
           min="0"
           max="100"
           value="15"
+          required
         >
           <span slot="end">%</span>
         </wa-number-input>
@@ -376,6 +383,7 @@
           min="0"
           max="100"
           value="25"
+          required
         >
           <span slot="end">%</span>
         </wa-number-input>
@@ -389,6 +397,7 @@
           min="0"
           max="500"
           value="100"
+          required
         ></wa-number-input>
 
         <div class="footer-actions">
