@@ -104,17 +104,19 @@
   let dialog = $state<WaDialog>();
   let populatorState = $state<"idle" | "pending" | "error" | "settled">("idle");
 
-  const contestNotEmpty = $derived.by(() => {
+  const contestEmpty = $derived.by(() => {
     if (
       compClasses === undefined ||
       problems === undefined ||
       contenders === undefined
     ) {
-      return true;
+      return false;
     }
 
     return (
-      compClasses.length > 0 || problems.length > 0 || contenders.length > 0
+      compClasses.length === 0 &&
+      problems.length === 0 &&
+      contenders.length === 0
     );
   });
 
@@ -272,11 +274,7 @@
   };
 </script>
 
-<wa-button
-  appearance="outlined"
-  onclick={openDialog}
-  disabled={contestNotEmpty}
->
+<wa-button appearance="outlined" onclick={openDialog} disabled={!contestEmpty}>
   Populate with fake data
 </wa-button>
 
@@ -339,8 +337,8 @@
           range
           min="0"
           max="1000"
-          min-value="25"
-          max-value="1000"
+          min-value="50"
+          max-value="300"
           step="25"
           with-tooltip
         >
