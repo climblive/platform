@@ -22,7 +22,7 @@
 
   export const formSchema = z
     .object({
-      contestLengthHours: z.coerce.number().int(),
+      contestLengthHours: z.coerce.number(),
       problemCount: z.coerce.number(),
       ticketCount: z.coerce.number(),
       problemPoints: z
@@ -56,7 +56,7 @@
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/slider/slider.js";
   import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
-  import { GenericForm, name, value } from "@climblive/lib/forms";
+  import { GenericForm, name } from "@climblive/lib/forms";
   import type {
     CompClassTemplate,
     CreateContendersArguments,
@@ -91,14 +91,7 @@
     contestId: number;
   };
 
-  const defaultContestLengthHours = 12;
-  const defaultProblemMinPoints = 50;
-  const defaultProblemMaxPoints = 300;
-  const defaultFlashBonusPercentage = 5;
-  const defaultZone1Percentage = 15;
-  const defaultZone2Percentage = 20;
-
-  let { contestId }: Props = $props();
+  const { contestId }: Props = $props();
 
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
   const contendersQuery = $derived(getContendersByContestQuery(contestId));
@@ -116,14 +109,6 @@
   let completedSteps = $state(0);
   let submittedValues = $state<PopulateContestFormData>();
   let formVersion = $state(0);
-
-  const defaultProblemCount = $derived(
-    Math.min(50, 100 - (problems?.length ?? 0)),
-  );
-
-  const defaultTicketCount = $derived(
-    Math.min(100, 500 - (contenders?.length ?? 0)),
-  );
 
   const contestNotEmpty = $derived.by(() => {
     if (
@@ -354,7 +339,7 @@
             label="Contest length"
             min="1"
             max="72"
-            {@attach value(defaultContestLengthHours.toString())}
+            value="12"
           >
             <span slot="end">hours</span>
           </wa-number-input>
@@ -367,7 +352,7 @@
             label="Number of problems"
             min="0"
             max="100"
-            {@attach value(defaultProblemCount.toString())}
+            value="50"
           ></wa-number-input>
 
           <wa-slider
@@ -377,8 +362,8 @@
             range
             min="0"
             max="1000"
-            min-value={defaultProblemMinPoints}
-            max-value={defaultProblemMaxPoints}
+            min-value="25"
+            max-value="1000"
             step="25"
             with-tooltip
           >
@@ -393,7 +378,7 @@
             label="Flash bonus"
             min="0"
             max="100"
-            {@attach value(defaultFlashBonusPercentage.toString())}
+            value="5"
           >
             <span slot="end">%</span>
           </wa-number-input>
@@ -404,7 +389,7 @@
             label="Zone 1"
             min="0"
             max="100"
-            {@attach value(defaultZone1Percentage.toString())}
+            value="15"
           >
             <span slot="end">%</span>
           </wa-number-input>
@@ -415,7 +400,7 @@
             label="Zone 2"
             min="0"
             max="100"
-            {@attach value(defaultZone2Percentage.toString())}
+            value="25"
           >
             <span slot="end">%</span>
           </wa-number-input>
@@ -428,7 +413,7 @@
             label="Number of tickets"
             min="0"
             max="500"
-            {@attach value(defaultTicketCount.toString())}
+            value="100"
           ></wa-number-input>
 
           <div class="footer-actions">
