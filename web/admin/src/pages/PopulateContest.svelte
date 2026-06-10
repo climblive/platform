@@ -106,7 +106,6 @@
   let failed = $state(false);
   let progress = $state(0);
   let completedSteps = $state(0);
-  let submittedValues = $state<PopulateContestFormData>();
 
   const contestNotEmpty = $derived.by(() => {
     if (
@@ -130,13 +129,7 @@
     return Math.max(...problems.map(({ number }) => number));
   });
 
-  const totalSteps = $derived(
-    submittedValues === undefined
-      ? 0
-      : submittedValues.classNames.length +
-          submittedValues.problemCount +
-          (submittedValues.ticketCount > 0 ? 1 : 0),
-  );
+  let totalSteps = $state(0);
 
   const createCompClass = $derived(createCompClassMutation(contestId));
   const createProblem = $derived(createProblemMutation(contestId));
@@ -151,7 +144,6 @@
     failed = false;
     progress = 0;
     completedSteps = 0;
-    submittedValues = undefined;
 
     if (dialog) {
       dialog.open = true;
@@ -244,14 +236,18 @@
     }));
   };
 
-  const handlePopulate = async (values: PopulateContestFormData) => {
+  const handlePopulate = async (formData: PopulateContestFormData) => {
     isRunning = true;
     completed = false;
     failed = false;
-    submittedValues = values;
+
+    totalSteps =
+      formData.classNames.length +
+      formData.problemCount +
+      (formData.ticketCount > 0 ? 1 : 0);
 
     try {
-      const compClasses = getCompClasses(values);
+      const compClasses = getCompClasses(formData);
       const firstProblemNumber = maxExistingProblemNumber + 1;
 
       for (const compClass of compClasses.values()) {
@@ -259,16 +255,16 @@
         incrementProgress();
       }
 
-      for (let index = 0; index < values.problemCount; index++) {
+      for (let index = 0; index < formData.problemCount; index++) {
         await createProblem.mutateAsync(
-          getProblemTemplate(index, firstProblemNumber, values),
+          getProblemTemplate(index, firstProblemNumber, formData),
         );
         incrementProgress();
       }
 
-      if (values.ticketCount > 0) {
+      if (formData.ticketCount > 0) {
         await createContenders.mutateAsync({
-          number: values.ticketCount,
+          number: formData.ticketCount,
         });
 
         incrementProgress();
