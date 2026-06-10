@@ -102,11 +102,7 @@
   const problems = $derived(problemsQuery.data);
 
   let dialog = $state<WaDialog>();
-  let completedSteps = $state(0);
-
-  let operationState = $state<"idle" | "pending" | "error" | "completed">(
-    "idle",
-  );
+  let populatorState = $state<"idle" | "pending" | "error" | "settled">("idle");
 
   const contestNotEmpty = $derived.by(() => {
     if (
@@ -131,6 +127,7 @@
   });
 
   let totalSteps = $state(0);
+  let completedSteps = $state(0);
   let progress = $derived(
     totalSteps === 0 ? 100 : (completedSteps / totalSteps) * 100,
   );
@@ -227,7 +224,7 @@
   };
 
   const handlePopulate = async (formData: PopulateContestFormData) => {
-    operationState = "pending";
+    populatorState = "pending";
 
     totalSteps =
       formData.classNames.length +
@@ -267,9 +264,9 @@
       }
 
       await Promise.all(promises);
-      operationState = "completed";
+      populatorState = "settled";
     } catch {
-      operationState = "error";
+      populatorState = "error";
       toastError("Failed to populate contest.");
     }
   };
@@ -284,7 +281,7 @@
 </wa-button>
 
 <wa-dialog bind:this={dialog} label="Populate contest">
-  {#if operationState !== "idle"}
+  {#if populatorState !== "idle"}
     <wa-progress-bar value={progress}></wa-progress-bar>
     <wa-button
       slot="footer"
