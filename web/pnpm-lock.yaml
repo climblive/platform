@@ -91,7 +91,7 @@ importers:
   e2e:
     devDependencies:
       '@playwright/test':
-        specifier: ^1.59.1
+        specifier: ^1.60.0
         version: 1.60.0
       '@testcontainers/mariadb':
         specifier: ^11.14.0
