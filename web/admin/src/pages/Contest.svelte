@@ -11,6 +11,7 @@
   import {
     getContendersByContestQuery,
     getContestQuery,
+    getSelfQuery,
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
@@ -35,8 +36,10 @@
   let compClassesHeading: HTMLHeadingElement | undefined = $state();
 
   const contestQuery = $derived(getContestQuery(contestId));
+  const selfQuery = $derived(getSelfQuery());
 
   const contest = $derived(contestQuery.data);
+  const self = $derived(selfQuery.data);
 
   $effect(() => {
     const hash = window.location.hash.substring(1);
@@ -169,7 +172,7 @@
           organizerId={contest.ownership.organizerId}
         />
       </div>
-      {#if location.hostname !== "climblive.app"}
+      {#if location.hostname !== "climblive.app" || self?.admin}
         <h3>Developer tools</h3>
         <div class="developer-tools">
           <wa-button
