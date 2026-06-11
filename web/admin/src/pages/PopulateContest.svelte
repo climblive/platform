@@ -233,39 +233,26 @@
       formData.problemCount +
       (formData.ticketCount > 0 ? 1 : 0);
 
-    const promises: Promise<unknown>[] = [];
-
     try {
       const compClasses = getCompClasses(formData);
       const firstProblemNumber = maxExistingProblemNumber + 1;
 
       for (const compClass of compClasses.values()) {
-        promises.push(
-          createCompClass.mutateAsync(compClass).then(incrementProgress),
-        );
+        await createCompClass.mutateAsync(compClass).then(incrementProgress);
       }
 
       for (let index = 0; index < formData.problemCount; index++) {
-        promises.push(
-          createProblem
-            .mutateAsync(
-              getProblemTemplate(index, firstProblemNumber, formData),
-            )
-            .then(incrementProgress),
-        );
+        await createProblem
+          .mutateAsync(getProblemTemplate(index, firstProblemNumber, formData))
+          .then(incrementProgress);
       }
 
       if (formData.ticketCount > 0) {
-        promises.push(
-          createContenders
-            .mutateAsync({
-              number: formData.ticketCount,
-            })
-            .then(incrementProgress),
-        );
+        await createContenders
+          .mutateAsync({ number: formData.ticketCount })
+          .then(incrementProgress);
       }
 
-      await Promise.all(promises);
       populatorState = "settled";
     } catch {
       populatorState = "error";
