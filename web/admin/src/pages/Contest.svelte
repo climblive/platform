@@ -17,6 +17,7 @@
   import ArchiveContest from "./ArchiveContest.svelte";
   import CompClassList from "./CompClassList.svelte";
   import DuplicateContest from "./DuplicateContest.svelte";
+  import PopulateContest from "./PopulateContest.svelte";
   import ProblemList from "./ProblemList.svelte";
   import RaffleList from "./RaffleList.svelte";
   import RestoreContest from "./RestoreContest.svelte";
@@ -170,13 +171,17 @@
       </div>
       {#if location.hostname !== "climblive.app"}
         <h3>Developer tools</h3>
-        <wa-button
-          appearance="outlined"
-          disabled={!contenders || contenders.length === 0}
-          onclick={handleDownloadSimulatorConfig}
-          >Download simulator config
-          <wa-icon name="download" slot="start"></wa-icon>
-        </wa-button>
+        <div class="developer-tools">
+          <wa-button
+            appearance="outlined"
+            disabled={!contenders || contenders.length === 0}
+            onclick={handleDownloadSimulatorConfig}
+            >Download simulator config
+            <wa-icon name="download" slot="start"></wa-icon>
+          </wa-button>
+
+          <PopulateContest {contestId} />
+        </div>
       {/if}
       <h3>Score Engines</h3>
       <p>
@@ -204,6 +209,12 @@
   }
 
   .actions {
+    display: flex;
+    gap: var(--wa-space-xs);
+    flex-wrap: wrap;
+  }
+
+  .developer-tools {
     display: flex;
     gap: var(--wa-space-xs);
     flex-wrap: wrap;
