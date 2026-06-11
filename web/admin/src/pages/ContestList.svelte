@@ -199,18 +199,20 @@
 {/snippet}
 
 {#snippet createButton(className?: string)}
-  <wa-button
-    id={createButtonId}
-    class={className}
-    variant="neutral"
-    disabled={limitReached}
-    onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
-    >Create new contest</wa-button
-  >
-  {#if limitReached}
-    <wa-tooltip for={createButtonId} placement="top-start"
-      >Maximum of {maxContestsPerWeek} contests per week reached.</wa-tooltip
+  {#if organizerId}
+    <wa-button
+      id={createButtonId}
+      class={className}
+      variant="neutral"
+      disabled={limitReached}
+      onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
+      >Create new contest</wa-button
     >
+    {#if limitReached}
+      <wa-tooltip for={createButtonId} placement="top-start"
+        >Maximum of {maxContestsPerWeek} contests per week reached.</wa-tooltip
+      >
+    {/if}
   {/if}
 {/snippet}
 
