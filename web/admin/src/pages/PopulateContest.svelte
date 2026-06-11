@@ -402,10 +402,10 @@
         ></wa-number-input>
 
         <div class="footer-actions">
-          <wa-button appearance="plain" type="button" onclick={closeDialog}>
-            Cancel
-          </wa-button>
-          <wa-button variant="neutral" type="submit"> Proceed </wa-button>
+          <wa-button appearance="plain" type="button" onclick={closeDialog}
+            >Cancel</wa-button
+          >
+          <wa-button variant="neutral" type="submit">Proceed</wa-button>
         </div>
       </div>
     </GenericForm>
