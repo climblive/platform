@@ -10,11 +10,11 @@
   "keywords": [],
   "author": "",
   "devDependencies": {
-    "@playwright/test": "^1.59.1",
+    "@playwright/test": "^1.60.0",
     "@testcontainers/mariadb": "^11.14.0",
-    "@types/node": "^25.6.1",
+    "@types/node": "^25.9.2",
     "fs": "0.0.1-security",
-    "mariadb": "^3.5.2",
+    "mariadb": "^3.5.3",
     "testcontainers": "^11.14.0"
   }
 }
