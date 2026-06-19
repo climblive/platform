@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import {
   MariaDbContainer,
   StartedMariaDbContainer,
@@ -18,6 +18,55 @@ let startedDbContainer: StartedMariaDbContainer | undefined;
 let startedAppContainer: StartedTestContainer | undefined;
 
 test.describe.configure({ mode: "serial" });
+
+const clickTickOption = async (
+  problem: Locator,
+  option: "Top" | "Zone 1" | "Zone 2",
+) => {
+  await problem.locator(`wa-checkbox[aria-label="${option}"]`).click();
+};
+
+const clearTopSelection = async (problem: Locator) => {
+  await clickTickOption(problem, "Top");
+  await clickTickOption(problem, "Zone 2");
+  await clickTickOption(problem, "Zone 1");
+};
+
+const openTickDialog = async (problem: Locator) => {
+  await problem.getByRole("button", { name: /Tick|Edit/ }).click();
+};
+
+const saveAttempts = async (
+  problem: Locator,
+  option: "Top" | "Zone 1" | "Zone 2",
+  attempts: number,
+) => {
+  await problem
+    .getByRole("button", { name: `Edit ${option} attempts` })
+    .click();
+  await problem
+    .locator(`wa-number-input[aria-label="${option} attempts"]`)
+    .evaluate((element, value) => {
+      const input = element as HTMLElement & { value: string };
+      input.value = String(value);
+      input.dispatchEvent(new CustomEvent("wa-input", { bubbles: true }));
+    }, attempts);
+  await problem
+    .getByRole("button", { name: `Save ${option} attempts` })
+    .click();
+};
+
+const closeTickDialog = async (page: Page) => {
+  await page.keyboard.press("Escape");
+};
+
+const getTopScore = (problemNumber: number) => {
+  if (problemNumber < 5) {
+    return `+${problemNumber * 100 + 10}p`;
+  }
+
+  return `+${problemNumber * 100}p`;
+};
 
 test.beforeAll(async () => {
   const network = await new Network().start();
@@ -276,23 +325,25 @@ test("tick and untick all problems", async ({ page }) => {
     const problem = page.getByRole("region", { name: `Problem ${p}` });
     await expect(problem).toBeVisible();
 
-    await problem.getByRole("button", { name: "Tick" }).click();
-    await problem.getByRole("button", { name: "Top" }).click();
+    await openTickDialog(problem);
+    await clickTickOption(problem, "Top");
 
-    await expect(problem.getByText(`+${p * 100}p`)).toBeVisible();
+    await expect(problem.getByText(getTopScore(p))).toBeVisible();
+    await closeTickDialog(page);
   }
 
-  await expect(page.getByText("1500p")).toBeVisible();
+  await expect(page.getByText("1540p")).toBeVisible();
   await expect(page.getByText("1st").first()).toBeVisible();
 
   for (let p = 1; p <= 5; p++) {
     const problem = page.getByRole("region", { name: `Problem ${p}` });
     await expect(problem).toBeVisible();
 
-    await problem.getByRole("button", { name: "Edit" }).click();
-    await problem.getByRole("button", { name: "Unsend" }).click();
+    await openTickDialog(problem);
+    await clearTopSelection(problem);
 
-    await expect(problem.getByText(`+${p * 100}p`)).not.toBeVisible();
+    await expect(problem.getByText(getTopScore(p))).not.toBeVisible();
+    await closeTickDialog(page);
   }
 
   await expect(page.getByText("0p", { exact: true })).toBeVisible();
@@ -305,13 +356,13 @@ test("tick a problem as a flash", async ({ page }) => {
   const problem = page.getByRole("region", { name: "Problem 1" });
   await expect(problem).toBeVisible();
 
-  await problem.getByRole("button", { name: "Tick" }).click();
-  await problem.getByRole("button", { name: "Flash" }).click();
+  await openTickDialog(problem);
+  await clickTickOption(problem, "Top");
 
   await expect(problem.getByText("+110p")).toBeVisible();
+  await expect(problem.locator('button[data-variant="flash"]')).toBeVisible();
 
-  await problem.getByRole("button", { name: "Edit" }).click();
-  await problem.getByRole("button", { name: "Unsend" }).click();
+  await clearTopSelection(problem);
 
   await expect(problem.getByText("+110p")).not.toBeVisible();
 });
@@ -322,13 +373,12 @@ test("tick the first zone", async ({ page }) => {
   const problem = page.getByRole("region", { name: "Problem 1" });
   await expect(problem).toBeVisible();
 
-  await problem.getByRole("button", { name: "Tick" }).click();
-  await problem.getByRole("button", { name: "Zone 1" }).click();
+  await openTickDialog(problem);
+  await clickTickOption(problem, "Zone 1");
 
   await expect(problem.getByText("+10p")).toBeVisible();
 
-  await problem.getByRole("button", { name: "Edit" }).click();
-  await problem.getByRole("button", { name: "Unsend" }).click();
+  await clickTickOption(problem, "Zone 1");
 
   await expect(problem.getByText("+10p")).not.toBeVisible();
 });
@@ -339,13 +389,13 @@ test("tick the second zone", async ({ page }) => {
   const problem = page.getByRole("region", { name: "Problem 1" });
   await expect(problem).toBeVisible();
 
-  await problem.getByRole("button", { name: "Tick" }).click();
-  await problem.getByRole("button", { name: "Zone 2" }).click();
+  await openTickDialog(problem);
+  await clickTickOption(problem, "Zone 2");
 
   await expect(problem.getByText("+20p")).toBeVisible();
 
-  await problem.getByRole("button", { name: "Edit" }).click();
-  await problem.getByRole("button", { name: "Unsend" }).click();
+  await clickTickOption(problem, "Zone 2");
+  await clickTickOption(problem, "Zone 1");
 
   await expect(problem.getByText("+20p")).not.toBeVisible();
 });
@@ -356,30 +406,64 @@ test("update a problem through all scoring states", async ({ page }) => {
   const problem = page.getByRole("region", { name: "Problem 1" });
   await expect(problem).toBeVisible();
 
-  await problem.getByRole("button", { name: "Tick" }).click();
-  await problem.getByRole("button", { name: "Zone 1" }).click();
+  await openTickDialog(problem);
+  await clickTickOption(problem, "Zone 1");
 
   await expect(problem.getByText("+10p")).toBeVisible();
 
-  await problem.getByRole("button", { name: "Edit" }).click();
-  await problem.getByRole("button", { name: "Zone 2" }).click();
+  await clickTickOption(problem, "Zone 2");
 
   await expect(problem.getByText("+20p")).toBeVisible();
 
-  await problem.getByRole("button", { name: "Edit" }).click();
-  await problem.getByRole("button", { name: "Top" }).click();
+  await clickTickOption(problem, "Top");
+  await expect(problem.getByText("+110p")).toBeVisible();
+  await expect(problem.locator('button[data-variant="flash"]')).toBeVisible();
+
+  await clearTopSelection(problem);
+  await problem.getByRole("button", { name: "Log failed attempt" }).click();
+  await clickTickOption(problem, "Top");
 
   await expect(problem.getByText("+100p")).toBeVisible();
+  await expect(problem.locator('button[data-variant="top"]')).toBeVisible();
 
-  await problem.getByRole("button", { name: "Edit" }).click();
-  await problem.getByRole("button", { name: "Flash" }).click();
+  await clearTopSelection(problem);
 
-  await expect(problem.getByText("+110p")).toBeVisible();
+  await expect(problem.getByText("+100p")).not.toBeVisible();
+});
 
-  await problem.getByRole("button", { name: "Edit" }).click();
-  await problem.getByRole("button", { name: "Unsend" }).click();
+test("adjust attempts with inline editor", async ({ page }) => {
+  await page.goto("/ABCD0003");
 
-  await expect(problem.getByText("+110p")).not.toBeVisible();
+  const problem = page.getByRole("region", { name: "Problem 1" });
+  await expect(problem).toBeVisible();
+
+  await openTickDialog(problem);
+  await expect(
+    problem.getByRole("button", { name: "Edit Top attempts" }),
+  ).toHaveCount(0);
+  await saveAttempts(problem, "Zone 1", 1);
+  await expect(problem.getByText("1 failed attempt")).toHaveCount(3);
+  await expect(
+    problem.getByRole("button", { name: "Edit Top attempts" }),
+  ).toBeVisible();
+
+  await saveAttempts(problem, "Zone 2", 2);
+  await expect(problem.getByText("1 failed attempt")).toHaveCount(3);
+
+  await clickTickOption(problem, "Zone 1");
+  await expect(problem.getByText("2 failed attempts")).toHaveCount(2);
+  await expect(problem.getByText("2 attempts")).toHaveCount(1);
+
+  await saveAttempts(problem, "Top", 3);
+  await expect(problem.getByText("2 failed attempts")).toHaveCount(2);
+  await expect(problem.getByText("2 attempts")).toHaveCount(1);
+
+  await saveAttempts(problem, "Zone 2", 4);
+  await expect(problem.getByText("4 failed attempts")).toHaveCount(2);
+  await expect(problem.getByText("2 attempts")).toHaveCount(1);
+
+  await clickTickOption(problem, "Zone 1");
+  await expect(problem.getByText("2 failed attempts")).toHaveCount(3);
 });
 
 test("info tab", async ({ page }) => {
