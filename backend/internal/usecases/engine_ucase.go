@@ -12,6 +12,7 @@ import (
 
 type scoreEngineManager interface {
 	GetScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) (scores.ScoreEngineDescriptor, error)
+	ListScoreEngines(ctx context.Context) ([]scores.ScoreEngineDescriptor, error)
 	ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]scores.ScoreEngineDescriptor, error)
 	StopScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) error
 	StartScoreEngine(ctx context.Context, contestID domain.ContestID, terminatedBy time.Time) (domain.ScoreEngineInstanceID, error)
@@ -25,6 +26,34 @@ type ScoreEngineUseCase struct {
 	Authorizer         domain.Authorizer
 	Repo               scoreEngineUseCaseRepository
 	ScoreEngineManager scoreEngineManager
+}
+
+func (uc *ScoreEngineUseCase) ListScoreEngines(ctx context.Context) ([]scores.ScoreEngineDescriptor, error) {
+	engines, err := uc.ScoreEngineManager.ListScoreEngines(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	accessibleEngines := make([]scores.ScoreEngineDescriptor, 0, len(engines))
+
+	for _, engine := range engines {
+		contest, err := uc.Repo.GetContest(ctx, nil, engine.ContestID)
+		if err != nil {
+			return nil, errors.Wrap(err, 0)
+		}
+
+		if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+			if errors.Is(err, domain.ErrNoOwnership) {
+				continue
+			}
+
+			return nil, errors.Wrap(err, 0)
+		}
+
+		accessibleEngines = append(accessibleEngines, engine)
+	}
+
+	return accessibleEngines, nil
 }
 
 func (uc *ScoreEngineUseCase) ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreEngineInstanceID, error) {

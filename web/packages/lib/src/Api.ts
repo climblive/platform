@@ -37,6 +37,11 @@ interface ApiCredentialsProvider {
   getAuthHeaders(): RawAxiosRequestHeaders;
 }
 
+const runningScoreEngineSchema = z.object({
+  contestId: z.number(),
+  instanceId: z.string().uuid(),
+});
+
 export class ContenderCredentialsProvider implements ApiCredentialsProvider {
   private registrationCode: string;
 
@@ -401,6 +406,16 @@ export class ApiClient {
     });
 
     return z.array(z.string().uuid()).parse(result.data);
+  };
+
+  getRunningScoreEngines = async () => {
+    const endpoint = "/score-engines";
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(runningScoreEngineSchema).parse(result.data);
   };
 
   startScoreEngine = async (
