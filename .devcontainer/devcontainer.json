@@ -18,7 +18,7 @@
       "golangciLintVersion": "2.9.0"
     },
     "ghcr.io/devcontainers/features/docker-in-docker:": {},
-    "ghcr.io/devcontainers/features/node:1": {
+    "ghcr.io/devcontainers/features/node:2": {
       "version": "22",
       "pnpmVersion": "11.1.1"
     }
