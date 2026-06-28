@@ -42,9 +42,7 @@
     const name = String(path[0]);
 
     const input = form?.querySelector(`[name="${name}"]`) as
-      | HTMLInputElement
-      | null
-      | undefined;
+      HTMLInputElement | null | undefined;
 
     if (!input) {
       return;
@@ -59,8 +57,7 @@
 
   const resetCustomValidation = () => {
     const inputs = form?.querySelectorAll(`[name]`) as
-      | NodeListOf<HTMLInputElement>
-      | undefined;
+      NodeListOf<HTMLInputElement> | undefined;
 
     if (!inputs) {
       return;
