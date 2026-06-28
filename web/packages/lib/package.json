@@ -39,7 +39,7 @@
     "vite": "^8.1.0"
   },
   "dependencies": {
-    "@awesome.me/webawesome": "3.8.0",
+    "@awesome.me/webawesome": "3.9.0",
     "@sentry/svelte": "^10.62.0",
     "@tanstack/svelte-query": "^6.1.35",
     "axios": "^1.18.1",
