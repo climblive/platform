@@ -579,7 +579,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			}).
 			Return()
 
-		f.engine.HandleProblemAdded(domain.ProblemAddedEvent{
+		effects := f.engine.HandleProblemAdded(domain.ProblemAddedEvent{
 			ProblemID: fakedProblemID,
 			ProblemValue: domain.ProblemValue{
 				PointsTop:   100,
@@ -588,6 +588,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 				FlashBonus:  10,
 			},
 		})
+
+		require.Nil(t, effects)
 
 		awaitExpectations(t)
 	})
@@ -644,7 +646,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			}).
 			Return()
 
-		f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
+		effects := f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
 			ContenderID:   fakedContenderID,
 			ProblemID:     fakedProblemID,
 			Top:           true,
@@ -654,6 +656,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Zone2:         true,
 			AttemptsZone2: 3,
 		})
+
+		require.Nil(t, effects)
 
 		awaitExpectations(t)
 	})
@@ -736,10 +740,12 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("DeleteTick", fakedContenderID, fakedProblemID).
 			Return()
 
-		f.engine.HandleAscentDeregistered(domain.AscentDeregisteredEvent{
+		effects := f.engine.HandleAscentDeregistered(domain.AscentDeregisteredEvent{
 			ContenderID: fakedContenderID,
 			ProblemID:   fakedProblemID,
 		})
+
+		require.Nil(t, effects)
 
 		awaitExpectations(t)
 	})
