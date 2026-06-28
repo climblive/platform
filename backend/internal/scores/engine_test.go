@@ -1431,6 +1431,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(slices.Values([]scores.Contender{
 				{ID: fakedContender1ID},
 				{ID: fakedContender2ID},
+				{ID: fakedContender3ID},
 			}))
 
 		f.store.
@@ -1451,12 +1452,23 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Zone2:       true,
 				Top:         true,
 				AttemptsTop: 1,
+			}, true).
+			On("GetTick", fakedContender3ID, fakedProblemID).
+			Return(scores.Tick{
+				ContenderID: fakedContender3ID,
+				ProblemID:   fakedProblemID,
+				Zone1:       true,
+				Zone2:       true,
+				Top:         true,
+				AttemptsTop: 1,
 			}, true)
 
 		f.store.
 			On("GetPointValue", fakedContender1ID, fakedProblemID).
 			Return(domain.PointValue{}, false).
 			On("GetPointValue", fakedContender2ID, fakedProblemID).
+			Return(domain.PointValue{}, false).
+			On("GetPointValue", fakedContender3ID, fakedProblemID).
 			Return(domain.PointValue{}, false)
 
 		f.store.
@@ -1477,6 +1489,15 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Zone2:       50,
 				Top:         250,
 				Flash:       262,
+			}).Return().
+			On("SavePointValue", fakedContender3ID, fakedProblemID, domain.PointValue{
+				ContenderID: fakedContender3ID,
+				ProblemID:   fakedProblemID,
+				Current:     0,
+				Zone1:       0,
+				Zone2:       0,
+				Top:         0,
+				Flash:       0,
 			}).Return()
 
 		effects := slices.Collect(f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID))
@@ -1484,6 +1505,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 		require.ElementsMatch(t, effects, []scores.Effect{
 			scores.EffectScoreContender{ContenderID: fakedContender1ID},
 			scores.EffectScoreContender{ContenderID: fakedContender2ID},
+			scores.EffectScoreContender{ContenderID: fakedContender3ID},
 		})
 
 		awaitExpectations(t)
