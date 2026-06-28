@@ -124,9 +124,7 @@ func (e *DefaultScoreEngine) Start() iter.Seq[Effect] {
 					return
 				}
 			}
-		}
 
-		for _, compClassID := range e.store.GetCompClassIDs() {
 			if !yield(EffectRankClass{CompClassID: compClassID}) {
 				return
 			}
