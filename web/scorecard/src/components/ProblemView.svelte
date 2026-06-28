@@ -16,6 +16,19 @@
   }
 
   const { problem, tick, disabled, disqualified, counted }: Props = $props();
+
+  const highestPossibleValue = $derived.by(() => {
+    if (problem.pointValue === undefined) {
+      return 0;
+    }
+
+    return Math.max(
+      problem.pointValue.zone1,
+      problem.pointValue.zone2,
+      problem.pointValue.top,
+      problem.pointValue.flash,
+    );
+  });
 </script>
 
 <section
@@ -31,9 +44,7 @@
   />
   <span class="number">№ {problem.number}</span>
   <span class="points">
-    {#if problem.pointValue}
-      <span class="top">≤ {problem.pointValue.flash}p</span>
-    {/if}
+    <span class="top">≤ {highestPossibleValue}p</span>
   </span>
   <div class="score" class:uncounted={!counted}>
     {#if tick && problem.pointValue}

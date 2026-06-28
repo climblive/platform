@@ -1228,7 +1228,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Zone1:       10,
 				Zone2:       25,
 				Top:         166,
-				Flash:       199,
+				Flash:       0,
 			}).Return().
 			On("SavePointValue", fakedContender4ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender4ID,
@@ -1237,7 +1237,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Zone1:       10,
 				Zone2:       25,
 				Top:         125,
-				Flash:       158,
+				Flash:       0,
 			}).Return().
 			On("SavePointValue", fakedContender5ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender5ID,
@@ -1246,7 +1246,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Zone1:       10,
 				Zone2:       20,
 				Top:         125,
-				Flash:       158,
+				Flash:       0,
 			}).Return()
 
 		effects := slices.Collect(f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID))

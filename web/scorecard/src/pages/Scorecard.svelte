@@ -129,11 +129,24 @@
             return -1;
           }
 
-          if (p1.pointValue.flash === p2.pointValue.flash) {
+          const p1Best = Math.max(
+            p1.pointValue.zone1,
+            p1.pointValue.zone2,
+            p1.pointValue.top,
+            p1.pointValue.flash,
+          );
+          const p2Best = Math.max(
+            p2.pointValue.zone1,
+            p2.pointValue.zone2,
+            p2.pointValue.top,
+            p2.pointValue.flash,
+          );
+
+          if (p1Best === p2Best) {
             return p1.number - p2.number;
           }
 
-          return p1.pointValue.flash - p2.pointValue.flash;
+          return p1Best - p2Best;
         });
 
         break;
