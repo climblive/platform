@@ -1612,7 +1612,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("GetRules").
 			Return(scores.Rules{
 				QualifyingProblems: 0,
-				UsePoints:          false,
 			})
 
 		f.store.
@@ -1699,7 +1698,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("GetRules").
 			Return(scores.Rules{
 				QualifyingProblems: 2,
-				UsePoints:          true,
 			})
 
 		f.store.
@@ -1756,7 +1754,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("GetRules").
 			Return(scores.Rules{
 				QualifyingProblems: 0,
-				UsePoints:          false,
 			})
 
 		effects := f.engine.ScoreContender(fakedContenderID)
@@ -1815,7 +1812,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("GetRules").
 			Return(scores.Rules{
 				QualifyingProblems: 0,
-				UsePoints:          false,
 			})
 
 		f.store.
