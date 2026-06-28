@@ -3,7 +3,7 @@
 //////////
 // source: id.go
 
-export type ResourceID = number /* int32 */;
+export type ResourceID = number; /* int32 */
 export type CompClassID = ResourceID;
 export type ContenderID = ResourceID;
 export type ContestID = ResourceID;
