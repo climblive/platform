@@ -447,34 +447,38 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 			ProblemID:   problemID,
 		}
 
-		if contender.Disqualified {
-			continue
+		if !contender.Disqualified {
+			pointValue.Current = CalculatePoints(problemValue, tick)
 		}
 
-		pointValue.Current = CalculatePoints(problemValue, tick)
+		switch {
+		case contender.Disqualified:
+		case rules.PooledPoints:
+			{
+				hypotheticalProblemValue := tickPool.Sub(tick).Add(hypotheticalBestTop).CalculateProblemValue(problem.ProblemValue)
 
-		if rules.PooledPoints {
-			hypotheticalProblemValue := tickPool.Sub(tick).Add(hypotheticalBestTop).CalculateProblemValue(problem.ProblemValue)
-
-			pointValue.Zone1 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone1)
-			pointValue.Zone2 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone2)
-			pointValue.Top = CalculatePoints(hypotheticalProblemValue, hypotheticalSecondBestTop)
-			pointValue.Flash = CalculatePoints(hypotheticalProblemValue, hypotheticalBestTop)
-		} else {
-			pointValue.Zone1 = CalculatePoints(problemValue, hypotheticalBestZone1)
-			pointValue.Zone2 = CalculatePoints(problemValue, hypotheticalBestZone2)
-			pointValue.Top = CalculatePoints(problemValue, hypotheticalSecondBestTop)
-			pointValue.Flash = CalculatePoints(problemValue, hypotheticalBestTop)
+				pointValue.Zone1 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone1)
+				pointValue.Zone2 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone2)
+				pointValue.Top = CalculatePoints(hypotheticalProblemValue, hypotheticalSecondBestTop)
+				pointValue.Flash = CalculatePoints(hypotheticalProblemValue, hypotheticalBestTop)
+			}
+		default:
+			{
+				pointValue.Zone1 = CalculatePoints(problemValue, hypotheticalBestZone1)
+				pointValue.Zone2 = CalculatePoints(problemValue, hypotheticalBestZone2)
+				pointValue.Top = CalculatePoints(problemValue, hypotheticalSecondBestTop)
+				pointValue.Flash = CalculatePoints(problemValue, hypotheticalBestTop)
+			}
 		}
 
 		if hypotheticalBestTop.AttemptsTop > 1 {
 			pointValue.Flash = 0
 		}
 
-		oldValue, hasTick := e.store.GetPointValue(contender.ID, problemID)
+		oldValue, hadPointValue := e.store.GetPointValue(contender.ID, problemID)
 		e.store.SavePointValue(contender.ID, problemID, pointValue)
 
-		if !hasTick || !ComparePointValue(oldValue, pointValue) {
+		if !hadPointValue || !ComparePointValue(oldValue, pointValue) {
 			affectedContenders = append(affectedContenders, contender.ID)
 		}
 	}
