@@ -467,7 +467,7 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 			pointValue.Flash = CalculatePoints(problemValue, hypotheticalBestTop)
 		}
 
-		if hypotheticalBestTop.Top && hypotheticalBestTop.AttemptsTop > 1 {
+		if hypotheticalBestTop.AttemptsTop > 1 {
 			pointValue.Flash = 0
 		}
 
