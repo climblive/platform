@@ -727,7 +727,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			}).
 			Return()
 
-		f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
+		effects := slices.Collect(f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
 			ContenderID:   fakedContenderID,
 			ProblemID:     fakedProblemID,
 			Top:           true,
@@ -736,6 +736,11 @@ func TestDefaultScoreEngine(t *testing.T) {
 			AttemptsZone1: 2,
 			Zone2:         true,
 			AttemptsZone2: 3,
+		}))
+
+		require.ElementsMatch(t, effects, []scores.Effect{
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblemID},
+			scores.EffectScoreContender{ContenderID: fakedContenderID},
 		})
 
 		awaitExpectations(t)
