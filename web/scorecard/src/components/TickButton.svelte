@@ -12,12 +12,8 @@
     $props();
 
   const pointsLabel = $derived.by(() => {
-    if (points === undefined) {
+    if (points === undefined || originalPoints === undefined) {
       return undefined;
-    }
-
-    if (originalPoints === undefined || originalPoints === points) {
-      return `${points}p`;
     }
 
     return `${points}p / ${originalPoints}p`;
