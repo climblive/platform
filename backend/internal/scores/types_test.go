@@ -1,18 +1,19 @@
-package scores
+package scores_test
 
 import (
 	"testing"
 
+	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCompareContender(t *testing.T) {
 	t.Run("ByScore", func(t *testing.T) {
-		c1 := Contender{
+		c1 := scores.Contender{
 			Score: 200,
 		}
 
-		c2 := Contender{
+		c2 := scores.Contender{
 			Score: 100,
 		}
 
@@ -21,12 +22,12 @@ func TestCompareContender(t *testing.T) {
 	})
 
 	t.Run("TieBreak", func(t *testing.T) {
-		c1 := Contender{
+		c1 := scores.Contender{
 			ID:    1,
 			Score: 100,
 		}
 
-		c2 := Contender{
+		c2 := scores.Contender{
 			ID:    2,
 			Score: 100,
 		}
