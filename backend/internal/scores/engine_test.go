@@ -811,9 +811,14 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("DeleteTick", fakedContenderID, fakedProblemID).
 			Return()
 
-		f.engine.HandleAscentDeregistered(domain.AscentDeregisteredEvent{
+		effects := slices.Collect(f.engine.HandleAscentDeregistered(domain.AscentDeregisteredEvent{
 			ContenderID: fakedContenderID,
 			ProblemID:   fakedProblemID,
+		}))
+
+		require.ElementsMatch(t, effects, []scores.Effect{
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblemID},
+			scores.EffectScoreContender{ContenderID: fakedContenderID},
 		})
 
 		awaitExpectations(t)
