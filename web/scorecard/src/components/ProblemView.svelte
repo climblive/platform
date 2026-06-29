@@ -11,11 +11,10 @@
     problem: ScorecardProblem;
     tick?: Tick | undefined;
     disabled: boolean;
-    disqualified: boolean;
     counted: boolean;
   }
 
-  const { problem, tick, disabled, disqualified, counted }: Props = $props();
+  const { problem, tick, disabled, counted }: Props = $props();
 
   const valueRange = $derived.by<{ min: number; max: number }>(() => {
     if (problem.pointValue === undefined) {
@@ -52,9 +51,9 @@
     </span>
   </span>
   <div class="score" class:uncounted={!counted}>
-    {#if tick && problem.pointValue}
+    {#if tick && problem.pointValue !== undefined}
       <Score
-        value={disqualified ? 0 : problem.pointValue.current}
+        value={problem.pointValue.current}
         prefix={counted ? "+" : undefined}
       />
     {/if}

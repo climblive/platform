@@ -435,7 +435,6 @@
                     {problem}
                     {tick}
                     disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
-                    disqualified={contender.disqualified}
                     counted={contest.qualifyingProblems === 0 ||
                       (!!tick && countedTickIds.has(tick.id))}
                   />
