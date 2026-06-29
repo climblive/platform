@@ -82,7 +82,7 @@ func (c TickPool) Sub(tick Tick) TickPool {
 	return c
 }
 
-func (c TickPool) CalculateProblemValue(value domain.ProblemValue) domain.ProblemValue {
+func (c TickPool) CalculatePooledProblemValue(value domain.ProblemValue) domain.ProblemValue {
 	weightedValue := func(value int, divisor int) int {
 		if divisor == 0 {
 			return value

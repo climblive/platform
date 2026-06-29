@@ -429,7 +429,7 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 			tickPool = tickPool.Add(tick)
 		}
 
-		problemValue = tickPool.CalculateProblemValue(problem.ProblemValue)
+		problemValue = tickPool.CalculatePooledProblemValue(problem.ProblemValue)
 	}
 
 	affectedContenders := make([]domain.ContenderID, 0)
@@ -455,7 +455,7 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 		case contender.Disqualified:
 		case rules.PooledPoints:
 			{
-				hypotheticalProblemValue := tickPool.Sub(tick).Add(hypotheticalBestTop).CalculateProblemValue(problem.ProblemValue)
+				hypotheticalProblemValue := tickPool.Sub(tick).Add(hypotheticalBestTop).CalculatePooledProblemValue(problem.ProblemValue)
 
 				pointValue.Zone1 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone1)
 				pointValue.Zone2 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone2)
