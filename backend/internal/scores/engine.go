@@ -445,6 +445,11 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 		pointValue := domain.PointValue{
 			ContenderID: contender.ID,
 			ProblemID:   problemID,
+			Current:     0,
+			Zone1:       0,
+			Zone2:       0,
+			Top:         0,
+			Flash:       0,
 		}
 
 		if !contender.Disqualified {

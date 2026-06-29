@@ -166,6 +166,7 @@ func main() {
 		Authorizer:                authorizer,
 		EventBroker:               eventBroker,
 		ScoreKeeper:               scoreKeeper,
+		PointValueKeeper:          pointValueKeeper,
 		RegistrationCodeGenerator: &registrationCodeGenerator{}}
 
 	scrubInterval := time.Hour

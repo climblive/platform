@@ -28,8 +28,10 @@ type PointValueKeeper struct {
 
 func NewPointValueKeeper(eventBroker domain.EventBroker) *PointValueKeeper {
 	return &PointValueKeeper{
+		mu:          sync.RWMutex{},
 		eventBroker: eventBroker,
 		pointValues: make(map[domain.ContenderID]map[domain.ProblemID]keptPointValue),
+		running:     atomic.Bool{},
 	}
 }
 
