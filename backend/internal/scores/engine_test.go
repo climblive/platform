@@ -184,10 +184,28 @@ func TestDefaultScoreEngine(t *testing.T) {
 		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 
+		fakedProblem1ID := testutils.RandomResourceID[domain.ProblemID]()
+		fakedProblem2ID := testutils.RandomResourceID[domain.ProblemID]()
+		fakedProblem3ID := testutils.RandomResourceID[domain.ProblemID]()
+
 		f.store.On("SaveContender", scores.Contender{
 			ID:          fakedContenderID,
 			CompClassID: fakedCompClassID,
 		}).Return()
+
+		f.store.
+			On("GetAllProblems").
+			Return(slices.Values([]scores.Problem{
+				{
+					ID: fakedProblem1ID,
+				},
+				{
+					ID: fakedProblem2ID,
+				},
+				{
+					ID: fakedProblem3ID,
+				},
+			}))
 
 		effects := slices.Collect(f.engine.HandleContenderEntered(domain.ContenderEnteredEvent{
 			ContenderID: fakedContenderID,
@@ -195,6 +213,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblem3ID},
 			scores.EffectRankClass{CompClassID: fakedCompClassID},
 		})
 
@@ -274,16 +295,17 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Score:               123,
 		}).Return()
 
-		f.store.On("GetTicksByContender", fakedContenderID).
-			Return(slices.Values([]scores.Tick{
+		f.store.
+			On("GetAllProblems").
+			Return(slices.Values([]scores.Problem{
 				{
-					ProblemID: fakedProblem1ID,
+					ID: fakedProblem1ID,
 				},
 				{
-					ProblemID: fakedProblem2ID,
+					ID: fakedProblem2ID,
 				},
 				{
-					ProblemID: fakedProblem3ID,
+					ID: fakedProblem3ID,
 				},
 			}))
 
@@ -567,6 +589,10 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
+		fakedCompClass1ID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompClass2ID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompClass3ID := testutils.RandomResourceID[domain.CompClassID]()
+
 		f.store.
 			On("SaveProblem", scores.Problem{
 				ID: fakedProblemID,
@@ -579,7 +605,15 @@ func TestDefaultScoreEngine(t *testing.T) {
 			}).
 			Return()
 
-		effects := f.engine.HandleProblemAdded(domain.ProblemAddedEvent{
+		f.store.
+			On("GetCompClassIDs").
+			Return([]domain.CompClassID{
+				fakedCompClass1ID,
+				fakedCompClass2ID,
+				fakedCompClass3ID,
+			})
+
+		effects := slices.Collect(f.engine.HandleProblemAdded(domain.ProblemAddedEvent{
 			ProblemID: fakedProblemID,
 			ProblemValue: domain.ProblemValue{
 				PointsTop:   100,
@@ -587,9 +621,13 @@ func TestDefaultScoreEngine(t *testing.T) {
 				PointsZone2: 75,
 				FlashBonus:  10,
 			},
-		})
+		}))
 
-		require.Nil(t, effects)
+		require.ElementsMatch(t, effects, []scores.Effect{
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClass1ID, ProblemID: fakedProblemID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClass2ID, ProblemID: fakedProblemID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClass3ID, ProblemID: fakedProblemID},
+		})
 
 		awaitExpectations(t)
 	})
