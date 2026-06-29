@@ -17,17 +17,16 @@
 
   const { problem, tick, disabled, disqualified, counted }: Props = $props();
 
-  const highestPossibleValue = $derived.by(() => {
+  const valueRange = $derived.by<{ min: number; max: number }>(() => {
     if (problem.pointValue === undefined) {
-      return 0;
+      return { min: 0, max: 0 };
     }
 
-    return Math.max(
-      problem.pointValue.zone1,
-      problem.pointValue.zone2,
-      problem.pointValue.top,
-      problem.pointValue.flash,
-    );
+    const { zone1, zone2, top, flash } = problem.pointValue;
+
+    const values = [zone1, zone2, top, flash];
+
+    return { min: Math.min(...values), max: Math.max(...values) };
   });
 </script>
 
@@ -44,7 +43,13 @@
   />
   <span class="number">№ {problem.number}</span>
   <span class="points">
-    <span class="top">≤ {highestPossibleValue}p</span>
+    <span class="top">
+      {#if valueRange.min === valueRange.max}
+        {valueRange.max}p
+      {:else}
+        ≤ {valueRange.max}p
+      {/if}
+    </span>
   </span>
   <div class="score" class:uncounted={!counted}>
     {#if tick && problem.pointValue}
