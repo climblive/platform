@@ -44,7 +44,7 @@
     updatePointValueInQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
-  import { calculateProblemScore, getApiUrl } from "@climblive/lib/utils";
+  import { getApiUrl } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
@@ -88,6 +88,15 @@
   let problems = $derived(problemsQuery?.data);
   let pointValues = $derived(pointValuesQuery.data);
 
+  const pointValueByProblemId = $derived(
+    new Map(
+      (pointValues ?? []).map((pointValue) => [
+        pointValue.problemId,
+        pointValue,
+      ]),
+    ),
+  );
+
   type ScorecardProblem = Problem & {
     pointValue?: PointValue;
   };
@@ -96,13 +105,6 @@
   let sortDirection = $state<"asc" | "desc">("asc");
 
   let sortedProblems = $derived.by<ScorecardProblem[]>(() => {
-    const pointValueByProblemId = new Map(
-      (pointValues ?? []).map((pointValue) => [
-        pointValue.problemId,
-        pointValue,
-      ]),
-    );
-
     const clonedProblems = (problems ?? []).map((problem) => ({
       ...problem,
       pointValue: pointValueByProblemId.get(problem.id),
@@ -191,11 +193,9 @@
     }
 
     const ticksWithScore = ticks.map((tick) => {
-      const problem = problems.find(({ id }) => id === tick.problemId);
-
       return {
         tick,
-        pointValue: problem ? calculateProblemScore(problem, tick) : 0,
+        pointValue: pointValueByProblemId.get(tick.problemId)?.current ?? 0,
       };
     });
 
