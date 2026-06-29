@@ -5,11 +5,7 @@ import {
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import type {
-  Problem,
-  ProblemPatch,
-  ProblemTemplate,
-} from "../models";
+import type { Problem, ProblemPatch, ProblemTemplate } from "../models";
 import { HOUR } from "./constants";
 
 export const getProblemQuery = (problemId: number) =>
