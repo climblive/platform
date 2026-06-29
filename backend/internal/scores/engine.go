@@ -437,10 +437,10 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 	for contender := range e.store.GetContendersByCompClass(compClassID) {
 		tick, _ := e.store.GetTick(contender.ID, problemID)
 
-		hypotheticalZone1 := HypotheticalZone1(tick)
-		hypotheticalZone2 := HypotheticalZone2(tick)
-		hypotheticalTop := HypotheticalTop(tick)
-		hypotheticalFlash := HypotheticalFlash(tick)
+		hypotheticalBestZone1 := HypotheticalBestZone1(tick)
+		hypotheticalBestZone2 := HypotheticalBestZone2(tick)
+		hypotheticalBestTop := HypotheticalBestTop(tick)
+		hypotheticalSecondBestTop := HypotheticalSecondBestTop(tick)
 
 		pointValue := domain.PointValue{
 			ContenderID: contender.ID,
@@ -454,17 +454,21 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 		pointValue.Current = CalculatePoints(problemValue, tick)
 
 		if rules.PooledPoints {
-			hypotheticalProblemValue := tickPool.Sub(tick).Add(hypotheticalFlash).CalculateProblemValue(problem.ProblemValue)
+			hypotheticalProblemValue := tickPool.Sub(tick).Add(hypotheticalBestTop).CalculateProblemValue(problem.ProblemValue)
 
-			pointValue.Zone1 = CalculatePoints(hypotheticalProblemValue, hypotheticalZone1)
-			pointValue.Zone2 = CalculatePoints(hypotheticalProblemValue, hypotheticalZone2)
-			pointValue.Top = CalculatePoints(hypotheticalProblemValue, hypotheticalTop)
-			pointValue.Flash = CalculatePoints(hypotheticalProblemValue, hypotheticalFlash)
+			pointValue.Zone1 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone1)
+			pointValue.Zone2 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone2)
+			pointValue.Top = CalculatePoints(hypotheticalProblemValue, hypotheticalSecondBestTop)
+			pointValue.Flash = CalculatePoints(hypotheticalProblemValue, hypotheticalBestTop)
 		} else {
-			pointValue.Zone1 = CalculatePoints(problemValue, hypotheticalZone1)
-			pointValue.Zone2 = CalculatePoints(problemValue, hypotheticalZone2)
-			pointValue.Top = CalculatePoints(problemValue, hypotheticalTop)
-			pointValue.Flash = CalculatePoints(problemValue, hypotheticalFlash)
+			pointValue.Zone1 = CalculatePoints(problemValue, hypotheticalBestZone1)
+			pointValue.Zone2 = CalculatePoints(problemValue, hypotheticalBestZone2)
+			pointValue.Top = CalculatePoints(problemValue, hypotheticalSecondBestTop)
+			pointValue.Flash = CalculatePoints(problemValue, hypotheticalBestTop)
+		}
+
+		if hypotheticalBestTop.Top && hypotheticalBestTop.AttemptsTop > 1 {
+			pointValue.Flash = 0
 		}
 
 		oldValue, hasTick := e.store.GetPointValue(contender.ID, problemID)

@@ -89,7 +89,7 @@ func TestCalculatePoints(t *testing.T) {
 	}
 }
 
-func TestHypotheticalTop(t *testing.T) {
+func HypotheticalSecondBestTop(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    scores.Tick
@@ -154,7 +154,7 @@ func TestHypotheticalTop(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			original := tt.input
 
-			actual := scores.HypotheticalTop(tt.input)
+			actual := scores.HypotheticalSecondBestTop(tt.input)
 
 			assert.Equal(t, tt.expected, actual)
 			assert.Equal(t, original, tt.input)
@@ -162,7 +162,7 @@ func TestHypotheticalTop(t *testing.T) {
 	}
 }
 
-func TestHypotheticalFlash(t *testing.T) {
+func HypotheticalBestTop(t *testing.T) {
 	input := scores.Tick{
 		ContenderID:   1,
 		ProblemID:     2,
@@ -183,7 +183,7 @@ func TestHypotheticalFlash(t *testing.T) {
 		AttemptsZone2: 1,
 		Top:           true,
 		AttemptsTop:   1,
-	}, scores.HypotheticalFlash(input))
+	}, scores.HypotheticalBestTop(input))
 
 	assert.Equal(t, scores.Tick{
 		ContenderID:   1,

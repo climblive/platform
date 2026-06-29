@@ -24,38 +24,61 @@ func CalculatePoints(value domain.ProblemValue, tick Tick) int {
 	return current
 }
 
-func HypotheticalZone1(tick Tick) Tick {
-	return Tick{
-		ContenderID:   tick.ContenderID,
-		ProblemID:     tick.ProblemID,
-		Zone1:         true,
-		AttemptsZone1: 999,
-		AttemptsZone2: 999,
-		AttemptsTop:   999,
+func HypotheticalBestZone1(tick Tick) Tick {
+	if !tick.Zone1 {
+		tick.Zone1 = true
+		tick.AttemptsZone1 += 1
 	}
-}
 
-func HypotheticalZone2(tick Tick) Tick {
-	tick = HypotheticalZone1(tick)
-	tick.Zone2 = true
-	tick.AttemptsZone2 = 999
+	tick.Zone2 = false
+	tick.Top = false
 
 	return tick
 }
 
-func HypotheticalTop(tick Tick) Tick {
-	tick = HypotheticalZone2(tick)
-	tick.Top = true
-	tick.AttemptsTop = 999
+func HypotheticalBestZone2(tick Tick) Tick {
+	if !tick.Zone1 {
+		tick.Zone1 = true
+		tick.AttemptsZone1 += 1
+	}
+
+	if !tick.Zone2 {
+		tick.Zone2 = true
+		tick.AttemptsZone2 += 1
+	}
+
+	tick.Top = false
 
 	return tick
 }
 
-func HypotheticalFlash(tick Tick) Tick {
-	tick = HypotheticalTop(tick)
-	tick.AttemptsZone1 = 1
-	tick.AttemptsZone2 = 1
-	tick.AttemptsTop = 1
+func HypotheticalBestTop(tick Tick) Tick {
+	if !tick.Zone1 {
+		tick.Zone1 = true
+		tick.AttemptsZone1 += 1
+	}
+
+	if !tick.Zone2 {
+		tick.Zone2 = true
+		tick.AttemptsZone2 += 1
+	}
+
+	if !tick.Top {
+		tick.Top = true
+		tick.AttemptsTop += 1
+	}
+
+	return tick
+}
+
+func HypotheticalSecondBestTop(tick Tick) Tick {
+	tick = HypotheticalBestTop(tick)
+
+	if tick.AttemptsTop == 1 {
+		tick.AttemptsZone1 += 1
+		tick.AttemptsZone2 += 1
+		tick.AttemptsTop += 1
+	}
 
 	return tick
 }
