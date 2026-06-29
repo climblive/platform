@@ -6,10 +6,18 @@
     points?: number;
     originalPoints?: number;
     active: boolean;
+    disabled?: boolean;
   };
 
-  const { onClick, iconName, label, points, originalPoints, active }: Props =
-    $props();
+  const {
+    onClick,
+    iconName,
+    label,
+    points,
+    originalPoints,
+    active,
+    disabled,
+  }: Props = $props();
 
   const pointsLabel = $derived.by(() => {
     if (points === undefined || originalPoints === undefined) {
@@ -27,6 +35,7 @@
     onclick={onClick}
     pill
     variant="neutral"
+    {disabled}
   >
     <wa-icon slot="start" name={iconName}></wa-icon>
     {label}
