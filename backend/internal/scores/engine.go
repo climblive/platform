@@ -523,9 +523,6 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 		}
 
 		problemLimit := e.store.GetRules().QualifyingProblems
-		if !e.store.GetRules().UsePoints {
-			problemLimit = 0
-		}
 
 		scorer := Scorer{
 			ProblemLimit: problemLimit,
