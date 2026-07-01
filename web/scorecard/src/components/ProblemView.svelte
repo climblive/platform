@@ -1,20 +1,34 @@
 <script lang="ts">
   import { HoldColorIndicator, Score } from "@climblive/lib/components";
-  import type { Problem, Tick } from "@climblive/lib/models";
-  import { calculateProblemScore } from "@climblive/lib/utils";
+  import type { PointValue, Problem, Tick } from "@climblive/lib/models";
   import TickBox from "./TickBox.svelte";
 
+  type ScorecardProblem = Problem & {
+    pointValue?: PointValue;
+  };
+
   interface Props {
-    problem: Problem;
+    problem: ScorecardProblem;
     tick?: Tick | undefined;
     disabled: boolean;
-    disqualified: boolean;
     counted: boolean;
   }
 
-  const { problem, tick, disabled, disqualified, counted }: Props = $props();
+  const { problem, tick, disabled, counted }: Props = $props();
 
-  const pointValue = $derived(calculateProblemScore(problem, tick));
+  const valueRange = $derived.by<{ min: number; max: number } | undefined>(
+    () => {
+      if (problem.pointValue === undefined) {
+        return undefined;
+      }
+
+      const { zone1, zone2, top, flash } = problem.pointValue;
+
+      const values = [zone1, zone2, top, flash];
+
+      return { min: Math.min(...values), max: Math.max(...values) };
+    },
+  );
 </script>
 
 <section
@@ -30,23 +44,26 @@
   />
   <span class="number">№ {problem.number}</span>
   <span class="points">
-    <span class="top">
-      {problem.pointsTop}p
-    </span>
-    {#if problem.flashBonus}
-      <wa-icon name="bolt"></wa-icon>
+    {#if valueRange}
+      <span class="top">
+        {#if valueRange.min === valueRange.max}
+          {valueRange.max}p
+        {:else}
+          ≤ {valueRange.max}p
+        {/if}
+      </span>
     {/if}
   </span>
   <div class="score" class:uncounted={!counted}>
-    {#if tick}
+    {#if tick && problem.pointValue !== undefined}
       <Score
-        value={disqualified ? 0 : pointValue}
+        value={problem.pointValue.current}
         prefix={counted ? "+" : undefined}
       />
     {/if}
   </div>
 
-  <TickBox {problem} {tick} {disabled} />
+  <TickBox {problem} {tick} {disabled} pointValue={problem.pointValue} />
 </section>
 
 <style>
@@ -83,10 +100,6 @@
   .points {
     margin-right: auto;
     white-space: nowrap;
-
-    & wa-icon {
-      font-size: var(--wa-font-size-xs);
-    }
   }
 
   .score {

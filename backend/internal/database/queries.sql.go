@@ -123,7 +123,7 @@ func (q *Queries) DeleteTick(ctx context.Context, id int32) error {
 }
 
 const getAllContests = `-- name: GetAllContests :many
-SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
+SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 LEFT JOIN contender c ON c.contest_id = contest.id
@@ -157,6 +157,8 @@ func (q *Queries) GetAllContests(ctx context.Context) ([]GetAllContestsRow, erro
 			&i.Contest.Country,
 			&i.Contest.QualifyingProblems,
 			&i.Contest.Finalists,
+			&i.Contest.UsePoints,
+			&i.Contest.PooledPoints,
 			&i.Contest.Info,
 			&i.Contest.GracePeriod,
 			&i.Contest.NameRetentionTime,
@@ -475,7 +477,7 @@ func (q *Queries) GetContendersByContest(ctx context.Context, contestID int32) (
 }
 
 const getContest = `-- name: GetContest :one
-SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
+SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 LEFT JOIN contender c ON c.contest_id = contest.id
@@ -504,6 +506,8 @@ func (q *Queries) GetContest(ctx context.Context, id int32) (GetContestRow, erro
 		&i.Contest.Country,
 		&i.Contest.QualifyingProblems,
 		&i.Contest.Finalists,
+		&i.Contest.UsePoints,
+		&i.Contest.PooledPoints,
 		&i.Contest.Info,
 		&i.Contest.GracePeriod,
 		&i.Contest.NameRetentionTime,
@@ -516,7 +520,7 @@ func (q *Queries) GetContest(ctx context.Context, id int32) (GetContestRow, erro
 }
 
 const getContestsByOrganizer = `-- name: GetContestsByOrganizer :many
-SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
+SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 LEFT JOIN contender c ON c.contest_id = contest.id
@@ -551,6 +555,8 @@ func (q *Queries) GetContestsByOrganizer(ctx context.Context, organizerID int32)
 			&i.Contest.Country,
 			&i.Contest.QualifyingProblems,
 			&i.Contest.Finalists,
+			&i.Contest.UsePoints,
+			&i.Contest.PooledPoints,
 			&i.Contest.Info,
 			&i.Contest.GracePeriod,
 			&i.Contest.NameRetentionTime,
@@ -574,9 +580,9 @@ func (q *Queries) GetContestsByOrganizer(ctx context.Context, organizerID int32)
 
 const getContestsCurrentlyRunningOrByStartTime = `-- name: GetContestsCurrentlyRunningOrByStartTime :many
 SELECT
-	id, organizer_id, archived_at, series_id, name, description, location, country, qualifying_problems, finalists, info, grace_period, name_retention_time, created, time_begin, time_end
+	id, organizer_id, archived_at, series_id, name, description, location, country, qualifying_problems, finalists, use_points, pooled_points, info, grace_period, name_retention_time, created, time_begin, time_end
 FROM (
-    SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+    SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
     FROM contest
     JOIN comp_class cc ON cc.contest_id = contest.id
     WHERE archived_at IS NULL
@@ -602,6 +608,8 @@ type GetContestsCurrentlyRunningOrByStartTimeRow struct {
 	Country            string
 	QualifyingProblems int32
 	Finalists          int32
+	UsePoints          bool
+	PooledPoints       bool
 	Info               sql.NullString
 	GracePeriod        int32
 	NameRetentionTime  int32
@@ -630,6 +638,8 @@ func (q *Queries) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context, 
 			&i.Country,
 			&i.QualifyingProblems,
 			&i.Finalists,
+			&i.UsePoints,
+			&i.PooledPoints,
 			&i.Info,
 			&i.GracePeriod,
 			&i.NameRetentionTime,
@@ -1389,9 +1399,9 @@ func (q *Queries) UpsertContender(ctx context.Context, arg UpsertContenderParams
 
 const upsertContest = `-- name: UpsertContest :execlastid
 INSERT INTO 
-	contest (id, organizer_id, archived_at, series_id, name, description, location, country, qualifying_problems, finalists, info, grace_period, name_retention_time, created)
+	contest (id, organizer_id, archived_at, series_id, name, description, location, country, qualifying_problems, finalists, use_points, pooled_points, info, grace_period, name_retention_time, created)
 VALUES 
-	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     archived_at = VALUES(archived_at),
@@ -1402,6 +1412,8 @@ ON DUPLICATE KEY UPDATE
     country = VALUES(country),
     qualifying_problems = VALUES(qualifying_problems),
     finalists = VALUES(finalists),
+    use_points = VALUES(use_points),
+    pooled_points = VALUES(pooled_points),
     info = VALUES(info),
     grace_period = VALUES(grace_period),
     name_retention_time = VALUES(name_retention_time),
@@ -1419,6 +1431,8 @@ type UpsertContestParams struct {
 	Country            string
 	QualifyingProblems int32
 	Finalists          int32
+	UsePoints          bool
+	PooledPoints       bool
 	Info               sql.NullString
 	GracePeriod        int32
 	NameRetentionTime  int32
@@ -1437,6 +1451,8 @@ func (q *Queries) UpsertContest(ctx context.Context, arg UpsertContestParams) (i
 		arg.Country,
 		arg.QualifyingProblems,
 		arg.Finalists,
+		arg.UsePoints,
+		arg.PooledPoints,
 		arg.Info,
 		arg.GracePeriod,
 		arg.NameRetentionTime,

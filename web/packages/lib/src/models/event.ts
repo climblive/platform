@@ -4,8 +4,10 @@ import type {
   AscentRegisteredEvent,
   ContenderPublicInfoUpdatedEvent,
   ContenderScoreUpdatedEvent,
+  PointValueUpdatedEvent,
   RaffleWinnerDrawnEvent,
 } from "./generated";
+import { pointValueSchema } from "./pointValue";
 
 export const contenderPublicInfoUpdatedEventSchema: z.ZodType<ContenderPublicInfoUpdatedEvent> =
   z.object({
@@ -47,6 +49,9 @@ export const ascentDeregisteredEventSchema: z.ZodType<AscentDeregisteredEvent> =
     contenderId: z.number(),
     problemId: z.number(),
   });
+
+export const pointValueUpdatedEventSchema: z.ZodType<PointValueUpdatedEvent> =
+  pointValueSchema;
 
 export const raffleWinnerDrawnEventSchema: z.ZodType<RaffleWinnerDrawnEvent> =
   z.object({

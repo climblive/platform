@@ -25,7 +25,9 @@
     ascentRegisteredEventSchema,
     contenderPublicInfoUpdatedEventSchema,
     contenderScoreUpdatedEventSchema,
+    pointValueUpdatedEventSchema,
     raffleWinnerDrawnEventSchema,
+    type PointValue,
     type Problem,
     type Tick,
     type TickID,
@@ -34,13 +36,15 @@
     getCompClassesQuery,
     getContenderQuery,
     getContestQuery,
+    getPointValuesByContenderQuery,
     getProblemsQuery,
     getTicksByContenderQuery,
     removeTickFromQueryCache,
     updateContenderPublicInfoInQueryCache,
+    updatePointValueInQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
-  import { calculateProblemScore, getApiUrl } from "@climblive/lib/utils";
+  import { getApiUrl } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
@@ -52,8 +56,10 @@
   const contenderQuery = $derived(getContenderQuery($session.contenderId));
   const contestQuery = $derived(getContestQuery($session.contestId));
   const compClassesQuery = $derived(getCompClassesQuery($session.contestId));
-  const problemsQuery = $derived(getProblemsQuery($session.contestId));
   const ticksQuery = $derived(getTicksByContenderQuery($session.contenderId));
+  const pointValuesQuery = $derived(
+    getPointValuesByContenderQuery($session.contenderId),
+  );
 
   let resultsConnected = $state(false);
   let tabGroup: WaTabGroup | undefined = $state();
@@ -66,7 +72,6 @@
   let contender = $derived(contenderQuery.data);
   let contest = $derived(contestQuery.data);
   let compClasses = $derived(compClassesQuery.data);
-  let problems = $derived(problemsQuery.data);
   let ticks = $derived(ticksQuery.data);
   let selectedCompClass = $derived(
     compClasses?.find(({ id }) => id === contender?.compClassId),
@@ -78,27 +83,73 @@
     selectedCompClass?.timeEnd ?? new Date(-8640000000000000),
   );
 
+  const problemsQuery = $derived(getProblemsQuery($session.contestId));
+
+  let problems = $derived(problemsQuery?.data);
+  let pointValues = $derived(pointValuesQuery.data);
+
+  const pointValueByProblemId = $derived(
+    new Map(
+      (pointValues ?? []).map((pointValue) => [
+        pointValue.problemId,
+        pointValue,
+      ]),
+    ),
+  );
+
+  type ScorecardProblem = Problem & {
+    pointValue?: PointValue;
+  };
+
   let orderProblemsBy = $state<"number" | "points">("number");
   let sortDirection = $state<"asc" | "desc">("asc");
 
-  let sortedProblems = $derived.by<Problem[]>(() => {
-    const clonedProblems = [...(problems ?? [])];
+  let sortedProblems = $derived.by<ScorecardProblem[]>(() => {
+    const clonedProblems = (problems ?? []).map((problem) => ({
+      ...problem,
+      pointValue: pointValueByProblemId.get(problem.id),
+    }));
 
     switch (orderProblemsBy) {
       case "number":
         clonedProblems.sort(
-          (p1: Problem, p2: Problem) => p1.number - p2.number,
+          (p1: ScorecardProblem, p2: ScorecardProblem) => p1.number - p2.number,
         );
 
         break;
       case "points":
-        clonedProblems.sort(
-          (p1: Problem, p2: Problem) =>
-            p1.pointsTop +
-            (p1.flashBonus ?? 0) -
-            p2.pointsTop -
-            (p2.flashBonus ?? 0),
-        );
+        clonedProblems.sort((p1: ScorecardProblem, p2: ScorecardProblem) => {
+          if (p1.pointValue === undefined && p2.pointValue === undefined) {
+            return p1.number - p2.number;
+          }
+
+          if (p1.pointValue === undefined) {
+            return 1;
+          }
+
+          if (p2.pointValue === undefined) {
+            return -1;
+          }
+
+          const p1Max = Math.max(
+            p1.pointValue.zone1,
+            p1.pointValue.zone2,
+            p1.pointValue.top,
+            p1.pointValue.flash,
+          );
+          const p2Max = Math.max(
+            p2.pointValue.zone1,
+            p2.pointValue.zone2,
+            p2.pointValue.top,
+            p2.pointValue.flash,
+          );
+
+          if (p1Max === p2Max) {
+            return p1.number - p2.number;
+          }
+
+          return p1Max - p2Max;
+        });
 
         break;
     }
@@ -142,11 +193,9 @@
     }
 
     const ticksWithScore = ticks.map((tick) => {
-      const problem = problems.find(({ id }) => id === tick.problemId);
-
       return {
         tick,
-        pointValue: problem ? calculateProblemScore(problem, tick) : 0,
+        pointValue: pointValueByProblemId.get(tick.problemId)?.current ?? 0,
       };
     });
 
@@ -230,6 +279,10 @@
     eventSource.addEventListener("ASCENT_REGISTERED", (e) => {
       const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
 
+      if (event.contenderId !== contender?.id) {
+        return;
+      }
+
       const newTick: Tick = {
         id: event.tickId,
         timestamp: event.timestamp,
@@ -248,7 +301,17 @@
     eventSource.addEventListener("ASCENT_DEREGISTERED", (e) => {
       const event = ascentDeregisteredEventSchema.parse(JSON.parse(e.data));
 
+      if (event.contenderId !== contender?.id) {
+        return;
+      }
+
       removeTickFromQueryCache(queryClient, event.tickId);
+    });
+
+    eventSource.addEventListener("POINT_VALUE_UPDATED", (e) => {
+      const event = pointValueUpdatedEventSchema.parse(JSON.parse(e.data));
+
+      updatePointValueInQueryCache(queryClient, event.contenderId, event);
     });
 
     eventSource.addEventListener("RAFFLE_WINNER_DRAWN", (e) => {
@@ -372,7 +435,6 @@
                     {problem}
                     {tick}
                     disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
-                    disqualified={contender.disqualified}
                     counted={contest.qualifyingProblems === 0 ||
                       (!!tick && countedTickIds.has(tick.id))}
                   />

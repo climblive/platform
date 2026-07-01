@@ -2,7 +2,7 @@
   import type { ScorecardSession } from "@/types";
   import WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import { HoldColorIndicator } from "@climblive/lib/components";
-  import type { Problem, Tick } from "@climblive/lib/models";
+  import type { PointValue, Problem, Tick } from "@climblive/lib/models";
   import { deleteTickMutation, putTickMutation } from "@climblive/lib/queries";
   import { toastError } from "@climblive/lib/utils";
   import { AxiosError } from "axios";
@@ -14,9 +14,10 @@
     problem: Problem;
     tick: Tick | undefined;
     disabled: boolean | undefined;
+    pointValue?: PointValue;
   }
 
-  let { problem, tick, disabled = false }: Props = $props();
+  let { problem, tick, disabled = false, pointValue }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
 
@@ -27,6 +28,13 @@
   let open = $state(false);
 
   const loading = $derived(putTick.isPending || deleteTick.isPending);
+  const originalPoints = $derived({
+    top: problem.pointsTop,
+    flash: problem.pointsTop + (problem.flashBonus ?? 0),
+    zone2: problem.pointsZone2,
+    zone1: problem.pointsZone1,
+  });
+
   const variant = $derived.by(() => {
     switch (true) {
       case tick?.top && tick.attemptsTop === 1:
@@ -153,7 +161,8 @@
         iconName="check"
         label="Top"
         onClick={(e: MouseEvent) => handleTick(e, "top", false)}
-        points={problem.pointsTop}
+        points={pointValue?.top}
+        originalPoints={originalPoints.top}
         active={variant === "top"}
       />
 
@@ -161,7 +170,8 @@
         iconName="bolt"
         label="Flash"
         onClick={(e: MouseEvent) => handleTick(e, "top", true)}
-        points={problem.pointsTop + (problem.flashBonus ?? 0)}
+        points={pointValue?.flash}
+        originalPoints={originalPoints.flash}
         active={variant === "flash"}
       />
     </div>
@@ -171,7 +181,8 @@
         iconName="check"
         label="Zone 2"
         onClick={(e: MouseEvent) => handleTick(e, "zone2", false)}
-        points={problem.pointsZone2}
+        points={pointValue?.zone2}
+        originalPoints={originalPoints.zone2}
         active={variant === "zone2"}
       />
     {/if}
@@ -181,7 +192,8 @@
         iconName="check"
         label="Zone 1"
         onClick={(e: MouseEvent) => handleTick(e, "zone1", false)}
-        points={problem.pointsZone1}
+        points={pointValue?.zone1}
+        originalPoints={originalPoints.zone1}
         active={variant === "zone1"}
       />
     {/if}
