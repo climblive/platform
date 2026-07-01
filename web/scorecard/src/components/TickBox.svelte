@@ -173,7 +173,6 @@
         points={pointValue?.flash}
         originalPoints={originalPoints.flash}
         active={variant === "flash"}
-        disabled={tick && variant !== "flash"}
       />
     </div>
 
