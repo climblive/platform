@@ -18,7 +18,7 @@ func ComparePointValue(pv1, pv2 domain.PointValue) bool {
 	return pv1 == pv2
 }
 
-func Points(values iter.Seq[domain.PointValue]) iter.Seq[int] {
+func CurrentPoints(values iter.Seq[domain.PointValue]) iter.Seq[int] {
 	return func(yield func(int) bool) {
 		for value := range values {
 			if !yield(value.Current) {

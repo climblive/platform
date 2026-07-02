@@ -533,7 +533,7 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 			ProblemLimit: problemLimit,
 		}
 
-		contender.Score = scorer.CalculateScore(Points(pointValues))
+		contender.Score = scorer.CalculateScore(CurrentPoints(pointValues))
 	}
 
 	if contender.Score == oldScore {
