@@ -95,7 +95,7 @@ EventLoop:
 
 			switch ev := event.Data.(type) {
 			case domain.PointValueUpdatedEvent:
-				k.HandlePointValueUpdated(ev)
+				k.handlePointValueUpdated(ev)
 			}
 		case <-ticker:
 			k.expungeExpired(time.Now())
@@ -110,7 +110,7 @@ EventLoop:
 	}
 }
 
-func (k *PointValueKeeper) HandlePointValueUpdated(event domain.PointValueUpdatedEvent) {
+func (k *PointValueKeeper) handlePointValueUpdated(event domain.PointValueUpdatedEvent) {
 	k.mu.Lock()
 	defer k.mu.Unlock()
 

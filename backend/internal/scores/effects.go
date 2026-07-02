@@ -14,7 +14,7 @@ func NewEffectRunner(driver *ScoreEngineDriver) *EffectRunner {
 	}
 }
 
-func (r *EffectRunner) RunChainEffects(effects iter.Seq[Effect]) {
+func (r *EffectRunner) RunEffects(effects iter.Seq[Effect]) {
 	if effects == nil {
 		return
 	}
