@@ -311,6 +311,10 @@
     eventSource.addEventListener("POINT_VALUE_UPDATED", (e) => {
       const event = pointValueUpdatedEventSchema.parse(JSON.parse(e.data));
 
+      if (event.contenderId !== contender?.id) {
+        return;
+      }
+
       updatePointValueInQueryCache(queryClient, event.contenderId, event);
     });
 
