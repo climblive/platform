@@ -173,3 +173,7 @@ func (k *PointValueKeeper) expungeExpired(now time.Time) {
 		}
 	}
 }
+
+func (k *PointValueKeeper) GetStatus() domain.ServiceStatus {
+	return domain.ServiceStatus{Name: "PointValueKeeper", Healthy: k.running.Load(), CheckedAt: time.Now()}
+}

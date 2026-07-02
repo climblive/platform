@@ -24,12 +24,16 @@ type contenderUseCaseRepository interface {
 	GetScrubEligibleContenders(ctx context.Context, deadline time.Time) ([]domain.Contender, error)
 }
 
+type pointValueKeeper interface {
+	GetPointValues(contenderID domain.ContenderID) []domain.PointValue
+}
+
 type ContenderUseCase struct {
 	Repo                      contenderUseCaseRepository
 	Authorizer                domain.Authorizer
 	EventBroker               domain.EventBroker
 	ScoreKeeper               domain.ScoreKeeper
-	PointValueKeeper          domain.PointValueKeeper
+	PointValueKeeper          pointValueKeeper
 	RegistrationCodeGenerator domain.CodeGenerator
 }
 

@@ -275,7 +275,7 @@ func setupMux(
 	scoreKeeper *scores.Keeper,
 	scoreEngineManager *scores.ScoreEngineManager,
 	scrubber *scrubber.Scrubber,
-	pointValueKeeper domain.PointValueKeeper,
+	pointValueKeeper *scores.PointValueKeeper,
 ) *rest.Mux {
 	contenderUseCase := usecases.ContenderUseCase{
 		Repo:                      repo,
@@ -338,6 +338,7 @@ func setupMux(
 		ScoreEngineManager: scoreEngineManager,
 		ScoreKeeper:        scoreKeeper,
 		Scrubber:           scrubber,
+		PointValueKeeper:   pointValueKeeper,
 	}
 
 	mux := rest.NewMux()
