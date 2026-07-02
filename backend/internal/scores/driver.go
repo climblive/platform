@@ -188,8 +188,8 @@ PreLoop:
 			effects := d.engine.Start()
 			defer d.engine.Stop()
 
-			runner := NewEffectRunner(d)
-			runner.RunEffects(effects)
+			runner := NewEffectRunner(d.engine)
+			runner.RunEffects(effects, d.logger)
 
 			break PreLoop
 		case <-ctx.Done():
@@ -269,8 +269,8 @@ func (d *ScoreEngineDriver) handleEvent(event domain.EventEnvelope) {
 		effects = d.engine.HandleProblemUpdated(ev)
 	}
 
-	runner := NewEffectRunner(d)
-	runner.RunEffects(effects)
+	runner := NewEffectRunner(d.engine)
+	runner.RunEffects(effects, d.logger)
 }
 
 func (d *ScoreEngineDriver) publishDirtyUpdates() int {
