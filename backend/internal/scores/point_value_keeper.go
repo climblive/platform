@@ -108,6 +108,8 @@ EventLoop:
 	if ctx.Err() == nil {
 		slog.Error("point value keeper subscription closed unexpectedly")
 	}
+
+	slog.Info("point value keeper shutting down")
 }
 
 func (k *PointValueKeeper) handlePointValueUpdated(event domain.PointValueUpdatedEvent) {
