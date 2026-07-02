@@ -3,7 +3,6 @@ package scores
 import (
 	"context"
 	"log/slog"
-	"slices"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -132,7 +131,6 @@ func (k *PointValueKeeper) GetPointValues(contenderID domain.ContenderID) []doma
 	k.mu.RLock()
 	defer k.mu.RUnlock()
 
-	now := time.Now()
 	contenderPointValues := k.pointValues[contenderID]
 	if contenderPointValues == nil {
 		return []domain.PointValue{}
@@ -141,20 +139,8 @@ func (k *PointValueKeeper) GetPointValues(contenderID domain.ContenderID) []doma
 	pointValues := make([]domain.PointValue, 0, len(contenderPointValues))
 
 	for _, pointValue := range contenderPointValues {
-		if now.After(pointValue.expiresAt) {
-			continue
-		}
-
 		pointValues = append(pointValues, pointValue.value)
 	}
-
-	slices.SortFunc(pointValues, func(a, b domain.PointValue) int {
-		if a.ProblemID == b.ProblemID {
-			return int(a.ContenderID) - int(b.ContenderID)
-		}
-
-		return int(a.ProblemID) - int(b.ProblemID)
-	})
 
 	return pointValues
 }
