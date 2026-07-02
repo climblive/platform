@@ -3,7 +3,6 @@ package scores_test
 import (
 	"context"
 	"iter"
-	"slices"
 	"testing"
 	"time"
 
@@ -117,7 +116,7 @@ func TestEngineDriver(t *testing.T) {
 
 		mockedEngine := new(scoreEngineMock)
 
-		mockedEngine.On("Start").Run(func(args mock.Arguments) { cancel() }).Return(slices.Values([]scores.Effect{}))
+		mockedEngine.On("Start").Run(func(args mock.Arguments) { cancel() }).Return(noEffects)
 		mockedEngine.On("Stop").Return()
 		mockedEngine.On("GetDirtyScores").Return([]domain.Score{})
 		mockedEngine.On("GetDirtyPointValues").Return([]domain.PointValue{})
@@ -367,7 +366,7 @@ func TestEngineDriver(t *testing.T) {
 				Finalist:    false,
 			},
 		})
-			mockedEngine.On("GetDirtyPointValues").Return([]domain.PointValue{})
+		mockedEngine.On("GetDirtyPointValues").Return([]domain.PointValue{})
 
 		f.broker.
 			On("Dispatch", fakedContestID,
