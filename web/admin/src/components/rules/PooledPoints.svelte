@@ -30,7 +30,7 @@
     <RuleOptionCard
       title="Pooled points"
       description="Points for completed problems are split by percentages. A boulder worth 1000 points with two tops will give each contender 500 points. If a third contender also tops the boulder, then all three will receive 333 points instead. Minimum point value is 1 point."
-      tag="Experimental"
+      tag="New"
     >
       {#snippet header()}
         <wa-checkbox
