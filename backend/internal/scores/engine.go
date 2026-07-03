@@ -253,11 +253,9 @@ func (e *DefaultScoreEngine) HandleContenderDisqualified(event domain.ContenderD
 
 	e.store.SaveContender(contender)
 
-	ticks := e.store.GetTicksByContender(contender.ID)
-
 	return func(yield func(Effect) bool) {
-		for tick := range ticks {
-			if !yield(EffectCalculatePointValues{CompClassID: contender.CompClassID, ProblemID: tick.ProblemID}) {
+		for problem := range e.store.GetAllProblems() {
+			if !yield(EffectCalculatePointValues{CompClassID: contender.CompClassID, ProblemID: problem.ID}) {
 				return
 			}
 		}
@@ -282,11 +280,9 @@ func (e *DefaultScoreEngine) HandleContenderRequalified(event domain.ContenderRe
 
 	e.store.SaveContender(contender)
 
-	ticks := e.store.GetTicksByContender(contender.ID)
-
 	return func(yield func(Effect) bool) {
-		for tick := range ticks {
-			if !yield(EffectCalculatePointValues{CompClassID: contender.CompClassID, ProblemID: tick.ProblemID}) {
+		for problem := range e.store.GetAllProblems() {
+			if !yield(EffectCalculatePointValues{CompClassID: contender.CompClassID, ProblemID: problem.ID}) {
 				return
 			}
 		}

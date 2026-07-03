@@ -473,16 +473,16 @@ func TestDefaultScoreEngine(t *testing.T) {
 			}, true)
 
 		f.store.
-			On("GetTicksByContender", fakedContenderID).
-			Return(slices.Values([]scores.Tick{
+			On("GetAllProblems").
+			Return(slices.Values([]scores.Problem{
 				{
-					ProblemID: fakedProblem1ID,
+					ID: fakedProblem1ID,
 				},
 				{
-					ProblemID: fakedProblem2ID,
+					ID: fakedProblem2ID,
 				},
 				{
-					ProblemID: fakedProblem3ID,
+					ID: fakedProblem3ID,
 				},
 			}))
 
@@ -548,16 +548,16 @@ func TestDefaultScoreEngine(t *testing.T) {
 			}, true)
 
 		f.store.
-			On("GetTicksByContender", fakedContenderID).
-			Return(slices.Values([]scores.Tick{
+			On("GetAllProblems").
+			Return(slices.Values([]scores.Problem{
 				{
-					ProblemID: fakedProblem1ID,
+					ID: fakedProblem1ID,
 				},
 				{
-					ProblemID: fakedProblem2ID,
+					ID: fakedProblem2ID,
 				},
 				{
-					ProblemID: fakedProblem3ID,
+					ID: fakedProblem3ID,
 				},
 			}))
 
