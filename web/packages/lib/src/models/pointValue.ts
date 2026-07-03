@@ -8,5 +8,5 @@ export const pointValueSchema: z.ZodType<PointValue> = z.object({
   zone1: z.number(),
   zone2: z.number(),
   top: z.number(),
-  flash: z.number(),
+  flashBonus: z.number(),
 });
