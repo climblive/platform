@@ -445,7 +445,7 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 			Zone1:       0,
 			Zone2:       0,
 			Top:         0,
-			Flash:       0,
+			FlashBonus:  0,
 		}
 
 		if !contender.Disqualified {
@@ -461,14 +461,14 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 				pointValue.Zone1 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone1)
 				pointValue.Zone2 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone2)
 				pointValue.Top = CalculatePoints(hypotheticalProblemValue, hypotheticalBestTopNoFlash)
-				pointValue.Flash = CalculatePoints(hypotheticalProblemValue, hypotheticalFlash)
+				pointValue.FlashBonus = hypotheticalProblemValue.FlashBonus
 			}
 		default:
 			{
 				pointValue.Zone1 = CalculatePoints(problemValue, hypotheticalBestZone1)
 				pointValue.Zone2 = CalculatePoints(problemValue, hypotheticalBestZone2)
 				pointValue.Top = CalculatePoints(problemValue, hypotheticalBestTopNoFlash)
-				pointValue.Flash = CalculatePoints(problemValue, hypotheticalFlash)
+				pointValue.FlashBonus = problemValue.FlashBonus
 			}
 		}
 

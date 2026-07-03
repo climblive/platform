@@ -154,7 +154,7 @@ export interface PointValue {
   zone1: number /* int */;
   zone2: number /* int */;
   top: number /* int */;
-  flash: number /* int */;
+  flashBonus: number /* int */;
 }
 export interface Problem extends ProblemValue {
   id: ProblemID;
@@ -309,7 +309,15 @@ export interface ContenderScoreUpdatedEvent {
   finalist: boolean;
   rankOrder: number /* int */;
 }
-export interface PointValueUpdatedEvent extends PointValue {}
+export interface PointValueUpdatedEvent {
+  contenderId: ContenderID;
+  problemId: ProblemID;
+  current: number /* int */;
+  zone1: number /* int */;
+  zone2: number /* int */;
+  top: number /* int */;
+  flashBonus: number /* int */;
+}
 export interface ScoreEngineStartedEvent {
   instanceId: ScoreEngineInstanceID;
 }

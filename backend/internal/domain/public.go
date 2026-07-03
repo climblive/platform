@@ -147,7 +147,7 @@ type PointValue struct {
 	Zone1       int         `json:"zone1"`
 	Zone2       int         `json:"zone2"`
 	Top         int         `json:"top"`
-	Flash       int         `json:"flash"`
+	FlashBonus  int         `json:"flashBonus"`
 }
 
 type Problem struct {
@@ -349,7 +349,7 @@ type PointValueUpdatedEvent struct {
 	Zone1       int         `json:"zone1"`
 	Zone2       int         `json:"zone2"`
 	Top         int         `json:"top"`
-	Flash       int         `json:"flash"`
+	FlashBonus  int         `json:"flashBonus"`
 }
 
 type ScoreEngineStartedEvent struct {

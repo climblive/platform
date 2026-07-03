@@ -22,9 +22,9 @@
         return undefined;
       }
 
-      const { zone1, zone2, top, flash } = problem.pointValue;
+      const { zone1, zone2, top, flashBonus } = problem.pointValue;
 
-      const values = [zone1, zone2, top, flash];
+      const values = [zone1, zone2, top, flashBonus];
 
       return { min: Math.min(...values), max: Math.max(...values) };
     },

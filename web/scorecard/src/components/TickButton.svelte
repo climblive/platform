@@ -4,19 +4,25 @@
     iconName: string;
     label: string;
     points?: number;
-    originalPoints?: number;
+    bonusPoints?: number;
     active: boolean;
   };
 
-  const { onClick, iconName, label, points, originalPoints, active }: Props =
-    $props();
+  const {
+    onClick,
+    iconName,
+    label,
+    points = 0,
+    bonusPoints,
+    active,
+  }: Props = $props();
 
   const pointsLabel = $derived.by(() => {
-    if (points === undefined || originalPoints === undefined) {
-      return undefined;
+    if (bonusPoints) {
+      return `${points}p + ${bonusPoints}p`;
     }
 
-    return `${points}p / ${originalPoints}p`;
+    return `${points}p`;
   });
 </script>
 
