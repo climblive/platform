@@ -967,7 +967,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+
+		fakedContender1ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedContender2ID := testutils.RandomResourceID[domain.ContenderID]()
 
 		f.store.
 			On("GetRules").
@@ -990,14 +992,19 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetContendersByCompClass", fakedCompClassID).
-			Return(slices.Values([]scores.Contender{{
-				ID: fakedContenderID,
-			}}))
+			Return(slices.Values([]scores.Contender{
+				{
+					ID: fakedContender1ID,
+				},
+				{
+					ID: fakedContender2ID,
+				},
+			}))
 
 		f.store.
-			On("GetTick", fakedContenderID, fakedProblemID).
+			On("GetTick", fakedContender1ID, fakedProblemID).
 			Return(scores.Tick{
-				ContenderID:   fakedContenderID,
+				ContenderID:   fakedContender1ID,
 				ProblemID:     fakedProblemID,
 				Top:           true,
 				AttemptsTop:   1,
@@ -1005,34 +1012,42 @@ func TestDefaultScoreEngine(t *testing.T) {
 				AttemptsZone2: 1,
 				Zone1:         true,
 				AttemptsZone1: 1,
-			}, true)
+			}, true).
+			On("GetTick", fakedContender2ID, fakedProblemID).
+			Return(scores.Tick{}, false)
 
 		f.store.
-			On("GetPointValue", fakedContenderID, fakedProblemID).
-			Return(domain.PointValue{
-				ContenderID: fakedContenderID,
+			On("GetPointValue", fakedContender1ID, fakedProblemID).
+			Return(domain.PointValue{}, false).
+			On("GetPointValue", fakedContender2ID, fakedProblemID).
+			Return(domain.PointValue{}, false)
+
+		f.store.
+			On("SavePointValue", fakedContender1ID, fakedProblemID, domain.PointValue{
+				ContenderID: fakedContender1ID,
 				ProblemID:   fakedProblemID,
 				Current:     550,
 				Zone1:       100,
 				Zone2:       200,
 				Top:         500,
 				Flash:       550,
-			}, true)
-
-		f.store.
-			On("SavePointValue", fakedContenderID, fakedProblemID, domain.PointValue{
-				ContenderID: fakedContenderID,
+			}).Return().
+			On("SavePointValue", fakedContender2ID, fakedProblemID, domain.PointValue{
+				ContenderID: fakedContender2ID,
 				ProblemID:   fakedProblemID,
-				Current:     550,
+				Current:     0,
 				Zone1:       100,
 				Zone2:       200,
 				Top:         500,
 				Flash:       550,
 			}).Return()
 
-		effects := f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID)
+		effects := slices.Collect(f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID))
 
-		assert.Nil(t, effects)
+		require.ElementsMatch(t, effects, []scores.Effect{
+			scores.EffectScoreContender{ContenderID: fakedContender1ID},
+			scores.EffectScoreContender{ContenderID: fakedContender2ID},
+		})
 
 		awaitExpectations(t)
 	})
@@ -1127,6 +1142,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 		fakedContender3ID := testutils.RandomResourceID[domain.ContenderID]()
 		fakedContender4ID := testutils.RandomResourceID[domain.ContenderID]()
 		fakedContender5ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedContender6ID := testutils.RandomResourceID[domain.ContenderID]()
 
 		fakedTicksByContender := map[domain.ContenderID]scores.Tick{
 			fakedContender1ID: {
@@ -1224,6 +1240,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				{ID: fakedContender3ID},
 				{ID: fakedContender4ID},
 				{ID: fakedContender5ID},
+				{ID: fakedContender6ID},
 			}))
 
 		f.store.
@@ -1236,7 +1253,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("GetTick", fakedContender4ID, fakedProblemID).
 			Return(fakedTicksByContender[fakedContender4ID], true).
 			On("GetTick", fakedContender5ID, fakedProblemID).
-			Return(fakedTicksByContender[fakedContender5ID], true)
+			Return(fakedTicksByContender[fakedContender5ID], true).
+			On("GetTick", fakedContender6ID, fakedProblemID).
+			Return(scores.Tick{}, false)
 
 		f.store.
 			On("GetPointValue", fakedContender1ID, fakedProblemID).
@@ -1248,6 +1267,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("GetPointValue", fakedContender4ID, fakedProblemID).
 			Return(domain.PointValue{}, false).
 			On("GetPointValue", fakedContender5ID, fakedProblemID).
+			Return(domain.PointValue{}, false).
+			On("GetPointValue", fakedContender6ID, fakedProblemID).
 			Return(domain.PointValue{}, false)
 
 		f.store.
@@ -1295,6 +1316,15 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Zone2:       20,
 				Top:         125,
 				Flash:       0,
+			}).Return().
+			On("SavePointValue", fakedContender6ID, fakedProblemID, domain.PointValue{
+				ContenderID: fakedContender6ID,
+				ProblemID:   fakedProblemID,
+				Current:     0,
+				Zone1:       8,
+				Zone2:       20,
+				Top:         125,
+				Flash:       158,
 			}).Return()
 
 		effects := slices.Collect(f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID))
@@ -1305,6 +1335,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			scores.EffectScoreContender{ContenderID: fakedContender3ID},
 			scores.EffectScoreContender{ContenderID: fakedContender4ID},
 			scores.EffectScoreContender{ContenderID: fakedContender5ID},
+			scores.EffectScoreContender{ContenderID: fakedContender6ID},
 		})
 
 		awaitExpectations(t)
