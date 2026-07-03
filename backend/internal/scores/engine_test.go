@@ -1037,7 +1037,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
-	t.Run("CalculatePointValues_PooledPoints_ValueUnchanged", func(t *testing.T) {
+	t.Run("CalculatePointValues_ValueUnchanged", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
@@ -1063,8 +1063,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f.store.
 			On("GetRules").
 			Return(scores.Rules{
-				UsePoints:    true,
-				PooledPoints: true,
+				UsePoints: true,
 			})
 
 		f.store.
@@ -1078,14 +1077,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 					FlashBonus:  100,
 				},
 			}, true)
-
-		f.store.
-			On("GetTicksByProblem", fakedCompClassID, fakedProblemID).
-			Return(slices.Values([]scores.Tick{fakedTick}))
-
-		f.store.
-			On("GetContender", fakedContenderID).
-			Return(fakedContender, true)
 
 		f.store.
 			On("GetContendersByCompClass", fakedCompClassID).
