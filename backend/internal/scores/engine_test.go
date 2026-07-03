@@ -632,6 +632,54 @@ func TestDefaultScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
+	t.Run("ProblemUpdated", func(t *testing.T) {
+		f, awaitExpectations := makeFixture()
+
+		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
+
+		fakedCompClass1ID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompClass2ID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompClass3ID := testutils.RandomResourceID[domain.CompClassID]()
+
+		f.store.
+			On("SaveProblem", scores.Problem{
+				ID: fakedProblemID,
+				ProblemValue: domain.ProblemValue{
+					PointsTop:   100,
+					PointsZone1: 50,
+					PointsZone2: 75,
+					FlashBonus:  10,
+				},
+			}).
+			Return()
+
+		f.store.
+			On("GetCompClassIDs").
+			Return([]domain.CompClassID{
+				fakedCompClass1ID,
+				fakedCompClass2ID,
+				fakedCompClass3ID,
+			})
+
+		effects := slices.Collect(f.engine.HandleProblemUpdated(domain.ProblemUpdatedEvent{
+			ProblemID: fakedProblemID,
+			ProblemValue: domain.ProblemValue{
+				PointsTop:   100,
+				PointsZone1: 50,
+				PointsZone2: 75,
+				FlashBonus:  10,
+			},
+		}))
+
+		require.ElementsMatch(t, effects, []scores.Effect{
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClass1ID, ProblemID: fakedProblemID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClass2ID, ProblemID: fakedProblemID},
+			scores.EffectCalculatePointValues{CompClassID: fakedCompClass3ID, ProblemID: fakedProblemID},
+		})
+
+		awaitExpectations(t)
+	})
+
 	t.Run("AscentRegistered_ContenderNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
