@@ -1,6 +1,7 @@
 package scores_test
 
 import (
+	"maps"
 	"slices"
 	"testing"
 	"testing/synctest"
@@ -996,10 +997,14 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f.store.
 			On("GetTick", fakedContenderID, fakedProblemID).
 			Return(scores.Tick{
-				ContenderID: fakedContenderID,
-				ProblemID:   fakedProblemID,
-				Top:         true,
-				AttemptsTop: 1,
+				ContenderID:   fakedContenderID,
+				ProblemID:     fakedProblemID,
+				Top:           true,
+				AttemptsTop:   1,
+				Zone2:         true,
+				AttemptsZone2: 1,
+				Zone1:         true,
+				AttemptsZone1: 1,
 			}, true)
 
 		f.store.
@@ -1038,7 +1043,22 @@ func TestDefaultScoreEngine(t *testing.T) {
 		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
-		fakedContender1ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+
+		fakedContender := scores.Contender{
+			ID: fakedContenderID,
+		}
+
+		fakedTick := scores.Tick{
+			ContenderID:   fakedContenderID,
+			ProblemID:     fakedProblemID,
+			Zone1:         true,
+			AttemptsZone1: 1,
+			Zone2:         true,
+			AttemptsZone2: 1,
+			Top:           true,
+			AttemptsTop:   1,
+		}
 
 		f.store.
 			On("GetRules").
@@ -1061,45 +1081,24 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetTicksByProblem", fakedCompClassID, fakedProblemID).
-			Return(slices.Values([]scores.Tick{
-				{
-					ContenderID: fakedContender1ID,
-					ProblemID:   fakedProblemID,
-					Zone1:       true,
-					Zone2:       true,
-					Top:         true,
-					AttemptsTop: 1,
-				},
-			}))
+			Return(slices.Values([]scores.Tick{fakedTick}))
 
 		f.store.
-			On("GetContender", fakedContender1ID).
-			Return(scores.Contender{
-				ID:           fakedContender1ID,
-				Disqualified: false,
-			}, true)
+			On("GetContender", fakedContenderID).
+			Return(fakedContender, true)
 
 		f.store.
 			On("GetContendersByCompClass", fakedCompClassID).
-			Return(slices.Values([]scores.Contender{{
-				ID: fakedContender1ID,
-			}}))
+			Return(slices.Values([]scores.Contender{fakedContender}))
 
 		f.store.
-			On("GetTick", fakedContender1ID, fakedProblemID).
-			Return(scores.Tick{
-				ContenderID: fakedContender1ID,
-				ProblemID:   fakedProblemID,
-				Zone1:       true,
-				Zone2:       true,
-				Top:         true,
-				AttemptsTop: 1,
-			}, true)
+			On("GetTick", fakedContenderID, fakedProblemID).
+			Return(fakedTick, true)
 
 		f.store.
-			On("GetPointValue", fakedContender1ID, fakedProblemID).
+			On("GetPointValue", fakedContenderID, fakedProblemID).
 			Return(domain.PointValue{
-				ContenderID: fakedContender1ID,
+				ContenderID: fakedContenderID,
 				ProblemID:   fakedProblemID,
 				Current:     600,
 				Zone1:       100,
@@ -1109,8 +1108,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 			}, true)
 
 		f.store.
-			On("SavePointValue", fakedContender1ID, fakedProblemID, domain.PointValue{
-				ContenderID: fakedContender1ID,
+			On("SavePointValue", fakedContenderID, fakedProblemID, domain.PointValue{
+				ContenderID: fakedContenderID,
 				ProblemID:   fakedProblemID,
 				Current:     600,
 				Zone1:       100,
@@ -1138,6 +1137,59 @@ func TestDefaultScoreEngine(t *testing.T) {
 		fakedContender4ID := testutils.RandomResourceID[domain.ContenderID]()
 		fakedContender5ID := testutils.RandomResourceID[domain.ContenderID]()
 
+		fakedTicksByContender := map[domain.ContenderID]scores.Tick{
+			fakedContender1ID: {
+				ContenderID:   fakedContender1ID,
+				ProblemID:     fakedProblemID,
+				Zone1:         true,
+				AttemptsZone1: 1,
+				Zone2:         true,
+				AttemptsZone2: 1,
+				Top:           true,
+				AttemptsTop:   1,
+			},
+			fakedContender2ID: {
+				ContenderID:   fakedContender2ID,
+				ProblemID:     fakedProblemID,
+				Zone1:         true,
+				AttemptsZone1: 1,
+				Zone2:         true,
+				AttemptsZone2: 1,
+				Top:           true,
+				AttemptsTop:   1,
+			},
+			fakedContender3ID: {
+				ContenderID:   fakedContender3ID,
+				ProblemID:     fakedProblemID,
+				Zone1:         true,
+				AttemptsZone1: 999,
+				Zone2:         true,
+				AttemptsZone2: 999,
+				Top:           true,
+				AttemptsTop:   999,
+			},
+			fakedContender4ID: {
+				ContenderID:   fakedContender4ID,
+				ProblemID:     fakedProblemID,
+				Zone1:         true,
+				AttemptsZone1: 999,
+				Zone2:         true,
+				AttemptsZone2: 999,
+				Top:           false,
+				AttemptsTop:   999,
+			},
+			fakedContender5ID: {
+				ContenderID:   fakedContender5ID,
+				ProblemID:     fakedProblemID,
+				Zone1:         true,
+				AttemptsZone1: 999,
+				Zone2:         false,
+				AttemptsZone2: 999,
+				Top:           false,
+				AttemptsTop:   999,
+			},
+		}
+
 		f.store.
 			On("GetRules").
 			Return(scores.Rules{
@@ -1159,85 +1211,19 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetTicksByProblem", fakedCompClassID, fakedProblemID).
-			Return(slices.Values([]scores.Tick{
-				{
-					ContenderID:   fakedContender1ID,
-					ProblemID:     fakedProblemID,
-					Zone1:         true,
-					AttemptsZone1: 1,
-					Zone2:         true,
-					AttemptsZone2: 1,
-					Top:           true,
-					AttemptsTop:   1,
-				},
-				{
-					ContenderID:   fakedContender2ID,
-					ProblemID:     fakedProblemID,
-					Zone1:         true,
-					AttemptsZone1: 1,
-					Zone2:         true,
-					AttemptsZone2: 1,
-					Top:           true,
-					AttemptsTop:   1,
-				},
-				{
-					ContenderID:   fakedContender3ID,
-					ProblemID:     fakedProblemID,
-					Zone1:         true,
-					AttemptsZone1: 999,
-					Zone2:         true,
-					AttemptsZone2: 999,
-					Top:           true,
-					AttemptsTop:   999,
-				},
-				{
-					ContenderID:   fakedContender4ID,
-					ProblemID:     fakedProblemID,
-					Zone1:         true,
-					AttemptsZone1: 999,
-					Zone2:         true,
-					AttemptsZone2: 999,
-					Top:           false,
-					AttemptsTop:   999,
-				},
-				{
-					ContenderID:   fakedContender5ID,
-					ProblemID:     fakedProblemID,
-					Zone1:         true,
-					AttemptsZone1: 999,
-					Zone2:         false,
-					AttemptsZone2: 999,
-					Top:           false,
-					AttemptsTop:   999,
-				},
-			}))
+			Return(maps.Values(fakedTicksByContender))
 
 		f.store.
 			On("GetContender", fakedContender1ID).
-			Return(scores.Contender{
-				ID:           fakedContender1ID,
-				Disqualified: false,
-			}, true).
+			Return(scores.Contender{ID: fakedContender1ID}, true).
 			On("GetContender", fakedContender2ID).
-			Return(scores.Contender{
-				ID:           fakedContender2ID,
-				Disqualified: false,
-			}, true).
+			Return(scores.Contender{ID: fakedContender2ID}, true).
 			On("GetContender", fakedContender3ID).
-			Return(scores.Contender{
-				ID:           fakedContender3ID,
-				Disqualified: false,
-			}, true).
+			Return(scores.Contender{ID: fakedContender3ID}, true).
 			On("GetContender", fakedContender4ID).
-			Return(scores.Contender{
-				ID:           fakedContender4ID,
-				Disqualified: false,
-			}, true).
+			Return(scores.Contender{ID: fakedContender4ID}, true).
 			On("GetContender", fakedContender5ID).
-			Return(scores.Contender{
-				ID:           fakedContender5ID,
-				Disqualified: false,
-			}, true)
+			Return(scores.Contender{ID: fakedContender5ID}, true)
 
 		f.store.
 			On("GetContendersByCompClass", fakedCompClassID).
@@ -1251,60 +1237,15 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetTick", fakedContender1ID, fakedProblemID).
-			Return(scores.Tick{
-				ContenderID:   fakedContender1ID,
-				ProblemID:     fakedProblemID,
-				Zone1:         true,
-				AttemptsZone1: 1,
-				Zone2:         true,
-				AttemptsZone2: 1,
-				Top:           true,
-				AttemptsTop:   1,
-			}, true).
+			Return(fakedTicksByContender[fakedContender1ID], true).
 			On("GetTick", fakedContender2ID, fakedProblemID).
-			Return(scores.Tick{
-				ContenderID:   fakedContender2ID,
-				ProblemID:     fakedProblemID,
-				Zone1:         true,
-				AttemptsZone1: 1,
-				Zone2:         true,
-				AttemptsZone2: 1,
-				Top:           true,
-				AttemptsTop:   1,
-			}, true).
+			Return(fakedTicksByContender[fakedContender2ID], true).
 			On("GetTick", fakedContender3ID, fakedProblemID).
-			Return(scores.Tick{
-				ContenderID:   fakedContender3ID,
-				ProblemID:     fakedProblemID,
-				Zone1:         true,
-				AttemptsZone1: 999,
-				Zone2:         true,
-				AttemptsZone2: 999,
-				Top:           true,
-				AttemptsTop:   999,
-			}, true).
+			Return(fakedTicksByContender[fakedContender3ID], true).
 			On("GetTick", fakedContender4ID, fakedProblemID).
-			Return(scores.Tick{
-				ContenderID:   fakedContender4ID,
-				ProblemID:     fakedProblemID,
-				Zone1:         true,
-				AttemptsZone1: 999,
-				Zone2:         true,
-				AttemptsZone2: 999,
-				Top:           false,
-				AttemptsTop:   999,
-			}, true).
+			Return(fakedTicksByContender[fakedContender4ID], true).
 			On("GetTick", fakedContender5ID, fakedProblemID).
-			Return(scores.Tick{
-				ContenderID:   fakedContender5ID,
-				ProblemID:     fakedProblemID,
-				Zone1:         true,
-				AttemptsZone1: 999,
-				Zone2:         false,
-				AttemptsZone2: 999,
-				Top:           false,
-				AttemptsTop:   999,
-			}, true)
+			Return(fakedTicksByContender[fakedContender5ID], true)
 
 		f.store.
 			On("GetPointValue", fakedContender1ID, fakedProblemID).
@@ -1397,6 +1338,39 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Disqualified: true,
 		}
 
+		fakedTicksByContender := map[domain.ContenderID]scores.Tick{
+			fakedContender1.ID: {
+				ContenderID:   fakedContender1.ID,
+				ProblemID:     fakedProblemID,
+				Zone1:         true,
+				AttemptsZone1: 1,
+				Zone2:         true,
+				AttemptsZone2: 1,
+				Top:           true,
+				AttemptsTop:   1,
+			},
+			fakedContender2.ID: {
+				ContenderID:   fakedContender2.ID,
+				ProblemID:     fakedProblemID,
+				Zone1:         true,
+				AttemptsZone1: 1,
+				Zone2:         true,
+				AttemptsZone2: 1,
+				Top:           true,
+				AttemptsTop:   1,
+			},
+			fakedContender3.ID: {
+				ContenderID:   fakedContender3.ID,
+				ProblemID:     fakedProblemID,
+				Zone1:         true,
+				AttemptsZone1: 1,
+				Zone2:         true,
+				AttemptsZone2: 1,
+				Top:           true,
+				AttemptsTop:   1,
+			},
+		}
+
 		f.store.
 			On("GetRules").
 			Return(scores.Rules{
@@ -1418,38 +1392,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetTicksByProblem", fakedCompClassID, fakedProblemID).
-			Return(slices.Values([]scores.Tick{
-				{
-					ContenderID:   fakedContender1.ID,
-					ProblemID:     fakedProblemID,
-					Zone1:         true,
-					AttemptsZone1: 1,
-					Zone2:         true,
-					AttemptsZone2: 1,
-					Top:           true,
-					AttemptsTop:   1,
-				},
-				{
-					ContenderID:   fakedContender2.ID,
-					ProblemID:     fakedProblemID,
-					Zone1:         true,
-					AttemptsZone1: 1,
-					Zone2:         true,
-					AttemptsZone2: 1,
-					Top:           true,
-					AttemptsTop:   1,
-				},
-				{
-					ContenderID:   fakedContender3.ID,
-					ProblemID:     fakedProblemID,
-					Zone1:         true,
-					AttemptsZone1: 1,
-					Zone2:         true,
-					AttemptsZone2: 1,
-					Top:           true,
-					AttemptsTop:   1,
-				},
-			}))
+			Return(maps.Values(fakedTicksByContender))
 
 		f.store.
 			On("GetContender", fakedContender1.ID).
@@ -1469,38 +1412,11 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetTick", fakedContender1.ID, fakedProblemID).
-			Return(scores.Tick{
-				ContenderID:   fakedContender1.ID,
-				ProblemID:     fakedProblemID,
-				Zone1:         true,
-				AttemptsZone1: 1,
-				Zone2:         true,
-				AttemptsZone2: 1,
-				Top:           true,
-				AttemptsTop:   1,
-			}, true).
+			Return(fakedTicksByContender[fakedContender1.ID], true).
 			On("GetTick", fakedContender2.ID, fakedProblemID).
-			Return(scores.Tick{
-				ContenderID:   fakedContender2.ID,
-				ProblemID:     fakedProblemID,
-				Zone1:         true,
-				AttemptsZone1: 1,
-				Zone2:         true,
-				AttemptsZone2: 1,
-				Top:           true,
-				AttemptsTop:   1,
-			}, true).
+			Return(fakedTicksByContender[fakedContender2.ID], true).
 			On("GetTick", fakedContender3.ID, fakedProblemID).
-			Return(scores.Tick{
-				ContenderID:   fakedContender3.ID,
-				ProblemID:     fakedProblemID,
-				Zone1:         true,
-				AttemptsZone1: 1,
-				Zone2:         true,
-				AttemptsZone2: 1,
-				Top:           true,
-				AttemptsTop:   1,
-			}, true)
+			Return(fakedTicksByContender[fakedContender3.ID], true)
 
 		f.store.
 			On("GetPointValue", fakedContender1.ID, fakedProblemID).
