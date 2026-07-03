@@ -435,8 +435,8 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 
 		hypotheticalBestZone1 := HypotheticalBestZone1(tick)
 		hypotheticalBestZone2 := HypotheticalBestZone2(tick)
-		hypotheticalBestTop := HypotheticalBestTop(tick)
-		hypotheticalSecondBestTop := HypotheticalSecondBestTop(tick)
+		hypotheticalBestTopNoFlash := HypotheticalBestTopNoFlash(tick)
+		hypotheticalFlash := HypotheticalFlash(tick)
 
 		pointValue := domain.PointValue{
 			ContenderID: contender.ID,
@@ -456,24 +456,20 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 		case contender.Disqualified:
 		case rules.PooledPoints:
 			{
-				hypotheticalProblemValue := tickPool.Sub(tick).Add(hypotheticalBestTop).CalculatePooledProblemValue(problem.ProblemValue)
+				hypotheticalProblemValue := tickPool.Sub(tick).Add(hypotheticalFlash).CalculatePooledProblemValue(problem.ProblemValue)
 
 				pointValue.Zone1 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone1)
 				pointValue.Zone2 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone2)
-				pointValue.Top = CalculatePoints(hypotheticalProblemValue, hypotheticalSecondBestTop)
-				pointValue.Flash = CalculatePoints(hypotheticalProblemValue, hypotheticalBestTop)
+				pointValue.Top = CalculatePoints(hypotheticalProblemValue, hypotheticalBestTopNoFlash)
+				pointValue.Flash = CalculatePoints(hypotheticalProblemValue, hypotheticalFlash)
 			}
 		default:
 			{
 				pointValue.Zone1 = CalculatePoints(problemValue, hypotheticalBestZone1)
 				pointValue.Zone2 = CalculatePoints(problemValue, hypotheticalBestZone2)
-				pointValue.Top = CalculatePoints(problemValue, hypotheticalSecondBestTop)
-				pointValue.Flash = CalculatePoints(problemValue, hypotheticalBestTop)
+				pointValue.Top = CalculatePoints(problemValue, hypotheticalBestTopNoFlash)
+				pointValue.Flash = CalculatePoints(problemValue, hypotheticalFlash)
 			}
-		}
-
-		if hypotheticalBestTop.AttemptsTop > 1 {
-			pointValue.Flash = 0
 		}
 
 		oldValue, hadPointValue := e.store.GetPointValue(contender.ID, problemID)

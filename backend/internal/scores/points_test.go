@@ -154,7 +154,7 @@ func HypotheticalSecondBestTop(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			original := tt.input
 
-			actual := scores.HypotheticalSecondBestTop(tt.input)
+			actual := scores.HypotheticalBestTopNoFlash(tt.input)
 
 			assert.Equal(t, tt.expected, actual)
 			assert.Equal(t, original, tt.input)
@@ -183,7 +183,7 @@ func HypotheticalBestTop(t *testing.T) {
 		AttemptsZone2: 1,
 		Top:           true,
 		AttemptsTop:   1,
-	}, scores.HypotheticalBestTop(input))
+	}, scores.HypotheticalFlash(input))
 
 	assert.Equal(t, scores.Tick{
 		ContenderID:   1,
