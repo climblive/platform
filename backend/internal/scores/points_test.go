@@ -89,7 +89,7 @@ func TestCalculatePoints(t *testing.T) {
 	}
 }
 
-func HypotheticalSecondBestTop(t *testing.T) {
+func HypotheticalBestTopNoFlash(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    scores.Tick
@@ -162,7 +162,7 @@ func HypotheticalSecondBestTop(t *testing.T) {
 	}
 }
 
-func HypotheticalBestTop(t *testing.T) {
+func HypotheticalFlash(t *testing.T) {
 	input := scores.Tick{
 		ContenderID:   1,
 		ProblemID:     2,
