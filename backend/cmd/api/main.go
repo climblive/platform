@@ -150,14 +150,14 @@ func main() {
 		panic(err)
 	}
 
+	scoreEngineMaxLifetime := getScoreEngineMaxLifetime()
+	slog.Info("score engine maximum lifetime cap enabled", "max_lifetime", scoreEngineMaxLifetime)
+
 	authorizer := authorizer.NewAuthorizer(database, jwtDecoder)
 	eventBroker := events.NewBroker()
 	scoreKeeper := scores.NewScoreKeeper(eventBroker, database)
-	pointValueKeeper := scores.NewPointValueKeeper(eventBroker)
+	pointValueKeeper := scores.NewPointValueKeeper(eventBroker, scoreEngineMaxLifetime+time.Hour)
 	scoreEngineStoreHydrator := &scores.StandardEngineStoreHydrator{Repo: database}
-
-	scoreEngineMaxLifetime := getScoreEngineMaxLifetime()
-	slog.Info("score engine maximum lifetime cap enabled", "max_lifetime", scoreEngineMaxLifetime)
 
 	scoreEngineManager := scores.NewScoreEngineManager(database, scoreEngineStoreHydrator, eventBroker, scoreEngineMaxLifetime)
 
