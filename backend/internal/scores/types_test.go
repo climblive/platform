@@ -36,3 +36,81 @@ func TestCompareContender(t *testing.T) {
 		assert.Greater(t, c2.Compare(c1), 0)
 	})
 }
+
+func TestTickPool_Add(t *testing.T) {
+	t.Run("AddZone1", func(t *testing.T) {
+		pool := scores.TickPool{}
+
+		for range 5 {
+			pool = pool.Add(scores.Tick{
+				Zone1:         true,
+				AttemptsZone1: 1,
+			})
+		}
+
+		assert.Equal(t, scores.TickPool{
+			Zone1: 5,
+		}, pool)
+	})
+
+	t.Run("AddZone2", func(t *testing.T) {
+		pool := scores.TickPool{}
+
+		for range 5 {
+			pool = pool.Add(scores.Tick{
+				Zone1:         true,
+				AttemptsZone1: 1,
+				Zone2:         true,
+				AttemptsZone2: 1,
+			})
+		}
+
+		assert.Equal(t, scores.TickPool{
+			Zone1: 5,
+			Zone2: 5,
+		}, pool)
+	})
+
+	t.Run("AddTopWithoutFlash", func(t *testing.T) {
+		pool := scores.TickPool{}
+
+		for range 5 {
+			pool = pool.Add(scores.Tick{
+				Zone1:         true,
+				AttemptsZone1: 999,
+				Zone2:         true,
+				AttemptsZone2: 999,
+				Top:           true,
+				AttemptsTop:   999,
+			})
+		}
+
+		assert.Equal(t, scores.TickPool{
+			Zone1: 5,
+			Zone2: 5,
+			Top:   5,
+		}, pool)
+	})
+
+	t.Run("AddTopWithFlash", func(t *testing.T) {
+		pool := scores.TickPool{}
+
+		for range 5 {
+			pool = pool.Add(scores.Tick{
+				Zone1:         true,
+				AttemptsZone1: 1,
+				Zone2:         true,
+				AttemptsZone2: 1,
+				Top:           true,
+				AttemptsTop:   1,
+			})
+		}
+
+		assert.Equal(t, scores.TickPool{
+			Zone1: 5,
+			Zone2: 5,
+			Top:   5,
+			Flash: 5,
+		}, pool)
+	})
+}
