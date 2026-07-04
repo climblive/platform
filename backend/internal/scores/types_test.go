@@ -3,6 +3,7 @@ package scores_test
 import (
 	"testing"
 
+	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/stretchr/testify/assert"
 )
@@ -216,5 +217,84 @@ func TestTickPool_Sub(t *testing.T) {
 			Top:   2,
 			Flash: 2,
 		}, pool)
+	})
+}
+
+func TestCalculatePooledProblemValue(t *testing.T) {
+	t.Run("Weighted", func(t *testing.T) {
+		pool := scores.TickPool{
+			Zone1: 1000,
+			Zone2: 100,
+			Top:   10,
+			Flash: 1,
+		}
+
+		value := pool.CalculatePooledProblemValue(domain.ProblemValue{
+			PointsZone1: 10_000,
+			PointsZone2: 20_000,
+			PointsTop:   100_000,
+			FlashBonus:  5_000,
+		})
+
+		assert.Equal(t, domain.ProblemValue{
+			PointsZone1: 10,
+			PointsZone2: 200,
+			PointsTop:   10_000,
+			FlashBonus:  5_000,
+		}, value)
+	})
+
+	t.Run("EmptyPool", func(t *testing.T) {
+		pool := scores.TickPool{}
+
+		value := pool.CalculatePooledProblemValue(domain.ProblemValue{
+			PointsZone1: 100,
+			PointsZone2: 200,
+			PointsTop:   1000,
+			FlashBonus:  50,
+		})
+
+		assert.Equal(t, domain.ProblemValue{
+			PointsZone1: 100,
+			PointsZone2: 200,
+			PointsTop:   1000,
+			FlashBonus:  50,
+		}, value)
+	})
+
+	t.Run("ZeroValueProblem", func(t *testing.T) {
+		pool := scores.TickPool{
+			Zone1: 10,
+			Zone2: 10,
+			Top:   10,
+			Flash: 10,
+		}
+
+		value := pool.CalculatePooledProblemValue(domain.ProblemValue{})
+
+		assert.Empty(t, value)
+	})
+
+	t.Run("MinOnePoint", func(t *testing.T) {
+		pool := scores.TickPool{
+			Zone1: 1000,
+			Zone2: 1000,
+			Top:   1000,
+			Flash: 1000,
+		}
+
+		value := pool.CalculatePooledProblemValue(domain.ProblemValue{
+			PointsZone1: 5,
+			PointsZone2: 5,
+			PointsTop:   5,
+			FlashBonus:  5,
+		})
+
+		assert.Equal(t, domain.ProblemValue{
+			PointsZone1: 1,
+			PointsZone2: 1,
+			PointsTop:   1,
+			FlashBonus:  1,
+		}, value)
 	})
 }
