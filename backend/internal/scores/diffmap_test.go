@@ -8,7 +8,7 @@ import (
 )
 
 func TestDiffMap(t *testing.T) {
-	dm := scores.NewDiffMap[int, string](func(v1, v2 string) bool { return v1 == v2 })
+	dm := scores.NewDiffMap[int](func(v1, v2 string) bool { return v1 == v2 })
 
 	dm.Set(1, "Alice")
 	dm.Set(2, "Bob")
@@ -34,7 +34,7 @@ func TestDiffMap(t *testing.T) {
 }
 
 func TestDiffMap_RevertValue(t *testing.T) {
-	dm := scores.NewDiffMap[int, string](func(v1, v2 string) bool { return v1 == v2 })
+	dm := scores.NewDiffMap[int](func(v1, v2 string) bool { return v1 == v2 })
 
 	dm.Set(1, "Alice")
 
@@ -46,4 +46,35 @@ func TestDiffMap_RevertValue(t *testing.T) {
 
 	diff = dm.Commit()
 	assert.Len(t, diff, 0)
+}
+
+func TestDiffMap_GetValue(t *testing.T) {
+	dm := scores.NewDiffMap[int](func(v1, v2 string) bool { return v1 == v2 })
+
+	dm.Set(1, "Alice")
+	dm.Set(2, "Bob")
+
+	name, found := dm.Get(1)
+	assert.True(t, found)
+	assert.Equal(t, "Alice", name)
+
+	name, found = dm.Get(2)
+	assert.True(t, found)
+	assert.Equal(t, "Bob", name)
+
+	name, found = dm.Get(3)
+	assert.False(t, found)
+	assert.Empty(t, name)
+
+	_ = dm.Commit()
+
+	dm.Set(2, "Bobby")
+
+	name, found = dm.Get(1)
+	assert.True(t, found)
+	assert.Equal(t, "Alice", name)
+
+	name, found = dm.Get(2)
+	assert.True(t, found)
+	assert.Equal(t, "Bobby", name)
 }
