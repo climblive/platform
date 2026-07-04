@@ -72,6 +72,10 @@ func (r *EffectRunner) RunEffects(effects iter.Seq[Effect], logger *slog.Logger)
 			}
 		}
 	}, logger)
+
+	if len(r.queue) > 0 {
+		logger.Error("unhandled effects", "count", len(r.queue))
+	}
 }
 
 func (r *EffectRunner) Run(effects iter.Seq[Effect], logger *slog.Logger) {
