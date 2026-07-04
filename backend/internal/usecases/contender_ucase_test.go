@@ -3,6 +3,7 @@ package usecases_test
 import (
 	"context"
 	"fmt"
+	"slices"
 	"testing"
 	"testing/synctest"
 	"time"
@@ -159,6 +160,110 @@ func TestGetContenderByCode(t *testing.T) {
 		assert.ErrorIs(t, err, domain.ErrNotFound)
 		assert.Empty(t, contender)
 
+		mockedRepo.AssertExpectations(t)
+	})
+}
+
+func TestGetPointValues(t *testing.T) {
+	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+
+	fakedOwnership := domain.OwnershipData{
+		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
+		ContenderID: &fakedContenderID,
+	}
+
+	t.Run("HappyPath", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+		mockedRepo := new(repositoryMock)
+		mockedPointValueKeeper := new(pointValueKeeperMock)
+
+		fakedPointValues := []domain.PointValue{
+			{
+				ContenderID: fakedContenderID,
+				ProblemID:   testutils.RandomResourceID[domain.ProblemID](),
+				Current:     1_000,
+				Zone1:       10,
+				Zone2:       100,
+				Top:         1_000,
+				FlashBonus:  5,
+			},
+			{
+				ContenderID: fakedContenderID,
+				ProblemID:   testutils.RandomResourceID[domain.ProblemID](),
+				Current:     2_000,
+				Zone1:       20,
+				Zone2:       200,
+				Top:         2_000,
+				FlashBonus:  10,
+			},
+			{
+				ContenderID: fakedContenderID,
+				ProblemID:   testutils.RandomResourceID[domain.ProblemID](),
+				Current:     3_000,
+				Zone1:       30,
+				Zone2:       300,
+				Top:         3_000,
+				FlashBonus:  15,
+			},
+		}
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.ContenderRole, nil)
+
+		mockedRepo.
+			On("GetContender", mock.Anything, nil, fakedContenderID).
+			Return(domain.Contender{
+				ID:        fakedContenderID,
+				Ownership: fakedOwnership,
+			}, nil)
+
+		mockedPointValueKeeper.
+			On("GetPointValues", fakedContenderID).
+			Return(slices.Collect(slices.Values(fakedPointValues)))
+
+		ucase := usecases.ContenderUseCase{
+			Repo:             mockedRepo,
+			Authorizer:       mockedAuthorizer,
+			PointValueKeeper: mockedPointValueKeeper,
+		}
+
+		pointValues, err := ucase.GetPointValues(context.Background(), fakedContenderID)
+
+		require.NoError(t, err)
+		assert.Equal(t, fakedPointValues, pointValues)
+
+		mockedAuthorizer.AssertExpectations(t)
+		mockedRepo.AssertExpectations(t)
+		mockedPointValueKeeper.AssertExpectations(t)
+	})
+
+	t.Run("BadCredentials", func(t *testing.T) {
+		mockedAuthorizer := new(authorizerMock)
+		mockedRepo := new(repositoryMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.NilRole, domain.ErrNoOwnership)
+
+		mockedRepo.
+			On("GetContender", mock.Anything, nil, fakedContenderID).
+			Return(domain.Contender{
+				ID:        fakedContenderID,
+				Ownership: fakedOwnership,
+			}, nil)
+
+		ucase := usecases.ContenderUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		pointValues, err := ucase.GetPointValues(context.Background(), fakedContenderID)
+
+		assert.ErrorIs(t, err, domain.ErrNoOwnership)
+		assert.Empty(t, pointValues)
+
+		mockedAuthorizer.AssertExpectations(t)
 		mockedRepo.AssertExpectations(t)
 	})
 }

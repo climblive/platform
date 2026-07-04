@@ -326,3 +326,12 @@ func (m *uuidGeneratorMock) Generate() uuid.UUID {
 	args := m.Called()
 	return args.Get(0).(uuid.UUID)
 }
+
+type pointValueKeeperMock struct {
+	mock.Mock
+}
+
+func (m *pointValueKeeperMock) GetPointValues(contenderID domain.ContenderID) []domain.PointValue {
+	args := m.Called(contenderID)
+	return args.Get(0).([]domain.PointValue)
+}
