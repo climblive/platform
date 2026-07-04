@@ -10,7 +10,7 @@ import (
 	"github.com/climblive/platform/backend/internal/domain"
 )
 
-const pointValueSweepInterval = time.Minute
+const gcInterval = time.Minute
 
 type keptPointValue struct {
 	value     domain.PointValue
@@ -31,6 +31,7 @@ func NewPointValueKeeper(eventBroker domain.EventBroker, ttl time.Duration) *Poi
 		eventBroker: eventBroker,
 		pointValues: make(map[domain.ContenderID]map[domain.ProblemID]keptPointValue),
 		running:     atomic.Bool{},
+		ttl:         ttl,
 	}
 }
 
@@ -82,7 +83,9 @@ func (k *PointValueKeeper) run(ctx context.Context, ready chan<- struct{}) {
 	close(ready)
 
 	events := eventReader.EventsChan(ctx)
-	ticker := time.Tick(pointValueSweepInterval)
+	ticker := time.Tick(gcInterval)
+
+	slog.Info("point value keeper started", "ttl", k.ttl, "gc_interval", gcInterval)
 
 EventLoop:
 	for {
