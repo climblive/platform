@@ -367,6 +367,8 @@ func TestCreateContest(t *testing.T) {
 						Description:        "Who is the best climber in Sweden?",
 						QualifyingProblems: 10,
 						Finalists:          7,
+						UsePoints:          true,
+						PooledPoints:       true,
 						Info:               "No rules!",
 						GracePeriod:        time.Hour,
 						Created:            time.Now(),
@@ -383,6 +385,8 @@ func TestCreateContest(t *testing.T) {
 					Description:        "Who is the best climber in Sweden?",
 					QualifyingProblems: 10,
 					Finalists:          7,
+					UsePoints:          true,
+					PooledPoints:       true,
 					Info:               "No rules!",
 					GracePeriod:        time.Hour,
 					Created:            time.Now(),
@@ -401,6 +405,8 @@ func TestCreateContest(t *testing.T) {
 				Description:        "Who is the best climber in Sweden?",
 				QualifyingProblems: 10,
 				Finalists:          7,
+				UsePoints:          true,
+				PooledPoints:       true,
 				Info:               "No rules!",
 				GracePeriod:        time.Hour,
 				NameRetentionTime:  14 * 24 * time.Hour,
@@ -416,6 +422,8 @@ func TestCreateContest(t *testing.T) {
 			assert.Equal(t, "Who is the best climber in Sweden?", contest.Description)
 			assert.Equal(t, 10, contest.QualifyingProblems)
 			assert.Equal(t, 7, contest.Finalists)
+			assert.True(t, contest.UsePoints)
+			assert.True(t, contest.PooledPoints)
 			assert.Equal(t, "No rules!", contest.Info)
 			assert.Equal(t, time.Hour, contest.GracePeriod)
 			assert.Empty(t, contest.TimeBegin)
