@@ -25,12 +25,14 @@ func NewEffectRunner(resolver effectResolver) *EffectRunner {
 	}
 }
 
-func (r *EffectRunner) RunEffects(effects iter.Seq[Effect], logger *slog.Logger) {
+func (r *EffectRunner) RunEffects(effects iter.Seq[Effect]) int64 {
+	effectsResolved := int64(0)
+
 	if effects == nil {
-		return
+		return 0
 	}
 
-	r.Run(func(yield func(Effect) bool) {
+	effectsResolved += r.run(func(yield func(Effect) bool) {
 		for effect := range effects {
 			switch effect.(type) {
 			case EffectCalculatePointValues:
@@ -43,9 +45,9 @@ func (r *EffectRunner) RunEffects(effects iter.Seq[Effect], logger *slog.Logger)
 				return
 			}
 		}
-	}, logger)
+	})
 
-	r.Run(func(yield func(Effect) bool) {
+	effectsResolved += r.run(func(yield func(Effect) bool) {
 		for _, effect := range r.queue {
 			switch effect.(type) {
 			case EffectScoreContender:
@@ -57,9 +59,9 @@ func (r *EffectRunner) RunEffects(effects iter.Seq[Effect], logger *slog.Logger)
 				return
 			}
 		}
-	}, logger)
+	})
 
-	r.Run(func(yield func(Effect) bool) {
+	effectsResolved += r.run(func(yield func(Effect) bool) {
 		for _, effect := range r.queue {
 			switch effect.(type) {
 			case EffectRankClass:
@@ -71,27 +73,31 @@ func (r *EffectRunner) RunEffects(effects iter.Seq[Effect], logger *slog.Logger)
 				return
 			}
 		}
-	}, logger)
+	})
 
 	if len(r.queue) > 0 {
-		logger.Error("unhandled effects", "count", len(r.queue))
+		slog.Error("unhandled effects", "count", len(r.queue))
 	}
+
+	return effectsResolved
 }
 
-func (r *EffectRunner) Run(effects iter.Seq[Effect], logger *slog.Logger) {
+func (r *EffectRunner) run(effects iter.Seq[Effect]) int64 {
+	var effectsResolved int64
+
 	for e := range effects {
 		var chainEffects iter.Seq[Effect]
 
 		switch effect := e.(type) {
 		case EffectRankClass:
-			logger.Info("re-ranking comp class", "comp_class_id", effect.CompClassID)
 			r.resolver.RankCompClass(effect.CompClassID)
+			effectsResolved += 1
 		case EffectScoreContender:
-			logger.Info("re-scoring contender", "contender_id", effect.ContenderID)
 			chainEffects = r.resolver.ScoreContender(effect.ContenderID)
+			effectsResolved += 1
 		case EffectCalculatePointValues:
-			logger.Info("re-calculating point values", "comp_class_id", effect.CompClassID, "problem_id", effect.ProblemID)
 			chainEffects = r.resolver.CalculatePointValues(effect.CompClassID, effect.ProblemID)
+			effectsResolved += 1
 		}
 
 		if chainEffects == nil {
@@ -99,7 +105,13 @@ func (r *EffectRunner) Run(effects iter.Seq[Effect], logger *slog.Logger) {
 		}
 
 		for chainEffect := range chainEffects {
+			if chainEffect.Type() <= e.Type() {
+				continue
+			}
+
 			r.queue[chainEffect.Encode()] = chainEffect
 		}
 	}
+
+	return effectsResolved
 }

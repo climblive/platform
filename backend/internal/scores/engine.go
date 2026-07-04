@@ -34,11 +34,16 @@ const (
 type EncodedEffect = [9]byte
 
 type Effect interface {
+	Type() EffectType
 	Encode() EncodedEffect
 }
 
 type EffectScoreContender struct {
 	ContenderID domain.ContenderID
+}
+
+func (e EffectScoreContender) Type() EffectType {
+	return EffectTypeScoreContender
 }
 
 func (e EffectScoreContender) Encode() EncodedEffect {
@@ -52,6 +57,10 @@ type EffectRankClass struct {
 	CompClassID domain.CompClassID
 }
 
+func (e EffectRankClass) Type() EffectType {
+	return EffectTypeRankClass
+}
+
 func (e EffectRankClass) Encode() EncodedEffect {
 	var data EncodedEffect
 	data[0] = byte(EffectTypeRankClass)
@@ -62,6 +71,10 @@ func (e EffectRankClass) Encode() EncodedEffect {
 type EffectCalculatePointValues struct {
 	CompClassID domain.CompClassID
 	ProblemID   domain.ProblemID
+}
+
+func (e EffectCalculatePointValues) Type() EffectType {
+	return EffectTypeCalculatePointValues
 }
 
 func (e EffectCalculatePointValues) Encode() EncodedEffect {
