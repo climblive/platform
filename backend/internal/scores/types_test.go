@@ -113,7 +113,9 @@ func TestTickPool_Add(t *testing.T) {
 			Flash: 5,
 		}, pool)
 	})
+}
 
+func TestTickPool_Sub(t *testing.T) {
 	t.Run("SubZone1", func(t *testing.T) {
 		pool := scores.TickPool{
 			Zone1: 5,
