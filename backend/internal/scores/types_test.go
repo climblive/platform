@@ -113,4 +113,106 @@ func TestTickPool_Add(t *testing.T) {
 			Flash: 5,
 		}, pool)
 	})
+
+	t.Run("SubZone1", func(t *testing.T) {
+		pool := scores.TickPool{
+			Zone1: 5,
+			Zone2: 5,
+			Top:   5,
+			Flash: 5,
+		}
+
+		for range 3 {
+			pool = pool.Sub(scores.Tick{
+				Zone1:         true,
+				AttemptsZone1: 1,
+			})
+		}
+
+		assert.Equal(t, scores.TickPool{
+			Zone1: 2,
+			Zone2: 5,
+			Top:   5,
+			Flash: 5,
+		}, pool)
+	})
+
+	t.Run("SubZone2", func(t *testing.T) {
+		pool := scores.TickPool{
+			Zone1: 5,
+			Zone2: 5,
+			Top:   5,
+			Flash: 5,
+		}
+
+		for range 3 {
+			pool = pool.Sub(scores.Tick{
+				Zone1:         true,
+				AttemptsZone1: 1,
+				Zone2:         true,
+				AttemptsZone2: 1,
+			})
+		}
+
+		assert.Equal(t, scores.TickPool{
+			Zone1: 2,
+			Zone2: 2,
+			Top:   5,
+			Flash: 5,
+		}, pool)
+	})
+
+	t.Run("SubTopWithoutFlash", func(t *testing.T) {
+		pool := scores.TickPool{
+			Zone1: 5,
+			Zone2: 5,
+			Top:   5,
+			Flash: 5,
+		}
+
+		for range 3 {
+			pool = pool.Sub(scores.Tick{
+				Zone1:         true,
+				AttemptsZone1: 999,
+				Zone2:         true,
+				AttemptsZone2: 999,
+				Top:           true,
+				AttemptsTop:   999,
+			})
+		}
+
+		assert.Equal(t, scores.TickPool{
+			Zone1: 2,
+			Zone2: 2,
+			Top:   2,
+			Flash: 5,
+		}, pool)
+	})
+
+	t.Run("SubTopWithFlash", func(t *testing.T) {
+		pool := scores.TickPool{
+			Zone1: 5,
+			Zone2: 5,
+			Top:   5,
+			Flash: 5,
+		}
+
+		for range 3 {
+			pool = pool.Sub(scores.Tick{
+				Zone1:         true,
+				AttemptsZone1: 1,
+				Zone2:         true,
+				AttemptsZone2: 1,
+				Top:           true,
+				AttemptsTop:   1,
+			})
+		}
+
+		assert.Equal(t, scores.TickPool{
+			Zone1: 2,
+			Zone2: 2,
+			Top:   2,
+			Flash: 2,
+		}, pool)
+	})
 }
