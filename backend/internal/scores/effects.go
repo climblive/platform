@@ -2,7 +2,6 @@ package scores
 
 import (
 	"iter"
-	"log/slog"
 
 	"github.com/climblive/platform/backend/internal/domain"
 )
@@ -74,10 +73,6 @@ func (r *EffectRunner) RunEffects(effects iter.Seq[Effect]) int64 {
 			}
 		}
 	})
-
-	if len(r.queue) > 0 {
-		slog.Error("unhandled effects", "count", len(r.queue))
-	}
 
 	return effectsResolved
 }
