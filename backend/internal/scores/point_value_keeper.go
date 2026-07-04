@@ -10,7 +10,6 @@ import (
 	"github.com/climblive/platform/backend/internal/domain"
 )
 
-const pointValueTTL = 24 * time.Hour
 const pointValueSweepInterval = time.Minute
 
 type keptPointValue struct {
@@ -23,9 +22,10 @@ type PointValueKeeper struct {
 	eventBroker domain.EventBroker
 	pointValues map[domain.ContenderID]map[domain.ProblemID]keptPointValue
 	running     atomic.Bool
+	ttl         time.Duration
 }
 
-func NewPointValueKeeper(eventBroker domain.EventBroker) *PointValueKeeper {
+func NewPointValueKeeper(eventBroker domain.EventBroker, ttl time.Duration) *PointValueKeeper {
 	return &PointValueKeeper{
 		mu:          sync.RWMutex{},
 		eventBroker: eventBroker,
@@ -123,7 +123,7 @@ func (k *PointValueKeeper) handlePointValueUpdated(event domain.PointValueUpdate
 
 	contenderPointValues[event.ProblemID] = keptPointValue{
 		value:     domain.PointValue(event),
-		expiresAt: time.Now().Add(pointValueTTL),
+		expiresAt: time.Now().Add(k.ttl),
 	}
 }
 
