@@ -228,7 +228,8 @@ func TestPointValueKeeper(t *testing.T) {
 				}, pointValues)
 			}
 
-			<-time.After(time.Hour + time.Minute + time.Nanosecond)
+			<-time.After(time.Hour + time.Minute)
+			synctest.Wait()
 
 			for _, contenderID := range fakedContenderIDs {
 				pointValues := keeper.GetPointValues(contenderID)
