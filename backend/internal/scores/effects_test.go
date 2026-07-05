@@ -51,14 +51,37 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 			}
 		}
 
-		mockedResolver.On("RankCompClass", mock.Anything).Return()
-		mockedResolver.On("ScoreContender", mock.Anything).Return(effectYielder(10))
-		mockedResolver.On("CalculatePointValues", mock.Anything, mock.Anything).Return(effectYielder(10))
+		effectCounters := map[scores.EffectType]int{
+			scores.EffectTypeRankClass:            0,
+			scores.EffectTypeScoreContender:       0,
+			scores.EffectTypeCalculatePointValues: 0,
+		}
+
+		incrementCounter := func(effectType scores.EffectType) func(args mock.Arguments) {
+			return func(args mock.Arguments) {
+				effectCounters[effectType] += 1
+			}
+		}
+
+		mockedResolver.
+			On("RankCompClass", mock.Anything).
+			Return().
+			Run(incrementCounter(scores.EffectTypeRankClass))
+		mockedResolver.
+			On("ScoreContender", mock.Anything).
+			Return(effectYielder(10)).
+			Run(incrementCounter(scores.EffectTypeScoreContender))
+		mockedResolver.
+			On("CalculatePointValues", mock.Anything, mock.Anything).
+			Return(effectYielder(10)).
+			Run(incrementCounter(scores.EffectTypeCalculatePointValues))
 
 		runner := scores.NewEffectRunner(mockedResolver)
 
-		effectsResolved := runner.RunEffects(effectYielder(10))
+		runner.RunEffects(effectYielder(10))
 
-		assert.Equal(t, int64(10+110+1210), effectsResolved)
+		assert.Equal(t, 10, effectCounters[scores.EffectTypeCalculatePointValues])
+		assert.Equal(t, 110, effectCounters[scores.EffectTypeScoreContender])
+		assert.Equal(t, 1210, effectCounters[scores.EffectTypeRankClass])
 	})
 }

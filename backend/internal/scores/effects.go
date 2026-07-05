@@ -24,14 +24,12 @@ func NewEffectRunner(resolver effectResolver) *EffectRunner {
 	}
 }
 
-func (r *EffectRunner) RunEffects(effects iter.Seq[Effect]) int64 {
-	effectsResolved := int64(0)
-
+func (r *EffectRunner) RunEffects(effects iter.Seq[Effect]) {
 	if effects == nil {
-		return 0
+		return
 	}
 
-	effectsResolved += r.run(func(yield func(Effect) bool) {
+	r.run(func(yield func(Effect) bool) {
 		for effect := range effects {
 			switch effect.(type) {
 			case EffectCalculatePointValues:
@@ -46,7 +44,7 @@ func (r *EffectRunner) RunEffects(effects iter.Seq[Effect]) int64 {
 		}
 	})
 
-	effectsResolved += r.run(func(yield func(Effect) bool) {
+	r.run(func(yield func(Effect) bool) {
 		for _, effect := range r.queue {
 			switch effect.(type) {
 			case EffectScoreContender:
@@ -60,7 +58,7 @@ func (r *EffectRunner) RunEffects(effects iter.Seq[Effect]) int64 {
 		}
 	})
 
-	effectsResolved += r.run(func(yield func(Effect) bool) {
+	r.run(func(yield func(Effect) bool) {
 		for _, effect := range r.queue {
 			switch effect.(type) {
 			case EffectRankClass:
@@ -73,26 +71,19 @@ func (r *EffectRunner) RunEffects(effects iter.Seq[Effect]) int64 {
 			}
 		}
 	})
-
-	return effectsResolved
 }
 
-func (r *EffectRunner) run(effects iter.Seq[Effect]) int64 {
-	var effectsResolved int64
-
+func (r *EffectRunner) run(effects iter.Seq[Effect]) {
 	for e := range effects {
 		var chainEffects iter.Seq[Effect]
 
 		switch effect := e.(type) {
 		case EffectRankClass:
 			r.resolver.RankCompClass(effect.CompClassID)
-			effectsResolved += 1
 		case EffectScoreContender:
 			chainEffects = r.resolver.ScoreContender(effect.ContenderID)
-			effectsResolved += 1
 		case EffectCalculatePointValues:
 			chainEffects = r.resolver.CalculatePointValues(effect.CompClassID, effect.ProblemID)
-			effectsResolved += 1
 		}
 
 		if chainEffects == nil {
@@ -107,6 +98,4 @@ func (r *EffectRunner) run(effects iter.Seq[Effect]) int64 {
 			r.queue[chainEffect.Encode()] = chainEffect
 		}
 	}
-
-	return effectsResolved
 }
