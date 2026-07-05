@@ -40,11 +40,41 @@ func TestPointValueKeeper(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 
 		wg := keeper.Run(ctx)
+
 		cancel()
 
 		wg.Wait()
 
 		mockedEventBroker.AssertExpectations(t)
+	})
+
+	t.Run("HealthCheck", func(t *testing.T) {
+		synctest.Test(t, func(t *testing.T) {
+			mockedEventBroker, _ := makeMocks(0)
+			keeper := scores.NewPointValueKeeper(mockedEventBroker, time.Hour)
+
+			ctx, cancel := context.WithCancel(context.Background())
+
+			wg := keeper.Run(ctx)
+
+			assert.Equal(t, domain.ServiceStatus{
+				Name:      "PointValueKeeper",
+				Healthy:   true,
+				CheckedAt: time.Now(),
+			}, keeper.GetStatus())
+
+			cancel()
+
+			wg.Wait()
+
+			assert.Equal(t, domain.ServiceStatus{
+				Name:      "PointValueKeeper",
+				Healthy:   false,
+				CheckedAt: time.Now(),
+			}, keeper.GetStatus())
+
+			mockedEventBroker.AssertExpectations(t)
+		})
 	})
 
 	t.Run("SubscriptionUnexpectedlyClosed", func(t *testing.T) {
