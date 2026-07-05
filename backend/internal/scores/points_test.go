@@ -89,110 +89,171 @@ func TestCalculatePoints(t *testing.T) {
 	}
 }
 
-func HypotheticalBestTopNoFlash(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    scores.Tick
-		expected scores.Tick
-	}{
-		{
-			name:  "EmptyTick",
-			input: scores.Tick{},
-			expected: scores.Tick{
-				Zone1:         true,
-				AttemptsZone1: 999,
-				Zone2:         true,
-				AttemptsZone2: 999,
-				Top:           true,
-				AttemptsTop:   999,
-			},
-		},
-		{
-			name: "NormalizesToTop",
-			input: scores.Tick{
-				ContenderID:   1,
-				ProblemID:     2,
-				Zone1:         true,
-				AttemptsZone1: 2,
-				Zone2:         true,
-				AttemptsZone2: 3,
-				AttemptsTop:   4,
-			},
-			expected: scores.Tick{
-				ContenderID:   1,
-				ProblemID:     2,
-				Zone1:         true,
-				AttemptsZone1: 999,
-				Zone2:         true,
-				AttemptsZone2: 999,
-				Top:           true,
-				AttemptsTop:   999,
-			},
-		},
-		{
-			name: "DropsExistingFlashAttemptCounts",
-			input: scores.Tick{
-				Zone1:         true,
-				AttemptsZone1: 2,
-				Zone2:         true,
-				AttemptsZone2: 1,
-				Top:           true,
-				AttemptsTop:   1,
-			},
-			expected: scores.Tick{
-				Zone1:         true,
-				AttemptsZone1: 999,
-				Zone2:         true,
-				AttemptsZone2: 999,
-				Top:           true,
-				AttemptsTop:   999,
-			},
-		},
-	}
+func TestHypotheticalBestZone1(t *testing.T) {
+	t.Run("EmptyTick", func(t *testing.T) {
+		hypothetical := scores.HypotheticalBestZone1(scores.Tick{})
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			original := tt.input
+		assert.Equal(t, scores.Tick{
+			Zone1:         true,
+			AttemptsZone1: 1,
+		}, hypothetical)
+	})
 
-			actual := scores.HypotheticalBestTopNoFlash(tt.input)
-
-			assert.Equal(t, tt.expected, actual)
-			assert.Equal(t, original, tt.input)
+	t.Run("Topped", func(t *testing.T) {
+		hypothetical := scores.HypotheticalBestZone1(scores.Tick{
+			Zone1:         true,
+			AttemptsZone1: 10,
+			Zone2:         true,
+			AttemptsZone2: 10,
+			Top:           true,
+			AttemptsTop:   10,
 		})
-	}
+
+		assert.Equal(t, scores.Tick{
+			Zone1:         true,
+			AttemptsZone1: 10,
+			AttemptsZone2: 10,
+			AttemptsTop:   10,
+		}, hypothetical)
+	})
 }
 
-func HypotheticalFlash(t *testing.T) {
-	input := scores.Tick{
-		ContenderID:   1,
-		ProblemID:     2,
-		Zone1:         true,
-		AttemptsZone1: 999,
-		Zone2:         true,
-		AttemptsZone2: 999,
-		Top:           true,
-		AttemptsTop:   999,
-	}
+func TestHypotheticalBestZone2(t *testing.T) {
+	t.Run("EmptyTick", func(t *testing.T) {
+		hypothetical := scores.HypotheticalBestZone2(scores.Tick{})
 
-	assert.Equal(t, scores.Tick{
-		ContenderID:   1,
-		ProblemID:     2,
-		Zone1:         true,
-		AttemptsZone1: 1,
-		Zone2:         true,
-		AttemptsZone2: 1,
-		Top:           true,
-		AttemptsTop:   1,
-	}, scores.HypotheticalFlash(input))
+		assert.Equal(t, scores.Tick{
+			Zone1:         true,
+			AttemptsZone1: 1,
+			Zone2:         true,
+			AttemptsZone2: 1,
+		}, hypothetical)
+	})
 
-	assert.Equal(t, scores.Tick{
-		ContenderID:   1,
-		ProblemID:     2,
-		Zone1:         true,
-		AttemptsZone1: 999,
-		Zone2:         true,
-		AttemptsZone2: 999,
-		Top:           true,
-		AttemptsTop:   999,
-	}, input)
+	t.Run("ReachedZone1", func(t *testing.T) {
+		hypothetical := scores.HypotheticalBestZone2(scores.Tick{
+			Zone1:         true,
+			AttemptsZone1: 5,
+			AttemptsZone2: 5,
+			AttemptsTop:   5,
+		})
+
+		assert.Equal(t, scores.Tick{
+			Zone1:         true,
+			AttemptsZone1: 5,
+			Zone2:         true,
+			AttemptsZone2: 6,
+			AttemptsTop:   6,
+		}, hypothetical)
+	})
+
+	t.Run("Topped", func(t *testing.T) {
+		hypothetical := scores.HypotheticalBestZone2(scores.Tick{
+			Zone1:         true,
+			AttemptsZone1: 5,
+			Zone2:         true,
+			AttemptsZone2: 10,
+			AttemptsTop:   10,
+		})
+
+		assert.Equal(t, scores.Tick{
+			Zone1:         true,
+			AttemptsZone1: 5,
+			Zone2:         true,
+			AttemptsZone2: 10,
+			AttemptsTop:   10,
+		}, hypothetical)
+	})
+}
+
+func TestHypotheticalBestTopNoFlash(t *testing.T) {
+	t.Run("EmptyTick", func(t *testing.T) {
+		hypothetical := scores.HypotheticalBestTopNoFlash(scores.Tick{})
+
+		assert.Equal(t, scores.Tick{
+			Zone1:         true,
+			AttemptsZone1: 2,
+			Zone2:         true,
+			AttemptsZone2: 2,
+			Top:           true,
+			AttemptsTop:   2,
+		}, hypothetical)
+	})
+
+	t.Run("ReachedZone1", func(t *testing.T) {
+		hypothetical := scores.HypotheticalBestTopNoFlash(scores.Tick{
+			Zone1:         true,
+			AttemptsZone1: 5,
+			AttemptsZone2: 5,
+			AttemptsTop:   5,
+		})
+
+		assert.Equal(t, scores.Tick{
+			Zone1:         true,
+			AttemptsZone1: 5,
+			Zone2:         true,
+			AttemptsZone2: 6,
+			Top:           true,
+			AttemptsTop:   6,
+		}, hypothetical)
+	})
+
+	t.Run("ReachedZone2", func(t *testing.T) {
+		hypothetical := scores.HypotheticalBestTopNoFlash(scores.Tick{
+			Zone1:         true,
+			AttemptsZone1: 5,
+			Zone2:         true,
+			AttemptsZone2: 10,
+			AttemptsTop:   10,
+		})
+
+		assert.Equal(t, scores.Tick{
+			Zone1:         true,
+			AttemptsZone1: 5,
+			Zone2:         true,
+			AttemptsZone2: 10,
+			Top:           true,
+			AttemptsTop:   11,
+		}, hypothetical)
+	})
+
+	t.Run("Flashed", func(t *testing.T) {
+		hypothetical := scores.HypotheticalBestTopNoFlash(scores.Tick{
+			Zone1:         true,
+			AttemptsZone1: 1,
+			Zone2:         true,
+			AttemptsZone2: 1,
+			Top:           true,
+			AttemptsTop:   1,
+		})
+
+		assert.Equal(t, scores.Tick{
+			Zone1:         true,
+			AttemptsZone1: 2,
+			Zone2:         true,
+			AttemptsZone2: 2,
+			Top:           true,
+			AttemptsTop:   2,
+		}, hypothetical)
+	})
+
+	t.Run("AlreadyReachedTop", func(t *testing.T) {
+		hypothetical := scores.HypotheticalBestTopNoFlash(scores.Tick{
+			Zone1:         true,
+			AttemptsZone1: 2,
+			Zone2:         true,
+			AttemptsZone2: 2,
+			Top:           true,
+			AttemptsTop:   2,
+		})
+
+		assert.Equal(t, scores.Tick{
+			Zone1:         true,
+			AttemptsZone1: 2,
+			Zone2:         true,
+			AttemptsZone2: 2,
+			Top:           true,
+			AttemptsTop:   2,
+		}, hypothetical)
+	})
 }

@@ -449,7 +449,14 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 		hypotheticalBestZone1 := HypotheticalBestZone1(tick)
 		hypotheticalBestZone2 := HypotheticalBestZone2(tick)
 		hypotheticalBestTopNoFlash := HypotheticalBestTopNoFlash(tick)
-		hypotheticalFlash := HypotheticalFlash(tick)
+		hypotheticalFlash := Tick{
+			Zone1:         true,
+			AttemptsZone1: 1,
+			Zone2:         true,
+			AttemptsZone2: 1,
+			Top:           true,
+			AttemptsTop:   1,
+		}
 
 		pointValue := domain.PointValue{
 			ContenderID: contender.ID,

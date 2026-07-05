@@ -52,18 +52,6 @@ func HypotheticalBestZone2(tick Tick) Tick {
 	return tick
 }
 
-func HypotheticalFlash(tick Tick) Tick {
-	tick.Zone1 = true
-	tick.Zone2 = true
-	tick.Top = true
-
-	tick.AttemptsTop = 1
-	tick.AttemptsZone1 = 1
-	tick.AttemptsZone2 = 1
-
-	return tick
-}
-
 func HypotheticalBestTopNoFlash(tick Tick) Tick {
 	if !tick.Zone1 {
 		tick.Zone1 = true
