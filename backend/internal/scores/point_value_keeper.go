@@ -20,7 +20,7 @@ type keptPointValue struct {
 type PointValueKeeper struct {
 	mu          sync.RWMutex
 	eventBroker domain.EventBroker
-	pointValues map[domain.ContenderID]map[domain.ProblemID]keptPointValue
+	pointValues map[domain.ContenderID][]keptPointValue
 	running     atomic.Bool
 	ttl         time.Duration
 }
@@ -29,7 +29,7 @@ func NewPointValueKeeper(eventBroker domain.EventBroker, ttl time.Duration) *Poi
 	return &PointValueKeeper{
 		mu:          sync.RWMutex{},
 		eventBroker: eventBroker,
-		pointValues: make(map[domain.ContenderID]map[domain.ProblemID]keptPointValue),
+		pointValues: make(map[domain.ContenderID][]keptPointValue),
 		running:     atomic.Bool{},
 		ttl:         ttl,
 	}
@@ -119,15 +119,11 @@ func (k *PointValueKeeper) handlePointValueUpdated(event domain.PointValueUpdate
 	defer k.mu.Unlock()
 
 	contenderPointValues := k.pointValues[event.ContenderID]
-	if contenderPointValues == nil {
-		contenderPointValues = make(map[domain.ProblemID]keptPointValue)
-		k.pointValues[event.ContenderID] = contenderPointValues
-	}
 
-	contenderPointValues[event.ProblemID] = keptPointValue{
+	k.pointValues[event.ContenderID] = append(contenderPointValues, keptPointValue{
 		value:     domain.PointValue(event),
 		expiresAt: time.Now().Add(k.ttl),
-	}
+	})
 }
 
 func (k *PointValueKeeper) GetPointValues(contenderID domain.ContenderID) []domain.PointValue {
@@ -153,15 +149,29 @@ func (k *PointValueKeeper) expungeExpired(now time.Time) {
 	defer k.mu.Unlock()
 
 	for contenderID, contenderPointValues := range k.pointValues {
-		for problemID, pointValue := range contenderPointValues {
+		expiredCount := 0
+
+		for _, pointValue := range contenderPointValues {
 			if now.After(pointValue.expiresAt) {
-				delete(contenderPointValues, problemID)
+				expiredCount += 1
 			}
 		}
 
-		if len(contenderPointValues) == 0 {
-			delete(k.pointValues, contenderID)
+		if expiredCount == 0 {
+			continue
 		}
+
+		freshContenderPointValues := make([]keptPointValue, 0, len(contenderPointValues)-expiredCount)
+
+		for _, pointValue := range contenderPointValues {
+			if now.After(pointValue.expiresAt) {
+				continue
+			}
+
+			freshContenderPointValues = append(freshContenderPointValues, pointValue)
+		}
+
+		k.pointValues[contenderID] = freshContenderPointValues
 	}
 }
 

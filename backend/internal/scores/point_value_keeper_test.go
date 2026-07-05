@@ -193,7 +193,7 @@ func TestPointValueKeeper(t *testing.T) {
 			}
 
 			for _, contenderID := range fakedContenderIDs {
-				for k := 1; k <= 3; k++ {
+				for k := 1; k <= 2; k++ {
 					pointValue := domain.PointValue{
 						ContenderID: contenderID,
 						ProblemID:   domain.ProblemID(1000 + k),
@@ -205,6 +205,21 @@ func TestPointValueKeeper(t *testing.T) {
 
 					require.NoError(t, err)
 				}
+			}
+
+			time.Sleep(5 * time.Minute)
+
+			for _, contenderID := range fakedContenderIDs {
+				pointValue := domain.PointValue{
+					ContenderID: contenderID,
+					ProblemID:   domain.ProblemID(1003),
+				}
+
+				err := subscription.Post(domain.EventEnvelope{
+					Data: domain.PointValueUpdatedEvent(pointValue),
+				})
+
+				require.NoError(t, err)
 			}
 
 			synctest.Wait()
@@ -228,13 +243,17 @@ func TestPointValueKeeper(t *testing.T) {
 				}, pointValues)
 			}
 
-			<-time.After(time.Hour + time.Minute)
-			synctest.Wait()
+			time.Sleep(time.Hour)
 
 			for _, contenderID := range fakedContenderIDs {
 				pointValues := keeper.GetPointValues(contenderID)
 
-				assert.Empty(t, pointValues)
+				assert.Equal(t, []domain.PointValue{
+					{
+						ContenderID: contenderID,
+						ProblemID:   1003,
+					},
+				}, pointValues)
 			}
 
 			cancel()
