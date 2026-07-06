@@ -425,4 +425,24 @@ func TestMemoryStore(t *testing.T) {
 		assert.True(t, found)
 		assert.Equal(t, problem, result)
 	})
+
+	t.Run("GetAllProblems", func(t *testing.T) {
+		store := scores.NewMemoryStore()
+
+		p1 := scores.Problem{
+			ID: testutils.RandomResourceID[domain.ProblemID](),
+		}
+		p2 := scores.Problem{
+			ID: testutils.RandomResourceID[domain.ProblemID](),
+		}
+		p3 := scores.Problem{
+			ID: testutils.RandomResourceID[domain.ProblemID](),
+		}
+
+		store.SaveProblem(p1)
+		store.SaveProblem(p2)
+		store.SaveProblem(p3)
+
+		assert.ElementsMatch(t, []scores.Problem{p1, p2, p3}, slices.Collect(store.GetAllProblems()))
+	})
 }
