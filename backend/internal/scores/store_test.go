@@ -256,6 +256,61 @@ func TestMemoryStore(t *testing.T) {
 		assert.Empty(t, tick)
 	})
 
+	t.Run("GetTicksByProblem", func(t *testing.T) {
+		store := scores.NewMemoryStore()
+
+		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
+
+		fakedContender1ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedContender2ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedContender3ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedContender4ID := testutils.RandomResourceID[domain.ContenderID]()
+
+		t1 := scores.Tick{
+			ContenderID:   fakedContender1ID,
+			ProblemID:     fakedProblemID,
+			Zone1:         true,
+			AttemptsZone1: 1,
+			Zone2:         true,
+			AttemptsZone2: 2,
+			Top:           true,
+			AttemptsTop:   3,
+		}
+		t2 := scores.Tick{
+			ContenderID:   fakedContender2ID,
+			ProblemID:     fakedProblemID,
+			Zone1:         false,
+			AttemptsZone1: 4,
+			Zone2:         false,
+			AttemptsZone2: 5,
+			Top:           false,
+			AttemptsTop:   6,
+		}
+
+		store.SaveContender(scores.Contender{
+			ID:          fakedContender1ID,
+			CompClassID: fakedCompClassID,
+		})
+		store.SaveContender(scores.Contender{
+			ID:          fakedContender2ID,
+			CompClassID: fakedCompClassID,
+		})
+		store.SaveContender(scores.Contender{
+			ID:          fakedContender3ID,
+			CompClassID: fakedCompClassID,
+		})
+		store.SaveContender(scores.Contender{
+			ID:          fakedContender4ID,
+			CompClassID: testutils.RandomResourceID[domain.CompClassID](),
+		})
+
+		store.SaveTick(fakedContender1ID, t1)
+		store.SaveTick(fakedContender2ID, t2)
+
+		assert.ElementsMatch(t, []scores.Tick{t1, t2}, slices.Collect(store.GetTicksByProblem(fakedCompClassID, fakedProblemID)))
+	})
+
 	t.Run("SaveTick", func(t *testing.T) {
 		store := scores.NewMemoryStore()
 
