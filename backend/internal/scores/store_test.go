@@ -3,6 +3,7 @@ package scores_test
 import (
 	"slices"
 	"testing"
+	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
@@ -505,5 +506,31 @@ func TestMemoryStore(t *testing.T) {
 		dirtyPointValues = store.GetDirtyPointValues()
 
 		assert.Empty(t, dirtyPointValues)
+	})
+
+	t.Run("GetDirtyScores", func(t *testing.T) {
+		store := scores.NewMemoryStore()
+
+		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+
+		score := domain.Score{
+			Timestamp:   time.Now(),
+			ContenderID: fakedContenderID,
+			Score:       1000,
+			Placement:   10,
+			Finalist:    true,
+			RankOrder:   9,
+		}
+
+		store.SaveScore(score)
+
+		dirtyScores := store.GetDirtyScores()
+
+		assert.Len(t, dirtyScores, 1)
+		assert.Equal(t, score, dirtyScores[0])
+
+		dirtyScores = store.GetDirtyScores()
+
+		assert.Empty(t, dirtyScores)
 	})
 }
