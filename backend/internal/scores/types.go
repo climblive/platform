@@ -29,6 +29,76 @@ type Tick struct {
 	AttemptsTop   int
 }
 
+func (t Tick) TurnIntoZone1() Tick {
+	if !t.Zone1 {
+		t.AttemptsZone1 += 1
+		t.AttemptsZone2 += 1
+		t.AttemptsTop += 1
+	}
+
+	t.Zone1 = true
+	t.Zone2 = false
+	t.Top = false
+
+	return t
+}
+
+func (t Tick) TurnIntoZone2() Tick {
+	if !t.Zone1 {
+		t.AttemptsZone1 += 1
+	}
+
+	if !t.Zone1 || !t.Zone2 {
+		t.AttemptsZone2 += 1
+		t.AttemptsTop += 1
+	}
+
+	t.Zone1 = true
+	t.Zone2 = true
+	t.Top = false
+
+	return t
+}
+
+func (t Tick) TurnIntoRedpoint() Tick {
+	if !t.Zone1 {
+		t.AttemptsZone1 += 1
+	}
+
+	if !t.Zone1 || !t.Zone2 {
+		t.AttemptsZone2 += 1
+	}
+
+	if !t.Zone1 || !t.Zone2 || !t.Top {
+		t.AttemptsTop += 1
+	}
+
+	if t.AttemptsTop == 1 {
+		t.AttemptsZone1 += 1
+		t.AttemptsZone2 += 1
+		t.AttemptsTop += 1
+	}
+
+	t.Zone1 = true
+	t.Zone2 = true
+	t.Top = true
+
+	return t
+}
+
+func (t Tick) TurnIntoFlash() Tick {
+	t.Zone1 = true
+	t.AttemptsZone1 = 1
+
+	t.Zone2 = true
+	t.AttemptsZone2 = 1
+
+	t.Top = true
+	t.AttemptsTop = 1
+
+	return t
+}
+
 type Problem struct {
 	ID domain.ProblemID
 

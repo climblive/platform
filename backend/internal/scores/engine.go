@@ -446,17 +446,10 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 	for contender := range e.store.GetContendersByCompClass(compClassID) {
 		tick, _ := e.store.GetTick(contender.ID, problemID)
 
-		hypotheticalBestZone1 := HypotheticalBestZone1(tick)
-		hypotheticalBestZone2 := HypotheticalBestZone2(tick)
-		hypotheticalBestTopNoFlash := HypotheticalBestTopNoFlash(tick)
-		hypotheticalFlash := Tick{
-			Zone1:         true,
-			AttemptsZone1: 1,
-			Zone2:         true,
-			AttemptsZone2: 1,
-			Top:           true,
-			AttemptsTop:   1,
-		}
+		hypotheticalBestZone1 := tick.TurnIntoZone1()
+		hypotheticalBestZone2 := tick.TurnIntoZone2()
+		hypotheticalBestRedpoint := tick.TurnIntoRedpoint()
+		hypotheticalFlash := tick.TurnIntoFlash()
 
 		pointValue := domain.PointValue{
 			ContenderID: contender.ID,
@@ -480,14 +473,14 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 
 				pointValue.Zone1 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone1)
 				pointValue.Zone2 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone2)
-				pointValue.Top = CalculatePoints(hypotheticalProblemValue, hypotheticalBestTopNoFlash)
+				pointValue.Top = CalculatePoints(hypotheticalProblemValue, hypotheticalBestRedpoint)
 				pointValue.FlashBonus = hypotheticalProblemValue.FlashBonus
 			}
 		default:
 			{
 				pointValue.Zone1 = CalculatePoints(problemValue, hypotheticalBestZone1)
 				pointValue.Zone2 = CalculatePoints(problemValue, hypotheticalBestZone2)
-				pointValue.Top = CalculatePoints(problemValue, hypotheticalBestTopNoFlash)
+				pointValue.Top = CalculatePoints(problemValue, hypotheticalBestRedpoint)
 				pointValue.FlashBonus = problemValue.FlashBonus
 			}
 		}

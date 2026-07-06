@@ -5,6 +5,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
+	"github.com/climblive/platform/backend/internal/testutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -89,171 +90,415 @@ func TestCalculatePoints(t *testing.T) {
 	}
 }
 
-func TestHypotheticalBestZone1(t *testing.T) {
-	t.Run("EmptyTick", func(t *testing.T) {
-		hypothetical := scores.HypotheticalBestZone1(scores.Tick{})
+func TestTick(t *testing.T) {
+	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
-		assert.Equal(t, scores.Tick{
-			Zone1:         true,
-			AttemptsZone1: 1,
-		}, hypothetical)
-	})
-
-	t.Run("Topped", func(t *testing.T) {
-		hypothetical := scores.HypotheticalBestZone1(scores.Tick{
-			Zone1:         true,
-			AttemptsZone1: 10,
-			Zone2:         true,
-			AttemptsZone2: 10,
-			Top:           true,
-			AttemptsTop:   10,
-		})
-
-		assert.Equal(t, scores.Tick{
-			Zone1:         true,
+	makeFakes := func() (scores.Tick, scores.Tick, scores.Tick, scores.Tick, scores.Tick) {
+		none := scores.Tick{
+			ContenderID:   fakedContenderID,
+			ProblemID:     fakedProblemID,
+			Zone1:         false,
+			Zone2:         false,
+			Top:           false,
 			AttemptsZone1: 10,
 			AttemptsZone2: 10,
 			AttemptsTop:   10,
-		}, hypothetical)
-	})
-}
+		}
 
-func TestHypotheticalBestZone2(t *testing.T) {
-	t.Run("EmptyTick", func(t *testing.T) {
-		hypothetical := scores.HypotheticalBestZone2(scores.Tick{})
-
-		assert.Equal(t, scores.Tick{
+		zone1 := scores.Tick{
+			ContenderID:   fakedContenderID,
+			ProblemID:     fakedProblemID,
 			Zone1:         true,
+			Zone2:         false,
+			Top:           false,
+			AttemptsZone1: 10,
+			AttemptsZone2: 10,
+			AttemptsTop:   10,
+		}
+
+		zone2 := scores.Tick{
+			ContenderID:   fakedContenderID,
+			ProblemID:     fakedProblemID,
+			Zone1:         true,
+			Zone2:         true,
+			Top:           false,
+			AttemptsZone1: 10,
+			AttemptsZone2: 10,
+			AttemptsTop:   10,
+		}
+
+		top := scores.Tick{
+			ContenderID:   fakedContenderID,
+			ProblemID:     fakedProblemID,
+			Zone1:         true,
+			Zone2:         true,
+			Top:           true,
+			AttemptsZone1: 10,
+			AttemptsZone2: 10,
+			AttemptsTop:   10,
+		}
+
+		flash := scores.Tick{
+			ContenderID:   fakedContenderID,
+			ProblemID:     fakedProblemID,
+			Zone1:         true,
+			Zone2:         true,
+			Top:           true,
 			AttemptsZone1: 1,
-			Zone2:         true,
 			AttemptsZone2: 1,
-		}, hypothetical)
-	})
-
-	t.Run("ReachedZone1", func(t *testing.T) {
-		hypothetical := scores.HypotheticalBestZone2(scores.Tick{
-			Zone1:         true,
-			AttemptsZone1: 5,
-			AttemptsZone2: 5,
-			AttemptsTop:   5,
-		})
-
-		assert.Equal(t, scores.Tick{
-			Zone1:         true,
-			AttemptsZone1: 5,
-			Zone2:         true,
-			AttemptsZone2: 6,
-			AttemptsTop:   6,
-		}, hypothetical)
-	})
-
-	t.Run("Topped", func(t *testing.T) {
-		hypothetical := scores.HypotheticalBestZone2(scores.Tick{
-			Zone1:         true,
-			AttemptsZone1: 5,
-			Zone2:         true,
-			AttemptsZone2: 10,
-			AttemptsTop:   10,
-		})
-
-		assert.Equal(t, scores.Tick{
-			Zone1:         true,
-			AttemptsZone1: 5,
-			Zone2:         true,
-			AttemptsZone2: 10,
-			AttemptsTop:   10,
-		}, hypothetical)
-	})
-}
-
-func TestHypotheticalBestTopNoFlash(t *testing.T) {
-	t.Run("EmptyTick", func(t *testing.T) {
-		hypothetical := scores.HypotheticalBestTopNoFlash(scores.Tick{})
-
-		assert.Equal(t, scores.Tick{
-			Zone1:         true,
-			AttemptsZone1: 2,
-			Zone2:         true,
-			AttemptsZone2: 2,
-			Top:           true,
-			AttemptsTop:   2,
-		}, hypothetical)
-	})
-
-	t.Run("ReachedZone1", func(t *testing.T) {
-		hypothetical := scores.HypotheticalBestTopNoFlash(scores.Tick{
-			Zone1:         true,
-			AttemptsZone1: 5,
-			AttemptsZone2: 5,
-			AttemptsTop:   5,
-		})
-
-		assert.Equal(t, scores.Tick{
-			Zone1:         true,
-			AttemptsZone1: 5,
-			Zone2:         true,
-			AttemptsZone2: 6,
-			Top:           true,
-			AttemptsTop:   6,
-		}, hypothetical)
-	})
-
-	t.Run("ReachedZone2", func(t *testing.T) {
-		hypothetical := scores.HypotheticalBestTopNoFlash(scores.Tick{
-			Zone1:         true,
-			AttemptsZone1: 5,
-			Zone2:         true,
-			AttemptsZone2: 10,
-			AttemptsTop:   10,
-		})
-
-		assert.Equal(t, scores.Tick{
-			Zone1:         true,
-			AttemptsZone1: 5,
-			Zone2:         true,
-			AttemptsZone2: 10,
-			Top:           true,
-			AttemptsTop:   11,
-		}, hypothetical)
-	})
-
-	t.Run("Flashed", func(t *testing.T) {
-		hypothetical := scores.HypotheticalBestTopNoFlash(scores.Tick{
-			Zone1:         true,
-			AttemptsZone1: 1,
-			Zone2:         true,
-			AttemptsZone2: 1,
-			Top:           true,
 			AttemptsTop:   1,
-		})
+		}
 
-		assert.Equal(t, scores.Tick{
-			Zone1:         true,
-			AttemptsZone1: 2,
-			Zone2:         true,
-			AttemptsZone2: 2,
-			Top:           true,
-			AttemptsTop:   2,
-		}, hypothetical)
+		return none, zone1, zone2, top, flash
+	}
+
+	t.Run("TurnIntoZone1", func(t *testing.T) {
+		none, zone1, zone2, top, flash := makeFakes()
+
+		cases := []struct {
+			name     string
+			tick     scores.Tick
+			expected scores.Tick
+		}{
+			{
+				name: "None",
+				tick: none,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         false,
+					Top:           false,
+					AttemptsZone1: 11,
+					AttemptsZone2: 11,
+					AttemptsTop:   11,
+				},
+			},
+			{
+				name: "Zone1",
+				tick: zone1,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         false,
+					Top:           false,
+					AttemptsZone1: 10,
+					AttemptsZone2: 10,
+					AttemptsTop:   10,
+				},
+			},
+			{
+				name: "Zone2",
+				tick: zone2,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         false,
+					Top:           false,
+					AttemptsZone1: 10,
+					AttemptsZone2: 10,
+					AttemptsTop:   10,
+				},
+			},
+			{
+				name: "Top",
+				tick: top,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         false,
+					Top:           false,
+					AttemptsZone1: 10,
+					AttemptsZone2: 10,
+					AttemptsTop:   10,
+				},
+			},
+			{
+				name: "Flash",
+				tick: flash,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         false,
+					Top:           false,
+					AttemptsZone1: 1,
+					AttemptsZone2: 1,
+					AttemptsTop:   1,
+				},
+			},
+		}
+
+		for _, tt := range cases {
+			t.Run(tt.name, func(t *testing.T) {
+				assert.Equal(t, tt.expected, tt.tick.TurnIntoZone1())
+			})
+		}
 	})
 
-	t.Run("AlreadyReachedTop", func(t *testing.T) {
-		hypothetical := scores.HypotheticalBestTopNoFlash(scores.Tick{
-			Zone1:         true,
-			AttemptsZone1: 2,
-			Zone2:         true,
-			AttemptsZone2: 2,
-			Top:           true,
-			AttemptsTop:   2,
-		})
+	t.Run("TurnIntoZone2", func(t *testing.T) {
+		none, zone1, zone2, top, flash := makeFakes()
 
-		assert.Equal(t, scores.Tick{
-			Zone1:         true,
-			AttemptsZone1: 2,
-			Zone2:         true,
-			AttemptsZone2: 2,
-			Top:           true,
-			AttemptsTop:   2,
-		}, hypothetical)
+		cases := []struct {
+			name     string
+			tick     scores.Tick
+			expected scores.Tick
+		}{
+			{
+				name: "None",
+				tick: none,
+				expected: scores.Tick{
+					ContenderID: fakedContenderID,
+					ProblemID:   fakedProblemID,
+
+					Zone1:         true,
+					Zone2:         true,
+					Top:           false,
+					AttemptsZone1: 11,
+					AttemptsZone2: 11,
+					AttemptsTop:   11,
+				},
+			},
+			{
+				name: "Zone1",
+				tick: zone1,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         true,
+					Top:           false,
+					AttemptsZone1: 10,
+					AttemptsZone2: 11,
+					AttemptsTop:   11,
+				},
+			},
+			{
+				name: "Zone2",
+				tick: zone2,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         true,
+					Top:           false,
+					AttemptsZone1: 10,
+					AttemptsZone2: 10,
+					AttemptsTop:   10,
+				},
+			},
+			{
+				name: "Top",
+				tick: top,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         true,
+					Top:           false,
+					AttemptsZone1: 10,
+					AttemptsZone2: 10,
+					AttemptsTop:   10,
+				},
+			},
+			{
+				name: "Flash",
+				tick: flash,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         true,
+					Top:           false,
+					AttemptsZone1: 1,
+					AttemptsZone2: 1,
+					AttemptsTop:   1,
+				},
+			},
+		}
+
+		for _, tt := range cases {
+			t.Run(tt.name, func(t *testing.T) {
+				assert.Equal(t, tt.expected, tt.tick.TurnIntoZone2())
+			})
+		}
+	})
+
+	t.Run("TurnIntoRedpoint", func(t *testing.T) {
+		none, zone1, zone2, top, flash := makeFakes()
+
+		cases := []struct {
+			name     string
+			tick     scores.Tick
+			expected scores.Tick
+		}{
+			{
+				name: "None",
+				tick: none,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         true,
+					Top:           true,
+					AttemptsZone1: 11,
+					AttemptsZone2: 11,
+					AttemptsTop:   11,
+				},
+			},
+			{
+				name: "Zone1",
+				tick: zone1,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         true,
+					Top:           true,
+					AttemptsZone1: 10,
+					AttemptsZone2: 11,
+					AttemptsTop:   11,
+				},
+			},
+			{
+				name: "Zone2",
+				tick: zone2,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         true,
+					Top:           true,
+					AttemptsZone1: 10,
+					AttemptsZone2: 10,
+					AttemptsTop:   11,
+				},
+			},
+			{
+				name: "Top",
+				tick: top,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         true,
+					Top:           true,
+					AttemptsZone1: 10,
+					AttemptsZone2: 10,
+					AttemptsTop:   10,
+				},
+			},
+			{
+				name: "Flash",
+				tick: flash,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         true,
+					Top:           true,
+					AttemptsZone1: 2,
+					AttemptsZone2: 2,
+					AttemptsTop:   2,
+				},
+			},
+		}
+
+		for _, tt := range cases {
+			t.Run(tt.name, func(t *testing.T) {
+				assert.Equal(t, tt.expected, tt.tick.TurnIntoRedpoint())
+			})
+		}
+	})
+
+	t.Run("TurnIntoFlash", func(t *testing.T) {
+		none, zone1, zone2, top, flash := makeFakes()
+
+		cases := []struct {
+			name     string
+			tick     scores.Tick
+			expected scores.Tick
+		}{
+			{
+				name: "None",
+				tick: none,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         true,
+					Top:           true,
+					AttemptsZone1: 1,
+					AttemptsZone2: 1,
+					AttemptsTop:   1,
+				},
+			},
+			{
+				name: "Zone1",
+				tick: zone1,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         true,
+					Top:           true,
+					AttemptsZone1: 1,
+					AttemptsZone2: 1,
+					AttemptsTop:   1,
+				},
+			},
+			{
+				name: "Zone2",
+				tick: zone2,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         true,
+					Top:           true,
+					AttemptsZone1: 1,
+					AttemptsZone2: 1,
+					AttemptsTop:   1,
+				},
+			},
+			{
+				name: "Top",
+				tick: top,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         true,
+					Top:           true,
+					AttemptsZone1: 1,
+					AttemptsZone2: 1,
+					AttemptsTop:   1,
+				},
+			},
+			{
+				name: "Flash",
+				tick: flash,
+				expected: scores.Tick{
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
+					Zone1:         true,
+					Zone2:         true,
+					Top:           true,
+					AttemptsZone1: 1,
+					AttemptsZone2: 1,
+					AttemptsTop:   1,
+				},
+			},
+		}
+
+		for _, tt := range cases {
+			t.Run(tt.name, func(t *testing.T) {
+				assert.Equal(t, tt.expected, tt.tick.TurnIntoFlash())
+			})
+		}
 	})
 }
