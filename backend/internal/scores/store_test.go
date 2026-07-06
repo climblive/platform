@@ -478,4 +478,32 @@ func TestMemoryStore(t *testing.T) {
 			assert.Empty(t, result)
 		})
 	})
+
+	t.Run("GetDirtyPointValues", func(t *testing.T) {
+		store := scores.NewMemoryStore()
+
+		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
+
+		pointValue := domain.PointValue{
+			ContenderID: fakedContenderID,
+			ProblemID:   fakedProblemID,
+			Current:     225,
+			Zone1:       100,
+			Zone2:       150,
+			Top:         200,
+			FlashBonus:  25,
+		}
+
+		store.SavePointValue(fakedContenderID, fakedProblemID, pointValue)
+
+		dirtyPointValues := store.GetDirtyPointValues()
+
+		assert.Len(t, dirtyPointValues, 1)
+		assert.Equal(t, pointValue, dirtyPointValues[0])
+
+		dirtyPointValues = store.GetDirtyPointValues()
+
+		assert.Empty(t, dirtyPointValues)
+	})
 }
