@@ -307,6 +307,16 @@ func TestMemoryStore(t *testing.T) {
 
 		store.SaveTick(fakedContender1ID, t1)
 		store.SaveTick(fakedContender2ID, t2)
+		store.SaveTick(fakedContender2ID, scores.Tick{
+			ContenderID:   fakedContender2ID,
+			ProblemID:     testutils.RandomResourceID[domain.ProblemID](),
+			Zone1:         false,
+			AttemptsZone1: 7,
+			Zone2:         false,
+			AttemptsZone2: 8,
+			Top:           false,
+			AttemptsTop:   9,
+		})
 
 		assert.ElementsMatch(t, []scores.Tick{t1, t2}, slices.Collect(store.GetTicksByProblem(fakedCompClassID, fakedProblemID)))
 	})
