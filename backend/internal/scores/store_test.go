@@ -222,6 +222,39 @@ func TestMemoryStore(t *testing.T) {
 		assert.ElementsMatch(t, []scores.Tick{t4, t5}, slices.Collect(store.GetTicksByContender(otherContenderID)))
 	})
 
+	t.Run("GetTick", func(t *testing.T) {
+		store := scores.NewMemoryStore()
+
+		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+
+		fakedTick := scores.Tick{
+			ContenderID:   fakedContenderID,
+			ProblemID:     testutils.RandomResourceID[domain.ProblemID](),
+			Zone1:         true,
+			AttemptsZone1: 1,
+			Zone2:         true,
+			AttemptsZone2: 2,
+			Top:           true,
+			AttemptsTop:   3,
+		}
+
+		store.SaveTick(fakedContenderID, fakedTick)
+
+		tick, found := store.GetTick(fakedContenderID, fakedTick.ProblemID)
+
+		assert.True(t, found)
+		assert.Equal(t, fakedTick, tick)
+	})
+
+	t.Run("GetTick_NotFound", func(t *testing.T) {
+		store := scores.NewMemoryStore()
+
+		tick, found := store.GetTick(testutils.RandomResourceID[domain.ContenderID](), testutils.RandomResourceID[domain.ProblemID]())
+
+		assert.False(t, found)
+		assert.Empty(t, tick)
+	})
+
 	t.Run("SaveTick", func(t *testing.T) {
 		store := scores.NewMemoryStore()
 
