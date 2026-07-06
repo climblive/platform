@@ -252,9 +252,8 @@ func TestTick(t *testing.T) {
 				name: "None",
 				tick: none,
 				expected: scores.Tick{
-					ContenderID: fakedContenderID,
-					ProblemID:   fakedProblemID,
-
+					ContenderID:   fakedContenderID,
+					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
 					Top:           false,
