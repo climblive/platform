@@ -445,4 +445,37 @@ func TestMemoryStore(t *testing.T) {
 
 		assert.ElementsMatch(t, []scores.Problem{p1, p2, p3}, slices.Collect(store.GetAllProblems()))
 	})
+
+	t.Run("GetPointValue", func(t *testing.T) {
+		store := scores.NewMemoryStore()
+
+		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
+
+		pointValue := domain.PointValue{
+			ContenderID: fakedContenderID,
+			ProblemID:   fakedProblemID,
+			Current:     225,
+			Zone1:       100,
+			Zone2:       150,
+			Top:         200,
+			FlashBonus:  25,
+		}
+
+		store.SavePointValue(fakedContenderID, fakedProblemID, pointValue)
+
+		t.Run("Found", func(t *testing.T) {
+			result, found := store.GetPointValue(fakedContenderID, fakedProblemID)
+
+			assert.True(t, found)
+			assert.Equal(t, pointValue, result)
+		})
+
+		t.Run("NotFound", func(t *testing.T) {
+			result, found := store.GetPointValue(testutils.RandomResourceID[domain.ContenderID](), testutils.RandomResourceID[domain.ProblemID]())
+
+			assert.False(t, found)
+			assert.Empty(t, result)
+		})
+	})
 }
