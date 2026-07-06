@@ -230,7 +230,7 @@ func TestMemoryStore(t *testing.T) {
 
 		fakedTick := scores.Tick{
 			ContenderID:   fakedContenderID,
-			ProblemID:     y,
+			ProblemID:     fakedProblemID,
 			Zone1:         true,
 			AttemptsZone1: 1,
 			Zone2:         true,
