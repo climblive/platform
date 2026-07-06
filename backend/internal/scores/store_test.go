@@ -226,10 +226,11 @@ func TestMemoryStore(t *testing.T) {
 		store := scores.NewMemoryStore()
 
 		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 		fakedTick := scores.Tick{
 			ContenderID:   fakedContenderID,
-			ProblemID:     testutils.RandomResourceID[domain.ProblemID](),
+			ProblemID:     fakedProblemID,
 			Zone1:         true,
 			AttemptsZone1: 1,
 			Zone2:         true,
