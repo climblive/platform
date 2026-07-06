@@ -230,7 +230,7 @@ func TestMemoryStore(t *testing.T) {
 
 		fakedTick := scores.Tick{
 			ContenderID:   fakedContenderID,
-			ProblemID:     fakedProblemID,
+			ProblemID:     y,
 			Zone1:         true,
 			AttemptsZone1: 1,
 			Zone2:         true,
@@ -241,7 +241,7 @@ func TestMemoryStore(t *testing.T) {
 
 		store.SaveTick(fakedContenderID, fakedTick)
 
-		tick, found := store.GetTick(fakedContenderID, fakedTick.ProblemID)
+		tick, found := store.GetTick(fakedContenderID, fakedProblemID)
 
 		assert.True(t, found)
 		assert.Equal(t, fakedTick, tick)
