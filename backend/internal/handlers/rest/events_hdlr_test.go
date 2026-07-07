@@ -39,6 +39,7 @@ func TestEventsHandler(t *testing.T) {
 			"ASCENT_REGISTERED",
 			"ASCENT_DEREGISTERED",
 			"RAFFLE_WINNER_DRAWN",
+			"POINT_VALUE_UPDATED",
 		))
 
 		mux := rest.NewMux()
@@ -76,6 +77,7 @@ func TestEventsHandler(t *testing.T) {
 			"ASCENT_REGISTERED",
 			"ASCENT_DEREGISTERED",
 			"RAFFLE_WINNER_DRAWN",
+			"POINT_VALUE_UPDATED",
 		))
 
 		mux := rest.NewMux()
@@ -117,6 +119,7 @@ func TestEventsHandler(t *testing.T) {
 			"ASCENT_REGISTERED",
 			"ASCENT_DEREGISTERED",
 			"RAFFLE_WINNER_DRAWN",
+			"POINT_VALUE_UPDATED",
 		))
 
 		err := subscription.Post(domain.EventEnvelope{
@@ -175,6 +178,7 @@ func TestEventsHandler(t *testing.T) {
 			"ASCENT_REGISTERED",
 			"ASCENT_DEREGISTERED",
 			"RAFFLE_WINNER_DRAWN",
+			"POINT_VALUE_UPDATED",
 		))
 
 		err := subscription.Post(domain.EventEnvelope{

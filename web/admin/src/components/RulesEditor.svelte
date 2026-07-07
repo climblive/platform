@@ -19,6 +19,7 @@
   import { toastError } from "@climblive/lib/utils";
   import RuleOptionCard from "./RuleOptionCard.svelte";
   import Finalists from "./rules/Finalists.svelte";
+  import PooledPoints from "./rules/PooledPoints.svelte";
   import ProblemLimit from "./rules/ProblemLimit.svelte";
 
   interface Props {
@@ -53,20 +54,11 @@
 
 <h3>Options</h3>
 <section>
-  <ProblemLimit {contest} />
-
   <Finalists {contest} />
 
-  <RuleOptionCard
-    title="Pooled points"
-    description="Points for completed problems are split by percentages. A boulder worth 1000 points with two tops will give each contender 500 points. If a third contender also tops the boulder, then all three will receive 333 points instead."
-    disabled
-    tag="Upcoming"
-  >
-    {#snippet header()}
-      <wa-checkbox size="s" disabled></wa-checkbox>
-    {/snippet}
-  </RuleOptionCard>
+  <PooledPoints {contest} />
+
+  <ProblemLimit {contest} />
 
   <RuleOptionCard
     title="Max attempts"

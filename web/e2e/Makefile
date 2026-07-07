@@ -39,4 +39,4 @@ test-ci: images
 
 clean:
 	rm -rf .local
-	rm -rf $(WEB_DIR)/admin $(WEB_DIR)/scoreboard $(WEB_DIR)/scorecard $(WEB_DIR)/www
+	rm -rf ../../backend/climblive $(WEB_DIR)/admin $(WEB_DIR)/scoreboard $(WEB_DIR)/scorecard $(WEB_DIR)/www

@@ -75,6 +75,7 @@ func (hdlr *eventHandler) HandleSubscribeContenderEvents(w http.ResponseWriter, 
 		"CONTENDER_SCORE_UPDATED",
 		"ASCENT_REGISTERED",
 		"ASCENT_DEREGISTERED",
+		"POINT_VALUE_UPDATED",
 		"RAFFLE_WINNER_DRAWN",
 	)
 

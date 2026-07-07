@@ -24,7 +24,8 @@ export const getProblemsQuery = (
   createQuery(() => ({
     ...options,
     queryKey: ["problems", { contestId }],
-    queryFn: async () => ApiClient.getInstance().getProblems(contestId),
+    queryFn: async () =>
+      ApiClient.getInstance().getProblemsByContest(contestId),
     retry: false,
     gcTime: 12 * HOUR,
     staleTime: 12 * HOUR,

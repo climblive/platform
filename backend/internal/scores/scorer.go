@@ -5,14 +5,14 @@ import (
 	"slices"
 )
 
-type HardestProblems struct {
-	Number int
+type Scorer struct {
+	ProblemLimit int
 }
 
-func (r *HardestProblems) CalculateScore(points iter.Seq[int]) int {
+func (r *Scorer) CalculateScore(points iter.Seq[int]) int {
 	score := 0
 
-	if r.Number == 0 {
+	if r.ProblemLimit == 0 {
 		for p := range points {
 			score += p
 		}
@@ -22,7 +22,7 @@ func (r *HardestProblems) CalculateScore(points iter.Seq[int]) int {
 
 	n := 0
 	for _, p := range slices.Backward(slices.Sorted(points)) {
-		if n >= r.Number {
+		if n >= r.ProblemLimit {
 			break
 		}
 

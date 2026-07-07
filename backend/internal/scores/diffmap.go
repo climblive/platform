@@ -36,3 +36,13 @@ func (d *DiffMap[K, V]) Set(key K, val V) {
 
 	d.dirty[key] = val
 }
+
+func (d *DiffMap[K, V]) Get(key K) (V, bool) {
+	val, ok := d.dirty[key]
+	if ok {
+		return val, ok
+	}
+
+	val, ok = d.committed[key]
+	return val, ok
+}

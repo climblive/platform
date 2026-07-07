@@ -23,6 +23,7 @@ import { contenderSchema } from "./models/contender";
 import { serviceStatusSchema } from "./models/health";
 import { organizerSchema } from "./models/organizer";
 import { organizerInviteSchema } from "./models/organizerInvite";
+import { pointValueSchema } from "./models/pointValue";
 import { problemSchema } from "./models/problem";
 import { raffleSchema, raffleWinnerSchema } from "./models/raffle";
 import type {
@@ -119,6 +120,16 @@ export class ApiClient {
     });
 
     return contenderSchema.parse(result.data);
+  };
+
+  getPointValuesByContender = async (id: number) => {
+    const endpoint = `/contenders/${id}/points`;
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(pointValueSchema).parse(result.data);
   };
 
   getContendersByContest = async (contestId: number) => {
@@ -264,7 +275,7 @@ export class ApiClient {
     return problemSchema.parse(result.data);
   };
 
-  getProblems = async (contestId: number) => {
+  getProblemsByContest = async (contestId: number) => {
     const endpoint = `/contests/${contestId}/problems`;
 
     const result = await this.axiosInstance.get(endpoint);
