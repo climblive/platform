@@ -83,5 +83,68 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 		assert.Equal(t, 10, effectCounters[scores.EffectTypeCalculatePointValues])
 		assert.Equal(t, 110, effectCounters[scores.EffectTypeScoreContender])
 		assert.Equal(t, 1210, effectCounters[scores.EffectTypeRankClass])
+
+		mockedResolver.AssertExpectations(t)
+	})
+
+	t.Run("RunEffectsInOrder", func(t *testing.T) {
+		mockedResolver := new(effectResolverMock)
+
+		effectYielder := func(effects ...scores.Effect) iter.Seq[scores.Effect] {
+			return func(yield func(scores.Effect) bool) {
+				for _, effect := range effects {
+					if !yield(effect) {
+						return
+					}
+				}
+			}
+		}
+
+		eff1 := scores.EffectCalculatePointValues{CompClassID: testutils.RandomResourceID[domain.CompClassID](), ProblemID: testutils.RandomResourceID[domain.ProblemID]()}
+		eff2 := scores.EffectScoreContender{ContenderID: testutils.RandomResourceID[domain.ContenderID]()}
+		eff3 := scores.EffectScoreContender{ContenderID: testutils.RandomResourceID[domain.ContenderID]()}
+		eff4 := scores.EffectRankClass{CompClassID: testutils.RandomResourceID[domain.CompClassID]()}
+		eff5 := scores.EffectRankClass{CompClassID: testutils.RandomResourceID[domain.CompClassID]()}
+
+		recordedOrder := make([]scores.Effect, 0)
+
+		recordOrder := func(eff scores.Effect) func(args mock.Arguments) {
+			return func(mock.Arguments) {
+				recordedOrder = append(recordedOrder, eff)
+			}
+		}
+
+		mockedResolver.
+			On("CalculatePointValues", eff1.CompClassID, eff1.ProblemID).
+			Return(effectYielder(eff3)).
+			Run(recordOrder(eff1))
+
+		mockedResolver.
+			On("ScoreContender", eff2.ContenderID).
+			Return(effectYielder(eff5)).
+			Run(recordOrder(eff2))
+
+		mockedResolver.
+			On("ScoreContender", eff3.ContenderID).
+			Return(effectYielder()).
+			Run(recordOrder(eff3))
+
+		mockedResolver.
+			On("RankCompClass", eff4.CompClassID).
+			Return().
+			Run(recordOrder(eff4))
+
+		mockedResolver.
+			On("RankCompClass", eff5.CompClassID).
+			Return().
+			Run(recordOrder(eff5))
+
+		runner := scores.NewEffectRunner(mockedResolver)
+
+		runner.RunEffects(effectYielder(eff4, eff2, eff1))
+
+		assert.Equal(t, []scores.Effect{eff1, eff2, eff3, eff4, eff5}, recordedOrder)
+
+		mockedResolver.AssertExpectations(t)
 	})
 }
