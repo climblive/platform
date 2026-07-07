@@ -147,4 +147,42 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 
 		mockedResolver.AssertExpectations(t)
 	})
+
+	t.Run("DontRunDuplicateChainReactions", func(t *testing.T) {
+		mockedResolver := new(effectResolverMock)
+
+		effectYielder := func(effects ...scores.Effect) iter.Seq[scores.Effect] {
+			return func(yield func(scores.Effect) bool) {
+				for _, effect := range effects {
+					if !yield(effect) {
+						return
+					}
+				}
+			}
+		}
+
+		eff1 := scores.EffectCalculatePointValues{CompClassID: testutils.RandomResourceID[domain.CompClassID](), ProblemID: testutils.RandomResourceID[domain.ProblemID]()}
+		eff2 := scores.EffectScoreContender{ContenderID: testutils.RandomResourceID[domain.ContenderID]()}
+		eff3 := scores.EffectRankClass{CompClassID: testutils.RandomResourceID[domain.CompClassID]()}
+
+		mockedResolver.
+			On("CalculatePointValues", eff1.CompClassID, eff1.ProblemID).
+			Return(effectYielder(eff2, eff2, eff2, eff2, eff2))
+
+		mockedResolver.
+			On("ScoreContender", eff2.ContenderID).
+			Return(effectYielder(eff3, eff3, eff3, eff3, eff3)).
+			Once()
+
+		mockedResolver.
+			On("RankCompClass", eff3.CompClassID).
+			Return().
+			Once()
+
+		runner := scores.NewEffectRunner(mockedResolver)
+
+		runner.RunEffects(effectYielder(eff1))
+
+		mockedResolver.AssertExpectations(t)
+	})
 }
