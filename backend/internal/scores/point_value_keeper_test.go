@@ -177,6 +177,60 @@ func TestPointValueKeeper(t *testing.T) {
 		})
 	})
 
+	t.Run("GatherScores_MultipleUpdates", func(t *testing.T) {
+		synctest.Test(t, func(t *testing.T) {
+			mockedEventBroker, subscription := makeMocks(0)
+			keeper := scores.NewPointValueKeeper(mockedEventBroker, time.Hour)
+
+			ctx, cancel := context.WithCancel(context.Background())
+
+			wg := keeper.Run(ctx)
+
+			fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+			fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
+
+			for k := 1; k <= 10; k++ {
+				pointValue := domain.PointValue{
+					ContenderID: fakedContenderID,
+					ProblemID:   fakedProblemID,
+					Current:     1000 + k,
+					Zone1:       10 + k,
+					Zone2:       20 + k,
+					Top:         1000 + k,
+					FlashBonus:  100 + k,
+				}
+
+				err := subscription.Post(domain.EventEnvelope{
+					Data: domain.PointValueUpdatedEvent(pointValue),
+				})
+
+				require.NoError(t, err)
+			}
+
+			synctest.Wait()
+
+			pointValues := keeper.GetPointValues(fakedContenderID)
+
+			assert.ElementsMatch(t, []domain.PointValue{
+				{
+					ContenderID: fakedContenderID,
+					ProblemID:   fakedProblemID,
+					Current:     1010,
+					Zone1:       20,
+					Zone2:       30,
+					Top:         1010,
+					FlashBonus:  110,
+				},
+			}, pointValues)
+
+			cancel()
+
+			wg.Wait()
+
+			mockedEventBroker.AssertExpectations(t)
+		})
+	})
+
 	t.Run("ExpungeExpiredScores", func(t *testing.T) {
 		synctest.Test(t, func(t *testing.T) {
 			mockedEventBroker, subscription := makeMocks(0)

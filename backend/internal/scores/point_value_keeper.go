@@ -3,6 +3,7 @@ package scores
 import (
 	"context"
 	"log/slog"
+	"slices"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -120,10 +121,20 @@ func (k *PointValueKeeper) handlePointValueUpdated(event domain.PointValueUpdate
 
 	contenderPointValues := k.pointValues[event.ContenderID]
 
-	k.pointValues[event.ContenderID] = append(contenderPointValues, keptPointValue{
+	idx := slices.IndexFunc(contenderPointValues, func(kpv keptPointValue) bool {
+		return kpv.value.ProblemID == event.ProblemID
+	})
+
+	updatedValue := keptPointValue{
 		value:     domain.PointValue(event),
 		expiresAt: time.Now().Add(k.ttl),
-	})
+	}
+
+	if idx == -1 {
+		k.pointValues[event.ContenderID] = append(contenderPointValues, updatedValue)
+	} else {
+		contenderPointValues[idx] = updatedValue
+	}
 }
 
 func (k *PointValueKeeper) GetPointValues(contenderID domain.ContenderID) []domain.PointValue {
