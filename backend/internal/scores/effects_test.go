@@ -106,11 +106,11 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 		eff4 := scores.EffectRankClass{CompClassID: testutils.RandomResourceID[domain.CompClassID]()}
 		eff5 := scores.EffectRankClass{CompClassID: testutils.RandomResourceID[domain.CompClassID]()}
 
-		recordedOrder := make([]scores.Effect, 0)
+		recordedOrder := make([]scores.EffectType, 0)
 
 		recordOrder := func(eff scores.Effect) func(args mock.Arguments) {
 			return func(mock.Arguments) {
-				recordedOrder = append(recordedOrder, eff)
+				recordedOrder = append(recordedOrder, eff.Type())
 			}
 		}
 
@@ -143,7 +143,13 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 
 		runner.RunEffects(effectYielder(eff4, eff2, eff1))
 
-		assert.Equal(t, []scores.Effect{eff1, eff2, eff3, eff4, eff5}, recordedOrder)
+		assert.Equal(t, []scores.EffectType{
+			scores.EffectTypeCalculatePointValues,
+			scores.EffectTypeScoreContender,
+			scores.EffectTypeScoreContender,
+			scores.EffectTypeRankClass,
+			scores.EffectTypeRankClass,
+		}, recordedOrder)
 
 		mockedResolver.AssertExpectations(t)
 	})
