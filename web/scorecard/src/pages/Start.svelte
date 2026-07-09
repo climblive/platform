@@ -8,12 +8,12 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import { FullLogo, SplashScreen } from "@climblive/lib/components";
+  import { z } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { format } from "date-fns";
   import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
-  import { z } from "@climblive/lib/utils";
   import { ZodError } from "zod/v4";
 
   const enterFormSchema = z.object({
@@ -141,6 +141,10 @@
         </wa-button>
       </section>
     {/each}
+
+    <span class="admin-hint"
+      >Looking for the <a href="/admin">admin</a> page?</span
+    >
   </main>
 {/if}
 
@@ -211,5 +215,11 @@
   wa-input::part(base) {
     text-transform: uppercase;
     letter-spacing: 0.25rem;
+  }
+
+  .admin-hint {
+    text-align: center;
+    margin-block-start: var(--wa-space-m);
+    color: var(--wa-color-text-quiet);
   }
 </style>
