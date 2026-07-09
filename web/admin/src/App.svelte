@@ -86,7 +86,7 @@
             <div class="logo">
               <FullLogo />
             </div>
-            <p>Sign-in to manage your competition on ClimbLive.</p>
+            <p>Sign in to manage your competition on ClimbLive.</p>
             <wa-button variant="neutral" onclick={authenticator.redirectLogin}
               >Sign in</wa-button
             >

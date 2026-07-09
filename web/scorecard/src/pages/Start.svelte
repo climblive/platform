@@ -220,5 +220,6 @@
   .admin-hint {
     text-align: center;
     margin-block-start: var(--wa-space-m);
+    font-size: var(--wa-font-size-s);
   }
 </style>
