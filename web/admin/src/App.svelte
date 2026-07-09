@@ -1,7 +1,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
-  import { ErrorBoundary } from "@climblive/lib/components";
+  import { ErrorBoundary, FullLogo } from "@climblive/lib/components";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { onDestroy, onMount, setContext } from "svelte";
@@ -83,7 +83,9 @@
       {#if !authenticator.isAuthenticated()}
         <main>
           <section>
-            <h1>Hi!</h1>
+            <div class="logo">
+              <FullLogo />
+            </div>
             <p>Sign-in to manage your competitions on ClimbLive.</p>
             <wa-button variant="neutral" onclick={authenticator.redirectLogin}
               >Sign in</wa-button
@@ -128,5 +130,11 @@
 
   wa-button:last-of-type {
     margin-left: var(--wa-space-xs);
+  }
+
+  .logo {
+    height: var(--wa-font-size-xl);
+    color: var(--wa-color-text-normal);
+    margin-bottom: var(--wa-space-s);
   }
 </style>
