@@ -220,6 +220,5 @@
   .admin-hint {
     text-align: center;
     margin-block-start: var(--wa-space-m);
-    color: var(--wa-color-text-quiet);
   }
 </style>
