@@ -1,7 +1,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
-  import { ErrorBoundary } from "@climblive/lib/components";
+  import { ErrorBoundary, FullLogo } from "@climblive/lib/components";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { onDestroy, onMount, setContext } from "svelte";
@@ -83,14 +83,16 @@
       {#if !authenticator.isAuthenticated()}
         <main>
           <section>
-            <h1>Hi!</h1>
-            <p>Sign-in to manage your competitions on ClimbLive.</p>
+            <div class="logo">
+              <FullLogo />
+            </div>
+            <p>Sign in to manage your competition on ClimbLive.</p>
             <wa-button variant="neutral" onclick={authenticator.redirectLogin}
               >Sign in</wa-button
             >
             <wa-button
               variant="neutral"
-              appearance="plain"
+              appearance="outlined"
               onclick={authenticator.redirectSignup}>Sign up</wa-button
             >
           </section>
@@ -120,13 +122,25 @@
 
   main {
     display: flex;
-    justify-content: center;
-    height: 100vh;
-    padding: var(--wa-space-l);
-    padding-top: 20vh;
+    min-height: 100vh;
+    padding-inline: var(--wa-space-l);
+  }
+
+  section {
+    margin-top: 25%;
+
+    & p {
+      margin-block-start: 0;
+    }
   }
 
   wa-button:last-of-type {
     margin-left: var(--wa-space-xs);
+  }
+
+  .logo {
+    height: var(--wa-font-size-xl);
+    color: var(--wa-color-text-normal);
+    margin-bottom: var(--wa-space-s);
   }
 </style>
