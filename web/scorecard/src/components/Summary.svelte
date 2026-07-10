@@ -67,7 +67,7 @@
 {/snippet}
 
 {#snippet pointsValue()}
-  <strong>{score}p</strong>
+  <strong>{score}</strong>
 {/snippet}
 
 {#snippet placementValue()}

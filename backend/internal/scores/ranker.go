@@ -72,7 +72,7 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 		score := domain.Score{
 			Timestamp:   now,
 			ContenderID: contender.ID,
-			Score:       fmt.Sprintf("%sp", contender.Score),
+			Score:       fmt.Sprintf("%dp", contender.Score),
 			Placement:   0,
 			Finalist:    false,
 			RankOrder:   0,

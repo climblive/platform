@@ -516,7 +516,7 @@ func TestMemoryStore(t *testing.T) {
 		score := domain.Score{
 			Timestamp:   time.Now(),
 			ContenderID: fakedContenderID,
-			Score:       1000,
+			Score:       "1000p",
 			Placement:   10,
 			Finalist:    true,
 			RankOrder:   9,

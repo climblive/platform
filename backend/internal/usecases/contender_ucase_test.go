@@ -31,7 +31,7 @@ func TestGetContender(t *testing.T) {
 		fakedScore := domain.Score{
 			Timestamp:   time.Now(),
 			ContenderID: fakedContenderID,
-			Score:       1000,
+			Score:       "1000p",
 			Placement:   5,
 			Finalist:    true,
 			RankOrder:   6,
@@ -113,7 +113,7 @@ func TestGetContenderByCode(t *testing.T) {
 		fakedScore := domain.Score{
 			Timestamp:   time.Now(),
 			ContenderID: fakedContenderID,
-			Score:       1000,
+			Score:       "1000p",
 			Placement:   5,
 			Finalist:    true,
 			RankOrder:   6,
@@ -292,7 +292,7 @@ func TestGetContendersByCompClass(t *testing.T) {
 			mockedScoreKeeper.On("GetScore", contenderID).Return(domain.Score{
 				Timestamp:   currentTime,
 				ContenderID: contenderID,
-				Score:       k * 10,
+				Score:       fmt.Sprintf("%dp", k*10),
 				Placement:   k,
 				RankOrder:   k - 1,
 				Finalist:    true,
@@ -328,7 +328,7 @@ func TestGetContendersByCompClass(t *testing.T) {
 		for i, contender := range contenders {
 			assert.Equal(t, domain.ContenderID(i+1), contender.ID)
 			require.NotNil(t, contender.Score)
-			assert.Equal(t, (i+1)*10, contender.Score.Score)
+			assert.Equal(t, fmt.Sprintf("%dp", (i+1)*10), contender.Score.Score)
 			assert.Equal(t, i+1, contender.Score.Placement)
 			assert.Equal(t, i, contender.Score.RankOrder)
 			assert.True(t, contender.Score.Finalist)
@@ -394,7 +394,7 @@ func TestGetContendersByContest(t *testing.T) {
 			mockedScoreKeeper.On("GetScore", contenderID).Return(domain.Score{
 				Timestamp:   currentTime,
 				ContenderID: contenderID,
-				Score:       k * 10,
+				Score:       fmt.Sprintf("%dp", k*10),
 				Placement:   k,
 				RankOrder:   k - 1,
 				Finalist:    true,
@@ -430,7 +430,7 @@ func TestGetContendersByContest(t *testing.T) {
 		for i, contender := range contenders {
 			assert.Equal(t, domain.ContenderID(i+1), contender.ID)
 			require.NotNil(t, contender.Score)
-			assert.Equal(t, (i+1)*10, contender.Score.Score)
+			assert.Equal(t, fmt.Sprintf("%dp", (i+1)*10), contender.Score.Score)
 			assert.Equal(t, i+1, contender.Score.Placement)
 			assert.Equal(t, i, contender.Score.RankOrder)
 			assert.True(t, contender.Score.Finalist)
@@ -827,7 +827,7 @@ func TestPatchContender(t *testing.T) {
 		fakedScore := domain.Score{
 			Timestamp:   currentTime,
 			ContenderID: fakedContenderID,
-			Score:       1000,
+			Score:       "1000p",
 			Placement:   5,
 			Finalist:    true,
 			RankOrder:   6,
