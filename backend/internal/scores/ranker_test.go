@@ -12,7 +12,7 @@ import (
 )
 
 func TestBasicRanker(t *testing.T) {
-	ranker := scores.NewBasicRanker(5)
+	ranker := scores.NewBasicRanker(5, true)
 
 	makeContenders := func(count int) []scores.Contender {
 		contenders := make([]scores.Contender, count)

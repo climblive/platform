@@ -1842,6 +1842,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				On("GetRules").
 				Return(scores.Rules{
 					Finalists: 2,
+					UsePoints: true,
 				})
 
 			f.store.
