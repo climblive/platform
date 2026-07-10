@@ -201,7 +201,7 @@ export interface RaffleWinner {
 export interface Score {
   timestamp: Date;
   contenderId: ContenderID;
-  score: number /* int */;
+  score: string;
   placement: number /* int */;
   finalist: boolean;
   rankOrder: number /* int */;
@@ -304,7 +304,7 @@ export interface ContenderPublicInfoUpdatedEvent {
 export interface ContenderScoreUpdatedEvent {
   timestamp: Date;
   contenderId: ContenderID;
-  score: number /* int */;
+  score: string;
   placement: number /* int */;
   finalist: boolean;
   rankOrder: number /* int */;

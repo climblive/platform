@@ -886,7 +886,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			{
 				ContenderID: fakedContenderID1,
 				Timestamp:   now,
-				Score:       100,
+				Score:       "100p",
 				Placement:   1,
 				RankOrder:   0,
 				Finalist:    true,
@@ -894,7 +894,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			{
 				ContenderID: fakedContenderID2,
 				Timestamp:   now,
-				Score:       200,
+				Score:       "200p",
 				Placement:   2,
 				RankOrder:   1,
 				Finalist:    true,
@@ -902,7 +902,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			{
 				ContenderID: fakedContenderID3,
 				Timestamp:   now,
-				Score:       300,
+				Score:       "300p",
 				Placement:   3,
 				RankOrder:   2,
 				Finalist:    false,
@@ -1867,7 +1867,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			f.store.
 				On("SaveScore", domain.Score{
 					ContenderID: fakedContender2ID,
-					Score:       200,
+					Score:       "200p",
 					Placement:   1,
 					RankOrder:   0,
 					Finalist:    true,
@@ -1877,7 +1877,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			f.store.
 				On("SaveScore", domain.Score{
 					ContenderID: fakedContender3ID,
-					Score:       150,
+					Score:       "150p",
 					Placement:   2,
 					RankOrder:   1,
 					Finalist:    true,
@@ -1887,7 +1887,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			f.store.
 				On("SaveScore", domain.Score{
 					ContenderID: fakedContender1ID,
-					Score:       100,
+					Score:       "100p",
 					Placement:   3,
 					RankOrder:   2,
 					Finalist:    false,

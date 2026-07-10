@@ -344,7 +344,7 @@ func TestEngineDriver(t *testing.T) {
 			{
 				ContenderID: 1,
 				Timestamp:   now,
-				Score:       100,
+				Score:       "100p",
 				Placement:   1,
 				RankOrder:   0,
 				Finalist:    true,
@@ -352,7 +352,7 @@ func TestEngineDriver(t *testing.T) {
 			{
 				ContenderID: 2,
 				Timestamp:   now,
-				Score:       200,
+				Score:       "200p",
 				Placement:   2,
 				RankOrder:   1,
 				Finalist:    true,
@@ -360,7 +360,7 @@ func TestEngineDriver(t *testing.T) {
 			{
 				ContenderID: 3,
 				Timestamp:   now,
-				Score:       300,
+				Score:       "300p",
 				Placement:   3,
 				RankOrder:   2,
 				Finalist:    false,
@@ -373,7 +373,7 @@ func TestEngineDriver(t *testing.T) {
 				domain.ContenderScoreUpdatedEvent{
 					ContenderID: 1,
 					Timestamp:   now,
-					Score:       100,
+					Score:       "100p",
 					Placement:   1,
 					RankOrder:   0,
 					Finalist:    true,
@@ -383,7 +383,7 @@ func TestEngineDriver(t *testing.T) {
 				domain.ContenderScoreUpdatedEvent{
 					ContenderID: 2,
 					Timestamp:   now,
-					Score:       200,
+					Score:       "200p",
 					Placement:   2,
 					RankOrder:   1,
 					Finalist:    true,
@@ -393,7 +393,7 @@ func TestEngineDriver(t *testing.T) {
 				domain.ContenderScoreUpdatedEvent{
 					ContenderID: 3,
 					Timestamp:   now,
-					Score:       300,
+					Score:       "300p",
 					Placement:   3,
 					RankOrder:   2,
 					Finalist:    false,
@@ -404,7 +404,7 @@ func TestEngineDriver(t *testing.T) {
 					{
 						ContenderID: 1,
 						Timestamp:   now,
-						Score:       100,
+						Score:       "100p",
 						Placement:   1,
 						RankOrder:   0,
 						Finalist:    true,
@@ -412,7 +412,7 @@ func TestEngineDriver(t *testing.T) {
 					{
 						ContenderID: 2,
 						Timestamp:   now,
-						Score:       200,
+						Score:       "200p",
 						Placement:   2,
 						RankOrder:   1,
 						Finalist:    true,
@@ -420,7 +420,7 @@ func TestEngineDriver(t *testing.T) {
 					{
 						ContenderID: 3,
 						Timestamp:   now,
-						Score:       300,
+						Score:       "300p",
 						Placement:   3,
 						RankOrder:   2,
 						Finalist:    false,

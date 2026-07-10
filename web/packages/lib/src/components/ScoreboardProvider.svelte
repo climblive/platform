@@ -9,6 +9,7 @@
     type Score,
     type ScoreboardEntry,
   } from "../models";
+  import { NO_SCORE } from "../models/score";
   import { getApiUrl } from "../utils";
 
   interface Props {
@@ -153,7 +154,7 @@
 
           contender.score = {
             contenderId: contender.contenderId,
-            score: 0,
+            score: NO_SCORE,
             placement: 0,
             finalist: false,
             rankOrder,

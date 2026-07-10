@@ -46,6 +46,7 @@
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
+  import { NO_SCORE } from "node_modules/@climblive/lib/src/models/score";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
 
@@ -65,7 +66,7 @@
   let tabGroup: WaTabGroup | undefined = $state();
   let raffleWinnerDialog: WaDialog | undefined = $state();
   let eventSource: EventSource | undefined;
-  let score: number = $state(0);
+  let score: string = $state(NO_SCORE);
   let placement: number | undefined = $state();
   let finalist: boolean = $state(false);
 
@@ -212,7 +213,7 @@
 
   $effect(() => {
     if (contender) {
-      score = contender.score?.score ?? 0;
+      score = contender.score?.score ?? NO_SCORE;
       placement = contender.score?.placement;
       finalist = contender.score?.finalist ?? false;
     }

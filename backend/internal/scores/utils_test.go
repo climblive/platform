@@ -15,7 +15,7 @@ func TestCompareScore(t *testing.T) {
 	s1 := domain.Score{
 		Timestamp:   now,
 		ContenderID: 1,
-		Score:       100,
+		Score:       "100p",
 		Placement:   1,
 		Finalist:    true,
 		RankOrder:   0,
@@ -23,7 +23,7 @@ func TestCompareScore(t *testing.T) {
 	s2 := domain.Score{
 		Timestamp:   now.Add(time.Second),
 		ContenderID: 1,
-		Score:       100,
+		Score:       "100p",
 		Placement:   1,
 		Finalist:    true,
 		RankOrder:   0,

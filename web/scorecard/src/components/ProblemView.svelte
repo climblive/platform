@@ -57,7 +57,7 @@
   <div class="score" class:uncounted={!counted}>
     {#if tick && problem.pointValue !== undefined}
       <Score
-        value={problem.pointValue.current}
+        value={problem.pointValue.current + "p"}
         prefix={counted ? "+" : undefined}
       />
     {/if}

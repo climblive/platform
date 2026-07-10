@@ -3,6 +3,7 @@ package scores_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -84,7 +85,7 @@ func TestKeeper(t *testing.T) {
 			score := domain.Score{
 				Timestamp:   now,
 				ContenderID: domain.ContenderID(k),
-				Score:       k * 100,
+				Score:       fmt.Sprintf("%dp", k*100),
 				Placement:   k,
 				Finalist:    true,
 				RankOrder:   k - 1,
@@ -106,7 +107,7 @@ func TestKeeper(t *testing.T) {
 				require.NoError(collect, err)
 				assert.Equal(collect, now, score.Timestamp)
 				assert.Equal(collect, domain.ContenderID(k), score.ContenderID)
-				assert.Equal(collect, k*100, score.Score)
+				assert.Equal(collect, fmt.Sprintf("%dp", k*100), score.Score)
 				assert.Equal(collect, k, score.Placement)
 				assert.True(collect, score.Finalist)
 				assert.Equal(collect, k-1, score.RankOrder)
@@ -134,7 +135,7 @@ func TestKeeper(t *testing.T) {
 			score := domain.Score{
 				Timestamp:   now,
 				ContenderID: domain.ContenderID(k),
-				Score:       k * 100,
+				Score:       fmt.Sprintf("%dp", k*100),
 				Placement:   k,
 				Finalist:    true,
 				RankOrder:   k - 1,
@@ -188,7 +189,7 @@ func TestKeeper(t *testing.T) {
 			score := domain.Score{
 				Timestamp:   now,
 				ContenderID: domain.ContenderID(k),
-				Score:       k * 100,
+				Score:       fmt.Sprintf("%dp", k*100),
 				Placement:   k,
 				Finalist:    true,
 				RankOrder:   k - 1,
@@ -235,7 +236,7 @@ func TestKeeper(t *testing.T) {
 			score := domain.Score{
 				Timestamp:   now,
 				ContenderID: domain.ContenderID(k),
-				Score:       k * 100,
+				Score:       fmt.Sprintf("%dp", k*100),
 				Placement:   k,
 				Finalist:    true,
 				RankOrder:   k - 1,
@@ -288,7 +289,7 @@ func TestKeeper(t *testing.T) {
 			score := domain.Score{
 				Timestamp:   now,
 				ContenderID: domain.ContenderID(k),
-				Score:       k * 100,
+				Score:       fmt.Sprintf("%dp", k*100),
 				Placement:   k,
 				Finalist:    true,
 				RankOrder:   k - 1,
