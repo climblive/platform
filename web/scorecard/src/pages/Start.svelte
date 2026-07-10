@@ -157,7 +157,7 @@
   }
 
   header {
-    margin-top: 25%;
+    margin-block-start: 25vh;
 
     & .logo {
       height: var(--wa-font-size-xl);

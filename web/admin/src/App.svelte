@@ -127,7 +127,7 @@
   }
 
   section {
-    margin-top: 25%;
+    margin-block-start: 25vh;
     margin-inline: auto;
 
     & p {
