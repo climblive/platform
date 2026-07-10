@@ -128,6 +128,7 @@
 
   section {
     margin-top: 25%;
+    margin-inline: auto;
 
     & p {
       margin-block-start: 0;
