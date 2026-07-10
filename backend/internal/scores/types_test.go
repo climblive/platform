@@ -11,11 +11,11 @@ import (
 func TestCompareContender(t *testing.T) {
 	t.Run("ByScore", func(t *testing.T) {
 		c1 := scores.Contender{
-			Score: 200,
+			Points: 200,
 		}
 
 		c2 := scores.Contender{
-			Score: 100,
+			Points: 100,
 		}
 
 		assert.Less(t, c1.Compare(c2), 0)
@@ -24,13 +24,13 @@ func TestCompareContender(t *testing.T) {
 
 	t.Run("TieBreak", func(t *testing.T) {
 		c1 := scores.Contender{
-			ID:    1,
-			Score: 100,
+			ID:     1,
+			Points: 100,
 		}
 
 		c2 := scores.Contender{
-			ID:    2,
-			Score: 100,
+			ID:     2,
+			Points: 100,
 		}
 
 		assert.Less(t, c1.Compare(c2), 0)

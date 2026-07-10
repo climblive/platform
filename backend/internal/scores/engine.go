@@ -167,7 +167,7 @@ func (e *DefaultScoreEngine) HandleContenderEntered(event domain.ContenderEntere
 		CompClassID:         event.CompClassID,
 		Disqualified:        false,
 		WithdrawnFromFinals: false,
-		Score:               0,
+		Points:              0,
 	}
 
 	e.store.SaveContender(contender)
@@ -512,10 +512,13 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 		return nil
 	}
 
-	oldScore := contender.Score
+	oldScore := contender.Points
+	oldTops := contender.Tops
+	oldZone1s := contender.Zone1s
+	oldZone2s := contender.Zone2s
 
 	if contender.Disqualified {
-		contender.Score = 0
+		contender.Points = 0
 	} else {
 		ticks := e.store.GetTicksByContender(contender.ID)
 
@@ -538,10 +541,26 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 			ProblemLimit: problemLimit,
 		}
 
-		contender.Score = scorer.CalculateScore(CurrentPoints(pointValues))
+		contender.Points = scorer.CalculateScore(CurrentPoints(pointValues))
+
+		ticks = e.store.GetTicksByContender(contender.ID)
+
+		for tick := range ticks {
+			if tick.Top {
+				contender.Tops += 1
+			}
+
+			if tick.Zone2 {
+				contender.Zone2s += 1
+			}
+
+			if tick.Zone1 {
+				contender.Zone1s += 1
+			}
+		}
 	}
 
-	if contender.Score == oldScore {
+	if contender.Points == oldScore && contender.Tops == oldTops && contender.Zone1s == oldZone1s && contender.Zone2s == oldZone2s {
 		return nil
 	}
 

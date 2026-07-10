@@ -285,7 +285,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				CompClassID:         fakedOldCompClassID,
 				Disqualified:        false,
 				WithdrawnFromFinals: false,
-				Score:               123,
+				Points:              123,
 			}, true)
 
 		f.store.On("SaveContender", scores.Contender{
@@ -293,7 +293,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			CompClassID:         fakedNewCompClassID,
 			Disqualified:        false,
 			WithdrawnFromFinals: false,
-			Score:               123,
+			Points:              123,
 		}).Return()
 
 		f.store.
@@ -361,7 +361,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ID:           fakedContenderID,
 				CompClassID:  fakedCompClassID,
 				Disqualified: true,
-				Score:        123,
+				Points:       123,
 			}, true)
 
 		f.store.On("SaveContender", scores.Contender{
@@ -369,7 +369,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			CompClassID:         fakedCompClassID,
 			Disqualified:        true,
 			WithdrawnFromFinals: true,
-			Score:               123,
+			Points:              123,
 		}).Return()
 
 		effects := slices.Collect(f.engine.HandleContenderWithdrewFromFinals(domain.ContenderWithdrewFromFinalsEvent{
@@ -414,7 +414,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				CompClassID:         fakedCompClassID,
 				Disqualified:        true,
 				WithdrawnFromFinals: true,
-				Score:               123,
+				Points:              123,
 			}, true)
 
 		f.store.On("SaveContender", scores.Contender{
@@ -422,7 +422,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			CompClassID:         fakedCompClassID,
 			Disqualified:        true,
 			WithdrawnFromFinals: false,
-			Score:               123,
+			Points:              123,
 		}).Return()
 
 		effects := slices.Collect(f.engine.HandleContenderReenteredFinals(domain.ContenderReenteredFinalsEvent{
@@ -470,7 +470,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ID:                  fakedContenderID,
 				CompClassID:         fakedCompClassID,
 				WithdrawnFromFinals: true,
-				Score:               123,
+				Points:              123,
 			}, true)
 
 		f.store.
@@ -492,7 +492,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			CompClassID:         fakedCompClassID,
 			Disqualified:        true,
 			WithdrawnFromFinals: true,
-			Score:               123,
+			Points:              123,
 		}).Return()
 
 		effects := slices.Collect(f.engine.HandleContenderDisqualified(domain.ContenderDisqualifiedEvent{
@@ -545,7 +545,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				CompClassID:         fakedCompClassID,
 				Disqualified:        true,
 				WithdrawnFromFinals: true,
-				Score:               0,
+				Points:              0,
 			}, true)
 
 		f.store.
@@ -567,7 +567,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			CompClassID:         fakedCompClassID,
 			Disqualified:        false,
 			WithdrawnFromFinals: true,
-			Score:               0,
+			Points:              0,
 		}).Return()
 
 		effects := slices.Collect(f.engine.HandleContenderRequalified(domain.ContenderRequalifiedEvent{
@@ -1516,7 +1516,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ID:           fakedContenderID,
 				CompClassID:  fakedCompClassID,
 				Disqualified: true,
-				Score:        100,
+				Points:       100,
 			}, true)
 
 		f.store.
@@ -1524,7 +1524,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ID:           fakedContenderID,
 				CompClassID:  fakedCompClassID,
 				Disqualified: true,
-				Score:        0,
+				Points:       0,
 			}).Return()
 
 		effects := slices.Collect(f.engine.ScoreContender(fakedContenderID))
@@ -1548,7 +1548,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ID:           fakedContenderID,
 				CompClassID:  fakedCompClassID,
 				Disqualified: true,
-				Score:        0,
+				Points:       0,
 			}, true)
 
 		effects := f.engine.ScoreContender(fakedContenderID)
@@ -1571,7 +1571,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(scores.Contender{
 				ID:          fakedContenderID,
 				CompClassID: fakedCompClassID,
-				Score:       0,
+				Points:      0,
 			}, true)
 
 		f.store.
@@ -1617,7 +1617,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("SaveContender", scores.Contender{
 				ID:          fakedContenderID,
 				CompClassID: fakedCompClassID,
-				Score:       210,
+				Points:      210,
 			}).Return()
 
 		effects := slices.Collect(f.engine.ScoreContender(fakedContenderID))
@@ -1643,7 +1643,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(scores.Contender{
 				ID:          fakedContenderID,
 				CompClassID: fakedCompClassID,
-				Score:       0,
+				Points:      0,
 			}, true)
 
 		f.store.
@@ -1703,7 +1703,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("SaveContender", scores.Contender{
 				ID:          fakedContenderID,
 				CompClassID: fakedCompClassID,
-				Score:       192,
+				Points:      192,
 			}).Return()
 
 		effects := slices.Collect(f.engine.ScoreContender(fakedContenderID))
@@ -1727,7 +1727,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(scores.Contender{
 				ID:          fakedContenderID,
 				CompClassID: fakedCompClassID,
-				Score:       110,
+				Points:      110,
 			}, true)
 
 		f.store.
@@ -1775,7 +1775,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(scores.Contender{
 				ID:          fakedContenderID,
 				CompClassID: fakedCompClassID,
-				Score:       0,
+				Points:      0,
 			}, true)
 
 		f.store.
@@ -1817,7 +1817,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("SaveContender", scores.Contender{
 				ID:          fakedContenderID,
 				CompClassID: fakedCompClassID,
-				Score:       110,
+				Points:      110,
 			}).Return()
 
 		effects := slices.Collect(f.engine.ScoreContender(fakedContenderID))
@@ -1851,17 +1851,17 @@ func TestDefaultScoreEngine(t *testing.T) {
 					{
 						ID:          fakedContender1ID,
 						CompClassID: fakedCompClassID,
-						Score:       100,
+						Points:      100,
 					},
 					{
 						ID:          fakedContender2ID,
 						CompClassID: fakedCompClassID,
-						Score:       200,
+						Points:      200,
 					},
 					{
 						ID:          fakedContender3ID,
 						CompClassID: fakedCompClassID,
-						Score:       150,
+						Points:      150,
 					},
 				}))
 

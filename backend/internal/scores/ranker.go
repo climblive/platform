@@ -74,9 +74,9 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 		var scoreValue string
 
 		if r.usePoints {
-			scoreValue = fmt.Sprintf("%dp", contender.Score)
+			scoreValue = fmt.Sprintf("%dp", contender.Points)
 		} else {
-			scoreValue = "0T0Z₁0Z₂"
+			scoreValue = fmt.Sprintf("%dt %dz₁ %dz₂", contender.Tops, contender.Zone1s, contender.Zone2s)
 		}
 
 		score := domain.Score{
@@ -92,9 +92,9 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 		case previousContender == nil:
 			placement = 1
 			gap = 0
-		case contender.Score == previousContender.Score:
+		case contender.Points == previousContender.Points:
 			gap++
-		case contender.Score != previousContender.Score:
+		case contender.Points != previousContender.Points:
 			placement += 1 + gap
 			gap = 0
 		}
@@ -103,7 +103,7 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 		score.RankOrder = i
 
 		switch {
-		case contender.Score == 0:
+		case contender.Points == 0:
 			fallthrough
 		case contender.WithdrawnFromFinals:
 			fallthrough

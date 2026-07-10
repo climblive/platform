@@ -7,15 +7,18 @@ type Contender struct {
 	CompClassID         domain.CompClassID
 	Disqualified        bool
 	WithdrawnFromFinals bool
-	Score               int
+	Points              int
+	Tops                int
+	Zone1s              int
+	Zone2s              int
 }
 
 func (c Contender) Compare(other Contender) int {
-	if c.Score == other.Score {
+	if c.Points == other.Points {
 		return int(c.ID) - int(other.ID)
 	}
 
-	return other.Score - c.Score
+	return other.Points - c.Points
 }
 
 type Tick struct {
