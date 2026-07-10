@@ -1,6 +1,6 @@
 <script lang="ts">
   interface Props {
-    value: number;
+    value: string;
     prefix?: string;
     hideZero?: boolean;
   }
@@ -9,7 +9,7 @@
 </script>
 
 <div class="counter" aria-live="polite">
-  {#if !(hideZero && value === 0)}
+  {#if !(hideZero && value === "0p")}
     {prefix}{value}<span class="suffix">p</span>
   {/if}
 </div>

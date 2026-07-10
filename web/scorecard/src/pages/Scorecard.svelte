@@ -65,7 +65,7 @@
   let tabGroup: WaTabGroup | undefined = $state();
   let raffleWinnerDialog: WaDialog | undefined = $state();
   let eventSource: EventSource | undefined;
-  let score: number = $state(0);
+  let score: string = $state("0p");
   let placement: number | undefined = $state();
   let finalist: boolean = $state(false);
 
@@ -212,7 +212,7 @@
 
   $effect(() => {
     if (contender) {
-      score = contender.score?.score ?? 0;
+      score = contender.score?.score ?? "0p";
       placement = contender.score?.placement;
       finalist = contender.score?.finalist ?? false;
     }

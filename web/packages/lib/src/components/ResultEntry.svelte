@@ -33,7 +33,7 @@
     />
   </div>
   <div class="score">
-    {#if score === undefined || score.score === 0}
+    {#if score === undefined || score.score === "0p"}
       -
     {:else}
       <Score value={score.score} />

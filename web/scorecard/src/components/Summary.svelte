@@ -9,7 +9,7 @@
   interface Props {
     ticks: Tick[];
     problems: Problem[];
-    score: number;
+    score: string;
     placement: number | undefined;
     finalist: boolean;
     disqualified: boolean;

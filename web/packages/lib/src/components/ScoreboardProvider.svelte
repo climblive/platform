@@ -153,7 +153,7 @@
 
           contender.score = {
             contenderId: contender.contenderId,
-            score: 0,
+            score: "0p",
             placement: 0,
             finalist: false,
             rankOrder,

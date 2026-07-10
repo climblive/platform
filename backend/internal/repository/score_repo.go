@@ -12,7 +12,7 @@ func (d *Database) StoreScore(ctx context.Context, tx domain.Transaction, score 
 	params := database.UpsertScoreParams{
 		ContenderID: int32(score.ContenderID),
 		Timestamp:   score.Timestamp,
-		Score:       int32(score.Score),
+		Score:       score.Score,
 		Placement:   int32(score.Placement),
 		Finalist:    score.Finalist,
 		RankOrder:   int32(score.RankOrder),
