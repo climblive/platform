@@ -9,7 +9,7 @@
   interface Props {
     ticks: Tick[];
     problems: Problem[];
-    score: number;
+    score: string;
     placement: number | undefined;
     finalist: boolean;
     disqualified: boolean;
@@ -67,7 +67,7 @@
 {/snippet}
 
 {#snippet pointsValue()}
-  <strong>{score}p</strong>
+  <strong>{score}</strong>
 {/snippet}
 
 {#snippet placementValue()}

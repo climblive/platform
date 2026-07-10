@@ -10,6 +10,7 @@ type HealthUseCase struct {
 	ScoreEngineManager domain.StatusReporter
 	ScoreKeeper        domain.StatusReporter
 	Scrubber           domain.StatusReporter
+	PointValueKeeper   domain.StatusReporter
 }
 
 func (uc *HealthUseCase) GetHealth(_ context.Context) ([]domain.ServiceStatus, error) {
@@ -17,5 +18,6 @@ func (uc *HealthUseCase) GetHealth(_ context.Context) ([]domain.ServiceStatus, e
 		uc.ScoreEngineManager.GetStatus(),
 		uc.ScoreKeeper.GetStatus(),
 		uc.Scrubber.GetStatus(),
+		uc.PointValueKeeper.GetStatus(),
 	}, nil
 }

@@ -68,6 +68,8 @@ type Contest struct {
 	Description          string        `json:"description,omitempty"`
 	QualifyingProblems   int           `json:"qualifyingProblems"`
 	Finalists            int           `json:"finalists"`
+	UsePoints            bool          `json:"usePoints"`
+	PooledPoints         bool          `json:"pooledPoints"`
 	Info                 string        `json:"info,omitempty"`
 	GracePeriod          time.Duration `json:"gracePeriod"`
 	NameRetentionTime    time.Duration `json:"nameRetentionTime"`
@@ -85,6 +87,8 @@ type ContestTemplate struct {
 	Description        string        `json:"description,omitempty"`
 	QualifyingProblems int           `json:"qualifyingProblems"`
 	Finalists          int           `json:"finalists"`
+	UsePoints          bool          `json:"usePoints"`
+	PooledPoints       bool          `json:"pooledPoints"`
 	Info               string        `json:"info,omitempty"`
 	GracePeriod        time.Duration `json:"gracePeriod"`
 	NameRetentionTime  time.Duration `json:"nameRetentionTime"`
@@ -98,6 +102,8 @@ type ContestPatch struct {
 	Description        Patch[string]        `json:"description,omitzero" tstype:"string"`
 	QualifyingProblems Patch[int]           `json:"qualifyingProblems,omitzero" tstype:"number"`
 	Finalists          Patch[int]           `json:"finalists,omitzero" tstype:"number"`
+	UsePoints          Patch[bool]          `json:"usePoints,omitzero" tstype:"boolean"`
+	PooledPoints       Patch[bool]          `json:"pooledPoints,omitzero" tstype:"boolean"`
 	Info               Patch[string]        `json:"info,omitzero" tstype:"string"`
 	GracePeriod        Patch[time.Duration] `json:"gracePeriod,omitzero" tstype:"number"`
 }
@@ -132,6 +138,16 @@ type ProblemValue struct {
 	PointsZone2 int `json:"pointsZone2,omitempty"`
 	PointsTop   int `json:"pointsTop"`
 	FlashBonus  int `json:"flashBonus,omitempty"`
+}
+
+type PointValue struct {
+	ContenderID ContenderID `json:"contenderId"`
+	ProblemID   ProblemID   `json:"problemId"`
+	Current     int         `json:"current"`
+	Zone1       int         `json:"zone1"`
+	Zone2       int         `json:"zone2"`
+	Top         int         `json:"top"`
+	FlashBonus  int         `json:"flashBonus"`
 }
 
 type Problem struct {
@@ -191,7 +207,7 @@ type RaffleWinner struct {
 type Score struct {
 	Timestamp   time.Time   `json:"timestamp"`
 	ContenderID ContenderID `json:"contenderId"`
-	Score       int         `json:"score"`
+	Score       string      `json:"score"`
 	Placement   int         `json:"placement"`
 	Finalist    bool        `json:"finalist"`
 	RankOrder   int         `json:"rankOrder"`
@@ -302,8 +318,10 @@ type ProblemDeletedEvent struct {
 }
 
 type RulesUpdatedEvent struct {
-	QualifyingProblems int `json:"qualifyingProblems"`
-	Finalists          int `json:"finalists"`
+	QualifyingProblems int  `json:"qualifyingProblems"`
+	Finalists          int  `json:"finalists"`
+	UsePoints          bool `json:"usePoints"`
+	PooledPoints       bool `json:"pooledPoints"`
 }
 
 type ContenderPublicInfoUpdatedEvent struct {
@@ -318,10 +336,20 @@ type ContenderPublicInfoUpdatedEvent struct {
 type ContenderScoreUpdatedEvent struct {
 	Timestamp   time.Time   `json:"timestamp"`
 	ContenderID ContenderID `json:"contenderId"`
-	Score       int         `json:"score"`
+	Score       string      `json:"score"`
 	Placement   int         `json:"placement"`
 	Finalist    bool        `json:"finalist"`
 	RankOrder   int         `json:"rankOrder"`
+}
+
+type PointValueUpdatedEvent struct {
+	ContenderID ContenderID `json:"contenderId"`
+	ProblemID   ProblemID   `json:"problemId"`
+	Current     int         `json:"current"`
+	Zone1       int         `json:"zone1"`
+	Zone2       int         `json:"zone2"`
+	Top         int         `json:"top"`
+	FlashBonus  int         `json:"flashBonus"`
 }
 
 type ScoreEngineStartedEvent struct {

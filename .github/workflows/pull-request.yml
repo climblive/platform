@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [build-backend]
     container:
-      image: mcr.microsoft.com/playwright:v1.59.1-noble
+      image: mcr.microsoft.com/playwright:v1.61.0-noble
       options: --ipc=host --add-host=host.docker.internal:host-gateway
     permissions:
       contents: read
@@ -131,7 +131,7 @@ jobs:
 
       - uses: sqlc-dev/setup-sqlc@v3
         with:
-          sqlc-version: "1.30.0"
+          sqlc-version: "1.31.1"
 
       - run: sqlc diff
         working-directory: backend

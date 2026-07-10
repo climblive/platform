@@ -11,6 +11,7 @@ import (
 type contenderUseCase interface {
 	GetContender(ctx context.Context, contenderID domain.ContenderID) (domain.Contender, error)
 	GetContenderByCode(ctx context.Context, registrationCode string) (domain.Contender, error)
+	GetPointValues(ctx context.Context, contenderID domain.ContenderID) ([]domain.PointValue, error)
 	GetContendersByCompClass(ctx context.Context, compClassID domain.CompClassID) ([]domain.Contender, error)
 	GetContendersByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Contender, error)
 	PatchContender(ctx context.Context, contenderID domain.ContenderID, patch domain.ContenderPatch) (domain.Contender, error)
@@ -29,6 +30,7 @@ func InstallContenderHandler(mux *Mux, contenderUseCase contenderUseCase) {
 	}
 
 	mux.HandleFunc("GET /contenders/{contenderID}", handler.GetContender)
+	mux.HandleFunc("GET /contenders/{contenderID}/points", handler.GetPointValues)
 	mux.HandleFunc("GET /codes/{registrationCode}/contender", handler.GetContenderByCode)
 	mux.HandleFunc("GET /compClasses/{compClassID}/contenders", handler.GetContendersByCompClass)
 	mux.HandleFunc("GET /contests/{contestID}/contenders", handler.GetContendersByContest)
@@ -36,6 +38,22 @@ func InstallContenderHandler(mux *Mux, contenderUseCase contenderUseCase) {
 	mux.HandleFunc("POST /contenders/{contenderID}/scrub", handler.ScrubContender)
 	mux.HandleFunc("DELETE /contenders/{contenderID}", handler.DeleteContender)
 	mux.HandleFunc("POST /contests/{contestID}/contenders", handler.CreateContenders)
+}
+
+func (hdlr *contenderHandler) GetPointValues(w http.ResponseWriter, r *http.Request) {
+	contenderID, err := parseResourceID[domain.ContenderID](r.PathValue("contenderID"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	pointValues, err := hdlr.contenderUseCase.GetPointValues(r.Context(), contenderID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusOK, pointValues)
 }
 
 func (hdlr *contenderHandler) GetContender(w http.ResponseWriter, r *http.Request) {

@@ -150,13 +150,14 @@ func main() {
 		panic(err)
 	}
 
+	scoreEngineMaxLifetime := getScoreEngineMaxLifetime()
+	slog.Info("score engine maximum lifetime cap enabled", "max_lifetime", scoreEngineMaxLifetime)
+
 	authorizer := authorizer.NewAuthorizer(database, jwtDecoder)
 	eventBroker := events.NewBroker()
 	scoreKeeper := scores.NewScoreKeeper(eventBroker, database)
+	pointValueKeeper := scores.NewPointValueKeeper(eventBroker, scoreEngineMaxLifetime+time.Hour)
 	scoreEngineStoreHydrator := &scores.StandardEngineStoreHydrator{Repo: database}
-
-	scoreEngineMaxLifetime := getScoreEngineMaxLifetime()
-	slog.Info("score engine maximum lifetime cap enabled", "max_lifetime", scoreEngineMaxLifetime)
 
 	scoreEngineManager := scores.NewScoreEngineManager(database, scoreEngineStoreHydrator, eventBroker, scoreEngineMaxLifetime)
 
@@ -165,6 +166,7 @@ func main() {
 		Authorizer:                authorizer,
 		EventBroker:               eventBroker,
 		ScoreKeeper:               scoreKeeper,
+		PointValueKeeper:          pointValueKeeper,
 		RegistrationCodeGenerator: &registrationCodeGenerator{}}
 
 	scrubInterval := time.Hour
@@ -173,9 +175,10 @@ func main() {
 	barriers = append(barriers,
 		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
 		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()),
-		scrubberRunner.Run(ctx, scrubber.WithPanicRecovery()))
+		scrubberRunner.Run(ctx, scrubber.WithPanicRecovery()),
+		pointValueKeeper.Run(ctx, scores.WithPanicRecovery()))
 
-	apiMux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager, scrubberRunner)
+	apiMux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager, scrubberRunner, pointValueKeeper)
 
 	appMux := http.NewServeMux()
 	appMux.Handle("/api/", accessLog(http.StripPrefix("/api", noCacheHandler(apiMux))))
@@ -272,12 +275,14 @@ func setupMux(
 	scoreKeeper *scores.Keeper,
 	scoreEngineManager *scores.ScoreEngineManager,
 	scrubber *scrubber.Scrubber,
+	pointValueKeeper *scores.PointValueKeeper,
 ) *rest.Mux {
 	contenderUseCase := usecases.ContenderUseCase{
 		Repo:                      repo,
 		Authorizer:                authorizer,
 		EventBroker:               eventBroker,
 		ScoreKeeper:               scoreKeeper,
+		PointValueKeeper:          pointValueKeeper,
 		RegistrationCodeGenerator: &registrationCodeGenerator{},
 	}
 
@@ -333,6 +338,7 @@ func setupMux(
 		ScoreEngineManager: scoreEngineManager,
 		ScoreKeeper:        scoreKeeper,
 		Scrubber:           scrubber,
+		PointValueKeeper:   pointValueKeeper,
 	}
 
 	mux := rest.NewMux()

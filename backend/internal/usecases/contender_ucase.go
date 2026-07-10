@@ -24,11 +24,16 @@ type contenderUseCaseRepository interface {
 	GetScrubEligibleContenders(ctx context.Context, deadline time.Time) ([]domain.Contender, error)
 }
 
+type pointValueKeeper interface {
+	GetPointValues(contenderID domain.ContenderID) []domain.PointValue
+}
+
 type ContenderUseCase struct {
 	Repo                      contenderUseCaseRepository
 	Authorizer                domain.Authorizer
 	EventBroker               domain.EventBroker
 	ScoreKeeper               domain.ScoreKeeper
+	PointValueKeeper          pointValueKeeper
 	RegistrationCodeGenerator domain.CodeGenerator
 }
 
@@ -52,6 +57,19 @@ func (uc *ContenderUseCase) GetContenderByCode(ctx context.Context, registration
 	}
 
 	return withScore(contender, uc.ScoreKeeper), nil
+}
+
+func (uc *ContenderUseCase) GetPointValues(ctx context.Context, contenderID domain.ContenderID) ([]domain.PointValue, error) {
+	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
+	if err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	if _, err := uc.Authorizer.HasOwnership(ctx, contender.Ownership); err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	return uc.PointValueKeeper.GetPointValues(contenderID), nil
 }
 
 func (uc *ContenderUseCase) GetContendersByCompClass(ctx context.Context, compClassID domain.CompClassID) ([]domain.Contender, error) {

@@ -39,6 +39,7 @@ func TestEventsHandler(t *testing.T) {
 			"ASCENT_REGISTERED",
 			"ASCENT_DEREGISTERED",
 			"RAFFLE_WINNER_DRAWN",
+			"POINT_VALUE_UPDATED",
 		))
 
 		mux := rest.NewMux()
@@ -76,6 +77,7 @@ func TestEventsHandler(t *testing.T) {
 			"ASCENT_REGISTERED",
 			"ASCENT_DEREGISTERED",
 			"RAFFLE_WINNER_DRAWN",
+			"POINT_VALUE_UPDATED",
 		))
 
 		mux := rest.NewMux()
@@ -117,13 +119,14 @@ func TestEventsHandler(t *testing.T) {
 			"ASCENT_REGISTERED",
 			"ASCENT_DEREGISTERED",
 			"RAFFLE_WINNER_DRAWN",
+			"POINT_VALUE_UPDATED",
 		))
 
 		err := subscription.Post(domain.EventEnvelope{
 			Data: domain.ContenderScoreUpdatedEvent{
 				Timestamp:   time.Date(2024, 12, 01, 00, 00, 00, 0, time.UTC),
 				ContenderID: domain.ContenderID(1),
-				Score:       100,
+				Score:       "100p",
 				Placement:   10,
 				Finalist:    true,
 				RankOrder:   9,
@@ -156,7 +159,7 @@ func TestEventsHandler(t *testing.T) {
 			"retry: 5000",
 			"",
 			"event: CONTENDER_SCORE_UPDATED",
-			`data: {"timestamp":"2024-12-01T00:00:00Z","contenderId":1,"score":100,"placement":10,"finalist":true,"rankOrder":9}`,
+			`data: {"timestamp":"2024-12-01T00:00:00Z","contenderId":1,"score":"100p","placement":10,"finalist":true,"rankOrder":9}`,
 		}, lines)
 
 		_ = resp.Body.Close()
@@ -175,6 +178,7 @@ func TestEventsHandler(t *testing.T) {
 			"ASCENT_REGISTERED",
 			"ASCENT_DEREGISTERED",
 			"RAFFLE_WINNER_DRAWN",
+			"POINT_VALUE_UPDATED",
 		))
 
 		err := subscription.Post(domain.EventEnvelope{

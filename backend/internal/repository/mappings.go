@@ -32,7 +32,7 @@ func contenderToDomain(record database.GetContenderRow) domain.Contender {
 		score := domain.Score{
 			Timestamp:   record.Timestamp.Time,
 			ContenderID: domain.ContenderID(record.ContenderID.Int32),
-			Score:       int(record.Score.Int32),
+			Score:       record.Score.String,
 			Placement:   int(record.Placement.Int32),
 			Finalist:    record.Finalist.Bool,
 			RankOrder:   int(record.RankOrder.Int32),
@@ -77,6 +77,8 @@ func contestToDomain(record database.Contest) domain.Contest {
 		Description:          record.Description.String,
 		QualifyingProblems:   int(record.QualifyingProblems),
 		Finalists:            int(record.Finalists),
+		UsePoints:            record.UsePoints,
+		PooledPoints:         record.PooledPoints,
 		Info:                 record.Info.String,
 		GracePeriod:          time.Duration(record.GracePeriod) * time.Minute,
 		NameRetentionTime:    time.Duration(record.NameRetentionTime) * time.Minute,

@@ -1,15 +1,12 @@
 <script lang="ts">
   interface Props {
-    value: number;
+    value: string;
     prefix?: string;
-    hideZero?: boolean;
   }
 
-  let { value, prefix = "", hideZero = false }: Props = $props();
+  let { value, prefix = "" }: Props = $props();
 </script>
 
 <div class="counter" aria-live="polite">
-  {#if !(hideZero && value === 0)}
-    {prefix}{value}<span class="suffix">p</span>
-  {/if}
+  {prefix}{value}<span class="suffix"></span>
 </div>

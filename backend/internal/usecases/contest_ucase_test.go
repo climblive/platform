@@ -67,7 +67,7 @@ func TestGetScoreboard(t *testing.T) {
 			ScrubbedAt:          currentTime,
 			Score: &domain.Score{
 				ContenderID: contenderID,
-				Score:       i * 10,
+				Score:       fmt.Sprintf("%dp", i*10),
 				Placement:   i,
 				Finalist:    true,
 				RankOrder:   i - 1,
@@ -87,7 +87,7 @@ func TestGetScoreboard(t *testing.T) {
 	mockedScoreKeeper.On("GetScore", domain.ContenderID(1)).Return(domain.Score{
 		Timestamp:   future,
 		ContenderID: domain.ContenderID(1),
-		Score:       1234,
+		Score:       "1234p",
 		Placement:   42,
 		Finalist:    false,
 		RankOrder:   1337,
@@ -114,7 +114,7 @@ func TestGetScoreboard(t *testing.T) {
 	assert.Equal(t, currentTime, scoreboard[0].ScrubbedAt)
 	assert.NotNil(t, scoreboard[0].Score)
 	assert.Equal(t, future, scoreboard[0].Score.Timestamp)
-	assert.Equal(t, 1234, scoreboard[0].Score.Score)
+	assert.Equal(t, "1234p", scoreboard[0].Score.Score)
 	assert.Equal(t, 42, scoreboard[0].Score.Placement)
 	assert.False(t, scoreboard[0].Score.Finalist)
 	assert.Equal(t, 1337, scoreboard[0].Score.RankOrder)
@@ -130,7 +130,7 @@ func TestGetScoreboard(t *testing.T) {
 		assert.Equal(t, currentTime, entry.ScrubbedAt)
 		assert.NotNil(t, entry.Score)
 		assert.Equal(t, currentTime, entry.Score.Timestamp)
-		assert.Equal(t, i*10, entry.Score.Score)
+		assert.Equal(t, fmt.Sprintf("%dp", i*10), entry.Score.Score)
 		assert.Equal(t, i, entry.Score.Placement)
 		assert.Equal(t, i-1, entry.Score.RankOrder)
 		assert.True(t, entry.Score.Finalist)
@@ -367,6 +367,8 @@ func TestCreateContest(t *testing.T) {
 						Description:        "Who is the best climber in Sweden?",
 						QualifyingProblems: 10,
 						Finalists:          7,
+						UsePoints:          true,
+						PooledPoints:       true,
 						Info:               "No rules!",
 						GracePeriod:        time.Hour,
 						Created:            time.Now(),
@@ -383,6 +385,8 @@ func TestCreateContest(t *testing.T) {
 					Description:        "Who is the best climber in Sweden?",
 					QualifyingProblems: 10,
 					Finalists:          7,
+					UsePoints:          true,
+					PooledPoints:       true,
 					Info:               "No rules!",
 					GracePeriod:        time.Hour,
 					Created:            time.Now(),
@@ -401,6 +405,8 @@ func TestCreateContest(t *testing.T) {
 				Description:        "Who is the best climber in Sweden?",
 				QualifyingProblems: 10,
 				Finalists:          7,
+				UsePoints:          true,
+				PooledPoints:       true,
 				Info:               "No rules!",
 				GracePeriod:        time.Hour,
 				NameRetentionTime:  14 * 24 * time.Hour,
@@ -416,6 +422,8 @@ func TestCreateContest(t *testing.T) {
 			assert.Equal(t, "Who is the best climber in Sweden?", contest.Description)
 			assert.Equal(t, 10, contest.QualifyingProblems)
 			assert.Equal(t, 7, contest.Finalists)
+			assert.True(t, contest.UsePoints)
+			assert.True(t, contest.PooledPoints)
 			assert.Equal(t, "No rules!", contest.Info)
 			assert.Equal(t, time.Hour, contest.GracePeriod)
 			assert.Empty(t, contest.TimeBegin)
@@ -653,6 +661,8 @@ func TestDuplicateContest(t *testing.T) {
 		Description:        "Who is the best climber in Sweden?",
 		QualifyingProblems: 10,
 		Finalists:          7,
+		UsePoints:          true,
+		PooledPoints:       true,
 		Info:               "No rules!",
 		GracePeriod:        time.Hour,
 		TimeBegin:          timeBegin,
@@ -772,6 +782,8 @@ func TestDuplicateContest(t *testing.T) {
 		assert.Equal(t, "Who is the best climber in Sweden?", duplicatedContest.Description)
 		assert.Equal(t, 10, duplicatedContest.QualifyingProblems)
 		assert.Equal(t, 7, duplicatedContest.Finalists)
+		assert.True(t, duplicatedContest.UsePoints)
+		assert.True(t, duplicatedContest.PooledPoints)
 		assert.Equal(t, "No rules!", duplicatedContest.Info)
 		assert.Equal(t, time.Hour, duplicatedContest.GracePeriod)
 		assert.Equal(t, timeBegin, duplicatedContest.TimeBegin)
@@ -863,6 +875,8 @@ func TestTransferContest(t *testing.T) {
 		Description:        "National bouldering championship",
 		QualifyingProblems: 8,
 		Finalists:          6,
+		UsePoints:          true,
+		PooledPoints:       true,
 		Info:               "Standard IFSC rules apply",
 		GracePeriod:        30 * time.Minute,
 		TimeBegin:          timeBegin,
@@ -901,7 +915,7 @@ func TestTransferContest(t *testing.T) {
 	fakedScore := domain.Score{
 		Timestamp:   now.Add(time.Duration(rand.Int())),
 		ContenderID: fakedContenderID,
-		Score:       10,
+		Score:       "10p",
 		Placement:   3,
 		Finalist:    true,
 		RankOrder:   2,
@@ -1013,6 +1027,8 @@ func TestTransferContest(t *testing.T) {
 				Description:        "National bouldering championship",
 				QualifyingProblems: 8,
 				Finalists:          6,
+				UsePoints:          true,
+				PooledPoints:       true,
 				Info:               "Standard IFSC rules apply",
 				GracePeriod:        30 * time.Minute,
 				TimeBegin:          fakedContest.TimeBegin,
@@ -1250,6 +1266,8 @@ func TestPatchContest(t *testing.T) {
 					Description:        "Who is the best climber in Sweden?",
 					QualifyingProblems: 20,
 					Finalists:          5,
+					UsePoints:          true,
+					PooledPoints:       true,
 					Info:               "No rules!",
 					GracePeriod:        time.Hour,
 					NameRetentionTime:  14 * 24 * time.Hour,
@@ -1265,6 +1283,8 @@ func TestPatchContest(t *testing.T) {
 				Description:        "Who is the best climber in Sweden?",
 				QualifyingProblems: 20,
 				Finalists:          5,
+				UsePoints:          true,
+				PooledPoints:       true,
 				Info:               "No rules!",
 				GracePeriod:        time.Hour,
 				NameRetentionTime:  14 * 24 * time.Hour,
@@ -1274,6 +1294,8 @@ func TestPatchContest(t *testing.T) {
 			On("Dispatch", fakedContestID, domain.RulesUpdatedEvent{
 				QualifyingProblems: 20,
 				Finalists:          5,
+				UsePoints:          true,
+				PooledPoints:       true,
 			}).
 			Return(nil)
 
@@ -1291,6 +1313,8 @@ func TestPatchContest(t *testing.T) {
 			Description:        domain.NewPatch("Who is the best climber in Sweden?"),
 			QualifyingProblems: domain.NewPatch(20),
 			Finalists:          domain.NewPatch(5),
+			UsePoints:          domain.NewPatch(true),
+			PooledPoints:       domain.NewPatch(true),
 			Info:               domain.NewPatch("No rules!"),
 			GracePeriod:        domain.NewPatch(time.Hour),
 		}
@@ -1305,6 +1329,8 @@ func TestPatchContest(t *testing.T) {
 		assert.Equal(t, "Who is the best climber in Sweden?", contest.Description)
 		assert.Equal(t, 20, contest.QualifyingProblems)
 		assert.Equal(t, 5, contest.Finalists)
+		assert.True(t, contest.UsePoints)
+		assert.True(t, contest.PooledPoints)
 		assert.Equal(t, "No rules!", contest.Info)
 		assert.Equal(t, time.Hour, contest.GracePeriod)
 		assert.Equal(t, 14*24*time.Hour, contest.NameRetentionTime)

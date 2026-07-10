@@ -11,7 +11,6 @@
     getProblemsQuery,
     getTicksByContenderQuery,
   } from "@climblive/lib/queries";
-  import { calculateProblemScore } from "@climblive/lib/utils";
   import { format } from "date-fns";
 
   interface Props {
@@ -73,12 +72,6 @@
       align: "left",
     },
     {
-      label: "Points",
-      mobile: true,
-      render: renderPoints,
-      width: "max-content",
-    },
-    {
       label: "Timestamp",
       mobile: false,
       render: renderTimestamp,
@@ -114,10 +107,6 @@
 {#snippet renderFlash({ tick }: TickAndProblem)}
   <wa-icon name={tick.top && tick.attemptsTop === 1 ? "bolt" : "minus"}
   ></wa-icon>
-{/snippet}
-
-{#snippet renderPoints({ tick, problem }: TickAndProblem)}
-  {calculateProblemScore(problem, tick)} pts
 {/snippet}
 
 {#snippet renderTimestamp({ tick }: TickAndProblem)}

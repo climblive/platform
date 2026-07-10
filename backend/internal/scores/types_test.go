@@ -3,110 +3,10 @@ package scores_test
 import (
 	"testing"
 
+	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/stretchr/testify/assert"
 )
-
-func TestScoreTick(t *testing.T) {
-	problem := scores.Problem{
-		PointsTop:   100,
-		PointsZone1: 50,
-		PointsZone2: 75,
-		FlashBonus:  10,
-	}
-
-	t.Run("NoAttempts", func(t *testing.T) {
-		previousPoints := 1_000
-
-		tick := scores.Tick{
-			Top:           false,
-			AttemptsTop:   0,
-			Zone1:         false,
-			AttemptsZone1: 0,
-			Zone2:         false,
-			AttemptsZone2: 0,
-			Points:        previousPoints,
-		}
-
-		tick.Score(problem)
-
-		assert.Equal(t, 0, tick.Points)
-	})
-
-	t.Run("SingleAttemptNoLuck", func(t *testing.T) {
-		tick := scores.Tick{
-			Top:           false,
-			AttemptsTop:   1,
-			Zone1:         false,
-			AttemptsZone1: 1,
-			Zone2:         false,
-			AttemptsZone2: 1,
-		}
-
-		tick.Score(problem)
-
-		assert.Equal(t, 0, tick.Points)
-	})
-
-	t.Run("Flash", func(t *testing.T) {
-		tick := scores.Tick{
-			Top:           true,
-			AttemptsTop:   1,
-			Zone1:         true,
-			AttemptsZone1: 1,
-			Zone2:         true,
-			AttemptsZone2: 1,
-		}
-
-		tick.Score(problem)
-
-		assert.Equal(t, 110, tick.Points)
-	})
-
-	t.Run("TopWithSeveralAttempts", func(t *testing.T) {
-		tick := scores.Tick{
-			Top:           true,
-			AttemptsTop:   999,
-			Zone1:         true,
-			AttemptsZone1: 999,
-			Zone2:         true,
-			AttemptsZone2: 999,
-		}
-
-		tick.Score(problem)
-
-		assert.Equal(t, 100, tick.Points)
-	})
-
-	t.Run("Zone1WithSeveralAttempts", func(t *testing.T) {
-		tick := scores.Tick{
-			Top:           false,
-			AttemptsTop:   999,
-			Zone1:         true,
-			AttemptsZone1: 999,
-			Zone2:         false,
-			AttemptsZone2: 999,
-		}
-
-		tick.Score(problem)
-
-		assert.Equal(t, 50, tick.Points)
-	})
-	t.Run("Zone2WithSeveralAttempts", func(t *testing.T) {
-		tick := scores.Tick{
-			Top:           false,
-			AttemptsTop:   999,
-			Zone1:         true,
-			AttemptsZone1: 999,
-			Zone2:         true,
-			AttemptsZone2: 999,
-		}
-
-		tick.Score(problem)
-
-		assert.Equal(t, 75, tick.Points)
-	})
-}
 
 func TestCompareContender(t *testing.T) {
 	t.Run("ByScore", func(t *testing.T) {
@@ -135,5 +35,266 @@ func TestCompareContender(t *testing.T) {
 
 		assert.Less(t, c1.Compare(c2), 0)
 		assert.Greater(t, c2.Compare(c1), 0)
+	})
+}
+
+func TestTickPool_Add(t *testing.T) {
+	t.Run("AddZone1", func(t *testing.T) {
+		pool := scores.TickPool{}
+
+		for range 5 {
+			pool = pool.Add(scores.Tick{
+				Zone1:         true,
+				AttemptsZone1: 1,
+			})
+		}
+
+		assert.Equal(t, scores.TickPool{
+			Zone1: 5,
+		}, pool)
+	})
+
+	t.Run("AddZone2", func(t *testing.T) {
+		pool := scores.TickPool{}
+
+		for range 5 {
+			pool = pool.Add(scores.Tick{
+				Zone1:         true,
+				AttemptsZone1: 1,
+				Zone2:         true,
+				AttemptsZone2: 1,
+			})
+		}
+
+		assert.Equal(t, scores.TickPool{
+			Zone1: 5,
+			Zone2: 5,
+		}, pool)
+	})
+
+	t.Run("AddTopWithoutFlash", func(t *testing.T) {
+		pool := scores.TickPool{}
+
+		for range 5 {
+			pool = pool.Add(scores.Tick{
+				Zone1:         true,
+				AttemptsZone1: 999,
+				Zone2:         true,
+				AttemptsZone2: 999,
+				Top:           true,
+				AttemptsTop:   999,
+			})
+		}
+
+		assert.Equal(t, scores.TickPool{
+			Zone1: 5,
+			Zone2: 5,
+			Top:   5,
+		}, pool)
+	})
+
+	t.Run("AddTopWithFlash", func(t *testing.T) {
+		pool := scores.TickPool{}
+
+		for range 5 {
+			pool = pool.Add(scores.Tick{
+				Zone1:         true,
+				AttemptsZone1: 1,
+				Zone2:         true,
+				AttemptsZone2: 1,
+				Top:           true,
+				AttemptsTop:   1,
+			})
+		}
+
+		assert.Equal(t, scores.TickPool{
+			Zone1: 5,
+			Zone2: 5,
+			Top:   5,
+			Flash: 5,
+		}, pool)
+	})
+}
+
+func TestTickPool_Sub(t *testing.T) {
+	t.Run("SubZone1", func(t *testing.T) {
+		pool := scores.TickPool{
+			Zone1: 5,
+			Zone2: 5,
+			Top:   5,
+			Flash: 5,
+		}
+
+		for range 3 {
+			pool = pool.Sub(scores.Tick{
+				Zone1:         true,
+				AttemptsZone1: 1,
+			})
+		}
+
+		assert.Equal(t, scores.TickPool{
+			Zone1: 2,
+			Zone2: 5,
+			Top:   5,
+			Flash: 5,
+		}, pool)
+	})
+
+	t.Run("SubZone2", func(t *testing.T) {
+		pool := scores.TickPool{
+			Zone1: 5,
+			Zone2: 5,
+			Top:   5,
+			Flash: 5,
+		}
+
+		for range 3 {
+			pool = pool.Sub(scores.Tick{
+				Zone1:         true,
+				AttemptsZone1: 1,
+				Zone2:         true,
+				AttemptsZone2: 1,
+			})
+		}
+
+		assert.Equal(t, scores.TickPool{
+			Zone1: 2,
+			Zone2: 2,
+			Top:   5,
+			Flash: 5,
+		}, pool)
+	})
+
+	t.Run("SubTopWithoutFlash", func(t *testing.T) {
+		pool := scores.TickPool{
+			Zone1: 5,
+			Zone2: 5,
+			Top:   5,
+			Flash: 5,
+		}
+
+		for range 3 {
+			pool = pool.Sub(scores.Tick{
+				Zone1:         true,
+				AttemptsZone1: 999,
+				Zone2:         true,
+				AttemptsZone2: 999,
+				Top:           true,
+				AttemptsTop:   999,
+			})
+		}
+
+		assert.Equal(t, scores.TickPool{
+			Zone1: 2,
+			Zone2: 2,
+			Top:   2,
+			Flash: 5,
+		}, pool)
+	})
+
+	t.Run("SubTopWithFlash", func(t *testing.T) {
+		pool := scores.TickPool{
+			Zone1: 5,
+			Zone2: 5,
+			Top:   5,
+			Flash: 5,
+		}
+
+		for range 3 {
+			pool = pool.Sub(scores.Tick{
+				Zone1:         true,
+				AttemptsZone1: 1,
+				Zone2:         true,
+				AttemptsZone2: 1,
+				Top:           true,
+				AttemptsTop:   1,
+			})
+		}
+
+		assert.Equal(t, scores.TickPool{
+			Zone1: 2,
+			Zone2: 2,
+			Top:   2,
+			Flash: 2,
+		}, pool)
+	})
+}
+
+func TestCalculatePooledProblemValue(t *testing.T) {
+	t.Run("Weighted", func(t *testing.T) {
+		pool := scores.TickPool{
+			Zone1: 1000,
+			Zone2: 100,
+			Top:   10,
+			Flash: 1,
+		}
+
+		value := pool.CalculatePooledProblemValue(domain.ProblemValue{
+			PointsZone1: 10_000,
+			PointsZone2: 20_000,
+			PointsTop:   100_000,
+			FlashBonus:  5_000,
+		})
+
+		assert.Equal(t, domain.ProblemValue{
+			PointsZone1: 10,
+			PointsZone2: 200,
+			PointsTop:   10_000,
+			FlashBonus:  5_000,
+		}, value)
+	})
+
+	t.Run("EmptyPool", func(t *testing.T) {
+		pool := scores.TickPool{}
+
+		value := pool.CalculatePooledProblemValue(domain.ProblemValue{
+			PointsZone1: 100,
+			PointsZone2: 200,
+			PointsTop:   1000,
+			FlashBonus:  50,
+		})
+
+		assert.Equal(t, domain.ProblemValue{
+			PointsZone1: 100,
+			PointsZone2: 200,
+			PointsTop:   1000,
+			FlashBonus:  50,
+		}, value)
+	})
+
+	t.Run("ZeroValueProblem", func(t *testing.T) {
+		pool := scores.TickPool{
+			Zone1: 10,
+			Zone2: 10,
+			Top:   10,
+			Flash: 10,
+		}
+
+		value := pool.CalculatePooledProblemValue(domain.ProblemValue{})
+
+		assert.Empty(t, value)
+	})
+
+	t.Run("MinOnePoint", func(t *testing.T) {
+		pool := scores.TickPool{
+			Zone1: 1000,
+			Zone2: 1000,
+			Top:   1000,
+			Flash: 1000,
+		}
+
+		value := pool.CalculatePooledProblemValue(domain.ProblemValue{
+			PointsZone1: 5,
+			PointsZone2: 5,
+			PointsTop:   5,
+			FlashBonus:  5,
+		})
+
+		assert.Equal(t, domain.ProblemValue{
+			PointsZone1: 1,
+			PointsZone2: 1,
+			PointsTop:   1,
+			FlashBonus:  1,
+		}, value)
 	})
 }

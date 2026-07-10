@@ -19,6 +19,7 @@ func (c Contender) Compare(other Contender) int {
 }
 
 type Tick struct {
+	ContenderID   domain.ContenderID
 	ProblemID     domain.ProblemID
 	Zone1         bool
 	AttemptsZone1 int
@@ -26,33 +27,148 @@ type Tick struct {
 	AttemptsZone2 int
 	Top           bool
 	AttemptsTop   int
-	Points        int
 }
 
-func (t *Tick) Score(problem Problem) {
-	t.Points = 0
-
-	if t.Zone1 {
-		t.Points = problem.PointsZone1
+func (t Tick) TurnIntoZone1() Tick {
+	if !t.Zone1 {
+		t.AttemptsZone1 += 1
+		t.AttemptsZone2 += 1
+		t.AttemptsTop += 1
 	}
 
-	if t.Zone2 {
-		t.Points = problem.PointsZone2
+	t.Zone1 = true
+	t.Zone2 = false
+	t.Top = false
+
+	return t
+}
+
+func (t Tick) TurnIntoZone2() Tick {
+	if !t.Zone1 {
+		t.AttemptsZone1 += 1
 	}
 
-	if t.Top {
-		t.Points = problem.PointsTop
+	if !t.Zone1 || !t.Zone2 {
+		t.AttemptsZone2 += 1
+		t.AttemptsTop += 1
 	}
 
-	if t.Top && t.AttemptsTop == 1 {
-		t.Points += problem.FlashBonus
+	t.Zone1 = true
+	t.Zone2 = true
+	t.Top = false
+
+	return t
+}
+
+func (t Tick) TurnIntoRedpoint() Tick {
+	if !t.Zone1 {
+		t.AttemptsZone1 += 1
 	}
+
+	if !t.Zone1 || !t.Zone2 {
+		t.AttemptsZone2 += 1
+	}
+
+	if !t.Zone1 || !t.Zone2 || !t.Top {
+		t.AttemptsTop += 1
+	}
+
+	if t.AttemptsTop == 1 {
+		t.AttemptsZone1 += 1
+		t.AttemptsZone2 += 1
+		t.AttemptsTop += 1
+	}
+
+	t.Zone1 = true
+	t.Zone2 = true
+	t.Top = true
+
+	return t
+}
+
+func (t Tick) TurnIntoFlash() Tick {
+	t.Zone1 = true
+	t.AttemptsZone1 = 1
+
+	t.Zone2 = true
+	t.AttemptsZone2 = 1
+
+	t.Top = true
+	t.AttemptsTop = 1
+
+	return t
 }
 
 type Problem struct {
-	ID          domain.ProblemID
-	PointsZone1 int
-	PointsZone2 int
-	PointsTop   int
-	FlashBonus  int
+	ID domain.ProblemID
+
+	domain.ProblemValue
+}
+
+type TickPool struct {
+	Zone1 int
+	Zone2 int
+	Top   int
+	Flash int
+}
+
+func (c TickPool) Add(tick Tick) TickPool {
+	if tick.Zone1 {
+		c.Zone1++
+	}
+
+	if tick.Zone2 {
+		c.Zone2++
+	}
+
+	if tick.Top {
+		c.Top++
+
+		if tick.AttemptsTop == 1 {
+			c.Flash++
+		}
+	}
+
+	return c
+}
+
+func (c TickPool) Sub(tick Tick) TickPool {
+	if tick.Zone1 {
+		c.Zone1--
+	}
+
+	if tick.Zone2 {
+		c.Zone2--
+	}
+
+	if tick.Top {
+		c.Top--
+
+		if tick.AttemptsTop == 1 {
+			c.Flash--
+		}
+	}
+
+	return c
+}
+
+func (c TickPool) CalculatePooledProblemValue(value domain.ProblemValue) domain.ProblemValue {
+	weightedValue := func(value int, divisor int) int {
+		if divisor == 0 {
+			return value
+		}
+
+		if value == 0 {
+			return 0
+		}
+
+		return max(1, value/divisor)
+	}
+
+	return domain.ProblemValue{
+		PointsZone1: weightedValue(value.PointsZone1, c.Zone1),
+		PointsZone2: weightedValue(value.PointsZone2, c.Zone2),
+		PointsTop:   weightedValue(value.PointsTop, c.Top),
+		FlashBonus:  weightedValue(value.FlashBonus, c.Flash),
+	}
 }

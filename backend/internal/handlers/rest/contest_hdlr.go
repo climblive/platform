@@ -381,7 +381,10 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 				}
 			}
 
-			var score, placement int
+			var (
+				score     string
+				placement int
+			)
 			if entry.Score != nil {
 				score = entry.Score.Score
 				placement = entry.Score.Placement
