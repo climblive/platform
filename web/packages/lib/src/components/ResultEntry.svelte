@@ -1,6 +1,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import type { ScoreboardEntry } from "../models";
+  import { NO_SCORE } from "../models/score";
   import { ordinalSuperscript } from "../utils";
   import ContenderName from "./ContenderName.svelte";
   import Score from "./Score.svelte";
@@ -33,7 +34,7 @@
     />
   </div>
   <div class="score">
-    {#if score === undefined || score.score === "0p"}
+    {#if score === undefined || score.score === NO_SCORE}
       -
     {:else}
       <Score value={score.score} />
