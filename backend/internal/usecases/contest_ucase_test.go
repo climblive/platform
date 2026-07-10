@@ -67,7 +67,7 @@ func TestGetScoreboard(t *testing.T) {
 			ScrubbedAt:          currentTime,
 			Score: &domain.Score{
 				ContenderID: contenderID,
-				Score:       i * 10,
+				Score:       fmt.Sprintf("%dp", i*10),
 				Placement:   i,
 				Finalist:    true,
 				RankOrder:   i - 1,
@@ -87,7 +87,7 @@ func TestGetScoreboard(t *testing.T) {
 	mockedScoreKeeper.On("GetScore", domain.ContenderID(1)).Return(domain.Score{
 		Timestamp:   future,
 		ContenderID: domain.ContenderID(1),
-		Score:       1234,
+		Score:       "1234p",
 		Placement:   42,
 		Finalist:    false,
 		RankOrder:   1337,
@@ -114,7 +114,7 @@ func TestGetScoreboard(t *testing.T) {
 	assert.Equal(t, currentTime, scoreboard[0].ScrubbedAt)
 	assert.NotNil(t, scoreboard[0].Score)
 	assert.Equal(t, future, scoreboard[0].Score.Timestamp)
-	assert.Equal(t, 1234, scoreboard[0].Score.Score)
+	assert.Equal(t, "1234p", scoreboard[0].Score.Score)
 	assert.Equal(t, 42, scoreboard[0].Score.Placement)
 	assert.False(t, scoreboard[0].Score.Finalist)
 	assert.Equal(t, 1337, scoreboard[0].Score.RankOrder)
@@ -130,7 +130,7 @@ func TestGetScoreboard(t *testing.T) {
 		assert.Equal(t, currentTime, entry.ScrubbedAt)
 		assert.NotNil(t, entry.Score)
 		assert.Equal(t, currentTime, entry.Score.Timestamp)
-		assert.Equal(t, i*10, entry.Score.Score)
+		assert.Equal(t, fmt.Sprintf("%dp", i*10), entry.Score.Score)
 		assert.Equal(t, i, entry.Score.Placement)
 		assert.Equal(t, i-1, entry.Score.RankOrder)
 		assert.True(t, entry.Score.Finalist)
@@ -915,7 +915,7 @@ func TestTransferContest(t *testing.T) {
 	fakedScore := domain.Score{
 		Timestamp:   now.Add(time.Duration(rand.Int())),
 		ContenderID: fakedContenderID,
-		Score:       10,
+		Score:       "10p",
 		Placement:   3,
 		Finalist:    true,
 		RankOrder:   2,

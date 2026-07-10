@@ -23,7 +23,7 @@ export const contenderScoreUpdatedEventSchema: z.ZodType<ContenderScoreUpdatedEv
   z.object({
     timestamp: z.coerce.date(),
     contenderId: z.number(),
-    score: z.number(),
+    score: z.string(),
     placement: z.number(),
     rankOrder: z.number(),
     finalist: z.boolean(),
