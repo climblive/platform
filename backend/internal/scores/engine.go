@@ -553,7 +553,7 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 }
 
 func (e *DefaultScoreEngine) RankCompClass(compClassID domain.CompClassID) {
-	ranker := NewBasicRanker(e.store.GetRules().Finalists)
+	ranker := NewBasicRanker(e.store.GetRules().Finalists, e.store.GetRules().UsePoints)
 
 	scores := ranker.RankContenders(e.store.GetContendersByCompClass(compClassID))
 

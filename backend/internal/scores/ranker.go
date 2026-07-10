@@ -11,11 +11,13 @@ import (
 
 type BasicRanker struct {
 	numberOfFinalists int
+	usePoints         bool
 }
 
-func NewBasicRanker(numberOfFinalists int) *BasicRanker {
+func NewBasicRanker(numberOfFinalists int, usePoints bool) *BasicRanker {
 	return &BasicRanker{
 		numberOfFinalists: numberOfFinalists,
+		usePoints:         usePoints,
 	}
 }
 
@@ -69,10 +71,18 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 	}
 
 	for i, contender := range sortedContenders {
+		var scoreValue string
+
+		if r.usePoints {
+			scoreValue = fmt.Sprintf("%dp", contender.Score)
+		} else {
+			scoreValue = "0T0Z₁0Z₂"
+		}
+
 		score := domain.Score{
 			Timestamp:   now,
 			ContenderID: contender.ID,
-			Score:       fmt.Sprintf("%dp", contender.Score),
+			Score:       scoreValue,
 			Placement:   0,
 			Finalist:    false,
 			RankOrder:   0,
