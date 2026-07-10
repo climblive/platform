@@ -21,8 +21,8 @@ importers:
   admin:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.9.0
-        version: 3.9.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
+        specifier: 3.10.0
+        version: 3.10.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -112,8 +112,8 @@ importers:
   packages/lib:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.9.0
-        version: 3.9.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
+        specifier: 3.10.0
+        version: 3.10.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
       '@sentry/svelte':
         specifier: ^10.62.0
         version: 10.62.0(svelte@5.56.4(@typescript-eslint/types@8.62.0))
@@ -176,8 +176,8 @@ importers:
   scoreboard:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.9.0
-        version: 3.9.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
+        specifier: 3.10.0
+        version: 3.10.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -231,8 +231,8 @@ importers:
   scorecard:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.9.0
-        version: 3.9.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
+        specifier: 3.10.0
+        version: 3.10.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -292,8 +292,8 @@ importers:
   www:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.9.0
-        version: 3.9.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
+        specifier: 3.10.0
+        version: 3.10.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
     devDependencies:
       '@climblive/lib':
         specifier: workspace:*
@@ -307,8 +307,8 @@ importers:
 
 packages:
 
-  '@awesome.me/webawesome@3.9.0':
-    resolution: {integrity: sha512-doKgUCglb/E1d/dYSzXQQthlYmyndFOtG/Vr5HyHjIFqNwn/tbutMsIMYJrYFEjq07vPwcOHKeAulbiqoslRoQ==}
+  '@awesome.me/webawesome@3.10.0':
+    resolution: {integrity: sha512-QrVKGTiz9OhtIoDic7RF6o1x5ShnJI7jgxK93uoSBh3INYlUyejKYXohXqpJ2cgjIJqfo0jMSQygd1Ty96QOMA==}
     engines: {node: '>=14.17.0'}
 
   '@babel/code-frame@7.29.7':
@@ -2755,7 +2755,7 @@ packages:
 
 snapshots:
 
-  '@awesome.me/webawesome@3.9.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)':
+  '@awesome.me/webawesome@3.10.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)':
     dependencies:
       '@ctrl/tinycolor': 4.1.0
       '@floating-ui/dom': 1.7.6
