@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { NO_SCORE } from "../models/score";
-
   interface Props {
     value: string;
     prefix?: string;
@@ -11,7 +9,7 @@
 </script>
 
 <div class="counter" aria-live="polite">
-  {#if !(hideZero && value === NO_SCORE)}
+  {#if !(hideZero && value === "0p")}
     {prefix}{value}<span class="suffix"></span>
   {/if}
 </div>
