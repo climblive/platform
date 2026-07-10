@@ -27,6 +27,17 @@
   }
 
   const { contest }: Props = $props();
+
+  const patchContest = $derived(patchContestMutation(contest.id));
+
+  const handleUsePointsChange = (usePoints: boolean) => {
+    patchContest.mutate(
+      { usePoints },
+      {
+        onError: () => toastError("Failed to update rules."),
+      },
+    );
+  };
 </script>
 
 <h3>Ranking method</h3>
@@ -36,18 +47,25 @@
     description="Contenders are ranked based on the total points scored across all problems."
   >
     {#snippet header()}
-      <wa-radio size="s" checked></wa-radio>
+      <wa-radio
+        onclick={handleUsePointsChange(true)}
+        size="s"
+        checked={contest.usePoints ? true : undefined}
+      ></wa-radio>
     {/snippet}
   </RuleOptionCard>
 
   <RuleOptionCard
     title="Attempts"
     description="Contenders are ranked based on the number of attempts needed to complete problems."
-    disabled
-    tag="Upcoming"
+    tag="New"
   >
     {#snippet header()}
-      <wa-radio size="s" disabled></wa-radio>
+      <wa-radio
+        onclick={handleUsePointsChange(false)}
+        size="s"
+        checked={!contest.usePoints ? true : undefined}
+      ></wa-radio>
     {/snippet}
   </RuleOptionCard>
 </section>
