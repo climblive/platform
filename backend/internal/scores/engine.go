@@ -512,7 +512,7 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 		return nil
 	}
 
-	oldScore := contender.Points
+	oldPoints := contender.Points
 	oldTops := contender.Tops
 	oldZone1s := contender.Zone1s
 	oldZone2s := contender.Zone2s
@@ -545,6 +545,10 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 
 		ticks = e.store.GetTicksByContender(contender.ID)
 
+		contender.Tops = 0
+		contender.Zone2s = 0
+		contender.Zone1s = 0
+
 		for tick := range ticks {
 			if tick.Top {
 				contender.Tops += 1
@@ -560,7 +564,7 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 		}
 	}
 
-	if contender.Points == oldScore && contender.Tops == oldTops && contender.Zone1s == oldZone1s && contender.Zone2s == oldZone2s {
+	if contender.Points == oldPoints && contender.Tops == oldTops && contender.Zone1s == oldZone1s && contender.Zone2s == oldZone2s {
 		return nil
 	}
 
