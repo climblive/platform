@@ -546,20 +546,26 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 		ticks = e.store.GetTicksByContender(contender.ID)
 
 		contender.Tops = 0
+		contender.AttemptsTops = 0
 		contender.Zone2s = 0
+		contender.AttemptsZone2s = 0
 		contender.Zone1s = 0
+		contender.AttemptsZone1s = 0
 
 		for tick := range ticks {
 			if tick.Top {
 				contender.Tops += 1
+				contender.AttemptsTops += tick.AttemptsTop
 			}
 
 			if tick.Zone2 {
 				contender.Zone2s += 1
+				contender.AttemptsZone2s += tick.AttemptsZone2
 			}
 
 			if tick.Zone1 {
 				contender.Zone1s += 1
+				contender.AttemptsZone1s += tick.AttemptsZone1
 			}
 		}
 	}

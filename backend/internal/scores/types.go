@@ -9,8 +9,11 @@ type Contender struct {
 	WithdrawnFromFinals bool
 	Points              int
 	Tops                int
+	AttemptsTops        int
 	Zone1s              int
+	AttemptsZone1s      int
 	Zone2s              int
+	AttemptsZone2s      int
 }
 
 func (c Contender) Compare(other Contender) int {
