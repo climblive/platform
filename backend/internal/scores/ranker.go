@@ -76,7 +76,7 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 		if r.usePoints {
 			scoreValue = fmt.Sprintf("%dp", contender.Points)
 		} else {
-			scoreValue = fmt.Sprintf("%dt %dz₂ %dz₁ %d %d %d", contender.Tops, contender.Zone2s, contender.Zone1s, contender.AttemptsTops, contender.AttemptsZone2s, contender.AttemptsZone1s)
+			scoreValue = fmt.Sprintf("%dt %dz₂ %dz₁", contender.Tops, contender.Zone2s, contender.Zone1s)
 		}
 
 		score := domain.Score{
