@@ -535,13 +535,19 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 			}
 		}
 
-		problemLimit := e.store.GetRules().QualifyingProblems
+		rules := e.store.GetRules()
+
+		problemLimit := rules.QualifyingProblems
 
 		scorer := Scorer{
 			ProblemLimit: problemLimit,
 		}
 
-		contender.Points = scorer.CalculateScore(CurrentPoints(pointValues))
+		if rules.UsePoints {
+			contender.Points = scorer.CalculateScore(CurrentPoints(pointValues))
+		} else {
+			contender.Points = 0
+		}
 
 		ticks = e.store.GetTicksByContender(contender.ID)
 
