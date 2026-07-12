@@ -17,11 +17,35 @@ type Contender struct {
 }
 
 func (c Contender) Compare(other Contender) int {
-	if c.Points == other.Points {
-		return int(c.ID) - int(other.ID)
+	if c.Points != other.Points {
+		return other.Points - c.Points
 	}
 
-	return other.Points - c.Points
+	if c.Tops != other.Tops {
+		return other.Tops - c.Tops
+	}
+
+	if c.AttemptsTops != other.AttemptsTops {
+		return other.AttemptsTops - c.AttemptsTops
+	}
+
+	if c.Zone2s != other.Zone2s {
+		return other.Zone2s - c.Zone2s
+	}
+
+	if c.AttemptsZone2s != other.AttemptsZone2s {
+		return other.AttemptsZone2s - c.AttemptsZone2s
+	}
+
+	if c.Zone1s != other.Zone1s {
+		return other.Zone1s - c.Zone1s
+	}
+
+	if c.AttemptsZone1s != other.AttemptsZone1s {
+		return other.AttemptsZone1s - c.AttemptsZone1s
+	}
+
+	return int(c.ID) - int(other.ID)
 }
 
 type Tick struct {
