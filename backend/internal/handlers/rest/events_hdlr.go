@@ -56,7 +56,7 @@ func (hdlr *eventHandler) HandleSubscribeContestEvents(w http.ResponseWriter, r 
 		"SCORE_ENGINE_STOPPED",
 	)
 
-	hdlr.subscribe(w, r, filter, logger)
+	hdlr.subscribe(w, r, []domain.EventFilter{filter}, logger)
 }
 
 func (hdlr *eventHandler) HandleSubscribeContenderEvents(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +68,9 @@ func (hdlr *eventHandler) HandleSubscribeContenderEvents(w http.ResponseWriter, 
 
 	logger := slog.Default().With("contender_id", contenderID, "remote_addr", readRemoteAddr(r))
 
-	filter := domain.NewEventFilter(
+	filters := make([]domain.EventFilter, 0, 2)
+
+	filters = append(filters, domain.NewEventFilter(
 		0,
 		contenderID,
 		"CONTENDER_PUBLIC_INFO_UPDATED",
@@ -77,15 +79,21 @@ func (hdlr *eventHandler) HandleSubscribeContenderEvents(w http.ResponseWriter, 
 		"ASCENT_DEREGISTERED",
 		"POINT_VALUE_UPDATED",
 		"RAFFLE_WINNER_DRAWN",
-	)
+	))
 
-	hdlr.subscribe(w, r, filter, logger)
+	filters = append(filters, domain.NewEventFilter(
+		0,
+		0,
+		"RULES_UPDATED",
+	))
+
+	hdlr.subscribe(w, r, filters, logger)
 }
 
 func (hdlr *eventHandler) subscribe(
 	w http.ResponseWriter,
 	r *http.Request,
-	filter domain.EventFilter,
+	filters []domain.EventFilter,
 	logger *slog.Logger,
 ) {
 	w.Header().Set("Content-Type", "text/event-stream")
@@ -94,7 +102,7 @@ func (hdlr *eventHandler) subscribe(
 	w.Header().Set("Connection", "keep-alive")
 
 	logger.Debug("starting event subscription")
-	subscriptionID, eventReader := hdlr.eventBroker.Subscribe(filter, bufferCapacity)
+	subscriptionID, eventReader := hdlr.eventBroker.Subscribe(filters, bufferCapacity)
 
 	defer hdlr.eventBroker.Unsubscribe(subscriptionID)
 

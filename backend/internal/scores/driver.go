@@ -142,7 +142,7 @@ func (d *ScoreEngineDriver) run(
 		"RULES_UPDATED",
 	)
 
-	subscriptionID, eventReader := d.eventBroker.Subscribe(filter, 0)
+	subscriptionID, eventReader := d.eventBroker.Subscribe([]domain.EventFilter{filter}, 0)
 	d.logger.Info("score engine subscribed", "subscription_id", subscriptionID)
 
 	defer d.eventBroker.Unsubscribe(subscriptionID)

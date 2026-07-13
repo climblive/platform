@@ -30,7 +30,7 @@ func TestEngineDriver(t *testing.T) {
 	makeFixture := func(bufferCapacity int) (fixture, func(t *testing.T)) {
 		mockedEventBroker := new(eventBrokerMock)
 
-		subscription := events.NewSubscription(domain.EventFilter{}, bufferCapacity)
+		subscription := events.NewSubscription([]domain.EventFilter{domain.EventFilter{}}, bufferCapacity)
 		subscriptionID := uuid.New()
 
 		filter := domain.NewEventFilter(
@@ -49,7 +49,7 @@ func TestEngineDriver(t *testing.T) {
 			"RULES_UPDATED",
 		)
 
-		mockedEventBroker.On("Subscribe", filter, 0).Return(subscriptionID, subscription)
+		mockedEventBroker.On("Subscribe", []domain.EventFilter{filter}, 0).Return(subscriptionID, subscription)
 
 		mockedEventBroker.On("Unsubscribe", subscriptionID).Return()
 
@@ -210,6 +210,7 @@ func TestEngineDriver(t *testing.T) {
 		events := []any{}
 
 		events = append(events, domain.RulesUpdatedEvent{
+			ContestID:          1,
 			QualifyingProblems: 10,
 			Finalists:          7,
 		})
@@ -273,6 +274,7 @@ func TestEngineDriver(t *testing.T) {
 		mockedEngine.On("GetDirtyPointValues").Return([]domain.PointValue{})
 
 		mockedEngine.On("HandleRulesUpdated", domain.RulesUpdatedEvent{
+			ContestID:          1,
 			QualifyingProblems: 10,
 			Finalists:          7,
 		}).Return(noEffects)

@@ -25,8 +25,10 @@
     ascentRegisteredEventSchema,
     contenderPublicInfoUpdatedEventSchema,
     contenderScoreUpdatedEventSchema,
+    NO_SCORE,
     pointValueUpdatedEventSchema,
     raffleWinnerDrawnEventSchema,
+    rulesUpdatedEventSchema,
     type PointValue,
     type Problem,
     type Tick,
@@ -42,11 +44,11 @@
     removeTickFromQueryCache,
     updateContenderPublicInfoInQueryCache,
     updatePointValueInQueryCache,
+    updateRulesInQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
-  import { NO_SCORE } from "node_modules/@climblive/lib/src/models/score";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
 
@@ -323,6 +325,12 @@
       if (event.contenderId === contender?.id && raffleWinnerDialog) {
         raffleWinnerDialog.open = true;
       }
+    });
+
+    eventSource.addEventListener("RULES_UPDATED", (e) => {
+      const event = rulesUpdatedEventSchema.parse(JSON.parse(e.data));
+
+      updateRulesInQueryCache(queryClient, event.contestId, event);
     });
   };
 

@@ -18,7 +18,7 @@ import (
 func TestPostAndReceive(t *testing.T) {
 	randomNumber := rand.Int()
 
-	subscription := events.NewSubscription(domain.EventFilter{}, 1)
+	subscription := events.NewSubscription([]domain.EventFilter{{}}, 1)
 
 	err := subscription.Post(domain.EventEnvelope{
 		Data: randomNumber,
@@ -32,7 +32,7 @@ func TestPostAndReceive(t *testing.T) {
 }
 
 func TestFIFO(t *testing.T) {
-	subscription := events.NewSubscription(domain.EventFilter{}, 3)
+	subscription := events.NewSubscription([]domain.EventFilter{{}}, 3)
 
 	for k := 1; k <= 3; k++ {
 		err := subscription.Post(domain.EventEnvelope{
@@ -54,7 +54,7 @@ func TestAwait(t *testing.T) {
 	randomNumber := rand.Int()
 	var wg sync.WaitGroup
 
-	subscription := events.NewSubscription(domain.EventFilter{}, 1)
+	subscription := events.NewSubscription([]domain.EventFilter{{}}, 1)
 
 	wg.Add(1)
 
@@ -84,7 +84,7 @@ func TestBufferFull(t *testing.T) {
 	bufferCapacity := 10
 	var wg sync.WaitGroup
 
-	subscription := events.NewSubscription(domain.EventFilter{}, bufferCapacity)
+	subscription := events.NewSubscription([]domain.EventFilter{{}}, bufferCapacity)
 
 	wg.Add(1)
 
@@ -118,7 +118,7 @@ func TestBufferFull(t *testing.T) {
 }
 
 func TestTerminate(t *testing.T) {
-	subscription := events.NewSubscription(domain.EventFilter{}, 0)
+	subscription := events.NewSubscription([]domain.EventFilter{{}}, 0)
 
 	err := subscription.Post(domain.EventEnvelope{
 		Data: "Something",
@@ -139,7 +139,7 @@ func TestTerminate(t *testing.T) {
 }
 
 func TestAwaitCancelled(t *testing.T) {
-	subscription := events.NewSubscription(domain.EventFilter{}, 1)
+	subscription := events.NewSubscription([]domain.EventFilter{{}}, 1)
 	var wg sync.WaitGroup
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -165,7 +165,7 @@ func TestAwaitCancelled(t *testing.T) {
 }
 
 func TestContextCancelledPreAwait(t *testing.T) {
-	subscription := events.NewSubscription(domain.EventFilter{}, 1)
+	subscription := events.NewSubscription([]domain.EventFilter{{}}, 1)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()
@@ -182,7 +182,7 @@ func TestEventsChan(t *testing.T) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	subscription := events.NewSubscription(domain.EventFilter{}, bufferCapacity)
+	subscription := events.NewSubscription([]domain.EventFilter{{}}, bufferCapacity)
 
 	go func() {
 		for range bufferCapacity {
@@ -215,7 +215,7 @@ func TestEventsChanBufferFull(t *testing.T) {
 
 	ctx := context.Background()
 
-	subscription := events.NewSubscription(domain.EventFilter{}, bufferCapacity)
+	subscription := events.NewSubscription([]domain.EventFilter{{}}, bufferCapacity)
 
 	err := subscription.Post(domain.EventEnvelope{Data: "Something"})
 	assert.NoError(t, err)
@@ -236,67 +236,67 @@ func TestEventsChanBufferFull(t *testing.T) {
 
 func TestMatchFilter(t *testing.T) {
 	t.Run("ContestMatchWildcard", func(t *testing.T) {
-		subscription := events.NewSubscription(domain.NewEventFilter(0, 0), 0)
+		subscription := events.NewSubscription([]domain.EventFilter{domain.NewEventFilter(0, 0)}, 0)
 
-		match := subscription.FilterMatch(testutils.RandomResourceID[domain.ContestID](), 0, "A")
+		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.ContestID](), 0, "A")
 
 		assert.True(t, match)
 	})
 
 	t.Run("ContestMatch", func(t *testing.T) {
-		subscription := events.NewSubscription(domain.NewEventFilter(1337, 0), 0)
+		subscription := events.NewSubscription([]domain.EventFilter{domain.NewEventFilter(1337, 0)}, 0)
 
-		match := subscription.FilterMatch(domain.ContestID(1337), 0, "A")
+		match := subscription.FiltersMatch(domain.ContestID(1337), 0, "A")
 
 		assert.True(t, match)
 	})
 
 	t.Run("ContestNoMatch", func(t *testing.T) {
-		subscription := events.NewSubscription(domain.NewEventFilter(1337, 0), 0)
+		subscription := events.NewSubscription([]domain.EventFilter{domain.NewEventFilter(1337, 0)}, 0)
 
-		match := subscription.FilterMatch(domain.ContestID(42), 0, "A")
+		match := subscription.FiltersMatch(domain.ContestID(42), 0, "A")
 
 		assert.False(t, match)
 	})
 
 	t.Run("ContenderMatchWildcard", func(t *testing.T) {
-		subscription := events.NewSubscription(domain.NewEventFilter(0, 0), 0)
+		subscription := events.NewSubscription([]domain.EventFilter{domain.NewEventFilter(0, 0)}, 0)
 
-		match := subscription.FilterMatch(testutils.RandomResourceID[domain.ContestID](), testutils.RandomResourceID[domain.ContenderID](), "A")
+		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.ContestID](), testutils.RandomResourceID[domain.ContenderID](), "A")
 
 		assert.True(t, match)
 	})
 
 	t.Run("ContenderMatch", func(t *testing.T) {
-		subscription := events.NewSubscription(domain.NewEventFilter(0, 1337), 0)
+		subscription := events.NewSubscription([]domain.EventFilter{domain.NewEventFilter(0, 1337)}, 0)
 
-		match := subscription.FilterMatch(testutils.RandomResourceID[domain.ContestID](), domain.ContenderID(1337), "A")
+		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.ContestID](), domain.ContenderID(1337), "A")
 
 		assert.True(t, match)
 	})
 
 	t.Run("ContenderNoMatch", func(t *testing.T) {
-		subscription := events.NewSubscription(domain.NewEventFilter(0, 1337), 0)
+		subscription := events.NewSubscription([]domain.EventFilter{domain.NewEventFilter(0, 1337)}, 0)
 
-		match := subscription.FilterMatch(testutils.RandomResourceID[domain.ContestID](), domain.ContenderID(42), "A")
+		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.ContestID](), domain.ContenderID(42), "A")
 
 		assert.False(t, match)
 	})
 
 	t.Run("EventTypeMatch", func(t *testing.T) {
-		subscription := events.NewSubscription(domain.NewEventFilter(0, 0, "A", "B", "C"), 0)
+		subscription := events.NewSubscription([]domain.EventFilter{domain.NewEventFilter(0, 0, "A", "B", "C")}, 0)
 
 		for eventType := range slices.Values([]string{"A", "B", "C"}) {
-			match := subscription.FilterMatch(testutils.RandomResourceID[domain.ContestID](), testutils.RandomResourceID[domain.ContenderID](), eventType)
+			match := subscription.FiltersMatch(testutils.RandomResourceID[domain.ContestID](), testutils.RandomResourceID[domain.ContenderID](), eventType)
 
 			assert.True(t, match)
 		}
 	})
 
 	t.Run("EventTypeNoMatch", func(t *testing.T) {
-		subscription := events.NewSubscription(domain.NewEventFilter(0, 0, "A", "B", "C"), 0)
+		subscription := events.NewSubscription([]domain.EventFilter{domain.NewEventFilter(0, 0, "A", "B", "C")}, 0)
 
-		match := subscription.FilterMatch(testutils.RandomResourceID[domain.ContestID](), testutils.RandomResourceID[domain.ContenderID](), "X")
+		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.ContestID](), testutils.RandomResourceID[domain.ContenderID](), "X")
 
 		assert.False(t, match)
 	})

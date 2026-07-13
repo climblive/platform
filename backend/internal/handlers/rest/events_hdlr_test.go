@@ -17,30 +17,41 @@ import (
 )
 
 func TestEventsHandler(t *testing.T) {
-	makeMocks := func(bufferCapacity int, filter domain.EventFilter) (*eventBrokerMock, *events.Subscription) {
+	makeMocks := func(bufferCapacity int, filters []domain.EventFilter) (*eventBrokerMock, *events.Subscription) {
 		mockedEventBroker := new(eventBrokerMock)
 
-		subscription := events.NewSubscription(domain.EventFilter{}, bufferCapacity)
+		subscription := events.NewSubscription(filters, bufferCapacity)
 		subscriptionID := uuid.New()
 
-		mockedEventBroker.On("Subscribe", filter, 1000).Return(subscriptionID, subscription)
+		mockedEventBroker.On("Subscribe", filters, 1000).Return(subscriptionID, subscription)
 
 		mockedEventBroker.On("Unsubscribe", subscriptionID).Return()
 
 		return mockedEventBroker, subscription
 	}
 
+	makeContenderFilters := func() []domain.EventFilter {
+		return []domain.EventFilter{
+			domain.NewEventFilter(
+				0,
+				domain.ContenderID(1),
+				"CONTENDER_PUBLIC_INFO_UPDATED",
+				"CONTENDER_SCORE_UPDATED",
+				"ASCENT_REGISTERED",
+				"ASCENT_DEREGISTERED",
+				"RAFFLE_WINNER_DRAWN",
+				"POINT_VALUE_UPDATED",
+			),
+			domain.NewEventFilter(
+				0,
+				0,
+				"RULES_UPDATED",
+			),
+		}
+	}
+
 	t.Run("ConnectAndDisconnect", func(t *testing.T) {
-		mockedEventBroker, _ := makeMocks(0, domain.NewEventFilter(
-			0,
-			domain.ContenderID(1),
-			"CONTENDER_PUBLIC_INFO_UPDATED",
-			"CONTENDER_SCORE_UPDATED",
-			"ASCENT_REGISTERED",
-			"ASCENT_DEREGISTERED",
-			"RAFFLE_WINNER_DRAWN",
-			"POINT_VALUE_UPDATED",
-		))
+		mockedEventBroker, _ := makeMocks(0, makeContenderFilters())
 
 		mux := rest.NewMux()
 		rest.InstallEventHandler(mux, mockedEventBroker, 0)
@@ -69,16 +80,7 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("ReceivePing", func(t *testing.T) {
-		mockedEventBroker, _ := makeMocks(0, domain.NewEventFilter(
-			0,
-			domain.ContenderID(1),
-			"CONTENDER_PUBLIC_INFO_UPDATED",
-			"CONTENDER_SCORE_UPDATED",
-			"ASCENT_REGISTERED",
-			"ASCENT_DEREGISTERED",
-			"RAFFLE_WINNER_DRAWN",
-			"POINT_VALUE_UPDATED",
-		))
+		mockedEventBroker, _ := makeMocks(0, makeContenderFilters())
 
 		mux := rest.NewMux()
 		rest.InstallEventHandler(mux, mockedEventBroker, time.Millisecond)
@@ -111,16 +113,7 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("ReceiveEvent", func(t *testing.T) {
-		mockedEventBroker, subscription := makeMocks(0, domain.NewEventFilter(
-			0,
-			domain.ContenderID(1),
-			"CONTENDER_PUBLIC_INFO_UPDATED",
-			"CONTENDER_SCORE_UPDATED",
-			"ASCENT_REGISTERED",
-			"ASCENT_DEREGISTERED",
-			"RAFFLE_WINNER_DRAWN",
-			"POINT_VALUE_UPDATED",
-		))
+		mockedEventBroker, subscription := makeMocks(0, makeContenderFilters())
 
 		err := subscription.Post(domain.EventEnvelope{
 			Data: domain.ContenderScoreUpdatedEvent{
@@ -170,16 +163,7 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("SubscriptionUnexpectedlyClosed", func(t *testing.T) {
-		mockedEventBroker, subscription := makeMocks(1, domain.NewEventFilter(
-			0,
-			domain.ContenderID(1),
-			"CONTENDER_PUBLIC_INFO_UPDATED",
-			"CONTENDER_SCORE_UPDATED",
-			"ASCENT_REGISTERED",
-			"ASCENT_DEREGISTERED",
-			"RAFFLE_WINNER_DRAWN",
-			"POINT_VALUE_UPDATED",
-		))
+		mockedEventBroker, subscription := makeMocks(1, makeContenderFilters())
 
 		err := subscription.Post(domain.EventEnvelope{
 			Data: domain.ContenderScoreUpdatedEvent{},
@@ -207,14 +191,14 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("ContestEvents", func(t *testing.T) {
-		mockedEventBroker, _ := makeMocks(0, domain.NewEventFilter(
+		mockedEventBroker, _ := makeMocks(0, []domain.EventFilter{domain.NewEventFilter(
 			domain.ContestID(1),
 			0,
 			"CONTENDER_PUBLIC_INFO_UPDATED",
 			"[]CONTENDER_SCORE_UPDATED",
 			"SCORE_ENGINE_STARTED",
 			"SCORE_ENGINE_STOPPED",
-		))
+		)})
 
 		mux := rest.NewMux()
 		rest.InstallEventHandler(mux, mockedEventBroker, time.Hour)
@@ -242,8 +226,8 @@ func (m *eventBrokerMock) Dispatch(contestID domain.ContestID, event any) {
 	m.Called(contestID, event)
 }
 
-func (m *eventBrokerMock) Subscribe(filter domain.EventFilter, bufferCapacity int) (domain.SubscriptionID, domain.EventReader) {
-	args := m.Called(filter, bufferCapacity)
+func (m *eventBrokerMock) Subscribe(filters []domain.EventFilter, bufferCapacity int) (domain.SubscriptionID, domain.EventReader) {
+	args := m.Called(filters, bufferCapacity)
 	return args.Get(0).(domain.SubscriptionID), args.Get(1).(domain.EventReader)
 }
 

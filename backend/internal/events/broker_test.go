@@ -13,7 +13,7 @@ func TestBlockingSubscriber(t *testing.T) {
 		ContestID: 1,
 	}
 
-	_, _ = broker.Subscribe(filter, 1)
+	_, _ = broker.Subscribe([]domain.EventFilter{filter}, 1)
 
 	for range 100 {
 		broker.Dispatch(1, domain.ContenderEnteredEvent{
