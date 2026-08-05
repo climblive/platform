@@ -28,6 +28,7 @@ export const toast = (options: ToastOptions) => {
 
   toast.create(
     `
+        <wa-icon name="${options.icon}" slot="icon"></wa-icon>
         <strong>${options.title}</strong><br />
         ${options.message}
     `,
