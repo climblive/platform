@@ -21,8 +21,8 @@ importers:
   admin:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.10.0
-        version: 3.10.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
+        specifier: 3.11.0
+        version: 3.11.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -112,8 +112,8 @@ importers:
   packages/lib:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.10.0
-        version: 3.10.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
+        specifier: 3.11.0
+        version: 3.11.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
       '@sentry/svelte':
         specifier: ^10.62.0
         version: 10.62.0(svelte@5.56.4(@typescript-eslint/types@8.62.0))
@@ -176,8 +176,8 @@ importers:
   scoreboard:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.10.0
-        version: 3.10.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
+        specifier: 3.11.0
+        version: 3.11.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -231,8 +231,8 @@ importers:
   scorecard:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.10.0
-        version: 3.10.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
+        specifier: 3.11.0
+        version: 3.11.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -292,8 +292,8 @@ importers:
   www:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.10.0
-        version: 3.10.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
+        specifier: 3.11.0
+        version: 3.11.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)
     devDependencies:
       '@climblive/lib':
         specifier: workspace:*
@@ -307,8 +307,8 @@ importers:
 
 packages:
 
-  '@awesome.me/webawesome@3.10.0':
-    resolution: {integrity: sha512-QrVKGTiz9OhtIoDic7RF6o1x5ShnJI7jgxK93uoSBh3INYlUyejKYXohXqpJ2cgjIJqfo0jMSQygd1Ty96QOMA==}
+  '@awesome.me/webawesome@3.11.0':
+    resolution: {integrity: sha512-WM8kyP+AdAT3/zwNpc/YzN3Nu5pRD6ksREFZAct/DIn6KMnQs8lPVfiPbJrOpKMk8OaSnQX19iiwFGjoswXVXw==}
     engines: {node: '>=14.17.0'}
 
   '@babel/code-frame@7.29.7':
@@ -817,8 +817,8 @@ packages:
   '@shoelace-style/animations@1.2.0':
     resolution: {integrity: sha512-avvo1xxkLbv2dgtabdewBbqcJfV0e0zCwFqkPMnHFGbJbBHorRFfMAHh1NG9ymmXn0jW95ibUVH03E1NYXD6Gw==}
 
-  '@shoelace-style/localize@3.2.2':
-    resolution: {integrity: sha512-h3+2/cFWGaw3KQUwintkP4Cy3PtrVW//ysr9DM5nOfIXYekgrHwsELk/nyxc8hmjVP/Kcon7KCzvUtSwUBipfQ==}
+  '@shoelace-style/localize@3.2.3':
+    resolution: {integrity: sha512-pWoZywizMilenLfQcpE9bjaqi7WKiQXJB42cxvmSPwYS76U776wJ7B5QQ0P28yVit1vpHuFZzq1CtfVFv32jaQ==}
 
   '@svelte-put/qr@2.1.3':
     resolution: {integrity: sha512-T1nu3sE7hmW2v5NbP2Rak8N2ZOU5rKbchHtPBMe++vf2dZHtnMHFk0ipExw8zg6dtJVgydhYh+MLsyqmvkg10A==}
@@ -2755,7 +2755,7 @@ packages:
 
 snapshots:
 
-  '@awesome.me/webawesome@3.10.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)':
+  '@awesome.me/webawesome@3.11.0(@floating-ui/utils@0.2.11)(@types/react@18.2.46)':
     dependencies:
       '@ctrl/tinycolor': 4.1.0
       '@floating-ui/dom': 1.7.6
@@ -2765,7 +2765,7 @@ snapshots:
       '@lit/context': 1.1.6
       '@lit/react': 1.0.8(@types/react@18.2.46)
       '@shoelace-style/animations': 1.2.0
-      '@shoelace-style/localize': 3.2.2
+      '@shoelace-style/localize': 3.2.3
       composed-offset-position: 0.0.6(@floating-ui/utils@0.2.11)
       lit: 3.3.3
       marked: 11.2.0
@@ -3276,7 +3276,7 @@ snapshots:
 
   '@shoelace-style/animations@1.2.0': {}
 
-  '@shoelace-style/localize@3.2.2': {}
+  '@shoelace-style/localize@3.2.3': {}
 
   '@svelte-put/qr@2.1.3(svelte@5.56.4(@typescript-eslint/types@8.62.0))':
     dependencies:
