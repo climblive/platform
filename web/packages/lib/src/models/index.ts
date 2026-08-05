@@ -8,5 +8,6 @@ export * from "./organizer";
 export * from "./pointValue";
 export * from "./problem";
 export * from "./rest";
+export * from "./score";
 export * from "./scoreboard";
 export * from "./tick";
