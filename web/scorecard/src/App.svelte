@@ -7,6 +7,7 @@
   import { type ScorecardSession } from "@/types";
   import { authenticateContender } from "@/utils/auth";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import "@awesome.me/webawesome/dist/components/toast/toast.js";
   import { ErrorBoundary } from "@climblive/lib/components";
   import { extractCodeFromPath } from "@climblive/lib/utils";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
@@ -84,6 +85,8 @@
 </script>
 
 <ErrorBoundary>
+  <wa-toast placement="bottom-end"></wa-toast>
+
   <QueryClientProvider client={queryClient}>
     {#if compatibilityIgnored}
       <wa-callout variant="neutral" appearance="outlined filled">
