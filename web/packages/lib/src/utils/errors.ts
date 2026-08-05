@@ -35,7 +35,6 @@ export const toast = (options: ToastOptions) => {
       allowHtml: true,
       variant: options.variant ?? "neutral",
       duration: options.duration ?? 5000,
-      size: "s",
     },
   );
 };
