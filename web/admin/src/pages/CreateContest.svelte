@@ -6,7 +6,7 @@
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import type { Contest, ContestTemplate } from "@climblive/lib/models";
   import { createContestMutation } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -38,7 +38,7 @@
       },
       {
         onSuccess: (contest: Contest) => navigate(`contests/${contest.id}`),
-        onError: () => toastError("Failed to create contest."),
+        onError: () => toastUnexpectedError("Failed to create contest."),
       },
     );
   };

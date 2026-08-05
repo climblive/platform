@@ -12,7 +12,7 @@
     CreateContendersArguments,
   } from "@climblive/lib/models";
   import { createContendersMutation } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
 
   const maxTickets = 500;
 
@@ -80,7 +80,7 @@
             }
           }
         },
-        onError: () => toastError("Failed to create tickets."),
+        onError: () => toastUnexpectedError("Failed to create tickets."),
       });
     }
   };
