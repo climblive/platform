@@ -25,6 +25,7 @@
     ascentRegisteredEventSchema,
     contenderPublicInfoUpdatedEventSchema,
     contenderScoreUpdatedEventSchema,
+    NO_SCORE,
     pointValueUpdatedEventSchema,
     raffleWinnerDrawnEventSchema,
     type PointValue,
@@ -46,7 +47,6 @@
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
-  import { NO_SCORE } from "node_modules/@climblive/lib/src/models/score";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
 
