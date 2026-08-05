@@ -1,21 +1,23 @@
-import "@awesome.me/webawesome/dist/components/callout/callout.js";
 import "@awesome.me/webawesome/dist/components/icon/icon.js";
+import WaToast from "@awesome.me/webawesome/dist/components/toast/toast.js";
 
 export const toastError = (message: string, duration = 5000) => {
-  const alert = Object.assign(document.createElement("wa-callout"), {
-    variant: "danger",
-    closable: true,
-    duration: duration,
-    innerHTML: `
+  const toast = document.querySelector("wa-toast");
+
+  if (!toast || !(toast instanceof WaToast)) {
+    return;
+  }
+
+  toast.create(
+    `
         <wa-icon name="circle-exclamation" slot="icon"></wa-icon>
         <strong>An unexpected error occurred</strong><br />
         ${message}
-      `,
-  });
-
-  document.getElementById("callout-stack")?.append(alert);
-
-  setTimeout(() => {
-    alert.remove();
-  }, duration);
+    `,
+    {
+      allowHtml: true,
+      variant: "brand",
+      duration,
+    },
+  );
 };

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/toast/toast.js";
   import { ErrorBoundary } from "@climblive/lib/components";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
@@ -15,6 +16,8 @@
 </script>
 
 <ErrorBoundary>
+  <wa-toast></wa-toast>
+
   <QueryClientProvider client={queryClient}>
     <Router>
       <Route path="/scoreboard/:contestId"
