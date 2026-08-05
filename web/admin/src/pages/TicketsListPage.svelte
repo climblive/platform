@@ -10,7 +10,11 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
-  import { Table, type ColumnDefinition } from "@climblive/lib/components";
+  import {
+    RegistrationCode,
+    Table,
+    type ColumnDefinition,
+  } from "@climblive/lib/components";
   import type { Contender } from "@climblive/lib/models";
   import {
     getContendersByContestQuery,
@@ -208,7 +212,7 @@
 {#snippet renderRegistrationCode({ id, registrationCode }: Contender)}
   <Link to={`/admin/contenders/${id}`}>
     <wa-icon name="qrcode"></wa-icon>
-    <span class="regcode">{registrationCode}</span>
+    <span class="regcode"><RegistrationCode code={registrationCode} /></span>
   </Link>
 {/snippet}
 
