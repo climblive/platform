@@ -7,7 +7,7 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import { FullLogo, SplashScreen } from "@climblive/lib/components";
-  import { toastError, z } from "@climblive/lib/utils";
+  import { toast, z } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { format } from "date-fns";
   import { getContext, onMount } from "svelte";
@@ -66,7 +66,12 @@
         console.error(e);
       }
 
-      toastError("The registration code is not valid.");
+      toast({
+        title: "Invalid registration code",
+        message: "The registration code you entered is not valid.",
+        icon: "circle-exclamation",
+        variant: "warning",
+      });
     } finally {
       loadingContender = false;
     }

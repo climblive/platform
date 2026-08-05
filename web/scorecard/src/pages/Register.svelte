@@ -15,7 +15,7 @@
     getContestQuery,
     patchContenderMutation,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { add, formatDistance, isAfter } from "date-fns";
   import { getContext } from "svelte";
   import { navigate } from "svelte-routing";
@@ -52,7 +52,7 @@
       },
       {
         onSuccess: gotoScorecard,
-        onError: () => toastError("Registration was not successful."),
+        onError: () => toastUnexpectedError("Registration was not successful."),
       },
     );
   };
