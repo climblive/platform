@@ -6,7 +6,7 @@
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import type WaInput from "@awesome.me/webawesome/dist/components/input/input.js";
   import { patchOrganizerMutation } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { type Snippet } from "svelte";
 
   type Props = {
@@ -50,7 +50,7 @@
         onSuccess: () => {
           handleCancel();
         },
-        onError: () => toastError("Failed to update organizer name."),
+        onError: () => toastUnexpectedError("Failed to update organizer name."),
       },
     );
   };

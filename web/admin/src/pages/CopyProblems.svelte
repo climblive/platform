@@ -16,7 +16,7 @@
     getContestsByOrganizerQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { format } from "date-fns";
 
   interface Props {
@@ -127,7 +127,7 @@
     copyCompleted = true;
 
     if (failCount > 0) {
-      toastError(
+      toastUnexpectedError(
         `Failed to copy ${failCount} problem${failCount > 1 ? "s" : ""}`,
       );
     }

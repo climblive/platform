@@ -15,7 +15,7 @@
     createRaffleMutation,
     getRafflesQuery,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { Link, navigate } from "svelte-routing";
   import DeleteRaffle from "./DeleteRaffle.svelte";
 
@@ -40,7 +40,7 @@
   const handleCreateRaffle = () => {
     createRaffle.mutate(undefined, {
       onSuccess: (raffle: Raffle) => navigate(`/admin/raffles/${raffle.id}`),
-      onError: () => toastError("Failed to create raffle."),
+      onError: () => toastUnexpectedError("Failed to create raffle."),
     });
   };
 

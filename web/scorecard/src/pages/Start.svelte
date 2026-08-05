@@ -3,12 +3,11 @@
   import { authenticateContender, readStoredSessions } from "@/utils/auth";
   import { serialize } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import { FullLogo, SplashScreen } from "@climblive/lib/components";
-  import { z } from "@climblive/lib/utils";
+  import { toastError, z } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { format } from "date-fns";
   import { getContext, onMount } from "svelte";
@@ -21,7 +20,6 @@
   });
 
   let loadingContender = $state(false);
-  let loadingFailed = $state(false);
   let queryClient = useQueryClient();
   let form: HTMLFormElement | undefined = $state();
   let restoredSessions: ScorecardSession[] = $state([]);
@@ -49,7 +47,6 @@
 
   const handleEnter = async (registrationCode: string) => {
     try {
-      loadingFailed = false;
       loadingContender = true;
 
       const contender = await authenticateContender(
@@ -69,7 +66,7 @@
         console.error(e);
       }
 
-      loadingFailed = true;
+      toastError("The registration code is not valid.");
     } finally {
       loadingContender = false;
     }
@@ -98,13 +95,12 @@
       >
         <wa-icon name="key" slot="start"></wa-icon>
       </wa-input>
-      {#if loadingFailed}
-        <wa-callout open variant="danger">
-          <wa-icon slot="icon" name="exclamation-octagon"></wa-icon>
-          The registration code is not valid.
-        </wa-callout>
-      {/if}
-      <wa-button variant="neutral" type="submit" loading={loadingContender}>
+      <wa-button
+        variant="neutral"
+        type="submit"
+        loading={loadingContender}
+        size="s"
+      >
         <wa-icon slot="start" name="arrow-right-to-bracket"></wa-icon>
         Enter
       </wa-button>
