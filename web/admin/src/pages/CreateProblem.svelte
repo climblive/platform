@@ -7,7 +7,7 @@
     createProblemMutation,
     getProblemsQuery,
   } from "@climblive/lib/queries";
-  import { toast, toastUnexpectedError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -36,15 +36,7 @@
     createProblem.mutate(
       { ...tmpl },
       {
-        onSuccess: () => {
-          toast({
-            title: "Problem created",
-            message: "The problem has been created successfully.",
-            icon: "circle-check",
-            variant: "success",
-          });
-          navigate(`/admin/contests/${contestId}#problems`);
-        },
+        onSuccess: () => navigate(`/admin/contests/${contestId}#problems`),
         onError: () => toastUnexpectedError("Failed to create problem."),
       },
     );
