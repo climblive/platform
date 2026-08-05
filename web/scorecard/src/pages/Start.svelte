@@ -67,10 +67,10 @@
       }
 
       toast({
-        title: "Invalid registration code",
-        message: "The registration code you entered is not valid.",
+        title: "Incorrect registration code",
+        message: "Please enter a valid registration code.",
         icon: "circle-exclamation",
-        variant: "warning",
+        variant: "danger",
       });
     } finally {
       loadingContender = false;
