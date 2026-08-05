@@ -16,7 +16,7 @@ export const toastError = (message: string, duration = 5000) => {
     `,
     {
       allowHtml: true,
-      variant: "brand",
+      variant: "danger",
       duration,
       size: "s",
     },
