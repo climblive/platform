@@ -75,7 +75,7 @@
 />
 
 <ErrorBoundary>
-  <wa-toast></wa-toast>
+  <wa-toast placement="bottom-end"></wa-toast>
 
   {#await authenticator.authenticate()}
     <div class="loading">

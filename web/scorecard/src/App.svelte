@@ -85,7 +85,7 @@
 </script>
 
 <ErrorBoundary>
-  <wa-toast></wa-toast>
+  <wa-toast placement="bottom-end"></wa-toast>
 
   <QueryClientProvider client={queryClient}>
     {#if compatibilityIgnored}
