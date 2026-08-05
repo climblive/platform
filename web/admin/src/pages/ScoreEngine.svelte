@@ -6,7 +6,6 @@
     startScoreEngineMutation,
     stopScoreEngineMutation,
   } from "@climblive/lib/queries";
-  import { toast, toastUnexpectedError } from "@climblive/lib/utils";
   import { add, format, isBefore, subSeconds } from "date-fns";
 
   interface Props {
@@ -53,18 +52,7 @@
       size="s"
       appearance="outlined"
       variant="danger"
-      onclick={() =>
-        stopScoreEngine.mutate(engineInstanceId, {
-          onSuccess: () => {
-            toast({
-              title: "Score engine stopped",
-              message: "The score engine has been stopped successfully.",
-              icon: "circle-check",
-              variant: "success",
-            });
-          },
-          onError: () => toastUnexpectedError("Failed to stop score engine."),
-        })}
+      onclick={() => stopScoreEngine.mutate(engineInstanceId)}
       loading={stopScoreEngine.isPending}
       >Stop engine
       <wa-icon name="stop" slot="start"></wa-icon>
@@ -76,23 +64,9 @@
       appearance="outlined"
       variant="neutral"
       onclick={() =>
-        startScoreEngine.mutate(
-          {
-            terminatedBy: add(new Date(), { hours: 6 }),
-          },
-          {
-            onSuccess: () => {
-              toast({
-                title: "Score engine started",
-                message: "The score engine has been started successfully.",
-                icon: "circle-check",
-                variant: "success",
-              });
-            },
-            onError: () =>
-              toastUnexpectedError("Failed to start score engine."),
-          },
-        )}
+        startScoreEngine.mutate({
+          terminatedBy: add(new Date(), { hours: 6 }),
+        })}
       loading={startScoreEngine.isPending}
       disabled={earliestStartTime && isBefore(new Date(), earliestStartTime)}
       >Start engine manually
