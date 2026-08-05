@@ -12,7 +12,7 @@
     getSelfQuery,
     transferContestMutation,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
   type Props = {
@@ -52,7 +52,7 @@
 
     transferContest.mutate(selectedOrganizerId, {
       onSuccess: () => navigate(`./organizers/${selectedOrganizerId}/contests`),
-      onError: () => toastError("Failed to transfer contest."),
+      onError: () => toastUnexpectedError("Failed to transfer contest."),
     });
   };
 

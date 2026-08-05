@@ -7,7 +7,7 @@
     createCompClassMutation,
     getCompClassesQuery,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { add, roundToNearestHours } from "date-fns";
   import { navigate } from "svelte-routing";
 
@@ -41,7 +41,7 @@
   const handleSubmit = async (tmpl: CompClassTemplate) => {
     createCompClass.mutate(tmpl, {
       onSuccess: () => navigate(`/admin/contests/${contestId}#comp-classes`),
-      onError: () => toastError("Failed to create class."),
+      onError: () => toastUnexpectedError("Failed to create class."),
     });
   };
 </script>
