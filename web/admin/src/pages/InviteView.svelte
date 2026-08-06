@@ -7,7 +7,7 @@
     deleteOrganizerInviteMutation,
     getOrganizerInviteQuery,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { isAfter } from "date-fns";
   import { navigate } from "svelte-routing";
 
@@ -32,7 +32,7 @@
 
       navigate(`./organizers/${invite.organizerId}/contests`);
     } catch {
-      toastError("Failed to accept invite.");
+      toastUnexpectedError("Failed to accept invite.");
     }
   };
 
@@ -42,7 +42,7 @@
         navigate(`./`);
       },
       onError: () => {
-        toastError("Failed to decline invite.");
+        toastUnexpectedError("Failed to decline invite.");
       },
     });
   };

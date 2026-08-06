@@ -7,7 +7,7 @@
     getProblemQuery,
     patchProblemMutation,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -25,7 +25,7 @@
     patchProblem.mutate(tmpl, {
       onSuccess: (problem: Problem) =>
         navigate(`/admin/contests/${problem.contestId}#problems`),
-      onError: () => toastError("Failed to save problem."),
+      onError: () => toastUnexpectedError("Failed to save problem."),
     });
   };
 </script>

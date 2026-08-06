@@ -7,7 +7,7 @@
   import type WaInput from "@awesome.me/webawesome/dist/components/input/input.js";
   import type { Organizer } from "@climblive/lib/models";
   import { createOrganizerMutation } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { Snippet } from "svelte";
   import { navigate } from "svelte-routing";
 
@@ -50,7 +50,7 @@
           handleCancel();
           navigate(`./organizers/${organizer.id}/contests`);
         },
-        onError: () => toastError("Failed to create organizer."),
+        onError: () => toastUnexpectedError("Failed to create organizer."),
       },
     );
   };

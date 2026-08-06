@@ -5,7 +5,7 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { ApiClient } from "@climblive/lib";
   import { ScoreboardProvider } from "@climblive/lib/components";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
 
   interface Props {
     contestId: number;
@@ -28,7 +28,7 @@
 
       window.URL.revokeObjectURL(url);
     } catch {
-      toastError("Failed to download results.");
+      toastUnexpectedError("Failed to download results.");
     }
   };
 </script>

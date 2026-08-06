@@ -5,7 +5,7 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import type { OrganizerInviteID } from "@climblive/lib/models";
   import { deleteOrganizerInviteMutation } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { Snippet } from "svelte";
 
   type Props = {
@@ -33,7 +33,7 @@
 
   const confirmDelete = () => {
     deleteInvite.mutate(undefined, {
-      onError: () => toastError("Failed to delete invite."),
+      onError: () => toastUnexpectedError("Failed to delete invite."),
     });
   };
 </script>
