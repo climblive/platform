@@ -62,10 +62,7 @@ export const startScoreEngineMutation = (contestId: number) => {
             );
           }
 
-          return [
-            ...(oldEngines ?? []),
-            newEngineDescriptor,
-          ];
+          return [...(oldEngines ?? []), newEngineDescriptor];
         },
       );
     },
