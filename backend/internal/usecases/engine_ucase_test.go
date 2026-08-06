@@ -34,10 +34,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 		t.Run("HappyCase", func(t *testing.T) {
 			mockedRepo, mockedAuthorizer, mockedScoreEngineManager := makeMocks()
 
-			secondContestID := testutils.RandomResourceID[domain.ContestID]()
-			secondOwnership := domain.OwnershipData{
-				OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
-			}
+			secondfakedContestID := testutils.RandomResourceID[domain.ContestID]()
 
 			fakedScoreEngines := []domain.ScoreEngineDescriptor{
 				{
@@ -46,7 +43,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 				},
 				{
 					InstanceID: uuid.New(),
-					ContestID:  secondContestID,
+					ContestID:  secondfakedContestID,
 				},
 			}
 
@@ -54,17 +51,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 				On("ListScoreEngines", mock.Anything).
 				Return(fakedScoreEngines, nil)
 
-			mockedRepo.
-				On("GetContest", mock.Anything, nil, fakedContestID).
-				Return(domain.Contest{ID: fakedContestID, Ownership: fakedOwnership}, nil)
-
-			mockedAuthorizer.On("HasOwnership", mock.Anything, fakedOwnership).Return(domain.OrganizerRole, nil)
-
-			mockedRepo.
-				On("GetContest", mock.Anything, nil, secondContestID).
-				Return(domain.Contest{ID: secondContestID, Ownership: secondOwnership}, nil)
-
-			mockedAuthorizer.On("HasOwnership", mock.Anything, secondOwnership).Return(domain.NilRole, domain.ErrNoOwnership)
+			mockedAuthorizer.On("HasOwnership", mock.Anything, domain.OwnershipData{}).Return(domain.AdminRole, nil)
 
 			ucase := usecases.ScoreEngineUseCase{
 				Repo:               mockedRepo,
@@ -75,7 +62,39 @@ func TestScoreEngineUseCase(t *testing.T) {
 			engines, err := ucase.ListScoreEngines(context.Background())
 
 			require.NoError(t, err)
-			assert.Equal(t, []domain.ScoreEngineDescriptor{fakedScoreEngines[0]}, engines)
+			assert.Equal(t, fakedScoreEngines, engines)
+		})
+
+		t.Run("BadCredentials", func(t *testing.T) {
+			mockedRepo, mockedAuthorizer, _ := makeMocks()
+
+			mockedAuthorizer.On("HasOwnership", mock.Anything, domain.OwnershipData{}).Return(domain.NilRole, domain.ErrNoOwnership)
+
+			ucase := usecases.ScoreEngineUseCase{
+				Repo:       mockedRepo,
+				Authorizer: mockedAuthorizer,
+			}
+
+			engines, err := ucase.ListScoreEngines(context.Background())
+
+			require.ErrorIs(t, err, domain.ErrNoOwnership)
+			assert.Empty(t, engines)
+		})
+
+		t.Run("NotAdmin", func(t *testing.T) {
+			mockedRepo, mockedAuthorizer, _ := makeMocks()
+
+			mockedAuthorizer.On("HasOwnership", mock.Anything, domain.OwnershipData{}).Return(domain.OrganizerRole, nil)
+
+			ucase := usecases.ScoreEngineUseCase{
+				Repo:       mockedRepo,
+				Authorizer: mockedAuthorizer,
+			}
+
+			engines, err := ucase.ListScoreEngines(context.Background())
+
+			require.ErrorIs(t, err, domain.ErrNotAuthorized)
+			assert.Empty(t, engines)
 		})
 	})
 
@@ -117,11 +136,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 			instances, err := ucase.ListScoreEnginesByContest(context.Background(), fakedContestID)
 
 			require.NoError(t, err)
-			assert.ElementsMatch(t, []domain.ScoreEngineInstanceID{
-				fakedScoreEngines[0].InstanceID,
-				fakedScoreEngines[1].InstanceID,
-				fakedScoreEngines[2].InstanceID,
-			}, instances)
+			assert.ElementsMatch(t, fakedScoreEngines, instances)
 		})
 
 		t.Run("BadCredentials", func(t *testing.T) {
