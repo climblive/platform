@@ -84,7 +84,6 @@
       contest: contests?.find(({ id }) => id === engine.contestId),
     }));
 
-    rows.sort((left, right) => left.contestId - right.contestId);
     return rows;
   });
 
