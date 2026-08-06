@@ -46,7 +46,7 @@
 
 <wa-dropdown
   onwa-select={(event: WaSelectEvent) => {
-    if ((event.detail.item as WaDropdownItem).value === "delete") {
+    if ((event.detail.item as WaDropdownItem).value === "stop") {
       handleStop();
     }
   }}
