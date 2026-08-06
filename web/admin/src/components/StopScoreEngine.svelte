@@ -72,7 +72,7 @@
     loading={stopScoreEngine.isPending}
   >
     Proceed
-    <wa-icon slot="stop" name="trash"></wa-icon>
+    <wa-icon slot="start" name="stop"></wa-icon>
   </wa-button>
 </wa-dialog>
 
