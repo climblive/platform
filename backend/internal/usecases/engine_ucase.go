@@ -29,31 +29,23 @@ type ScoreEngineUseCase struct {
 }
 
 func (uc *ScoreEngineUseCase) ListScoreEngines(ctx context.Context) ([]scores.ScoreEngineDescriptor, error) {
+	var role domain.AuthRole
+	var err error
+
+	if role, err = uc.Authorizer.HasOwnership(ctx, domain.OwnershipData{}); err != nil {
+		return nil, errors.Wrap(err, 0)
+	}
+
+	if role != domain.AdminRole {
+		return nil, domain.ErrNotAuthorized
+	}
+
 	engines, err := uc.ScoreEngineManager.ListScoreEngines(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
 
-	accessibleEngines := make([]scores.ScoreEngineDescriptor, 0, len(engines))
-
-	for _, engine := range engines {
-		contest, err := uc.Repo.GetContest(ctx, nil, engine.ContestID)
-		if err != nil {
-			return nil, errors.Wrap(err, 0)
-		}
-
-		if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
-			if errors.Is(err, domain.ErrNoOwnership) {
-				continue
-			}
-
-			return nil, errors.Wrap(err, 0)
-		}
-
-		accessibleEngines = append(accessibleEngines, engine)
-	}
-
-	return accessibleEngines, nil
+	return engines, nil
 }
 
 func (uc *ScoreEngineUseCase) ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreEngineInstanceID, error) {
