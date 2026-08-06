@@ -1,12 +1,28 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import RelativeTime from "@/components/RelativeTime.svelte";
+  import StopScoreEngine from "@/components/StopScoreEngine.svelte";
   import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { Table, type ColumnDefinition } from "@climblive/lib/components";
-  import type { ServiceStatus } from "@climblive/lib/models";
-  import { getHealthQuery, getVersionQuery } from "@climblive/lib/queries";
+  import {
+    EmptyState,
+    LabeledText,
+    Table,
+    type ColumnDefinition,
+  } from "@climblive/lib/components";
+  import type {
+    Contest,
+    ScoreEngineDescriptor,
+    ServiceStatus,
+  } from "@climblive/lib/models";
+  import {
+    getAllContestsQuery,
+    getHealthQuery,
+    getScoreEnginesQuery,
+    getVersionQuery,
+  } from "@climblive/lib/queries";
+  import { Link } from "svelte-routing";
 
   const columns: ColumnDefinition<ServiceStatus>[] = [
     {
@@ -29,10 +45,51 @@
     },
   ];
 
+  type RunningScoreEngineRow = ScoreEngineDescriptor & {
+    contest: Contest | undefined;
+  };
+
+  const runningScoreEngineColumns: ColumnDefinition<RunningScoreEngineRow>[] = [
+    {
+      label: "ID",
+      mobile: true,
+      render: renderScoreEngineInstanceId,
+      width: "1fr",
+    },
+    {
+      label: "Contest",
+      mobile: true,
+      render: renderScoreEngineContest,
+      width: "1fr",
+    },
+    {
+      mobile: true,
+      render: renderScoreEngineActions,
+      align: "right",
+      width: "max-content",
+    },
+  ];
+
   const healthQuery = $derived(getHealthQuery());
   const health = $derived(healthQuery.data);
+
   const versionQuery = $derived(getVersionQuery());
   const version = $derived(versionQuery.data);
+
+  const scoreEnginesQuery = $derived(getScoreEnginesQuery());
+  const scoreEngines = $derived(scoreEnginesQuery.data);
+
+  const contestsQuery = $derived(getAllContestsQuery());
+  const contests = $derived(contestsQuery.data);
+
+  const scoreEngineRows = $derived.by(() => {
+    const rows = (scoreEngines ?? []).map((engine) => ({
+      ...engine,
+      contest: contests?.find(({ id }) => id === engine.contestId),
+    }));
+
+    return rows;
+  });
 
   const allHealthy = $derived(health?.every(({ healthy }) => healthy));
 </script>
@@ -51,6 +108,23 @@
 
 {#snippet renderLastSeen({ checkedAt }: ServiceStatus)}
   <RelativeTime time={checkedAt} />
+{/snippet}
+
+{#snippet renderScoreEngineInstanceId({ instanceId }: RunningScoreEngineRow)}
+  {instanceId}
+{/snippet}
+
+{#snippet renderScoreEngineContest({
+  contest,
+  contestId,
+}: RunningScoreEngineRow)}
+  <Link to={`/admin/contests/${contestId}`}>
+    {contest?.name}
+  </Link>
+{/snippet}
+
+{#snippet renderScoreEngineActions({ instanceId }: RunningScoreEngineRow)}
+  <StopScoreEngine {instanceId} />
 {/snippet}
 
 <div class="title">
@@ -75,6 +149,25 @@
     </wa-callout>
   {/if}
   <Table {columns} data={health} getId={({ name }) => name}></Table>
+
+  <h2>Running score engines</h2>
+  {#if contests === undefined || scoreEngines === undefined}
+    <Loader />
+  {:else if scoreEngineRows.length === 0}
+    <EmptyState
+      title="No score engines are running"
+      description="Refresh the page to check for new score engines."
+    ></EmptyState>
+  {:else}
+    <Table
+      columns={runningScoreEngineColumns}
+      data={scoreEngineRows}
+      getId={({ instanceId }) => instanceId}
+    ></Table>
+  {/if}
+
+  <h2>System info</h2>
+  <LabeledText label="Version">{version}</LabeledText>
 {/if}
 
 <style>
@@ -103,5 +196,9 @@
 
   wa-callout {
     margin-block-end: var(--wa-space-m);
+  }
+
+  h2 {
+    margin-block-start: var(--wa-space-xl);
   }
 </style>

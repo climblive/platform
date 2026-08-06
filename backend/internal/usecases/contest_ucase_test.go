@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
-	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/climblive/platform/backend/internal/testutils"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/usecases/validators"
@@ -1477,7 +1476,7 @@ func TestArchiveContest(t *testing.T) {
 
 			mockedScoreEngineManager.
 				On("ListScoreEnginesByContest", mock.Anything, fakedContestID).
-				Return([]scores.ScoreEngineDescriptor{
+				Return([]domain.ScoreEngineDescriptor{
 					{
 						InstanceID: fakedScoreEngineInstanceID,
 						ContestID:  fakedContestID,

@@ -256,6 +256,11 @@ type ServiceStatus struct {
 	CheckedAt time.Time `json:"checkedAt"`
 }
 
+type ScoreEngineDescriptor struct {
+	InstanceID ScoreEngineInstanceID `json:"instanceId"`
+	ContestID  ContestID             `json:"contestId"`
+}
+
 type ContenderEnteredEvent struct {
 	ContenderID ContenderID `json:"contenderId"`
 	CompClassID CompClassID `json:"compClassId"`

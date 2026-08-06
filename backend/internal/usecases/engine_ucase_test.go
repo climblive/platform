@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
-	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/climblive/platform/backend/internal/testutils"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/google/uuid"
@@ -35,13 +34,81 @@ func TestScoreEngineUseCase(t *testing.T) {
 		t.Run("HappyCase", func(t *testing.T) {
 			mockedRepo, mockedAuthorizer, mockedScoreEngineManager := makeMocks()
 
+			secondfakedContestID := testutils.RandomResourceID[domain.ContestID]()
+
+			fakedScoreEngines := []domain.ScoreEngineDescriptor{
+				{
+					InstanceID: uuid.New(),
+					ContestID:  fakedContestID,
+				},
+				{
+					InstanceID: uuid.New(),
+					ContestID:  secondfakedContestID,
+				},
+			}
+
+			mockedScoreEngineManager.
+				On("ListScoreEngines", mock.Anything).
+				Return(fakedScoreEngines, nil)
+
+			mockedAuthorizer.On("HasOwnership", mock.Anything, domain.OwnershipData{}).Return(domain.AdminRole, nil)
+
+			ucase := usecases.ScoreEngineUseCase{
+				Repo:               mockedRepo,
+				Authorizer:         mockedAuthorizer,
+				ScoreEngineManager: mockedScoreEngineManager,
+			}
+
+			engines, err := ucase.ListScoreEngines(context.Background())
+
+			require.NoError(t, err)
+			assert.Equal(t, fakedScoreEngines, engines)
+		})
+
+		t.Run("BadCredentials", func(t *testing.T) {
+			mockedRepo, mockedAuthorizer, _ := makeMocks()
+
+			mockedAuthorizer.On("HasOwnership", mock.Anything, domain.OwnershipData{}).Return(domain.NilRole, domain.ErrNoOwnership)
+
+			ucase := usecases.ScoreEngineUseCase{
+				Repo:       mockedRepo,
+				Authorizer: mockedAuthorizer,
+			}
+
+			engines, err := ucase.ListScoreEngines(context.Background())
+
+			require.ErrorIs(t, err, domain.ErrNoOwnership)
+			assert.Empty(t, engines)
+		})
+
+		t.Run("NotAdmin", func(t *testing.T) {
+			mockedRepo, mockedAuthorizer, _ := makeMocks()
+
+			mockedAuthorizer.On("HasOwnership", mock.Anything, domain.OwnershipData{}).Return(domain.OrganizerRole, nil)
+
+			ucase := usecases.ScoreEngineUseCase{
+				Repo:       mockedRepo,
+				Authorizer: mockedAuthorizer,
+			}
+
+			engines, err := ucase.ListScoreEngines(context.Background())
+
+			require.ErrorIs(t, err, domain.ErrNotAuthorized)
+			assert.Empty(t, engines)
+		})
+	})
+
+	t.Run("ListScoreEnginesByContest", func(t *testing.T) {
+		t.Run("HappyCase", func(t *testing.T) {
+			mockedRepo, mockedAuthorizer, mockedScoreEngineManager := makeMocks()
+
 			mockedRepo.
 				On("GetContest", mock.Anything, nil, fakedContestID).
 				Return(domain.Contest{ID: fakedContestID, Ownership: fakedOwnership}, nil)
 
 			mockedAuthorizer.On("HasOwnership", mock.Anything, fakedOwnership).Return(domain.OrganizerRole, nil)
 
-			fakedScoreEngines := []scores.ScoreEngineDescriptor{
+			fakedScoreEngines := []domain.ScoreEngineDescriptor{
 				{
 					InstanceID: uuid.New(),
 					ContestID:  fakedContestID,
@@ -69,11 +136,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 			instances, err := ucase.ListScoreEnginesByContest(context.Background(), fakedContestID)
 
 			require.NoError(t, err)
-			assert.ElementsMatch(t, []domain.ScoreEngineInstanceID{
-				fakedScoreEngines[0].InstanceID,
-				fakedScoreEngines[1].InstanceID,
-				fakedScoreEngines[2].InstanceID,
-			}, instances)
+			assert.ElementsMatch(t, fakedScoreEngines, instances)
 		})
 
 		t.Run("BadCredentials", func(t *testing.T) {
@@ -275,7 +338,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 
 			mockedScoreEngineManager.
 				On("GetScoreEngine", mock.Anything, fakedInstanceID).
-				Return(scores.ScoreEngineDescriptor{
+				Return(domain.ScoreEngineDescriptor{
 					InstanceID: fakedInstanceID,
 					ContestID:  fakedContestID,
 				}, nil)
@@ -308,7 +371,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 
 			mockedScoreEngineManager.
 				On("GetScoreEngine", mock.Anything, fakedInstanceID).
-				Return(scores.ScoreEngineDescriptor{
+				Return(domain.ScoreEngineDescriptor{
 					InstanceID: fakedInstanceID,
 					ContestID:  fakedContestID,
 				}, nil)
@@ -330,14 +393,19 @@ type scoreEngineManagerMock struct {
 	mock.Mock
 }
 
-func (m *scoreEngineManagerMock) GetScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) (scores.ScoreEngineDescriptor, error) {
+func (m *scoreEngineManagerMock) GetScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) (domain.ScoreEngineDescriptor, error) {
 	args := m.Called(ctx, instanceID)
-	return args.Get(0).(scores.ScoreEngineDescriptor), args.Error(1)
+	return args.Get(0).(domain.ScoreEngineDescriptor), args.Error(1)
 }
 
-func (m *scoreEngineManagerMock) ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]scores.ScoreEngineDescriptor, error) {
+func (m *scoreEngineManagerMock) ListScoreEngines(ctx context.Context) ([]domain.ScoreEngineDescriptor, error) {
+	args := m.Called(ctx)
+	return args.Get(0).([]domain.ScoreEngineDescriptor), args.Error(1)
+}
+
+func (m *scoreEngineManagerMock) ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreEngineDescriptor, error) {
 	args := m.Called(ctx, contestID)
-	return args.Get(0).([]scores.ScoreEngineDescriptor), args.Error(1)
+	return args.Get(0).([]domain.ScoreEngineDescriptor), args.Error(1)
 }
 
 func (m *scoreEngineManagerMock) StopScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) error {

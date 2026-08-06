@@ -241,6 +241,10 @@ export interface ServiceStatus {
   healthy: boolean;
   checkedAt: Date;
 }
+export interface ScoreEngineDescriptor {
+  instanceId: ScoreEngineInstanceID;
+  contestId: ContestID;
+}
 export interface ContenderEnteredEvent {
   contenderId: ContenderID;
   compClassId: CompClassID;

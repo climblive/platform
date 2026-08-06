@@ -10,4 +10,5 @@ export * from "./problem";
 export * from "./rest";
 export * from "./score";
 export * from "./scoreboard";
+export * from "./scoreEngine";
 export * from "./tick";
