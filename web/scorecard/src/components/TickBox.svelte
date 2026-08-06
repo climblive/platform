@@ -4,7 +4,7 @@
   import { HoldColorIndicator } from "@climblive/lib/components";
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
   import { deleteTickMutation, putTickMutation } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { AxiosError } from "axios";
   import { getContext } from "svelte";
   import type { Readable } from "svelte/store";
@@ -54,9 +54,9 @@
     deleteTick.mutate(tick.id, {
       onError: (error) => {
         if (error instanceof AxiosError && error.status === 404) {
-          toastError("Ascent is already removed.");
+          toastUnexpectedError("Ascent is already removed.");
         } else {
-          toastError("Failed to remove ascent.");
+          toastUnexpectedError("Failed to remove ascent.");
         }
       },
     });
@@ -99,9 +99,9 @@
     putTick.mutate(nextTick, {
       onError: (error) => {
         if (error instanceof AxiosError && error.status === 409) {
-          toastError("Ascent is already registered.");
+          toastUnexpectedError("Ascent is already registered.");
         } else {
-          toastError("Failed to register ascent.");
+          toastUnexpectedError("Failed to register ascent.");
         }
       },
     });

@@ -13,7 +13,7 @@
     patchContenderMutation,
     scrubContenderMutation,
   } from "@climblive/lib/queries";
-  import { SyncedTime, toastError } from "@climblive/lib/utils";
+  import { SyncedTime, toastUnexpectedError } from "@climblive/lib/utils";
   import { formatDistance, isBefore } from "date-fns";
   import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
@@ -68,7 +68,8 @@
       },
       {
         onSuccess: gotoScorecard,
-        onError: () => toastError("Failed to save registration data."),
+        onError: () =>
+          toastUnexpectedError("Failed to save registration data."),
       },
     );
   };
@@ -76,7 +77,7 @@
   const handleScrub = () => {
     scrubContender.mutate(undefined, {
       onSuccess: gotoScorecard,
-      onError: () => toastError("Failed to remove your name."),
+      onError: () => toastUnexpectedError("Failed to remove your name."),
     });
   };
 </script>

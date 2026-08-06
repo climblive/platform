@@ -19,7 +19,7 @@
     getRaffleQuery,
     getRaffleWinnersQuery,
   } from "@climblive/lib/queries";
-  import { getApiUrl, toastError } from "@climblive/lib/utils";
+  import { getApiUrl, toastUnexpectedError } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { AxiosError } from "axios";
   import { format } from "date-fns";
@@ -118,9 +118,9 @@
     drawRaffleWinner.mutate(undefined, {
       onError: (error) => {
         if (error instanceof AxiosError && error.status === 404) {
-          toastError("All winners have been drawn.");
+          toastUnexpectedError("All winners have been drawn.");
         } else {
-          toastError("Failed to draw winner.");
+          toastUnexpectedError("Failed to draw winner.");
         }
       },
     });

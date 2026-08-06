@@ -4,7 +4,7 @@
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { deleteCompClassMutation } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { Snippet } from "svelte";
 
   type Props = {
@@ -32,7 +32,7 @@
 
   const confirmDelete = () => {
     deleteCompClass.mutate(undefined, {
-      onError: () => toastError("Failed to delete comp class."),
+      onError: () => toastUnexpectedError("Failed to delete comp class."),
     });
   };
 </script>

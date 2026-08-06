@@ -4,7 +4,7 @@
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { duplicateContestMutation } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
   type Props = {
@@ -36,7 +36,7 @@
         navigate(`/admin/contests/${duplicate.id}`);
       },
       onError: () => {
-        toastError("Failed to duplicate contest.");
+        toastUnexpectedError("Failed to duplicate contest.");
       },
     });
   };
