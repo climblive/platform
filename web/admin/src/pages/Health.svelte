@@ -1,8 +1,8 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import RelativeTime from "@/components/RelativeTime.svelte";
-  import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/badge/badge.js";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
@@ -12,7 +12,7 @@
   } from "@climblive/lib/components";
   import type { Contest, ServiceStatus } from "@climblive/lib/models";
   import {
-    getContestsQuery,
+    getAllContestsQuery,
     getHealthQuery,
     getRunningScoreEnginesQuery,
     getVersionQuery,
@@ -74,10 +74,8 @@
   const version = $derived(versionQuery.data);
   const runningScoreEnginesQuery = $derived(getRunningScoreEnginesQuery());
   const runningScoreEngines = $derived(runningScoreEnginesQuery.data);
-  const contestIds = $derived(
-    runningScoreEngines?.map(({ contestId }) => contestId),
-  );
-  const contestsQuery = $derived(getContestsQuery(contestIds));
+
+  const contestsQuery = $derived(getAllContestsQuery());
   const contests = $derived(contestsQuery.data);
 
   const runningScoreEngineRows = $derived.by(() => {
