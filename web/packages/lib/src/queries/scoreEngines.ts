@@ -64,7 +64,7 @@ export const startScoreEngineMutation = (contestId: number) => {
 
           return [
             ...(oldEngines ?? []),
-            { contestId, instanceId: newEngineInstanceId },
+            newEngineDescriptor,
           ];
         },
       );
