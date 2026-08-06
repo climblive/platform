@@ -63,7 +63,6 @@
       width: "1fr",
     },
     {
-      label: "Actions",
       mobile: true,
       render: renderScoreEngineActions,
       align: "right",
