@@ -3,7 +3,6 @@
   import RelativeTime from "@/components/RelativeTime.svelte";
   import StopScoreEngine from "@/components/StopScoreEngine.svelte";
   import "@awesome.me/webawesome/dist/components/badge/badge.js";
-  import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
