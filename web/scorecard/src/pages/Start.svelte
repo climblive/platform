@@ -212,4 +212,8 @@
     margin-block: var(--wa-space-m);
     font-size: var(--wa-font-size-s);
   }
+
+  wa-otp-input::part(segments) {
+    flex-wrap: wrap;
+  }
 </style>
