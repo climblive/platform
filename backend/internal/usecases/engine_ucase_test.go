@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
-	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/climblive/platform/backend/internal/testutils"
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/google/uuid"
@@ -40,7 +39,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 				OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 			}
 
-			fakedScoreEngines := []scores.ScoreEngineDescriptor{
+			fakedScoreEngines := []domain.ScoreEngineDescriptor{
 				{
 					InstanceID: uuid.New(),
 					ContestID:  fakedContestID,
@@ -76,7 +75,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 			engines, err := ucase.ListScoreEngines(context.Background())
 
 			require.NoError(t, err)
-			assert.Equal(t, []scores.ScoreEngineDescriptor{fakedScoreEngines[0]}, engines)
+			assert.Equal(t, []domain.ScoreEngineDescriptor{fakedScoreEngines[0]}, engines)
 		})
 	})
 
@@ -90,7 +89,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 
 			mockedAuthorizer.On("HasOwnership", mock.Anything, fakedOwnership).Return(domain.OrganizerRole, nil)
 
-			fakedScoreEngines := []scores.ScoreEngineDescriptor{
+			fakedScoreEngines := []domain.ScoreEngineDescriptor{
 				{
 					InstanceID: uuid.New(),
 					ContestID:  fakedContestID,
@@ -324,7 +323,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 
 			mockedScoreEngineManager.
 				On("GetScoreEngine", mock.Anything, fakedInstanceID).
-				Return(scores.ScoreEngineDescriptor{
+				Return(domain.ScoreEngineDescriptor{
 					InstanceID: fakedInstanceID,
 					ContestID:  fakedContestID,
 				}, nil)
@@ -357,7 +356,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 
 			mockedScoreEngineManager.
 				On("GetScoreEngine", mock.Anything, fakedInstanceID).
-				Return(scores.ScoreEngineDescriptor{
+				Return(domain.ScoreEngineDescriptor{
 					InstanceID: fakedInstanceID,
 					ContestID:  fakedContestID,
 				}, nil)
@@ -379,19 +378,19 @@ type scoreEngineManagerMock struct {
 	mock.Mock
 }
 
-func (m *scoreEngineManagerMock) GetScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) (scores.ScoreEngineDescriptor, error) {
+func (m *scoreEngineManagerMock) GetScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) (domain.ScoreEngineDescriptor, error) {
 	args := m.Called(ctx, instanceID)
-	return args.Get(0).(scores.ScoreEngineDescriptor), args.Error(1)
+	return args.Get(0).(domain.ScoreEngineDescriptor), args.Error(1)
 }
 
-func (m *scoreEngineManagerMock) ListScoreEngines(ctx context.Context) ([]scores.ScoreEngineDescriptor, error) {
+func (m *scoreEngineManagerMock) ListScoreEngines(ctx context.Context) ([]domain.ScoreEngineDescriptor, error) {
 	args := m.Called(ctx)
-	return args.Get(0).([]scores.ScoreEngineDescriptor), args.Error(1)
+	return args.Get(0).([]domain.ScoreEngineDescriptor), args.Error(1)
 }
 
-func (m *scoreEngineManagerMock) ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]scores.ScoreEngineDescriptor, error) {
+func (m *scoreEngineManagerMock) ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreEngineDescriptor, error) {
 	args := m.Called(ctx, contestID)
-	return args.Get(0).([]scores.ScoreEngineDescriptor), args.Error(1)
+	return args.Get(0).([]domain.ScoreEngineDescriptor), args.Error(1)
 }
 
 func (m *scoreEngineManagerMock) StopScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) error {
