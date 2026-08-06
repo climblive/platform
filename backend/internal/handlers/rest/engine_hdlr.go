@@ -11,7 +11,8 @@ import (
 )
 
 type scoreEngineUseCase interface {
-	ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreEngineInstanceID, error)
+	ListScoreEngines(ctx context.Context) ([]domain.ScoreEngineDescriptor, error)
+	ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreEngineDescriptor, error)
 	StopScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) error
 	StartScoreEngine(ctx context.Context, contestID domain.ContestID, terminatedBy time.Time) (domain.ScoreEngineInstanceID, error)
 }
@@ -25,9 +26,20 @@ func InstallScoreEngineHandler(mux *Mux, scoreEngineUseCase scoreEngineUseCase) 
 		scoreEngineUseCase: scoreEngineUseCase,
 	}
 
+	mux.HandleFunc("GET /score-engines", handler.ListScoreEngines)
 	mux.HandleFunc("GET /contests/{contestID}/score-engines", handler.ListScoreEnginesByContest)
 	mux.HandleFunc("DELETE /score-engines/{instanceID}", handler.StopScoreEngine)
 	mux.HandleFunc("POST /contests/{contestID}/score-engines", handler.StartScoreEngine)
+}
+
+func (hdlr *scoreEngineHandler) ListScoreEngines(w http.ResponseWriter, r *http.Request) {
+	instances, err := hdlr.scoreEngineUseCase.ListScoreEngines(r.Context())
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
+	writeResponse(w, http.StatusOK, instances)
 }
 
 func (hdlr *scoreEngineHandler) ListScoreEnginesByContest(w http.ResponseWriter, r *http.Request) {
