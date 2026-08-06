@@ -155,7 +155,7 @@
     <Loader />
   {:else if scoreEngineRows.length === 0}
     <EmptyState
-      title="No score engines are currently running"
+      title="No score engines are running"
       description="Refresh the page to check for new score engines."
     ></EmptyState>
   {:else}
