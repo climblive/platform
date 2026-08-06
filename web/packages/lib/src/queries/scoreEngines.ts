@@ -37,21 +37,30 @@ export const startScoreEngineMutation = (contestId: number) => {
   return createMutation(() => ({
     mutationFn: (args: StartScoreEngineArguments) =>
       ApiClient.getInstance().startScoreEngine(contestId, args),
-    onSuccess: (newEngine) => {
+    onSuccess: (newEngineInstanceId) => {
       const queryKey: QueryKey = ["score-engines", { contestId }];
 
       client.setQueryData<ScoreEngineInstanceID[]>(queryKey, (oldEngines) =>
-        oldEngines ? [...oldEngines, newEngine] : [newEngine],
+        oldEngines
+          ? [...oldEngines, newEngineInstanceId]
+          : [newEngineInstanceId],
       );
 
       client.setQueryData<RunningScoreEngine[]>(
         ["score-engines"],
         (oldEngines) => {
-          if (oldEngines?.some(({ instanceId }) => instanceId === newEngine)) {
+          if (
+            oldEngines?.some(
+              ({ instanceId }) => instanceId === newEngineInstanceId,
+            )
+          ) {
             return oldEngines;
           }
 
-          return [...(oldEngines ?? []), { contestId, instanceId: newEngine }];
+          return [
+            ...(oldEngines ?? []),
+            { contestId, instanceId: newEngineInstanceId },
+          ];
         },
       );
     },
