@@ -409,7 +409,7 @@ export class ApiClient {
     return z.array(scoreboardEntrySchema).parse(result.data);
   };
 
-  getScoreEngines = async (contestId: ContestID) => {
+  getScoreEnginesByContest = async (contestId: ContestID) => {
     const endpoint = `/contests/${contestId}/score-engines`;
 
     const result = await this.axiosInstance.get(endpoint, {
@@ -419,7 +419,7 @@ export class ApiClient {
     return z.array(z.string().uuid()).parse(result.data);
   };
 
-  getRunningScoreEngines = async () => {
+  getScoreEngines = async () => {
     const endpoint = "/score-engines";
 
     const result = await this.axiosInstance.get(endpoint, {

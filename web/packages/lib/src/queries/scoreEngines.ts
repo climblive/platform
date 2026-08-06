@@ -14,24 +14,21 @@ export type RunningScoreEngine = {
   instanceId: ScoreEngineInstanceID;
 };
 
-export const getScoreEnginesQuery = (contestId: ContestID) =>
+export const getScoreEnginesByContestQuery = (contestId: ContestID) =>
   createQuery(() => ({
     queryKey: ["score-engines", { contestId }],
-    queryFn: async () => ApiClient.getInstance().getScoreEngines(contestId),
+    queryFn: async () =>
+      ApiClient.getInstance().getScoreEnginesByContest(contestId),
     retry: false,
     gcTime: 12 * HOUR,
     staleTime: 0,
     refetchOnWindowFocus: true,
   }));
 
-export const getRunningScoreEnginesQuery = () =>
+export const getScoreEnginesQuery = () =>
   createQuery(() => ({
-    queryKey: ["score-engines", "all"],
-    queryFn: async () => ApiClient.getInstance().getRunningScoreEngines(),
-    retry: false,
-    gcTime: 12 * HOUR,
-    staleTime: 0,
-    refetchOnWindowFocus: true,
+    queryKey: ["score-engines"],
+    queryFn: async () => ApiClient.getInstance().getScoreEngines(),
   }));
 
 export const startScoreEngineMutation = (contestId: number) => {
@@ -47,11 +44,8 @@ export const startScoreEngineMutation = (contestId: number) => {
         oldEngines ? [...oldEngines, newEngine] : [newEngine],
       );
 
-      client.setQueriesData<RunningScoreEngine[]>(
-        {
-          queryKey: ["score-engines", "all"],
-          exact: false,
-        },
+      client.setQueryData<RunningScoreEngine[]>(
+        ["score-engines"],
         (oldEngines) => {
           if (oldEngines?.some(({ instanceId }) => instanceId === newEngine)) {
             return oldEngines;
@@ -84,11 +78,8 @@ export const stopScoreEngineMutation = () => {
             : undefined,
       );
 
-      client.setQueriesData<RunningScoreEngine[]>(
-        {
-          queryKey: ["score-engines", "all"],
-          exact: false,
-        },
+      client.setQueryData<RunningScoreEngine[]>(
+        ["score-engines"],
         (oldEngines) =>
           oldEngines?.filter(({ instanceId }) => instanceId !== variables),
       );

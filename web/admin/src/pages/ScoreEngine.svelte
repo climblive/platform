@@ -2,7 +2,7 @@
   import Loader from "@/components/Loader.svelte";
   import {
     getContestQuery,
-    getScoreEnginesQuery,
+    getScoreEnginesByContestQuery,
     startScoreEngineMutation,
     stopScoreEngineMutation,
   } from "@climblive/lib/queries";
@@ -15,7 +15,7 @@
   let { contestId }: Props = $props();
 
   const contestQuery = $derived(getContestQuery(contestId));
-  const scoreEnginesQuery = $derived(getScoreEnginesQuery(contestId));
+  const scoreEnginesQuery = $derived(getScoreEnginesByContestQuery(contestId));
   const startScoreEngine = startScoreEngineMutation(contestId);
   const stopScoreEngine = stopScoreEngineMutation();
 

@@ -14,7 +14,7 @@
   import {
     getAllContestsQuery,
     getHealthQuery,
-    getRunningScoreEnginesQuery,
+    getScoreEnginesQuery,
     getVersionQuery,
     stopScoreEngineMutation,
     type RunningScoreEngine,
@@ -72,14 +72,14 @@
   const health = $derived(healthQuery.data);
   const versionQuery = $derived(getVersionQuery());
   const version = $derived(versionQuery.data);
-  const runningScoreEnginesQuery = $derived(getRunningScoreEnginesQuery());
-  const runningScoreEngines = $derived(runningScoreEnginesQuery.data);
+  const scoreEnginesQuery = $derived(getScoreEnginesQuery());
+  const scoreEngines = $derived(scoreEnginesQuery.data);
 
   const contestsQuery = $derived(getAllContestsQuery());
   const contests = $derived(contestsQuery.data);
 
-  const runningScoreEngineRows = $derived.by(() => {
-    const rows = (runningScoreEngines ?? []).map((engine) => ({
+  const scoreEngineRows = $derived.by(() => {
+    const rows = (scoreEngines ?? []).map((engine) => ({
       ...engine,
       contest: contests?.find(({ id }) => id === engine.contestId),
     }));
@@ -87,6 +87,7 @@
     rows.sort((left, right) => left.contestId - right.contestId);
     return rows;
   });
+
   const allHealthy = $derived(health?.every(({ healthy }) => healthy));
   const stopScoreEngine = stopScoreEngineMutation();
 
@@ -108,7 +109,7 @@
   $effect(() => {
     if (
       confirmStopEngineId &&
-      !runningScoreEngines?.some(
+      !scoreEngines?.some(
         ({ instanceId }) => instanceId === confirmStopEngineId,
       )
     ) {
@@ -187,9 +188,9 @@
   <Table {columns} data={health} getId={({ name }) => name}></Table>
 
   <h2>Running score engines</h2>
-  {#if contests === undefined || runningScoreEngines === undefined}
+  {#if contests === undefined || scoreEngines === undefined}
     <Loader />
-  {:else if runningScoreEngineRows.length === 0}
+  {:else if scoreEngineRows.length === 0}
     <EmptyState
       title="No score engines are currently running"
       description="Running score engines will appear here automatically."
@@ -197,7 +198,7 @@
   {:else}
     <Table
       columns={runningScoreEngineColumns}
-      data={runningScoreEngineRows}
+      data={scoreEngineRows}
       getId={({ instanceId }) => instanceId}
     ></Table>
   {/if}
