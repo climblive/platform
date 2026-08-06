@@ -5,15 +5,14 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
-	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/go-errors/errors"
 	"github.com/google/uuid"
 )
 
 type scoreEngineManager interface {
-	GetScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) (scores.ScoreEngineDescriptor, error)
-	ListScoreEngines(ctx context.Context) ([]scores.ScoreEngineDescriptor, error)
-	ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]scores.ScoreEngineDescriptor, error)
+	GetScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) (domain.ScoreEngineDescriptor, error)
+	ListScoreEngines(ctx context.Context) ([]domain.ScoreEngineDescriptor, error)
+	ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreEngineDescriptor, error)
 	StopScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) error
 	StartScoreEngine(ctx context.Context, contestID domain.ContestID, terminatedBy time.Time) (domain.ScoreEngineInstanceID, error)
 }
@@ -28,7 +27,7 @@ type ScoreEngineUseCase struct {
 	ScoreEngineManager scoreEngineManager
 }
 
-func (uc *ScoreEngineUseCase) ListScoreEngines(ctx context.Context) ([]scores.ScoreEngineDescriptor, error) {
+func (uc *ScoreEngineUseCase) ListScoreEngines(ctx context.Context) ([]domain.ScoreEngineDescriptor, error) {
 	var role domain.AuthRole
 	var err error
 
@@ -48,7 +47,7 @@ func (uc *ScoreEngineUseCase) ListScoreEngines(ctx context.Context) ([]scores.Sc
 	return engines, nil
 }
 
-func (uc *ScoreEngineUseCase) ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreEngineInstanceID, error) {
+func (uc *ScoreEngineUseCase) ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreEngineDescriptor, error) {
 	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
@@ -63,13 +62,7 @@ func (uc *ScoreEngineUseCase) ListScoreEnginesByContest(ctx context.Context, con
 		return nil, errors.Wrap(err, 0)
 	}
 
-	instances := make([]domain.ScoreEngineInstanceID, 0)
-
-	for _, engine := range engines {
-		instances = append(instances, engine.InstanceID)
-	}
-
-	return instances, nil
+	return engines, nil
 }
 
 func (uc *ScoreEngineUseCase) StopScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) error {

@@ -4,6 +4,7 @@ import { z } from "zod/v4";
 import {
   contestSchema,
   scoreboardEntrySchema,
+  scoreEngineDescriptorSchema,
   type CompClassPatch,
   type CompClassTemplate,
   type ContenderPatch,
@@ -37,11 +38,6 @@ import { getApiUrl } from "./utils/config";
 interface ApiCredentialsProvider {
   getAuthHeaders(): RawAxiosRequestHeaders;
 }
-
-const runningScoreEngineSchema = z.object({
-  contestId: z.number(),
-  instanceId: z.string().uuid(),
-});
 
 export class ContenderCredentialsProvider implements ApiCredentialsProvider {
   private registrationCode: string;
@@ -416,7 +412,7 @@ export class ApiClient {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 
-    return z.array(z.string().uuid()).parse(result.data);
+    return z.array(scoreEngineDescriptorSchema).parse(result.data);
   };
 
   getScoreEngines = async () => {
@@ -426,7 +422,7 @@ export class ApiClient {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 
-    return z.array(runningScoreEngineSchema).parse(result.data);
+    return z.array(scoreEngineDescriptorSchema).parse(result.data);
   };
 
   startScoreEngine = async (

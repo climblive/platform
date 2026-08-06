@@ -5,14 +5,13 @@ import {
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import type { ContestID, ScoreEngineInstanceID } from "../models";
+import type {
+  ContestID,
+  ScoreEngineDescriptor,
+  ScoreEngineInstanceID,
+} from "../models";
 import type { StartScoreEngineArguments } from "../models/rest";
 import { HOUR } from "./constants";
-
-export type RunningScoreEngine = {
-  contestId: ContestID;
-  instanceId: ScoreEngineInstanceID;
-};
 
 export const getScoreEnginesByContestQuery = (contestId: ContestID) =>
   createQuery(() => ({
@@ -40,13 +39,18 @@ export const startScoreEngineMutation = (contestId: number) => {
     onSuccess: (newEngineInstanceId) => {
       const queryKey: QueryKey = ["score-engines", { contestId }];
 
-      client.setQueryData<ScoreEngineInstanceID[]>(queryKey, (oldEngines) =>
+      const newEngineDescriptor: ScoreEngineDescriptor = {
+        contestId,
+        instanceId: newEngineInstanceId,
+      };
+
+      client.setQueryData<ScoreEngineDescriptor[]>(queryKey, (oldEngines) =>
         oldEngines
-          ? [...oldEngines, newEngineInstanceId]
-          : [newEngineInstanceId],
+          ? [...oldEngines, newEngineDescriptor]
+          : [newEngineDescriptor],
       );
 
-      client.setQueryData<RunningScoreEngine[]>(
+      client.setQueryData<ScoreEngineDescriptor[]>(
         ["score-engines"],
         (oldEngines) => {
           if (
@@ -76,21 +80,16 @@ export const stopScoreEngineMutation = () => {
     onSuccess: (...args) => {
       const [, variables] = args;
       const queryKey = ["score-engines"];
-      client.setQueriesData<ScoreEngineInstanceID[]>(
+
+      client.setQueriesData<ScoreEngineDescriptor[]>(
         {
           queryKey,
           exact: false,
         },
         (oldEngines) =>
           oldEngines
-            ? oldEngines.filter((instanceId) => instanceId !== variables)
+            ? oldEngines.filter(({ instanceId }) => instanceId !== variables)
             : undefined,
-      );
-
-      client.setQueryData<RunningScoreEngine[]>(
-        ["score-engines"],
-        (oldEngines) =>
-          oldEngines?.filter(({ instanceId }) => instanceId !== variables),
       );
     },
   }));

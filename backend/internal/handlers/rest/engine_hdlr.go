@@ -7,24 +7,18 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
-	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/google/uuid"
 )
 
 type scoreEngineUseCase interface {
-	ListScoreEngines(ctx context.Context) ([]scores.ScoreEngineDescriptor, error)
-	ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreEngineInstanceID, error)
+	ListScoreEngines(ctx context.Context) ([]domain.ScoreEngineDescriptor, error)
+	ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreEngineDescriptor, error)
 	StopScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) error
 	StartScoreEngine(ctx context.Context, contestID domain.ContestID, terminatedBy time.Time) (domain.ScoreEngineInstanceID, error)
 }
 
 type scoreEngineHandler struct {
 	scoreEngineUseCase scoreEngineUseCase
-}
-
-type runningScoreEngine struct {
-	ContestID  domain.ContestID             `json:"contestId"`
-	InstanceID domain.ScoreEngineInstanceID `json:"instanceId"`
 }
 
 func InstallScoreEngineHandler(mux *Mux, scoreEngineUseCase scoreEngineUseCase) {
@@ -45,16 +39,7 @@ func (hdlr *scoreEngineHandler) ListScoreEngines(w http.ResponseWriter, r *http.
 		return
 	}
 
-	response := make([]runningScoreEngine, 0, len(instances))
-
-	for _, instance := range instances {
-		response = append(response, runningScoreEngine{
-			ContestID:  instance.ContestID,
-			InstanceID: instance.InstanceID,
-		})
-	}
-
-	writeResponse(w, http.StatusOK, response)
+	writeResponse(w, http.StatusOK, instances)
 }
 
 func (hdlr *scoreEngineHandler) ListScoreEnginesByContest(w http.ResponseWriter, r *http.Request) {

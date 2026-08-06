@@ -47,12 +47,12 @@
 {#if scoreEngines === undefined}
   <Loader />
 {:else}
-  {#each scoreEngines as engineInstanceId (engineInstanceId)}
+  {#each scoreEngines as scoreEngine (scoreEngine.instanceId)}
     <wa-button
       size="s"
       appearance="outlined"
       variant="danger"
-      onclick={() => stopScoreEngine.mutate(engineInstanceId)}
+      onclick={() => stopScoreEngine.mutate(scoreEngine.instanceId)}
       loading={stopScoreEngine.isPending}
       >Stop engine
       <wa-icon name="stop" slot="start"></wa-icon>

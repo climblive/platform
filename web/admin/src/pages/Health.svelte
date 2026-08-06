@@ -10,14 +10,17 @@
     Table,
     type ColumnDefinition,
   } from "@climblive/lib/components";
-  import type { Contest, ServiceStatus } from "@climblive/lib/models";
+  import type {
+    Contest,
+    ScoreEngineDescriptor,
+    ServiceStatus,
+  } from "@climblive/lib/models";
   import {
     getAllContestsQuery,
     getHealthQuery,
     getScoreEnginesQuery,
     getVersionQuery,
     stopScoreEngineMutation,
-    type RunningScoreEngine,
   } from "@climblive/lib/queries";
   import { Link } from "svelte-routing";
 
@@ -42,7 +45,7 @@
     },
   ];
 
-  type RunningScoreEngineRow = RunningScoreEngine & {
+  type RunningScoreEngineRow = ScoreEngineDescriptor & {
     contest: Contest | undefined;
   };
 
