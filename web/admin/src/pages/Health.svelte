@@ -142,7 +142,7 @@
   contestId,
 }: RunningScoreEngineRow)}
   <Link to={`/admin/contests/${contestId}`}>
-    {contest?.name ?? `Contest ${contestId}`}
+    {contest?.name}
   </Link>
 {/snippet}
 
