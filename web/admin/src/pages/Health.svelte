@@ -1,6 +1,7 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import RelativeTime from "@/components/RelativeTime.svelte";
+  import StopScoreEngine from "@/components/StopScoreEngine.svelte";
   import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
@@ -20,7 +21,6 @@
     getHealthQuery,
     getScoreEnginesQuery,
     getVersionQuery,
-    stopScoreEngineMutation,
   } from "@climblive/lib/queries";
   import { Link } from "svelte-routing";
 
@@ -51,7 +51,7 @@
 
   const runningScoreEngineColumns: ColumnDefinition<RunningScoreEngineRow>[] = [
     {
-      label: "Engine ID",
+      label: "ID",
       mobile: true,
       render: renderScoreEngineInstanceId,
       width: "1fr",
@@ -73,8 +73,10 @@
 
   const healthQuery = $derived(getHealthQuery());
   const health = $derived(healthQuery.data);
+
   const versionQuery = $derived(getVersionQuery());
   const version = $derived(versionQuery.data);
+
   const scoreEnginesQuery = $derived(getScoreEnginesQuery());
   const scoreEngines = $derived(scoreEnginesQuery.data);
 
@@ -91,33 +93,6 @@
   });
 
   const allHealthy = $derived(health?.every(({ healthy }) => healthy));
-  const stopScoreEngine = stopScoreEngineMutation();
-
-  let confirmStopEngineId = $state<string | undefined>(undefined);
-
-  const handleStopScoreEngine = (instanceId: string) => {
-    if (confirmStopEngineId !== instanceId) {
-      confirmStopEngineId = instanceId;
-      return;
-    }
-
-    stopScoreEngine.mutate(instanceId, {
-      onSettled: () => {
-        confirmStopEngineId = undefined;
-      },
-    });
-  };
-
-  $effect(() => {
-    if (
-      confirmStopEngineId &&
-      !scoreEngines?.some(
-        ({ instanceId }) => instanceId === confirmStopEngineId,
-      )
-    ) {
-      confirmStopEngineId = undefined;
-    }
-  });
 </script>
 
 {#snippet renderStatus({ healthy }: ServiceStatus)}
@@ -150,20 +125,7 @@
 {/snippet}
 
 {#snippet renderScoreEngineActions({ instanceId }: RunningScoreEngineRow)}
-  <wa-button
-    size="s"
-    appearance="outlined"
-    variant={confirmStopEngineId === instanceId ? "danger" : "neutral"}
-    loading={stopScoreEngine.isPending}
-    onclick={() => handleStopScoreEngine(instanceId)}
-  >
-    {#if confirmStopEngineId === instanceId}
-      Confirm stop
-    {:else}
-      Stop
-    {/if}
-    <wa-icon name="stop" slot="start"></wa-icon>
-  </wa-button>
+  <StopScoreEngine {instanceId} />
 {/snippet}
 
 <div class="title">
@@ -235,6 +197,6 @@
   }
 
   h2 {
-    margin: var(--wa-space-xl) 0 var(--wa-space-m);
+    margin-block-start: var(--wa-space-xl);
   }
 </style>
