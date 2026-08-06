@@ -8,6 +8,7 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
     EmptyState,
+    LabeledText,
     Table,
     type ColumnDefinition,
   } from "@climblive/lib/components";
@@ -165,6 +166,9 @@
       getId={({ instanceId }) => instanceId}
     ></Table>
   {/if}
+
+  <h2>Info</h2>
+  <LabeledText label="Version">{version}</LabeledText>
 {/if}
 
 <style>
