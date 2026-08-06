@@ -167,7 +167,7 @@
     ></Table>
   {/if}
 
-  <h2>Info</h2>
+  <h2>System info</h2>
   <LabeledText label="Version">{version}</LabeledText>
 {/if}
 
