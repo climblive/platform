@@ -54,7 +54,7 @@
   <wa-button slot="trigger" size="s" appearance="plain">
     <wa-icon name="ellipsis-vertical" label="Actions"></wa-icon>
   </wa-button>
-  <wa-dropdown-item value="delete" variant="danger">
+  <wa-dropdown-item value="stop" variant="danger">
     <wa-icon slot="icon" name="stop"></wa-icon>
     Stop
   </wa-dropdown-item>
