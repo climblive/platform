@@ -46,6 +46,9 @@ func TestEventsHandler(t *testing.T) {
 				0,
 				0,
 				"RULES_UPDATED",
+				"PROBLEM_ADDED",
+				"PROBLEM_UPDATED",
+				"PROBLEM_DELETED",
 			),
 		}
 	}
