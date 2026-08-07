@@ -275,7 +275,6 @@ func TestEngineDriver(t *testing.T) {
 		mockedEngine.On("GetDirtyPointValues").Return([]domain.PointValue{})
 
 		mockedEngine.On("HandleRulesUpdated", domain.RulesUpdatedEvent{
-			ContestID:          1,
 			QualifyingProblems: 10,
 			Finalists:          7,
 		}).Return(noEffects)
