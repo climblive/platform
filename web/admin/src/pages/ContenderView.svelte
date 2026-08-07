@@ -16,6 +16,7 @@
     ContenderName,
     EmptyState,
     LabeledText,
+    RegistrationCode,
   } from "@climblive/lib/components";
   import { checked, value } from "@climblive/lib/forms";
   import {
@@ -166,7 +167,7 @@
       </a>
 
       <span class="registration-code">
-        {contender.registrationCode}
+        <RegistrationCode code={contender.registrationCode} />
         <wa-copy-button value={contender.registrationCode}></wa-copy-button>
       </span>
     </div>
