@@ -41,6 +41,7 @@
     getPointValuesByContenderQuery,
     getProblemsQuery,
     getTicksByContenderQuery,
+    refetchProblems,
     removeTickFromQueryCache,
     updateContenderPublicInfoInQueryCache,
     updatePointValueInQueryCache,
@@ -330,7 +331,23 @@
     eventSource.addEventListener("RULES_UPDATED", (e) => {
       const event = rulesUpdatedEventSchema.parse(JSON.parse(e.data));
 
+      if (event.contestId !== $session.contestId) {
+        return;
+      }
+
       updateRulesInQueryCache(queryClient, event.contestId, event);
+    });
+
+    eventSource.addEventListener("PROBLEM_ADDED", () => {
+      refetchProblems(queryClient, $session.contestId);
+    });
+
+    eventSource.addEventListener("PROBLEM_UPDATED", () => {
+      refetchProblems(queryClient, $session.contestId);
+    });
+
+    eventSource.addEventListener("PROBLEM_DELETED", () => {
+      refetchProblems(queryClient, $session.contestId);
     });
   };
 

@@ -307,16 +307,18 @@ type AscentDeregisteredEvent struct {
 }
 
 type ProblemAddedEvent struct {
-	ProblemID ProblemID `json:"problemId"`
+	ProblemID          ProblemID `json:"problemId"`
+	Number             int       `json:"number"`
+	HoldColorPrimary   string    `json:"holdColorPrimary"`
+	HoldColorSecondary string    `json:"holdColorSecondary,omitempty"`
+	Description        string    `json:"description,omitempty"`
+	Zone1Enabled       bool      `json:"zone1Enabled"`
+	Zone2Enabled       bool      `json:"zone2Enabled"`
 
 	ProblemValue `tstype:",extends"`
 }
 
-type ProblemUpdatedEvent struct {
-	ProblemID ProblemID `json:"problemId"`
-
-	ProblemValue `tstype:",extends"`
-}
+type ProblemUpdatedEvent ProblemAddedEvent
 
 type ProblemDeletedEvent struct {
 	ProblemID ProblemID `json:"problemId"`

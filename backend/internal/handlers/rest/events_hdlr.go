@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -17,12 +18,18 @@ const clientRetry = 5 * time.Second
 type eventHandler struct {
 	eventBroker  domain.EventBroker
 	pingInterval time.Duration
+	repo         eventHandlerRepository
 }
 
-func InstallEventHandler(mux *Mux, eventBroker domain.EventBroker, pingInterval time.Duration) {
+type eventHandlerRepository interface {
+	GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error)
+}
+
+func InstallEventHandler(mux *Mux, eventBroker domain.EventBroker, repo eventHandlerRepository, pingInterval time.Duration) {
 	handler := &eventHandler{
 		eventBroker:  eventBroker,
 		pingInterval: pingInterval,
+		repo:         repo,
 	}
 
 	mux.HandleFunc("GET /contests/{contestID}/events", handler.HandleSubscribeContestEvents)
@@ -66,12 +73,18 @@ func (hdlr *eventHandler) HandleSubscribeContenderEvents(w http.ResponseWriter, 
 		return
 	}
 
+	contender, err := hdlr.repo.GetContender(r.Context(), nil, contenderID)
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+
 	logger := slog.Default().With("contender_id", contenderID, "remote_addr", readRemoteAddr(r))
 
 	filters := make([]domain.EventFilter, 0, 2)
 
 	filters = append(filters, domain.NewEventFilter(
-		0,
+		contender.ContestID,
 		contenderID,
 		"CONTENDER_PUBLIC_INFO_UPDATED",
 		"CONTENDER_SCORE_UPDATED",
@@ -82,9 +95,12 @@ func (hdlr *eventHandler) HandleSubscribeContenderEvents(w http.ResponseWriter, 
 	))
 
 	filters = append(filters, domain.NewEventFilter(
-		0,
+		contender.ContestID,
 		0,
 		"RULES_UPDATED",
+		"PROBLEM_ADDED",
+		"PROBLEM_UPDATED",
+		"PROBLEM_DELETED",
 	))
 
 	hdlr.subscribe(w, r, filters, logger)

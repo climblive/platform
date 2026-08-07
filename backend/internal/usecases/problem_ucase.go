@@ -61,7 +61,14 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 	}
 
 	problemUpdatedEventBaseline := domain.ProblemUpdatedEvent{
-		ProblemID:    problemID,
+		ProblemID:          problem.ID,
+		Number:             problem.Number,
+		HoldColorPrimary:   problem.HoldColorPrimary,
+		HoldColorSecondary: problem.HoldColorSecondary,
+		Description:        problem.Description,
+		Zone1Enabled:       problem.Zone1Enabled,
+		Zone2Enabled:       problem.Zone2Enabled,
+
 		ProblemValue: problem.ProblemValue,
 	}
 
@@ -123,7 +130,14 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 	}
 
 	event := domain.ProblemUpdatedEvent{
-		ProblemID:    problemID,
+		ProblemID:          problem.ID,
+		Number:             problem.Number,
+		HoldColorPrimary:   problem.HoldColorPrimary,
+		HoldColorSecondary: problem.HoldColorSecondary,
+		Description:        problem.Description,
+		Zone1Enabled:       problem.Zone1Enabled,
+		Zone2Enabled:       problem.Zone2Enabled,
+
 		ProblemValue: problem.ProblemValue,
 	}
 
@@ -186,7 +200,14 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 	}
 
 	event := domain.ProblemAddedEvent{
-		ProblemID:    createdProblem.ID,
+		ProblemID:          createdProblem.ID,
+		Number:             createdProblem.Number,
+		HoldColorPrimary:   createdProblem.HoldColorPrimary,
+		HoldColorSecondary: createdProblem.HoldColorSecondary,
+		Description:        createdProblem.Description,
+		Zone1Enabled:       createdProblem.Zone1Enabled,
+		Zone2Enabled:       createdProblem.Zone2Enabled,
+
 		ProblemValue: problem.ProblemValue,
 	}
 
