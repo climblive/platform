@@ -151,7 +151,6 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 	}
 
 	rulesUpdateEventBaseline := domain.RulesUpdatedEvent{
-		ContestID:          contest.ID,
 		QualifyingProblems: contest.QualifyingProblems,
 		Finalists:          contest.Finalists,
 		UsePoints:          contest.UsePoints,
@@ -211,7 +210,6 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 	}
 
 	event := domain.RulesUpdatedEvent{
-		ContestID:          contest.ID,
 		QualifyingProblems: contest.QualifyingProblems,
 		Finalists:          contest.Finalists,
 		UsePoints:          contest.UsePoints,

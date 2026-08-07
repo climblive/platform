@@ -1,7 +1,6 @@
 import {
   createMutation,
   createQuery,
-  QueryClient,
   useQueryClient,
   type QueryKey,
 } from "@tanstack/svelte-query";
@@ -219,42 +218,4 @@ export const transferContestMutation = (contestId: number) => {
       );
     },
   }));
-};
-
-export const updateRulesInQueryCache = (
-  queryClient: QueryClient,
-  contestId: number,
-  updatedRules: Pick<
-    Contest,
-    "qualifyingProblems" | "finalists" | "usePoints" | "pooledPoints"
-  >,
-) => {
-  let queryKey: QueryKey = ["contests"];
-
-  queryClient.setQueriesData<Contest[]>(
-    { queryKey, exact: false },
-    (oldContests) => {
-      if (oldContests === undefined) {
-        return undefined;
-      }
-
-      return oldContests.map((contest) => {
-        if (contest.id === contestId) {
-          return { ...contest, ...updatedRules };
-        }
-
-        return contest;
-      });
-    },
-  );
-
-  queryKey = ["contest", { id: contestId }];
-
-  queryClient.setQueryData<Contest>(queryKey, (oldContest) => {
-    if (!oldContest) {
-      return undefined;
-    }
-
-    return { ...oldContest, ...updatedRules };
-  });
 };

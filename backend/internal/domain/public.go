@@ -323,11 +323,10 @@ type ProblemDeletedEvent struct {
 }
 
 type RulesUpdatedEvent struct {
-	ContestID          ContestID `json:"contestId"`
-	QualifyingProblems int       `json:"qualifyingProblems"`
-	Finalists          int       `json:"finalists"`
-	UsePoints          bool      `json:"usePoints"`
-	PooledPoints       bool      `json:"pooledPoints"`
+	QualifyingProblems int  `json:"qualifyingProblems"`
+	Finalists          int  `json:"finalists"`
+	UsePoints          bool `json:"usePoints"`
+	PooledPoints       bool `json:"pooledPoints"`
 }
 
 type ContenderPublicInfoUpdatedEvent struct {

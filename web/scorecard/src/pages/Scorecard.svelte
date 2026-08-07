@@ -28,7 +28,6 @@
     NO_SCORE,
     pointValueUpdatedEventSchema,
     raffleWinnerDrawnEventSchema,
-    rulesUpdatedEventSchema,
     type PointValue,
     type Problem,
     type Tick,
@@ -44,7 +43,6 @@
     removeTickFromQueryCache,
     updateContenderPublicInfoInQueryCache,
     updatePointValueInQueryCache,
-    updateRulesInQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
@@ -325,12 +323,6 @@
       if (event.contenderId === contender?.id && raffleWinnerDialog) {
         raffleWinnerDialog.open = true;
       }
-    });
-
-    eventSource.addEventListener("RULES_UPDATED", (e) => {
-      const event = rulesUpdatedEventSchema.parse(JSON.parse(e.data));
-
-      updateRulesInQueryCache(queryClient, event.contestId, event);
     });
   };
 

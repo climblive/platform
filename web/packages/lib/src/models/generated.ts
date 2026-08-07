@@ -292,7 +292,6 @@ export interface ProblemDeletedEvent {
   problemId: ProblemID;
 }
 export interface RulesUpdatedEvent {
-  contestId: ContestID;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
   usePoints: boolean;
