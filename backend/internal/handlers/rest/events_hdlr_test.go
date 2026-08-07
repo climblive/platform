@@ -92,6 +92,7 @@ func TestEventsHandler(t *testing.T) {
 
 		server.Close()
 
+		mockedRepository.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)
 	})
 
@@ -130,6 +131,7 @@ func TestEventsHandler(t *testing.T) {
 
 		server.Close()
 
+		mockedRepository.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)
 	})
 
@@ -185,6 +187,7 @@ func TestEventsHandler(t *testing.T) {
 
 		server.Close()
 
+		mockedRepository.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)
 	})
 
@@ -218,6 +221,7 @@ func TestEventsHandler(t *testing.T) {
 
 		server.Close()
 
+		mockedRepository.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)
 	})
 
@@ -245,6 +249,7 @@ func TestEventsHandler(t *testing.T) {
 
 		server.Close()
 
+		mockedRepository.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)
 	})
 }
