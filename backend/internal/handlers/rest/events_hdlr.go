@@ -22,8 +22,6 @@ type eventHandler struct {
 }
 
 type eventHandlerRepository interface {
-	domain.Transactor
-
 	GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error)
 }
 
@@ -77,7 +75,7 @@ func (hdlr *eventHandler) HandleSubscribeContenderEvents(w http.ResponseWriter, 
 
 	contender, err := hdlr.repo.GetContender(r.Context(), nil, contenderID)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		handleError(w, err)
 		return
 	}
 
@@ -86,7 +84,7 @@ func (hdlr *eventHandler) HandleSubscribeContenderEvents(w http.ResponseWriter, 
 	filters := make([]domain.EventFilter, 0, 2)
 
 	filters = append(filters, domain.NewEventFilter(
-		0,
+		contender.ContestID,
 		contenderID,
 		"CONTENDER_PUBLIC_INFO_UPDATED",
 		"CONTENDER_SCORE_UPDATED",
