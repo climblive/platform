@@ -38,8 +38,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 	t.Run("HandleRulesUpdated", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContestID := testutils.RandomResourceID[domain.ContestID]()
-
 		fakedCompClass1ID := testutils.RandomResourceID[domain.CompClassID]()
 		fakedCompClass2ID := testutils.RandomResourceID[domain.CompClassID]()
 
