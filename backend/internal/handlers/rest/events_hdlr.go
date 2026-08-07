@@ -81,6 +81,12 @@ func (hdlr *eventHandler) HandleSubscribeContenderEvents(w http.ResponseWriter, 
 		"RAFFLE_WINNER_DRAWN",
 	))
 
+	filters = append(filters, domain.NewEventFilter(
+		0,
+		0,
+		"RULES_UPDATED",
+	))
+
 	hdlr.subscribe(w, r, filters, logger)
 }
 

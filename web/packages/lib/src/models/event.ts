@@ -6,6 +6,7 @@ import type {
   ContenderScoreUpdatedEvent,
   PointValueUpdatedEvent,
   RaffleWinnerDrawnEvent,
+  RulesUpdatedEvent,
 } from "./generated";
 import { pointValueSchema } from "./pointValue";
 
@@ -59,3 +60,11 @@ export const raffleWinnerDrawnEventSchema: z.ZodType<RaffleWinnerDrawnEvent> =
     contenderId: z.number(),
     timestamp: z.coerce.date(),
   });
+
+export const rulesUpdatedEventSchema: z.ZodType<RulesUpdatedEvent> = z.object({
+  contestId: z.number(),
+  qualifyingProblems: z.number(),
+  finalists: z.number(),
+  usePoints: z.boolean(),
+  pooledPoints: z.boolean(),
+});
