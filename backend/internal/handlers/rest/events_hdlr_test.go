@@ -42,11 +42,6 @@ func TestEventsHandler(t *testing.T) {
 				"RAFFLE_WINNER_DRAWN",
 				"POINT_VALUE_UPDATED",
 			),
-			domain.NewEventFilter(
-				0,
-				0,
-				"RULES_UPDATED",
-			),
 		}
 	}
 
