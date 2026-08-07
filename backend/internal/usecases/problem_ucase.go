@@ -200,7 +200,14 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 	}
 
 	event := domain.ProblemAddedEvent{
-		ProblemID:    createdProblem.ID,
+		ProblemID:          createdProblem.ID,
+		Number:             createdProblem.Number,
+		HoldColorPrimary:   createdProblem.HoldColorPrimary,
+		HoldColorSecondary: createdProblem.HoldColorSecondary,
+		Description:        createdProblem.Description,
+		Zone1Enabled:       createdProblem.Zone1Enabled,
+		Zone2Enabled:       createdProblem.Zone2Enabled,
+
 		ProblemValue: problem.ProblemValue,
 	}
 
