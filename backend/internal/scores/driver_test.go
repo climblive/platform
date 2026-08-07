@@ -212,7 +212,6 @@ func TestEngineDriver(t *testing.T) {
 		events := []any{}
 
 		events = append(events, domain.RulesUpdatedEvent{
-			ContestID:          1,
 			QualifyingProblems: 10,
 			Finalists:          7,
 		})
