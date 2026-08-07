@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { RegistrationCode } from "@climblive/lib/components";
   import QrCode from "./QrCode.svelte";
 
   type Props = {
@@ -17,7 +18,7 @@
       Scan the QR code or register at {location.protocol}//{location.host}
       using your <em>secret code:</em></span
     >
-    <span class="code">{registrationCode}</span>
+    <span class="code"><RegistrationCode code={registrationCode} /></span>
   </div>
   <QrCode {registrationCode} width={80}></QrCode>
   <span class="ticket-number">#{ticketNumber.toString().padStart(6, "0")}</span>
