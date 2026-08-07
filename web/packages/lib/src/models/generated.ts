@@ -284,10 +284,14 @@ export interface AscentDeregisteredEvent {
 }
 export interface ProblemAddedEvent extends ProblemValue {
   problemId: ProblemID;
+  number: number /* int */;
+  holdColorPrimary: string;
+  holdColorSecondary?: string;
+  description?: string;
+  zone1Enabled: boolean;
+  zone2Enabled: boolean;
 }
-export interface ProblemUpdatedEvent extends ProblemValue {
-  problemId: ProblemID;
-}
+export type ProblemUpdatedEvent = ProblemAddedEvent;
 export interface ProblemDeletedEvent {
   problemId: ProblemID;
 }
