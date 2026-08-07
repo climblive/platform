@@ -4,6 +4,7 @@ import { z } from "zod/v4";
 import {
   contestSchema,
   scoreboardEntrySchema,
+  scoreEngineDescriptorSchema,
   type CompClassPatch,
   type CompClassTemplate,
   type ContenderPatch,
@@ -404,14 +405,24 @@ export class ApiClient {
     return z.array(scoreboardEntrySchema).parse(result.data);
   };
 
-  getScoreEngines = async (contestId: ContestID) => {
+  getScoreEnginesByContest = async (contestId: ContestID) => {
     const endpoint = `/contests/${contestId}/score-engines`;
 
     const result = await this.axiosInstance.get(endpoint, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 
-    return z.array(z.string().uuid()).parse(result.data);
+    return z.array(scoreEngineDescriptorSchema).parse(result.data);
+  };
+
+  getScoreEngines = async () => {
+    const endpoint = "/score-engines";
+
+    const result = await this.axiosInstance.get(endpoint, {
+      headers: this.credentialsProvider?.getAuthHeaders(),
+    });
+
+    return z.array(scoreEngineDescriptorSchema).parse(result.data);
   };
 
   startScoreEngine = async (

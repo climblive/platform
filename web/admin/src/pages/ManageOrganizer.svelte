@@ -17,7 +17,7 @@
     getSelfQuery,
     getUsersByOrganizerQuery,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { isAfter } from "date-fns";
   import { navigate } from "svelte-routing";
   import DeleteInvite from "./DeleteInvite.svelte";
@@ -72,7 +72,7 @@
 
   const handleCreateInvite = () => {
     createInvite.mutate(undefined, {
-      onError: () => toastError("Failed to create invite."),
+      onError: () => toastUnexpectedError("Failed to create invite."),
     });
   };
 </script>

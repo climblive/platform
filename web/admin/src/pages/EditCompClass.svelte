@@ -7,7 +7,7 @@
     getCompClassQuery,
     patchCompClassMutation,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -25,7 +25,7 @@
     patchCompClass.mutate(patch, {
       onSuccess: (compClass) =>
         navigate(`/admin/contests/${compClass.contestId}#comp-classes`),
-      onError: () => toastError("Failed to save comp class."),
+      onError: () => toastUnexpectedError("Failed to save comp class."),
     });
   };
 </script>

@@ -25,8 +25,10 @@
     ascentRegisteredEventSchema,
     contenderPublicInfoUpdatedEventSchema,
     contenderScoreUpdatedEventSchema,
+    NO_SCORE,
     pointValueUpdatedEventSchema,
     raffleWinnerDrawnEventSchema,
+    rulesUpdatedEventSchema,
     type PointValue,
     type Problem,
     type Tick,
@@ -39,14 +41,15 @@
     getPointValuesByContenderQuery,
     getProblemsQuery,
     getTicksByContenderQuery,
+    refetchProblems,
     removeTickFromQueryCache,
     updateContenderPublicInfoInQueryCache,
     updatePointValueInQueryCache,
+    updateRulesInQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
   import { getApiUrl } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
-  import { NO_SCORE } from "node_modules/@climblive/lib/src/models/score";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
 
@@ -323,6 +326,28 @@
       if (event.contenderId === contender?.id && raffleWinnerDialog) {
         raffleWinnerDialog.open = true;
       }
+    });
+
+    eventSource.addEventListener("RULES_UPDATED", (e) => {
+      const event = rulesUpdatedEventSchema.parse(JSON.parse(e.data));
+
+      if (event.contestId !== $session.contestId) {
+        return;
+      }
+
+      updateRulesInQueryCache(queryClient, event.contestId, event);
+    });
+
+    eventSource.addEventListener("PROBLEM_ADDED", () => {
+      refetchProblems(queryClient, $session.contestId);
+    });
+
+    eventSource.addEventListener("PROBLEM_UPDATED", () => {
+      refetchProblems(queryClient, $session.contestId);
+    });
+
+    eventSource.addEventListener("PROBLEM_DELETED", () => {
+      refetchProblems(queryClient, $session.contestId);
     });
   };
 

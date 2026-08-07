@@ -128,7 +128,13 @@ func TestPatchProblem(t *testing.T) {
 
 		mockedEventBroker.
 			On("Dispatch", fakedContestID, domain.ProblemUpdatedEvent{
-				ProblemID: fakedProblemID,
+				ProblemID:          fakedProblemID,
+				Number:             20,
+				HoldColorPrimary:   "#ff0000",
+				HoldColorSecondary: "#00ff00",
+				Description:        "The twentieth boulder",
+				Zone1Enabled:       true,
+				Zone2Enabled:       true,
 				ProblemValue: domain.ProblemValue{
 					PointsTop:   1000,
 					PointsZone1: 500,
@@ -305,7 +311,13 @@ func TestCreateProblem(t *testing.T) {
 
 		mockedEventBroker.
 			On("Dispatch", fakedContestID, domain.ProblemAddedEvent{
-				ProblemID: fakedProblemID,
+				ProblemID:          fakedProblemID,
+				Number:             10,
+				HoldColorPrimary:   "#ffffff",
+				HoldColorSecondary: "#000",
+				Description:        "Crack volumes are included",
+				Zone1Enabled:       true,
+				Zone2Enabled:       true,
 				ProblemValue: domain.ProblemValue{
 					PointsTop:   100,
 					PointsZone1: 50,

@@ -6,7 +6,7 @@
   ) => {
     mutation.mutate(patch, {
       onSuccess,
-      onError: () => toastError("Failed to update rules."),
+      onError: () => toastUnexpectedError("Failed to update rules."),
     });
   };
 </script>
@@ -16,7 +16,7 @@
   import "@awesome.me/webawesome/dist/components/radio/radio.js";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
   import { patchContestMutation } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import RuleOptionCard from "./RuleOptionCard.svelte";
   import Finalists from "./rules/Finalists.svelte";
   import PooledPoints from "./rules/PooledPoints.svelte";

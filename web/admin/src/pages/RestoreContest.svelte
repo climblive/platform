@@ -3,7 +3,7 @@
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { restoreContestMutation } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
   type Props = {
@@ -20,7 +20,7 @@
         navigate(`/admin/contests/${contestId}`);
       },
       onError: () => {
-        toastError("Failed to restore contest.");
+        toastUnexpectedError("Failed to restore contest.");
       },
     });
   };

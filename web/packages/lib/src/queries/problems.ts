@@ -1,6 +1,7 @@
 import {
   createMutation,
   createQuery,
+  QueryClient,
   useQueryClient,
   type QueryKey,
 } from "@tanstack/svelte-query";
@@ -108,4 +109,11 @@ export const deleteProblemMutation = (problemId: number) => {
       client.removeQueries({ queryKey });
     },
   }));
+};
+
+export const refetchProblems = (
+  queryClient: QueryClient,
+  contestId: number,
+) => {
+  queryClient.refetchQueries({ queryKey: ["problems", { contestId }] });
 };

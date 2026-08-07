@@ -14,7 +14,7 @@ var ErrTerminated = errors.New("terminated")
 
 type Subscription struct {
 	ID             domain.SubscriptionID
-	filter         domain.EventFilter
+	filters        []domain.EventFilter
 	mu             sync.Mutex
 	cond           *sync.Cond
 	buffer         []domain.EventEnvelope
@@ -23,12 +23,12 @@ type Subscription struct {
 }
 
 func NewSubscription(
-	filter domain.EventFilter,
+	filters []domain.EventFilter,
 	bufferCapacity int,
 ) *Subscription {
 	sub := Subscription{
 		ID:             uuid.New(),
-		filter:         filter,
+		filters:        filters,
 		bufferCapacity: bufferCapacity,
 		mu:             sync.Mutex{},
 		cond:           nil,
@@ -125,24 +125,12 @@ func (s *Subscription) Post(event domain.EventEnvelope) error {
 	return nil
 }
 
-func (s *Subscription) FilterMatch(contestID domain.ContestID, contenderID domain.ContenderID, eventType string) bool {
-	switch s.filter.ContestID {
-	case 0, contestID:
-	default:
-		return false
+func (s *Subscription) FiltersMatch(contestID domain.ContestID, contenderID domain.ContenderID, eventType string) bool {
+	for _, filter := range s.filters {
+		if filter.Match(contestID, contenderID, eventType) {
+			return true
+		}
 	}
 
-	switch s.filter.ContenderID {
-	case 0, contenderID:
-	default:
-		return false
-	}
-
-	hasEventTypeFilters := len(s.filter.EventTypes) > 0
-
-	if _, found := s.filter.EventTypes[eventType]; hasEventTypeFilters && !found {
-		return false
-	}
-
-	return true
+	return false
 }

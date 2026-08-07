@@ -10,7 +10,7 @@
     getContestQuery,
     patchContestMutation,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -36,7 +36,7 @@
       {
         onSuccess: (contest: Contest) =>
           navigate(`/admin/contests/${contest.id}`),
-        onError: () => toastError("Failed to save contest."),
+        onError: () => toastUnexpectedError("Failed to save contest."),
       },
     );
   };

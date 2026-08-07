@@ -75,7 +75,7 @@ func TestScoreEngineManager(t *testing.T) {
 
 		mockedEventBroker.
 			On("Subscribe", mock.Anything, mock.Anything).
-			Return(fakedSubscriptionID, events.NewSubscription(domain.EventFilter{}, 1000))
+			Return(fakedSubscriptionID, events.NewSubscription([]domain.EventFilter{{}}, 1000))
 
 		mockedEventBroker.
 			On("Unsubscribe", fakedSubscriptionID).
@@ -132,7 +132,7 @@ func TestScoreEngineManager(t *testing.T) {
 
 		mockedEventBroker.
 			On("Subscribe", mock.Anything, mock.Anything).
-			Return(fakedSubscriptionID, events.NewSubscription(domain.EventFilter{}, 1000))
+			Return(fakedSubscriptionID, events.NewSubscription([]domain.EventFilter{{}}, 1000))
 
 		mockedEventBroker.
 			On("Unsubscribe", fakedSubscriptionID).
@@ -168,10 +168,18 @@ func TestScoreEngineManager(t *testing.T) {
 		instances, err := mngr.ListScoreEnginesByContest(context.Background(), fakedContestID)
 
 		require.NoError(t, err)
-		assert.ElementsMatch(t, []scores.ScoreEngineDescriptor{{
+		assert.ElementsMatch(t, []domain.ScoreEngineDescriptor{{
 			InstanceID: instanceID,
 			ContestID:  fakedContestID,
 		}}, instances)
+
+		allInstances, err := mngr.ListScoreEngines(context.Background())
+
+		require.NoError(t, err)
+		assert.ElementsMatch(t, []domain.ScoreEngineDescriptor{{
+			InstanceID: instanceID,
+			ContestID:  fakedContestID,
+		}}, allInstances)
 
 		err = mngr.StopScoreEngine(context.Background(), instanceID)
 
@@ -186,6 +194,11 @@ func TestScoreEngineManager(t *testing.T) {
 
 		require.NoError(t, err)
 		require.Len(t, instances, 0)
+
+		allInstances, err = mngr.ListScoreEngines(context.Background())
+
+		require.NoError(t, err)
+		require.Len(t, allInstances, 0)
 
 		cancel()
 
@@ -239,8 +252,8 @@ func (m *eventBrokerMock) Dispatch(contestID domain.ContestID, event any) {
 	m.Called(contestID, event)
 }
 
-func (m *eventBrokerMock) Subscribe(filter domain.EventFilter, bufferCapacity int) (domain.SubscriptionID, domain.EventReader) {
-	args := m.Called(filter, bufferCapacity)
+func (m *eventBrokerMock) Subscribe(filters []domain.EventFilter, bufferCapacity int) (domain.SubscriptionID, domain.EventReader) {
+	args := m.Called(filters, bufferCapacity)
 	return args.Get(0).(domain.SubscriptionID), args.Get(1).(domain.EventReader)
 }
 

@@ -3,12 +3,11 @@
   import { authenticateContender, readStoredSessions } from "@/utils/auth";
   import { serialize } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/otp-input/otp-input.js";
   import { FullLogo, SplashScreen } from "@climblive/lib/components";
-  import { z } from "@climblive/lib/utils";
+  import { toast, z } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { format } from "date-fns";
   import { getContext, onMount } from "svelte";
@@ -21,7 +20,6 @@
   });
 
   let loadingContender = $state(false);
-  let loadingFailed = $state(false);
   let queryClient = useQueryClient();
   let form: HTMLFormElement | undefined = $state();
   let restoredSessions: ScorecardSession[] = $state([]);
@@ -49,7 +47,6 @@
 
   const handleEnter = async (registrationCode: string) => {
     try {
-      loadingFailed = false;
       loadingContender = true;
 
       const contender = await authenticateContender(
@@ -69,7 +66,12 @@
         console.error(e);
       }
 
-      loadingFailed = true;
+      toast({
+        title: "Incorrect registration code",
+        message: "Please enter a valid registration code.",
+        icon: "circle-exclamation",
+        variant: "danger",
+      });
     } finally {
       loadingContender = false;
     }
@@ -86,25 +88,25 @@
       </div>
     </header>
     <form bind:this={form} onsubmit={handleSubmit}>
-      <wa-input
+      <wa-otp-input
         required
-        placeholder="ABCD1234"
         label="Registration code"
         hint="Input your 8 digit registration code."
         name="code"
-        type="text"
-        minlength="8"
-        maxlength="8"
+        autosubmit
+        case="upper"
+        format="####-####"
+        type="alphanumeric"
+        size="s"
       >
         <wa-icon name="key" slot="start"></wa-icon>
-      </wa-input>
-      {#if loadingFailed}
-        <wa-callout open variant="danger">
-          <wa-icon slot="icon" name="exclamation-octagon"></wa-icon>
-          The registration code is not valid.
-        </wa-callout>
-      {/if}
-      <wa-button variant="neutral" type="submit" loading={loadingContender}>
+      </wa-otp-input>
+      <wa-button
+        variant="neutral"
+        type="submit"
+        loading={loadingContender}
+        size="s"
+      >
         <wa-icon slot="start" name="arrow-right-to-bracket"></wa-icon>
         Enter
       </wa-button>
@@ -135,7 +137,7 @@
           }}
           loading={loadingContender}
           size="s"
-          appearance="outlined filled"
+          appearance="outlined"
           >Restore
           <wa-icon slot="start" name="arrow-right-to-bracket"></wa-icon>
         </wa-button>
@@ -171,14 +173,6 @@
     flex-direction: column;
     text-align: left;
     gap: var(--wa-space-s);
-
-    & wa-input::part(input) {
-      text-transform: uppercase;
-      font-family: monospace;
-      white-space: pre;
-
-      width: 100%;
-    }
   }
 
   .restoredSession {
@@ -212,14 +206,13 @@
     margin-bottom: var(--wa-space-s);
   }
 
-  wa-input::part(base) {
-    text-transform: uppercase;
-    letter-spacing: 0.25rem;
-  }
-
   .admin-hint {
     text-align: center;
-    margin-block-start: var(--wa-space-m);
+    margin-block: var(--wa-space-m);
     font-size: var(--wa-font-size-s);
+  }
+
+  wa-otp-input::part(segments) {
+    flex-wrap: wrap;
   }
 </style>

@@ -352,7 +352,7 @@ func setupMux(
 	rest.InstallCompClassHandler(mux, &compClassUseCase)
 	rest.InstallProblemHandler(mux, &problemUseCase)
 	rest.InstallTickHandler(mux, &tickUseCase)
-	rest.InstallEventHandler(mux, eventBroker, 10*time.Second)
+	rest.InstallEventHandler(mux, eventBroker, repo, 10*time.Second)
 	rest.InstallScoreEngineHandler(mux, &scoreEngineUseCase)
 	rest.InstallRaffleHandler(mux, &raffleUseCase)
 	rest.InstallUserHandler(mux, &userUseCase)

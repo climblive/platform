@@ -19,11 +19,11 @@ func NewBroker() domain.EventBroker {
 	}
 }
 
-func (b *broker) Subscribe(filter domain.EventFilter, bufferCapacity int) (domain.SubscriptionID, domain.EventReader) {
+func (b *broker) Subscribe(filters []domain.EventFilter, bufferCapacity int) (domain.SubscriptionID, domain.EventReader) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
-	subscription := NewSubscription(filter, bufferCapacity)
+	subscription := NewSubscription(filters, bufferCapacity)
 
 	b.subscriptions[subscription.ID] = subscription
 
@@ -45,7 +45,7 @@ func (b *broker) Dispatch(contestID domain.ContestID, event any) {
 	contenderID := extractContenderID(event)
 
 	for _, subscription := range b.subscriptions {
-		if !subscription.FilterMatch(contestID, contenderID, eventName) {
+		if !subscription.FiltersMatch(contestID, contenderID, eventName) {
 			continue
 		}
 

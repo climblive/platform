@@ -2,7 +2,7 @@
   import Loader from "@/components/Loader.svelte";
   import {
     getContestQuery,
-    getScoreEnginesQuery,
+    getScoreEnginesByContestQuery,
     startScoreEngineMutation,
     stopScoreEngineMutation,
   } from "@climblive/lib/queries";
@@ -15,7 +15,7 @@
   let { contestId }: Props = $props();
 
   const contestQuery = $derived(getContestQuery(contestId));
-  const scoreEnginesQuery = $derived(getScoreEnginesQuery(contestId));
+  const scoreEnginesQuery = $derived(getScoreEnginesByContestQuery(contestId));
   const startScoreEngine = startScoreEngineMutation(contestId);
   const stopScoreEngine = stopScoreEngineMutation();
 
@@ -47,12 +47,12 @@
 {#if scoreEngines === undefined}
   <Loader />
 {:else}
-  {#each scoreEngines as engineInstanceId (engineInstanceId)}
+  {#each scoreEngines as scoreEngine (scoreEngine.instanceId)}
     <wa-button
       size="s"
       appearance="outlined"
       variant="danger"
-      onclick={() => stopScoreEngine.mutate(engineInstanceId)}
+      onclick={() => stopScoreEngine.mutate(scoreEngine.instanceId)}
       loading={stopScoreEngine.isPending}
       >Stop engine
       <wa-icon name="stop" slot="start"></wa-icon>

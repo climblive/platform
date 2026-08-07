@@ -309,8 +309,8 @@ func (m *eventBrokerMock) Dispatch(contestID domain.ContestID, event any) {
 	m.Called(contestID, event)
 }
 
-func (m *eventBrokerMock) Subscribe(filter domain.EventFilter, bufferCapacity int) (domain.SubscriptionID, domain.EventReader) {
-	args := m.Called(filter, bufferCapacity)
+func (m *eventBrokerMock) Subscribe(filters []domain.EventFilter, bufferCapacity int) (domain.SubscriptionID, domain.EventReader) {
+	args := m.Called(filters, bufferCapacity)
 	return args.Get(0).(domain.SubscriptionID), args.Get(1).(domain.EventReader)
 }
 

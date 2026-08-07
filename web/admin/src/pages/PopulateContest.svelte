@@ -69,7 +69,7 @@
     getContendersByContestQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
-  import { toastError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { add } from "date-fns";
 
   const holdColors = [
@@ -256,7 +256,7 @@
       populatorState = "settled";
     } catch {
       populatorState = "error";
-      toastError("Failed to populate contest.");
+      toastUnexpectedError("Failed to populate contest.");
     }
   };
 </script>
