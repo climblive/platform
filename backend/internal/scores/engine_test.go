@@ -91,7 +91,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}))
 
 		effects := slices.Collect(f.engine.HandleRulesUpdated(domain.RulesUpdatedEvent{
-			ContestID:          fakedContestID,
 			QualifyingProblems: 10,
 			Finalists:          7,
 			UsePoints:          true,
