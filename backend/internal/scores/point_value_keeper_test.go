@@ -19,14 +19,16 @@ func TestPointValueKeeper(t *testing.T) {
 	makeMocks := func(bufferCapacity int) (*eventBrokerMock, *events.Subscription) {
 		mockedEventBroker := new(eventBrokerMock)
 
-		subscription := events.NewSubscription(domain.EventFilter{}, bufferCapacity)
-		subscriptionID := uuid.New()
-
-		mockedEventBroker.On("Subscribe", domain.NewEventFilter(
+		filters := []domain.EventFilter{domain.NewEventFilter(
 			0,
 			0,
 			"POINT_VALUE_UPDATED",
-		), 0).Return(subscriptionID, subscription)
+		)}
+
+		subscription := events.NewSubscription(filters, bufferCapacity)
+		subscriptionID := uuid.New()
+
+		mockedEventBroker.On("Subscribe", filters, 0).Return(subscriptionID, subscription)
 
 		mockedEventBroker.On("Unsubscribe", subscriptionID).Return()
 

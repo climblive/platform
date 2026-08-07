@@ -15,6 +15,28 @@ type EventFilter struct {
 	EventTypes  map[string]struct{}
 }
 
+func (f EventFilter) Match(contestID ContestID, contenderID ContenderID, eventType string) bool {
+	switch f.ContestID {
+	case 0, contestID:
+	default:
+		return false
+	}
+
+	switch f.ContenderID {
+	case 0, contenderID:
+	default:
+		return false
+	}
+
+	hasEventTypeFilters := len(f.EventTypes) > 0
+
+	if _, found := f.EventTypes[eventType]; hasEventTypeFilters && !found {
+		return false
+	}
+
+	return true
+}
+
 func NewEventFilter(contestID ContestID, contenderID ContenderID, eventTypes ...string) EventFilter {
 	filter := EventFilter{
 		ContestID:   contestID,
@@ -35,7 +57,7 @@ func NewEventFilter(contestID ContestID, contenderID ContenderID, eventTypes ...
 
 type EventBroker interface {
 	Dispatch(contestID ContestID, event any)
-	Subscribe(filter EventFilter, bufferCapacity int) (SubscriptionID, EventReader)
+	Subscribe(filters []EventFilter, bufferCapacity int) (SubscriptionID, EventReader)
 	Unsubscribe(subscriptionID SubscriptionID)
 }
 

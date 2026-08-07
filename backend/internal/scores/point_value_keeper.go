@@ -75,7 +75,7 @@ func (k *PointValueKeeper) run(ctx context.Context, ready chan<- struct{}) {
 		"POINT_VALUE_UPDATED",
 	)
 
-	subscriptionID, eventReader := k.eventBroker.Subscribe(filter, 0)
+	subscriptionID, eventReader := k.eventBroker.Subscribe([]domain.EventFilter{filter}, 0)
 	defer k.eventBroker.Unsubscribe(subscriptionID)
 
 	k.running.Store(true)

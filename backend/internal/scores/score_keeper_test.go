@@ -21,14 +21,16 @@ func TestKeeper(t *testing.T) {
 		mockedRepo := new(repositoryMock)
 		mockedEventBroker := new(eventBrokerMock)
 
-		subscription := events.NewSubscription(domain.EventFilter{}, bufferCapacity)
-		subscriptionID := uuid.New()
-
-		mockedEventBroker.On("Subscribe", domain.NewEventFilter(
+		filters := []domain.EventFilter{domain.NewEventFilter(
 			0,
 			0,
 			"CONTENDER_SCORE_UPDATED",
-		), 0).Return(subscriptionID, subscription)
+		)}
+
+		subscription := events.NewSubscription(filters, bufferCapacity)
+		subscriptionID := uuid.New()
+
+		mockedEventBroker.On("Subscribe", filters, 0).Return(subscriptionID, subscription)
 
 		mockedEventBroker.On("Unsubscribe", subscriptionID).Return()
 
