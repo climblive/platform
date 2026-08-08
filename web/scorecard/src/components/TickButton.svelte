@@ -38,9 +38,9 @@
   >
     {label}
   </wa-checkbox>
-  <div>
+  <div class="subtext">
     {#if attempts !== undefined}
-      <span>{attempts} attempts;</span>
+      <span>{attempts} attempts</span>
     {/if}
     {#if pointsLabel !== undefined}
       <span>{pointsLabel}</span>
@@ -63,6 +63,12 @@
       var(--wa-color-surface-border);
     padding: var(--wa-space-s);
     border-radius: var(--wa-border-radius-m);
+  }
+
+  .subtext {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
   }
 
   .container[data-active="true"] {
