@@ -43,7 +43,8 @@
     {indeterminate}
     disabled={indeterminate}
   >
-    {label} <span class="sub">{subLabel}</span>
+    {label}
+    <span class="sub">{subLabel}</span>
   </wa-checkbox>
   <div class="subtext">
     {#if attempts !== undefined}
@@ -83,17 +84,24 @@
     justify-content: space-between;
   }
 
+  .subtext {
+    font-size: var(--wa-font-size-xs);
+    color: var(--wa-color-text-quiet);
+  }
+
   .container[data-active="true"] {
-    & span {
+    & .subtext {
       color: var(--wa-color-success-fill-loud);
     }
+
     border-color: var(--wa-color-success-border-loud);
   }
 
   .container[data-disabled="true"] {
-    & span {
+    & .subtext {
       color: var(--wa-color-text-quiet);
     }
+
     border-color: var(--wa-color-surface-border);
     opacity: 0.5;
   }
@@ -106,11 +114,6 @@
 
   .sub {
     margin-left: auto;
-    color: var(--wa-color-text-quiet);
-  }
-
-  .subtext span {
-    font-size: var(--wa-font-size-xs);
     color: var(--wa-color-text-quiet);
   }
 </style>
