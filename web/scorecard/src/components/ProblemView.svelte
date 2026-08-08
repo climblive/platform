@@ -71,9 +71,9 @@
       />
     {:else if tick?.top}
       +1t
-    {:else if tick?.zone2}
+    {:else if tick?.zone2 && problem.zone2Enabled}
       +1z₂
-    {:else if tick?.zone1}
+    {:else if tick?.zone1 && problem.zone1Enabled}
       +1z₁
     {/if}
   </div>

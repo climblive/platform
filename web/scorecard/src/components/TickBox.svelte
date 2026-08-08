@@ -48,9 +48,9 @@
         return "flash";
       case tick?.top:
         return "top";
-      case tick?.zone2:
+      case tick?.zone2 && problem.zone2Enabled:
         return "zone2";
-      case tick?.zone1:
+      case tick?.zone1 && problem.zone1Enabled:
         return "zone1";
     }
   });
@@ -151,15 +151,15 @@
     {#if loading}
       <wa-spinner></wa-spinner>
     {:else if tick?.top && tick.attemptsTop === 1}
-      <pre>F</pre>
+      <wa-icon name="bolt"></wa-icon>
     {:else if tick?.top}
       <pre>T</pre>
-    {:else if tick?.zone2}
+    {:else if tick?.zone2 && problem.zone2Enabled}
       <pre>Z₂</pre>
-    {:else if tick?.zone1}
+    {:else if tick?.zone1 && problem.zone1Enabled}
       <pre>Z₁</pre>
     {:else if tick !== undefined}
-      <pre>?</pre>
+      <pre>{tick.attemptsTop > 99 ? "99+" : tick.attemptsTop}</pre>
     {/if}
   </button>
 
