@@ -7,7 +7,8 @@
     attempts?: number;
     points?: number;
     bonusPoints?: number;
-    active: boolean;
+    checked: boolean;
+    indeterminate?: boolean;
   };
 
   const {
@@ -16,7 +17,8 @@
     attempts,
     points = 0,
     bonusPoints,
-    active,
+    checked,
+    indeterminate = false,
   }: Props = $props();
 
   const pointsLabel = $derived.by(() => {
@@ -28,8 +30,13 @@
   });
 </script>
 
-<div class="container" data-active={active}>
-  <wa-checkbox onclick={onClick} checked={active}>
+<div class="container" data-active={checked}>
+  <wa-checkbox
+    onclick={onClick}
+    {checked}
+    {indeterminate}
+    disabled={indeterminate}
+  >
     {label}
   </wa-checkbox>
   <div>

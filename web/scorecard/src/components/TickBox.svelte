@@ -173,7 +173,7 @@
         label="Top"
         onClick={(e: MouseEvent) => handleTick(e, "top", false)}
         points={pointValue?.top}
-        active={variant === "top"}
+        checked={variant === "top"}
         attempts={enableAttempts ? tick?.attemptsTop : undefined}
       />
 
@@ -183,7 +183,8 @@
           onClick={(e: MouseEvent) => handleTick(e, "top", true)}
           points={pointValue?.top}
           bonusPoints={pointValue?.flashBonus}
-          active={variant === "flash"}
+          checked={variant === "flash"}
+          indeterminate={variant === "flash"}
           attempts={enableAttempts ? tick?.attemptsTop : undefined}
         />
       {/if}
@@ -194,7 +195,8 @@
         label="Zone 2"
         onClick={(e: MouseEvent) => handleTick(e, "zone2", false)}
         points={pointValue?.zone2}
-        active={variant === "zone2"}
+        checked={variant === "zone2"}
+        indeterminate={variant === "top" || variant === "flash"}
         attempts={enableAttempts ? tick?.attemptsZone2 : undefined}
       />
     {/if}
@@ -204,7 +206,10 @@
         label="Zone 1"
         onClick={(e: MouseEvent) => handleTick(e, "zone1", false)}
         points={pointValue?.zone1}
-        active={variant === "zone1"}
+        checked={variant === "zone1"}
+        indeterminate={variant === "zone2" ||
+          variant === "top" ||
+          variant === "flash"}
         attempts={enableAttempts ? tick?.attemptsZone1 : undefined}
       />
     {/if}
@@ -214,6 +219,7 @@
         size="s"
         appearance="outlined"
         onclick={(event: MouseEvent) => handleLogAttempt(event)}
+        disabled={variant === "top" || variant === "flash"}
       >
         <wa-icon slot="start" name="plus"></wa-icon>
         Attempt
