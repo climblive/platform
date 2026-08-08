@@ -40,7 +40,7 @@
   </wa-checkbox>
   <div class="subtext">
     {#if attempts !== undefined}
-      <span>{attempts} attempts</span>
+      <span>{attempts} {attempts === 1 ? "attempt" : "attempts"}</span>
     {/if}
     {#if pointsLabel !== undefined}
       <span>{pointsLabel}</span>

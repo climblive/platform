@@ -92,26 +92,50 @@
       reachedFeatures.add("zone1");
     }
 
-    if (uncheck) {
-      reachedFeatures.delete(feature);
-    } else {
-      reachedFeatures.add(feature);
-    }
-
-    let attempts = flash ? 1 : 999;
-    if (reachedFeatures.size === 0) {
-      attempts = 0;
-    }
-
     const nextTick: Omit<Tick, "id" | "timestamp"> = {
       problemId: problem.id,
       top: false,
       zone2: false,
       zone1: false,
-      attemptsTop: attempts,
-      attemptsZone2: attempts,
-      attemptsZone1: attempts,
+      attemptsTop: tick?.attemptsTop ?? 0,
+      attemptsZone2: tick?.attemptsZone2 ?? 0,
+      attemptsZone1: tick?.attemptsZone1 ?? 0,
     };
+
+    if (!enableAttempts) {
+      let attempts = flash ? 1 : 999;
+
+      nextTick.attemptsTop = attempts;
+      nextTick.attemptsZone2 = attempts;
+      nextTick.attemptsZone1 = attempts;
+    } else if (!uncheck) {
+      if (!reachedFeatures.has("top")) {
+        nextTick.attemptsTop++;
+      }
+
+      if (!reachedFeatures.has("zone2")) {
+        nextTick.attemptsZone2++;
+      }
+
+      if (!reachedFeatures.has("zone1")) {
+        nextTick.attemptsZone1++;
+      }
+    }
+
+    if (uncheck) {
+      reachedFeatures.delete(feature);
+    } else {
+      switch (feature) {
+        case "top":
+          reachedFeatures.add("top");
+        // eslint-disable-next-line no-fallthrough
+        case "zone2":
+          reachedFeatures.add("zone2");
+        // eslint-disable-next-line no-fallthrough
+        case "zone1":
+          reachedFeatures.add("zone1");
+      }
+    }
 
     nextTick.top = reachedFeatures.has("top");
     nextTick.zone2 = reachedFeatures.has("zone2");
@@ -129,15 +153,38 @@
 
     navigator.vibrate?.(50);
 
+    const reachedFeatures = new Set<string>();
+    if (tick?.top) {
+      reachedFeatures.add("top");
+    }
+    if (problem.zone2Enabled && tick?.zone2) {
+      reachedFeatures.add("zone2");
+    }
+    if (problem.zone1Enabled && tick?.zone1) {
+      reachedFeatures.add("zone1");
+    }
+
     const nextTick: Omit<Tick, "id" | "timestamp"> = {
       problemId: problem.id,
       top: tick?.top ?? false,
       zone2: tick?.zone2 ?? false,
       zone1: tick?.zone1 ?? false,
-      attemptsTop: (tick?.attemptsTop ?? 0) + 1,
-      attemptsZone2: (tick?.attemptsZone2 ?? 0) + 1,
-      attemptsZone1: (tick?.attemptsZone1 ?? 0) + 1,
+      attemptsTop: tick?.attemptsTop ?? 0,
+      attemptsZone2: tick?.attemptsZone2 ?? 0,
+      attemptsZone1: tick?.attemptsZone1 ?? 0,
     };
+
+    if (!reachedFeatures.has("top")) {
+      nextTick.attemptsTop++;
+    }
+
+    if (!reachedFeatures.has("zone2")) {
+      nextTick.attemptsZone2++;
+    }
+
+    if (!reachedFeatures.has("zone1")) {
+      nextTick.attemptsZone1++;
+    }
 
     putTick.mutate(nextTick, {
       onError: () => {
@@ -189,7 +236,7 @@
         onChange={(e: InputEvent) => handleTick(e, "top", false)}
         points={pointValue?.top}
         checked={tick?.top}
-        attempts={enableAttempts ? tick?.attemptsTop : undefined}
+        attempts={enableAttempts ? (tick?.attemptsTop ?? 0) : undefined}
       />
 
       {#if !enableAttempts}
@@ -199,7 +246,7 @@
           points={pointValue?.top}
           bonusPoints={pointValue?.flashBonus}
           checked={tick?.top && tick?.attemptsTop === 1}
-          attempts={enableAttempts ? tick?.attemptsTop : undefined}
+          attempts={enableAttempts ? (tick?.attemptsTop ?? 0) : undefined}
         />
       {/if}
     </div>
@@ -211,7 +258,7 @@
         points={pointValue?.zone2}
         checked={tick?.zone2}
         indeterminate={tick?.top}
-        attempts={enableAttempts ? tick?.attemptsZone2 : undefined}
+        attempts={enableAttempts ? (tick?.attemptsZone2 ?? 0) : undefined}
       />
     {/if}
 
@@ -222,7 +269,7 @@
         points={pointValue?.zone1}
         checked={tick?.zone1}
         indeterminate={tick?.zone2}
-        attempts={enableAttempts ? tick?.attemptsZone1 : undefined}
+        attempts={enableAttempts ? (tick?.attemptsZone1 ?? 0) : undefined}
       />
     {/if}
 
@@ -231,14 +278,14 @@
         size="s"
         appearance="outlined"
         onclick={(event: MouseEvent) => handleLogAttempt(event)}
-        disabled={tick?.top}
+        disabled={tick?.top === true}
       >
         <wa-icon slot="start" name="plus"></wa-icon>
         Attempt
       </wa-button>
     {/if}
 
-    {#if open && variant !== undefined}
+    {#if open && tick !== undefined}
       <wa-button
         size="s"
         appearance="plain"
