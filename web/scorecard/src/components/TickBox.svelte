@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { ScorecardSession } from "@/types";
-  import type WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import { HoldColorIndicator } from "@climblive/lib/components";
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
   import { deleteTickMutation, putTickMutation } from "@climblive/lib/queries";
@@ -73,27 +72,23 @@
   };
 
   const handleTick = (
-    event: InputEvent,
+    checked: boolean,
     feature: "zone1" | "zone2" | "top",
     flash: boolean,
   ) => {
-    event.stopPropagation();
-
     navigator.vibrate?.(50);
 
-    const uncheck = !(event.target as WaCheckbox).checked;
-
-    if (uncheck) {
-      tickBuilder.unreachFeature(feature);
-    } else {
+    if (checked) {
       tickBuilder.reachFeature(feature);
+    } else {
+      tickBuilder.unreachFeature(feature);
     }
 
     const nextTick = tickBuilder.tick;
 
     if (!enableAttempts) {
       let attempts = 999;
-      if (flash && !uncheck) {
+      if (flash && checked) {
         attempts = 1;
       }
 
@@ -182,35 +177,28 @@
       <TickButton
         label="Top"
         subLabel="T"
-        onChange={(e: InputEvent) => handleTick(e, "top", false)}
+        onChange={(checked, flash) => handleTick(checked, "top", flash)}
         points={showPoints ? pointValue?.top : undefined}
+        bonusPoints={pointValue?.flashBonus}
         checked={tick?.top}
-        indeterminate={!enableAttempts && tick?.top && tick?.attemptsTop === 1}
-        attempts={enableAttempts ? (tick?.attemptsTop ?? 0) : undefined}
+        attempts={tick?.attemptsTop ?? 0}
+        flashToggle
+        showAttempts={enableAttempts}
+        {showPoints}
       />
-
-      {#if !enableAttempts}
-        <TickButton
-          label="Flash"
-          subLabel="F"
-          onChange={(e: InputEvent) => handleTick(e, "top", true)}
-          points={showPoints ? pointValue?.top : undefined}
-          bonusPoints={pointValue?.flashBonus}
-          checked={tick?.top && tick?.attemptsTop === 1}
-          attempts={enableAttempts ? (tick?.attemptsTop ?? 0) : undefined}
-        />
-      {/if}
     </div>
 
     {#if problem.zone2Enabled}
       <TickButton
         label="Zone 2"
         subLabel="Z₂"
-        onChange={(e: InputEvent) => handleTick(e, "zone2", false)}
+        onChange={(checked) => handleTick(checked, "zone2", false)}
         points={showPoints ? pointValue?.zone2 : undefined}
         checked={tick?.zone2}
         indeterminate={tick?.top}
-        attempts={enableAttempts ? (tick?.attemptsZone2 ?? 0) : undefined}
+        attempts={tick?.attemptsZone2 ?? 0}
+        showAttempts={enableAttempts}
+        {showPoints}
       />
     {/if}
 
@@ -218,11 +206,13 @@
       <TickButton
         label="Zone 1"
         subLabel="Z₁"
-        onChange={(e: InputEvent) => handleTick(e, "zone1", false)}
+        onChange={(checked) => handleTick(checked, "zone1", false)}
         points={showPoints ? pointValue?.zone1 : undefined}
         checked={tick?.zone1}
         indeterminate={tick?.zone2}
-        attempts={enableAttempts ? (tick?.attemptsZone1 ?? 0) : undefined}
+        attempts={tick?.attemptsZone1 ?? 0}
+        showAttempts={enableAttempts}
+        {showPoints}
       />
     {/if}
 
