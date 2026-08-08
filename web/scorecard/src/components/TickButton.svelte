@@ -7,7 +7,7 @@
     attempts?: number;
     points?: number;
     bonusPoints?: number;
-    checked: boolean;
+    checked?: boolean;
     indeterminate?: boolean;
   };
 
@@ -30,12 +30,11 @@
   });
 </script>
 
-<div class="container" data-active={checked}>
+<div class="container" data-active={checked} data-disabled={indeterminate}>
   <wa-checkbox
     onchange={onChange}
-    {checked}
+    checked={checked && !indeterminate}
     {indeterminate}
-    disabled={indeterminate}
   >
     {label}
   </wa-checkbox>
@@ -71,6 +70,14 @@
       color: var(--wa-color-success-fill-loud);
     }
     border-color: var(--wa-color-success-border-loud);
+  }
+
+  .container[data-disabled="true"] {
+    & span {
+      color: var(--wa-color-text-quiet);
+    }
+    border-color: var(--wa-color-surface-border);
+    opacity: 0.5;
   }
 
   span {

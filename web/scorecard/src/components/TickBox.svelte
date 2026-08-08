@@ -18,7 +18,7 @@
     enableAttempts: boolean;
   }
 
-  let {
+  const {
     problem,
     tick,
     disabled = false,
@@ -173,7 +173,7 @@
         label="Top"
         onChange={(e: InputEvent) => handleTick(e, "top", false)}
         points={pointValue?.top}
-        checked={variant === "top"}
+        checked={tick?.top}
         attempts={enableAttempts ? tick?.attemptsTop : undefined}
       />
 
@@ -183,8 +183,7 @@
           onChange={(e: InputEvent) => handleTick(e, "top", true)}
           points={pointValue?.top}
           bonusPoints={pointValue?.flashBonus}
-          checked={variant === "flash"}
-          indeterminate={variant === "flash"}
+          checked={tick?.top && tick?.attemptsTop === 1}
           attempts={enableAttempts ? tick?.attemptsTop : undefined}
         />
       {/if}
@@ -195,8 +194,8 @@
         label="Zone 2"
         onChange={(e: InputEvent) => handleTick(e, "zone2", false)}
         points={pointValue?.zone2}
-        checked={variant === "zone2"}
-        indeterminate={variant === "top" || variant === "flash"}
+        checked={tick?.zone2}
+        indeterminate={tick?.top}
         attempts={enableAttempts ? tick?.attemptsZone2 : undefined}
       />
     {/if}
@@ -206,10 +205,8 @@
         label="Zone 1"
         onChange={(e: InputEvent) => handleTick(e, "zone1", false)}
         points={pointValue?.zone1}
-        checked={variant === "zone1"}
-        indeterminate={variant === "zone2" ||
-          variant === "top" ||
-          variant === "flash"}
+        checked={tick?.zone1}
+        indeterminate={tick?.zone2}
         attempts={enableAttempts ? tick?.attemptsZone1 : undefined}
       />
     {/if}
@@ -219,7 +216,7 @@
         size="s"
         appearance="outlined"
         onclick={(event: MouseEvent) => handleLogAttempt(event)}
-        disabled={variant === "top" || variant === "flash"}
+        disabled={tick?.top}
       >
         <wa-icon slot="start" name="plus"></wa-icon>
         Attempt
