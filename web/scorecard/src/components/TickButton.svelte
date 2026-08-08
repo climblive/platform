@@ -2,7 +2,7 @@
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
 
   type Props = {
-    onClick: (e: MouseEvent) => void;
+    onChange: (e: InputEvent) => void;
     label: string;
     attempts?: number;
     points?: number;
@@ -12,7 +12,7 @@
   };
 
   const {
-    onClick,
+    onChange,
     label,
     attempts,
     points = 0,
@@ -32,7 +32,7 @@
 
 <div class="container" data-active={checked}>
   <wa-checkbox
-    onclick={onClick}
+    onchange={onChange}
     {checked}
     {indeterminate}
     disabled={indeterminate}

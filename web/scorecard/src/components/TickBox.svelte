@@ -70,7 +70,7 @@
   };
 
   const handleTick = (
-    event: MouseEvent,
+    event: InputEvent,
     feature: "zone1" | "zone2" | "top",
     flash: boolean,
   ) => {
@@ -171,7 +171,7 @@
     <div class="horizontal">
       <TickButton
         label="Top"
-        onClick={(e: MouseEvent) => handleTick(e, "top", false)}
+        onChange={(e: InputEvent) => handleTick(e, "top", false)}
         points={pointValue?.top}
         checked={variant === "top"}
         attempts={enableAttempts ? tick?.attemptsTop : undefined}
@@ -180,7 +180,7 @@
       {#if !enableAttempts}
         <TickButton
           label="Flash"
-          onClick={(e: MouseEvent) => handleTick(e, "top", true)}
+          onChange={(e: InputEvent) => handleTick(e, "top", true)}
           points={pointValue?.top}
           bonusPoints={pointValue?.flashBonus}
           checked={variant === "flash"}
@@ -193,7 +193,7 @@
     {#if problem.zone2Enabled}
       <TickButton
         label="Zone 2"
-        onClick={(e: MouseEvent) => handleTick(e, "zone2", false)}
+        onChange={(e: InputEvent) => handleTick(e, "zone2", false)}
         points={pointValue?.zone2}
         checked={variant === "zone2"}
         indeterminate={variant === "top" || variant === "flash"}
@@ -204,7 +204,7 @@
     {#if problem.zone1Enabled}
       <TickButton
         label="Zone 1"
-        onClick={(e: MouseEvent) => handleTick(e, "zone1", false)}
+        onChange={(e: InputEvent) => handleTick(e, "zone1", false)}
         points={pointValue?.zone1}
         checked={variant === "zone1"}
         indeterminate={variant === "zone2" ||
