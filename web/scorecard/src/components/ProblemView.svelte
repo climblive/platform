@@ -12,9 +12,10 @@
     tick?: Tick | undefined;
     disabled: boolean;
     counted: boolean;
+    showPoints: boolean;
   }
 
-  const { problem, tick, disabled, counted }: Props = $props();
+  const { problem, tick, disabled, counted, showPoints }: Props = $props();
 
   const valueRange = $derived.by<{ min: number; max: number } | undefined>(
     () => {
@@ -44,7 +45,7 @@
   />
   <span class="number">№ {problem.number}</span>
   <span class="points">
-    {#if valueRange}
+    {#if showPoints && valueRange}
       <span class="top">
         {#if valueRange.min === valueRange.max}
           {valueRange.max}p

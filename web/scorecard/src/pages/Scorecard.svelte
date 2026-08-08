@@ -465,6 +465,7 @@
                     disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
                     counted={contest.qualifyingProblems === 0 ||
                       (!!tick && countedTickIds.has(tick.id))}
+                    showPoints={contest.usePoints}
                   />
                 {/each}
               </div>
