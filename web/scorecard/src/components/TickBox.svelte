@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { ScorecardSession } from "@/types";
   import type WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
-  import WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import { HoldColorIndicator } from "@climblive/lib/components";
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
   import { deleteTickMutation, putTickMutation } from "@climblive/lib/queries";
@@ -29,8 +28,6 @@
     showPoints,
     enableAttempts,
   }: Props = $props();
-
-  let dialog: WaDialog | undefined = $state();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
   const putTick = $derived(putTickMutation($session.contenderId));
@@ -159,13 +156,16 @@
     {:else if tick?.zone1 && problem.zone1Enabled}
       <pre>Z₁</pre>
     {:else if tick !== undefined}
-      <pre>{tick.attemptsTop > 99 ? "99+" : tick.attemptsTop}</pre>
+      {#if tick.attemptsTop > 99}
+        <pre class="small">99+</pre>
+      {:else}
+        <pre>{tick.attemptsTop}</pre>
+      {/if}
     {/if}
   </button>
 
   <wa-dialog
     label="Problem number {problem.number}"
-    bind:this={dialog}
     {open}
     light-dismiss
     onwa-hide={() => (open = false)}
@@ -277,14 +277,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: calc(100% - 2 * var(--wa-space-xs));
-    aspect-ratio: 1 / 1;
+    height: 2rem;
+    width: 2rem;
     border: var(--wa-border-style) var(--wa-border-width-s)
       var(--wa-color-neutral-border-loud);
-    border-radius: var(--wa-border-radius-l);
+    border-radius: var(--wa-border-radius-m);
     background: none;
     cursor: pointer;
-    width: max-content;
     font-size: var(--wa-font-size-s);
     font-weight: var(--wa-font-weight-bold);
 
@@ -361,5 +360,9 @@
     & wa-button {
       flex: 1;
     }
+  }
+
+  pre.small {
+    font-size: var(--wa-font-size-xs);
   }
 </style>
