@@ -167,7 +167,6 @@
   <wa-dialog
     label="Problem number {problem.number}"
     {open}
-    light-dismiss
     onwa-hide={() => (open = false)}
   >
     <div class="label" slot="label">
