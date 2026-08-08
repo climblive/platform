@@ -152,9 +152,9 @@
     {:else if tick?.top}
       T
     {:else if tick?.zone2 && problem.zone2Enabled}
-      Z₂
+      Z2
     {:else if tick?.zone1 && problem.zone1Enabled}
-      Z₁
+      Z1
     {:else if tick !== undefined}
       {#if tick.attemptsTop > 99}
         <span class="small">99+</span>
