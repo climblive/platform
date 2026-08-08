@@ -182,7 +182,7 @@
         bonusPoints={pointValue?.flashBonus}
         checked={tick?.top}
         attempts={tick?.attemptsTop ?? 0}
-        flashToggle
+        flashToggle={!enableAttempts}
         showAttempts={enableAttempts}
         {showPoints}
       />

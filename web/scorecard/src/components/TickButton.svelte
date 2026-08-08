@@ -53,7 +53,7 @@
   <div class="top">
     <wa-checkbox
       onchange={(e: InputEvent) => handleChange(e, false)}
-      checked={checked && !indeterminate && attempts > 1}
+      checked={checked && !indeterminate && attempts !== 1}
       {indeterminate}
       disabled={indeterminate}
       size="m"
