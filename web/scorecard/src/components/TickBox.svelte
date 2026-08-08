@@ -150,16 +150,16 @@
     {:else if tick?.top && tick.attemptsTop === 1}
       <wa-icon name="bolt"></wa-icon>
     {:else if tick?.top}
-      <pre>T</pre>
+      T
     {:else if tick?.zone2 && problem.zone2Enabled}
-      <pre>Z₂</pre>
+      Z₂
     {:else if tick?.zone1 && problem.zone1Enabled}
-      <pre>Z₁</pre>
+      Z₁
     {:else if tick !== undefined}
       {#if tick.attemptsTop > 99}
-        <pre class="small">99+</pre>
+        <span class="small">99+</span>
       {:else}
-        <pre>{tick.attemptsTop}</pre>
+        {tick.attemptsTop}
       {/if}
     {/if}
   </button>
@@ -323,10 +323,6 @@
       border-color: var(--wa-color-yellow-50);
       color: var(--wa-color-yellow-50);
     }
-
-    & pre {
-      margin: 0;
-    }
   }
 
   .label {
@@ -363,7 +359,7 @@
     }
   }
 
-  pre.small {
+  .small {
     font-size: var(--wa-font-size-xs);
   }
 </style>
