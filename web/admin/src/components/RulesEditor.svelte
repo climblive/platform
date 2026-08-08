@@ -34,7 +34,7 @@
     patchContest.mutate(
       { usePoints },
       {
-        onError: () => toastError("Failed to update rules."),
+        onError: () => toastUnexpectedError("Failed to update rules."),
       },
     );
   };

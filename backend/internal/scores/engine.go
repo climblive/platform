@@ -168,6 +168,12 @@ func (e *DefaultScoreEngine) HandleContenderEntered(event domain.ContenderEntere
 		Disqualified:        false,
 		WithdrawnFromFinals: false,
 		Points:              0,
+		Tops:                0,
+		AttemptsTops:        0,
+		Zone1s:              0,
+		AttemptsZone1s:      0,
+		Zone2s:              0,
+		AttemptsZone2s:      0,
 	}
 
 	e.store.SaveContender(contender)
