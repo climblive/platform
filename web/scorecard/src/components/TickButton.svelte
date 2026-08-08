@@ -33,9 +33,9 @@
 <div class="container" data-active={checked} data-disabled={indeterminate}>
   <wa-checkbox
     onchange={onChange}
-    checked={checked && !indeterminate}
+    {checked}
     {indeterminate}
-    disabled={indeterminate}
+    // disabled={indeterminate}
   >
     {label}
   </wa-checkbox>

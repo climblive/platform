@@ -10,6 +10,7 @@
   import { getContext } from "svelte";
   import type { Readable } from "svelte/store";
   import TickButton from "./TickButton.svelte";
+  import { TickBuilder } from "./tick";
 
   interface Props {
     problem: Problem;
@@ -32,6 +33,8 @@
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
   const putTick = $derived(putTickMutation($session.contenderId));
   const deleteTick = $derived(deleteTickMutation());
+
+  const tickBuilder = $derived(new TickBuilder(problem, tick));
 
   let open = $state(false);
 
@@ -81,26 +84,13 @@
 
     const uncheck = !(event.target as WaCheckbox).checked;
 
-    const reachedFeatures = new Set<string>();
-    if (tick?.top) {
-      reachedFeatures.add("top");
-    }
-    if (problem.zone2Enabled && tick?.zone2) {
-      reachedFeatures.add("zone2");
-    }
-    if (problem.zone1Enabled && tick?.zone1) {
-      reachedFeatures.add("zone1");
+    if (uncheck) {
+      tickBuilder.unreachFeature(feature);
+    } else {
+      tickBuilder.reachFeature(feature);
     }
 
-    const nextTick: Omit<Tick, "id" | "timestamp"> = {
-      problemId: problem.id,
-      top: false,
-      zone2: false,
-      zone1: false,
-      attemptsTop: tick?.attemptsTop ?? 0,
-      attemptsZone2: tick?.attemptsZone2 ?? 0,
-      attemptsZone1: tick?.attemptsZone1 ?? 0,
-    };
+    const nextTick = tickBuilder.tick;
 
     if (!enableAttempts) {
       let attempts = flash ? 1 : 999;
@@ -108,38 +98,7 @@
       nextTick.attemptsTop = attempts;
       nextTick.attemptsZone2 = attempts;
       nextTick.attemptsZone1 = attempts;
-    } else if (!uncheck) {
-      if (!reachedFeatures.has("top")) {
-        nextTick.attemptsTop++;
-      }
-
-      if (!reachedFeatures.has("zone2")) {
-        nextTick.attemptsZone2++;
-      }
-
-      if (!reachedFeatures.has("zone1")) {
-        nextTick.attemptsZone1++;
-      }
     }
-
-    if (uncheck) {
-      reachedFeatures.delete(feature);
-    } else {
-      switch (feature) {
-        case "top":
-          reachedFeatures.add("top");
-        // eslint-disable-next-line no-fallthrough
-        case "zone2":
-          reachedFeatures.add("zone2");
-        // eslint-disable-next-line no-fallthrough
-        case "zone1":
-          reachedFeatures.add("zone1");
-      }
-    }
-
-    nextTick.top = reachedFeatures.has("top");
-    nextTick.zone2 = reachedFeatures.has("zone2");
-    nextTick.zone1 = reachedFeatures.has("zone1");
 
     putTick.mutate(nextTick, {
       onError: () => {
@@ -153,40 +112,9 @@
 
     navigator.vibrate?.(50);
 
-    const reachedFeatures = new Set<string>();
-    if (tick?.top) {
-      reachedFeatures.add("top");
-    }
-    if (problem.zone2Enabled && tick?.zone2) {
-      reachedFeatures.add("zone2");
-    }
-    if (problem.zone1Enabled && tick?.zone1) {
-      reachedFeatures.add("zone1");
-    }
+    tickBuilder.subtractAttempt();
 
-    const nextTick: Omit<Tick, "id" | "timestamp"> = {
-      problemId: problem.id,
-      top: tick?.top ?? false,
-      zone2: tick?.zone2 ?? false,
-      zone1: tick?.zone1 ?? false,
-      attemptsTop: tick?.attemptsTop ?? 0,
-      attemptsZone2: tick?.attemptsZone2 ?? 0,
-      attemptsZone1: tick?.attemptsZone1 ?? 0,
-    };
-
-    if (!reachedFeatures.has("top")) {
-      nextTick.attemptsTop--;
-    }
-
-    if (!reachedFeatures.has("zone2")) {
-      nextTick.attemptsZone2--;
-    }
-
-    if (!reachedFeatures.has("zone1")) {
-      nextTick.attemptsZone1--;
-    }
-
-    putTick.mutate(nextTick, {
+    putTick.mutate(tickBuilder.tick, {
       onError: () => {
         toastUnexpectedError("Failed to update tick.");
       },
@@ -198,40 +126,9 @@
 
     navigator.vibrate?.(50);
 
-    const reachedFeatures = new Set<string>();
-    if (tick?.top) {
-      reachedFeatures.add("top");
-    }
-    if (problem.zone2Enabled && tick?.zone2) {
-      reachedFeatures.add("zone2");
-    }
-    if (problem.zone1Enabled && tick?.zone1) {
-      reachedFeatures.add("zone1");
-    }
+    tickBuilder.addAttempt();
 
-    const nextTick: Omit<Tick, "id" | "timestamp"> = {
-      problemId: problem.id,
-      top: tick?.top ?? false,
-      zone2: tick?.zone2 ?? false,
-      zone1: tick?.zone1 ?? false,
-      attemptsTop: tick?.attemptsTop ?? 0,
-      attemptsZone2: tick?.attemptsZone2 ?? 0,
-      attemptsZone1: tick?.attemptsZone1 ?? 0,
-    };
-
-    if (!reachedFeatures.has("top")) {
-      nextTick.attemptsTop++;
-    }
-
-    if (!reachedFeatures.has("zone2")) {
-      nextTick.attemptsZone2++;
-    }
-
-    if (!reachedFeatures.has("zone1")) {
-      nextTick.attemptsZone1++;
-    }
-
-    putTick.mutate(nextTick, {
+    putTick.mutate(tickBuilder.tick, {
       onError: () => {
         toastUnexpectedError("Failed to update tick.");
       },
@@ -324,7 +221,7 @@
           size="s"
           appearance="outlined"
           onclick={(event: MouseEvent) => handleAddAttempt(event)}
-          disabled={tick?.top === true}
+          disabled={!tickBuilder.canAddAttempt()}
         >
           <wa-icon slot="start" name="plus"></wa-icon>
           Attempt
@@ -334,7 +231,7 @@
           size="s"
           appearance="outlined"
           onclick={(event: MouseEvent) => handleSubtractAttempt(event)}
-          disabled={tick?.top === true}
+          disabled={!tickBuilder.canSubtractAttempt()}
         >
           <wa-icon slot="start" name="minus"></wa-icon>
           Attempt
@@ -347,7 +244,7 @@
       appearance="plain"
       onclick={(e: MouseEvent) => handleDelete(e)}
       variant="danger"
-      disabled={open && tick !== undefined}
+      disabled={open && tick === undefined}
     >
       <wa-icon slot="start" name="rotate-left"></wa-icon>
       Unsend
