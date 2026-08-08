@@ -93,7 +93,17 @@ export class TickBuilder {
   }
 
   public canAddAttempt(): boolean {
-    return !this.#reachedFeatures.has("top");
+    if (this.#reachedFeatures.has("top")) {
+      return false;
+    }
+
+    for (const attempts of this.#attempts.values()) {
+      if (attempts === 999) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   public canSubtractAttempt(): boolean {
