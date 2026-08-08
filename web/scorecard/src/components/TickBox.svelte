@@ -195,10 +195,10 @@
         onChange={(checked) => handleTick(checked, "zone2", false)}
         points={showPoints ? pointValue?.zone2 : undefined}
         checked={tick?.zone2}
-        indeterminate={tick?.top}
         attempts={tick?.attemptsZone2 ?? 0}
         showAttempts={enableAttempts}
         {showPoints}
+        disabled={tick?.top}
       />
     {/if}
 
@@ -209,10 +209,10 @@
         onChange={(checked) => handleTick(checked, "zone1", false)}
         points={showPoints ? pointValue?.zone1 : undefined}
         checked={tick?.zone1}
-        indeterminate={tick?.zone2}
         attempts={tick?.attemptsZone1 ?? 0}
         showAttempts={enableAttempts}
         {showPoints}
+        disabled={tick?.zone2}
       />
     {/if}
 

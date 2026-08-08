@@ -10,10 +10,10 @@
     points?: number;
     bonusPoints?: number;
     checked?: boolean;
-    indeterminate?: boolean;
     flashToggle?: boolean;
     showPoints?: boolean;
     showAttempts?: boolean;
+    disabled?: boolean;
   };
 
   const {
@@ -24,10 +24,10 @@
     points,
     bonusPoints,
     checked,
-    indeterminate = false,
     flashToggle,
     showPoints,
     showAttempts,
+    disabled = false,
   }: Props = $props();
 
   const pointsLabel = $derived.by(() => {
@@ -47,15 +47,16 @@
 
     onChange(checked, flash);
   };
+
+  const flashToggleChecked = $derived(flashToggle && attempts === 1);
 </script>
 
-<div class="container" data-active={checked} data-disabled={indeterminate}>
+<div class="container" data-active={checked} data-disabled={disabled}>
   <div class="top">
     <wa-checkbox
       onchange={(e: InputEvent) => handleChange(e, false)}
-      checked={checked && !indeterminate && attempts !== 1}
-      {indeterminate}
-      disabled={indeterminate}
+      checked={checked && !flashToggleChecked}
+      {disabled}
       size="m"
     >
       {label}
@@ -66,9 +67,8 @@
 
       <wa-checkbox
         onchange={(e: InputEvent) => handleChange(e, true)}
-        checked={checked && !indeterminate && attempts === 1}
-        {indeterminate}
-        disabled={indeterminate}
+        checked={checked && flashToggleChecked}
+        {disabled}
         size="m"
       >
         Flash
@@ -136,7 +136,6 @@
     }
 
     border-color: var(--wa-color-surface-border);
-    opacity: 0.5;
   }
 
   .sub {
