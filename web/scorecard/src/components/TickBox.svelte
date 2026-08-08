@@ -150,13 +150,13 @@
   >
     {#if loading}
       <wa-spinner></wa-spinner>
-    {:else if variant === "flash"}
+    {:else if tick?.top && tick.attemptsTop === 1}
       <pre>F</pre>
-    {:else if variant === "top"}
+    {:else if tick?.top}
       <pre>T</pre>
-    {:else if variant === "zone2"}
+    {:else if tick?.zone2}
       <pre>Z2</pre>
-    {:else if variant === "zone1"}
+    {:else if tick?.zone1}
       <pre>Z1</pre>
     {/if}
   </button>

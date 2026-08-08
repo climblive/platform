@@ -69,6 +69,12 @@
         value={problem.pointValue.current + "p"}
         prefix={counted ? "+" : undefined}
       />
+    {:else if tick?.top}
+      +1t
+    {:else if tick?.zone2}
+      +1z₂
+    {:else if tick?.zone1}
+      +1z₁
     {/if}
   </div>
 
