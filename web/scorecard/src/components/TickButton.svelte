@@ -4,6 +4,7 @@
   type Props = {
     onChange: (e: InputEvent) => void;
     label: string;
+    subLabel?: string;
     attempts?: number;
     points?: number;
     bonusPoints?: number;
@@ -14,6 +15,7 @@
   const {
     onChange,
     label,
+    subLabel,
     attempts,
     points,
     bonusPoints,
@@ -41,7 +43,7 @@
     {indeterminate}
     disabled={indeterminate}
   >
-    {label}
+    {label} <span class="sub">{subLabel}</span>
   </wa-checkbox>
   <div class="subtext">
     {#if attempts !== undefined}
@@ -96,7 +98,18 @@
     opacity: 0.5;
   }
 
-  span {
+  wa-checkbox::part(label) {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .sub {
+    margin-left: auto;
+    color: var(--wa-color-text-quiet);
+  }
+
+  .subtext span {
     font-size: var(--wa-font-size-xs);
     color: var(--wa-color-text-quiet);
   }

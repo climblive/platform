@@ -180,6 +180,7 @@
     <div class="horizontal">
       <TickButton
         label="Top"
+        subLabel="T"
         onChange={(e: InputEvent) => handleTick(e, "top", false)}
         points={showPoints ? pointValue?.top : undefined}
         checked={tick?.top}
@@ -190,6 +191,7 @@
       {#if !enableAttempts}
         <TickButton
           label="Flash"
+          subLabel="F"
           onChange={(e: InputEvent) => handleTick(e, "top", true)}
           points={showPoints ? pointValue?.top : undefined}
           bonusPoints={pointValue?.flashBonus}
@@ -202,6 +204,7 @@
     {#if problem.zone2Enabled}
       <TickButton
         label="Zone 2"
+        subLabel="Z₂"
         onChange={(e: InputEvent) => handleTick(e, "zone2", false)}
         points={showPoints ? pointValue?.zone2 : undefined}
         checked={tick?.zone2}
@@ -213,6 +216,7 @@
     {#if problem.zone1Enabled}
       <TickButton
         label="Zone 1"
+        subLabel="Z₁"
         onChange={(e: InputEvent) => handleTick(e, "zone1", false)}
         points={showPoints ? pointValue?.zone1 : undefined}
         checked={tick?.zone1}
