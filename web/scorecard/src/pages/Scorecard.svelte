@@ -466,6 +466,7 @@
                     counted={contest.qualifyingProblems === 0 ||
                       (!!tick && countedTickIds.has(tick.id))}
                     showPoints={contest.usePoints}
+                    enableAttempts={!contest.usePoints}
                   />
                 {/each}
               </div>

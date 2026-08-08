@@ -15,9 +15,16 @@
     tick: Tick | undefined;
     disabled: boolean | undefined;
     pointValue?: PointValue;
+    enableAttempts: boolean;
   }
 
-  let { problem, tick, disabled = false, pointValue }: Props = $props();
+  let {
+    problem,
+    tick,
+    disabled = false,
+    pointValue,
+    enableAttempts,
+  }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
 
@@ -70,7 +77,6 @@
     event.stopPropagation();
 
     navigator.vibrate?.(50);
-    open = false;
 
     const nextTick: Omit<Tick, "id" | "timestamp"> = {
       problemId: problem.id,
@@ -97,21 +103,33 @@
     }
 
     putTick.mutate(nextTick, {
-      onError: (error) => {
-        if (error instanceof AxiosError && error.status === 409) {
-          toastUnexpectedError("Ascent is already registered.");
-        } else {
-          toastUnexpectedError("Failed to register ascent.");
-        }
+      onError: () => {
+        toastUnexpectedError("Failed to register ascent.");
       },
     });
   };
 
-  $effect(() => {
-    if (tick !== undefined) {
-      open = false;
-    }
-  });
+  const handleLogAttempt = (event: MouseEvent) => {
+    event.stopPropagation();
+
+    navigator.vibrate?.(50);
+
+    const nextTick: Omit<Tick, "id" | "timestamp"> = {
+      problemId: problem.id,
+      top: tick?.top ?? false,
+      zone2: tick?.zone2 ?? false,
+      zone1: tick?.zone1 ?? false,
+      attemptsTop: (tick?.attemptsTop ?? 0) + 1,
+      attemptsZone2: (tick?.attemptsZone2 ?? 0) + 1,
+      attemptsZone1: (tick?.attemptsZone1 ?? 0) + 1,
+    };
+
+    putTick.mutate(nextTick, {
+      onError: () => {
+        toastUnexpectedError("Failed to register ascent.");
+      },
+    });
+  };
 </script>
 
 <div class="container">
@@ -152,41 +170,54 @@
 
     <div class="horizontal">
       <TickButton
-        iconName="check"
         label="Top"
         onClick={(e: MouseEvent) => handleTick(e, "top", false)}
         points={pointValue?.top}
         active={variant === "top"}
+        attempts={enableAttempts ? tick?.attemptsTop : undefined}
       />
 
-      <TickButton
-        iconName="bolt"
-        label="Flash"
-        onClick={(e: MouseEvent) => handleTick(e, "top", true)}
-        points={pointValue?.top}
-        bonusPoints={pointValue?.flashBonus}
-        active={variant === "flash"}
-      />
+      {#if !enableAttempts}
+        <TickButton
+          label="Flash"
+          onClick={(e: MouseEvent) => handleTick(e, "top", true)}
+          points={pointValue?.top}
+          bonusPoints={pointValue?.flashBonus}
+          active={variant === "flash"}
+          attempts={enableAttempts ? tick?.attemptsTop : undefined}
+        />
+      {/if}
     </div>
 
     {#if problem.zone2Enabled}
       <TickButton
-        iconName="check"
         label="Zone 2"
         onClick={(e: MouseEvent) => handleTick(e, "zone2", false)}
         points={pointValue?.zone2}
         active={variant === "zone2"}
+        attempts={enableAttempts ? tick?.attemptsZone2 : undefined}
       />
     {/if}
 
     {#if problem.zone1Enabled}
       <TickButton
-        iconName="check"
         label="Zone 1"
         onClick={(e: MouseEvent) => handleTick(e, "zone1", false)}
         points={pointValue?.zone1}
         active={variant === "zone1"}
+        attempts={enableAttempts ? tick?.attemptsZone1 : undefined}
       />
+    {/if}
+
+    {#if enableAttempts}
+      <wa-button
+        size="s"
+        appearance="outlined"
+        onclick={(event: MouseEvent) => handleLogAttempt(event)}
+      >
+        <wa-icon slot="start" name="plus"></wa-icon>
+        Attempt
+      </wa-button>
     {/if}
 
     {#if open && variant !== undefined}
@@ -283,7 +314,7 @@
     &::part(body) {
       display: flex;
       flex-direction: column;
-      gap: var(--wa-space-l);
+      gap: var(--wa-space-m);
     }
 
     & .horizontal {

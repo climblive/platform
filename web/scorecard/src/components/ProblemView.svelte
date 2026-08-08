@@ -13,9 +13,17 @@
     disabled: boolean;
     counted: boolean;
     showPoints: boolean;
+    enableAttempts: boolean;
   }
 
-  const { problem, tick, disabled, counted, showPoints }: Props = $props();
+  const {
+    problem,
+    tick,
+    disabled,
+    counted,
+    showPoints,
+    enableAttempts,
+  }: Props = $props();
 
   const valueRange = $derived.by<{ min: number; max: number } | undefined>(
     () => {
@@ -56,7 +64,7 @@
     {/if}
   </span>
   <div class="score" class:uncounted={!counted}>
-    {#if tick && problem.pointValue !== undefined}
+    {#if showPoints && tick && problem.pointValue !== undefined}
       <Score
         value={problem.pointValue.current + "p"}
         prefix={counted ? "+" : undefined}
@@ -64,7 +72,13 @@
     {/if}
   </div>
 
-  <TickBox {problem} {tick} {disabled} pointValue={problem.pointValue} />
+  <TickBox
+    {problem}
+    {tick}
+    {disabled}
+    pointValue={problem.pointValue}
+    {enableAttempts}
+  />
 </section>
 
 <style>
