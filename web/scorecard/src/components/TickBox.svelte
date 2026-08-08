@@ -342,17 +342,16 @@
       </div>
     {/if}
 
-    {#if open && tick !== undefined}
-      <wa-button
-        size="s"
-        appearance="plain"
-        onclick={(e: MouseEvent) => handleDelete(e)}
-        variant="danger"
-      >
-        <wa-icon slot="start" name="rotate-left"></wa-icon>
-        Unsend
-      </wa-button>
-    {/if}
+    <wa-button
+      size="s"
+      appearance="plain"
+      onclick={(e: MouseEvent) => handleDelete(e)}
+      variant="danger"
+      disabled={open && tick !== undefined}
+    >
+      <wa-icon slot="start" name="rotate-left"></wa-icon>
+      Unsend
+    </wa-button>
   </wa-dialog>
 </div>
 

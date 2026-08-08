@@ -35,6 +35,7 @@
     onchange={onChange}
     checked={checked && !indeterminate}
     {indeterminate}
+    disabled={indeterminate}
   >
     {label}
   </wa-checkbox>
