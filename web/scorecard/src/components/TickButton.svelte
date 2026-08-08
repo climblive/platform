@@ -15,13 +15,17 @@
     onChange,
     label,
     attempts,
-    points = 0,
+    points,
     bonusPoints,
     checked,
     indeterminate = false,
   }: Props = $props();
 
   const pointsLabel = $derived.by(() => {
+    if (points === undefined) {
+      return undefined;
+    }
+
     if (bonusPoints) {
       return `${points}p + ${bonusPoints}p`;
     }
@@ -33,9 +37,9 @@
 <div class="container" data-active={checked} data-disabled={indeterminate}>
   <wa-checkbox
     onchange={onChange}
-    {checked}
+    checked={checked && !indeterminate}
     {indeterminate}
-    // disabled={indeterminate}
+    disabled={indeterminate}
   >
     {label}
   </wa-checkbox>

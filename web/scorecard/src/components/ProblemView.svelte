@@ -78,6 +78,7 @@
     {disabled}
     pointValue={problem.pointValue}
     {enableAttempts}
+    {showPoints}
   />
 </section>
 

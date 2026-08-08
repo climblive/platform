@@ -17,6 +17,7 @@
     tick: Tick | undefined;
     disabled: boolean | undefined;
     pointValue?: PointValue;
+    showPoints: boolean;
     enableAttempts: boolean;
   }
 
@@ -25,6 +26,7 @@
     tick,
     disabled = false,
     pointValue,
+    showPoints,
     enableAttempts,
   }: Props = $props();
 
@@ -93,7 +95,10 @@
     const nextTick = tickBuilder.tick;
 
     if (!enableAttempts) {
-      let attempts = flash ? 1 : 999;
+      let attempts = 999;
+      if (flash && !uncheck) {
+        attempts = 1;
+      }
 
       nextTick.attemptsTop = attempts;
       nextTick.attemptsZone2 = attempts;
@@ -176,8 +181,9 @@
       <TickButton
         label="Top"
         onChange={(e: InputEvent) => handleTick(e, "top", false)}
-        points={pointValue?.top}
+        points={showPoints ? pointValue?.top : undefined}
         checked={tick?.top}
+        indeterminate={tick?.top && tick?.attemptsTop === 1}
         attempts={enableAttempts ? (tick?.attemptsTop ?? 0) : undefined}
       />
 
@@ -185,7 +191,7 @@
         <TickButton
           label="Flash"
           onChange={(e: InputEvent) => handleTick(e, "top", true)}
-          points={pointValue?.top}
+          points={showPoints ? pointValue?.top : undefined}
           bonusPoints={pointValue?.flashBonus}
           checked={tick?.top && tick?.attemptsTop === 1}
           attempts={enableAttempts ? (tick?.attemptsTop ?? 0) : undefined}
@@ -197,7 +203,7 @@
       <TickButton
         label="Zone 2"
         onChange={(e: InputEvent) => handleTick(e, "zone2", false)}
-        points={pointValue?.zone2}
+        points={showPoints ? pointValue?.zone2 : undefined}
         checked={tick?.zone2}
         indeterminate={tick?.top}
         attempts={enableAttempts ? (tick?.attemptsZone2 ?? 0) : undefined}
@@ -208,7 +214,7 @@
       <TickButton
         label="Zone 1"
         onChange={(e: InputEvent) => handleTick(e, "zone1", false)}
-        points={pointValue?.zone1}
+        points={showPoints ? pointValue?.zone1 : undefined}
         checked={tick?.zone1}
         indeterminate={tick?.zone2}
         attempts={enableAttempts ? (tick?.attemptsZone1 ?? 0) : undefined}
@@ -247,7 +253,7 @@
       disabled={open && tick === undefined}
     >
       <wa-icon slot="start" name="rotate-left"></wa-icon>
-      Unsend
+      Remove
     </wa-button>
   </wa-dialog>
 </div>
