@@ -64,7 +64,7 @@
         if (error instanceof AxiosError && error.status === 404) {
           toastUnexpectedError("Ascent is already removed.");
         } else {
-          toastUnexpectedError("Failed to remove ascent.");
+          toastUnexpectedError("Failed to remove tick.");
         }
       },
     });
@@ -143,12 +143,57 @@
 
     putTick.mutate(nextTick, {
       onError: () => {
-        toastUnexpectedError("Failed to register ascent.");
+        toastUnexpectedError("Failed to update tick.");
       },
     });
   };
 
-  const handleLogAttempt = (event: MouseEvent) => {
+  const handleSubtractAttempt = (event: MouseEvent) => {
+    event.stopPropagation();
+
+    navigator.vibrate?.(50);
+
+    const reachedFeatures = new Set<string>();
+    if (tick?.top) {
+      reachedFeatures.add("top");
+    }
+    if (problem.zone2Enabled && tick?.zone2) {
+      reachedFeatures.add("zone2");
+    }
+    if (problem.zone1Enabled && tick?.zone1) {
+      reachedFeatures.add("zone1");
+    }
+
+    const nextTick: Omit<Tick, "id" | "timestamp"> = {
+      problemId: problem.id,
+      top: tick?.top ?? false,
+      zone2: tick?.zone2 ?? false,
+      zone1: tick?.zone1 ?? false,
+      attemptsTop: tick?.attemptsTop ?? 0,
+      attemptsZone2: tick?.attemptsZone2 ?? 0,
+      attemptsZone1: tick?.attemptsZone1 ?? 0,
+    };
+
+    if (!reachedFeatures.has("top")) {
+      nextTick.attemptsTop--;
+    }
+
+    if (!reachedFeatures.has("zone2")) {
+      nextTick.attemptsZone2--;
+    }
+
+    if (!reachedFeatures.has("zone1")) {
+      nextTick.attemptsZone1--;
+    }
+
+    putTick.mutate(nextTick, {
+      onError: () => {
+        toastUnexpectedError("Failed to update tick.");
+      },
+    });
+  };
+
+  const handleAddAttempt = (event: MouseEvent) => {
     event.stopPropagation();
 
     navigator.vibrate?.(50);
@@ -188,7 +233,7 @@
 
     putTick.mutate(nextTick, {
       onError: () => {
-        toastUnexpectedError("Failed to register ascent.");
+        toastUnexpectedError("Failed to update tick.");
       },
     });
   };
@@ -274,15 +319,27 @@
     {/if}
 
     {#if enableAttempts}
-      <wa-button
-        size="s"
-        appearance="outlined"
-        onclick={(event: MouseEvent) => handleLogAttempt(event)}
-        disabled={tick?.top === true}
-      >
-        <wa-icon slot="start" name="plus"></wa-icon>
-        Attempt
-      </wa-button>
+      <div class="horizontal">
+        <wa-button
+          size="s"
+          appearance="outlined"
+          onclick={(event: MouseEvent) => handleAddAttempt(event)}
+          disabled={tick?.top === true}
+        >
+          <wa-icon slot="start" name="plus"></wa-icon>
+          Attempt
+        </wa-button>
+
+        <wa-button
+          size="s"
+          appearance="outlined"
+          onclick={(event: MouseEvent) => handleSubtractAttempt(event)}
+          disabled={tick?.top === true}
+        >
+          <wa-icon slot="start" name="minus"></wa-icon>
+          Attempt
+        </wa-button>
+      </div>
     {/if}
 
     {#if open && tick !== undefined}
@@ -385,6 +442,16 @@
     & .horizontal {
       display: flex;
       gap: var(--wa-space-s);
+    }
+  }
+
+  .horizontal {
+    width: 100%;
+    display: flex;
+    gap: var(--wa-space-2xs);
+
+    & wa-button {
+      flex: 1;
     }
   }
 </style>

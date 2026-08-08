@@ -40,7 +40,12 @@
   </wa-checkbox>
   <div class="subtext">
     {#if attempts !== undefined}
-      <span>{attempts} {attempts === 1 ? "attempt" : "attempts"}</span>
+      <span>
+        {attempts}
+        {attempts === 1 ? "attempt" : "attempts"}
+        {#if checked}<wa-icon name="lock"></wa-icon>
+        {/if}
+      </span>
     {/if}
     {#if pointsLabel !== undefined}
       <span>{pointsLabel}</span>
@@ -58,7 +63,7 @@
     display: flex;
     flex-direction: column;
     align-items: start;
-    gap: var(--wa-space-2xs);
+    gap: var(--wa-space-xs);
     border: var(--wa-border-width-s) var(--wa-border-style)
       var(--wa-color-surface-border);
     padding: var(--wa-space-s);
