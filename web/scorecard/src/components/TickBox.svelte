@@ -155,9 +155,11 @@
     {:else if tick?.top}
       <pre>T</pre>
     {:else if tick?.zone2}
-      <pre>Z2</pre>
+      <pre>Z₂</pre>
     {:else if tick?.zone1}
-      <pre>Z1</pre>
+      <pre>Z₁</pre>
+    {:else if tick !== undefined}
+      <pre>?</pre>
     {/if}
   </button>
 
