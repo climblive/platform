@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ScorecardSession } from "@/types";
+  import type WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import { HoldColorIndicator } from "@climblive/lib/components";
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
@@ -78,29 +79,43 @@
 
     navigator.vibrate?.(50);
 
+    const uncheck = !(event.target as WaCheckbox).checked;
+
+    const reachedFeatures = new Set<string>();
+    if (tick?.top) {
+      reachedFeatures.add("top");
+    }
+    if (problem.zone2Enabled && tick?.zone2) {
+      reachedFeatures.add("zone2");
+    }
+    if (problem.zone1Enabled && tick?.zone1) {
+      reachedFeatures.add("zone1");
+    }
+
+    if (uncheck) {
+      reachedFeatures.delete(feature);
+    } else {
+      reachedFeatures.add(feature);
+    }
+
+    let attempts = flash ? 1 : 999;
+    if (reachedFeatures.size === 0) {
+      attempts = 0;
+    }
+
     const nextTick: Omit<Tick, "id" | "timestamp"> = {
       problemId: problem.id,
       top: false,
       zone2: false,
       zone1: false,
-      attemptsTop: flash ? 1 : 999,
-      attemptsZone2: flash ? 1 : 999,
-      attemptsZone1: flash ? 1 : 999,
+      attemptsTop: attempts,
+      attemptsZone2: attempts,
+      attemptsZone1: attempts,
     };
 
-    switch (feature) {
-      case "top":
-        nextTick.top = true;
-        nextTick.zone2 = true;
-        nextTick.zone1 = true;
-        break;
-      case "zone2":
-        nextTick.zone2 = true;
-        nextTick.zone1 = true;
-        break;
-      case "zone1":
-        nextTick.zone1 = true;
-    }
+    nextTick.top = reachedFeatures.has("top");
+    nextTick.zone2 = reachedFeatures.has("zone2");
+    nextTick.zone1 = reachedFeatures.has("zone1");
 
     putTick.mutate(nextTick, {
       onError: () => {
