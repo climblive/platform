@@ -184,7 +184,7 @@
         onChange={(e: InputEvent) => handleTick(e, "top", false)}
         points={showPoints ? pointValue?.top : undefined}
         checked={tick?.top}
-        indeterminate={tick?.top && tick?.attemptsTop === 1}
+        indeterminate={!enableAttempts && tick?.top && tick?.attemptsTop === 1}
         attempts={enableAttempts ? (tick?.attemptsTop ?? 0) : undefined}
       />
 
