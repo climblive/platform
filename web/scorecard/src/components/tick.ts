@@ -138,23 +138,40 @@ export class TickBuilder {
   }
 
   public normalizeAttempts() {
+    if (this.#reachedFeatures.size === 0) {
+      const firstFeature = this.#features[0];
+
+      if (!firstFeature) {
+        return;
+      }
+
+      const attemptsFirstFeature = this.#attempts.get(firstFeature) ?? 0;
+
+      for (const feature of this.#features) {
+        this.#attempts.set(feature, attemptsFirstFeature);
+      }
+    }
+
     for (let k = 0; k < this.#features.length; k++) {
       const f1 = this.#features[k];
       const f2 = this.#features[k + 1];
+      const f3 = this.#features[k + 2];
 
-      if (f2 === undefined) {
+      if (f2 === undefined || f2 === undefined) {
         continue;
       }
 
-      switch (true) {
-        case this.#reachedFeatures.size === 0:
-        case this.#reachedFeatures.has(f1) && !this.#reachedFeatures.has(f2):
-          for (let j = k + 1; j < this.#features.length; j++) {
-            const feature = this.#features[j];
-            this.#attempts.set(feature, this.#attempts.get(f1) ?? 0);
-          }
+      if (
+        this.#reachedFeatures.has(f1) &&
+        !this.#reachedFeatures.has(f2) &&
+        !this.#reachedFeatures.has(f3)
+      ) {
+        for (let j = k + 2; j < this.#features.length; j++) {
+          const feature = this.#features[j];
+          this.#attempts.set(feature, this.#attempts.get(f2) ?? 0);
+        }
 
-          return;
+        return;
       }
     }
   }
