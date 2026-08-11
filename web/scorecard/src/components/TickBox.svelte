@@ -240,16 +240,23 @@
       </div>
     {/if}
 
-    <wa-button
-      size="s"
-      appearance="plain"
-      onclick={(e: MouseEvent) => handleDelete(e)}
-      variant="danger"
-      disabled={open && tick === undefined}
-    >
-      <wa-icon slot="start" name="rotate-left"></wa-icon>
-      Remove
-    </wa-button>
+    <div class="footer">
+      <wa-button
+        size="s"
+        appearance="plain"
+        onclick={(e: MouseEvent) => handleDelete(e)}
+        variant="danger"
+        disabled={open && tick === undefined}
+      >
+        <wa-icon name="trash" label="Remove"></wa-icon>
+      </wa-button>
+
+      {#if putTick.isPending}
+        <wa-spinner></wa-spinner>
+      {:else if putTick.isSuccess}
+        <wa-icon class="success" name="check"></wa-icon>
+      {/if}
+    </div>
   </wa-dialog>
 </div>
 
@@ -351,5 +358,24 @@
 
   .small {
     font-size: var(--wa-font-size-xs);
+  }
+
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    & .success {
+      color: var(--wa-color-success-fill-loud);
+      animation: hideAnimation 0s ease 2s;
+      animation-fill-mode: forwards;
+    }
+  }
+
+  @keyframes hideAnimation {
+    to {
+      visibility: hidden;
+    }
   }
 </style>
