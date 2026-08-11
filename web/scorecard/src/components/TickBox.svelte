@@ -368,12 +368,12 @@
 
     & .success {
       color: var(--wa-color-success-fill-loud);
-      animation: hideAnimation 0s ease 2s;
+      animation: hide 0s ease 2s;
       animation-fill-mode: forwards;
     }
   }
 
-  @keyframes hideAnimation {
+  @keyframes hide {
     to {
       visibility: hidden;
     }
