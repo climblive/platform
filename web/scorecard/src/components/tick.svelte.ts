@@ -1,12 +1,14 @@
 import type { Problem, Tick } from "@climblive/lib/models";
+import { SvelteMap, SvelteSet } from "svelte/reactivity";
 
 type Feature = "zone1" | "zone2" | "top";
 
 export class TickBuilder {
   #problemId: number;
   #features: Feature[];
-  #reachedFeatures: Set<Feature>;
-  #attempts: Map<Feature, number>;
+  #reachedFeatures: SvelteSet<Feature>;
+  #attempts: SvelteMap<Feature, number>;
+  #tick: Omit<Tick, "id" | "timestamp">;
 
   constructor(problem: Problem, tick?: Tick) {
     this.#problemId = problem.id;
@@ -16,7 +18,7 @@ export class TickBuilder {
     this.#features.push("zone2");
     this.#features.push("top");
 
-    this.#reachedFeatures = new Set<Feature>();
+    this.#reachedFeatures = new SvelteSet();
 
     for (const feature of this.#features) {
       switch (feature) {
@@ -38,14 +40,12 @@ export class TickBuilder {
       }
     }
 
-    this.#attempts = new Map<Feature, number>();
+    this.#attempts = new SvelteMap();
     this.#attempts.set("zone1", tick?.attemptsZone1 ?? 0);
     this.#attempts.set("zone2", tick?.attemptsZone2 ?? 0);
     this.#attempts.set("top", tick?.attemptsTop ?? 0);
-  }
 
-  public get tick(): Omit<Tick, "id" | "timestamp"> {
-    return {
+    this.#tick = $derived<Omit<Tick, "id" | "timestamp">>({
       problemId: this.#problemId,
       zone1: this.#reachedFeatures.has("zone1"),
       attemptsZone1: this.#attempts.get("zone1") ?? 0,
@@ -53,7 +53,11 @@ export class TickBuilder {
       attemptsZone2: this.#attempts.get("zone2") ?? 0,
       top: this.#reachedFeatures.has("top"),
       attemptsTop: this.#attempts.get("top") ?? 0,
-    };
+    });
+  }
+
+  public get tick(): Omit<Tick, "id" | "timestamp"> {
+    return this.#tick;
   }
 
   public addAttempt(): void {

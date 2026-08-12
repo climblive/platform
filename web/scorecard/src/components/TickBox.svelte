@@ -8,7 +8,7 @@
   import { getContext } from "svelte";
   import type { Readable } from "svelte/store";
   import TickButton from "./TickButton.svelte";
-  import { TickBuilder } from "./tick";
+  import { TickBuilder } from "./tick.svelte";
 
   interface Props {
     problem: Problem;
@@ -21,18 +21,20 @@
 
   const {
     problem,
-    tick,
     disabled = false,
     pointValue,
     showPoints,
     enableAttempts,
+    ...rest
   }: Props = $props();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
   const putTick = $derived(putTickMutation($session.contenderId));
   const deleteTick = $derived(deleteTickMutation());
 
-  const tickBuilder = $derived(new TickBuilder(problem, tick));
+  const tickId = $derived(rest.tick?.id);
+  const tickBuilder = $derived(new TickBuilder(problem, rest.tick));
+  const tick = $derived(tickBuilder.tick);
 
   let open = $state(false);
 
@@ -52,7 +54,7 @@
   });
 
   const handleDelete = (event: MouseEvent) => {
-    if (!tick) {
+    if (!tickId) {
       return;
     }
 
@@ -60,7 +62,7 @@
 
     open = false;
 
-    deleteTick.mutate(tick.id, {
+    deleteTick.mutate(tickId, {
       onError: (error) => {
         if (error instanceof AxiosError && error.status === 404) {
           toastUnexpectedError("Ascent is already removed.");
@@ -138,7 +140,7 @@
     data-variant={variant}
     disabled={disabled || loading}
     onclick={() => (open = true)}
-    aria-label={tick?.id ? "Edit" : "Tick"}
+    aria-label={tickId ? "Edit" : "Tick"}
   >
     {#if loading}
       <wa-spinner></wa-spinner>
