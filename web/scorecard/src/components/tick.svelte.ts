@@ -224,6 +224,6 @@ export class TickBuilder {
 
     this.subtractAttempt();
 
-    this.#normalizeAttempts();
+    //this.#normalizeAttempts();
   }
 }
