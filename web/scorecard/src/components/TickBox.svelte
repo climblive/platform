@@ -243,13 +243,15 @@
     {/if}
 
     <div class="footer">
-      {#if putTick.isPending}
-        <wa-spinner></wa-spinner>
-      {:else if putTick.isSuccess}
-        <div class="success">
-          <wa-icon name="check"></wa-icon> Saved
-        </div>
-      {/if}
+      <div class="status">
+        {#if putTick.isPending}
+          <wa-spinner></wa-spinner>
+        {:else if putTick.isSuccess}
+          <div class="success">
+            <wa-icon name="check"></wa-icon> Saved
+          </div>
+        {/if}
+      </div>
 
       <wa-button
         size="s"
