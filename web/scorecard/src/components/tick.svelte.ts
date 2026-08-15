@@ -1,59 +1,89 @@
 import type { Problem, Tick } from "@climblive/lib/models";
-import { SvelteMap, SvelteSet } from "svelte/reactivity";
+import { SvelteMap } from "svelte/reactivity";
 
 type Feature = "zone1" | "zone2" | "top";
 
 export class TickBuilder {
   #problemId: number;
   #features: Feature[];
-  #reachedFeatures: SvelteSet<Feature>;
-  #attempts: SvelteMap<Feature, number>;
+  #reachedFeatures: SvelteMap<Feature, number>;
+  #attempts: number;
   #tick: Omit<Tick, "id" | "timestamp">;
 
   constructor(problem: Problem, tick?: Tick) {
     this.#problemId = problem.id;
 
     this.#features = [];
-    this.#features.push("zone1");
-    this.#features.push("zone2");
+    if (problem.zone1Enabled) {
+      this.#features.push("zone1");
+    }
+    if (problem.zone2Enabled) {
+      this.#features.push("zone2");
+    }
     this.#features.push("top");
 
-    this.#reachedFeatures = new SvelteSet();
+    this.#reachedFeatures = new SvelteMap();
+    this.#attempts = $state(0);
 
-    for (const feature of this.#features) {
-      switch (feature) {
-        case "zone1":
-          if (tick?.zone1) {
-            this.#reachedFeatures.add("zone1");
-          }
-          break;
-        case "zone2":
-          if (tick?.zone2) {
-            this.#reachedFeatures.add("zone2");
-          }
-          break;
-        case "top":
-          if (tick?.top) {
-            this.#reachedFeatures.add("top");
-          }
-          break;
+    if (tick) {
+      for (const feature of this.#features) {
+        switch (feature) {
+          case "zone1":
+            if (tick.zone1) {
+              this.#reachedFeatures.set("zone1", tick.attemptsZone1);
+            }
+            break;
+          case "zone2":
+            if (tick.zone2) {
+              this.#reachedFeatures.set("zone2", tick.attemptsZone2);
+            }
+            break;
+          case "top":
+            if (tick.top) {
+              this.#reachedFeatures.set("top", tick.attemptsTop);
+            }
+            break;
+        }
       }
-    }
 
-    this.#attempts = new SvelteMap();
-    this.#attempts.set("zone1", tick?.attemptsZone1 ?? 0);
-    this.#attempts.set("zone2", tick?.attemptsZone2 ?? 0);
-    this.#attempts.set("top", tick?.attemptsTop ?? 0);
+      this.#attempts = tick.attemptsTop;
+    }
 
     this.#tick = $derived<Omit<Tick, "id" | "timestamp">>({
       problemId: this.#problemId,
-      zone1: this.#reachedFeatures.has("zone1"),
-      attemptsZone1: this.#attempts.get("zone1") ?? 0,
-      zone2: this.#reachedFeatures.has("zone2"),
-      attemptsZone2: this.#attempts.get("zone2") ?? 0,
-      top: this.#reachedFeatures.has("top"),
-      attemptsTop: this.#attempts.get("top") ?? 0,
+      zone1: this.#hasReached("zone1"),
+      attemptsZone1: this.#calculateAttempts("zone1"),
+      zone2: this.#hasReached("zone2"),
+      attemptsZone2: this.#calculateAttempts("zone2"),
+      top: this.#hasReached("top"),
+      attemptsTop: this.#calculateAttempts("top"),
     });
+  }
+
+  #hasReached(feature: Feature): boolean {
+    let featureReached = false;
+
+    for (let k = this.#features.length - 1; k >= 0; k--) {
+      const f = this.#features[k];
+      if (this.#reachedFeatures.has(f)) {
+        featureReached = true;
+      }
+
+      if (f === feature) {
+        return featureReached;
+      }
+    }
+
+    return false;
+  }
+
+  #calculateAttempts(feature: Feature): number {
+    const attempts = this.#reachedFeatures.get(feature);
+    if (attempts !== undefined) {
+      return attempts;
+    }
+
+    return this.#attempts;
   }
 
   public get tick(): Omit<Tick, "id" | "timestamp"> {
@@ -65,17 +95,7 @@ export class TickBuilder {
       return;
     }
 
-    if (!this.#reachedFeatures.has("top")) {
-      this.#attempts.set("top", (this.#attempts.get("top") ?? 0) + 1);
-    }
-
-    if (!this.#reachedFeatures.has("zone2")) {
-      this.#attempts.set("zone2", (this.#attempts.get("zone2") ?? 0) + 1);
-    }
-
-    if (!this.#reachedFeatures.has("zone1")) {
-      this.#attempts.set("zone1", (this.#attempts.get("zone1") ?? 0) + 1);
-    }
+    this.#attempts += 1;
   }
 
   public subtractAttempt(): void {
@@ -83,50 +103,40 @@ export class TickBuilder {
       return;
     }
 
-    if (!this.#reachedFeatures.has("top")) {
-      this.#attempts.set("top", (this.#attempts.get("top") ?? 0) - 1);
-    }
-
-    if (!this.#reachedFeatures.has("zone2")) {
-      this.#attempts.set("zone2", (this.#attempts.get("zone2") ?? 0) - 1);
-    }
-
-    if (!this.#reachedFeatures.has("zone1")) {
-      this.#attempts.set("zone1", (this.#attempts.get("zone1") ?? 0) - 1);
-    }
+    this.#attempts -= 1;
   }
 
   public canAddAttempt(): boolean {
-    if (this.#reachedFeatures.has("top")) {
+    const topFeature = this.#features[this.#features.length - 1];
+
+    if (this.#reachedFeatures.has(topFeature)) {
       return false;
     }
 
-    for (const attempts of this.#attempts.values()) {
-      if (attempts === 999) {
-        return false;
-      }
+    if (this.#attempts === 999) {
+      return false;
     }
 
     return true;
   }
 
   public canSubtractAttempt(): boolean {
-    if (this.#reachedFeatures.has("top")) {
+    const topFeature = this.#features[this.#features.length - 1];
+
+    if (this.#reachedFeatures.has(topFeature)) {
       return false;
     }
 
-    for (const attempts of this.#attempts.values()) {
-      if (attempts === 0) {
-        return false;
-      }
+    if (this.#attempts === 0) {
+      return false;
     }
 
     for (let k = this.#features.length - 1; k >= 0; k--) {
       const f0 = this.#features[k - 1];
       const f1 = this.#features[k];
 
-      const a0 = this.#attempts.get(f0);
-      const a1 = this.#attempts.get(f1);
+      const a0 = this.#reachedFeatures.get(f0);
+      const a1 = this.#reachedFeatures.get(f1);
 
       if (
         a0 !== undefined &&
@@ -141,7 +151,7 @@ export class TickBuilder {
     return true;
   }
 
-  public normalizeAttempts() {
+  #normalizeAttempts() {
     if (this.#reachedFeatures.size === 0) {
       const firstFeature = this.#features[0];
 
@@ -149,10 +159,10 @@ export class TickBuilder {
         return;
       }
 
-      const attemptsFirstFeature = this.#attempts.get(firstFeature) ?? 0;
+      const attemptsFirstFeature = this.#reachedFeatures.get(firstFeature) ?? 0;
 
       for (const feature of this.#features) {
-        this.#attempts.set(feature, attemptsFirstFeature);
+        this.#reachedFeatures.set(feature, attemptsFirstFeature);
       }
     }
 
@@ -172,7 +182,10 @@ export class TickBuilder {
       ) {
         for (let j = k + 2; j < this.#features.length; j++) {
           const feature = this.#features[j];
-          this.#attempts.set(feature, this.#attempts.get(f2) ?? 0);
+          this.#reachedFeatures.set(
+            feature,
+            this.#reachedFeatures.get(f2) ?? 0,
+          );
         }
 
         return;
@@ -183,30 +196,34 @@ export class TickBuilder {
   public reachFeature(feature: Feature): void {
     this.addAttempt();
 
-    switch (feature) {
-      case "top":
-        this.#reachedFeatures.add("top");
-      // eslint-disable-next-line no-fallthrough
-      case "zone2":
-        this.#reachedFeatures.add("zone2");
-      // eslint-disable-next-line no-fallthrough
-      case "zone1":
-        this.#reachedFeatures.add("zone1");
+    const featureIndex = this.#features.findIndex((f) => f === feature);
+    if (featureIndex === -1) {
+      return;
+    }
+
+    for (let k = featureIndex; k >= 0; k--) {
+      const f = this.#features[k];
+
+      if (!this.#reachedFeatures.has(f)) {
+        this.#reachedFeatures.set(f, this.#attempts);
+      }
     }
   }
 
   public unreachFeature(feature: Feature): void {
-    switch (feature) {
-      case "zone1":
-        this.#reachedFeatures.delete("zone1");
-      // eslint-disable-next-line no-fallthrough
-      case "zone2":
-        this.#reachedFeatures.delete("zone2");
-      // eslint-disable-next-line no-fallthrough
-      case "top":
-        this.#reachedFeatures.delete("top");
+    const featureIndex = this.#features.findIndex((f) => f === feature);
+    if (featureIndex === -1) {
+      return;
     }
 
-    this.normalizeAttempts();
+    for (let k = featureIndex; k < this.#features.length; k++) {
+      const f = this.#features[k];
+
+      this.#reachedFeatures.delete(f);
+    }
+
+    this.subtractAttempt();
+
+    this.#normalizeAttempts();
   }
 }
