@@ -223,26 +223,32 @@
         <wa-button
           size="s"
           appearance="outlined"
-          onclick={(event: MouseEvent) => handleAddAttempt(event)}
-          disabled={!tickBuilder.canAddAttempt()}
-        >
-          <wa-icon slot="start" name="plus"></wa-icon>
-          Attempt
-        </wa-button>
-
-        <wa-button
-          size="s"
-          appearance="outlined"
           onclick={(event: MouseEvent) => handleSubtractAttempt(event)}
           disabled={!tickBuilder.canSubtractAttempt()}
         >
           <wa-icon slot="start" name="minus"></wa-icon>
           Attempt
         </wa-button>
+
+        <wa-button
+          size="s"
+          appearance="outlined"
+          onclick={(event: MouseEvent) => handleAddAttempt(event)}
+          disabled={!tickBuilder.canAddAttempt()}
+        >
+          <wa-icon slot="start" name="plus"></wa-icon>
+          Attempt
+        </wa-button>
       </div>
     {/if}
 
     <div class="footer">
+      {#if putTick.isPending}
+        <wa-spinner></wa-spinner>
+      {:else if putTick.isSuccess}
+        <wa-icon class="success" name="check"></wa-icon>
+      {/if}
+
       <wa-button
         size="s"
         appearance="plain"
@@ -252,12 +258,6 @@
       >
         <wa-icon name="trash" label="Remove"></wa-icon>
       </wa-button>
-
-      {#if putTick.isPending}
-        <wa-spinner></wa-spinner>
-      {:else if putTick.isSuccess}
-        <wa-icon class="success" name="check"></wa-icon>
-      {/if}
     </div>
   </wa-dialog>
 </div>
