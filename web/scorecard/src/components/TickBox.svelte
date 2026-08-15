@@ -246,7 +246,9 @@
       {#if putTick.isPending}
         <wa-spinner></wa-spinner>
       {:else if putTick.isSuccess}
-        <wa-icon class="success" name="check"></wa-icon>
+        <div class="success">
+          <wa-icon name="check"></wa-icon> Saved
+        </div>
       {/if}
 
       <wa-button
@@ -368,7 +370,11 @@
     justify-content: space-between;
     width: 100%;
 
-    & .success {
+    .success {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--wa-space-2xs);
       color: var(--wa-color-success-fill-loud);
       animation: hide 0s ease 2s;
       animation-fill-mode: forwards;
