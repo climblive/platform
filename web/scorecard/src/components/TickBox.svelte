@@ -152,7 +152,7 @@
       Z2
     {:else if tick?.zone1 && problem.zone1Enabled}
       Z1
-    {:else if tick !== undefined && enableAttempts}
+    {:else if tick !== undefined && enableAttempts && tick.attemptsTop}
       {#if tick.attemptsTop > 99}
         <span class="small">99+</span>
       {:else}
