@@ -258,7 +258,7 @@
         appearance="plain"
         onclick={(e: MouseEvent) => handleDelete(e)}
         variant="danger"
-        disabled={open && tick === undefined}
+        disabled={open && tickId === undefined}
       >
         <wa-icon name="trash" label="Remove"></wa-icon>
       </wa-button>
