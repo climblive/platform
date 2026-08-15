@@ -151,48 +151,6 @@ export class TickBuilder {
     return true;
   }
 
-  #normalizeAttempts() {
-    if (this.#reachedFeatures.size === 0) {
-      const firstFeature = this.#features[0];
-
-      if (!firstFeature) {
-        return;
-      }
-
-      const attemptsFirstFeature = this.#reachedFeatures.get(firstFeature) ?? 0;
-
-      for (const feature of this.#features) {
-        this.#reachedFeatures.set(feature, attemptsFirstFeature);
-      }
-    }
-
-    for (let k = 0; k < this.#features.length; k++) {
-      const f1 = this.#features[k];
-      const f2 = this.#features[k + 1];
-      const f3 = this.#features[k + 2];
-
-      if (f2 === undefined || f2 === undefined) {
-        continue;
-      }
-
-      if (
-        this.#reachedFeatures.has(f1) &&
-        !this.#reachedFeatures.has(f2) &&
-        !this.#reachedFeatures.has(f3)
-      ) {
-        for (let j = k + 2; j < this.#features.length; j++) {
-          const feature = this.#features[j];
-          this.#reachedFeatures.set(
-            feature,
-            this.#reachedFeatures.get(f2) ?? 0,
-          );
-        }
-
-        return;
-      }
-    }
-  }
-
   public reachFeature(feature: Feature): void {
     this.addAttempt();
 
@@ -223,7 +181,5 @@ export class TickBuilder {
     }
 
     this.subtractAttempt();
-
-    //this.#normalizeAttempts();
   }
 }
