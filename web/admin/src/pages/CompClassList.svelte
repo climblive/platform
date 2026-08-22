@@ -128,9 +128,9 @@
 {/snippet}
 
 <p class="copy">
-  Categories represent the categories in which the competitors compete,
-  typically divided into Males and Females. The competition duration is defined
-  by the start and end times of your categories.
+  Categories represent the classes in which the competitors compete, typically
+  divided into Males and Females. The competition duration is defined by the
+  start and end times of your categories.
 </p>
 
 <section>

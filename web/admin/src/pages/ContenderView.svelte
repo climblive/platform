@@ -220,7 +220,7 @@
       <wa-select
         size="s"
         bind:this={compClassSelect}
-        label="Competition category"
+        label="Category"
         hint="Change the category for this competitor."
         {@attach value(contender.compClassId)}
         onchange={handleCompClassChange}
