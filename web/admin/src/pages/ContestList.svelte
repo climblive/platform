@@ -237,7 +237,8 @@
   <h3>{heading} ({contests.length})</h3>
   {#if showSummary}
     <p class="contest-summary">
-      A total of {totalRegistered} competitors has participated in
+      A total of {totalRegistered}
+      {totalRegistered === 1 ? "competitor has" : "competitors have"} participated
       {contests.length}
       {contests.length === 1 ? "competition" : "competitions"} averaging {averageRegistered}
       {averageRegistered === 1 ? "contender" : "contenders"} per competition.
