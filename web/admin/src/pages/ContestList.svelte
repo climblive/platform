@@ -216,7 +216,7 @@
   {/if}
 {/snippet}
 
-<h2>Competition</h2>
+<h2>Competitions</h2>
 {#if numberOfUnarchivedContests > 0}
   {@render createButton("create-contest-button")}
 {/if}
