@@ -174,21 +174,44 @@
         secondary={problem.holdColorSecondary}
       /> Problem № {problem.number}
     </div>
+    {#if enableAttempts}
+      <div class="horizontal">
+        {tick.attemptsTop}
+        {tick.attemptsTop === 1 ? "attempt" : "attempts"}
+        <wa-button
+          size="m"
+          pill
+          appearance="outlined"
+          onclick={(event: MouseEvent) => handleSubtractAttempt(event)}
+          disabled={!tickBuilder.canSubtractAttempt()}
+        >
+          <wa-icon name="minus"></wa-icon>
+        </wa-button>
 
-    <div class="horizontal">
-      <TickButton
-        label="Top"
-        subLabel="T"
-        onChange={(checked, flash) => handleTick(checked, "top", flash)}
-        points={showPoints ? pointValue?.top : undefined}
-        bonusPoints={pointValue?.flashBonus}
-        checked={tick?.top}
-        attempts={tick?.attemptsTop ?? 0}
-        flashToggle={!enableAttempts}
-        showAttempts={enableAttempts}
-        {showPoints}
-      />
-    </div>
+        <wa-button
+          size="m"
+          pill
+          appearance="outlined"
+          onclick={(event: MouseEvent) => handleAddAttempt(event)}
+          disabled={!tickBuilder.canAddAttempt()}
+        >
+          <wa-icon name="plus"></wa-icon>
+        </wa-button>
+      </div>
+    {/if}
+
+    <TickButton
+      label="Top"
+      subLabel="T"
+      onChange={(checked, flash) => handleTick(checked, "top", flash)}
+      points={showPoints ? pointValue?.top : undefined}
+      bonusPoints={pointValue?.flashBonus}
+      checked={tick?.top}
+      attempts={tick?.attemptsTop ?? 0}
+      flashToggle={!enableAttempts}
+      showAttempts={enableAttempts}
+      {showPoints}
+    />
 
     {#if problem.zone2Enabled}
       <TickButton
@@ -216,30 +239,6 @@
         {showPoints}
         disabled={tick?.zone2}
       />
-    {/if}
-
-    {#if enableAttempts}
-      <div class="horizontal">
-        <wa-button
-          size="s"
-          appearance="outlined"
-          onclick={(event: MouseEvent) => handleSubtractAttempt(event)}
-          disabled={!tickBuilder.canSubtractAttempt()}
-        >
-          <wa-icon slot="start" name="minus"></wa-icon>
-          Attempt
-        </wa-button>
-
-        <wa-button
-          size="s"
-          appearance="outlined"
-          onclick={(event: MouseEvent) => handleAddAttempt(event)}
-          disabled={!tickBuilder.canAddAttempt()}
-        >
-          <wa-icon slot="start" name="plus"></wa-icon>
-          Attempt
-        </wa-button>
-      </div>
     {/if}
 
     <div class="footer">
@@ -345,21 +344,13 @@
       flex-direction: column;
       gap: var(--wa-space-m);
     }
-
-    & .horizontal {
-      display: flex;
-      gap: var(--wa-space-s);
-    }
   }
 
   .horizontal {
-    width: 100%;
+    margin-inline-start: auto;
     display: flex;
-    gap: var(--wa-space-2xs);
-
-    & wa-button {
-      flex: 1;
-    }
+    align-items: center;
+    gap: var(--wa-space-xs);
   }
 
   .small {

@@ -1,6 +1,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import type WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
+  import { ordinalSuperscript } from "@climblive/lib/utils";
 
   type Props = {
     onChange: (checked: boolean, flash: boolean) => void;
@@ -82,9 +83,12 @@
   <div class="subtext">
     {#if showAttempts}
       <span>
-        {attempts}
-        {attempts === 1 ? "attempt" : "attempts"}
-        {#if checked}<wa-icon name="lock"></wa-icon>
+        {#if checked}
+          {attempts}{ordinalSuperscript(attempts)}
+          attempt
+          <wa-icon name="lock"></wa-icon>
+        {:else}
+          -
         {/if}
       </span>
     {/if}
