@@ -104,9 +104,13 @@ export class Authenticator {
     window.location.href = url;
   };
 
-  public redirectSignup = () => {
+  public redirectSignup = async () => {
+    const verifier = crypto.randomUUID();
+    const challenge = await challengeFromVerifier(verifier);
+    sessionStorage.setItem("code_verifier", verifier);
+
     const redirectUri = encodeURIComponent(window.location.origin + "/admin");
-    const url = `https://clmb.auth.eu-west-1.amazoncognito.com/signup?response_type=code&client_id=${configData.COGNITO_CLIENT_ID}&redirect_uri=${redirectUri}`;
+    const url = `https://clmb.auth.eu-west-1.amazoncognito.com/signup?response_type=code&client_id=${configData.COGNITO_CLIENT_ID}&redirect_uri=${redirectUri}&code_challenge=${challenge}&code_challenge_method=S256`;
     window.location.href = url;
   };
 
@@ -119,7 +123,7 @@ export class Authenticator {
   };
 }
 
-async function challengeFromVerifier(verfier: string) {
+const challengeFromVerifier = async (verfier: string) => {
   const hash = await crypto.subtle.digest(
     "SHA-256",
     new TextEncoder().encode(verfier),
@@ -129,4 +133,4 @@ async function challengeFromVerifier(verfier: string) {
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=+$/, "");
-}
+};
