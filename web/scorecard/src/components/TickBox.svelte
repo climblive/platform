@@ -147,7 +147,7 @@
         --width="1.25em"
         primary={problem.holdColorPrimary}
         secondary={problem.holdColorSecondary}
-      /> Problem № {problem.number}
+      /> Problem #{problem.number}
     </div>
 
     <div class="horizontal">

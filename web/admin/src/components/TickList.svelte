@@ -88,7 +88,7 @@
       primary={problem.holdColorPrimary}
       secondary={problem.holdColorSecondary}
     />
-    № {problem.number}
+    #{problem.number}
   </div>
 {/snippet}
 

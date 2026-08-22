@@ -137,7 +137,7 @@
       primary={holdColorPrimary}
       secondary={holdColorSecondary}
     />
-    № {number}
+    #{number}
   </div>
 {/snippet}
 
