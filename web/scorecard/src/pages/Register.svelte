@@ -107,7 +107,7 @@
       {#snippet registerCallout()}
         <wa-callout variant="neutral" size="s">
           <wa-icon slot="icon" name="circle-info"></wa-icon>
-          Your name will be stored for {retentionDuration} after the contest ends,
+          Your name will be stored for {retentionDuration} after the competition ends,
           after which it will be removed and your results anonymized.
         </wa-callout>
       {/snippet}
