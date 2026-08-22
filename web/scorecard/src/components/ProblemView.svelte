@@ -42,7 +42,7 @@
     --height="1.25rem"
     --width="1.25rem"
   />
-  <span class="number">№ {problem.number}</span>
+  <span class="number">#{problem.number}</span>
   <span class="points">
     {#if valueRange}
       <span class="top">

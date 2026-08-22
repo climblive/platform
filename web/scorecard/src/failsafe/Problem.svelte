@@ -77,7 +77,7 @@
       primary={problem.holdColorPrimary}
       secondary={problem.holdColorSecondary}
     />
-    № {problem.number}
+    #{problem.number}
     <div class="icon">
       {#if tick?.top && tick?.attemptsTop === 1}
         F
