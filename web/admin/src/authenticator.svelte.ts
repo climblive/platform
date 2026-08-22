@@ -94,9 +94,13 @@ export class Authenticator {
     }
   };
 
-  public redirectLogin = () => {
+  public redirectLogin = async () => {
+    const verifier = generateRandomString();
+    const challenge = await challenge_from_verifier(verifier);
+    sessionStorage.setItem("code_verifier", verifier);
+
     const redirectUri = encodeURIComponent(window.location.origin + "/admin");
-    const url = `https://clmb.auth.eu-west-1.amazoncognito.com/login?response_type=code&client_id=${configData.COGNITO_CLIENT_ID}&redirect_uri=${redirectUri}`;
+    const url = `https://clmb.auth.eu-west-1.amazoncognito.com/login?response_type=code&client_id=${configData.COGNITO_CLIENT_ID}&redirect_uri=${redirectUri}&code_challenge=${challenge}&code_challenge_method=S256`;
     window.location.href = url;
   };
 
@@ -113,4 +117,39 @@ export class Authenticator {
     const url = `https://clmb.auth.eu-west-1.amazoncognito.com/logout?client_id=${configData.COGNITO_CLIENT_ID}&logout_uri=${redirectUri}`;
     window.location.href = url;
   };
+}
+
+function dec2hex(dec: number) {
+  return ("0" + dec.toString(16)).substr(-2);
+}
+
+function generateRandomString() {
+  const array = new Uint32Array(56 / 2);
+  window.crypto.getRandomValues(array);
+  return Array.from(array, dec2hex).join("");
+}
+
+function sha256(plain: string): Promise<ArrayBuffer> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(plain);
+  return window.crypto.subtle.digest("SHA-256", data);
+}
+
+function base64urlencode(a: ArrayBuffer) {
+  let str = "";
+  const bytes = new Uint8Array(a);
+  const len = bytes.byteLength;
+
+  for (let i = 0; i < len; i++) {
+    str += String.fromCharCode(bytes[i]);
+  }
+
+  return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+async function challenge_from_verifier(v: string) {
+  const hashed = await sha256(v);
+  const base64encoded = base64urlencode(hashed);
+
+  return base64encoded;
 }
