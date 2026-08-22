@@ -95,7 +95,7 @@ export class Authenticator {
   };
 
   public redirectLogin = async () => {
-    const verifier = generateRandomString();
+    const verifier = crypto.randomUUID();
     const challenge = await challengeFromVerifier(verifier);
     sessionStorage.setItem("code_verifier", verifier);
 
@@ -117,16 +117,6 @@ export class Authenticator {
     const url = `https://clmb.auth.eu-west-1.amazoncognito.com/logout?client_id=${configData.COGNITO_CLIENT_ID}&logout_uri=${redirectUri}`;
     window.location.href = url;
   };
-}
-
-function dec2hex(dec: number) {
-  return ("0" + dec.toString(16)).substr(-2);
-}
-
-function generateRandomString() {
-  const array = new Uint32Array(56 / 2);
-  window.crypto.getRandomValues(array);
-  return Array.from(array, dec2hex).join("");
 }
 
 async function challengeFromVerifier(verfier: string) {
