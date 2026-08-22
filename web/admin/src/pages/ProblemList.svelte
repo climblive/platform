@@ -218,14 +218,14 @@
   >
   {#if limitReached}
     <wa-tooltip for={createButtonId} placement="top-start"
-      >Maximum of {maxProblems} problems per contest reached.</wa-tooltip
+      >Maximum of {maxProblems} problems per competition reached.</wa-tooltip
     >
   {/if}
 {/snippet}
 
 <p class="copy">
-  Problems refer to the boulder problems that the contenders will attempt during
-  the contest, each of which can have its own point value.
+  Problems refer to the boulder problems that the competitors will attempt
+  during the competition, each of which can have its own point value.
 </p>
 
 <section>
@@ -243,7 +243,7 @@
   {:else}
     <EmptyState
       title="No problems yet"
-      description="Create boulder problems that contenders will attempt during the contest."
+      description="Create boulder problems that competitors will attempt during the competition."
     >
       {#snippet actions()}
         <div class="actions">
@@ -257,7 +257,7 @@
               appearance="outlined"
               variant="neutral"
             >
-              Copy from another contest
+              Copy from another competition
               <wa-icon name="copy" slot="start"></wa-icon>
             </wa-button>
           {/if}

@@ -57,7 +57,7 @@
       width: "1fr",
     },
     {
-      label: "Contest",
+      label: "Competition",
       mobile: true,
       render: renderScoreEngineContest,
       width: "1fr",

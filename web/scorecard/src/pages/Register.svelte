@@ -90,7 +90,7 @@
           <wa-callout variant="warning">
             <wa-icon slot="icon" name="clock"></wa-icon>
             <strong>Registration is no longer possible</strong><br />
-            All classes have ended.
+            All categories have ended.
           </wa-callout>
         {/if}
         <wa-button

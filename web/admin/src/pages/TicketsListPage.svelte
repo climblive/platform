@@ -230,11 +230,12 @@
   <wa-breadcrumb>
     <wa-breadcrumb-item
       onclick={() =>
-        navigate(`/admin/organizers/${contest.ownership.organizerId}/contests`)}
-      ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
+        navigate(
+          `/admin/organizers/${competition.ownership.organizerId}/contests`,
+        )}><wa-icon name="home"></wa-icon></wa-breadcrumb-item
     >
     <wa-breadcrumb-item onclick={() => navigate(`/admin/contests/${contestId}`)}
-      >{contest.name}</wa-breadcrumb-item
+      >{competition.name}</wa-breadcrumb-item
     >
     <wa-breadcrumb-item>Tickets</wa-breadcrumb-item>
   </wa-breadcrumb>
@@ -242,9 +243,9 @@
   <h1>Tickets</h1>
 
   <p class="copy">
-    Tickets contain registration codes that allow contenders to enter your
-    contest. These tickets may be printed on paper and distributed to the
-    contenders on site.
+    Tickets contain registration codes that allow competitors to enter your
+    competition. These tickets may be printed on paper and distributed to the
+    competitors on site.
     {#if contenders && contenders.length > 0}
       Out of the {contenders.length}
       tickets that you have created, {registeredContenders} have already been used.

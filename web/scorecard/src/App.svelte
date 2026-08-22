@@ -107,7 +107,7 @@
         <Route path="/"><Start /></Route>
       </Router>
     {/if}
-    {#if import.meta.env.DEV}
+    {#if false && import.meta.env.DEV}
       <SvelteQueryDevtools />
     {/if}
   </QueryClientProvider>

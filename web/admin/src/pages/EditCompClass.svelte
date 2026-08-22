@@ -25,7 +25,7 @@
     patchCompClass.mutate(patch, {
       onSuccess: (compClass) =>
         navigate(`/admin/contests/${compClass.contestId}#comp-classes`),
-      onError: () => toastUnexpectedError("Failed to save comp class."),
+      onError: () => toastUnexpectedError("Failed to save category."),
     });
   };
 </script>

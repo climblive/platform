@@ -20,7 +20,7 @@
         navigate(`/admin/contests/${contestId}`);
       },
       onError: () => {
-        toastUnexpectedError("Failed to restore contest.");
+        toastUnexpectedError("Failed to restore competition.");
       },
     });
   };
@@ -30,8 +30,8 @@
   <wa-callout variant="danger" size="s">
     <wa-icon slot="icon" name="box-archive"></wa-icon>
     <p>
-      <strong>This contest has been archived.</strong><br />
-      You can restore this contest at any time to make it active again.
+      <strong>This competition has been archived.</strong><br />
+      You can restore this competition at any time to make it active again.
     </p>
   </wa-callout>
 

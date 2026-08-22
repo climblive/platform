@@ -118,7 +118,7 @@
 {:else if tableData}
   <EmptyState
     title="No ticks yet"
-    description="Ticks will appear here once the contender starts logging their attempts."
+    description="Ticks will appear here once the competitor starts logging their attempts."
   />
 {/if}
 

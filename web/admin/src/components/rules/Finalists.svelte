@@ -46,7 +46,7 @@
   {#snippet children(form)}
     <RuleOptionCard
       title="Finalists"
-      description="The number of contenders that will proceed to the finals.
+      description="The number of competitors that will proceed to the finals.
     There might be additional finalists in case of ties."
     >
       {#snippet header()}

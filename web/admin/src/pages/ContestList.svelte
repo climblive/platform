@@ -206,17 +206,17 @@
       variant="neutral"
       disabled={limitReached}
       onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
-      >Create new contest</wa-button
+      >Create new competition</wa-button
     >
     {#if limitReached}
       <wa-tooltip for={createButtonId} placement="top-start"
-        >Maximum of {maxContestsPerWeek} contests per week reached.</wa-tooltip
+        >Maximum of {maxContestsPerWeek} competitions per week reached.</wa-tooltip
       >
     {/if}
   {/if}
 {/snippet}
 
-<h2>Contests</h2>
+<h2>Competition</h2>
 {#if numberOfUnarchivedContests > 0}
   {@render createButton("create-contest-button")}
 {/if}
@@ -237,11 +237,10 @@
   <h3>{heading} ({contests.length})</h3>
   {#if showSummary}
     <p class="contest-summary">
-      A total of {totalRegistered}
-      {totalRegistered === 1 ? "contender has" : "contenders have"} participated in
+      A total of {totalRegistered} competitors has participated in
       {contests.length}
-      {contests.length === 1 ? "contest" : "contests"} averaging {averageRegistered}
-      {averageRegistered === 1 ? "contender" : "contenders"} per contest.
+      {contests.length === 1 ? "competition" : "competitions"} averaging {averageRegistered}
+      {averageRegistered === 1 ? "contender" : "contenders"} per competition.
     </p>
   {/if}
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
@@ -264,8 +263,8 @@
 
   {#if contests && numberOfUnarchivedContests === 0}
     <EmptyState
-      title="No contests yet"
-      description="Create a contest to get started with your first event."
+      title="No competitions yet"
+      description="Create a competition to get started with your first event."
     >
       {#snippet actions()}
         {@render createButton()}
@@ -286,9 +285,9 @@
       class="toggle-archived-button"
     >
       {#if showArchived}
-        Hide archived contests
+        Hide archived competitions
       {:else}
-        Show archived contests ({archived.length})
+        Show archived competitions ({archived.length})
       {/if}
     </wa-button>
   {/if}

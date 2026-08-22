@@ -36,7 +36,7 @@
         navigate(`/admin/contests/${duplicate.id}`);
       },
       onError: () => {
-        toastUnexpectedError("Failed to duplicate contest.");
+        toastUnexpectedError("Failed to duplicate competition.");
       },
     });
   };
@@ -49,8 +49,8 @@
   </wa-button>
 </div>
 
-<wa-dialog bind:this={dialog} label="Duplicate contest">
-  You are about to create a copy of the contest. Everything except tickets,
+<wa-dialog bind:this={dialog} label="Duplicate competition">
+  You are about to create a copy of the competition. Everything except tickets,
   results and raffles will be copied.
   <wa-button slot="footer" appearance="plain" onclick={handleCancel}>
     Cancel</wa-button

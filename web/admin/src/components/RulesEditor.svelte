@@ -33,7 +33,7 @@
 <section>
   <RuleOptionCard
     title="Points"
-    description="Contenders are ranked based on the total points scored across all problems."
+    description="Competitors are ranked based on the total points scored across all problems."
   >
     {#snippet header()}
       <wa-radio size="s" checked></wa-radio>
@@ -42,7 +42,7 @@
 
   <RuleOptionCard
     title="Attempts"
-    description="Contenders are ranked based on the number of attempts needed to complete problems."
+    description="Competitors are ranked based on the number of attempts needed to complete problems."
     disabled
     tag="Upcoming"
   >
@@ -62,7 +62,7 @@
 
   <RuleOptionCard
     title="Max attempts"
-    description="Each contender has a fixed number of attempts per problem. Attempts above that limit yield 0 points for that problem."
+    description="Each competitor has a fixed number of attempts per problem. Attempts above that limit yield 0 points for that problem."
     disabled
     tag="Upcoming"
   >
