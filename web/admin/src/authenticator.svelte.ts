@@ -96,7 +96,7 @@ export class Authenticator {
 
   public redirectLogin = async () => {
     const verifier = generateRandomString();
-    const challenge = await challenge_from_verifier(verifier);
+    const challenge = await challengeFromVerifier(verifier);
     sessionStorage.setItem("code_verifier", verifier);
 
     const redirectUri = encodeURIComponent(window.location.origin + "/admin");
@@ -129,27 +129,14 @@ function generateRandomString() {
   return Array.from(array, dec2hex).join("");
 }
 
-function sha256(plain: string): Promise<ArrayBuffer> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(plain);
-  return window.crypto.subtle.digest("SHA-256", data);
-}
+async function challengeFromVerifier(verfier: string) {
+  const hash = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(verfier),
+  );
 
-function base64urlencode(a: ArrayBuffer) {
-  let str = "";
-  const bytes = new Uint8Array(a);
-  const len = bytes.byteLength;
-
-  for (let i = 0; i < len; i++) {
-    str += String.fromCharCode(bytes[i]);
-  }
-
-  return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-async function challenge_from_verifier(v: string) {
-  const hashed = await sha256(v);
-  const base64encoded = base64urlencode(hashed);
-
-  return base64encoded;
+  return btoa(String.fromCharCode(...new Uint8Array(hash)))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
 }
