@@ -91,7 +91,7 @@ test("enter competition by entering registration code", async ({ page }) => {
   await page
     .getByRole("textbox", { name: "Name *" })
     .pressSequentially("Dwight Schrute");
-  const compClass = page.getByRole("combobox", { name: "Competition class *" });
+  const compClass = page.getByRole("combobox", { name: "Category *" });
   await compClass.click();
   await page
     .getByRole("option", { name: "Males 16 years and older", exact: true })
@@ -203,7 +203,7 @@ test("edit profile", async ({ page }) => {
   await nameInput.fill("");
   await nameInput.pressSequentially("Phyllis Lapin-Vance");
 
-  const compClass = page.getByRole("combobox", { name: "Competition class *" });
+  const compClass = page.getByRole("combobox", { name: "Category *" });
   await compClass.click();
   await page
     .getByRole("option", { name: "Females 16 years and older", exact: true })
@@ -521,7 +521,7 @@ test.describe("failsafe mode", () => {
       .getByRole("textbox", { name: "Name" })
       .pressSequentially("Andy Bernard");
     await page
-      .getByRole("combobox", { name: "Competition class" })
+      .getByRole("combobox", { name: "Category" })
       .selectOption({ label: "Females" });
 
     await page.getByRole("button", { name: "Register" }).click();
@@ -537,9 +537,9 @@ test.describe("failsafe mode", () => {
     await expect(page.getByRole("textbox", { name: "Name" })).toHaveValue(
       "Andy Bernard",
     );
-    await expect(
-      page.getByRole("combobox", { name: "Competition class" }),
-    ).toHaveValue("2");
+    await expect(page.getByRole("combobox", { name: "Category" })).toHaveValue(
+      "2",
+    );
   });
 
   test("tick and untick all problems", async ({ page }) => {

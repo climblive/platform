@@ -41,7 +41,7 @@
   const handleSubmit = async (tmpl: CompClassTemplate) => {
     createCompClass.mutate(tmpl, {
       onSuccess: () => navigate(`/admin/contests/${contestId}#comp-classes`),
-      onError: () => toastUnexpectedError("Failed to create class."),
+      onError: () => toastUnexpectedError("Failed to create category."),
     });
   };
 </script>

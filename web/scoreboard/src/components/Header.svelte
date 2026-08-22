@@ -29,7 +29,7 @@
     <header>
       <div class="left">
         <div class="title">
-          <small>Class</small>
+          <small>Category</small>
           <h2>
             {name}
           </h2>

@@ -118,7 +118,7 @@
     appearance="accent"
     disabled={limitReached}
     onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
-    >Create class</wa-button
+    >Create category</wa-button
   >
   {#if limitReached}
     <wa-tooltip for={createButtonId} placement="top-start"

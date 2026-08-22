@@ -174,7 +174,7 @@
 
     <section>
       <article>
-        <LabeledText label="Class"
+        <LabeledText label="Category"
           >{compClasses.find(({ id }) => id === contender.compClassId)?.name ??
             "-"}</LabeledText
         >
