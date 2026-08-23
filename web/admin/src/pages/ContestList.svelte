@@ -241,7 +241,7 @@
       {totalRegistered === 1 ? "competitor has" : "competitors have"} participated
       in {contests.length}
       {contests.length === 1 ? "competition" : "competitions"} averaging {averageRegistered}
-      {averageRegistered === 1 ? "contender" : "contenders"} per competition.
+      {averageRegistered === 1 ? "competitor" : "competitors"} per competition.
     </p>
   {/if}
   <Table {columns} data={contests} getId={({ id }) => id}></Table>
