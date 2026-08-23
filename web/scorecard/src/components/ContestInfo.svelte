@@ -20,7 +20,7 @@
 </script>
 
 <section>
-  <LabeledText label="Name">{contest.name}</LabeledText>
+  <LabeledText label="Competition">{contest.name}</LabeledText>
   {#if contest.description}
     <LabeledText label="Description">{contest.description}</LabeledText>
   {/if}

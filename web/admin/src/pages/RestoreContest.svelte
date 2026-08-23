@@ -30,7 +30,7 @@
   <wa-callout variant="danger" size="s">
     <wa-icon slot="icon" name="box-archive"></wa-icon>
     <p>
-      <strong>This competition has been archived.</strong><br />
+      <strong>This competition has been archived</strong><br />
       You can restore this competition at any time to make it active again.
     </p>
   </wa-callout>

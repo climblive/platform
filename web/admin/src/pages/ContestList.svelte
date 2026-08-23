@@ -239,7 +239,7 @@
     <p class="contest-summary">
       A total of {totalRegistered}
       {totalRegistered === 1 ? "competitor has" : "competitors have"} participated
-      {contests.length}
+      in {contests.length}
       {contests.length === 1 ? "competition" : "competitions"} averaging {averageRegistered}
       {averageRegistered === 1 ? "contender" : "contenders"} per competition.
     </p>
