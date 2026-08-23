@@ -207,7 +207,7 @@
       <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
       ></wa-divider>
       <p class="copy">
-        All problems attempted by the competitor during the competition.
+        Problems attempted by the competitor during the competition.
       </p>
       <TickList contenderId={contender.id} contestId={contender.contestId}
       ></TickList>
