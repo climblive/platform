@@ -134,7 +134,7 @@
   {#if !contender.entered}
     <EmptyState
       title="Not registered"
-      description="Have the competitor scan the QR code below to enter the competition and start climbing."
+      description="Have a competitor scan the QR code below to register for the competition."
     >
       {#snippet actions()}
         <QrCode
