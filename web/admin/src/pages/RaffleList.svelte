@@ -114,7 +114,7 @@
   {:else}
     <EmptyState
       title="No raffles yet"
-      description="Start a new raffle to hand out prices to the competitors."
+      description="Start a new raffle to hand out some prizes."
     >
       {#snippet actions()}
         {@render createButton()}
