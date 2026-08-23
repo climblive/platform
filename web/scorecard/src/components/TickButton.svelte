@@ -87,8 +87,12 @@
           {attempts}{ordinalSuperscript(attempts)}
           attempt
           <wa-icon name="lock"></wa-icon>
+        {:else if attempts === 0}
+          0 attempts
+        {:else if attempts === 1}
+          1 unsuccessful attempt
         {:else}
-          -
+          {attempts} unsuccessful attempts
         {/if}
       </span>
     {/if}
