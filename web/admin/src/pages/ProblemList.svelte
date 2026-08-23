@@ -243,7 +243,7 @@
   {:else}
     <EmptyState
       title="No problems yet"
-      description="Create boulder problems that competitors will attempt during the competition."
+      description="Add problems that the competitors will attempt during the competition."
     >
       {#snippet actions()}
         <div class="actions">
