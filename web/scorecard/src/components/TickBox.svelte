@@ -176,8 +176,6 @@
     </div>
     {#if enableAttempts}
       <div class="horizontal">
-        {tick.attemptsTop}
-        {tick.attemptsTop === 1 ? "attempt" : "attempts"}
         <wa-button
           size="m"
           pill
@@ -187,6 +185,11 @@
         >
           <wa-icon name="minus"></wa-icon>
         </wa-button>
+
+        <div class="attempts">
+          <span class="number">{tick.attemptsTop}</span>
+          {tick.attemptsTop === 1 ? "attempt" : "attempts"}
+        </div>
 
         <wa-button
           size="m"
@@ -347,7 +350,7 @@
   }
 
   .horizontal {
-    margin-inline-start: auto;
+    margin-inline: auto;
     display: flex;
     align-items: center;
     gap: var(--wa-space-xs);
@@ -377,6 +380,22 @@
   @keyframes hide {
     to {
       visibility: hidden;
+    }
+  }
+
+  .attempts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: var(--wa-font-size-s);
+    width: 4rem;
+    color: var(--wa-color-text-quiet);
+
+    & .number {
+      margin: 0;
+      font-size: var(--wa-font-size-l);
+      font-weight: var(--wa-font-weight-bold);
+      color: var(--wa-color-text-normal);
     }
   }
 </style>
