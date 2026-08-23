@@ -142,7 +142,7 @@
   {:else}
     <EmptyState
       title="No categories yet"
-      description="Create categories to define the classes in which competitors will compete."
+      description="Add categories for competitors to compete in."
     >
       {#snippet actions()}
         {@render createButton()}
