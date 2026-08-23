@@ -101,7 +101,7 @@
 {/snippet}
 
 <p class="copy">
-  Raffles are used to randomly select prize winners, typically after the
+  Raffles are used to draw prize winners. They are typically held after the
   competition has ended.
 </p>
 
@@ -114,7 +114,7 @@
   {:else}
     <EmptyState
       title="No raffles yet"
-      description="Start a new raffle to randomly select winners from your competitors."
+      description="Start a new raffle to hand out prices to the competitors."
     >
       {#snippet actions()}
         {@render createButton()}
