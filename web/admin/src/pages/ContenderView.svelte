@@ -203,11 +203,11 @@
     </section>
 
     {#if !contender.disqualified}
-      <h2>Ticks</h2>
+      <h2>Results</h2>
       <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
       ></wa-divider>
       <p class="copy">
-        All ticks registered by the competitor during the competition.
+        All problems attempted by the competitor during the competition.
       </p>
       <TickList contenderId={contender.id} contestId={contender.contestId}
       ></TickList>
