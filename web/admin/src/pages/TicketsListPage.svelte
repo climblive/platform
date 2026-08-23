@@ -42,22 +42,6 @@
     contenders === undefined ? undefined : maxTickets - contenders.length,
   );
 
-  const registeredContenders = $derived.by(() => {
-    if (!contenders) {
-      return undefined;
-    }
-
-    let count = 0;
-
-    for (const contender of contenders) {
-      if (contender.entered !== undefined) {
-        count += 1;
-      }
-    }
-
-    return count;
-  });
-
   let showUnusedOnly = $state(false);
   let selectionStartId: number | undefined = $state(undefined);
   let selectionEndId: number | undefined = $state(undefined);
@@ -244,10 +228,6 @@
   <p class="copy">
     Tickets contain registration codes that allow competitors to enter your
     competition. These tickets may be printed on paper and distributed on site.
-    {#if contenders && contenders.length > 0}
-      Out of the {contenders.length}
-      tickets that you have created, {registeredContenders} have already been used.
-    {/if}
   </p>
 
   <div class="controls">

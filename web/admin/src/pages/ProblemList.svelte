@@ -225,7 +225,7 @@
 
 <p class="copy">
   Problems refer to the boulder problems that the competitors will attempt
-  during the competition, each of which can have its own point value.
+  during the competition.
 </p>
 
 <section>

@@ -40,7 +40,8 @@
 {@render children({ deleteCompClass: handleDelete })}
 
 <wa-dialog bind:this={dialog} label="Delete category">
-  Deleting a category will permanently remove it and it cannot be restored.
+  Are you sure you want to delete this category? This action is permanent and
+  cannot be undone.
   <wa-button slot="footer" appearance="plain" onclick={handleCancel}>
     Cancel</wa-button
   >
