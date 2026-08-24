@@ -384,7 +384,7 @@ test("info tab", async ({ page }) => {
   await page.getByRole("tab", { name: "Info" }).click();
 
   await expect(
-    page.getByText("Name World Testing Championships"),
+    page.getByText("Competition World Testing Championships"),
   ).toBeVisible();
   await expect(
     page.getByText(
