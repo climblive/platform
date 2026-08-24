@@ -167,7 +167,7 @@
     </wa-callout>
   {:else}
     <wa-button variant="neutral" onclick={handleDrawWinner}
-      >Draw winner</wa-button
+      >Draw winner at random</wa-button
     >
   {/if}
 {/snippet}

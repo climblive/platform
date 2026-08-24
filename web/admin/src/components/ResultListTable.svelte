@@ -162,7 +162,7 @@
       <wa-select
         bind:this={compClassSelector}
         size="s"
-        label="Class filter"
+        label="Category filter"
         {@attach value(selectedCompClassId)}
         onchange={() => {
           selectedCompClassId = Number(compClassSelector?.value);

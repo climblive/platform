@@ -19,6 +19,9 @@ const instance = axios.create({
 });
 
 export const exchangeCode = async (code: string) => {
+  const codeVerifier = sessionStorage.getItem("code_verifier");
+  sessionStorage.removeItem("code_verifier");
+
   const params = new URLSearchParams();
   params.append("grant_type", "authorization_code");
   params.append("client_id", configData.COGNITO_CLIENT_ID);
@@ -27,6 +30,10 @@ export const exchangeCode = async (code: string) => {
     "redirect_uri",
     window.location.protocol + "//" + window.location.host + "/admin",
   );
+
+  if (codeVerifier !== null) {
+    params.append("code_verifier", codeVerifier);
+  }
 
   const response = await instance.post("/oauth2/token", params);
 

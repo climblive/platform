@@ -78,7 +78,7 @@ test.afterAll(async () => {
   await startedDbContainer?.stop();
 });
 
-test("enter contest by entering registration code", async ({ page }) => {
+test("enter competition by entering registration code", async ({ page }) => {
   await page.goto("/");
 
   await expect(page).toHaveTitle(/ClimbLive/);
@@ -91,7 +91,7 @@ test("enter contest by entering registration code", async ({ page }) => {
   await page
     .getByRole("textbox", { name: "Name *" })
     .pressSequentially("Dwight Schrute");
-  const compClass = page.getByRole("combobox", { name: "Competition class *" });
+  const compClass = page.getByRole("combobox", { name: "Category *" });
   await compClass.click();
   await page
     .getByRole("option", { name: "Males 16 years and older", exact: true })
@@ -102,7 +102,7 @@ test("enter contest by entering registration code", async ({ page }) => {
   await page.waitForURL("/ABCD0002");
 });
 
-test("registration code is saved until 12 hours after contest ends", async ({
+test("registration code is saved until 12 hours after competition ends", async ({
   page,
 }) => {
   await page.clock.install({ time: new Date() });
@@ -203,7 +203,7 @@ test("edit profile", async ({ page }) => {
   await nameInput.fill("");
   await nameInput.pressSequentially("Phyllis Lapin-Vance");
 
-  const compClass = page.getByRole("combobox", { name: "Competition class *" });
+  const compClass = page.getByRole("combobox", { name: "Category *" });
   await compClass.click();
   await page
     .getByRole("option", { name: "Females 16 years and older", exact: true })
@@ -384,7 +384,7 @@ test("info tab", async ({ page }) => {
   await page.getByRole("tab", { name: "Info" }).click();
 
   await expect(
-    page.getByText("Name World Testing Championships"),
+    page.getByText("Competition World Testing Championships"),
   ).toBeVisible();
   await expect(
     page.getByText(
@@ -392,7 +392,7 @@ test("info tab", async ({ page }) => {
     ),
   ).toBeVisible();
   await expect(page.getByText("Location On the web")).toBeVisible();
-  await expect(page.getByText("Classes Males, Females")).toBeVisible();
+  await expect(page.getByText("Categories Males, Females")).toBeVisible();
   await expect(page.getByText("Number of problems 5")).toBeVisible();
   await expect(page.getByText("Qualifying problems 10 hardest")).toBeVisible();
   await expect(page.getByText("Number of finalists 7")).toBeVisible();
@@ -406,12 +406,12 @@ test("info tab", async ({ page }) => {
   ).toBeVisible();
 });
 
-test.describe("contest states", () => {
+test.describe("competition states", () => {
   test.beforeEach(async ({ page }) => {
     await page.clock.setFixedTime(new Date("2023-11-01T00:00:00"));
   });
 
-  test("before contest has started", async ({ page }) => {
+  test("before competition has started", async ({ page }) => {
     await page.goto("/ABCD0001");
 
     const timer = page.getByRole("timer", { name: "Starting in" });
@@ -427,7 +427,7 @@ test.describe("contest states", () => {
     await expect(problem.getByRole("button", { name: "Tick" })).toBeDisabled();
   });
 
-  test("while contest is running", async ({ page }) => {
+  test("while competition is running", async ({ page }) => {
     await page.goto("/ABCD0001");
 
     await page.clock.setFixedTime(new Date("2024-01-01T00:00:00"));
@@ -463,7 +463,7 @@ test.describe("contest states", () => {
     await expect(problem.getByRole("button", { name: "Tick" })).toBeEnabled();
   });
 
-  test("after contest has ended", async ({ page }) => {
+  test("after competition has ended", async ({ page }) => {
     await page.goto("/ABCD0001");
 
     await page.clock.setFixedTime(new Date("2027-01-01T00:05:00"));
@@ -505,7 +505,7 @@ test("scrub name", async ({ page }) => {
 });
 
 test.describe("failsafe mode", () => {
-  test("enter contest by entering registration code", async ({ page }) => {
+  test("enter competition by entering registration code", async ({ page }) => {
     await page.goto("/failsafe");
 
     await expect(page.getByRole("heading", { name: "Welcome!" })).toBeVisible();
@@ -521,7 +521,7 @@ test.describe("failsafe mode", () => {
       .getByRole("textbox", { name: "Name" })
       .pressSequentially("Andy Bernard");
     await page
-      .getByRole("combobox", { name: "Competition class" })
+      .getByRole("combobox", { name: "Category" })
       .selectOption({ label: "Females" });
 
     await page.getByRole("button", { name: "Register" }).click();
@@ -537,9 +537,9 @@ test.describe("failsafe mode", () => {
     await expect(page.getByRole("textbox", { name: "Name" })).toHaveValue(
       "Andy Bernard",
     );
-    await expect(
-      page.getByRole("combobox", { name: "Competition class" }),
-    ).toHaveValue("2");
+    await expect(page.getByRole("combobox", { name: "Category" })).toHaveValue(
+      "2",
+    );
   });
 
   test("tick and untick all problems", async ({ page }) => {

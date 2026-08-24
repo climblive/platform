@@ -241,7 +241,7 @@
 
 <wa-dialog bind:this={dialog} label="Inconsistent zone points">
   Points for the second zone are lower than points for the first zone.
-  Contenders will lose points when reaching the second zone.
+  Competitors will lose points when reaching the second zone.
   <wa-button slot="footer" appearance="plain" onclick={handleCancelDialog}
     >Cancel</wa-button
   >

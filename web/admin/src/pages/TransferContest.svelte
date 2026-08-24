@@ -52,7 +52,7 @@
 
     transferContest.mutate(selectedOrganizerId, {
       onSuccess: () => navigate(`./organizers/${selectedOrganizerId}/contests`),
-      onError: () => toastUnexpectedError("Failed to transfer contest."),
+      onError: () => toastUnexpectedError("Failed to transfer competition."),
     });
   };
 
@@ -71,7 +71,7 @@
   <wa-icon name="arrow-right" slot="start"></wa-icon>
 </wa-button>
 
-<wa-dialog bind:this={dialog} label="Transfer contest">
+<wa-dialog bind:this={dialog} label="Transfer competition">
   <wa-select
     label="Select new organizer"
     onchange={handleSelect}
@@ -94,7 +94,7 @@
     {#if currentOrganizer && newOrganizer}
       <wa-callout variant="warning">
         <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
-        This will transfer all contest data from the current organizer
+        This will transfer all competition data from the current organizer
         <strong>
           {currentOrganizer.name}
         </strong>

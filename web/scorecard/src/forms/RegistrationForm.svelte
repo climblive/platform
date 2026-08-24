@@ -54,7 +54,7 @@
       <wa-select
         size="s"
         {@attach name("compClassId")}
-        label="Competition class"
+        label="Category"
         required
         {@attach value(data.compClassId)}
         {disabled}

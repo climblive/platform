@@ -451,7 +451,7 @@
             {#if sortedProblems.length === 0}
               <EmptyState
                 title="No problems"
-                description="The organizer has not added any problems to this contest yet."
+                description="The organizer has not added any problems to this competition yet."
               />
             {:else}
               <div class="problems-list">

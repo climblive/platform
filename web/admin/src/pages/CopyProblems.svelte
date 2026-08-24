@@ -155,13 +155,13 @@
       <Loader />
     {:else if availableContests.length === 0}
       <EmptyState
-        title="No contests available"
-        description="There are no other contests to copy problems from."
+        title="No competitions available"
+        description="There are no other competitions to copy problems from."
       />
     {:else}
       <wa-select
-        label="Select contest"
-        placeholder="Select a contest to copy from"
+        label="Select competition"
+        placeholder="Select a competition to copy from"
         onchange={handleContestChange}
       >
         {#each availableContests as contest (contest.id)}
@@ -188,7 +188,7 @@
         <wa-progress-bar value={copyProgress}></wa-progress-bar>
       {:else}
         <p class="summary">
-          This contest has {problemsSummary.count} problem{problemsSummary.count !==
+          This competition has {problemsSummary.count} problem{problemsSummary.count !==
           1
             ? "s"
             : ""} with point values ranging from {problemsSummary.minPoints} to
@@ -198,7 +198,7 @@
     {:else}
       <EmptyState
         title="No problems found"
-        description="This contest has no problems to copy."
+        description="This competition has no problems to copy."
       />
     {/if}
   {/if}

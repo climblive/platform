@@ -36,7 +36,7 @@
       {
         onSuccess: (contest: Contest) =>
           navigate(`/admin/contests/${contest.id}`),
-        onError: () => toastUnexpectedError("Failed to save contest."),
+        onError: () => toastUnexpectedError("Failed to save competition."),
       },
     );
   };

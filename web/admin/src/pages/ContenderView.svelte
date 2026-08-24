@@ -134,7 +134,7 @@
   {#if !contender.entered}
     <EmptyState
       title="Not registered"
-      description="Have the contender scan the QR code below to enter the contest and start climbing."
+      description="Have a competitor scan the QR code below to register for the competition."
     >
       {#snippet actions()}
         <QrCode
@@ -174,7 +174,7 @@
 
     <section>
       <article>
-        <LabeledText label="Class"
+        <LabeledText label="Category"
           >{compClasses.find(({ id }) => id === contender.compClassId)?.name ??
             "-"}</LabeledText
         >
@@ -203,11 +203,11 @@
     </section>
 
     {#if !contender.disqualified}
-      <h2>Ticks</h2>
+      <h2>Results</h2>
       <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
       ></wa-divider>
       <p class="copy">
-        All ticks registered by the contender during the contest.
+        Problems attempted by the competitor during the competition.
       </p>
       <TickList contenderId={contender.id} contestId={contender.contestId}
       ></TickList>
@@ -220,8 +220,8 @@
       <wa-select
         size="s"
         bind:this={compClassSelect}
-        label="Competition class"
-        hint="Change the class for this contender."
+        label="Category"
+        hint="Change the category for this competitor."
         {@attach value(contender.compClassId)}
         onchange={handleCompClassChange}
         disabled={contender.disqualified || patchContender.isPending}
@@ -239,7 +239,7 @@
       <wa-switch
         size="s"
         bind:this={withdrawFromFinalsToggle}
-        hint="In case the contender does not wish to take part in the finals."
+        hint="In case the competitor does not wish to take part in the finals."
         {@attach checked(contender.withdrawnFromFinals)}
         onchange={handleToggleWithdrawFromFinals}
         disabled={contender.disqualified || patchContender.isPending}
@@ -251,7 +251,7 @@
           onclick={handleRequalify}
           loading={patchContender.isPending}
           appearance="outlined"
-          >Requalify contender<wa-icon slot="start" name="right-to-bracket"
+          >Requalify competitor<wa-icon slot="start" name="right-to-bracket"
           ></wa-icon></wa-button
         >
       {:else}
@@ -260,7 +260,7 @@
           variant="danger"
           onclick={handleDisqualify}
           loading={patchContender.isPending}
-          >Disqualify contender<wa-icon slot="start" name="user-slash"
+          >Disqualify competitor<wa-icon slot="start" name="user-slash"
           ></wa-icon></wa-button
         >
       {/if}

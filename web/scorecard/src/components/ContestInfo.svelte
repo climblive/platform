@@ -20,7 +20,7 @@
 </script>
 
 <section>
-  <LabeledText label="Name">{contest.name}</LabeledText>
+  <LabeledText label="Competition">{contest.name}</LabeledText>
   {#if contest.description}
     <LabeledText label="Description">{contest.description}</LabeledText>
   {/if}
@@ -37,7 +37,7 @@
       {format(contest.timeEnd, "PPpp", { locale: sv })}
     </LabeledText>
   {/if}
-  <LabeledText label="Competition classes">
+  <LabeledText label="Categories">
     {compClasses.map((cc) => cc.name).join(", ")}
   </LabeledText>
   <LabeledText label="Number of problems">

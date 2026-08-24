@@ -79,7 +79,7 @@
       type="text"
       required
       value={data.name}
-      hint="The name of the contest as shown to contenders."
+      hint="The name of the competition as shown to competitors."
     ></wa-input>
     <wa-input
       size="s"
@@ -87,7 +87,7 @@
       label="Description"
       type="text"
       value={data.description}
-      hint="A short description or tagline for the contest."
+      hint="A short description or tagline for the competition."
     ></wa-input>
     <div class="location">
       <wa-input
@@ -103,7 +103,7 @@
         {@attach name("country")}
         {@attach value(selectedCountry)}
         label="Country"
-        hint="The country where the contest is held."
+        hint="The country where the competition is held."
         onchange={handleCountryChange}
       >
         <span slot="start">{getFlag(selectedCountry)}</span>
@@ -119,7 +119,7 @@
       size="s"
       {@attach name("gracePeriod")}
       label="Grace period"
-      hint="Extra time after the end of the contest during which contenders can enter their last results."
+      hint="Extra time after the end of the competition during which competitors can enter their last results."
       required
       min={0}
       max={60}
@@ -133,7 +133,7 @@
       {@attach value(data.nameRetentionTime)}
       orientation="horizontal"
       label="Retention time"
-      hint="How long contender names are retained after the contest ends before results are anonymized."
+      hint="How long competitor names are retained after the competition ends before results are anonymized."
       disabled={disableNameRetentionTime}
     >
       {#each retentionOptions as option (option.value)}

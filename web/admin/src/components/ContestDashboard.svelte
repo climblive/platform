@@ -52,11 +52,10 @@
 {#snippet summary()}
   {@const registeredContenders = contest?.registeredContenders ?? 0}
 
-  {@const contenderStr = (count: number) =>
-    count === 1 ? "1 contender" : `${count} contenders`}
+  {@const contenderStr = (count: number) => `${count} registered`}
 
   {@const compClassStr = (count: number) =>
-    count === 1 ? "1 class" : `${count} classes`}
+    count === 1 ? "1 category" : `${count} categories`}
 
   {@const problemStr = (count: number) =>
     count === 1 ? "1 problem" : `${count} problems`}
