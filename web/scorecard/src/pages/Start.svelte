@@ -6,8 +6,9 @@
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/otp-input/otp-input.js";
+  import type WaOtpInput from "@awesome.me/webawesome/dist/components/otp-input/otp-input.js";
   import { FullLogo, SplashScreen } from "@climblive/lib/components";
-  import { toast, z } from "@climblive/lib/utils";
+  import { z } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { format } from "date-fns";
   import { getContext, onMount } from "svelte";
@@ -20,8 +21,10 @@
   });
 
   let loadingContender = $state(false);
+  let error = $state<string>();
   let queryClient = useQueryClient();
   let form: HTMLFormElement | undefined = $state();
+  let otpInput: WaOtpInput | undefined = $state();
   let restoredSessions: ScorecardSession[] = $state([]);
   let showSplash = $state(true);
 
@@ -66,12 +69,8 @@
         console.error(e);
       }
 
-      toast({
-        title: "Incorrect registration code",
-        message: "Please enter a valid registration code.",
-        icon: "circle-exclamation",
-        variant: "danger",
-      });
+      error = "Incorrect registration code";
+      otpInput?.setCustomValidity(error);
     } finally {
       loadingContender = false;
     }
@@ -89,9 +88,11 @@
     </header>
     <form bind:this={form} onsubmit={handleSubmit}>
       <wa-otp-input
+        bind:this={otpInput}
+        onchange={() => (error = undefined)}
         required
         label="Registration code"
-        hint="Input your 8 digit registration code."
+        hint={error ?? "Input your 8 digit registration code."}
         name="code"
         autosubmit
         case="upper"
