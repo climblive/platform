@@ -2,7 +2,7 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
   import "@awesome.me/webawesome/dist/components/toast/toast.js";
-  import { ErrorBoundary, FullLogo } from "@climblive/lib/components";
+  import { Banner, ErrorBoundary, FullLogo } from "@climblive/lib/components";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { onDestroy, onMount, setContext } from "svelte";
@@ -76,6 +76,10 @@
 
 <ErrorBoundary>
   <wa-toast placement="bottom-end"></wa-toast>
+
+  <Banner visible={location.hostname !== "climblive.app"}>
+    Development version
+  </Banner>
 
   {#await authenticator.authenticate()}
     <div class="loading">

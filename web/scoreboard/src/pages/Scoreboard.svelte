@@ -3,6 +3,7 @@
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import {
+    Banner,
     FullLogo,
     ResultList,
     ScoreboardProvider,
@@ -57,9 +58,9 @@
 {:else}
   <ScoreboardProvider {contestId} hideDisqualified>
     {#snippet children({ scoreboard, loading, online })}
-      <header data-online={online}>
+      <Banner visible={!online}>
         <wa-icon name="triangle-exclamation"></wa-icon>Offline
-      </header>
+      </Banner>
       <main>
         <div class="banner">
           <h1>
@@ -121,23 +122,6 @@
 {/if}
 
 <style>
-  header {
-    background-color: var(--wa-color-danger-fill-loud);
-    width: 100%;
-    height: 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: var(--wa-space-xs);
-    color: var(--wa-color-danger-on-loud);
-    font-weight: var(--wa-font-weight-semibold);
-    font-size: var(--wa-font-size-s);
-
-    &[data-online="true"] {
-      display: none;
-    }
-  }
-
   main {
     display: flex;
     flex-direction: column;

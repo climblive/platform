@@ -1,6 +1,6 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/toast/toast.js";
-  import { ErrorBoundary } from "@climblive/lib/components";
+  import { Banner, ErrorBoundary } from "@climblive/lib/components";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { Route, Router } from "svelte-routing";
@@ -17,6 +17,10 @@
 
 <ErrorBoundary>
   <wa-toast placement="bottom-end"></wa-toast>
+
+  <Banner visible={location.hostname !== "climblive.app"}>
+    Development version
+  </Banner>
 
   <QueryClientProvider client={queryClient}>
     <Router>

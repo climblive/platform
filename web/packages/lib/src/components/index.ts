@@ -1,3 +1,4 @@
+export { default as Banner } from "./Banner.svelte";
 export { default as ContenderName } from "./ContenderName.svelte";
 export { default as ContestStateProvider } from "./ContestStateProvider.svelte";
 export { default as EmptyState } from "./EmptyState.svelte";
