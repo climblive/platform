@@ -95,7 +95,7 @@
   >
   {#if limitReached}
     <wa-tooltip for={createButtonId} placement="top-start"
-      >Maximum of {maxRaffles} raffles per competition reached.</wa-tooltip
+      >Limit of {maxRaffles} raffles per competition reached.</wa-tooltip
     >
   {/if}
 {/snippet}

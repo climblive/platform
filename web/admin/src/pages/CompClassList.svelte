@@ -122,7 +122,7 @@
   >
   {#if limitReached}
     <wa-tooltip for={createButtonId} placement="top-start"
-      >Maximum of {maxCompClasses} categories per competition reached.</wa-tooltip
+      >Limit of {maxCompClasses} categories per competition reached.</wa-tooltip
     >
   {/if}
 {/snippet}

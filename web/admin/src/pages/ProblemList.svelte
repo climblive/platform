@@ -218,7 +218,7 @@
   >
   {#if limitReached}
     <wa-tooltip for={createButtonId} placement="top-start"
-      >Maximum of {maxProblems} problems per competition reached.</wa-tooltip
+      >Limit of {maxProblems} problems per competition reached.</wa-tooltip
     >
   {/if}
 {/snippet}

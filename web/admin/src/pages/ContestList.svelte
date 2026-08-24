@@ -210,7 +210,7 @@
     >
     {#if limitReached}
       <wa-tooltip for={createButtonId} placement="top-start"
-        >Maximum of {maxContestsPerWeek} competitions per week reached.</wa-tooltip
+        >Limit of {maxContestsPerWeek} competitions per week reached.</wa-tooltip
       >
     {/if}
   {/if}
