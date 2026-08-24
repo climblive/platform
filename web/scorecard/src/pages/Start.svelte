@@ -71,6 +71,7 @@
 
       error = "Incorrect registration code";
       otpInput?.setCustomValidity(error);
+      otpInput?.blur();
     } finally {
       loadingContender = false;
     }
@@ -89,7 +90,10 @@
     <form bind:this={form} onsubmit={handleSubmit}>
       <wa-otp-input
         bind:this={otpInput}
-        onchange={() => (error = undefined)}
+        oninput={() => {
+          error = undefined;
+          otpInput?.setCustomValidity("");
+        }}
         required
         label="Registration code"
         hint={error ?? "Input your 8 digit registration code."}
