@@ -59,7 +59,7 @@
       name="compClassId"
       required
       value={selectedCompClass?.id}
-      aria-label="Competition class"
+      aria-label="Category"
     >
       {#each compClasses as compClass (compClass.id)}
         <option value={compClass.id}>{compClass.name}</option>

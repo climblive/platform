@@ -95,14 +95,14 @@
   >
   {#if limitReached}
     <wa-tooltip for={createButtonId} placement="top-start"
-      >Maximum of {maxRaffles} raffles per contest reached.</wa-tooltip
+      >Limit of {maxRaffles} raffles per competition reached.</wa-tooltip
     >
   {/if}
 {/snippet}
 
 <p class="copy">
-  Raffles are used to randomly select prize winners, typically after the contest
-  has ended.
+  Raffles are used to draw prize winners. They are typically held after the
+  competition has ended.
 </p>
 
 <section>
@@ -114,7 +114,7 @@
   {:else}
     <EmptyState
       title="No raffles yet"
-      description="Start a new raffle to randomly select winners from your contenders."
+      description="Start a new raffle to hand out some prizes."
     >
       {#snippet actions()}
         {@render createButton()}

@@ -32,15 +32,16 @@
 
   const confirmDelete = () => {
     deleteCompClass.mutate(undefined, {
-      onError: () => toastUnexpectedError("Failed to delete comp class."),
+      onError: () => toastUnexpectedError("Failed to delete category."),
     });
   };
 </script>
 
 {@render children({ deleteCompClass: handleDelete })}
 
-<wa-dialog bind:this={dialog} label="Delete comp class">
-  Deleting a comp class will permanently remove it and it cannot be restored.
+<wa-dialog bind:this={dialog} label="Delete category">
+  Are you sure you want to delete this category? This action is permanent and
+  cannot be undone.
   <wa-button slot="footer" appearance="plain" onclick={handleCancel}>
     Cancel</wa-button
   >

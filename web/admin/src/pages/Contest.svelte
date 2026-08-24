@@ -136,7 +136,7 @@
       <wa-divider></wa-divider>
       <RulesEditor {contest} />
 
-      <h2 bind:this={compClassesHeading}>Classes</h2>
+      <h2 bind:this={compClassesHeading}>Categories</h2>
       <wa-divider></wa-divider>
       <CompClassList {contestId} />
 
@@ -188,7 +188,7 @@
       {/if}
       <h3>Score Engines</h3>
       <p>
-        An active score engine collects all results during a contest and
+        An active score engine collects all results during a competition and
         computes scores and rankings for all participants.
       </p>
 

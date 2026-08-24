@@ -37,7 +37,7 @@
         navigate(`/admin/organizers/${organizerId}/contests`);
       },
       onError: () => {
-        toastUnexpectedError("Failed to archive contest.");
+        toastUnexpectedError("Failed to archive competition.");
       },
     });
   };
@@ -50,9 +50,9 @@
   </wa-button>
 </div>
 
-<wa-dialog bind:this={dialog} label="Archive contest">
-  This will hide the contest for you and stop any running score engines.
-  Archived contests may be permanently deleted in the future.
+<wa-dialog bind:this={dialog} label="Archive competition">
+  This will hide the competition for you and stop any running score engines.
+  Archived competitions may be permanently deleted in the future.
   <wa-button slot="footer" appearance="plain" onclick={handleCancel}>
     Cancel</wa-button
   >

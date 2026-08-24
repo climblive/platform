@@ -256,7 +256,7 @@
       populatorState = "settled";
     } catch {
       populatorState = "error";
-      toastUnexpectedError("Failed to populate contest.");
+      toastUnexpectedError("Failed to populate competition.");
     }
   };
 </script>
@@ -265,7 +265,7 @@
   Populate with fake data
 </wa-button>
 
-<wa-dialog bind:this={dialog} label="Populate contest">
+<wa-dialog bind:this={dialog} label="Populate competition">
   {#if populatorState !== "idle"}
     <wa-progress-bar value={progress}></wa-progress-bar>
     <wa-button
@@ -279,15 +279,15 @@
   {:else}
     <GenericForm schema={formSchema} submit={handlePopulate}>
       <div class="content">
-        <h4>Classes</h4>
+        <h4>Categories</h4>
 
         <wa-select
           size="s"
           multiple
           with-clear
           {@attach name("className")}
-          label="Classes"
-          hint="Select the classes to create."
+          label="Categories"
+          hint="Select the categories to create."
           required
         >
           {#each supportedClassNames as className, index (className)}
@@ -300,7 +300,7 @@
         <wa-number-input
           size="s"
           {@attach name("contestLengthHours")}
-          label="Contest length"
+          label="Competition length"
           min="1"
           max="72"
           value="12"

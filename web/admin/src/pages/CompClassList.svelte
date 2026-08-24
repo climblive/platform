@@ -118,19 +118,19 @@
     appearance="accent"
     disabled={limitReached}
     onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
-    >Create class</wa-button
+    >Create category</wa-button
   >
   {#if limitReached}
     <wa-tooltip for={createButtonId} placement="top-start"
-      >Maximum of {maxCompClasses} classes per contest reached.</wa-tooltip
+      >Limit of {maxCompClasses} categories per competition reached.</wa-tooltip
     >
   {/if}
 {/snippet}
 
 <p class="copy">
-  Classes represent the categories in which the contenders compete, typically
-  divided into Males and Females. The contest duration is defined by the start
-  and end times of your classes.
+  Categories represent the classes in which the competitors compete, typically
+  divided into Males and Females. The competition duration is defined by the
+  start and end times of your categories.
 </p>
 
 <section>
@@ -141,8 +141,8 @@
     <Table {columns} data={compClasses} getId={({ id }) => id}></Table>
   {:else}
     <EmptyState
-      title="No classes yet"
-      description="Create classes to define the categories in which contenders will compete."
+      title="No categories yet"
+      description="Add categories for competitors to compete in."
     >
       {#snippet actions()}
         {@render createButton()}

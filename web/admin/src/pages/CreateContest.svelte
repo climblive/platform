@@ -38,7 +38,7 @@
       },
       {
         onSuccess: (contest: Contest) => navigate(`contests/${contest.id}`),
-        onError: () => toastUnexpectedError("Failed to create contest."),
+        onError: () => toastUnexpectedError("Failed to create competition."),
       },
     );
   };

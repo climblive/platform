@@ -117,8 +117,8 @@
   <Table {columns} data={tableData} getId={({ tick }) => tick.id}></Table>
 {:else if tableData}
   <EmptyState
-    title="No ticks yet"
-    description="Ticks will appear here once the contender starts logging their attempts."
+    title="No results yet"
+    description="Problems will appear here once the competitor starts logging attempts."
   />
 {/if}
 

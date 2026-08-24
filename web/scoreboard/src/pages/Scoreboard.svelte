@@ -74,7 +74,7 @@
             bind:this={compClassSelector}
             size="s"
             name="compClassId"
-            label="Competition class"
+            label="Category"
             {@attach value(selectedCompClassId)}
             onchange={() => {
               selectedCompClassId = Number(compClassSelector?.value);

@@ -33,7 +33,7 @@
   <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
   <strong>Score engines are managed automatically</strong><br />
   Score engines are started automatically, and manual intervention is typically only
-  required for re-scoring results long after a contest has concluded.
+  required for re-scoring results long after a competition has concluded.
 
   {#if earliestStartTime && isBefore(new Date(), earliestStartTime)}
     Manual start is available starting {format(
