@@ -188,7 +188,7 @@
 
         <div class="attempts">
           <span class="number">{tick.attemptsTop}</span>
-          {tick.attemptsTop === 1 ? "attempt" : "attempts"}
+          failed {tick.attemptsTop === 1 ? "attempt" : "attempts"}
         </div>
 
         <wa-button
