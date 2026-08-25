@@ -133,6 +133,17 @@
       },
     });
   };
+
+  const renderAttempts = (attempts: number, showFlash: boolean) => {
+    switch (true) {
+      case attempts === 1 && showFlash:
+        return "Flash";
+      case attempts === 1:
+        return "1 attempt";
+      default:
+        return `${attempts} attempts`;
+    }
+  };
 </script>
 
 <div class="container">
@@ -204,7 +215,7 @@
     {/if}
 
     <TickButton
-      label="Top"
+      label={`Top (${renderAttempts((tick?.attemptsTop ?? 0) + 1, true)})`}
       subLabel="T"
       onChange={(checked, flash) => handleTick(checked, "top", flash)}
       points={showPoints ? pointValue?.top : undefined}
@@ -218,7 +229,7 @@
 
     {#if problem.zone2Enabled}
       <TickButton
-        label="Zone 2"
+        label={`Zone 2 (${renderAttempts((tick?.attemptsZone2 ?? 0) + 1, false)})`}
         subLabel="Z₂"
         onChange={(checked) => handleTick(checked, "zone2", false)}
         points={showPoints ? pointValue?.zone2 : undefined}
@@ -232,7 +243,7 @@
 
     {#if problem.zone1Enabled}
       <TickButton
-        label="Zone 1"
+        label={`Zone 1 (${renderAttempts((tick?.attemptsZone1 ?? 0) + 1, false)})`}
         subLabel="Z₁"
         onChange={(checked) => handleTick(checked, "zone1", false)}
         points={showPoints ? pointValue?.zone1 : undefined}
