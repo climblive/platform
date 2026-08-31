@@ -75,7 +75,7 @@
 
 {#if problem.zone2Enabled}
   <TickButton
-    label="Zone2"
+    label="Zone 2"
     onClick={() => handleTick("zone2", false)}
     points={pointValue?.zone2}
     iconName="check"
@@ -84,7 +84,7 @@
 
 {#if problem.zone1Enabled}
   <TickButton
-    label="Zone1"
+    label="Zone 1"
     onClick={() => handleTick("zone1", false)}
     points={pointValue?.zone1}
     iconName="check"
