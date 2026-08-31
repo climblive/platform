@@ -1613,7 +1613,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
-	t.Run("ScoreContender_WithTicks", func(t *testing.T) {
+	t.Run("ScoreContender_PointsAndAttempts", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
@@ -1738,6 +1738,69 @@ func TestDefaultScoreEngine(t *testing.T) {
 					AttemptsZone1s: 100 + 10,
 					Zone2s:         1,
 					AttemptsZone2s: 200,
+				},
+			}).Return()
+
+		effects := slices.Collect(f.engine.ScoreContender(fakedContenderID))
+
+		require.ElementsMatch(t, effects, []scores.Effect{
+			scores.EffectRankClass{CompClassID: fakedCompClassID},
+		})
+
+		awaitExpectations(t)
+	})
+
+	t.Run("ScoreContender_NoPoints", func(t *testing.T) {
+		f, awaitExpectations := makeFixture()
+
+		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedProblem1ID := testutils.RandomResourceID[domain.ProblemID]()
+		fakedProblem2ID := testutils.RandomResourceID[domain.ProblemID]()
+
+		f.store.
+			On("GetContender", fakedContenderID).
+			Return(scores.Contender{
+				ID:          fakedContenderID,
+				CompClassID: fakedCompClassID,
+				Results:     scores.Results{},
+			}, true)
+
+		f.store.
+			On("GetTicksByContender", fakedContenderID).
+			Return(slices.Values([]scores.Tick{
+				{
+					ContenderID: fakedContenderID,
+					ProblemID:   fakedProblem1ID,
+					Top:         true,
+					AttemptsTop: 10,
+				},
+				{
+					ContenderID: fakedContenderID,
+					ProblemID:   fakedProblem2ID,
+					Top:         true,
+					AttemptsTop: 20,
+				},
+			}))
+
+		f.store.
+			On("GetProblem", fakedProblem1ID).
+			Return(scores.Problem{}, true).
+			On("GetProblem", fakedProblem2ID).
+			Return(scores.Problem{}, true)
+
+		f.store.
+			On("GetRules").
+			Return(scores.Rules{})
+
+		f.store.
+			On("SaveContender", scores.Contender{
+				ID:          fakedContenderID,
+				CompClassID: fakedCompClassID,
+				Results: scores.Results{
+					Points:       0,
+					Tops:         2,
+					AttemptsTops: 30,
 				},
 			}).Return()
 
