@@ -26,7 +26,7 @@ func (c Contender) Compare(other Contender) int {
 	}
 
 	if c.AttemptsTops != other.AttemptsTops {
-		return other.AttemptsTops - c.AttemptsTops
+		return c.AttemptsTops - other.AttemptsTops
 	}
 
 	if c.Zone2s != other.Zone2s {
@@ -34,7 +34,7 @@ func (c Contender) Compare(other Contender) int {
 	}
 
 	if c.AttemptsZone2s != other.AttemptsZone2s {
-		return other.AttemptsZone2s - c.AttemptsZone2s
+		return c.AttemptsZone2s - other.AttemptsZone2s
 	}
 
 	if c.Zone1s != other.Zone1s {
@@ -42,7 +42,7 @@ func (c Contender) Compare(other Contender) int {
 	}
 
 	if c.AttemptsZone1s != other.AttemptsZone1s {
-		return other.AttemptsZone1s - c.AttemptsZone1s
+		return c.AttemptsZone1s - other.AttemptsZone1s
 	}
 
 	return int(c.ID) - int(other.ID)
@@ -133,6 +133,9 @@ type Problem struct {
 	ID domain.ProblemID
 
 	domain.ProblemValue
+
+	Zone1Enabled bool
+	Zone2Enabled bool
 }
 
 type TickPool struct {

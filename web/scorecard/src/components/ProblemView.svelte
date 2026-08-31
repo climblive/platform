@@ -1,7 +1,7 @@
 <script lang="ts">
   import { HoldColorIndicator, Score } from "@climblive/lib/components";
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
-  import TickBox from "./TickBox.svelte";
+  import TickDialog from "./TickDialog.svelte";
 
   type ScorecardProblem = Problem & {
     pointValue?: PointValue;
@@ -78,7 +78,7 @@
     {/if}
   </div>
 
-  <TickBox
+  <TickDialog
     {problem}
     {tick}
     {disabled}

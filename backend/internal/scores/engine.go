@@ -377,6 +377,8 @@ func (e *DefaultScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) 
 	problem := Problem{
 		ID:           event.ProblemID,
 		ProblemValue: event.ProblemValue,
+		Zone1Enabled: event.Zone1Enabled,
+		Zone2Enabled: event.Zone2Enabled,
 	}
 
 	e.store.SaveProblem(problem)
@@ -394,6 +396,8 @@ func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEve
 	problem := Problem{
 		ID:           event.ProblemID,
 		ProblemValue: event.ProblemValue,
+		Zone1Enabled: event.Zone1Enabled,
+		Zone2Enabled: event.Zone2Enabled,
 	}
 
 	e.store.SaveProblem(problem)
@@ -565,17 +569,22 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 		contender.AttemptsZone1s = 0
 
 		for tick := range ticks {
+			problem, found := e.store.GetProblem(tick.ProblemID)
+			if !found {
+				continue
+			}
+
 			if tick.Top {
 				contender.Tops += 1
 				contender.AttemptsTops += tick.AttemptsTop
 			}
 
-			if tick.Zone2 {
+			if tick.Zone2 && problem.Zone2Enabled {
 				contender.Zone2s += 1
 				contender.AttemptsZone2s += tick.AttemptsZone2
 			}
 
-			if tick.Zone1 {
+			if tick.Zone1 && problem.Zone1Enabled {
 				contender.Zone1s += 1
 				contender.AttemptsZone1s += tick.AttemptsZone1
 			}

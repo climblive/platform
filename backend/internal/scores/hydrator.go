@@ -41,6 +41,8 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 		store.SaveProblem(Problem{
 			ID:           problem.ID,
 			ProblemValue: problem.ProblemValue,
+			Zone1Enabled: problem.Zone1Enabled,
+			Zone2Enabled: problem.Zone2Enabled,
 		})
 	}
 

@@ -3,6 +3,8 @@ import { SvelteMap } from "svelte/reactivity";
 
 type Feature = "zone1" | "zone2" | "top";
 
+const allFeatures: Feature[] = ["zone1", "zone2", "top"];
+
 export class TickBuilder {
   #problemId: number;
   #features: Feature[];
@@ -52,19 +54,19 @@ export class TickBuilder {
     this.#tick = $derived<Omit<Tick, "id" | "timestamp">>({
       problemId: this.#problemId,
       zone1: this.#hasReached("zone1"),
-      attemptsZone1: this.#calculateAttempts("zone1"),
+      attemptsZone1: this.#calculateImplicitAttempts("zone1"),
       zone2: this.#hasReached("zone2"),
-      attemptsZone2: this.#calculateAttempts("zone2"),
+      attemptsZone2: this.#calculateImplicitAttempts("zone2"),
       top: this.#hasReached("top"),
-      attemptsTop: this.#calculateAttempts("top"),
+      attemptsTop: this.#calculateImplicitAttempts("top"),
     });
   }
 
   #hasReached(feature: Feature): boolean {
     let featureReached = false;
 
-    for (let k = this.#features.length - 1; k >= 0; k--) {
-      const f = this.#features[k];
+    for (let k = allFeatures.length - 1; k >= 0; k--) {
+      const f = allFeatures[k];
       if (this.#reachedFeatures.has(f)) {
         featureReached = true;
       }
@@ -77,13 +79,22 @@ export class TickBuilder {
     return false;
   }
 
-  #calculateAttempts(feature: Feature): number {
-    const attempts = this.#reachedFeatures.get(feature);
-    if (attempts !== undefined) {
-      return attempts;
+  #calculateImplicitAttempts(feature: Feature): number {
+    let attempts = this.#attempts;
+
+    for (let k = allFeatures.length - 1; k >= 0; k--) {
+      const f = allFeatures[k];
+      const a = this.#reachedFeatures.get(f);
+      if (a !== undefined) {
+        attempts = a;
+      }
+
+      if (f === feature) {
+        return attempts;
+      }
     }
 
-    return this.#attempts;
+    return attempts;
   }
 
   public get tick(): Omit<Tick, "id" | "timestamp"> {
@@ -107,9 +118,7 @@ export class TickBuilder {
   }
 
   public canAddAttempt(): boolean {
-    const topFeature = this.#features[this.#features.length - 1];
-
-    if (this.#reachedFeatures.has(topFeature)) {
+    if (this.#reachedFeatures.has("top")) {
       return false;
     }
 
@@ -121,9 +130,7 @@ export class TickBuilder {
   }
 
   public canSubtractAttempt(): boolean {
-    const topFeature = this.#features[this.#features.length - 1];
-
-    if (this.#reachedFeatures.has(topFeature)) {
+    if (this.#reachedFeatures.has("top")) {
       return false;
     }
 
@@ -131,24 +138,7 @@ export class TickBuilder {
       return false;
     }
 
-    for (let k = this.#features.length - 1; k >= 0; k--) {
-      const f0 = this.#features[k - 1];
-      const f1 = this.#features[k];
-
-      const a0 = this.#reachedFeatures.get(f0);
-      const a1 = this.#reachedFeatures.get(f1);
-
-      if (
-        a0 !== undefined &&
-        a1 !== undefined &&
-        this.#reachedFeatures.has(f0) &&
-        a0 === a1
-      ) {
-        return false;
-      }
-    }
-
-    return true;
+    return this.#attempts > Math.max(...this.#reachedFeatures.values());
   }
 
   public reachFeature(feature: Feature): void {
