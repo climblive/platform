@@ -12,7 +12,18 @@ export class TickBuilder {
   #attempts: number;
   #tick: Omit<Tick, "id" | "timestamp">;
 
-  constructor(problem: Problem, tick?: Tick) {
+  constructor(
+    problem: Pick<Problem, "id" | "zone1Enabled" | "zone2Enabled">,
+    tick?: Pick<
+      Tick,
+      | "top"
+      | "attemptsTop"
+      | "zone2"
+      | "attemptsZone2"
+      | "zone1"
+      | "attemptsZone1"
+    >,
+  ) {
     this.#problemId = problem.id;
 
     this.#features = [];
@@ -122,7 +133,7 @@ export class TickBuilder {
       return false;
     }
 
-    if (this.#attempts === 999) {
+    if (this.#attempts >= 999) {
       return false;
     }
 
