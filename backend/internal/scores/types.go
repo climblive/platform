@@ -2,18 +2,23 @@ package scores
 
 import "github.com/climblive/platform/backend/internal/domain"
 
+type Results struct {
+	Points         int
+	Tops           int
+	AttemptsTops   int
+	Zone1s         int
+	AttemptsZone1s int
+	Zone2s         int
+	AttemptsZone2s int
+}
+
 type Contender struct {
 	ID                  domain.ContenderID
 	CompClassID         domain.CompClassID
 	Disqualified        bool
 	WithdrawnFromFinals bool
-	Points              int
-	Tops                int
-	AttemptsTops        int
-	Zone1s              int
-	AttemptsZone1s      int
-	Zone2s              int
-	AttemptsZone2s      int
+
+	Results
 }
 
 func (c Contender) Compare(other Contender) int {

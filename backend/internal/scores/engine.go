@@ -167,13 +167,7 @@ func (e *DefaultScoreEngine) HandleContenderEntered(event domain.ContenderEntere
 		CompClassID:         event.CompClassID,
 		Disqualified:        false,
 		WithdrawnFromFinals: false,
-		Points:              0,
-		Tops:                0,
-		AttemptsTops:        0,
-		Zone1s:              0,
-		AttemptsZone1s:      0,
-		Zone2s:              0,
-		AttemptsZone2s:      0,
+		Results:             Results{},
 	}
 
 	e.store.SaveContender(contender)
@@ -522,76 +516,62 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 		return nil
 	}
 
-	oldPoints := contender.Points
-	oldTops := contender.Tops
-	oldZone1s := contender.Zone1s
-	oldZone2s := contender.Zone2s
+	rules := e.store.GetRules()
 
-	if contender.Disqualified {
-		contender.Points = 0
-	} else {
+	oldResults := contender.Results
+
+	contender.Results = Results{}
+
+	switch {
+	case contender.Disqualified:
+	case rules.UsePoints:
 		ticks := e.store.GetTicksByContender(contender.ID)
 
-		var pointValues iter.Seq[domain.PointValue] = func(yield func(domain.PointValue) bool) {
+		var pointValues iter.Seq[int] = func(yield func(int) bool) {
 			for tick := range ticks {
 				value, found := e.store.GetPointValue(contender.ID, tick.ProblemID)
 				if !found {
 					continue
 				}
 
-				if !yield(value) {
+				if !yield(value.Current) {
 					return
 				}
 			}
 		}
 
-		rules := e.store.GetRules()
-
-		problemLimit := rules.QualifyingProblems
-
 		scorer := Scorer{
-			ProblemLimit: problemLimit,
+			ProblemLimit: rules.QualifyingProblems,
 		}
 
-		if rules.UsePoints {
-			contender.Points = scorer.CalculateScore(CurrentPoints(pointValues))
-		} else {
-			contender.Points = 0
+		contender.Points = scorer.CalculateScore(pointValues)
+	}
+
+	ticks := e.store.GetTicksByContender(contender.ID)
+
+	for tick := range ticks {
+		problem, found := e.store.GetProblem(tick.ProblemID)
+		if !found {
+			continue
 		}
 
-		ticks = e.store.GetTicksByContender(contender.ID)
+		if tick.Top {
+			contender.Tops += 1
+			contender.AttemptsTops += tick.AttemptsTop
+		}
 
-		contender.Tops = 0
-		contender.AttemptsTops = 0
-		contender.Zone2s = 0
-		contender.AttemptsZone2s = 0
-		contender.Zone1s = 0
-		contender.AttemptsZone1s = 0
+		if tick.Zone2 && problem.Zone2Enabled {
+			contender.Zone2s += 1
+			contender.AttemptsZone2s += tick.AttemptsZone2
+		}
 
-		for tick := range ticks {
-			problem, found := e.store.GetProblem(tick.ProblemID)
-			if !found {
-				continue
-			}
-
-			if tick.Top {
-				contender.Tops += 1
-				contender.AttemptsTops += tick.AttemptsTop
-			}
-
-			if tick.Zone2 && problem.Zone2Enabled {
-				contender.Zone2s += 1
-				contender.AttemptsZone2s += tick.AttemptsZone2
-			}
-
-			if tick.Zone1 && problem.Zone1Enabled {
-				contender.Zone1s += 1
-				contender.AttemptsZone1s += tick.AttemptsZone1
-			}
+		if tick.Zone1 && problem.Zone1Enabled {
+			contender.Zone1s += 1
+			contender.AttemptsZone1s += tick.AttemptsZone1
 		}
 	}
 
-	if contender.Points == oldPoints && contender.Tops == oldTops && contender.Zone1s == oldZone1s && contender.Zone2s == oldZone2s {
+	if contender.Results == oldResults {
 		return nil
 	}
 

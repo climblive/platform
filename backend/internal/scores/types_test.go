@@ -11,27 +11,31 @@ import (
 func TestCompareContender(t *testing.T) {
 	best := func(contenderID domain.ContenderID) scores.Contender {
 		return scores.Contender{
-			ID:             contenderID,
-			Points:         1_000,
-			Tops:           1_000,
-			AttemptsTops:   1_000,
-			Zone1s:         1_000,
-			AttemptsZone1s: 1_000,
-			Zone2s:         1_000,
-			AttemptsZone2s: 1_100,
+			ID: contenderID,
+			Results: scores.Results{
+				Points:         1_000,
+				Tops:           1_000,
+				AttemptsTops:   1_000,
+				Zone1s:         1_000,
+				AttemptsZone1s: 1_000,
+				Zone2s:         1_000,
+				AttemptsZone2s: 1_100,
+			},
 		}
 	}
 
 	worst := func(contenderID domain.ContenderID) scores.Contender {
 		return scores.Contender{
-			ID:             contenderID,
-			Points:         0,
-			Tops:           0,
-			AttemptsTops:   1_000_000,
-			Zone1s:         0,
-			AttemptsZone1s: 1_000_000,
-			Zone2s:         0,
-			AttemptsZone2s: 1_100_000,
+			ID: contenderID,
+			Results: scores.Results{
+				Points:         0,
+				Tops:           0,
+				AttemptsTops:   1_000_000,
+				Zone1s:         0,
+				AttemptsZone1s: 1_000_000,
+				Zone2s:         0,
+				AttemptsZone2s: 1_100_000,
+			},
 		}
 	}
 
