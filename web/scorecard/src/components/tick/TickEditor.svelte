@@ -2,7 +2,7 @@
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { CreateMutationResult } from "@tanstack/svelte-query";
-  import { TickBuilder } from "../tickBuilder.svelte";
+  import { TickBuilder } from "../../utils/tickBuilder.svelte";
   import TickBox from "./TickBox.svelte";
 
   interface Props {
