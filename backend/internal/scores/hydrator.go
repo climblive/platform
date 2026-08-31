@@ -61,7 +61,7 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 			CompClassID:         contender.CompClassID,
 			WithdrawnFromFinals: contender.WithdrawnFromFinals,
 			Disqualified:        contender.Disqualified,
-			Results: Results{
+			Score: Score{
 				Tops:           0,
 				Points:         0,
 				AttemptsTops:   0,

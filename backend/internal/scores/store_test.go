@@ -145,7 +145,7 @@ func TestMemoryStore(t *testing.T) {
 			CompClassID:         testutils.RandomResourceID[domain.CompClassID](),
 			WithdrawnFromFinals: true,
 			Disqualified:        true,
-			Results: scores.Results{
+			Score: scores.Score{
 				Points: 123,
 			},
 		}

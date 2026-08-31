@@ -12,7 +12,7 @@ func TestCompareContender(t *testing.T) {
 	best := func(contenderID domain.ContenderID) scores.Contender {
 		return scores.Contender{
 			ID: contenderID,
-			Results: scores.Results{
+			Score: scores.Score{
 				Points:         1_000,
 				Tops:           1_000,
 				AttemptsTops:   1_000,
@@ -27,7 +27,7 @@ func TestCompareContender(t *testing.T) {
 	worst := func(contenderID domain.ContenderID) scores.Contender {
 		return scores.Contender{
 			ID: contenderID,
-			Results: scores.Results{
+			Score: scores.Score{
 				Points:         0,
 				Tops:           0,
 				AttemptsTops:   1_000_000,

@@ -167,7 +167,7 @@ func (e *DefaultScoreEngine) HandleContenderEntered(event domain.ContenderEntere
 		CompClassID:         event.CompClassID,
 		Disqualified:        false,
 		WithdrawnFromFinals: false,
-		Results:             Results{},
+		Score:               Score{},
 	}
 
 	e.store.SaveContender(contender)
@@ -518,9 +518,9 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 
 	rules := e.store.GetRules()
 
-	oldResults := contender.Results
+	oldResults := contender.Score
 
-	contender.Results = Results{}
+	contender.Score = Score{}
 
 	switch {
 	case contender.Disqualified:
@@ -571,7 +571,7 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 		}
 	}
 
-	if contender.Results == oldResults {
+	if contender.Score == oldResults {
 		return nil
 	}
 

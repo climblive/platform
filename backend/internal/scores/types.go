@@ -2,7 +2,7 @@ package scores
 
 import "github.com/climblive/platform/backend/internal/domain"
 
-type Results struct {
+type Score struct {
 	Points         int
 	Tops           int
 	AttemptsTops   int
@@ -18,7 +18,7 @@ type Contender struct {
 	Disqualified        bool
 	WithdrawnFromFinals bool
 
-	Results
+	Score
 }
 
 func (c Contender) Compare(other Contender) int {

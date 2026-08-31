@@ -288,7 +288,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				CompClassID:         fakedOldCompClassID,
 				Disqualified:        false,
 				WithdrawnFromFinals: false,
-				Results: scores.Results{
+				Score: scores.Score{
 					Points: 123,
 				},
 			}, true)
@@ -298,7 +298,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			CompClassID:         fakedNewCompClassID,
 			Disqualified:        false,
 			WithdrawnFromFinals: false,
-			Results: scores.Results{
+			Score: scores.Score{
 				Points: 123,
 			},
 		}).Return()
@@ -368,7 +368,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ID:           fakedContenderID,
 				CompClassID:  fakedCompClassID,
 				Disqualified: true,
-				Results: scores.Results{
+				Score: scores.Score{
 					Points: 123,
 				},
 			}, true)
@@ -378,7 +378,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			CompClassID:         fakedCompClassID,
 			Disqualified:        true,
 			WithdrawnFromFinals: true,
-			Results: scores.Results{
+			Score: scores.Score{
 				Points: 123,
 			},
 		}).Return()
@@ -425,7 +425,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				CompClassID:         fakedCompClassID,
 				Disqualified:        true,
 				WithdrawnFromFinals: true,
-				Results: scores.Results{
+				Score: scores.Score{
 					Points: 123,
 				},
 			}, true)
@@ -435,7 +435,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			CompClassID:         fakedCompClassID,
 			Disqualified:        true,
 			WithdrawnFromFinals: false,
-			Results: scores.Results{
+			Score: scores.Score{
 				Points: 123,
 			},
 		}).Return()
@@ -485,7 +485,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ID:                  fakedContenderID,
 				CompClassID:         fakedCompClassID,
 				WithdrawnFromFinals: true,
-				Results: scores.Results{
+				Score: scores.Score{
 					Points: 123,
 				},
 			}, true)
@@ -509,7 +509,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			CompClassID:         fakedCompClassID,
 			Disqualified:        true,
 			WithdrawnFromFinals: true,
-			Results: scores.Results{
+			Score: scores.Score{
 				Points: 123,
 			},
 		}).Return()
@@ -564,7 +564,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				CompClassID:         fakedCompClassID,
 				Disqualified:        true,
 				WithdrawnFromFinals: true,
-				Results:             scores.Results{},
+				Score:               scores.Score{},
 			}, true)
 
 		f.store.
@@ -586,7 +586,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			CompClassID:         fakedCompClassID,
 			Disqualified:        false,
 			WithdrawnFromFinals: true,
-			Results:             scores.Results{},
+			Score:               scores.Score{},
 		}).Return()
 
 		effects := slices.Collect(f.engine.HandleContenderRequalified(domain.ContenderRequalifiedEvent{
@@ -1541,7 +1541,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ID:           fakedContenderID,
 				CompClassID:  fakedCompClassID,
 				Disqualified: true,
-				Results: scores.Results{
+				Score: scores.Score{
 					Points: 100,
 				},
 			}, true)
@@ -1567,7 +1567,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ID:           fakedContenderID,
 				CompClassID:  fakedCompClassID,
 				Disqualified: true,
-				Results: scores.Results{
+				Score: scores.Score{
 					Points:       0,
 					Tops:         1,
 					AttemptsTops: 10,
@@ -1603,7 +1603,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ID:           fakedContenderID,
 				CompClassID:  fakedCompClassID,
 				Disqualified: true,
-				Results:      scores.Results{},
+				Score:        scores.Score{},
 			}, true)
 
 		effects := f.engine.ScoreContender(fakedContenderID)
@@ -1628,7 +1628,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(scores.Contender{
 				ID:          fakedContenderID,
 				CompClassID: fakedCompClassID,
-				Results:     scores.Results{},
+				Score:       scores.Score{},
 			}, true)
 
 		f.store.
@@ -1730,7 +1730,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("SaveContender", scores.Contender{
 				ID:          fakedContenderID,
 				CompClassID: fakedCompClassID,
-				Results: scores.Results{
+				Score: scores.Score{
 					Points:         210,
 					Tops:           3,
 					AttemptsTops:   300 + 30 + 3,
@@ -1763,7 +1763,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(scores.Contender{
 				ID:          fakedContenderID,
 				CompClassID: fakedCompClassID,
-				Results:     scores.Results{},
+				Score:       scores.Score{},
 			}, true)
 
 		f.store.
@@ -1797,7 +1797,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("SaveContender", scores.Contender{
 				ID:          fakedContenderID,
 				CompClassID: fakedCompClassID,
-				Results: scores.Results{
+				Score: scores.Score{
 					Points:       0,
 					Tops:         2,
 					AttemptsTops: 30,
@@ -1827,7 +1827,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(scores.Contender{
 				ID:          fakedContenderID,
 				CompClassID: fakedCompClassID,
-				Results:     scores.Results{},
+				Score:       scores.Score{},
 			}, true)
 
 		f.store.
@@ -1894,7 +1894,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("SaveContender", scores.Contender{
 				ID:          fakedContenderID,
 				CompClassID: fakedCompClassID,
-				Results: scores.Results{
+				Score: scores.Score{
 					Points:       192,
 					Tops:         3,
 					AttemptsTops: 3,
@@ -1922,7 +1922,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(scores.Contender{
 				ID:          fakedContenderID,
 				CompClassID: fakedCompClassID,
-				Results: scores.Results{
+				Score: scores.Score{
 					Points:       110,
 					Tops:         1,
 					AttemptsTops: 1,
@@ -1979,7 +1979,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(scores.Contender{
 				ID:          fakedContenderID,
 				CompClassID: fakedCompClassID,
-				Results:     scores.Results{},
+				Score:       scores.Score{},
 			}, true)
 
 		f.store.
@@ -2028,7 +2028,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("SaveContender", scores.Contender{
 				ID:          fakedContenderID,
 				CompClassID: fakedCompClassID,
-				Results: scores.Results{
+				Score: scores.Score{
 					Points:       110,
 					Tops:         2,
 					AttemptsTops: 2,
@@ -2066,21 +2066,21 @@ func TestDefaultScoreEngine(t *testing.T) {
 					{
 						ID:          fakedContender1ID,
 						CompClassID: fakedCompClassID,
-						Results: scores.Results{
+						Score: scores.Score{
 							Points: 100,
 						},
 					},
 					{
 						ID:          fakedContender2ID,
 						CompClassID: fakedCompClassID,
-						Results: scores.Results{
+						Score: scores.Score{
 							Points: 200,
 						},
 					},
 					{
 						ID:          fakedContender3ID,
 						CompClassID: fakedCompClassID,
-						Results: scores.Results{
+						Score: scores.Score{
 							Points: 150,
 						},
 					},
