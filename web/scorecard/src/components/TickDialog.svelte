@@ -7,8 +7,8 @@
   import { AxiosError } from "axios";
   import { getContext } from "svelte";
   import type { Readable } from "svelte/store";
-  import AdvancedView from "./AdvancedView.svelte";
-  import SimpleView from "./SimpleView.svelte";
+  import SimpleTickEditor from "./tick/SimpleTickEditor.svelte";
+  import TickEditor from "./tick/TickEditor.svelte";
 
   interface Props {
     problem: Problem;
@@ -111,9 +111,9 @@
     </div>
 
     {#if enableAttempts}
-      <AdvancedView {problem} {tick} {pointValue} {showPoints} {putTick} />
+      <TickEditor {problem} {tick} {pointValue} {showPoints} {putTick} />
     {:else}
-      <SimpleView {problem} {tick} {pointValue} {putTick} bind:open />
+      <SimpleTickEditor {problem} {tick} {pointValue} {putTick} bind:open />
     {/if}
 
     <div class="footer">
