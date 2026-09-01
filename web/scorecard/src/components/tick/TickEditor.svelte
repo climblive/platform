@@ -20,7 +20,7 @@
 
   const { problem, pointValue, showPoints, putTick, ...rest }: Props = $props();
 
-  const tickBuilder = $derived(new TickBuilder(problem, rest.tick));
+  const tickBuilder = $derived(TickBuilder.from(problem, rest.tick));
   const tick = $derived(tickBuilder.tick);
 
   const handleSubtractAttempt = (event: MouseEvent) => {

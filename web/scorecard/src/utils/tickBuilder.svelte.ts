@@ -1,7 +1,7 @@
 import type { Problem, Tick } from "@climblive/lib/models";
 import { SvelteMap } from "svelte/reactivity";
 
-type Feature = "zone1" | "zone2" | "top";
+export type Feature = "zone1" | "zone2" | "top";
 
 const allFeatures: Feature[] = ["zone1", "zone2", "top"];
 
@@ -13,54 +13,15 @@ export class TickBuilder {
   #tick: Omit<Tick, "id" | "timestamp">;
 
   constructor(
-    problem: Pick<Problem, "id" | "zone1Enabled" | "zone2Enabled">,
-    tick?: Pick<
-      Tick,
-      | "top"
-      | "attemptsTop"
-      | "zone2"
-      | "attemptsZone2"
-      | "zone1"
-      | "attemptsZone1"
-    >,
+    problemId: number,
+    features: Feature[],
+    attempts: number,
+    reachedFeatures: Map<Feature, number>,
   ) {
-    this.#problemId = problem.id;
-
-    this.#features = [];
-    if (problem.zone1Enabled) {
-      this.#features.push("zone1");
-    }
-    if (problem.zone2Enabled) {
-      this.#features.push("zone2");
-    }
-    this.#features.push("top");
-
-    this.#reachedFeatures = new SvelteMap();
-    this.#attempts = $state(0);
-
-    if (tick) {
-      for (const feature of this.#features) {
-        switch (feature) {
-          case "zone1":
-            if (tick.zone1) {
-              this.#reachedFeatures.set("zone1", tick.attemptsZone1);
-            }
-            break;
-          case "zone2":
-            if (tick.zone2) {
-              this.#reachedFeatures.set("zone2", tick.attemptsZone2);
-            }
-            break;
-          case "top":
-            if (tick.top) {
-              this.#reachedFeatures.set("top", tick.attemptsTop);
-            }
-            break;
-        }
-      }
-
-      this.#attempts = tick.attemptsTop;
-    }
+    this.#problemId = problemId;
+    this.#features = [...features];
+    this.#attempts = $state(attempts);
+    this.#reachedFeatures = new SvelteMap(reachedFeatures);
 
     this.#tick = $derived<Omit<Tick, "id" | "timestamp">>({
       problemId: this.#problemId,
@@ -71,6 +32,59 @@ export class TickBuilder {
       top: this.#hasReached("top"),
       attemptsTop: this.#calculateImplicitAttempts("top"),
     });
+  }
+
+  static from(
+    problem: Pick<Problem, "id" | "zone1Enabled" | "zone2Enabled">,
+    tick?: Pick<
+      Tick,
+      | "top"
+      | "attemptsTop"
+      | "zone2"
+      | "attemptsZone2"
+      | "zone1"
+      | "attemptsZone1"
+    >,
+  ): TickBuilder {
+    const features: Feature[] = [];
+    if (problem.zone1Enabled) {
+      features.push("zone1");
+    }
+    if (problem.zone2Enabled) {
+      features.push("zone2");
+    }
+    features.push("top");
+
+    const reachedFeatures = new SvelteMap<Feature, number>();
+
+    if (tick) {
+      for (const feature of features) {
+        switch (feature) {
+          case "zone1":
+            if (tick.zone1) {
+              reachedFeatures.set("zone1", tick.attemptsZone1);
+            }
+            break;
+          case "zone2":
+            if (tick.zone2) {
+              reachedFeatures.set("zone2", tick.attemptsZone2);
+            }
+            break;
+          case "top":
+            if (tick.top) {
+              reachedFeatures.set("top", tick.attemptsTop);
+            }
+            break;
+        }
+      }
+    }
+
+    return new TickBuilder(
+      problem.id,
+      features,
+      tick?.attemptsTop ?? 0,
+      reachedFeatures,
+    );
   }
 
   #hasReached(feature: Feature): boolean {
