@@ -17,6 +17,7 @@
   const { contestId, contenderId }: Props = $props();
 
   let form: HTMLFormElement | undefined = $state();
+  let showInfo = $state(false);
 
   const contenderQuery = $derived(getContenderQuery(contenderId));
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
@@ -77,14 +78,25 @@
 
 {#if compClasses && contender}
   {#if !contender.scrubbedAt}
-    <p class="info" role="note">
-      {#if retentionDuration}
-        Your name will be kept stored for {retentionDuration} from now, after which
-        it will be removed and your results anonymized.
-      {:else}
-        Your name will be removed and your results anonymized shortly.
-      {/if}
-    </p>
+    <button
+      class="info-button"
+      type="button"
+      aria-label="Show information about name retention"
+      aria-expanded={showInfo}
+      onclick={() => (showInfo = !showInfo)}
+    >
+      info
+    </button>
+    {#if showInfo}
+      <p class="info" role="note">
+        {#if retentionDuration}
+          Your name will be kept stored for {retentionDuration} from now, after which
+          it will be removed and your results anonymized.
+        {:else}
+          Your name will be removed and your results anonymized shortly.
+        {/if}
+      </p>
+    {/if}
   {/if}
   <form onsubmit={handleSubmit} bind:this={form}>
     <input
@@ -119,6 +131,12 @@
 {/if}
 
 <style>
+  .info-button {
+    align-self: flex-start;
+    padding: 0.15rem 0.35rem;
+    font-size: 0.75rem;
+  }
+
   .info {
     padding: var(--wa-space-s);
     border: 1px solid;
