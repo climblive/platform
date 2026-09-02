@@ -29,17 +29,17 @@ type CompClassTemplate struct {
 }
 
 type CompClassPatch struct {
-	Name        Patch[string]    `json:"name,omitempty" tstype:"string"`
-	Description Patch[string]    `json:"description,omitempty" tstype:"string"`
-	TimeBegin   Patch[time.Time] `json:"timeBegin,omitempty" tstype:"Date"`
-	TimeEnd     Patch[time.Time] `json:"timeEnd,omitempty" tstype:"Date"`
+	Name        Patch[string]    `json:"name,omitzero" tstype:"string"`
+	Description Patch[string]    `json:"description,omitzero" tstype:"string"`
+	TimeBegin   Patch[time.Time] `json:"timeBegin,omitzero" tstype:"Date"`
+	TimeEnd     Patch[time.Time] `json:"timeEnd,omitzero" tstype:"Date"`
 }
 
 type Contender struct {
 	ID                  ContenderID   `json:"id"`
 	Ownership           OwnershipData `json:"-"`
 	ContestID           ContestID     `json:"contestId"`
-	CompClassID         CompClassID   `json:"compClassId,omitempty"`
+	CompClassID         CompClassID   `json:"compClassId,omitzero"`
 	RegistrationCode    string        `json:"registrationCode"`
 	Name                string        `json:"name,omitempty"`
 	Entered             time.Time     `json:"entered,omitzero"`
@@ -63,7 +63,7 @@ type Contest struct {
 	ArchivedAt           time.Time     `json:"archivedAt,omitzero"`
 	Location             string        `json:"location,omitempty"`
 	Country              string        `json:"country"`
-	SeriesID             SeriesID      `json:"seriesId,omitempty"`
+	SeriesID             SeriesID      `json:"seriesId,omitzero"`
 	Name                 string        `json:"name"`
 	Description          string        `json:"description,omitempty"`
 	QualifyingProblems   int           `json:"qualifyingProblems"`
@@ -82,7 +82,7 @@ type Contest struct {
 type ContestTemplate struct {
 	Location           string        `json:"location,omitempty"`
 	Country            string        `json:"country"`
-	SeriesID           SeriesID      `json:"seriesId,omitempty"`
+	SeriesID           SeriesID      `json:"seriesId,omitzero"`
 	Name               string        `json:"name"`
 	Description        string        `json:"description,omitempty"`
 	QualifyingProblems int           `json:"qualifyingProblems"`
@@ -134,10 +134,10 @@ type OrganizerInvite struct {
 }
 
 type ProblemValue struct {
-	PointsZone1 int `json:"pointsZone1,omitempty"`
-	PointsZone2 int `json:"pointsZone2,omitempty"`
+	PointsZone1 int `json:"pointsZone1,omitzero"`
+	PointsZone2 int `json:"pointsZone2,omitzero"`
 	PointsTop   int `json:"pointsTop"`
-	FlashBonus  int `json:"flashBonus,omitempty"`
+	FlashBonus  int `json:"flashBonus,omitzero"`
 }
 
 type PointValue struct {
