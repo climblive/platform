@@ -5,7 +5,12 @@ updates:
    schedule:
      interval: weekly
 
+ - package-ecosystem: "github-actions"
+   directory: "/"
+   schedule:
+     interval: weekly
+
  - package-ecosystem: "npm"
-    directory: "/web"
-    schedule:
-      interval: "daily"
+   directory: "/web"
+   schedule:
+     interval: "daily"
