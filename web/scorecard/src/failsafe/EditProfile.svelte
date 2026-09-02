@@ -1,6 +1,4 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/callout/callout.js";
-  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
     getCompClassesQuery,
     getContenderQuery,
@@ -67,8 +65,9 @@
       !confirm(
         "Your name will be permanently removed and your results will be anonymized. This action cannot be undone.\n\nBe aware that without a name, you will lose your chance at finals and you cannot take part in any prize raffles.",
       )
-    )
+    ) {
       return;
+    }
     scrubContender.mutate(undefined, {
       onSuccess: () => window.location.reload(),
       onError: () => toastUnexpectedError("Failed to remove your name."),
@@ -77,12 +76,16 @@
 </script>
 
 {#if compClasses && contender}
-  {#if !contender.scrubbedAt}<wa-callout variant="neutral" size="s"
-      ><wa-icon slot="icon" name="circle-info"
-      ></wa-icon>{#if retentionDuration}Your name will be kept stored for {retentionDuration}
-        from now, after which it will be removed and your results anonymized.{:else}Your
-        name will be removed and your results anonymized shortly.{/if}</wa-callout
-    >{/if}
+  {#if !contender.scrubbedAt}
+    <p class="info" role="note">
+      {#if retentionDuration}
+        Your name will be kept stored for {retentionDuration} from now, after which
+        it will be removed and your results anonymized.
+      {:else}
+        Your name will be removed and your results anonymized shortly.
+      {/if}
+    </p>
+  {/if}
   <form onsubmit={handleSubmit} bind:this={form}>
     <input
       required
@@ -116,6 +119,12 @@
 {/if}
 
 <style>
+  .info {
+    padding: var(--wa-space-s);
+    border: 1px solid;
+    border-radius: 0.25rem;
+  }
+
   form {
     display: flex;
     flex-direction: column;
