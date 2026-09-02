@@ -23,6 +23,11 @@ export class TickBuilder {
     this.#attempts = $state(attempts);
     this.#reachedFeatures = new SvelteMap(reachedFeatures);
 
+    const attemptsTop = this.#reachedFeatures.get("top");
+    if (attemptsTop !== undefined && attemptsTop !== this.#attempts) {
+      throw new Error("Attempts mismatch");
+    }
+
     this.#tick = $derived<Omit<Tick, "id" | "timestamp">>({
       problemId: this.#problemId,
       zone1: this.#hasReached("zone1"),

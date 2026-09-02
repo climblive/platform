@@ -11,6 +11,10 @@ const FLASH = new Map<Feature, number>([
 const NO_LUCK = new Map<Feature, number>();
 
 describe(TickBuilder.name, () => {
+  it("should not allow attempts to differ from attempts required for top", () => {
+    expect(() => new TickBuilder(123, ALL_FEATURES, 2, FLASH)).toThrow();
+  });
+
   describe(TickBuilder.prototype.canAddAttempt.name, () => {
     it("should return false if top is reached", () => {
       const builder = new TickBuilder(123, ALL_FEATURES, 1, FLASH);
