@@ -1,12 +1,27 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { ApiClient, ContenderCredentialsProvider } from "@climblive/lib";
   import type { Contender } from "@climblive/lib/models";
+  import { getContestQuery } from "@climblive/lib/queries";
+  import { add, formatDistance } from "date-fns";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { onMount } from "svelte";
   import Scorecard from "./Scorecard.svelte";
 
   let code = $state<string>();
   let contender = $state<Contender>();
+  const contestQuery = $derived(
+    contender ? getContestQuery(contender.contestId) : undefined,
+  );
+  const contest = $derived(contestQuery?.data);
+  const retentionDuration = $derived.by(() => {
+    const base = new Date(0);
+    return formatDistance(
+      add(base, { minutes: (contest?.nameRetentionTime ?? 0) / 60000000000 }),
+      base,
+    );
+  });
 
   let form: HTMLFormElement | undefined = $state();
 
@@ -64,6 +79,11 @@
 </script>
 
 {#if contender}
+  {#if !contender.entered && contest}<wa-callout variant="neutral" size="s"
+      ><wa-icon slot="icon" name="circle-info"></wa-icon>Your name will be
+      stored for {retentionDuration} after the competition ends, after which it will
+      be removed and your results anonymized.</wa-callout
+    >{/if}
   <Scorecard contestId={contender.contestId} contenderId={contender.id} />
 {:else}
   <h2>Welcome!</h2>
