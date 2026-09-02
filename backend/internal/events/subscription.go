@@ -6,7 +6,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
-	"github.com/google/uuid"
+	"uuid"
 )
 
 var ErrBufferFull = errors.New("buffer full")

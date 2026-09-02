@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/domain"
-	"github.com/google/uuid"
+	"uuid"
 )
 
 type organizerUseCase interface {
