@@ -30,9 +30,9 @@ import (
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/utils"
 	"github.com/go-errors/errors"
-	"github.com/google/uuid"
 	"github.com/lmittmann/tint"
 	"github.com/mattn/go-isatty"
+	"uuid"
 
 	"github.com/pressly/goose/v3"
 )
