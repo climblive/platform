@@ -4,6 +4,35 @@ on:
   workflow_dispatch:
 
 jobs:
+  dependency-security:
+    name: Dependency security
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Dependabot configuration
+        run: |
+          ruby -e 'require "yaml"; YAML.load_file(".github/dependabot.yml", aliases: false)'
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: web/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: web/package.json
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+        working-directory: web
+      - run: pnpm audit --prod
+        working-directory: web
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+      - uses: golang/govulncheck-action@v1
+        with:
+          work-dir: backend
+
   check:
     name: Code check
     runs-on: ubuntu-24.04
