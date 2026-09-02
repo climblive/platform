@@ -49,6 +49,8 @@ const appCSP = "default-src 'self'; connect-src 'self' clmb.auth.eu-west-1.amazo
 
 const wwwCSP = "default-src 'self'; script-src 'self' 'sha256-jIhoHP5AYEa/rjrf399lCKS/+7hIAc+G1cKDLBSPd7o='; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'none'; form-action 'none'; base-uri 'self'"
 
+const permissionsPolicy = "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+
 type registrationCodeGenerator struct {
 }
 
@@ -191,7 +193,7 @@ func main() {
 
 	httpServer := &http.Server{
 		Addr:                         net.JoinHostPort("0.0.0.0", strconv.Itoa(listenPort)),
-		Handler:                      &httpRouter{appHandler: appMux, wwwHandler: wwwMux, wwwHost: wwwHost},
+		Handler:                      securityHeaders(&httpRouter{appHandler: appMux, wwwHandler: wwwMux, wwwHost: wwwHost}),
 		DisableGeneralOptionsHandler: false,
 		TLSConfig:                    tlsConfig,
 		ReadTimeout:                  0,
@@ -473,6 +475,18 @@ func installWWWStaticHandlers(mux *http.ServeMux) {
 func noCacheHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-store")
+		next.ServeHTTP(w, r)
+	})
+}
+
+func securityHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("Referrer-Policy", "same-origin")
+		w.Header().Set("Permissions-Policy", permissionsPolicy)
+		if r.TLS != nil {
+			w.Header().Set("Strict-Transport-Security", "max-age=86400")
+		}
 		next.ServeHTTP(w, r)
 	})
 }
