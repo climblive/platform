@@ -15,4 +15,4 @@ updates:
   - package-ecosystem: "docker"
     directory: "/backend"
     schedule:
-      interval: "weekly"&
+      interval: "weekly"
