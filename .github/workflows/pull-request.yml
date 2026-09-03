@@ -12,8 +12,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: |
-          ruby -e 'require "yaml"; YAML.load_file(".github/dependabot.yml", aliases: false)'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - run: python -m pip install check-jsonschema==0.38.0
+
+      - run: check-jsonschema --builtin-schema vendor.dependabot .github/dependabot.yml
 
   check:
     name: Code check
