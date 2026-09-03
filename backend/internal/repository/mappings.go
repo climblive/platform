@@ -6,7 +6,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
-	"github.com/google/uuid"
+	"uuid"
 )
 
 func contenderToDomain(record database.GetContenderRow) domain.Contender {

@@ -30,9 +30,9 @@ import (
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/utils"
 	"github.com/go-errors/errors"
-	"github.com/google/uuid"
 	"github.com/lmittmann/tint"
 	"github.com/mattn/go-isatty"
+	"uuid"
 
 	"github.com/pressly/goose/v3"
 )
@@ -199,15 +199,17 @@ func main() {
 		WriteTimeout:                 0,
 		IdleTimeout:                  0,
 		MaxHeaderBytes:               0,
+		MaxHeaderValueCount:          0,
 		TLSNextProto:                 nil,
 		ConnState:                    nil,
 		ErrorLog:                     nil,
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
 		},
-		ConnContext: nil,
-		HTTP2:       nil,
-		Protocols:   nil,
+		ConnContext:           nil,
+		HTTP2:                 nil,
+		Protocols:             nil,
+		DisableClientPriority: false,
 	}
 
 	context.AfterFunc(ctx, func() {

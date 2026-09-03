@@ -28,7 +28,7 @@
     "vitest": "^4.1.11"
   },
   "dependencies": {
-    "@awesome.me/webawesome": "3.11.0",
+    "@awesome.me/webawesome": "3.12.0",
     "@climblive/lib": "workspace:*",
     "@sentry/svelte": "^10.62.0",
     "@tanstack/svelte-query": "^6.1.35",

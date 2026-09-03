@@ -2,7 +2,7 @@ package rest
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/v2"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -72,7 +72,7 @@ func (hdlr *compClassHandler) CreateCompClass(w http.ResponseWriter, r *http.Req
 	}
 
 	var tmpl domain.CompClassTemplate
-	err = json.NewDecoder(r.Body).Decode(&tmpl)
+	err = json.UnmarshalRead(r.Body, &tmpl)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -111,7 +111,7 @@ func (hdlr *compClassHandler) PatchCompClass(w http.ResponseWriter, r *http.Requ
 	}
 
 	var patch domain.CompClassPatch
-	err = json.NewDecoder(r.Body).Decode(&patch)
+	err = json.UnmarshalRead(r.Body, &patch)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return

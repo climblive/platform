@@ -6,7 +6,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
-	"github.com/google/uuid"
+	"uuid"
 )
 
 type scoreEngineManager interface {
@@ -91,34 +91,34 @@ func (uc *ScoreEngineUseCase) StopScoreEngine(ctx context.Context, instanceID do
 func (uc *ScoreEngineUseCase) StartScoreEngine(ctx context.Context, contestID domain.ContestID, terminatedBy time.Time) (domain.ScoreEngineInstanceID, error) {
 	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
 	if err != nil {
-		return uuid.Nil, errors.Wrap(err, 0)
+		return uuid.Nil(), errors.Wrap(err, 0)
 	}
 
 	if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
-		return uuid.Nil, errors.Wrap(err, 0)
+		return uuid.Nil(), errors.Wrap(err, 0)
 	}
 
 	if contest.TimeBegin.IsZero() || contest.TimeEnd.IsZero() {
-		return uuid.Nil, errors.Wrap(domain.ErrNotAllowed, 0)
+		return uuid.Nil(), errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 
 	now := time.Now()
 
 	if now.Before(contest.TimeBegin.Add(-1 * time.Hour)) {
-		return uuid.Nil, errors.Wrap(domain.ErrNotAllowed, 0)
+		return uuid.Nil(), errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 
 	if terminatedBy.Before(now) {
-		return uuid.Nil, errors.Wrap(domain.ErrNotAllowed, 0)
+		return uuid.Nil(), errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 
 	if terminatedBy.Sub(now) > 12*time.Hour {
-		return uuid.Nil, errors.Wrap(domain.ErrNotAllowed, 0)
+		return uuid.Nil(), errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 
 	instanceID, err := uc.ScoreEngineManager.StartScoreEngine(ctx, contestID, terminatedBy)
 	if err != nil {
-		return uuid.Nil, errors.Wrap(err, 0)
+		return uuid.Nil(), errors.Wrap(err, 0)
 	}
 
 	return instanceID, nil

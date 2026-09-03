@@ -4,6 +4,22 @@ on:
   workflow_dispatch:
 
 jobs:
+  validate-dependabot-config:
+    name: Validate Dependabot configuration
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - run: python -m pip install check-jsonschema==0.38.0
+
+      - run: check-jsonschema --builtin-schema vendor.dependabot .github/dependabot.yml
+
   check:
     name: Code check
     runs-on: ubuntu-24.04
@@ -120,7 +136,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v7
         with:
-          version: v2.9.0
+          version: v2.13.2
           working-directory: backend
 
   lint-sql:
