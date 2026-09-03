@@ -1,6 +1,6 @@
 package domain
 
-import "github.com/google/uuid"
+import "uuid"
 
 type ResourceID int32
 
