@@ -2,7 +2,7 @@ package rest
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/v2"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -41,7 +41,7 @@ func InstallOrganizerHandler(mux *Mux, organizerUseCase organizerUseCase) {
 
 func (hdlr *organizerHandler) CreateOrganizer(w http.ResponseWriter, r *http.Request) {
 	var template domain.OrganizerTemplate
-	err := json.NewDecoder(r.Body).Decode(&template)
+	err := json.UnmarshalRead(r.Body, &template)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -80,7 +80,7 @@ func (hdlr *organizerHandler) PatchOrganizer(w http.ResponseWriter, r *http.Requ
 	}
 
 	var patch domain.OrganizerPatch
-	err = json.NewDecoder(r.Body).Decode(&patch)
+	err = json.UnmarshalRead(r.Body, &patch)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
