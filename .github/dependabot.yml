@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: "devcontainers"
     directory: "/"
     schedule:
-     interval: weekly
+      interval: "weekly"
   - package-ecosystem: "npm"
     directory: "/web"
     schedule:
@@ -15,4 +15,4 @@ updates:
   - package-ecosystem: "docker"
     directory: "/backend"
     schedule:
-      interval: "weekly"
+      interval: "weekly"&
