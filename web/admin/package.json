@@ -32,7 +32,7 @@
     "@tanstack/svelte-query": "^6.1.35",
     "@tiptap/core": "^3.27.1",
     "@tiptap/pm": "^3.27.1",
-    "@tiptap/starter-kit": "^3.27.1",
+    "@tiptap/starter-kit": "^3.30.6",
     "axios": "^1.18.1",
     "date-fns": "^4.4.0",
     "svelte-routing": "^2.13.0",
