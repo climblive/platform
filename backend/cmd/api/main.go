@@ -49,8 +49,6 @@ const appCSP = "default-src 'self'; connect-src 'self' clmb.auth.eu-west-1.amazo
 
 const wwwCSP = "default-src 'self'; script-src 'self' 'sha256-jIhoHP5AYEa/rjrf399lCKS/+7hIAc+G1cKDLBSPd7o='; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'none'; form-action 'none'; base-uri 'self'"
 
-const permissionsPolicy = "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
-
 type registrationCodeGenerator struct {
 }
 
@@ -485,7 +483,6 @@ func securityHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("Referrer-Policy", "same-origin")
-		w.Header().Set("Permissions-Policy", permissionsPolicy)
 		if r.TLS != nil {
 			w.Header().Set("Strict-Transport-Security", "max-age=86400")
 		}
