@@ -12,11 +12,11 @@ importers:
         specifier: ^10.6.0
         version: 10.6.0
       prettier:
-        specifier: ^3.9.0
-        version: 3.9.0
+        specifier: ^3.9.6
+        version: 3.9.6
       prettier-plugin-svelte:
         specifier: ^3.5.2
-        version: 3.5.2(prettier@3.9.0)(svelte@5.56.4(@typescript-eslint/types@8.62.0))
+        version: 3.5.2(prettier@3.9.6)(svelte@5.56.4(@typescript-eslint/types@8.62.0))
 
   admin:
     dependencies:
@@ -2246,8 +2246,8 @@ packages:
       prettier: ^3.0.0
       svelte: ^3.2.0 || ^4.0.0-next.0 || ^5.0.0-next.0
 
-  prettier@3.9.0:
-    resolution: {integrity: sha512-LjIqSIC5VYLzs9WedVmJ2ljNAGnU+DteIClbahu4L/DBeWjZ6iT/k1lAYyu9JUh+1xINxWadaPw/Pl63y/agAw==}
+  prettier@3.9.6:
+    resolution: {integrity: sha512-OpN0zzVdiaiAhxpuuj5efpIS4sY9j7bY6uR5mnj5yPzGkdkjNKSJeUThPb60Jw29QuAZgA4o+/iB49kFiaBX6g==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -4667,12 +4667,12 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-svelte@3.5.2(prettier@3.9.0)(svelte@5.56.4(@typescript-eslint/types@8.62.0)):
+  prettier-plugin-svelte@3.5.2(prettier@3.9.6)(svelte@5.56.4(@typescript-eslint/types@8.62.0)):
     dependencies:
-      prettier: 3.9.0
+      prettier: 3.9.6
       svelte: 5.56.4(@typescript-eslint/types@8.62.0)
 
-  prettier@3.9.0: {}
+  prettier@3.9.6: {}
 
   process-nextick-args@2.0.1: {}
 
