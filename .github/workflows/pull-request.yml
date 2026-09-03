@@ -11,7 +11,8 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-        run: |
+
+      - run: |
           ruby -e 'require "yaml"; YAML.load_file(".github/dependabot.yml", aliases: false)'
 
   check:
