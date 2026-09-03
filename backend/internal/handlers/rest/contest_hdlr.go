@@ -2,6 +2,7 @@ package rest
 
 import (
 	"context"
+	jsonv1 "encoding/json"
 	"encoding/json/v2"
 	"fmt"
 	"net/http"
@@ -125,7 +126,7 @@ func (hdlr *contestHandler) PatchContest(w http.ResponseWriter, r *http.Request)
 	}
 
 	var patch domain.ContestPatch
-	err = json.UnmarshalRead(r.Body, &patch)
+	err = json.UnmarshalRead(r.Body, &patch, jsonv1.FormatDurationAsNano(true))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -148,7 +149,7 @@ func (hdlr *contestHandler) CreateContest(w http.ResponseWriter, r *http.Request
 	}
 
 	var tmpl domain.ContestTemplate
-	err = json.UnmarshalRead(r.Body, &tmpl)
+	err = json.UnmarshalRead(r.Body, &tmpl, jsonv1.FormatDurationAsNano(true))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return

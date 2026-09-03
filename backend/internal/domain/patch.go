@@ -1,6 +1,7 @@
 package domain
 
 import (
+	jsonv1 "encoding/json"
 	"encoding/json/v2"
 
 	"github.com/go-errors/errors"
@@ -19,11 +20,11 @@ func NewPatch[T comparable](v T) Patch[T] {
 }
 
 func (p Patch[T]) MarshalJSON() ([]byte, error) {
-	return json.Marshal(p.Value)
+	return json.Marshal(p.Value, jsonv1.FormatDurationAsNano(true))
 }
 
 func (p *Patch[T]) UnmarshalJSON(data []byte) error {
-	err := json.Unmarshal(data, &p.Value)
+	err := json.Unmarshal(data, &p.Value, jsonv1.FormatDurationAsNano(true))
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}

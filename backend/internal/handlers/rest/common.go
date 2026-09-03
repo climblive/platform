@@ -1,6 +1,7 @@
 package rest
 
 import (
+	jsonv1 "encoding/json"
 	"encoding/json/v2"
 	"fmt"
 	"log/slog"
@@ -28,7 +29,7 @@ func writeResponse(w http.ResponseWriter, status int, data any) {
 		return
 	}
 
-	json, err := json.Marshal(data)
+	json, err := json.Marshal(data, jsonv1.FormatDurationAsNano(true))
 	if err != nil {
 		handleError(w, errors.Wrap(err, 0))
 		return
