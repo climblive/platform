@@ -13,10 +13,10 @@ import (
 	"github.com/climblive/platform/backend/internal/events"
 	"github.com/climblive/platform/backend/internal/handlers/rest"
 	"github.com/climblive/platform/backend/internal/testutils"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"uuid"
 )
 
 func TestEventsHandler(t *testing.T) {
