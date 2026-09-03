@@ -6,7 +6,7 @@ require (
 	github.com/go-errors/errors v1.5.1
 	github.com/go-faker/faker/v4 v4.7.0
 	github.com/go-jose/go-jose/v4 v4.1.4
-	github.com/go-sql-driver/mysql v1.9.3
+	github.com/go-sql-driver/mysql v1.10.0
 	github.com/lmittmann/tint v1.1.3
 	github.com/mattn/go-isatty v0.0.20
 	github.com/microcosm-cc/bluemonday v1.0.27
