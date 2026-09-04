@@ -2,7 +2,7 @@
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { CreateMutationResult } from "@tanstack/svelte-query";
-  import { TickBuilder } from "../../utils/tickBuilder.svelte";
+  import { buildTick, TickBuilder } from "../../utils/tickBuilder.svelte";
   import TickBox from "./TickBox.svelte";
 
   interface Props {
@@ -21,7 +21,7 @@
   const { problem, pointValue, showPoints, putTick, ...rest }: Props = $props();
 
   const tickBuilder = $derived(TickBuilder.from(problem, rest.tick));
-  const tick = $derived(tickBuilder.tick);
+  const tick = $derived(buildTick(tickBuilder));
 
   const handleSubtractAttempt = (event: MouseEvent) => {
     event.stopPropagation();
@@ -30,7 +30,7 @@
 
     tickBuilder.subtractAttempt();
 
-    putTick.mutate(tickBuilder.tick, {
+    putTick.mutate(tick, {
       onError: () => {
         toastUnexpectedError("Failed to update tick.");
       },
@@ -44,7 +44,7 @@
 
     tickBuilder.addAttempt();
 
-    putTick.mutate(tickBuilder.tick, {
+    putTick.mutate(tick, {
       onError: () => {
         toastUnexpectedError("Failed to update tick.");
       },
@@ -77,9 +77,7 @@
       tickBuilder.unreachFeature(feature);
     }
 
-    const nextTick = tickBuilder.tick;
-
-    putTick.mutate(nextTick, {
+    putTick.mutate(tick, {
       onError: () => {
         toastUnexpectedError("Failed to update tick.");
       },

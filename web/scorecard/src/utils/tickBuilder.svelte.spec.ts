@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { TickBuilder, type Feature } from "./tickBuilder.svelte";
+import { buildTick, TickBuilder, type Feature } from "./tickBuilder.svelte";
 
 const PROBLEM_ID = 123;
 const ALL_FEATURES: Feature[] = ["zone1", "zone2", "top"];
@@ -10,16 +10,15 @@ const FLASH = new Map<Feature, number>([
 ]);
 const NO_LUCK = new Map<Feature, number>();
 
-describe(TickBuilder.name, () => {
-  it("should derive the tick from reached features", () => {
-    const builder = new TickBuilder(
-      PROBLEM_ID,
-      ["zone2", "top"],
-      4,
-      new Map<Feature, number>([["zone2", 3]]),
-    );
-
-    expect(builder.tick).toEqual({
+describe(buildTick.name, () => {
+  it("should build a tick with implicit features and attempts", () => {
+    expect(
+      buildTick({
+        problemId: PROBLEM_ID,
+        attempts: 4,
+        reachedFeatures: new Map<Feature, number>([["zone2", 3]]),
+      }),
+    ).toEqual({
       problemId: PROBLEM_ID,
       zone1: true,
       attemptsZone1: 3,
@@ -29,30 +28,34 @@ describe(TickBuilder.name, () => {
       attemptsTop: 4,
     });
   });
+});
+
+describe(TickBuilder.name, () => {
+  it("should expose its state", () => {
+    const builder = new TickBuilder(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
+
+    expect(builder.problemId).toEqual(PROBLEM_ID);
+    expect(builder.features).toEqual(ALL_FEATURES);
+    expect(builder.attempts).toEqual(1);
+    expect(builder.reachedFeatures).toEqual(FLASH);
+  });
 
   it("should not allow attempts to differ from attempts required for top", () => {
-    expect(
-      () => new TickBuilder(PROBLEM_ID, ALL_FEATURES, 2, FLASH),
-    ).toThrowError("Attempts mismatch");
+    expect(() => new TickBuilder(PROBLEM_ID, ALL_FEATURES, 2, FLASH)).toThrow();
   });
 
   describe(TickBuilder.from.name, () => {
-    it("should create an empty tick", () => {
+    it("should create an empty builder", () => {
       const builder = TickBuilder.from({
         id: PROBLEM_ID,
         zone1Enabled: true,
         zone2Enabled: true,
       });
 
-      expect(builder.tick).toEqual({
-        problemId: PROBLEM_ID,
-        zone1: false,
-        attemptsZone1: 0,
-        zone2: false,
-        attemptsZone2: 0,
-        top: false,
-        attemptsTop: 0,
-      });
+      expect(builder.problemId).toEqual(PROBLEM_ID);
+      expect(builder.features).toEqual(ALL_FEATURES);
+      expect(builder.attempts).toEqual(0);
+      expect(builder.reachedFeatures).toEqual(NO_LUCK);
     });
 
     it("should restore an existing tick", () => {
@@ -68,15 +71,14 @@ describe(TickBuilder.name, () => {
         },
       );
 
-      expect(builder.tick).toEqual({
-        problemId: PROBLEM_ID,
-        zone1: true,
-        attemptsZone1: 1,
-        zone2: true,
-        attemptsZone2: 2,
-        top: true,
-        attemptsTop: 3,
-      });
+      expect(builder.attempts).toEqual(3);
+      expect(builder.reachedFeatures).toEqual(
+        new Map<Feature, number>([
+          ["zone1", 1],
+          ["zone2", 2],
+          ["top", 3],
+        ]),
+      );
     });
 
     it("should ignore reached features that are not enabled", () => {
@@ -92,15 +94,9 @@ describe(TickBuilder.name, () => {
         },
       );
 
-      expect(builder.tick).toEqual({
-        problemId: PROBLEM_ID,
-        zone1: false,
-        attemptsZone1: 3,
-        zone2: false,
-        attemptsZone2: 3,
-        top: false,
-        attemptsTop: 3,
-      });
+      expect(builder.features).toEqual(["top"]);
+      expect(builder.attempts).toEqual(3);
+      expect(builder.reachedFeatures).toEqual(NO_LUCK);
     });
   });
 
@@ -166,9 +162,7 @@ describe(TickBuilder.name, () => {
 
       builder.addAttempt();
 
-      expect(builder.tick.attemptsTop).toEqual(1);
-      expect(builder.tick.attemptsZone2).toEqual(1);
-      expect(builder.tick.attemptsZone1).toEqual(1);
+      expect(builder.attempts).toEqual(1);
     });
 
     it("should not add an attempt if another attempt cannot be added", () => {
@@ -176,7 +170,7 @@ describe(TickBuilder.name, () => {
 
       builder.addAttempt();
 
-      expect(builder.tick.attemptsTop).toEqual(1);
+      expect(builder.attempts).toEqual(1);
     });
   });
 
@@ -186,9 +180,7 @@ describe(TickBuilder.name, () => {
 
       builder.subtractAttempt();
 
-      expect(builder.tick.attemptsTop).toEqual(0);
-      expect(builder.tick.attemptsZone2).toEqual(0);
-      expect(builder.tick.attemptsZone1).toEqual(0);
+      expect(builder.attempts).toEqual(0);
     });
 
     it("should not subtract an attempt if the latest attempt reached a feature", () => {
@@ -201,7 +193,7 @@ describe(TickBuilder.name, () => {
 
       builder.subtractAttempt();
 
-      expect(builder.tick.attemptsTop).toEqual(1);
+      expect(builder.attempts).toEqual(1);
     });
   });
 
@@ -211,15 +203,13 @@ describe(TickBuilder.name, () => {
 
       builder.reachFeature("zone2");
 
-      expect(builder.tick).toEqual({
-        problemId: PROBLEM_ID,
-        zone1: true,
-        attemptsZone1: 2,
-        zone2: true,
-        attemptsZone2: 2,
-        top: false,
-        attemptsTop: 2,
-      });
+      expect(builder.attempts).toEqual(2);
+      expect(builder.reachedFeatures).toEqual(
+        new Map<Feature, number>([
+          ["zone1", 2],
+          ["zone2", 2],
+        ]),
+      );
     });
 
     it("should not reach a feature that is not enabled", () => {
@@ -227,15 +217,8 @@ describe(TickBuilder.name, () => {
 
       builder.reachFeature("zone1");
 
-      expect(builder.tick).toEqual({
-        problemId: PROBLEM_ID,
-        zone1: false,
-        attemptsZone1: 1,
-        zone2: false,
-        attemptsZone2: 1,
-        top: false,
-        attemptsTop: 1,
-      });
+      expect(builder.attempts).toEqual(1);
+      expect(builder.reachedFeatures).toEqual(NO_LUCK);
     });
   });
 
@@ -254,15 +237,10 @@ describe(TickBuilder.name, () => {
 
       builder.unreachFeature("zone2");
 
-      expect(builder.tick).toEqual({
-        problemId: PROBLEM_ID,
-        zone1: true,
-        attemptsZone1: 1,
-        zone2: false,
-        attemptsZone2: 2,
-        top: false,
-        attemptsTop: 2,
-      });
+      expect(builder.attempts).toEqual(2);
+      expect(builder.reachedFeatures).toEqual(
+        new Map<Feature, number>([["zone1", 1]]),
+      );
     });
 
     it("should not change a feature that is not enabled", () => {
@@ -270,15 +248,8 @@ describe(TickBuilder.name, () => {
 
       builder.unreachFeature("zone1");
 
-      expect(builder.tick).toEqual({
-        problemId: PROBLEM_ID,
-        zone1: false,
-        attemptsZone1: 1,
-        zone2: false,
-        attemptsZone2: 1,
-        top: false,
-        attemptsTop: 1,
-      });
+      expect(builder.attempts).toEqual(1);
+      expect(builder.reachedFeatures).toEqual(NO_LUCK);
     });
   });
 });

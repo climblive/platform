@@ -10,7 +10,6 @@ export class TickBuilder {
   #features: Feature[];
   #reachedFeatures: SvelteMap<Feature, number>;
   #attempts: number;
-  #tick: Omit<Tick, "id" | "timestamp">;
 
   constructor(
     problemId: number,
@@ -27,16 +26,6 @@ export class TickBuilder {
     if (attemptsTop !== undefined && attemptsTop !== this.#attempts) {
       throw new Error("Attempts mismatch");
     }
-
-    this.#tick = $derived<Omit<Tick, "id" | "timestamp">>({
-      problemId: this.#problemId,
-      zone1: this.#hasReached("zone1"),
-      attemptsZone1: this.#calculateImplicitAttempts("zone1"),
-      zone2: this.#hasReached("zone2"),
-      attemptsZone2: this.#calculateImplicitAttempts("zone2"),
-      top: this.#hasReached("top"),
-      attemptsTop: this.#calculateImplicitAttempts("top"),
-    });
   }
 
   static from(
@@ -92,43 +81,20 @@ export class TickBuilder {
     );
   }
 
-  #hasReached(feature: Feature): boolean {
-    let featureReached = false;
-
-    for (let k = allFeatures.length - 1; k >= 0; k--) {
-      const f = allFeatures[k];
-      if (this.#reachedFeatures.has(f)) {
-        featureReached = true;
-      }
-
-      if (f === feature) {
-        return featureReached;
-      }
-    }
-
-    return false;
+  public get problemId(): number {
+    return this.#problemId;
   }
 
-  #calculateImplicitAttempts(feature: Feature): number {
-    let attempts = this.#attempts;
-
-    for (let k = allFeatures.length - 1; k >= 0; k--) {
-      const f = allFeatures[k];
-      const a = this.#reachedFeatures.get(f);
-      if (a !== undefined) {
-        attempts = a;
-      }
-
-      if (f === feature) {
-        return attempts;
-      }
-    }
-
-    return attempts;
+  public get features(): readonly Feature[] {
+    return this.#features;
   }
 
-  public get tick(): Omit<Tick, "id" | "timestamp"> {
-    return this.#tick;
+  public get reachedFeatures(): ReadonlyMap<Feature, number> {
+    return this.#reachedFeatures;
+  }
+
+  public get attempts(): number {
+    return this.#attempts;
   }
 
   public addAttempt(): void {
@@ -202,4 +168,53 @@ export class TickBuilder {
 
     this.subtractAttempt();
   }
+}
+
+export function buildTick(
+  builder: Pick<TickBuilder, "problemId" | "attempts" | "reachedFeatures">,
+): Omit<Tick, "id" | "timestamp"> {
+  const hasReached = (feature: Feature): boolean => {
+    let featureReached = false;
+
+    for (let k = allFeatures.length - 1; k >= 0; k--) {
+      const f = allFeatures[k];
+      if (builder.reachedFeatures.has(f)) {
+        featureReached = true;
+      }
+
+      if (f === feature) {
+        return featureReached;
+      }
+    }
+
+    return false;
+  };
+
+  const calculateImplicitAttempts = (feature: Feature): number => {
+    let attempts = builder.attempts;
+
+    for (let k = allFeatures.length - 1; k >= 0; k--) {
+      const f = allFeatures[k];
+      const a = builder.reachedFeatures.get(f);
+      if (a !== undefined) {
+        attempts = a;
+      }
+
+      if (f === feature) {
+        return attempts;
+      }
+    }
+
+    return attempts;
+  };
+
+  return {
+    problemId: builder.problemId,
+    zone1: hasReached("zone1"),
+    attemptsZone1: calculateImplicitAttempts("zone1"),
+    zone2: hasReached("zone2"),
+    attemptsZone2: calculateImplicitAttempts("zone2"),
+    top: hasReached("top"),
+    attemptsTop: calculateImplicitAttempts("top"),
+  };
 }
