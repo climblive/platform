@@ -40,7 +40,7 @@ export const exchangeCode = async (code: string, state: string) => {
     window.location.protocol + "//" + window.location.host + "/admin",
   );
 
-  params.append("oauth_code_verifier", codeVerifier);
+  params.append("code_verifier", codeVerifier);
 
   const response = await instance.post("/oauth2/token", params);
 
