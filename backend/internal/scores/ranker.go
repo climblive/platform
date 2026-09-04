@@ -92,9 +92,9 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 		case previousContender == nil:
 			placement = 1
 			gap = 0
-		case contender.Points == previousContender.Points:
+		case contender.Score == previousContender.Score:
 			gap++
-		case contender.Points != previousContender.Points:
+		case contender.Score != previousContender.Score:
 			placement += 1 + gap
 			gap = 0
 		}
@@ -103,7 +103,7 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 		score.RankOrder = i
 
 		switch {
-		case contender.Points == 0:
+		case contender.Score == Score{}:
 			fallthrough
 		case contender.WithdrawnFromFinals:
 			fallthrough
