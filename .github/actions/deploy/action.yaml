@@ -15,6 +15,9 @@ inputs:
   database-password:
     description: "Database password"
     required: true
+  cors-allowed-origins:
+    description: "Comma-separated CORS allowed origins"
+    required: true
 runs:
   using: "composite"
   steps:
@@ -24,5 +27,6 @@ runs:
         scp -o StrictHostKeyChecking=accept-new ${{ inputs.package-file-name }} ${{ inputs.deploy-user }}@${{ inputs.deploy-host }}:
         ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo apt-get install -y --allow-downgrades ~/${{ inputs.package-file-name }}"
         ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} 'sudo sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=${{ inputs.database-password }}\"/g" /etc/systemd/system/climblive.service.d/override.conf'
+        ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} 'sudo sed -i "s#CORS_ALLOWED_ORIGINS=.*#CORS_ALLOWED_ORIGINS=${{ inputs.cors-allowed-origins }}\"#g" /etc/systemd/system/climblive.service.d/override.conf'
         ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo systemctl daemon-reload"
         ssh -t ${{ inputs.deploy-user }}@${{ inputs.deploy-host }} "sudo systemctl restart climblive"

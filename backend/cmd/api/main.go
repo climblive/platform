@@ -339,7 +339,7 @@ func setupMux(
 	mux.RegisterMiddleware(rest.CORSWithOrigins(corsOrigins))
 	mux.RegisterMiddleware(authorizer.Middleware)
 
-	mux.HandleFunc("OPTIONS /", func(w http.ResponseWriter, r *http.Request) { rest.HandleCORSPreFlight(w, r, corsOrigins) })
+	mux.HandleFunc("OPTIONS /", rest.CORSPreFlight(corsOrigins))
 
 	rest.InstallContenderHandler(mux, &contenderUseCase)
 	rest.InstallContestHandler(mux, &contestUseCase, &compClassUseCase, &tickUseCase, &problemUseCase)

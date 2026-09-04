@@ -8,14 +8,16 @@ import (
 var corsMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE"}
 var corsHeaders = []string{"Authorization", "Content-Type"}
 
-func CORS(next http.Handler) http.Handler { return CORSWithOrigins(nil)(next) }
+func CORS(next http.Handler) http.Handler { return CORSWithOrigins([]string{"*"})(next) }
 
 func CORSWithOrigins(origins []string) Middleware {
 	allowed := prepareOriginLookupTable(origins)
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if _, ok := allowed[r.Header.Get("Origin")]; ok {
+			if _, ok := allowed["*"]; ok {
+				w.Header().Set("Access-Control-Allow-Origin", "*")
+			} else if _, ok := allowed[r.Header.Get("Origin")]; ok {
 				w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 				w.Header().Add("Vary", "Origin")
 			}
@@ -25,18 +27,19 @@ func CORSWithOrigins(origins []string) Middleware {
 	}
 }
 
-func HandleCORSPreFlight(w http.ResponseWriter, r *http.Request, origins []string) {
+func CORSPreFlight(origins []string) http.HandlerFunc {
 	allowed := prepareOriginLookupTable(origins)
 
-	if _, ok := allowed[r.Header.Get("Origin")]; ok {
-		w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-		w.Header().Add("Vary", "Origin")
-	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		if _, ok := allowed[r.Header.Get("Origin")]; ok {
+			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+		}
 
-	w.Header().Add("Vary", "Origin")
-	w.Header().Set("Access-Control-Allow-Methods", strings.Join(corsMethods, ", "))
-	w.Header().Set("Access-Control-Allow-Headers", strings.Join(corsHeaders, ", "))
-	w.WriteHeader(http.StatusNoContent)
+		w.Header().Add("Vary", "Origin")
+		w.Header().Set("Access-Control-Allow-Methods", strings.Join(corsMethods, ", "))
+		w.Header().Set("Access-Control-Allow-Headers", strings.Join(corsHeaders, ", "))
+		w.WriteHeader(http.StatusNoContent)
+	}
 }
 
 func prepareOriginLookupTable(origins []string) map[string]struct{} {

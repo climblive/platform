@@ -91,4 +91,5 @@ jobs:
           deploy-host: ${{ vars.DEPLOY_SSH_HOST }}
           deploy-user: ${{ vars.DEPLOY_SSH_USER }}
           database-password: ${{ secrets.DATABASE_PASSWORD }}
+          cors-allowed-origins: ${{ vars.CORS_ALLOWED_ORIGINS }}
           ssh-auth-sock: ${{ steps.start-agent.outputs.ssh-auth-sock }}
