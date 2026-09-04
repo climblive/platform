@@ -100,10 +100,10 @@ export class Authenticator {
   };
 
   public redirectLogin = async () => {
-    const verifier = randomUrlSafeValue();
-    const challenge = await challengeFromVerifier(verifier);
+    const codeVerifier = randomUrlSafeValue();
+    const challenge = await challengeFromVerifier(codeVerifier);
     const state = randomUrlSafeValue();
-    sessionStorage.setItem("oauth_code_verifier", verifier);
+    sessionStorage.setItem("oauth_code_verifier", codeVerifier);
     sessionStorage.setItem("oauth_state", state);
 
     const url = authorizationUrl("login", challenge, state);
@@ -111,10 +111,10 @@ export class Authenticator {
   };
 
   public redirectSignup = async () => {
-    const verifier = randomUrlSafeValue();
-    const challenge = await challengeFromVerifier(verifier);
+    const codeVerifier = randomUrlSafeValue();
+    const challenge = await challengeFromVerifier(codeVerifier);
     const state = randomUrlSafeValue();
-    sessionStorage.setItem("oauth_code_verifier", verifier);
+    sessionStorage.setItem("oauth_code_verifier", codeVerifier);
     sessionStorage.setItem("oauth_state", state);
 
     const url = authorizationUrl("signup", challenge, state);
