@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"embed"
-	"io"
 	"io/fs"
 	"log"
 	"log/slog"

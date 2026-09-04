@@ -6,7 +6,7 @@ run:
 linters:
   default: standard
   enable:
-    - exhaustruct
+    - exhaustruct_v5
   settings:
-    exhaustruct:
+    exhaustruct_v5:
       allow-empty: true
