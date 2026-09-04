@@ -55,6 +55,32 @@ func TestTickValidator(t *testing.T) {
 		assert.True(t, validator.IsValidationError(err))
 	})
 
+	t.Run("ReachedFeatureWithoutAttempts", func(t *testing.T) {
+		tests := map[string]domain.Tick{
+			"Zone1": {
+				Zone1: true,
+			},
+			"Zone2": {
+				Zone1: true,
+				Zone2: true,
+			},
+			"Top": {
+				Zone1: true,
+				Zone2: true,
+				Top:   true,
+			},
+		}
+
+		for name, tick := range tests {
+			t.Run(name, func(t *testing.T) {
+				err := validator.Validate(tick)
+
+				assert.ErrorIs(t, err, domain.ErrInvalidData)
+				assert.True(t, validator.IsValidationError(err))
+			})
+		}
+	})
+
 	t.Run("TopWithoutZones", func(t *testing.T) {
 		tick := validTick()
 		tick.Top = true

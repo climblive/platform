@@ -85,6 +85,45 @@ func TestBasicRanker(t *testing.T) {
 		assert.Equal(t, expected, prettifyAll(scores))
 	})
 
+	t.Run("SharedPlacementWithEqualPointsAndDifferentAttempts", func(t *testing.T) {
+		contenders := makeContenders(2)
+		contenders[0].Points = 100
+		contenders[0].Tops = 1
+		contenders[0].AttemptsTops = 2
+		contenders[1].Points = 100
+
+		scores := ranker.RankContenders(slices.Values(contenders))
+
+		expected := []string{
+			"i:1 p:1 r:0 f:🏆",
+			"i:2 p:1 r:1 f:🏆",
+		}
+
+		assert.Equal(t, expected, prettifyAll(scores))
+	})
+
+	t.Run("Attempts", func(t *testing.T) {
+		attemptRanker := scores.NewBasicRanker(1, false)
+		contenders := makeContenders(4)
+		contenders[0].Tops = 1
+		contenders[0].AttemptsTops = 2
+		contenders[1].Tops = 1
+		contenders[1].AttemptsTops = 2
+		contenders[2].Tops = 1
+		contenders[2].AttemptsTops = 3
+
+		rankedScores := attemptRanker.RankContenders(slices.Values(contenders))
+
+		expected := []string{
+			"i:1 p:1 r:0 f:🏆",
+			"i:2 p:1 r:1 f:🏆",
+			"i:3 p:3 r:2 f:-",
+			"i:4 p:4 r:3 f:-",
+		}
+
+		assert.Equal(t, expected, prettifyAll(rankedScores))
+	})
+
 	t.Run("ExtraFinalists", func(t *testing.T) {
 		contenders := makeContenders(10)
 		contenders[0].Points = 500

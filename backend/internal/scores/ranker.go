@@ -14,6 +14,14 @@ type BasicRanker struct {
 	usePoints         bool
 }
 
+func (r *BasicRanker) scoresAreEqual(c1, c2 Contender) bool {
+	if r.usePoints {
+		return c1.Points == c2.Points
+	}
+
+	return c1.Score == c2.Score
+}
+
 func NewBasicRanker(numberOfFinalists int, usePoints bool) *BasicRanker {
 	return &BasicRanker{
 		numberOfFinalists: numberOfFinalists,
@@ -92,9 +100,9 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 		case previousContender == nil:
 			placement = 1
 			gap = 0
-		case contender.Score == previousContender.Score:
+		case r.scoresAreEqual(contender, *previousContender):
 			gap++
-		case contender.Score != previousContender.Score:
+		default:
 			placement += 1 + gap
 			gap = 0
 		}

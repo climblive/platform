@@ -24,6 +24,12 @@ func (v TickValidator) Validate(tick domain.Tick) error {
 		fallthrough
 	case tick.AttemptsZone1 > 999:
 		fallthrough
+	case tick.Zone1 && tick.AttemptsZone1 == 0:
+		fallthrough
+	case tick.Zone2 && tick.AttemptsZone2 == 0:
+		fallthrough
+	case tick.Top && tick.AttemptsTop == 0:
+		fallthrough
 	case tick.AttemptsZone1 > tick.AttemptsZone2:
 		fallthrough
 	case tick.AttemptsZone2 > tick.AttemptsTop:
