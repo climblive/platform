@@ -138,7 +138,11 @@ const randomUrlSafeValue = () => {
     .replace(/=+$/, "");
 };
 
-const authorizationUrl = (endpoint: "login" | "signup", challenge: string, state: string) => {
+const authorizationUrl = (
+  endpoint: "login" | "signup",
+  challenge: string,
+  state: string,
+) => {
   const params = new URLSearchParams({
     response_type: "code",
     client_id: configData.COGNITO_CLIENT_ID,

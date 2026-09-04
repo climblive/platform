@@ -23,7 +23,11 @@ export const exchangeCode = async (code: string, state: string) => {
   sessionStorage.removeItem("code_verifier");
   sessionStorage.removeItem("oauth_state");
 
-  if (codeVerifier === null || expectedState === null || state !== expectedState) {
+  if (
+    codeVerifier === null ||
+    expectedState === null ||
+    state !== expectedState
+  ) {
     throw new Error("Invalid OAuth response");
   }
 
