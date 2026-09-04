@@ -13,7 +13,7 @@
   "devDependencies": {
     "@climblive/lib": "workspace:*",
     "typescript": "^5.9.3",
-    "vite": "^8.1.0"
+    "vite": "^8.2.2"
   },
   "dependencies": {
     "@awesome.me/webawesome": "3.12.0"

@@ -20,6 +20,8 @@ import (
 	"syscall"
 	"time"
 
+	"uuid"
+
 	"github.com/climblive/platform/backend/internal/authorizer"
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/events"
@@ -32,7 +34,6 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/lmittmann/tint"
 	"github.com/mattn/go-isatty"
-	"uuid"
 
 	"github.com/pressly/goose/v3"
 )
@@ -83,16 +84,10 @@ func main() {
 
 	w := os.Stdout
 
-	logger := slog.New(tint.NewHandler(w, nil))
+	logger := slog.New(tint.NewTextHandler(w, nil))
 
 	slog.SetDefault(slog.New(
-		tint.NewHandler(w, &tint.Options{
-			Level:       slog.LevelDebug,
-			TimeFormat:  time.Kitchen,
-			NoColor:     !isatty.IsTerminal(w.Fd()),
-			AddSource:   false,
-			ReplaceAttr: nil,
-		}),
+		tint.NewTextHandler(w, &tint.Options{Level: slog.LevelDebug, TimeFormat: time.Kitchen, NoColor: !isatty.IsTerminal(w.Fd()), AddSource: false, ReplaceAttr: nil}),
 	))
 
 	slog.SetDefault(logger)
@@ -191,7 +186,7 @@ func main() {
 
 	httpServer := &http.Server{
 		Addr:                         net.JoinHostPort("0.0.0.0", strconv.Itoa(listenPort)),
-		Handler:                      &httpRouter{appHandler: appMux, wwwHandler: wwwMux, wwwHost: wwwHost},
+		Handler:                      securityHeaders(&httpRouter{appHandler: appMux, wwwHandler: wwwMux, wwwHost: wwwHost}),
 		DisableGeneralOptionsHandler: false,
 		TLSConfig:                    tlsConfig,
 		ReadTimeout:                  0,
@@ -226,11 +221,13 @@ func main() {
 	}
 
 	runAsUser := os.Getenv("RUN_AS_USER")
-	if runAsUser == "" {
-		panic("RUN_AS_USER is required")
-	}
-	if err := dropPrivileges(runAsUser); err != nil {
-		panic(err)
+	if os.Geteuid() == 0 {
+		if runAsUser == "" {
+			panic("RUN_AS_USER is required when running as root")
+		}
+		if err := dropPrivileges(runAsUser); err != nil {
+			panic(err)
+		}
 	}
 
 	if httpServer.TLSConfig != nil {
@@ -475,6 +472,17 @@ func installWWWStaticHandlers(mux *http.ServeMux) {
 func noCacheHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-store")
+		next.ServeHTTP(w, r)
+	})
+}
+
+func securityHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("Referrer-Policy", "same-origin")
+		if r.TLS != nil {
+			w.Header().Set("Strict-Transport-Security", "max-age=31536000")
+		}
 		next.ServeHTTP(w, r)
 	})
 }

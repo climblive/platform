@@ -11,11 +11,16 @@ jobs:
       pull-requests: read
 
     steps:
-      - run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            TITLE="${{ github.event.pull_request.title }}"
+      - name: Validate title
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          MERGE_GROUP_MESSAGE: ${{ github.event.merge_group.head_commit.message }}
+        run: |
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            TITLE="$PR_TITLE"
           else
-            TITLE="${{ github.event.merge_group.head_commit.message }}"
+            TITLE="$MERGE_GROUP_MESSAGE"
             TITLE="${TITLE%%$'\n'*}"
           fi
 
