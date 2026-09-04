@@ -5,6 +5,7 @@ import (
 	"encoding/json/v2"
 	"fmt"
 	"log/slog"
+	"mime"
 	"net/http"
 	"strconv"
 
@@ -12,6 +13,8 @@ import (
 	"github.com/climblive/platform/backend/internal/utils"
 	"github.com/go-errors/errors"
 )
+
+const maxJSONBodySize = 1 << 20
 
 func parseResourceID[T domain.ResourceIDType](id string) (T, error) {
 	number, err := strconv.ParseInt(id, 10, 32)
@@ -42,6 +45,29 @@ func writeResponse(w http.ResponseWriter, status int, data any) {
 	if err != nil {
 		slog.Error("failed to write http response", "error", err)
 	}
+}
+
+func readJSON(w http.ResponseWriter, r *http.Request, out any, opts ...json.Options) bool {
+	mediaType, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	if err != nil || mediaType != "application/json" {
+		w.WriteHeader(http.StatusUnsupportedMediaType)
+		return false
+	}
+
+	r.Body = http.MaxBytesReader(w, r.Body, maxJSONBodySize)
+	err = json.UnmarshalRead(r.Body, out, append(opts, json.RejectUnknownMembers(true))...)
+	if err == nil {
+		return true
+	}
+
+	var maxBytesError *http.MaxBytesError
+	if errors.As(err, &maxBytesError) {
+		w.WriteHeader(http.StatusRequestEntityTooLarge)
+		return false
+	}
+
+	w.WriteHeader(http.StatusBadRequest)
+	return false
 }
 
 func handleError(w http.ResponseWriter, err error) {

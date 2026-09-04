@@ -2,7 +2,6 @@ package rest
 
 import (
 	"context"
-	"encoding/json/v2"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -72,9 +71,7 @@ func (hdlr *problemHandler) PatchProblem(w http.ResponseWriter, r *http.Request)
 	}
 
 	var patch domain.ProblemPatch
-	err = json.UnmarshalRead(r.Body, &patch)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+	if !readJSON(w, r, &patch) {
 		return
 	}
 
@@ -95,9 +92,7 @@ func (hdlr *problemHandler) CreateProblem(w http.ResponseWriter, r *http.Request
 	}
 
 	var tmpl domain.ProblemTemplate
-	err = json.UnmarshalRead(r.Body, &tmpl)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+	if !readJSON(w, r, &tmpl) {
 		return
 	}
 
