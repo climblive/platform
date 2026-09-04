@@ -103,7 +103,7 @@ export class Authenticator {
     const verifier = randomUrlSafeValue();
     const challenge = await challengeFromVerifier(verifier);
     const state = randomUrlSafeValue();
-    sessionStorage.setItem("code_verifier", verifier);
+    sessionStorage.setItem("oauth_code_verifier", verifier);
     sessionStorage.setItem("oauth_state", state);
 
     const url = authorizationUrl("login", challenge, state);
@@ -114,7 +114,7 @@ export class Authenticator {
     const verifier = randomUrlSafeValue();
     const challenge = await challengeFromVerifier(verifier);
     const state = randomUrlSafeValue();
-    sessionStorage.setItem("code_verifier", verifier);
+    sessionStorage.setItem("oauth_code_verifier", verifier);
     sessionStorage.setItem("oauth_state", state);
 
     const url = authorizationUrl("signup", challenge, state);

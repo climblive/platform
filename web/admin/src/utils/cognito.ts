@@ -18,9 +18,9 @@ const instance = axios.create({
 });
 
 export const exchangeCode = async (code: string, state: string) => {
-  const codeVerifier = sessionStorage.getItem("code_verifier");
+  const codeVerifier = sessionStorage.getItem("oauth_code_verifier");
   const expectedState = sessionStorage.getItem("oauth_state");
-  sessionStorage.removeItem("code_verifier");
+  sessionStorage.removeItem("oauth_code_verifier");
   sessionStorage.removeItem("oauth_state");
 
   if (
@@ -40,7 +40,7 @@ export const exchangeCode = async (code: string, state: string) => {
     window.location.protocol + "//" + window.location.host + "/admin",
   );
 
-  params.append("code_verifier", codeVerifier);
+  params.append("oauth_code_verifier", codeVerifier);
 
   const response = await instance.post("/oauth2/token", params);
 
