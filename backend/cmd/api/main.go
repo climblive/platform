@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"embed"
+	"io"
 	"io/fs"
 	"log"
 	"log/slog"
@@ -84,16 +85,10 @@ func main() {
 
 	w := os.Stdout
 
-	logger := slog.New(tint.NewHandler(w, nil))
+	logger := slog.New(tint.NewTextHandler(w, nil))
 
 	slog.SetDefault(slog.New(
-		tint.NewHandler(w, &tint.Options{
-			Level:       slog.LevelDebug,
-			TimeFormat:  time.Kitchen,
-			NoColor:     !isatty.IsTerminal(w.Fd()),
-			AddSource:   false,
-			ReplaceAttr: nil,
-		}),
+		tint.NewTextHandler(w, &tint.Options{Level: slog.LevelDebug, TimeFormat: time.Kitchen, NoColor: !isatty.IsTerminal(w.Fd()), AddSource: false, ReplaceAttr: nil}),
 	))
 
 	slog.SetDefault(logger)
