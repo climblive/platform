@@ -5,6 +5,7 @@ import {
   useQueryClient,
   type QueryKey,
 } from "@tanstack/svelte-query";
+import { CanceledError } from "axios";
 import { ApiClient } from "../Api";
 import type { Tick } from "../models";
 import { HOUR } from "./constants";
@@ -36,10 +37,33 @@ export const getTicksByContestQuery = (contestId: number) =>
 
 export const putTickMutation = (contenderId: number) => {
   const client = useQueryClient();
+  let abortController: AbortController | undefined;
 
   return createMutation(() => ({
-    mutationFn: (tick: Omit<Tick, "id" | "timestamp">) =>
-      ApiClient.getInstance().putTick(contenderId, tick),
+    mutationFn: async (tick: Omit<Tick, "id" | "timestamp">) => {
+      abortController?.abort();
+
+      const currentController = new AbortController();
+      abortController = currentController;
+
+      try {
+        const updatedTick = await ApiClient.getInstance().putTick(
+          contenderId,
+          tick,
+          currentController.signal,
+        );
+
+        if (abortController !== currentController) {
+          throw new CanceledError();
+        }
+
+        return updatedTick;
+      } finally {
+        if (abortController === currentController) {
+          abortController = undefined;
+        }
+      }
+    },
     onSuccess: (updatedTick) => {
       updateTickInQueryCache(client, contenderId, updatedTick);
     },

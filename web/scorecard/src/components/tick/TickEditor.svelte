@@ -2,6 +2,7 @@
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { CreateMutationResult } from "@tanstack/svelte-query";
+  import { isCancel } from "axios";
   import { buildTick, TickBuilder } from "../../utils/tickBuilder.svelte";
   import TickBox from "./TickBox.svelte";
 
@@ -23,6 +24,16 @@
   const tickBuilder = $derived(TickBuilder.from(problem, rest.tick));
   const tick = $derived(buildTick(tickBuilder));
 
+  const saveTick = async () => {
+    try {
+      await putTick.mutateAsync({ ...tick });
+    } catch (error) {
+      if (!isCancel(error)) {
+        toastUnexpectedError("Failed to update tick.");
+      }
+    }
+  };
+
   const handleSubtractAttempt = (event: MouseEvent) => {
     event.stopPropagation();
 
@@ -30,11 +41,7 @@
 
     tickBuilder.subtractAttempt();
 
-    putTick.mutate(tick, {
-      onError: () => {
-        toastUnexpectedError("Failed to update tick.");
-      },
-    });
+    void saveTick();
   };
 
   const handleAddAttempt = (event: MouseEvent) => {
@@ -44,11 +51,7 @@
 
     tickBuilder.addAttempt();
 
-    putTick.mutate(tick, {
-      onError: () => {
-        toastUnexpectedError("Failed to update tick.");
-      },
-    });
+    void saveTick();
   };
 
   const renderSublabel = (
@@ -77,11 +80,7 @@
       tickBuilder.unreachFeature(feature);
     }
 
-    putTick.mutate(tick, {
-      onError: () => {
-        toastUnexpectedError("Failed to update tick.");
-      },
-    });
+    void saveTick();
   };
 </script>
 
