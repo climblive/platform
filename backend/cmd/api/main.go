@@ -20,6 +20,8 @@ import (
 	"syscall"
 	"time"
 
+	"uuid"
+
 	"github.com/climblive/platform/backend/internal/authorizer"
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/events"
@@ -32,7 +34,6 @@ import (
 	"github.com/go-errors/errors"
 	"github.com/lmittmann/tint"
 	"github.com/mattn/go-isatty"
-	"uuid"
 
 	"github.com/pressly/goose/v3"
 )
@@ -83,16 +84,10 @@ func main() {
 
 	w := os.Stdout
 
-	logger := slog.New(tint.NewHandler(w, nil))
+	logger := slog.New(tint.NewTextHandler(w, nil))
 
 	slog.SetDefault(slog.New(
-		tint.NewHandler(w, &tint.Options{
-			Level:       slog.LevelDebug,
-			TimeFormat:  time.Kitchen,
-			NoColor:     !isatty.IsTerminal(w.Fd()),
-			AddSource:   false,
-			ReplaceAttr: nil,
-		}),
+		tint.NewTextHandler(w, &tint.Options{Level: slog.LevelDebug, TimeFormat: time.Kitchen, NoColor: !isatty.IsTerminal(w.Fd()), AddSource: false, ReplaceAttr: nil}),
 	))
 
 	slog.SetDefault(logger)
