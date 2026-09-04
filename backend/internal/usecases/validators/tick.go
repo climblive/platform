@@ -12,9 +12,15 @@ type TickValidator struct {
 
 func (v TickValidator) Validate(tick domain.Tick) error {
 	switch {
+	case tick.AttemptsTop < 0:
+		fallthrough
 	case tick.AttemptsTop > 999:
 		fallthrough
+	case tick.AttemptsZone2 < 0:
+		fallthrough
 	case tick.AttemptsZone2 > 999:
+		fallthrough
+	case tick.AttemptsZone1 < 0:
 		fallthrough
 	case tick.AttemptsZone1 > 999:
 		fallthrough
