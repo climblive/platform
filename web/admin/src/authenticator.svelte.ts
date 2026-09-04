@@ -25,10 +25,6 @@ export class Authenticator {
     const state = query.get("state");
 
     if (code != null) {
-      if (state === null) {
-        throw new Error("Missing OAuth state");
-      }
-
       const { access_token, refresh_token } = await exchangeCode(code, state);
 
       ApiClient.getInstance().setCredentialsProvider(

@@ -17,7 +17,7 @@ const instance = axios.create({
   },
 });
 
-export const exchangeCode = async (code: string, state: string) => {
+export const exchangeCode = async (code: string, state: string | null) => {
   const codeVerifier = sessionStorage.getItem("oauth_code_verifier");
   const expectedState = sessionStorage.getItem("oauth_state");
   sessionStorage.removeItem("oauth_code_verifier");
