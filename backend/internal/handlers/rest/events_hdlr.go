@@ -5,44 +5,111 @@ import (
 	"encoding/json/v2"
 	"fmt"
 	"log/slog"
+	"net"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/events"
 )
 
-const bufferCapacity = 1_000
+const eventBufferCapacity = 64
 const clientRetry = 5 * time.Second
+const eventWriteTimeout = 10 * time.Second
+
+type EventStreamLimits struct {
+	Global    int
+	PerClient int
+}
+
+func defaultEventStreamLimits() EventStreamLimits {
+	return EventStreamLimits{Global: 200, PerClient: 5}
+}
+
+type eventConnectionLimiter struct {
+	mu       sync.Mutex
+	limits   EventStreamLimits
+	total    int
+	byClient map[string]int
+}
 
 type eventHandler struct {
 	eventBroker  domain.EventBroker
 	pingInterval time.Duration
 	repo         eventHandlerRepository
+	limiter      *eventConnectionLimiter
 }
 
 type eventHandlerRepository interface {
 	GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error)
 }
 
-func InstallEventHandler(mux *Mux, eventBroker domain.EventBroker, repo eventHandlerRepository, pingInterval time.Duration) {
+func InstallEventHandler(mux *Mux, eventBroker domain.EventBroker, repo eventHandlerRepository, pingInterval time.Duration, configuredLimits ...EventStreamLimits) {
+	limits := defaultEventStreamLimits()
+	if len(configuredLimits) > 0 {
+		limits = configuredLimits[0]
+	}
+
 	handler := &eventHandler{
 		eventBroker:  eventBroker,
 		pingInterval: pingInterval,
 		repo:         repo,
+		limiter:      newEventConnectionLimiter(limits),
 	}
 
 	mux.HandleFunc("GET /contests/{contestID}/events", handler.HandleSubscribeContestEvents)
 	mux.HandleFunc("GET /contenders/{contenderID}/events", handler.HandleSubscribeContenderEvents)
 }
 
-func readRemoteAddr(r *http.Request) string {
-	addr := r.Header.Get("X-Real-IP")
-	if addr == "" {
-		addr = r.RemoteAddr
+func newEventConnectionLimiter(limits EventStreamLimits) *eventConnectionLimiter {
+	return &eventConnectionLimiter{
+		mu:       sync.Mutex{},
+		limits:   limits,
+		total:    0,
+		byClient: make(map[string]int),
+	}
+}
+
+func (l *eventConnectionLimiter) acquire(client string) bool {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
+	if l.total >= l.limits.Global || l.byClient[client] >= l.limits.PerClient {
+		return false
 	}
 
-	return addr
+	l.total++
+	l.byClient[client]++
+	return true
+}
+
+func (l *eventConnectionLimiter) release(client string) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
+	l.total--
+	l.byClient[client]--
+	if l.byClient[client] == 0 {
+		delete(l.byClient, client)
+	}
+}
+
+func readRemoteAddr(r *http.Request) string {
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		host = r.RemoteAddr
+	}
+
+	remoteIP := net.ParseIP(host)
+	if remoteIP != nil && remoteIP.IsLoopback() {
+		realIP := net.ParseIP(r.Header.Get("X-Real-IP"))
+		if realIP != nil {
+			return realIP.String()
+		}
+	}
+
+	return host
 }
 
 func (hdlr *eventHandler) HandleSubscribeContestEvents(w http.ResponseWriter, r *http.Request) {
@@ -112,21 +179,37 @@ func (hdlr *eventHandler) subscribe(
 	filters []domain.EventFilter,
 	logger *slog.Logger,
 ) {
+	client := readRemoteAddr(r)
+	if !hdlr.limiter.acquire(client) {
+		w.Header().Set("Retry-After", "5")
+		w.WriteHeader(http.StatusTooManyRequests)
+		return
+	}
+	defer hdlr.limiter.release(client)
+
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("X-Accel-Buffering", "no")
 	w.Header().Set("Cache-Control", "no-store")
 	w.Header().Set("Connection", "keep-alive")
 
 	logger.Debug("starting event subscription")
-	subscriptionID, eventReader := hdlr.eventBroker.Subscribe(filters, bufferCapacity)
+	subscriptionID, eventReader := hdlr.eventBroker.Subscribe(filters, eventBufferCapacity)
 
 	defer hdlr.eventBroker.Unsubscribe(subscriptionID)
 
 	w.WriteHeader(http.StatusOK)
 
-	write(w, fmt.Sprintf("retry: %d\n\n", clientRetry.Milliseconds()))
+	if !writeEvent(w, fmt.Sprintf("retry: %d\n\n", clientRetry.Milliseconds())) {
+		return
+	}
 
-	keepAlive := time.Tick(hdlr.pingInterval)
+	var keepAlive <-chan time.Time
+	var keepAliveTicker *time.Ticker
+	if hdlr.pingInterval > 0 {
+		keepAliveTicker = time.NewTicker(hdlr.pingInterval)
+		keepAlive = keepAliveTicker.C
+		defer keepAliveTicker.Stop()
+	}
 	eventsCh := eventReader.EventsChan(r.Context())
 
 ConsumeEvents:
@@ -142,9 +225,13 @@ ConsumeEvents:
 				panic(err)
 			}
 
-			write(w, fmt.Sprintf("event: %s\ndata: %s\n\n", events.EventName(event.Data), json))
+			if !writeEvent(w, fmt.Sprintf("event: %s\ndata: %s\n\n", events.EventName(event.Data), json)) {
+				break ConsumeEvents
+			}
 		case <-keepAlive:
-			write(w, ":\n\n")
+			if !writeEvent(w, ":\n\n") {
+				break ConsumeEvents
+			}
 		case <-r.Context().Done():
 			logger.Debug("subscription closed", "reason", r.Context().Err())
 			break ConsumeEvents
@@ -156,12 +243,19 @@ ConsumeEvents:
 	}
 }
 
-func write(w http.ResponseWriter, data string) {
-	_, err := w.Write([]byte(data))
-	if err != nil {
+func writeEvent(w http.ResponseWriter, data string) bool {
+	controller := http.NewResponseController(w)
+	_ = controller.SetWriteDeadline(time.Now().Add(eventWriteTimeout))
+
+	if _, err := w.Write([]byte(data)); err != nil {
 		slog.Error("failed to write server-sent event", "error", err)
-		return
+		return false
 	}
 
-	w.(http.Flusher).Flush()
+	if err := controller.Flush(); err != nil {
+		slog.Error("failed to flush server-sent event", "error", err)
+		return false
+	}
+
+	return true
 }

@@ -31,7 +31,7 @@ func TestEventsHandler(t *testing.T) {
 		subscription := events.NewSubscription(filters, bufferCapacity)
 		subscriptionID := uuid.New()
 
-		mockedEventBroker.On("Subscribe", filters, 1000).Return(subscriptionID, subscription)
+		mockedEventBroker.On("Subscribe", filters, 64).Return(subscriptionID, subscription)
 
 		mockedEventBroker.On("Unsubscribe", subscriptionID).Return()
 
@@ -251,6 +251,70 @@ func TestEventsHandler(t *testing.T) {
 
 		mockedRepository.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)
+
+		t.Run("PerClientSubscriptionLimit", func(t *testing.T) {
+			filters := []domain.EventFilter{domain.NewEventFilter(
+				fakedContestID,
+				0,
+				"CONTENDER_PUBLIC_INFO_UPDATED",
+				"[]CONTENDER_SCORE_UPDATED",
+				"SCORE_ENGINE_STARTED",
+				"SCORE_ENGINE_STOPPED",
+			)}
+			mockedRepository, mockedEventBroker, _ := makeMocks(0, filters)
+
+			mux := rest.NewMux()
+			rest.InstallEventHandler(mux, mockedEventBroker, mockedRepository, time.Hour, rest.EventStreamLimits{Global: 2, PerClient: 1})
+
+			server := httptest.NewServer(mux)
+			defer server.Close()
+
+			first, err := http.Get(server.URL + fmt.Sprintf("/contests/%v/events", fakedContestID))
+			require.NoError(t, err)
+			defer first.Body.Close()
+
+			second, err := http.Get(server.URL + fmt.Sprintf("/contests/%v/events", fakedContestID))
+			require.NoError(t, err)
+			defer second.Body.Close()
+
+			assert.Equal(t, http.StatusTooManyRequests, second.StatusCode)
+			mockedEventBroker.AssertNumberOfCalls(t, "Subscribe", 1)
+		})
+
+		t.Run("GlobalSubscriptionLimit", func(t *testing.T) {
+			filters := []domain.EventFilter{domain.NewEventFilter(
+				fakedContestID,
+				0,
+				"CONTENDER_PUBLIC_INFO_UPDATED",
+				"[]CONTENDER_SCORE_UPDATED",
+				"SCORE_ENGINE_STARTED",
+				"SCORE_ENGINE_STOPPED",
+			)}
+			mockedRepository, mockedEventBroker, _ := makeMocks(0, filters)
+
+			mux := rest.NewMux()
+			rest.InstallEventHandler(mux, mockedEventBroker, mockedRepository, time.Hour, rest.EventStreamLimits{Global: 1, PerClient: 2})
+
+			server := httptest.NewServer(mux)
+			defer server.Close()
+
+			firstRequest, err := http.NewRequest(http.MethodGet, server.URL+fmt.Sprintf("/contests/%v/events", fakedContestID), nil)
+			require.NoError(t, err)
+			firstRequest.Header.Set("X-Real-IP", "192.0.2.1")
+			first, err := http.DefaultClient.Do(firstRequest)
+			require.NoError(t, err)
+			defer first.Body.Close()
+
+			secondRequest, err := http.NewRequest(http.MethodGet, server.URL+fmt.Sprintf("/contests/%v/events", fakedContestID), nil)
+			require.NoError(t, err)
+			secondRequest.Header.Set("X-Real-IP", "192.0.2.2")
+			second, err := http.DefaultClient.Do(secondRequest)
+			require.NoError(t, err)
+			defer second.Body.Close()
+
+			assert.Equal(t, http.StatusTooManyRequests, second.StatusCode)
+			mockedEventBroker.AssertNumberOfCalls(t, "Subscribe", 1)
+		})
 	})
 }
 
