@@ -20,6 +20,8 @@ import (
 	"syscall"
 	"time"
 
+	"uuid"
+
 	"github.com/climblive/platform/backend/internal/authorizer"
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/events"
@@ -30,7 +32,6 @@ import (
 	"github.com/climblive/platform/backend/internal/usecases"
 	"github.com/climblive/platform/backend/internal/utils"
 	"github.com/go-errors/errors"
-	"github.com/google/uuid"
 	"github.com/lmittmann/tint"
 	"github.com/mattn/go-isatty"
 
@@ -83,16 +84,10 @@ func main() {
 
 	w := os.Stdout
 
-	logger := slog.New(tint.NewHandler(w, nil))
+	logger := slog.New(tint.NewTextHandler(w, nil))
 
 	slog.SetDefault(slog.New(
-		tint.NewHandler(w, &tint.Options{
-			Level:       slog.LevelDebug,
-			TimeFormat:  time.Kitchen,
-			NoColor:     !isatty.IsTerminal(w.Fd()),
-			AddSource:   false,
-			ReplaceAttr: nil,
-		}),
+		tint.NewTextHandler(w, &tint.Options{Level: slog.LevelDebug, TimeFormat: time.Kitchen, NoColor: !isatty.IsTerminal(w.Fd()), AddSource: false, ReplaceAttr: nil}),
 	))
 
 	slog.SetDefault(logger)
@@ -191,7 +186,7 @@ func main() {
 
 	httpServer := &http.Server{
 		Addr:                         net.JoinHostPort("0.0.0.0", strconv.Itoa(listenPort)),
-		Handler:                      &httpRouter{appHandler: appMux, wwwHandler: wwwMux, wwwHost: wwwHost},
+		Handler:                      securityHeaders(&httpRouter{appHandler: appMux, wwwHandler: wwwMux, wwwHost: wwwHost}),
 		DisableGeneralOptionsHandler: false,
 		TLSConfig:                    tlsConfig,
 		ReadTimeout:                  0,
@@ -199,15 +194,17 @@ func main() {
 		WriteTimeout:                 0,
 		IdleTimeout:                  0,
 		MaxHeaderBytes:               0,
+		MaxHeaderValueCount:          0,
 		TLSNextProto:                 nil,
 		ConnState:                    nil,
 		ErrorLog:                     nil,
 		BaseContext: func(_ net.Listener) context.Context {
 			return ctx
 		},
-		ConnContext: nil,
-		HTTP2:       nil,
-		Protocols:   nil,
+		ConnContext:           nil,
+		HTTP2:                 nil,
+		Protocols:             nil,
+		DisableClientPriority: false,
 	}
 
 	context.AfterFunc(ctx, func() {
@@ -475,6 +472,17 @@ func installWWWStaticHandlers(mux *http.ServeMux) {
 func noCacheHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-store")
+		next.ServeHTTP(w, r)
+	})
+}
+
+func securityHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("Referrer-Policy", "same-origin")
+		if r.TLS != nil {
+			w.Header().Set("Strict-Transport-Security", "max-age=31536000")
+		}
 		next.ServeHTTP(w, r)
 	})
 }
