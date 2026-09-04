@@ -46,6 +46,8 @@ func TestScrubber(t *testing.T) {
 
 			time.Sleep(interval)
 
+			synctest.Wait()
+
 			cancel()
 			wg.Wait()
 
