@@ -221,11 +221,13 @@ func main() {
 	}
 
 	runAsUser := os.Getenv("RUN_AS_USER")
-	if runAsUser == "" {
-		panic("RUN_AS_USER is required")
-	}
-	if err := dropPrivileges(runAsUser); err != nil {
-		panic(err)
+	if os.Geteuid() == 0 {
+		if runAsUser == "" {
+			panic("RUN_AS_USER is required when running as root")
+		}
+		if err := dropPrivileges(runAsUser); err != nil {
+			panic(err)
+		}
 	}
 
 	if httpServer.TLSConfig != nil {
