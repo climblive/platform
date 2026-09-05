@@ -620,6 +620,44 @@ func TestPutTick(t *testing.T) {
 		mockedEventBroker.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
 	})
+
+	t.Run("RejectsRevisionJumpExceedingMaximum", func(t *testing.T) {
+		mockedRepo, mockedEventBroker := makeMocks(now.Add(-time.Hour), now.Add(time.Hour))
+		mockedAuthorizer := new(authorizerMock)
+
+		mockedAuthorizer.
+			On("HasOwnership", mock.Anything, fakedOwnership).
+			Return(domain.ContenderRole, nil)
+
+		mockedRepo.
+			On("GetProblem", mock.Anything, nil, fakedProblemID).
+			Return(domain.Problem{
+				ID:        fakedProblemID,
+				ContestID: fakedContestID,
+			}, nil)
+
+		mockedRepo.
+			On("GetTickByContenderAndProblem", mock.Anything, nil, fakedContenderID, fakedProblemID).
+			Return(domain.Tick{Revision: 1}, nil)
+
+		ucase := usecases.TickUseCase{
+			Repo:       mockedRepo,
+			Authorizer: mockedAuthorizer,
+		}
+
+		tick, err := ucase.PutTick(context.Background(), fakedContenderID, domain.Tick{
+			Revision:  1002,
+			ProblemID: fakedProblemID,
+		})
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.Empty(t, tick)
+
+		mockedRepo.AssertExpectations(t)
+		mockedEventBroker.AssertExpectations(t)
+		mockedAuthorizer.AssertExpectations(t)
+	})
+
 	t.Run("UpdatesExistingTick", func(t *testing.T) {
 		synctest.Test(t, func(t *testing.T) {
 			now := time.Now()
