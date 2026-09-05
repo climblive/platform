@@ -2,7 +2,6 @@ package rest
 
 import (
 	"context"
-	jsonv1 "encoding/json"
 	"fmt"
 	"net/http"
 	"slices"
@@ -125,7 +124,7 @@ func (hdlr *contestHandler) PatchContest(w http.ResponseWriter, r *http.Request)
 	}
 
 	var patch domain.ContestPatch
-	if !readJSON(w, r, &patch, jsonv1.FormatDurationAsNano(true)) {
+	if !readJSON(w, r, &patch) {
 		return
 	}
 
@@ -146,7 +145,7 @@ func (hdlr *contestHandler) CreateContest(w http.ResponseWriter, r *http.Request
 	}
 
 	var tmpl domain.ContestTemplate
-	if !readJSON(w, r, &tmpl, jsonv1.FormatDurationAsNano(true)) {
+	if !readJSON(w, r, &tmpl) {
 		return
 	}
 

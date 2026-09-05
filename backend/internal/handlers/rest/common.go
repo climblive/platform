@@ -47,7 +47,7 @@ func writeResponse(w http.ResponseWriter, status int, data any) {
 	}
 }
 
-func readJSON(w http.ResponseWriter, r *http.Request, out any, opts ...json.Options) bool {
+func readJSON(w http.ResponseWriter, r *http.Request, out any) bool {
 	mediaType, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
 	if err != nil || mediaType != "application/json" {
 		w.WriteHeader(http.StatusUnsupportedMediaType)
@@ -55,7 +55,7 @@ func readJSON(w http.ResponseWriter, r *http.Request, out any, opts ...json.Opti
 	}
 
 	r.Body = http.MaxBytesReader(w, r.Body, maxJSONBodySize)
-	err = json.UnmarshalRead(r.Body, out, append(opts, json.RejectUnknownMembers(true))...)
+	err = json.UnmarshalRead(r.Body, out, jsonv1.FormatDurationAsNano(true), json.RejectUnknownMembers(true))
 	if err == nil {
 		return true
 	}
