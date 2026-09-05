@@ -40,7 +40,7 @@ export const putTickMutation = (contenderId: number) => {
 
   return createMutation(() => ({
     mutationFn: async (tick: Omit<Tick, "id" | "timestamp">) => {
-      // abortController?.abort();
+      abortController?.abort();
 
       const currentController = new AbortController();
       abortController = currentController;
