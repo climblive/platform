@@ -58,7 +58,7 @@
   <RuleOptionCard
     title="Attempts"
     description="Competitors are ranked based on the number of attempts needed to complete problems."
-    tag="New"
+    tag="Early access"
   >
     {#snippet header()}
       <wa-radio
