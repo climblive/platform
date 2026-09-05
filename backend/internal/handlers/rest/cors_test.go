@@ -10,14 +10,31 @@ import (
 )
 
 func TestCORS(t *testing.T) {
-	r := httptest.NewRequest("GET", "http://localhost", nil)
-	w := httptest.NewRecorder()
-
-	dummyHandler := func(w http.ResponseWriter, r *http.Request) {
+	tests := map[string]struct {
+		origin        string
+		allowedOrigin string
+	}{
+		"AllowedOrigin": {
+			origin:        "https://admin.climblive.com",
+			allowedOrigin: "https://admin.climblive.com",
+		},
+		"DisallowedOrigin": {
+			origin: "https://example.com",
+		},
+		"MissingOrigin": {},
 	}
 
-	handler := rest.CORS(http.HandlerFunc(dummyHandler))
-	handler.ServeHTTP(w, r)
+	handler := rest.CORSWithOrigins([]string{"https://admin.climblive.com"})(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}))
 
-	assert.Equal(t, "*", w.Header().Get("Access-Control-Allow-Origin"))
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			r := httptest.NewRequest(http.MethodGet, "http://localhost", nil)
+			r.Header.Set("Origin", tt.origin)
+			w := httptest.NewRecorder()
+
+			handler.ServeHTTP(w, r)
+
+			assert.Equal(t, tt.allowedOrigin, w.Header().Get("Access-Control-Allow-Origin"))
+		})
+	}
 }

@@ -71,13 +71,6 @@ func (g *uuidGenerator) Generate() uuid.UUID {
 	return uuid.New()
 }
 
-func HandleCORSPreFlight(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, PATCH")
-	w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type")
-	w.WriteHeader(http.StatusOK)
-}
-
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -341,10 +334,11 @@ func setupMux(
 	}
 
 	mux := rest.NewMux()
-	mux.RegisterMiddleware(rest.CORS)
+	corsOrigins := strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ",")
+	mux.RegisterMiddleware(rest.CORSWithOrigins(corsOrigins))
 	mux.RegisterMiddleware(authorizer.Middleware)
 
-	mux.HandleFunc("OPTIONS /", HandleCORSPreFlight)
+	mux.HandleFunc("OPTIONS /", rest.CORSPreFlight(corsOrigins))
 
 	rest.InstallContenderHandler(mux, &contenderUseCase)
 	rest.InstallContestHandler(mux, &contestUseCase, &compClassUseCase, &tickUseCase, &problemUseCase)
