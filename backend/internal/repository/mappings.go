@@ -113,7 +113,6 @@ func problemToDomain(record database.Problem) domain.Problem {
 
 func tickToDomain(record database.Tick) domain.Tick {
 	return domain.Tick{
-		ID: domain.TickID(record.ID),
 		Ownership: domain.OwnershipData{
 			OrganizerID: domain.OrganizerID(record.OrganizerID),
 			ContenderID: nillableIntToResourceID[domain.ContenderID](&record.ContenderID),

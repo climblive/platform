@@ -32,7 +32,6 @@
     type PointValue,
     type Problem,
     type Tick,
-    type TickID,
   } from "@climblive/lib/models";
   import {
     getCompClassesQuery,
@@ -187,11 +186,11 @@
       : "Sort by points ascending",
   );
 
-  const countedTickIds = $derived.by<Set<TickID>>(() => {
+  const countedProblemIds = $derived.by<Set<number>>(() => {
     const limit = contest?.qualifyingProblems;
 
     if (!limit || !ticks || !problems) {
-      return new Set<TickID>();
+      return new Set<number>();
     }
 
     const ticksWithScore = ticks.map((tick) => {
@@ -209,8 +208,8 @@
       return a.tick.timestamp.getTime() - b.tick.timestamp.getTime();
     });
 
-    return new Set<TickID>(
-      ticksWithScore.slice(0, limit).map(({ tick }) => tick.id),
+    return new Set<number>(
+      ticksWithScore.slice(0, limit).map(({ tick }) => tick.problemId),
     );
   });
 
@@ -286,7 +285,6 @@
       }
 
       const newTick: Tick = {
-        id: event.tickId,
         timestamp: event.timestamp,
         problemId: event.problemId,
         zone1: event.zone1,
@@ -307,7 +305,7 @@
         return;
       }
 
-      removeTickFromQueryCache(queryClient, event.tickId);
+      removeTickFromQueryCache(queryClient, event.contenderId, event.problemId);
     });
 
     eventSource.addEventListener("POINT_VALUE_UPDATED", (e) => {
@@ -464,7 +462,7 @@
                     {tick}
                     disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
                     counted={contest.qualifyingProblems === 0 ||
-                      (!!tick && countedTickIds.has(tick.id))}
+                      (!!tick && countedProblemIds.has(tick.problemId))}
                   />
                 {/each}
               </div>

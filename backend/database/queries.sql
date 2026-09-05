@@ -188,11 +188,6 @@ ON DUPLICATE KEY UPDATE
     points_top = VALUES(points_top),
     flash_bonus = VALUES(flash_bonus);
 
--- name: GetTick :one
-SELECT sqlc.embed(tick)
-FROM tick
-WHERE id = ?;
-
 -- name: GetTickByContenderAndProblem :one
 SELECT sqlc.embed(tick)
 FROM tick
@@ -216,13 +211,13 @@ WHERE problem_id = ?;
 -- name: DeleteTick :exec
 DELETE
 FROM tick
-WHERE id = ?;
+WHERE contender_id = ? AND problem_id = ?;
 
--- name: UpsertTick :execlastid
+-- name: UpsertTick :exec
 INSERT INTO
-    tick (id, organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
+    tick (organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
 VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     contest_id = VALUES(contest_id),
