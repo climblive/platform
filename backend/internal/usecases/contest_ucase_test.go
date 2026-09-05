@@ -854,7 +854,6 @@ func TestTransferContest(t *testing.T) {
 	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 	fakedRaffleID := testutils.RandomResourceID[domain.RaffleID]()
 	fakedRaffleWinnerID := testutils.RandomResourceID[domain.RaffleWinnerID]()
-	fakedTickID := testutils.RandomResourceID[domain.TickID]()
 	fakedSeriesID := testutils.RandomResourceID[domain.SeriesID]()
 
 	now := time.Now()
@@ -949,7 +948,6 @@ func TestTransferContest(t *testing.T) {
 	}
 
 	fakedTick := domain.Tick{
-		ID:            fakedTickID,
 		Ownership:     domain.OwnershipData{OrganizerID: fakedOldOrganizerID, ContenderID: &fakedContenderID},
 		Timestamp:     now.Add(time.Duration(rand.Int())),
 		ContestID:     fakedContestID,
@@ -1008,7 +1006,7 @@ func TestTransferContest(t *testing.T) {
 
 		mockedRepo.On("Begin").Return(mockedTx, nil)
 
-		mockedRepo.On("DeleteTick", mock.Anything, mockedTx, fakedTickID).Return(nil)
+		mockedRepo.On("DeleteTick", mock.Anything, mockedTx, fakedContenderID, fakedProblemID).Return(nil)
 		mockedRepo.On("DeleteRaffleWinner", mock.Anything, mockedTx, fakedRaffleWinnerID).Return(nil)
 		mockedRepo.On("DeleteRaffle", mock.Anything, mockedTx, fakedRaffleID).Return(nil)
 		mockedRepo.On("DeleteContender", mock.Anything, mockedTx, fakedContenderID).Return(nil)
@@ -1107,7 +1105,6 @@ func TestTransferContest(t *testing.T) {
 
 		mockedRepo.
 			On("StoreTick", mock.Anything, mockedTx, domain.Tick{
-				ID:            fakedTickID,
 				Ownership:     domain.OwnershipData{OrganizerID: fakedNewOrganizerID, ContenderID: &fakedContenderID},
 				Timestamp:     fakedTick.Timestamp,
 				ContestID:     fakedContestID,

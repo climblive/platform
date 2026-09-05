@@ -13,7 +13,6 @@ export type RaffleID = ResourceID;
 export type RaffleWinnerID = ResourceID;
 export type SeriesID = ResourceID;
 export type UserID = ResourceID;
-export type TickID = ResourceID;
 export type OrganizerInviteID = string;
 export type ResourceIDType =
   | CompClassID
@@ -24,8 +23,7 @@ export type ResourceIDType =
   | RaffleID
   | RaffleWinnerID
   | SeriesID
-  | UserID
-  | TickID;
+  | UserID;
 export type ScoreEngineInstanceID = string;
 
 //////////
@@ -220,7 +218,6 @@ export interface ScoreboardEntry {
   score?: Score;
 }
 export interface Tick {
-  id: TickID;
   timestamp: Date;
   problemId: ProblemID;
   zone1: boolean;
@@ -266,7 +263,6 @@ export interface ContenderRequalifiedEvent {
   contenderId: ContenderID;
 }
 export interface AscentRegisteredEvent {
-  tickId: TickID;
   timestamp: Date;
   contenderId: ContenderID;
   problemId: ProblemID;
@@ -278,7 +274,6 @@ export interface AscentRegisteredEvent {
   attemptsTop: number /* int */;
 }
 export interface AscentDeregisteredEvent {
-  tickId: TickID;
   contenderId: ContenderID;
   problemId: ProblemID;
 }

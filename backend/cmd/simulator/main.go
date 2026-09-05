@@ -261,7 +261,7 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 
 		tick, ok := r.ticks[problem.ID]
 		if ok {
-			r.DeleteTick(tick.ID)
+			r.DeleteTick(r.contender.ID, tick.ProblemID)
 			delete(r.ticks, problem.ID)
 		} else {
 			tick := buildTick(problem)
@@ -406,8 +406,8 @@ func (r *ContenderRunner) GetTicks(contenderID domain.ContenderID) []domain.Tick
 	return ticks
 }
 
-func (r *ContenderRunner) DeleteTick(tickID domain.TickID) {
-	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("%s/ticks/%d", r.apiURL, tickID), nil)
+func (r *ContenderRunner) DeleteTick(contenderID domain.ContenderID, problemID domain.ProblemID) {
+	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("%s/contenders/%d/ticks/%d", r.apiURL, contenderID, problemID), nil)
 	if err != nil {
 		panic(err)
 	}

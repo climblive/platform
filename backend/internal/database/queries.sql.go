@@ -114,11 +114,16 @@ func (q *Queries) DeleteRaffleWinner(ctx context.Context, id int32) error {
 const deleteTick = `-- name: DeleteTick :exec
 DELETE
 FROM tick
-WHERE id = ?
+WHERE contender_id = ? AND problem_id = ?
 `
 
-func (q *Queries) DeleteTick(ctx context.Context, id int32) error {
-	_, err := q.db.ExecContext(ctx, deleteTick, id)
+type DeleteTickParams struct {
+	ContenderID int32
+	ProblemID   int32
+}
+
+func (q *Queries) DeleteTick(ctx context.Context, arg DeleteTickParams) error {
+	_, err := q.db.ExecContext(ctx, deleteTick, arg.ContenderID, arg.ProblemID)
 	return err
 }
 
@@ -1005,36 +1010,6 @@ func (q *Queries) GetScrubEligibleContenders(ctx context.Context, scrubBefore sq
 	return items, nil
 }
 
-const getTick = `-- name: GetTick :one
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
-FROM tick
-WHERE id = ?
-`
-
-type GetTickRow struct {
-	Tick Tick
-}
-
-func (q *Queries) GetTick(ctx context.Context, id int32) (GetTickRow, error) {
-	row := q.db.QueryRowContext(ctx, getTick, id)
-	var i GetTickRow
-	err := row.Scan(
-		&i.Tick.ID,
-		&i.Tick.OrganizerID,
-		&i.Tick.ContestID,
-		&i.Tick.ContenderID,
-		&i.Tick.ProblemID,
-		&i.Tick.Timestamp,
-		&i.Tick.Zone1,
-		&i.Tick.AttemptsZone1,
-		&i.Tick.Zone2,
-		&i.Tick.AttemptsZone2,
-		&i.Tick.Top,
-		&i.Tick.AttemptsTop,
-	)
-	return i, err
-}
-
 const getTickByContenderAndProblem = `-- name: GetTickByContenderAndProblem :one
 SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick
@@ -1636,11 +1611,11 @@ func (q *Queries) UpsertScore(ctx context.Context, arg UpsertScoreParams) error 
 	return err
 }
 
-const upsertTick = `-- name: UpsertTick :execlastid
+const upsertTick = `-- name: UpsertTick :exec
 INSERT INTO
-    tick (id, organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
+    tick (organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
 VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     contest_id = VALUES(contest_id),
@@ -1656,7 +1631,6 @@ ON DUPLICATE KEY UPDATE
 `
 
 type UpsertTickParams struct {
-	ID            int32
 	OrganizerID   int32
 	ContestID     int32
 	ContenderID   int32
@@ -1670,9 +1644,8 @@ type UpsertTickParams struct {
 	AttemptsZone2 int32
 }
 
-func (q *Queries) UpsertTick(ctx context.Context, arg UpsertTickParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, upsertTick,
-		arg.ID,
+func (q *Queries) UpsertTick(ctx context.Context, arg UpsertTickParams) error {
+	_, err := q.db.ExecContext(ctx, upsertTick,
 		arg.OrganizerID,
 		arg.ContestID,
 		arg.ContenderID,
@@ -1685,10 +1658,7 @@ func (q *Queries) UpsertTick(ctx context.Context, arg UpsertTickParams) (int64, 
 		arg.Zone2,
 		arg.AttemptsZone2,
 	)
-	if err != nil {
-		return 0, err
-	}
-	return result.LastInsertId()
+	return err
 }
 
 const upsertUser = `-- name: UpsertUser :execlastid

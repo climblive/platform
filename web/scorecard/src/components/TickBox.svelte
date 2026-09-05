@@ -23,7 +23,7 @@
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
   const putTick = $derived(putTickMutation($session.contenderId));
-  const deleteTick = $derived(deleteTickMutation());
+  const deleteTick = $derived(deleteTickMutation($session.contenderId));
 
   let open = $state(false);
 
@@ -51,7 +51,7 @@
 
     open = false;
 
-    deleteTick.mutate(tick.id, {
+    deleteTick.mutate(tick.problemId, {
       onError: (error) => {
         if (error instanceof AxiosError && error.status === 404) {
           toastUnexpectedError("Ascent is already removed.");
@@ -72,7 +72,7 @@
     navigator.vibrate?.(50);
     open = false;
 
-    const nextTick: Omit<Tick, "id" | "timestamp"> = {
+    const nextTick: Omit<Tick, "timestamp"> = {
       problemId: problem.id,
       top: false,
       zone2: false,
@@ -119,7 +119,7 @@
     data-variant={variant}
     disabled={disabled || loading}
     onclick={() => (open = true)}
-    aria-label={tick?.id ? "Edit" : "Tick"}
+    aria-label={tick ? "Edit" : "Tick"}
   >
     {#if loading}
       <wa-spinner></wa-spinner>
