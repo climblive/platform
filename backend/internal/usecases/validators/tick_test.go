@@ -8,7 +8,6 @@ import (
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestTickValidator(t *testing.T) {
@@ -138,8 +137,6 @@ func TestTickValidator(t *testing.T) {
 
 		for name, mutate := range tests {
 			t.Run(name, func(t *testing.T) {
-				require.NotNil(t, mutate)
-
 				tick := validTick()
 				mutate(&tick)
 
