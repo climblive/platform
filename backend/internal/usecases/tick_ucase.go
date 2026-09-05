@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"math/rand"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -192,6 +193,8 @@ func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.Contender
 	if err := (validators.TickValidator{}).Validate(existingTick); err != nil {
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
+
+	time.Sleep(5*time.Second + time.Duration(rand.Intn(5*int(time.Second))))
 
 	existingTick, err = uc.Repo.StoreTick(ctx, nil, existingTick)
 	if err != nil {
