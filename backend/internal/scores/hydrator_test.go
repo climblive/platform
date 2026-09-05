@@ -35,7 +35,9 @@ func TestHydrate(t *testing.T) {
 		On("GetProblemsByContest", mock.Anything, nil, fakedContestID).
 		Return([]domain.Problem{
 			{
-				ID: fakedProblemID,
+				ID:           fakedProblemID,
+				Zone1Enabled: true,
+				Zone2Enabled: true,
 				ProblemValue: domain.ProblemValue{
 					PointsTop:   100,
 					PointsZone1: 50,
@@ -84,7 +86,9 @@ func TestHydrate(t *testing.T) {
 	}).Return()
 
 	mockedStore.On("SaveProblem", scores.Problem{
-		ID: fakedProblemID,
+		ID:           fakedProblemID,
+		Zone1Enabled: true,
+		Zone2Enabled: true,
 		ProblemValue: domain.ProblemValue{
 			PointsTop:   100,
 			PointsZone1: 50,

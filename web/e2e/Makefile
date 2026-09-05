@@ -29,7 +29,7 @@ images: certs
 		$(MAKE) web; \
 		cd ../../backend && CGO_ENABLED=0 go build -o ./climblive ./cmd/api; \
 	fi
-	docker build ../../backend -t climblive-api:latest
+	docker build --no-cache ../../backend -t climblive-api:latest
 
 test: images
 	PW_TEST_HTML_REPORT_OPEN='never' pnpm exec playwright test --headed --project="Mobile Chrome"

@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { ScorecardSession } from "@/types";
-  import WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import { HoldColorIndicator } from "@climblive/lib/components";
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
   import { deleteTickMutation, putTickMutation } from "@climblive/lib/queries";
@@ -8,21 +7,29 @@
   import { AxiosError } from "axios";
   import { getContext } from "svelte";
   import type { Readable } from "svelte/store";
-  import TickButton from "./TickButton.svelte";
+  import SimpleTickEditor from "./tick/SimpleTickEditor.svelte";
+  import TickEditor from "./tick/TickEditor.svelte";
 
   interface Props {
     problem: Problem;
     tick: Tick | undefined;
     disabled: boolean | undefined;
     pointValue?: PointValue;
+    showPoints: boolean;
+    enableAttempts: boolean;
   }
 
-  let { problem, tick, disabled = false, pointValue }: Props = $props();
-
-  let dialog: WaDialog | undefined = $state();
+  const {
+    problem,
+    tick,
+    disabled = false,
+    pointValue,
+    showPoints,
+    enableAttempts,
+  }: Props = $props();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
-  const putTick = $derived(putTickMutation($session.contenderId));
+  const putTick = $derived(putTickMutation($session.contenderId, problem.id));
   const deleteTick = $derived(deleteTickMutation());
 
   let open = $state(false);
@@ -35,15 +42,15 @@
         return "flash";
       case tick?.top:
         return "top";
-      case tick?.zone2:
+      case tick?.zone2 && problem.zone2Enabled:
         return "zone2";
-      case tick?.zone1:
+      case tick?.zone1 && problem.zone1Enabled:
         return "zone1";
     }
   });
 
   const handleDelete = (event: MouseEvent) => {
-    if (!tick) {
+    if (!tick?.id) {
       return;
     }
 
@@ -56,62 +63,11 @@
         if (error instanceof AxiosError && error.status === 404) {
           toastUnexpectedError("Ascent is already removed.");
         } else {
-          toastUnexpectedError("Failed to remove ascent.");
+          toastUnexpectedError("Failed to remove tick.");
         }
       },
     });
   };
-
-  const handleTick = (
-    event: MouseEvent,
-    feature: "zone1" | "zone2" | "top",
-    flash: boolean,
-  ) => {
-    event.stopPropagation();
-
-    navigator.vibrate?.(50);
-    open = false;
-
-    const nextTick: Omit<Tick, "id" | "timestamp"> = {
-      problemId: problem.id,
-      top: false,
-      zone2: false,
-      zone1: false,
-      attemptsTop: flash ? 1 : 999,
-      attemptsZone2: flash ? 1 : 999,
-      attemptsZone1: flash ? 1 : 999,
-    };
-
-    switch (feature) {
-      case "top":
-        nextTick.top = true;
-        nextTick.zone2 = true;
-        nextTick.zone1 = true;
-        break;
-      case "zone2":
-        nextTick.zone2 = true;
-        nextTick.zone1 = true;
-        break;
-      case "zone1":
-        nextTick.zone1 = true;
-    }
-
-    putTick.mutate(nextTick, {
-      onError: (error) => {
-        if (error instanceof AxiosError && error.status === 409) {
-          toastUnexpectedError("Ascent is already registered.");
-        } else {
-          toastUnexpectedError("Failed to register ascent.");
-        }
-      },
-    });
-  };
-
-  $effect(() => {
-    if (tick !== undefined) {
-      open = false;
-    }
-  });
 </script>
 
 <div class="container">
@@ -123,22 +79,26 @@
   >
     {#if loading}
       <wa-spinner></wa-spinner>
-    {:else if variant === "flash"}
-      <pre>F</pre>
-    {:else if variant === "top"}
-      <pre>T</pre>
-    {:else if variant === "zone2"}
-      <pre>Z2</pre>
-    {:else if variant === "zone1"}
-      <pre>Z1</pre>
+    {:else if tick?.top && tick.attemptsTop === 1}
+      <wa-icon name="bolt"></wa-icon>
+    {:else if tick?.top}
+      T
+    {:else if tick?.zone2 && problem.zone2Enabled}
+      Z2
+    {:else if tick?.zone1 && problem.zone1Enabled}
+      Z1
+    {:else if tick !== undefined && enableAttempts && tick.attemptsTop}
+      {#if tick.attemptsTop > 99}
+        <span class="small">99+</span>
+      {:else}
+        {tick.attemptsTop}
+      {/if}
     {/if}
   </button>
 
   <wa-dialog
     label="Problem number {problem.number}"
-    bind:this={dialog}
     {open}
-    light-dismiss
     onwa-hide={() => (open = false)}
   >
     <div class="label" slot="label">
@@ -150,56 +110,33 @@
       /> Problem #{problem.number}
     </div>
 
-    <div class="horizontal">
-      <TickButton
-        iconName="check"
-        label="Top"
-        onClick={(e: MouseEvent) => handleTick(e, "top", false)}
-        points={pointValue?.top}
-        active={variant === "top"}
-      />
-
-      <TickButton
-        iconName="bolt"
-        label="Flash"
-        onClick={(e: MouseEvent) => handleTick(e, "top", true)}
-        points={pointValue?.top}
-        bonusPoints={pointValue?.flashBonus}
-        active={variant === "flash"}
-      />
-    </div>
-
-    {#if problem.zone2Enabled}
-      <TickButton
-        iconName="check"
-        label="Zone 2"
-        onClick={(e: MouseEvent) => handleTick(e, "zone2", false)}
-        points={pointValue?.zone2}
-        active={variant === "zone2"}
-      />
+    {#if enableAttempts}
+      <TickEditor {problem} {tick} {pointValue} {showPoints} {putTick} />
+    {:else}
+      <SimpleTickEditor {problem} {tick} {pointValue} {putTick} bind:open />
     {/if}
 
-    {#if problem.zone1Enabled}
-      <TickButton
-        iconName="check"
-        label="Zone 1"
-        onClick={(e: MouseEvent) => handleTick(e, "zone1", false)}
-        points={pointValue?.zone1}
-        active={variant === "zone1"}
-      />
-    {/if}
+    <div class="footer">
+      <div class="status">
+        {#if putTick.isPending}
+          <wa-spinner></wa-spinner>
+        {:else if putTick.isSuccess}
+          <div class="success">
+            <wa-icon name="check"></wa-icon> Saved
+          </div>
+        {/if}
+      </div>
 
-    {#if open && variant !== undefined}
       <wa-button
         size="s"
         appearance="plain"
         onclick={(e: MouseEvent) => handleDelete(e)}
         variant="danger"
+        disabled={open && tick?.id === undefined}
       >
-        <wa-icon slot="start" name="rotate-left"></wa-icon>
-        Unsend
+        <wa-icon name="trash" label="Remove"></wa-icon>
       </wa-button>
-    {/if}
+    </div>
   </wa-dialog>
 </div>
 
@@ -213,19 +150,20 @@
   }
 
   button {
+    flex-shrink: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: calc(100% - 2 * var(--wa-space-xs));
-    aspect-ratio: 1 / 1;
+    height: 2rem;
+    width: 2rem;
     border: var(--wa-border-style) var(--wa-border-width-s)
       var(--wa-color-neutral-border-loud);
-    border-radius: var(--wa-border-radius-l);
+    border-radius: var(--wa-border-radius-m);
     background: none;
     cursor: pointer;
-    width: max-content;
     font-size: var(--wa-font-size-s);
     font-weight: var(--wa-font-weight-bold);
+    color: var(--wa-color-text-quiet);
 
     &[data-variant] {
       background-color: var(--wa-color-gray-95);
@@ -262,10 +200,6 @@
       border-color: var(--wa-color-yellow-50);
       color: var(--wa-color-yellow-50);
     }
-
-    & pre {
-      margin: 0;
-    }
   }
 
   .label {
@@ -283,12 +217,34 @@
     &::part(body) {
       display: flex;
       flex-direction: column;
-      gap: var(--wa-space-l);
+      gap: var(--wa-space-m);
     }
+  }
 
-    & .horizontal {
+  .small {
+    font-size: var(--wa-font-size-xs);
+  }
+
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    .success {
       display: flex;
-      gap: var(--wa-space-s);
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--wa-space-2xs);
+      color: var(--wa-color-success-fill-loud);
+      animation: hide 0s ease 2s;
+      animation-fill-mode: forwards;
+    }
+  }
+
+  @keyframes hide {
+    to {
+      visibility: hidden;
     }
   }
 </style>

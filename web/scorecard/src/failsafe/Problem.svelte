@@ -11,7 +11,8 @@
 
   const { problem, tick, contenderId }: Props = $props();
 
-  const putTick = $derived(putTickMutation(contenderId));
+  const putTick = $derived(putTickMutation(contenderId, problem.id));
+  let latestLocalRevision = $state(0);
   const deleteTick = $derived(deleteTickMutation());
 
   const tickType = (tick?: Tick) => {
@@ -28,8 +29,11 @@
 
   const addTick = (type: "zone1" | "zone2" | "top" | "flash") => () => {
     const attempts = type === "flash" ? 1 : 999;
+    latestLocalRevision =
+      Math.max(latestLocalRevision, tick?.revision ?? 0) + 1;
 
-    const tick: Omit<Tick, "id" | "timestamp"> = {
+    const nextTick: Omit<Tick, "id" | "timestamp"> = {
+      revision: latestLocalRevision,
       problemId: problem.id,
       top: false,
       zone2: false,
@@ -42,20 +46,20 @@
     switch (type) {
       case "flash":
       case "top":
-        tick.top = true;
-        tick.zone2 = true;
-        tick.zone1 = true;
+        nextTick.top = true;
+        nextTick.zone2 = true;
+        nextTick.zone1 = true;
         break;
       case "zone2":
-        tick.zone2 = true;
-        tick.zone1 = true;
+        nextTick.zone2 = true;
+        nextTick.zone1 = true;
         break;
       case "zone1":
-        tick.zone1 = true;
+        nextTick.zone1 = true;
         break;
     }
 
-    putTick.mutate(tick);
+    putTick.mutate(nextTick);
   };
 
   const removeTick = () => {

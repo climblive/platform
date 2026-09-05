@@ -51,6 +51,9 @@ jobs:
       - run: pnpm --filter=* check
         working-directory: web
 
+      - run: pnpm --filter=* test
+        working-directory: web
+
   build-web:
     name: Build web
     runs-on: ubuntu-24.04

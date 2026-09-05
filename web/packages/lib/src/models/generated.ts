@@ -222,6 +222,7 @@ export interface ScoreboardEntry {
 export interface Tick {
   id: TickID;
   timestamp: Date;
+  revision: number /* int */;
   problemId: ProblemID;
   zone1: boolean;
   attemptsZone1: number /* int */;
@@ -270,6 +271,7 @@ export interface AscentRegisteredEvent {
   timestamp: Date;
   contenderId: ContenderID;
   problemId: ProblemID;
+  revision: number /* int */;
   zone1: boolean;
   attemptsZone1: number /* int */;
   zone2: boolean;

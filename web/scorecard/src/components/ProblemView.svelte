@@ -1,7 +1,7 @@
 <script lang="ts">
   import { HoldColorIndicator, Score } from "@climblive/lib/components";
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
-  import TickBox from "./TickBox.svelte";
+  import TickDialog from "./TickDialog.svelte";
 
   type ScorecardProblem = Problem & {
     pointValue?: PointValue;
@@ -12,9 +12,18 @@
     tick?: Tick | undefined;
     disabled: boolean;
     counted: boolean;
+    showPoints: boolean;
+    enableAttempts: boolean;
   }
 
-  const { problem, tick, disabled, counted }: Props = $props();
+  const {
+    problem,
+    tick,
+    disabled,
+    counted,
+    showPoints,
+    enableAttempts,
+  }: Props = $props();
 
   const valueRange = $derived.by<{ min: number; max: number } | undefined>(
     () => {
@@ -44,7 +53,7 @@
   />
   <span class="number">#{problem.number}</span>
   <span class="points">
-    {#if valueRange}
+    {#if showPoints && valueRange}
       <span class="top">
         {#if valueRange.min === valueRange.max}
           {valueRange.max}p
@@ -55,15 +64,28 @@
     {/if}
   </span>
   <div class="score" class:uncounted={!counted}>
-    {#if tick && problem.pointValue !== undefined}
+    {#if showPoints && tick && problem.pointValue?.current}
       <Score
         value={problem.pointValue.current + "p"}
         prefix={counted ? "+" : undefined}
       />
+    {:else if tick?.top}
+      +1t
+    {:else if tick?.zone2 && problem.zone2Enabled}
+      +1z₂
+    {:else if tick?.zone1 && problem.zone1Enabled}
+      +1z₁
     {/if}
   </div>
 
-  <TickBox {problem} {tick} {disabled} pointValue={problem.pointValue} />
+  <TickDialog
+    {problem}
+    {tick}
+    {disabled}
+    pointValue={problem.pointValue}
+    {enableAttempts}
+    {showPoints}
+  />
 </section>
 
 <style>

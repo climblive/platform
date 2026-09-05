@@ -9,6 +9,9 @@ import { ApiClient } from "../Api";
 import type { Tick } from "../models";
 import { HOUR } from "./constants";
 
+export const putTickMutationKey = (contenderId: number, problemId: number) =>
+  ["putTick", { contenderId, problemId }] as const;
+
 export const getTicksByContenderQuery = (
   contenderId: number,
   options?: Partial<Parameters<typeof createQuery<Tick[]>>[0]>,
@@ -34,12 +37,30 @@ export const getTicksByContestQuery = (contestId: number) =>
     refetchOnWindowFocus: true,
   }));
 
-export const putTickMutation = (contenderId: number) => {
+export const putTickMutation = (contenderId: number, problemId: number) => {
   const client = useQueryClient();
+  let abortController: AbortController | undefined;
 
   return createMutation(() => ({
-    mutationFn: (tick: Omit<Tick, "id" | "timestamp">) =>
-      ApiClient.getInstance().putTick(contenderId, tick),
+    mutationKey: putTickMutationKey(contenderId, problemId),
+    mutationFn: async (tick: Omit<Tick, "id" | "timestamp">) => {
+      abortController?.abort();
+
+      const currentController = new AbortController();
+      abortController = currentController;
+
+      try {
+        return await ApiClient.getInstance().putTick(
+          contenderId,
+          tick,
+          currentController.signal,
+        );
+      } finally {
+        if (abortController === currentController) {
+          abortController = undefined;
+        }
+      }
+    },
     onSuccess: (updatedTick) => {
       updateTickInQueryCache(client, contenderId, updatedTick);
     },
@@ -69,9 +90,13 @@ export const updateTickInQueryCache = (
   queryClient.setQueryData<Tick[]>(queryKey, (oldTicks) => {
     const predicate = ({ id }: Tick) => id === updatedTick.id;
 
-    const found = (oldTicks ?? []).findIndex(predicate) !== -1;
+    const existingTick = (oldTicks ?? []).find(predicate);
 
-    if (found) {
+    if (existingTick && existingTick.revision > updatedTick.revision) {
+      return oldTicks;
+    }
+
+    if (existingTick) {
       return (oldTicks ?? []).map((oldTick) =>
         predicate(oldTick) ? updatedTick : oldTick,
       );

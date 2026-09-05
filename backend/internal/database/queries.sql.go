@@ -1006,7 +1006,7 @@ func (q *Queries) GetScrubEligibleContenders(ctx context.Context, scrubBefore sq
 }
 
 const getTick = `-- name: GetTick :one
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
+SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.revision, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick
 WHERE id = ?
 `
@@ -1025,6 +1025,7 @@ func (q *Queries) GetTick(ctx context.Context, id int32) (GetTickRow, error) {
 		&i.Tick.ContenderID,
 		&i.Tick.ProblemID,
 		&i.Tick.Timestamp,
+		&i.Tick.Revision,
 		&i.Tick.Zone1,
 		&i.Tick.AttemptsZone1,
 		&i.Tick.Zone2,
@@ -1036,7 +1037,7 @@ func (q *Queries) GetTick(ctx context.Context, id int32) (GetTickRow, error) {
 }
 
 const getTickByContenderAndProblem = `-- name: GetTickByContenderAndProblem :one
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
+SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.revision, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick
 WHERE contender_id = ? AND problem_id = ?
 `
@@ -1060,6 +1061,7 @@ func (q *Queries) GetTickByContenderAndProblem(ctx context.Context, arg GetTickB
 		&i.Tick.ContenderID,
 		&i.Tick.ProblemID,
 		&i.Tick.Timestamp,
+		&i.Tick.Revision,
 		&i.Tick.Zone1,
 		&i.Tick.AttemptsZone1,
 		&i.Tick.Zone2,
@@ -1071,7 +1073,7 @@ func (q *Queries) GetTickByContenderAndProblem(ctx context.Context, arg GetTickB
 }
 
 const getTicksByContender = `-- name: GetTicksByContender :many
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
+SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.revision, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick
 WHERE contender_id = ?
 `
@@ -1096,6 +1098,7 @@ func (q *Queries) GetTicksByContender(ctx context.Context, contenderID int32) ([
 			&i.Tick.ContenderID,
 			&i.Tick.ProblemID,
 			&i.Tick.Timestamp,
+			&i.Tick.Revision,
 			&i.Tick.Zone1,
 			&i.Tick.AttemptsZone1,
 			&i.Tick.Zone2,
@@ -1117,7 +1120,7 @@ func (q *Queries) GetTicksByContender(ctx context.Context, contenderID int32) ([
 }
 
 const getTicksByContest = `-- name: GetTicksByContest :many
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
+SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.revision, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick
 WHERE contest_id = ?
 `
@@ -1142,6 +1145,7 @@ func (q *Queries) GetTicksByContest(ctx context.Context, contestID int32) ([]Get
 			&i.Tick.ContenderID,
 			&i.Tick.ProblemID,
 			&i.Tick.Timestamp,
+			&i.Tick.Revision,
 			&i.Tick.Zone1,
 			&i.Tick.AttemptsZone1,
 			&i.Tick.Zone2,
@@ -1163,7 +1167,7 @@ func (q *Queries) GetTicksByContest(ctx context.Context, contestID int32) ([]Get
 }
 
 const getTicksByProblem = `-- name: GetTicksByProblem :many
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
+SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.revision, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick
 WHERE problem_id = ?
 `
@@ -1188,6 +1192,7 @@ func (q *Queries) GetTicksByProblem(ctx context.Context, problemID int32) ([]Get
 			&i.Tick.ContenderID,
 			&i.Tick.ProblemID,
 			&i.Tick.Timestamp,
+			&i.Tick.Revision,
 			&i.Tick.Zone1,
 			&i.Tick.AttemptsZone1,
 			&i.Tick.Zone2,
@@ -1636,23 +1641,25 @@ func (q *Queries) UpsertScore(ctx context.Context, arg UpsertScoreParams) error 
 	return err
 }
 
-const upsertTick = `-- name: UpsertTick :execlastid
+const upsertTick = `-- name: UpsertTick :execresult
 INSERT INTO
-    tick (id, organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
+    tick (id, organizer_id, contest_id, contender_id, problem_id, timestamp, revision, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
 VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
-    organizer_id = VALUES(organizer_id),
-    contest_id = VALUES(contest_id),
-    contender_id = VALUES(contender_id),
-    problem_id = VALUES(problem_id),
-    timestamp = VALUES(timestamp),
-    top = VALUES(top),
-    attempts_top = VALUES(attempts_top),
-    zone_1 = VALUES(zone_1),
-    attempts_zone_1 = VALUES(attempts_zone_1),
-    zone_2 = VALUES(zone_2),
-    attempts_zone_2 = VALUES(attempts_zone_2)
+    id = LAST_INSERT_ID(id),
+    organizer_id = IF(VALUES(revision) > revision, VALUES(organizer_id), organizer_id),
+    contest_id = IF(VALUES(revision) > revision, VALUES(contest_id), contest_id),
+    contender_id = IF(VALUES(revision) > revision, VALUES(contender_id), contender_id),
+    problem_id = IF(VALUES(revision) > revision, VALUES(problem_id), problem_id),
+    timestamp = IF(VALUES(revision) > revision, VALUES(timestamp), timestamp),
+    top = IF(VALUES(revision) > revision, VALUES(top), top),
+    attempts_top = IF(VALUES(revision) > revision, VALUES(attempts_top), attempts_top),
+    zone_1 = IF(VALUES(revision) > revision, VALUES(zone_1), zone_1),
+    attempts_zone_1 = IF(VALUES(revision) > revision, VALUES(attempts_zone_1), attempts_zone_1),
+    zone_2 = IF(VALUES(revision) > revision, VALUES(zone_2), zone_2),
+    attempts_zone_2 = IF(VALUES(revision) > revision, VALUES(attempts_zone_2), attempts_zone_2),
+    revision = GREATEST(revision, VALUES(revision))
 `
 
 type UpsertTickParams struct {
@@ -1662,6 +1669,7 @@ type UpsertTickParams struct {
 	ContenderID   int32
 	ProblemID     int32
 	Timestamp     time.Time
+	Revision      uint32
 	Top           bool
 	AttemptsTop   int32
 	Zone1         bool
@@ -1670,14 +1678,15 @@ type UpsertTickParams struct {
 	AttemptsZone2 int32
 }
 
-func (q *Queries) UpsertTick(ctx context.Context, arg UpsertTickParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, upsertTick,
+func (q *Queries) UpsertTick(ctx context.Context, arg UpsertTickParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, upsertTick,
 		arg.ID,
 		arg.OrganizerID,
 		arg.ContestID,
 		arg.ContenderID,
 		arg.ProblemID,
 		arg.Timestamp,
+		arg.Revision,
 		arg.Top,
 		arg.AttemptsTop,
 		arg.Zone1,
@@ -1685,10 +1694,6 @@ func (q *Queries) UpsertTick(ctx context.Context, arg UpsertTickParams) (int64, 
 		arg.Zone2,
 		arg.AttemptsZone2,
 	)
-	if err != nil {
-		return 0, err
-	}
-	return result.LastInsertId()
 }
 
 const upsertUser = `-- name: UpsertUser :execlastid

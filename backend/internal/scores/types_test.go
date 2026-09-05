@@ -9,32 +9,118 @@ import (
 )
 
 func TestCompareContender(t *testing.T) {
-	t.Run("ByScore", func(t *testing.T) {
-		c1 := scores.Contender{
-			Score: 200,
+	best := func(contenderID domain.ContenderID) scores.Contender {
+		return scores.Contender{
+			ID: contenderID,
+			Score: scores.Score{
+				Points:         1_000,
+				Tops:           1_000,
+				AttemptsTops:   1_000,
+				Zone1s:         1_000,
+				AttemptsZone1s: 1_000,
+				Zone2s:         1_000,
+				AttemptsZone2s: 1_100,
+			},
 		}
+	}
 
-		c2 := scores.Contender{
-			Score: 100,
+	worst := func(contenderID domain.ContenderID) scores.Contender {
+		return scores.Contender{
+			ID: contenderID,
+			Score: scores.Score{
+				Points:         0,
+				Tops:           0,
+				AttemptsTops:   1_000_000,
+				Zone1s:         0,
+				AttemptsZone1s: 1_000_000,
+				Zone2s:         0,
+				AttemptsZone2s: 1_100_000,
+			},
 		}
+	}
+
+	assertOrder := func(t *testing.T, c1, c2 scores.Contender) {
+		t.Helper()
 
 		assert.Less(t, c1.Compare(c2), 0)
 		assert.Greater(t, c2.Compare(c1), 0)
+	}
+
+	c1 := worst(1)
+	c2 := best(2)
+
+	t.Run("ByPoints", func(t *testing.T) {
+		c1.Points = 200
+		c2.Points = 199
+
+		assertOrder(t, c1, c2)
+	})
+
+	t.Run("ByTops", func(t *testing.T) {
+		c1.Points = 200
+		c2.Points = 200
+
+		c1.Tops = 10
+		c2.Tops = 9
+
+		assertOrder(t, c1, c2)
+	})
+
+	t.Run("ByAttemptsTops", func(t *testing.T) {
+		c1.Tops = 10
+		c2.Tops = 10
+
+		c1.AttemptsTops = 10
+		c2.AttemptsTops = 11
+
+		assertOrder(t, c1, c2)
+	})
+
+	t.Run("ByZone2s", func(t *testing.T) {
+		c1.AttemptsTops = 10
+		c2.AttemptsTops = 10
+
+		c1.Zone2s = 10
+		c2.Zone2s = 9
+
+		assertOrder(t, c1, c2)
+	})
+
+	t.Run("ByAttemptsZone2s", func(t *testing.T) {
+		c1.Zone2s = 10
+		c2.Zone2s = 10
+
+		c1.AttemptsZone2s = 10
+		c2.AttemptsZone2s = 11
+
+		assertOrder(t, c1, c2)
+	})
+
+	t.Run("ByZone1s", func(t *testing.T) {
+		c1.AttemptsZone2s = 10
+		c2.AttemptsZone2s = 10
+
+		c1.Zone1s = 10
+		c2.Zone1s = 9
+
+		assertOrder(t, c1, c2)
+	})
+
+	t.Run("ByAttemptsZone1s", func(t *testing.T) {
+		c1.Zone1s = 10
+		c2.Zone1s = 10
+
+		c1.AttemptsZone1s = 10
+		c2.AttemptsZone1s = 11
+
+		assertOrder(t, c1, c2)
 	})
 
 	t.Run("TieBreak", func(t *testing.T) {
-		c1 := scores.Contender{
-			ID:    1,
-			Score: 100,
-		}
+		c1 = best(1)
+		c2 = best(2)
 
-		c2 := scores.Contender{
-			ID:    2,
-			Score: 100,
-		}
-
-		assert.Less(t, c1.Compare(c2), 0)
-		assert.Greater(t, c2.Compare(c1), 0)
+		assertOrder(t, c1, c2)
 	})
 }
 

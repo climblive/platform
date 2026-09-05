@@ -1,21 +1,13 @@
 <script lang="ts">
   type Props = {
-    onClick: (e: MouseEvent) => void;
-    iconName: string;
+    onClick: () => void;
+    iconName?: string;
     label: string;
     points?: number;
     bonusPoints?: number;
-    active: boolean;
   };
 
-  const {
-    onClick,
-    iconName,
-    label,
-    points = 0,
-    bonusPoints,
-    active,
-  }: Props = $props();
+  const { onClick, iconName, label, points = 0, bonusPoints }: Props = $props();
 
   const pointsLabel = $derived.by(() => {
     if (bonusPoints) {
@@ -26,7 +18,7 @@
   });
 </script>
 
-<div data-active={active}>
+<div>
   <wa-button
     size="s"
     appearance="outlined"
@@ -34,7 +26,9 @@
     pill
     variant="neutral"
   >
-    <wa-icon slot="start" name={iconName}></wa-icon>
+    {#if iconName}
+      <wa-icon slot="start" name={iconName}></wa-icon>
+    {/if}
     {label}
   </wa-button>
   {#if pointsLabel !== undefined}
@@ -53,12 +47,6 @@
     flex-direction: column;
     align-items: start;
     gap: var(--wa-space-xs);
-  }
-
-  div[data-active="true"] {
-    & span {
-      color: var(--wa-color-success-fill-loud);
-    }
   }
 
   span {

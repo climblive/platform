@@ -116,6 +116,7 @@ type Tick struct {
 	ContenderID   int32
 	ProblemID     int32
 	Timestamp     time.Time
+	Revision      uint32
 	Zone1         bool
 	AttemptsZone1 int32
 	Zone2         bool

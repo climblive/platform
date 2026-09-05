@@ -218,23 +218,25 @@ DELETE
 FROM tick
 WHERE id = ?;
 
--- name: UpsertTick :execlastid
+-- name: UpsertTick :execresult
 INSERT INTO
-    tick (id, organizer_id, contest_id, contender_id, problem_id, timestamp, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
+    tick (id, organizer_id, contest_id, contender_id, problem_id, timestamp, revision, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
 VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
-    organizer_id = VALUES(organizer_id),
-    contest_id = VALUES(contest_id),
-    contender_id = VALUES(contender_id),
-    problem_id = VALUES(problem_id),
-    timestamp = VALUES(timestamp),
-    top = VALUES(top),
-    attempts_top = VALUES(attempts_top),
-    zone_1 = VALUES(zone_1),
-    attempts_zone_1 = VALUES(attempts_zone_1),
-    zone_2 = VALUES(zone_2),
-    attempts_zone_2 = VALUES(attempts_zone_2);
+    id = LAST_INSERT_ID(id),
+    organizer_id = IF(VALUES(revision) > revision, VALUES(organizer_id), organizer_id),
+    contest_id = IF(VALUES(revision) > revision, VALUES(contest_id), contest_id),
+    contender_id = IF(VALUES(revision) > revision, VALUES(contender_id), contender_id),
+    problem_id = IF(VALUES(revision) > revision, VALUES(problem_id), problem_id),
+    timestamp = IF(VALUES(revision) > revision, VALUES(timestamp), timestamp),
+    top = IF(VALUES(revision) > revision, VALUES(top), top),
+    attempts_top = IF(VALUES(revision) > revision, VALUES(attempts_top), attempts_top),
+    zone_1 = IF(VALUES(revision) > revision, VALUES(zone_1), zone_1),
+    attempts_zone_1 = IF(VALUES(revision) > revision, VALUES(attempts_zone_1), attempts_zone_1),
+    zone_2 = IF(VALUES(revision) > revision, VALUES(zone_2), zone_2),
+    attempts_zone_2 = IF(VALUES(revision) > revision, VALUES(attempts_zone_2), attempts_zone_2),
+    revision = GREATEST(revision, VALUES(revision));
 
 -- name: UpsertOrganizer :execlastid
 INSERT INTO

@@ -52,6 +52,8 @@ func handleError(w http.ResponseWriter, err error) {
 		fallthrough
 	case errors.Is(err, domain.ErrArchived):
 		w.WriteHeader(http.StatusNotFound)
+	case errors.Is(err, domain.ErrSuperseded):
+		w.WriteHeader(http.StatusConflict)
 	case errors.Is(err, domain.ErrDuplicate):
 		w.WriteHeader(http.StatusConflict)
 	case errors.Is(err, domain.ErrNotAuthenticated):
