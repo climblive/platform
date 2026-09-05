@@ -29,7 +29,7 @@
   }: Props = $props();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
-  const putTick = $derived(putTickMutation($session.contenderId));
+  const putTick = $derived(putTickMutation($session.contenderId, problem.id));
   const deleteTick = $derived(deleteTickMutation());
 
   let open = $state(false);

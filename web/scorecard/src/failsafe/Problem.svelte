@@ -11,7 +11,7 @@
 
   const { problem, tick, contenderId }: Props = $props();
 
-  const putTick = $derived(putTickMutation(contenderId));
+  const putTick = $derived(putTickMutation(contenderId, problem.id));
   let latestLocalRevision = $state(0);
   const deleteTick = $derived(deleteTickMutation());
 

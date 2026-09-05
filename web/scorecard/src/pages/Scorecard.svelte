@@ -41,6 +41,7 @@
     getPointValuesByContenderQuery,
     getProblemsQuery,
     getTicksByContenderQuery,
+    putTickMutationKey,
     refetchProblems,
     removeTickFromQueryCache,
     updateContenderPublicInfoInQueryCache,
@@ -282,6 +283,18 @@
       const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
 
       if (event.contenderId !== contender?.id) {
+        return;
+      }
+
+      if (
+        queryClient.isMutating({
+          mutationKey: putTickMutationKey(
+            $session.contenderId,
+            event.problemId,
+          ),
+          exact: true,
+        }) > 0
+      ) {
         return;
       }
 
