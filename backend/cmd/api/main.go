@@ -187,12 +187,28 @@ func main() {
 
 	wwwHost := os.Getenv("WWW_HOST")
 
-	httpServer := newHTTPServer(
-		net.JoinHostPort("0.0.0.0", strconv.Itoa(listenPort)),
-		securityHeaders(&httpRouter{appHandler: appMux, wwwHandler: wwwMux, wwwHost: wwwHost}),
-		tlsConfig,
-		ctx,
-	)
+	httpServer := &http.Server{
+		Addr:                         net.JoinHostPort("0.0.0.0", strconv.Itoa(listenPort)),
+		Handler:                      securityHeaders(&httpRouter{appHandler: appMux, wwwHandler: wwwMux, wwwHost: wwwHost}),
+		DisableGeneralOptionsHandler: false,
+		TLSConfig:                    tlsConfig,
+		ReadTimeout:                  httpReadTimeout,
+		ReadHeaderTimeout:            httpReadHeaderTimeout,
+		WriteTimeout:                 0,
+		IdleTimeout:                  httpIdleTimeout,
+		MaxHeaderBytes:               0,
+		MaxHeaderValueCount:          0,
+		TLSNextProto:                 nil,
+		ConnState:                    nil,
+		ErrorLog:                     nil,
+		BaseContext: func(_ net.Listener) context.Context {
+			return ctx
+		},
+		ConnContext:           nil,
+		HTTP2:                 nil,
+		Protocols:             nil,
+		DisableClientPriority: false,
+	}
 
 	context.AfterFunc(ctx, func() {
 		_ = httpServer.Shutdown(context.Background())
@@ -252,31 +268,6 @@ func getScoreEngineMaxLifetime() time.Duration {
 	}
 
 	return maxLifetime
-}
-
-func newHTTPServer(addr string, handler http.Handler, tlsConfig *tls.Config, baseContext context.Context) *http.Server {
-	return &http.Server{
-		Addr:                         addr,
-		Handler:                      handler,
-		DisableGeneralOptionsHandler: false,
-		TLSConfig:                    tlsConfig,
-		ReadTimeout:                  httpReadTimeout,
-		ReadHeaderTimeout:            httpReadHeaderTimeout,
-		WriteTimeout:                 0,
-		IdleTimeout:                  httpIdleTimeout,
-		MaxHeaderBytes:               0,
-		MaxHeaderValueCount:          0,
-		TLSNextProto:                 nil,
-		ConnState:                    nil,
-		ErrorLog:                     nil,
-		BaseContext: func(_ net.Listener) context.Context {
-			return baseContext
-		},
-		ConnContext:           nil,
-		HTTP2:                 nil,
-		Protocols:             nil,
-		DisableClientPriority: false,
-	}
 }
 
 func setupMux(
