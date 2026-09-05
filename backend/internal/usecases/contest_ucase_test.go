@@ -1112,6 +1112,7 @@ func TestTransferContest(t *testing.T) {
 				Timestamp:     fakedTick.Timestamp,
 				ContestID:     fakedContestID,
 				ProblemID:     fakedProblemID,
+				Revision:      1,
 				Zone1:         true,
 				AttemptsZone1: 2,
 				Zone2:         true,

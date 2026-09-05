@@ -586,6 +586,7 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 		}
 
 		for _, tick := range ticks {
+			tick.Revision++
 			_, err = uc.Repo.StoreTick(ctx, tx, tick)
 			if err != nil {
 				return err

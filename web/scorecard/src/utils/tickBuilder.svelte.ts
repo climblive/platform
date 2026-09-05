@@ -172,7 +172,7 @@ export class TickBuilder {
 
 export function buildTick(
   builder: Pick<TickBuilder, "problemId" | "attempts" | "reachedFeatures">,
-): Omit<Tick, "id" | "timestamp"> {
+): Omit<Tick, "id" | "timestamp" | "revision"> {
   const hasReached = (feature: Feature): boolean => {
     let featureReached = false;
 

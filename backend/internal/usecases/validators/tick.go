@@ -1,6 +1,8 @@
 package validators
 
 import (
+	"math"
+
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
 )
@@ -12,6 +14,10 @@ type TickValidator struct {
 
 func (v TickValidator) Validate(tick domain.Tick) error {
 	switch {
+	case tick.Revision < 1:
+		fallthrough
+	case tick.Revision > math.MaxUint32:
+		fallthrough
 	case tick.AttemptsTop < 0:
 		fallthrough
 	case tick.AttemptsTop > 999:

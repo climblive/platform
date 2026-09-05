@@ -5,7 +5,6 @@ import {
   useQueryClient,
   type QueryKey,
 } from "@tanstack/svelte-query";
-import { CanceledError } from "axios";
 import { ApiClient } from "../Api";
 import type { Tick } from "../models";
 import { HOUR } from "./constants";
@@ -47,17 +46,11 @@ export const putTickMutation = (contenderId: number) => {
       abortController = currentController;
 
       try {
-        const updatedTick = await ApiClient.getInstance().putTick(
+        return await ApiClient.getInstance().putTick(
           contenderId,
           tick,
           currentController.signal,
         );
-
-        if (abortController !== currentController) {
-          throw new CanceledError();
-        }
-
-        return updatedTick;
       } finally {
         if (abortController === currentController) {
           abortController = undefined;
@@ -93,9 +86,13 @@ export const updateTickInQueryCache = (
   queryClient.setQueryData<Tick[]>(queryKey, (oldTicks) => {
     const predicate = ({ id }: Tick) => id === updatedTick.id;
 
-    const found = (oldTicks ?? []).findIndex(predicate) !== -1;
+    const existingTick = (oldTicks ?? []).find(predicate);
 
-    if (found) {
+    if (existingTick && existingTick.revision >= updatedTick.revision) {
+      return oldTicks;
+    }
+
+    if (existingTick) {
       return (oldTicks ?? []).map((oldTick) =>
         predicate(oldTick) ? updatedTick : oldTick,
       );

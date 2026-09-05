@@ -21,6 +21,7 @@ func TestTickValidator(t *testing.T) {
 			},
 			ContestID:     domain.ContestID(1),
 			ProblemID:     domain.ProblemID(1),
+			Revision:      1,
 			Zone1:         true,
 			AttemptsZone1: 10,
 			Zone2:         true,
@@ -33,6 +34,15 @@ func TestTickValidator(t *testing.T) {
 	t.Run("ValidData", func(t *testing.T) {
 		err := validator.Validate(validTick())
 		assert.NoError(t, err)
+		t.Run("RevisionRequired", func(t *testing.T) {
+			tick := validTick()
+			tick.Revision = 0
+
+			err := validator.Validate(tick)
+
+			assert.ErrorIs(t, err, domain.ErrInvalidData)
+			assert.True(t, validator.IsValidationError(err))
+		})
 	})
 
 	t.Run("AttemptsZone1ExceedsAttemptsZone2", func(t *testing.T) {

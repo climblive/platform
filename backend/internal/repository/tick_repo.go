@@ -47,6 +47,7 @@ func (d *Database) StoreTick(ctx context.Context, tx domain.Transaction, tick do
 		ContenderID:   int32(*tick.Ownership.ContenderID),
 		ProblemID:     int32(tick.ProblemID),
 		Timestamp:     tick.Timestamp,
+		Revision:      uint32(tick.Revision),
 		Top:           tick.Top,
 		AttemptsTop:   int32(tick.AttemptsTop),
 		Zone1:         tick.Zone1,
@@ -55,14 +56,26 @@ func (d *Database) StoreTick(ctx context.Context, tx domain.Transaction, tick do
 		AttemptsZone2: int32(tick.AttemptsZone2),
 	}
 
-	insertID, err := d.WithTx(tx).UpsertTick(ctx, params)
+	result, err := d.WithTx(tx).UpsertTick(ctx, params)
 	if err != nil {
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
-	if insertID != 0 {
-		tick.ID = domain.TickID(insertID)
+	affectedRows, err := result.RowsAffected()
+	if err != nil {
+		return domain.Tick{}, errors.Wrap(err, 0)
 	}
+
+	if affectedRows == 0 {
+		return domain.Tick{}, errors.Wrap(domain.ErrSuperseded, 0)
+	}
+
+	tickID, err := result.LastInsertId()
+	if err != nil {
+		return domain.Tick{}, errors.Wrap(err, 0)
+	}
+
+	tick.ID = domain.TickID(tickID)
 
 	return tick, nil
 }

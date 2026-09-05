@@ -23,10 +23,14 @@
 
   const tickBuilder = $derived(TickBuilder.from(problem, rest.tick));
   const tick = $derived(buildTick(tickBuilder));
+  let latestLocalRevision = $state(0);
 
   const saveTick = async () => {
     try {
-      await putTick.mutateAsync({ ...tick });
+      latestLocalRevision =
+        Math.max(latestLocalRevision, rest.tick?.revision ?? 0) + 1;
+
+      await putTick.mutateAsync({ ...tick, revision: latestLocalRevision });
     } catch (error) {
       if (!isCancel(error)) {
         toastUnexpectedError("Failed to update tick.");

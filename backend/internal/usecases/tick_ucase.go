@@ -9,6 +9,8 @@ import (
 	"github.com/go-errors/errors"
 )
 
+const maxTickRevisionJump = 1_000
+
 type tickUseCaseRepository interface {
 	domain.Transactor
 
@@ -166,10 +168,19 @@ func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.Contender
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
+	if tick.Revision <= existingTick.Revision {
+		return domain.Tick{}, errors.Wrap(domain.ErrSuperseded, 0)
+	}
+
+	if tick.Revision-existingTick.Revision > maxTickRevisionJump {
+		return domain.Tick{}, errors.Wrap(domain.ErrInvalidData, 0)
+	}
+
 	existingTick.Ownership = contender.Ownership
 	existingTick.ContestID = contest.ID
 	existingTick.ProblemID = problem.ID
 	existingTick.Timestamp = time.Now()
+	existingTick.Revision = tick.Revision
 
 	existingTick.Top = tick.Top
 	existingTick.AttemptsTop = tick.AttemptsTop
@@ -193,6 +204,7 @@ func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.Contender
 		ContenderID:   *existingTick.Ownership.ContenderID,
 		ProblemID:     existingTick.ProblemID,
 		Top:           existingTick.Top,
+		Revision:      existingTick.Revision,
 		AttemptsTop:   existingTick.AttemptsTop,
 		Zone1:         existingTick.Zone1,
 		AttemptsZone1: existingTick.AttemptsZone1,

@@ -288,6 +288,7 @@
       const newTick: Tick = {
         id: event.tickId,
         timestamp: event.timestamp,
+        revision: event.revision,
         problemId: event.problemId,
         zone1: event.zone1,
         attemptsZone1: event.attemptsZone1,

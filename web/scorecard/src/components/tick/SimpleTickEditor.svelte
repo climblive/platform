@@ -2,6 +2,7 @@
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { CreateMutationResult } from "@tanstack/svelte-query";
+  import { isCancel } from "axios";
   import TickButton from "./TickButton.svelte";
 
   interface Props {
@@ -17,13 +18,24 @@
     open: boolean;
   }
 
-  // eslint-disable-next-line no-useless-assignment
-  let { problem, pointValue, putTick, open = $bindable() }: Props = $props();
+  let {
+    problem,
+    tick,
+    pointValue,
+    putTick,
+    // eslint-disable-next-line no-useless-assignment
+    open = $bindable(),
+  }: Props = $props();
+  let latestLocalRevision = $state(0);
 
   const handleTick = (feature: "zone1" | "zone2" | "top", flash: boolean) => {
     navigator.vibrate?.(50);
 
+    latestLocalRevision =
+      Math.max(latestLocalRevision, tick?.revision ?? 0) + 1;
+
     const nextTick: Omit<Tick, "id" | "timestamp"> = {
+      revision: latestLocalRevision,
       problemId: problem.id,
       top: false,
       zone2: false,
@@ -48,8 +60,10 @@
     }
 
     putTick.mutate(nextTick, {
-      onError: () => {
-        toastUnexpectedError("Failed to register ascent.");
+      onError: (error) => {
+        if (!isCancel(error)) {
+          toastUnexpectedError("Failed to register ascent.");
+        }
       },
     });
 
