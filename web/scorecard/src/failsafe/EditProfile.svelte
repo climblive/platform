@@ -88,43 +88,41 @@
 
 {#if compClasses && contender}
   <form onsubmit={handleSubmit} bind:this={form}>
-    <div class="name-field">
-      <div class="name-row">
-        <input
-          required
-          placeholder="Name"
-          name="name"
-          type="text"
-          value={contender.name}
-          aria-label="Name"
-        />
-        {#if contender.entered && !contender.scrubbedAt}
-          <button
-            class="info-button"
-            type="button"
-            aria-expanded={showInfo}
-            onclick={() => (showInfo = !showInfo)}
-          >
-            Info
-          </button>
-        {/if}
-      </div>
-      {#if !contender.entered && contest}
-        <p class="info" role="note">
-          Your name will be stored for {registrationRetentionDuration} after the competition
-          ends, after which it will be removed and your results anonymized.
-        </p>
-      {:else if showInfo && !contender.scrubbedAt}
-        <p class="info" role="note">
-          {#if retentionDuration}
-            Your name will be kept stored for {retentionDuration} from now, after
-            which it will be removed and your results anonymized.
-          {:else}
-            Your name will be removed and your results anonymized shortly.
-          {/if}
-        </p>
+    <div class="name-row">
+      <input
+        required
+        placeholder="Name"
+        name="name"
+        type="text"
+        value={contender.name}
+        aria-label="Name"
+      />
+      {#if contender.entered && !contender.scrubbedAt}
+        <button
+          class="info-button"
+          type="button"
+          aria-expanded={showInfo}
+          onclick={() => (showInfo = !showInfo)}
+        >
+          Info
+        </button>
       {/if}
     </div>
+    {#if !contender.entered && contest}
+      <p class="info" role="note">
+        Your name will be stored for {registrationRetentionDuration} after the competition
+        ends, after which it will be removed and your results anonymized.
+      </p>
+    {:else if showInfo && !contender.scrubbedAt}
+      <p class="info" role="note">
+        {#if retentionDuration}
+          Your name will be kept stored for {retentionDuration} from now, after which
+          it will be removed and your results anonymized.
+        {:else}
+          Your name will be removed and your results anonymized shortly.
+        {/if}
+      </p>
+    {/if}
     <select
       name="compClassId"
       required
@@ -161,18 +159,13 @@
     padding: var(--wa-space-s);
     border: 1px solid;
     border-radius: 0.25rem;
+    margin: 0;
   }
 
   form {
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-m);
-  }
-
-  .name-field {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wa-space-xs);
   }
 
   .name-row,
