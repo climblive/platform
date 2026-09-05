@@ -125,7 +125,7 @@ func (hdlr *eventHandler) subscribe(
 
 	w.WriteHeader(http.StatusOK)
 
-	if !writeEvent(w, fmt.Sprintf("retry: %d\n\n", clientRetry.Milliseconds())) {
+	if !write(w, fmt.Sprintf("retry: %d\n\n", clientRetry.Milliseconds())) {
 		return
 	}
 
@@ -145,11 +145,11 @@ ConsumeEvents:
 				panic(err)
 			}
 
-			if !writeEvent(w, fmt.Sprintf("event: %s\ndata: %s\n\n", events.EventName(event.Data), json)) {
+			if !write(w, fmt.Sprintf("event: %s\ndata: %s\n\n", events.EventName(event.Data), json)) {
 				break ConsumeEvents
 			}
 		case <-keepAlive:
-			if !writeEvent(w, ":\n\n") {
+			if !write(w, ":\n\n") {
 				break ConsumeEvents
 			}
 		case <-r.Context().Done():
@@ -163,7 +163,7 @@ ConsumeEvents:
 	}
 }
 
-func writeEvent(w http.ResponseWriter, data string) bool {
+func write(w http.ResponseWriter, data string) bool {
 	controller := http.NewResponseController(w)
 	_ = controller.SetWriteDeadline(time.Now().Add(eventWriteTimeout))
 
