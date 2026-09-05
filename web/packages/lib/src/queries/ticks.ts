@@ -88,7 +88,7 @@ export const updateTickInQueryCache = (
 
     const existingTick = (oldTicks ?? []).find(predicate);
 
-    if (existingTick && existingTick.revision >= updatedTick.revision) {
+    if (existingTick && existingTick.revision > updatedTick.revision) {
       return oldTicks;
     }
 
