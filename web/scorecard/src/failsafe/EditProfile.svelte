@@ -2,11 +2,12 @@
   import {
     getCompClassesQuery,
     getContenderQuery,
+    getContestQuery,
     patchContenderMutation,
     scrubContenderMutation,
   } from "@climblive/lib/queries";
   import { SyncedTime, toastUnexpectedError } from "@climblive/lib/utils";
-  import { formatDistance, isBefore } from "date-fns";
+  import { add, formatDistance, isBefore } from "date-fns";
   import { onMount } from "svelte";
 
   type Props = {
@@ -20,6 +21,7 @@
   let showInfo = $state(false);
 
   const contenderQuery = $derived(getContenderQuery(contenderId));
+  const contestQuery = $derived(getContestQuery(contestId));
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
   const patchContender = $derived(patchContenderMutation(contenderId));
   const scrubContender = $derived(scrubContenderMutation(contenderId));
@@ -30,6 +32,7 @@
   });
 
   let contender = $derived(contenderQuery.data);
+  let contest = $derived(contestQuery.data);
   let compClasses = $derived(compClassesQuery.data);
   let selectedCompClass = $derived(
     compClasses?.find(({ id }) => id === contender?.compClassId),
@@ -40,6 +43,13 @@
       ? formatDistance(contender.scrubBefore, time.current)
       : undefined,
   );
+  const registrationRetentionDuration = $derived.by(() => {
+    const base = new Date(0);
+    return formatDistance(
+      add(base, { minutes: (contest?.nameRetentionTime ?? 0) / 60000000000 }),
+      base,
+    );
+  });
 
   const handleSubmit = (event: SubmitEvent) => {
     event.preventDefault();
@@ -77,36 +87,44 @@
 </script>
 
 {#if compClasses && contender}
-  {#if !contender.scrubbedAt}
-    <button
-      class="info-button"
-      type="button"
-      aria-label="Show information about name retention"
-      aria-expanded={showInfo}
-      onclick={() => (showInfo = !showInfo)}
-    >
-      info
-    </button>
-    {#if showInfo}
-      <p class="info" role="note">
-        {#if retentionDuration}
-          Your name will be kept stored for {retentionDuration} from now, after which
-          it will be removed and your results anonymized.
-        {:else}
-          Your name will be removed and your results anonymized shortly.
-        {/if}
-      </p>
-    {/if}
-  {/if}
   <form onsubmit={handleSubmit} bind:this={form}>
-    <input
-      required
-      placeholder="Name"
-      name="name"
-      type="text"
-      value={contender.name}
-      aria-label="Name"
-    />
+    <div class="name-field">
+      <div class="name-row">
+        <input
+          required
+          placeholder="Name"
+          name="name"
+          type="text"
+          value={contender.name}
+          aria-label="Name"
+        />
+        {#if contender.entered && !contender.scrubbedAt}
+          <button
+            class="info-button"
+            type="button"
+            aria-expanded={showInfo}
+            onclick={() => (showInfo = !showInfo)}
+          >
+            Info
+          </button>
+        {/if}
+      </div>
+      {#if !contender.entered && contest}
+        <p class="info" role="note">
+          Your name will be stored for {registrationRetentionDuration} after the competition
+          ends, after which it will be removed and your results anonymized.
+        </p>
+      {:else if showInfo && !contender.scrubbedAt}
+        <p class="info" role="note">
+          {#if retentionDuration}
+            Your name will be kept stored for {retentionDuration} from now, after
+            which it will be removed and your results anonymized.
+          {:else}
+            Your name will be removed and your results anonymized shortly.
+          {/if}
+        </p>
+      {/if}
+    </div>
     <select
       name="compClassId"
       required
@@ -117,24 +135,26 @@
         <option value={compClass.id}>{compClass.name}</option>
       {/each}
     </select>
-    {#if contender.name}<button
-        type="button"
-        disabled={scrubContender.isPending}
-        onclick={handleScrub}>Remove my name</button
-      >{/if}
-    <button
-      type="submit"
-      disabled={patchContender.isPending || scrubContender.isPending}
-      >{contender.entered ? "Update" : "Register"}</button
-    >
+    <div class="actions">
+      {#if contender.name}<button
+          type="button"
+          disabled={scrubContender.isPending}
+          onclick={handleScrub}>Remove my name</button
+        >{/if}
+      <button
+        type="submit"
+        disabled={patchContender.isPending || scrubContender.isPending}
+        >{contender.entered ? "Update" : "Register"}</button
+      >
+    </div>
   </form>
 {/if}
 
 <style>
   .info-button {
-    align-self: flex-start;
     padding: 0.15rem 0.35rem;
     font-size: 0.75rem;
+    white-space: nowrap;
   }
 
   .info {
@@ -147,5 +167,26 @@
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-m);
+  }
+
+  .name-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-xs);
+  }
+
+  .name-row,
+  .actions {
+    display: flex;
+    gap: var(--wa-space-xs);
+  }
+
+  .name-row input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .actions {
+    flex-wrap: nowrap;
   }
 </style>
