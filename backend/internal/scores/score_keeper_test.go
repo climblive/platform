@@ -10,10 +10,10 @@ import (
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/events"
 	"github.com/climblive/platform/backend/internal/scores"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"uuid"
 )
 
 func TestKeeper(t *testing.T) {

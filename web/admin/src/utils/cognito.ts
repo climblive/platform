@@ -14,13 +14,22 @@ const instance = axios.create({
   timeout: 10_000,
   headers: {
     "Content-Type": "application/x-www-form-urlencoded",
-    Authorization: `Basic ${btoa(configData.COGNITO_CLIENT_ID + ":" + configData.COGNITO_CLIENT_SECRET)}`,
   },
 });
 
-export const exchangeCode = async (code: string) => {
-  const codeVerifier = sessionStorage.getItem("code_verifier");
-  sessionStorage.removeItem("code_verifier");
+export const exchangeCode = async (code: string, state: string | null) => {
+  const codeVerifier = sessionStorage.getItem("oauth_code_verifier");
+  const expectedState = sessionStorage.getItem("oauth_state");
+  sessionStorage.removeItem("oauth_code_verifier");
+  sessionStorage.removeItem("oauth_state");
+
+  if (
+    codeVerifier === null ||
+    expectedState === null ||
+    state !== expectedState
+  ) {
+    throw new Error("Invalid OAuth response");
+  }
 
   const params = new URLSearchParams();
   params.append("grant_type", "authorization_code");
@@ -31,9 +40,7 @@ export const exchangeCode = async (code: string) => {
     window.location.protocol + "//" + window.location.host + "/admin",
   );
 
-  if (codeVerifier !== null) {
-    params.append("code_verifier", codeVerifier);
-  }
+  params.append("code_verifier", codeVerifier);
 
   const response = await instance.post("/oauth2/token", params);
 

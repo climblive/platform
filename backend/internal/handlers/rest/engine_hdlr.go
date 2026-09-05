@@ -2,12 +2,12 @@ package rest
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/v2"
 	"net/http"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
-	"github.com/google/uuid"
+	"uuid"
 )
 
 type scoreEngineUseCase interface {
@@ -86,7 +86,7 @@ func (hdlr *scoreEngineHandler) StartScoreEngine(w http.ResponseWriter, r *http.
 	}
 
 	var arguments StartScoreEngineArguments
-	err = json.NewDecoder(r.Body).Decode(&arguments)
+	err = json.UnmarshalRead(r.Body, &arguments)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
