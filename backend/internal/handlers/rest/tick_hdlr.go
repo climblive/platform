@@ -69,7 +69,7 @@ func (hdlr *tickHandler) PutTick(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var tick domain.Tick
-	if !readJSON(w, r, &tick) {
+	if !readJSON(w, r.Body, &tick) {
 		return
 	}
 

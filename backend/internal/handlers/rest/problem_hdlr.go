@@ -71,7 +71,7 @@ func (hdlr *problemHandler) PatchProblem(w http.ResponseWriter, r *http.Request)
 	}
 
 	var patch domain.ProblemPatch
-	if !readJSON(w, r, &patch) {
+	if !readJSON(w, r.Body, &patch) {
 		return
 	}
 
@@ -92,7 +92,7 @@ func (hdlr *problemHandler) CreateProblem(w http.ResponseWriter, r *http.Request
 	}
 
 	var tmpl domain.ProblemTemplate
-	if !readJSON(w, r, &tmpl) {
+	if !readJSON(w, r.Body, &tmpl) {
 		return
 	}
 

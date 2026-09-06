@@ -4,8 +4,8 @@ import (
 	jsonv1 "encoding/json"
 	"encoding/json/v2"
 	"fmt"
+	"io"
 	"log/slog"
-	"mime"
 	"net/http"
 	"strconv"
 
@@ -47,15 +47,9 @@ func writeResponse(w http.ResponseWriter, status int, data any) {
 	}
 }
 
-func readJSON(w http.ResponseWriter, r *http.Request, out any) bool {
-	mediaType, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
-	if err != nil || mediaType != "application/json" {
-		w.WriteHeader(http.StatusUnsupportedMediaType)
-		return false
-	}
-
-	r.Body = http.MaxBytesReader(w, r.Body, maxJSONBodySize)
-	err = json.UnmarshalRead(r.Body, out, jsonv1.FormatDurationAsNano(true), json.RejectUnknownMembers(true))
+func readJSON[T any](w http.ResponseWriter, body io.ReadCloser, out *T) bool {
+	body = http.MaxBytesReader(w, body, maxJSONBodySize)
+	err := json.UnmarshalRead(body, out, jsonv1.FormatDurationAsNano(true), json.RejectUnknownMembers(true))
 	if err == nil {
 		return true
 	}
