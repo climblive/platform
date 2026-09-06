@@ -150,12 +150,6 @@
 {/if}
 
 <style>
-  .info-button {
-    padding: 0.15rem 0.35rem;
-    font-size: 0.75rem;
-    white-space: nowrap;
-  }
-
   .info {
     padding: var(--wa-space-s);
     border: 1px solid;
@@ -172,15 +166,15 @@
   .name-row,
   .actions {
     display: flex;
+    align-items: center;
     gap: var(--wa-space-xs);
   }
 
   .name-row input {
-    flex: 1;
-    min-width: 0;
+    flex-grow: 1;
   }
 
   .actions {
-    flex-wrap: nowrap;
+    justify-content: space-between;
   }
 </style>
