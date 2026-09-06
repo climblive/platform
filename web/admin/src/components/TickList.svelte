@@ -114,7 +114,8 @@
 {/snippet}
 
 {#if tableData && tableData.length > 0}
-  <Table {columns} data={tableData} getId={({ tick }) => tick.id}></Table>
+  <Table {columns} data={tableData} getId={({ tick }) => tick.problemId}
+  ></Table>
 {:else if tableData}
   <EmptyState
     title="No results yet"

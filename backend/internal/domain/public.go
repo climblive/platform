@@ -230,7 +230,6 @@ type ScoreboardEntry struct {
 }
 
 type Tick struct {
-	ID            TickID        `json:"id"`
 	Ownership     OwnershipData `json:"-"`
 	Timestamp     time.Time     `json:"timestamp"`
 	ContestID     ContestID     `json:"-"`
@@ -288,7 +287,6 @@ type ContenderRequalifiedEvent struct {
 }
 
 type AscentRegisteredEvent struct {
-	TickID        TickID      `json:"tickId"`
 	Timestamp     time.Time   `json:"timestamp"`
 	ContenderID   ContenderID `json:"contenderId"`
 	ProblemID     ProblemID   `json:"problemId"`
@@ -301,7 +299,6 @@ type AscentRegisteredEvent struct {
 }
 
 type AscentDeregisteredEvent struct {
-	TickID      TickID      `json:"tickId"`
 	ContenderID ContenderID `json:"contenderId"`
 	ProblemID   ProblemID   `json:"problemId"`
 }

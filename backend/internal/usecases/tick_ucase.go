@@ -18,9 +18,8 @@ type tickUseCaseRepository interface {
 	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
 	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error)
 	GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) (domain.Problem, error)
-	DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) error
+	DeleteTick(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID, problemID domain.ProblemID) error
 	StoreTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error)
-	GetTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) (domain.Tick, error)
 	GetTickByContenderAndProblem(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID, problemID domain.ProblemID) (domain.Tick, error)
 }
 
@@ -66,8 +65,8 @@ func (uc *TickUseCase) GetTicksByContest(ctx context.Context, contestID domain.C
 	return ticks, nil
 }
 
-func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.TickID) error {
-	tick, err := uc.Repo.GetTick(ctx, nil, tickID)
+func (uc *TickUseCase) DeleteTick(ctx context.Context, contenderID domain.ContenderID, problemID domain.ProblemID) error {
+	tick, err := uc.Repo.GetTickByContenderAndProblem(ctx, nil, contenderID, problemID)
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
@@ -76,8 +75,6 @@ func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.TickID) err
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
-
-	contenderID := *tick.Ownership.ContenderID
 
 	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
 	if err != nil {
@@ -102,13 +99,12 @@ func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.TickID) err
 		return errors.New(domain.ErrContestEnded)
 	}
 
-	err = uc.Repo.DeleteTick(ctx, nil, tickID)
+	err = uc.Repo.DeleteTick(ctx, nil, contenderID, problemID)
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
 
 	uc.EventBroker.Dispatch(contest.ID, domain.AscentDeregisteredEvent{
-		TickID:      tickID,
 		ContenderID: contender.ID,
 		ProblemID:   tick.ProblemID,
 	})
@@ -188,7 +184,6 @@ func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.Contender
 	}
 
 	uc.EventBroker.Dispatch(contest.ID, domain.AscentRegisteredEvent{
-		TickID:        existingTick.ID,
 		Timestamp:     existingTick.Timestamp,
 		ContenderID:   *existingTick.Ownership.ContenderID,
 		ProblemID:     existingTick.ProblemID,

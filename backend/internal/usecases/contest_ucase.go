@@ -38,7 +38,7 @@ type contestUseCaseRepository interface {
 	DeleteRaffleWinner(ctx context.Context, tx domain.Transaction, raffleWinnerID domain.RaffleWinnerID) error
 	StoreRaffleWinner(ctx context.Context, tx domain.Transaction, winner domain.RaffleWinner) (domain.RaffleWinner, error)
 	GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error)
-	DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) error
+	DeleteTick(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID, problemID domain.ProblemID) error
 	StoreTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error)
 	StoreScore(ctx context.Context, tx domain.Transaction, score domain.Score) error
 }
@@ -485,7 +485,7 @@ func (uc *ContestUseCase) TransferContest(ctx context.Context, contestID domain.
 
 	purge := func() error {
 		for _, tick := range ticks {
-			err = uc.Repo.DeleteTick(ctx, tx, tick.ID)
+			err = uc.Repo.DeleteTick(ctx, tx, *tick.Ownership.ContenderID, tick.ProblemID)
 			if err != nil {
 				return err
 			}

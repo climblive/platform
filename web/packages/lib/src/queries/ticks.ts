@@ -38,7 +38,7 @@ export const putTickMutation = (contenderId: number) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
-    mutationFn: (tick: Omit<Tick, "id" | "timestamp">) =>
+    mutationFn: (tick: Omit<Tick, "timestamp">) =>
       ApiClient.getInstance().putTick(contenderId, tick),
     onSuccess: (updatedTick) => {
       updateTickInQueryCache(client, contenderId, updatedTick);
@@ -46,15 +46,16 @@ export const putTickMutation = (contenderId: number) => {
   }));
 };
 
-export const deleteTickMutation = () => {
+export const deleteTickMutation = (contenderId: number) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
-    mutationFn: (tickId: number) => ApiClient.getInstance().deleteTick(tickId),
+    mutationFn: (problemId: number) =>
+      ApiClient.getInstance().deleteTick(contenderId, problemId),
     onSuccess: (...args) => {
-      const [, tickId] = args;
+      const [, problemId] = args;
 
-      removeTickFromQueryCache(client, tickId);
+      removeTickFromQueryCache(client, contenderId, problemId);
     },
   }));
 };
@@ -67,7 +68,8 @@ export const updateTickInQueryCache = (
   const queryKey: QueryKey = ["ticks", { contenderId }];
 
   queryClient.setQueryData<Tick[]>(queryKey, (oldTicks) => {
-    const predicate = ({ id }: Tick) => id === updatedTick.id;
+    const predicate = ({ problemId }: Tick) =>
+      problemId === updatedTick.problemId;
 
     const found = (oldTicks ?? []).findIndex(predicate) !== -1;
 
@@ -83,19 +85,14 @@ export const updateTickInQueryCache = (
 
 export const removeTickFromQueryCache = (
   queryClient: QueryClient,
-  tickId: number,
+  contenderId: number,
+  problemId: number,
 ) => {
-  const queryKey = ["ticks"];
+  const queryKey: QueryKey = ["ticks", { contenderId }];
 
-  queryClient.setQueriesData<Tick[]>(
-    {
-      queryKey,
-      exact: false,
-    },
-    (oldTicks) => {
-      const predicate = ({ id }: Tick) => id !== tickId;
+  queryClient.setQueryData<Tick[]>(queryKey, (oldTicks) => {
+    const predicate = (tick: Tick) => tick.problemId !== problemId;
 
-      return oldTicks ? oldTicks.filter(predicate) : undefined;
-    },
-  );
+    return oldTicks ? oldTicks.filter(predicate) : undefined;
+  });
 };

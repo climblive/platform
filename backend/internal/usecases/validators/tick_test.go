@@ -15,7 +15,6 @@ func TestTickValidator(t *testing.T) {
 	validTick := func() domain.Tick {
 		return domain.Tick{
 			Timestamp: time.Now(),
-			ID:        domain.TickID(1),
 			Ownership: domain.OwnershipData{
 				OrganizerID: domain.OrganizerID(1),
 			},

@@ -12,7 +12,7 @@
   const { problem, tick, contenderId }: Props = $props();
 
   const putTick = $derived(putTickMutation(contenderId));
-  const deleteTick = $derived(deleteTickMutation());
+  const deleteTick = $derived(deleteTickMutation(contenderId));
 
   const tickType = (tick?: Tick) => {
     if (tick?.top && tick.attemptsTop === 1) {
@@ -29,7 +29,7 @@
   const addTick = (type: "zone1" | "zone2" | "top" | "flash") => () => {
     const attempts = type === "flash" ? 1 : 999;
 
-    const tick: Omit<Tick, "id" | "timestamp"> = {
+    const tick: Omit<Tick, "timestamp"> = {
       problemId: problem.id,
       top: false,
       zone2: false,
@@ -59,8 +59,8 @@
   };
 
   const removeTick = () => {
-    if (tick?.id) {
-      deleteTick.mutate(tick.id);
+    if (tick) {
+      deleteTick.mutate(tick.problemId);
     }
   };
 </script>

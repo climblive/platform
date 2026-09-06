@@ -376,10 +376,7 @@ export class ApiClient {
     return z.array(tickSchema).parse(result.data);
   };
 
-  putTick = async (
-    contenderId: number,
-    tick: Omit<Tick, "id" | "timestamp">,
-  ) => {
+  putTick = async (contenderId: number, tick: Omit<Tick, "timestamp">) => {
     const endpoint = `/contenders/${contenderId}/ticks`;
 
     const result = await this.axiosInstance.put(endpoint, tick, {
@@ -389,8 +386,8 @@ export class ApiClient {
     return tickSchema.parse(result.data);
   };
 
-  deleteTick = async (tickId: number) => {
-    const endpoint = `/ticks/${tickId}`;
+  deleteTick = async (contenderId: number, problemId: number) => {
+    const endpoint = `/contenders/${contenderId}/ticks/${problemId}`;
 
     await this.axiosInstance.delete(endpoint, {
       headers: this.credentialsProvider?.getAuthHeaders(),

@@ -32,7 +32,6 @@ export const contenderScoreUpdatedEventSchema: z.ZodType<ContenderScoreUpdatedEv
 
 export const ascentRegisteredEventSchema: z.ZodType<AscentRegisteredEvent> =
   z.object({
-    tickId: z.number(),
     timestamp: z.coerce.date(),
     contenderId: z.number(),
     problemId: z.number(),
@@ -46,7 +45,6 @@ export const ascentRegisteredEventSchema: z.ZodType<AscentRegisteredEvent> =
 
 export const ascentDeregisteredEventSchema: z.ZodType<AscentDeregisteredEvent> =
   z.object({
-    tickId: z.number(),
     contenderId: z.number(),
     problemId: z.number(),
   });
