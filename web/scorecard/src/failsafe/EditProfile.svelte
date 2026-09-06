@@ -131,6 +131,7 @@
       required
       value={selectedCompClass?.id}
       aria-label="Category"
+      disabled={contender.scrubbedAt !== undefined}
     >
       {#each compClasses as compClass (compClass.id)}
         <option value={compClass.id}>{compClass.name}</option>
@@ -144,7 +145,9 @@
         >{/if}
       <button
         type="submit"
-        disabled={patchContender.isPending || scrubContender.isPending}
+        disabled={contender.scrubbedAt !== undefined ||
+          patchContender.isPending ||
+          scrubContender.isPending}
         >{contender.entered ? "Update" : "Register"}</button
       >
     </div>
