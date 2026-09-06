@@ -19,6 +19,6 @@ func TestReadJSONRejectsOversizedPayload(t *testing.T) {
 		Value string `json:"value"`
 	}
 
-	assert.False(t, readJSON(response, request.Body, &payload))
+	assert.False(t, readJSON(response, request, &payload))
 	assert.Equal(t, http.StatusRequestEntityTooLarge, response.Code)
 }

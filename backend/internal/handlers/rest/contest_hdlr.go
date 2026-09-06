@@ -124,7 +124,7 @@ func (hdlr *contestHandler) PatchContest(w http.ResponseWriter, r *http.Request)
 	}
 
 	var patch domain.ContestPatch
-	if !readJSON(w, r.Body, &patch) {
+	if !readJSON(w, r, &patch) {
 		return
 	}
 
@@ -145,7 +145,7 @@ func (hdlr *contestHandler) CreateContest(w http.ResponseWriter, r *http.Request
 	}
 
 	var tmpl domain.ContestTemplate
-	if !readJSON(w, r.Body, &tmpl) {
+	if !readJSON(w, r, &tmpl) {
 		return
 	}
 
@@ -214,7 +214,7 @@ func (hdlr *contestHandler) TransferContest(w http.ResponseWriter, r *http.Reque
 	}
 
 	var req domain.ContestTransferRequest
-	if !readJSON(w, r.Body, &req) {
+	if !readJSON(w, r, &req) {
 		return
 	}
 

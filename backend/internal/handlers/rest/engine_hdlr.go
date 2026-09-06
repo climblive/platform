@@ -85,7 +85,7 @@ func (hdlr *scoreEngineHandler) StartScoreEngine(w http.ResponseWriter, r *http.
 	}
 
 	var arguments StartScoreEngineArguments
-	if !readJSON(w, r.Body, &arguments) {
+	if !readJSON(w, r, &arguments) {
 		return
 	}
 

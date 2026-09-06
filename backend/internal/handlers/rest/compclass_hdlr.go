@@ -71,7 +71,7 @@ func (hdlr *compClassHandler) CreateCompClass(w http.ResponseWriter, r *http.Req
 	}
 
 	var tmpl domain.CompClassTemplate
-	if !readJSON(w, r.Body, &tmpl) {
+	if !readJSON(w, r, &tmpl) {
 		return
 	}
 
@@ -108,7 +108,7 @@ func (hdlr *compClassHandler) PatchCompClass(w http.ResponseWriter, r *http.Requ
 	}
 
 	var patch domain.CompClassPatch
-	if !readJSON(w, r.Body, &patch) {
+	if !readJSON(w, r, &patch) {
 		return
 	}
 

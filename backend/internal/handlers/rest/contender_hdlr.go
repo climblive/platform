@@ -123,7 +123,7 @@ func (hdlr *contenderHandler) PatchContender(w http.ResponseWriter, r *http.Requ
 	}
 
 	var patch domain.ContenderPatch
-	if !readJSON(w, r.Body, &patch) {
+	if !readJSON(w, r, &patch) {
 		return
 	}
 
@@ -176,7 +176,7 @@ func (hdlr *contenderHandler) CreateContenders(w http.ResponseWriter, r *http.Re
 	}
 
 	var arguments CreateContendersArguments
-	if !readJSON(w, r.Body, &arguments) {
+	if !readJSON(w, r, &arguments) {
 		return
 	}
 

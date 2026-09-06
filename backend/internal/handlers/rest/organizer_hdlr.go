@@ -40,7 +40,7 @@ func InstallOrganizerHandler(mux *Mux, organizerUseCase organizerUseCase) {
 
 func (hdlr *organizerHandler) CreateOrganizer(w http.ResponseWriter, r *http.Request) {
 	var template domain.OrganizerTemplate
-	if !readJSON(w, r.Body, &template) {
+	if !readJSON(w, r, &template) {
 		return
 	}
 
@@ -77,7 +77,7 @@ func (hdlr *organizerHandler) PatchOrganizer(w http.ResponseWriter, r *http.Requ
 	}
 
 	var patch domain.OrganizerPatch
-	if !readJSON(w, r.Body, &patch) {
+	if !readJSON(w, r, &patch) {
 		return
 	}
 
