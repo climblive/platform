@@ -37,7 +37,6 @@
 
     if (name && compClassId) {
       patchContender.mutate({
-        ...contender,
         name,
         compClassId: Number(compClassId),
       });
