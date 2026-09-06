@@ -10,18 +10,18 @@ import (
 )
 
 func TestCORSAllowsConfiguredOrigin(t *testing.T) {
-	handler := rest.CORS([]string{"https://admin.climblive.com"})(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}))
+	handler := rest.CORS([]string{"https://climblive.com"})(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}))
 	r := httptest.NewRequest(http.MethodGet, "http://localhost", nil)
-	r.Header.Set("Origin", "https://admin.climblive.com")
+	r.Header.Set("Origin", "https://climblive.com")
 	w := httptest.NewRecorder()
 
 	handler.ServeHTTP(w, r)
 
-	assert.Equal(t, "https://admin.climblive.com", w.Header().Get("Access-Control-Allow-Origin"))
+	assert.Equal(t, "https://climblive.com", w.Header().Get("Access-Control-Allow-Origin"))
 }
 
 func TestCORSRejectsUnconfiguredOrigin(t *testing.T) {
-	handler := rest.CORS([]string{"https://admin.climblive.com"})(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}))
+	handler := rest.CORS([]string{"https://climblive.com"})(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}))
 	r := httptest.NewRequest(http.MethodGet, "http://localhost", nil)
 	r.Header.Set("Origin", "https://example.com")
 	w := httptest.NewRecorder()
@@ -29,4 +29,32 @@ func TestCORSRejectsUnconfiguredOrigin(t *testing.T) {
 	handler.ServeHTTP(w, r)
 
 	assert.Empty(t, w.Header().Get("Access-Control-Allow-Origin"))
+}
+
+func TestCORSPreFlightAllowsConfiguredOrigin(t *testing.T) {
+	handler := rest.CORSPreFlight([]string{"https://climblive.com"})
+	r := httptest.NewRequest(http.MethodOptions, "http://localhost", nil)
+	r.Header.Set("Origin", "https://climblive.com")
+	w := httptest.NewRecorder()
+
+	handler.ServeHTTP(w, r)
+
+	assert.Equal(t, http.StatusNoContent, w.Code)
+	assert.Equal(t, "https://climblive.com", w.Header().Get("Access-Control-Allow-Origin"))
+	assert.Equal(t, "Origin", w.Header().Get("Vary"))
+	assert.Equal(t, "GET, POST, PUT, PATCH, DELETE", w.Header().Get("Access-Control-Allow-Methods"))
+	assert.Equal(t, "Authorization, Content-Type", w.Header().Get("Access-Control-Allow-Headers"))
+}
+
+func TestCORSPreFlightRejectsUnconfiguredOrigin(t *testing.T) {
+	handler := rest.CORSPreFlight([]string{"https://climblive.com"})
+	r := httptest.NewRequest(http.MethodOptions, "http://localhost", nil)
+	r.Header.Set("Origin", "https://example.com")
+	w := httptest.NewRecorder()
+
+	handler.ServeHTTP(w, r)
+
+	assert.Equal(t, http.StatusNoContent, w.Code)
+	assert.Empty(t, w.Header().Get("Access-Control-Allow-Origin"))
+	assert.Empty(t, w.Header().Get("Vary"))
 }
