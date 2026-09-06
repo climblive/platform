@@ -45,6 +45,9 @@ var embedMigrations embed.FS
 var webAssets embed.FS
 
 const defaultScoreEngineMaxLifetime = 24 * time.Hour
+const httpReadHeaderTimeout = 10 * time.Second
+const httpReadTimeout = 30 * time.Second
+const httpIdleTimeout = 2 * time.Minute
 
 const appCSP = "default-src 'self'; connect-src 'self' clmb.auth.eu-west-1.amazoncognito.com *.fontawesome.com *.sentry.io data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'self'; img-src 'self' data:; report-uri https://o4509937603641344.ingest.de.sentry.io/api/4509937616093264/security/?sentry_key=019099d850441f60cea5d465e217f768"
 
@@ -189,10 +192,10 @@ func main() {
 		Handler:                      securityHeaders(&httpRouter{appHandler: appMux, wwwHandler: wwwMux, wwwHost: wwwHost}),
 		DisableGeneralOptionsHandler: false,
 		TLSConfig:                    tlsConfig,
-		ReadTimeout:                  0,
-		ReadHeaderTimeout:            0,
+		ReadTimeout:                  httpReadTimeout,
+		ReadHeaderTimeout:            httpReadHeaderTimeout,
 		WriteTimeout:                 0,
-		IdleTimeout:                  0,
+		IdleTimeout:                  httpIdleTimeout,
 		MaxHeaderBytes:               0,
 		MaxHeaderValueCount:          0,
 		TLSNextProto:                 nil,
