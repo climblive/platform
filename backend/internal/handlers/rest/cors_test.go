@@ -24,7 +24,7 @@ func TestCORS(t *testing.T) {
 		"MissingOrigin": {},
 	}
 
-	handler := rest.CORSWithOrigins([]string{"https://admin.climblive.com"})(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}))
+	handler := rest.CORS([]string{"https://admin.climblive.com"})(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}))
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {

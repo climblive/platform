@@ -335,7 +335,7 @@ func setupMux(
 
 	mux := rest.NewMux()
 	corsOrigins := strings.Split(os.Getenv("CORS_ALLOWED_ORIGINS"), ",")
-	mux.RegisterMiddleware(rest.CORSWithOrigins(corsOrigins))
+	mux.RegisterMiddleware(rest.CORS(corsOrigins))
 	mux.RegisterMiddleware(authorizer.Middleware)
 
 	mux.HandleFunc("OPTIONS /", rest.CORSPreFlight(corsOrigins))
