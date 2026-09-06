@@ -6,7 +6,7 @@
     patchContenderMutation,
     scrubContenderMutation,
   } from "@climblive/lib/queries";
-  import { SyncedTime } from "@climblive/lib/utils";
+  import { maskScrubbedName, SyncedTime } from "@climblive/lib/utils";
   import { add, formatDistance, isBefore } from "date-fns";
   import { onMount } from "svelte";
 
@@ -101,7 +101,9 @@
         placeholder="Name"
         name="name"
         type="text"
-        value={contender.name}
+        value={contender.scrubbedAt !== undefined
+          ? maskScrubbedName(contender.id)
+          : contender.name}
         aria-label="Name"
         disabled={contender.scrubbedAt !== undefined}
       />
