@@ -15,8 +15,8 @@ inputs:
   database-password:
     description: "Database password"
     required: true
-  cors-allowed-origins:
-    description: "Comma-separated CORS allowed origins"
+  public-host:
+    description: "Public hostname"
     required: true
 runs:
   using: "composite"
