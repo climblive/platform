@@ -2,7 +2,6 @@ package rest
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"slices"
@@ -125,9 +124,7 @@ func (hdlr *contestHandler) PatchContest(w http.ResponseWriter, r *http.Request)
 	}
 
 	var patch domain.ContestPatch
-	err = json.NewDecoder(r.Body).Decode(&patch)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+	if !readJSON(w, r, &patch) {
 		return
 	}
 
@@ -148,9 +145,7 @@ func (hdlr *contestHandler) CreateContest(w http.ResponseWriter, r *http.Request
 	}
 
 	var tmpl domain.ContestTemplate
-	err = json.NewDecoder(r.Body).Decode(&tmpl)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+	if !readJSON(w, r, &tmpl) {
 		return
 	}
 
@@ -219,9 +214,7 @@ func (hdlr *contestHandler) TransferContest(w http.ResponseWriter, r *http.Reque
 	}
 
 	var req domain.ContestTransferRequest
-	err = json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+	if !readJSON(w, r, &req) {
 		return
 	}
 

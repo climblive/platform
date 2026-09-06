@@ -4,7 +4,7 @@ import (
 	"context"
 	"slices"
 
-	"github.com/google/uuid"
+	"uuid"
 )
 
 type SubscriptionID = uuid.UUID

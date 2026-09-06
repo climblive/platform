@@ -2,11 +2,10 @@ package rest
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/domain"
-	"github.com/google/uuid"
+	"uuid"
 )
 
 type organizerUseCase interface {
@@ -41,9 +40,7 @@ func InstallOrganizerHandler(mux *Mux, organizerUseCase organizerUseCase) {
 
 func (hdlr *organizerHandler) CreateOrganizer(w http.ResponseWriter, r *http.Request) {
 	var template domain.OrganizerTemplate
-	err := json.NewDecoder(r.Body).Decode(&template)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+	if !readJSON(w, r, &template) {
 		return
 	}
 
@@ -80,9 +77,7 @@ func (hdlr *organizerHandler) PatchOrganizer(w http.ResponseWriter, r *http.Requ
 	}
 
 	var patch domain.OrganizerPatch
-	err = json.NewDecoder(r.Body).Decode(&patch)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+	if !readJSON(w, r, &patch) {
 		return
 	}
 

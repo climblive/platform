@@ -6,8 +6,8 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
+	"uuid"
 )
 
 var errMock = errors.New("mock error")

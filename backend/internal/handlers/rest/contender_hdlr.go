@@ -2,7 +2,6 @@ package rest
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -124,9 +123,7 @@ func (hdlr *contenderHandler) PatchContender(w http.ResponseWriter, r *http.Requ
 	}
 
 	var patch domain.ContenderPatch
-	err = json.NewDecoder(r.Body).Decode(&patch)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+	if !readJSON(w, r, &patch) {
 		return
 	}
 
@@ -179,9 +176,7 @@ func (hdlr *contenderHandler) CreateContenders(w http.ResponseWriter, r *http.Re
 	}
 
 	var arguments CreateContendersArguments
-	err = json.NewDecoder(r.Body).Decode(&arguments)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+	if !readJSON(w, r, &arguments) {
 		return
 	}
 

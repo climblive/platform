@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
+	"encoding/json/v2"
 	"errors"
 	"flag"
 	"fmt"
@@ -52,7 +52,7 @@ func main() {
 		_ = f.Close()
 	}()
 
-	if err := json.NewDecoder(f).Decode(&cfg); err != nil {
+	if err := json.UnmarshalRead(f, &cfg); err != nil {
 		log.Fatalf("failed to parse config file: %v", err)
 	}
 
@@ -290,7 +290,7 @@ func (r *ContenderRunner) GetContender() domain.Contender {
 
 	contender := domain.Contender{}
 
-	err = json.NewDecoder(resp.Body).Decode(&contender)
+	err = json.UnmarshalRead(resp.Body, &contender)
 	if err != nil {
 		panic(err)
 	}
@@ -300,7 +300,7 @@ func (r *ContenderRunner) GetContender() domain.Contender {
 
 func (r *ContenderRunner) PatchContender(contenderID domain.ContenderID, patch domain.ContenderPatch) domain.Contender {
 	buf := new(bytes.Buffer)
-	err := json.NewEncoder(buf).Encode(patch)
+	err := json.MarshalWrite(buf, patch)
 	if err != nil {
 		panic(err)
 	}
@@ -325,7 +325,7 @@ func (r *ContenderRunner) PatchContender(contenderID domain.ContenderID, patch d
 
 	var contender domain.Contender
 
-	err = json.NewDecoder(resp.Body).Decode(&contender)
+	err = json.UnmarshalRead(resp.Body, &contender)
 	if err != nil {
 		panic(err)
 	}
@@ -347,7 +347,7 @@ func (r *ContenderRunner) GetCompClasses(contestID domain.ContestID) []domain.Co
 
 	compClasses := []domain.CompClass{}
 
-	err = json.NewDecoder(resp.Body).Decode(&compClasses)
+	err = json.UnmarshalRead(resp.Body, &compClasses)
 	if err != nil {
 		panic(err)
 	}
@@ -369,7 +369,7 @@ func (r *ContenderRunner) GetProblems(contestID domain.ContestID) []domain.Probl
 
 	problems := []domain.Problem{}
 
-	err = json.NewDecoder(resp.Body).Decode(&problems)
+	err = json.UnmarshalRead(resp.Body, &problems)
 	if err != nil {
 		panic(err)
 	}
@@ -398,7 +398,7 @@ func (r *ContenderRunner) GetTicks(contenderID domain.ContenderID) []domain.Tick
 
 	ticks := []domain.Tick{}
 
-	err = json.NewDecoder(resp.Body).Decode(&ticks)
+	err = json.UnmarshalRead(resp.Body, &ticks)
 	if err != nil {
 		panic(err)
 	}
@@ -428,7 +428,7 @@ func (r *ContenderRunner) DeleteTick(tickID domain.TickID) {
 
 func (r *ContenderRunner) PutTick(contenderID domain.ContenderID, tick domain.Tick) domain.Tick {
 	buf := new(bytes.Buffer)
-	err := json.NewEncoder(buf).Encode(tick)
+	err := json.MarshalWrite(buf, tick)
 	if err != nil {
 		panic(err)
 	}
@@ -451,7 +451,7 @@ func (r *ContenderRunner) PutTick(contenderID domain.ContenderID, tick domain.Ti
 
 	mustStatus(resp, http.StatusOK)
 
-	err = json.NewDecoder(resp.Body).Decode(&tick)
+	err = json.UnmarshalRead(resp.Body, &tick)
 	if err != nil {
 		panic(err)
 	}

@@ -11,7 +11,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
-	"github.com/google/uuid"
+	"uuid"
 )
 
 var ErrAlreadyStarted = errors.New("already started")
@@ -295,14 +295,14 @@ func (mngr *ScoreEngineManager) runPeriodicCheck(ctx context.Context) {
 
 func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID domain.ContestID, terminatedBy time.Time) (domain.ScoreEngineInstanceID, error) {
 	if _, ok := mngr.handlers[contestID]; ok {
-		return uuid.Nil, errors.New(ErrAlreadyStarted)
+		return uuid.Nil(), errors.New(ErrAlreadyStarted)
 	}
 
 	now := time.Now()
 
 	contest, err := mngr.repo.GetContest(ctx, nil, contestID)
 	if err != nil {
-		return uuid.Nil, errors.Wrap(err, 0)
+		return uuid.Nil(), errors.Wrap(err, 0)
 	}
 
 	logger := slog.New(slog.Default().Handler()).With("contest_id", contestID)
@@ -338,7 +338,7 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 
 		stop()
 
-		return uuid.Nil, errors.Wrap(err, 0)
+		return uuid.Nil(), errors.Wrap(err, 0)
 	}
 
 	logger.Debug("score engine store hydration complete", "time", time.Since(hydrationStartTime))
