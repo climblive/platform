@@ -25,7 +25,7 @@
   const compClassesQuery = $derived(getCompClassesQuery(contestId));
   const patchContender = $derived(patchContenderMutation(contenderId));
   const scrubContender = $derived(scrubContenderMutation(contenderId));
-  const time = new SyncedTime(60000);
+  const time = new SyncedTime(60_000);
   onMount(() => {
     time.start();
     return () => time.stop();
@@ -46,7 +46,9 @@
   const registrationRetentionDuration = $derived.by(() => {
     const base = new Date(0);
     return formatDistance(
-      add(base, { minutes: (contest?.nameRetentionTime ?? 0) / 60000000000 }),
+      add(base, {
+        minutes: (contest?.nameRetentionTime ?? 0) / 60_000_000_000,
+      }),
       base,
     );
   });
@@ -72,12 +74,13 @@
 
   const handleScrub = () => {
     if (
-      !confirm(
+      !window.confirm(
         "Your name will be permanently removed and your results will be anonymized. This action cannot be undone.\n\nBe aware that without a name, you will lose your chance at finals and you cannot take part in any prize raffles.",
       )
     ) {
       return;
     }
+
     scrubContender.mutate(undefined, {
       onSuccess: () => window.location.reload(),
       onError: () => toastUnexpectedError("Failed to remove your name."),
@@ -100,7 +103,6 @@
         <button
           class="info-button"
           type="button"
-          aria-expanded={showInfo}
           onclick={() => (showInfo = !showInfo)}
         >
           Info
@@ -108,12 +110,12 @@
       {/if}
     </div>
     {#if !contender.entered && contest}
-      <p class="info" role="note">
+      <p class="info">
         Your name will be stored for {registrationRetentionDuration} after the competition
         ends, after which it will be removed and your results anonymized.
       </p>
-    {:else if showInfo && !contender.scrubbedAt}
-      <p class="info" role="note">
+    {:else if showInfo}
+      <p class="info">
         {#if retentionDuration}
           Your name will be kept stored for {retentionDuration} from now, after which
           it will be removed and your results anonymized.
