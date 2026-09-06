@@ -65,10 +65,15 @@
     const compClassId = formData.get("compClassId")?.toString().trim();
 
     if (name && compClassId) {
-      patchContender.mutate({
-        name,
-        compClassId: Number(compClassId),
-      });
+      patchContender.mutate(
+        {
+          name,
+          compClassId: Number(compClassId),
+        },
+        {
+          onError: () => window.alert("Failed to save registration data."),
+        },
+      );
     }
   };
 
@@ -98,6 +103,7 @@
         type="text"
         value={contender.name}
         aria-label="Name"
+        disabled={contender.scrubbedAt !== undefined}
       />
       {#if contender.entered && !contender.scrubbedAt}
         <button type="button" onclick={() => (showInfo = !showInfo)}>
