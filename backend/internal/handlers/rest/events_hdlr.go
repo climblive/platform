@@ -14,6 +14,7 @@ import (
 
 const bufferCapacity = 1_000
 const clientRetry = 5 * time.Second
+const eventWriteTimeout = 10 * time.Second
 
 type eventHandler struct {
 	eventBroker  domain.EventBroker
@@ -124,7 +125,9 @@ func (hdlr *eventHandler) subscribe(
 
 	w.WriteHeader(http.StatusOK)
 
-	write(w, fmt.Sprintf("retry: %d\n\n", clientRetry.Milliseconds()))
+	if !write(w, fmt.Sprintf("retry: %d\n\n", clientRetry.Milliseconds())) {
+		return
+	}
 
 	keepAlive := time.Tick(hdlr.pingInterval)
 	eventsCh := eventReader.EventsChan(r.Context())
@@ -142,9 +145,13 @@ ConsumeEvents:
 				panic(err)
 			}
 
-			write(w, fmt.Sprintf("event: %s\ndata: %s\n\n", events.EventName(event.Data), json))
+			if !write(w, fmt.Sprintf("event: %s\ndata: %s\n\n", events.EventName(event.Data), json)) {
+				break ConsumeEvents
+			}
 		case <-keepAlive:
-			write(w, ":\n\n")
+			if !write(w, ":\n\n") {
+				break ConsumeEvents
+			}
 		case <-r.Context().Done():
 			logger.Debug("subscription closed", "reason", r.Context().Err())
 			break ConsumeEvents
@@ -156,12 +163,19 @@ ConsumeEvents:
 	}
 }
 
-func write(w http.ResponseWriter, data string) {
-	_, err := w.Write([]byte(data))
-	if err != nil {
+func write(w http.ResponseWriter, data string) bool {
+	controller := http.NewResponseController(w)
+	_ = controller.SetWriteDeadline(time.Now().Add(eventWriteTimeout))
+
+	if _, err := w.Write([]byte(data)); err != nil {
 		slog.Error("failed to write server-sent event", "error", err)
-		return
+		return false
 	}
 
-	w.(http.Flusher).Flush()
+	if err := controller.Flush(); err != nil {
+		slog.Error("failed to flush server-sent event", "error", err)
+		return false
+	}
+
+	return true
 }

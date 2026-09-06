@@ -4,6 +4,7 @@ import (
 	"context"
 	"iter"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -333,48 +334,20 @@ func TestEngineDriver(t *testing.T) {
 	})
 
 	t.Run("PublishScores", func(t *testing.T) {
-		f, awaitExpectations := makeFixture(0)
+		synctest.Test(t, func(t *testing.T) {
+			f, awaitExpectations := makeFixture(0)
 
-		ctx, cancel := context.WithCancel(context.Background())
-		wg, installEngine := f.driver.Run(ctx)
+			ctx, cancel := context.WithCancel(context.Background())
+			wg, installEngine := f.driver.Run(ctx)
 
-		now := time.Now()
+			now := time.Now()
 
-		mockedEngine := new(scoreEngineMock)
+			mockedEngine := new(scoreEngineMock)
 
-		mockedEngine.On("Start").Return(noEffects)
-		mockedEngine.On("Stop").Return()
-		mockedEngine.On("GetDirtyScores").Return([]domain.Score{
-			{
-				ContenderID: 1,
-				Timestamp:   now,
-				Score:       "100p",
-				Placement:   1,
-				RankOrder:   0,
-				Finalist:    true,
-			},
-			{
-				ContenderID: 2,
-				Timestamp:   now,
-				Score:       "200p",
-				Placement:   2,
-				RankOrder:   1,
-				Finalist:    true,
-			},
-			{
-				ContenderID: 3,
-				Timestamp:   now,
-				Score:       "300p",
-				Placement:   3,
-				RankOrder:   2,
-				Finalist:    false,
-			},
-		})
-		mockedEngine.On("GetDirtyPointValues").Return([]domain.PointValue{})
-
-		f.broker.
-			On("Dispatch", fakedContestID,
-				domain.ContenderScoreUpdatedEvent{
+			mockedEngine.On("Start").Return(noEffects)
+			mockedEngine.On("Stop").Return()
+			mockedEngine.On("GetDirtyScores").Return([]domain.Score{
+				{
 					ContenderID: 1,
 					Timestamp:   now,
 					Score:       "100p",
@@ -382,9 +355,7 @@ func TestEngineDriver(t *testing.T) {
 					RankOrder:   0,
 					Finalist:    true,
 				},
-			).Return().
-			On("Dispatch", fakedContestID,
-				domain.ContenderScoreUpdatedEvent{
+				{
 					ContenderID: 2,
 					Timestamp:   now,
 					Score:       "200p",
@@ -392,9 +363,7 @@ func TestEngineDriver(t *testing.T) {
 					RankOrder:   1,
 					Finalist:    true,
 				},
-			).Return().
-			On("Dispatch", fakedContestID,
-				domain.ContenderScoreUpdatedEvent{
+				{
 					ContenderID: 3,
 					Timestamp:   now,
 					Score:       "300p",
@@ -402,10 +371,12 @@ func TestEngineDriver(t *testing.T) {
 					RankOrder:   2,
 					Finalist:    false,
 				},
-			).Return().
-			On("Dispatch", fakedContestID,
-				[]domain.ContenderScoreUpdatedEvent{
-					{
+			})
+			mockedEngine.On("GetDirtyPointValues").Return([]domain.PointValue{})
+
+			f.broker.
+				On("Dispatch", fakedContestID,
+					domain.ContenderScoreUpdatedEvent{
 						ContenderID: 1,
 						Timestamp:   now,
 						Score:       "100p",
@@ -413,7 +384,9 @@ func TestEngineDriver(t *testing.T) {
 						RankOrder:   0,
 						Finalist:    true,
 					},
-					{
+				).Return().
+				On("Dispatch", fakedContestID,
+					domain.ContenderScoreUpdatedEvent{
 						ContenderID: 2,
 						Timestamp:   now,
 						Score:       "200p",
@@ -421,7 +394,9 @@ func TestEngineDriver(t *testing.T) {
 						RankOrder:   1,
 						Finalist:    true,
 					},
-					{
+				).Return().
+				On("Dispatch", fakedContestID,
+					domain.ContenderScoreUpdatedEvent{
 						ContenderID: 3,
 						Timestamp:   now,
 						Score:       "300p",
@@ -429,17 +404,46 @@ func TestEngineDriver(t *testing.T) {
 						RankOrder:   2,
 						Finalist:    false,
 					},
-				},
-			).Return()
+				).Return().
+				On("Dispatch", fakedContestID,
+					[]domain.ContenderScoreUpdatedEvent{
+						{
+							ContenderID: 1,
+							Timestamp:   now,
+							Score:       "100p",
+							Placement:   1,
+							RankOrder:   0,
+							Finalist:    true,
+						},
+						{
+							ContenderID: 2,
+							Timestamp:   now,
+							Score:       "200p",
+							Placement:   2,
+							RankOrder:   1,
+							Finalist:    true,
+						},
+						{
+							ContenderID: 3,
+							Timestamp:   now,
+							Score:       "300p",
+							Placement:   3,
+							RankOrder:   2,
+							Finalist:    false,
+						},
+					},
+				).Return()
 
-		installEngine(mockedEngine)
+			installEngine(mockedEngine)
+			synctest.Wait()
 
-		cancel()
+			cancel()
 
-		wg.Wait()
+			wg.Wait()
 
-		awaitExpectations(t)
-		mockedEngine.AssertExpectations(t)
+			awaitExpectations(t)
+			mockedEngine.AssertExpectations(t)
+		})
 	})
 }
 
