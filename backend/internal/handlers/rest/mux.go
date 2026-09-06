@@ -3,7 +3,10 @@ package rest
 import (
 	"net/http"
 	"slices"
+	"time"
 )
+
+const writeTimeout = 30 * time.Second
 
 type Middleware = func(http.Handler) http.Handler
 
@@ -34,5 +37,6 @@ func (m *Mux) HandleFunc(pattern string, handler func(http.ResponseWriter, *http
 }
 
 func (m *Mux) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	_ = http.NewResponseController(w).SetWriteDeadline(time.Now().Add(writeTimeout))
 	m.mux.ServeHTTP(w, r)
 }

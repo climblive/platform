@@ -177,5 +177,7 @@ func write(w http.ResponseWriter, data string) bool {
 		return false
 	}
 
+	_ = controller.SetWriteDeadline(time.Time{})
+
 	return true
 }

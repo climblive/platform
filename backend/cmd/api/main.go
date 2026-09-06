@@ -531,3 +531,7 @@ func (w *statusWriter) WriteHeader(statusCode int) {
 func (w *statusWriter) Flush() {
 	w.ResponseWriter.(http.Flusher).Flush()
 }
+
+func (w *statusWriter) Unwrap() http.ResponseWriter {
+	return w.ResponseWriter
+}
