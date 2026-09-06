@@ -22,9 +22,10 @@ export class Authenticator {
   public authenticate = async () => {
     const query = new URLSearchParams(location.search);
     const code = query.get("code");
+    const state = query.get("state");
 
     if (code != null) {
-      const { access_token, refresh_token } = await exchangeCode(code);
+      const { access_token, refresh_token } = await exchangeCode(code, state);
 
       ApiClient.getInstance().setCredentialsProvider(
         new OrganizerCredentialsProvider(access_token),
@@ -95,22 +96,24 @@ export class Authenticator {
   };
 
   public redirectLogin = async () => {
-    const verifier = crypto.randomUUID();
-    const challenge = await challengeFromVerifier(verifier);
-    sessionStorage.setItem("code_verifier", verifier);
+    const codeVerifier = randomUrlSafeValue();
+    const challenge = await challengeFromVerifier(codeVerifier);
+    const state = randomUrlSafeValue();
+    sessionStorage.setItem("oauth_code_verifier", codeVerifier);
+    sessionStorage.setItem("oauth_state", state);
 
-    const redirectUri = encodeURIComponent(window.location.origin + "/admin");
-    const url = `https://clmb.auth.eu-west-1.amazoncognito.com/login?response_type=code&client_id=${configData.COGNITO_CLIENT_ID}&redirect_uri=${redirectUri}&code_challenge=${challenge}&code_challenge_method=S256`;
+    const url = authorizationUrl("login", challenge, state);
     window.location.href = url;
   };
 
   public redirectSignup = async () => {
-    const verifier = crypto.randomUUID();
-    const challenge = await challengeFromVerifier(verifier);
-    sessionStorage.setItem("code_verifier", verifier);
+    const codeVerifier = randomUrlSafeValue();
+    const challenge = await challengeFromVerifier(codeVerifier);
+    const state = randomUrlSafeValue();
+    sessionStorage.setItem("oauth_code_verifier", codeVerifier);
+    sessionStorage.setItem("oauth_state", state);
 
-    const redirectUri = encodeURIComponent(window.location.origin + "/admin");
-    const url = `https://clmb.auth.eu-west-1.amazoncognito.com/signup?response_type=code&client_id=${configData.COGNITO_CLIENT_ID}&redirect_uri=${redirectUri}&code_challenge=${challenge}&code_challenge_method=S256`;
+    const url = authorizationUrl("signup", challenge, state);
     window.location.href = url;
   };
 
@@ -123,10 +126,34 @@ export class Authenticator {
   };
 }
 
-const challengeFromVerifier = async (verfier: string) => {
+const randomUrlSafeValue = () => {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  return btoa(String.fromCharCode(...bytes))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+};
+
+const authorizationUrl = (
+  endpoint: "login" | "signup",
+  challenge: string,
+  state: string,
+) => {
+  const params = new URLSearchParams({
+    response_type: "code",
+    client_id: configData.COGNITO_CLIENT_ID,
+    redirect_uri: window.location.origin + "/admin",
+    code_challenge: challenge,
+    code_challenge_method: "S256",
+    state,
+  });
+  return `https://clmb.auth.eu-west-1.amazoncognito.com/${endpoint}?${params}`;
+};
+
+const challengeFromVerifier = async (verifier: string) => {
   const hash = await crypto.subtle.digest(
     "SHA-256",
-    new TextEncoder().encode(verfier),
+    new TextEncoder().encode(verifier),
   );
 
   return btoa(String.fromCharCode(...new Uint8Array(hash)))
