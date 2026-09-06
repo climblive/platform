@@ -15,9 +15,7 @@ func CORSWithOrigins(origins []string) Middleware {
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if _, ok := allowed["*"]; ok {
-				w.Header().Set("Access-Control-Allow-Origin", "*")
-			} else if _, ok := allowed[r.Header.Get("Origin")]; ok {
+			if _, ok := allowed[r.Header.Get("Origin")]; ok {
 				w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 				w.Header().Add("Vary", "Origin")
 			}
