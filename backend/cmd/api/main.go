@@ -139,7 +139,7 @@ func main() {
 		panic(err)
 	}
 
-	jwtDecoder, err := authorizer.NewStandardJWTDecoder()
+	jwtDecoder, err := authorizer.NewStandardJWTDecoder(ctx)
 	if err != nil {
 		if stack := utils.GetErrorStack(err); stack != "" {
 			log.Println(stack)
