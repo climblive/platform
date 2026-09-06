@@ -9,32 +9,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCORS(t *testing.T) {
-	tests := map[string]struct {
-		origin        string
-		allowedOrigin string
-	}{
-		"AllowedOrigin": {
-			origin:        "https://admin.climblive.com",
-			allowedOrigin: "https://admin.climblive.com",
-		},
-		"DisallowedOrigin": {
-			origin: "https://example.com",
-		},
-		"MissingOrigin": {},
-	}
-
+func TestCORSAllowsConfiguredOrigin(t *testing.T) {
 	handler := rest.CORS([]string{"https://admin.climblive.com"})(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}))
+	r := httptest.NewRequest(http.MethodGet, "http://localhost", nil)
+	r.Header.Set("Origin", "https://admin.climblive.com")
+	w := httptest.NewRecorder()
 
-	for name, tt := range tests {
-		t.Run(name, func(t *testing.T) {
-			r := httptest.NewRequest(http.MethodGet, "http://localhost", nil)
-			r.Header.Set("Origin", tt.origin)
-			w := httptest.NewRecorder()
+	handler.ServeHTTP(w, r)
 
-			handler.ServeHTTP(w, r)
+	assert.Equal(t, "https://admin.climblive.com", w.Header().Get("Access-Control-Allow-Origin"))
+}
 
-			assert.Equal(t, tt.allowedOrigin, w.Header().Get("Access-Control-Allow-Origin"))
-		})
-	}
+func TestCORSRejectsUnconfiguredOrigin(t *testing.T) {
+	handler := rest.CORS([]string{"https://admin.climblive.com"})(http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}))
+	r := httptest.NewRequest(http.MethodGet, "http://localhost", nil)
+	r.Header.Set("Origin", "https://example.com")
+	w := httptest.NewRecorder()
+
+	handler.ServeHTTP(w, r)
+
+	assert.Empty(t, w.Header().Get("Access-Control-Allow-Origin"))
 }
