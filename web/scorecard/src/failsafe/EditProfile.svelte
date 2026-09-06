@@ -6,7 +6,7 @@
     patchContenderMutation,
     scrubContenderMutation,
   } from "@climblive/lib/queries";
-  import { SyncedTime, toastUnexpectedError } from "@climblive/lib/utils";
+  import { SyncedTime } from "@climblive/lib/utils";
   import { add, formatDistance, isBefore } from "date-fns";
   import { onMount } from "svelte";
 
@@ -83,7 +83,7 @@
 
     scrubContender.mutate(undefined, {
       onSuccess: () => window.location.reload(),
-      onError: () => toastUnexpectedError("Failed to remove your name."),
+      onError: () => window.alert("Failed to remove your name."),
     });
   };
 </script>
