@@ -100,11 +100,7 @@
         aria-label="Name"
       />
       {#if contender.entered && !contender.scrubbedAt}
-        <button
-          class="info-button"
-          type="button"
-          onclick={() => (showInfo = !showInfo)}
-        >
+        <button type="button" onclick={() => (showInfo = !showInfo)}>
           Info
         </button>
       {/if}
