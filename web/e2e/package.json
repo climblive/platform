@@ -15,6 +15,6 @@
     "@types/node": "^26.4.0",
     "fs": "0.0.1-security",
     "mariadb": "^3.5.4",
-    "testcontainers": "^11.14.0"
+    "testcontainers": "^12.1.0"
   }
 }
