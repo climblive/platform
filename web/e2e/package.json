@@ -13,6 +13,7 @@
     "@playwright/test": "^1.62.1",
     "@testcontainers/mariadb": "^12.1.0",
     "@types/node": "^26.4.0",
+    "amazon-cognito-identity-js": "^6.3.20",
     "fs": "0.0.1-security",
     "mariadb": "^3.5.4",
     "testcontainers": "^12.1.0"
