@@ -29,10 +29,6 @@ type StandardJWTDecoder struct {
 const cognitoJWKSURL = "https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_Jftnyms2n/.well-known/jwks.json"
 
 func NewStandardJWTDecoder(ctx context.Context) (*StandardJWTDecoder, error) {
-	return newStandardJWTDecoder(ctx, cognitoJWKSURL)
-}
-
-func newStandardJWTDecoder(ctx context.Context, url string) (*StandardJWTDecoder, error) {
 	builtInKeys, err := parseJWKS(jwks)
 	if err != nil {
 		return nil, err
@@ -40,12 +36,12 @@ func newStandardJWTDecoder(ctx context.Context, url string) (*StandardJWTDecoder
 
 	client := &http.Client{Timeout: 10 * time.Second, Transport: nil, CheckRedirect: nil, Jar: nil}
 
-	keys, err := fetchJWKS(ctx, client, url)
+	keys, err := fetchJWKS(ctx, client, cognitoJWKSURL)
 	if err != nil {
 		slog.WarnContext(ctx, "failed to fetch cognito jwks", "error", err, "action", "falling back to built-in keys")
 		keys = builtInKeys
 	} else {
-		slog.Info("fetched cognito jwks", "url", url, "keys_count", len(keys.Keys))
+		slog.Info("fetched cognito jwks", "url", cognitoJWKSURL, "keys_count", len(keys.Keys))
 	}
 
 	return &StandardJWTDecoder{keys: keys}, nil
