@@ -13,7 +13,7 @@ ClimbLive is a bouldering competition scoring system consisting of:
   - `scorecard`: Scorecard interface for competitors
   - `www`: Public website
 
-The platform manages bouldering climbing competitions, calculates scores in real-time, and provides live updates to multiple clients, including the scoreboard and scorecard. Scores are based on the information entered by the competitiors them self using the scorecard app during competitions.
+The platform manages bouldering climbing competitions, calculates scores in real-time, and provides live updates to multiple clients, including the scoreboard and scorecard. Scores are based on the information entered by the competitors themselves using the scorecard app during competitions.
 
 ## Architecture
 
@@ -172,7 +172,7 @@ make test
 
 ## Coding Conventions
 
-- **Comments**: Keep comments to an absolute minimum, preferrably none
+- **Comments**: Keep comments to an absolute minimum, preferably none
 
 ### Backend (Go)
 
