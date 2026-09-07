@@ -31,7 +31,7 @@ const cognitoJWKSURL = "https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_Jf
 func NewStandardJWTDecoder(ctx context.Context) (*StandardJWTDecoder, error) {
 	builtInKeys, err := parseJWKS(jwks)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, 0)
 	}
 
 	client := &http.Client{Timeout: 10 * time.Second, Transport: nil, CheckRedirect: nil, Jar: nil}
