@@ -18,6 +18,8 @@ import (
 var ErrUnexpectedIssuer = errors.New("unexpected issuer")
 var ErrExpiredCredentials = errors.New("expired credentials")
 var ErrBadSignature = errors.New("bad signature")
+var ErrUnexpectedHTTPStatus = errors.New("unexpected http status")
+var ErrEmptyJWKS = errors.New("empty jwks")
 
 //go:embed keys.json
 var jwks []byte
@@ -38,7 +40,7 @@ func NewStandardJWTDecoder(ctx context.Context) (*StandardJWTDecoder, error) {
 
 	keys, err := fetchJWKS(ctx, client, cognitoJWKSURL)
 	if err != nil {
-		slog.WarnContext(ctx, "failed to fetch cognito jwks", "error", err, "action", "falling back to built-in keys")
+		slog.Warn("failed to fetch cognito jwks", "error", err, "action", "falling back to built-in keys")
 		keys = builtInKeys
 	} else {
 		slog.Info("fetched cognito jwks", "url", cognitoJWKSURL, "keys_count", len(keys.Keys))
@@ -61,7 +63,7 @@ func fetchJWKS(ctx context.Context, client *http.Client, url string) (jose.JSONW
 	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
-		return jose.JSONWebKeySet{}, errors.Errorf("unexpected jwks http status: %s", resp.Status)
+		return jose.JSONWebKeySet{}, errors.Wrap(ErrUnexpectedHTTPStatus, 0)
 	}
 
 	data, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
@@ -93,7 +95,7 @@ func parseJWKS(data []byte) (jose.JSONWebKeySet, error) {
 	}
 
 	if len(keys.Keys) == 0 {
-		return jose.JSONWebKeySet{}, errors.New("empty cognito jwks")
+		return jose.JSONWebKeySet{}, errors.Wrap(ErrEmptyJWKS, 0)
 	}
 
 	return keys, nil
