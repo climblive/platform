@@ -13,7 +13,12 @@ INSERT INTO problem VALUES (NULL, 1, 1, 2, '#f97316', NULL, TRUE, TRUE, NULL, 20
 INSERT INTO problem VALUES (NULL, 1, 1, 3, '#84cc16', NULL, TRUE, TRUE, NULL, 30, 60, 300, 10);
 INSERT INTO problem VALUES (NULL, 1, 1, 4, '#0ea5e9', NULL, TRUE, TRUE, NULL, 40, 80, 400, 10);
 INSERT INTO problem VALUES (NULL, 1, 1, 5, '#8b5cf6', NULL, TRUE, TRUE, NULL, 50, 100, 500, NULL);
-INSERT INTO tick VALUES (NULL, 1, 1, 1, 1, '2024-01-01 00:00:00', TRUE, 999, TRUE, 999, TRUE, 999);
+INSERT INTO tick VALUES (NULL, 1, 1, 1, 1, '2024-01-01 00:00:00', 0, TRUE, 999, TRUE, 999, TRUE, 999);
+
+INSERT INTO contest VALUES (NULL, 1, NULL, 1, 'World Attempts Championships', 'A competition scored by tops, zones and attempts', 'On the web', 'AQ', 1, 0, FALSE, FALSE, NULL, 5, 20160, NOW());
+INSERT INTO comp_class VALUES (NULL, 1, 2, 'Open', NULL, '#ff0000', '2024-01-01 00:00:00', '2026-12-31 23:59:59');
+INSERT INTO contender VALUES (NULL, 1, 2, 'ABCD0006', 'Jim Halpert', 3, '2024-01-01 00:00:00', FALSE, FALSE, NULL, NULL);
+INSERT INTO problem VALUES (NULL, 1, 2, 1, '#ef4444', NULL, TRUE, TRUE, NULL, 0, 0, 0, NULL);
 
 CREATE TABLE `goose_db_version` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -23,4 +28,4 @@ CREATE TABLE `goose_db_version` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO goose_db_version SELECT NULL, seq, 1, NOW() FROM seq_1_to_38;
+INSERT INTO goose_db_version SELECT NULL, seq, 1, NOW() FROM seq_1_to_39;

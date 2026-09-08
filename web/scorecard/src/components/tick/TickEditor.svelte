@@ -96,7 +96,7 @@
     onclick={(event: MouseEvent) => handleSubtractAttempt(event)}
     disabled={!tickBuilder.canSubtractAttempt()}
   >
-    <wa-icon name="minus"></wa-icon>
+    <wa-icon name="minus" label="Subtract failed attempt"></wa-icon>
   </wa-button>
 
   <div class="attempts">
