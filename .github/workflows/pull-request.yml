@@ -108,6 +108,8 @@ jobs:
         env:
           HOME: /root
           BASE_URL: https://host.docker.internal:8443
+          ADMIN_USERNAME: ${{ secrets.E2E_ADMIN_USERNAME }}
+          ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
           TESTCONTAINERS_HOST_OVERRIDE: host.docker.internal
 
       - uses: actions/upload-artifact@v4

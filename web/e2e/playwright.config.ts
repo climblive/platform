@@ -29,15 +29,23 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
+      name: "admin",
+      testMatch: "**/admin.spec.ts",
+      use: { ...devices["Desktop Chrome"], timezoneId: "UTC" },
+    },
+    {
       name: "firefox",
+      testIgnore: "**/admin.spec.ts",
       use: { ...devices["Desktop Firefox"] },
     },
     {
       name: "Mobile Chrome",
+      testIgnore: "**/admin.spec.ts",
       use: { ...devices["Pixel 5"] },
     },
     {
       name: "Mobile Safari",
+      testIgnore: "**/admin.spec.ts",
       use: { ...devices["iPhone 12"] },
     },
   ],
