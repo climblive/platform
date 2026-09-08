@@ -1,14 +1,8 @@
-import {
-  AuthenticationDetails,
-  CognitoUser,
-  CognitoUserPool,
-} from "amazon-cognito-identity-js";
-import config from "../../packages/lib/src/config.json";
 import { expect, test } from "../fixtures";
 
-let refreshToken: string;
-
-test.beforeAll(async () => {
+test("create a competition, register a contender, enter results and draw a raffle winner", async ({
+  page,
+}) => {
   const username = process.env.ADMIN_USERNAME;
   const password = process.env.ADMIN_PASSWORD;
 
@@ -18,43 +12,25 @@ test.beforeAll(async () => {
     );
   }
 
-  const user = new CognitoUser({
-    Username: username,
-    Pool: new CognitoUserPool({
-      UserPoolId: config.COGNITO_POOL_ID,
-      ClientId: config.COGNITO_CLIENT_ID,
-    }),
-  });
-
-  refreshToken = await new Promise<string>((resolve, reject) => {
-    user.authenticateUser(
-      new AuthenticationDetails({ Username: username, Password: password }),
-      {
-        onSuccess: (session) => resolve(session.getRefreshToken().getToken()),
-        onFailure: reject,
-        newPasswordRequired: () =>
-          reject(new Error("The test user needs a permanent password.")),
-        mfaRequired: () =>
-          reject(new Error("The test user must not require MFA.")),
-        totpRequired: () =>
-          reject(new Error("The test user must not require MFA.")),
-      },
-    );
-  });
-});
-
-test("create a competition, register a contender, enter results and draw a raffle winner", async ({
-  page,
-}) => {
   let contestUrl: string;
   let contenderUrl: string;
 
-  await page.addInitScript((token) => {
-    localStorage.setItem("refresh_token", token);
-  }, refreshToken);
+  await test.step("Sign in through Cognito", async () => {
+    await page.goto("/admin");
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
+    await page.waitForURL(
+      "https://clmb.auth.eu-west-1.amazoncognito.com/login?**",
+    );
+    await page.locator('input[name="username"]:visible').fill(username);
+    await page.locator('input[name="password"]:visible').fill(password);
+    await page.getByRole("button", { name: "Sign in", exact: true }).click();
+    await page.waitForURL(/\/admin\/?$/);
+    await expect(
+      page.getByRole("button", { name: "Create new competition" }),
+    ).toBeVisible();
+  });
 
   await test.step("Create the competition", async () => {
-    await page.goto("/admin");
     await page.getByRole("button", { name: "Create new competition" }).click();
 
     await page
