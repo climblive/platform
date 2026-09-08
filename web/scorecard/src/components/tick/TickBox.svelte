@@ -42,7 +42,7 @@
   };
 </script>
 
-<div class="container" data-active={checked}>
+<div class="container" role="group" aria-label={label} data-active={checked}>
   <div class="top">
     <wa-checkbox onchange={handleChange} {checked} size="m">
       {label}

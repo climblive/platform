@@ -394,19 +394,16 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   });
 
   const expectAttempts = async (attempts: number) => {
-    await expect(dialog.locator(".attempts")).toHaveText(
+    await expect(dialog.getByRole("status", { name: "Attempts" })).toHaveText(
       `${attempts} ${attempts === 1 ? "attempt" : "attempts"}`,
     );
   };
 
   const expectFeature = async (name: string, attempt: string) => {
-    const checkbox = dialog.getByRole("checkbox", { name, exact: true });
+    const feature = dialog.getByRole("group", { name, exact: true });
+    const checkbox = feature.getByRole("checkbox", { name, exact: true });
     await expect(checkbox).toBeChecked();
-    await expect(
-      dialog.locator(".container").filter({
-        has: page.getByRole("checkbox", { name, exact: true }),
-      }),
-    ).toContainText(`${attempt} attempt`);
+    await expect(feature.getByText(attempt, { exact: true })).toBeVisible();
   };
 
   await problem.getByRole("button", { name: "Tick", exact: true }).click();

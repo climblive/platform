@@ -99,7 +99,7 @@
     <wa-icon name="minus" label="Subtract failed attempt"></wa-icon>
   </wa-button>
 
-  <div class="attempts">
+  <div class="attempts" role="status" aria-label="Attempts">
     <span class="number">{tick.attemptsTop}</span>
     {tick.attemptsTop === 1 ? "attempt" : "attempts"}
   </div>
