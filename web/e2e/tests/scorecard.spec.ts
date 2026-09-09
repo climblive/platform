@@ -384,29 +384,32 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await expect(page.getByText("Jim Halpert")).toBeVisible();
 
   const problem = page.getByRole("region", { name: "Problem 1", exact: true });
-  const dialog = problem.locator("wa-dialog");
-  const top = dialog.getByRole("checkbox", { name: /^Top/ });
-  const zone1 = dialog.getByRole("checkbox", { name: /^Zone 1/ });
-  const zone2 = dialog.getByRole("checkbox", { name: /^Zone 2/ });
-  const addAttempt = dialog.getByRole("button", { name: "Add failed attempt" });
-  const subtractAttempt = dialog.getByRole("button", {
+  const dialog = problem.getByRole("dialog");
+  const top = problem.getByRole("checkbox", { name: /^Top/ });
+  const zone1 = problem.getByRole("checkbox", { name: /^Zone 1/ });
+  const zone2 = problem.getByRole("checkbox", { name: /^Zone 2/ });
+  const addAttempt = problem.getByRole("button", {
+    name: "Add failed attempt",
+  });
+  const subtractAttempt = problem.getByRole("button", {
     name: "Subtract failed attempt",
   });
 
   const expectAttempts = async (attempts: number) => {
-    await expect(dialog.getByRole("status", { name: "Attempts" })).toHaveText(
+    await expect(problem.getByRole("status", { name: "Attempts" })).toHaveText(
       `${attempts} ${attempts === 1 ? "attempt" : "attempts"}`,
     );
   };
 
   const expectFeature = async (name: string, attempt: string) => {
-    const feature = dialog.getByRole("group", { name, exact: true });
+    const feature = problem.getByRole("group", { name, exact: true });
     const checkbox = feature.getByRole("checkbox", { name, exact: true });
     await expect(checkbox).toBeChecked();
     await expect(feature.getByText(attempt, { exact: true })).toBeVisible();
   };
 
   await problem.getByRole("button", { name: "Tick", exact: true }).click();
+  await expect(dialog).toBeVisible();
   await expect(top).not.toBeChecked();
   await expect(zone1).not.toBeChecked();
   await expect(zone2).not.toBeChecked();
@@ -418,10 +421,11 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await expectFeature("Zone 2", "1st attempt");
   await expect(problem.getByText("+1t", { exact: true })).toBeVisible();
 
-  await dialog.getByRole("button", { name: "Remove" }).click();
+  await problem.getByRole("button", { name: "Remove" }).click();
   await expect(problem.getByText("+1t", { exact: true })).not.toBeVisible();
 
   await problem.getByRole("button", { name: "Tick", exact: true }).click();
+  await expect(dialog).toBeVisible();
   await expect(top).not.toBeChecked();
   await expect(zone1).not.toBeChecked();
   await expect(zone2).not.toBeChecked();
