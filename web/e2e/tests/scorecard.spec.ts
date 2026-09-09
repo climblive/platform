@@ -420,9 +420,11 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await expectFeature("Zone 1", "1st attempt");
   await expectFeature("Zone 2", "1st attempt");
   await expect(problem.getByText("+1t", { exact: true })).toBeVisible();
+  await expect(page.getByText("1t 1z₂ 1z₁", { exact: true })).toBeVisible();
 
   await problem.getByRole("button", { name: "Remove" }).click();
   await expect(problem.getByText("+1t", { exact: true })).not.toBeVisible();
+  await expect(page.getByText("0t 0z₂ 0z₁", { exact: true })).toBeVisible();
 
   await problem.getByRole("button", { name: "Tick", exact: true }).click();
   await expect(dialog).toBeVisible();
@@ -434,6 +436,7 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await expectAttempts(1);
   await expectFeature("Zone 1", "1st attempt");
   await expect(problem.getByText("+1z₁", { exact: true })).toBeVisible();
+  await expect(page.getByText("0t 0z₂ 1z₁", { exact: true })).toBeVisible();
 
   await addAttempt.click();
   await expectAttempts(2);
@@ -443,6 +446,7 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await expectFeature("Zone 1", "1st attempt");
   await expectFeature("Zone 2", "3rd attempt");
   await expect(problem.getByText("+1z₂", { exact: true })).toBeVisible();
+  await expect(page.getByText("0t 1z₂ 1z₁", { exact: true })).toBeVisible();
 
   await addAttempt.click();
   await expectAttempts(4);
@@ -459,6 +463,7 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await expect(addAttempt).toBeDisabled();
   await expect(subtractAttempt).toBeDisabled();
   await expect(problem.getByText("+1t", { exact: true })).toBeVisible();
+  await expect(page.getByText("1t 1z₂ 1z₁", { exact: true })).toBeVisible();
 });
 
 test("info tab", async ({ page }) => {
