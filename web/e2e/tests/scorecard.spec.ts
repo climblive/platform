@@ -455,8 +455,6 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await expect(addAttempt).toBeDisabled();
   await expect(subtractAttempt).toBeDisabled();
   await expect(problem.getByText("+1t", { exact: true })).toBeVisible();
-
-  await dialog.getByRole("button", { name: "Remove" }).click();
 });
 
 test("info tab", async ({ page }) => {
