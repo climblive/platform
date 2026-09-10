@@ -33,7 +33,6 @@
   import "@awesome.me/webawesome/dist/components/radio/radio.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
-  import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
   import { GenericForm, name, value } from "@climblive/lib/forms";
   import type { Contest } from "@climblive/lib/models";
   import { countries, getFlag } from "@climblive/lib/utils";

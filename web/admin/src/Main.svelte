@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
   import { Route, Router } from "svelte-routing";
   import Header from "./Header.svelte";
   import ContenderView from "./pages/ContenderView.svelte";
