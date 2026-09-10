@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import EditProfile from "@/pages/EditProfile.svelte";
   import Loading from "@/pages/Loading.svelte";
   import Register from "@/pages/Register.svelte";

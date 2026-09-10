@@ -1,4 +1,6 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   type Props = {
     onClick: (e: MouseEvent) => void;
     iconName: string;

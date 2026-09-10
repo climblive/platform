@@ -1,4 +1,6 @@
 <script lang="ts" module>
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { z } from "@climblive/lib/utils";
 
   export const editFormSchema = z.object({

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import ContestForm, {
     formSchema,
     nanosecondsInMinute,

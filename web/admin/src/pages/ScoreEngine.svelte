@@ -1,4 +1,7 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import Loader from "@/components/Loader.svelte";
   import {
     getContestQuery,
