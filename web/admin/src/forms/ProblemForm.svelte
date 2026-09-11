@@ -35,7 +35,6 @@
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
-  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import type WaNumberInput from "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";

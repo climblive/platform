@@ -49,13 +49,11 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
-  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/slider/slider.js";
-  import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
   import { GenericForm, name } from "@climblive/lib/forms";
   import type {
     CompClassTemplate,

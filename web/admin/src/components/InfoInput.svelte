@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/button-group/button-group.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import { name } from "@climblive/lib/forms";

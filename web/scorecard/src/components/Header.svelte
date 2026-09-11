@@ -1,4 +1,6 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { ContenderName, FullLogo } from "@climblive/lib/components";
   import { navigate } from "svelte-routing";
 
