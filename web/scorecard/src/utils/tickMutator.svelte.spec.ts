@@ -89,7 +89,7 @@ describe(TickMutator.name, () => {
           attemptsZone1: 1,
           zone2: true,
           attemptsZone2: 2,
-          top: false,
+          top: true,
           attemptsTop: 3,
         },
       );
@@ -97,7 +97,9 @@ describe(TickMutator.name, () => {
       expect(mutator.problemId).toEqual(PROBLEM_ID);
       expect(mutator.features).toEqual(["top"]);
       expect(mutator.attempts).toEqual(3);
-      expect(mutator.reachedFeatures).toEqual(NO_LUCK);
+      expect(mutator.reachedFeatures).toEqual(
+        new Map<Feature, number>([["top", 3]]),
+      );
     });
   });
 
