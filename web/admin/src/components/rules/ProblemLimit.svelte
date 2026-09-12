@@ -4,7 +4,7 @@
   import WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
-  import { checked, GenericForm, name } from "@climblive/lib/forms";
+  import { GenericForm, name } from "@climblive/lib/forms";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
   import { patchContestMutation } from "@climblive/lib/queries";
   import { debounce, z } from "@climblive/lib/utils";
@@ -66,7 +66,7 @@
 
             setTimeout(() => form.requestSubmit());
           }}
-          {@attach checked(enabled)}
+          checked={enabled}
         ></wa-checkbox>
       {/snippet}
       {#snippet indicator()}
