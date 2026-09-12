@@ -122,6 +122,13 @@ func TestCompareContender(t *testing.T) {
 
 		assertOrder(t, c1, c2)
 	})
+
+	t.Run("Equal", func(t *testing.T) {
+		c1 = best(1)
+		c2 = best(1)
+
+		assert.Equal(t, 0, c1.Compare(c2))
+	})
 }
 
 func TestTickPool_Add(t *testing.T) {
