@@ -201,6 +201,21 @@ describe(TickMutator.name, () => {
   });
 
   describe(TickMutator.prototype.reachFeature.name, () => {
+    it("should reach all preceding features when reaching top", () => {
+      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, NO_LUCK);
+
+      mutator.reachFeature("top");
+
+      expect(mutator.attempts).toEqual(2);
+      expect(mutator.reachedFeatures).toEqual(
+        new Map<Feature, number>([
+          ["zone1", 2],
+          ["zone2", 2],
+          ["top", 2],
+        ]),
+      );
+    });
+
     it("should reach the feature and all preceding features", () => {
       const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, NO_LUCK);
 
