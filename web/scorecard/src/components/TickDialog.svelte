@@ -15,7 +15,7 @@
     tick: Tick | undefined;
     disabled: boolean | undefined;
     pointValue?: PointValue;
-    showPoints: boolean;
+    enablePoints: boolean;
     enableAttempts: boolean;
   }
 
@@ -24,7 +24,7 @@
     tick,
     disabled = false,
     pointValue,
-    showPoints,
+    enablePoints,
     enableAttempts,
   }: Props = $props();
 
@@ -111,7 +111,7 @@
     </div>
 
     {#if enableAttempts}
-      <TickEditor {problem} {tick} {pointValue} {showPoints} {putTick} />
+      <TickEditor {problem} {tick} {pointValue} {enablePoints} {putTick} />
     {:else}
       <SimpleTickEditor {problem} {tick} {pointValue} {putTick} bind:open />
     {/if}

@@ -12,7 +12,7 @@
     tick?: Tick | undefined;
     disabled: boolean;
     counted: boolean;
-    showPoints: boolean;
+    enablePoints: boolean;
     enableAttempts: boolean;
   }
 
@@ -21,7 +21,7 @@
     tick,
     disabled,
     counted,
-    showPoints,
+    enablePoints,
     enableAttempts,
   }: Props = $props();
 
@@ -53,7 +53,7 @@
   />
   <span class="number">#{problem.number}</span>
   <span class="points">
-    {#if showPoints && valueRange}
+    {#if enablePoints && valueRange}
       <span class="top">
         {#if valueRange.min === valueRange.max}
           {valueRange.max}p
@@ -64,7 +64,7 @@
     {/if}
   </span>
   <div class="score" class:uncounted={!counted}>
-    {#if showPoints && tick && problem.pointValue?.current}
+    {#if enablePoints && tick && problem.pointValue?.current}
       <Score
         value={problem.pointValue.current + "p"}
         prefix={counted ? "+" : undefined}
@@ -84,7 +84,7 @@
     {disabled}
     pointValue={problem.pointValue}
     {enableAttempts}
-    {showPoints}
+    {enablePoints}
   />
 </section>
 
