@@ -17,6 +17,7 @@ func TestContestValidator(t *testing.T) {
 			Name:               "Swedish Championships",
 			Country:            "SE",
 			QualifyingProblems: 10,
+			UsePoints:          true,
 			Finalists:          7,
 			GracePeriod:        time.Minute * 15,
 			NameRetentionTime:  14 * 24 * time.Hour,
@@ -71,6 +72,17 @@ func TestContestValidator(t *testing.T) {
 	t.Run("QualifyingProblemsTooLarge", func(t *testing.T) {
 		contest := validContest()
 		contest.QualifyingProblems = 65536 + 1
+
+		err := validator.Validate(contest)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("QualifyingProblemsWithoutPoints", func(t *testing.T) {
+		contest := validContest()
+		contest.UsePoints = false
+		contest.QualifyingProblems = 10
 
 		err := validator.Validate(contest)
 

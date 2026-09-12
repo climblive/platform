@@ -20,7 +20,7 @@
 
   const patchContest = patchContestMutation(contest.id);
 
-  let enabled = $derived(contest.qualifyingProblems > 0);
+  let enabled = $derived(contest.usePoints && contest.qualifyingProblems > 0);
   let saved = $state(false);
   let savedTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -53,11 +53,13 @@
   {#snippet children(form)}
     <RuleOptionCard
       title="Problem limit"
+      disabled={!contest.usePoints}
       description="Only count the hardest problems towards each competitor's total score."
     >
       {#snippet header()}
         <wa-checkbox
           size="s"
+          disabled={!contest.usePoints}
           onchange={(event: InputEvent) => {
             const checkbox = event.target as WaCheckbox;
             enabled = checkbox.checked;
@@ -88,6 +90,7 @@
 
             <wa-number-input
               size="s"
+              disabled={!contest.usePoints}
               {@attach name("qualifyingProblems")}
               label="Limit"
               required

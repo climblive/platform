@@ -47,6 +47,8 @@ func (v ContestValidator) Validate(contest domain.Contest) error {
 		fallthrough
 	case contest.QualifyingProblems < 0 || contest.QualifyingProblems > 65536:
 		fallthrough
+	case !contest.UsePoints && contest.QualifyingProblems > 0:
+		fallthrough
 	case contest.GracePeriod < 0 || contest.GracePeriod > time.Hour:
 		fallthrough
 	case !isValidNameRetentionTime(contest.NameRetentionTime):
