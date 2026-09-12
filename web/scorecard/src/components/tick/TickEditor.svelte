@@ -65,6 +65,8 @@
     switch (true) {
       case attempts === 1:
         return "in 1 attempt";
+      case attempts > 999:
+        return undefined;
       default:
         return `in ${attempts} attempts`;
     }
@@ -119,6 +121,7 @@
   bonusPoints={pointValue?.flashBonus}
   checked={tick?.top}
   attempts={tick?.attemptsTop ?? 0}
+  disabled={tick?.top === false && !tickMutator.canAddAttempt()}
 />
 
 {#if problem.zone2Enabled}
@@ -129,6 +132,7 @@
     points={pointValue?.zone2}
     checked={tick?.zone2}
     attempts={tick?.attemptsZone2 ?? 0}
+    disabled={tick?.zone2 === false && !tickMutator.canAddAttempt()}
   />
 {/if}
 
@@ -140,6 +144,7 @@
     points={pointValue?.zone1}
     checked={tick?.zone1}
     attempts={tick?.attemptsZone1 ?? 0}
+    disabled={tick?.zone1 === false && !tickMutator.canAddAttempt()}
   />
 {/if}
 

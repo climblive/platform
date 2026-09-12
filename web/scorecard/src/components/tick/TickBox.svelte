@@ -11,6 +11,7 @@
     points?: number;
     bonusPoints?: number;
     checked: boolean;
+    disabled?: boolean;
   };
 
   const {
@@ -21,6 +22,7 @@
     points,
     bonusPoints,
     checked,
+    disabled,
   }: Props = $props();
 
   const pointsLabel = $derived.by(() => {
@@ -43,7 +45,7 @@
 </script>
 
 <div class="container" role="group" aria-label={label} data-checked={checked}>
-  <wa-checkbox onchange={handleChange} {checked} size="m">
+  <wa-checkbox onchange={handleChange} {checked} {disabled} size="m">
     {label}
     {#if sublabel !== undefined}
       <span class="sublabel">

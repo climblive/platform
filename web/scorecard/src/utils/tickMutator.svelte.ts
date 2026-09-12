@@ -85,20 +85,24 @@ export class TickMutator {
     return this.#attempts;
   }
 
-  public addAttempt(): void {
+  public addAttempt(): boolean {
     if (!this.canAddAttempt()) {
-      return;
+      return false;
     }
 
     this.#attempts += 1;
+
+    return true;
   }
 
-  public subtractAttempt(): void {
+  public subtractAttempt(): boolean {
     if (!this.canSubtractAttempt()) {
-      return;
+      return false;
     }
 
     this.#attempts -= 1;
+
+    return true;
   }
 
   public canAddAttempt(): boolean {
@@ -126,7 +130,9 @@ export class TickMutator {
   }
 
   public reachFeature(feature: Feature): void {
-    this.addAttempt();
+    if (!this.addAttempt()) {
+      return;
+    }
 
     const featureIndex = this.#features.findIndex((f) => f === feature);
     if (featureIndex === -1) {

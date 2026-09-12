@@ -149,17 +149,19 @@ describe(TickMutator.name, () => {
     it("should add an attempt", () => {
       const mutator = new TickMutator(ALL_FEATURES, 0, NO_RESULT);
 
-      mutator.addAttempt();
+      const attemptAdded = mutator.addAttempt();
 
+      expect(attemptAdded).toEqual(true);
       expect(mutator.attempts).toEqual(1);
     });
 
     it("should not add an attempt if another attempt cannot be added", () => {
       const mutator = new TickMutator(ALL_FEATURES, 1, FLASH);
 
-      mutator.addAttempt();
+      const attemptAdded = mutator.addAttempt();
 
       expect(mutator.attempts).toEqual(1);
+      expect(attemptAdded).toEqual(false);
     });
   });
 
@@ -167,17 +169,19 @@ describe(TickMutator.name, () => {
     it("should subtract an attempt", () => {
       const mutator = new TickMutator(ALL_FEATURES, 1, NO_RESULT);
 
-      mutator.subtractAttempt();
+      const attemptSubtracted = mutator.subtractAttempt();
 
       expect(mutator.attempts).toEqual(0);
+      expect(attemptSubtracted).toEqual(true);
     });
 
     it("should not subtract an attempt if the latest attempt reached a feature", () => {
       const mutator = new TickMutator(ALL_FEATURES, 1, new Map([["zone1", 1]]));
 
-      mutator.subtractAttempt();
+      const attemptSubtracted = mutator.subtractAttempt();
 
       expect(mutator.attempts).toEqual(1);
+      expect(attemptSubtracted).toEqual(false);
     });
   });
 
@@ -217,6 +221,15 @@ describe(TickMutator.name, () => {
       mutator.reachFeature("zone1");
 
       expect(mutator.attempts).toEqual(1);
+      expect(mutator.reachedFeatures).toEqual(NO_RESULT);
+    });
+
+    it("should not reach a feature if no more attempts can be added", () => {
+      const mutator = new TickMutator(ALL_FEATURES, 999, NO_RESULT);
+
+      mutator.reachFeature("top");
+
+      expect(mutator.attempts).toEqual(999);
       expect(mutator.reachedFeatures).toEqual(NO_RESULT);
     });
   });
