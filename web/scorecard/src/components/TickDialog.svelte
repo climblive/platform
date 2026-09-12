@@ -4,10 +4,7 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
   import type { ScorecardSession } from "@/types";
-  import {
-    HoldColorIndicator,
-    SaveIndicator,
-  } from "@climblive/lib/components";
+  import { HoldColorIndicator, SaveIndicator } from "@climblive/lib/components";
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
   import { deleteTickMutation, putTickMutation } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
