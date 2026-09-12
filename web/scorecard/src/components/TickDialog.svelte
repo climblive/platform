@@ -4,7 +4,10 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
   import type { ScorecardSession } from "@/types";
-  import { HoldColorIndicator } from "@climblive/lib/components";
+  import {
+    HoldColorIndicator,
+    SaveIndicator,
+  } from "@climblive/lib/components";
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
   import { deleteTickMutation, putTickMutation } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
@@ -130,9 +133,7 @@
         {#if putTick.isPending}
           <wa-spinner></wa-spinner>
         {:else if putTick.isSuccess}
-          <div class="success">
-            <wa-icon name="check"></wa-icon> Saved
-          </div>
+          <SaveIndicator />
         {/if}
       </div>
 
@@ -240,21 +241,5 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-
-    .success {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--wa-space-2xs);
-      color: var(--wa-color-success-fill-loud);
-      animation: hide 0s ease 2s;
-      animation-fill-mode: forwards;
-    }
-  }
-
-  @keyframes hide {
-    to {
-      visibility: hidden;
-    }
   }
 </style>
