@@ -13,11 +13,9 @@ const NO_LUCK = new Map<Feature, number>();
 describe(buildTick.name, () => {
   it("should build a tick with implicit features and attempts", () => {
     expect(
-      buildTick({
-        problemId: PROBLEM_ID,
-        attempts: 4,
-        reachedFeatures: new Map<Feature, number>([["zone2", 3]]),
-      }),
+      buildTick(
+        new TickMutator(PROBLEM_ID, ALL_FEATURES, 4, new Map([["zone2", 3]])),
+      ),
     ).toEqual({
       problemId: PROBLEM_ID,
       zone1: true,

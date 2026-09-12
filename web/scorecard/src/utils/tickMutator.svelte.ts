@@ -171,7 +171,7 @@ export class TickMutator {
 }
 
 export function buildTick(
-  mutator: Pick<TickMutator, "problemId" | "attempts" | "reachedFeatures">,
+  mutator: TickMutator,
 ): Omit<Tick, "id" | "timestamp" | "revision"> {
   const hasReached = (feature: Feature): boolean => {
     let featureReached = false;
