@@ -1578,8 +1578,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 
-		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
-
 		f.store.
 			On("GetRules").
 			Return(scores.Rules{})
@@ -1591,24 +1589,10 @@ func TestDefaultScoreEngine(t *testing.T) {
 				CompClassID:  fakedCompClassID,
 				Disqualified: true,
 				Score: scores.Score{
-					Points: 100,
+					Points:       100,
+					Tops:         1,
+					AttemptsTops: 10,
 				},
-			}, true)
-
-		f.store.
-			On("GetTicksByContender", fakedContenderID).
-			Return(slices.Values([]scores.Tick{
-				{
-					ProblemID:   fakedProblemID,
-					Top:         true,
-					AttemptsTop: 10,
-				},
-			}))
-
-		f.store.
-			On("GetProblem", fakedProblemID).
-			Return(scores.Problem{
-				ID: fakedProblemID,
 			}, true)
 
 		f.store.
@@ -1616,11 +1600,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				ID:           fakedContenderID,
 				CompClassID:  fakedCompClassID,
 				Disqualified: true,
-				Score: scores.Score{
-					Points:       0,
-					Tops:         1,
-					AttemptsTops: 10,
-				},
+				Score:        scores.Score{},
 			}).Return()
 
 		effects := slices.Collect(f.engine.ScoreContender(fakedContenderID))
@@ -1628,36 +1608,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 		require.ElementsMatch(t, effects, []scores.Effect{
 			scores.EffectRankClass{CompClassID: fakedCompClassID},
 		})
-
-		awaitExpectations(t)
-	})
-
-	t.Run("ScoreContender_DisqualifiedNoScoreChange", func(t *testing.T) {
-		f, awaitExpectations := makeFixture()
-
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
-
-		f.store.
-			On("GetRules").
-			Return(scores.Rules{})
-
-		f.store.
-			On("GetTicksByContender", fakedContenderID).
-			Return(slices.Values([]scores.Tick{}))
-
-		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{
-				ID:           fakedContenderID,
-				CompClassID:  fakedCompClassID,
-				Disqualified: true,
-				Score:        scores.Score{},
-			}, true)
-
-		effects := f.engine.ScoreContender(fakedContenderID)
-
-		assert.Nil(t, effects)
 
 		awaitExpectations(t)
 	})

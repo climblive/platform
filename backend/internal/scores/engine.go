@@ -528,52 +528,52 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 
 	contender.Score = Score{}
 
-	switch {
-	case contender.Disqualified:
-	case rules.UsePoints:
-		ticks := e.store.GetTicksByContender(contender.ID)
+	if !contender.Disqualified {
+		if rules.UsePoints {
+			ticks := e.store.GetTicksByContender(contender.ID)
 
-		var pointValues iter.Seq[int] = func(yield func(int) bool) {
-			for tick := range ticks {
-				value, found := e.store.GetPointValue(contender.ID, tick.ProblemID)
-				if !found {
-					continue
-				}
+			var pointValues iter.Seq[int] = func(yield func(int) bool) {
+				for tick := range ticks {
+					value, found := e.store.GetPointValue(contender.ID, tick.ProblemID)
+					if !found {
+						continue
+					}
 
-				if !yield(value.Current) {
-					return
+					if !yield(value.Current) {
+						return
+					}
 				}
 			}
+
+			scorer := Scorer{
+				ProblemLimit: rules.QualifyingProblems,
+			}
+
+			contender.Points = scorer.CalculatePoints(pointValues)
 		}
 
-		scorer := Scorer{
-			ProblemLimit: rules.QualifyingProblems,
-		}
+		ticks := e.store.GetTicksByContender(contender.ID)
 
-		contender.Points = scorer.CalculatePoints(pointValues)
-	}
+		for tick := range ticks {
+			problem, found := e.store.GetProblem(tick.ProblemID)
+			if !found {
+				continue
+			}
 
-	ticks := e.store.GetTicksByContender(contender.ID)
+			if tick.Top {
+				contender.Tops += 1
+				contender.AttemptsTops += tick.AttemptsTop
+			}
 
-	for tick := range ticks {
-		problem, found := e.store.GetProblem(tick.ProblemID)
-		if !found {
-			continue
-		}
+			if tick.Zone2 && problem.Zone2Enabled {
+				contender.Zone2s += 1
+				contender.AttemptsZone2s += tick.AttemptsZone2
+			}
 
-		if tick.Top {
-			contender.Tops += 1
-			contender.AttemptsTops += tick.AttemptsTop
-		}
-
-		if tick.Zone2 && problem.Zone2Enabled {
-			contender.Zone2s += 1
-			contender.AttemptsZone2s += tick.AttemptsZone2
-		}
-
-		if tick.Zone1 && problem.Zone1Enabled {
-			contender.Zone1s += 1
-			contender.AttemptsZone1s += tick.AttemptsZone1
+			if tick.Zone1 && problem.Zone1Enabled {
+				contender.Zone1s += 1
+				contender.AttemptsZone1s += tick.AttemptsZone1
+			}
 		}
 	}
 
