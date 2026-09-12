@@ -286,7 +286,7 @@ test("tick and untick all problems", async ({ page }) => {
     await expect(problem).toBeVisible();
 
     await problem.getByRole("button", { name: "Edit" }).click();
-    await problem.getByRole("button", { name: "Unsend" }).click();
+    await problem.getByRole("button", { name: "Remove" }).click();
 
     await expect(problem.getByText(`+${p * 100}p`)).not.toBeVisible();
   }
@@ -307,7 +307,7 @@ test("tick a problem as a flash", async ({ page }) => {
   await expect(problem.getByText("+110p")).toBeVisible();
 
   await problem.getByRole("button", { name: "Edit" }).click();
-  await problem.getByRole("button", { name: "Unsend" }).click();
+  await problem.getByRole("button", { name: "Remove" }).click();
 
   await expect(problem.getByText("+110p")).not.toBeVisible();
 });
@@ -324,7 +324,7 @@ test("tick the first zone", async ({ page }) => {
   await expect(problem.getByText("+10p")).toBeVisible();
 
   await problem.getByRole("button", { name: "Edit" }).click();
-  await problem.getByRole("button", { name: "Unsend" }).click();
+  await problem.getByRole("button", { name: "Remove" }).click();
 
   await expect(problem.getByText("+10p")).not.toBeVisible();
 });
@@ -341,7 +341,7 @@ test("tick the second zone", async ({ page }) => {
   await expect(problem.getByText("+20p")).toBeVisible();
 
   await problem.getByRole("button", { name: "Edit" }).click();
-  await problem.getByRole("button", { name: "Unsend" }).click();
+  await problem.getByRole("button", { name: "Remove" }).click();
 
   await expect(problem.getByText("+20p")).not.toBeVisible();
 });
@@ -373,9 +373,97 @@ test("update a problem through all scoring states", async ({ page }) => {
   await expect(problem.getByText("+110p")).toBeVisible();
 
   await problem.getByRole("button", { name: "Edit" }).click();
-  await problem.getByRole("button", { name: "Unsend" }).click();
+  await problem.getByRole("button", { name: "Remove" }).click();
 
   await expect(problem.getByText("+110p")).not.toBeVisible();
+});
+
+test("tick and remove a problem with zones and attempts", async ({ page }) => {
+  await page.goto("/ABCD0006");
+
+  await expect(page.getByText("Jim Halpert")).toBeVisible();
+
+  const problem = page.getByRole("region", { name: "Problem 1", exact: true });
+  const dialog = problem.getByRole("dialog");
+  const top = problem.getByRole("checkbox", { name: /^Top/ });
+  const zone1 = problem.getByRole("checkbox", { name: /^Zone 1/ });
+  const zone2 = problem.getByRole("checkbox", { name: /^Zone 2/ });
+  const addAttempt = problem.getByRole("button", {
+    name: "Add failed attempt",
+  });
+  const subtractAttempt = problem.getByRole("button", {
+    name: "Subtract failed attempt",
+  });
+
+  const expectAttempts = async (attempts: number) => {
+    await expect(problem.getByRole("status", { name: "Attempts" })).toHaveText(
+      `${attempts} ${attempts === 1 ? "attempt" : "attempts"}`,
+    );
+  };
+
+  const expectFeature = async (name: string, attempt: string) => {
+    const feature = problem.getByRole("group", { name, exact: true });
+    const checkbox = feature.getByRole("checkbox", { name, exact: true });
+    await expect(checkbox).toBeChecked();
+    await expect(feature.getByText(attempt, { exact: true })).toBeVisible();
+  };
+
+  await problem.getByRole("button", { name: "Tick", exact: true }).click();
+  await expect(dialog).toBeVisible();
+  await expect(top).not.toBeChecked();
+  await expect(zone1).not.toBeChecked();
+  await expect(zone2).not.toBeChecked();
+  await top.check({ force: true });
+
+  await expectAttempts(1);
+  await expectFeature("Top", "1st attempt");
+  await expectFeature("Zone 1", "1st attempt");
+  await expectFeature("Zone 2", "1st attempt");
+  await expect(problem.getByText("+1t", { exact: true })).toBeVisible();
+  await expect(page.getByText("1t 1z₂ 1z₁", { exact: true })).toBeVisible();
+
+  await problem.getByRole("button", { name: "Remove" }).click();
+  await expect(problem.getByText("+1t", { exact: true })).not.toBeVisible();
+  await expect(page.getByText("0t 0z₂ 0z₁", { exact: true })).toBeVisible();
+
+  await problem.getByRole("button", { name: "Tick", exact: true }).click();
+  await expect(dialog).toBeVisible();
+  await expect(top).not.toBeChecked();
+  await expect(zone1).not.toBeChecked();
+  await expect(zone2).not.toBeChecked();
+
+  await zone1.check({ force: true });
+  await expectAttempts(1);
+  await expectFeature("Zone 1", "1st attempt");
+  await expect(problem.getByText("+1z₁", { exact: true })).toBeVisible();
+  await expect(page.getByText("0t 0z₂ 1z₁", { exact: true })).toBeVisible();
+
+  await addAttempt.click();
+  await expectAttempts(2);
+
+  await zone2.check({ force: true });
+  await expectAttempts(3);
+  await expectFeature("Zone 1", "1st attempt");
+  await expectFeature("Zone 2", "3rd attempt");
+  await expect(problem.getByText("+1z₂", { exact: true })).toBeVisible();
+  await expect(page.getByText("0t 1z₂ 1z₁", { exact: true })).toBeVisible();
+
+  await addAttempt.click();
+  await expectAttempts(4);
+  await addAttempt.click();
+  await expectAttempts(5);
+  await subtractAttempt.click();
+  await expectAttempts(4);
+
+  await top.check({ force: true });
+  await expectAttempts(5);
+  await expectFeature("Zone 1", "1st attempt");
+  await expectFeature("Zone 2", "3rd attempt");
+  await expectFeature("Top", "5th attempt");
+  await expect(addAttempt).toBeDisabled();
+  await expect(subtractAttempt).toBeDisabled();
+  await expect(problem.getByText("+1t", { exact: true })).toBeVisible();
+  await expect(page.getByText("1t 1z₂ 1z₁", { exact: true })).toBeVisible();
 });
 
 test("info tab", async ({ page }) => {

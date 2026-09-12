@@ -3,6 +3,7 @@ package domain
 import "errors"
 
 var ErrNotFound = errors.New("not found")
+var ErrSuperseded = errors.New("superseded")
 var ErrArchived = errors.New("archived")
 var ErrDuplicate = errors.New("duplicate")
 var ErrBadState = errors.New("bad state")

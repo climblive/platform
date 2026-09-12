@@ -26,7 +26,7 @@ func TestScorerWithProblemLimit(t *testing.T) {
 		100,
 	}
 
-	score := rules.CalculateScore(slices.Values(tickPointValues))
+	score := rules.CalculatePoints(slices.Values(tickPointValues))
 
 	assert.Equal(t, 1450, score)
 }
@@ -49,7 +49,7 @@ func TestScorer_NoLimit(t *testing.T) {
 		100,
 	}
 
-	score := rules.CalculateScore(slices.Values(tickPointValues))
+	score := rules.CalculatePoints(slices.Values(tickPointValues))
 
 	assert.Equal(t, 1775, score)
 }

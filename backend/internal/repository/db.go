@@ -19,7 +19,7 @@ type Database struct {
 
 func NewDatabase(username, password, host string, port int, databaseName string) (*Database, error) {
 	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local&clientFoundRows=false",
 		username,
 		password,
 		host,

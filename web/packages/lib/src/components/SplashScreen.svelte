@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
   import { onMount } from "svelte";
   import SplashLogo from "./SplashLogo.svelte";
 

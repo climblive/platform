@@ -379,11 +379,13 @@ export class ApiClient {
   putTick = async (
     contenderId: number,
     tick: Omit<Tick, "id" | "timestamp">,
+    signal?: AbortSignal,
   ) => {
     const endpoint = `/contenders/${contenderId}/ticks`;
 
     const result = await this.axiosInstance.put(endpoint, tick, {
       headers: this.credentialsProvider?.getAuthHeaders(),
+      signal,
     });
 
     return tickSchema.parse(result.data);

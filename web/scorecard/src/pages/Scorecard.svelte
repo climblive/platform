@@ -43,6 +43,7 @@
     getTicksByContenderQuery,
     refetchProblems,
     removeTickFromQueryCache,
+    tickKey,
     updateContenderPublicInfoInQueryCache,
     updatePointValueInQueryCache,
     updateRulesInQueryCache,
@@ -285,9 +286,19 @@
         return;
       }
 
+      const mutationCount = queryClient.isMutating({
+        mutationKey: tickKey($session.contenderId, event.problemId),
+        exact: true,
+      });
+
+      if (mutationCount > 0) {
+        return;
+      }
+
       const newTick: Tick = {
         id: event.tickId,
         timestamp: event.timestamp,
+        revision: event.revision,
         problemId: event.problemId,
         zone1: event.zone1,
         attemptsZone1: event.attemptsZone1,
@@ -465,6 +476,8 @@
                     disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
                     counted={contest.qualifyingProblems === 0 ||
                       (!!tick && countedTickIds.has(tick.id))}
+                    enablePoints={contest.usePoints}
+                    enableAttempts={!contest.usePoints}
                   />
                 {/each}
               </div>

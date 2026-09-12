@@ -234,6 +234,7 @@ type Tick struct {
 	Ownership     OwnershipData `json:"-"`
 	Timestamp     time.Time     `json:"timestamp"`
 	ContestID     ContestID     `json:"-"`
+	Revision      int           `json:"revision"`
 	ProblemID     ProblemID     `json:"problemId"`
 	Zone1         bool          `json:"zone1"`
 	AttemptsZone1 int           `json:"attemptsZone1"`
@@ -292,6 +293,7 @@ type AscentRegisteredEvent struct {
 	Timestamp     time.Time   `json:"timestamp"`
 	ContenderID   ContenderID `json:"contenderId"`
 	ProblemID     ProblemID   `json:"problemId"`
+	Revision      int         `json:"revision"`
 	Zone1         bool        `json:"zone1"`
 	AttemptsZone1 int         `json:"attemptsZone1"`
 	Zone2         bool        `json:"zone2"`

@@ -11,11 +11,21 @@ import (
 
 type BasicRanker struct {
 	numberOfFinalists int
+	usePoints         bool
 }
 
-func NewBasicRanker(numberOfFinalists int) *BasicRanker {
+func (r *BasicRanker) scoresAreEqual(c1, c2 Contender) bool {
+	if r.usePoints {
+		return c1.Points == c2.Points
+	}
+
+	return c1.Score == c2.Score
+}
+
+func NewBasicRanker(numberOfFinalists int, usePoints bool) *BasicRanker {
 	return &BasicRanker{
 		numberOfFinalists: numberOfFinalists,
+		usePoints:         usePoints,
 	}
 }
 
@@ -69,10 +79,18 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 	}
 
 	for i, contender := range sortedContenders {
+		var scoreValue string
+
+		if r.usePoints {
+			scoreValue = fmt.Sprintf("%dp", contender.Points)
+		} else {
+			scoreValue = fmt.Sprintf("%dt %dz₂ %dz₁", contender.Tops, contender.Zone2s, contender.Zone1s)
+		}
+
 		score := domain.Score{
 			Timestamp:   now,
 			ContenderID: contender.ID,
-			Score:       fmt.Sprintf("%dp", contender.Score),
+			Score:       scoreValue,
 			Placement:   0,
 			Finalist:    false,
 			RankOrder:   0,
@@ -82,9 +100,9 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 		case previousContender == nil:
 			placement = 1
 			gap = 0
-		case contender.Score == previousContender.Score:
+		case r.scoresAreEqual(contender, *previousContender):
 			gap++
-		case contender.Score != previousContender.Score:
+		default:
 			placement += 1 + gap
 			gap = 0
 		}
@@ -93,7 +111,7 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 		score.RankOrder = i
 
 		switch {
-		case contender.Score == 0:
+		case contender.Score == Score{}:
 			fallthrough
 		case contender.WithdrawnFromFinals:
 			fallthrough

@@ -1,24 +1,64 @@
 package scores
 
-import "github.com/climblive/platform/backend/internal/domain"
+import (
+	"cmp"
+
+	"github.com/climblive/platform/backend/internal/domain"
+)
+
+type Score struct {
+	Points         int
+	Tops           int
+	AttemptsTops   int
+	Zone1s         int
+	AttemptsZone1s int
+	Zone2s         int
+	AttemptsZone2s int
+}
 
 type Contender struct {
 	ID                  domain.ContenderID
 	CompClassID         domain.CompClassID
 	Disqualified        bool
 	WithdrawnFromFinals bool
-	Score               int
+
+	Score
 }
 
 func (c Contender) Compare(other Contender) int {
-	if c.Score == other.Score {
-		return int(c.ID) - int(other.ID)
+	if result := cmp.Compare(other.Points, c.Points); result != 0 {
+		return result
 	}
 
-	return other.Score - c.Score
+	if result := cmp.Compare(other.Tops, c.Tops); result != 0 {
+		return result
+	}
+
+	if result := cmp.Compare(c.AttemptsTops, other.AttemptsTops); result != 0 {
+		return result
+	}
+
+	if result := cmp.Compare(other.Zone2s, c.Zone2s); result != 0 {
+		return result
+	}
+
+	if result := cmp.Compare(c.AttemptsZone2s, other.AttemptsZone2s); result != 0 {
+		return result
+	}
+
+	if result := cmp.Compare(other.Zone1s, c.Zone1s); result != 0 {
+		return result
+	}
+
+	if result := cmp.Compare(c.AttemptsZone1s, other.AttemptsZone1s); result != 0 {
+		return result
+	}
+
+	return cmp.Compare(c.ID, other.ID)
 }
 
 type Tick struct {
+	Revision      int
 	ContenderID   domain.ContenderID
 	ProblemID     domain.ProblemID
 	Zone1         bool
@@ -103,6 +143,9 @@ type Problem struct {
 	ID domain.ProblemID
 
 	domain.ProblemValue
+
+	Zone1Enabled bool
+	Zone2Enabled bool
 }
 
 type TickPool struct {

@@ -167,7 +167,7 @@ func (e *DefaultScoreEngine) HandleContenderEntered(event domain.ContenderEntere
 		CompClassID:         event.CompClassID,
 		Disqualified:        false,
 		WithdrawnFromFinals: false,
-		Score:               0,
+		Score:               Score{},
 	}
 
 	e.store.SaveContender(contender)
@@ -312,6 +312,7 @@ func (e *DefaultScoreEngine) HandleContenderRequalified(event domain.ContenderRe
 
 func (e *DefaultScoreEngine) HandleAscentRegistered(event domain.AscentRegisteredEvent) iter.Seq[Effect] {
 	tick := Tick{
+		Revision:      event.Revision,
 		ContenderID:   event.ContenderID,
 		ProblemID:     event.ProblemID,
 		Zone1:         event.Zone1,
@@ -320,6 +321,11 @@ func (e *DefaultScoreEngine) HandleAscentRegistered(event domain.AscentRegistere
 		AttemptsZone2: event.AttemptsZone2,
 		Top:           event.Top,
 		AttemptsTop:   event.AttemptsTop,
+	}
+
+	existingTick, found := e.store.GetTick(event.ContenderID, event.ProblemID)
+	if found && existingTick.Revision > event.Revision {
+		return nil
 	}
 
 	contender, found := e.store.GetContender(event.ContenderID)
@@ -371,6 +377,8 @@ func (e *DefaultScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) 
 	problem := Problem{
 		ID:           event.ProblemID,
 		ProblemValue: event.ProblemValue,
+		Zone1Enabled: event.Zone1Enabled,
+		Zone2Enabled: event.Zone2Enabled,
 	}
 
 	e.store.SaveProblem(problem)
@@ -388,6 +396,8 @@ func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEve
 	problem := Problem{
 		ID:           event.ProblemID,
 		ProblemValue: event.ProblemValue,
+		Zone1Enabled: event.Zone1Enabled,
+		Zone2Enabled: event.Zone2Enabled,
 	}
 
 	e.store.SaveProblem(problem)
@@ -396,6 +406,14 @@ func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEve
 		for _, compClassID := range e.store.GetCompClassIDs() {
 			if !yield(EffectCalculatePointValues{CompClassID: compClassID, ProblemID: event.ProblemID}) {
 				return
+			}
+
+			contenders := e.store.GetContendersByCompClass(compClassID)
+
+			for contender := range contenders {
+				if !yield(EffectScoreContender{ContenderID: contender.ID}) {
+					return
+				}
 			}
 		}
 	}
@@ -512,33 +530,59 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 		return nil
 	}
 
+	rules := e.store.GetRules()
+
 	oldScore := contender.Score
 
-	if contender.Disqualified {
-		contender.Score = 0
-	} else {
-		ticks := e.store.GetTicksByContender(contender.ID)
+	contender.Score = Score{}
 
-		var pointValues iter.Seq[domain.PointValue] = func(yield func(domain.PointValue) bool) {
-			for tick := range ticks {
-				value, found := e.store.GetPointValue(contender.ID, tick.ProblemID)
-				if !found {
-					continue
-				}
+	if !contender.Disqualified {
+		if rules.UsePoints {
+			ticks := e.store.GetTicksByContender(contender.ID)
 
-				if !yield(value) {
-					return
+			var pointValues iter.Seq[int] = func(yield func(int) bool) {
+				for tick := range ticks {
+					value, found := e.store.GetPointValue(contender.ID, tick.ProblemID)
+					if !found {
+						continue
+					}
+
+					if !yield(value.Current) {
+						return
+					}
 				}
 			}
+
+			scorer := Scorer{
+				ProblemLimit: rules.QualifyingProblems,
+			}
+
+			contender.Points = scorer.CalculatePoints(pointValues)
 		}
 
-		problemLimit := e.store.GetRules().QualifyingProblems
+		ticks := e.store.GetTicksByContender(contender.ID)
 
-		scorer := Scorer{
-			ProblemLimit: problemLimit,
+		for tick := range ticks {
+			problem, found := e.store.GetProblem(tick.ProblemID)
+			if !found {
+				continue
+			}
+
+			if tick.Top {
+				contender.Tops += 1
+				contender.AttemptsTops += tick.AttemptsTop
+			}
+
+			if tick.Zone2 && problem.Zone2Enabled {
+				contender.Zone2s += 1
+				contender.AttemptsZone2s += tick.AttemptsZone2
+			}
+
+			if tick.Zone1 && problem.Zone1Enabled {
+				contender.Zone1s += 1
+				contender.AttemptsZone1s += tick.AttemptsZone1
+			}
 		}
-
-		contender.Score = scorer.CalculateScore(CurrentPoints(pointValues))
 	}
 
 	if contender.Score == oldScore {
@@ -553,7 +597,7 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 }
 
 func (e *DefaultScoreEngine) RankCompClass(compClassID domain.CompClassID) {
-	ranker := NewBasicRanker(e.store.GetRules().Finalists)
+	ranker := NewBasicRanker(e.store.GetRules().Finalists, e.store.GetRules().UsePoints)
 
 	scores := ranker.RankContenders(e.store.GetContendersByCompClass(compClassID))
 

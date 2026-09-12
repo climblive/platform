@@ -41,6 +41,8 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 		store.SaveProblem(Problem{
 			ID:           problem.ID,
 			ProblemValue: problem.ProblemValue,
+			Zone1Enabled: problem.Zone1Enabled,
+			Zone2Enabled: problem.Zone2Enabled,
 		})
 	}
 
@@ -59,7 +61,15 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 			CompClassID:         contender.CompClassID,
 			WithdrawnFromFinals: contender.WithdrawnFromFinals,
 			Disqualified:        contender.Disqualified,
-			Score:               0,
+			Score: Score{
+				Tops:           0,
+				Points:         0,
+				AttemptsTops:   0,
+				Zone1s:         0,
+				AttemptsZone1s: 0,
+				Zone2s:         0,
+				AttemptsZone2s: 0,
+			},
 		})
 	}
 
@@ -70,6 +80,7 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 
 	for tick := range slices.Values(ticks) {
 		store.SaveTick(*tick.Ownership.ContenderID, Tick{
+			Revision:      tick.Revision,
 			ContenderID:   *tick.Ownership.ContenderID,
 			ProblemID:     tick.ProblemID,
 			Zone1:         tick.Zone1,

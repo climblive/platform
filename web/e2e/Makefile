@@ -1,7 +1,7 @@
 CERT_DIR := .local/certs
 WEB_DIR := ../../backend/cmd/api/web
 
-.PHONY: images certs web clean test test-ci
+.PHONY: images images-ci certs web clean test test-ci
 
 certs: $(CERT_DIR)/cert.pem
 
@@ -24,17 +24,17 @@ web:
 	cp -r ../scorecard/dist $(WEB_DIR)/scorecard
 	cp -r ../www/dist $(WEB_DIR)/www
 
-images: certs
-	@if [ ! -f ../../backend/climblive ]; then \
-		$(MAKE) web; \
-		cd ../../backend && CGO_ENABLED=0 go build -o ./climblive ./cmd/api; \
-	fi
-	docker build ../../backend -t climblive-api:latest
+images: certs web
+	cd ../../backend && CGO_ENABLED=0 go build -o ./climblive ./cmd/api
+	docker build --no-cache ../../backend -t climblive-api:latest
+
+images-ci: certs
+	docker build --no-cache ../../backend -t climblive-api:latest
 
 test: images
 	PW_TEST_HTML_REPORT_OPEN='never' pnpm exec playwright test --headed --project="Mobile Chrome"
 
-test-ci: images
+test-ci: images-ci
 	DEBUG=testcontainers* pnpm exec playwright test
 
 clean:

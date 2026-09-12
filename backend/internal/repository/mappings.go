@@ -120,6 +120,7 @@ func tickToDomain(record database.Tick) domain.Tick {
 		},
 		Timestamp:     record.Timestamp,
 		ContestID:     domain.ContestID(record.ContestID),
+		Revision:      int(record.Revision),
 		ProblemID:     domain.ProblemID(record.ProblemID),
 		Zone1:         record.Zone1,
 		AttemptsZone1: int(record.AttemptsZone1),

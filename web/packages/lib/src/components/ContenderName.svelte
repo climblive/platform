@@ -18,7 +18,7 @@
 
 {#if scrubbedAt && withTooltip}
   <wa-popover for={tooltipId}>
-    The competitor name was removed and anonymized on {format(
+    The competitor's name was removed and anonymized on {format(
       scrubbedAt,
       "yyyy-MM-dd HH:mm",
     )}.

@@ -35,6 +35,7 @@ export const ascentRegisteredEventSchema: z.ZodType<AscentRegisteredEvent> =
     tickId: z.number(),
     timestamp: z.coerce.date(),
     contenderId: z.number(),
+    revision: z.number(),
     problemId: z.number(),
     zone1: z.boolean(),
     attemptsZone1: z.number(),

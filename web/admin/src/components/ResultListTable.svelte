@@ -127,7 +127,7 @@
 
 {#snippet renderScore({ score }: ScoreboardEntry)}
   {#if score}
-    {score.score} pts
+    {score.score}
   {/if}
 {/snippet}
 
