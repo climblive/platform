@@ -10,7 +10,6 @@
     problem: Problem;
     tick: Tick | undefined;
     pointValue?: PointValue;
-    enablePoints: boolean;
     putTick: CreateMutationResult<
       Tick,
       Error,
@@ -19,8 +18,7 @@
     >;
   }
 
-  const { problem, pointValue, enablePoints, putTick, ...rest }: Props =
-    $props();
+  const { problem, pointValue, putTick, ...rest }: Props = $props();
 
   const tickMutator = $derived(TickMutator.from(problem, rest.tick));
   const tick = $derived(buildTick(tickMutator));
@@ -117,7 +115,7 @@
   label="Top"
   sublabel={renderSublabel(tick.top, (tick?.attemptsTop ?? 0) + 1)}
   onChange={(checked) => handleTick(checked, "top")}
-  points={enablePoints ? pointValue?.top : undefined}
+  points={pointValue?.top}
   bonusPoints={pointValue?.flashBonus}
   checked={tick?.top}
   attempts={tick?.attemptsTop ?? 0}
@@ -128,7 +126,7 @@
     label="Zone 2"
     sublabel={renderSublabel(tick.zone2, (tick?.attemptsZone2 ?? 0) + 1)}
     onChange={(checked) => handleTick(checked, "zone2")}
-    points={enablePoints ? pointValue?.zone2 : undefined}
+    points={pointValue?.zone2}
     checked={tick?.zone2}
     attempts={tick?.attemptsZone2 ?? 0}
   />
@@ -139,7 +137,7 @@
     label="Zone 1"
     sublabel={renderSublabel(tick.zone1, (tick?.attemptsZone1 ?? 0) + 1)}
     onChange={(checked) => handleTick(checked, "zone1")}
-    points={enablePoints ? pointValue?.zone1 : undefined}
+    points={pointValue?.zone1}
     checked={tick?.zone1}
     attempts={tick?.attemptsZone1 ?? 0}
   />

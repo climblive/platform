@@ -111,7 +111,12 @@
     </div>
 
     {#if enableAttempts}
-      <TickEditor {problem} {tick} {pointValue} {enablePoints} {putTick} />
+      <TickEditor
+        {problem}
+        {tick}
+        pointValue={enablePoints ? pointValue : undefined}
+        {putTick}
+      />
     {:else}
       <SimpleTickEditor {problem} {tick} {pointValue} {putTick} bind:open />
     {/if}
