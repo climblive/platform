@@ -9,8 +9,8 @@ import { ApiClient } from "../Api";
 import type { Tick } from "../models";
 import { HOUR } from "./constants";
 
-export const putTickMutationKey = (contenderId: number, problemId: number) =>
-  ["putTick", { contenderId, problemId }] as const;
+export const tickKey = (contenderId: number, problemId: number) =>
+  ["tick", { contenderId, problemId }] as const;
 
 export const getTicksByContenderQuery = (
   contenderId: number,
@@ -42,7 +42,7 @@ export const putTickMutation = (contenderId: number, problemId: number) => {
   let abortController: AbortController | undefined;
 
   return createMutation(() => ({
-    mutationKey: putTickMutationKey(contenderId, problemId),
+    mutationKey: tickKey(contenderId, problemId),
     mutationFn: async (tick: Omit<Tick, "id" | "timestamp">) => {
       abortController?.abort();
 

@@ -41,9 +41,9 @@
     getPointValuesByContenderQuery,
     getProblemsQuery,
     getTicksByContenderQuery,
-    putTickMutationKey,
     refetchProblems,
     removeTickFromQueryCache,
+    tickKey,
     updateContenderPublicInfoInQueryCache,
     updatePointValueInQueryCache,
     updateRulesInQueryCache,
@@ -287,7 +287,7 @@
       }
 
       const mutationCount = queryClient.isMutating({
-        mutationKey: putTickMutationKey($session.contenderId, event.problemId),
+        mutationKey: tickKey($session.contenderId, event.problemId),
         exact: true,
       });
 

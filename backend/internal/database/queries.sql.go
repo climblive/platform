@@ -1647,7 +1647,6 @@ INSERT INTO
 VALUES
     (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
-    id = LAST_INSERT_ID(id),
     organizer_id = IF(VALUES(revision) > revision, VALUES(organizer_id), organizer_id),
     contest_id = IF(VALUES(revision) > revision, VALUES(contest_id), contest_id),
     contender_id = IF(VALUES(revision) > revision, VALUES(contender_id), contender_id),
