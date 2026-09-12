@@ -1,6 +1,10 @@
 package scores
 
-import "github.com/climblive/platform/backend/internal/domain"
+import (
+	"cmp"
+
+	"github.com/climblive/platform/backend/internal/domain"
+)
 
 type Score struct {
 	Points         int
@@ -22,35 +26,35 @@ type Contender struct {
 }
 
 func (c Contender) Compare(other Contender) int {
-	if c.Points != other.Points {
-		return other.Points - c.Points
+	if result := cmp.Compare(other.Points, c.Points); result != 0 {
+		return result
 	}
 
-	if c.Tops != other.Tops {
-		return other.Tops - c.Tops
+	if result := cmp.Compare(other.Tops, c.Tops); result != 0 {
+		return result
 	}
 
-	if c.AttemptsTops != other.AttemptsTops {
-		return c.AttemptsTops - other.AttemptsTops
+	if result := cmp.Compare(c.AttemptsTops, other.AttemptsTops); result != 0 {
+		return result
 	}
 
-	if c.Zone2s != other.Zone2s {
-		return other.Zone2s - c.Zone2s
+	if result := cmp.Compare(other.Zone2s, c.Zone2s); result != 0 {
+		return result
 	}
 
-	if c.AttemptsZone2s != other.AttemptsZone2s {
-		return c.AttemptsZone2s - other.AttemptsZone2s
+	if result := cmp.Compare(c.AttemptsZone2s, other.AttemptsZone2s); result != 0 {
+		return result
 	}
 
-	if c.Zone1s != other.Zone1s {
-		return other.Zone1s - c.Zone1s
+	if result := cmp.Compare(other.Zone1s, c.Zone1s); result != 0 {
+		return result
 	}
 
-	if c.AttemptsZone1s != other.AttemptsZone1s {
-		return c.AttemptsZone1s - other.AttemptsZone1s
+	if result := cmp.Compare(c.AttemptsZone1s, other.AttemptsZone1s); result != 0 {
+		return result
 	}
 
-	return int(c.ID) - int(other.ID)
+	return cmp.Compare(c.ID, other.ID)
 }
 
 type Tick struct {
