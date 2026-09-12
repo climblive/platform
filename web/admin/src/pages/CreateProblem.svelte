@@ -59,6 +59,7 @@
       flashBonus: 0,
     }}
     schema={formSchema}
+    hidePoints={!contest?.usePoints}
   >
     <div class="controls">
       <wa-button

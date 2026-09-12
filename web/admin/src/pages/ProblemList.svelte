@@ -1,10 +1,10 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import Loader from "@/components/Loader.svelte";
   import { type WaSelectEvent } from "@awesome.me/webawesome";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import WaDropdownItem from "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
   import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
   import {
     EmptyState,
@@ -14,6 +14,7 @@
   } from "@climblive/lib/components";
   import { type Problem, type ProblemID } from "@climblive/lib/models";
   import {
+    getContestQuery,
     getContestsByOrganizerQuery,
     getProblemsQuery,
     getTicksByContestQuery,
@@ -39,6 +40,7 @@
 
   const problemsQuery = $derived(getProblemsQuery(contestId));
   const ticksQuery = $derived(getTicksByContestQuery(contestId));
+  const contestQuery = $derived(getContestQuery(contestId));
   const contestsQuery = $derived(getContestsByOrganizerQuery(organizerId));
 
   const ascentsByProblem = $derived.by(() => {
@@ -60,7 +62,9 @@
 
     return ascentsByProblem;
   });
+
   const contests = $derived(contestsQuery.data);
+  const contest = $derived(contestQuery.data);
 
   const limitReached = $derived(
     problemsQuery.data !== undefined &&
@@ -86,45 +90,46 @@
     tableLimit = undefined;
   };
 
-  const columns: ColumnDefinition<ProblemWithAscents>[] = [
-    {
-      label: "Number",
-      mobile: true,
-      render: renderNumberAndColor,
-      width: "minmax(max-content, 3fr)",
-    },
-    {
-      label: "Zones",
-      mobile: false,
-      render: renderZones,
-      width: "max-content",
-    },
-    {
-      label: "Points",
-      mobile: true,
-      render: renderPoints,
-      width: "max-content",
-    },
-    {
-      label: "Flash",
-      mobile: false,
-      render: renderFlashBonus,
-      width: "max-content",
-    },
-    {
-      label: "Tops",
-      mobile: false,
-      render: renderAscents,
-      align: "right",
-      width: "max-content",
-    },
-    {
+  const columns = $derived.by<ColumnDefinition<ProblemWithAscents>[]>(() => {
+    const columns: ColumnDefinition<ProblemWithAscents>[] = [
+      {
+        label: "Number",
+        mobile: true,
+        render: renderNumberAndColor,
+        width: "minmax(max-content, 3fr)",
+      },
+      {
+        label: "Zones",
+        mobile: false,
+        render: renderZones,
+        width: "max-content",
+      },
+    ];
+
+    if (contest?.usePoints) {
+      columns.push({
+        label: "Points",
+        mobile: true,
+        render: renderPoints,
+        width: "max-content",
+      });
+      columns.push({
+        label: "Flash",
+        mobile: false,
+        render: renderFlashBonus,
+        width: "max-content",
+      });
+    }
+
+    columns.push({
       mobile: true,
       render: renderControls,
       align: "right",
       width: "max-content",
-    },
-  ];
+    });
+
+    return columns;
+  });
 </script>
 
 {#snippet renderNumberAndColor({
@@ -203,10 +208,6 @@
       </wa-dropdown>
     {/snippet}
   </DeleteProblem>
-{/snippet}
-
-{#snippet renderAscents({ ascents }: ProblemWithAscents)}
-  {ascents}
 {/snippet}
 
 {#snippet createButton()}
