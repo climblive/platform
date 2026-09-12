@@ -46,8 +46,8 @@ func TestCompareContender(t *testing.T) {
 		assert.Greater(t, c2.Compare(c1), 0)
 	}
 
-	c1 := worst(1)
-	c2 := best(2)
+	c1 := worst(2)
+	c2 := best(1)
 
 	t.Run("ByPoints", func(t *testing.T) {
 		c1.Points = 200
