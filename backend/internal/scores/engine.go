@@ -312,6 +312,7 @@ func (e *DefaultScoreEngine) HandleContenderRequalified(event domain.ContenderRe
 
 func (e *DefaultScoreEngine) HandleAscentRegistered(event domain.AscentRegisteredEvent) iter.Seq[Effect] {
 	tick := Tick{
+		Revision:      event.Revision,
 		ContenderID:   event.ContenderID,
 		ProblemID:     event.ProblemID,
 		Zone1:         event.Zone1,
@@ -320,6 +321,11 @@ func (e *DefaultScoreEngine) HandleAscentRegistered(event domain.AscentRegistere
 		AttemptsZone2: event.AttemptsZone2,
 		Top:           event.Top,
 		AttemptsTop:   event.AttemptsTop,
+	}
+
+	existingTick, found := e.store.GetTick(event.ContenderID, event.ProblemID)
+	if found && existingTick.Revision > event.Revision {
+		return nil
 	}
 
 	contender, found := e.store.GetContender(event.ContenderID)

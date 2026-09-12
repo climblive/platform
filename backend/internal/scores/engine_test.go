@@ -707,6 +707,10 @@ func TestDefaultScoreEngine(t *testing.T) {
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
+			On("GetTick", fakedContenderID, fakedProblemID).
+			Return(scores.Tick{}, false)
+
+		f.store.
 			On("GetContender", fakedContenderID).
 			Return(scores.Contender{}, false)
 
@@ -732,6 +736,10 @@ func TestDefaultScoreEngine(t *testing.T) {
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
+			On("GetTick", fakedContenderID, fakedProblemID).
+			Return(scores.Tick{}, false)
+
+		f.store.
 			On("GetContender", fakedContenderID).
 			Return(scores.Contender{
 				ID:           fakedContenderID,
@@ -741,6 +749,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("SaveTick", fakedContenderID, scores.Tick{
+				Revision:      1,
 				ContenderID:   fakedContenderID,
 				ProblemID:     fakedProblemID,
 				Top:           true,
@@ -753,6 +762,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return()
 
 		effects := f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
+			Revision:      1,
 			ContenderID:   fakedContenderID,
 			ProblemID:     fakedProblemID,
 			Top:           true,
@@ -768,12 +778,41 @@ func TestDefaultScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
+	t.Run("AscentRegistered_StaleRevision", func(t *testing.T) {
+		f, awaitExpectations := makeFixture()
+
+		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
+
+		f.store.
+			On("GetTick", fakedContenderID, fakedProblemID).
+			Return(scores.Tick{
+				ContenderID: fakedContenderID,
+				ProblemID:   fakedProblemID,
+				Revision:    2,
+			}, true)
+
+		effects := f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
+			ContenderID: fakedContenderID,
+			ProblemID:   fakedProblemID,
+			Revision:    1,
+		})
+
+		require.Nil(t, effects)
+
+		awaitExpectations(t)
+	})
+
 	t.Run("AscentRegistered", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
+
+		f.store.
+			On("GetTick", fakedContenderID, fakedProblemID).
+			Return(scores.Tick{}, false)
 
 		f.store.
 			On("GetContender", fakedContenderID).
@@ -784,6 +823,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("SaveTick", fakedContenderID, scores.Tick{
+				Revision:      1,
 				ContenderID:   fakedContenderID,
 				ProblemID:     fakedProblemID,
 				Top:           true,
@@ -796,6 +836,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return()
 
 		effects := slices.Collect(f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
+			Revision:      1,
 			ContenderID:   fakedContenderID,
 			ProblemID:     fakedProblemID,
 			Top:           true,
