@@ -286,15 +286,12 @@
         return;
       }
 
-      if (
-        queryClient.isMutating({
-          mutationKey: putTickMutationKey(
-            $session.contenderId,
-            event.problemId,
-          ),
-          exact: true,
-        }) > 0
-      ) {
+      const mutationCount = queryClient.isMutating({
+        mutationKey: putTickMutationKey($session.contenderId, event.problemId),
+        exact: true,
+      });
+
+      if (mutationCount > 0) {
         return;
       }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildTick, TickBuilder, type Feature } from "./tickBuilder.svelte";
+import { buildTick, TickMutator, type Feature } from "./tickMutator.svelte";
 
 const PROBLEM_ID = 123;
 const ALL_FEATURES: Feature[] = ["zone1", "zone2", "top"];
@@ -30,9 +30,9 @@ describe(buildTick.name, () => {
   });
 });
 
-describe(TickBuilder.name, () => {
+describe(TickMutator.name, () => {
   it("should expose its state", () => {
-    const builder = new TickBuilder(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
+    const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
 
     expect(builder.problemId).toEqual(PROBLEM_ID);
     expect(builder.features).toEqual(ALL_FEATURES);
@@ -41,12 +41,12 @@ describe(TickBuilder.name, () => {
   });
 
   it("should not allow attempts to differ from attempts required for top", () => {
-    expect(() => new TickBuilder(PROBLEM_ID, ALL_FEATURES, 2, FLASH)).toThrow();
+    expect(() => new TickMutator(PROBLEM_ID, ALL_FEATURES, 2, FLASH)).toThrow();
   });
 
-  describe(TickBuilder.from.name, () => {
+  describe(TickMutator.from.name, () => {
     it("should create an empty builder", () => {
-      const builder = TickBuilder.from({
+      const builder = TickMutator.from({
         id: PROBLEM_ID,
         zone1Enabled: true,
         zone2Enabled: true,
@@ -59,7 +59,7 @@ describe(TickBuilder.name, () => {
     });
 
     it("should restore an existing tick", () => {
-      const builder = TickBuilder.from(
+      const builder = TickMutator.from(
         { id: PROBLEM_ID, zone1Enabled: true, zone2Enabled: true },
         {
           zone1: true,
@@ -82,7 +82,7 @@ describe(TickBuilder.name, () => {
     });
 
     it("should ignore reached features that are not enabled", () => {
-      const builder = TickBuilder.from(
+      const builder = TickMutator.from(
         { id: PROBLEM_ID, zone1Enabled: false, zone2Enabled: false },
         {
           zone1: true,
@@ -100,29 +100,29 @@ describe(TickBuilder.name, () => {
     });
   });
 
-  describe(TickBuilder.prototype.canAddAttempt.name, () => {
+  describe(TickMutator.prototype.canAddAttempt.name, () => {
     it("should return true if another attempt can be added", () => {
-      const builder = new TickBuilder(PROBLEM_ID, ALL_FEATURES, 998, NO_LUCK);
+      const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 998, NO_LUCK);
 
       expect(builder.canAddAttempt()).toEqual(true);
     });
 
     it("should return false if top is reached", () => {
-      const builder = new TickBuilder(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
+      const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
 
       expect(builder.canAddAttempt()).toEqual(false);
     });
 
     it("should return false if attempts is 999 or more", () => {
-      const builder = new TickBuilder(PROBLEM_ID, ALL_FEATURES, 999, NO_LUCK);
+      const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 999, NO_LUCK);
 
       expect(builder.canAddAttempt()).toEqual(false);
     });
   });
 
-  describe(TickBuilder.prototype.canSubtractAttempt.name, () => {
+  describe(TickMutator.prototype.canSubtractAttempt.name, () => {
     it("should return true if the latest attempt reached no features", () => {
-      const builder = new TickBuilder(
+      const builder = new TickMutator(
         PROBLEM_ID,
         ALL_FEATURES,
         2,
@@ -133,19 +133,19 @@ describe(TickBuilder.name, () => {
     });
 
     it("should return false if top is reached", () => {
-      const builder = new TickBuilder(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
+      const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
 
       expect(builder.canSubtractAttempt()).toEqual(false);
     });
 
     it("should return false if there are no attempts", () => {
-      const builder = new TickBuilder(PROBLEM_ID, ALL_FEATURES, 0, NO_LUCK);
+      const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 0, NO_LUCK);
 
       expect(builder.canSubtractAttempt()).toEqual(false);
     });
 
     it("should return false if the latest attempt reached a feature", () => {
-      const builder = new TickBuilder(
+      const builder = new TickMutator(
         PROBLEM_ID,
         ALL_FEATURES,
         1,
@@ -156,9 +156,9 @@ describe(TickBuilder.name, () => {
     });
   });
 
-  describe(TickBuilder.prototype.addAttempt.name, () => {
+  describe(TickMutator.prototype.addAttempt.name, () => {
     it("should add an attempt", () => {
-      const builder = new TickBuilder(PROBLEM_ID, ALL_FEATURES, 0, NO_LUCK);
+      const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 0, NO_LUCK);
 
       builder.addAttempt();
 
@@ -166,7 +166,7 @@ describe(TickBuilder.name, () => {
     });
 
     it("should not add an attempt if another attempt cannot be added", () => {
-      const builder = new TickBuilder(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
+      const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
 
       builder.addAttempt();
 
@@ -174,9 +174,9 @@ describe(TickBuilder.name, () => {
     });
   });
 
-  describe(TickBuilder.prototype.subtractAttempt.name, () => {
+  describe(TickMutator.prototype.subtractAttempt.name, () => {
     it("should subtract an attempt", () => {
-      const builder = new TickBuilder(PROBLEM_ID, ALL_FEATURES, 1, NO_LUCK);
+      const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, NO_LUCK);
 
       builder.subtractAttempt();
 
@@ -184,7 +184,7 @@ describe(TickBuilder.name, () => {
     });
 
     it("should not subtract an attempt if the latest attempt reached a feature", () => {
-      const builder = new TickBuilder(
+      const builder = new TickMutator(
         PROBLEM_ID,
         ALL_FEATURES,
         1,
@@ -197,9 +197,9 @@ describe(TickBuilder.name, () => {
     });
   });
 
-  describe(TickBuilder.prototype.reachFeature.name, () => {
+  describe(TickMutator.prototype.reachFeature.name, () => {
     it("should reach the feature and all preceding features", () => {
-      const builder = new TickBuilder(PROBLEM_ID, ALL_FEATURES, 1, NO_LUCK);
+      const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, NO_LUCK);
 
       builder.reachFeature("zone2");
 
@@ -213,7 +213,7 @@ describe(TickBuilder.name, () => {
     });
 
     it("should not reach a feature that is not enabled", () => {
-      const builder = new TickBuilder(PROBLEM_ID, ["top"], 0, NO_LUCK);
+      const builder = new TickMutator(PROBLEM_ID, ["top"], 0, NO_LUCK);
 
       builder.reachFeature("zone1");
 
@@ -222,9 +222,9 @@ describe(TickBuilder.name, () => {
     });
   });
 
-  describe(TickBuilder.prototype.unreachFeature.name, () => {
+  describe(TickMutator.prototype.unreachFeature.name, () => {
     it("should unreach the feature and all subsequent features", () => {
-      const builder = new TickBuilder(
+      const builder = new TickMutator(
         PROBLEM_ID,
         ALL_FEATURES,
         3,
@@ -244,7 +244,7 @@ describe(TickBuilder.name, () => {
     });
 
     it("should not change a feature that is not enabled", () => {
-      const builder = new TickBuilder(PROBLEM_ID, ["top"], 1, NO_LUCK);
+      const builder = new TickMutator(PROBLEM_ID, ["top"], 1, NO_LUCK);
 
       builder.unreachFeature("zone1");
 

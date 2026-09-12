@@ -5,7 +5,7 @@ export type Feature = "zone1" | "zone2" | "top";
 
 const allFeatures: Feature[] = ["zone1", "zone2", "top"];
 
-export class TickBuilder {
+export class TickMutator {
   #problemId: number;
   #features: Feature[];
   #reachedFeatures: SvelteMap<Feature, number>;
@@ -39,7 +39,7 @@ export class TickBuilder {
       | "zone1"
       | "attemptsZone1"
     >,
-  ): TickBuilder {
+  ): TickMutator {
     const features: Feature[] = [];
     if (problem.zone1Enabled) {
       features.push("zone1");
@@ -73,7 +73,7 @@ export class TickBuilder {
       }
     }
 
-    return new TickBuilder(
+    return new TickMutator(
       problem.id,
       features,
       tick?.attemptsTop ?? 0,
@@ -171,14 +171,14 @@ export class TickBuilder {
 }
 
 export function buildTick(
-  builder: Pick<TickBuilder, "problemId" | "attempts" | "reachedFeatures">,
+  mutator: Pick<TickMutator, "problemId" | "attempts" | "reachedFeatures">,
 ): Omit<Tick, "id" | "timestamp" | "revision"> {
   const hasReached = (feature: Feature): boolean => {
     let featureReached = false;
 
     for (let k = allFeatures.length - 1; k >= 0; k--) {
       const f = allFeatures[k];
-      if (builder.reachedFeatures.has(f)) {
+      if (mutator.reachedFeatures.has(f)) {
         featureReached = true;
       }
 
@@ -191,11 +191,11 @@ export function buildTick(
   };
 
   const calculateImplicitAttempts = (feature: Feature): number => {
-    let attempts = builder.attempts;
+    let attempts = mutator.attempts;
 
     for (let k = allFeatures.length - 1; k >= 0; k--) {
       const f = allFeatures[k];
-      const a = builder.reachedFeatures.get(f);
+      const a = mutator.reachedFeatures.get(f);
       if (a !== undefined) {
         attempts = a;
       }
@@ -209,7 +209,7 @@ export function buildTick(
   };
 
   return {
-    problemId: builder.problemId,
+    problemId: mutator.problemId,
     zone1: hasReached("zone1"),
     attemptsZone1: calculateImplicitAttempts("zone1"),
     zone2: hasReached("zone2"),

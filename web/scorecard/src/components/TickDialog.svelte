@@ -63,7 +63,7 @@
         if (error instanceof AxiosError && error.status === 404) {
           toastUnexpectedError("Ascent is already removed.");
         } else {
-          toastUnexpectedError("Failed to remove tick.");
+          toastUnexpectedError("Failed to remove ascent.");
         }
       },
     });

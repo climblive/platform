@@ -9,7 +9,7 @@ type Scorer struct {
 	ProblemLimit int
 }
 
-func (r *Scorer) CalculateScore(points iter.Seq[int]) int {
+func (r *Scorer) CalculatePoints(points iter.Seq[int]) int {
 	score := 0
 
 	if r.ProblemLimit == 0 {

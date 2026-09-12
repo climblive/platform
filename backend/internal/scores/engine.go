@@ -544,7 +544,7 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 			ProblemLimit: rules.QualifyingProblems,
 		}
 
-		contender.Points = scorer.CalculateScore(pointValues)
+		contender.Points = scorer.CalculatePoints(pointValues)
 	}
 
 	ticks := e.store.GetTicksByContender(contender.ID)

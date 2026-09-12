@@ -10,7 +10,7 @@
     attempts: number;
     points?: number;
     bonusPoints?: number;
-    checked?: boolean;
+    checked: boolean;
   };
 
   const {
@@ -42,7 +42,7 @@
   };
 </script>
 
-<div class="container" role="group" aria-label={label} data-active={checked}>
+<div class="container" role="group" aria-label={label} data-checked={checked}>
   <div class="top">
     <wa-checkbox onchange={handleChange} {checked} size="m">
       {label}
@@ -60,10 +60,6 @@
         {attempts}{ordinalSuperscript(attempts)}
         attempt
         <wa-icon name="lock"></wa-icon>
-      {:else if attempts === 0}
-        -
-      {:else if attempts === 1}
-        -
       {:else}
         -
       {/if}
@@ -91,9 +87,6 @@
     width: 100%;
     justify-content: space-between;
     align-items: center;
-  }
-
-  .subtext {
     font-size: var(--wa-font-size-xs);
     color: var(--wa-color-text-quiet);
   }
@@ -102,7 +95,7 @@
     display: none;
   }
 
-  .container[data-active="true"] {
+  .container[data-checked="true"] {
     & .subtext {
       color: var(--wa-color-success-fill-loud);
     }

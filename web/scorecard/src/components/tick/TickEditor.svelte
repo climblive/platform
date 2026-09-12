@@ -3,7 +3,7 @@
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { CreateMutationResult } from "@tanstack/svelte-query";
   import { isCancel } from "axios";
-  import { buildTick, TickBuilder } from "../../utils/tickBuilder.svelte";
+  import { buildTick, TickMutator } from "../../utils/tickMutator.svelte";
   import TickBox from "./TickBox.svelte";
 
   interface Props {
@@ -21,8 +21,8 @@
 
   const { problem, pointValue, showPoints, putTick, ...rest }: Props = $props();
 
-  const tickBuilder = $derived(TickBuilder.from(problem, rest.tick));
-  const tick = $derived(buildTick(tickBuilder));
+  const tickMutator = $derived(TickMutator.from(problem, rest.tick));
+  const tick = $derived(buildTick(tickMutator));
   let latestLocalRevision = $state(0);
 
   const saveTick = async () => {
@@ -33,7 +33,7 @@
       await putTick.mutateAsync({ ...tick, revision: latestLocalRevision });
     } catch (error) {
       if (!isCancel(error)) {
-        toastUnexpectedError("Failed to update tick.");
+        toastUnexpectedError("Failed to update ascent.");
       }
     }
   };
@@ -43,9 +43,9 @@
 
     navigator.vibrate?.(50);
 
-    tickBuilder.subtractAttempt();
+    tickMutator.subtractAttempt();
 
-    void saveTick();
+    saveTick();
   };
 
   const handleAddAttempt = (event: MouseEvent) => {
@@ -53,22 +53,18 @@
 
     navigator.vibrate?.(50);
 
-    tickBuilder.addAttempt();
+    tickMutator.addAttempt();
 
-    void saveTick();
+    saveTick();
   };
 
-  const renderSublabel = (
-    featureReached: boolean,
-    attempts: number,
-    showFlash: boolean,
-  ) => {
+  const renderSublabel = (featureReached: boolean, attempts: number) => {
     if (featureReached) {
       return undefined;
     }
 
     switch (true) {
-      case attempts === 1 && showFlash:
+      case attempts === 1:
         return "in 1 attempt";
       default:
         return `in ${attempts} attempts`;
@@ -79,12 +75,12 @@
     navigator.vibrate?.(50);
 
     if (checked) {
-      tickBuilder.reachFeature(feature);
+      tickMutator.reachFeature(feature);
     } else {
-      tickBuilder.unreachFeature(feature);
+      tickMutator.unreachFeature(feature);
     }
 
-    void saveTick();
+    saveTick();
   };
 </script>
 
@@ -94,7 +90,7 @@
     pill
     appearance="outlined"
     onclick={(event: MouseEvent) => handleSubtractAttempt(event)}
-    disabled={!tickBuilder.canSubtractAttempt()}
+    disabled={!tickMutator.canSubtractAttempt()}
   >
     <wa-icon name="minus" label="Subtract failed attempt"></wa-icon>
   </wa-button>
@@ -109,7 +105,7 @@
     pill
     appearance="outlined"
     onclick={(event: MouseEvent) => handleAddAttempt(event)}
-    disabled={!tickBuilder.canAddAttempt()}
+    disabled={!tickMutator.canAddAttempt()}
   >
     <wa-icon slot="start" name="plus"></wa-icon>
     Add failed attempt
@@ -118,7 +114,7 @@
 
 <TickBox
   label="Top"
-  sublabel={renderSublabel(tick.top, (tick?.attemptsTop ?? 0) + 1, true)}
+  sublabel={renderSublabel(tick.top, (tick?.attemptsTop ?? 0) + 1)}
   onChange={(checked) => handleTick(checked, "top")}
   points={showPoints ? pointValue?.top : undefined}
   bonusPoints={pointValue?.flashBonus}
@@ -129,7 +125,7 @@
 {#if problem.zone2Enabled}
   <TickBox
     label="Zone 2"
-    sublabel={renderSublabel(tick.zone2, (tick?.attemptsZone2 ?? 0) + 1, false)}
+    sublabel={renderSublabel(tick.zone2, (tick?.attemptsZone2 ?? 0) + 1)}
     onChange={(checked) => handleTick(checked, "zone2")}
     points={showPoints ? pointValue?.zone2 : undefined}
     checked={tick?.zone2}
@@ -140,7 +136,7 @@
 {#if problem.zone1Enabled}
   <TickBox
     label="Zone 1"
-    sublabel={renderSublabel(tick.zone1, (tick?.attemptsZone1 ?? 0) + 1, false)}
+    sublabel={renderSublabel(tick.zone1, (tick?.attemptsZone1 ?? 0) + 1)}
     onChange={(checked) => handleTick(checked, "zone1")}
     points={showPoints ? pointValue?.zone1 : undefined}
     checked={tick?.zone1}

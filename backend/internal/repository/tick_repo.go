@@ -70,12 +70,12 @@ func (d *Database) StoreTick(ctx context.Context, tx domain.Transaction, tick do
 		return domain.Tick{}, errors.Wrap(domain.ErrSuperseded, 0)
 	}
 
-	tickID, err := result.LastInsertId()
+	insertID, err := result.LastInsertId()
 	if err != nil {
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
-	tick.ID = domain.TickID(tickID)
+	tick.ID = domain.TickID(insertID)
 
 	return tick, nil
 }
