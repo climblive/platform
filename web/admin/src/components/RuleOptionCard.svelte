@@ -29,11 +29,11 @@
       {@render header()}
     {/if}
     <h3>{title}</h3>
-    {#if tag}
-      <wa-badge pill variant="neutral">{tag}</wa-badge>
-    {/if}
     {#if indicator}
       {@render indicator()}
+    {/if}
+    {#if tag}
+      <wa-badge pill variant="neutral">{tag}</wa-badge>
     {/if}
   </div>
 

@@ -4,11 +4,11 @@
   import WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
+  import { SaveIndicator } from "@climblive/lib/components";
   import { checked, GenericForm, name } from "@climblive/lib/forms";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
   import { patchContestMutation } from "@climblive/lib/queries";
   import { debounce, z } from "@climblive/lib/utils";
-  import { onDestroy } from "svelte";
   import RuleOptionCard from "../RuleOptionCard.svelte";
   import { doSubmit } from "../RulesEditor.svelte";
 
@@ -21,10 +21,6 @@
   const patchContest = patchContestMutation(contest.id);
 
   let enabled = $derived(contest.qualifyingProblems > 0);
-  let saved = $state(false);
-  let savedTimer: ReturnType<typeof setTimeout> | undefined;
-
-  onDestroy(() => clearTimeout(savedTimer));
 
   const formSchema = z.object({
     qualifyingProblems: z.coerce.number().min(0).max(65536).optional(),
@@ -36,17 +32,9 @@
   );
 
   const handleSubmit = (value: Partial<ContestPatch>) =>
-    doSubmit(
-      patchContest,
-      {
-        qualifyingProblems: value.qualifyingProblems ?? 0,
-      },
-      () => {
-        saved = true;
-        clearTimeout(savedTimer);
-        savedTimer = setTimeout(() => (saved = false), 2_000);
-      },
-    );
+    doSubmit(patchContest, {
+      qualifyingProblems: value.qualifyingProblems ?? 0,
+    });
 </script>
 
 <GenericForm schema={formSchema} submit={handleSubmit}>
@@ -68,11 +56,8 @@
         ></wa-checkbox>
       {/snippet}
       {#snippet indicator()}
-        {#if saved}
-          <div class="indicator">
-            <wa-icon name="check"></wa-icon>
-            Saved
-          </div>
+        {#if patchContest.isSuccess}
+          <SaveIndicator />
         {/if}
       {/snippet}
       {#snippet footer()}
@@ -118,15 +103,5 @@
     flex-wrap: wrap;
     gap: var(--wa-space-xs);
     align-items: end;
-  }
-
-  .indicator {
-    margin-inline-start: auto;
-    display: flex;
-    align-items: center;
-    gap: var(--wa-space-2xs);
-    font-size: var(--wa-font-size-s);
-    color: var(--wa-color-success-fill-loud);
-    font-weight: var(--wa-font-weight-bold);
   }
 </style>

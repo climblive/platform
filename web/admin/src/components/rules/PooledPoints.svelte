@@ -1,5 +1,6 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
+  import { SaveIndicator } from "@climblive/lib/components";
   import { checked, GenericForm, name } from "@climblive/lib/forms";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
   import { patchContestMutation } from "@climblive/lib/queries";
@@ -13,7 +14,7 @@
 
   const { contest }: Props = $props();
 
-  const patchContest = $derived(patchContestMutation(contest.id));
+  const patchContest = patchContestMutation(contest.id);
 
   const formSchema = z.object({
     pooledPoints: z.coerce.boolean(),
@@ -37,6 +38,11 @@
           onchange={() => setTimeout(() => form.requestSubmit())}
           {@attach checked(contest.pooledPoints)}
         ></wa-checkbox>
+      {/snippet}
+      {#snippet indicator()}
+        {#if patchContest.isSuccess}
+          <SaveIndicator />
+        {/if}
       {/snippet}
     </RuleOptionCard>
   {/snippet}

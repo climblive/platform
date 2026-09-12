@@ -11,6 +11,7 @@ export { default as LabeledText } from "./LabeledText.svelte";
 export { default as RegistrationCode } from "./RegistrationCode.svelte";
 export { default as ResultEntry } from "./ResultEntry.svelte";
 export { default as ResultList } from "./ResultList.svelte";
+export { default as SaveIndicator } from "./SaveIndicator.svelte";
 export { default as Score } from "./Score.svelte";
 export { default as ScoreboardProvider } from "./ScoreboardProvider.svelte";
 export { default as SplashScreen } from "./SplashScreen.svelte";
