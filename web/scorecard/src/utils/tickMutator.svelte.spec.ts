@@ -69,6 +69,8 @@ describe(TickMutator.name, () => {
         },
       );
 
+      expect(mutator.problemId).toEqual(PROBLEM_ID);
+      expect(mutator.features).toEqual(ALL_FEATURES);
       expect(mutator.attempts).toEqual(3);
       expect(mutator.reachedFeatures).toEqual(
         new Map<Feature, number>([
@@ -92,6 +94,7 @@ describe(TickMutator.name, () => {
         },
       );
 
+      expect(mutator.problemId).toEqual(PROBLEM_ID);
       expect(mutator.features).toEqual(["top"]);
       expect(mutator.attempts).toEqual(3);
       expect(mutator.reachedFeatures).toEqual(NO_LUCK);
