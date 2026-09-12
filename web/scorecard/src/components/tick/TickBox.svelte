@@ -89,10 +89,6 @@
     color: var(--wa-color-text-quiet);
   }
 
-  .subtext:not(:has(*)) {
-    display: none;
-  }
-
   .container[data-checked="true"] {
     & .subtext {
       color: var(--wa-color-success-fill-loud);
