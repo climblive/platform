@@ -6,18 +6,15 @@ export type Feature = "zone1" | "zone2" | "top";
 const allFeatures: Feature[] = ["zone1", "zone2", "top"];
 
 export class TickMutator {
-  #problemId: number;
   #features: Feature[];
   #reachedFeatures: SvelteMap<Feature, number>;
   #attempts: number;
 
   constructor(
-    problemId: number,
     features: Feature[],
     attempts: number,
     reachedFeatures: Map<Feature, number>,
   ) {
-    this.#problemId = problemId;
     this.#features = [...features];
     this.#attempts = $state(attempts);
     this.#reachedFeatures = new SvelteMap(reachedFeatures);
@@ -29,7 +26,7 @@ export class TickMutator {
   }
 
   static from(
-    problem: Pick<Problem, "id" | "zone1Enabled" | "zone2Enabled">,
+    problem: Pick<Problem, "zone1Enabled" | "zone2Enabled">,
     tick?: Pick<
       Tick,
       | "top"
@@ -73,16 +70,7 @@ export class TickMutator {
       }
     }
 
-    return new TickMutator(
-      problem.id,
-      features,
-      tick?.attemptsTop ?? 0,
-      reachedFeatures,
-    );
-  }
-
-  public get problemId(): number {
-    return this.#problemId;
+    return new TickMutator(features, tick?.attemptsTop ?? 0, reachedFeatures);
   }
 
   public get features(): readonly Feature[] {
@@ -171,6 +159,7 @@ export class TickMutator {
 }
 
 export function buildTick(
+  problemId: number,
   mutator: TickMutator,
 ): Omit<Tick, "id" | "timestamp" | "revision"> {
   const hasReached = (feature: Feature): boolean => {
@@ -209,7 +198,7 @@ export function buildTick(
   };
 
   return {
-    problemId: mutator.problemId,
+    problemId,
     zone1: hasReached("zone1"),
     attemptsZone1: calculateImplicitAttempts("zone1"),
     zone2: hasReached("zone2"),

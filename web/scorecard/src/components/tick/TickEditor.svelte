@@ -21,7 +21,7 @@
   const { problem, pointValue, putTick, ...rest }: Props = $props();
 
   const tickMutator = $derived(TickMutator.from(problem, rest.tick));
-  const tick = $derived(buildTick(tickMutator));
+  const tick = $derived(buildTick(problem.id, tickMutator));
   let latestLocalRevision = $state(0);
 
   const saveTick = async () => {
