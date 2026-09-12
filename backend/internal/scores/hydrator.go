@@ -80,6 +80,7 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 
 	for tick := range slices.Values(ticks) {
 		store.SaveTick(*tick.Ownership.ContenderID, Tick{
+			Revision:      tick.Revision,
 			ContenderID:   *tick.Ownership.ContenderID,
 			ProblemID:     tick.ProblemID,
 			Zone1:         tick.Zone1,

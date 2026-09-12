@@ -70,6 +70,7 @@ func TestHydrate(t *testing.T) {
 				Ownership: domain.OwnershipData{
 					ContenderID: &fakedContenderID,
 				},
+				Revision:      1,
 				ProblemID:     fakedProblemID,
 				Top:           true,
 				AttemptsTop:   999,
@@ -105,6 +106,7 @@ func TestHydrate(t *testing.T) {
 	}).Return()
 
 	mockedStore.On("SaveTick", fakedContenderID, scores.Tick{
+		Revision:      1,
 		ContenderID:   fakedContenderID,
 		ProblemID:     fakedProblemID,
 		Top:           true,
