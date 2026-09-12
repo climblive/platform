@@ -21,12 +21,7 @@ func TestProblemValidator(t *testing.T) {
 			Description:        "First boulder",
 			Zone1Enabled:       true,
 			Zone2Enabled:       true,
-			ProblemValue: domain.ProblemValue{
-				PointsZone1: 50,
-				PointsZone2: 75,
-				PointsTop:   100,
-				FlashBonus:  10,
-			},
+			ProblemValue:       domain.ProblemValue{},
 		}
 	}
 
@@ -149,6 +144,31 @@ func TestProblemValidator(t *testing.T) {
 		problem := validProblem()
 		problem.Zone1Enabled = false
 		problem.Zone2Enabled = true
+
+		err := validator.Validate(problem)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("DisabledZone1WithPoints", func(t *testing.T) {
+		problem := validProblem()
+		problem.Zone1Enabled = false
+		problem.Zone2Enabled = false
+
+		problem.PointsZone1 = 100
+
+		err := validator.Validate(problem)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("DisabledZone2WithPoints", func(t *testing.T) {
+		problem := validProblem()
+		problem.Zone2Enabled = false
+
+		problem.PointsZone2 = 100
 
 		err := validator.Validate(problem)
 

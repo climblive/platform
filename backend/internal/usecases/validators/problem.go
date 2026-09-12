@@ -40,6 +40,10 @@ func (v ProblemValidator) Validate(problem domain.Problem) error {
 		fallthrough
 	case problem.PointsZone2 > maxAllowedPointValue:
 		fallthrough
+	case !problem.Zone1Enabled && problem.PointsZone1 != 0:
+		fallthrough
+	case !problem.Zone2Enabled && problem.PointsZone2 != 0:
+		fallthrough
 	case problem.Zone2Enabled && !problem.Zone1Enabled:
 		return errors.Errorf("%w: %w", domain.ErrInvalidData, errProblemConstraintViolation)
 	}
