@@ -32,12 +32,12 @@ describe(buildTick.name, () => {
 
 describe(TickMutator.name, () => {
   it("should expose its state", () => {
-    const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
+    const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
 
-    expect(builder.problemId).toEqual(PROBLEM_ID);
-    expect(builder.features).toEqual(ALL_FEATURES);
-    expect(builder.attempts).toEqual(1);
-    expect(builder.reachedFeatures).toEqual(FLASH);
+    expect(mutator.problemId).toEqual(PROBLEM_ID);
+    expect(mutator.features).toEqual(ALL_FEATURES);
+    expect(mutator.attempts).toEqual(1);
+    expect(mutator.reachedFeatures).toEqual(FLASH);
   });
 
   it("should not allow attempts to differ from attempts required for top", () => {
@@ -45,21 +45,21 @@ describe(TickMutator.name, () => {
   });
 
   describe(TickMutator.from.name, () => {
-    it("should create an empty builder", () => {
-      const builder = TickMutator.from({
+    it("should create an empty mutator", () => {
+      const mutator = TickMutator.from({
         id: PROBLEM_ID,
         zone1Enabled: true,
         zone2Enabled: true,
       });
 
-      expect(builder.problemId).toEqual(PROBLEM_ID);
-      expect(builder.features).toEqual(ALL_FEATURES);
-      expect(builder.attempts).toEqual(0);
-      expect(builder.reachedFeatures).toEqual(NO_LUCK);
+      expect(mutator.problemId).toEqual(PROBLEM_ID);
+      expect(mutator.features).toEqual(ALL_FEATURES);
+      expect(mutator.attempts).toEqual(0);
+      expect(mutator.reachedFeatures).toEqual(NO_LUCK);
     });
 
     it("should restore an existing tick", () => {
-      const builder = TickMutator.from(
+      const mutator = TickMutator.from(
         { id: PROBLEM_ID, zone1Enabled: true, zone2Enabled: true },
         {
           zone1: true,
@@ -71,8 +71,8 @@ describe(TickMutator.name, () => {
         },
       );
 
-      expect(builder.attempts).toEqual(3);
-      expect(builder.reachedFeatures).toEqual(
+      expect(mutator.attempts).toEqual(3);
+      expect(mutator.reachedFeatures).toEqual(
         new Map<Feature, number>([
           ["zone1", 1],
           ["zone2", 2],
@@ -82,7 +82,7 @@ describe(TickMutator.name, () => {
     });
 
     it("should ignore reached features that are not enabled", () => {
-      const builder = TickMutator.from(
+      const mutator = TickMutator.from(
         { id: PROBLEM_ID, zone1Enabled: false, zone2Enabled: false },
         {
           zone1: true,
@@ -94,117 +94,117 @@ describe(TickMutator.name, () => {
         },
       );
 
-      expect(builder.features).toEqual(["top"]);
-      expect(builder.attempts).toEqual(3);
-      expect(builder.reachedFeatures).toEqual(NO_LUCK);
+      expect(mutator.features).toEqual(["top"]);
+      expect(mutator.attempts).toEqual(3);
+      expect(mutator.reachedFeatures).toEqual(NO_LUCK);
     });
   });
 
   describe(TickMutator.prototype.canAddAttempt.name, () => {
     it("should return true if another attempt can be added", () => {
-      const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 998, NO_LUCK);
+      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 998, NO_LUCK);
 
-      expect(builder.canAddAttempt()).toEqual(true);
+      expect(mutator.canAddAttempt()).toEqual(true);
     });
 
     it("should return false if top is reached", () => {
-      const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
+      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
 
-      expect(builder.canAddAttempt()).toEqual(false);
+      expect(mutator.canAddAttempt()).toEqual(false);
     });
 
     it("should return false if attempts is 999 or more", () => {
-      const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 999, NO_LUCK);
+      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 999, NO_LUCK);
 
-      expect(builder.canAddAttempt()).toEqual(false);
+      expect(mutator.canAddAttempt()).toEqual(false);
     });
   });
 
   describe(TickMutator.prototype.canSubtractAttempt.name, () => {
     it("should return true if the latest attempt reached no features", () => {
-      const builder = new TickMutator(
+      const mutator = new TickMutator(
         PROBLEM_ID,
         ALL_FEATURES,
         2,
         new Map([["zone1", 1]]),
       );
 
-      expect(builder.canSubtractAttempt()).toEqual(true);
+      expect(mutator.canSubtractAttempt()).toEqual(true);
     });
 
     it("should return false if top is reached", () => {
-      const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
+      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
 
-      expect(builder.canSubtractAttempt()).toEqual(false);
+      expect(mutator.canSubtractAttempt()).toEqual(false);
     });
 
     it("should return false if there are no attempts", () => {
-      const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 0, NO_LUCK);
+      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 0, NO_LUCK);
 
-      expect(builder.canSubtractAttempt()).toEqual(false);
+      expect(mutator.canSubtractAttempt()).toEqual(false);
     });
 
     it("should return false if the latest attempt reached a feature", () => {
-      const builder = new TickMutator(
+      const mutator = new TickMutator(
         PROBLEM_ID,
         ALL_FEATURES,
         1,
         new Map([["zone1", 1]]),
       );
 
-      expect(builder.canSubtractAttempt()).toEqual(false);
+      expect(mutator.canSubtractAttempt()).toEqual(false);
     });
   });
 
   describe(TickMutator.prototype.addAttempt.name, () => {
     it("should add an attempt", () => {
-      const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 0, NO_LUCK);
+      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 0, NO_LUCK);
 
-      builder.addAttempt();
+      mutator.addAttempt();
 
-      expect(builder.attempts).toEqual(1);
+      expect(mutator.attempts).toEqual(1);
     });
 
     it("should not add an attempt if another attempt cannot be added", () => {
-      const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
+      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
 
-      builder.addAttempt();
+      mutator.addAttempt();
 
-      expect(builder.attempts).toEqual(1);
+      expect(mutator.attempts).toEqual(1);
     });
   });
 
   describe(TickMutator.prototype.subtractAttempt.name, () => {
     it("should subtract an attempt", () => {
-      const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, NO_LUCK);
+      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, NO_LUCK);
 
-      builder.subtractAttempt();
+      mutator.subtractAttempt();
 
-      expect(builder.attempts).toEqual(0);
+      expect(mutator.attempts).toEqual(0);
     });
 
     it("should not subtract an attempt if the latest attempt reached a feature", () => {
-      const builder = new TickMutator(
+      const mutator = new TickMutator(
         PROBLEM_ID,
         ALL_FEATURES,
         1,
         new Map([["zone1", 1]]),
       );
 
-      builder.subtractAttempt();
+      mutator.subtractAttempt();
 
-      expect(builder.attempts).toEqual(1);
+      expect(mutator.attempts).toEqual(1);
     });
   });
 
   describe(TickMutator.prototype.reachFeature.name, () => {
     it("should reach the feature and all preceding features", () => {
-      const builder = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, NO_LUCK);
+      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, NO_LUCK);
 
-      builder.reachFeature("zone2");
+      mutator.reachFeature("zone2");
 
-      expect(builder.attempts).toEqual(2);
-      expect(builder.reachedFeatures).toEqual(
+      expect(mutator.attempts).toEqual(2);
+      expect(mutator.reachedFeatures).toEqual(
         new Map<Feature, number>([
           ["zone1", 2],
           ["zone2", 2],
@@ -213,18 +213,18 @@ describe(TickMutator.name, () => {
     });
 
     it("should not reach a feature that is not enabled", () => {
-      const builder = new TickMutator(PROBLEM_ID, ["top"], 0, NO_LUCK);
+      const mutator = new TickMutator(PROBLEM_ID, ["top"], 0, NO_LUCK);
 
-      builder.reachFeature("zone1");
+      mutator.reachFeature("zone1");
 
-      expect(builder.attempts).toEqual(1);
-      expect(builder.reachedFeatures).toEqual(NO_LUCK);
+      expect(mutator.attempts).toEqual(1);
+      expect(mutator.reachedFeatures).toEqual(NO_LUCK);
     });
   });
 
   describe(TickMutator.prototype.unreachFeature.name, () => {
     it("should unreach the feature and all subsequent features", () => {
-      const builder = new TickMutator(
+      const mutator = new TickMutator(
         PROBLEM_ID,
         ALL_FEATURES,
         3,
@@ -235,21 +235,21 @@ describe(TickMutator.name, () => {
         ]),
       );
 
-      builder.unreachFeature("zone2");
+      mutator.unreachFeature("zone2");
 
-      expect(builder.attempts).toEqual(2);
-      expect(builder.reachedFeatures).toEqual(
+      expect(mutator.attempts).toEqual(2);
+      expect(mutator.reachedFeatures).toEqual(
         new Map<Feature, number>([["zone1", 1]]),
       );
     });
 
     it("should not change a feature that is not enabled", () => {
-      const builder = new TickMutator(PROBLEM_ID, ["top"], 1, NO_LUCK);
+      const mutator = new TickMutator(PROBLEM_ID, ["top"], 1, NO_LUCK);
 
-      builder.unreachFeature("zone1");
+      mutator.unreachFeature("zone1");
 
-      expect(builder.attempts).toEqual(1);
-      expect(builder.reachedFeatures).toEqual(NO_LUCK);
+      expect(mutator.attempts).toEqual(1);
+      expect(mutator.reachedFeatures).toEqual(NO_LUCK);
     });
   });
 });
