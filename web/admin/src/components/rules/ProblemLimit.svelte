@@ -20,7 +20,7 @@
 
   const patchContest = patchContestMutation(contest.id);
 
-  let enabled = $derived(contest.usePoints && contest.qualifyingProblems > 0);
+  let enabled = $derived(contest.qualifyingProblems > 0);
   let saved = $state(false);
   let savedTimer: ReturnType<typeof setTimeout> | undefined;
 

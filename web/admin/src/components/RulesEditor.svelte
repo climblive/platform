@@ -37,6 +37,7 @@
 
     if (!usePoints) {
       patch.qualifyingProblems = 0;
+      patch.pooledPoints = false;
     }
 
     patchContest.mutate(patch, {
