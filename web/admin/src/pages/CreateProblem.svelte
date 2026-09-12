@@ -5,6 +5,7 @@
   import type { ProblemTemplate } from "@climblive/lib/models";
   import {
     createProblemMutation,
+    getContestQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
@@ -15,6 +16,9 @@
   }
 
   let { contestId }: Props = $props();
+
+  const contestQuery = $derived(getContestQuery(contestId));
+  const contest = $derived(contestQuery.data);
 
   const problemsQuery = $derived(getProblemsQuery(contestId));
 
@@ -51,7 +55,7 @@
     data={{
       number: highestProblemNumber + 1,
       holdColorPrimary: "#000000",
-      pointsTop: 100,
+      pointsTop: contest?.usePoints ? 100 : 0,
       flashBonus: 0,
     }}
     schema={formSchema}
