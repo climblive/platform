@@ -43,16 +43,14 @@
 </script>
 
 <div class="container" role="group" aria-label={label} data-checked={checked}>
-  <div class="top">
-    <wa-checkbox onchange={handleChange} {checked} size="m">
-      {label}
-      {#if sublabel !== undefined}
-        <span class="sublabel">
-          {sublabel}
-        </span>
-      {/if}
-    </wa-checkbox>
-  </div>
+  <wa-checkbox onchange={handleChange} {checked} size="m">
+    {label}
+    {#if sublabel !== undefined}
+      <span class="sublabel">
+        {sublabel}
+      </span>
+    {/if}
+  </wa-checkbox>
 
   <div class="subtext">
     <span>
@@ -101,12 +99,6 @@
     }
 
     border-color: var(--wa-color-success-border-loud);
-  }
-
-  .top {
-    display: flex;
-    gap: var(--wa-space-s);
-    width: 100%;
   }
 
   .sublabel {
