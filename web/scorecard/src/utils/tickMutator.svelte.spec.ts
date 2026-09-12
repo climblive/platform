@@ -8,7 +8,7 @@ const FLASH = new Map<Feature, number>([
   ["zone2", 1],
   ["top", 1],
 ]);
-const NO_LUCK = new Map<Feature, number>();
+const NO_RESULT = new Map<Feature, number>();
 
 describe(buildTick.name, () => {
   it("should build a tick with implicit features and attempts", () => {
@@ -51,7 +51,7 @@ describe(TickMutator.name, () => {
 
       expect(mutator.features).toEqual(ALL_FEATURES);
       expect(mutator.attempts).toEqual(0);
-      expect(mutator.reachedFeatures).toEqual(NO_LUCK);
+      expect(mutator.reachedFeatures).toEqual(NO_RESULT);
     });
 
     it("should restore an existing tick", () => {
@@ -101,7 +101,7 @@ describe(TickMutator.name, () => {
 
   describe(TickMutator.prototype.canAddAttempt.name, () => {
     it("should return true if another attempt can be added", () => {
-      const mutator = new TickMutator(ALL_FEATURES, 998, NO_LUCK);
+      const mutator = new TickMutator(ALL_FEATURES, 998, NO_RESULT);
 
       expect(mutator.canAddAttempt()).toEqual(true);
     });
@@ -113,7 +113,7 @@ describe(TickMutator.name, () => {
     });
 
     it("should return false if attempts is 999 or more", () => {
-      const mutator = new TickMutator(ALL_FEATURES, 999, NO_LUCK);
+      const mutator = new TickMutator(ALL_FEATURES, 999, NO_RESULT);
 
       expect(mutator.canAddAttempt()).toEqual(false);
     });
@@ -133,7 +133,7 @@ describe(TickMutator.name, () => {
     });
 
     it("should return false if there are no attempts", () => {
-      const mutator = new TickMutator(ALL_FEATURES, 0, NO_LUCK);
+      const mutator = new TickMutator(ALL_FEATURES, 0, NO_RESULT);
 
       expect(mutator.canSubtractAttempt()).toEqual(false);
     });
@@ -147,7 +147,7 @@ describe(TickMutator.name, () => {
 
   describe(TickMutator.prototype.addAttempt.name, () => {
     it("should add an attempt", () => {
-      const mutator = new TickMutator(ALL_FEATURES, 0, NO_LUCK);
+      const mutator = new TickMutator(ALL_FEATURES, 0, NO_RESULT);
 
       mutator.addAttempt();
 
@@ -165,7 +165,7 @@ describe(TickMutator.name, () => {
 
   describe(TickMutator.prototype.subtractAttempt.name, () => {
     it("should subtract an attempt", () => {
-      const mutator = new TickMutator(ALL_FEATURES, 1, NO_LUCK);
+      const mutator = new TickMutator(ALL_FEATURES, 1, NO_RESULT);
 
       mutator.subtractAttempt();
 
@@ -183,7 +183,7 @@ describe(TickMutator.name, () => {
 
   describe(TickMutator.prototype.reachFeature.name, () => {
     it("should reach all preceding features when reaching top", () => {
-      const mutator = new TickMutator(ALL_FEATURES, 1, NO_LUCK);
+      const mutator = new TickMutator(ALL_FEATURES, 1, NO_RESULT);
 
       mutator.reachFeature("top");
 
@@ -198,7 +198,7 @@ describe(TickMutator.name, () => {
     });
 
     it("should reach the feature and all preceding features", () => {
-      const mutator = new TickMutator(ALL_FEATURES, 1, NO_LUCK);
+      const mutator = new TickMutator(ALL_FEATURES, 1, NO_RESULT);
 
       mutator.reachFeature("zone2");
 
@@ -212,12 +212,12 @@ describe(TickMutator.name, () => {
     });
 
     it("should not reach a feature that is not enabled", () => {
-      const mutator = new TickMutator(["top"], 0, NO_LUCK);
+      const mutator = new TickMutator(["top"], 0, NO_RESULT);
 
       mutator.reachFeature("zone1");
 
       expect(mutator.attempts).toEqual(1);
-      expect(mutator.reachedFeatures).toEqual(NO_LUCK);
+      expect(mutator.reachedFeatures).toEqual(NO_RESULT);
     });
   });
 
@@ -242,12 +242,12 @@ describe(TickMutator.name, () => {
     });
 
     it("should not change a feature that is not enabled", () => {
-      const mutator = new TickMutator(["top"], 1, NO_LUCK);
+      const mutator = new TickMutator(["top"], 1, NO_RESULT);
 
       mutator.unreachFeature("zone1");
 
       expect(mutator.attempts).toEqual(1);
-      expect(mutator.reachedFeatures).toEqual(NO_LUCK);
+      expect(mutator.reachedFeatures).toEqual(NO_RESULT);
     });
   });
 });
