@@ -14,7 +14,8 @@ describe(buildTick.name, () => {
   it("should build a tick with implicit features and attempts", () => {
     expect(
       buildTick(
-        new TickMutator(PROBLEM_ID, ALL_FEATURES, 4, new Map([["zone2", 3]])),
+        PROBLEM_ID,
+        new TickMutator(ALL_FEATURES, 4, new Map([["zone2", 3]])),
       ),
     ).toEqual({
       problemId: PROBLEM_ID,
@@ -30,27 +31,24 @@ describe(buildTick.name, () => {
 
 describe(TickMutator.name, () => {
   it("should expose its state", () => {
-    const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
+    const mutator = new TickMutator(ALL_FEATURES, 1, FLASH);
 
-    expect(mutator.problemId).toEqual(PROBLEM_ID);
     expect(mutator.features).toEqual(ALL_FEATURES);
     expect(mutator.attempts).toEqual(1);
     expect(mutator.reachedFeatures).toEqual(FLASH);
   });
 
   it("should not allow attempts to differ from attempts required for top", () => {
-    expect(() => new TickMutator(PROBLEM_ID, ALL_FEATURES, 2, FLASH)).toThrow();
+    expect(() => new TickMutator(ALL_FEATURES, 2, FLASH)).toThrow();
   });
 
   describe(TickMutator.from.name, () => {
     it("should create an empty mutator", () => {
       const mutator = TickMutator.from({
-        id: PROBLEM_ID,
         zone1Enabled: true,
         zone2Enabled: true,
       });
 
-      expect(mutator.problemId).toEqual(PROBLEM_ID);
       expect(mutator.features).toEqual(ALL_FEATURES);
       expect(mutator.attempts).toEqual(0);
       expect(mutator.reachedFeatures).toEqual(NO_LUCK);
@@ -58,7 +56,7 @@ describe(TickMutator.name, () => {
 
     it("should restore an existing tick", () => {
       const mutator = TickMutator.from(
-        { id: PROBLEM_ID, zone1Enabled: true, zone2Enabled: true },
+        { zone1Enabled: true, zone2Enabled: true },
         {
           zone1: true,
           attemptsZone1: 1,
@@ -69,7 +67,6 @@ describe(TickMutator.name, () => {
         },
       );
 
-      expect(mutator.problemId).toEqual(PROBLEM_ID);
       expect(mutator.features).toEqual(ALL_FEATURES);
       expect(mutator.attempts).toEqual(3);
       expect(mutator.reachedFeatures).toEqual(
@@ -83,7 +80,7 @@ describe(TickMutator.name, () => {
 
     it("should ignore reached features that are not enabled", () => {
       const mutator = TickMutator.from(
-        { id: PROBLEM_ID, zone1Enabled: false, zone2Enabled: false },
+        { zone1Enabled: false, zone2Enabled: false },
         {
           zone1: true,
           attemptsZone1: 1,
@@ -94,7 +91,6 @@ describe(TickMutator.name, () => {
         },
       );
 
-      expect(mutator.problemId).toEqual(PROBLEM_ID);
       expect(mutator.features).toEqual(["top"]);
       expect(mutator.attempts).toEqual(3);
       expect(mutator.reachedFeatures).toEqual(
@@ -105,19 +101,19 @@ describe(TickMutator.name, () => {
 
   describe(TickMutator.prototype.canAddAttempt.name, () => {
     it("should return true if another attempt can be added", () => {
-      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 998, NO_LUCK);
+      const mutator = new TickMutator(ALL_FEATURES, 998, NO_LUCK);
 
       expect(mutator.canAddAttempt()).toEqual(true);
     });
 
     it("should return false if top is reached", () => {
-      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
+      const mutator = new TickMutator(ALL_FEATURES, 1, FLASH);
 
       expect(mutator.canAddAttempt()).toEqual(false);
     });
 
     it("should return false if attempts is 999 or more", () => {
-      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 999, NO_LUCK);
+      const mutator = new TickMutator(ALL_FEATURES, 999, NO_LUCK);
 
       expect(mutator.canAddAttempt()).toEqual(false);
     });
@@ -125,35 +121,25 @@ describe(TickMutator.name, () => {
 
   describe(TickMutator.prototype.canSubtractAttempt.name, () => {
     it("should return true if the latest attempt reached no features", () => {
-      const mutator = new TickMutator(
-        PROBLEM_ID,
-        ALL_FEATURES,
-        2,
-        new Map([["zone1", 1]]),
-      );
+      const mutator = new TickMutator(ALL_FEATURES, 2, new Map([["zone1", 1]]));
 
       expect(mutator.canSubtractAttempt()).toEqual(true);
     });
 
     it("should return false if top is reached", () => {
-      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
+      const mutator = new TickMutator(ALL_FEATURES, 1, FLASH);
 
       expect(mutator.canSubtractAttempt()).toEqual(false);
     });
 
     it("should return false if there are no attempts", () => {
-      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 0, NO_LUCK);
+      const mutator = new TickMutator(ALL_FEATURES, 0, NO_LUCK);
 
       expect(mutator.canSubtractAttempt()).toEqual(false);
     });
 
     it("should return false if the latest attempt reached a feature", () => {
-      const mutator = new TickMutator(
-        PROBLEM_ID,
-        ALL_FEATURES,
-        1,
-        new Map([["zone1", 1]]),
-      );
+      const mutator = new TickMutator(ALL_FEATURES, 1, new Map([["zone1", 1]]));
 
       expect(mutator.canSubtractAttempt()).toEqual(false);
     });
@@ -161,7 +147,7 @@ describe(TickMutator.name, () => {
 
   describe(TickMutator.prototype.addAttempt.name, () => {
     it("should add an attempt", () => {
-      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 0, NO_LUCK);
+      const mutator = new TickMutator(ALL_FEATURES, 0, NO_LUCK);
 
       mutator.addAttempt();
 
@@ -169,7 +155,7 @@ describe(TickMutator.name, () => {
     });
 
     it("should not add an attempt if another attempt cannot be added", () => {
-      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, FLASH);
+      const mutator = new TickMutator(ALL_FEATURES, 1, FLASH);
 
       mutator.addAttempt();
 
@@ -179,7 +165,7 @@ describe(TickMutator.name, () => {
 
   describe(TickMutator.prototype.subtractAttempt.name, () => {
     it("should subtract an attempt", () => {
-      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, NO_LUCK);
+      const mutator = new TickMutator(ALL_FEATURES, 1, NO_LUCK);
 
       mutator.subtractAttempt();
 
@@ -187,12 +173,7 @@ describe(TickMutator.name, () => {
     });
 
     it("should not subtract an attempt if the latest attempt reached a feature", () => {
-      const mutator = new TickMutator(
-        PROBLEM_ID,
-        ALL_FEATURES,
-        1,
-        new Map([["zone1", 1]]),
-      );
+      const mutator = new TickMutator(ALL_FEATURES, 1, new Map([["zone1", 1]]));
 
       mutator.subtractAttempt();
 
@@ -202,7 +183,7 @@ describe(TickMutator.name, () => {
 
   describe(TickMutator.prototype.reachFeature.name, () => {
     it("should reach all preceding features when reaching top", () => {
-      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, NO_LUCK);
+      const mutator = new TickMutator(ALL_FEATURES, 1, NO_LUCK);
 
       mutator.reachFeature("top");
 
@@ -217,7 +198,7 @@ describe(TickMutator.name, () => {
     });
 
     it("should reach the feature and all preceding features", () => {
-      const mutator = new TickMutator(PROBLEM_ID, ALL_FEATURES, 1, NO_LUCK);
+      const mutator = new TickMutator(ALL_FEATURES, 1, NO_LUCK);
 
       mutator.reachFeature("zone2");
 
@@ -231,7 +212,7 @@ describe(TickMutator.name, () => {
     });
 
     it("should not reach a feature that is not enabled", () => {
-      const mutator = new TickMutator(PROBLEM_ID, ["top"], 0, NO_LUCK);
+      const mutator = new TickMutator(["top"], 0, NO_LUCK);
 
       mutator.reachFeature("zone1");
 
@@ -243,7 +224,6 @@ describe(TickMutator.name, () => {
   describe(TickMutator.prototype.unreachFeature.name, () => {
     it("should unreach the feature and all subsequent features", () => {
       const mutator = new TickMutator(
-        PROBLEM_ID,
         ALL_FEATURES,
         3,
         new Map<Feature, number>([
@@ -262,7 +242,7 @@ describe(TickMutator.name, () => {
     });
 
     it("should not change a feature that is not enabled", () => {
-      const mutator = new TickMutator(PROBLEM_ID, ["top"], 1, NO_LUCK);
+      const mutator = new TickMutator(["top"], 1, NO_LUCK);
 
       mutator.unreachFeature("zone1");
 
