@@ -311,6 +311,7 @@ func (r *ContenderRunner) PatchContender(contenderID domain.ContenderID, patch d
 	}
 
 	req.Header.Set("Authorization", fmt.Sprintf("Regcode %s", r.RegistrationCode))
+	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -427,6 +428,8 @@ func (r *ContenderRunner) DeleteTick(tickID domain.TickID) {
 }
 
 func (r *ContenderRunner) PutTick(contenderID domain.ContenderID, tick domain.Tick) domain.Tick {
+	tick.Revision = r.ticks[tick.ProblemID].Revision + 1
+
 	buf := new(bytes.Buffer)
 	err := json.MarshalWrite(buf, tick)
 	if err != nil {
@@ -439,6 +442,7 @@ func (r *ContenderRunner) PutTick(contenderID domain.ContenderID, tick domain.Ti
 	}
 
 	req.Header.Set("Authorization", fmt.Sprintf("Regcode %s", r.RegistrationCode))
+	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
