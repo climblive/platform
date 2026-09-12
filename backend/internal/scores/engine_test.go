@@ -615,7 +615,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("SaveProblem", scores.Problem{
-				ID: fakedProblemID,
+				ID:           fakedProblemID,
+				Zone1Enabled: true,
+				Zone2Enabled: true,
 				ProblemValue: domain.ProblemValue{
 					PointsTop:   100,
 					PointsZone1: 50,
@@ -634,7 +636,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 			})
 
 		effects := slices.Collect(f.engine.HandleProblemAdded(domain.ProblemAddedEvent{
-			ProblemID: fakedProblemID,
+			ProblemID:    fakedProblemID,
+			Zone1Enabled: true,
+			Zone2Enabled: true,
 			ProblemValue: domain.ProblemValue{
 				PointsTop:   100,
 				PointsZone1: 50,
@@ -663,7 +667,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("SaveProblem", scores.Problem{
-				ID: fakedProblemID,
+				ID:           fakedProblemID,
+				Zone1Enabled: true,
+				Zone2Enabled: true,
 				ProblemValue: domain.ProblemValue{
 					PointsTop:   100,
 					PointsZone1: 50,
@@ -682,7 +688,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 			})
 
 		effects := slices.Collect(f.engine.HandleProblemUpdated(domain.ProblemUpdatedEvent{
-			ProblemID: fakedProblemID,
+			ProblemID:    fakedProblemID,
+			Zone1Enabled: true,
+			Zone2Enabled: true,
 			ProblemValue: domain.ProblemValue{
 				PointsTop:   100,
 				PointsZone1: 50,
