@@ -1,6 +1,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import type WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { ordinalSuperscript } from "@climblive/lib/utils";
 
   type Props = {
