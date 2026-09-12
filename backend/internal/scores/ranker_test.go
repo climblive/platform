@@ -43,72 +43,175 @@ func TestBasicRanker(t *testing.T) {
 		assert.Equal(t, expected, prettifyAll(scores))
 	})
 
-	t.Run("Simple", func(t *testing.T) {
-		contenders := makeContenders(3)
-		contenders[0].Points = 300
-		contenders[1].Points = 200
-		contenders[2].Points = 100
+	t.Run("ByPoints", func(t *testing.T) {
+		t.Run("Simple", func(t *testing.T) {
+			contenders := makeContenders(3)
+			contenders[0].Points = 300
+			contenders[1].Points = 200
+			contenders[2].Points = 100
 
-		shuffleSlice(contenders)
+			shuffleSlice(contenders)
 
-		ranker := scores.NewBasicRanker(5, true)
+			ranker := scores.NewBasicRanker(5, true)
 
-		scores := ranker.RankContenders(slices.Values(contenders))
+			scores := ranker.RankContenders(slices.Values(contenders))
 
-		expected := []string{
-			"i:1 p:1 r:0 f:🏆",
-			"i:2 p:2 r:1 f:🏆",
-			"i:3 p:3 r:2 f:🏆",
-		}
+			expected := []string{
+				"i:1 p:1 r:0 f:🏆",
+				"i:2 p:2 r:1 f:🏆",
+				"i:3 p:3 r:2 f:🏆",
+			}
 
-		assert.Equal(t, expected, prettifyAll(scores))
+			assert.Equal(t, expected, prettifyAll(scores))
+		})
+
+		t.Run("SharedPlacement", func(t *testing.T) {
+			contenders := makeContenders(5)
+			contenders[0].Points = 300
+			contenders[1].Points = 200
+			contenders[2].Points = 200
+			contenders[3].Points = 200
+			contenders[4].Points = 100
+
+			shuffleSlice(contenders)
+
+			ranker := scores.NewBasicRanker(5, true)
+
+			scores := ranker.RankContenders(slices.Values(contenders))
+
+			expected := []string{
+				"i:1 p:1 r:0 f:🏆",
+				"i:2 p:2 r:1 f:🏆",
+				"i:3 p:2 r:2 f:🏆",
+				"i:4 p:2 r:3 f:🏆",
+				"i:5 p:5 r:4 f:🏆",
+			}
+
+			assert.Equal(t, expected, prettifyAll(scores))
+		})
+
+		t.Run("IgnoreAttempts", func(t *testing.T) {
+			contenders := makeContenders(2)
+			contenders[0].Points = 100
+			contenders[0].Tops = 1
+			contenders[0].AttemptsTops = 2
+			contenders[1].Points = 100
+
+			ranker := scores.NewBasicRanker(5, true)
+
+			scores := ranker.RankContenders(slices.Values(contenders))
+
+			expected := []string{
+				"i:1 p:1 r:0 f:🏆",
+				"i:2 p:1 r:1 f:🏆",
+			}
+
+			assert.Equal(t, expected, prettifyAll(scores))
+		})
+
+		t.Run("ExtraFinalists", func(t *testing.T) {
+			contenders := makeContenders(10)
+			contenders[0].Points = 500
+			contenders[1].Points = 400
+			contenders[2].Points = 300
+			contenders[3].Points = 200
+			contenders[4].Points = 100
+			contenders[5].Points = 100
+			contenders[6].Points = 100
+			contenders[7].Points = 50
+			contenders[8].Points = 50
+			contenders[9].Points = 50
+
+			shuffleSlice(contenders)
+
+			ranker := scores.NewBasicRanker(5, true)
+
+			scores := ranker.RankContenders(slices.Values(contenders))
+
+			expected := []string{
+				"i:1 p:1 r:0 f:🏆",
+				"i:2 p:2 r:1 f:🏆",
+				"i:3 p:3 r:2 f:🏆",
+				"i:4 p:4 r:3 f:🏆",
+				"i:5 p:5 r:4 f:🏆",
+				"i:6 p:5 r:5 f:🏆",
+				"i:7 p:5 r:6 f:🏆",
+				"i:8 p:8 r:7 f:-",
+				"i:9 p:8 r:8 f:-",
+				"i:10 p:8 r:9 f:-",
+			}
+
+			assert.Equal(t, expected, prettifyAll(scores))
+		})
+
+		t.Run("WithdrawalsFromFinals", func(t *testing.T) {
+			contenders := makeContenders(10)
+			contenders[0].Points = 500
+			contenders[1].Points = 400
+			contenders[2].Points = 300
+			contenders[3].Points = 200
+			contenders[4].Points = 100
+			contenders[5].Points = 100
+			contenders[6].Points = 100
+			contenders[7].Points = 50
+			contenders[8].Points = 50
+			contenders[9].Points = 0
+
+			contenders[1].WithdrawnFromFinals = true
+			contenders[2].WithdrawnFromFinals = true
+			contenders[5].WithdrawnFromFinals = true
+
+			shuffleSlice(contenders)
+
+			ranker := scores.NewBasicRanker(5, true)
+
+			scores := ranker.RankContenders(slices.Values(contenders))
+
+			expected := []string{
+				"i:1 p:1 r:0 f:🏆",
+				"i:2 p:2 r:1 f:-",
+				"i:3 p:3 r:2 f:-",
+				"i:4 p:4 r:3 f:🏆",
+				"i:5 p:5 r:4 f:🏆",
+				"i:6 p:5 r:5 f:-",
+				"i:7 p:5 r:6 f:🏆",
+				"i:8 p:8 r:7 f:🏆",
+				"i:9 p:8 r:8 f:🏆",
+				"i:10 p:10 r:9 f:-",
+			}
+
+			assert.Equal(t, expected, prettifyAll(scores))
+		})
+
+		t.Run("DisqualifiedContendersLast", func(t *testing.T) {
+			contenders := makeContenders(5)
+			contenders[0].Points = 0
+			contenders[1].Points = 0
+			contenders[2].Points = 0
+			contenders[3].Points = 0
+			contenders[4].Points = 0
+
+			contenders[1].Disqualified = true
+
+			shuffleSlice(contenders)
+
+			ranker := scores.NewBasicRanker(5, true)
+
+			scores := ranker.RankContenders(slices.Values(contenders))
+
+			expected := []string{
+				"i:1 p:1 r:0 f:-",
+				"i:3 p:1 r:1 f:-",
+				"i:4 p:1 r:2 f:-",
+				"i:5 p:1 r:3 f:-",
+				"i:2 p:1 r:4 f:-",
+			}
+
+			assert.Equal(t, expected, prettifyAll(scores))
+		})
 	})
 
-	t.Run("SharedPlacement", func(t *testing.T) {
-		contenders := makeContenders(5)
-		contenders[0].Points = 300
-		contenders[1].Points = 200
-		contenders[2].Points = 200
-		contenders[3].Points = 200
-		contenders[4].Points = 100
-
-		shuffleSlice(contenders)
-
-		ranker := scores.NewBasicRanker(5, true)
-
-		scores := ranker.RankContenders(slices.Values(contenders))
-
-		expected := []string{
-			"i:1 p:1 r:0 f:🏆",
-			"i:2 p:2 r:1 f:🏆",
-			"i:3 p:2 r:2 f:🏆",
-			"i:4 p:2 r:3 f:🏆",
-			"i:5 p:5 r:4 f:🏆",
-		}
-
-		assert.Equal(t, expected, prettifyAll(scores))
-	})
-
-	t.Run("SharedPlacementWithEqualPointsAndDifferentAttempts", func(t *testing.T) {
-		contenders := makeContenders(2)
-		contenders[0].Points = 100
-		contenders[0].Tops = 1
-		contenders[0].AttemptsTops = 2
-		contenders[1].Points = 100
-
-		ranker := scores.NewBasicRanker(5, true)
-
-		scores := ranker.RankContenders(slices.Values(contenders))
-
-		expected := []string{
-			"i:1 p:1 r:0 f:🏆",
-			"i:2 p:1 r:1 f:🏆",
-		}
-
-		assert.Equal(t, expected, prettifyAll(scores))
-	})
-
-	t.Run("Attempts", func(t *testing.T) {
+	t.Run("ByAttempts", func(t *testing.T) {
 		contenders := makeContenders(4)
 		contenders[0].Tops = 1
 		contenders[0].AttemptsTops = 2
@@ -129,107 +232,6 @@ func TestBasicRanker(t *testing.T) {
 		}
 
 		assert.Equal(t, expected, prettifyAll(rankedScores))
-	})
-
-	t.Run("ExtraFinalists", func(t *testing.T) {
-		contenders := makeContenders(10)
-		contenders[0].Points = 500
-		contenders[1].Points = 400
-		contenders[2].Points = 300
-		contenders[3].Points = 200
-		contenders[4].Points = 100
-		contenders[5].Points = 100
-		contenders[6].Points = 100
-		contenders[7].Points = 50
-		contenders[8].Points = 50
-		contenders[9].Points = 50
-
-		shuffleSlice(contenders)
-
-		ranker := scores.NewBasicRanker(5, true)
-
-		scores := ranker.RankContenders(slices.Values(contenders))
-
-		expected := []string{
-			"i:1 p:1 r:0 f:🏆",
-			"i:2 p:2 r:1 f:🏆",
-			"i:3 p:3 r:2 f:🏆",
-			"i:4 p:4 r:3 f:🏆",
-			"i:5 p:5 r:4 f:🏆",
-			"i:6 p:5 r:5 f:🏆",
-			"i:7 p:5 r:6 f:🏆",
-			"i:8 p:8 r:7 f:-",
-			"i:9 p:8 r:8 f:-",
-			"i:10 p:8 r:9 f:-",
-		}
-
-		assert.Equal(t, expected, prettifyAll(scores))
-	})
-
-	t.Run("WithdrawalsFromFinals", func(t *testing.T) {
-		contenders := makeContenders(10)
-		contenders[0].Points = 500
-		contenders[1].Points = 400
-		contenders[2].Points = 300
-		contenders[3].Points = 200
-		contenders[4].Points = 100
-		contenders[5].Points = 100
-		contenders[6].Points = 100
-		contenders[7].Points = 50
-		contenders[8].Points = 50
-		contenders[9].Points = 0
-
-		contenders[1].WithdrawnFromFinals = true
-		contenders[2].WithdrawnFromFinals = true
-		contenders[5].WithdrawnFromFinals = true
-
-		shuffleSlice(contenders)
-
-		ranker := scores.NewBasicRanker(5, true)
-
-		scores := ranker.RankContenders(slices.Values(contenders))
-
-		expected := []string{
-			"i:1 p:1 r:0 f:🏆",
-			"i:2 p:2 r:1 f:-",
-			"i:3 p:3 r:2 f:-",
-			"i:4 p:4 r:3 f:🏆",
-			"i:5 p:5 r:4 f:🏆",
-			"i:6 p:5 r:5 f:-",
-			"i:7 p:5 r:6 f:🏆",
-			"i:8 p:8 r:7 f:🏆",
-			"i:9 p:8 r:8 f:🏆",
-			"i:10 p:10 r:9 f:-",
-		}
-
-		assert.Equal(t, expected, prettifyAll(scores))
-	})
-
-	t.Run("DisqualifiedContendersLast", func(t *testing.T) {
-		contenders := makeContenders(5)
-		contenders[0].Points = 0
-		contenders[1].Points = 0
-		contenders[2].Points = 0
-		contenders[3].Points = 0
-		contenders[4].Points = 0
-
-		contenders[1].Disqualified = true
-
-		shuffleSlice(contenders)
-
-		ranker := scores.NewBasicRanker(5, true)
-
-		scores := ranker.RankContenders(slices.Values(contenders))
-
-		expected := []string{
-			"i:1 p:1 r:0 f:-",
-			"i:3 p:1 r:1 f:-",
-			"i:4 p:1 r:2 f:-",
-			"i:5 p:1 r:3 f:-",
-			"i:2 p:1 r:4 f:-",
-		}
-
-		assert.Equal(t, expected, prettifyAll(scores))
 	})
 }
 
