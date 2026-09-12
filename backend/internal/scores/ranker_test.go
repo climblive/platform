@@ -12,8 +12,6 @@ import (
 )
 
 func TestBasicRanker(t *testing.T) {
-	ranker := scores.NewBasicRanker(5, true)
-
 	makeContenders := func(count int) []scores.Contender {
 		contenders := make([]scores.Contender, count)
 
@@ -31,6 +29,8 @@ func TestBasicRanker(t *testing.T) {
 	t.Run("ContestNotStarted", func(t *testing.T) {
 		contenders := makeContenders(3)
 		shuffleSlice(contenders)
+
+		ranker := scores.NewBasicRanker(5, true)
 
 		scores := ranker.RankContenders(slices.Values(contenders))
 
@@ -50,6 +50,8 @@ func TestBasicRanker(t *testing.T) {
 		contenders[2].Points = 100
 
 		shuffleSlice(contenders)
+
+		ranker := scores.NewBasicRanker(5, true)
 
 		scores := ranker.RankContenders(slices.Values(contenders))
 
@@ -72,6 +74,8 @@ func TestBasicRanker(t *testing.T) {
 
 		shuffleSlice(contenders)
 
+		ranker := scores.NewBasicRanker(5, true)
+
 		scores := ranker.RankContenders(slices.Values(contenders))
 
 		expected := []string{
@@ -92,6 +96,8 @@ func TestBasicRanker(t *testing.T) {
 		contenders[0].AttemptsTops = 2
 		contenders[1].Points = 100
 
+		ranker := scores.NewBasicRanker(5, true)
+
 		scores := ranker.RankContenders(slices.Values(contenders))
 
 		expected := []string{
@@ -103,7 +109,6 @@ func TestBasicRanker(t *testing.T) {
 	})
 
 	t.Run("Attempts", func(t *testing.T) {
-		attemptRanker := scores.NewBasicRanker(1, false)
 		contenders := makeContenders(4)
 		contenders[0].Tops = 1
 		contenders[0].AttemptsTops = 2
@@ -112,7 +117,9 @@ func TestBasicRanker(t *testing.T) {
 		contenders[2].Tops = 1
 		contenders[2].AttemptsTops = 3
 
-		rankedScores := attemptRanker.RankContenders(slices.Values(contenders))
+		ranker := scores.NewBasicRanker(1, false)
+
+		rankedScores := ranker.RankContenders(slices.Values(contenders))
 
 		expected := []string{
 			"i:1 p:1 r:0 f:🏆",
@@ -138,6 +145,8 @@ func TestBasicRanker(t *testing.T) {
 		contenders[9].Points = 50
 
 		shuffleSlice(contenders)
+
+		ranker := scores.NewBasicRanker(5, true)
 
 		scores := ranker.RankContenders(slices.Values(contenders))
 
@@ -176,6 +185,8 @@ func TestBasicRanker(t *testing.T) {
 
 		shuffleSlice(contenders)
 
+		ranker := scores.NewBasicRanker(5, true)
+
 		scores := ranker.RankContenders(slices.Values(contenders))
 
 		expected := []string{
@@ -205,6 +216,8 @@ func TestBasicRanker(t *testing.T) {
 		contenders[1].Disqualified = true
 
 		shuffleSlice(contenders)
+
+		ranker := scores.NewBasicRanker(5, true)
 
 		scores := ranker.RankContenders(slices.Values(contenders))
 
