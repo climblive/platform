@@ -518,7 +518,7 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 
 	rules := e.store.GetRules()
 
-	oldResults := contender.Score
+	oldScore := contender.Score
 
 	contender.Score = Score{}
 
@@ -571,7 +571,7 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 		}
 	}
 
-	if contender.Score == oldResults {
+	if contender.Score == oldScore {
 		return nil
 	}
 
