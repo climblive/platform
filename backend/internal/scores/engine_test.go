@@ -1681,7 +1681,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(domain.PointValue{
 				ContenderID: fakedContenderID,
 				ProblemID:   fakedProblem1ID,
-				Current:     110,
+				Current:     0,
 			}, true).
 			On("GetPointValue", fakedContenderID, fakedProblem2ID).
 			Return(domain.PointValue{
@@ -1693,7 +1693,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(domain.PointValue{
 				ContenderID: fakedContenderID,
 				ProblemID:   fakedProblem3ID,
-				Current:     0,
+				Current:     110,
 			}, true).
 			On("GetPointValue", fakedContenderID, fakedProblem4ID).
 			Return(domain.PointValue{
