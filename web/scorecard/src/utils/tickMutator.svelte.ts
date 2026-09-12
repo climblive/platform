@@ -130,12 +130,12 @@ export class TickMutator {
   }
 
   public reachFeature(feature: Feature): void {
-    if (!this.addAttempt()) {
+    const featureIndex = this.#features.findIndex((f) => f === feature);
+    if (featureIndex === -1) {
       return;
     }
 
-    const featureIndex = this.#features.findIndex((f) => f === feature);
-    if (featureIndex === -1) {
+    if (!this.addAttempt()) {
       return;
     }
 

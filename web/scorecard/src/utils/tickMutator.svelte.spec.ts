@@ -220,7 +220,7 @@ describe(TickMutator.name, () => {
 
       mutator.reachFeature("zone1");
 
-      expect(mutator.attempts).toEqual(1);
+      expect(mutator.attempts).toEqual(0);
       expect(mutator.reachedFeatures).toEqual(NO_RESULT);
     });
 
