@@ -51,9 +51,10 @@
     schema: z.ZodType<T, unknown>;
     submit: (value: T) => void;
     children?: Snippet;
+    hidePoints: boolean;
   }
 
-  let { data, schema, submit, children }: Props = $props();
+  let { data, schema, submit, children, hidePoints }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
   let pendingValue: T | undefined = $state(undefined);
@@ -161,6 +162,7 @@
       />
     </div>
     <wa-number-input
+      class={{ hidden: hidePoints }}
       size="s"
       {@attach name("pointsTop")}
       label="Points top"
@@ -173,6 +175,7 @@
       <span slot="end">pts</span>
     </wa-number-input>
     <wa-number-input
+      class={{ hidden: hidePoints }}
       size="s"
       {@attach name("flashBonus")}
       label="Flash bonus"
@@ -205,7 +208,7 @@
       min={0}
       max={2 ** 31 - 1}
       class={{
-        hidden: !zone2Enabled,
+        hidden: !zone2Enabled || hidePoints,
       }}
     >
       <span slot="end">pts</span>
@@ -228,7 +231,7 @@
       min={0}
       max={2 ** 31 - 1}
       class={{
-        hidden: !zone1Enabled,
+        hidden: !zone1Enabled || hidePoints,
       }}
     >
       <span slot="end">pts</span>
