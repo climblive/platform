@@ -29,12 +29,18 @@
   const patchContest = $derived(patchContestMutation(contest.id));
 
   const handleUsePointsChange = (usePoints: boolean) => {
-    patchContest.mutate(
-      { usePoints },
-      {
-        onError: () => toastUnexpectedError("Failed to update rules."),
-      },
-    );
+    const patch: ContestPatch = {
+      usePoints,
+    };
+
+    if (!usePoints) {
+      patch.qualifyingProblems = 0;
+      patch.pooledPoints = false;
+    }
+
+    patchContest.mutate(patch, {
+      onError: () => toastUnexpectedError("Failed to update rules."),
+    });
   };
 </script>
 
@@ -46,7 +52,7 @@
   >
     {#snippet header()}
       <wa-radio
-        onclick={handleUsePointsChange(true)}
+        onclick={() => handleUsePointsChange(true)}
         size="s"
         checked={contest.usePoints ? true : undefined}
       ></wa-radio>
@@ -60,7 +66,7 @@
   >
     {#snippet header()}
       <wa-radio
-        onclick={handleUsePointsChange(false)}
+        onclick={() => handleUsePointsChange(false)}
         size="s"
         checked={!contest.usePoints ? true : undefined}
       ></wa-radio>
