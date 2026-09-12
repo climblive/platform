@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import RegistrationForm from "@/forms/RegistrationForm.svelte";
   import type { ScorecardSession } from "@/types";
   import "@awesome.me/webawesome/dist/components/button/button.js";

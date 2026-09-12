@@ -1,9 +1,9 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import ContestForm, {
     formSchema,
     nanosecondsInMinute,
   } from "@/forms/ContestForm.svelte";
-  import "@awesome.me/webawesome/dist/components/input/input.js";
   import type { Contest, ContestTemplate } from "@climblive/lib/models";
   import { createContestMutation } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
