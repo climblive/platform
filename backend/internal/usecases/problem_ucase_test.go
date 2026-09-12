@@ -55,8 +55,8 @@ func TestPatchProblem(t *testing.T) {
 		HoldColorPrimary:   "#ffffff",
 		HoldColorSecondary: "#000000",
 		Description:        "The tenth boulder",
-		Zone1Enabled:       false,
-		Zone2Enabled:       false,
+		Zone1Enabled:       true,
+		Zone2Enabled:       true,
 		ProblemValue: domain.ProblemValue{
 			PointsTop:   100,
 			PointsZone1: 50,
