@@ -407,6 +407,14 @@ func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEve
 			if !yield(EffectCalculatePointValues{CompClassID: compClassID, ProblemID: event.ProblemID}) {
 				return
 			}
+
+			contenders := e.store.GetContendersByCompClass(compClassID)
+
+			for contender := range contenders {
+				if !yield(EffectScoreContender{ContenderID: contender.ID}) {
+					return
+				}
+			}
 		}
 	}
 }
