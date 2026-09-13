@@ -768,7 +768,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedTickID := testutils.RandomResourceID[domain.TickID]()
-
 		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
@@ -847,7 +846,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedTickID := testutils.RandomResourceID[domain.TickID]()
-
 		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
@@ -921,7 +919,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedTickID := testutils.RandomResourceID[domain.TickID]()
-
 		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
@@ -953,7 +950,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedTickID := testutils.RandomResourceID[domain.TickID]()
-
 		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
