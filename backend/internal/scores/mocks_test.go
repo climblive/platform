@@ -59,8 +59,8 @@ func (m *engineStoreMock) SaveTick(contenderID domain.ContenderID, tick scores.T
 	m.Called(contenderID, tick)
 }
 
-func (m *engineStoreMock) DeleteTick(contenderID domain.ContenderID, problemID domain.ProblemID) {
-	m.Called(contenderID, problemID)
+func (m *engineStoreMock) DeleteTick(contenderID domain.ContenderID, tickID domain.TickID) {
+	m.Called(contenderID, tickID)
 }
 
 func (m *engineStoreMock) GetProblem(problemID domain.ProblemID) (scores.Problem, bool) {
