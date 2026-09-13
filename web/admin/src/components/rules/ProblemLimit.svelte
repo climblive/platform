@@ -5,7 +5,7 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import { SaveIndicator } from "@climblive/lib/components";
-  import { checked, GenericForm, name } from "@climblive/lib/forms";
+  import { GenericForm, name } from "@climblive/lib/forms";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
   import { patchContestMutation } from "@climblive/lib/queries";
   import { debounce, z } from "@climblive/lib/utils";
@@ -41,18 +41,20 @@
   {#snippet children(form)}
     <RuleOptionCard
       title="Problem limit"
+      disabled={!contest.usePoints}
       description="Only count the hardest problems towards each competitor's total score."
     >
       {#snippet header()}
         <wa-checkbox
           size="s"
+          disabled={!contest.usePoints}
           onchange={(event: InputEvent) => {
             const checkbox = event.target as WaCheckbox;
             enabled = checkbox.checked;
 
             setTimeout(() => form.requestSubmit());
           }}
-          {@attach checked(enabled)}
+          checked={enabled}
         ></wa-checkbox>
       {/snippet}
       {#snippet indicator()}
@@ -73,6 +75,7 @@
 
             <wa-number-input
               size="s"
+              disabled={!contest.usePoints}
               {@attach name("qualifyingProblems")}
               label="Limit"
               required
