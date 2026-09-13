@@ -22,19 +22,21 @@
 
   const { problem, pointValue, putTick, ...rest }: Props = $props();
 
-  const tickMutator = $derived(TickMutator.from(problem, rest.tick));
+  let tickMutator = $derived(TickMutator.from(problem, rest.tick));
   const tick = $derived(buildTick(problem.id, tickMutator));
   let latestLocalRevision = $state(0);
 
   const saveTick = async () => {
-    try {
-      latestLocalRevision =
-        Math.max(latestLocalRevision, rest.tick?.revision ?? 0) + 1;
+    const revision =
+      Math.max(latestLocalRevision, rest.tick?.revision ?? 0) + 1;
+    latestLocalRevision = revision;
 
-      await putTick.mutateAsync({ ...tick, revision: latestLocalRevision });
+    try {
+      await putTick.mutateAsync({ ...tick, revision });
     } catch (error) {
-      if (!isCancel(error)) {
-        toastUnexpectedError("Failed to update ascent.");
+      if (!isCancel(error) && revision === latestLocalRevision) {
+        tickMutator = TickMutator.from(problem, rest.tick);
+        toastUnexpectedError("Failed to update ascent. Changes reverted.");
       }
     }
   };
