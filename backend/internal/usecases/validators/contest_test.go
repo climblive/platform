@@ -90,6 +90,17 @@ func TestContestValidator(t *testing.T) {
 		assert.True(t, validator.IsValidationError(err))
 	})
 
+	t.Run("PooledPointsWithoutPoints", func(t *testing.T) {
+		contest := validContest()
+		contest.UsePoints = false
+		contest.PooledPoints = true
+
+		err := validator.Validate(contest)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
+
 	t.Run("NegativeGracePeriod", func(t *testing.T) {
 		contest := validContest()
 		contest.GracePeriod = -1
