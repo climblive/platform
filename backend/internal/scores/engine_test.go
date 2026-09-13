@@ -932,7 +932,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			}, true)
 
 		f.store.
-			On("DeleteTick", fakedContenderID, fakedTickID).
+			On("DeleteTick", fakedTickID).
 			Return()
 
 		effects := f.engine.HandleAscentDeregistered(domain.AscentDeregisteredEvent{
@@ -962,7 +962,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			}, true)
 
 		f.store.
-			On("DeleteTick", fakedContenderID, fakedTickID).
+			On("DeleteTick", fakedTickID).
 			Return()
 
 		effects := slices.Collect(f.engine.HandleAscentDeregistered(domain.AscentDeregisteredEvent{

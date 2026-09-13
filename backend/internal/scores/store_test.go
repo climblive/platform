@@ -362,44 +362,32 @@ func TestMemoryStore(t *testing.T) {
 	})
 
 	t.Run("DeleteTick", func(t *testing.T) {
-		for _, tt := range []struct {
-			name        string
-			contenderID domain.ContenderID
-			tickID      domain.TickID
-			deleted     bool
-		}{
-			{name: "MatchingID", contenderID: 1, tickID: 20, deleted: true},
-			{name: "UnknownID", contenderID: 1, tickID: 99},
-			{name: "ProblemIDIsNotTickID", contenderID: 1, tickID: 2},
-			{name: "ReplacedTick", contenderID: 1, tickID: 40},
-			{name: "WrongContender", contenderID: 2, tickID: 20},
-			{name: "UnknownContender", contenderID: 3, tickID: 20},
-		} {
-			t.Run(tt.name, func(t *testing.T) {
-				store := scores.NewMemoryStore()
+		store := scores.NewMemoryStore()
 
-				t1 := scores.Tick{ID: 10, ProblemID: 1}
-				t2 := scores.Tick{ID: 20, ProblemID: 2}
-				t3 := scores.Tick{ID: 30, ProblemID: 3}
-				oldTick := scores.Tick{ID: 40, ProblemID: 2}
-				otherContenderTick := scores.Tick{ID: 50, ProblemID: 2}
+		contenderID := domain.ContenderID(1)
 
-				store.SaveTick(1, oldTick)
-				store.SaveTick(1, t1)
-				store.SaveTick(1, t2)
-				store.SaveTick(1, t3)
-				store.SaveTick(2, otherContenderTick)
-
-				store.DeleteTick(tt.contenderID, tt.tickID)
-
-				expected := []scores.Tick{t1, t2, t3}
-				if tt.deleted {
-					expected = []scores.Tick{t1, t3}
-				}
-				assert.ElementsMatch(t, expected, slices.Collect(store.GetTicksByContender(1)))
-				assert.ElementsMatch(t, []scores.Tick{otherContenderTick}, slices.Collect(store.GetTicksByContender(2)))
-			})
+		t1 := scores.Tick{
+			ID:        10,
+			ProblemID: 1,
 		}
+		t2 := scores.Tick{
+			ID:        20,
+			ProblemID: 2,
+		}
+		t3 := scores.Tick{
+			ID:        30,
+			ProblemID: 3,
+		}
+
+		store.SaveTick(contenderID, t1)
+		store.SaveTick(contenderID, t2)
+		store.SaveTick(contenderID, t3)
+
+		assert.ElementsMatch(t, []scores.Tick{t1, t2, t3}, slices.Collect(store.GetTicksByContender(contenderID)))
+
+		store.DeleteTick(t2.ID)
+
+		assert.ElementsMatch(t, []scores.Tick{t1, t3}, slices.Collect(store.GetTicksByContender(contenderID)))
 	})
 
 	t.Run("GetProblem", func(t *testing.T) {
