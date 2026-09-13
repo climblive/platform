@@ -4,6 +4,7 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { Problem, ProblemPatch } from "@climblive/lib/models";
   import {
+    getContestQuery,
     getProblemQuery,
     patchProblemMutation,
   } from "@climblive/lib/queries";
@@ -21,6 +22,11 @@
 
   const problem = $derived(problemQuery.data);
 
+  const contestQuery = $derived(
+    problem?.contestId ? getContestQuery(problem.contestId) : undefined,
+  );
+  const contest = $derived(contestQuery?.data);
+
   const handleSubmit = async (tmpl: ProblemPatch) => {
     patchProblem.mutate(tmpl, {
       onSuccess: (problem: Problem) =>
@@ -33,7 +39,12 @@
 {#if problem === undefined}
   <Loader />
 {:else}
-  <ProblemForm submit={handleSubmit} data={problem} schema={formSchema}>
+  <ProblemForm
+    submit={handleSubmit}
+    data={problem}
+    schema={formSchema}
+    hidePoints={contest?.usePoints === false}
+  >
     <div class="controls">
       <wa-button
         size="s"
