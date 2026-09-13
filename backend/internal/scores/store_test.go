@@ -367,12 +367,15 @@ func TestMemoryStore(t *testing.T) {
 		contenderID := domain.ContenderID(1)
 
 		t1 := scores.Tick{
+			ID:        10,
 			ProblemID: 1,
 		}
 		t2 := scores.Tick{
+			ID:        20,
 			ProblemID: 2,
 		}
 		t3 := scores.Tick{
+			ID:        30,
 			ProblemID: 3,
 		}
 
@@ -382,7 +385,7 @@ func TestMemoryStore(t *testing.T) {
 
 		assert.ElementsMatch(t, []scores.Tick{t1, t2, t3}, slices.Collect(store.GetTicksByContender(contenderID)))
 
-		store.DeleteTick(contenderID, t2.ProblemID)
+		store.DeleteTick(t2.ID)
 
 		assert.ElementsMatch(t, []scores.Tick{t1, t3}, slices.Collect(store.GetTicksByContender(contenderID)))
 	})

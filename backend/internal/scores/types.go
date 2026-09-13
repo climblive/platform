@@ -58,6 +58,7 @@ func (c Contender) Compare(other Contender) int {
 }
 
 type Tick struct {
+	ID            domain.TickID
 	Revision      int
 	ContenderID   domain.ContenderID
 	ProblemID     domain.ProblemID

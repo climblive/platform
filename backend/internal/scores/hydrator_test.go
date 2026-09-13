@@ -16,6 +16,7 @@ func TestHydrate(t *testing.T) {
 	mockedRepo := new(repositoryMock)
 	mockedStore := new(engineStoreMock)
 
+	fakedTickID := testutils.RandomResourceID[domain.TickID]()
 	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
@@ -67,6 +68,7 @@ func TestHydrate(t *testing.T) {
 		On("GetTicksByContest", mock.Anything, nil, fakedContestID).
 		Return([]domain.Tick{
 			{
+				ID: fakedTickID,
 				Ownership: domain.OwnershipData{
 					ContenderID: &fakedContenderID,
 				},
@@ -106,6 +108,7 @@ func TestHydrate(t *testing.T) {
 	}).Return()
 
 	mockedStore.On("SaveTick", fakedContenderID, scores.Tick{
+		ID:            fakedTickID,
 		Revision:      1,
 		ContenderID:   fakedContenderID,
 		ProblemID:     fakedProblemID,

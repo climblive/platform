@@ -98,7 +98,7 @@ type EngineStore interface {
 	GetTicksByContender(domain.ContenderID) iter.Seq[Tick]
 	GetTick(domain.ContenderID, domain.ProblemID) (Tick, bool)
 	SaveTick(domain.ContenderID, Tick)
-	DeleteTick(domain.ContenderID, domain.ProblemID)
+	DeleteTick(domain.TickID)
 	GetTicksByProblem(domain.CompClassID, domain.ProblemID) iter.Seq[Tick]
 
 	GetProblem(domain.ProblemID) (Problem, bool)
@@ -312,6 +312,7 @@ func (e *DefaultScoreEngine) HandleContenderRequalified(event domain.ContenderRe
 
 func (e *DefaultScoreEngine) HandleAscentRegistered(event domain.AscentRegisteredEvent) iter.Seq[Effect] {
 	tick := Tick{
+		ID:            event.TickID,
 		Revision:      event.Revision,
 		ContenderID:   event.ContenderID,
 		ProblemID:     event.ProblemID,
@@ -356,7 +357,7 @@ func (e *DefaultScoreEngine) HandleAscentDeregistered(event domain.AscentDeregis
 		return nil
 	}
 
-	e.store.DeleteTick(event.ContenderID, event.ProblemID)
+	e.store.DeleteTick(event.TickID)
 
 	if contender.Disqualified {
 		return nil
