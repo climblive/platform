@@ -130,7 +130,7 @@ func (s *MemoryStore) SaveTick(contenderID domain.ContenderID, tick Tick) {
 	contenderTicks[tick.ProblemID] = tick
 }
 
-func (s *MemoryStore) DeleteTick(contenderID domain.ContenderID, tickID domain.TickID) {
+func (s *MemoryStore) DeleteTick(tickID domain.TickID) {
 	contenderTicks := s.ticks[contenderID]
 
 	for problemID, tick := range contenderTicks {
