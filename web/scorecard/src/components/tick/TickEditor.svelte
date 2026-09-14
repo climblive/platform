@@ -92,7 +92,6 @@
     pill
     appearance="outlined"
     onclick={(event: MouseEvent) => handleSubtractAttempt(event)}
-    loading={putTick.isPending}
     disabled={!tickMutator.canSubtractAttempt() || putTick.isPending}
   >
     <wa-icon name="minus" label="Subtract failed attempt"></wa-icon>
@@ -108,7 +107,6 @@
     pill
     appearance="outlined"
     onclick={(event: MouseEvent) => handleAddAttempt(event)}
-    loading={putTick.isPending}
     disabled={!tickMutator.canAddAttempt() || putTick.isPending}
   >
     <wa-icon slot="start" name="plus"></wa-icon>
