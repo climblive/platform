@@ -9,9 +9,6 @@ import { ApiClient } from "../Api";
 import type { Tick } from "../models";
 import { HOUR } from "./constants";
 
-export const tickKey = (contenderId: number, problemId: number) =>
-  ["tick", { contenderId, problemId }] as const;
-
 export const getTicksByContenderQuery = (
   contenderId: number,
   options?: Partial<Parameters<typeof createQuery<Tick[]>>[0]>,
@@ -37,30 +34,12 @@ export const getTicksByContestQuery = (contestId: number) =>
     refetchOnWindowFocus: true,
   }));
 
-export const putTickMutation = (contenderId: number, problemId: number) => {
+export const putTickMutation = (contenderId: number) => {
   const client = useQueryClient();
-  let abortController: AbortController | undefined;
 
   return createMutation(() => ({
-    mutationKey: tickKey(contenderId, problemId),
-    mutationFn: async (tick: Omit<Tick, "id" | "timestamp">) => {
-      abortController?.abort();
-
-      const currentController = new AbortController();
-      abortController = currentController;
-
-      try {
-        return await ApiClient.getInstance().putTick(
-          contenderId,
-          tick,
-          currentController.signal,
-        );
-      } finally {
-        if (abortController === currentController) {
-          abortController = undefined;
-        }
-      }
-    },
+    mutationFn: (tick: Omit<Tick, "id" | "timestamp">) =>
+      ApiClient.getInstance().putTick(contenderId, tick),
     onSuccess: (updatedTick) => {
       updateTickInQueryCache(client, contenderId, updatedTick);
     },

@@ -43,7 +43,6 @@
     getTicksByContenderQuery,
     refetchProblems,
     removeTickFromQueryCache,
-    tickKey,
     updateContenderPublicInfoInQueryCache,
     updatePointValueInQueryCache,
     updateRulesInQueryCache,
@@ -283,15 +282,6 @@
       const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
 
       if (event.contenderId !== contender?.id) {
-        return;
-      }
-
-      const mutationCount = queryClient.isMutating({
-        mutationKey: tickKey($session.contenderId, event.problemId),
-        exact: true,
-      });
-
-      if (mutationCount > 0) {
         return;
       }
 
