@@ -634,9 +634,8 @@ test.describe("failsafe mode", () => {
     await page.goto("/failsafe/ABCD0005");
 
     for (let p = 1; p <= 5; p++) {
-      const problem = page.getByRole("group", { name: `Problem ${p}` });
+      const problem = page.getByRole("region", { name: `Problem ${p}` });
       await expect(problem).toBeVisible();
-      await problem.locator("summary").click();
 
       await expect(
         problem.getByRole("button", { name: "Zone 1" }),
@@ -655,7 +654,7 @@ test.describe("failsafe mode", () => {
     }
 
     for (let p = 1; p <= 5; p++) {
-      const problem = page.getByRole("group", { name: `Problem ${p}` });
+      const problem = page.getByRole("region", { name: `Problem ${p}` });
       await expect(problem).toBeVisible();
 
       await problem.getByRole("button", { name: "Unsend" }).click();
@@ -670,7 +669,10 @@ test.describe("failsafe mode", () => {
   test("record attempts for each feature", async ({ page }) => {
     await page.goto("/failsafe/ABCD0006");
 
-    const problem = page.getByRole("group", { name: "Problem 1", exact: true });
+    const problem = page.getByRole("region", {
+      name: "Problem 1",
+      exact: true,
+    });
     const top = problem.getByRole("checkbox", { name: /^Top/ });
     const zone1 = problem.getByRole("checkbox", { name: /^Zone 1/ });
     const zone2 = problem.getByRole("checkbox", { name: /^Zone 2/ });
@@ -688,8 +690,7 @@ test.describe("failsafe mode", () => {
       ).toHaveText(`${attempts} ${attempts === 1 ? "attempt" : "attempts"}`);
     };
 
-    await expect(top).not.toBeVisible();
-    await problem.locator("summary").click();
+    await expect(top).toBeVisible();
     if (await unsend.isVisible()) {
       await unsend.click();
     }
@@ -726,7 +727,6 @@ test.describe("failsafe mode", () => {
     await expect(unsend).toBeEnabled();
 
     await page.reload();
-    await problem.locator("summary").click();
     await expectAttempts(4);
     await expect(top).toBeChecked();
     await expect(zone1).toHaveAccessibleName("Zone 1 in 1 attempt");
