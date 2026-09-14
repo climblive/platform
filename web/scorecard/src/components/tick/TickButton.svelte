@@ -7,9 +7,17 @@
     label: string;
     points?: number;
     bonusPoints?: number;
+    disabled?: boolean;
   };
 
-  const { onClick, iconName, label, points = 0, bonusPoints }: Props = $props();
+  const {
+    onClick,
+    iconName,
+    label,
+    points = 0,
+    bonusPoints,
+    disabled,
+  }: Props = $props();
 
   const pointsLabel = $derived.by(() => {
     if (bonusPoints) {
@@ -25,6 +33,7 @@
     size="s"
     appearance="outlined"
     onclick={onClick}
+    {disabled}
     pill
     variant="neutral"
   >

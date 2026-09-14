@@ -4,7 +4,6 @@
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { CreateMutationResult } from "@tanstack/svelte-query";
-  import { isCancel } from "axios";
   import { buildTick, TickMutator } from "../../utils/tickMutator.svelte";
   import TickBox from "./TickBox.svelte";
 
@@ -33,11 +32,9 @@
 
     try {
       await putTick.mutateAsync({ ...tick, revision });
-    } catch (error) {
-      if (!isCancel(error) && revision === latestLocalRevision) {
-        tickMutator = TickMutator.from(problem, rest.tick);
-        toastUnexpectedError("Failed to update ascent. Changes reverted.");
-      }
+    } catch {
+      tickMutator = TickMutator.from(problem, rest.tick);
+      toastUnexpectedError("Failed to update ascent. Changes reverted.");
     }
   };
 
@@ -127,7 +124,8 @@
   bonusPoints={pointValue?.flashBonus}
   checked={tick?.top}
   attempts={tick?.attemptsTop ?? 0}
-  disabled={tick?.top === false && !tickMutator.canAddAttempt()}
+  disabled={putTick.isPending ||
+    (tick?.top === false && !tickMutator.canAddAttempt())}
 />
 
 {#if problem.zone2Enabled}
@@ -138,7 +136,8 @@
     points={pointValue?.zone2}
     checked={tick?.zone2}
     attempts={tick?.attemptsZone2 ?? 0}
-    disabled={tick?.zone2 === false && !tickMutator.canAddAttempt()}
+    disabled={putTick.isPending ||
+      (tick?.zone2 === false && !tickMutator.canAddAttempt())}
   />
 {/if}
 
@@ -150,7 +149,8 @@
     points={pointValue?.zone1}
     checked={tick?.zone1}
     attempts={tick?.attemptsZone1 ?? 0}
-    disabled={tick?.zone1 === false && !tickMutator.canAddAttempt()}
+    disabled={putTick.isPending ||
+      (tick?.zone1 === false && !tickMutator.canAddAttempt())}
   />
 {/if}
 
