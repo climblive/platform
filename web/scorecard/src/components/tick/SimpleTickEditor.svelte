@@ -2,7 +2,6 @@
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { CreateMutationResult } from "@tanstack/svelte-query";
-  import { isCancel } from "axios";
   import TickButton from "./TickButton.svelte";
 
   interface Props {
@@ -60,10 +59,8 @@
     }
 
     putTick.mutate(nextTick, {
-      onError: (error) => {
-        if (!isCancel(error)) {
-          toastUnexpectedError("Failed to register ascent.");
-        }
+      onError: () => {
+        toastUnexpectedError("Failed to register ascent.");
       },
     });
 
@@ -76,6 +73,7 @@
     label="Top"
     onClick={() => handleTick("top", false)}
     points={pointValue?.top}
+    disabled={putTick.isPending}
     iconName="check"
   />
   <TickButton
@@ -83,6 +81,7 @@
     onClick={() => handleTick("top", true)}
     points={pointValue?.top}
     bonusPoints={pointValue?.flashBonus}
+    disabled={putTick.isPending}
     iconName="bolt"
   />
 </div>
@@ -92,6 +91,7 @@
     label="Zone 2"
     onClick={() => handleTick("zone2", false)}
     points={pointValue?.zone2}
+    disabled={putTick.isPending}
     iconName="check"
   />
 {/if}
@@ -101,6 +101,7 @@
     label="Zone 1"
     onClick={() => handleTick("zone1", false)}
     points={pointValue?.zone1}
+    disabled={putTick.isPending}
     iconName="check"
   />
 {/if}
