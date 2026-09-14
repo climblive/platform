@@ -7,6 +7,7 @@ StartLimitBurst=5
 [Service]
 ExecStart=/usr/bin/climblive
 User=climblive
+LogNamespace=climblive
 NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=true
