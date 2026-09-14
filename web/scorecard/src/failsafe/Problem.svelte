@@ -12,18 +12,26 @@
   };
 
   const { problem, tick, contenderId, usePoints }: Props = $props();
+
+  const tickType = $derived(
+    tick?.top ? (tick.attemptsTop === 1 ? "flash" : "top") : "no-top",
+  );
 </script>
 
-<details aria-label={`Problem ${problem.number}`}>
-  <summary>
-    <span>
-      <HoldColorIndicator
-        --height="1.25rem"
-        --width="1.25rem"
-        primary={problem.holdColorPrimary}
-        secondary={problem.holdColorSecondary}
-      />
-      #{problem.number}
+<section
+  aria-label={`Problem ${problem.number}`}
+  class="problem"
+  data-tick={tickType}
+>
+  <span class="label">
+    <HoldColorIndicator
+      --height="1.25rem"
+      --width="1.25rem"
+      primary={problem.holdColorPrimary}
+      secondary={problem.holdColorSecondary}
+    />
+    #{problem.number}
+    <span class="icon">
       {#if tick?.top && tick.attemptsTop === 1}
         F
       {:else if tick?.top}
@@ -34,19 +42,50 @@
         Z1
       {/if}
     </span>
-  </summary>
-  {#if usePoints}
-    <SimpleTickEditor {problem} {tick} {contenderId} />
-  {:else}
-    <TickEditor {problem} {tick} {contenderId} />
-  {/if}
-</details>
+  </span>
+  <div>
+    {#if usePoints}
+      <SimpleTickEditor {problem} {tick} {contenderId} />
+    {:else}
+      <TickEditor {problem} {tick} {contenderId} />
+    {/if}
+  </div>
+</section>
 
 <style>
-  summary span {
-    display: inline-flex;
+  .problem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--wa-space-m);
+    border: var(--wa-border-width-m) var(--wa-border-style)
+      var(--wa-color-surface-border);
+    padding: var(--wa-space-s);
+    border-radius: var(--wa-border-radius-m);
+
+    &[data-tick="top"] {
+      border-color: var(--wa-color-green-50);
+
+      & .icon {
+        color: var(--wa-color-green-50);
+      }
+    }
+
+    &[data-tick="flash"] {
+      border-color: var(--wa-color-yellow-50);
+
+      & .icon {
+        color: var(--wa-color-yellow-50);
+      }
+    }
+  }
+
+  .label {
+    display: flex;
     align-items: center;
     gap: var(--wa-space-xs);
-    vertical-align: middle;
+    white-space: nowrap;
+    flex-grow: 1;
   }
 </style>
