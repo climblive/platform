@@ -634,8 +634,9 @@ test.describe("failsafe mode", () => {
     await page.goto("/failsafe/ABCD0005");
 
     for (let p = 1; p <= 5; p++) {
-      const problem = page.getByRole("region", { name: `Problem ${p}` });
+      const problem = page.getByRole("group", { name: `Problem ${p}` });
       await expect(problem).toBeVisible();
+      await problem.locator("summary").click();
 
       await expect(
         problem.getByRole("button", { name: "Zone 1" }),
@@ -654,7 +655,7 @@ test.describe("failsafe mode", () => {
     }
 
     for (let p = 1; p <= 5; p++) {
-      const problem = page.getByRole("region", { name: `Problem ${p}` });
+      const problem = page.getByRole("group", { name: `Problem ${p}` });
       await expect(problem).toBeVisible();
 
       await problem.getByRole("button", { name: "Unsend" }).click();
@@ -664,5 +665,81 @@ test.describe("failsafe mode", () => {
         problem.getByRole("button", { name: "Flash" }),
       ).toBeVisible();
     }
+  });
+
+  test("record attempts for each feature", async ({ page }) => {
+    await page.goto("/failsafe/ABCD0006");
+
+    const problem = page.getByRole("group", { name: "Problem 1", exact: true });
+    const top = problem.getByRole("checkbox", { name: /^Top/ });
+    const zone1 = problem.getByRole("checkbox", { name: /^Zone 1/ });
+    const zone2 = problem.getByRole("checkbox", { name: /^Zone 2/ });
+    const addAttempt = problem.getByRole("button", {
+      name: "Add failed attempt",
+    });
+    const subtractAttempt = problem.getByRole("button", {
+      name: "Subtract failed attempt",
+    });
+    const unsend = problem.getByRole("button", { name: "Unsend" });
+
+    const expectAttempts = async (attempts: number) => {
+      await expect(
+        problem.getByRole("status", { name: "Attempts" }),
+      ).toHaveText(`${attempts} ${attempts === 1 ? "attempt" : "attempts"}`);
+    };
+
+    await expect(top).not.toBeVisible();
+    await problem.locator("summary").click();
+    if (await unsend.isVisible()) {
+      await unsend.click();
+    }
+    await expectAttempts(0);
+    await expect(subtractAttempt).toBeDisabled();
+    await expect(problem.locator("wa-checkbox, wa-button")).toHaveCount(0);
+
+    await top.check();
+    await expectAttempts(1);
+    await expect(zone1).toBeChecked();
+    await expect(zone2).toBeChecked();
+    await expect(addAttempt).toBeDisabled();
+    await unsend.click();
+    await expectAttempts(0);
+
+    await zone1.check();
+    await expectAttempts(1);
+    await expect(subtractAttempt).toBeDisabled();
+    await addAttempt.click();
+    await expectAttempts(2);
+    await zone2.check();
+    await expectAttempts(3);
+    await addAttempt.click();
+    await expectAttempts(4);
+    await subtractAttempt.click();
+    await expectAttempts(3);
+    await top.check();
+    await expectAttempts(4);
+    await expect(zone1).toHaveAccessibleName("Zone 1 in 1 attempt");
+    await expect(zone2).toHaveAccessibleName("Zone 2 in 3 attempts");
+    await expect(top).toHaveAccessibleName("Top in 4 attempts");
+    await expect(addAttempt).toBeDisabled();
+    await expect(subtractAttempt).toBeDisabled();
+    await expect(unsend).toBeEnabled();
+
+    await page.reload();
+    await problem.locator("summary").click();
+    await expectAttempts(4);
+    await expect(top).toBeChecked();
+    await expect(zone1).toHaveAccessibleName("Zone 1 in 1 attempt");
+    await expect(zone2).toHaveAccessibleName("Zone 2 in 3 attempts");
+
+    await zone2.uncheck();
+    await expect(top).not.toBeChecked();
+    await expect(zone1).toBeChecked();
+    await expectAttempts(3);
+    await unsend.click();
+    await expectAttempts(0);
+    await expect(zone1).not.toBeChecked();
+    await expect(zone2).not.toBeChecked();
+    await expect(top).not.toBeChecked();
   });
 });
