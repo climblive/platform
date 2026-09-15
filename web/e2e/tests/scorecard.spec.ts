@@ -464,6 +464,8 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await expect(subtractAttempt).toBeDisabled();
   await expect(problem.getByText("+1t", { exact: true })).toBeVisible();
   await expect(page.getByText("1t 1z₂ 1z₁", { exact: true })).toBeVisible();
+
+  await problem.getByRole("button", { name: "Remove" }).click();
 });
 
 test("info tab", async ({ page }) => {
