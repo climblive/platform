@@ -99,11 +99,8 @@
 {/each}
 
 {#if tick}
-  <button
-    class="remove"
-    type="button"
-    onclick={removeTick}
-    disabled={putTick.isPending || deleteTick.isPending}>Remove</button
+  <button class="remove" type="button" onclick={removeTick} disabled={isPending}
+    >Remove</button
   >
 {/if}
 
