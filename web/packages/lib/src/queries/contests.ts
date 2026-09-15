@@ -11,15 +11,11 @@ import {
   type ContestPatch,
   type ContestTemplate,
 } from "../models";
-import { HOUR } from "./constants";
 
 export const getContestQuery = (contestId: number) =>
   createQuery(() => ({
     queryKey: ["contest", { id: contestId }],
     queryFn: async () => ApiClient.getInstance().getContest(contestId),
-    retry: false,
-    gcTime: 12 * HOUR,
-    staleTime: 12 * HOUR,
   }));
 
 export const getAllContestsQuery = (

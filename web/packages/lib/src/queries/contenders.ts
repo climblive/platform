@@ -8,16 +8,11 @@ import {
 import { ApiClient } from "../Api";
 import type { Contender, ContenderPatch, PointValue } from "../models";
 import type { CreateContendersArguments } from "../models/rest";
-import { HOUR } from "./constants";
 
 export const getContenderQuery = (contenderId: number) =>
   createQuery(() => ({
     queryKey: ["contender", { id: contenderId }],
     queryFn: async () => ApiClient.getInstance().getContender(contenderId),
-    retry: false,
-    gcTime: 12 * HOUR,
-    staleTime: 0,
-    refetchOnWindowFocus: true,
   }));
 
 export const getContendersByContestQuery = (contestId: number) =>
@@ -25,9 +20,6 @@ export const getContendersByContestQuery = (contestId: number) =>
     queryKey: ["contenders", { contestId }],
     queryFn: async () =>
       ApiClient.getInstance().getContendersByContest(contestId),
-    retry: false,
-    gcTime: 12 * HOUR,
-    staleTime: 0,
   }));
 
 export const getPointValuesByContenderQuery = (contenderId: number) =>
@@ -35,10 +27,6 @@ export const getPointValuesByContenderQuery = (contenderId: number) =>
     queryKey: ["point-values", { contenderId }],
     queryFn: async () =>
       ApiClient.getInstance().getPointValuesByContender(contenderId),
-    retry: false,
-    gcTime: 12 * HOUR,
-    staleTime: 0,
-    refetchOnWindowFocus: true,
   }));
 
 export const patchContenderMutation = (contenderId: number) => {

@@ -7,15 +7,11 @@ import {
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
 import type { Problem, ProblemPatch, ProblemTemplate } from "../models";
-import { HOUR } from "./constants";
 
 export const getProblemQuery = (problemId: number) =>
   createQuery(() => ({
     queryKey: ["problem", { id: problemId }],
     queryFn: async () => ApiClient.getInstance().getProblem(problemId),
-    retry: false,
-    gcTime: 12 * HOUR,
-    staleTime: 12 * HOUR,
   }));
 
 export const getProblemsQuery = (
@@ -27,9 +23,6 @@ export const getProblemsQuery = (
     queryKey: ["problems", { contestId }],
     queryFn: async () =>
       ApiClient.getInstance().getProblemsByContest(contestId),
-    retry: false,
-    gcTime: 12 * HOUR,
-    staleTime: 12 * HOUR,
   }));
 
 export const createProblemMutation = (contestId: number) => {
