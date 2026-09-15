@@ -13,9 +13,20 @@
 
   const { problem, tick, contenderId, enablePoints }: Props = $props();
 
-  const tickType = $derived(
-    tick?.top ? (tick.attemptsTop === 1 ? "flash" : "top") : "no-top",
-  );
+  const tickType = $derived.by(() => {
+    switch (true) {
+      case tick?.top && tick.attemptsTop === 1:
+        return "flash";
+      case tick?.top:
+        return "top";
+      case tick?.zone2:
+        return "zone2";
+      case tick?.zone1:
+        return "zone1";
+      default:
+        return undefined;
+    }
+  });
 </script>
 
 <section aria-label={`Problem ${problem.number}`} data-tick={tickType}>
@@ -52,12 +63,14 @@
   section {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--wa-space-xs);
-    border: var(--wa-border-width-m) var(--wa-border-style)
+    gap: var(--wa-space-s);
+    border: var(--wa-border-width-l) var(--wa-border-style)
       var(--wa-color-surface-border);
     padding: var(--wa-space-s);
     border-radius: var(--wa-border-radius-m);
 
+    &[data-tick="zone1"],
+    &[data-tick="zone2"],
     &[data-tick="top"] {
       border-color: var(--wa-color-green-50);
 
