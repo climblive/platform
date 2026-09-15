@@ -10,6 +10,7 @@
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/toast/toast.js";
   import { ErrorBoundary } from "@climblive/lib/components";
+  import { HOUR } from "@climblive/lib/queries";
   import { extractCodeFromPath } from "@climblive/lib/utils";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
@@ -32,7 +33,9 @@
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        refetchOnWindowFocus: false,
+        staleTime: 12 * HOUR,
+        gcTime: 12 * HOUR,
+        refetchOnWindowFocus: "always",
       },
     },
   });

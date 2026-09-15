@@ -1,6 +1,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/toast/toast.js";
   import { ErrorBoundary } from "@climblive/lib/components";
+  import { HOUR } from "@climblive/lib/queries";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
   import { Route, Router } from "svelte-routing";
@@ -9,7 +10,9 @@
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        refetchOnWindowFocus: false,
+        staleTime: 12 * HOUR,
+        gcTime: 12 * HOUR,
+        refetchOnWindowFocus: "always",
       },
     },
   });
