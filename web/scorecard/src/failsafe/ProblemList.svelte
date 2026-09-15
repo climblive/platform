@@ -9,10 +9,10 @@
   type Props = {
     contestId: number;
     contenderId: number;
-    usePoints: boolean;
+    enablePoints: boolean;
   };
 
-  const { contestId, contenderId, usePoints }: Props = $props();
+  const { contestId, contenderId, enablePoints }: Props = $props();
 
   const problemsQuery = $derived(getProblemsQuery(contestId));
   const ticksQuery = $derived(getTicksByContenderQuery(contenderId));
@@ -32,7 +32,7 @@
     {#each problems as problem (problem.id)}
       {@const tick = ticksByProblem.get(problem.id)}
 
-      <Problem {problem} {tick} {contenderId} {usePoints} />
+      <Problem {problem} {tick} {contenderId} {enablePoints} />
     {/each}
   </section>
 {/if}

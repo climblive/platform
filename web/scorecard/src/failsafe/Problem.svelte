@@ -8,10 +8,10 @@
     problem: Problem;
     tick?: Tick;
     contenderId: number;
-    usePoints: boolean;
+    enablePoints: boolean;
   };
 
-  const { problem, tick, contenderId, usePoints }: Props = $props();
+  const { problem, tick, contenderId, enablePoints }: Props = $props();
 
   const tickType = $derived(
     tick?.top ? (tick.attemptsTop === 1 ? "flash" : "top") : "no-top",
@@ -44,7 +44,7 @@
     </span>
   </span>
   <div>
-    {#if usePoints}
+    {#if enablePoints}
       <SimpleTickEditor {problem} {tick} {contenderId} />
     {:else}
       <TickEditor {problem} {tick} {contenderId} />

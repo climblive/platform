@@ -22,5 +22,5 @@
 
 {#if contender?.entered && contest}
   <h2>Scorecard</h2>
-  <ProblemList {contestId} {contenderId} usePoints={contest.usePoints} />
+  <ProblemList {contestId} {contenderId} enablePoints={contest.usePoints} />
 {/if}
