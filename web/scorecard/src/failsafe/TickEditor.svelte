@@ -56,7 +56,7 @@
   const isPending = $derived(putTick.isPending || deleteTick.isPending);
 </script>
 
-<div>
+<div class="attempts">
   <button
     type="button"
     aria-label="Subtract failed attempt"
@@ -100,8 +100,28 @@
 
 {#if tick}
   <button
+    class="remove"
     type="button"
     onclick={removeTick}
     disabled={putTick.isPending || deleteTick.isPending}>Remove</button
   >
 {/if}
+
+<style>
+  .attempts {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-xs);
+    margin-bottom: var(--wa-space-xs);
+    flex-wrap: wrap;
+
+    & span,
+    & button {
+      white-space: nowrap;
+    }
+  }
+
+  .remove {
+    margin-top: var(--wa-space-xs);
+  }
+</style>

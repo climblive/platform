@@ -18,11 +18,7 @@
   );
 </script>
 
-<section
-  aria-label={`Problem ${problem.number}`}
-  class="problem"
-  data-tick={tickType}
->
+<section aria-label={`Problem ${problem.number}`} data-tick={tickType}>
   <span class="label">
     <HoldColorIndicator
       --height="1.25rem"
@@ -43,7 +39,7 @@
       {/if}
     </div>
   </span>
-  <div>
+  <div class="editor">
     {#if enablePoints}
       <SimpleTickEditor {problem} {tick} {contenderId} />
     {:else}
@@ -53,12 +49,10 @@
 </section>
 
 <style>
-  .problem {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: var(--wa-space-m);
+  section {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--wa-space-xs);
     border: var(--wa-border-width-m) var(--wa-border-style)
       var(--wa-color-surface-border);
     padding: var(--wa-space-s);
@@ -86,6 +80,5 @@
     align-items: center;
     gap: var(--wa-space-xs);
     white-space: nowrap;
-    flex-grow: 1;
   }
 </style>
