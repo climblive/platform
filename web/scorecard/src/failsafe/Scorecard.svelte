@@ -20,33 +20,7 @@
 <h2>Profile</h2>
 <EditProfile {contestId} {contenderId} />
 
-{#if contender?.entered}
+{#if contender?.entered && contest}
   <h2>Scorecard</h2>
-
-  {#if contest?.usePoints === false}
-    <div class="info">
-      <strong>Important notice</strong>
-      <span>
-        In this basic version of the app, any result you log that is not a flash
-        will be recorded as 999 attempts.
-      </span>
-    </div>
-  {/if}
-
-  <ProblemList {contestId} {contenderId}></ProblemList>
+  <ProblemList {contestId} {contenderId} enablePoints={contest.usePoints} />
 {/if}
-
-<style>
-  .info {
-    padding: var(--wa-space-s);
-    border: 1px solid var(--wa-color-warning-border-quiet);
-    border-radius: 0.25rem;
-    margin: 0;
-    background-color: var(--wa-color-warning-fill-quiet);
-
-    & strong {
-      display: block;
-      margin-block-end: var(--wa-space-2xs);
-    }
-  }
-</style>

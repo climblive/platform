@@ -62,7 +62,7 @@
     {
       "name": "Service",
       "configurations": ["Backend", "Scorecard", "Scoreboard", "Admin", "WWW"],
-      "stopAll": false
+      "stopAll": true
     }
   ]
 }

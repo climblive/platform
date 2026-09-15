@@ -464,6 +464,8 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await expect(subtractAttempt).toBeDisabled();
   await expect(problem.getByText("+1t", { exact: true })).toBeVisible();
   await expect(page.getByText("1t 1z₂ 1z₁", { exact: true })).toBeVisible();
+
+  await problem.getByRole("button", { name: "Remove" }).click();
 });
 
 test("info tab", async ({ page }) => {
@@ -664,5 +666,72 @@ test.describe("failsafe mode", () => {
         problem.getByRole("button", { name: "Flash" }),
       ).toBeVisible();
     }
+  });
+
+  test("record attempts for each feature", async ({ page }) => {
+    await page.goto("/failsafe/ABCD0006");
+
+    const problem = page.getByRole("region", {
+      name: "Problem 1",
+      exact: true,
+    });
+    const top = problem.getByRole("checkbox", { name: /^Top/ });
+    const zone1 = problem.getByRole("checkbox", { name: /^Zone 1/ });
+    const zone2 = problem.getByRole("checkbox", { name: /^Zone 2/ });
+    const addAttempt = problem.getByRole("button", {
+      name: "Add failed attempt",
+    });
+    const subtractAttempt = problem.getByRole("button", {
+      name: "Subtract failed attempt",
+    });
+    const remove = problem.getByRole("button", { name: "Remove" });
+
+    const expectAttempts = async (attempts: number) => {
+      await expect(
+        problem.getByRole("status", { name: "Attempts" }),
+      ).toHaveText(`${attempts} ${attempts === 1 ? "attempt" : "attempts"}`);
+    };
+
+    await expectAttempts(0);
+    await expect(subtractAttempt).toBeDisabled();
+
+    await top.check();
+    await expectAttempts(1);
+    await expect(zone1).toBeChecked();
+    await expect(zone2).toBeChecked();
+    await expect(subtractAttempt).toBeDisabled();
+    await expect(addAttempt).toBeDisabled();
+    await expect(top).toHaveAccessibleName("Top in 1 attempt");
+    await expect(zone2).toHaveAccessibleName("Zone 2 in 1 attempt");
+    await expect(zone1).toHaveAccessibleName("Zone 1 in 1 attempt");
+
+    await remove.click();
+    await expectAttempts(0);
+
+    await zone1.check();
+    await expectAttempts(1);
+    await expect(zone1).toHaveAccessibleName("Zone 1 in 1 attempt");
+
+    await addAttempt.click();
+    await expectAttempts(2);
+
+    await zone2.check();
+    await expectAttempts(3);
+    await expect(zone1).toHaveAccessibleName("Zone 1 in 1 attempt");
+    await expect(zone2).toHaveAccessibleName("Zone 2 in 3 attempts");
+
+    await addAttempt.click();
+    await expectAttempts(4);
+
+    await subtractAttempt.click();
+    await expectAttempts(3);
+
+    await top.check();
+    await expectAttempts(4);
+    await expect(zone1).toHaveAccessibleName("Zone 1 in 1 attempt");
+    await expect(zone2).toHaveAccessibleName("Zone 2 in 3 attempts");
+    await expect(top).toHaveAccessibleName("Top in 4 attempts");
+
+    await remove.click();
   });
 });

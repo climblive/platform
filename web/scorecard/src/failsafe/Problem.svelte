@@ -1,80 +1,36 @@
 <script lang="ts">
   import { HoldColorIndicator } from "@climblive/lib/components";
   import type { Problem, Tick } from "@climblive/lib/models";
-  import { deleteTickMutation, putTickMutation } from "@climblive/lib/queries";
+  import SimpleTickEditor from "./SimpleTickEditor.svelte";
+  import TickEditor from "./TickEditor.svelte";
 
   type Props = {
     problem: Problem;
     tick?: Tick;
     contenderId: number;
+    enablePoints: boolean;
   };
 
-  const { problem, tick, contenderId }: Props = $props();
+  const { problem, tick, contenderId, enablePoints }: Props = $props();
 
-  const putTick = $derived(putTickMutation(contenderId));
-  let latestLocalRevision = $state(0);
-  const deleteTick = $derived(deleteTickMutation());
-
-  const tickType = (tick?: Tick) => {
-    if (tick?.top && tick.attemptsTop === 1) {
-      return "flash";
+  const tickType = $derived.by(() => {
+    switch (true) {
+      case tick?.top && tick.attemptsTop === 1:
+        return "flash";
+      case tick?.top:
+        return "top";
+      case tick?.zone2:
+        return "zone2";
+      case tick?.zone1:
+        return "zone1";
+      default:
+        return undefined;
     }
-
-    if (tick?.top) {
-      return "top";
-    }
-
-    return "no-top";
-  };
-
-  const addTick = (type: "zone1" | "zone2" | "top" | "flash") => () => {
-    const attempts = type === "flash" ? 1 : 999;
-    latestLocalRevision =
-      Math.max(latestLocalRevision, tick?.revision ?? 0) + 1;
-
-    const nextTick: Omit<Tick, "id" | "timestamp"> = {
-      revision: latestLocalRevision,
-      problemId: problem.id,
-      top: false,
-      zone2: false,
-      zone1: false,
-      attemptsTop: attempts,
-      attemptsZone2: attempts,
-      attemptsZone1: attempts,
-    };
-
-    switch (type) {
-      case "flash":
-      case "top":
-        nextTick.top = true;
-        nextTick.zone2 = true;
-        nextTick.zone1 = true;
-        break;
-      case "zone2":
-        nextTick.zone2 = true;
-        nextTick.zone1 = true;
-        break;
-      case "zone1":
-        nextTick.zone1 = true;
-        break;
-    }
-
-    putTick.mutate(nextTick);
-  };
-
-  const removeTick = () => {
-    if (tick?.id) {
-      deleteTick.mutate(tick.id);
-    }
-  };
+  });
 </script>
 
-<section
-  aria-label={`Problem ${problem.number}`}
-  class="problem"
-  data-tick={tickType(tick)}
->
-  <span>
+<section aria-label={`Problem ${problem.number}`} data-tick={tickType}>
+  <span class="label">
     <HoldColorIndicator
       --height="1.25rem"
       --width="1.25rem"
@@ -83,7 +39,7 @@
     />
     #{problem.number}
     <div class="icon">
-      {#if tick?.top && tick?.attemptsTop === 1}
+      {#if tick?.top && tick.attemptsTop === 1}
         F
       {:else if tick?.top}
         T
@@ -94,41 +50,27 @@
       {/if}
     </div>
   </span>
-  <div class="controls">
-    {#if tick}
-      <button onclick={removeTick} disabled={deleteTick.isPending}
-        >Unsend</button
-      >
+  <div class="editor">
+    {#if enablePoints}
+      <SimpleTickEditor {problem} {tick} {contenderId} />
     {:else}
-      {#if problem.zone1Enabled}
-        <button onclick={addTick("zone1")} disabled={putTick.isPending}
-          >Zone 1</button
-        >
-      {/if}
-      {#if problem.zone2Enabled}
-        <button onclick={addTick("zone2")} disabled={putTick.isPending}
-          >Zone 2</button
-        >
-      {/if}
-      <button onclick={addTick("top")} disabled={putTick.isPending}>Top</button>
-      <button onclick={addTick("flash")} disabled={putTick.isPending}
-        >Flash</button
-      >
+      <TickEditor {problem} {tick} {contenderId} />
     {/if}
   </div>
 </section>
 
 <style>
-  .problem {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--wa-space-m);
-    border: var(--wa-border-width-m) var(--wa-border-style)
+  section {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--wa-space-s);
+    border: var(--wa-border-width-l) var(--wa-border-style)
       var(--wa-color-surface-border);
     padding: var(--wa-space-s);
     border-radius: var(--wa-border-radius-m);
 
+    &[data-tick="zone1"],
+    &[data-tick="zone2"],
     &[data-tick="top"] {
       border-color: var(--wa-color-green-50);
 
@@ -144,30 +86,12 @@
         color: var(--wa-color-yellow-50);
       }
     }
-
-    & span {
-      display: flex;
-      align-items: center;
-      gap: var(--wa-space-xs);
-      white-space: nowrap;
-      flex-grow: 1;
-      width: max-content;
-
-      & :global(*) {
-        flex-shrink: 0;
-      }
-    }
   }
 
-  .controls {
+  .label {
     display: flex;
     align-items: center;
     gap: var(--wa-space-xs);
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-
-  button {
     white-space: nowrap;
   }
 </style>
