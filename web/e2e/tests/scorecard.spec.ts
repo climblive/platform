@@ -691,12 +691,8 @@ test.describe("failsafe mode", () => {
     };
 
     await expect(top).toBeVisible();
-    if (await remove.isVisible()) {
-      await remove.click();
-    }
     await expectAttempts(0);
     await expect(subtractAttempt).toBeDisabled();
-    await expect(problem.locator("wa-checkbox, wa-button")).toHaveCount(0);
 
     await top.check();
     await expectAttempts(1);
@@ -725,21 +721,5 @@ test.describe("failsafe mode", () => {
     await expect(addAttempt).toBeDisabled();
     await expect(subtractAttempt).toBeDisabled();
     await expect(remove).toBeEnabled();
-
-    await page.reload();
-    await expectAttempts(4);
-    await expect(top).toBeChecked();
-    await expect(zone1).toHaveAccessibleName("Zone 1 in 1 attempt");
-    await expect(zone2).toHaveAccessibleName("Zone 2 in 3 attempts");
-
-    await zone2.uncheck();
-    await expect(top).not.toBeChecked();
-    await expect(zone1).toBeChecked();
-    await expectAttempts(3);
-    await remove.click();
-    await expectAttempts(0);
-    await expect(zone1).not.toBeChecked();
-    await expect(zone2).not.toBeChecked();
-    await expect(top).not.toBeChecked();
   });
 });

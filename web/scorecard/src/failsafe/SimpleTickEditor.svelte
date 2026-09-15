@@ -46,12 +46,16 @@
         break;
     }
 
-    putTick.mutate(nextTick);
+    putTick.mutate(nextTick, {
+      onError: () => window.alert("Failed to update ascent."),
+    });
   };
 
   const removeTick = () => {
     if (tick?.id) {
-      deleteTick.mutate(tick.id);
+      deleteTick.mutate(tick.id, {
+        onError: () => window.alert("Failed to remove ascent."),
+      });
     }
   };
 </script>
