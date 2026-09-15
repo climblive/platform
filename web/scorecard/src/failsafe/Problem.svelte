@@ -31,7 +31,7 @@
       secondary={problem.holdColorSecondary}
     />
     #{problem.number}
-    <span class="icon">
+    <div class="icon">
       {#if tick?.top && tick.attemptsTop === 1}
         F
       {:else if tick?.top}
@@ -41,7 +41,7 @@
       {:else if tick?.zone1}
         Z1
       {/if}
-    </span>
+    </div>
   </span>
   <div>
     {#if enablePoints}

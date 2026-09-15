@@ -10,7 +10,7 @@
 
   const { problem, tick, contenderId }: Props = $props();
 
-  const putTick = $derived(putTickMutation(contenderId, problem.id));
+  const putTick = $derived(putTickMutation(contenderId));
   let latestLocalRevision = $state(0);
   const deleteTick = $derived(deleteTickMutation());
 
@@ -58,21 +58,31 @@
 
 <div>
   {#if tick}
-    <button onclick={removeTick} disabled={deleteTick.isPending}>Unsend</button>
+    <button type="button" onclick={removeTick} disabled={deleteTick.isPending}
+      >Unsend</button
+    >
   {:else}
     {#if problem.zone1Enabled}
-      <button onclick={addTick("zone1")} disabled={putTick.isPending}
-        >Zone 1</button
+      <button
+        type="button"
+        onclick={addTick("zone1")}
+        disabled={putTick.isPending}>Zone 1</button
       >
     {/if}
     {#if problem.zone2Enabled}
-      <button onclick={addTick("zone2")} disabled={putTick.isPending}
-        >Zone 2</button
+      <button
+        type="button"
+        onclick={addTick("zone2")}
+        disabled={putTick.isPending}>Zone 2</button
       >
     {/if}
-    <button onclick={addTick("top")} disabled={putTick.isPending}>Top</button>
-    <button onclick={addTick("flash")} disabled={putTick.isPending}
-      >Flash</button
+    <button type="button" onclick={addTick("top")} disabled={putTick.isPending}
+      >Top</button
+    >
+    <button
+      type="button"
+      onclick={addTick("flash")}
+      disabled={putTick.isPending}>Flash</button
     >
   {/if}
 </div>

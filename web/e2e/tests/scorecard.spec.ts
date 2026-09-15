@@ -682,7 +682,7 @@ test.describe("failsafe mode", () => {
     const subtractAttempt = problem.getByRole("button", {
       name: "Subtract failed attempt",
     });
-    const unsend = problem.getByRole("button", { name: "Unsend" });
+    const remove = problem.getByRole("button", { name: "Remove" });
 
     const expectAttempts = async (attempts: number) => {
       await expect(
@@ -691,8 +691,8 @@ test.describe("failsafe mode", () => {
     };
 
     await expect(top).toBeVisible();
-    if (await unsend.isVisible()) {
-      await unsend.click();
+    if (await remove.isVisible()) {
+      await remove.click();
     }
     await expectAttempts(0);
     await expect(subtractAttempt).toBeDisabled();
@@ -703,7 +703,7 @@ test.describe("failsafe mode", () => {
     await expect(zone1).toBeChecked();
     await expect(zone2).toBeChecked();
     await expect(addAttempt).toBeDisabled();
-    await unsend.click();
+    await remove.click();
     await expectAttempts(0);
 
     await zone1.check();
@@ -724,7 +724,7 @@ test.describe("failsafe mode", () => {
     await expect(top).toHaveAccessibleName("Top in 4 attempts");
     await expect(addAttempt).toBeDisabled();
     await expect(subtractAttempt).toBeDisabled();
-    await expect(unsend).toBeEnabled();
+    await expect(remove).toBeEnabled();
 
     await page.reload();
     await expectAttempts(4);
@@ -736,7 +736,7 @@ test.describe("failsafe mode", () => {
     await expect(top).not.toBeChecked();
     await expect(zone1).toBeChecked();
     await expectAttempts(3);
-    await unsend.click();
+    await remove.click();
     await expectAttempts(0);
     await expect(zone1).not.toBeChecked();
     await expect(zone2).not.toBeChecked();
