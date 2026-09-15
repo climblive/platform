@@ -84,17 +84,19 @@
   {@const reachedAt = tickMutator.reachedFeatures.get(feature)}
   {@const attempts = reachedAt ?? tickMutator.attempts + 1}
   <div>
-    <input
-      type="checkbox"
-      checked={reachedAt !== undefined}
-      disabled={isPending ||
-        (reachedAt === undefined && !tickMutator.canAddAttempt())}
-      onchange={(event) => handleTick(event.currentTarget.checked, feature)}
-    />
-    {feature === "top" ? "Top" : feature === "zone2" ? "Zone 2" : "Zone 1"}
-    {#if attempts <= 999}
-      in {attempts} {attempts === 1 ? "attempt" : "attempts"}
-    {/if}
+    <label>
+      <input
+        type="checkbox"
+        checked={reachedAt !== undefined}
+        disabled={isPending ||
+          (reachedAt === undefined && !tickMutator.canAddAttempt())}
+        onchange={(event) => handleTick(event.currentTarget.checked, feature)}
+      />
+      {feature === "top" ? "Top" : feature === "zone2" ? "Zone 2" : "Zone 1"}
+      {#if attempts <= 999}
+        in {attempts} {attempts === 1 ? "attempt" : "attempts"}
+      {/if}
+    </label>
   </div>
 {/each}
 
