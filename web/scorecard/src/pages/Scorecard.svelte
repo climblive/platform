@@ -354,7 +354,7 @@
 
   const tearDown = () => {
     resultsConnected = false;
-    tabGroup?.setAttribute("active", "problems");
+    tabGroup?.setAttribute("active", "scorecard");
 
     eventSource?.close();
     eventSource = undefined;
