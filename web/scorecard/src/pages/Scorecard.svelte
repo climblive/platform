@@ -358,8 +358,6 @@
 
     eventSource?.close();
     eventSource = undefined;
-
-    stop();
   };
 
   onMount(() => {
