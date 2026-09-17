@@ -35,7 +35,7 @@
       queries: {
         staleTime: 12 * HOUR,
         gcTime: 12 * HOUR,
-        refetchOnWindowFocus: "always",
+        refetchOnWindowFocus: true,
       },
     },
   });
