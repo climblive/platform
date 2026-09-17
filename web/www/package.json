@@ -12,10 +12,10 @@
   },
   "devDependencies": {
     "@climblive/lib": "workspace:*",
-    "typescript": "^5.9.3",
-    "vite": "^8.2.2"
+    "typescript": "^6.0.3",
+    "vite": "^8.3.0"
   },
   "dependencies": {
-    "@awesome.me/webawesome": "3.12.0"
+    "@awesome.me/webawesome": "3.13.0"
   }
 }

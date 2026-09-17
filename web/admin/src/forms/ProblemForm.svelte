@@ -6,8 +6,8 @@
     holdColorPrimary: z.string().regex(/^#([0-9a-fA-F]{3}){1,2}$/),
     holdColorSecondary: z.string().optional(),
     description: z.string().optional(),
-    zone1Enabled: z.coerce.boolean(),
-    zone2Enabled: z.coerce.boolean(),
+    zone1Enabled: z.coerce.boolean().default(false),
+    zone2Enabled: z.coerce.boolean().default(false),
     pointsZone1: z.coerce
       .number()
       .min(0)
