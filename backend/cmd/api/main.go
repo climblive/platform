@@ -493,11 +493,6 @@ func securityHeaders(next http.Handler) http.Handler {
 
 func accessLog(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !strings.HasPrefix(r.URL.Path, "/api/") && !strings.HasPrefix(r.URL.Path, "/failsafe") {
-			next.ServeHTTP(w, r)
-			return
-		}
-
 		sw := &statusWriter{
 			ResponseWriter: w,
 			status:         http.StatusOK,
