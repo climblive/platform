@@ -4,7 +4,7 @@ go 1.27.1
 
 require (
 	github.com/go-errors/errors v1.5.1
-	github.com/go-faker/faker/v4 v4.11.0
+	github.com/go-faker/faker/v4 v4.12.0
 	github.com/go-jose/go-jose/v4 v4.1.5
 	github.com/go-sql-driver/mysql v1.10.1
 	github.com/lmittmann/tint v1.2.0
