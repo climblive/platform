@@ -1,6 +1,8 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import Ticket from "@/components/Ticket.svelte";
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
     getContendersByContestQuery,
     getContestQuery,
@@ -47,21 +49,70 @@
   });
 </script>
 
+<svelte:window onafterprint={() => window.close()} />
+
 <main>
   {#if !contest || !contenders}
     <Loader />
   {:else}
-    {#each contenders as contender (contender.id)}
-      <Ticket
-        contestName={contest.name}
-        registrationCode={contender.registrationCode}
-        ticketNumber={contender.id}
-      />
-    {/each}
+    <section class="print-prompt">
+      <h1>Your tickets are ready</h1>
+      <p>
+        Print the tickets for {contest.name} and hand them out to your competitors.
+        Each ticket includes a unique code to join the competition.
+      </p>
+      <p>
+        If the print dialog doesn't open automatically, click Print below. This
+        tab will close when you finish with the print dialog.
+      </p>
+      <wa-button variant="brand" onclick={() => window.print()}>
+        <wa-icon slot="start" name="print"></wa-icon>
+        Print
+      </wa-button>
+    </section>
+    <div class="tickets">
+      {#each contenders as contender (contender.id)}
+        <Ticket
+          contestName={contest.name}
+          registrationCode={contender.registrationCode}
+          ticketNumber={contender.id}
+        />
+      {/each}
+    </div>
   {/if}
 </main>
 
 <style>
+  .print-prompt {
+    max-width: 40rem;
+    margin-inline: auto;
+    padding: var(--wa-space-3xl) var(--wa-space-l);
+    text-align: center;
+
+    & h1 {
+      font-size: var(--wa-font-size-2xl);
+    }
+
+    & p {
+      color: var(--wa-color-text-quiet);
+      margin-block: var(--wa-space-m);
+    }
+  }
+
+  .tickets {
+    display: none;
+  }
+
+  @media print {
+    .print-prompt {
+      display: none;
+    }
+
+    .tickets {
+      display: block;
+    }
+  }
+
   @page {
     size: a4 portrait;
     margin: 2cm;
