@@ -37,41 +37,54 @@
   });
 
   let printDialogOpened = $state(false);
+  let printingFinished = $state(false);
 
   $effect(() => {
     if (contest && contenders && !printDialogOpened) {
       printDialogOpened = true;
 
       setTimeout(() => {
-        window.print();
+        // window.print();
       });
     }
   });
 </script>
+
+<svelte:window onafterprint={() => (printingFinished = true)} />
 
 <main>
   {#if !contest || !contenders}
     <Loader />
   {:else}
     <section class="print-prompt">
-      <h1>Your tickets are ready</h1>
-      <p>
-        If the print dialog doesn't open automatically, click Print below. Close
-        this tab when you are finished printing.
-      </p>
-      <wa-button
-        variant="neutral"
-        appearance="outlined"
-        onclick={() => window.close()}
-        size="s"
-      >
-        <wa-icon slot="start" name="close"></wa-icon>
-        Close
-      </wa-button>
-      <wa-button variant="brand" onclick={() => window.print()} size="s">
-        <wa-icon slot="start" name="print"></wa-icon>
-        Print
-      </wa-button>
+      {#if printingFinished}
+        <h1>All done?</h1>
+        <p>
+          Print again, or close this tab to return to managing your competition.
+        </p>
+        <wa-button
+          variant="neutral"
+          appearance="outlined"
+          onclick={() => window.close()}
+          size="s"
+        >
+          <wa-icon slot="start" name="close"></wa-icon>
+          Close
+        </wa-button>
+        <wa-button variant="brand" onclick={() => window.print()} size="s">
+          <wa-icon slot="start" name="print"></wa-icon>
+          Print again
+        </wa-button>
+      {:else}
+        <h1>Your tickets are ready</h1>
+        <p>
+          If the print dialog doesn't open automatically, click Print below.
+        </p>
+        <wa-button variant="brand" onclick={() => window.print()} size="s">
+          <wa-icon slot="start" name="print"></wa-icon>
+          Print
+        </wa-button>
+      {/if}
     </section>
     <div class="tickets">
       {#each contenders as contender (contender.id)}
@@ -93,8 +106,8 @@
       color: var(--wa-color-text-quiet);
     }
 
-    & wa-button:not(:last-child) {
-      margin-inline-end: var(--wa-space-xs);
+    & wa-button + wa-button {
+      margin-inline-start: var(--wa-space-xs);
     }
   }
 
