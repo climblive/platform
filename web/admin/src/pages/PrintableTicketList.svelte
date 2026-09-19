@@ -44,7 +44,7 @@
       printDialogOpened = true;
 
       setTimeout(() => {
-        // window.print();
+        window.print();
       });
     }
   });
