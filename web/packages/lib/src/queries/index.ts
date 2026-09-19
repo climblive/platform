@@ -1,4 +1,5 @@
 export * from "./compClasses";
+export * from "./constants";
 export * from "./contenders";
 export * from "./contests";
 export * from "./health";
