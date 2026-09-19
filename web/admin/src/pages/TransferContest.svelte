@@ -13,17 +13,19 @@
     transferContestMutation,
   } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
+  import type { Snippet } from "svelte";
   import { navigate } from "svelte-routing";
 
   type Props = {
     contestId: number;
+    children?: Snippet<[{ transferContest: () => void; canTransfer: boolean }]>;
     organizerId: number;
   };
 
   let dialog: WaDialog | undefined = $state();
   let selectedOrganizerId: number | undefined = $state();
 
-  const { contestId, organizerId }: Props = $props();
+  const { contestId, organizerId, children }: Props = $props();
 
   const selfQuery = $derived(getSelfQuery());
   const transferContest = $derived(transferContestMutation(contestId));
@@ -51,7 +53,10 @@
     }
 
     transferContest.mutate(selectedOrganizerId, {
-      onSuccess: () => navigate(`./organizers/${selectedOrganizerId}/contests`),
+      onSuccess: () => {
+        handleCancel();
+        navigate(`/admin/organizers/${selectedOrganizerId}/contests`);
+      },
       onError: () => toastUnexpectedError("Failed to transfer competition."),
     });
   };
@@ -62,14 +67,21 @@
   };
 </script>
 
-<wa-button
-  onclick={handleTransfer}
-  appearance="outlined"
-  disabled={otherOrganizers.length === 0}
->
-  Transfer
-  <wa-icon name="arrow-right" slot="start"></wa-icon>
-</wa-button>
+{#if children}
+  {@render children({
+    transferContest: handleTransfer,
+    canTransfer: otherOrganizers.length > 0,
+  })}
+{:else}
+  <wa-button
+    onclick={handleTransfer}
+    appearance="outlined"
+    disabled={otherOrganizers.length === 0}
+  >
+    Transfer
+    <wa-icon name="arrow-right" slot="start"></wa-icon>
+  </wa-button>
+{/if}
 
 <wa-dialog bind:this={dialog} label="Transfer competition">
   <wa-select
@@ -122,6 +134,10 @@
 </wa-dialog>
 
 <style>
+  wa-dialog {
+    white-space: normal;
+  }
+
   wa-dialog::part(body) {
     display: flex;
     flex-direction: column;

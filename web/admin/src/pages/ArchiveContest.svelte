@@ -5,16 +5,18 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { archiveContestMutation } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
+  import type { Snippet } from "svelte";
   import { navigate } from "svelte-routing";
 
   type Props = {
     contestId: number;
+    children?: Snippet<[{ archiveContest: () => void }]>;
     organizerId: number;
   };
 
   let dialog: WaDialog | undefined = $state();
 
-  let { contestId, organizerId }: Props = $props();
+  let { contestId, organizerId, children }: Props = $props();
 
   const archiveContest = $derived(archiveContestMutation(contestId));
 
@@ -43,12 +45,16 @@
   };
 </script>
 
-<div class="actions">
-  <wa-button onclick={handleArchive} appearance="outlined" variant="danger"
-    >Archive
-    <wa-icon name="box-archive" slot="start"></wa-icon>
-  </wa-button>
-</div>
+{#if children}
+  {@render children({ archiveContest: handleArchive })}
+{:else}
+  <div class="actions">
+    <wa-button onclick={handleArchive} appearance="outlined" variant="danger"
+      >Archive
+      <wa-icon name="box-archive" slot="start"></wa-icon>
+    </wa-button>
+  </div>
+{/if}
 
 <wa-dialog bind:this={dialog} label="Archive competition">
   This will hide the competition for you and stop any running score engines.
@@ -66,3 +72,9 @@
     <wa-icon slot="start" name="box-archive"></wa-icon>
   </wa-button>
 </wa-dialog>
+
+<style>
+  wa-dialog {
+    white-space: normal;
+  }
+</style>
