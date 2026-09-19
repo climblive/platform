@@ -180,7 +180,7 @@ func main() {
 	apiMux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager, scrubberRunner, pointValueKeeper)
 
 	appMux := http.NewServeMux()
-	appMux.Handle("/api/", accessLog(http.StripPrefix("/api", noCacheHandler(apiMux))))
+	appMux.Handle("/api/", http.StripPrefix("/api", noCacheHandler(apiMux)))
 	installAppStaticHandlers(appMux)
 
 	wwwMux := http.NewServeMux()
@@ -190,7 +190,7 @@ func main() {
 
 	httpServer := &http.Server{
 		Addr:                         net.JoinHostPort("0.0.0.0", strconv.Itoa(listenPort)),
-		Handler:                      securityHeaders(&httpRouter{appHandler: appMux, wwwHandler: wwwMux, wwwHost: wwwHost}),
+		Handler:                      securityHeaders(&httpRouter{appHandler: accessLog(appMux), wwwHandler: wwwMux, wwwHost: wwwHost}),
 		DisableGeneralOptionsHandler: false,
 		TLSConfig:                    tlsConfig,
 		ReadTimeout:                  httpReadTimeout,
@@ -493,9 +493,14 @@ func securityHeaders(next http.Handler) http.Handler {
 
 func accessLog(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !strings.HasPrefix(r.URL.Path, "/api/") && !strings.HasPrefix(r.URL.Path, "/failsafe") {
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		sw := &statusWriter{
 			ResponseWriter: w,
-			status:         0,
+			status:         http.StatusOK,
 		}
 
 		start := time.Now()
