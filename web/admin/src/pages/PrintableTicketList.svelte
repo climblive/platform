@@ -49,8 +49,6 @@
   });
 </script>
 
-<svelte:window onafterprint={() => window.close()} />
-
 <main>
   {#if !contest || !contenders}
     <Loader />
@@ -58,14 +56,19 @@
     <section class="print-prompt">
       <h1>Your tickets are ready</h1>
       <p>
-        Print the tickets for {contest.name} and hand them out to your competitors.
-        Each ticket includes a unique code to join the competition.
+        If the print dialog doesn't open automatically, click Print below. Close
+        this tab when you are finished printing.
       </p>
-      <p>
-        If the print dialog doesn't open automatically, click Print below. This
-        tab will close when you finish with the print dialog.
-      </p>
-      <wa-button variant="brand" onclick={() => window.print()}>
+      <wa-button
+        variant="neutral"
+        appearance="outlined"
+        onclick={() => window.close()}
+        size="s"
+      >
+        <wa-icon slot="start" name="close"></wa-icon>
+        Close
+      </wa-button>
+      <wa-button variant="brand" onclick={() => window.print()} size="s">
         <wa-icon slot="start" name="print"></wa-icon>
         Print
       </wa-button>
@@ -84,18 +87,14 @@
 
 <style>
   .print-prompt {
-    max-width: 40rem;
-    margin-inline: auto;
-    padding: var(--wa-space-3xl) var(--wa-space-l);
     text-align: center;
-
-    & h1 {
-      font-size: var(--wa-font-size-2xl);
-    }
 
     & p {
       color: var(--wa-color-text-quiet);
-      margin-block: var(--wa-space-m);
+    }
+
+    & wa-button:not(:last-child) {
+      margin-inline-end: var(--wa-space-xs);
     }
   }
 
