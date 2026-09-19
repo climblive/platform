@@ -218,7 +218,7 @@
     <ArchiveContest contestId={id} organizerId={ownership.organizerId}>
       {#snippet children({ archiveContest })}
         <TransferContest contestId={id} organizerId={ownership.organizerId}>
-          {#snippet children({ transferContest, canTransfer })}
+          {#snippet children({ transferContest, disabled })}
             <DuplicateContest contestId={id}>
               {#snippet children({ duplicateContest })}
                 <wa-dropdown
@@ -260,7 +260,7 @@
                     <wa-icon slot="icon" name="copy"></wa-icon>
                     Duplicate
                   </wa-dropdown-item>
-                  <wa-dropdown-item value="transfer" disabled={!canTransfer}>
+                  <wa-dropdown-item value="transfer" {disabled}>
                     <wa-icon slot="icon" name="arrow-right"></wa-icon>
                     Transfer
                   </wa-dropdown-item>

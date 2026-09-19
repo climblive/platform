@@ -18,7 +18,7 @@
 
   type Props = {
     contestId: number;
-    children?: Snippet<[{ transferContest: () => void; canTransfer: boolean }]>;
+    children?: Snippet<[{ transferContest: () => void; disabled: boolean }]>;
     organizerId: number;
   };
 
@@ -70,7 +70,7 @@
 {#if children}
   {@render children({
     transferContest: handleTransfer,
-    canTransfer: otherOrganizers.length > 0,
+    disabled: otherOrganizers.length === 0,
   })}
 {:else}
   <wa-button
