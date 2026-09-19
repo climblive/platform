@@ -17,6 +17,7 @@ export const getTicksByContenderQuery = (
     queryKey: ["ticks", { contenderId }],
     queryFn: async () =>
       ApiClient.getInstance().getTicksByContender(contenderId),
+    refetchOnWindowFocus: "always",
   }));
 
 export const getTicksByContestQuery = (contestId: number) =>

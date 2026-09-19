@@ -13,6 +13,7 @@ export const getContenderQuery = (contenderId: number) =>
   createQuery(() => ({
     queryKey: ["contender", { id: contenderId }],
     queryFn: async () => ApiClient.getInstance().getContender(contenderId),
+    refetchOnWindowFocus: "always",
   }));
 
 export const getContendersByContestQuery = (contestId: number) =>
@@ -27,6 +28,7 @@ export const getPointValuesByContenderQuery = (contenderId: number) =>
     queryKey: ["point-values", { contenderId }],
     queryFn: async () =>
       ApiClient.getInstance().getPointValuesByContender(contenderId),
+    refetchOnWindowFocus: "always",
   }));
 
 export const patchContenderMutation = (contenderId: number) => {
