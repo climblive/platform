@@ -213,6 +213,8 @@ export const transferContestMutation = (contestId: number) => {
         ["contest", { id: contestId }],
         transferredContest,
       );
+
+      client.invalidateQueries({ queryKey: ["contests"] });
     },
   }));
 };
