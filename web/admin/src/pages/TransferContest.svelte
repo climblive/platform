@@ -9,6 +9,7 @@
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import { value } from "@climblive/lib/forms";
   import {
+    getContestQuery,
     getSelfQuery,
     transferContestMutation,
   } from "@climblive/lib/queries";
@@ -34,6 +35,9 @@
   const otherOrganizers = $derived(
     organizers.filter(({ id }) => id !== organizerId),
   );
+
+  const contestQuery = $derived(getContestQuery(contestId));
+  const contest = $derived(contestQuery.data);
 
   const handleTransfer = async () => {
     if (dialog) {
@@ -106,7 +110,9 @@
     {#if currentOrganizer && newOrganizer}
       <wa-callout variant="warning">
         <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
-        This will transfer all competition data from the current organizer
+        This will transfer all competition data of
+        <strong>{contest?.name}</strong>
+        from the current organizer
         <strong>
           {currentOrganizer.name}
         </strong>

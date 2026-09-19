@@ -3,7 +3,10 @@
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { duplicateContestMutation } from "@climblive/lib/queries";
+  import {
+    duplicateContestMutation,
+    getContestQuery,
+  } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { Snippet } from "svelte";
   import { navigate } from "svelte-routing";
@@ -16,6 +19,9 @@
   let dialog: WaDialog | undefined = $state();
 
   let { contestId, children }: Props = $props();
+
+  const contestQuery = $derived(getContestQuery(contestId));
+  const contest = $derived(contestQuery.data);
 
   const duplicateContest = $derived(duplicateContestMutation(contestId));
 
@@ -56,8 +62,11 @@
 {/if}
 
 <wa-dialog bind:this={dialog} label="Duplicate competition">
-  You are about to create a copy of the competition. Everything except tickets,
-  results and raffles will be copied.
+  You are about to create a copy of the competition <strong
+    >{contest?.name}</strong
+  >.<br /><br />
+
+  Everything except tickets, results and raffles will be copied.
   <wa-button slot="footer" appearance="plain" onclick={handleCancel}>
     Cancel</wa-button
   >

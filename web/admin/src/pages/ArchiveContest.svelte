@@ -3,7 +3,10 @@
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { archiveContestMutation } from "@climblive/lib/queries";
+  import {
+    archiveContestMutation,
+    getContestQuery,
+  } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { Snippet } from "svelte";
   import { navigate } from "svelte-routing";
@@ -17,6 +20,9 @@
   let dialog: WaDialog | undefined = $state();
 
   let { contestId, organizerId, children }: Props = $props();
+
+  const contestQuery = $derived(getContestQuery(contestId));
+  const contest = $derived(contestQuery.data);
 
   const archiveContest = $derived(archiveContestMutation(contestId));
 
@@ -57,7 +63,8 @@
 {/if}
 
 <wa-dialog bind:this={dialog} label="Archive competition">
-  This will hide the competition for you and stop any running score engines.
+  This will hide the competition <strong>{contest?.name}</strong> for you and
+  stop any running score engines.<br /><br />
   Archived competitions may be permanently deleted in the future.
   <wa-button slot="footer" appearance="plain" onclick={handleCancel}>
     Cancel</wa-button
