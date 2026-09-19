@@ -3,6 +3,7 @@
   import RelativeTime from "@/components/RelativeTime.svelte";
   import { type WaSelectEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import WaDropdownItem from "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
   import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
@@ -192,12 +193,12 @@
   {registeredContenders}
 {/snippet}
 
-{#snippet renderTimeBegin({ timeBegin, timeEnd }: Contest)}
+{#snippet renderTimeBegin({ timeBegin, timeEnd }: Contest, mobile: boolean)}
   {#if timeBegin}
     {#if timeEnd && new Date() > timeEnd}
       {format(timeBegin, "yyyy-MM-dd HH:mm")}
     {:else}
-      <RelativeTime time={timeBegin} />
+      <RelativeTime format={mobile ? "narrow" : "long"} time={timeBegin} />
     {/if}
   {:else}
     -
@@ -252,6 +253,9 @@
                     <wa-icon slot="icon" name="ranking-star"></wa-icon>
                     View results
                   </wa-dropdown-item>
+
+                  <wa-divider></wa-divider>
+
                   <wa-dropdown-item value="duplicate">
                     <wa-icon slot="icon" name="copy"></wa-icon>
                     Duplicate
