@@ -11,6 +11,7 @@ export class Authenticator {
   private authenticated: boolean;
   private accessTokenExpiry: SvelteDate | undefined;
   private checkTokensIntervalTimer: number;
+  private refreshTokensPromise: Promise<void> | undefined;
 
   constructor() {
     this.authenticated = $state(false);
@@ -44,7 +45,17 @@ export class Authenticator {
     await this.refreshTokens();
   };
 
-  private refreshTokens = async () => {
+  private refreshTokens = () => {
+    if (this.refreshTokensPromise === undefined) {
+      this.refreshTokensPromise = this.performTokenRefresh().finally(() => {
+        this.refreshTokensPromise = undefined;
+      });
+    }
+
+    return this.refreshTokensPromise;
+  };
+
+  private performTokenRefresh = async () => {
     if (
       this.accessTokenExpiry !== undefined &&
       this.accessTokenExpiry.getTime() - new SvelteDate().getTime() >=
