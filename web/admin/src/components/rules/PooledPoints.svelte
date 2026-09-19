@@ -17,7 +17,7 @@
   const patchContest = patchContestMutation(contest.id);
 
   const formSchema = z.object({
-    pooledPoints: z.coerce.boolean(),
+    pooledPoints: z.coerce.boolean().default(false),
   });
 
   const handleSubmit = (value: Partial<ContestPatch>) =>
