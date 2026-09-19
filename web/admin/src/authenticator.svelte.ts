@@ -16,6 +16,22 @@ export class Authenticator {
   constructor() {
     this.authenticated = $state(false);
     this.checkTokensIntervalTimer = 0;
+
+    const accessToken = localStorage.getItem("access_token");
+
+    if (accessToken && localStorage.getItem("refresh_token")) {
+      try {
+        this.storeExpiryTime(accessToken);
+        ApiClient.getInstance().setCredentialsProvider(
+          new OrganizerCredentialsProvider(accessToken),
+        );
+
+        this.authenticated = true;
+      } catch {
+        localStorage.removeItem("access_token");
+        this.accessTokenExpiry = undefined;
+      }
+    }
   }
 
   public isAuthenticated = (): boolean => this.authenticated;
@@ -32,6 +48,7 @@ export class Authenticator {
         new OrganizerCredentialsProvider(access_token),
       );
       this.storeExpiryTime(access_token);
+      localStorage.setItem("access_token", access_token);
 
       localStorage.setItem("refresh_token", refresh_token);
 
@@ -74,11 +91,13 @@ export class Authenticator {
           new OrganizerCredentialsProvider(access_token),
         );
         this.storeExpiryTime(access_token);
+        localStorage.setItem("access_token", access_token);
 
         this.authenticated = true;
       }
     } catch {
       localStorage.removeItem("refresh_token");
+      localStorage.removeItem("access_token");
       this.authenticated = false;
     }
   };
@@ -130,6 +149,7 @@ export class Authenticator {
 
   public logout = () => {
     localStorage.removeItem("refresh_token");
+    localStorage.removeItem("access_token");
 
     const redirectUri = encodeURIComponent(window.location.origin + "/admin");
     const url = `https://clmb.auth.eu-west-1.amazoncognito.com/logout?client_id=${configData.COGNITO_CLIENT_ID}&logout_uri=${redirectUri}`;
