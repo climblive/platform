@@ -11,17 +11,12 @@ import type {
   ScoreEngineInstanceID,
 } from "../models";
 import type { StartScoreEngineArguments } from "../models/rest";
-import { HOUR } from "./constants";
 
 export const getScoreEnginesByContestQuery = (contestId: ContestID) =>
   createQuery(() => ({
     queryKey: ["score-engines", { contestId }],
     queryFn: async () =>
       ApiClient.getInstance().getScoreEnginesByContest(contestId),
-    retry: false,
-    gcTime: 12 * HOUR,
-    staleTime: 0,
-    refetchOnWindowFocus: true,
   }));
 
 export const getScoreEnginesQuery = () =>

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import EditProfile from "@/pages/EditProfile.svelte";
   import Loading from "@/pages/Loading.svelte";
   import Register from "@/pages/Register.svelte";
@@ -8,8 +7,10 @@
   import { type ScorecardSession } from "@/types";
   import { authenticateContender } from "@/utils/auth";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/toast/toast.js";
   import { ErrorBoundary } from "@climblive/lib/components";
+  import { HOUR, MINUTE } from "@climblive/lib/queries";
   import { extractCodeFromPath } from "@climblive/lib/utils";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
@@ -32,7 +33,9 @@
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        refetchOnWindowFocus: false,
+        staleTime: 5 * MINUTE,
+        gcTime: 12 * HOUR,
+        refetchOnWindowFocus: true,
       },
     },
   });

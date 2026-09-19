@@ -6,15 +6,11 @@ import {
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
 import type { CompClass, CompClassPatch, CompClassTemplate } from "../models";
-import { HOUR } from "./constants";
 
 export const getCompClassQuery = (compClassId: number) =>
   createQuery(() => ({
     queryKey: ["comp-class", { id: compClassId }],
     queryFn: async () => ApiClient.getInstance().getCompClass(compClassId),
-    retry: false,
-    gcTime: 12 * HOUR,
-    staleTime: 12 * HOUR,
   }));
 
 export const getCompClassesQuery = (
@@ -39,9 +35,6 @@ export const getCompClassesQuery = (
 
       return compClasses;
     },
-    retry: false,
-    gcTime: 12 * HOUR,
-    staleTime: 12 * HOUR,
   }));
 };
 

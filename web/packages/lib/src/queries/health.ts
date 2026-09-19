@@ -7,12 +7,10 @@ export const getHealthQuery = () =>
     queryKey: ["health"],
     queryFn: async () => ApiClient.getInstance().getHealth(),
     refetchInterval: 30 * SECOND,
-    retry: false,
   }));
 
 export const getVersionQuery = () =>
   createQuery(() => ({
     queryKey: ["version"],
     queryFn: async () => ApiClient.getInstance().getVersion(),
-    retry: false,
   }));
