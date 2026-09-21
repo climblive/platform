@@ -386,6 +386,10 @@ func (e *DefaultScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) 
 
 	return func(yield func(Effect) bool) {
 		for _, compClassID := range e.store.GetCompClassIDs() {
+			if !yield(EffectRankClass{CompClassID: compClassID}) {
+				return
+			}
+
 			if !yield(EffectCalculatePointValues{CompClassID: compClassID, ProblemID: event.ProblemID}) {
 				return
 			}
@@ -405,6 +409,10 @@ func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEve
 
 	return func(yield func(Effect) bool) {
 		for _, compClassID := range e.store.GetCompClassIDs() {
+			if !yield(EffectRankClass{CompClassID: compClassID}) {
+				return
+			}
+
 			if !yield(EffectCalculatePointValues{CompClassID: compClassID, ProblemID: event.ProblemID}) {
 				return
 			}
@@ -598,7 +606,15 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 }
 
 func (e *DefaultScoreEngine) RankCompClass(compClassID domain.CompClassID) {
-	ranker := NewBasicRanker(e.store.GetRules().Finalists, e.store.GetRules().UsePoints)
+	rules := e.store.GetRules()
+	var zone1Enabled, zone2Enabled bool
+	if !rules.UsePoints {
+		for problem := range e.store.GetAllProblems() {
+			zone1Enabled = zone1Enabled || problem.Zone1Enabled
+			zone2Enabled = zone2Enabled || problem.Zone2Enabled
+		}
+	}
+	ranker := NewBasicRanker(rules.Finalists, rules.UsePoints, zone1Enabled, zone2Enabled)
 
 	scores := ranker.RankContenders(e.store.GetContendersByCompClass(compClassID))
 
