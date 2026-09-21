@@ -8,10 +8,9 @@
     format?: "long" | "short" | "narrow";
   };
 
-  const { time, format }: Props = $props();
+  const { time, format = "long" }: Props = $props();
   const id = $props.id();
 </script>
 
 <wa-tooltip for={id}>{formatTime(time, "yyyy-MM-dd HH:mm")}</wa-tooltip>
-<wa-relative-time {id} date={time} format={format || "long"} sync
-></wa-relative-time>
+<wa-relative-time {id} date={time} {format} sync></wa-relative-time>
