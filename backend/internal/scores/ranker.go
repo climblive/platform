@@ -12,6 +12,8 @@ import (
 type BasicRanker struct {
 	numberOfFinalists int
 	usePoints         bool
+	zone1Enabled      bool
+	zone2Enabled      bool
 }
 
 func (r *BasicRanker) scoresAreEqual(c1, c2 Contender) bool {
@@ -22,10 +24,12 @@ func (r *BasicRanker) scoresAreEqual(c1, c2 Contender) bool {
 	return c1.Score == c2.Score
 }
 
-func NewBasicRanker(numberOfFinalists int, usePoints bool) *BasicRanker {
+func NewBasicRanker(numberOfFinalists int, usePoints, zone1Enabled, zone2Enabled bool) *BasicRanker {
 	return &BasicRanker{
 		numberOfFinalists: numberOfFinalists,
 		usePoints:         usePoints,
+		zone1Enabled:      zone1Enabled,
+		zone2Enabled:      zone2Enabled,
 	}
 }
 
@@ -84,7 +88,13 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 		if r.usePoints {
 			scoreValue = fmt.Sprintf("%dp", contender.Points)
 		} else {
-			scoreValue = fmt.Sprintf("%dt %dz₂ %dz₁", contender.Tops, contender.Zone2s, contender.Zone1s)
+			scoreValue = fmt.Sprintf("%dt", contender.Tops)
+			if r.zone2Enabled {
+				scoreValue += fmt.Sprintf(" %dz₂", contender.Zone2s)
+			}
+			if r.zone1Enabled {
+				scoreValue += fmt.Sprintf(" %dz₁", contender.Zone1s)
+			}
 		}
 
 		score := domain.Score{

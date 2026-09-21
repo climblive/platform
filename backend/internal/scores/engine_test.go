@@ -648,6 +648,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
+			scores.EffectRankClass{CompClassID: fakedCompClass1ID},
+			scores.EffectRankClass{CompClassID: fakedCompClass2ID},
+			scores.EffectRankClass{CompClassID: fakedCompClass3ID},
 			scores.EffectCalculatePointValues{CompClassID: fakedCompClass1ID, ProblemID: fakedProblemID},
 			scores.EffectCalculatePointValues{CompClassID: fakedCompClass2ID, ProblemID: fakedProblemID},
 			scores.EffectCalculatePointValues{CompClassID: fakedCompClass3ID, ProblemID: fakedProblemID},
@@ -724,6 +727,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
+			scores.EffectRankClass{CompClassID: fakedCompClass1ID},
+			scores.EffectRankClass{CompClassID: fakedCompClass2ID},
+			scores.EffectRankClass{CompClassID: fakedCompClass3ID},
 			scores.EffectCalculatePointValues{CompClassID: fakedCompClass1ID, ProblemID: fakedProblemID},
 			scores.EffectCalculatePointValues{CompClassID: fakedCompClass2ID, ProblemID: fakedProblemID},
 			scores.EffectCalculatePointValues{CompClassID: fakedCompClass3ID, ProblemID: fakedProblemID},
@@ -2157,5 +2163,45 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 			awaitExpectations(t)
 		})
+	})
+}
+
+func TestScoreFormatTracksEnabledZones(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		store := scores.NewMemoryStore()
+		store.SaveContender(scores.Contender{ID: 1, CompClassID: 1})
+		engine := scores.NewDefaultScoreEngine(store)
+
+		assertScore := func(expected string) {
+			t.Helper()
+			dirty := engine.GetDirtyScores()
+			require.Len(t, dirty, 1)
+			assert.Equal(t, expected, dirty[0].Score)
+		}
+
+		scores.NewEffectRunner(engine).RunEffects(engine.Start())
+		assertScore("0t")
+
+		scores.NewEffectRunner(engine).RunEffects(engine.HandleProblemAdded(domain.ProblemAddedEvent{
+			ProblemID:    1,
+			Zone1Enabled: true,
+		}))
+		assertScore("0t 0z₁")
+
+		scores.NewEffectRunner(engine).RunEffects(engine.HandleProblemAdded(domain.ProblemAddedEvent{
+			ProblemID:    2,
+			Zone2Enabled: true,
+		}))
+		assertScore("0t 0z₂ 0z₁")
+
+		scores.NewEffectRunner(engine).RunEffects(engine.HandleProblemUpdated(domain.ProblemUpdatedEvent{
+			ProblemID: 2,
+		}))
+		assertScore("0t 0z₁")
+
+		scores.NewEffectRunner(engine).RunEffects(engine.HandleProblemUpdated(domain.ProblemUpdatedEvent{
+			ProblemID: 1,
+		}))
+		assertScore("0t")
 	})
 }
