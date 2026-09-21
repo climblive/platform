@@ -214,71 +214,71 @@
 {/snippet}
 
 {#snippet renderControls({ id, ownership, archivedAt }: Contest)}
-  {#if archivedAt == null}
-    <ArchiveContest contestId={id} organizerId={ownership.organizerId}>
-      {#snippet children({ archiveContest })}
-        <TransferContest contestId={id} organizerId={ownership.organizerId}>
-          {#snippet children({ transferContest, disabled: transferDisabled })}
-            <DuplicateContest contestId={id}>
-              {#snippet children({ duplicateContest })}
-                <wa-dropdown
-                  onwa-select={(event: WaSelectEvent) => {
-                    switch ((event.detail.item as WaDropdownItem).value) {
-                      case "edit":
-                        navigate(`/admin/contests/${id}/edit`);
-                        break;
-                      case "results":
-                        navigate(`/admin/contests/${id}/results`);
-                        break;
-                      case "duplicate":
-                        duplicateContest();
-                        break;
-                      case "transfer":
-                        transferContest();
-                        break;
-                      case "archive":
-                        archiveContest();
-                        break;
-                    }
-                  }}
+  <ArchiveContest contestId={id} organizerId={ownership.organizerId}>
+    {#snippet children({ archiveContest })}
+      <TransferContest contestId={id} organizerId={ownership.organizerId}>
+        {#snippet children({ transferContest, disabled: transferDisabled })}
+          <DuplicateContest contestId={id}>
+            {#snippet children({ duplicateContest })}
+              {const disabled = archivedAt !== undefined}
+
+              <wa-dropdown
+                onwa-select={(event: WaSelectEvent) => {
+                  switch ((event.detail.item as WaDropdownItem).value) {
+                    case "edit":
+                      navigate(`/admin/contests/${id}/edit`);
+                      break;
+                    case "results":
+                      navigate(`/admin/contests/${id}/results`);
+                      break;
+                    case "duplicate":
+                      duplicateContest();
+                      break;
+                    case "transfer":
+                      transferContest();
+                      break;
+                    case "archive":
+                      archiveContest();
+                      break;
+                  }
+                }}
+              >
+                <wa-button slot="trigger" size="s" appearance="plain">
+                  <wa-icon name="ellipsis-vertical" label="Actions"></wa-icon>
+                </wa-button>
+                <wa-dropdown-item value="edit" {disabled}>
+                  <wa-icon slot="icon" name="pencil"></wa-icon>
+                  Edit
+                </wa-dropdown-item>
+                <wa-dropdown-item value="results" {disabled}>
+                  <wa-icon slot="icon" name="ranking-star"></wa-icon>
+                  View results
+                </wa-dropdown-item>
+
+                <wa-divider></wa-divider>
+
+                <wa-dropdown-item value="duplicate" {disabled}>
+                  <wa-icon slot="icon" name="copy"></wa-icon>
+                  Duplicate
+                </wa-dropdown-item>
+                <wa-dropdown-item
+                  value="transfer"
+                  disabled={disabled || transferDisabled}
                 >
-                  <wa-button slot="trigger" size="s" appearance="plain">
-                    <wa-icon name="ellipsis-vertical" label="Actions"></wa-icon>
-                  </wa-button>
-                  <wa-dropdown-item value="edit">
-                    <wa-icon slot="icon" name="pencil"></wa-icon>
-                    Edit
-                  </wa-dropdown-item>
-                  <wa-dropdown-item value="results">
-                    <wa-icon slot="icon" name="ranking-star"></wa-icon>
-                    View results
-                  </wa-dropdown-item>
-
-                  <wa-divider></wa-divider>
-
-                  <wa-dropdown-item value="duplicate">
-                    <wa-icon slot="icon" name="copy"></wa-icon>
-                    Duplicate
-                  </wa-dropdown-item>
-                  <wa-dropdown-item
-                    value="transfer"
-                    disabled={transferDisabled}
-                  >
-                    <wa-icon slot="icon" name="arrow-right"></wa-icon>
-                    Transfer
-                  </wa-dropdown-item>
-                  <wa-dropdown-item value="archive" variant="danger">
-                    <wa-icon slot="icon" name="box-archive"></wa-icon>
-                    Archive
-                  </wa-dropdown-item>
-                </wa-dropdown>
-              {/snippet}
-            </DuplicateContest>
-          {/snippet}
-        </TransferContest>
-      {/snippet}
-    </ArchiveContest>
-  {/if}
+                  <wa-icon slot="icon" name="arrow-right"></wa-icon>
+                  Transfer
+                </wa-dropdown-item>
+                <wa-dropdown-item value="archive" variant="danger" {disabled}>
+                  <wa-icon slot="icon" name="box-archive"></wa-icon>
+                  Archive
+                </wa-dropdown-item>
+              </wa-dropdown>
+            {/snippet}
+          </DuplicateContest>
+        {/snippet}
+      </TransferContest>
+    {/snippet}
+  </ArchiveContest>
 {/snippet}
 
 {#snippet createButton(className?: string)}
