@@ -161,13 +161,15 @@
       <wa-divider></wa-divider>
       <h3>Actions</h3>
       <div class="actions">
-        <DuplicateContest {contestId} />
+        <DuplicateContest {contestId} contestName={contest.name} />
         <TransferContest
           {contestId}
+          contestName={contest.name}
           organizerId={contest.ownership.organizerId}
         />
         <ArchiveContest
           {contestId}
+          contestName={contest.name}
           organizerId={contest.ownership.organizerId}
         />
       </div>

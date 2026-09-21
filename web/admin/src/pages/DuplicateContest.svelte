@@ -3,25 +3,20 @@
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import {
-    duplicateContestMutation,
-    getContestQuery,
-  } from "@climblive/lib/queries";
+  import { duplicateContestMutation } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { Snippet } from "svelte";
   import { navigate } from "svelte-routing";
 
   type Props = {
     contestId: number;
+    contestName: string;
     children?: Snippet<[{ duplicateContest: () => void }]>;
   };
 
   let dialog: WaDialog | undefined = $state();
 
-  let { contestId, children }: Props = $props();
-
-  const contestQuery = $derived(getContestQuery(contestId));
-  const contest = $derived(contestQuery.data);
+  let { contestId, contestName, children }: Props = $props();
 
   const duplicateContest = $derived(duplicateContestMutation(contestId));
 
@@ -63,7 +58,7 @@
 
 <wa-dialog bind:this={dialog} label="Duplicate competition">
   You are about to create a copy of the competition <strong
-    >{contest?.name}</strong
+    >{contestName}</strong
   >.<br /><br />
 
   Everything except tickets, results and raffles will be copied.

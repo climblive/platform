@@ -214,7 +214,7 @@
   {/if}
 {/snippet}
 
-{#snippet renderControls({ id, ownership, archivedAt }: Contest)}
+{#snippet renderControls({ id, name, ownership, archivedAt }: Contest)}
   {#if archivedAt !== undefined}
     <RestoreContest contestId={id}>
       {#snippet children({ restoreContest })}
@@ -236,11 +236,19 @@
       {/snippet}
     </RestoreContest>
   {:else}
-    <ArchiveContest contestId={id} organizerId={ownership.organizerId}>
+    <ArchiveContest
+      contestId={id}
+      contestName={name}
+      organizerId={ownership.organizerId}
+    >
       {#snippet children({ archiveContest })}
-        <TransferContest contestId={id} organizerId={ownership.organizerId}>
+        <TransferContest
+          contestId={id}
+          contestName={name}
+          organizerId={ownership.organizerId}
+        >
           {#snippet children({ transferContest, disabled: transferDisabled })}
-            <DuplicateContest contestId={id}>
+            <DuplicateContest contestId={id} contestName={name}>
               {#snippet children({ duplicateContest })}
                 <wa-dropdown
                   onwa-select={(event: WaSelectEvent) => {

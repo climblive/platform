@@ -9,7 +9,6 @@
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import { value } from "@climblive/lib/forms";
   import {
-    getContestQuery,
     getSelfQuery,
     transferContestMutation,
   } from "@climblive/lib/queries";
@@ -19,6 +18,7 @@
 
   type Props = {
     contestId: number;
+    contestName: string;
     children?: Snippet<[{ transferContest: () => void; disabled: boolean }]>;
     organizerId: number;
   };
@@ -26,7 +26,7 @@
   let dialog: WaDialog | undefined = $state();
   let selectedOrganizerId: number | undefined = $state();
 
-  const { contestId, organizerId, children }: Props = $props();
+  const { contestId, contestName, organizerId, children }: Props = $props();
 
   const selfQuery = $derived(getSelfQuery());
   const transferContest = $derived(transferContestMutation(contestId));
@@ -35,9 +35,6 @@
   const otherOrganizers = $derived(
     organizers.filter(({ id }) => id !== organizerId),
   );
-
-  const contestQuery = $derived(getContestQuery(contestId));
-  const contest = $derived(contestQuery.data);
 
   const handleTransfer = async () => {
     if (dialog) {
@@ -111,7 +108,7 @@
       <wa-callout variant="warning">
         <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
         This will transfer all competition data of
-        <strong>{contest?.name}</strong>
+        <strong>{contestName}</strong>
         from the current organizer
         <strong>
           {currentOrganizer.name}
