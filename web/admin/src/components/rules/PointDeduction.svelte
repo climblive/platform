@@ -79,7 +79,9 @@
             max={2 ** 31 - 1}
             defaultValue={contest.pointDeduction || 1}
             oninput={() => debouncedSubmit(form)}
-          ></wa-number-input>
+          >
+            <span slot="end">pts</span>
+          </wa-number-input>
         {/if}
       {/snippet}
     </RuleOptionCard>
