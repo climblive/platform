@@ -38,6 +38,7 @@
   const selfQuery = $derived(getSelfQuery());
 
   const contest = $derived(contestQuery.data);
+  const organizerId = $derived(contest?.ownership.organizerId);
   const self = $derived(selfQuery.data);
 
   $effect(() => {
@@ -101,7 +102,7 @@
 </script>
 
 <main>
-  {#if contest === undefined}
+  {#if contest === undefined || organizerId === undefined}
     <Loader />
   {:else}
     <wa-breadcrumb>
@@ -117,7 +118,7 @@
     {#if contest.archivedAt != null}
       <RestoreContest {contestId} />
     {:else}
-      <ContestDashboard contestId={contest.id} />
+      <ContestDashboard {contestId} />
 
       <div class="results">
         <wa-button
@@ -143,7 +144,7 @@
       <wa-divider></wa-divider>
       <ProblemList
         {contestId}
-        organizerId={contest.ownership.organizerId}
+        {organizerId}
         tableLimit={window.location.hash.substring(1) === "problems"
           ? undefined
           : 8}
@@ -162,14 +163,8 @@
       <h3>Actions</h3>
       <div class="actions">
         <DuplicateContest {contestId} />
-        <TransferContest
-          {contestId}
-          organizerId={contest.ownership.organizerId}
-        />
-        <ArchiveContest
-          {contestId}
-          organizerId={contest.ownership.organizerId}
-        />
+        <TransferContest {contestId} {organizerId} />
+        <ArchiveContest {contestId} {organizerId} />
       </div>
       {#if location.hostname !== "climblive.app" || self?.admin}
         <h3>Developer tools</h3>
