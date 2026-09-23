@@ -16,7 +16,8 @@
 
   const { contest }: Props = $props();
 
-  const patchContest = $derived(patchContestMutation(contest.id));
+  const contestId = $derived(contest.id);
+  const patchContest = $derived(patchContestMutation(contestId));
 
   let enabled = $derived(contest.pointDeduction > 0);
 
