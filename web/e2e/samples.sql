@@ -20,16 +20,6 @@ INSERT INTO comp_class VALUES (NULL, 1, 2, 'Open', NULL, '#ff0000', '2024-01-01 
 INSERT INTO contender VALUES (NULL, 1, 2, 'ABCD0006', 'Jim Halpert', 3, '2024-01-01 00:00:00', FALSE, FALSE, NULL, NULL);
 INSERT INTO problem VALUES (NULL, 1, 2, 1, '#ef4444', NULL, TRUE, TRUE, NULL, 0, 0, 0, NULL);
 
-INSERT INTO contest VALUES (3, 1, NULL, 1, 'Max attempts', NULL, NULL, 'AQ', 0, 0, TRUE, FALSE, 2, 0, NULL, 5, 20160, NOW());
-INSERT INTO comp_class VALUES (4, 1, 3, 'Open', NULL, '#ff0000', '2024-01-01 00:00:00', '2026-12-31 23:59:59');
-INSERT INTO contender VALUES (NULL, 1, 3, 'ABCD0007', 'Rule Tester', 4, '2024-01-01 00:00:00', FALSE, FALSE, NULL, NULL);
-INSERT INTO problem VALUES (NULL, 1, 3, 1, '#ef4444', NULL, TRUE, TRUE, NULL, 25, 50, 100, 10);
-
-INSERT INTO contest VALUES (4, 1, NULL, 1, 'Point deduction', NULL, NULL, 'AQ', 0, 0, TRUE, FALSE, 0, 10, NULL, 5, 20160, NOW());
-INSERT INTO comp_class VALUES (5, 1, 4, 'Open', NULL, '#ff0000', '2024-01-01 00:00:00', '2026-12-31 23:59:59');
-INSERT INTO contender VALUES (NULL, 1, 4, 'ABCD0008', 'Rule Tester', 5, '2024-01-01 00:00:00', FALSE, FALSE, NULL, NULL);
-INSERT INTO problem VALUES (NULL, 1, 4, 1, '#ef4444', NULL, TRUE, TRUE, NULL, 25, 50, 100, 10);
-
 CREATE TABLE `goose_db_version` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `version_id` bigint(20) NOT NULL,
