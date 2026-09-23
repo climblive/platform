@@ -73,7 +73,7 @@
               min={1}
               step={1}
               max={999}
-              defaultValue={contest.maxAttempts || 5}
+              defaultValue={contest.maxAttempts || 10}
               oninput={() => debouncedSubmit(form)}
             ></wa-number-input>
           {/if}
