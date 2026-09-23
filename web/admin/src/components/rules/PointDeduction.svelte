@@ -46,6 +46,7 @@
       title="Point deduction"
       disabled={!contest.usePoints}
       description="Deduct points for each failed attempt before reaching the scored top or zone. The score cannot fall below 0."
+      tag="Beta"
     >
       {#snippet header()}
         <wa-checkbox
