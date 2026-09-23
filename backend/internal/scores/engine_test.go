@@ -56,6 +56,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Finalists:          7,
 			UsePoints:          true,
 			PooledPoints:       true,
+			MaxAttempts:        5,
+			PointDeduction:     10,
 		}).Return()
 
 		f.store.On("GetCompClassIDs").Return([]domain.CompClassID{
@@ -96,6 +98,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Finalists:          7,
 			UsePoints:          true,
 			PooledPoints:       true,
+			MaxAttempts:        5,
+			PointDeduction:     10,
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
@@ -2158,4 +2162,70 @@ func TestDefaultScoreEngine(t *testing.T) {
 			awaitExpectations(t)
 		})
 	})
+}
+
+func TestPointValuesWithAttemptRules(t *testing.T) {
+	for _, tt := range []struct {
+		name        string
+		pooled      bool
+		maxAttempts int
+		current     int
+		top         int
+	}{
+		{"Fixed", false, 3, 15, 80},
+		{"Pooled", true, 3, 2, 30},
+		{"FixedLimit", false, 2, 15, 0},
+		{"PooledLimit", true, 2, 2, 0},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			store := scores.NewMemoryStore()
+			store.SaveRules(scores.Rules{UsePoints: true, PooledPoints: tt.pooled, MaxAttempts: tt.maxAttempts, PointDeduction: 10})
+			store.SaveProblem(scores.Problem{ID: 1, ProblemValue: domain.ProblemValue{PointsTop: 100, PointsZone1: 25, PointsZone2: 50}})
+			store.SaveContender(scores.Contender{ID: 1, CompClassID: 1})
+			store.SaveContender(scores.Contender{ID: 2, CompClassID: 1})
+			store.SaveTick(1, scores.Tick{ContenderID: 1, ProblemID: 1, Zone1: true, AttemptsZone1: 2, AttemptsZone2: 2, AttemptsTop: 2})
+			store.SaveTick(2, scores.Tick{ContenderID: 2, ProblemID: 1, Zone1: true, Zone2: true, Top: true, AttemptsZone1: 1, AttemptsZone2: 1, AttemptsTop: 1})
+
+			engine := scores.NewDefaultScoreEngine(store)
+			_ = slices.Collect(engine.CalculatePointValues(1, 1))
+			value, found := store.GetPointValue(1, 1)
+			require.True(t, found)
+			assert.Equal(t, tt.current, value.Current)
+			assert.Equal(t, tt.top, value.Top)
+		})
+	}
+}
+
+func TestAttemptRulesTopPreview(t *testing.T) {
+	for _, tt := range []struct {
+		name  string
+		rules scores.Rules
+		tick  scores.Tick
+		top   int
+		bonus int
+	}{
+		{"FlashOnly", scores.Rules{MaxAttempts: 1}, scores.Tick{}, 100, 10},
+		{"FlashWithDeduction", scores.Rules{PointDeduction: 10}, scores.Tick{}, 100, 10},
+		{"AlreadyFlashed", scores.Rules{MaxAttempts: 1}, scores.Tick{Top: true, AttemptsTop: 1}, 100, 10},
+		{"AfterFailedAttempt", scores.Rules{PointDeduction: 10}, scores.Tick{AttemptsTop: 1}, 90, 0},
+		{"NoAttemptsLeft", scores.Rules{MaxAttempts: 1}, scores.Tick{AttemptsTop: 1}, 0, 0},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			store := scores.NewMemoryStore()
+			tt.rules.UsePoints = true
+			store.SaveRules(tt.rules)
+			store.SaveProblem(scores.Problem{ID: 1, ProblemValue: domain.ProblemValue{PointsTop: 100, FlashBonus: 10}})
+			store.SaveContender(scores.Contender{ID: 1, CompClassID: 1})
+			tt.tick.ContenderID = 1
+			tt.tick.ProblemID = 1
+			store.SaveTick(1, tt.tick)
+
+			engine := scores.NewDefaultScoreEngine(store)
+			_ = slices.Collect(engine.CalculatePointValues(1, 1))
+			value, found := store.GetPointValue(1, 1)
+			require.True(t, found)
+			assert.Equal(t, tt.top, value.Top)
+			assert.Equal(t, tt.bonus, value.FlashBonus)
+		})
+	}
 }

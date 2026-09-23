@@ -152,3 +152,38 @@ func TestContestValidator(t *testing.T) {
 		assert.True(t, validator.IsValidationError(err))
 	})
 }
+
+func TestContestAttemptRules(t *testing.T) {
+	for _, tt := range []struct {
+		name           string
+		maxAttempts    int
+		pointDeduction int
+		usePoints      bool
+		valid          bool
+	}{
+		{"Disabled", 0, 0, false, true},
+		{"MinimumAttempts", 1, 0, true, true},
+		{"MaximumAttempts", 999, 0, true, true},
+		{"NegativeAttempts", -1, 0, true, false},
+		{"TooManyAttempts", 1000, 0, true, false},
+		{"MaximumDeduction", 0, 2_147_483_647, true, true},
+		{"NegativeDeduction", 0, -1, true, false},
+		{"DeductionTooLarge", 0, 2_147_483_648, true, false},
+		{"AttemptsWithoutPoints", 1, 0, false, false},
+		{"DeductionWithoutPoints", 0, 1, false, false},
+		{"BothRules", 5, 10, true, true},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			contest := domain.Contest{
+				Name: "Competition", Country: "SE", NameRetentionTime: 14 * 24 * time.Hour,
+				UsePoints: tt.usePoints, MaxAttempts: tt.maxAttempts, PointDeduction: tt.pointDeduction,
+			}
+			err := (validators.ContestValidator{}).Validate(contest)
+			if tt.valid {
+				assert.NoError(t, err)
+			} else {
+				assert.ErrorIs(t, err, domain.ErrInvalidData)
+			}
+		})
+	}
+}

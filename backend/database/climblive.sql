@@ -61,6 +61,8 @@ CREATE TABLE IF NOT EXISTS `contest` (
   `finalists` INT NOT NULL,
   `use_points` TINYINT(1) NOT NULL DEFAULT 1,
   `pooled_points` TINYINT(1) NOT NULL DEFAULT 0,
+  `max_attempts` INT NOT NULL DEFAULT 0,
+  `point_deduction` INT NOT NULL DEFAULT 0,
   `info` TEXT NULL,
   `grace_period` INT NOT NULL DEFAULT 300,
   `name_retention_time` INT NOT NULL DEFAULT 20160,
