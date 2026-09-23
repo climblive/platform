@@ -62,22 +62,20 @@
         {/if}
       {/snippet}
       {#snippet footer()}
-        <div class="controls">
-          {#if enabled}
-            <wa-number-input
-              size="s"
-              disabled={!contest.usePoints}
-              {@attach name("maxAttempts")}
-              label="Attempts"
-              required
-              min={1}
-              step={1}
-              max={999}
-              defaultValue={contest.maxAttempts || 10}
-              oninput={() => debouncedSubmit(form)}
-            ></wa-number-input>
-          {/if}
-        </div>
+        {#if enabled}
+          <wa-number-input
+            size="s"
+            disabled={!contest.usePoints}
+            {@attach name("maxAttempts")}
+            label="Attempts"
+            required
+            min={1}
+            step={1}
+            max={999}
+            defaultValue={contest.maxAttempts || 10}
+            oninput={() => debouncedSubmit(form)}
+          ></wa-number-input>
+        {/if}
       {/snippet}
     </RuleOptionCard>
   {/snippet}
@@ -86,12 +84,5 @@
 <style>
   wa-number-input {
     width: 100%;
-  }
-
-  .controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--wa-space-xs);
-    align-items: end;
   }
 </style>

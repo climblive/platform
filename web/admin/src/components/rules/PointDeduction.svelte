@@ -67,22 +67,20 @@
         {/if}
       {/snippet}
       {#snippet footer()}
-        <div class="controls">
-          {#if enabled}
-            <wa-number-input
-              size="s"
-              disabled={!contest.usePoints}
-              {@attach name("pointDeduction")}
-              label="Points per failed attempt"
-              required
-              min={0}
-              step={1}
-              max={2 ** 31 - 1}
-              defaultValue={contest.pointDeduction || 1}
-              oninput={() => debouncedSubmit(form)}
-            ></wa-number-input>
-          {/if}
-        </div>
+        {#if enabled}
+          <wa-number-input
+            size="s"
+            disabled={!contest.usePoints}
+            {@attach name("pointDeduction")}
+            label="Deduction per failed attempt"
+            required
+            min={0}
+            step={1}
+            max={2 ** 31 - 1}
+            defaultValue={contest.pointDeduction || 1}
+            oninput={() => debouncedSubmit(form)}
+          ></wa-number-input>
+        {/if}
       {/snippet}
     </RuleOptionCard>
   {/snippet}
@@ -91,12 +89,5 @@
 <style>
   wa-number-input {
     width: 100%;
-  }
-
-  .controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--wa-space-xs);
-    align-items: end;
   }
 </style>
