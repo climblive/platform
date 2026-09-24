@@ -1407,7 +1407,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Zone1:       10,
 				Zone2:       25,
 				Top:         166,
-				FlashBonus:  33,
+				FlashBonus:  0,
 			}).Return().
 			On("SavePointValue", fakedContender4ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender4ID,
@@ -1416,7 +1416,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Zone1:       10,
 				Zone2:       25,
 				Top:         125,
-				FlashBonus:  33,
+				FlashBonus:  0,
 			}).Return().
 			On("SavePointValue", fakedContender5ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender5ID,
@@ -1425,7 +1425,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Zone1:       10,
 				Zone2:       20,
 				Top:         125,
-				FlashBonus:  33,
+				FlashBonus:  0,
 			}).Return().
 			On("SavePointValue", fakedContender6ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender6ID,
@@ -2196,7 +2196,7 @@ func TestPointValuesWithAttemptRules(t *testing.T) {
 	}
 }
 
-func TestAttemptRulesTopPreview(t *testing.T) {
+func TestTopPreview(t *testing.T) {
 	for _, tt := range []struct {
 		name  string
 		rules scores.Rules
@@ -2204,9 +2204,11 @@ func TestAttemptRulesTopPreview(t *testing.T) {
 		top   int
 		bonus int
 	}{
+		{"Unattempted", scores.Rules{}, scores.Tick{}, 100, 10},
+		{"FailedWithoutAttemptRules", scores.Rules{}, scores.Tick{AttemptsTop: 1}, 100, 0},
 		{"FlashOnly", scores.Rules{MaxAttempts: 1}, scores.Tick{}, 100, 10},
 		{"FlashWithDeduction", scores.Rules{PointDeduction: 10}, scores.Tick{}, 100, 10},
-		{"AlreadyFlashed", scores.Rules{MaxAttempts: 1}, scores.Tick{Top: true, AttemptsTop: 1}, 100, 10},
+		{"AlreadyFlashed", scores.Rules{MaxAttempts: 1}, scores.Tick{Zone1: true, Zone2: true, Top: true, AttemptsZone1: 1, AttemptsZone2: 1, AttemptsTop: 1}, 100, 10},
 		{"AfterFailedAttempt", scores.Rules{PointDeduction: 10}, scores.Tick{AttemptsTop: 1}, 90, 0},
 		{"NoAttemptsLeft", scores.Rules{MaxAttempts: 1}, scores.Tick{AttemptsTop: 1}, 0, 0},
 	} {

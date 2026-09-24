@@ -471,16 +471,8 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 
 		hypotheticalBestZone1 := tick.TurnIntoZone1()
 		hypotheticalBestZone2 := tick.TurnIntoZone2()
-		hypotheticalBestRedpoint := tick.TurnIntoRedpoint()
+		hypotheticalBestTop := tick.TurnIntoTop()
 		hypotheticalFlash := tick.TurnIntoFlash()
-
-		if rules.MaxAttempts > 0 || rules.PointDeduction > 0 {
-			hypotheticalBestRedpoint = tick
-			hypotheticalBestRedpoint.Top = true
-			if !tick.Top {
-				hypotheticalBestRedpoint.AttemptsTop++
-			}
-		}
 
 		pointValue := domain.PointValue{
 			ContenderID: contender.ID,
@@ -494,34 +486,20 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 
 		if !contender.Disqualified {
 			pointValue.Current = CalculatePoints(problemValue, tick, rules)
-		}
 
-		switch {
-		case contender.Disqualified:
-		case rules.PooledPoints:
-			{
-				hypotheticalProblemValue := tickPool.Sub(tick).Add(hypotheticalFlash).CalculatePooledProblemValue(problem.ProblemValue)
+			hypotheticalProblemValue := problemValue
+			if rules.PooledPoints {
+				hypotheticalProblemValue = tickPool.Sub(tick).Add(hypotheticalFlash).CalculatePooledProblemValue(problem.ProblemValue)
+			}
 
-				pointValue.Zone1 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone1, rules)
-				pointValue.Zone2 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone2, rules)
-				pointValue.Top = CalculatePoints(hypotheticalProblemValue, hypotheticalBestRedpoint, rules)
+			if hypotheticalBestTop.AttemptsTop == 1 {
 				pointValue.FlashBonus = hypotheticalProblemValue.FlashBonus
 			}
-		default:
-			{
-				pointValue.Zone1 = CalculatePoints(problemValue, hypotheticalBestZone1, rules)
-				pointValue.Zone2 = CalculatePoints(problemValue, hypotheticalBestZone2, rules)
-				pointValue.Top = CalculatePoints(problemValue, hypotheticalBestRedpoint, rules)
-				pointValue.FlashBonus = problemValue.FlashBonus
-			}
-		}
+			hypotheticalProblemValue.FlashBonus = 0
 
-		if rules.MaxAttempts > 0 || rules.PointDeduction > 0 {
-			if hypotheticalBestRedpoint.AttemptsTop == 1 {
-				pointValue.Top -= pointValue.FlashBonus
-			} else {
-				pointValue.FlashBonus = 0
-			}
+			pointValue.Zone1 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone1, rules)
+			pointValue.Zone2 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone2, rules)
+			pointValue.Top = CalculatePoints(hypotheticalProblemValue, hypotheticalBestTop, rules)
 		}
 
 		oldValue, hadPointValue := e.store.GetPointValue(contender.ID, problemID)

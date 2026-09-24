@@ -327,7 +327,7 @@ func TestTick(t *testing.T) {
 		}
 	})
 
-	t.Run("TurnIntoRedpoint", func(t *testing.T) {
+	t.Run("TurnIntoTop", func(t *testing.T) {
 		none, zone1, zone2, top, flash := makeFakes()
 
 		cases := []struct {
@@ -335,6 +335,18 @@ func TestTick(t *testing.T) {
 			tick     scores.Tick
 			expected scores.Tick
 		}{
+			{
+				name: "Unattempted",
+				tick: scores.Tick{},
+				expected: scores.Tick{
+					Zone1:         true,
+					Zone2:         true,
+					Top:           true,
+					AttemptsZone1: 1,
+					AttemptsZone2: 1,
+					AttemptsTop:   1,
+				},
+			},
 			{
 				name: "None",
 				tick: none,
@@ -400,16 +412,16 @@ func TestTick(t *testing.T) {
 					Zone1:         true,
 					Zone2:         true,
 					Top:           true,
-					AttemptsZone1: 2,
-					AttemptsZone2: 2,
-					AttemptsTop:   2,
+					AttemptsZone1: 1,
+					AttemptsZone2: 1,
+					AttemptsTop:   1,
 				},
 			},
 		}
 
 		for _, tt := range cases {
 			t.Run(tt.name, func(t *testing.T) {
-				assert.Equal(t, tt.expected, tt.tick.TurnIntoRedpoint())
+				assert.Equal(t, tt.expected, tt.tick.TurnIntoTop())
 			})
 		}
 	})
