@@ -58,6 +58,7 @@ func TestContestValidator(t *testing.T) {
 
 	t.Run("NegativeQualifyingProblems", func(t *testing.T) {
 		contest := validContest()
+		contest.UsePoints = true
 		contest.QualifyingProblems = -1
 
 		err := validator.Validate(contest)
@@ -68,6 +69,7 @@ func TestContestValidator(t *testing.T) {
 
 	t.Run("QualifyingProblemsTooLarge", func(t *testing.T) {
 		contest := validContest()
+		contest.UsePoints = true
 		contest.QualifyingProblems = 65536 + 1
 
 		err := validator.Validate(contest)
@@ -151,6 +153,7 @@ func TestContestValidator(t *testing.T) {
 
 	t.Run("NegativeAttempts", func(t *testing.T) {
 		contest := validContest()
+		contest.UsePoints = true
 		contest.MaxAttempts = -1
 
 		err := validator.Validate(contest)
@@ -161,6 +164,7 @@ func TestContestValidator(t *testing.T) {
 
 	t.Run("TooManyAttempts", func(t *testing.T) {
 		contest := validContest()
+		contest.UsePoints = true
 		contest.MaxAttempts = 1000
 
 		err := validator.Validate(contest)
@@ -171,6 +175,7 @@ func TestContestValidator(t *testing.T) {
 
 	t.Run("NegativeDeduction", func(t *testing.T) {
 		contest := validContest()
+		contest.UsePoints = true
 		contest.PointDeduction = -1
 
 		err := validator.Validate(contest)
@@ -181,6 +186,7 @@ func TestContestValidator(t *testing.T) {
 
 	t.Run("DeductionTooLarge", func(t *testing.T) {
 		contest := validContest()
+		contest.UsePoints = true
 		contest.PointDeduction = 2_147_483_648
 
 		err := validator.Validate(contest)
