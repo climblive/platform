@@ -151,39 +151,115 @@ func TestContestValidator(t *testing.T) {
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
 		assert.True(t, validator.IsValidationError(err))
 	})
-}
 
-func TestContestAttemptRules(t *testing.T) {
-	for _, tt := range []struct {
-		name           string
-		maxAttempts    int
-		pointDeduction int
-		usePoints      bool
-		valid          bool
-	}{
-		{"Disabled", 0, 0, false, true},
-		{"MinimumAttempts", 1, 0, true, true},
-		{"MaximumAttempts", 999, 0, true, true},
-		{"NegativeAttempts", -1, 0, true, false},
-		{"TooManyAttempts", 1000, 0, true, false},
-		{"MaximumDeduction", 0, 2_147_483_647, true, true},
-		{"NegativeDeduction", 0, -1, true, false},
-		{"DeductionTooLarge", 0, 2_147_483_648, true, false},
-		{"AttemptsWithoutPoints", 1, 0, false, false},
-		{"DeductionWithoutPoints", 0, 1, false, false},
-		{"BothRules", 5, 10, true, true},
-	} {
-		t.Run(tt.name, func(t *testing.T) {
-			contest := domain.Contest{
-				Name: "Competition", Country: "SE", NameRetentionTime: 14 * 24 * time.Hour,
-				UsePoints: tt.usePoints, MaxAttempts: tt.maxAttempts, PointDeduction: tt.pointDeduction,
-			}
-			err := (validators.ContestValidator{}).Validate(contest)
-			if tt.valid {
-				assert.NoError(t, err)
-			} else {
-				assert.ErrorIs(t, err, domain.ErrInvalidData)
-			}
-		})
-	}
+	t.Run("Disabled", func(t *testing.T) {
+		contest := validContest()
+		contest.UsePoints = false
+		contest.QualifyingProblems = 0
+
+		err := validator.Validate(contest)
+
+		assert.NoError(t, err)
+	})
+
+	t.Run("MinimumAttempts", func(t *testing.T) {
+		contest := validContest()
+		contest.MaxAttempts = 1
+
+		err := validator.Validate(contest)
+
+		assert.NoError(t, err)
+	})
+
+	t.Run("MaximumAttempts", func(t *testing.T) {
+		contest := validContest()
+		contest.MaxAttempts = 999
+
+		err := validator.Validate(contest)
+
+		assert.NoError(t, err)
+	})
+
+	t.Run("NegativeAttempts", func(t *testing.T) {
+		contest := validContest()
+		contest.MaxAttempts = -1
+
+		err := validator.Validate(contest)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("TooManyAttempts", func(t *testing.T) {
+		contest := validContest()
+		contest.MaxAttempts = 1000
+
+		err := validator.Validate(contest)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("MaximumDeduction", func(t *testing.T) {
+		contest := validContest()
+		contest.PointDeduction = 2_147_483_647
+
+		err := validator.Validate(contest)
+
+		assert.NoError(t, err)
+	})
+
+	t.Run("NegativeDeduction", func(t *testing.T) {
+		contest := validContest()
+		contest.PointDeduction = -1
+
+		err := validator.Validate(contest)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("DeductionTooLarge", func(t *testing.T) {
+		contest := validContest()
+		contest.PointDeduction = 2_147_483_648
+
+		err := validator.Validate(contest)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("AttemptsWithoutPoints", func(t *testing.T) {
+		contest := validContest()
+		contest.UsePoints = false
+		contest.QualifyingProblems = 0
+		contest.MaxAttempts = 1
+
+		err := validator.Validate(contest)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("DeductionWithoutPoints", func(t *testing.T) {
+		contest := validContest()
+		contest.UsePoints = false
+		contest.QualifyingProblems = 0
+		contest.PointDeduction = 1
+
+		err := validator.Validate(contest)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("BothRules", func(t *testing.T) {
+		contest := validContest()
+		contest.MaxAttempts = 5
+		contest.PointDeduction = 10
+
+		err := validator.Validate(contest)
+
+		assert.NoError(t, err)
+	})
 }
