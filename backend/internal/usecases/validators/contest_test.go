@@ -56,28 +56,6 @@ func TestContestValidator(t *testing.T) {
 		assert.True(t, validator.IsValidationError(err))
 	})
 
-	t.Run("NegativeQualifyingProblems", func(t *testing.T) {
-		contest := validContest()
-		contest.UsePoints = true
-		contest.QualifyingProblems = -1
-
-		err := validator.Validate(contest)
-
-		assert.ErrorIs(t, err, domain.ErrInvalidData)
-		assert.True(t, validator.IsValidationError(err))
-	})
-
-	t.Run("QualifyingProblemsTooLarge", func(t *testing.T) {
-		contest := validContest()
-		contest.UsePoints = true
-		contest.QualifyingProblems = 65536 + 1
-
-		err := validator.Validate(contest)
-
-		assert.ErrorIs(t, err, domain.ErrInvalidData)
-		assert.True(t, validator.IsValidationError(err))
-	})
-
 	t.Run("QualifyingProblemsWithoutPoints", func(t *testing.T) {
 		contest := validContest()
 		contest.UsePoints = false
@@ -151,50 +129,6 @@ func TestContestValidator(t *testing.T) {
 		assert.True(t, validator.IsValidationError(err))
 	})
 
-	t.Run("NegativeAttempts", func(t *testing.T) {
-		contest := validContest()
-		contest.UsePoints = true
-		contest.MaxAttempts = -1
-
-		err := validator.Validate(contest)
-
-		assert.ErrorIs(t, err, domain.ErrInvalidData)
-		assert.True(t, validator.IsValidationError(err))
-	})
-
-	t.Run("TooManyAttempts", func(t *testing.T) {
-		contest := validContest()
-		contest.UsePoints = true
-		contest.MaxAttempts = 1000
-
-		err := validator.Validate(contest)
-
-		assert.ErrorIs(t, err, domain.ErrInvalidData)
-		assert.True(t, validator.IsValidationError(err))
-	})
-
-	t.Run("NegativeDeduction", func(t *testing.T) {
-		contest := validContest()
-		contest.UsePoints = true
-		contest.PointDeduction = -1
-
-		err := validator.Validate(contest)
-
-		assert.ErrorIs(t, err, domain.ErrInvalidData)
-		assert.True(t, validator.IsValidationError(err))
-	})
-
-	t.Run("DeductionTooLarge", func(t *testing.T) {
-		contest := validContest()
-		contest.UsePoints = true
-		contest.PointDeduction = 2_147_483_648
-
-		err := validator.Validate(contest)
-
-		assert.ErrorIs(t, err, domain.ErrInvalidData)
-		assert.True(t, validator.IsValidationError(err))
-	})
-
 	t.Run("AttemptsWithoutPoints", func(t *testing.T) {
 		contest := validContest()
 		contest.UsePoints = false
@@ -215,5 +149,77 @@ func TestContestValidator(t *testing.T) {
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
 		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("WithPoints", func(t *testing.T) {
+		validContest := func() domain.Contest {
+			return domain.Contest{
+				Name:              "Swedish Championships",
+				Country:           "SE",
+				UsePoints:         true,
+				GracePeriod:       time.Minute * 15,
+				NameRetentionTime: 14 * 24 * time.Hour,
+			}
+		}
+
+		t.Run("NegativeQualifyingProblems", func(t *testing.T) {
+			contest := validContest()
+			contest.QualifyingProblems = -1
+
+			err := validator.Validate(contest)
+
+			assert.ErrorIs(t, err, domain.ErrInvalidData)
+			assert.True(t, validator.IsValidationError(err))
+		})
+
+		t.Run("QualifyingProblemsTooLarge", func(t *testing.T) {
+			contest := validContest()
+			contest.QualifyingProblems = 65536 + 1
+
+			err := validator.Validate(contest)
+
+			assert.ErrorIs(t, err, domain.ErrInvalidData)
+			assert.True(t, validator.IsValidationError(err))
+		})
+
+		t.Run("NegativeAttempts", func(t *testing.T) {
+			contest := validContest()
+			contest.MaxAttempts = -1
+
+			err := validator.Validate(contest)
+
+			assert.ErrorIs(t, err, domain.ErrInvalidData)
+			assert.True(t, validator.IsValidationError(err))
+		})
+
+		t.Run("TooManyAttempts", func(t *testing.T) {
+			contest := validContest()
+			contest.MaxAttempts = 1000
+
+			err := validator.Validate(contest)
+
+			assert.ErrorIs(t, err, domain.ErrInvalidData)
+			assert.True(t, validator.IsValidationError(err))
+		})
+
+		t.Run("NegativeDeduction", func(t *testing.T) {
+			contest := validContest()
+			contest.PointDeduction = -1
+
+			err := validator.Validate(contest)
+
+			assert.ErrorIs(t, err, domain.ErrInvalidData)
+			assert.True(t, validator.IsValidationError(err))
+		})
+
+		t.Run("DeductionTooLarge", func(t *testing.T) {
+			contest := validContest()
+			contest.PointDeduction = 2_147_483_648
+
+			err := validator.Validate(contest)
+
+			assert.ErrorIs(t, err, domain.ErrInvalidData)
+			assert.True(t, validator.IsValidationError(err))
+		})
 	})
 }
