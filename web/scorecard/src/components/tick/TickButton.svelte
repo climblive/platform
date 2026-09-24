@@ -10,16 +10,14 @@
     disabled?: boolean;
   };
 
-  const {
-    onClick,
-    iconName,
-    label,
-    points = 0,
-    bonusPoints,
-    disabled,
-  }: Props = $props();
+  const { onClick, iconName, label, points, bonusPoints, disabled }: Props =
+    $props();
 
   const pointsLabel = $derived.by(() => {
+    if (points === undefined) {
+      return "-";
+    }
+
     if (bonusPoints) {
       return `${points}p + ${bonusPoints}p`;
     }

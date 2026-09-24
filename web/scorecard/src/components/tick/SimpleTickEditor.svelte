@@ -66,6 +66,10 @@
 
     open = false;
   };
+
+  const flashPossible = $derived.by(() => {
+    return tick?.zone1 !== true && tick?.zone2 !== true && tick?.top !== true;
+  });
 </script>
 
 <div class="horizontal">
@@ -73,15 +77,15 @@
     label="Top"
     onClick={() => handleTick("top", false)}
     points={pointValue?.top}
-    disabled={putTick.isPending}
+    disabled={putTick.isPending || tick?.top === true}
     iconName="check"
   />
   <TickButton
     label="Flash"
     onClick={() => handleTick("top", true)}
-    points={pointValue?.top}
+    points={flashPossible ? pointValue?.top : undefined}
     bonusPoints={pointValue?.flashBonus}
-    disabled={putTick.isPending}
+    disabled={putTick.isPending || !flashPossible}
     iconName="bolt"
   />
 </div>
@@ -91,7 +95,7 @@
     label="Zone 2"
     onClick={() => handleTick("zone2", false)}
     points={pointValue?.zone2}
-    disabled={putTick.isPending}
+    disabled={putTick.isPending || tick?.zone2 === true}
     iconName="check"
   />
 {/if}
@@ -101,7 +105,7 @@
     label="Zone 1"
     onClick={() => handleTick("zone1", false)}
     points={pointValue?.zone1}
-    disabled={putTick.isPending}
+    disabled={putTick.isPending || tick?.zone1 === true}
     iconName="check"
   />
 {/if}
