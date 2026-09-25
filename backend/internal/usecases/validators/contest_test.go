@@ -162,6 +162,11 @@ func TestContestValidator(t *testing.T) {
 			}
 		}
 
+		t.Run("ValidData", func(t *testing.T) {
+			err := validator.Validate(validContest())
+			assert.NoError(t, err)
+		})
+
 		t.Run("NegativeQualifyingProblems", func(t *testing.T) {
 			contest := validContest()
 			contest.QualifyingProblems = -1
