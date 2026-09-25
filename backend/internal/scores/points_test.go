@@ -624,15 +624,16 @@ func TestCalculatePointsAttemptRules(t *testing.T) {
 		assert.Equal(t, 0, scores.CalculatePoints(value, tick, rules))
 	})
 
-	t.Run("ZoneAboveAttemptLimit", func(t *testing.T) {
+	t.Run("MaxAttemptsAffectsOnlyReachedFeatures", func(t *testing.T) {
 		tick := scores.Tick{
 			Zone1:         true,
+			AttemptsTop:   11,
+			AttemptsZone2: 2,
 			AttemptsZone1: 1,
-			AttemptsTop:   4,
 		}
-		rules := scores.Rules{MaxAttempts: 3}
+		rules := scores.Rules{MaxAttempts: 10}
 
-		assert.Equal(t, 0, scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, 50, scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("BothRules", func(t *testing.T) {

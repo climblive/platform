@@ -3,10 +3,6 @@ package scores
 import "github.com/climblive/platform/backend/internal/domain"
 
 func CalculatePoints(value domain.ProblemValue, tick Tick, rules Rules) int {
-	if rules.MaxAttempts > 0 && tick.AttemptsTop > rules.MaxAttempts {
-		return 0
-	}
-
 	current := 0
 	attempts := 0
 
@@ -27,6 +23,10 @@ func CalculatePoints(value domain.ProblemValue, tick Tick, rules Rules) int {
 		if tick.AttemptsTop == 1 {
 			current += value.FlashBonus
 		}
+	}
+
+	if rules.MaxAttempts > 0 && attempts > rules.MaxAttempts {
+		return 0
 	}
 
 	return max(0, current-max(0, attempts-1)*rules.PointDeduction)
