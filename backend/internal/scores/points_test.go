@@ -649,3 +649,86 @@ func TestCalculatePointsAttemptRules(t *testing.T) {
 		assert.Equal(t, 50, scores.CalculatePoints(value, tick, rules))
 	})
 }
+
+func TestCalculatePointsKeepsBestScore(t *testing.T) {
+	value := domain.ProblemValue{PointsTop: 100, PointsZone1: 50, PointsZone2: 75}
+
+	tests := []struct {
+		name     string
+		tick     scores.Tick
+		rules    scores.Rules
+		expected int
+	}{
+		{
+			name: "Zone1ExceedsZone2AfterDeduction",
+			tick: scores.Tick{
+				Zone1:         true,
+				Zone2:         true,
+				Top:           false,
+				AttemptsZone1: 2,
+				AttemptsZone2: 5,
+				AttemptsTop:   5,
+			},
+			rules:    scores.Rules{PointDeduction: 10},
+			expected: 40,
+		},
+		{
+			name: "Zone2ExceedsTopAfterDeduction",
+			tick: scores.Tick{
+				Zone1:         true,
+				Zone2:         true,
+				Top:           true,
+				AttemptsZone1: 2,
+				AttemptsZone2: 3,
+				AttemptsTop:   6,
+			},
+			rules:    scores.Rules{PointDeduction: 10},
+			expected: 55,
+		},
+		{
+			name: "Zone1ExceedsBothHigherFeaturesAfterDeduction",
+			tick: scores.Tick{
+				Zone1:         true,
+				Zone2:         true,
+				Top:           true,
+				AttemptsZone1: 2,
+				AttemptsZone2: 5,
+				AttemptsTop:   11,
+			},
+			rules:    scores.Rules{PointDeduction: 10},
+			expected: 40,
+		},
+		{
+			name: "TopOverAttemptLimitPreservesZone2",
+			tick: scores.Tick{
+				Zone1:         true,
+				Zone2:         true,
+				Top:           true,
+				AttemptsZone1: 2,
+				AttemptsZone2: 3,
+				AttemptsTop:   6,
+			},
+			rules:    scores.Rules{PointDeduction: 10, MaxAttempts: 5},
+			expected: 55,
+		},
+		{
+			name: "HigherFeaturesOverAttemptLimitPreserveZone1",
+			tick: scores.Tick{
+				Zone1:         true,
+				Zone2:         true,
+				Top:           true,
+				AttemptsZone1: 2,
+				AttemptsZone2: 6,
+				AttemptsTop:   7,
+			},
+			rules:    scores.Rules{PointDeduction: 10, MaxAttempts: 5},
+			expected: 40,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, scores.CalculatePoints(value, tt.tick, tt.rules))
+		})
+	}
+}
