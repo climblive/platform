@@ -15,15 +15,9 @@
     children?: Snippet<[{ duplicateContest: () => void }]>;
   };
 
-  let {
-    contestId,
-    contestName,
-    children,
-    open: initialOpen = false,
-    onClose,
-  }: Props = $props();
+  let { contestId, contestName, children, onClose, ...rest }: Props = $props();
 
-  let open = $derived(initialOpen);
+  let open = $derived(rest.open);
 
   const duplicateContest = $derived(duplicateContestMutation(contestId));
 

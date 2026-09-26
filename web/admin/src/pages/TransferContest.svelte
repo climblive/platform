@@ -31,11 +31,11 @@
     contestName,
     organizerId,
     children,
-    open: initialOpen = false,
     onClose,
+    ...rest
   }: Props = $props();
 
-  let open = $derived(initialOpen);
+  let open = $derived(rest.open);
 
   const selfQuery = $derived(getSelfQuery());
   const transferContest = $derived(transferContestMutation(contestId));
