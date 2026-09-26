@@ -33,16 +33,16 @@
     }
   };
 
-  const confirmArchivation = () => {
-    archiveContest.mutate(undefined, {
-      onSuccess: () => {
-        handleCancel();
-        navigate(`/admin/organizers/${organizerId}/contests`);
-      },
-      onError: () => {
-        toastUnexpectedError("Failed to archive competition.");
-      },
-    });
+  const confirmArchivation = async () => {
+    const destination = `/admin/organizers/${organizerId}/contests`;
+
+    try {
+      await archiveContest.mutateAsync(undefined);
+      handleCancel();
+      navigate(destination);
+    } catch {
+      toastUnexpectedError("Failed to archive competition.");
+    }
   };
 </script>
 

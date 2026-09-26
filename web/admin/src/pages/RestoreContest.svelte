@@ -16,15 +16,13 @@
 
   const restoreContest = $derived(restoreContestMutation(contestId));
 
-  const handleRestore = () => {
-    restoreContest.mutate(undefined, {
-      onSuccess: () => {
-        navigate(`/admin/contests/${contestId}`);
-      },
-      onError: () => {
-        toastUnexpectedError("Failed to restore competition.");
-      },
-    });
+  const handleRestore = async () => {
+    try {
+      const restoredContest = await restoreContest.mutateAsync(undefined);
+      navigate(`/admin/contests/${restoredContest.id}`);
+    } catch {
+      toastUnexpectedError("Failed to restore competition.");
+    }
   };
 </script>
 

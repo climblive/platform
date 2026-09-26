@@ -48,18 +48,21 @@
     }
   };
 
-  const confirmTransfer = () => {
+  const confirmTransfer = async () => {
     if (selectedOrganizerId === undefined) {
       return;
     }
 
-    transferContest.mutate(selectedOrganizerId, {
-      onSuccess: () => {
-        handleCancel();
-        navigate(`/admin/organizers/${selectedOrganizerId}/contests`);
-      },
-      onError: () => toastUnexpectedError("Failed to transfer competition."),
-    });
+    try {
+      const transferredContest =
+        await transferContest.mutateAsync(selectedOrganizerId);
+      handleCancel();
+      navigate(
+        `/admin/organizers/${transferredContest.ownership.organizerId}/contests`,
+      );
+    } catch {
+      toastUnexpectedError("Failed to transfer competition.");
+    }
   };
 
   const handleSelect = (event: Event) => {
