@@ -19,6 +19,8 @@
   type Props = {
     contestId: number;
     contestName: string;
+    autoOpen?: boolean;
+    onClose?: () => void;
     children?: Snippet<[{ transferContest: () => void; disabled: boolean }]>;
     organizerId: number;
   };
@@ -26,7 +28,14 @@
   let dialog: WaDialog | undefined = $state();
   let selectedOrganizerId: number | undefined = $state();
 
-  const { contestId, contestName, organizerId, children }: Props = $props();
+  const {
+    contestId,
+    contestName,
+    organizerId,
+    children,
+    autoOpen = false,
+    onClose,
+  }: Props = $props();
 
   const selfQuery = $derived(getSelfQuery());
   const transferContest = $derived(transferContestMutation(contestId));
@@ -76,7 +85,7 @@
     transferContest: handleTransfer,
     disabled: otherOrganizers.length === 0,
   })}
-{:else}
+{:else if !autoOpen}
   <wa-button
     onclick={handleTransfer}
     appearance="outlined"
@@ -87,7 +96,12 @@
   </wa-button>
 {/if}
 
-<wa-dialog bind:this={dialog} label="Transfer competition">
+<wa-dialog
+  bind:this={dialog}
+  label="Transfer competition"
+  open={autoOpen}
+  onwa-after-hide={onClose}
+>
   <wa-select
     label="Select new organizer"
     onchange={handleSelect}

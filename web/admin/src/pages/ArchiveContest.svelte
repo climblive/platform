@@ -11,13 +11,22 @@
   type Props = {
     contestId: number;
     contestName: string;
+    autoOpen?: boolean;
+    onClose?: () => void;
     children?: Snippet<[{ archiveContest: () => void }]>;
     organizerId: number;
   };
 
   let dialog: WaDialog | undefined = $state();
 
-  let { contestId, contestName, organizerId, children }: Props = $props();
+  let {
+    contestId,
+    contestName,
+    organizerId,
+    children,
+    autoOpen = false,
+    onClose,
+  }: Props = $props();
 
   const archiveContest = $derived(archiveContestMutation(contestId));
 
@@ -48,7 +57,7 @@
 
 {#if children}
   {@render children({ archiveContest: handleArchive })}
-{:else}
+{:else if !autoOpen}
   <div class="actions">
     <wa-button onclick={handleArchive} appearance="outlined" variant="danger"
       >Archive
@@ -57,7 +66,12 @@
   </div>
 {/if}
 
-<wa-dialog bind:this={dialog} label="Archive competition">
+<wa-dialog
+  bind:this={dialog}
+  label="Archive competition"
+  open={autoOpen}
+  onwa-after-hide={onClose}
+>
   This will hide the competition <strong>{contestName}</strong> for you and stop
   any running score engines.<br /><br />
   Archived competitions may be permanently deleted in the future.

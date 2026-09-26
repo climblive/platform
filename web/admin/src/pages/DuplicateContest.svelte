@@ -11,12 +11,20 @@
   type Props = {
     contestId: number;
     contestName: string;
+    autoOpen?: boolean;
+    onClose?: () => void;
     children?: Snippet<[{ duplicateContest: () => void }]>;
   };
 
   let dialog: WaDialog | undefined = $state();
 
-  let { contestId, contestName, children }: Props = $props();
+  let {
+    contestId,
+    contestName,
+    children,
+    autoOpen = false,
+    onClose,
+  }: Props = $props();
 
   const duplicateContest = $derived(duplicateContestMutation(contestId));
 
@@ -47,7 +55,7 @@
 
 {#if children}
   {@render children({ duplicateContest: handleDuplication })}
-{:else}
+{:else if !autoOpen}
   <div class="actions">
     <wa-button onclick={handleDuplication} appearance="outlined"
       >Duplicate
@@ -56,7 +64,12 @@
   </div>
 {/if}
 
-<wa-dialog bind:this={dialog} label="Duplicate competition">
+<wa-dialog
+  bind:this={dialog}
+  label="Duplicate competition"
+  open={autoOpen}
+  onwa-after-hide={onClose}
+>
   You are about to create a copy of the competition <strong
     >{contestName}</strong
   >.<br /><br />

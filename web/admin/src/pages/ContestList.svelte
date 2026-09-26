@@ -39,6 +39,9 @@
   let { organizerId }: Props = $props();
 
   let showArchived = $state(false);
+  let selectedAction = $state<
+    { type: "duplicate" | "transfer" | "archive"; contest: Contest } | undefined
+  >();
 
   const time = new SyncedTime(60_000);
 
@@ -152,6 +155,24 @@
     showArchived = !showArchived;
   };
 
+  const handleContestAction = (event: WaSelectEvent, contest: Contest) => {
+    const action = (event.detail.item as WaDropdownItem).value;
+
+    switch (action) {
+      case "edit":
+        navigate(`/admin/contests/${contest.id}/edit`);
+        break;
+      case "results":
+        navigate(`/admin/contests/${contest.id}/results`);
+        break;
+      case "duplicate":
+      case "transfer":
+      case "archive":
+        selectedAction = { type: action, contest };
+        break;
+    }
+  };
+
   const numberOfUnarchivedContests = $derived(
     [ongoing, upcoming, past].reduce(
       (partialSum, a) => partialSum + a.length,
@@ -214,9 +235,9 @@
   {/if}
 {/snippet}
 
-{#snippet renderControls({ id, name, ownership, archivedAt }: Contest)}
-  {#if archivedAt !== undefined}
-    <RestoreContest contestId={id}>
+{#snippet renderControls(contest: Contest)}
+  {#if contest.archivedAt !== undefined}
+    <RestoreContest contestId={contest.id}>
       {#snippet children({ restoreContest })}
         <wa-dropdown
           onwa-select={(event: WaSelectEvent) => {
@@ -236,77 +257,42 @@
       {/snippet}
     </RestoreContest>
   {:else}
-    <ArchiveContest
-      contestId={id}
-      contestName={name}
-      organizerId={ownership.organizerId}
+    <wa-dropdown
+      onwa-select={(event: WaSelectEvent) =>
+        handleContestAction(event, contest)}
     >
-      {#snippet children({ archiveContest })}
-        <TransferContest
-          contestId={id}
-          contestName={name}
-          organizerId={ownership.organizerId}
-        >
-          {#snippet children({ transferContest, disabled: transferDisabled })}
-            <DuplicateContest contestId={id} contestName={name}>
-              {#snippet children({ duplicateContest })}
-                <wa-dropdown
-                  onwa-select={(event: WaSelectEvent) => {
-                    switch ((event.detail.item as WaDropdownItem).value) {
-                      case "edit":
-                        navigate(`/admin/contests/${id}/edit`);
-                        break;
-                      case "results":
-                        navigate(`/admin/contests/${id}/results`);
-                        break;
-                      case "duplicate":
-                        duplicateContest();
-                        break;
-                      case "transfer":
-                        transferContest();
-                        break;
-                      case "archive":
-                        archiveContest();
-                        break;
-                    }
-                  }}
-                >
-                  <wa-button slot="trigger" size="s" appearance="plain">
-                    <wa-icon name="ellipsis-vertical" label="Actions"></wa-icon>
-                  </wa-button>
-                  <wa-dropdown-item value="edit">
-                    <wa-icon slot="icon" name="pencil"></wa-icon>
-                    Edit
-                  </wa-dropdown-item>
-                  <wa-dropdown-item value="results">
-                    <wa-icon slot="icon" name="ranking-star"></wa-icon>
-                    View results
-                  </wa-dropdown-item>
+      <wa-button slot="trigger" size="s" appearance="plain">
+        <wa-icon name="ellipsis-vertical" label="Actions"></wa-icon>
+      </wa-button>
+      <wa-dropdown-item value="edit">
+        <wa-icon slot="icon" name="pencil"></wa-icon>
+        Edit
+      </wa-dropdown-item>
+      <wa-dropdown-item value="results">
+        <wa-icon slot="icon" name="ranking-star"></wa-icon>
+        View results
+      </wa-dropdown-item>
 
-                  <wa-divider></wa-divider>
+      <wa-divider></wa-divider>
 
-                  <wa-dropdown-item value="duplicate">
-                    <wa-icon slot="icon" name="copy"></wa-icon>
-                    Duplicate
-                  </wa-dropdown-item>
-                  <wa-dropdown-item
-                    value="transfer"
-                    disabled={transferDisabled}
-                  >
-                    <wa-icon slot="icon" name="arrow-right"></wa-icon>
-                    Transfer
-                  </wa-dropdown-item>
-                  <wa-dropdown-item value="archive" variant="danger">
-                    <wa-icon slot="icon" name="box-archive"></wa-icon>
-                    Archive
-                  </wa-dropdown-item>
-                </wa-dropdown>
-              {/snippet}
-            </DuplicateContest>
-          {/snippet}
-        </TransferContest>
-      {/snippet}
-    </ArchiveContest>
+      <wa-dropdown-item value="duplicate">
+        <wa-icon slot="icon" name="copy"></wa-icon>
+        Duplicate
+      </wa-dropdown-item>
+      <wa-dropdown-item
+        value="transfer"
+        disabled={!self?.organizers.some(
+          ({ id }) => id !== contest.ownership.organizerId,
+        )}
+      >
+        <wa-icon slot="icon" name="arrow-right"></wa-icon>
+        Transfer
+      </wa-dropdown-item>
+      <wa-dropdown-item value="archive" variant="danger">
+        <wa-icon slot="icon" name="box-archive"></wa-icon>
+        Archive
+      </wa-dropdown-item>
+    </wa-dropdown>
   {/if}
 {/snippet}
 
@@ -404,6 +390,31 @@
       {/if}
     </wa-button>
   {/if}
+{/if}
+
+{#if selectedAction?.type === "duplicate"}
+  <DuplicateContest
+    contestId={selectedAction.contest.id}
+    contestName={selectedAction.contest.name}
+    autoOpen
+    onClose={() => (selectedAction = undefined)}
+  />
+{:else if selectedAction?.type === "transfer"}
+  <TransferContest
+    contestId={selectedAction.contest.id}
+    contestName={selectedAction.contest.name}
+    organizerId={selectedAction.contest.ownership.organizerId}
+    autoOpen
+    onClose={() => (selectedAction = undefined)}
+  />
+{:else if selectedAction?.type === "archive"}
+  <ArchiveContest
+    contestId={selectedAction.contest.id}
+    contestName={selectedAction.contest.name}
+    organizerId={selectedAction.contest.ownership.organizerId}
+    autoOpen
+    onClose={() => (selectedAction = undefined)}
+  />
 {/if}
 
 <style>
