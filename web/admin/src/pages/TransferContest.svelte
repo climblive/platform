@@ -1,8 +1,11 @@
 <script lang="ts">
+  import {
+    type WaAfterHideEvent,
+    type WaHideEvent,
+  } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
-  import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
@@ -19,14 +22,24 @@
   type Props = {
     contestId: number;
     contestName: string;
+    open?: boolean;
+    onClose?: () => void;
     children?: Snippet<[{ transferContest: () => void; disabled: boolean }]>;
     organizerId: number;
   };
 
-  let dialog: WaDialog | undefined = $state();
   let selectedOrganizerId: number | undefined = $state();
 
-  const { contestId, contestName, organizerId, children }: Props = $props();
+  const {
+    contestId,
+    contestName,
+    organizerId,
+    children,
+    onClose,
+    ...rest
+  }: Props = $props();
+
+  let open = $derived(rest.open);
 
   const selfQuery = $derived(getSelfQuery());
   const transferContest = $derived(transferContestMutation(contestId));
@@ -36,16 +49,12 @@
     organizers.filter(({ id }) => id !== organizerId),
   );
 
-  const handleTransfer = async () => {
-    if (dialog) {
-      dialog.open = true;
-    }
+  const handleTransfer = () => {
+    open = true;
   };
 
   const handleCancel = () => {
-    if (dialog) {
-      dialog.open = false;
-    }
+    open = false;
   };
 
   const confirmTransfer = async () => {
@@ -87,12 +96,21 @@
   </wa-button>
 {/if}
 
-<wa-dialog bind:this={dialog} label="Transfer competition">
+<wa-dialog
+  label="Transfer competition"
+  {open}
+  onwa-after-hide={() => {
+    open = false;
+    onClose?.();
+  }}
+>
   <wa-select
     label="Select new organizer"
     onchange={handleSelect}
     {@attach value(selectedOrganizerId)}
     hint="Select one of the other organizers you belong to."
+    onwa-hide={(event: WaHideEvent) => event.stopPropagation()}
+    onwa-after-hide={(event: WaAfterHideEvent) => event.stopPropagation()}
   >
     {#each otherOrganizers as organizer (organizer.id)}
       <wa-option value={organizer.id}>{organizer.name}</wa-option>
