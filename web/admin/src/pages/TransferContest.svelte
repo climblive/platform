@@ -2,7 +2,6 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
-  import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
@@ -19,13 +18,12 @@
   type Props = {
     contestId: number;
     contestName: string;
-    autoOpen?: boolean;
+    open?: boolean;
     onClose?: () => void;
     children?: Snippet<[{ transferContest: () => void; disabled: boolean }]>;
     organizerId: number;
   };
 
-  let dialog: WaDialog | undefined = $state();
   let selectedOrganizerId: number | undefined = $state();
 
   const {
@@ -33,9 +31,11 @@
     contestName,
     organizerId,
     children,
-    autoOpen = false,
+    open: initialOpen = false,
     onClose,
   }: Props = $props();
+
+  let open = $derived(initialOpen);
 
   const selfQuery = $derived(getSelfQuery());
   const transferContest = $derived(transferContestMutation(contestId));
@@ -45,16 +45,12 @@
     organizers.filter(({ id }) => id !== organizerId),
   );
 
-  const handleTransfer = async () => {
-    if (dialog) {
-      dialog.open = true;
-    }
+  const handleTransfer = () => {
+    open = true;
   };
 
   const handleCancel = () => {
-    if (dialog) {
-      dialog.open = false;
-    }
+    open = false;
   };
 
   const confirmTransfer = async () => {
@@ -85,7 +81,7 @@
     transferContest: handleTransfer,
     disabled: otherOrganizers.length === 0,
   })}
-{:else if !autoOpen}
+{:else}
   <wa-button
     onclick={handleTransfer}
     appearance="outlined"
@@ -97,10 +93,12 @@
 {/if}
 
 <wa-dialog
-  bind:this={dialog}
   label="Transfer competition"
-  open={autoOpen}
-  onwa-after-hide={onClose}
+  {open}
+  onwa-after-hide={() => {
+    open = false;
+    onClose?.();
+  }}
 >
   <wa-select
     label="Select new organizer"

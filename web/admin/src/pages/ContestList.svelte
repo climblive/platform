@@ -396,7 +396,7 @@
   <DuplicateContest
     contestId={selectedAction.contest.id}
     contestName={selectedAction.contest.name}
-    autoOpen
+    open
     onClose={() => (selectedAction = undefined)}
   />
 {:else if selectedAction?.type === "transfer"}
@@ -404,7 +404,7 @@
     contestId={selectedAction.contest.id}
     contestName={selectedAction.contest.name}
     organizerId={selectedAction.contest.ownership.organizerId}
-    autoOpen
+    open
     onClose={() => (selectedAction = undefined)}
   />
 {:else if selectedAction?.type === "archive"}
@@ -412,7 +412,7 @@
     contestId={selectedAction.contest.id}
     contestName={selectedAction.contest.name}
     organizerId={selectedAction.contest.ownership.organizerId}
-    autoOpen
+    open
     onClose={() => (selectedAction = undefined)}
   />
 {/if}
