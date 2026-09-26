@@ -162,9 +162,9 @@
       <wa-divider></wa-divider>
       <h3>Actions</h3>
       <div class="actions">
-        <DuplicateContest {contestId} />
-        <TransferContest {contestId} {organizerId} />
-        <ArchiveContest {contestId} {organizerId} />
+        <DuplicateContest {contestId} contestName={contest.name} />
+        <TransferContest {contestId} {organizerId} contestName={contest.name} />
+        <ArchiveContest {contestId} {organizerId} contestName={contest.name} />
       </div>
       {#if location.hostname !== "climblive.app" || self?.admin}
         <h3>Developer tools</h3>

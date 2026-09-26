@@ -1,7 +1,12 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import RelativeTime from "@/components/RelativeTime.svelte";
+  import { type WaSelectEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/divider/divider.js";
+  import WaDropdownItem from "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
+  import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
   import {
     EmptyState,
@@ -18,6 +23,11 @@
   import { format, sub } from "date-fns";
   import { onMount } from "svelte";
   import { Link, navigate } from "svelte-routing";
+
+  import ArchiveContest from "./ArchiveContest.svelte";
+  import DuplicateContest from "./DuplicateContest.svelte";
+  import RestoreContest from "./RestoreContest.svelte";
+  import TransferContest from "./TransferContest.svelte";
 
   const maxContestsPerWeek = 10;
   const createButtonId = $props.id();
@@ -130,6 +140,12 @@
       width: "max-content",
       align: "right",
     },
+    {
+      mobile: true,
+      render: renderControls,
+      align: "right",
+      width: "max-content",
+    },
   ];
 
   const handleToggleArchive = () => {
@@ -178,12 +194,12 @@
   {registeredContenders}
 {/snippet}
 
-{#snippet renderTimeBegin({ timeBegin, timeEnd }: Contest)}
+{#snippet renderTimeBegin({ timeBegin, timeEnd }: Contest, mobile: boolean)}
   {#if timeBegin}
     {#if timeEnd && new Date() > timeEnd}
       {format(timeBegin, "yyyy-MM-dd HH:mm")}
     {:else}
-      <RelativeTime time={timeBegin} />
+      <RelativeTime format={mobile ? "narrow" : "long"} time={timeBegin} />
     {/if}
   {:else}
     -
@@ -195,6 +211,102 @@
     {format(timeEnd, "yyyy-MM-dd HH:mm")}
   {:else}
     -
+  {/if}
+{/snippet}
+
+{#snippet renderControls({ id, name, ownership, archivedAt }: Contest)}
+  {#if archivedAt !== undefined}
+    <RestoreContest contestId={id}>
+      {#snippet children({ restoreContest })}
+        <wa-dropdown
+          onwa-select={(event: WaSelectEvent) => {
+            if ((event.detail.item as WaDropdownItem).value === "restore") {
+              restoreContest();
+            }
+          }}
+        >
+          <wa-button slot="trigger" size="s" appearance="plain">
+            <wa-icon name="ellipsis-vertical" label="Actions"></wa-icon>
+          </wa-button>
+          <wa-dropdown-item value="restore">
+            <wa-icon slot="icon" name="rotate-left"></wa-icon>
+            Restore
+          </wa-dropdown-item>
+        </wa-dropdown>
+      {/snippet}
+    </RestoreContest>
+  {:else}
+    <ArchiveContest
+      contestId={id}
+      contestName={name}
+      organizerId={ownership.organizerId}
+    >
+      {#snippet children({ archiveContest })}
+        <TransferContest
+          contestId={id}
+          contestName={name}
+          organizerId={ownership.organizerId}
+        >
+          {#snippet children({ transferContest, disabled: transferDisabled })}
+            <DuplicateContest contestId={id} contestName={name}>
+              {#snippet children({ duplicateContest })}
+                <wa-dropdown
+                  onwa-select={(event: WaSelectEvent) => {
+                    switch ((event.detail.item as WaDropdownItem).value) {
+                      case "edit":
+                        navigate(`/admin/contests/${id}/edit`);
+                        break;
+                      case "results":
+                        navigate(`/admin/contests/${id}/results`);
+                        break;
+                      case "duplicate":
+                        duplicateContest();
+                        break;
+                      case "transfer":
+                        transferContest();
+                        break;
+                      case "archive":
+                        archiveContest();
+                        break;
+                    }
+                  }}
+                >
+                  <wa-button slot="trigger" size="s" appearance="plain">
+                    <wa-icon name="ellipsis-vertical" label="Actions"></wa-icon>
+                  </wa-button>
+                  <wa-dropdown-item value="edit">
+                    <wa-icon slot="icon" name="pencil"></wa-icon>
+                    Edit
+                  </wa-dropdown-item>
+                  <wa-dropdown-item value="results">
+                    <wa-icon slot="icon" name="ranking-star"></wa-icon>
+                    View results
+                  </wa-dropdown-item>
+
+                  <wa-divider></wa-divider>
+
+                  <wa-dropdown-item value="duplicate">
+                    <wa-icon slot="icon" name="copy"></wa-icon>
+                    Duplicate
+                  </wa-dropdown-item>
+                  <wa-dropdown-item
+                    value="transfer"
+                    disabled={transferDisabled}
+                  >
+                    <wa-icon slot="icon" name="arrow-right"></wa-icon>
+                    Transfer
+                  </wa-dropdown-item>
+                  <wa-dropdown-item value="archive" variant="danger">
+                    <wa-icon slot="icon" name="box-archive"></wa-icon>
+                    Archive
+                  </wa-dropdown-item>
+                </wa-dropdown>
+              {/snippet}
+            </DuplicateContest>
+          {/snippet}
+        </TransferContest>
+      {/snippet}
+    </ArchiveContest>
   {/if}
 {/snippet}
 

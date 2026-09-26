@@ -119,24 +119,24 @@ export const archiveContestMutation = (contestId: number) => {
   return createMutation(() => ({
     mutationFn: () => ApiClient.getInstance().archiveContest(contestId),
     onSuccess: (archivedContest) => {
-      let queryKey: QueryKey = [
-        "contests",
-        { organizerId: archivedContest.ownership.organizerId },
-      ];
+      let queryKey: QueryKey = ["contests"];
 
-      client.setQueryData<Contest[]>(queryKey, (oldContests) => {
-        if (oldContests === undefined) {
-          return undefined;
-        }
-
-        return oldContests.map((contest) => {
-          if (contest.id === archivedContest.id) {
-            return archivedContest;
+      client.setQueriesData<Contest[]>(
+        { queryKey, exact: false },
+        (oldContests) => {
+          if (oldContests === undefined) {
+            return undefined;
           }
 
-          return contest;
-        });
-      });
+          return oldContests.map((contest) => {
+            if (contest.id === archivedContest.id) {
+              return archivedContest;
+            }
+
+            return contest;
+          });
+        },
+      );
 
       queryKey = ["contest", { id: contestId }];
 
@@ -151,24 +151,24 @@ export const restoreContestMutation = (contestId: number) => {
   return createMutation(() => ({
     mutationFn: () => ApiClient.getInstance().restoreContest(contestId),
     onSuccess: (restoredContest) => {
-      let queryKey: QueryKey = [
-        "contests",
-        { organizerId: restoredContest.ownership.organizerId },
-      ];
+      let queryKey: QueryKey = ["contests"];
 
-      client.setQueryData<Contest[]>(queryKey, (oldContests) => {
-        if (oldContests === undefined) {
-          return undefined;
-        }
-
-        return oldContests.map((contest) => {
-          if (contest.id === restoredContest.id) {
-            return restoredContest;
+      client.setQueriesData<Contest[]>(
+        { queryKey, exact: false },
+        (oldContests) => {
+          if (oldContests === undefined) {
+            return undefined;
           }
 
-          return contest;
-        });
-      });
+          return oldContests.map((contest) => {
+            if (contest.id === restoredContest.id) {
+              return restoredContest;
+            }
+
+            return contest;
+          });
+        },
+      );
 
       queryKey = ["contest", { id: contestId }];
 
@@ -213,6 +213,8 @@ export const transferContestMutation = (contestId: number) => {
         ["contest", { id: contestId }],
         transferredContest,
       );
+
+      client.invalidateQueries({ queryKey: ["contests"] });
     },
   }));
 };
