@@ -14,13 +14,10 @@ func TestContestValidator(t *testing.T) {
 
 	validContest := func() domain.Contest {
 		return domain.Contest{
-			Name:               "Swedish Championships",
-			Country:            "SE",
-			QualifyingProblems: 10,
-			UsePoints:          true,
-			Finalists:          7,
-			GracePeriod:        time.Minute * 15,
-			NameRetentionTime:  14 * 24 * time.Hour,
+			Name:              "Swedish Championships",
+			Country:           "SE",
+			GracePeriod:       time.Minute * 15,
+			NameRetentionTime: 14 * 24 * time.Hour,
 		}
 	}
 
@@ -52,26 +49,6 @@ func TestContestValidator(t *testing.T) {
 	t.Run("FinalistsTooLarge", func(t *testing.T) {
 		contest := validContest()
 		contest.Finalists = 65536 + 1
-
-		err := validator.Validate(contest)
-
-		assert.ErrorIs(t, err, domain.ErrInvalidData)
-		assert.True(t, validator.IsValidationError(err))
-	})
-
-	t.Run("NegativeQualifyingProblems", func(t *testing.T) {
-		contest := validContest()
-		contest.QualifyingProblems = -1
-
-		err := validator.Validate(contest)
-
-		assert.ErrorIs(t, err, domain.ErrInvalidData)
-		assert.True(t, validator.IsValidationError(err))
-	})
-
-	t.Run("QualifyingProblemsTooLarge", func(t *testing.T) {
-		contest := validContest()
-		contest.QualifyingProblems = 65536 + 1
 
 		err := validator.Validate(contest)
 
@@ -150,5 +127,104 @@ func TestContestValidator(t *testing.T) {
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
 		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("MaxAttemptsWithoutPoints", func(t *testing.T) {
+		contest := validContest()
+		contest.UsePoints = false
+		contest.MaxAttempts = 1
+
+		err := validator.Validate(contest)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("PointDeductionWithoutPoints", func(t *testing.T) {
+		contest := validContest()
+		contest.UsePoints = false
+		contest.PointDeduction = 1
+
+		err := validator.Validate(contest)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("WithPoints", func(t *testing.T) {
+		validContest := func() domain.Contest {
+			return domain.Contest{
+				Name:              "Swedish Championships",
+				Country:           "SE",
+				UsePoints:         true,
+				GracePeriod:       time.Minute * 15,
+				NameRetentionTime: 14 * 24 * time.Hour,
+			}
+		}
+
+		t.Run("ValidData", func(t *testing.T) {
+			err := validator.Validate(validContest())
+			assert.NoError(t, err)
+		})
+
+		t.Run("NegativeQualifyingProblems", func(t *testing.T) {
+			contest := validContest()
+			contest.QualifyingProblems = -1
+
+			err := validator.Validate(contest)
+
+			assert.ErrorIs(t, err, domain.ErrInvalidData)
+			assert.True(t, validator.IsValidationError(err))
+		})
+
+		t.Run("QualifyingProblemsTooLarge", func(t *testing.T) {
+			contest := validContest()
+			contest.QualifyingProblems = 65536 + 1
+
+			err := validator.Validate(contest)
+
+			assert.ErrorIs(t, err, domain.ErrInvalidData)
+			assert.True(t, validator.IsValidationError(err))
+		})
+
+		t.Run("NegativeMaxAttempts", func(t *testing.T) {
+			contest := validContest()
+			contest.MaxAttempts = -1
+
+			err := validator.Validate(contest)
+
+			assert.ErrorIs(t, err, domain.ErrInvalidData)
+			assert.True(t, validator.IsValidationError(err))
+		})
+
+		t.Run("MaxAttemptsTooLarge", func(t *testing.T) {
+			contest := validContest()
+			contest.MaxAttempts = 1000
+
+			err := validator.Validate(contest)
+
+			assert.ErrorIs(t, err, domain.ErrInvalidData)
+			assert.True(t, validator.IsValidationError(err))
+		})
+
+		t.Run("NegativePointDeduction", func(t *testing.T) {
+			contest := validContest()
+			contest.PointDeduction = -1
+
+			err := validator.Validate(contest)
+
+			assert.ErrorIs(t, err, domain.ErrInvalidData)
+			assert.True(t, validator.IsValidationError(err))
+		})
+
+		t.Run("PointDeductionTooLarge", func(t *testing.T) {
+			contest := validContest()
+			contest.PointDeduction = 2_147_483_648
+
+			err := validator.Validate(contest)
+
+			assert.ErrorIs(t, err, domain.ErrInvalidData)
+			assert.True(t, validator.IsValidationError(err))
+		})
 	})
 }

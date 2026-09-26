@@ -87,6 +87,8 @@ export interface Contest {
   finalists: number /* int */;
   usePoints: boolean;
   pooledPoints: boolean;
+  maxAttempts: number /* int */;
+  pointDeduction: number /* int */;
   info?: string;
   gracePeriod: number;
   nameRetentionTime: number;
@@ -105,6 +107,8 @@ export interface ContestTemplate {
   finalists: number /* int */;
   usePoints: boolean;
   pooledPoints: boolean;
+  maxAttempts: number /* int */;
+  pointDeduction: number /* int */;
   info?: string;
   gracePeriod: number;
   nameRetentionTime: number;
@@ -119,6 +123,8 @@ export interface ContestPatch {
   finalists?: number;
   usePoints?: boolean;
   pooledPoints?: boolean;
+  maxAttempts?: number;
+  pointDeduction?: number;
   info?: string;
   gracePeriod?: number;
 }
@@ -303,6 +309,8 @@ export interface RulesUpdatedEvent {
   finalists: number /* int */;
   usePoints: boolean;
   pooledPoints: boolean;
+  maxAttempts: number /* int */;
+  pointDeduction: number /* int */;
 }
 export interface ContenderPublicInfoUpdatedEvent {
   contenderId: ContenderID;

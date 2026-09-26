@@ -79,6 +79,8 @@ func contestToDomain(record database.Contest) domain.Contest {
 		Finalists:            int(record.Finalists),
 		UsePoints:            record.UsePoints,
 		PooledPoints:         record.PooledPoints,
+		MaxAttempts:          int(record.MaxAttempts),
+		PointDeduction:       int(record.PointDeduction),
 		Info:                 record.Info.String,
 		GracePeriod:          time.Duration(record.GracePeriod) * time.Minute,
 		NameRetentionTime:    time.Duration(record.NameRetentionTime) * time.Minute,

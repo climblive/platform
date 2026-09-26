@@ -358,16 +358,32 @@ test("update a problem through all scoring states", async ({ page }) => {
   await expect(problem.getByText("+10p")).toBeVisible();
 
   await problem.getByRole("button", { name: "Edit" }).click();
+  await expect(problem.getByRole("button", { name: "Zone 1" })).toBeDisabled();
+  await expect(problem.getByRole("button", { name: "Flash" })).toBeDisabled();
   await problem.getByRole("button", { name: "Zone 2" }).click();
 
   await expect(problem.getByText("+20p")).toBeVisible();
 
   await problem.getByRole("button", { name: "Edit" }).click();
+  await expect(problem.getByRole("button", { name: "Zone 1" })).toBeDisabled();
+  await expect(problem.getByRole("button", { name: "Zone 2" })).toBeDisabled();
+  await expect(problem.getByRole("button", { name: "Flash" })).toBeDisabled();
   await problem.getByRole("button", { name: "Top" }).click();
 
   await expect(problem.getByText("+100p")).toBeVisible();
 
   await problem.getByRole("button", { name: "Edit" }).click();
+  for (const name of ["Zone 1", "Zone 2", "Top", "Flash"]) {
+    await expect(problem.getByRole("button", { name })).toBeDisabled();
+  }
+  await problem.getByRole("button", { name: "Remove" }).click();
+
+  await expect(problem.getByText("+100p")).not.toBeVisible();
+
+  await problem.getByRole("button", { name: "Tick" }).click();
+  for (const name of ["Zone 1", "Zone 2", "Top", "Flash"]) {
+    await expect(problem.getByRole("button", { name })).toBeEnabled();
+  }
   await problem.getByRole("button", { name: "Flash" }).click();
 
   await expect(problem.getByText("+110p")).toBeVisible();
@@ -591,7 +607,7 @@ test("scrub name", async ({ page }) => {
 
   await page.waitForURL("/ABCD0001");
 
-  await expect(page.getByText("anon824515495")).toBeVisible();
+  await expect(page.getByText("Unknown Crusher 824515495")).toBeVisible();
 });
 
 test.describe("failsafe mode", () => {

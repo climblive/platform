@@ -224,7 +224,12 @@ export const updateRulesInQueryCache = (
   contestId: number,
   updatedRules: Pick<
     Contest,
-    "qualifyingProblems" | "finalists" | "usePoints" | "pooledPoints"
+    | "qualifyingProblems"
+    | "finalists"
+    | "usePoints"
+    | "pooledPoints"
+    | "maxAttempts"
+    | "pointDeduction"
   >,
 ) => {
   let queryKey: QueryKey = ["contests"];

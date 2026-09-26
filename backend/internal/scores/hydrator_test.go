@@ -30,6 +30,10 @@ func TestHydrate(t *testing.T) {
 			ID:                 fakedContestID,
 			QualifyingProblems: 10,
 			Finalists:          7,
+			UsePoints:          true,
+			PooledPoints:       true,
+			MaxAttempts:        10,
+			PointDeduction:     2,
 		}, nil)
 
 	mockedRepo.
@@ -86,6 +90,10 @@ func TestHydrate(t *testing.T) {
 	mockedStore.On("SaveRules", scores.Rules{
 		QualifyingProblems: 10,
 		Finalists:          7,
+		UsePoints:          true,
+		PooledPoints:       true,
+		MaxAttempts:        10,
+		PointDeduction:     2,
 	}).Return()
 
 	mockedStore.On("SaveProblem", scores.Problem{

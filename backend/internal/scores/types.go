@@ -101,7 +101,7 @@ func (t Tick) TurnIntoZone2() Tick {
 	return t
 }
 
-func (t Tick) TurnIntoRedpoint() Tick {
+func (t Tick) TurnIntoTop() Tick {
 	if !t.Zone1 {
 		t.AttemptsZone1 += 1
 	}
@@ -111,12 +111,6 @@ func (t Tick) TurnIntoRedpoint() Tick {
 	}
 
 	if !t.Zone1 || !t.Zone2 || !t.Top {
-		t.AttemptsTop += 1
-	}
-
-	if t.AttemptsTop == 1 {
-		t.AttemptsZone1 += 1
-		t.AttemptsZone2 += 1
 		t.AttemptsTop += 1
 	}
 
