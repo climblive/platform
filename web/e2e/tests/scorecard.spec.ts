@@ -292,11 +292,11 @@ test("tick and untick all problems", async ({ page }) => {
   await expect(results.getByText("1500p", { exact: true })).toBeVisible();
   await expect(results.getByText("1st", { exact: true })).toBeVisible();
   await expect(results.getByRole("listitem")).toHaveText([
-    "Problem 5 Top 500p",
-    "Problem 4 Top 400p",
-    "Problem 3 Top 300p",
-    "Problem 2 Top 200p",
-    "Problem 1 Top 100p",
+    "Problem #5 Top 500p",
+    "Problem #4 Top 400p",
+    "Problem #3 Top 300p",
+    "Problem #2 Top 200p",
+    "Problem #1 Top 100p",
   ]);
 
   await page.reload();
