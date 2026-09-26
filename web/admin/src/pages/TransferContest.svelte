@@ -13,17 +13,20 @@
     transferContestMutation,
   } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
+  import type { Snippet } from "svelte";
   import { navigate } from "svelte-routing";
 
   type Props = {
     contestId: number;
+    contestName: string;
+    children?: Snippet<[{ transferContest: () => void; disabled: boolean }]>;
     organizerId: number;
   };
 
   let dialog: WaDialog | undefined = $state();
   let selectedOrganizerId: number | undefined = $state();
 
-  const { contestId, organizerId }: Props = $props();
+  const { contestId, contestName, organizerId, children }: Props = $props();
 
   const selfQuery = $derived(getSelfQuery());
   const transferContest = $derived(transferContestMutation(contestId));
@@ -45,15 +48,21 @@
     }
   };
 
-  const confirmTransfer = () => {
+  const confirmTransfer = async () => {
     if (selectedOrganizerId === undefined) {
       return;
     }
 
-    transferContest.mutate(selectedOrganizerId, {
-      onSuccess: () => navigate(`./organizers/${selectedOrganizerId}/contests`),
-      onError: () => toastUnexpectedError("Failed to transfer competition."),
-    });
+    try {
+      const transferredContest =
+        await transferContest.mutateAsync(selectedOrganizerId);
+      handleCancel();
+      navigate(
+        `/admin/organizers/${transferredContest.ownership.organizerId}/contests`,
+      );
+    } catch {
+      toastUnexpectedError("Failed to transfer competition.");
+    }
   };
 
   const handleSelect = (event: Event) => {
@@ -62,14 +71,21 @@
   };
 </script>
 
-<wa-button
-  onclick={handleTransfer}
-  appearance="outlined"
-  disabled={otherOrganizers.length === 0}
->
-  Transfer
-  <wa-icon name="arrow-right" slot="start"></wa-icon>
-</wa-button>
+{#if children}
+  {@render children({
+    transferContest: handleTransfer,
+    disabled: otherOrganizers.length === 0,
+  })}
+{:else}
+  <wa-button
+    onclick={handleTransfer}
+    appearance="outlined"
+    disabled={otherOrganizers.length === 0}
+  >
+    Transfer
+    <wa-icon name="arrow-right" slot="start"></wa-icon>
+  </wa-button>
+{/if}
 
 <wa-dialog bind:this={dialog} label="Transfer competition">
   <wa-select
@@ -94,7 +110,9 @@
     {#if currentOrganizer && newOrganizer}
       <wa-callout variant="warning">
         <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
-        This will transfer all competition data from the current organizer
+        This will transfer all competition data of
+        <strong>{contestName}</strong>
+        from the current organizer
         <strong>
           {currentOrganizer.name}
         </strong>
@@ -122,6 +140,10 @@
 </wa-dialog>
 
 <style>
+  wa-dialog {
+    white-space: normal;
+  }
+
   wa-dialog::part(body) {
     display: flex;
     flex-direction: column;
