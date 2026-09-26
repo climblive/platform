@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"embed"
+	"fmt"
 	"io/fs"
 	"log"
 	"log/slog"
@@ -50,7 +51,7 @@ const httpReadTimeout = 30 * time.Second
 const httpWriteTimeout = 30 * time.Second
 const httpIdleTimeout = 2 * time.Minute
 
-const appCSP = "default-src 'self'; connect-src 'self' clmb.auth.eu-west-1.amazoncognito.com *.fontawesome.com *.sentry.io data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-ancestors 'none'; form-action 'none'; base-uri 'self'; img-src 'self' data:; report-uri https://o4509937603641344.ingest.de.sentry.io/api/4509937616093264/security/?sentry_key=019099d850441f60cea5d465e217f768"
+const appCSP = "default-src 'self'; connect-src 'self' clmb.auth.eu-west-1.amazoncognito.com *.fontawesome.com *.sentry.io data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-ancestors %s; form-action 'none'; base-uri 'self'; img-src 'self' data:; report-uri https://o4509937603641344.ingest.de.sentry.io/api/4509937616093264/security/?sentry_key=019099d850441f60cea5d465e217f768"
 
 const wwwCSP = "default-src 'self'; script-src 'self' 'sha256-jIhoHP5AYEa/rjrf399lCKS/+7hIAc+G1cKDLBSPd7o='; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'none'; form-action 'none'; base-uri 'self'"
 
@@ -444,7 +445,17 @@ func (h *httpRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.appHandler.ServeHTTP(w, r)
 }
 
+func getFrameAncestors(env string) string {
+	ancestors := strings.Fields(os.Getenv(env))
+	if len(ancestors) == 0 {
+		return "'none'"
+	}
+
+	return strings.Join(ancestors, " ")
+}
+
 func installAppStaticHandlers(mux *http.ServeMux) {
+	csp := fmt.Sprintf(appCSP, getFrameAncestors("APP_FRAME_ANCESTORS"))
 	apps := []struct {
 		basePath string
 		subDir   string
@@ -460,7 +471,7 @@ func installAppStaticHandlers(mux *http.ServeMux) {
 			panic(err)
 		}
 
-		rest.InstallStaticHandler(mux, app.basePath, subFS, appCSP)
+		rest.InstallStaticHandler(mux, app.basePath, subFS, csp)
 	}
 }
 
