@@ -607,7 +607,7 @@ test("scrub name", async ({ page }) => {
 
   await page.waitForURL("/ABCD0001");
 
-  await expect(page.getByText("anon824515495")).toBeVisible();
+  await expect(page.getByText("Unknown Crusher 824515495")).toBeVisible();
 });
 
 test.describe("failsafe mode", () => {
