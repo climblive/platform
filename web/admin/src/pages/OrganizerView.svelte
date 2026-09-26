@@ -29,7 +29,10 @@
 
   const self = $derived(selfQuery.data);
 
-  let showAll = $derived(self?.admin === true);
+  let showAllPreference = $state(
+    sessionStorage.getItem("showAllContests") !== "false",
+  );
+  let showAll = $derived(self?.admin === true && showAllPreference);
 
   let select: WaSelect | undefined = $state();
 
@@ -59,7 +62,8 @@
       return;
     }
 
-    showAll = showAllToggle.checked;
+    showAllPreference = showAllToggle.checked;
+    sessionStorage.setItem("showAllContests", String(showAllPreference));
   };
 </script>
 
