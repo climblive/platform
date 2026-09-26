@@ -229,6 +229,21 @@ func TestCalculatePoints_MaxAttempts(t *testing.T) {
 		FlashBonus:  10,
 	}
 
+	t.Run("Flash", func(t *testing.T) {
+		tick := scores.Tick{
+			Top:           true,
+			AttemptsTop:   1,
+			Zone2:         true,
+			AttemptsZone2: 1,
+			Zone1:         true,
+			AttemptsZone1: 1,
+		}
+
+		rules := scores.Rules{MaxAttempts: 1}
+
+		assert.Equal(t, 110, scores.CalculatePoints(value, tick, rules))
+	})
+
 	t.Run("AtAttemptLimit", func(t *testing.T) {
 		tick := scores.Tick{
 			Top:           true,
