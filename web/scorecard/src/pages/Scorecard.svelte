@@ -3,6 +3,7 @@
   import Header from "@/components/Header.svelte";
   import ProblemView from "@/components/ProblemView.svelte";
   import Summary from "@/components/Summary.svelte";
+  import PersonalResults from "@/pages/PersonalResults.svelte";
   import type { ScorecardSession } from "@/types";
   import type { WaTabShowEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
@@ -52,6 +53,8 @@
   import { useQueryClient } from "@tanstack/svelte-query";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
+
+  const { personalResults = false }: { personalResults?: boolean } = $props();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
@@ -362,6 +365,10 @@
 
   onMount(() => {
     startEventSubscription();
+
+    if (personalResults) {
+      contenderQuery.refetch();
+    }
   });
 
   onDestroy(() => {
@@ -375,6 +382,18 @@
 
 {#if showSplash || !contender || !contest || !compClasses || !sortedProblems || !ticks || !selectedCompClass}
   <SplashScreen onComplete={() => (showSplash = false)} />
+{:else if personalResults}
+  <PersonalResults
+    registrationCode={$session.registrationCode}
+    {contest}
+    {contender}
+    compClassName={selectedCompClass.name}
+    {score}
+    {placement}
+    {ticks}
+    problems={problems ?? []}
+    {pointValues}
+  />
 {:else}
   <ContestStateProvider
     contestId={$session.contestId}

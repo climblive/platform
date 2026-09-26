@@ -281,6 +281,29 @@ test("tick and untick all problems", async ({ page }) => {
   await expect(page.getByText("1500p")).toBeVisible();
   await expect(page.getByText("1st").first()).toBeVisible();
 
+  await page.getByRole("button", { name: "Share results" }).click();
+  await page.waitForURL("/ABCD0003/results");
+
+  const results = page.getByRole("article", { name: "Personal results" });
+  await expect(results.getByRole("img", { name: "ClimbLive" })).toBeVisible();
+  await expect(results).toContainText("World Testing Championships");
+  await expect(results).toContainText("Phyllis Lapin-Vance");
+  await expect(results).toContainText("Females");
+  await expect(results.getByText("1500p", { exact: true })).toBeVisible();
+  await expect(results.getByText("1st", { exact: true })).toBeVisible();
+  await expect(results.getByRole("listitem")).toHaveText([
+    "Problem 5 Top 500p",
+    "Problem 4 Top 400p",
+    "Problem 3 Top 300p",
+    "Problem 2 Top 200p",
+    "Problem 1 Top 100p",
+  ]);
+
+  await page.reload();
+  await expect(results.getByText("1500p", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Back to scorecard" }).click();
+  await page.waitForURL("/ABCD0003");
+
   for (let p = 1; p <= 5; p++) {
     const problem = page.getByRole("region", { name: `Problem ${p}` });
     await expect(problem).toBeVisible();
@@ -293,6 +316,14 @@ test("tick and untick all problems", async ({ page }) => {
 
   await expect(page.getByText("0p", { exact: true })).toBeVisible();
   await expect(page.getByText("1st").first()).toBeVisible();
+});
+
+test("personal results without completed problems", async ({ page }) => {
+  await page.goto("/ABCD0003/results");
+
+  const results = page.getByRole("article", { name: "Personal results" });
+  await expect(results).toContainText("Your hardest tops will appear here");
+  await expect(results.getByRole("listitem")).toHaveCount(0);
 });
 
 test("tick a problem as a flash", async ({ page }) => {
