@@ -107,6 +107,7 @@
       <Router>
         <Route path="/:code/register"><Register /></Route>
         <Route path="/:code/edit"><EditProfile /></Route>
+        <Route path="/:code/results"><Scorecard personalResults /></Route>
         <Route path="/:code"><Scorecard /></Route>
         <Route path="/"><Start /></Route>
       </Router>
