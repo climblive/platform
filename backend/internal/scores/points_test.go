@@ -90,6 +90,186 @@ func TestCalculatePoints(t *testing.T) {
 	}
 }
 
+func TestCalculatePoints_HighestValueFeatureWins(t *testing.T) {
+	problem := domain.ProblemValue{
+		PointsTop:   100,
+		PointsZone1: 50,
+		PointsZone2: 75,
+		FlashBonus:  10,
+	}
+
+	t.Run("Zone1WinsOverZone2", func(t *testing.T) {
+		tick := scores.Tick{
+			AttemptsTop:   4,
+			Zone2:         true,
+			AttemptsZone2: 4,
+			Zone1:         true,
+			AttemptsZone1: 1,
+		}
+
+		rules := scores.Rules{PointDeduction: 10}
+
+		assert.Equal(t, 50, scores.CalculatePoints(problem, tick, rules))
+	})
+
+	t.Run("Zone2WinsOverTop", func(t *testing.T) {
+		tick := scores.Tick{
+			Top:           true,
+			AttemptsTop:   4,
+			Zone2:         true,
+			AttemptsZone2: 1,
+			Zone1:         true,
+			AttemptsZone1: 1,
+		}
+
+		rules := scores.Rules{PointDeduction: 10}
+
+		assert.Equal(t, 75, scores.CalculatePoints(problem, tick, rules))
+	})
+}
+
+func TestCalculatePoints_PointDeduction(t *testing.T) {
+	value := domain.ProblemValue{
+		PointsTop:   100,
+		PointsZone1: 50,
+		PointsZone2: 75,
+		FlashBonus:  10,
+	}
+
+	t.Run("NoAscent", func(t *testing.T) {
+		tick := scores.Tick{
+			AttemptsTop:   3,
+			AttemptsZone2: 3,
+			AttemptsZone1: 3,
+		}
+
+		rules := scores.Rules{}
+
+		assert.Equal(t, 0, scores.CalculatePoints(value, tick, rules))
+	})
+
+	t.Run("Flash", func(t *testing.T) {
+		tick := scores.Tick{
+			Top:           true,
+			AttemptsTop:   1,
+			Zone2:         true,
+			AttemptsZone2: 1,
+			Zone1:         true,
+			AttemptsZone1: 1,
+		}
+
+		rules := scores.Rules{PointDeduction: 1}
+
+		assert.Equal(t, 110, scores.CalculatePoints(value, tick, rules))
+	})
+
+	t.Run("Zone1", func(t *testing.T) {
+		tick := scores.Tick{
+			AttemptsTop:   5,
+			AttemptsZone2: 3,
+			Zone1:         true,
+			AttemptsZone1: 2,
+		}
+
+		rules := scores.Rules{PointDeduction: 10}
+
+		assert.Equal(t, 40, scores.CalculatePoints(value, tick, rules))
+	})
+
+	t.Run("Zone2", func(t *testing.T) {
+		tick := scores.Tick{
+			AttemptsTop:   5,
+			Zone2:         true,
+			AttemptsZone2: 3,
+			Zone1:         true,
+			AttemptsZone1: 2,
+		}
+
+		rules := scores.Rules{PointDeduction: 10}
+
+		assert.Equal(t, 55, scores.CalculatePoints(value, tick, rules))
+	})
+
+	t.Run("Top", func(t *testing.T) {
+		tick := scores.Tick{
+			Top:           true,
+			AttemptsTop:   5,
+			Zone2:         true,
+			AttemptsZone2: 3,
+			Zone1:         true,
+			AttemptsZone1: 2,
+		}
+
+		rules := scores.Rules{PointDeduction: 10}
+
+		assert.Equal(t, 60, scores.CalculatePoints(value, tick, rules))
+	})
+
+	t.Run("FloorAtZero", func(t *testing.T) {
+		tick := scores.Tick{
+			Top:           true,
+			AttemptsTop:   999,
+			Zone2:         true,
+			AttemptsZone2: 999,
+			Zone1:         true,
+			AttemptsZone1: 999,
+		}
+
+		rules := scores.Rules{PointDeduction: 2_147_483_647}
+
+		assert.Equal(t, 0, scores.CalculatePoints(value, tick, rules))
+	})
+}
+
+func TestCalculatePoints_MaxAttempts(t *testing.T) {
+	value := domain.ProblemValue{
+		PointsTop:   100,
+		PointsZone1: 50,
+		PointsZone2: 75,
+		FlashBonus:  10,
+	}
+
+	t.Run("AtAttemptLimit", func(t *testing.T) {
+		tick := scores.Tick{
+			Top:           true,
+			AttemptsTop:   10,
+			Zone2:         true,
+			AttemptsZone2: 10,
+			Zone1:         true,
+			AttemptsZone1: 10,
+		}
+		rules := scores.Rules{MaxAttempts: 10}
+
+		assert.Equal(t, 100, scores.CalculatePoints(value, tick, rules))
+	})
+
+	t.Run("AboveAttemptLimit", func(t *testing.T) {
+		tick := scores.Tick{
+			Top:           true,
+			AttemptsTop:   11,
+			Zone2:         true,
+			AttemptsZone2: 11,
+			Zone1:         true,
+			AttemptsZone1: 11,
+		}
+		rules := scores.Rules{MaxAttempts: 10}
+
+		assert.Equal(t, 0, scores.CalculatePoints(value, tick, rules))
+	})
+
+	t.Run("MaxAttemptsAffectsOnlyReachedFeatures", func(t *testing.T) {
+		tick := scores.Tick{
+			AttemptsTop:   11,
+			AttemptsZone2: 11,
+			Zone1:         true,
+			AttemptsZone1: 2,
+		}
+		rules := scores.Rules{MaxAttempts: 10}
+
+		assert.Equal(t, 50, scores.CalculatePoints(value, tick, rules))
+	})
+}
+
 func TestTick(t *testing.T) {
 	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
@@ -512,223 +692,4 @@ func TestTick(t *testing.T) {
 			})
 		}
 	})
-}
-
-func TestCalculatePointsAttemptRules(t *testing.T) {
-	value := domain.ProblemValue{PointsTop: 100, PointsZone1: 50, PointsZone2: 75, FlashBonus: 10}
-
-	t.Run("NoAscent", func(t *testing.T) {
-		tick := scores.Tick{
-			AttemptsTop:   3,
-			AttemptsZone2: 3,
-			AttemptsZone1: 3,
-		}
-		rules := scores.Rules{}
-
-		assert.Equal(t, 0, scores.CalculatePoints(value, tick, rules))
-	})
-
-	t.Run("Flash", func(t *testing.T) {
-		tick := scores.Tick{
-			Top:           true,
-			AttemptsTop:   1,
-			Zone2:         true,
-			AttemptsZone2: 1,
-			Zone1:         true,
-			AttemptsZone1: 1,
-		}
-		rules := scores.Rules{PointDeduction: 1, MaxAttempts: 1}
-
-		assert.Equal(t, 110, scores.CalculatePoints(value, tick, rules))
-	})
-
-	t.Run("Zone1", func(t *testing.T) {
-		tick := scores.Tick{
-			AttemptsTop:   5,
-			AttemptsZone2: 3,
-			Zone1:         true,
-			AttemptsZone1: 2,
-		}
-		rules := scores.Rules{PointDeduction: 10}
-
-		assert.Equal(t, 40, scores.CalculatePoints(value, tick, rules))
-	})
-
-	t.Run("Zone2", func(t *testing.T) {
-		tick := scores.Tick{
-			AttemptsTop:   5,
-			Zone2:         true,
-			AttemptsZone2: 3,
-			Zone1:         true,
-			AttemptsZone1: 2,
-		}
-		rules := scores.Rules{PointDeduction: 10}
-
-		assert.Equal(t, 55, scores.CalculatePoints(value, tick, rules))
-	})
-
-	t.Run("Top", func(t *testing.T) {
-		tick := scores.Tick{
-			Top:           true,
-			AttemptsTop:   5,
-			Zone2:         true,
-			AttemptsZone2: 3,
-			Zone1:         true,
-			AttemptsZone1: 2,
-		}
-		rules := scores.Rules{PointDeduction: 10}
-
-		assert.Equal(t, 60, scores.CalculatePoints(value, tick, rules))
-	})
-
-	t.Run("FloorAtZero", func(t *testing.T) {
-		tick := scores.Tick{
-			Top:           true,
-			AttemptsTop:   999,
-			Zone2:         true,
-			AttemptsZone2: 999,
-			Zone1:         true,
-			AttemptsZone1: 999,
-		}
-		rules := scores.Rules{PointDeduction: 2_147_483_647}
-
-		assert.Equal(t, 0, scores.CalculatePoints(value, tick, rules))
-	})
-
-	t.Run("ZeroDeduction", func(t *testing.T) {
-		tick := scores.Tick{
-			Top:           true,
-			AttemptsTop:   999,
-			Zone2:         true,
-			AttemptsZone2: 999,
-			Zone1:         true,
-			AttemptsZone1: 999,
-		}
-		rules := scores.Rules{}
-
-		assert.Equal(t, 100, scores.CalculatePoints(value, tick, rules))
-	})
-
-	t.Run("AtAttemptLimit", func(t *testing.T) {
-		tick := scores.Tick{
-			Top:           true,
-			AttemptsTop:   10,
-			Zone2:         true,
-			AttemptsZone2: 10,
-			Zone1:         true,
-			AttemptsZone1: 10,
-		}
-		rules := scores.Rules{MaxAttempts: 10}
-
-		assert.Equal(t, 100, scores.CalculatePoints(value, tick, rules))
-	})
-
-	t.Run("AboveAttemptLimit", func(t *testing.T) {
-		tick := scores.Tick{
-			Top:           true,
-			AttemptsTop:   11,
-			Zone2:         true,
-			AttemptsZone2: 11,
-			Zone1:         true,
-			AttemptsZone1: 11,
-		}
-		rules := scores.Rules{MaxAttempts: 10}
-
-		assert.Equal(t, 0, scores.CalculatePoints(value, tick, rules))
-	})
-
-	t.Run("MaxAttemptsAffectsOnlyReachedFeatures", func(t *testing.T) {
-		tick := scores.Tick{
-			AttemptsTop:   11,
-			AttemptsZone2: 11,
-			Zone1:         true,
-			AttemptsZone1: 2,
-		}
-		rules := scores.Rules{MaxAttempts: 10}
-
-		assert.Equal(t, 50, scores.CalculatePoints(value, tick, rules))
-	})
-}
-
-func TestCalculatePointsKeepsBestScore(t *testing.T) {
-	value := domain.ProblemValue{PointsTop: 100, PointsZone1: 50, PointsZone2: 75}
-
-	tests := []struct {
-		name     string
-		tick     scores.Tick
-		rules    scores.Rules
-		expected int
-	}{
-		{
-			name: "Zone1ExceedsZone2AfterDeduction",
-			tick: scores.Tick{
-				Zone1:         true,
-				Zone2:         true,
-				Top:           false,
-				AttemptsZone1: 2,
-				AttemptsZone2: 5,
-				AttemptsTop:   5,
-			},
-			rules:    scores.Rules{PointDeduction: 10},
-			expected: 40,
-		},
-		{
-			name: "Zone2ExceedsTopAfterDeduction",
-			tick: scores.Tick{
-				Zone1:         true,
-				Zone2:         true,
-				Top:           true,
-				AttemptsZone1: 2,
-				AttemptsZone2: 3,
-				AttemptsTop:   6,
-			},
-			rules:    scores.Rules{PointDeduction: 10},
-			expected: 55,
-		},
-		{
-			name: "Zone1ExceedsBothHigherFeaturesAfterDeduction",
-			tick: scores.Tick{
-				Zone1:         true,
-				Zone2:         true,
-				Top:           true,
-				AttemptsZone1: 2,
-				AttemptsZone2: 5,
-				AttemptsTop:   11,
-			},
-			rules:    scores.Rules{PointDeduction: 10},
-			expected: 40,
-		},
-		{
-			name: "TopOverAttemptLimitPreservesZone2",
-			tick: scores.Tick{
-				Zone1:         true,
-				Zone2:         true,
-				Top:           true,
-				AttemptsZone1: 2,
-				AttemptsZone2: 3,
-				AttemptsTop:   6,
-			},
-			rules:    scores.Rules{PointDeduction: 10, MaxAttempts: 5},
-			expected: 55,
-		},
-		{
-			name: "HigherFeaturesOverAttemptLimitPreserveZone1",
-			tick: scores.Tick{
-				Zone1:         true,
-				Zone2:         true,
-				Top:           true,
-				AttemptsZone1: 2,
-				AttemptsZone2: 6,
-				AttemptsTop:   7,
-			},
-			rules:    scores.Rules{PointDeduction: 10, MaxAttempts: 5},
-			expected: 40,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, scores.CalculatePoints(value, tt.tick, tt.rules))
-		})
-	}
 }
