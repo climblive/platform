@@ -1,4 +1,8 @@
 <script lang="ts">
+  import {
+    type WaAfterHideEvent,
+    type WaHideEvent,
+  } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
@@ -105,6 +109,8 @@
     onchange={handleSelect}
     {@attach value(selectedOrganizerId)}
     hint="Select one of the other organizers you belong to."
+    onwa-hide={(event: WaHideEvent) => event.stopPropagation()}
+    onwa-after-hide={(event: WaAfterHideEvent) => event.stopPropagation()}
   >
     {#each otherOrganizers as organizer (organizer.id)}
       <wa-option value={organizer.id}>{organizer.name}</wa-option>
