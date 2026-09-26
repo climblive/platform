@@ -70,6 +70,8 @@ type Contest struct {
 	Finalists            int           `json:"finalists"`
 	UsePoints            bool          `json:"usePoints"`
 	PooledPoints         bool          `json:"pooledPoints"`
+	MaxAttempts          int           `json:"maxAttempts"`
+	PointDeduction       int           `json:"pointDeduction"`
 	Info                 string        `json:"info,omitzero"`
 	GracePeriod          time.Duration `json:"gracePeriod"`
 	NameRetentionTime    time.Duration `json:"nameRetentionTime"`
@@ -89,6 +91,8 @@ type ContestTemplate struct {
 	Finalists          int           `json:"finalists"`
 	UsePoints          bool          `json:"usePoints"`
 	PooledPoints       bool          `json:"pooledPoints"`
+	MaxAttempts        int           `json:"maxAttempts"`
+	PointDeduction     int           `json:"pointDeduction"`
 	Info               string        `json:"info,omitzero"`
 	GracePeriod        time.Duration `json:"gracePeriod"`
 	NameRetentionTime  time.Duration `json:"nameRetentionTime"`
@@ -104,6 +108,8 @@ type ContestPatch struct {
 	Finalists          Patch[int]           `json:"finalists,omitzero" tstype:"number"`
 	UsePoints          Patch[bool]          `json:"usePoints,omitzero" tstype:"boolean"`
 	PooledPoints       Patch[bool]          `json:"pooledPoints,omitzero" tstype:"boolean"`
+	MaxAttempts        Patch[int]           `json:"maxAttempts,omitzero" tstype:"number"`
+	PointDeduction     Patch[int]           `json:"pointDeduction,omitzero" tstype:"number"`
 	Info               Patch[string]        `json:"info,omitzero" tstype:"string"`
 	GracePeriod        Patch[time.Duration] `json:"gracePeriod,omitzero" tstype:"number"`
 }
@@ -332,6 +338,8 @@ type RulesUpdatedEvent struct {
 	Finalists          int       `json:"finalists"`
 	UsePoints          bool      `json:"usePoints"`
 	PooledPoints       bool      `json:"pooledPoints"`
+	MaxAttempts        int       `json:"maxAttempts"`
+	PointDeduction     int       `json:"pointDeduction"`
 }
 
 type ContenderPublicInfoUpdatedEvent struct {

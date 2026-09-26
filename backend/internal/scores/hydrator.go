@@ -30,6 +30,8 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 		Finalists:          contest.Finalists,
 		UsePoints:          contest.UsePoints,
 		PooledPoints:       contest.PooledPoints,
+		MaxAttempts:        contest.MaxAttempts,
+		PointDeduction:     contest.PointDeduction,
 	})
 
 	problems, err := h.Repo.GetProblemsByContest(ctx, nil, contestID)

@@ -8,6 +8,8 @@ import (
 	"testing/synctest"
 	"time"
 
+	"uuid"
+
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/testutils"
 	"github.com/climblive/platform/backend/internal/usecases"
@@ -15,7 +17,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"uuid"
 )
 
 func TestGetContest(t *testing.T) {
@@ -368,6 +369,8 @@ func TestCreateContest(t *testing.T) {
 						Finalists:          7,
 						UsePoints:          true,
 						PooledPoints:       true,
+						MaxAttempts:        5,
+						PointDeduction:     2,
 						Info:               "No rules!",
 						GracePeriod:        time.Hour,
 						Created:            time.Now(),
@@ -386,6 +389,8 @@ func TestCreateContest(t *testing.T) {
 					Finalists:          7,
 					UsePoints:          true,
 					PooledPoints:       true,
+					MaxAttempts:        5,
+					PointDeduction:     2,
 					Info:               "No rules!",
 					GracePeriod:        time.Hour,
 					Created:            time.Now(),
@@ -406,6 +411,8 @@ func TestCreateContest(t *testing.T) {
 				Finalists:          7,
 				UsePoints:          true,
 				PooledPoints:       true,
+				MaxAttempts:        5,
+				PointDeduction:     2,
 				Info:               "No rules!",
 				GracePeriod:        time.Hour,
 				NameRetentionTime:  14 * 24 * time.Hour,
@@ -423,6 +430,8 @@ func TestCreateContest(t *testing.T) {
 			assert.Equal(t, 7, contest.Finalists)
 			assert.True(t, contest.UsePoints)
 			assert.True(t, contest.PooledPoints)
+			assert.Equal(t, 5, contest.MaxAttempts)
+			assert.Equal(t, 2, contest.PointDeduction)
 			assert.Equal(t, "No rules!", contest.Info)
 			assert.Equal(t, time.Hour, contest.GracePeriod)
 			assert.Empty(t, contest.TimeBegin)
@@ -667,6 +676,8 @@ func TestDuplicateContest(t *testing.T) {
 		Finalists:          7,
 		UsePoints:          true,
 		PooledPoints:       true,
+		MaxAttempts:        5,
+		PointDeduction:     2,
 		Info:               "No rules!",
 		GracePeriod:        time.Hour,
 		TimeBegin:          timeBegin,
@@ -788,6 +799,8 @@ func TestDuplicateContest(t *testing.T) {
 		assert.Equal(t, 7, duplicatedContest.Finalists)
 		assert.True(t, duplicatedContest.UsePoints)
 		assert.True(t, duplicatedContest.PooledPoints)
+		assert.Equal(t, 5, duplicatedContest.MaxAttempts)
+		assert.Equal(t, 2, duplicatedContest.PointDeduction)
 		assert.Equal(t, "No rules!", duplicatedContest.Info)
 		assert.Equal(t, time.Hour, duplicatedContest.GracePeriod)
 		assert.Equal(t, timeBegin, duplicatedContest.TimeBegin)
@@ -881,6 +894,8 @@ func TestTransferContest(t *testing.T) {
 		Finalists:          6,
 		UsePoints:          true,
 		PooledPoints:       true,
+		MaxAttempts:        5,
+		PointDeduction:     2,
 		Info:               "Standard IFSC rules apply",
 		GracePeriod:        30 * time.Minute,
 		TimeBegin:          timeBegin,
@@ -1033,6 +1048,8 @@ func TestTransferContest(t *testing.T) {
 				Finalists:          6,
 				UsePoints:          true,
 				PooledPoints:       true,
+				MaxAttempts:        5,
+				PointDeduction:     2,
 				Info:               "Standard IFSC rules apply",
 				GracePeriod:        30 * time.Minute,
 				TimeBegin:          fakedContest.TimeBegin,
@@ -1273,6 +1290,8 @@ func TestPatchContest(t *testing.T) {
 					Finalists:          5,
 					UsePoints:          true,
 					PooledPoints:       true,
+					MaxAttempts:        5,
+					PointDeduction:     2,
 					Info:               "No rules!",
 					GracePeriod:        time.Hour,
 					NameRetentionTime:  14 * 24 * time.Hour,
@@ -1290,6 +1309,8 @@ func TestPatchContest(t *testing.T) {
 				Finalists:          5,
 				UsePoints:          true,
 				PooledPoints:       true,
+				MaxAttempts:        5,
+				PointDeduction:     2,
 				Info:               "No rules!",
 				GracePeriod:        time.Hour,
 				NameRetentionTime:  14 * 24 * time.Hour,
@@ -1302,6 +1323,8 @@ func TestPatchContest(t *testing.T) {
 				Finalists:          5,
 				UsePoints:          true,
 				PooledPoints:       true,
+				MaxAttempts:        5,
+				PointDeduction:     2,
 			}).
 			Return(nil)
 
@@ -1321,6 +1344,8 @@ func TestPatchContest(t *testing.T) {
 			Finalists:          domain.NewPatch(5),
 			UsePoints:          domain.NewPatch(true),
 			PooledPoints:       domain.NewPatch(true),
+			MaxAttempts:        domain.NewPatch(5),
+			PointDeduction:     domain.NewPatch(2),
 			Info:               domain.NewPatch("No rules!"),
 			GracePeriod:        domain.NewPatch(time.Hour),
 		}
@@ -1337,6 +1362,8 @@ func TestPatchContest(t *testing.T) {
 		assert.Equal(t, 5, contest.Finalists)
 		assert.True(t, contest.UsePoints)
 		assert.True(t, contest.PooledPoints)
+		assert.Equal(t, 5, contest.MaxAttempts)
+		assert.Equal(t, 2, contest.PointDeduction)
 		assert.Equal(t, "No rules!", contest.Info)
 		assert.Equal(t, time.Hour, contest.GracePeriod)
 		assert.Equal(t, 14*24*time.Hour, contest.NameRetentionTime)

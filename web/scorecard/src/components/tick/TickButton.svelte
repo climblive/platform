@@ -3,23 +3,29 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   type Props = {
     onClick: () => void;
-    iconName?: string;
+    iconName: string;
     label: string;
     points?: number;
     bonusPoints?: number;
     disabled?: boolean;
+    reached?: boolean;
   };
 
   const {
     onClick,
     iconName,
     label,
-    points = 0,
+    points,
     bonusPoints,
     disabled,
+    reached = false,
   }: Props = $props();
 
   const pointsLabel = $derived.by(() => {
+    if (points === undefined) {
+      return "-";
+    }
+
     if (bonusPoints) {
       return `${points}p + ${bonusPoints}p`;
     }
@@ -31,13 +37,13 @@
 <div>
   <wa-button
     size="s"
-    appearance="outlined"
+    appearance={reached ? "filled-outlined" : "outlined"}
     onclick={onClick}
     {disabled}
     pill
-    variant="neutral"
+    variant={reached ? "success" : "neutral"}
   >
-    {#if iconName}
+    {#if reached}
       <wa-icon slot="start" name={iconName}></wa-icon>
     {/if}
     {label}

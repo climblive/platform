@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button-group/button-group.js";
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { CreateMutationResult } from "@tanstack/svelte-query";
@@ -66,32 +67,42 @@
 
     open = false;
   };
+
+  const flashed = $derived(tick?.top === true && tick.attemptsTop === 1);
+  const topped = $derived(tick?.top === true && !flashed);
+
+  const flashPossible = $derived.by(() => {
+    return tick?.zone1 !== true && tick?.zone2 !== true && tick?.top !== true;
+  });
 </script>
 
-<div class="horizontal">
+<wa-button-group label="Top or flash">
   <TickButton
     label="Top"
+    reached={topped}
     onClick={() => handleTick("top", false)}
     points={pointValue?.top}
-    disabled={putTick.isPending}
+    disabled={putTick.isPending || tick?.top === true}
     iconName="check"
   />
   <TickButton
     label="Flash"
+    reached={flashed}
     onClick={() => handleTick("top", true)}
-    points={pointValue?.top}
+    points={flashPossible || flashed ? pointValue?.top : undefined}
     bonusPoints={pointValue?.flashBonus}
-    disabled={putTick.isPending}
+    disabled={putTick.isPending || !flashPossible}
     iconName="bolt"
   />
-</div>
+</wa-button-group>
 
 {#if problem.zone2Enabled}
   <TickButton
     label="Zone 2"
+    reached={tick?.zone2}
     onClick={() => handleTick("zone2", false)}
     points={pointValue?.zone2}
-    disabled={putTick.isPending}
+    disabled={putTick.isPending || tick?.zone2 === true}
     iconName="check"
   />
 {/if}
@@ -99,17 +110,21 @@
 {#if problem.zone1Enabled}
   <TickButton
     label="Zone 1"
+    reached={tick?.zone1}
     onClick={() => handleTick("zone1", false)}
     points={pointValue?.zone1}
-    disabled={putTick.isPending}
+    disabled={putTick.isPending || tick?.zone1 === true}
     iconName="check"
   />
 {/if}
 
 <style>
-  .horizontal {
-    display: flex;
-    align-items: center;
-    gap: var(--wa-space-s);
+  wa-button-group {
+    width: 100%;
+
+    &::part(base) {
+      width: 100%;
+      flex-wrap: nowrap;
+    }
   }
 </style>

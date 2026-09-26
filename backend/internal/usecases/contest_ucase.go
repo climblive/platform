@@ -156,6 +156,8 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		Finalists:          contest.Finalists,
 		UsePoints:          contest.UsePoints,
 		PooledPoints:       contest.PooledPoints,
+		MaxAttempts:        contest.MaxAttempts,
+		PointDeduction:     contest.PointDeduction,
 	}
 
 	if patch.Location.Present {
@@ -194,6 +196,14 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		contest.PooledPoints = patch.PooledPoints.Value
 	}
 
+	if patch.MaxAttempts.Present {
+		contest.MaxAttempts = patch.MaxAttempts.Value
+	}
+
+	if patch.PointDeduction.Present {
+		contest.PointDeduction = patch.PointDeduction.Value
+	}
+
 	if patch.Info.Present {
 		contest.Info = sanitizationPolicy.Sanitize(patch.Info.Value)
 	}
@@ -216,6 +226,8 @@ func (uc *ContestUseCase) PatchContest(ctx context.Context, contestID domain.Con
 		Finalists:          contest.Finalists,
 		UsePoints:          contest.UsePoints,
 		PooledPoints:       contest.PooledPoints,
+		MaxAttempts:        contest.MaxAttempts,
+		PointDeduction:     contest.PointDeduction,
 	}
 
 	if event != rulesUpdateEventBaseline {
@@ -325,6 +337,8 @@ func (uc *ContestUseCase) CreateContest(ctx context.Context, organizerID domain.
 		Finalists:            tmpl.Finalists,
 		UsePoints:            tmpl.UsePoints,
 		PooledPoints:         tmpl.PooledPoints,
+		MaxAttempts:          tmpl.MaxAttempts,
+		PointDeduction:       tmpl.PointDeduction,
 		Info:                 sanitizationPolicy.Sanitize(tmpl.Info),
 		GracePeriod:          tmpl.GracePeriod,
 		NameRetentionTime:    tmpl.NameRetentionTime,

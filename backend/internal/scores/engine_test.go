@@ -56,6 +56,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Finalists:          7,
 			UsePoints:          true,
 			PooledPoints:       true,
+			MaxAttempts:        5,
+			PointDeduction:     10,
 		}).Return()
 
 		f.store.On("GetCompClassIDs").Return([]domain.CompClassID{
@@ -96,6 +98,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Finalists:          7,
 			UsePoints:          true,
 			PooledPoints:       true,
+			MaxAttempts:        5,
+			PointDeduction:     10,
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
@@ -1403,7 +1407,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Zone1:       10,
 				Zone2:       25,
 				Top:         166,
-				FlashBonus:  33,
+				FlashBonus:  0,
 			}).Return().
 			On("SavePointValue", fakedContender4ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender4ID,
@@ -1412,7 +1416,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Zone1:       10,
 				Zone2:       25,
 				Top:         125,
-				FlashBonus:  33,
+				FlashBonus:  0,
 			}).Return().
 			On("SavePointValue", fakedContender5ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender5ID,
@@ -1421,7 +1425,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Zone1:       10,
 				Zone2:       20,
 				Top:         125,
-				FlashBonus:  33,
+				FlashBonus:  0,
 			}).Return().
 			On("SavePointValue", fakedContender6ID, fakedProblemID, domain.PointValue{
 				ContenderID: fakedContender6ID,
@@ -2159,3 +2163,4 @@ func TestDefaultScoreEngine(t *testing.T) {
 		})
 	})
 }
+
