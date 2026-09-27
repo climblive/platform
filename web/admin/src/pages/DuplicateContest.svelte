@@ -1,7 +1,6 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
-  import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { duplicateContestMutation } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
@@ -11,25 +10,23 @@
   type Props = {
     contestId: number;
     contestName: string;
+    open?: boolean;
+    onClose?: () => void;
     children?: Snippet<[{ duplicateContest: () => void }]>;
   };
 
-  let dialog: WaDialog | undefined = $state();
+  let { contestId, contestName, children, onClose, ...rest }: Props = $props();
 
-  let { contestId, contestName, children }: Props = $props();
+  let open = $derived(rest.open);
 
   const duplicateContest = $derived(duplicateContestMutation(contestId));
 
-  const handleDuplication = async () => {
-    if (dialog) {
-      dialog.open = true;
-    }
+  const handleDuplication = () => {
+    open = true;
   };
 
   const handleCancel = () => {
-    if (dialog) {
-      dialog.open = false;
-    }
+    open = false;
   };
 
   const confirmDuplication = () => {
@@ -56,7 +53,14 @@
   </div>
 {/if}
 
-<wa-dialog bind:this={dialog} label="Duplicate competition">
+<wa-dialog
+  label="Duplicate competition"
+  {open}
+  onwa-after-hide={() => {
+    open = false;
+    onClose?.();
+  }}
+>
   You are about to create a copy of the competition <strong
     >{contestName}</strong
   >.<br /><br />
