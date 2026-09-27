@@ -337,6 +337,13 @@ func TestCalculatePooledProblemValue(t *testing.T) {
 		}, value)
 	})
 
+	t.Run("FractionalShare", func(t *testing.T) {
+		pool := scores.TickPool{Top: 3, Flash: 4}
+		value := pool.CalculatePooledProblemValue(domain.ProblemValue{PointsTop: 100, FlashBonus: 1})
+		assert.Equal(t, 33.3, value.PointsTop)
+		assert.Equal(t, 0.3, value.FlashBonus)
+	})
+
 	t.Run("EmptyPool", func(t *testing.T) {
 		pool := scores.TickPool{}
 
@@ -368,7 +375,7 @@ func TestCalculatePooledProblemValue(t *testing.T) {
 		assert.Empty(t, value)
 	})
 
-	t.Run("MinOnePoint", func(t *testing.T) {
+	t.Run("MinOneTenth", func(t *testing.T) {
 		pool := scores.TickPool{
 			Zone1: 1000,
 			Zone2: 1000,
@@ -384,10 +391,10 @@ func TestCalculatePooledProblemValue(t *testing.T) {
 		})
 
 		assert.Equal(t, domain.ProblemValue{
-			PointsZone1: 1,
-			PointsZone2: 1,
-			PointsTop:   1,
-			FlashBonus:  1,
+			PointsZone1: 0.1,
+			PointsZone2: 0.1,
+			PointsTop:   0.1,
+			FlashBonus:  0.1,
 		}, value)
 	})
 }

@@ -138,12 +138,14 @@
           const p1Max = Math.max(
             p1.pointValue.zone1,
             p1.pointValue.zone2,
-            p1.pointValue.top + p1.pointValue.flashBonus,
+            Math.round((p1.pointValue.top + p1.pointValue.flashBonus) * 10) /
+              10,
           );
           const p2Max = Math.max(
             p2.pointValue.zone1,
             p2.pointValue.zone2,
-            p2.pointValue.top + p2.pointValue.flashBonus,
+            Math.round((p2.pointValue.top + p2.pointValue.flashBonus) * 10) /
+              10,
           );
 
           if (p1Max === p2Max) {

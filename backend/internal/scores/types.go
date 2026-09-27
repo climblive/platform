@@ -7,7 +7,7 @@ import (
 )
 
 type Score struct {
-	Points         int
+	Points         float64
 	Tops           int
 	AttemptsTops   int
 	Zone1s         int
@@ -191,7 +191,7 @@ func (c TickPool) Sub(tick Tick) TickPool {
 }
 
 func (c TickPool) CalculatePooledProblemValue(value domain.ProblemValue) domain.ProblemValue {
-	weightedValue := func(value int, divisor int) int {
+	weightedValue := func(value float64, divisor int) float64 {
 		if divisor == 0 {
 			return value
 		}
@@ -200,7 +200,7 @@ func (c TickPool) CalculatePooledProblemValue(value domain.ProblemValue) domain.
 			return 0
 		}
 
-		return max(1, value/divisor)
+		return max(0.1, roundPoints(value/float64(divisor)))
 	}
 
 	return domain.ProblemValue{

@@ -617,7 +617,7 @@ type GetContestsCurrentlyRunningOrByStartTimeRow struct {
 	UsePoints          bool
 	PooledPoints       bool
 	MaxAttempts        int32
-	PointDeduction     int32
+	PointDeduction     float64
 	Info               sql.NullString
 	GracePeriod        int32
 	NameRetentionTime  int32
@@ -1451,7 +1451,7 @@ type UpsertContestParams struct {
 	UsePoints          bool
 	PooledPoints       bool
 	MaxAttempts        int32
-	PointDeduction     int32
+	PointDeduction     float64
 	Info               sql.NullString
 	GracePeriod        int32
 	NameRetentionTime  int32

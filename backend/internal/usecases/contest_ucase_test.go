@@ -431,7 +431,7 @@ func TestCreateContest(t *testing.T) {
 			assert.True(t, contest.UsePoints)
 			assert.True(t, contest.PooledPoints)
 			assert.Equal(t, 5, contest.MaxAttempts)
-			assert.Equal(t, 2, contest.PointDeduction)
+			assert.Equal(t, 2.0, contest.PointDeduction)
 			assert.Equal(t, "No rules!", contest.Info)
 			assert.Equal(t, time.Hour, contest.GracePeriod)
 			assert.Empty(t, contest.TimeBegin)
@@ -800,7 +800,7 @@ func TestDuplicateContest(t *testing.T) {
 		assert.True(t, duplicatedContest.UsePoints)
 		assert.True(t, duplicatedContest.PooledPoints)
 		assert.Equal(t, 5, duplicatedContest.MaxAttempts)
-		assert.Equal(t, 2, duplicatedContest.PointDeduction)
+		assert.Equal(t, 2.0, duplicatedContest.PointDeduction)
 		assert.Equal(t, "No rules!", duplicatedContest.Info)
 		assert.Equal(t, time.Hour, duplicatedContest.GracePeriod)
 		assert.Equal(t, timeBegin, duplicatedContest.TimeBegin)
@@ -1345,7 +1345,7 @@ func TestPatchContest(t *testing.T) {
 			UsePoints:          domain.NewPatch(true),
 			PooledPoints:       domain.NewPatch(true),
 			MaxAttempts:        domain.NewPatch(5),
-			PointDeduction:     domain.NewPatch(2),
+			PointDeduction:     domain.NewPatch(2.0),
 			Info:               domain.NewPatch("No rules!"),
 			GracePeriod:        domain.NewPatch(time.Hour),
 		}
@@ -1363,7 +1363,7 @@ func TestPatchContest(t *testing.T) {
 		assert.True(t, contest.UsePoints)
 		assert.True(t, contest.PooledPoints)
 		assert.Equal(t, 5, contest.MaxAttempts)
-		assert.Equal(t, 2, contest.PointDeduction)
+		assert.Equal(t, 2.0, contest.PointDeduction)
 		assert.Equal(t, "No rules!", contest.Info)
 		assert.Equal(t, time.Hour, contest.GracePeriod)
 		assert.Equal(t, 14*24*time.Hour, contest.NameRetentionTime)

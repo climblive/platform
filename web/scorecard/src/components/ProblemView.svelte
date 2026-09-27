@@ -33,7 +33,7 @@
 
       const { zone1, zone2, top, flashBonus } = problem.pointValue;
 
-      const values = [zone1, zone2, top + flashBonus];
+      const values = [zone1, zone2, Math.round((top + flashBonus) * 10) / 10];
 
       return { min: Math.min(...values), max: Math.max(...values) };
     },

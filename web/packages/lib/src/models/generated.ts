@@ -88,7 +88,7 @@ export interface Contest {
   usePoints: boolean;
   pooledPoints: boolean;
   maxAttempts: number /* int */;
-  pointDeduction: number /* int */;
+  pointDeduction: number /* float64 */;
   info?: string;
   gracePeriod: number;
   nameRetentionTime: number;
@@ -108,7 +108,7 @@ export interface ContestTemplate {
   usePoints: boolean;
   pooledPoints: boolean;
   maxAttempts: number /* int */;
-  pointDeduction: number /* int */;
+  pointDeduction: number /* float64 */;
   info?: string;
   gracePeriod: number;
   nameRetentionTime: number;
@@ -148,19 +148,19 @@ export interface OrganizerInvite {
   expiresAt: Date;
 }
 export interface ProblemValue {
-  pointsZone1?: number /* int */;
-  pointsZone2?: number /* int */;
-  pointsTop: number /* int */;
-  flashBonus?: number /* int */;
+  pointsZone1?: number /* float64 */;
+  pointsZone2?: number /* float64 */;
+  pointsTop: number /* float64 */;
+  flashBonus?: number /* float64 */;
 }
 export interface PointValue {
   contenderId: ContenderID;
   problemId: ProblemID;
-  current: number /* int */;
-  zone1: number /* int */;
-  zone2: number /* int */;
-  top: number /* int */;
-  flashBonus: number /* int */;
+  current: number /* float64 */;
+  zone1: number /* float64 */;
+  zone2: number /* float64 */;
+  top: number /* float64 */;
+  flashBonus: number /* float64 */;
 }
 export interface Problem extends ProblemValue {
   id: ProblemID;
@@ -310,7 +310,7 @@ export interface RulesUpdatedEvent {
   usePoints: boolean;
   pooledPoints: boolean;
   maxAttempts: number /* int */;
-  pointDeduction: number /* int */;
+  pointDeduction: number /* float64 */;
 }
 export interface ContenderPublicInfoUpdatedEvent {
   contenderId: ContenderID;
@@ -331,11 +331,11 @@ export interface ContenderScoreUpdatedEvent {
 export interface PointValueUpdatedEvent {
   contenderId: ContenderID;
   problemId: ProblemID;
-  current: number /* int */;
-  zone1: number /* int */;
-  zone2: number /* int */;
-  top: number /* int */;
-  flashBonus: number /* int */;
+  current: number /* float64 */;
+  zone1: number /* float64 */;
+  zone2: number /* float64 */;
+  top: number /* float64 */;
+  flashBonus: number /* float64 */;
 }
 export interface ScoreEngineStartedEvent {
   instanceId: ScoreEngineInstanceID;
