@@ -1,11 +1,5 @@
 @import url("@climblive/lib/theme.css");
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
   font-family: var(--wa-font-family-body);
   color: var(--wa-color-text-normal);
@@ -54,6 +48,32 @@ h1 {
 
 .features-section {
   padding-block: var(--wa-space-4xl);
+
+  .feature-card > * {
+    text-align: center;
+  }
+
+  .feature-icon {
+    margin-bottom: var(--wa-space-l);
+    color: var(--wa-color-brand-fill-loud);
+    font-size: var(--wa-font-size-3xl);
+  }
+
+  .feature-title {
+    margin-bottom: var(--wa-space-m);
+    font-size: var(--wa-font-size-l);
+    font-weight: var(--wa-font-weight-semibold);
+  }
+}
+
+wa-carousel {
+  --aspect-ratio: auto;
+}
+
+wa-carousel-item > wa-card {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .section-title {
@@ -64,30 +84,41 @@ h1 {
   font-weight: var(--wa-font-weight-heading);
 }
 
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
-  gap: var(--wa-space-xl);
-}
+.rules-section {
+  padding-block: var(--wa-space-4xl);
+  background-color: var(--wa-color-surface-lowered);
 
-.feature-card {
-  background: var(--wa-color-surface-raised);
-  padding: var(--wa-space-xl);
-  border-radius: var(--wa-border-radius-m);
-  box-shadow: var(--wa-shadow-m);
-  text-align: center;
-}
+  .rules-intro {
+    max-width: 680px;
+    margin: 0 auto var(--wa-space-3xl);
+    text-align: center;
+  }
 
-.feature-icon {
-  font-size: var(--wa-font-size-3xl);
-  color: var(--wa-color-brand-fill-loud);
-  margin-bottom: var(--wa-space-l);
-}
+  .rule-card h3 {
+    margin-bottom: var(--wa-space-m);
+    font-size: var(--wa-font-size-l);
+    font-weight: var(--wa-font-weight-semibold);
+  }
 
-.feature-title {
-  font-size: var(--wa-font-size-l);
-  margin-bottom: var(--wa-space-m);
-  font-weight: var(--wa-font-weight-semibold);
+  .rule-card-heading {
+    margin-bottom: var(--wa-space-m);
+
+    h3 {
+      margin-bottom: var(--wa-space-xs);
+    }
+  }
+
+  .ranking-card p + p {
+    margin-top: var(--wa-space-m);
+  }
+
+  .rule-note {
+    margin-top: var(--wa-space-l);
+
+    strong {
+      color: var(--wa-color-brand-fill-loud);
+    }
+  }
 }
 
 .description-section {
@@ -140,8 +171,6 @@ blockquote {
   background-color: var(--wa-color-surface-raised);
   border-radius: var(--wa-border-radius-m);
   box-shadow: var(--wa-shadow-m);
-  border-left: calc(var(--wa-border-width-l) * 2) var(--wa-border-style)
-    var(--wa-color-brand-fill-loud);
   text-align: left;
 }
 
@@ -185,10 +214,6 @@ blockquote::before {
   }
 
   .cta-container {
-    grid-template-columns: 1fr;
-  }
-
-  .features-grid {
     grid-template-columns: 1fr;
   }
 

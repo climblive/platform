@@ -140,53 +140,168 @@
 
     <section class="features-section">
       <div class="sales-container">
-        <h2 class="section-title">Feature Overview</h2>
-        <div class="features-grid">
-          <div class="feature-card">
-            <div class="feature-icon">📱</div>
-            <h3 class="feature-title">Web App for Self-Scoring</h3>
-            <p>
-              Simple and intuitive interface for competitors to record their own
-              scores.
-            </p>
-          </div>
+        <h2 id="feature-overview-title" class="section-title">
+          Feature Overview
+        </h2>
+        <wa-carousel
+          class="feature-carousel"
+          aria-labelledby="feature-overview-title"
+          navigation
+          pagination
+          mouse-dragging
+          slides-per-page="1"
+        >
+          <wa-carousel-item>
+            <wa-card class="feature-card">
+              <div class="feature-icon">📱</div>
+              <h3 class="feature-title">Web App for Self-Scoring</h3>
+              <p>
+                Simple and intuitive interface for competitors to record their
+                own scores.
+              </p>
+            </wa-card>
+          </wa-carousel-item>
 
-          <div class="feature-card">
-            <div class="feature-icon">👻</div>
-            <h3 class="feature-title">No Account Required</h3>
-            <p>
-              Competitors can participate without going through the hassle of
-              creating a user account.
-            </p>
-          </div>
+          <wa-carousel-item>
+            <wa-card class="feature-card">
+              <div class="feature-icon">👻</div>
+              <h3 class="feature-title">No Account Required</h3>
+              <p>
+                Competitors can participate without going through the hassle of
+                creating a user account.
+              </p>
+            </wa-card>
+          </wa-carousel-item>
 
-          <div class="feature-card">
-            <div class="feature-icon">⚡</div>
-            <h3 class="feature-title">Live Results</h3>
-            <p>
-              See competition standing updates in real-time without refreshing
-              the page.
-            </p>
-          </div>
+          <wa-carousel-item>
+            <wa-card class="feature-card">
+              <div class="feature-icon">⚡</div>
+              <h3 class="feature-title">Live Results</h3>
+              <p>
+                See competition standing updates in real-time without refreshing
+                the page.
+              </p>
+            </wa-card>
+          </wa-carousel-item>
 
-          <div class="feature-card">
-            <div class="feature-icon">🎁</div>
-            <h3 class="feature-title">Prize Raffles</h3>
-            <p>
-              Easily organize and manage prize raffles for your competition
-              participants.
-            </p>
-          </div>
+          <wa-carousel-item>
+            <wa-card class="feature-card">
+              <div class="feature-icon">🎁</div>
+              <h3 class="feature-title">Prize Raffles</h3>
+              <p>
+                Easily organize and manage prize raffles for your competition
+                participants.
+              </p>
+            </wa-card>
+          </wa-carousel-item>
 
-          <div class="feature-card">
-            <div class="feature-icon">🎨</div>
-            <h3 class="feature-title">Hold Color Tracking</h3>
-            <p>
-              Clear identification of hold colors on problems to avoid mix-ups
-              during the competition.
-            </p>
-          </div>
-        </div>
+          <wa-carousel-item>
+            <wa-card class="feature-card">
+              <div class="feature-icon">🎨</div>
+              <h3 class="feature-title">Hold Color Tracking</h3>
+              <p>
+                Clear identification of hold colors on problems to avoid mix-ups
+                during the competition.
+              </p>
+            </wa-card>
+          </wa-carousel-item>
+        </wa-carousel>
+      </div>
+    </section>
+
+    <section class="rules-section">
+      <div class="sales-container">
+        <h2 id="scoring-rules-title" class="section-title">
+          Flexible Scoring Rules
+        </h2>
+        <p class="rules-intro">
+          Choose the point-based rules that fit your bouldering competition. Use
+          these options individually or combine them to shape how scores are
+          calculated.
+        </p>
+        <wa-carousel
+          class="rules-carousel"
+          aria-labelledby="scoring-rules-title"
+          navigation
+          pagination
+          mouse-dragging
+          slides-per-page="1"
+        >
+          <wa-carousel-item>
+            <wa-card class="rule-card ranking-card">
+              <h3>Ranking format</h3>
+              <p>
+                <strong>Points:</strong> Competitors are ranked based on the
+                total points scored across all problems.
+              </p>
+              <p>
+                <strong>Attempts:</strong> Competitors are ranked based on the
+                number of attempts needed to complete problems.
+              </p>
+            </wa-card>
+          </wa-carousel-item>
+
+          <wa-carousel-item>
+            <wa-card class="rule-card">
+              <h3>Problem limit</h3>
+              <p>
+                Only count the hardest problems towards each competitor's total
+                score. Set the limit to decide how many problems count.
+              </p>
+            </wa-card>
+          </wa-carousel-item>
+
+          <wa-carousel-item>
+            <wa-card class="rule-card">
+              <div class="rule-card-heading">
+                <h3>Pooled points</h3>
+                <div>
+                  <wa-badge pill variant="neutral">New</wa-badge>
+                </div>
+              </div>
+              <p>
+                Points for completed problems and zones are split by
+                percentages. A boulder worth 1000 points with two tops will give
+                each competitor 500 points. If a third competitor also tops the
+                boulder, then all three will receive 333 points instead. Minimum
+                point value is 1 point.
+              </p>
+            </wa-card>
+          </wa-carousel-item>
+
+          <wa-carousel-item>
+            <wa-card class="rule-card">
+              <div class="rule-card-heading">
+                <h3>Max attempts</h3>
+                <div>
+                  <wa-badge pill variant="neutral">Beta</wa-badge>
+                </div>
+              </div>
+              <p>
+                Each competitor has a fixed number of attempts per problem.
+                Attempts above that limit yield 0 points for that problem.
+              </p>
+            </wa-card>
+          </wa-carousel-item>
+
+          <wa-carousel-item>
+            <wa-card class="rule-card">
+              <div class="rule-card-heading">
+                <h3>Point deduction</h3>
+                <wa-badge pill variant="neutral">IFSC</wa-badge>
+                <wa-badge pill variant="neutral">Beta</wa-badge>
+              </div>
+              <p>
+                Deduct points for each failed attempt before reaching the scored
+                top or zone. The score cannot fall below 0.
+              </p>
+              <p class="rule-note">
+                <strong>Note:</strong> Decimal point deductions are not
+                supported yet.
+              </p>
+            </wa-card>
+          </wa-carousel-item>
+        </wa-carousel>
       </div>
     </section>
 
