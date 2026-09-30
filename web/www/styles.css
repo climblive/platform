@@ -84,7 +84,6 @@ body {
 
 wa-carousel {
   --aspect-ratio: auto;
-  --scroll-hint: 10%;
 }
 
 wa-carousel-item > wa-card {
@@ -141,32 +140,30 @@ wa-carousel-item > wa-card {
     margin: 0 auto;
   }
 
-  blockquote {
-    font-style: italic;
-    margin: var(--wa-space-3xl) auto;
-    position: relative;
-    padding: var(--wa-space-3xl) var(--wa-space-4xl);
-    background-color: var(--wa-color-surface-raised);
-    border-radius: var(--wa-border-radius-m);
-    box-shadow: var(--wa-shadow-m);
+  wa-card {
+    margin-block: var(--wa-space-3xl);
 
-    p {
+    blockquote {
+      font-style: italic;
+      position: relative;
       margin: 0;
+      padding-left: var(--wa-space-2xl);
+
+      &::before {
+        content: '"';
+        font-size: var(--wa-font-size-4xl);
+        color: var(--wa-color-brand-fill-loud);
+        position: absolute;
+        top: 0;
+        left: 0;
+        line-height: 1;
+      }
     }
 
-    &::before {
-      content: '"';
-      font-size: var(--wa-font-size-4xl);
-      color: var(--wa-color-brand-fill-loud);
-      position: absolute;
-      top: var(--wa-space-l);
-      left: var(--wa-space-m);
-      line-height: 1;
+    .author {
+      margin: var(--wa-space-l) 0 0;
+      padding-left: var(--wa-space-2xl);
     }
-  }
-
-  .author {
-    padding-left: var(--wa-space-xl);
 
     & + wa-button {
       margin-top: var(--wa-space-2xl);
