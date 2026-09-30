@@ -93,7 +93,7 @@ wa-carousel-item > wa-card {
 }
 
 .section-title {
-  margin-bottom: var(--wa-space-4xl);
+  margin-bottom: var(--wa-space-2xl);
   color: var(--wa-color-brand-fill-loud);
 }
 
@@ -145,8 +145,6 @@ wa-carousel-item > wa-card {
   }
 
   wa-card {
-    margin-block: var(--wa-space-3xl);
-
     blockquote {
       font-style: italic;
       position: relative;
