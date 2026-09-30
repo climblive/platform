@@ -108,9 +108,13 @@ wa-carousel-item > wa-card {
 
   .rule {
     h3 {
-      margin-bottom: var(--wa-space-m);
+      margin-block: 0 var(--wa-space-m);
       font-size: var(--wa-font-size-l);
       font-weight: var(--wa-font-weight-semibold);
+    }
+
+    wa-badge + wa-badge {
+      margin-left: var(--wa-space-2xs);
     }
 
     .heading {
