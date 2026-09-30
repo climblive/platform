@@ -51,7 +51,7 @@
 </script>
 
 {#if children}
-  {@render children?.({ archiveContest: handleArchive })}
+  {@render children({ archiveContest: handleArchive })}
 {/if}
 
 <wa-dialog
