@@ -229,16 +229,6 @@
         >
           <wa-carousel-item>
             <wa-card class="rule-card">
-              <h3>Problem limit</h3>
-              <p>
-                Only count the hardest problems towards each competitor's total
-                score. Customize the limit to decide how many problems count.
-              </p>
-            </wa-card>
-          </wa-carousel-item>
-
-          <wa-carousel-item>
-            <wa-card class="rule-card">
               <div class="rule-card-heading">
                 <h3>Pooled points</h3>
                 <div>
@@ -246,26 +236,10 @@
                 </div>
               </div>
               <p>
-                Points for completed problems and zones are split by
-                percentages. A boulder worth 1000 points with two tops will give
-                each competitor 500 points. If a third competitor also tops the
-                boulder, then all three will receive 333 points instead. Minimum
-                point value is 1 point.
-              </p>
-            </wa-card>
-          </wa-carousel-item>
-
-          <wa-carousel-item>
-            <wa-card class="rule-card">
-              <div class="rule-card-heading">
-                <h3>Max attempts</h3>
-                <div>
-                  <wa-badge pill variant="neutral">Beta</wa-badge>
-                </div>
-              </div>
-              <p>
-                Each competitor has a fixed number of attempts per problem.
-                Attempts above that limit yield 0 points for that problem.
+                Points for completed problems and zones are split equally. A
+                boulder worth 1000 points with two tops will give each
+                competitor 500 points. If a third competitor also tops the
+                boulder, then all three will receive 333 points instead.
               </p>
             </wa-card>
           </wa-carousel-item>
@@ -284,6 +258,32 @@
               <p class="rule-note">
                 <strong>Note:</strong> Decimal point deductions are not
                 supported yet.
+              </p>
+            </wa-card>
+          </wa-carousel-item>
+
+          <wa-carousel-item>
+            <wa-card class="rule-card">
+              <h3>Problem limit</h3>
+              <p>
+                Only count the hardest problems towards each competitor's total
+                score. The limit can be customized to change how many problems
+                to count.
+              </p>
+            </wa-card>
+          </wa-carousel-item>
+
+          <wa-carousel-item>
+            <wa-card class="rule-card">
+              <div class="rule-card-heading">
+                <h3>Max attempts</h3>
+                <div>
+                  <wa-badge pill variant="neutral">Beta</wa-badge>
+                </div>
+              </div>
+              <p>
+                Each competitor has a fixed number of attempts per problem.
+                Attempts above that limit yield 0 points.
               </p>
             </wa-card>
           </wa-carousel-item>
