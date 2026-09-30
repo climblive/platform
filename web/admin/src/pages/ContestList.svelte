@@ -30,6 +30,7 @@
   import TransferContest from "./TransferContest.svelte";
 
   const maxContestsPerWeek = 10;
+  const tableLimit = 10;
   const createButtonId = $props.id();
 
   interface Props {
@@ -39,6 +40,7 @@
   let { organizerId }: Props = $props();
 
   let showArchived = $state(false);
+  let expandedListings = $state<string[]>([]);
   let selectedAction = $state<
     { type: "duplicate" | "transfer" | "archive"; contest: Contest } | undefined
   >();
@@ -153,6 +155,10 @@
 
   const handleToggleArchive = () => {
     showArchived = !showArchived;
+  };
+
+  const showAll = (heading: string) => {
+    expandedListings = [...expandedListings, heading];
   };
 
   const handleContestAction = (event: WaSelectEvent, contest: Contest) => {
@@ -342,7 +348,20 @@
       {averageRegistered === 1 ? "competitor" : "competitors"} per competition.
     </p>
   {/if}
-  <Table {columns} data={contests} getId={({ id }) => id}></Table>
+  <Table
+    {columns}
+    data={expandedListings.includes(heading)
+      ? contests
+      : contests.slice(0, tableLimit)}
+    getId={({ id }) => id}
+  ></Table>
+  {#if !expandedListings.includes(heading) && contests.length > tableLimit}
+    <wa-button
+      class="show-more"
+      appearance="plain"
+      onclick={() => showAll(heading)}>Show all</wa-button
+    >
+  {/if}
 {/snippet}
 
 {#if contestsQuery.isLoading || allContestsQuery.isLoading || !ongoing || !upcoming || !past || !archived}
@@ -425,6 +444,11 @@
   .toggle-archived-button {
     display: block;
     margin-block-start: var(--wa-space-m);
+  }
+
+  wa-button.show-more {
+    display: block;
+    margin: var(--wa-space-m) auto 0;
   }
 
   .contest-summary {

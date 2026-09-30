@@ -43,14 +43,7 @@
 </script>
 
 {#if children}
-  {@render children({ duplicateContest: handleDuplication })}
-{:else}
-  <div class="actions">
-    <wa-button onclick={handleDuplication} appearance="outlined"
-      >Duplicate
-      <wa-icon name="copy" slot="start"></wa-icon>
-    </wa-button>
-  </div>
+  {@render children?.({ duplicateContest: handleDuplication })}
 {/if}
 
 <wa-dialog

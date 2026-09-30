@@ -51,14 +51,7 @@
 </script>
 
 {#if children}
-  {@render children({ archiveContest: handleArchive })}
-{:else}
-  <div class="actions">
-    <wa-button onclick={handleArchive} appearance="outlined" variant="danger"
-      >Archive
-      <wa-icon name="box-archive" slot="start"></wa-icon>
-    </wa-button>
-  </div>
+  {@render children?.({ archiveContest: handleArchive })}
 {/if}
 
 <wa-dialog
