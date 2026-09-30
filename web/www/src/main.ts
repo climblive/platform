@@ -20,7 +20,34 @@ watchColorSchemeChanges((prefersDarkColorScheme) =>
 updateTheme(prefersDarkColorScheme());
 
 const compactCarouselLayout = window.matchMedia("(max-width: 768px)");
-const updateCarouselSlides = () => {
+
+const updateCardSizes = () => {
+  const cards = document.querySelectorAll<HTMLElement>(
+    "wa-carousel-item > wa-card",
+  );
+
+  if (cards.length === 0) {
+    return;
+  }
+
+  cards.forEach((card) => {
+    card.style.height = "auto";
+  });
+
+  const height = Math.ceil(
+    Math.max(
+      ...Array.from(cards, (card) => card.getBoundingClientRect().height),
+    ),
+  );
+
+  cards.forEach((card) => {
+    card.style.height = `${height}px`;
+  });
+};
+
+let cardSizingFrame = 0;
+
+const updateCarouselLayout = () => {
   document.querySelectorAll("wa-carousel").forEach((carousel) => {
     carousel.setAttribute(
       "slides-per-page",
@@ -28,7 +55,11 @@ const updateCarouselSlides = () => {
     );
     carousel.toggleAttribute("navigation", !compactCarouselLayout.matches);
   });
+
+  cancelAnimationFrame(cardSizingFrame);
+  cardSizingFrame = requestAnimationFrame(updateCardSizes);
 };
 
-compactCarouselLayout.addEventListener("change", updateCarouselSlides);
-updateCarouselSlides();
+window.addEventListener("resize", updateCarouselLayout);
+document.fonts.ready.then(updateCarouselLayout);
+updateCarouselLayout();
