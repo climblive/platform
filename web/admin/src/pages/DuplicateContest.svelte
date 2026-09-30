@@ -43,7 +43,7 @@
 </script>
 
 {#if children}
-  {@render children?.({ duplicateContest: handleDuplication })}
+  {@render children({ duplicateContest: handleDuplication })}
 {/if}
 
 <wa-dialog
