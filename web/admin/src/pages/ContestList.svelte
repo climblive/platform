@@ -30,7 +30,7 @@
   import TransferContest from "./TransferContest.svelte";
 
   const maxContestsPerWeek = 10;
-  const tableLimit = 10;
+  const defaultTableLimit = 10;
   const createButtonId = $props.id();
 
   interface Props {
@@ -157,7 +157,7 @@
     showArchived = !showArchived;
   };
 
-  const showAll = (heading: string) => {
+  const expandListing = (heading: string) => {
     expandedListings = [...expandedListings, heading];
   };
 
@@ -352,14 +352,14 @@
     {columns}
     data={expandedListings.includes(heading)
       ? contests
-      : contests.slice(0, tableLimit)}
+      : contests.slice(0, defaultTableLimit)}
     getId={({ id }) => id}
   ></Table>
-  {#if !expandedListings.includes(heading) && contests.length > tableLimit}
+  {#if !expandedListings.includes(heading) && contests.length > defaultTableLimit}
     <wa-button
       class="show-more"
       appearance="plain"
-      onclick={() => showAll(heading)}>Show all</wa-button
+      onclick={() => expandListing(heading)}>Show all</wa-button
     >
   {/if}
 {/snippet}
