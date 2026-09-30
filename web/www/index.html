@@ -28,7 +28,7 @@
     <script type="module" src="/src/main.ts"></script>
     <section class="hero-section">
       <div class="sales-container">
-        <div class="hero-content">
+        <div class="content">
           <div class="logo-container">
             <svg
               class="logo"
@@ -116,7 +116,7 @@
             results to a scoreboard, and gives organizers a full admin
             dashboard. Get set up in minutes with no app to install.
           </p>
-          <div class="cta-container">
+          <div class="cta">
             <wa-button
               variant="brand"
               href="https://climblive.app/admin"
@@ -144,7 +144,6 @@
           Feature Overview
         </h2>
         <wa-carousel
-          class="feature-carousel"
           aria-labelledby="feature-overview-title"
           navigation
           pagination
@@ -152,9 +151,9 @@
           slides-per-page="1"
         >
           <wa-carousel-item>
-            <wa-card class="feature-card">
-              <div class="feature-icon">📱</div>
-              <h3 class="feature-title">Web App for Self-Scoring</h3>
+            <wa-card class="feature">
+              <div class="icon">📱</div>
+              <h3 class="title">Web App for Self-Scoring</h3>
               <p>
                 Simple and intuitive interface for competitors to record their
                 own scores.
@@ -163,9 +162,9 @@
           </wa-carousel-item>
 
           <wa-carousel-item>
-            <wa-card class="feature-card">
-              <div class="feature-icon">👻</div>
-              <h3 class="feature-title">No Account Required</h3>
+            <wa-card class="feature">
+              <div class="icon">👻</div>
+              <h3 class="title">No Account Required</h3>
               <p>
                 Competitors can participate without going through the hassle of
                 creating a user account.
@@ -174,9 +173,9 @@
           </wa-carousel-item>
 
           <wa-carousel-item>
-            <wa-card class="feature-card">
-              <div class="feature-icon">⚡</div>
-              <h3 class="feature-title">Live Results</h3>
+            <wa-card class="feature">
+              <div class="icon">⚡</div>
+              <h3 class="title">Live Results</h3>
               <p>
                 See competition standing updates in real-time without refreshing
                 the page.
@@ -185,9 +184,9 @@
           </wa-carousel-item>
 
           <wa-carousel-item>
-            <wa-card class="feature-card">
-              <div class="feature-icon">🎁</div>
-              <h3 class="feature-title">Prize Raffles</h3>
+            <wa-card class="feature">
+              <div class="icon">🎁</div>
+              <h3 class="title">Prize Raffles</h3>
               <p>
                 Easily organize and manage prize raffles for your competition
                 participants.
@@ -196,9 +195,9 @@
           </wa-carousel-item>
 
           <wa-carousel-item>
-            <wa-card class="feature-card">
-              <div class="feature-icon">🎨</div>
-              <h3 class="feature-title">Hold Color Tracking</h3>
+            <wa-card class="feature">
+              <div class="icon">🎨</div>
+              <h3 class="title">Hold Color Tracking</h3>
               <p>
                 Clear identification of hold colors on problems to avoid mix-ups
                 during the competition.
@@ -214,13 +213,12 @@
         <h2 id="scoring-rules-title" class="section-title">
           Flexible Scoring Rules
         </h2>
-        <p class="rules-intro">
+        <p class="intro">
           ClimbLive supports both points-based and attempts-based scoring. For
           points-based competitions, use the options below individually or
           together to customize how scores are calculated.
         </p>
         <wa-carousel
-          class="rules-carousel"
           aria-labelledby="scoring-rules-title"
           navigation
           pagination
@@ -228,8 +226,8 @@
           slides-per-page="1"
         >
           <wa-carousel-item>
-            <wa-card class="rule-card">
-              <div class="rule-card-heading">
+            <wa-card class="rule">
+              <div class="heading">
                 <h3>Pooled points</h3>
                 <div>
                   <wa-badge pill variant="neutral">New</wa-badge>
@@ -245,8 +243,8 @@
           </wa-carousel-item>
 
           <wa-carousel-item>
-            <wa-card class="rule-card">
-              <div class="rule-card-heading">
+            <wa-card class="rule">
+              <div class="heading">
                 <h3>Point deduction</h3>
                 <wa-badge pill variant="neutral">IFSC</wa-badge>
                 <wa-badge pill variant="neutral">Beta</wa-badge>
@@ -255,7 +253,7 @@
                 Deduct points for each failed attempt before reaching the scored
                 top or zone. The score cannot fall below 0.
               </p>
-              <p class="rule-note">
+              <p class="note">
                 <strong>Note:</strong> Decimal point deductions are not
                 supported yet.
               </p>
@@ -263,7 +261,7 @@
           </wa-carousel-item>
 
           <wa-carousel-item>
-            <wa-card class="rule-card">
+            <wa-card class="rule">
               <h3>Problem limit</h3>
               <p>
                 Only count the hardest problems towards each competitor's total
@@ -274,8 +272,8 @@
           </wa-carousel-item>
 
           <wa-carousel-item>
-            <wa-card class="rule-card">
-              <div class="rule-card-heading">
+            <wa-card class="rule">
+              <div class="heading">
                 <h3>Max attempts</h3>
                 <div>
                   <wa-badge pill variant="neutral">Beta</wa-badge>
@@ -293,7 +291,7 @@
 
     <section class="description-section">
       <div class="sales-container">
-        <div class="description-content">
+        <div class="content">
           <h2 class="section-title">What are the users saying?</h2>
           <blockquote>
             <p>
@@ -306,7 +304,7 @@
               organizing events.
             </p>
           </blockquote>
-          <p class="quote-author">
+          <p class="author">
             —<span class="name">Denitsa Mircheva</span><br />
             Marketing & Sales Manager<br />
             <strong
@@ -332,7 +330,7 @@
           © 2019 - <span id="current-year"></span> ClimbLive. The free community
           platform for bouldering competitions.
         </p>
-        <div class="footer-links">
+        <div class="links">
           <a href="https://climblive.app/admin">Admin page</a>
           <a href="https://climblive.app">Scoring app</a>
           <a href="mailto:info@climblive.com">Contact us</a>
