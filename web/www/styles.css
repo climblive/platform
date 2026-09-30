@@ -1,9 +1,7 @@
 @import url("@climblive/lib/theme.css");
+@import url("@awesome.me/webawesome/dist/styles/utilities.css");
 
 body {
-  font-family: var(--wa-font-family-body);
-  color: var(--wa-color-text-normal);
-  background-color: var(--wa-color-surface-default);
   line-height: var(--wa-line-height-normal);
 }
 
@@ -46,21 +44,11 @@ body {
   }
 
   .cta {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--wa-space-s);
-
-    wa-button {
-      width: 100%;
-    }
+    --min-column-size: 24rem;
   }
 
   @media (max-width: 768px) {
     padding-block: var(--wa-space-3xl);
-
-    .cta {
-      grid-template-columns: 1fr;
-    }
 
     .logo {
       height: 3rem;
@@ -80,10 +68,6 @@ body {
   padding-block: var(--wa-space-4xl);
 
   .feature {
-    > * {
-      text-align: center;
-    }
-
     .icon {
       margin-bottom: var(--wa-space-l);
       color: var(--wa-color-brand-fill-loud);
@@ -110,11 +94,8 @@ wa-carousel-item > wa-card {
 }
 
 .section-title {
-  text-align: center;
-  font-size: var(--wa-font-size-2xl);
   margin-bottom: var(--wa-space-4xl);
   color: var(--wa-color-brand-fill-loud);
-  font-weight: var(--wa-font-weight-heading);
 }
 
 .rules-section {
@@ -124,7 +105,6 @@ wa-carousel-item > wa-card {
   .intro {
     max-width: 680px;
     margin: 0 auto var(--wa-space-3xl);
-    text-align: center;
   }
 
   .rule {
@@ -155,7 +135,6 @@ wa-carousel-item > wa-card {
 .description-section {
   background-color: var(--wa-color-surface-lowered);
   padding: var(--wa-space-4xl) 0;
-  text-align: center;
 
   .content {
     max-width: 800px;
@@ -170,7 +149,6 @@ wa-carousel-item > wa-card {
     background-color: var(--wa-color-surface-raised);
     border-radius: var(--wa-border-radius-m);
     box-shadow: var(--wa-shadow-m);
-    text-align: left;
 
     p {
       margin: 0;
@@ -188,19 +166,7 @@ wa-carousel-item > wa-card {
   }
 
   .author {
-    text-align: left;
     padding-left: var(--wa-space-xl);
-    color: var(--wa-color-text-quiet);
-
-    .name {
-      font-weight: var(--wa-font-weight-semibold);
-      color: var(--wa-color-text-normal);
-    }
-
-    a {
-      color: var(--wa-color-text-link);
-      text-decoration: none;
-    }
 
     & + wa-button {
       margin-top: var(--wa-space-2xl);
@@ -210,7 +176,6 @@ wa-carousel-item > wa-card {
 
 .footer {
   padding-block: var(--wa-space-3xl);
-  text-align: center;
   background-color: var(--wa-color-neutral-fill-loud);
   color: var(--wa-color-neutral-on-loud);
 
