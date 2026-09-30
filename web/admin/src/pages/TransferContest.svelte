@@ -85,15 +85,6 @@
     transferContest: handleTransfer,
     disabled: otherOrganizers.length === 0,
   })}
-{:else}
-  <wa-button
-    onclick={handleTransfer}
-    appearance="outlined"
-    disabled={otherOrganizers.length === 0}
-  >
-    Transfer
-    <wa-icon name="arrow-right" slot="start"></wa-icon>
-  </wa-button>
 {/if}
 
 <wa-dialog

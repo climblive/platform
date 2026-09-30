@@ -162,9 +162,38 @@
       <wa-divider></wa-divider>
       <h3>Actions</h3>
       <div class="actions">
-        <DuplicateContest {contestId} contestName={contest.name} />
-        <TransferContest {contestId} {organizerId} contestName={contest.name} />
-        <ArchiveContest {contestId} {organizerId} contestName={contest.name} />
+        <DuplicateContest {contestId} contestName={contest.name}>
+          {#snippet children({ duplicateContest })}
+            <wa-button onclick={duplicateContest} appearance="outlined">
+              Duplicate
+              <wa-icon name="copy" slot="start"></wa-icon>
+            </wa-button>
+          {/snippet}
+        </DuplicateContest>
+        <TransferContest {contestId} {organizerId} contestName={contest.name}>
+          {#snippet children({ transferContest, disabled })}
+            <wa-button
+              onclick={transferContest}
+              appearance="outlined"
+              {disabled}
+            >
+              Transfer
+              <wa-icon name="arrow-right" slot="start"></wa-icon>
+            </wa-button>
+          {/snippet}
+        </TransferContest>
+        <ArchiveContest {contestId} {organizerId} contestName={contest.name}>
+          {#snippet children({ archiveContest })}
+            <wa-button
+              onclick={archiveContest}
+              appearance="outlined"
+              variant="danger"
+            >
+              Archive
+              <wa-icon name="box-archive" slot="start"></wa-icon>
+            </wa-button>
+          {/snippet}
+        </ArchiveContest>
       </div>
       {#if location.hostname !== "climblive.app" || self?.admin}
         <h3>Developer tools</h3>
