@@ -81,7 +81,7 @@
 </script>
 
 {#if children}
-  {@render children?.({
+  {@render children({
     transferContest: handleTransfer,
     disabled: otherOrganizers.length === 0,
   })}
