@@ -22,26 +22,28 @@ updateTheme(prefersDarkColorScheme());
 const compactCarouselLayout = window.matchMedia("(max-width: 768px)");
 
 const updateCardSizes = () => {
-  const cards = document.querySelectorAll<HTMLElement>(
-    "wa-carousel-item > wa-card",
-  );
+  document.querySelectorAll("wa-carousel").forEach((carousel) => {
+    const cards = carousel.querySelectorAll<HTMLElement>(
+      "wa-carousel-item > wa-card",
+    );
 
-  if (cards.length === 0) {
-    return;
-  }
+    if (cards.length === 0) {
+      return;
+    }
 
-  cards.forEach((card) => {
-    card.style.height = "auto";
-  });
+    cards.forEach((card) => {
+      card.style.height = "auto";
+    });
 
-  const height = Math.ceil(
-    Math.max(
-      ...Array.from(cards, (card) => card.getBoundingClientRect().height),
-    ),
-  );
+    const height = Math.ceil(
+      Math.max(
+        ...Array.from(cards, (card) => card.getBoundingClientRect().height),
+      ),
+    );
 
-  cards.forEach((card) => {
-    card.style.height = `${height}px`;
+    cards.forEach((card) => {
+      card.style.height = `${height}px`;
+    });
   });
 };
 
