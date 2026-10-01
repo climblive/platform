@@ -11,27 +11,34 @@ body {
   padding-inline: var(--wa-space-l);
 }
 
-.hero-section {
-  background-color: var(--wa-color-surface-lowered);
+section {
   padding-block: var(--wa-space-4xl);
+}
 
-  .content {
+.hero-section,
+.rules-section,
+.description-section {
+  background-color: var(--wa-color-surface-lowered);
+}
+
+.hero-section,
+.description-section {
+  .sales-container {
     max-width: 800px;
-    margin: 0 auto;
   }
+}
 
+.hero-section {
   .logo-container {
     margin-bottom: var(--wa-space-2xl);
   }
 
   .logo {
     height: 4rem;
-    color: var(--wa-color-text-normal);
   }
 
   h1 {
     margin-bottom: var(--wa-space-l);
-    color: var(--wa-color-text-normal);
     font-size: var(--wa-font-size-3xl);
     font-weight: var(--wa-font-weight-heading);
     line-height: var(--wa-line-height-condensed);
@@ -65,31 +72,26 @@ body {
 }
 
 .features-section {
-  padding-block: var(--wa-space-4xl);
-
-  .feature {
-    .icon {
-      margin-bottom: var(--wa-space-l);
-      color: var(--wa-color-brand-fill-loud);
-      font-size: var(--wa-font-size-3xl);
-    }
-
-    .title {
-      margin-bottom: var(--wa-space-m);
-      font-size: var(--wa-font-size-l);
-      font-weight: var(--wa-font-weight-semibold);
-    }
+  .icon {
+    margin-bottom: var(--wa-space-l);
+    color: var(--wa-color-brand-fill-loud);
+    font-size: var(--wa-font-size-3xl);
   }
 }
 
 wa-carousel {
   --aspect-ratio: auto;
-}
 
-wa-carousel-item > wa-card {
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
+  wa-card {
+    width: 100%;
+    height: 100%;
+  }
+
+  h3 {
+    margin-bottom: var(--wa-space-m);
+    font-size: var(--wa-font-size-l);
+    font-weight: var(--wa-font-weight-semibold);
+  }
 }
 
 .section-title {
@@ -98,52 +100,37 @@ wa-carousel-item > wa-card {
 }
 
 .rules-section {
-  padding-block: var(--wa-space-4xl);
-  background-color: var(--wa-color-surface-lowered);
-
   .intro {
     max-width: 680px;
     margin: 0 auto var(--wa-space-3xl);
   }
 
-  .rule {
+  h3 {
+    margin-top: 0;
+  }
+
+  wa-badge + wa-badge {
+    margin-left: var(--wa-space-2xs);
+  }
+
+  .heading {
+    margin-bottom: var(--wa-space-m);
+
     h3 {
-      margin-block: 0 var(--wa-space-m);
-      font-size: var(--wa-font-size-l);
-      font-weight: var(--wa-font-weight-semibold);
+      margin-bottom: var(--wa-space-xs);
     }
+  }
 
-    wa-badge + wa-badge {
-      margin-left: var(--wa-space-2xs);
-    }
+  .note {
+    margin-top: var(--wa-space-l);
 
-    .heading {
-      margin-bottom: var(--wa-space-m);
-
-      h3 {
-        margin-bottom: var(--wa-space-xs);
-      }
-    }
-
-    .note {
-      margin-top: var(--wa-space-l);
-
-      strong {
-        color: var(--wa-color-brand-fill-loud);
-      }
+    strong {
+      color: var(--wa-color-brand-fill-loud);
     }
   }
 }
 
 .description-section {
-  background-color: var(--wa-color-surface-lowered);
-  padding: var(--wa-space-4xl) 0;
-
-  .content {
-    max-width: 800px;
-    margin: 0 auto;
-  }
-
   wa-card {
     blockquote {
       font-style: italic;
@@ -183,7 +170,6 @@ wa-carousel-item > wa-card {
 
     a {
       color: var(--wa-color-neutral-on-loud);
-      text-decoration: none;
       margin-inline: var(--wa-space-xs);
 
       &:hover {
