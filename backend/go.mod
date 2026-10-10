@@ -7,7 +7,7 @@ require (
 	github.com/go-faker/faker/v4 v4.12.0
 	github.com/go-jose/go-jose/v4 v4.1.5
 	github.com/go-sql-driver/mysql v1.10.1
-	github.com/lmittmann/tint v1.2.0
+	github.com/lmittmann/tint v1.2.1
 	github.com/mattn/go-isatty v0.0.24
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/pressly/goose/v3 v3.28.0
