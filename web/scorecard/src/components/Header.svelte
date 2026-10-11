@@ -29,13 +29,22 @@
       <FullLogo />
     </div>
 
-    <wa-button
-      size="small"
-      onclick={() => navigate(`/${registrationCode}/edit`)}
-      appearance="plain"
-    >
-      <wa-icon name="gear" label="Edit profile"></wa-icon>
-    </wa-button>
+    <div class="actions">
+      <wa-button
+        size="small"
+        onclick={() => navigate(`/${registrationCode}/results`)}
+        appearance="plain"
+      >
+        <wa-icon name="share-nodes" label="Share results"></wa-icon>
+      </wa-button>
+      <wa-button
+        size="small"
+        onclick={() => navigate(`/${registrationCode}/edit`)}
+        appearance="plain"
+      >
+        <wa-icon name="gear" label="Edit profile"></wa-icon>
+      </wa-button>
+    </div>
   </div>
   <div>
     <h1>
@@ -58,6 +67,11 @@
     flex-direction: column;
     gap: var(--wa-space-xs);
     padding-block-start: var(--wa-space-l);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
   }
 
   .logo {
