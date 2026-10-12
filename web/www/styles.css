@@ -29,16 +29,11 @@ section {
 }
 
 .hero-section {
-  .logo-container {
-    margin-bottom: var(--wa-space-2xl);
-  }
-
   .logo {
     height: 4rem;
   }
 
   h1 {
-    margin-bottom: var(--wa-space-l);
     font-size: var(--wa-font-size-3xl);
     font-weight: var(--wa-font-weight-heading);
     line-height: var(--wa-line-height-condensed);
@@ -48,10 +43,6 @@ section {
     font-size: var(--wa-font-size-xl);
     margin-bottom: var(--wa-space-3xl);
     font-weight: var(--wa-font-weight-light);
-  }
-
-  .cta {
-    --min-column-size: 24rem;
   }
 
   @media (max-width: 768px) {
@@ -73,9 +64,7 @@ section {
 
 .features-section {
   .icon {
-    margin-bottom: var(--wa-space-l);
-    color: var(--wa-color-brand-fill-loud);
-    font-size: var(--wa-font-size-3xl);
+    font-size: var(--wa-font-size-2xl);
   }
 }
 
@@ -88,14 +77,13 @@ wa-carousel {
   }
 
   h3 {
-    margin-bottom: var(--wa-space-m);
     font-size: var(--wa-font-size-l);
     font-weight: var(--wa-font-weight-semibold);
   }
 }
 
 .section-title {
-  margin-bottom: var(--wa-space-2xl);
+  margin-block: 0 var(--wa-space-2xl);
   color: var(--wa-color-brand-fill-loud);
 }
 
@@ -105,19 +93,14 @@ wa-carousel {
     margin: 0 auto var(--wa-space-3xl);
   }
 
-  h3 {
-    margin-top: 0;
-  }
-
   wa-badge + wa-badge {
     margin-left: var(--wa-space-2xs);
   }
 
   .heading {
-    margin-bottom: var(--wa-space-m);
-
     h3 {
-      margin-bottom: var(--wa-space-xs);
+      margin-block-start: 0;
+      margin-block-end: var(--wa-space-xs);
     }
   }
 
@@ -131,6 +114,10 @@ wa-carousel {
 }
 
 .description-section {
+  .section-title {
+    margin-bottom: 0;
+  }
+
   wa-card {
     blockquote {
       font-style: italic;
@@ -150,7 +137,7 @@ wa-carousel {
     }
 
     .author {
-      margin: var(--wa-space-l) 0 0;
+      margin-block-start: var(--wa-space-l);
       padding-left: var(--wa-space-2xl);
     }
 
