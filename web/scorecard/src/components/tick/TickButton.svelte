@@ -1,6 +1,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import { localizedPointsValue } from "@climblive/lib/utils";
   type Props = {
     onClick: () => void;
     iconName: string;
@@ -27,10 +28,10 @@
     }
 
     if (bonusPoints) {
-      return `${points}p + ${bonusPoints}p`;
+      return `${localizedPointsValue(points)}p + ${localizedPointsValue(bonusPoints)}p`;
     }
 
-    return `${points}p`;
+    return `${localizedPointsValue(points)}p`;
   });
 </script>
 
