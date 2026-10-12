@@ -19,7 +19,7 @@
     getProblemsQuery,
     getTicksByContestQuery,
   } from "@climblive/lib/queries";
-  import { isDefined } from "@climblive/lib/utils";
+  import { isDefined, localizedPointsValue } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
   import CopyProblems from "./CopyProblems.svelte";
   import DeleteProblem from "./DeleteProblem.svelte";
@@ -158,9 +158,9 @@
     {@const min = Math.min(...values)}
     {@const max = Math.max(...values)}
 
-    {[min, max + (flashBonus ?? 0)].join(" - ")} pts
+    {[min, max + (flashBonus ?? 0)].map(localizedPointsValue).join(" - ")} pts
   {:else}
-    {values.join(" / ")} pts
+    {values.map(localizedPointsValue).join(" / ")} pts
   {/if}
 {/snippet}
 
