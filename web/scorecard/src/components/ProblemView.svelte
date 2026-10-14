@@ -159,6 +159,7 @@
   .score {
     text-align: right;
     font-size: var(--wa-font-size-s);
+    font-weight: var(--wa-font-weight-semibold);
 
     &.uncounted {
       opacity: 0.3;
