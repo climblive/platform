@@ -14,7 +14,7 @@
       return value;
     }
 
-    return localizedPointsValue(Number(matches[1])) + "p";
+    return localizedPointsValue(Number(matches[1]));
   });
 </script>
 

@@ -28,10 +28,10 @@
     }
 
     if (bonusPoints) {
-      return `${localizedPointsValue(points)}p + ${localizedPointsValue(bonusPoints)}p`;
+      return `${localizedPointsValue(points)} + ${localizedPointsValue(bonusPoints)}`;
     }
 
-    return `${localizedPointsValue(points)}p`;
+    return `${localizedPointsValue(points)}`;
   });
 </script>
 
