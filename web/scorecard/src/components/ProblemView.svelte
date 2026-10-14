@@ -25,6 +25,8 @@
     enableAttempts,
   }: Props = $props();
 
+  const id = $props.id();
+
   const valueRange = $derived.by<{ min: number; max: number } | undefined>(
     () => {
       if (problem.pointValue === undefined) {
@@ -61,6 +63,22 @@
           ≤ <Score value={valueRange.max + "p"}></Score>
         {/if}
       </span>
+    {/if}
+
+    {#if problem.description}
+      <wa-popover for={id}>
+        {problem.description}
+        <wa-button
+          appearance="outlined"
+          variant="neutral"
+          size="s"
+          data-popover="close">Got it!</wa-button
+        >
+      </wa-popover>
+
+      <wa-button size="xs" appearance="plain" pill {id}
+        ><wa-icon name="info-circle"></wa-icon></wa-button
+      >
     {/if}
   </span>
   <div class="score" class:uncounted={!counted}>
@@ -122,6 +140,9 @@
   .points {
     margin-right: auto;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-2xs);
 
     & .top {
       white-space: nowrap;
@@ -135,5 +156,13 @@
       opacity: 0.3;
       text-decoration: line-through;
     }
+  }
+
+  wa-popover::part(body) {
+    margin-inline-start: var(--wa-space-l);
+  }
+
+  wa-popover wa-button {
+    margin-block-start: var(--wa-space-m);
   }
 </style>
