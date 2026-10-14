@@ -8,7 +8,7 @@ export const localizedPointsValue = (
     maximumFractionDigits: 1,
   };
 
-  if (short) {
+  if (short && points > 9_999) {
     options.notation = "compact";
   }
 
