@@ -15,7 +15,19 @@ import TryFailsafe from "./TryFailsafe.svelte";
 if (import.meta.env.PROD) {
   Sentry.init({
     dsn: "https://019099d850441f60cea5d465e217f768@o4509937603641344.ingest.de.sentry.io/4509937616093264",
-    sendDefaultPii: false,
+    dataCollection: {
+      userInfo: false,
+      cookies: false,
+      httpHeaders: {
+        request: { deny: ["forwarded", "-ip", "remote-", "via", "-user"] },
+        response: { deny: ["forwarded", "-ip", "remote-", "via", "-user"] },
+      },
+      httpBodies: [],
+      urlQueryParams: { deny: ["forwarded", "-ip", "remote-", "via", "-user"] },
+      genAI: { inputs: false, outputs: false },
+      databaseQueryData: false,
+      graphQL: { document: false, variables: false },
+    },
     environment: import.meta.env.VITE_SENTRY_ENVIRONMENT,
     integrations: [Sentry.captureConsoleIntegration({ levels: ["error"] })],
   });
