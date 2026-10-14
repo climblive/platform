@@ -3,7 +3,7 @@
 //////////
 // source: id.go
 
-export type ResourceID = number; /* int32 */
+export type ResourceID = number /* int32 */;
 export type CompClassID = ResourceID;
 export type ContenderID = ResourceID;
 export type ContestID = ResourceID;
@@ -15,17 +15,8 @@ export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
 export type OrganizerInviteID = string;
-export type ResourceIDType =
-  | CompClassID
-  | ContenderID
-  | ContestID
-  | OrganizerID
-  | ProblemID
-  | RaffleID
-  | RaffleWinnerID
-  | SeriesID
-  | UserID
-  | TickID;
+export type ResourceIDType = 
+    CompClassID | ContenderID | ContestID | OrganizerID | ProblemID | RaffleID | RaffleWinnerID | SeriesID | UserID | TickID;
 export type ScoreEngineInstanceID = string;
 
 //////////
@@ -165,7 +156,7 @@ export interface PointValue {
 export interface Problem extends ProblemValue {
   id: ProblemID;
   contestId: ContestID;
-  number: number /* int */;
+  label: number /* int */;
   holdColorPrimary: string;
   holdColorSecondary?: string;
   description?: string;
@@ -173,7 +164,7 @@ export interface Problem extends ProblemValue {
   zone2Enabled: boolean;
 }
 export interface ProblemTemplate extends ProblemValue {
-  number: number /* int */;
+  label: number /* int */;
   holdColorPrimary: string;
   holdColorSecondary?: string;
   description?: string;
@@ -181,7 +172,7 @@ export interface ProblemTemplate extends ProblemValue {
   zone2Enabled: boolean;
 }
 export interface ProblemPatch {
-  number?: number;
+  label?: number;
   holdColorPrimary?: string;
   holdColorSecondary?: string;
   description?: string;
@@ -292,7 +283,7 @@ export interface AscentDeregisteredEvent {
 }
 export interface ProblemAddedEvent extends ProblemValue {
   problemId: ProblemID;
-  number: number /* int */;
+  label: number /* int */;
   holdColorPrimary: string;
   holdColorSecondary?: string;
   description?: string;

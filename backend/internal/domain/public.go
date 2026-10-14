@@ -160,7 +160,7 @@ type Problem struct {
 	ID                 ProblemID     `json:"id"`
 	Ownership          OwnershipData `json:"-"`
 	ContestID          ContestID     `json:"contestId"`
-	Number             int           `json:"number"`
+	Label              int           `json:"label"`
 	HoldColorPrimary   string        `json:"holdColorPrimary"`
 	HoldColorSecondary string        `json:"holdColorSecondary,omitzero"`
 	Description        string        `json:"description,omitzero"`
@@ -171,7 +171,7 @@ type Problem struct {
 }
 
 type ProblemTemplate struct {
-	Number             int    `json:"number"`
+	Label              int    `json:"label"`
 	HoldColorPrimary   string `json:"holdColorPrimary"`
 	HoldColorSecondary string `json:"holdColorSecondary,omitzero"`
 	Description        string `json:"description,omitzero"`
@@ -182,7 +182,7 @@ type ProblemTemplate struct {
 }
 
 type ProblemPatch struct {
-	Number             Patch[int]    `json:"number,omitzero" tstype:"number"`
+	Label              Patch[int]    `json:"label,omitzero" tstype:"number"`
 	HoldColorPrimary   Patch[string] `json:"holdColorPrimary,omitzero" tstype:"string"`
 	HoldColorSecondary Patch[string] `json:"holdColorSecondary,omitzero" tstype:"string"`
 	Description        Patch[string] `json:"description,omitzero" tstype:"string"`
@@ -316,7 +316,7 @@ type AscentDeregisteredEvent struct {
 
 type ProblemAddedEvent struct {
 	ProblemID          ProblemID `json:"problemId"`
-	Number             int       `json:"number"`
+	Label              int       `json:"label"`
 	HoldColorPrimary   string    `json:"holdColorPrimary"`
 	HoldColorSecondary string    `json:"holdColorSecondary,omitzero"`
 	Description        string    `json:"description,omitzero"`
