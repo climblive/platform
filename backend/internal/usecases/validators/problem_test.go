@@ -15,7 +15,7 @@ func TestProblemValidator(t *testing.T) {
 		return domain.Problem{
 			ID:                 domain.ProblemID(1),
 			ContestID:          domain.ContestID(1),
-			Number:             1,
+			Label:              1,
 			HoldColorPrimary:   "#ffffff",
 			HoldColorSecondary: "#000000",
 			Description:        "First boulder",
@@ -32,7 +32,7 @@ func TestProblemValidator(t *testing.T) {
 
 	t.Run("NumberNegative", func(t *testing.T) {
 		problem := validProblem()
-		problem.Number = -5
+		problem.Label = -5
 
 		err := validator.Validate(problem)
 

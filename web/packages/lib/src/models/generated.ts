@@ -156,7 +156,7 @@ export interface PointValue {
 export interface Problem extends ProblemValue {
   id: ProblemID;
   contestId: ContestID;
-  label: number /* int */;
+  label: string;
   holdColorPrimary: string;
   holdColorSecondary?: string;
   description?: string;
@@ -164,7 +164,7 @@ export interface Problem extends ProblemValue {
   zone2Enabled: boolean;
 }
 export interface ProblemTemplate extends ProblemValue {
-  label: number /* int */;
+  label: string;
   holdColorPrimary: string;
   holdColorSecondary?: string;
   description?: string;
@@ -172,7 +172,7 @@ export interface ProblemTemplate extends ProblemValue {
   zone2Enabled: boolean;
 }
 export interface ProblemPatch {
-  label?: number;
+  label?: string;
   holdColorPrimary?: string;
   holdColorSecondary?: string;
   description?: string;

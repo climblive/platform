@@ -56,7 +56,7 @@ func (d *Database) StoreProblem(ctx context.Context, tx domain.Transaction, prob
 		ID:                 int32(problem.ID),
 		OrganizerID:        int32(problem.Ownership.OrganizerID),
 		ContestID:          int32(problem.ContestID),
-		Number:             int32(problem.Number),
+		Number:             int32(problem.Label),
 		HoldColorPrimary:   problem.HoldColorPrimary,
 		HoldColorSecondary: makeNullString(problem.HoldColorSecondary),
 		Description:        makeNullString(problem.Description),

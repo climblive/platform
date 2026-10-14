@@ -4,9 +4,10 @@ import (
 	"database/sql"
 	"time"
 
+	"uuid"
+
 	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
-	"uuid"
 )
 
 func contenderToDomain(record database.GetContenderRow) domain.Contender {
@@ -98,7 +99,7 @@ func problemToDomain(record database.Problem) domain.Problem {
 			ContenderID: nil,
 		},
 		ContestID:          domain.ContestID(record.ContestID),
-		Number:             int(record.Number),
+		Label:              record.Label,
 		HoldColorPrimary:   record.HoldColorPrimary,
 		HoldColorSecondary: record.HoldColorSecondary.String,
 		Description:        record.Description.String,

@@ -18,7 +18,7 @@ type ProblemValidator struct {
 
 func (v ProblemValidator) Validate(problem domain.Problem) error {
 	switch {
-	case problem.Number < 0:
+	case problem.Label < 0:
 		fallthrough
 	case !validHexColor.MatchString(problem.HoldColorPrimary):
 		fallthrough

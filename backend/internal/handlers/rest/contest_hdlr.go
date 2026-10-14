@@ -282,7 +282,7 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 		})
 
 		slices.SortFunc(problems, func(a, b domain.Problem) int {
-			return a.Number - b.Number
+			return a.Label - b.Label
 		})
 
 		for _, compClass := range compClasses {
@@ -351,7 +351,7 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 
 			problemNumbers := make([]string, 0)
 			for _, problem := range problems {
-				problemNumbers = append(problemNumbers, fmt.Sprintf("P%d", problem.Number))
+				problemNumbers = append(problemNumbers, fmt.Sprintf("P%d", problem.Label))
 			}
 
 			err = book.SetSheetRow(sheetName, "D1", &problemNumbers)
