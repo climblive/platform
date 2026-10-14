@@ -19,7 +19,7 @@
     getProblemsQuery,
     getTicksByContestQuery,
   } from "@climblive/lib/queries";
-  import { isDefined } from "@climblive/lib/utils";
+  import { isDefined, localizedPointsValue } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
   import CopyProblems from "./CopyProblems.svelte";
   import DeleteProblem from "./DeleteProblem.svelte";
@@ -114,7 +114,7 @@
         width: "max-content",
       });
       columns.push({
-        label: "Flash",
+        label: "Flash bonus",
         mobile: false,
         render: renderFlashBonus,
         width: "max-content",
@@ -157,16 +157,19 @@
   {#if mobile}
     {@const min = Math.min(...values)}
     {@const max = Math.max(...values)}
+    {@const uniquePoints = [
+      ...new Set([min, max + (flashBonus ?? 0)]),
+    ].toSorted()}
 
-    {[min, max + (flashBonus ?? 0)].join(" - ")} pts
+    {uniquePoints.map(localizedPointsValue).join(" - ")}
   {:else}
-    {values.join(" / ")} pts
+    {values.map(localizedPointsValue).join(" / ")}
   {/if}
 {/snippet}
 
 {#snippet renderFlashBonus({ flashBonus }: ProblemWithAscents)}
   {#if flashBonus}
-    +{flashBonus} pts
+    +{localizedPointsValue(flashBonus)}
   {:else}
     -
   {/if}

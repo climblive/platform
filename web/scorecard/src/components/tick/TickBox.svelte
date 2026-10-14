@@ -2,7 +2,10 @@
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import type WaCheckbox from "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { ordinalSuperscript } from "@climblive/lib/utils";
+  import {
+    localizedPointsValue,
+    ordinalSuperscript,
+  } from "@climblive/lib/utils";
 
   type Props = {
     onChange: (checked: boolean) => void;
@@ -32,10 +35,10 @@
     }
 
     if (bonusPoints) {
-      return `${points}p + ${bonusPoints}p`;
+      return `${localizedPointsValue(points)} + ${localizedPointsValue(bonusPoints)}`;
     }
 
-    return `${points}p`;
+    return `${localizedPointsValue(points)}`;
   });
 
   const handleChange = (e: InputEvent) => {
