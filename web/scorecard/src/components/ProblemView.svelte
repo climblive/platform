@@ -159,7 +159,7 @@
   }
 
   wa-popover::part(body) {
-    margin-inline-start: var(--wa-space-l);
+    width: 300px;
   }
 
   wa-popover wa-button {
