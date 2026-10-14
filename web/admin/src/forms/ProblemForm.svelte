@@ -172,7 +172,7 @@
       min={0}
       max={2 ** 31 - 1}
     >
-      <span slot="end">pts</span>
+      <span slot="end">p</span>
     </wa-number-input>
     <wa-number-input
       class={{ hidden: hidePoints }}
@@ -184,7 +184,7 @@
       min={0}
       max={2 ** 31 - 1}
     >
-      <span slot="end">pts</span>
+      <span slot="end">p</span>
     </wa-number-input>
 
     <wa-divider></wa-divider>
@@ -211,7 +211,7 @@
         hidden: !zone2Enabled || hidePoints,
       }}
     >
-      <span slot="end">pts</span>
+      <span slot="end">p</span>
     </wa-number-input>
 
     <wa-switch
@@ -234,7 +234,7 @@
         hidden: !zone1Enabled || hidePoints,
       }}
     >
-      <span slot="end">pts</span>
+      <span slot="end">p</span>
     </wa-number-input>
 
     {@render children?.()}

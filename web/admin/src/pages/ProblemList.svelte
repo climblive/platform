@@ -114,7 +114,7 @@
         width: "max-content",
       });
       columns.push({
-        label: "Flash",
+        label: "Flash bonus",
         mobile: false,
         render: renderFlashBonus,
         width: "max-content",
@@ -158,15 +158,15 @@
     {@const min = Math.min(...values)}
     {@const max = Math.max(...values)}
 
-    {[min, max + (flashBonus ?? 0)].map(localizedPointsValue).join(" - ")} pts
+    {[min, max + (flashBonus ?? 0)].map(localizedPointsValue).join(" - ")}
   {:else}
-    {values.map(localizedPointsValue).join(" / ")} pts
+    {values.map(localizedPointsValue).join(" / ")}
   {/if}
 {/snippet}
 
 {#snippet renderFlashBonus({ flashBonus }: ProblemWithAscents)}
   {#if flashBonus}
-    +{flashBonus} pts
+    +{localizedPointsValue(flashBonus)}
   {:else}
     -
   {/if}
