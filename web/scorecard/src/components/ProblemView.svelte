@@ -60,7 +60,8 @@
         {#if valueRange.min === valueRange.max}
           <Score value={valueRange.max + "p"}></Score>
         {:else}
-          ≤ <Score value={valueRange.max + "p"}></Score>
+          <span class="lte">≤</span>
+          <Score value={valueRange.max + "p"}></Score>
         {/if}
       </span>
     {/if}
@@ -146,6 +147,10 @@
 
     & .top {
       white-space: nowrap;
+    }
+
+    & .lte {
+      color: var(--wa-color-text-quiet);
     }
   }
 
