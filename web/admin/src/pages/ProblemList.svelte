@@ -157,9 +157,9 @@
   {#if mobile}
     {@const min = Math.min(...values)}
     {@const max = Math.max(...values)}
-    {@const uniquePoints = [
-      ...new Set([min, max + (flashBonus ?? 0)]),
-    ].toSorted()}
+    {@const uniquePoints = [...new Set([min, max + (flashBonus ?? 0)])]
+      .toSorted()
+      .reverse()}
 
     {uniquePoints.map(localizedPointsValue).join(" - ")}
   {:else}
