@@ -12,17 +12,17 @@ importers:
         specifier: ^10.11.0
         version: 10.11.0
       prettier:
-        specifier: ^3.9.8
-        version: 3.9.8
+        specifier: ^3.9.9
+        version: 3.9.9
       prettier-plugin-svelte:
         specifier: ^4.1.1
-        version: 4.1.1(prettier@3.9.8)(svelte@5.57.1(@typescript-eslint/types@8.70.1))
+        version: 4.1.1(prettier@3.9.9)(svelte@5.57.1(@typescript-eslint/types@8.70.1))
 
   admin:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.13.0
-        version: 3.13.0(@floating-ui/utils@0.2.12)(@types/react@18.2.46)
+        specifier: 3.14.0
+        version: 3.14.0(@floating-ui/utils@0.2.12)(@types/react@18.2.46)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -33,8 +33,8 @@ importers:
         specifier: ^2.1.3
         version: 2.1.3(svelte@5.57.1(@typescript-eslint/types@8.70.1))
       '@tanstack/svelte-query':
-        specifier: ^6.2.1
-        version: 6.2.1(svelte@5.57.1(@typescript-eslint/types@8.70.1))
+        specifier: ^6.2.4
+        version: 6.2.4(svelte@5.57.1(@typescript-eslint/types@8.70.1))
       '@tiptap/core':
         specifier: ^3.31.3
         version: 3.31.3(@tiptap/pm@3.31.3)
@@ -65,7 +65,7 @@ importers:
         version: 7.3.0(svelte@5.57.1(@typescript-eslint/types@8.70.1))(vite@8.3.0(yaml@2.9.1))
       '@tanstack/svelte-query-devtools':
         specifier: ^6.2.4
-        version: 6.2.4(@tanstack/svelte-query@6.2.1(svelte@5.57.1(@typescript-eslint/types@8.70.1)))(csstype@3.2.3)(svelte@5.57.1(@typescript-eslint/types@8.70.1))
+        version: 6.2.4(@tanstack/svelte-query@6.2.4(svelte@5.57.1(@typescript-eslint/types@8.70.1)))(csstype@3.2.3)(svelte@5.57.1(@typescript-eslint/types@8.70.1))
       '@tsconfig/svelte':
         specifier: ^5.0.8
         version: 5.0.8
@@ -112,14 +112,14 @@ importers:
   packages/lib:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.13.0
-        version: 3.13.0(@floating-ui/utils@0.2.12)(@types/react@18.2.46)
+        specifier: 3.14.0
+        version: 3.14.0(@floating-ui/utils@0.2.12)(@types/react@18.2.46)
       '@sentry/svelte':
         specifier: ^10.75.0
         version: 10.75.0(svelte@5.57.1(@typescript-eslint/types@8.70.1))
       '@tanstack/svelte-query':
-        specifier: ^6.2.1
-        version: 6.2.1(svelte@5.57.1(@typescript-eslint/types@8.70.1))
+        specifier: ^6.2.4
+        version: 6.2.4(svelte@5.57.1(@typescript-eslint/types@8.70.1))
       axios:
         specifier: ^1.20.0
         version: 1.20.0
@@ -176,8 +176,8 @@ importers:
   scoreboard:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.13.0
-        version: 3.13.0(@floating-ui/utils@0.2.12)(@types/react@18.2.46)
+        specifier: 3.14.0
+        version: 3.14.0(@floating-ui/utils@0.2.12)(@types/react@18.2.46)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -185,8 +185,8 @@ importers:
         specifier: ^10.75.0
         version: 10.75.0(svelte@5.57.1(@typescript-eslint/types@8.70.1))
       '@tanstack/svelte-query':
-        specifier: ^6.2.1
-        version: 6.2.1(svelte@5.57.1(@typescript-eslint/types@8.70.1))
+        specifier: ^6.2.4
+        version: 6.2.4(svelte@5.57.1(@typescript-eslint/types@8.70.1))
       date-fns:
         specifier: ^4.4.0
         version: 4.4.0
@@ -205,7 +205,7 @@ importers:
         version: 7.3.0(svelte@5.57.1(@typescript-eslint/types@8.70.1))(vite@8.3.0(yaml@2.9.1))
       '@tanstack/svelte-query-devtools':
         specifier: ^6.2.4
-        version: 6.2.4(@tanstack/svelte-query@6.2.1(svelte@5.57.1(@typescript-eslint/types@8.70.1)))(csstype@3.2.3)(svelte@5.57.1(@typescript-eslint/types@8.70.1))
+        version: 6.2.4(@tanstack/svelte-query@6.2.4(svelte@5.57.1(@typescript-eslint/types@8.70.1)))(csstype@3.2.3)(svelte@5.57.1(@typescript-eslint/types@8.70.1))
       '@tsconfig/svelte':
         specifier: ^5.0.8
         version: 5.0.8
@@ -231,8 +231,8 @@ importers:
   scorecard:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.13.0
-        version: 3.13.0(@floating-ui/utils@0.2.12)(@types/react@18.2.46)
+        specifier: 3.14.0
+        version: 3.14.0(@floating-ui/utils@0.2.12)(@types/react@18.2.46)
       '@climblive/lib':
         specifier: workspace:*
         version: link:../packages/lib
@@ -240,8 +240,8 @@ importers:
         specifier: ^10.75.0
         version: 10.75.0(svelte@5.57.1(@typescript-eslint/types@8.70.1))
       '@tanstack/svelte-query':
-        specifier: ^6.2.1
-        version: 6.2.1(svelte@5.57.1(@typescript-eslint/types@8.70.1))
+        specifier: ^6.2.4
+        version: 6.2.4(svelte@5.57.1(@typescript-eslint/types@8.70.1))
       axios:
         specifier: ^1.20.0
         version: 1.20.0
@@ -263,7 +263,7 @@ importers:
         version: 7.3.0(svelte@5.57.1(@typescript-eslint/types@8.70.1))(vite@8.3.0(yaml@2.9.1))
       '@tanstack/svelte-query-devtools':
         specifier: ^6.2.4
-        version: 6.2.4(@tanstack/svelte-query@6.2.1(svelte@5.57.1(@typescript-eslint/types@8.70.1)))(csstype@3.2.3)(svelte@5.57.1(@typescript-eslint/types@8.70.1))
+        version: 6.2.4(@tanstack/svelte-query@6.2.4(svelte@5.57.1(@typescript-eslint/types@8.70.1)))(csstype@3.2.3)(svelte@5.57.1(@typescript-eslint/types@8.70.1))
       '@tsconfig/svelte':
         specifier: ^5.0.8
         version: 5.0.8
@@ -295,8 +295,8 @@ importers:
   www:
     dependencies:
       '@awesome.me/webawesome':
-        specifier: 3.13.0
-        version: 3.13.0(@floating-ui/utils@0.2.12)(@types/react@18.2.46)
+        specifier: 3.14.0
+        version: 3.14.0(@floating-ui/utils@0.2.12)(@types/react@18.2.46)
     devDependencies:
       '@climblive/lib':
         specifier: workspace:*
@@ -310,8 +310,8 @@ importers:
 
 packages:
 
-  '@awesome.me/webawesome@3.13.0':
-    resolution: {integrity: sha512-egDzZAHCMj31xaYW2AFhwxl5XMj4lAFGxh9Q0WMQjRHdC6sy45JofA8ojGl28LuztDhrjfmz6tP5KG4anpjT8w==}
+  '@awesome.me/webawesome@3.14.0':
+    resolution: {integrity: sha512-m5rTGLK/iOvaVFOkYxRjiBOp8lwrBap5tv+zz1gsqLgAxlfwdvElB7BVGjs+Lf9gDps7bWRPTkG0FwZk40mk2A==}
     engines: {node: '>=14.17.0'}
 
   '@babel/code-frame@7.29.7':
@@ -934,9 +934,6 @@ packages:
     resolution: {integrity: sha512-Wo1iKt2b9OT7d+YGhvEPD3DXvPv2etTusIMhMUoG7fbhmxcXCtIjJDEygy91Y2JFlwGyjqiBPRozme7UD8hoqg==}
     engines: {node: '>=12'}
 
-  '@tanstack/query-core@5.103.1':
-    resolution: {integrity: sha512-rms8HqTGp6zA00dM+cUQ2eBcgzNJefuu5CAMB37i/6MiGT1zulPOytCFu2a0qjLqVR2n1jENPj9woqFQNuCzWA==}
-
   '@tanstack/query-core@5.103.2':
     resolution: {integrity: sha512-I8DkFXls5jXLqtm8+QpOhEmG07hIblhSZFzafg9wHsMSEvMzULy9hK17wU1T/ahfhMbtITJhbxutwwCoihkR7A==}
 
@@ -949,8 +946,8 @@ packages:
       '@tanstack/svelte-query': ^6.2.4
       svelte: ^5.25.0
 
-  '@tanstack/svelte-query@6.2.1':
-    resolution: {integrity: sha512-qnOuwv5u/xAiOq1WKnPub4oBjFfro2EebM/DWqC7vVvlVk/AEvxy5DApdSHzmvORLtO3fhCP0Jhg8nOdpdsDgA==}
+  '@tanstack/svelte-query@6.2.4':
+    resolution: {integrity: sha512-bvn6mWYJmrzWVwdqnzzrTxl6ShrpPYSn8iJXMqUgGefGtvcL5tyJWlpuLaDVl6MSyceicFryqIAM/VWIkyGsRw==}
     peerDependencies:
       svelte: ^5.25.0
 
@@ -1590,8 +1587,8 @@ packages:
   end-of-stream@1.4.5:
     resolution: {integrity: sha512-ooEGc6HP26xXq/N+GCGOT0JKCLDGrq2bQUZrQ7gyrJiZANJ/8YDTxTpQBXGMn+WbIQXNVpyWymm7KYVICQnyOg==}
 
-  enhanced-resolve@5.25.1:
-    resolution: {integrity: sha512-nGXts5znJzmWPu+mIE9izCOzdg63oJca2mDzGWWTth7sr4aCToKcoyFVBQwN75Ij5Pf6p510EwkTqViTRzDV+w==}
+  enhanced-resolve@5.26.0:
+    resolution: {integrity: sha512-9vhedylFonb2YGogzUKX6+Ja72gOJbN1QHAqdrvqLwhdl/QWbKopzoUC9EbQNVsAns/bx/4uyqalrQAoy1IByw==}
     engines: {node: '>=10.13.0'}
 
   entities@6.0.1:
@@ -2391,8 +2388,8 @@ packages:
       prettier: ^3.0.0
       svelte: ^5.0.0
 
-  prettier@3.9.8:
-    resolution: {integrity: sha512-WRFq3Wn3WId7LLROfMLdH7xaFr2jR62wU8nLO6rQUOLOxNZUviyJQs1M0iIhLexSFy+L+w0ch66wtoO2jRjG0A==}
+  prettier@3.9.9:
+    resolution: {integrity: sha512-Z/CJHIkdujO/OtN7nXUii0Rf3VT5SRuhjBA82Xvu2XhBUgX3nhP67T0LHceBdQLex7OOFGTox+Q5Yg8Jk2Qivg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -3000,7 +2997,7 @@ packages:
 
 snapshots:
 
-  '@awesome.me/webawesome@3.13.0(@floating-ui/utils@0.2.12)(@types/react@18.2.46)':
+  '@awesome.me/webawesome@3.14.0(@floating-ui/utils@0.2.12)(@types/react@18.2.46)':
     dependencies:
       '@ctrl/tinycolor': 4.1.0
       '@floating-ui/dom': 1.8.0
@@ -3307,7 +3304,7 @@ snapshots:
       '@lit-labs/ssr-dom-shim': 1.6.0
       '@lit/reactive-element': 2.1.2
       '@parse5/tools': 0.3.0
-      enhanced-resolve: 5.25.1
+      enhanced-resolve: 5.26.0
       lit: 3.3.3
       lit-element: 4.2.2
       lit-html: 3.3.3
@@ -3639,8 +3636,6 @@ snapshots:
     dependencies:
       remove-accents: 0.5.0
 
-  '@tanstack/query-core@5.103.1': {}
-
   '@tanstack/query-core@5.103.2': {}
 
   '@tanstack/query-devtools@5.103.2(csstype@3.2.3)':
@@ -3659,18 +3654,18 @@ snapshots:
     transitivePeerDependencies:
       - csstype
 
-  '@tanstack/svelte-query-devtools@6.2.4(@tanstack/svelte-query@6.2.1(svelte@5.57.1(@typescript-eslint/types@8.70.1)))(csstype@3.2.3)(svelte@5.57.1(@typescript-eslint/types@8.70.1))':
+  '@tanstack/svelte-query-devtools@6.2.4(@tanstack/svelte-query@6.2.4(svelte@5.57.1(@typescript-eslint/types@8.70.1)))(csstype@3.2.3)(svelte@5.57.1(@typescript-eslint/types@8.70.1))':
     dependencies:
       '@tanstack/query-devtools': 5.103.2(csstype@3.2.3)
-      '@tanstack/svelte-query': 6.2.1(svelte@5.57.1(@typescript-eslint/types@8.70.1))
+      '@tanstack/svelte-query': 6.2.4(svelte@5.57.1(@typescript-eslint/types@8.70.1))
       esm-env: 1.2.2
       svelte: 5.57.1(@typescript-eslint/types@8.70.1)
     transitivePeerDependencies:
       - csstype
 
-  '@tanstack/svelte-query@6.2.1(svelte@5.57.1(@typescript-eslint/types@8.70.1))':
+  '@tanstack/svelte-query@6.2.4(svelte@5.57.1(@typescript-eslint/types@8.70.1))':
     dependencies:
-      '@tanstack/query-core': 5.103.1
+      '@tanstack/query-core': 5.103.2
       svelte: 5.57.1(@typescript-eslint/types@8.70.1)
 
   '@testcontainers/mariadb@12.1.0':
@@ -4351,7 +4346,7 @@ snapshots:
     dependencies:
       once: 1.4.0
 
-  enhanced-resolve@5.25.1:
+  enhanced-resolve@5.26.0:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.3.3
@@ -5065,12 +5060,12 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-svelte@4.1.1(prettier@3.9.8)(svelte@5.57.1(@typescript-eslint/types@8.70.1)):
+  prettier-plugin-svelte@4.1.1(prettier@3.9.9)(svelte@5.57.1(@typescript-eslint/types@8.70.1)):
     dependencies:
-      prettier: 3.9.8
+      prettier: 3.9.9
       svelte: 5.57.1(@typescript-eslint/types@8.70.1)
 
-  prettier@3.9.8: {}
+  prettier@3.9.9: {}
 
   process-nextick-args@2.0.1: {}
 

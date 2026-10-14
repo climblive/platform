@@ -25,10 +25,10 @@
     "vite": "^8.3.0"
   },
   "dependencies": {
-    "@awesome.me/webawesome": "3.13.0",
+    "@awesome.me/webawesome": "3.14.0",
     "@climblive/lib": "workspace:*",
     "@sentry/svelte": "^10.75.0",
-    "@tanstack/svelte-query": "^6.2.1",
+    "@tanstack/svelte-query": "^6.2.4",
     "date-fns": "^4.4.0",
     "svelte-routing": "^2.13.0",
     "zod": "~4.6.5"
