@@ -53,6 +53,8 @@
       return {
         ...highestProblem,
         number: highestProblem.number + 1,
+        holdColorPrimary: "#000000",
+        holdColorSecondary: undefined,
       };
     } else {
       return {
