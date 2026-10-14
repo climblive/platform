@@ -2,7 +2,7 @@
   import Loader from "@/components/Loader.svelte";
   import ProblemForm, { formSchema } from "@/forms/ProblemForm.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import type { ProblemTemplate } from "@climblive/lib/models";
+  import type { Problem, ProblemTemplate } from "@climblive/lib/models";
   import {
     createProblemMutation,
     getContestQuery,
@@ -22,15 +22,17 @@
 
   const problemsQuery = $derived(getProblemsQuery(contestId));
 
-  let highestProblemNumber = $derived.by(() => {
+  let highestProblem = $derived.by<Problem | undefined | null>(() => {
     if (problemsQuery.data === undefined) {
       return undefined;
     } else if (problemsQuery.data.length > 0) {
-      return Math.max(
-        ...(problemsQuery.data?.map(({ number }) => number) ?? []),
+      const sortedProblems = problemsQuery.data.toSorted(
+        (p1, p2) => p1.number - p2.number,
       );
+
+      return sortedProblems.slice(-1)[0];
     } else {
-      return 0;
+      return null;
     }
   });
 
@@ -45,19 +47,30 @@
       },
     );
   };
+
+  const template = $derived.by<Partial<Problem>>(() => {
+    if (highestProblem) {
+      return {
+        ...highestProblem,
+        number: highestProblem.number + 1,
+      };
+    } else {
+      return {
+        number: 1,
+        holdColorPrimary: "#000000",
+        pointsTop: contest?.usePoints ? 100 : 0,
+        flashBonus: 0,
+      };
+    }
+  });
 </script>
 
-{#if highestProblemNumber === undefined}
+{#if highestProblem === undefined}
   <Loader />
 {:else}
   <ProblemForm
     submit={handleSubmit}
-    data={{
-      number: highestProblemNumber + 1,
-      holdColorPrimary: "#000000",
-      pointsTop: contest?.usePoints ? 100 : 0,
-      flashBonus: 0,
-    }}
+    data={template}
     schema={formSchema}
     hidePoints={contest?.usePoints === false}
   >
