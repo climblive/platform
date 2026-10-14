@@ -81,7 +81,7 @@
             defaultValue={contest.pointDeduction || 1}
             oninput={() => debouncedSubmit(form)}
           >
-            <span slot="end">pts</span>
+            <span slot="end">p</span>
           </wa-number-input>
         {/if}
       {/snippet}
