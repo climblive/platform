@@ -748,7 +748,7 @@ func (q *Queries) GetOrganizerInvitesByOrganizer(ctx context.Context, organizerI
 }
 
 const getProblem = `-- name: GetProblem :one
-SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
+SELECT problem.id, problem.organizer_id, problem.contest_id, problem.label, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
 FROM problem
 WHERE id = ?
 `
@@ -764,7 +764,7 @@ func (q *Queries) GetProblem(ctx context.Context, id int32) (GetProblemRow, erro
 		&i.Problem.ID,
 		&i.Problem.OrganizerID,
 		&i.Problem.ContestID,
-		&i.Problem.Number,
+		&i.Problem.Label,
 		&i.Problem.HoldColorPrimary,
 		&i.Problem.HoldColorSecondary,
 		&i.Problem.Zone1Enabled,
@@ -778,29 +778,29 @@ func (q *Queries) GetProblem(ctx context.Context, id int32) (GetProblemRow, erro
 	return i, err
 }
 
-const getProblemByNumber = `-- name: GetProblemByNumber :one
-SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
+const getProblemByLabel = `-- name: GetProblemByLabel :one
+SELECT problem.id, problem.organizer_id, problem.contest_id, problem.label, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
 FROM problem
-WHERE contest_id = ? AND number = ?
+WHERE contest_id = ? AND label = ?
 `
 
-type GetProblemByNumberParams struct {
+type GetProblemByLabelParams struct {
 	ContestID int32
-	Number    int32
+	Label     string
 }
 
-type GetProblemByNumberRow struct {
+type GetProblemByLabelRow struct {
 	Problem Problem
 }
 
-func (q *Queries) GetProblemByNumber(ctx context.Context, arg GetProblemByNumberParams) (GetProblemByNumberRow, error) {
-	row := q.db.QueryRowContext(ctx, getProblemByNumber, arg.ContestID, arg.Number)
-	var i GetProblemByNumberRow
+func (q *Queries) GetProblemByLabel(ctx context.Context, arg GetProblemByLabelParams) (GetProblemByLabelRow, error) {
+	row := q.db.QueryRowContext(ctx, getProblemByLabel, arg.ContestID, arg.Label)
+	var i GetProblemByLabelRow
 	err := row.Scan(
 		&i.Problem.ID,
 		&i.Problem.OrganizerID,
 		&i.Problem.ContestID,
-		&i.Problem.Number,
+		&i.Problem.Label,
 		&i.Problem.HoldColorPrimary,
 		&i.Problem.HoldColorSecondary,
 		&i.Problem.Zone1Enabled,
@@ -815,7 +815,7 @@ func (q *Queries) GetProblemByNumber(ctx context.Context, arg GetProblemByNumber
 }
 
 const getProblemsByContest = `-- name: GetProblemsByContest :many
-SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
+SELECT problem.id, problem.organizer_id, problem.contest_id, problem.label, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
 FROM problem
 WHERE contest_id = ?
 `
@@ -837,7 +837,7 @@ func (q *Queries) GetProblemsByContest(ctx context.Context, contestID int32) ([]
 			&i.Problem.ID,
 			&i.Problem.OrganizerID,
 			&i.Problem.ContestID,
-			&i.Problem.Number,
+			&i.Problem.Label,
 			&i.Problem.HoldColorPrimary,
 			&i.Problem.HoldColorSecondary,
 			&i.Problem.Zone1Enabled,
@@ -1509,13 +1509,13 @@ func (q *Queries) UpsertOrganizer(ctx context.Context, arg UpsertOrganizerParams
 
 const upsertProblem = `-- name: UpsertProblem :execlastid
 INSERT INTO 
-	problem (id, organizer_id, contest_id, number, hold_color_primary, hold_color_secondary, zone_1_enabled, zone_2_enabled, description, points_zone_1, points_zone_2, points_top, flash_bonus)
+	problem (id, organizer_id, contest_id, label, hold_color_primary, hold_color_secondary, zone_1_enabled, zone_2_enabled, description, points_zone_1, points_zone_2, points_top, flash_bonus)
 VALUES 
 	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     contest_id = VALUES(contest_id),
-    number = VALUES(number),
+    label = VALUES(label),
     hold_color_primary = VALUES(hold_color_primary),
     hold_color_secondary = VALUES(hold_color_secondary),
     zone_1_enabled = VALUES(zone_1_enabled),
@@ -1531,7 +1531,7 @@ type UpsertProblemParams struct {
 	ID                 int32
 	OrganizerID        int32
 	ContestID          int32
-	Number             int32
+	Label              string
 	HoldColorPrimary   string
 	HoldColorSecondary sql.NullString
 	Zone1Enabled       bool
@@ -1548,7 +1548,7 @@ func (q *Queries) UpsertProblem(ctx context.Context, arg UpsertProblemParams) (i
 		arg.ID,
 		arg.OrganizerID,
 		arg.ContestID,
-		arg.Number,
+		arg.Label,
 		arg.HoldColorPrimary,
 		arg.HoldColorSecondary,
 		arg.Zone1Enabled,
