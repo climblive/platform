@@ -4,9 +4,10 @@
   interface Props {
     value: string;
     prefix?: string;
+    short?: boolean;
   }
 
-  let { value, prefix = "" }: Props = $props();
+  let { value, prefix = "", short = false }: Props = $props();
 
   const localizedValue = $derived.by(() => {
     const matches = value.match(/^([0-9]+(\.[0-9]+)?)p$/);
@@ -14,7 +15,7 @@
       return value;
     }
 
-    return localizedPointsValue(Number(matches[1]));
+    return localizedPointsValue(Number(matches[1]), short);
   });
 </script>
 

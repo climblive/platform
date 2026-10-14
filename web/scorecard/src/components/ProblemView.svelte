@@ -87,6 +87,7 @@
       <Score
         value={problem.pointValue.current + "p"}
         prefix={counted ? "+" : undefined}
+        short
       />
     {:else if tick?.top}
       +1t
@@ -144,6 +145,7 @@
     display: flex;
     align-items: center;
     gap: var(--wa-space-2xs);
+    font-size: var(--wa-font-size-s);
 
     & .top {
       white-space: nowrap;
@@ -156,6 +158,7 @@
 
   .score {
     text-align: right;
+    font-size: var(--wa-font-size-s);
 
     &.uncounted {
       opacity: 0.3;
