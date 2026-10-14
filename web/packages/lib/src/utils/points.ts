@@ -1,4 +1,7 @@
-export const localizedPointsValue = (points: number, short: boolean) => {
+export const localizedPointsValue = (
+  points: number,
+  short: boolean = false,
+) => {
   const rounded = Math.round(points * 10) / 10;
 
   const options: Intl.NumberFormatOptions = {
