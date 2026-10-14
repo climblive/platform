@@ -25,6 +25,8 @@
     enableAttempts,
   }: Props = $props();
 
+  const id = $props.id();
+
   const valueRange = $derived.by<{ min: number; max: number } | undefined>(
     () => {
       if (problem.pointValue === undefined) {
@@ -56,11 +58,30 @@
     {#if enablePoints && valueRange}
       <span class="top">
         {#if valueRange.min === valueRange.max}
-          <Score value={valueRange.max + "p"}></Score>
+          <Score value={valueRange.max + "p"} compactThreshold={9_999_999}
+          ></Score>
         {:else}
-          ≤ <Score value={valueRange.max + "p"}></Score>
+          <span class="lte">≤</span>
+          <Score value={valueRange.max + "p"} compactThreshold={9_999_999}
+          ></Score>
         {/if}
       </span>
+    {/if}
+
+    {#if problem.description}
+      <wa-popover for={id}>
+        {problem.description}
+        <wa-button
+          appearance="outlined"
+          variant="neutral"
+          size="s"
+          data-popover="close">Got it!</wa-button
+        >
+      </wa-popover>
+
+      <wa-button size="xs" appearance="plain" pill {id}
+        ><wa-icon name="info-circle"></wa-icon></wa-button
+      >
     {/if}
   </span>
   <div class="score" class:uncounted={!counted}>
@@ -68,6 +89,7 @@
       <Score
         value={problem.pointValue.current + "p"}
         prefix={counted ? "+" : undefined}
+        compactThreshold={9_999}
       />
     {:else if tick?.top}
       +1t
@@ -122,18 +144,34 @@
   .points {
     margin-right: auto;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-2xs);
 
     & .top {
       white-space: nowrap;
+    }
+
+    & .lte {
+      color: var(--wa-color-text-quiet);
     }
   }
 
   .score {
     text-align: right;
+    font-weight: var(--wa-font-weight-semibold);
 
     &.uncounted {
       opacity: 0.3;
       text-decoration: line-through;
     }
+  }
+
+  wa-popover::part(body) {
+    width: 300px;
+  }
+
+  wa-popover wa-button {
+    margin-block-start: var(--wa-space-m);
   }
 </style>
