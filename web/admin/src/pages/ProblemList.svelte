@@ -158,7 +158,7 @@
     {@const min = Math.min(...values)}
     {@const max = Math.max(...values)}
 
-    {[min, max + (flashBonus ?? 0)].join(" - ")} pts
+    {[...new Set([min, max + (flashBonus ?? 0)])].join(" - ")} pts
   {:else}
     {values.join(" / ")} pts
   {/if}
