@@ -4,10 +4,14 @@
   interface Props {
     value: string;
     prefix?: string;
-    short?: boolean;
+    compactThreshold?: number;
   }
 
-  let { value, prefix = "", short = false }: Props = $props();
+  let {
+    value,
+    prefix = "",
+    compactThreshold = Number.MAX_SAFE_INTEGER,
+  }: Props = $props();
 
   const localizedValue = $derived.by(() => {
     const matches = value.match(/^([0-9]+(\.[0-9]+)?)p$/);
@@ -15,7 +19,7 @@
       return value;
     }
 
-    return localizedPointsValue(Number(matches[1]), short);
+    return localizedPointsValue(Number(matches[1]), compactThreshold);
   });
 </script>
 

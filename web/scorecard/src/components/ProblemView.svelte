@@ -58,10 +58,12 @@
     {#if enablePoints && valueRange}
       <span class="top">
         {#if valueRange.min === valueRange.max}
-          <Score value={valueRange.max + "p"}></Score>
+          <Score value={valueRange.max + "p"} compactThreshold={9_999_999}
+          ></Score>
         {:else}
           <span class="lte">≤</span>
-          <Score value={valueRange.max + "p"}></Score>
+          <Score value={valueRange.max + "p"} compactThreshold={9_999_999}
+          ></Score>
         {/if}
       </span>
     {/if}
@@ -87,7 +89,7 @@
       <Score
         value={problem.pointValue.current + "p"}
         prefix={counted ? "+" : undefined}
-        short
+        compactThreshold={9_999}
       />
     {:else if tick?.top}
       +1t
@@ -145,7 +147,6 @@
     display: flex;
     align-items: center;
     gap: var(--wa-space-2xs);
-    font-size: var(--wa-font-size-s);
 
     & .top {
       white-space: nowrap;
@@ -158,7 +159,6 @@
 
   .score {
     text-align: right;
-    font-size: var(--wa-font-size-s);
     font-weight: var(--wa-font-weight-semibold);
 
     &.uncounted {

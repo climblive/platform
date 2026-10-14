@@ -1,6 +1,6 @@
 export const localizedPointsValue = (
   points: number,
-  short: boolean = false,
+  compactThreshold: number = Number.MAX_SAFE_INTEGER,
 ) => {
   const rounded = Math.round(points * 10) / 10;
 
@@ -8,7 +8,7 @@ export const localizedPointsValue = (
     maximumFractionDigits: 1,
   };
 
-  if (short && points > 9_999) {
+  if (points > compactThreshold) {
     options.notation = "compact";
   }
 
