@@ -56,9 +56,9 @@
     {#if enablePoints && valueRange}
       <span class="top">
         {#if valueRange.min === valueRange.max}
-          {valueRange.max}p
+          <Score value={valueRange.max + "p"}></Score>
         {:else}
-          ≤ {valueRange.max}p
+          ≤ <Score value={valueRange.max + "p"}></Score>
         {/if}
       </span>
     {/if}
@@ -122,6 +122,10 @@
   .points {
     margin-right: auto;
     white-space: nowrap;
+
+    & .top {
+      white-space: nowrap;
+    }
   }
 
   .score {
