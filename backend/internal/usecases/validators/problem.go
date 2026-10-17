@@ -2,23 +2,34 @@ package validators
 
 import (
 	"regexp"
+	"unicode/utf8"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
 )
 
+const maxAllowedPointValue = 2_147_483_647
+
 var (
 	errProblemConstraintViolation = errors.New("constraint violation")
 	validHexColor                 = regexp.MustCompile(`^#([0-9a-fA-F]{3}){1,2}$`)
-	maxAllowedPointValue          = 2_147_483_647
+	labelRegex                    *regexp.Regexp
 )
+
+func init() {
+	labelRegex, _ = regexp.Compile(`^(\p{L}*)([0-9]+)(\p{L}*)$`)
+}
 
 type ProblemValidator struct {
 }
 
 func (v ProblemValidator) Validate(problem domain.Problem) error {
 	switch {
-	case problem.Number < 0:
+	case utf8.RuneCountInString(problem.Label) < 1:
+		fallthrough
+	case utf8.RuneCountInString(problem.Label) > 6:
+		fallthrough
+	case !labelRegex.Match([]byte(problem.Label)):
 		fallthrough
 	case !validHexColor.MatchString(problem.HoldColorPrimary):
 		fallthrough

@@ -4,10 +4,11 @@ import (
 	"context"
 	"time"
 
+	"uuid"
+
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/go-errors/errors"
 	"github.com/stretchr/testify/mock"
-	"uuid"
 )
 
 var errMock = errors.New("mock error")
@@ -173,8 +174,8 @@ func (m *repositoryMock) GetProblem(ctx context.Context, tx domain.Transaction, 
 	return args.Get(0).(domain.Problem), args.Error(1)
 }
 
-func (m *repositoryMock) GetProblemByNumber(ctx context.Context, tx domain.Transaction, contestID domain.ContestID, problemNumber int) (domain.Problem, error) {
-	args := m.Called(ctx, tx, contestID, problemNumber)
+func (m *repositoryMock) GetProblemByLabel(ctx context.Context, tx domain.Transaction, contestID domain.ContestID, problemLabel string) (domain.Problem, error) {
+	args := m.Called(ctx, tx, contestID, problemLabel)
 	return args.Get(0).(domain.Problem), args.Error(1)
 }
 

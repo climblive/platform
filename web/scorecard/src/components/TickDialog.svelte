@@ -1,13 +1,13 @@
 <script lang="ts">
+  import type { ScorecardSession } from "@/types";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
-  import type { ScorecardSession } from "@/types";
   import { HoldColorIndicator, SaveIndicator } from "@climblive/lib/components";
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
   import { deleteTickMutation, putTickMutation } from "@climblive/lib/queries";
-  import { toastUnexpectedError } from "@climblive/lib/utils";
+  import { renderLabel, toastUnexpectedError } from "@climblive/lib/utils";
   import { AxiosError } from "axios";
   import { getContext } from "svelte";
   import type { Readable } from "svelte/store";
@@ -101,7 +101,7 @@
   </button>
 
   <wa-dialog
-    label="Problem number {problem.number}"
+    label="Problem number {problem.label}"
     {open}
     onwa-hide={() => (open = false)}
   >
@@ -111,7 +111,7 @@
         --width="1.25em"
         primary={problem.holdColorPrimary}
         secondary={problem.holdColorSecondary}
-      /> Problem #{problem.number}
+      /> Problem {renderLabel(problem.label)}
     </div>
 
     {#if enableAttempts}

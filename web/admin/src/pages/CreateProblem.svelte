@@ -8,7 +8,11 @@
     getContestQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
-  import { toastUnexpectedError } from "@climblive/lib/utils";
+  import {
+    compareLabels,
+    labelRegex,
+    toastUnexpectedError,
+  } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -26,8 +30,8 @@
     if (problemsQuery.data === undefined) {
       return undefined;
     } else if (problemsQuery.data.length > 0) {
-      const sortedProblems = problemsQuery.data.toSorted(
-        (p1, p2) => p1.number - p2.number,
+      const sortedProblems = problemsQuery.data.toSorted((p1, p2) =>
+        compareLabels(p1.label, p2.label),
       );
 
       return sortedProblems.slice(-1)[0];
@@ -50,15 +54,22 @@
 
   const template = $derived.by<Partial<Problem>>(() => {
     if (highestProblem) {
+      let label = "0";
+
+      const matches = highestProblem.label.match(labelRegex);
+      if (matches !== null) {
+        label = matches[1] + (Number(matches[2]) + 1) + matches[3];
+      }
+
       return {
         ...highestProblem,
-        number: highestProblem.number + 1,
+        label,
         holdColorPrimary: "#000000",
         holdColorSecondary: undefined,
       };
     } else {
       return {
-        number: 1,
+        label: "1",
         holdColorPrimary: "#000000",
         pointsTop: contest?.usePoints ? 100 : 0,
         flashBonus: 0,

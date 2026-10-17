@@ -19,7 +19,12 @@
     getProblemsQuery,
     getTicksByContestQuery,
   } from "@climblive/lib/queries";
-  import { isDefined, localizedPointsValue } from "@climblive/lib/utils";
+  import {
+    compareLabels,
+    isDefined,
+    localizedPointsValue,
+    renderLabel,
+  } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
   import CopyProblems from "./CopyProblems.svelte";
   import DeleteProblem from "./DeleteProblem.svelte";
@@ -83,7 +88,7 @@
       ascents: ascentsByProblem.get(problem.id) ?? 0,
     }));
 
-    return problems?.sort((p1, p2) => p1.number - p2.number);
+    return problems?.sort((p1, p2) => compareLabels(p1.label, p2.label));
   });
 
   const showAll = () => {
@@ -133,7 +138,7 @@
 </script>
 
 {#snippet renderNumberAndColor({
-  number,
+  label,
   holdColorPrimary,
   holdColorSecondary,
 }: Problem)}
@@ -144,7 +149,7 @@
       primary={holdColorPrimary}
       secondary={holdColorSecondary}
     />
-    #{number}
+    {renderLabel(label)}
   </div>
 {/snippet}
 

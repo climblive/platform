@@ -1,6 +1,7 @@
 <script lang="ts">
   import { HoldColorIndicator, Score } from "@climblive/lib/components";
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
+  import { renderLabel } from "@climblive/lib/utils";
   import TickDialog from "./TickDialog.svelte";
 
   type ScorecardProblem = Problem & {
@@ -45,7 +46,7 @@
 <section
   data-ticked={!!tick}
   data-flashed={tick?.attemptsTop === 1}
-  aria-label={`Problem ${problem.number}`}
+  aria-label={`Problem ${problem.label}`}
 >
   <HoldColorIndicator
     primary={problem.holdColorPrimary}
@@ -53,7 +54,7 @@
     --height="1.25rem"
     --width="1.25rem"
   />
-  <span class="number">#{problem.number}</span>
+  <span class="number">{renderLabel(problem.label)}</span>
   <span class="points">
     {#if enablePoints && valueRange}
       <span class="top">

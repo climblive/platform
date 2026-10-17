@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -282,7 +283,7 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 		})
 
 		slices.SortFunc(problems, func(a, b domain.Problem) int {
-			return a.Number - b.Number
+			return strings.Compare(a.Label, b.Label)
 		})
 
 		for _, compClass := range compClasses {
@@ -351,7 +352,14 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 
 			problemNumbers := make([]string, 0)
 			for _, problem := range problems {
-				problemNumbers = append(problemNumbers, fmt.Sprintf("P%d", problem.Number))
+				label := problem.Label
+
+				_, err := strconv.ParseFloat(label, 64)
+				if err == nil {
+					label = "#" + label
+				}
+
+				problemNumbers = append(problemNumbers, label)
 			}
 
 			err = book.SetSheetRow(sheetName, "D1", &problemNumbers)

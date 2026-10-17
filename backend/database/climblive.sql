@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS `problem` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `organizer_id` INT NOT NULL,
   `contest_id` INT NOT NULL,
-  `number` INT NOT NULL,
+  `label` VARCHAR(6) NOT NULL,
   `hold_color_primary` VARCHAR(7) NOT NULL,
   `hold_color_secondary` VARCHAR(7) NULL DEFAULT NULL,
   `zone_1_enabled` TINYINT(1) NOT NULL DEFAULT 0,
@@ -186,7 +186,7 @@ COLLATE = utf8mb4_unicode_ci;
 
 CREATE INDEX `fk_problem_1_idx` ON `problem` (`contest_id` ASC, `organizer_id` ASC);
 
-CREATE UNIQUE INDEX `index3` ON `problem` (`number` ASC, `contest_id` ASC);
+CREATE UNIQUE INDEX `index3` ON `problem` (`label` ASC, `contest_id` ASC);
 
 CREATE INDEX `index5` ON `problem` (`id` ASC, `organizer_id` ASC, `contest_id` ASC);
 

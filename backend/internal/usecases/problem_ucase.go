@@ -17,7 +17,7 @@ type problemUseCaseRepository interface {
 	GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Problem, error)
 	StoreProblem(ctx context.Context, tx domain.Transaction, problem domain.Problem) (domain.Problem, error)
 	GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) (domain.Problem, error)
-	GetProblemByNumber(ctx context.Context, tx domain.Transaction, contestID domain.ContestID, problemNumber int) (domain.Problem, error)
+	GetProblemByLabel(ctx context.Context, tx domain.Transaction, contestID domain.ContestID, problemLabel string) (domain.Problem, error)
 	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
 	DeleteProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) error
 	GetTicksByProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) ([]domain.Tick, error)
@@ -62,7 +62,7 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 
 	problemUpdatedEventBaseline := domain.ProblemUpdatedEvent{
 		ProblemID:          problem.ID,
-		Number:             problem.Number,
+		Label:              problem.Label,
 		HoldColorPrimary:   problem.HoldColorPrimary,
 		HoldColorSecondary: problem.HoldColorSecondary,
 		Description:        problem.Description,
@@ -72,8 +72,8 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 		ProblemValue: problem.ProblemValue,
 	}
 
-	if patch.Number.PresentAndDistinct(problem.Number) {
-		_, err = uc.Repo.GetProblemByNumber(ctx, nil, problem.ContestID, patch.Number.Value)
+	if patch.Label.PresentAndDistinct(problem.Label) {
+		_, err = uc.Repo.GetProblemByLabel(ctx, nil, problem.ContestID, patch.Label.Value)
 		switch {
 		case err == nil:
 			return domain.Problem{}, errors.Wrap(domain.ErrDuplicate, 0)
@@ -82,7 +82,7 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 			return domain.Problem{}, errors.Wrap(err, 0)
 		}
 
-		problem.Number = patch.Number.Value
+		problem.Label = patch.Label.Value
 	}
 
 	if patch.HoldColorPrimary.Present {
@@ -131,7 +131,7 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 
 	event := domain.ProblemUpdatedEvent{
 		ProblemID:          problem.ID,
-		Number:             problem.Number,
+		Label:              problem.Label,
 		HoldColorPrimary:   problem.HoldColorPrimary,
 		HoldColorSecondary: problem.HoldColorSecondary,
 		Description:        problem.Description,
@@ -168,7 +168,7 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 		return domain.Problem{}, errors.New(domain.ErrLimitExceeded)
 	}
 
-	_, err = uc.Repo.GetProblemByNumber(ctx, nil, contestID, tmpl.Number)
+	_, err = uc.Repo.GetProblemByLabel(ctx, nil, contestID, tmpl.Label)
 	switch {
 	case err == nil:
 		return domain.Problem{}, errors.Wrap(domain.ErrDuplicate, 0)
@@ -181,7 +181,7 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 		ID:                 0,
 		Ownership:          contest.Ownership,
 		ContestID:          contestID,
-		Number:             tmpl.Number,
+		Label:              tmpl.Label,
 		HoldColorPrimary:   strings.TrimSpace(tmpl.HoldColorPrimary),
 		HoldColorSecondary: strings.TrimSpace(tmpl.HoldColorSecondary),
 		Description:        strings.TrimSpace(tmpl.Description),
@@ -201,7 +201,7 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 
 	event := domain.ProblemAddedEvent{
 		ProblemID:          createdProblem.ID,
-		Number:             createdProblem.Number,
+		Label:              createdProblem.Label,
 		HoldColorPrimary:   createdProblem.HoldColorPrimary,
 		HoldColorSecondary: createdProblem.HoldColorSecondary,
 		Description:        createdProblem.Description,
