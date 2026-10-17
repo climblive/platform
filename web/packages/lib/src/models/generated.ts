@@ -3,7 +3,7 @@
 //////////
 // source: id.go
 
-export type ResourceID = number; /* int32 */
+export type ResourceID = number /* int32 */;
 export type CompClassID = ResourceID;
 export type ContenderID = ResourceID;
 export type ContestID = ResourceID;
@@ -15,22 +15,19 @@ export type SeriesID = ResourceID;
 export type UserID = ResourceID;
 export type TickID = ResourceID;
 export type OrganizerInviteID = string;
-export type ResourceIDType =
-  | CompClassID
-  | ContenderID
-  | ContestID
-  | OrganizerID
-  | ProblemID
-  | RaffleID
-  | RaffleWinnerID
-  | SeriesID
-  | UserID
-  | TickID;
+export type ResourceIDType = 
+    CompClassID | ContenderID | ContestID | OrganizerID | ProblemID | RaffleID | RaffleWinnerID | SeriesID | UserID | TickID;
 export type ScoreEngineInstanceID = string;
 
 //////////
 // source: public.go
 
+export interface EventFilter {
+  contestId?: ContestID;
+  contenderId?: ContenderID;
+  eventTypes?: { [key: string]: {
+  }};
+}
 export type ColorRGB = string;
 export interface OwnershipData {
   organizerId: OrganizerID;
