@@ -8,11 +8,11 @@ INSERT INTO contender VALUES (NULL, 1, 1, 'ABCD0002', NULL, NULL, NULL, FALSE, F
 INSERT INTO contender VALUES (NULL, 1, 1, 'ABCD0003', 'Michael Scott', 1, '2024-01-01 00:00:00', FALSE, FALSE, NULL, NULL);
 INSERT INTO contender VALUES (NULL, 1, 1, 'ABCD0004', NULL, NULL, NULL, FALSE, FALSE, NULL, NULL);
 INSERT INTO contender VALUES (NULL, 1, 1, 'ABCD0005', NULL, NULL, NULL, FALSE, FALSE, NULL, NULL);
-INSERT INTO problem VALUES (NULL, 1, 1, 1, '#ef4444', '#eab308', TRUE, TRUE, 'Very slippery', 10, 20, 100, 10);
-INSERT INTO problem VALUES (NULL, 1, 1, 2, '#f97316', NULL, TRUE, TRUE, NULL, 20, 40, 200, 10);
-INSERT INTO problem VALUES (NULL, 1, 1, 3, '#84cc16', NULL, TRUE, TRUE, NULL, 30, 60, 300, 10);
-INSERT INTO problem VALUES (NULL, 1, 1, 4, '#0ea5e9', NULL, TRUE, TRUE, NULL, 40, 80, 400, 10);
-INSERT INTO problem VALUES (NULL, 1, 1, 5, '#8b5cf6', NULL, TRUE, TRUE, NULL, 50, 100, 500, NULL);
+INSERT INTO problem VALUES (NULL, 1, 1, '1', '#ef4444', '#eab308', TRUE, TRUE, 'Very slippery', 10, 20, 100, 10);
+INSERT INTO problem VALUES (NULL, 1, 1, '2', '#f97316', NULL, TRUE, TRUE, NULL, 20, 40, 200, 10);
+INSERT INTO problem VALUES (NULL, 1, 1, '3', '#84cc16', NULL, TRUE, TRUE, NULL, 30, 60, 300, 10);
+INSERT INTO problem VALUES (NULL, 1, 1, '4', '#0ea5e9', NULL, TRUE, TRUE, NULL, 40, 80, 400, 10);
+INSERT INTO problem VALUES (NULL, 1, 1, '5', '#8b5cf6', NULL, TRUE, TRUE, NULL, 50, 100, 500, NULL);
 INSERT INTO tick VALUES (NULL, 1, 1, 1, 1, '2024-01-01 00:00:00', 1, TRUE, 999, TRUE, 999, TRUE, 999);
 
 INSERT INTO contest VALUES (NULL, 1, NULL, 1, 'World Attempts Championships', 'A competition scored by tops, zones and attempts', 'On the web', 'AQ', 0, 0, FALSE, FALSE, 0, 0, NULL, 5, 20160, NOW());
@@ -28,4 +28,4 @@ CREATE TABLE `goose_db_version` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO goose_db_version SELECT NULL, seq, 1, NOW() FROM seq_1_to_40;
+INSERT INTO goose_db_version SELECT NULL, seq, 1, NOW() FROM seq_1_to_41;

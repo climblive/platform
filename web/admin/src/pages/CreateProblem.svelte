@@ -69,7 +69,7 @@
       };
     } else {
       return {
-        label: 1,
+        label: "1",
         holdColorPrimary: "#000000",
         pointsTop: contest?.usePoints ? 100 : 0,
         flashBonus: 0,

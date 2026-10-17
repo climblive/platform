@@ -51,7 +51,7 @@ func TestPatchProblem(t *testing.T) {
 		ID:                 fakedProblemID,
 		Ownership:          fakedOwnership,
 		ContestID:          fakedContestID,
-		Label:              10,
+		Label:              "10",
 		HoldColorPrimary:   "#ffffff",
 		HoldColorSecondary: "#000000",
 		Description:        "The tenth boulder",
@@ -87,7 +87,7 @@ func TestPatchProblem(t *testing.T) {
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
-			On("GetProblemByNumber", mock.Anything, nil, fakedContestID, 20).
+			On("GetProblemByLabel", mock.Anything, nil, fakedContestID, "20").
 			Return(domain.Problem{}, domain.ErrNotFound)
 
 		mockedRepo.
@@ -95,7 +95,7 @@ func TestPatchProblem(t *testing.T) {
 				ID:                 fakedProblemID,
 				Ownership:          fakedOwnership,
 				ContestID:          fakedContestID,
-				Label:              20,
+				Label:              "20",
 				HoldColorPrimary:   "#ff0000",
 				HoldColorSecondary: "#00ff00",
 				Description:        "The twentieth boulder",
@@ -112,7 +112,7 @@ func TestPatchProblem(t *testing.T) {
 				ID:                 fakedProblemID,
 				Ownership:          fakedOwnership,
 				ContestID:          fakedContestID,
-				Label:              20,
+				Label:              "20",
 				HoldColorPrimary:   "#ff0000",
 				HoldColorSecondary: "#00ff00",
 				Description:        "The twentieth boulder",
@@ -129,7 +129,7 @@ func TestPatchProblem(t *testing.T) {
 		mockedEventBroker.
 			On("Dispatch", fakedContestID, domain.ProblemUpdatedEvent{
 				ProblemID:          fakedProblemID,
-				Number:             20,
+				Label:              "20",
 				HoldColorPrimary:   "#ff0000",
 				HoldColorSecondary: "#00ff00",
 				Description:        "The twentieth boulder",
@@ -150,7 +150,7 @@ func TestPatchProblem(t *testing.T) {
 		}
 
 		problem, err := ucase.PatchProblem(context.Background(), fakedProblemID, domain.ProblemPatch{
-			Label:              domain.NewPatch(20),
+			Label:              domain.NewPatch("20"),
 			HoldColorPrimary:   domain.NewPatch("#ff0000"),
 			HoldColorSecondary: domain.NewPatch("#00ff00"),
 			Description:        domain.NewPatch("The twentieth boulder"),
@@ -163,7 +163,7 @@ func TestPatchProblem(t *testing.T) {
 		})
 
 		require.NoError(t, err)
-		assert.Equal(t, 20, problem.Label)
+		assert.Equal(t, "20", problem.Label)
 		assert.Equal(t, "#ff0000", problem.HoldColorPrimary)
 		assert.Equal(t, "#00ff00", problem.HoldColorSecondary)
 		assert.Equal(t, "The twentieth boulder", problem.Description)
@@ -211,7 +211,7 @@ func TestPatchProblem(t *testing.T) {
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
-			On("GetProblemByNumber", mock.Anything, nil, fakedContestID, 20).
+			On("GetProblemByLabel", mock.Anything, nil, fakedContestID, "20").
 			Return(domain.Problem{}, nil)
 
 		ucase := usecases.ProblemUseCase{
@@ -220,7 +220,7 @@ func TestPatchProblem(t *testing.T) {
 		}
 
 		_, err := ucase.PatchProblem(context.Background(), fakedProblemID, domain.ProblemPatch{
-			Label: domain.NewPatch(20),
+			Label: domain.NewPatch("20"),
 		})
 
 		require.ErrorIs(t, err, domain.ErrDuplicate)
@@ -312,7 +312,7 @@ func TestCreateProblem(t *testing.T) {
 		mockedEventBroker.
 			On("Dispatch", fakedContestID, domain.ProblemAddedEvent{
 				ProblemID:          fakedProblemID,
-				Number:             10,
+				Label:              "10",
 				HoldColorPrimary:   "#ffffff",
 				HoldColorSecondary: "#000",
 				Description:        "Crack volumes are included",
@@ -336,7 +336,7 @@ func TestCreateProblem(t *testing.T) {
 			Return([]domain.Problem{}, nil)
 
 		mockedRepo.
-			On("GetProblemByNumber", mock.Anything, nil, fakedContestID, 10).
+			On("GetProblemByLabel", mock.Anything, nil, fakedContestID, "10").
 			Return(domain.Problem{}, domain.ErrNotFound)
 
 		mockedRepo.
@@ -344,7 +344,7 @@ func TestCreateProblem(t *testing.T) {
 				domain.Problem{
 					Ownership:          fakedOwnership,
 					ContestID:          fakedContestID,
-					Label:              10,
+					Label:              "10",
 					HoldColorPrimary:   "#ffffff",
 					HoldColorSecondary: "#000",
 					Description:        "Crack volumes are included",
@@ -363,7 +363,7 @@ func TestCreateProblem(t *testing.T) {
 					ID:                 fakedProblemID,
 					Ownership:          fakedOwnership,
 					ContestID:          fakedContestID,
-					Label:              10,
+					Label:              "10",
 					HoldColorPrimary:   "#ffffff",
 					HoldColorSecondary: "#000",
 					Description:        "Crack volumes are included",
@@ -384,7 +384,7 @@ func TestCreateProblem(t *testing.T) {
 		}
 
 		problem, err := ucase.CreateProblem(context.Background(), fakedContestID, domain.ProblemTemplate{
-			Label:              10,
+			Label:              "10",
 			HoldColorPrimary:   "#ffffff",
 			HoldColorSecondary: "#000",
 			Description:        "Crack volumes are included",
@@ -402,7 +402,7 @@ func TestCreateProblem(t *testing.T) {
 		assert.Equal(t, fakedProblemID, problem.ID)
 		assert.Equal(t, fakedOwnership, problem.Ownership)
 		assert.Equal(t, fakedContestID, problem.ContestID)
-		assert.Equal(t, 10, problem.Label)
+		assert.Equal(t, "10", problem.Label)
 		assert.Equal(t, "#ffffff", problem.HoldColorPrimary)
 		assert.Equal(t, "#000", problem.HoldColorSecondary)
 		assert.Equal(t, "Crack volumes are included", problem.Description)
@@ -430,7 +430,7 @@ func TestCreateProblem(t *testing.T) {
 			Return([]domain.Problem{}, nil)
 
 		mockedRepo.
-			On("GetProblemByNumber", mock.Anything, nil, fakedContestID, 10).
+			On("GetProblemByLabel", mock.Anything, nil, fakedContestID, "10").
 			Return(domain.Problem{}, nil)
 
 		ucase := usecases.ProblemUseCase{
@@ -439,7 +439,7 @@ func TestCreateProblem(t *testing.T) {
 		}
 
 		_, err := ucase.CreateProblem(context.Background(), fakedContestID, domain.ProblemTemplate{
-			Label:              10,
+			Label:              "10",
 			HoldColorPrimary:   "#ffffff",
 			HoldColorSecondary: "#000",
 			Description:        "Crack volumes are included",
@@ -469,7 +469,7 @@ func TestCreateProblem(t *testing.T) {
 			Return([]domain.Problem{}, nil)
 
 		mockedRepo.
-			On("GetProblemByNumber", mock.Anything, nil, fakedContestID, 10).
+			On("GetProblemByLabel", mock.Anything, nil, fakedContestID, "10").
 			Return(domain.Problem{}, domain.ErrNotFound)
 
 		ucase := usecases.ProblemUseCase{
@@ -478,7 +478,7 @@ func TestCreateProblem(t *testing.T) {
 		}
 
 		_, err := ucase.CreateProblem(context.Background(), fakedContestID, domain.ProblemTemplate{
-			Label:        10,
+			Label:        "10",
 			ProblemValue: domain.ProblemValue{PointsTop: -100},
 		})
 
