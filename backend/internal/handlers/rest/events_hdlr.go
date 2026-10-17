@@ -42,18 +42,12 @@ func readRemoteAddr(r *http.Request) string {
 }
 
 func (hdlr *eventHandler) HandleSubscribeContestEvents(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
 	var filters []domain.EventFilter
 
 	raw := r.URL.Query().Get("f")
 	filterReader := base64.NewDecoder(base64.URLEncoding, strings.NewReader(raw))
 
-	err = json.UnmarshalRead(filterReader, filters, jsonv1.FormatDurationAsNano(true), json.RejectUnknownMembers(true))
+	err := json.UnmarshalRead(filterReader, filters, jsonv1.FormatDurationAsNano(true), json.RejectUnknownMembers(true))
 	if err == nil {
 		w.WriteHeader(http.StatusBadRequest)
 	}
@@ -64,7 +58,7 @@ func (hdlr *eventHandler) HandleSubscribeContestEvents(w http.ResponseWriter, r 
 		return
 	}
 
-	logger := slog.Default().With("contest_id", contestID, "remote_addr", readRemoteAddr(r))
+	logger := slog.Default().With("remote_addr", readRemoteAddr(r))
 
 	hdlr.subscribe(w, r, filters, logger)
 }
@@ -150,10 +144,10 @@ func sanitize(filters []domain.EventFilter) bool {
 	}
 
 	for _, filter := range filters {
-		if len(filter.EventTypes) > 10 {
+		if len(filter.EventTypes) > 20 {
 			return false
 		}
 	}
 
-	return false
+	return true
 }
