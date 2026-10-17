@@ -29,6 +29,7 @@
     pointValueUpdatedEventSchema,
     raffleWinnerDrawnEventSchema,
     rulesUpdatedEventSchema,
+    type EventFilter,
     type PointValue,
     type Problem,
     type Tick,
@@ -48,7 +49,7 @@
     updateRulesInQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
-  import { getApiUrl } from "@climblive/lib/utils";
+  import { base64UrlEncode, getApiUrl } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
@@ -246,8 +247,31 @@
       return;
     }
 
+    const filters: EventFilter[] = [
+      {
+        contenderId: $session.contenderId,
+        eventTypes: {
+          CONTENDER_PUBLIC_INFO_UPDATED: {},
+          CONTENDER_SCORE_UPDATED: {},
+          ASCENT_REGISTERED: {},
+          ASCENT_DEREGISTERED: {},
+          POINT_VALUE_UPDATED: {},
+          RAFFLE_WINNER_DRAWN: {},
+        },
+      },
+      {
+        contestId: $session.contestId,
+        eventTypes: {
+          RULES_UPDATED: {},
+          PROBLEM_ADDED: {},
+          PROBLEM_UPDATED: {},
+          PROBLEM_DELETED: {},
+        },
+      },
+    ];
+
     eventSource = new EventSource(
-      `${getApiUrl()}/contenders/${$session.contenderId}/events`,
+      `${getApiUrl()}/contests/events?f=${base64UrlEncode(JSON.stringify(filters))}`,
     );
 
     eventSource.addEventListener("CONTENDER_PUBLIC_INFO_UPDATED", (e) => {

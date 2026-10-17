@@ -4,6 +4,12 @@ import (
 	"time"
 )
 
+type EventFilter struct {
+	ContestID   ContestID           `json:"contestId,omitzero"`
+	ContenderID ContenderID         `json:"contenderId,omitzero"`
+	EventTypes  map[string]struct{} `json:"eventTypes,omitzero"`
+}
+
 type ColorRGB string
 
 type OwnershipData struct {

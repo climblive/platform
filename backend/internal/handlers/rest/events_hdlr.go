@@ -1,11 +1,13 @@
 package rest
 
 import (
-	"context"
+	"encoding/base64"
+	jsonv1 "encoding/json"
 	"encoding/json/v2"
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -19,22 +21,15 @@ const eventWriteTimeout = 10 * time.Second
 type eventHandler struct {
 	eventBroker  domain.EventBroker
 	pingInterval time.Duration
-	repo         eventHandlerRepository
 }
 
-type eventHandlerRepository interface {
-	GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error)
-}
-
-func InstallEventHandler(mux *Mux, eventBroker domain.EventBroker, repo eventHandlerRepository, pingInterval time.Duration) {
+func InstallEventHandler(mux *Mux, eventBroker domain.EventBroker, pingInterval time.Duration) {
 	handler := &eventHandler{
 		eventBroker:  eventBroker,
 		pingInterval: pingInterval,
-		repo:         repo,
 	}
 
-	mux.HandleFunc("GET /contests/{contestID}/events", handler.HandleSubscribeContestEvents)
-	mux.HandleFunc("GET /contenders/{contenderID}/events", handler.HandleSubscribeContenderEvents)
+	mux.HandleFunc("GET /contests/events", handler.HandleSubscribeContestEvents)
 }
 
 func readRemoteAddr(r *http.Request) string {
@@ -47,62 +42,23 @@ func readRemoteAddr(r *http.Request) string {
 }
 
 func (hdlr *eventHandler) HandleSubscribeContestEvents(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
-	if err != nil {
+	var filters []domain.EventFilter
+
+	raw := r.URL.Query().Get("f")
+	filterReader := base64.NewDecoder(base64.URLEncoding, strings.NewReader(raw))
+
+	err := json.UnmarshalRead(filterReader, filters, jsonv1.FormatDurationAsNano(true), json.RejectUnknownMembers(true))
+	if err == nil {
 		w.WriteHeader(http.StatusBadRequest)
-		return
 	}
 
-	logger := slog.Default().With("contest_id", contestID, "remote_addr", readRemoteAddr(r))
-
-	filter := domain.NewEventFilter(
-		contestID,
-		0,
-		"CONTENDER_PUBLIC_INFO_UPDATED",
-		"[]CONTENDER_SCORE_UPDATED",
-		"SCORE_ENGINE_STARTED",
-		"SCORE_ENGINE_STOPPED",
-	)
-
-	hdlr.subscribe(w, r, []domain.EventFilter{filter}, logger)
-}
-
-func (hdlr *eventHandler) HandleSubscribeContenderEvents(w http.ResponseWriter, r *http.Request) {
-	contenderID, err := parseResourceID[domain.ContenderID](r.PathValue("contenderID"))
-	if err != nil {
+	if !sanitize(filters) {
 		w.WriteHeader(http.StatusBadRequest)
+
 		return
 	}
 
-	contender, err := hdlr.repo.GetContender(r.Context(), nil, contenderID)
-	if err != nil {
-		handleError(w, err)
-		return
-	}
-
-	logger := slog.Default().With("contender_id", contenderID, "remote_addr", readRemoteAddr(r))
-
-	filters := make([]domain.EventFilter, 0, 2)
-
-	filters = append(filters, domain.NewEventFilter(
-		contender.ContestID,
-		contenderID,
-		"CONTENDER_PUBLIC_INFO_UPDATED",
-		"CONTENDER_SCORE_UPDATED",
-		"ASCENT_REGISTERED",
-		"ASCENT_DEREGISTERED",
-		"POINT_VALUE_UPDATED",
-		"RAFFLE_WINNER_DRAWN",
-	))
-
-	filters = append(filters, domain.NewEventFilter(
-		contender.ContestID,
-		0,
-		"RULES_UPDATED",
-		"PROBLEM_ADDED",
-		"PROBLEM_UPDATED",
-		"PROBLEM_DELETED",
-	))
+	logger := slog.Default().With("remote_addr", readRemoteAddr(r))
 
 	hdlr.subscribe(w, r, filters, logger)
 }
@@ -178,6 +134,20 @@ func write(w http.ResponseWriter, data string) bool {
 	}
 
 	_ = controller.SetWriteDeadline(time.Time{})
+
+	return true
+}
+
+func sanitize(filters []domain.EventFilter) bool {
+	if len(filters) > 5 {
+		return false
+	}
+
+	for _, filter := range filters {
+		if len(filter.EventTypes) > 20 {
+			return false
+		}
+	}
 
 	return true
 }
