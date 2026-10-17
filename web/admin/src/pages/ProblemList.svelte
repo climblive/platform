@@ -166,9 +166,9 @@
       ...new Set([min, max + (flashBonus ?? 0)]),
     ].toSorted((p1, p2) => p1 - p2)}
 
-    {uniquePoints.map(localizedPointsValue).join(" - ")}
+    {uniquePoints.map((p) => localizedPointsValue(p)).join(" - ")}
   {:else}
-    {values.map(localizedPointsValue).join(" / ")}
+    {values.map((p) => localizedPointsValue(p)).join(" / ")}
   {/if}
 {/snippet}
 

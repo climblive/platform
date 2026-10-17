@@ -163,6 +163,15 @@
         placement="bottom"
       />
     </div>
+    <wa-input
+      size="s"
+      {@attach name("description")}
+      label="Description"
+      type="text"
+      value={data.description}
+      hint="An optional short description of the problem."
+      placeholder="Volumes are included"
+    ></wa-input>
     <wa-number-input
       class={{ hidden: hidePoints }}
       size="s"
