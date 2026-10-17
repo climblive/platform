@@ -1,6 +1,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/popover/popover.js";
   import type { Problem } from "@climblive/lib/models";
+  import { renderLabel } from "@climblive/lib/utils";
   import type { ProblemStats } from "./ProblemsChart.svelte";
 
   type Props = {
@@ -17,7 +18,10 @@
 </script>
 
 <div class="container">
-  <button {id} aria-label="Show details for problem #{problem.number}">
+  <button
+    {id}
+    aria-label="Show details for problem {renderLabel(problem.label)}"
+  >
     <div
       class="fill"
       style:--primary-color={problem.holdColorPrimary}
@@ -27,10 +31,10 @@
       <div class="top" style:--target-height="{topPct}%"></div>
     </div>
   </button>
-  <span class="label">#{problem.number}</span>
+  <span class="label">{renderLabel(problem.label)}</span>
 
   <wa-popover for={id} placement="top">
-    <strong>Problem #{problem.number}</strong>
+    <strong>Problem {renderLabel(problem.label)}</strong>
 
     {#if problem.zone1Enabled}
       <div>

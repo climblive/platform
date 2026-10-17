@@ -36,10 +36,10 @@ func (d *Database) GetProblem(ctx context.Context, tx domain.Transaction, proble
 	return problemToDomain(record.Problem), nil
 }
 
-func (d *Database) GetProblemByNumber(ctx context.Context, tx domain.Transaction, contestID domain.ContestID, problemNumber int) (domain.Problem, error) {
-	record, err := d.WithTx(tx).GetProblemByNumber(ctx, database.GetProblemByNumberParams{
+func (d *Database) GetProblemByLabel(ctx context.Context, tx domain.Transaction, contestID domain.ContestID, problemLabel string) (domain.Problem, error) {
+	record, err := d.WithTx(tx).GetProblemByLabel(ctx, database.GetProblemByLabelParams{
 		ContestID: int32(contestID),
-		Number:    int32(problemNumber),
+		Label:     problemLabel,
 	})
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
@@ -56,7 +56,7 @@ func (d *Database) StoreProblem(ctx context.Context, tx domain.Transaction, prob
 		ID:                 int32(problem.ID),
 		OrganizerID:        int32(problem.Ownership.OrganizerID),
 		ContestID:          int32(problem.ContestID),
-		Number:             int32(problem.Label),
+		Label:              problem.Label,
 		HoldColorPrimary:   problem.HoldColorPrimary,
 		HoldColorSecondary: makeNullString(problem.HoldColorSecondary),
 		Description:        makeNullString(problem.Description),

@@ -282,7 +282,7 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 		})
 
 		slices.SortFunc(problems, func(a, b domain.Problem) int {
-			return a.Label - b.Label
+			return strings.Compare(a.Label, b.Label)
 		})
 
 		for _, compClass := range compClasses {

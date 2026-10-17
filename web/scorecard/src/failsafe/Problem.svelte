@@ -1,6 +1,7 @@
 <script lang="ts">
   import { HoldColorIndicator } from "@climblive/lib/components";
   import type { Problem, Tick } from "@climblive/lib/models";
+  import { renderLabel } from "@climblive/lib/utils";
   import SimpleTickEditor from "./SimpleTickEditor.svelte";
   import TickEditor from "./TickEditor.svelte";
 
@@ -29,7 +30,7 @@
   });
 </script>
 
-<section aria-label={`Problem ${problem.number}`} data-tick={tickType}>
+<section aria-label={`Problem ${problem.label}`} data-tick={tickType}>
   <span class="label">
     <HoldColorIndicator
       --height="1.25rem"
@@ -37,7 +38,7 @@
       primary={problem.holdColorPrimary}
       secondary={problem.holdColorSecondary}
     />
-    #{problem.number}
+    {renderLabel(problem.label)}
     <div class="icon">
       {#if tick?.top && tick.attemptsTop === 1}
         F

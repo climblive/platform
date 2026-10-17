@@ -48,7 +48,7 @@
     updateRulesInQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
-  import { getApiUrl } from "@climblive/lib/utils";
+  import { compareLabels, getApiUrl } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
@@ -116,15 +116,15 @@
 
     switch (orderProblemsBy) {
       case "number":
-        clonedProblems.sort(
-          (p1: ScorecardProblem, p2: ScorecardProblem) => p1.number - p2.number,
+        clonedProblems.sort((p1: ScorecardProblem, p2: ScorecardProblem) =>
+          compareLabels(p1.label, p2.label),
         );
 
         break;
       case "points":
         clonedProblems.sort((p1: ScorecardProblem, p2: ScorecardProblem) => {
           if (p1.pointValue === undefined && p2.pointValue === undefined) {
-            return p1.number - p2.number;
+            return compareLabels(p1.label, p2.label);
           }
 
           if (p1.pointValue === undefined) {
@@ -147,7 +147,7 @@
           );
 
           if (p1Max === p2Max) {
-            return p1.number - p2.number;
+            return compareLabels(p1.label, p2.label);
           }
 
           return p1Max - p2Max;

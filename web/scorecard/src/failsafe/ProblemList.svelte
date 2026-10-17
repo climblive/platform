@@ -4,6 +4,7 @@
     getProblemsQuery,
     getTicksByContenderQuery,
   } from "@climblive/lib/queries";
+  import { compareLabels } from "@climblive/lib/utils";
   import Problem from "./Problem.svelte";
 
   type Props = {
@@ -19,7 +20,7 @@
 
   let problems = $derived(
     problemsQuery.data
-      ? [...problemsQuery.data]?.sort((a, b) => a.number - b.number)
+      ? [...problemsQuery.data]?.sort((a, b) => compareLabels(a.label, b.label))
       : undefined,
   );
   let ticksByProblem = $derived<Map<number, Tick>>(

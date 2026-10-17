@@ -316,7 +316,7 @@ type AscentDeregisteredEvent struct {
 
 type ProblemAddedEvent struct {
 	ProblemID          ProblemID `json:"problemId"`
-	Label              int       `json:"label"`
+	Label              string    `json:"label"`
 	HoldColorPrimary   string    `json:"holdColorPrimary"`
 	HoldColorSecondary string    `json:"holdColorSecondary,omitzero"`
 	Description        string    `json:"description,omitzero"`
