@@ -68,7 +68,7 @@ func TestEventsHandler(t *testing.T) {
 		encoded, err := json.Marshal(filters)
 		require.NoError(t, err)
 
-		return base64.URLEncoding.EncodeToString(encoded)
+		return base64.RawURLEncoding.EncodeToString(encoded)
 	}
 
 	t.Run("ConnectAndDisconnect", func(t *testing.T) {

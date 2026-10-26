@@ -45,7 +45,7 @@ func (hdlr *eventHandler) HandleSubscribeEvents(w http.ResponseWriter, r *http.R
 	var filters []domain.EventFilter
 
 	raw := r.URL.Query().Get("f")
-	filterReader := base64.NewDecoder(base64.URLEncoding, strings.NewReader(raw))
+	filterReader := base64.NewDecoder(base64.RawURLEncoding, strings.NewReader(raw))
 
 	err := json.UnmarshalRead(filterReader, &filters, jsonv1.FormatDurationAsNano(true))
 	if err != nil {

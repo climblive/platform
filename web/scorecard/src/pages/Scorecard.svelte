@@ -271,7 +271,7 @@
     ];
 
     eventSource = new EventSource(
-      `${getApiUrl()}/contests/events?f=${base64UrlEncode(JSON.stringify(filters))}`,
+      `${getApiUrl()}/events?f=${base64UrlEncode(JSON.stringify(filters))}`,
     );
 
     eventSource.addEventListener("CONTENDER_PUBLIC_INFO_UPDATED", (e) => {

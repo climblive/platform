@@ -73,7 +73,7 @@
     ];
 
     const eventSource = new EventSource(
-      `${getApiUrl()}/contests/events?f=${base64UrlEncode(JSON.stringify(filters))}`,
+      `${getApiUrl()}/events?f=${base64UrlEncode(JSON.stringify(filters))}`,
     );
 
     setupEventHandlers(eventSource);
