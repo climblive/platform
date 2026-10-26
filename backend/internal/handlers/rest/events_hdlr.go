@@ -29,7 +29,7 @@ func InstallEventHandler(mux *Mux, eventBroker domain.EventBroker, pingInterval 
 		pingInterval: pingInterval,
 	}
 
-	mux.HandleFunc("GET /contests/events", handler.HandleSubscribeContestEvents)
+	mux.HandleFunc("GET /events", handler.HandleSubscribeEvents)
 }
 
 func readRemoteAddr(r *http.Request) string {
@@ -41,14 +41,14 @@ func readRemoteAddr(r *http.Request) string {
 	return addr
 }
 
-func (hdlr *eventHandler) HandleSubscribeContestEvents(w http.ResponseWriter, r *http.Request) {
+func (hdlr *eventHandler) HandleSubscribeEvents(w http.ResponseWriter, r *http.Request) {
 	var filters []domain.EventFilter
 
 	raw := r.URL.Query().Get("f")
 	filterReader := base64.NewDecoder(base64.URLEncoding, strings.NewReader(raw))
 
-	err := json.UnmarshalRead(filterReader, filters, jsonv1.FormatDurationAsNano(true), json.RejectUnknownMembers(true))
-	if err == nil {
+	err := json.UnmarshalRead(filterReader, &filters, jsonv1.FormatDurationAsNano(true))
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 	}
 
