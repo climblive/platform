@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { z } from "@climblive/lib/utils";
+  import { base64UrlEncode, z } from "@climblive/lib/utils";
   import { onDestroy, onMount, type Snippet } from "svelte";
   import { writable, type Writable } from "svelte/store";
   import { ApiClient } from "../Api";
   import {
     contenderPublicInfoUpdatedEventSchema,
     contenderScoreUpdatedEventSchema,
+    type EventFilter,
     type Score,
     type ScoreboardEntry,
   } from "../models";
@@ -61,8 +62,18 @@
   };
 
   const setup = () => {
-    eventSource = new EventSource(
-      `${getApiUrl()}/contests/${contestId}/events`,
+    const filters: EventFilter[] = [
+      {
+        contestId,
+        eventTypes: {
+          CONTENDER_PUBLIC_INFO_UPDATED: {},
+          "[]CONTENDER_SCORE_UPDATED": {},
+        },
+      },
+    ];
+
+    const eventSource = new EventSource(
+      `${getApiUrl()}/events?f=${base64UrlEncode(JSON.stringify(filters))}`,
     );
 
     setupEventHandlers(eventSource);

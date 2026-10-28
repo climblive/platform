@@ -18,6 +18,7 @@
   import { Route, Router, navigate } from "svelte-routing";
   import { writable } from "svelte/store";
   import { ZodError } from "zod/v4";
+  import EventsProvider from "../../packages/lib/src/components/EventsProvider.svelte";
 
   let authenticating = $state(true);
 
@@ -104,12 +105,14 @@
     {#if authenticating}
       <Loading />
     {:else}
-      <Router>
-        <Route path="/:code/register"><Register /></Route>
-        <Route path="/:code/edit"><EditProfile /></Route>
-        <Route path="/:code"><Scorecard /></Route>
-        <Route path="/"><Start /></Route>
-      </Router>
+      <EventsProvider>
+        <Router>
+          <Route path="/:code/register"><Register /></Route>
+          <Route path="/:code/edit"><EditProfile /></Route>
+          <Route path="/:code"><Scorecard /></Route>
+          <Route path="/"><Start /></Route>
+        </Router>
+      </EventsProvider>
     {/if}
     {#if import.meta.env.DEV}
       <SvelteQueryDevtools />

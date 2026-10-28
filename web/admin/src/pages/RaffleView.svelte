@@ -11,7 +11,7 @@
     Table,
     type ColumnDefinition,
   } from "@climblive/lib/components";
-  import type { RaffleWinner } from "@climblive/lib/models";
+  import type { EventFilter, RaffleWinner } from "@climblive/lib/models";
   import {
     drawRaffleWinnerMutation,
     getContendersByContestQuery,
@@ -19,7 +19,11 @@
     getRaffleQuery,
     getRaffleWinnersQuery,
   } from "@climblive/lib/queries";
-  import { getApiUrl, toastUnexpectedError } from "@climblive/lib/utils";
+  import {
+    base64UrlEncode,
+    getApiUrl,
+    toastUnexpectedError,
+  } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { AxiosError } from "axios";
   import { format } from "date-fns";
@@ -92,8 +96,19 @@
       return;
     }
 
+    const filters: EventFilter[] = [
+      {
+        contestId,
+        eventTypes: {
+          CONTENDER_ENTERED: {},
+          CONTENDER_DISQUALIFIED: {},
+          CONTENDER_REQUALIFIED: {},
+        },
+      },
+    ];
+
     const eventSource = new EventSource(
-      `${getApiUrl()}/contests/${contestId}/events`,
+      `${getApiUrl()}/events?f=${base64UrlEncode(JSON.stringify(filters))}`,
     );
 
     const invalidateContenders = () => {
