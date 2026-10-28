@@ -49,10 +49,10 @@
     updateRulesInQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
-  import { base64UrlEncode, getApiUrl } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
+  import { subscribeEvents } from "../../../packages/lib/src/components/EventsProvider.svelte";
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
@@ -270,109 +270,122 @@
       },
     ];
 
-    eventSource = new EventSource(
-      `${getApiUrl()}/events?f=${base64UrlEncode(JSON.stringify(filters))}`,
-    );
+    subscribeEvents(filters, (eventName: string, e: MessageEvent) => {
+      switch (eventName) {
+        case "CONTENDER_PUBLIC_INFO_UPDATED":
+          {
+            const event = contenderPublicInfoUpdatedEventSchema.parse(
+              JSON.parse(e.data),
+            );
 
-    eventSource.addEventListener("CONTENDER_PUBLIC_INFO_UPDATED", (e) => {
-      const event = contenderPublicInfoUpdatedEventSchema.parse(
-        JSON.parse(e.data),
-      );
+            if (event.contenderId !== contender?.id) {
+              return;
+            }
 
-      if (event.contenderId !== contender?.id) {
-        return;
+            updateContenderPublicInfoInQueryCache(
+              queryClient,
+              event.contenderId,
+              {
+                compClassId: event.compClassId,
+                name: event.name,
+                withdrawnFromFinals: event.withdrawnFromFinals,
+                disqualified: event.disqualified,
+                scrubbedAt: event.scrubbedAt,
+              },
+            );
+          }
+          break;
+        case "CONTENDER_SCORE_UPDATED":
+          {
+            const event = contenderScoreUpdatedEventSchema.parse(
+              JSON.parse(e.data),
+            );
+
+            if (event.contenderId === contender?.id) {
+              score = event.score;
+              placement = event.placement;
+              finalist = event.finalist;
+            }
+          }
+          break;
+        case "ASCENT_REGISTERED":
+          {
+            const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
+
+            if (event.contenderId !== contender?.id) {
+              return;
+            }
+
+            const newTick: Tick = {
+              id: event.tickId,
+              timestamp: event.timestamp,
+              revision: event.revision,
+              problemId: event.problemId,
+              zone1: event.zone1,
+              attemptsZone1: event.attemptsZone1,
+              zone2: event.zone2,
+              attemptsZone2: event.attemptsZone2,
+              top: event.top,
+              attemptsTop: event.attemptsTop,
+            };
+
+            updateTickInQueryCache(queryClient, $session.contenderId, newTick);
+          }
+          break;
+        case "ASCENT_DEREGISTERED":
+          {
+            const event = ascentDeregisteredEventSchema.parse(
+              JSON.parse(e.data),
+            );
+
+            if (event.contenderId !== contender?.id) {
+              return;
+            }
+
+            removeTickFromQueryCache(queryClient, event.tickId);
+          }
+          break;
+        case "POINT_VALUE_UPDATED":
+          {
+            const event = pointValueUpdatedEventSchema.parse(
+              JSON.parse(e.data),
+            );
+
+            if (event.contenderId !== contender?.id) {
+              return;
+            }
+
+            updatePointValueInQueryCache(queryClient, event.contenderId, event);
+          }
+          break;
+        case "RAFFLE_WINNER_DRAWN":
+          {
+            const event = raffleWinnerDrawnEventSchema.parse(
+              JSON.parse(e.data),
+            );
+
+            if (event.contenderId === contender?.id && raffleWinnerDialog) {
+              raffleWinnerDialog.open = true;
+            }
+          }
+          break;
+        case "RULES_UPDATED":
+          {
+            const event = rulesUpdatedEventSchema.parse(JSON.parse(e.data));
+
+            if (event.contestId !== $session.contestId) {
+              return;
+            }
+
+            updateRulesInQueryCache(queryClient, event.contestId, event);
+          }
+          break;
+        case "PROBLEM_ADDED":
+        case "PROBLEM_UPDATED":
+        case "PROBLEM_DELETED":
+          refetchProblems(queryClient, $session.contestId);
+          break;
       }
-
-      updateContenderPublicInfoInQueryCache(queryClient, event.contenderId, {
-        compClassId: event.compClassId,
-        name: event.name,
-        withdrawnFromFinals: event.withdrawnFromFinals,
-        disqualified: event.disqualified,
-        scrubbedAt: event.scrubbedAt,
-      });
-    });
-
-    eventSource.addEventListener("CONTENDER_SCORE_UPDATED", (e) => {
-      const event = contenderScoreUpdatedEventSchema.parse(JSON.parse(e.data));
-
-      if (event.contenderId === contender?.id) {
-        score = event.score;
-        placement = event.placement;
-        finalist = event.finalist;
-      }
-    });
-
-    eventSource.addEventListener("ASCENT_REGISTERED", (e) => {
-      const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
-
-      if (event.contenderId !== contender?.id) {
-        return;
-      }
-
-      const newTick: Tick = {
-        id: event.tickId,
-        timestamp: event.timestamp,
-        revision: event.revision,
-        problemId: event.problemId,
-        zone1: event.zone1,
-        attemptsZone1: event.attemptsZone1,
-        zone2: event.zone2,
-        attemptsZone2: event.attemptsZone2,
-        top: event.top,
-        attemptsTop: event.attemptsTop,
-      };
-
-      updateTickInQueryCache(queryClient, $session.contenderId, newTick);
-    });
-
-    eventSource.addEventListener("ASCENT_DEREGISTERED", (e) => {
-      const event = ascentDeregisteredEventSchema.parse(JSON.parse(e.data));
-
-      if (event.contenderId !== contender?.id) {
-        return;
-      }
-
-      removeTickFromQueryCache(queryClient, event.tickId);
-    });
-
-    eventSource.addEventListener("POINT_VALUE_UPDATED", (e) => {
-      const event = pointValueUpdatedEventSchema.parse(JSON.parse(e.data));
-
-      if (event.contenderId !== contender?.id) {
-        return;
-      }
-
-      updatePointValueInQueryCache(queryClient, event.contenderId, event);
-    });
-
-    eventSource.addEventListener("RAFFLE_WINNER_DRAWN", (e) => {
-      const event = raffleWinnerDrawnEventSchema.parse(JSON.parse(e.data));
-
-      if (event.contenderId === contender?.id && raffleWinnerDialog) {
-        raffleWinnerDialog.open = true;
-      }
-    });
-
-    eventSource.addEventListener("RULES_UPDATED", (e) => {
-      const event = rulesUpdatedEventSchema.parse(JSON.parse(e.data));
-
-      if (event.contestId !== $session.contestId) {
-        return;
-      }
-
-      updateRulesInQueryCache(queryClient, event.contestId, event);
-    });
-
-    eventSource.addEventListener("PROBLEM_ADDED", () => {
-      refetchProblems(queryClient, $session.contestId);
-    });
-
-    eventSource.addEventListener("PROBLEM_UPDATED", () => {
-      refetchProblems(queryClient, $session.contestId);
-    });
-
-    eventSource.addEventListener("PROBLEM_DELETED", () => {
-      refetchProblems(queryClient, $session.contestId);
     });
   };
 

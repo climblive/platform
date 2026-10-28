@@ -2,6 +2,7 @@ export { default as ContenderName } from "./ContenderName.svelte";
 export { default as ContestStateProvider } from "./ContestStateProvider.svelte";
 export { default as EmptyState } from "./EmptyState.svelte";
 export { default as ErrorBoundary } from "./ErrorBoundary.svelte";
+export { default as EventsProvider } from "./EventsProvider.svelte";
 export { default as Fallback } from "./Fallback.svelte";
 export { default as Floater } from "./Floater.svelte";
 export { default as FullLogo } from "./FullLogo.svelte";
