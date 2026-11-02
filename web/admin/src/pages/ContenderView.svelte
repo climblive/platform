@@ -17,6 +17,7 @@
     EmptyState,
     LabeledText,
     RegistrationCode,
+    Score,
   } from "@climblive/lib/components";
   import { checked, value } from "@climblive/lib/forms";
   import {
@@ -194,7 +195,13 @@
             -
           {/if}
         </LabeledText>
-        <LabeledText label="Score">{contender.score?.score ?? "-"}</LabeledText>
+        <LabeledText label="Score">
+          {#if contender.score?.score}
+            <Score value={contender.score.score}></Score>
+          {:else}
+            -
+          {/if}
+        </LabeledText>
         <LabeledText label="Finalist">
           <wa-icon name={contender.score?.finalist ? "medal" : "minus"}
           ></wa-icon>

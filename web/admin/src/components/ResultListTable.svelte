@@ -8,6 +8,7 @@
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import {
     ContenderName,
+    Score,
     Table,
     type ColumnDefinition,
   } from "@climblive/lib/components";
@@ -127,7 +128,7 @@
 
 {#snippet renderScore({ score }: ScoreboardEntry)}
   {#if score}
-    {score.score}
+    <Score value={score.score}></Score>
   {/if}
 {/snippet}
 
