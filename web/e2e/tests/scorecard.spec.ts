@@ -141,7 +141,14 @@ test("the three most recently used registration codes can be restored", async ({
 
   for (const code of ["ABCD0001", "ABCD0002", "ABCD0003", "ABCD0004"]) {
     await page.goto(`/${code}`);
-    await page.waitForURL(`/${code}`);
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const sessions = JSON.parse(localStorage.getItem("sessions") || "[]");
+          return sessions[0]?.registrationCode;
+        }),
+      )
+      .toBe(code);
 
     await page.clock.fastForward("00:00:01");
   }
