@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { base64UrlEncode, z } from "@climblive/lib/utils";
+  import { z } from "@climblive/lib/utils";
   import { onDestroy, onMount, type Snippet } from "svelte";
   import { writable, type Writable } from "svelte/store";
   import { ApiClient } from "../Api";
@@ -11,7 +11,7 @@
     type ScoreboardEntry,
   } from "../models";
   import { NO_SCORE } from "../models/score";
-  import { getApiUrl } from "../utils";
+  import { useEvents } from "./EventsProvider.svelte";
 
   interface Props {
     contestId: number;
@@ -29,7 +29,8 @@
 
   let { contestId, hideDisqualified = false, children }: Props = $props();
 
-  let eventSource: EventSource | undefined;
+  const { subscribeEvents, unsubscribeEvents } = useEvents();
+  let subscriptionId: symbol | undefined;
   let loading = $state(true);
   let online = $state(true);
 
@@ -38,7 +39,7 @@
     [];
   const scoreboard = writable<Map<number, ScoreboardEntry[]>>(new Map());
 
-  onMount(async () => {
+  onMount(() => {
     setup();
   });
 
@@ -62,6 +63,10 @@
   };
 
   const setup = () => {
+    if (subscriptionId !== undefined) {
+      return;
+    }
+
     const filters: EventFilter[] = [
       {
         contestId,
@@ -72,40 +77,31 @@
       },
     ];
 
-    const eventSource = new EventSource(
-      `${getApiUrl()}/events?f=${base64UrlEncode(JSON.stringify(filters))}`,
-    );
-
-    setupEventHandlers(eventSource);
-
-    eventSource.onerror = () => {
-      online = false;
-      reset();
-
-      if (eventSource?.readyState === EventSource.CLOSED) {
-        setTimeout(() => {
-          setup();
-        }, 5000);
-
-        return;
-      }
-    };
-
-    eventSource.onopen = () => {
-      online = true;
-      initializeStore();
-    };
+    subscriptionId = subscribeEvents(filters, handleEvent, {
+      onError: () => {
+        online = false;
+        reset();
+      },
+      onOpen: () => {
+        online = true;
+        reset();
+        initializeStore();
+      },
+    });
   };
 
   const reset = () => {
     loading = true;
     contenders.clear();
+    pendingUpdates.length = 0;
     $scoreboard = new Map();
   };
 
   const tearDown = () => {
-    eventSource?.close();
-    eventSource = undefined;
+    if (subscriptionId !== undefined) {
+      unsubscribeEvents(subscriptionId);
+      subscriptionId = undefined;
+    }
 
     reset();
   };
@@ -193,8 +189,8 @@
     }
   };
 
-  const setupEventHandlers = (eventSource: EventSource) => {
-    eventSource.addEventListener("CONTENDER_PUBLIC_INFO_UPDATED", (e) => {
+  const handleEvent = (eventName: string, e: MessageEvent) => {
+    if (eventName === "CONTENDER_PUBLIC_INFO_UPDATED") {
       const event = contenderPublicInfoUpdatedEventSchema.parse(
         JSON.parse(e.data),
       );
@@ -213,9 +209,9 @@
 
         contenders.set(event.contenderId, { ...contender });
       });
-    });
+    }
 
-    eventSource.addEventListener("[]CONTENDER_SCORE_UPDATED", (e) => {
+    if (eventName === "[]CONTENDER_SCORE_UPDATED") {
       const events = z
         .array(contenderScoreUpdatedEventSchema)
         .parse(JSON.parse(e.data));
@@ -240,7 +236,7 @@
           contenders.set(event.contenderId, { ...contender });
         });
       }
-    });
+    }
   };
 
   const createEmptyEntry = (contenderId: number): ScoreboardEntry => ({

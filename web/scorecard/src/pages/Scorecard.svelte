@@ -19,6 +19,7 @@
     ResultList,
     ScoreboardProvider,
     SplashScreen,
+    useEvents,
   } from "@climblive/lib/components";
   import {
     ascentDeregisteredEventSchema,
@@ -52,11 +53,11 @@
   import { useQueryClient } from "@tanstack/svelte-query";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
-  import { subscribeEvents } from "../../../packages/lib/src/components/EventsProvider.svelte";
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
   const queryClient = useQueryClient();
+  const { subscribeEvents, unsubscribeEvents } = useEvents();
 
   const contenderQuery = $derived(getContenderQuery($session.contenderId));
   const contestQuery = $derived(getContestQuery($session.contestId));
@@ -69,7 +70,7 @@
   let resultsConnected = $state(false);
   let tabGroup: WaTabGroup | undefined = $state();
   let raffleWinnerDialog: WaDialog | undefined = $state();
-  let eventSource: EventSource | undefined;
+  let subscriptionId: symbol | undefined;
   let score: string = $state(NO_SCORE);
   let placement: number | undefined = $state();
   let finalist: boolean = $state(false);
@@ -243,7 +244,7 @@
   };
 
   const startEventSubscription = () => {
-    if (eventSource) {
+    if (subscriptionId !== undefined) {
       return;
     }
 
@@ -270,7 +271,7 @@
       },
     ];
 
-    subscribeEvents(filters, (eventName: string, e: MessageEvent) => {
+    subscriptionId = subscribeEvents(filters, (eventName, e) => {
       switch (eventName) {
         case "CONTENDER_PUBLIC_INFO_UPDATED":
           {
@@ -393,8 +394,10 @@
     resultsConnected = false;
     tabGroup?.setAttribute("active", "scorecard");
 
-    eventSource?.close();
-    eventSource = undefined;
+    if (subscriptionId !== undefined) {
+      unsubscribeEvents(subscriptionId);
+      subscriptionId = undefined;
+    }
   };
 
   onMount(() => {

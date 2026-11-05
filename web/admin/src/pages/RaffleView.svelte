@@ -9,6 +9,7 @@
     ContenderName,
     EmptyState,
     Table,
+    useEvents,
     type ColumnDefinition,
   } from "@climblive/lib/components";
   import type { EventFilter, RaffleWinner } from "@climblive/lib/models";
@@ -19,11 +20,7 @@
     getRaffleQuery,
     getRaffleWinnersQuery,
   } from "@climblive/lib/queries";
-  import {
-    base64UrlEncode,
-    getApiUrl,
-    toastUnexpectedError,
-  } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { AxiosError } from "axios";
   import { format } from "date-fns";
@@ -36,6 +33,7 @@
   let { raffleId }: Props = $props();
 
   const queryClient = useQueryClient();
+  const { subscribeEvents, unsubscribeEvents } = useEvents();
 
   const raffleQuery = $derived(getRaffleQuery(raffleId));
   const drawRaffleWinner = $derived(drawRaffleWinnerMutation(raffleId));
@@ -107,25 +105,26 @@
       },
     ];
 
-    const eventSource = new EventSource(
-      `${getApiUrl()}/events?f=${base64UrlEncode(JSON.stringify(filters))}`,
-    );
-
     const invalidateContenders = () => {
       queryClient.invalidateQueries({
         queryKey: ["contenders", { contestId }],
       });
     };
 
-    eventSource.addEventListener("CONTENDER_ENTERED", invalidateContenders);
-    eventSource.addEventListener(
-      "CONTENDER_DISQUALIFIED",
-      invalidateContenders,
-    );
-    eventSource.addEventListener("CONTENDER_REQUALIFIED", invalidateContenders);
+    const subscriptionId = subscribeEvents(filters, (eventName) => {
+      if (
+        [
+          "CONTENDER_ENTERED",
+          "CONTENDER_DISQUALIFIED",
+          "CONTENDER_REQUALIFIED",
+        ].includes(eventName)
+      ) {
+        invalidateContenders();
+      }
+    });
 
     return () => {
-      eventSource.close();
+      unsubscribeEvents(subscriptionId);
     };
   });
 

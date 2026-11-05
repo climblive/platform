@@ -7,9 +7,13 @@
   const [get, set] = createContext<EventsClient>();
 
   type CallBack = (eventName: string, event: MessageEvent) => void;
+  type ConnectionHandlers = {
+    onOpen?: () => void;
+    onError?: () => void;
+  };
 
   class EventsClient {
-    #subscriptions: Map<symbol, [EventFilter[], CallBack]>;
+    #subscriptions: Map<symbol, [EventFilter[], CallBack, ConnectionHandlers]>;
     #filters: EventFilter[];
 
     constructor() {
@@ -23,10 +27,6 @@
           return;
         }
 
-        const eventSource = new EventSource(
-          `${getApiUrl()}/events?f=${base64UrlEncode(JSON.stringify(this.#filters))}`,
-        );
-
         const uniqueEventTypes = new Set(
           this.#filters.flatMap(({ eventTypes }) =>
             eventTypes ? Object.keys(eventTypes) : [],
@@ -34,6 +34,44 @@
         );
 
         const listeners: [string, (e: MessageEvent) => void][] = [];
+        let eventSource: EventSource;
+        let retryTimeout: ReturnType<typeof setTimeout> | undefined;
+
+        const connect = () => {
+          eventSource = new EventSource(
+            `${getApiUrl()}/events?f=${base64UrlEncode(JSON.stringify(this.#filters))}`,
+          );
+
+          eventSource.onopen = () => {
+            for (const [, , handlers] of this.#subscriptions.values()) {
+              handlers.onOpen?.();
+            }
+          };
+
+          eventSource.onerror = () => {
+            for (const [, , handlers] of this.#subscriptions.values()) {
+              handlers.onError?.();
+            }
+
+            if (eventSource.readyState === EventSource.CLOSED) {
+              disconnect();
+              retryTimeout = setTimeout(connect, 5000);
+            }
+          };
+
+          for (const [eventType, listener] of listeners) {
+            eventSource.addEventListener(eventType, listener);
+          }
+        };
+
+        const disconnect = () => {
+          eventSource.onopen = null;
+          eventSource.onerror = null;
+          for (const [eventType, listener] of listeners) {
+            eventSource.removeEventListener(eventType, listener);
+          }
+          eventSource.close();
+        };
 
         for (const eventType of uniqueEventTypes.values()) {
           const listener = (event: MessageEvent) => {
@@ -42,45 +80,41 @@
             }
           };
 
-          eventSource.addEventListener(eventType, listener);
-
           listeners.push([eventType, listener]);
         }
 
-        return () => {
-          listeners.forEach(([eventName, listener]) =>
-            eventSource.removeEventListener(eventName, listener),
-          );
+        connect();
 
-          eventSource.close();
+        return () => {
+          clearTimeout(retryTimeout);
+          disconnect();
         };
       });
     }
 
-    public subscribe(filters: EventFilter[], callback: CallBack): symbol {
+    public subscribe(
+      filters: EventFilter[],
+      callback: CallBack,
+      handlers: ConnectionHandlers = {},
+    ): symbol {
       const subscriptionId = Symbol();
 
-      this.#subscriptions.set(subscriptionId, [filters, callback]);
+      this.#subscriptions.set(subscriptionId, [filters, callback, handlers]);
 
       return subscriptionId;
     }
 
-    public unsubscibe(subscriptionId: symbol): void {
+    public unsubscribe(subscriptionId: symbol): void {
       this.#subscriptions.delete(subscriptionId);
     }
   }
 
-  export const subscribeEvents = (
-    filters: EventFilter[],
-    callback: CallBack,
-  ) => {
+  export const useEvents = () => {
     const client = get();
-    return client.subscribe(filters, callback);
-  };
-
-  export const unsubscibeEvents = (subscriptionId: symbol) => {
-    const client = get();
-    return client.unsubscibe(subscriptionId);
+    return {
+      subscribeEvents: client.subscribe.bind(client),
+      unsubscribeEvents: client.unsubscribe.bind(client),
+    };
   };
 </script>
 

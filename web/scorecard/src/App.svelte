@@ -9,7 +9,7 @@
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/toast/toast.js";
-  import { ErrorBoundary } from "@climblive/lib/components";
+  import { ErrorBoundary, EventsProvider } from "@climblive/lib/components";
   import { HOUR, MINUTE } from "@climblive/lib/queries";
   import { extractCodeFromPath } from "@climblive/lib/utils";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
@@ -18,7 +18,6 @@
   import { Route, Router, navigate } from "svelte-routing";
   import { writable } from "svelte/store";
   import { ZodError } from "zod/v4";
-  import EventsProvider from "../../packages/lib/src/components/EventsProvider.svelte";
 
   let authenticating = $state(true);
 
