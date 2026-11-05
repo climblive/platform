@@ -102,7 +102,7 @@ func parseJWKS(data []byte) (jose.JSONWebKeySet, error) {
 }
 
 func (d *StandardJWTDecoder) Decode(jwt string) (Claims, error) {
-	signature, err := jose.ParseSigned(jwt, []jose.SignatureAlgorithm{jose.RS256})
+	signature, err := jose.ParseSignedCompact(jwt, []jose.SignatureAlgorithm{jose.RS256})
 	if err != nil {
 		return Claims{}, errors.Wrap(err, 0)
 	}
