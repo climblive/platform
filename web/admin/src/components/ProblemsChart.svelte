@@ -6,6 +6,7 @@
     getProblemsQuery,
     getTicksByContestQuery,
   } from "@climblive/lib/queries";
+  import { compareLabels } from "@climblive/lib/utils";
   import Bar from "./Bar.svelte";
 
   interface Props {
@@ -65,7 +66,7 @@
 
   const sortedProblems = $derived(
     problemsQuery.data
-      ? [...problemsQuery.data].sort((a, b) => a.number - b.number)
+      ? [...problemsQuery.data].sort((a, b) => compareLabels(a.label, b.label))
       : undefined,
   );
 </script>

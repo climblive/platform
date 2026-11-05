@@ -157,10 +157,10 @@ SELECT sqlc.embed(problem)
 FROM problem
 WHERE id = ?;
 
--- name: GetProblemByNumber :one
+-- name: GetProblemByLabel :one
 SELECT sqlc.embed(problem)
 FROM problem
-WHERE contest_id = ? AND number = ?;
+WHERE contest_id = ? AND label = ?;
 
 -- name: GetProblemsByContest :many
 SELECT sqlc.embed(problem)
@@ -173,13 +173,13 @@ WHERE id = ?;
 
 -- name: UpsertProblem :execlastid
 INSERT INTO 
-	problem (id, organizer_id, contest_id, number, hold_color_primary, hold_color_secondary, zone_1_enabled, zone_2_enabled, description, points_zone_1, points_zone_2, points_top, flash_bonus)
+	problem (id, organizer_id, contest_id, label, hold_color_primary, hold_color_secondary, zone_1_enabled, zone_2_enabled, description, points_zone_1, points_zone_2, points_top, flash_bonus)
 VALUES 
 	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     contest_id = VALUES(contest_id),
-    number = VALUES(number),
+    label = VALUES(label),
     hold_color_primary = VALUES(hold_color_primary),
     hold_color_secondary = VALUES(hold_color_secondary),
     zone_1_enabled = VALUES(zone_1_enabled),

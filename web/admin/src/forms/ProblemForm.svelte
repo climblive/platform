@@ -1,8 +1,8 @@
 <script lang="ts" module>
-  import { z } from "@climblive/lib/utils";
+  import { labelRegex, z } from "@climblive/lib/utils";
 
   export const formSchema = z.object({
-    number: z.coerce.number().min(0),
+    label: z.string().regex(labelRegex).min(1).max(6),
     holdColorPrimary: z.string().regex(/^#([0-9a-fA-F]{3}){1,2}$/),
     holdColorSecondary: z.string().optional(),
     description: z.string().optional(),
@@ -137,14 +137,16 @@
 
 <GenericForm {schema} submit={handleSubmit}>
   <fieldset>
-    <wa-number-input
+    <wa-input
       size="s"
-      {@attach name("number")}
-      label="Number"
+      {@attach name("label")}
+      label="Label"
       required
-      value={data.number}
-      min={0}
-    ></wa-number-input>
+      value={data.label}
+      minlength={0}
+      maxlength={6}
+      hint="Labels must contain numbers but can optionally be prefixed or suffixed with letters, like B10, 10B, etc."
+    ></wa-input>
     <div class="colors">
       <HoldColorPicker
         name="holdColorPrimary"

@@ -11,7 +11,7 @@ export const problemValueSchema = z.object({
 export const problemSchema: z.ZodType<Problem> = problemValueSchema.extend({
   id: z.number(),
   contestId: z.number(),
-  number: z.number(),
+  label: z.string().min(1).max(6),
   holdColorPrimary: z.string(),
   holdColorSecondary: z.string().optional(),
   name: z.string().optional(),
