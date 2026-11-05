@@ -12,6 +12,15 @@
     onError?: () => void;
   };
 
+  const invokeCallback = (callback: (() => void) | undefined) => {
+    try {
+      callback?.();
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Event subscriber callback failed", error);
+    }
+  };
+
   class EventsClient {
     #subscriptions: Map<symbol, [EventFilter[], CallBack, ConnectionHandlers]>;
     #filters: EventFilter[];
@@ -44,13 +53,13 @@
 
           eventSource.onopen = () => {
             for (const [, , handlers] of this.#subscriptions.values()) {
-              handlers.onOpen?.();
+              invokeCallback(handlers.onOpen);
             }
           };
 
           eventSource.onerror = () => {
             for (const [, , handlers] of this.#subscriptions.values()) {
-              handlers.onError?.();
+              invokeCallback(handlers.onError);
             }
 
             if (eventSource.readyState === EventSource.CLOSED) {
@@ -76,7 +85,7 @@
         for (const eventType of uniqueEventTypes.values()) {
           const listener = (event: MessageEvent) => {
             for (const [, cb] of this.#subscriptions.values()) {
-              cb(event.type, event);
+              invokeCallback(() => cb(event.type, event));
             }
           };
 
