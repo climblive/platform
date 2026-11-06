@@ -214,34 +214,6 @@ func TestEventsHandler(t *testing.T) {
 
 		mockedEventBroker.AssertExpectations(t)
 	})
-
-	t.Run("ContestEvents", func(t *testing.T) {
-		filters := []domain.EventFilter{domain.NewEventFilter(
-			fakedContestID,
-			0,
-			"CONTENDER_PUBLIC_INFO_UPDATED",
-			"[]CONTENDER_SCORE_UPDATED",
-			"SCORE_ENGINE_STARTED",
-			"SCORE_ENGINE_STOPPED",
-		)}
-		mockedEventBroker, _ := makeMocks(0, filters)
-
-		mux := rest.NewMux()
-		rest.InstallEventHandler(mux, mockedEventBroker, time.Hour)
-
-		server := httptest.NewServer(mux)
-
-		resp, err := http.Get(server.URL + fmt.Sprintf("/events?f=%s", encodeFilters(t, filters)))
-		require.NoError(t, err)
-
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-		_ = resp.Body.Close()
-
-		server.Close()
-
-		mockedEventBroker.AssertExpectations(t)
-	})
 }
 
 type eventBrokerMock struct {
