@@ -33,6 +33,7 @@
   let subscriptionId: symbol | undefined;
   let loading = $state(true);
   let online = $state(true);
+  let generation = 0;
 
   const contenders: Map<number, ScoreboardEntry> = new Map();
   const pendingUpdates: ((contenders: Map<number, ScoreboardEntry>) => void)[] =
@@ -91,6 +92,7 @@
   };
 
   const reset = () => {
+    generation++;
     loading = true;
     contenders.clear();
     pendingUpdates.length = 0;
@@ -107,7 +109,12 @@
   };
 
   const initializeStore = async () => {
+    const currentGeneration = generation;
     const entries = await ApiClient.getInstance().getScoreboard(contestId);
+
+    if (currentGeneration !== generation) {
+      return;
+    }
 
     for (const entry of entries) {
       contenders.set(entry.contenderId, entry);

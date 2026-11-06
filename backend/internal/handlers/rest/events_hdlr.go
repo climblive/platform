@@ -50,6 +50,7 @@ func (hdlr *eventHandler) HandleSubscribeEvents(w http.ResponseWriter, r *http.R
 	err := json.UnmarshalRead(filterReader, &filters, jsonv1.FormatDurationAsNano(true))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
 	if !sanitize(filters) {

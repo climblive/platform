@@ -36,12 +36,6 @@
           return;
         }
 
-        const uniqueEventTypes = new Set(
-          this.#filters.flatMap(({ eventTypes }) =>
-            eventTypes ? Object.keys(eventTypes) : [],
-          ),
-        );
-
         const listeners: [string, (e: MessageEvent) => void][] = [];
         let eventSource: EventSource;
         let retryTimeout: ReturnType<typeof setTimeout> | undefined;
@@ -82,14 +76,20 @@
           eventSource.close();
         };
 
-        for (const eventType of uniqueEventTypes.values()) {
-          const listener = (event: MessageEvent) => {
-            for (const [, cb] of this.#subscriptions.values()) {
-              invokeCallback(() => cb(event.type, event));
-            }
-          };
+        for (const [id, [filters, callback]] of this.#subscriptions) {
+          const eventTypes = new Set(
+            filters.flatMap(({ eventTypes }) => Object.keys(eventTypes ?? {})),
+          );
 
-          listeners.push([eventType, listener]);
+          for (const eventType of eventTypes) {
+            const listener = (event: MessageEvent) => {
+              if (this.#subscriptions.has(id)) {
+                invokeCallback(() => callback(event.type, event));
+              }
+            };
+
+            listeners.push([eventType, listener]);
+          }
         }
 
         connect();

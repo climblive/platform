@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	"uuid"
@@ -70,6 +71,90 @@ func TestEventsHandler(t *testing.T) {
 
 		return base64.RawURLEncoding.EncodeToString(encoded)
 	}
+
+	t.Run("BadInput", func(t *testing.T) {
+		for _, tc := range []struct {
+			name string
+			raw  string
+		}{
+			{name: "InvalidBase64", raw: "!"},
+			{name: "MalformedJSON", raw: base64.RawURLEncoding.EncodeToString([]byte("["))},
+		} {
+			t.Run(tc.name, func(t *testing.T) {
+				mockedEventBroker := new(eventBrokerMock)
+				mux := rest.NewMux()
+				rest.InstallEventHandler(mux, mockedEventBroker, 0)
+
+				response := httptest.NewRecorder()
+				mux.ServeHTTP(response, httptest.NewRequest(http.MethodGet, "/events?f="+tc.raw, nil))
+
+				assert.Equal(t, http.StatusBadRequest, response.Code)
+
+				mockedEventBroker.AssertExpectations(t)
+			})
+		}
+	})
+
+	makeFakeFilters := func(filterCount, eventTypeCount int) []domain.EventFilter {
+		eventTypes := make([]string, eventTypeCount)
+		for i := range eventTypes {
+			eventTypes[i] = fmt.Sprintf("EVENT_%d", i)
+		}
+
+		filters := make([]domain.EventFilter, filterCount)
+		for i := range filters {
+			filters[i] = domain.NewEventFilter(fakedContestID, 0, eventTypes...)
+		}
+
+		return filters
+	}
+
+	t.Run("FilterLimits", func(t *testing.T) {
+		for _, tc := range []struct {
+			name    string
+			filters []domain.EventFilter
+		}{
+			{name: "TooManyFilters", filters: makeFakeFilters(6, 1)},
+			{name: "TooManyEventTypes", filters: makeFakeFilters(1, 21)},
+		} {
+			t.Run(tc.name, func(t *testing.T) {
+				mockedEventBroker := new(eventBrokerMock)
+
+				mux := rest.NewMux()
+				rest.InstallEventHandler(mux, mockedEventBroker, 0)
+
+				request := httptest.NewRequest(http.MethodGet, "/events?f="+encodeFilters(t, tc.filters), nil)
+				response := httptest.NewRecorder()
+				mux.ServeHTTP(response, request)
+
+				assert.Equal(t, http.StatusBadRequest, response.Code)
+
+				mockedEventBroker.AssertExpectations(t)
+			})
+		}
+	})
+
+	t.Run("MaximumFiltersAndEventTypes", func(t *testing.T) {
+		synctest.Test(t, func(t *testing.T) {
+			filters := makeFakeFilters(5, 20)
+
+			mockedEventBroker, _ := makeMocks(0, filters)
+
+			mux := rest.NewMux()
+			rest.InstallEventHandler(mux, mockedEventBroker, 0)
+
+			ctx, cancel := context.WithCancel(t.Context())
+			cancel()
+
+			request := httptest.NewRequestWithContext(ctx, http.MethodGet, "/events?f="+encodeFilters(t, filters), nil)
+			response := httptest.NewRecorder()
+			mux.ServeHTTP(response, request)
+
+			assert.Equal(t, http.StatusOK, response.Code)
+
+			mockedEventBroker.AssertExpectations(t)
+		})
+	})
 
 	t.Run("ConnectAndDisconnect", func(t *testing.T) {
 		filters := makeContenderFilters(fakedContestID, fakedContenderID)
