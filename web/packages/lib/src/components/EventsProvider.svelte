@@ -27,9 +27,9 @@
 
     constructor() {
       this.#subscriptions = new SvelteMap();
-      this.#filters = $derived([
-        ...this.#subscriptions.values().flatMap(([filters]) => filters),
-      ]);
+      this.#filters = $derived(
+        [...this.#subscriptions.values()].flatMap(([filters]) => filters),
+      );
 
       $effect(() => {
         if (this.#filters.length === 0) {
