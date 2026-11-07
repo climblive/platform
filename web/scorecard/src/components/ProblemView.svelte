@@ -5,6 +5,7 @@
     Score,
   } from "@climblive/lib/components";
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
+  import { roundPoints } from "@climblive/lib/utils";
   import TickDialog from "./TickDialog.svelte";
 
   type ScorecardProblem = Problem & {
@@ -37,7 +38,7 @@
 
       const { zone1, zone2, top, flashBonus } = problem.pointValue;
 
-      const values = [zone1, zone2, Math.round((top + flashBonus) * 10) / 10];
+      const values = [zone1, zone2, roundPoints(top + flashBonus)];
 
       return { min: Math.min(...values), max: Math.max(...values) };
     },

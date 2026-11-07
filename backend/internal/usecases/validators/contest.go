@@ -35,7 +35,7 @@ func init() {
 	}
 }
 
-func validPointValue(value float64) bool {
+func isValidPointDeduction(value float64) bool {
 	return value >= 0 && value <= float64(maxAllowedPointValue) && math.Abs(value*10-math.Round(value*10)) < 1e-6
 }
 
@@ -62,7 +62,7 @@ func (v ContestValidator) Validate(contest domain.Contest) error {
 		fallthrough
 	case contest.MaxAttempts < 0 || contest.MaxAttempts > 999:
 		fallthrough
-	case !validPointValue(contest.PointDeduction):
+	case !isValidPointDeduction(contest.PointDeduction):
 		fallthrough
 	case contest.GracePeriod < 0 || contest.GracePeriod > time.Hour:
 		fallthrough

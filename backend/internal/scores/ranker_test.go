@@ -5,11 +5,39 @@ import (
 	"math/rand"
 	"slices"
 	"testing"
+	"testing/synctest"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestBasicRankerPointsFormatting(t *testing.T) {
+	tests := []struct {
+		name     string
+		points   float64
+		expected string
+	}{
+		{name: "Zero", points: 0, expected: "0p"},
+		{name: "Integer", points: 25, expected: "25p"},
+		{name: "Fractional", points: 24.7, expected: "24.7p"},
+		{name: "LargeInteger", points: 1_000_000, expected: "1000000p"},
+		{name: "LargeFractional", points: 1_000_000.1, expected: "1000000.1p"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			synctest.Test(t, func(t *testing.T) {
+				ranker := scores.NewBasicRanker(0, true)
+				contenders := []scores.Contender{{ID: 1, Score: scores.Score{Points: tt.points}}}
+
+				ranked := ranker.RankContenders(slices.Values(contenders))
+
+				assert.Equal(t, tt.expected, ranked[0].Score)
+			})
+		})
+	}
+}
 
 func TestBasicRanker(t *testing.T) {
 	makeContenders := func(count int) []scores.Contender {
