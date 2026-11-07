@@ -251,6 +251,7 @@
 
     const filters: EventFilter[] = [
       {
+        contestId: $session.contestId,
         contenderId: $session.contenderId,
         eventTypes: {
           CONTENDER_PUBLIC_INFO_UPDATED: {},
