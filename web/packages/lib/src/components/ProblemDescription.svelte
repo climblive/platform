@@ -30,9 +30,6 @@
 <style>
   wa-popover {
     --max-width: min(300px, calc(100vw - 2 * var(--wa-space-m)));
-
-    white-space: normal;
-    overflow-wrap: anywhere;
   }
 
   wa-popover::part(body) {
