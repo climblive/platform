@@ -9,12 +9,6 @@ import (
 
 type SubscriptionID = uuid.UUID
 
-type EventFilter struct {
-	ContestID   ContestID
-	ContenderID ContenderID
-	EventTypes  map[string]struct{}
-}
-
 func (f EventFilter) Match(contestID ContestID, contenderID ContenderID, eventType string) bool {
 	switch f.ContestID {
 	case 0, contestID:

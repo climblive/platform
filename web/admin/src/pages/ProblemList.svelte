@@ -9,6 +9,7 @@
   import {
     EmptyState,
     HoldColorIndicator,
+    ProblemDescription,
     Table,
     type ColumnDefinition,
   } from "@climblive/lib/components";
@@ -132,19 +133,21 @@
   });
 </script>
 
-{#snippet renderNumberAndColor({
-  number,
-  holdColorPrimary,
-  holdColorSecondary,
-}: Problem)}
+{#snippet renderNumberAndColor(problem: Problem)}
   <div class="number">
     <HoldColorIndicator
       --height="1.25rem"
       --width="1.25rem"
-      primary={holdColorPrimary}
-      secondary={holdColorSecondary}
+      primary={problem.holdColorPrimary}
+      secondary={problem.holdColorSecondary}
     />
-    #{number}
+    #{problem.number}
+    {#if problem.description}
+      <ProblemDescription
+        description={problem.description}
+        number={problem.number}
+      />
+    {/if}
   </div>
 {/snippet}
 
