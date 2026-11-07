@@ -15,11 +15,7 @@ export const contestSchema: z.ZodType<Contest> = z.object({
   usePoints: z.boolean(),
   pooledPoints: z.boolean(),
   maxAttempts: z.number().int().min(0).max(999),
-  pointDeduction: z
-    .number()
-    .int()
-    .min(0)
-    .max(2 ** 31 - 1),
+  pointDeduction: z.number(),
   finalists: z.number(),
   info: z.string().optional(),
   gracePeriod: z.number(),

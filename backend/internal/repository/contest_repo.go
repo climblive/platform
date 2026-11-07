@@ -150,7 +150,7 @@ func (d *Database) StoreContest(ctx context.Context, tx domain.Transaction, cont
 		UsePoints:          contest.UsePoints,
 		PooledPoints:       contest.PooledPoints,
 		MaxAttempts:        int32(contest.MaxAttempts),
-		PointDeduction:     int32(contest.PointDeduction),
+		PointDeduction:     contest.PointDeduction,
 		Info:               makeNullString(contest.Info),
 		GracePeriod:        int32(contest.GracePeriod / time.Minute),
 		NameRetentionTime:  int32(contest.NameRetentionTime / time.Minute),

@@ -24,7 +24,7 @@
   const formSchema = z.object({
     pointDeduction: z.coerce
       .number()
-      .int()
+      .multipleOf(0.1)
       .min(0)
       .max(2 ** 31 - 1)
       .optional(),
@@ -76,9 +76,9 @@
             label="Deduction per failed attempt"
             required
             min={0}
-            step={1}
+            step={0.1}
             max={2 ** 31 - 1}
-            defaultValue={contest.pointDeduction || 1}
+            defaultValue={contest.pointDeduction || 0.1}
             oninput={() => debouncedSubmit(form)}
           >
             <span slot="end">p</span>

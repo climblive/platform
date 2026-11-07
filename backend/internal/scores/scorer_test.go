@@ -13,7 +13,7 @@ func TestScorerWithProblemLimit(t *testing.T) {
 		ProblemLimit: 5,
 	}
 
-	tickPointValues := []int{
+	tickPointValues := []float64{
 		100,
 		50,
 		25,
@@ -28,7 +28,7 @@ func TestScorerWithProblemLimit(t *testing.T) {
 
 	score := rules.CalculatePoints(slices.Values(tickPointValues))
 
-	assert.Equal(t, 1450, score)
+	assert.Equal(t, 1450.0, score)
 }
 
 func TestScorer_NoLimit(t *testing.T) {
@@ -36,7 +36,7 @@ func TestScorer_NoLimit(t *testing.T) {
 		ProblemLimit: 0,
 	}
 
-	tickPointValues := []int{
+	tickPointValues := []float64{
 		100,
 		50,
 		25,
@@ -51,5 +51,10 @@ func TestScorer_NoLimit(t *testing.T) {
 
 	score := rules.CalculatePoints(slices.Values(tickPointValues))
 
-	assert.Equal(t, 1775, score)
+	assert.Equal(t, 1775.0, score)
+}
+
+func TestScorerRoundsFractionalTotal(t *testing.T) {
+	scorer := scores.Scorer{}
+	assert.Equal(t, 0.3, scorer.CalculatePoints(slices.Values([]float64{0.1, 0.2})))
 }
