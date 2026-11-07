@@ -164,15 +164,15 @@
       ...new Set([min, max + (flashBonus ?? 0)]),
     ].toSorted((p1, p2) => p1 - p2)}
 
-    {uniquePoints.map((p) => localizedPointsValue(p)).join(" - ")}
+    {uniquePoints.map((p) => localizedPointsValue(p, 9_999)).join(" - ")}
   {:else}
     {values.map((p) => localizedPointsValue(p)).join(" / ")}
   {/if}
 {/snippet}
 
-{#snippet renderFlashBonus({ flashBonus }: ProblemWithAscents)}
+{#snippet renderFlashBonus({ flashBonus }: ProblemWithAscents, mobile: boolean)}
   {#if flashBonus}
-    +{localizedPointsValue(flashBonus)}
+    +{localizedPointsValue(flashBonus, mobile ? 9_999 : undefined)}
   {:else}
     -
   {/if}
