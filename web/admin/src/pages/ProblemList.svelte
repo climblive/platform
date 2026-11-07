@@ -142,7 +142,12 @@
       secondary={problem.holdColorSecondary}
     />
     #{problem.number}
-    <ProblemDescription {problem} />
+    {#if problem.description}
+      <ProblemDescription
+        description={problem.description}
+        number={problem.number}
+      />
+    {/if}
   </div>
 {/snippet}
 

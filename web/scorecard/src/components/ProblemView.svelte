@@ -70,7 +70,12 @@
       </span>
     {/if}
 
-    <ProblemDescription {problem} />
+    {#if problem.description}
+      <ProblemDescription
+        description={problem.description}
+        number={problem.number}
+      />
+    {/if}
   </span>
   <div class="score" class:uncounted={!counted}>
     {#if enablePoints && tick && problem.pointValue?.current !== undefined}

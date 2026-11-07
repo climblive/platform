@@ -2,34 +2,30 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/popover/popover.js";
-  import type { Problem } from "../models";
 
   interface Props {
-    problem: Pick<Problem, "number" | "description">;
+    description: string;
+    number: number;
   }
 
-  const { problem }: Props = $props();
+  const { description, number }: Props = $props();
   const id = $props.id();
 </script>
 
-{#if problem.description}
-  <wa-button size="xs" appearance="plain" pill {id}
-    ><wa-icon
-      name="info-circle"
-      label={`Description for problem ${problem.number}`}
-    ></wa-icon></wa-button
-  >
+<wa-button size="xs" appearance="plain" pill {id}
+  ><wa-icon name="info-circle" label={`Description for problem ${number}`}
+  ></wa-icon></wa-button
+>
 
-  <wa-popover for={id}>
-    {problem.description}
-    <wa-button
-      appearance="outlined"
-      variant="neutral"
-      size="s"
-      data-popover="close">Got it!</wa-button
-    >
-  </wa-popover>
-{/if}
+<wa-popover for={id}>
+  {description}
+  <wa-button
+    appearance="outlined"
+    variant="neutral"
+    size="s"
+    data-popover="close">Got it!</wa-button
+  >
+</wa-popover>
 
 <style>
   wa-popover {
