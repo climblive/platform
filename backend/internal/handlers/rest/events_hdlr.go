@@ -59,6 +59,13 @@ func (hdlr *eventHandler) HandleSubscribeEvents(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	for _, filter := range filters {
+		if filter.ContestID != filters[0].ContestID {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+	}
+
 	logger := slog.Default().With("remote_addr", readRemoteAddr(r))
 
 	hdlr.subscribe(w, r, filters, logger)
