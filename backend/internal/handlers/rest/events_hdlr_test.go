@@ -134,6 +134,24 @@ func TestEventsHandler(t *testing.T) {
 		}
 	})
 
+	t.Run("MixedContestIDs", func(t *testing.T) {
+		filters := []domain.EventFilter{
+			domain.NewEventFilter(1, 0),
+			domain.NewEventFilter(2, 0),
+		}
+		mockedEventBroker := new(eventBrokerMock)
+
+		mux := rest.NewMux()
+		rest.InstallEventHandler(mux, mockedEventBroker, 0)
+
+		request := httptest.NewRequest(http.MethodGet, "/events?f="+encodeFilters(t, filters), nil)
+		response := httptest.NewRecorder()
+		mux.ServeHTTP(response, request)
+
+		assert.Equal(t, http.StatusBadRequest, response.Code)
+		mockedEventBroker.AssertExpectations(t)
+	})
+
 	t.Run("MaximumFiltersAndEventTypes", func(t *testing.T) {
 		synctest.Test(t, func(t *testing.T) {
 			filters := makeFakeFilters(5, 20)
