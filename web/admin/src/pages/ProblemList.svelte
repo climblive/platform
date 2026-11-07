@@ -170,9 +170,9 @@
   {/if}
 {/snippet}
 
-{#snippet renderFlashBonus({ flashBonus }: ProblemWithAscents, mobile: boolean)}
+{#snippet renderFlashBonus({ flashBonus }: ProblemWithAscents)}
   {#if flashBonus}
-    +{localizedPointsValue(flashBonus, mobile ? 9_999 : undefined)}
+    +{localizedPointsValue(flashBonus)}
   {:else}
     -
   {/if}
