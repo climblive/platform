@@ -417,7 +417,7 @@ func TestMemoryStore(t *testing.T) {
 
 		problem := scores.Problem{
 			ID: testutils.RandomResourceID[domain.ProblemID](),
-			ProblemValue: domain.ProblemValue{
+			ProblemValue: scores.ProblemValue{
 				PointsTop:   200,
 				PointsZone1: 100,
 				PointsZone2: 150,

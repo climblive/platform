@@ -60,13 +60,6 @@ func TestProblemValidator(t *testing.T) {
 		assert.True(t, validator.IsValidationError(err))
 	})
 
-	t.Run("FractionalProblemPoints", func(t *testing.T) {
-		problem := validProblem()
-		problem.PointsTop = 24.7
-
-		assert.ErrorIs(t, validator.Validate(problem), domain.ErrInvalidData)
-	})
-
 	t.Run("NegativePointsTop", func(t *testing.T) {
 		problem := validProblem()
 		problem.PointsTop = -1

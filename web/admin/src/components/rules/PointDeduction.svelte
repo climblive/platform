@@ -78,7 +78,7 @@
             min={0}
             step={0.1}
             max={2 ** 31 - 1}
-            defaultValue={contest.pointDeduction || 1}
+            defaultValue={contest.pointDeduction || 0.1}
             oninput={() => debouncedSubmit(form)}
           >
             <span slot="end">p</span>

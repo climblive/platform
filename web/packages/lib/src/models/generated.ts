@@ -153,10 +153,10 @@ export interface OrganizerInvite {
   expiresAt: Date;
 }
 export interface ProblemValue {
-  pointsZone1?: number /* float64 */;
-  pointsZone2?: number /* float64 */;
-  pointsTop: number /* float64 */;
-  flashBonus?: number /* float64 */;
+  pointsZone1?: number /* int */;
+  pointsZone2?: number /* int */;
+  pointsTop: number /* int */;
+  flashBonus?: number /* int */;
 }
 export interface PointValue {
   contenderId: ContenderID;

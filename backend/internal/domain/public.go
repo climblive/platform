@@ -146,10 +146,10 @@ type OrganizerInvite struct {
 }
 
 type ProblemValue struct {
-	PointsZone1 float64 `json:"pointsZone1,omitzero"`
-	PointsZone2 float64 `json:"pointsZone2,omitzero"`
-	PointsTop   float64 `json:"pointsTop"`
-	FlashBonus  float64 `json:"flashBonus,omitzero"`
+	PointsZone1 int `json:"pointsZone1,omitzero"`
+	PointsZone2 int `json:"pointsZone2,omitzero"`
+	PointsTop   int `json:"pointsTop"`
+	FlashBonus  int `json:"flashBonus,omitzero"`
 }
 
 type PointValue struct {

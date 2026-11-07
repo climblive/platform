@@ -137,10 +137,17 @@ func (t Tick) TurnIntoFlash() Tick {
 type Problem struct {
 	ID domain.ProblemID
 
-	domain.ProblemValue
+	ProblemValue
 
 	Zone1Enabled bool
 	Zone2Enabled bool
+}
+
+type ProblemValue struct {
+	PointsZone1 float64
+	PointsZone2 float64
+	PointsTop   float64
+	FlashBonus  float64
 }
 
 type TickPool struct {
@@ -190,7 +197,7 @@ func (c TickPool) Sub(tick Tick) TickPool {
 	return c
 }
 
-func (c TickPool) CalculatePooledProblemValue(value domain.ProblemValue) domain.ProblemValue {
+func (c TickPool) CalculatePooledProblemValue(value ProblemValue) ProblemValue {
 	weightedValue := func(value float64, divisor int) float64 {
 		if divisor == 0 {
 			return value
@@ -203,7 +210,7 @@ func (c TickPool) CalculatePooledProblemValue(value domain.ProblemValue) domain.
 		return max(0.1, roundPoints(value/float64(divisor)))
 	}
 
-	return domain.ProblemValue{
+	return ProblemValue{
 		PointsZone1: weightedValue(value.PointsZone1, c.Zone1),
 		PointsZone2: weightedValue(value.PointsZone2, c.Zone2),
 		PointsTop:   weightedValue(value.PointsTop, c.Top),

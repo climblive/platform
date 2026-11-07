@@ -106,19 +106,19 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 	}
 
 	if patch.PointsTop.Present {
-		problem.PointsTop = float64(patch.PointsTop.Value)
+		problem.PointsTop = patch.PointsTop.Value
 	}
 
 	if patch.PointsZone1.Present {
-		problem.PointsZone1 = float64(patch.PointsZone1.Value)
+		problem.PointsZone1 = patch.PointsZone1.Value
 	}
 
 	if patch.PointsZone2.Present {
-		problem.PointsZone2 = float64(patch.PointsZone2.Value)
+		problem.PointsZone2 = patch.PointsZone2.Value
 	}
 
 	if patch.FlashBonus.Present {
-		problem.FlashBonus = float64(patch.FlashBonus.Value)
+		problem.FlashBonus = patch.FlashBonus.Value
 	}
 
 	if err := (validators.ProblemValidator{}).Validate(problem); err != nil {

@@ -1,7 +1,6 @@
 package validators
 
 import (
-	"math"
 	"regexp"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -11,7 +10,7 @@ import (
 var (
 	errProblemConstraintViolation = errors.New("constraint violation")
 	validHexColor                 = regexp.MustCompile(`^#([0-9a-fA-F]{3}){1,2}$`)
-	maxAllowedPointValue          = 2_147_483_647.0
+	maxAllowedPointValue          = 2_147_483_647
 )
 
 type ProblemValidator struct {
@@ -25,13 +24,13 @@ func (v ProblemValidator) Validate(problem domain.Problem) error {
 		fallthrough
 	case len(problem.HoldColorSecondary) > 0 && !validHexColor.MatchString(problem.HoldColorSecondary):
 		fallthrough
-	case problem.PointsTop < 0 || math.Trunc(problem.PointsTop) != problem.PointsTop:
+	case problem.PointsTop < 0:
 		fallthrough
-	case problem.FlashBonus < 0 || math.Trunc(problem.FlashBonus) != problem.FlashBonus:
+	case problem.FlashBonus < 0:
 		fallthrough
-	case problem.PointsZone1 < 0 || math.Trunc(problem.PointsZone1) != problem.PointsZone1:
+	case problem.PointsZone1 < 0:
 		fallthrough
-	case problem.PointsZone2 < 0 || math.Trunc(problem.PointsZone2) != problem.PointsZone2:
+	case problem.PointsZone2 < 0:
 		fallthrough
 	case problem.PointsTop > maxAllowedPointValue:
 		fallthrough

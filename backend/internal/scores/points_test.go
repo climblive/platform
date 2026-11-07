@@ -10,7 +10,7 @@ import (
 )
 
 func TestCalculatePoints(t *testing.T) {
-	problem := domain.ProblemValue{
+	problem := scores.ProblemValue{
 		PointsTop:   100,
 		PointsZone1: 50,
 		PointsZone2: 75,
@@ -91,7 +91,7 @@ func TestCalculatePoints(t *testing.T) {
 }
 
 func TestCalculatePoints_HighestValueFeatureWins(t *testing.T) {
-	problem := domain.ProblemValue{
+	problem := scores.ProblemValue{
 		PointsTop:   100,
 		PointsZone1: 50,
 		PointsZone2: 75,
@@ -129,7 +129,7 @@ func TestCalculatePoints_HighestValueFeatureWins(t *testing.T) {
 }
 
 func TestCalculatePoints_PointDeduction(t *testing.T) {
-	value := domain.ProblemValue{
+	value := scores.ProblemValue{
 		PointsTop:   100,
 		PointsZone1: 50,
 		PointsZone2: 75,
@@ -222,7 +222,7 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 }
 
 func TestCalculatePoints_MaxAttempts(t *testing.T) {
-	value := domain.ProblemValue{
+	value := scores.ProblemValue{
 		PointsTop:   100,
 		PointsZone1: 50,
 		PointsZone2: 75,
@@ -710,8 +710,30 @@ func TestTick(t *testing.T) {
 }
 
 func TestCalculatePointsFractionalDeduction(t *testing.T) {
-	value := domain.ProblemValue{PointsTop: 25, PointsZone1: 10}
+	value := scores.ProblemValue{PointsTop: 25, PointsZone1: 10}
 	tick := scores.Tick{Top: true, AttemptsTop: 3, Zone1: true, AttemptsZone1: 2}
 
 	assert.Equal(t, 24.8, scores.CalculatePoints(value, tick, scores.Rules{PointDeduction: 0.1}))
+}
+
+func TestCalculatePointsFractionalPooledValue(t *testing.T) {
+	pool := scores.TickPool{Top: 3, Flash: 4}
+	value := pool.CalculatePooledProblemValue(scores.ProblemValue{PointsTop: 100, FlashBonus: 1})
+
+	tests := []struct {
+		name     string
+		attempts int
+		expected float64
+	}{
+		{name: "Flash", attempts: 1, expected: 33.6},
+		{name: "WithDeduction", attempts: 2, expected: 33.2},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tick := scores.Tick{Top: true, AttemptsTop: tt.attempts}
+
+			assert.Equal(t, tt.expected, scores.CalculatePoints(value, tick, scores.Rules{PointDeduction: 0.1}))
+		})
+	}
 }

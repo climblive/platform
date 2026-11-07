@@ -1,16 +1,12 @@
 package scores
 
-import (
-	"math"
-
-	"github.com/climblive/platform/backend/internal/domain"
-)
+import "math"
 
 func roundPoints(points float64) float64 {
 	return math.Round(points*10) / 10
 }
 
-func CalculatePoints(value domain.ProblemValue, tick Tick, rules Rules) float64 {
+func CalculatePoints(value ProblemValue, tick Tick, rules Rules) float64 {
 	calculate := func(points float64, attempts int) float64 {
 		if rules.MaxAttempts > 0 && attempts > rules.MaxAttempts {
 			return 0

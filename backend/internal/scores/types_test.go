@@ -322,14 +322,14 @@ func TestCalculatePooledProblemValue(t *testing.T) {
 			Flash: 1,
 		}
 
-		value := pool.CalculatePooledProblemValue(domain.ProblemValue{
+		value := pool.CalculatePooledProblemValue(scores.ProblemValue{
 			PointsZone1: 10_000,
 			PointsZone2: 20_000,
 			PointsTop:   100_000,
 			FlashBonus:  5_000,
 		})
 
-		assert.Equal(t, domain.ProblemValue{
+		assert.Equal(t, scores.ProblemValue{
 			PointsZone1: 10,
 			PointsZone2: 200,
 			PointsTop:   10_000,
@@ -339,7 +339,7 @@ func TestCalculatePooledProblemValue(t *testing.T) {
 
 	t.Run("FractionalShare", func(t *testing.T) {
 		pool := scores.TickPool{Top: 3, Flash: 4}
-		value := pool.CalculatePooledProblemValue(domain.ProblemValue{PointsTop: 100, FlashBonus: 1})
+		value := pool.CalculatePooledProblemValue(scores.ProblemValue{PointsTop: 100, FlashBonus: 1})
 		assert.Equal(t, 33.3, value.PointsTop)
 		assert.Equal(t, 0.3, value.FlashBonus)
 	})
@@ -347,14 +347,14 @@ func TestCalculatePooledProblemValue(t *testing.T) {
 	t.Run("EmptyPool", func(t *testing.T) {
 		pool := scores.TickPool{}
 
-		value := pool.CalculatePooledProblemValue(domain.ProblemValue{
+		value := pool.CalculatePooledProblemValue(scores.ProblemValue{
 			PointsZone1: 100,
 			PointsZone2: 200,
 			PointsTop:   1000,
 			FlashBonus:  50,
 		})
 
-		assert.Equal(t, domain.ProblemValue{
+		assert.Equal(t, scores.ProblemValue{
 			PointsZone1: 100,
 			PointsZone2: 200,
 			PointsTop:   1000,
@@ -370,7 +370,7 @@ func TestCalculatePooledProblemValue(t *testing.T) {
 			Flash: 10,
 		}
 
-		value := pool.CalculatePooledProblemValue(domain.ProblemValue{})
+		value := pool.CalculatePooledProblemValue(scores.ProblemValue{})
 
 		assert.Empty(t, value)
 	})
@@ -383,14 +383,14 @@ func TestCalculatePooledProblemValue(t *testing.T) {
 			Flash: 1000,
 		}
 
-		value := pool.CalculatePooledProblemValue(domain.ProblemValue{
+		value := pool.CalculatePooledProblemValue(scores.ProblemValue{
 			PointsZone1: 5,
 			PointsZone2: 5,
 			PointsTop:   5,
 			FlashBonus:  5,
 		})
 
-		assert.Equal(t, domain.ProblemValue{
+		assert.Equal(t, scores.ProblemValue{
 			PointsZone1: 0.1,
 			PointsZone2: 0.1,
 			PointsTop:   0.1,

@@ -105,10 +105,10 @@ func problemToDomain(record database.Problem) domain.Problem {
 		Zone1Enabled:       record.Zone1Enabled,
 		Zone2Enabled:       record.Zone2Enabled,
 		ProblemValue: domain.ProblemValue{
-			PointsZone1: float64(record.PointsZone1.Int32),
-			PointsZone2: float64(record.PointsZone2.Int32),
-			PointsTop:   float64(record.PointsTop),
-			FlashBonus:  float64(record.FlashBonus.Int32),
+			PointsZone1: int(record.PointsZone1.Int32),
+			PointsZone2: int(record.PointsZone2.Int32),
+			PointsTop:   int(record.PointsTop),
+			FlashBonus:  int(record.FlashBonus.Int32),
 		},
 	}
 }
