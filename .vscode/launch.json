@@ -25,29 +25,36 @@
       "name": "Scorecard",
       "type": "node-terminal",
       "request": "launch",
-      "command": "pnpm i && pnpm run dev --port 5173",
+      "command": "pnpm i && pnpm run dev --port 5173 --strictPort",
       "cwd": "${workspaceFolder}/web/scorecard"
     },
     {
       "name": "Scoreboard",
       "type": "node-terminal",
       "request": "launch",
-      "command": "pnpm i && pnpm run dev --port 5174",
+      "command": "pnpm i && pnpm run dev --port 5174 --strictPort",
       "cwd": "${workspaceFolder}/web/scoreboard"
     },
     {
       "name": "Admin",
       "type": "node-terminal",
       "request": "launch",
-      "command": "pnpm i && pnpm run dev --port 5175",
+      "command": "pnpm i && pnpm run dev --port 5175 --strictPort",
       "cwd": "${workspaceFolder}/web/admin"
     },
     {
       "name": "WWW",
       "type": "node-terminal",
       "request": "launch",
-      "command": "pnpm i && pnpm run dev --port 5176",
+      "command": "pnpm i && pnpm run dev --port 5176 --strictPort",
       "cwd": "${workspaceFolder}/web/www"
+    },
+    {
+      "name": "Proxy",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "docker run --rm --name climblive-dev-proxy --network host --mount \"type=bind,source=${workspaceFolder}/.vscode/nginx.conf,target=/etc/nginx/conf.d/default.conf,readonly\" nginx:stable-alpine",
+      "postDebugTask": "Stop development proxy"
     },
     {
       "name": "Simulator",
@@ -61,7 +68,14 @@
   "compounds": [
     {
       "name": "Service",
-      "configurations": ["Backend", "Scorecard", "Scoreboard", "Admin", "WWW"],
+      "configurations": [
+        "Backend",
+        "Scorecard",
+        "Scoreboard",
+        "Admin",
+        "WWW",
+        "Proxy"
+      ],
       "stopAll": true
     }
   ]
