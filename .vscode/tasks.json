@@ -5,12 +5,6 @@
       "label": "Start MariaDB",
       "type": "shell",
       "command": "sudo service mariadb start"
-    },
-    {
-      "label": "Stop development proxy",
-      "type": "shell",
-      "command": "if docker container inspect climblive-dev-proxy >/dev/null 2>&1; then docker stop --timeout 1 climblive-dev-proxy; fi",
-      "problemMatcher": []
     }
   ]
 }

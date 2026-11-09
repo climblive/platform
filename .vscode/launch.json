@@ -53,8 +53,7 @@
       "name": "Proxy",
       "type": "node-terminal",
       "request": "launch",
-      "command": "docker run --rm --name climblive-dev-proxy --network host --mount \"type=bind,source=${workspaceFolder}/.vscode/nginx.conf,target=/etc/nginx/conf.d/default.conf,readonly\" nginx:stable-alpine",
-      "postDebugTask": "Stop development proxy"
+      "command": "docker run --rm --name climblive-dev-proxy --network host --mount \"type=bind,source=${workspaceFolder}/.vscode/nginx.conf,target=/etc/nginx/conf.d/default.conf,readonly\" nginx:stable-alpine"
     },
     {
       "name": "Simulator",
