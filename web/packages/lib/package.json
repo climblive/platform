@@ -41,7 +41,7 @@
   "dependencies": {
     "@awesome.me/webawesome": "3.14.0",
     "@sentry/svelte": "^11.10.0",
-    "@tanstack/svelte-query": "^6.3.7",
+    "@tanstack/svelte-query": "^6.3.11",
     "axios": "^1.21.0",
     "date-fns": "^4.4.0",
     "normalize.css": "^8.0.1",
