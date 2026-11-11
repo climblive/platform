@@ -41,8 +41,13 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 
 	for problem := range slices.Values(problems) {
 		store.SaveProblem(Problem{
-			ID:           problem.ID,
-			ProblemValue: problem.ProblemValue,
+			ID: problem.ID,
+			ProblemValue: ProblemValue{
+				PointsZone1: float64(problem.PointsZone1),
+				PointsZone2: float64(problem.PointsZone2),
+				PointsTop:   float64(problem.PointsTop),
+				FlashBonus:  float64(problem.FlashBonus),
+			},
 			Zone1Enabled: problem.Zone1Enabled,
 			Zone2Enabled: problem.Zone2Enabled,
 		})

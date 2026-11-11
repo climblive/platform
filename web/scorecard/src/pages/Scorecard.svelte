@@ -50,6 +50,7 @@
     updateRulesInQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
+  import { roundPoints } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { getContext, onDestroy, onMount } from "svelte";
   import { type Readable } from "svelte/store";
@@ -140,12 +141,12 @@
           const p1Max = Math.max(
             p1.pointValue.zone1,
             p1.pointValue.zone2,
-            p1.pointValue.top + p1.pointValue.flashBonus,
+            roundPoints(p1.pointValue.top + p1.pointValue.flashBonus),
           );
           const p2Max = Math.max(
             p2.pointValue.zone1,
             p2.pointValue.zone2,
-            p2.pointValue.top + p2.pointValue.flashBonus,
+            roundPoints(p2.pointValue.top + p2.pointValue.flashBonus),
           );
 
           if (p1Max === p2Max) {
