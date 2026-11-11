@@ -29,7 +29,7 @@
     <RuleOptionCard
       title="Pooled points"
       disabled={!contest.usePoints}
-      description="Points for completed problems and zones are split by percentages. A boulder worth 1000 points with two tops will give each competitor 500 points. If a third competitor also tops the boulder, then all three will receive 333 points instead. Minimum point value is 0.1 point."
+      description="Points for completed problems and zones are split by percentages. A boulder worth 1000 points with two tops will give each competitor 500 points. If a third competitor also tops the boulder, then all three will receive 333.3 points instead. Minimum point value is 0.1 point."
       tag="New"
     >
       {#snippet header()}
