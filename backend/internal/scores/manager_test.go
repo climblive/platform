@@ -208,7 +208,6 @@ func TestScoreEngineManager(t *testing.T) {
 		mockedStoreHydrator.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)
 	})
-
 }
 
 type repositoryMock struct {
