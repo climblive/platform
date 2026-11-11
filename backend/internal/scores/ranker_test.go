@@ -5,7 +5,6 @@ import (
 	"math/rand"
 	"slices"
 	"testing"
-	"testing/synctest"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
@@ -27,14 +26,12 @@ func TestBasicRankerPointsFormatting(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			synctest.Test(t, func(t *testing.T) {
-				ranker := scores.NewBasicRanker(0, true)
-				contenders := []scores.Contender{{ID: 1, Score: scores.Score{Points: tt.points}}}
+			ranker := scores.NewBasicRanker(0, true)
+			contenders := []scores.Contender{{ID: 1, Score: scores.Score{Points: tt.points}}}
 
-				ranked := ranker.RankContenders(slices.Values(contenders))
+			ranked := ranker.RankContenders(slices.Values(contenders))
 
-				assert.Equal(t, tt.expected, ranked[0].Score)
-			})
+			assert.Equal(t, tt.expected, ranked[0].Score)
 		})
 	}
 }
