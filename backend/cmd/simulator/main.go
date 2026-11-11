@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"encoding/base64"
 	"encoding/json/v2"
 	"errors"
 	"flag"
@@ -464,7 +465,33 @@ func (r *ContenderRunner) PutTick(contenderID domain.ContenderID, tick domain.Ti
 }
 
 func (r *ContenderRunner) ReadEvents(contenderID domain.ContenderID) {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/contenders/%d/events", r.apiURL, contenderID), nil)
+	filters := []domain.EventFilter{
+		domain.NewEventFilter(
+			r.contender.ContestID,
+			contenderID,
+			"CONTENDER_PUBLIC_INFO_UPDATED",
+			"CONTENDER_SCORE_UPDATED",
+			"ASCENT_REGISTERED",
+			"ASCENT_DEREGISTERED",
+			"POINT_VALUE_UPDATED",
+			"RAFFLE_WINNER_DRAWN",
+		),
+		domain.NewEventFilter(
+			r.contender.ContestID,
+			0,
+			"RULES_UPDATED",
+			"PROBLEM_ADDED",
+			"PROBLEM_UPDATED",
+			"PROBLEM_DELETED",
+		),
+	}
+
+	data, err := json.Marshal(filters)
+	if err != nil {
+		panic(err)
+	}
+
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/events?f=%s", r.apiURL, base64.RawURLEncoding.EncodeToString(data)), nil)
 	if err != nil {
 		panic(err)
 	}
