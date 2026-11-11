@@ -33,7 +33,9 @@ func TestContestValidator(t *testing.T) {
 		assert.NoError(t, validator.Validate(contest))
 
 		contest.PointDeduction = 0.15
-		assert.ErrorIs(t, validator.Validate(contest), domain.ErrInvalidData)
+		err := validator.Validate(contest)
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
 	})
 
 	t.Run("EmptyName", func(t *testing.T) {

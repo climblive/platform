@@ -3,7 +3,7 @@ package scores
 import "math"
 
 func roundPoints(points float64) float64 {
-	return math.Round(points*10) / 10
+	return math.Floor(points*10) / 10
 }
 
 func CalculatePoints(value ProblemValue, tick Tick, rules Rules) float64 {

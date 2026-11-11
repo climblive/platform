@@ -1,4 +1,4 @@
-export const roundPoints = (points: number) => Math.round(points * 10) / 10;
+export const roundPoints = (points: number) => Math.floor(points * 10) / 10;
 
 export const localizedPointsValue = (
   points: number,

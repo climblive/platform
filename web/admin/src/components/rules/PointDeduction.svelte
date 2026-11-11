@@ -6,7 +6,7 @@
   import { GenericForm, name } from "@climblive/lib/forms";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
   import { patchContestMutation } from "@climblive/lib/queries";
-  import { debounce, z } from "@climblive/lib/utils";
+  import { debounce, roundPoints, z } from "@climblive/lib/utils";
   import RuleOptionCard from "../RuleOptionCard.svelte";
   import { doSubmit } from "../RulesEditor.svelte";
 
@@ -24,9 +24,9 @@
   const formSchema = z.object({
     pointDeduction: z.coerce
       .number()
-      .multipleOf(0.1)
       .min(0)
       .max(2 ** 31 - 1)
+      .transform(roundPoints)
       .optional(),
   });
 
