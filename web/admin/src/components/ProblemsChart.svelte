@@ -1,11 +1,21 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/scroller/scroller.js";
-  import type { ProblemID } from "@climblive/lib/models";
+  import { useEvents } from "@climblive/lib/components";
+  import {
+    ascentDeregisteredEventSchema,
+    ascentRegisteredEventSchema,
+    type EventFilter,
+    type ProblemID,
+    type Tick,
+  } from "@climblive/lib/models";
   import {
     getProblemsQuery,
     getTicksByContestQuery,
+    removeTickFromQueryCache,
+    updateTickInContestQueryCache,
   } from "@climblive/lib/queries";
+  import { useQueryClient } from "@tanstack/svelte-query";
   import Bar from "./Bar.svelte";
 
   interface Props {
@@ -21,8 +31,57 @@
 
   const { contestId }: Props = $props();
 
+  const queryClient = useQueryClient();
+  const { subscribeEvents, unsubscribeEvents } = useEvents();
+
   const problemsQuery = $derived(getProblemsQuery(contestId));
   const ticksQuery = $derived(getTicksByContestQuery(contestId));
+
+  $effect(() => {
+    const currentContestId = contestId;
+    const filters: EventFilter[] = [
+      {
+        contestId: currentContestId,
+        eventTypes: {
+          ASCENT_REGISTERED: {},
+          ASCENT_DEREGISTERED: {},
+        },
+      },
+    ];
+
+    const subscriptionId = subscribeEvents(filters, (eventName, e) => {
+      switch (eventName) {
+        case "ASCENT_REGISTERED": {
+          const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
+          const tick: Tick = {
+            id: event.tickId,
+            timestamp: event.timestamp,
+            revision: event.revision,
+            problemId: event.problemId,
+            zone1: event.zone1,
+            attemptsZone1: event.attemptsZone1,
+            zone2: event.zone2,
+            attemptsZone2: event.attemptsZone2,
+            top: event.top,
+            attemptsTop: event.attemptsTop,
+          };
+
+          updateTickInContestQueryCache(queryClient, currentContestId, tick);
+          break;
+        }
+        case "ASCENT_DEREGISTERED": {
+          const event = ascentDeregisteredEventSchema.parse(JSON.parse(e.data));
+
+          removeTickFromQueryCache(queryClient, event.tickId);
+          break;
+        }
+      }
+    });
+
+    return () => {
+      unsubscribeEvents(subscriptionId);
+    };
+  });
 
   const statsByProblem = $derived.by(() => {
     const stats = new Map<ProblemID, ProblemStats>();
