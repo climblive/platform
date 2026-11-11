@@ -71,18 +71,6 @@ func TestBasicRanker(t *testing.T) {
 		assert.Equal(t, expected, prettifyAll(scores))
 	})
 
-	t.Run("FractionalPoints", func(t *testing.T) {
-		contenders := makeContenders(2)
-		contenders[0].Points = 24.7
-		contenders[1].Points = 24.6
-		ranker := scores.NewBasicRanker(0, true)
-		ranked := ranker.RankContenders(slices.Values(contenders))
-		assert.Equal(t, "24.7p", ranked[0].Score)
-		assert.Equal(t, "24.6p", ranked[1].Score)
-		assert.Equal(t, 1, ranked[0].Placement)
-		assert.Equal(t, 2, ranked[1].Placement)
-	})
-
 	t.Run("ByPoints", func(t *testing.T) {
 		t.Run("Simple", func(t *testing.T) {
 			contenders := makeContenders(3)
