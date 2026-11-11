@@ -3,6 +3,7 @@ package scores_test
 import (
 	"context"
 	"testing"
+	"testing/synctest"
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
@@ -207,6 +208,124 @@ func TestScoreEngineManager(t *testing.T) {
 		mockedRepo.AssertExpectations(t)
 		mockedStoreHydrator.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)
+	})
+
+	for _, stopMethod := range []string{"ManualStop", "Deadline", "SubscriptionClosed"} {
+		t.Run("LifecycleEvents/"+stopMethod, func(t *testing.T) {
+			synctest.Test(t, func(t *testing.T) {
+				ctx, cancel := context.WithCancel(context.Background())
+				mockedRepo := new(repositoryMock)
+				mockedStoreHydrator := new(engineStoreHydratorMock)
+				mockedEventBroker := new(eventBrokerMock)
+				contestID := domain.ContestID(42)
+				subscription := events.NewSubscription([]domain.EventFilter{{}}, 0)
+				emittedEvents := make(chan any, 4)
+
+				mockedRepo.
+					On("GetContestsCurrentlyRunningOrByStartTime", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+					Return([]domain.Contest{}, nil)
+				mockedRepo.
+					On("GetContest", mock.Anything, mock.Anything, contestID).
+					Return(domain.Contest{ID: contestID}, nil)
+				mockedEventBroker.
+					On("Subscribe", mock.Anything, 0).
+					Return(subscription.ID, subscription).Once()
+				mockedEventBroker.On("Unsubscribe", subscription.ID).Return().Once()
+				mockedStoreHydrator.
+					On("Hydrate", mock.Anything, contestID, mock.Anything).
+					Run(func(mock.Arguments) {
+						synctest.Wait()
+						assert.Empty(t, emittedEvents)
+					}).
+					Return(nil).Once()
+				for _, eventType := range []string{"domain.ScoreEngineStartedEvent", "domain.ScoreEngineStoppedEvent"} {
+					mockedEventBroker.
+						On("Dispatch", contestID, mock.AnythingOfType(eventType)).
+						Run(func(args mock.Arguments) {
+							emittedEvents <- args.Get(1)
+						}).Return().Once()
+				}
+
+				mngr := scores.NewScoreEngineManager(mockedRepo, mockedStoreHydrator, mockedEventBroker, time.Hour)
+				wg := mngr.Run(ctx)
+				defer func() {
+					cancel()
+					wg.Wait()
+				}()
+
+				instanceID, err := mngr.StartScoreEngine(ctx, contestID, time.Now().Add(time.Second))
+				require.NoError(t, err)
+				assert.Equal(t, domain.ScoreEngineStartedEvent{InstanceID: instanceID}, <-emittedEvents)
+
+				engines, err := mngr.ListScoreEnginesByContest(ctx, contestID)
+				require.NoError(t, err)
+				assert.Equal(t, []domain.ScoreEngineDescriptor{{ContestID: contestID, InstanceID: instanceID}}, engines)
+
+				switch stopMethod {
+				case "ManualStop":
+					require.NoError(t, mngr.StopScoreEngine(ctx, instanceID))
+				case "Deadline":
+					time.Sleep(time.Second)
+				case "SubscriptionClosed":
+					subscription.Terminate()
+				}
+
+				assert.Equal(t, domain.ScoreEngineStoppedEvent{InstanceID: instanceID}, <-emittedEvents)
+				engines, err = mngr.ListScoreEnginesByContest(ctx, contestID)
+				require.NoError(t, err)
+				assert.Empty(t, engines)
+				allEngines, err := mngr.ListScoreEngines(ctx)
+				require.NoError(t, err)
+				assert.Empty(t, allEngines)
+
+				synctest.Wait()
+				assert.Empty(t, emittedEvents)
+				mockedRepo.AssertExpectations(t)
+				mockedStoreHydrator.AssertExpectations(t)
+				mockedEventBroker.AssertExpectations(t)
+			})
+		})
+	}
+
+	t.Run("HydrationFailureDoesNotEmitLifecycleEvents", func(t *testing.T) {
+		synctest.Test(t, func(t *testing.T) {
+			ctx, cancel := context.WithCancel(context.Background())
+			mockedRepo := new(repositoryMock)
+			mockedStoreHydrator := new(engineStoreHydratorMock)
+			mockedEventBroker := new(eventBrokerMock)
+			contestID := domain.ContestID(42)
+			subscription := events.NewSubscription([]domain.EventFilter{{}}, 0)
+
+			mockedRepo.
+				On("GetContestsCurrentlyRunningOrByStartTime", mock.Anything, mock.Anything, mock.Anything, mock.Anything).
+				Return([]domain.Contest{}, nil)
+			mockedRepo.
+				On("GetContest", mock.Anything, mock.Anything, contestID).
+				Return(domain.Contest{ID: contestID}, nil)
+			mockedEventBroker.
+				On("Subscribe", mock.Anything, 0).
+				Return(subscription.ID, subscription).Once()
+			mockedEventBroker.On("Unsubscribe", subscription.ID).Return().Once()
+			mockedStoreHydrator.
+				On("Hydrate", mock.Anything, contestID, mock.Anything).
+				Return(assert.AnError).Once()
+
+			mngr := scores.NewScoreEngineManager(mockedRepo, mockedStoreHydrator, mockedEventBroker, time.Hour)
+			wg := mngr.Run(ctx)
+
+			instanceID, err := mngr.StartScoreEngine(ctx, contestID, time.Now().Add(time.Hour))
+			require.ErrorIs(t, err, assert.AnError)
+			assert.Empty(t, instanceID)
+			engines, err := mngr.ListScoreEnginesByContest(ctx, contestID)
+			require.NoError(t, err)
+			assert.Empty(t, engines)
+
+			cancel()
+			wg.Wait()
+			mockedRepo.AssertExpectations(t)
+			mockedStoreHydrator.AssertExpectations(t)
+			mockedEventBroker.AssertExpectations(t)
+		})
 	})
 }
 

@@ -206,8 +206,9 @@ func (mngr *ScoreEngineManager) run(ctx context.Context) {
 				handler.stop()
 			}
 
-			for handler := range maps.Values(mngr.handlers) {
+			for contestID, handler := range mngr.handlers {
 				handler.wg.Wait()
+				mngr.removeScoreEngine(contestID)
 			}
 
 			return
@@ -219,7 +220,7 @@ func (mngr *ScoreEngineManager) run(ctx context.Context) {
 			for contestID, handler := range mngr.handlers {
 				if handler.instanceID == terminatedInstanceID {
 					slog.Info("removing terminated score engine", "instance_id", terminatedInstanceID)
-					delete(mngr.handlers, contestID)
+					mngr.removeScoreEngine(contestID)
 
 					break
 				}
@@ -337,6 +338,7 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 		logger.Error("hydration failed", "error", err)
 
 		stop()
+		wg.Wait()
 
 		return uuid.Nil(), errors.Wrap(err, 0)
 	}
@@ -351,6 +353,9 @@ func (mngr *ScoreEngineManager) startScoreEngine(ctx context.Context, contestID 
 		stop:       stop,
 		wg:         wg,
 	}
+	mngr.eventBroker.Dispatch(contestID, domain.ScoreEngineStartedEvent{
+		InstanceID: instanceID,
+	})
 
 	go func() {
 		wg.Wait()
@@ -397,11 +402,20 @@ func (mngr *ScoreEngineManager) stopScoreEngine(instanceID domain.ScoreEngineIns
 			handler.stop()
 			handler.wg.Wait()
 
-			delete(mngr.handlers, contestID)
+			mngr.removeScoreEngine(contestID)
 
 			return
 		}
 	}
+}
+
+func (mngr *ScoreEngineManager) removeScoreEngine(contestID domain.ContestID) {
+	handler := mngr.handlers[contestID]
+	delete(mngr.handlers, contestID)
+
+	mngr.eventBroker.Dispatch(contestID, domain.ScoreEngineStoppedEvent{
+		InstanceID: handler.instanceID,
+	})
 }
 
 func (mngr *ScoreEngineManager) getScoreEngine(instanceID domain.ScoreEngineInstanceID) (domain.ScoreEngineDescriptor, error) {

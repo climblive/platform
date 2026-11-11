@@ -56,14 +56,6 @@ func TestEngineDriver(t *testing.T) {
 
 		mockedEventBroker.On("Unsubscribe", subscriptionID).Return()
 
-		mockedEventBroker.On("Dispatch", fakedContestID, domain.ScoreEngineStartedEvent{
-			InstanceID: fakedInstanceID,
-		}).Return()
-
-		mockedEventBroker.On("Dispatch", fakedContestID, domain.ScoreEngineStoppedEvent{
-			InstanceID: fakedInstanceID,
-		}).Return()
-
 		driver := scores.NewScoreEngineDriver(fakedContestID, fakedInstanceID, mockedEventBroker)
 
 		awaitExpectations := func(t *testing.T) {

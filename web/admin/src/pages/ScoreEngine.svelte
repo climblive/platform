@@ -3,12 +3,15 @@
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import Loader from "@/components/Loader.svelte";
+  import { useEvents } from "@climblive/lib/components";
+  import type { EventFilter } from "@climblive/lib/models";
   import {
     getContestQuery,
     getScoreEnginesByContestQuery,
     startScoreEngineMutation,
     stopScoreEngineMutation,
   } from "@climblive/lib/queries";
+  import { useQueryClient } from "@tanstack/svelte-query";
   import { add, format, isBefore, subSeconds } from "date-fns";
 
   interface Props {
@@ -16,6 +19,9 @@
   }
 
   let { contestId }: Props = $props();
+
+  const queryClient = useQueryClient();
+  const { subscribeEvents, unsubscribeEvents } = useEvents();
 
   const contestQuery = $derived(getContestQuery(contestId));
   const scoreEnginesQuery = $derived(getScoreEnginesByContestQuery(contestId));
@@ -30,6 +36,31 @@
       ? subSeconds(contest.timeBegin.getTime(), 60 * 60)
       : undefined,
   );
+
+  $effect(() => {
+    const filters: EventFilter[] = [
+      {
+        contestId,
+        eventTypes: {
+          SCORE_ENGINE_STARTED: {},
+          SCORE_ENGINE_STOPPED: {},
+        },
+      },
+    ];
+    const queryKey = ["score-engines", { contestId }];
+
+    const invalidateScoreEngines = () => {
+      queryClient.invalidateQueries({ queryKey });
+    };
+
+    const subscriptionId = subscribeEvents(filters, invalidateScoreEngines, {
+      onOpen: invalidateScoreEngines,
+    });
+
+    return () => {
+      unsubscribeEvents(subscriptionId);
+    };
+  });
 </script>
 
 <wa-callout variant="warning" size="s">
