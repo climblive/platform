@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"slices"
 	"testing"
+	"testing/synctest"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
@@ -14,14 +15,14 @@ import (
 func TestBasicRankerPointsFormatting(t *testing.T) {
 	tests := []struct {
 		name     string
-		points   float64
+		points   scores.Tenths
 		expected string
 	}{
 		{name: "Zero", points: 0, expected: "0p"},
-		{name: "Integer", points: 25, expected: "25p"},
-		{name: "Fractional", points: 24.7, expected: "24.7p"},
-		{name: "LargeInteger", points: 1_000_000, expected: "1000000p"},
-		{name: "LargeFractional", points: 1_000_000.1, expected: "1000000.1p"},
+		{name: "Integer", points: 250, expected: "25p"},
+		{name: "Fractional", points: 247, expected: "24.7p"},
+		{name: "LargeInteger", points: 10_000_000, expected: "1000000p"},
+		{name: "LargeFractional", points: 10_000_001, expected: "1000000.1p"},
 	}
 
 	for _, tt := range tests {
@@ -34,6 +35,34 @@ func TestBasicRankerPointsFormatting(t *testing.T) {
 			assert.Equal(t, tt.expected, ranked[0].Score)
 		})
 	}
+}
+
+func TestBasicRankerFractionalTies(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		scorer := scores.Scorer{}
+		var contenders []scores.Contender
+		for i, values := range [][]scores.Tenths{{1, 1, 6}, {1, 6, 1}, {6, 1, 1}, {7}} {
+			contenders = append(contenders, scores.Contender{
+				ID: domain.ContenderID(i + 1),
+				Score: scores.Score{
+					Points: scorer.CalculatePoints(slices.Values(values)),
+				},
+			})
+		}
+		ranker := scores.NewBasicRanker(1, true)
+
+		ranked := ranker.RankContenders(slices.Values(contenders))
+
+		for i, score := range ranked[:3] {
+			assert.Equal(t, domain.ContenderID(i+1), score.ContenderID)
+			assert.Equal(t, "0.8p", score.Score)
+			assert.Equal(t, 1, score.Placement)
+			assert.True(t, score.Finalist)
+		}
+		assert.Equal(t, "0.7p", ranked[3].Score)
+		assert.Equal(t, 4, ranked[3].Placement)
+		assert.False(t, ranked[3].Finalist)
+	})
 }
 
 func TestBasicRanker(t *testing.T) {

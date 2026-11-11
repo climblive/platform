@@ -31,7 +31,7 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 		UsePoints:          contest.UsePoints,
 		PooledPoints:       contest.PooledPoints,
 		MaxAttempts:        contest.MaxAttempts,
-		PointDeduction:     contest.PointDeduction,
+		PointDeduction:     tenthsFromFloat64(contest.PointDeduction),
 	})
 
 	problems, err := h.Repo.GetProblemsByContest(ctx, nil, contestID)
@@ -41,13 +41,8 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 
 	for problem := range slices.Values(problems) {
 		store.SaveProblem(Problem{
-			ID: problem.ID,
-			ProblemValue: ProblemValue{
-				PointsZone1: float64(problem.PointsZone1),
-				PointsZone2: float64(problem.PointsZone2),
-				PointsTop:   float64(problem.PointsTop),
-				FlashBonus:  float64(problem.FlashBonus),
-			},
+			ID:           problem.ID,
+			ProblemValue: problemValueFromDomain(problem.ProblemValue),
 			Zone1Enabled: problem.Zone1Enabled,
 			Zone2Enabled: problem.Zone2Enabled,
 		})

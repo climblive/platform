@@ -77,18 +77,18 @@ func (m *engineStoreMock) GetAllProblems() iter.Seq[scores.Problem] {
 	return args.Get(0).(iter.Seq[scores.Problem])
 }
 
-func (m *engineStoreMock) GetPointValue(contenderID domain.ContenderID, problemID domain.ProblemID) (domain.PointValue, bool) {
+func (m *engineStoreMock) GetPointValue(contenderID domain.ContenderID, problemID domain.ProblemID) (scores.PointValue, bool) {
 	args := m.Called(contenderID, problemID)
-	return args.Get(0).(domain.PointValue), args.Bool(1)
+	return args.Get(0).(scores.PointValue), args.Bool(1)
 }
 
-func (m *engineStoreMock) SavePointValue(contenderID domain.ContenderID, problemID domain.ProblemID, value domain.PointValue) {
+func (m *engineStoreMock) SavePointValue(contenderID domain.ContenderID, problemID domain.ProblemID, value scores.PointValue) {
 	m.Called(contenderID, problemID, value)
 }
 
-func (m *engineStoreMock) GetDirtyPointValues() []domain.PointValue {
+func (m *engineStoreMock) GetDirtyPointValues() []scores.PointValue {
 	args := m.Called()
-	return args.Get(0).([]domain.PointValue)
+	return args.Get(0).([]scores.PointValue)
 }
 
 func (m *engineStoreMock) SaveScore(score domain.Score) {

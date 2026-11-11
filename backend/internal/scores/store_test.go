@@ -458,7 +458,7 @@ func TestMemoryStore(t *testing.T) {
 		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
-		pointValue := domain.PointValue{
+		pointValue := scores.PointValue{
 			ContenderID: fakedContenderID,
 			ProblemID:   fakedProblemID,
 			Current:     225,
@@ -491,7 +491,7 @@ func TestMemoryStore(t *testing.T) {
 		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
-		pointValue := domain.PointValue{
+		pointValue := scores.PointValue{
 			ContenderID: fakedContenderID,
 			ProblemID:   fakedProblemID,
 			Current:     225,
