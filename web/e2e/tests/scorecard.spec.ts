@@ -436,6 +436,7 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await expect(top).not.toBeChecked();
   await expect(zone1).not.toBeChecked();
   await expect(zone2).not.toBeChecked();
+  await expect(top).toBeEnabled();
   await top.check({ force: true });
 
   await expectAttempts(1);
@@ -455,6 +456,7 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await expect(zone1).not.toBeChecked();
   await expect(zone2).not.toBeChecked();
 
+  await expect(zone1).toBeEnabled();
   await zone1.check({ force: true });
   await expectAttempts(1);
   await expectFeature("Zone 1", "1st attempt");
@@ -464,6 +466,7 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await addAttempt.click();
   await expectAttempts(2);
 
+  await expect(zone2).toBeEnabled();
   await zone2.check({ force: true });
   await expectAttempts(3);
   await expectFeature("Zone 1", "1st attempt");
@@ -478,6 +481,7 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await subtractAttempt.click();
   await expectAttempts(4);
 
+  await expect(top).toBeEnabled();
   await top.check({ force: true });
   await expectAttempts(5);
   await expectFeature("Zone 1", "1st attempt");
