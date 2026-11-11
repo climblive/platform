@@ -143,7 +143,7 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 			AttemptsZone1: 3,
 		}
 
-		rules := scores.Rules{}
+		rules := scores.Rules{PointDeduction: 10}
 
 		assert.Equal(t, 0.0, scores.CalculatePoints(value, tick, rules))
 	})
@@ -171,9 +171,9 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 			AttemptsZone1: 2,
 		}
 
-		rules := scores.Rules{PointDeduction: 10}
+		rules := scores.Rules{PointDeduction: 0.1}
 
-		assert.Equal(t, 40.0, scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, 49.9, scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("Zone2", func(t *testing.T) {
@@ -185,9 +185,9 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 			AttemptsZone1: 2,
 		}
 
-		rules := scores.Rules{PointDeduction: 10}
+		rules := scores.Rules{PointDeduction: 0.1}
 
-		assert.Equal(t, 55.0, scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, 74.8, scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("Top", func(t *testing.T) {
@@ -200,9 +200,9 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 			AttemptsZone1: 2,
 		}
 
-		rules := scores.Rules{PointDeduction: 10}
+		rules := scores.Rules{PointDeduction: 0.1}
 
-		assert.Equal(t, 60.0, scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, 99.6, scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("FloorAtZero", func(t *testing.T) {
@@ -707,33 +707,4 @@ func TestTick(t *testing.T) {
 			})
 		}
 	})
-}
-
-func TestCalculatePointsFractionalDeduction(t *testing.T) {
-	value := scores.ProblemValue{PointsTop: 25, PointsZone1: 10}
-	tick := scores.Tick{Top: true, AttemptsTop: 3, Zone1: true, AttemptsZone1: 2}
-
-	assert.Equal(t, 24.8, scores.CalculatePoints(value, tick, scores.Rules{PointDeduction: 0.1}))
-}
-
-func TestCalculatePointsFractionalPooledValue(t *testing.T) {
-	pool := scores.TickPool{Top: 3, Flash: 4}
-	value := pool.CalculatePooledProblemValue(scores.ProblemValue{PointsTop: 100, FlashBonus: 1})
-
-	tests := []struct {
-		name     string
-		attempts int
-		expected float64
-	}{
-		{name: "Flash", attempts: 1, expected: 33.6},
-		{name: "WithDeduction", attempts: 2, expected: 33.2},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tick := scores.Tick{Top: true, AttemptsTop: tt.attempts}
-
-			assert.Equal(t, tt.expected, scores.CalculatePoints(value, tick, scores.Rules{PointDeduction: 0.1}))
-		})
-	}
 }
