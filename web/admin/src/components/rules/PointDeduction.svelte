@@ -6,7 +6,7 @@
   import { GenericForm, name } from "@climblive/lib/forms";
   import type { Contest, ContestPatch } from "@climblive/lib/models";
   import { patchContestMutation } from "@climblive/lib/queries";
-  import { debounce, z } from "@climblive/lib/utils";
+  import { debounce, roundPoints, z } from "@climblive/lib/utils";
   import RuleOptionCard from "../RuleOptionCard.svelte";
   import { doSubmit } from "../RulesEditor.svelte";
 
@@ -24,9 +24,9 @@
   const formSchema = z.object({
     pointDeduction: z.coerce
       .number()
-      .int()
       .min(0)
       .max(2 ** 31 - 1)
+      .transform(roundPoints)
       .optional(),
   });
 
@@ -76,9 +76,9 @@
             label="Deduction per failed attempt"
             required
             min={0}
-            step={1}
+            step={0.1}
             max={2 ** 31 - 1}
-            defaultValue={contest.pointDeduction || 1}
+            defaultValue={contest.pointDeduction || 0.1}
             oninput={() => debouncedSubmit(form)}
           >
             <span slot="end">p</span>

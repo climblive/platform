@@ -100,7 +100,7 @@ func TestHydrate(t *testing.T) {
 		ID:           fakedProblemID,
 		Zone1Enabled: true,
 		Zone2Enabled: true,
-		ProblemValue: domain.ProblemValue{
+		ProblemValue: scores.ProblemValue{
 			PointsTop:   100,
 			PointsZone1: 50,
 			PointsZone2: 75,
