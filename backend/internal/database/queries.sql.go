@@ -670,6 +670,33 @@ func (q *Queries) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context, 
 	return items, nil
 }
 
+const getGlobalStats = `-- name: GetGlobalStats :one
+SELECT
+    (SELECT COUNT(*) FROM contest WHERE archived_at IS NULL) AS contests,
+    (SELECT COUNT(*)
+     FROM contender c
+     JOIN contest ON contest.id = c.contest_id
+     WHERE contest.archived_at IS NULL AND c.entered IS NOT NULL AND c.disqualified = FALSE) AS registered_contenders,
+    (SELECT COUNT(*)
+     FROM tick t
+     JOIN contender c ON c.id = t.contender_id
+     JOIN contest ON contest.id = t.contest_id
+     WHERE contest.archived_at IS NULL AND c.disqualified = FALSE) AS ticks
+`
+
+type GetGlobalStatsRow struct {
+	Contests             int64
+	RegisteredContenders int64
+	Ticks                int64
+}
+
+func (q *Queries) GetGlobalStats(ctx context.Context) (GetGlobalStatsRow, error) {
+	row := q.db.QueryRowContext(ctx, getGlobalStats)
+	var i GetGlobalStatsRow
+	err := row.Scan(&i.Contests, &i.RegisteredContenders, &i.Ticks)
+	return i, err
+}
+
 const getOrganizer = `-- name: GetOrganizer :one
 SELECT id, name
 FROM organizer

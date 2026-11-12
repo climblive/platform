@@ -53,7 +53,7 @@ const httpIdleTimeout = 2 * time.Minute
 
 const appCSP = "default-src 'self'; connect-src 'self' clmb.auth.eu-west-1.amazoncognito.com *.fontawesome.com *.sentry.io data:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; object-src 'none'; frame-ancestors %s; form-action 'none'; base-uri 'self'; img-src 'self' data:; report-uri https://o4509937603641344.ingest.de.sentry.io/api/4509937616093264/security/?sentry_key=019099d850441f60cea5d465e217f768"
 
-const wwwCSP = "default-src 'self'; script-src 'self' 'sha256-jIhoHP5AYEa/rjrf399lCKS/+7hIAc+G1cKDLBSPd7o='; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'none'; form-action 'none'; base-uri 'self'"
+const wwwCSP = "default-src 'self'; connect-src 'self' https://climblive.app https://labs.climblive.app; script-src 'self' 'sha256-jIhoHP5AYEa/rjrf399lCKS/+7hIAc+G1cKDLBSPd7o='; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'none'; form-action 'none'; base-uri 'self'"
 
 type registrationCodeGenerator struct {
 }
@@ -345,6 +345,8 @@ func setupMux(
 		PointValueKeeper:   pointValueKeeper,
 	}
 
+	statsUseCase := usecases.StatsUseCase{Repo: repo}
+
 	mux := rest.NewMux()
 	mux.RegisterMiddleware(rest.CORS)
 	mux.RegisterMiddleware(authorizer.Middleware)
@@ -362,6 +364,7 @@ func setupMux(
 	rest.InstallUserHandler(mux, &userUseCase)
 	rest.InstallOrganizerHandler(mux, &organizerUseCase)
 	rest.InstallHealthHandler(mux, &healthUseCase)
+	rest.InstallStatsHandler(mux, &statsUseCase)
 
 	return mux
 }
