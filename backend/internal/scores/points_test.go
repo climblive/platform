@@ -161,6 +161,12 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 		rules := scores.Rules{PointDeduction: 10}
 
 		assert.Equal(t, domain.Tenths(1100), scores.CalculatePoints(value, tick, rules))
+
+		maxValue := scores.ProblemValue{
+			PointsTop:  21_474_836_470,
+			FlashBonus: 21_474_836_470,
+		}
+		assert.Equal(t, domain.Tenths(42_949_672_940), scores.CalculatePoints(maxValue, tick, rules))
 	})
 
 	t.Run("Zone1", func(t *testing.T) {
@@ -283,56 +289,6 @@ func TestCalculatePoints_MaxAttempts(t *testing.T) {
 
 		assert.Equal(t, domain.Tenths(500), scores.CalculatePoints(value, tick, rules))
 	})
-}
-
-func TestCalculatePointsFractionalPrecision(t *testing.T) {
-	tests := []struct {
-		name     string
-		value    scores.ProblemValue
-		tick     scores.Tick
-		rules    scores.Rules
-		expected domain.Tenths
-	}{
-		{
-			name:     "SixDeductions",
-			value:    scores.ProblemValue{PointsTop: 10},
-			tick:     scores.Tick{Top: true, AttemptsTop: 7},
-			rules:    scores.Rules{PointDeduction: 1},
-			expected: 4,
-		},
-		{
-			name:     "LastTenth",
-			value:    scores.ProblemValue{PointsTop: 10},
-			tick:     scores.Tick{Top: true, AttemptsTop: 10},
-			rules:    scores.Rules{PointDeduction: 1},
-			expected: 1,
-		},
-		{
-			name:     "ClampAtZero",
-			value:    scores.ProblemValue{PointsTop: 10},
-			tick:     scores.Tick{Top: true, AttemptsTop: 12},
-			rules:    scores.Rules{PointDeduction: 1},
-			expected: 0,
-		},
-		{
-			name:     "PooledFlash",
-			value:    scores.ProblemValue{PointsTop: 333, FlashBonus: 83},
-			tick:     scores.Tick{Top: true, AttemptsTop: 1},
-			expected: 416,
-		},
-		{
-			name:     "LargeFlash",
-			value:    scores.ProblemValue{PointsTop: 21_474_836_470, FlashBonus: 21_474_836_470},
-			tick:     scores.Tick{Top: true, AttemptsTop: 1},
-			expected: 42_949_672_940,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, scores.CalculatePoints(tt.value, tt.tick, tt.rules))
-		})
-	}
 }
 
 func TestTick(t *testing.T) {

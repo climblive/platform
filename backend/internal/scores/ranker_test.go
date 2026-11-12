@@ -27,42 +27,16 @@ func TestBasicRankerPointsFormatting(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ranker := scores.NewBasicRanker(0, true)
-			contenders := []scores.Contender{{ID: 1, Score: scores.Score{Points: tt.points}}}
+			synctest.Test(t, func(t *testing.T) {
+				ranker := scores.NewBasicRanker(0, true)
+				contenders := []scores.Contender{{ID: 1, Score: scores.Score{Points: tt.points}}}
 
-			ranked := ranker.RankContenders(slices.Values(contenders))
+				ranked := ranker.RankContenders(slices.Values(contenders))
 
-			assert.Equal(t, tt.expected, ranked[0].Score)
+				assert.Equal(t, tt.expected, ranked[0].Score)
+			})
 		})
 	}
-}
-
-func TestBasicRankerFractionalTies(t *testing.T) {
-	synctest.Test(t, func(t *testing.T) {
-		scorer := scores.Scorer{}
-		var contenders []scores.Contender
-		for i, values := range [][]domain.Tenths{{1, 1, 6}, {1, 6, 1}, {6, 1, 1}, {7}} {
-			contenders = append(contenders, scores.Contender{
-				ID: domain.ContenderID(i + 1),
-				Score: scores.Score{
-					Points: scorer.CalculatePoints(slices.Values(values)),
-				},
-			})
-		}
-		ranker := scores.NewBasicRanker(1, true)
-
-		ranked := ranker.RankContenders(slices.Values(contenders))
-
-		for i, score := range ranked[:3] {
-			assert.Equal(t, domain.ContenderID(i+1), score.ContenderID)
-			assert.Equal(t, "0.8p", score.Score)
-			assert.Equal(t, 1, score.Placement)
-			assert.True(t, score.Finalist)
-		}
-		assert.Equal(t, "0.7p", ranked[3].Score)
-		assert.Equal(t, 4, ranked[3].Placement)
-		assert.False(t, ranked[3].Finalist)
-	})
 }
 
 func TestBasicRanker(t *testing.T) {

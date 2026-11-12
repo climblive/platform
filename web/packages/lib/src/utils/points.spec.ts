@@ -1,8 +1,5 @@
-import { expect, test } from "@playwright/test";
-import {
-  localizedPointsValue,
-  roundPoints,
-} from "../../packages/lib/src/utils/points";
+import { expect, test } from "vitest";
+import { localizedPointsValue, roundPoints } from "./points";
 
 test("rounds fractional sums without losing a tenth", () => {
   expect(roundPoints(33.3 + 8.3)).toBe(41.6);
