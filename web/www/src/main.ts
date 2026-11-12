@@ -35,6 +35,8 @@ const loadGlobalStats = async () => {
     document.getElementById("stats-ticks")!.textContent = formatter.format(
       stats.ticks,
     );
+    document.getElementById("stats-registrations")!.textContent =
+      formatter.format(stats.registeredContenders);
     document.getElementById("stats-contests")!.textContent = formatter.format(
       stats.contests,
     );
