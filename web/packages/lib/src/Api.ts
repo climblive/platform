@@ -33,7 +33,6 @@ import type {
 } from "./models/rest";
 import { tickSchema } from "./models/tick";
 import { userSchema } from "./models/user";
-import { getApiUrl } from "./utils/config";
 
 interface ApiCredentialsProvider {
   getAuthHeaders(): RawAxiosRequestHeaders;
@@ -78,7 +77,7 @@ export class ApiClient {
 
   private constructor() {
     this.axiosInstance = axios.create({
-      baseURL: getApiUrl(),
+      baseURL: "/api",
       timeout: 10_000,
     });
   }

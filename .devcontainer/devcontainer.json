@@ -24,9 +24,12 @@
       "pnpmVersion": "11.1.1"
     }
   },
-  "forwardPorts": [8090],
+  "forwardPorts": [8080],
   "portsAttributes": {
-    "8090": {}
+    "8080": {
+      "label": "ClimbLive",
+      "onAutoForward": "notify"
+    }
   },
   "postCreateCommand": "./.devcontainer/scripts/post.sh"
 }
