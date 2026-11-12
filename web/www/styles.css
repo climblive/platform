@@ -13,11 +13,10 @@ body {
 
 section {
   padding-block: var(--wa-space-4xl);
+  background-color: var(--wa-color-surface-default);
 }
 
-.hero-section,
-.rules-section,
-.description-section {
+section:nth-child(odd of section:not([hidden])) {
   background-color: var(--wa-color-surface-lowered);
 }
 
@@ -58,6 +57,40 @@ section {
 
     h1 {
       font-size: var(--wa-font-size-2xl);
+    }
+  }
+}
+
+.stats-section {
+  .stats-statement {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--wa-space-2xl);
+    margin: 0;
+  }
+
+  .stats-metric {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-xs);
+    min-width: 0;
+    font-size: var(--wa-font-size-l);
+
+    strong {
+      color: var(--wa-color-brand-fill-loud);
+      font-size: var(--wa-font-size-4xl);
+      font-weight: var(--wa-font-weight-bold);
+      font-variant-numeric: tabular-nums;
+      line-height: var(--wa-line-height-condensed);
+      overflow-wrap: anywhere;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .stats-statement {
+      flex-direction: column;
+      gap: var(--wa-space-l);
     }
   }
 }

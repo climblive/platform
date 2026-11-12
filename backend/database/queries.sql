@@ -358,3 +358,15 @@ WHERE contender.name != ''
   AND contender.scrub_before IS NOT NULL
   AND contender.scrub_before < ?;
 
+-- name: GetGlobalStats :one
+SELECT
+    (SELECT COUNT(*) FROM contest WHERE archived_at IS NULL) AS contests,
+    (SELECT COUNT(*)
+     FROM contender c
+     JOIN contest ON contest.id = c.contest_id
+     WHERE contest.archived_at IS NULL AND c.entered IS NOT NULL AND c.disqualified = FALSE) AS registered_contenders,
+    (SELECT COUNT(*)
+     FROM tick t
+     JOIN contender c ON c.id = t.contender_id
+     JOIN contest ON contest.id = t.contest_id
+     WHERE contest.archived_at IS NULL AND c.disqualified = FALSE) AS ticks;

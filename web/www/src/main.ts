@@ -8,6 +8,8 @@ import {
   updateTheme,
   watchColorSchemeChanges,
 } from "@climblive/lib/utils";
+import type { GlobalStats } from "@climblive/lib/models";
+import { getApiBaseUrl } from "./api";
 import "../styles.css";
 
 document.getElementById("current-year")!.textContent = new Date()
@@ -18,6 +20,33 @@ watchColorSchemeChanges((prefersDarkColorScheme) =>
   updateTheme(prefersDarkColorScheme),
 );
 updateTheme(prefersDarkColorScheme());
+
+const loadGlobalStats = async () => {
+  try {
+    const response = await fetch(`${getApiBaseUrl()}/stats/global`, {
+      credentials: "omit",
+    });
+    if (!response.ok) {
+      return;
+    }
+
+    const stats: GlobalStats = await response.json();
+    const formatter = new Intl.NumberFormat(document.documentElement.lang);
+    document.getElementById("stats-ticks")!.textContent = formatter.format(
+      stats.ticks,
+    );
+    document.getElementById("stats-registrations")!.textContent =
+      formatter.format(stats.registeredContenders);
+    document.getElementById("stats-contests")!.textContent = formatter.format(
+      stats.contests,
+    );
+    document.getElementById("global-stats")!.hidden = false;
+  } catch {
+    document.getElementById("global-stats")!.hidden = true;
+  }
+};
+
+void loadGlobalStats();
 
 const compactCarouselLayout = window.matchMedia("(max-width: 768px)");
 

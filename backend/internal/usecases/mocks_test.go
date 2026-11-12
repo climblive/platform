@@ -38,6 +38,11 @@ type repositoryMock struct {
 	mock.Mock
 }
 
+func (m *repositoryMock) GetGlobalStats(ctx context.Context) (domain.GlobalStats, error) {
+	args := m.Called(ctx)
+	return args.Get(0).(domain.GlobalStats), args.Error(1)
+}
+
 func (m *repositoryMock) Begin() (domain.Transaction, error) {
 	args := m.Called()
 	return args.Get(0).(domain.Transaction), args.Error(1)
