@@ -5,6 +5,7 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/stretchr/testify/assert"
 )
@@ -14,7 +15,7 @@ func TestScorerWithProblemLimit(t *testing.T) {
 		ProblemLimit: 5,
 	}
 
-	tickPointValues := []scores.Tenths{
+	tickPointValues := []domain.Tenths{
 		1000,
 		500,
 		250,
@@ -29,7 +30,7 @@ func TestScorerWithProblemLimit(t *testing.T) {
 
 	score := rules.CalculatePoints(slices.Values(tickPointValues))
 
-	assert.Equal(t, scores.Tenths(14500), score)
+	assert.Equal(t, domain.Tenths(14500), score)
 }
 
 func TestScorer_NoLimit(t *testing.T) {
@@ -37,7 +38,7 @@ func TestScorer_NoLimit(t *testing.T) {
 		ProblemLimit: 0,
 	}
 
-	tickPointValues := []scores.Tenths{
+	tickPointValues := []domain.Tenths{
 		1000,
 		500,
 		250,
@@ -52,26 +53,26 @@ func TestScorer_NoLimit(t *testing.T) {
 
 	score := rules.CalculatePoints(slices.Values(tickPointValues))
 
-	assert.Equal(t, scores.Tenths(17750), score)
+	assert.Equal(t, domain.Tenths(17750), score)
 }
 
 func TestScorerFractionalTotals(t *testing.T) {
 	tests := []struct {
 		name     string
-		points   []scores.Tenths
-		expected scores.Tenths
+		points   []domain.Tenths
+		expected domain.Tenths
 	}{
 		{name: "Empty", expected: 0},
-		{name: "TwoTenths", points: []scores.Tenths{1, 2}, expected: 3},
-		{name: "RepeatedTenths", points: slices.Repeat([]scores.Tenths{1}, 8), expected: 8},
-		{name: "PooledPoints", points: []scores.Tenths{333, 333, 333}, expected: 999},
-		{name: "SmallFirst", points: []scores.Tenths{1, 1, 6}, expected: 8},
-		{name: "LargeMiddle", points: []scores.Tenths{1, 6, 1}, expected: 8},
-		{name: "LargeFirst", points: []scores.Tenths{6, 1, 1}, expected: 8},
+		{name: "TwoTenths", points: []domain.Tenths{1, 2}, expected: 3},
+		{name: "RepeatedTenths", points: slices.Repeat([]domain.Tenths{1}, 8), expected: 8},
+		{name: "PooledPoints", points: []domain.Tenths{333, 333, 333}, expected: 999},
+		{name: "SmallFirst", points: []domain.Tenths{1, 1, 6}, expected: 8},
+		{name: "LargeMiddle", points: []domain.Tenths{1, 6, 1}, expected: 8},
+		{name: "LargeFirst", points: []domain.Tenths{6, 1, 1}, expected: 8},
 		{
 			name:     "LargeTotal",
-			points:   slices.Repeat([]scores.Tenths{42_949_672_940}, 65536),
-			expected: scores.Tenths(42_949_672_940) * 65536,
+			points:   slices.Repeat([]domain.Tenths{42_949_672_940}, 65536),
+			expected: domain.Tenths(42_949_672_940) * 65536,
 		},
 	}
 
@@ -87,7 +88,7 @@ func TestScorerFractionalTotals(t *testing.T) {
 
 func TestScorerFractionalProblemLimit(t *testing.T) {
 	scorer := scores.Scorer{ProblemLimit: 2}
-	points := []scores.Tenths{332, 333, 1, 334}
+	points := []domain.Tenths{332, 333, 1, 334}
 
-	assert.Equal(t, scores.Tenths(667), scorer.CalculatePoints(slices.Values(points)))
+	assert.Equal(t, domain.Tenths(667), scorer.CalculatePoints(slices.Values(points)))
 }

@@ -1,15 +1,17 @@
 package scores
 
-func CalculatePoints(value ProblemValue, tick Tick, rules Rules) Tenths {
-	calculate := func(points Tenths, attempts int) Tenths {
+import "github.com/climblive/platform/backend/internal/domain"
+
+func CalculatePoints(value ProblemValue, tick Tick, rules Rules) domain.Tenths {
+	calculate := func(points domain.Tenths, attempts int) domain.Tenths {
 		if rules.MaxAttempts > 0 && attempts > rules.MaxAttempts {
 			return 0
 		}
 
-		return max(0, points-Tenths(max(0, attempts-1))*rules.PointDeduction)
+		return max(0, points-domain.Tenths(max(0, attempts-1))*rules.PointDeduction)
 	}
 
-	points := [3]Tenths{}
+	points := [3]domain.Tenths{}
 
 	if tick.Zone1 {
 		points[0] = calculate(value.PointsZone1, tick.AttemptsZone1)

@@ -33,7 +33,7 @@ func TestHydrate(t *testing.T) {
 			UsePoints:          true,
 			PooledPoints:       true,
 			MaxAttempts:        10,
-			PointDeduction:     0.3,
+			PointDeduction:     3,
 		}, nil)
 
 	mockedRepo.

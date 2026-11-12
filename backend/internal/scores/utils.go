@@ -13,6 +13,6 @@ func CompareScore(s1, s2 domain.Score) bool {
 	return s1 == s2
 }
 
-func ComparePointValue(pv1, pv2 PointValue) bool {
+func ComparePointValue(pv1, pv2 domain.PointValue) bool {
 	return pv1 == pv2
 }

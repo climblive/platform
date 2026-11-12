@@ -14,11 +14,11 @@ type Rules struct {
 	UsePoints          bool
 	PooledPoints       bool
 	MaxAttempts        int
-	PointDeduction     Tenths
+	PointDeduction     domain.Tenths
 }
 
 type ScoringRules interface {
-	CalculateScore(points iter.Seq[Tenths]) Tenths
+	CalculateScore(points iter.Seq[domain.Tenths]) domain.Tenths
 }
 
 type Ranker interface {
@@ -107,9 +107,9 @@ type EngineStore interface {
 	SaveProblem(Problem)
 	GetAllProblems() iter.Seq[Problem]
 
-	GetPointValue(domain.ContenderID, domain.ProblemID) (PointValue, bool)
-	SavePointValue(domain.ContenderID, domain.ProblemID, PointValue)
-	GetDirtyPointValues() []PointValue
+	GetPointValue(domain.ContenderID, domain.ProblemID) (domain.PointValue, bool)
+	SavePointValue(domain.ContenderID, domain.ProblemID, domain.PointValue)
+	GetDirtyPointValues() []domain.PointValue
 
 	SaveScore(domain.Score)
 	GetDirtyScores() []domain.Score
@@ -157,7 +157,7 @@ func (e *DefaultScoreEngine) HandleRulesUpdated(event domain.RulesUpdatedEvent) 
 		UsePoints:          event.UsePoints,
 		PooledPoints:       event.PooledPoints,
 		MaxAttempts:        event.MaxAttempts,
-		PointDeduction:     tenthsFromFloat64(event.PointDeduction),
+		PointDeduction:     event.PointDeduction,
 	}
 
 	e.store.SaveRules(rules)
@@ -380,8 +380,13 @@ func (e *DefaultScoreEngine) HandleAscentDeregistered(event domain.AscentDeregis
 
 func (e *DefaultScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) iter.Seq[Effect] {
 	problem := Problem{
-		ID:           event.ProblemID,
-		ProblemValue: problemValueFromDomain(event.ProblemValue),
+		ID: event.ProblemID,
+		ProblemValue: ProblemValue{
+			PointsZone1: domain.Tenths(event.PointsZone1) * 10,
+			PointsZone2: domain.Tenths(event.PointsZone2) * 10,
+			PointsTop:   domain.Tenths(event.PointsTop) * 10,
+			FlashBonus:  domain.Tenths(event.FlashBonus) * 10,
+		},
 		Zone1Enabled: event.Zone1Enabled,
 		Zone2Enabled: event.Zone2Enabled,
 	}
@@ -399,8 +404,13 @@ func (e *DefaultScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) 
 
 func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEvent) iter.Seq[Effect] {
 	problem := Problem{
-		ID:           event.ProblemID,
-		ProblemValue: problemValueFromDomain(event.ProblemValue),
+		ID: event.ProblemID,
+		ProblemValue: ProblemValue{
+			PointsZone1: domain.Tenths(event.PointsZone1) * 10,
+			PointsZone2: domain.Tenths(event.PointsZone2) * 10,
+			PointsTop:   domain.Tenths(event.PointsTop) * 10,
+			FlashBonus:  domain.Tenths(event.FlashBonus) * 10,
+		},
 		Zone1Enabled: event.Zone1Enabled,
 		Zone2Enabled: event.Zone2Enabled,
 	}
@@ -429,11 +439,7 @@ func (e *DefaultScoreEngine) GetDirtyScores() []domain.Score {
 }
 
 func (e *DefaultScoreEngine) GetDirtyPointValues() []domain.PointValue {
-	var values []domain.PointValue
-	for _, value := range e.store.GetDirtyPointValues() {
-		values = append(values, value.toDomain())
-	}
-	return values
+	return e.store.GetDirtyPointValues()
 }
 
 func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect] {
@@ -478,7 +484,7 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 		hypotheticalBestTop := tick.TurnIntoTop()
 		hypotheticalFlash := tick.TurnIntoFlash()
 
-		pointValue := PointValue{
+		pointValue := domain.PointValue{
 			ContenderID: contender.ID,
 			ProblemID:   problemID,
 			Current:     0,
@@ -543,7 +549,7 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 		if rules.UsePoints {
 			ticks := e.store.GetTicksByContender(contender.ID)
 
-			var pointValues iter.Seq[Tenths] = func(yield func(Tenths) bool) {
+			var pointValues iter.Seq[domain.Tenths] = func(yield func(domain.Tenths) bool) {
 				for tick := range ticks {
 					value, found := e.store.GetPointValue(contender.ID, tick.ProblemID)
 					if !found {

@@ -15,7 +15,7 @@ import (
 func TestBasicRankerPointsFormatting(t *testing.T) {
 	tests := []struct {
 		name     string
-		points   scores.Tenths
+		points   domain.Tenths
 		expected string
 	}{
 		{name: "Zero", points: 0, expected: "0p"},
@@ -41,7 +41,7 @@ func TestBasicRankerFractionalTies(t *testing.T) {
 	synctest.Test(t, func(t *testing.T) {
 		scorer := scores.Scorer{}
 		var contenders []scores.Contender
-		for i, values := range [][]scores.Tenths{{1, 1, 6}, {1, 6, 1}, {6, 1, 1}, {7}} {
+		for i, values := range [][]domain.Tenths{{1, 1, 6}, {1, 6, 1}, {6, 1, 1}, {7}} {
 			contenders = append(contenders, scores.Contender{
 				ID: domain.ContenderID(i + 1),
 				Score: scores.Score{

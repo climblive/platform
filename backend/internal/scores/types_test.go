@@ -341,12 +341,12 @@ func TestCalculatePooledProblemValue(t *testing.T) {
 		pool := scores.TickPool{Top: 3, Flash: 4}
 		problem := scores.ProblemValue{PointsTop: 1000, FlashBonus: 10}
 		value := pool.CalculatePooledProblemValue(problem)
-		assert.Equal(t, scores.Tenths(333), value.PointsTop)
-		assert.Equal(t, scores.Tenths(2), value.FlashBonus)
+		assert.Equal(t, domain.Tenths(333), value.PointsTop)
+		assert.Equal(t, domain.Tenths(2), value.FlashBonus)
 
 		pool.Flash = 3
 		value = pool.CalculatePooledProblemValue(problem)
-		assert.Equal(t, scores.Tenths(3), value.FlashBonus)
+		assert.Equal(t, domain.Tenths(3), value.FlashBonus)
 	})
 
 	t.Run("EmptyPool", func(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 )
 
 type Score struct {
-	Points         Tenths
+	Points         domain.Tenths
 	Tops           int
 	AttemptsTops   int
 	Zone1s         int
@@ -144,41 +144,10 @@ type Problem struct {
 }
 
 type ProblemValue struct {
-	PointsZone1 Tenths
-	PointsZone2 Tenths
-	PointsTop   Tenths
-	FlashBonus  Tenths
-}
-
-func problemValueFromDomain(value domain.ProblemValue) ProblemValue {
-	return ProblemValue{
-		PointsZone1: Tenths(value.PointsZone1) * 10,
-		PointsZone2: Tenths(value.PointsZone2) * 10,
-		PointsTop:   Tenths(value.PointsTop) * 10,
-		FlashBonus:  Tenths(value.FlashBonus) * 10,
-	}
-}
-
-type PointValue struct {
-	ContenderID domain.ContenderID
-	ProblemID   domain.ProblemID
-	Current     Tenths
-	Zone1       Tenths
-	Zone2       Tenths
-	Top         Tenths
-	FlashBonus  Tenths
-}
-
-func (v PointValue) toDomain() domain.PointValue {
-	return domain.PointValue{
-		ContenderID: v.ContenderID,
-		ProblemID:   v.ProblemID,
-		Current:     v.Current.Float64(),
-		Zone1:       v.Zone1.Float64(),
-		Zone2:       v.Zone2.Float64(),
-		Top:         v.Top.Float64(),
-		FlashBonus:  v.FlashBonus.Float64(),
-	}
+	PointsZone1 domain.Tenths
+	PointsZone2 domain.Tenths
+	PointsTop   domain.Tenths
+	FlashBonus  domain.Tenths
 }
 
 type TickPool struct {
@@ -229,7 +198,7 @@ func (c TickPool) Sub(tick Tick) TickPool {
 }
 
 func (c TickPool) CalculatePooledProblemValue(value ProblemValue) ProblemValue {
-	weightedValue := func(value Tenths, divisor int) Tenths {
+	weightedValue := func(value domain.Tenths, divisor int) domain.Tenths {
 		if divisor == 0 {
 			return value
 		}
@@ -238,7 +207,7 @@ func (c TickPool) CalculatePooledProblemValue(value ProblemValue) ProblemValue {
 			return 0
 		}
 
-		return max(1, value/Tenths(divisor))
+		return max(1, value/domain.Tenths(divisor))
 	}
 
 	return ProblemValue{

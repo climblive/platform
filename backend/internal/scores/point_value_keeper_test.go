@@ -120,11 +120,11 @@ func TestPointValueKeeper(t *testing.T) {
 					pointValue := domain.PointValue{
 						ContenderID: contenderID,
 						ProblemID:   domain.ProblemID(1000 + k),
-						Current:     float64(1000 + k),
-						Zone1:       float64(10 + k),
-						Zone2:       float64(20 + k),
-						Top:         float64(1000 + k),
-						FlashBonus:  float64(100 + k),
+						Current:     domain.Tenths(1000 + k),
+						Zone1:       domain.Tenths(10 + k),
+						Zone2:       domain.Tenths(20 + k),
+						Top:         domain.Tenths(1000 + k),
+						FlashBonus:  domain.Tenths(100 + k),
 					}
 
 					err := subscription.Post(domain.EventEnvelope{
@@ -195,11 +195,11 @@ func TestPointValueKeeper(t *testing.T) {
 				pointValue := domain.PointValue{
 					ContenderID: fakedContenderID,
 					ProblemID:   fakedProblemID,
-					Current:     float64(1000 + k),
-					Zone1:       float64(10 + k),
-					Zone2:       float64(20 + k),
-					Top:         float64(1000 + k),
-					FlashBonus:  float64(100 + k),
+					Current:     domain.Tenths(1000 + k),
+					Zone1:       domain.Tenths(10 + k),
+					Zone2:       domain.Tenths(20 + k),
+					Top:         domain.Tenths(1000 + k),
+					FlashBonus:  domain.Tenths(100 + k),
 				}
 
 				err := subscription.Post(domain.EventEnvelope{

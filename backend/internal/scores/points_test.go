@@ -109,7 +109,7 @@ func TestCalculatePoints_HighestValueFeatureWins(t *testing.T) {
 
 		rules := scores.Rules{PointDeduction: 100}
 
-		assert.Equal(t, scores.Tenths(500), scores.CalculatePoints(problem, tick, rules))
+		assert.Equal(t, domain.Tenths(500), scores.CalculatePoints(problem, tick, rules))
 	})
 
 	t.Run("Zone2WinsOverTop", func(t *testing.T) {
@@ -124,7 +124,7 @@ func TestCalculatePoints_HighestValueFeatureWins(t *testing.T) {
 
 		rules := scores.Rules{PointDeduction: 100}
 
-		assert.Equal(t, scores.Tenths(750), scores.CalculatePoints(problem, tick, rules))
+		assert.Equal(t, domain.Tenths(750), scores.CalculatePoints(problem, tick, rules))
 	})
 }
 
@@ -145,7 +145,7 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 
 		rules := scores.Rules{PointDeduction: 100}
 
-		assert.Equal(t, scores.Tenths(0), scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(0), scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("Flash", func(t *testing.T) {
@@ -160,7 +160,7 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 
 		rules := scores.Rules{PointDeduction: 10}
 
-		assert.Equal(t, scores.Tenths(1100), scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(1100), scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("Zone1", func(t *testing.T) {
@@ -173,7 +173,7 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 
 		rules := scores.Rules{PointDeduction: 1}
 
-		assert.Equal(t, scores.Tenths(499), scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(499), scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("Zone2", func(t *testing.T) {
@@ -187,7 +187,7 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 
 		rules := scores.Rules{PointDeduction: 1}
 
-		assert.Equal(t, scores.Tenths(748), scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(748), scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("Top", func(t *testing.T) {
@@ -202,7 +202,7 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 
 		rules := scores.Rules{PointDeduction: 1}
 
-		assert.Equal(t, scores.Tenths(996), scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(996), scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("FloorAtZero", func(t *testing.T) {
@@ -217,7 +217,7 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 
 		rules := scores.Rules{PointDeduction: 21_474_836_470}
 
-		assert.Equal(t, scores.Tenths(0), scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(0), scores.CalculatePoints(value, tick, rules))
 	})
 }
 
@@ -241,7 +241,7 @@ func TestCalculatePoints_MaxAttempts(t *testing.T) {
 
 		rules := scores.Rules{MaxAttempts: 1}
 
-		assert.Equal(t, scores.Tenths(1100), scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(1100), scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("AtAttemptLimit", func(t *testing.T) {
@@ -255,7 +255,7 @@ func TestCalculatePoints_MaxAttempts(t *testing.T) {
 		}
 		rules := scores.Rules{MaxAttempts: 10}
 
-		assert.Equal(t, scores.Tenths(1000), scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(1000), scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("AboveAttemptLimit", func(t *testing.T) {
@@ -269,7 +269,7 @@ func TestCalculatePoints_MaxAttempts(t *testing.T) {
 		}
 		rules := scores.Rules{MaxAttempts: 10}
 
-		assert.Equal(t, scores.Tenths(0), scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(0), scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("MaxAttemptsAffectsOnlyReachedFeatures", func(t *testing.T) {
@@ -281,7 +281,7 @@ func TestCalculatePoints_MaxAttempts(t *testing.T) {
 		}
 		rules := scores.Rules{MaxAttempts: 10}
 
-		assert.Equal(t, scores.Tenths(500), scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(500), scores.CalculatePoints(value, tick, rules))
 	})
 }
 
@@ -291,7 +291,7 @@ func TestCalculatePointsFractionalPrecision(t *testing.T) {
 		value    scores.ProblemValue
 		tick     scores.Tick
 		rules    scores.Rules
-		expected scores.Tenths
+		expected domain.Tenths
 	}{
 		{
 			name:     "SixDeductions",
