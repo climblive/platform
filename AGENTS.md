@@ -184,7 +184,8 @@ make test
 
 ### Frontend (Svelte)
 
-- **Svelte 5**: Use runes API (`$state`, `$derived`, `$effect`)
+- **Svelte 5**: Use runes API (`$state`, `$derived`)
+- **Effects**: Always avoid `$effect` unless absolutely necessary; prefer lifecycle hooks such as `onMount` for setup and cleanup
 - **TypeScript**: Strict mode enabled
 - **API Calls**: Use TanStack Query through queries in the shared library
 - **Conditionals**: Always use braces for one-line conditionals; do not use shorthand `if (...) return ...` style
