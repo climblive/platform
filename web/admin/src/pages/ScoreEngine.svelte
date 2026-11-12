@@ -13,6 +13,7 @@
   } from "@climblive/lib/queries";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { add, format, isBefore, subSeconds } from "date-fns";
+  import { onMount } from "svelte";
 
   interface Props {
     contestId: number;
@@ -37,7 +38,7 @@
       : undefined,
   );
 
-  $effect(() => {
+  onMount(() => {
     const filters: EventFilter[] = [
       {
         contestId,
