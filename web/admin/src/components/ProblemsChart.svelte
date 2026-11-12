@@ -16,6 +16,7 @@
     updateTickInContestQueryCache,
   } from "@climblive/lib/queries";
   import { useQueryClient } from "@tanstack/svelte-query";
+  import { onMount } from "svelte";
   import Bar from "./Bar.svelte";
 
   interface Props {
@@ -37,7 +38,7 @@
   const problemsQuery = $derived(getProblemsQuery(contestId));
   const ticksQuery = $derived(getTicksByContestQuery(contestId));
 
-  $effect(() => {
+  onMount(() => {
     const currentContestId = contestId;
     const filters: EventFilter[] = [
       {
