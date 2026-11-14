@@ -39,11 +39,6 @@
 - Mock interfaces using `stretchr/testify/mock`.
 - Use `testing/synctest` (via `synctest.Test`) whenever a test involves `time.Now()`.
 
-### Frontend
-
-- E2E tests using Playwright in `web/e2e`.
-- Run `make test` for full E2E suite.
-
 ## Common Tasks
 
 ### Modifying database schema
