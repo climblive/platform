@@ -26,7 +26,8 @@ func (t Tenths) String() string {
 	}
 	data = strconv.AppendInt(data, whole, 10)
 	if fraction != 0 {
-		data = append(data, '.', byte('0'+fraction))
+		data = append(data, '.')
+		data = strconv.AppendInt(data, fraction, 10)
 	}
 	return string(data)
 }
@@ -36,14 +37,17 @@ func (t Tenths) MarshalJSON() ([]byte, error) {
 }
 
 func (t *Tenths) UnmarshalJSON(data []byte) error {
-	var points float64
+	var points *float64
 	if err := json.Unmarshal(data, &points); err != nil {
 		return errors.Wrap(err, 0)
 	}
+	if points == nil {
+		return errors.Errorf("%w: expected a JSON number", ErrInvalidData)
+	}
 
-	scaled := points * 10
+	scaled := *points * 10
 	rounded := math.Round(scaled)
-	if math.IsNaN(rounded) || math.IsInf(rounded, 0) || rounded < -0x1p63 || rounded >= 0x1p63 || math.Abs(scaled-rounded) >= 1e-6 {
+	if rounded < -0x1p63 || rounded >= 0x1p63 || math.Abs(scaled-rounded) >= 1e-6 {
 		return errors.Errorf("%w: value cannot be represented in tenths", ErrInvalidData)
 	}
 

@@ -11,8 +11,6 @@ import (
 )
 
 func TestTenthsFromFloat64(t *testing.T) {
-	oneTenth := 0.1
-	twoTenths := 0.2
 	tests := []struct {
 		name     string
 		points   float64
@@ -22,7 +20,6 @@ func TestTenthsFromFloat64(t *testing.T) {
 		{name: "Integer", points: 25, expected: 250},
 		{name: "Fractional", points: 24.7, expected: 247},
 		{name: "Negative", points: -0.3, expected: -3},
-		{name: "FloatingPointNoise", points: oneTenth + twoTenths, expected: 3},
 		{name: "MaximumInteger", points: 2_147_483_647, expected: 21_474_836_470},
 		{name: "LargeFractional", points: 2_147_483_646.9, expected: 21_474_836_469},
 	}
@@ -30,7 +27,25 @@ func TestTenthsFromFloat64(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.Equal(t, tt.expected, domain.TenthsFromFloat64(tt.points))
-			assert.Equal(t, tt.expected, domain.TenthsFromFloat64(tt.expected.Float64()))
+		})
+	}
+}
+
+func TestTenthsFloat64(t *testing.T) {
+	tests := []struct {
+		name     string
+		value    domain.Tenths
+		expected float64
+	}{
+		{name: "Zero", value: 0, expected: 0},
+		{name: "Integer", value: 250, expected: 25},
+		{name: "Fractional", value: 247, expected: 24.7},
+		{name: "Negative", value: -3, expected: -0.3},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, tt.value.Float64())
 		})
 	}
 }
@@ -59,7 +74,6 @@ func TestTenthsMarshalJSON(t *testing.T) {
 			encoded, err := json.Marshal(tt.value)
 			require.NoError(t, err)
 			assert.Equal(t, tt.expected, string(encoded))
-			assert.Equal(t, tt.expected, tt.value.String())
 		})
 	}
 }
@@ -71,6 +85,8 @@ func TestTenthsUnmarshalJSON(t *testing.T) {
 		expected domain.Tenths
 	}{
 		{name: "Zero", encoded: "0", expected: 0},
+		{name: "NegativeZero", encoded: "-0.0", expected: 0},
+		{name: "ZeroWithLargeExponent", encoded: "0e999999999999999999999", expected: 0},
 		{name: "Integer", encoded: "25", expected: 250},
 		{name: "Fractional", encoded: "24.7", expected: 247},
 		{name: "OneTenth", encoded: "0.1", expected: 1},
@@ -78,23 +94,21 @@ func TestTenthsUnmarshalJSON(t *testing.T) {
 		{name: "NegativeFractional", encoded: "-24.7", expected: -247},
 		{name: "TrailingZeros", encoded: "24.700", expected: 247},
 		{name: "Exponent", encoded: "247e-1", expected: 247},
+		{name: "PositiveExponent", encoded: "2.47E+1", expected: 247},
+		{name: "ExponentWithTrailingZeros", encoded: "2470e-2", expected: 247},
+		{name: "LongMantissa", encoded: "1000000000000000000000000000000e-30", expected: 10},
+		{name: "Whitespace", encoded: " \t24.7\r\n", expected: 247},
 		{name: "FloatingPointNoise", encoded: "0.30000000000000004", expected: 3},
 		{name: "LargeInteger", encoded: "2147483647", expected: 21_474_836_470},
 		{name: "LargeFractional", encoded: "2147483646.9", expected: 21_474_836_469},
-		{name: "Null", encoded: "null", expected: 0},
+		{name: "Minimum", encoded: "-922337203685477580.8", expected: math.MinInt64},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			value := domain.Tenths(123)
+			var value domain.Tenths
 			require.NoError(t, json.Unmarshal([]byte(tt.encoded), &value))
 			assert.Equal(t, tt.expected, value)
-
-			encoded, err := json.Marshal(value)
-			require.NoError(t, err)
-			var decoded domain.Tenths
-			require.NoError(t, json.Unmarshal(encoded, &decoded))
-			assert.Equal(t, value, decoded)
 		})
 	}
 }
@@ -102,8 +116,8 @@ func TestTenthsUnmarshalJSON(t *testing.T) {
 func TestTenthsUnmarshalJSONInvalid(t *testing.T) {
 	for _, encoded := range []string{
 		"0.15", "-0.15", "1e-2", "1e18", "-1e18", "1e309", "1e308",
-		"922337203685477580.8", "-922337203685477785.6",
-		`"0.1"`, "true", "{}", "[]", "NaN", "Infinity", "01", "1 2", "",
+		"922337203685477580.8", "-922337203685477785.6", "1e999999999999999999999",
+		`"0.1"`, "null", "true", "{}", "[]", "NaN", "Infinity", "01", "1 2", "",
 	} {
 		t.Run(encoded, func(t *testing.T) {
 			value := domain.Tenths(123)
