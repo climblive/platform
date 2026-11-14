@@ -24,11 +24,10 @@
     });
   });
 
-  let element: HTMLSpanElement;
   let animated = $state<number>();
   let previous = 0;
 
-  $effect(() => {
+  function animateScore(element: HTMLSpanElement) {
     const target = value;
     const from = previous;
     previous = target;
@@ -42,10 +41,10 @@
       stop();
       previous = current ?? target;
     };
-  });
+  }
 </script>
 
-<span class="points" bind:this={element}>
+<span class="points" {@attach animateScore}>
   <span class="value" class:animating={animated !== undefined}>
     {formattedValue}
   </span>
