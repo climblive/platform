@@ -14,14 +14,14 @@ import (
 func TestBasicRankerPointsFormatting(t *testing.T) {
 	tests := []struct {
 		name     string
-		points   float64
+		points   domain.Tenths
 		expected string
 	}{
 		{name: "Zero", points: 0, expected: "0p"},
-		{name: "Integer", points: 25, expected: "25p"},
-		{name: "Fractional", points: 24.7, expected: "24.7p"},
-		{name: "LargeInteger", points: 1_000_000, expected: "1000000p"},
-		{name: "LargeFractional", points: 1_000_000.1, expected: "1000000.1p"},
+		{name: "Integer", points: 250, expected: "25p"},
+		{name: "Fractional", points: 247, expected: "24.7p"},
+		{name: "LargeInteger", points: 10_000_000, expected: "1000000p"},
+		{name: "LargeFractional", points: 10_000_001, expected: "1000000.1p"},
 	}
 
 	for _, tt := range tests {

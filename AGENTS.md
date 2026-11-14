@@ -173,6 +173,7 @@ make test
 ## Coding Conventions
 
 - **Comments**: Keep comments to an absolute minimum, preferably none
+- **Questions**: Always number questions addressed to the user so they can reference them
 
 ### Backend (Go)
 
@@ -206,7 +207,7 @@ make test
 - Table-driven tests preferred for multiple test cases
 - Use `stretchr/testify` for assertions
 - Mock interfaces using `stretchr/testify/mock`
-- Use `testing/synctest` (via `synctest.Test`) whenever a test involves `time.Now()`
+- Use `testing/synctest` (via `synctest.Test`) when assertions or synchronization depend on time, not merely because the code calls `time.Now()`
 
 ### Frontend
 

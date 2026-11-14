@@ -43,10 +43,10 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 		store.SaveProblem(Problem{
 			ID: problem.ID,
 			ProblemValue: ProblemValue{
-				PointsZone1: float64(problem.PointsZone1),
-				PointsZone2: float64(problem.PointsZone2),
-				PointsTop:   float64(problem.PointsTop),
-				FlashBonus:  float64(problem.FlashBonus),
+				PointsZone1: domain.Tenths(problem.PointsZone1) * 10,
+				PointsZone2: domain.Tenths(problem.PointsZone2) * 10,
+				PointsTop:   domain.Tenths(problem.PointsTop) * 10,
+				FlashBonus:  domain.Tenths(problem.FlashBonus) * 10,
 			},
 			Zone1Enabled: problem.Zone1Enabled,
 			Zone2Enabled: problem.Zone2Enabled,
