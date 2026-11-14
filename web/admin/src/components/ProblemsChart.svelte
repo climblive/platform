@@ -15,6 +15,7 @@
     removeTickFromQueryCache,
     updateTickInContestQueryCache,
   } from "@climblive/lib/queries";
+  import { compareLabels } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { onMount } from "svelte";
   import Bar from "./Bar.svelte";
@@ -125,7 +126,7 @@
 
   const sortedProblems = $derived(
     problemsQuery.data
-      ? [...problemsQuery.data].sort((a, b) => a.number - b.number)
+      ? [...problemsQuery.data].sort((a, b) => compareLabels(a.label, b.label))
       : undefined,
   );
 </script>

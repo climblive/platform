@@ -71,6 +71,7 @@ type Problem struct {
 	OrganizerID        int32
 	ContestID          int32
 	Number             int32
+	Label              string
 	HoldColorPrimary   string
 	HoldColorSecondary sql.NullString
 	Zone1Enabled       bool

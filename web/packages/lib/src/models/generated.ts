@@ -171,7 +171,7 @@ export interface PointValue {
 export interface Problem extends ProblemValue {
   id: ProblemID;
   contestId: ContestID;
-  number: number /* int */;
+  label: string;
   holdColorPrimary: string;
   holdColorSecondary?: string;
   description?: string;
@@ -179,7 +179,7 @@ export interface Problem extends ProblemValue {
   zone2Enabled: boolean;
 }
 export interface ProblemTemplate extends ProblemValue {
-  number: number /* int */;
+  label: string;
   holdColorPrimary: string;
   holdColorSecondary?: string;
   description?: string;
@@ -187,7 +187,7 @@ export interface ProblemTemplate extends ProblemValue {
   zone2Enabled: boolean;
 }
 export interface ProblemPatch {
-  number?: number;
+  label?: string;
   holdColorPrimary?: string;
   holdColorSecondary?: string;
   description?: string;
@@ -298,7 +298,7 @@ export interface AscentDeregisteredEvent {
 }
 export interface ProblemAddedEvent extends ProblemValue {
   problemId: ProblemID;
-  number: number /* int */;
+  label: number /* int */;
   holdColorPrimary: string;
   holdColorSecondary?: string;
   description?: string;

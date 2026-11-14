@@ -5,15 +5,15 @@
 
   interface Props {
     description: string;
-    number: number;
+    label: string;
   }
 
-  const { description, number }: Props = $props();
+  const { description, label }: Props = $props();
   const id = $props.id();
 </script>
 
 <wa-button size="xs" appearance="plain" pill {id}
-  ><wa-icon name="info-circle" label={`Description for problem ${number}`}
+  ><wa-icon name="info-circle" label={`Description for problem ${label}`}
   ></wa-icon></wa-button
 >
 

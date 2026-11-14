@@ -15,7 +15,7 @@ func TestProblemValidator(t *testing.T) {
 		return domain.Problem{
 			ID:                 domain.ProblemID(1),
 			ContestID:          domain.ContestID(1),
-			Number:             1,
+			Label:              "Ω1234Σ",
 			HoldColorPrimary:   "#ffffff",
 			HoldColorSecondary: "#000000",
 			Description:        "First boulder",
@@ -30,9 +30,29 @@ func TestProblemValidator(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("NumberNegative", func(t *testing.T) {
+	t.Run("LabelEmpty", func(t *testing.T) {
 		problem := validProblem()
-		problem.Number = -5
+		problem.Label = ""
+
+		err := validator.Validate(problem)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("LabelTooLong", func(t *testing.T) {
+		problem := validProblem()
+		problem.Label = "1234567"
+
+		err := validator.Validate(problem)
+
+		assert.ErrorIs(t, err, domain.ErrInvalidData)
+		assert.True(t, validator.IsValidationError(err))
+	})
+
+	t.Run("LabelWithInvalidCharacters", func(t *testing.T) {
+		problem := validProblem()
+		problem.Label = "!10"
 
 		err := validator.Validate(problem)
 

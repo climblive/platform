@@ -11,6 +11,7 @@
     getProblemsQuery,
     getTicksByContenderQuery,
   } from "@climblive/lib/queries";
+  import { compareLabels, renderLabel } from "@climblive/lib/utils";
   import { format } from "date-fns";
 
   interface Props {
@@ -44,9 +45,8 @@
         };
       })
       .filter((entry) => entry !== undefined)
-      .sort(
-        (t1: TickAndProblem, t2: TickAndProblem) =>
-          t1.problem.number - t2.problem.number,
+      .sort((t1: TickAndProblem, t2: TickAndProblem) =>
+        compareLabels(t1.problem.label, t2.problem.label),
       ) ?? [],
   );
 
@@ -88,7 +88,7 @@
       primary={problem.holdColorPrimary}
       secondary={problem.holdColorSecondary}
     />
-    #{problem.number}
+    {renderLabel(problem.label)}
   </div>
 {/snippet}
 

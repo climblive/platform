@@ -118,14 +118,6 @@
     );
   });
 
-  const maxExistingProblemNumber = $derived.by(() => {
-    if (problems === undefined || problems.length === 0) {
-      return 0;
-    }
-
-    return Math.max(...problems.map(({ number }) => number));
-  });
-
   let totalSteps = $state(0);
   let completedSteps = $state(0);
   let progress = $derived(
@@ -193,7 +185,7 @@
     const problemNumber = startNumberOffset + index;
 
     return {
-      number: problemNumber,
+      label: "Ω" + problemNumber,
       holdColorPrimary,
       zone1Enabled,
       zone2Enabled,
@@ -233,7 +225,7 @@
 
     try {
       const compClasses = getCompClasses(formData);
-      const firstProblemNumber = maxExistingProblemNumber + 1;
+      const firstProblemNumber = 1;
 
       for (const compClass of compClasses.values()) {
         await createCompClass.mutateAsync(compClass).then(incrementProgress);
