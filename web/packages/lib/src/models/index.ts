@@ -1,6 +1,6 @@
 export * from "./compClass";
 export * from "./contender";
-export * from "./contest";
+export * from "./competition";
 export * from "./event";
 export * from "./generated";
 export * from "./health";

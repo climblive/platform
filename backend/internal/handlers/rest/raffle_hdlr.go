@@ -9,8 +9,8 @@ import (
 
 type raffleUseCase interface {
 	GetRaffle(ctx context.Context, raffleID domain.RaffleID) (domain.Raffle, error)
-	GetRafflesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Raffle, error)
-	CreateRaffle(ctx context.Context, contestID domain.ContestID) (domain.Raffle, error)
+	GetRafflesByCompetition(ctx context.Context, competitionID domain.CompetitionID) ([]domain.Raffle, error)
+	CreateRaffle(ctx context.Context, competitionID domain.CompetitionID) (domain.Raffle, error)
 	DeleteRaffle(ctx context.Context, raffleID domain.RaffleID) error
 	DrawRaffleWinner(ctx context.Context, raffleID domain.RaffleID) (domain.RaffleWinner, error)
 	GetRaffleWinners(ctx context.Context, raffleID domain.RaffleID) ([]domain.RaffleWinner, error)
@@ -26,8 +26,8 @@ func InstallRaffleHandler(mux *Mux, raffleUseCase raffleUseCase) {
 	}
 
 	mux.HandleFunc("GET /raffles/{raffleID}", handler.GetRaffle)
-	mux.HandleFunc("GET /contests/{contestID}/raffles", handler.GetRaffles)
-	mux.HandleFunc("POST /contests/{contestID}/raffles", handler.CreateRaffle)
+	mux.HandleFunc("GET /competitions/{competitionID}/raffles", handler.GetRaffles)
+	mux.HandleFunc("POST /competitions/{competitionID}/raffles", handler.CreateRaffle)
 	mux.HandleFunc("DELETE /raffles/{raffleID}", handler.DeleteRaffle)
 	mux.HandleFunc("POST /raffles/{raffleID}/winners", handler.DrawRaffleWinner)
 	mux.HandleFunc("GET /raffles/{raffleID}/winners", handler.GetRaffleWinners)
@@ -50,13 +50,13 @@ func (hdlr *raffleHandler) GetRaffle(w http.ResponseWriter, r *http.Request) {
 }
 
 func (hdlr *raffleHandler) GetRaffles(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	raffles, err := hdlr.raffleUseCase.GetRafflesByContest(r.Context(), contestID)
+	raffles, err := hdlr.raffleUseCase.GetRafflesByCompetition(r.Context(), competitionID)
 	if err != nil {
 		handleError(w, err)
 		return
@@ -66,13 +66,13 @@ func (hdlr *raffleHandler) GetRaffles(w http.ResponseWriter, r *http.Request) {
 }
 
 func (hdlr *raffleHandler) CreateRaffle(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	createdRaffle, err := hdlr.raffleUseCase.CreateRaffle(r.Context(), contestID)
+	createdRaffle, err := hdlr.raffleUseCase.CreateRaffle(r.Context(), competitionID)
 	if err != nil {
 		handleError(w, err)
 		return

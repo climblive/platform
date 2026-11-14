@@ -22,7 +22,7 @@
 
   export const formSchema = z
     .object({
-      contestLengthHours: z.coerce.number(),
+      competitionLengthHours: z.coerce.number(),
       problemCount: z.coerce.number(),
       ticketCount: z.coerce.number(),
       problemPoints: z
@@ -42,7 +42,7 @@
       classNames: value.className,
     }));
 
-  type PopulateContestFormData = z.infer<typeof formSchema>;
+  type PopulateCompetitionFormData = z.infer<typeof formSchema>;
 </script>
 
 <script lang="ts">
@@ -64,7 +64,7 @@
     createContendersMutation,
     createProblemMutation,
     getCompClassesQuery,
-    getContendersByContestQuery,
+    getContendersByCompetitionQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
@@ -86,14 +86,16 @@
   ] as const;
 
   type Props = {
-    contestId: number;
+    competitionId: number;
   };
 
-  const { contestId }: Props = $props();
+  const { competitionId }: Props = $props();
 
-  const compClassesQuery = $derived(getCompClassesQuery(contestId));
-  const contendersQuery = $derived(getContendersByContestQuery(contestId));
-  const problemsQuery = $derived(getProblemsQuery(contestId));
+  const compClassesQuery = $derived(getCompClassesQuery(competitionId));
+  const contendersQuery = $derived(
+    getContendersByCompetitionQuery(competitionId),
+  );
+  const problemsQuery = $derived(getProblemsQuery(competitionId));
 
   const compClasses = $derived(compClassesQuery.data);
   const contenders = $derived(contendersQuery.data);
@@ -102,7 +104,7 @@
   let dialog = $state<WaDialog>();
   let populatorState = $state<"idle" | "pending" | "error" | "settled">("idle");
 
-  const contestEmpty = $derived.by(() => {
+  const competitionEmpty = $derived.by(() => {
     if (
       compClasses === undefined ||
       problems === undefined ||
@@ -132,9 +134,9 @@
     totalSteps === 0 ? 100 : (completedSteps / totalSteps) * 100,
   );
 
-  const createCompClass = $derived(createCompClassMutation(contestId));
-  const createProblem = $derived(createProblemMutation(contestId));
-  const createContenders = $derived(createContendersMutation(contestId));
+  const createCompClass = $derived(createCompClassMutation(competitionId));
+  const createProblem = $derived(createProblemMutation(competitionId));
+  const createContenders = $derived(createContendersMutation(competitionId));
 
   const openDialog = () => {
     if (dialog) {
@@ -178,7 +180,7 @@
   const getProblemTemplate = (
     index: number,
     startNumberOffset: number,
-    formData: PopulateContestFormData,
+    formData: PopulateCompetitionFormData,
   ): ProblemTemplate => {
     const pointsTop = getProblemPointsTop(
       index,
@@ -210,10 +212,10 @@
     };
   };
 
-  const getCompClasses = (formData: PopulateContestFormData) => {
+  const getCompClasses = (formData: PopulateCompetitionFormData) => {
     const timeBegin = new Date();
     const timeEnd = add(timeBegin.getTime(), {
-      hours: formData.contestLengthHours,
+      hours: formData.competitionLengthHours,
     });
 
     return formData.classNames.map<CompClassTemplate>((name) => ({
@@ -223,7 +225,7 @@
     }));
   };
 
-  const handlePopulate = async (formData: PopulateContestFormData) => {
+  const handlePopulate = async (formData: PopulateCompetitionFormData) => {
     populatorState = "pending";
 
     totalSteps =
@@ -259,7 +261,11 @@
   };
 </script>
 
-<wa-button appearance="outlined" onclick={openDialog} disabled={!contestEmpty}>
+<wa-button
+  appearance="outlined"
+  onclick={openDialog}
+  disabled={!competitionEmpty}
+>
   Populate with fake data
 </wa-button>
 
@@ -297,7 +303,7 @@
 
         <wa-number-input
           size="s"
-          {@attach name("contestLengthHours")}
+          {@attach name("competitionLengthHours")}
           label="Competition length"
           min="1"
           max="72"

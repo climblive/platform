@@ -13,26 +13,28 @@
   import { value } from "@climblive/lib/forms";
   import {
     getSelfQuery,
-    transferContestMutation,
+    transferCompetitionMutation,
   } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { Snippet } from "svelte";
   import { navigate } from "svelte-routing";
 
   type Props = {
-    contestId: number;
-    contestName: string;
+    competitionId: number;
+    competitionName: string;
     open?: boolean;
     onClose?: () => void;
-    children?: Snippet<[{ transferContest: () => void; disabled: boolean }]>;
+    children?: Snippet<
+      [{ transferCompetition: () => void; disabled: boolean }]
+    >;
     organizerId: number;
   };
 
   let selectedOrganizerId: number | undefined = $state();
 
   const {
-    contestId,
-    contestName,
+    competitionId,
+    competitionName,
     organizerId,
     children,
     onClose,
@@ -42,7 +44,9 @@
   let open = $derived(rest.open);
 
   const selfQuery = $derived(getSelfQuery());
-  const transferContest = $derived(transferContestMutation(contestId));
+  const transferCompetition = $derived(
+    transferCompetitionMutation(competitionId),
+  );
 
   const organizers = $derived(selfQuery.data?.organizers ?? []);
   const otherOrganizers = $derived(
@@ -63,11 +67,11 @@
     }
 
     try {
-      const transferredContest =
-        await transferContest.mutateAsync(selectedOrganizerId);
+      const transferredCompetition =
+        await transferCompetition.mutateAsync(selectedOrganizerId);
       handleCancel();
       navigate(
-        `/admin/organizers/${transferredContest.ownership.organizerId}/contests`,
+        `/admin/organizers/${transferredCompetition.ownership.organizerId}/competitions`,
       );
     } catch {
       toastUnexpectedError("Failed to transfer competition.");
@@ -82,7 +86,7 @@
 
 {#if children}
   {@render children({
-    transferContest: handleTransfer,
+    transferCompetition: handleTransfer,
     disabled: otherOrganizers.length === 0,
   })}
 {/if}
@@ -120,7 +124,7 @@
       <wa-callout variant="warning">
         <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
         This will transfer all competition data of
-        <strong>{contestName}</strong>
+        <strong>{competitionName}</strong>
         from the current organizer
         <strong>
           {currentOrganizer.name}
@@ -140,7 +144,7 @@
     slot="footer"
     variant="warning"
     onclick={confirmTransfer}
-    loading={transferContest.isPending}
+    loading={transferCompetition.isPending}
     disabled={selectedOrganizerId === undefined}
   >
     Transfer

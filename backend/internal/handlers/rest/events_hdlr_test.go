@@ -24,7 +24,7 @@ import (
 )
 
 func TestEventsHandler(t *testing.T) {
-	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
 	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 
 	makeMocks := func(bufferCapacity int, filters []domain.EventFilter) (*eventBrokerMock, *events.Subscription) {
@@ -40,10 +40,10 @@ func TestEventsHandler(t *testing.T) {
 		return mockedEventBroker, subscription
 	}
 
-	makeContenderFilters := func(contestID domain.ContestID, contenderID domain.ContenderID) []domain.EventFilter {
+	makeContenderFilters := func(competitionID domain.CompetitionID, contenderID domain.ContenderID) []domain.EventFilter {
 		return []domain.EventFilter{
 			domain.NewEventFilter(
-				contestID,
+				competitionID,
 				contenderID,
 				"CONTENDER_PUBLIC_INFO_UPDATED",
 				"CONTENDER_SCORE_UPDATED",
@@ -53,7 +53,7 @@ func TestEventsHandler(t *testing.T) {
 				"POINT_VALUE_UPDATED",
 			),
 			domain.NewEventFilter(
-				contestID,
+				competitionID,
 				0,
 				"RULES_UPDATED",
 				"PROBLEM_ADDED",
@@ -103,7 +103,7 @@ func TestEventsHandler(t *testing.T) {
 
 		filters := make([]domain.EventFilter, filterCount)
 		for i := range filters {
-			filters[i] = domain.NewEventFilter(fakedContestID, 0, eventTypes...)
+			filters[i] = domain.NewEventFilter(fakedCompetitionID, 0, eventTypes...)
 		}
 
 		return filters
@@ -134,7 +134,7 @@ func TestEventsHandler(t *testing.T) {
 		}
 	})
 
-	t.Run("MixedContestIDs", func(t *testing.T) {
+	t.Run("MixedCompetitionIDs", func(t *testing.T) {
 		filters := []domain.EventFilter{
 			domain.NewEventFilter(1, 0),
 			domain.NewEventFilter(2, 0),
@@ -175,7 +175,7 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("ConnectAndDisconnect", func(t *testing.T) {
-		filters := makeContenderFilters(fakedContestID, fakedContenderID)
+		filters := makeContenderFilters(fakedCompetitionID, fakedContenderID)
 		mockedEventBroker, _ := makeMocks(0, filters)
 
 		mux := rest.NewMux()
@@ -205,7 +205,7 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("ReceivePing", func(t *testing.T) {
-		filters := makeContenderFilters(fakedContestID, fakedContenderID)
+		filters := makeContenderFilters(fakedCompetitionID, fakedContenderID)
 		mockedEventBroker, _ := makeMocks(0, filters)
 
 		mux := rest.NewMux()
@@ -239,7 +239,7 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("ReceiveEvent", func(t *testing.T) {
-		filters := makeContenderFilters(fakedContestID, fakedContenderID)
+		filters := makeContenderFilters(fakedCompetitionID, fakedContenderID)
 		mockedEventBroker, subscription := makeMocks(0, filters)
 
 		err := subscription.Post(domain.EventEnvelope{
@@ -290,7 +290,7 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("SubscriptionUnexpectedlyClosed", func(t *testing.T) {
-		filters := makeContenderFilters(fakedContestID, fakedContenderID)
+		filters := makeContenderFilters(fakedCompetitionID, fakedContenderID)
 		mockedEventBroker, subscription := makeMocks(1, filters)
 
 		err := subscription.Post(domain.EventEnvelope{
@@ -323,8 +323,8 @@ type eventBrokerMock struct {
 	mock.Mock
 }
 
-func (m *eventBrokerMock) Dispatch(contestID domain.ContestID, event any) {
-	m.Called(contestID, event)
+func (m *eventBrokerMock) Dispatch(competitionID domain.CompetitionID, event any) {
+	m.Called(competitionID, event)
 }
 
 func (m *eventBrokerMock) Subscribe(filters []domain.EventFilter, bufferCapacity int) (domain.SubscriptionID, domain.EventReader) {

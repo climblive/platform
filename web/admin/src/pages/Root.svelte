@@ -26,7 +26,7 @@
 
     if ($selectedOrganizer !== undefined) {
       setTimeout(() => {
-        navigate(`/admin/organizers/${$selectedOrganizer}/contests`, {
+        navigate(`/admin/organizers/${$selectedOrganizer}/competitions`, {
           replace: true,
         });
       });

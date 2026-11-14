@@ -11,16 +11,16 @@
   } from "@climblive/lib/models";
   import {
     getProblemsQuery,
-    getTicksByContestQuery,
+    getTicksByCompetitionQuery,
     removeTickFromQueryCache,
-    updateTickInContestQueryCache,
+    updateTickInCompetitionQueryCache,
   } from "@climblive/lib/queries";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { onMount } from "svelte";
   import Bar from "./Bar.svelte";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
   }
 
   export interface ProblemStats {
@@ -30,19 +30,19 @@
     flash: number;
   }
 
-  const { contestId }: Props = $props();
+  const { competitionId }: Props = $props();
 
   const queryClient = useQueryClient();
   const { subscribeEvents, unsubscribeEvents } = useEvents();
 
-  const problemsQuery = $derived(getProblemsQuery(contestId));
-  const ticksQuery = $derived(getTicksByContestQuery(contestId));
+  const problemsQuery = $derived(getProblemsQuery(competitionId));
+  const ticksQuery = $derived(getTicksByCompetitionQuery(competitionId));
 
   onMount(() => {
-    const currentContestId = contestId;
+    const currentCompetitionId = competitionId;
     const filters: EventFilter[] = [
       {
-        contestId: currentContestId,
+        competitionId: currentCompetitionId,
         eventTypes: {
           ASCENT_REGISTERED: {},
           ASCENT_DEREGISTERED: {},
@@ -67,7 +67,11 @@
             attemptsTop: event.attemptsTop,
           };
 
-          updateTickInContestQueryCache(queryClient, currentContestId, tick);
+          updateTickInCompetitionQueryCache(
+            queryClient,
+            currentCompetitionId,
+            tick,
+          );
           break;
         }
         case "ASCENT_DEREGISTERED": {

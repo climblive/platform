@@ -4,24 +4,26 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
-    getContendersByContestQuery,
-    getContestQuery,
+    getContendersByCompetitionQuery,
+    getCompetitionQuery,
   } from "@climblive/lib/queries";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
   }
 
-  let { contestId }: Props = $props();
+  let { competitionId }: Props = $props();
 
   const urlParams = new URLSearchParams(window.location.search);
   const fromId = Number(urlParams.get("from")) || undefined;
   const toId = Number(urlParams.get("to")) || undefined;
 
-  const contestQuery = $derived(getContestQuery(contestId));
-  const contendersQuery = $derived(getContendersByContestQuery(contestId));
+  const competitionQuery = $derived(getCompetitionQuery(competitionId));
+  const contendersQuery = $derived(
+    getContendersByCompetitionQuery(competitionId),
+  );
 
-  const contest = $derived(contestQuery.data);
+  const competition = $derived(competitionQuery.data);
   const allContenders = $derived(contendersQuery.data);
 
   const contenders = $derived.by(() => {
@@ -40,7 +42,7 @@
   let printingFinished = $state(false);
 
   $effect(() => {
-    if (contest && contenders && !printDialogOpened) {
+    if (competition && contenders && !printDialogOpened) {
       printDialogOpened = true;
 
       setTimeout(() => {
@@ -53,7 +55,7 @@
 <svelte:window onafterprint={() => (printingFinished = true)} />
 
 <main>
-  {#if !contest || !contenders}
+  {#if !competition || !contenders}
     <Loader />
   {:else}
     <section class="print-prompt">
@@ -89,7 +91,7 @@
     <div class="tickets">
       {#each contenders as contender (contender.id)}
         <Ticket
-          contestName={contest.name}
+          competitionName={competition.name}
           registrationCode={contender.registrationCode}
           ticketNumber={contender.id}
         />

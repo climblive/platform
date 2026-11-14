@@ -10,17 +10,17 @@ import (
 	"github.com/go-errors/errors"
 )
 
-const maxRafflesPerContest = 10
+const maxRafflesPerCompetition = 10
 
 type raffleUseCaseRepository interface {
 	domain.Transactor
 
 	StoreRaffle(ctx context.Context, tx domain.Transaction, raffle domain.Raffle) (domain.Raffle, error)
 	StoreRaffleWinner(ctx context.Context, tx domain.Transaction, winner domain.RaffleWinner) (domain.RaffleWinner, error)
-	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
+	GetCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (domain.Competition, error)
 	GetRaffle(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) (domain.Raffle, error)
-	GetRafflesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Raffle, error)
-	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error)
+	GetRafflesByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Raffle, error)
+	GetContendersByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Contender, error)
 	GetRaffleWinners(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) ([]domain.RaffleWinner, error)
 	DeleteRaffleWinner(ctx context.Context, tx domain.Transaction, raffleWinnerID domain.RaffleWinnerID) error
 	DeleteRaffle(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) error
@@ -45,17 +45,17 @@ func (uc *RaffleUseCase) GetRaffle(ctx context.Context, raffleID domain.RaffleID
 	return raffle, nil
 }
 
-func (uc *RaffleUseCase) GetRafflesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Raffle, error) {
-	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
+func (uc *RaffleUseCase) GetRafflesByCompetition(ctx context.Context, competitionID domain.CompetitionID) ([]domain.Raffle, error) {
+	competition, err := uc.Repo.GetCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
 
-	if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+	if _, err := uc.Authorizer.HasOwnership(ctx, competition.Ownership); err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
 
-	raffles, err := uc.Repo.GetRafflesByContest(ctx, nil, contestID)
+	raffles, err := uc.Repo.GetRafflesByCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -63,30 +63,30 @@ func (uc *RaffleUseCase) GetRafflesByContest(ctx context.Context, contestID doma
 	return raffles, nil
 }
 
-func (uc *RaffleUseCase) CreateRaffle(ctx context.Context, contestID domain.ContestID) (domain.Raffle, error) {
-	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
+func (uc *RaffleUseCase) CreateRaffle(ctx context.Context, competitionID domain.CompetitionID) (domain.Raffle, error) {
+	competition, err := uc.Repo.GetCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return domain.Raffle{}, errors.Wrap(err, 0)
 	}
 
-	_, err = uc.Authorizer.HasOwnership(ctx, contest.Ownership)
+	_, err = uc.Authorizer.HasOwnership(ctx, competition.Ownership)
 	if err != nil {
 		return domain.Raffle{}, errors.Wrap(err, 0)
 	}
 
-	raffles, err := uc.Repo.GetRafflesByContest(ctx, nil, contestID)
+	raffles, err := uc.Repo.GetRafflesByCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return domain.Raffle{}, errors.Wrap(err, 0)
 	}
 
-	if len(raffles) >= maxRafflesPerContest {
+	if len(raffles) >= maxRafflesPerCompetition {
 		return domain.Raffle{}, errors.New(domain.ErrLimitExceeded)
 	}
 
 	raffle := domain.Raffle{
-		ID:        0,
-		Ownership: contest.Ownership,
-		ContestID: contestID,
+		ID:            0,
+		Ownership:     competition.Ownership,
+		CompetitionID: competitionID,
 	}
 
 	createdRaffle, err := uc.Repo.StoreRaffle(ctx, nil, raffle)
@@ -107,7 +107,7 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 		return domain.RaffleWinner{}, errors.Wrap(err, 0)
 	}
 
-	contenders, err := uc.Repo.GetContendersByContest(ctx, nil, raffle.ContestID)
+	contenders, err := uc.Repo.GetContendersByCompetition(ctx, nil, raffle.CompetitionID)
 	if err != nil {
 		return domain.RaffleWinner{}, errors.Wrap(err, 0)
 	}
@@ -170,7 +170,7 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 		return domain.RaffleWinner{}, errors.Wrap(err, 0)
 	}
 
-	uc.EventBroker.Dispatch(raffle.ContestID, domain.RaffleWinnerDrawnEvent{
+	uc.EventBroker.Dispatch(raffle.CompetitionID, domain.RaffleWinnerDrawnEvent{
 		RaffleID:    createdWinner.RaffleID,
 		ContenderID: createdWinner.ContenderID,
 		Timestamp:   createdWinner.Timestamp,

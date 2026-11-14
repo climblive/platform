@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ContestInfo from "@/components/ContestInfo.svelte";
+  import CompetitionInfo from "@/components/CompetitionInfo.svelte";
   import Header from "@/components/Header.svelte";
   import ProblemView from "@/components/ProblemView.svelte";
   import Summary from "@/components/Summary.svelte";
@@ -14,7 +14,7 @@
   import "@awesome.me/webawesome/dist/components/tab-panel/tab-panel.js";
   import "@awesome.me/webawesome/dist/components/tab/tab.js";
   import {
-    ContestStateProvider,
+    CompetitionStateProvider,
     EmptyState,
     ResultList,
     ScoreboardProvider,
@@ -39,7 +39,7 @@
   import {
     getCompClassesQuery,
     getContenderQuery,
-    getContestQuery,
+    getCompetitionQuery,
     getPointValuesByContenderQuery,
     getProblemsQuery,
     getTicksByContenderQuery,
@@ -61,8 +61,12 @@
   const { subscribeEvents, unsubscribeEvents } = useEvents();
 
   const contenderQuery = $derived(getContenderQuery($session.contenderId));
-  const contestQuery = $derived(getContestQuery($session.contestId));
-  const compClassesQuery = $derived(getCompClassesQuery($session.contestId));
+  const competitionQuery = $derived(
+    getCompetitionQuery($session.competitionId),
+  );
+  const compClassesQuery = $derived(
+    getCompClassesQuery($session.competitionId),
+  );
   const ticksQuery = $derived(getTicksByContenderQuery($session.contenderId));
   const pointValuesQuery = $derived(
     getPointValuesByContenderQuery($session.contenderId),
@@ -77,7 +81,7 @@
   let finalist: boolean = $state(false);
 
   let contender = $derived(contenderQuery.data);
-  let contest = $derived(contestQuery.data);
+  let competition = $derived(competitionQuery.data);
   let compClasses = $derived(compClassesQuery.data);
   let ticks = $derived(ticksQuery.data);
   let selectedCompClass = $derived(
@@ -90,7 +94,7 @@
     selectedCompClass?.timeEnd ?? new Date(-8640000000000000),
   );
 
-  const problemsQuery = $derived(getProblemsQuery($session.contestId));
+  const problemsQuery = $derived(getProblemsQuery($session.competitionId));
 
   let problems = $derived(problemsQuery?.data);
   let pointValues = $derived(pointValuesQuery.data);
@@ -191,7 +195,7 @@
   );
 
   const countedTickIds = $derived.by<Set<TickID>>(() => {
-    const limit = contest?.qualifyingProblems;
+    const limit = competition?.qualifyingProblems;
 
     if (!limit || !ticks || !problems) {
       return new Set<TickID>();
@@ -251,7 +255,7 @@
 
     const filters: EventFilter[] = [
       {
-        contestId: $session.contestId,
+        competitionId: $session.competitionId,
         contenderId: $session.contenderId,
         eventTypes: {
           CONTENDER_PUBLIC_INFO_UPDATED: {},
@@ -263,7 +267,7 @@
         },
       },
       {
-        contestId: $session.contestId,
+        competitionId: $session.competitionId,
         eventTypes: {
           RULES_UPDATED: {},
           PROBLEM_ADDED: {},
@@ -376,17 +380,17 @@
           {
             const event = rulesUpdatedEventSchema.parse(JSON.parse(e.data));
 
-            if (event.contestId !== $session.contestId) {
+            if (event.competitionId !== $session.competitionId) {
               return;
             }
 
-            updateRulesInQueryCache(queryClient, event.contestId, event);
+            updateRulesInQueryCache(queryClient, event.competitionId, event);
           }
           break;
         case "PROBLEM_ADDED":
         case "PROBLEM_UPDATED":
         case "PROBLEM_DELETED":
-          refetchProblems(queryClient, $session.contestId);
+          refetchProblems(queryClient, $session.competitionId);
           break;
       }
     });
@@ -415,19 +419,19 @@
 
 <svelte:window onvisibilitychange={handleVisibilityChange} />
 
-{#if showSplash || !contender || !contest || !compClasses || !sortedProblems || !ticks || !selectedCompClass}
+{#if showSplash || !contender || !competition || !compClasses || !sortedProblems || !ticks || !selectedCompClass}
   <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
-  <ContestStateProvider
-    contestId={$session.contestId}
+  <CompetitionStateProvider
+    competitionId={$session.competitionId}
     compClassId={contender?.compClassId}
   >
-    {#snippet children({ contestState })}
+    {#snippet children({ competitionState })}
       <main>
         <div class="sticky">
           <Header
             registrationCode={$session.registrationCode}
-            contestName={contest.name}
+            competitionName={competition.name}
             compClassName={selectedCompClass?.name}
             contenderId={contender.id}
             contenderName={contender.name}
@@ -447,7 +451,7 @@
               {placement}
               {finalist}
               disqualified={contender.disqualified}
-              {contestState}
+              {competitionState}
               {startTime}
               {endTime}
             />
@@ -503,13 +507,15 @@
                   <ProblemView
                     {problem}
                     {tick}
-                    disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
-                    counted={contest.qualifyingProblems === 0 ||
+                    disabled={["NOT_STARTED", "ENDED"].includes(
+                      competitionState,
+                    )}
+                    counted={competition.qualifyingProblems === 0 ||
                       (!!tick && countedTickIds.has(tick.id))}
-                    enablePoints={contest.usePoints}
-                    enableAttempts={!contest.usePoints ||
-                      contest.maxAttempts > 0 ||
-                      contest.pointDeduction > 0}
+                    enablePoints={competition.usePoints}
+                    enableAttempts={!competition.usePoints ||
+                      competition.maxAttempts > 0 ||
+                      competition.pointDeduction > 0}
                   />
                 {/each}
               </div>
@@ -518,7 +524,7 @@
           <wa-tab-panel name="results">
             {#if resultsConnected}
               <ScoreboardProvider
-                contestId={$session.contestId}
+                competitionId={$session.competitionId}
                 hideDisqualified
               >
                 {#snippet children({ scoreboard, loading })}
@@ -534,12 +540,16 @@
             {/if}
           </wa-tab-panel>
           <wa-tab-panel name="info">
-            <ContestInfo {contest} problems={sortedProblems} {compClasses} />
+            <CompetitionInfo
+              {competition}
+              problems={sortedProblems}
+              {compClasses}
+            />
           </wa-tab-panel>
         </wa-tab-group>
       </main>
     {/snippet}
-  </ContestStateProvider>
+  </CompetitionStateProvider>
 {/if}
 
 <wa-dialog

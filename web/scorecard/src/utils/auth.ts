@@ -16,10 +16,10 @@ export const authenticateContender = async (
     queryFn: async () => ApiClient.getInstance().findContender(code),
   });
 
-  const contest = await queryClient.fetchQuery({
-    queryKey: ["contest", { id: contender.contestId }],
+  const competition = await queryClient.fetchQuery({
+    queryKey: ["competition", { id: contender.competitionId }],
     queryFn: async () =>
-      ApiClient.getInstance().getContest(contender.contestId),
+      ApiClient.getInstance().getCompetition(contender.competitionId),
   });
 
   const provider = new ContenderCredentialsProvider(code);
@@ -27,16 +27,16 @@ export const authenticateContender = async (
 
   session.update((current) => {
     const now = new Date();
-    const contestEndTime = contest.timeEnd || now;
+    const competitionEndTime = competition.timeEnd || now;
     const baseTime = new Date(
-      Math.max(contestEndTime.getTime(), now.getTime()),
+      Math.max(competitionEndTime.getTime(), now.getTime()),
     );
     const expiryTime = add(baseTime, { hours: 12 });
 
     const updatedSession: ScorecardSession = {
       ...current,
       contenderId: contender.id,
-      contestId: contender.contestId,
+      competitionId: contender.competitionId,
       registrationCode: code,
       expiryTime,
     };
@@ -67,7 +67,22 @@ export const readStoredSessions = (): ScorecardSession[] => {
   if (data) {
     try {
       const obj = JSON.parse(data);
-      const storedSessions = z.array(scorecardSessionSchema).parse(obj);
+      const storedSessions = z
+        .array(
+          z.preprocess((value) => {
+            if (
+              typeof value === "object" &&
+              value !== null &&
+              !("competitionId" in value) &&
+              "contestId" in value
+            ) {
+              return { ...value, competitionId: value.contestId };
+            }
+
+            return value;
+          }, scorecardSessionSchema),
+        )
+        .parse(obj);
 
       const now = new Date();
       for (const storedSession of storedSessions) {

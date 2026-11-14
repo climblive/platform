@@ -9,32 +9,32 @@ import (
 )
 
 type standardEngineStoreHydratorRepository interface {
-	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
-	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error)
-	GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Problem, error)
-	GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error)
+	GetCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (domain.Competition, error)
+	GetContendersByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Contender, error)
+	GetProblemsByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Problem, error)
+	GetTicksByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Tick, error)
 }
 
 type StandardEngineStoreHydrator struct {
 	Repo standardEngineStoreHydratorRepository
 }
 
-func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID domain.ContestID, store EngineStore) error {
-	contest, err := h.Repo.GetContest(ctx, nil, contestID)
+func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, competitionID domain.CompetitionID, store EngineStore) error {
+	competition, err := h.Repo.GetCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
 
 	store.SaveRules(Rules{
-		QualifyingProblems: contest.QualifyingProblems,
-		Finalists:          contest.Finalists,
-		UsePoints:          contest.UsePoints,
-		PooledPoints:       contest.PooledPoints,
-		MaxAttempts:        contest.MaxAttempts,
-		PointDeduction:     contest.PointDeduction,
+		QualifyingProblems: competition.QualifyingProblems,
+		Finalists:          competition.Finalists,
+		UsePoints:          competition.UsePoints,
+		PooledPoints:       competition.PooledPoints,
+		MaxAttempts:        competition.MaxAttempts,
+		PointDeduction:     competition.PointDeduction,
 	})
 
-	problems, err := h.Repo.GetProblemsByContest(ctx, nil, contestID)
+	problems, err := h.Repo.GetProblemsByCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
@@ -53,7 +53,7 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 		})
 	}
 
-	contenders, err := h.Repo.GetContendersByContest(ctx, nil, contestID)
+	contenders, err := h.Repo.GetContendersByCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
@@ -80,7 +80,7 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 		})
 	}
 
-	ticks, err := h.Repo.GetTicksByContest(ctx, nil, contestID)
+	ticks, err := h.Repo.GetTicksByCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}

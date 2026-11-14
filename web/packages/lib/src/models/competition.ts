@@ -1,8 +1,8 @@
 import { z } from "@climblive/lib/utils";
 import { ownershipDataSchema } from "./common";
-import type { Contest } from "./generated";
+import type { Competition } from "./generated";
 
-export const contestSchema: z.ZodType<Contest> = z.object({
+export const competitionSchema: z.ZodType<Competition> = z.object({
   id: z.number(),
   ownership: ownershipDataSchema,
   archivedAt: z.coerce.date().optional(),

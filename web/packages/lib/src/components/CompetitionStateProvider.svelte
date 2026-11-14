@@ -1,36 +1,40 @@
 <script lang="ts">
   import { add, isBefore } from "date-fns";
   import { onMount, type Snippet } from "svelte";
-  import { getCompClassQuery, getContestQuery } from "../queries";
-  import type { ContestState } from "../types";
+  import { getCompClassQuery, getCompetitionQuery } from "../queries";
+  import type { CompetitionState } from "../types";
   import { SyncedTime } from "../utils";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
     compClassId?: number;
-    children?: Snippet<[{ contestState: ContestState; progress: number }]>;
+    children?: Snippet<
+      [{ competitionState: CompetitionState; progress: number }]
+    >;
   }
 
-  const { contestId, compClassId, children }: Props = $props();
+  const { competitionId, compClassId, children }: Props = $props();
 
-  const contestQuery = $derived(getContestQuery(contestId));
+  const competitionQuery = $derived(getCompetitionQuery(competitionId));
   const compClassQuery = $derived(
     compClassId ? getCompClassQuery(compClassId) : undefined,
   );
 
-  const contest = $derived(contestQuery.data);
+  const competition = $derived(competitionQuery.data);
   const compClass = $derived(compClassQuery?.data);
 
   const startTime = $derived(
-    compClass?.timeBegin ?? contest?.timeBegin ?? new Date(8640000000000000),
+    compClass?.timeBegin ??
+      competition?.timeBegin ??
+      new Date(8640000000000000),
   );
   const endTime = $derived(
-    compClass?.timeEnd ?? contest?.timeEnd ?? new Date(-8640000000000000),
+    compClass?.timeEnd ?? competition?.timeEnd ?? new Date(-8640000000000000),
   );
   const gracePeriodEndTime = $derived(
-    contest
+    competition
       ? add(endTime, {
-          minutes: (contest.gracePeriod ?? 0) / (1_000_000_000 * 60),
+          minutes: (competition.gracePeriod ?? 0) / (1_000_000_000 * 60),
         })
       : undefined,
   );
@@ -43,7 +47,7 @@
     return () => time.stop();
   });
 
-  const computeState = (): ContestState => {
+  const computeState = (): CompetitionState => {
     const now = new Date(time.current);
     now.setMilliseconds(0);
 
@@ -59,7 +63,7 @@
     }
   };
 
-  const contestState: ContestState = $derived(computeState());
+  const competitionState: CompetitionState = $derived(computeState());
 
   const progress = $derived.by(() => {
     const total = endTime.getTime() - startTime.getTime();
@@ -72,4 +76,4 @@
   });
 </script>
 
-{@render children?.({ contestState, progress })}
+{@render children?.({ competitionState, progress })}

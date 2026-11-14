@@ -7,14 +7,14 @@
   import Problem from "./Problem.svelte";
 
   type Props = {
-    contestId: number;
+    competitionId: number;
     contenderId: number;
     enableAttempts: boolean;
   };
 
-  const { contestId, contenderId, enableAttempts }: Props = $props();
+  const { competitionId, contenderId, enableAttempts }: Props = $props();
 
-  const problemsQuery = $derived(getProblemsQuery(contestId));
+  const problemsQuery = $derived(getProblemsQuery(competitionId));
   const ticksQuery = $derived(getTicksByContenderQuery(contenderId));
 
   let problems = $derived(

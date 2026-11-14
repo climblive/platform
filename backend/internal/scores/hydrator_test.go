@@ -17,7 +17,7 @@ func TestHydrate(t *testing.T) {
 	mockedStore := new(engineStoreMock)
 
 	fakedTickID := testutils.RandomResourceID[domain.TickID]()
-	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
@@ -25,9 +25,9 @@ func TestHydrate(t *testing.T) {
 	now := time.Now()
 
 	mockedRepo.
-		On("GetContest", mock.Anything, nil, fakedContestID).
-		Return(domain.Contest{
-			ID:                 fakedContestID,
+		On("GetCompetition", mock.Anything, nil, fakedCompetitionID).
+		Return(domain.Competition{
+			ID:                 fakedCompetitionID,
 			QualifyingProblems: 10,
 			Finalists:          7,
 			UsePoints:          true,
@@ -37,7 +37,7 @@ func TestHydrate(t *testing.T) {
 		}, nil)
 
 	mockedRepo.
-		On("GetProblemsByContest", mock.Anything, nil, fakedContestID).
+		On("GetProblemsByCompetition", mock.Anything, nil, fakedCompetitionID).
 		Return([]domain.Problem{
 			{
 				ID:           fakedProblemID,
@@ -53,7 +53,7 @@ func TestHydrate(t *testing.T) {
 		}, nil)
 
 	mockedRepo.
-		On("GetContendersByContest", mock.Anything, nil, fakedContestID).
+		On("GetContendersByCompetition", mock.Anything, nil, fakedCompetitionID).
 		Return([]domain.Contender{
 			{
 				ID:                  fakedContenderID,
@@ -69,7 +69,7 @@ func TestHydrate(t *testing.T) {
 		}, nil)
 
 	mockedRepo.
-		On("GetTicksByContest", mock.Anything, nil, fakedContestID).
+		On("GetTicksByCompetition", mock.Anything, nil, fakedCompetitionID).
 		Return([]domain.Tick{
 			{
 				ID: fakedTickID,
@@ -129,7 +129,7 @@ func TestHydrate(t *testing.T) {
 	}).Return()
 
 	hydrator := &scores.StandardEngineStoreHydrator{Repo: mockedRepo}
-	err := hydrator.Hydrate(context.Background(), fakedContestID, mockedStore)
+	err := hydrator.Hydrate(context.Background(), fakedCompetitionID, mockedStore)
 
 	require.NoError(t, err)
 

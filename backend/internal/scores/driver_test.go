@@ -19,7 +19,7 @@ import (
 var noEffects iter.Seq[scores.Effect]
 
 func TestEngineDriver(t *testing.T) {
-	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
 	fakedInstanceID := uuid.New()
 
 	type fixture struct {
@@ -32,7 +32,7 @@ func TestEngineDriver(t *testing.T) {
 		mockedEventBroker := new(eventBrokerMock)
 
 		filter := domain.NewEventFilter(
-			fakedContestID,
+			fakedCompetitionID,
 			0,
 			"CONTENDER_ENTERED",
 			"CONTENDER_SWITCHED_CLASS",
@@ -56,15 +56,15 @@ func TestEngineDriver(t *testing.T) {
 
 		mockedEventBroker.On("Unsubscribe", subscriptionID).Return()
 
-		mockedEventBroker.On("Dispatch", fakedContestID, domain.ScoreEngineStartedEvent{
+		mockedEventBroker.On("Dispatch", fakedCompetitionID, domain.ScoreEngineStartedEvent{
 			InstanceID: fakedInstanceID,
 		}).Return()
 
-		mockedEventBroker.On("Dispatch", fakedContestID, domain.ScoreEngineStoppedEvent{
+		mockedEventBroker.On("Dispatch", fakedCompetitionID, domain.ScoreEngineStoppedEvent{
 			InstanceID: fakedInstanceID,
 		}).Return()
 
-		driver := scores.NewScoreEngineDriver(fakedContestID, fakedInstanceID, mockedEventBroker)
+		driver := scores.NewScoreEngineDriver(fakedCompetitionID, fakedInstanceID, mockedEventBroker)
 
 		awaitExpectations := func(t *testing.T) {
 			mockedEventBroker.AssertExpectations(t)
@@ -213,7 +213,7 @@ func TestEngineDriver(t *testing.T) {
 		events := []any{}
 
 		events = append(events, domain.RulesUpdatedEvent{
-			ContestID:          1,
+			CompetitionID:      1,
 			QualifyingProblems: 10,
 			Finalists:          7,
 		})
@@ -277,7 +277,7 @@ func TestEngineDriver(t *testing.T) {
 		mockedEngine.On("GetDirtyPointValues").Return([]domain.PointValue{})
 
 		mockedEngine.On("HandleRulesUpdated", domain.RulesUpdatedEvent{
-			ContestID:          1,
+			CompetitionID:      1,
 			QualifyingProblems: 10,
 			Finalists:          7,
 		}).Return(noEffects)
@@ -375,7 +375,7 @@ func TestEngineDriver(t *testing.T) {
 			mockedEngine.On("GetDirtyPointValues").Return([]domain.PointValue{})
 
 			f.broker.
-				On("Dispatch", fakedContestID,
+				On("Dispatch", fakedCompetitionID,
 					domain.ContenderScoreUpdatedEvent{
 						ContenderID: 1,
 						Timestamp:   now,
@@ -385,7 +385,7 @@ func TestEngineDriver(t *testing.T) {
 						Finalist:    true,
 					},
 				).Return().
-				On("Dispatch", fakedContestID,
+				On("Dispatch", fakedCompetitionID,
 					domain.ContenderScoreUpdatedEvent{
 						ContenderID: 2,
 						Timestamp:   now,
@@ -395,7 +395,7 @@ func TestEngineDriver(t *testing.T) {
 						Finalist:    true,
 					},
 				).Return().
-				On("Dispatch", fakedContestID,
+				On("Dispatch", fakedCompetitionID,
 					domain.ContenderScoreUpdatedEvent{
 						ContenderID: 3,
 						Timestamp:   now,
@@ -405,7 +405,7 @@ func TestEngineDriver(t *testing.T) {
 						Finalist:    false,
 					},
 				).Return().
-				On("Dispatch", fakedContestID,
+				On("Dispatch", fakedCompetitionID,
 					[]domain.ContenderScoreUpdatedEvent{
 						{
 							ContenderID: 1,

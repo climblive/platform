@@ -2,24 +2,27 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { restoreContestMutation } from "@climblive/lib/queries";
+  import { restoreCompetitionMutation } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { Snippet } from "svelte";
   import { navigate } from "svelte-routing";
 
   type Props = {
-    contestId: number;
-    children?: Snippet<[{ restoreContest: () => void }]>;
+    competitionId: number;
+    children?: Snippet<[{ restoreCompetition: () => void }]>;
   };
 
-  let { contestId, children }: Props = $props();
+  let { competitionId, children }: Props = $props();
 
-  const restoreContest = $derived(restoreContestMutation(contestId));
+  const restoreCompetition = $derived(
+    restoreCompetitionMutation(competitionId),
+  );
 
   const handleRestore = async () => {
     try {
-      const restoredContest = await restoreContest.mutateAsync(undefined);
-      navigate(`/admin/contests/${restoredContest.id}`);
+      const restoredCompetition =
+        await restoreCompetition.mutateAsync(undefined);
+      navigate(`/admin/competitions/${restoredCompetition.id}`);
     } catch {
       toastUnexpectedError("Failed to restore competition.");
     }
@@ -28,7 +31,7 @@
 
 {#if children}
   {@render children({
-    restoreContest: handleRestore,
+    restoreCompetition: handleRestore,
   })}
 {:else}
   <section>
@@ -42,7 +45,7 @@
 
     <wa-button
       onclick={handleRestore}
-      loading={restoreContest.isPending}
+      loading={restoreCompetition.isPending}
       appearance="filled-outlined"
       variant="success">Restore</wa-button
     >

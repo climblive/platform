@@ -11,7 +11,7 @@
   import { getContext } from "svelte";
   import { Link, navigate } from "svelte-routing";
   import type { Writable } from "svelte/store";
-  import ContestList from "./ContestList.svelte";
+  import CompetitionList from "./CompetitionList.svelte";
   import CreateOrganizer from "./CreateOrganizer.svelte";
 
   interface Props {
@@ -30,7 +30,7 @@
   const self = $derived(selfQuery.data);
 
   let showAllPreference = $state(
-    sessionStorage.getItem("showAllContests") !== "false",
+    sessionStorage.getItem("showAllCompetitions") !== "false",
   );
   let showAll = $derived(self?.admin === true && showAllPreference);
 
@@ -53,7 +53,7 @@
     if (select) {
       const organizerId = Number(select.value);
       $selectedOrganizerId = organizerId;
-      navigate(`/admin/organizers/${organizerId}/contests`);
+      navigate(`/admin/organizers/${organizerId}/competitions`);
     }
   };
 
@@ -63,7 +63,7 @@
     }
 
     showAllPreference = showAllToggle.checked;
-    sessionStorage.setItem("showAllContests", String(showAllPreference));
+    sessionStorage.setItem("showAllCompetitions", String(showAllPreference));
   };
 </script>
 
@@ -116,7 +116,7 @@
   </div>
 {/if}
 
-<ContestList organizerId={showAll ? undefined : Number(organizerId)} />
+<CompetitionList organizerId={showAll ? undefined : Number(organizerId)} />
 
 <style>
   .organizer-select {

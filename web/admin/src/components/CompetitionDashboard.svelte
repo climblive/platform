@@ -3,43 +3,49 @@
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/badge/badge.js";
-  import { ContestStateProvider } from "@climblive/lib/components";
+  import { CompetitionStateProvider } from "@climblive/lib/components";
   import {
     getCompClassesQuery,
-    getContestQuery,
+    getCompetitionQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
-  import type { ContestState } from "@climblive/lib/types";
+  import type { CompetitionState } from "@climblive/lib/types";
   import { getCountryName, getFlag } from "@climblive/lib/utils";
   import { format } from "date-fns";
   import { navigate } from "svelte-routing";
 
   type Props = {
-    contestId: number;
+    competitionId: number;
   };
 
-  const { contestId }: Props = $props();
+  const { competitionId }: Props = $props();
 
-  const contestQuery = $derived(getContestQuery(contestId));
-  const compClassesQuery = $derived(getCompClassesQuery(contestId));
-  const problemsQuery = $derived(getProblemsQuery(contestId));
+  const competitionQuery = $derived(getCompetitionQuery(competitionId));
+  const compClassesQuery = $derived(getCompClassesQuery(competitionId));
+  const problemsQuery = $derived(getProblemsQuery(competitionId));
 
-  const contest = $derived(contestQuery.data);
+  const competition = $derived(competitionQuery.data);
   const compClassCount = $derived(compClassesQuery.data?.length ?? 0);
   const problemCount = $derived(problemsQuery.data?.length ?? 0);
-  const contestSpansMultipleDays = $derived.by(() => {
-    if (contest?.timeBegin === undefined || contest?.timeEnd === undefined) {
+  const competitionSpansMultipleDays = $derived.by(() => {
+    if (
+      competition?.timeBegin === undefined ||
+      competition?.timeEnd === undefined
+    ) {
       return false;
     }
 
-    return contest.timeBegin.toDateString() !== contest.timeEnd.toDateString();
+    return (
+      competition.timeBegin.toDateString() !==
+      competition.timeEnd.toDateString()
+    );
   });
 
   const formatDateTime = (date: Date) => format(date, "PPp");
   const formatDate = (date: Date) => format(date, "PP");
   const formatTime = (date: Date) => format(date, "p");
 
-  const contestStateToString = (state: ContestState): string => {
+  const competitionStateToString = (state: CompetitionState): string => {
     switch (state) {
       case "NOT_STARTED":
         return "Upcoming";
@@ -53,7 +59,7 @@
 </script>
 
 {#snippet summary()}
-  {@const registeredContenders = contest?.registeredContenders ?? 0}
+  {@const registeredContenders = competition?.registeredContenders ?? 0}
 
   {@const contenderStr = (count: number) => `${count} registered`}
 
@@ -72,15 +78,15 @@
   </div>
 {/snippet}
 
-{#if contest}
+{#if competition}
   <div class="heading">
     <h2>
-      {contest.name}
+      {competition.name}
     </h2>
     <wa-button
       size="s"
       appearance="plain"
-      onclick={() => navigate(`/admin/contests/${contest.id}/edit`)}
+      onclick={() => navigate(`/admin/competitions/${competition.id}/edit`)}
     >
       <wa-icon name="pencil"></wa-icon>
     </wa-button>
@@ -88,52 +94,52 @@
 
   <wa-divider></wa-divider>
 
-  {#if contest.description}
-    <p class="description">{contest.description}</p>
+  {#if competition.description}
+    <p class="description">{competition.description}</p>
   {/if}
 
   <div class="meta">
     <span class="location">
       <wa-icon name="location-dot"></wa-icon>
 
-      {#if contest.location}
-        {contest.location},
+      {#if competition.location}
+        {competition.location},
       {/if}
 
-      {getCountryName(contest.country)}
-      <span class="flag">{getFlag(contest.country)}</span>
+      {getCountryName(competition.country)}
+      <span class="flag">{getFlag(competition.country)}</span>
     </span>
 
-    {#if contest.timeBegin && !contestSpansMultipleDays}
+    {#if competition.timeBegin && !competitionSpansMultipleDays}
       <span>
         <wa-icon name="calendar"></wa-icon>
 
-        {formatDate(new Date(contest.timeBegin))}
+        {formatDate(new Date(competition.timeBegin))}
       </span>
     {/if}
 
-    {#if contest.timeBegin && contest.timeEnd}
+    {#if competition.timeBegin && competition.timeEnd}
       <span>
         <wa-icon name="clock"></wa-icon>
 
-        {#if contestSpansMultipleDays}
-          {formatDateTime(new Date(contest.timeBegin))} – {formatDateTime(
-            new Date(contest.timeEnd),
+        {#if competitionSpansMultipleDays}
+          {formatDateTime(new Date(competition.timeBegin))} – {formatDateTime(
+            new Date(competition.timeEnd),
           )}
         {:else}
-          {formatTime(new Date(contest.timeBegin))} – {formatTime(
-            new Date(contest.timeEnd),
+          {formatTime(new Date(competition.timeBegin))} – {formatTime(
+            new Date(competition.timeEnd),
           )}
         {/if}
       </span>
     {/if}
 
-    {#if contest.timeBegin && contest.timeEnd}
-      <ContestStateProvider {contestId}>
-        {#snippet children({ contestState })}
-          <wa-badge pill>{contestStateToString(contestState)}</wa-badge>
+    {#if competition.timeBegin && competition.timeEnd}
+      <CompetitionStateProvider {competitionId}>
+        {#snippet children({ competitionState })}
+          <wa-badge pill>{competitionStateToString(competitionState)}</wa-badge>
         {/snippet}
-      </ContestStateProvider>
+      </CompetitionStateProvider>
     {/if}
   </div>
 

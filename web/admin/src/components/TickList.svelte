@@ -14,13 +14,13 @@
   import { format } from "date-fns";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
     contenderId: number;
   }
 
-  const { contestId, contenderId }: Props = $props();
+  const { competitionId, contenderId }: Props = $props();
 
-  const problemsQuery = $derived(getProblemsQuery(contestId));
+  const problemsQuery = $derived(getProblemsQuery(competitionId));
   const ticksQuery = $derived(getTicksByContenderQuery(contenderId));
 
   const problems = $derived(

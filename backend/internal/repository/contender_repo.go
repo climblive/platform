@@ -55,8 +55,8 @@ func (d *Database) GetContendersByCompClass(ctx context.Context, tx domain.Trans
 	return contenders, nil
 }
 
-func (d *Database) GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error) {
-	records, err := d.WithTx(tx).GetContendersByContest(ctx, int32(contestID))
+func (d *Database) GetContendersByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Contender, error) {
+	records, err := d.WithTx(tx).GetContendersByCompetition(ctx, int32(competitionID))
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -76,7 +76,7 @@ func (d *Database) StoreContender(ctx context.Context, tx domain.Transaction, co
 	params := database.UpsertContenderParams{
 		ID:                  int32(contender.ID),
 		OrganizerID:         int32(contender.Ownership.OrganizerID),
-		ContestID:           int32(contender.ContestID),
+		CompetitionID:       int32(contender.CompetitionID),
 		RegistrationCode:    contender.RegistrationCode,
 		Name:                makeNullString(contender.Name),
 		ClassID:             makeNullInt32(int32(contender.CompClassID)),
@@ -108,8 +108,8 @@ func (d *Database) DeleteContender(ctx context.Context, tx domain.Transaction, c
 	return nil
 }
 
-func (d *Database) GetNumberOfContenders(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (int, error) {
-	count, err := d.WithTx(tx).CountContenders(ctx, int32(contestID))
+func (d *Database) GetNumberOfContenders(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (int, error) {
+	count, err := d.WithTx(tx).CountContenders(ctx, int32(competitionID))
 	if err != nil {
 		return 0, errors.Wrap(err, 0)
 	}

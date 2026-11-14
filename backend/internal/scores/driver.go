@@ -37,9 +37,9 @@ type ScoreEngine interface {
 }
 
 type ScoreEngineDriver struct {
-	logger     *slog.Logger
-	contestID  domain.ContestID
-	instanceID domain.ScoreEngineInstanceID
+	logger        *slog.Logger
+	competitionID domain.CompetitionID
+	instanceID    domain.ScoreEngineInstanceID
 
 	eventBroker   domain.EventBroker
 	pendingEvents []domain.EventEnvelope
@@ -52,17 +52,17 @@ type ScoreEngineDriver struct {
 }
 
 func NewScoreEngineDriver(
-	contestID domain.ContestID,
+	competitionID domain.CompetitionID,
 	instanceID domain.ScoreEngineInstanceID,
 	eventBroker domain.EventBroker,
 ) *ScoreEngineDriver {
 	logger := slog.New(slog.Default().Handler()).
-		With("contest_id", contestID).
+		With("competition_id", competitionID).
 		With("instance_id", instanceID)
 
 	return &ScoreEngineDriver{
 		logger:        logger,
-		contestID:     contestID,
+		competitionID: competitionID,
 		instanceID:    instanceID,
 		eventBroker:   eventBroker,
 		pendingEvents: make([]domain.EventEnvelope, 0),
@@ -127,7 +127,7 @@ func (d *ScoreEngineDriver) run(
 	engineReceiver chan ScoreEngine,
 ) {
 	filter := domain.NewEventFilter(
-		d.contestID,
+		d.competitionID,
 		0,
 		"CONTENDER_ENTERED",
 		"CONTENDER_SWITCHED_CLASS",
@@ -149,11 +149,11 @@ func (d *ScoreEngineDriver) run(
 
 	close(ready)
 
-	d.eventBroker.Dispatch(d.contestID, domain.ScoreEngineStartedEvent{
+	d.eventBroker.Dispatch(d.competitionID, domain.ScoreEngineStartedEvent{
 		InstanceID: d.instanceID,
 	})
 
-	defer d.eventBroker.Dispatch(d.contestID, domain.ScoreEngineStoppedEvent{
+	defer d.eventBroker.Dispatch(d.competitionID, domain.ScoreEngineStoppedEvent{
 		InstanceID: d.instanceID,
 	})
 
@@ -279,20 +279,20 @@ func (d *ScoreEngineDriver) publishDirtyUpdates() int {
 	var batch []domain.ContenderScoreUpdatedEvent
 
 	for score := range slices.Values(d.engine.GetDirtyScores()) {
-		d.eventBroker.Dispatch(d.contestID, domain.ContenderScoreUpdatedEvent(score))
+		d.eventBroker.Dispatch(d.competitionID, domain.ContenderScoreUpdatedEvent(score))
 		publishCount++
 
 		batch = append(batch, domain.ContenderScoreUpdatedEvent(score))
 	}
 
 	for pointValue := range slices.Values(d.engine.GetDirtyPointValues()) {
-		d.eventBroker.Dispatch(d.contestID, domain.PointValueUpdatedEvent(pointValue))
+		d.eventBroker.Dispatch(d.competitionID, domain.PointValueUpdatedEvent(pointValue))
 
 		publishCount++
 	}
 
 	if len(batch) > 0 {
-		d.eventBroker.Dispatch(d.contestID, batch)
+		d.eventBroker.Dispatch(d.competitionID, batch)
 	}
 
 	return publishCount

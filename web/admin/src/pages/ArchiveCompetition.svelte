@@ -2,23 +2,23 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { archiveContestMutation } from "@climblive/lib/queries";
+  import { archiveCompetitionMutation } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { Snippet } from "svelte";
   import { navigate } from "svelte-routing";
 
   type Props = {
-    contestId: number;
-    contestName: string;
+    competitionId: number;
+    competitionName: string;
     open?: boolean;
     onClose?: () => void;
-    children?: Snippet<[{ archiveContest: () => void }]>;
+    children?: Snippet<[{ archiveCompetition: () => void }]>;
     organizerId: number;
   };
 
   let {
-    contestId,
-    contestName,
+    competitionId,
+    competitionName,
     organizerId,
     children,
     onClose,
@@ -27,7 +27,9 @@
 
   let open = $derived(rest.open);
 
-  const archiveContest = $derived(archiveContestMutation(contestId));
+  const archiveCompetition = $derived(
+    archiveCompetitionMutation(competitionId),
+  );
 
   const handleArchive = () => {
     open = true;
@@ -38,10 +40,10 @@
   };
 
   const confirmArchivation = async () => {
-    const destination = `/admin/organizers/${organizerId}/contests`;
+    const destination = `/admin/organizers/${organizerId}/competitions`;
 
     try {
-      await archiveContest.mutateAsync(undefined);
+      await archiveCompetition.mutateAsync(undefined);
       handleCancel();
       navigate(destination);
     } catch {
@@ -51,7 +53,7 @@
 </script>
 
 {#if children}
-  {@render children({ archiveContest: handleArchive })}
+  {@render children({ archiveCompetition: handleArchive })}
 {/if}
 
 <wa-dialog
@@ -62,8 +64,8 @@
     onClose?.();
   }}
 >
-  This will hide the competition <strong>{contestName}</strong> for you and stop
-  any running score engines.<br /><br />
+  This will hide the competition <strong>{competitionName}</strong> for you and
+  stop any running score engines.<br /><br />
   Archived competitions may be permanently deleted in the future.
   <wa-button slot="footer" appearance="plain" onclick={handleCancel}>
     Cancel</wa-button
@@ -72,7 +74,7 @@
     slot="footer"
     variant="danger"
     onclick={confirmArchivation}
-    loading={archiveContest.isPending}
+    loading={archiveCompetition.isPending}
   >
     Archive
     <wa-icon slot="start" name="box-archive"></wa-icon>

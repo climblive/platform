@@ -2,24 +2,27 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { duplicateContestMutation } from "@climblive/lib/queries";
+  import { duplicateCompetitionMutation } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { Snippet } from "svelte";
   import { navigate } from "svelte-routing";
 
   type Props = {
-    contestId: number;
-    contestName: string;
+    competitionId: number;
+    competitionName: string;
     open?: boolean;
     onClose?: () => void;
-    children?: Snippet<[{ duplicateContest: () => void }]>;
+    children?: Snippet<[{ duplicateCompetition: () => void }]>;
   };
 
-  let { contestId, contestName, children, onClose, ...rest }: Props = $props();
+  let { competitionId, competitionName, children, onClose, ...rest }: Props =
+    $props();
 
   let open = $derived(rest.open);
 
-  const duplicateContest = $derived(duplicateContestMutation(contestId));
+  const duplicateCompetition = $derived(
+    duplicateCompetitionMutation(competitionId),
+  );
 
   const handleDuplication = () => {
     open = true;
@@ -30,10 +33,10 @@
   };
 
   const confirmDuplication = () => {
-    duplicateContest.mutate(undefined, {
+    duplicateCompetition.mutate(undefined, {
       onSuccess: (duplicate) => {
         handleCancel();
-        navigate(`/admin/contests/${duplicate.id}`);
+        navigate(`/admin/competitions/${duplicate.id}`);
       },
       onError: () => {
         toastUnexpectedError("Failed to duplicate competition.");
@@ -43,7 +46,7 @@
 </script>
 
 {#if children}
-  {@render children({ duplicateContest: handleDuplication })}
+  {@render children({ duplicateCompetition: handleDuplication })}
 {/if}
 
 <wa-dialog
@@ -55,7 +58,7 @@
   }}
 >
   You are about to create a copy of the competition <strong
-    >{contestName}</strong
+    >{competitionName}</strong
   >.<br /><br />
 
   Everything except tickets, results and raffles will be copied.
@@ -66,7 +69,7 @@
     slot="footer"
     variant="warning"
     onclick={confirmDuplication}
-    loading={duplicateContest.isPending}
+    loading={duplicateCompetition.isPending}
   >
     Duplicate
     <wa-icon slot="start" name="copy"></wa-icon>

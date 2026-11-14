@@ -7,9 +7,9 @@ import (
 type Tenths int64
 
 type EventFilter struct {
-	ContestID   ContestID           `json:"contestId,omitzero"`
-	ContenderID ContenderID         `json:"contenderId,omitzero"`
-	EventTypes  map[string]struct{} `json:"eventTypes,omitzero"`
+	CompetitionID CompetitionID       `json:"competitionId,omitzero"`
+	ContenderID   ContenderID         `json:"contenderId,omitzero"`
+	EventTypes    map[string]struct{} `json:"eventTypes,omitzero"`
 }
 
 type ColorRGB string
@@ -20,13 +20,13 @@ type OwnershipData struct {
 }
 
 type CompClass struct {
-	ID          CompClassID   `json:"id"`
-	Ownership   OwnershipData `json:"-"`
-	ContestID   ContestID     `json:"contestId"`
-	Name        string        `json:"name"`
-	Description string        `json:"description,omitzero"`
-	TimeBegin   time.Time     `json:"timeBegin"`
-	TimeEnd     time.Time     `json:"timeEnd"`
+	ID            CompClassID   `json:"id"`
+	Ownership     OwnershipData `json:"-"`
+	CompetitionID CompetitionID `json:"competitionId"`
+	Name          string        `json:"name"`
+	Description   string        `json:"description,omitzero"`
+	TimeBegin     time.Time     `json:"timeBegin"`
+	TimeEnd       time.Time     `json:"timeEnd"`
 }
 
 type CompClassTemplate struct {
@@ -46,7 +46,7 @@ type CompClassPatch struct {
 type Contender struct {
 	ID                  ContenderID   `json:"id"`
 	Ownership           OwnershipData `json:"-"`
-	ContestID           ContestID     `json:"contestId"`
+	CompetitionID       CompetitionID `json:"competitionId"`
 	CompClassID         CompClassID   `json:"compClassId,omitzero"`
 	RegistrationCode    string        `json:"registrationCode"`
 	Name                string        `json:"name,omitzero"`
@@ -65,8 +65,8 @@ type ContenderPatch struct {
 	Disqualified        Patch[bool]        `json:"disqualified,omitzero" tstype:"boolean"`
 }
 
-type Contest struct {
-	ID                   ContestID     `json:"id"`
+type Competition struct {
+	ID                   CompetitionID `json:"id"`
 	Ownership            OwnershipData `json:"ownership"`
 	ArchivedAt           time.Time     `json:"archivedAt,omitzero"`
 	Location             string        `json:"location,omitzero"`
@@ -89,7 +89,7 @@ type Contest struct {
 	RegisteredContenders int           `json:"registeredContenders"`
 }
 
-type ContestTemplate struct {
+type CompetitionTemplate struct {
 	Location           string        `json:"location,omitzero"`
 	Country            string        `json:"country"`
 	SeriesID           SeriesID      `json:"seriesId,omitzero"`
@@ -106,7 +106,7 @@ type ContestTemplate struct {
 	NameRetentionTime  time.Duration `json:"nameRetentionTime"`
 }
 
-type ContestPatch struct {
+type CompetitionPatch struct {
 	Location           Patch[string]        `json:"location,omitzero" tstype:"string"`
 	Country            Patch[string]        `json:"country,omitzero" tstype:"string"`
 	SeriesID           Patch[SeriesID]      `json:"seriesId,omitzero" tstype:"number"`
@@ -122,7 +122,7 @@ type ContestPatch struct {
 	GracePeriod        Patch[time.Duration] `json:"gracePeriod,omitzero" tstype:"number"`
 }
 
-type ContestTransferRequest struct {
+type CompetitionTransferRequest struct {
 	NewOrganizerID OrganizerID `json:"newOrganizerId"`
 }
 
@@ -167,7 +167,7 @@ type PointValue struct {
 type Problem struct {
 	ID                 ProblemID     `json:"id"`
 	Ownership          OwnershipData `json:"-"`
-	ContestID          ContestID     `json:"contestId"`
+	CompetitionID      CompetitionID `json:"competitionId"`
 	Number             int           `json:"number"`
 	HoldColorPrimary   string        `json:"holdColorPrimary"`
 	HoldColorSecondary string        `json:"holdColorSecondary,omitzero"`
@@ -203,9 +203,9 @@ type ProblemPatch struct {
 }
 
 type Raffle struct {
-	ID        RaffleID      `json:"id"`
-	Ownership OwnershipData `json:"-"`
-	ContestID ContestID     `json:"contestId"`
+	ID            RaffleID      `json:"id"`
+	Ownership     OwnershipData `json:"-"`
+	CompetitionID CompetitionID `json:"competitionId"`
 }
 
 type RaffleWinner struct {
@@ -247,7 +247,7 @@ type Tick struct {
 	ID            TickID        `json:"id"`
 	Ownership     OwnershipData `json:"-"`
 	Timestamp     time.Time     `json:"timestamp"`
-	ContestID     ContestID     `json:"-"`
+	CompetitionID CompetitionID `json:"-"`
 	Revision      int           `json:"revision"`
 	ProblemID     ProblemID     `json:"problemId"`
 	Zone1         bool          `json:"zone1"`
@@ -272,8 +272,8 @@ type ServiceStatus struct {
 }
 
 type ScoreEngineDescriptor struct {
-	InstanceID ScoreEngineInstanceID `json:"instanceId"`
-	ContestID  ContestID             `json:"contestId"`
+	InstanceID    ScoreEngineInstanceID `json:"instanceId"`
+	CompetitionID CompetitionID         `json:"competitionId"`
 }
 
 type ContenderEnteredEvent struct {
@@ -341,13 +341,13 @@ type ProblemDeletedEvent struct {
 }
 
 type RulesUpdatedEvent struct {
-	ContestID          ContestID `json:"contestId"`
-	QualifyingProblems int       `json:"qualifyingProblems"`
-	Finalists          int       `json:"finalists"`
-	UsePoints          bool      `json:"usePoints"`
-	PooledPoints       bool      `json:"pooledPoints"`
-	MaxAttempts        int       `json:"maxAttempts"`
-	PointDeduction     Tenths    `json:"pointDeduction"`
+	CompetitionID      CompetitionID `json:"competitionId"`
+	QualifyingProblems int           `json:"qualifyingProblems"`
+	Finalists          int           `json:"finalists"`
+	UsePoints          bool          `json:"usePoints"`
+	PooledPoints       bool          `json:"pooledPoints"`
+	MaxAttempts        int           `json:"maxAttempts"`
+	PointDeduction     Tenths        `json:"pointDeduction"`
 }
 
 type ContenderPublicInfoUpdatedEvent struct {

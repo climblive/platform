@@ -17,7 +17,7 @@ func contenderToDomain(record database.GetContenderRow) domain.Contender {
 			ContenderID: nillableIntToResourceID[domain.ContenderID](&record.Contender.ID),
 		},
 		Score:               nil,
-		ContestID:           domain.ContestID(record.Contender.ContestID),
+		CompetitionID:       domain.CompetitionID(record.Contender.CompetitionID),
 		CompClassID:         domain.CompClassID(record.Contender.ClassID.Int32),
 		RegistrationCode:    record.Contender.RegistrationCode,
 		Name:                record.Contender.Name.String,
@@ -51,17 +51,17 @@ func compClassToDomain(record database.CompClass) domain.CompClass {
 			OrganizerID: domain.OrganizerID(record.OrganizerID),
 			ContenderID: nil,
 		},
-		ContestID:   domain.ContestID(record.ContestID),
-		Name:        record.Name,
-		Description: record.Description.String,
-		TimeBegin:   record.TimeBegin,
-		TimeEnd:     record.TimeEnd,
+		CompetitionID: domain.CompetitionID(record.CompetitionID),
+		Name:          record.Name,
+		Description:   record.Description.String,
+		TimeBegin:     record.TimeBegin,
+		TimeEnd:       record.TimeEnd,
 	}
 }
 
-func contestToDomain(record database.Contest) domain.Contest {
-	contest := domain.Contest{
-		ID: domain.ContestID(record.ID),
+func competitionToDomain(record database.Competition) domain.Competition {
+	competition := domain.Competition{
+		ID: domain.CompetitionID(record.ID),
 		Ownership: domain.OwnershipData{
 			OrganizerID: domain.OrganizerID(record.OrganizerID),
 			ContenderID: nil,
@@ -87,7 +87,7 @@ func contestToDomain(record database.Contest) domain.Contest {
 		Created:              record.Created,
 	}
 
-	return contest
+	return competition
 }
 
 func problemToDomain(record database.Problem) domain.Problem {
@@ -97,7 +97,7 @@ func problemToDomain(record database.Problem) domain.Problem {
 			OrganizerID: domain.OrganizerID(record.OrganizerID),
 			ContenderID: nil,
 		},
-		ContestID:          domain.ContestID(record.ContestID),
+		CompetitionID:      domain.CompetitionID(record.CompetitionID),
 		Number:             int(record.Number),
 		HoldColorPrimary:   record.HoldColorPrimary,
 		HoldColorSecondary: record.HoldColorSecondary.String,
@@ -121,7 +121,7 @@ func tickToDomain(record database.Tick) domain.Tick {
 			ContenderID: nillableIntToResourceID[domain.ContenderID](&record.ContenderID),
 		},
 		Timestamp:     record.Timestamp,
-		ContestID:     domain.ContestID(record.ContestID),
+		CompetitionID: domain.CompetitionID(record.CompetitionID),
 		Revision:      int(record.Revision),
 		ProblemID:     domain.ProblemID(record.ProblemID),
 		Zone1:         record.Zone1,
@@ -160,7 +160,7 @@ func raffleToDomain(record database.Raffle) domain.Raffle {
 			OrganizerID: domain.OrganizerID(record.OrganizerID),
 			ContenderID: nil,
 		},
-		ContestID: domain.ContestID(record.ContestID),
+		CompetitionID: domain.CompetitionID(record.CompetitionID),
 	}
 }
 

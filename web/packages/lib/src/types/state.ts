@@ -1,1 +1,2 @@
-export type ContestState = "NOT_STARTED" | "RUNNING" | "GRACE_PERIOD" | "ENDED";
+export type CompetitionState =
+  "NOT_STARTED" | "RUNNING" | "GRACE_PERIOD" | "ENDED";

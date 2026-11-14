@@ -9,8 +9,8 @@ import (
 	"github.com/go-errors/errors"
 )
 
-func (d *Database) GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Problem, error) {
-	records, err := d.WithTx(tx).GetProblemsByContest(ctx, int32(contestID))
+func (d *Database) GetProblemsByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Problem, error) {
+	records, err := d.WithTx(tx).GetProblemsByCompetition(ctx, int32(competitionID))
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -36,10 +36,10 @@ func (d *Database) GetProblem(ctx context.Context, tx domain.Transaction, proble
 	return problemToDomain(record.Problem), nil
 }
 
-func (d *Database) GetProblemByNumber(ctx context.Context, tx domain.Transaction, contestID domain.ContestID, problemNumber int) (domain.Problem, error) {
+func (d *Database) GetProblemByNumber(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID, problemNumber int) (domain.Problem, error) {
 	record, err := d.WithTx(tx).GetProblemByNumber(ctx, database.GetProblemByNumberParams{
-		ContestID: int32(contestID),
-		Number:    int32(problemNumber),
+		CompetitionID: int32(competitionID),
+		Number:        int32(problemNumber),
 	})
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
@@ -55,7 +55,7 @@ func (d *Database) StoreProblem(ctx context.Context, tx domain.Transaction, prob
 	params := database.UpsertProblemParams{
 		ID:                 int32(problem.ID),
 		OrganizerID:        int32(problem.Ownership.OrganizerID),
-		ContestID:          int32(problem.ContestID),
+		CompetitionID:      int32(problem.CompetitionID),
 		Number:             int32(problem.Number),
 		HoldColorPrimary:   problem.HoldColorPrimary,
 		HoldColorSecondary: makeNullString(problem.HoldColorSecondary),

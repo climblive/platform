@@ -2,20 +2,22 @@
   import CreateTicketsDialog from "@/components/CreateTicketsDialog.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { getContendersByContestQuery } from "@climblive/lib/queries";
+  import { getContendersByCompetitionQuery } from "@climblive/lib/queries";
   import { Link } from "svelte-routing";
 
   const maxTickets = 500;
 
   interface Props {
-    contestId: number;
+    competitionId: number;
   }
 
-  let { contestId }: Props = $props();
+  let { competitionId }: Props = $props();
 
   let createTicketsDialog: CreateTicketsDialog | undefined = $state();
 
-  const contendersQuery = $derived(getContendersByContestQuery(contestId));
+  const contendersQuery = $derived(
+    getContendersByCompetitionQuery(competitionId),
+  );
 
   let contenders = $derived(contendersQuery.data);
 
@@ -31,7 +33,7 @@
 
 <CreateTicketsDialog
   bind:this={createTicketsDialog}
-  {contestId}
+  {competitionId}
   {remainingCodes}
 />
 
@@ -47,7 +49,7 @@
     Create tickets</wa-button
   >
   {#if contenders && contenders.length > 0}
-    <Link to={`/admin/contests/${contestId}/tickets`}>
+    <Link to={`/admin/competitions/${competitionId}/tickets`}>
       <wa-button appearance="outlined" size="s"
         >View and print tickets
         <wa-icon name="list" slot="start"></wa-icon>

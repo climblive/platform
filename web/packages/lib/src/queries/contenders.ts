@@ -16,11 +16,11 @@ export const getContenderQuery = (contenderId: number) =>
     refetchOnWindowFocus: "always",
   }));
 
-export const getContendersByContestQuery = (contestId: number) =>
+export const getContendersByCompetitionQuery = (competitionId: number) =>
   createQuery(() => ({
-    queryKey: ["contenders", { contestId }],
+    queryKey: ["contenders", { competitionId }],
     queryFn: async () =>
-      ApiClient.getInstance().getContendersByContest(contestId),
+      ApiClient.getInstance().getContendersByCompetition(competitionId),
   }));
 
 export const getPointValuesByContenderQuery = (contenderId: number) =>
@@ -56,14 +56,14 @@ export const scrubContenderMutation = (contenderId: number) => {
   }));
 };
 
-export const createContendersMutation = (contestId: number) => {
+export const createContendersMutation = (competitionId: number) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
     mutationFn: async (args: CreateContendersArguments) =>
-      ApiClient.getInstance().createContenders(contestId, args),
+      ApiClient.getInstance().createContenders(competitionId, args),
     onSuccess: (newContenders) => {
-      const queryKey: QueryKey = ["contenders", { contestId }];
+      const queryKey: QueryKey = ["contenders", { competitionId }];
       client.setQueryData<Contender[]>(queryKey, (oldContenders) => {
         return [...(oldContenders ?? []), ...newContenders];
       });

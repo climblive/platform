@@ -60,7 +60,7 @@ func (hdlr *eventHandler) HandleSubscribeEvents(w http.ResponseWriter, r *http.R
 	}
 
 	for _, filter := range filters {
-		if filter.ContestID != filters[0].ContestID {
+		if filter.CompetitionID != filters[0].CompetitionID {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}

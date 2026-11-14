@@ -47,7 +47,7 @@
       {
         onSuccess: (organizer: Organizer) => {
           handleCancel();
-          navigate(`./organizers/${organizer.id}/contests`);
+          navigate(`./organizers/${organizer.id}/competitions`);
         },
         onError: () => toastUnexpectedError("Failed to create organizer."),
       },

@@ -15,10 +15,10 @@
   } from "@climblive/lib/components";
   import { type Problem, type ProblemID } from "@climblive/lib/models";
   import {
-    getContestQuery,
-    getContestsByOrganizerQuery,
+    getCompetitionQuery,
+    getCompetitionsByOrganizerQuery,
     getProblemsQuery,
-    getTicksByContestQuery,
+    getTicksByCompetitionQuery,
   } from "@climblive/lib/queries";
   import { isDefined, localizedPointsValue } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
@@ -29,20 +29,22 @@
   const createButtonId = $props.id();
 
   interface Props {
-    contestId: number;
+    competitionId: number;
     organizerId: number;
     tableLimit: number | undefined;
   }
 
-  let { contestId, organizerId, ...props }: Props = $props();
+  let { competitionId, organizerId, ...props }: Props = $props();
   let tableLimit = $state<number | undefined>(props.tableLimit);
 
   let copyProblemsOpen = $state(false);
 
-  const problemsQuery = $derived(getProblemsQuery(contestId));
-  const ticksQuery = $derived(getTicksByContestQuery(contestId));
-  const contestQuery = $derived(getContestQuery(contestId));
-  const contestsQuery = $derived(getContestsByOrganizerQuery(organizerId));
+  const problemsQuery = $derived(getProblemsQuery(competitionId));
+  const ticksQuery = $derived(getTicksByCompetitionQuery(competitionId));
+  const competitionQuery = $derived(getCompetitionQuery(competitionId));
+  const competitionsQuery = $derived(
+    getCompetitionsByOrganizerQuery(organizerId),
+  );
 
   const ascentsByProblem = $derived.by(() => {
     const ascentsByProblem = new Map<ProblemID, number>();
@@ -64,8 +66,8 @@
     return ascentsByProblem;
   });
 
-  const contests = $derived(contestsQuery.data);
-  const contest = $derived(contestQuery.data);
+  const competitions = $derived(competitionsQuery.data);
+  const competition = $derived(competitionQuery.data);
 
   const limitReached = $derived(
     problemsQuery.data !== undefined &&
@@ -107,7 +109,7 @@
       },
     ];
 
-    if (contest?.usePoints) {
+    if (competition?.usePoints) {
       columns.push({
         label: "Points",
         mobile: true,
@@ -222,7 +224,7 @@
     variant="neutral"
     appearance="accent"
     disabled={limitReached}
-    onclick={() => navigate(`contests/${contestId}/new-problem`)}
+    onclick={() => navigate(`competitions/${competitionId}/new-problem`)}
     >Create problem</wa-button
   >
   {#if limitReached}
@@ -258,7 +260,7 @@
         <div class="actions">
           {@render createButton()}
 
-          {#if contests && contests.length > 1}
+          {#if competitions && competitions.length > 1}
             <wa-button
               onclick={() => {
                 copyProblemsOpen = true;
@@ -282,7 +284,7 @@
   {/if}
 </section>
 
-<CopyProblems {organizerId} {contestId} bind:open={copyProblemsOpen} />
+<CopyProblems {organizerId} {competitionId} bind:open={copyProblemsOpen} />
 
 <style>
   .number {

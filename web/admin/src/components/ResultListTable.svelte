@@ -21,19 +21,19 @@
   import Loader from "./Loader.svelte";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
     loading: boolean;
   }
 
-  const { contestId, scoreboard, loading }: Props = $props();
+  const { competitionId, scoreboard, loading }: Props = $props();
 
   let tableData = $state<ScoreboardEntry[]>([]);
 
   let compClassSelector: WaSelect | undefined = $state();
   let quickFilter: WaInput | undefined = $state();
 
-  const compClassesQuery = $derived(getCompClassesQuery(contestId));
+  const compClassesQuery = $derived(getCompClassesQuery(competitionId));
 
   const compClasses = $derived(compClassesQuery.data);
 

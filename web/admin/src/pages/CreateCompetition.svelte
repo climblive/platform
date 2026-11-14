@@ -1,11 +1,11 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import ContestForm, {
+  import CompetitionForm, {
     formSchema,
     nanosecondsInMinute,
-  } from "@/forms/ContestForm.svelte";
-  import type { Contest, ContestTemplate } from "@climblive/lib/models";
-  import { createContestMutation } from "@climblive/lib/queries";
+  } from "@/forms/CompetitionForm.svelte";
+  import type { Competition, CompetitionTemplate } from "@climblive/lib/models";
+  import { createCompetitionMutation } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
@@ -15,11 +15,11 @@
 
   let { organizerId }: Props = $props();
 
-  const createContest = $derived(createContestMutation(organizerId));
+  const createCompetition = $derived(createCompetitionMutation(organizerId));
 
   const handleSubmit = (
     form: Omit<
-      ContestTemplate,
+      CompetitionTemplate,
       | "qualifyingProblems"
       | "finalists"
       | "usePoints"
@@ -28,11 +28,11 @@
       | "pointDeduction"
     >,
   ) => {
-    if (createContest.isPending) {
+    if (createCompetition.isPending) {
       return;
     }
 
-    createContest.mutate(
+    createCompetition.mutate(
       {
         ...form,
         gracePeriod: form.gracePeriod * nanosecondsInMinute,
@@ -44,14 +44,15 @@
         pointDeduction: 0,
       },
       {
-        onSuccess: (contest: Contest) => navigate(`contests/${contest.id}`),
+        onSuccess: (competition: Competition) =>
+          navigate(`competitions/${competition.id}`),
         onError: () => toastUnexpectedError("Failed to create competition."),
       },
     );
   };
 </script>
 
-<ContestForm
+<CompetitionForm
   submit={handleSubmit}
   data={{
     name: "",
@@ -65,19 +66,19 @@
     <wa-button
       size="s"
       appearance="plain"
-      onclick={() => navigate(`./organizers/${organizerId}/contests`)}
+      onclick={() => navigate(`./organizers/${organizerId}/competitions`)}
       >Cancel</wa-button
     >
     <wa-button
       size="s"
       type="submit"
-      loading={createContest.isPending}
+      loading={createCompetition.isPending}
       variant="neutral"
       appearance="accent"
       >Create
     </wa-button>
   </div>
-</ContestForm>
+</CompetitionForm>
 
 <style>
   .controls {

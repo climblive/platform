@@ -36,11 +36,11 @@
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import { GenericForm, name, value } from "@climblive/lib/forms";
-  import type { Contest } from "@climblive/lib/models";
+  import type { Competition } from "@climblive/lib/models";
   import { countries, getFlag } from "@climblive/lib/utils";
   import { type Snippet } from "svelte";
 
-  type T = $$Generic<Partial<Contest>>;
+  type T = $$Generic<Partial<Competition>>;
 
   interface Props {
     data: Partial<T>;

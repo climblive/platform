@@ -20,7 +20,7 @@ func TestTickValidator(t *testing.T) {
 			Ownership: domain.OwnershipData{
 				OrganizerID: domain.OrganizerID(1),
 			},
-			ContestID:     domain.ContestID(1),
+			CompetitionID: domain.CompetitionID(1),
 			ProblemID:     domain.ProblemID(1),
 			Revision:      1,
 			Zone1:         true,

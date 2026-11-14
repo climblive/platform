@@ -14,7 +14,7 @@
   import { useEvents } from "./EventsProvider.svelte";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
     hideDisqualified?: boolean;
     children?: Snippet<
       [
@@ -27,7 +27,7 @@
     >;
   }
 
-  let { contestId, hideDisqualified = false, children }: Props = $props();
+  let { competitionId, hideDisqualified = false, children }: Props = $props();
 
   const { subscribeEvents, unsubscribeEvents } = useEvents();
   let subscriptionId: symbol | undefined;
@@ -70,7 +70,7 @@
 
     const filters: EventFilter[] = [
       {
-        contestId,
+        competitionId,
         eventTypes: {
           CONTENDER_PUBLIC_INFO_UPDATED: {},
           "[]CONTENDER_SCORE_UPDATED": {},
@@ -110,7 +110,7 @@
 
   const initializeStore = async () => {
     const currentGeneration = generation;
-    const entries = await ApiClient.getInstance().getScoreboard(contestId);
+    const entries = await ApiClient.getInstance().getScoreboard(competitionId);
 
     if (currentGeneration !== generation) {
       return;

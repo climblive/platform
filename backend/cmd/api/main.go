@@ -290,7 +290,7 @@ func setupMux(
 		RegistrationCodeGenerator: &registrationCodeGenerator{},
 	}
 
-	contestUseCase := usecases.ContestUseCase{
+	competitionUseCase := usecases.CompetitionUseCase{
 		Authorizer:         authorizer,
 		Repo:               repo,
 		ScoreKeeper:        scoreKeeper,
@@ -352,7 +352,7 @@ func setupMux(
 	mux.HandleFunc("OPTIONS /", HandleCORSPreFlight)
 
 	rest.InstallContenderHandler(mux, &contenderUseCase)
-	rest.InstallContestHandler(mux, &contestUseCase, &compClassUseCase, &tickUseCase, &problemUseCase)
+	rest.InstallCompetitionHandler(mux, &competitionUseCase, &compClassUseCase, &tickUseCase, &problemUseCase)
 	rest.InstallCompClassHandler(mux, &compClassUseCase)
 	rest.InstallProblemHandler(mux, &problemUseCase)
 	rest.InstallTickHandler(mux, &tickUseCase)

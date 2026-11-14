@@ -16,8 +16,8 @@ type tickUseCaseRepository interface {
 
 	GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error)
 	GetTicksByContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) ([]domain.Tick, error)
-	GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error)
-	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
+	GetTicksByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Tick, error)
+	GetCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (domain.Competition, error)
 	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error)
 	GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) (domain.Problem, error)
 	DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) error
@@ -50,17 +50,17 @@ func (uc *TickUseCase) GetTicksByContender(ctx context.Context, contenderID doma
 	return ticks, nil
 }
 
-func (uc *TickUseCase) GetTicksByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Tick, error) {
-	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
+func (uc *TickUseCase) GetTicksByCompetition(ctx context.Context, competitionID domain.CompetitionID) ([]domain.Tick, error) {
+	competition, err := uc.Repo.GetCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
 
-	if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+	if _, err := uc.Authorizer.HasOwnership(ctx, competition.Ownership); err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
 
-	ticks, err := uc.Repo.GetTicksByContest(ctx, nil, contestID)
+	ticks, err := uc.Repo.GetTicksByCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -86,7 +86,7 @@ func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.TickID) err
 		return errors.Wrap(err, 0)
 	}
 
-	contest, err := uc.Repo.GetContest(ctx, nil, tick.ContestID)
+	competition, err := uc.Repo.GetCompetition(ctx, nil, tick.CompetitionID)
 	if err != nil {
 		return errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
 	}
@@ -96,12 +96,12 @@ func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.TickID) err
 		return errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
 	}
 
-	gracePeriodEnd := compClass.TimeEnd.Add(contest.GracePeriod)
+	gracePeriodEnd := compClass.TimeEnd.Add(competition.GracePeriod)
 
 	switch {
 	case role.OneOf(domain.OrganizerRole, domain.AdminRole):
 	case time.Now().After(gracePeriodEnd):
-		return errors.New(domain.ErrContestEnded)
+		return errors.New(domain.ErrCompetitionEnded)
 	}
 
 	err = uc.Repo.DeleteTick(ctx, nil, tickID)
@@ -109,7 +109,7 @@ func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.TickID) err
 		return errors.Wrap(err, 0)
 	}
 
-	uc.EventBroker.Dispatch(contest.ID, domain.AscentDeregisteredEvent{
+	uc.EventBroker.Dispatch(competition.ID, domain.AscentDeregisteredEvent{
 		TickID:      tickID,
 		ContenderID: contender.ID,
 		ProblemID:   tick.ProblemID,
@@ -129,7 +129,7 @@ func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.Contender
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
-	contest, err := uc.Repo.GetContest(ctx, nil, contender.ContestID)
+	competition, err := uc.Repo.GetCompetition(ctx, nil, contender.CompetitionID)
 	if err != nil {
 		return domain.Tick{}, errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
 	}
@@ -140,15 +140,15 @@ func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.Contender
 	}
 
 	if time.Now().Before(compClass.TimeBegin) {
-		return domain.Tick{}, errors.New(domain.ErrContestNotStarted)
+		return domain.Tick{}, errors.New(domain.ErrCompetitionNotStarted)
 	}
 
-	gracePeriodEnd := compClass.TimeEnd.Add(contest.GracePeriod)
+	gracePeriodEnd := compClass.TimeEnd.Add(competition.GracePeriod)
 
 	switch {
 	case role.OneOf(domain.OrganizerRole, domain.AdminRole):
 	case time.Now().After(gracePeriodEnd):
-		return domain.Tick{}, errors.New(domain.ErrContestEnded)
+		return domain.Tick{}, errors.New(domain.ErrCompetitionEnded)
 	}
 
 	problem, err := uc.Repo.GetProblem(ctx, nil, tick.ProblemID)
@@ -156,8 +156,8 @@ func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.Contender
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
-	if problem.ContestID != contest.ID {
-		return domain.Tick{}, errors.New(domain.ErrProblemNotInContest)
+	if problem.CompetitionID != competition.ID {
+		return domain.Tick{}, errors.New(domain.ErrProblemNotInCompetition)
 	}
 
 	existingTick, err := uc.Repo.GetTickByContenderAndProblem(ctx, nil, contenderID, problem.ID)
@@ -177,7 +177,7 @@ func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.Contender
 	}
 
 	existingTick.Ownership = contender.Ownership
-	existingTick.ContestID = contest.ID
+	existingTick.CompetitionID = competition.ID
 	existingTick.ProblemID = problem.ID
 	existingTick.Timestamp = time.Now()
 	existingTick.Revision = tick.Revision
@@ -198,7 +198,7 @@ func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.Contender
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
-	uc.EventBroker.Dispatch(contest.ID, domain.AscentRegisteredEvent{
+	uc.EventBroker.Dispatch(competition.ID, domain.AscentRegisteredEvent{
 		TickID:        existingTick.ID,
 		Timestamp:     existingTick.Timestamp,
 		ContenderID:   *existingTick.Ownership.ContenderID,

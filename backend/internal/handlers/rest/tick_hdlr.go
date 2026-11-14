@@ -9,7 +9,7 @@ import (
 
 type tickUseCase interface {
 	GetTicksByContender(ctx context.Context, contenderID domain.ContenderID) ([]domain.Tick, error)
-	GetTicksByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Tick, error)
+	GetTicksByCompetition(ctx context.Context, competitionID domain.CompetitionID) ([]domain.Tick, error)
 	DeleteTick(ctx context.Context, tickID domain.TickID) error
 	PutTick(ctx context.Context, contenderID domain.ContenderID, tick domain.Tick) (domain.Tick, error)
 }
@@ -24,7 +24,7 @@ func InstallTickHandler(mux *Mux, tickUseCase tickUseCase) {
 	}
 
 	mux.HandleFunc("GET /contenders/{contenderID}/ticks", handler.GetTicksByContender)
-	mux.HandleFunc("GET /contests/{contestID}/ticks", handler.GetTicksByContest)
+	mux.HandleFunc("GET /competitions/{competitionID}/ticks", handler.GetTicksByCompetition)
 	mux.HandleFunc("PUT /contenders/{contenderID}/ticks", handler.PutTick)
 	mux.HandleFunc("DELETE /ticks/{tickID}", handler.DeleteTick)
 }
@@ -45,14 +45,14 @@ func (hdlr *tickHandler) GetTicksByContender(w http.ResponseWriter, r *http.Requ
 	writeResponse(w, http.StatusOK, ticks)
 }
 
-func (hdlr *tickHandler) GetTicksByContest(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+func (hdlr *tickHandler) GetTicksByCompetition(w http.ResponseWriter, r *http.Request) {
+	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	ticks, err := hdlr.tickUseCase.GetTicksByContest(r.Context(), contestID)
+	ticks, err := hdlr.tickUseCase.GetTicksByCompetition(r.Context(), competitionID)
 	if err != nil {
 		handleError(w, err)
 		return

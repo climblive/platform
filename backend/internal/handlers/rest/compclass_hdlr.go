@@ -8,8 +8,8 @@ import (
 )
 
 type compClassUseCase interface {
-	GetCompClassesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.CompClass, error)
-	CreateCompClass(ctx context.Context, contestID domain.ContestID, tmpl domain.CompClassTemplate) (domain.CompClass, error)
+	GetCompClassesByCompetition(ctx context.Context, competitionID domain.CompetitionID) ([]domain.CompClass, error)
+	CreateCompClass(ctx context.Context, competitionID domain.CompetitionID, tmpl domain.CompClassTemplate) (domain.CompClass, error)
 	DeleteCompClass(ctx context.Context, compClassID domain.CompClassID) error
 	GetCompClass(ctx context.Context, compClassID domain.CompClassID) (domain.CompClass, error)
 	PatchCompClass(ctx context.Context, compClassID domain.CompClassID, patch domain.CompClassPatch) (domain.CompClass, error)
@@ -25,8 +25,8 @@ func InstallCompClassHandler(mux *Mux, compClassUseCase compClassUseCase) {
 	}
 
 	mux.HandleFunc("GET /comp-classes/{compClassID}", handler.GetCompClass)
-	mux.HandleFunc("GET /contests/{contestID}/comp-classes", handler.GetCompClassesByContest)
-	mux.HandleFunc("POST /contests/{contestID}/comp-classes", handler.CreateCompClass)
+	mux.HandleFunc("GET /competitions/{competitionID}/comp-classes", handler.GetCompClassesByCompetition)
+	mux.HandleFunc("POST /competitions/{competitionID}/comp-classes", handler.CreateCompClass)
 	mux.HandleFunc("DELETE /comp-classes/{compClassID}", handler.DeleteCompClass)
 	mux.HandleFunc("PATCH /comp-classes/{compClassID}", handler.PatchCompClass)
 }
@@ -47,14 +47,14 @@ func (hdlr *compClassHandler) GetCompClass(w http.ResponseWriter, r *http.Reques
 	writeResponse(w, http.StatusOK, compClass)
 }
 
-func (hdlr *compClassHandler) GetCompClassesByContest(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+func (hdlr *compClassHandler) GetCompClassesByCompetition(w http.ResponseWriter, r *http.Request) {
+	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	compClasses, err := hdlr.compClassUseCase.GetCompClassesByContest(r.Context(), contestID)
+	compClasses, err := hdlr.compClassUseCase.GetCompClassesByCompetition(r.Context(), competitionID)
 	if err != nil {
 		handleError(w, err)
 		return
@@ -64,7 +64,7 @@ func (hdlr *compClassHandler) GetCompClassesByContest(w http.ResponseWriter, r *
 }
 
 func (hdlr *compClassHandler) CreateCompClass(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -75,7 +75,7 @@ func (hdlr *compClassHandler) CreateCompClass(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	createdCompClass, err := hdlr.compClassUseCase.CreateCompClass(r.Context(), contestID, tmpl)
+	createdCompClass, err := hdlr.compClassUseCase.CreateCompClass(r.Context(), competitionID, tmpl)
 	if err != nil {
 		handleError(w, err)
 		return

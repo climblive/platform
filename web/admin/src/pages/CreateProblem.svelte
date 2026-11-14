@@ -5,22 +5,22 @@
   import type { Problem, ProblemTemplate } from "@climblive/lib/models";
   import {
     createProblemMutation,
-    getContestQuery,
+    getCompetitionQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
   }
 
-  let { contestId }: Props = $props();
+  let { competitionId }: Props = $props();
 
-  const contestQuery = $derived(getContestQuery(contestId));
-  const contest = $derived(contestQuery.data);
+  const competitionQuery = $derived(getCompetitionQuery(competitionId));
+  const competition = $derived(competitionQuery.data);
 
-  const problemsQuery = $derived(getProblemsQuery(contestId));
+  const problemsQuery = $derived(getProblemsQuery(competitionId));
 
   let highestProblem = $derived.by<Problem | undefined | null>(() => {
     if (problemsQuery.data === undefined) {
@@ -36,13 +36,14 @@
     }
   });
 
-  const createProblem = $derived(createProblemMutation(contestId));
+  const createProblem = $derived(createProblemMutation(competitionId));
 
   const handleSubmit = async (tmpl: Omit<ProblemTemplate, "pointsZone">) => {
     createProblem.mutate(
       { ...tmpl },
       {
-        onSuccess: () => navigate(`/admin/contests/${contestId}#problems`),
+        onSuccess: () =>
+          navigate(`/admin/competitions/${competitionId}#problems`),
         onError: () => toastUnexpectedError("Failed to create problem."),
       },
     );
@@ -60,7 +61,7 @@
       return {
         number: 1,
         holdColorPrimary: "#000000",
-        pointsTop: contest?.usePoints ? 100 : 0,
+        pointsTop: competition?.usePoints ? 100 : 0,
         flashBonus: 0,
       };
     }
@@ -74,14 +75,15 @@
     submit={handleSubmit}
     data={template}
     schema={formSchema}
-    hidePoints={contest?.usePoints === false}
+    hidePoints={competition?.usePoints === false}
   >
     <div class="controls">
       <wa-button
         size="s"
         type="button"
         appearance="plain"
-        onclick={() => navigate(`/admin/contests/${contestId}#problems`)}
+        onclick={() =>
+          navigate(`/admin/competitions/${competitionId}#problems`)}
         >Cancel</wa-button
       >
       <wa-button

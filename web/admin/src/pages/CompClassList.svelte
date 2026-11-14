@@ -21,12 +21,12 @@
   const createButtonId = $props.id();
 
   interface Props {
-    contestId: number;
+    competitionId: number;
   }
 
-  const { contestId }: Props = $props();
+  const { competitionId }: Props = $props();
 
-  const compClassesQuery = $derived(getCompClassesQuery(contestId));
+  const compClassesQuery = $derived(getCompClassesQuery(competitionId));
 
   let compClasses = $derived(compClassesQuery.data);
 
@@ -118,7 +118,7 @@
     variant="neutral"
     appearance="accent"
     disabled={limitReached}
-    onclick={() => navigate(`contests/${contestId}/new-comp-class`)}
+    onclick={() => navigate(`competitions/${competitionId}/new-comp-class`)}
     >Create category</wa-button
   >
   {#if limitReached}

@@ -20,10 +20,11 @@ export const getTicksByContenderQuery = (
     refetchOnWindowFocus: "always",
   }));
 
-export const getTicksByContestQuery = (contestId: number) =>
+export const getTicksByCompetitionQuery = (competitionId: number) =>
   createQuery(() => ({
-    queryKey: ["ticks", { contestId }],
-    queryFn: async () => ApiClient.getInstance().getTicksByContest(contestId),
+    queryKey: ["ticks", { competitionId }],
+    queryFn: async () =>
+      ApiClient.getInstance().getTicksByCompetition(competitionId),
   }));
 
 export const putTickMutation = (contenderId: number) => {
@@ -81,12 +82,12 @@ export const updateTickInQueryCache = (
   );
 };
 
-export const updateTickInContestQueryCache = (
+export const updateTickInCompetitionQueryCache = (
   queryClient: QueryClient,
-  contestId: number,
+  competitionId: number,
   updatedTick: Tick,
 ) => {
-  const queryKey: QueryKey = ["ticks", { contestId }];
+  const queryKey: QueryKey = ["ticks", { competitionId }];
 
   queryClient.setQueryData<Tick[]>(queryKey, (oldTicks) =>
     updateTick(oldTicks, updatedTick),

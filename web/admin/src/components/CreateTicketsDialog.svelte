@@ -17,19 +17,19 @@
   const maxTickets = 500;
 
   interface Props {
-    contestId: number;
+    competitionId: number;
     remainingCodes: number | undefined;
     onCreated?: (contenders: Contender[]) => void;
   }
 
-  const { contestId, remainingCodes, onCreated }: Props = $props();
+  const { competitionId, remainingCodes, onCreated }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
   let printDialog: WaDialog | undefined = $state();
   let numberInput: WaNumberInput | undefined = $state();
   let printUrl: string | undefined = $state(undefined);
 
-  const createContenders = createContendersMutation(contestId);
+  const createContenders = createContendersMutation(competitionId);
 
   export const open = () => {
     if (dialog) {
@@ -71,7 +71,7 @@
             const ids = newContenders.map(({ id }) => id);
             const from = Math.min(...ids);
             const to = Math.max(...ids);
-            printUrl = `/admin/contests/${contestId}/tickets/print?from=${from}&to=${to}`;
+            printUrl = `/admin/competitions/${competitionId}/tickets/print?from=${from}&to=${to}`;
 
             onCreated?.(newContenders);
 

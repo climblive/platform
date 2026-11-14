@@ -4,7 +4,7 @@ import { scoreSchema } from "./score";
 
 export const contenderSchema: z.ZodType<Contender> = z.object({
   id: z.number(),
-  contestId: z.number(),
+  competitionId: z.number(),
   compClassId: z.number().optional(),
   registrationCode: z.string(),
   name: z.string().optional(),
