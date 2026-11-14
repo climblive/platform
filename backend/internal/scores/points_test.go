@@ -20,7 +20,7 @@ func TestCalculatePoints(t *testing.T) {
 	tests := []struct {
 		name     string
 		tick     scores.Tick
-		expected float64
+		expected domain.Tenths
 	}{
 		{
 			name:     "NoAttempts",
@@ -46,7 +46,7 @@ func TestCalculatePoints(t *testing.T) {
 				Zone2:         true,
 				AttemptsZone2: 1,
 			},
-			expected: 110,
+			expected: 1100,
 		},
 		{
 			name: "TopWithSeveralAttempts",
@@ -58,7 +58,7 @@ func TestCalculatePoints(t *testing.T) {
 				Zone2:         true,
 				AttemptsZone2: 999,
 			},
-			expected: 100,
+			expected: 1000,
 		},
 		{
 			name: "Zone1WithSeveralAttempts",
@@ -68,7 +68,7 @@ func TestCalculatePoints(t *testing.T) {
 				AttemptsZone1: 999,
 				AttemptsZone2: 999,
 			},
-			expected: 50,
+			expected: 500,
 		},
 		{
 			name: "Zone2WithSeveralAttempts",
@@ -79,13 +79,13 @@ func TestCalculatePoints(t *testing.T) {
 				Zone2:         true,
 				AttemptsZone2: 999,
 			},
-			expected: 75,
+			expected: 750,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, scores.CalculatePoints(problem, tt.tick, scores.Rules{}).Float64())
+			assert.Equal(t, tt.expected, scores.CalculatePoints(problem, tt.tick, scores.Rules{}))
 		})
 	}
 }
@@ -161,12 +161,6 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 		rules := scores.Rules{PointDeduction: 10}
 
 		assert.Equal(t, domain.Tenths(1100), scores.CalculatePoints(value, tick, rules))
-
-		maxValue := scores.ProblemValue{
-			PointsTop:  21_474_836_470,
-			FlashBonus: 21_474_836_470,
-		}
-		assert.Equal(t, domain.Tenths(42_949_672_940), scores.CalculatePoints(maxValue, tick, rules))
 	})
 
 	t.Run("Zone1", func(t *testing.T) {
@@ -225,6 +219,16 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 
 		assert.Equal(t, domain.Tenths(0), scores.CalculatePoints(value, tick, rules))
 	})
+}
+
+func TestCalculatePoints_MaximumTopAndFlashBonus(t *testing.T) {
+	value := scores.ProblemValue{
+		PointsTop:  21_474_836_470,
+		FlashBonus: 21_474_836_470,
+	}
+	tick := scores.Tick{Top: true, AttemptsTop: 1}
+
+	assert.Equal(t, domain.Tenths(42_949_672_940), scores.CalculatePoints(value, tick, scores.Rules{}))
 }
 
 func TestCalculatePoints_MaxAttempts(t *testing.T) {

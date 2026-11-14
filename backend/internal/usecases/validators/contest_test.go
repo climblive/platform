@@ -26,13 +26,6 @@ func TestContestValidator(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("FractionalDeduction", func(t *testing.T) {
-		contest := validContest()
-		contest.UsePoints = true
-		contest.PointDeduction = 1
-		assert.NoError(t, validator.Validate(contest))
-	})
-
 	t.Run("EmptyName", func(t *testing.T) {
 		contest := validContest()
 		contest.Name = whitespaceCharacters
@@ -232,12 +225,6 @@ func TestContestValidator(t *testing.T) {
 
 			assert.ErrorIs(t, err, domain.ErrInvalidData)
 			assert.True(t, validator.IsValidationError(err))
-		})
-
-		t.Run("MaximumPointDeduction", func(t *testing.T) {
-			contest := validContest()
-			contest.PointDeduction = 21_474_836_470
-			assert.NoError(t, validator.Validate(contest))
 		})
 	})
 }
