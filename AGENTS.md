@@ -25,6 +25,7 @@
 - **Conditionals**: Always use braces for one-line conditionals; do not use shorthand `if (...) return ...` style
 - **Styling**: Component-scoped styles in plain CSS (prefer nesting)
 - **Web Awesome**: Use the `webawesome` skill for Web Awesome components and styling
+- **Design Tokens**: Use Web Awesome design tokens whenever possible
 - **Theme**: Shared theme in `packages/lib/src/theme.css`
 - **Zod**: Always import as `import { z } from "@climblive/lib/utils"`
 
