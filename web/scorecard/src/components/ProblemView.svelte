@@ -84,6 +84,7 @@
         value={problem.pointValue.current + "p"}
         prefix={counted ? "+" : undefined}
         compactThreshold={9_999}
+        animate={counted}
       />
     {:else if tick?.top}
       +1t
