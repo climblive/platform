@@ -68,7 +68,7 @@
 
 {#snippet scoreValue()}
   <strong>
-    <Score value={score}></Score>
+    <Score value={score} animate></Score>
   </strong>
 {/snippet}
 

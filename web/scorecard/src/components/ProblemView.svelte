@@ -61,11 +61,17 @@
     {#if enablePoints && valueRange}
       <span class="top">
         {#if valueRange.min === valueRange.max}
-          <Score value={valueRange.max + "p"} compactThreshold={9_999_999}
+          <Score
+            value={valueRange.max + "p"}
+            compactThreshold={9_999_999}
+            animate
           ></Score>
         {:else}
           <span class="lte">≤</span>
-          <Score value={valueRange.max + "p"} compactThreshold={9_999_999}
+          <Score
+            value={valueRange.max + "p"}
+            compactThreshold={9_999_999}
+            animate
           ></Score>
         {/if}
       </span>
@@ -84,6 +90,7 @@
         value={problem.pointValue.current + "p"}
         prefix={counted ? "+" : undefined}
         compactThreshold={9_999}
+        animate={counted}
       />
     {:else if tick?.top}
       +1t
