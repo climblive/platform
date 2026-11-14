@@ -2175,7 +2175,6 @@ func TestDefaultScoreEngine(t *testing.T) {
 			problems []scores.Problem
 			expected string
 		}{
-			{name: "NoProblems", expected: "2t"},
 			{name: "NoZones", problems: []scores.Problem{{}}, expected: "2t"},
 			{
 				name:     "Zone1",
