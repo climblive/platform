@@ -61,11 +61,17 @@
     {#if enablePoints && valueRange}
       <span class="top">
         {#if valueRange.min === valueRange.max}
-          <Score value={valueRange.max + "p"} compactThreshold={9_999_999}
+          <Score
+            value={valueRange.max + "p"}
+            compactThreshold={9_999_999}
+            animate
           ></Score>
         {:else}
           <span class="lte">≤</span>
-          <Score value={valueRange.max + "p"} compactThreshold={9_999_999}
+          <Score
+            value={valueRange.max + "p"}
+            compactThreshold={9_999_999}
+            animate
           ></Score>
         {/if}
       </span>
