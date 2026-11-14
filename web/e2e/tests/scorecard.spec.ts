@@ -408,9 +408,11 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
 
   const problem = page.getByRole("region", { name: "Problem 1", exact: true });
   const dialog = problem.getByRole("dialog");
-  const top = problem.getByRole("checkbox", { name: /^Top/ });
-  const zone1 = problem.getByRole("checkbox", { name: /^Zone 1/ });
-  const zone2 = problem.getByRole("checkbox", { name: /^Zone 2/ });
+  const featureCheckbox = (name: string) =>
+    problem.getByRole("group", { name, exact: true }).locator("label");
+  const top = featureCheckbox("Top");
+  const zone1 = featureCheckbox("Zone 1");
+  const zone2 = featureCheckbox("Zone 2");
   const addAttempt = problem.getByRole("button", {
     name: "Add failed attempt",
   });
@@ -436,7 +438,7 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await expect(top).not.toBeChecked();
   await expect(zone1).not.toBeChecked();
   await expect(zone2).not.toBeChecked();
-  await top.check({ force: true });
+  await top.check();
 
   await expectAttempts(1);
   await expectFeature("Top", "1st attempt");
@@ -455,7 +457,7 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await expect(zone1).not.toBeChecked();
   await expect(zone2).not.toBeChecked();
 
-  await zone1.check({ force: true });
+  await zone1.check();
   await expectAttempts(1);
   await expectFeature("Zone 1", "1st attempt");
   await expect(problem.getByText("+1z₁", { exact: true })).toBeVisible();
@@ -464,7 +466,7 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await addAttempt.click();
   await expectAttempts(2);
 
-  await zone2.check({ force: true });
+  await zone2.check();
   await expectAttempts(3);
   await expectFeature("Zone 1", "1st attempt");
   await expectFeature("Zone 2", "3rd attempt");
@@ -478,7 +480,7 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await subtractAttempt.click();
   await expectAttempts(4);
 
-  await top.check({ force: true });
+  await top.check();
   await expectAttempts(5);
   await expectFeature("Zone 1", "1st attempt");
   await expectFeature("Zone 2", "3rd attempt");

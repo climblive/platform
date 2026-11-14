@@ -21,8 +21,8 @@ export default defineConfig({
     /* Accept self-signed certificates */
     ignoreHTTPSErrors: true,
 
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: "on-first-retry",
+    /* Retain traces for failed tests. See https://playwright.dev/docs/trace-viewer */
+    trace: "retain-on-failure",
     screenshot: "only-on-failure",
     locale: "en-US",
   },
