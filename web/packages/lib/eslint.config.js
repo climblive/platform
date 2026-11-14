@@ -38,4 +38,7 @@ export default [
       "svelte/prefer-svelte-reactivity": "off",
     },
   },
+  {
+    ignores: ["**/generated.ts"],
+  },
 ];

@@ -14,11 +14,11 @@ type Rules struct {
 	UsePoints          bool
 	PooledPoints       bool
 	MaxAttempts        int
-	PointDeduction     int
+	PointDeduction     float64
 }
 
 type ScoringRules interface {
-	CalculateScore(points iter.Seq[int]) int
+	CalculateScore(points iter.Seq[float64]) float64
 }
 
 type Ranker interface {
@@ -380,8 +380,13 @@ func (e *DefaultScoreEngine) HandleAscentDeregistered(event domain.AscentDeregis
 
 func (e *DefaultScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) iter.Seq[Effect] {
 	problem := Problem{
-		ID:           event.ProblemID,
-		ProblemValue: event.ProblemValue,
+		ID: event.ProblemID,
+		ProblemValue: ProblemValue{
+			PointsZone1: float64(event.PointsZone1),
+			PointsZone2: float64(event.PointsZone2),
+			PointsTop:   float64(event.PointsTop),
+			FlashBonus:  float64(event.FlashBonus),
+		},
 		Zone1Enabled: event.Zone1Enabled,
 		Zone2Enabled: event.Zone2Enabled,
 	}
@@ -399,8 +404,13 @@ func (e *DefaultScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) 
 
 func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEvent) iter.Seq[Effect] {
 	problem := Problem{
-		ID:           event.ProblemID,
-		ProblemValue: event.ProblemValue,
+		ID: event.ProblemID,
+		ProblemValue: ProblemValue{
+			PointsZone1: float64(event.PointsZone1),
+			PointsZone2: float64(event.PointsZone2),
+			PointsTop:   float64(event.PointsTop),
+			FlashBonus:  float64(event.FlashBonus),
+		},
 		Zone1Enabled: event.Zone1Enabled,
 		Zone2Enabled: event.Zone2Enabled,
 	}
@@ -539,7 +549,7 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 		if rules.UsePoints {
 			ticks := e.store.GetTicksByContender(contender.ID)
 
-			var pointValues iter.Seq[int] = func(yield func(int) bool) {
+			var pointValues iter.Seq[float64] = func(yield func(float64) bool) {
 				for tick := range ticks {
 					value, found := e.store.GetPointValue(contender.ID, tick.ProblemID)
 					if !found {

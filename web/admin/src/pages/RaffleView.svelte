@@ -9,9 +9,10 @@
     ContenderName,
     EmptyState,
     Table,
+    useEvents,
     type ColumnDefinition,
   } from "@climblive/lib/components";
-  import type { RaffleWinner } from "@climblive/lib/models";
+  import type { EventFilter, RaffleWinner } from "@climblive/lib/models";
   import {
     drawRaffleWinnerMutation,
     getContendersByContestQuery,
@@ -19,7 +20,7 @@
     getRaffleQuery,
     getRaffleWinnersQuery,
   } from "@climblive/lib/queries";
-  import { getApiUrl, toastUnexpectedError } from "@climblive/lib/utils";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { AxiosError } from "axios";
   import { format } from "date-fns";
@@ -32,6 +33,7 @@
   let { raffleId }: Props = $props();
 
   const queryClient = useQueryClient();
+  const { subscribeEvents, unsubscribeEvents } = useEvents();
 
   const raffleQuery = $derived(getRaffleQuery(raffleId));
   const drawRaffleWinner = $derived(drawRaffleWinnerMutation(raffleId));
@@ -92,9 +94,16 @@
       return;
     }
 
-    const eventSource = new EventSource(
-      `${getApiUrl()}/contests/${contestId}/events`,
-    );
+    const filters: EventFilter[] = [
+      {
+        contestId,
+        eventTypes: {
+          CONTENDER_ENTERED: {},
+          CONTENDER_DISQUALIFIED: {},
+          CONTENDER_REQUALIFIED: {},
+        },
+      },
+    ];
 
     const invalidateContenders = () => {
       queryClient.invalidateQueries({
@@ -102,15 +111,20 @@
       });
     };
 
-    eventSource.addEventListener("CONTENDER_ENTERED", invalidateContenders);
-    eventSource.addEventListener(
-      "CONTENDER_DISQUALIFIED",
-      invalidateContenders,
-    );
-    eventSource.addEventListener("CONTENDER_REQUALIFIED", invalidateContenders);
+    const subscriptionId = subscribeEvents(filters, (eventName) => {
+      if (
+        [
+          "CONTENDER_ENTERED",
+          "CONTENDER_DISQUALIFIED",
+          "CONTENDER_REQUALIFIED",
+        ].includes(eventName)
+      ) {
+        invalidateContenders();
+      }
+    });
 
     return () => {
-      eventSource.close();
+      unsubscribeEvents(subscriptionId);
     };
   });
 

@@ -1,7 +1,11 @@
 <script lang="ts">
-  import { HoldColorIndicator, Score } from "@climblive/lib/components";
+  import {
+    HoldColorIndicator,
+    ProblemDescription,
+    Score,
+  } from "@climblive/lib/components";
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
-  import { renderLabel } from "@climblive/lib/utils";
+  import { renderLabel, roundPoints } from "@climblive/lib/utils";
   import TickDialog from "./TickDialog.svelte";
 
   type ScorecardProblem = Problem & {
@@ -26,8 +30,6 @@
     enableAttempts,
   }: Props = $props();
 
-  const id = $props.id();
-
   const valueRange = $derived.by<{ min: number; max: number } | undefined>(
     () => {
       if (problem.pointValue === undefined) {
@@ -36,7 +38,7 @@
 
       const { zone1, zone2, top, flashBonus } = problem.pointValue;
 
-      const values = [zone1, zone2, top + flashBonus];
+      const values = [zone1, zone2, roundPoints(top + flashBonus)];
 
       return { min: Math.min(...values), max: Math.max(...values) };
     },
@@ -70,19 +72,10 @@
     {/if}
 
     {#if problem.description}
-      <wa-popover for={id}>
-        {problem.description}
-        <wa-button
-          appearance="outlined"
-          variant="neutral"
-          size="s"
-          data-popover="close">Got it!</wa-button
-        >
-      </wa-popover>
-
-      <wa-button size="xs" appearance="plain" pill {id}
-        ><wa-icon name="info-circle"></wa-icon></wa-button
-      >
+      <ProblemDescription
+        description={problem.description}
+        label={problem.label}
+      />
     {/if}
   </span>
   <div class="score" class:uncounted={!counted}>
@@ -166,13 +159,5 @@
       opacity: 0.3;
       text-decoration: line-through;
     }
-  }
-
-  wa-popover::part(body) {
-    width: 300px;
-  }
-
-  wa-popover wa-button {
-    margin-block-start: var(--wa-space-m);
   }
 </style>

@@ -9,6 +9,7 @@
   import {
     EmptyState,
     HoldColorIndicator,
+    ProblemDescription,
     Table,
     type ColumnDefinition,
   } from "@climblive/lib/components";
@@ -137,19 +138,21 @@
   });
 </script>
 
-{#snippet renderNumberAndColor({
-  label,
-  holdColorPrimary,
-  holdColorSecondary,
-}: Problem)}
+{#snippet renderNumberAndColor(problem: Problem)}
   <div class="number">
     <HoldColorIndicator
       --height="1.25rem"
       --width="1.25rem"
-      primary={holdColorPrimary}
-      secondary={holdColorSecondary}
+      primary={problem.holdColorPrimary}
+      secondary={problem.holdColorSecondary}
     />
-    {renderLabel(label)}
+    {renderLabel(problem.label)}
+    {#if problem.description}
+      <ProblemDescription
+        description={problem.description}
+        label={problem.label}
+      />
+    {/if}
   </div>
 {/snippet}
 
@@ -166,7 +169,7 @@
       ...new Set([min, max + (flashBonus ?? 0)]),
     ].toSorted((p1, p2) => p1 - p2)}
 
-    {uniquePoints.map((p) => localizedPointsValue(p)).join(" - ")}
+    {uniquePoints.map((p) => localizedPointsValue(p, 9_999)).join(" - ")}
   {:else}
     {values.map((p) => localizedPointsValue(p)).join(" / ")}
   {/if}

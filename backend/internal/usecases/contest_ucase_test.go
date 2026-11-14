@@ -370,7 +370,7 @@ func TestCreateContest(t *testing.T) {
 						UsePoints:          true,
 						PooledPoints:       true,
 						MaxAttempts:        5,
-						PointDeduction:     2,
+						PointDeduction:     0.2,
 						Info:               "No rules!",
 						GracePeriod:        time.Hour,
 						Created:            time.Now(),
@@ -390,7 +390,7 @@ func TestCreateContest(t *testing.T) {
 					UsePoints:          true,
 					PooledPoints:       true,
 					MaxAttempts:        5,
-					PointDeduction:     2,
+					PointDeduction:     0.2,
 					Info:               "No rules!",
 					GracePeriod:        time.Hour,
 					Created:            time.Now(),
@@ -412,7 +412,7 @@ func TestCreateContest(t *testing.T) {
 				UsePoints:          true,
 				PooledPoints:       true,
 				MaxAttempts:        5,
-				PointDeduction:     2,
+				PointDeduction:     0.2,
 				Info:               "No rules!",
 				GracePeriod:        time.Hour,
 				NameRetentionTime:  14 * 24 * time.Hour,
@@ -431,7 +431,7 @@ func TestCreateContest(t *testing.T) {
 			assert.True(t, contest.UsePoints)
 			assert.True(t, contest.PooledPoints)
 			assert.Equal(t, 5, contest.MaxAttempts)
-			assert.Equal(t, 2, contest.PointDeduction)
+			assert.Equal(t, 0.2, contest.PointDeduction)
 			assert.Equal(t, "No rules!", contest.Info)
 			assert.Equal(t, time.Hour, contest.GracePeriod)
 			assert.Empty(t, contest.TimeBegin)
@@ -677,7 +677,7 @@ func TestDuplicateContest(t *testing.T) {
 		UsePoints:          true,
 		PooledPoints:       true,
 		MaxAttempts:        5,
-		PointDeduction:     2,
+		PointDeduction:     0.2,
 		Info:               "No rules!",
 		GracePeriod:        time.Hour,
 		TimeBegin:          timeBegin,
@@ -800,7 +800,7 @@ func TestDuplicateContest(t *testing.T) {
 		assert.True(t, duplicatedContest.UsePoints)
 		assert.True(t, duplicatedContest.PooledPoints)
 		assert.Equal(t, 5, duplicatedContest.MaxAttempts)
-		assert.Equal(t, 2, duplicatedContest.PointDeduction)
+		assert.Equal(t, 0.2, duplicatedContest.PointDeduction)
 		assert.Equal(t, "No rules!", duplicatedContest.Info)
 		assert.Equal(t, time.Hour, duplicatedContest.GracePeriod)
 		assert.Equal(t, timeBegin, duplicatedContest.TimeBegin)
@@ -895,7 +895,7 @@ func TestTransferContest(t *testing.T) {
 		UsePoints:          true,
 		PooledPoints:       true,
 		MaxAttempts:        5,
-		PointDeduction:     2,
+		PointDeduction:     0.2,
 		Info:               "Standard IFSC rules apply",
 		GracePeriod:        30 * time.Minute,
 		TimeBegin:          timeBegin,
@@ -1049,7 +1049,7 @@ func TestTransferContest(t *testing.T) {
 				UsePoints:          true,
 				PooledPoints:       true,
 				MaxAttempts:        5,
-				PointDeduction:     2,
+				PointDeduction:     0.2,
 				Info:               "Standard IFSC rules apply",
 				GracePeriod:        30 * time.Minute,
 				TimeBegin:          fakedContest.TimeBegin,
@@ -1291,7 +1291,7 @@ func TestPatchContest(t *testing.T) {
 					UsePoints:          true,
 					PooledPoints:       true,
 					MaxAttempts:        5,
-					PointDeduction:     2,
+					PointDeduction:     0.2,
 					Info:               "No rules!",
 					GracePeriod:        time.Hour,
 					NameRetentionTime:  14 * 24 * time.Hour,
@@ -1310,7 +1310,7 @@ func TestPatchContest(t *testing.T) {
 				UsePoints:          true,
 				PooledPoints:       true,
 				MaxAttempts:        5,
-				PointDeduction:     2,
+				PointDeduction:     0.2,
 				Info:               "No rules!",
 				GracePeriod:        time.Hour,
 				NameRetentionTime:  14 * 24 * time.Hour,
@@ -1324,7 +1324,7 @@ func TestPatchContest(t *testing.T) {
 				UsePoints:          true,
 				PooledPoints:       true,
 				MaxAttempts:        5,
-				PointDeduction:     2,
+				PointDeduction:     0.2,
 			}).
 			Return(nil)
 
@@ -1345,7 +1345,7 @@ func TestPatchContest(t *testing.T) {
 			UsePoints:          domain.NewPatch(true),
 			PooledPoints:       domain.NewPatch(true),
 			MaxAttempts:        domain.NewPatch(5),
-			PointDeduction:     domain.NewPatch(2),
+			PointDeduction:     domain.NewPatch(0.2),
 			Info:               domain.NewPatch("No rules!"),
 			GracePeriod:        domain.NewPatch(time.Hour),
 		}
@@ -1363,7 +1363,7 @@ func TestPatchContest(t *testing.T) {
 		assert.True(t, contest.UsePoints)
 		assert.True(t, contest.PooledPoints)
 		assert.Equal(t, 5, contest.MaxAttempts)
-		assert.Equal(t, 2, contest.PointDeduction)
+		assert.Equal(t, 0.2, contest.PointDeduction)
 		assert.Equal(t, "No rules!", contest.Info)
 		assert.Equal(t, time.Hour, contest.GracePeriod)
 		assert.Equal(t, 14*24*time.Hour, contest.NameRetentionTime)

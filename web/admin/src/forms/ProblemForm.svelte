@@ -10,20 +10,24 @@
     zone2Enabled: z.coerce.boolean().default(false),
     pointsZone1: z.coerce
       .number()
+      .int()
       .min(0)
       .max(2 ** 31 - 1)
       .optional(),
     pointsZone2: z.coerce
       .number()
+      .int()
       .min(0)
       .max(2 ** 31 - 1)
       .optional(),
     pointsTop: z.coerce
       .number()
+      .int()
       .min(0)
       .max(2 ** 31 - 1),
     flashBonus: z.coerce
       .number()
+      .int()
       .min(0)
       .max(2 ** 31 - 1)
       .optional(),

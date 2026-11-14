@@ -1,5 +1,6 @@
 import { ApiClient, OrganizerCredentialsProvider } from "@climblive/lib";
 import configData from "@climblive/lib/config.json";
+import { base64UrlEncode } from "@climblive/lib/utils";
 import { navigate } from "svelte-routing";
 import { SvelteDate } from "svelte/reactivity";
 import { exchangeCode, refreshSession } from "./utils/cognito";
@@ -159,10 +160,7 @@ export class Authenticator {
 
 const randomUrlSafeValue = () => {
   const bytes = crypto.getRandomValues(new Uint8Array(32));
-  return btoa(String.fromCharCode(...bytes))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
+  return base64UrlEncode(String.fromCharCode(...bytes));
 };
 
 const authorizationUrl = (
@@ -187,8 +185,5 @@ const challengeFromVerifier = async (verifier: string) => {
     new TextEncoder().encode(verifier),
   );
 
-  return btoa(String.fromCharCode(...new Uint8Array(hash)))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
+  return base64UrlEncode(String.fromCharCode(...new Uint8Array(hash)));
 };

@@ -3,8 +3,8 @@ import { svelte } from "@sveltejs/vite-plugin-svelte";
 import path from "path";
 import { defineConfig } from "vite";
 
-export default defineConfig({
-  base: "./",
+export default defineConfig(({ command }) => ({
+  base: command === "serve" ? "/admin/" : "./",
   build: {
     minify: true,
     sourcemap: true,
@@ -23,4 +23,4 @@ export default defineConfig({
       authToken: process.env.SENTRY_AUTH_TOKEN,
     }),
   ],
-});
+}));

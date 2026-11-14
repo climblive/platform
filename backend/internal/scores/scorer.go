@@ -9,15 +9,15 @@ type Scorer struct {
 	ProblemLimit int
 }
 
-func (r *Scorer) CalculatePoints(points iter.Seq[int]) int {
-	score := 0
+func (r *Scorer) CalculatePoints(points iter.Seq[float64]) float64 {
+	score := 0.0
 
 	if r.ProblemLimit == 0 {
 		for p := range points {
 			score += p
 		}
 
-		return score
+		return roundPoints(score)
 	}
 
 	n := 0
@@ -30,5 +30,5 @@ func (r *Scorer) CalculatePoints(points iter.Seq[int]) int {
 		n++
 	}
 
-	return score
+	return roundPoints(score)
 }

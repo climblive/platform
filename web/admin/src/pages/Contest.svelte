@@ -12,7 +12,6 @@
     getContestQuery,
     getSelfQuery,
   } from "@climblive/lib/queries";
-  import { getApiUrl } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
   import ArchiveContest from "./ArchiveContest.svelte";
   import CompClassList from "./CompClassList.svelte";
@@ -80,7 +79,7 @@
     const registrationCodes = contenders?.map((c) => c.registrationCode) ?? [];
 
     const config = {
-      apiUrl: new URL(getApiUrl(), window.location.origin).toString(),
+      apiUrl: new URL("/api", window.location.origin).toString(),
       registrationCodes,
       iterations: 10,
       maxSleep: 10_000,

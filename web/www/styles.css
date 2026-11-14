@@ -103,14 +103,6 @@ wa-carousel {
       margin-block-end: var(--wa-space-xs);
     }
   }
-
-  .note {
-    margin-top: var(--wa-space-l);
-
-    strong {
-      color: var(--wa-color-brand-fill-loud);
-    }
-  }
 }
 
 .description-section {
