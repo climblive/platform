@@ -1,21 +1,17 @@
 package scores
 
-import "math"
+import "github.com/climblive/platform/backend/internal/domain"
 
-func roundPoints(points float64) float64 {
-	return math.Floor(points*10) / 10
-}
-
-func CalculatePoints(value ProblemValue, tick Tick, rules Rules) float64 {
-	calculate := func(points float64, attempts int) float64 {
+func CalculatePoints(value ProblemValue, tick Tick, rules Rules) domain.Tenths {
+	calculate := func(points domain.Tenths, attempts int) domain.Tenths {
 		if rules.MaxAttempts > 0 && attempts > rules.MaxAttempts {
 			return 0
 		}
 
-		return max(0, roundPoints(points-float64(max(0, attempts-1))*rules.PointDeduction))
+		return max(0, points-domain.Tenths(max(0, attempts-1))*rules.PointDeduction)
 	}
 
-	points := [3]float64{}
+	points := [3]domain.Tenths{}
 
 	if tick.Zone1 {
 		points[0] = calculate(value.PointsZone1, tick.AttemptsZone1)

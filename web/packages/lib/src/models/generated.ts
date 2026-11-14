@@ -31,6 +31,7 @@ export type ScoreEngineInstanceID = string;
 //////////
 // source: public.go
 
+export type Tenths = number; /* int64 */
 export interface EventFilter {
   contestId?: ContestID;
   contenderId?: ContenderID;
@@ -93,7 +94,7 @@ export interface Contest {
   usePoints: boolean;
   pooledPoints: boolean;
   maxAttempts: number /* int */;
-  pointDeduction: number /* float64 */;
+  pointDeduction: Tenths;
   info?: string;
   gracePeriod: number;
   nameRetentionTime: number;
@@ -113,7 +114,7 @@ export interface ContestTemplate {
   usePoints: boolean;
   pooledPoints: boolean;
   maxAttempts: number /* int */;
-  pointDeduction: number /* float64 */;
+  pointDeduction: Tenths;
   info?: string;
   gracePeriod: number;
   nameRetentionTime: number;
@@ -161,11 +162,11 @@ export interface ProblemValue {
 export interface PointValue {
   contenderId: ContenderID;
   problemId: ProblemID;
-  current: number /* float64 */;
-  zone1: number /* float64 */;
-  zone2: number /* float64 */;
-  top: number /* float64 */;
-  flashBonus: number /* float64 */;
+  current: Tenths;
+  zone1: Tenths;
+  zone2: Tenths;
+  top: Tenths;
+  flashBonus: Tenths;
 }
 export interface Problem extends ProblemValue {
   id: ProblemID;
@@ -315,7 +316,7 @@ export interface RulesUpdatedEvent {
   usePoints: boolean;
   pooledPoints: boolean;
   maxAttempts: number /* int */;
-  pointDeduction: number /* float64 */;
+  pointDeduction: Tenths;
 }
 export interface ContenderPublicInfoUpdatedEvent {
   contenderId: ContenderID;
@@ -336,11 +337,11 @@ export interface ContenderScoreUpdatedEvent {
 export interface PointValueUpdatedEvent {
   contenderId: ContenderID;
   problemId: ProblemID;
-  current: number /* float64 */;
-  zone1: number /* float64 */;
-  zone2: number /* float64 */;
-  top: number /* float64 */;
-  flashBonus: number /* float64 */;
+  current: Tenths;
+  zone1: Tenths;
+  zone2: Tenths;
+  top: Tenths;
+  flashBonus: Tenths;
 }
 export interface ScoreEngineStartedEvent {
   instanceId: ScoreEngineInstanceID;

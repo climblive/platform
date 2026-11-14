@@ -4,6 +4,7 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
 	"github.com/stretchr/testify/assert"
 )
@@ -13,22 +14,22 @@ func TestScorerWithProblemLimit(t *testing.T) {
 		ProblemLimit: 5,
 	}
 
-	tickPointValues := []float64{
-		100,
-		50,
-		25,
-		200,
-		250,
+	tickPointValues := []domain.Tenths{
+		1000,
 		500,
-		200,
-		300,
-		50,
-		100,
+		250,
+		2000,
+		2500,
+		5000,
+		2000,
+		3000,
+		500,
+		1000,
 	}
 
 	score := rules.CalculatePoints(slices.Values(tickPointValues))
 
-	assert.Equal(t, 1450.0, score)
+	assert.Equal(t, domain.Tenths(14500), score)
 }
 
 func TestScorer_NoLimit(t *testing.T) {
@@ -36,25 +37,20 @@ func TestScorer_NoLimit(t *testing.T) {
 		ProblemLimit: 0,
 	}
 
-	tickPointValues := []float64{
-		100,
-		50,
-		25,
-		200,
-		250,
+	tickPointValues := []domain.Tenths{
+		1000,
 		500,
-		200,
-		300,
-		50,
-		100,
+		250,
+		2000,
+		2500,
+		5000,
+		2000,
+		3000,
+		500,
+		1000,
 	}
 
 	score := rules.CalculatePoints(slices.Values(tickPointValues))
 
-	assert.Equal(t, 1775.0, score)
-}
-
-func TestScorerRoundsFractionalTotal(t *testing.T) {
-	scorer := scores.Scorer{}
-	assert.Equal(t, 0.3, scorer.CalculatePoints(slices.Values([]float64{0.1, 0.2})))
+	assert.Equal(t, domain.Tenths(17750), score)
 }
