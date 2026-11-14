@@ -7,7 +7,7 @@ import (
 )
 
 type Score struct {
-	Points         int
+	Points         domain.Tenths
 	Tops           int
 	AttemptsTops   int
 	Zone1s         int
@@ -101,7 +101,7 @@ func (t Tick) TurnIntoZone2() Tick {
 	return t
 }
 
-func (t Tick) TurnIntoRedpoint() Tick {
+func (t Tick) TurnIntoTop() Tick {
 	if !t.Zone1 {
 		t.AttemptsZone1 += 1
 	}
@@ -111,12 +111,6 @@ func (t Tick) TurnIntoRedpoint() Tick {
 	}
 
 	if !t.Zone1 || !t.Zone2 || !t.Top {
-		t.AttemptsTop += 1
-	}
-
-	if t.AttemptsTop == 1 {
-		t.AttemptsZone1 += 1
-		t.AttemptsZone2 += 1
 		t.AttemptsTop += 1
 	}
 
@@ -143,10 +137,17 @@ func (t Tick) TurnIntoFlash() Tick {
 type Problem struct {
 	ID domain.ProblemID
 
-	domain.ProblemValue
+	ProblemValue
 
 	Zone1Enabled bool
 	Zone2Enabled bool
+}
+
+type ProblemValue struct {
+	PointsZone1 domain.Tenths
+	PointsZone2 domain.Tenths
+	PointsTop   domain.Tenths
+	FlashBonus  domain.Tenths
 }
 
 type TickPool struct {
@@ -196,8 +197,8 @@ func (c TickPool) Sub(tick Tick) TickPool {
 	return c
 }
 
-func (c TickPool) CalculatePooledProblemValue(value domain.ProblemValue) domain.ProblemValue {
-	weightedValue := func(value int, divisor int) int {
+func (c TickPool) CalculatePooledProblemValue(value ProblemValue) ProblemValue {
+	weightedValue := func(value domain.Tenths, divisor int) domain.Tenths {
 		if divisor == 0 {
 			return value
 		}
@@ -206,10 +207,10 @@ func (c TickPool) CalculatePooledProblemValue(value domain.ProblemValue) domain.
 			return 0
 		}
 
-		return max(1, value/divisor)
+		return max(1, value/domain.Tenths(divisor))
 	}
 
-	return domain.ProblemValue{
+	return ProblemValue{
 		PointsZone1: weightedValue(value.PointsZone1, c.Zone1),
 		PointsZone2: weightedValue(value.PointsZone2, c.Zone2),
 		PointsTop:   weightedValue(value.PointsTop, c.Top),

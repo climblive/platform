@@ -1,43 +1,50 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import { localizedPointsValue } from "@climblive/lib/utils";
   type Props = {
     onClick: () => void;
-    iconName?: string;
+    iconName: string;
     label: string;
     points?: number;
     bonusPoints?: number;
     disabled?: boolean;
+    reached?: boolean;
   };
 
   const {
     onClick,
     iconName,
     label,
-    points = 0,
+    points,
     bonusPoints,
     disabled,
+    reached = false,
   }: Props = $props();
 
   const pointsLabel = $derived.by(() => {
-    if (bonusPoints) {
-      return `${points}p + ${bonusPoints}p`;
+    if (points === undefined) {
+      return "-";
     }
 
-    return `${points}p`;
+    if (bonusPoints) {
+      return `${localizedPointsValue(points)} + ${localizedPointsValue(bonusPoints)}`;
+    }
+
+    return `${localizedPointsValue(points)}`;
   });
 </script>
 
 <div>
   <wa-button
     size="s"
-    appearance="outlined"
+    appearance={reached ? "filled-outlined" : "outlined"}
     onclick={onClick}
     {disabled}
     pill
-    variant="neutral"
+    variant={reached ? "success" : "neutral"}
   >
-    {#if iconName}
+    {#if reached}
       <wa-icon slot="start" name={iconName}></wa-icon>
     {/if}
     {label}

@@ -141,7 +141,14 @@ test("the three most recently used registration codes can be restored", async ({
 
   for (const code of ["ABCD0001", "ABCD0002", "ABCD0003", "ABCD0004"]) {
     await page.goto(`/${code}`);
-    await page.waitForURL(`/${code}`);
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const sessions = JSON.parse(localStorage.getItem("sessions") || "[]");
+          return sessions[0]?.registrationCode;
+        }),
+      )
+      .toBe(code);
 
     await page.clock.fastForward("00:00:01");
   }
@@ -278,7 +285,7 @@ test("tick and untick all problems", async ({ page }) => {
     await expect(problem.getByText(`+${p * 100}p`)).toBeVisible();
   }
 
-  await expect(page.getByText("1500p")).toBeVisible();
+  await expect(page.getByText("1,500p")).toBeVisible();
   await expect(page.getByText("1st").first()).toBeVisible();
 
   for (let p = 1; p <= 5; p++) {
@@ -358,16 +365,32 @@ test("update a problem through all scoring states", async ({ page }) => {
   await expect(problem.getByText("+10p")).toBeVisible();
 
   await problem.getByRole("button", { name: "Edit" }).click();
+  await expect(problem.getByRole("button", { name: "Zone 1" })).toBeDisabled();
+  await expect(problem.getByRole("button", { name: "Flash" })).toBeDisabled();
   await problem.getByRole("button", { name: "Zone 2" }).click();
 
   await expect(problem.getByText("+20p")).toBeVisible();
 
   await problem.getByRole("button", { name: "Edit" }).click();
+  await expect(problem.getByRole("button", { name: "Zone 1" })).toBeDisabled();
+  await expect(problem.getByRole("button", { name: "Zone 2" })).toBeDisabled();
+  await expect(problem.getByRole("button", { name: "Flash" })).toBeDisabled();
   await problem.getByRole("button", { name: "Top" }).click();
 
   await expect(problem.getByText("+100p")).toBeVisible();
 
   await problem.getByRole("button", { name: "Edit" }).click();
+  for (const name of ["Zone 1", "Zone 2", "Top", "Flash"]) {
+    await expect(problem.getByRole("button", { name })).toBeDisabled();
+  }
+  await problem.getByRole("button", { name: "Remove" }).click();
+
+  await expect(problem.getByText("+100p")).not.toBeVisible();
+
+  await problem.getByRole("button", { name: "Tick" }).click();
+  for (const name of ["Zone 1", "Zone 2", "Top", "Flash"]) {
+    await expect(problem.getByRole("button", { name })).toBeEnabled();
+  }
   await problem.getByRole("button", { name: "Flash" }).click();
 
   await expect(problem.getByText("+110p")).toBeVisible();
@@ -385,9 +408,11 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
 
   const problem = page.getByRole("region", { name: "Problem 1", exact: true });
   const dialog = problem.getByRole("dialog");
-  const top = problem.getByRole("checkbox", { name: /^Top/ });
-  const zone1 = problem.getByRole("checkbox", { name: /^Zone 1/ });
-  const zone2 = problem.getByRole("checkbox", { name: /^Zone 2/ });
+  const featureCheckbox = (name: string) =>
+    problem.getByRole("group", { name, exact: true }).locator("label");
+  const top = featureCheckbox("Top");
+  const zone1 = featureCheckbox("Zone 1");
+  const zone2 = featureCheckbox("Zone 2");
   const addAttempt = problem.getByRole("button", {
     name: "Add failed attempt",
   });
@@ -413,7 +438,7 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await expect(top).not.toBeChecked();
   await expect(zone1).not.toBeChecked();
   await expect(zone2).not.toBeChecked();
-  await top.check({ force: true });
+  await top.check();
 
   await expectAttempts(1);
   await expectFeature("Top", "1st attempt");
@@ -432,7 +457,7 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await expect(zone1).not.toBeChecked();
   await expect(zone2).not.toBeChecked();
 
-  await zone1.check({ force: true });
+  await zone1.check();
   await expectAttempts(1);
   await expectFeature("Zone 1", "1st attempt");
   await expect(problem.getByText("+1z₁", { exact: true })).toBeVisible();
@@ -441,7 +466,7 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await addAttempt.click();
   await expectAttempts(2);
 
-  await zone2.check({ force: true });
+  await zone2.check();
   await expectAttempts(3);
   await expectFeature("Zone 1", "1st attempt");
   await expectFeature("Zone 2", "3rd attempt");
@@ -455,7 +480,7 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
   await subtractAttempt.click();
   await expectAttempts(4);
 
-  await top.check({ force: true });
+  await top.check();
   await expectAttempts(5);
   await expectFeature("Zone 1", "1st attempt");
   await expectFeature("Zone 2", "3rd attempt");
@@ -591,7 +616,7 @@ test("scrub name", async ({ page }) => {
 
   await page.waitForURL("/ABCD0001");
 
-  await expect(page.getByText("anon824515495")).toBeVisible();
+  await expect(page.getByText("Unknown Crusher 824515495")).toBeVisible();
 });
 
 test.describe("failsafe mode", () => {

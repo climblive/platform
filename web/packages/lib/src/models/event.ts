@@ -68,4 +68,9 @@ export const rulesUpdatedEventSchema: z.ZodType<RulesUpdatedEvent> = z.object({
   finalists: z.number(),
   usePoints: z.boolean(),
   pooledPoints: z.boolean(),
+  maxAttempts: z.number().int().min(0).max(999),
+  pointDeduction: z
+    .number()
+    .min(0)
+    .max(2 ** 31 - 1),
 });

@@ -13,10 +13,12 @@ type Rules struct {
 	Finalists          int
 	UsePoints          bool
 	PooledPoints       bool
+	MaxAttempts        int
+	PointDeduction     domain.Tenths
 }
 
 type ScoringRules interface {
-	CalculateScore(points iter.Seq[int]) int
+	CalculateScore(points iter.Seq[domain.Tenths]) domain.Tenths
 }
 
 type Ranker interface {
@@ -154,6 +156,8 @@ func (e *DefaultScoreEngine) HandleRulesUpdated(event domain.RulesUpdatedEvent) 
 		Finalists:          event.Finalists,
 		UsePoints:          event.UsePoints,
 		PooledPoints:       event.PooledPoints,
+		MaxAttempts:        event.MaxAttempts,
+		PointDeduction:     event.PointDeduction,
 	}
 
 	e.store.SaveRules(rules)
@@ -376,8 +380,13 @@ func (e *DefaultScoreEngine) HandleAscentDeregistered(event domain.AscentDeregis
 
 func (e *DefaultScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) iter.Seq[Effect] {
 	problem := Problem{
-		ID:           event.ProblemID,
-		ProblemValue: event.ProblemValue,
+		ID: event.ProblemID,
+		ProblemValue: ProblemValue{
+			PointsZone1: domain.Tenths(event.PointsZone1) * 10,
+			PointsZone2: domain.Tenths(event.PointsZone2) * 10,
+			PointsTop:   domain.Tenths(event.PointsTop) * 10,
+			FlashBonus:  domain.Tenths(event.FlashBonus) * 10,
+		},
 		Zone1Enabled: event.Zone1Enabled,
 		Zone2Enabled: event.Zone2Enabled,
 	}
@@ -399,8 +408,13 @@ func (e *DefaultScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) 
 
 func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEvent) iter.Seq[Effect] {
 	problem := Problem{
-		ID:           event.ProblemID,
-		ProblemValue: event.ProblemValue,
+		ID: event.ProblemID,
+		ProblemValue: ProblemValue{
+			PointsZone1: domain.Tenths(event.PointsZone1) * 10,
+			PointsZone2: domain.Tenths(event.PointsZone2) * 10,
+			PointsTop:   domain.Tenths(event.PointsTop) * 10,
+			FlashBonus:  domain.Tenths(event.FlashBonus) * 10,
+		},
 		Zone1Enabled: event.Zone1Enabled,
 		Zone2Enabled: event.Zone2Enabled,
 	}
@@ -475,7 +489,7 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 
 		hypotheticalBestZone1 := tick.TurnIntoZone1()
 		hypotheticalBestZone2 := tick.TurnIntoZone2()
-		hypotheticalBestRedpoint := tick.TurnIntoRedpoint()
+		hypotheticalBestTop := tick.TurnIntoTop()
 		hypotheticalFlash := tick.TurnIntoFlash()
 
 		pointValue := domain.PointValue{
@@ -489,27 +503,21 @@ func (e *DefaultScoreEngine) CalculatePointValues(compClassID domain.CompClassID
 		}
 
 		if !contender.Disqualified {
-			pointValue.Current = CalculatePoints(problemValue, tick)
-		}
+			pointValue.Current = CalculatePoints(problemValue, tick, rules)
 
-		switch {
-		case contender.Disqualified:
-		case rules.PooledPoints:
-			{
-				hypotheticalProblemValue := tickPool.Sub(tick).Add(hypotheticalFlash).CalculatePooledProblemValue(problem.ProblemValue)
+			hypotheticalProblemValue := problemValue
+			if rules.PooledPoints {
+				hypotheticalProblemValue = tickPool.Sub(tick).Add(hypotheticalFlash).CalculatePooledProblemValue(problem.ProblemValue)
+			}
 
-				pointValue.Zone1 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone1)
-				pointValue.Zone2 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone2)
-				pointValue.Top = CalculatePoints(hypotheticalProblemValue, hypotheticalBestRedpoint)
+			if hypotheticalBestTop.AttemptsTop == 1 {
 				pointValue.FlashBonus = hypotheticalProblemValue.FlashBonus
 			}
-		default:
-			{
-				pointValue.Zone1 = CalculatePoints(problemValue, hypotheticalBestZone1)
-				pointValue.Zone2 = CalculatePoints(problemValue, hypotheticalBestZone2)
-				pointValue.Top = CalculatePoints(problemValue, hypotheticalBestRedpoint)
-				pointValue.FlashBonus = problemValue.FlashBonus
-			}
+			hypotheticalProblemValue.FlashBonus = 0
+
+			pointValue.Zone1 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone1, rules)
+			pointValue.Zone2 = CalculatePoints(hypotheticalProblemValue, hypotheticalBestZone2, rules)
+			pointValue.Top = CalculatePoints(hypotheticalProblemValue, hypotheticalBestTop, rules)
 		}
 
 		oldValue, hadPointValue := e.store.GetPointValue(contender.ID, problemID)
@@ -549,7 +557,7 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 		if rules.UsePoints {
 			ticks := e.store.GetTicksByContender(contender.ID)
 
-			var pointValues iter.Seq[int] = func(yield func(int) bool) {
+			var pointValues iter.Seq[domain.Tenths] = func(yield func(domain.Tenths) bool) {
 				for tick := range ticks {
 					value, found := e.store.GetPointValue(contender.ID, tick.ProblemID)
 					if !found {

@@ -9,6 +9,7 @@
   import {
     EmptyState,
     HoldColorIndicator,
+    ProblemDescription,
     Table,
     type ColumnDefinition,
   } from "@climblive/lib/components";
@@ -19,7 +20,7 @@
     getProblemsQuery,
     getTicksByContestQuery,
   } from "@climblive/lib/queries";
-  import { isDefined } from "@climblive/lib/utils";
+  import { isDefined, localizedPointsValue } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
   import CopyProblems from "./CopyProblems.svelte";
   import DeleteProblem from "./DeleteProblem.svelte";
@@ -114,7 +115,7 @@
         width: "max-content",
       });
       columns.push({
-        label: "Flash",
+        label: "Flash bonus",
         mobile: false,
         render: renderFlashBonus,
         width: "max-content",
@@ -132,19 +133,21 @@
   });
 </script>
 
-{#snippet renderNumberAndColor({
-  number,
-  holdColorPrimary,
-  holdColorSecondary,
-}: Problem)}
+{#snippet renderNumberAndColor(problem: Problem)}
   <div class="number">
     <HoldColorIndicator
       --height="1.25rem"
       --width="1.25rem"
-      primary={holdColorPrimary}
-      secondary={holdColorSecondary}
+      primary={problem.holdColorPrimary}
+      secondary={problem.holdColorSecondary}
     />
-    #{number}
+    #{problem.number}
+    {#if problem.description}
+      <ProblemDescription
+        description={problem.description}
+        number={problem.number}
+      />
+    {/if}
   </div>
 {/snippet}
 
@@ -157,16 +160,19 @@
   {#if mobile}
     {@const min = Math.min(...values)}
     {@const max = Math.max(...values)}
+    {@const uniquePoints = [
+      ...new Set([min, max + (flashBonus ?? 0)]),
+    ].toSorted((p1, p2) => p1 - p2)}
 
-    {[min, max + (flashBonus ?? 0)].join(" - ")} pts
+    {uniquePoints.map((p) => localizedPointsValue(p, 9_999)).join(" - ")}
   {:else}
-    {values.join(" / ")} pts
+    {values.map((p) => localizedPointsValue(p)).join(" / ")}
   {/if}
 {/snippet}
 
 {#snippet renderFlashBonus({ flashBonus }: ProblemWithAscents)}
   {#if flashBonus}
-    +{flashBonus} pts
+    +{localizedPointsValue(flashBonus)}
   {:else}
     -
   {/if}

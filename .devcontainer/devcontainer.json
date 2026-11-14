@@ -15,8 +15,8 @@
   "runArgs": ["--add-host=host.docker.internal:host-gateway"],
   "features": {
     "ghcr.io/devcontainers/features/go:1": {
-      "version": "1.27.1",
-      "golangciLintVersion": "2.13.2"
+      "version": "1.27.3",
+      "golangciLintVersion": "2.15.0"
     },
     "ghcr.io/devcontainers/features/docker-in-docker:": {},
     "ghcr.io/devcontainers/features/node:2": {
@@ -24,9 +24,12 @@
       "pnpmVersion": "11.1.1"
     }
   },
-  "forwardPorts": [8090],
+  "forwardPorts": [8080],
   "portsAttributes": {
-    "8090": {}
+    "8080": {
+      "label": "ClimbLive",
+      "onAutoForward": "notify"
+    }
   },
   "postCreateCommand": "./.devcontainer/scripts/post.sh"
 }

@@ -9,7 +9,7 @@
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/toast/toast.js";
-  import { ErrorBoundary } from "@climblive/lib/components";
+  import { ErrorBoundary, EventsProvider } from "@climblive/lib/components";
   import { HOUR, MINUTE } from "@climblive/lib/queries";
   import { extractCodeFromPath } from "@climblive/lib/utils";
   import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
@@ -104,12 +104,14 @@
     {#if authenticating}
       <Loading />
     {:else}
-      <Router>
-        <Route path="/:code/register"><Register /></Route>
-        <Route path="/:code/edit"><EditProfile /></Route>
-        <Route path="/:code"><Scorecard /></Route>
-        <Route path="/"><Start /></Route>
-      </Router>
+      <EventsProvider>
+        <Router>
+          <Route path="/:code/register"><Register /></Route>
+          <Route path="/:code/edit"><EditProfile /></Route>
+          <Route path="/:code"><Scorecard /></Route>
+          <Route path="/"><Start /></Route>
+        </Router>
+      </EventsProvider>
     {/if}
     {#if import.meta.env.DEV}
       <SvelteQueryDevtools />

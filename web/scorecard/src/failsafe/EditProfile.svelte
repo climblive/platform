@@ -102,7 +102,7 @@
         name="name"
         type="text"
         value={contender.scrubbedAt !== undefined
-          ? maskScrubbedName(contender.id)
+          ? `Unknown Crusher ${maskScrubbedName(contender.id)}`
           : contender.name}
         aria-label="Name"
         disabled={contender.scrubbedAt !== undefined}

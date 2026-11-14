@@ -10,20 +10,24 @@
     zone2Enabled: z.coerce.boolean().default(false),
     pointsZone1: z.coerce
       .number()
+      .int()
       .min(0)
       .max(2 ** 31 - 1)
       .optional(),
     pointsZone2: z.coerce
       .number()
+      .int()
       .min(0)
       .max(2 ** 31 - 1)
       .optional(),
     pointsTop: z.coerce
       .number()
+      .int()
       .min(0)
       .max(2 ** 31 - 1),
     flashBonus: z.coerce
       .number()
+      .int()
       .min(0)
       .max(2 ** 31 - 1)
       .optional(),
@@ -161,6 +165,15 @@
         placement="bottom"
       />
     </div>
+    <wa-input
+      size="s"
+      {@attach name("description")}
+      label="Description"
+      type="text"
+      value={data.description}
+      hint="An optional short description of the problem."
+      placeholder="Volumes are included"
+    ></wa-input>
     <wa-number-input
       class={{ hidden: hidePoints }}
       size="s"
@@ -172,7 +185,7 @@
       min={0}
       max={2 ** 31 - 1}
     >
-      <span slot="end">pts</span>
+      <span slot="end">p</span>
     </wa-number-input>
     <wa-number-input
       class={{ hidden: hidePoints }}
@@ -184,7 +197,7 @@
       min={0}
       max={2 ** 31 - 1}
     >
-      <span slot="end">pts</span>
+      <span slot="end">p</span>
     </wa-number-input>
 
     <wa-divider></wa-divider>
@@ -211,7 +224,7 @@
         hidden: !zone2Enabled || hidePoints,
       }}
     >
-      <span slot="end">pts</span>
+      <span slot="end">p</span>
     </wa-number-input>
 
     <wa-switch
@@ -234,7 +247,7 @@
         hidden: !zone1Enabled || hidePoints,
       }}
     >
-      <span slot="end">pts</span>
+      <span slot="end">p</span>
     </wa-number-input>
 
     {@render children?.()}
@@ -243,7 +256,6 @@
 
 <wa-dialog bind:this={dialog} label="Inconsistent zone points">
   Points for the second zone are lower than points for the first zone.
-  Competitors will lose points when reaching the second zone.
   <wa-button slot="footer" appearance="plain" onclick={handleCancelDialog}
     >Cancel</wa-button
   >

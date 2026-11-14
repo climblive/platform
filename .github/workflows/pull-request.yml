@@ -74,7 +74,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [build-backend]
     container:
-      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
       options: --ipc=host --add-host=host.docker.internal:host-gateway
     permissions:
       contents: read
@@ -136,7 +136,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v7
         with:
-          version: v2.13.2
+          version: v2.15.0
           working-directory: backend
 
   lint-sql:

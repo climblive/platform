@@ -18,6 +18,8 @@
   import RuleOptionCard from "./RuleOptionCard.svelte";
   import Finalists from "./rules/Finalists.svelte";
   import PooledPoints from "./rules/PooledPoints.svelte";
+  import MaxAttempts from "./rules/MaxAttempts.svelte";
+  import PointDeduction from "./rules/PointDeduction.svelte";
   import ProblemLimit from "./rules/ProblemLimit.svelte";
 
   interface Props {
@@ -36,6 +38,8 @@
     if (!usePoints) {
       patch.qualifyingProblems = 0;
       patch.pooledPoints = false;
+      patch.maxAttempts = 0;
+      patch.pointDeduction = 0;
     }
 
     patchContest.mutate(patch, {
@@ -82,27 +86,9 @@
 
   <ProblemLimit {contest} />
 
-  <RuleOptionCard
-    title="Max attempts"
-    description="Each competitor has a fixed number of attempts per problem. Attempts above that limit yield 0 points for that problem."
-    disabled
-    tag="Upcoming"
-  >
-    {#snippet header()}
-      <wa-checkbox size="s" disabled></wa-checkbox>
-    {/snippet}
-  </RuleOptionCard>
+  <MaxAttempts {contest} />
 
-  <RuleOptionCard
-    title="Point deduction"
-    description="Deduct points for each failed attempt."
-    disabled
-    tag="Upcoming"
-  >
-    {#snippet header()}
-      <wa-checkbox size="s" disabled></wa-checkbox>
-    {/snippet}
-  </RuleOptionCard>
+  <PointDeduction {contest} />
 </section>
 
 <style>

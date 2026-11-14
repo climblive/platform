@@ -31,6 +31,12 @@ export type ScoreEngineInstanceID = string;
 //////////
 // source: public.go
 
+export type Tenths = number; /* int64 */
+export interface EventFilter {
+  contestId?: ContestID;
+  contenderId?: ContenderID;
+  eventTypes?: { [key: string]: {} };
+}
 export type ColorRGB = string;
 export interface OwnershipData {
   organizerId: OrganizerID;
@@ -87,6 +93,8 @@ export interface Contest {
   finalists: number /* int */;
   usePoints: boolean;
   pooledPoints: boolean;
+  maxAttempts: number /* int */;
+  pointDeduction: Tenths;
   info?: string;
   gracePeriod: number;
   nameRetentionTime: number;
@@ -105,6 +113,8 @@ export interface ContestTemplate {
   finalists: number /* int */;
   usePoints: boolean;
   pooledPoints: boolean;
+  maxAttempts: number /* int */;
+  pointDeduction: Tenths;
   info?: string;
   gracePeriod: number;
   nameRetentionTime: number;
@@ -119,6 +129,8 @@ export interface ContestPatch {
   finalists?: number;
   usePoints?: boolean;
   pooledPoints?: boolean;
+  maxAttempts?: number;
+  pointDeduction?: number;
   info?: string;
   gracePeriod?: number;
 }
@@ -150,11 +162,11 @@ export interface ProblemValue {
 export interface PointValue {
   contenderId: ContenderID;
   problemId: ProblemID;
-  current: number /* int */;
-  zone1: number /* int */;
-  zone2: number /* int */;
-  top: number /* int */;
-  flashBonus: number /* int */;
+  current: Tenths;
+  zone1: Tenths;
+  zone2: Tenths;
+  top: Tenths;
+  flashBonus: Tenths;
 }
 export interface Problem extends ProblemValue {
   id: ProblemID;
@@ -303,6 +315,8 @@ export interface RulesUpdatedEvent {
   finalists: number /* int */;
   usePoints: boolean;
   pooledPoints: boolean;
+  maxAttempts: number /* int */;
+  pointDeduction: Tenths;
 }
 export interface ContenderPublicInfoUpdatedEvent {
   contenderId: ContenderID;
@@ -323,11 +337,11 @@ export interface ContenderScoreUpdatedEvent {
 export interface PointValueUpdatedEvent {
   contenderId: ContenderID;
   problemId: ProblemID;
-  current: number /* int */;
-  zone1: number /* int */;
-  zone2: number /* int */;
-  top: number /* int */;
-  flashBonus: number /* int */;
+  current: Tenths;
+  zone1: Tenths;
+  zone2: Tenths;
+  top: Tenths;
+  flashBonus: Tenths;
 }
 export interface ScoreEngineStartedEvent {
   instanceId: ScoreEngineInstanceID;

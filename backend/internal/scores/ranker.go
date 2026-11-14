@@ -86,7 +86,7 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 		var scoreValue string
 
 		if r.usePoints {
-			scoreValue = fmt.Sprintf("%dp", contender.Points)
+			scoreValue = contender.Points.String() + "p"
 		} else {
 			scoreValue = fmt.Sprintf("%dt", contender.Tops)
 			if r.zone2Enabled {

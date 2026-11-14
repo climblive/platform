@@ -31,7 +31,9 @@
 
 <span id={tooltipId}>
   {#if scrubbedAt}
-    {maskScrubbedName(id)}
+    <span class="scrubbed">
+      Unknown Crusher <span class="number">{maskScrubbedName(id)}</span>
+    </span>
   {:else}
     {name ?? ""}
   {/if}
@@ -50,5 +52,14 @@
 
   wa-button {
     margin-block-start: var(--wa-space-m);
+  }
+
+  .scrubbed {
+    font-style: italic;
+  }
+
+  .number {
+    font-style: normal;
+    opacity: 0.75;
   }
 </style>

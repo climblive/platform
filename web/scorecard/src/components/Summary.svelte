@@ -1,6 +1,6 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { Timer } from "@climblive/lib/components";
+  import { Score, Timer } from "@climblive/lib/components";
   import type { Problem, Tick } from "@climblive/lib/models";
   import { type ContestState } from "@climblive/lib/types";
   import { ordinalSuperscript } from "@climblive/lib/utils";
@@ -66,8 +66,10 @@
   </div>
 {/snippet}
 
-{#snippet pointsValue()}
-  <strong>{score}</strong>
+{#snippet scoreValue()}
+  <strong>
+    <Score value={score}></Score>
+  </strong>
 {/snippet}
 
 {#snippet placementValue()}
@@ -108,7 +110,7 @@
 
 <div class="summary">
   <div class="grid">
-    {@render entry("Score", pointsValue)}
+    {@render entry("Score", scoreValue)}
     {@render entry("Placement", placementValue)}
 
     {#if contestState === "NOT_STARTED"}

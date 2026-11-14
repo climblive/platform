@@ -1,32 +1,32 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
-  import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { duplicateContestMutation } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
+  import type { Snippet } from "svelte";
   import { navigate } from "svelte-routing";
 
   type Props = {
     contestId: number;
+    contestName: string;
+    open?: boolean;
+    onClose?: () => void;
+    children?: Snippet<[{ duplicateContest: () => void }]>;
   };
 
-  let dialog: WaDialog | undefined = $state();
+  let { contestId, contestName, children, onClose, ...rest }: Props = $props();
 
-  let { contestId }: Props = $props();
+  let open = $derived(rest.open);
 
   const duplicateContest = $derived(duplicateContestMutation(contestId));
 
-  const handleDuplication = async () => {
-    if (dialog) {
-      dialog.open = true;
-    }
+  const handleDuplication = () => {
+    open = true;
   };
 
   const handleCancel = () => {
-    if (dialog) {
-      dialog.open = false;
-    }
+    open = false;
   };
 
   const confirmDuplication = () => {
@@ -42,16 +42,23 @@
   };
 </script>
 
-<div class="actions">
-  <wa-button onclick={handleDuplication} appearance="outlined"
-    >Duplicate
-    <wa-icon name="copy" slot="start"></wa-icon>
-  </wa-button>
-</div>
+{#if children}
+  {@render children({ duplicateContest: handleDuplication })}
+{/if}
 
-<wa-dialog bind:this={dialog} label="Duplicate competition">
-  You are about to create a copy of the competition. Everything except tickets,
-  results and raffles will be copied.
+<wa-dialog
+  label="Duplicate competition"
+  {open}
+  onwa-after-hide={() => {
+    open = false;
+    onClose?.();
+  }}
+>
+  You are about to create a copy of the competition <strong
+    >{contestName}</strong
+  >.<br /><br />
+
+  Everything except tickets, results and raffles will be copied.
   <wa-button slot="footer" appearance="plain" onclick={handleCancel}>
     Cancel</wa-button
   >
@@ -65,3 +72,9 @@
     <wa-icon slot="start" name="copy"></wa-icon>
   </wa-button>
 </wa-dialog>
+
+<style>
+  wa-dialog {
+    white-space: normal;
+  }
+</style>

@@ -4,6 +4,14 @@ import (
 	"time"
 )
 
+type Tenths int64
+
+type EventFilter struct {
+	ContestID   ContestID           `json:"contestId,omitzero"`
+	ContenderID ContenderID         `json:"contenderId,omitzero"`
+	EventTypes  map[string]struct{} `json:"eventTypes,omitzero"`
+}
+
 type ColorRGB string
 
 type OwnershipData struct {
@@ -70,6 +78,8 @@ type Contest struct {
 	Finalists            int           `json:"finalists"`
 	UsePoints            bool          `json:"usePoints"`
 	PooledPoints         bool          `json:"pooledPoints"`
+	MaxAttempts          int           `json:"maxAttempts"`
+	PointDeduction       Tenths        `json:"pointDeduction"`
 	Info                 string        `json:"info,omitzero"`
 	GracePeriod          time.Duration `json:"gracePeriod"`
 	NameRetentionTime    time.Duration `json:"nameRetentionTime"`
@@ -89,6 +99,8 @@ type ContestTemplate struct {
 	Finalists          int           `json:"finalists"`
 	UsePoints          bool          `json:"usePoints"`
 	PooledPoints       bool          `json:"pooledPoints"`
+	MaxAttempts        int           `json:"maxAttempts"`
+	PointDeduction     Tenths        `json:"pointDeduction"`
 	Info               string        `json:"info,omitzero"`
 	GracePeriod        time.Duration `json:"gracePeriod"`
 	NameRetentionTime  time.Duration `json:"nameRetentionTime"`
@@ -104,6 +116,8 @@ type ContestPatch struct {
 	Finalists          Patch[int]           `json:"finalists,omitzero" tstype:"number"`
 	UsePoints          Patch[bool]          `json:"usePoints,omitzero" tstype:"boolean"`
 	PooledPoints       Patch[bool]          `json:"pooledPoints,omitzero" tstype:"boolean"`
+	MaxAttempts        Patch[int]           `json:"maxAttempts,omitzero" tstype:"number"`
+	PointDeduction     Patch[Tenths]        `json:"pointDeduction,omitzero" tstype:"number"`
 	Info               Patch[string]        `json:"info,omitzero" tstype:"string"`
 	GracePeriod        Patch[time.Duration] `json:"gracePeriod,omitzero" tstype:"number"`
 }
@@ -143,11 +157,11 @@ type ProblemValue struct {
 type PointValue struct {
 	ContenderID ContenderID `json:"contenderId"`
 	ProblemID   ProblemID   `json:"problemId"`
-	Current     int         `json:"current"`
-	Zone1       int         `json:"zone1"`
-	Zone2       int         `json:"zone2"`
-	Top         int         `json:"top"`
-	FlashBonus  int         `json:"flashBonus"`
+	Current     Tenths      `json:"current"`
+	Zone1       Tenths      `json:"zone1"`
+	Zone2       Tenths      `json:"zone2"`
+	Top         Tenths      `json:"top"`
+	FlashBonus  Tenths      `json:"flashBonus"`
 }
 
 type Problem struct {
@@ -332,6 +346,8 @@ type RulesUpdatedEvent struct {
 	Finalists          int       `json:"finalists"`
 	UsePoints          bool      `json:"usePoints"`
 	PooledPoints       bool      `json:"pooledPoints"`
+	MaxAttempts        int       `json:"maxAttempts"`
+	PointDeduction     Tenths    `json:"pointDeduction"`
 }
 
 type ContenderPublicInfoUpdatedEvent struct {
@@ -355,11 +371,11 @@ type ContenderScoreUpdatedEvent struct {
 type PointValueUpdatedEvent struct {
 	ContenderID ContenderID `json:"contenderId"`
 	ProblemID   ProblemID   `json:"problemId"`
-	Current     int         `json:"current"`
-	Zone1       int         `json:"zone1"`
-	Zone2       int         `json:"zone2"`
-	Top         int         `json:"top"`
-	FlashBonus  int         `json:"flashBonus"`
+	Current     Tenths      `json:"current"`
+	Zone1       Tenths      `json:"zone1"`
+	Zone2       Tenths      `json:"zone2"`
+	Top         Tenths      `json:"top"`
+	FlashBonus  Tenths      `json:"flashBonus"`
 }
 
 type ScoreEngineStartedEvent struct {

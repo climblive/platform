@@ -1,8 +1,11 @@
 <script lang="ts">
+  import {
+    type WaAfterHideEvent,
+    type WaHideEvent,
+  } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
-  import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/option/option.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
@@ -13,17 +16,30 @@
     transferContestMutation,
   } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
+  import type { Snippet } from "svelte";
   import { navigate } from "svelte-routing";
 
   type Props = {
     contestId: number;
+    contestName: string;
+    open?: boolean;
+    onClose?: () => void;
+    children?: Snippet<[{ transferContest: () => void; disabled: boolean }]>;
     organizerId: number;
   };
 
-  let dialog: WaDialog | undefined = $state();
   let selectedOrganizerId: number | undefined = $state();
 
-  const { contestId, organizerId }: Props = $props();
+  const {
+    contestId,
+    contestName,
+    organizerId,
+    children,
+    onClose,
+    ...rest
+  }: Props = $props();
+
+  let open = $derived(rest.open);
 
   const selfQuery = $derived(getSelfQuery());
   const transferContest = $derived(transferContestMutation(contestId));
@@ -33,27 +49,29 @@
     organizers.filter(({ id }) => id !== organizerId),
   );
 
-  const handleTransfer = async () => {
-    if (dialog) {
-      dialog.open = true;
-    }
+  const handleTransfer = () => {
+    open = true;
   };
 
   const handleCancel = () => {
-    if (dialog) {
-      dialog.open = false;
-    }
+    open = false;
   };
 
-  const confirmTransfer = () => {
+  const confirmTransfer = async () => {
     if (selectedOrganizerId === undefined) {
       return;
     }
 
-    transferContest.mutate(selectedOrganizerId, {
-      onSuccess: () => navigate(`./organizers/${selectedOrganizerId}/contests`),
-      onError: () => toastUnexpectedError("Failed to transfer competition."),
-    });
+    try {
+      const transferredContest =
+        await transferContest.mutateAsync(selectedOrganizerId);
+      handleCancel();
+      navigate(
+        `/admin/organizers/${transferredContest.ownership.organizerId}/contests`,
+      );
+    } catch {
+      toastUnexpectedError("Failed to transfer competition.");
+    }
   };
 
   const handleSelect = (event: Event) => {
@@ -62,21 +80,28 @@
   };
 </script>
 
-<wa-button
-  onclick={handleTransfer}
-  appearance="outlined"
-  disabled={otherOrganizers.length === 0}
->
-  Transfer
-  <wa-icon name="arrow-right" slot="start"></wa-icon>
-</wa-button>
+{#if children}
+  {@render children({
+    transferContest: handleTransfer,
+    disabled: otherOrganizers.length === 0,
+  })}
+{/if}
 
-<wa-dialog bind:this={dialog} label="Transfer competition">
+<wa-dialog
+  label="Transfer competition"
+  {open}
+  onwa-after-hide={() => {
+    open = false;
+    onClose?.();
+  }}
+>
   <wa-select
     label="Select new organizer"
     onchange={handleSelect}
     {@attach value(selectedOrganizerId)}
     hint="Select one of the other organizers you belong to."
+    onwa-hide={(event: WaHideEvent) => event.stopPropagation()}
+    onwa-after-hide={(event: WaAfterHideEvent) => event.stopPropagation()}
   >
     {#each otherOrganizers as organizer (organizer.id)}
       <wa-option value={organizer.id}>{organizer.name}</wa-option>
@@ -94,7 +119,9 @@
     {#if currentOrganizer && newOrganizer}
       <wa-callout variant="warning">
         <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
-        This will transfer all competition data from the current organizer
+        This will transfer all competition data of
+        <strong>{contestName}</strong>
+        from the current organizer
         <strong>
           {currentOrganizer.name}
         </strong>
@@ -122,6 +149,10 @@
 </wa-dialog>
 
 <style>
+  wa-dialog {
+    white-space: normal;
+  }
+
   wa-dialog::part(body) {
     display: flex;
     flex-direction: column;

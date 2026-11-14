@@ -20,7 +20,12 @@
   const handleSubmit = (
     form: Omit<
       ContestTemplate,
-      "qualifyingProblems" | "finalists" | "usePoints" | "pooledPoints"
+      | "qualifyingProblems"
+      | "finalists"
+      | "usePoints"
+      | "pooledPoints"
+      | "maxAttempts"
+      | "pointDeduction"
     >,
   ) => {
     if (createContest.isPending) {
@@ -35,6 +40,8 @@
         finalists: 0,
         usePoints: true,
         pooledPoints: false,
+        maxAttempts: 0,
+        pointDeduction: 0,
       },
       {
         onSuccess: (contest: Contest) => navigate(`contests/${contest.id}`),

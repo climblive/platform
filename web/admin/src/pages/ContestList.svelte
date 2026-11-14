@@ -1,7 +1,12 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import RelativeTime from "@/components/RelativeTime.svelte";
+  import { type WaSelectEvent } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/divider/divider.js";
+  import WaDropdownItem from "@awesome.me/webawesome/dist/components/dropdown-item/dropdown-item.js";
+  import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/tooltip/tooltip.js";
   import {
     EmptyState,
@@ -19,7 +24,13 @@
   import { onMount } from "svelte";
   import { Link, navigate } from "svelte-routing";
 
+  import ArchiveContest from "./ArchiveContest.svelte";
+  import DuplicateContest from "./DuplicateContest.svelte";
+  import RestoreContest from "./RestoreContest.svelte";
+  import TransferContest from "./TransferContest.svelte";
+
   const maxContestsPerWeek = 10;
+  const defaultTableLimit = 10;
   const createButtonId = $props.id();
 
   interface Props {
@@ -29,6 +40,10 @@
   let { organizerId }: Props = $props();
 
   let showArchived = $state(false);
+  let expandedListings = $state<string[]>([]);
+  let selectedAction = $state<
+    { type: "duplicate" | "transfer" | "archive"; contest: Contest } | undefined
+  >();
 
   const time = new SyncedTime(60_000);
 
@@ -130,10 +145,38 @@
       width: "max-content",
       align: "right",
     },
+    {
+      mobile: true,
+      render: renderControls,
+      align: "right",
+      width: "max-content",
+    },
   ];
 
   const handleToggleArchive = () => {
     showArchived = !showArchived;
+  };
+
+  const expandListing = (heading: string) => {
+    expandedListings = [...expandedListings, heading];
+  };
+
+  const handleContestAction = (event: WaSelectEvent, contest: Contest) => {
+    const action = (event.detail.item as WaDropdownItem).value;
+
+    switch (action) {
+      case "edit":
+        navigate(`/admin/contests/${contest.id}/edit`);
+        break;
+      case "results":
+        navigate(`/admin/contests/${contest.id}/results`);
+        break;
+      case "duplicate":
+      case "transfer":
+      case "archive":
+        selectedAction = { type: action, contest };
+        break;
+    }
   };
 
   const numberOfUnarchivedContests = $derived(
@@ -178,12 +221,12 @@
   {registeredContenders}
 {/snippet}
 
-{#snippet renderTimeBegin({ timeBegin, timeEnd }: Contest)}
+{#snippet renderTimeBegin({ timeBegin, timeEnd }: Contest, mobile: boolean)}
   {#if timeBegin}
     {#if timeEnd && new Date() > timeEnd}
       {format(timeBegin, "yyyy-MM-dd HH:mm")}
     {:else}
-      <RelativeTime time={timeBegin} />
+      <RelativeTime format={mobile ? "narrow" : "long"} time={timeBegin} />
     {/if}
   {:else}
     -
@@ -195,6 +238,67 @@
     {format(timeEnd, "yyyy-MM-dd HH:mm")}
   {:else}
     -
+  {/if}
+{/snippet}
+
+{#snippet renderControls(contest: Contest)}
+  {#if contest.archivedAt !== undefined}
+    <RestoreContest contestId={contest.id}>
+      {#snippet children({ restoreContest })}
+        <wa-dropdown
+          onwa-select={(event: WaSelectEvent) => {
+            if ((event.detail.item as WaDropdownItem).value === "restore") {
+              restoreContest();
+            }
+          }}
+        >
+          <wa-button slot="trigger" size="s" appearance="plain">
+            <wa-icon name="ellipsis-vertical" label="Actions"></wa-icon>
+          </wa-button>
+          <wa-dropdown-item value="restore">
+            <wa-icon slot="icon" name="rotate-left"></wa-icon>
+            Restore
+          </wa-dropdown-item>
+        </wa-dropdown>
+      {/snippet}
+    </RestoreContest>
+  {:else}
+    <wa-dropdown
+      onwa-select={(event: WaSelectEvent) =>
+        handleContestAction(event, contest)}
+    >
+      <wa-button slot="trigger" size="s" appearance="plain">
+        <wa-icon name="ellipsis-vertical" label="Actions"></wa-icon>
+      </wa-button>
+      <wa-dropdown-item value="edit">
+        <wa-icon slot="icon" name="pencil"></wa-icon>
+        Edit
+      </wa-dropdown-item>
+      <wa-dropdown-item value="results">
+        <wa-icon slot="icon" name="ranking-star"></wa-icon>
+        View results
+      </wa-dropdown-item>
+
+      <wa-divider></wa-divider>
+
+      <wa-dropdown-item value="duplicate">
+        <wa-icon slot="icon" name="copy"></wa-icon>
+        Duplicate
+      </wa-dropdown-item>
+      <wa-dropdown-item
+        value="transfer"
+        disabled={!self?.organizers.some(
+          ({ id }) => id !== contest.ownership.organizerId,
+        )}
+      >
+        <wa-icon slot="icon" name="arrow-right"></wa-icon>
+        Transfer
+      </wa-dropdown-item>
+      <wa-dropdown-item value="archive" variant="danger">
+        <wa-icon slot="icon" name="box-archive"></wa-icon>
+        Archive
+      </wa-dropdown-item>
+    </wa-dropdown>
   {/if}
 {/snippet}
 
@@ -244,7 +348,20 @@
       {averageRegistered === 1 ? "competitor" : "competitors"} per competition.
     </p>
   {/if}
-  <Table {columns} data={contests} getId={({ id }) => id}></Table>
+  <Table
+    {columns}
+    data={expandedListings.includes(heading)
+      ? contests
+      : contests.slice(0, defaultTableLimit)}
+    getId={({ id }) => id}
+  ></Table>
+  {#if !expandedListings.includes(heading) && contests.length > defaultTableLimit}
+    <wa-button
+      class="show-more"
+      appearance="plain"
+      onclick={() => expandListing(heading)}>Show all</wa-button
+    >
+  {/if}
 {/snippet}
 
 {#if contestsQuery.isLoading || allContestsQuery.isLoading || !ongoing || !upcoming || !past || !archived}
@@ -294,6 +411,31 @@
   {/if}
 {/if}
 
+{#if selectedAction?.type === "duplicate"}
+  <DuplicateContest
+    contestId={selectedAction.contest.id}
+    contestName={selectedAction.contest.name}
+    open
+    onClose={() => (selectedAction = undefined)}
+  />
+{:else if selectedAction?.type === "transfer"}
+  <TransferContest
+    contestId={selectedAction.contest.id}
+    contestName={selectedAction.contest.name}
+    organizerId={selectedAction.contest.ownership.organizerId}
+    open
+    onClose={() => (selectedAction = undefined)}
+  />
+{:else if selectedAction?.type === "archive"}
+  <ArchiveContest
+    contestId={selectedAction.contest.id}
+    contestName={selectedAction.contest.name}
+    organizerId={selectedAction.contest.ownership.organizerId}
+    open
+    onClose={() => (selectedAction = undefined)}
+  />
+{/if}
+
 <style>
   .create-contest-button {
     margin-block-end: var(--wa-space-m);
@@ -302,6 +444,11 @@
   .toggle-archived-button {
     display: block;
     margin-block-start: var(--wa-space-m);
+  }
+
+  wa-button.show-more {
+    display: block;
+    margin: var(--wa-space-m) auto 0;
   }
 
   .contest-summary {

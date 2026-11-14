@@ -12,7 +12,6 @@
     getContestQuery,
     getSelfQuery,
   } from "@climblive/lib/queries";
-  import { getApiUrl } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
   import ArchiveContest from "./ArchiveContest.svelte";
   import CompClassList from "./CompClassList.svelte";
@@ -38,6 +37,7 @@
   const selfQuery = $derived(getSelfQuery());
 
   const contest = $derived(contestQuery.data);
+  const organizerId = $derived(contest?.ownership.organizerId);
   const self = $derived(selfQuery.data);
 
   $effect(() => {
@@ -79,7 +79,7 @@
     const registrationCodes = contenders?.map((c) => c.registrationCode) ?? [];
 
     const config = {
-      apiUrl: new URL(getApiUrl(), window.location.origin).toString(),
+      apiUrl: new URL("/api", window.location.origin).toString(),
       registrationCodes,
       iterations: 10,
       maxSleep: 10_000,
@@ -101,7 +101,7 @@
 </script>
 
 <main>
-  {#if contest === undefined}
+  {#if contest === undefined || organizerId === undefined}
     <Loader />
   {:else}
     <wa-breadcrumb>
@@ -117,7 +117,7 @@
     {#if contest.archivedAt != null}
       <RestoreContest {contestId} />
     {:else}
-      <ContestDashboard contestId={contest.id} />
+      <ContestDashboard {contestId} />
 
       <div class="results">
         <wa-button
@@ -143,7 +143,7 @@
       <wa-divider></wa-divider>
       <ProblemList
         {contestId}
-        organizerId={contest.ownership.organizerId}
+        {organizerId}
         tableLimit={window.location.hash.substring(1) === "problems"
           ? undefined
           : 8}
@@ -161,15 +161,38 @@
       <wa-divider></wa-divider>
       <h3>Actions</h3>
       <div class="actions">
-        <DuplicateContest {contestId} />
-        <TransferContest
-          {contestId}
-          organizerId={contest.ownership.organizerId}
-        />
-        <ArchiveContest
-          {contestId}
-          organizerId={contest.ownership.organizerId}
-        />
+        <DuplicateContest {contestId} contestName={contest.name}>
+          {#snippet children({ duplicateContest })}
+            <wa-button onclick={duplicateContest} appearance="outlined">
+              Duplicate
+              <wa-icon name="copy" slot="start"></wa-icon>
+            </wa-button>
+          {/snippet}
+        </DuplicateContest>
+        <TransferContest {contestId} {organizerId} contestName={contest.name}>
+          {#snippet children({ transferContest, disabled })}
+            <wa-button
+              onclick={transferContest}
+              appearance="outlined"
+              {disabled}
+            >
+              Transfer
+              <wa-icon name="arrow-right" slot="start"></wa-icon>
+            </wa-button>
+          {/snippet}
+        </TransferContest>
+        <ArchiveContest {contestId} {organizerId} contestName={contest.name}>
+          {#snippet children({ archiveContest })}
+            <wa-button
+              onclick={archiveContest}
+              appearance="outlined"
+              variant="danger"
+            >
+              Archive
+              <wa-icon name="box-archive" slot="start"></wa-icon>
+            </wa-button>
+          {/snippet}
+        </ArchiveContest>
       </div>
       {#if location.hostname !== "climblive.app" || self?.admin}
         <h3>Developer tools</h3>

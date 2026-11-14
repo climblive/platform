@@ -39,14 +39,14 @@ export const startScoreEngineMutation = (contestId: number) => {
         instanceId: newEngineInstanceId,
       };
 
-      client.setQueryData<ScoreEngineDescriptor[]>(queryKey, (oldEngines) =>
-        oldEngines
-          ? [...oldEngines, newEngineDescriptor]
-          : [newEngineDescriptor],
-      );
-
       const predicate = ({ instanceId }: ScoreEngineDescriptor) =>
         instanceId === newEngineInstanceId;
+
+      client.setQueryData<ScoreEngineDescriptor[]>(queryKey, (oldEngines) =>
+        oldEngines?.some(predicate)
+          ? oldEngines
+          : [...(oldEngines ?? []), newEngineDescriptor],
+      );
 
       client.setQueryData<ScoreEngineDescriptor[]>(
         ["score-engines"],

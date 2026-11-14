@@ -6,11 +6,12 @@
   import {
     contenderPublicInfoUpdatedEventSchema,
     contenderScoreUpdatedEventSchema,
+    type EventFilter,
     type Score,
     type ScoreboardEntry,
   } from "../models";
   import { NO_SCORE } from "../models/score";
-  import { getApiUrl } from "../utils";
+  import { useEvents } from "./EventsProvider.svelte";
 
   interface Props {
     contestId: number;
@@ -28,16 +29,18 @@
 
   let { contestId, hideDisqualified = false, children }: Props = $props();
 
-  let eventSource: EventSource | undefined;
+  const { subscribeEvents, unsubscribeEvents } = useEvents();
+  let subscriptionId: symbol | undefined;
   let loading = $state(true);
   let online = $state(true);
+  let generation = 0;
 
   const contenders: Map<number, ScoreboardEntry> = new Map();
   const pendingUpdates: ((contenders: Map<number, ScoreboardEntry>) => void)[] =
     [];
   const scoreboard = writable<Map<number, ScoreboardEntry[]>>(new Map());
 
-  onMount(async () => {
+  onMount(() => {
     setup();
   });
 
@@ -61,46 +64,57 @@
   };
 
   const setup = () => {
-    eventSource = new EventSource(
-      `${getApiUrl()}/contests/${contestId}/events`,
-    );
+    if (subscriptionId !== undefined) {
+      return;
+    }
 
-    setupEventHandlers(eventSource);
+    const filters: EventFilter[] = [
+      {
+        contestId,
+        eventTypes: {
+          CONTENDER_PUBLIC_INFO_UPDATED: {},
+          "[]CONTENDER_SCORE_UPDATED": {},
+        },
+      },
+    ];
 
-    eventSource.onerror = () => {
-      online = false;
-      reset();
-
-      if (eventSource?.readyState === EventSource.CLOSED) {
-        setTimeout(() => {
-          setup();
-        }, 5000);
-
-        return;
-      }
-    };
-
-    eventSource.onopen = () => {
-      online = true;
-      initializeStore();
-    };
+    subscriptionId = subscribeEvents(filters, handleEvent, {
+      onError: () => {
+        online = false;
+        reset();
+      },
+      onOpen: () => {
+        online = true;
+        reset();
+        initializeStore();
+      },
+    });
   };
 
   const reset = () => {
+    generation++;
     loading = true;
     contenders.clear();
+    pendingUpdates.length = 0;
     $scoreboard = new Map();
   };
 
   const tearDown = () => {
-    eventSource?.close();
-    eventSource = undefined;
+    if (subscriptionId !== undefined) {
+      unsubscribeEvents(subscriptionId);
+      subscriptionId = undefined;
+    }
 
     reset();
   };
 
   const initializeStore = async () => {
+    const currentGeneration = generation;
     const entries = await ApiClient.getInstance().getScoreboard(contestId);
+
+    if (currentGeneration !== generation) {
+      return;
+    }
 
     for (const entry of entries) {
       contenders.set(entry.contenderId, entry);
@@ -182,8 +196,8 @@
     }
   };
 
-  const setupEventHandlers = (eventSource: EventSource) => {
-    eventSource.addEventListener("CONTENDER_PUBLIC_INFO_UPDATED", (e) => {
+  const handleEvent = (eventName: string, e: MessageEvent) => {
+    if (eventName === "CONTENDER_PUBLIC_INFO_UPDATED") {
       const event = contenderPublicInfoUpdatedEventSchema.parse(
         JSON.parse(e.data),
       );
@@ -202,9 +216,9 @@
 
         contenders.set(event.contenderId, { ...contender });
       });
-    });
+    }
 
-    eventSource.addEventListener("[]CONTENDER_SCORE_UPDATED", (e) => {
+    if (eventName === "[]CONTENDER_SCORE_UPDATED") {
       const events = z
         .array(contenderScoreUpdatedEventSchema)
         .parse(JSON.parse(e.data));
@@ -229,7 +243,7 @@
           contenders.set(event.contenderId, { ...contender });
         });
       }
-    });
+    }
   };
 
   const createEmptyEntry = (contenderId: number): ScoreboardEntry => ({

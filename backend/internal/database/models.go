@@ -47,6 +47,8 @@ type Contest struct {
 	Finalists          int32
 	UsePoints          bool
 	PooledPoints       bool
+	MaxAttempts        int32
+	PointDeduction     float64
 	Info               sql.NullString
 	GracePeriod        int32
 	NameRetentionTime  int32

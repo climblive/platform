@@ -1,6 +1,11 @@
 <script lang="ts">
-  import { HoldColorIndicator, Score } from "@climblive/lib/components";
+  import {
+    HoldColorIndicator,
+    ProblemDescription,
+    Score,
+  } from "@climblive/lib/components";
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
+  import { roundPoints } from "@climblive/lib/utils";
   import TickDialog from "./TickDialog.svelte";
 
   type ScorecardProblem = Problem & {
@@ -33,7 +38,7 @@
 
       const { zone1, zone2, top, flashBonus } = problem.pointValue;
 
-      const values = [zone1, zone2, top + flashBonus];
+      const values = [zone1, zone2, roundPoints(top + flashBonus)];
 
       return { min: Math.min(...values), max: Math.max(...values) };
     },
@@ -56,11 +61,21 @@
     {#if enablePoints && valueRange}
       <span class="top">
         {#if valueRange.min === valueRange.max}
-          {valueRange.max}p
+          <Score value={valueRange.max + "p"} compactThreshold={9_999_999}
+          ></Score>
         {:else}
-          ≤ {valueRange.max}p
+          <span class="lte">≤</span>
+          <Score value={valueRange.max + "p"} compactThreshold={9_999_999}
+          ></Score>
         {/if}
       </span>
+    {/if}
+
+    {#if problem.description}
+      <ProblemDescription
+        description={problem.description}
+        number={problem.number}
+      />
     {/if}
   </span>
   <div class="score" class:uncounted={!counted}>
@@ -68,6 +83,7 @@
       <Score
         value={problem.pointValue.current + "p"}
         prefix={counted ? "+" : undefined}
+        compactThreshold={9_999}
       />
     {:else if tick?.top}
       +1t
@@ -122,10 +138,22 @@
   .points {
     margin-right: auto;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-2xs);
+
+    & .top {
+      white-space: nowrap;
+    }
+
+    & .lte {
+      color: var(--wa-color-text-quiet);
+    }
   }
 
   .score {
     text-align: right;
+    font-weight: var(--wa-font-weight-semibold);
 
     &.uncounted {
       opacity: 0.3;
