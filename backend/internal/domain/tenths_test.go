@@ -85,6 +85,7 @@ func TestTenthsUnmarshalJSON(t *testing.T) {
 		expected domain.Tenths
 	}{
 		{name: "Zero", encoded: "0", expected: 0},
+		{name: "Null", encoded: "null", expected: 0},
 		{name: "NegativeZero", encoded: "-0.0", expected: 0},
 		{name: "ZeroWithLargeExponent", encoded: "0e999999999999999999999", expected: 0},
 		{name: "Integer", encoded: "25", expected: 250},
@@ -117,7 +118,7 @@ func TestTenthsUnmarshalJSONInvalid(t *testing.T) {
 	for _, encoded := range []string{
 		"0.15", "-0.15", "1e-2", "1e18", "-1e18", "1e309", "1e308",
 		"922337203685477580.8", "-922337203685477785.6", "1e999999999999999999999",
-		`"0.1"`, "null", "true", "{}", "[]", "NaN", "Infinity", "01", "1 2", "",
+		`"0.1"`, "true", "{}", "[]", "NaN", "Infinity", "01", "1 2", "",
 	} {
 		t.Run(encoded, func(t *testing.T) {
 			value := domain.Tenths(123)

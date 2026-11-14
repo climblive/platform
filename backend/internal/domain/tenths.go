@@ -37,15 +37,12 @@ func (t Tenths) MarshalJSON() ([]byte, error) {
 }
 
 func (t *Tenths) UnmarshalJSON(data []byte) error {
-	var points *float64
+	var points float64
 	if err := json.Unmarshal(data, &points); err != nil {
 		return errors.Wrap(err, 0)
 	}
-	if points == nil {
-		return errors.Errorf("%w: expected a JSON number", ErrInvalidData)
-	}
 
-	scaled := *points * 10
+	scaled := points * 10
 	rounded := math.Round(scaled)
 	if rounded < -0x1p63 || rounded >= 0x1p63 || math.Abs(scaled-rounded) >= 1e-6 {
 		return errors.Errorf("%w: value cannot be represented in tenths", ErrInvalidData)
