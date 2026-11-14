@@ -748,7 +748,7 @@ func (q *Queries) GetOrganizerInvitesByOrganizer(ctx context.Context, organizerI
 }
 
 const getProblem = `-- name: GetProblem :one
-SELECT problem.id, problem.organizer_id, problem.contest_id, problem.label, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
+SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.label, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
 FROM problem
 WHERE id = ?
 `
@@ -764,6 +764,7 @@ func (q *Queries) GetProblem(ctx context.Context, id int32) (GetProblemRow, erro
 		&i.Problem.ID,
 		&i.Problem.OrganizerID,
 		&i.Problem.ContestID,
+		&i.Problem.Number,
 		&i.Problem.Label,
 		&i.Problem.HoldColorPrimary,
 		&i.Problem.HoldColorSecondary,
@@ -779,7 +780,7 @@ func (q *Queries) GetProblem(ctx context.Context, id int32) (GetProblemRow, erro
 }
 
 const getProblemByLabel = `-- name: GetProblemByLabel :one
-SELECT problem.id, problem.organizer_id, problem.contest_id, problem.label, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
+SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.label, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
 FROM problem
 WHERE contest_id = ? AND label = ?
 `
@@ -800,6 +801,7 @@ func (q *Queries) GetProblemByLabel(ctx context.Context, arg GetProblemByLabelPa
 		&i.Problem.ID,
 		&i.Problem.OrganizerID,
 		&i.Problem.ContestID,
+		&i.Problem.Number,
 		&i.Problem.Label,
 		&i.Problem.HoldColorPrimary,
 		&i.Problem.HoldColorSecondary,
@@ -815,7 +817,7 @@ func (q *Queries) GetProblemByLabel(ctx context.Context, arg GetProblemByLabelPa
 }
 
 const getProblemsByContest = `-- name: GetProblemsByContest :many
-SELECT problem.id, problem.organizer_id, problem.contest_id, problem.label, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
+SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.label, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
 FROM problem
 WHERE contest_id = ?
 `
@@ -837,6 +839,7 @@ func (q *Queries) GetProblemsByContest(ctx context.Context, contestID int32) ([]
 			&i.Problem.ID,
 			&i.Problem.OrganizerID,
 			&i.Problem.ContestID,
+			&i.Problem.Number,
 			&i.Problem.Label,
 			&i.Problem.HoldColorPrimary,
 			&i.Problem.HoldColorSecondary,

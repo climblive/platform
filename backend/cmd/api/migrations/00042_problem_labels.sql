@@ -1,22 +1,30 @@
 -- +goose Up
-DROP INDEX `index3` ON `problem`;
+SET @problem_number_sequence_sql = (
+    SELECT CONCAT(
+        'CREATE SEQUENCE `problem_number_seq` START WITH ',
+        GREATEST(COALESCE(MAX(`number`), 0) + 1, 1),
+        ' MINVALUE 1 MAXVALUE 2147483647 NOCYCLE'
+    ) FROM `problem`
+);
+PREPARE problem_number_sequence_stmt FROM @problem_number_sequence_sql;
+EXECUTE problem_number_sequence_stmt;
+DEALLOCATE PREPARE problem_number_sequence_stmt;
 
 ALTER TABLE `problem`
-    CHANGE COLUMN `number` `label` VARCHAR(6) NOT NULL;
+    ADD COLUMN `label` VARCHAR(6) NULL AFTER `number`,
+    ALTER COLUMN `number` SET DEFAULT (NEXT VALUE FOR `problem_number_seq`);
 
-CREATE UNIQUE INDEX `index3` ON `problem` (`label` ASC, `contest_id` ASC);
+UPDATE `problem` SET `label` = CAST(`number` AS CHAR);
+
+ALTER TABLE `problem` MODIFY COLUMN `label` VARCHAR(6) NOT NULL;
+
+CREATE UNIQUE INDEX `label_contest_unique` ON `problem` (`label` ASC, `contest_id` ASC);
 
 -- +goose Down
-DROP INDEX `index3` ON `problem`;
-
-UPDATE `problem`
-JOIN (
-    SELECT `id`, ROW_NUMBER() OVER (PARTITION BY `contest_id` ORDER BY `label`, `id`) AS `number`
-    FROM `problem`
-) AS `numbered` ON `problem`.`id` = `numbered`.`id`
-SET `problem`.`label` = `numbered`.`number`;
+DROP INDEX `label_contest_unique` ON `problem`;
 
 ALTER TABLE `problem`
-    CHANGE COLUMN `label` `number` INT NOT NULL;
+    DROP COLUMN `label`,
+    ALTER COLUMN `number` DROP DEFAULT;
 
-CREATE UNIQUE INDEX `index3` ON `problem` (`number` ASC, `contest_id` ASC);
+DROP SEQUENCE `problem_number_seq`;

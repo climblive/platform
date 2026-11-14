@@ -8,17 +8,17 @@ INSERT INTO contender VALUES (NULL, 1, 1, 'ABCD0002', NULL, NULL, NULL, FALSE, F
 INSERT INTO contender VALUES (NULL, 1, 1, 'ABCD0003', 'Michael Scott', 1, '2024-01-01 00:00:00', FALSE, FALSE, NULL, NULL);
 INSERT INTO contender VALUES (NULL, 1, 1, 'ABCD0004', NULL, NULL, NULL, FALSE, FALSE, NULL, NULL);
 INSERT INTO contender VALUES (NULL, 1, 1, 'ABCD0005', NULL, NULL, NULL, FALSE, FALSE, NULL, NULL);
-INSERT INTO problem VALUES (NULL, 1, 1, '1', '#ef4444', '#eab308', TRUE, TRUE, 'Very slippery', 10, 20, 100, 10);
-INSERT INTO problem VALUES (NULL, 1, 1, '2', '#f97316', NULL, TRUE, TRUE, NULL, 20, 40, 200, 10);
-INSERT INTO problem VALUES (NULL, 1, 1, '3', '#84cc16', NULL, TRUE, TRUE, NULL, 30, 60, 300, 10);
-INSERT INTO problem VALUES (NULL, 1, 1, '4', '#0ea5e9', NULL, TRUE, TRUE, NULL, 40, 80, 400, 10);
-INSERT INTO problem VALUES (NULL, 1, 1, '5', '#8b5cf6', NULL, TRUE, TRUE, NULL, 50, 100, 500, NULL);
+INSERT INTO problem (id, organizer_id, contest_id, label, hold_color_primary, hold_color_secondary, zone_1_enabled, zone_2_enabled, description, points_zone_1, points_zone_2, points_top, flash_bonus) VALUES (NULL, 1, 1, '1', '#ef4444', '#eab308', TRUE, TRUE, 'Very slippery', 10, 20, 100, 10);
+INSERT INTO problem (id, organizer_id, contest_id, label, hold_color_primary, hold_color_secondary, zone_1_enabled, zone_2_enabled, description, points_zone_1, points_zone_2, points_top, flash_bonus) VALUES (NULL, 1, 1, '2', '#f97316', NULL, TRUE, TRUE, NULL, 20, 40, 200, 10);
+INSERT INTO problem (id, organizer_id, contest_id, label, hold_color_primary, hold_color_secondary, zone_1_enabled, zone_2_enabled, description, points_zone_1, points_zone_2, points_top, flash_bonus) VALUES (NULL, 1, 1, '3', '#84cc16', NULL, TRUE, TRUE, NULL, 30, 60, 300, 10);
+INSERT INTO problem (id, organizer_id, contest_id, label, hold_color_primary, hold_color_secondary, zone_1_enabled, zone_2_enabled, description, points_zone_1, points_zone_2, points_top, flash_bonus) VALUES (NULL, 1, 1, '4', '#0ea5e9', NULL, TRUE, TRUE, NULL, 40, 80, 400, 10);
+INSERT INTO problem (id, organizer_id, contest_id, label, hold_color_primary, hold_color_secondary, zone_1_enabled, zone_2_enabled, description, points_zone_1, points_zone_2, points_top, flash_bonus) VALUES (NULL, 1, 1, '5', '#8b5cf6', NULL, TRUE, TRUE, NULL, 50, 100, 500, NULL);
 INSERT INTO tick VALUES (NULL, 1, 1, 1, 1, '2024-01-01 00:00:00', 1, TRUE, 999, TRUE, 999, TRUE, 999);
 
 INSERT INTO contest VALUES (NULL, 1, NULL, 1, 'World Attempts Championships', 'A competition scored by tops, zones and attempts', 'On the web', 'AQ', 0, 0, FALSE, FALSE, 0, 0, NULL, 5, 20160, NOW());
 INSERT INTO comp_class VALUES (NULL, 1, 2, 'Open', NULL, '#ff0000', '2024-01-01 00:00:00', '2026-12-31 23:59:59');
 INSERT INTO contender VALUES (NULL, 1, 2, 'ABCD0006', 'Jim Halpert', 3, '2024-01-01 00:00:00', FALSE, FALSE, NULL, NULL);
-INSERT INTO problem VALUES (NULL, 1, 2, 1, '#ef4444', NULL, TRUE, TRUE, NULL, 0, 0, 0, NULL);
+INSERT INTO problem (id, organizer_id, contest_id, label, hold_color_primary, hold_color_secondary, zone_1_enabled, zone_2_enabled, description, points_zone_1, points_zone_2, points_top, flash_bonus) VALUES (NULL, 1, 2, '1', '#ef4444', NULL, TRUE, TRUE, NULL, 0, 0, 0, NULL);
 
 CREATE TABLE `goose_db_version` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -28,4 +28,4 @@ CREATE TABLE `goose_db_version` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO goose_db_version SELECT NULL, seq, 1, NOW() FROM seq_1_to_41;
+INSERT INTO goose_db_version SELECT NULL, seq, 1, NOW() FROM seq_1_to_42;
