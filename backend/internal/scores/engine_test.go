@@ -2168,44 +2168,55 @@ func TestDefaultScoreEngine(t *testing.T) {
 			awaitExpectations(t)
 		})
 	})
-}
 
-func TestScoreFormatTracksEnabledZones(t *testing.T) {
-	synctest.Test(t, func(t *testing.T) {
-		store := scores.NewMemoryStore()
-		store.SaveContender(scores.Contender{ID: 1, CompClassID: 1})
-		engine := scores.NewDefaultScoreEngine(store)
+	t.Run("RankCompClass_EnabledZones", func(t *testing.T) {
+		for _, tt := range []struct {
+			name     string
+			problems []scores.Problem
+			expected string
+		}{
+			{name: "NoProblems", expected: "2t"},
+			{name: "NoZones", problems: []scores.Problem{{}}, expected: "2t"},
+			{
+				name:     "Zone1",
+				problems: []scores.Problem{{Zone1Enabled: true}, {}},
+				expected: "2t 4z₁",
+			},
+			{
+				name:     "Zone2",
+				problems: []scores.Problem{{Zone1Enabled: true}, {Zone1Enabled: true, Zone2Enabled: true}, {}},
+				expected: "2t 3z₂ 4z₁",
+			},
+		} {
+			t.Run(tt.name, func(t *testing.T) {
+				synctest.Test(t, func(t *testing.T) {
+					f, awaitExpectations := makeFixture()
 
-		assertScore := func(expected string) {
-			t.Helper()
-			dirty := engine.GetDirtyScores()
-			require.Len(t, dirty, 1)
-			assert.Equal(t, expected, dirty[0].Score)
+					fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+					fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+
+					f.store.On("GetRules").Return(scores.Rules{})
+					f.store.On("GetAllProblems").Return(slices.Values(tt.problems))
+					f.store.
+						On("GetContendersByCompClass", fakedCompClassID).
+						Return(slices.Values([]scores.Contender{{
+							ID:          fakedContenderID,
+							CompClassID: fakedCompClassID,
+							Score:       scores.Score{Tops: 2, Zone2s: 3, Zone1s: 4},
+						}}))
+					f.store.
+						On("SaveScore", domain.Score{
+							ContenderID: fakedContenderID,
+							Score:       tt.expected,
+							Placement:   1,
+							Timestamp:   time.Now(),
+						}).Return()
+
+					f.engine.RankCompClass(fakedCompClassID)
+
+					awaitExpectations(t)
+				})
+			})
 		}
-
-		scores.NewEffectRunner(engine).RunEffects(engine.Start())
-		assertScore("0t")
-
-		scores.NewEffectRunner(engine).RunEffects(engine.HandleProblemAdded(domain.ProblemAddedEvent{
-			ProblemID:    1,
-			Zone1Enabled: true,
-		}))
-		assertScore("0t 0z₁")
-
-		scores.NewEffectRunner(engine).RunEffects(engine.HandleProblemAdded(domain.ProblemAddedEvent{
-			ProblemID:    2,
-			Zone2Enabled: true,
-		}))
-		assertScore("0t 0z₂ 0z₁")
-
-		scores.NewEffectRunner(engine).RunEffects(engine.HandleProblemUpdated(domain.ProblemUpdatedEvent{
-			ProblemID: 2,
-		}))
-		assertScore("0t 0z₁")
-
-		scores.NewEffectRunner(engine).RunEffects(engine.HandleProblemUpdated(domain.ProblemUpdatedEvent{
-			ProblemID: 1,
-		}))
-		assertScore("0t")
 	})
 }

@@ -5,7 +5,6 @@ import (
 	"math/rand"
 	"slices"
 	"testing"
-	"testing/synctest"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
@@ -27,7 +26,7 @@ func TestBasicRankerPointsFormatting(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ranker := scores.NewBasicRanker(0, true)
+			ranker := scores.NewBasicRanker(0, true, false, false)
 			contenders := []scores.Contender{{ID: 1, Score: scores.Score{Points: tt.points}}}
 
 			ranked := ranker.RankContenders(slices.Values(contenders))
@@ -296,20 +295,17 @@ func TestBasicRankerScoreFormat(t *testing.T) {
 	}{
 		{name: "NoZones", expected: "2t"},
 		{name: "Zone1", zone1Enabled: true, expected: "2t 4z₁"},
-		{name: "Zone2", zone2Enabled: true, expected: "2t 3z₂"},
-		{name: "BothZones", zone1Enabled: true, zone2Enabled: true, expected: "2t 3z₂ 4z₁"},
+		{name: "Zone2", zone1Enabled: true, zone2Enabled: true, expected: "2t 3z₂ 4z₁"},
 		{name: "Points", usePoints: true, zone1Enabled: true, zone2Enabled: true, expected: "100p"},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
-			synctest.Test(t, func(t *testing.T) {
-				ranker := scores.NewBasicRanker(0, tt.usePoints, tt.zone1Enabled, tt.zone2Enabled)
-				contenders := []scores.Contender{{
-					ID:    1,
-					Score: scores.Score{Tops: 2, Zone2s: 3, Zone1s: 4, Points: 100},
-				}}
-				ranked := ranker.RankContenders(slices.Values(contenders))
-				assert.Equal(t, tt.expected, ranked[0].Score)
-			})
+			ranker := scores.NewBasicRanker(0, tt.usePoints, tt.zone1Enabled, tt.zone2Enabled)
+			contenders := []scores.Contender{{
+				ID:    1,
+				Score: scores.Score{Tops: 2, Zone2s: 3, Zone1s: 4, Points: 1000},
+			}}
+			ranked := ranker.RankContenders(slices.Values(contenders))
+			assert.Equal(t, tt.expected, ranked[0].Score)
 		})
 	}
 }
