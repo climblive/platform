@@ -652,6 +652,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
+			scores.EffectRankClass{CompClassID: fakedCompClass1ID},
+			scores.EffectRankClass{CompClassID: fakedCompClass2ID},
+			scores.EffectRankClass{CompClassID: fakedCompClass3ID},
 			scores.EffectCalculatePointValues{CompClassID: fakedCompClass1ID, ProblemID: fakedProblemID},
 			scores.EffectCalculatePointValues{CompClassID: fakedCompClass2ID, ProblemID: fakedProblemID},
 			scores.EffectCalculatePointValues{CompClassID: fakedCompClass3ID, ProblemID: fakedProblemID},
@@ -728,6 +731,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
+			scores.EffectRankClass{CompClassID: fakedCompClass1ID},
+			scores.EffectRankClass{CompClassID: fakedCompClass2ID},
+			scores.EffectRankClass{CompClassID: fakedCompClass3ID},
 			scores.EffectCalculatePointValues{CompClassID: fakedCompClass1ID, ProblemID: fakedProblemID},
 			scores.EffectCalculatePointValues{CompClassID: fakedCompClass2ID, ProblemID: fakedProblemID},
 			scores.EffectCalculatePointValues{CompClassID: fakedCompClass3ID, ProblemID: fakedProblemID},
@@ -2161,5 +2167,55 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 			awaitExpectations(t)
 		})
+	})
+
+	t.Run("RankCompClass_EnabledZones", func(t *testing.T) {
+		for _, tt := range []struct {
+			name     string
+			problems []scores.Problem
+			expected string
+		}{
+			{name: "NoZones", problems: []scores.Problem{{}}, expected: "2t"},
+			{
+				name:     "Zone1",
+				problems: []scores.Problem{{Zone1Enabled: true}, {}},
+				expected: "2t 4z₁",
+			},
+			{
+				name:     "Zone2",
+				problems: []scores.Problem{{Zone1Enabled: true}, {Zone1Enabled: true, Zone2Enabled: true}, {}},
+				expected: "2t 3z₂ 4z₁",
+			},
+		} {
+			t.Run(tt.name, func(t *testing.T) {
+				synctest.Test(t, func(t *testing.T) {
+					f, awaitExpectations := makeFixture()
+
+					fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+					fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+
+					f.store.On("GetRules").Return(scores.Rules{})
+					f.store.On("GetAllProblems").Return(slices.Values(tt.problems))
+					f.store.
+						On("GetContendersByCompClass", fakedCompClassID).
+						Return(slices.Values([]scores.Contender{{
+							ID:          fakedContenderID,
+							CompClassID: fakedCompClassID,
+							Score:       scores.Score{Tops: 2, Zone2s: 3, Zone1s: 4},
+						}}))
+					f.store.
+						On("SaveScore", domain.Score{
+							ContenderID: fakedContenderID,
+							Score:       tt.expected,
+							Placement:   1,
+							Timestamp:   time.Now(),
+						}).Return()
+
+					f.engine.RankCompClass(fakedCompClassID)
+
+					awaitExpectations(t)
+				})
+			})
+		}
 	})
 }
