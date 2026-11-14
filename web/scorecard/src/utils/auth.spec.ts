@@ -12,12 +12,16 @@ describe(readStoredSessions.name, () => {
     vi.unstubAllGlobals();
   });
 
-  it("restores a saved session", () => {
+  it.each([
+    { competitionId: 42 },
+    { contestId: 42 },
+    { competitionId: 42, contestId: 99 },
+  ])("restores a saved session with %j", (competition) => {
     const getItem = vi.fn().mockReturnValue(
       JSON.stringify([
         {
           contenderId: 7,
-          competitionId: 42,
+          ...competition,
           registrationCode: "ABCD0001",
           expiryTime: "2026-11-15T00:00:00Z",
         },
@@ -36,23 +40,7 @@ describe(readStoredSessions.name, () => {
     expect(getItem).toHaveBeenCalledWith("sessions");
   });
 
-  it("does not restore expired sessions", () => {
-    vi.stubGlobal("localStorage", {
-      getItem: () =>
-        JSON.stringify([
-          {
-            contenderId: 7,
-            competitionId: 42,
-            registrationCode: "ABCD0001",
-            expiryTime: "2026-11-14T11:00:00Z",
-          },
-        ]),
-    });
-
-    expect(readStoredSessions()).toEqual([]);
-  });
-
-  it("does not restore legacy sessions", () => {
+  it("does not restore expired legacy sessions", () => {
     vi.stubGlobal("localStorage", {
       getItem: () =>
         JSON.stringify([
@@ -60,7 +48,7 @@ describe(readStoredSessions.name, () => {
             contenderId: 7,
             contestId: 42,
             registrationCode: "ABCD0001",
-            expiryTime: "2026-11-15T00:00:00Z",
+            expiryTime: "2026-11-14T11:00:00Z",
           },
         ]),
     });

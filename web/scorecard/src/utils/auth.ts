@@ -67,7 +67,22 @@ export const readStoredSessions = (): ScorecardSession[] => {
   if (data) {
     try {
       const obj = JSON.parse(data);
-      const storedSessions = z.array(scorecardSessionSchema).parse(obj);
+      const storedSessions = z
+        .array(
+          z.preprocess((value) => {
+            if (
+              typeof value === "object" &&
+              value !== null &&
+              !("competitionId" in value) &&
+              "contestId" in value
+            ) {
+              return { ...value, competitionId: value.contestId };
+            }
+
+            return value;
+          }, scorecardSessionSchema),
+        )
+        .parse(obj);
 
       const now = new Date();
       for (const storedSession of storedSessions) {
