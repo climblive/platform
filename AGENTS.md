@@ -1,174 +1,9 @@
 # AGENTS.md
 
-This document provides AI coding agents and developers with essential information about the ClimbLive platform codebase.
+## Git Worktrees
 
-## Project Overview
-
-ClimbLive is a bouldering competition scoring system consisting of:
-
-- **Backend**: Go-based REST API server with real-time event streaming
-- **Frontend**: Multiple Svelte 5 applications served through a monorepo structure
-  - `admin`: Competition administration interface
-  - `scoreboard`: Live scoreboard display for competitions
-  - `scorecard`: Scorecard interface for competitors
-  - `www`: Public website
-
-The platform manages bouldering climbing competitions, calculates scores in real-time, and provides live updates to multiple clients, including the scoreboard and scorecard. Scores are based on the information entered by the competitors themselves using the scorecard app during competitions.
-
-## Architecture
-
-### Backend (`/backend`)
-
-**Language**: Go 1.27.3  
-**Database**: MySQL  
-**Key Features**: Event-driven architecture, real-time score calculation, JWT authentication
-
-**Structure**:
-
-```
-backend/
-├── cmd/api/              # API server entry point
-├── cmd/simulator/        # Testing/simulation tools
-├── internal/
-│   ├── authorizer/       # JWT authentication & authorization
-│   ├── database/         # SQLC-generated database layer
-│   ├── domain/           # Core domain models and interfaces
-│   ├── events/           # Event broker for real-time updates
-│   ├── handlers/rest/    # HTTP handlers
-│   ├── repository/       # Repository implementations
-│   ├── scores/           # Score engine implementation
-│   ├── usecases/         # Business logic layer
-│   └── utils/            # Shared utilities
-└── database/             # SQL schema and queries
-```
-
-**Key Patterns**:
-
-- **Clean Architecture**: Innermost layers are made up of the domain followed by the use cases layer
-- **Repository Pattern**: Data access abstracted through repository interfaces
-- **Event Broker**: Pub/sub system for real-time scoring events, etc. (`events.EventBroker`)
-- **Score Engine**: Separate engine that manages score calculations
-- **Use Cases**: Business logic written almost completely using the Go standard library
-- **SQLC**: Type-safe SQL queries generated from `queries.sql`
-
-**Core Domain Entities**:
-
-- `Contest`: A climbing competition
-- `CompClass`: Competition class/category (e.g., Males, Females)
-- `Contender`: A contender participating in a contest
-- `Problem`: A boulder problem set for the competition
-- `Tick`: An attempt at a problem by a contender
-- `Score`: Calculated score for a contender
-
-### Frontend (`/web`)
-
-**Framework**: Svelte 5  
-**Build Tool**: Vite  
-**Package Manager**: pnpm  
-**Node Version**: ≥20
-
-**Structure**:
-
-```
-web/
-├── admin/              # Admin application
-├── scoreboard/         # Live scoreboard
-├── scorecard/          # Contender scorecard
-├── www/                # Public website (marketing)
-├── packages/lib/       # Shared library (@climblive/lib)
-└── e2e/                # End-to-end tests (Playwright)
-```
-
-**Shared Library** (`packages/lib`):
-
-- Shared UI components
-- API client (`Api.ts`)
-- TypeScript models (generated from Go backend via tygo)
-- TanStack Query queries
-- Model validators built in zod
-- Form utilities
-- Theme and styling
-
-**Key Technologies**:
-
-- **Remote State Management**: TanStack Query
-- **Routing**: svelte-routing
-- **UI Components**: @awesome.me/webawesome
-- **Validation**: Zod
-- **Error Tracking**: Sentry
-
-## Development Setup
-
-### Prerequisites
-
-- Go 1.27.3+
-- Node.js 20+
-- pnpm
-- MySQL database
-- Docker (for containerized development)
-
-### Backend Setup
-
-```bash
-cd backend
-
-# Install dependencies
-go mod download
-
-# Set environment variables
-export DB_USERNAME=your_db_user
-export DB_PASSWORD=your_db_password
-export DB_HOST=localhost
-export DB_PORT=3306
-export DB_DATABASE=climblive
-
-# Run migrations (automatic on startup)
-# Run the API server
-go run cmd/api/main.go
-```
-
-The API server runs on `http://0.0.0.0:8090` by default.
-
-**Database Tools**:
-
-- Migrations are embedded in the binary (`cmd/api/migrations/*.sql`) and run automatically using Goose
-- SQLC generates type-safe Go code from SQL queries in `database/queries.sql`
-- Run `sqlc generate` to regenerate database code after modifying queries
-
-### Frontend Setup
-
-```bash
-cd web
-
-# Install dependencies
-pnpm -r i
-
-# Run specific app in development mode
-cd admin && pnpm dev
-# or
-cd scoreboard && pnpm dev
-# or
-cd scorecard && pnpm dev
-# or
-cd www && pnpm dev
-
-# Build for production
-pnpm build
-```
-
-Development servers run with `--host` flag for network access.
-
-### End-to-End Testing
-
-```bash
-cd web/e2e
-
-# Install Playwright
-pnpm exec playwright install --with-deps
-
-# Run tests
-make test
-```
+- Always create worktrees inside the main repository at `.local/worktrees/<name>`, never in `/tmp` or outside the repository.
+- Use relative Git worktree links (`--relative-paths`) so worktrees remain accessible from both the host and the devcontainer.
 
 ## Coding Conventions
 
@@ -186,17 +21,12 @@ make test
 
 - **Svelte 5**: Use runes API (`$state`, `$derived`)
 - **Effects**: Always avoid `$effect` unless absolutely necessary; prefer lifecycle hooks such as `onMount` for setup and cleanup
-- **TypeScript**: Strict mode enabled
 - **API Calls**: Use TanStack Query through queries in the shared library
 - **Conditionals**: Always use braces for one-line conditionals; do not use shorthand `if (...) return ...` style
 - **Styling**: Component-scoped styles in plain CSS (prefer nesting)
-- **Tokens**: Use Web Awesome design tokens for all styling (`@awesome.me/webawesome/dist/styles/themes/default.css`)
+- **Web Awesome**: Use the `webawesome` skill for Web Awesome components and styling
 - **Theme**: Shared theme in `packages/lib/src/theme.css`
-- **Formatting**: Prettier with project-specific config
-- **Linting**: ESLint with Svelte plugin
 - **Zod**: Always import as `import { z } from "@climblive/lib/utils"`
-
-**Shared Code**: Common utilities, types, and components belong in `packages/lib` for reuse across apps.
 
 ## Testing Guidelines
 
@@ -213,12 +43,6 @@ make test
 - E2E tests using Playwright in `web/e2e`
 - Run `make test` for full E2E suite
 
-## Deployment
-
-- Everything packaged as a single Debian package (see `packageroot/DEBIAN/`)
-- Backend lifecycle managed as systemd service
-- Static frontend builds served via Nginx (see `packageroot/etc/nginx/sites-available`)
-
 ## Common Tasks
 
 ### Modifying database schema
@@ -234,11 +58,6 @@ make test
 
 1. Update domain models in `backend/internal/domain/public.go`
 2. Run `tygo generate` to generate updated TypeScript types
-
-## Authentication
-
-- **Organizers**: Admin users authenticate using JWT tokens issued by Cognito
-- **Contenders**: Scorecard users authenticate using their unique alphanumeric registration code
 
 ## When making changes
 
