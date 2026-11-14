@@ -408,7 +408,6 @@ test("tick and remove a problem with zones and attempts", async ({ page }) => {
 
   const problem = page.getByRole("region", { name: "Problem 1", exact: true });
   const dialog = problem.getByRole("dialog");
-  // Web Awesome's internal input has pointer-events: none.
   const featureCheckbox = (name: string) =>
     problem.getByRole("group", { name, exact: true }).locator("label");
   const top = featureCheckbox("Top");
