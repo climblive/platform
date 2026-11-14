@@ -14,11 +14,11 @@ type Rules struct {
 	UsePoints          bool
 	PooledPoints       bool
 	MaxAttempts        int
-	PointDeduction     float64
+	PointDeduction     domain.Tenths
 }
 
 type ScoringRules interface {
-	CalculateScore(points iter.Seq[float64]) float64
+	CalculateScore(points iter.Seq[domain.Tenths]) domain.Tenths
 }
 
 type Ranker interface {
@@ -382,10 +382,10 @@ func (e *DefaultScoreEngine) HandleProblemAdded(event domain.ProblemAddedEvent) 
 	problem := Problem{
 		ID: event.ProblemID,
 		ProblemValue: ProblemValue{
-			PointsZone1: float64(event.PointsZone1),
-			PointsZone2: float64(event.PointsZone2),
-			PointsTop:   float64(event.PointsTop),
-			FlashBonus:  float64(event.FlashBonus),
+			PointsZone1: domain.Tenths(event.PointsZone1) * 10,
+			PointsZone2: domain.Tenths(event.PointsZone2) * 10,
+			PointsTop:   domain.Tenths(event.PointsTop) * 10,
+			FlashBonus:  domain.Tenths(event.FlashBonus) * 10,
 		},
 		Zone1Enabled: event.Zone1Enabled,
 		Zone2Enabled: event.Zone2Enabled,
@@ -406,10 +406,10 @@ func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEve
 	problem := Problem{
 		ID: event.ProblemID,
 		ProblemValue: ProblemValue{
-			PointsZone1: float64(event.PointsZone1),
-			PointsZone2: float64(event.PointsZone2),
-			PointsTop:   float64(event.PointsTop),
-			FlashBonus:  float64(event.FlashBonus),
+			PointsZone1: domain.Tenths(event.PointsZone1) * 10,
+			PointsZone2: domain.Tenths(event.PointsZone2) * 10,
+			PointsTop:   domain.Tenths(event.PointsTop) * 10,
+			FlashBonus:  domain.Tenths(event.FlashBonus) * 10,
 		},
 		Zone1Enabled: event.Zone1Enabled,
 		Zone2Enabled: event.Zone2Enabled,
@@ -549,7 +549,7 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 		if rules.UsePoints {
 			ticks := e.store.GetTicksByContender(contender.ID)
 
-			var pointValues iter.Seq[float64] = func(yield func(float64) bool) {
+			var pointValues iter.Seq[domain.Tenths] = func(yield func(domain.Tenths) bool) {
 				for tick := range ticks {
 					value, found := e.store.GetPointValue(contender.ID, tick.ProblemID)
 					if !found {

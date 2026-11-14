@@ -33,7 +33,7 @@ func TestHydrate(t *testing.T) {
 			UsePoints:          true,
 			PooledPoints:       true,
 			MaxAttempts:        10,
-			PointDeduction:     2,
+			PointDeduction:     3,
 		}, nil)
 
 	mockedRepo.
@@ -93,7 +93,7 @@ func TestHydrate(t *testing.T) {
 		UsePoints:          true,
 		PooledPoints:       true,
 		MaxAttempts:        10,
-		PointDeduction:     2,
+		PointDeduction:     3,
 	}).Return()
 
 	mockedStore.On("SaveProblem", scores.Problem{
@@ -101,10 +101,10 @@ func TestHydrate(t *testing.T) {
 		Zone1Enabled: true,
 		Zone2Enabled: true,
 		ProblemValue: scores.ProblemValue{
-			PointsTop:   100,
-			PointsZone1: 50,
-			PointsZone2: 75,
-			FlashBonus:  10,
+			PointsTop:   1000,
+			PointsZone1: 500,
+			PointsZone2: 750,
+			FlashBonus:  100,
 		},
 	}).Return()
 
