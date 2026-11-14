@@ -51,6 +51,24 @@ export const deleteTickMutation = () => {
   }));
 };
 
+const updateTick = (oldTicks: Tick[] | undefined, updatedTick: Tick) => {
+  const predicate = ({ id }: Tick) => id === updatedTick.id;
+
+  const existingTick = (oldTicks ?? []).find(predicate);
+
+  if (existingTick && existingTick.revision > updatedTick.revision) {
+    return oldTicks;
+  }
+
+  if (existingTick) {
+    return (oldTicks ?? []).map((oldTick) =>
+      predicate(oldTick) ? updatedTick : oldTick,
+    );
+  } else {
+    return [...(oldTicks ?? []), updatedTick];
+  }
+};
+
 export const updateTickInQueryCache = (
   queryClient: QueryClient,
   contenderId: number,
@@ -58,23 +76,21 @@ export const updateTickInQueryCache = (
 ) => {
   const queryKey: QueryKey = ["ticks", { contenderId }];
 
-  queryClient.setQueryData<Tick[]>(queryKey, (oldTicks) => {
-    const predicate = ({ id }: Tick) => id === updatedTick.id;
+  queryClient.setQueryData<Tick[]>(queryKey, (oldTicks) =>
+    updateTick(oldTicks, updatedTick),
+  );
+};
 
-    const existingTick = (oldTicks ?? []).find(predicate);
+export const updateTickInContestQueryCache = (
+  queryClient: QueryClient,
+  contestId: number,
+  updatedTick: Tick,
+) => {
+  const queryKey: QueryKey = ["ticks", { contestId }];
 
-    if (existingTick && existingTick.revision > updatedTick.revision) {
-      return oldTicks;
-    }
-
-    if (existingTick) {
-      return (oldTicks ?? []).map((oldTick) =>
-        predicate(oldTick) ? updatedTick : oldTick,
-      );
-    } else {
-      return [...(oldTicks ?? []), updatedTick];
-    }
-  });
+  queryClient.setQueryData<Tick[]>(queryKey, (oldTicks) =>
+    updateTick(oldTicks, updatedTick),
+  );
 };
 
 export const removeTickFromQueryCache = (

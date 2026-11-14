@@ -2,7 +2,7 @@
   import { createContext, type Snippet } from "svelte";
   import { SvelteMap } from "svelte/reactivity";
   import type { EventFilter } from "../models";
-  import { base64UrlEncode, getApiUrl } from "../utils";
+  import { base64UrlEncode } from "../utils";
 
   const [get, set] = createContext<EventsClient>();
 
@@ -42,7 +42,7 @@
 
         const connect = () => {
           eventSource = new EventSource(
-            `${getApiUrl()}/events?f=${base64UrlEncode(JSON.stringify(this.#filters))}`,
+            `/api/events?f=${base64UrlEncode(JSON.stringify(this.#filters))}`,
           );
 
           eventSource.onopen = () => {
