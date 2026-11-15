@@ -37,6 +37,11 @@ export interface EventFilter {
   competitorId?: CompetitorID;
   eventTypes?: { [key: string]: {} };
 }
+export interface GlobalStats {
+  competitions: number /* int64 */;
+  competitors: number /* int64 */;
+  ticks: number /* int64 */;
+}
 export type ColorRGB = string;
 export interface OwnershipData {
   organizerId: OrganizerID;

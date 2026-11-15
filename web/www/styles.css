@@ -13,11 +13,10 @@ body {
 
 section {
   padding-block: var(--wa-space-4xl);
+  background-color: var(--wa-color-surface-default);
 }
 
-.hero-section,
-.rules-section,
-.description-section {
+section:nth-child(odd of section:not([hidden])) {
   background-color: var(--wa-color-surface-lowered);
 }
 
@@ -58,6 +57,30 @@ section {
 
     h1 {
       font-size: var(--wa-font-size-2xl);
+    }
+  }
+}
+
+.stats-section {
+  .intro {
+    max-width: 680px;
+    margin: 0 auto var(--wa-space-2xl);
+  }
+
+  .statement {
+    margin: 0;
+  }
+
+  .metric {
+    font-size: var(--wa-font-size-l);
+
+    strong {
+      color: var(--wa-color-brand-fill-loud);
+      font-size: var(--wa-font-size-4xl);
+      font-weight: var(--wa-font-weight-bold);
+      font-variant-numeric: tabular-nums;
+      line-height: var(--wa-line-height-condensed);
+      overflow-wrap: anywhere;
     }
   }
 }

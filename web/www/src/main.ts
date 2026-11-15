@@ -8,16 +8,43 @@ import {
   updateTheme,
   watchColorSchemeChanges,
 } from "@climblive/lib/utils";
+import type { GlobalStats } from "@climblive/lib/models";
+import { getApiBaseUrl } from "./api";
 import "../styles.css";
 
-document.getElementById("current-year")!.textContent = new Date()
-  .getFullYear()
-  .toString();
+const currentYear = document.getElementById("current-year");
+if (currentYear) {
+  currentYear.textContent = new Date().getFullYear().toString();
+}
 
 watchColorSchemeChanges((prefersDarkColorScheme) =>
   updateTheme(prefersDarkColorScheme),
 );
 updateTheme(prefersDarkColorScheme());
+
+const loadGlobalStats = async () => {
+  const section = document.getElementById("global-stats");
+  const ticks = document.getElementById("stats-ticks");
+  const competitors = document.getElementById("stats-competitors");
+  const competitions = document.getElementById("stats-competitions");
+  if (!section || !ticks || !competitors || !competitions) {
+    return;
+  }
+
+  const response = await fetch(`${getApiBaseUrl()}/stats/global`);
+  if (!response.ok) {
+    return;
+  }
+
+  const stats: GlobalStats = await response.json();
+  const formatter = new Intl.NumberFormat(document.documentElement.lang);
+  ticks.textContent = formatter.format(stats.ticks);
+  competitors.textContent = formatter.format(stats.competitors);
+  competitions.textContent = formatter.format(stats.competitions);
+  section.hidden = false;
+};
+
+void loadGlobalStats().catch(() => undefined);
 
 const compactCarouselLayout = window.matchMedia("(max-width: 768px)");
 

@@ -12,6 +12,12 @@ type EventFilter struct {
 	EventTypes    map[string]struct{} `json:"eventTypes,omitzero"`
 }
 
+type GlobalStats struct {
+	Competitions int64 `json:"competitions"`
+	Competitors  int64 `json:"competitors"`
+	Ticks        int64 `json:"ticks"`
+}
+
 type ColorRGB string
 
 type OwnershipData struct {

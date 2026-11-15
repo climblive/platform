@@ -670,6 +670,31 @@ func (q *Queries) GetCompetitorsByCompetition(ctx context.Context, competitionID
 	return items, nil
 }
 
+const getGlobalStats = `-- name: GetGlobalStats :one
+SELECT
+    COUNT(DISTINCT competition.id) AS competitions,
+    COUNT(DISTINCT CASE WHEN competitor.entered IS NOT NULL THEN competitor.id END) AS competitors,
+    COUNT(tick.id) AS ticks
+FROM contest AS competition
+LEFT JOIN contender AS competitor
+    ON competitor.contest_id = competition.id AND competitor.disqualified = FALSE
+LEFT JOIN tick ON tick.contender_id = competitor.id AND tick.contest_id = competition.id
+WHERE competition.archived_at IS NULL
+`
+
+type GetGlobalStatsRow struct {
+	Competitions int64
+	Competitors  int64
+	Ticks        int64
+}
+
+func (q *Queries) GetGlobalStats(ctx context.Context) (GetGlobalStatsRow, error) {
+	row := q.db.QueryRowContext(ctx, getGlobalStats)
+	var i GetGlobalStatsRow
+	err := row.Scan(&i.Competitions, &i.Competitors, &i.Ticks)
+	return i, err
+}
+
 const getOrganizer = `-- name: GetOrganizer :one
 SELECT id, name
 FROM organizer
