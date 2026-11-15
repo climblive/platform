@@ -6,21 +6,21 @@
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import { SaveIndicator } from "@climblive/lib/components";
   import { GenericForm, name } from "@climblive/lib/forms";
-  import type { Contest, ContestPatch } from "@climblive/lib/models";
-  import { patchContestMutation } from "@climblive/lib/queries";
+  import type { Competition, CompetitionPatch } from "@climblive/lib/models";
+  import { patchCompetitionMutation } from "@climblive/lib/queries";
   import { debounce, z } from "@climblive/lib/utils";
   import RuleOptionCard from "../RuleOptionCard.svelte";
   import { doSubmit } from "../RulesEditor.svelte";
 
   interface Props {
-    contest: Contest;
+    competition: Competition;
   }
 
-  const { contest }: Props = $props();
+  const { competition }: Props = $props();
 
-  const patchContest = patchContestMutation(contest.id);
+  const patchCompetition = patchCompetitionMutation(competition.id);
 
-  let enabled = $derived(contest.qualifyingProblems > 0);
+  let enabled = $derived(competition.qualifyingProblems > 0);
 
   const formSchema = z.object({
     qualifyingProblems: z.coerce.number().min(0).max(65536).optional(),
@@ -31,8 +31,8 @@
     1000,
   );
 
-  const handleSubmit = (value: Partial<ContestPatch>) =>
-    doSubmit(patchContest, {
+  const handleSubmit = (value: Partial<CompetitionPatch>) =>
+    doSubmit(patchCompetition, {
       qualifyingProblems: value.qualifyingProblems ?? 0,
     });
 </script>
@@ -41,13 +41,13 @@
   {#snippet children(form)}
     <RuleOptionCard
       title="Problem limit"
-      disabled={!contest.usePoints}
+      disabled={!competition.usePoints}
       description="Only count the hardest problems towards each competitor's total score."
     >
       {#snippet header()}
         <wa-checkbox
           size="s"
-          disabled={!contest.usePoints}
+          disabled={!competition.usePoints}
           onchange={(event: InputEvent) => {
             const checkbox = event.target as WaCheckbox;
             enabled = checkbox.checked;
@@ -58,14 +58,14 @@
         ></wa-checkbox>
       {/snippet}
       {#snippet indicator()}
-        {#if patchContest.isSuccess}
+        {#if patchCompetition.isSuccess}
           <SaveIndicator />
         {/if}
       {/snippet}
       {#snippet footer()}
         <div class="controls">
           {#if enabled}
-            {#if contest.pooledPoints}
+            {#if competition.pooledPoints}
               <wa-callout variant="warning" size="small">
                 <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
                 This setting in combination with pooled points may lead to unintuitive
@@ -75,13 +75,13 @@
 
             <wa-number-input
               size="s"
-              disabled={!contest.usePoints}
+              disabled={!competition.usePoints}
               {@attach name("qualifyingProblems")}
               label="Limit"
               required
               min={0}
               max={65536}
-              defaultValue={contest.qualifyingProblems || 10}
+              defaultValue={competition.qualifyingProblems || 10}
               oninput={() => debouncedSubmit(form)}
             ></wa-number-input>
           {/if}

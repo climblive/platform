@@ -10,24 +10,27 @@
     SplashScreen,
   } from "@climblive/lib/components";
   import { value } from "@climblive/lib/forms";
-  import { getCompClassesQuery, getContestQuery } from "@climblive/lib/queries";
+  import {
+    getCompClassesQuery,
+    getCompetitionQuery,
+  } from "@climblive/lib/queries";
   import { onMount } from "svelte";
   import Header from "../components/Header.svelte";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
   }
 
-  let { contestId }: Props = $props();
+  let { competitionId }: Props = $props();
 
   let compClassSelector: WaSelect | undefined = $state();
   let selectedCompClassId: number | undefined = $state();
   let overflow: "pagination" | "scroll" = $state("scroll");
 
-  const contestQuery = $derived(getContestQuery(contestId));
-  const compClassesQuery = $derived(getCompClassesQuery(contestId));
+  const competitionQuery = $derived(getCompetitionQuery(competitionId));
+  const compClassesQuery = $derived(getCompClassesQuery(competitionId));
 
-  let contest = $derived(contestQuery.data);
+  let competition = $derived(competitionQuery.data);
   let compClasses = $derived(compClassesQuery.data);
 
   $effect(() => {
@@ -53,10 +56,10 @@
   }}
 />
 
-{#if showSplash || !contest || !compClasses}
+{#if showSplash || !competition || !compClasses}
   <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
-  <ScoreboardProvider {contestId} hideDisqualified>
+  <ScoreboardProvider {competitionId} hideDisqualified>
     {#snippet children({ scoreboard, loading, online })}
       <header data-online={online}>
         <wa-icon name="triangle-exclamation"></wa-icon>Offline
@@ -64,7 +67,7 @@
       <main>
         <div class="banner">
           <h1>
-            {contest.name}
+            {competition.name}
           </h1>
           <div class="logo">
             <FullLogo />
@@ -100,7 +103,7 @@
                 : "false"}
             >
               <Header
-                {contestId}
+                {competitionId}
                 compClassId={compClass.id}
                 name={compClass.name}
                 startTime={compClass.timeBegin}

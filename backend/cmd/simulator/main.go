@@ -223,7 +223,7 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 	r.contender = r.GetContender()
 
 	r.sleep()
-	compClasses := r.GetCompClasses(r.contender.ContestID)
+	compClasses := r.GetCompClasses(r.contender.CompetitionID)
 
 	patch := domain.ContenderPatch{}
 
@@ -244,7 +244,7 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 	r.PatchContender(r.contender.ID, patch)
 
 	r.sleep()
-	problems := r.GetProblems(r.contender.ContestID)
+	problems := r.GetProblems(r.contender.CompetitionID)
 
 	r.sleep()
 	ticks := r.GetTicks(r.contender.ID)
@@ -335,8 +335,8 @@ func (r *ContenderRunner) PatchContender(contenderID domain.ContenderID, patch d
 	return contender
 }
 
-func (r *ContenderRunner) GetCompClasses(contestID domain.ContestID) []domain.CompClass {
-	resp, err := http.Get(fmt.Sprintf("%s/contests/%d/comp-classes", r.apiURL, contestID))
+func (r *ContenderRunner) GetCompClasses(competitionID domain.CompetitionID) []domain.CompClass {
+	resp, err := http.Get(fmt.Sprintf("%s/competitions/%d/comp-classes", r.apiURL, competitionID))
 	if err != nil {
 		panic(err)
 	}
@@ -357,8 +357,8 @@ func (r *ContenderRunner) GetCompClasses(contestID domain.ContestID) []domain.Co
 	return compClasses
 }
 
-func (r *ContenderRunner) GetProblems(contestID domain.ContestID) []domain.Problem {
-	resp, err := http.Get(fmt.Sprintf("%s/contests/%d/problems", r.apiURL, contestID))
+func (r *ContenderRunner) GetProblems(competitionID domain.CompetitionID) []domain.Problem {
+	resp, err := http.Get(fmt.Sprintf("%s/competitions/%d/problems", r.apiURL, competitionID))
 	if err != nil {
 		panic(err)
 	}
@@ -467,7 +467,7 @@ func (r *ContenderRunner) PutTick(contenderID domain.ContenderID, tick domain.Ti
 func (r *ContenderRunner) ReadEvents(contenderID domain.ContenderID) {
 	filters := []domain.EventFilter{
 		domain.NewEventFilter(
-			r.contender.ContestID,
+			r.contender.CompetitionID,
 			contenderID,
 			"CONTENDER_PUBLIC_INFO_UPDATED",
 			"CONTENDER_SCORE_UPDATED",
@@ -477,7 +477,7 @@ func (r *ContenderRunner) ReadEvents(contenderID domain.ContenderID) {
 			"RAFFLE_WINNER_DRAWN",
 		),
 		domain.NewEventFilter(
-			r.contender.ContestID,
+			r.contender.CompetitionID,
 			0,
 			"RULES_UPDATED",
 			"PROBLEM_ADDED",

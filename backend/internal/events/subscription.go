@@ -125,9 +125,9 @@ func (s *Subscription) Post(event domain.EventEnvelope) error {
 	return nil
 }
 
-func (s *Subscription) FiltersMatch(contestID domain.ContestID, contenderID domain.ContenderID, eventType string) bool {
+func (s *Subscription) FiltersMatch(competitionID domain.CompetitionID, contenderID domain.ContenderID, eventType string) bool {
 	for _, filter := range s.filters {
-		if filter.Match(contestID, contenderID, eventType) {
+		if filter.Match(competitionID, contenderID, eventType) {
 			return true
 		}
 	}

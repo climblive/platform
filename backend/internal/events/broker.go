@@ -37,7 +37,7 @@ func (b *broker) Unsubscribe(subscriptionID domain.SubscriptionID) {
 	delete(b.subscriptions, subscriptionID)
 }
 
-func (b *broker) Dispatch(contestID domain.ContestID, event any) {
+func (b *broker) Dispatch(competitionID domain.CompetitionID, event any) {
 	b.mu.RLock()
 	defer b.mu.RUnlock()
 
@@ -45,7 +45,7 @@ func (b *broker) Dispatch(contestID domain.ContestID, event any) {
 	contenderID := extractContenderID(event)
 
 	for _, subscription := range b.subscriptions {
-		if !subscription.FiltersMatch(contestID, contenderID, eventName) {
+		if !subscription.FiltersMatch(competitionID, contenderID, eventName) {
 			continue
 		}
 

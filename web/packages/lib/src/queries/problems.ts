@@ -15,24 +15,24 @@ export const getProblemQuery = (problemId: number) =>
   }));
 
 export const getProblemsQuery = (
-  contestId: number,
+  competitionId: number,
   options?: Partial<Parameters<typeof createQuery<Problem[]>>[0]>,
 ) =>
   createQuery(() => ({
     ...options,
-    queryKey: ["problems", { contestId }],
+    queryKey: ["problems", { competitionId }],
     queryFn: async () =>
-      ApiClient.getInstance().getProblemsByContest(contestId),
+      ApiClient.getInstance().getProblemsByCompetition(competitionId),
   }));
 
-export const createProblemMutation = (contestId: number) => {
+export const createProblemMutation = (competitionId: number) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
     mutationFn: (template: ProblemTemplate) =>
-      ApiClient.getInstance().createProblem(contestId, template),
+      ApiClient.getInstance().createProblem(competitionId, template),
     onSuccess: (newProblem) => {
-      let queryKey: QueryKey = ["problems", { contestId }];
+      let queryKey: QueryKey = ["problems", { competitionId }];
 
       client.setQueryData<Problem[]>(queryKey, (oldProblems) => {
         return [...(oldProblems ?? []), newProblem];
@@ -54,7 +54,7 @@ export const patchProblemMutation = (problemId: number) => {
     onSuccess: (patchedProblem) => {
       let queryKey: QueryKey = [
         "problems",
-        { contestId: patchedProblem.contestId },
+        { competitionId: patchedProblem.competitionId },
       ];
 
       client.setQueryData<Problem[]>(queryKey, (oldProblems) => {
@@ -106,7 +106,7 @@ export const deleteProblemMutation = (problemId: number) => {
 
 export const refetchProblems = (
   queryClient: QueryClient,
-  contestId: number,
+  competitionId: number,
 ) => {
-  queryClient.refetchQueries({ queryKey: ["problems", { contestId }] });
+  queryClient.refetchQueries({ queryKey: ["problems", { competitionId }] });
 };

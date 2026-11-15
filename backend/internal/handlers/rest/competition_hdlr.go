@@ -12,86 +12,86 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-type contestUseCase interface {
-	GetContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error)
-	GetAllContests(ctx context.Context) ([]domain.Contest, error)
-	GetContestsByOrganizer(ctx context.Context, organizerID domain.OrganizerID) ([]domain.Contest, error)
-	GetScoreboard(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreboardEntry, error)
-	PatchContest(ctx context.Context, contestID domain.ContestID, patch domain.ContestPatch) (domain.Contest, error)
-	ArchiveContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error)
-	RestoreContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error)
-	CreateContest(ctx context.Context, organizerID domain.OrganizerID, template domain.ContestTemplate) (domain.Contest, error)
-	DuplicateContest(ctx context.Context, contestID domain.ContestID) (domain.Contest, error)
-	TransferContest(ctx context.Context, contestID domain.ContestID, newOrganizerID domain.OrganizerID) (domain.Contest, error)
+type competitionUseCase interface {
+	GetCompetition(ctx context.Context, competitionID domain.CompetitionID) (domain.Competition, error)
+	GetAllCompetitions(ctx context.Context) ([]domain.Competition, error)
+	GetCompetitionsByOrganizer(ctx context.Context, organizerID domain.OrganizerID) ([]domain.Competition, error)
+	GetScoreboard(ctx context.Context, competitionID domain.CompetitionID) ([]domain.ScoreboardEntry, error)
+	PatchCompetition(ctx context.Context, competitionID domain.CompetitionID, patch domain.CompetitionPatch) (domain.Competition, error)
+	ArchiveCompetition(ctx context.Context, competitionID domain.CompetitionID) (domain.Competition, error)
+	RestoreCompetition(ctx context.Context, competitionID domain.CompetitionID) (domain.Competition, error)
+	CreateCompetition(ctx context.Context, organizerID domain.OrganizerID, template domain.CompetitionTemplate) (domain.Competition, error)
+	DuplicateCompetition(ctx context.Context, competitionID domain.CompetitionID) (domain.Competition, error)
+	TransferCompetition(ctx context.Context, competitionID domain.CompetitionID, newOrganizerID domain.OrganizerID) (domain.Competition, error)
 }
 
-type contestHandler struct {
-	contestUseCase   contestUseCase
-	compClassUseCase compClassUseCase
-	tickUseCase      tickUseCase
-	problemUseCase   problemUseCase
+type competitionHandler struct {
+	competitionUseCase competitionUseCase
+	compClassUseCase   compClassUseCase
+	tickUseCase        tickUseCase
+	problemUseCase     problemUseCase
 }
 
-func InstallContestHandler(
+func InstallCompetitionHandler(
 	mux *Mux,
-	contestUseCase contestUseCase,
+	competitionUseCase competitionUseCase,
 	compClassUseCase compClassUseCase,
 	tickUseCase tickUseCase,
 	problemUseCase problemUseCase) {
-	handler := &contestHandler{
-		contestUseCase:   contestUseCase,
-		compClassUseCase: compClassUseCase,
-		tickUseCase:      tickUseCase,
-		problemUseCase:   problemUseCase,
+	handler := &competitionHandler{
+		competitionUseCase: competitionUseCase,
+		compClassUseCase:   compClassUseCase,
+		tickUseCase:        tickUseCase,
+		problemUseCase:     problemUseCase,
 	}
 
-	mux.HandleFunc("GET /contests/{contestID}", handler.GetContest)
-	mux.HandleFunc("GET /contests", handler.GetAllContests)
-	mux.HandleFunc("GET /contests/{contestID}/scoreboard", handler.GetScoreboard)
-	mux.HandleFunc("GET /organizers/{organizerID}/contests", handler.GetContestsByOrganizer)
-	mux.HandleFunc("POST /organizers/{organizerID}/contests", handler.CreateContest)
-	mux.HandleFunc("POST /contests/{contestID}/duplicate", handler.DuplicateContest)
-	mux.HandleFunc("POST /contests/{contestID}/transfer", handler.TransferContest)
-	mux.HandleFunc("POST /contests/{contestID}/archive", handler.ArchiveContest)
-	mux.HandleFunc("POST /contests/{contestID}/restore", handler.RestoreContest)
-	mux.HandleFunc("GET /contests/{contestID}/results", handler.DownloadResults)
-	mux.HandleFunc("PATCH /contests/{contestID}", handler.PatchContest)
+	mux.HandleFunc("GET /competitions/{competitionID}", handler.GetCompetition)
+	mux.HandleFunc("GET /competitions", handler.GetAllCompetitions)
+	mux.HandleFunc("GET /competitions/{competitionID}/scoreboard", handler.GetScoreboard)
+	mux.HandleFunc("GET /organizers/{organizerID}/competitions", handler.GetCompetitionsByOrganizer)
+	mux.HandleFunc("POST /organizers/{organizerID}/competitions", handler.CreateCompetition)
+	mux.HandleFunc("POST /competitions/{competitionID}/duplicate", handler.DuplicateCompetition)
+	mux.HandleFunc("POST /competitions/{competitionID}/transfer", handler.TransferCompetition)
+	mux.HandleFunc("POST /competitions/{competitionID}/archive", handler.ArchiveCompetition)
+	mux.HandleFunc("POST /competitions/{competitionID}/restore", handler.RestoreCompetition)
+	mux.HandleFunc("GET /competitions/{competitionID}/results", handler.DownloadResults)
+	mux.HandleFunc("PATCH /competitions/{competitionID}", handler.PatchCompetition)
 }
 
-func (hdlr *contestHandler) GetContest(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+func (hdlr *competitionHandler) GetCompetition(w http.ResponseWriter, r *http.Request) {
+	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	contest, err := hdlr.contestUseCase.GetContest(r.Context(), contestID)
+	competition, err := hdlr.competitionUseCase.GetCompetition(r.Context(), competitionID)
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	writeResponse(w, http.StatusOK, contest)
+	writeResponse(w, http.StatusOK, competition)
 }
 
-func (hdlr *contestHandler) GetAllContests(w http.ResponseWriter, r *http.Request) {
-	contests, err := hdlr.contestUseCase.GetAllContests(r.Context())
+func (hdlr *competitionHandler) GetAllCompetitions(w http.ResponseWriter, r *http.Request) {
+	competitions, err := hdlr.competitionUseCase.GetAllCompetitions(r.Context())
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	writeResponse(w, http.StatusOK, contests)
+	writeResponse(w, http.StatusOK, competitions)
 }
 
-func (hdlr *contestHandler) GetScoreboard(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+func (hdlr *competitionHandler) GetScoreboard(w http.ResponseWriter, r *http.Request) {
+	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	scoreboard, err := hdlr.contestUseCase.GetScoreboard(r.Context(), contestID)
+	scoreboard, err := hdlr.competitionUseCase.GetScoreboard(r.Context(), competitionID)
 	if err != nil {
 		handleError(w, err)
 		return
@@ -100,135 +100,135 @@ func (hdlr *contestHandler) GetScoreboard(w http.ResponseWriter, r *http.Request
 	writeResponse(w, http.StatusOK, scoreboard)
 }
 
-func (hdlr *contestHandler) GetContestsByOrganizer(w http.ResponseWriter, r *http.Request) {
+func (hdlr *competitionHandler) GetCompetitionsByOrganizer(w http.ResponseWriter, r *http.Request) {
 	organizerID, err := parseResourceID[domain.OrganizerID](r.PathValue("organizerID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	contests, err := hdlr.contestUseCase.GetContestsByOrganizer(r.Context(), organizerID)
+	competitions, err := hdlr.competitionUseCase.GetCompetitionsByOrganizer(r.Context(), organizerID)
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	writeResponse(w, http.StatusOK, contests)
+	writeResponse(w, http.StatusOK, competitions)
 }
 
-func (hdlr *contestHandler) PatchContest(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+func (hdlr *competitionHandler) PatchCompetition(w http.ResponseWriter, r *http.Request) {
+	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	var patch domain.ContestPatch
+	var patch domain.CompetitionPatch
 	if !readJSON(w, r, &patch) {
 		return
 	}
 
-	updatedContest, err := hdlr.contestUseCase.PatchContest(r.Context(), contestID, patch)
+	updatedCompetition, err := hdlr.competitionUseCase.PatchCompetition(r.Context(), competitionID, patch)
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	writeResponse(w, http.StatusOK, updatedContest)
+	writeResponse(w, http.StatusOK, updatedCompetition)
 }
 
-func (hdlr *contestHandler) CreateContest(w http.ResponseWriter, r *http.Request) {
+func (hdlr *competitionHandler) CreateCompetition(w http.ResponseWriter, r *http.Request) {
 	organizerID, err := parseResourceID[domain.OrganizerID](r.PathValue("organizerID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	var tmpl domain.ContestTemplate
+	var tmpl domain.CompetitionTemplate
 	if !readJSON(w, r, &tmpl) {
 		return
 	}
 
-	createdContest, err := hdlr.contestUseCase.CreateContest(r.Context(), organizerID, tmpl)
+	createdCompetition, err := hdlr.competitionUseCase.CreateCompetition(r.Context(), organizerID, tmpl)
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	writeResponse(w, http.StatusCreated, createdContest)
+	writeResponse(w, http.StatusCreated, createdCompetition)
 }
 
-func (hdlr *contestHandler) DuplicateContest(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+func (hdlr *competitionHandler) DuplicateCompetition(w http.ResponseWriter, r *http.Request) {
+	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	duplicatedContest, err := hdlr.contestUseCase.DuplicateContest(r.Context(), contestID)
+	duplicatedCompetition, err := hdlr.competitionUseCase.DuplicateCompetition(r.Context(), competitionID)
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	writeResponse(w, http.StatusCreated, duplicatedContest)
+	writeResponse(w, http.StatusCreated, duplicatedCompetition)
 }
 
-func (hdlr *contestHandler) ArchiveContest(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+func (hdlr *competitionHandler) ArchiveCompetition(w http.ResponseWriter, r *http.Request) {
+	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	contest, err := hdlr.contestUseCase.ArchiveContest(r.Context(), contestID)
+	competition, err := hdlr.competitionUseCase.ArchiveCompetition(r.Context(), competitionID)
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	writeResponse(w, http.StatusOK, contest)
+	writeResponse(w, http.StatusOK, competition)
 }
 
-func (hdlr *contestHandler) RestoreContest(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+func (hdlr *competitionHandler) RestoreCompetition(w http.ResponseWriter, r *http.Request) {
+	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	contest, err := hdlr.contestUseCase.RestoreContest(r.Context(), contestID)
+	competition, err := hdlr.competitionUseCase.RestoreCompetition(r.Context(), competitionID)
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	writeResponse(w, http.StatusOK, contest)
+	writeResponse(w, http.StatusOK, competition)
 }
 
-func (hdlr *contestHandler) TransferContest(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+func (hdlr *competitionHandler) TransferCompetition(w http.ResponseWriter, r *http.Request) {
+	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	var req domain.ContestTransferRequest
+	var req domain.CompetitionTransferRequest
 	if !readJSON(w, r, &req) {
 		return
 	}
 
-	transferredContest, err := hdlr.contestUseCase.TransferContest(r.Context(), contestID, req.NewOrganizerID)
+	transferredCompetition, err := hdlr.competitionUseCase.TransferCompetition(r.Context(), competitionID, req.NewOrganizerID)
 	if err != nil {
 		handleError(w, err)
 		return
 	}
 
-	writeResponse(w, http.StatusOK, transferredContest)
+	writeResponse(w, http.StatusOK, transferredCompetition)
 }
 
-func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+func (hdlr *competitionHandler) DownloadResults(w http.ResponseWriter, r *http.Request) {
+	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -257,22 +257,22 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 	}
 
 	writeBook := func(book *excelize.File) error {
-		compClasses, err := hdlr.compClassUseCase.GetCompClassesByContest(r.Context(), contestID)
+		compClasses, err := hdlr.compClassUseCase.GetCompClassesByCompetition(r.Context(), competitionID)
 		if err != nil {
 			return errors.Wrap(err, 0)
 		}
 
-		scoreboard, err := hdlr.contestUseCase.GetScoreboard(r.Context(), contestID)
+		scoreboard, err := hdlr.competitionUseCase.GetScoreboard(r.Context(), competitionID)
 		if err != nil {
 			return errors.Wrap(err, 0)
 		}
 
-		problems, err := hdlr.problemUseCase.GetProblemsByContest(r.Context(), contestID)
+		problems, err := hdlr.problemUseCase.GetProblemsByCompetition(r.Context(), competitionID)
 		if err != nil {
 			return errors.Wrap(err, 0)
 		}
 
-		ticks, err := hdlr.tickUseCase.GetTicksByContest(r.Context(), contestID)
+		ticks, err := hdlr.tickUseCase.GetTicksByCompetition(r.Context(), competitionID)
 		if err != nil {
 			return errors.Wrap(err, 0)
 		}
@@ -435,7 +435,7 @@ func (hdlr *contestHandler) DownloadResults(w http.ResponseWriter, r *http.Reque
 	}
 
 	w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="contest_%d_results.xlsx"`, contestID))
+	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="competition_%d_results.xlsx"`, competitionID))
 	w.WriteHeader(http.StatusOK)
 
 	if _, err := book.WriteTo(w); err != nil {

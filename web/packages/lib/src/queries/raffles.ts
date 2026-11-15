@@ -13,19 +13,19 @@ export const getRaffleQuery = (raffleId: number) =>
     queryFn: async () => ApiClient.getInstance().getRaffle(raffleId),
   }));
 
-export const getRafflesQuery = (contestId: number) =>
+export const getRafflesQuery = (competitionId: number) =>
   createQuery(() => ({
-    queryKey: ["raffles", { contestId }],
-    queryFn: async () => ApiClient.getInstance().getRaffles(contestId),
+    queryKey: ["raffles", { competitionId }],
+    queryFn: async () => ApiClient.getInstance().getRaffles(competitionId),
   }));
 
-export const createRaffleMutation = (contestId: number) => {
+export const createRaffleMutation = (competitionId: number) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
-    mutationFn: () => ApiClient.getInstance().createRaffle(contestId),
+    mutationFn: () => ApiClient.getInstance().createRaffle(competitionId),
     onSuccess: (newRaffle) => {
-      let queryKey: QueryKey = ["raffles", { contestId }];
+      let queryKey: QueryKey = ["raffles", { competitionId }];
 
       client.setQueryData<Raffle[]>(queryKey, (oldRaffles) => {
         return [...(oldRaffles ?? []), newRaffle];

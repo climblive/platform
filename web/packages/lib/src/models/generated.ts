@@ -6,7 +6,7 @@
 export type ResourceID = number; /* int32 */
 export type CompClassID = ResourceID;
 export type ContenderID = ResourceID;
-export type ContestID = ResourceID;
+export type CompetitionID = ResourceID;
 export type OrganizerID = ResourceID;
 export type ProblemID = ResourceID;
 export type RaffleID = ResourceID;
@@ -18,7 +18,7 @@ export type OrganizerInviteID = string;
 export type ResourceIDType =
   | CompClassID
   | ContenderID
-  | ContestID
+  | CompetitionID
   | OrganizerID
   | ProblemID
   | RaffleID
@@ -33,7 +33,7 @@ export type ScoreEngineInstanceID = string;
 
 export type Tenths = number; /* int64 */
 export interface EventFilter {
-  contestId?: ContestID;
+  competitionId?: CompetitionID;
   contenderId?: ContenderID;
   eventTypes?: { [key: string]: {} };
 }
@@ -43,7 +43,7 @@ export interface OwnershipData {
 }
 export interface CompClass {
   id: CompClassID;
-  contestId: ContestID;
+  competitionId: CompetitionID;
   name: string;
   description?: string;
   timeBegin: Date;
@@ -63,7 +63,7 @@ export interface CompClassPatch {
 }
 export interface Contender {
   id: ContenderID;
-  contestId: ContestID;
+  competitionId: CompetitionID;
   compClassId?: CompClassID;
   registrationCode: string;
   name?: string;
@@ -80,8 +80,8 @@ export interface ContenderPatch {
   withdrawnFromFinals?: boolean;
   disqualified?: boolean;
 }
-export interface Contest {
-  id: ContestID;
+export interface Competition {
+  id: CompetitionID;
   ownership: OwnershipData;
   archivedAt?: Date;
   location?: string;
@@ -103,7 +103,7 @@ export interface Contest {
   created: Date;
   registeredContenders: number /* int */;
 }
-export interface ContestTemplate {
+export interface CompetitionTemplate {
   location?: string;
   country: string;
   seriesId?: SeriesID;
@@ -119,7 +119,7 @@ export interface ContestTemplate {
   gracePeriod: number;
   nameRetentionTime: number;
 }
-export interface ContestPatch {
+export interface CompetitionPatch {
   location?: string;
   country?: string;
   seriesId?: number;
@@ -134,7 +134,7 @@ export interface ContestPatch {
   info?: string;
   gracePeriod?: number;
 }
-export interface ContestTransferRequest {
+export interface CompetitionTransferRequest {
   newOrganizerId: OrganizerID;
 }
 export interface Organizer {
@@ -170,7 +170,7 @@ export interface PointValue {
 }
 export interface Problem extends ProblemValue {
   id: ProblemID;
-  contestId: ContestID;
+  competitionId: CompetitionID;
   number: number /* int */;
   holdColorPrimary: string;
   holdColorSecondary?: string;
@@ -200,7 +200,7 @@ export interface ProblemPatch {
 }
 export interface Raffle {
   id: RaffleID;
-  contestId: ContestID;
+  competitionId: CompetitionID;
 }
 export interface RaffleWinner {
   id: RaffleWinnerID;
@@ -256,7 +256,7 @@ export interface ServiceStatus {
 }
 export interface ScoreEngineDescriptor {
   instanceId: ScoreEngineInstanceID;
-  contestId: ContestID;
+  competitionId: CompetitionID;
 }
 export interface ContenderEnteredEvent {
   contenderId: ContenderID;
@@ -310,7 +310,7 @@ export interface ProblemDeletedEvent {
   problemId: ProblemID;
 }
 export interface RulesUpdatedEvent {
-  contestId: ContestID;
+  competitionId: CompetitionID;
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
   usePoints: boolean;

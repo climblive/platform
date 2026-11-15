@@ -6,11 +6,11 @@
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { ContestStateProvider } from "@climblive/lib/components";
+  import { CompetitionStateProvider } from "@climblive/lib/components";
   import type { ContenderPatch } from "@climblive/lib/models";
   import {
     getContenderQuery,
-    getContestQuery,
+    getCompetitionQuery,
     patchContenderMutation,
     scrubContenderMutation,
   } from "@climblive/lib/queries";
@@ -24,7 +24,9 @@
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
   const contenderQuery = $derived(getContenderQuery($session.contenderId));
-  const contestQuery = $derived(getContestQuery($session.contestId));
+  const competitionQuery = $derived(
+    getCompetitionQuery($session.competitionId),
+  );
   const patchContender = $derived(patchContenderMutation($session.contenderId));
   const scrubContender = $derived(scrubContenderMutation($session.contenderId));
   const time = new SyncedTime(60_000);
@@ -36,7 +38,7 @@
   });
 
   let contender = $derived(contenderQuery.data);
-  let contest = $derived(contestQuery.data);
+  let competition = $derived(competitionQuery.data);
 
   const retentionDuration = $derived.by(() => {
     if (!contender?.scrubBefore) {
@@ -83,16 +85,16 @@
   };
 </script>
 
-{#if !contender || !contest}
+{#if !contender || !competition}
   <Loading />
 {:else}
-  <ContestStateProvider
-    contestId={contest.id}
+  <CompetitionStateProvider
+    competitionId={competition.id}
     compClassId={contender.compClassId}
   >
-    {#snippet children({ contestState })}
+    {#snippet children({ competitionState })}
       {@const disabled =
-        contender.scrubbedAt !== undefined || contestState === "ENDED"}
+        contender.scrubbedAt !== undefined || competitionState === "ENDED"}
 
       <RegistrationForm
         submit={handleSubmit}
@@ -102,7 +104,7 @@
           withdrawnFromFinals: contender.withdrawnFromFinals,
         }}
         callout={profileCallout}
-        {contestState}
+        {competitionState}
         {disabled}
       >
         <div class="controls">
@@ -156,7 +158,7 @@
         {/if}
       {/snippet}
     {/snippet}
-  </ContestStateProvider>
+  </CompetitionStateProvider>
 
   <wa-dialog bind:this={scrubDialog} label="Remove your name">
     Your name will be <strong>permanently</strong> removed and your results will

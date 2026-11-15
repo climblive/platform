@@ -24,9 +24,13 @@
   <QueryClientProvider client={queryClient}>
     <EventsProvider>
       <Router>
-        <Route path="/scoreboard/:contestId"
-          >{#snippet children({ params }: { params: { contestId: number } })}
-            <Scoreboard contestId={Number(params.contestId)} />
+        <Route path="/scoreboard/:competitionId"
+          >{#snippet children({
+            params,
+          }: {
+            params: { competitionId: number };
+          })}
+            <Scoreboard competitionId={Number(params.competitionId)} />
           {/snippet}
         </Route>
       </Router>

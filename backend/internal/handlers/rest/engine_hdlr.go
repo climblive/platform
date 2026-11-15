@@ -11,9 +11,9 @@ import (
 
 type scoreEngineUseCase interface {
 	ListScoreEngines(ctx context.Context) ([]domain.ScoreEngineDescriptor, error)
-	ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreEngineDescriptor, error)
+	ListScoreEnginesByCompetition(ctx context.Context, competitionID domain.CompetitionID) ([]domain.ScoreEngineDescriptor, error)
 	StopScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) error
-	StartScoreEngine(ctx context.Context, contestID domain.ContestID, terminatedBy time.Time) (domain.ScoreEngineInstanceID, error)
+	StartScoreEngine(ctx context.Context, competitionID domain.CompetitionID, terminatedBy time.Time) (domain.ScoreEngineInstanceID, error)
 }
 
 type scoreEngineHandler struct {
@@ -26,9 +26,9 @@ func InstallScoreEngineHandler(mux *Mux, scoreEngineUseCase scoreEngineUseCase) 
 	}
 
 	mux.HandleFunc("GET /score-engines", handler.ListScoreEngines)
-	mux.HandleFunc("GET /contests/{contestID}/score-engines", handler.ListScoreEnginesByContest)
+	mux.HandleFunc("GET /competitions/{competitionID}/score-engines", handler.ListScoreEnginesByCompetition)
 	mux.HandleFunc("DELETE /score-engines/{instanceID}", handler.StopScoreEngine)
-	mux.HandleFunc("POST /contests/{contestID}/score-engines", handler.StartScoreEngine)
+	mux.HandleFunc("POST /competitions/{competitionID}/score-engines", handler.StartScoreEngine)
 }
 
 func (hdlr *scoreEngineHandler) ListScoreEngines(w http.ResponseWriter, r *http.Request) {
@@ -41,15 +41,15 @@ func (hdlr *scoreEngineHandler) ListScoreEngines(w http.ResponseWriter, r *http.
 	writeResponse(w, http.StatusOK, instances)
 }
 
-func (hdlr *scoreEngineHandler) ListScoreEnginesByContest(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+func (hdlr *scoreEngineHandler) ListScoreEnginesByCompetition(w http.ResponseWriter, r *http.Request) {
+	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 
 		return
 	}
 
-	instances, err := hdlr.scoreEngineUseCase.ListScoreEnginesByContest(r.Context(), contestID)
+	instances, err := hdlr.scoreEngineUseCase.ListScoreEnginesByCompetition(r.Context(), competitionID)
 	if err != nil {
 		handleError(w, err)
 		return
@@ -77,7 +77,7 @@ func (hdlr *scoreEngineHandler) StopScoreEngine(w http.ResponseWriter, r *http.R
 }
 
 func (hdlr *scoreEngineHandler) StartScoreEngine(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 
@@ -89,7 +89,7 @@ func (hdlr *scoreEngineHandler) StartScoreEngine(w http.ResponseWriter, r *http.
 		return
 	}
 
-	instanceID, err := hdlr.scoreEngineUseCase.StartScoreEngine(r.Context(), contestID, arguments.TerminatedBy)
+	instanceID, err := hdlr.scoreEngineUseCase.StartScoreEngine(r.Context(), competitionID, arguments.TerminatedBy)
 	if err != nil {
 		handleError(w, err)
 		return

@@ -21,8 +21,8 @@ func (d *Database) GetCompClass(ctx context.Context, tx domain.Transaction, comp
 	return compClassToDomain(record.CompClass), nil
 }
 
-func (d *Database) GetCompClassesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.CompClass, error) {
-	records, err := d.WithTx(tx).GetCompClassesByContest(ctx, int32(contestID))
+func (d *Database) GetCompClassesByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.CompClass, error) {
+	records, err := d.WithTx(tx).GetCompClassesByCompetition(ctx, int32(competitionID))
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -38,14 +38,14 @@ func (d *Database) GetCompClassesByContest(ctx context.Context, tx domain.Transa
 
 func (d *Database) StoreCompClass(ctx context.Context, tx domain.Transaction, compClass domain.CompClass) (domain.CompClass, error) {
 	params := database.UpsertCompClassParams{
-		ID:          int32(compClass.ID),
-		OrganizerID: int32(compClass.Ownership.OrganizerID),
-		ContestID:   int32(compClass.ContestID),
-		Name:        compClass.Name,
-		Description: makeNullString(compClass.Description),
-		Color:       sql.NullString{String: "", Valid: false},
-		TimeBegin:   compClass.TimeBegin,
-		TimeEnd:     compClass.TimeEnd,
+		ID:            int32(compClass.ID),
+		OrganizerID:   int32(compClass.Ownership.OrganizerID),
+		CompetitionID: int32(compClass.CompetitionID),
+		Name:          compClass.Name,
+		Description:   makeNullString(compClass.Description),
+		Color:         sql.NullString{String: "", Valid: false},
+		TimeBegin:     compClass.TimeBegin,
+		TimeEnd:       compClass.TimeEnd,
 	}
 
 	insertID, err := d.WithTx(tx).UpsertCompClass(ctx, params)

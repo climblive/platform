@@ -51,7 +51,7 @@ func TestBasicRanker(t *testing.T) {
 		return contenders
 	}
 
-	t.Run("ContestNotStarted", func(t *testing.T) {
+	t.Run("CompetitionNotStarted", func(t *testing.T) {
 		contenders := makeContenders(3)
 		shuffleSlice(contenders)
 

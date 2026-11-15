@@ -23,7 +23,7 @@
   import {
     getCompClassesQuery,
     getContenderQuery,
-    getContestQuery,
+    getCompetitionQuery,
     patchContenderMutation,
   } from "@climblive/lib/queries";
   import { ordinalSuperscript } from "@climblive/lib/utils";
@@ -39,18 +39,18 @@
   const contenderQuery = $derived(getContenderQuery(contenderId));
   const patchContender = $derived(patchContenderMutation(contenderId));
   const contender = $derived(contenderQuery.data);
-  const contestId = $derived(contender?.contestId ?? 0);
+  const competitionId = $derived(contender?.competitionId ?? 0);
 
   const compClassesQuery = $derived(
-    getCompClassesQuery(contestId, { enabled: !!contestId }),
+    getCompClassesQuery(competitionId, { enabled: !!competitionId }),
   );
 
   const compClasses = $derived(compClassesQuery.data);
 
-  const contestQuery = $derived(
-    contestId ? getContestQuery(contestId) : undefined,
+  const competitionQuery = $derived(
+    competitionId ? getCompetitionQuery(competitionId) : undefined,
   );
-  const contest = $derived(contestQuery?.data);
+  const competition = $derived(competitionQuery?.data);
 
   let withdrawFromFinalsToggle: WaSwitch | undefined = $state();
   let compClassSelect: WaSelect | undefined = $state();
@@ -94,18 +94,20 @@
   };
 </script>
 
-{#if contender && compClasses && contest}
+{#if contender && compClasses && competition}
   <wa-breadcrumb>
     <wa-breadcrumb-item
       onclick={() =>
-        navigate(`/admin/organizers/${contest.ownership.organizerId}/contests`)}
-      ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
-    >
-    <wa-breadcrumb-item onclick={() => navigate(`/admin/contests/${contestId}`)}
-      >{contest.name}</wa-breadcrumb-item
+        navigate(
+          `/admin/organizers/${competition.ownership.organizerId}/competitions`,
+        )}><wa-icon name="home"></wa-icon></wa-breadcrumb-item
     >
     <wa-breadcrumb-item
-      onclick={() => navigate(`/admin/contests/${contestId}/results`)}
+      onclick={() => navigate(`/admin/competitions/${competitionId}`)}
+      >{competition.name}</wa-breadcrumb-item
+    >
+    <wa-breadcrumb-item
+      onclick={() => navigate(`/admin/competitions/${competitionId}/results`)}
       >Results</wa-breadcrumb-item
     >
   </wa-breadcrumb>
@@ -216,7 +218,9 @@
       <p class="copy">
         Problems attempted by the competitor during the competition.
       </p>
-      <TickList contenderId={contender.id} contestId={contender.contestId}
+      <TickList
+        contenderId={contender.id}
+        competitionId={contender.competitionId}
       ></TickList>
     {/if}
 

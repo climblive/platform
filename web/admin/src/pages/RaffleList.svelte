@@ -24,13 +24,13 @@
   const createButtonId = $props.id();
 
   interface Props {
-    contestId: number;
+    competitionId: number;
   }
 
-  let { contestId }: Props = $props();
+  let { competitionId }: Props = $props();
 
-  const rafflesQuery = $derived(getRafflesQuery(contestId));
-  const createRaffle = $derived(createRaffleMutation(contestId));
+  const rafflesQuery = $derived(getRafflesQuery(competitionId));
+  const createRaffle = $derived(createRaffleMutation(competitionId));
 
   let raffles = $derived(rafflesQuery.data);
 

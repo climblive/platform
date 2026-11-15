@@ -8,13 +8,13 @@ import (
 	"github.com/go-errors/errors"
 )
 
-const maxCompClassesPerContest = 20
+const maxCompClassesPerCompetition = 20
 
 type compClassUseCaseRepository interface {
 	domain.Transactor
 
-	GetCompClassesByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.CompClass, error)
-	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
+	GetCompClassesByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.CompClass, error)
+	GetCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (domain.Competition, error)
 	StoreCompClass(ctx context.Context, tx domain.Transaction, compClass domain.CompClass) (domain.CompClass, error)
 	DeleteCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) error
 	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error)
@@ -35,8 +35,8 @@ func (uc *CompClassUseCase) GetCompClass(ctx context.Context, compClassID domain
 	return compClass, nil
 }
 
-func (uc *CompClassUseCase) GetCompClassesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.CompClass, error) {
-	compClasses, err := uc.Repo.GetCompClassesByContest(ctx, nil, contestID)
+func (uc *CompClassUseCase) GetCompClassesByCompetition(ctx context.Context, competitionID domain.CompetitionID) ([]domain.CompClass, error) {
+	compClasses, err := uc.Repo.GetCompClassesByCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -44,34 +44,34 @@ func (uc *CompClassUseCase) GetCompClassesByContest(ctx context.Context, contest
 	return compClasses, nil
 }
 
-func (uc *CompClassUseCase) CreateCompClass(ctx context.Context, contestID domain.ContestID, tmpl domain.CompClassTemplate) (domain.CompClass, error) {
-	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
+func (uc *CompClassUseCase) CreateCompClass(ctx context.Context, competitionID domain.CompetitionID, tmpl domain.CompClassTemplate) (domain.CompClass, error) {
+	competition, err := uc.Repo.GetCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return domain.CompClass{}, errors.Wrap(err, 0)
 	}
 
-	_, err = uc.Authorizer.HasOwnership(ctx, contest.Ownership)
+	_, err = uc.Authorizer.HasOwnership(ctx, competition.Ownership)
 	if err != nil {
 		return domain.CompClass{}, errors.Wrap(err, 0)
 	}
 
-	compClasses, err := uc.Repo.GetCompClassesByContest(ctx, nil, contestID)
+	compClasses, err := uc.Repo.GetCompClassesByCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return domain.CompClass{}, errors.Wrap(err, 0)
 	}
 
-	if len(compClasses) >= maxCompClassesPerContest {
+	if len(compClasses) >= maxCompClassesPerCompetition {
 		return domain.CompClass{}, errors.New(domain.ErrLimitExceeded)
 	}
 
 	compClass := domain.CompClass{
-		ID:          0,
-		Ownership:   contest.Ownership,
-		ContestID:   contestID,
-		Name:        tmpl.Name,
-		Description: tmpl.Description,
-		TimeBegin:   tmpl.TimeBegin,
-		TimeEnd:     tmpl.TimeEnd,
+		ID:            0,
+		Ownership:     competition.Ownership,
+		CompetitionID: competitionID,
+		Name:          tmpl.Name,
+		Description:   tmpl.Description,
+		TimeBegin:     tmpl.TimeBegin,
+		TimeEnd:       tmpl.TimeEnd,
 	}
 
 	if err := (validators.CompClassValidator{}).Validate(compClass); err != nil {

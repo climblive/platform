@@ -15,8 +15,8 @@
   import type { EventFilter, RaffleWinner } from "@climblive/lib/models";
   import {
     drawRaffleWinnerMutation,
-    getContendersByContestQuery,
-    getContestQuery,
+    getContendersByCompetitionQuery,
+    getCompetitionQuery,
     getRaffleQuery,
     getRaffleWinnersQuery,
   } from "@climblive/lib/queries";
@@ -49,14 +49,16 @@
     return winners;
   });
 
-  const contestQuery = $derived(
-    raffle?.contestId ? getContestQuery(raffle.contestId) : undefined,
+  const competitionQuery = $derived(
+    raffle?.competitionId
+      ? getCompetitionQuery(raffle.competitionId)
+      : undefined,
   );
-  const contest = $derived(contestQuery?.data);
+  const competition = $derived(competitionQuery?.data);
 
   const contendersQuery = $derived(
-    raffle?.contestId
-      ? getContendersByContestQuery(raffle.contestId)
+    raffle?.competitionId
+      ? getContendersByCompetitionQuery(raffle.competitionId)
       : undefined,
   );
 
@@ -88,15 +90,15 @@
   );
 
   $effect(() => {
-    const contestId = raffle?.contestId;
+    const competitionId = raffle?.competitionId;
 
-    if (contestId === undefined) {
+    if (competitionId === undefined) {
       return;
     }
 
     const filters: EventFilter[] = [
       {
-        contestId,
+        competitionId,
         eventTypes: {
           CONTENDER_ENTERED: {},
           CONTENDER_DISQUALIFIED: {},
@@ -107,7 +109,7 @@
 
     const invalidateContenders = () => {
       queryClient.invalidateQueries({
-        queryKey: ["contenders", { contestId }],
+        queryKey: ["contenders", { competitionId }],
       });
     };
 
@@ -186,19 +188,21 @@
   {/if}
 {/snippet}
 
-{#if contest && raffle}
+{#if competition && raffle}
   <wa-breadcrumb>
     <wa-breadcrumb-item
       onclick={() =>
-        navigate(`/admin/organizers/${contest.ownership.organizerId}/contests`)}
-      ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
+        navigate(
+          `/admin/organizers/${competition.ownership.organizerId}/competitions`,
+        )}><wa-icon name="home"></wa-icon></wa-breadcrumb-item
     >
     <wa-breadcrumb-item
-      onclick={() => navigate(`/admin/contests/${raffle.contestId}`)}
-      >{contest.name}</wa-breadcrumb-item
+      onclick={() => navigate(`/admin/competitions/${raffle.competitionId}`)}
+      >{competition.name}</wa-breadcrumb-item
     >
     <wa-breadcrumb-item
-      onclick={() => navigate(`/admin/contests/${raffle.contestId}#raffles`)}
+      onclick={() =>
+        navigate(`/admin/competitions/${raffle.competitionId}#raffles`)}
       >Raffles</wa-breadcrumb-item
     >
   </wa-breadcrumb>

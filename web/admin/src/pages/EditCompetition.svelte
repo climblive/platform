@@ -1,31 +1,31 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
-  import ContestForm, {
+  import CompetitionForm, {
     editFormSchema,
     nanosecondsInMinute,
-  } from "@/forms/ContestForm.svelte";
+  } from "@/forms/CompetitionForm.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import type { Contest, ContestPatch } from "@climblive/lib/models";
+  import type { Competition, CompetitionPatch } from "@climblive/lib/models";
   import {
-    getContestQuery,
-    patchContestMutation,
+    getCompetitionQuery,
+    patchCompetitionMutation,
   } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import { navigate } from "svelte-routing";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
   }
 
-  let { contestId }: Props = $props();
+  let { competitionId }: Props = $props();
 
-  const contestQuery = $derived(getContestQuery(contestId));
-  const patchContest = $derived(patchContestMutation(contestId));
+  const competitionQuery = $derived(getCompetitionQuery(competitionId));
+  const patchCompetition = $derived(patchCompetitionMutation(competitionId));
 
-  const contest = $derived(contestQuery.data);
+  const competition = $derived(competitionQuery.data);
 
-  const handleSubmit = async (tmpl: ContestPatch) => {
-    patchContest.mutate(
+  const handleSubmit = async (tmpl: CompetitionPatch) => {
+    patchCompetition.mutate(
       {
         ...tmpl,
         gracePeriod:
@@ -34,20 +34,20 @@
             : undefined,
       },
       {
-        onSuccess: (contest: Contest) =>
-          navigate(`/admin/contests/${contest.id}`),
+        onSuccess: (competition: Competition) =>
+          navigate(`/admin/competitions/${competition.id}`),
         onError: () => toastUnexpectedError("Failed to save competition."),
       },
     );
   };
 </script>
 
-{#if contest === undefined}
+{#if competition === undefined}
   <Loader />
 {:else}
-  <ContestForm
+  <CompetitionForm
     submit={handleSubmit}
-    data={contest}
+    data={competition}
     schema={editFormSchema}
     disableNameRetentionTime
   >
@@ -61,12 +61,12 @@
       <wa-button
         size="s"
         type="submit"
-        loading={patchContest.isPending}
+        loading={patchCompetition.isPending}
         variant="neutral"
         >Save
       </wa-button>
     </div>
-  </ContestForm>
+  </CompetitionForm>
 {/if}
 
 <style>

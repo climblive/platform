@@ -24,7 +24,7 @@
   const handleSubmit = async (patch: CompClassPatch) => {
     patchCompClass.mutate(patch, {
       onSuccess: (compClass) =>
-        navigate(`/admin/contests/${compClass.contestId}#comp-classes`),
+        navigate(`/admin/competitions/${compClass.competitionId}#comp-classes`),
       onError: () => toastUnexpectedError("Failed to save category."),
     });
   };
@@ -40,8 +40,9 @@
         type="button"
         appearance="plain"
         onclick={() =>
-          navigate(`/admin/contests/${compClass.contestId}#comp-classes`)}
-        >Cancel</wa-button
+          navigate(
+            `/admin/competitions/${compClass.competitionId}#comp-classes`,
+          )}>Cancel</wa-button
       >
       <wa-button
         size="s"

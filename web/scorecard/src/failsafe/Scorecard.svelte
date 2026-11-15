@@ -1,32 +1,35 @@
 <script lang="ts">
-  import { getContenderQuery, getContestQuery } from "@climblive/lib/queries";
+  import {
+    getContenderQuery,
+    getCompetitionQuery,
+  } from "@climblive/lib/queries";
   import EditProfile from "./EditProfile.svelte";
   import ProblemList from "./ProblemList.svelte";
 
   type Props = {
-    contestId: number;
+    competitionId: number;
     contenderId: number;
   };
 
-  const { contestId, contenderId }: Props = $props();
+  const { competitionId, contenderId }: Props = $props();
 
   const contenderQuery = $derived(getContenderQuery(contenderId));
-  const contestQuery = $derived(getContestQuery(contestId));
+  const competitionQuery = $derived(getCompetitionQuery(competitionId));
 
   const contender = $derived(contenderQuery.data);
-  const contest = $derived(contestQuery.data);
+  const competition = $derived(competitionQuery.data);
 </script>
 
 <h2>Profile</h2>
-<EditProfile {contestId} {contenderId} />
+<EditProfile {competitionId} {contenderId} />
 
-{#if contender?.entered && contest}
+{#if contender?.entered && competition}
   <h2>Scorecard</h2>
   <ProblemList
-    {contestId}
+    {competitionId}
     {contenderId}
-    enableAttempts={!contest.usePoints ||
-      contest.maxAttempts > 0 ||
-      contest.pointDeduction > 0}
+    enableAttempts={!competition.usePoints ||
+      competition.maxAttempts > 0 ||
+      competition.pointDeduction > 0}
   />
 {/if}

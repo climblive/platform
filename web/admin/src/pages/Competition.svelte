@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ContestDashboard from "@/components/ContestDashboard.svelte";
+  import CompetitionDashboard from "@/components/CompetitionDashboard.svelte";
   import Loader from "@/components/Loader.svelte";
   import RulesEditor from "@/components/RulesEditor.svelte";
   import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
@@ -8,36 +8,36 @@
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
-    getContendersByContestQuery,
-    getContestQuery,
+    getContendersByCompetitionQuery,
+    getCompetitionQuery,
     getSelfQuery,
   } from "@climblive/lib/queries";
   import { navigate } from "svelte-routing";
-  import ArchiveContest from "./ArchiveContest.svelte";
+  import ArchiveCompetition from "./ArchiveCompetition.svelte";
   import CompClassList from "./CompClassList.svelte";
-  import DuplicateContest from "./DuplicateContest.svelte";
-  import PopulateContest from "./PopulateContest.svelte";
+  import DuplicateCompetition from "./DuplicateCompetition.svelte";
+  import PopulateCompetition from "./PopulateCompetition.svelte";
   import ProblemList from "./ProblemList.svelte";
   import RaffleList from "./RaffleList.svelte";
-  import RestoreContest from "./RestoreContest.svelte";
+  import RestoreCompetition from "./RestoreCompetition.svelte";
   import ScoreEngine from "./ScoreEngine.svelte";
   import TicketList from "./TicketList.svelte";
-  import TransferContest from "./TransferContest.svelte";
+  import TransferCompetition from "./TransferCompetition.svelte";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
   }
 
-  let { contestId }: Props = $props();
+  let { competitionId }: Props = $props();
 
   let problemsHeading: HTMLHeadingElement | undefined = $state();
   let compClassesHeading: HTMLHeadingElement | undefined = $state();
 
-  const contestQuery = $derived(getContestQuery(contestId));
+  const competitionQuery = $derived(getCompetitionQuery(competitionId));
   const selfQuery = $derived(getSelfQuery());
 
-  const contest = $derived(contestQuery.data);
-  const organizerId = $derived(contest?.ownership.organizerId);
+  const competition = $derived(competitionQuery.data);
+  const organizerId = $derived(competition?.ownership.organizerId);
   const self = $derived(selfQuery.data);
 
   $effect(() => {
@@ -72,7 +72,9 @@
     }
   });
 
-  const contendersQuery = $derived(getContendersByContestQuery(contestId));
+  const contendersQuery = $derived(
+    getContendersByCompetitionQuery(competitionId),
+  );
   const contenders = $derived(contendersQuery.data);
 
   const handleDownloadSimulatorConfig = () => {
@@ -93,7 +95,7 @@
 
     const a = document.createElement("a");
     a.href = url;
-    a.download = `contest_${contestId}_simulator_config.json`;
+    a.download = `competition_${competitionId}_simulator_config.json`;
     a.click();
 
     window.URL.revokeObjectURL(url);
@@ -101,30 +103,31 @@
 </script>
 
 <main>
-  {#if contest === undefined || organizerId === undefined}
+  {#if competition === undefined || organizerId === undefined}
     <Loader />
   {:else}
     <wa-breadcrumb>
       <wa-breadcrumb-item
         onclick={() =>
           navigate(
-            `/admin/organizers/${contest.ownership.organizerId}/contests`,
+            `/admin/organizers/${competition.ownership.organizerId}/competitions`,
           )}><wa-icon name="home"></wa-icon></wa-breadcrumb-item
       >
-      <wa-breadcrumb-item>{contest.name}</wa-breadcrumb-item>
+      <wa-breadcrumb-item>{competition.name}</wa-breadcrumb-item>
     </wa-breadcrumb>
 
-    {#if contest.archivedAt != null}
-      <RestoreContest {contestId} />
+    {#if competition.archivedAt != null}
+      <RestoreCompetition {competitionId} />
     {:else}
-      <ContestDashboard {contestId} />
+      <CompetitionDashboard {competitionId} />
 
       <div class="results">
         <wa-button
           size="s"
           appearance="outlined"
           variant="brand"
-          onclick={() => navigate(`/admin/contests/${contest.id}/results`)}
+          onclick={() =>
+            navigate(`/admin/competitions/${competition.id}/results`)}
         >
           View results
           <wa-icon slot="end" name="arrow-right"></wa-icon>
@@ -133,16 +136,16 @@
 
       <h2>Rules</h2>
       <wa-divider></wa-divider>
-      <RulesEditor {contest} />
+      <RulesEditor {competition} />
 
       <h2 bind:this={compClassesHeading}>Categories</h2>
       <wa-divider></wa-divider>
-      <CompClassList {contestId} />
+      <CompClassList {competitionId} />
 
       <h2 bind:this={problemsHeading}>Problems</h2>
       <wa-divider></wa-divider>
       <ProblemList
-        {contestId}
+        {competitionId}
         {organizerId}
         tableLimit={window.location.hash.substring(1) === "problems"
           ? undefined
@@ -151,28 +154,35 @@
 
       <h2>Tickets</h2>
       <wa-divider></wa-divider>
-      <TicketList {contestId} />
+      <TicketList {competitionId} />
 
       <h2>Raffles</h2>
       <wa-divider></wa-divider>
-      <RaffleList {contestId} />
+      <RaffleList {competitionId} />
 
       <h2>Advanced</h2>
       <wa-divider></wa-divider>
       <h3>Actions</h3>
       <div class="actions">
-        <DuplicateContest {contestId} contestName={contest.name}>
-          {#snippet children({ duplicateContest })}
-            <wa-button onclick={duplicateContest} appearance="outlined">
+        <DuplicateCompetition
+          {competitionId}
+          competitionName={competition.name}
+        >
+          {#snippet children({ duplicateCompetition })}
+            <wa-button onclick={duplicateCompetition} appearance="outlined">
               Duplicate
               <wa-icon name="copy" slot="start"></wa-icon>
             </wa-button>
           {/snippet}
-        </DuplicateContest>
-        <TransferContest {contestId} {organizerId} contestName={contest.name}>
-          {#snippet children({ transferContest, disabled })}
+        </DuplicateCompetition>
+        <TransferCompetition
+          {competitionId}
+          {organizerId}
+          competitionName={competition.name}
+        >
+          {#snippet children({ transferCompetition, disabled })}
             <wa-button
-              onclick={transferContest}
+              onclick={transferCompetition}
               appearance="outlined"
               {disabled}
             >
@@ -180,11 +190,15 @@
               <wa-icon name="arrow-right" slot="start"></wa-icon>
             </wa-button>
           {/snippet}
-        </TransferContest>
-        <ArchiveContest {contestId} {organizerId} contestName={contest.name}>
-          {#snippet children({ archiveContest })}
+        </TransferCompetition>
+        <ArchiveCompetition
+          {competitionId}
+          {organizerId}
+          competitionName={competition.name}
+        >
+          {#snippet children({ archiveCompetition })}
             <wa-button
-              onclick={archiveContest}
+              onclick={archiveCompetition}
               appearance="outlined"
               variant="danger"
             >
@@ -192,7 +206,7 @@
               <wa-icon name="box-archive" slot="start"></wa-icon>
             </wa-button>
           {/snippet}
-        </ArchiveContest>
+        </ArchiveCompetition>
       </div>
       {#if location.hostname !== "climblive.app" || self?.admin}
         <h3>Developer tools</h3>
@@ -205,7 +219,7 @@
             <wa-icon name="download" slot="start"></wa-icon>
           </wa-button>
 
-          <PopulateContest {contestId} />
+          <PopulateCompetition {competitionId} />
         </div>
       {/if}
       <h3>Score Engines</h3>
@@ -214,7 +228,7 @@
         computes scores and rankings for all participants.
       </p>
 
-      <ScoreEngine {contestId} />
+      <ScoreEngine {competitionId} />
     {/if}
   {/if}
 </main>

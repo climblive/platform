@@ -7,3 +7,6 @@ sql:
       go:
         package: "database"
         out: "internal/database"
+        rename:
+          contest: "Competition"
+          contest_id: "CompetitionID"

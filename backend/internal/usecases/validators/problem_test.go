@@ -14,7 +14,7 @@ func TestProblemValidator(t *testing.T) {
 	validProblem := func() domain.Problem {
 		return domain.Problem{
 			ID:                 domain.ProblemID(1),
-			ContestID:          domain.ContestID(1),
+			CompetitionID:      domain.CompetitionID(1),
 			Number:             1,
 			HoldColorPrimary:   "#ffffff",
 			HoldColorSecondary: "#000000",

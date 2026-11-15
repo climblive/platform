@@ -24,8 +24,8 @@ func (d *Database) GetTicksByContender(ctx context.Context, tx domain.Transactio
 	return ticks, nil
 }
 
-func (d *Database) GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error) {
-	records, err := d.WithTx(tx).GetTicksByContest(ctx, int32(contestID))
+func (d *Database) GetTicksByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Tick, error) {
+	records, err := d.WithTx(tx).GetTicksByCompetition(ctx, int32(competitionID))
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -43,7 +43,7 @@ func (d *Database) StoreTick(ctx context.Context, tx domain.Transaction, tick do
 	params := database.UpsertTickParams{
 		ID:            int32(tick.ID),
 		OrganizerID:   int32(tick.Ownership.OrganizerID),
-		ContestID:     int32(tick.ContestID),
+		CompetitionID: int32(tick.CompetitionID),
 		ContenderID:   int32(*tick.Ownership.ContenderID),
 		ProblemID:     int32(tick.ProblemID),
 		Timestamp:     tick.Timestamp,

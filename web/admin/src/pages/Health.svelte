@@ -12,12 +12,12 @@
     type ColumnDefinition,
   } from "@climblive/lib/components";
   import type {
-    Contest,
+    Competition,
     ScoreEngineDescriptor,
     ServiceStatus,
   } from "@climblive/lib/models";
   import {
-    getAllContestsQuery,
+    getAllCompetitionsQuery,
     getHealthQuery,
     getScoreEnginesQuery,
     getVersionQuery,
@@ -46,7 +46,7 @@
   ];
 
   type RunningScoreEngineRow = ScoreEngineDescriptor & {
-    contest: Contest | undefined;
+    competition: Competition | undefined;
   };
 
   const runningScoreEngineColumns: ColumnDefinition<RunningScoreEngineRow>[] = [
@@ -59,7 +59,7 @@
     {
       label: "Competition",
       mobile: true,
-      render: renderScoreEngineContest,
+      render: renderScoreEngineCompetition,
       width: "1fr",
     },
     {
@@ -79,13 +79,13 @@
   const scoreEnginesQuery = $derived(getScoreEnginesQuery());
   const scoreEngines = $derived(scoreEnginesQuery.data);
 
-  const contestsQuery = $derived(getAllContestsQuery());
-  const contests = $derived(contestsQuery.data);
+  const competitionsQuery = $derived(getAllCompetitionsQuery());
+  const competitions = $derived(competitionsQuery.data);
 
   const scoreEngineRows = $derived.by(() => {
     const rows = (scoreEngines ?? []).map((engine) => ({
       ...engine,
-      contest: contests?.find(({ id }) => id === engine.contestId),
+      competition: competitions?.find(({ id }) => id === engine.competitionId),
     }));
 
     return rows;
@@ -114,12 +114,12 @@
   {instanceId}
 {/snippet}
 
-{#snippet renderScoreEngineContest({
-  contest,
-  contestId,
+{#snippet renderScoreEngineCompetition({
+  competition,
+  competitionId,
 }: RunningScoreEngineRow)}
-  <Link to={`/admin/contests/${contestId}`}>
-    {contest?.name}
+  <Link to={`/admin/competitions/${competitionId}`}>
+    {competition?.name}
   </Link>
 {/snippet}
 
@@ -151,7 +151,7 @@
   <Table {columns} data={health} getId={({ name }) => name}></Table>
 
   <h2>Running score engines</h2>
-  {#if contests === undefined || scoreEngines === undefined}
+  {#if competitions === undefined || scoreEngines === undefined}
     <Loader />
   {:else if scoreEngineRows.length === 0}
     <EmptyState

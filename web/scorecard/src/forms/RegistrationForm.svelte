@@ -7,7 +7,7 @@
   import { checked, GenericForm, name, value } from "@climblive/lib/forms";
   import { type ContenderPatch } from "@climblive/lib/models";
   import { getCompClassesQuery } from "@climblive/lib/queries";
-  import type { ContestState } from "@climblive/lib/types";
+  import type { CompetitionState } from "@climblive/lib/types";
   import { z } from "@climblive/lib/utils";
   import { isAfter } from "date-fns";
   import { getContext, type Snippet } from "svelte";
@@ -24,18 +24,18 @@
     submit: (patch: ContenderPatch) => void;
     callout?: Snippet;
     children?: Snippet;
-    contestState: ContestState;
+    competitionState: CompetitionState;
     disabled?: boolean;
   }
 
-  const { data, submit, callout, children, contestState, ...rest }: Props =
+  const { data, submit, callout, children, competitionState, ...rest }: Props =
     $props();
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
-  let compClassesQuery = $derived(getCompClassesQuery($session.contestId));
+  let compClassesQuery = $derived(getCompClassesQuery($session.competitionId));
 
-  const disabled = $derived(rest.disabled || contestState === "ENDED");
+  const disabled = $derived(rest.disabled || competitionState === "ENDED");
 </script>
 
 {#if compClassesQuery.data}

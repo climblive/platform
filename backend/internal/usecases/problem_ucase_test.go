@@ -13,26 +13,26 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetProblemsByContest(t *testing.T) {
-	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+func TestGetProblemsByCompetition(t *testing.T) {
+	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
 	fakedProblems := []domain.Problem{
 		{
-			ID:        testutils.RandomResourceID[domain.ProblemID](),
-			ContestID: fakedContestID,
+			ID:            testutils.RandomResourceID[domain.ProblemID](),
+			CompetitionID: fakedCompetitionID,
 		},
 	}
 
 	mockedRepo := new(repositoryMock)
 
 	mockedRepo.
-		On("GetProblemsByContest", mock.Anything, mock.Anything, fakedContestID).
+		On("GetProblemsByCompetition", mock.Anything, mock.Anything, fakedCompetitionID).
 		Return(fakedProblems, nil)
 
 	ucase := usecases.ProblemUseCase{
 		Repo: mockedRepo,
 	}
 
-	problems, err := ucase.GetProblemsByContest(context.Background(), fakedContestID)
+	problems, err := ucase.GetProblemsByCompetition(context.Background(), fakedCompetitionID)
 
 	require.NoError(t, err)
 	assert.Equal(t, fakedProblems, problems)
@@ -45,12 +45,12 @@ func TestPatchProblem(t *testing.T) {
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 	}
-	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
 
 	fakedProblem := domain.Problem{
 		ID:                 fakedProblemID,
 		Ownership:          fakedOwnership,
-		ContestID:          fakedContestID,
+		CompetitionID:      fakedCompetitionID,
 		Number:             10,
 		HoldColorPrimary:   "#ffffff",
 		HoldColorSecondary: "#000000",
@@ -87,14 +87,14 @@ func TestPatchProblem(t *testing.T) {
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
-			On("GetProblemByNumber", mock.Anything, nil, fakedContestID, 20).
+			On("GetProblemByNumber", mock.Anything, nil, fakedCompetitionID, 20).
 			Return(domain.Problem{}, domain.ErrNotFound)
 
 		mockedRepo.
 			On("StoreProblem", mock.Anything, nil, domain.Problem{
 				ID:                 fakedProblemID,
 				Ownership:          fakedOwnership,
-				ContestID:          fakedContestID,
+				CompetitionID:      fakedCompetitionID,
 				Number:             20,
 				HoldColorPrimary:   "#ff0000",
 				HoldColorSecondary: "#00ff00",
@@ -111,7 +111,7 @@ func TestPatchProblem(t *testing.T) {
 			Return(domain.Problem{
 				ID:                 fakedProblemID,
 				Ownership:          fakedOwnership,
-				ContestID:          fakedContestID,
+				CompetitionID:      fakedCompetitionID,
 				Number:             20,
 				HoldColorPrimary:   "#ff0000",
 				HoldColorSecondary: "#00ff00",
@@ -127,7 +127,7 @@ func TestPatchProblem(t *testing.T) {
 			}, nil)
 
 		mockedEventBroker.
-			On("Dispatch", fakedContestID, domain.ProblemUpdatedEvent{
+			On("Dispatch", fakedCompetitionID, domain.ProblemUpdatedEvent{
 				ProblemID:          fakedProblemID,
 				Number:             20,
 				HoldColorPrimary:   "#ff0000",
@@ -211,7 +211,7 @@ func TestPatchProblem(t *testing.T) {
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
-			On("GetProblemByNumber", mock.Anything, nil, fakedContestID, 20).
+			On("GetProblemByNumber", mock.Anything, nil, fakedCompetitionID, 20).
 			Return(domain.Problem{}, nil)
 
 		ucase := usecases.ProblemUseCase{
@@ -286,16 +286,16 @@ func TestCreateProblem(t *testing.T) {
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 	makeMocks := func() (*repositoryMock, *authorizerMock) {
 		mockedRepo := new(repositoryMock)
 
 		mockedRepo.
-			On("GetContest", mock.Anything, nil, fakedContestID).
-			Return(domain.Contest{
-				ID:        fakedContestID,
+			On("GetCompetition", mock.Anything, nil, fakedCompetitionID).
+			Return(domain.Competition{
+				ID:        fakedCompetitionID,
 				Ownership: fakedOwnership,
 			}, nil)
 
@@ -310,7 +310,7 @@ func TestCreateProblem(t *testing.T) {
 		mockedEventBroker := new(eventBrokerMock)
 
 		mockedEventBroker.
-			On("Dispatch", fakedContestID, domain.ProblemAddedEvent{
+			On("Dispatch", fakedCompetitionID, domain.ProblemAddedEvent{
 				ProblemID:          fakedProblemID,
 				Number:             10,
 				HoldColorPrimary:   "#ffffff",
@@ -332,18 +332,18 @@ func TestCreateProblem(t *testing.T) {
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
-			On("GetProblemsByContest", mock.Anything, nil, fakedContestID).
+			On("GetProblemsByCompetition", mock.Anything, nil, fakedCompetitionID).
 			Return([]domain.Problem{}, nil)
 
 		mockedRepo.
-			On("GetProblemByNumber", mock.Anything, nil, fakedContestID, 10).
+			On("GetProblemByNumber", mock.Anything, nil, fakedCompetitionID, 10).
 			Return(domain.Problem{}, domain.ErrNotFound)
 
 		mockedRepo.
 			On("StoreProblem", mock.Anything, nil,
 				domain.Problem{
 					Ownership:          fakedOwnership,
-					ContestID:          fakedContestID,
+					CompetitionID:      fakedCompetitionID,
 					Number:             10,
 					HoldColorPrimary:   "#ffffff",
 					HoldColorSecondary: "#000",
@@ -362,7 +362,7 @@ func TestCreateProblem(t *testing.T) {
 				domain.Problem{
 					ID:                 fakedProblemID,
 					Ownership:          fakedOwnership,
-					ContestID:          fakedContestID,
+					CompetitionID:      fakedCompetitionID,
 					Number:             10,
 					HoldColorPrimary:   "#ffffff",
 					HoldColorSecondary: "#000",
@@ -383,7 +383,7 @@ func TestCreateProblem(t *testing.T) {
 			EventBroker: mockedEventBroker,
 		}
 
-		problem, err := ucase.CreateProblem(context.Background(), fakedContestID, domain.ProblemTemplate{
+		problem, err := ucase.CreateProblem(context.Background(), fakedCompetitionID, domain.ProblemTemplate{
 			Number:             10,
 			HoldColorPrimary:   "#ffffff",
 			HoldColorSecondary: "#000",
@@ -401,7 +401,7 @@ func TestCreateProblem(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, fakedProblemID, problem.ID)
 		assert.Equal(t, fakedOwnership, problem.Ownership)
-		assert.Equal(t, fakedContestID, problem.ContestID)
+		assert.Equal(t, fakedCompetitionID, problem.CompetitionID)
 		assert.Equal(t, 10, problem.Number)
 		assert.Equal(t, "#ffffff", problem.HoldColorPrimary)
 		assert.Equal(t, "#000", problem.HoldColorSecondary)
@@ -426,11 +426,11 @@ func TestCreateProblem(t *testing.T) {
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
-			On("GetProblemsByContest", mock.Anything, nil, fakedContestID).
+			On("GetProblemsByCompetition", mock.Anything, nil, fakedCompetitionID).
 			Return([]domain.Problem{}, nil)
 
 		mockedRepo.
-			On("GetProblemByNumber", mock.Anything, nil, fakedContestID, 10).
+			On("GetProblemByNumber", mock.Anything, nil, fakedCompetitionID, 10).
 			Return(domain.Problem{}, nil)
 
 		ucase := usecases.ProblemUseCase{
@@ -438,7 +438,7 @@ func TestCreateProblem(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		_, err := ucase.CreateProblem(context.Background(), fakedContestID, domain.ProblemTemplate{
+		_, err := ucase.CreateProblem(context.Background(), fakedCompetitionID, domain.ProblemTemplate{
 			Number:             10,
 			HoldColorPrimary:   "#ffffff",
 			HoldColorSecondary: "#000",
@@ -465,11 +465,11 @@ func TestCreateProblem(t *testing.T) {
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
-			On("GetProblemsByContest", mock.Anything, nil, fakedContestID).
+			On("GetProblemsByCompetition", mock.Anything, nil, fakedCompetitionID).
 			Return([]domain.Problem{}, nil)
 
 		mockedRepo.
-			On("GetProblemByNumber", mock.Anything, nil, fakedContestID, 10).
+			On("GetProblemByNumber", mock.Anything, nil, fakedCompetitionID, 10).
 			Return(domain.Problem{}, domain.ErrNotFound)
 
 		ucase := usecases.ProblemUseCase{
@@ -477,7 +477,7 @@ func TestCreateProblem(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		_, err := ucase.CreateProblem(context.Background(), fakedContestID, domain.ProblemTemplate{
+		_, err := ucase.CreateProblem(context.Background(), fakedCompetitionID, domain.ProblemTemplate{
 			Number:       10,
 			ProblemValue: domain.ProblemValue{PointsTop: -100},
 		})
@@ -498,7 +498,7 @@ func TestCreateProblem(t *testing.T) {
 
 		problems := make([]domain.Problem, 100)
 		mockedRepo.
-			On("GetProblemsByContest", mock.Anything, nil, fakedContestID).
+			On("GetProblemsByCompetition", mock.Anything, nil, fakedCompetitionID).
 			Return(problems, nil)
 
 		ucase := usecases.ProblemUseCase{
@@ -506,7 +506,7 @@ func TestCreateProblem(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		_, err := ucase.CreateProblem(context.Background(), fakedContestID, domain.ProblemTemplate{})
+		_, err := ucase.CreateProblem(context.Background(), fakedCompetitionID, domain.ProblemTemplate{})
 
 		require.ErrorIs(t, err, domain.ErrLimitExceeded)
 
@@ -526,7 +526,7 @@ func TestCreateProblem(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		_, err := ucase.CreateProblem(context.Background(), fakedContestID, domain.ProblemTemplate{})
+		_, err := ucase.CreateProblem(context.Background(), fakedCompetitionID, domain.ProblemTemplate{})
 
 		require.ErrorIs(t, err, domain.ErrNoOwnership)
 
@@ -540,12 +540,12 @@ func TestDeleteProblem(t *testing.T) {
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 	}
-	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
 
 	fakedProblem := domain.Problem{
-		ID:        fakedProblemID,
-		Ownership: fakedOwnership,
-		ContestID: fakedContestID,
+		ID:            fakedProblemID,
+		Ownership:     fakedOwnership,
+		CompetitionID: fakedCompetitionID,
 	}
 
 	makeMocks := func() (*repositoryMock, *eventBrokerMock, *authorizerMock) {
@@ -578,7 +578,7 @@ func TestDeleteProblem(t *testing.T) {
 			Return(nil)
 
 		mockedEventBroker.
-			On("Dispatch", fakedContestID, domain.ProblemDeletedEvent{
+			On("Dispatch", fakedCompetitionID, domain.ProblemDeletedEvent{
 				ProblemID: fakedProblemID,
 			}).Return()
 

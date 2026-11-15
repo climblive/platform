@@ -23,7 +23,7 @@
 
   const session = writable<ScorecardSession>({
     contenderId: NaN,
-    contestId: NaN,
+    competitionId: NaN,
     registrationCode: "",
     expiryTime: new Date(0),
   });

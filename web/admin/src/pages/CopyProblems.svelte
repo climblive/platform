@@ -13,7 +13,7 @@
   import { type ProblemTemplate } from "@climblive/lib/models";
   import {
     createProblemMutation,
-    getContestsByOrganizerQuery,
+    getCompetitionsByOrganizerQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
@@ -21,27 +21,31 @@
 
   interface Props {
     organizerId: number;
-    contestId: number;
+    competitionId: number;
     open: boolean;
   }
 
-  let { organizerId, contestId, open = $bindable() }: Props = $props();
+  let { organizerId, competitionId, open = $bindable() }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
-  let selectedContestId: number | undefined = $state();
+  let selectedCompetitionId: number | undefined = $state();
   let isCopying = $state(false);
   let copyProgress = $state(0);
   let copyCompleted = $state(false);
 
-  const contestsQuery = $derived(getContestsByOrganizerQuery(organizerId));
+  const competitionsQuery = $derived(
+    getCompetitionsByOrganizerQuery(organizerId),
+  );
 
-  const availableContests = $derived.by(() => {
-    if (!contestsQuery.data) {
+  const availableCompetitions = $derived.by(() => {
+    if (!competitionsQuery.data) {
       return [];
     }
 
-    return contestsQuery.data
-      .filter(({ id, archivedAt }) => id !== contestId && archivedAt == null)
+    return competitionsQuery.data
+      .filter(
+        ({ id, archivedAt }) => id !== competitionId && archivedAt == null,
+      )
       .sort((a, b) => {
         if (!a.timeBegin && !b.timeBegin) {
           return b.created.getTime() - a.created.getTime();
@@ -59,17 +63,17 @@
       });
   });
 
-  const selectedContest = $derived(
-    availableContests.find((c) => c.id === selectedContestId),
+  const selectedCompetition = $derived(
+    availableCompetitions.find((c) => c.id === selectedCompetitionId),
   );
 
   const selectedProblemsQuery = $derived(
-    selectedContest ? getProblemsQuery(selectedContest.id) : undefined,
+    selectedCompetition ? getProblemsQuery(selectedCompetition.id) : undefined,
   );
 
   const problems = $derived(selectedProblemsQuery?.data);
 
-  const createMutation = $derived(createProblemMutation(contestId));
+  const createMutation = $derived(createProblemMutation(competitionId));
 
   const problemsSummary = $derived.by(() => {
     if (!problems || problems.length === 0) {
@@ -91,9 +95,9 @@
     open = false;
   };
 
-  const handleContestChange = (e: Event) => {
+  const handleCompetitionChange = (e: Event) => {
     const select = e.target as WaSelect;
-    selectedContestId = select.value ? Number(select.value) : undefined;
+    selectedCompetitionId = select.value ? Number(select.value) : undefined;
   };
 
   const handleCopy = async () => {
@@ -108,7 +112,7 @@
 
     for (let i = 0; i < problems.length; i++) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { id, contestId, ...rest } = problems[i];
+      const { id, competitionId, ...rest } = problems[i];
 
       const template: ProblemTemplate = {
         ...rest,
@@ -151,9 +155,9 @@
   }}
 >
   {#if !(isCopying || copyCompleted)}
-    {#if contestsQuery.isPending}
+    {#if competitionsQuery.isPending}
       <Loader />
-    {:else if availableContests.length === 0}
+    {:else if availableCompetitions.length === 0}
       <EmptyState
         title="No competitions available"
         description="There are no other competitions to copy problems from."
@@ -162,16 +166,16 @@
       <wa-select
         label="Select competition"
         placeholder="Select a competition to copy from"
-        onchange={handleContestChange}
+        onchange={handleCompetitionChange}
       >
-        {#each availableContests as contest (contest.id)}
-          <wa-option value={contest.id} label={contest.name}>
-            {contest.name}
-            {#if contest.timeBegin && contest.timeEnd}
+        {#each availableCompetitions as competition (competition.id)}
+          <wa-option value={competition.id} label={competition.name}>
+            {competition.name}
+            {#if competition.timeBegin && competition.timeEnd}
               <small>
-                {format(contest.timeBegin, "yyyy-MM-dd HH:mm")}
+                {format(competition.timeBegin, "yyyy-MM-dd HH:mm")}
                 -
-                {format(contest.timeEnd, "yyyy-MM-dd HH:mm")}
+                {format(competition.timeEnd, "yyyy-MM-dd HH:mm")}
               </small>
             {/if}
           </wa-option>
@@ -180,7 +184,7 @@
     {/if}
   {/if}
 
-  {#if selectedContest}
+  {#if selectedCompetition}
     {#if selectedProblemsQuery?.isPending}
       <Loader />
     {:else if problemsSummary}
@@ -217,7 +221,7 @@
     >
       Cancel
     </wa-button>
-    {#if selectedContest}
+    {#if selectedCompetition}
       <wa-button
         slot="footer"
         variant="accent"

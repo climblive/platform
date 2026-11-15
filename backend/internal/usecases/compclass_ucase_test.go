@@ -46,28 +46,28 @@ func TestGetCompClass(t *testing.T) {
 	mockedRepo.AssertExpectations(t)
 }
 
-func TestGetCompClassesByContest(t *testing.T) {
+func TestGetCompClassesByCompetition(t *testing.T) {
 	t.Parallel()
 
-	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
 
 	fakedCompClasses := []domain.CompClass{{
-		ID:        testutils.RandomResourceID[domain.CompClassID](),
-		ContestID: fakedContestID,
+		ID:            testutils.RandomResourceID[domain.CompClassID](),
+		CompetitionID: fakedCompetitionID,
 	},
 	}
 
 	mockedRepo := new(repositoryMock)
 
 	mockedRepo.
-		On("GetCompClassesByContest", mock.Anything, mock.Anything, fakedContestID).
+		On("GetCompClassesByCompetition", mock.Anything, mock.Anything, fakedCompetitionID).
 		Return(fakedCompClasses, nil)
 
 	ucase := usecases.CompClassUseCase{
 		Repo: mockedRepo,
 	}
 
-	compClasses, err := ucase.GetCompClassesByContest(context.Background(), fakedContestID)
+	compClasses, err := ucase.GetCompClassesByCompetition(context.Background(), fakedCompetitionID)
 
 	require.NoError(t, err)
 	assert.Equal(t, fakedCompClasses, compClasses)
@@ -80,7 +80,7 @@ func TestCreateCompClass(t *testing.T) {
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
 	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
 
 	now := time.Now()
@@ -89,9 +89,9 @@ func TestCreateCompClass(t *testing.T) {
 		mockedRepo := new(repositoryMock)
 
 		mockedRepo.
-			On("GetContest", mock.Anything, nil, fakedContestID).
-			Return(domain.Contest{
-				ID:        fakedContestID,
+			On("GetCompetition", mock.Anything, nil, fakedCompetitionID).
+			Return(domain.Competition{
+				ID:        fakedCompetitionID,
 				Ownership: fakedOwnership,
 			}, nil)
 
@@ -108,29 +108,29 @@ func TestCreateCompClass(t *testing.T) {
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
-			On("GetCompClassesByContest", mock.Anything, nil, fakedContestID).
+			On("GetCompClassesByCompetition", mock.Anything, nil, fakedCompetitionID).
 			Return([]domain.CompClass{}, nil)
 
 		mockedRepo.
 			On("StoreCompClass", mock.Anything, nil,
 				domain.CompClass{
-					Ownership:   fakedOwnership,
-					ContestID:   fakedContestID,
-					Name:        "Females",
-					Description: "Female climbers",
-					TimeBegin:   now,
-					TimeEnd:     now.Add(time.Hour),
+					Ownership:     fakedOwnership,
+					CompetitionID: fakedCompetitionID,
+					Name:          "Females",
+					Description:   "Female climbers",
+					TimeBegin:     now,
+					TimeEnd:       now.Add(time.Hour),
 				},
 			).
 			Return(
 				domain.CompClass{
-					ID:          fakedCompClassID,
-					Ownership:   fakedOwnership,
-					ContestID:   fakedContestID,
-					Name:        "Females",
-					Description: "Female climbers",
-					TimeBegin:   now,
-					TimeEnd:     now.Add(time.Hour),
+					ID:            fakedCompClassID,
+					Ownership:     fakedOwnership,
+					CompetitionID: fakedCompetitionID,
+					Name:          "Females",
+					Description:   "Female climbers",
+					TimeBegin:     now,
+					TimeEnd:       now.Add(time.Hour),
 				}, nil)
 
 		ucase := usecases.CompClassUseCase{
@@ -138,7 +138,7 @@ func TestCreateCompClass(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		compClass, err := ucase.CreateCompClass(context.Background(), fakedContestID, domain.CompClassTemplate{
+		compClass, err := ucase.CreateCompClass(context.Background(), fakedCompetitionID, domain.CompClassTemplate{
 			Name:        "Females",
 			Description: "Female climbers",
 			TimeBegin:   now,
@@ -165,7 +165,7 @@ func TestCreateCompClass(t *testing.T) {
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
-			On("GetCompClassesByContest", mock.Anything, nil, fakedContestID).
+			On("GetCompClassesByCompetition", mock.Anything, nil, fakedCompetitionID).
 			Return([]domain.CompClass{}, nil)
 
 		ucase := usecases.CompClassUseCase{
@@ -173,7 +173,7 @@ func TestCreateCompClass(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		_, err := ucase.CreateCompClass(context.Background(), fakedContestID, domain.CompClassTemplate{})
+		_, err := ucase.CreateCompClass(context.Background(), fakedCompetitionID, domain.CompClassTemplate{})
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
 		assert.True(t, validators.CompClassValidator{}.IsValidationError(err))
@@ -191,7 +191,7 @@ func TestCreateCompClass(t *testing.T) {
 
 		compClasses := make([]domain.CompClass, 20)
 		mockedRepo.
-			On("GetCompClassesByContest", mock.Anything, nil, fakedContestID).
+			On("GetCompClassesByCompetition", mock.Anything, nil, fakedCompetitionID).
 			Return(compClasses, nil)
 
 		ucase := usecases.CompClassUseCase{
@@ -199,7 +199,7 @@ func TestCreateCompClass(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		_, err := ucase.CreateCompClass(context.Background(), fakedContestID, domain.CompClassTemplate{})
+		_, err := ucase.CreateCompClass(context.Background(), fakedCompetitionID, domain.CompClassTemplate{})
 
 		require.ErrorIs(t, err, domain.ErrLimitExceeded)
 
@@ -219,7 +219,7 @@ func TestCreateCompClass(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		_, err := ucase.CreateCompClass(context.Background(), fakedContestID, domain.CompClassTemplate{})
+		_, err := ucase.CreateCompClass(context.Background(), fakedCompetitionID, domain.CompClassTemplate{})
 
 		require.ErrorIs(t, err, domain.ErrNoOwnership)
 

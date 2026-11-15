@@ -38,7 +38,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 	t.Run("HandleRulesUpdated", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+		fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
 
 		fakedCompClass1ID := testutils.RandomResourceID[domain.CompClassID]()
 		fakedCompClass2ID := testutils.RandomResourceID[domain.CompClassID]()
@@ -93,7 +93,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}))
 
 		effects := slices.Collect(f.engine.HandleRulesUpdated(domain.RulesUpdatedEvent{
-			ContestID:          fakedContestID,
+			CompetitionID:      fakedCompetitionID,
 			QualifyingProblems: 10,
 			Finalists:          7,
 			UsePoints:          true,

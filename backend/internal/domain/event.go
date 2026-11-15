@@ -9,9 +9,9 @@ import (
 
 type SubscriptionID = uuid.UUID
 
-func (f EventFilter) Match(contestID ContestID, contenderID ContenderID, eventType string) bool {
-	switch f.ContestID {
-	case 0, contestID:
+func (f EventFilter) Match(competitionID CompetitionID, contenderID ContenderID, eventType string) bool {
+	switch f.CompetitionID {
+	case 0, competitionID:
 	default:
 		return false
 	}
@@ -31,11 +31,11 @@ func (f EventFilter) Match(contestID ContestID, contenderID ContenderID, eventTy
 	return true
 }
 
-func NewEventFilter(contestID ContestID, contenderID ContenderID, eventTypes ...string) EventFilter {
+func NewEventFilter(competitionID CompetitionID, contenderID ContenderID, eventTypes ...string) EventFilter {
 	filter := EventFilter{
-		ContestID:   contestID,
-		ContenderID: contenderID,
-		EventTypes:  nil,
+		CompetitionID: competitionID,
+		ContenderID:   contenderID,
+		EventTypes:    nil,
 	}
 
 	if len(eventTypes) > 0 {
@@ -50,7 +50,7 @@ func NewEventFilter(contestID ContestID, contenderID ContenderID, eventTypes ...
 }
 
 type EventBroker interface {
-	Dispatch(contestID ContestID, event any)
+	Dispatch(competitionID CompetitionID, event any)
 	Subscribe(filters []EventFilter, bufferCapacity int) (SubscriptionID, EventReader)
 	Unsubscribe(subscriptionID SubscriptionID)
 }

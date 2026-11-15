@@ -2,39 +2,39 @@
   import "@awesome.me/webawesome/dist/components/details/details.js";
   import type WaDetails from "@awesome.me/webawesome/dist/components/details/details.js";
   import { LabeledText } from "@climblive/lib/components";
-  import type { CompClass, Contest, Problem } from "@climblive/lib/models";
+  import type { CompClass, Competition, Problem } from "@climblive/lib/models";
   import { format } from "date-fns";
   import { sv } from "date-fns/locale";
 
   interface Props {
-    contest: Contest;
+    competition: Competition;
     compClasses: CompClass[];
     problems: Problem[];
   }
 
-  let { contest, compClasses, problems }: Props = $props();
+  let { competition, compClasses, problems }: Props = $props();
 
   let details: WaDetails | undefined = $state();
 
-  const scoreboardUrl = `${location.protocol}//${location.host}/scoreboard/${contest.id}`;
+  const scoreboardUrl = `${location.protocol}//${location.host}/scoreboard/${competition.id}`;
 </script>
 
 <section>
-  <LabeledText label="Competition">{contest.name}</LabeledText>
-  {#if contest.description}
-    <LabeledText label="Description">{contest.description}</LabeledText>
+  <LabeledText label="Competition">{competition.name}</LabeledText>
+  {#if competition.description}
+    <LabeledText label="Description">{competition.description}</LabeledText>
   {/if}
-  {#if contest.location}
-    <LabeledText label="Location">{contest.location}</LabeledText>
+  {#if competition.location}
+    <LabeledText label="Location">{competition.location}</LabeledText>
   {/if}
-  {#if contest.timeBegin}
+  {#if competition.timeBegin}
     <LabeledText label="Start time">
-      {format(contest.timeBegin, "PPpp", { locale: sv })}
+      {format(competition.timeBegin, "PPpp", { locale: sv })}
     </LabeledText>
   {/if}
-  {#if contest.timeEnd}
+  {#if competition.timeEnd}
     <LabeledText label="End time">
-      {format(contest.timeEnd, "PPpp", { locale: sv })}
+      {format(competition.timeEnd, "PPpp", { locale: sv })}
     </LabeledText>
   {/if}
   <LabeledText label="Categories">
@@ -43,21 +43,21 @@
   <LabeledText label="Number of problems">
     {problems.length.toString()}</LabeledText
   >
-  {#if contest.qualifyingProblems > 0}
+  {#if competition.qualifyingProblems > 0}
     <LabeledText label="Qualifying problems">
-      {`${contest.qualifyingProblems.toString()} hardest`}
+      {`${competition.qualifyingProblems.toString()} hardest`}
     </LabeledText>
   {/if}
-  {#if contest.finalists > 0}
+  {#if competition.finalists > 0}
     <LabeledText label="Number of finalists">
-      {contest.finalists.toString()}
+      {competition.finalists.toString()}
     </LabeledText>
   {/if}
   <LabeledText label="Scoreboard">
     <a href={scoreboardUrl} target="_blank">{scoreboardUrl}</a>
   </LabeledText>
 </section>
-{#if contest.info}
+{#if competition.info}
   <wa-details
     onwa-after-show={() =>
       details?.scrollIntoView({
@@ -68,7 +68,7 @@
     bind:this={details}
     summary="General info"
   >
-    {@html contest.info}
+    {@html competition.info}
   </wa-details>
 {/if}
 

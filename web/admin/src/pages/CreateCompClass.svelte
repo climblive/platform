@@ -12,13 +12,13 @@
   import { navigate } from "svelte-routing";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
   }
 
-  let { contestId }: Props = $props();
+  let { competitionId }: Props = $props();
 
-  const compClassesQuery = $derived(getCompClassesQuery(contestId));
-  const createCompClass = $derived(createCompClassMutation(contestId));
+  const compClassesQuery = $derived(getCompClassesQuery(competitionId));
+  const createCompClass = $derived(createCompClassMutation(competitionId));
 
   const compClasses = $derived(compClassesQuery.data);
 
@@ -40,7 +40,8 @@
 
   const handleSubmit = async (tmpl: CompClassTemplate) => {
     createCompClass.mutate(tmpl, {
-      onSuccess: () => navigate(`/admin/contests/${contestId}#comp-classes`),
+      onSuccess: () =>
+        navigate(`/admin/competitions/${competitionId}#comp-classes`),
       onError: () => toastUnexpectedError("Failed to create category."),
     });
   };
@@ -55,7 +56,8 @@
         size="s"
         type="button"
         appearance="plain"
-        onclick={() => navigate(`/admin/contests/${contestId}#comp-classes`)}
+        onclick={() =>
+          navigate(`/admin/competitions/${competitionId}#comp-classes`)}
         >Cancel</wa-button
       >
       <wa-button

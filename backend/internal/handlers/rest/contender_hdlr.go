@@ -12,11 +12,11 @@ type contenderUseCase interface {
 	GetContenderByCode(ctx context.Context, registrationCode string) (domain.Contender, error)
 	GetPointValues(ctx context.Context, contenderID domain.ContenderID) ([]domain.PointValue, error)
 	GetContendersByCompClass(ctx context.Context, compClassID domain.CompClassID) ([]domain.Contender, error)
-	GetContendersByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Contender, error)
+	GetContendersByCompetition(ctx context.Context, competitionID domain.CompetitionID) ([]domain.Contender, error)
 	PatchContender(ctx context.Context, contenderID domain.ContenderID, patch domain.ContenderPatch) (domain.Contender, error)
 	ScrubContender(ctx context.Context, contenderID domain.ContenderID) (domain.Contender, error)
 	DeleteContender(ctx context.Context, contenderID domain.ContenderID) error
-	CreateContenders(ctx context.Context, contestID domain.ContestID, number int) ([]domain.Contender, error)
+	CreateContenders(ctx context.Context, competitionID domain.CompetitionID, number int) ([]domain.Contender, error)
 }
 
 type contenderHandler struct {
@@ -32,11 +32,11 @@ func InstallContenderHandler(mux *Mux, contenderUseCase contenderUseCase) {
 	mux.HandleFunc("GET /contenders/{contenderID}/points", handler.GetPointValues)
 	mux.HandleFunc("GET /codes/{registrationCode}/contender", handler.GetContenderByCode)
 	mux.HandleFunc("GET /compClasses/{compClassID}/contenders", handler.GetContendersByCompClass)
-	mux.HandleFunc("GET /contests/{contestID}/contenders", handler.GetContendersByContest)
+	mux.HandleFunc("GET /competitions/{competitionID}/contenders", handler.GetContendersByCompetition)
 	mux.HandleFunc("PATCH /contenders/{contenderID}", handler.PatchContender)
 	mux.HandleFunc("POST /contenders/{contenderID}/scrub", handler.ScrubContender)
 	mux.HandleFunc("DELETE /contenders/{contenderID}", handler.DeleteContender)
-	mux.HandleFunc("POST /contests/{contestID}/contenders", handler.CreateContenders)
+	mux.HandleFunc("POST /competitions/{competitionID}/contenders", handler.CreateContenders)
 }
 
 func (hdlr *contenderHandler) GetPointValues(w http.ResponseWriter, r *http.Request) {
@@ -99,14 +99,14 @@ func (hdlr *contenderHandler) GetContendersByCompClass(w http.ResponseWriter, r 
 	writeResponse(w, http.StatusOK, contenders)
 }
 
-func (hdlr *contenderHandler) GetContendersByContest(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+func (hdlr *contenderHandler) GetContendersByCompetition(w http.ResponseWriter, r *http.Request) {
+	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	contenders, err := hdlr.contenderUseCase.GetContendersByContest(r.Context(), contestID)
+	contenders, err := hdlr.contenderUseCase.GetContendersByCompetition(r.Context(), competitionID)
 	if err != nil {
 		handleError(w, err)
 		return
@@ -169,7 +169,7 @@ func (hdlr *contenderHandler) ScrubContender(w http.ResponseWriter, r *http.Requ
 }
 
 func (hdlr *contenderHandler) CreateContenders(w http.ResponseWriter, r *http.Request) {
-	contestID, err := parseResourceID[domain.ContestID](r.PathValue("contestID"))
+	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -180,7 +180,7 @@ func (hdlr *contenderHandler) CreateContenders(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	contenders, err := hdlr.contenderUseCase.CreateContenders(r.Context(), contestID, arguments.Number)
+	contenders, err := hdlr.contenderUseCase.CreateContenders(r.Context(), competitionID, arguments.Number)
 	if err != nil {
 		handleError(w, err)
 		return

@@ -4,7 +4,7 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import type { Problem, ProblemPatch } from "@climblive/lib/models";
   import {
-    getContestQuery,
+    getCompetitionQuery,
     getProblemQuery,
     patchProblemMutation,
   } from "@climblive/lib/queries";
@@ -22,15 +22,17 @@
 
   const problem = $derived(problemQuery.data);
 
-  const contestQuery = $derived(
-    problem?.contestId ? getContestQuery(problem.contestId) : undefined,
+  const competitionQuery = $derived(
+    problem?.competitionId
+      ? getCompetitionQuery(problem.competitionId)
+      : undefined,
   );
-  const contest = $derived(contestQuery?.data);
+  const competition = $derived(competitionQuery?.data);
 
   const handleSubmit = async (tmpl: ProblemPatch) => {
     patchProblem.mutate(tmpl, {
       onSuccess: (problem: Problem) =>
-        navigate(`/admin/contests/${problem.contestId}#problems`),
+        navigate(`/admin/competitions/${problem.competitionId}#problems`),
       onError: () => toastUnexpectedError("Failed to save problem."),
     });
   };
@@ -43,7 +45,7 @@
     submit={handleSubmit}
     data={problem}
     schema={formSchema}
-    hidePoints={contest?.usePoints === false}
+    hidePoints={competition?.usePoints === false}
   >
     <div class="controls">
       <wa-button
@@ -51,7 +53,7 @@
         type="button"
         appearance="plain"
         onclick={() =>
-          navigate(`/admin/contests/${problem.contestId}#problems`)}
+          navigate(`/admin/competitions/${problem.competitionId}#problems`)}
         >Cancel</wa-button
       >
       <wa-button

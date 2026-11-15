@@ -10,7 +10,7 @@ export const problemValueSchema = z.object({
 
 export const problemSchema: z.ZodType<Problem> = problemValueSchema.extend({
   id: z.number(),
-  contestId: z.number(),
+  competitionId: z.number(),
   number: z.number(),
   holdColorPrimary: z.string(),
   holdColorSecondary: z.string().optional(),

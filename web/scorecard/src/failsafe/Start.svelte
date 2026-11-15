@@ -64,7 +64,10 @@
 </script>
 
 {#if contender}
-  <Scorecard contestId={contender.contestId} contenderId={contender.id} />
+  <Scorecard
+    competitionId={contender.competitionId}
+    contenderId={contender.id}
+  />
 {:else}
   <h2>Welcome!</h2>
   <form bind:this={form} onsubmit={handleEnter}>

@@ -14,17 +14,17 @@ export const getCompClassQuery = (compClassId: number) =>
   }));
 
 export const getCompClassesQuery = (
-  contestId: number,
+  competitionId: number,
   options?: Partial<Parameters<typeof createQuery<CompClass[]>>[0]>,
 ) => {
   const client = useQueryClient();
 
   return createQuery(() => ({
     ...options,
-    queryKey: ["comp-classes", { contestId }],
+    queryKey: ["comp-classes", { competitionId }],
     queryFn: async () => {
       const compClasses =
-        await ApiClient.getInstance().getCompClasses(contestId);
+        await ApiClient.getInstance().getCompClasses(competitionId);
 
       for (const compClass of compClasses) {
         client.setQueryData<CompClass>(
@@ -38,14 +38,14 @@ export const getCompClassesQuery = (
   }));
 };
 
-export const createCompClassMutation = (contestId: number) => {
+export const createCompClassMutation = (competitionId: number) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
     mutationFn: (template: CompClassTemplate) =>
-      ApiClient.getInstance().createCompClass(contestId, template),
+      ApiClient.getInstance().createCompClass(competitionId, template),
     onSuccess: (newCompClass) => {
-      let queryKey: QueryKey = ["comp-classes", { contestId }];
+      let queryKey: QueryKey = ["comp-classes", { competitionId }];
 
       client.setQueryData<CompClass[]>(queryKey, (oldCompClasses) => {
         return [...(oldCompClasses ?? []), newCompClass];
@@ -67,7 +67,7 @@ export const patchCompClassMutation = (compClassId: number) => {
     onSuccess: (patchedCompClass) => {
       let queryKey: QueryKey = [
         "comp-classes",
-        { contestId: patchedCompClass.contestId },
+        { competitionId: patchedCompClass.competitionId },
       ];
 
       client.setQueryData<CompClass[]>(queryKey, (oldCompClasses) => {

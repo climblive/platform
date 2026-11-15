@@ -1,11 +1,11 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
-  import { ContestStateProvider, Timer } from "@climblive/lib/components";
+  import { CompetitionStateProvider, Timer } from "@climblive/lib/components";
   import type { ScoreboardEntry } from "@climblive/lib/models";
   import { type Readable } from "svelte/store";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
     name: string;
     compClassId: number;
     startTime: Date;
@@ -13,8 +13,14 @@
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
   }
 
-  let { contestId, name, compClassId, startTime, endTime, scoreboard }: Props =
-    $props();
+  let {
+    competitionId,
+    name,
+    compClassId,
+    startTime,
+    endTime,
+    scoreboard,
+  }: Props = $props();
 
   let classSize = $derived(($scoreboard.get(compClassId) ?? []).length);
   let totalSize = $derived.by(() => {
@@ -24,8 +30,8 @@
   });
 </script>
 
-<ContestStateProvider {contestId} {compClassId}>
-  {#snippet children({ contestState, progress })}
+<CompetitionStateProvider {competitionId} {compClassId}>
+  {#snippet children({ competitionState, progress })}
     <header>
       <div class="left">
         <div class="title">
@@ -34,7 +40,7 @@
             {name}
           </h2>
         </div>
-        {#if contestState === "NOT_STARTED"}
+        {#if competitionState === "NOT_STARTED"}
           <Timer endTime={startTime} label="Starting in" />
         {:else}
           <Timer {endTime} label="Time left" />
@@ -46,7 +52,7 @@
       <wa-progress-bar value={progress}></wa-progress-bar>
     </header>
   {/snippet}
-</ContestStateProvider>
+</CompetitionStateProvider>
 
 <style>
   header {

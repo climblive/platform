@@ -13,10 +13,10 @@
     Table,
     type ColumnDefinition,
   } from "@climblive/lib/components";
-  import type { Contest } from "@climblive/lib/models";
+  import type { Competition } from "@climblive/lib/models";
   import {
-    getAllContestsQuery,
-    getContestsByOrganizerQuery,
+    getAllCompetitionsQuery,
+    getCompetitionsByOrganizerQuery,
     getSelfQuery,
   } from "@climblive/lib/queries";
   import { getCountryName, getFlag, SyncedTime } from "@climblive/lib/utils";
@@ -24,12 +24,12 @@
   import { onMount } from "svelte";
   import { Link, navigate } from "svelte-routing";
 
-  import ArchiveContest from "./ArchiveContest.svelte";
-  import DuplicateContest from "./DuplicateContest.svelte";
-  import RestoreContest from "./RestoreContest.svelte";
-  import TransferContest from "./TransferContest.svelte";
+  import ArchiveCompetition from "./ArchiveCompetition.svelte";
+  import DuplicateCompetition from "./DuplicateCompetition.svelte";
+  import RestoreCompetition from "./RestoreCompetition.svelte";
+  import TransferCompetition from "./TransferCompetition.svelte";
 
-  const maxContestsPerWeek = 10;
+  const maxCompetitionsPerWeek = 10;
   const defaultTableLimit = 10;
   const createButtonId = $props.id();
 
@@ -42,7 +42,8 @@
   let showArchived = $state(false);
   let expandedListings = $state<string[]>([]);
   let selectedAction = $state<
-    { type: "duplicate" | "transfer" | "archive"; contest: Contest } | undefined
+    | { type: "duplicate" | "transfer" | "archive"; competition: Competition }
+    | undefined
   >();
 
   const time = new SyncedTime(60_000);
@@ -55,51 +56,53 @@
 
   const selfQuery = $derived(getSelfQuery());
 
-  const contestsQuery = $derived(
-    getContestsByOrganizerQuery(organizerId ?? 0, {
+  const competitionsQuery = $derived(
+    getCompetitionsByOrganizerQuery(organizerId ?? 0, {
       enabled: organizerId !== undefined,
     }),
   );
-  const allContestsQuery = $derived(
-    getAllContestsQuery({ enabled: organizerId === undefined }),
+  const allCompetitionsQuery = $derived(
+    getAllCompetitionsQuery({ enabled: organizerId === undefined }),
   );
 
   const self = $derived(selfQuery.data);
-  const contests = $derived(
-    organizerId === undefined ? allContestsQuery.data : contestsQuery.data,
+  const competitions = $derived(
+    organizerId === undefined
+      ? allCompetitionsQuery.data
+      : competitionsQuery.data,
   );
 
   const [ongoing, upcoming, past, archived] = $derived.by(() => {
     const now = time.current;
 
-    const ongoing: Contest[] = [];
-    const upcoming: Contest[] = [];
-    const past: Contest[] = [];
-    const archived: Contest[] = [];
+    const ongoing: Competition[] = [];
+    const upcoming: Competition[] = [];
+    const past: Competition[] = [];
+    const archived: Competition[] = [];
 
-    contests?.forEach((contest) => {
-      const { timeBegin, timeEnd } = contest;
+    competitions?.forEach((competition) => {
+      const { timeBegin, timeEnd } = competition;
 
-      if (contest.archivedAt != null) {
-        archived.push(contest);
+      if (competition.archivedAt != null) {
+        archived.push(competition);
       } else if (timeBegin && timeEnd && now >= timeBegin && now < timeEnd) {
-        ongoing.push(contest);
+        ongoing.push(competition);
       } else if (timeEnd && now > timeEnd) {
-        past.push(contest);
+        past.push(competition);
       } else {
-        upcoming.push(contest);
+        upcoming.push(competition);
       }
     });
 
-    ongoing?.sort(sortContests);
-    upcoming?.sort(sortContests).reverse();
-    past?.sort(sortContests);
-    archived?.sort(sortContests);
+    ongoing?.sort(sortCompetitions);
+    upcoming?.sort(sortCompetitions).reverse();
+    past?.sort(sortCompetitions);
+    archived?.sort(sortCompetitions);
 
     return [ongoing, upcoming, past, archived];
   });
 
-  const sortContests = (c1: Contest, c2: Contest) => {
+  const sortCompetitions = (c1: Competition, c2: Competition) => {
     if (c1.timeBegin && c2.timeBegin) {
       return c2.timeBegin.getTime() - c1.timeBegin.getTime();
     }
@@ -107,7 +110,7 @@
     return 0;
   };
 
-  const columns: ColumnDefinition<Contest>[] = [
+  const columns: ColumnDefinition<Competition>[] = [
     {
       label: "",
       mobile: true,
@@ -161,25 +164,28 @@
     expandedListings = [...expandedListings, heading];
   };
 
-  const handleContestAction = (event: WaSelectEvent, contest: Contest) => {
+  const handleCompetitionAction = (
+    event: WaSelectEvent,
+    competition: Competition,
+  ) => {
     const action = (event.detail.item as WaDropdownItem).value;
 
     switch (action) {
       case "edit":
-        navigate(`/admin/contests/${contest.id}/edit`);
+        navigate(`/admin/competitions/${competition.id}/edit`);
         break;
       case "results":
-        navigate(`/admin/contests/${contest.id}/results`);
+        navigate(`/admin/competitions/${competition.id}/results`);
         break;
       case "duplicate":
       case "transfer":
       case "archive":
-        selectedAction = { type: action, contest };
+        selectedAction = { type: action, competition };
         break;
     }
   };
 
-  const numberOfUnarchivedContests = $derived(
+  const numberOfUnarchivedCompetitions = $derived(
     [ongoing, upcoming, past].reduce(
       (partialSum, a) => partialSum + a.length,
       0,
@@ -187,7 +193,7 @@
   );
 
   const limitReached = $derived.by(() => {
-    if (!contests) {
+    if (!competitions) {
       return false;
     }
 
@@ -196,32 +202,32 @@
     }
 
     const oneWeekAgo = sub(new Date(), { weeks: 1 });
-    const recentCount = contests.filter(
+    const recentCount = competitions.filter(
       (c) => c.archivedAt == null && c.created > oneWeekAgo,
     ).length;
 
-    return recentCount >= maxContestsPerWeek;
+    return recentCount >= maxCompetitionsPerWeek;
   });
 </script>
 
-{#snippet renderFlag({ id, country }: Contest)}
+{#snippet renderFlag({ id, country }: Competition)}
   <wa-tooltip for="flag-{id}">{getCountryName(country)}</wa-tooltip>
   <span id="flag-{id}" class="flag">{getFlag(country)}</span>
 {/snippet}
 
-{#snippet renderName({ id, name }: Contest)}
-  <Link to="contests/{id}">{name}</Link>
+{#snippet renderName({ id, name }: Competition)}
+  <Link to="competitions/{id}">{name}</Link>
 {/snippet}
 
-{#snippet renderLocation({ location }: Contest)}
+{#snippet renderLocation({ location }: Competition)}
   {location || "-"}
 {/snippet}
 
-{#snippet renderRegisteredContenders({ registeredContenders }: Contest)}
+{#snippet renderRegisteredContenders({ registeredContenders }: Competition)}
   {registeredContenders}
 {/snippet}
 
-{#snippet renderTimeBegin({ timeBegin, timeEnd }: Contest, mobile: boolean)}
+{#snippet renderTimeBegin({ timeBegin, timeEnd }: Competition, mobile: boolean)}
   {#if timeBegin}
     {#if timeEnd && new Date() > timeEnd}
       {format(timeBegin, "yyyy-MM-dd HH:mm")}
@@ -233,7 +239,7 @@
   {/if}
 {/snippet}
 
-{#snippet renderTimeEnd({ timeEnd }: Contest)}
+{#snippet renderTimeEnd({ timeEnd }: Competition)}
   {#if timeEnd}
     {format(timeEnd, "yyyy-MM-dd HH:mm")}
   {:else}
@@ -241,14 +247,14 @@
   {/if}
 {/snippet}
 
-{#snippet renderControls(contest: Contest)}
-  {#if contest.archivedAt !== undefined}
-    <RestoreContest contestId={contest.id}>
-      {#snippet children({ restoreContest })}
+{#snippet renderControls(competition: Competition)}
+  {#if competition.archivedAt !== undefined}
+    <RestoreCompetition competitionId={competition.id}>
+      {#snippet children({ restoreCompetition })}
         <wa-dropdown
           onwa-select={(event: WaSelectEvent) => {
             if ((event.detail.item as WaDropdownItem).value === "restore") {
-              restoreContest();
+              restoreCompetition();
             }
           }}
         >
@@ -261,11 +267,11 @@
           </wa-dropdown-item>
         </wa-dropdown>
       {/snippet}
-    </RestoreContest>
+    </RestoreCompetition>
   {:else}
     <wa-dropdown
       onwa-select={(event: WaSelectEvent) =>
-        handleContestAction(event, contest)}
+        handleCompetitionAction(event, competition)}
     >
       <wa-button slot="trigger" size="s" appearance="plain">
         <wa-icon name="ellipsis-vertical" label="Actions"></wa-icon>
@@ -288,7 +294,7 @@
       <wa-dropdown-item
         value="transfer"
         disabled={!self?.organizers.some(
-          ({ id }) => id !== contest.ownership.organizerId,
+          ({ id }) => id !== competition.ownership.organizerId,
         )}
       >
         <wa-icon slot="icon" name="arrow-right"></wa-icon>
@@ -309,53 +315,53 @@
       class={className}
       variant="neutral"
       disabled={limitReached}
-      onclick={() => navigate(`organizers/${organizerId}/contests/new`)}
+      onclick={() => navigate(`organizers/${organizerId}/competitions/new`)}
       >Create new competition</wa-button
     >
     {#if limitReached}
       <wa-tooltip for={createButtonId} placement="top-start"
-        >Limit of {maxContestsPerWeek} competitions per week reached.</wa-tooltip
+        >Limit of {maxCompetitionsPerWeek} competitions per week reached.</wa-tooltip
       >
     {/if}
   {/if}
 {/snippet}
 
 <h2>Competitions</h2>
-{#if numberOfUnarchivedContests > 0}
-  {@render createButton("create-contest-button")}
+{#if numberOfUnarchivedCompetitions > 0}
+  {@render createButton("create-competition-button")}
 {/if}
 
 {#snippet listing(
   heading: string,
-  contests: Contest[],
+  competitions: Competition[],
   showSummary: boolean = false,
 )}
-  {@const totalRegistered = contests.reduce(
+  {@const totalRegistered = competitions.reduce(
     (sum, c) => sum + c.registeredContenders,
     0,
   )}
   {@const averageRegistered = Math.floor(
-    contests.length > 0 ? totalRegistered / contests.length : 0,
+    competitions.length > 0 ? totalRegistered / competitions.length : 0,
   )}
 
-  <h3>{heading} ({contests.length})</h3>
+  <h3>{heading} ({competitions.length})</h3>
   {#if showSummary}
-    <p class="contest-summary">
+    <p class="competition-summary">
       A total of {totalRegistered}
       {totalRegistered === 1 ? "competitor has" : "competitors have"} participated
-      in {contests.length}
-      {contests.length === 1 ? "competition" : "competitions"} averaging {averageRegistered}
+      in {competitions.length}
+      {competitions.length === 1 ? "competition" : "competitions"} averaging {averageRegistered}
       {averageRegistered === 1 ? "competitor" : "competitors"} per competition.
     </p>
   {/if}
   <Table
     {columns}
     data={expandedListings.includes(heading)
-      ? contests
-      : contests.slice(0, defaultTableLimit)}
+      ? competitions
+      : competitions.slice(0, defaultTableLimit)}
     getId={({ id }) => id}
   ></Table>
-  {#if !expandedListings.includes(heading) && contests.length > defaultTableLimit}
+  {#if !expandedListings.includes(heading) && competitions.length > defaultTableLimit}
     <wa-button
       class="show-more"
       appearance="plain"
@@ -364,7 +370,7 @@
   {/if}
 {/snippet}
 
-{#if contestsQuery.isLoading || allContestsQuery.isLoading || !ongoing || !upcoming || !past || !archived}
+{#if competitionsQuery.isLoading || allCompetitionsQuery.isLoading || !ongoing || !upcoming || !past || !archived}
   <Loader />
 {:else}
   {#if ongoing?.length}
@@ -379,7 +385,7 @@
     {@render listing("Past", past, true)}
   {/if}
 
-  {#if contests && numberOfUnarchivedContests === 0}
+  {#if competitions && numberOfUnarchivedCompetitions === 0}
     <EmptyState
       title="No competitions yet"
       description="Create a competition to get started with your first event."
@@ -412,32 +418,32 @@
 {/if}
 
 {#if selectedAction?.type === "duplicate"}
-  <DuplicateContest
-    contestId={selectedAction.contest.id}
-    contestName={selectedAction.contest.name}
+  <DuplicateCompetition
+    competitionId={selectedAction.competition.id}
+    competitionName={selectedAction.competition.name}
     open
     onClose={() => (selectedAction = undefined)}
   />
 {:else if selectedAction?.type === "transfer"}
-  <TransferContest
-    contestId={selectedAction.contest.id}
-    contestName={selectedAction.contest.name}
-    organizerId={selectedAction.contest.ownership.organizerId}
+  <TransferCompetition
+    competitionId={selectedAction.competition.id}
+    competitionName={selectedAction.competition.name}
+    organizerId={selectedAction.competition.ownership.organizerId}
     open
     onClose={() => (selectedAction = undefined)}
   />
 {:else if selectedAction?.type === "archive"}
-  <ArchiveContest
-    contestId={selectedAction.contest.id}
-    contestName={selectedAction.contest.name}
-    organizerId={selectedAction.contest.ownership.organizerId}
+  <ArchiveCompetition
+    competitionId={selectedAction.competition.id}
+    competitionName={selectedAction.competition.name}
+    organizerId={selectedAction.competition.ownership.organizerId}
     open
     onClose={() => (selectedAction = undefined)}
   />
 {/if}
 
 <style>
-  .create-contest-button {
+  .create-competition-button {
     margin-block-end: var(--wa-space-m);
   }
 
@@ -451,7 +457,7 @@
     margin: var(--wa-space-m) auto 0;
   }
 
-  .contest-summary {
+  .competition-summary {
     color: var(--wa-color-text-quiet);
     font-size: var(--wa-font-size-s);
     margin-block-start: var(--wa-space-xs) var(--wa-space-m);

@@ -2,7 +2,7 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { Score, Timer } from "@climblive/lib/components";
   import type { Problem, Tick } from "@climblive/lib/models";
-  import { type ContestState } from "@climblive/lib/types";
+  import { type CompetitionState } from "@climblive/lib/types";
   import { ordinalSuperscript } from "@climblive/lib/utils";
   import type { Snippet } from "svelte";
 
@@ -13,7 +13,7 @@
     placement: number | undefined;
     finalist: boolean;
     disqualified: boolean;
-    contestState: ContestState;
+    competitionState: CompetitionState;
     startTime: Date;
     endTime: Date;
   }
@@ -25,7 +25,7 @@
     placement,
     finalist,
     disqualified,
-    contestState,
+    competitionState,
     startTime,
     endTime,
   }: Props = $props();
@@ -84,7 +84,7 @@
 
 {#snippet timerValue()}
   <strong>
-    {#if contestState === "NOT_STARTED"}
+    {#if competitionState === "NOT_STARTED"}
       <Timer endTime={startTime} label="Starting in" hideLabel />
     {:else}
       <Timer {endTime} label="Time left" hideLabel />
@@ -113,7 +113,7 @@
     {@render entry("Score", scoreValue)}
     {@render entry("Placement", placementValue)}
 
-    {#if contestState === "NOT_STARTED"}
+    {#if competitionState === "NOT_STARTED"}
       {@render entry("Starting in", timerValue)}
     {:else}
       {@render entry("Time left", timerValue)}

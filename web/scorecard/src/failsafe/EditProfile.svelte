@@ -2,7 +2,7 @@
   import {
     getCompClassesQuery,
     getContenderQuery,
-    getContestQuery,
+    getCompetitionQuery,
     patchContenderMutation,
     scrubContenderMutation,
   } from "@climblive/lib/queries";
@@ -11,18 +11,18 @@
   import { onMount } from "svelte";
 
   type Props = {
-    contestId: number;
+    competitionId: number;
     contenderId: number;
   };
 
-  const { contestId, contenderId }: Props = $props();
+  const { competitionId, contenderId }: Props = $props();
 
   let form: HTMLFormElement | undefined = $state();
   let showInfo = $state(false);
 
   const contenderQuery = $derived(getContenderQuery(contenderId));
-  const contestQuery = $derived(getContestQuery(contestId));
-  const compClassesQuery = $derived(getCompClassesQuery(contestId));
+  const competitionQuery = $derived(getCompetitionQuery(competitionId));
+  const compClassesQuery = $derived(getCompClassesQuery(competitionId));
   const patchContender = $derived(patchContenderMutation(contenderId));
   const scrubContender = $derived(scrubContenderMutation(contenderId));
   const time = new SyncedTime(60_000);
@@ -32,7 +32,7 @@
   });
 
   let contender = $derived(contenderQuery.data);
-  let contest = $derived(contestQuery.data);
+  let competition = $derived(competitionQuery.data);
   let compClasses = $derived(compClassesQuery.data);
   let selectedCompClass = $derived(
     compClasses?.find(({ id }) => id === contender?.compClassId),
@@ -47,7 +47,7 @@
     const base = new Date(0);
     return formatDistance(
       add(base, {
-        minutes: (contest?.nameRetentionTime ?? 0) / 60_000_000_000,
+        minutes: (competition?.nameRetentionTime ?? 0) / 60_000_000_000,
       }),
       base,
     );
@@ -113,7 +113,7 @@
         </button>
       {/if}
     </div>
-    {#if !contender.entered && contest}
+    {#if !contender.entered && competition}
       <p class="info">
         Your name will be stored for {registrationRetentionDuration} after the competition
         ends, after which it will be removed and your results anonymized.

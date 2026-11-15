@@ -4,21 +4,21 @@
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import { SaveIndicator } from "@climblive/lib/components";
   import { checked, GenericForm, name } from "@climblive/lib/forms";
-  import type { Contest, ContestPatch } from "@climblive/lib/models";
-  import { patchContestMutation } from "@climblive/lib/queries";
+  import type { Competition, CompetitionPatch } from "@climblive/lib/models";
+  import { patchCompetitionMutation } from "@climblive/lib/queries";
   import { debounce, z } from "@climblive/lib/utils";
   import RuleOptionCard from "../RuleOptionCard.svelte";
   import { doSubmit } from "../RulesEditor.svelte";
 
   interface Props {
-    contest: Contest;
+    competition: Competition;
   }
 
-  const { contest }: Props = $props();
+  const { competition }: Props = $props();
 
-  const patchContest = patchContestMutation(contest.id);
+  const patchCompetition = patchCompetitionMutation(competition.id);
 
-  let enabled = $derived(contest.finalists > 0);
+  let enabled = $derived(competition.finalists > 0);
 
   const formSchema = z.object({
     finalists: z.coerce.number().min(0).max(65536).optional(),
@@ -29,8 +29,8 @@
     1000,
   );
 
-  const handleSubmit = (value: Partial<ContestPatch>) =>
-    doSubmit(patchContest, { finalists: value.finalists ?? 0 });
+  const handleSubmit = (value: Partial<CompetitionPatch>) =>
+    doSubmit(patchCompetition, { finalists: value.finalists ?? 0 });
 </script>
 
 <GenericForm submit={handleSubmit} schema={formSchema}>
@@ -53,7 +53,7 @@
         ></wa-checkbox>
       {/snippet}
       {#snippet indicator()}
-        {#if patchContest.isSuccess}
+        {#if patchCompetition.isSuccess}
           <SaveIndicator />
         {/if}
       {/snippet}
@@ -67,7 +67,7 @@
               required
               min={0}
               max={65536}
-              defaultValue={contest.finalists || 7}
+              defaultValue={competition.finalists || 7}
               oninput={() => debouncedSubmit(form)}
             ></wa-number-input>
           {/if}

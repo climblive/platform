@@ -17,23 +17,25 @@
   } from "@climblive/lib/components";
   import type { Contender } from "@climblive/lib/models";
   import {
-    getContendersByContestQuery,
-    getContestQuery,
+    getContendersByCompetitionQuery,
+    getCompetitionQuery,
   } from "@climblive/lib/queries";
   import { Link, navigate } from "svelte-routing";
 
   const maxTickets = 500;
 
   interface Props {
-    contestId: number;
+    competitionId: number;
   }
 
-  const { contestId }: Props = $props();
+  const { competitionId }: Props = $props();
 
-  const contestQuery = $derived(getContestQuery(contestId));
-  const contendersQuery = $derived(getContendersByContestQuery(contestId));
+  const competitionQuery = $derived(getCompetitionQuery(competitionId));
+  const contendersQuery = $derived(
+    getContendersByCompetitionQuery(competitionId),
+  );
 
-  const contest = $derived(contestQuery.data);
+  const competition = $derived(competitionQuery.data);
   const contenders = $derived(contendersQuery.data);
 
   let createTicketsDialog: CreateTicketsDialog | undefined = $state();
@@ -133,7 +135,7 @@
       return undefined;
     }
 
-    return `/admin/contests/${contestId}/tickets/print?from=${selectionStartId}&to=${selectionEndId}`;
+    return `/admin/competitions/${competitionId}/tickets/print?from=${selectionStartId}&to=${selectionEndId}`;
   });
 
   const handleCreated = (newContenders: Contender[]) => {
@@ -210,15 +212,17 @@
   {/if}
 {/snippet}
 
-{#if contest}
+{#if competition}
   <wa-breadcrumb>
     <wa-breadcrumb-item
       onclick={() =>
-        navigate(`/admin/organizers/${contest.ownership.organizerId}/contests`)}
-      ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
+        navigate(
+          `/admin/organizers/${competition.ownership.organizerId}/competitions`,
+        )}><wa-icon name="home"></wa-icon></wa-breadcrumb-item
     >
-    <wa-breadcrumb-item onclick={() => navigate(`/admin/contests/${contestId}`)}
-      >{contest.name}</wa-breadcrumb-item
+    <wa-breadcrumb-item
+      onclick={() => navigate(`/admin/competitions/${competitionId}`)}
+      >{competition.name}</wa-breadcrumb-item
     >
     <wa-breadcrumb-item>Tickets</wa-breadcrumb-item>
   </wa-breadcrumb>
@@ -266,7 +270,7 @@
 
   <CreateTicketsDialog
     bind:this={createTicketsDialog}
-    {contestId}
+    {competitionId}
     {remainingCodes}
     onCreated={handleCreated}
   />
