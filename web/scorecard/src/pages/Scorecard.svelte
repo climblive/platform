@@ -25,7 +25,7 @@
     ascentDeregisteredEventSchema,
     ascentRegisteredEventSchema,
     contenderPublicInfoUpdatedEventSchema,
-    contenderScoreUpdatedEventSchema,
+    contenderResultUpdatedEventSchema,
     NO_SCORE,
     pointValueUpdatedEventSchema,
     raffleWinnerDrawnEventSchema,
@@ -221,9 +221,9 @@
 
   $effect(() => {
     if (contender) {
-      score = contender.score?.score ?? NO_SCORE;
-      placement = contender.score?.placement;
-      finalist = contender.score?.finalist ?? false;
+      score = contender.result?.score ?? NO_SCORE;
+      placement = contender.result?.placement;
+      finalist = contender.result?.finalist ?? false;
     }
   });
 
@@ -257,7 +257,7 @@
         contenderId: $session.contenderId,
         eventTypes: {
           CONTENDER_PUBLIC_INFO_UPDATED: {},
-          CONTENDER_SCORE_UPDATED: {},
+          CONTENDER_RESULT_UPDATED: {},
           ASCENT_REGISTERED: {},
           ASCENT_DEREGISTERED: {},
           POINT_VALUE_UPDATED: {},
@@ -300,9 +300,9 @@
             );
           }
           break;
-        case "CONTENDER_SCORE_UPDATED":
+        case "CONTENDER_RESULT_UPDATED":
           {
-            const event = contenderScoreUpdatedEventSchema.parse(
+            const event = contenderResultUpdatedEventSchema.parse(
               JSON.parse(e.data),
             );
 

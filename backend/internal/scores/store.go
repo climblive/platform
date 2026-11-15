@@ -17,7 +17,7 @@ type MemoryStore struct {
 	}, domain.PointValue]
 	contenders map[domain.ContenderID]Contender
 	ticks      map[domain.ContenderID]map[domain.ProblemID]Tick
-	scores     *DiffMap[domain.ContenderID, domain.Score]
+	results    *DiffMap[domain.ContenderID, domain.Result]
 }
 
 func NewMemoryStore() *MemoryStore {
@@ -29,7 +29,7 @@ func NewMemoryStore() *MemoryStore {
 		}](ComparePointValue),
 		contenders: make(map[domain.ContenderID]Contender),
 		ticks:      make(map[domain.ContenderID]map[domain.ProblemID]Tick),
-		scores:     NewDiffMap[domain.ContenderID](CompareScore),
+		results:    NewDiffMap[domain.ContenderID](CompareResult),
 		rules:      Rules{},
 	}
 }
@@ -174,12 +174,12 @@ func (s *MemoryStore) SavePointValue(contenderID domain.ContenderID, problemID d
 	s.pointValues.Set(key, value)
 }
 
-func (s *MemoryStore) SaveScore(score domain.Score) {
-	s.scores.Set(score.ContenderID, score)
+func (s *MemoryStore) SaveResult(result domain.Result) {
+	s.results.Set(result.ContenderID, result)
 }
 
-func (s *MemoryStore) GetDirtyScores() []domain.Score {
-	return s.scores.Commit()
+func (s *MemoryStore) GetDirtyResults() []domain.Result {
+	return s.results.Commit()
 }
 
 func (s *MemoryStore) GetDirtyPointValues() []domain.PointValue {

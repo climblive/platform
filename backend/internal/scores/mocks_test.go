@@ -91,11 +91,11 @@ func (m *engineStoreMock) GetDirtyPointValues() []domain.PointValue {
 	return args.Get(0).([]domain.PointValue)
 }
 
-func (m *engineStoreMock) SaveScore(score domain.Score) {
-	m.Called(score)
+func (m *engineStoreMock) SaveResult(result domain.Result) {
+	m.Called(result)
 }
 
-func (m *engineStoreMock) GetDirtyScores() []domain.Score {
+func (m *engineStoreMock) GetDirtyResults() []domain.Result {
 	args := m.Called()
-	return args.Get(0).([]domain.Score)
+	return args.Get(0).([]domain.Result)
 }

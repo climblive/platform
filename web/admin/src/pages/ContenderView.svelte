@@ -189,23 +189,23 @@
         <LabeledText label="Placement">
           {#if contender.disqualified}
             Disqualified
-          {:else if contender.score?.placement}
-            {contender.score.placement}<sup
-              >{ordinalSuperscript(contender.score.placement)}</sup
+          {:else if contender.result?.placement}
+            {contender.result.placement}<sup
+              >{ordinalSuperscript(contender.result.placement)}</sup
             >
           {:else}
             -
           {/if}
         </LabeledText>
         <LabeledText label="Score">
-          {#if contender.score?.score}
-            <Score value={contender.score.score}></Score>
+          {#if contender.result?.score}
+            <Score value={contender.result.score}></Score>
           {:else}
             -
           {/if}
         </LabeledText>
         <LabeledText label="Finalist">
-          <wa-icon name={contender.score?.finalist ? "medal" : "minus"}
+          <wa-icon name={contender.result?.finalist ? "medal" : "minus"}
           ></wa-icon>
         </LabeledText>
       </article>

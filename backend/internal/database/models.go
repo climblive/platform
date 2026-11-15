@@ -96,7 +96,7 @@ type RaffleWinner struct {
 	Timestamp   time.Time
 }
 
-type Score struct {
+type Result struct {
 	ContenderID int32
 	Timestamp   time.Time
 	Score       string

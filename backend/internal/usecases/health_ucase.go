@@ -8,7 +8,7 @@ import (
 
 type HealthUseCase struct {
 	ScoreEngineManager domain.StatusReporter
-	ScoreKeeper        domain.StatusReporter
+	ResultKeeper       domain.StatusReporter
 	Scrubber           domain.StatusReporter
 	PointValueKeeper   domain.StatusReporter
 }
@@ -16,7 +16,7 @@ type HealthUseCase struct {
 func (uc *HealthUseCase) GetHealth(_ context.Context) ([]domain.ServiceStatus, error) {
 	return []domain.ServiceStatus{
 		uc.ScoreEngineManager.GetStatus(),
-		uc.ScoreKeeper.GetStatus(),
+		uc.ResultKeeper.GetStatus(),
 		uc.Scrubber.GetStatus(),
 		uc.PointValueKeeper.GetStatus(),
 	}, nil

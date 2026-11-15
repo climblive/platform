@@ -470,7 +470,7 @@ func (r *ContenderRunner) ReadEvents(contenderID domain.ContenderID) {
 			r.contender.CompetitionID,
 			contenderID,
 			"CONTENDER_PUBLIC_INFO_UPDATED",
-			"CONTENDER_SCORE_UPDATED",
+			"CONTENDER_RESULT_UPDATED",
 			"ASCENT_REGISTERED",
 			"ASCENT_DEREGISTERED",
 			"POINT_VALUE_UPDATED",

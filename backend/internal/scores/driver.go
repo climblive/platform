@@ -32,7 +32,7 @@ type ScoreEngine interface {
 	ScoreContender(contenderID domain.ContenderID) iter.Seq[Effect]
 	CalculatePointValues(categoryID domain.CategoryID, problemID domain.ProblemID) iter.Seq[Effect]
 
-	GetDirtyScores() []domain.Score
+	GetDirtyResults() []domain.Result
 	GetDirtyPointValues() []domain.PointValue
 }
 
@@ -276,13 +276,13 @@ func (d *ScoreEngineDriver) handleEvent(event domain.EventEnvelope) {
 func (d *ScoreEngineDriver) publishDirtyUpdates() int {
 	publishCount := 0
 
-	var batch []domain.ContenderScoreUpdatedEvent
+	var batch []domain.ContenderResultUpdatedEvent
 
-	for score := range slices.Values(d.engine.GetDirtyScores()) {
-		d.eventBroker.Dispatch(d.competitionID, domain.ContenderScoreUpdatedEvent(score))
+	for result := range slices.Values(d.engine.GetDirtyResults()) {
+		d.eventBroker.Dispatch(d.competitionID, domain.ContenderResultUpdatedEvent(result))
 		publishCount++
 
-		batch = append(batch, domain.ContenderScoreUpdatedEvent(score))
+		batch = append(batch, domain.ContenderResultUpdatedEvent(result))
 	}
 
 	for pointValue := range slices.Values(d.engine.GetDirtyPointValues()) {

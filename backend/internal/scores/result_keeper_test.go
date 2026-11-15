@@ -24,7 +24,7 @@ func TestKeeper(t *testing.T) {
 		filters := []domain.EventFilter{domain.NewEventFilter(
 			0,
 			0,
-			"CONTENDER_SCORE_UPDATED",
+			"CONTENDER_RESULT_UPDATED",
 		)}
 
 		subscription := events.NewSubscription(filters, bufferCapacity)
@@ -39,7 +39,7 @@ func TestKeeper(t *testing.T) {
 
 	t.Run("StartAndStop", func(t *testing.T) {
 		mockedRepo, mockedEventBroker, _ := makeMocks(0)
-		keeper := scores.NewScoreKeeper(mockedEventBroker, mockedRepo)
+		keeper := scores.NewResultKeeper(mockedEventBroker, mockedRepo)
 
 		ctx, cancel := context.WithCancel(context.Background())
 
@@ -54,15 +54,15 @@ func TestKeeper(t *testing.T) {
 
 	t.Run("SubscriptionUnexpectedlyClosed", func(t *testing.T) {
 		mockedRepo, mockedEventBroker, subscription := makeMocks(1)
-		keeper := scores.NewScoreKeeper(mockedEventBroker, mockedRepo)
+		keeper := scores.NewResultKeeper(mockedEventBroker, mockedRepo)
 
 		err := subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderScoreUpdatedEvent{},
+			Data: domain.ContenderResultUpdatedEvent{},
 		})
 		require.NoError(t, err)
 
 		err = subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderScoreUpdatedEvent{},
+			Data: domain.ContenderResultUpdatedEvent{},
 		})
 		require.Error(t, err)
 
@@ -74,9 +74,9 @@ func TestKeeper(t *testing.T) {
 		mockedRepo.AssertExpectations(t)
 	})
 
-	t.Run("GatherScores", func(t *testing.T) {
+	t.Run("GatherResults", func(t *testing.T) {
 		mockedRepo, mockedEventBroker, subscription := makeMocks(0)
-		keeper := scores.NewScoreKeeper(mockedEventBroker, mockedRepo)
+		keeper := scores.NewResultKeeper(mockedEventBroker, mockedRepo)
 
 		ctx, cancel := context.WithCancel(context.Background())
 		now := time.Now()
@@ -84,7 +84,7 @@ func TestKeeper(t *testing.T) {
 		wg := keeper.Run(ctx)
 
 		for k := 1; k <= 5; k++ {
-			score := domain.Score{
+			result := domain.Result{
 				Timestamp:   now,
 				ContenderID: domain.ContenderID(k),
 				Score:       fmt.Sprintf("%dp", k*100),
@@ -94,25 +94,25 @@ func TestKeeper(t *testing.T) {
 			}
 
 			err := subscription.Post(domain.EventEnvelope{
-				Data: domain.ContenderScoreUpdatedEvent(score),
+				Data: domain.ContenderResultUpdatedEvent(result),
 			})
 
-			mockedRepo.On("StoreScore", mock.Anything, nil, score).Return(nil)
+			mockedRepo.On("StoreResult", mock.Anything, nil, result).Return(nil)
 
 			require.NoError(t, err)
 		}
 
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			for k := 1; k <= 5; k++ {
-				score, err := keeper.GetScore(domain.ContenderID(k))
+				result, err := keeper.GetResult(domain.ContenderID(k))
 
 				require.NoError(collect, err)
-				assert.Equal(collect, now, score.Timestamp)
-				assert.Equal(collect, domain.ContenderID(k), score.ContenderID)
-				assert.Equal(collect, fmt.Sprintf("%dp", k*100), score.Score)
-				assert.Equal(collect, k, score.Placement)
-				assert.True(collect, score.Finalist)
-				assert.Equal(collect, k-1, score.RankOrder)
+				assert.Equal(collect, now, result.Timestamp)
+				assert.Equal(collect, domain.ContenderID(k), result.ContenderID)
+				assert.Equal(collect, fmt.Sprintf("%dp", k*100), result.Score)
+				assert.Equal(collect, k, result.Placement)
+				assert.True(collect, result.Finalist)
+				assert.Equal(collect, k-1, result.RankOrder)
 			}
 		}, time.Second, 10*time.Millisecond)
 
@@ -124,9 +124,9 @@ func TestKeeper(t *testing.T) {
 		mockedRepo.AssertExpectations(t)
 	})
 
-	t.Run("PersistScores", func(t *testing.T) {
+	t.Run("PersistResults", func(t *testing.T) {
 		mockedRepo, mockedEventBroker, subscription := makeMocks(0)
-		keeper := scores.NewScoreKeeper(mockedEventBroker, mockedRepo)
+		keeper := scores.NewResultKeeper(mockedEventBroker, mockedRepo)
 
 		ctx, cancel := context.WithCancel(context.Background())
 		now := time.Now()
@@ -134,7 +134,7 @@ func TestKeeper(t *testing.T) {
 		wg := keeper.Run(ctx)
 
 		for k := 1; k <= 5; k++ {
-			score := domain.Score{
+			result := domain.Result{
 				Timestamp:   now,
 				ContenderID: domain.ContenderID(k),
 				Score:       fmt.Sprintf("%dp", k*100),
@@ -143,10 +143,10 @@ func TestKeeper(t *testing.T) {
 				RankOrder:   k - 1,
 			}
 
-			mockedRepo.On("StoreScore", mock.Anything, nil, score).Return(nil)
+			mockedRepo.On("StoreResult", mock.Anything, nil, result).Return(nil)
 
 			err := subscription.Post(domain.EventEnvelope{
-				Data: domain.ContenderScoreUpdatedEvent(score),
+				Data: domain.ContenderResultUpdatedEvent(result),
 			})
 
 			require.NoError(t, err)
@@ -154,7 +154,7 @@ func TestKeeper(t *testing.T) {
 
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			for k := 1; k <= 5; k++ {
-				_, err := keeper.GetScore(domain.ContenderID(k))
+				_, err := keeper.GetResult(domain.ContenderID(k))
 
 				require.NoError(collect, err)
 			}
@@ -164,7 +164,7 @@ func TestKeeper(t *testing.T) {
 
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			for k := 1; k <= 5; k++ {
-				_, err := keeper.GetScore(domain.ContenderID(k))
+				_, err := keeper.GetResult(domain.ContenderID(k))
 
 				require.Error(collect, err, domain.ErrNotFound)
 			}
@@ -178,9 +178,9 @@ func TestKeeper(t *testing.T) {
 		mockedRepo.AssertExpectations(t)
 	})
 
-	t.Run("PersistScoresBeforeShutdown", func(t *testing.T) {
+	t.Run("PersistResultsBeforeShutdown", func(t *testing.T) {
 		mockedRepo, mockedEventBroker, subscription := makeMocks(0)
-		keeper := scores.NewScoreKeeper(mockedEventBroker, mockedRepo)
+		keeper := scores.NewResultKeeper(mockedEventBroker, mockedRepo)
 
 		ctx, cancel := context.WithCancel(context.Background())
 		now := time.Now()
@@ -188,7 +188,7 @@ func TestKeeper(t *testing.T) {
 		wg := keeper.Run(ctx)
 
 		for k := 1; k <= 5; k++ {
-			score := domain.Score{
+			result := domain.Result{
 				Timestamp:   now,
 				ContenderID: domain.ContenderID(k),
 				Score:       fmt.Sprintf("%dp", k*100),
@@ -197,10 +197,10 @@ func TestKeeper(t *testing.T) {
 				RankOrder:   k - 1,
 			}
 
-			mockedRepo.On("StoreScore", mock.Anything, nil, score).Return(nil)
+			mockedRepo.On("StoreResult", mock.Anything, nil, result).Return(nil)
 
 			err := subscription.Post(domain.EventEnvelope{
-				Data: domain.ContenderScoreUpdatedEvent(score),
+				Data: domain.ContenderResultUpdatedEvent(result),
 			})
 
 			require.NoError(t, err)
@@ -208,7 +208,7 @@ func TestKeeper(t *testing.T) {
 
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			for k := 1; k <= 5; k++ {
-				_, err := keeper.GetScore(domain.ContenderID(k))
+				_, err := keeper.GetResult(domain.ContenderID(k))
 
 				require.NoError(collect, err)
 			}
@@ -222,12 +222,12 @@ func TestKeeper(t *testing.T) {
 		mockedRepo.AssertExpectations(t)
 	})
 
-	t.Run("PersistScores_KeepInMemoryOnFailure", func(t *testing.T) {
+	t.Run("PersistResults_KeepInMemoryOnFailure", func(t *testing.T) {
 		mockedRepo, mockedEventBroker, subscription := makeMocks(0)
-		keeper := scores.NewScoreKeeper(mockedEventBroker, mockedRepo)
+		keeper := scores.NewResultKeeper(mockedEventBroker, mockedRepo)
 		errMock := errors.New("mock error")
 
-		mockedRepo.On("StoreScore", mock.Anything, nil, mock.AnythingOfType("domain.Score")).Return(errMock)
+		mockedRepo.On("StoreResult", mock.Anything, nil, mock.AnythingOfType("domain.Result")).Return(errMock)
 
 		ctx, cancel := context.WithCancel(context.Background())
 		now := time.Now()
@@ -235,7 +235,7 @@ func TestKeeper(t *testing.T) {
 		wg := keeper.Run(ctx)
 
 		for k := 1; k <= 5; k++ {
-			score := domain.Score{
+			result := domain.Result{
 				Timestamp:   now,
 				ContenderID: domain.ContenderID(k),
 				Score:       fmt.Sprintf("%dp", k*100),
@@ -245,7 +245,7 @@ func TestKeeper(t *testing.T) {
 			}
 
 			err := subscription.Post(domain.EventEnvelope{
-				Data: domain.ContenderScoreUpdatedEvent(score),
+				Data: domain.ContenderResultUpdatedEvent(result),
 			})
 
 			require.NoError(t, err)
@@ -253,7 +253,7 @@ func TestKeeper(t *testing.T) {
 
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			for k := 1; k <= 5; k++ {
-				_, err := keeper.GetScore(domain.ContenderID(k))
+				_, err := keeper.GetResult(domain.ContenderID(k))
 
 				require.NoError(collect, err)
 			}
@@ -265,7 +265,7 @@ func TestKeeper(t *testing.T) {
 			mockedRepo.AssertExpectations(collect)
 
 			for k := 1; k <= 5; k++ {
-				_, err := keeper.GetScore(domain.ContenderID(k))
+				_, err := keeper.GetResult(domain.ContenderID(k))
 
 				require.NoError(collect, err)
 			}
@@ -278,9 +278,9 @@ func TestKeeper(t *testing.T) {
 		mockedEventBroker.AssertExpectations(t)
 	})
 
-	t.Run("PersistScores_DropIfContenderNotFound", func(t *testing.T) {
+	t.Run("PersistResults_DropIfContenderNotFound", func(t *testing.T) {
 		mockedRepo, mockedEventBroker, subscription := makeMocks(0)
-		keeper := scores.NewScoreKeeper(mockedEventBroker, mockedRepo)
+		keeper := scores.NewResultKeeper(mockedEventBroker, mockedRepo)
 
 		ctx, cancel := context.WithCancel(context.Background())
 		now := time.Now()
@@ -288,7 +288,7 @@ func TestKeeper(t *testing.T) {
 		wg := keeper.Run(ctx)
 
 		for k := 1; k <= 5; k++ {
-			score := domain.Score{
+			result := domain.Result{
 				Timestamp:   now,
 				ContenderID: domain.ContenderID(k),
 				Score:       fmt.Sprintf("%dp", k*100),
@@ -297,10 +297,10 @@ func TestKeeper(t *testing.T) {
 				RankOrder:   k - 1,
 			}
 
-			mockedRepo.On("StoreScore", mock.Anything, nil, score).Return(domain.ErrNotFound)
+			mockedRepo.On("StoreResult", mock.Anything, nil, result).Return(domain.ErrNotFound)
 
 			err := subscription.Post(domain.EventEnvelope{
-				Data: domain.ContenderScoreUpdatedEvent(score),
+				Data: domain.ContenderResultUpdatedEvent(result),
 			})
 
 			require.NoError(t, err)
@@ -308,7 +308,7 @@ func TestKeeper(t *testing.T) {
 
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			for k := 1; k <= 5; k++ {
-				_, err := keeper.GetScore(domain.ContenderID(k))
+				_, err := keeper.GetResult(domain.ContenderID(k))
 
 				require.NoError(collect, err)
 			}
@@ -320,7 +320,7 @@ func TestKeeper(t *testing.T) {
 			mockedRepo.AssertExpectations(collect)
 
 			for k := 1; k <= 5; k++ {
-				_, err := keeper.GetScore(domain.ContenderID(k))
+				_, err := keeper.GetResult(domain.ContenderID(k))
 
 				require.Error(collect, err, domain.ErrNotFound)
 			}

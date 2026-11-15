@@ -151,8 +151,8 @@
     {/each}
   {:else}
     {#each results as scoreboardEntry (scoreboardEntry.contenderId)}
-      {#if scoreboardEntry.score}
-        <Floater order={scoreboardEntry.score.rankOrder}>
+      {#if scoreboardEntry.result}
+        <Floater order={scoreboardEntry.result.rankOrder}>
           <ResultEntry
             {scoreboardEntry}
             highlighted={highlightedContenderId === scoreboardEntry.contenderId}

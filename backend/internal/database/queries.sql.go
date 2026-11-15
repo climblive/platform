@@ -471,9 +471,9 @@ func (q *Queries) GetCompetitionsCurrentlyRunningOrByStartTime(ctx context.Conte
 }
 
 const getContender = `-- name: GetContender :one
-SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, score.contender_id, score.timestamp, score.score, score.placement, score.finalist, score.rank_order
+SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
 FROM contender
-LEFT JOIN score ON score.contender_id = id
+LEFT JOIN result ON result.contender_id = id
 WHERE id = ?
 `
 
@@ -513,9 +513,9 @@ func (q *Queries) GetContender(ctx context.Context, id int32) (GetContenderRow, 
 }
 
 const getContenderByCode = `-- name: GetContenderByCode :one
-SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, score.contender_id, score.timestamp, score.score, score.placement, score.finalist, score.rank_order
+SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
 FROM contender
-LEFT JOIN score ON score.contender_id = id
+LEFT JOIN result ON result.contender_id = id
 WHERE registration_code = ?
 `
 
@@ -555,9 +555,9 @@ func (q *Queries) GetContenderByCode(ctx context.Context, registrationCode strin
 }
 
 const getContendersByCategory = `-- name: GetContendersByCategory :many
-SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, score.contender_id, score.timestamp, score.score, score.placement, score.finalist, score.rank_order
+SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
 FROM contender
-LEFT JOIN score ON score.contender_id = id
+LEFT JOIN result ON result.contender_id = id
 WHERE class_id = ?
 `
 
@@ -613,9 +613,9 @@ func (q *Queries) GetContendersByCategory(ctx context.Context, categoryID sql.Nu
 }
 
 const getContendersByCompetition = `-- name: GetContendersByCompetition :many
-SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, score.contender_id, score.timestamp, score.score, score.placement, score.finalist, score.rank_order
+SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
 FROM contender
-LEFT JOIN score ON score.contender_id = id
+LEFT JOIN result ON result.contender_id = id
 WHERE contest_id = ?
 `
 
@@ -956,9 +956,9 @@ func (q *Queries) GetRafflesByCompetition(ctx context.Context, competitionID int
 }
 
 const getScrubEligibleContenders = `-- name: GetScrubEligibleContenders :many
-SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, score.contender_id, score.timestamp, score.score, score.placement, score.finalist, score.rank_order
+SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
 FROM contender
-LEFT JOIN score ON score.contender_id = id
+LEFT JOIN result ON result.contender_id = id
 WHERE contender.name != ''
   AND contender.scrub_before IS NOT NULL
   AND contender.scrub_before < ?
@@ -1623,9 +1623,9 @@ func (q *Queries) UpsertRaffleWinner(ctx context.Context, arg UpsertRaffleWinner
 	return result.LastInsertId()
 }
 
-const upsertScore = `-- name: UpsertScore :exec
+const upsertResult = `-- name: UpsertResult :exec
 INSERT INTO
-    score (contender_id, timestamp, score, placement, finalist, rank_order)
+    result (contender_id, timestamp, score, placement, finalist, rank_order)
 VALUES
     (?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
@@ -1636,7 +1636,7 @@ ON DUPLICATE KEY UPDATE
     rank_order = VALUES(rank_order)
 `
 
-type UpsertScoreParams struct {
+type UpsertResultParams struct {
 	ContenderID int32
 	Timestamp   time.Time
 	Score       string
@@ -1645,8 +1645,8 @@ type UpsertScoreParams struct {
 	RankOrder   int32
 }
 
-func (q *Queries) UpsertScore(ctx context.Context, arg UpsertScoreParams) error {
-	_, err := q.db.ExecContext(ctx, upsertScore,
+func (q *Queries) UpsertResult(ctx context.Context, arg UpsertResultParams) error {
+	_, err := q.db.ExecContext(ctx, upsertResult,
 		arg.ContenderID,
 		arg.Timestamp,
 		arg.Score,

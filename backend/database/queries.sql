@@ -1,25 +1,25 @@
 -- name: GetContender :one
-SELECT sqlc.embed(contender), score.*
+SELECT sqlc.embed(contender), result.*
 FROM contender
-LEFT JOIN score ON score.contender_id = id
+LEFT JOIN result ON result.contender_id = id
 WHERE id = ?;
 
 -- name: GetContenderByCode :one
-SELECT sqlc.embed(contender), score.*
+SELECT sqlc.embed(contender), result.*
 FROM contender
-LEFT JOIN score ON score.contender_id = id
+LEFT JOIN result ON result.contender_id = id
 WHERE registration_code = ?;
 
 -- name: GetContendersByCategory :many
-SELECT sqlc.embed(contender), score.*
+SELECT sqlc.embed(contender), result.*
 FROM contender
-LEFT JOIN score ON score.contender_id = id
+LEFT JOIN result ON result.contender_id = id
 WHERE class_id = sqlc.arg(category_id);
 
 -- name: GetContendersByCompetition :many
-SELECT sqlc.embed(contender), score.*
+SELECT sqlc.embed(contender), result.*
 FROM contender
-LEFT JOIN score ON score.contender_id = id
+LEFT JOIN result ON result.contender_id = id
 WHERE contest_id = sqlc.arg(competition_id);
 
 -- name: DeleteContender :exec
@@ -48,9 +48,9 @@ ON DUPLICATE KEY UPDATE
     scrubbed_at = VALUES(scrubbed_at),
     scrub_before = VALUES(scrub_before);
 
--- name: UpsertScore :exec
+-- name: UpsertResult :exec
 INSERT INTO
-    score (contender_id, timestamp, score, placement, finalist, rank_order)
+    result (contender_id, timestamp, score, placement, finalist, rank_order)
 VALUES
     (?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
@@ -351,9 +351,9 @@ DELETE FROM organizer_invite
 WHERE id = ?;
 
 -- name: GetScrubEligibleContenders :many
-SELECT sqlc.embed(contender), score.*
+SELECT sqlc.embed(contender), result.*
 FROM contender
-LEFT JOIN score ON score.contender_id = id
+LEFT JOIN result ON result.contender_id = id
 WHERE contender.name != ''
   AND contender.scrub_before IS NOT NULL
   AND contender.scrub_before < ?;

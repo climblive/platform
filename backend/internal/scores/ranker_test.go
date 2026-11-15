@@ -57,7 +57,7 @@ func TestBasicRanker(t *testing.T) {
 
 		ranker := scores.NewBasicRanker(5, true, false, false)
 
-		scores := ranker.RankContenders(slices.Values(contenders))
+		results := ranker.RankContenders(slices.Values(contenders))
 
 		expected := []string{
 			"i:1 p:1 r:0 f:-",
@@ -65,7 +65,7 @@ func TestBasicRanker(t *testing.T) {
 			"i:3 p:1 r:2 f:-",
 		}
 
-		assert.Equal(t, expected, prettifyAll(scores))
+		assert.Equal(t, expected, prettifyAll(results))
 	})
 
 	t.Run("ByPoints", func(t *testing.T) {
@@ -79,7 +79,7 @@ func TestBasicRanker(t *testing.T) {
 
 			ranker := scores.NewBasicRanker(5, true, false, false)
 
-			scores := ranker.RankContenders(slices.Values(contenders))
+			results := ranker.RankContenders(slices.Values(contenders))
 
 			expected := []string{
 				"i:1 p:1 r:0 f:🏆",
@@ -87,7 +87,7 @@ func TestBasicRanker(t *testing.T) {
 				"i:3 p:3 r:2 f:🏆",
 			}
 
-			assert.Equal(t, expected, prettifyAll(scores))
+			assert.Equal(t, expected, prettifyAll(results))
 		})
 
 		t.Run("SharedPlacement", func(t *testing.T) {
@@ -102,7 +102,7 @@ func TestBasicRanker(t *testing.T) {
 
 			ranker := scores.NewBasicRanker(5, true, false, false)
 
-			scores := ranker.RankContenders(slices.Values(contenders))
+			results := ranker.RankContenders(slices.Values(contenders))
 
 			expected := []string{
 				"i:1 p:1 r:0 f:🏆",
@@ -112,7 +112,7 @@ func TestBasicRanker(t *testing.T) {
 				"i:5 p:5 r:4 f:🏆",
 			}
 
-			assert.Equal(t, expected, prettifyAll(scores))
+			assert.Equal(t, expected, prettifyAll(results))
 		})
 
 		t.Run("IgnoreAttempts", func(t *testing.T) {
@@ -124,14 +124,14 @@ func TestBasicRanker(t *testing.T) {
 
 			ranker := scores.NewBasicRanker(5, true, false, false)
 
-			scores := ranker.RankContenders(slices.Values(contenders))
+			results := ranker.RankContenders(slices.Values(contenders))
 
 			expected := []string{
 				"i:1 p:1 r:0 f:🏆",
 				"i:2 p:1 r:1 f:🏆",
 			}
 
-			assert.Equal(t, expected, prettifyAll(scores))
+			assert.Equal(t, expected, prettifyAll(results))
 		})
 
 		t.Run("ExtraFinalists", func(t *testing.T) {
@@ -151,7 +151,7 @@ func TestBasicRanker(t *testing.T) {
 
 			ranker := scores.NewBasicRanker(5, true, false, false)
 
-			scores := ranker.RankContenders(slices.Values(contenders))
+			results := ranker.RankContenders(slices.Values(contenders))
 
 			expected := []string{
 				"i:1 p:1 r:0 f:🏆",
@@ -166,7 +166,7 @@ func TestBasicRanker(t *testing.T) {
 				"i:10 p:8 r:9 f:-",
 			}
 
-			assert.Equal(t, expected, prettifyAll(scores))
+			assert.Equal(t, expected, prettifyAll(results))
 		})
 
 		t.Run("WithdrawalsFromFinals", func(t *testing.T) {
@@ -190,7 +190,7 @@ func TestBasicRanker(t *testing.T) {
 
 			ranker := scores.NewBasicRanker(5, true, false, false)
 
-			scores := ranker.RankContenders(slices.Values(contenders))
+			results := ranker.RankContenders(slices.Values(contenders))
 
 			expected := []string{
 				"i:1 p:1 r:0 f:🏆",
@@ -205,7 +205,7 @@ func TestBasicRanker(t *testing.T) {
 				"i:10 p:10 r:9 f:-",
 			}
 
-			assert.Equal(t, expected, prettifyAll(scores))
+			assert.Equal(t, expected, prettifyAll(results))
 		})
 
 		t.Run("DisqualifiedContendersLast", func(t *testing.T) {
@@ -222,7 +222,7 @@ func TestBasicRanker(t *testing.T) {
 
 			ranker := scores.NewBasicRanker(5, true, false, false)
 
-			scores := ranker.RankContenders(slices.Values(contenders))
+			results := ranker.RankContenders(slices.Values(contenders))
 
 			expected := []string{
 				"i:1 p:1 r:0 f:-",
@@ -232,7 +232,7 @@ func TestBasicRanker(t *testing.T) {
 				"i:2 p:1 r:4 f:-",
 			}
 
-			assert.Equal(t, expected, prettifyAll(scores))
+			assert.Equal(t, expected, prettifyAll(results))
 		})
 	})
 
@@ -247,7 +247,7 @@ func TestBasicRanker(t *testing.T) {
 
 		ranker := scores.NewBasicRanker(1, false, true, true)
 
-		rankedScores := ranker.RankContenders(slices.Values(contenders))
+		results := ranker.RankContenders(slices.Values(contenders))
 
 		expected := []string{
 			"i:1 p:1 r:0 f:🏆",
@@ -256,7 +256,7 @@ func TestBasicRanker(t *testing.T) {
 			"i:4 p:4 r:3 f:-",
 		}
 
-		assert.Equal(t, expected, prettifyAll(rankedScores))
+		assert.Equal(t, expected, prettifyAll(results))
 	})
 }
 
@@ -267,19 +267,19 @@ func shuffleSlice[T any](slice []T) {
 	}
 }
 
-func prettify(score domain.Score) string {
+func prettify(result domain.Result) string {
 	finalist := "-"
-	if score.Finalist {
+	if result.Finalist {
 		finalist = "🏆"
 	}
-	return fmt.Sprintf("i:%v p:%d r:%d f:%v", score.ContenderID, score.Placement, score.RankOrder, finalist)
+	return fmt.Sprintf("i:%v p:%d r:%d f:%v", result.ContenderID, result.Placement, result.RankOrder, finalist)
 }
 
-func prettifyAll(scores []domain.Score) []string {
+func prettifyAll(results []domain.Result) []string {
 	arr := make([]string, 0)
 
-	for score := range slices.Values(scores) {
-		arr = append(arr, prettify(score))
+	for result := range slices.Values(results) {
+		arr = append(arr, prettify(result))
 	}
 
 	return arr

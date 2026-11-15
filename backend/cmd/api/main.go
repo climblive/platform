@@ -155,7 +155,7 @@ func main() {
 
 	authorizer := authorizer.NewAuthorizer(database, jwtDecoder)
 	eventBroker := events.NewBroker()
-	scoreKeeper := scores.NewScoreKeeper(eventBroker, database)
+	resultKeeper := scores.NewResultKeeper(eventBroker, database)
 	pointValueKeeper := scores.NewPointValueKeeper(eventBroker, scoreEngineMaxLifetime+time.Hour)
 	scoreEngineStoreHydrator := &scores.StandardEngineStoreHydrator{Repo: database}
 
@@ -165,7 +165,7 @@ func main() {
 		Repo:                      database,
 		Authorizer:                authorizer,
 		EventBroker:               eventBroker,
-		ScoreKeeper:               scoreKeeper,
+		ResultKeeper:              resultKeeper,
 		PointValueKeeper:          pointValueKeeper,
 		RegistrationCodeGenerator: &registrationCodeGenerator{}}
 
@@ -173,12 +173,12 @@ func main() {
 	scrubberRunner := scrubber.New(&contenderUseCase, scrubInterval)
 
 	barriers = append(barriers,
-		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
+		resultKeeper.Run(ctx, scores.WithPanicRecovery()),
 		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()),
 		scrubberRunner.Run(ctx, scrubber.WithPanicRecovery()),
 		pointValueKeeper.Run(ctx, scores.WithPanicRecovery()))
 
-	apiMux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager, scrubberRunner, pointValueKeeper)
+	apiMux := setupMux(database, authorizer, eventBroker, resultKeeper, &scoreEngineManager, scrubberRunner, pointValueKeeper)
 
 	appMux := http.NewServeMux()
 	appMux.Handle("/api/", http.StripPrefix("/api", noCacheHandler(apiMux)))
@@ -276,7 +276,7 @@ func setupMux(
 	repo *repository.Database,
 	authorizer *authorizer.Authorizer,
 	eventBroker domain.EventBroker,
-	scoreKeeper *scores.Keeper,
+	resultKeeper *scores.Keeper,
 	scoreEngineManager *scores.ScoreEngineManager,
 	scrubber *scrubber.Scrubber,
 	pointValueKeeper *scores.PointValueKeeper,
@@ -285,7 +285,7 @@ func setupMux(
 		Repo:                      repo,
 		Authorizer:                authorizer,
 		EventBroker:               eventBroker,
-		ScoreKeeper:               scoreKeeper,
+		ResultKeeper:              resultKeeper,
 		PointValueKeeper:          pointValueKeeper,
 		RegistrationCodeGenerator: &registrationCodeGenerator{},
 	}
@@ -293,7 +293,7 @@ func setupMux(
 	competitionUseCase := usecases.CompetitionUseCase{
 		Authorizer:         authorizer,
 		Repo:               repo,
-		ScoreKeeper:        scoreKeeper,
+		ResultKeeper:       resultKeeper,
 		ScoreEngineManager: scoreEngineManager,
 		EventBroker:        eventBroker,
 	}
@@ -340,7 +340,7 @@ func setupMux(
 
 	healthUseCase := usecases.HealthUseCase{
 		ScoreEngineManager: scoreEngineManager,
-		ScoreKeeper:        scoreKeeper,
+		ResultKeeper:       resultKeeper,
 		Scrubber:           scrubber,
 		PointValueKeeper:   pointValueKeeper,
 	}

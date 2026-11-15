@@ -15,22 +15,22 @@ const persistInterval = time.Minute
 const lastDitchPersistTimeout = 10 * time.Second
 
 type keeperRepository interface {
-	StoreScore(ctx context.Context, tx domain.Transaction, score domain.Score) error
+	StoreResult(ctx context.Context, tx domain.Transaction, result domain.Result) error
 }
 
 type Keeper struct {
 	mu                     sync.RWMutex
 	eventBroker            domain.EventBroker
-	scores                 map[domain.ContenderID]domain.Score
+	results                map[domain.ContenderID]domain.Result
 	repo                   keeperRepository
 	externalPersistTrigger chan struct{}
 	running                atomic.Bool
 }
 
-func NewScoreKeeper(eventBroker domain.EventBroker, repo keeperRepository) *Keeper {
+func NewResultKeeper(eventBroker domain.EventBroker, repo keeperRepository) *Keeper {
 	return &Keeper{
 		eventBroker:            eventBroker,
-		scores:                 make(map[domain.ContenderID]domain.Score),
+		results:                make(map[domain.ContenderID]domain.Result),
 		repo:                   repo,
 		externalPersistTrigger: make(chan struct{}, 1),
 		mu:                     sync.RWMutex{},
@@ -56,7 +56,7 @@ func (k *Keeper) Run(ctx context.Context, options ...func(*runOptions)) *sync.Wa
 			}
 
 			if r := recover(); r != nil {
-				slog.Error("score keeper panicked", "error", r)
+				slog.Error("result keeper panicked", "error", r)
 			}
 		}()
 
@@ -74,7 +74,7 @@ func (k *Keeper) run(ctx context.Context, ready chan<- struct{}) {
 	filter := domain.NewEventFilter(
 		0,
 		0,
-		"CONTENDER_SCORE_UPDATED",
+		"CONTENDER_RESULT_UPDATED",
 	)
 
 	subscriptionID, eventReader := k.eventBroker.Subscribe([]domain.EventFilter{filter}, 0)
@@ -97,13 +97,13 @@ EventLoop:
 			}
 
 			switch ev := event.Data.(type) {
-			case domain.ContenderScoreUpdatedEvent:
-				k.HandleContenderScoreUpdated(ev)
+			case domain.ContenderResultUpdatedEvent:
+				k.HandleContenderResultUpdated(ev)
 			}
 		case <-ticker:
-			k.persistScores(ctx)
+			k.persistResults(ctx)
 		case <-k.externalPersistTrigger:
-			k.persistScores(ctx)
+			k.persistResults(ctx)
 		case <-ctx.Done():
 			slog.Info("subscription closed", "reason", ctx.Err())
 			break EventLoop
@@ -114,15 +114,15 @@ EventLoop:
 		slog.Error("subscription closed unexpectedly")
 	}
 
-	slog.Info("score keeper shutting down")
+	slog.Info("result keeper shutting down")
 
-	numScores := k.getNumScoresWithLock()
-	if numScores > 0 {
+	numResults := k.getNumResultsWithLock()
+	if numResults > 0 {
 		ctxWithDeadline, cancel := context.WithTimeout(context.Background(), lastDitchPersistTimeout)
 		defer cancel()
 
-		slog.Warn("making a last-ditch attempt to persist scores", "timeout", lastDitchPersistTimeout)
-		k.persistScores(ctxWithDeadline)
+		slog.Warn("making a last-ditch attempt to persist results", "timeout", lastDitchPersistTimeout)
+		k.persistResults(ctxWithDeadline)
 	}
 }
 
@@ -130,103 +130,103 @@ func (k *Keeper) RequestPersist() {
 	k.externalPersistTrigger <- struct{}{}
 }
 
-func (k *Keeper) persistScores(ctx context.Context) {
-	takeFirst := func() (domain.ContenderID, domain.Score) {
+func (k *Keeper) persistResults(ctx context.Context) {
+	takeFirst := func() (domain.ContenderID, domain.Result) {
 		k.mu.Lock()
 		defer k.mu.Unlock()
 
 		var contenderID domain.ContenderID
-		var score domain.Score
-		for contenderID, score = range k.scores {
+		var result domain.Result
+		for contenderID, result = range k.results {
 			break
 		}
 
 		if contenderID == 0 {
-			return 0, domain.Score{}
+			return 0, domain.Result{}
 		}
 
-		delete(k.scores, contenderID)
+		delete(k.results, contenderID)
 
-		return contenderID, score
+		return contenderID, result
 	}
 
-	putBack := func(contenderID domain.ContenderID, score domain.Score) {
+	putBack := func(contenderID domain.ContenderID, result domain.Result) {
 		k.mu.Lock()
 		defer k.mu.Unlock()
 
-		if _, found := k.scores[contenderID]; !found {
-			k.scores[contenderID] = score
+		if _, found := k.results[contenderID]; !found {
+			k.results[contenderID] = result
 		}
 	}
 
-	persistedScores := 0
+	persistedResults := 0
 
-IterateScores:
+IterateResults:
 	for ctx.Err() == nil {
-		contenderID, score := takeFirst()
+		contenderID, result := takeFirst()
 
 		if contenderID == 0 {
 			break
 		}
 
-		err := k.repo.StoreScore(ctx, nil, score)
+		err := k.repo.StoreResult(ctx, nil, result)
 		switch {
 		case err == nil:
-			persistedScores += 1
+			persistedResults += 1
 		case errors.Is(err, domain.ErrNotFound):
-			slog.Warn("failed to persist score for non-existent contender",
+			slog.Warn("failed to persist result for non-existent contender",
 				"contender_id", contenderID,
 				"action", "drop",
 				"error", err)
 
 			continue
 		default:
-			slog.Error("failed to persist score",
+			slog.Error("failed to persist result",
 				"contender_id", contenderID,
 				"action", "try_again_later",
 				"error", err)
 
-			putBack(contenderID, score)
+			putBack(contenderID, result)
 
-			break IterateScores
+			break IterateResults
 		}
 	}
 
-	leftInMemory := k.getNumScoresWithLock()
+	leftInMemory := k.getNumResultsWithLock()
 	if leftInMemory > 0 {
-		slog.Warn("not all scores where persisted",
+		slog.Warn("not all results were persisted",
 			"left_in_memory", leftInMemory,
 		)
-	} else if persistedScores > 0 {
-		slog.Info("successfully persisted scores", "num_scores", persistedScores)
+	} else if persistedResults > 0 {
+		slog.Info("successfully persisted results", "num_results", persistedResults)
 	}
 }
 
-func (k *Keeper) getNumScoresWithLock() int {
+func (k *Keeper) getNumResultsWithLock() int {
 	k.mu.RLock()
 	defer k.mu.RUnlock()
 
-	return len(k.scores)
+	return len(k.results)
 }
 
-func (k *Keeper) HandleContenderScoreUpdated(event domain.ContenderScoreUpdatedEvent) {
+func (k *Keeper) HandleContenderResultUpdated(event domain.ContenderResultUpdatedEvent) {
 	k.mu.Lock()
 	defer k.mu.Unlock()
 
-	k.scores[event.ContenderID] = domain.Score(event)
+	k.results[event.ContenderID] = domain.Result(event)
 }
 
-func (k *Keeper) GetScore(contenderID domain.ContenderID) (domain.Score, error) {
+func (k *Keeper) GetResult(contenderID domain.ContenderID) (domain.Result, error) {
 	k.mu.RLock()
 	defer k.mu.RUnlock()
 
-	if score, found := k.scores[contenderID]; found {
-		return score, nil
+	if result, found := k.results[contenderID]; found {
+		return result, nil
 	}
 
-	return domain.Score{}, domain.ErrNotFound
+	return domain.Result{}, domain.ErrNotFound
 }
 
 func (k *Keeper) GetStatus() domain.ServiceStatus {
-	return domain.ServiceStatus{Name: "ScoreKeeper", Healthy: k.running.Load(), CheckedAt: time.Now()}
+	return domain.ServiceStatus{Name: "ResultKeeper", Healthy: k.running.Load(), CheckedAt: time.Now()}
 }

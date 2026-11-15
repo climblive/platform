@@ -278,7 +278,7 @@ func (hdlr *competitionHandler) DownloadResults(w http.ResponseWriter, r *http.R
 		}
 
 		slices.SortFunc(scoreboard, func(a, b domain.ScoreboardEntry) int {
-			return a.Score.RankOrder - b.Score.RankOrder
+			return a.Result.RankOrder - b.Result.RankOrder
 		})
 
 		slices.SortFunc(problems, func(a, b domain.Problem) int {
@@ -378,9 +378,9 @@ func (hdlr *competitionHandler) DownloadResults(w http.ResponseWriter, r *http.R
 				score     string
 				placement int
 			)
-			if entry.Score != nil {
-				score = entry.Score.Score
-				placement = entry.Score.Placement
+			if entry.Result != nil {
+				score = entry.Result.Score
+				placement = entry.Result.Placement
 			}
 
 			err = book.SetSheetRow(sheetName, fmt.Sprintf("A%d", counter), &[]any{

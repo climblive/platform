@@ -9,6 +9,7 @@ export * from "./pointValue";
 export * from "./problem";
 export * from "./rest";
 export * from "./score";
+export * from "./result";
 export * from "./scoreboard";
 export * from "./scoreEngine";
 export * from "./tick";

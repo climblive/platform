@@ -989,7 +989,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
-	t.Run("GetDirtyScores", func(t *testing.T) {
+	t.Run("GetDirtyResults", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		now := time.Now()
@@ -998,7 +998,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 		fakedContenderID2 := testutils.RandomResourceID[domain.ContenderID]()
 		fakedContenderID3 := testutils.RandomResourceID[domain.ContenderID]()
 
-		fakedScores := []domain.Score{
+		fakedResults := []domain.Result{
 			{
 				ContenderID: fakedContenderID1,
 				Timestamp:   now,
@@ -1026,12 +1026,12 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}
 
 		f.store.
-			On("GetDirtyScores").
-			Return(fakedScores)
+			On("GetDirtyResults").
+			Return(fakedResults)
 
-		scores := f.engine.GetDirtyScores()
+		results := f.engine.GetDirtyResults()
 
-		assert.Equal(t, fakedScores, scores)
+		assert.Equal(t, fakedResults, results)
 
 		awaitExpectations(t)
 	})
@@ -2134,7 +2134,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				}))
 
 			f.store.
-				On("SaveScore", domain.Score{
+				On("SaveResult", domain.Result{
 					ContenderID: fakedContender2ID,
 					Score:       "200p",
 					Placement:   1,
@@ -2144,7 +2144,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				}).Return()
 
 			f.store.
-				On("SaveScore", domain.Score{
+				On("SaveResult", domain.Result{
 					ContenderID: fakedContender3ID,
 					Score:       "150p",
 					Placement:   2,
@@ -2154,7 +2154,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				}).Return()
 
 			f.store.
-				On("SaveScore", domain.Score{
+				On("SaveResult", domain.Result{
 					ContenderID: fakedContender1ID,
 					Score:       "100p",
 					Placement:   3,
@@ -2204,7 +2204,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 							Score:      scores.Score{Tops: 2, Zone2s: 3, Zone1s: 4},
 						}}))
 					f.store.
-						On("SaveScore", domain.Score{
+						On("SaveResult", domain.Result{
 							ContenderID: fakedContenderID,
 							Score:       tt.expected,
 							Placement:   1,

@@ -12,16 +12,16 @@
   }
 
   const { scoreboardEntry, highlighted = false }: Props = $props();
-  let score = $derived(scoreboardEntry.score);
+  let result = $derived(scoreboardEntry.result);
 </script>
 
 <section
-  data-finalist={score?.finalist ?? false}
+  data-finalist={result?.finalist ?? false}
   data-highlighted={highlighted ? "true" : "false"}
 >
   <div class="number">
-    {#if score?.placement}
-      {score.placement}<sup>{ordinalSuperscript(score.placement)}</sup>
+    {#if result?.placement}
+      {result.placement}<sup>{ordinalSuperscript(result.placement)}</sup>
     {:else}
       -
     {/if}
@@ -34,11 +34,11 @@
     />
   </div>
   <div class="score">
-    {#if score === undefined || score.score === NO_SCORE}
+    {#if result === undefined || result.score === NO_SCORE}
       -
     {:else}
-      <Score value={score.score} />
-      <wa-icon name={score?.finalist ? "medal" : "minus"}></wa-icon>
+      <Score value={result.score} />
+      <wa-icon name={result?.finalist ? "medal" : "minus"}></wa-icon>
     {/if}
   </div>
 </section>

@@ -49,7 +49,7 @@ func TestGetScoreboard(t *testing.T) {
 	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 	mockedRepo := new(repositoryMock)
-	mockedScoreKeeper := new(scoreKeeperMock)
+	mockedResultKeeper := new(resultKeeperMock)
 
 	currentTime := time.Now()
 
@@ -65,7 +65,7 @@ func TestGetScoreboard(t *testing.T) {
 			WithdrawnFromFinals: true,
 			Disqualified:        true,
 			ScrubbedAt:          currentTime,
-			Score: &domain.Score{
+			Result: &domain.Result{
 				ContenderID: contenderID,
 				Score:       fmt.Sprintf("%dp", i*10),
 				Placement:   i,
@@ -84,7 +84,7 @@ func TestGetScoreboard(t *testing.T) {
 
 	future := currentTime.Add(time.Minute)
 
-	mockedScoreKeeper.On("GetScore", domain.ContenderID(1)).Return(domain.Score{
+	mockedResultKeeper.On("GetResult", domain.ContenderID(1)).Return(domain.Result{
 		Timestamp:   future,
 		ContenderID: domain.ContenderID(1),
 		Score:       "1234p",
@@ -93,11 +93,11 @@ func TestGetScoreboard(t *testing.T) {
 		RankOrder:   1337,
 	}, nil)
 
-	mockedScoreKeeper.On("GetScore", mock.Anything).Return(domain.Score{}, errMock)
+	mockedResultKeeper.On("GetResult", mock.Anything).Return(domain.Result{}, errMock)
 
 	ucase := usecases.CompetitionUseCase{
-		Repo:        mockedRepo,
-		ScoreKeeper: mockedScoreKeeper,
+		Repo:         mockedRepo,
+		ResultKeeper: mockedResultKeeper,
 	}
 
 	scoreboard, err := ucase.GetScoreboard(context.Background(), fakedCompetitionID)
@@ -112,12 +112,12 @@ func TestGetScoreboard(t *testing.T) {
 	assert.Equal(t, true, scoreboard[0].WithdrawnFromFinals)
 	assert.Equal(t, true, scoreboard[0].Disqualified)
 	assert.Equal(t, currentTime, scoreboard[0].ScrubbedAt)
-	assert.NotNil(t, scoreboard[0].Score)
-	assert.Equal(t, future, scoreboard[0].Score.Timestamp)
-	assert.Equal(t, "1234p", scoreboard[0].Score.Score)
-	assert.Equal(t, 42, scoreboard[0].Score.Placement)
-	assert.False(t, scoreboard[0].Score.Finalist)
-	assert.Equal(t, 1337, scoreboard[0].Score.RankOrder)
+	assert.NotNil(t, scoreboard[0].Result)
+	assert.Equal(t, future, scoreboard[0].Result.Timestamp)
+	assert.Equal(t, "1234p", scoreboard[0].Result.Score)
+	assert.Equal(t, 42, scoreboard[0].Result.Placement)
+	assert.False(t, scoreboard[0].Result.Finalist)
+	assert.Equal(t, 1337, scoreboard[0].Result.RankOrder)
 
 	for i := 2; i <= 10; i++ {
 		entry := scoreboard[i-1]
@@ -128,16 +128,16 @@ func TestGetScoreboard(t *testing.T) {
 		assert.Equal(t, true, entry.WithdrawnFromFinals)
 		assert.Equal(t, true, entry.Disqualified)
 		assert.Equal(t, currentTime, entry.ScrubbedAt)
-		assert.NotNil(t, entry.Score)
-		assert.Equal(t, currentTime, entry.Score.Timestamp)
-		assert.Equal(t, fmt.Sprintf("%dp", i*10), entry.Score.Score)
-		assert.Equal(t, i, entry.Score.Placement)
-		assert.Equal(t, i-1, entry.Score.RankOrder)
-		assert.True(t, entry.Score.Finalist)
+		assert.NotNil(t, entry.Result)
+		assert.Equal(t, currentTime, entry.Result.Timestamp)
+		assert.Equal(t, fmt.Sprintf("%dp", i*10), entry.Result.Score)
+		assert.Equal(t, i, entry.Result.Placement)
+		assert.Equal(t, i-1, entry.Result.RankOrder)
+		assert.True(t, entry.Result.Finalist)
 	}
 
 	mockedRepo.AssertExpectations(t)
-	mockedScoreKeeper.AssertExpectations(t)
+	mockedResultKeeper.AssertExpectations(t)
 }
 
 func TestGetScoreboard_Empty(t *testing.T) {
@@ -931,7 +931,7 @@ func TestTransferCompetition(t *testing.T) {
 		},
 	}
 
-	fakedScore := domain.Score{
+	fakedResult := domain.Result{
 		Timestamp:   now.Add(time.Duration(rand.Int())),
 		ContenderID: fakedContenderID,
 		Score:       "10p",
@@ -950,7 +950,7 @@ func TestTransferCompetition(t *testing.T) {
 		Entered:             now.Add(time.Duration(rand.Int())),
 		WithdrawnFromFinals: true,
 		Disqualified:        true,
-		Score:               &fakedScore,
+		Result:              &fakedResult,
 	}
 
 	fakedRaffle := domain.Raffle{
@@ -1100,12 +1100,12 @@ func TestTransferCompetition(t *testing.T) {
 				Entered:             fakedContender.Entered,
 				WithdrawnFromFinals: true,
 				Disqualified:        true,
-				Score:               &fakedScore,
+				Result:              &fakedResult,
 			}).
 			Return(domain.Contender{}, nil)
 
 		mockedRepo.
-			On("StoreScore", mock.Anything, mockedTx, fakedScore).
+			On("StoreResult", mock.Anything, mockedTx, fakedResult).
 			Return(nil)
 
 		mockedRepo.
