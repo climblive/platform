@@ -11,9 +11,9 @@ type EventFilter struct {
 }
 
 type GlobalStats struct {
-	Competitions  int64 `json:"competitions"`
-	Registrations int64 `json:"registrations"`
-	Ticks         int64 `json:"ticks"`
+	Competitions int64 `json:"competitions"`
+	Competitors  int64 `json:"competitors"`
+	Ticks        int64 `json:"ticks"`
 }
 
 type ColorRGB string

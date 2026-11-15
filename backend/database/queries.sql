@@ -361,10 +361,10 @@ WHERE contender.name != ''
 -- name: GetGlobalStats :one
 SELECT
     COUNT(DISTINCT competition.id) AS competitions,
-    COUNT(DISTINCT CASE WHEN registration.entered IS NOT NULL THEN registration.id END) AS registrations,
+    COUNT(DISTINCT CASE WHEN competitor.entered IS NOT NULL THEN competitor.id END) AS competitors,
     COUNT(tick.id) AS ticks
 FROM contest AS competition
-LEFT JOIN contender AS registration
-    ON registration.contest_id = competition.id AND registration.disqualified = FALSE
-LEFT JOIN tick ON tick.contender_id = registration.id AND tick.contest_id = competition.id
+LEFT JOIN contender AS competitor
+    ON competitor.contest_id = competition.id AND competitor.disqualified = FALSE
+LEFT JOIN tick ON tick.contender_id = competitor.id AND tick.contest_id = competition.id
 WHERE competition.archived_at IS NULL;

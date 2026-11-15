@@ -38,7 +38,7 @@ export interface EventFilter {
 }
 export interface GlobalStats {
   competitions: number /* int64 */;
-  registrations: number /* int64 */;
+  competitors: number /* int64 */;
   ticks: number /* int64 */;
 }
 export type ColorRGB = string;

@@ -25,9 +25,9 @@ updateTheme(prefersDarkColorScheme());
 const loadGlobalStats = async () => {
   const section = document.getElementById("global-stats");
   const ticks = document.getElementById("stats-ticks");
-  const registrations = document.getElementById("stats-registrations");
+  const competitors = document.getElementById("stats-competitors");
   const competitions = document.getElementById("stats-competitions");
-  if (!section || !ticks || !registrations || !competitions) {
+  if (!section || !ticks || !competitors || !competitions) {
     return;
   }
 
@@ -39,14 +39,12 @@ const loadGlobalStats = async () => {
   const stats: GlobalStats = await response.json();
   const formatter = new Intl.NumberFormat(document.documentElement.lang);
   ticks.textContent = formatter.format(stats.ticks);
-  registrations.textContent = formatter.format(stats.registrations);
+  competitors.textContent = formatter.format(stats.competitors);
   competitions.textContent = formatter.format(stats.competitions);
   section.hidden = false;
 };
 
-void loadGlobalStats().catch((error: unknown) => {
-  console.error("Failed to load global statistics", error);
-});
+void loadGlobalStats().catch(() => undefined);
 
 const compactCarouselLayout = window.matchMedia("(max-width: 768px)");
 
