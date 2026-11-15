@@ -8,14 +8,14 @@
   import { toastUnexpectedError } from "@climblive/lib/utils";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
   }
 
-  let { contestId }: Props = $props();
+  let { competitionId }: Props = $props();
 
   const handleDownloadResults = async () => {
     try {
-      const blob = await ApiClient.getInstance().downloadResults(contestId);
+      const blob = await ApiClient.getInstance().downloadResults(competitionId);
 
       const a = document.createElement("a");
       document.body.appendChild(a);
@@ -23,7 +23,7 @@
 
       const url = window.URL.createObjectURL(blob);
       a.href = url;
-      a.download = `contest_${contestId}_results.xlsx`;
+      a.download = `competition_${competitionId}_results.xlsx`;
       a.click();
 
       window.URL.revokeObjectURL(url);
@@ -39,7 +39,7 @@
     <wa-icon name="file-excel" slot="start"></wa-icon>
   </wa-button>
 
-  <a href={`/scoreboard/${contestId}`} target="_blank">
+  <a href={`/scoreboard/${competitionId}`} target="_blank">
     <wa-button appearance="outlined">
       <wa-icon slot="start" name="arrow-up-right-from-square"></wa-icon>
       Open public scoreboard
@@ -47,11 +47,11 @@
   </a>
 </div>
 
-<ProblemsChart {contestId} />
+<ProblemsChart {competitionId} />
 
-<ScoreboardProvider {contestId}>
+<ScoreboardProvider {competitionId}>
   {#snippet children({ scoreboard, loading })}
-    <ResultListTable {contestId} {scoreboard} {loading}></ResultListTable>
+    <ResultListTable {competitionId} {scoreboard} {loading}></ResultListTable>
   {/snippet}
 </ScoreboardProvider>
 

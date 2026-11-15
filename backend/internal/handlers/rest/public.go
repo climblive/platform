@@ -2,7 +2,7 @@ package rest
 
 import "time"
 
-type CreateContendersArguments struct {
+type CreateCompetitorsArguments struct {
 	Number int `json:"number"`
 }
 

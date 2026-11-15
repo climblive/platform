@@ -5,15 +5,15 @@
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
-    ContestStateProvider,
+    CompetitionStateProvider,
     SplashScreen,
   } from "@climblive/lib/components";
-  import type { ContenderPatch } from "@climblive/lib/models";
+  import type { CompetitorPatch } from "@climblive/lib/models";
   import {
-    getCompClassesQuery,
-    getContenderQuery,
-    getContestQuery,
-    patchContenderMutation,
+    getCategoriesQuery,
+    getCompetitorQuery,
+    getCompetitionQuery,
+    patchCompetitorMutation,
   } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import { add, formatDistance, isAfter } from "date-fns";
@@ -25,28 +25,32 @@
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
-  const contenderQuery = $derived(getContenderQuery($session.contenderId));
-  const contestQuery = $derived(getContestQuery($session.contestId));
-  const compClassesQuery = $derived(getCompClassesQuery($session.contestId));
-  const patchContender = $derived(patchContenderMutation($session.contenderId));
+  const competitorQuery = $derived(getCompetitorQuery($session.competitorId));
+  const competitionQuery = $derived(
+    getCompetitionQuery($session.competitionId),
+  );
+  const categoriesQuery = $derived(getCategoriesQuery($session.competitionId));
+  const patchCompetitor = $derived(
+    patchCompetitorMutation($session.competitorId),
+  );
 
-  const contender = $derived(contenderQuery.data);
-  const contest = $derived(contestQuery.data);
+  const competitor = $derived(competitorQuery.data);
+  const competition = $derived(competitionQuery.data);
 
   const tooLate = $derived(
-    compClassesQuery.data?.every(({ timeEnd }) => isAfter(new Date(), timeEnd)),
+    categoriesQuery.data?.every(({ timeEnd }) => isAfter(new Date(), timeEnd)),
   );
 
   const gotoScorecard = () => {
-    navigate(`/${contender?.registrationCode}`, { replace: true });
+    navigate(`/${competitor?.registrationCode}`, { replace: true });
   };
 
-  const handleSubmit = (form: ContenderPatch) => {
-    if (!contender || patchContender.isPending) {
+  const handleSubmit = (form: CompetitorPatch) => {
+    if (!competitor || patchCompetitor.isPending) {
       return;
     }
 
-    patchContender.mutate(
+    patchCompetitor.mutate(
       {
         ...form,
       },
@@ -61,7 +65,7 @@
     const base = new Date(0);
     return formatDistance(
       add(base, {
-        minutes: (contest?.nameRetentionTime ?? 0) / nanosecondsInMinute,
+        minutes: (competition?.nameRetentionTime ?? 0) / nanosecondsInMinute,
       }),
       base,
     );
@@ -70,21 +74,21 @@
   let showSplash = $state(true);
 </script>
 
-{#if showSplash || !contender || !contest || tooLate === undefined}
+{#if showSplash || !competitor || !competition || tooLate === undefined}
   <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
-  <h1>{contest.name}</h1>
-  <ContestStateProvider contestId={contest.id}>
-    {#snippet children({ contestState })}
+  <h1>{competition.name}</h1>
+  <CompetitionStateProvider competitionId={competition.id}>
+    {#snippet children({ competitionState })}
       <RegistrationForm
         submit={handleSubmit}
         data={{
-          name: contender.name,
-          compClassId: contender.compClassId,
-          withdrawnFromFinals: contender.withdrawnFromFinals,
+          name: competitor.name,
+          categoryId: competitor.categoryId,
+          withdrawnFromFinals: competitor.withdrawnFromFinals,
         }}
         callout={registerCallout}
-        {contestState}
+        {competitionState}
       >
         {#if tooLate}
           <wa-callout variant="warning">
@@ -96,7 +100,7 @@
         <wa-button
           size="s"
           type="submit"
-          loading={patchContender.isPending}
+          loading={patchCompetitor.isPending}
           variant="neutral"
           appearance="accent"
           disabled={tooLate}
@@ -112,7 +116,7 @@
         </wa-callout>
       {/snippet}
     {/snippet}
-  </ContestStateProvider>
+  </CompetitionStateProvider>
 {/if}
 
 <style>

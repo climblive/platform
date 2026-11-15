@@ -6,7 +6,7 @@
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
-    ContenderName,
+    CompetitorName,
     EmptyState,
     Table,
     useEvents,
@@ -15,8 +15,8 @@
   import type { EventFilter, RaffleWinner } from "@climblive/lib/models";
   import {
     drawRaffleWinnerMutation,
-    getContendersByContestQuery,
-    getContestQuery,
+    getCompetitorsByCompetitionQuery,
+    getCompetitionQuery,
     getRaffleQuery,
     getRaffleWinnersQuery,
   } from "@climblive/lib/queries";
@@ -49,25 +49,27 @@
     return winners;
   });
 
-  const contestQuery = $derived(
-    raffle?.contestId ? getContestQuery(raffle.contestId) : undefined,
+  const competitionQuery = $derived(
+    raffle?.competitionId
+      ? getCompetitionQuery(raffle.competitionId)
+      : undefined,
   );
-  const contest = $derived(contestQuery?.data);
+  const competition = $derived(competitionQuery?.data);
 
-  const contendersQuery = $derived(
-    raffle?.contestId
-      ? getContendersByContestQuery(raffle.contestId)
+  const competitorsQuery = $derived(
+    raffle?.competitionId
+      ? getCompetitorsByCompetitionQuery(raffle.competitionId)
       : undefined,
   );
 
   const eligibleCount = $derived.by(() => {
-    const contenders = contendersQuery?.data;
+    const competitors = competitorsQuery?.data;
 
-    if (contenders === undefined) {
+    if (competitors === undefined) {
       return undefined;
     }
 
-    return contenders.filter(({ entered, disqualified, scrubbedAt }) => {
+    return competitors.filter(({ entered, disqualified, scrubbedAt }) => {
       switch (true) {
         case entered === undefined:
           return false;
@@ -88,38 +90,38 @@
   );
 
   $effect(() => {
-    const contestId = raffle?.contestId;
+    const competitionId = raffle?.competitionId;
 
-    if (contestId === undefined) {
+    if (competitionId === undefined) {
       return;
     }
 
     const filters: EventFilter[] = [
       {
-        contestId,
+        competitionId,
         eventTypes: {
-          CONTENDER_ENTERED: {},
-          CONTENDER_DISQUALIFIED: {},
-          CONTENDER_REQUALIFIED: {},
+          COMPETITOR_ENTERED: {},
+          COMPETITOR_DISQUALIFIED: {},
+          COMPETITOR_REQUALIFIED: {},
         },
       },
     ];
 
-    const invalidateContenders = () => {
+    const invalidateCompetitors = () => {
       queryClient.invalidateQueries({
-        queryKey: ["contenders", { contestId }],
+        queryKey: ["competitors", { competitionId }],
       });
     };
 
     const subscriptionId = subscribeEvents(filters, (eventName) => {
       if (
         [
-          "CONTENDER_ENTERED",
-          "CONTENDER_DISQUALIFIED",
-          "CONTENDER_REQUALIFIED",
+          "COMPETITOR_ENTERED",
+          "COMPETITOR_DISQUALIFIED",
+          "COMPETITOR_REQUALIFIED",
         ].includes(eventName)
       ) {
-        invalidateContenders();
+        invalidateCompetitors();
       }
     });
 
@@ -157,14 +159,14 @@
 </script>
 
 {#snippet renderName({
-  contenderName,
-  contenderId,
-  contenderScrubbedAt,
+  competitorName,
+  competitorId,
+  competitorScrubbedAt,
 }: RaffleWinner)}
-  <ContenderName
-    id={contenderId}
-    name={contenderName}
-    scrubbedAt={contenderScrubbedAt}
+  <CompetitorName
+    id={competitorId}
+    name={competitorName}
+    scrubbedAt={competitorScrubbedAt}
     withTooltip
   />
 {/snippet}
@@ -186,19 +188,21 @@
   {/if}
 {/snippet}
 
-{#if contest && raffle}
+{#if competition && raffle}
   <wa-breadcrumb>
     <wa-breadcrumb-item
       onclick={() =>
-        navigate(`/admin/organizers/${contest.ownership.organizerId}/contests`)}
-      ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
+        navigate(
+          `/admin/organizers/${competition.ownership.organizerId}/competitions`,
+        )}><wa-icon name="home"></wa-icon></wa-breadcrumb-item
     >
     <wa-breadcrumb-item
-      onclick={() => navigate(`/admin/contests/${raffle.contestId}`)}
-      >{contest.name}</wa-breadcrumb-item
+      onclick={() => navigate(`/admin/competitions/${raffle.competitionId}`)}
+      >{competition.name}</wa-breadcrumb-item
     >
     <wa-breadcrumb-item
-      onclick={() => navigate(`/admin/contests/${raffle.contestId}#raffles`)}
+      onclick={() =>
+        navigate(`/admin/competitions/${raffle.competitionId}#raffles`)}
       >Raffles</wa-breadcrumb-item
     >
   </wa-breadcrumb>
@@ -212,7 +216,7 @@
       <Table
         {columns}
         data={sortedRaffleWinners}
-        getId={({ contenderId }) => contenderId}
+        getId={({ competitorId }) => competitorId}
       ></Table>
     {:else if eligibleCount === 0}
       <EmptyState

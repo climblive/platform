@@ -1,40 +1,40 @@
--- name: GetContender :one
-SELECT sqlc.embed(contender), score.*
+-- name: GetCompetitor :one
+SELECT sqlc.embed(contender), result.*
 FROM contender
-LEFT JOIN score ON score.contender_id = id
+LEFT JOIN result ON result.contender_id = id
 WHERE id = ?;
 
--- name: GetContenderByCode :one
-SELECT sqlc.embed(contender), score.*
+-- name: GetCompetitorByCode :one
+SELECT sqlc.embed(contender), result.*
 FROM contender
-LEFT JOIN score ON score.contender_id = id
+LEFT JOIN result ON result.contender_id = id
 WHERE registration_code = ?;
 
--- name: GetContendersByCompClass :many
-SELECT sqlc.embed(contender), score.*
+-- name: GetCompetitorsByCategory :many
+SELECT sqlc.embed(contender), result.*
 FROM contender
-LEFT JOIN score ON score.contender_id = id
-WHERE class_id = ?;
+LEFT JOIN result ON result.contender_id = id
+WHERE class_id = sqlc.arg(category_id);
 
--- name: GetContendersByContest :many
-SELECT sqlc.embed(contender), score.*
+-- name: GetCompetitorsByCompetition :many
+SELECT sqlc.embed(contender), result.*
 FROM contender
-LEFT JOIN score ON score.contender_id = id
-WHERE contest_id = ?;
+LEFT JOIN result ON result.contender_id = id
+WHERE contest_id = sqlc.arg(competition_id);
 
--- name: DeleteContender :exec
+-- name: DeleteCompetitor :exec
 DELETE FROM contender
 WHERE id = ?;
 
--- name: CountContenders :one
+-- name: CountCompetitors :one
 SELECT COUNT(*)
 FROM contender
-WHERE contest_id = ?;
+WHERE contest_id = sqlc.arg(competition_id);
 
--- name: UpsertContender :execlastid
-INSERT INTO 
+-- name: UpsertCompetitor :execlastid
+INSERT INTO
 	contender (id, organizer_id, contest_id, registration_code, name, class_id, entered, disqualified, withdrawn_from_finals, scrubbed_at, scrub_before)
-VALUES 
+VALUES
 	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
@@ -48,9 +48,9 @@ ON DUPLICATE KEY UPDATE
     scrubbed_at = VALUES(scrubbed_at),
     scrub_before = VALUES(scrub_before);
 
--- name: UpsertScore :exec
+-- name: UpsertResult :exec
 INSERT INTO
-    score (contender_id, timestamp, score, placement, finalist, rank_order)
+    result (contender_id, timestamp, score, placement, finalist, rank_order)
 VALUES
     (?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
@@ -60,21 +60,21 @@ ON DUPLICATE KEY UPDATE
     finalist = VALUES(finalist),
     rank_order = VALUES(rank_order);
 
--- name: GetCompClass :one
+-- name: GetCategory :one
 SELECT sqlc.embed(comp_class)
 FROM comp_class
 WHERE id = ?;
 
--- name: GetCompClassesByContest :many
+-- name: GetCategoriesByCompetition :many
 SELECT sqlc.embed(comp_class)
 FROM comp_class
-WHERE contest_id = ?;
+WHERE contest_id = sqlc.arg(competition_id);
 
--- name: DeleteCompClass :exec
+-- name: DeleteCategory :exec
 DELETE FROM comp_class
 WHERE id = ?;
 
--- name: UpsertCompClass :execlastid
+-- name: UpsertCategory :execlastid
 INSERT INTO 
 	comp_class (id, organizer_id, contest_id, name, description, color, time_begin, time_end)
 VALUES 
@@ -88,22 +88,22 @@ ON DUPLICATE KEY UPDATE
     time_begin = VALUES(time_begin),
     time_end = VALUES(time_end);
 
--- name: GetContest :one
-SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
+-- name: GetCompetition :one
+SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_competitors
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 LEFT JOIN contender c ON c.contest_id = contest.id
 WHERE contest.id = ?
 GROUP BY contest.id;
 
--- name: GetAllContests :many
-SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
+-- name: GetAllCompetitions :many
+SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_competitors
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 LEFT JOIN contender c ON c.contest_id = contest.id
 GROUP BY contest.id;
 
--- name: UpsertContest :execlastid
+-- name: UpsertCompetition :execlastid
 INSERT INTO 
 	contest (id, organizer_id, archived_at, series_id, name, description, location, country, qualifying_problems, finalists, use_points, pooled_points, max_attempts, point_deduction, info, grace_period, name_retention_time, created)
 VALUES 
@@ -127,19 +127,19 @@ ON DUPLICATE KEY UPDATE
     name_retention_time = VALUES(name_retention_time),
     created = VALUES(created);
 
--- name: DeleteContest :exec
+-- name: DeleteCompetition :exec
 DELETE FROM contest
 WHERE id = ?;
 
--- name: GetContestsByOrganizer :many
-SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
+-- name: GetCompetitionsByOrganizer :many
+SELECT sqlc.embed(contest), MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_competitors
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 LEFT JOIN contender c ON c.contest_id = contest.id
 WHERE contest.organizer_id = ?
 GROUP BY contest.id;
 
--- name: GetContestsCurrentlyRunningOrByStartTime :many
+-- name: GetCompetitionsCurrentlyRunningOrByStartTime :many
 SELECT
 	*
 FROM (
@@ -160,12 +160,12 @@ WHERE id = ?;
 -- name: GetProblemByNumber :one
 SELECT sqlc.embed(problem)
 FROM problem
-WHERE contest_id = ? AND number = ?;
+WHERE contest_id = sqlc.arg(competition_id) AND number = ?;
 
--- name: GetProblemsByContest :many
+-- name: GetProblemsByCompetition :many
 SELECT sqlc.embed(problem)
 FROM problem
-WHERE contest_id = ?;
+WHERE contest_id = sqlc.arg(competition_id);
 
 -- name: DeleteProblem :exec
 DELETE FROM problem
@@ -195,20 +195,20 @@ SELECT sqlc.embed(tick)
 FROM tick
 WHERE id = ?;
 
--- name: GetTickByContenderAndProblem :one
+-- name: GetTickByCompetitorAndProblem :one
 SELECT sqlc.embed(tick)
 FROM tick
-WHERE contender_id = ? AND problem_id = ?;
+WHERE contender_id = sqlc.arg(competitor_id) AND problem_id = ?;
 
--- name: GetTicksByContender :many
+-- name: GetTicksByCompetitor :many
 SELECT sqlc.embed(tick)
 FROM tick
-WHERE contender_id = ?;
+WHERE contender_id = sqlc.arg(competitor_id);
 
--- name: GetTicksByContest :many
+-- name: GetTicksByCompetition :many
 SELECT sqlc.embed(tick)
 FROM tick
-WHERE contest_id = ?;
+WHERE contest_id = sqlc.arg(competition_id);
 
 -- name: GetTicksByProblem :many
 SELECT sqlc.embed(tick)
@@ -289,10 +289,10 @@ SELECT sqlc.embed(raffle)
 FROM raffle
 WHERE id = ?;
 
--- name: GetRafflesByContest :many
+-- name: GetRafflesByCompetition :many
 SELECT sqlc.embed(raffle)
 FROM raffle
-WHERE contest_id = ?;
+WHERE contest_id = sqlc.arg(competition_id);
 
 -- name: UpsertRaffle :execlastid
 INSERT INTO
@@ -350,10 +350,10 @@ VALUES
 DELETE FROM organizer_invite
 WHERE id = ?;
 
--- name: GetScrubEligibleContenders :many
-SELECT sqlc.embed(contender), score.*
+-- name: GetScrubEligibleCompetitors :many
+SELECT sqlc.embed(contender), result.*
 FROM contender
-LEFT JOIN score ON score.contender_id = id
+LEFT JOIN result ON result.contender_id = id
 WHERE contender.name != ''
   AND contender.scrub_before IS NOT NULL
   AND contender.scrub_before < ?;

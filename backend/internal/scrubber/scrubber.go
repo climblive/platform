@@ -20,17 +20,17 @@ func WithPanicRecovery() func(*runOptions) {
 	}
 }
 
-type contenderScrubberUseCase interface {
-	ScrubContenders(ctx context.Context, deadline time.Time) (int, error)
+type competitorScrubberUseCase interface {
+	ScrubCompetitors(ctx context.Context, deadline time.Time) (int, error)
 }
 
 type Scrubber struct {
-	useCase  contenderScrubberUseCase
+	useCase  competitorScrubberUseCase
 	interval time.Duration
 	running  atomic.Bool
 }
 
-func New(useCase contenderScrubberUseCase, interval time.Duration) *Scrubber {
+func New(useCase competitorScrubberUseCase, interval time.Duration) *Scrubber {
 	return &Scrubber{useCase: useCase, interval: interval, running: atomic.Bool{}}
 }
 
@@ -71,9 +71,9 @@ func (s *Scrubber) Run(ctx context.Context, options ...func(*runOptions)) *sync.
 			case <-time.After(delay):
 				slog.Info("running scrubber")
 
-				count, err := s.useCase.ScrubContenders(ctx, time.Now().Add(s.interval).Round(time.Hour))
+				count, err := s.useCase.ScrubCompetitors(ctx, time.Now().Add(s.interval).Round(time.Hour))
 				if err != nil {
-					slog.Error("failed to scrub contenders", "error", err)
+					slog.Error("failed to scrub competitors", "error", err)
 				} else if count > 0 {
 					slog.Info("scrubber completed", "count", count)
 				}

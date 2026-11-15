@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ContestInfo from "@/components/ContestInfo.svelte";
+  import CompetitionInfo from "@/components/CompetitionInfo.svelte";
   import Header from "@/components/Header.svelte";
   import ProblemView from "@/components/ProblemView.svelte";
   import Summary from "@/components/Summary.svelte";
@@ -14,7 +14,7 @@
   import "@awesome.me/webawesome/dist/components/tab-panel/tab-panel.js";
   import "@awesome.me/webawesome/dist/components/tab/tab.js";
   import {
-    ContestStateProvider,
+    CompetitionStateProvider,
     EmptyState,
     ResultList,
     ScoreboardProvider,
@@ -24,8 +24,8 @@
   import {
     ascentDeregisteredEventSchema,
     ascentRegisteredEventSchema,
-    contenderPublicInfoUpdatedEventSchema,
-    contenderScoreUpdatedEventSchema,
+    competitorPublicInfoUpdatedEventSchema,
+    competitorResultUpdatedEventSchema,
     NO_SCORE,
     pointValueUpdatedEventSchema,
     raffleWinnerDrawnEventSchema,
@@ -37,15 +37,15 @@
     type TickID,
   } from "@climblive/lib/models";
   import {
-    getCompClassesQuery,
-    getContenderQuery,
-    getContestQuery,
-    getPointValuesByContenderQuery,
+    getCategoriesQuery,
+    getCompetitorQuery,
+    getCompetitionQuery,
+    getPointValuesByCompetitorQuery,
     getProblemsQuery,
-    getTicksByContenderQuery,
+    getTicksByCompetitorQuery,
     refetchProblems,
     removeTickFromQueryCache,
-    updateContenderPublicInfoInQueryCache,
+    updateCompetitorPublicInfoInQueryCache,
     updatePointValueInQueryCache,
     updateRulesInQueryCache,
     updateTickInQueryCache,
@@ -60,12 +60,14 @@
   const queryClient = useQueryClient();
   const { subscribeEvents, unsubscribeEvents } = useEvents();
 
-  const contenderQuery = $derived(getContenderQuery($session.contenderId));
-  const contestQuery = $derived(getContestQuery($session.contestId));
-  const compClassesQuery = $derived(getCompClassesQuery($session.contestId));
-  const ticksQuery = $derived(getTicksByContenderQuery($session.contenderId));
+  const competitorQuery = $derived(getCompetitorQuery($session.competitorId));
+  const competitionQuery = $derived(
+    getCompetitionQuery($session.competitionId),
+  );
+  const categoriesQuery = $derived(getCategoriesQuery($session.competitionId));
+  const ticksQuery = $derived(getTicksByCompetitorQuery($session.competitorId));
   const pointValuesQuery = $derived(
-    getPointValuesByContenderQuery($session.contenderId),
+    getPointValuesByCompetitorQuery($session.competitorId),
   );
 
   let resultsConnected = $state(false);
@@ -76,21 +78,21 @@
   let placement: number | undefined = $state();
   let finalist: boolean = $state(false);
 
-  let contender = $derived(contenderQuery.data);
-  let contest = $derived(contestQuery.data);
-  let compClasses = $derived(compClassesQuery.data);
+  let competitor = $derived(competitorQuery.data);
+  let competition = $derived(competitionQuery.data);
+  let categories = $derived(categoriesQuery.data);
   let ticks = $derived(ticksQuery.data);
-  let selectedCompClass = $derived(
-    compClasses?.find(({ id }) => id === contender?.compClassId),
+  let selectedCategory = $derived(
+    categories?.find(({ id }) => id === competitor?.categoryId),
   );
   let startTime = $derived(
-    selectedCompClass?.timeBegin ?? new Date(8640000000000000),
+    selectedCategory?.timeBegin ?? new Date(8640000000000000),
   );
   let endTime = $derived(
-    selectedCompClass?.timeEnd ?? new Date(-8640000000000000),
+    selectedCategory?.timeEnd ?? new Date(-8640000000000000),
   );
 
-  const problemsQuery = $derived(getProblemsQuery($session.contestId));
+  const problemsQuery = $derived(getProblemsQuery($session.competitionId));
 
   let problems = $derived(problemsQuery?.data);
   let pointValues = $derived(pointValuesQuery.data);
@@ -191,7 +193,7 @@
   );
 
   const countedTickIds = $derived.by<Set<TickID>>(() => {
-    const limit = contest?.qualifyingProblems;
+    const limit = competition?.qualifyingProblems;
 
     if (!limit || !ticks || !problems) {
       return new Set<TickID>();
@@ -218,10 +220,10 @@
   });
 
   $effect(() => {
-    if (contender) {
-      score = contender.score?.score ?? NO_SCORE;
-      placement = contender.score?.placement;
-      finalist = contender.score?.finalist ?? false;
+    if (competitor) {
+      score = competitor.result?.score ?? NO_SCORE;
+      placement = competitor.result?.placement;
+      finalist = competitor.result?.finalist ?? false;
     }
   });
 
@@ -251,11 +253,11 @@
 
     const filters: EventFilter[] = [
       {
-        contestId: $session.contestId,
-        contenderId: $session.contenderId,
+        competitionId: $session.competitionId,
+        competitorId: $session.competitorId,
         eventTypes: {
-          CONTENDER_PUBLIC_INFO_UPDATED: {},
-          CONTENDER_SCORE_UPDATED: {},
+          COMPETITOR_PUBLIC_INFO_UPDATED: {},
+          COMPETITOR_RESULT_UPDATED: {},
           ASCENT_REGISTERED: {},
           ASCENT_DEREGISTERED: {},
           POINT_VALUE_UPDATED: {},
@@ -263,7 +265,7 @@
         },
       },
       {
-        contestId: $session.contestId,
+        competitionId: $session.competitionId,
         eventTypes: {
           RULES_UPDATED: {},
           PROBLEM_ADDED: {},
@@ -275,21 +277,21 @@
 
     subscriptionId = subscribeEvents(filters, (eventName, e) => {
       switch (eventName) {
-        case "CONTENDER_PUBLIC_INFO_UPDATED":
+        case "COMPETITOR_PUBLIC_INFO_UPDATED":
           {
-            const event = contenderPublicInfoUpdatedEventSchema.parse(
+            const event = competitorPublicInfoUpdatedEventSchema.parse(
               JSON.parse(e.data),
             );
 
-            if (event.contenderId !== contender?.id) {
+            if (event.competitorId !== competitor?.id) {
               return;
             }
 
-            updateContenderPublicInfoInQueryCache(
+            updateCompetitorPublicInfoInQueryCache(
               queryClient,
-              event.contenderId,
+              event.competitorId,
               {
-                compClassId: event.compClassId,
+                categoryId: event.categoryId,
                 name: event.name,
                 withdrawnFromFinals: event.withdrawnFromFinals,
                 disqualified: event.disqualified,
@@ -298,13 +300,13 @@
             );
           }
           break;
-        case "CONTENDER_SCORE_UPDATED":
+        case "COMPETITOR_RESULT_UPDATED":
           {
-            const event = contenderScoreUpdatedEventSchema.parse(
+            const event = competitorResultUpdatedEventSchema.parse(
               JSON.parse(e.data),
             );
 
-            if (event.contenderId === contender?.id) {
+            if (event.competitorId === competitor?.id) {
               score = event.score;
               placement = event.placement;
               finalist = event.finalist;
@@ -315,7 +317,7 @@
           {
             const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
 
-            if (event.contenderId !== contender?.id) {
+            if (event.competitorId !== competitor?.id) {
               return;
             }
 
@@ -332,7 +334,7 @@
               attemptsTop: event.attemptsTop,
             };
 
-            updateTickInQueryCache(queryClient, $session.contenderId, newTick);
+            updateTickInQueryCache(queryClient, $session.competitorId, newTick);
           }
           break;
         case "ASCENT_DEREGISTERED":
@@ -341,7 +343,7 @@
               JSON.parse(e.data),
             );
 
-            if (event.contenderId !== contender?.id) {
+            if (event.competitorId !== competitor?.id) {
               return;
             }
 
@@ -354,11 +356,15 @@
               JSON.parse(e.data),
             );
 
-            if (event.contenderId !== contender?.id) {
+            if (event.competitorId !== competitor?.id) {
               return;
             }
 
-            updatePointValueInQueryCache(queryClient, event.contenderId, event);
+            updatePointValueInQueryCache(
+              queryClient,
+              event.competitorId,
+              event,
+            );
           }
           break;
         case "RAFFLE_WINNER_DRAWN":
@@ -367,7 +373,7 @@
               JSON.parse(e.data),
             );
 
-            if (event.contenderId === contender?.id && raffleWinnerDialog) {
+            if (event.competitorId === competitor?.id && raffleWinnerDialog) {
               raffleWinnerDialog.open = true;
             }
           }
@@ -376,17 +382,17 @@
           {
             const event = rulesUpdatedEventSchema.parse(JSON.parse(e.data));
 
-            if (event.contestId !== $session.contestId) {
+            if (event.competitionId !== $session.competitionId) {
               return;
             }
 
-            updateRulesInQueryCache(queryClient, event.contestId, event);
+            updateRulesInQueryCache(queryClient, event.competitionId, event);
           }
           break;
         case "PROBLEM_ADDED":
         case "PROBLEM_UPDATED":
         case "PROBLEM_DELETED":
-          refetchProblems(queryClient, $session.contestId);
+          refetchProblems(queryClient, $session.competitionId);
           break;
       }
     });
@@ -415,23 +421,23 @@
 
 <svelte:window onvisibilitychange={handleVisibilityChange} />
 
-{#if showSplash || !contender || !contest || !compClasses || !sortedProblems || !ticks || !selectedCompClass}
+{#if showSplash || !competitor || !competition || !categories || !sortedProblems || !ticks || !selectedCategory}
   <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
-  <ContestStateProvider
-    contestId={$session.contestId}
-    compClassId={contender?.compClassId}
+  <CompetitionStateProvider
+    competitionId={$session.competitionId}
+    categoryId={competitor?.categoryId}
   >
-    {#snippet children({ contestState })}
+    {#snippet children({ competitionState })}
       <main>
         <div class="sticky">
           <Header
             registrationCode={$session.registrationCode}
-            contestName={contest.name}
-            compClassName={selectedCompClass?.name}
-            contenderId={contender.id}
-            contenderName={contender.name}
-            contenderScrubbedAt={contender.scrubbedAt}
+            competitionName={competition.name}
+            categoryName={selectedCategory?.name}
+            competitorId={competitor.id}
+            competitorName={competitor.name}
+            competitorScrubbedAt={competitor.scrubbedAt}
           />
         </div>
         <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleShowTab}>
@@ -446,8 +452,8 @@
               {score}
               {placement}
               {finalist}
-              disqualified={contender.disqualified}
-              {contestState}
+              disqualified={competitor.disqualified}
+              {competitionState}
               {startTime}
               {endTime}
             />
@@ -503,13 +509,15 @@
                   <ProblemView
                     {problem}
                     {tick}
-                    disabled={["NOT_STARTED", "ENDED"].includes(contestState)}
-                    counted={contest.qualifyingProblems === 0 ||
+                    disabled={["NOT_STARTED", "ENDED"].includes(
+                      competitionState,
+                    )}
+                    counted={competition.qualifyingProblems === 0 ||
                       (!!tick && countedTickIds.has(tick.id))}
-                    enablePoints={contest.usePoints}
-                    enableAttempts={!contest.usePoints ||
-                      contest.maxAttempts > 0 ||
-                      contest.pointDeduction > 0}
+                    enablePoints={competition.usePoints}
+                    enableAttempts={!competition.usePoints ||
+                      competition.maxAttempts > 0 ||
+                      competition.pointDeduction > 0}
                   />
                 {/each}
               </div>
@@ -518,15 +526,15 @@
           <wa-tab-panel name="results">
             {#if resultsConnected}
               <ScoreboardProvider
-                contestId={$session.contestId}
+                competitionId={$session.competitionId}
                 hideDisqualified
               >
                 {#snippet children({ scoreboard, loading })}
                   <ResultList
-                    compClassId={selectedCompClass.id}
+                    categoryId={selectedCategory.id}
                     {scoreboard}
                     {loading}
-                    highlightedContenderId={contender.id}
+                    highlightedCompetitorId={competitor.id}
                     autoScroll
                   />
                 {/snippet}
@@ -534,12 +542,16 @@
             {/if}
           </wa-tab-panel>
           <wa-tab-panel name="info">
-            <ContestInfo {contest} problems={sortedProblems} {compClasses} />
+            <CompetitionInfo
+              {competition}
+              problems={sortedProblems}
+              {categories}
+            />
           </wa-tab-panel>
         </wa-tab-group>
       </main>
     {/snippet}
-  </ContestStateProvider>
+  </CompetitionStateProvider>
 {/if}
 
 <wa-dialog

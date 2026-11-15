@@ -1,0 +1,83 @@
+<script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
+  import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
+  import { duplicateCompetitionMutation } from "@climblive/lib/queries";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
+  import type { Snippet } from "svelte";
+  import { navigate } from "svelte-routing";
+
+  type Props = {
+    competitionId: number;
+    competitionName: string;
+    open?: boolean;
+    onClose?: () => void;
+    children?: Snippet<[{ duplicateCompetition: () => void }]>;
+  };
+
+  let { competitionId, competitionName, children, onClose, ...rest }: Props =
+    $props();
+
+  let open = $derived(rest.open);
+
+  const duplicateCompetition = $derived(
+    duplicateCompetitionMutation(competitionId),
+  );
+
+  const handleDuplication = () => {
+    open = true;
+  };
+
+  const handleCancel = () => {
+    open = false;
+  };
+
+  const confirmDuplication = () => {
+    duplicateCompetition.mutate(undefined, {
+      onSuccess: (duplicate) => {
+        handleCancel();
+        navigate(`/admin/competitions/${duplicate.id}`);
+      },
+      onError: () => {
+        toastUnexpectedError("Failed to duplicate competition.");
+      },
+    });
+  };
+</script>
+
+{#if children}
+  {@render children({ duplicateCompetition: handleDuplication })}
+{/if}
+
+<wa-dialog
+  label="Duplicate competition"
+  {open}
+  onwa-after-hide={() => {
+    open = false;
+    onClose?.();
+  }}
+>
+  You are about to create a copy of the competition <strong
+    >{competitionName}</strong
+  >.<br /><br />
+
+  Everything except tickets, results and raffles will be copied.
+  <wa-button slot="footer" appearance="plain" onclick={handleCancel}>
+    Cancel</wa-button
+  >
+  <wa-button
+    slot="footer"
+    variant="warning"
+    onclick={confirmDuplication}
+    loading={duplicateCompetition.isPending}
+  >
+    Duplicate
+    <wa-icon slot="start" name="copy"></wa-icon>
+  </wa-button>
+</wa-dialog>
+
+<style>
+  wa-dialog {
+    white-space: normal;
+  }
+</style>

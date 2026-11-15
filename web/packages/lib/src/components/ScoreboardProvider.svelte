@@ -4,17 +4,17 @@
   import { writable, type Writable } from "svelte/store";
   import { ApiClient } from "../Api";
   import {
-    contenderPublicInfoUpdatedEventSchema,
-    contenderScoreUpdatedEventSchema,
+    competitorPublicInfoUpdatedEventSchema,
+    competitorResultUpdatedEventSchema,
     type EventFilter,
-    type Score,
+    type Result,
     type ScoreboardEntry,
   } from "../models";
   import { NO_SCORE } from "../models/score";
   import { useEvents } from "./EventsProvider.svelte";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
     hideDisqualified?: boolean;
     children?: Snippet<
       [
@@ -27,7 +27,7 @@
     >;
   }
 
-  let { contestId, hideDisqualified = false, children }: Props = $props();
+  let { competitionId, hideDisqualified = false, children }: Props = $props();
 
   const { subscribeEvents, unsubscribeEvents } = useEvents();
   let subscriptionId: symbol | undefined;
@@ -35,9 +35,10 @@
   let online = $state(true);
   let generation = 0;
 
-  const contenders: Map<number, ScoreboardEntry> = new Map();
-  const pendingUpdates: ((contenders: Map<number, ScoreboardEntry>) => void)[] =
-    [];
+  const competitors: Map<number, ScoreboardEntry> = new Map();
+  const pendingUpdates: ((
+    competitors: Map<number, ScoreboardEntry>,
+  ) => void)[] = [];
   const scoreboard = writable<Map<number, ScoreboardEntry[]>>(new Map());
 
   onMount(() => {
@@ -70,10 +71,10 @@
 
     const filters: EventFilter[] = [
       {
-        contestId,
+        competitionId,
         eventTypes: {
-          CONTENDER_PUBLIC_INFO_UPDATED: {},
-          "[]CONTENDER_SCORE_UPDATED": {},
+          COMPETITOR_PUBLIC_INFO_UPDATED: {},
+          "[]COMPETITOR_RESULT_UPDATED": {},
         },
       },
     ];
@@ -94,7 +95,7 @@
   const reset = () => {
     generation++;
     loading = true;
-    contenders.clear();
+    competitors.clear();
     pendingUpdates.length = 0;
     $scoreboard = new Map();
   };
@@ -110,19 +111,19 @@
 
   const initializeStore = async () => {
     const currentGeneration = generation;
-    const entries = await ApiClient.getInstance().getScoreboard(contestId);
+    const entries = await ApiClient.getInstance().getScoreboard(competitionId);
 
     if (currentGeneration !== generation) {
       return;
     }
 
     for (const entry of entries) {
-      contenders.set(entry.contenderId, entry);
+      competitors.set(entry.competitorId, entry);
     }
 
     while (pendingUpdates.length > 0) {
       const handler = pendingUpdates.shift();
-      handler?.(contenders);
+      handler?.(competitors);
     }
 
     rebuildStore();
@@ -131,43 +132,43 @@
 
   const rebuildStore = () => {
     const results = new Map<number, ScoreboardEntry[]>();
-    const withoutScore: ScoreboardEntry[] = [];
+    const withoutResult: ScoreboardEntry[] = [];
 
-    for (const contender of contenders.values()) {
-      let classEntries = results.get(contender.compClassId);
+    for (const competitor of competitors.values()) {
+      let categoryEntries = results.get(competitor.categoryId);
 
-      if (classEntries === undefined) {
-        classEntries = [];
-        results.set(contender.compClassId, classEntries);
+      if (categoryEntries === undefined) {
+        categoryEntries = [];
+        results.set(competitor.categoryId, categoryEntries);
       }
 
-      if (hideDisqualified && contender.disqualified) {
+      if (hideDisqualified && competitor.disqualified) {
         continue;
       }
 
-      if (!contender.score) {
-        withoutScore.push(contender);
+      if (!competitor.result) {
+        withoutResult.push(competitor);
       } else {
-        classEntries.push(contender);
+        categoryEntries.push(competitor);
       }
     }
 
-    if (withoutScore.length) {
-      for (const [compClassId, classEntries] of results.entries()) {
+    if (withoutResult.length) {
+      for (const [categoryId, categoryEntries] of results.entries()) {
         const maxRankOrder = Math.max(
-          ...classEntries.map(({ score }) => score?.rankOrder ?? -1),
+          ...categoryEntries.map(({ result }) => result?.rankOrder ?? -1),
           -1,
         );
 
         let rankOrder = maxRankOrder + 1;
 
-        for (const contender of withoutScore) {
-          if (contender.compClassId !== compClassId) {
+        for (const competitor of withoutResult) {
+          if (competitor.categoryId !== categoryId) {
             continue;
           }
 
-          contender.score = {
-            contenderId: contender.contenderId,
+          competitor.result = {
+            competitorId: competitor.competitorId,
             score: NO_SCORE,
             placement: 0,
             finalist: false,
@@ -175,7 +176,7 @@
             timestamp: new Date(0),
           };
 
-          classEntries.push(contender);
+          categoryEntries.push(competitor);
 
           rankOrder++;
         }
@@ -186,52 +187,52 @@
   };
 
   const queueEventHandler = (
-    handler: (contenders: Map<number, ScoreboardEntry>) => void,
+    handler: (competitors: Map<number, ScoreboardEntry>) => void,
   ) => {
     if (loading) {
       pendingUpdates.push(handler);
     } else {
-      handler(contenders);
+      handler(competitors);
       rebuildStore();
     }
   };
 
   const handleEvent = (eventName: string, e: MessageEvent) => {
-    if (eventName === "CONTENDER_PUBLIC_INFO_UPDATED") {
-      const event = contenderPublicInfoUpdatedEventSchema.parse(
+    if (eventName === "COMPETITOR_PUBLIC_INFO_UPDATED") {
+      const event = competitorPublicInfoUpdatedEventSchema.parse(
         JSON.parse(e.data),
       );
 
-      queueEventHandler((contenders: Map<number, ScoreboardEntry>) => {
-        let contender = contenders.get(event.contenderId);
-        if (!contender) {
-          contender = createEmptyEntry(event.contenderId);
+      queueEventHandler((competitors: Map<number, ScoreboardEntry>) => {
+        let competitor = competitors.get(event.competitorId);
+        if (!competitor) {
+          competitor = createEmptyEntry(event.competitorId);
         }
 
-        contender.compClassId = event.compClassId;
-        contender.name = event.name;
-        contender.withdrawnFromFinals = event.withdrawnFromFinals;
-        contender.disqualified = event.disqualified;
-        contender.scrubbedAt = event.scrubbedAt;
+        competitor.categoryId = event.categoryId;
+        competitor.name = event.name;
+        competitor.withdrawnFromFinals = event.withdrawnFromFinals;
+        competitor.disqualified = event.disqualified;
+        competitor.scrubbedAt = event.scrubbedAt;
 
-        contenders.set(event.contenderId, { ...contender });
+        competitors.set(event.competitorId, { ...competitor });
       });
     }
 
-    if (eventName === "[]CONTENDER_SCORE_UPDATED") {
+    if (eventName === "[]COMPETITOR_RESULT_UPDATED") {
       const events = z
-        .array(contenderScoreUpdatedEventSchema)
+        .array(competitorResultUpdatedEventSchema)
         .parse(JSON.parse(e.data));
 
       for (const event of events) {
-        queueEventHandler((contenders: Map<number, ScoreboardEntry>) => {
-          let contender = contenders.get(event.contenderId);
-          if (!contender) {
-            contender = createEmptyEntry(event.contenderId);
+        queueEventHandler((competitors: Map<number, ScoreboardEntry>) => {
+          let competitor = competitors.get(event.competitorId);
+          if (!competitor) {
+            competitor = createEmptyEntry(event.competitorId);
           }
 
-          const score: Score = {
-            contenderId: event.contenderId,
+          const result: Result = {
+            competitorId: event.competitorId,
             score: event.score,
             placement: event.placement,
             finalist: event.finalist,
@@ -239,16 +240,16 @@
             timestamp: event.timestamp,
           };
 
-          contender.score = score;
-          contenders.set(event.contenderId, { ...contender });
+          competitor.result = result;
+          competitors.set(event.competitorId, { ...competitor });
         });
       }
     }
   };
 
-  const createEmptyEntry = (contenderId: number): ScoreboardEntry => ({
-    contenderId: contenderId,
-    compClassId: 0,
+  const createEmptyEntry = (competitorId: number): ScoreboardEntry => ({
+    competitorId: competitorId,
+    categoryId: 0,
     name: "",
     withdrawnFromFinals: false,
     disqualified: false,

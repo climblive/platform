@@ -24,8 +24,8 @@ import (
 )
 
 func TestEventsHandler(t *testing.T) {
-	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
-	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 
 	makeMocks := func(bufferCapacity int, filters []domain.EventFilter) (*eventBrokerMock, *events.Subscription) {
 		mockedEventBroker := new(eventBrokerMock)
@@ -40,20 +40,20 @@ func TestEventsHandler(t *testing.T) {
 		return mockedEventBroker, subscription
 	}
 
-	makeContenderFilters := func(contestID domain.ContestID, contenderID domain.ContenderID) []domain.EventFilter {
+	makeCompetitorFilters := func(competitionID domain.CompetitionID, competitorID domain.CompetitorID) []domain.EventFilter {
 		return []domain.EventFilter{
 			domain.NewEventFilter(
-				contestID,
-				contenderID,
-				"CONTENDER_PUBLIC_INFO_UPDATED",
-				"CONTENDER_SCORE_UPDATED",
+				competitionID,
+				competitorID,
+				"COMPETITOR_PUBLIC_INFO_UPDATED",
+				"COMPETITOR_RESULT_UPDATED",
 				"ASCENT_REGISTERED",
 				"ASCENT_DEREGISTERED",
 				"RAFFLE_WINNER_DRAWN",
 				"POINT_VALUE_UPDATED",
 			),
 			domain.NewEventFilter(
-				contestID,
+				competitionID,
 				0,
 				"RULES_UPDATED",
 				"PROBLEM_ADDED",
@@ -103,7 +103,7 @@ func TestEventsHandler(t *testing.T) {
 
 		filters := make([]domain.EventFilter, filterCount)
 		for i := range filters {
-			filters[i] = domain.NewEventFilter(fakedContestID, 0, eventTypes...)
+			filters[i] = domain.NewEventFilter(fakedCompetitionID, 0, eventTypes...)
 		}
 
 		return filters
@@ -134,7 +134,7 @@ func TestEventsHandler(t *testing.T) {
 		}
 	})
 
-	t.Run("MixedContestIDs", func(t *testing.T) {
+	t.Run("MixedCompetitionIDs", func(t *testing.T) {
 		filters := []domain.EventFilter{
 			domain.NewEventFilter(1, 0),
 			domain.NewEventFilter(2, 0),
@@ -175,7 +175,7 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("ConnectAndDisconnect", func(t *testing.T) {
-		filters := makeContenderFilters(fakedContestID, fakedContenderID)
+		filters := makeCompetitorFilters(fakedCompetitionID, fakedCompetitorID)
 		mockedEventBroker, _ := makeMocks(0, filters)
 
 		mux := rest.NewMux()
@@ -205,7 +205,7 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("ReceivePing", func(t *testing.T) {
-		filters := makeContenderFilters(fakedContestID, fakedContenderID)
+		filters := makeCompetitorFilters(fakedCompetitionID, fakedCompetitorID)
 		mockedEventBroker, _ := makeMocks(0, filters)
 
 		mux := rest.NewMux()
@@ -239,17 +239,17 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("ReceiveEvent", func(t *testing.T) {
-		filters := makeContenderFilters(fakedContestID, fakedContenderID)
+		filters := makeCompetitorFilters(fakedCompetitionID, fakedCompetitorID)
 		mockedEventBroker, subscription := makeMocks(0, filters)
 
 		err := subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderScoreUpdatedEvent{
-				Timestamp:   time.Date(2024, 12, 01, 00, 00, 00, 0, time.UTC),
-				ContenderID: fakedContenderID,
-				Score:       "100p",
-				Placement:   10,
-				Finalist:    true,
-				RankOrder:   9,
+			Data: domain.CompetitorResultUpdatedEvent{
+				Timestamp:    time.Date(2024, 12, 01, 00, 00, 00, 0, time.UTC),
+				CompetitorID: fakedCompetitorID,
+				Score:        "100p",
+				Placement:    10,
+				Finalist:     true,
+				RankOrder:    9,
 			},
 		})
 		require.NoError(t, err)
@@ -278,8 +278,8 @@ func TestEventsHandler(t *testing.T) {
 		assert.Equal(t, []string{
 			"retry: 5000",
 			"",
-			"event: CONTENDER_SCORE_UPDATED",
-			fmt.Sprintf(`data: {"timestamp":"2024-12-01T00:00:00Z","contenderId":%v,"score":"100p","placement":10,"finalist":true,"rankOrder":9}`, fakedContenderID),
+			"event: COMPETITOR_RESULT_UPDATED",
+			fmt.Sprintf(`data: {"timestamp":"2024-12-01T00:00:00Z","competitorId":%v,"score":"100p","placement":10,"finalist":true,"rankOrder":9}`, fakedCompetitorID),
 		}, lines)
 
 		_ = resp.Body.Close()
@@ -290,16 +290,16 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("SubscriptionUnexpectedlyClosed", func(t *testing.T) {
-		filters := makeContenderFilters(fakedContestID, fakedContenderID)
+		filters := makeCompetitorFilters(fakedCompetitionID, fakedCompetitorID)
 		mockedEventBroker, subscription := makeMocks(1, filters)
 
 		err := subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderScoreUpdatedEvent{},
+			Data: domain.CompetitorResultUpdatedEvent{},
 		})
 		require.NoError(t, err)
 
 		err = subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderScoreUpdatedEvent{},
+			Data: domain.CompetitorResultUpdatedEvent{},
 		})
 		require.ErrorIs(t, err, events.ErrBufferFull)
 
@@ -323,8 +323,8 @@ type eventBrokerMock struct {
 	mock.Mock
 }
 
-func (m *eventBrokerMock) Dispatch(contestID domain.ContestID, event any) {
-	m.Called(contestID, event)
+func (m *eventBrokerMock) Dispatch(competitionID domain.CompetitionID, event any) {
+	m.Called(competitionID, event)
 }
 
 func (m *eventBrokerMock) Subscribe(filters []domain.EventFilter, bufferCapacity int) (domain.SubscriptionID, domain.EventReader) {
@@ -340,7 +340,7 @@ type repositoryMock struct {
 	mock.Mock
 }
 
-func (m *repositoryMock) GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error) {
-	args := m.Called(ctx, tx, contenderID)
-	return args.Get(0).(domain.Contender), args.Error(1)
+func (m *repositoryMock) GetCompetitor(ctx context.Context, tx domain.Transaction, competitorID domain.CompetitorID) (domain.Competitor, error) {
+	args := m.Called(ctx, tx, competitorID)
+	return args.Get(0).(domain.Competitor), args.Error(1)
 }

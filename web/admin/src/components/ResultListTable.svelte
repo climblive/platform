@@ -7,43 +7,43 @@
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import {
-    ContenderName,
+    CompetitorName,
     Score,
     Table,
     type ColumnDefinition,
   } from "@climblive/lib/components";
   import { value } from "@climblive/lib/forms";
   import type { ScoreboardEntry } from "@climblive/lib/models";
-  import { getCompClassesQuery } from "@climblive/lib/queries";
+  import { getCategoriesQuery } from "@climblive/lib/queries";
   import { ordinalSuperscript } from "@climblive/lib/utils";
   import { Link } from "svelte-routing";
   import type { Readable } from "svelte/store";
   import Loader from "./Loader.svelte";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
     loading: boolean;
   }
 
-  const { contestId, scoreboard, loading }: Props = $props();
+  const { competitionId, scoreboard, loading }: Props = $props();
 
   let tableData = $state<ScoreboardEntry[]>([]);
 
-  let compClassSelector: WaSelect | undefined = $state();
+  let categorySelector: WaSelect | undefined = $state();
   let quickFilter: WaInput | undefined = $state();
 
-  const compClassesQuery = $derived(getCompClassesQuery(contestId));
+  const categoriesQuery = $derived(getCategoriesQuery(competitionId));
 
-  const compClasses = $derived(compClassesQuery.data);
+  const categories = $derived(categoriesQuery.data);
 
   let filterText = $state<string>();
-  let selectedCompClassId: number | undefined = $state();
+  let selectedCategoryId: number | undefined = $state();
 
-  const contenderCounts = $derived(
+  const competitorCounts = $derived(
     new Map(
-      Array.from($scoreboard.entries()).map(([classId, entries]) => [
-        classId,
+      Array.from($scoreboard.entries()).map(([categoryId, entries]) => [
+        categoryId,
         entries.length,
       ]),
     ),
@@ -51,33 +51,35 @@
 
   $effect(() => {
     if (
-      compClasses &&
-      compClasses.length > 0 &&
-      selectedCompClassId === undefined
+      categories &&
+      categories.length > 0 &&
+      selectedCategoryId === undefined
     ) {
-      selectedCompClassId = compClasses[0].id;
+      selectedCategoryId = categories[0].id;
     }
   });
 
   $effect(() => {
-    if (selectedCompClassId === undefined) {
+    if (selectedCategoryId === undefined) {
       return;
     }
 
-    let scores = [...($scoreboard.get(selectedCompClassId) ?? [])];
+    let results = [...($scoreboard.get(selectedCategoryId) ?? [])];
 
     if (filterText) {
       const search = filterText.toLowerCase();
 
-      scores = scores.filter(({ name }) => name.toLowerCase().includes(search));
+      results = results.filter(({ name }) =>
+        name.toLowerCase().includes(search),
+      );
     }
 
-    scores.sort(
+    results.sort(
       (a: ScoreboardEntry, b: ScoreboardEntry) =>
-        (a.score?.rankOrder ?? Infinity) - (b.score?.rankOrder ?? Infinity),
+        (a.result?.rankOrder ?? Infinity) - (b.result?.rankOrder ?? Infinity),
     );
 
-    tableData = scores;
+    tableData = results;
   });
 
   const columns: ColumnDefinition<ScoreboardEntry>[] = [
@@ -112,42 +114,42 @@
 </script>
 
 {#snippet renderName({
-  contenderId,
+  competitorId,
   name,
   disqualified,
   scrubbedAt,
 }: ScoreboardEntry)}
-  <Link to={`./contenders/${contenderId}`}>
+  <Link to={`./competitors/${competitorId}`}>
     {#if disqualified}
-      <del><ContenderName id={contenderId} {name} {scrubbedAt} /></del>
+      <del><CompetitorName id={competitorId} {name} {scrubbedAt} /></del>
     {:else}
-      <ContenderName id={contenderId} {name} {scrubbedAt} />
+      <CompetitorName id={competitorId} {name} {scrubbedAt} />
     {/if}
   </Link>
 {/snippet}
 
-{#snippet renderScore({ score }: ScoreboardEntry)}
-  {#if score}
-    <Score value={score.score}></Score>
+{#snippet renderScore({ result }: ScoreboardEntry)}
+  {#if result}
+    <Score value={result.score}></Score>
   {/if}
 {/snippet}
 
-{#snippet renderPlacement({ score }: ScoreboardEntry)}
-  {#if score?.placement}
-    {score.placement}<sup>{ordinalSuperscript(score.placement)}</sup>
+{#snippet renderPlacement({ result }: ScoreboardEntry)}
+  {#if result?.placement}
+    {result.placement}<sup>{ordinalSuperscript(result.placement)}</sup>
   {:else}
     <wa-icon name="minus"></wa-icon>
   {/if}
 {/snippet}
 
-{#snippet renderFinalist({ score }: ScoreboardEntry)}
-  <wa-icon name={score?.finalist ? "medal" : "minus"}></wa-icon>
+{#snippet renderFinalist({ result }: ScoreboardEntry)}
+  <wa-icon name={result?.finalist ? "medal" : "minus"}></wa-icon>
 {/snippet}
 
-<h2>Scores</h2>
+<h2>Results</h2>
 
 <section>
-  {#if compClasses}
+  {#if categories}
     <div class="controls">
       <wa-input
         bind:this={quickFilter}
@@ -160,26 +162,26 @@
         with-clear
       ></wa-input>
       <wa-select
-        bind:this={compClassSelector}
+        bind:this={categorySelector}
         size="s"
         label="Category filter"
-        {@attach value(selectedCompClassId)}
+        {@attach value(selectedCategoryId)}
         onchange={() => {
-          selectedCompClassId = Number(compClassSelector?.value);
+          selectedCategoryId = Number(categorySelector?.value);
         }}
       >
-        {#each compClasses as compClass (compClass.id)}
-          {@const count = contenderCounts.get(compClass.id)}
+        {#each categories as category (category.id)}
+          {@const count = competitorCounts.get(category.id)}
 
-          <wa-option value={compClass.id} label={compClass.name}>
+          <wa-option value={category.id} label={category.name}>
             <div class="label">
-              {compClass.name}
+              {category.name}
               {#if count}
                 <wa-badge pill variant="neutral">{count}</wa-badge>
               {/if}
             </div>
-            {#if compClass.description}
-              <small>{compClass.description}</small>
+            {#if category.description}
+              <small>{category.description}</small>
             {/if}
           </wa-option>
         {/each}
@@ -190,7 +192,7 @@
   {#if loading}
     <Loader />
   {:else}
-    <Table {columns} data={tableData} getId={({ contenderId }) => contenderId}
+    <Table {columns} data={tableData} getId={({ competitorId }) => competitorId}
     ></Table>
   {/if}
 </section>

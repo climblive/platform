@@ -6,17 +6,19 @@ import {
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
 import type {
-  ContestID,
+  CompetitionID,
   ScoreEngineDescriptor,
   ScoreEngineInstanceID,
 } from "../models";
 import type { StartScoreEngineArguments } from "../models/rest";
 
-export const getScoreEnginesByContestQuery = (contestId: ContestID) =>
+export const getScoreEnginesByCompetitionQuery = (
+  competitionId: CompetitionID,
+) =>
   createQuery(() => ({
-    queryKey: ["score-engines", { contestId }],
+    queryKey: ["score-engines", { competitionId }],
     queryFn: async () =>
-      ApiClient.getInstance().getScoreEnginesByContest(contestId),
+      ApiClient.getInstance().getScoreEnginesByCompetition(competitionId),
   }));
 
 export const getScoreEnginesQuery = () =>
@@ -25,28 +27,28 @@ export const getScoreEnginesQuery = () =>
     queryFn: async () => ApiClient.getInstance().getScoreEngines(),
   }));
 
-export const startScoreEngineMutation = (contestId: number) => {
+export const startScoreEngineMutation = (competitionId: number) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
     mutationFn: (args: StartScoreEngineArguments) =>
-      ApiClient.getInstance().startScoreEngine(contestId, args),
+      ApiClient.getInstance().startScoreEngine(competitionId, args),
     onSuccess: (newEngineInstanceId) => {
-      const queryKey: QueryKey = ["score-engines", { contestId }];
+      const queryKey: QueryKey = ["score-engines", { competitionId }];
 
       const newEngineDescriptor: ScoreEngineDescriptor = {
-        contestId,
+        competitionId,
         instanceId: newEngineInstanceId,
       };
 
-      client.setQueryData<ScoreEngineDescriptor[]>(queryKey, (oldEngines) =>
-        oldEngines
-          ? [...oldEngines, newEngineDescriptor]
-          : [newEngineDescriptor],
-      );
-
       const predicate = ({ instanceId }: ScoreEngineDescriptor) =>
         instanceId === newEngineInstanceId;
+
+      client.setQueryData<ScoreEngineDescriptor[]>(queryKey, (oldEngines) =>
+        oldEngines?.some(predicate)
+          ? oldEngines
+          : [...(oldEngines ?? []), newEngineDescriptor],
+      );
 
       client.setQueryData<ScoreEngineDescriptor[]>(
         ["score-engines"],

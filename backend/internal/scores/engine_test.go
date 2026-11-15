@@ -38,18 +38,18 @@ func TestDefaultScoreEngine(t *testing.T) {
 	t.Run("HandleRulesUpdated", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+		fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
 
-		fakedCompClass1ID := testutils.RandomResourceID[domain.CompClassID]()
-		fakedCompClass2ID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCategory1ID := testutils.RandomResourceID[domain.CategoryID]()
+		fakedCategory2ID := testutils.RandomResourceID[domain.CategoryID]()
 
 		fakedProblem1ID := testutils.RandomResourceID[domain.ProblemID]()
 		fakedProblem2ID := testutils.RandomResourceID[domain.ProblemID]()
 
-		fakedContender1ID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedContender2ID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedContender3ID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedContender4ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedCompetitor1ID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCompetitor2ID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCompetitor3ID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCompetitor4ID := testutils.RandomResourceID[domain.CompetitorID]()
 
 		f.store.On("SaveRules", scores.Rules{
 			QualifyingProblems: 10,
@@ -57,12 +57,12 @@ func TestDefaultScoreEngine(t *testing.T) {
 			UsePoints:          true,
 			PooledPoints:       true,
 			MaxAttempts:        5,
-			PointDeduction:     10,
+			PointDeduction:     3,
 		}).Return()
 
-		f.store.On("GetCompClassIDs").Return([]domain.CompClassID{
-			fakedCompClass1ID,
-			fakedCompClass2ID,
+		f.store.On("GetCategoryIDs").Return([]domain.CategoryID{
+			fakedCategory1ID,
+			fakedCategory2ID,
 		})
 
 		f.store.On("GetAllProblems").Return(slices.Values([]scores.Problem{
@@ -75,46 +75,46 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}))
 
 		f.store.
-			On("GetContendersByCompClass", fakedCompClass1ID).Return(slices.Values([]scores.Contender{
+			On("GetCompetitorsByCategory", fakedCategory1ID).Return(slices.Values([]scores.Competitor{
 			{
-				ID: fakedContender1ID,
+				ID: fakedCompetitor1ID,
 			},
 			{
-				ID: fakedContender2ID,
+				ID: fakedCompetitor2ID,
 			},
 		})).
-			On("GetContendersByCompClass", fakedCompClass2ID).Return(slices.Values([]scores.Contender{
+			On("GetCompetitorsByCategory", fakedCategory2ID).Return(slices.Values([]scores.Competitor{
 			{
-				ID: fakedContender3ID,
+				ID: fakedCompetitor3ID,
 			},
 			{
-				ID: fakedContender4ID,
+				ID: fakedCompetitor4ID,
 			},
 		}))
 
 		effects := slices.Collect(f.engine.HandleRulesUpdated(domain.RulesUpdatedEvent{
-			ContestID:          fakedContestID,
+			CompetitionID:      fakedCompetitionID,
 			QualifyingProblems: 10,
 			Finalists:          7,
 			UsePoints:          true,
 			PooledPoints:       true,
 			MaxAttempts:        5,
-			PointDeduction:     10,
+			PointDeduction:     3,
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClass1ID, ProblemID: fakedProblem1ID},
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClass1ID, ProblemID: fakedProblem2ID},
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClass2ID, ProblemID: fakedProblem1ID},
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClass2ID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategory1ID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategory1ID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategory2ID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategory2ID, ProblemID: fakedProblem2ID},
 
-			scores.EffectScoreContender{ContenderID: fakedContender1ID},
-			scores.EffectScoreContender{ContenderID: fakedContender2ID},
-			scores.EffectScoreContender{ContenderID: fakedContender3ID},
-			scores.EffectScoreContender{ContenderID: fakedContender4ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor1ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor2ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor3ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor4ID},
 
-			scores.EffectRankClass{CompClassID: fakedCompClass1ID},
-			scores.EffectRankClass{CompClassID: fakedCompClass2ID},
+			scores.EffectRankCategory{CategoryID: fakedCategory1ID},
+			scores.EffectRankCategory{CategoryID: fakedCategory2ID},
 		})
 
 		awaitExpectations(t)
@@ -123,20 +123,20 @@ func TestDefaultScoreEngine(t *testing.T) {
 	t.Run("Start", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedCompClass1ID := testutils.RandomResourceID[domain.CompClassID]()
-		fakedCompClass2ID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCategory1ID := testutils.RandomResourceID[domain.CategoryID]()
+		fakedCategory2ID := testutils.RandomResourceID[domain.CategoryID]()
 
 		fakedProblem1ID := testutils.RandomResourceID[domain.ProblemID]()
 		fakedProblem2ID := testutils.RandomResourceID[domain.ProblemID]()
 
-		fakedContender1ID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedContender2ID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedContender3ID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedContender4ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedCompetitor1ID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCompetitor2ID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCompetitor3ID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCompetitor4ID := testutils.RandomResourceID[domain.CompetitorID]()
 
-		f.store.On("GetCompClassIDs").Return([]domain.CompClassID{
-			fakedCompClass1ID,
-			fakedCompClass2ID,
+		f.store.On("GetCategoryIDs").Return([]domain.CategoryID{
+			fakedCategory1ID,
+			fakedCategory2ID,
 		})
 
 		f.store.On("GetAllProblems").Return(slices.Values([]scores.Problem{
@@ -149,56 +149,56 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}))
 
 		f.store.
-			On("GetContendersByCompClass", fakedCompClass1ID).Return(slices.Values([]scores.Contender{
+			On("GetCompetitorsByCategory", fakedCategory1ID).Return(slices.Values([]scores.Competitor{
 			{
-				ID: fakedContender1ID,
+				ID: fakedCompetitor1ID,
 			},
 			{
-				ID: fakedContender2ID,
+				ID: fakedCompetitor2ID,
 			},
 		})).
-			On("GetContendersByCompClass", fakedCompClass2ID).Return(slices.Values([]scores.Contender{
+			On("GetCompetitorsByCategory", fakedCategory2ID).Return(slices.Values([]scores.Competitor{
 			{
-				ID: fakedContender3ID,
+				ID: fakedCompetitor3ID,
 			},
 			{
-				ID: fakedContender4ID,
+				ID: fakedCompetitor4ID,
 			},
 		}))
 
 		effects := slices.Collect(f.engine.Start())
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClass1ID, ProblemID: fakedProblem1ID},
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClass1ID, ProblemID: fakedProblem2ID},
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClass2ID, ProblemID: fakedProblem1ID},
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClass2ID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategory1ID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategory1ID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategory2ID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategory2ID, ProblemID: fakedProblem2ID},
 
-			scores.EffectScoreContender{ContenderID: fakedContender1ID},
-			scores.EffectScoreContender{ContenderID: fakedContender2ID},
-			scores.EffectScoreContender{ContenderID: fakedContender3ID},
-			scores.EffectScoreContender{ContenderID: fakedContender4ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor1ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor2ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor3ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor4ID},
 
-			scores.EffectRankClass{CompClassID: fakedCompClass1ID},
-			scores.EffectRankClass{CompClassID: fakedCompClass2ID},
+			scores.EffectRankCategory{CategoryID: fakedCategory1ID},
+			scores.EffectRankCategory{CategoryID: fakedCategory2ID},
 		})
 
 		awaitExpectations(t)
 	})
 
-	t.Run("ContenderEntered", func(t *testing.T) {
+	t.Run("CompetitorEntered", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 		fakedProblem1ID := testutils.RandomResourceID[domain.ProblemID]()
 		fakedProblem2ID := testutils.RandomResourceID[domain.ProblemID]()
 		fakedProblem3ID := testutils.RandomResourceID[domain.ProblemID]()
 
-		f.store.On("SaveContender", scores.Contender{
-			ID:          fakedContenderID,
-			CompClassID: fakedCompClassID,
+		f.store.On("SaveCompetitor", scores.Competitor{
+			ID:         fakedCompetitorID,
+			CategoryID: fakedCategoryID,
 		}).Return()
 
 		f.store.
@@ -215,35 +215,35 @@ func TestDefaultScoreEngine(t *testing.T) {
 				},
 			}))
 
-		effects := slices.Collect(f.engine.HandleContenderEntered(domain.ContenderEnteredEvent{
-			ContenderID: fakedContenderID,
-			CompClassID: fakedCompClassID,
+		effects := slices.Collect(f.engine.HandleCompetitorEntered(domain.CompetitorEnteredEvent{
+			CompetitorID: fakedCompetitorID,
+			CategoryID:   fakedCategoryID,
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblem1ID},
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblem2ID},
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblem3ID},
-			scores.EffectRankClass{CompClassID: fakedCompClassID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategoryID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategoryID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategoryID, ProblemID: fakedProblem3ID},
+			scores.EffectRankCategory{CategoryID: fakedCategoryID},
 		})
 
 		awaitExpectations(t)
 	})
 
-	t.Run("ContenderSwitchedClass_ContenderNotFound", func(t *testing.T) {
+	t.Run("CompetitorSwitchedCategory_CompetitorNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{}, false)
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{}, false)
 
-		effects := f.engine.HandleContenderSwitchedClass(
-			domain.ContenderSwitchedClassEvent{
-				ContenderID: fakedContenderID,
-				CompClassID: fakedCompClassID,
+		effects := f.engine.HandleCompetitorSwitchedCategory(
+			domain.CompetitorSwitchedCategoryEvent{
+				CompetitorID: fakedCompetitorID,
+				CategoryID:   fakedCategoryID,
 			})
 
 		assert.Empty(t, effects)
@@ -251,22 +251,22 @@ func TestDefaultScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
-	t.Run("ContenderSwitchedClass_SameClass", func(t *testing.T) {
+	t.Run("CompetitorSwitchedCategory_SameCategory", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{
-				ID:          fakedContenderID,
-				CompClassID: fakedCompClassID,
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{
+				ID:         fakedCompetitorID,
+				CategoryID: fakedCategoryID,
 			}, true)
 
-		effects := f.engine.HandleContenderSwitchedClass(domain.ContenderSwitchedClassEvent{
-			ContenderID: fakedContenderID,
-			CompClassID: fakedCompClassID,
+		effects := f.engine.HandleCompetitorSwitchedCategory(domain.CompetitorSwitchedCategoryEvent{
+			CompetitorID: fakedCompetitorID,
+			CategoryID:   fakedCategoryID,
 		})
 
 		assert.Empty(t, effects)
@@ -274,22 +274,22 @@ func TestDefaultScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
-	t.Run("ContenderSwitchedClass", func(t *testing.T) {
+	t.Run("CompetitorSwitchedCategory", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedOldCompClassID := testutils.RandomResourceID[domain.CompClassID]()
-		fakedNewCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedOldCategoryID := testutils.RandomResourceID[domain.CategoryID]()
+		fakedNewCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 		fakedProblem1ID := testutils.RandomResourceID[domain.ProblemID]()
 		fakedProblem2ID := testutils.RandomResourceID[domain.ProblemID]()
 		fakedProblem3ID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{
-				ID:                  fakedContenderID,
-				CompClassID:         fakedOldCompClassID,
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{
+				ID:                  fakedCompetitorID,
+				CategoryID:          fakedOldCategoryID,
 				Disqualified:        false,
 				WithdrawnFromFinals: false,
 				Score: scores.Score{
@@ -297,9 +297,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 				},
 			}, true)
 
-		f.store.On("SaveContender", scores.Contender{
-			ID:                  fakedContenderID,
-			CompClassID:         fakedNewCompClassID,
+		f.store.On("SaveCompetitor", scores.Competitor{
+			ID:                  fakedCompetitorID,
+			CategoryID:          fakedNewCategoryID,
 			Disqualified:        false,
 			WithdrawnFromFinals: false,
 			Score: scores.Score{
@@ -321,38 +321,38 @@ func TestDefaultScoreEngine(t *testing.T) {
 				},
 			}))
 
-		effects := slices.Collect(f.engine.HandleContenderSwitchedClass(domain.ContenderSwitchedClassEvent{
-			ContenderID: fakedContenderID,
-			CompClassID: fakedNewCompClassID,
+		effects := slices.Collect(f.engine.HandleCompetitorSwitchedCategory(domain.CompetitorSwitchedCategoryEvent{
+			CompetitorID: fakedCompetitorID,
+			CategoryID:   fakedNewCategoryID,
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectCalculatePointValues{CompClassID: fakedOldCompClassID, ProblemID: fakedProblem1ID},
-			scores.EffectCalculatePointValues{CompClassID: fakedOldCompClassID, ProblemID: fakedProblem2ID},
-			scores.EffectCalculatePointValues{CompClassID: fakedOldCompClassID, ProblemID: fakedProblem3ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedOldCategoryID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedOldCategoryID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedOldCategoryID, ProblemID: fakedProblem3ID},
 
-			scores.EffectCalculatePointValues{CompClassID: fakedNewCompClassID, ProblemID: fakedProblem1ID},
-			scores.EffectCalculatePointValues{CompClassID: fakedNewCompClassID, ProblemID: fakedProblem2ID},
-			scores.EffectCalculatePointValues{CompClassID: fakedNewCompClassID, ProblemID: fakedProblem3ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedNewCategoryID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedNewCategoryID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedNewCategoryID, ProblemID: fakedProblem3ID},
 
-			scores.EffectRankClass{CompClassID: fakedOldCompClassID},
-			scores.EffectRankClass{CompClassID: fakedNewCompClassID},
+			scores.EffectRankCategory{CategoryID: fakedOldCategoryID},
+			scores.EffectRankCategory{CategoryID: fakedNewCategoryID},
 		})
 
 		awaitExpectations(t)
 	})
 
-	t.Run("ContenderWithdrewFromFinals_ContenderNotFound", func(t *testing.T) {
+	t.Run("CompetitorWithdrewFromFinals_CompetitorNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{}, false)
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{}, false)
 
-		effects := f.engine.HandleContenderWithdrewFromFinals(domain.ContenderWithdrewFromFinalsEvent{
-			ContenderID: fakedContenderID,
+		effects := f.engine.HandleCompetitorWithdrewFromFinals(domain.CompetitorWithdrewFromFinalsEvent{
+			CompetitorID: fakedCompetitorID,
 		})
 
 		assert.Empty(t, effects)
@@ -360,26 +360,26 @@ func TestDefaultScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
-	t.Run("ContenderWithdrewFromFinals", func(t *testing.T) {
+	t.Run("CompetitorWithdrewFromFinals", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{
-				ID:           fakedContenderID,
-				CompClassID:  fakedCompClassID,
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{
+				ID:           fakedCompetitorID,
+				CategoryID:   fakedCategoryID,
 				Disqualified: true,
 				Score: scores.Score{
 					Points: 123,
 				},
 			}, true)
 
-		f.store.On("SaveContender", scores.Contender{
-			ID:                  fakedContenderID,
-			CompClassID:         fakedCompClassID,
+		f.store.On("SaveCompetitor", scores.Competitor{
+			ID:                  fakedCompetitorID,
+			CategoryID:          fakedCategoryID,
 			Disqualified:        true,
 			WithdrawnFromFinals: true,
 			Score: scores.Score{
@@ -387,28 +387,28 @@ func TestDefaultScoreEngine(t *testing.T) {
 			},
 		}).Return()
 
-		effects := slices.Collect(f.engine.HandleContenderWithdrewFromFinals(domain.ContenderWithdrewFromFinalsEvent{
-			ContenderID: fakedContenderID,
+		effects := slices.Collect(f.engine.HandleCompetitorWithdrewFromFinals(domain.CompetitorWithdrewFromFinalsEvent{
+			CompetitorID: fakedCompetitorID,
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectRankClass{CompClassID: fakedCompClassID},
+			scores.EffectRankCategory{CategoryID: fakedCategoryID},
 		})
 
 		awaitExpectations(t)
 	})
 
-	t.Run("ContenderReenteredFinals_ContenderNotFound", func(t *testing.T) {
+	t.Run("CompetitorReenteredFinals_CompetitorNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{}, false)
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{}, false)
 
-		effects := f.engine.HandleContenderReenteredFinals(domain.ContenderReenteredFinalsEvent{
-			ContenderID: fakedContenderID,
+		effects := f.engine.HandleCompetitorReenteredFinals(domain.CompetitorReenteredFinalsEvent{
+			CompetitorID: fakedCompetitorID,
 		})
 
 		assert.Empty(t, effects)
@@ -416,17 +416,17 @@ func TestDefaultScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
-	t.Run("ContenderReenteredFinals", func(t *testing.T) {
+	t.Run("CompetitorReenteredFinals", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{
-				ID:                  fakedContenderID,
-				CompClassID:         fakedCompClassID,
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{
+				ID:                  fakedCompetitorID,
+				CategoryID:          fakedCategoryID,
 				Disqualified:        true,
 				WithdrawnFromFinals: true,
 				Score: scores.Score{
@@ -434,9 +434,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 				},
 			}, true)
 
-		f.store.On("SaveContender", scores.Contender{
-			ID:                  fakedContenderID,
-			CompClassID:         fakedCompClassID,
+		f.store.On("SaveCompetitor", scores.Competitor{
+			ID:                  fakedCompetitorID,
+			CategoryID:          fakedCategoryID,
 			Disqualified:        true,
 			WithdrawnFromFinals: false,
 			Score: scores.Score{
@@ -444,28 +444,28 @@ func TestDefaultScoreEngine(t *testing.T) {
 			},
 		}).Return()
 
-		effects := slices.Collect(f.engine.HandleContenderReenteredFinals(domain.ContenderReenteredFinalsEvent{
-			ContenderID: fakedContenderID,
+		effects := slices.Collect(f.engine.HandleCompetitorReenteredFinals(domain.CompetitorReenteredFinalsEvent{
+			CompetitorID: fakedCompetitorID,
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectRankClass{CompClassID: fakedCompClassID},
+			scores.EffectRankCategory{CategoryID: fakedCategoryID},
 		})
 
 		awaitExpectations(t)
 	})
 
-	t.Run("ContenderDisqualified_ContenderNotFound", func(t *testing.T) {
+	t.Run("CompetitorDisqualified_CompetitorNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{}, false)
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{}, false)
 
-		effects := f.engine.HandleContenderDisqualified(domain.ContenderDisqualifiedEvent{
-			ContenderID: fakedContenderID,
+		effects := f.engine.HandleCompetitorDisqualified(domain.CompetitorDisqualifiedEvent{
+			CompetitorID: fakedCompetitorID,
 		})
 
 		assert.Empty(t, effects)
@@ -473,21 +473,21 @@ func TestDefaultScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
-	t.Run("ContenderDisqualified", func(t *testing.T) {
+	t.Run("CompetitorDisqualified", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 		fakedProblem1ID := testutils.RandomResourceID[domain.ProblemID]()
 		fakedProblem2ID := testutils.RandomResourceID[domain.ProblemID]()
 		fakedProblem3ID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{
-				ID:                  fakedContenderID,
-				CompClassID:         fakedCompClassID,
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{
+				ID:                  fakedCompetitorID,
+				CategoryID:          fakedCategoryID,
 				WithdrawnFromFinals: true,
 				Score: scores.Score{
 					Points: 123,
@@ -508,9 +508,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 				},
 			}))
 
-		f.store.On("SaveContender", scores.Contender{
-			ID:                  fakedContenderID,
-			CompClassID:         fakedCompClassID,
+		f.store.On("SaveCompetitor", scores.Competitor{
+			ID:                  fakedCompetitorID,
+			CategoryID:          fakedCategoryID,
 			Disqualified:        true,
 			WithdrawnFromFinals: true,
 			Score: scores.Score{
@@ -518,32 +518,32 @@ func TestDefaultScoreEngine(t *testing.T) {
 			},
 		}).Return()
 
-		effects := slices.Collect(f.engine.HandleContenderDisqualified(domain.ContenderDisqualifiedEvent{
-			ContenderID: fakedContenderID,
+		effects := slices.Collect(f.engine.HandleCompetitorDisqualified(domain.CompetitorDisqualifiedEvent{
+			CompetitorID: fakedCompetitorID,
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblem1ID},
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblem2ID},
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblem3ID},
-			scores.EffectScoreContender{ContenderID: fakedContenderID},
-			scores.EffectRankClass{CompClassID: fakedCompClassID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategoryID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategoryID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategoryID, ProblemID: fakedProblem3ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitorID},
+			scores.EffectRankCategory{CategoryID: fakedCategoryID},
 		})
 
 		awaitExpectations(t)
 	})
 
-	t.Run("ContenderRequalified_ContenderNotFound", func(t *testing.T) {
+	t.Run("CompetitorRequalified_CompetitorNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{}, false)
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{}, false)
 
-		effects := f.engine.HandleContenderRequalified(domain.ContenderRequalifiedEvent{
-			ContenderID: fakedContenderID,
+		effects := f.engine.HandleCompetitorRequalified(domain.CompetitorRequalifiedEvent{
+			CompetitorID: fakedCompetitorID,
 		})
 
 		assert.Empty(t, effects)
@@ -551,21 +551,21 @@ func TestDefaultScoreEngine(t *testing.T) {
 		awaitExpectations(t)
 	})
 
-	t.Run("ContenderRequalified", func(t *testing.T) {
+	t.Run("CompetitorRequalified", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 		fakedProblem1ID := testutils.RandomResourceID[domain.ProblemID]()
 		fakedProblem2ID := testutils.RandomResourceID[domain.ProblemID]()
 		fakedProblem3ID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{
-				ID:                  fakedContenderID,
-				CompClassID:         fakedCompClassID,
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{
+				ID:                  fakedCompetitorID,
+				CategoryID:          fakedCategoryID,
 				Disqualified:        true,
 				WithdrawnFromFinals: true,
 				Score:               scores.Score{},
@@ -585,24 +585,24 @@ func TestDefaultScoreEngine(t *testing.T) {
 				},
 			}))
 
-		f.store.On("SaveContender", scores.Contender{
-			ID:                  fakedContenderID,
-			CompClassID:         fakedCompClassID,
+		f.store.On("SaveCompetitor", scores.Competitor{
+			ID:                  fakedCompetitorID,
+			CategoryID:          fakedCategoryID,
 			Disqualified:        false,
 			WithdrawnFromFinals: true,
 			Score:               scores.Score{},
 		}).Return()
 
-		effects := slices.Collect(f.engine.HandleContenderRequalified(domain.ContenderRequalifiedEvent{
-			ContenderID: fakedContenderID,
+		effects := slices.Collect(f.engine.HandleCompetitorRequalified(domain.CompetitorRequalifiedEvent{
+			CompetitorID: fakedCompetitorID,
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblem1ID},
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblem2ID},
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblem3ID},
-			scores.EffectScoreContender{ContenderID: fakedContenderID},
-			scores.EffectRankClass{CompClassID: fakedCompClassID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategoryID, ProblemID: fakedProblem1ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategoryID, ProblemID: fakedProblem2ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategoryID, ProblemID: fakedProblem3ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitorID},
+			scores.EffectRankCategory{CategoryID: fakedCategoryID},
 		})
 
 		awaitExpectations(t)
@@ -613,9 +613,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
-		fakedCompClass1ID := testutils.RandomResourceID[domain.CompClassID]()
-		fakedCompClass2ID := testutils.RandomResourceID[domain.CompClassID]()
-		fakedCompClass3ID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCategory1ID := testutils.RandomResourceID[domain.CategoryID]()
+		fakedCategory2ID := testutils.RandomResourceID[domain.CategoryID]()
+		fakedCategory3ID := testutils.RandomResourceID[domain.CategoryID]()
 
 		f.store.
 			On("SaveProblem", scores.Problem{
@@ -623,20 +623,20 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Zone1Enabled: true,
 				Zone2Enabled: true,
 				ProblemValue: scores.ProblemValue{
-					PointsTop:   100,
-					PointsZone1: 50,
-					PointsZone2: 75,
-					FlashBonus:  10,
+					PointsTop:   1000,
+					PointsZone1: 500,
+					PointsZone2: 750,
+					FlashBonus:  100,
 				},
 			}).
 			Return()
 
 		f.store.
-			On("GetCompClassIDs").
-			Return([]domain.CompClassID{
-				fakedCompClass1ID,
-				fakedCompClass2ID,
-				fakedCompClass3ID,
+			On("GetCategoryIDs").
+			Return([]domain.CategoryID{
+				fakedCategory1ID,
+				fakedCategory2ID,
+				fakedCategory3ID,
 			})
 
 		effects := slices.Collect(f.engine.HandleProblemAdded(domain.ProblemAddedEvent{
@@ -652,9 +652,12 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClass1ID, ProblemID: fakedProblemID},
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClass2ID, ProblemID: fakedProblemID},
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClass3ID, ProblemID: fakedProblemID},
+			scores.EffectRankCategory{CategoryID: fakedCategory1ID},
+			scores.EffectRankCategory{CategoryID: fakedCategory2ID},
+			scores.EffectRankCategory{CategoryID: fakedCategory3ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategory1ID, ProblemID: fakedProblemID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategory2ID, ProblemID: fakedProblemID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategory3ID, ProblemID: fakedProblemID},
 		})
 
 		awaitExpectations(t)
@@ -665,13 +668,13 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
-		fakedCompClass1ID := testutils.RandomResourceID[domain.CompClassID]()
-		fakedCompClass2ID := testutils.RandomResourceID[domain.CompClassID]()
-		fakedCompClass3ID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCategory1ID := testutils.RandomResourceID[domain.CategoryID]()
+		fakedCategory2ID := testutils.RandomResourceID[domain.CategoryID]()
+		fakedCategory3ID := testutils.RandomResourceID[domain.CategoryID]()
 
-		fakedContender1ID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedContender2ID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedContender3ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedCompetitor1ID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCompetitor2ID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCompetitor3ID := testutils.RandomResourceID[domain.CompetitorID]()
 
 		f.store.
 			On("SaveProblem", scores.Problem{
@@ -679,39 +682,39 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Zone1Enabled: true,
 				Zone2Enabled: true,
 				ProblemValue: scores.ProblemValue{
-					PointsTop:   100,
-					PointsZone1: 50,
-					PointsZone2: 75,
-					FlashBonus:  10,
+					PointsTop:   1000,
+					PointsZone1: 500,
+					PointsZone2: 750,
+					FlashBonus:  100,
 				},
 			}).
 			Return()
 
 		f.store.
-			On("GetCompClassIDs").
-			Return([]domain.CompClassID{
-				fakedCompClass1ID,
-				fakedCompClass2ID,
-				fakedCompClass3ID,
+			On("GetCategoryIDs").
+			Return([]domain.CategoryID{
+				fakedCategory1ID,
+				fakedCategory2ID,
+				fakedCategory3ID,
 			})
 
 		f.store.
-			On("GetContendersByCompClass", fakedCompClass1ID).
-			Return(slices.Values([]scores.Contender{
+			On("GetCompetitorsByCategory", fakedCategory1ID).
+			Return(slices.Values([]scores.Competitor{
 				{
-					ID: fakedContender1ID,
+					ID: fakedCompetitor1ID,
 				},
 			})).
-			On("GetContendersByCompClass", fakedCompClass2ID).
-			Return(slices.Values([]scores.Contender{
+			On("GetCompetitorsByCategory", fakedCategory2ID).
+			Return(slices.Values([]scores.Competitor{
 				{
-					ID: fakedContender2ID,
+					ID: fakedCompetitor2ID,
 				},
 			})).
-			On("GetContendersByCompClass", fakedCompClass3ID).
-			Return(slices.Values([]scores.Contender{
+			On("GetCompetitorsByCategory", fakedCategory3ID).
+			Return(slices.Values([]scores.Competitor{
 				{
-					ID: fakedContender3ID,
+					ID: fakedCompetitor3ID,
 				},
 			}))
 
@@ -728,34 +731,37 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClass1ID, ProblemID: fakedProblemID},
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClass2ID, ProblemID: fakedProblemID},
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClass3ID, ProblemID: fakedProblemID},
+			scores.EffectRankCategory{CategoryID: fakedCategory1ID},
+			scores.EffectRankCategory{CategoryID: fakedCategory2ID},
+			scores.EffectRankCategory{CategoryID: fakedCategory3ID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategory1ID, ProblemID: fakedProblemID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategory2ID, ProblemID: fakedProblemID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategory3ID, ProblemID: fakedProblemID},
 
-			scores.EffectScoreContender{ContenderID: fakedContender1ID},
-			scores.EffectScoreContender{ContenderID: fakedContender2ID},
-			scores.EffectScoreContender{ContenderID: fakedContender3ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor1ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor2ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor3ID},
 		})
 
 		awaitExpectations(t)
 	})
 
-	t.Run("AscentRegistered_ContenderNotFound", func(t *testing.T) {
+	t.Run("AscentRegistered_CompetitorNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
-			On("GetTick", fakedContenderID, fakedProblemID).
+			On("GetTick", fakedCompetitorID, fakedProblemID).
 			Return(scores.Tick{}, false)
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{}, false)
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{}, false)
 
 		f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
-			ContenderID:   fakedContenderID,
+			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Top:           true,
 			AttemptsTop:   3,
@@ -772,27 +778,27 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedTickID := testutils.RandomResourceID[domain.TickID]()
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
-			On("GetTick", fakedContenderID, fakedProblemID).
+			On("GetTick", fakedCompetitorID, fakedProblemID).
 			Return(scores.Tick{}, false)
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{
-				ID:           fakedContenderID,
-				CompClassID:  fakedCompClassID,
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{
+				ID:           fakedCompetitorID,
+				CategoryID:   fakedCategoryID,
 				Disqualified: true,
 			}, true)
 
 		f.store.
-			On("SaveTick", fakedContenderID, scores.Tick{
+			On("SaveTick", fakedCompetitorID, scores.Tick{
 				ID:            fakedTickID,
 				Revision:      1,
-				ContenderID:   fakedContenderID,
+				CompetitorID:  fakedCompetitorID,
 				ProblemID:     fakedProblemID,
 				Top:           true,
 				AttemptsTop:   5,
@@ -806,7 +812,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 		effects := f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
 			TickID:        fakedTickID,
 			Revision:      1,
-			ContenderID:   fakedContenderID,
+			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Top:           true,
 			AttemptsTop:   5,
@@ -824,21 +830,21 @@ func TestDefaultScoreEngine(t *testing.T) {
 	t.Run("AscentRegistered_StaleRevision", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
-			On("GetTick", fakedContenderID, fakedProblemID).
+			On("GetTick", fakedCompetitorID, fakedProblemID).
 			Return(scores.Tick{
-				ContenderID: fakedContenderID,
-				ProblemID:   fakedProblemID,
-				Revision:    2,
+				CompetitorID: fakedCompetitorID,
+				ProblemID:    fakedProblemID,
+				Revision:     2,
 			}, true)
 
 		effects := f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
-			ContenderID: fakedContenderID,
-			ProblemID:   fakedProblemID,
-			Revision:    1,
+			CompetitorID: fakedCompetitorID,
+			ProblemID:    fakedProblemID,
+			Revision:     1,
 		})
 
 		require.Nil(t, effects)
@@ -850,26 +856,26 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedTickID := testutils.RandomResourceID[domain.TickID]()
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
-			On("GetTick", fakedContenderID, fakedProblemID).
+			On("GetTick", fakedCompetitorID, fakedProblemID).
 			Return(scores.Tick{}, false)
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{
-				ID:          fakedContenderID,
-				CompClassID: fakedCompClassID,
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{
+				ID:         fakedCompetitorID,
+				CategoryID: fakedCategoryID,
 			}, true)
 
 		f.store.
-			On("SaveTick", fakedContenderID, scores.Tick{
+			On("SaveTick", fakedCompetitorID, scores.Tick{
 				ID:            fakedTickID,
 				Revision:      1,
-				ContenderID:   fakedContenderID,
+				CompetitorID:  fakedCompetitorID,
 				ProblemID:     fakedProblemID,
 				Top:           true,
 				AttemptsTop:   5,
@@ -883,7 +889,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 		effects := slices.Collect(f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
 			TickID:        fakedTickID,
 			Revision:      1,
-			ContenderID:   fakedContenderID,
+			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Top:           true,
 			AttemptsTop:   5,
@@ -894,26 +900,26 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblemID},
-			scores.EffectScoreContender{ContenderID: fakedContenderID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategoryID, ProblemID: fakedProblemID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitorID},
 		})
 
 		awaitExpectations(t)
 	})
 
-	t.Run("AscentDeregistered_ContenderNotFound", func(t *testing.T) {
+	t.Run("AscentDeregistered_CompetitorNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{}, false)
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{}, false)
 
 		f.engine.HandleAscentDeregistered(domain.AscentDeregisteredEvent{
-			ContenderID: fakedContenderID,
-			ProblemID:   fakedProblemID,
+			CompetitorID: fakedCompetitorID,
+			ProblemID:    fakedProblemID,
 		})
 
 		awaitExpectations(t)
@@ -923,15 +929,15 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedTickID := testutils.RandomResourceID[domain.TickID]()
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{
-				ID:           fakedContenderID,
-				CompClassID:  fakedCompClassID,
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{
+				ID:           fakedCompetitorID,
+				CategoryID:   fakedCategoryID,
 				Disqualified: true,
 			}, true)
 
@@ -940,9 +946,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return()
 
 		effects := f.engine.HandleAscentDeregistered(domain.AscentDeregisteredEvent{
-			TickID:      fakedTickID,
-			ContenderID: fakedContenderID,
-			ProblemID:   fakedProblemID,
+			TickID:       fakedTickID,
+			CompetitorID: fakedCompetitorID,
+			ProblemID:    fakedProblemID,
 		})
 
 		require.Nil(t, effects)
@@ -954,15 +960,15 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		fakedTickID := testutils.RandomResourceID[domain.TickID]()
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{
-				ID:          fakedContenderID,
-				CompClassID: fakedCompClassID,
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{
+				ID:         fakedCompetitorID,
+				CategoryID: fakedCategoryID,
 			}, true)
 
 		f.store.
@@ -970,62 +976,62 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return()
 
 		effects := slices.Collect(f.engine.HandleAscentDeregistered(domain.AscentDeregisteredEvent{
-			TickID:      fakedTickID,
-			ContenderID: fakedContenderID,
-			ProblemID:   fakedProblemID,
+			TickID:       fakedTickID,
+			CompetitorID: fakedCompetitorID,
+			ProblemID:    fakedProblemID,
 		}))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectCalculatePointValues{CompClassID: fakedCompClassID, ProblemID: fakedProblemID},
-			scores.EffectScoreContender{ContenderID: fakedContenderID},
+			scores.EffectCalculatePointValues{CategoryID: fakedCategoryID, ProblemID: fakedProblemID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitorID},
 		})
 
 		awaitExpectations(t)
 	})
 
-	t.Run("GetDirtyScores", func(t *testing.T) {
+	t.Run("GetDirtyResults", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
 		now := time.Now()
 
-		fakedContenderID1 := testutils.RandomResourceID[domain.ContenderID]()
-		fakedContenderID2 := testutils.RandomResourceID[domain.ContenderID]()
-		fakedContenderID3 := testutils.RandomResourceID[domain.ContenderID]()
+		fakedCompetitorID1 := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCompetitorID2 := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCompetitorID3 := testutils.RandomResourceID[domain.CompetitorID]()
 
-		fakedScores := []domain.Score{
+		fakedResults := []domain.Result{
 			{
-				ContenderID: fakedContenderID1,
-				Timestamp:   now,
-				Score:       "100p",
-				Placement:   1,
-				RankOrder:   0,
-				Finalist:    true,
+				CompetitorID: fakedCompetitorID1,
+				Timestamp:    now,
+				Score:        "100p",
+				Placement:    1,
+				RankOrder:    0,
+				Finalist:     true,
 			},
 			{
-				ContenderID: fakedContenderID2,
-				Timestamp:   now,
-				Score:       "200p",
-				Placement:   2,
-				RankOrder:   1,
-				Finalist:    true,
+				CompetitorID: fakedCompetitorID2,
+				Timestamp:    now,
+				Score:        "200p",
+				Placement:    2,
+				RankOrder:    1,
+				Finalist:     true,
 			},
 			{
-				ContenderID: fakedContenderID3,
-				Timestamp:   now,
-				Score:       "300p",
-				Placement:   3,
-				RankOrder:   2,
-				Finalist:    false,
+				CompetitorID: fakedCompetitorID3,
+				Timestamp:    now,
+				Score:        "300p",
+				Placement:    3,
+				RankOrder:    2,
+				Finalist:     false,
 			},
 		}
 
 		f.store.
-			On("GetDirtyScores").
-			Return(fakedScores)
+			On("GetDirtyResults").
+			Return(fakedResults)
 
-		scores := f.engine.GetDirtyScores()
+		results := f.engine.GetDirtyResults()
 
-		assert.Equal(t, fakedScores, scores)
+		assert.Equal(t, fakedResults, results)
 
 		awaitExpectations(t)
 	})
@@ -1033,7 +1039,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 	t.Run("CalculatePointValues_UsePointsFalse", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
@@ -1042,7 +1048,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				UsePoints: false,
 			})
 
-		effects := f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID)
+		effects := f.engine.CalculatePointValues(fakedCategoryID, fakedProblemID)
 
 		assert.Nil(t, effects)
 
@@ -1052,7 +1058,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 	t.Run("CalculatePointValues_ProblemNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
@@ -1065,7 +1071,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			On("GetProblem", fakedProblemID).
 			Return(scores.Problem{}, false)
 
-		effects := f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID)
+		effects := f.engine.CalculatePointValues(fakedCategoryID, fakedProblemID)
 
 		assert.Nil(t, effects)
 
@@ -1075,11 +1081,11 @@ func TestDefaultScoreEngine(t *testing.T) {
 	t.Run("CalculatePointValues_NonPooledPoints", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
-		fakedContender1ID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedContender2ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedCompetitor1ID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCompetitor2ID := testutils.RandomResourceID[domain.CompetitorID]()
 
 		f.store.
 			On("GetRules").
@@ -1093,28 +1099,28 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(scores.Problem{
 				ID: fakedProblemID,
 				ProblemValue: scores.ProblemValue{
-					PointsZone1: 100,
-					PointsZone2: 200,
-					PointsTop:   500,
-					FlashBonus:  50,
+					PointsZone1: 1000,
+					PointsZone2: 2000,
+					PointsTop:   5000,
+					FlashBonus:  500,
 				},
 			}, true)
 
 		f.store.
-			On("GetContendersByCompClass", fakedCompClassID).
-			Return(slices.Values([]scores.Contender{
+			On("GetCompetitorsByCategory", fakedCategoryID).
+			Return(slices.Values([]scores.Competitor{
 				{
-					ID: fakedContender1ID,
+					ID: fakedCompetitor1ID,
 				},
 				{
-					ID: fakedContender2ID,
+					ID: fakedCompetitor2ID,
 				},
 			}))
 
 		f.store.
-			On("GetTick", fakedContender1ID, fakedProblemID).
+			On("GetTick", fakedCompetitor1ID, fakedProblemID).
 			Return(scores.Tick{
-				ContenderID:   fakedContender1ID,
+				CompetitorID:  fakedCompetitor1ID,
 				ProblemID:     fakedProblemID,
 				Top:           true,
 				AttemptsTop:   1,
@@ -1123,40 +1129,40 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Zone1:         true,
 				AttemptsZone1: 1,
 			}, true).
-			On("GetTick", fakedContender2ID, fakedProblemID).
+			On("GetTick", fakedCompetitor2ID, fakedProblemID).
 			Return(scores.Tick{}, false)
 
 		f.store.
-			On("GetPointValue", fakedContender1ID, fakedProblemID).
+			On("GetPointValue", fakedCompetitor1ID, fakedProblemID).
 			Return(domain.PointValue{}, false).
-			On("GetPointValue", fakedContender2ID, fakedProblemID).
+			On("GetPointValue", fakedCompetitor2ID, fakedProblemID).
 			Return(domain.PointValue{}, false)
 
 		f.store.
-			On("SavePointValue", fakedContender1ID, fakedProblemID, domain.PointValue{
-				ContenderID: fakedContender1ID,
-				ProblemID:   fakedProblemID,
-				Current:     550,
-				Zone1:       100,
-				Zone2:       200,
-				Top:         500,
-				FlashBonus:  50,
+			On("SavePointValue", fakedCompetitor1ID, fakedProblemID, domain.PointValue{
+				CompetitorID: fakedCompetitor1ID,
+				ProblemID:    fakedProblemID,
+				Current:      5500,
+				Zone1:        1000,
+				Zone2:        2000,
+				Top:          5000,
+				FlashBonus:   500,
 			}).Return().
-			On("SavePointValue", fakedContender2ID, fakedProblemID, domain.PointValue{
-				ContenderID: fakedContender2ID,
-				ProblemID:   fakedProblemID,
-				Current:     0,
-				Zone1:       100,
-				Zone2:       200,
-				Top:         500,
-				FlashBonus:  50,
+			On("SavePointValue", fakedCompetitor2ID, fakedProblemID, domain.PointValue{
+				CompetitorID: fakedCompetitor2ID,
+				ProblemID:    fakedProblemID,
+				Current:      0,
+				Zone1:        1000,
+				Zone2:        2000,
+				Top:          5000,
+				FlashBonus:   500,
 			}).Return()
 
-		effects := slices.Collect(f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID))
+		effects := slices.Collect(f.engine.CalculatePointValues(fakedCategoryID, fakedProblemID))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectScoreContender{ContenderID: fakedContender1ID},
-			scores.EffectScoreContender{ContenderID: fakedContender2ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor1ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor2ID},
 		})
 
 		awaitExpectations(t)
@@ -1165,17 +1171,17 @@ func TestDefaultScoreEngine(t *testing.T) {
 	t.Run("CalculatePointValues_ValueUnchanged", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 
-		fakedContender := scores.Contender{
-			ID: fakedContenderID,
+		fakedCompetitor := scores.Competitor{
+			ID: fakedCompetitorID,
 		}
 
 		fakedTick := scores.Tick{
-			ContenderID:   fakedContenderID,
+			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Zone1:         true,
 			AttemptsZone1: 1,
@@ -1196,45 +1202,45 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(scores.Problem{
 				ID: fakedProblemID,
 				ProblemValue: scores.ProblemValue{
-					PointsZone1: 100,
-					PointsZone2: 200,
-					PointsTop:   500,
-					FlashBonus:  100,
+					PointsZone1: 1000,
+					PointsZone2: 2000,
+					PointsTop:   5000,
+					FlashBonus:  1000,
 				},
 			}, true)
 
 		f.store.
-			On("GetContendersByCompClass", fakedCompClassID).
-			Return(slices.Values([]scores.Contender{fakedContender}))
+			On("GetCompetitorsByCategory", fakedCategoryID).
+			Return(slices.Values([]scores.Competitor{fakedCompetitor}))
 
 		f.store.
-			On("GetTick", fakedContenderID, fakedProblemID).
+			On("GetTick", fakedCompetitorID, fakedProblemID).
 			Return(fakedTick, true)
 
 		f.store.
-			On("GetPointValue", fakedContenderID, fakedProblemID).
+			On("GetPointValue", fakedCompetitorID, fakedProblemID).
 			Return(domain.PointValue{
-				ContenderID: fakedContenderID,
-				ProblemID:   fakedProblemID,
-				Current:     600,
-				Zone1:       100,
-				Zone2:       200,
-				Top:         500,
-				FlashBonus:  100,
+				CompetitorID: fakedCompetitorID,
+				ProblemID:    fakedProblemID,
+				Current:      6000,
+				Zone1:        1000,
+				Zone2:        2000,
+				Top:          5000,
+				FlashBonus:   1000,
 			}, true)
 
 		f.store.
-			On("SavePointValue", fakedContenderID, fakedProblemID, domain.PointValue{
-				ContenderID: fakedContenderID,
-				ProblemID:   fakedProblemID,
-				Current:     600,
-				Zone1:       100,
-				Zone2:       200,
-				Top:         500,
-				FlashBonus:  100,
+			On("SavePointValue", fakedCompetitorID, fakedProblemID, domain.PointValue{
+				CompetitorID: fakedCompetitorID,
+				ProblemID:    fakedProblemID,
+				Current:      6000,
+				Zone1:        1000,
+				Zone2:        2000,
+				Top:          5000,
+				FlashBonus:   1000,
 			}).Return()
 
-		effects := f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID)
+		effects := f.engine.CalculatePointValues(fakedCategoryID, fakedProblemID)
 
 		require.Nil(t, effects)
 
@@ -1244,19 +1250,19 @@ func TestDefaultScoreEngine(t *testing.T) {
 	t.Run("CalculatePointValues_PooledPoints_UpdatedValue", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
-		fakedContender1ID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedContender2ID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedContender3ID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedContender4ID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedContender5ID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedContender6ID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedCompetitor1ID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCompetitor2ID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCompetitor3ID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCompetitor4ID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCompetitor5ID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCompetitor6ID := testutils.RandomResourceID[domain.CompetitorID]()
 
-		fakedTicksByContender := map[domain.ContenderID]scores.Tick{
-			fakedContender1ID: {
-				ContenderID:   fakedContender1ID,
+		fakedTicksByCompetitor := map[domain.CompetitorID]scores.Tick{
+			fakedCompetitor1ID: {
+				CompetitorID:  fakedCompetitor1ID,
 				ProblemID:     fakedProblemID,
 				Zone1:         true,
 				AttemptsZone1: 1,
@@ -1265,8 +1271,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Top:           true,
 				AttemptsTop:   1,
 			},
-			fakedContender2ID: {
-				ContenderID:   fakedContender2ID,
+			fakedCompetitor2ID: {
+				CompetitorID:  fakedCompetitor2ID,
 				ProblemID:     fakedProblemID,
 				Zone1:         true,
 				AttemptsZone1: 1,
@@ -1275,8 +1281,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Top:           true,
 				AttemptsTop:   1,
 			},
-			fakedContender3ID: {
-				ContenderID:   fakedContender3ID,
+			fakedCompetitor3ID: {
+				CompetitorID:  fakedCompetitor3ID,
 				ProblemID:     fakedProblemID,
 				Zone1:         true,
 				AttemptsZone1: 999,
@@ -1285,8 +1291,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Top:           true,
 				AttemptsTop:   999,
 			},
-			fakedContender4ID: {
-				ContenderID:   fakedContender4ID,
+			fakedCompetitor4ID: {
+				CompetitorID:  fakedCompetitor4ID,
 				ProblemID:     fakedProblemID,
 				Zone1:         true,
 				AttemptsZone1: 999,
@@ -1295,8 +1301,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Top:           false,
 				AttemptsTop:   999,
 			},
-			fakedContender5ID: {
-				ContenderID:   fakedContender5ID,
+			fakedCompetitor5ID: {
+				CompetitorID:  fakedCompetitor5ID,
 				ProblemID:     fakedProblemID,
 				Zone1:         true,
 				AttemptsZone1: 999,
@@ -1319,133 +1325,133 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(scores.Problem{
 				ID: fakedProblemID,
 				ProblemValue: scores.ProblemValue{
-					PointsZone1: 50,
-					PointsZone2: 100,
-					PointsTop:   500,
-					FlashBonus:  100,
+					PointsZone1: 500,
+					PointsZone2: 1000,
+					PointsTop:   5000,
+					FlashBonus:  1000,
 				},
 			}, true)
 
 		f.store.
-			On("GetTicksByProblem", fakedCompClassID, fakedProblemID).
-			Return(maps.Values(fakedTicksByContender))
+			On("GetTicksByProblem", fakedCategoryID, fakedProblemID).
+			Return(maps.Values(fakedTicksByCompetitor))
 
 		f.store.
-			On("GetContender", fakedContender1ID).
-			Return(scores.Contender{ID: fakedContender1ID}, true).
-			On("GetContender", fakedContender2ID).
-			Return(scores.Contender{ID: fakedContender2ID}, true).
-			On("GetContender", fakedContender3ID).
-			Return(scores.Contender{ID: fakedContender3ID}, true).
-			On("GetContender", fakedContender4ID).
-			Return(scores.Contender{ID: fakedContender4ID}, true).
-			On("GetContender", fakedContender5ID).
-			Return(scores.Contender{ID: fakedContender5ID}, true)
+			On("GetCompetitor", fakedCompetitor1ID).
+			Return(scores.Competitor{ID: fakedCompetitor1ID}, true).
+			On("GetCompetitor", fakedCompetitor2ID).
+			Return(scores.Competitor{ID: fakedCompetitor2ID}, true).
+			On("GetCompetitor", fakedCompetitor3ID).
+			Return(scores.Competitor{ID: fakedCompetitor3ID}, true).
+			On("GetCompetitor", fakedCompetitor4ID).
+			Return(scores.Competitor{ID: fakedCompetitor4ID}, true).
+			On("GetCompetitor", fakedCompetitor5ID).
+			Return(scores.Competitor{ID: fakedCompetitor5ID}, true)
 
 		f.store.
-			On("GetContendersByCompClass", fakedCompClassID).
-			Return(slices.Values([]scores.Contender{
-				{ID: fakedContender1ID},
-				{ID: fakedContender2ID},
-				{ID: fakedContender3ID},
-				{ID: fakedContender4ID},
-				{ID: fakedContender5ID},
-				{ID: fakedContender6ID},
+			On("GetCompetitorsByCategory", fakedCategoryID).
+			Return(slices.Values([]scores.Competitor{
+				{ID: fakedCompetitor1ID},
+				{ID: fakedCompetitor2ID},
+				{ID: fakedCompetitor3ID},
+				{ID: fakedCompetitor4ID},
+				{ID: fakedCompetitor5ID},
+				{ID: fakedCompetitor6ID},
 			}))
 
 		f.store.
-			On("GetTick", fakedContender1ID, fakedProblemID).
-			Return(fakedTicksByContender[fakedContender1ID], true).
-			On("GetTick", fakedContender2ID, fakedProblemID).
-			Return(fakedTicksByContender[fakedContender2ID], true).
-			On("GetTick", fakedContender3ID, fakedProblemID).
-			Return(fakedTicksByContender[fakedContender3ID], true).
-			On("GetTick", fakedContender4ID, fakedProblemID).
-			Return(fakedTicksByContender[fakedContender4ID], true).
-			On("GetTick", fakedContender5ID, fakedProblemID).
-			Return(fakedTicksByContender[fakedContender5ID], true).
-			On("GetTick", fakedContender6ID, fakedProblemID).
+			On("GetTick", fakedCompetitor1ID, fakedProblemID).
+			Return(fakedTicksByCompetitor[fakedCompetitor1ID], true).
+			On("GetTick", fakedCompetitor2ID, fakedProblemID).
+			Return(fakedTicksByCompetitor[fakedCompetitor2ID], true).
+			On("GetTick", fakedCompetitor3ID, fakedProblemID).
+			Return(fakedTicksByCompetitor[fakedCompetitor3ID], true).
+			On("GetTick", fakedCompetitor4ID, fakedProblemID).
+			Return(fakedTicksByCompetitor[fakedCompetitor4ID], true).
+			On("GetTick", fakedCompetitor5ID, fakedProblemID).
+			Return(fakedTicksByCompetitor[fakedCompetitor5ID], true).
+			On("GetTick", fakedCompetitor6ID, fakedProblemID).
 			Return(scores.Tick{}, false)
 
 		f.store.
-			On("GetPointValue", fakedContender1ID, fakedProblemID).
+			On("GetPointValue", fakedCompetitor1ID, fakedProblemID).
 			Return(domain.PointValue{}, false).
-			On("GetPointValue", fakedContender2ID, fakedProblemID).
+			On("GetPointValue", fakedCompetitor2ID, fakedProblemID).
 			Return(domain.PointValue{}, false).
-			On("GetPointValue", fakedContender3ID, fakedProblemID).
+			On("GetPointValue", fakedCompetitor3ID, fakedProblemID).
 			Return(domain.PointValue{}, false).
-			On("GetPointValue", fakedContender4ID, fakedProblemID).
+			On("GetPointValue", fakedCompetitor4ID, fakedProblemID).
 			Return(domain.PointValue{}, false).
-			On("GetPointValue", fakedContender5ID, fakedProblemID).
+			On("GetPointValue", fakedCompetitor5ID, fakedProblemID).
 			Return(domain.PointValue{}, false).
-			On("GetPointValue", fakedContender6ID, fakedProblemID).
+			On("GetPointValue", fakedCompetitor6ID, fakedProblemID).
 			Return(domain.PointValue{}, false)
 
 		f.store.
-			On("SavePointValue", fakedContender1ID, fakedProblemID, domain.PointValue{
-				ContenderID: fakedContender1ID,
-				ProblemID:   fakedProblemID,
-				Current:     216.6,
-				Zone1:       10,
-				Zone2:       25,
-				Top:         166.6,
-				FlashBonus:  50,
+			On("SavePointValue", fakedCompetitor1ID, fakedProblemID, domain.PointValue{
+				CompetitorID: fakedCompetitor1ID,
+				ProblemID:    fakedProblemID,
+				Current:      2166,
+				Zone1:        100,
+				Zone2:        250,
+				Top:          1666,
+				FlashBonus:   500,
 			}).Return().
-			On("SavePointValue", fakedContender2ID, fakedProblemID, domain.PointValue{
-				ContenderID: fakedContender2ID,
-				ProblemID:   fakedProblemID,
-				Current:     216.6,
-				Zone1:       10,
-				Zone2:       25,
-				Top:         166.6,
-				FlashBonus:  50,
+			On("SavePointValue", fakedCompetitor2ID, fakedProblemID, domain.PointValue{
+				CompetitorID: fakedCompetitor2ID,
+				ProblemID:    fakedProblemID,
+				Current:      2166,
+				Zone1:        100,
+				Zone2:        250,
+				Top:          1666,
+				FlashBonus:   500,
 			}).Return().
-			On("SavePointValue", fakedContender3ID, fakedProblemID, domain.PointValue{
-				ContenderID: fakedContender3ID,
-				ProblemID:   fakedProblemID,
-				Current:     166.6,
-				Zone1:       10,
-				Zone2:       25,
-				Top:         166.6,
-				FlashBonus:  0,
+			On("SavePointValue", fakedCompetitor3ID, fakedProblemID, domain.PointValue{
+				CompetitorID: fakedCompetitor3ID,
+				ProblemID:    fakedProblemID,
+				Current:      1666,
+				Zone1:        100,
+				Zone2:        250,
+				Top:          1666,
+				FlashBonus:   0,
 			}).Return().
-			On("SavePointValue", fakedContender4ID, fakedProblemID, domain.PointValue{
-				ContenderID: fakedContender4ID,
-				ProblemID:   fakedProblemID,
-				Current:     25,
-				Zone1:       10,
-				Zone2:       25,
-				Top:         125,
-				FlashBonus:  0,
+			On("SavePointValue", fakedCompetitor4ID, fakedProblemID, domain.PointValue{
+				CompetitorID: fakedCompetitor4ID,
+				ProblemID:    fakedProblemID,
+				Current:      250,
+				Zone1:        100,
+				Zone2:        250,
+				Top:          1250,
+				FlashBonus:   0,
 			}).Return().
-			On("SavePointValue", fakedContender5ID, fakedProblemID, domain.PointValue{
-				ContenderID: fakedContender5ID,
-				ProblemID:   fakedProblemID,
-				Current:     10,
-				Zone1:       10,
-				Zone2:       20,
-				Top:         125,
-				FlashBonus:  0,
+			On("SavePointValue", fakedCompetitor5ID, fakedProblemID, domain.PointValue{
+				CompetitorID: fakedCompetitor5ID,
+				ProblemID:    fakedProblemID,
+				Current:      100,
+				Zone1:        100,
+				Zone2:        200,
+				Top:          1250,
+				FlashBonus:   0,
 			}).Return().
-			On("SavePointValue", fakedContender6ID, fakedProblemID, domain.PointValue{
-				ContenderID: fakedContender6ID,
-				ProblemID:   fakedProblemID,
-				Current:     0,
-				Zone1:       8.3,
-				Zone2:       20,
-				Top:         125,
-				FlashBonus:  33.3,
+			On("SavePointValue", fakedCompetitor6ID, fakedProblemID, domain.PointValue{
+				CompetitorID: fakedCompetitor6ID,
+				ProblemID:    fakedProblemID,
+				Current:      0,
+				Zone1:        83,
+				Zone2:        200,
+				Top:          1250,
+				FlashBonus:   333,
 			}).Return()
 
-		effects := slices.Collect(f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID))
+		effects := slices.Collect(f.engine.CalculatePointValues(fakedCategoryID, fakedProblemID))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectScoreContender{ContenderID: fakedContender1ID},
-			scores.EffectScoreContender{ContenderID: fakedContender2ID},
-			scores.EffectScoreContender{ContenderID: fakedContender3ID},
-			scores.EffectScoreContender{ContenderID: fakedContender4ID},
-			scores.EffectScoreContender{ContenderID: fakedContender5ID},
-			scores.EffectScoreContender{ContenderID: fakedContender6ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor1ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor2ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor3ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor4ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor5ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor6ID},
 		})
 
 		awaitExpectations(t)
@@ -1454,25 +1460,25 @@ func TestDefaultScoreEngine(t *testing.T) {
 	t.Run("CalculatePointValues_PooledPoints_ExcludeDisqualified", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
-		fakedContender1 := scores.Contender{
-			ID: testutils.RandomResourceID[domain.ContenderID](),
+		fakedCompetitor1 := scores.Competitor{
+			ID: testutils.RandomResourceID[domain.CompetitorID](),
 		}
 
-		fakedContender2 := scores.Contender{
-			ID: testutils.RandomResourceID[domain.ContenderID](),
+		fakedCompetitor2 := scores.Competitor{
+			ID: testutils.RandomResourceID[domain.CompetitorID](),
 		}
 
-		fakedContender3 := scores.Contender{
-			ID:           testutils.RandomResourceID[domain.ContenderID](),
+		fakedCompetitor3 := scores.Competitor{
+			ID:           testutils.RandomResourceID[domain.CompetitorID](),
 			Disqualified: true,
 		}
 
-		fakedTicksByContender := map[domain.ContenderID]scores.Tick{
-			fakedContender1.ID: {
-				ContenderID:   fakedContender1.ID,
+		fakedTicksByCompetitor := map[domain.CompetitorID]scores.Tick{
+			fakedCompetitor1.ID: {
+				CompetitorID:  fakedCompetitor1.ID,
 				ProblemID:     fakedProblemID,
 				Zone1:         true,
 				AttemptsZone1: 1,
@@ -1481,8 +1487,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Top:           true,
 				AttemptsTop:   1,
 			},
-			fakedContender2.ID: {
-				ContenderID:   fakedContender2.ID,
+			fakedCompetitor2.ID: {
+				CompetitorID:  fakedCompetitor2.ID,
 				ProblemID:     fakedProblemID,
 				Zone1:         true,
 				AttemptsZone1: 1,
@@ -1491,8 +1497,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 				Top:           true,
 				AttemptsTop:   1,
 			},
-			fakedContender3.ID: {
-				ContenderID:   fakedContender3.ID,
+			fakedCompetitor3.ID: {
+				CompetitorID:  fakedCompetitor3.ID,
 				ProblemID:     fakedProblemID,
 				Zone1:         true,
 				AttemptsZone1: 1,
@@ -1515,120 +1521,120 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(scores.Problem{
 				ID: fakedProblemID,
 				ProblemValue: scores.ProblemValue{
-					PointsZone1: 50,
-					PointsZone2: 100,
-					PointsTop:   500,
-					FlashBonus:  25,
+					PointsZone1: 500,
+					PointsZone2: 1000,
+					PointsTop:   5000,
+					FlashBonus:  250,
 				},
 			}, true)
 
 		f.store.
-			On("GetTicksByProblem", fakedCompClassID, fakedProblemID).
-			Return(maps.Values(fakedTicksByContender))
+			On("GetTicksByProblem", fakedCategoryID, fakedProblemID).
+			Return(maps.Values(fakedTicksByCompetitor))
 
 		f.store.
-			On("GetContender", fakedContender1.ID).
-			Return(fakedContender1, true).
-			On("GetContender", fakedContender2.ID).
-			Return(fakedContender2, true).
-			On("GetContender", fakedContender3.ID).
-			Return(fakedContender3, true)
+			On("GetCompetitor", fakedCompetitor1.ID).
+			Return(fakedCompetitor1, true).
+			On("GetCompetitor", fakedCompetitor2.ID).
+			Return(fakedCompetitor2, true).
+			On("GetCompetitor", fakedCompetitor3.ID).
+			Return(fakedCompetitor3, true)
 
 		f.store.
-			On("GetContendersByCompClass", fakedCompClassID).
-			Return(slices.Values([]scores.Contender{
-				fakedContender1,
-				fakedContender2,
-				fakedContender3,
+			On("GetCompetitorsByCategory", fakedCategoryID).
+			Return(slices.Values([]scores.Competitor{
+				fakedCompetitor1,
+				fakedCompetitor2,
+				fakedCompetitor3,
 			}))
 
 		f.store.
-			On("GetTick", fakedContender1.ID, fakedProblemID).
-			Return(fakedTicksByContender[fakedContender1.ID], true).
-			On("GetTick", fakedContender2.ID, fakedProblemID).
-			Return(fakedTicksByContender[fakedContender2.ID], true).
-			On("GetTick", fakedContender3.ID, fakedProblemID).
-			Return(fakedTicksByContender[fakedContender3.ID], true)
+			On("GetTick", fakedCompetitor1.ID, fakedProblemID).
+			Return(fakedTicksByCompetitor[fakedCompetitor1.ID], true).
+			On("GetTick", fakedCompetitor2.ID, fakedProblemID).
+			Return(fakedTicksByCompetitor[fakedCompetitor2.ID], true).
+			On("GetTick", fakedCompetitor3.ID, fakedProblemID).
+			Return(fakedTicksByCompetitor[fakedCompetitor3.ID], true)
 
 		f.store.
-			On("GetPointValue", fakedContender1.ID, fakedProblemID).
+			On("GetPointValue", fakedCompetitor1.ID, fakedProblemID).
 			Return(domain.PointValue{}, false).
-			On("GetPointValue", fakedContender2.ID, fakedProblemID).
+			On("GetPointValue", fakedCompetitor2.ID, fakedProblemID).
 			Return(domain.PointValue{}, false).
-			On("GetPointValue", fakedContender3.ID, fakedProblemID).
+			On("GetPointValue", fakedCompetitor3.ID, fakedProblemID).
 			Return(domain.PointValue{}, false)
 
 		f.store.
-			On("SavePointValue", fakedContender1.ID, fakedProblemID, domain.PointValue{
-				ContenderID: fakedContender1.ID,
-				ProblemID:   fakedProblemID,
-				Current:     262.5,
-				Zone1:       25,
-				Zone2:       50,
-				Top:         250,
-				FlashBonus:  12.5,
+			On("SavePointValue", fakedCompetitor1.ID, fakedProblemID, domain.PointValue{
+				CompetitorID: fakedCompetitor1.ID,
+				ProblemID:    fakedProblemID,
+				Current:      2625,
+				Zone1:        250,
+				Zone2:        500,
+				Top:          2500,
+				FlashBonus:   125,
 			}).Return().
-			On("SavePointValue", fakedContender2.ID, fakedProblemID, domain.PointValue{
-				ContenderID: fakedContender2.ID,
-				ProblemID:   fakedProblemID,
-				Current:     262.5,
-				Zone1:       25,
-				Zone2:       50,
-				Top:         250,
-				FlashBonus:  12.5,
+			On("SavePointValue", fakedCompetitor2.ID, fakedProblemID, domain.PointValue{
+				CompetitorID: fakedCompetitor2.ID,
+				ProblemID:    fakedProblemID,
+				Current:      2625,
+				Zone1:        250,
+				Zone2:        500,
+				Top:          2500,
+				FlashBonus:   125,
 			}).Return().
-			On("SavePointValue", fakedContender3.ID, fakedProblemID, domain.PointValue{
-				ContenderID: fakedContender3.ID,
-				ProblemID:   fakedProblemID,
-				Current:     0,
-				Zone1:       0,
-				Zone2:       0,
-				Top:         0,
-				FlashBonus:  0,
+			On("SavePointValue", fakedCompetitor3.ID, fakedProblemID, domain.PointValue{
+				CompetitorID: fakedCompetitor3.ID,
+				ProblemID:    fakedProblemID,
+				Current:      0,
+				Zone1:        0,
+				Zone2:        0,
+				Top:          0,
+				FlashBonus:   0,
 			}).Return()
 
-		effects := slices.Collect(f.engine.CalculatePointValues(fakedCompClassID, fakedProblemID))
+		effects := slices.Collect(f.engine.CalculatePointValues(fakedCategoryID, fakedProblemID))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectScoreContender{ContenderID: fakedContender1.ID},
-			scores.EffectScoreContender{ContenderID: fakedContender2.ID},
-			scores.EffectScoreContender{ContenderID: fakedContender3.ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor1.ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor2.ID},
+			scores.EffectScoreCompetitor{CompetitorID: fakedCompetitor3.ID},
 		})
 
 		awaitExpectations(t)
 	})
 
-	t.Run("ScoreContender_ContenderNotFound", func(t *testing.T) {
+	t.Run("ScoreCompetitor_CompetitorNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{}, false)
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{}, false)
 
-		effects := f.engine.ScoreContender(fakedContenderID)
+		effects := f.engine.ScoreCompetitor(fakedCompetitorID)
 
 		assert.Nil(t, effects)
 
 		awaitExpectations(t)
 	})
 
-	t.Run("ScoreContender_Disqualified", func(t *testing.T) {
+	t.Run("ScoreCompetitor_Disqualified", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 		f.store.
 			On("GetRules").
 			Return(scores.Rules{})
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{
-				ID:           fakedContenderID,
-				CompClassID:  fakedCompClassID,
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{
+				ID:           fakedCompetitorID,
+				CategoryID:   fakedCategoryID,
 				Disqualified: true,
 				Score: scores.Score{
 					Points:       100,
@@ -1638,45 +1644,45 @@ func TestDefaultScoreEngine(t *testing.T) {
 			}, true)
 
 		f.store.
-			On("SaveContender", scores.Contender{
-				ID:           fakedContenderID,
-				CompClassID:  fakedCompClassID,
+			On("SaveCompetitor", scores.Competitor{
+				ID:           fakedCompetitorID,
+				CategoryID:   fakedCategoryID,
 				Disqualified: true,
 				Score:        scores.Score{},
 			}).Return()
 
-		effects := slices.Collect(f.engine.ScoreContender(fakedContenderID))
+		effects := slices.Collect(f.engine.ScoreCompetitor(fakedCompetitorID))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectRankClass{CompClassID: fakedCompClassID},
+			scores.EffectRankCategory{CategoryID: fakedCategoryID},
 		})
 
 		awaitExpectations(t)
 	})
 
-	t.Run("ScoreContender_PointsAndAttempts", func(t *testing.T) {
+	t.Run("ScoreCompetitor_PointsAndAttempts", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 		fakedProblem1ID := testutils.RandomResourceID[domain.ProblemID]()
 		fakedProblem2ID := testutils.RandomResourceID[domain.ProblemID]()
 		fakedProblem3ID := testutils.RandomResourceID[domain.ProblemID]()
 		fakedProblem4ID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{
-				ID:          fakedContenderID,
-				CompClassID: fakedCompClassID,
-				Score:       scores.Score{},
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{
+				ID:         fakedCompetitorID,
+				CategoryID: fakedCategoryID,
+				Score:      scores.Score{},
 			}, true)
 
 		f.store.
-			On("GetTicksByContender", fakedContenderID).
+			On("GetTicksByCompetitor", fakedCompetitorID).
 			Return(slices.Values([]scores.Tick{
 				{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblem1ID,
 					Top:           false,
 					AttemptsTop:   1_000_000,
@@ -1686,7 +1692,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 					AttemptsZone1: 1_000_000,
 				},
 				{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblem2ID,
 					Top:           true,
 					AttemptsTop:   300,
@@ -1696,7 +1702,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 					AttemptsZone1: 100,
 				},
 				{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblem3ID,
 					Top:           true,
 					AttemptsTop:   30,
@@ -1706,7 +1712,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 					AttemptsZone1: 10,
 				},
 				{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblem4ID,
 					Top:           true,
 					AttemptsTop:   3,
@@ -1718,29 +1724,29 @@ func TestDefaultScoreEngine(t *testing.T) {
 			}))
 
 		f.store.
-			On("GetPointValue", fakedContenderID, fakedProblem1ID).
+			On("GetPointValue", fakedCompetitorID, fakedProblem1ID).
 			Return(domain.PointValue{
-				ContenderID: fakedContenderID,
-				ProblemID:   fakedProblem1ID,
-				Current:     0,
+				CompetitorID: fakedCompetitorID,
+				ProblemID:    fakedProblem1ID,
+				Current:      0,
 			}, true).
-			On("GetPointValue", fakedContenderID, fakedProblem2ID).
+			On("GetPointValue", fakedCompetitorID, fakedProblem2ID).
 			Return(domain.PointValue{
-				ContenderID: fakedContenderID,
-				ProblemID:   fakedProblem2ID,
-				Current:     100,
+				CompetitorID: fakedCompetitorID,
+				ProblemID:    fakedProblem2ID,
+				Current:      100,
 			}, true).
-			On("GetPointValue", fakedContenderID, fakedProblem3ID).
+			On("GetPointValue", fakedCompetitorID, fakedProblem3ID).
 			Return(domain.PointValue{
-				ContenderID: fakedContenderID,
-				ProblemID:   fakedProblem3ID,
-				Current:     110,
+				CompetitorID: fakedCompetitorID,
+				ProblemID:    fakedProblem3ID,
+				Current:      110,
 			}, true).
-			On("GetPointValue", fakedContenderID, fakedProblem4ID).
+			On("GetPointValue", fakedCompetitorID, fakedProblem4ID).
 			Return(domain.PointValue{
-				ContenderID: fakedContenderID,
-				ProblemID:   fakedProblem4ID,
-				Current:     0,
+				CompetitorID: fakedCompetitorID,
+				ProblemID:    fakedProblem4ID,
+				Current:      0,
 			}, true)
 
 		f.store.
@@ -1768,9 +1774,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 			})
 
 		f.store.
-			On("SaveContender", scores.Contender{
-				ID:          fakedContenderID,
-				CompClassID: fakedCompClassID,
+			On("SaveCompetitor", scores.Competitor{
+				ID:         fakedCompetitorID,
+				CategoryID: fakedCategoryID,
 				Score: scores.Score{
 					Points:         210,
 					Tops:           3,
@@ -1782,45 +1788,45 @@ func TestDefaultScoreEngine(t *testing.T) {
 				},
 			}).Return()
 
-		effects := slices.Collect(f.engine.ScoreContender(fakedContenderID))
+		effects := slices.Collect(f.engine.ScoreCompetitor(fakedCompetitorID))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectRankClass{CompClassID: fakedCompClassID},
+			scores.EffectRankCategory{CategoryID: fakedCategoryID},
 		})
 
 		awaitExpectations(t)
 	})
 
-	t.Run("ScoreContender_NoPoints", func(t *testing.T) {
+	t.Run("ScoreCompetitor_NoPoints", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 		fakedProblem1ID := testutils.RandomResourceID[domain.ProblemID]()
 		fakedProblem2ID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{
-				ID:          fakedContenderID,
-				CompClassID: fakedCompClassID,
-				Score:       scores.Score{},
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{
+				ID:         fakedCompetitorID,
+				CategoryID: fakedCategoryID,
+				Score:      scores.Score{},
 			}, true)
 
 		f.store.
-			On("GetTicksByContender", fakedContenderID).
+			On("GetTicksByCompetitor", fakedCompetitorID).
 			Return(slices.Values([]scores.Tick{
 				{
-					ContenderID: fakedContenderID,
-					ProblemID:   fakedProblem1ID,
-					Top:         true,
-					AttemptsTop: 10,
+					CompetitorID: fakedCompetitorID,
+					ProblemID:    fakedProblem1ID,
+					Top:          true,
+					AttemptsTop:  10,
 				},
 				{
-					ContenderID: fakedContenderID,
-					ProblemID:   fakedProblem2ID,
-					Top:         true,
-					AttemptsTop: 20,
+					CompetitorID: fakedCompetitorID,
+					ProblemID:    fakedProblem2ID,
+					Top:          true,
+					AttemptsTop:  20,
 				},
 			}))
 
@@ -1835,9 +1841,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(scores.Rules{})
 
 		f.store.
-			On("SaveContender", scores.Contender{
-				ID:          fakedContenderID,
-				CompClassID: fakedCompClassID,
+			On("SaveCompetitor", scores.Competitor{
+				ID:         fakedCompetitorID,
+				CategoryID: fakedCategoryID,
 				Score: scores.Score{
 					Points:       0,
 					Tops:         2,
@@ -1845,67 +1851,67 @@ func TestDefaultScoreEngine(t *testing.T) {
 				},
 			}).Return()
 
-		effects := slices.Collect(f.engine.ScoreContender(fakedContenderID))
+		effects := slices.Collect(f.engine.ScoreCompetitor(fakedCompetitorID))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectRankClass{CompClassID: fakedCompClassID},
+			scores.EffectRankCategory{CategoryID: fakedCategoryID},
 		})
 
 		awaitExpectations(t)
 	})
 
-	t.Run("ScoreContender_WithProblemLimit", func(t *testing.T) {
+	t.Run("ScoreCompetitor_WithProblemLimit", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 		fakedProblem1ID := testutils.RandomResourceID[domain.ProblemID]()
 		fakedProblem2ID := testutils.RandomResourceID[domain.ProblemID]()
 		fakedProblem3ID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{
-				ID:          fakedContenderID,
-				CompClassID: fakedCompClassID,
-				Score:       scores.Score{},
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{
+				ID:         fakedCompetitorID,
+				CategoryID: fakedCategoryID,
+				Score:      scores.Score{},
 			}, true)
 
 		f.store.
-			On("GetTicksByContender", fakedContenderID).
+			On("GetTicksByCompetitor", fakedCompetitorID).
 			Return(slices.Values([]scores.Tick{
 				{
-					ContenderID: fakedContenderID,
-					ProblemID:   fakedProblem1ID,
-					Top:         true,
-					AttemptsTop: 1,
+					CompetitorID: fakedCompetitorID,
+					ProblemID:    fakedProblem1ID,
+					Top:          true,
+					AttemptsTop:  1,
 				},
 				{
-					ContenderID: fakedContenderID,
-					ProblemID:   fakedProblem2ID,
-					Top:         true,
-					AttemptsTop: 1,
+					CompetitorID: fakedCompetitorID,
+					ProblemID:    fakedProblem2ID,
+					Top:          true,
+					AttemptsTop:  1,
 				},
 				{
-					ContenderID: fakedContenderID,
-					ProblemID:   fakedProblem3ID,
-					Top:         true,
-					AttemptsTop: 1,
+					CompetitorID: fakedCompetitorID,
+					ProblemID:    fakedProblem3ID,
+					Top:          true,
+					AttemptsTop:  1,
 				},
 			}))
 
 		f.store.
-			On("GetPointValue", fakedContenderID, fakedProblem1ID).
+			On("GetPointValue", fakedCompetitorID, fakedProblem1ID).
 			Return(domain.PointValue{
-				ContenderID: fakedContenderID,
-				ProblemID:   fakedProblem1ID,
-				Current:     55,
+				CompetitorID: fakedCompetitorID,
+				ProblemID:    fakedProblem1ID,
+				Current:      55,
 			}, true).
-			On("GetPointValue", fakedContenderID, fakedProblem2ID).
+			On("GetPointValue", fakedCompetitorID, fakedProblem2ID).
 			Return(domain.PointValue{
-				ContenderID: fakedContenderID,
-				ProblemID:   fakedProblem2ID,
-				Current:     110,
+				CompetitorID: fakedCompetitorID,
+				ProblemID:    fakedProblem2ID,
+				Current:      110,
 			}, true)
 
 		f.store.
@@ -1917,11 +1923,11 @@ func TestDefaultScoreEngine(t *testing.T) {
 			Return(scores.Problem{}, true)
 
 		f.store.
-			On("GetPointValue", fakedContenderID, fakedProblem3ID).
+			On("GetPointValue", fakedCompetitorID, fakedProblem3ID).
 			Return(domain.PointValue{
-				ContenderID: fakedContenderID,
-				ProblemID:   fakedProblem3ID,
-				Current:     82,
+				CompetitorID: fakedCompetitorID,
+				ProblemID:    fakedProblem3ID,
+				Current:      82,
 			}, true)
 
 		f.store.
@@ -1932,9 +1938,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 			})
 
 		f.store.
-			On("SaveContender", scores.Contender{
-				ID:          fakedContenderID,
-				CompClassID: fakedCompClassID,
+			On("SaveCompetitor", scores.Competitor{
+				ID:         fakedCompetitorID,
+				CategoryID: fakedCategoryID,
 				Score: scores.Score{
 					Points:       192,
 					Tops:         3,
@@ -1942,27 +1948,27 @@ func TestDefaultScoreEngine(t *testing.T) {
 				},
 			}).Return()
 
-		effects := slices.Collect(f.engine.ScoreContender(fakedContenderID))
+		effects := slices.Collect(f.engine.ScoreCompetitor(fakedCompetitorID))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectRankClass{CompClassID: fakedCompClassID},
+			scores.EffectRankCategory{CategoryID: fakedCategoryID},
 		})
 
 		awaitExpectations(t)
 	})
 
-	t.Run("ScoreContender_NoScoreChange", func(t *testing.T) {
+	t.Run("ScoreCompetitor_NoScoreChange", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 		fakedProblem1ID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{
-				ID:          fakedContenderID,
-				CompClassID: fakedCompClassID,
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{
+				ID:         fakedCompetitorID,
+				CategoryID: fakedCategoryID,
 				Score: scores.Score{
 					Points:       110,
 					Tops:         1,
@@ -1971,22 +1977,22 @@ func TestDefaultScoreEngine(t *testing.T) {
 			}, true)
 
 		f.store.
-			On("GetTicksByContender", fakedContenderID).
+			On("GetTicksByCompetitor", fakedCompetitorID).
 			Return(slices.Values([]scores.Tick{
 				{
-					ContenderID: fakedContenderID,
-					ProblemID:   fakedProblem1ID,
-					Top:         true,
-					AttemptsTop: 1,
+					CompetitorID: fakedCompetitorID,
+					ProblemID:    fakedProblem1ID,
+					Top:          true,
+					AttemptsTop:  1,
 				},
 			}))
 
 		f.store.
-			On("GetPointValue", fakedContenderID, fakedProblem1ID).
+			On("GetPointValue", fakedCompetitorID, fakedProblem1ID).
 			Return(domain.PointValue{
-				ContenderID: fakedContenderID,
-				ProblemID:   fakedProblem1ID,
-				Current:     110,
+				CompetitorID: fakedCompetitorID,
+				ProblemID:    fakedProblem1ID,
+				Current:      110,
 			}, true)
 
 		f.store.
@@ -2000,56 +2006,56 @@ func TestDefaultScoreEngine(t *testing.T) {
 				QualifyingProblems: 0,
 			})
 
-		effects := f.engine.ScoreContender(fakedContenderID)
+		effects := f.engine.ScoreCompetitor(fakedCompetitorID)
 
 		assert.Nil(t, effects)
 
 		awaitExpectations(t)
 	})
 
-	t.Run("ScoreContender_ProblemValueNotFound", func(t *testing.T) {
+	t.Run("ScoreCompetitor_ProblemValueNotFound", func(t *testing.T) {
 		f, awaitExpectations := makeFixture()
 
-		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 		fakedProblem1ID := testutils.RandomResourceID[domain.ProblemID]()
 		fakedProblem2ID := testutils.RandomResourceID[domain.ProblemID]()
 
 		f.store.
-			On("GetContender", fakedContenderID).
-			Return(scores.Contender{
-				ID:          fakedContenderID,
-				CompClassID: fakedCompClassID,
-				Score:       scores.Score{},
+			On("GetCompetitor", fakedCompetitorID).
+			Return(scores.Competitor{
+				ID:         fakedCompetitorID,
+				CategoryID: fakedCategoryID,
+				Score:      scores.Score{},
 			}, true)
 
 		f.store.
-			On("GetTicksByContender", fakedContenderID).
+			On("GetTicksByCompetitor", fakedCompetitorID).
 			Return(slices.Values([]scores.Tick{
 				{
-					ContenderID: fakedContenderID,
-					ProblemID:   fakedProblem1ID,
-					Top:         true,
-					AttemptsTop: 1,
+					CompetitorID: fakedCompetitorID,
+					ProblemID:    fakedProblem1ID,
+					Top:          true,
+					AttemptsTop:  1,
 				},
 				{
-					ContenderID: fakedContenderID,
-					ProblemID:   fakedProblem2ID,
-					Top:         true,
-					AttemptsTop: 1,
+					CompetitorID: fakedCompetitorID,
+					ProblemID:    fakedProblem2ID,
+					Top:          true,
+					AttemptsTop:  1,
 				},
 			}))
 
 		f.store.
-			On("GetPointValue", fakedContenderID, fakedProblem1ID).
+			On("GetPointValue", fakedCompetitorID, fakedProblem1ID).
 			Return(domain.PointValue{
-				ContenderID: fakedContenderID,
-				ProblemID:   fakedProblem1ID,
-				Current:     110,
+				CompetitorID: fakedCompetitorID,
+				ProblemID:    fakedProblem1ID,
+				Current:      110,
 			}, true)
 
 		f.store.
-			On("GetPointValue", fakedContenderID, fakedProblem2ID).
+			On("GetPointValue", fakedCompetitorID, fakedProblem2ID).
 			Return(domain.PointValue{}, false)
 
 		f.store.
@@ -2066,9 +2072,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 			})
 
 		f.store.
-			On("SaveContender", scores.Contender{
-				ID:          fakedContenderID,
-				CompClassID: fakedCompClassID,
+			On("SaveCompetitor", scores.Competitor{
+				ID:         fakedCompetitorID,
+				CategoryID: fakedCategoryID,
 				Score: scores.Score{
 					Points:       110,
 					Tops:         2,
@@ -2076,23 +2082,23 @@ func TestDefaultScoreEngine(t *testing.T) {
 				},
 			}).Return()
 
-		effects := slices.Collect(f.engine.ScoreContender(fakedContenderID))
+		effects := slices.Collect(f.engine.ScoreCompetitor(fakedCompetitorID))
 
 		require.ElementsMatch(t, effects, []scores.Effect{
-			scores.EffectRankClass{CompClassID: fakedCompClassID},
+			scores.EffectRankCategory{CategoryID: fakedCategoryID},
 		})
 
 		awaitExpectations(t)
 	})
 
-	t.Run("RankCompClass", func(t *testing.T) {
+	t.Run("RankCategory", func(t *testing.T) {
 		synctest.Test(t, func(t *testing.T) {
 			f, awaitExpectations := makeFixture()
 
-			fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
-			fakedContender1ID := testutils.RandomResourceID[domain.ContenderID]()
-			fakedContender2ID := testutils.RandomResourceID[domain.ContenderID]()
-			fakedContender3ID := testutils.RandomResourceID[domain.ContenderID]()
+			fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
+			fakedCompetitor1ID := testutils.RandomResourceID[domain.CompetitorID]()
+			fakedCompetitor2ID := testutils.RandomResourceID[domain.CompetitorID]()
+			fakedCompetitor3ID := testutils.RandomResourceID[domain.CompetitorID]()
 
 			f.store.
 				On("GetRules").
@@ -2102,64 +2108,114 @@ func TestDefaultScoreEngine(t *testing.T) {
 				})
 
 			f.store.
-				On("GetContendersByCompClass", fakedCompClassID).
-				Return(slices.Values([]scores.Contender{
+				On("GetCompetitorsByCategory", fakedCategoryID).
+				Return(slices.Values([]scores.Competitor{
 					{
-						ID:          fakedContender1ID,
-						CompClassID: fakedCompClassID,
+						ID:         fakedCompetitor1ID,
+						CategoryID: fakedCategoryID,
 						Score: scores.Score{
-							Points: 100,
+							Points: 1000,
 						},
 					},
 					{
-						ID:          fakedContender2ID,
-						CompClassID: fakedCompClassID,
+						ID:         fakedCompetitor2ID,
+						CategoryID: fakedCategoryID,
 						Score: scores.Score{
-							Points: 200,
+							Points: 2000,
 						},
 					},
 					{
-						ID:          fakedContender3ID,
-						CompClassID: fakedCompClassID,
+						ID:         fakedCompetitor3ID,
+						CategoryID: fakedCategoryID,
 						Score: scores.Score{
-							Points: 150,
+							Points: 1500,
 						},
 					},
 				}))
 
 			f.store.
-				On("SaveScore", domain.Score{
-					ContenderID: fakedContender2ID,
-					Score:       "200p",
-					Placement:   1,
-					RankOrder:   0,
-					Finalist:    true,
-					Timestamp:   time.Now(),
+				On("SaveResult", domain.Result{
+					CompetitorID: fakedCompetitor2ID,
+					Score:        "200p",
+					Placement:    1,
+					RankOrder:    0,
+					Finalist:     true,
+					Timestamp:    time.Now(),
 				}).Return()
 
 			f.store.
-				On("SaveScore", domain.Score{
-					ContenderID: fakedContender3ID,
-					Score:       "150p",
-					Placement:   2,
-					RankOrder:   1,
-					Finalist:    true,
-					Timestamp:   time.Now(),
+				On("SaveResult", domain.Result{
+					CompetitorID: fakedCompetitor3ID,
+					Score:        "150p",
+					Placement:    2,
+					RankOrder:    1,
+					Finalist:     true,
+					Timestamp:    time.Now(),
 				}).Return()
 
 			f.store.
-				On("SaveScore", domain.Score{
-					ContenderID: fakedContender1ID,
-					Score:       "100p",
-					Placement:   3,
-					RankOrder:   2,
-					Finalist:    false,
-					Timestamp:   time.Now(),
+				On("SaveResult", domain.Result{
+					CompetitorID: fakedCompetitor1ID,
+					Score:        "100p",
+					Placement:    3,
+					RankOrder:    2,
+					Finalist:     false,
+					Timestamp:    time.Now(),
 				}).Return()
 
-			f.engine.RankCompClass(fakedCompClassID)
+			f.engine.RankCategory(fakedCategoryID)
 
 			awaitExpectations(t)
 		})
+	})
+
+	t.Run("RankCategory_EnabledZones", func(t *testing.T) {
+		for _, tt := range []struct {
+			name     string
+			problems []scores.Problem
+			expected string
+		}{
+			{name: "NoZones", problems: []scores.Problem{{}}, expected: "2t"},
+			{
+				name:     "Zone1",
+				problems: []scores.Problem{{Zone1Enabled: true}, {}},
+				expected: "2t 4z₁",
+			},
+			{
+				name:     "Zone2",
+				problems: []scores.Problem{{Zone1Enabled: true}, {Zone1Enabled: true, Zone2Enabled: true}, {}},
+				expected: "2t 3z₂ 4z₁",
+			},
+		} {
+			t.Run(tt.name, func(t *testing.T) {
+				synctest.Test(t, func(t *testing.T) {
+					f, awaitExpectations := makeFixture()
+
+					fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
+					fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+
+					f.store.On("GetRules").Return(scores.Rules{})
+					f.store.On("GetAllProblems").Return(slices.Values(tt.problems))
+					f.store.
+						On("GetCompetitorsByCategory", fakedCategoryID).
+						Return(slices.Values([]scores.Competitor{{
+							ID:         fakedCompetitorID,
+							CategoryID: fakedCategoryID,
+							Score:      scores.Score{Tops: 2, Zone2s: 3, Zone1s: 4},
+						}}))
+					f.store.
+						On("SaveResult", domain.Result{
+							CompetitorID: fakedCompetitorID,
+							Score:        tt.expected,
+							Placement:    1,
+							Timestamp:    time.Now(),
+						}).Return()
+
+					f.engine.RankCategory(fakedCategoryID)
+
+					awaitExpectations(t)
+				})
+			})
+		}
 	})
 }

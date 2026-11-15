@@ -14,13 +14,13 @@ import (
 )
 
 func TestAuthorizer(t *testing.T) {
-	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+	fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedUserID := testutils.RandomResourceID[domain.UserID]()
 
 	fakedOwnership := domain.OwnershipData{
-		OrganizerID: fakedOrganizerID,
-		ContenderID: &fakedContenderID,
+		OrganizerID:  fakedOrganizerID,
+		CompetitorID: &fakedCompetitorID,
 	}
 
 	t.Run("MissingAuthorization", func(t *testing.T) {
@@ -49,14 +49,14 @@ func TestAuthorizer(t *testing.T) {
 		mockedJWTDecoder.AssertExpectations(t)
 	})
 
-	t.Run("Contender", func(t *testing.T) {
+	t.Run("Competitor", func(t *testing.T) {
 		t.Run("BadAuthorization", func(t *testing.T) {
 			mockedRepo := new(repositoryMock)
 			mockedJWTDecoder := new(jwtDecoderMock)
 
 			mockedRepo.
-				On("GetContenderByCode", mock.Anything, nil, mock.AnythingOfType("string")).
-				Return(domain.Contender{}, domain.ErrNotFound)
+				On("GetCompetitorByCode", mock.Anything, nil, mock.AnythingOfType("string")).
+				Return(domain.Competitor{}, domain.ErrNotFound)
 
 			authorizer := authorizer.NewAuthorizer(mockedRepo, mockedJWTDecoder)
 
@@ -109,9 +109,9 @@ func TestAuthorizer(t *testing.T) {
 			mockedJWTDecoder := new(jwtDecoderMock)
 
 			mockedRepo.
-				On("GetContenderByCode", mock.Anything, nil, "ABCD1234").
-				Return(domain.Contender{
-					ID: fakedContenderID,
+				On("GetCompetitorByCode", mock.Anything, nil, "ABCD1234").
+				Return(domain.Competitor{
+					ID: fakedCompetitorID,
 				}, nil)
 
 			authorizer := authorizer.NewAuthorizer(mockedRepo, mockedJWTDecoder)
@@ -119,7 +119,7 @@ func TestAuthorizer(t *testing.T) {
 			dummyHandler := func(w http.ResponseWriter, r *http.Request) {
 				role, err := authorizer.HasOwnership(r.Context(), fakedOwnership)
 
-				assert.Equal(t, domain.ContenderRole, role)
+				assert.Equal(t, domain.CompetitorRole, role)
 				assert.NoError(t, err)
 
 				authentication, err := authorizer.GetAuthentication(r.Context())
@@ -145,16 +145,16 @@ func TestAuthorizer(t *testing.T) {
 			mockedJWTDecoder := new(jwtDecoderMock)
 
 			mockedRepo.
-				On("GetContenderByCode", mock.Anything, nil, "ABCD1234").
-				Return(domain.Contender{
-					ID: fakedContenderID,
+				On("GetCompetitorByCode", mock.Anything, nil, "ABCD1234").
+				Return(domain.Competitor{
+					ID: fakedCompetitorID,
 				}, nil)
 
-			otherContenderID := fakedContenderID + 1
+			otherCompetitorID := fakedCompetitorID + 1
 
 			fakedOtherOwnership := domain.OwnershipData{
-				OrganizerID: fakedOrganizerID,
-				ContenderID: &otherContenderID,
+				OrganizerID:  fakedOrganizerID,
+				CompetitorID: &otherCompetitorID,
 			}
 
 			authorizer := authorizer.NewAuthorizer(mockedRepo, mockedJWTDecoder)
@@ -183,8 +183,8 @@ func TestAuthorizer(t *testing.T) {
 			mockedJWTDecoder := new(jwtDecoderMock)
 
 			mockedRepo.
-				On("GetContenderByCode", mock.Anything, nil, "WXYZ1234").
-				Return(domain.Contender{}, nil)
+				On("GetCompetitorByCode", mock.Anything, nil, "WXYZ1234").
+				Return(domain.Competitor{}, nil)
 
 			authorizer := authorizer.NewAuthorizer(mockedRepo, mockedJWTDecoder)
 
@@ -445,9 +445,9 @@ func (m *repositoryMock) Begin() (domain.Transaction, error) {
 	return args.Get(0).(domain.Transaction), args.Error(1)
 }
 
-func (m *repositoryMock) GetContenderByCode(ctx context.Context, tx domain.Transaction, registrationCode string) (domain.Contender, error) {
+func (m *repositoryMock) GetCompetitorByCode(ctx context.Context, tx domain.Transaction, registrationCode string) (domain.Competitor, error) {
 	args := m.Called(ctx, tx, registrationCode)
-	return args.Get(0).(domain.Contender), args.Error(1)
+	return args.Get(0).(domain.Competitor), args.Error(1)
 }
 
 func (m *repositoryMock) GetUserByUsername(ctx context.Context, tx domain.Transaction, username string) (domain.User, error) {

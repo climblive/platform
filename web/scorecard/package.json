@@ -16,7 +16,7 @@
   "devDependencies": {
     "@sentry/vite-plugin": "^11.10.0",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
-    "@tanstack/svelte-query-devtools": "^6.3.9",
+    "@tanstack/svelte-query-devtools": "^6.4.1",
     "@tsconfig/svelte": "^5.0.8",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-visualizer": "^7.1.1",
@@ -25,13 +25,13 @@
     "tslib": "^2.9.1",
     "typescript": "^6.0.3",
     "vite": "^8.3.5",
-    "vitest": "^5.0.5"
+    "vitest": "^5.1.0"
   },
   "dependencies": {
     "@awesome.me/webawesome": "3.14.0",
     "@climblive/lib": "workspace:*",
     "@sentry/svelte": "^11.11.0",
-    "@tanstack/svelte-query": "^6.3.7",
+    "@tanstack/svelte-query": "^6.4.1",
     "axios": "^1.21.0",
     "date-fns": "^4.4.0",
     "svelte-routing": "^2.13.0",

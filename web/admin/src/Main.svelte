@@ -1,13 +1,13 @@
 <script lang="ts">
   import { Route, Router } from "svelte-routing";
   import Header from "./Header.svelte";
-  import ContenderView from "./pages/ContenderView.svelte";
-  import Contest from "./pages/Contest.svelte";
-  import CreateCompClass from "./pages/CreateCompClass.svelte";
-  import CreateContest from "./pages/CreateContest.svelte";
+  import CompetitorView from "./pages/CompetitorView.svelte";
+  import Competition from "./pages/Competition.svelte";
+  import CreateCategory from "./pages/CreateCategory.svelte";
+  import CreateCompetition from "./pages/CreateCompetition.svelte";
   import CreateProblem from "./pages/CreateProblem.svelte";
-  import EditCompClass from "./pages/EditCompClass.svelte";
-  import EditContest from "./pages/EditContest.svelte";
+  import EditCategory from "./pages/EditCategory.svelte";
+  import EditCompetition from "./pages/EditCompetition.svelte";
   import EditProblem from "./pages/EditProblem.svelte";
   import Health from "./pages/Health.svelte";
   import Help from "./pages/Help.svelte";
@@ -48,36 +48,36 @@
     <Route path="/health">
       <Health />
     </Route>
-    <Route path="/organizers/:organizerId/contests">
+    <Route path="/organizers/:organizerId/competitions">
       {#snippet children({ params }: { params: { organizerId: number } })}
         <OrganizerView organizerId={Number(params.organizerId)} />
       {/snippet}
     </Route>
-    <Route path="/organizers/:organizerId/contests/new">
+    <Route path="/organizers/:organizerId/competitions/new">
       {#snippet children({ params }: { params: { organizerId: number } })}
-        <CreateContest organizerId={Number(params.organizerId)} />
+        <CreateCompetition organizerId={Number(params.organizerId)} />
       {/snippet}
     </Route>
-    <Route path="/contests/:contestId">
-      {#snippet children({ params }: { params: { contestId: number } })}
-        {#key params.contestId}
-          <Contest contestId={Number(params.contestId)} />
+    <Route path="/competitions/:competitionId">
+      {#snippet children({ params }: { params: { competitionId: number } })}
+        {#key params.competitionId}
+          <Competition competitionId={Number(params.competitionId)} />
         {/key}
       {/snippet}
     </Route>
-    <Route path="/contests/:contestId/edit">
-      {#snippet children({ params }: { params: { contestId: number } })}
-        <EditContest contestId={Number(params.contestId)} />
+    <Route path="/competitions/:competitionId/edit">
+      {#snippet children({ params }: { params: { competitionId: number } })}
+        <EditCompetition competitionId={Number(params.competitionId)} />
       {/snippet}
     </Route>
-    <Route path="/contests/:contestId/new-comp-class">
-      {#snippet children({ params }: { params: { contestId: number } })}
-        <CreateCompClass contestId={Number(params.contestId)} />
+    <Route path="/competitions/:competitionId/new-category">
+      {#snippet children({ params }: { params: { competitionId: number } })}
+        <CreateCategory competitionId={Number(params.competitionId)} />
       {/snippet}
     </Route>
-    <Route path="/contests/:contestId/new-problem">
-      {#snippet children({ params }: { params: { contestId: number } })}
-        <CreateProblem contestId={Number(params.contestId)} />
+    <Route path="/competitions/:competitionId/new-problem">
+      {#snippet children({ params }: { params: { competitionId: number } })}
+        <CreateProblem competitionId={Number(params.competitionId)} />
       {/snippet}
     </Route>
     <Route path="/problems/:problemId/edit">
@@ -85,9 +85,9 @@
         <EditProblem problemId={Number(params.problemId)} />
       {/snippet}
     </Route>
-    <Route path="/comp-classes/:compClassId/edit">
-      {#snippet children({ params }: { params: { compClassId: number } })}
-        <EditCompClass compClassId={Number(params.compClassId)} />
+    <Route path="/categories/:categoryId/edit">
+      {#snippet children({ params }: { params: { categoryId: number } })}
+        <EditCategory categoryId={Number(params.categoryId)} />
       {/snippet}
     </Route>
     <Route path="/raffles/:raffleId">
@@ -95,24 +95,24 @@
         <RaffleView raffleId={Number(params.raffleId)} />
       {/snippet}
     </Route>
-    <Route path="/contests/:contestId/results">
-      {#snippet children({ params }: { params: { contestId: number } })}
-        <ResultsPage contestId={Number(params.contestId)} />
+    <Route path="/competitions/:competitionId/results">
+      {#snippet children({ params }: { params: { competitionId: number } })}
+        <ResultsPage competitionId={Number(params.competitionId)} />
       {/snippet}
     </Route>
-    <Route path="/contests/:contestId/tickets">
-      {#snippet children({ params }: { params: { contestId: number } })}
-        <TicketsListPage contestId={Number(params.contestId)} />
+    <Route path="/competitions/:competitionId/tickets">
+      {#snippet children({ params }: { params: { competitionId: number } })}
+        <TicketsListPage competitionId={Number(params.competitionId)} />
       {/snippet}
     </Route>
-    <Route path="/contests/:contestId/tickets/print">
-      {#snippet children({ params }: { params: { contestId: number } })}
-        <PrintableTicketList contestId={Number(params.contestId)} />
+    <Route path="/competitions/:competitionId/tickets/print">
+      {#snippet children({ params }: { params: { competitionId: number } })}
+        <PrintableTicketList competitionId={Number(params.competitionId)} />
       {/snippet}
     </Route>
-    <Route path="/contenders/:contenderId">
-      {#snippet children({ params }: { params: { contenderId: number } })}
-        <ContenderView contenderId={Number(params.contenderId)} />
+    <Route path="/competitors/:competitorId">
+      {#snippet children({ params }: { params: { competitorId: number } })}
+        <CompetitorView competitorId={Number(params.competitorId)} />
       {/snippet}
     </Route>
   </Router>

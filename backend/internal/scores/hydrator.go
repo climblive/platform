@@ -9,32 +9,32 @@ import (
 )
 
 type standardEngineStoreHydratorRepository interface {
-	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
-	GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error)
-	GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Problem, error)
-	GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error)
+	GetCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (domain.Competition, error)
+	GetCompetitorsByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Competitor, error)
+	GetProblemsByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Problem, error)
+	GetTicksByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Tick, error)
 }
 
 type StandardEngineStoreHydrator struct {
 	Repo standardEngineStoreHydratorRepository
 }
 
-func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID domain.ContestID, store EngineStore) error {
-	contest, err := h.Repo.GetContest(ctx, nil, contestID)
+func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, competitionID domain.CompetitionID, store EngineStore) error {
+	competition, err := h.Repo.GetCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
 
 	store.SaveRules(Rules{
-		QualifyingProblems: contest.QualifyingProblems,
-		Finalists:          contest.Finalists,
-		UsePoints:          contest.UsePoints,
-		PooledPoints:       contest.PooledPoints,
-		MaxAttempts:        contest.MaxAttempts,
-		PointDeduction:     contest.PointDeduction,
+		QualifyingProblems: competition.QualifyingProblems,
+		Finalists:          competition.Finalists,
+		UsePoints:          competition.UsePoints,
+		PooledPoints:       competition.PooledPoints,
+		MaxAttempts:        competition.MaxAttempts,
+		PointDeduction:     competition.PointDeduction,
 	})
 
-	problems, err := h.Repo.GetProblemsByContest(ctx, nil, contestID)
+	problems, err := h.Repo.GetProblemsByCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
@@ -43,31 +43,31 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 		store.SaveProblem(Problem{
 			ID: problem.ID,
 			ProblemValue: ProblemValue{
-				PointsZone1: float64(problem.PointsZone1),
-				PointsZone2: float64(problem.PointsZone2),
-				PointsTop:   float64(problem.PointsTop),
-				FlashBonus:  float64(problem.FlashBonus),
+				PointsZone1: domain.Tenths(problem.PointsZone1) * 10,
+				PointsZone2: domain.Tenths(problem.PointsZone2) * 10,
+				PointsTop:   domain.Tenths(problem.PointsTop) * 10,
+				FlashBonus:  domain.Tenths(problem.FlashBonus) * 10,
 			},
 			Zone1Enabled: problem.Zone1Enabled,
 			Zone2Enabled: problem.Zone2Enabled,
 		})
 	}
 
-	contenders, err := h.Repo.GetContendersByContest(ctx, nil, contestID)
+	competitors, err := h.Repo.GetCompetitorsByCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
 
-	for contender := range slices.Values(contenders) {
-		if contender.CompClassID == 0 {
+	for competitor := range slices.Values(competitors) {
+		if competitor.CategoryID == 0 {
 			continue
 		}
 
-		store.SaveContender(Contender{
-			ID:                  contender.ID,
-			CompClassID:         contender.CompClassID,
-			WithdrawnFromFinals: contender.WithdrawnFromFinals,
-			Disqualified:        contender.Disqualified,
+		store.SaveCompetitor(Competitor{
+			ID:                  competitor.ID,
+			CategoryID:          competitor.CategoryID,
+			WithdrawnFromFinals: competitor.WithdrawnFromFinals,
+			Disqualified:        competitor.Disqualified,
 			Score: Score{
 				Tops:           0,
 				Points:         0,
@@ -80,16 +80,16 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, contestID dom
 		})
 	}
 
-	ticks, err := h.Repo.GetTicksByContest(ctx, nil, contestID)
+	ticks, err := h.Repo.GetTicksByCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
 
 	for tick := range slices.Values(ticks) {
-		store.SaveTick(*tick.Ownership.ContenderID, Tick{
+		store.SaveTick(*tick.Ownership.CompetitorID, Tick{
 			ID:            tick.ID,
 			Revision:      tick.Revision,
-			ContenderID:   *tick.Ownership.ContenderID,
+			CompetitorID:  *tick.Ownership.CompetitorID,
 			ProblemID:     tick.ProblemID,
 			Zone1:         tick.Zone1,
 			AttemptsZone1: tick.AttemptsZone1,

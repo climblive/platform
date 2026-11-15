@@ -9,16 +9,16 @@ import (
 	"github.com/go-errors/errors"
 )
 
-const maxProblemsPerContest = 100
+const maxProblemsPerCompetition = 100
 
 type problemUseCaseRepository interface {
 	domain.Transactor
 
-	GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Problem, error)
+	GetProblemsByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Problem, error)
 	StoreProblem(ctx context.Context, tx domain.Transaction, problem domain.Problem) (domain.Problem, error)
 	GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) (domain.Problem, error)
-	GetProblemByNumber(ctx context.Context, tx domain.Transaction, contestID domain.ContestID, problemNumber int) (domain.Problem, error)
-	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
+	GetProblemByNumber(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID, problemNumber int) (domain.Problem, error)
+	GetCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (domain.Competition, error)
 	DeleteProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) error
 	GetTicksByProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) ([]domain.Tick, error)
 }
@@ -38,8 +38,8 @@ func (uc *ProblemUseCase) GetProblem(ctx context.Context, problemID domain.Probl
 	return problem, nil
 }
 
-func (uc *ProblemUseCase) GetProblemsByContest(ctx context.Context, contestID domain.ContestID) ([]domain.Problem, error) {
-	problems, err := uc.Repo.GetProblemsByContest(ctx, nil, contestID)
+func (uc *ProblemUseCase) GetProblemsByCompetition(ctx context.Context, competitionID domain.CompetitionID) ([]domain.Problem, error) {
+	problems, err := uc.Repo.GetProblemsByCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -73,7 +73,7 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 	}
 
 	if patch.Number.PresentAndDistinct(problem.Number) {
-		_, err = uc.Repo.GetProblemByNumber(ctx, nil, problem.ContestID, patch.Number.Value)
+		_, err = uc.Repo.GetProblemByNumber(ctx, nil, problem.CompetitionID, patch.Number.Value)
 		switch {
 		case err == nil:
 			return domain.Problem{}, errors.Wrap(domain.ErrDuplicate, 0)
@@ -142,33 +142,33 @@ func (uc *ProblemUseCase) PatchProblem(ctx context.Context, problemID domain.Pro
 	}
 
 	if event != problemUpdatedEventBaseline {
-		uc.EventBroker.Dispatch(problem.ContestID, event)
+		uc.EventBroker.Dispatch(problem.CompetitionID, event)
 	}
 
 	return problem, nil
 }
 
-func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.ContestID, tmpl domain.ProblemTemplate) (domain.Problem, error) {
-	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
+func (uc *ProblemUseCase) CreateProblem(ctx context.Context, competitionID domain.CompetitionID, tmpl domain.ProblemTemplate) (domain.Problem, error) {
+	competition, err := uc.Repo.GetCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return domain.Problem{}, errors.Wrap(err, 0)
 	}
 
-	_, err = uc.Authorizer.HasOwnership(ctx, contest.Ownership)
+	_, err = uc.Authorizer.HasOwnership(ctx, competition.Ownership)
 	if err != nil {
 		return domain.Problem{}, errors.Wrap(err, 0)
 	}
 
-	problems, err := uc.Repo.GetProblemsByContest(ctx, nil, contestID)
+	problems, err := uc.Repo.GetProblemsByCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return domain.Problem{}, errors.Wrap(err, 0)
 	}
 
-	if len(problems) >= maxProblemsPerContest {
+	if len(problems) >= maxProblemsPerCompetition {
 		return domain.Problem{}, errors.New(domain.ErrLimitExceeded)
 	}
 
-	_, err = uc.Repo.GetProblemByNumber(ctx, nil, contestID, tmpl.Number)
+	_, err = uc.Repo.GetProblemByNumber(ctx, nil, competitionID, tmpl.Number)
 	switch {
 	case err == nil:
 		return domain.Problem{}, errors.Wrap(domain.ErrDuplicate, 0)
@@ -179,8 +179,8 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 
 	problem := domain.Problem{
 		ID:                 0,
-		Ownership:          contest.Ownership,
-		ContestID:          contestID,
+		Ownership:          competition.Ownership,
+		CompetitionID:      competitionID,
 		Number:             tmpl.Number,
 		HoldColorPrimary:   strings.TrimSpace(tmpl.HoldColorPrimary),
 		HoldColorSecondary: strings.TrimSpace(tmpl.HoldColorSecondary),
@@ -211,7 +211,7 @@ func (uc *ProblemUseCase) CreateProblem(ctx context.Context, contestID domain.Co
 		ProblemValue: problem.ProblemValue,
 	}
 
-	uc.EventBroker.Dispatch(problem.ContestID, event)
+	uc.EventBroker.Dispatch(problem.CompetitionID, event)
 
 	return createdProblem, nil
 }
@@ -244,7 +244,7 @@ func (uc *ProblemUseCase) DeleteProblem(ctx context.Context, problemID domain.Pr
 		ProblemID: problem.ID,
 	}
 
-	uc.EventBroker.Dispatch(problem.ContestID, event)
+	uc.EventBroker.Dispatch(problem.CompetitionID, event)
 
 	return nil
 }

@@ -1,7 +1,7 @@
 <script lang="ts" module>
   export const doSubmit = (
-    mutation: ReturnType<typeof patchContestMutation>,
-    patch: ContestPatch,
+    mutation: ReturnType<typeof patchCompetitionMutation>,
+    patch: CompetitionPatch,
   ) => {
     mutation.mutate(patch, {
       onError: () => toastUnexpectedError("Failed to update rules."),
@@ -12,8 +12,8 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/checkbox/checkbox.js";
   import "@awesome.me/webawesome/dist/components/radio/radio.js";
-  import type { Contest, ContestPatch } from "@climblive/lib/models";
-  import { patchContestMutation } from "@climblive/lib/queries";
+  import type { Competition, CompetitionPatch } from "@climblive/lib/models";
+  import { patchCompetitionMutation } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import RuleOptionCard from "./RuleOptionCard.svelte";
   import Finalists from "./rules/Finalists.svelte";
@@ -23,15 +23,15 @@
   import ProblemLimit from "./rules/ProblemLimit.svelte";
 
   interface Props {
-    contest: Contest;
+    competition: Competition;
   }
 
-  const { contest }: Props = $props();
+  const { competition }: Props = $props();
 
-  const patchContest = $derived(patchContestMutation(contest.id));
+  const patchCompetition = $derived(patchCompetitionMutation(competition.id));
 
   const handleUsePointsChange = (usePoints: boolean) => {
-    const patch: ContestPatch = {
+    const patch: CompetitionPatch = {
       usePoints,
     };
 
@@ -42,7 +42,7 @@
       patch.pointDeduction = 0;
     }
 
-    patchContest.mutate(patch, {
+    patchCompetition.mutate(patch, {
       onError: () => toastUnexpectedError("Failed to update rules."),
     });
   };
@@ -53,12 +53,13 @@
   <RuleOptionCard
     title="Points"
     description="Competitors are ranked based on the total points scored across all problems."
+    tags={["Recommended"]}
   >
     {#snippet header()}
       <wa-radio
         onclick={() => handleUsePointsChange(true)}
         size="s"
-        checked={contest.usePoints ? true : undefined}
+        checked={competition.usePoints ? true : undefined}
       ></wa-radio>
     {/snippet}
   </RuleOptionCard>
@@ -66,13 +67,12 @@
   <RuleOptionCard
     title="Attempts"
     description="Competitors are ranked based on the number of attempts needed to complete problems."
-    tag="Beta"
   >
     {#snippet header()}
       <wa-radio
         onclick={() => handleUsePointsChange(false)}
         size="s"
-        checked={!contest.usePoints ? true : undefined}
+        checked={!competition.usePoints ? true : undefined}
       ></wa-radio>
     {/snippet}
   </RuleOptionCard>
@@ -80,15 +80,15 @@
 
 <h3>Options</h3>
 <section>
-  <Finalists {contest} />
+  <Finalists {competition} />
 
-  <PooledPoints {contest} />
+  <PooledPoints {competition} />
 
-  <ProblemLimit {contest} />
+  <ProblemLimit {competition} />
 
-  <MaxAttempts {contest} />
+  <MaxAttempts {competition} />
 
-  <PointDeduction {contest} />
+  <PointDeduction {competition} />
 </section>
 
 <style>

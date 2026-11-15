@@ -7,9 +7,9 @@ import (
 )
 
 type effectResolver interface {
-	RankCompClass(domain.CompClassID)
-	ScoreContender(domain.ContenderID) iter.Seq[Effect]
-	CalculatePointValues(domain.CompClassID, domain.ProblemID) iter.Seq[Effect]
+	RankCategory(domain.CategoryID)
+	ScoreCompetitor(domain.CompetitorID) iter.Seq[Effect]
+	CalculatePointValues(domain.CategoryID, domain.ProblemID) iter.Seq[Effect]
 }
 
 type EffectRunner struct {
@@ -47,7 +47,7 @@ func (r *EffectRunner) RunEffects(effects iter.Seq[Effect]) {
 	r.run(func(yield func(Effect) bool) {
 		for _, effect := range r.queue {
 			switch effect.(type) {
-			case EffectScoreContender:
+			case EffectScoreCompetitor:
 			default:
 				continue
 			}
@@ -61,7 +61,7 @@ func (r *EffectRunner) RunEffects(effects iter.Seq[Effect]) {
 	r.run(func(yield func(Effect) bool) {
 		for _, effect := range r.queue {
 			switch effect.(type) {
-			case EffectRankClass:
+			case EffectRankCategory:
 			default:
 				continue
 			}
@@ -78,12 +78,12 @@ func (r *EffectRunner) run(effects iter.Seq[Effect]) {
 		var chainEffects iter.Seq[Effect]
 
 		switch effect := e.(type) {
-		case EffectRankClass:
-			r.resolver.RankCompClass(effect.CompClassID)
-		case EffectScoreContender:
-			chainEffects = r.resolver.ScoreContender(effect.ContenderID)
+		case EffectRankCategory:
+			r.resolver.RankCategory(effect.CategoryID)
+		case EffectScoreCompetitor:
+			chainEffects = r.resolver.ScoreCompetitor(effect.CompetitorID)
 		case EffectCalculatePointValues:
-			chainEffects = r.resolver.CalculatePointValues(effect.CompClassID, effect.ProblemID)
+			chainEffects = r.resolver.CalculatePointValues(effect.CategoryID, effect.ProblemID)
 		}
 
 		if chainEffects == nil {

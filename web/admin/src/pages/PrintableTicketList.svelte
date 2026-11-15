@@ -4,43 +4,45 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
-    getContendersByContestQuery,
-    getContestQuery,
+    getCompetitorsByCompetitionQuery,
+    getCompetitionQuery,
   } from "@climblive/lib/queries";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
   }
 
-  let { contestId }: Props = $props();
+  let { competitionId }: Props = $props();
 
   const urlParams = new URLSearchParams(window.location.search);
   const fromId = Number(urlParams.get("from")) || undefined;
   const toId = Number(urlParams.get("to")) || undefined;
 
-  const contestQuery = $derived(getContestQuery(contestId));
-  const contendersQuery = $derived(getContendersByContestQuery(contestId));
+  const competitionQuery = $derived(getCompetitionQuery(competitionId));
+  const competitorsQuery = $derived(
+    getCompetitorsByCompetitionQuery(competitionId),
+  );
 
-  const contest = $derived(contestQuery.data);
-  const allContenders = $derived(contendersQuery.data);
+  const competition = $derived(competitionQuery.data);
+  const allCompetitors = $derived(competitorsQuery.data);
 
-  const contenders = $derived.by(() => {
-    if (!allContenders) {
+  const competitors = $derived.by(() => {
+    if (!allCompetitors) {
       return undefined;
     }
 
     if (fromId !== undefined && toId !== undefined) {
-      return allContenders.filter((c) => c.id >= fromId && c.id <= toId);
+      return allCompetitors.filter((c) => c.id >= fromId && c.id <= toId);
     }
 
-    return allContenders;
+    return allCompetitors;
   });
 
   let printDialogOpened = $state(false);
   let printingFinished = $state(false);
 
   $effect(() => {
-    if (contest && contenders && !printDialogOpened) {
+    if (competition && competitors && !printDialogOpened) {
       printDialogOpened = true;
 
       setTimeout(() => {
@@ -53,7 +55,7 @@
 <svelte:window onafterprint={() => (printingFinished = true)} />
 
 <main>
-  {#if !contest || !contenders}
+  {#if !competition || !competitors}
     <Loader />
   {:else}
     <section class="print-prompt">
@@ -87,11 +89,11 @@
       {/if}
     </section>
     <div class="tickets">
-      {#each contenders as contender (contender.id)}
+      {#each competitors as competitor (competitor.id)}
         <Ticket
-          contestName={contest.name}
-          registrationCode={contender.registrationCode}
-          ticketNumber={contender.id}
+          competitionName={competition.name}
+          registrationCode={competitor.registrationCode}
+          ticketNumber={competitor.id}
         />
       {/each}
     </div>

@@ -17,27 +17,27 @@ func TestHydrate(t *testing.T) {
 	mockedStore := new(engineStoreMock)
 
 	fakedTickID := testutils.RandomResourceID[domain.TickID]()
-	fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
-	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
+	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 	now := time.Now()
 
 	mockedRepo.
-		On("GetContest", mock.Anything, nil, fakedContestID).
-		Return(domain.Contest{
-			ID:                 fakedContestID,
+		On("GetCompetition", mock.Anything, nil, fakedCompetitionID).
+		Return(domain.Competition{
+			ID:                 fakedCompetitionID,
 			QualifyingProblems: 10,
 			Finalists:          7,
 			UsePoints:          true,
 			PooledPoints:       true,
 			MaxAttempts:        10,
-			PointDeduction:     2,
+			PointDeduction:     3,
 		}, nil)
 
 	mockedRepo.
-		On("GetProblemsByContest", mock.Anything, nil, fakedContestID).
+		On("GetProblemsByCompetition", mock.Anything, nil, fakedCompetitionID).
 		Return([]domain.Problem{
 			{
 				ID:           fakedProblemID,
@@ -53,28 +53,28 @@ func TestHydrate(t *testing.T) {
 		}, nil)
 
 	mockedRepo.
-		On("GetContendersByContest", mock.Anything, nil, fakedContestID).
-		Return([]domain.Contender{
+		On("GetCompetitorsByCompetition", mock.Anything, nil, fakedCompetitionID).
+		Return([]domain.Competitor{
 			{
-				ID:                  fakedContenderID,
-				CompClassID:         fakedCompClassID,
+				ID:                  fakedCompetitorID,
+				CategoryID:          fakedCategoryID,
 				Disqualified:        true,
 				WithdrawnFromFinals: true,
 				Entered:             now,
 			},
 			{
-				ID:          fakedContenderID + 1,
-				CompClassID: 0,
+				ID:         fakedCompetitorID + 1,
+				CategoryID: 0,
 			},
 		}, nil)
 
 	mockedRepo.
-		On("GetTicksByContest", mock.Anything, nil, fakedContestID).
+		On("GetTicksByCompetition", mock.Anything, nil, fakedCompetitionID).
 		Return([]domain.Tick{
 			{
 				ID: fakedTickID,
 				Ownership: domain.OwnershipData{
-					ContenderID: &fakedContenderID,
+					CompetitorID: &fakedCompetitorID,
 				},
 				Revision:      1,
 				ProblemID:     fakedProblemID,
@@ -93,7 +93,7 @@ func TestHydrate(t *testing.T) {
 		UsePoints:          true,
 		PooledPoints:       true,
 		MaxAttempts:        10,
-		PointDeduction:     2,
+		PointDeduction:     3,
 	}).Return()
 
 	mockedStore.On("SaveProblem", scores.Problem{
@@ -101,24 +101,24 @@ func TestHydrate(t *testing.T) {
 		Zone1Enabled: true,
 		Zone2Enabled: true,
 		ProblemValue: scores.ProblemValue{
-			PointsTop:   100,
-			PointsZone1: 50,
-			PointsZone2: 75,
-			FlashBonus:  10,
+			PointsTop:   1000,
+			PointsZone1: 500,
+			PointsZone2: 750,
+			FlashBonus:  100,
 		},
 	}).Return()
 
-	mockedStore.On("SaveContender", scores.Contender{
-		ID:                  fakedContenderID,
-		CompClassID:         fakedCompClassID,
+	mockedStore.On("SaveCompetitor", scores.Competitor{
+		ID:                  fakedCompetitorID,
+		CategoryID:          fakedCategoryID,
 		Disqualified:        true,
 		WithdrawnFromFinals: true,
 	}).Return()
 
-	mockedStore.On("SaveTick", fakedContenderID, scores.Tick{
+	mockedStore.On("SaveTick", fakedCompetitorID, scores.Tick{
 		ID:            fakedTickID,
 		Revision:      1,
-		ContenderID:   fakedContenderID,
+		CompetitorID:  fakedCompetitorID,
 		ProblemID:     fakedProblemID,
 		Top:           true,
 		AttemptsTop:   999,
@@ -129,7 +129,7 @@ func TestHydrate(t *testing.T) {
 	}).Return()
 
 	hydrator := &scores.StandardEngineStoreHydrator{Repo: mockedRepo}
-	err := hydrator.Hydrate(context.Background(), fakedContestID, mockedStore)
+	err := hydrator.Hydrate(context.Background(), fakedCompetitionID, mockedStore)
 
 	require.NoError(t, err)
 

@@ -22,8 +22,8 @@ func TestScoreEngineManager(t *testing.T) {
 		mockedEventBroker := new(eventBrokerMock)
 
 		mockedRepo.
-			On("GetContestsCurrentlyRunningOrByStartTime", mock.Anything, mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
-			Return([]domain.Contest{}, nil)
+			On("GetCompetitionsCurrentlyRunningOrByStartTime", mock.Anything, mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
+			Return([]domain.Competition{}, nil)
 
 		mngr := scores.NewScoreEngineManager(mockedRepo, mockedStoreHydrator, mockedEventBroker, time.Hour)
 
@@ -47,15 +47,15 @@ func TestScoreEngineManager(t *testing.T) {
 		mockedEventBroker := new(eventBrokerMock)
 
 		fakedSubscriptionID := domain.SubscriptionID(uuid.New())
-		fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+		fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
 
 		now := time.Now()
 
 		mockedRepo.
-			On("GetContestsCurrentlyRunningOrByStartTime", mock.Anything, mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
-			Return([]domain.Contest{
+			On("GetCompetitionsCurrentlyRunningOrByStartTime", mock.Anything, mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
+			Return([]domain.Competition{
 				{
-					ID:                 fakedContestID,
+					ID:                 fakedCompetitionID,
 					QualifyingProblems: 10,
 					Finalists:          7,
 					TimeBegin:          now,
@@ -64,9 +64,9 @@ func TestScoreEngineManager(t *testing.T) {
 			}, nil)
 
 		mockedRepo.
-			On("GetContest", mock.Anything, mock.Anything, fakedContestID).
-			Return(domain.Contest{
-				ID:                 fakedContestID,
+			On("GetCompetition", mock.Anything, mock.Anything, fakedCompetitionID).
+			Return(domain.Competition{
+				ID:                 fakedCompetitionID,
 				QualifyingProblems: 10,
 				Finalists:          7,
 				TimeBegin:          now,
@@ -82,11 +82,11 @@ func TestScoreEngineManager(t *testing.T) {
 			Return()
 
 		mockedEventBroker.
-			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.ScoreEngineStartedEvent")).
-			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.ScoreEngineStoppedEvent"))
+			On("Dispatch", fakedCompetitionID, mock.AnythingOfType("domain.ScoreEngineStartedEvent")).
+			On("Dispatch", fakedCompetitionID, mock.AnythingOfType("domain.ScoreEngineStoppedEvent"))
 
 		mockedStoreHydrator.
-			On("Hydrate", mock.Anything, fakedContestID, mock.AnythingOfType("*scores.MemoryStore")).
+			On("Hydrate", mock.Anything, fakedCompetitionID, mock.AnythingOfType("*scores.MemoryStore")).
 			Run(func(args mock.Arguments) {
 				cancel()
 			}).
@@ -112,18 +112,18 @@ func TestScoreEngineManager(t *testing.T) {
 		mockedEventBroker := new(eventBrokerMock)
 
 		fakedSubscriptionID := domain.SubscriptionID(uuid.New())
-		fakedContestID := testutils.RandomResourceID[domain.ContestID]()
+		fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
 
 		now := time.Now()
 
 		mockedRepo.
-			On("GetContestsCurrentlyRunningOrByStartTime", mock.Anything, mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
-			Return([]domain.Contest{}, nil)
+			On("GetCompetitionsCurrentlyRunningOrByStartTime", mock.Anything, mock.Anything, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).
+			Return([]domain.Competition{}, nil)
 
 		mockedRepo.
-			On("GetContest", mock.Anything, mock.Anything, fakedContestID).
-			Return(domain.Contest{
-				ID:                 fakedContestID,
+			On("GetCompetition", mock.Anything, mock.Anything, fakedCompetitionID).
+			Return(domain.Competition{
+				ID:                 fakedCompetitionID,
 				QualifyingProblems: 10,
 				Finalists:          7,
 				TimeBegin:          now,
@@ -139,23 +139,23 @@ func TestScoreEngineManager(t *testing.T) {
 			Return()
 
 		mockedStoreHydrator.
-			On("Hydrate", mock.Anything, fakedContestID, mock.AnythingOfType("*scores.MemoryStore")).
+			On("Hydrate", mock.Anything, fakedCompetitionID, mock.AnythingOfType("*scores.MemoryStore")).
 			Return(nil)
 
 		mockedEventBroker.
-			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.ScoreEngineStartedEvent")).Return().
-			On("Dispatch", fakedContestID, mock.AnythingOfType("domain.ScoreEngineStoppedEvent")).Return()
+			On("Dispatch", fakedCompetitionID, mock.AnythingOfType("domain.ScoreEngineStartedEvent")).Return().
+			On("Dispatch", fakedCompetitionID, mock.AnythingOfType("domain.ScoreEngineStoppedEvent")).Return()
 
 		mngr := scores.NewScoreEngineManager(mockedRepo, mockedStoreHydrator, mockedEventBroker, time.Hour)
 
 		wg := mngr.Run(ctx)
 
-		instanceID, err := mngr.StartScoreEngine(context.Background(), fakedContestID, time.Now().Add(time.Hour))
+		instanceID, err := mngr.StartScoreEngine(context.Background(), fakedCompetitionID, time.Now().Add(time.Hour))
 
 		require.NoError(t, err)
 		assert.NotEmpty(t, instanceID)
 
-		_, err = mngr.StartScoreEngine(context.Background(), fakedContestID, time.Now().Add(time.Hour))
+		_, err = mngr.StartScoreEngine(context.Background(), fakedCompetitionID, time.Now().Add(time.Hour))
 
 		require.ErrorIs(t, err, scores.ErrAlreadyStarted)
 
@@ -163,22 +163,22 @@ func TestScoreEngineManager(t *testing.T) {
 
 		require.NoError(t, err)
 		assert.Equal(t, instanceID, scoreEngineDescriptor.InstanceID)
-		assert.Equal(t, fakedContestID, scoreEngineDescriptor.ContestID)
+		assert.Equal(t, fakedCompetitionID, scoreEngineDescriptor.CompetitionID)
 
-		instances, err := mngr.ListScoreEnginesByContest(context.Background(), fakedContestID)
+		instances, err := mngr.ListScoreEnginesByCompetition(context.Background(), fakedCompetitionID)
 
 		require.NoError(t, err)
 		assert.ElementsMatch(t, []domain.ScoreEngineDescriptor{{
-			InstanceID: instanceID,
-			ContestID:  fakedContestID,
+			InstanceID:    instanceID,
+			CompetitionID: fakedCompetitionID,
 		}}, instances)
 
 		allInstances, err := mngr.ListScoreEngines(context.Background())
 
 		require.NoError(t, err)
 		assert.ElementsMatch(t, []domain.ScoreEngineDescriptor{{
-			InstanceID: instanceID,
-			ContestID:  fakedContestID,
+			InstanceID:    instanceID,
+			CompetitionID: fakedCompetitionID,
 		}}, allInstances)
 
 		err = mngr.StopScoreEngine(context.Background(), instanceID)
@@ -190,7 +190,7 @@ func TestScoreEngineManager(t *testing.T) {
 		require.ErrorIs(t, err, domain.ErrNotFound)
 		assert.Empty(t, scoreEngineDescriptor)
 
-		instances, err = mngr.ListScoreEnginesByContest(context.Background(), fakedContestID)
+		instances, err = mngr.ListScoreEnginesByCompetition(context.Background(), fakedCompetitionID)
 
 		require.NoError(t, err)
 		require.Len(t, instances, 0)
@@ -214,33 +214,33 @@ type repositoryMock struct {
 	mock.Mock
 }
 
-func (m *repositoryMock) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context, tx domain.Transaction, earliestStartTime, latestStartTime time.Time) ([]domain.Contest, error) {
+func (m *repositoryMock) GetCompetitionsCurrentlyRunningOrByStartTime(ctx context.Context, tx domain.Transaction, earliestStartTime, latestStartTime time.Time) ([]domain.Competition, error) {
 	args := m.Called(ctx, tx, earliestStartTime, latestStartTime)
-	return args.Get(0).([]domain.Contest), args.Error(1)
+	return args.Get(0).([]domain.Competition), args.Error(1)
 }
 
-func (m *repositoryMock) GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error) {
-	args := m.Called(ctx, tx, contestID)
-	return args.Get(0).(domain.Contest), args.Error(1)
+func (m *repositoryMock) GetCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (domain.Competition, error) {
+	args := m.Called(ctx, tx, competitionID)
+	return args.Get(0).(domain.Competition), args.Error(1)
 }
 
-func (m *repositoryMock) GetContendersByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Contender, error) {
-	args := m.Called(ctx, tx, contestID)
-	return args.Get(0).([]domain.Contender), args.Error(1)
+func (m *repositoryMock) GetCompetitorsByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Competitor, error) {
+	args := m.Called(ctx, tx, competitionID)
+	return args.Get(0).([]domain.Competitor), args.Error(1)
 }
 
-func (m *repositoryMock) GetProblemsByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Problem, error) {
-	args := m.Called(ctx, tx, contestID)
+func (m *repositoryMock) GetProblemsByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Problem, error) {
+	args := m.Called(ctx, tx, competitionID)
 	return args.Get(0).([]domain.Problem), args.Error(1)
 }
 
-func (m *repositoryMock) GetTicksByContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) ([]domain.Tick, error) {
-	args := m.Called(ctx, tx, contestID)
+func (m *repositoryMock) GetTicksByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Tick, error) {
+	args := m.Called(ctx, tx, competitionID)
 	return args.Get(0).([]domain.Tick), args.Error(1)
 }
 
-func (m *repositoryMock) StoreScore(ctx context.Context, tx domain.Transaction, score domain.Score) error {
-	args := m.Called(ctx, tx, score)
+func (m *repositoryMock) StoreResult(ctx context.Context, tx domain.Transaction, result domain.Result) error {
+	args := m.Called(ctx, tx, result)
 	return args.Error(0)
 }
 
@@ -248,8 +248,8 @@ type eventBrokerMock struct {
 	mock.Mock
 }
 
-func (m *eventBrokerMock) Dispatch(contestID domain.ContestID, event any) {
-	m.Called(contestID, event)
+func (m *eventBrokerMock) Dispatch(competitionID domain.CompetitionID, event any) {
+	m.Called(competitionID, event)
 }
 
 func (m *eventBrokerMock) Subscribe(filters []domain.EventFilter, bufferCapacity int) (domain.SubscriptionID, domain.EventReader) {
@@ -265,7 +265,7 @@ type engineStoreHydratorMock struct {
 	mock.Mock
 }
 
-func (m *engineStoreHydratorMock) Hydrate(ctx context.Context, contestID domain.ContestID, store scores.EngineStore) error {
-	args := m.Called(ctx, contestID, store)
+func (m *engineStoreHydratorMock) Hydrate(ctx context.Context, competitionID domain.CompetitionID, store scores.EngineStore) error {
+	args := m.Called(ctx, competitionID, store)
 	return args.Error(0)
 }

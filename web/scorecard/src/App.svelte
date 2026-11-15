@@ -5,7 +5,7 @@
   import Scorecard from "@/pages/Scorecard.svelte";
   import Start from "@/pages/Start.svelte";
   import { type ScorecardSession } from "@/types";
-  import { authenticateContender } from "@/utils/auth";
+  import { authenticateCompetitor } from "@/utils/auth";
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/toast/toast.js";
@@ -22,8 +22,8 @@
   let authenticating = $state(true);
 
   const session = writable<ScorecardSession>({
-    contenderId: NaN,
-    contestId: NaN,
+    competitorId: NaN,
+    competitionId: NaN,
     registrationCode: "",
     expiryTime: new Date(0),
   });
@@ -42,9 +42,13 @@
 
   const authenticate = async (code: string) => {
     try {
-      const contender = await authenticateContender(code, queryClient, session);
+      const competitor = await authenticateCompetitor(
+        code,
+        queryClient,
+        session,
+      );
 
-      if (!contender.entered) {
+      if (!competitor.entered) {
         navigate(`/${code}/register`);
       }
     } catch (e) {

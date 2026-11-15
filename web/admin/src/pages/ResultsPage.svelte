@@ -3,38 +3,40 @@
   import "@awesome.me/webawesome/dist/components/breadcrumb-item/breadcrumb-item.js";
   import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { getContestQuery } from "@climblive/lib/queries";
+  import { getCompetitionQuery } from "@climblive/lib/queries";
   import { navigate } from "svelte-routing";
   import ResultsList from "./ResultsList.svelte";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
   }
 
-  const { contestId }: Props = $props();
+  const { competitionId }: Props = $props();
 
-  const contestQuery = $derived(getContestQuery(contestId));
-  const contest = $derived(contestQuery.data);
+  const competitionQuery = $derived(getCompetitionQuery(competitionId));
+  const competition = $derived(competitionQuery.data);
 </script>
 
-{#if contest === undefined}
+{#if competition === undefined}
   <Loader />
 {:else}
   <wa-breadcrumb>
     <wa-breadcrumb-item
       onclick={() =>
-        navigate(`/admin/organizers/${contest.ownership.organizerId}/contests`)}
-      ><wa-icon name="home"></wa-icon></wa-breadcrumb-item
+        navigate(
+          `/admin/organizers/${competition.ownership.organizerId}/competitions`,
+        )}><wa-icon name="home"></wa-icon></wa-breadcrumb-item
     >
-    <wa-breadcrumb-item onclick={() => navigate(`/admin/contests/${contestId}`)}
-      >{contest.name}</wa-breadcrumb-item
+    <wa-breadcrumb-item
+      onclick={() => navigate(`/admin/competitions/${competitionId}`)}
+      >{competition.name}</wa-breadcrumb-item
     >
     <wa-breadcrumb-item>Results</wa-breadcrumb-item>
   </wa-breadcrumb>
 
   <h1>Results</h1>
 
-  <ResultsList {contestId} />
+  <ResultsList {competitionId} />
 {/if}
 
 <style>

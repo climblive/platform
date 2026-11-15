@@ -11,16 +11,16 @@ import (
 
 func TestCalculatePoints(t *testing.T) {
 	problem := scores.ProblemValue{
-		PointsTop:   100,
-		PointsZone1: 50,
-		PointsZone2: 75,
-		FlashBonus:  10,
+		PointsTop:   1000,
+		PointsZone1: 500,
+		PointsZone2: 750,
+		FlashBonus:  100,
 	}
 
 	tests := []struct {
 		name     string
 		tick     scores.Tick
-		expected float64
+		expected domain.Tenths
 	}{
 		{
 			name:     "NoAttempts",
@@ -46,7 +46,7 @@ func TestCalculatePoints(t *testing.T) {
 				Zone2:         true,
 				AttemptsZone2: 1,
 			},
-			expected: 110,
+			expected: 1100,
 		},
 		{
 			name: "TopWithSeveralAttempts",
@@ -58,7 +58,7 @@ func TestCalculatePoints(t *testing.T) {
 				Zone2:         true,
 				AttemptsZone2: 999,
 			},
-			expected: 100,
+			expected: 1000,
 		},
 		{
 			name: "Zone1WithSeveralAttempts",
@@ -68,7 +68,7 @@ func TestCalculatePoints(t *testing.T) {
 				AttemptsZone1: 999,
 				AttemptsZone2: 999,
 			},
-			expected: 50,
+			expected: 500,
 		},
 		{
 			name: "Zone2WithSeveralAttempts",
@@ -79,7 +79,7 @@ func TestCalculatePoints(t *testing.T) {
 				Zone2:         true,
 				AttemptsZone2: 999,
 			},
-			expected: 75,
+			expected: 750,
 		},
 	}
 
@@ -92,10 +92,10 @@ func TestCalculatePoints(t *testing.T) {
 
 func TestCalculatePoints_HighestValueFeatureWins(t *testing.T) {
 	problem := scores.ProblemValue{
-		PointsTop:   100,
-		PointsZone1: 50,
-		PointsZone2: 75,
-		FlashBonus:  10,
+		PointsTop:   1000,
+		PointsZone1: 500,
+		PointsZone2: 750,
+		FlashBonus:  100,
 	}
 
 	t.Run("Zone1WinsOverZone2", func(t *testing.T) {
@@ -107,9 +107,9 @@ func TestCalculatePoints_HighestValueFeatureWins(t *testing.T) {
 			AttemptsZone1: 1,
 		}
 
-		rules := scores.Rules{PointDeduction: 10}
+		rules := scores.Rules{PointDeduction: 100}
 
-		assert.Equal(t, 50.0, scores.CalculatePoints(problem, tick, rules))
+		assert.Equal(t, domain.Tenths(500), scores.CalculatePoints(problem, tick, rules))
 	})
 
 	t.Run("Zone2WinsOverTop", func(t *testing.T) {
@@ -122,18 +122,18 @@ func TestCalculatePoints_HighestValueFeatureWins(t *testing.T) {
 			AttemptsZone1: 1,
 		}
 
-		rules := scores.Rules{PointDeduction: 10}
+		rules := scores.Rules{PointDeduction: 100}
 
-		assert.Equal(t, 75.0, scores.CalculatePoints(problem, tick, rules))
+		assert.Equal(t, domain.Tenths(750), scores.CalculatePoints(problem, tick, rules))
 	})
 }
 
 func TestCalculatePoints_PointDeduction(t *testing.T) {
 	value := scores.ProblemValue{
-		PointsTop:   100,
-		PointsZone1: 50,
-		PointsZone2: 75,
-		FlashBonus:  10,
+		PointsTop:   1000,
+		PointsZone1: 500,
+		PointsZone2: 750,
+		FlashBonus:  100,
 	}
 
 	t.Run("NoAscent", func(t *testing.T) {
@@ -143,9 +143,9 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 			AttemptsZone1: 3,
 		}
 
-		rules := scores.Rules{PointDeduction: 10}
+		rules := scores.Rules{PointDeduction: 100}
 
-		assert.Equal(t, 0.0, scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(0), scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("Flash", func(t *testing.T) {
@@ -158,9 +158,9 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 			AttemptsZone1: 1,
 		}
 
-		rules := scores.Rules{PointDeduction: 1}
+		rules := scores.Rules{PointDeduction: 10}
 
-		assert.Equal(t, 110.0, scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(1100), scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("Zone1", func(t *testing.T) {
@@ -171,9 +171,9 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 			AttemptsZone1: 2,
 		}
 
-		rules := scores.Rules{PointDeduction: 0.1}
+		rules := scores.Rules{PointDeduction: 1}
 
-		assert.Equal(t, 49.9, scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(499), scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("Zone2", func(t *testing.T) {
@@ -185,9 +185,9 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 			AttemptsZone1: 2,
 		}
 
-		rules := scores.Rules{PointDeduction: 0.1}
+		rules := scores.Rules{PointDeduction: 1}
 
-		assert.Equal(t, 74.8, scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(748), scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("Top", func(t *testing.T) {
@@ -200,9 +200,9 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 			AttemptsZone1: 2,
 		}
 
-		rules := scores.Rules{PointDeduction: 0.1}
+		rules := scores.Rules{PointDeduction: 1}
 
-		assert.Equal(t, 99.6, scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(996), scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("FloorAtZero", func(t *testing.T) {
@@ -215,18 +215,28 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 			AttemptsZone1: 999,
 		}
 
-		rules := scores.Rules{PointDeduction: 2_147_483_647}
+		rules := scores.Rules{PointDeduction: 21_474_836_470}
 
-		assert.Equal(t, 0.0, scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(0), scores.CalculatePoints(value, tick, rules))
 	})
+}
+
+func TestCalculatePoints_MaximumTopAndFlashBonus(t *testing.T) {
+	value := scores.ProblemValue{
+		PointsTop:  21_474_836_470,
+		FlashBonus: 21_474_836_470,
+	}
+	tick := scores.Tick{Top: true, AttemptsTop: 1}
+
+	assert.Equal(t, domain.Tenths(42_949_672_940), scores.CalculatePoints(value, tick, scores.Rules{}))
 }
 
 func TestCalculatePoints_MaxAttempts(t *testing.T) {
 	value := scores.ProblemValue{
-		PointsTop:   100,
-		PointsZone1: 50,
-		PointsZone2: 75,
-		FlashBonus:  10,
+		PointsTop:   1000,
+		PointsZone1: 500,
+		PointsZone2: 750,
+		FlashBonus:  100,
 	}
 
 	t.Run("Flash", func(t *testing.T) {
@@ -241,7 +251,7 @@ func TestCalculatePoints_MaxAttempts(t *testing.T) {
 
 		rules := scores.Rules{MaxAttempts: 1}
 
-		assert.Equal(t, 110.0, scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(1100), scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("AtAttemptLimit", func(t *testing.T) {
@@ -255,7 +265,7 @@ func TestCalculatePoints_MaxAttempts(t *testing.T) {
 		}
 		rules := scores.Rules{MaxAttempts: 10}
 
-		assert.Equal(t, 100.0, scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(1000), scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("AboveAttemptLimit", func(t *testing.T) {
@@ -269,7 +279,7 @@ func TestCalculatePoints_MaxAttempts(t *testing.T) {
 		}
 		rules := scores.Rules{MaxAttempts: 10}
 
-		assert.Equal(t, 0.0, scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(0), scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("MaxAttemptsAffectsOnlyReachedFeatures", func(t *testing.T) {
@@ -281,17 +291,17 @@ func TestCalculatePoints_MaxAttempts(t *testing.T) {
 		}
 		rules := scores.Rules{MaxAttempts: 10}
 
-		assert.Equal(t, 50.0, scores.CalculatePoints(value, tick, rules))
+		assert.Equal(t, domain.Tenths(500), scores.CalculatePoints(value, tick, rules))
 	})
 }
 
 func TestTick(t *testing.T) {
-	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+	fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 	makeFakes := func() (scores.Tick, scores.Tick, scores.Tick, scores.Tick, scores.Tick) {
 		none := scores.Tick{
-			ContenderID:   fakedContenderID,
+			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Zone1:         false,
 			Zone2:         false,
@@ -302,7 +312,7 @@ func TestTick(t *testing.T) {
 		}
 
 		zone1 := scores.Tick{
-			ContenderID:   fakedContenderID,
+			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Zone1:         true,
 			Zone2:         false,
@@ -313,7 +323,7 @@ func TestTick(t *testing.T) {
 		}
 
 		zone2 := scores.Tick{
-			ContenderID:   fakedContenderID,
+			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Zone1:         true,
 			Zone2:         true,
@@ -324,7 +334,7 @@ func TestTick(t *testing.T) {
 		}
 
 		top := scores.Tick{
-			ContenderID:   fakedContenderID,
+			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Zone1:         true,
 			Zone2:         true,
@@ -335,7 +345,7 @@ func TestTick(t *testing.T) {
 		}
 
 		flash := scores.Tick{
-			ContenderID:   fakedContenderID,
+			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Zone1:         true,
 			Zone2:         true,
@@ -360,7 +370,7 @@ func TestTick(t *testing.T) {
 				name: "None",
 				tick: none,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         false,
@@ -374,7 +384,7 @@ func TestTick(t *testing.T) {
 				name: "Zone1",
 				tick: zone1,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         false,
@@ -388,7 +398,7 @@ func TestTick(t *testing.T) {
 				name: "Zone2",
 				tick: zone2,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         false,
@@ -402,7 +412,7 @@ func TestTick(t *testing.T) {
 				name: "Top",
 				tick: top,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         false,
@@ -416,7 +426,7 @@ func TestTick(t *testing.T) {
 				name: "Flash",
 				tick: flash,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         false,
@@ -447,7 +457,7 @@ func TestTick(t *testing.T) {
 				name: "None",
 				tick: none,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -461,7 +471,7 @@ func TestTick(t *testing.T) {
 				name: "Zone1",
 				tick: zone1,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -475,7 +485,7 @@ func TestTick(t *testing.T) {
 				name: "Zone2",
 				tick: zone2,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -489,7 +499,7 @@ func TestTick(t *testing.T) {
 				name: "Top",
 				tick: top,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -503,7 +513,7 @@ func TestTick(t *testing.T) {
 				name: "Flash",
 				tick: flash,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -546,7 +556,7 @@ func TestTick(t *testing.T) {
 				name: "None",
 				tick: none,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -560,7 +570,7 @@ func TestTick(t *testing.T) {
 				name: "Zone1",
 				tick: zone1,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -574,7 +584,7 @@ func TestTick(t *testing.T) {
 				name: "Zone2",
 				tick: zone2,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -588,7 +598,7 @@ func TestTick(t *testing.T) {
 				name: "Top",
 				tick: top,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -602,7 +612,7 @@ func TestTick(t *testing.T) {
 				name: "Flash",
 				tick: flash,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -633,7 +643,7 @@ func TestTick(t *testing.T) {
 				name: "None",
 				tick: none,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -647,7 +657,7 @@ func TestTick(t *testing.T) {
 				name: "Zone1",
 				tick: zone1,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -661,7 +671,7 @@ func TestTick(t *testing.T) {
 				name: "Zone2",
 				tick: zone2,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -675,7 +685,7 @@ func TestTick(t *testing.T) {
 				name: "Top",
 				tick: top,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -689,7 +699,7 @@ func TestTick(t *testing.T) {
 				name: "Flash",
 				tick: flash,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,

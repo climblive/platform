@@ -1,42 +1,42 @@
 import { scorecardSessionSchema, type ScorecardSession } from "@/types";
-import { ApiClient, ContenderCredentialsProvider } from "@climblive/lib";
-import type { Contender } from "@climblive/lib/models";
+import { ApiClient, CompetitorCredentialsProvider } from "@climblive/lib";
+import type { Competitor } from "@climblive/lib/models";
 import { z } from "@climblive/lib/utils";
 import type { QueryClient } from "@tanstack/svelte-query";
 import { add } from "date-fns";
 import type { Writable } from "svelte/store";
 
-export const authenticateContender = async (
+export const authenticateCompetitor = async (
   code: string,
   queryClient: QueryClient,
   session: Writable<ScorecardSession>,
-): Promise<Contender> => {
-  const contender = await queryClient.fetchQuery({
-    queryKey: ["contender", { code }],
-    queryFn: async () => ApiClient.getInstance().findContender(code),
+): Promise<Competitor> => {
+  const competitor = await queryClient.fetchQuery({
+    queryKey: ["competitor", { code }],
+    queryFn: async () => ApiClient.getInstance().findCompetitor(code),
   });
 
-  const contest = await queryClient.fetchQuery({
-    queryKey: ["contest", { id: contender.contestId }],
+  const competition = await queryClient.fetchQuery({
+    queryKey: ["competition", { id: competitor.competitionId }],
     queryFn: async () =>
-      ApiClient.getInstance().getContest(contender.contestId),
+      ApiClient.getInstance().getCompetition(competitor.competitionId),
   });
 
-  const provider = new ContenderCredentialsProvider(code);
+  const provider = new CompetitorCredentialsProvider(code);
   ApiClient.getInstance().setCredentialsProvider(provider);
 
   session.update((current) => {
     const now = new Date();
-    const contestEndTime = contest.timeEnd || now;
+    const competitionEndTime = competition.timeEnd || now;
     const baseTime = new Date(
-      Math.max(contestEndTime.getTime(), now.getTime()),
+      Math.max(competitionEndTime.getTime(), now.getTime()),
     );
     const expiryTime = add(baseTime, { hours: 12 });
 
     const updatedSession: ScorecardSession = {
       ...current,
-      contenderId: contender.id,
-      contestId: contender.contestId,
+      competitorId: competitor.id,
+      competitionId: competitor.competitionId,
       registrationCode: code,
       expiryTime,
     };
@@ -53,11 +53,11 @@ export const authenticateContender = async (
   });
 
   queryClient.setQueryData(
-    ["contender", { id: contender.id }],
-    () => contender,
+    ["competitor", { id: competitor.id }],
+    () => competitor,
   );
 
-  return contender;
+  return competitor;
 };
 
 export const readStoredSessions = (): ScorecardSession[] => {

@@ -17,29 +17,29 @@ type ScoreEngine interface {
 	Stop()
 
 	HandleRulesUpdated(event domain.RulesUpdatedEvent) iter.Seq[Effect]
-	HandleContenderEntered(event domain.ContenderEnteredEvent) iter.Seq[Effect]
-	HandleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent) iter.Seq[Effect]
-	HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent) iter.Seq[Effect]
-	HandleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent) iter.Seq[Effect]
-	HandleContenderDisqualified(event domain.ContenderDisqualifiedEvent) iter.Seq[Effect]
-	HandleContenderRequalified(event domain.ContenderRequalifiedEvent) iter.Seq[Effect]
+	HandleCompetitorEntered(event domain.CompetitorEnteredEvent) iter.Seq[Effect]
+	HandleCompetitorSwitchedCategory(event domain.CompetitorSwitchedCategoryEvent) iter.Seq[Effect]
+	HandleCompetitorWithdrewFromFinals(event domain.CompetitorWithdrewFromFinalsEvent) iter.Seq[Effect]
+	HandleCompetitorReenteredFinals(event domain.CompetitorReenteredFinalsEvent) iter.Seq[Effect]
+	HandleCompetitorDisqualified(event domain.CompetitorDisqualifiedEvent) iter.Seq[Effect]
+	HandleCompetitorRequalified(event domain.CompetitorRequalifiedEvent) iter.Seq[Effect]
 	HandleAscentRegistered(event domain.AscentRegisteredEvent) iter.Seq[Effect]
 	HandleAscentDeregistered(event domain.AscentDeregisteredEvent) iter.Seq[Effect]
 	HandleProblemAdded(event domain.ProblemAddedEvent) iter.Seq[Effect]
 	HandleProblemUpdated(event domain.ProblemUpdatedEvent) iter.Seq[Effect]
 
-	RankCompClass(compClassID domain.CompClassID)
-	ScoreContender(contenderID domain.ContenderID) iter.Seq[Effect]
-	CalculatePointValues(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect]
+	RankCategory(categoryID domain.CategoryID)
+	ScoreCompetitor(competitorID domain.CompetitorID) iter.Seq[Effect]
+	CalculatePointValues(categoryID domain.CategoryID, problemID domain.ProblemID) iter.Seq[Effect]
 
-	GetDirtyScores() []domain.Score
+	GetDirtyResults() []domain.Result
 	GetDirtyPointValues() []domain.PointValue
 }
 
 type ScoreEngineDriver struct {
-	logger     *slog.Logger
-	contestID  domain.ContestID
-	instanceID domain.ScoreEngineInstanceID
+	logger        *slog.Logger
+	competitionID domain.CompetitionID
+	instanceID    domain.ScoreEngineInstanceID
 
 	eventBroker   domain.EventBroker
 	pendingEvents []domain.EventEnvelope
@@ -52,17 +52,17 @@ type ScoreEngineDriver struct {
 }
 
 func NewScoreEngineDriver(
-	contestID domain.ContestID,
+	competitionID domain.CompetitionID,
 	instanceID domain.ScoreEngineInstanceID,
 	eventBroker domain.EventBroker,
 ) *ScoreEngineDriver {
 	logger := slog.New(slog.Default().Handler()).
-		With("contest_id", contestID).
+		With("competition_id", competitionID).
 		With("instance_id", instanceID)
 
 	return &ScoreEngineDriver{
 		logger:        logger,
-		contestID:     contestID,
+		competitionID: competitionID,
 		instanceID:    instanceID,
 		eventBroker:   eventBroker,
 		pendingEvents: make([]domain.EventEnvelope, 0),
@@ -127,14 +127,14 @@ func (d *ScoreEngineDriver) run(
 	engineReceiver chan ScoreEngine,
 ) {
 	filter := domain.NewEventFilter(
-		d.contestID,
+		d.competitionID,
 		0,
-		"CONTENDER_ENTERED",
-		"CONTENDER_SWITCHED_CLASS",
-		"CONTENDER_WITHDREW_FROM_FINALS",
-		"CONTENDER_REENTERED_FINALS",
-		"CONTENDER_DISQUALIFIED",
-		"CONTENDER_REQUALIFIED",
+		"COMPETITOR_ENTERED",
+		"COMPETITOR_SWITCHED_CATEGORY",
+		"COMPETITOR_WITHDREW_FROM_FINALS",
+		"COMPETITOR_REENTERED_FINALS",
+		"COMPETITOR_DISQUALIFIED",
+		"COMPETITOR_REQUALIFIED",
 		"ASCENT_REGISTERED",
 		"ASCENT_DEREGISTERED",
 		"PROBLEM_ADDED",
@@ -149,11 +149,11 @@ func (d *ScoreEngineDriver) run(
 
 	close(ready)
 
-	d.eventBroker.Dispatch(d.contestID, domain.ScoreEngineStartedEvent{
+	d.eventBroker.Dispatch(d.competitionID, domain.ScoreEngineStartedEvent{
 		InstanceID: d.instanceID,
 	})
 
-	defer d.eventBroker.Dispatch(d.contestID, domain.ScoreEngineStoppedEvent{
+	defer d.eventBroker.Dispatch(d.competitionID, domain.ScoreEngineStoppedEvent{
 		InstanceID: d.instanceID,
 	})
 
@@ -247,18 +247,18 @@ func (d *ScoreEngineDriver) handleEvent(event domain.EventEnvelope) {
 	switch ev := event.Data.(type) {
 	case domain.RulesUpdatedEvent:
 		effects = d.engine.HandleRulesUpdated(ev)
-	case domain.ContenderEnteredEvent:
-		effects = d.engine.HandleContenderEntered(ev)
-	case domain.ContenderSwitchedClassEvent:
-		effects = d.engine.HandleContenderSwitchedClass(ev)
-	case domain.ContenderWithdrewFromFinalsEvent:
-		effects = d.engine.HandleContenderWithdrewFromFinals(ev)
-	case domain.ContenderReenteredFinalsEvent:
-		effects = d.engine.HandleContenderReenteredFinals(ev)
-	case domain.ContenderDisqualifiedEvent:
-		effects = d.engine.HandleContenderDisqualified(ev)
-	case domain.ContenderRequalifiedEvent:
-		effects = d.engine.HandleContenderRequalified(ev)
+	case domain.CompetitorEnteredEvent:
+		effects = d.engine.HandleCompetitorEntered(ev)
+	case domain.CompetitorSwitchedCategoryEvent:
+		effects = d.engine.HandleCompetitorSwitchedCategory(ev)
+	case domain.CompetitorWithdrewFromFinalsEvent:
+		effects = d.engine.HandleCompetitorWithdrewFromFinals(ev)
+	case domain.CompetitorReenteredFinalsEvent:
+		effects = d.engine.HandleCompetitorReenteredFinals(ev)
+	case domain.CompetitorDisqualifiedEvent:
+		effects = d.engine.HandleCompetitorDisqualified(ev)
+	case domain.CompetitorRequalifiedEvent:
+		effects = d.engine.HandleCompetitorRequalified(ev)
 	case domain.AscentRegisteredEvent:
 		effects = d.engine.HandleAscentRegistered(ev)
 	case domain.AscentDeregisteredEvent:
@@ -276,23 +276,23 @@ func (d *ScoreEngineDriver) handleEvent(event domain.EventEnvelope) {
 func (d *ScoreEngineDriver) publishDirtyUpdates() int {
 	publishCount := 0
 
-	var batch []domain.ContenderScoreUpdatedEvent
+	var batch []domain.CompetitorResultUpdatedEvent
 
-	for score := range slices.Values(d.engine.GetDirtyScores()) {
-		d.eventBroker.Dispatch(d.contestID, domain.ContenderScoreUpdatedEvent(score))
+	for result := range slices.Values(d.engine.GetDirtyResults()) {
+		d.eventBroker.Dispatch(d.competitionID, domain.CompetitorResultUpdatedEvent(result))
 		publishCount++
 
-		batch = append(batch, domain.ContenderScoreUpdatedEvent(score))
+		batch = append(batch, domain.CompetitorResultUpdatedEvent(result))
 	}
 
 	for pointValue := range slices.Values(d.engine.GetDirtyPointValues()) {
-		d.eventBroker.Dispatch(d.contestID, domain.PointValueUpdatedEvent(pointValue))
+		d.eventBroker.Dispatch(d.competitionID, domain.PointValueUpdatedEvent(pointValue))
 
 		publishCount++
 	}
 
 	if len(batch) > 0 {
-		d.eventBroker.Dispatch(d.contestID, batch)
+		d.eventBroker.Dispatch(d.competitionID, batch)
 	}
 
 	return publishCount

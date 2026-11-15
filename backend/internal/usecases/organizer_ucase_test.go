@@ -97,7 +97,7 @@ func TestCreateOrganizer(t *testing.T) {
 		mockedRepo.AssertExpectations(t)
 	})
 
-	t.Run("ContenderCannotCreateOrganizer", func(t *testing.T) {
+	t.Run("CompetitorCannotCreateOrganizer", func(t *testing.T) {
 		mockedRepo := new(repositoryMock)
 		mockedAuthorizer := new(authorizerMock)
 

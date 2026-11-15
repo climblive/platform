@@ -3,6 +3,6 @@ import { type ScoreEngineDescriptor } from "./generated";
 
 export const scoreEngineDescriptorSchema: z.ZodType<ScoreEngineDescriptor> =
   z.object({
-    contestId: z.number(),
+    competitionId: z.number(),
     instanceId: z.string().uuid(),
   });

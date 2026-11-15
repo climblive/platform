@@ -1,6 +1,6 @@
-export * from "./compClass";
-export * from "./contender";
-export * from "./contest";
+export * from "./category";
+export * from "./competitor";
+export * from "./competition";
 export * from "./event";
 export * from "./generated";
 export * from "./health";
@@ -9,6 +9,7 @@ export * from "./pointValue";
 export * from "./problem";
 export * from "./rest";
 export * from "./score";
+export * from "./result";
 export * from "./scoreboard";
 export * from "./scoreEngine";
 export * from "./tick";

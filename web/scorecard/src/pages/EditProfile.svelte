@@ -6,13 +6,13 @@
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { ContestStateProvider } from "@climblive/lib/components";
-  import type { ContenderPatch } from "@climblive/lib/models";
+  import { CompetitionStateProvider } from "@climblive/lib/components";
+  import type { CompetitorPatch } from "@climblive/lib/models";
   import {
-    getContenderQuery,
-    getContestQuery,
-    patchContenderMutation,
-    scrubContenderMutation,
+    getCompetitorQuery,
+    getCompetitionQuery,
+    patchCompetitorMutation,
+    scrubCompetitorMutation,
   } from "@climblive/lib/queries";
   import { SyncedTime, toastUnexpectedError } from "@climblive/lib/utils";
   import { formatDistance, isBefore } from "date-fns";
@@ -23,10 +23,16 @@
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
-  const contenderQuery = $derived(getContenderQuery($session.contenderId));
-  const contestQuery = $derived(getContestQuery($session.contestId));
-  const patchContender = $derived(patchContenderMutation($session.contenderId));
-  const scrubContender = $derived(scrubContenderMutation($session.contenderId));
+  const competitorQuery = $derived(getCompetitorQuery($session.competitorId));
+  const competitionQuery = $derived(
+    getCompetitionQuery($session.competitionId),
+  );
+  const patchCompetitor = $derived(
+    patchCompetitorMutation($session.competitorId),
+  );
+  const scrubCompetitor = $derived(
+    scrubCompetitorMutation($session.competitorId),
+  );
   const time = new SyncedTime(60_000);
 
   onMount(() => {
@@ -35,35 +41,35 @@
     return () => time.stop();
   });
 
-  let contender = $derived(contenderQuery.data);
-  let contest = $derived(contestQuery.data);
+  let competitor = $derived(competitorQuery.data);
+  let competition = $derived(competitionQuery.data);
 
   const retentionDuration = $derived.by(() => {
-    if (!contender?.scrubBefore) {
+    if (!competitor?.scrubBefore) {
       return undefined;
     }
 
     const now = time.current;
 
-    if (isBefore(contender.scrubBefore, now)) {
+    if (isBefore(competitor.scrubBefore, now)) {
       return undefined;
     }
 
-    return formatDistance(contender.scrubBefore, now);
+    return formatDistance(competitor.scrubBefore, now);
   });
 
   let scrubDialog: WaDialog | undefined = $state();
 
   const gotoScorecard = () => {
-    navigate(`/${contender?.registrationCode}`);
+    navigate(`/${competitor?.registrationCode}`);
   };
 
-  const handleSubmit = (form: ContenderPatch) => {
-    if (!contender || patchContender.isPending) {
+  const handleSubmit = (form: CompetitorPatch) => {
+    if (!competitor || patchCompetitor.isPending) {
       return;
     }
 
-    patchContender.mutate(
+    patchCompetitor.mutate(
       {
         ...form,
       },
@@ -76,37 +82,37 @@
   };
 
   const handleScrub = () => {
-    scrubContender.mutate(undefined, {
+    scrubCompetitor.mutate(undefined, {
       onSuccess: gotoScorecard,
       onError: () => toastUnexpectedError("Failed to remove your name."),
     });
   };
 </script>
 
-{#if !contender || !contest}
+{#if !competitor || !competition}
   <Loading />
 {:else}
-  <ContestStateProvider
-    contestId={contest.id}
-    compClassId={contender.compClassId}
+  <CompetitionStateProvider
+    competitionId={competition.id}
+    categoryId={competitor.categoryId}
   >
-    {#snippet children({ contestState })}
+    {#snippet children({ competitionState })}
       {@const disabled =
-        contender.scrubbedAt !== undefined || contestState === "ENDED"}
+        competitor.scrubbedAt !== undefined || competitionState === "ENDED"}
 
       <RegistrationForm
         submit={handleSubmit}
         data={{
-          name: contender.name,
-          compClassId: contender.compClassId,
-          withdrawnFromFinals: contender.withdrawnFromFinals,
+          name: competitor.name,
+          categoryId: competitor.categoryId,
+          withdrawnFromFinals: competitor.withdrawnFromFinals,
         }}
         callout={profileCallout}
-        {contestState}
+        {competitionState}
         {disabled}
       >
         <div class="controls">
-          {#if !!contender.name}
+          {#if !!competitor.name}
             <wa-button
               class="scrub-button"
               size="s"
@@ -133,7 +139,7 @@
           <wa-button
             size="s"
             type="submit"
-            loading={patchContender.isPending}
+            loading={patchCompetitor.isPending}
             variant="neutral"
             appearance="accent"
             {disabled}
@@ -143,7 +149,7 @@
       </RegistrationForm>
 
       {#snippet profileCallout()}
-        {#if !contender?.scrubbedAt}
+        {#if !competitor?.scrubbedAt}
           <wa-callout variant="neutral" size="s">
             <wa-icon slot="icon" name="circle-info"></wa-icon>
             {#if retentionDuration}
@@ -156,7 +162,7 @@
         {/if}
       {/snippet}
     {/snippet}
-  </ContestStateProvider>
+  </CompetitionStateProvider>
 
   <wa-dialog bind:this={scrubDialog} label="Remove your name">
     Your name will be <strong>permanently</strong> removed and your results will
@@ -178,7 +184,7 @@
       size="s"
       slot="footer"
       variant="danger"
-      loading={scrubContender.isPending}
+      loading={scrubCompetitor.isPending}
       onclick={handleScrub}
     >
       <wa-icon slot="start" name="user-slash"></wa-icon>

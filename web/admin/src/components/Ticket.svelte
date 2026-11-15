@@ -3,17 +3,17 @@
   import QrCode from "./QrCode.svelte";
 
   type Props = {
-    contestName: string;
+    competitionName: string;
     registrationCode: string;
     ticketNumber: number;
   };
 
-  let { contestName, registrationCode, ticketNumber }: Props = $props();
+  let { competitionName, registrationCode, ticketNumber }: Props = $props();
 </script>
 
 <section>
   <div class="left">
-    <h1>{contestName}</h1>
+    <h1>{competitionName}</h1>
     <span class="link">
       Scan the QR code or register at {location.protocol}//{location.host}
       using your <em>secret code:</em></span

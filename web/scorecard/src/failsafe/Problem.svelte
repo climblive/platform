@@ -7,11 +7,11 @@
   type Props = {
     problem: Problem;
     tick?: Tick;
-    contenderId: number;
+    competitorId: number;
     enableAttempts: boolean;
   };
 
-  const { problem, tick, contenderId, enableAttempts }: Props = $props();
+  const { problem, tick, competitorId, enableAttempts }: Props = $props();
 
   const tickType = $derived.by(() => {
     switch (true) {
@@ -52,9 +52,9 @@
   </span>
   <div class="editor">
     {#if !enableAttempts}
-      <SimpleTickEditor {problem} {tick} {contenderId} />
+      <SimpleTickEditor {problem} {tick} {competitorId} />
     {:else}
-      <TickEditor {problem} {tick} {contenderId} />
+      <TickEditor {problem} {tick} {competitorId} />
     {/if}
   </div>
 </section>

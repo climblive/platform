@@ -1,24 +1,24 @@
 <script lang="ts">
-  import { ApiClient, ContenderCredentialsProvider } from "@climblive/lib";
-  import type { Contender } from "@climblive/lib/models";
+  import { ApiClient, CompetitorCredentialsProvider } from "@climblive/lib";
+  import type { Competitor } from "@climblive/lib/models";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { onMount } from "svelte";
   import Scorecard from "./Scorecard.svelte";
 
   let code = $state<string>();
-  let contender = $state<Contender>();
+  let competitor = $state<Competitor>();
 
   let form: HTMLFormElement | undefined = $state();
 
   const queryClient = useQueryClient();
 
   const authenticate = async (code: string) => {
-    const contender = await ApiClient.getInstance().findContender(code);
+    const competitor = await ApiClient.getInstance().findCompetitor(code);
 
-    const provider = new ContenderCredentialsProvider(code);
+    const provider = new CompetitorCredentialsProvider(code);
     ApiClient.getInstance().setCredentialsProvider(provider);
 
-    return contender;
+    return competitor;
   };
 
   const handleEnter = async (event: SubmitEvent) => {
@@ -37,11 +37,11 @@
   };
 
   const tryEnter = async (code: string) => {
-    contender = await authenticate(code);
+    competitor = await authenticate(code);
 
     queryClient.setQueryData(
-      ["contender", { id: contender.id }],
-      () => contender,
+      ["competitor", { id: competitor.id }],
+      () => competitor,
     );
 
     history.replaceState({}, "", `/failsafe/${code}`);
@@ -63,8 +63,11 @@
   });
 </script>
 
-{#if contender}
-  <Scorecard contestId={contender.contestId} contenderId={contender.id} />
+{#if competitor}
+  <Scorecard
+    competitionId={competitor.competitionId}
+    competitorId={competitor.id}
+  />
 {:else}
   <h2>Welcome!</h2>
   <form bind:this={form} onsubmit={handleEnter}>

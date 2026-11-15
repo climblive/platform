@@ -1,5 +1,5 @@
-export { default as ContenderName } from "./ContenderName.svelte";
-export { default as ContestStateProvider } from "./ContestStateProvider.svelte";
+export { default as CompetitorName } from "./CompetitorName.svelte";
+export { default as CompetitionStateProvider } from "./CompetitionStateProvider.svelte";
 export { default as EmptyState } from "./EmptyState.svelte";
 export { default as ErrorBoundary } from "./ErrorBoundary.svelte";
 export { default as EventsProvider, useEvents } from "./EventsProvider.svelte";

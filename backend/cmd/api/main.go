@@ -155,30 +155,30 @@ func main() {
 
 	authorizer := authorizer.NewAuthorizer(database, jwtDecoder)
 	eventBroker := events.NewBroker()
-	scoreKeeper := scores.NewScoreKeeper(eventBroker, database)
+	resultKeeper := scores.NewResultKeeper(eventBroker, database)
 	pointValueKeeper := scores.NewPointValueKeeper(eventBroker, scoreEngineMaxLifetime+time.Hour)
 	scoreEngineStoreHydrator := &scores.StandardEngineStoreHydrator{Repo: database}
 
 	scoreEngineManager := scores.NewScoreEngineManager(database, scoreEngineStoreHydrator, eventBroker, scoreEngineMaxLifetime)
 
-	contenderUseCase := usecases.ContenderUseCase{
+	competitorUseCase := usecases.CompetitorUseCase{
 		Repo:                      database,
 		Authorizer:                authorizer,
 		EventBroker:               eventBroker,
-		ScoreKeeper:               scoreKeeper,
+		ResultKeeper:              resultKeeper,
 		PointValueKeeper:          pointValueKeeper,
 		RegistrationCodeGenerator: &registrationCodeGenerator{}}
 
 	scrubInterval := time.Hour
-	scrubberRunner := scrubber.New(&contenderUseCase, scrubInterval)
+	scrubberRunner := scrubber.New(&competitorUseCase, scrubInterval)
 
 	barriers = append(barriers,
-		scoreKeeper.Run(ctx, scores.WithPanicRecovery()),
+		resultKeeper.Run(ctx, scores.WithPanicRecovery()),
 		scoreEngineManager.Run(ctx, scores.WithPanicRecovery()),
 		scrubberRunner.Run(ctx, scrubber.WithPanicRecovery()),
 		pointValueKeeper.Run(ctx, scores.WithPanicRecovery()))
 
-	apiMux := setupMux(database, authorizer, eventBroker, scoreKeeper, &scoreEngineManager, scrubberRunner, pointValueKeeper)
+	apiMux := setupMux(database, authorizer, eventBroker, resultKeeper, &scoreEngineManager, scrubberRunner, pointValueKeeper)
 
 	appMux := http.NewServeMux()
 	appMux.Handle("/api/", http.StripPrefix("/api", noCacheHandler(apiMux)))
@@ -276,29 +276,29 @@ func setupMux(
 	repo *repository.Database,
 	authorizer *authorizer.Authorizer,
 	eventBroker domain.EventBroker,
-	scoreKeeper *scores.Keeper,
+	resultKeeper *scores.Keeper,
 	scoreEngineManager *scores.ScoreEngineManager,
 	scrubber *scrubber.Scrubber,
 	pointValueKeeper *scores.PointValueKeeper,
 ) *rest.Mux {
-	contenderUseCase := usecases.ContenderUseCase{
+	competitorUseCase := usecases.CompetitorUseCase{
 		Repo:                      repo,
 		Authorizer:                authorizer,
 		EventBroker:               eventBroker,
-		ScoreKeeper:               scoreKeeper,
+		ResultKeeper:              resultKeeper,
 		PointValueKeeper:          pointValueKeeper,
 		RegistrationCodeGenerator: &registrationCodeGenerator{},
 	}
 
-	contestUseCase := usecases.ContestUseCase{
+	competitionUseCase := usecases.CompetitionUseCase{
 		Authorizer:         authorizer,
 		Repo:               repo,
-		ScoreKeeper:        scoreKeeper,
+		ResultKeeper:       resultKeeper,
 		ScoreEngineManager: scoreEngineManager,
 		EventBroker:        eventBroker,
 	}
 
-	compClassUseCase := usecases.CompClassUseCase{
+	categoryUseCase := usecases.CategoryUseCase{
 		Authorizer: authorizer,
 		Repo:       repo,
 	}
@@ -340,7 +340,7 @@ func setupMux(
 
 	healthUseCase := usecases.HealthUseCase{
 		ScoreEngineManager: scoreEngineManager,
-		ScoreKeeper:        scoreKeeper,
+		ResultKeeper:       resultKeeper,
 		Scrubber:           scrubber,
 		PointValueKeeper:   pointValueKeeper,
 	}
@@ -353,9 +353,9 @@ func setupMux(
 
 	mux.HandleFunc("OPTIONS /", HandleCORSPreFlight)
 
-	rest.InstallContenderHandler(mux, &contenderUseCase)
-	rest.InstallContestHandler(mux, &contestUseCase, &compClassUseCase, &tickUseCase, &problemUseCase)
-	rest.InstallCompClassHandler(mux, &compClassUseCase)
+	rest.InstallCompetitorHandler(mux, &competitorUseCase)
+	rest.InstallCompetitionHandler(mux, &competitionUseCase, &categoryUseCase, &tickUseCase, &problemUseCase)
+	rest.InstallCategoryHandler(mux, &categoryUseCase)
 	rest.InstallProblemHandler(mux, &problemUseCase)
 	rest.InstallTickHandler(mux, &tickUseCase)
 	rest.InstallEventHandler(mux, eventBroker, 10*time.Second)

@@ -12,13 +12,13 @@ import (
 type scoreEngineManager interface {
 	GetScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) (domain.ScoreEngineDescriptor, error)
 	ListScoreEngines(ctx context.Context) ([]domain.ScoreEngineDescriptor, error)
-	ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreEngineDescriptor, error)
+	ListScoreEnginesByCompetition(ctx context.Context, competitionID domain.CompetitionID) ([]domain.ScoreEngineDescriptor, error)
 	StopScoreEngine(ctx context.Context, instanceID domain.ScoreEngineInstanceID) error
-	StartScoreEngine(ctx context.Context, contestID domain.ContestID, terminatedBy time.Time) (domain.ScoreEngineInstanceID, error)
+	StartScoreEngine(ctx context.Context, competitionID domain.CompetitionID, terminatedBy time.Time) (domain.ScoreEngineInstanceID, error)
 }
 
 type scoreEngineUseCaseRepository interface {
-	GetContest(ctx context.Context, tx domain.Transaction, contestID domain.ContestID) (domain.Contest, error)
+	GetCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (domain.Competition, error)
 }
 
 type ScoreEngineUseCase struct {
@@ -47,17 +47,17 @@ func (uc *ScoreEngineUseCase) ListScoreEngines(ctx context.Context) ([]domain.Sc
 	return engines, nil
 }
 
-func (uc *ScoreEngineUseCase) ListScoreEnginesByContest(ctx context.Context, contestID domain.ContestID) ([]domain.ScoreEngineDescriptor, error) {
-	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
+func (uc *ScoreEngineUseCase) ListScoreEnginesByCompetition(ctx context.Context, competitionID domain.CompetitionID) ([]domain.ScoreEngineDescriptor, error) {
+	competition, err := uc.Repo.GetCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
 
-	if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+	if _, err := uc.Authorizer.HasOwnership(ctx, competition.Ownership); err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
 
-	engines, err := uc.ScoreEngineManager.ListScoreEnginesByContest(ctx, contestID)
+	engines, err := uc.ScoreEngineManager.ListScoreEnginesByCompetition(ctx, competitionID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -71,12 +71,12 @@ func (uc *ScoreEngineUseCase) StopScoreEngine(ctx context.Context, instanceID do
 		return errors.Wrap(err, 0)
 	}
 
-	contest, err := uc.Repo.GetContest(ctx, nil, engine.ContestID)
+	competition, err := uc.Repo.GetCompetition(ctx, nil, engine.CompetitionID)
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
 
-	if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+	if _, err := uc.Authorizer.HasOwnership(ctx, competition.Ownership); err != nil {
 		return errors.Wrap(err, 0)
 	}
 
@@ -88,23 +88,23 @@ func (uc *ScoreEngineUseCase) StopScoreEngine(ctx context.Context, instanceID do
 	return nil
 }
 
-func (uc *ScoreEngineUseCase) StartScoreEngine(ctx context.Context, contestID domain.ContestID, terminatedBy time.Time) (domain.ScoreEngineInstanceID, error) {
-	contest, err := uc.Repo.GetContest(ctx, nil, contestID)
+func (uc *ScoreEngineUseCase) StartScoreEngine(ctx context.Context, competitionID domain.CompetitionID, terminatedBy time.Time) (domain.ScoreEngineInstanceID, error) {
+	competition, err := uc.Repo.GetCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return uuid.Nil(), errors.Wrap(err, 0)
 	}
 
-	if _, err := uc.Authorizer.HasOwnership(ctx, contest.Ownership); err != nil {
+	if _, err := uc.Authorizer.HasOwnership(ctx, competition.Ownership); err != nil {
 		return uuid.Nil(), errors.Wrap(err, 0)
 	}
 
-	if contest.TimeBegin.IsZero() || contest.TimeEnd.IsZero() {
+	if competition.TimeBegin.IsZero() || competition.TimeEnd.IsZero() {
 		return uuid.Nil(), errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 
 	now := time.Now()
 
-	if now.Before(contest.TimeBegin.Add(-1 * time.Hour)) {
+	if now.Before(competition.TimeBegin.Add(-1 * time.Hour)) {
 		return uuid.Nil(), errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 
@@ -116,7 +116,7 @@ func (uc *ScoreEngineUseCase) StartScoreEngine(ctx context.Context, contestID do
 		return uuid.Nil(), errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 
-	instanceID, err := uc.ScoreEngineManager.StartScoreEngine(ctx, contestID, terminatedBy)
+	instanceID, err := uc.ScoreEngineManager.StartScoreEngine(ctx, competitionID, terminatedBy)
 	if err != nil {
 		return uuid.Nil(), errors.Wrap(err, 0)
 	}

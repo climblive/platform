@@ -88,7 +88,7 @@ func handleError(w http.ResponseWriter, err error) {
 		fallthrough
 	case errors.Is(err, domain.ErrNoOwnership):
 		fallthrough
-	case errors.Is(err, domain.ErrContestEnded):
+	case errors.Is(err, domain.ErrCompetitionEnded):
 		fallthrough
 	case errors.Is(err, domain.ErrInsufficientRole):
 		fallthrough

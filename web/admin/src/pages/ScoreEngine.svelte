@@ -3,33 +3,67 @@
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import Loader from "@/components/Loader.svelte";
+  import { useEvents } from "@climblive/lib/components";
+  import type { EventFilter } from "@climblive/lib/models";
   import {
-    getContestQuery,
-    getScoreEnginesByContestQuery,
+    getCompetitionQuery,
+    getScoreEnginesByCompetitionQuery,
     startScoreEngineMutation,
     stopScoreEngineMutation,
   } from "@climblive/lib/queries";
+  import { useQueryClient } from "@tanstack/svelte-query";
   import { add, format, isBefore, subSeconds } from "date-fns";
+  import { onMount } from "svelte";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
   }
 
-  let { contestId }: Props = $props();
+  let { competitionId }: Props = $props();
 
-  const contestQuery = $derived(getContestQuery(contestId));
-  const scoreEnginesQuery = $derived(getScoreEnginesByContestQuery(contestId));
-  const startScoreEngine = startScoreEngineMutation(contestId);
+  const queryClient = useQueryClient();
+  const { subscribeEvents, unsubscribeEvents } = useEvents();
+
+  const competitionQuery = $derived(getCompetitionQuery(competitionId));
+  const scoreEnginesQuery = $derived(
+    getScoreEnginesByCompetitionQuery(competitionId),
+  );
+  const startScoreEngine = startScoreEngineMutation(competitionId);
   const stopScoreEngine = stopScoreEngineMutation();
 
-  let contest = $derived(contestQuery.data);
+  let competition = $derived(competitionQuery.data);
   let scoreEngines = $derived(scoreEnginesQuery.data);
 
   const earliestStartTime = $derived(
-    contest?.timeBegin
-      ? subSeconds(contest.timeBegin.getTime(), 60 * 60)
+    competition?.timeBegin
+      ? subSeconds(competition.timeBegin.getTime(), 60 * 60)
       : undefined,
   );
+
+  onMount(() => {
+    const filters: EventFilter[] = [
+      {
+        competitionId,
+        eventTypes: {
+          SCORE_ENGINE_STARTED: {},
+          SCORE_ENGINE_STOPPED: {},
+        },
+      },
+    ];
+    const queryKey = ["score-engines", { competitionId }];
+
+    const invalidateScoreEngines = () => {
+      queryClient.invalidateQueries({ queryKey });
+    };
+
+    const subscriptionId = subscribeEvents(filters, invalidateScoreEngines, {
+      onOpen: invalidateScoreEngines,
+    });
+
+    return () => {
+      unsubscribeEvents(subscriptionId);
+    };
+  });
 </script>
 
 <wa-callout variant="warning" size="s">

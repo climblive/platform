@@ -9,32 +9,18 @@ import (
 	"time"
 )
 
-type CompClass struct {
-	ID          int32
-	OrganizerID int32
-	ContestID   int32
-	Name        string
-	Description sql.NullString
-	Color       sql.NullString
-	TimeBegin   time.Time
-	TimeEnd     time.Time
+type Category struct {
+	ID            int32
+	OrganizerID   int32
+	CompetitionID int32
+	Name          string
+	Description   sql.NullString
+	Color         sql.NullString
+	TimeBegin     time.Time
+	TimeEnd       time.Time
 }
 
-type Contender struct {
-	ID                  int32
-	OrganizerID         int32
-	ContestID           int32
-	RegistrationCode    string
-	Name                sql.NullString
-	ClassID             sql.NullInt32
-	Entered             sql.NullTime
-	Disqualified        bool
-	WithdrawnFromFinals bool
-	ScrubbedAt          sql.NullTime
-	ScrubBefore         sql.NullTime
-}
-
-type Contest struct {
+type Competition struct {
 	ID                 int32
 	OrganizerID        int32
 	ArchivedAt         sql.NullTime
@@ -55,6 +41,20 @@ type Contest struct {
 	Created            time.Time
 }
 
+type Competitor struct {
+	ID                  int32
+	OrganizerID         int32
+	CompetitionID       int32
+	RegistrationCode    string
+	Name                sql.NullString
+	CategoryID          sql.NullInt32
+	Entered             sql.NullTime
+	Disqualified        bool
+	WithdrawnFromFinals bool
+	ScrubbedAt          sql.NullTime
+	ScrubBefore         sql.NullTime
+}
+
 type Organizer struct {
 	ID   int32
 	Name string
@@ -69,7 +69,7 @@ type OrganizerInvite struct {
 type Problem struct {
 	ID                 int32
 	OrganizerID        int32
-	ContestID          int32
+	CompetitionID      int32
 	Number             int32
 	HoldColorPrimary   string
 	HoldColorSecondary sql.NullString
@@ -83,26 +83,26 @@ type Problem struct {
 }
 
 type Raffle struct {
-	ID          int32
-	OrganizerID int32
-	ContestID   int32
+	ID            int32
+	OrganizerID   int32
+	CompetitionID int32
 }
 
 type RaffleWinner struct {
-	ID          int32
-	OrganizerID int32
-	RaffleID    int32
-	ContenderID int32
-	Timestamp   time.Time
+	ID           int32
+	OrganizerID  int32
+	RaffleID     int32
+	CompetitorID int32
+	Timestamp    time.Time
 }
 
-type Score struct {
-	ContenderID int32
-	Timestamp   time.Time
-	Score       string
-	Placement   int32
-	Finalist    bool
-	RankOrder   int32
+type Result struct {
+	CompetitorID int32
+	Timestamp    time.Time
+	Score        string
+	Placement    int32
+	Finalist     bool
+	RankOrder    int32
 }
 
 type Series struct {
@@ -114,8 +114,8 @@ type Series struct {
 type Tick struct {
 	ID            int32
 	OrganizerID   int32
-	ContestID     int32
-	ContenderID   int32
+	CompetitionID int32
+	CompetitorID  int32
 	ProblemID     int32
 	Timestamp     time.Time
 	Revision      uint32

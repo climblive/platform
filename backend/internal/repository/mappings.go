@@ -9,95 +9,95 @@ import (
 	"uuid"
 )
 
-func contenderToDomain(record database.GetContenderRow) domain.Contender {
-	contender := domain.Contender{
-		ID: domain.ContenderID(record.Contender.ID),
+func competitorToDomain(record database.GetCompetitorRow) domain.Competitor {
+	competitor := domain.Competitor{
+		ID: domain.CompetitorID(record.Competitor.ID),
 		Ownership: domain.OwnershipData{
-			OrganizerID: domain.OrganizerID(record.Contender.OrganizerID),
-			ContenderID: nillableIntToResourceID[domain.ContenderID](&record.Contender.ID),
+			OrganizerID:  domain.OrganizerID(record.Competitor.OrganizerID),
+			CompetitorID: nillableIntToResourceID[domain.CompetitorID](&record.Competitor.ID),
 		},
-		Score:               nil,
-		ContestID:           domain.ContestID(record.Contender.ContestID),
-		CompClassID:         domain.CompClassID(record.Contender.ClassID.Int32),
-		RegistrationCode:    record.Contender.RegistrationCode,
-		Name:                record.Contender.Name.String,
-		Entered:             record.Contender.Entered.Time,
-		WithdrawnFromFinals: record.Contender.WithdrawnFromFinals,
-		Disqualified:        record.Contender.Disqualified,
-		ScrubbedAt:          record.Contender.ScrubbedAt.Time,
-		ScrubBefore:         record.Contender.ScrubBefore.Time,
+		Result:              nil,
+		CompetitionID:       domain.CompetitionID(record.Competitor.CompetitionID),
+		CategoryID:          domain.CategoryID(record.Competitor.CategoryID.Int32),
+		RegistrationCode:    record.Competitor.RegistrationCode,
+		Name:                record.Competitor.Name.String,
+		Entered:             record.Competitor.Entered.Time,
+		WithdrawnFromFinals: record.Competitor.WithdrawnFromFinals,
+		Disqualified:        record.Competitor.Disqualified,
+		ScrubbedAt:          record.Competitor.ScrubbedAt.Time,
+		ScrubBefore:         record.Competitor.ScrubBefore.Time,
 	}
 
-	if record.ContenderID.Valid {
-		score := domain.Score{
-			Timestamp:   record.Timestamp.Time,
-			ContenderID: domain.ContenderID(record.ContenderID.Int32),
-			Score:       record.Score.String,
-			Placement:   int(record.Placement.Int32),
-			Finalist:    record.Finalist.Bool,
-			RankOrder:   int(record.RankOrder.Int32),
+	if record.CompetitorID.Valid {
+		result := domain.Result{
+			Timestamp:    record.Timestamp.Time,
+			CompetitorID: domain.CompetitorID(record.CompetitorID.Int32),
+			Score:        record.Score.String,
+			Placement:    int(record.Placement.Int32),
+			Finalist:     record.Finalist.Bool,
+			RankOrder:    int(record.RankOrder.Int32),
 		}
 
-		contender.Score = &score
+		competitor.Result = &result
 	}
 
-	return contender
+	return competitor
 }
 
-func compClassToDomain(record database.CompClass) domain.CompClass {
-	return domain.CompClass{
-		ID: domain.CompClassID(record.ID),
+func categoryToDomain(record database.Category) domain.Category {
+	return domain.Category{
+		ID: domain.CategoryID(record.ID),
 		Ownership: domain.OwnershipData{
-			OrganizerID: domain.OrganizerID(record.OrganizerID),
-			ContenderID: nil,
+			OrganizerID:  domain.OrganizerID(record.OrganizerID),
+			CompetitorID: nil,
 		},
-		ContestID:   domain.ContestID(record.ContestID),
-		Name:        record.Name,
-		Description: record.Description.String,
-		TimeBegin:   record.TimeBegin,
-		TimeEnd:     record.TimeEnd,
+		CompetitionID: domain.CompetitionID(record.CompetitionID),
+		Name:          record.Name,
+		Description:   record.Description.String,
+		TimeBegin:     record.TimeBegin,
+		TimeEnd:       record.TimeEnd,
 	}
 }
 
-func contestToDomain(record database.Contest) domain.Contest {
-	contest := domain.Contest{
-		ID: domain.ContestID(record.ID),
+func competitionToDomain(record database.Competition) domain.Competition {
+	competition := domain.Competition{
+		ID: domain.CompetitionID(record.ID),
 		Ownership: domain.OwnershipData{
-			OrganizerID: domain.OrganizerID(record.OrganizerID),
-			ContenderID: nil,
+			OrganizerID:  domain.OrganizerID(record.OrganizerID),
+			CompetitorID: nil,
 		},
-		TimeBegin:            time.Time{},
-		TimeEnd:              time.Time{},
-		RegisteredContenders: 0,
-		ArchivedAt:           record.ArchivedAt.Time,
-		Location:             record.Location.String,
-		Country:              record.Country,
-		SeriesID:             domain.SeriesID(record.SeriesID.Int32),
-		Name:                 record.Name,
-		Description:          record.Description.String,
-		QualifyingProblems:   int(record.QualifyingProblems),
-		Finalists:            int(record.Finalists),
-		UsePoints:            record.UsePoints,
-		PooledPoints:         record.PooledPoints,
-		MaxAttempts:          int(record.MaxAttempts),
-		PointDeduction:       record.PointDeduction,
-		Info:                 record.Info.String,
-		GracePeriod:          time.Duration(record.GracePeriod) * time.Minute,
-		NameRetentionTime:    time.Duration(record.NameRetentionTime) * time.Minute,
-		Created:              record.Created,
+		TimeBegin:             time.Time{},
+		TimeEnd:               time.Time{},
+		RegisteredCompetitors: 0,
+		ArchivedAt:            record.ArchivedAt.Time,
+		Location:              record.Location.String,
+		Country:               record.Country,
+		SeriesID:              domain.SeriesID(record.SeriesID.Int32),
+		Name:                  record.Name,
+		Description:           record.Description.String,
+		QualifyingProblems:    int(record.QualifyingProblems),
+		Finalists:             int(record.Finalists),
+		UsePoints:             record.UsePoints,
+		PooledPoints:          record.PooledPoints,
+		MaxAttempts:           int(record.MaxAttempts),
+		PointDeduction:        domain.TenthsFromFloat64(record.PointDeduction),
+		Info:                  record.Info.String,
+		GracePeriod:           time.Duration(record.GracePeriod) * time.Minute,
+		NameRetentionTime:     time.Duration(record.NameRetentionTime) * time.Minute,
+		Created:               record.Created,
 	}
 
-	return contest
+	return competition
 }
 
 func problemToDomain(record database.Problem) domain.Problem {
 	return domain.Problem{
 		ID: domain.ProblemID(record.ID),
 		Ownership: domain.OwnershipData{
-			OrganizerID: domain.OrganizerID(record.OrganizerID),
-			ContenderID: nil,
+			OrganizerID:  domain.OrganizerID(record.OrganizerID),
+			CompetitorID: nil,
 		},
-		ContestID:          domain.ContestID(record.ContestID),
+		CompetitionID:      domain.CompetitionID(record.CompetitionID),
 		Number:             int(record.Number),
 		HoldColorPrimary:   record.HoldColorPrimary,
 		HoldColorSecondary: record.HoldColorSecondary.String,
@@ -117,11 +117,11 @@ func tickToDomain(record database.Tick) domain.Tick {
 	return domain.Tick{
 		ID: domain.TickID(record.ID),
 		Ownership: domain.OwnershipData{
-			OrganizerID: domain.OrganizerID(record.OrganizerID),
-			ContenderID: nillableIntToResourceID[domain.ContenderID](&record.ContenderID),
+			OrganizerID:  domain.OrganizerID(record.OrganizerID),
+			CompetitorID: nillableIntToResourceID[domain.CompetitorID](&record.CompetitorID),
 		},
 		Timestamp:     record.Timestamp,
-		ContestID:     domain.ContestID(record.ContestID),
+		CompetitionID: domain.CompetitionID(record.CompetitionID),
 		Revision:      int(record.Revision),
 		ProblemID:     domain.ProblemID(record.ProblemID),
 		Zone1:         record.Zone1,
@@ -146,8 +146,8 @@ func organizerToDomain(record database.Organizer) domain.Organizer {
 	return domain.Organizer{
 		ID: domain.OrganizerID(record.ID),
 		Ownership: domain.OwnershipData{
-			OrganizerID: domain.OrganizerID(record.ID),
-			ContenderID: nil,
+			OrganizerID:  domain.OrganizerID(record.ID),
+			CompetitorID: nil,
 		},
 		Name: record.Name,
 	}
@@ -157,10 +157,10 @@ func raffleToDomain(record database.Raffle) domain.Raffle {
 	return domain.Raffle{
 		ID: domain.RaffleID(record.ID),
 		Ownership: domain.OwnershipData{
-			OrganizerID: domain.OrganizerID(record.OrganizerID),
-			ContenderID: nil,
+			OrganizerID:  domain.OrganizerID(record.OrganizerID),
+			CompetitorID: nil,
 		},
-		ContestID: domain.ContestID(record.ContestID),
+		CompetitionID: domain.CompetitionID(record.CompetitionID),
 	}
 }
 
@@ -168,14 +168,14 @@ func raffleWinnerToDomain(record database.RaffleWinner, name string, scrubbedAt 
 	return domain.RaffleWinner{
 		ID: domain.RaffleWinnerID(record.ID),
 		Ownership: domain.OwnershipData{
-			OrganizerID: domain.OrganizerID(record.OrganizerID),
-			ContenderID: nil,
+			OrganizerID:  domain.OrganizerID(record.OrganizerID),
+			CompetitorID: nil,
 		},
-		RaffleID:            domain.RaffleID(record.RaffleID),
-		ContenderID:         domain.ContenderID(record.ContenderID),
-		ContenderName:       name,
-		ContenderScrubbedAt: scrubbedAt,
-		Timestamp:           record.Timestamp,
+		RaffleID:             domain.RaffleID(record.RaffleID),
+		CompetitorID:         domain.CompetitorID(record.CompetitorID),
+		CompetitorName:       name,
+		CompetitorScrubbedAt: scrubbedAt,
+		Timestamp:            record.Timestamp,
 	}
 }
 

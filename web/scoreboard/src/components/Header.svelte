@@ -1,22 +1,28 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/progress-bar/progress-bar.js";
-  import { ContestStateProvider, Timer } from "@climblive/lib/components";
+  import { CompetitionStateProvider, Timer } from "@climblive/lib/components";
   import type { ScoreboardEntry } from "@climblive/lib/models";
   import { type Readable } from "svelte/store";
 
   interface Props {
-    contestId: number;
+    competitionId: number;
     name: string;
-    compClassId: number;
+    categoryId: number;
     startTime: Date;
     endTime: Date;
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
   }
 
-  let { contestId, name, compClassId, startTime, endTime, scoreboard }: Props =
-    $props();
+  let {
+    competitionId,
+    name,
+    categoryId,
+    startTime,
+    endTime,
+    scoreboard,
+  }: Props = $props();
 
-  let classSize = $derived(($scoreboard.get(compClassId) ?? []).length);
+  let categorySize = $derived(($scoreboard.get(categoryId) ?? []).length);
   let totalSize = $derived.by(() => {
     let total = 0;
     $scoreboard.forEach((entry) => (total += entry.length));
@@ -24,8 +30,8 @@
   });
 </script>
 
-<ContestStateProvider {contestId} {compClassId}>
-  {#snippet children({ contestState, progress })}
+<CompetitionStateProvider {competitionId} {categoryId}>
+  {#snippet children({ competitionState, progress })}
     <header>
       <div class="left">
         <div class="title">
@@ -34,19 +40,19 @@
             {name}
           </h2>
         </div>
-        {#if contestState === "NOT_STARTED"}
+        {#if competitionState === "NOT_STARTED"}
           <Timer endTime={startTime} label="Starting in" />
         {:else}
           <Timer {endTime} label="Time left" />
         {/if}
       </div>
       <div class="size">
-        <strong>{classSize}</strong>/{totalSize}
+        <strong>{categorySize}</strong>/{totalSize}
       </div>
       <wa-progress-bar value={progress}></wa-progress-bar>
     </header>
   {/snippet}
-</ContestStateProvider>
+</CompetitionStateProvider>
 
 <style>
   header {
