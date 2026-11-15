@@ -9,7 +9,7 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
     getCompetitionQuery,
-    getContendersByCompetitionQuery,
+    getCompetitorsByCompetitionQuery,
     getSelfQuery,
   } from "@climblive/lib/queries";
   import { format } from "date-fns";
@@ -73,13 +73,13 @@
     }
   });
 
-  const contendersQuery = $derived(
-    getContendersByCompetitionQuery(competitionId),
+  const competitorsQuery = $derived(
+    getCompetitorsByCompetitionQuery(competitionId),
   );
-  const contenders = $derived(contendersQuery.data);
+  const competitors = $derived(competitorsQuery.data);
 
   const handleDownloadSimulatorConfig = () => {
-    const registrationCodes = contenders?.map((c) => c.registrationCode) ?? [];
+    const registrationCodes = competitors?.map((c) => c.registrationCode) ?? [];
 
     const config = {
       apiUrl: new URL("/api", window.location.origin).toString(),
@@ -214,7 +214,7 @@
         <div class="developer-tools">
           <wa-button
             appearance="outlined"
-            disabled={!contenders || contenders.length === 0}
+            disabled={!competitors || competitors.length === 0}
             onclick={handleDownloadSimulatorConfig}
             >Download simulator config
             <wa-icon name="download" slot="start"></wa-icon>

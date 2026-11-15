@@ -8,12 +8,12 @@
     CompetitionStateProvider,
     SplashScreen,
   } from "@climblive/lib/components";
-  import type { ContenderPatch } from "@climblive/lib/models";
+  import type { CompetitorPatch } from "@climblive/lib/models";
   import {
     getCategoriesQuery,
-    getContenderQuery,
+    getCompetitorQuery,
     getCompetitionQuery,
-    patchContenderMutation,
+    patchCompetitorMutation,
   } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import { add, formatDistance, isAfter } from "date-fns";
@@ -25,14 +25,16 @@
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
-  const contenderQuery = $derived(getContenderQuery($session.contenderId));
+  const competitorQuery = $derived(getCompetitorQuery($session.competitorId));
   const competitionQuery = $derived(
     getCompetitionQuery($session.competitionId),
   );
   const categoriesQuery = $derived(getCategoriesQuery($session.competitionId));
-  const patchContender = $derived(patchContenderMutation($session.contenderId));
+  const patchCompetitor = $derived(
+    patchCompetitorMutation($session.competitorId),
+  );
 
-  const contender = $derived(contenderQuery.data);
+  const competitor = $derived(competitorQuery.data);
   const competition = $derived(competitionQuery.data);
 
   const tooLate = $derived(
@@ -40,15 +42,15 @@
   );
 
   const gotoScorecard = () => {
-    navigate(`/${contender?.registrationCode}`, { replace: true });
+    navigate(`/${competitor?.registrationCode}`, { replace: true });
   };
 
-  const handleSubmit = (form: ContenderPatch) => {
-    if (!contender || patchContender.isPending) {
+  const handleSubmit = (form: CompetitorPatch) => {
+    if (!competitor || patchCompetitor.isPending) {
       return;
     }
 
-    patchContender.mutate(
+    patchCompetitor.mutate(
       {
         ...form,
       },
@@ -72,7 +74,7 @@
   let showSplash = $state(true);
 </script>
 
-{#if showSplash || !contender || !competition || tooLate === undefined}
+{#if showSplash || !competitor || !competition || tooLate === undefined}
   <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
   <h1>{competition.name}</h1>
@@ -81,9 +83,9 @@
       <RegistrationForm
         submit={handleSubmit}
         data={{
-          name: contender.name,
-          categoryId: contender.categoryId,
-          withdrawnFromFinals: contender.withdrawnFromFinals,
+          name: competitor.name,
+          categoryId: competitor.categoryId,
+          withdrawnFromFinals: competitor.withdrawnFromFinals,
         }}
         callout={registerCallout}
         {competitionState}
@@ -98,7 +100,7 @@
         <wa-button
           size="s"
           type="submit"
-          loading={patchContender.isPending}
+          loading={patchCompetitor.isPending}
           variant="neutral"
           appearance="accent"
           disabled={tooLate}

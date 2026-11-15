@@ -28,14 +28,14 @@ func (q *Queries) AddUserToOrganizer(ctx context.Context, arg AddUserToOrganizer
 	return err
 }
 
-const countContenders = `-- name: CountContenders :one
+const countCompetitors = `-- name: CountCompetitors :one
 SELECT COUNT(*)
 FROM contender
 WHERE contest_id = ?
 `
 
-func (q *Queries) CountContenders(ctx context.Context, competitionID int32) (int64, error) {
-	row := q.db.QueryRowContext(ctx, countContenders, competitionID)
+func (q *Queries) CountCompetitors(ctx context.Context, competitionID int32) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countCompetitors, competitionID)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
@@ -61,13 +61,13 @@ func (q *Queries) DeleteCompetition(ctx context.Context, id int32) error {
 	return err
 }
 
-const deleteContender = `-- name: DeleteContender :exec
+const deleteCompetitor = `-- name: DeleteCompetitor :exec
 DELETE FROM contender
 WHERE id = ?
 `
 
-func (q *Queries) DeleteContender(ctx context.Context, id int32) error {
-	_, err := q.db.ExecContext(ctx, deleteContender, id)
+func (q *Queries) DeleteCompetitor(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deleteCompetitor, id)
 	return err
 }
 
@@ -123,7 +123,7 @@ func (q *Queries) DeleteTick(ctx context.Context, id int32) error {
 }
 
 const getAllCompetitions = `-- name: GetAllCompetitions :many
-SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.max_attempts, contest.point_deduction, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
+SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.max_attempts, contest.point_deduction, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_competitors
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 LEFT JOIN contender c ON c.contest_id = contest.id
@@ -131,10 +131,10 @@ GROUP BY contest.id
 `
 
 type GetAllCompetitionsRow struct {
-	Competition          Competition
-	TimeBegin            interface{}
-	TimeEnd              interface{}
-	RegisteredContenders int64
+	Competition           Competition
+	TimeBegin             interface{}
+	TimeEnd               interface{}
+	RegisteredCompetitors int64
 }
 
 func (q *Queries) GetAllCompetitions(ctx context.Context) ([]GetAllCompetitionsRow, error) {
@@ -167,7 +167,7 @@ func (q *Queries) GetAllCompetitions(ctx context.Context) ([]GetAllCompetitionsR
 			&i.Competition.Created,
 			&i.TimeBegin,
 			&i.TimeEnd,
-			&i.RegisteredContenders,
+			&i.RegisteredCompetitors,
 		); err != nil {
 			return nil, err
 		}
@@ -279,7 +279,7 @@ func (q *Queries) GetCategory(ctx context.Context, id int32) (GetCategoryRow, er
 }
 
 const getCompetition = `-- name: GetCompetition :one
-SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.max_attempts, contest.point_deduction, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
+SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.max_attempts, contest.point_deduction, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_competitors
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 LEFT JOIN contender c ON c.contest_id = contest.id
@@ -288,10 +288,10 @@ GROUP BY contest.id
 `
 
 type GetCompetitionRow struct {
-	Competition          Competition
-	TimeBegin            interface{}
-	TimeEnd              interface{}
-	RegisteredContenders int64
+	Competition           Competition
+	TimeBegin             interface{}
+	TimeEnd               interface{}
+	RegisteredCompetitors int64
 }
 
 func (q *Queries) GetCompetition(ctx context.Context, id int32) (GetCompetitionRow, error) {
@@ -318,13 +318,13 @@ func (q *Queries) GetCompetition(ctx context.Context, id int32) (GetCompetitionR
 		&i.Competition.Created,
 		&i.TimeBegin,
 		&i.TimeEnd,
-		&i.RegisteredContenders,
+		&i.RegisteredCompetitors,
 	)
 	return i, err
 }
 
 const getCompetitionsByOrganizer = `-- name: GetCompetitionsByOrganizer :many
-SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.max_attempts, contest.point_deduction, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_contenders
+SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.max_attempts, contest.point_deduction, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_competitors
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 LEFT JOIN contender c ON c.contest_id = contest.id
@@ -333,10 +333,10 @@ GROUP BY contest.id
 `
 
 type GetCompetitionsByOrganizerRow struct {
-	Competition          Competition
-	TimeBegin            interface{}
-	TimeEnd              interface{}
-	RegisteredContenders int64
+	Competition           Competition
+	TimeBegin             interface{}
+	TimeEnd               interface{}
+	RegisteredCompetitors int64
 }
 
 func (q *Queries) GetCompetitionsByOrganizer(ctx context.Context, organizerID int32) ([]GetCompetitionsByOrganizerRow, error) {
@@ -369,7 +369,7 @@ func (q *Queries) GetCompetitionsByOrganizer(ctx context.Context, organizerID in
 			&i.Competition.Created,
 			&i.TimeBegin,
 			&i.TimeEnd,
-			&i.RegisteredContenders,
+			&i.RegisteredCompetitors,
 		); err != nil {
 			return nil, err
 		}
@@ -470,39 +470,39 @@ func (q *Queries) GetCompetitionsCurrentlyRunningOrByStartTime(ctx context.Conte
 	return items, nil
 }
 
-const getContender = `-- name: GetContender :one
+const getCompetitor = `-- name: GetCompetitor :one
 SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
 FROM contender
 LEFT JOIN result ON result.contender_id = id
 WHERE id = ?
 `
 
-type GetContenderRow struct {
-	Contender   Contender
-	ContenderID sql.NullInt32
-	Timestamp   sql.NullTime
-	Score       sql.NullString
-	Placement   sql.NullInt32
-	Finalist    sql.NullBool
-	RankOrder   sql.NullInt32
+type GetCompetitorRow struct {
+	Competitor   Competitor
+	CompetitorID sql.NullInt32
+	Timestamp    sql.NullTime
+	Score        sql.NullString
+	Placement    sql.NullInt32
+	Finalist     sql.NullBool
+	RankOrder    sql.NullInt32
 }
 
-func (q *Queries) GetContender(ctx context.Context, id int32) (GetContenderRow, error) {
-	row := q.db.QueryRowContext(ctx, getContender, id)
-	var i GetContenderRow
+func (q *Queries) GetCompetitor(ctx context.Context, id int32) (GetCompetitorRow, error) {
+	row := q.db.QueryRowContext(ctx, getCompetitor, id)
+	var i GetCompetitorRow
 	err := row.Scan(
-		&i.Contender.ID,
-		&i.Contender.OrganizerID,
-		&i.Contender.CompetitionID,
-		&i.Contender.RegistrationCode,
-		&i.Contender.Name,
-		&i.Contender.CategoryID,
-		&i.Contender.Entered,
-		&i.Contender.Disqualified,
-		&i.Contender.WithdrawnFromFinals,
-		&i.Contender.ScrubbedAt,
-		&i.Contender.ScrubBefore,
-		&i.ContenderID,
+		&i.Competitor.ID,
+		&i.Competitor.OrganizerID,
+		&i.Competitor.CompetitionID,
+		&i.Competitor.RegistrationCode,
+		&i.Competitor.Name,
+		&i.Competitor.CategoryID,
+		&i.Competitor.Entered,
+		&i.Competitor.Disqualified,
+		&i.Competitor.WithdrawnFromFinals,
+		&i.Competitor.ScrubbedAt,
+		&i.Competitor.ScrubBefore,
+		&i.CompetitorID,
 		&i.Timestamp,
 		&i.Score,
 		&i.Placement,
@@ -512,39 +512,39 @@ func (q *Queries) GetContender(ctx context.Context, id int32) (GetContenderRow, 
 	return i, err
 }
 
-const getContenderByCode = `-- name: GetContenderByCode :one
+const getCompetitorByCode = `-- name: GetCompetitorByCode :one
 SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
 FROM contender
 LEFT JOIN result ON result.contender_id = id
 WHERE registration_code = ?
 `
 
-type GetContenderByCodeRow struct {
-	Contender   Contender
-	ContenderID sql.NullInt32
-	Timestamp   sql.NullTime
-	Score       sql.NullString
-	Placement   sql.NullInt32
-	Finalist    sql.NullBool
-	RankOrder   sql.NullInt32
+type GetCompetitorByCodeRow struct {
+	Competitor   Competitor
+	CompetitorID sql.NullInt32
+	Timestamp    sql.NullTime
+	Score        sql.NullString
+	Placement    sql.NullInt32
+	Finalist     sql.NullBool
+	RankOrder    sql.NullInt32
 }
 
-func (q *Queries) GetContenderByCode(ctx context.Context, registrationCode string) (GetContenderByCodeRow, error) {
-	row := q.db.QueryRowContext(ctx, getContenderByCode, registrationCode)
-	var i GetContenderByCodeRow
+func (q *Queries) GetCompetitorByCode(ctx context.Context, registrationCode string) (GetCompetitorByCodeRow, error) {
+	row := q.db.QueryRowContext(ctx, getCompetitorByCode, registrationCode)
+	var i GetCompetitorByCodeRow
 	err := row.Scan(
-		&i.Contender.ID,
-		&i.Contender.OrganizerID,
-		&i.Contender.CompetitionID,
-		&i.Contender.RegistrationCode,
-		&i.Contender.Name,
-		&i.Contender.CategoryID,
-		&i.Contender.Entered,
-		&i.Contender.Disqualified,
-		&i.Contender.WithdrawnFromFinals,
-		&i.Contender.ScrubbedAt,
-		&i.Contender.ScrubBefore,
-		&i.ContenderID,
+		&i.Competitor.ID,
+		&i.Competitor.OrganizerID,
+		&i.Competitor.CompetitionID,
+		&i.Competitor.RegistrationCode,
+		&i.Competitor.Name,
+		&i.Competitor.CategoryID,
+		&i.Competitor.Entered,
+		&i.Competitor.Disqualified,
+		&i.Competitor.WithdrawnFromFinals,
+		&i.Competitor.ScrubbedAt,
+		&i.Competitor.ScrubBefore,
+		&i.CompetitorID,
 		&i.Timestamp,
 		&i.Score,
 		&i.Placement,
@@ -554,45 +554,45 @@ func (q *Queries) GetContenderByCode(ctx context.Context, registrationCode strin
 	return i, err
 }
 
-const getContendersByCategory = `-- name: GetContendersByCategory :many
+const getCompetitorsByCategory = `-- name: GetCompetitorsByCategory :many
 SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
 FROM contender
 LEFT JOIN result ON result.contender_id = id
 WHERE class_id = ?
 `
 
-type GetContendersByCategoryRow struct {
-	Contender   Contender
-	ContenderID sql.NullInt32
-	Timestamp   sql.NullTime
-	Score       sql.NullString
-	Placement   sql.NullInt32
-	Finalist    sql.NullBool
-	RankOrder   sql.NullInt32
+type GetCompetitorsByCategoryRow struct {
+	Competitor   Competitor
+	CompetitorID sql.NullInt32
+	Timestamp    sql.NullTime
+	Score        sql.NullString
+	Placement    sql.NullInt32
+	Finalist     sql.NullBool
+	RankOrder    sql.NullInt32
 }
 
-func (q *Queries) GetContendersByCategory(ctx context.Context, categoryID sql.NullInt32) ([]GetContendersByCategoryRow, error) {
-	rows, err := q.db.QueryContext(ctx, getContendersByCategory, categoryID)
+func (q *Queries) GetCompetitorsByCategory(ctx context.Context, categoryID sql.NullInt32) ([]GetCompetitorsByCategoryRow, error) {
+	rows, err := q.db.QueryContext(ctx, getCompetitorsByCategory, categoryID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetContendersByCategoryRow
+	var items []GetCompetitorsByCategoryRow
 	for rows.Next() {
-		var i GetContendersByCategoryRow
+		var i GetCompetitorsByCategoryRow
 		if err := rows.Scan(
-			&i.Contender.ID,
-			&i.Contender.OrganizerID,
-			&i.Contender.CompetitionID,
-			&i.Contender.RegistrationCode,
-			&i.Contender.Name,
-			&i.Contender.CategoryID,
-			&i.Contender.Entered,
-			&i.Contender.Disqualified,
-			&i.Contender.WithdrawnFromFinals,
-			&i.Contender.ScrubbedAt,
-			&i.Contender.ScrubBefore,
-			&i.ContenderID,
+			&i.Competitor.ID,
+			&i.Competitor.OrganizerID,
+			&i.Competitor.CompetitionID,
+			&i.Competitor.RegistrationCode,
+			&i.Competitor.Name,
+			&i.Competitor.CategoryID,
+			&i.Competitor.Entered,
+			&i.Competitor.Disqualified,
+			&i.Competitor.WithdrawnFromFinals,
+			&i.Competitor.ScrubbedAt,
+			&i.Competitor.ScrubBefore,
+			&i.CompetitorID,
 			&i.Timestamp,
 			&i.Score,
 			&i.Placement,
@@ -612,45 +612,45 @@ func (q *Queries) GetContendersByCategory(ctx context.Context, categoryID sql.Nu
 	return items, nil
 }
 
-const getContendersByCompetition = `-- name: GetContendersByCompetition :many
+const getCompetitorsByCompetition = `-- name: GetCompetitorsByCompetition :many
 SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
 FROM contender
 LEFT JOIN result ON result.contender_id = id
 WHERE contest_id = ?
 `
 
-type GetContendersByCompetitionRow struct {
-	Contender   Contender
-	ContenderID sql.NullInt32
-	Timestamp   sql.NullTime
-	Score       sql.NullString
-	Placement   sql.NullInt32
-	Finalist    sql.NullBool
-	RankOrder   sql.NullInt32
+type GetCompetitorsByCompetitionRow struct {
+	Competitor   Competitor
+	CompetitorID sql.NullInt32
+	Timestamp    sql.NullTime
+	Score        sql.NullString
+	Placement    sql.NullInt32
+	Finalist     sql.NullBool
+	RankOrder    sql.NullInt32
 }
 
-func (q *Queries) GetContendersByCompetition(ctx context.Context, competitionID int32) ([]GetContendersByCompetitionRow, error) {
-	rows, err := q.db.QueryContext(ctx, getContendersByCompetition, competitionID)
+func (q *Queries) GetCompetitorsByCompetition(ctx context.Context, competitionID int32) ([]GetCompetitorsByCompetitionRow, error) {
+	rows, err := q.db.QueryContext(ctx, getCompetitorsByCompetition, competitionID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetContendersByCompetitionRow
+	var items []GetCompetitorsByCompetitionRow
 	for rows.Next() {
-		var i GetContendersByCompetitionRow
+		var i GetCompetitorsByCompetitionRow
 		if err := rows.Scan(
-			&i.Contender.ID,
-			&i.Contender.OrganizerID,
-			&i.Contender.CompetitionID,
-			&i.Contender.RegistrationCode,
-			&i.Contender.Name,
-			&i.Contender.CategoryID,
-			&i.Contender.Entered,
-			&i.Contender.Disqualified,
-			&i.Contender.WithdrawnFromFinals,
-			&i.Contender.ScrubbedAt,
-			&i.Contender.ScrubBefore,
-			&i.ContenderID,
+			&i.Competitor.ID,
+			&i.Competitor.OrganizerID,
+			&i.Competitor.CompetitionID,
+			&i.Competitor.RegistrationCode,
+			&i.Competitor.Name,
+			&i.Competitor.CategoryID,
+			&i.Competitor.Entered,
+			&i.Competitor.Disqualified,
+			&i.Competitor.WithdrawnFromFinals,
+			&i.Competitor.ScrubbedAt,
+			&i.Competitor.ScrubBefore,
+			&i.CompetitorID,
 			&i.Timestamp,
 			&i.Score,
 			&i.Placement,
@@ -904,7 +904,7 @@ func (q *Queries) GetRaffleWinners(ctx context.Context, raffleID int32) ([]GetRa
 			&i.RaffleWinner.ID,
 			&i.RaffleWinner.OrganizerID,
 			&i.RaffleWinner.RaffleID,
-			&i.RaffleWinner.ContenderID,
+			&i.RaffleWinner.CompetitorID,
 			&i.RaffleWinner.Timestamp,
 			&i.Name,
 			&i.ScrubbedAt,
@@ -955,7 +955,7 @@ func (q *Queries) GetRafflesByCompetition(ctx context.Context, competitionID int
 	return items, nil
 }
 
-const getScrubEligibleContenders = `-- name: GetScrubEligibleContenders :many
+const getScrubEligibleCompetitors = `-- name: GetScrubEligibleCompetitors :many
 SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
 FROM contender
 LEFT JOIN result ON result.contender_id = id
@@ -964,38 +964,38 @@ WHERE contender.name != ''
   AND contender.scrub_before < ?
 `
 
-type GetScrubEligibleContendersRow struct {
-	Contender   Contender
-	ContenderID sql.NullInt32
-	Timestamp   sql.NullTime
-	Score       sql.NullString
-	Placement   sql.NullInt32
-	Finalist    sql.NullBool
-	RankOrder   sql.NullInt32
+type GetScrubEligibleCompetitorsRow struct {
+	Competitor   Competitor
+	CompetitorID sql.NullInt32
+	Timestamp    sql.NullTime
+	Score        sql.NullString
+	Placement    sql.NullInt32
+	Finalist     sql.NullBool
+	RankOrder    sql.NullInt32
 }
 
-func (q *Queries) GetScrubEligibleContenders(ctx context.Context, scrubBefore sql.NullTime) ([]GetScrubEligibleContendersRow, error) {
-	rows, err := q.db.QueryContext(ctx, getScrubEligibleContenders, scrubBefore)
+func (q *Queries) GetScrubEligibleCompetitors(ctx context.Context, scrubBefore sql.NullTime) ([]GetScrubEligibleCompetitorsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getScrubEligibleCompetitors, scrubBefore)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetScrubEligibleContendersRow
+	var items []GetScrubEligibleCompetitorsRow
 	for rows.Next() {
-		var i GetScrubEligibleContendersRow
+		var i GetScrubEligibleCompetitorsRow
 		if err := rows.Scan(
-			&i.Contender.ID,
-			&i.Contender.OrganizerID,
-			&i.Contender.CompetitionID,
-			&i.Contender.RegistrationCode,
-			&i.Contender.Name,
-			&i.Contender.CategoryID,
-			&i.Contender.Entered,
-			&i.Contender.Disqualified,
-			&i.Contender.WithdrawnFromFinals,
-			&i.Contender.ScrubbedAt,
-			&i.Contender.ScrubBefore,
-			&i.ContenderID,
+			&i.Competitor.ID,
+			&i.Competitor.OrganizerID,
+			&i.Competitor.CompetitionID,
+			&i.Competitor.RegistrationCode,
+			&i.Competitor.Name,
+			&i.Competitor.CategoryID,
+			&i.Competitor.Entered,
+			&i.Competitor.Disqualified,
+			&i.Competitor.WithdrawnFromFinals,
+			&i.Competitor.ScrubbedAt,
+			&i.Competitor.ScrubBefore,
+			&i.CompetitorID,
 			&i.Timestamp,
 			&i.Score,
 			&i.Placement,
@@ -1032,7 +1032,7 @@ func (q *Queries) GetTick(ctx context.Context, id int32) (GetTickRow, error) {
 		&i.Tick.ID,
 		&i.Tick.OrganizerID,
 		&i.Tick.CompetitionID,
-		&i.Tick.ContenderID,
+		&i.Tick.CompetitorID,
 		&i.Tick.ProblemID,
 		&i.Tick.Timestamp,
 		&i.Tick.Revision,
@@ -1046,29 +1046,29 @@ func (q *Queries) GetTick(ctx context.Context, id int32) (GetTickRow, error) {
 	return i, err
 }
 
-const getTickByContenderAndProblem = `-- name: GetTickByContenderAndProblem :one
+const getTickByCompetitorAndProblem = `-- name: GetTickByCompetitorAndProblem :one
 SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.revision, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick
 WHERE contender_id = ? AND problem_id = ?
 `
 
-type GetTickByContenderAndProblemParams struct {
-	ContenderID int32
-	ProblemID   int32
+type GetTickByCompetitorAndProblemParams struct {
+	CompetitorID int32
+	ProblemID    int32
 }
 
-type GetTickByContenderAndProblemRow struct {
+type GetTickByCompetitorAndProblemRow struct {
 	Tick Tick
 }
 
-func (q *Queries) GetTickByContenderAndProblem(ctx context.Context, arg GetTickByContenderAndProblemParams) (GetTickByContenderAndProblemRow, error) {
-	row := q.db.QueryRowContext(ctx, getTickByContenderAndProblem, arg.ContenderID, arg.ProblemID)
-	var i GetTickByContenderAndProblemRow
+func (q *Queries) GetTickByCompetitorAndProblem(ctx context.Context, arg GetTickByCompetitorAndProblemParams) (GetTickByCompetitorAndProblemRow, error) {
+	row := q.db.QueryRowContext(ctx, getTickByCompetitorAndProblem, arg.CompetitorID, arg.ProblemID)
+	var i GetTickByCompetitorAndProblemRow
 	err := row.Scan(
 		&i.Tick.ID,
 		&i.Tick.OrganizerID,
 		&i.Tick.CompetitionID,
-		&i.Tick.ContenderID,
+		&i.Tick.CompetitorID,
 		&i.Tick.ProblemID,
 		&i.Tick.Timestamp,
 		&i.Tick.Revision,
@@ -1105,7 +1105,7 @@ func (q *Queries) GetTicksByCompetition(ctx context.Context, competitionID int32
 			&i.Tick.ID,
 			&i.Tick.OrganizerID,
 			&i.Tick.CompetitionID,
-			&i.Tick.ContenderID,
+			&i.Tick.CompetitorID,
 			&i.Tick.ProblemID,
 			&i.Tick.Timestamp,
 			&i.Tick.Revision,
@@ -1129,30 +1129,30 @@ func (q *Queries) GetTicksByCompetition(ctx context.Context, competitionID int32
 	return items, nil
 }
 
-const getTicksByContender = `-- name: GetTicksByContender :many
+const getTicksByCompetitor = `-- name: GetTicksByCompetitor :many
 SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.revision, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick
 WHERE contender_id = ?
 `
 
-type GetTicksByContenderRow struct {
+type GetTicksByCompetitorRow struct {
 	Tick Tick
 }
 
-func (q *Queries) GetTicksByContender(ctx context.Context, contenderID int32) ([]GetTicksByContenderRow, error) {
-	rows, err := q.db.QueryContext(ctx, getTicksByContender, contenderID)
+func (q *Queries) GetTicksByCompetitor(ctx context.Context, competitorID int32) ([]GetTicksByCompetitorRow, error) {
+	rows, err := q.db.QueryContext(ctx, getTicksByCompetitor, competitorID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetTicksByContenderRow
+	var items []GetTicksByCompetitorRow
 	for rows.Next() {
-		var i GetTicksByContenderRow
+		var i GetTicksByCompetitorRow
 		if err := rows.Scan(
 			&i.Tick.ID,
 			&i.Tick.OrganizerID,
 			&i.Tick.CompetitionID,
-			&i.Tick.ContenderID,
+			&i.Tick.CompetitorID,
 			&i.Tick.ProblemID,
 			&i.Tick.Timestamp,
 			&i.Tick.Revision,
@@ -1199,7 +1199,7 @@ func (q *Queries) GetTicksByProblem(ctx context.Context, problemID int32) ([]Get
 			&i.Tick.ID,
 			&i.Tick.OrganizerID,
 			&i.Tick.CompetitionID,
-			&i.Tick.ContenderID,
+			&i.Tick.CompetitorID,
 			&i.Tick.ProblemID,
 			&i.Tick.Timestamp,
 			&i.Tick.Revision,
@@ -1433,7 +1433,7 @@ func (q *Queries) UpsertCompetition(ctx context.Context, arg UpsertCompetitionPa
 	return result.LastInsertId()
 }
 
-const upsertContender = `-- name: UpsertContender :execlastid
+const upsertCompetitor = `-- name: UpsertCompetitor :execlastid
 INSERT INTO
 	contender (id, organizer_id, contest_id, registration_code, name, class_id, entered, disqualified, withdrawn_from_finals, scrubbed_at, scrub_before)
 VALUES
@@ -1451,7 +1451,7 @@ ON DUPLICATE KEY UPDATE
     scrub_before = VALUES(scrub_before)
 `
 
-type UpsertContenderParams struct {
+type UpsertCompetitorParams struct {
 	ID                  int32
 	OrganizerID         int32
 	CompetitionID       int32
@@ -1465,8 +1465,8 @@ type UpsertContenderParams struct {
 	ScrubBefore         sql.NullTime
 }
 
-func (q *Queries) UpsertContender(ctx context.Context, arg UpsertContenderParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, upsertContender,
+func (q *Queries) UpsertCompetitor(ctx context.Context, arg UpsertCompetitorParams) (int64, error) {
+	result, err := q.db.ExecContext(ctx, upsertCompetitor,
 		arg.ID,
 		arg.OrganizerID,
 		arg.CompetitionID,
@@ -1602,11 +1602,11 @@ ON DUPLICATE KEY UPDATE
 `
 
 type UpsertRaffleWinnerParams struct {
-	ID          int32
-	OrganizerID int32
-	RaffleID    int32
-	ContenderID int32
-	Timestamp   time.Time
+	ID           int32
+	OrganizerID  int32
+	RaffleID     int32
+	CompetitorID int32
+	Timestamp    time.Time
 }
 
 func (q *Queries) UpsertRaffleWinner(ctx context.Context, arg UpsertRaffleWinnerParams) (int64, error) {
@@ -1614,7 +1614,7 @@ func (q *Queries) UpsertRaffleWinner(ctx context.Context, arg UpsertRaffleWinner
 		arg.ID,
 		arg.OrganizerID,
 		arg.RaffleID,
-		arg.ContenderID,
+		arg.CompetitorID,
 		arg.Timestamp,
 	)
 	if err != nil {
@@ -1637,17 +1637,17 @@ ON DUPLICATE KEY UPDATE
 `
 
 type UpsertResultParams struct {
-	ContenderID int32
-	Timestamp   time.Time
-	Score       string
-	Placement   int32
-	Finalist    bool
-	RankOrder   int32
+	CompetitorID int32
+	Timestamp    time.Time
+	Score        string
+	Placement    int32
+	Finalist     bool
+	RankOrder    int32
 }
 
 func (q *Queries) UpsertResult(ctx context.Context, arg UpsertResultParams) error {
 	_, err := q.db.ExecContext(ctx, upsertResult,
-		arg.ContenderID,
+		arg.CompetitorID,
 		arg.Timestamp,
 		arg.Score,
 		arg.Placement,
@@ -1681,7 +1681,7 @@ type UpsertTickParams struct {
 	ID            int32
 	OrganizerID   int32
 	CompetitionID int32
-	ContenderID   int32
+	CompetitorID  int32
 	ProblemID     int32
 	Timestamp     time.Time
 	Revision      uint32
@@ -1698,7 +1698,7 @@ func (q *Queries) UpsertTick(ctx context.Context, arg UpsertTickParams) (sql.Res
 		arg.ID,
 		arg.OrganizerID,
 		arg.CompetitionID,
-		arg.ContenderID,
+		arg.CompetitorID,
 		arg.ProblemID,
 		arg.Timestamp,
 		arg.Revision,

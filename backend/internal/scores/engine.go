@@ -22,14 +22,14 @@ type ScoringRules interface {
 }
 
 type Ranker interface {
-	RankContenders(contenders iter.Seq[Contender]) []domain.Result
+	RankCompetitors(competitors iter.Seq[Competitor]) []domain.Result
 }
 
 type EffectType int8
 
 const (
 	EffectTypeCalculatePointValues EffectType = iota
-	EffectTypeScoreContender
+	EffectTypeScoreCompetitor
 	EffectTypeRankCategory
 )
 
@@ -40,18 +40,18 @@ type Effect interface {
 	Encode() EncodedEffect
 }
 
-type EffectScoreContender struct {
-	ContenderID domain.ContenderID
+type EffectScoreCompetitor struct {
+	CompetitorID domain.CompetitorID
 }
 
-func (e EffectScoreContender) Type() EffectType {
-	return EffectTypeScoreContender
+func (e EffectScoreCompetitor) Type() EffectType {
+	return EffectTypeScoreCompetitor
 }
 
-func (e EffectScoreContender) Encode() EncodedEffect {
+func (e EffectScoreCompetitor) Encode() EncodedEffect {
 	var data EncodedEffect
-	data[0] = byte(EffectTypeScoreContender)
-	binary.LittleEndian.PutUint32(data[1:], uint32(e.ContenderID))
+	data[0] = byte(EffectTypeScoreCompetitor)
+	binary.LittleEndian.PutUint32(data[1:], uint32(e.CompetitorID))
 	return data
 }
 
@@ -91,15 +91,15 @@ type EngineStore interface {
 	GetRules() Rules
 	SaveRules(Rules)
 
-	GetContender(domain.ContenderID) (Contender, bool)
-	GetContendersByCategory(domain.CategoryID) iter.Seq[Contender]
-	SaveContender(Contender)
+	GetCompetitor(domain.CompetitorID) (Competitor, bool)
+	GetCompetitorsByCategory(domain.CategoryID) iter.Seq[Competitor]
+	SaveCompetitor(Competitor)
 
 	GetCategoryIDs() []domain.CategoryID
 
-	GetTicksByContender(domain.ContenderID) iter.Seq[Tick]
-	GetTick(domain.ContenderID, domain.ProblemID) (Tick, bool)
-	SaveTick(domain.ContenderID, Tick)
+	GetTicksByCompetitor(domain.CompetitorID) iter.Seq[Tick]
+	GetTick(domain.CompetitorID, domain.ProblemID) (Tick, bool)
+	SaveTick(domain.CompetitorID, Tick)
 	DeleteTick(domain.TickID)
 	GetTicksByProblem(domain.CategoryID, domain.ProblemID) iter.Seq[Tick]
 
@@ -107,8 +107,8 @@ type EngineStore interface {
 	SaveProblem(Problem)
 	GetAllProblems() iter.Seq[Problem]
 
-	GetPointValue(domain.ContenderID, domain.ProblemID) (domain.PointValue, bool)
-	SavePointValue(domain.ContenderID, domain.ProblemID, domain.PointValue)
+	GetPointValue(domain.CompetitorID, domain.ProblemID) (domain.PointValue, bool)
+	SavePointValue(domain.CompetitorID, domain.ProblemID, domain.PointValue)
 	GetDirtyPointValues() []domain.PointValue
 
 	SaveResult(domain.Result)
@@ -134,8 +134,8 @@ func (e *DefaultScoreEngine) Start() iter.Seq[Effect] {
 				}
 			}
 
-			for contender := range e.store.GetContendersByCategory(categoryID) {
-				if !yield(EffectScoreContender{ContenderID: contender.ID}) {
+			for competitor := range e.store.GetCompetitorsByCategory(categoryID) {
+				if !yield(EffectScoreCompetitor{CompetitorID: competitor.ID}) {
 					return
 				}
 			}
@@ -165,45 +165,45 @@ func (e *DefaultScoreEngine) HandleRulesUpdated(event domain.RulesUpdatedEvent) 
 	return e.Start()
 }
 
-func (e *DefaultScoreEngine) HandleContenderEntered(event domain.ContenderEnteredEvent) iter.Seq[Effect] {
-	contender := Contender{
-		ID:                  event.ContenderID,
+func (e *DefaultScoreEngine) HandleCompetitorEntered(event domain.CompetitorEnteredEvent) iter.Seq[Effect] {
+	competitor := Competitor{
+		ID:                  event.CompetitorID,
 		CategoryID:          event.CategoryID,
 		Disqualified:        false,
 		WithdrawnFromFinals: false,
 		Score:               Score{},
 	}
 
-	e.store.SaveContender(contender)
+	e.store.SaveCompetitor(competitor)
 
 	return func(yield func(Effect) bool) {
 		for problem := range e.store.GetAllProblems() {
-			if !yield(EffectCalculatePointValues{CategoryID: contender.CategoryID, ProblemID: problem.ID}) {
+			if !yield(EffectCalculatePointValues{CategoryID: competitor.CategoryID, ProblemID: problem.ID}) {
 				return
 			}
 		}
 
-		if !yield(EffectRankCategory{CategoryID: contender.CategoryID}) {
+		if !yield(EffectRankCategory{CategoryID: competitor.CategoryID}) {
 			return
 		}
 	}
 }
 
-func (e *DefaultScoreEngine) HandleContenderSwitchedCategory(event domain.ContenderSwitchedCategoryEvent) iter.Seq[Effect] {
-	contender, found := e.store.GetContender(event.ContenderID)
+func (e *DefaultScoreEngine) HandleCompetitorSwitchedCategory(event domain.CompetitorSwitchedCategoryEvent) iter.Seq[Effect] {
+	competitor, found := e.store.GetCompetitor(event.CompetitorID)
 	if !found {
 		return nil
 	}
 
-	if contender.CategoryID == event.CategoryID {
+	if competitor.CategoryID == event.CategoryID {
 		return nil
 	}
 
-	oldCategoryID := contender.CategoryID
+	oldCategoryID := competitor.CategoryID
 
-	contender.CategoryID = event.CategoryID
+	competitor.CategoryID = event.CategoryID
 
-	e.store.SaveContender(contender)
+	e.store.SaveCompetitor(competitor)
 
 	return func(yield func(Effect) bool) {
 		for problem := range e.store.GetAllProblems() {
@@ -226,89 +226,89 @@ func (e *DefaultScoreEngine) HandleContenderSwitchedCategory(event domain.Conten
 	}
 }
 
-func (e *DefaultScoreEngine) HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent) iter.Seq[Effect] {
-	contender, found := e.store.GetContender(event.ContenderID)
+func (e *DefaultScoreEngine) HandleCompetitorWithdrewFromFinals(event domain.CompetitorWithdrewFromFinalsEvent) iter.Seq[Effect] {
+	competitor, found := e.store.GetCompetitor(event.CompetitorID)
 	if !found {
 		return nil
 	}
 
-	contender.WithdrawnFromFinals = true
+	competitor.WithdrawnFromFinals = true
 
-	e.store.SaveContender(contender)
+	e.store.SaveCompetitor(competitor)
 
 	return func(yield func(Effect) bool) {
-		if !yield(EffectRankCategory{CategoryID: contender.CategoryID}) {
+		if !yield(EffectRankCategory{CategoryID: competitor.CategoryID}) {
 			return
 		}
 	}
 }
 
-func (e *DefaultScoreEngine) HandleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent) iter.Seq[Effect] {
-	contender, found := e.store.GetContender(event.ContenderID)
+func (e *DefaultScoreEngine) HandleCompetitorReenteredFinals(event domain.CompetitorReenteredFinalsEvent) iter.Seq[Effect] {
+	competitor, found := e.store.GetCompetitor(event.CompetitorID)
 	if !found {
 		return nil
 	}
 
-	contender.WithdrawnFromFinals = false
+	competitor.WithdrawnFromFinals = false
 
-	e.store.SaveContender(contender)
+	e.store.SaveCompetitor(competitor)
 
 	return func(yield func(Effect) bool) {
-		if !yield(EffectRankCategory{CategoryID: contender.CategoryID}) {
+		if !yield(EffectRankCategory{CategoryID: competitor.CategoryID}) {
 			return
 		}
 	}
 }
 
-func (e *DefaultScoreEngine) HandleContenderDisqualified(event domain.ContenderDisqualifiedEvent) iter.Seq[Effect] {
-	contender, found := e.store.GetContender(event.ContenderID)
+func (e *DefaultScoreEngine) HandleCompetitorDisqualified(event domain.CompetitorDisqualifiedEvent) iter.Seq[Effect] {
+	competitor, found := e.store.GetCompetitor(event.CompetitorID)
 	if !found {
 		return nil
 	}
 
-	contender.Disqualified = true
+	competitor.Disqualified = true
 
-	e.store.SaveContender(contender)
+	e.store.SaveCompetitor(competitor)
 
 	return func(yield func(Effect) bool) {
 		for problem := range e.store.GetAllProblems() {
-			if !yield(EffectCalculatePointValues{CategoryID: contender.CategoryID, ProblemID: problem.ID}) {
+			if !yield(EffectCalculatePointValues{CategoryID: competitor.CategoryID, ProblemID: problem.ID}) {
 				return
 			}
 		}
 
-		if !yield(EffectScoreContender{ContenderID: contender.ID}) {
+		if !yield(EffectScoreCompetitor{CompetitorID: competitor.ID}) {
 			return
 		}
 
-		if !yield(EffectRankCategory{CategoryID: contender.CategoryID}) {
+		if !yield(EffectRankCategory{CategoryID: competitor.CategoryID}) {
 			return
 		}
 	}
 }
 
-func (e *DefaultScoreEngine) HandleContenderRequalified(event domain.ContenderRequalifiedEvent) iter.Seq[Effect] {
-	contender, found := e.store.GetContender(event.ContenderID)
+func (e *DefaultScoreEngine) HandleCompetitorRequalified(event domain.CompetitorRequalifiedEvent) iter.Seq[Effect] {
+	competitor, found := e.store.GetCompetitor(event.CompetitorID)
 	if !found {
 		return nil
 	}
 
-	contender.Disqualified = false
+	competitor.Disqualified = false
 
-	e.store.SaveContender(contender)
+	e.store.SaveCompetitor(competitor)
 
 	return func(yield func(Effect) bool) {
 		for problem := range e.store.GetAllProblems() {
-			if !yield(EffectCalculatePointValues{CategoryID: contender.CategoryID, ProblemID: problem.ID}) {
+			if !yield(EffectCalculatePointValues{CategoryID: competitor.CategoryID, ProblemID: problem.ID}) {
 				return
 			}
 		}
 
-		if !yield(EffectScoreContender{ContenderID: contender.ID}) {
+		if !yield(EffectScoreCompetitor{CompetitorID: competitor.ID}) {
 			return
 		}
 
-		if !yield(EffectRankCategory{CategoryID: contender.CategoryID}) {
+		if !yield(EffectRankCategory{CategoryID: competitor.CategoryID}) {
 			return
 		}
 	}
@@ -318,7 +318,7 @@ func (e *DefaultScoreEngine) HandleAscentRegistered(event domain.AscentRegistere
 	tick := Tick{
 		ID:            event.TickID,
 		Revision:      event.Revision,
-		ContenderID:   event.ContenderID,
+		CompetitorID:  event.CompetitorID,
 		ProblemID:     event.ProblemID,
 		Zone1:         event.Zone1,
 		AttemptsZone1: event.AttemptsZone1,
@@ -328,51 +328,51 @@ func (e *DefaultScoreEngine) HandleAscentRegistered(event domain.AscentRegistere
 		AttemptsTop:   event.AttemptsTop,
 	}
 
-	existingTick, found := e.store.GetTick(event.ContenderID, event.ProblemID)
+	existingTick, found := e.store.GetTick(event.CompetitorID, event.ProblemID)
 	if found && existingTick.Revision > event.Revision {
 		return nil
 	}
 
-	contender, found := e.store.GetContender(event.ContenderID)
+	competitor, found := e.store.GetCompetitor(event.CompetitorID)
 	if !found {
 		return nil
 	}
 
-	e.store.SaveTick(event.ContenderID, tick)
+	e.store.SaveTick(event.CompetitorID, tick)
 
-	if contender.Disqualified {
+	if competitor.Disqualified {
 		return nil
 	}
 
 	return func(yield func(Effect) bool) {
-		if !yield(EffectCalculatePointValues{CategoryID: contender.CategoryID, ProblemID: event.ProblemID}) {
+		if !yield(EffectCalculatePointValues{CategoryID: competitor.CategoryID, ProblemID: event.ProblemID}) {
 			return
 		}
 
-		if !yield(EffectScoreContender{ContenderID: contender.ID}) {
+		if !yield(EffectScoreCompetitor{CompetitorID: competitor.ID}) {
 			return
 		}
 	}
 }
 
 func (e *DefaultScoreEngine) HandleAscentDeregistered(event domain.AscentDeregisteredEvent) iter.Seq[Effect] {
-	contender, found := e.store.GetContender(event.ContenderID)
+	competitor, found := e.store.GetCompetitor(event.CompetitorID)
 	if !found {
 		return nil
 	}
 
 	e.store.DeleteTick(event.TickID)
 
-	if contender.Disqualified {
+	if competitor.Disqualified {
 		return nil
 	}
 
 	return func(yield func(Effect) bool) {
-		if !yield(EffectCalculatePointValues{CategoryID: contender.CategoryID, ProblemID: event.ProblemID}) {
+		if !yield(EffectCalculatePointValues{CategoryID: competitor.CategoryID, ProblemID: event.ProblemID}) {
 			return
 		}
 
-		if !yield(EffectScoreContender{ContenderID: contender.ID}) {
+		if !yield(EffectScoreCompetitor{CompetitorID: competitor.ID}) {
 			return
 		}
 	}
@@ -431,10 +431,10 @@ func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEve
 				return
 			}
 
-			contenders := e.store.GetContendersByCategory(categoryID)
+			competitors := e.store.GetCompetitorsByCategory(categoryID)
 
-			for contender := range contenders {
-				if !yield(EffectScoreContender{ContenderID: contender.ID}) {
+			for competitor := range competitors {
+				if !yield(EffectScoreCompetitor{CompetitorID: competitor.ID}) {
 					return
 				}
 			}
@@ -467,12 +467,12 @@ func (e *DefaultScoreEngine) CalculatePointValues(categoryID domain.CategoryID, 
 
 	if rules.PooledPoints {
 		for tick := range e.store.GetTicksByProblem(categoryID, problemID) {
-			contender, found := e.store.GetContender(tick.ContenderID)
+			competitor, found := e.store.GetCompetitor(tick.CompetitorID)
 			if !found {
 				continue
 			}
 
-			if contender.Disqualified {
+			if competitor.Disqualified {
 				continue
 			}
 
@@ -482,10 +482,10 @@ func (e *DefaultScoreEngine) CalculatePointValues(categoryID domain.CategoryID, 
 		problemValue = tickPool.CalculatePooledProblemValue(problem.ProblemValue)
 	}
 
-	affectedContenders := make([]domain.ContenderID, 0)
+	affectedCompetitors := make([]domain.CompetitorID, 0)
 
-	for contender := range e.store.GetContendersByCategory(categoryID) {
-		tick, _ := e.store.GetTick(contender.ID, problemID)
+	for competitor := range e.store.GetCompetitorsByCategory(categoryID) {
+		tick, _ := e.store.GetTick(competitor.ID, problemID)
 
 		hypotheticalBestZone1 := tick.TurnIntoZone1()
 		hypotheticalBestZone2 := tick.TurnIntoZone2()
@@ -493,16 +493,16 @@ func (e *DefaultScoreEngine) CalculatePointValues(categoryID domain.CategoryID, 
 		hypotheticalFlash := tick.TurnIntoFlash()
 
 		pointValue := domain.PointValue{
-			ContenderID: contender.ID,
-			ProblemID:   problemID,
-			Current:     0,
-			Zone1:       0,
-			Zone2:       0,
-			Top:         0,
-			FlashBonus:  0,
+			CompetitorID: competitor.ID,
+			ProblemID:    problemID,
+			Current:      0,
+			Zone1:        0,
+			Zone2:        0,
+			Top:          0,
+			FlashBonus:   0,
 		}
 
-		if !contender.Disqualified {
+		if !competitor.Disqualified {
 			pointValue.Current = CalculatePoints(problemValue, tick, rules)
 
 			hypotheticalProblemValue := problemValue
@@ -520,46 +520,46 @@ func (e *DefaultScoreEngine) CalculatePointValues(categoryID domain.CategoryID, 
 			pointValue.Top = CalculatePoints(hypotheticalProblemValue, hypotheticalBestTop, rules)
 		}
 
-		oldValue, hadPointValue := e.store.GetPointValue(contender.ID, problemID)
-		e.store.SavePointValue(contender.ID, problemID, pointValue)
+		oldValue, hadPointValue := e.store.GetPointValue(competitor.ID, problemID)
+		e.store.SavePointValue(competitor.ID, problemID, pointValue)
 
 		if !hadPointValue || !ComparePointValue(oldValue, pointValue) {
-			affectedContenders = append(affectedContenders, contender.ID)
+			affectedCompetitors = append(affectedCompetitors, competitor.ID)
 		}
 	}
 
-	if len(affectedContenders) == 0 {
+	if len(affectedCompetitors) == 0 {
 		return nil
 	}
 
 	return func(yield func(Effect) bool) {
-		for _, contenderID := range affectedContenders {
-			if !yield(EffectScoreContender{ContenderID: contenderID}) {
+		for _, competitorID := range affectedCompetitors {
+			if !yield(EffectScoreCompetitor{CompetitorID: competitorID}) {
 				return
 			}
 		}
 	}
 }
 
-func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter.Seq[Effect] {
-	contender, found := e.store.GetContender(contenderID)
+func (e *DefaultScoreEngine) ScoreCompetitor(competitorID domain.CompetitorID) iter.Seq[Effect] {
+	competitor, found := e.store.GetCompetitor(competitorID)
 	if !found {
 		return nil
 	}
 
 	rules := e.store.GetRules()
 
-	oldScore := contender.Score
+	oldScore := competitor.Score
 
-	contender.Score = Score{}
+	competitor.Score = Score{}
 
-	if !contender.Disqualified {
+	if !competitor.Disqualified {
 		if rules.UsePoints {
-			ticks := e.store.GetTicksByContender(contender.ID)
+			ticks := e.store.GetTicksByCompetitor(competitor.ID)
 
 			var pointValues iter.Seq[domain.Tenths] = func(yield func(domain.Tenths) bool) {
 				for tick := range ticks {
-					value, found := e.store.GetPointValue(contender.ID, tick.ProblemID)
+					value, found := e.store.GetPointValue(competitor.ID, tick.ProblemID)
 					if !found {
 						continue
 					}
@@ -574,10 +574,10 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 				ProblemLimit: rules.QualifyingProblems,
 			}
 
-			contender.Points = scorer.CalculatePoints(pointValues)
+			competitor.Points = scorer.CalculatePoints(pointValues)
 		}
 
-		ticks := e.store.GetTicksByContender(contender.ID)
+		ticks := e.store.GetTicksByCompetitor(competitor.ID)
 
 		for tick := range ticks {
 			problem, found := e.store.GetProblem(tick.ProblemID)
@@ -586,30 +586,30 @@ func (e *DefaultScoreEngine) ScoreContender(contenderID domain.ContenderID) iter
 			}
 
 			if tick.Top {
-				contender.Tops += 1
-				contender.AttemptsTops += tick.AttemptsTop
+				competitor.Tops += 1
+				competitor.AttemptsTops += tick.AttemptsTop
 			}
 
 			if tick.Zone2 && problem.Zone2Enabled {
-				contender.Zone2s += 1
-				contender.AttemptsZone2s += tick.AttemptsZone2
+				competitor.Zone2s += 1
+				competitor.AttemptsZone2s += tick.AttemptsZone2
 			}
 
 			if tick.Zone1 && problem.Zone1Enabled {
-				contender.Zone1s += 1
-				contender.AttemptsZone1s += tick.AttemptsZone1
+				competitor.Zone1s += 1
+				competitor.AttemptsZone1s += tick.AttemptsZone1
 			}
 		}
 	}
 
-	if contender.Score == oldScore {
+	if competitor.Score == oldScore {
 		return nil
 	}
 
-	e.store.SaveContender(contender)
+	e.store.SaveCompetitor(competitor)
 
 	return func(yield func(Effect) bool) {
-		yield(EffectRankCategory{CategoryID: contender.CategoryID})
+		yield(EffectRankCategory{CategoryID: competitor.CategoryID})
 	}
 }
 
@@ -624,7 +624,7 @@ func (e *DefaultScoreEngine) RankCategory(categoryID domain.CategoryID) {
 	}
 	ranker := NewBasicRanker(rules.Finalists, rules.UsePoints, zone1Enabled, zone2Enabled)
 
-	results := ranker.RankContenders(e.store.GetContendersByCategory(categoryID))
+	results := ranker.RankCompetitors(e.store.GetCompetitorsByCategory(categoryID))
 
 	for result := range slices.Values(results) {
 		e.store.SaveResult(result)

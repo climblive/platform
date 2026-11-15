@@ -8,10 +8,10 @@
   import type WaNumberInput from "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import { value } from "@climblive/lib/forms";
   import type {
-    Contender,
-    CreateContendersArguments,
+    Competitor,
+    CreateCompetitorsArguments,
   } from "@climblive/lib/models";
-  import { createContendersMutation } from "@climblive/lib/queries";
+  import { createCompetitorsMutation } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
 
   const maxTickets = 500;
@@ -19,7 +19,7 @@
   interface Props {
     competitionId: number;
     remainingCodes: number | undefined;
-    onCreated?: (contenders: Contender[]) => void;
+    onCreated?: (competitors: Competitor[]) => void;
   }
 
   const { competitionId, remainingCodes, onCreated }: Props = $props();
@@ -29,7 +29,7 @@
   let numberInput: WaNumberInput | undefined = $state();
   let printUrl: string | undefined = $state(undefined);
 
-  const createContenders = createContendersMutation(competitionId);
+  const createCompetitors = createCompetitorsMutation(competitionId);
 
   export const open = () => {
     if (dialog) {
@@ -59,21 +59,21 @@
 
   const handleCreate = () => {
     if (numberInput) {
-      const args: CreateContendersArguments = {
+      const args: CreateCompetitorsArguments = {
         number: Number(numberInput.value),
       };
 
-      createContenders.mutate(args, {
-        onSuccess: (newContenders) => {
+      createCompetitors.mutate(args, {
+        onSuccess: (newCompetitors) => {
           closeDialog();
 
-          if (newContenders.length > 0) {
-            const ids = newContenders.map(({ id }) => id);
+          if (newCompetitors.length > 0) {
+            const ids = newCompetitors.map(({ id }) => id);
             const from = Math.min(...ids);
             const to = Math.max(...ids);
             printUrl = `/admin/competitions/${competitionId}/tickets/print?from=${from}&to=${to}`;
 
-            onCreated?.(newContenders);
+            onCreated?.(newCompetitors);
 
             if (printDialog) {
               printDialog.open = true;
@@ -112,7 +112,7 @@
     size="s"
     variant="neutral"
     appearance="accent"
-    loading={createContenders.isPending}
+    loading={createCompetitors.isPending}
     onclick={handleCreate}
   >
     Create

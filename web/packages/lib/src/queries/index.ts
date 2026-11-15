@@ -1,6 +1,6 @@
 export * from "./categories";
 export * from "./constants";
-export * from "./contenders";
+export * from "./competitors";
 export * from "./competitions";
 export * from "./health";
 export * from "./organizerInvites";

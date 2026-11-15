@@ -5,7 +5,7 @@
 
 export type ResourceID = number; /* int32 */
 export type CategoryID = ResourceID;
-export type ContenderID = ResourceID;
+export type CompetitorID = ResourceID;
 export type CompetitionID = ResourceID;
 export type OrganizerID = ResourceID;
 export type ProblemID = ResourceID;
@@ -17,7 +17,7 @@ export type TickID = ResourceID;
 export type OrganizerInviteID = string;
 export type ResourceIDType =
   | CategoryID
-  | ContenderID
+  | CompetitorID
   | CompetitionID
   | OrganizerID
   | ProblemID
@@ -34,7 +34,7 @@ export type ScoreEngineInstanceID = string;
 export type Tenths = number; /* int64 */
 export interface EventFilter {
   competitionId?: CompetitionID;
-  contenderId?: ContenderID;
+  competitorId?: CompetitorID;
   eventTypes?: { [key: string]: {} };
 }
 export type ColorRGB = string;
@@ -61,8 +61,8 @@ export interface CategoryPatch {
   timeBegin?: Date;
   timeEnd?: Date;
 }
-export interface Contender {
-  id: ContenderID;
+export interface Competitor {
+  id: CompetitorID;
   competitionId: CompetitionID;
   categoryId?: CategoryID;
   registrationCode: string;
@@ -74,7 +74,7 @@ export interface Contender {
   scrubBefore?: Date;
   result?: Result;
 }
-export interface ContenderPatch {
+export interface CompetitorPatch {
   categoryId?: CategoryID;
   name?: string;
   withdrawnFromFinals?: boolean;
@@ -101,7 +101,7 @@ export interface Competition {
   timeBegin?: Date;
   timeEnd?: Date;
   created: Date;
-  registeredContenders: number /* int */;
+  registeredCompetitors: number /* int */;
 }
 export interface CompetitionTemplate {
   location?: string;
@@ -160,7 +160,7 @@ export interface ProblemValue {
   flashBonus?: number /* int */;
 }
 export interface PointValue {
-  contenderId: ContenderID;
+  competitorId: CompetitorID;
   problemId: ProblemID;
   current: Tenths;
   zone1: Tenths;
@@ -205,14 +205,14 @@ export interface Raffle {
 export interface RaffleWinner {
   id: RaffleWinnerID;
   raffleId: RaffleID;
-  contenderId: ContenderID;
-  contenderName: string;
-  contenderScrubbedAt?: Date;
+  competitorId: CompetitorID;
+  competitorName: string;
+  competitorScrubbedAt?: Date;
   timestamp: Date;
 }
 export interface Result {
   timestamp: Date;
-  contenderId: ContenderID;
+  competitorId: CompetitorID;
   score: string;
   placement: number /* int */;
   finalist: boolean;
@@ -223,7 +223,7 @@ export interface Series {
   name: string;
 }
 export interface ScoreboardEntry {
-  contenderId: ContenderID;
+  competitorId: CompetitorID;
   categoryId: CategoryID;
   name: string;
   withdrawnFromFinals: boolean;
@@ -258,30 +258,30 @@ export interface ScoreEngineDescriptor {
   instanceId: ScoreEngineInstanceID;
   competitionId: CompetitionID;
 }
-export interface ContenderEnteredEvent {
-  contenderId: ContenderID;
+export interface CompetitorEnteredEvent {
+  competitorId: CompetitorID;
   categoryId: CategoryID;
 }
-export interface ContenderSwitchedCategoryEvent {
-  contenderId: ContenderID;
+export interface CompetitorSwitchedCategoryEvent {
+  competitorId: CompetitorID;
   categoryId: CategoryID;
 }
-export interface ContenderWithdrewFromFinalsEvent {
-  contenderId: ContenderID;
+export interface CompetitorWithdrewFromFinalsEvent {
+  competitorId: CompetitorID;
 }
-export interface ContenderReenteredFinalsEvent {
-  contenderId: ContenderID;
+export interface CompetitorReenteredFinalsEvent {
+  competitorId: CompetitorID;
 }
-export interface ContenderDisqualifiedEvent {
-  contenderId: ContenderID;
+export interface CompetitorDisqualifiedEvent {
+  competitorId: CompetitorID;
 }
-export interface ContenderRequalifiedEvent {
-  contenderId: ContenderID;
+export interface CompetitorRequalifiedEvent {
+  competitorId: CompetitorID;
 }
 export interface AscentRegisteredEvent {
   tickId: TickID;
   timestamp: Date;
-  contenderId: ContenderID;
+  competitorId: CompetitorID;
   problemId: ProblemID;
   revision: number /* int */;
   zone1: boolean;
@@ -293,7 +293,7 @@ export interface AscentRegisteredEvent {
 }
 export interface AscentDeregisteredEvent {
   tickId: TickID;
-  contenderId: ContenderID;
+  competitorId: CompetitorID;
   problemId: ProblemID;
 }
 export interface ProblemAddedEvent extends ProblemValue {
@@ -318,24 +318,24 @@ export interface RulesUpdatedEvent {
   maxAttempts: number /* int */;
   pointDeduction: Tenths;
 }
-export interface ContenderPublicInfoUpdatedEvent {
-  contenderId: ContenderID;
+export interface CompetitorPublicInfoUpdatedEvent {
+  competitorId: CompetitorID;
   categoryId: CategoryID;
   name: string;
   withdrawnFromFinals: boolean;
   disqualified: boolean;
   scrubbedAt?: Date;
 }
-export interface ContenderResultUpdatedEvent {
+export interface CompetitorResultUpdatedEvent {
   timestamp: Date;
-  contenderId: ContenderID;
+  competitorId: CompetitorID;
   score: string;
   placement: number /* int */;
   finalist: boolean;
   rankOrder: number /* int */;
 }
 export interface PointValueUpdatedEvent {
-  contenderId: ContenderID;
+  competitorId: CompetitorID;
   problemId: ProblemID;
   current: Tenths;
   zone1: Tenths;
@@ -351,6 +351,6 @@ export interface ScoreEngineStoppedEvent {
 }
 export interface RaffleWinnerDrawnEvent {
   raffleId: RaffleID;
-  contenderId: ContenderID;
+  competitorId: CompetitorID;
   timestamp: Date;
 }

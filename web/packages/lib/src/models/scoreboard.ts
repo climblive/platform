@@ -3,7 +3,7 @@ import type { ScoreboardEntry } from "./generated";
 import { resultSchema } from "./result";
 
 export const scoreboardEntrySchema: z.ZodType<ScoreboardEntry> = z.object({
-  contenderId: z.number(),
+  competitorId: z.number(),
   categoryId: z.number(),
   name: z.string(),
   withdrawnFromFinals: z.boolean(),

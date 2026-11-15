@@ -15,9 +15,9 @@
     Table,
     type ColumnDefinition,
   } from "@climblive/lib/components";
-  import type { Contender } from "@climblive/lib/models";
+  import type { Competitor } from "@climblive/lib/models";
   import {
-    getContendersByCompetitionQuery,
+    getCompetitorsByCompetitionQuery,
     getCompetitionQuery,
   } from "@climblive/lib/queries";
   import { Link, navigate } from "svelte-routing";
@@ -31,29 +31,29 @@
   const { competitionId }: Props = $props();
 
   const competitionQuery = $derived(getCompetitionQuery(competitionId));
-  const contendersQuery = $derived(
-    getContendersByCompetitionQuery(competitionId),
+  const competitorsQuery = $derived(
+    getCompetitorsByCompetitionQuery(competitionId),
   );
 
   const competition = $derived(competitionQuery.data);
-  const contenders = $derived(contendersQuery.data);
+  const competitors = $derived(competitorsQuery.data);
 
   let createTicketsDialog: CreateTicketsDialog | undefined = $state();
 
   const remainingCodes = $derived(
-    contenders === undefined ? undefined : maxTickets - contenders.length,
+    competitors === undefined ? undefined : maxTickets - competitors.length,
   );
 
   let showUnusedOnly = $state(false);
   let selectionStartId: number | undefined = $state(undefined);
   let selectionEndId: number | undefined = $state(undefined);
 
-  const filteredContenders = $derived.by(() => {
-    if (!contenders) {
+  const filteredCompetitors = $derived.by(() => {
+    if (!competitors) {
       return undefined;
     }
 
-    const sorted = [...contenders].sort((a, b) => a.id - b.id);
+    const sorted = [...competitors].sort((a, b) => a.id - b.id);
 
     if (showUnusedOnly) {
       return sorted.filter(({ entered }) => entered === undefined);
@@ -66,11 +66,11 @@
     const from = selectionStartId;
     const to = selectionEndId;
 
-    if (from === undefined || to === undefined || !filteredContenders) {
+    if (from === undefined || to === undefined || !filteredCompetitors) {
       return 0;
     }
 
-    return filteredContenders.filter(({ id }) => isSelected(id)).length;
+    return filteredCompetitors.filter(({ id }) => isSelected(id)).length;
   });
 
   const isSelected = (id: number): boolean => {
@@ -102,16 +102,16 @@
       selectionStartId = undefined;
       selectionEndId = undefined;
     } else if (id === selectionStartId) {
-      selectionStartId = filteredContenders?.find((c) => c.id > id)?.id;
+      selectionStartId = filteredCompetitors?.find((c) => c.id > id)?.id;
     } else if (id === selectionEndId) {
-      selectionEndId = filteredContenders?.findLast((c) => c.id < id)?.id;
+      selectionEndId = filteredCompetitors?.findLast((c) => c.id < id)?.id;
     }
   };
 
   const allSelected = $derived(
-    filteredContenders !== undefined &&
-      filteredContenders.length > 0 &&
-      selectedCount === filteredContenders.length,
+    filteredCompetitors !== undefined &&
+      filteredCompetitors.length > 0 &&
+      selectedCount === filteredCompetitors.length,
   );
 
   const handleToggleSelectAll = (event: InputEvent) => {
@@ -119,11 +119,11 @@
 
     if (
       checkbox.checked &&
-      filteredContenders &&
-      filteredContenders.length > 0
+      filteredCompetitors &&
+      filteredCompetitors.length > 0
     ) {
-      selectionStartId = filteredContenders[0].id;
-      selectionEndId = filteredContenders[filteredContenders.length - 1].id;
+      selectionStartId = filteredCompetitors[0].id;
+      selectionEndId = filteredCompetitors[filteredCompetitors.length - 1].id;
     } else {
       selectionStartId = undefined;
       selectionEndId = undefined;
@@ -138,13 +138,13 @@
     return `/admin/competitions/${competitionId}/tickets/print?from=${selectionStartId}&to=${selectionEndId}`;
   });
 
-  const handleCreated = (newContenders: Contender[]) => {
-    const ids = newContenders.map(({ id }) => id);
+  const handleCreated = (newCompetitors: Competitor[]) => {
+    const ids = newCompetitors.map(({ id }) => id);
     selectionStartId = Math.min(...ids);
     selectionEndId = Math.max(...ids);
   };
 
-  const columns: ColumnDefinition<Contender>[] = [
+  const columns: ColumnDefinition<Competitor>[] = [
     {
       label: renderSelectAll,
       mobile: true,
@@ -182,27 +182,27 @@
   ></wa-checkbox>
 {/snippet}
 
-{#snippet renderCheckbox(contender: Contender)}
+{#snippet renderCheckbox(competitor: Competitor)}
   <wa-checkbox
     size="s"
-    checked={isSelected(contender.id)}
-    disabled={isLocked(contender.id)}
-    onchange={(e: InputEvent) => handleCheckboxChange(contender.id, e)}
+    checked={isSelected(competitor.id)}
+    disabled={isLocked(competitor.id)}
+    onchange={(e: InputEvent) => handleCheckboxChange(competitor.id, e)}
   ></wa-checkbox>
 {/snippet}
 
-{#snippet renderTicketNumber({ id }: Contender)}
+{#snippet renderTicketNumber({ id }: Competitor)}
   #{id.toString().padStart(6, "0")}
 {/snippet}
 
-{#snippet renderRegistrationCode({ id, registrationCode }: Contender)}
-  <Link to={`/admin/contenders/${id}`}>
+{#snippet renderRegistrationCode({ id, registrationCode }: Competitor)}
+  <Link to={`/admin/competitors/${id}`}>
     <wa-icon name="qrcode"></wa-icon>
     <span class="regcode"><RegistrationCode code={registrationCode} /></span>
   </Link>
 {/snippet}
 
-{#snippet renderUsed({ entered }: Contender)}
+{#snippet renderUsed({ entered }: Competitor)}
   {#if entered}
     <wa-badge variant="success"
       ><wa-icon slot="start" name="user-check"></wa-icon>Registered</wa-badge
@@ -275,10 +275,10 @@
     onCreated={handleCreated}
   />
 
-  {#if filteredContenders === undefined}
+  {#if filteredCompetitors === undefined}
     <Loader />
-  {:else if filteredContenders.length > 0}
-    <Table {columns} data={filteredContenders} getId={({ id }) => id}></Table>
+  {:else if filteredCompetitors.length > 0}
+    <Table {columns} data={filteredCompetitors} getId={({ id }) => id}></Table>
   {/if}
 {/if}
 

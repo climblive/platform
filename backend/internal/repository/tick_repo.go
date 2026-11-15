@@ -9,8 +9,8 @@ import (
 	"github.com/go-errors/errors"
 )
 
-func (d *Database) GetTicksByContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) ([]domain.Tick, error) {
-	records, err := d.WithTx(tx).GetTicksByContender(ctx, int32(contenderID))
+func (d *Database) GetTicksByCompetitor(ctx context.Context, tx domain.Transaction, competitorID domain.CompetitorID) ([]domain.Tick, error) {
+	records, err := d.WithTx(tx).GetTicksByCompetitor(ctx, int32(competitorID))
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -44,7 +44,7 @@ func (d *Database) StoreTick(ctx context.Context, tx domain.Transaction, tick do
 		ID:            int32(tick.ID),
 		OrganizerID:   int32(tick.Ownership.OrganizerID),
 		CompetitionID: int32(tick.CompetitionID),
-		ContenderID:   int32(*tick.Ownership.ContenderID),
+		CompetitorID:  int32(*tick.Ownership.CompetitorID),
 		ProblemID:     int32(tick.ProblemID),
 		Timestamp:     tick.Timestamp,
 		Revision:      uint32(tick.Revision),
@@ -101,10 +101,10 @@ func (d *Database) GetTick(ctx context.Context, tx domain.Transaction, tickID do
 	return tickToDomain(record.Tick), nil
 }
 
-func (d *Database) GetTickByContenderAndProblem(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID, problemID domain.ProblemID) (domain.Tick, error) {
-	record, err := d.WithTx(tx).GetTickByContenderAndProblem(ctx, database.GetTickByContenderAndProblemParams{
-		ContenderID: int32(contenderID),
-		ProblemID:   int32(problemID),
+func (d *Database) GetTickByCompetitorAndProblem(ctx context.Context, tx domain.Transaction, competitorID domain.CompetitorID, problemID domain.ProblemID) (domain.Tick, error) {
+	record, err := d.WithTx(tx).GetTickByCompetitorAndProblem(ctx, database.GetTickByCompetitorAndProblemParams{
+		CompetitorID: int32(competitorID),
+		ProblemID:    int32(problemID),
 	})
 	switch {
 	case errors.Is(err, sql.ErrNoRows):

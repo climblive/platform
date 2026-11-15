@@ -9,15 +9,15 @@ import (
 
 type SubscriptionID = uuid.UUID
 
-func (f EventFilter) Match(competitionID CompetitionID, contenderID ContenderID, eventType string) bool {
+func (f EventFilter) Match(competitionID CompetitionID, competitorID CompetitorID, eventType string) bool {
 	switch f.CompetitionID {
 	case 0, competitionID:
 	default:
 		return false
 	}
 
-	switch f.ContenderID {
-	case 0, contenderID:
+	switch f.CompetitorID {
+	case 0, competitorID:
 	default:
 		return false
 	}
@@ -31,10 +31,10 @@ func (f EventFilter) Match(competitionID CompetitionID, contenderID ContenderID,
 	return true
 }
 
-func NewEventFilter(competitionID CompetitionID, contenderID ContenderID, eventTypes ...string) EventFilter {
+func NewEventFilter(competitionID CompetitionID, competitorID CompetitorID, eventTypes ...string) EventFilter {
 	filter := EventFilter{
 		CompetitionID: competitionID,
-		ContenderID:   contenderID,
+		CompetitorID:  competitorID,
 		EventTypes:    nil,
 	}
 

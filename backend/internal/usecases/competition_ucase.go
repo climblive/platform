@@ -18,7 +18,7 @@ type competitionUseCaseRepository interface {
 
 	GetCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (domain.Competition, error)
 	GetAllCompetitions(ctx context.Context, tx domain.Transaction) ([]domain.Competition, error)
-	GetContendersByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Contender, error)
+	GetCompetitorsByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Competitor, error)
 	GetCompetitionsByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.Competition, error)
 	GetOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) (domain.Organizer, error)
 	StoreCompetition(ctx context.Context, tx domain.Transaction, competition domain.Competition) (domain.Competition, error)
@@ -29,8 +29,8 @@ type competitionUseCaseRepository interface {
 	DeleteCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) error
 	DeleteProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) error
 	DeleteCategory(ctx context.Context, tx domain.Transaction, categoryID domain.CategoryID) error
-	DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) error
-	StoreContender(ctx context.Context, tx domain.Transaction, contender domain.Contender) (domain.Contender, error)
+	DeleteCompetitor(ctx context.Context, tx domain.Transaction, competitorID domain.CompetitorID) error
+	StoreCompetitor(ctx context.Context, tx domain.Transaction, competitor domain.Competitor) (domain.Competitor, error)
 	GetRafflesByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Raffle, error)
 	DeleteRaffle(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) error
 	StoreRaffle(ctx context.Context, tx domain.Transaction, raffle domain.Raffle) (domain.Raffle, error)
@@ -101,29 +101,29 @@ func (uc *CompetitionUseCase) GetCompetitionsByOrganizer(ctx context.Context, or
 }
 
 func (uc *CompetitionUseCase) GetScoreboard(ctx context.Context, competitionID domain.CompetitionID) ([]domain.ScoreboardEntry, error) {
-	contenders, err := uc.Repo.GetContendersByCompetition(ctx, nil, competitionID)
+	competitors, err := uc.Repo.GetCompetitorsByCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
 
 	entries := make([]domain.ScoreboardEntry, 0)
 
-	for _, contender := range contenders {
-		if contender.CategoryID == 0 {
+	for _, competitor := range competitors {
+		if competitor.CategoryID == 0 {
 			continue
 		}
 
 		entry := domain.ScoreboardEntry{
-			ContenderID:         contender.ID,
-			CategoryID:          contender.CategoryID,
-			Name:                contender.Name,
-			WithdrawnFromFinals: contender.WithdrawnFromFinals,
-			Disqualified:        contender.Disqualified,
-			ScrubbedAt:          contender.ScrubbedAt,
-			Result:              contender.Result,
+			CompetitorID:        competitor.ID,
+			CategoryID:          competitor.CategoryID,
+			Name:                competitor.Name,
+			WithdrawnFromFinals: competitor.WithdrawnFromFinals,
+			Disqualified:        competitor.Disqualified,
+			ScrubbedAt:          competitor.ScrubbedAt,
+			Result:              competitor.Result,
 		}
 
-		if result, err := uc.ResultKeeper.GetResult(contender.ID); err == nil {
+		if result, err := uc.ResultKeeper.GetResult(competitor.ID); err == nil {
 			entry.Result = &result
 		}
 
@@ -321,28 +321,28 @@ func (uc *CompetitionUseCase) CreateCompetition(ctx context.Context, organizerID
 	competition := domain.Competition{
 		ID: 0,
 		Ownership: domain.OwnershipData{
-			OrganizerID: organizerID,
-			ContenderID: nil,
+			OrganizerID:  organizerID,
+			CompetitorID: nil,
 		},
-		ArchivedAt:           time.Time{},
-		SeriesID:             0,
-		TimeBegin:            time.Time{},
-		TimeEnd:              time.Time{},
-		RegisteredContenders: 0,
-		Location:             strings.TrimSpace(tmpl.Location),
-		Country:              strings.TrimSpace(tmpl.Country),
-		Name:                 strings.TrimSpace(tmpl.Name),
-		Description:          strings.TrimSpace(tmpl.Description),
-		QualifyingProblems:   tmpl.QualifyingProblems,
-		Finalists:            tmpl.Finalists,
-		UsePoints:            tmpl.UsePoints,
-		PooledPoints:         tmpl.PooledPoints,
-		MaxAttempts:          tmpl.MaxAttempts,
-		PointDeduction:       tmpl.PointDeduction,
-		Info:                 sanitizationPolicy.Sanitize(tmpl.Info),
-		GracePeriod:          tmpl.GracePeriod,
-		NameRetentionTime:    tmpl.NameRetentionTime,
-		Created:              time.Now(),
+		ArchivedAt:            time.Time{},
+		SeriesID:              0,
+		TimeBegin:             time.Time{},
+		TimeEnd:               time.Time{},
+		RegisteredCompetitors: 0,
+		Location:              strings.TrimSpace(tmpl.Location),
+		Country:               strings.TrimSpace(tmpl.Country),
+		Name:                  strings.TrimSpace(tmpl.Name),
+		Description:           strings.TrimSpace(tmpl.Description),
+		QualifyingProblems:    tmpl.QualifyingProblems,
+		Finalists:             tmpl.Finalists,
+		UsePoints:             tmpl.UsePoints,
+		PooledPoints:          tmpl.PooledPoints,
+		MaxAttempts:           tmpl.MaxAttempts,
+		PointDeduction:        tmpl.PointDeduction,
+		Info:                  sanitizationPolicy.Sanitize(tmpl.Info),
+		GracePeriod:           tmpl.GracePeriod,
+		NameRetentionTime:     tmpl.NameRetentionTime,
+		Created:               time.Now(),
 	}
 
 	if err := (validators.CompetitionValidator{}).Validate(competition); err != nil {
@@ -466,7 +466,7 @@ func (uc *CompetitionUseCase) TransferCompetition(ctx context.Context, competiti
 		return domain.Competition{}, errors.Wrap(err, 0)
 	}
 
-	contenders, err := uc.Repo.GetContendersByCompetition(ctx, nil, competitionID)
+	competitors, err := uc.Repo.GetCompetitorsByCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return domain.Competition{}, errors.Wrap(err, 0)
 	}
@@ -519,8 +519,8 @@ func (uc *CompetitionUseCase) TransferCompetition(ctx context.Context, competiti
 			}
 		}
 
-		for _, contender := range contenders {
-			err = uc.Repo.DeleteContender(ctx, tx, contender.ID)
+		for _, competitor := range competitors {
+			err = uc.Repo.DeleteCompetitor(ctx, tx, competitor.ID)
 			if err != nil {
 				return err
 			}
@@ -568,13 +568,13 @@ func (uc *CompetitionUseCase) TransferCompetition(ctx context.Context, competiti
 			}
 		}
 
-		for _, contender := range contenders {
-			_, err = uc.Repo.StoreContender(ctx, tx, contender)
+		for _, competitor := range competitors {
+			_, err = uc.Repo.StoreCompetitor(ctx, tx, competitor)
 			if err != nil {
 				return err
 			}
 
-			result := contender.Result
+			result := competitor.Result
 			if result == nil {
 				continue
 			}
@@ -626,8 +626,8 @@ func (uc *CompetitionUseCase) TransferCompetition(ctx context.Context, competiti
 		problems[index].Ownership.OrganizerID = newOrganizerID
 	}
 
-	for index := range contenders {
-		contenders[index].Ownership.OrganizerID = newOrganizerID
+	for index := range competitors {
+		competitors[index].Ownership.OrganizerID = newOrganizerID
 	}
 
 	for index := range raffles {

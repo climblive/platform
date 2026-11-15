@@ -8,15 +8,15 @@ import {
 import { ApiClient } from "../Api";
 import type { Tick } from "../models";
 
-export const getTicksByContenderQuery = (
-  contenderId: number,
+export const getTicksByCompetitorQuery = (
+  competitorId: number,
   options?: Partial<Parameters<typeof createQuery<Tick[]>>[0]>,
 ) =>
   createQuery<Tick[]>(() => ({
     ...options,
-    queryKey: ["ticks", { contenderId }],
+    queryKey: ["ticks", { competitorId }],
     queryFn: async () =>
-      ApiClient.getInstance().getTicksByContender(contenderId),
+      ApiClient.getInstance().getTicksByCompetitor(competitorId),
     refetchOnWindowFocus: "always",
   }));
 
@@ -27,14 +27,14 @@ export const getTicksByCompetitionQuery = (competitionId: number) =>
       ApiClient.getInstance().getTicksByCompetition(competitionId),
   }));
 
-export const putTickMutation = (contenderId: number) => {
+export const putTickMutation = (competitorId: number) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
     mutationFn: (tick: Omit<Tick, "id" | "timestamp">) =>
-      ApiClient.getInstance().putTick(contenderId, tick),
+      ApiClient.getInstance().putTick(competitorId, tick),
     onSuccess: (updatedTick) => {
-      updateTickInQueryCache(client, contenderId, updatedTick);
+      updateTickInQueryCache(client, competitorId, updatedTick);
     },
   }));
 };
@@ -72,10 +72,10 @@ const updateTick = (oldTicks: Tick[] | undefined, updatedTick: Tick) => {
 
 export const updateTickInQueryCache = (
   queryClient: QueryClient,
-  contenderId: number,
+  competitorId: number,
   updatedTick: Tick,
 ) => {
-  const queryKey: QueryKey = ["ticks", { contenderId }];
+  const queryKey: QueryKey = ["ticks", { competitorId }];
 
   queryClient.setQueryData<Tick[]>(queryKey, (oldTicks) =>
     updateTick(oldTicks, updatedTick),

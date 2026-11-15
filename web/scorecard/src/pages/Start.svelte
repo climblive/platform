@@ -1,6 +1,6 @@
 <script lang="ts">
   import { type ScorecardSession } from "@/types";
-  import { authenticateContender, readStoredSessions } from "@/utils/auth";
+  import { authenticateCompetitor, readStoredSessions } from "@/utils/auth";
   import { serialize } from "@awesome.me/webawesome";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
@@ -19,7 +19,7 @@
     code: z.string().length(8),
   });
 
-  let loadingContender = $state(false);
+  let loadingCompetitor = $state(false);
   let queryClient = useQueryClient();
   let form: HTMLFormElement | undefined = $state();
   let restoredSessions: ScorecardSession[] = $state([]);
@@ -47,15 +47,15 @@
 
   const handleEnter = async (registrationCode: string) => {
     try {
-      loadingContender = true;
+      loadingCompetitor = true;
 
-      const contender = await authenticateContender(
+      const competitor = await authenticateCompetitor(
         registrationCode,
         queryClient,
         session,
       );
 
-      if (contender.entered) {
+      if (competitor.entered) {
         navigate(`/${registrationCode}`);
       } else {
         navigate(`/${registrationCode}/register`);
@@ -73,7 +73,7 @@
         variant: "danger",
       });
     } finally {
-      loadingContender = false;
+      loadingCompetitor = false;
     }
   };
 </script>
@@ -104,7 +104,7 @@
       <wa-button
         variant="neutral"
         type="submit"
-        loading={loadingContender}
+        loading={loadingCompetitor}
         size="s"
       >
         <wa-icon slot="start" name="arrow-right-to-bracket"></wa-icon>
@@ -135,7 +135,7 @@
               handleEnter(restoredSession.registrationCode);
             }
           }}
-          loading={loadingContender}
+          loading={loadingCompetitor}
           size="s"
           appearance="outlined"
           >Restore

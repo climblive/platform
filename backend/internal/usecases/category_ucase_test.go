@@ -260,8 +260,8 @@ func TestDeleteCategory(t *testing.T) {
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
-			On("GetContendersByCategory", mock.Anything, nil, fakedCategoryID).
-			Return([]domain.Contender{}, nil)
+			On("GetCompetitorsByCategory", mock.Anything, nil, fakedCategoryID).
+			Return([]domain.Competitor{}, nil)
 
 		mockedRepo.
 			On("DeleteCategory", mock.Anything, nil, fakedCategoryID).
@@ -280,7 +280,7 @@ func TestDeleteCategory(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
-	t.Run("CategoryHasContenders", func(t *testing.T) {
+	t.Run("CategoryHasCompetitors", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 
 		mockedAuthorizer.
@@ -288,8 +288,8 @@ func TestDeleteCategory(t *testing.T) {
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
-			On("GetContendersByCategory", mock.Anything, nil, fakedCategoryID).
-			Return([]domain.Contender{{}}, nil)
+			On("GetCompetitorsByCategory", mock.Anything, nil, fakedCategoryID).
+			Return([]domain.Competitor{{}}, nil)
 
 		ucase := usecases.CategoryUseCase{
 			Repo:       mockedRepo,

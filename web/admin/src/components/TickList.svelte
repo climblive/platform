@@ -9,19 +9,19 @@
   import type { Problem, Tick } from "@climblive/lib/models";
   import {
     getProblemsQuery,
-    getTicksByContenderQuery,
+    getTicksByCompetitorQuery,
   } from "@climblive/lib/queries";
   import { format } from "date-fns";
 
   interface Props {
     competitionId: number;
-    contenderId: number;
+    competitorId: number;
   }
 
-  const { competitionId, contenderId }: Props = $props();
+  const { competitionId, competitorId }: Props = $props();
 
   const problemsQuery = $derived(getProblemsQuery(competitionId));
-  const ticksQuery = $derived(getTicksByContenderQuery(contenderId));
+  const ticksQuery = $derived(getTicksByCompetitorQuery(competitorId));
 
   const problems = $derived(
     new Map(problemsQuery.data?.map((problem) => [problem.id, problem]) ?? []),

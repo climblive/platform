@@ -29,7 +29,7 @@ func (d *Database) GetCompetition(ctx context.Context, tx domain.Transaction, co
 		competition.TimeEnd = timeEnd
 	}
 
-	competition.RegisteredContenders = int(record.RegisteredContenders)
+	competition.RegisteredCompetitors = int(record.RegisteredCompetitors)
 
 	return competition, nil
 }
@@ -53,7 +53,7 @@ func (d *Database) GetAllCompetitions(ctx context.Context, tx domain.Transaction
 			competition.TimeEnd = timeEnd
 		}
 
-		competition.RegisteredContenders = int(record.RegisteredContenders)
+		competition.RegisteredCompetitors = int(record.RegisteredCompetitors)
 
 		competitions = append(competitions, competition)
 	}
@@ -80,7 +80,7 @@ func (d *Database) GetCompetitionsByOrganizer(ctx context.Context, tx domain.Tra
 			competition.TimeEnd = timeEnd
 		}
 
-		competition.RegisteredContenders = int(record.RegisteredContenders)
+		competition.RegisteredCompetitors = int(record.RegisteredCompetitors)
 
 		competitions = append(competitions, competition)
 	}

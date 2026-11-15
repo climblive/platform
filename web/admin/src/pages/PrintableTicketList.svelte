@@ -4,7 +4,7 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
-    getContendersByCompetitionQuery,
+    getCompetitorsByCompetitionQuery,
     getCompetitionQuery,
   } from "@climblive/lib/queries";
 
@@ -19,30 +19,30 @@
   const toId = Number(urlParams.get("to")) || undefined;
 
   const competitionQuery = $derived(getCompetitionQuery(competitionId));
-  const contendersQuery = $derived(
-    getContendersByCompetitionQuery(competitionId),
+  const competitorsQuery = $derived(
+    getCompetitorsByCompetitionQuery(competitionId),
   );
 
   const competition = $derived(competitionQuery.data);
-  const allContenders = $derived(contendersQuery.data);
+  const allCompetitors = $derived(competitorsQuery.data);
 
-  const contenders = $derived.by(() => {
-    if (!allContenders) {
+  const competitors = $derived.by(() => {
+    if (!allCompetitors) {
       return undefined;
     }
 
     if (fromId !== undefined && toId !== undefined) {
-      return allContenders.filter((c) => c.id >= fromId && c.id <= toId);
+      return allCompetitors.filter((c) => c.id >= fromId && c.id <= toId);
     }
 
-    return allContenders;
+    return allCompetitors;
   });
 
   let printDialogOpened = $state(false);
   let printingFinished = $state(false);
 
   $effect(() => {
-    if (competition && contenders && !printDialogOpened) {
+    if (competition && competitors && !printDialogOpened) {
       printDialogOpened = true;
 
       setTimeout(() => {
@@ -55,7 +55,7 @@
 <svelte:window onafterprint={() => (printingFinished = true)} />
 
 <main>
-  {#if !competition || !contenders}
+  {#if !competition || !competitors}
     <Loader />
   {:else}
     <section class="print-prompt">
@@ -89,11 +89,11 @@
       {/if}
     </section>
     <div class="tickets">
-      {#each contenders as contender (contender.id)}
+      {#each competitors as competitor (competitor.id)}
         <Ticket
           competitionName={competition.name}
-          registrationCode={contender.registrationCode}
-          ticketNumber={contender.id}
+          registrationCode={competitor.registrationCode}
+          ticketNumber={competitor.id}
         />
       {/each}
     </div>

@@ -11,7 +11,7 @@
     overflow?: "pagination" | "scroll";
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
     loading: boolean;
-    highlightedContenderId?: number;
+    highlightedCompetitorId?: number;
     autoScroll?: boolean;
   }
 
@@ -20,7 +20,7 @@
     overflow = "scroll",
     scoreboard,
     loading,
-    highlightedContenderId,
+    highlightedCompetitorId,
     autoScroll = true,
   }: Props = $props();
 
@@ -76,7 +76,7 @@
 
     visibilityObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
-        if (entry.isIntersecting && highlightedContenderId && autoScroll) {
+        if (entry.isIntersecting && highlightedCompetitorId && autoScroll) {
           setTimeout(scrollToHighlighted);
         }
       }
@@ -99,7 +99,7 @@
   });
 
   $effect(() => {
-    if (highlightedContenderId && results.length > 0 && autoScroll) {
+    if (highlightedCompetitorId && results.length > 0 && autoScroll) {
       setTimeout(scrollToHighlighted);
     }
   });
@@ -150,12 +150,13 @@
       <wa-skeleton effect="sheen"></wa-skeleton>
     {/each}
   {:else}
-    {#each results as scoreboardEntry (scoreboardEntry.contenderId)}
+    {#each results as scoreboardEntry (scoreboardEntry.competitorId)}
       {#if scoreboardEntry.result}
         <Floater order={scoreboardEntry.result.rankOrder}>
           <ResultEntry
             {scoreboardEntry}
-            highlighted={highlightedContenderId === scoreboardEntry.contenderId}
+            highlighted={highlightedCompetitorId ===
+              scoreboardEntry.competitorId}
           />
         </Floater>
       {/if}

@@ -24,7 +24,7 @@ func TestKeeper(t *testing.T) {
 		filters := []domain.EventFilter{domain.NewEventFilter(
 			0,
 			0,
-			"CONTENDER_RESULT_UPDATED",
+			"COMPETITOR_RESULT_UPDATED",
 		)}
 
 		subscription := events.NewSubscription(filters, bufferCapacity)
@@ -57,12 +57,12 @@ func TestKeeper(t *testing.T) {
 		keeper := scores.NewResultKeeper(mockedEventBroker, mockedRepo)
 
 		err := subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderResultUpdatedEvent{},
+			Data: domain.CompetitorResultUpdatedEvent{},
 		})
 		require.NoError(t, err)
 
 		err = subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderResultUpdatedEvent{},
+			Data: domain.CompetitorResultUpdatedEvent{},
 		})
 		require.Error(t, err)
 
@@ -85,16 +85,16 @@ func TestKeeper(t *testing.T) {
 
 		for k := 1; k <= 5; k++ {
 			result := domain.Result{
-				Timestamp:   now,
-				ContenderID: domain.ContenderID(k),
-				Score:       fmt.Sprintf("%dp", k*100),
-				Placement:   k,
-				Finalist:    true,
-				RankOrder:   k - 1,
+				Timestamp:    now,
+				CompetitorID: domain.CompetitorID(k),
+				Score:        fmt.Sprintf("%dp", k*100),
+				Placement:    k,
+				Finalist:     true,
+				RankOrder:    k - 1,
 			}
 
 			err := subscription.Post(domain.EventEnvelope{
-				Data: domain.ContenderResultUpdatedEvent(result),
+				Data: domain.CompetitorResultUpdatedEvent(result),
 			})
 
 			mockedRepo.On("StoreResult", mock.Anything, nil, result).Return(nil)
@@ -104,11 +104,11 @@ func TestKeeper(t *testing.T) {
 
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			for k := 1; k <= 5; k++ {
-				result, err := keeper.GetResult(domain.ContenderID(k))
+				result, err := keeper.GetResult(domain.CompetitorID(k))
 
 				require.NoError(collect, err)
 				assert.Equal(collect, now, result.Timestamp)
-				assert.Equal(collect, domain.ContenderID(k), result.ContenderID)
+				assert.Equal(collect, domain.CompetitorID(k), result.CompetitorID)
 				assert.Equal(collect, fmt.Sprintf("%dp", k*100), result.Score)
 				assert.Equal(collect, k, result.Placement)
 				assert.True(collect, result.Finalist)
@@ -135,18 +135,18 @@ func TestKeeper(t *testing.T) {
 
 		for k := 1; k <= 5; k++ {
 			result := domain.Result{
-				Timestamp:   now,
-				ContenderID: domain.ContenderID(k),
-				Score:       fmt.Sprintf("%dp", k*100),
-				Placement:   k,
-				Finalist:    true,
-				RankOrder:   k - 1,
+				Timestamp:    now,
+				CompetitorID: domain.CompetitorID(k),
+				Score:        fmt.Sprintf("%dp", k*100),
+				Placement:    k,
+				Finalist:     true,
+				RankOrder:    k - 1,
 			}
 
 			mockedRepo.On("StoreResult", mock.Anything, nil, result).Return(nil)
 
 			err := subscription.Post(domain.EventEnvelope{
-				Data: domain.ContenderResultUpdatedEvent(result),
+				Data: domain.CompetitorResultUpdatedEvent(result),
 			})
 
 			require.NoError(t, err)
@@ -154,7 +154,7 @@ func TestKeeper(t *testing.T) {
 
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			for k := 1; k <= 5; k++ {
-				_, err := keeper.GetResult(domain.ContenderID(k))
+				_, err := keeper.GetResult(domain.CompetitorID(k))
 
 				require.NoError(collect, err)
 			}
@@ -164,7 +164,7 @@ func TestKeeper(t *testing.T) {
 
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			for k := 1; k <= 5; k++ {
-				_, err := keeper.GetResult(domain.ContenderID(k))
+				_, err := keeper.GetResult(domain.CompetitorID(k))
 
 				require.Error(collect, err, domain.ErrNotFound)
 			}
@@ -189,18 +189,18 @@ func TestKeeper(t *testing.T) {
 
 		for k := 1; k <= 5; k++ {
 			result := domain.Result{
-				Timestamp:   now,
-				ContenderID: domain.ContenderID(k),
-				Score:       fmt.Sprintf("%dp", k*100),
-				Placement:   k,
-				Finalist:    true,
-				RankOrder:   k - 1,
+				Timestamp:    now,
+				CompetitorID: domain.CompetitorID(k),
+				Score:        fmt.Sprintf("%dp", k*100),
+				Placement:    k,
+				Finalist:     true,
+				RankOrder:    k - 1,
 			}
 
 			mockedRepo.On("StoreResult", mock.Anything, nil, result).Return(nil)
 
 			err := subscription.Post(domain.EventEnvelope{
-				Data: domain.ContenderResultUpdatedEvent(result),
+				Data: domain.CompetitorResultUpdatedEvent(result),
 			})
 
 			require.NoError(t, err)
@@ -208,7 +208,7 @@ func TestKeeper(t *testing.T) {
 
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			for k := 1; k <= 5; k++ {
-				_, err := keeper.GetResult(domain.ContenderID(k))
+				_, err := keeper.GetResult(domain.CompetitorID(k))
 
 				require.NoError(collect, err)
 			}
@@ -236,16 +236,16 @@ func TestKeeper(t *testing.T) {
 
 		for k := 1; k <= 5; k++ {
 			result := domain.Result{
-				Timestamp:   now,
-				ContenderID: domain.ContenderID(k),
-				Score:       fmt.Sprintf("%dp", k*100),
-				Placement:   k,
-				Finalist:    true,
-				RankOrder:   k - 1,
+				Timestamp:    now,
+				CompetitorID: domain.CompetitorID(k),
+				Score:        fmt.Sprintf("%dp", k*100),
+				Placement:    k,
+				Finalist:     true,
+				RankOrder:    k - 1,
 			}
 
 			err := subscription.Post(domain.EventEnvelope{
-				Data: domain.ContenderResultUpdatedEvent(result),
+				Data: domain.CompetitorResultUpdatedEvent(result),
 			})
 
 			require.NoError(t, err)
@@ -253,7 +253,7 @@ func TestKeeper(t *testing.T) {
 
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			for k := 1; k <= 5; k++ {
-				_, err := keeper.GetResult(domain.ContenderID(k))
+				_, err := keeper.GetResult(domain.CompetitorID(k))
 
 				require.NoError(collect, err)
 			}
@@ -265,7 +265,7 @@ func TestKeeper(t *testing.T) {
 			mockedRepo.AssertExpectations(collect)
 
 			for k := 1; k <= 5; k++ {
-				_, err := keeper.GetResult(domain.ContenderID(k))
+				_, err := keeper.GetResult(domain.CompetitorID(k))
 
 				require.NoError(collect, err)
 			}
@@ -278,7 +278,7 @@ func TestKeeper(t *testing.T) {
 		mockedEventBroker.AssertExpectations(t)
 	})
 
-	t.Run("PersistResults_DropIfContenderNotFound", func(t *testing.T) {
+	t.Run("PersistResults_DropIfCompetitorNotFound", func(t *testing.T) {
 		mockedRepo, mockedEventBroker, subscription := makeMocks(0)
 		keeper := scores.NewResultKeeper(mockedEventBroker, mockedRepo)
 
@@ -289,18 +289,18 @@ func TestKeeper(t *testing.T) {
 
 		for k := 1; k <= 5; k++ {
 			result := domain.Result{
-				Timestamp:   now,
-				ContenderID: domain.ContenderID(k),
-				Score:       fmt.Sprintf("%dp", k*100),
-				Placement:   k,
-				Finalist:    true,
-				RankOrder:   k - 1,
+				Timestamp:    now,
+				CompetitorID: domain.CompetitorID(k),
+				Score:        fmt.Sprintf("%dp", k*100),
+				Placement:    k,
+				Finalist:     true,
+				RankOrder:    k - 1,
 			}
 
 			mockedRepo.On("StoreResult", mock.Anything, nil, result).Return(domain.ErrNotFound)
 
 			err := subscription.Post(domain.EventEnvelope{
-				Data: domain.ContenderResultUpdatedEvent(result),
+				Data: domain.CompetitorResultUpdatedEvent(result),
 			})
 
 			require.NoError(t, err)
@@ -308,7 +308,7 @@ func TestKeeper(t *testing.T) {
 
 		assert.EventuallyWithT(t, func(collect *assert.CollectT) {
 			for k := 1; k <= 5; k++ {
-				_, err := keeper.GetResult(domain.ContenderID(k))
+				_, err := keeper.GetResult(domain.CompetitorID(k))
 
 				require.NoError(collect, err)
 			}
@@ -320,7 +320,7 @@ func TestKeeper(t *testing.T) {
 			mockedRepo.AssertExpectations(collect)
 
 			for k := 1; k <= 5; k++ {
-				_, err := keeper.GetResult(domain.ContenderID(k))
+				_, err := keeper.GetResult(domain.CompetitorID(k))
 
 				require.Error(collect, err, domain.ErrNotFound)
 			}

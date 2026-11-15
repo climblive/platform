@@ -1,10 +1,10 @@
 <script lang="ts">
   import {
     getCategoriesQuery,
-    getContenderQuery,
+    getCompetitorQuery,
     getCompetitionQuery,
-    patchContenderMutation,
-    scrubContenderMutation,
+    patchCompetitorMutation,
+    scrubCompetitorMutation,
   } from "@climblive/lib/queries";
   import { maskScrubbedName, SyncedTime } from "@climblive/lib/utils";
   import { add, formatDistance, isBefore } from "date-fns";
@@ -12,35 +12,35 @@
 
   type Props = {
     competitionId: number;
-    contenderId: number;
+    competitorId: number;
   };
 
-  const { competitionId, contenderId }: Props = $props();
+  const { competitionId, competitorId }: Props = $props();
 
   let form: HTMLFormElement | undefined = $state();
   let showInfo = $state(false);
 
-  const contenderQuery = $derived(getContenderQuery(contenderId));
+  const competitorQuery = $derived(getCompetitorQuery(competitorId));
   const competitionQuery = $derived(getCompetitionQuery(competitionId));
   const categoriesQuery = $derived(getCategoriesQuery(competitionId));
-  const patchContender = $derived(patchContenderMutation(contenderId));
-  const scrubContender = $derived(scrubContenderMutation(contenderId));
+  const patchCompetitor = $derived(patchCompetitorMutation(competitorId));
+  const scrubCompetitor = $derived(scrubCompetitorMutation(competitorId));
   const time = new SyncedTime(60_000);
   onMount(() => {
     time.start();
     return () => time.stop();
   });
 
-  let contender = $derived(contenderQuery.data);
+  let competitor = $derived(competitorQuery.data);
   let competition = $derived(competitionQuery.data);
   let categories = $derived(categoriesQuery.data);
   let selectedCategory = $derived(
-    categories?.find(({ id }) => id === contender?.categoryId),
+    categories?.find(({ id }) => id === competitor?.categoryId),
   );
 
   const retentionDuration = $derived.by(() =>
-    contender?.scrubBefore && !isBefore(contender.scrubBefore, time.current)
-      ? formatDistance(contender.scrubBefore, time.current)
+    competitor?.scrubBefore && !isBefore(competitor.scrubBefore, time.current)
+      ? formatDistance(competitor.scrubBefore, time.current)
       : undefined,
   );
   const registrationRetentionDuration = $derived.by(() => {
@@ -56,7 +56,7 @@
   const handleSubmit = (event: SubmitEvent) => {
     event.preventDefault();
 
-    if (!form || !contender) {
+    if (!form || !competitor) {
       return;
     }
 
@@ -65,7 +65,7 @@
     const categoryId = formData.get("categoryId")?.toString().trim();
 
     if (name && categoryId) {
-      patchContender.mutate(
+      patchCompetitor.mutate(
         {
           name,
           categoryId: Number(categoryId),
@@ -86,14 +86,14 @@
       return;
     }
 
-    scrubContender.mutate(undefined, {
+    scrubCompetitor.mutate(undefined, {
       onSuccess: () => window.location.reload(),
       onError: () => window.alert("Failed to remove your name."),
     });
   };
 </script>
 
-{#if categories && contender}
+{#if categories && competitor}
   <form onsubmit={handleSubmit} bind:this={form}>
     <div class="name-row">
       <input
@@ -101,19 +101,19 @@
         placeholder="Name"
         name="name"
         type="text"
-        value={contender.scrubbedAt !== undefined
-          ? `Unknown Crusher ${maskScrubbedName(contender.id)}`
-          : contender.name}
+        value={competitor.scrubbedAt !== undefined
+          ? `Unknown Crusher ${maskScrubbedName(competitor.id)}`
+          : competitor.name}
         aria-label="Name"
-        disabled={contender.scrubbedAt !== undefined}
+        disabled={competitor.scrubbedAt !== undefined}
       />
-      {#if contender.entered && !contender.scrubbedAt}
+      {#if competitor.entered && !competitor.scrubbedAt}
         <button type="button" onclick={() => (showInfo = !showInfo)}>
           Info
         </button>
       {/if}
     </div>
-    {#if !contender.entered && competition}
+    {#if !competitor.entered && competition}
       <p class="info">
         Your name will be stored for {registrationRetentionDuration} after the competition
         ends, after which it will be removed and your results anonymized.
@@ -133,24 +133,24 @@
       required
       value={selectedCategory?.id}
       aria-label="Category"
-      disabled={contender.scrubbedAt !== undefined}
+      disabled={competitor.scrubbedAt !== undefined}
     >
       {#each categories as category (category.id)}
         <option value={category.id}>{category.name}</option>
       {/each}
     </select>
     <div class="actions">
-      {#if contender.name}<button
+      {#if competitor.name}<button
           type="button"
-          disabled={scrubContender.isPending}
+          disabled={scrubCompetitor.isPending}
           onclick={handleScrub}>Remove my name</button
         >{/if}
       <button
         type="submit"
-        disabled={contender.scrubbedAt !== undefined ||
-          patchContender.isPending ||
-          scrubContender.isPending}
-        >{contender.entered ? "Update" : "Register"}</button
+        disabled={competitor.scrubbedAt !== undefined ||
+          patchCompetitor.isPending ||
+          scrubCompetitor.isPending}
+        >{competitor.entered ? "Update" : "Register"}</button
       >
     </div>
   </form>

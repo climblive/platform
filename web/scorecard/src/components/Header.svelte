@@ -1,25 +1,25 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { ContenderName, FullLogo } from "@climblive/lib/components";
+  import { CompetitorName, FullLogo } from "@climblive/lib/components";
   import { navigate } from "svelte-routing";
 
   interface Props {
     registrationCode: string;
     competitionName: string;
     categoryName: string | undefined;
-    contenderId: number;
-    contenderName: string | undefined;
-    contenderScrubbedAt: Date | undefined;
+    competitorId: number;
+    competitorName: string | undefined;
+    competitorScrubbedAt: Date | undefined;
   }
 
   const {
     registrationCode,
     competitionName,
     categoryName,
-    contenderId,
-    contenderName,
-    contenderScrubbedAt,
+    competitorId,
+    competitorName,
+    competitorScrubbedAt,
   }: Props = $props();
 </script>
 
@@ -39,10 +39,10 @@
   </div>
   <div>
     <h1>
-      <ContenderName
-        id={contenderId}
-        name={contenderName}
-        scrubbedAt={contenderScrubbedAt}
+      <CompetitorName
+        id={competitorId}
+        name={competitorName}
+        scrubbedAt={competitorScrubbedAt}
         withTooltip
       />
     </h1>

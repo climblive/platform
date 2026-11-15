@@ -19,8 +19,8 @@ func (m *effectResolverMock) RankCategory(categoryID domain.CategoryID) {
 	m.Called(categoryID)
 }
 
-func (m *effectResolverMock) ScoreContender(contenderID domain.ContenderID) iter.Seq[scores.Effect] {
-	args := m.Called(contenderID)
+func (m *effectResolverMock) ScoreCompetitor(competitorID domain.CompetitorID) iter.Seq[scores.Effect] {
+	args := m.Called(competitorID)
 	return args.Get(0).(iter.Seq[scores.Effect])
 }
 
@@ -40,7 +40,7 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 						return
 					}
 
-					if !yield(scores.EffectScoreContender{ContenderID: testutils.RandomResourceID[domain.ContenderID]()}) {
+					if !yield(scores.EffectScoreCompetitor{CompetitorID: testutils.RandomResourceID[domain.CompetitorID]()}) {
 						return
 					}
 
@@ -53,7 +53,7 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 
 		effectCounters := map[scores.EffectType]int{
 			scores.EffectTypeRankCategory:         0,
-			scores.EffectTypeScoreContender:       0,
+			scores.EffectTypeScoreCompetitor:      0,
 			scores.EffectTypeCalculatePointValues: 0,
 		}
 
@@ -68,9 +68,9 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 			Return().
 			Run(incrementCounter(scores.EffectTypeRankCategory))
 		mockedResolver.
-			On("ScoreContender", mock.Anything).
+			On("ScoreCompetitor", mock.Anything).
 			Return(effectYielder(10)).
-			Run(incrementCounter(scores.EffectTypeScoreContender))
+			Run(incrementCounter(scores.EffectTypeScoreCompetitor))
 		mockedResolver.
 			On("CalculatePointValues", mock.Anything, mock.Anything).
 			Return(effectYielder(10)).
@@ -81,7 +81,7 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 		runner.RunEffects(effectYielder(10))
 
 		assert.Equal(t, 10, effectCounters[scores.EffectTypeCalculatePointValues])
-		assert.Equal(t, 110, effectCounters[scores.EffectTypeScoreContender])
+		assert.Equal(t, 110, effectCounters[scores.EffectTypeScoreCompetitor])
 		assert.Equal(t, 1210, effectCounters[scores.EffectTypeRankCategory])
 
 		mockedResolver.AssertExpectations(t)
@@ -101,8 +101,8 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 		}
 
 		eff1 := scores.EffectCalculatePointValues{CategoryID: testutils.RandomResourceID[domain.CategoryID](), ProblemID: testutils.RandomResourceID[domain.ProblemID]()}
-		eff2 := scores.EffectScoreContender{ContenderID: testutils.RandomResourceID[domain.ContenderID]()}
-		eff3 := scores.EffectScoreContender{ContenderID: testutils.RandomResourceID[domain.ContenderID]()}
+		eff2 := scores.EffectScoreCompetitor{CompetitorID: testutils.RandomResourceID[domain.CompetitorID]()}
+		eff3 := scores.EffectScoreCompetitor{CompetitorID: testutils.RandomResourceID[domain.CompetitorID]()}
 		eff4 := scores.EffectRankCategory{CategoryID: testutils.RandomResourceID[domain.CategoryID]()}
 		eff5 := scores.EffectRankCategory{CategoryID: testutils.RandomResourceID[domain.CategoryID]()}
 
@@ -120,12 +120,12 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 			Run(recordOrder(eff1))
 
 		mockedResolver.
-			On("ScoreContender", eff2.ContenderID).
+			On("ScoreCompetitor", eff2.CompetitorID).
 			Return(effectYielder(eff5)).
 			Run(recordOrder(eff2))
 
 		mockedResolver.
-			On("ScoreContender", eff3.ContenderID).
+			On("ScoreCompetitor", eff3.CompetitorID).
 			Return(effectYielder()).
 			Run(recordOrder(eff3))
 
@@ -145,8 +145,8 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 
 		assert.Equal(t, []scores.EffectType{
 			scores.EffectTypeCalculatePointValues,
-			scores.EffectTypeScoreContender,
-			scores.EffectTypeScoreContender,
+			scores.EffectTypeScoreCompetitor,
+			scores.EffectTypeScoreCompetitor,
 			scores.EffectTypeRankCategory,
 			scores.EffectTypeRankCategory,
 		}, recordedOrder)
@@ -168,7 +168,7 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 		}
 
 		eff1 := scores.EffectCalculatePointValues{CategoryID: testutils.RandomResourceID[domain.CategoryID](), ProblemID: testutils.RandomResourceID[domain.ProblemID]()}
-		eff2 := scores.EffectScoreContender{ContenderID: testutils.RandomResourceID[domain.ContenderID]()}
+		eff2 := scores.EffectScoreCompetitor{CompetitorID: testutils.RandomResourceID[domain.CompetitorID]()}
 		eff3 := scores.EffectRankCategory{CategoryID: testutils.RandomResourceID[domain.CategoryID]()}
 
 		mockedResolver.
@@ -176,7 +176,7 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 			Return(effectYielder(eff2, eff2, eff2, eff2, eff2))
 
 		mockedResolver.
-			On("ScoreContender", eff2.ContenderID).
+			On("ScoreCompetitor", eff2.CompetitorID).
 			Return(effectYielder(eff3, eff3, eff3, eff3, eff3)).
 			Once()
 

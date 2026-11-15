@@ -42,10 +42,10 @@ func (b *broker) Dispatch(competitionID domain.CompetitionID, event any) {
 	defer b.mu.RUnlock()
 
 	eventName := EventName(event)
-	contenderID := extractContenderID(event)
+	competitorID := extractCompetitorID(event)
 
 	for _, subscription := range b.subscriptions {
-		if !subscription.FiltersMatch(competitionID, contenderID, eventName) {
+		if !subscription.FiltersMatch(competitionID, competitorID, eventName) {
 			continue
 		}
 
@@ -61,18 +61,18 @@ func (b *broker) Dispatch(competitionID domain.CompetitionID, event any) {
 
 func EventName(event any) string {
 	switch event.(type) {
-	case domain.ContenderEnteredEvent:
-		return "CONTENDER_ENTERED"
-	case domain.ContenderSwitchedCategoryEvent:
-		return "CONTENDER_SWITCHED_CATEGORY"
-	case domain.ContenderWithdrewFromFinalsEvent:
-		return "CONTENDER_WITHDREW_FROM_FINALS"
-	case domain.ContenderReenteredFinalsEvent:
-		return "CONTENDER_REENTERED_FINALS"
-	case domain.ContenderDisqualifiedEvent:
-		return "CONTENDER_DISQUALIFIED"
-	case domain.ContenderRequalifiedEvent:
-		return "CONTENDER_REQUALIFIED"
+	case domain.CompetitorEnteredEvent:
+		return "COMPETITOR_ENTERED"
+	case domain.CompetitorSwitchedCategoryEvent:
+		return "COMPETITOR_SWITCHED_CATEGORY"
+	case domain.CompetitorWithdrewFromFinalsEvent:
+		return "COMPETITOR_WITHDREW_FROM_FINALS"
+	case domain.CompetitorReenteredFinalsEvent:
+		return "COMPETITOR_REENTERED_FINALS"
+	case domain.CompetitorDisqualifiedEvent:
+		return "COMPETITOR_DISQUALIFIED"
+	case domain.CompetitorRequalifiedEvent:
+		return "COMPETITOR_REQUALIFIED"
 	case domain.AscentRegisteredEvent:
 		return "ASCENT_REGISTERED"
 	case domain.AscentDeregisteredEvent:
@@ -85,12 +85,12 @@ func EventName(event any) string {
 		return "PROBLEM_DELETED"
 	case domain.RulesUpdatedEvent:
 		return "RULES_UPDATED"
-	case domain.ContenderPublicInfoUpdatedEvent:
-		return "CONTENDER_PUBLIC_INFO_UPDATED"
-	case domain.ContenderResultUpdatedEvent:
-		return "CONTENDER_RESULT_UPDATED"
-	case []domain.ContenderResultUpdatedEvent:
-		return "[]CONTENDER_RESULT_UPDATED"
+	case domain.CompetitorPublicInfoUpdatedEvent:
+		return "COMPETITOR_PUBLIC_INFO_UPDATED"
+	case domain.CompetitorResultUpdatedEvent:
+		return "COMPETITOR_RESULT_UPDATED"
+	case []domain.CompetitorResultUpdatedEvent:
+		return "[]COMPETITOR_RESULT_UPDATED"
 	case domain.ScoreEngineStartedEvent:
 		return "SCORE_ENGINE_STARTED"
 	case domain.ScoreEngineStoppedEvent:
@@ -104,32 +104,32 @@ func EventName(event any) string {
 	}
 }
 
-func extractContenderID(event any) domain.ContenderID {
+func extractCompetitorID(event any) domain.CompetitorID {
 	switch ev := event.(type) {
-	case domain.ContenderEnteredEvent:
-		return ev.ContenderID
-	case domain.ContenderSwitchedCategoryEvent:
-		return ev.ContenderID
-	case domain.ContenderWithdrewFromFinalsEvent:
-		return ev.ContenderID
-	case domain.ContenderReenteredFinalsEvent:
-		return ev.ContenderID
-	case domain.ContenderDisqualifiedEvent:
-		return ev.ContenderID
-	case domain.ContenderRequalifiedEvent:
-		return ev.ContenderID
+	case domain.CompetitorEnteredEvent:
+		return ev.CompetitorID
+	case domain.CompetitorSwitchedCategoryEvent:
+		return ev.CompetitorID
+	case domain.CompetitorWithdrewFromFinalsEvent:
+		return ev.CompetitorID
+	case domain.CompetitorReenteredFinalsEvent:
+		return ev.CompetitorID
+	case domain.CompetitorDisqualifiedEvent:
+		return ev.CompetitorID
+	case domain.CompetitorRequalifiedEvent:
+		return ev.CompetitorID
 	case domain.AscentRegisteredEvent:
-		return ev.ContenderID
+		return ev.CompetitorID
 	case domain.AscentDeregisteredEvent:
-		return ev.ContenderID
-	case domain.ContenderPublicInfoUpdatedEvent:
-		return ev.ContenderID
-	case domain.ContenderResultUpdatedEvent:
-		return ev.ContenderID
+		return ev.CompetitorID
+	case domain.CompetitorPublicInfoUpdatedEvent:
+		return ev.CompetitorID
+	case domain.CompetitorResultUpdatedEvent:
+		return ev.CompetitorID
 	case domain.PointValueUpdatedEvent:
-		return ev.ContenderID
+		return ev.CompetitorID
 	case domain.RaffleWinnerDrawnEvent:
-		return ev.ContenderID
+		return ev.CompetitorID
 	default:
 		return 0
 	}

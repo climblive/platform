@@ -7,7 +7,7 @@ import {
   scoreEngineDescriptorSchema,
   type CategoryPatch,
   type CategoryTemplate,
-  type ContenderPatch,
+  type CompetitorPatch,
   type CompetitionID,
   type CompetitionPatch,
   type CompetitionTemplate,
@@ -20,7 +20,7 @@ import {
   type Tick,
 } from "./models";
 import { categorySchema } from "./models/category";
-import { contenderSchema } from "./models/contender";
+import { competitorSchema } from "./models/competitor";
 import { serviceStatusSchema } from "./models/health";
 import { organizerSchema } from "./models/organizer";
 import { organizerInviteSchema } from "./models/organizerInvite";
@@ -28,7 +28,7 @@ import { pointValueSchema } from "./models/pointValue";
 import { problemSchema } from "./models/problem";
 import { raffleSchema, raffleWinnerSchema } from "./models/raffle";
 import type {
-  CreateContendersArguments,
+  CreateCompetitorsArguments,
   StartScoreEngineArguments,
 } from "./models/rest";
 import { tickSchema } from "./models/tick";
@@ -38,7 +38,7 @@ interface ApiCredentialsProvider {
   getAuthHeaders(): RawAxiosRequestHeaders;
 }
 
-export class ContenderCredentialsProvider implements ApiCredentialsProvider {
+export class CompetitorCredentialsProvider implements ApiCredentialsProvider {
   private registrationCode: string;
 
   constructor(registrationCode: string) {
@@ -104,26 +104,26 @@ export class ApiClient {
     return userSchema.parse(result.data);
   };
 
-  findContender = async (registrationCode: string) => {
-    const endpoint = `/codes/${registrationCode}/contender`;
+  findCompetitor = async (registrationCode: string) => {
+    const endpoint = `/codes/${registrationCode}/competitor`;
 
     const result = await this.axiosInstance.get(endpoint);
 
-    return contenderSchema.parse(result.data);
+    return competitorSchema.parse(result.data);
   };
 
-  getContender = async (id: number) => {
-    const endpoint = `/contenders/${id}`;
+  getCompetitor = async (id: number) => {
+    const endpoint = `/competitors/${id}`;
 
     const result = await this.axiosInstance.get(endpoint, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 
-    return contenderSchema.parse(result.data);
+    return competitorSchema.parse(result.data);
   };
 
-  getPointValuesByContender = async (id: number) => {
-    const endpoint = `/contenders/${id}/points`;
+  getPointValuesByCompetitor = async (id: number) => {
+    const endpoint = `/competitors/${id}/points`;
 
     const result = await this.axiosInstance.get(endpoint, {
       headers: this.credentialsProvider?.getAuthHeaders(),
@@ -132,47 +132,47 @@ export class ApiClient {
     return z.array(pointValueSchema).parse(result.data);
   };
 
-  getContendersByCompetition = async (competitionId: number) => {
-    const endpoint = `/competitions/${competitionId}/contenders`;
+  getCompetitorsByCompetition = async (competitionId: number) => {
+    const endpoint = `/competitions/${competitionId}/competitors`;
 
     const result = await this.axiosInstance.get(endpoint, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 
-    return z.array(contenderSchema).parse(result.data);
+    return z.array(competitorSchema).parse(result.data);
   };
 
-  patchContender = async (id: number, patch: ContenderPatch) => {
-    const endpoint = `/contenders/${id}`;
+  patchCompetitor = async (id: number, patch: CompetitorPatch) => {
+    const endpoint = `/competitors/${id}`;
 
     const result = await this.axiosInstance.patch(endpoint, patch, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 
-    return contenderSchema.parse(result.data);
+    return competitorSchema.parse(result.data);
   };
 
-  scrubContender = async (id: number) => {
-    const endpoint = `/contenders/${id}/scrub`;
+  scrubCompetitor = async (id: number) => {
+    const endpoint = `/competitors/${id}/scrub`;
 
     const result = await this.axiosInstance.post(endpoint, null, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 
-    return contenderSchema.parse(result.data);
+    return competitorSchema.parse(result.data);
   };
 
-  createContenders = async (
+  createCompetitors = async (
     competitionId: number,
-    args: CreateContendersArguments,
+    args: CreateCompetitorsArguments,
   ) => {
-    const endpoint = `/competitions/${competitionId}/contenders`;
+    const endpoint = `/competitions/${competitionId}/competitors`;
 
     const result = await this.axiosInstance.post(endpoint, args, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 
-    return z.array(contenderSchema).parse(result.data);
+    return z.array(competitorSchema).parse(result.data);
   };
 
   getCompetition = async (id: number) => {
@@ -364,8 +364,8 @@ export class ApiClient {
     return categorySchema.parse(result.data);
   };
 
-  getTicksByContender = async (contenderId: number) => {
-    const endpoint = `/contenders/${contenderId}/ticks`;
+  getTicksByCompetitor = async (competitorId: number) => {
+    const endpoint = `/competitors/${competitorId}/ticks`;
 
     const result = await this.axiosInstance.get(endpoint, {
       headers: this.credentialsProvider?.getAuthHeaders(),
@@ -385,10 +385,10 @@ export class ApiClient {
   };
 
   putTick = async (
-    contenderId: number,
+    competitorId: number,
     tick: Omit<Tick, "id" | "timestamp">,
   ) => {
-    const endpoint = `/contenders/${contenderId}/ticks`;
+    const endpoint = `/competitors/${competitorId}/ticks`;
 
     const result = await this.axiosInstance.put(endpoint, tick, {
       headers: this.credentialsProvider?.getAuthHeaders(),

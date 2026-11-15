@@ -41,7 +41,7 @@ type Competition struct {
 	Created            time.Time
 }
 
-type Contender struct {
+type Competitor struct {
 	ID                  int32
 	OrganizerID         int32
 	CompetitionID       int32
@@ -89,20 +89,20 @@ type Raffle struct {
 }
 
 type RaffleWinner struct {
-	ID          int32
-	OrganizerID int32
-	RaffleID    int32
-	ContenderID int32
-	Timestamp   time.Time
+	ID           int32
+	OrganizerID  int32
+	RaffleID     int32
+	CompetitorID int32
+	Timestamp    time.Time
 }
 
 type Result struct {
-	ContenderID int32
-	Timestamp   time.Time
-	Score       string
-	Placement   int32
-	Finalist    bool
-	RankOrder   int32
+	CompetitorID int32
+	Timestamp    time.Time
+	Score        string
+	Placement    int32
+	Finalist     bool
+	RankOrder    int32
 }
 
 type Series struct {
@@ -115,7 +115,7 @@ type Tick struct {
 	ID            int32
 	OrganizerID   int32
 	CompetitionID int32
-	ContenderID   int32
+	CompetitorID  int32
 	ProblemID     int32
 	Timestamp     time.Time
 	Revision      uint32

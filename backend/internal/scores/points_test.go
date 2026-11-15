@@ -296,12 +296,12 @@ func TestCalculatePoints_MaxAttempts(t *testing.T) {
 }
 
 func TestTick(t *testing.T) {
-	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+	fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 	makeFakes := func() (scores.Tick, scores.Tick, scores.Tick, scores.Tick, scores.Tick) {
 		none := scores.Tick{
-			ContenderID:   fakedContenderID,
+			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Zone1:         false,
 			Zone2:         false,
@@ -312,7 +312,7 @@ func TestTick(t *testing.T) {
 		}
 
 		zone1 := scores.Tick{
-			ContenderID:   fakedContenderID,
+			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Zone1:         true,
 			Zone2:         false,
@@ -323,7 +323,7 @@ func TestTick(t *testing.T) {
 		}
 
 		zone2 := scores.Tick{
-			ContenderID:   fakedContenderID,
+			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Zone1:         true,
 			Zone2:         true,
@@ -334,7 +334,7 @@ func TestTick(t *testing.T) {
 		}
 
 		top := scores.Tick{
-			ContenderID:   fakedContenderID,
+			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Zone1:         true,
 			Zone2:         true,
@@ -345,7 +345,7 @@ func TestTick(t *testing.T) {
 		}
 
 		flash := scores.Tick{
-			ContenderID:   fakedContenderID,
+			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Zone1:         true,
 			Zone2:         true,
@@ -370,7 +370,7 @@ func TestTick(t *testing.T) {
 				name: "None",
 				tick: none,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         false,
@@ -384,7 +384,7 @@ func TestTick(t *testing.T) {
 				name: "Zone1",
 				tick: zone1,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         false,
@@ -398,7 +398,7 @@ func TestTick(t *testing.T) {
 				name: "Zone2",
 				tick: zone2,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         false,
@@ -412,7 +412,7 @@ func TestTick(t *testing.T) {
 				name: "Top",
 				tick: top,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         false,
@@ -426,7 +426,7 @@ func TestTick(t *testing.T) {
 				name: "Flash",
 				tick: flash,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         false,
@@ -457,7 +457,7 @@ func TestTick(t *testing.T) {
 				name: "None",
 				tick: none,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -471,7 +471,7 @@ func TestTick(t *testing.T) {
 				name: "Zone1",
 				tick: zone1,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -485,7 +485,7 @@ func TestTick(t *testing.T) {
 				name: "Zone2",
 				tick: zone2,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -499,7 +499,7 @@ func TestTick(t *testing.T) {
 				name: "Top",
 				tick: top,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -513,7 +513,7 @@ func TestTick(t *testing.T) {
 				name: "Flash",
 				tick: flash,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -556,7 +556,7 @@ func TestTick(t *testing.T) {
 				name: "None",
 				tick: none,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -570,7 +570,7 @@ func TestTick(t *testing.T) {
 				name: "Zone1",
 				tick: zone1,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -584,7 +584,7 @@ func TestTick(t *testing.T) {
 				name: "Zone2",
 				tick: zone2,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -598,7 +598,7 @@ func TestTick(t *testing.T) {
 				name: "Top",
 				tick: top,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -612,7 +612,7 @@ func TestTick(t *testing.T) {
 				name: "Flash",
 				tick: flash,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -643,7 +643,7 @@ func TestTick(t *testing.T) {
 				name: "None",
 				tick: none,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -657,7 +657,7 @@ func TestTick(t *testing.T) {
 				name: "Zone1",
 				tick: zone1,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -671,7 +671,7 @@ func TestTick(t *testing.T) {
 				name: "Zone2",
 				tick: zone2,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -685,7 +685,7 @@ func TestTick(t *testing.T) {
 				name: "Top",
 				tick: top,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,
@@ -699,7 +699,7 @@ func TestTick(t *testing.T) {
 				name: "Flash",
 				tick: flash,
 				expected: scores.Tick{
-					ContenderID:   fakedContenderID,
+					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
 					Zone2:         true,

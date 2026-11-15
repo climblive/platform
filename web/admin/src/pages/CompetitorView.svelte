@@ -13,7 +13,7 @@
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
   import {
-    ContenderName,
+    CompetitorName,
     EmptyState,
     LabeledText,
     RegistrationCode,
@@ -22,24 +22,24 @@
   import { checked, value } from "@climblive/lib/forms";
   import {
     getCategoriesQuery,
-    getContenderQuery,
+    getCompetitorQuery,
     getCompetitionQuery,
-    patchContenderMutation,
+    patchCompetitorMutation,
   } from "@climblive/lib/queries";
   import { ordinalSuperscript } from "@climblive/lib/utils";
   import { format } from "date-fns";
   import { navigate } from "svelte-routing";
 
   interface Props {
-    contenderId: number;
+    competitorId: number;
   }
 
-  let { contenderId }: Props = $props();
+  let { competitorId }: Props = $props();
 
-  const contenderQuery = $derived(getContenderQuery(contenderId));
-  const patchContender = $derived(patchContenderMutation(contenderId));
-  const contender = $derived(contenderQuery.data);
-  const competitionId = $derived(contender?.competitionId ?? 0);
+  const competitorQuery = $derived(getCompetitorQuery(competitorId));
+  const patchCompetitor = $derived(patchCompetitorMutation(competitorId));
+  const competitor = $derived(competitorQuery.data);
+  const competitionId = $derived(competitor?.competitionId ?? 0);
 
   const categoriesQuery = $derived(
     getCategoriesQuery(competitionId, { enabled: !!competitionId }),
@@ -60,19 +60,19 @@
       return;
     }
 
-    patchContender.mutate({
+    patchCompetitor.mutate({
       withdrawnFromFinals: withdrawFromFinalsToggle.checked,
     });
   };
 
   const handleDisqualify = () => {
-    patchContender.mutate({
+    patchCompetitor.mutate({
       disqualified: true,
     });
   };
 
   const handleRequalify = () => {
-    patchContender.mutate({
+    patchCompetitor.mutate({
       disqualified: false,
     });
   };
@@ -88,13 +88,13 @@
 
     const newCategoryId = parseInt(categorySelect.value, 10);
 
-    patchContender.mutate({
+    patchCompetitor.mutate({
       categoryId: newCategoryId,
     });
   };
 </script>
 
-{#if contender && categories && competition}
+{#if competitor && categories && competition}
   <wa-breadcrumb>
     <wa-breadcrumb-item
       onclick={() =>
@@ -113,41 +113,41 @@
   </wa-breadcrumb>
 
   <h1>
-    {#if contender.entered}
-      {#if contender.disqualified}
+    {#if competitor.entered}
+      {#if competitor.disqualified}
         <del>
-          <ContenderName
-            id={contender.id}
-            name={contender.name}
-            scrubbedAt={contender.scrubbedAt}
+          <CompetitorName
+            id={competitor.id}
+            name={competitor.name}
+            scrubbedAt={competitor.scrubbedAt}
             withTooltip
           />
         </del>
       {:else}
-        <ContenderName
-          id={contender.id}
-          name={contender.name}
-          scrubbedAt={contender.scrubbedAt}
+        <CompetitorName
+          id={competitor.id}
+          name={competitor.name}
+          scrubbedAt={competitor.scrubbedAt}
           withTooltip
         />
       {/if}
     {/if}
   </h1>
 
-  {#if !contender.entered}
+  {#if !competitor.entered}
     <EmptyState
       title="Not registered"
       description="Have a competitor scan the QR code below to register for the competition."
     >
       {#snippet actions()}
         <QrCode
-          registrationCode={contender.registrationCode}
+          registrationCode={competitor.registrationCode}
           width={200}
           fill="var(--wa-color-text-normal)"
         ></QrCode>
 
         <wa-button
-          href={`/${contender.registrationCode}`}
+          href={`/${competitor.registrationCode}`}
           target="_blank"
           appearance="plain"
           variant="neutral"
@@ -161,7 +161,7 @@
   {:else}
     <div class="codes">
       <a
-        href={`/${contender.registrationCode}`}
+        href={`/${competitor.registrationCode}`}
         target="_blank"
         class="open-scorecard-link"
       >
@@ -170,48 +170,48 @@
       </a>
 
       <span class="registration-code">
-        <RegistrationCode code={contender.registrationCode} />
-        <wa-copy-button value={contender.registrationCode}></wa-copy-button>
+        <RegistrationCode code={competitor.registrationCode} />
+        <wa-copy-button value={competitor.registrationCode}></wa-copy-button>
       </span>
     </div>
 
     <section>
       <article>
         <LabeledText label="Category"
-          >{categories.find(({ id }) => id === contender.categoryId)?.name ??
+          >{categories.find(({ id }) => id === competitor.categoryId)?.name ??
             "-"}</LabeledText
         >
         <span class="entered">
           <LabeledText label="Entered"
-            >{format(contender.entered, "yyyy-MM-dd HH:mm")}</LabeledText
+            >{format(competitor.entered, "yyyy-MM-dd HH:mm")}</LabeledText
           ></span
         >
         <LabeledText label="Placement">
-          {#if contender.disqualified}
+          {#if competitor.disqualified}
             Disqualified
-          {:else if contender.result?.placement}
-            {contender.result.placement}<sup
-              >{ordinalSuperscript(contender.result.placement)}</sup
+          {:else if competitor.result?.placement}
+            {competitor.result.placement}<sup
+              >{ordinalSuperscript(competitor.result.placement)}</sup
             >
           {:else}
             -
           {/if}
         </LabeledText>
         <LabeledText label="Score">
-          {#if contender.result?.score}
-            <Score value={contender.result.score}></Score>
+          {#if competitor.result?.score}
+            <Score value={competitor.result.score}></Score>
           {:else}
             -
           {/if}
         </LabeledText>
         <LabeledText label="Finalist">
-          <wa-icon name={contender.result?.finalist ? "medal" : "minus"}
+          <wa-icon name={competitor.result?.finalist ? "medal" : "minus"}
           ></wa-icon>
         </LabeledText>
       </article>
     </section>
 
-    {#if !contender.disqualified}
+    {#if !competitor.disqualified}
       <h2>Results</h2>
       <wa-divider style="--color: var(--wa-color-brand-fill-normal);"
       ></wa-divider>
@@ -219,8 +219,8 @@
         Problems attempted by the competitor during the competition.
       </p>
       <TickList
-        contenderId={contender.id}
-        competitionId={contender.competitionId}
+        competitorId={competitor.id}
+        competitionId={competitor.competitionId}
       ></TickList>
     {/if}
 
@@ -233,9 +233,9 @@
         bind:this={categorySelect}
         label="Category"
         hint="Change the category for this competitor."
-        {@attach value(contender.categoryId)}
+        {@attach value(competitor.categoryId)}
         onchange={handleCategoryChange}
-        disabled={contender.disqualified || patchContender.isPending}
+        disabled={competitor.disqualified || patchCompetitor.isPending}
       >
         {#each categories as category (category.id)}
           <wa-option value={category.id} label={category.name}>
@@ -251,16 +251,16 @@
         size="s"
         bind:this={withdrawFromFinalsToggle}
         hint="In case the competitor does not wish to take part in the finals."
-        {@attach checked(contender.withdrawnFromFinals)}
+        {@attach checked(competitor.withdrawnFromFinals)}
         onchange={handleToggleWithdrawFromFinals}
-        disabled={contender.disqualified || patchContender.isPending}
+        disabled={competitor.disqualified || patchCompetitor.isPending}
         >Withdraw from finals</wa-switch
       >
 
-      {#if contender.disqualified}
+      {#if competitor.disqualified}
         <wa-button
           onclick={handleRequalify}
-          loading={patchContender.isPending}
+          loading={patchCompetitor.isPending}
           appearance="outlined"
           >Requalify competitor<wa-icon slot="start" name="right-to-bracket"
           ></wa-icon></wa-button
@@ -270,7 +270,7 @@
           size="s"
           variant="danger"
           onclick={handleDisqualify}
-          loading={patchContender.isPending}
+          loading={patchCompetitor.isPending}
           >Disqualify competitor<wa-icon slot="start" name="user-slash"
           ></wa-icon></wa-button
         >

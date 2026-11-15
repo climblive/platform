@@ -7,7 +7,7 @@
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import {
-    ContenderName,
+    CompetitorName,
     Score,
     Table,
     type ColumnDefinition,
@@ -40,7 +40,7 @@
   let filterText = $state<string>();
   let selectedCategoryId: number | undefined = $state();
 
-  const contenderCounts = $derived(
+  const competitorCounts = $derived(
     new Map(
       Array.from($scoreboard.entries()).map(([categoryId, entries]) => [
         categoryId,
@@ -114,16 +114,16 @@
 </script>
 
 {#snippet renderName({
-  contenderId,
+  competitorId,
   name,
   disqualified,
   scrubbedAt,
 }: ScoreboardEntry)}
-  <Link to={`./contenders/${contenderId}`}>
+  <Link to={`./competitors/${competitorId}`}>
     {#if disqualified}
-      <del><ContenderName id={contenderId} {name} {scrubbedAt} /></del>
+      <del><CompetitorName id={competitorId} {name} {scrubbedAt} /></del>
     {:else}
-      <ContenderName id={contenderId} {name} {scrubbedAt} />
+      <CompetitorName id={competitorId} {name} {scrubbedAt} />
     {/if}
   </Link>
 {/snippet}
@@ -171,7 +171,7 @@
         }}
       >
         {#each categories as category (category.id)}
-          {@const count = contenderCounts.get(category.id)}
+          {@const count = competitorCounts.get(category.id)}
 
           <wa-option value={category.id} label={category.name}>
             <div class="label">
@@ -192,7 +192,7 @@
   {#if loading}
     <Loader />
   {:else}
-    <Table {columns} data={tableData} getId={({ contenderId }) => contenderId}
+    <Table {columns} data={tableData} getId={({ competitorId }) => competitorId}
     ></Table>
   {/if}
 </section>

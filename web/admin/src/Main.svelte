@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Route, Router } from "svelte-routing";
   import Header from "./Header.svelte";
-  import ContenderView from "./pages/ContenderView.svelte";
+  import CompetitorView from "./pages/CompetitorView.svelte";
   import Competition from "./pages/Competition.svelte";
   import CreateCategory from "./pages/CreateCategory.svelte";
   import CreateCompetition from "./pages/CreateCompetition.svelte";
@@ -110,9 +110,9 @@
         <PrintableTicketList competitionId={Number(params.competitionId)} />
       {/snippet}
     </Route>
-    <Route path="/contenders/:contenderId">
-      {#snippet children({ params }: { params: { contenderId: number } })}
-        <ContenderView contenderId={Number(params.contenderId)} />
+    <Route path="/competitors/:competitorId">
+      {#snippet children({ params }: { params: { competitorId: number } })}
+        <CompetitorView competitorId={Number(params.competitorId)} />
       {/snippet}
     </Route>
   </Router>

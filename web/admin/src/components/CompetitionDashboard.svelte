@@ -59,9 +59,9 @@
 </script>
 
 {#snippet summary()}
-  {@const registeredContenders = competition?.registeredContenders ?? 0}
+  {@const registeredCompetitors = competition?.registeredCompetitors ?? 0}
 
-  {@const contenderStr = (count: number) => `${count} registered`}
+  {@const competitorStr = (count: number) => `${count} registered`}
 
   {@const categoryStr = (count: number) =>
     count === 1 ? "1 category" : `${count} categories`}
@@ -71,7 +71,7 @@
 
   <div class="summary">
     <ul>
-      <li>{contenderStr(registeredContenders)}</li>
+      <li>{competitorStr(registeredCompetitors)}</li>
       <li>{categoryStr(categoryCount)}</li>
       <li>{problemStr(problemCount)}</li>
     </ul>

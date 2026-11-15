@@ -11,12 +11,12 @@ import (
 
 func TestNewEventFilter(t *testing.T) {
 	competitionID := testutils.RandomResourceID[domain.CompetitionID]()
-	contenderID := testutils.RandomResourceID[domain.ContenderID]()
+	competitorID := testutils.RandomResourceID[domain.CompetitorID]()
 
-	filter := domain.NewEventFilter(competitionID, contenderID, "A", "B", "C")
+	filter := domain.NewEventFilter(competitionID, competitorID, "A", "B", "C")
 
 	assert.Equal(t, competitionID, filter.CompetitionID)
-	assert.Equal(t, contenderID, filter.ContenderID)
+	assert.Equal(t, competitorID, filter.CompetitorID)
 
 	assert.Equal(t, map[string]struct{}{
 		"A": {},
@@ -49,26 +49,26 @@ func TestMatchFilter(t *testing.T) {
 		assert.False(t, match)
 	})
 
-	t.Run("ContenderMatchWildcard", func(t *testing.T) {
+	t.Run("CompetitorMatchWildcard", func(t *testing.T) {
 		filter := domain.NewEventFilter(0, 0)
 
-		match := filter.Match(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.ContenderID](), "A")
+		match := filter.Match(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.CompetitorID](), "A")
 
 		assert.True(t, match)
 	})
 
-	t.Run("ContenderMatch", func(t *testing.T) {
+	t.Run("CompetitorMatch", func(t *testing.T) {
 		filter := domain.NewEventFilter(0, 1337)
 
-		match := filter.Match(testutils.RandomResourceID[domain.CompetitionID](), domain.ContenderID(1337), "A")
+		match := filter.Match(testutils.RandomResourceID[domain.CompetitionID](), domain.CompetitorID(1337), "A")
 
 		assert.True(t, match)
 	})
 
-	t.Run("ContenderNoMatch", func(t *testing.T) {
+	t.Run("CompetitorNoMatch", func(t *testing.T) {
 		filter := domain.NewEventFilter(0, 1337)
 
-		match := filter.Match(testutils.RandomResourceID[domain.CompetitionID](), domain.ContenderID(42), "A")
+		match := filter.Match(testutils.RandomResourceID[domain.CompetitionID](), domain.CompetitorID(42), "A")
 
 		assert.False(t, match)
 	})
@@ -77,7 +77,7 @@ func TestMatchFilter(t *testing.T) {
 		filter := domain.NewEventFilter(0, 0, "A", "B", "C")
 
 		for eventType := range slices.Values([]string{"A", "B", "C"}) {
-			match := filter.Match(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.ContenderID](), eventType)
+			match := filter.Match(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.CompetitorID](), eventType)
 
 			assert.True(t, match)
 		}
@@ -86,7 +86,7 @@ func TestMatchFilter(t *testing.T) {
 	t.Run("EventTypeNoMatch", func(t *testing.T) {
 		filter := domain.NewEventFilter(0, 0, "A", "B", "C")
 
-		match := filter.Match(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.ContenderID](), "X")
+		match := filter.Match(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.CompetitorID](), "X")
 
 		assert.False(t, match)
 	})

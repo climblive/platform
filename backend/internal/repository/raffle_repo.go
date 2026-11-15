@@ -72,11 +72,11 @@ func (d *Database) GetRaffleWinners(ctx context.Context, tx domain.Transaction, 
 
 func (d *Database) StoreRaffleWinner(ctx context.Context, tx domain.Transaction, winner domain.RaffleWinner) (domain.RaffleWinner, error) {
 	params := database.UpsertRaffleWinnerParams{
-		ID:          int32(winner.ID),
-		RaffleID:    int32(winner.RaffleID),
-		OrganizerID: int32(winner.Ownership.OrganizerID),
-		ContenderID: int32(winner.ContenderID),
-		Timestamp:   winner.Timestamp,
+		ID:           int32(winner.ID),
+		RaffleID:     int32(winner.RaffleID),
+		OrganizerID:  int32(winner.Ownership.OrganizerID),
+		CompetitorID: int32(winner.CompetitorID),
+		Timestamp:    winner.Timestamp,
 	}
 
 	insertID, err := d.WithTx(tx).UpsertRaffleWinner(ctx, params)
