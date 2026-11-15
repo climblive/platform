@@ -237,7 +237,7 @@ func TestMatchFilters(t *testing.T) {
 	t.Run("NoFilters", func(t *testing.T) {
 		subscription := events.NewSubscription([]domain.EventFilter{}, 0)
 
-		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.ContenderID](), "A")
+		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.CompetitorID](), "A")
 
 		assert.False(t, match)
 	})
@@ -245,7 +245,7 @@ func TestMatchFilters(t *testing.T) {
 	t.Run("SingleFilter_Match", func(t *testing.T) {
 		subscription := events.NewSubscription([]domain.EventFilter{domain.NewEventFilter(0, 0, "A")}, 0)
 
-		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.ContenderID](), "A")
+		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.CompetitorID](), "A")
 
 		assert.True(t, match)
 	})
@@ -253,7 +253,7 @@ func TestMatchFilters(t *testing.T) {
 	t.Run("SingleFilter_NoMatch", func(t *testing.T) {
 		subscription := events.NewSubscription([]domain.EventFilter{domain.NewEventFilter(0, 0, "A")}, 0)
 
-		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.ContenderID](), "B")
+		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.CompetitorID](), "B")
 
 		assert.False(t, match)
 	})
@@ -265,13 +265,13 @@ func TestMatchFilters(t *testing.T) {
 			domain.NewEventFilter(0, 0, "C"),
 		}, 0)
 
-		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.ContenderID](), "A")
+		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.CompetitorID](), "A")
 		assert.True(t, match)
 
-		match = subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.ContenderID](), "B")
+		match = subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.CompetitorID](), "B")
 		assert.True(t, match)
 
-		match = subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.ContenderID](), "C")
+		match = subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.CompetitorID](), "C")
 		assert.True(t, match)
 	})
 
@@ -282,7 +282,7 @@ func TestMatchFilters(t *testing.T) {
 			domain.NewEventFilter(0, 0, "C"),
 		}, 0)
 
-		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.ContenderID](), "D")
+		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.CompetitorID](), "D")
 		assert.False(t, match)
 	})
 }

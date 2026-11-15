@@ -3,7 +3,7 @@
   import type { ScoreboardEntry } from "../models";
   import { NO_SCORE } from "../models/score";
   import { ordinalSuperscript } from "../utils";
-  import ContenderName from "./ContenderName.svelte";
+  import CompetitorName from "./CompetitorName.svelte";
   import Score from "./Score.svelte";
 
   interface Props {
@@ -27,8 +27,8 @@
     {/if}
   </div>
   <div class="name">
-    <ContenderName
-      id={scoreboardEntry.contenderId}
+    <CompetitorName
+      id={scoreboardEntry.competitorId}
       name={scoreboardEntry.name}
       scrubbedAt={scoreboardEntry.scrubbedAt}
     />

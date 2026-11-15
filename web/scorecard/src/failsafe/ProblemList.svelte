@@ -2,20 +2,20 @@
   import type { Tick } from "@climblive/lib/models";
   import {
     getProblemsQuery,
-    getTicksByContenderQuery,
+    getTicksByCompetitorQuery,
   } from "@climblive/lib/queries";
   import Problem from "./Problem.svelte";
 
   type Props = {
     competitionId: number;
-    contenderId: number;
+    competitorId: number;
     enableAttempts: boolean;
   };
 
-  const { competitionId, contenderId, enableAttempts }: Props = $props();
+  const { competitionId, competitorId, enableAttempts }: Props = $props();
 
   const problemsQuery = $derived(getProblemsQuery(competitionId));
-  const ticksQuery = $derived(getTicksByContenderQuery(contenderId));
+  const ticksQuery = $derived(getTicksByCompetitorQuery(competitorId));
 
   let problems = $derived(
     problemsQuery.data
@@ -32,7 +32,7 @@
     {#each problems as problem (problem.id)}
       {@const tick = ticksByProblem.get(problem.id)}
 
-      <Problem {problem} {tick} {contenderId} {enableAttempts} />
+      <Problem {problem} {tick} {competitorId} {enableAttempts} />
     {/each}
   </section>
 {/if}

@@ -100,11 +100,11 @@ func main() {
 	}()
 
 	for _, code := range registrationCodes {
-		runner := ContenderRunner{
+		runner := CompetitorRunner{
 			RegistrationCode: code,
 			apiURL:           apiURL,
 			maxSleep:         maxSleep,
-			contender:        domain.Contender{},
+			competitor:       domain.Competitor{},
 			ticks:            nil,
 			events:           nil,
 		}
@@ -192,11 +192,11 @@ func buildTick(problem domain.Problem) domain.Tick {
 	return tick
 }
 
-type ContenderRunner struct {
+type CompetitorRunner struct {
 	RegistrationCode string
 	apiURL           string
 	maxSleep         time.Duration
-	contender        domain.Contender
+	competitor       domain.Competitor
 	ticks            map[domain.ProblemID]domain.Tick
 	events           chan<- SimulatorEvent
 }
@@ -207,7 +207,7 @@ func mustStatus(resp *http.Response, expected int) {
 	}
 }
 
-func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- SimulatorEvent) {
+func (r *CompetitorRunner) Run(requests int, wg *sync.WaitGroup, events chan<- SimulatorEvent) {
 	defer func() {
 		if err := recover(); err != nil {
 			slog.Error("runner panicked", "code", r.RegistrationCode, "error", err)
@@ -220,12 +220,12 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 	r.events = events
 
 	r.sleep()
-	r.contender = r.GetContender()
+	r.competitor = r.GetCompetitor()
 
 	r.sleep()
-	categories := r.GetCategories(r.contender.CompetitionID)
+	categories := r.GetCategories(r.competitor.CompetitionID)
 
-	patch := domain.ContenderPatch{}
+	patch := domain.CompetitorPatch{}
 
 	selectedCategory := categories[rand.Int()%len(categories)]
 
@@ -241,19 +241,19 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 	patch.CategoryID = domain.NewPatch(selectedCategory.ID)
 
 	r.sleep()
-	r.PatchContender(r.contender.ID, patch)
+	r.PatchCompetitor(r.competitor.ID, patch)
 
 	r.sleep()
-	problems := r.GetProblems(r.contender.CompetitionID)
+	problems := r.GetProblems(r.competitor.CompetitionID)
 
 	r.sleep()
-	ticks := r.GetTicks(r.contender.ID)
+	ticks := r.GetTicks(r.competitor.ID)
 
 	for tick := range slices.Values(ticks) {
 		r.ticks[tick.ProblemID] = tick
 	}
 
-	go r.ReadEvents(r.contender.ID)
+	go r.ReadEvents(r.competitor.ID)
 
 	for range requests {
 		r.sleep()
@@ -267,18 +267,18 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 		} else {
 			tick := buildTick(problem)
 
-			tick = r.PutTick(r.contender.ID, tick)
+			tick = r.PutTick(r.competitor.ID, tick)
 			r.ticks[problem.ID] = tick
 		}
 	}
 }
 
-func (r *ContenderRunner) sleep() {
+func (r *CompetitorRunner) sleep() {
 	time.Sleep(time.Duration(rand.Int() % int(r.maxSleep)))
 }
 
-func (r *ContenderRunner) GetContender() domain.Contender {
-	resp, err := http.Get(fmt.Sprintf("%s/codes/%s/contender", r.apiURL, r.RegistrationCode))
+func (r *CompetitorRunner) GetCompetitor() domain.Competitor {
+	resp, err := http.Get(fmt.Sprintf("%s/codes/%s/competitor", r.apiURL, r.RegistrationCode))
 	if err != nil {
 		panic(err)
 	}
@@ -289,24 +289,24 @@ func (r *ContenderRunner) GetContender() domain.Contender {
 
 	mustStatus(resp, http.StatusOK)
 
-	contender := domain.Contender{}
+	competitor := domain.Competitor{}
 
-	err = json.UnmarshalRead(resp.Body, &contender)
+	err = json.UnmarshalRead(resp.Body, &competitor)
 	if err != nil {
 		panic(err)
 	}
 
-	return contender
+	return competitor
 }
 
-func (r *ContenderRunner) PatchContender(contenderID domain.ContenderID, patch domain.ContenderPatch) domain.Contender {
+func (r *CompetitorRunner) PatchCompetitor(competitorID domain.CompetitorID, patch domain.CompetitorPatch) domain.Competitor {
 	buf := new(bytes.Buffer)
 	err := json.MarshalWrite(buf, patch)
 	if err != nil {
 		panic(err)
 	}
 
-	req, err := http.NewRequest(http.MethodPatch, fmt.Sprintf("%s/contenders/%d", r.apiURL, contenderID), buf)
+	req, err := http.NewRequest(http.MethodPatch, fmt.Sprintf("%s/competitors/%d", r.apiURL, competitorID), buf)
 	if err != nil {
 		panic(err)
 	}
@@ -325,17 +325,17 @@ func (r *ContenderRunner) PatchContender(contenderID domain.ContenderID, patch d
 
 	mustStatus(resp, http.StatusOK)
 
-	var contender domain.Contender
+	var competitor domain.Competitor
 
-	err = json.UnmarshalRead(resp.Body, &contender)
+	err = json.UnmarshalRead(resp.Body, &competitor)
 	if err != nil {
 		panic(err)
 	}
 
-	return contender
+	return competitor
 }
 
-func (r *ContenderRunner) GetCategories(competitionID domain.CompetitionID) []domain.Category {
+func (r *CompetitorRunner) GetCategories(competitionID domain.CompetitionID) []domain.Category {
 	resp, err := http.Get(fmt.Sprintf("%s/competitions/%d/categories", r.apiURL, competitionID))
 	if err != nil {
 		panic(err)
@@ -357,7 +357,7 @@ func (r *ContenderRunner) GetCategories(competitionID domain.CompetitionID) []do
 	return categories
 }
 
-func (r *ContenderRunner) GetProblems(competitionID domain.CompetitionID) []domain.Problem {
+func (r *CompetitorRunner) GetProblems(competitionID domain.CompetitionID) []domain.Problem {
 	resp, err := http.Get(fmt.Sprintf("%s/competitions/%d/problems", r.apiURL, competitionID))
 	if err != nil {
 		panic(err)
@@ -379,8 +379,8 @@ func (r *ContenderRunner) GetProblems(competitionID domain.CompetitionID) []doma
 	return problems
 }
 
-func (r *ContenderRunner) GetTicks(contenderID domain.ContenderID) []domain.Tick {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/contenders/%d/ticks", r.apiURL, contenderID), nil)
+func (r *CompetitorRunner) GetTicks(competitorID domain.CompetitorID) []domain.Tick {
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/competitors/%d/ticks", r.apiURL, competitorID), nil)
 	if err != nil {
 		panic(err)
 	}
@@ -408,7 +408,7 @@ func (r *ContenderRunner) GetTicks(contenderID domain.ContenderID) []domain.Tick
 	return ticks
 }
 
-func (r *ContenderRunner) DeleteTick(tickID domain.TickID) {
+func (r *CompetitorRunner) DeleteTick(tickID domain.TickID) {
 	req, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("%s/ticks/%d", r.apiURL, tickID), nil)
 	if err != nil {
 		panic(err)
@@ -428,7 +428,7 @@ func (r *ContenderRunner) DeleteTick(tickID domain.TickID) {
 	mustStatus(resp, http.StatusNoContent)
 }
 
-func (r *ContenderRunner) PutTick(contenderID domain.ContenderID, tick domain.Tick) domain.Tick {
+func (r *CompetitorRunner) PutTick(competitorID domain.CompetitorID, tick domain.Tick) domain.Tick {
 	tick.Revision = r.ticks[tick.ProblemID].Revision + 1
 
 	buf := new(bytes.Buffer)
@@ -437,7 +437,7 @@ func (r *ContenderRunner) PutTick(contenderID domain.ContenderID, tick domain.Ti
 		panic(err)
 	}
 
-	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("%s/contenders/%d/ticks", r.apiURL, contenderID), buf)
+	req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("%s/competitors/%d/ticks", r.apiURL, competitorID), buf)
 	if err != nil {
 		panic(err)
 	}
@@ -464,20 +464,20 @@ func (r *ContenderRunner) PutTick(contenderID domain.ContenderID, tick domain.Ti
 	return tick
 }
 
-func (r *ContenderRunner) ReadEvents(contenderID domain.ContenderID) {
+func (r *CompetitorRunner) ReadEvents(competitorID domain.CompetitorID) {
 	filters := []domain.EventFilter{
 		domain.NewEventFilter(
-			r.contender.CompetitionID,
-			contenderID,
-			"CONTENDER_PUBLIC_INFO_UPDATED",
-			"CONTENDER_RESULT_UPDATED",
+			r.competitor.CompetitionID,
+			competitorID,
+			"COMPETITOR_PUBLIC_INFO_UPDATED",
+			"COMPETITOR_RESULT_UPDATED",
 			"ASCENT_REGISTERED",
 			"ASCENT_DEREGISTERED",
 			"POINT_VALUE_UPDATED",
 			"RAFFLE_WINNER_DRAWN",
 		),
 		domain.NewEventFilter(
-			r.contender.CompetitionID,
+			r.competitor.CompetitionID,
 			0,
 			"RULES_UPDATED",
 			"PROBLEM_ADDED",

@@ -13,20 +13,20 @@ func TestCompareResult(t *testing.T) {
 	now := time.Now()
 
 	r1 := domain.Result{
-		Timestamp:   now,
-		ContenderID: 1,
-		Score:       "100p",
-		Placement:   1,
-		Finalist:    true,
-		RankOrder:   0,
+		Timestamp:    now,
+		CompetitorID: 1,
+		Score:        "100p",
+		Placement:    1,
+		Finalist:     true,
+		RankOrder:    0,
 	}
 	r2 := domain.Result{
-		Timestamp:   now.Add(time.Second),
-		ContenderID: 1,
-		Score:       "100p",
-		Placement:   1,
-		Finalist:    true,
-		RankOrder:   0,
+		Timestamp:    now.Add(time.Second),
+		CompetitorID: 1,
+		Score:        "100p",
+		Placement:    1,
+		Finalist:     true,
+		RankOrder:    0,
 	}
 
 	assert.True(t, scores.CompareResult(r1, r2))

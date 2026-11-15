@@ -24,8 +24,8 @@
   import {
     ascentDeregisteredEventSchema,
     ascentRegisteredEventSchema,
-    contenderPublicInfoUpdatedEventSchema,
-    contenderResultUpdatedEventSchema,
+    competitorPublicInfoUpdatedEventSchema,
+    competitorResultUpdatedEventSchema,
     NO_SCORE,
     pointValueUpdatedEventSchema,
     raffleWinnerDrawnEventSchema,
@@ -38,14 +38,14 @@
   } from "@climblive/lib/models";
   import {
     getCategoriesQuery,
-    getContenderQuery,
+    getCompetitorQuery,
     getCompetitionQuery,
-    getPointValuesByContenderQuery,
+    getPointValuesByCompetitorQuery,
     getProblemsQuery,
-    getTicksByContenderQuery,
+    getTicksByCompetitorQuery,
     refetchProblems,
     removeTickFromQueryCache,
-    updateContenderPublicInfoInQueryCache,
+    updateCompetitorPublicInfoInQueryCache,
     updatePointValueInQueryCache,
     updateRulesInQueryCache,
     updateTickInQueryCache,
@@ -60,14 +60,14 @@
   const queryClient = useQueryClient();
   const { subscribeEvents, unsubscribeEvents } = useEvents();
 
-  const contenderQuery = $derived(getContenderQuery($session.contenderId));
+  const competitorQuery = $derived(getCompetitorQuery($session.competitorId));
   const competitionQuery = $derived(
     getCompetitionQuery($session.competitionId),
   );
   const categoriesQuery = $derived(getCategoriesQuery($session.competitionId));
-  const ticksQuery = $derived(getTicksByContenderQuery($session.contenderId));
+  const ticksQuery = $derived(getTicksByCompetitorQuery($session.competitorId));
   const pointValuesQuery = $derived(
-    getPointValuesByContenderQuery($session.contenderId),
+    getPointValuesByCompetitorQuery($session.competitorId),
   );
 
   let resultsConnected = $state(false);
@@ -78,12 +78,12 @@
   let placement: number | undefined = $state();
   let finalist: boolean = $state(false);
 
-  let contender = $derived(contenderQuery.data);
+  let competitor = $derived(competitorQuery.data);
   let competition = $derived(competitionQuery.data);
   let categories = $derived(categoriesQuery.data);
   let ticks = $derived(ticksQuery.data);
   let selectedCategory = $derived(
-    categories?.find(({ id }) => id === contender?.categoryId),
+    categories?.find(({ id }) => id === competitor?.categoryId),
   );
   let startTime = $derived(
     selectedCategory?.timeBegin ?? new Date(8640000000000000),
@@ -220,10 +220,10 @@
   });
 
   $effect(() => {
-    if (contender) {
-      score = contender.result?.score ?? NO_SCORE;
-      placement = contender.result?.placement;
-      finalist = contender.result?.finalist ?? false;
+    if (competitor) {
+      score = competitor.result?.score ?? NO_SCORE;
+      placement = competitor.result?.placement;
+      finalist = competitor.result?.finalist ?? false;
     }
   });
 
@@ -254,10 +254,10 @@
     const filters: EventFilter[] = [
       {
         competitionId: $session.competitionId,
-        contenderId: $session.contenderId,
+        competitorId: $session.competitorId,
         eventTypes: {
-          CONTENDER_PUBLIC_INFO_UPDATED: {},
-          CONTENDER_RESULT_UPDATED: {},
+          COMPETITOR_PUBLIC_INFO_UPDATED: {},
+          COMPETITOR_RESULT_UPDATED: {},
           ASCENT_REGISTERED: {},
           ASCENT_DEREGISTERED: {},
           POINT_VALUE_UPDATED: {},
@@ -277,19 +277,19 @@
 
     subscriptionId = subscribeEvents(filters, (eventName, e) => {
       switch (eventName) {
-        case "CONTENDER_PUBLIC_INFO_UPDATED":
+        case "COMPETITOR_PUBLIC_INFO_UPDATED":
           {
-            const event = contenderPublicInfoUpdatedEventSchema.parse(
+            const event = competitorPublicInfoUpdatedEventSchema.parse(
               JSON.parse(e.data),
             );
 
-            if (event.contenderId !== contender?.id) {
+            if (event.competitorId !== competitor?.id) {
               return;
             }
 
-            updateContenderPublicInfoInQueryCache(
+            updateCompetitorPublicInfoInQueryCache(
               queryClient,
-              event.contenderId,
+              event.competitorId,
               {
                 categoryId: event.categoryId,
                 name: event.name,
@@ -300,13 +300,13 @@
             );
           }
           break;
-        case "CONTENDER_RESULT_UPDATED":
+        case "COMPETITOR_RESULT_UPDATED":
           {
-            const event = contenderResultUpdatedEventSchema.parse(
+            const event = competitorResultUpdatedEventSchema.parse(
               JSON.parse(e.data),
             );
 
-            if (event.contenderId === contender?.id) {
+            if (event.competitorId === competitor?.id) {
               score = event.score;
               placement = event.placement;
               finalist = event.finalist;
@@ -317,7 +317,7 @@
           {
             const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
 
-            if (event.contenderId !== contender?.id) {
+            if (event.competitorId !== competitor?.id) {
               return;
             }
 
@@ -334,7 +334,7 @@
               attemptsTop: event.attemptsTop,
             };
 
-            updateTickInQueryCache(queryClient, $session.contenderId, newTick);
+            updateTickInQueryCache(queryClient, $session.competitorId, newTick);
           }
           break;
         case "ASCENT_DEREGISTERED":
@@ -343,7 +343,7 @@
               JSON.parse(e.data),
             );
 
-            if (event.contenderId !== contender?.id) {
+            if (event.competitorId !== competitor?.id) {
               return;
             }
 
@@ -356,11 +356,15 @@
               JSON.parse(e.data),
             );
 
-            if (event.contenderId !== contender?.id) {
+            if (event.competitorId !== competitor?.id) {
               return;
             }
 
-            updatePointValueInQueryCache(queryClient, event.contenderId, event);
+            updatePointValueInQueryCache(
+              queryClient,
+              event.competitorId,
+              event,
+            );
           }
           break;
         case "RAFFLE_WINNER_DRAWN":
@@ -369,7 +373,7 @@
               JSON.parse(e.data),
             );
 
-            if (event.contenderId === contender?.id && raffleWinnerDialog) {
+            if (event.competitorId === competitor?.id && raffleWinnerDialog) {
               raffleWinnerDialog.open = true;
             }
           }
@@ -417,12 +421,12 @@
 
 <svelte:window onvisibilitychange={handleVisibilityChange} />
 
-{#if showSplash || !contender || !competition || !categories || !sortedProblems || !ticks || !selectedCategory}
+{#if showSplash || !competitor || !competition || !categories || !sortedProblems || !ticks || !selectedCategory}
   <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
   <CompetitionStateProvider
     competitionId={$session.competitionId}
-    categoryId={contender?.categoryId}
+    categoryId={competitor?.categoryId}
   >
     {#snippet children({ competitionState })}
       <main>
@@ -431,9 +435,9 @@
             registrationCode={$session.registrationCode}
             competitionName={competition.name}
             categoryName={selectedCategory?.name}
-            contenderId={contender.id}
-            contenderName={contender.name}
-            contenderScrubbedAt={contender.scrubbedAt}
+            competitorId={competitor.id}
+            competitorName={competitor.name}
+            competitorScrubbedAt={competitor.scrubbedAt}
           />
         </div>
         <wa-tab-group bind:this={tabGroup} onwa-tab-show={handleShowTab}>
@@ -448,7 +452,7 @@
               {score}
               {placement}
               {finalist}
-              disqualified={contender.disqualified}
+              disqualified={competitor.disqualified}
               {competitionState}
               {startTime}
               {endTime}
@@ -530,7 +534,7 @@
                     categoryId={selectedCategory.id}
                     {scoreboard}
                     {loading}
-                    highlightedContenderId={contender.id}
+                    highlightedCompetitorId={competitor.id}
                     autoScroll
                   />
                 {/snippet}

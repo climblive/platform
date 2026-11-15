@@ -18,7 +18,7 @@ type categoryUseCaseRepository interface {
 	StoreCategory(ctx context.Context, tx domain.Transaction, category domain.Category) (domain.Category, error)
 	DeleteCategory(ctx context.Context, tx domain.Transaction, categoryID domain.CategoryID) error
 	GetCategory(ctx context.Context, tx domain.Transaction, categoryID domain.CategoryID) (domain.Category, error)
-	GetContendersByCategory(ctx context.Context, tx domain.Transaction, categoryID domain.CategoryID) ([]domain.Contender, error)
+	GetCompetitorsByCategory(ctx context.Context, tx domain.Transaction, categoryID domain.CategoryID) ([]domain.Competitor, error)
 }
 
 type CategoryUseCase struct {
@@ -96,12 +96,12 @@ func (uc *CategoryUseCase) DeleteCategory(ctx context.Context, categoryID domain
 		return errors.Wrap(err, 0)
 	}
 
-	contenders, err := uc.Repo.GetContendersByCategory(ctx, nil, categoryID)
+	competitors, err := uc.Repo.GetCompetitorsByCategory(ctx, nil, categoryID)
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
 
-	if len(contenders) > 0 {
+	if len(competitors) > 0 {
 		return errors.Wrap(domain.ErrNotAllowed, 0)
 	}
 

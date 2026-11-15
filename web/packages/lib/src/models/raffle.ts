@@ -9,8 +9,8 @@ export const raffleSchema: z.ZodType<Raffle> = z.object({
 export const raffleWinnerSchema: z.ZodType<RaffleWinner> = z.object({
   id: z.number(),
   raffleId: z.number(),
-  contenderId: z.number(),
-  contenderName: z.string(),
-  contenderScrubbedAt: z.coerce.date().optional(),
+  competitorId: z.number(),
+  competitorName: z.string(),
+  competitorScrubbedAt: z.coerce.date().optional(),
   timestamp: z.coerce.date(),
 });

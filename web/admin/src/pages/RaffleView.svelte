@@ -6,7 +6,7 @@
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
-    ContenderName,
+    CompetitorName,
     EmptyState,
     Table,
     useEvents,
@@ -15,7 +15,7 @@
   import type { EventFilter, RaffleWinner } from "@climblive/lib/models";
   import {
     drawRaffleWinnerMutation,
-    getContendersByCompetitionQuery,
+    getCompetitorsByCompetitionQuery,
     getCompetitionQuery,
     getRaffleQuery,
     getRaffleWinnersQuery,
@@ -56,20 +56,20 @@
   );
   const competition = $derived(competitionQuery?.data);
 
-  const contendersQuery = $derived(
+  const competitorsQuery = $derived(
     raffle?.competitionId
-      ? getContendersByCompetitionQuery(raffle.competitionId)
+      ? getCompetitorsByCompetitionQuery(raffle.competitionId)
       : undefined,
   );
 
   const eligibleCount = $derived.by(() => {
-    const contenders = contendersQuery?.data;
+    const competitors = competitorsQuery?.data;
 
-    if (contenders === undefined) {
+    if (competitors === undefined) {
       return undefined;
     }
 
-    return contenders.filter(({ entered, disqualified, scrubbedAt }) => {
+    return competitors.filter(({ entered, disqualified, scrubbedAt }) => {
       switch (true) {
         case entered === undefined:
           return false;
@@ -100,28 +100,28 @@
       {
         competitionId,
         eventTypes: {
-          CONTENDER_ENTERED: {},
-          CONTENDER_DISQUALIFIED: {},
-          CONTENDER_REQUALIFIED: {},
+          COMPETITOR_ENTERED: {},
+          COMPETITOR_DISQUALIFIED: {},
+          COMPETITOR_REQUALIFIED: {},
         },
       },
     ];
 
-    const invalidateContenders = () => {
+    const invalidateCompetitors = () => {
       queryClient.invalidateQueries({
-        queryKey: ["contenders", { competitionId }],
+        queryKey: ["competitors", { competitionId }],
       });
     };
 
     const subscriptionId = subscribeEvents(filters, (eventName) => {
       if (
         [
-          "CONTENDER_ENTERED",
-          "CONTENDER_DISQUALIFIED",
-          "CONTENDER_REQUALIFIED",
+          "COMPETITOR_ENTERED",
+          "COMPETITOR_DISQUALIFIED",
+          "COMPETITOR_REQUALIFIED",
         ].includes(eventName)
       ) {
-        invalidateContenders();
+        invalidateCompetitors();
       }
     });
 
@@ -159,14 +159,14 @@
 </script>
 
 {#snippet renderName({
-  contenderName,
-  contenderId,
-  contenderScrubbedAt,
+  competitorName,
+  competitorId,
+  competitorScrubbedAt,
 }: RaffleWinner)}
-  <ContenderName
-    id={contenderId}
-    name={contenderName}
-    scrubbedAt={contenderScrubbedAt}
+  <CompetitorName
+    id={competitorId}
+    name={competitorName}
+    scrubbedAt={competitorScrubbedAt}
     withTooltip
   />
 {/snippet}
@@ -216,7 +216,7 @@
       <Table
         {columns}
         data={sortedRaffleWinners}
-        getId={({ contenderId }) => contenderId}
+        getId={({ competitorId }) => competitorId}
       ></Table>
     {:else if eligibleCount === 0}
       <EmptyState

@@ -8,10 +8,10 @@ import (
 )
 
 type tickUseCase interface {
-	GetTicksByContender(ctx context.Context, contenderID domain.ContenderID) ([]domain.Tick, error)
+	GetTicksByCompetitor(ctx context.Context, competitorID domain.CompetitorID) ([]domain.Tick, error)
 	GetTicksByCompetition(ctx context.Context, competitionID domain.CompetitionID) ([]domain.Tick, error)
 	DeleteTick(ctx context.Context, tickID domain.TickID) error
-	PutTick(ctx context.Context, contenderID domain.ContenderID, tick domain.Tick) (domain.Tick, error)
+	PutTick(ctx context.Context, competitorID domain.CompetitorID, tick domain.Tick) (domain.Tick, error)
 }
 
 type tickHandler struct {
@@ -23,20 +23,20 @@ func InstallTickHandler(mux *Mux, tickUseCase tickUseCase) {
 		tickUseCase: tickUseCase,
 	}
 
-	mux.HandleFunc("GET /contenders/{contenderID}/ticks", handler.GetTicksByContender)
+	mux.HandleFunc("GET /competitors/{competitorID}/ticks", handler.GetTicksByCompetitor)
 	mux.HandleFunc("GET /competitions/{competitionID}/ticks", handler.GetTicksByCompetition)
-	mux.HandleFunc("PUT /contenders/{contenderID}/ticks", handler.PutTick)
+	mux.HandleFunc("PUT /competitors/{competitorID}/ticks", handler.PutTick)
 	mux.HandleFunc("DELETE /ticks/{tickID}", handler.DeleteTick)
 }
 
-func (hdlr *tickHandler) GetTicksByContender(w http.ResponseWriter, r *http.Request) {
-	contenderID, err := parseResourceID[domain.ContenderID](r.PathValue("contenderID"))
+func (hdlr *tickHandler) GetTicksByCompetitor(w http.ResponseWriter, r *http.Request) {
+	competitorID, err := parseResourceID[domain.CompetitorID](r.PathValue("competitorID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	ticks, err := hdlr.tickUseCase.GetTicksByContender(r.Context(), contenderID)
+	ticks, err := hdlr.tickUseCase.GetTicksByCompetitor(r.Context(), competitorID)
 	if err != nil {
 		handleError(w, err)
 		return
@@ -62,7 +62,7 @@ func (hdlr *tickHandler) GetTicksByCompetition(w http.ResponseWriter, r *http.Re
 }
 
 func (hdlr *tickHandler) PutTick(w http.ResponseWriter, r *http.Request) {
-	contenderID, err := parseResourceID[domain.ContenderID](r.PathValue("contenderID"))
+	competitorID, err := parseResourceID[domain.CompetitorID](r.PathValue("competitorID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -73,7 +73,7 @@ func (hdlr *tickHandler) PutTick(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updatedTick, err := hdlr.tickUseCase.PutTick(r.Context(), contenderID, tick)
+	updatedTick, err := hdlr.tickUseCase.PutTick(r.Context(), competitorID, tick)
 	if err != nil {
 		handleError(w, err)
 		return

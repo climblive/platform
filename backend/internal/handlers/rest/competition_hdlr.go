@@ -393,7 +393,7 @@ func (hdlr *competitionHandler) DownloadResults(w http.ResponseWriter, r *http.R
 
 			problemResults := make(map[domain.ProblemID]string, 0)
 			for _, tick := range ticks {
-				if *tick.Ownership.ContenderID == entry.ContenderID {
+				if *tick.Ownership.CompetitorID == entry.CompetitorID {
 					result := ""
 
 					switch {

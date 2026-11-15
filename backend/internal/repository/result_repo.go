@@ -10,12 +10,12 @@ import (
 
 func (d *Database) StoreResult(ctx context.Context, tx domain.Transaction, result domain.Result) error {
 	params := database.UpsertResultParams{
-		ContenderID: int32(result.ContenderID),
-		Timestamp:   result.Timestamp,
-		Score:       result.Score,
-		Placement:   int32(result.Placement),
-		Finalist:    result.Finalist,
-		RankOrder:   int32(result.RankOrder),
+		CompetitorID: int32(result.CompetitorID),
+		Timestamp:    result.Timestamp,
+		Score:        result.Score,
+		Placement:    int32(result.Placement),
+		Finalist:     result.Finalist,
+		RankOrder:    int32(result.RankOrder),
 	}
 
 	err := d.WithTx(tx).UpsertResult(ctx, params)

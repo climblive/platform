@@ -14,8 +14,8 @@ const maxTickRevisionJump = 1_000
 type tickUseCaseRepository interface {
 	domain.Transactor
 
-	GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error)
-	GetTicksByContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) ([]domain.Tick, error)
+	GetCompetitor(ctx context.Context, tx domain.Transaction, competitorID domain.CompetitorID) (domain.Competitor, error)
+	GetTicksByCompetitor(ctx context.Context, tx domain.Transaction, competitorID domain.CompetitorID) ([]domain.Tick, error)
 	GetTicksByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Tick, error)
 	GetCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (domain.Competition, error)
 	GetCategory(ctx context.Context, tx domain.Transaction, categoryID domain.CategoryID) (domain.Category, error)
@@ -23,7 +23,7 @@ type tickUseCaseRepository interface {
 	DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) error
 	StoreTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error)
 	GetTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) (domain.Tick, error)
-	GetTickByContenderAndProblem(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID, problemID domain.ProblemID) (domain.Tick, error)
+	GetTickByCompetitorAndProblem(ctx context.Context, tx domain.Transaction, competitorID domain.CompetitorID, problemID domain.ProblemID) (domain.Tick, error)
 }
 
 type TickUseCase struct {
@@ -32,17 +32,17 @@ type TickUseCase struct {
 	EventBroker domain.EventBroker
 }
 
-func (uc *TickUseCase) GetTicksByContender(ctx context.Context, contenderID domain.ContenderID) ([]domain.Tick, error) {
-	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
+func (uc *TickUseCase) GetTicksByCompetitor(ctx context.Context, competitorID domain.CompetitorID) ([]domain.Tick, error) {
+	competitor, err := uc.Repo.GetCompetitor(ctx, nil, competitorID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
 
-	if _, err := uc.Authorizer.HasOwnership(ctx, contender.Ownership); err != nil {
+	if _, err := uc.Authorizer.HasOwnership(ctx, competitor.Ownership); err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
 
-	ticks, err := uc.Repo.GetTicksByContender(ctx, nil, contenderID)
+	ticks, err := uc.Repo.GetTicksByCompetitor(ctx, nil, competitorID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -79,9 +79,9 @@ func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.TickID) err
 		return errors.Wrap(err, 0)
 	}
 
-	contenderID := *tick.Ownership.ContenderID
+	competitorID := *tick.Ownership.CompetitorID
 
-	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
+	competitor, err := uc.Repo.GetCompetitor(ctx, nil, competitorID)
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
@@ -91,7 +91,7 @@ func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.TickID) err
 		return errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
 	}
 
-	category, err := uc.Repo.GetCategory(ctx, nil, contender.CategoryID)
+	category, err := uc.Repo.GetCategory(ctx, nil, competitor.CategoryID)
 	if err != nil {
 		return errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
 	}
@@ -110,31 +110,31 @@ func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.TickID) err
 	}
 
 	uc.EventBroker.Dispatch(competition.ID, domain.AscentDeregisteredEvent{
-		TickID:      tickID,
-		ContenderID: contender.ID,
-		ProblemID:   tick.ProblemID,
+		TickID:       tickID,
+		CompetitorID: competitor.ID,
+		ProblemID:    tick.ProblemID,
 	})
 
 	return nil
 }
 
-func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.ContenderID, tick domain.Tick) (domain.Tick, error) {
-	contender, err := uc.Repo.GetContender(ctx, nil, contenderID)
+func (uc *TickUseCase) PutTick(ctx context.Context, competitorID domain.CompetitorID, tick domain.Tick) (domain.Tick, error) {
+	competitor, err := uc.Repo.GetCompetitor(ctx, nil, competitorID)
 	if err != nil {
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
-	role, err := uc.Authorizer.HasOwnership(ctx, contender.Ownership)
+	role, err := uc.Authorizer.HasOwnership(ctx, competitor.Ownership)
 	if err != nil {
 		return domain.Tick{}, errors.Wrap(err, 0)
 	}
 
-	competition, err := uc.Repo.GetCompetition(ctx, nil, contender.CompetitionID)
+	competition, err := uc.Repo.GetCompetition(ctx, nil, competitor.CompetitionID)
 	if err != nil {
 		return domain.Tick{}, errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
 	}
 
-	category, err := uc.Repo.GetCategory(ctx, nil, contender.CategoryID)
+	category, err := uc.Repo.GetCategory(ctx, nil, competitor.CategoryID)
 	if err != nil {
 		return domain.Tick{}, errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
 	}
@@ -160,7 +160,7 @@ func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.Contender
 		return domain.Tick{}, errors.New(domain.ErrProblemNotInCompetition)
 	}
 
-	existingTick, err := uc.Repo.GetTickByContenderAndProblem(ctx, nil, contenderID, problem.ID)
+	existingTick, err := uc.Repo.GetTickByCompetitorAndProblem(ctx, nil, competitorID, problem.ID)
 	switch {
 	case err == nil:
 	case errors.Is(err, domain.ErrNotFound):
@@ -176,7 +176,7 @@ func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.Contender
 		return domain.Tick{}, errors.Wrap(domain.ErrInvalidData, 0)
 	}
 
-	existingTick.Ownership = contender.Ownership
+	existingTick.Ownership = competitor.Ownership
 	existingTick.CompetitionID = competition.ID
 	existingTick.ProblemID = problem.ID
 	existingTick.Timestamp = time.Now()
@@ -201,7 +201,7 @@ func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.Contender
 	uc.EventBroker.Dispatch(competition.ID, domain.AscentRegisteredEvent{
 		TickID:        existingTick.ID,
 		Timestamp:     existingTick.Timestamp,
-		ContenderID:   *existingTick.Ownership.ContenderID,
+		CompetitorID:  *existingTick.Ownership.CompetitorID,
 		ProblemID:     existingTick.ProblemID,
 		Top:           existingTick.Top,
 		Revision:      existingTick.Revision,

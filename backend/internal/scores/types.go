@@ -16,8 +16,8 @@ type Score struct {
 	AttemptsZone2s int
 }
 
-type Contender struct {
-	ID                  domain.ContenderID
+type Competitor struct {
+	ID                  domain.CompetitorID
 	CategoryID          domain.CategoryID
 	Disqualified        bool
 	WithdrawnFromFinals bool
@@ -25,7 +25,7 @@ type Contender struct {
 	Score
 }
 
-func (c Contender) Compare(other Contender) int {
+func (c Competitor) Compare(other Competitor) int {
 	if result := cmp.Compare(other.Points, c.Points); result != 0 {
 		return result
 	}
@@ -60,7 +60,7 @@ func (c Contender) Compare(other Contender) int {
 type Tick struct {
 	ID            domain.TickID
 	Revision      int
-	ContenderID   domain.ContenderID
+	CompetitorID  domain.CompetitorID
 	ProblemID     domain.ProblemID
 	Zone1         bool
 	AttemptsZone1 int

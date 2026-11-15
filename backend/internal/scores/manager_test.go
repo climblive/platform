@@ -224,9 +224,9 @@ func (m *repositoryMock) GetCompetition(ctx context.Context, tx domain.Transacti
 	return args.Get(0).(domain.Competition), args.Error(1)
 }
 
-func (m *repositoryMock) GetContendersByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Contender, error) {
+func (m *repositoryMock) GetCompetitorsByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Competitor, error) {
 	args := m.Called(ctx, tx, competitionID)
-	return args.Get(0).([]domain.Contender), args.Error(1)
+	return args.Get(0).([]domain.Competitor), args.Error(1)
 }
 
 func (m *repositoryMock) GetProblemsByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Problem, error) {

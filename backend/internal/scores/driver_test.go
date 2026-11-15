@@ -34,12 +34,12 @@ func TestEngineDriver(t *testing.T) {
 		filter := domain.NewEventFilter(
 			fakedCompetitionID,
 			0,
-			"CONTENDER_ENTERED",
-			"CONTENDER_SWITCHED_CATEGORY",
-			"CONTENDER_WITHDREW_FROM_FINALS",
-			"CONTENDER_REENTERED_FINALS",
-			"CONTENDER_DISQUALIFIED",
-			"CONTENDER_REQUALIFIED",
+			"COMPETITOR_ENTERED",
+			"COMPETITOR_SWITCHED_CATEGORY",
+			"COMPETITOR_WITHDREW_FROM_FINALS",
+			"COMPETITOR_REENTERED_FINALS",
+			"COMPETITOR_DISQUALIFIED",
+			"COMPETITOR_REQUALIFIED",
 			"ASCENT_REGISTERED",
 			"ASCENT_DEREGISTERED",
 			"PROBLEM_ADDED",
@@ -95,12 +95,12 @@ func TestEngineDriver(t *testing.T) {
 		f, awaitExpectations := makeFixture(1)
 
 		err := f.subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderResultUpdatedEvent{},
+			Data: domain.CompetitorResultUpdatedEvent{},
 		})
 		require.NoError(t, err)
 
 		err = f.subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderEnteredEvent{},
+			Data: domain.CompetitorEnteredEvent{},
 		})
 		require.ErrorIs(t, err, events.ErrBufferFull)
 
@@ -140,26 +140,26 @@ func TestEngineDriver(t *testing.T) {
 
 		err := f.subscription.Post(domain.EventEnvelope{
 			Data: domain.AscentRegisteredEvent{
-				ContenderID: 1,
-				ProblemID:   1,
-				Top:         true,
-				AttemptsTop: 10,
+				CompetitorID: 1,
+				ProblemID:    1,
+				Top:          true,
+				AttemptsTop:  10,
 			},
 		})
 		require.NoError(t, err)
 
 		err = f.subscription.Post(domain.EventEnvelope{
 			Data: domain.AscentDeregisteredEvent{
-				ContenderID: 1,
-				ProblemID:   2,
+				CompetitorID: 1,
+				ProblemID:    2,
 			},
 		})
 		require.NoError(t, err)
 
 		err = f.subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderEnteredEvent{
-				ContenderID: 2,
-				CategoryID:  1,
+			Data: domain.CompetitorEnteredEvent{
+				CompetitorID: 2,
+				CategoryID:   1,
 			},
 		})
 		require.NoError(t, err)
@@ -174,27 +174,27 @@ func TestEngineDriver(t *testing.T) {
 		mockedEngine.On("GetDirtyPointValues").Return([]domain.PointValue{})
 
 		mockedEngine.On("HandleAscentRegistered", domain.AscentRegisteredEvent{
-			ContenderID: 1,
-			ProblemID:   1,
-			Top:         true,
-			AttemptsTop: 10,
+			CompetitorID: 1,
+			ProblemID:    1,
+			Top:          true,
+			AttemptsTop:  10,
 		}).Return(noEffects)
 
 		mockedEngine.On("HandleAscentDeregistered", domain.AscentDeregisteredEvent{
-			ContenderID: 1,
-			ProblemID:   2,
+			CompetitorID: 1,
+			ProblemID:    2,
 		}).Return(noEffects)
 
-		mockedEngine.On("HandleContenderEntered", domain.ContenderEnteredEvent{
-			ContenderID: 2,
-			CategoryID:  1,
+		mockedEngine.On("HandleCompetitorEntered", domain.CompetitorEnteredEvent{
+			CompetitorID: 2,
+			CategoryID:   1,
 		}).Return(noEffects)
 
 		time.Sleep(time.Millisecond)
 
 		mockedEngine.AssertNotCalled(t, "HandleAscentRegistered")
 		mockedEngine.AssertNotCalled(t, "HandleAscentDeregistered")
-		mockedEngine.AssertNotCalled(t, "HandleContenderEntered")
+		mockedEngine.AssertNotCalled(t, "HandleCompetitorEntered")
 
 		installEngine(mockedEngine)
 
@@ -217,28 +217,28 @@ func TestEngineDriver(t *testing.T) {
 			QualifyingProblems: 10,
 			Finalists:          7,
 		})
-		events = append(events, domain.ContenderEnteredEvent{
-			ContenderID: 1,
-			CategoryID:  1,
+		events = append(events, domain.CompetitorEnteredEvent{
+			CompetitorID: 1,
+			CategoryID:   1,
 		})
-		events = append(events, domain.ContenderSwitchedCategoryEvent{
-			ContenderID: 1,
-			CategoryID:  1,
+		events = append(events, domain.CompetitorSwitchedCategoryEvent{
+			CompetitorID: 1,
+			CategoryID:   1,
 		})
-		events = append(events, domain.ContenderWithdrewFromFinalsEvent{
-			ContenderID: 1,
+		events = append(events, domain.CompetitorWithdrewFromFinalsEvent{
+			CompetitorID: 1,
 		})
-		events = append(events, domain.ContenderReenteredFinalsEvent{
-			ContenderID: 1,
+		events = append(events, domain.CompetitorReenteredFinalsEvent{
+			CompetitorID: 1,
 		})
-		events = append(events, domain.ContenderDisqualifiedEvent{
-			ContenderID: 1,
+		events = append(events, domain.CompetitorDisqualifiedEvent{
+			CompetitorID: 1,
 		})
-		events = append(events, domain.ContenderRequalifiedEvent{
-			ContenderID: 1,
+		events = append(events, domain.CompetitorRequalifiedEvent{
+			CompetitorID: 1,
 		})
 		events = append(events, domain.AscentRegisteredEvent{
-			ContenderID:   1,
+			CompetitorID:  1,
 			ProblemID:     1,
 			Top:           true,
 			AttemptsTop:   999,
@@ -248,8 +248,8 @@ func TestEngineDriver(t *testing.T) {
 			AttemptsZone2: 42,
 		})
 		events = append(events, domain.AscentDeregisteredEvent{
-			ContenderID: 1,
-			ProblemID:   1,
+			CompetitorID: 1,
+			ProblemID:    1,
 		})
 		events = append(events, domain.ProblemAddedEvent{
 			ProblemID: 1,
@@ -281,28 +281,28 @@ func TestEngineDriver(t *testing.T) {
 			QualifyingProblems: 10,
 			Finalists:          7,
 		}).Return(noEffects)
-		mockedEngine.On("HandleContenderEntered", domain.ContenderEnteredEvent{
-			ContenderID: 1,
-			CategoryID:  1,
+		mockedEngine.On("HandleCompetitorEntered", domain.CompetitorEnteredEvent{
+			CompetitorID: 1,
+			CategoryID:   1,
 		}).Return(noEffects)
-		mockedEngine.On("HandleContenderSwitchedCategory", domain.ContenderSwitchedCategoryEvent{
-			ContenderID: 1,
-			CategoryID:  1,
+		mockedEngine.On("HandleCompetitorSwitchedCategory", domain.CompetitorSwitchedCategoryEvent{
+			CompetitorID: 1,
+			CategoryID:   1,
 		}).Return(noEffects)
-		mockedEngine.On("HandleContenderWithdrewFromFinals", domain.ContenderWithdrewFromFinalsEvent{
-			ContenderID: 1,
+		mockedEngine.On("HandleCompetitorWithdrewFromFinals", domain.CompetitorWithdrewFromFinalsEvent{
+			CompetitorID: 1,
 		}).Return(noEffects)
-		mockedEngine.On("HandleContenderReenteredFinals", domain.ContenderReenteredFinalsEvent{
-			ContenderID: 1,
+		mockedEngine.On("HandleCompetitorReenteredFinals", domain.CompetitorReenteredFinalsEvent{
+			CompetitorID: 1,
 		}).Return(noEffects)
-		mockedEngine.On("HandleContenderDisqualified", domain.ContenderDisqualifiedEvent{
-			ContenderID: 1,
+		mockedEngine.On("HandleCompetitorDisqualified", domain.CompetitorDisqualifiedEvent{
+			CompetitorID: 1,
 		}).Return(noEffects)
-		mockedEngine.On("HandleContenderRequalified", domain.ContenderRequalifiedEvent{
-			ContenderID: 1,
+		mockedEngine.On("HandleCompetitorRequalified", domain.CompetitorRequalifiedEvent{
+			CompetitorID: 1,
 		}).Return(noEffects)
 		mockedEngine.On("HandleAscentRegistered", domain.AscentRegisteredEvent{
-			ContenderID:   1,
+			CompetitorID:  1,
 			ProblemID:     1,
 			Top:           true,
 			AttemptsTop:   999,
@@ -312,8 +312,8 @@ func TestEngineDriver(t *testing.T) {
 			AttemptsZone2: 42,
 		}).Return(noEffects)
 		mockedEngine.On("HandleAscentDeregistered", domain.AscentDeregisteredEvent{
-			ContenderID: 1,
-			ProblemID:   1,
+			CompetitorID: 1,
+			ProblemID:    1,
 		}).Return(noEffects)
 		mockedEngine.On("HandleProblemAdded", domain.ProblemAddedEvent{
 			ProblemID: 1,
@@ -348,88 +348,88 @@ func TestEngineDriver(t *testing.T) {
 			mockedEngine.On("Stop").Return()
 			mockedEngine.On("GetDirtyResults").Return([]domain.Result{
 				{
-					ContenderID: 1,
-					Timestamp:   now,
-					Score:       "100p",
-					Placement:   1,
-					RankOrder:   0,
-					Finalist:    true,
+					CompetitorID: 1,
+					Timestamp:    now,
+					Score:        "100p",
+					Placement:    1,
+					RankOrder:    0,
+					Finalist:     true,
 				},
 				{
-					ContenderID: 2,
-					Timestamp:   now,
-					Score:       "200p",
-					Placement:   2,
-					RankOrder:   1,
-					Finalist:    true,
+					CompetitorID: 2,
+					Timestamp:    now,
+					Score:        "200p",
+					Placement:    2,
+					RankOrder:    1,
+					Finalist:     true,
 				},
 				{
-					ContenderID: 3,
-					Timestamp:   now,
-					Score:       "300p",
-					Placement:   3,
-					RankOrder:   2,
-					Finalist:    false,
+					CompetitorID: 3,
+					Timestamp:    now,
+					Score:        "300p",
+					Placement:    3,
+					RankOrder:    2,
+					Finalist:     false,
 				},
 			})
 			mockedEngine.On("GetDirtyPointValues").Return([]domain.PointValue{})
 
 			f.broker.
 				On("Dispatch", fakedCompetitionID,
-					domain.ContenderResultUpdatedEvent{
-						ContenderID: 1,
-						Timestamp:   now,
-						Score:       "100p",
-						Placement:   1,
-						RankOrder:   0,
-						Finalist:    true,
+					domain.CompetitorResultUpdatedEvent{
+						CompetitorID: 1,
+						Timestamp:    now,
+						Score:        "100p",
+						Placement:    1,
+						RankOrder:    0,
+						Finalist:     true,
 					},
 				).Return().
 				On("Dispatch", fakedCompetitionID,
-					domain.ContenderResultUpdatedEvent{
-						ContenderID: 2,
-						Timestamp:   now,
-						Score:       "200p",
-						Placement:   2,
-						RankOrder:   1,
-						Finalist:    true,
+					domain.CompetitorResultUpdatedEvent{
+						CompetitorID: 2,
+						Timestamp:    now,
+						Score:        "200p",
+						Placement:    2,
+						RankOrder:    1,
+						Finalist:     true,
 					},
 				).Return().
 				On("Dispatch", fakedCompetitionID,
-					domain.ContenderResultUpdatedEvent{
-						ContenderID: 3,
-						Timestamp:   now,
-						Score:       "300p",
-						Placement:   3,
-						RankOrder:   2,
-						Finalist:    false,
+					domain.CompetitorResultUpdatedEvent{
+						CompetitorID: 3,
+						Timestamp:    now,
+						Score:        "300p",
+						Placement:    3,
+						RankOrder:    2,
+						Finalist:     false,
 					},
 				).Return().
 				On("Dispatch", fakedCompetitionID,
-					[]domain.ContenderResultUpdatedEvent{
+					[]domain.CompetitorResultUpdatedEvent{
 						{
-							ContenderID: 1,
-							Timestamp:   now,
-							Score:       "100p",
-							Placement:   1,
-							RankOrder:   0,
-							Finalist:    true,
+							CompetitorID: 1,
+							Timestamp:    now,
+							Score:        "100p",
+							Placement:    1,
+							RankOrder:    0,
+							Finalist:     true,
 						},
 						{
-							ContenderID: 2,
-							Timestamp:   now,
-							Score:       "200p",
-							Placement:   2,
-							RankOrder:   1,
-							Finalist:    true,
+							CompetitorID: 2,
+							Timestamp:    now,
+							Score:        "200p",
+							Placement:    2,
+							RankOrder:    1,
+							Finalist:     true,
 						},
 						{
-							ContenderID: 3,
-							Timestamp:   now,
-							Score:       "300p",
-							Placement:   3,
-							RankOrder:   2,
-							Finalist:    false,
+							CompetitorID: 3,
+							Timestamp:    now,
+							Score:        "300p",
+							Placement:    3,
+							RankOrder:    2,
+							Finalist:     false,
 						},
 					},
 				).Return()
@@ -465,32 +465,32 @@ func (m *scoreEngineMock) HandleRulesUpdated(event domain.RulesUpdatedEvent) ite
 	return args.Get(0).(iter.Seq[scores.Effect])
 }
 
-func (m *scoreEngineMock) HandleContenderEntered(event domain.ContenderEnteredEvent) iter.Seq[scores.Effect] {
+func (m *scoreEngineMock) HandleCompetitorEntered(event domain.CompetitorEnteredEvent) iter.Seq[scores.Effect] {
 	args := m.Called(event)
 	return args.Get(0).(iter.Seq[scores.Effect])
 }
 
-func (m *scoreEngineMock) HandleContenderSwitchedCategory(event domain.ContenderSwitchedCategoryEvent) iter.Seq[scores.Effect] {
+func (m *scoreEngineMock) HandleCompetitorSwitchedCategory(event domain.CompetitorSwitchedCategoryEvent) iter.Seq[scores.Effect] {
 	args := m.Called(event)
 	return args.Get(0).(iter.Seq[scores.Effect])
 }
 
-func (m *scoreEngineMock) HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent) iter.Seq[scores.Effect] {
+func (m *scoreEngineMock) HandleCompetitorWithdrewFromFinals(event domain.CompetitorWithdrewFromFinalsEvent) iter.Seq[scores.Effect] {
 	args := m.Called(event)
 	return args.Get(0).(iter.Seq[scores.Effect])
 }
 
-func (m *scoreEngineMock) HandleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent) iter.Seq[scores.Effect] {
+func (m *scoreEngineMock) HandleCompetitorReenteredFinals(event domain.CompetitorReenteredFinalsEvent) iter.Seq[scores.Effect] {
 	args := m.Called(event)
 	return args.Get(0).(iter.Seq[scores.Effect])
 }
 
-func (m *scoreEngineMock) HandleContenderDisqualified(event domain.ContenderDisqualifiedEvent) iter.Seq[scores.Effect] {
+func (m *scoreEngineMock) HandleCompetitorDisqualified(event domain.CompetitorDisqualifiedEvent) iter.Seq[scores.Effect] {
 	args := m.Called(event)
 	return args.Get(0).(iter.Seq[scores.Effect])
 }
 
-func (m *scoreEngineMock) HandleContenderRequalified(event domain.ContenderRequalifiedEvent) iter.Seq[scores.Effect] {
+func (m *scoreEngineMock) HandleCompetitorRequalified(event domain.CompetitorRequalifiedEvent) iter.Seq[scores.Effect] {
 	args := m.Called(event)
 	return args.Get(0).(iter.Seq[scores.Effect])
 }
@@ -519,8 +519,8 @@ func (m *scoreEngineMock) RankCategory(categoryID domain.CategoryID) {
 	m.Called(categoryID)
 }
 
-func (m *scoreEngineMock) ScoreContender(contenderID domain.ContenderID) iter.Seq[scores.Effect] {
-	args := m.Called(contenderID)
+func (m *scoreEngineMock) ScoreCompetitor(competitorID domain.CompetitorID) iter.Seq[scores.Effect] {
+	args := m.Called(competitorID)
 	return args.Get(0).(iter.Seq[scores.Effect])
 }
 

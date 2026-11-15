@@ -5,12 +5,12 @@
   type Props = {
     problem: Problem;
     tick?: Tick;
-    contenderId: number;
+    competitorId: number;
   };
 
-  const { problem, tick, contenderId }: Props = $props();
+  const { problem, tick, competitorId }: Props = $props();
 
-  const putTick = $derived(putTickMutation(contenderId));
+  const putTick = $derived(putTickMutation(competitorId));
   let latestLocalRevision = $state(0);
   const deleteTick = $derived(deleteTickMutation());
 

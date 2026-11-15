@@ -4,8 +4,8 @@
   import { writable, type Writable } from "svelte/store";
   import { ApiClient } from "../Api";
   import {
-    contenderPublicInfoUpdatedEventSchema,
-    contenderResultUpdatedEventSchema,
+    competitorPublicInfoUpdatedEventSchema,
+    competitorResultUpdatedEventSchema,
     type EventFilter,
     type Result,
     type ScoreboardEntry,
@@ -35,9 +35,10 @@
   let online = $state(true);
   let generation = 0;
 
-  const contenders: Map<number, ScoreboardEntry> = new Map();
-  const pendingUpdates: ((contenders: Map<number, ScoreboardEntry>) => void)[] =
-    [];
+  const competitors: Map<number, ScoreboardEntry> = new Map();
+  const pendingUpdates: ((
+    competitors: Map<number, ScoreboardEntry>,
+  ) => void)[] = [];
   const scoreboard = writable<Map<number, ScoreboardEntry[]>>(new Map());
 
   onMount(() => {
@@ -72,8 +73,8 @@
       {
         competitionId,
         eventTypes: {
-          CONTENDER_PUBLIC_INFO_UPDATED: {},
-          "[]CONTENDER_RESULT_UPDATED": {},
+          COMPETITOR_PUBLIC_INFO_UPDATED: {},
+          "[]COMPETITOR_RESULT_UPDATED": {},
         },
       },
     ];
@@ -94,7 +95,7 @@
   const reset = () => {
     generation++;
     loading = true;
-    contenders.clear();
+    competitors.clear();
     pendingUpdates.length = 0;
     $scoreboard = new Map();
   };
@@ -117,12 +118,12 @@
     }
 
     for (const entry of entries) {
-      contenders.set(entry.contenderId, entry);
+      competitors.set(entry.competitorId, entry);
     }
 
     while (pendingUpdates.length > 0) {
       const handler = pendingUpdates.shift();
-      handler?.(contenders);
+      handler?.(competitors);
     }
 
     rebuildStore();
@@ -133,22 +134,22 @@
     const results = new Map<number, ScoreboardEntry[]>();
     const withoutResult: ScoreboardEntry[] = [];
 
-    for (const contender of contenders.values()) {
-      let categoryEntries = results.get(contender.categoryId);
+    for (const competitor of competitors.values()) {
+      let categoryEntries = results.get(competitor.categoryId);
 
       if (categoryEntries === undefined) {
         categoryEntries = [];
-        results.set(contender.categoryId, categoryEntries);
+        results.set(competitor.categoryId, categoryEntries);
       }
 
-      if (hideDisqualified && contender.disqualified) {
+      if (hideDisqualified && competitor.disqualified) {
         continue;
       }
 
-      if (!contender.result) {
-        withoutResult.push(contender);
+      if (!competitor.result) {
+        withoutResult.push(competitor);
       } else {
-        categoryEntries.push(contender);
+        categoryEntries.push(competitor);
       }
     }
 
@@ -161,13 +162,13 @@
 
         let rankOrder = maxRankOrder + 1;
 
-        for (const contender of withoutResult) {
-          if (contender.categoryId !== categoryId) {
+        for (const competitor of withoutResult) {
+          if (competitor.categoryId !== categoryId) {
             continue;
           }
 
-          contender.result = {
-            contenderId: contender.contenderId,
+          competitor.result = {
+            competitorId: competitor.competitorId,
             score: NO_SCORE,
             placement: 0,
             finalist: false,
@@ -175,7 +176,7 @@
             timestamp: new Date(0),
           };
 
-          categoryEntries.push(contender);
+          categoryEntries.push(competitor);
 
           rankOrder++;
         }
@@ -186,52 +187,52 @@
   };
 
   const queueEventHandler = (
-    handler: (contenders: Map<number, ScoreboardEntry>) => void,
+    handler: (competitors: Map<number, ScoreboardEntry>) => void,
   ) => {
     if (loading) {
       pendingUpdates.push(handler);
     } else {
-      handler(contenders);
+      handler(competitors);
       rebuildStore();
     }
   };
 
   const handleEvent = (eventName: string, e: MessageEvent) => {
-    if (eventName === "CONTENDER_PUBLIC_INFO_UPDATED") {
-      const event = contenderPublicInfoUpdatedEventSchema.parse(
+    if (eventName === "COMPETITOR_PUBLIC_INFO_UPDATED") {
+      const event = competitorPublicInfoUpdatedEventSchema.parse(
         JSON.parse(e.data),
       );
 
-      queueEventHandler((contenders: Map<number, ScoreboardEntry>) => {
-        let contender = contenders.get(event.contenderId);
-        if (!contender) {
-          contender = createEmptyEntry(event.contenderId);
+      queueEventHandler((competitors: Map<number, ScoreboardEntry>) => {
+        let competitor = competitors.get(event.competitorId);
+        if (!competitor) {
+          competitor = createEmptyEntry(event.competitorId);
         }
 
-        contender.categoryId = event.categoryId;
-        contender.name = event.name;
-        contender.withdrawnFromFinals = event.withdrawnFromFinals;
-        contender.disqualified = event.disqualified;
-        contender.scrubbedAt = event.scrubbedAt;
+        competitor.categoryId = event.categoryId;
+        competitor.name = event.name;
+        competitor.withdrawnFromFinals = event.withdrawnFromFinals;
+        competitor.disqualified = event.disqualified;
+        competitor.scrubbedAt = event.scrubbedAt;
 
-        contenders.set(event.contenderId, { ...contender });
+        competitors.set(event.competitorId, { ...competitor });
       });
     }
 
-    if (eventName === "[]CONTENDER_RESULT_UPDATED") {
+    if (eventName === "[]COMPETITOR_RESULT_UPDATED") {
       const events = z
-        .array(contenderResultUpdatedEventSchema)
+        .array(competitorResultUpdatedEventSchema)
         .parse(JSON.parse(e.data));
 
       for (const event of events) {
-        queueEventHandler((contenders: Map<number, ScoreboardEntry>) => {
-          let contender = contenders.get(event.contenderId);
-          if (!contender) {
-            contender = createEmptyEntry(event.contenderId);
+        queueEventHandler((competitors: Map<number, ScoreboardEntry>) => {
+          let competitor = competitors.get(event.competitorId);
+          if (!competitor) {
+            competitor = createEmptyEntry(event.competitorId);
           }
 
           const result: Result = {
-            contenderId: event.contenderId,
+            competitorId: event.competitorId,
             score: event.score,
             placement: event.placement,
             finalist: event.finalist,
@@ -239,15 +240,15 @@
             timestamp: event.timestamp,
           };
 
-          contender.result = result;
-          contenders.set(event.contenderId, { ...contender });
+          competitor.result = result;
+          competitors.set(event.competitorId, { ...competitor });
         });
       }
     }
   };
 
-  const createEmptyEntry = (contenderId: number): ScoreboardEntry => ({
-    contenderId: contenderId,
+  const createEmptyEntry = (competitorId: number): ScoreboardEntry => ({
+    competitorId: competitorId,
     categoryId: 0,
     name: "",
     withdrawnFromFinals: false,

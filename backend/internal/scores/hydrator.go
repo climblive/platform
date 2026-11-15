@@ -10,7 +10,7 @@ import (
 
 type standardEngineStoreHydratorRepository interface {
 	GetCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (domain.Competition, error)
-	GetContendersByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Contender, error)
+	GetCompetitorsByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Competitor, error)
 	GetProblemsByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Problem, error)
 	GetTicksByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Tick, error)
 }
@@ -53,21 +53,21 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, competitionID
 		})
 	}
 
-	contenders, err := h.Repo.GetContendersByCompetition(ctx, nil, competitionID)
+	competitors, err := h.Repo.GetCompetitorsByCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}
 
-	for contender := range slices.Values(contenders) {
-		if contender.CategoryID == 0 {
+	for competitor := range slices.Values(competitors) {
+		if competitor.CategoryID == 0 {
 			continue
 		}
 
-		store.SaveContender(Contender{
-			ID:                  contender.ID,
-			CategoryID:          contender.CategoryID,
-			WithdrawnFromFinals: contender.WithdrawnFromFinals,
-			Disqualified:        contender.Disqualified,
+		store.SaveCompetitor(Competitor{
+			ID:                  competitor.ID,
+			CategoryID:          competitor.CategoryID,
+			WithdrawnFromFinals: competitor.WithdrawnFromFinals,
+			Disqualified:        competitor.Disqualified,
 			Score: Score{
 				Tops:           0,
 				Points:         0,
@@ -86,10 +86,10 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, competitionID
 	}
 
 	for tick := range slices.Values(ticks) {
-		store.SaveTick(*tick.Ownership.ContenderID, Tick{
+		store.SaveTick(*tick.Ownership.CompetitorID, Tick{
 			ID:            tick.ID,
 			Revision:      tick.Revision,
-			ContenderID:   *tick.Ownership.ContenderID,
+			CompetitorID:  *tick.Ownership.CompetitorID,
 			ProblemID:     tick.ProblemID,
 			Zone1:         tick.Zone1,
 			AttemptsZone1: tick.AttemptsZone1,

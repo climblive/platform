@@ -64,10 +64,10 @@
   } from "@climblive/lib/models";
   import {
     createCategoryMutation,
-    createContendersMutation,
+    createCompetitorsMutation,
     createProblemMutation,
     getCategoriesQuery,
-    getContendersByCompetitionQuery,
+    getCompetitorsByCompetitionQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
@@ -95,13 +95,13 @@
   const { competitionId }: Props = $props();
 
   const categoriesQuery = $derived(getCategoriesQuery(competitionId));
-  const contendersQuery = $derived(
-    getContendersByCompetitionQuery(competitionId),
+  const competitorsQuery = $derived(
+    getCompetitorsByCompetitionQuery(competitionId),
   );
   const problemsQuery = $derived(getProblemsQuery(competitionId));
 
   const categories = $derived(categoriesQuery.data);
-  const contenders = $derived(contendersQuery.data);
+  const competitors = $derived(competitorsQuery.data);
   const problems = $derived(problemsQuery.data);
 
   let dialog = $state<WaDialog>();
@@ -111,7 +111,7 @@
     if (
       categories === undefined ||
       problems === undefined ||
-      contenders === undefined
+      competitors === undefined
     ) {
       return false;
     }
@@ -119,7 +119,7 @@
     return (
       categories.length === 0 &&
       problems.length === 0 &&
-      contenders.length === 0
+      competitors.length === 0
     );
   });
 
@@ -139,7 +139,7 @@
 
   const createCategory = $derived(createCategoryMutation(competitionId));
   const createProblem = $derived(createProblemMutation(competitionId));
-  const createContenders = $derived(createContendersMutation(competitionId));
+  const createCompetitors = $derived(createCompetitorsMutation(competitionId));
 
   const openDialog = () => {
     if (dialog) {
@@ -251,7 +251,7 @@
       }
 
       if (formData.ticketCount > 0) {
-        await createContenders
+        await createCompetitors
           .mutateAsync({ number: formData.ticketCount })
           .then(incrementProgress);
       }

@@ -1,5 +1,5 @@
 export * from "./category";
-export * from "./contender";
+export * from "./competitor";
 export * from "./competition";
 export * from "./event";
 export * from "./generated";

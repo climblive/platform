@@ -21,7 +21,7 @@ type keptPointValue struct {
 type PointValueKeeper struct {
 	mu          sync.RWMutex
 	eventBroker domain.EventBroker
-	pointValues map[domain.ContenderID][]keptPointValue
+	pointValues map[domain.CompetitorID][]keptPointValue
 	running     atomic.Bool
 	ttl         time.Duration
 }
@@ -30,7 +30,7 @@ func NewPointValueKeeper(eventBroker domain.EventBroker, ttl time.Duration) *Poi
 	return &PointValueKeeper{
 		mu:          sync.RWMutex{},
 		eventBroker: eventBroker,
-		pointValues: make(map[domain.ContenderID][]keptPointValue),
+		pointValues: make(map[domain.CompetitorID][]keptPointValue),
 		running:     atomic.Bool{},
 		ttl:         ttl,
 	}
@@ -119,9 +119,9 @@ func (k *PointValueKeeper) handlePointValueUpdated(event domain.PointValueUpdate
 	k.mu.Lock()
 	defer k.mu.Unlock()
 
-	contenderPointValues := k.pointValues[event.ContenderID]
+	competitorPointValues := k.pointValues[event.CompetitorID]
 
-	idx := slices.IndexFunc(contenderPointValues, func(kpv keptPointValue) bool {
+	idx := slices.IndexFunc(competitorPointValues, func(kpv keptPointValue) bool {
 		return kpv.value.ProblemID == event.ProblemID
 	})
 
@@ -131,24 +131,24 @@ func (k *PointValueKeeper) handlePointValueUpdated(event domain.PointValueUpdate
 	}
 
 	if idx == -1 {
-		k.pointValues[event.ContenderID] = append(contenderPointValues, updatedValue)
+		k.pointValues[event.CompetitorID] = append(competitorPointValues, updatedValue)
 	} else {
-		contenderPointValues[idx] = updatedValue
+		competitorPointValues[idx] = updatedValue
 	}
 }
 
-func (k *PointValueKeeper) GetPointValues(contenderID domain.ContenderID) []domain.PointValue {
+func (k *PointValueKeeper) GetPointValues(competitorID domain.CompetitorID) []domain.PointValue {
 	k.mu.RLock()
 	defer k.mu.RUnlock()
 
-	contenderPointValues := k.pointValues[contenderID]
-	if contenderPointValues == nil {
+	competitorPointValues := k.pointValues[competitorID]
+	if competitorPointValues == nil {
 		return []domain.PointValue{}
 	}
 
-	pointValues := make([]domain.PointValue, 0, len(contenderPointValues))
+	pointValues := make([]domain.PointValue, 0, len(competitorPointValues))
 
-	for _, pointValue := range contenderPointValues {
+	for _, pointValue := range competitorPointValues {
 		pointValues = append(pointValues, pointValue.value)
 	}
 
@@ -159,10 +159,10 @@ func (k *PointValueKeeper) expungeExpired(now time.Time) {
 	k.mu.Lock()
 	defer k.mu.Unlock()
 
-	for contenderID, contenderPointValues := range k.pointValues {
+	for competitorID, competitorPointValues := range k.pointValues {
 		expiredCount := 0
 
-		for _, pointValue := range contenderPointValues {
+		for _, pointValue := range competitorPointValues {
 			if now.After(pointValue.expiresAt) {
 				expiredCount += 1
 			}
@@ -172,17 +172,17 @@ func (k *PointValueKeeper) expungeExpired(now time.Time) {
 			continue
 		}
 
-		freshContenderPointValues := make([]keptPointValue, 0, len(contenderPointValues)-expiredCount)
+		freshCompetitorPointValues := make([]keptPointValue, 0, len(competitorPointValues)-expiredCount)
 
-		for _, pointValue := range contenderPointValues {
+		for _, pointValue := range competitorPointValues {
 			if now.After(pointValue.expiresAt) {
 				continue
 			}
 
-			freshContenderPointValues = append(freshContenderPointValues, pointValue)
+			freshCompetitorPointValues = append(freshCompetitorPointValues, pointValue)
 		}
 
-		k.pointValues[contenderID] = freshContenderPointValues
+		k.pointValues[competitorID] = freshCompetitorPointValues
 	}
 }
 

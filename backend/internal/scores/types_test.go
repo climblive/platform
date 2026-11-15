@@ -8,10 +8,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCompareContender(t *testing.T) {
-	best := func(contenderID domain.ContenderID) scores.Contender {
-		return scores.Contender{
-			ID: contenderID,
+func TestCompareCompetitor(t *testing.T) {
+	best := func(competitorID domain.CompetitorID) scores.Competitor {
+		return scores.Competitor{
+			ID: competitorID,
 			Score: scores.Score{
 				Points:         1_000,
 				Tops:           1_000,
@@ -24,9 +24,9 @@ func TestCompareContender(t *testing.T) {
 		}
 	}
 
-	worst := func(contenderID domain.ContenderID) scores.Contender {
-		return scores.Contender{
-			ID: contenderID,
+	worst := func(competitorID domain.CompetitorID) scores.Competitor {
+		return scores.Competitor{
+			ID: competitorID,
 			Score: scores.Score{
 				Points:         0,
 				Tops:           0,
@@ -39,7 +39,7 @@ func TestCompareContender(t *testing.T) {
 		}
 	}
 
-	assertOrder := func(t *testing.T, c1, c2 scores.Contender) {
+	assertOrder := func(t *testing.T, c1, c2 scores.Competitor) {
 		t.Helper()
 
 		assert.Less(t, c1.Compare(c2), 0)

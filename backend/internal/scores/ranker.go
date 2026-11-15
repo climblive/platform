@@ -16,7 +16,7 @@ type BasicRanker struct {
 	zone2Enabled      bool
 }
 
-func (r *BasicRanker) scoresAreEqual(c1, c2 Contender) bool {
+func (r *BasicRanker) scoresAreEqual(c1, c2 Competitor) bool {
 	if r.usePoints {
 		return c1.Points == c2.Points
 	}
@@ -33,42 +33,42 @@ func NewBasicRanker(numberOfFinalists int, usePoints, zone1Enabled, zone2Enabled
 	}
 }
 
-func qualifiedContenders(contenders iter.Seq[Contender]) iter.Seq[Contender] {
-	return func(yield func(Contender) bool) {
-		for contender := range contenders {
-			if contender.Disqualified {
+func qualifiedCompetitors(competitors iter.Seq[Competitor]) iter.Seq[Competitor] {
+	return func(yield func(Competitor) bool) {
+		for competitor := range competitors {
+			if competitor.Disqualified {
 				continue
 			}
 
-			if !yield(contender) {
+			if !yield(competitor) {
 				return
 			}
 		}
 	}
 }
 
-func disqualifiedContenders(contenders iter.Seq[Contender]) iter.Seq[Contender] {
-	return func(yield func(Contender) bool) {
-		for contender := range contenders {
-			if !contender.Disqualified {
+func disqualifiedCompetitors(competitors iter.Seq[Competitor]) iter.Seq[Competitor] {
+	return func(yield func(Competitor) bool) {
+		for competitor := range competitors {
+			if !competitor.Disqualified {
 				continue
 			}
 
-			if !yield(contender) {
+			if !yield(competitor) {
 				return
 			}
 		}
 	}
 }
 
-func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Result {
+func (r *BasicRanker) RankCompetitors(competitors iter.Seq[Competitor]) []domain.Result {
 	var results []domain.Result
 
-	comparator := func(c1, c2 Contender) int {
+	comparator := func(c1, c2 Competitor) int {
 		return c1.Compare(c2)
 	}
 
-	var previousContender *Contender
+	var previousCompetitor *Competitor
 	var placement int
 	var gap int
 	var numberOfAssignedFinalists int
@@ -76,41 +76,41 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Re
 
 	now := time.Now()
 
-	sortedContenders := slices.SortedFunc(qualifiedContenders(contenders), comparator)
+	sortedCompetitors := slices.SortedFunc(qualifiedCompetitors(competitors), comparator)
 
-	for contender := range disqualifiedContenders(contenders) {
-		sortedContenders = append(sortedContenders, contender)
+	for competitor := range disqualifiedCompetitors(competitors) {
+		sortedCompetitors = append(sortedCompetitors, competitor)
 	}
 
-	for i, contender := range sortedContenders {
+	for i, competitor := range sortedCompetitors {
 		var scoreValue string
 
 		if r.usePoints {
-			scoreValue = contender.Points.String() + "p"
+			scoreValue = competitor.Points.String() + "p"
 		} else {
-			scoreValue = fmt.Sprintf("%dt", contender.Tops)
+			scoreValue = fmt.Sprintf("%dt", competitor.Tops)
 			if r.zone2Enabled {
-				scoreValue += fmt.Sprintf(" %dz₂", contender.Zone2s)
+				scoreValue += fmt.Sprintf(" %dz₂", competitor.Zone2s)
 			}
 			if r.zone1Enabled {
-				scoreValue += fmt.Sprintf(" %dz₁", contender.Zone1s)
+				scoreValue += fmt.Sprintf(" %dz₁", competitor.Zone1s)
 			}
 		}
 
 		result := domain.Result{
-			Timestamp:   now,
-			ContenderID: contender.ID,
-			Score:       scoreValue,
-			Placement:   0,
-			Finalist:    false,
-			RankOrder:   0,
+			Timestamp:    now,
+			CompetitorID: competitor.ID,
+			Score:        scoreValue,
+			Placement:    0,
+			Finalist:     false,
+			RankOrder:    0,
 		}
 
 		switch {
-		case previousContender == nil:
+		case previousCompetitor == nil:
 			placement = 1
 			gap = 0
-		case r.scoresAreEqual(contender, *previousContender):
+		case r.scoresAreEqual(competitor, *previousCompetitor):
 			gap++
 		default:
 			placement += 1 + gap
@@ -121,11 +121,11 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Re
 		result.RankOrder = i
 
 		switch {
-		case contender.Score == Score{}:
+		case competitor.Score == Score{}:
 			fallthrough
-		case contender.WithdrawnFromFinals:
+		case competitor.WithdrawnFromFinals:
 			fallthrough
-		case contender.Disqualified:
+		case competitor.Disqualified:
 		case numberOfAssignedFinalists < r.numberOfFinalists:
 			result.Finalist = true
 			numberOfAssignedFinalists++
@@ -135,7 +135,7 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Re
 		}
 
 		results = append(results, result)
-		previousContender = &contender
+		previousCompetitor = &competitor
 	}
 
 	return results

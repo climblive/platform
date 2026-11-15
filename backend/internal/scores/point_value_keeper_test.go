@@ -109,22 +109,22 @@ func TestPointValueKeeper(t *testing.T) {
 
 			wg := keeper.Run(ctx)
 
-			fakedContenderIDs := []domain.ContenderID{
-				testutils.RandomResourceID[domain.ContenderID](),
-				testutils.RandomResourceID[domain.ContenderID](),
-				testutils.RandomResourceID[domain.ContenderID](),
+			fakedCompetitorIDs := []domain.CompetitorID{
+				testutils.RandomResourceID[domain.CompetitorID](),
+				testutils.RandomResourceID[domain.CompetitorID](),
+				testutils.RandomResourceID[domain.CompetitorID](),
 			}
 
-			for _, contenderID := range fakedContenderIDs {
+			for _, competitorID := range fakedCompetitorIDs {
 				for k := 1; k <= 3; k++ {
 					pointValue := domain.PointValue{
-						ContenderID: contenderID,
-						ProblemID:   domain.ProblemID(1000 + k),
-						Current:     domain.Tenths(1000 + k),
-						Zone1:       domain.Tenths(10 + k),
-						Zone2:       domain.Tenths(20 + k),
-						Top:         domain.Tenths(1000 + k),
-						FlashBonus:  domain.Tenths(100 + k),
+						CompetitorID: competitorID,
+						ProblemID:    domain.ProblemID(1000 + k),
+						Current:      domain.Tenths(1000 + k),
+						Zone1:        domain.Tenths(10 + k),
+						Zone2:        domain.Tenths(20 + k),
+						Top:          domain.Tenths(1000 + k),
+						FlashBonus:   domain.Tenths(100 + k),
 					}
 
 					err := subscription.Post(domain.EventEnvelope{
@@ -137,36 +137,36 @@ func TestPointValueKeeper(t *testing.T) {
 
 			synctest.Wait()
 
-			for _, contenderID := range fakedContenderIDs {
-				pointValues := keeper.GetPointValues(contenderID)
+			for _, competitorID := range fakedCompetitorIDs {
+				pointValues := keeper.GetPointValues(competitorID)
 
 				assert.ElementsMatch(t, []domain.PointValue{
 					{
-						ContenderID: contenderID,
-						ProblemID:   1001,
-						Current:     1001,
-						Zone1:       11,
-						Zone2:       21,
-						Top:         1001,
-						FlashBonus:  101,
+						CompetitorID: competitorID,
+						ProblemID:    1001,
+						Current:      1001,
+						Zone1:        11,
+						Zone2:        21,
+						Top:          1001,
+						FlashBonus:   101,
 					},
 					{
-						ContenderID: contenderID,
-						ProblemID:   1002,
-						Current:     1002,
-						Zone1:       12,
-						Zone2:       22,
-						Top:         1002,
-						FlashBonus:  102,
+						CompetitorID: competitorID,
+						ProblemID:    1002,
+						Current:      1002,
+						Zone1:        12,
+						Zone2:        22,
+						Top:          1002,
+						FlashBonus:   102,
 					},
 					{
-						ContenderID: contenderID,
-						ProblemID:   1003,
-						Current:     1003,
-						Zone1:       13,
-						Zone2:       23,
-						Top:         1003,
-						FlashBonus:  103,
+						CompetitorID: competitorID,
+						ProblemID:    1003,
+						Current:      1003,
+						Zone1:        13,
+						Zone2:        23,
+						Top:          1003,
+						FlashBonus:   103,
 					},
 				}, pointValues)
 			}
@@ -188,18 +188,18 @@ func TestPointValueKeeper(t *testing.T) {
 
 			wg := keeper.Run(ctx)
 
-			fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+			fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 			fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 			for k := 1; k <= 10; k++ {
 				pointValue := domain.PointValue{
-					ContenderID: fakedContenderID,
-					ProblemID:   fakedProblemID,
-					Current:     domain.Tenths(1000 + k),
-					Zone1:       domain.Tenths(10 + k),
-					Zone2:       domain.Tenths(20 + k),
-					Top:         domain.Tenths(1000 + k),
-					FlashBonus:  domain.Tenths(100 + k),
+					CompetitorID: fakedCompetitorID,
+					ProblemID:    fakedProblemID,
+					Current:      domain.Tenths(1000 + k),
+					Zone1:        domain.Tenths(10 + k),
+					Zone2:        domain.Tenths(20 + k),
+					Top:          domain.Tenths(1000 + k),
+					FlashBonus:   domain.Tenths(100 + k),
 				}
 
 				err := subscription.Post(domain.EventEnvelope{
@@ -211,17 +211,17 @@ func TestPointValueKeeper(t *testing.T) {
 
 			synctest.Wait()
 
-			pointValues := keeper.GetPointValues(fakedContenderID)
+			pointValues := keeper.GetPointValues(fakedCompetitorID)
 
 			assert.ElementsMatch(t, []domain.PointValue{
 				{
-					ContenderID: fakedContenderID,
-					ProblemID:   fakedProblemID,
-					Current:     1010,
-					Zone1:       20,
-					Zone2:       30,
-					Top:         1010,
-					FlashBonus:  110,
+					CompetitorID: fakedCompetitorID,
+					ProblemID:    fakedProblemID,
+					Current:      1010,
+					Zone1:        20,
+					Zone2:        30,
+					Top:          1010,
+					FlashBonus:   110,
 				},
 			}, pointValues)
 
@@ -242,17 +242,17 @@ func TestPointValueKeeper(t *testing.T) {
 
 			wg := keeper.Run(ctx)
 
-			fakedContenderIDs := []domain.ContenderID{
-				testutils.RandomResourceID[domain.ContenderID](),
-				testutils.RandomResourceID[domain.ContenderID](),
-				testutils.RandomResourceID[domain.ContenderID](),
+			fakedCompetitorIDs := []domain.CompetitorID{
+				testutils.RandomResourceID[domain.CompetitorID](),
+				testutils.RandomResourceID[domain.CompetitorID](),
+				testutils.RandomResourceID[domain.CompetitorID](),
 			}
 
-			for _, contenderID := range fakedContenderIDs {
+			for _, competitorID := range fakedCompetitorIDs {
 				for k := 1; k <= 2; k++ {
 					pointValue := domain.PointValue{
-						ContenderID: contenderID,
-						ProblemID:   domain.ProblemID(1000 + k),
+						CompetitorID: competitorID,
+						ProblemID:    domain.ProblemID(1000 + k),
 					}
 
 					err := subscription.Post(domain.EventEnvelope{
@@ -265,10 +265,10 @@ func TestPointValueKeeper(t *testing.T) {
 
 			time.Sleep(5 * time.Minute)
 
-			for _, contenderID := range fakedContenderIDs {
+			for _, competitorID := range fakedCompetitorIDs {
 				pointValue := domain.PointValue{
-					ContenderID: contenderID,
-					ProblemID:   domain.ProblemID(1003),
+					CompetitorID: competitorID,
+					ProblemID:    domain.ProblemID(1003),
 				}
 
 				err := subscription.Post(domain.EventEnvelope{
@@ -280,34 +280,34 @@ func TestPointValueKeeper(t *testing.T) {
 
 			synctest.Wait()
 
-			for _, contenderID := range fakedContenderIDs {
-				pointValues := keeper.GetPointValues(contenderID)
+			for _, competitorID := range fakedCompetitorIDs {
+				pointValues := keeper.GetPointValues(competitorID)
 
 				assert.ElementsMatch(t, []domain.PointValue{
 					{
-						ContenderID: contenderID,
-						ProblemID:   1001,
+						CompetitorID: competitorID,
+						ProblemID:    1001,
 					},
 					{
-						ContenderID: contenderID,
-						ProblemID:   1002,
+						CompetitorID: competitorID,
+						ProblemID:    1002,
 					},
 					{
-						ContenderID: contenderID,
-						ProblemID:   1003,
+						CompetitorID: competitorID,
+						ProblemID:    1003,
 					},
 				}, pointValues)
 			}
 
 			time.Sleep(time.Hour)
 
-			for _, contenderID := range fakedContenderIDs {
-				pointValues := keeper.GetPointValues(contenderID)
+			for _, competitorID := range fakedCompetitorIDs {
+				pointValues := keeper.GetPointValues(competitorID)
 
 				assert.Equal(t, []domain.PointValue{
 					{
-						ContenderID: contenderID,
-						ProblemID:   1003,
+						CompetitorID: competitorID,
+						ProblemID:    1003,
 					},
 				}, pointValues)
 			}

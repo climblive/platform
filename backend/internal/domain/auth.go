@@ -7,11 +7,11 @@ import (
 type AuthRole string
 
 const (
-	NilRole       AuthRole = ""
-	ContenderRole AuthRole = "contender"
-	JudgeRole     AuthRole = "judge"
-	OrganizerRole AuthRole = "organizer"
-	AdminRole     AuthRole = "admin"
+	NilRole        AuthRole = ""
+	CompetitorRole AuthRole = "competitor"
+	JudgeRole      AuthRole = "judge"
+	OrganizerRole  AuthRole = "organizer"
+	AdminRole      AuthRole = "admin"
 )
 
 func (role AuthRole) OneOf(roles ...AuthRole) bool {

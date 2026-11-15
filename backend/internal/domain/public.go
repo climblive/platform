@@ -8,15 +8,15 @@ type Tenths int64
 
 type EventFilter struct {
 	CompetitionID CompetitionID       `json:"competitionId,omitzero"`
-	ContenderID   ContenderID         `json:"contenderId,omitzero"`
+	CompetitorID  CompetitorID        `json:"competitorId,omitzero"`
 	EventTypes    map[string]struct{} `json:"eventTypes,omitzero"`
 }
 
 type ColorRGB string
 
 type OwnershipData struct {
-	OrganizerID OrganizerID  `json:"organizerId"`
-	ContenderID *ContenderID `json:"-"`
+	OrganizerID  OrganizerID   `json:"organizerId"`
+	CompetitorID *CompetitorID `json:"-"`
 }
 
 type Category struct {
@@ -43,8 +43,8 @@ type CategoryPatch struct {
 	TimeEnd     Patch[time.Time] `json:"timeEnd,omitzero" tstype:"Date"`
 }
 
-type Contender struct {
-	ID                  ContenderID   `json:"id"`
+type Competitor struct {
+	ID                  CompetitorID  `json:"id"`
 	Ownership           OwnershipData `json:"-"`
 	CompetitionID       CompetitionID `json:"competitionId"`
 	CategoryID          CategoryID    `json:"categoryId,omitzero"`
@@ -58,7 +58,7 @@ type Contender struct {
 	Result              *Result       `json:"result,omitzero"`
 }
 
-type ContenderPatch struct {
+type CompetitorPatch struct {
 	CategoryID          Patch[CategoryID] `json:"categoryId,omitzero" tstype:"CategoryID"`
 	Name                Patch[string]     `json:"name,omitzero" tstype:"string"`
 	WithdrawnFromFinals Patch[bool]       `json:"withdrawnFromFinals,omitzero" tstype:"boolean"`
@@ -66,27 +66,27 @@ type ContenderPatch struct {
 }
 
 type Competition struct {
-	ID                   CompetitionID `json:"id"`
-	Ownership            OwnershipData `json:"ownership"`
-	ArchivedAt           time.Time     `json:"archivedAt,omitzero"`
-	Location             string        `json:"location,omitzero"`
-	Country              string        `json:"country"`
-	SeriesID             SeriesID      `json:"seriesId,omitzero"`
-	Name                 string        `json:"name"`
-	Description          string        `json:"description,omitzero"`
-	QualifyingProblems   int           `json:"qualifyingProblems"`
-	Finalists            int           `json:"finalists"`
-	UsePoints            bool          `json:"usePoints"`
-	PooledPoints         bool          `json:"pooledPoints"`
-	MaxAttempts          int           `json:"maxAttempts"`
-	PointDeduction       Tenths        `json:"pointDeduction"`
-	Info                 string        `json:"info,omitzero"`
-	GracePeriod          time.Duration `json:"gracePeriod"`
-	NameRetentionTime    time.Duration `json:"nameRetentionTime"`
-	TimeBegin            time.Time     `json:"timeBegin,omitzero"`
-	TimeEnd              time.Time     `json:"timeEnd,omitzero"`
-	Created              time.Time     `json:"created"`
-	RegisteredContenders int           `json:"registeredContenders"`
+	ID                    CompetitionID `json:"id"`
+	Ownership             OwnershipData `json:"ownership"`
+	ArchivedAt            time.Time     `json:"archivedAt,omitzero"`
+	Location              string        `json:"location,omitzero"`
+	Country               string        `json:"country"`
+	SeriesID              SeriesID      `json:"seriesId,omitzero"`
+	Name                  string        `json:"name"`
+	Description           string        `json:"description,omitzero"`
+	QualifyingProblems    int           `json:"qualifyingProblems"`
+	Finalists             int           `json:"finalists"`
+	UsePoints             bool          `json:"usePoints"`
+	PooledPoints          bool          `json:"pooledPoints"`
+	MaxAttempts           int           `json:"maxAttempts"`
+	PointDeduction        Tenths        `json:"pointDeduction"`
+	Info                  string        `json:"info,omitzero"`
+	GracePeriod           time.Duration `json:"gracePeriod"`
+	NameRetentionTime     time.Duration `json:"nameRetentionTime"`
+	TimeBegin             time.Time     `json:"timeBegin,omitzero"`
+	TimeEnd               time.Time     `json:"timeEnd,omitzero"`
+	Created               time.Time     `json:"created"`
+	RegisteredCompetitors int           `json:"registeredCompetitors"`
 }
 
 type CompetitionTemplate struct {
@@ -155,13 +155,13 @@ type ProblemValue struct {
 }
 
 type PointValue struct {
-	ContenderID ContenderID `json:"contenderId"`
-	ProblemID   ProblemID   `json:"problemId"`
-	Current     Tenths      `json:"current"`
-	Zone1       Tenths      `json:"zone1"`
-	Zone2       Tenths      `json:"zone2"`
-	Top         Tenths      `json:"top"`
-	FlashBonus  Tenths      `json:"flashBonus"`
+	CompetitorID CompetitorID `json:"competitorId"`
+	ProblemID    ProblemID    `json:"problemId"`
+	Current      Tenths       `json:"current"`
+	Zone1        Tenths       `json:"zone1"`
+	Zone2        Tenths       `json:"zone2"`
+	Top          Tenths       `json:"top"`
+	FlashBonus   Tenths       `json:"flashBonus"`
 }
 
 type Problem struct {
@@ -209,22 +209,22 @@ type Raffle struct {
 }
 
 type RaffleWinner struct {
-	ID                  RaffleWinnerID `json:"id"`
-	Ownership           OwnershipData  `json:"-"`
-	RaffleID            RaffleID       `json:"raffleId"`
-	ContenderID         ContenderID    `json:"contenderId"`
-	ContenderName       string         `json:"contenderName"`
-	ContenderScrubbedAt time.Time      `json:"contenderScrubbedAt,omitzero"`
-	Timestamp           time.Time      `json:"timestamp"`
+	ID                   RaffleWinnerID `json:"id"`
+	Ownership            OwnershipData  `json:"-"`
+	RaffleID             RaffleID       `json:"raffleId"`
+	CompetitorID         CompetitorID   `json:"competitorId"`
+	CompetitorName       string         `json:"competitorName"`
+	CompetitorScrubbedAt time.Time      `json:"competitorScrubbedAt,omitzero"`
+	Timestamp            time.Time      `json:"timestamp"`
 }
 
 type Result struct {
-	Timestamp   time.Time   `json:"timestamp"`
-	ContenderID ContenderID `json:"contenderId"`
-	Score       string      `json:"score"`
-	Placement   int         `json:"placement"`
-	Finalist    bool        `json:"finalist"`
-	RankOrder   int         `json:"rankOrder"`
+	Timestamp    time.Time    `json:"timestamp"`
+	CompetitorID CompetitorID `json:"competitorId"`
+	Score        string       `json:"score"`
+	Placement    int          `json:"placement"`
+	Finalist     bool         `json:"finalist"`
+	RankOrder    int          `json:"rankOrder"`
 }
 
 type Series struct {
@@ -234,13 +234,13 @@ type Series struct {
 }
 
 type ScoreboardEntry struct {
-	ContenderID         ContenderID `json:"contenderId"`
-	CategoryID          CategoryID  `json:"categoryId"`
-	Name                string      `json:"name"`
-	WithdrawnFromFinals bool        `json:"withdrawnFromFinals"`
-	Disqualified        bool        `json:"disqualified"`
-	ScrubbedAt          time.Time   `json:"scrubbedAt,omitzero"`
-	Result              *Result     `json:"result,omitzero"`
+	CompetitorID        CompetitorID `json:"competitorId"`
+	CategoryID          CategoryID   `json:"categoryId"`
+	Name                string       `json:"name"`
+	WithdrawnFromFinals bool         `json:"withdrawnFromFinals"`
+	Disqualified        bool         `json:"disqualified"`
+	ScrubbedAt          time.Time    `json:"scrubbedAt,omitzero"`
+	Result              *Result      `json:"result,omitzero"`
 }
 
 type Tick struct {
@@ -276,50 +276,50 @@ type ScoreEngineDescriptor struct {
 	CompetitionID CompetitionID         `json:"competitionId"`
 }
 
-type ContenderEnteredEvent struct {
-	ContenderID ContenderID `json:"contenderId"`
-	CategoryID  CategoryID  `json:"categoryId"`
+type CompetitorEnteredEvent struct {
+	CompetitorID CompetitorID `json:"competitorId"`
+	CategoryID   CategoryID   `json:"categoryId"`
 }
 
-type ContenderSwitchedCategoryEvent struct {
-	ContenderID ContenderID `json:"contenderId"`
-	CategoryID  CategoryID  `json:"categoryId"`
+type CompetitorSwitchedCategoryEvent struct {
+	CompetitorID CompetitorID `json:"competitorId"`
+	CategoryID   CategoryID   `json:"categoryId"`
 }
 
-type ContenderWithdrewFromFinalsEvent struct {
-	ContenderID ContenderID `json:"contenderId"`
+type CompetitorWithdrewFromFinalsEvent struct {
+	CompetitorID CompetitorID `json:"competitorId"`
 }
 
-type ContenderReenteredFinalsEvent struct {
-	ContenderID ContenderID `json:"contenderId"`
+type CompetitorReenteredFinalsEvent struct {
+	CompetitorID CompetitorID `json:"competitorId"`
 }
 
-type ContenderDisqualifiedEvent struct {
-	ContenderID ContenderID `json:"contenderId"`
+type CompetitorDisqualifiedEvent struct {
+	CompetitorID CompetitorID `json:"competitorId"`
 }
 
-type ContenderRequalifiedEvent struct {
-	ContenderID ContenderID `json:"contenderId"`
+type CompetitorRequalifiedEvent struct {
+	CompetitorID CompetitorID `json:"competitorId"`
 }
 
 type AscentRegisteredEvent struct {
-	TickID        TickID      `json:"tickId"`
-	Timestamp     time.Time   `json:"timestamp"`
-	ContenderID   ContenderID `json:"contenderId"`
-	ProblemID     ProblemID   `json:"problemId"`
-	Revision      int         `json:"revision"`
-	Zone1         bool        `json:"zone1"`
-	AttemptsZone1 int         `json:"attemptsZone1"`
-	Zone2         bool        `json:"zone2"`
-	AttemptsZone2 int         `json:"attemptsZone2"`
-	Top           bool        `json:"top"`
-	AttemptsTop   int         `json:"attemptsTop"`
+	TickID        TickID       `json:"tickId"`
+	Timestamp     time.Time    `json:"timestamp"`
+	CompetitorID  CompetitorID `json:"competitorId"`
+	ProblemID     ProblemID    `json:"problemId"`
+	Revision      int          `json:"revision"`
+	Zone1         bool         `json:"zone1"`
+	AttemptsZone1 int          `json:"attemptsZone1"`
+	Zone2         bool         `json:"zone2"`
+	AttemptsZone2 int          `json:"attemptsZone2"`
+	Top           bool         `json:"top"`
+	AttemptsTop   int          `json:"attemptsTop"`
 }
 
 type AscentDeregisteredEvent struct {
-	TickID      TickID      `json:"tickId"`
-	ContenderID ContenderID `json:"contenderId"`
-	ProblemID   ProblemID   `json:"problemId"`
+	TickID       TickID       `json:"tickId"`
+	CompetitorID CompetitorID `json:"competitorId"`
+	ProblemID    ProblemID    `json:"problemId"`
 }
 
 type ProblemAddedEvent struct {
@@ -350,32 +350,32 @@ type RulesUpdatedEvent struct {
 	PointDeduction     Tenths        `json:"pointDeduction"`
 }
 
-type ContenderPublicInfoUpdatedEvent struct {
-	ContenderID         ContenderID `json:"contenderId"`
-	CategoryID          CategoryID  `json:"categoryId"`
-	Name                string      `json:"name"`
-	WithdrawnFromFinals bool        `json:"withdrawnFromFinals"`
-	Disqualified        bool        `json:"disqualified"`
-	ScrubbedAt          time.Time   `json:"scrubbedAt,omitzero"`
+type CompetitorPublicInfoUpdatedEvent struct {
+	CompetitorID        CompetitorID `json:"competitorId"`
+	CategoryID          CategoryID   `json:"categoryId"`
+	Name                string       `json:"name"`
+	WithdrawnFromFinals bool         `json:"withdrawnFromFinals"`
+	Disqualified        bool         `json:"disqualified"`
+	ScrubbedAt          time.Time    `json:"scrubbedAt,omitzero"`
 }
 
-type ContenderResultUpdatedEvent struct {
-	Timestamp   time.Time   `json:"timestamp"`
-	ContenderID ContenderID `json:"contenderId"`
-	Score       string      `json:"score"`
-	Placement   int         `json:"placement"`
-	Finalist    bool        `json:"finalist"`
-	RankOrder   int         `json:"rankOrder"`
+type CompetitorResultUpdatedEvent struct {
+	Timestamp    time.Time    `json:"timestamp"`
+	CompetitorID CompetitorID `json:"competitorId"`
+	Score        string       `json:"score"`
+	Placement    int          `json:"placement"`
+	Finalist     bool         `json:"finalist"`
+	RankOrder    int          `json:"rankOrder"`
 }
 
 type PointValueUpdatedEvent struct {
-	ContenderID ContenderID `json:"contenderId"`
-	ProblemID   ProblemID   `json:"problemId"`
-	Current     Tenths      `json:"current"`
-	Zone1       Tenths      `json:"zone1"`
-	Zone2       Tenths      `json:"zone2"`
-	Top         Tenths      `json:"top"`
-	FlashBonus  Tenths      `json:"flashBonus"`
+	CompetitorID CompetitorID `json:"competitorId"`
+	ProblemID    ProblemID    `json:"problemId"`
+	Current      Tenths       `json:"current"`
+	Zone1        Tenths       `json:"zone1"`
+	Zone2        Tenths       `json:"zone2"`
+	Top          Tenths       `json:"top"`
+	FlashBonus   Tenths       `json:"flashBonus"`
 }
 
 type ScoreEngineStartedEvent struct {
@@ -387,7 +387,7 @@ type ScoreEngineStoppedEvent struct {
 }
 
 type RaffleWinnerDrawnEvent struct {
-	RaffleID    RaffleID    `json:"raffleId"`
-	ContenderID ContenderID `json:"contenderId"`
-	Timestamp   time.Time   `json:"timestamp"`
+	RaffleID     RaffleID     `json:"raffleId"`
+	CompetitorID CompetitorID `json:"competitorId"`
+	Timestamp    time.Time    `json:"timestamp"`
 }

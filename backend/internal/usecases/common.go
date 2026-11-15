@@ -4,11 +4,11 @@ import (
 	"github.com/climblive/platform/backend/internal/domain"
 )
 
-func withResult(contender domain.Contender, resultKeeper domain.ResultKeeper) domain.Contender {
-	result, err := resultKeeper.GetResult(contender.ID)
+func withResult(competitor domain.Competitor, resultKeeper domain.ResultKeeper) domain.Competitor {
+	result, err := resultKeeper.GetResult(competitor.ID)
 	if err == nil {
-		contender.Result = &result
+		competitor.Result = &result
 	}
 
-	return contender
+	return competitor
 }

@@ -144,7 +144,7 @@
     {
       label: "Registered",
       mobile: false,
-      render: renderRegisteredContenders,
+      render: renderRegisteredCompetitors,
       width: "max-content",
       align: "right",
     },
@@ -223,8 +223,8 @@
   {location || "-"}
 {/snippet}
 
-{#snippet renderRegisteredContenders({ registeredContenders }: Competition)}
-  {registeredContenders}
+{#snippet renderRegisteredCompetitors({ registeredCompetitors }: Competition)}
+  {registeredCompetitors}
 {/snippet}
 
 {#snippet renderTimeBegin({ timeBegin, timeEnd }: Competition, mobile: boolean)}
@@ -337,7 +337,7 @@
   showSummary: boolean = false,
 )}
   {@const totalRegistered = competitions.reduce(
-    (sum, c) => sum + c.registeredContenders,
+    (sum, c) => sum + c.registeredCompetitors,
     0,
   )}
   {@const averageRegistered = Math.floor(

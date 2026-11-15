@@ -20,7 +20,7 @@ type raffleUseCaseRepository interface {
 	GetCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (domain.Competition, error)
 	GetRaffle(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) (domain.Raffle, error)
 	GetRafflesByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Raffle, error)
-	GetContendersByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Contender, error)
+	GetCompetitorsByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Competitor, error)
 	GetRaffleWinners(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) ([]domain.RaffleWinner, error)
 	DeleteRaffleWinner(ctx context.Context, tx domain.Transaction, raffleWinnerID domain.RaffleWinnerID) error
 	DeleteRaffle(ctx context.Context, tx domain.Transaction, raffleID domain.RaffleID) error
@@ -107,12 +107,12 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 		return domain.RaffleWinner{}, errors.Wrap(err, 0)
 	}
 
-	contenders, err := uc.Repo.GetContendersByCompetition(ctx, nil, raffle.CompetitionID)
+	competitors, err := uc.Repo.GetCompetitorsByCompetition(ctx, nil, raffle.CompetitionID)
 	if err != nil {
 		return domain.RaffleWinner{}, errors.Wrap(err, 0)
 	}
 
-	if len(contenders) == 0 {
+	if len(competitors) == 0 {
 		return domain.RaffleWinner{}, domain.ErrAllWinnersDrawn
 	}
 
@@ -121,28 +121,28 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 		return domain.RaffleWinner{}, errors.Wrap(err, 0)
 	}
 
-	winnersSet := make(map[domain.ContenderID]struct{})
+	winnersSet := make(map[domain.CompetitorID]struct{})
 	for _, winner := range winners {
-		winnersSet[winner.ContenderID] = struct{}{}
+		winnersSet[winner.CompetitorID] = struct{}{}
 	}
 
-	candidates := make([]domain.Contender, 0)
+	candidates := make([]domain.Competitor, 0)
 
-	for _, contender := range contenders {
-		if contender.Entered.IsZero() {
+	for _, competitor := range competitors {
+		if competitor.Entered.IsZero() {
 			continue
 		}
 
-		if !contender.ScrubbedAt.IsZero() {
+		if !competitor.ScrubbedAt.IsZero() {
 			continue
 		}
 
-		if contender.Disqualified {
+		if competitor.Disqualified {
 			continue
 		}
 
-		if _, alreadyDrawn := winnersSet[contender.ID]; !alreadyDrawn {
-			candidates = append(candidates, contender)
+		if _, alreadyDrawn := winnersSet[competitor.ID]; !alreadyDrawn {
+			candidates = append(candidates, competitor)
 		}
 	}
 
@@ -156,13 +156,13 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 	}
 
 	winner := domain.RaffleWinner{
-		ID:                  0,
-		Ownership:           raffle.Ownership,
-		RaffleID:            raffle.ID,
-		ContenderID:         candidates[winnerIndex.Int64()].ID,
-		ContenderName:       candidates[winnerIndex.Int64()].Name,
-		ContenderScrubbedAt: candidates[winnerIndex.Int64()].ScrubbedAt,
-		Timestamp:           time.Now(),
+		ID:                   0,
+		Ownership:            raffle.Ownership,
+		RaffleID:             raffle.ID,
+		CompetitorID:         candidates[winnerIndex.Int64()].ID,
+		CompetitorName:       candidates[winnerIndex.Int64()].Name,
+		CompetitorScrubbedAt: candidates[winnerIndex.Int64()].ScrubbedAt,
+		Timestamp:            time.Now(),
 	}
 
 	createdWinner, err := uc.Repo.StoreRaffleWinner(ctx, nil, winner)
@@ -171,9 +171,9 @@ func (uc *RaffleUseCase) DrawRaffleWinner(ctx context.Context, raffleID domain.R
 	}
 
 	uc.EventBroker.Dispatch(raffle.CompetitionID, domain.RaffleWinnerDrawnEvent{
-		RaffleID:    createdWinner.RaffleID,
-		ContenderID: createdWinner.ContenderID,
-		Timestamp:   createdWinner.Timestamp,
+		RaffleID:     createdWinner.RaffleID,
+		CompetitorID: createdWinner.CompetitorID,
+		Timestamp:    createdWinner.Timestamp,
 	})
 
 	return createdWinner, nil

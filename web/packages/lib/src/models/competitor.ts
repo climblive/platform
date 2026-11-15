@@ -1,8 +1,8 @@
 import { z } from "@climblive/lib/utils";
-import type { Contender } from "./generated";
+import type { Competitor } from "./generated";
 import { resultSchema } from "./result";
 
-export const contenderSchema: z.ZodType<Contender> = z.object({
+export const competitorSchema: z.ZodType<Competitor> = z.object({
   id: z.number(),
   competitionId: z.number(),
   categoryId: z.number().optional(),

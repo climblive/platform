@@ -161,7 +161,7 @@ func main() {
 
 	scoreEngineManager := scores.NewScoreEngineManager(database, scoreEngineStoreHydrator, eventBroker, scoreEngineMaxLifetime)
 
-	contenderUseCase := usecases.ContenderUseCase{
+	competitorUseCase := usecases.CompetitorUseCase{
 		Repo:                      database,
 		Authorizer:                authorizer,
 		EventBroker:               eventBroker,
@@ -170,7 +170,7 @@ func main() {
 		RegistrationCodeGenerator: &registrationCodeGenerator{}}
 
 	scrubInterval := time.Hour
-	scrubberRunner := scrubber.New(&contenderUseCase, scrubInterval)
+	scrubberRunner := scrubber.New(&competitorUseCase, scrubInterval)
 
 	barriers = append(barriers,
 		resultKeeper.Run(ctx, scores.WithPanicRecovery()),
@@ -281,7 +281,7 @@ func setupMux(
 	scrubber *scrubber.Scrubber,
 	pointValueKeeper *scores.PointValueKeeper,
 ) *rest.Mux {
-	contenderUseCase := usecases.ContenderUseCase{
+	competitorUseCase := usecases.CompetitorUseCase{
 		Repo:                      repo,
 		Authorizer:                authorizer,
 		EventBroker:               eventBroker,
@@ -351,7 +351,7 @@ func setupMux(
 
 	mux.HandleFunc("OPTIONS /", HandleCORSPreFlight)
 
-	rest.InstallContenderHandler(mux, &contenderUseCase)
+	rest.InstallCompetitorHandler(mux, &competitorUseCase)
 	rest.InstallCompetitionHandler(mux, &competitionUseCase, &categoryUseCase, &tickUseCase, &problemUseCase)
 	rest.InstallCategoryHandler(mux, &categoryUseCase)
 	rest.InstallProblemHandler(mux, &problemUseCase)

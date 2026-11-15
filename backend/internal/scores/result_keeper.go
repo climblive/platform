@@ -21,7 +21,7 @@ type keeperRepository interface {
 type Keeper struct {
 	mu                     sync.RWMutex
 	eventBroker            domain.EventBroker
-	results                map[domain.ContenderID]domain.Result
+	results                map[domain.CompetitorID]domain.Result
 	repo                   keeperRepository
 	externalPersistTrigger chan struct{}
 	running                atomic.Bool
@@ -30,7 +30,7 @@ type Keeper struct {
 func NewResultKeeper(eventBroker domain.EventBroker, repo keeperRepository) *Keeper {
 	return &Keeper{
 		eventBroker:            eventBroker,
-		results:                make(map[domain.ContenderID]domain.Result),
+		results:                make(map[domain.CompetitorID]domain.Result),
 		repo:                   repo,
 		externalPersistTrigger: make(chan struct{}, 1),
 		mu:                     sync.RWMutex{},
@@ -74,7 +74,7 @@ func (k *Keeper) run(ctx context.Context, ready chan<- struct{}) {
 	filter := domain.NewEventFilter(
 		0,
 		0,
-		"CONTENDER_RESULT_UPDATED",
+		"COMPETITOR_RESULT_UPDATED",
 	)
 
 	subscriptionID, eventReader := k.eventBroker.Subscribe([]domain.EventFilter{filter}, 0)
@@ -97,8 +97,8 @@ EventLoop:
 			}
 
 			switch ev := event.Data.(type) {
-			case domain.ContenderResultUpdatedEvent:
-				k.HandleContenderResultUpdated(ev)
+			case domain.CompetitorResultUpdatedEvent:
+				k.HandleCompetitorResultUpdated(ev)
 			}
 		case <-ticker:
 			k.persistResults(ctx)
@@ -131,31 +131,31 @@ func (k *Keeper) RequestPersist() {
 }
 
 func (k *Keeper) persistResults(ctx context.Context) {
-	takeFirst := func() (domain.ContenderID, domain.Result) {
+	takeFirst := func() (domain.CompetitorID, domain.Result) {
 		k.mu.Lock()
 		defer k.mu.Unlock()
 
-		var contenderID domain.ContenderID
+		var competitorID domain.CompetitorID
 		var result domain.Result
-		for contenderID, result = range k.results {
+		for competitorID, result = range k.results {
 			break
 		}
 
-		if contenderID == 0 {
+		if competitorID == 0 {
 			return 0, domain.Result{}
 		}
 
-		delete(k.results, contenderID)
+		delete(k.results, competitorID)
 
-		return contenderID, result
+		return competitorID, result
 	}
 
-	putBack := func(contenderID domain.ContenderID, result domain.Result) {
+	putBack := func(competitorID domain.CompetitorID, result domain.Result) {
 		k.mu.Lock()
 		defer k.mu.Unlock()
 
-		if _, found := k.results[contenderID]; !found {
-			k.results[contenderID] = result
+		if _, found := k.results[competitorID]; !found {
+			k.results[competitorID] = result
 		}
 	}
 
@@ -163,9 +163,9 @@ func (k *Keeper) persistResults(ctx context.Context) {
 
 IterateResults:
 	for ctx.Err() == nil {
-		contenderID, result := takeFirst()
+		competitorID, result := takeFirst()
 
-		if contenderID == 0 {
+		if competitorID == 0 {
 			break
 		}
 
@@ -174,19 +174,19 @@ IterateResults:
 		case err == nil:
 			persistedResults += 1
 		case errors.Is(err, domain.ErrNotFound):
-			slog.Warn("failed to persist result for non-existent contender",
-				"contender_id", contenderID,
+			slog.Warn("failed to persist result for non-existent competitor",
+				"competitor_id", competitorID,
 				"action", "drop",
 				"error", err)
 
 			continue
 		default:
 			slog.Error("failed to persist result",
-				"contender_id", contenderID,
+				"competitor_id", competitorID,
 				"action", "try_again_later",
 				"error", err)
 
-			putBack(contenderID, result)
+			putBack(competitorID, result)
 
 			break IterateResults
 		}
@@ -209,18 +209,18 @@ func (k *Keeper) getNumResultsWithLock() int {
 	return len(k.results)
 }
 
-func (k *Keeper) HandleContenderResultUpdated(event domain.ContenderResultUpdatedEvent) {
+func (k *Keeper) HandleCompetitorResultUpdated(event domain.CompetitorResultUpdatedEvent) {
 	k.mu.Lock()
 	defer k.mu.Unlock()
 
-	k.results[event.ContenderID] = domain.Result(event)
+	k.results[event.CompetitorID] = domain.Result(event)
 }
 
-func (k *Keeper) GetResult(contenderID domain.ContenderID) (domain.Result, error) {
+func (k *Keeper) GetResult(competitorID domain.CompetitorID) (domain.Result, error) {
 	k.mu.RLock()
 	defer k.mu.RUnlock()
 
-	if result, found := k.results[contenderID]; found {
+	if result, found := k.results[competitorID]; found {
 		return result, nil
 	}
 

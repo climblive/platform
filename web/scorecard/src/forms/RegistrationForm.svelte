@@ -5,7 +5,7 @@
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { checked, GenericForm, name, value } from "@climblive/lib/forms";
-  import { type ContenderPatch } from "@climblive/lib/models";
+  import { type CompetitorPatch } from "@climblive/lib/models";
   import { getCategoriesQuery } from "@climblive/lib/queries";
   import type { CompetitionState } from "@climblive/lib/types";
   import { z } from "@climblive/lib/utils";
@@ -13,15 +13,15 @@
   import { getContext, type Snippet } from "svelte";
   import type { Readable } from "svelte/store";
 
-  const registrationFormSchema: z.ZodType<ContenderPatch> = z.object({
+  const registrationFormSchema: z.ZodType<CompetitorPatch> = z.object({
     name: z.string().min(1),
     categoryId: z.coerce.number().gt(0, { message: "" }),
     withdrawnFromFinals: z.coerce.boolean().default(false),
   });
 
   interface Props {
-    data: Partial<ContenderPatch>;
-    submit: (patch: ContenderPatch) => void;
+    data: Partial<CompetitorPatch>;
+    submit: (patch: CompetitorPatch) => void;
     callout?: Snippet;
     children?: Snippet;
     competitionState: CompetitionState;

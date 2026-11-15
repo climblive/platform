@@ -3,7 +3,7 @@
 //////////
 // source: public.go
 
-export interface CreateContendersArguments {
+export interface CreateCompetitorsArguments {
   number: number /* int */;
 }
 export interface StartScoreEngineArguments {

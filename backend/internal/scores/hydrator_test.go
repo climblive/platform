@@ -19,7 +19,7 @@ func TestHydrate(t *testing.T) {
 	fakedTickID := testutils.RandomResourceID[domain.TickID]()
 	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
-	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+	fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 	now := time.Now()
@@ -53,17 +53,17 @@ func TestHydrate(t *testing.T) {
 		}, nil)
 
 	mockedRepo.
-		On("GetContendersByCompetition", mock.Anything, nil, fakedCompetitionID).
-		Return([]domain.Contender{
+		On("GetCompetitorsByCompetition", mock.Anything, nil, fakedCompetitionID).
+		Return([]domain.Competitor{
 			{
-				ID:                  fakedContenderID,
+				ID:                  fakedCompetitorID,
 				CategoryID:          fakedCategoryID,
 				Disqualified:        true,
 				WithdrawnFromFinals: true,
 				Entered:             now,
 			},
 			{
-				ID:         fakedContenderID + 1,
+				ID:         fakedCompetitorID + 1,
 				CategoryID: 0,
 			},
 		}, nil)
@@ -74,7 +74,7 @@ func TestHydrate(t *testing.T) {
 			{
 				ID: fakedTickID,
 				Ownership: domain.OwnershipData{
-					ContenderID: &fakedContenderID,
+					CompetitorID: &fakedCompetitorID,
 				},
 				Revision:      1,
 				ProblemID:     fakedProblemID,
@@ -108,17 +108,17 @@ func TestHydrate(t *testing.T) {
 		},
 	}).Return()
 
-	mockedStore.On("SaveContender", scores.Contender{
-		ID:                  fakedContenderID,
+	mockedStore.On("SaveCompetitor", scores.Competitor{
+		ID:                  fakedCompetitorID,
 		CategoryID:          fakedCategoryID,
 		Disqualified:        true,
 		WithdrawnFromFinals: true,
 	}).Return()
 
-	mockedStore.On("SaveTick", fakedContenderID, scores.Tick{
+	mockedStore.On("SaveTick", fakedCompetitorID, scores.Tick{
 		ID:            fakedTickID,
 		Revision:      1,
-		ContenderID:   fakedContenderID,
+		CompetitorID:  fakedCompetitorID,
 		ProblemID:     fakedProblemID,
 		Top:           true,
 		AttemptsTop:   999,

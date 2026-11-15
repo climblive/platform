@@ -25,7 +25,7 @@ import (
 
 func TestEventsHandler(t *testing.T) {
 	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
-	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
+	fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 
 	makeMocks := func(bufferCapacity int, filters []domain.EventFilter) (*eventBrokerMock, *events.Subscription) {
 		mockedEventBroker := new(eventBrokerMock)
@@ -40,13 +40,13 @@ func TestEventsHandler(t *testing.T) {
 		return mockedEventBroker, subscription
 	}
 
-	makeContenderFilters := func(competitionID domain.CompetitionID, contenderID domain.ContenderID) []domain.EventFilter {
+	makeCompetitorFilters := func(competitionID domain.CompetitionID, competitorID domain.CompetitorID) []domain.EventFilter {
 		return []domain.EventFilter{
 			domain.NewEventFilter(
 				competitionID,
-				contenderID,
-				"CONTENDER_PUBLIC_INFO_UPDATED",
-				"CONTENDER_RESULT_UPDATED",
+				competitorID,
+				"COMPETITOR_PUBLIC_INFO_UPDATED",
+				"COMPETITOR_RESULT_UPDATED",
 				"ASCENT_REGISTERED",
 				"ASCENT_DEREGISTERED",
 				"RAFFLE_WINNER_DRAWN",
@@ -175,7 +175,7 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("ConnectAndDisconnect", func(t *testing.T) {
-		filters := makeContenderFilters(fakedCompetitionID, fakedContenderID)
+		filters := makeCompetitorFilters(fakedCompetitionID, fakedCompetitorID)
 		mockedEventBroker, _ := makeMocks(0, filters)
 
 		mux := rest.NewMux()
@@ -205,7 +205,7 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("ReceivePing", func(t *testing.T) {
-		filters := makeContenderFilters(fakedCompetitionID, fakedContenderID)
+		filters := makeCompetitorFilters(fakedCompetitionID, fakedCompetitorID)
 		mockedEventBroker, _ := makeMocks(0, filters)
 
 		mux := rest.NewMux()
@@ -239,17 +239,17 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("ReceiveEvent", func(t *testing.T) {
-		filters := makeContenderFilters(fakedCompetitionID, fakedContenderID)
+		filters := makeCompetitorFilters(fakedCompetitionID, fakedCompetitorID)
 		mockedEventBroker, subscription := makeMocks(0, filters)
 
 		err := subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderResultUpdatedEvent{
-				Timestamp:   time.Date(2024, 12, 01, 00, 00, 00, 0, time.UTC),
-				ContenderID: fakedContenderID,
-				Score:       "100p",
-				Placement:   10,
-				Finalist:    true,
-				RankOrder:   9,
+			Data: domain.CompetitorResultUpdatedEvent{
+				Timestamp:    time.Date(2024, 12, 01, 00, 00, 00, 0, time.UTC),
+				CompetitorID: fakedCompetitorID,
+				Score:        "100p",
+				Placement:    10,
+				Finalist:     true,
+				RankOrder:    9,
 			},
 		})
 		require.NoError(t, err)
@@ -278,8 +278,8 @@ func TestEventsHandler(t *testing.T) {
 		assert.Equal(t, []string{
 			"retry: 5000",
 			"",
-			"event: CONTENDER_RESULT_UPDATED",
-			fmt.Sprintf(`data: {"timestamp":"2024-12-01T00:00:00Z","contenderId":%v,"score":"100p","placement":10,"finalist":true,"rankOrder":9}`, fakedContenderID),
+			"event: COMPETITOR_RESULT_UPDATED",
+			fmt.Sprintf(`data: {"timestamp":"2024-12-01T00:00:00Z","competitorId":%v,"score":"100p","placement":10,"finalist":true,"rankOrder":9}`, fakedCompetitorID),
 		}, lines)
 
 		_ = resp.Body.Close()
@@ -290,16 +290,16 @@ func TestEventsHandler(t *testing.T) {
 	})
 
 	t.Run("SubscriptionUnexpectedlyClosed", func(t *testing.T) {
-		filters := makeContenderFilters(fakedCompetitionID, fakedContenderID)
+		filters := makeCompetitorFilters(fakedCompetitionID, fakedCompetitorID)
 		mockedEventBroker, subscription := makeMocks(1, filters)
 
 		err := subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderResultUpdatedEvent{},
+			Data: domain.CompetitorResultUpdatedEvent{},
 		})
 		require.NoError(t, err)
 
 		err = subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderResultUpdatedEvent{},
+			Data: domain.CompetitorResultUpdatedEvent{},
 		})
 		require.ErrorIs(t, err, events.ErrBufferFull)
 
@@ -340,7 +340,7 @@ type repositoryMock struct {
 	mock.Mock
 }
 
-func (m *repositoryMock) GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error) {
-	args := m.Called(ctx, tx, contenderID)
-	return args.Get(0).(domain.Contender), args.Error(1)
+func (m *repositoryMock) GetCompetitor(ctx context.Context, tx domain.Transaction, competitorID domain.CompetitorID) (domain.Competitor, error) {
+	args := m.Called(ctx, tx, competitorID)
+	return args.Get(0).(domain.Competitor), args.Error(1)
 }

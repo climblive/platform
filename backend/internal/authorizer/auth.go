@@ -22,7 +22,7 @@ type authenticationResult struct {
 type authorizerRepository interface {
 	domain.Transactor
 
-	GetContenderByCode(ctx context.Context, tx domain.Transaction, registrationCode string) (domain.Contender, error)
+	GetCompetitorByCode(ctx context.Context, tx domain.Transaction, registrationCode string) (domain.Competitor, error)
 	GetUserByUsername(ctx context.Context, tx domain.Transaction, username string) (domain.User, error)
 	StoreUser(ctx context.Context, tx domain.Transaction, user domain.User) (domain.User, error)
 	StoreOrganizer(ctx context.Context, tx domain.Transaction, organizer domain.Organizer) (domain.Organizer, error)
@@ -87,13 +87,13 @@ func (a *Authorizer) GetAuthentication(ctx context.Context) (domain.Authenticati
 }
 
 func (a *Authorizer) authorizeByRegCode(ctx context.Context, regcode string, resourceOwnership domain.OwnershipData) (domain.AuthRole, error) {
-	contender, err := a.repo.GetContenderByCode(ctx, nil, strings.ToUpper(regcode))
+	competitor, err := a.repo.GetCompetitorByCode(ctx, nil, strings.ToUpper(regcode))
 	if err != nil {
 		return domain.NilRole, domain.ErrNotAuthorized
 	}
 
-	if resourceOwnership.ContenderID != nil && contender.ID == *resourceOwnership.ContenderID {
-		return domain.ContenderRole, nil
+	if resourceOwnership.CompetitorID != nil && competitor.ID == *resourceOwnership.CompetitorID {
+		return domain.CompetitorRole, nil
 	}
 
 	return domain.NilRole, domain.ErrNoOwnership
