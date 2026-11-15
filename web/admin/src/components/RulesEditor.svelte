@@ -53,6 +53,7 @@
   <RuleOptionCard
     title="Points"
     description="Competitors are ranked based on the total points scored across all problems."
+    tags={["Recommended"]}
   >
     {#snippet header()}
       <wa-radio
@@ -66,7 +67,6 @@
   <RuleOptionCard
     title="Attempts"
     description="Competitors are ranked based on the number of attempts needed to complete problems."
-    tag="Beta"
   >
     {#snippet header()}
       <wa-radio

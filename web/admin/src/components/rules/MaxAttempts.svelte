@@ -42,7 +42,7 @@
       title="Max attempts"
       disabled={!competition.usePoints}
       description="Each competitor has a fixed number of attempts per problem. Attempts above that limit yield 0 points for that problem."
-      tag="Beta"
+      tags={["New"]}
     >
       {#snippet header()}
         <wa-checkbox

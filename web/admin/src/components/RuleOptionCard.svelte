@@ -6,7 +6,7 @@
     title: string;
     description: string;
     disabled?: boolean;
-    tag?: string;
+    tags?: string[];
     header?: Snippet;
     footer?: Snippet;
     indicator?: Snippet;
@@ -16,7 +16,7 @@
     title,
     description,
     disabled = false,
-    tag,
+    tags = [],
     header,
     footer,
     indicator,
@@ -32,8 +32,12 @@
     {#if indicator}
       {@render indicator()}
     {/if}
-    {#if tag}
-      <wa-badge pill variant="neutral">{tag}</wa-badge>
+    {#if tags.length > 0}
+      <div class="tags">
+        {#each tags as tag (tag)}
+          <wa-badge pill variant="neutral">{tag}</wa-badge>
+        {/each}
+      </div>
     {/if}
   </div>
 
@@ -62,6 +66,7 @@
 
   .header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--wa-space-s);
 
@@ -70,8 +75,14 @@
       font-size: var(--wa-font-size-m);
     }
 
-    wa-badge {
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--wa-space-xs);
       margin-inline-start: auto;
+    }
+
+    wa-badge {
       font-size: var(--wa-font-size-2xs);
     }
   }
