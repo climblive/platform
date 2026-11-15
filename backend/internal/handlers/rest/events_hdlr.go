@@ -47,7 +47,12 @@ func (hdlr *eventHandler) HandleSubscribeEvents(w http.ResponseWriter, r *http.R
 	raw := r.URL.Query().Get("f")
 	filterReader := base64.NewDecoder(base64.RawURLEncoding, strings.NewReader(raw))
 
-	err := json.UnmarshalRead(filterReader, &filters, jsonv1.FormatDurationAsNano(true))
+	err := json.UnmarshalRead(
+		filterReader,
+		&filters,
+		jsonv1.FormatDurationAsNano(true),
+		json.RejectUnknownMembers(true),
+	)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
