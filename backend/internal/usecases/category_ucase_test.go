@@ -49,7 +49,7 @@ func TestGetCategory(t *testing.T) {
 func TestGetCategoriesByCompetition(t *testing.T) {
 	t.Parallel()
 
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 
 	fakedCategories := []domain.Category{{
 		ID:            testutils.RandomResourceID[domain.CategoryID](),
@@ -80,7 +80,7 @@ func TestCreateCategory(t *testing.T) {
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 	now := time.Now()

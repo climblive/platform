@@ -19,7 +19,7 @@ import (
 var noEffects iter.Seq[scores.Effect]
 
 func TestEngineDriver(t *testing.T) {
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedInstanceID := uuid.New()
 
 	type fixture struct {
@@ -213,7 +213,7 @@ func TestEngineDriver(t *testing.T) {
 		events := []any{}
 
 		events = append(events, domain.RulesUpdatedEvent{
-			CompetitionID:      1,
+			CompetitionID:      fakedCompetitionID,
 			QualifyingProblems: 10,
 			Finalists:          7,
 		})
@@ -277,7 +277,7 @@ func TestEngineDriver(t *testing.T) {
 		mockedEngine.On("GetDirtyPointValues").Return([]domain.PointValue{})
 
 		mockedEngine.On("HandleRulesUpdated", domain.RulesUpdatedEvent{
-			CompetitionID:      1,
+			CompetitionID:      fakedCompetitionID,
 			QualifyingProblems: 10,
 			Finalists:          7,
 		}).Return(noEffects)

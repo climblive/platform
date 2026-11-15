@@ -48,7 +48,7 @@ func (hdlr *problemHandler) GetProblem(w http.ResponseWriter, r *http.Request) {
 }
 
 func (hdlr *problemHandler) GetProblemsByCompetition(w http.ResponseWriter, r *http.Request) {
-	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
+	competitionID, err := parseCompetitionID(r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -85,7 +85,7 @@ func (hdlr *problemHandler) PatchProblem(w http.ResponseWriter, r *http.Request)
 }
 
 func (hdlr *problemHandler) CreateProblem(w http.ResponseWriter, r *http.Request) {
-	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
+	competitionID, err := parseCompetitionID(r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return

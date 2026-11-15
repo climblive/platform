@@ -20,7 +20,7 @@ func TestCreateRaffle(t *testing.T) {
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedRaffleID := testutils.RandomResourceID[domain.RaffleID]()
 
 	makeMocks := func() (*repositoryMock, *authorizerMock) {
@@ -130,7 +130,7 @@ func TestGetRaffle(t *testing.T) {
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedRaffleID := testutils.RandomResourceID[domain.RaffleID]()
 
 	makeMocks := func() (*repositoryMock, *authorizerMock) {
@@ -198,7 +198,7 @@ func TestGetRafflesByCompetition(t *testing.T) {
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 
 	var fakedRaffles []domain.Raffle
 	for range 3 {
@@ -275,7 +275,7 @@ func TestDrawRaffleWinner(t *testing.T) {
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedRaffleID := testutils.RandomResourceID[domain.RaffleID]()
 
 	makeMocks := func() (*repositoryMock, *eventBrokerMock, *authorizerMock) {
@@ -657,7 +657,7 @@ func TestGetRaffleWinners(t *testing.T) {
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedRaffleID := testutils.RandomResourceID[domain.RaffleID]()
 
 	makeMocks := func() (*repositoryMock, *authorizerMock) {
@@ -744,7 +744,7 @@ func TestDeleteRaffle(t *testing.T) {
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedRaffleID := testutils.RandomResourceID[domain.RaffleID]()
 	fakedRaffleWinnerID := testutils.RandomResourceID[domain.RaffleWinnerID]()
 

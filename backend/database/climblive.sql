@@ -46,10 +46,10 @@ CREATE INDEX `index3` ON `series` (`id` ASC, `organizer_id` ASC);
 
 
 -- -----------------------------------------------------
--- Table `contest`
+-- Table `competition`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `contest` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `competition` (
+  `id` BINARY(16) NOT NULL,
   `organizer_id` INT NOT NULL,
   `archived_at` TIMESTAMP NULL DEFAULT NULL,
   `series_id` INT NULL,
@@ -68,12 +68,12 @@ CREATE TABLE IF NOT EXISTS `contest` (
   `name_retention_time` INT NOT NULL DEFAULT 20160,
   `created` TIMESTAMP NOT NULL DEFAULT '1970-01-01 00:00:01',
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_contest_2`
+  CONSTRAINT `fk_competition_2`
     FOREIGN KEY (`organizer_id`)
     REFERENCES `organizer` (`id`)
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
-  CONSTRAINT `fk_contest_3`
+  CONSTRAINT `fk_competition_3`
     FOREIGN KEY (`series_id` , `organizer_id`)
     REFERENCES `series` (`id` , `organizer_id`)
     ON DELETE RESTRICT
@@ -82,11 +82,11 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
-CREATE INDEX `fk_contest_2_idx` ON `contest` (`organizer_id` ASC);
+CREATE INDEX `fk_competition_2_idx` ON `competition` (`organizer_id` ASC);
 
-CREATE INDEX `fk_contest_3` ON `contest` (`series_id` ASC, `organizer_id` ASC);
+CREATE INDEX `fk_competition_3` ON `competition` (`series_id` ASC, `organizer_id` ASC);
 
-CREATE INDEX `index5` ON `contest` (`id` ASC, `organizer_id` ASC);
+CREATE INDEX `index5` ON `competition` (`id` ASC, `organizer_id` ASC);
 
 
 -- -----------------------------------------------------
@@ -95,7 +95,7 @@ CREATE INDEX `index5` ON `contest` (`id` ASC, `organizer_id` ASC);
 CREATE TABLE IF NOT EXISTS `comp_class` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `organizer_id` INT NOT NULL,
-  `contest_id` INT NOT NULL,
+  `competition_id` BINARY(16) NOT NULL,
   `name` VARCHAR(45) NOT NULL,
   `description` VARCHAR(255) NULL,
   `color` VARCHAR(7) NULL,
@@ -103,17 +103,17 @@ CREATE TABLE IF NOT EXISTS `comp_class` (
   `time_end` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_comp_class_1`
-    FOREIGN KEY (`contest_id` , `organizer_id`)
-    REFERENCES `contest` (`id` , `organizer_id`)
+    FOREIGN KEY (`competition_id` , `organizer_id`)
+    REFERENCES `competition` (`id` , `organizer_id`)
     ON DELETE CASCADE
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
-CREATE INDEX `index3` ON `comp_class` (`id` ASC, `contest_id` ASC);
+CREATE INDEX `index3` ON `comp_class` (`id` ASC, `competition_id` ASC);
 
-CREATE INDEX `fk_comp_class_1_idx` ON `comp_class` (`contest_id` ASC, `organizer_id` ASC);
+CREATE INDEX `fk_comp_class_1_idx` ON `comp_class` (`competition_id` ASC, `organizer_id` ASC);
 
 
 -- -----------------------------------------------------
@@ -122,7 +122,7 @@ CREATE INDEX `fk_comp_class_1_idx` ON `comp_class` (`contest_id` ASC, `organizer
 CREATE TABLE IF NOT EXISTS `contender` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `organizer_id` INT NOT NULL,
-  `contest_id` INT NOT NULL,
+  `competition_id` BINARY(16) NOT NULL,
   `registration_code` VARCHAR(16) NOT NULL,
   `name` VARCHAR(64) NULL,
   `class_id` INT NULL,
@@ -133,26 +133,26 @@ CREATE TABLE IF NOT EXISTS `contender` (
   `scrub_before` TIMESTAMP NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_contender_1`
-    FOREIGN KEY (`class_id` , `contest_id`)
-    REFERENCES `comp_class` (`id` , `contest_id`)
+    FOREIGN KEY (`class_id` , `competition_id`)
+    REFERENCES `comp_class` (`id` , `competition_id`)
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
   CONSTRAINT `fk_contender_2`
-    FOREIGN KEY (`contest_id` , `organizer_id`)
-    REFERENCES `contest` (`id` , `organizer_id`)
+    FOREIGN KEY (`competition_id` , `organizer_id`)
+    REFERENCES `competition` (`id` , `organizer_id`)
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
-CREATE INDEX `fk_contender_1_idx` ON `contender` (`class_id` ASC, `contest_id` ASC);
+CREATE INDEX `fk_contender_1_idx` ON `contender` (`class_id` ASC, `competition_id` ASC);
 
 CREATE UNIQUE INDEX `registration_code_UNIQUE` ON `contender` (`registration_code` ASC);
 
-CREATE INDEX `fk_contender_2_idx` ON `contender` (`contest_id` ASC, `organizer_id` ASC);
+CREATE INDEX `fk_contender_2_idx` ON `contender` (`competition_id` ASC, `organizer_id` ASC);
 
-CREATE INDEX `index5` ON `contender` (`id` ASC, `organizer_id` ASC, `contest_id` ASC);
+CREATE INDEX `index5` ON `contender` (`id` ASC, `organizer_id` ASC, `competition_id` ASC);
 
 CREATE INDEX `index6` ON `contender` (`scrub_before` ASC, `scrubbed_at` ASC, `name` ASC);
 
@@ -163,7 +163,7 @@ CREATE INDEX `index6` ON `contender` (`scrub_before` ASC, `scrubbed_at` ASC, `na
 CREATE TABLE IF NOT EXISTS `problem` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `organizer_id` INT NOT NULL,
-  `contest_id` INT NOT NULL,
+  `competition_id` BINARY(16) NOT NULL,
   `number` INT NOT NULL,
   `hold_color_primary` VARCHAR(7) NOT NULL,
   `hold_color_secondary` VARCHAR(7) NULL DEFAULT NULL,
@@ -176,19 +176,19 @@ CREATE TABLE IF NOT EXISTS `problem` (
   `flash_bonus` INT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_problem_1`
-    FOREIGN KEY (`contest_id` , `organizer_id`)
-    REFERENCES `contest` (`id` , `organizer_id`)
+    FOREIGN KEY (`competition_id` , `organizer_id`)
+    REFERENCES `competition` (`id` , `organizer_id`)
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
-CREATE INDEX `fk_problem_1_idx` ON `problem` (`contest_id` ASC, `organizer_id` ASC);
+CREATE INDEX `fk_problem_1_idx` ON `problem` (`competition_id` ASC, `organizer_id` ASC);
 
-CREATE UNIQUE INDEX `index3` ON `problem` (`number` ASC, `contest_id` ASC);
+CREATE UNIQUE INDEX `index3` ON `problem` (`number` ASC, `competition_id` ASC);
 
-CREATE INDEX `index5` ON `problem` (`id` ASC, `organizer_id` ASC, `contest_id` ASC);
+CREATE INDEX `index5` ON `problem` (`id` ASC, `organizer_id` ASC, `competition_id` ASC);
 
 
 -- -----------------------------------------------------
@@ -197,7 +197,7 @@ CREATE INDEX `index5` ON `problem` (`id` ASC, `organizer_id` ASC, `contest_id` A
 CREATE TABLE IF NOT EXISTS `tick` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `organizer_id` INT NOT NULL,
-  `contest_id` INT NOT NULL,
+  `competition_id` BINARY(16) NOT NULL,
   `contender_id` INT NOT NULL,
   `problem_id` INT NOT NULL,
   `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -210,22 +210,22 @@ CREATE TABLE IF NOT EXISTS `tick` (
   `attempts_top` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_tick_1`
-    FOREIGN KEY (`problem_id` , `organizer_id` , `contest_id`)
-    REFERENCES `problem` (`id` , `organizer_id` , `contest_id`)
+    FOREIGN KEY (`problem_id` , `organizer_id` , `competition_id`)
+    REFERENCES `problem` (`id` , `organizer_id` , `competition_id`)
     ON DELETE RESTRICT
     ON UPDATE RESTRICT,
   CONSTRAINT `fk_tick_2`
-    FOREIGN KEY (`contender_id` , `organizer_id` , `contest_id`)
-    REFERENCES `contender` (`id` , `organizer_id` , `contest_id`)
+    FOREIGN KEY (`contender_id` , `organizer_id` , `competition_id`)
+    REFERENCES `contender` (`id` , `organizer_id` , `competition_id`)
     ON DELETE RESTRICT
     ON UPDATE RESTRICT)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
-CREATE INDEX `fk_tick_1_idx` ON `tick` (`problem_id` ASC, `organizer_id` ASC, `contest_id` ASC);
+CREATE INDEX `fk_tick_1_idx` ON `tick` (`problem_id` ASC, `organizer_id` ASC, `competition_id` ASC);
 
-CREATE INDEX `fk_tick_2_idx` ON `tick` (`contender_id` ASC, `organizer_id` ASC, `contest_id` ASC);
+CREATE INDEX `fk_tick_2_idx` ON `tick` (`contender_id` ASC, `organizer_id` ASC, `competition_id` ASC);
 
 CREATE UNIQUE INDEX `index4` ON `tick` (`contender_id` ASC, `problem_id` ASC);
 
@@ -275,18 +275,18 @@ CREATE INDEX `fk_user_organizer_2_idx` ON `user_organizer` (`organizer_id` ASC);
 CREATE TABLE IF NOT EXISTS `raffle` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `organizer_id` INT NOT NULL,
-  `contest_id` INT NOT NULL,
+  `competition_id` BINARY(16) NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_raffle_1`
-    FOREIGN KEY (`contest_id` , `organizer_id`)
-    REFERENCES `contest` (`id` , `organizer_id`)
+    FOREIGN KEY (`competition_id` , `organizer_id`)
+    REFERENCES `competition` (`id` , `organizer_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
-CREATE INDEX `fk_raffle_1_idx` ON `raffle` (`contest_id` ASC, `organizer_id` ASC);
+CREATE INDEX `fk_raffle_1_idx` ON `raffle` (`competition_id` ASC, `organizer_id` ASC);
 
 CREATE INDEX `index3` ON `raffle` (`id` ASC, `organizer_id` ASC);
 

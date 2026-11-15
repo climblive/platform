@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"time"
+	"uuid"
 
 	"github.com/climblive/platform/backend/internal/database"
 	"github.com/climblive/platform/backend/internal/domain"
@@ -11,7 +12,7 @@ import (
 )
 
 func (d *Database) GetCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (domain.Competition, error) {
-	record, err := d.WithTx(tx).GetCompetition(ctx, int32(competitionID))
+	record, err := d.WithTx(tx).GetCompetition(ctx, competitionID)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		return domain.Competition{}, errors.Wrap(domain.ErrNotFound, 0)
@@ -136,8 +137,12 @@ func (d *Database) GetCompetitionsCurrentlyRunningOrByStartTime(ctx context.Cont
 }
 
 func (d *Database) StoreCompetition(ctx context.Context, tx domain.Transaction, competition domain.Competition) (domain.Competition, error) {
+	if competition.ID == (domain.CompetitionID{}) {
+		competition.ID = domain.CompetitionID(uuid.NewV7())
+	}
+
 	params := database.UpsertCompetitionParams{
-		ID:                 int32(competition.ID),
+		ID:                 competition.ID,
 		OrganizerID:        int32(competition.Ownership.OrganizerID),
 		ArchivedAt:         makeNullTime(competition.ArchivedAt),
 		SeriesID:           makeNullInt32(int32(competition.SeriesID)),
@@ -157,20 +162,16 @@ func (d *Database) StoreCompetition(ctx context.Context, tx domain.Transaction, 
 		Created:            competition.Created,
 	}
 
-	insertID, err := d.WithTx(tx).UpsertCompetition(ctx, params)
+	err := d.WithTx(tx).UpsertCompetition(ctx, params)
 	if err != nil {
 		return domain.Competition{}, errors.Wrap(err, 0)
-	}
-
-	if insertID != 0 {
-		competition.ID = domain.CompetitionID(insertID)
 	}
 
 	return competition, err
 }
 
 func (d *Database) DeleteCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) error {
-	err := d.WithTx(tx).DeleteCompetition(ctx, int32(competitionID))
+	err := d.WithTx(tx).DeleteCompetition(ctx, competitionID)
 	if err != nil {
 		return errors.Wrap(err, 0)
 	}

@@ -8,7 +8,7 @@
   import ResultsList from "./ResultsList.svelte";
 
   interface Props {
-    competitionId: number;
+    competitionId: string;
   }
 
   const { competitionId }: Props = $props();

@@ -7,12 +7,14 @@ package database
 import (
 	"database/sql"
 	"time"
+
+	"github.com/climblive/platform/backend/internal/domain"
 )
 
 type Category struct {
 	ID            int32
 	OrganizerID   int32
-	CompetitionID int32
+	CompetitionID domain.CompetitionID
 	Name          string
 	Description   sql.NullString
 	Color         sql.NullString
@@ -21,7 +23,7 @@ type Category struct {
 }
 
 type Competition struct {
-	ID                 int32
+	ID                 domain.CompetitionID
 	OrganizerID        int32
 	ArchivedAt         sql.NullTime
 	SeriesID           sql.NullInt32
@@ -44,7 +46,7 @@ type Competition struct {
 type Competitor struct {
 	ID                  int32
 	OrganizerID         int32
-	CompetitionID       int32
+	CompetitionID       domain.CompetitionID
 	RegistrationCode    string
 	Name                sql.NullString
 	CategoryID          sql.NullInt32
@@ -69,7 +71,7 @@ type OrganizerInvite struct {
 type Problem struct {
 	ID                 int32
 	OrganizerID        int32
-	CompetitionID      int32
+	CompetitionID      domain.CompetitionID
 	Number             int32
 	HoldColorPrimary   string
 	HoldColorSecondary sql.NullString
@@ -85,7 +87,7 @@ type Problem struct {
 type Raffle struct {
 	ID            int32
 	OrganizerID   int32
-	CompetitionID int32
+	CompetitionID domain.CompetitionID
 }
 
 type RaffleWinner struct {
@@ -114,7 +116,7 @@ type Series struct {
 type Tick struct {
 	ID            int32
 	OrganizerID   int32
-	CompetitionID int32
+	CompetitionID domain.CompetitionID
 	CompetitorID  int32
 	ProblemID     int32
 	Timestamp     time.Time

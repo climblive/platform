@@ -15,7 +15,7 @@
   import { navigate } from "svelte-routing";
 
   type Props = {
-    competitionId: number;
+    competitionId: string;
   };
 
   const { competitionId }: Props = $props();

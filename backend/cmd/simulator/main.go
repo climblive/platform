@@ -336,7 +336,7 @@ func (r *CompetitorRunner) PatchCompetitor(competitorID domain.CompetitorID, pat
 }
 
 func (r *CompetitorRunner) GetCategories(competitionID domain.CompetitionID) []domain.Category {
-	resp, err := http.Get(fmt.Sprintf("%s/competitions/%d/categories", r.apiURL, competitionID))
+	resp, err := http.Get(fmt.Sprintf("%s/competitions/%s/categories", r.apiURL, competitionID))
 	if err != nil {
 		panic(err)
 	}
@@ -358,7 +358,7 @@ func (r *CompetitorRunner) GetCategories(competitionID domain.CompetitionID) []d
 }
 
 func (r *CompetitorRunner) GetProblems(competitionID domain.CompetitionID) []domain.Problem {
-	resp, err := http.Get(fmt.Sprintf("%s/competitions/%d/problems", r.apiURL, competitionID))
+	resp, err := http.Get(fmt.Sprintf("%s/competitions/%s/problems", r.apiURL, competitionID))
 	if err != nil {
 		panic(err)
 	}

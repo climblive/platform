@@ -3,7 +3,7 @@ import { ownershipDataSchema } from "./common";
 import type { Competition } from "./generated";
 
 export const competitionSchema: z.ZodType<Competition> = z.object({
-  id: z.number(),
+  id: z.string().uuid(),
   ownership: ownershipDataSchema,
   archivedAt: z.coerce.date().optional(),
   location: z.string().optional(),

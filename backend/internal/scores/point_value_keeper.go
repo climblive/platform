@@ -70,7 +70,7 @@ func (k *PointValueKeeper) Run(ctx context.Context, options ...func(*runOptions)
 
 func (k *PointValueKeeper) run(ctx context.Context, ready chan<- struct{}) {
 	filter := domain.NewEventFilter(
-		0,
+		domain.CompetitionID{},
 		0,
 		"POINT_VALUE_UPDATED",
 	)

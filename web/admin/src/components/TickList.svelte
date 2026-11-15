@@ -14,7 +14,7 @@
   import { format } from "date-fns";
 
   interface Props {
-    competitionId: number;
+    competitionId: string;
     competitorId: number;
   }
 

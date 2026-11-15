@@ -9,6 +9,8 @@ import (
 	"context"
 	"database/sql"
 	"time"
+
+	"github.com/climblive/platform/backend/internal/domain"
 )
 
 const addUserToOrganizer = `-- name: AddUserToOrganizer :exec
@@ -31,10 +33,10 @@ func (q *Queries) AddUserToOrganizer(ctx context.Context, arg AddUserToOrganizer
 const countCompetitors = `-- name: CountCompetitors :one
 SELECT COUNT(*)
 FROM contender
-WHERE contest_id = ?
+WHERE competition_id = ?
 `
 
-func (q *Queries) CountCompetitors(ctx context.Context, competitionID int32) (int64, error) {
+func (q *Queries) CountCompetitors(ctx context.Context, competitionID domain.CompetitionID) (int64, error) {
 	row := q.db.QueryRowContext(ctx, countCompetitors, competitionID)
 	var count int64
 	err := row.Scan(&count)
@@ -52,11 +54,11 @@ func (q *Queries) DeleteCategory(ctx context.Context, id int32) error {
 }
 
 const deleteCompetition = `-- name: DeleteCompetition :exec
-DELETE FROM contest
+DELETE FROM competition
 WHERE id = ?
 `
 
-func (q *Queries) DeleteCompetition(ctx context.Context, id int32) error {
+func (q *Queries) DeleteCompetition(ctx context.Context, id domain.CompetitionID) error {
 	_, err := q.db.ExecContext(ctx, deleteCompetition, id)
 	return err
 }
@@ -123,11 +125,11 @@ func (q *Queries) DeleteTick(ctx context.Context, id int32) error {
 }
 
 const getAllCompetitions = `-- name: GetAllCompetitions :many
-SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.max_attempts, contest.point_deduction, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_competitors
-FROM contest
-LEFT JOIN comp_class cc ON cc.contest_id = contest.id
-LEFT JOIN contender c ON c.contest_id = contest.id
-GROUP BY contest.id
+SELECT competition.id, competition.organizer_id, competition.archived_at, competition.series_id, competition.name, competition.description, competition.location, competition.country, competition.qualifying_problems, competition.finalists, competition.use_points, competition.pooled_points, competition.max_attempts, competition.point_deduction, competition.info, competition.grace_period, competition.name_retention_time, competition.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_competitors
+FROM competition
+LEFT JOIN comp_class cc ON cc.competition_id = competition.id
+LEFT JOIN contender c ON c.competition_id = competition.id
+GROUP BY competition.id
 `
 
 type GetAllCompetitionsRow struct {
@@ -211,16 +213,16 @@ func (q *Queries) GetAllOrganizers(ctx context.Context) ([]Organizer, error) {
 }
 
 const getCategoriesByCompetition = `-- name: GetCategoriesByCompetition :many
-SELECT comp_class.id, comp_class.organizer_id, comp_class.contest_id, comp_class.name, comp_class.description, comp_class.color, comp_class.time_begin, comp_class.time_end
+SELECT comp_class.id, comp_class.organizer_id, comp_class.competition_id, comp_class.name, comp_class.description, comp_class.color, comp_class.time_begin, comp_class.time_end
 FROM comp_class
-WHERE contest_id = ?
+WHERE competition_id = ?
 `
 
 type GetCategoriesByCompetitionRow struct {
 	Category Category
 }
 
-func (q *Queries) GetCategoriesByCompetition(ctx context.Context, competitionID int32) ([]GetCategoriesByCompetitionRow, error) {
+func (q *Queries) GetCategoriesByCompetition(ctx context.Context, competitionID domain.CompetitionID) ([]GetCategoriesByCompetitionRow, error) {
 	rows, err := q.db.QueryContext(ctx, getCategoriesByCompetition, competitionID)
 	if err != nil {
 		return nil, err
@@ -253,7 +255,7 @@ func (q *Queries) GetCategoriesByCompetition(ctx context.Context, competitionID 
 }
 
 const getCategory = `-- name: GetCategory :one
-SELECT comp_class.id, comp_class.organizer_id, comp_class.contest_id, comp_class.name, comp_class.description, comp_class.color, comp_class.time_begin, comp_class.time_end
+SELECT comp_class.id, comp_class.organizer_id, comp_class.competition_id, comp_class.name, comp_class.description, comp_class.color, comp_class.time_begin, comp_class.time_end
 FROM comp_class
 WHERE id = ?
 `
@@ -279,12 +281,12 @@ func (q *Queries) GetCategory(ctx context.Context, id int32) (GetCategoryRow, er
 }
 
 const getCompetition = `-- name: GetCompetition :one
-SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.max_attempts, contest.point_deduction, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_competitors
-FROM contest
-LEFT JOIN comp_class cc ON cc.contest_id = contest.id
-LEFT JOIN contender c ON c.contest_id = contest.id
-WHERE contest.id = ?
-GROUP BY contest.id
+SELECT competition.id, competition.organizer_id, competition.archived_at, competition.series_id, competition.name, competition.description, competition.location, competition.country, competition.qualifying_problems, competition.finalists, competition.use_points, competition.pooled_points, competition.max_attempts, competition.point_deduction, competition.info, competition.grace_period, competition.name_retention_time, competition.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_competitors
+FROM competition
+LEFT JOIN comp_class cc ON cc.competition_id = competition.id
+LEFT JOIN contender c ON c.competition_id = competition.id
+WHERE competition.id = ?
+GROUP BY competition.id
 `
 
 type GetCompetitionRow struct {
@@ -294,7 +296,7 @@ type GetCompetitionRow struct {
 	RegisteredCompetitors int64
 }
 
-func (q *Queries) GetCompetition(ctx context.Context, id int32) (GetCompetitionRow, error) {
+func (q *Queries) GetCompetition(ctx context.Context, id domain.CompetitionID) (GetCompetitionRow, error) {
 	row := q.db.QueryRowContext(ctx, getCompetition, id)
 	var i GetCompetitionRow
 	err := row.Scan(
@@ -324,12 +326,12 @@ func (q *Queries) GetCompetition(ctx context.Context, id int32) (GetCompetitionR
 }
 
 const getCompetitionsByOrganizer = `-- name: GetCompetitionsByOrganizer :many
-SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.max_attempts, contest.point_deduction, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_competitors
-FROM contest
-LEFT JOIN comp_class cc ON cc.contest_id = contest.id
-LEFT JOIN contender c ON c.contest_id = contest.id
-WHERE contest.organizer_id = ?
-GROUP BY contest.id
+SELECT competition.id, competition.organizer_id, competition.archived_at, competition.series_id, competition.name, competition.description, competition.location, competition.country, competition.qualifying_problems, competition.finalists, competition.use_points, competition.pooled_points, competition.max_attempts, competition.point_deduction, competition.info, competition.grace_period, competition.name_retention_time, competition.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_competitors
+FROM competition
+LEFT JOIN comp_class cc ON cc.competition_id = competition.id
+LEFT JOIN contender c ON c.competition_id = competition.id
+WHERE competition.organizer_id = ?
+GROUP BY competition.id
 `
 
 type GetCompetitionsByOrganizerRow struct {
@@ -388,11 +390,11 @@ const getCompetitionsCurrentlyRunningOrByStartTime = `-- name: GetCompetitionsCu
 SELECT
 	id, organizer_id, archived_at, series_id, name, description, location, country, qualifying_problems, finalists, use_points, pooled_points, max_attempts, point_deduction, info, grace_period, name_retention_time, created, time_begin, time_end
 FROM (
-    SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.max_attempts, contest.point_deduction, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
-    FROM contest
-    JOIN comp_class cc ON cc.contest_id = contest.id
+    SELECT competition.id, competition.organizer_id, competition.archived_at, competition.series_id, competition.name, competition.description, competition.location, competition.country, competition.qualifying_problems, competition.finalists, competition.use_points, competition.pooled_points, competition.max_attempts, competition.point_deduction, competition.info, competition.grace_period, competition.name_retention_time, competition.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+    FROM competition
+    JOIN comp_class cc ON cc.competition_id = competition.id
     WHERE archived_at IS NULL
-    GROUP BY contest.id) AS sub
+    GROUP BY competition.id) AS sub
 WHERE
     NOW() BETWEEN sub.time_begin AND DATE_ADD(sub.time_end, INTERVAL (sub.grace_period + 15) MINUTE)
 	OR sub.time_begin BETWEEN ? AND ?
@@ -404,7 +406,7 @@ type GetCompetitionsCurrentlyRunningOrByStartTimeParams struct {
 }
 
 type GetCompetitionsCurrentlyRunningOrByStartTimeRow struct {
-	ID                 int32
+	ID                 domain.CompetitionID
 	OrganizerID        int32
 	ArchivedAt         sql.NullTime
 	SeriesID           sql.NullInt32
@@ -471,7 +473,7 @@ func (q *Queries) GetCompetitionsCurrentlyRunningOrByStartTime(ctx context.Conte
 }
 
 const getCompetitor = `-- name: GetCompetitor :one
-SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
+SELECT contender.id, contender.organizer_id, contender.competition_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
 FROM contender
 LEFT JOIN result ON result.contender_id = id
 WHERE id = ?
@@ -513,7 +515,7 @@ func (q *Queries) GetCompetitor(ctx context.Context, id int32) (GetCompetitorRow
 }
 
 const getCompetitorByCode = `-- name: GetCompetitorByCode :one
-SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
+SELECT contender.id, contender.organizer_id, contender.competition_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
 FROM contender
 LEFT JOIN result ON result.contender_id = id
 WHERE registration_code = ?
@@ -555,7 +557,7 @@ func (q *Queries) GetCompetitorByCode(ctx context.Context, registrationCode stri
 }
 
 const getCompetitorsByCategory = `-- name: GetCompetitorsByCategory :many
-SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
+SELECT contender.id, contender.organizer_id, contender.competition_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
 FROM contender
 LEFT JOIN result ON result.contender_id = id
 WHERE class_id = ?
@@ -613,10 +615,10 @@ func (q *Queries) GetCompetitorsByCategory(ctx context.Context, categoryID sql.N
 }
 
 const getCompetitorsByCompetition = `-- name: GetCompetitorsByCompetition :many
-SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
+SELECT contender.id, contender.organizer_id, contender.competition_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
 FROM contender
 LEFT JOIN result ON result.contender_id = id
-WHERE contest_id = ?
+WHERE competition_id = ?
 `
 
 type GetCompetitorsByCompetitionRow struct {
@@ -629,7 +631,7 @@ type GetCompetitorsByCompetitionRow struct {
 	RankOrder    sql.NullInt32
 }
 
-func (q *Queries) GetCompetitorsByCompetition(ctx context.Context, competitionID int32) ([]GetCompetitorsByCompetitionRow, error) {
+func (q *Queries) GetCompetitorsByCompetition(ctx context.Context, competitionID domain.CompetitionID) ([]GetCompetitorsByCompetitionRow, error) {
 	rows, err := q.db.QueryContext(ctx, getCompetitorsByCompetition, competitionID)
 	if err != nil {
 		return nil, err
@@ -748,7 +750,7 @@ func (q *Queries) GetOrganizerInvitesByOrganizer(ctx context.Context, organizerI
 }
 
 const getProblem = `-- name: GetProblem :one
-SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
+SELECT problem.id, problem.organizer_id, problem.competition_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
 FROM problem
 WHERE id = ?
 `
@@ -779,13 +781,13 @@ func (q *Queries) GetProblem(ctx context.Context, id int32) (GetProblemRow, erro
 }
 
 const getProblemByNumber = `-- name: GetProblemByNumber :one
-SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
+SELECT problem.id, problem.organizer_id, problem.competition_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
 FROM problem
-WHERE contest_id = ? AND number = ?
+WHERE competition_id = ? AND number = ?
 `
 
 type GetProblemByNumberParams struct {
-	CompetitionID int32
+	CompetitionID domain.CompetitionID
 	Number        int32
 }
 
@@ -815,16 +817,16 @@ func (q *Queries) GetProblemByNumber(ctx context.Context, arg GetProblemByNumber
 }
 
 const getProblemsByCompetition = `-- name: GetProblemsByCompetition :many
-SELECT problem.id, problem.organizer_id, problem.contest_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
+SELECT problem.id, problem.organizer_id, problem.competition_id, problem.number, problem.hold_color_primary, problem.hold_color_secondary, problem.zone_1_enabled, problem.zone_2_enabled, problem.description, problem.points_zone_1, problem.points_zone_2, problem.points_top, problem.flash_bonus
 FROM problem
-WHERE contest_id = ?
+WHERE competition_id = ?
 `
 
 type GetProblemsByCompetitionRow struct {
 	Problem Problem
 }
 
-func (q *Queries) GetProblemsByCompetition(ctx context.Context, competitionID int32) ([]GetProblemsByCompetitionRow, error) {
+func (q *Queries) GetProblemsByCompetition(ctx context.Context, competitionID domain.CompetitionID) ([]GetProblemsByCompetitionRow, error) {
 	rows, err := q.db.QueryContext(ctx, getProblemsByCompetition, competitionID)
 	if err != nil {
 		return nil, err
@@ -862,7 +864,7 @@ func (q *Queries) GetProblemsByCompetition(ctx context.Context, competitionID in
 }
 
 const getRaffle = `-- name: GetRaffle :one
-SELECT raffle.id, raffle.organizer_id, raffle.contest_id
+SELECT raffle.id, raffle.organizer_id, raffle.competition_id
 FROM raffle
 WHERE id = ?
 `
@@ -923,16 +925,16 @@ func (q *Queries) GetRaffleWinners(ctx context.Context, raffleID int32) ([]GetRa
 }
 
 const getRafflesByCompetition = `-- name: GetRafflesByCompetition :many
-SELECT raffle.id, raffle.organizer_id, raffle.contest_id
+SELECT raffle.id, raffle.organizer_id, raffle.competition_id
 FROM raffle
-WHERE contest_id = ?
+WHERE competition_id = ?
 `
 
 type GetRafflesByCompetitionRow struct {
 	Raffle Raffle
 }
 
-func (q *Queries) GetRafflesByCompetition(ctx context.Context, competitionID int32) ([]GetRafflesByCompetitionRow, error) {
+func (q *Queries) GetRafflesByCompetition(ctx context.Context, competitionID domain.CompetitionID) ([]GetRafflesByCompetitionRow, error) {
 	rows, err := q.db.QueryContext(ctx, getRafflesByCompetition, competitionID)
 	if err != nil {
 		return nil, err
@@ -956,7 +958,7 @@ func (q *Queries) GetRafflesByCompetition(ctx context.Context, competitionID int
 }
 
 const getScrubEligibleCompetitors = `-- name: GetScrubEligibleCompetitors :many
-SELECT contender.id, contender.organizer_id, contender.contest_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
+SELECT contender.id, contender.organizer_id, contender.competition_id, contender.registration_code, contender.name, contender.class_id, contender.entered, contender.disqualified, contender.withdrawn_from_finals, contender.scrubbed_at, contender.scrub_before, result.contender_id, result.timestamp, result.score, result.placement, result.finalist, result.rank_order
 FROM contender
 LEFT JOIN result ON result.contender_id = id
 WHERE contender.name != ''
@@ -1016,7 +1018,7 @@ func (q *Queries) GetScrubEligibleCompetitors(ctx context.Context, scrubBefore s
 }
 
 const getTick = `-- name: GetTick :one
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.revision, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
+SELECT tick.id, tick.organizer_id, tick.competition_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.revision, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick
 WHERE id = ?
 `
@@ -1047,7 +1049,7 @@ func (q *Queries) GetTick(ctx context.Context, id int32) (GetTickRow, error) {
 }
 
 const getTickByCompetitorAndProblem = `-- name: GetTickByCompetitorAndProblem :one
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.revision, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
+SELECT tick.id, tick.organizer_id, tick.competition_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.revision, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick
 WHERE contender_id = ? AND problem_id = ?
 `
@@ -1083,16 +1085,16 @@ func (q *Queries) GetTickByCompetitorAndProblem(ctx context.Context, arg GetTick
 }
 
 const getTicksByCompetition = `-- name: GetTicksByCompetition :many
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.revision, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
+SELECT tick.id, tick.organizer_id, tick.competition_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.revision, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick
-WHERE contest_id = ?
+WHERE competition_id = ?
 `
 
 type GetTicksByCompetitionRow struct {
 	Tick Tick
 }
 
-func (q *Queries) GetTicksByCompetition(ctx context.Context, competitionID int32) ([]GetTicksByCompetitionRow, error) {
+func (q *Queries) GetTicksByCompetition(ctx context.Context, competitionID domain.CompetitionID) ([]GetTicksByCompetitionRow, error) {
 	rows, err := q.db.QueryContext(ctx, getTicksByCompetition, competitionID)
 	if err != nil {
 		return nil, err
@@ -1130,7 +1132,7 @@ func (q *Queries) GetTicksByCompetition(ctx context.Context, competitionID int32
 }
 
 const getTicksByCompetitor = `-- name: GetTicksByCompetitor :many
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.revision, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
+SELECT tick.id, tick.organizer_id, tick.competition_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.revision, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick
 WHERE contender_id = ?
 `
@@ -1177,7 +1179,7 @@ func (q *Queries) GetTicksByCompetitor(ctx context.Context, competitorID int32) 
 }
 
 const getTicksByProblem = `-- name: GetTicksByProblem :many
-SELECT tick.id, tick.organizer_id, tick.contest_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.revision, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
+SELECT tick.id, tick.organizer_id, tick.competition_id, tick.contender_id, tick.problem_id, tick.timestamp, tick.revision, tick.zone_1, tick.attempts_zone_1, tick.zone_2, tick.attempts_zone_2, tick.top, tick.attempts_top
 FROM tick
 WHERE problem_id = ?
 `
@@ -1319,12 +1321,12 @@ func (q *Queries) InsertOrganizerInvite(ctx context.Context, arg InsertOrganizer
 
 const upsertCategory = `-- name: UpsertCategory :execlastid
 INSERT INTO 
-	comp_class (id, organizer_id, contest_id, name, description, color, time_begin, time_end)
+	comp_class (id, organizer_id, competition_id, name, description, color, time_begin, time_end)
 VALUES 
 	(?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
-    contest_id = VALUES(contest_id),
+    competition_id = VALUES(competition_id),
     name = VALUES(name),
     description = VALUES(description),
     color = VALUES(color),
@@ -1335,7 +1337,7 @@ ON DUPLICATE KEY UPDATE
 type UpsertCategoryParams struct {
 	ID            int32
 	OrganizerID   int32
-	CompetitionID int32
+	CompetitionID domain.CompetitionID
 	Name          string
 	Description   sql.NullString
 	Color         sql.NullString
@@ -1360,9 +1362,9 @@ func (q *Queries) UpsertCategory(ctx context.Context, arg UpsertCategoryParams) 
 	return result.LastInsertId()
 }
 
-const upsertCompetition = `-- name: UpsertCompetition :execlastid
+const upsertCompetition = `-- name: UpsertCompetition :exec
 INSERT INTO 
-	contest (id, organizer_id, archived_at, series_id, name, description, location, country, qualifying_problems, finalists, use_points, pooled_points, max_attempts, point_deduction, info, grace_period, name_retention_time, created)
+	competition (id, organizer_id, archived_at, series_id, name, description, location, country, qualifying_problems, finalists, use_points, pooled_points, max_attempts, point_deduction, info, grace_period, name_retention_time, created)
 VALUES 
 	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
@@ -1386,7 +1388,7 @@ ON DUPLICATE KEY UPDATE
 `
 
 type UpsertCompetitionParams struct {
-	ID                 int32
+	ID                 domain.CompetitionID
 	OrganizerID        int32
 	ArchivedAt         sql.NullTime
 	SeriesID           sql.NullInt32
@@ -1406,8 +1408,8 @@ type UpsertCompetitionParams struct {
 	Created            time.Time
 }
 
-func (q *Queries) UpsertCompetition(ctx context.Context, arg UpsertCompetitionParams) (int64, error) {
-	result, err := q.db.ExecContext(ctx, upsertCompetition,
+func (q *Queries) UpsertCompetition(ctx context.Context, arg UpsertCompetitionParams) error {
+	_, err := q.db.ExecContext(ctx, upsertCompetition,
 		arg.ID,
 		arg.OrganizerID,
 		arg.ArchivedAt,
@@ -1427,20 +1429,17 @@ func (q *Queries) UpsertCompetition(ctx context.Context, arg UpsertCompetitionPa
 		arg.NameRetentionTime,
 		arg.Created,
 	)
-	if err != nil {
-		return 0, err
-	}
-	return result.LastInsertId()
+	return err
 }
 
 const upsertCompetitor = `-- name: UpsertCompetitor :execlastid
 INSERT INTO
-	contender (id, organizer_id, contest_id, registration_code, name, class_id, entered, disqualified, withdrawn_from_finals, scrubbed_at, scrub_before)
+	contender (id, organizer_id, competition_id, registration_code, name, class_id, entered, disqualified, withdrawn_from_finals, scrubbed_at, scrub_before)
 VALUES
 	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
-    contest_id = VALUES(contest_id),
+    competition_id = VALUES(competition_id),
     registration_code = VALUES(registration_code),
     name = VALUES(name),
     class_id = VALUES(class_id),
@@ -1454,7 +1453,7 @@ ON DUPLICATE KEY UPDATE
 type UpsertCompetitorParams struct {
 	ID                  int32
 	OrganizerID         int32
-	CompetitionID       int32
+	CompetitionID       domain.CompetitionID
 	RegistrationCode    string
 	Name                sql.NullString
 	CategoryID          sql.NullInt32
@@ -1509,12 +1508,12 @@ func (q *Queries) UpsertOrganizer(ctx context.Context, arg UpsertOrganizerParams
 
 const upsertProblem = `-- name: UpsertProblem :execlastid
 INSERT INTO 
-	problem (id, organizer_id, contest_id, number, hold_color_primary, hold_color_secondary, zone_1_enabled, zone_2_enabled, description, points_zone_1, points_zone_2, points_top, flash_bonus)
+	problem (id, organizer_id, competition_id, number, hold_color_primary, hold_color_secondary, zone_1_enabled, zone_2_enabled, description, points_zone_1, points_zone_2, points_top, flash_bonus)
 VALUES 
 	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
-    contest_id = VALUES(contest_id),
+    competition_id = VALUES(competition_id),
     number = VALUES(number),
     hold_color_primary = VALUES(hold_color_primary),
     hold_color_secondary = VALUES(hold_color_secondary),
@@ -1530,7 +1529,7 @@ ON DUPLICATE KEY UPDATE
 type UpsertProblemParams struct {
 	ID                 int32
 	OrganizerID        int32
-	CompetitionID      int32
+	CompetitionID      domain.CompetitionID
 	Number             int32
 	HoldColorPrimary   string
 	HoldColorSecondary sql.NullString
@@ -1567,18 +1566,18 @@ func (q *Queries) UpsertProblem(ctx context.Context, arg UpsertProblemParams) (i
 
 const upsertRaffle = `-- name: UpsertRaffle :execlastid
 INSERT INTO
-    raffle (id, organizer_id, contest_id)
+    raffle (id, organizer_id, competition_id)
 VALUES
     (?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
-    contest_id = VALUES(contest_id)
+    competition_id = VALUES(competition_id)
 `
 
 type UpsertRaffleParams struct {
 	ID            int32
 	OrganizerID   int32
-	CompetitionID int32
+	CompetitionID domain.CompetitionID
 }
 
 func (q *Queries) UpsertRaffle(ctx context.Context, arg UpsertRaffleParams) (int64, error) {
@@ -1659,12 +1658,12 @@ func (q *Queries) UpsertResult(ctx context.Context, arg UpsertResultParams) erro
 
 const upsertTick = `-- name: UpsertTick :execresult
 INSERT INTO
-    tick (id, organizer_id, contest_id, contender_id, problem_id, timestamp, revision, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
+    tick (id, organizer_id, competition_id, contender_id, problem_id, timestamp, revision, top, attempts_top, zone_1, attempts_zone_1, zone_2, attempts_zone_2)
 VALUES
     (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = IF(VALUES(revision) > revision, VALUES(organizer_id), organizer_id),
-    contest_id = IF(VALUES(revision) > revision, VALUES(contest_id), contest_id),
+    competition_id = IF(VALUES(revision) > revision, VALUES(competition_id), competition_id),
     contender_id = IF(VALUES(revision) > revision, VALUES(contender_id), contender_id),
     problem_id = IF(VALUES(revision) > revision, VALUES(problem_id), problem_id),
     timestamp = IF(VALUES(revision) > revision, VALUES(timestamp), timestamp),
@@ -1680,7 +1679,7 @@ ON DUPLICATE KEY UPDATE
 type UpsertTickParams struct {
 	ID            int32
 	OrganizerID   int32
-	CompetitionID int32
+	CompetitionID domain.CompetitionID
 	CompetitorID  int32
 	ProblemID     int32
 	Timestamp     time.Time

@@ -20,7 +20,7 @@
   import Bar from "./Bar.svelte";
 
   interface Props {
-    competitionId: number;
+    competitionId: string;
   }
 
   export interface ProblemStats {

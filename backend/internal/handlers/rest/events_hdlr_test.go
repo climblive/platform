@@ -24,7 +24,7 @@ import (
 )
 
 func TestEventsHandler(t *testing.T) {
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 
 	makeMocks := func(bufferCapacity int, filters []domain.EventFilter) (*eventBrokerMock, *events.Subscription) {
@@ -136,8 +136,8 @@ func TestEventsHandler(t *testing.T) {
 
 	t.Run("MixedCompetitionIDs", func(t *testing.T) {
 		filters := []domain.EventFilter{
-			domain.NewEventFilter(1, 0),
-			domain.NewEventFilter(2, 0),
+			domain.NewEventFilter(testutils.RandomCompetitionID(), 0),
+			domain.NewEventFilter(testutils.RandomCompetitionID(), 0),
 		}
 		mockedEventBroker := new(eventBrokerMock)
 

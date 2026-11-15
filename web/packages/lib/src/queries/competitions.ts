@@ -12,7 +12,7 @@ import {
   type CompetitionTemplate,
 } from "../models";
 
-export const getCompetitionQuery = (competitionId: number) =>
+export const getCompetitionQuery = (competitionId: string) =>
   createQuery(() => ({
     queryKey: ["competition", { id: competitionId }],
     queryFn: async () => ApiClient.getInstance().getCompetition(competitionId),
@@ -58,7 +58,7 @@ export const createCompetitionMutation = (organizerId: number) => {
   }));
 };
 
-export const patchCompetitionMutation = (competitionId: number) => {
+export const patchCompetitionMutation = (competitionId: string) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
@@ -91,7 +91,7 @@ export const patchCompetitionMutation = (competitionId: number) => {
   }));
 };
 
-export const duplicateCompetitionMutation = (competitionId: number) => {
+export const duplicateCompetitionMutation = (competitionId: string) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
@@ -114,7 +114,7 @@ export const duplicateCompetitionMutation = (competitionId: number) => {
   }));
 };
 
-export const archiveCompetitionMutation = (competitionId: number) => {
+export const archiveCompetitionMutation = (competitionId: string) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
@@ -146,7 +146,7 @@ export const archiveCompetitionMutation = (competitionId: number) => {
   }));
 };
 
-export const restoreCompetitionMutation = (competitionId: number) => {
+export const restoreCompetitionMutation = (competitionId: string) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
@@ -178,7 +178,7 @@ export const restoreCompetitionMutation = (competitionId: number) => {
   }));
 };
 
-export const transferCompetitionMutation = (competitionId: number) => {
+export const transferCompetitionMutation = (competitionId: string) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
@@ -225,7 +225,7 @@ export const transferCompetitionMutation = (competitionId: number) => {
 
 export const updateRulesInQueryCache = (
   queryClient: QueryClient,
-  competitionId: number,
+  competitionId: string,
   updatedRules: Pick<
     Competition,
     | "qualifyingProblems"

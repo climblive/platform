@@ -13,13 +13,13 @@ export const getRaffleQuery = (raffleId: number) =>
     queryFn: async () => ApiClient.getInstance().getRaffle(raffleId),
   }));
 
-export const getRafflesQuery = (competitionId: number) =>
+export const getRafflesQuery = (competitionId: string) =>
   createQuery(() => ({
     queryKey: ["raffles", { competitionId }],
     queryFn: async () => ApiClient.getInstance().getRaffles(competitionId),
   }));
 
-export const createRaffleMutation = (competitionId: number) => {
+export const createRaffleMutation = (competitionId: string) => {
   const client = useQueryClient();
 
   return createMutation(() => ({

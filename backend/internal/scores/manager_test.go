@@ -47,7 +47,7 @@ func TestScoreEngineManager(t *testing.T) {
 		mockedEventBroker := new(eventBrokerMock)
 
 		fakedSubscriptionID := domain.SubscriptionID(uuid.New())
-		fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+		fakedCompetitionID := testutils.RandomCompetitionID()
 
 		now := time.Now()
 
@@ -112,7 +112,7 @@ func TestScoreEngineManager(t *testing.T) {
 		mockedEventBroker := new(eventBrokerMock)
 
 		fakedSubscriptionID := domain.SubscriptionID(uuid.New())
-		fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+		fakedCompetitionID := testutils.RandomCompetitionID()
 
 		now := time.Now()
 

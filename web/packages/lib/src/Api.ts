@@ -132,7 +132,7 @@ export class ApiClient {
     return z.array(pointValueSchema).parse(result.data);
   };
 
-  getCompetitorsByCompetition = async (competitionId: number) => {
+  getCompetitorsByCompetition = async (competitionId: string) => {
     const endpoint = `/competitions/${competitionId}/competitors`;
 
     const result = await this.axiosInstance.get(endpoint, {
@@ -163,7 +163,7 @@ export class ApiClient {
   };
 
   createCompetitors = async (
-    competitionId: number,
+    competitionId: string,
     args: CreateCompetitorsArguments,
   ) => {
     const endpoint = `/competitions/${competitionId}/competitors`;
@@ -175,7 +175,7 @@ export class ApiClient {
     return z.array(competitorSchema).parse(result.data);
   };
 
-  getCompetition = async (id: number) => {
+  getCompetition = async (id: string) => {
     const endpoint = `/competitions/${id}`;
 
     const result = await this.axiosInstance.get(endpoint);
@@ -206,7 +206,7 @@ export class ApiClient {
     return competitionSchema.parse(result.data);
   };
 
-  patchCompetition = async (id: number, patch: CompetitionPatch) => {
+  patchCompetition = async (id: string, patch: CompetitionPatch) => {
     const endpoint = `/competitions/${id}`;
 
     const result = await this.axiosInstance.patch(endpoint, patch, {
@@ -216,7 +216,7 @@ export class ApiClient {
     return competitionSchema.parse(result.data);
   };
 
-  duplicateCompetition = async (competitionId: number) => {
+  duplicateCompetition = async (competitionId: string) => {
     const endpoint = `/competitions/${competitionId}/duplicate`;
 
     const result = await this.axiosInstance.post(endpoint, undefined, {
@@ -226,7 +226,7 @@ export class ApiClient {
     return competitionSchema.parse(result.data);
   };
 
-  archiveCompetition = async (competitionId: number) => {
+  archiveCompetition = async (competitionId: string) => {
     const endpoint = `/competitions/${competitionId}/archive`;
 
     const result = await this.axiosInstance.post(endpoint, undefined, {
@@ -236,7 +236,7 @@ export class ApiClient {
     return competitionSchema.parse(result.data);
   };
 
-  restoreCompetition = async (competitionId: number) => {
+  restoreCompetition = async (competitionId: string) => {
     const endpoint = `/competitions/${competitionId}/restore`;
 
     const result = await this.axiosInstance.post(endpoint, undefined, {
@@ -247,7 +247,7 @@ export class ApiClient {
   };
 
   transferCompetition = async (
-    competitionId: number,
+    competitionId: string,
     newOrganizerId: number,
   ) => {
     const endpoint = `/competitions/${competitionId}/transfer`;
@@ -281,7 +281,7 @@ export class ApiClient {
     return problemSchema.parse(result.data);
   };
 
-  getProblemsByCompetition = async (competitionId: number) => {
+  getProblemsByCompetition = async (competitionId: string) => {
     const endpoint = `/competitions/${competitionId}/problems`;
 
     const result = await this.axiosInstance.get(endpoint);
@@ -289,7 +289,7 @@ export class ApiClient {
     return z.array(problemSchema).parse(result.data);
   };
 
-  createProblem = async (competitionId: number, template: ProblemTemplate) => {
+  createProblem = async (competitionId: string, template: ProblemTemplate) => {
     const endpoint = `/competitions/${competitionId}/problems`;
 
     const result = await this.axiosInstance.post(endpoint, template, {
@@ -325,7 +325,7 @@ export class ApiClient {
     return categorySchema.parse(result.data);
   };
 
-  getCategories = async (competitionId: number) => {
+  getCategories = async (competitionId: string) => {
     const endpoint = `/competitions/${competitionId}/categories`;
 
     const result = await this.axiosInstance.get(endpoint);
@@ -334,7 +334,7 @@ export class ApiClient {
   };
 
   createCategory = async (
-    competitionId: number,
+    competitionId: string,
     template: CategoryTemplate,
   ) => {
     const endpoint = `/competitions/${competitionId}/categories`;
@@ -374,7 +374,7 @@ export class ApiClient {
     return z.array(tickSchema).parse(result.data);
   };
 
-  getTicksByCompetition = async (competitionId: number) => {
+  getTicksByCompetition = async (competitionId: string) => {
     const endpoint = `/competitions/${competitionId}/ticks`;
 
     const result = await this.axiosInstance.get(endpoint, {
@@ -405,7 +405,7 @@ export class ApiClient {
     });
   };
 
-  getScoreboard = async (competitionId: number) => {
+  getScoreboard = async (competitionId: string) => {
     const endpoint = `/competitions/${competitionId}/scoreboard`;
 
     const result = await this.axiosInstance.get(endpoint);
@@ -464,7 +464,7 @@ export class ApiClient {
     return raffleSchema.parse(result.data);
   };
 
-  getRaffles = async (competitionId: number) => {
+  getRaffles = async (competitionId: string) => {
     const endpoint = `/competitions/${competitionId}/raffles`;
 
     const result = await this.axiosInstance.get(endpoint, {
@@ -474,7 +474,7 @@ export class ApiClient {
     return z.array(raffleSchema).parse(result.data);
   };
 
-  createRaffle = async (competitionId: number) => {
+  createRaffle = async (competitionId: string) => {
     const endpoint = `/competitions/${competitionId}/raffles`;
 
     const result = await this.axiosInstance.post(endpoint, undefined, {
@@ -596,7 +596,7 @@ export class ApiClient {
     return z.array(userSchema).parse(result.data);
   };
 
-  downloadResults = async (competitionId: number) => {
+  downloadResults = async (competitionId: string) => {
     const endpoint = `/competitions/${competitionId}/results`;
 
     const result = await this.axiosInstance.get(endpoint, {

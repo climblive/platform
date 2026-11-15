@@ -39,7 +39,7 @@
   const competitorQuery = $derived(getCompetitorQuery(competitorId));
   const patchCompetitor = $derived(patchCompetitorMutation(competitorId));
   const competitor = $derived(competitorQuery.data);
-  const competitionId = $derived(competitor?.competitionId ?? 0);
+  const competitionId = $derived(competitor?.competitionId ?? "");
 
   const categoriesQuery = $derived(
     getCategoriesQuery(competitionId, { enabled: !!competitionId }),

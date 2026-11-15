@@ -9,7 +9,7 @@
   } from "@climblive/lib/queries";
 
   interface Props {
-    competitionId: number;
+    competitionId: string;
   }
 
   let { competitionId }: Props = $props();

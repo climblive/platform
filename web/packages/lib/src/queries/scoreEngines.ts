@@ -27,7 +27,7 @@ export const getScoreEnginesQuery = () =>
     queryFn: async () => ApiClient.getInstance().getScoreEngines(),
   }));
 
-export const startScoreEngineMutation = (competitionId: number) => {
+export const startScoreEngineMutation = (competitionId: string) => {
   const client = useQueryClient();
 
   return createMutation(() => ({

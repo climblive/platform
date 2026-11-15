@@ -17,7 +17,7 @@
   const maxTickets = 500;
 
   interface Props {
-    competitionId: number;
+    competitionId: string;
     remainingCodes: number | undefined;
     onCreated?: (competitors: Competitor[]) => void;
   }

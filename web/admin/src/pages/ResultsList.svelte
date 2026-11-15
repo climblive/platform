@@ -8,7 +8,7 @@
   import { toastUnexpectedError } from "@climblive/lib/utils";
 
   interface Props {
-    competitionId: number;
+    competitionId: string;
   }
 
   let { competitionId }: Props = $props();

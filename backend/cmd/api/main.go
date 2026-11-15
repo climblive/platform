@@ -23,6 +23,7 @@ import (
 
 	"uuid"
 
+	_ "github.com/climblive/platform/backend/cmd/api/migrations"
 	"github.com/climblive/platform/backend/internal/authorizer"
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/events"

@@ -21,14 +21,14 @@
 
   interface Props {
     organizerId: number;
-    competitionId: number;
+    competitionId: string;
     open: boolean;
   }
 
   let { organizerId, competitionId, open = $bindable() }: Props = $props();
 
   let dialog: WaDialog | undefined = $state();
-  let selectedCompetitionId: number | undefined = $state();
+  let selectedCompetitionId: string | undefined = $state();
   let isCopying = $state(false);
   let copyProgress = $state(0);
   let copyCompleted = $state(false);
@@ -97,7 +97,7 @@
 
   const handleCompetitionChange = (e: Event) => {
     const select = e.target as WaSelect;
-    selectedCompetitionId = select.value ? Number(select.value) : undefined;
+    selectedCompetitionId = select.value ? String(select.value) : undefined;
   };
 
   const handleCopy = async () => {

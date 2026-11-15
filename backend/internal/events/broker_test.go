@@ -10,13 +10,13 @@ import (
 func TestBlockingSubscriber(t *testing.T) {
 	broker := events.NewBroker()
 	filter := domain.EventFilter{
-		CompetitionID: 1,
+		CompetitionID: domain.CompetitionID{1},
 	}
 
 	_, _ = broker.Subscribe([]domain.EventFilter{filter}, 1)
 
 	for range 100 {
-		broker.Dispatch(1, domain.CompetitorEnteredEvent{
+		broker.Dispatch(filter.CompetitionID, domain.CompetitorEnteredEvent{
 			CompetitorID: 1,
 		})
 	}

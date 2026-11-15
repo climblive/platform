@@ -56,7 +56,7 @@ func (d *Database) GetCompetitorsByCategory(ctx context.Context, tx domain.Trans
 }
 
 func (d *Database) GetCompetitorsByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Competitor, error) {
-	records, err := d.WithTx(tx).GetCompetitorsByCompetition(ctx, int32(competitionID))
+	records, err := d.WithTx(tx).GetCompetitorsByCompetition(ctx, competitionID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -76,7 +76,7 @@ func (d *Database) StoreCompetitor(ctx context.Context, tx domain.Transaction, c
 	params := database.UpsertCompetitorParams{
 		ID:                  int32(competitor.ID),
 		OrganizerID:         int32(competitor.Ownership.OrganizerID),
-		CompetitionID:       int32(competitor.CompetitionID),
+		CompetitionID:       competitor.CompetitionID,
 		RegistrationCode:    competitor.RegistrationCode,
 		Name:                makeNullString(competitor.Name),
 		CategoryID:          makeNullInt32(int32(competitor.CategoryID)),
@@ -109,7 +109,7 @@ func (d *Database) DeleteCompetitor(ctx context.Context, tx domain.Transaction, 
 }
 
 func (d *Database) GetNumberOfCompetitors(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (int, error) {
-	count, err := d.WithTx(tx).CountCompetitors(ctx, int32(competitionID))
+	count, err := d.WithTx(tx).CountCompetitors(ctx, competitionID)
 	if err != nil {
 		return 0, errors.Wrap(err, 0)
 	}

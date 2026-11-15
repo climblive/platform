@@ -14,7 +14,7 @@ export const getCategoryQuery = (categoryId: number) =>
   }));
 
 export const getCategoriesQuery = (
-  competitionId: number,
+  competitionId: string,
   options?: Partial<Parameters<typeof createQuery<Category[]>>[0]>,
 ) => {
   const client = useQueryClient();
@@ -38,7 +38,7 @@ export const getCategoriesQuery = (
   }));
 };
 
-export const createCategoryMutation = (competitionId: number) => {
+export const createCategoryMutation = (competitionId: string) => {
   const client = useQueryClient();
 
   return createMutation(() => ({

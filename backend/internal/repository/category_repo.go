@@ -22,7 +22,7 @@ func (d *Database) GetCategory(ctx context.Context, tx domain.Transaction, categ
 }
 
 func (d *Database) GetCategoriesByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Category, error) {
-	records, err := d.WithTx(tx).GetCategoriesByCompetition(ctx, int32(competitionID))
+	records, err := d.WithTx(tx).GetCategoriesByCompetition(ctx, competitionID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -40,7 +40,7 @@ func (d *Database) StoreCategory(ctx context.Context, tx domain.Transaction, cat
 	params := database.UpsertCategoryParams{
 		ID:            int32(category.ID),
 		OrganizerID:   int32(category.Ownership.OrganizerID),
-		CompetitionID: int32(category.CompetitionID),
+		CompetitionID: category.CompetitionID,
 		Name:          category.Name,
 		Description:   makeNullString(category.Description),
 		Color:         sql.NullString{String: "", Valid: false},

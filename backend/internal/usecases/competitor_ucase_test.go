@@ -371,7 +371,7 @@ func TestGetCompetitorsByCategory(t *testing.T) {
 }
 
 func TestGetCompetitorsByCompetition(t *testing.T) {
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 	}
@@ -562,7 +562,7 @@ func TestDeleteCompetitor(t *testing.T) {
 }
 
 func TestCreateCompetitors(t *testing.T) {
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
@@ -741,7 +741,7 @@ func TestPatchCompetitor(t *testing.T) {
 		OrganizerID:  testutils.RandomResourceID[domain.OrganizerID](),
 		CompetitorID: &fakedCompetitorID,
 	}
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 	currentTime := time.Now()
@@ -1709,7 +1709,7 @@ func TestScrubCompetitor(t *testing.T) {
 		OrganizerID:  testutils.RandomResourceID[domain.OrganizerID](),
 		CompetitorID: &fakedCompetitorID,
 	}
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 	t.Run("HappyPath", func(t *testing.T) {
@@ -1837,7 +1837,7 @@ func TestScrubCompetitor(t *testing.T) {
 }
 
 func TestScrubCompetitors(t *testing.T) {
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedDeadline := time.Date(2025, 6, 15, 12, 0, 0, 0, time.UTC)
 
 	t.Run("HappyPath", func(t *testing.T) {

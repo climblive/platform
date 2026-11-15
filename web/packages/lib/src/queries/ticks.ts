@@ -20,7 +20,7 @@ export const getTicksByCompetitorQuery = (
     refetchOnWindowFocus: "always",
   }));
 
-export const getTicksByCompetitionQuery = (competitionId: number) =>
+export const getTicksByCompetitionQuery = (competitionId: string) =>
   createQuery(() => ({
     queryKey: ["ticks", { competitionId }],
     queryFn: async () =>
@@ -84,7 +84,7 @@ export const updateTickInQueryCache = (
 
 export const updateTickInCompetitionQueryCache = (
   queryClient: QueryClient,
-  competitionId: number,
+  competitionId: string,
   updatedTick: Tick,
 ) => {
   const queryKey: QueryKey = ["ticks", { competitionId }];

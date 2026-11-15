@@ -6,7 +6,7 @@
   import { SyncedTime } from "../utils";
 
   interface Props {
-    competitionId: number;
+    competitionId: string;
     categoryId?: number;
     children?: Snippet<
       [{ competitionState: CompetitionState; progress: number }]

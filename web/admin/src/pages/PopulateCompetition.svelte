@@ -89,7 +89,7 @@
   ] as const;
 
   type Props = {
-    competitionId: number;
+    competitionId: string;
   };
 
   const { competitionId }: Props = $props();

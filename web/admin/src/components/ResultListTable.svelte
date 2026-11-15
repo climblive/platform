@@ -21,7 +21,7 @@
   import Loader from "./Loader.svelte";
 
   interface Props {
-    competitionId: number;
+    competitionId: string;
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
     loading: boolean;
   }

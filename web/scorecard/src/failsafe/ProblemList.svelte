@@ -7,7 +7,7 @@
   import Problem from "./Problem.svelte";
 
   type Props = {
-    competitionId: number;
+    competitionId: string;
     competitorId: number;
     enableAttempts: boolean;
   };

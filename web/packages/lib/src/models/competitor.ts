@@ -4,7 +4,7 @@ import { resultSchema } from "./result";
 
 export const competitorSchema: z.ZodType<Competitor> = z.object({
   id: z.number(),
-  competitionId: z.number(),
+  competitionId: z.string().uuid(),
   categoryId: z.number().optional(),
   registrationCode: z.string(),
   name: z.string().optional(),

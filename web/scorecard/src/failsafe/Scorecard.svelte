@@ -7,7 +7,7 @@
   import ProblemList from "./ProblemList.svelte";
 
   type Props = {
-    competitionId: number;
+    competitionId: string;
     competitorId: number;
   };
 

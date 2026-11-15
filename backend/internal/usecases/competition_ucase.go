@@ -319,7 +319,7 @@ func (uc *CompetitionUseCase) CreateCompetition(ctx context.Context, organizerID
 	}
 
 	competition := domain.Competition{
-		ID: 0,
+		ID: domain.CompetitionID{},
 		Ownership: domain.OwnershipData{
 			OrganizerID:  organizerID,
 			CompetitorID: nil,
@@ -382,7 +382,7 @@ func (uc *CompetitionUseCase) DuplicateCompetition(ctx context.Context, competit
 	}
 
 	duplicatedCompetition := competition
-	duplicatedCompetition.ID = 0
+	duplicatedCompetition.ID = domain.CompetitionID{}
 	duplicatedCompetition.Name += " (Copy)"
 
 	tx, err := uc.Repo.Begin()

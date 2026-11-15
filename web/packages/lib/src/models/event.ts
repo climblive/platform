@@ -63,7 +63,7 @@ export const raffleWinnerDrawnEventSchema: z.ZodType<RaffleWinnerDrawnEvent> =
   });
 
 export const rulesUpdatedEventSchema: z.ZodType<RulesUpdatedEvent> = z.object({
-  competitionId: z.number(),
+  competitionId: z.string().uuid(),
   qualifyingProblems: z.number(),
   finalists: z.number(),
   usePoints: z.boolean(),

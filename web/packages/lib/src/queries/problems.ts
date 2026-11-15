@@ -15,7 +15,7 @@ export const getProblemQuery = (problemId: number) =>
   }));
 
 export const getProblemsQuery = (
-  competitionId: number,
+  competitionId: string,
   options?: Partial<Parameters<typeof createQuery<Problem[]>>[0]>,
 ) =>
   createQuery(() => ({
@@ -25,7 +25,7 @@ export const getProblemsQuery = (
       ApiClient.getInstance().getProblemsByCompetition(competitionId),
   }));
 
-export const createProblemMutation = (competitionId: number) => {
+export const createProblemMutation = (competitionId: string) => {
   const client = useQueryClient();
 
   return createMutation(() => ({
@@ -106,7 +106,7 @@ export const deleteProblemMutation = (problemId: number) => {
 
 export const refetchProblems = (
   queryClient: QueryClient,
-  competitionId: number,
+  competitionId: string,
 ) => {
   queryClient.refetchQueries({ queryKey: ["problems", { competitionId }] });
 };

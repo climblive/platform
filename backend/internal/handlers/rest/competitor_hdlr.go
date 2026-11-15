@@ -100,7 +100,7 @@ func (hdlr *competitorHandler) GetCompetitorsByCategory(w http.ResponseWriter, r
 }
 
 func (hdlr *competitorHandler) GetCompetitorsByCompetition(w http.ResponseWriter, r *http.Request) {
-	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
+	competitionID, err := parseCompetitionID(r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -169,7 +169,7 @@ func (hdlr *competitorHandler) ScrubCompetitor(w http.ResponseWriter, r *http.Re
 }
 
 func (hdlr *competitorHandler) CreateCompetitors(w http.ResponseWriter, r *http.Request) {
-	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
+	competitionID, err := parseCompetitionID(r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return

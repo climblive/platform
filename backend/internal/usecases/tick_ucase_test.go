@@ -92,7 +92,7 @@ func TestGetTicksByCompetitor(t *testing.T) {
 }
 
 func TestGetTicksByCompetition(t *testing.T) {
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 	}
@@ -168,7 +168,7 @@ func TestGetTicksByCompetition(t *testing.T) {
 
 func TestPutTick(t *testing.T) {
 	fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
@@ -393,7 +393,7 @@ func TestPutTick(t *testing.T) {
 			On("GetProblem", mock.Anything, mock.Anything, fakedOtherProblemID).
 			Return(domain.Problem{
 				ID:            fakedOtherProblemID,
-				CompetitionID: fakedCompetitionID + 1,
+				CompetitionID: testutils.RandomCompetitionID(),
 			}, nil)
 
 		ucase := usecases.TickUseCase{
@@ -775,7 +775,7 @@ func TestPutTick(t *testing.T) {
 func TestDeleteTick(t *testing.T) {
 	fakedTickID := testutils.RandomResourceID[domain.TickID]()
 	fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 

@@ -20,7 +20,7 @@ import (
 )
 
 func TestGetCompetition(t *testing.T) {
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 
 	fakedCompetition := domain.Competition{
 		ID: fakedCompetitionID,
@@ -45,7 +45,7 @@ func TestGetCompetition(t *testing.T) {
 }
 
 func TestGetScoreboard(t *testing.T) {
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 	mockedRepo := new(repositoryMock)
@@ -141,7 +141,7 @@ func TestGetScoreboard(t *testing.T) {
 }
 
 func TestGetScoreboard_Empty(t *testing.T) {
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 
 	mockedRepo := new(repositoryMock)
 
@@ -164,7 +164,7 @@ func TestGetScoreboard_Empty(t *testing.T) {
 
 func TestGetCompetitionsByOrganizer(t *testing.T) {
 	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
@@ -238,7 +238,7 @@ func TestGetCompetitionsByOrganizer(t *testing.T) {
 
 func TestGetAllCompetitions(t *testing.T) {
 	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
@@ -327,7 +327,7 @@ func TestCreateCompetition(t *testing.T) {
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 
 	makeMocks := func() (*repositoryMock, *authorizerMock) {
 		mockedRepo := new(repositoryMock)
@@ -654,8 +654,8 @@ func TestCreateCompetition(t *testing.T) {
 }
 
 func TestDuplicateCompetition(t *testing.T) {
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
-	fakedDuplicatedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
+	fakedDuplicatedCompetitionID := testutils.RandomCompetitionID()
 	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 	fakedOwnership := domain.OwnershipData{
@@ -751,7 +751,7 @@ func TestDuplicateCompetition(t *testing.T) {
 		mockedRepo.
 			On("StoreCompetition", mock.Anything, mockedTx, mock.MatchedBy(func(competition domain.Competition) bool {
 				expected := fakedDuplicatedCompetition
-				expected.ID = 0
+				expected.ID = domain.CompetitionID{}
 
 				return competition == expected
 			})).
@@ -864,7 +864,7 @@ func TestDuplicateCompetition(t *testing.T) {
 }
 
 func TestTransferCompetition(t *testing.T) {
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedOldOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedNewOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
@@ -1245,7 +1245,7 @@ func TestTransferCompetition(t *testing.T) {
 func TestPatchCompetition(t *testing.T) {
 	t.Parallel()
 
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
@@ -1460,7 +1460,7 @@ func TestPatchCompetition(t *testing.T) {
 }
 
 func TestArchiveCompetition(t *testing.T) {
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
@@ -1567,7 +1567,7 @@ func TestArchiveCompetition(t *testing.T) {
 }
 
 func TestRestoreCompetition(t *testing.T) {
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,

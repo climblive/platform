@@ -6,7 +6,7 @@ type ResourceID int32
 
 type CategoryID ResourceID
 type CompetitorID ResourceID
-type CompetitionID ResourceID
+type CompetitionID uuid.UUID
 type OrganizerID ResourceID
 type ProblemID ResourceID
 type RaffleID ResourceID
@@ -20,7 +20,6 @@ type OrganizerInviteID = uuid.UUID
 type ResourceIDType interface {
 	CategoryID |
 		CompetitorID |
-		CompetitionID |
 		OrganizerID |
 		ProblemID |
 		RaffleID |

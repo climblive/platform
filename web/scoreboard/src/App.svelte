@@ -28,9 +28,9 @@
           >{#snippet children({
             params,
           }: {
-            params: { competitionId: number };
+            params: { competitionId: string };
           })}
-            <Scoreboard competitionId={Number(params.competitionId)} />
+            <Scoreboard competitionId={params.competitionId} />
           {/snippet}
         </Route>
       </Router>

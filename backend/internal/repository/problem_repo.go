@@ -10,7 +10,7 @@ import (
 )
 
 func (d *Database) GetProblemsByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Problem, error) {
-	records, err := d.WithTx(tx).GetProblemsByCompetition(ctx, int32(competitionID))
+	records, err := d.WithTx(tx).GetProblemsByCompetition(ctx, competitionID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -38,7 +38,7 @@ func (d *Database) GetProblem(ctx context.Context, tx domain.Transaction, proble
 
 func (d *Database) GetProblemByNumber(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID, problemNumber int) (domain.Problem, error) {
 	record, err := d.WithTx(tx).GetProblemByNumber(ctx, database.GetProblemByNumberParams{
-		CompetitionID: int32(competitionID),
+		CompetitionID: competitionID,
 		Number:        int32(problemNumber),
 	})
 	switch {
@@ -55,7 +55,7 @@ func (d *Database) StoreProblem(ctx context.Context, tx domain.Transaction, prob
 	params := database.UpsertProblemParams{
 		ID:                 int32(problem.ID),
 		OrganizerID:        int32(problem.Ownership.OrganizerID),
-		CompetitionID:      int32(problem.CompetitionID),
+		CompetitionID:      problem.CompetitionID,
 		Number:             int32(problem.Number),
 		HoldColorPrimary:   problem.HoldColorPrimary,
 		HoldColorSecondary: makeNullString(problem.HoldColorSecondary),

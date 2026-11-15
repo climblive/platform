@@ -8,7 +8,7 @@
   const maxTickets = 500;
 
   interface Props {
-    competitionId: number;
+    competitionId: string;
   }
 
   let { competitionId }: Props = $props();

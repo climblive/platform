@@ -5,7 +5,7 @@
   import { type Readable } from "svelte/store";
 
   interface Props {
-    competitionId: number;
+    competitionId: string;
     name: string;
     categoryId: number;
     startTime: Date;

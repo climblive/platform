@@ -21,7 +21,7 @@
   const createButtonId = $props.id();
 
   interface Props {
-    competitionId: number;
+    competitionId: string;
   }
 
   const { competitionId }: Props = $props();

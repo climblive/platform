@@ -20,7 +20,7 @@ func TestPointValueKeeper(t *testing.T) {
 		mockedEventBroker := new(eventBrokerMock)
 
 		filters := []domain.EventFilter{domain.NewEventFilter(
-			0,
+			domain.CompetitionID{},
 			0,
 			"POINT_VALUE_UPDATED",
 		)}

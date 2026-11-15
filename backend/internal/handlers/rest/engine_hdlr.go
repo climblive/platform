@@ -42,7 +42,7 @@ func (hdlr *scoreEngineHandler) ListScoreEngines(w http.ResponseWriter, r *http.
 }
 
 func (hdlr *scoreEngineHandler) ListScoreEnginesByCompetition(w http.ResponseWriter, r *http.Request) {
-	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
+	competitionID, err := parseCompetitionID(r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 
@@ -77,7 +77,7 @@ func (hdlr *scoreEngineHandler) StopScoreEngine(w http.ResponseWriter, r *http.R
 }
 
 func (hdlr *scoreEngineHandler) StartScoreEngine(w http.ResponseWriter, r *http.Request) {
-	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
+	competitionID, err := parseCompetitionID(r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 

@@ -237,52 +237,52 @@ func TestMatchFilters(t *testing.T) {
 	t.Run("NoFilters", func(t *testing.T) {
 		subscription := events.NewSubscription([]domain.EventFilter{}, 0)
 
-		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.CompetitorID](), "A")
+		match := subscription.FiltersMatch(testutils.RandomCompetitionID(), testutils.RandomResourceID[domain.CompetitorID](), "A")
 
 		assert.False(t, match)
 	})
 
 	t.Run("SingleFilter_Match", func(t *testing.T) {
-		subscription := events.NewSubscription([]domain.EventFilter{domain.NewEventFilter(0, 0, "A")}, 0)
+		subscription := events.NewSubscription([]domain.EventFilter{domain.NewEventFilter(domain.CompetitionID{}, 0, "A")}, 0)
 
-		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.CompetitorID](), "A")
+		match := subscription.FiltersMatch(testutils.RandomCompetitionID(), testutils.RandomResourceID[domain.CompetitorID](), "A")
 
 		assert.True(t, match)
 	})
 
 	t.Run("SingleFilter_NoMatch", func(t *testing.T) {
-		subscription := events.NewSubscription([]domain.EventFilter{domain.NewEventFilter(0, 0, "A")}, 0)
+		subscription := events.NewSubscription([]domain.EventFilter{domain.NewEventFilter(domain.CompetitionID{}, 0, "A")}, 0)
 
-		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.CompetitorID](), "B")
+		match := subscription.FiltersMatch(testutils.RandomCompetitionID(), testutils.RandomResourceID[domain.CompetitorID](), "B")
 
 		assert.False(t, match)
 	})
 
 	t.Run("MultipleFilters_Match", func(t *testing.T) {
 		subscription := events.NewSubscription([]domain.EventFilter{
-			domain.NewEventFilter(0, 0, "A"),
-			domain.NewEventFilter(0, 0, "B"),
-			domain.NewEventFilter(0, 0, "C"),
+			domain.NewEventFilter(domain.CompetitionID{}, 0, "A"),
+			domain.NewEventFilter(domain.CompetitionID{}, 0, "B"),
+			domain.NewEventFilter(domain.CompetitionID{}, 0, "C"),
 		}, 0)
 
-		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.CompetitorID](), "A")
+		match := subscription.FiltersMatch(testutils.RandomCompetitionID(), testutils.RandomResourceID[domain.CompetitorID](), "A")
 		assert.True(t, match)
 
-		match = subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.CompetitorID](), "B")
+		match = subscription.FiltersMatch(testutils.RandomCompetitionID(), testutils.RandomResourceID[domain.CompetitorID](), "B")
 		assert.True(t, match)
 
-		match = subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.CompetitorID](), "C")
+		match = subscription.FiltersMatch(testutils.RandomCompetitionID(), testutils.RandomResourceID[domain.CompetitorID](), "C")
 		assert.True(t, match)
 	})
 
 	t.Run("MultipleFilters_NoMatch", func(t *testing.T) {
 		subscription := events.NewSubscription([]domain.EventFilter{
-			domain.NewEventFilter(0, 0, "A"),
-			domain.NewEventFilter(0, 0, "B"),
-			domain.NewEventFilter(0, 0, "C"),
+			domain.NewEventFilter(domain.CompetitionID{}, 0, "A"),
+			domain.NewEventFilter(domain.CompetitionID{}, 0, "B"),
+			domain.NewEventFilter(domain.CompetitionID{}, 0, "C"),
 		}, 0)
 
-		match := subscription.FiltersMatch(testutils.RandomResourceID[domain.CompetitionID](), testutils.RandomResourceID[domain.CompetitorID](), "D")
+		match := subscription.FiltersMatch(testutils.RandomCompetitionID(), testutils.RandomResourceID[domain.CompetitorID](), "D")
 		assert.False(t, match)
 	})
 }

@@ -15,7 +15,7 @@ import (
 )
 
 func TestScoreEngineUseCase(t *testing.T) {
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 	}
@@ -34,7 +34,7 @@ func TestScoreEngineUseCase(t *testing.T) {
 		t.Run("HappyCase", func(t *testing.T) {
 			mockedRepo, mockedAuthorizer, mockedScoreEngineManager := makeMocks()
 
-			secondfakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+			secondfakedCompetitionID := testutils.RandomCompetitionID()
 
 			fakedScoreEngines := []domain.ScoreEngineDescriptor{
 				{

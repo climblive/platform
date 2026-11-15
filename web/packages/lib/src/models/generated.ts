@@ -6,7 +6,7 @@
 export type ResourceID = number; /* int32 */
 export type CategoryID = ResourceID;
 export type CompetitorID = ResourceID;
-export type CompetitionID = ResourceID;
+export type CompetitionID = string;
 export type OrganizerID = ResourceID;
 export type ProblemID = ResourceID;
 export type RaffleID = ResourceID;
@@ -18,7 +18,6 @@ export type OrganizerInviteID = string;
 export type ResourceIDType =
   | CategoryID
   | CompetitorID
-  | CompetitionID
   | OrganizerID
   | ProblemID
   | RaffleID

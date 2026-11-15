@@ -72,7 +72,7 @@ func (k *Keeper) Run(ctx context.Context, options ...func(*runOptions)) *sync.Wa
 
 func (k *Keeper) run(ctx context.Context, ready chan<- struct{}) {
 	filter := domain.NewEventFilter(
-		0,
+		domain.CompetitionID{},
 		0,
 		"COMPETITOR_RESULT_UPDATED",
 	)

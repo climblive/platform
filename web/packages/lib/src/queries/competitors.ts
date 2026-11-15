@@ -16,7 +16,7 @@ export const getCompetitorQuery = (competitorId: number) =>
     refetchOnWindowFocus: "always",
   }));
 
-export const getCompetitorsByCompetitionQuery = (competitionId: number) =>
+export const getCompetitorsByCompetitionQuery = (competitionId: string) =>
   createQuery(() => ({
     queryKey: ["competitors", { competitionId }],
     queryFn: async () =>
@@ -57,7 +57,7 @@ export const scrubCompetitorMutation = (competitorId: number) => {
   }));
 };
 
-export const createCompetitorsMutation = (competitionId: number) => {
+export const createCompetitorsMutation = (competitionId: string) => {
   const client = useQueryClient();
 
   return createMutation(() => ({

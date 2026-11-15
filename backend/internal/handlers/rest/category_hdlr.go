@@ -48,7 +48,7 @@ func (hdlr *categoryHandler) GetCategory(w http.ResponseWriter, r *http.Request)
 }
 
 func (hdlr *categoryHandler) GetCategoriesByCompetition(w http.ResponseWriter, r *http.Request) {
-	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
+	competitionID, err := parseCompetitionID(r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -64,7 +64,7 @@ func (hdlr *categoryHandler) GetCategoriesByCompetition(w http.ResponseWriter, r
 }
 
 func (hdlr *categoryHandler) CreateCategory(w http.ResponseWriter, r *http.Request) {
-	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
+	competitionID, err := parseCompetitionID(r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return

@@ -18,7 +18,7 @@
   import Header from "../components/Header.svelte";
 
   interface Props {
-    competitionId: number;
+    competitionId: string;
   }
 
   let { competitionId }: Props = $props();

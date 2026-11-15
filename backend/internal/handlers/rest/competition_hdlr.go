@@ -59,7 +59,7 @@ func InstallCompetitionHandler(
 }
 
 func (hdlr *competitionHandler) GetCompetition(w http.ResponseWriter, r *http.Request) {
-	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
+	competitionID, err := parseCompetitionID(r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -85,7 +85,7 @@ func (hdlr *competitionHandler) GetAllCompetitions(w http.ResponseWriter, r *htt
 }
 
 func (hdlr *competitionHandler) GetScoreboard(w http.ResponseWriter, r *http.Request) {
-	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
+	competitionID, err := parseCompetitionID(r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -117,7 +117,7 @@ func (hdlr *competitionHandler) GetCompetitionsByOrganizer(w http.ResponseWriter
 }
 
 func (hdlr *competitionHandler) PatchCompetition(w http.ResponseWriter, r *http.Request) {
-	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
+	competitionID, err := parseCompetitionID(r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -159,7 +159,7 @@ func (hdlr *competitionHandler) CreateCompetition(w http.ResponseWriter, r *http
 }
 
 func (hdlr *competitionHandler) DuplicateCompetition(w http.ResponseWriter, r *http.Request) {
-	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
+	competitionID, err := parseCompetitionID(r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -175,7 +175,7 @@ func (hdlr *competitionHandler) DuplicateCompetition(w http.ResponseWriter, r *h
 }
 
 func (hdlr *competitionHandler) ArchiveCompetition(w http.ResponseWriter, r *http.Request) {
-	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
+	competitionID, err := parseCompetitionID(r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -191,7 +191,7 @@ func (hdlr *competitionHandler) ArchiveCompetition(w http.ResponseWriter, r *htt
 }
 
 func (hdlr *competitionHandler) RestoreCompetition(w http.ResponseWriter, r *http.Request) {
-	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
+	competitionID, err := parseCompetitionID(r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -207,7 +207,7 @@ func (hdlr *competitionHandler) RestoreCompetition(w http.ResponseWriter, r *htt
 }
 
 func (hdlr *competitionHandler) TransferCompetition(w http.ResponseWriter, r *http.Request) {
-	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
+	competitionID, err := parseCompetitionID(r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -228,7 +228,7 @@ func (hdlr *competitionHandler) TransferCompetition(w http.ResponseWriter, r *ht
 }
 
 func (hdlr *competitionHandler) DownloadResults(w http.ResponseWriter, r *http.Request) {
-	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
+	competitionID, err := parseCompetitionID(r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
@@ -435,7 +435,7 @@ func (hdlr *competitionHandler) DownloadResults(w http.ResponseWriter, r *http.R
 	}
 
 	w.Header().Set("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="competition_%d_results.xlsx"`, competitionID))
+	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="competition_%s_results.xlsx"`, competitionID))
 	w.WriteHeader(http.StatusOK)
 
 	if _, err := book.WriteTo(w); err != nil {

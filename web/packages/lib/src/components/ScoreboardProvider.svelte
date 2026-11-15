@@ -14,7 +14,7 @@
   import { useEvents } from "./EventsProvider.svelte";
 
   interface Props {
-    competitionId: number;
+    competitionId: string;
     hideDisqualified?: boolean;
     children?: Snippet<
       [

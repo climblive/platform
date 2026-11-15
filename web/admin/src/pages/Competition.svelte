@@ -26,7 +26,7 @@
   import TransferCompetition from "./TransferCompetition.svelte";
 
   interface Props {
-    competitionId: number;
+    competitionId: string;
   }
 
   let { competitionId }: Props = $props();

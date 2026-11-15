@@ -17,7 +17,7 @@ func TestHydrate(t *testing.T) {
 	mockedStore := new(engineStoreMock)
 
 	fakedTickID := testutils.RandomResourceID[domain.TickID]()
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 	fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()

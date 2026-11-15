@@ -8,9 +8,16 @@ sql:
         package: "database"
         out: "internal/database"
         rename:
-          contest: "Competition"
-          contest_id: "CompetitionID"
           comp_class: "Category"
           class_id: "CategoryID"
           contender: "Competitor"
           contender_id: "CompetitorID"
+        overrides:
+          - column: "competition.id"
+            go_type:
+              import: "github.com/climblive/platform/backend/internal/domain"
+              type: "CompetitionID"
+          - column: "*.competition_id"
+            go_type:
+              import: "github.com/climblive/platform/backend/internal/domain"
+              type: "CompetitionID"

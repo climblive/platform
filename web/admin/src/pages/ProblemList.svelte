@@ -29,7 +29,7 @@
   const createButtonId = $props.id();
 
   interface Props {
-    competitionId: number;
+    competitionId: string;
     organizerId: number;
     tableLimit: number | undefined;
   }

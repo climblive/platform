@@ -11,7 +11,7 @@ type SubscriptionID = uuid.UUID
 
 func (f EventFilter) Match(competitionID CompetitionID, competitorID CompetitorID, eventType string) bool {
 	switch f.CompetitionID {
-	case 0, competitionID:
+	case CompetitionID{}, competitionID:
 	default:
 		return false
 	}

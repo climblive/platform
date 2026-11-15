@@ -46,7 +46,7 @@ func (hdlr *tickHandler) GetTicksByCompetitor(w http.ResponseWriter, r *http.Req
 }
 
 func (hdlr *tickHandler) GetTicksByCompetition(w http.ResponseWriter, r *http.Request) {
-	competitionID, err := parseResourceID[domain.CompetitionID](r.PathValue("competitionID"))
+	competitionID, err := parseCompetitionID(r.PathValue("competitionID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return

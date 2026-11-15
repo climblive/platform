@@ -11,7 +11,7 @@
   import { onMount } from "svelte";
 
   type Props = {
-    competitionId: number;
+    competitionId: string;
     competitorId: number;
   };
 

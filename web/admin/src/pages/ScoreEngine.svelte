@@ -16,7 +16,7 @@
   import { onMount } from "svelte";
 
   interface Props {
-    competitionId: number;
+    competitionId: string;
   }
 
   let { competitionId }: Props = $props();

@@ -8,7 +8,7 @@
   import { navigate } from "svelte-routing";
 
   type Props = {
-    competitionId: number;
+    competitionId: string;
     children?: Snippet<[{ restoreCompetition: () => void }]>;
   };
 

@@ -8,6 +8,7 @@ import (
 	"mime"
 	"net/http"
 	"strconv"
+	"uuid"
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/utils"
@@ -15,6 +16,11 @@ import (
 )
 
 const maxJSONBodySize = 1 << 20
+
+func parseCompetitionID(id string) (domain.CompetitionID, error) {
+	parsed, err := uuid.Parse(id)
+	return domain.CompetitionID(parsed), err
+}
 
 func parseResourceID[T domain.ResourceIDType](id string) (T, error) {
 	number, err := strconv.ParseInt(id, 10, 32)

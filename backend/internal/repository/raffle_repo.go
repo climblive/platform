@@ -10,7 +10,7 @@ import (
 )
 
 func (d *Database) GetRafflesByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Raffle, error) {
-	records, err := d.WithTx(tx).GetRafflesByCompetition(ctx, int32(competitionID))
+	records, err := d.WithTx(tx).GetRafflesByCompetition(ctx, competitionID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -39,7 +39,7 @@ func (d *Database) GetRaffle(ctx context.Context, tx domain.Transaction, raffleI
 func (d *Database) StoreRaffle(ctx context.Context, tx domain.Transaction, raffle domain.Raffle) (domain.Raffle, error) {
 	params := database.UpsertRaffleParams{
 		ID:            int32(raffle.ID),
-		CompetitionID: int32(raffle.CompetitionID),
+		CompetitionID: raffle.CompetitionID,
 		OrganizerID:   int32(raffle.Ownership.OrganizerID),
 	}
 

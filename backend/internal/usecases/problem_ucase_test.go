@@ -14,7 +14,7 @@ import (
 )
 
 func TestGetProblemsByCompetition(t *testing.T) {
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedProblems := []domain.Problem{
 		{
 			ID:            testutils.RandomResourceID[domain.ProblemID](),
@@ -45,7 +45,7 @@ func TestPatchProblem(t *testing.T) {
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 	}
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 
 	fakedProblem := domain.Problem{
 		ID:                 fakedProblemID,
@@ -286,7 +286,7 @@ func TestCreateProblem(t *testing.T) {
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: fakedOrganizerID,
 	}
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 	makeMocks := func() (*repositoryMock, *authorizerMock) {
@@ -540,7 +540,7 @@ func TestDeleteProblem(t *testing.T) {
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 	}
-	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
+	fakedCompetitionID := testutils.RandomCompetitionID()
 
 	fakedProblem := domain.Problem{
 		ID:            fakedProblemID,

@@ -14,7 +14,7 @@
   import { navigate } from "svelte-routing";
 
   interface Props {
-    competitionId: number;
+    competitionId: string;
   }
 
   let { competitionId }: Props = $props();
