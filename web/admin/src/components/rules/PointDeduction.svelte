@@ -47,7 +47,7 @@
       title="Point deduction"
       disabled={!competition.usePoints}
       description="Deduct points for each failed attempt before reaching the scored top or zone. The score cannot fall below 0."
-      tag="Beta"
+      tags={["IFSC", "New"]}
     >
       {#snippet header()}
         <wa-checkbox
