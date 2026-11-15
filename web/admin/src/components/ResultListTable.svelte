@@ -14,7 +14,7 @@
   } from "@climblive/lib/components";
   import { value } from "@climblive/lib/forms";
   import type { ScoreboardEntry } from "@climblive/lib/models";
-  import { getCompClassesQuery } from "@climblive/lib/queries";
+  import { getCategoriesQuery } from "@climblive/lib/queries";
   import { ordinalSuperscript } from "@climblive/lib/utils";
   import { Link } from "svelte-routing";
   import type { Readable } from "svelte/store";
@@ -30,20 +30,20 @@
 
   let tableData = $state<ScoreboardEntry[]>([]);
 
-  let compClassSelector: WaSelect | undefined = $state();
+  let categorySelector: WaSelect | undefined = $state();
   let quickFilter: WaInput | undefined = $state();
 
-  const compClassesQuery = $derived(getCompClassesQuery(competitionId));
+  const categoriesQuery = $derived(getCategoriesQuery(competitionId));
 
-  const compClasses = $derived(compClassesQuery.data);
+  const categories = $derived(categoriesQuery.data);
 
   let filterText = $state<string>();
-  let selectedCompClassId: number | undefined = $state();
+  let selectedCategoryId: number | undefined = $state();
 
   const contenderCounts = $derived(
     new Map(
-      Array.from($scoreboard.entries()).map(([classId, entries]) => [
-        classId,
+      Array.from($scoreboard.entries()).map(([categoryId, entries]) => [
+        categoryId,
         entries.length,
       ]),
     ),
@@ -51,20 +51,20 @@
 
   $effect(() => {
     if (
-      compClasses &&
-      compClasses.length > 0 &&
-      selectedCompClassId === undefined
+      categories &&
+      categories.length > 0 &&
+      selectedCategoryId === undefined
     ) {
-      selectedCompClassId = compClasses[0].id;
+      selectedCategoryId = categories[0].id;
     }
   });
 
   $effect(() => {
-    if (selectedCompClassId === undefined) {
+    if (selectedCategoryId === undefined) {
       return;
     }
 
-    let scores = [...($scoreboard.get(selectedCompClassId) ?? [])];
+    let scores = [...($scoreboard.get(selectedCategoryId) ?? [])];
 
     if (filterText) {
       const search = filterText.toLowerCase();
@@ -147,7 +147,7 @@
 <h2>Scores</h2>
 
 <section>
-  {#if compClasses}
+  {#if categories}
     <div class="controls">
       <wa-input
         bind:this={quickFilter}
@@ -160,26 +160,26 @@
         with-clear
       ></wa-input>
       <wa-select
-        bind:this={compClassSelector}
+        bind:this={categorySelector}
         size="s"
         label="Category filter"
-        {@attach value(selectedCompClassId)}
+        {@attach value(selectedCategoryId)}
         onchange={() => {
-          selectedCompClassId = Number(compClassSelector?.value);
+          selectedCategoryId = Number(categorySelector?.value);
         }}
       >
-        {#each compClasses as compClass (compClass.id)}
-          {@const count = contenderCounts.get(compClass.id)}
+        {#each categories as category (category.id)}
+          {@const count = contenderCounts.get(category.id)}
 
-          <wa-option value={compClass.id} label={compClass.name}>
+          <wa-option value={category.id} label={category.name}>
             <div class="label">
-              {compClass.name}
+              {category.name}
               {#if count}
                 <wa-badge pill variant="neutral">{count}</wa-badge>
               {/if}
             </div>
-            {#if compClass.description}
-              <small>{compClass.description}</small>
+            {#if category.description}
+              <small>{category.description}</small>
             {/if}
           </wa-option>
         {/each}

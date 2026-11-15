@@ -298,7 +298,7 @@ func setupMux(
 		EventBroker:        eventBroker,
 	}
 
-	compClassUseCase := usecases.CompClassUseCase{
+	categoryUseCase := usecases.CategoryUseCase{
 		Authorizer: authorizer,
 		Repo:       repo,
 	}
@@ -352,8 +352,8 @@ func setupMux(
 	mux.HandleFunc("OPTIONS /", HandleCORSPreFlight)
 
 	rest.InstallContenderHandler(mux, &contenderUseCase)
-	rest.InstallCompetitionHandler(mux, &competitionUseCase, &compClassUseCase, &tickUseCase, &problemUseCase)
-	rest.InstallCompClassHandler(mux, &compClassUseCase)
+	rest.InstallCompetitionHandler(mux, &competitionUseCase, &categoryUseCase, &tickUseCase, &problemUseCase)
+	rest.InstallCategoryHandler(mux, &categoryUseCase)
 	rest.InstallProblemHandler(mux, &problemUseCase)
 	rest.InstallTickHandler(mux, &tickUseCase)
 	rest.InstallEventHandler(mux, eventBroker, 10*time.Second)

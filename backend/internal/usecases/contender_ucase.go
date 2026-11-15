@@ -14,12 +14,12 @@ type contenderUseCaseRepository interface {
 
 	GetContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) (domain.Contender, error)
 	GetContenderByCode(ctx context.Context, tx domain.Transaction, registrationCode string) (domain.Contender, error)
-	GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) ([]domain.Contender, error)
+	GetContendersByCategory(ctx context.Context, tx domain.Transaction, categoryID domain.CategoryID) ([]domain.Contender, error)
 	GetContendersByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Contender, error)
 	StoreContender(ctx context.Context, tx domain.Transaction, contender domain.Contender) (domain.Contender, error)
 	DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) error
 	GetCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (domain.Competition, error)
-	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error)
+	GetCategory(ctx context.Context, tx domain.Transaction, categoryID domain.CategoryID) (domain.Category, error)
 	GetNumberOfContenders(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (int, error)
 	GetScrubEligibleContenders(ctx context.Context, deadline time.Time) ([]domain.Contender, error)
 }
@@ -72,17 +72,17 @@ func (uc *ContenderUseCase) GetPointValues(ctx context.Context, contenderID doma
 	return uc.PointValueKeeper.GetPointValues(contenderID), nil
 }
 
-func (uc *ContenderUseCase) GetContendersByCompClass(ctx context.Context, compClassID domain.CompClassID) ([]domain.Contender, error) {
-	compClass, err := uc.Repo.GetCompClass(ctx, nil, compClassID)
+func (uc *ContenderUseCase) GetContendersByCategory(ctx context.Context, categoryID domain.CategoryID) ([]domain.Contender, error) {
+	category, err := uc.Repo.GetCategory(ctx, nil, categoryID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
 
-	if _, err := uc.Authorizer.HasOwnership(ctx, compClass.Ownership); err != nil {
+	if _, err := uc.Authorizer.HasOwnership(ctx, category.Ownership); err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
 
-	contenders, err := uc.Repo.GetContendersByCompClass(ctx, nil, compClassID)
+	contenders, err := uc.Repo.GetContendersByCategory(ctx, nil, categoryID)
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -132,7 +132,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 
 	publicInfoEvent := domain.ContenderPublicInfoUpdatedEvent{
 		ContenderID:         contenderID,
-		CompClassID:         contender.CompClassID,
+		CategoryID:          contender.CategoryID,
 		Name:                contender.Name,
 		WithdrawnFromFinals: contender.WithdrawnFromFinals,
 		Disqualified:        contender.Disqualified,
@@ -146,13 +146,13 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 		return mty, errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
 	}
 
-	if contender.CompClassID != 0 {
-		compClass, err := uc.Repo.GetCompClass(ctx, nil, contender.CompClassID)
+	if contender.CategoryID != 0 {
+		category, err := uc.Repo.GetCategory(ctx, nil, contender.CategoryID)
 		if err != nil {
 			return mty, errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
 		}
 
-		gracePeriodEnd := compClass.TimeEnd.Add(competition.GracePeriod)
+		gracePeriodEnd := category.TimeEnd.Add(competition.GracePeriod)
 		switch {
 		case role.OneOf(domain.AdminRole, domain.OrganizerRole):
 			break
@@ -161,29 +161,29 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 		}
 	}
 
-	if patch.CompClassID.Present && contender.CompClassID != patch.CompClassID.Value {
-		if patch.CompClassID.Value == 0 {
+	if patch.CategoryID.Present && contender.CategoryID != patch.CategoryID.Value {
+		if patch.CategoryID.Value == 0 {
 			return mty, errors.Wrap(domain.ErrNotAllowed, 0)
 		}
 
-		compClass, err := uc.Repo.GetCompClass(ctx, nil, patch.CompClassID.Value)
+		category, err := uc.Repo.GetCategory(ctx, nil, patch.CategoryID.Value)
 		if err != nil {
 			return mty, errors.Wrap(err, 0)
 		}
 
-		if contender.CompClassID == 0 {
+		if contender.CategoryID == 0 {
 			events = append(events, domain.ContenderEnteredEvent{
 				ContenderID: contenderID,
-				CompClassID: patch.CompClassID.Value,
+				CategoryID:  patch.CategoryID.Value,
 			})
 		} else {
-			events = append(events, domain.ContenderSwitchedClassEvent{
+			events = append(events, domain.ContenderSwitchedCategoryEvent{
 				ContenderID: contenderID,
-				CompClassID: patch.CompClassID.Value,
+				CategoryID:  patch.CategoryID.Value,
 			})
 		}
 
-		gracePeriodEnd := compClass.TimeEnd.Add(competition.GracePeriod)
+		gracePeriodEnd := category.TimeEnd.Add(competition.GracePeriod)
 
 		switch {
 		case role.OneOf(domain.AdminRole, domain.OrganizerRole):
@@ -192,15 +192,15 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 			return mty, errors.Wrap(domain.ErrCompetitionEnded, 0)
 		}
 
-		contender.CompClassID = patch.CompClassID.Value
+		contender.CategoryID = patch.CategoryID.Value
 
 		if contender.Entered.IsZero() {
 			contender.Entered = time.Now()
-			contender.ScrubBefore = compClass.TimeEnd.Add(competition.NameRetentionTime)
+			contender.ScrubBefore = category.TimeEnd.Add(competition.NameRetentionTime)
 		}
 	}
 
-	if contender.CompClassID == 0 {
+	if contender.CategoryID == 0 {
 		return mty, errors.New(domain.ErrNotRegistered)
 	}
 
@@ -248,7 +248,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 		contender.Disqualified = patch.Disqualified.Value
 	}
 
-	publicInfoEvent.CompClassID = contender.CompClassID
+	publicInfoEvent.CategoryID = contender.CategoryID
 	publicInfoEvent.Name = contender.Name
 	publicInfoEvent.WithdrawnFromFinals = contender.WithdrawnFromFinals
 	publicInfoEvent.Disqualified = contender.Disqualified
@@ -291,7 +291,7 @@ func (uc *ContenderUseCase) ScrubContender(ctx context.Context, contenderID doma
 
 	uc.EventBroker.Dispatch(contender.CompetitionID, domain.ContenderPublicInfoUpdatedEvent{
 		ContenderID:         contender.ID,
-		CompClassID:         contender.CompClassID,
+		CategoryID:          contender.CategoryID,
 		Name:                contender.Name,
 		WithdrawnFromFinals: contender.WithdrawnFromFinals,
 		Disqualified:        contender.Disqualified,
@@ -360,7 +360,7 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, competitionID 
 			ID:                  0,
 			CompetitionID:       competitionID,
 			Ownership:           competition.Ownership,
-			CompClassID:         0,
+			CategoryID:          0,
 			RegistrationCode:    uc.RegistrationCodeGenerator.Generate(registrationCodeLength),
 			Name:                "",
 			Entered:             time.Time{},
@@ -419,7 +419,7 @@ func (uc *ContenderUseCase) ScrubContenders(ctx context.Context, deadline time.T
 	for _, contender := range contenders {
 		uc.EventBroker.Dispatch(contender.CompetitionID, domain.ContenderPublicInfoUpdatedEvent{
 			ContenderID:         contender.ID,
-			CompClassID:         contender.CompClassID,
+			CategoryID:          contender.CategoryID,
 			Name:                contender.Name,
 			WithdrawnFromFinals: contender.WithdrawnFromFinals,
 			Disqualified:        contender.Disqualified,

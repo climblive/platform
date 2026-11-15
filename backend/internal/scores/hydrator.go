@@ -59,13 +59,13 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, competitionID
 	}
 
 	for contender := range slices.Values(contenders) {
-		if contender.CompClassID == 0 {
+		if contender.CategoryID == 0 {
 			continue
 		}
 
 		store.SaveContender(Contender{
 			ID:                  contender.ID,
-			CompClassID:         contender.CompClassID,
+			CategoryID:          contender.CategoryID,
 			WithdrawnFromFinals: contender.WithdrawnFromFinals,
 			Disqualified:        contender.Disqualified,
 			Score: Score{

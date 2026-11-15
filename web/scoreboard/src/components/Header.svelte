@@ -7,7 +7,7 @@
   interface Props {
     competitionId: number;
     name: string;
-    compClassId: number;
+    categoryId: number;
     startTime: Date;
     endTime: Date;
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
@@ -16,13 +16,13 @@
   let {
     competitionId,
     name,
-    compClassId,
+    categoryId,
     startTime,
     endTime,
     scoreboard,
   }: Props = $props();
 
-  let classSize = $derived(($scoreboard.get(compClassId) ?? []).length);
+  let categorySize = $derived(($scoreboard.get(categoryId) ?? []).length);
   let totalSize = $derived.by(() => {
     let total = 0;
     $scoreboard.forEach((entry) => (total += entry.length));
@@ -30,7 +30,7 @@
   });
 </script>
 
-<CompetitionStateProvider {competitionId} {compClassId}>
+<CompetitionStateProvider {competitionId} {categoryId}>
   {#snippet children({ competitionState, progress })}
     <header>
       <div class="left">
@@ -47,7 +47,7 @@
         {/if}
       </div>
       <div class="size">
-        <strong>{classSize}</strong>/{totalSize}
+        <strong>{categorySize}</strong>/{totalSize}
       </div>
       <wa-progress-bar value={progress}></wa-progress-bar>
     </header>

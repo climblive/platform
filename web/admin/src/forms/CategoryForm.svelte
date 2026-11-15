@@ -38,11 +38,11 @@
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import type WaInput from "@awesome.me/webawesome/dist/components/input/input.js";
   import { GenericForm, name } from "@climblive/lib/forms";
-  import type { CompClass } from "@climblive/lib/models";
+  import type { Category } from "@climblive/lib/models";
   import { addSeconds, format } from "date-fns";
   import { type Snippet } from "svelte";
 
-  type T = $$Generic<Partial<CompClass>>;
+  type T = $$Generic<Partial<Category>>;
 
   interface Props {
     data: Partial<T>;

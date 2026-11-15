@@ -6,7 +6,7 @@
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
   import { checked, GenericForm, name, value } from "@climblive/lib/forms";
   import { type ContenderPatch } from "@climblive/lib/models";
-  import { getCompClassesQuery } from "@climblive/lib/queries";
+  import { getCategoriesQuery } from "@climblive/lib/queries";
   import type { CompetitionState } from "@climblive/lib/types";
   import { z } from "@climblive/lib/utils";
   import { isAfter } from "date-fns";
@@ -15,7 +15,7 @@
 
   const registrationFormSchema: z.ZodType<ContenderPatch> = z.object({
     name: z.string().min(1),
-    compClassId: z.coerce.number().gt(0, { message: "" }),
+    categoryId: z.coerce.number().gt(0, { message: "" }),
     withdrawnFromFinals: z.coerce.boolean().default(false),
   });
 
@@ -33,12 +33,12 @@
 
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
-  let compClassesQuery = $derived(getCompClassesQuery($session.competitionId));
+  let categoriesQuery = $derived(getCategoriesQuery($session.competitionId));
 
   const disabled = $derived(rest.disabled || competitionState === "ENDED");
 </script>
 
-{#if compClassesQuery.data}
+{#if categoriesQuery.data}
   <GenericForm schema={registrationFormSchema} {submit}>
     <fieldset>
       <wa-input
@@ -53,21 +53,21 @@
       {@render callout?.()}
       <wa-select
         size="s"
-        {@attach name("compClassId")}
+        {@attach name("categoryId")}
         label="Category"
         required
-        {@attach value(data.compClassId)}
+        {@attach value(data.categoryId)}
         {disabled}
       >
-        {#each compClassesQuery.data as compClass (compClass.id)}
+        {#each categoriesQuery.data as category (category.id)}
           <wa-option
-            value={compClass.id}
-            disabled={isAfter(new Date(), compClass.timeEnd)}
-            label={compClass.name}
+            value={category.id}
+            disabled={isAfter(new Date(), category.timeEnd)}
+            label={category.name}
           >
-            {compClass.name}
-            {#if compClass.description}
-              <small>{compClass.description}</small>
+            {category.name}
+            {#if category.description}
+              <small>{category.description}</small>
             {/if}
           </wa-option>
         {/each}

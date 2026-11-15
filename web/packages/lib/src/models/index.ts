@@ -1,4 +1,4 @@
-export * from "./compClass";
+export * from "./category";
 export * from "./contender";
 export * from "./competition";
 export * from "./event";

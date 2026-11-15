@@ -5,8 +5,8 @@ import {
   competitionSchema,
   scoreboardEntrySchema,
   scoreEngineDescriptorSchema,
-  type CompClassPatch,
-  type CompClassTemplate,
+  type CategoryPatch,
+  type CategoryTemplate,
   type ContenderPatch,
   type CompetitionID,
   type CompetitionPatch,
@@ -19,7 +19,7 @@ import {
   type ScoreEngineInstanceID,
   type Tick,
 } from "./models";
-import { compClassSchema } from "./models/compClass";
+import { categorySchema } from "./models/category";
 import { contenderSchema } from "./models/contender";
 import { serviceStatusSchema } from "./models/health";
 import { organizerSchema } from "./models/organizer";
@@ -317,51 +317,51 @@ export class ApiClient {
     });
   };
 
-  getCompClass = async (compClassId: number) => {
-    const endpoint = `/comp-classes/${compClassId}`;
+  getCategory = async (categoryId: number) => {
+    const endpoint = `/categories/${categoryId}`;
 
     const result = await this.axiosInstance.get(endpoint);
 
-    return compClassSchema.parse(result.data);
+    return categorySchema.parse(result.data);
   };
 
-  getCompClasses = async (competitionId: number) => {
-    const endpoint = `/competitions/${competitionId}/comp-classes`;
+  getCategories = async (competitionId: number) => {
+    const endpoint = `/competitions/${competitionId}/categories`;
 
     const result = await this.axiosInstance.get(endpoint);
 
-    return z.array(compClassSchema).parse(result.data);
+    return z.array(categorySchema).parse(result.data);
   };
 
-  createCompClass = async (
+  createCategory = async (
     competitionId: number,
-    template: CompClassTemplate,
+    template: CategoryTemplate,
   ) => {
-    const endpoint = `/competitions/${competitionId}/comp-classes`;
+    const endpoint = `/competitions/${competitionId}/categories`;
 
     const result = await this.axiosInstance.post(endpoint, template, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 
-    return compClassSchema.parse(result.data);
+    return categorySchema.parse(result.data);
   };
 
-  deleteCompClass = async (id: number) => {
-    const endpoint = `/comp-classes/${id}`;
+  deleteCategory = async (id: number) => {
+    const endpoint = `/categories/${id}`;
 
     await this.axiosInstance.delete(endpoint, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
   };
 
-  patchCompClass = async (id: number, patch: CompClassPatch) => {
-    const endpoint = `/comp-classes/${id}`;
+  patchCategory = async (id: number, patch: CategoryPatch) => {
+    const endpoint = `/categories/${id}`;
 
     const result = await this.axiosInstance.patch(endpoint, patch, {
       headers: this.credentialsProvider?.getAuthHeaders(),
     });
 
-    return compClassSchema.parse(result.data);
+    return categorySchema.parse(result.data);
   };
 
   getTicksByContender = async (contenderId: number) => {

@@ -53,8 +53,8 @@ func (m *repositoryMock) GetContenderByCode(ctx context.Context, tx domain.Trans
 	return args.Get(0).(domain.Contender), args.Error(1)
 }
 
-func (m *repositoryMock) GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) ([]domain.Contender, error) {
-	args := m.Called(ctx, tx, compClassID)
+func (m *repositoryMock) GetContendersByCategory(ctx context.Context, tx domain.Transaction, categoryID domain.CategoryID) ([]domain.Contender, error) {
+	args := m.Called(ctx, tx, categoryID)
 	return args.Get(0).([]domain.Contender), args.Error(1)
 }
 
@@ -103,24 +103,24 @@ func (m *repositoryMock) GetCompetitionsByOrganizer(ctx context.Context, tx doma
 	return args.Get(0).([]domain.Competition), args.Error(1)
 }
 
-func (m *repositoryMock) GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error) {
-	args := m.Called(ctx, tx, compClassID)
-	return args.Get(0).(domain.CompClass), args.Error(1)
+func (m *repositoryMock) GetCategory(ctx context.Context, tx domain.Transaction, categoryID domain.CategoryID) (domain.Category, error) {
+	args := m.Called(ctx, tx, categoryID)
+	return args.Get(0).(domain.Category), args.Error(1)
 }
 
-func (m *repositoryMock) GetCompClassesByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.CompClass, error) {
+func (m *repositoryMock) GetCategoriesByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Category, error) {
 	args := m.Called(ctx, tx, competitionID)
-	return args.Get(0).([]domain.CompClass), args.Error(1)
+	return args.Get(0).([]domain.Category), args.Error(1)
 }
 
-func (m *repositoryMock) DeleteCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) error {
-	args := m.Called(ctx, tx, compClassID)
+func (m *repositoryMock) DeleteCategory(ctx context.Context, tx domain.Transaction, categoryID domain.CategoryID) error {
+	args := m.Called(ctx, tx, categoryID)
 	return args.Error(0)
 }
 
-func (m *repositoryMock) StoreCompClass(ctx context.Context, tx domain.Transaction, compClass domain.CompClass) (domain.CompClass, error) {
-	args := m.Called(ctx, tx, compClass)
-	return args.Get(0).(domain.CompClass), args.Error(1)
+func (m *repositoryMock) StoreCategory(ctx context.Context, tx domain.Transaction, category domain.Category) (domain.Category, error) {
+	args := m.Called(ctx, tx, category)
+	return args.Get(0).(domain.Category), args.Error(1)
 }
 
 func (m *repositoryMock) GetNumberOfContenders(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (int, error) {

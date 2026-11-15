@@ -2,17 +2,17 @@
   import "@awesome.me/webawesome/dist/components/details/details.js";
   import type WaDetails from "@awesome.me/webawesome/dist/components/details/details.js";
   import { LabeledText } from "@climblive/lib/components";
-  import type { CompClass, Competition, Problem } from "@climblive/lib/models";
+  import type { Category, Competition, Problem } from "@climblive/lib/models";
   import { format } from "date-fns";
   import { sv } from "date-fns/locale";
 
   interface Props {
     competition: Competition;
-    compClasses: CompClass[];
+    categories: Category[];
     problems: Problem[];
   }
 
-  let { competition, compClasses, problems }: Props = $props();
+  let { competition, categories, problems }: Props = $props();
 
   let details: WaDetails | undefined = $state();
 
@@ -38,7 +38,7 @@
     </LabeledText>
   {/if}
   <LabeledText label="Categories">
-    {compClasses.map((cc) => cc.name).join(", ")}
+    {categories.map((cc) => cc.name).join(", ")}
   </LabeledText>
   <LabeledText label="Number of problems">
     {problems.length.toString()}</LabeledText

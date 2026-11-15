@@ -13,7 +13,7 @@ import { pointValueSchema } from "./pointValue";
 export const contenderPublicInfoUpdatedEventSchema: z.ZodType<ContenderPublicInfoUpdatedEvent> =
   z.object({
     contenderId: z.number(),
-    compClassId: z.number(),
+    categoryId: z.number(),
     name: z.string(),
     withdrawnFromFinals: z.boolean(),
     disqualified: z.boolean(),

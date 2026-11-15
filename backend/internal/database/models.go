@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-type CompClass struct {
+type Category struct {
 	ID            int32
 	OrganizerID   int32
 	CompetitionID int32
@@ -47,7 +47,7 @@ type Contender struct {
 	CompetitionID       int32
 	RegistrationCode    string
 	Name                sql.NullString
-	ClassID             sql.NullInt32
+	CategoryID          sql.NullInt32
 	Entered             sql.NullTime
 	Disqualified        bool
 	WithdrawnFromFinals bool

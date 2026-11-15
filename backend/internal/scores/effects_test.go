@@ -15,8 +15,8 @@ type effectResolverMock struct {
 	mock.Mock
 }
 
-func (m *effectResolverMock) RankCompClass(compClassID domain.CompClassID) {
-	m.Called(compClassID)
+func (m *effectResolverMock) RankCategory(categoryID domain.CategoryID) {
+	m.Called(categoryID)
 }
 
 func (m *effectResolverMock) ScoreContender(contenderID domain.ContenderID) iter.Seq[scores.Effect] {
@@ -24,8 +24,8 @@ func (m *effectResolverMock) ScoreContender(contenderID domain.ContenderID) iter
 	return args.Get(0).(iter.Seq[scores.Effect])
 }
 
-func (m *effectResolverMock) CalculatePointValues(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[scores.Effect] {
-	args := m.Called(compClassID, problemID)
+func (m *effectResolverMock) CalculatePointValues(categoryID domain.CategoryID, problemID domain.ProblemID) iter.Seq[scores.Effect] {
+	args := m.Called(categoryID, problemID)
 	return args.Get(0).(iter.Seq[scores.Effect])
 }
 
@@ -36,7 +36,7 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 		effectYielder := func(iterations int) iter.Seq[scores.Effect] {
 			return func(yield func(scores.Effect) bool) {
 				for range iterations {
-					if !yield(scores.EffectCalculatePointValues{CompClassID: testutils.RandomResourceID[domain.CompClassID](), ProblemID: testutils.RandomResourceID[domain.ProblemID]()}) {
+					if !yield(scores.EffectCalculatePointValues{CategoryID: testutils.RandomResourceID[domain.CategoryID](), ProblemID: testutils.RandomResourceID[domain.ProblemID]()}) {
 						return
 					}
 
@@ -44,7 +44,7 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 						return
 					}
 
-					if !yield(scores.EffectRankClass{CompClassID: testutils.RandomResourceID[domain.CompClassID]()}) {
+					if !yield(scores.EffectRankCategory{CategoryID: testutils.RandomResourceID[domain.CategoryID]()}) {
 						return
 					}
 				}
@@ -52,7 +52,7 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 		}
 
 		effectCounters := map[scores.EffectType]int{
-			scores.EffectTypeRankClass:            0,
+			scores.EffectTypeRankCategory:         0,
 			scores.EffectTypeScoreContender:       0,
 			scores.EffectTypeCalculatePointValues: 0,
 		}
@@ -64,9 +64,9 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 		}
 
 		mockedResolver.
-			On("RankCompClass", mock.Anything).
+			On("RankCategory", mock.Anything).
 			Return().
-			Run(incrementCounter(scores.EffectTypeRankClass))
+			Run(incrementCounter(scores.EffectTypeRankCategory))
 		mockedResolver.
 			On("ScoreContender", mock.Anything).
 			Return(effectYielder(10)).
@@ -82,7 +82,7 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 
 		assert.Equal(t, 10, effectCounters[scores.EffectTypeCalculatePointValues])
 		assert.Equal(t, 110, effectCounters[scores.EffectTypeScoreContender])
-		assert.Equal(t, 1210, effectCounters[scores.EffectTypeRankClass])
+		assert.Equal(t, 1210, effectCounters[scores.EffectTypeRankCategory])
 
 		mockedResolver.AssertExpectations(t)
 	})
@@ -100,11 +100,11 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 			}
 		}
 
-		eff1 := scores.EffectCalculatePointValues{CompClassID: testutils.RandomResourceID[domain.CompClassID](), ProblemID: testutils.RandomResourceID[domain.ProblemID]()}
+		eff1 := scores.EffectCalculatePointValues{CategoryID: testutils.RandomResourceID[domain.CategoryID](), ProblemID: testutils.RandomResourceID[domain.ProblemID]()}
 		eff2 := scores.EffectScoreContender{ContenderID: testutils.RandomResourceID[domain.ContenderID]()}
 		eff3 := scores.EffectScoreContender{ContenderID: testutils.RandomResourceID[domain.ContenderID]()}
-		eff4 := scores.EffectRankClass{CompClassID: testutils.RandomResourceID[domain.CompClassID]()}
-		eff5 := scores.EffectRankClass{CompClassID: testutils.RandomResourceID[domain.CompClassID]()}
+		eff4 := scores.EffectRankCategory{CategoryID: testutils.RandomResourceID[domain.CategoryID]()}
+		eff5 := scores.EffectRankCategory{CategoryID: testutils.RandomResourceID[domain.CategoryID]()}
 
 		recordedOrder := make([]scores.EffectType, 0)
 
@@ -115,7 +115,7 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 		}
 
 		mockedResolver.
-			On("CalculatePointValues", eff1.CompClassID, eff1.ProblemID).
+			On("CalculatePointValues", eff1.CategoryID, eff1.ProblemID).
 			Return(effectYielder(eff3)).
 			Run(recordOrder(eff1))
 
@@ -130,12 +130,12 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 			Run(recordOrder(eff3))
 
 		mockedResolver.
-			On("RankCompClass", eff4.CompClassID).
+			On("RankCategory", eff4.CategoryID).
 			Return().
 			Run(recordOrder(eff4))
 
 		mockedResolver.
-			On("RankCompClass", eff5.CompClassID).
+			On("RankCategory", eff5.CategoryID).
 			Return().
 			Run(recordOrder(eff5))
 
@@ -147,8 +147,8 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 			scores.EffectTypeCalculatePointValues,
 			scores.EffectTypeScoreContender,
 			scores.EffectTypeScoreContender,
-			scores.EffectTypeRankClass,
-			scores.EffectTypeRankClass,
+			scores.EffectTypeRankCategory,
+			scores.EffectTypeRankCategory,
 		}, recordedOrder)
 
 		mockedResolver.AssertExpectations(t)
@@ -167,12 +167,12 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 			}
 		}
 
-		eff1 := scores.EffectCalculatePointValues{CompClassID: testutils.RandomResourceID[domain.CompClassID](), ProblemID: testutils.RandomResourceID[domain.ProblemID]()}
+		eff1 := scores.EffectCalculatePointValues{CategoryID: testutils.RandomResourceID[domain.CategoryID](), ProblemID: testutils.RandomResourceID[domain.ProblemID]()}
 		eff2 := scores.EffectScoreContender{ContenderID: testutils.RandomResourceID[domain.ContenderID]()}
-		eff3 := scores.EffectRankClass{CompClassID: testutils.RandomResourceID[domain.CompClassID]()}
+		eff3 := scores.EffectRankCategory{CategoryID: testutils.RandomResourceID[domain.CategoryID]()}
 
 		mockedResolver.
-			On("CalculatePointValues", eff1.CompClassID, eff1.ProblemID).
+			On("CalculatePointValues", eff1.CategoryID, eff1.ProblemID).
 			Return(effectYielder(eff2, eff2, eff2, eff2, eff2))
 
 		mockedResolver.
@@ -181,7 +181,7 @@ func TestEffectRunner_RunEffects(t *testing.T) {
 			Once()
 
 		mockedResolver.
-			On("RankCompClass", eff3.CompClassID).
+			On("RankCategory", eff3.CategoryID).
 			Return().
 			Once()
 

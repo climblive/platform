@@ -35,7 +35,7 @@ func TestEngineDriver(t *testing.T) {
 			fakedCompetitionID,
 			0,
 			"CONTENDER_ENTERED",
-			"CONTENDER_SWITCHED_CLASS",
+			"CONTENDER_SWITCHED_CATEGORY",
 			"CONTENDER_WITHDREW_FROM_FINALS",
 			"CONTENDER_REENTERED_FINALS",
 			"CONTENDER_DISQUALIFIED",
@@ -159,7 +159,7 @@ func TestEngineDriver(t *testing.T) {
 		err = f.subscription.Post(domain.EventEnvelope{
 			Data: domain.ContenderEnteredEvent{
 				ContenderID: 2,
-				CompClassID: 1,
+				CategoryID:  1,
 			},
 		})
 		require.NoError(t, err)
@@ -187,7 +187,7 @@ func TestEngineDriver(t *testing.T) {
 
 		mockedEngine.On("HandleContenderEntered", domain.ContenderEnteredEvent{
 			ContenderID: 2,
-			CompClassID: 1,
+			CategoryID:  1,
 		}).Return(noEffects)
 
 		time.Sleep(time.Millisecond)
@@ -219,11 +219,11 @@ func TestEngineDriver(t *testing.T) {
 		})
 		events = append(events, domain.ContenderEnteredEvent{
 			ContenderID: 1,
-			CompClassID: 1,
+			CategoryID:  1,
 		})
-		events = append(events, domain.ContenderSwitchedClassEvent{
+		events = append(events, domain.ContenderSwitchedCategoryEvent{
 			ContenderID: 1,
-			CompClassID: 1,
+			CategoryID:  1,
 		})
 		events = append(events, domain.ContenderWithdrewFromFinalsEvent{
 			ContenderID: 1,
@@ -283,11 +283,11 @@ func TestEngineDriver(t *testing.T) {
 		}).Return(noEffects)
 		mockedEngine.On("HandleContenderEntered", domain.ContenderEnteredEvent{
 			ContenderID: 1,
-			CompClassID: 1,
+			CategoryID:  1,
 		}).Return(noEffects)
-		mockedEngine.On("HandleContenderSwitchedClass", domain.ContenderSwitchedClassEvent{
+		mockedEngine.On("HandleContenderSwitchedCategory", domain.ContenderSwitchedCategoryEvent{
 			ContenderID: 1,
-			CompClassID: 1,
+			CategoryID:  1,
 		}).Return(noEffects)
 		mockedEngine.On("HandleContenderWithdrewFromFinals", domain.ContenderWithdrewFromFinalsEvent{
 			ContenderID: 1,
@@ -470,7 +470,7 @@ func (m *scoreEngineMock) HandleContenderEntered(event domain.ContenderEnteredEv
 	return args.Get(0).(iter.Seq[scores.Effect])
 }
 
-func (m *scoreEngineMock) HandleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent) iter.Seq[scores.Effect] {
+func (m *scoreEngineMock) HandleContenderSwitchedCategory(event domain.ContenderSwitchedCategoryEvent) iter.Seq[scores.Effect] {
 	args := m.Called(event)
 	return args.Get(0).(iter.Seq[scores.Effect])
 }
@@ -515,8 +515,8 @@ func (m *scoreEngineMock) HandleProblemUpdated(event domain.ProblemUpdatedEvent)
 	return args.Get(0).(iter.Seq[scores.Effect])
 }
 
-func (m *scoreEngineMock) RankCompClass(compClassID domain.CompClassID) {
-	m.Called(compClassID)
+func (m *scoreEngineMock) RankCategory(categoryID domain.CategoryID) {
+	m.Called(categoryID)
 }
 
 func (m *scoreEngineMock) ScoreContender(contenderID domain.ContenderID) iter.Seq[scores.Effect] {
@@ -524,8 +524,8 @@ func (m *scoreEngineMock) ScoreContender(contenderID domain.ContenderID) iter.Se
 	return args.Get(0).(iter.Seq[scores.Effect])
 }
 
-func (m *scoreEngineMock) CalculatePointValues(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[scores.Effect] {
-	args := m.Called(compClassID, problemID)
+func (m *scoreEngineMock) CalculatePointValues(categoryID domain.CategoryID, problemID domain.ProblemID) iter.Seq[scores.Effect] {
+	args := m.Called(categoryID, problemID)
 	return args.Get(0).(iter.Seq[scores.Effect])
 }
 

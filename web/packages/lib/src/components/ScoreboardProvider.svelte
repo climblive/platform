@@ -134,11 +134,11 @@
     const withoutScore: ScoreboardEntry[] = [];
 
     for (const contender of contenders.values()) {
-      let classEntries = results.get(contender.compClassId);
+      let categoryEntries = results.get(contender.categoryId);
 
-      if (classEntries === undefined) {
-        classEntries = [];
-        results.set(contender.compClassId, classEntries);
+      if (categoryEntries === undefined) {
+        categoryEntries = [];
+        results.set(contender.categoryId, categoryEntries);
       }
 
       if (hideDisqualified && contender.disqualified) {
@@ -148,21 +148,21 @@
       if (!contender.score) {
         withoutScore.push(contender);
       } else {
-        classEntries.push(contender);
+        categoryEntries.push(contender);
       }
     }
 
     if (withoutScore.length) {
-      for (const [compClassId, classEntries] of results.entries()) {
+      for (const [categoryId, categoryEntries] of results.entries()) {
         const maxRankOrder = Math.max(
-          ...classEntries.map(({ score }) => score?.rankOrder ?? -1),
+          ...categoryEntries.map(({ score }) => score?.rankOrder ?? -1),
           -1,
         );
 
         let rankOrder = maxRankOrder + 1;
 
         for (const contender of withoutScore) {
-          if (contender.compClassId !== compClassId) {
+          if (contender.categoryId !== categoryId) {
             continue;
           }
 
@@ -175,7 +175,7 @@
             timestamp: new Date(0),
           };
 
-          classEntries.push(contender);
+          categoryEntries.push(contender);
 
           rankOrder++;
         }
@@ -208,7 +208,7 @@
           contender = createEmptyEntry(event.contenderId);
         }
 
-        contender.compClassId = event.compClassId;
+        contender.categoryId = event.categoryId;
         contender.name = event.name;
         contender.withdrawnFromFinals = event.withdrawnFromFinals;
         contender.disqualified = event.disqualified;
@@ -248,7 +248,7 @@
 
   const createEmptyEntry = (contenderId: number): ScoreboardEntry => ({
     contenderId: contenderId,
-    compClassId: 0,
+    categoryId: 0,
     name: "",
     withdrawnFromFinals: false,
     disqualified: false,

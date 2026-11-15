@@ -22,13 +22,13 @@ type competitionUseCaseRepository interface {
 	GetCompetitionsByOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) ([]domain.Competition, error)
 	GetOrganizer(ctx context.Context, tx domain.Transaction, organizerID domain.OrganizerID) (domain.Organizer, error)
 	StoreCompetition(ctx context.Context, tx domain.Transaction, competition domain.Competition) (domain.Competition, error)
-	GetCompClassesByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.CompClass, error)
-	StoreCompClass(ctx context.Context, tx domain.Transaction, compClass domain.CompClass) (domain.CompClass, error)
+	GetCategoriesByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Category, error)
+	StoreCategory(ctx context.Context, tx domain.Transaction, category domain.Category) (domain.Category, error)
 	GetProblemsByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Problem, error)
 	StoreProblem(ctx context.Context, tx domain.Transaction, problem domain.Problem) (domain.Problem, error)
 	DeleteCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) error
 	DeleteProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) error
-	DeleteCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) error
+	DeleteCategory(ctx context.Context, tx domain.Transaction, categoryID domain.CategoryID) error
 	DeleteContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) error
 	StoreContender(ctx context.Context, tx domain.Transaction, contender domain.Contender) (domain.Contender, error)
 	GetRafflesByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Raffle, error)
@@ -109,13 +109,13 @@ func (uc *CompetitionUseCase) GetScoreboard(ctx context.Context, competitionID d
 	entries := make([]domain.ScoreboardEntry, 0)
 
 	for _, contender := range contenders {
-		if contender.CompClassID == 0 {
+		if contender.CategoryID == 0 {
 			continue
 		}
 
 		entry := domain.ScoreboardEntry{
 			ContenderID:         contender.ID,
-			CompClassID:         contender.CompClassID,
+			CategoryID:          contender.CategoryID,
 			Name:                contender.Name,
 			WithdrawnFromFinals: contender.WithdrawnFromFinals,
 			Disqualified:        contender.Disqualified,
@@ -371,7 +371,7 @@ func (uc *CompetitionUseCase) DuplicateCompetition(ctx context.Context, competit
 		return domain.Competition{}, errors.Wrap(domain.ErrArchived, 0)
 	}
 
-	compClasses, err := uc.Repo.GetCompClassesByCompetition(ctx, nil, competitionID)
+	categories, err := uc.Repo.GetCategoriesByCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return domain.Competition{}, errors.Wrap(err, 0)
 	}
@@ -396,11 +396,11 @@ func (uc *CompetitionUseCase) DuplicateCompetition(ctx context.Context, competit
 			return domain.Competition{}, err
 		}
 
-		for _, compClass := range compClasses {
-			compClass.ID = 0
-			compClass.CompetitionID = createdCompetition.ID
+		for _, category := range categories {
+			category.ID = 0
+			category.CompetitionID = createdCompetition.ID
 
-			_, err = uc.Repo.StoreCompClass(ctx, tx, compClass)
+			_, err = uc.Repo.StoreCategory(ctx, tx, category)
 			if err != nil {
 				return domain.Competition{}, err
 			}
@@ -456,7 +456,7 @@ func (uc *CompetitionUseCase) TransferCompetition(ctx context.Context, competiti
 		return domain.Competition{}, errors.Wrap(err, 0)
 	}
 
-	compClasses, err := uc.Repo.GetCompClassesByCompetition(ctx, nil, competitionID)
+	categories, err := uc.Repo.GetCategoriesByCompetition(ctx, nil, competitionID)
 	if err != nil {
 		return domain.Competition{}, errors.Wrap(err, 0)
 	}
@@ -533,8 +533,8 @@ func (uc *CompetitionUseCase) TransferCompetition(ctx context.Context, competiti
 			}
 		}
 
-		for _, compClass := range compClasses {
-			err = uc.Repo.DeleteCompClass(ctx, tx, compClass.ID)
+		for _, category := range categories {
+			err = uc.Repo.DeleteCategory(ctx, tx, category.ID)
 			if err != nil {
 				return err
 			}
@@ -554,8 +554,8 @@ func (uc *CompetitionUseCase) TransferCompetition(ctx context.Context, competiti
 			return err
 		}
 
-		for _, compClass := range compClasses {
-			_, err = uc.Repo.StoreCompClass(ctx, tx, compClass)
+		for _, category := range categories {
+			_, err = uc.Repo.StoreCategory(ctx, tx, category)
 			if err != nil {
 				return err
 			}
@@ -618,8 +618,8 @@ func (uc *CompetitionUseCase) TransferCompetition(ctx context.Context, competiti
 
 	competition.Ownership.OrganizerID = newOrganizerID
 
-	for index := range compClasses {
-		compClasses[index].Ownership.OrganizerID = newOrganizerID
+	for index := range categories {
+		categories[index].Ownership.OrganizerID = newOrganizerID
 	}
 
 	for index := range problems {

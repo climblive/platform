@@ -18,7 +18,7 @@ type ScoreEngine interface {
 
 	HandleRulesUpdated(event domain.RulesUpdatedEvent) iter.Seq[Effect]
 	HandleContenderEntered(event domain.ContenderEnteredEvent) iter.Seq[Effect]
-	HandleContenderSwitchedClass(event domain.ContenderSwitchedClassEvent) iter.Seq[Effect]
+	HandleContenderSwitchedCategory(event domain.ContenderSwitchedCategoryEvent) iter.Seq[Effect]
 	HandleContenderWithdrewFromFinals(event domain.ContenderWithdrewFromFinalsEvent) iter.Seq[Effect]
 	HandleContenderReenteredFinals(event domain.ContenderReenteredFinalsEvent) iter.Seq[Effect]
 	HandleContenderDisqualified(event domain.ContenderDisqualifiedEvent) iter.Seq[Effect]
@@ -28,9 +28,9 @@ type ScoreEngine interface {
 	HandleProblemAdded(event domain.ProblemAddedEvent) iter.Seq[Effect]
 	HandleProblemUpdated(event domain.ProblemUpdatedEvent) iter.Seq[Effect]
 
-	RankCompClass(compClassID domain.CompClassID)
+	RankCategory(categoryID domain.CategoryID)
 	ScoreContender(contenderID domain.ContenderID) iter.Seq[Effect]
-	CalculatePointValues(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Effect]
+	CalculatePointValues(categoryID domain.CategoryID, problemID domain.ProblemID) iter.Seq[Effect]
 
 	GetDirtyScores() []domain.Score
 	GetDirtyPointValues() []domain.PointValue
@@ -130,7 +130,7 @@ func (d *ScoreEngineDriver) run(
 		d.competitionID,
 		0,
 		"CONTENDER_ENTERED",
-		"CONTENDER_SWITCHED_CLASS",
+		"CONTENDER_SWITCHED_CATEGORY",
 		"CONTENDER_WITHDREW_FROM_FINALS",
 		"CONTENDER_REENTERED_FINALS",
 		"CONTENDER_DISQUALIFIED",
@@ -249,8 +249,8 @@ func (d *ScoreEngineDriver) handleEvent(event domain.EventEnvelope) {
 		effects = d.engine.HandleRulesUpdated(ev)
 	case domain.ContenderEnteredEvent:
 		effects = d.engine.HandleContenderEntered(ev)
-	case domain.ContenderSwitchedClassEvent:
-		effects = d.engine.HandleContenderSwitchedClass(ev)
+	case domain.ContenderSwitchedCategoryEvent:
+		effects = d.engine.HandleContenderSwitchedCategory(ev)
 	case domain.ContenderWithdrewFromFinalsEvent:
 		effects = d.engine.HandleContenderWithdrewFromFinals(ev)
 	case domain.ContenderReenteredFinalsEvent:

@@ -3,20 +3,20 @@
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { deleteCompClassMutation } from "@climblive/lib/queries";
+  import { deleteCategoryMutation } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import type { Snippet } from "svelte";
 
   type Props = {
-    compClassId: number;
-    children: Snippet<[{ deleteCompClass: () => void }]>;
+    categoryId: number;
+    children: Snippet<[{ deleteCategory: () => void }]>;
   };
 
   let dialog: WaDialog | undefined = $state();
 
-  let { compClassId, children }: Props = $props();
+  let { categoryId, children }: Props = $props();
 
-  const deleteCompClass = $derived(deleteCompClassMutation(compClassId));
+  const deleteCategory = $derived(deleteCategoryMutation(categoryId));
 
   const handleDelete = async () => {
     if (dialog) {
@@ -31,13 +31,13 @@
   };
 
   const confirmDelete = () => {
-    deleteCompClass.mutate(undefined, {
+    deleteCategory.mutate(undefined, {
       onError: () => toastUnexpectedError("Failed to delete category."),
     });
   };
 </script>
 
-{@render children({ deleteCompClass: handleDelete })}
+{@render children({ deleteCategory: handleDelete })}
 
 <wa-dialog bind:this={dialog} label="Delete category">
   Are you sure you want to delete this category? This action is permanent and
@@ -49,7 +49,7 @@
     slot="footer"
     variant="danger"
     onclick={confirmDelete}
-    loading={deleteCompClass.isPending}
+    loading={deleteCategory.isPending}
   >
     Remove
     <wa-icon slot="start" name="trash"></wa-icon>

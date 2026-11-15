@@ -1,7 +1,7 @@
 <script lang="ts" module>
   import { z } from "@climblive/lib/utils";
 
-  const supportedClassNames = [
+  const supportedCategoryNames = [
     "Males",
     "Females",
     "Boys",
@@ -9,8 +9,11 @@
     "Seniors",
   ] as const;
 
-  const classNamesSchema = z
-    .union([z.enum(supportedClassNames), z.array(z.enum(supportedClassNames))])
+  const categoryNamesSchema = z
+    .union([
+      z.enum(supportedCategoryNames),
+      z.array(z.enum(supportedCategoryNames)),
+    ])
     .transform((value) => {
       if (Array.isArray(value)) {
         return value;
@@ -18,7 +21,7 @@
 
       return [value];
     })
-    .pipe(z.array(z.enum(supportedClassNames)));
+    .pipe(z.array(z.enum(supportedCategoryNames)));
 
   export const formSchema = z
     .object({
@@ -33,13 +36,13 @@
       flashBonusPercentage: z.coerce.number(),
       zone1Percentage: z.coerce.number(),
       zone2Percentage: z.coerce.number(),
-      className: classNamesSchema,
+      categoryName: categoryNamesSchema,
     })
     .transform((value) => ({
       ...value,
       problemMinPoints: Math.min(...value.problemPoints),
       problemMaxPoints: Math.max(...value.problemPoints),
-      classNames: value.className,
+      categoryNames: value.categoryName,
     }));
 
   type PopulateCompetitionFormData = z.infer<typeof formSchema>;
@@ -56,14 +59,14 @@
   import "@awesome.me/webawesome/dist/components/slider/slider.js";
   import { GenericForm, name } from "@climblive/lib/forms";
   import type {
-    CompClassTemplate,
+    CategoryTemplate,
     ProblemTemplate,
   } from "@climblive/lib/models";
   import {
-    createCompClassMutation,
+    createCategoryMutation,
     createContendersMutation,
     createProblemMutation,
-    getCompClassesQuery,
+    getCategoriesQuery,
     getContendersByCompetitionQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
@@ -91,13 +94,13 @@
 
   const { competitionId }: Props = $props();
 
-  const compClassesQuery = $derived(getCompClassesQuery(competitionId));
+  const categoriesQuery = $derived(getCategoriesQuery(competitionId));
   const contendersQuery = $derived(
     getContendersByCompetitionQuery(competitionId),
   );
   const problemsQuery = $derived(getProblemsQuery(competitionId));
 
-  const compClasses = $derived(compClassesQuery.data);
+  const categories = $derived(categoriesQuery.data);
   const contenders = $derived(contendersQuery.data);
   const problems = $derived(problemsQuery.data);
 
@@ -106,7 +109,7 @@
 
   const competitionEmpty = $derived.by(() => {
     if (
-      compClasses === undefined ||
+      categories === undefined ||
       problems === undefined ||
       contenders === undefined
     ) {
@@ -114,7 +117,7 @@
     }
 
     return (
-      compClasses.length === 0 &&
+      categories.length === 0 &&
       problems.length === 0 &&
       contenders.length === 0
     );
@@ -134,7 +137,7 @@
     totalSteps === 0 ? 100 : (completedSteps / totalSteps) * 100,
   );
 
-  const createCompClass = $derived(createCompClassMutation(competitionId));
+  const createCategory = $derived(createCategoryMutation(competitionId));
   const createProblem = $derived(createProblemMutation(competitionId));
   const createContenders = $derived(createContendersMutation(competitionId));
 
@@ -212,13 +215,13 @@
     };
   };
 
-  const getCompClasses = (formData: PopulateCompetitionFormData) => {
+  const getCategories = (formData: PopulateCompetitionFormData) => {
     const timeBegin = new Date();
     const timeEnd = add(timeBegin.getTime(), {
       hours: formData.competitionLengthHours,
     });
 
-    return formData.classNames.map<CompClassTemplate>((name) => ({
+    return formData.categoryNames.map<CategoryTemplate>((name) => ({
       name,
       timeBegin,
       timeEnd,
@@ -229,16 +232,16 @@
     populatorState = "pending";
 
     totalSteps =
-      formData.classNames.length +
+      formData.categoryNames.length +
       formData.problemCount +
       (formData.ticketCount > 0 ? 1 : 0);
 
     try {
-      const compClasses = getCompClasses(formData);
+      const categories = getCategories(formData);
       const firstProblemNumber = maxExistingProblemNumber + 1;
 
-      for (const compClass of compClasses.values()) {
-        await createCompClass.mutateAsync(compClass).then(incrementProgress);
+      for (const category of categories.values()) {
+        await createCategory.mutateAsync(category).then(incrementProgress);
       }
 
       for (let index = 0; index < formData.problemCount; index++) {
@@ -289,14 +292,14 @@
           size="s"
           multiple
           with-clear
-          {@attach name("className")}
+          {@attach name("categoryName")}
           label="Categories"
           hint="Select the categories to create."
           required
         >
-          {#each supportedClassNames as className, index (className)}
-            <wa-option value={className} selected={index < 2}>
-              {className}
+          {#each supportedCategoryNames as categoryName, index (categoryName)}
+            <wa-option value={categoryName} selected={index < 2}>
+              {categoryName}
             </wa-option>
           {/each}
         </wa-select>

@@ -11,7 +11,7 @@ type contenderUseCase interface {
 	GetContender(ctx context.Context, contenderID domain.ContenderID) (domain.Contender, error)
 	GetContenderByCode(ctx context.Context, registrationCode string) (domain.Contender, error)
 	GetPointValues(ctx context.Context, contenderID domain.ContenderID) ([]domain.PointValue, error)
-	GetContendersByCompClass(ctx context.Context, compClassID domain.CompClassID) ([]domain.Contender, error)
+	GetContendersByCategory(ctx context.Context, categoryID domain.CategoryID) ([]domain.Contender, error)
 	GetContendersByCompetition(ctx context.Context, competitionID domain.CompetitionID) ([]domain.Contender, error)
 	PatchContender(ctx context.Context, contenderID domain.ContenderID, patch domain.ContenderPatch) (domain.Contender, error)
 	ScrubContender(ctx context.Context, contenderID domain.ContenderID) (domain.Contender, error)
@@ -31,7 +31,7 @@ func InstallContenderHandler(mux *Mux, contenderUseCase contenderUseCase) {
 	mux.HandleFunc("GET /contenders/{contenderID}", handler.GetContender)
 	mux.HandleFunc("GET /contenders/{contenderID}/points", handler.GetPointValues)
 	mux.HandleFunc("GET /codes/{registrationCode}/contender", handler.GetContenderByCode)
-	mux.HandleFunc("GET /compClasses/{compClassID}/contenders", handler.GetContendersByCompClass)
+	mux.HandleFunc("GET /categories/{categoryID}/contenders", handler.GetContendersByCategory)
 	mux.HandleFunc("GET /competitions/{competitionID}/contenders", handler.GetContendersByCompetition)
 	mux.HandleFunc("PATCH /contenders/{contenderID}", handler.PatchContender)
 	mux.HandleFunc("POST /contenders/{contenderID}/scrub", handler.ScrubContender)
@@ -83,14 +83,14 @@ func (hdlr *contenderHandler) GetContenderByCode(w http.ResponseWriter, r *http.
 	writeResponse(w, http.StatusOK, contender)
 }
 
-func (hdlr *contenderHandler) GetContendersByCompClass(w http.ResponseWriter, r *http.Request) {
-	compClassID, err := parseResourceID[domain.CompClassID](r.PathValue("compClassID"))
+func (hdlr *contenderHandler) GetContendersByCategory(w http.ResponseWriter, r *http.Request) {
+	categoryID, err := parseResourceID[domain.CategoryID](r.PathValue("categoryID"))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	contenders, err := hdlr.contenderUseCase.GetContendersByCompClass(r.Context(), compClassID)
+	contenders, err := hdlr.contenderUseCase.GetContendersByCategory(r.Context(), categoryID)
 	if err != nil {
 		handleError(w, err)
 		return

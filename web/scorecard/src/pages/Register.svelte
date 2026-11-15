@@ -10,7 +10,7 @@
   } from "@climblive/lib/components";
   import type { ContenderPatch } from "@climblive/lib/models";
   import {
-    getCompClassesQuery,
+    getCategoriesQuery,
     getContenderQuery,
     getCompetitionQuery,
     patchContenderMutation,
@@ -29,16 +29,14 @@
   const competitionQuery = $derived(
     getCompetitionQuery($session.competitionId),
   );
-  const compClassesQuery = $derived(
-    getCompClassesQuery($session.competitionId),
-  );
+  const categoriesQuery = $derived(getCategoriesQuery($session.competitionId));
   const patchContender = $derived(patchContenderMutation($session.contenderId));
 
   const contender = $derived(contenderQuery.data);
   const competition = $derived(competitionQuery.data);
 
   const tooLate = $derived(
-    compClassesQuery.data?.every(({ timeEnd }) => isAfter(new Date(), timeEnd)),
+    categoriesQuery.data?.every(({ timeEnd }) => isAfter(new Date(), timeEnd)),
   );
 
   const gotoScorecard = () => {
@@ -84,7 +82,7 @@
         submit={handleSubmit}
         data={{
           name: contender.name,
-          compClassId: contender.compClassId,
+          categoryId: contender.categoryId,
           withdrawnFromFinals: contender.withdrawnFromFinals,
         }}
         callout={registerCallout}

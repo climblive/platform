@@ -18,7 +18,7 @@ type tickUseCaseRepository interface {
 	GetTicksByContender(ctx context.Context, tx domain.Transaction, contenderID domain.ContenderID) ([]domain.Tick, error)
 	GetTicksByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Tick, error)
 	GetCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) (domain.Competition, error)
-	GetCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) (domain.CompClass, error)
+	GetCategory(ctx context.Context, tx domain.Transaction, categoryID domain.CategoryID) (domain.Category, error)
 	GetProblem(ctx context.Context, tx domain.Transaction, problemID domain.ProblemID) (domain.Problem, error)
 	DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) error
 	StoreTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error)
@@ -91,12 +91,12 @@ func (uc *TickUseCase) DeleteTick(ctx context.Context, tickID domain.TickID) err
 		return errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
 	}
 
-	compClass, err := uc.Repo.GetCompClass(ctx, nil, contender.CompClassID)
+	category, err := uc.Repo.GetCategory(ctx, nil, contender.CategoryID)
 	if err != nil {
 		return errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
 	}
 
-	gracePeriodEnd := compClass.TimeEnd.Add(competition.GracePeriod)
+	gracePeriodEnd := category.TimeEnd.Add(competition.GracePeriod)
 
 	switch {
 	case role.OneOf(domain.OrganizerRole, domain.AdminRole):
@@ -134,16 +134,16 @@ func (uc *TickUseCase) PutTick(ctx context.Context, contenderID domain.Contender
 		return domain.Tick{}, errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
 	}
 
-	compClass, err := uc.Repo.GetCompClass(ctx, nil, contender.CompClassID)
+	category, err := uc.Repo.GetCategory(ctx, nil, contender.CategoryID)
 	if err != nil {
 		return domain.Tick{}, errors.Errorf("%w: %w", domain.ErrRepositoryIntegrityViolation, err)
 	}
 
-	if time.Now().Before(compClass.TimeBegin) {
+	if time.Now().Before(category.TimeBegin) {
 		return domain.Tick{}, errors.New(domain.ErrCompetitionNotStarted)
 	}
 
-	gracePeriodEnd := compClass.TimeEnd.Add(competition.GracePeriod)
+	gracePeriodEnd := category.TimeEnd.Add(competition.GracePeriod)
 
 	switch {
 	case role.OneOf(domain.OrganizerRole, domain.AdminRole):

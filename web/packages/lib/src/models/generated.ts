@@ -4,7 +4,7 @@
 // source: id.go
 
 export type ResourceID = number; /* int32 */
-export type CompClassID = ResourceID;
+export type CategoryID = ResourceID;
 export type ContenderID = ResourceID;
 export type CompetitionID = ResourceID;
 export type OrganizerID = ResourceID;
@@ -16,7 +16,7 @@ export type UserID = ResourceID;
 export type TickID = ResourceID;
 export type OrganizerInviteID = string;
 export type ResourceIDType =
-  | CompClassID
+  | CategoryID
   | ContenderID
   | CompetitionID
   | OrganizerID
@@ -41,21 +41,21 @@ export type ColorRGB = string;
 export interface OwnershipData {
   organizerId: OrganizerID;
 }
-export interface CompClass {
-  id: CompClassID;
+export interface Category {
+  id: CategoryID;
   competitionId: CompetitionID;
   name: string;
   description?: string;
   timeBegin: Date;
   timeEnd: Date;
 }
-export interface CompClassTemplate {
+export interface CategoryTemplate {
   name: string;
   description?: string;
   timeBegin: Date;
   timeEnd: Date;
 }
-export interface CompClassPatch {
+export interface CategoryPatch {
   name?: string;
   description?: string;
   timeBegin?: Date;
@@ -64,7 +64,7 @@ export interface CompClassPatch {
 export interface Contender {
   id: ContenderID;
   competitionId: CompetitionID;
-  compClassId?: CompClassID;
+  categoryId?: CategoryID;
   registrationCode: string;
   name?: string;
   entered?: Date;
@@ -75,7 +75,7 @@ export interface Contender {
   score?: Score;
 }
 export interface ContenderPatch {
-  compClassId?: CompClassID;
+  categoryId?: CategoryID;
   name?: string;
   withdrawnFromFinals?: boolean;
   disqualified?: boolean;
@@ -224,7 +224,7 @@ export interface Series {
 }
 export interface ScoreboardEntry {
   contenderId: ContenderID;
-  compClassId: CompClassID;
+  categoryId: CategoryID;
   name: string;
   withdrawnFromFinals: boolean;
   disqualified: boolean;
@@ -260,11 +260,11 @@ export interface ScoreEngineDescriptor {
 }
 export interface ContenderEnteredEvent {
   contenderId: ContenderID;
-  compClassId: CompClassID;
+  categoryId: CategoryID;
 }
-export interface ContenderSwitchedClassEvent {
+export interface ContenderSwitchedCategoryEvent {
   contenderId: ContenderID;
-  compClassId: CompClassID;
+  categoryId: CategoryID;
 }
 export interface ContenderWithdrewFromFinalsEvent {
   contenderId: ContenderID;
@@ -320,7 +320,7 @@ export interface RulesUpdatedEvent {
 }
 export interface ContenderPublicInfoUpdatedEvent {
   contenderId: ContenderID;
-  compClassId: CompClassID;
+  categoryId: CategoryID;
   name: string;
   withdrawnFromFinals: boolean;
   disqualified: boolean;

@@ -37,7 +37,7 @@
     type TickID,
   } from "@climblive/lib/models";
   import {
-    getCompClassesQuery,
+    getCategoriesQuery,
     getContenderQuery,
     getCompetitionQuery,
     getPointValuesByContenderQuery,
@@ -64,9 +64,7 @@
   const competitionQuery = $derived(
     getCompetitionQuery($session.competitionId),
   );
-  const compClassesQuery = $derived(
-    getCompClassesQuery($session.competitionId),
-  );
+  const categoriesQuery = $derived(getCategoriesQuery($session.competitionId));
   const ticksQuery = $derived(getTicksByContenderQuery($session.contenderId));
   const pointValuesQuery = $derived(
     getPointValuesByContenderQuery($session.contenderId),
@@ -82,16 +80,16 @@
 
   let contender = $derived(contenderQuery.data);
   let competition = $derived(competitionQuery.data);
-  let compClasses = $derived(compClassesQuery.data);
+  let categories = $derived(categoriesQuery.data);
   let ticks = $derived(ticksQuery.data);
-  let selectedCompClass = $derived(
-    compClasses?.find(({ id }) => id === contender?.compClassId),
+  let selectedCategory = $derived(
+    categories?.find(({ id }) => id === contender?.categoryId),
   );
   let startTime = $derived(
-    selectedCompClass?.timeBegin ?? new Date(8640000000000000),
+    selectedCategory?.timeBegin ?? new Date(8640000000000000),
   );
   let endTime = $derived(
-    selectedCompClass?.timeEnd ?? new Date(-8640000000000000),
+    selectedCategory?.timeEnd ?? new Date(-8640000000000000),
   );
 
   const problemsQuery = $derived(getProblemsQuery($session.competitionId));
@@ -293,7 +291,7 @@
               queryClient,
               event.contenderId,
               {
-                compClassId: event.compClassId,
+                categoryId: event.categoryId,
                 name: event.name,
                 withdrawnFromFinals: event.withdrawnFromFinals,
                 disqualified: event.disqualified,
@@ -419,12 +417,12 @@
 
 <svelte:window onvisibilitychange={handleVisibilityChange} />
 
-{#if showSplash || !contender || !competition || !compClasses || !sortedProblems || !ticks || !selectedCompClass}
+{#if showSplash || !contender || !competition || !categories || !sortedProblems || !ticks || !selectedCategory}
   <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
   <CompetitionStateProvider
     competitionId={$session.competitionId}
-    compClassId={contender?.compClassId}
+    categoryId={contender?.categoryId}
   >
     {#snippet children({ competitionState })}
       <main>
@@ -432,7 +430,7 @@
           <Header
             registrationCode={$session.registrationCode}
             competitionName={competition.name}
-            compClassName={selectedCompClass?.name}
+            categoryName={selectedCategory?.name}
             contenderId={contender.id}
             contenderName={contender.name}
             contenderScrubbedAt={contender.scrubbedAt}
@@ -529,7 +527,7 @@
               >
                 {#snippet children({ scoreboard, loading })}
                   <ResultList
-                    compClassId={selectedCompClass.id}
+                    categoryId={selectedCategory.id}
                     {scoreboard}
                     {loading}
                     highlightedContenderId={contender.id}
@@ -543,7 +541,7 @@
             <CompetitionInfo
               {competition}
               problems={sortedProblems}
-              {compClasses}
+              {categories}
             />
           </wa-tab-panel>
         </wa-tab-group>

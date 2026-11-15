@@ -19,8 +19,8 @@ type OwnershipData struct {
 	ContenderID *ContenderID `json:"-"`
 }
 
-type CompClass struct {
-	ID            CompClassID   `json:"id"`
+type Category struct {
+	ID            CategoryID    `json:"id"`
 	Ownership     OwnershipData `json:"-"`
 	CompetitionID CompetitionID `json:"competitionId"`
 	Name          string        `json:"name"`
@@ -29,14 +29,14 @@ type CompClass struct {
 	TimeEnd       time.Time     `json:"timeEnd"`
 }
 
-type CompClassTemplate struct {
+type CategoryTemplate struct {
 	Name        string    `json:"name"`
 	Description string    `json:"description,omitzero"`
 	TimeBegin   time.Time `json:"timeBegin"`
 	TimeEnd     time.Time `json:"timeEnd"`
 }
 
-type CompClassPatch struct {
+type CategoryPatch struct {
 	Name        Patch[string]    `json:"name,omitzero" tstype:"string"`
 	Description Patch[string]    `json:"description,omitzero" tstype:"string"`
 	TimeBegin   Patch[time.Time] `json:"timeBegin,omitzero" tstype:"Date"`
@@ -47,7 +47,7 @@ type Contender struct {
 	ID                  ContenderID   `json:"id"`
 	Ownership           OwnershipData `json:"-"`
 	CompetitionID       CompetitionID `json:"competitionId"`
-	CompClassID         CompClassID   `json:"compClassId,omitzero"`
+	CategoryID          CategoryID    `json:"categoryId,omitzero"`
 	RegistrationCode    string        `json:"registrationCode"`
 	Name                string        `json:"name,omitzero"`
 	Entered             time.Time     `json:"entered,omitzero"`
@@ -59,10 +59,10 @@ type Contender struct {
 }
 
 type ContenderPatch struct {
-	CompClassID         Patch[CompClassID] `json:"compClassId,omitzero" tstype:"CompClassID"`
-	Name                Patch[string]      `json:"name,omitzero" tstype:"string"`
-	WithdrawnFromFinals Patch[bool]        `json:"withdrawnFromFinals,omitzero" tstype:"boolean"`
-	Disqualified        Patch[bool]        `json:"disqualified,omitzero" tstype:"boolean"`
+	CategoryID          Patch[CategoryID] `json:"categoryId,omitzero" tstype:"CategoryID"`
+	Name                Patch[string]     `json:"name,omitzero" tstype:"string"`
+	WithdrawnFromFinals Patch[bool]       `json:"withdrawnFromFinals,omitzero" tstype:"boolean"`
+	Disqualified        Patch[bool]       `json:"disqualified,omitzero" tstype:"boolean"`
 }
 
 type Competition struct {
@@ -235,7 +235,7 @@ type Series struct {
 
 type ScoreboardEntry struct {
 	ContenderID         ContenderID `json:"contenderId"`
-	CompClassID         CompClassID `json:"compClassId"`
+	CategoryID          CategoryID  `json:"categoryId"`
 	Name                string      `json:"name"`
 	WithdrawnFromFinals bool        `json:"withdrawnFromFinals"`
 	Disqualified        bool        `json:"disqualified"`
@@ -278,12 +278,12 @@ type ScoreEngineDescriptor struct {
 
 type ContenderEnteredEvent struct {
 	ContenderID ContenderID `json:"contenderId"`
-	CompClassID CompClassID `json:"compClassId"`
+	CategoryID  CategoryID  `json:"categoryId"`
 }
 
-type ContenderSwitchedClassEvent struct {
+type ContenderSwitchedCategoryEvent struct {
 	ContenderID ContenderID `json:"contenderId"`
-	CompClassID CompClassID `json:"compClassId"`
+	CategoryID  CategoryID  `json:"categoryId"`
 }
 
 type ContenderWithdrewFromFinalsEvent struct {
@@ -352,7 +352,7 @@ type RulesUpdatedEvent struct {
 
 type ContenderPublicInfoUpdatedEvent struct {
 	ContenderID         ContenderID `json:"contenderId"`
-	CompClassID         CompClassID `json:"compClassId"`
+	CategoryID          CategoryID  `json:"categoryId"`
 	Name                string      `json:"name"`
 	WithdrawnFromFinals bool        `json:"withdrawnFromFinals"`
 	Disqualified        bool        `json:"disqualified"`

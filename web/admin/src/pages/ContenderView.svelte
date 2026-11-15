@@ -21,7 +21,7 @@
   } from "@climblive/lib/components";
   import { checked, value } from "@climblive/lib/forms";
   import {
-    getCompClassesQuery,
+    getCategoriesQuery,
     getContenderQuery,
     getCompetitionQuery,
     patchContenderMutation,
@@ -41,11 +41,11 @@
   const contender = $derived(contenderQuery.data);
   const competitionId = $derived(contender?.competitionId ?? 0);
 
-  const compClassesQuery = $derived(
-    getCompClassesQuery(competitionId, { enabled: !!competitionId }),
+  const categoriesQuery = $derived(
+    getCategoriesQuery(competitionId, { enabled: !!competitionId }),
   );
 
-  const compClasses = $derived(compClassesQuery.data);
+  const categories = $derived(categoriesQuery.data);
 
   const competitionQuery = $derived(
     competitionId ? getCompetitionQuery(competitionId) : undefined,
@@ -53,7 +53,7 @@
   const competition = $derived(competitionQuery?.data);
 
   let withdrawFromFinalsToggle: WaSwitch | undefined = $state();
-  let compClassSelect: WaSelect | undefined = $state();
+  let categorySelect: WaSelect | undefined = $state();
 
   const handleToggleWithdrawFromFinals = () => {
     if (!withdrawFromFinalsToggle) {
@@ -77,24 +77,24 @@
     });
   };
 
-  const handleCompClassChange = () => {
-    if (!compClassSelect || !compClassSelect.value) {
+  const handleCategoryChange = () => {
+    if (!categorySelect || !categorySelect.value) {
       return;
     }
 
-    if (typeof compClassSelect.value !== "string") {
+    if (typeof categorySelect.value !== "string") {
       return;
     }
 
-    const newCompClassId = parseInt(compClassSelect.value, 10);
+    const newCategoryId = parseInt(categorySelect.value, 10);
 
     patchContender.mutate({
-      compClassId: newCompClassId,
+      categoryId: newCategoryId,
     });
   };
 </script>
 
-{#if contender && compClasses && competition}
+{#if contender && categories && competition}
   <wa-breadcrumb>
     <wa-breadcrumb-item
       onclick={() =>
@@ -178,7 +178,7 @@
     <section>
       <article>
         <LabeledText label="Category"
-          >{compClasses.find(({ id }) => id === contender.compClassId)?.name ??
+          >{categories.find(({ id }) => id === contender.categoryId)?.name ??
             "-"}</LabeledText
         >
         <span class="entered">
@@ -230,18 +230,18 @@
     <div class="controls">
       <wa-select
         size="s"
-        bind:this={compClassSelect}
+        bind:this={categorySelect}
         label="Category"
         hint="Change the category for this competitor."
-        {@attach value(contender.compClassId)}
-        onchange={handleCompClassChange}
+        {@attach value(contender.categoryId)}
+        onchange={handleCategoryChange}
         disabled={contender.disqualified || patchContender.isPending}
       >
-        {#each compClasses as compClass (compClass.id)}
-          <wa-option value={compClass.id} label={compClass.name}>
-            {compClass.name}
-            {#if compClass.description}
-              <small>{compClass.description}</small>
+        {#each categories as category (category.id)}
+          <wa-option value={category.id} label={category.name}>
+            {category.name}
+            {#if category.description}
+              <small>{category.description}</small>
             {/if}
           </wa-option>
         {/each}

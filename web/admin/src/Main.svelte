@@ -3,10 +3,10 @@
   import Header from "./Header.svelte";
   import ContenderView from "./pages/ContenderView.svelte";
   import Competition from "./pages/Competition.svelte";
-  import CreateCompClass from "./pages/CreateCompClass.svelte";
+  import CreateCategory from "./pages/CreateCategory.svelte";
   import CreateCompetition from "./pages/CreateCompetition.svelte";
   import CreateProblem from "./pages/CreateProblem.svelte";
-  import EditCompClass from "./pages/EditCompClass.svelte";
+  import EditCategory from "./pages/EditCategory.svelte";
   import EditCompetition from "./pages/EditCompetition.svelte";
   import EditProblem from "./pages/EditProblem.svelte";
   import Health from "./pages/Health.svelte";
@@ -70,9 +70,9 @@
         <EditCompetition competitionId={Number(params.competitionId)} />
       {/snippet}
     </Route>
-    <Route path="/competitions/:competitionId/new-comp-class">
+    <Route path="/competitions/:competitionId/new-category">
       {#snippet children({ params }: { params: { competitionId: number } })}
-        <CreateCompClass competitionId={Number(params.competitionId)} />
+        <CreateCategory competitionId={Number(params.competitionId)} />
       {/snippet}
     </Route>
     <Route path="/competitions/:competitionId/new-problem">
@@ -85,9 +85,9 @@
         <EditProblem problemId={Number(params.problemId)} />
       {/snippet}
     </Route>
-    <Route path="/comp-classes/:compClassId/edit">
-      {#snippet children({ params }: { params: { compClassId: number } })}
-        <EditCompClass compClassId={Number(params.compClassId)} />
+    <Route path="/categories/:categoryId/edit">
+      {#snippet children({ params }: { params: { categoryId: number } })}
+        <EditCategory categoryId={Number(params.categoryId)} />
       {/snippet}
     </Route>
     <Route path="/raffles/:raffleId">

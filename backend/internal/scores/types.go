@@ -18,7 +18,7 @@ type Score struct {
 
 type Contender struct {
 	ID                  domain.ContenderID
-	CompClassID         domain.CompClassID
+	CategoryID          domain.CategoryID
 	Disqualified        bool
 	WithdrawnFromFinals bool
 

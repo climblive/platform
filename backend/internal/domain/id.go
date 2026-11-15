@@ -4,7 +4,7 @@ import "uuid"
 
 type ResourceID int32
 
-type CompClassID ResourceID
+type CategoryID ResourceID
 type ContenderID ResourceID
 type CompetitionID ResourceID
 type OrganizerID ResourceID
@@ -18,7 +18,7 @@ type TickID ResourceID
 type OrganizerInviteID = uuid.UUID
 
 type ResourceIDType interface {
-	CompClassID |
+	CategoryID |
 		ContenderID |
 		CompetitionID |
 		OrganizerID |
