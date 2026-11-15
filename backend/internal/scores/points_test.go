@@ -24,61 +24,66 @@ func TestCalculatePoints(t *testing.T) {
 	}{
 		{
 			name:     "NoAttempts",
-			tick:     scores.Tick{},
+			tick:     testutils.MustScoreTick(scores.Tick{Revision: 1}),
 			expected: 0,
 		},
 		{
 			name: "SingleAttemptNoLuck",
-			tick: scores.Tick{
+			tick: testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				AttemptsTop:   1,
 				AttemptsZone1: 1,
 				AttemptsZone2: 1,
-			},
+			}),
 			expected: 0,
 		},
 		{
 			name: "Flash",
-			tick: scores.Tick{
+			tick: testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				Top:           true,
 				AttemptsTop:   1,
 				Zone1:         true,
 				AttemptsZone1: 1,
 				Zone2:         true,
 				AttemptsZone2: 1,
-			},
+			}),
 			expected: 1100,
 		},
 		{
 			name: "TopWithSeveralAttempts",
-			tick: scores.Tick{
+			tick: testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				Top:           true,
 				AttemptsTop:   999,
 				Zone1:         true,
 				AttemptsZone1: 999,
 				Zone2:         true,
 				AttemptsZone2: 999,
-			},
+			}),
 			expected: 1000,
 		},
 		{
 			name: "Zone1WithSeveralAttempts",
-			tick: scores.Tick{
+			tick: testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				AttemptsTop:   999,
 				Zone1:         true,
 				AttemptsZone1: 999,
 				AttemptsZone2: 999,
-			},
+			}),
 			expected: 500,
 		},
 		{
 			name: "Zone2WithSeveralAttempts",
-			tick: scores.Tick{
+			tick: testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				AttemptsTop:   999,
 				Zone1:         true,
 				AttemptsZone1: 999,
 				Zone2:         true,
 				AttemptsZone2: 999,
-			},
+			}),
 			expected: 750,
 		},
 	}
@@ -99,13 +104,14 @@ func TestCalculatePoints_HighestValueFeatureWins(t *testing.T) {
 	}
 
 	t.Run("Zone1WinsOverZone2", func(t *testing.T) {
-		tick := scores.Tick{
+		tick := testutils.MustScoreTick(scores.Tick{
+			Revision:      1,
 			AttemptsTop:   4,
 			Zone2:         true,
 			AttemptsZone2: 4,
 			Zone1:         true,
 			AttemptsZone1: 1,
-		}
+		})
 
 		rules := scores.Rules{PointDeduction: 100}
 
@@ -113,14 +119,15 @@ func TestCalculatePoints_HighestValueFeatureWins(t *testing.T) {
 	})
 
 	t.Run("Zone2WinsOverTop", func(t *testing.T) {
-		tick := scores.Tick{
+		tick := testutils.MustScoreTick(scores.Tick{
+			Revision:      1,
 			Top:           true,
 			AttemptsTop:   4,
 			Zone2:         true,
 			AttemptsZone2: 1,
 			Zone1:         true,
 			AttemptsZone1: 1,
-		}
+		})
 
 		rules := scores.Rules{PointDeduction: 100}
 
@@ -137,11 +144,12 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 	}
 
 	t.Run("NoAscent", func(t *testing.T) {
-		tick := scores.Tick{
+		tick := testutils.MustScoreTick(scores.Tick{
+			Revision:      1,
 			AttemptsTop:   3,
 			AttemptsZone2: 3,
 			AttemptsZone1: 3,
-		}
+		})
 
 		rules := scores.Rules{PointDeduction: 100}
 
@@ -149,14 +157,15 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 	})
 
 	t.Run("Flash", func(t *testing.T) {
-		tick := scores.Tick{
+		tick := testutils.MustScoreTick(scores.Tick{
+			Revision:      1,
 			Top:           true,
 			AttemptsTop:   1,
 			Zone2:         true,
 			AttemptsZone2: 1,
 			Zone1:         true,
 			AttemptsZone1: 1,
-		}
+		})
 
 		rules := scores.Rules{PointDeduction: 10}
 
@@ -164,12 +173,13 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 	})
 
 	t.Run("Zone1", func(t *testing.T) {
-		tick := scores.Tick{
+		tick := testutils.MustScoreTick(scores.Tick{
+			Revision:      1,
 			AttemptsTop:   5,
 			AttemptsZone2: 3,
 			Zone1:         true,
 			AttemptsZone1: 2,
-		}
+		})
 
 		rules := scores.Rules{PointDeduction: 1}
 
@@ -177,13 +187,14 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 	})
 
 	t.Run("Zone2", func(t *testing.T) {
-		tick := scores.Tick{
+		tick := testutils.MustScoreTick(scores.Tick{
+			Revision:      1,
 			AttemptsTop:   5,
 			Zone2:         true,
 			AttemptsZone2: 3,
 			Zone1:         true,
 			AttemptsZone1: 2,
-		}
+		})
 
 		rules := scores.Rules{PointDeduction: 1}
 
@@ -191,14 +202,15 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 	})
 
 	t.Run("Top", func(t *testing.T) {
-		tick := scores.Tick{
+		tick := testutils.MustScoreTick(scores.Tick{
+			Revision:      1,
 			Top:           true,
 			AttemptsTop:   5,
 			Zone2:         true,
 			AttemptsZone2: 3,
 			Zone1:         true,
 			AttemptsZone1: 2,
-		}
+		})
 
 		rules := scores.Rules{PointDeduction: 1}
 
@@ -206,14 +218,15 @@ func TestCalculatePoints_PointDeduction(t *testing.T) {
 	})
 
 	t.Run("FloorAtZero", func(t *testing.T) {
-		tick := scores.Tick{
+		tick := testutils.MustScoreTick(scores.Tick{
+			Revision:      1,
 			Top:           true,
 			AttemptsTop:   999,
 			Zone2:         true,
 			AttemptsZone2: 999,
 			Zone1:         true,
 			AttemptsZone1: 999,
-		}
+		})
 
 		rules := scores.Rules{PointDeduction: 21_474_836_470}
 
@@ -226,7 +239,15 @@ func TestCalculatePoints_MaximumTopAndFlashBonus(t *testing.T) {
 		PointsTop:  21_474_836_470,
 		FlashBonus: 21_474_836_470,
 	}
-	tick := scores.Tick{Top: true, AttemptsTop: 1}
+	tick := testutils.MustScoreTick(scores.Tick{
+		Revision:      1,
+		Top:           true,
+		AttemptsTop:   1,
+		Zone1:         true,
+		AttemptsZone1: 1,
+		Zone2:         true,
+		AttemptsZone2: 1,
+	})
 
 	assert.Equal(t, domain.Tenths(42_949_672_940), scores.CalculatePoints(value, tick, scores.Rules{}))
 }
@@ -240,14 +261,15 @@ func TestCalculatePoints_MaxAttempts(t *testing.T) {
 	}
 
 	t.Run("Flash", func(t *testing.T) {
-		tick := scores.Tick{
+		tick := testutils.MustScoreTick(scores.Tick{
+			Revision:      1,
 			Top:           true,
 			AttemptsTop:   1,
 			Zone2:         true,
 			AttemptsZone2: 1,
 			Zone1:         true,
 			AttemptsZone1: 1,
-		}
+		})
 
 		rules := scores.Rules{MaxAttempts: 1}
 
@@ -255,40 +277,43 @@ func TestCalculatePoints_MaxAttempts(t *testing.T) {
 	})
 
 	t.Run("AtAttemptLimit", func(t *testing.T) {
-		tick := scores.Tick{
+		tick := testutils.MustScoreTick(scores.Tick{
+			Revision:      1,
 			Top:           true,
 			AttemptsTop:   10,
 			Zone2:         true,
 			AttemptsZone2: 10,
 			Zone1:         true,
 			AttemptsZone1: 10,
-		}
+		})
 		rules := scores.Rules{MaxAttempts: 10}
 
 		assert.Equal(t, domain.Tenths(1000), scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("AboveAttemptLimit", func(t *testing.T) {
-		tick := scores.Tick{
+		tick := testutils.MustScoreTick(scores.Tick{
+			Revision:      1,
 			Top:           true,
 			AttemptsTop:   11,
 			Zone2:         true,
 			AttemptsZone2: 11,
 			Zone1:         true,
 			AttemptsZone1: 11,
-		}
+		})
 		rules := scores.Rules{MaxAttempts: 10}
 
 		assert.Equal(t, domain.Tenths(0), scores.CalculatePoints(value, tick, rules))
 	})
 
 	t.Run("MaxAttemptsAffectsOnlyReachedFeatures", func(t *testing.T) {
-		tick := scores.Tick{
+		tick := testutils.MustScoreTick(scores.Tick{
+			Revision:      1,
 			AttemptsTop:   11,
 			AttemptsZone2: 11,
 			Zone1:         true,
 			AttemptsZone1: 2,
-		}
+		})
 		rules := scores.Rules{MaxAttempts: 10}
 
 		assert.Equal(t, domain.Tenths(500), scores.CalculatePoints(value, tick, rules))
@@ -300,7 +325,8 @@ func TestTick(t *testing.T) {
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 	makeFakes := func() (scores.Tick, scores.Tick, scores.Tick, scores.Tick, scores.Tick) {
-		none := scores.Tick{
+		none := testutils.MustScoreTick(scores.Tick{
+			Revision:      1,
 			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Zone1:         false,
@@ -309,9 +335,10 @@ func TestTick(t *testing.T) {
 			AttemptsZone1: 10,
 			AttemptsZone2: 10,
 			AttemptsTop:   10,
-		}
+		})
 
-		zone1 := scores.Tick{
+		zone1 := testutils.MustScoreTick(scores.Tick{
+			Revision:      1,
 			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Zone1:         true,
@@ -320,9 +347,10 @@ func TestTick(t *testing.T) {
 			AttemptsZone1: 10,
 			AttemptsZone2: 10,
 			AttemptsTop:   10,
-		}
+		})
 
-		zone2 := scores.Tick{
+		zone2 := testutils.MustScoreTick(scores.Tick{
+			Revision:      1,
 			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Zone1:         true,
@@ -331,9 +359,10 @@ func TestTick(t *testing.T) {
 			AttemptsZone1: 10,
 			AttemptsZone2: 10,
 			AttemptsTop:   10,
-		}
+		})
 
-		top := scores.Tick{
+		top := testutils.MustScoreTick(scores.Tick{
+			Revision:      1,
 			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Zone1:         true,
@@ -342,9 +371,10 @@ func TestTick(t *testing.T) {
 			AttemptsZone1: 10,
 			AttemptsZone2: 10,
 			AttemptsTop:   10,
-		}
+		})
 
-		flash := scores.Tick{
+		flash := testutils.MustScoreTick(scores.Tick{
+			Revision:      1,
 			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Zone1:         true,
@@ -353,7 +383,7 @@ func TestTick(t *testing.T) {
 			AttemptsZone1: 1,
 			AttemptsZone2: 1,
 			AttemptsTop:   1,
-		}
+		})
 
 		return none, zone1, zone2, top, flash
 	}
@@ -369,7 +399,8 @@ func TestTick(t *testing.T) {
 			{
 				name: "None",
 				tick: none,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -378,12 +409,13 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 11,
 					AttemptsZone2: 11,
 					AttemptsTop:   11,
-				},
+				}),
 			},
 			{
 				name: "Zone1",
 				tick: zone1,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -392,12 +424,13 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 10,
 					AttemptsZone2: 10,
 					AttemptsTop:   10,
-				},
+				}),
 			},
 			{
 				name: "Zone2",
 				tick: zone2,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -406,12 +439,13 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 10,
 					AttemptsZone2: 10,
 					AttemptsTop:   10,
-				},
+				}),
 			},
 			{
 				name: "Top",
 				tick: top,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -420,12 +454,13 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 10,
 					AttemptsZone2: 10,
 					AttemptsTop:   10,
-				},
+				}),
 			},
 			{
 				name: "Flash",
 				tick: flash,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -434,7 +469,7 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 1,
 					AttemptsZone2: 1,
 					AttemptsTop:   1,
-				},
+				}),
 			},
 		}
 
@@ -456,7 +491,8 @@ func TestTick(t *testing.T) {
 			{
 				name: "None",
 				tick: none,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -465,12 +501,13 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 11,
 					AttemptsZone2: 11,
 					AttemptsTop:   11,
-				},
+				}),
 			},
 			{
 				name: "Zone1",
 				tick: zone1,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -479,12 +516,13 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 10,
 					AttemptsZone2: 11,
 					AttemptsTop:   11,
-				},
+				}),
 			},
 			{
 				name: "Zone2",
 				tick: zone2,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -493,12 +531,13 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 10,
 					AttemptsZone2: 10,
 					AttemptsTop:   10,
-				},
+				}),
 			},
 			{
 				name: "Top",
 				tick: top,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -507,12 +546,13 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 10,
 					AttemptsZone2: 10,
 					AttemptsTop:   10,
-				},
+				}),
 			},
 			{
 				name: "Flash",
 				tick: flash,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -521,7 +561,7 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 1,
 					AttemptsZone2: 1,
 					AttemptsTop:   1,
-				},
+				}),
 			},
 		}
 
@@ -542,20 +582,22 @@ func TestTick(t *testing.T) {
 		}{
 			{
 				name: "Unattempted",
-				tick: scores.Tick{},
-				expected: scores.Tick{
+				tick: testutils.MustScoreTick(scores.Tick{Revision: 1}),
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					Zone1:         true,
 					Zone2:         true,
 					Top:           true,
 					AttemptsZone1: 1,
 					AttemptsZone2: 1,
 					AttemptsTop:   1,
-				},
+				}),
 			},
 			{
 				name: "None",
 				tick: none,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -564,12 +606,13 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 11,
 					AttemptsZone2: 11,
 					AttemptsTop:   11,
-				},
+				}),
 			},
 			{
 				name: "Zone1",
 				tick: zone1,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -578,12 +621,13 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 10,
 					AttemptsZone2: 11,
 					AttemptsTop:   11,
-				},
+				}),
 			},
 			{
 				name: "Zone2",
 				tick: zone2,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -592,12 +636,13 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 10,
 					AttemptsZone2: 10,
 					AttemptsTop:   11,
-				},
+				}),
 			},
 			{
 				name: "Top",
 				tick: top,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -606,12 +651,13 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 10,
 					AttemptsZone2: 10,
 					AttemptsTop:   10,
-				},
+				}),
 			},
 			{
 				name: "Flash",
 				tick: flash,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -620,7 +666,7 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 1,
 					AttemptsZone2: 1,
 					AttemptsTop:   1,
-				},
+				}),
 			},
 		}
 
@@ -642,7 +688,8 @@ func TestTick(t *testing.T) {
 			{
 				name: "None",
 				tick: none,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -651,12 +698,13 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 1,
 					AttemptsZone2: 1,
 					AttemptsTop:   1,
-				},
+				}),
 			},
 			{
 				name: "Zone1",
 				tick: zone1,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -665,12 +713,13 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 1,
 					AttemptsZone2: 1,
 					AttemptsTop:   1,
-				},
+				}),
 			},
 			{
 				name: "Zone2",
 				tick: zone2,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -679,12 +728,13 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 1,
 					AttemptsZone2: 1,
 					AttemptsTop:   1,
-				},
+				}),
 			},
 			{
 				name: "Top",
 				tick: top,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -693,12 +743,13 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 1,
 					AttemptsZone2: 1,
 					AttemptsTop:   1,
-				},
+				}),
 			},
 			{
 				name: "Flash",
 				tick: flash,
-				expected: scores.Tick{
+				expected: testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblemID,
 					Zone1:         true,
@@ -707,7 +758,7 @@ func TestTick(t *testing.T) {
 					AttemptsZone1: 1,
 					AttemptsZone2: 1,
 					AttemptsTop:   1,
-				},
+				}),
 			},
 		}
 

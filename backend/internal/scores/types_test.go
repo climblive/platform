@@ -5,6 +5,7 @@ import (
 
 	"github.com/climblive/platform/backend/internal/domain"
 	"github.com/climblive/platform/backend/internal/scores"
+	"github.com/climblive/platform/backend/internal/testutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -136,10 +137,13 @@ func TestTickPool_Add(t *testing.T) {
 		pool := scores.TickPool{}
 
 		for range 5 {
-			pool = pool.Add(scores.Tick{
+			pool = pool.Add(testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				Zone1:         true,
 				AttemptsZone1: 1,
-			})
+				AttemptsZone2: 1,
+				AttemptsTop:   1,
+			}))
 		}
 
 		assert.Equal(t, scores.TickPool{
@@ -151,12 +155,14 @@ func TestTickPool_Add(t *testing.T) {
 		pool := scores.TickPool{}
 
 		for range 5 {
-			pool = pool.Add(scores.Tick{
+			pool = pool.Add(testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				Zone1:         true,
 				AttemptsZone1: 1,
 				Zone2:         true,
 				AttemptsZone2: 1,
-			})
+				AttemptsTop:   1,
+			}))
 		}
 
 		assert.Equal(t, scores.TickPool{
@@ -169,14 +175,15 @@ func TestTickPool_Add(t *testing.T) {
 		pool := scores.TickPool{}
 
 		for range 5 {
-			pool = pool.Add(scores.Tick{
+			pool = pool.Add(testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				Zone1:         true,
 				AttemptsZone1: 999,
 				Zone2:         true,
 				AttemptsZone2: 999,
 				Top:           true,
 				AttemptsTop:   999,
-			})
+			}))
 		}
 
 		assert.Equal(t, scores.TickPool{
@@ -190,14 +197,15 @@ func TestTickPool_Add(t *testing.T) {
 		pool := scores.TickPool{}
 
 		for range 5 {
-			pool = pool.Add(scores.Tick{
+			pool = pool.Add(testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				Zone1:         true,
 				AttemptsZone1: 1,
 				Zone2:         true,
 				AttemptsZone2: 1,
 				Top:           true,
 				AttemptsTop:   1,
-			})
+			}))
 		}
 
 		assert.Equal(t, scores.TickPool{
@@ -219,10 +227,13 @@ func TestTickPool_Sub(t *testing.T) {
 		}
 
 		for range 3 {
-			pool = pool.Sub(scores.Tick{
+			pool = pool.Sub(testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				Zone1:         true,
 				AttemptsZone1: 1,
-			})
+				AttemptsZone2: 1,
+				AttemptsTop:   1,
+			}))
 		}
 
 		assert.Equal(t, scores.TickPool{
@@ -242,12 +253,14 @@ func TestTickPool_Sub(t *testing.T) {
 		}
 
 		for range 3 {
-			pool = pool.Sub(scores.Tick{
+			pool = pool.Sub(testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				Zone1:         true,
 				AttemptsZone1: 1,
 				Zone2:         true,
 				AttemptsZone2: 1,
-			})
+				AttemptsTop:   1,
+			}))
 		}
 
 		assert.Equal(t, scores.TickPool{
@@ -267,14 +280,15 @@ func TestTickPool_Sub(t *testing.T) {
 		}
 
 		for range 3 {
-			pool = pool.Sub(scores.Tick{
+			pool = pool.Sub(testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				Zone1:         true,
 				AttemptsZone1: 999,
 				Zone2:         true,
 				AttemptsZone2: 999,
 				Top:           true,
 				AttemptsTop:   999,
-			})
+			}))
 		}
 
 		assert.Equal(t, scores.TickPool{
@@ -294,14 +308,15 @@ func TestTickPool_Sub(t *testing.T) {
 		}
 
 		for range 3 {
-			pool = pool.Sub(scores.Tick{
+			pool = pool.Sub(testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				Zone1:         true,
 				AttemptsZone1: 1,
 				Zone2:         true,
 				AttemptsZone2: 1,
 				Top:           true,
 				AttemptsTop:   1,
-			})
+			}))
 		}
 
 		assert.Equal(t, scores.TickPool{

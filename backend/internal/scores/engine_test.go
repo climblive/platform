@@ -795,7 +795,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			}, true)
 
 		f.store.
-			On("SaveTick", fakedCompetitorID, scores.Tick{
+			On("SaveTick", fakedCompetitorID, testutils.MustScoreTick(scores.Tick{
 				ID:            fakedTickID,
 				Revision:      1,
 				CompetitorID:  fakedCompetitorID,
@@ -806,7 +806,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				AttemptsZone1: 2,
 				Zone2:         true,
 				AttemptsZone2: 3,
-			}).
+			})).
 			Return()
 
 		effects := f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
@@ -835,11 +835,11 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetTick", fakedCompetitorID, fakedProblemID).
-			Return(scores.Tick{
+			Return(testutils.MustScoreTick(scores.Tick{
 				CompetitorID: fakedCompetitorID,
 				ProblemID:    fakedProblemID,
 				Revision:     2,
-			}, true)
+			}), true)
 
 		effects := f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
 			CompetitorID: fakedCompetitorID,
@@ -872,7 +872,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			}, true)
 
 		f.store.
-			On("SaveTick", fakedCompetitorID, scores.Tick{
+			On("SaveTick", fakedCompetitorID, testutils.MustScoreTick(scores.Tick{
 				ID:            fakedTickID,
 				Revision:      1,
 				CompetitorID:  fakedCompetitorID,
@@ -883,7 +883,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				AttemptsZone1: 2,
 				Zone2:         true,
 				AttemptsZone2: 3,
-			}).
+			})).
 			Return()
 
 		effects := slices.Collect(f.engine.HandleAscentRegistered(domain.AscentRegisteredEvent{
@@ -1119,7 +1119,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 
 		f.store.
 			On("GetTick", fakedCompetitor1ID, fakedProblemID).
-			Return(scores.Tick{
+			Return(testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				CompetitorID:  fakedCompetitor1ID,
 				ProblemID:     fakedProblemID,
 				Top:           true,
@@ -1128,7 +1129,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				AttemptsZone2: 1,
 				Zone1:         true,
 				AttemptsZone1: 1,
-			}, true).
+			}), true).
 			On("GetTick", fakedCompetitor2ID, fakedProblemID).
 			Return(scores.Tick{}, false)
 
@@ -1180,7 +1181,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 			ID: fakedCompetitorID,
 		}
 
-		fakedTick := scores.Tick{
+		fakedTick := testutils.MustScoreTick(scores.Tick{
+			Revision:      1,
 			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Zone1:         true,
@@ -1189,7 +1191,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 			AttemptsZone2: 1,
 			Top:           true,
 			AttemptsTop:   1,
-		}
+		})
 
 		f.store.
 			On("GetRules").
@@ -1261,7 +1263,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 		fakedCompetitor6ID := testutils.RandomResourceID[domain.CompetitorID]()
 
 		fakedTicksByCompetitor := map[domain.CompetitorID]scores.Tick{
-			fakedCompetitor1ID: {
+			fakedCompetitor1ID: testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				CompetitorID:  fakedCompetitor1ID,
 				ProblemID:     fakedProblemID,
 				Zone1:         true,
@@ -1270,8 +1273,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 				AttemptsZone2: 1,
 				Top:           true,
 				AttemptsTop:   1,
-			},
-			fakedCompetitor2ID: {
+			}),
+			fakedCompetitor2ID: testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				CompetitorID:  fakedCompetitor2ID,
 				ProblemID:     fakedProblemID,
 				Zone1:         true,
@@ -1280,8 +1284,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 				AttemptsZone2: 1,
 				Top:           true,
 				AttemptsTop:   1,
-			},
-			fakedCompetitor3ID: {
+			}),
+			fakedCompetitor3ID: testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				CompetitorID:  fakedCompetitor3ID,
 				ProblemID:     fakedProblemID,
 				Zone1:         true,
@@ -1290,8 +1295,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 				AttemptsZone2: 999,
 				Top:           true,
 				AttemptsTop:   999,
-			},
-			fakedCompetitor4ID: {
+			}),
+			fakedCompetitor4ID: testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				CompetitorID:  fakedCompetitor4ID,
 				ProblemID:     fakedProblemID,
 				Zone1:         true,
@@ -1300,8 +1306,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 				AttemptsZone2: 999,
 				Top:           false,
 				AttemptsTop:   999,
-			},
-			fakedCompetitor5ID: {
+			}),
+			fakedCompetitor5ID: testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				CompetitorID:  fakedCompetitor5ID,
 				ProblemID:     fakedProblemID,
 				Zone1:         true,
@@ -1310,7 +1317,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				AttemptsZone2: 999,
 				Top:           false,
 				AttemptsTop:   999,
-			},
+			}),
 		}
 
 		f.store.
@@ -1477,7 +1484,8 @@ func TestDefaultScoreEngine(t *testing.T) {
 		}
 
 		fakedTicksByCompetitor := map[domain.CompetitorID]scores.Tick{
-			fakedCompetitor1.ID: {
+			fakedCompetitor1.ID: testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				CompetitorID:  fakedCompetitor1.ID,
 				ProblemID:     fakedProblemID,
 				Zone1:         true,
@@ -1486,8 +1494,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 				AttemptsZone2: 1,
 				Top:           true,
 				AttemptsTop:   1,
-			},
-			fakedCompetitor2.ID: {
+			}),
+			fakedCompetitor2.ID: testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				CompetitorID:  fakedCompetitor2.ID,
 				ProblemID:     fakedProblemID,
 				Zone1:         true,
@@ -1496,8 +1505,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 				AttemptsZone2: 1,
 				Top:           true,
 				AttemptsTop:   1,
-			},
-			fakedCompetitor3.ID: {
+			}),
+			fakedCompetitor3.ID: testutils.MustScoreTick(scores.Tick{
+				Revision:      1,
 				CompetitorID:  fakedCompetitor3.ID,
 				ProblemID:     fakedProblemID,
 				Zone1:         true,
@@ -1506,7 +1516,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 				AttemptsZone2: 1,
 				Top:           true,
 				AttemptsTop:   1,
-			},
+			}),
 		}
 
 		f.store.
@@ -1681,17 +1691,19 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f.store.
 			On("GetTicksByCompetitor", fakedCompetitorID).
 			Return(slices.Values([]scores.Tick{
-				{
+				testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblem1ID,
 					Top:           false,
-					AttemptsTop:   1_000_000,
+					AttemptsTop:   999,
 					Zone2:         false,
-					AttemptsZone2: 1_000_000,
+					AttemptsZone2: 999,
 					Zone1:         false,
-					AttemptsZone1: 1_000_000,
-				},
-				{
+					AttemptsZone1: 999,
+				}),
+				testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblem2ID,
 					Top:           true,
@@ -1700,8 +1712,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 					AttemptsZone2: 200,
 					Zone1:         true,
 					AttemptsZone1: 100,
-				},
-				{
+				}),
+				testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblem3ID,
 					Top:           true,
@@ -1710,8 +1723,9 @@ func TestDefaultScoreEngine(t *testing.T) {
 					AttemptsZone2: 20,
 					Zone1:         true,
 					AttemptsZone1: 10,
-				},
-				{
+				}),
+				testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
 					CompetitorID:  fakedCompetitorID,
 					ProblemID:     fakedProblem4ID,
 					Top:           true,
@@ -1720,7 +1734,7 @@ func TestDefaultScoreEngine(t *testing.T) {
 					AttemptsZone2: 2,
 					Zone1:         true,
 					AttemptsZone1: 1,
-				},
+				}),
 			}))
 
 		f.store.
@@ -1816,18 +1830,28 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f.store.
 			On("GetTicksByCompetitor", fakedCompetitorID).
 			Return(slices.Values([]scores.Tick{
-				{
-					CompetitorID: fakedCompetitorID,
-					ProblemID:    fakedProblem1ID,
-					Top:          true,
-					AttemptsTop:  10,
-				},
-				{
-					CompetitorID: fakedCompetitorID,
-					ProblemID:    fakedProblem2ID,
-					Top:          true,
-					AttemptsTop:  20,
-				},
+				testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
+					CompetitorID:  fakedCompetitorID,
+					ProblemID:     fakedProblem1ID,
+					Top:           true,
+					AttemptsTop:   10,
+					Zone1:         true,
+					AttemptsZone1: 10,
+					Zone2:         true,
+					AttemptsZone2: 10,
+				}),
+				testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
+					CompetitorID:  fakedCompetitorID,
+					ProblemID:     fakedProblem2ID,
+					Top:           true,
+					AttemptsTop:   20,
+					Zone1:         true,
+					AttemptsZone1: 20,
+					Zone2:         true,
+					AttemptsZone2: 20,
+				}),
 			}))
 
 		f.store.
@@ -1880,24 +1904,39 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f.store.
 			On("GetTicksByCompetitor", fakedCompetitorID).
 			Return(slices.Values([]scores.Tick{
-				{
-					CompetitorID: fakedCompetitorID,
-					ProblemID:    fakedProblem1ID,
-					Top:          true,
-					AttemptsTop:  1,
-				},
-				{
-					CompetitorID: fakedCompetitorID,
-					ProblemID:    fakedProblem2ID,
-					Top:          true,
-					AttemptsTop:  1,
-				},
-				{
-					CompetitorID: fakedCompetitorID,
-					ProblemID:    fakedProblem3ID,
-					Top:          true,
-					AttemptsTop:  1,
-				},
+				testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
+					CompetitorID:  fakedCompetitorID,
+					ProblemID:     fakedProblem1ID,
+					Top:           true,
+					AttemptsTop:   1,
+					Zone1:         true,
+					AttemptsZone1: 1,
+					Zone2:         true,
+					AttemptsZone2: 1,
+				}),
+				testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
+					CompetitorID:  fakedCompetitorID,
+					ProblemID:     fakedProblem2ID,
+					Top:           true,
+					AttemptsTop:   1,
+					Zone1:         true,
+					AttemptsZone1: 1,
+					Zone2:         true,
+					AttemptsZone2: 1,
+				}),
+				testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
+					CompetitorID:  fakedCompetitorID,
+					ProblemID:     fakedProblem3ID,
+					Top:           true,
+					AttemptsTop:   1,
+					Zone1:         true,
+					AttemptsZone1: 1,
+					Zone2:         true,
+					AttemptsZone2: 1,
+				}),
 			}))
 
 		f.store.
@@ -1979,12 +2018,17 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f.store.
 			On("GetTicksByCompetitor", fakedCompetitorID).
 			Return(slices.Values([]scores.Tick{
-				{
-					CompetitorID: fakedCompetitorID,
-					ProblemID:    fakedProblem1ID,
-					Top:          true,
-					AttemptsTop:  1,
-				},
+				testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
+					CompetitorID:  fakedCompetitorID,
+					ProblemID:     fakedProblem1ID,
+					Top:           true,
+					AttemptsTop:   1,
+					Zone1:         true,
+					AttemptsZone1: 1,
+					Zone2:         true,
+					AttemptsZone2: 1,
+				}),
 			}))
 
 		f.store.
@@ -2032,18 +2076,28 @@ func TestDefaultScoreEngine(t *testing.T) {
 		f.store.
 			On("GetTicksByCompetitor", fakedCompetitorID).
 			Return(slices.Values([]scores.Tick{
-				{
-					CompetitorID: fakedCompetitorID,
-					ProblemID:    fakedProblem1ID,
-					Top:          true,
-					AttemptsTop:  1,
-				},
-				{
-					CompetitorID: fakedCompetitorID,
-					ProblemID:    fakedProblem2ID,
-					Top:          true,
-					AttemptsTop:  1,
-				},
+				testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
+					CompetitorID:  fakedCompetitorID,
+					ProblemID:     fakedProblem1ID,
+					Top:           true,
+					AttemptsTop:   1,
+					Zone1:         true,
+					AttemptsZone1: 1,
+					Zone2:         true,
+					AttemptsZone2: 1,
+				}),
+				testutils.MustScoreTick(scores.Tick{
+					Revision:      1,
+					CompetitorID:  fakedCompetitorID,
+					ProblemID:     fakedProblem2ID,
+					Top:           true,
+					AttemptsTop:   1,
+					Zone1:         true,
+					AttemptsZone1: 1,
+					Zone2:         true,
+					AttemptsZone2: 1,
+				}),
 			}))
 
 		f.store.

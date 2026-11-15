@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/climblive/platform/backend/internal/domain"
+	"github.com/climblive/platform/backend/internal/testutils"
 	"github.com/climblive/platform/backend/internal/usecases/validators"
 	"github.com/stretchr/testify/assert"
 )
@@ -14,7 +15,7 @@ func TestTickValidator(t *testing.T) {
 	validator := validators.TickValidator{}
 
 	validTick := func() domain.Tick {
-		return domain.Tick{
+		return testutils.MustTick(domain.Tick{
 			Timestamp: time.Now(),
 			ID:        domain.TickID(1),
 			Ownership: domain.OwnershipData{
@@ -29,7 +30,7 @@ func TestTickValidator(t *testing.T) {
 			AttemptsZone2: 20,
 			Top:           true,
 			AttemptsTop:   30,
-		}
+		})
 	}
 
 	t.Run("ValidData", func(t *testing.T) {
