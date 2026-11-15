@@ -15,29 +15,32 @@ func RandomResourceID[T domain.ResourceIDType]() T {
 	return T(counter.Add(1))
 }
 
-func MustTick(tick domain.Tick) domain.Tick {
-	if err := (validators.TickValidator{}).Validate(tick); err != nil {
-		panic(err)
+func MustTick[T domain.Tick | scores.Tick](tick T) T {
+	var domainTick domain.Tick
+
+	switch tick := any(tick).(type) {
+	case domain.Tick:
+		domainTick = tick
+	case scores.Tick:
+		domainTick = domain.Tick{
+			ID:            tick.ID,
+			Ownership:     domain.OwnershipData{},
+			Timestamp:     time.Time{},
+			CompetitionID: 0,
+			Revision:      tick.Revision,
+			ProblemID:     tick.ProblemID,
+			Zone1:         tick.Zone1,
+			AttemptsZone1: tick.AttemptsZone1,
+			Zone2:         tick.Zone2,
+			AttemptsZone2: tick.AttemptsZone2,
+			Top:           tick.Top,
+			AttemptsTop:   tick.AttemptsTop,
+		}
 	}
 
-	return tick
-}
-
-func MustScoreTick(tick scores.Tick) scores.Tick {
-	MustTick(domain.Tick{
-		ID:            tick.ID,
-		Ownership:     domain.OwnershipData{},
-		Timestamp:     time.Time{},
-		CompetitionID: 0,
-		Revision:      tick.Revision,
-		ProblemID:     tick.ProblemID,
-		Zone1:         tick.Zone1,
-		AttemptsZone1: tick.AttemptsZone1,
-		Zone2:         tick.Zone2,
-		AttemptsZone2: tick.AttemptsZone2,
-		Top:           tick.Top,
-		AttemptsTop:   tick.AttemptsTop,
-	})
+	if err := (validators.TickValidator{}).Validate(domainTick); err != nil {
+		panic(err)
+	}
 
 	return tick
 }

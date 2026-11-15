@@ -115,7 +115,7 @@ func TestHydrate(t *testing.T) {
 		WithdrawnFromFinals: true,
 	}).Return()
 
-	mockedStore.On("SaveTick", fakedCompetitorID, testutils.MustScoreTick(scores.Tick{
+	mockedStore.On("SaveTick", fakedCompetitorID, testutils.MustTick(scores.Tick{
 		ID:            fakedTickID,
 		Revision:      1,
 		CompetitorID:  fakedCompetitorID,

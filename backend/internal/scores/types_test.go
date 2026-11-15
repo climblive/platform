@@ -137,7 +137,7 @@ func TestTickPool_Add(t *testing.T) {
 		pool := scores.TickPool{}
 
 		for range 5 {
-			pool = pool.Add(testutils.MustScoreTick(scores.Tick{
+			pool = pool.Add(testutils.MustTick(scores.Tick{
 				Revision:      1,
 				Zone1:         true,
 				AttemptsZone1: 1,
@@ -155,7 +155,7 @@ func TestTickPool_Add(t *testing.T) {
 		pool := scores.TickPool{}
 
 		for range 5 {
-			pool = pool.Add(testutils.MustScoreTick(scores.Tick{
+			pool = pool.Add(testutils.MustTick(scores.Tick{
 				Revision:      1,
 				Zone1:         true,
 				AttemptsZone1: 1,
@@ -175,7 +175,7 @@ func TestTickPool_Add(t *testing.T) {
 		pool := scores.TickPool{}
 
 		for range 5 {
-			pool = pool.Add(testutils.MustScoreTick(scores.Tick{
+			pool = pool.Add(testutils.MustTick(scores.Tick{
 				Revision:      1,
 				Zone1:         true,
 				AttemptsZone1: 999,
@@ -197,7 +197,7 @@ func TestTickPool_Add(t *testing.T) {
 		pool := scores.TickPool{}
 
 		for range 5 {
-			pool = pool.Add(testutils.MustScoreTick(scores.Tick{
+			pool = pool.Add(testutils.MustTick(scores.Tick{
 				Revision:      1,
 				Zone1:         true,
 				AttemptsZone1: 1,
@@ -227,7 +227,7 @@ func TestTickPool_Sub(t *testing.T) {
 		}
 
 		for range 3 {
-			pool = pool.Sub(testutils.MustScoreTick(scores.Tick{
+			pool = pool.Sub(testutils.MustTick(scores.Tick{
 				Revision:      1,
 				Zone1:         true,
 				AttemptsZone1: 1,
@@ -253,7 +253,7 @@ func TestTickPool_Sub(t *testing.T) {
 		}
 
 		for range 3 {
-			pool = pool.Sub(testutils.MustScoreTick(scores.Tick{
+			pool = pool.Sub(testutils.MustTick(scores.Tick{
 				Revision:      1,
 				Zone1:         true,
 				AttemptsZone1: 1,
@@ -280,7 +280,7 @@ func TestTickPool_Sub(t *testing.T) {
 		}
 
 		for range 3 {
-			pool = pool.Sub(testutils.MustScoreTick(scores.Tick{
+			pool = pool.Sub(testutils.MustTick(scores.Tick{
 				Revision:      1,
 				Zone1:         true,
 				AttemptsZone1: 999,
@@ -308,7 +308,7 @@ func TestTickPool_Sub(t *testing.T) {
 		}
 
 		for range 3 {
-			pool = pool.Sub(testutils.MustScoreTick(scores.Tick{
+			pool = pool.Sub(testutils.MustTick(scores.Tick{
 				Revision:      1,
 				Zone1:         true,
 				AttemptsZone1: 1,
