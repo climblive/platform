@@ -8,10 +8,11 @@
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
-    getContendersByCompetitionQuery,
     getCompetitionQuery,
+    getContendersByCompetitionQuery,
     getSelfQuery,
   } from "@climblive/lib/queries";
+  import { format } from "date-fns";
   import { navigate } from "svelte-routing";
   import ArchiveCompetition from "./ArchiveCompetition.svelte";
   import CompClassList from "./CompClassList.svelte";
@@ -230,6 +231,12 @@
 
       <ScoreEngine {competitionId} />
     {/if}
+
+    <p class="created">
+      Competition created on <time datetime={competition.created.toISOString()}
+        >{format(competition.created, "PPp")}</time
+      >
+    </p>
   {/if}
 </main>
 
@@ -261,5 +268,11 @@
 
   .results {
     margin-block-start: var(--wa-space-m);
+  }
+
+  .created {
+    margin-block-start: var(--wa-space-l);
+    font-size: var(--wa-font-size-s);
+    color: var(--wa-color-text-quiet);
   }
 </style>
