@@ -29,8 +29,8 @@ func TestMemoryStore(t *testing.T) {
 		store := scores.NewMemoryStore()
 
 		contender := scores.Contender{
-			ID:          testutils.RandomResourceID[domain.ContenderID](),
-			CompClassID: testutils.RandomResourceID[domain.CompClassID](),
+			ID:         testutils.RandomResourceID[domain.ContenderID](),
+			CategoryID: testutils.RandomResourceID[domain.CategoryID](),
 		}
 
 		store.SaveContender(contender)
@@ -48,59 +48,59 @@ func TestMemoryStore(t *testing.T) {
 		})
 	})
 
-	t.Run("GetContendersByCompClass", func(t *testing.T) {
+	t.Run("GetContendersByCategory", func(t *testing.T) {
 		store := scores.NewMemoryStore()
 
 		store.SaveContender(scores.Contender{
-			ID:          1,
-			CompClassID: 1,
+			ID:         1,
+			CategoryID: 1,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          2,
-			CompClassID: 1,
+			ID:         2,
+			CategoryID: 1,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          3,
-			CompClassID: 2,
+			ID:         3,
+			CategoryID: 2,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          4,
-			CompClassID: 3,
+			ID:         4,
+			CategoryID: 3,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          5,
-			CompClassID: 1,
+			ID:         5,
+			CategoryID: 1,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          6,
-			CompClassID: 2,
+			ID:         6,
+			CategoryID: 2,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          7,
-			CompClassID: 1,
+			ID:         7,
+			CategoryID: 1,
 		})
 
-		t.Run("CompClassOne", func(t *testing.T) {
+		t.Run("CategoryOne", func(t *testing.T) {
 			var filteredContenders []domain.ContenderID
-			for contender := range slices.Values(slices.Collect(store.GetContendersByCompClass(1))) {
+			for contender := range slices.Values(slices.Collect(store.GetContendersByCategory(1))) {
 				filteredContenders = append(filteredContenders, contender.ID)
 			}
 
 			assert.ElementsMatch(t, filteredContenders, []domain.ContenderID{1, 2, 5, 7})
 		})
 
-		t.Run("CompClassTwo", func(t *testing.T) {
+		t.Run("CategoryTwo", func(t *testing.T) {
 			var filteredContenders []domain.ContenderID
-			for contender := range slices.Values(slices.Collect(store.GetContendersByCompClass(2))) {
+			for contender := range slices.Values(slices.Collect(store.GetContendersByCategory(2))) {
 				filteredContenders = append(filteredContenders, contender.ID)
 			}
 
 			assert.ElementsMatch(t, filteredContenders, []domain.ContenderID{3, 6})
 		})
 
-		t.Run("CompClassThree", func(t *testing.T) {
+		t.Run("CategoryThree", func(t *testing.T) {
 			var filteredContenders []domain.ContenderID
-			for contender := range slices.Values(slices.Collect(store.GetContendersByCompClass(3))) {
+			for contender := range slices.Values(slices.Collect(store.GetContendersByCategory(3))) {
 				filteredContenders = append(filteredContenders, contender.ID)
 			}
 
@@ -108,7 +108,7 @@ func TestMemoryStore(t *testing.T) {
 		})
 
 		t.Run("ExtractFirstItemOnly", func(t *testing.T) {
-			for _ = range store.GetContendersByCompClass(1) {
+			for _ = range store.GetContendersByCategory(1) {
 				break
 			}
 		})
@@ -118,16 +118,16 @@ func TestMemoryStore(t *testing.T) {
 		store := scores.NewMemoryStore()
 
 		c1 := scores.Contender{
-			ID:          1,
-			CompClassID: 1,
+			ID:         1,
+			CategoryID: 1,
 		}
 		c2 := scores.Contender{
-			ID:          2,
-			CompClassID: 2,
+			ID:         2,
+			CategoryID: 2,
 		}
 		c3 := scores.Contender{
-			ID:          3,
-			CompClassID: 3,
+			ID:         3,
+			CategoryID: 3,
 		}
 
 		store.SaveContender(c1)
@@ -142,7 +142,7 @@ func TestMemoryStore(t *testing.T) {
 
 		contender := scores.Contender{
 			ID:                  testutils.RandomResourceID[domain.ContenderID](),
-			CompClassID:         testutils.RandomResourceID[domain.CompClassID](),
+			CategoryID:          testutils.RandomResourceID[domain.CategoryID](),
 			WithdrawnFromFinals: true,
 			Disqualified:        true,
 			Score: scores.Score{
@@ -157,39 +157,39 @@ func TestMemoryStore(t *testing.T) {
 		assert.Equal(t, contender, result)
 	})
 
-	t.Run("GetCompClassIDs", func(t *testing.T) {
+	t.Run("GetCategoryIDs", func(t *testing.T) {
 		store := scores.NewMemoryStore()
 
 		store.SaveContender(scores.Contender{
-			ID:          testutils.RandomResourceID[domain.ContenderID](),
-			CompClassID: 1,
+			ID:         testutils.RandomResourceID[domain.ContenderID](),
+			CategoryID: 1,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          testutils.RandomResourceID[domain.ContenderID](),
-			CompClassID: 1,
+			ID:         testutils.RandomResourceID[domain.ContenderID](),
+			CategoryID: 1,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          testutils.RandomResourceID[domain.ContenderID](),
-			CompClassID: 2,
+			ID:         testutils.RandomResourceID[domain.ContenderID](),
+			CategoryID: 2,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          testutils.RandomResourceID[domain.ContenderID](),
-			CompClassID: 3,
+			ID:         testutils.RandomResourceID[domain.ContenderID](),
+			CategoryID: 3,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          testutils.RandomResourceID[domain.ContenderID](),
-			CompClassID: 1,
+			ID:         testutils.RandomResourceID[domain.ContenderID](),
+			CategoryID: 1,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          testutils.RandomResourceID[domain.ContenderID](),
-			CompClassID: 2,
+			ID:         testutils.RandomResourceID[domain.ContenderID](),
+			CategoryID: 2,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          testutils.RandomResourceID[domain.ContenderID](),
-			CompClassID: 1,
+			ID:         testutils.RandomResourceID[domain.ContenderID](),
+			CategoryID: 1,
 		})
 
-		assert.ElementsMatch(t, []domain.CompClassID{1, 2, 3}, store.GetCompClassIDs())
+		assert.ElementsMatch(t, []domain.CategoryID{1, 2, 3}, store.GetCategoryIDs())
 	})
 
 	t.Run("GetTicksByContender", func(t *testing.T) {
@@ -262,7 +262,7 @@ func TestMemoryStore(t *testing.T) {
 	t.Run("GetTicksByProblem", func(t *testing.T) {
 		store := scores.NewMemoryStore()
 
-		fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+		fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 		fakedContender1ID := testutils.RandomResourceID[domain.ContenderID]()
@@ -292,20 +292,20 @@ func TestMemoryStore(t *testing.T) {
 		}
 
 		store.SaveContender(scores.Contender{
-			ID:          fakedContender1ID,
-			CompClassID: fakedCompClassID,
+			ID:         fakedContender1ID,
+			CategoryID: fakedCategoryID,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          fakedContender2ID,
-			CompClassID: fakedCompClassID,
+			ID:         fakedContender2ID,
+			CategoryID: fakedCategoryID,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          fakedContender3ID,
-			CompClassID: fakedCompClassID,
+			ID:         fakedContender3ID,
+			CategoryID: fakedCategoryID,
 		})
 		store.SaveContender(scores.Contender{
-			ID:          fakedContender4ID,
-			CompClassID: testutils.RandomResourceID[domain.CompClassID](),
+			ID:         fakedContender4ID,
+			CategoryID: testutils.RandomResourceID[domain.CategoryID](),
 		})
 
 		store.SaveTick(fakedContender1ID, t1)
@@ -321,7 +321,7 @@ func TestMemoryStore(t *testing.T) {
 			AttemptsTop:   9,
 		})
 
-		assert.ElementsMatch(t, []scores.Tick{t1, t2}, slices.Collect(store.GetTicksByProblem(fakedCompClassID, fakedProblemID)))
+		assert.ElementsMatch(t, []scores.Tick{t1, t2}, slices.Collect(store.GetTicksByProblem(fakedCategoryID, fakedProblemID)))
 	})
 
 	t.Run("SaveTick", func(t *testing.T) {

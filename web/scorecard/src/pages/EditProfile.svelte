@@ -90,7 +90,7 @@
 {:else}
   <CompetitionStateProvider
     competitionId={competition.id}
-    compClassId={contender.compClassId}
+    categoryId={contender.categoryId}
   >
     {#snippet children({ competitionState })}
       {@const disabled =
@@ -100,7 +100,7 @@
         submit={handleSubmit}
         data={{
           name: contender.name,
-          compClassId: contender.compClassId,
+          categoryId: contender.categoryId,
           withdrawnFromFinals: contender.withdrawnFromFinals,
         }}
         callout={profileCallout}

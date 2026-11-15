@@ -223,13 +223,13 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 	r.contender = r.GetContender()
 
 	r.sleep()
-	compClasses := r.GetCompClasses(r.contender.CompetitionID)
+	categories := r.GetCategories(r.contender.CompetitionID)
 
 	patch := domain.ContenderPatch{}
 
-	selectedCompClass := compClasses[rand.Int()%len(compClasses)]
+	selectedCategory := categories[rand.Int()%len(categories)]
 
-	switch selectedCompClass.Name {
+	switch selectedCategory.Name {
 	case "Males":
 		patch.Name = domain.NewPatch(fmt.Sprintf("%s %s", faker.FirstNameMale(), faker.LastName()))
 	case "Females":
@@ -238,7 +238,7 @@ func (r *ContenderRunner) Run(requests int, wg *sync.WaitGroup, events chan<- Si
 		patch.Name = domain.NewPatch(fmt.Sprintf("%s %s", faker.FirstNameFemale(), faker.LastName()))
 	}
 
-	patch.CompClassID = domain.NewPatch(selectedCompClass.ID)
+	patch.CategoryID = domain.NewPatch(selectedCategory.ID)
 
 	r.sleep()
 	r.PatchContender(r.contender.ID, patch)
@@ -335,8 +335,8 @@ func (r *ContenderRunner) PatchContender(contenderID domain.ContenderID, patch d
 	return contender
 }
 
-func (r *ContenderRunner) GetCompClasses(competitionID domain.CompetitionID) []domain.CompClass {
-	resp, err := http.Get(fmt.Sprintf("%s/competitions/%d/comp-classes", r.apiURL, competitionID))
+func (r *ContenderRunner) GetCategories(competitionID domain.CompetitionID) []domain.Category {
+	resp, err := http.Get(fmt.Sprintf("%s/competitions/%d/categories", r.apiURL, competitionID))
 	if err != nil {
 		panic(err)
 	}
@@ -347,14 +347,14 @@ func (r *ContenderRunner) GetCompClasses(competitionID domain.CompetitionID) []d
 
 	mustStatus(resp, http.StatusOK)
 
-	compClasses := []domain.CompClass{}
+	categories := []domain.Category{}
 
-	err = json.UnmarshalRead(resp.Body, &compClasses)
+	err = json.UnmarshalRead(resp.Body, &categories)
 	if err != nil {
 		panic(err)
 	}
 
-	return compClasses
+	return categories
 }
 
 func (r *ContenderRunner) GetProblems(competitionID domain.CompetitionID) []domain.Problem {

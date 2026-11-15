@@ -7,7 +7,7 @@
   import ResultEntry from "./ResultEntry.svelte";
 
   interface Props {
-    compClassId: number;
+    categoryId: number;
     overflow?: "pagination" | "scroll";
     scoreboard: Readable<Map<number, ScoreboardEntry[]>>;
     loading: boolean;
@@ -16,7 +16,7 @@
   }
 
   let {
-    compClassId,
+    categoryId,
     overflow = "scroll",
     scoreboard,
     loading,
@@ -104,7 +104,7 @@
     }
   });
 
-  let results = $derived($scoreboard.get(compClassId) ?? []);
+  let results = $derived($scoreboard.get(categoryId) ?? []);
 
   $effect(() => {
     switch (overflow) {

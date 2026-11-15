@@ -11,7 +11,7 @@
   } from "@climblive/lib/components";
   import { value } from "@climblive/lib/forms";
   import {
-    getCompClassesQuery,
+    getCategoriesQuery,
     getCompetitionQuery,
   } from "@climblive/lib/queries";
   import { onMount } from "svelte";
@@ -23,19 +23,19 @@
 
   let { competitionId }: Props = $props();
 
-  let compClassSelector: WaSelect | undefined = $state();
-  let selectedCompClassId: number | undefined = $state();
+  let categorySelector: WaSelect | undefined = $state();
+  let selectedCategoryId: number | undefined = $state();
   let overflow: "pagination" | "scroll" = $state("scroll");
 
   const competitionQuery = $derived(getCompetitionQuery(competitionId));
-  const compClassesQuery = $derived(getCompClassesQuery(competitionId));
+  const categoriesQuery = $derived(getCategoriesQuery(competitionId));
 
   let competition = $derived(competitionQuery.data);
-  let compClasses = $derived(compClassesQuery.data);
+  let categories = $derived(categoriesQuery.data);
 
   $effect(() => {
-    if (compClasses && compClasses.length > 0 && !selectedCompClassId) {
-      selectedCompClassId = compClasses[0].id;
+    if (categories && categories.length > 0 && !selectedCategoryId) {
+      selectedCategoryId = categories[0].id;
     }
   });
 
@@ -56,7 +56,7 @@
   }}
 />
 
-{#if showSplash || !competition || !compClasses}
+{#if showSplash || !competition || !categories}
   <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
   <ScoreboardProvider {competitionId} hideDisqualified>
@@ -73,45 +73,45 @@
             <FullLogo />
           </div>
         </div>
-        {#if compClasses.length > 1}
+        {#if categories.length > 1}
           <wa-select
-            bind:this={compClassSelector}
+            bind:this={categorySelector}
             size="s"
-            name="compClassId"
+            name="categoryId"
             label="Category"
-            {@attach value(selectedCompClassId)}
+            {@attach value(selectedCategoryId)}
             onchange={() => {
-              selectedCompClassId = Number(compClassSelector?.value);
+              selectedCategoryId = Number(categorySelector?.value);
             }}
           >
-            {#each compClasses as compClass (compClass.id)}
-              <wa-option value={compClass.id} label={compClass.name}>
-                {compClass.name}
-                {#if compClass.description}
-                  <small>{compClass.description}</small>
+            {#each categories as category (category.id)}
+              <wa-option value={category.id} label={category.name}>
+                {category.name}
+                {#if category.description}
+                  <small>{category.description}</small>
                 {/if}
               </wa-option>
             {/each}
           </wa-select>
         {/if}
-        <div class="container" style="--num-columns: {compClasses.length}">
-          {#each compClasses as compClass (compClass.id)}
+        <div class="container" style="--num-columns: {categories.length}">
+          {#each categories as category (category.id)}
             <section
-              class="class"
-              data-selected={compClass.id === selectedCompClassId
+              class="category"
+              data-selected={category.id === selectedCategoryId
                 ? "true"
                 : "false"}
             >
               <Header
                 {competitionId}
-                compClassId={compClass.id}
-                name={compClass.name}
-                startTime={compClass.timeBegin}
-                endTime={compClass.timeEnd}
+                categoryId={category.id}
+                name={category.name}
+                startTime={category.timeBegin}
+                endTime={category.timeEnd}
                 {scoreboard}
               ></Header>
               <ResultList
-                compClassId={compClass.id}
+                categoryId={category.id}
                 {overflow}
                 {scoreboard}
                 {loading}
@@ -184,7 +184,7 @@
     gap: var(--wa-space-s);
   }
 
-  .class {
+  .category {
     display: flex;
     flex-direction: column;
   }
@@ -222,7 +222,7 @@
       max-width: none;
     }
 
-    .class[data-selected="false"] {
+    .category[data-selected="false"] {
       display: none;
     }
   }

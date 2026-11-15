@@ -1,6 +1,6 @@
 <script lang="ts">
   import {
-    getCompClassesQuery,
+    getCategoriesQuery,
     getContenderQuery,
     getCompetitionQuery,
     patchContenderMutation,
@@ -22,7 +22,7 @@
 
   const contenderQuery = $derived(getContenderQuery(contenderId));
   const competitionQuery = $derived(getCompetitionQuery(competitionId));
-  const compClassesQuery = $derived(getCompClassesQuery(competitionId));
+  const categoriesQuery = $derived(getCategoriesQuery(competitionId));
   const patchContender = $derived(patchContenderMutation(contenderId));
   const scrubContender = $derived(scrubContenderMutation(contenderId));
   const time = new SyncedTime(60_000);
@@ -33,9 +33,9 @@
 
   let contender = $derived(contenderQuery.data);
   let competition = $derived(competitionQuery.data);
-  let compClasses = $derived(compClassesQuery.data);
-  let selectedCompClass = $derived(
-    compClasses?.find(({ id }) => id === contender?.compClassId),
+  let categories = $derived(categoriesQuery.data);
+  let selectedCategory = $derived(
+    categories?.find(({ id }) => id === contender?.categoryId),
   );
 
   const retentionDuration = $derived.by(() =>
@@ -62,13 +62,13 @@
 
     const formData = new FormData(form);
     const name = formData.get("name")?.toString().trim();
-    const compClassId = formData.get("compClassId")?.toString().trim();
+    const categoryId = formData.get("categoryId")?.toString().trim();
 
-    if (name && compClassId) {
+    if (name && categoryId) {
       patchContender.mutate(
         {
           name,
-          compClassId: Number(compClassId),
+          categoryId: Number(categoryId),
         },
         {
           onError: () => window.alert("Failed to save registration data."),
@@ -93,7 +93,7 @@
   };
 </script>
 
-{#if compClasses && contender}
+{#if categories && contender}
   <form onsubmit={handleSubmit} bind:this={form}>
     <div class="name-row">
       <input
@@ -129,14 +129,14 @@
       </p>
     {/if}
     <select
-      name="compClassId"
+      name="categoryId"
       required
-      value={selectedCompClass?.id}
+      value={selectedCategory?.id}
       aria-label="Category"
       disabled={contender.scrubbedAt !== undefined}
     >
-      {#each compClasses as compClass (compClass.id)}
-        <option value={compClass.id}>{compClass.name}</option>
+      {#each categories as category (category.id)}
+        <option value={category.id}>{category.name}</option>
       {/each}
     </select>
     <div class="actions">

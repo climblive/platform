@@ -38,8 +38,8 @@ func (d *Database) GetContenderByCode(ctx context.Context, tx domain.Transaction
 	return contender, nil
 }
 
-func (d *Database) GetContendersByCompClass(ctx context.Context, tx domain.Transaction, compClassID domain.CompClassID) ([]domain.Contender, error) {
-	records, err := d.WithTx(tx).GetContendersByCompClass(ctx, sql.NullInt32{Valid: true, Int32: int32(compClassID)})
+func (d *Database) GetContendersByCategory(ctx context.Context, tx domain.Transaction, categoryID domain.CategoryID) ([]domain.Contender, error) {
+	records, err := d.WithTx(tx).GetContendersByCategory(ctx, sql.NullInt32{Valid: true, Int32: int32(categoryID)})
 	if err != nil {
 		return nil, errors.Wrap(err, 0)
 	}
@@ -79,7 +79,7 @@ func (d *Database) StoreContender(ctx context.Context, tx domain.Transaction, co
 		CompetitionID:       int32(contender.CompetitionID),
 		RegistrationCode:    contender.RegistrationCode,
 		Name:                makeNullString(contender.Name),
-		ClassID:             makeNullInt32(int32(contender.CompClassID)),
+		CategoryID:          makeNullInt32(int32(contender.CategoryID)),
 		Entered:             makeNullTime(contender.Entered),
 		Disqualified:        contender.Disqualified,
 		WithdrawnFromFinals: contender.WithdrawnFromFinals,

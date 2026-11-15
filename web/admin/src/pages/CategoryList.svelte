@@ -11,13 +11,13 @@
     Table,
     type ColumnDefinition,
   } from "@climblive/lib/components";
-  import type { CompClass } from "@climblive/lib/models";
-  import { getCompClassesQuery } from "@climblive/lib/queries";
+  import type { Category } from "@climblive/lib/models";
+  import { getCategoriesQuery } from "@climblive/lib/queries";
   import { format } from "date-fns";
   import { navigate } from "svelte-routing";
-  import DeleteCompClass from "./DeleteCompClass.svelte";
+  import DeleteCategory from "./DeleteCategory.svelte";
 
-  const maxCompClasses = 20;
+  const maxCategories = 20;
   const createButtonId = $props.id();
 
   interface Props {
@@ -26,15 +26,15 @@
 
   const { competitionId }: Props = $props();
 
-  const compClassesQuery = $derived(getCompClassesQuery(competitionId));
+  const categoriesQuery = $derived(getCategoriesQuery(competitionId));
 
-  let compClasses = $derived(compClassesQuery.data);
+  let categories = $derived(categoriesQuery.data);
 
   const limitReached = $derived(
-    compClasses !== undefined && compClasses.length >= maxCompClasses,
+    categories !== undefined && categories.length >= maxCategories,
   );
 
-  const columns: ColumnDefinition<CompClass>[] = [
+  const columns: ColumnDefinition<Category>[] = [
     {
       label: "Name",
       mobile: true,
@@ -68,31 +68,31 @@
   ];
 </script>
 
-{#snippet renderName({ name }: CompClass)}
+{#snippet renderName({ name }: Category)}
   {name}
 {/snippet}
 
-{#snippet renderDescription({ description }: CompClass)}
+{#snippet renderDescription({ description }: Category)}
   {description}
 {/snippet}
 
-{#snippet renderTimeBegin({ timeBegin }: CompClass)}
+{#snippet renderTimeBegin({ timeBegin }: Category)}
   {format(timeBegin, "yyyy-MM-dd HH:mm")}
 {/snippet}
 
-{#snippet renderTimeEnd({ timeEnd }: CompClass)}
+{#snippet renderTimeEnd({ timeEnd }: Category)}
   {format(timeEnd, "yyyy-MM-dd HH:mm")}
 {/snippet}
 
-{#snippet renderControls({ id }: CompClass)}
-  <DeleteCompClass compClassId={id}>
-    {#snippet children({ deleteCompClass })}
+{#snippet renderControls({ id }: Category)}
+  <DeleteCategory categoryId={id}>
+    {#snippet children({ deleteCategory })}
       <wa-dropdown
         onwa-select={(event: WaSelectEvent) => {
           if ((event.detail.item as WaDropdownItem).value === "delete") {
-            deleteCompClass();
+            deleteCategory();
           } else {
-            navigate(`/admin/comp-classes/${id}/edit`);
+            navigate(`/admin/categories/${id}/edit`);
           }
         }}
       >
@@ -109,7 +109,7 @@
         </wa-dropdown-item>
       </wa-dropdown>
     {/snippet}
-  </DeleteCompClass>
+  </DeleteCategory>
 {/snippet}
 
 {#snippet createButton()}
@@ -118,12 +118,12 @@
     variant="neutral"
     appearance="accent"
     disabled={limitReached}
-    onclick={() => navigate(`competitions/${competitionId}/new-comp-class`)}
+    onclick={() => navigate(`competitions/${competitionId}/new-category`)}
     >Create category</wa-button
   >
   {#if limitReached}
     <wa-tooltip for={createButtonId} placement="top-start"
-      >Limit of {maxCompClasses} categories per competition reached.</wa-tooltip
+      >Limit of {maxCategories} categories per competition reached.</wa-tooltip
     >
   {/if}
 {/snippet}
@@ -135,11 +135,11 @@
 </p>
 
 <section>
-  {#if compClasses === undefined}
+  {#if categories === undefined}
     <Loader />
-  {:else if compClasses.length > 0}
+  {:else if categories.length > 0}
     {@render createButton()}
-    <Table {columns} data={compClasses} getId={({ id }) => id}></Table>
+    <Table {columns} data={categories} getId={({ id }) => id}></Table>
   {:else}
     <EmptyState
       title="No categories yet"

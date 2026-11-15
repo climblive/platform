@@ -47,10 +47,10 @@ func (s *MemoryStore) GetContender(contenderID domain.ContenderID) (Contender, b
 	return contender, ok
 }
 
-func (s *MemoryStore) GetContendersByCompClass(compClassID domain.CompClassID) iter.Seq[Contender] {
+func (s *MemoryStore) GetContendersByCategory(categoryID domain.CategoryID) iter.Seq[Contender] {
 	return func(yield func(Contender) bool) {
 		for _, contender := range s.contenders {
-			if contender.CompClassID != compClassID {
+			if contender.CategoryID != categoryID {
 				continue
 			}
 
@@ -69,14 +69,14 @@ func (s *MemoryStore) SaveContender(contender Contender) {
 	s.contenders[contender.ID] = contender
 }
 
-func (s *MemoryStore) GetCompClassIDs() []domain.CompClassID {
-	compClassIDs := make(map[domain.CompClassID]struct{})
+func (s *MemoryStore) GetCategoryIDs() []domain.CategoryID {
+	categoryIDs := make(map[domain.CategoryID]struct{})
 
 	for contender := range maps.Values(s.contenders) {
-		compClassIDs[contender.CompClassID] = struct{}{}
+		categoryIDs[contender.CategoryID] = struct{}{}
 	}
 
-	return slices.Collect(maps.Keys(compClassIDs))
+	return slices.Collect(maps.Keys(categoryIDs))
 }
 
 func (s *MemoryStore) GetTicksByContender(contenderID domain.ContenderID) iter.Seq[Tick] {
@@ -93,10 +93,10 @@ func (s *MemoryStore) GetTick(contenderID domain.ContenderID, problemID domain.P
 	return tick, ok
 }
 
-func (s *MemoryStore) GetTicksByProblem(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[Tick] {
+func (s *MemoryStore) GetTicksByProblem(categoryID domain.CategoryID, problemID domain.ProblemID) iter.Seq[Tick] {
 	return func(yield func(Tick) bool) {
 		for _, contender := range s.contenders {
-			if contender.CompClassID != compClassID {
+			if contender.CategoryID != categoryID {
 				continue
 			}
 

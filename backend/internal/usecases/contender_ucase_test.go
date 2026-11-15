@@ -268,8 +268,8 @@ func TestGetPointValues(t *testing.T) {
 	})
 }
 
-func TestGetContendersByCompClass(t *testing.T) {
-	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+func TestGetContendersByCategory(t *testing.T) {
+	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
 	}
@@ -304,14 +304,14 @@ func TestGetContendersByCompClass(t *testing.T) {
 			Return(domain.OrganizerRole, nil)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
-			Return(domain.CompClass{
-				ID:        fakedCompClassID,
+			On("GetCategory", mock.Anything, mock.Anything, fakedCategoryID).
+			Return(domain.Category{
+				ID:        fakedCategoryID,
 				Ownership: fakedOwnership,
 			}, nil)
 
 		mockedRepo.
-			On("GetContendersByCompClass", mock.Anything, mock.Anything, fakedCompClassID).
+			On("GetContendersByCategory", mock.Anything, mock.Anything, fakedCategoryID).
 			Return(contenders, nil)
 
 		ucase := usecases.ContenderUseCase{
@@ -320,7 +320,7 @@ func TestGetContendersByCompClass(t *testing.T) {
 			ScoreKeeper: mockedScoreKeeper,
 		}
 
-		contenders, err := ucase.GetContendersByCompClass(context.Background(), fakedCompClassID)
+		contenders, err := ucase.GetContendersByCategory(context.Background(), fakedCategoryID)
 
 		require.NoError(t, err)
 		assert.Len(t, contenders, 10)
@@ -349,9 +349,9 @@ func TestGetContendersByCompClass(t *testing.T) {
 			Return(domain.NilRole, domain.ErrNoOwnership)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
-			Return(domain.CompClass{
-				ID:        fakedCompClassID,
+			On("GetCategory", mock.Anything, mock.Anything, fakedCategoryID).
+			Return(domain.Category{
+				ID:        fakedCategoryID,
 				Ownership: fakedOwnership,
 			}, nil)
 
@@ -360,7 +360,7 @@ func TestGetContendersByCompClass(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		contenders, err := ucase.GetContendersByCompClass(context.Background(), fakedCompClassID)
+		contenders, err := ucase.GetContendersByCategory(context.Background(), fakedCategoryID)
 
 		assert.ErrorIs(t, err, domain.ErrNoOwnership)
 		assert.Nil(t, contenders)
@@ -742,7 +742,7 @@ func TestPatchContender(t *testing.T) {
 		ContenderID: &fakedContenderID,
 	}
 	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
-	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 	currentTime := time.Now()
 	gracePeriod := 15 * time.Minute
@@ -776,7 +776,7 @@ func TestPatchContender(t *testing.T) {
 			ID:                  fakedContenderID,
 			Ownership:           fakedOwnership,
 			CompetitionID:       fakedCompetitionID,
-			CompClassID:         fakedCompClassID,
+			CategoryID:          fakedCategoryID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			Entered:             currentTime,
@@ -787,9 +787,9 @@ func TestPatchContender(t *testing.T) {
 		mockedRepo := makeMockedRepo(fakedContender)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
-			Return(domain.CompClass{
-				ID:        fakedCompClassID,
+			On("GetCategory", mock.Anything, mock.Anything, fakedCategoryID).
+			Return(domain.Category{
+				ID:        fakedCategoryID,
 				TimeBegin: currentTime.Add(-1 * time.Hour),
 				TimeEnd:   currentTime.Add(time.Hour),
 			}, nil)
@@ -800,7 +800,7 @@ func TestPatchContender(t *testing.T) {
 					ID:                  fakedContenderID,
 					Ownership:           fakedOwnership,
 					CompetitionID:       fakedCompetitionID,
-					CompClassID:         fakedCompClassID,
+					CategoryID:          fakedCategoryID,
 					RegistrationCode:    "ABCD1234",
 					Name:                "John Doe",
 					Entered:             currentTime,
@@ -812,7 +812,7 @@ func TestPatchContender(t *testing.T) {
 				ID:                  fakedContenderID,
 				Ownership:           fakedOwnership,
 				CompetitionID:       fakedCompetitionID,
-				CompClassID:         fakedCompClassID,
+				CategoryID:          fakedCategoryID,
 				RegistrationCode:    "ABCD1234",
 				Name:                "John Doe",
 				Entered:             currentTime,
@@ -848,7 +848,7 @@ func TestPatchContender(t *testing.T) {
 		assert.Equal(t, fakedContender.ID, contender.ID)
 		assert.Equal(t, fakedContender.Ownership, contender.Ownership)
 		assert.Equal(t, fakedContender.CompetitionID, contender.CompetitionID)
-		assert.Equal(t, fakedContender.CompClassID, contender.CompClassID)
+		assert.Equal(t, fakedContender.CategoryID, contender.CategoryID)
 		assert.Equal(t, fakedContender.RegistrationCode, contender.RegistrationCode)
 		assert.Equal(t, fakedContender.Name, contender.Name)
 		assert.Equal(t, fakedContender.Entered, contender.Entered)
@@ -870,7 +870,7 @@ func TestPatchContender(t *testing.T) {
 			ID:                  fakedContenderID,
 			Ownership:           fakedOwnership,
 			CompetitionID:       fakedCompetitionID,
-			CompClassID:         fakedCompClassID,
+			CategoryID:          fakedCategoryID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			Entered:             currentTime,
@@ -881,9 +881,9 @@ func TestPatchContender(t *testing.T) {
 		mockedRepo := makeMockedRepo(fakedContender)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
-			Return(domain.CompClass{
-				ID:        fakedCompClassID,
+			On("GetCategory", mock.Anything, mock.Anything, fakedCategoryID).
+			Return(domain.Category{
+				ID:        fakedCategoryID,
 				TimeBegin: currentTime.Add(-1 * time.Hour),
 				TimeEnd:   currentTime.Add(time.Hour),
 			}, nil)
@@ -918,7 +918,7 @@ func TestPatchContender(t *testing.T) {
 				ID:                  fakedContenderID,
 				Ownership:           fakedOwnership,
 				CompetitionID:       fakedCompetitionID,
-				CompClassID:         0,
+				CategoryID:          0,
 				RegistrationCode:    "ABCD1234",
 				Name:                "",
 				Entered:             time.Time{},
@@ -929,9 +929,9 @@ func TestPatchContender(t *testing.T) {
 			mockedRepo := makeMockedRepo(fakedContender)
 
 			mockedRepo.
-				On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
-				Return(domain.CompClass{
-					ID:        fakedCompClassID,
+				On("GetCategory", mock.Anything, mock.Anything, fakedCategoryID).
+				Return(domain.Category{
+					ID:        fakedCategoryID,
 					TimeBegin: currentTime.Add(-1 * time.Hour),
 					TimeEnd:   currentTime.Add(time.Hour),
 				}, nil)
@@ -942,7 +942,7 @@ func TestPatchContender(t *testing.T) {
 						ID:                  fakedContenderID,
 						Ownership:           fakedOwnership,
 						CompetitionID:       fakedCompetitionID,
-						CompClassID:         fakedCompClassID,
+						CategoryID:          fakedCategoryID,
 						RegistrationCode:    "ABCD1234",
 						Name:                "John Doe",
 						Entered:             time.Now(),
@@ -955,7 +955,7 @@ func TestPatchContender(t *testing.T) {
 					ID:                  fakedContenderID,
 					Ownership:           fakedOwnership,
 					CompetitionID:       fakedCompetitionID,
-					CompClassID:         fakedCompClassID,
+					CategoryID:          fakedCategoryID,
 					RegistrationCode:    "ABCD1234",
 					Name:                "John Doe",
 					Entered:             time.Now(),
@@ -980,25 +980,25 @@ func TestPatchContender(t *testing.T) {
 			}
 
 			contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
-				CompClassID: domain.NewPatch(fakedCompClassID),
-				Name:        domain.NewPatch("John Doe"),
+				CategoryID: domain.NewPatch(fakedCategoryID),
+				Name:       domain.NewPatch("John Doe"),
 			})
 
 			require.NoError(t, err)
 
-			assert.Equal(t, fakedCompClassID, contender.CompClassID)
+			assert.Equal(t, fakedCategoryID, contender.CategoryID)
 			assert.Equal(t, "John Doe", contender.Name)
 			assert.Equal(t, time.Now(), contender.Entered)
 			assert.Equal(t, currentTime.Add(time.Hour).Add(fakedNameRetentionTime), contender.ScrubBefore)
 
 			mockedEventBroker.AssertCalled(t, "Dispatch", fakedCompetitionID, domain.ContenderEnteredEvent{
 				ContenderID: fakedContenderID,
-				CompClassID: fakedCompClassID,
+				CategoryID:  fakedCategoryID,
 			})
 
 			mockedEventBroker.AssertCalled(t, "Dispatch", fakedCompetitionID, domain.ContenderPublicInfoUpdatedEvent{
 				ContenderID:         fakedContenderID,
-				CompClassID:         fakedCompClassID,
+				CategoryID:          fakedCategoryID,
 				Name:                "John Doe",
 				WithdrawnFromFinals: false,
 				Disqualified:        false,
@@ -1018,7 +1018,7 @@ func TestPatchContender(t *testing.T) {
 			ID:                  fakedContenderID,
 			Ownership:           fakedOwnership,
 			CompetitionID:       fakedCompetitionID,
-			CompClassID:         0,
+			CategoryID:          0,
 			RegistrationCode:    "ABCD1234",
 			Name:                "",
 			Entered:             time.Time{},
@@ -1053,7 +1053,7 @@ func TestPatchContender(t *testing.T) {
 			ID:                  fakedContenderID,
 			Ownership:           fakedOwnership,
 			CompetitionID:       fakedCompetitionID,
-			CompClassID:         fakedCompClassID,
+			CategoryID:          fakedCategoryID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			Entered:             currentTime,
@@ -1064,9 +1064,9 @@ func TestPatchContender(t *testing.T) {
 		mockedRepo := makeMockedRepo(fakedContender)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
-			Return(domain.CompClass{
-				ID:        fakedCompClassID,
+			On("GetCategory", mock.Anything, mock.Anything, fakedCategoryID).
+			Return(domain.Category{
+				ID:        fakedCategoryID,
 				TimeBegin: currentTime.Add(-1 * time.Hour),
 				TimeEnd:   currentTime.Add(time.Hour),
 			}, nil)
@@ -1081,7 +1081,7 @@ func TestPatchContender(t *testing.T) {
 		}
 
 		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
-			CompClassID: domain.NewPatch(domain.CompClassID(0)),
+			CategoryID: domain.NewPatch(domain.CategoryID(0)),
 		})
 
 		assert.ErrorIs(t, err, domain.ErrNotAllowed)
@@ -1100,7 +1100,7 @@ func TestPatchContender(t *testing.T) {
 			ID:                  fakedContenderID,
 			Ownership:           fakedOwnership,
 			CompetitionID:       fakedCompetitionID,
-			CompClassID:         fakedCompClassID,
+			CategoryID:          fakedCategoryID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			Entered:             currentTime,
@@ -1112,15 +1112,15 @@ func TestPatchContender(t *testing.T) {
 		mockedRepo := makeMockedRepo(fakedContender)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
-			Return(domain.CompClass{
-				ID:        fakedCompClassID,
+			On("GetCategory", mock.Anything, mock.Anything, fakedCategoryID).
+			Return(domain.Category{
+				ID:        fakedCategoryID,
 				TimeBegin: currentTime.Add(-1 * time.Hour),
 				TimeEnd:   currentTime.Add(time.Hour),
 			}, nil)
 
-		fakedOtherCompClass := domain.CompClass{
-			ID:        testutils.RandomResourceID[domain.CompClassID](),
+		fakedOtherCategory := domain.Category{
+			ID:        testutils.RandomResourceID[domain.CategoryID](),
 			TimeBegin: currentTime.Add(-1 * time.Hour),
 			TimeEnd:   currentTime,
 		}
@@ -1131,7 +1131,7 @@ func TestPatchContender(t *testing.T) {
 					ID:                  fakedContenderID,
 					Ownership:           fakedOwnership,
 					CompetitionID:       fakedCompetitionID,
-					CompClassID:         fakedOtherCompClass.ID,
+					CategoryID:          fakedOtherCategory.ID,
 					RegistrationCode:    "ABCD1234",
 					Name:                "Jane Doe",
 					Entered:             currentTime,
@@ -1144,7 +1144,7 @@ func TestPatchContender(t *testing.T) {
 				ID:                  fakedContenderID,
 				Ownership:           fakedOwnership,
 				CompetitionID:       fakedCompetitionID,
-				CompClassID:         fakedOtherCompClass.ID,
+				CategoryID:          fakedOtherCategory.ID,
 				RegistrationCode:    "ABCD1234",
 				Name:                "Jane Doe",
 				Entered:             currentTime,
@@ -1162,8 +1162,8 @@ func TestPatchContender(t *testing.T) {
 		mockedEventBroker.On("Dispatch", fakedCompetitionID, mock.Anything).Return()
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedOtherCompClass.ID).
-			Return(fakedOtherCompClass, nil)
+			On("GetCategory", mock.Anything, mock.Anything, fakedOtherCategory.ID).
+			Return(fakedOtherCategory, nil)
 
 		ucase := usecases.ContenderUseCase{
 			Repo:        mockedRepo,
@@ -1173,7 +1173,7 @@ func TestPatchContender(t *testing.T) {
 		}
 
 		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
-			CompClassID:         domain.NewPatch(fakedOtherCompClass.ID),
+			CategoryID:          domain.NewPatch(fakedOtherCategory.ID),
 			Name:                domain.NewPatch("Jane Doe"),
 			WithdrawnFromFinals: domain.NewPatch(true),
 			Disqualified:        domain.NewPatch(true),
@@ -1181,21 +1181,21 @@ func TestPatchContender(t *testing.T) {
 
 		require.NoError(t, err)
 
-		assert.Equal(t, fakedOtherCompClass.ID, contender.CompClassID)
+		assert.Equal(t, fakedOtherCategory.ID, contender.CategoryID)
 		assert.Equal(t, "Jane Doe", contender.Name)
 		assert.Equal(t, true, contender.WithdrawnFromFinals)
 		assert.Equal(t, true, contender.Disqualified)
 		assert.Equal(t, currentTime, contender.Entered)
 		assert.Equal(t, currentTime.Add(42*time.Hour), contender.ScrubBefore)
 
-		mockedEventBroker.AssertCalled(t, "Dispatch", fakedCompetitionID, domain.ContenderSwitchedClassEvent{
+		mockedEventBroker.AssertCalled(t, "Dispatch", fakedCompetitionID, domain.ContenderSwitchedCategoryEvent{
 			ContenderID: fakedContenderID,
-			CompClassID: fakedOtherCompClass.ID,
+			CategoryID:  fakedOtherCategory.ID,
 		})
 
 		mockedEventBroker.AssertCalled(t, "Dispatch", fakedCompetitionID, domain.ContenderPublicInfoUpdatedEvent{
 			ContenderID:         fakedContenderID,
-			CompClassID:         fakedOtherCompClass.ID,
+			CategoryID:          fakedOtherCategory.ID,
 			Name:                "Jane Doe",
 			WithdrawnFromFinals: true,
 			Disqualified:        true,
@@ -1225,7 +1225,7 @@ func TestPatchContender(t *testing.T) {
 			ID:                  fakedContenderID,
 			Ownership:           fakedOwnership,
 			CompetitionID:       fakedCompetitionID,
-			CompClassID:         fakedCompClassID,
+			CategoryID:          fakedCategoryID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "",
 			Entered:             currentTime,
@@ -1238,9 +1238,9 @@ func TestPatchContender(t *testing.T) {
 		mockedRepo := makeMockedRepo(fakedContender)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
-			Return(domain.CompClass{
-				ID:        fakedCompClassID,
+			On("GetCategory", mock.Anything, mock.Anything, fakedCategoryID).
+			Return(domain.Category{
+				ID:        fakedCategoryID,
 				TimeBegin: currentTime.Add(-1 * time.Hour),
 				TimeEnd:   currentTime.Add(time.Hour),
 			}, nil)
@@ -1272,7 +1272,7 @@ func TestPatchContender(t *testing.T) {
 			ID:                  fakedContenderID,
 			Ownership:           fakedOwnership,
 			CompetitionID:       fakedCompetitionID,
-			CompClassID:         fakedCompClassID,
+			CategoryID:          fakedCategoryID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			Entered:             currentTime,
@@ -1283,9 +1283,9 @@ func TestPatchContender(t *testing.T) {
 		mockedRepo := makeMockedRepo(fakedContender)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
-			Return(domain.CompClass{
-				ID:        fakedCompClassID,
+			On("GetCategory", mock.Anything, mock.Anything, fakedCategoryID).
+			Return(domain.Category{
+				ID:        fakedCategoryID,
 				TimeBegin: currentTime.Add(-1 * time.Hour),
 				TimeEnd:   currentTime.Add(time.Hour),
 			}, nil)
@@ -1320,7 +1320,7 @@ func TestPatchContender(t *testing.T) {
 			ID:                  fakedContenderID,
 			Ownership:           fakedOwnership,
 			CompetitionID:       fakedCompetitionID,
-			CompClassID:         fakedCompClassID,
+			CategoryID:          fakedCategoryID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			Entered:             currentTime,
@@ -1331,9 +1331,9 @@ func TestPatchContender(t *testing.T) {
 		mockedRepo := makeMockedRepo(fakedContender)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
-			Return(domain.CompClass{
-				ID:        fakedCompClassID,
+			On("GetCategory", mock.Anything, mock.Anything, fakedCategoryID).
+			Return(domain.Category{
+				ID:        fakedCategoryID,
 				TimeBegin: currentTime.Add(-1 * time.Hour),
 				TimeEnd:   currentTime.Add(time.Hour),
 			}, nil)
@@ -1344,7 +1344,7 @@ func TestPatchContender(t *testing.T) {
 					ID:                  fakedContenderID,
 					Ownership:           fakedOwnership,
 					CompetitionID:       fakedCompetitionID,
-					CompClassID:         fakedCompClassID,
+					CategoryID:          fakedCategoryID,
 					RegistrationCode:    "ABCD1234",
 					Name:                "John Doe",
 					Entered:             currentTime,
@@ -1356,7 +1356,7 @@ func TestPatchContender(t *testing.T) {
 				ID:                  fakedContenderID,
 				Ownership:           fakedOwnership,
 				CompetitionID:       fakedCompetitionID,
-				CompClassID:         fakedCompClassID,
+				CategoryID:          fakedCategoryID,
 				RegistrationCode:    "ABCD1234",
 				Name:                "John Doe",
 				Entered:             currentTime,
@@ -1405,7 +1405,7 @@ func TestPatchContender(t *testing.T) {
 			ID:                  fakedContenderID,
 			Ownership:           fakedOwnership,
 			CompetitionID:       fakedCompetitionID,
-			CompClassID:         fakedCompClassID,
+			CategoryID:          fakedCategoryID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			Entered:             currentTime,
@@ -1416,9 +1416,9 @@ func TestPatchContender(t *testing.T) {
 		mockedRepo := makeMockedRepo(fakedContender)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
-			Return(domain.CompClass{
-				ID:        fakedCompClassID,
+			On("GetCategory", mock.Anything, mock.Anything, fakedCategoryID).
+			Return(domain.Category{
+				ID:        fakedCategoryID,
 				TimeBegin: currentTime.Add(-1 * time.Hour),
 				TimeEnd:   currentTime.Add(time.Hour),
 			}, nil)
@@ -1429,7 +1429,7 @@ func TestPatchContender(t *testing.T) {
 					ID:                  fakedContenderID,
 					Ownership:           fakedOwnership,
 					CompetitionID:       fakedCompetitionID,
-					CompClassID:         fakedCompClassID,
+					CategoryID:          fakedCategoryID,
 					RegistrationCode:    "ABCD1234",
 					Name:                "John Doe",
 					Entered:             currentTime,
@@ -1441,7 +1441,7 @@ func TestPatchContender(t *testing.T) {
 				ID:                  fakedContenderID,
 				Ownership:           fakedOwnership,
 				CompetitionID:       fakedCompetitionID,
-				CompClassID:         fakedCompClassID,
+				CategoryID:          fakedCategoryID,
 				RegistrationCode:    "ABCD1234",
 				Name:                "John Doe",
 				Entered:             currentTime,
@@ -1481,7 +1481,7 @@ func TestPatchContender(t *testing.T) {
 		mockedRepo.AssertExpectations(t)
 	})
 
-	t.Run("CannotSwitchToAnEndedCompClass", func(t *testing.T) {
+	t.Run("CannotSwitchToAnEndedCategory", func(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 
 		mockedAuthorizer.
@@ -1492,7 +1492,7 @@ func TestPatchContender(t *testing.T) {
 			ID:                  fakedContenderID,
 			Ownership:           fakedOwnership,
 			CompetitionID:       fakedCompetitionID,
-			CompClassID:         fakedCompClassID,
+			CategoryID:          fakedCategoryID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			Entered:             currentTime,
@@ -1500,8 +1500,8 @@ func TestPatchContender(t *testing.T) {
 			Disqualified:        false,
 		}
 
-		fakedOtherCompClass := domain.CompClass{
-			ID:        testutils.RandomResourceID[domain.CompClassID](),
+		fakedOtherCategory := domain.Category{
+			ID:        testutils.RandomResourceID[domain.CategoryID](),
 			TimeBegin: currentTime.Add(-1 * time.Hour),
 			TimeEnd:   currentTime.Add(-1 * gracePeriod),
 		}
@@ -1509,16 +1509,16 @@ func TestPatchContender(t *testing.T) {
 		mockedRepo := makeMockedRepo(fakedContender)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
-			Return(domain.CompClass{
-				ID:        fakedCompClassID,
+			On("GetCategory", mock.Anything, mock.Anything, fakedCategoryID).
+			Return(domain.Category{
+				ID:        fakedCategoryID,
 				TimeBegin: currentTime.Add(-1 * time.Hour),
 				TimeEnd:   currentTime.Add(time.Hour),
 			}, nil)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedOtherCompClass.ID).
-			Return(fakedOtherCompClass, nil)
+			On("GetCategory", mock.Anything, mock.Anything, fakedOtherCategory.ID).
+			Return(fakedOtherCategory, nil)
 
 		ucase := usecases.ContenderUseCase{
 			Repo:       mockedRepo,
@@ -1526,7 +1526,7 @@ func TestPatchContender(t *testing.T) {
 		}
 
 		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
-			CompClassID: domain.NewPatch(fakedOtherCompClass.ID),
+			CategoryID: domain.NewPatch(fakedOtherCategory.ID),
 		})
 
 		assert.ErrorIs(t, err, domain.ErrCompetitionEnded)
@@ -1543,8 +1543,8 @@ func TestPatchContender(t *testing.T) {
 			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.ContenderRole, nil)
 
-		fakedOtherCompClass := domain.CompClass{
-			ID:        testutils.RandomResourceID[domain.CompClassID](),
+		fakedOtherCategory := domain.Category{
+			ID:        testutils.RandomResourceID[domain.CategoryID](),
 			TimeBegin: currentTime.Add(-1 * time.Hour),
 			TimeEnd:   currentTime.Add(-1 * gracePeriod),
 		}
@@ -1553,7 +1553,7 @@ func TestPatchContender(t *testing.T) {
 			ID:                  fakedContenderID,
 			Ownership:           fakedOwnership,
 			CompetitionID:       fakedCompetitionID,
-			CompClassID:         fakedOtherCompClass.ID,
+			CategoryID:          fakedOtherCategory.ID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			Entered:             currentTime,
@@ -1564,8 +1564,8 @@ func TestPatchContender(t *testing.T) {
 		mockedRepo := makeMockedRepo(fakedContender)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedOtherCompClass.ID).
-			Return(fakedOtherCompClass, nil)
+			On("GetCategory", mock.Anything, mock.Anything, fakedOtherCategory.ID).
+			Return(fakedOtherCategory, nil)
 
 		ucase := usecases.ContenderUseCase{
 			Repo:       mockedRepo,
@@ -1593,14 +1593,14 @@ func TestPatchContender(t *testing.T) {
 
 		mockedEventBroker.On("Dispatch", fakedCompetitionID, mock.Anything).Return()
 
-		fakedSecondCompClass := domain.CompClass{
-			ID:        testutils.RandomResourceID[domain.CompClassID](),
+		fakedSecondCategory := domain.Category{
+			ID:        testutils.RandomResourceID[domain.CategoryID](),
 			TimeBegin: currentTime.Add(-1 * time.Hour),
 			TimeEnd:   currentTime.Add(-1 * gracePeriod),
 		}
 
-		fakedThirdCompClass := domain.CompClass{
-			ID:        testutils.RandomResourceID[domain.CompClassID](),
+		fakedThirdCategory := domain.Category{
+			ID:        testutils.RandomResourceID[domain.CategoryID](),
 			TimeBegin: currentTime.Add(-1 * time.Hour),
 			TimeEnd:   currentTime.Add(-1 * gracePeriod),
 		}
@@ -1609,7 +1609,7 @@ func TestPatchContender(t *testing.T) {
 			ID:                  fakedContenderID,
 			Ownership:           fakedOwnership,
 			CompetitionID:       fakedCompetitionID,
-			CompClassID:         fakedSecondCompClass.ID,
+			CategoryID:          fakedSecondCategory.ID,
 			RegistrationCode:    "ABCD1234",
 			Name:                "John Doe",
 			Entered:             currentTime,
@@ -1620,12 +1620,12 @@ func TestPatchContender(t *testing.T) {
 		mockedRepo := makeMockedRepo(fakedContender)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedSecondCompClass.ID).
-			Return(fakedSecondCompClass, nil)
+			On("GetCategory", mock.Anything, mock.Anything, fakedSecondCategory.ID).
+			Return(fakedSecondCategory, nil)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedThirdCompClass.ID).
-			Return(fakedThirdCompClass, nil)
+			On("GetCategory", mock.Anything, mock.Anything, fakedThirdCategory.ID).
+			Return(fakedThirdCategory, nil)
 
 		mockedRepo.
 			On("StoreContender", mock.Anything, mock.Anything,
@@ -1633,7 +1633,7 @@ func TestPatchContender(t *testing.T) {
 					ID:                  fakedContenderID,
 					Ownership:           fakedOwnership,
 					CompetitionID:       fakedCompetitionID,
-					CompClassID:         fakedThirdCompClass.ID,
+					CategoryID:          fakedThirdCategory.ID,
 					RegistrationCode:    "ABCD1234",
 					Name:                "John Doe",
 					Entered:             currentTime,
@@ -1645,7 +1645,7 @@ func TestPatchContender(t *testing.T) {
 				ID:                  fakedContenderID,
 				Ownership:           fakedOwnership,
 				CompetitionID:       fakedCompetitionID,
-				CompClassID:         fakedThirdCompClass.ID,
+				CategoryID:          fakedThirdCategory.ID,
 				RegistrationCode:    "ABCD1234",
 				Name:                "John Doe",
 				Entered:             currentTime,
@@ -1661,11 +1661,11 @@ func TestPatchContender(t *testing.T) {
 		}
 
 		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
-			CompClassID: domain.NewPatch(fakedThirdCompClass.ID),
+			CategoryID: domain.NewPatch(fakedThirdCategory.ID),
 		})
 
 		require.NoError(t, err)
-		assert.Equal(t, fakedThirdCompClass.ID, contender.CompClassID)
+		assert.Equal(t, fakedThirdCategory.ID, contender.CategoryID)
 
 		mockedAuthorizer.AssertExpectations(t)
 		mockedScoreKeeper.AssertExpectations(t)
@@ -1710,7 +1710,7 @@ func TestScrubContender(t *testing.T) {
 		ContenderID: &fakedContenderID,
 	}
 	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
-	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 	t.Run("HappyPath", func(t *testing.T) {
 		synctest.Test(t, func(t *testing.T) {
@@ -1723,7 +1723,7 @@ func TestScrubContender(t *testing.T) {
 				ID:               fakedContenderID,
 				Ownership:        fakedOwnership,
 				CompetitionID:    fakedCompetitionID,
-				CompClassID:      fakedCompClassID,
+				CategoryID:       fakedCategoryID,
 				RegistrationCode: "ABCD1234",
 				Name:             "John Doe",
 				Entered:          time.Now().Add(-1 * time.Hour),
@@ -1742,7 +1742,7 @@ func TestScrubContender(t *testing.T) {
 					ID:                  fakedContenderID,
 					Ownership:           fakedOwnership,
 					CompetitionID:       fakedCompetitionID,
-					CompClassID:         fakedCompClassID,
+					CategoryID:          fakedCategoryID,
 					RegistrationCode:    "ABCD1234",
 					Name:                "",
 					Entered:             fakedContender.Entered,
@@ -1754,7 +1754,7 @@ func TestScrubContender(t *testing.T) {
 					ID:                  fakedContenderID,
 					Ownership:           fakedOwnership,
 					CompetitionID:       fakedCompetitionID,
-					CompClassID:         fakedCompClassID,
+					CategoryID:          fakedCategoryID,
 					RegistrationCode:    "ABCD1234",
 					Name:                "",
 					Entered:             fakedContender.Entered,
@@ -1766,7 +1766,7 @@ func TestScrubContender(t *testing.T) {
 			mockedEventBroker.
 				On("Dispatch", fakedCompetitionID, domain.ContenderPublicInfoUpdatedEvent{
 					ContenderID:         fakedContenderID,
-					CompClassID:         fakedCompClassID,
+					CategoryID:          fakedCategoryID,
 					Name:                "",
 					WithdrawnFromFinals: true,
 					Disqualified:        false,
@@ -1850,7 +1850,7 @@ func TestScrubContenders(t *testing.T) {
 				{
 					ID:                  testutils.RandomResourceID[domain.ContenderID](),
 					CompetitionID:       fakedCompetitionID,
-					CompClassID:         testutils.RandomResourceID[domain.CompClassID](),
+					CategoryID:          testutils.RandomResourceID[domain.CategoryID](),
 					Name:                "Alice",
 					WithdrawnFromFinals: false,
 					Disqualified:        false,
@@ -1858,7 +1858,7 @@ func TestScrubContenders(t *testing.T) {
 				{
 					ID:                  testutils.RandomResourceID[domain.ContenderID](),
 					CompetitionID:       fakedCompetitionID,
-					CompClassID:         testutils.RandomResourceID[domain.CompClassID](),
+					CategoryID:          testutils.RandomResourceID[domain.CategoryID](),
 					Name:                "Bob",
 					WithdrawnFromFinals: true,
 					Disqualified:        false,
@@ -1875,7 +1875,7 @@ func TestScrubContenders(t *testing.T) {
 				On("StoreContender", mock.Anything, mockedTx, domain.Contender{
 					ID:            fakedContenders[0].ID,
 					CompetitionID: fakedCompetitionID,
-					CompClassID:   fakedContenders[0].CompClassID,
+					CategoryID:    fakedContenders[0].CategoryID,
 					ScrubbedAt:    time.Now(),
 				}).
 				Return(domain.Contender{}, nil).Once()
@@ -1884,7 +1884,7 @@ func TestScrubContenders(t *testing.T) {
 				On("StoreContender", mock.Anything, mockedTx, domain.Contender{
 					ID:                  fakedContenders[1].ID,
 					CompetitionID:       fakedCompetitionID,
-					CompClassID:         fakedContenders[1].CompClassID,
+					CategoryID:          fakedContenders[1].CategoryID,
 					WithdrawnFromFinals: true,
 					ScrubbedAt:          time.Now(),
 				}).
@@ -1896,14 +1896,14 @@ func TestScrubContenders(t *testing.T) {
 			mockedEventBroker.
 				On("Dispatch", fakedCompetitionID, domain.ContenderPublicInfoUpdatedEvent{
 					ContenderID: fakedContenders[0].ID,
-					CompClassID: fakedContenders[0].CompClassID,
+					CategoryID:  fakedContenders[0].CategoryID,
 					ScrubbedAt:  time.Now(),
 				}).Return()
 
 			mockedEventBroker.
 				On("Dispatch", fakedCompetitionID, domain.ContenderPublicInfoUpdatedEvent{
 					ContenderID:         fakedContenders[1].ID,
-					CompClassID:         fakedContenders[1].CompClassID,
+					CategoryID:          fakedContenders[1].CategoryID,
 					WithdrawnFromFinals: true,
 					ScrubbedAt:          time.Now(),
 				}).Return()

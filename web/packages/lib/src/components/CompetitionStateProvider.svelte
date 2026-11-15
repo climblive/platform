@@ -1,35 +1,33 @@
 <script lang="ts">
   import { add, isBefore } from "date-fns";
   import { onMount, type Snippet } from "svelte";
-  import { getCompClassQuery, getCompetitionQuery } from "../queries";
+  import { getCategoryQuery, getCompetitionQuery } from "../queries";
   import type { CompetitionState } from "../types";
   import { SyncedTime } from "../utils";
 
   interface Props {
     competitionId: number;
-    compClassId?: number;
+    categoryId?: number;
     children?: Snippet<
       [{ competitionState: CompetitionState; progress: number }]
     >;
   }
 
-  const { competitionId, compClassId, children }: Props = $props();
+  const { competitionId, categoryId, children }: Props = $props();
 
   const competitionQuery = $derived(getCompetitionQuery(competitionId));
-  const compClassQuery = $derived(
-    compClassId ? getCompClassQuery(compClassId) : undefined,
+  const categoryQuery = $derived(
+    categoryId ? getCategoryQuery(categoryId) : undefined,
   );
 
   const competition = $derived(competitionQuery.data);
-  const compClass = $derived(compClassQuery?.data);
+  const category = $derived(categoryQuery?.data);
 
   const startTime = $derived(
-    compClass?.timeBegin ??
-      competition?.timeBegin ??
-      new Date(8640000000000000),
+    category?.timeBegin ?? competition?.timeBegin ?? new Date(8640000000000000),
   );
   const endTime = $derived(
-    compClass?.timeEnd ?? competition?.timeEnd ?? new Date(-8640000000000000),
+    category?.timeEnd ?? competition?.timeEnd ?? new Date(-8640000000000000),
   );
   const gracePeriodEndTime = $derived(
     competition

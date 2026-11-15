@@ -5,7 +5,7 @@
   import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import { CompetitionStateProvider } from "@climblive/lib/components";
   import {
-    getCompClassesQuery,
+    getCategoriesQuery,
     getCompetitionQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
@@ -21,11 +21,11 @@
   const { competitionId }: Props = $props();
 
   const competitionQuery = $derived(getCompetitionQuery(competitionId));
-  const compClassesQuery = $derived(getCompClassesQuery(competitionId));
+  const categoriesQuery = $derived(getCategoriesQuery(competitionId));
   const problemsQuery = $derived(getProblemsQuery(competitionId));
 
   const competition = $derived(competitionQuery.data);
-  const compClassCount = $derived(compClassesQuery.data?.length ?? 0);
+  const categoryCount = $derived(categoriesQuery.data?.length ?? 0);
   const problemCount = $derived(problemsQuery.data?.length ?? 0);
   const competitionSpansMultipleDays = $derived.by(() => {
     if (
@@ -63,7 +63,7 @@
 
   {@const contenderStr = (count: number) => `${count} registered`}
 
-  {@const compClassStr = (count: number) =>
+  {@const categoryStr = (count: number) =>
     count === 1 ? "1 category" : `${count} categories`}
 
   {@const problemStr = (count: number) =>
@@ -72,7 +72,7 @@
   <div class="summary">
     <ul>
       <li>{contenderStr(registeredContenders)}</li>
-      <li>{compClassStr(compClassCount)}</li>
+      <li>{categoryStr(categoryCount)}</li>
       <li>{problemStr(problemCount)}</li>
     </ul>
   </div>

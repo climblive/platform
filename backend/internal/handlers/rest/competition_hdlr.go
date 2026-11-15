@@ -27,7 +27,7 @@ type competitionUseCase interface {
 
 type competitionHandler struct {
 	competitionUseCase competitionUseCase
-	compClassUseCase   compClassUseCase
+	categoryUseCase    categoryUseCase
 	tickUseCase        tickUseCase
 	problemUseCase     problemUseCase
 }
@@ -35,12 +35,12 @@ type competitionHandler struct {
 func InstallCompetitionHandler(
 	mux *Mux,
 	competitionUseCase competitionUseCase,
-	compClassUseCase compClassUseCase,
+	categoryUseCase categoryUseCase,
 	tickUseCase tickUseCase,
 	problemUseCase problemUseCase) {
 	handler := &competitionHandler{
 		competitionUseCase: competitionUseCase,
-		compClassUseCase:   compClassUseCase,
+		categoryUseCase:    categoryUseCase,
 		tickUseCase:        tickUseCase,
 		problemUseCase:     problemUseCase,
 	}
@@ -257,7 +257,7 @@ func (hdlr *competitionHandler) DownloadResults(w http.ResponseWriter, r *http.R
 	}
 
 	writeBook := func(book *excelize.File) error {
-		compClasses, err := hdlr.compClassUseCase.GetCompClassesByCompetition(r.Context(), competitionID)
+		categories, err := hdlr.categoryUseCase.GetCategoriesByCompetition(r.Context(), competitionID)
 		if err != nil {
 			return errors.Wrap(err, 0)
 		}
@@ -285,16 +285,16 @@ func (hdlr *competitionHandler) DownloadResults(w http.ResponseWriter, r *http.R
 			return a.Number - b.Number
 		})
 
-		for _, compClass := range compClasses {
-			if _, err := book.NewSheet(sanitizeSheetName(compClass.Name)); err != nil {
+		for _, category := range categories {
+			if _, err := book.NewSheet(sanitizeSheetName(category.Name)); err != nil {
 				return errors.Wrap(err, 0)
 			}
 		}
 
-		nextRowNumbers := make(map[domain.CompClassID]int)
+		nextRowNumbers := make(map[domain.CategoryID]int)
 
-		for _, compClass := range compClasses {
-			sheetName := sanitizeSheetName(compClass.Name)
+		for _, category := range categories {
+			sheetName := sanitizeSheetName(category.Name)
 
 			style, err := book.NewStyle(&excelize.Style{
 				Font: &excelize.Font{
@@ -359,16 +359,16 @@ func (hdlr *competitionHandler) DownloadResults(w http.ResponseWriter, r *http.R
 				return errors.Wrap(err, 0)
 			}
 
-			nextRowNumbers[compClass.ID] = 2
+			nextRowNumbers[category.ID] = 2
 		}
 
 		for _, entry := range scoreboard {
 			var sheetName string
-			counter := nextRowNumbers[entry.CompClassID]
+			counter := nextRowNumbers[entry.CategoryID]
 
-			for _, compClass := range compClasses {
-				if entry.CompClassID == compClass.ID {
-					sheetName = sanitizeSheetName(compClass.Name)
+			for _, category := range categories {
+				if entry.CategoryID == category.ID {
+					sheetName = sanitizeSheetName(category.Name)
 
 					break
 				}
@@ -417,7 +417,7 @@ func (hdlr *competitionHandler) DownloadResults(w http.ResponseWriter, r *http.R
 				return errors.Wrap(err, 0)
 			}
 
-			nextRowNumbers[entry.CompClassID]++
+			nextRowNumbers[entry.CategoryID]++
 		}
 
 		err = book.DeleteSheet("Sheet1")

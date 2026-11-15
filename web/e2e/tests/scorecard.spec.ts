@@ -91,8 +91,8 @@ test("enter competition by entering registration code", async ({ page }) => {
   await page
     .getByRole("textbox", { name: "Name *" })
     .pressSequentially("Dwight Schrute");
-  const compClass = page.getByRole("combobox", { name: "Category *" });
-  await compClass.click();
+  const category = page.getByRole("combobox", { name: "Category *" });
+  await category.click();
   await page
     .getByRole("option", { name: "Males 16 years and older", exact: true })
     .click();
@@ -210,8 +210,8 @@ test("edit profile", async ({ page }) => {
   await nameInput.fill("");
   await nameInput.pressSequentially("Phyllis Lapin-Vance");
 
-  const compClass = page.getByRole("combobox", { name: "Category *" });
-  await compClass.click();
+  const category = page.getByRole("combobox", { name: "Category *" });
+  await category.click();
   await page
     .getByRole("option", { name: "Females 16 years and older", exact: true })
     .click();

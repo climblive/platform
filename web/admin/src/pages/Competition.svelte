@@ -14,7 +14,7 @@
   } from "@climblive/lib/queries";
   import { navigate } from "svelte-routing";
   import ArchiveCompetition from "./ArchiveCompetition.svelte";
-  import CompClassList from "./CompClassList.svelte";
+  import CategoryList from "./CategoryList.svelte";
   import DuplicateCompetition from "./DuplicateCompetition.svelte";
   import PopulateCompetition from "./PopulateCompetition.svelte";
   import ProblemList from "./ProblemList.svelte";
@@ -31,7 +31,7 @@
   let { competitionId }: Props = $props();
 
   let problemsHeading: HTMLHeadingElement | undefined = $state();
-  let compClassesHeading: HTMLHeadingElement | undefined = $state();
+  let categoriesHeading: HTMLHeadingElement | undefined = $state();
 
   const competitionQuery = $derived(getCompetitionQuery(competitionId));
   const selfQuery = $derived(getSelfQuery());
@@ -49,8 +49,8 @@
       case "problems":
         scrollElement = problemsHeading;
         break;
-      case "comp-classes":
-        scrollElement = compClassesHeading;
+      case "categories":
+        scrollElement = categoriesHeading;
         break;
     }
 
@@ -138,9 +138,9 @@
       <wa-divider></wa-divider>
       <RulesEditor {competition} />
 
-      <h2 bind:this={compClassesHeading}>Categories</h2>
+      <h2 bind:this={categoriesHeading}>Categories</h2>
       <wa-divider></wa-divider>
-      <CompClassList {competitionId} />
+      <CategoryList {competitionId} />
 
       <h2 bind:this={problemsHeading}>Problems</h2>
       <wa-divider></wa-divider>

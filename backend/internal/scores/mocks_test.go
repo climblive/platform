@@ -26,8 +26,8 @@ func (m *engineStoreMock) GetContender(contenderID domain.ContenderID) (scores.C
 	return args.Get(0).(scores.Contender), args.Bool(1)
 }
 
-func (m *engineStoreMock) GetContendersByCompClass(compClassID domain.CompClassID) iter.Seq[scores.Contender] {
-	args := m.Called(compClassID)
+func (m *engineStoreMock) GetContendersByCategory(categoryID domain.CategoryID) iter.Seq[scores.Contender] {
+	args := m.Called(categoryID)
 	return args.Get(0).(iter.Seq[scores.Contender])
 }
 
@@ -35,9 +35,9 @@ func (m *engineStoreMock) SaveContender(contender scores.Contender) {
 	m.Called(contender)
 }
 
-func (m *engineStoreMock) GetCompClassIDs() []domain.CompClassID {
+func (m *engineStoreMock) GetCategoryIDs() []domain.CategoryID {
 	args := m.Called()
-	return args.Get(0).([]domain.CompClassID)
+	return args.Get(0).([]domain.CategoryID)
 }
 
 func (m *engineStoreMock) GetTicksByContender(contenderID domain.ContenderID) iter.Seq[scores.Tick] {
@@ -50,8 +50,8 @@ func (m *engineStoreMock) GetTick(contenderID domain.ContenderID, problemID doma
 	return args.Get(0).(scores.Tick), args.Bool(1)
 }
 
-func (m *engineStoreMock) GetTicksByProblem(compClassID domain.CompClassID, problemID domain.ProblemID) iter.Seq[scores.Tick] {
-	args := m.Called(compClassID, problemID)
+func (m *engineStoreMock) GetTicksByProblem(categoryID domain.CategoryID, problemID domain.ProblemID) iter.Seq[scores.Tick] {
+	args := m.Called(categoryID, problemID)
 	return args.Get(0).(iter.Seq[scores.Tick])
 }
 

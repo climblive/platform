@@ -63,8 +63,8 @@ func EventName(event any) string {
 	switch event.(type) {
 	case domain.ContenderEnteredEvent:
 		return "CONTENDER_ENTERED"
-	case domain.ContenderSwitchedClassEvent:
-		return "CONTENDER_SWITCHED_CLASS"
+	case domain.ContenderSwitchedCategoryEvent:
+		return "CONTENDER_SWITCHED_CATEGORY"
 	case domain.ContenderWithdrewFromFinalsEvent:
 		return "CONTENDER_WITHDREW_FROM_FINALS"
 	case domain.ContenderReenteredFinalsEvent:
@@ -108,7 +108,7 @@ func extractContenderID(event any) domain.ContenderID {
 	switch ev := event.(type) {
 	case domain.ContenderEnteredEvent:
 		return ev.ContenderID
-	case domain.ContenderSwitchedClassEvent:
+	case domain.ContenderSwitchedCategoryEvent:
 		return ev.ContenderID
 	case domain.ContenderWithdrewFromFinalsEvent:
 		return ev.ContenderID

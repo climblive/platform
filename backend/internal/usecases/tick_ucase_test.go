@@ -169,7 +169,7 @@ func TestGetTicksByCompetition(t *testing.T) {
 func TestPutTick(t *testing.T) {
 	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
-	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 	now := time.Now()
@@ -188,7 +188,7 @@ func TestPutTick(t *testing.T) {
 			ID:            fakedContenderID,
 			Ownership:     fakedOwnership,
 			CompetitionID: fakedCompetitionID,
-			CompClassID:   fakedCompClassID,
+			CategoryID:    fakedCategoryID,
 		}
 
 		mockedRepo.
@@ -203,9 +203,9 @@ func TestPutTick(t *testing.T) {
 			}, nil)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
-			Return(domain.CompClass{
-				ID:        fakedCompClassID,
+			On("GetCategory", mock.Anything, mock.Anything, fakedCategoryID).
+			Return(domain.Category{
+				ID:        fakedCategoryID,
 				TimeBegin: timeBegin,
 				TimeEnd:   timeEnd,
 			}, nil)
@@ -776,7 +776,7 @@ func TestDeleteTick(t *testing.T) {
 	fakedTickID := testutils.RandomResourceID[domain.TickID]()
 	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
-	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
 	gracePeriod := 15 * time.Minute
@@ -793,7 +793,7 @@ func TestDeleteTick(t *testing.T) {
 		fakedContender := domain.Contender{
 			ID:            fakedContenderID,
 			CompetitionID: fakedCompetitionID,
-			CompClassID:   fakedCompClassID,
+			CategoryID:    fakedCategoryID,
 		}
 
 		fakedTick := domain.Tick{
@@ -819,9 +819,9 @@ func TestDeleteTick(t *testing.T) {
 			}, nil)
 
 		mockedRepo.
-			On("GetCompClass", mock.Anything, mock.Anything, fakedCompClassID).
-			Return(domain.CompClass{
-				ID:      fakedCompClassID,
+			On("GetCategory", mock.Anything, mock.Anything, fakedCategoryID).
+			Return(domain.Category{
+				ID:      fakedCategoryID,
 				TimeEnd: timeEnd,
 			}, nil)
 

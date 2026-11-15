@@ -1,4 +1,4 @@
-export * from "./compClasses";
+export * from "./categories";
 export * from "./constants";
 export * from "./contenders";
 export * from "./competitions";

@@ -10,3 +10,5 @@ sql:
         rename:
           contest: "Competition"
           contest_id: "CompetitionID"
+          comp_class: "Category"
+          class_id: "CategoryID"

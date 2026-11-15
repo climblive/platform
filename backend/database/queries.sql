@@ -10,11 +10,11 @@ FROM contender
 LEFT JOIN score ON score.contender_id = id
 WHERE registration_code = ?;
 
--- name: GetContendersByCompClass :many
+-- name: GetContendersByCategory :many
 SELECT sqlc.embed(contender), score.*
 FROM contender
 LEFT JOIN score ON score.contender_id = id
-WHERE class_id = ?;
+WHERE class_id = sqlc.arg(category_id);
 
 -- name: GetContendersByCompetition :many
 SELECT sqlc.embed(contender), score.*
@@ -60,21 +60,21 @@ ON DUPLICATE KEY UPDATE
     finalist = VALUES(finalist),
     rank_order = VALUES(rank_order);
 
--- name: GetCompClass :one
+-- name: GetCategory :one
 SELECT sqlc.embed(comp_class)
 FROM comp_class
 WHERE id = ?;
 
--- name: GetCompClassesByCompetition :many
+-- name: GetCategoriesByCompetition :many
 SELECT sqlc.embed(comp_class)
 FROM comp_class
 WHERE contest_id = sqlc.arg(competition_id);
 
--- name: DeleteCompClass :exec
+-- name: DeleteCategory :exec
 DELETE FROM comp_class
 WHERE id = ?;
 
--- name: UpsertCompClass :execlastid
+-- name: UpsertCategory :execlastid
 INSERT INTO 
 	comp_class (id, organizer_id, contest_id, name, description, color, time_begin, time_end)
 VALUES 

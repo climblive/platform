@@ -9,13 +9,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCompClassValidator(t *testing.T) {
+func TestCategoryValidator(t *testing.T) {
 	now := time.Now()
 
-	validator := validators.CompClassValidator{}
+	validator := validators.CategoryValidator{}
 
-	validCompClass := func() domain.CompClass {
-		return domain.CompClass{
+	validCategory := func() domain.Category {
+		return domain.Category{
 			Name:        "Females",
 			Description: "Female climbers",
 			TimeBegin:   now,
@@ -24,35 +24,35 @@ func TestCompClassValidator(t *testing.T) {
 	}
 
 	t.Run("ValidData", func(t *testing.T) {
-		err := validator.Validate(validCompClass())
+		err := validator.Validate(validCategory())
 		assert.NoError(t, err)
 	})
 
 	t.Run("EmptyName", func(t *testing.T) {
-		compClass := validCompClass()
-		compClass.Name = whitespaceCharacters
+		category := validCategory()
+		category.Name = whitespaceCharacters
 
-		err := validator.Validate(compClass)
+		err := validator.Validate(category)
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
 		assert.True(t, validator.IsValidationError(err))
 	})
 
 	t.Run("TimeEndBeforeTimeBegin", func(t *testing.T) {
-		compClass := validCompClass()
-		compClass.TimeEnd = compClass.TimeBegin.Add(-time.Nanosecond)
+		category := validCategory()
+		category.TimeEnd = category.TimeBegin.Add(-time.Nanosecond)
 
-		err := validator.Validate(compClass)
+		err := validator.Validate(category)
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
 		assert.True(t, validator.IsValidationError(err))
 	})
 
 	t.Run("TotalDurationExceeding31Days", func(t *testing.T) {
-		compClass := validCompClass()
-		compClass.TimeEnd = compClass.TimeBegin.Add(31*24*time.Hour + time.Nanosecond)
+		category := validCategory()
+		category.TimeEnd = category.TimeBegin.Add(31*24*time.Hour + time.Nanosecond)
 
-		err := validator.Validate(compClass)
+		err := validator.Validate(category)
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
 		assert.True(t, validator.IsValidationError(err))

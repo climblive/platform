@@ -76,7 +76,7 @@ export const updateContenderPublicInfoInQueryCache = (
   contenderId: number,
   updatedPublicInfo: Pick<
     Contender,
-    | "compClassId"
+    | "categoryId"
     | "name"
     | "withdrawnFromFinals"
     | "disqualified"

@@ -46,7 +46,7 @@ func TestGetCompetition(t *testing.T) {
 
 func TestGetScoreboard(t *testing.T) {
 	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
-	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 	mockedRepo := new(repositoryMock)
 	mockedScoreKeeper := new(scoreKeeperMock)
@@ -60,7 +60,7 @@ func TestGetScoreboard(t *testing.T) {
 
 		fakedContender := domain.Contender{
 			ID:                  contenderID,
-			CompClassID:         fakedCompClassID,
+			CategoryID:          fakedCategoryID,
 			Name:                fmt.Sprintf("Climber %d", i),
 			WithdrawnFromFinals: true,
 			Disqualified:        true,
@@ -107,7 +107,7 @@ func TestGetScoreboard(t *testing.T) {
 	assert.Len(t, scoreboard, 10)
 
 	assert.Equal(t, domain.ContenderID(1), scoreboard[0].ContenderID)
-	assert.Equal(t, fakedCompClassID, scoreboard[0].CompClassID)
+	assert.Equal(t, fakedCategoryID, scoreboard[0].CategoryID)
 	assert.Equal(t, "Climber 1", scoreboard[0].Name)
 	assert.Equal(t, true, scoreboard[0].WithdrawnFromFinals)
 	assert.Equal(t, true, scoreboard[0].Disqualified)
@@ -123,7 +123,7 @@ func TestGetScoreboard(t *testing.T) {
 		entry := scoreboard[i-1]
 
 		assert.Equal(t, domain.ContenderID(i), entry.ContenderID)
-		assert.Equal(t, fakedCompClassID, entry.CompClassID)
+		assert.Equal(t, fakedCategoryID, entry.CategoryID)
 		assert.Equal(t, fmt.Sprintf("Climber %d", i), entry.Name)
 		assert.Equal(t, true, entry.WithdrawnFromFinals)
 		assert.Equal(t, true, entry.Disqualified)
@@ -656,7 +656,7 @@ func TestCreateCompetition(t *testing.T) {
 func TestDuplicateCompetition(t *testing.T) {
 	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
 	fakedDuplicatedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
-	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 	fakedOwnership := domain.OwnershipData{
 		OrganizerID: testutils.RandomResourceID[domain.OrganizerID](),
@@ -684,8 +684,8 @@ func TestDuplicateCompetition(t *testing.T) {
 		TimeEnd:            timeEnd,
 	}
 
-	fakedCompClass := domain.CompClass{
-		ID:            fakedCompClassID,
+	fakedCategory := domain.Category{
+		ID:            fakedCategoryID,
 		Ownership:     fakedOwnership,
 		CompetitionID: fakedCompetitionID,
 		Name:          "Males",
@@ -735,8 +735,8 @@ func TestDuplicateCompetition(t *testing.T) {
 			Return(fakedCompetition, nil)
 
 		mockedRepo.
-			On("GetCompClassesByCompetition", mock.Anything, nil, fakedCompetitionID).
-			Return([]domain.CompClass{fakedCompClass}, nil)
+			On("GetCategoriesByCompetition", mock.Anything, nil, fakedCompetitionID).
+			Return([]domain.Category{fakedCategory}, nil)
 
 		mockedRepo.
 			On("GetProblemsByCompetition", mock.Anything, nil, fakedCompetitionID).
@@ -758,14 +758,14 @@ func TestDuplicateCompetition(t *testing.T) {
 			Return(fakedDuplicatedCompetition, nil)
 
 		mockedRepo.
-			On("StoreCompClass", mock.Anything, mockedTx, mock.MatchedBy(func(compClass domain.CompClass) bool {
-				expected := fakedCompClass
+			On("StoreCategory", mock.Anything, mockedTx, mock.MatchedBy(func(category domain.Category) bool {
+				expected := fakedCategory
 				expected.ID = 0
 				expected.CompetitionID = fakedDuplicatedCompetitionID
 
-				return compClass == expected
+				return category == expected
 			})).
-			Return(domain.CompClass{}, nil)
+			Return(domain.Category{}, nil)
 
 		mockedRepo.
 			On("StoreProblem", mock.Anything, mockedTx, mock.MatchedBy(func(problem domain.Problem) bool {
@@ -867,7 +867,7 @@ func TestTransferCompetition(t *testing.T) {
 	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
 	fakedOldOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
 	fakedNewOrganizerID := testutils.RandomResourceID[domain.OrganizerID]()
-	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 	fakedRaffleID := testutils.RandomResourceID[domain.RaffleID]()
@@ -903,8 +903,8 @@ func TestTransferCompetition(t *testing.T) {
 		Created:            now.Add(time.Duration(rand.Int())),
 	}
 
-	fakedCompClass := domain.CompClass{
-		ID:            fakedCompClassID,
+	fakedCategory := domain.Category{
+		ID:            fakedCategoryID,
 		Ownership:     fakedOldOwnership,
 		CompetitionID: fakedCompetitionID,
 		Name:          "Males",
@@ -944,7 +944,7 @@ func TestTransferCompetition(t *testing.T) {
 		ID:                  fakedContenderID,
 		Ownership:           domain.OwnershipData{OrganizerID: fakedOldOrganizerID, ContenderID: &fakedContenderID},
 		CompetitionID:       fakedCompetitionID,
-		CompClassID:         fakedCompClassID,
+		CategoryID:          fakedCategoryID,
 		RegistrationCode:    "ABCD1234",
 		Name:                "John Doe",
 		Entered:             now.Add(time.Duration(rand.Int())),
@@ -1008,8 +1008,8 @@ func TestTransferCompetition(t *testing.T) {
 				ID:        fakedNewOrganizerID,
 				Ownership: fakedNewOwnership,
 			}, nil)
-		mockedRepo.On("GetCompClassesByCompetition", mock.Anything, nil, fakedCompetitionID).
-			Return([]domain.CompClass{fakedCompClass}, nil)
+		mockedRepo.On("GetCategoriesByCompetition", mock.Anything, nil, fakedCompetitionID).
+			Return([]domain.Category{fakedCategory}, nil)
 		mockedRepo.
 			On("GetProblemsByCompetition", mock.Anything, nil, fakedCompetitionID).
 			Return([]domain.Problem{fakedProblem}, nil)
@@ -1033,7 +1033,7 @@ func TestTransferCompetition(t *testing.T) {
 		mockedRepo.On("DeleteRaffle", mock.Anything, mockedTx, fakedRaffleID).Return(nil)
 		mockedRepo.On("DeleteContender", mock.Anything, mockedTx, fakedContenderID).Return(nil)
 		mockedRepo.On("DeleteProblem", mock.Anything, mockedTx, fakedProblemID).Return(nil)
-		mockedRepo.On("DeleteCompClass", mock.Anything, mockedTx, fakedCompClassID).Return(nil)
+		mockedRepo.On("DeleteCategory", mock.Anything, mockedTx, fakedCategoryID).Return(nil)
 		mockedRepo.On("DeleteCompetition", mock.Anything, mockedTx, fakedCompetitionID).Return(nil)
 
 		mockedRepo.
@@ -1059,16 +1059,16 @@ func TestTransferCompetition(t *testing.T) {
 			Return(domain.Competition{}, nil)
 
 		mockedRepo.
-			On("StoreCompClass", mock.Anything, mockedTx, domain.CompClass{
-				ID:            fakedCompClassID,
+			On("StoreCategory", mock.Anything, mockedTx, domain.Category{
+				ID:            fakedCategoryID,
 				Ownership:     fakedNewOwnership,
 				CompetitionID: fakedCompetitionID,
 				Name:          "Males",
 				Description:   "Male competitors",
-				TimeBegin:     fakedCompClass.TimeBegin,
-				TimeEnd:       fakedCompClass.TimeEnd,
+				TimeBegin:     fakedCategory.TimeBegin,
+				TimeEnd:       fakedCategory.TimeEnd,
 			}).
-			Return(domain.CompClass{}, nil)
+			Return(domain.Category{}, nil)
 
 		mockedRepo.
 			On("StoreProblem", mock.Anything, mockedTx, domain.Problem{
@@ -1094,7 +1094,7 @@ func TestTransferCompetition(t *testing.T) {
 				ID:                  fakedContenderID,
 				Ownership:           domain.OwnershipData{OrganizerID: fakedNewOrganizerID, ContenderID: &fakedContenderID},
 				CompetitionID:       fakedCompetitionID,
-				CompClassID:         fakedCompClassID,
+				CategoryID:          fakedCategoryID,
 				RegistrationCode:    "ABCD1234",
 				Name:                "John Doe",
 				Entered:             fakedContender.Entered,

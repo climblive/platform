@@ -18,7 +18,7 @@ func contenderToDomain(record database.GetContenderRow) domain.Contender {
 		},
 		Score:               nil,
 		CompetitionID:       domain.CompetitionID(record.Contender.CompetitionID),
-		CompClassID:         domain.CompClassID(record.Contender.ClassID.Int32),
+		CategoryID:          domain.CategoryID(record.Contender.CategoryID.Int32),
 		RegistrationCode:    record.Contender.RegistrationCode,
 		Name:                record.Contender.Name.String,
 		Entered:             record.Contender.Entered.Time,
@@ -44,9 +44,9 @@ func contenderToDomain(record database.GetContenderRow) domain.Contender {
 	return contender
 }
 
-func compClassToDomain(record database.CompClass) domain.CompClass {
-	return domain.CompClass{
-		ID: domain.CompClassID(record.ID),
+func categoryToDomain(record database.Category) domain.Category {
+	return domain.Category{
+		ID: domain.CategoryID(record.ID),
 		Ownership: domain.OwnershipData{
 			OrganizerID: domain.OrganizerID(record.OrganizerID),
 			ContenderID: nil,

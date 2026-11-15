@@ -20,7 +20,7 @@ func TestHydrate(t *testing.T) {
 	fakedCompetitionID := testutils.RandomResourceID[domain.CompetitionID]()
 	fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 	fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
-	fakedCompClassID := testutils.RandomResourceID[domain.CompClassID]()
+	fakedCategoryID := testutils.RandomResourceID[domain.CategoryID]()
 
 	now := time.Now()
 
@@ -57,14 +57,14 @@ func TestHydrate(t *testing.T) {
 		Return([]domain.Contender{
 			{
 				ID:                  fakedContenderID,
-				CompClassID:         fakedCompClassID,
+				CategoryID:          fakedCategoryID,
 				Disqualified:        true,
 				WithdrawnFromFinals: true,
 				Entered:             now,
 			},
 			{
-				ID:          fakedContenderID + 1,
-				CompClassID: 0,
+				ID:         fakedContenderID + 1,
+				CategoryID: 0,
 			},
 		}, nil)
 
@@ -110,7 +110,7 @@ func TestHydrate(t *testing.T) {
 
 	mockedStore.On("SaveContender", scores.Contender{
 		ID:                  fakedContenderID,
-		CompClassID:         fakedCompClassID,
+		CategoryID:          fakedCategoryID,
 		Disqualified:        true,
 		WithdrawnFromFinals: true,
 	}).Return()

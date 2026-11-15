@@ -1,11 +1,11 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
-  import CompClassForm, { formSchema } from "@/forms/CompClassForm.svelte";
+  import CategoryForm, { formSchema } from "@/forms/CategoryForm.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import type { CompClassTemplate } from "@climblive/lib/models";
+  import type { CategoryTemplate } from "@climblive/lib/models";
   import {
-    createCompClassMutation,
-    getCompClassesQuery,
+    createCategoryMutation,
+    getCategoriesQuery,
   } from "@climblive/lib/queries";
   import { toastUnexpectedError } from "@climblive/lib/utils";
   import { add, roundToNearestHours } from "date-fns";
@@ -17,59 +17,59 @@
 
   let { competitionId }: Props = $props();
 
-  const compClassesQuery = $derived(getCompClassesQuery(competitionId));
-  const createCompClass = $derived(createCompClassMutation(competitionId));
+  const categoriesQuery = $derived(getCategoriesQuery(competitionId));
+  const createCategory = $derived(createCategoryMutation(competitionId));
 
-  const compClasses = $derived(compClassesQuery.data);
+  const categories = $derived(categoriesQuery.data);
 
   const initialTimes = $derived.by(() => {
-    if (!compClasses || compClasses.length === 0) {
+    if (!categories || categories.length === 0) {
       return {
         timeBegin: roundToNearestHours(add(new Date(), { hours: 1 })),
         timeEnd: roundToNearestHours(add(new Date(), { hours: 4 })),
       };
     }
 
-    const lastCompClass = compClasses[compClasses.length - 1];
+    const lastCategory = categories[categories.length - 1];
 
     return {
-      timeBegin: lastCompClass.timeBegin,
-      timeEnd: lastCompClass.timeEnd,
+      timeBegin: lastCategory.timeBegin,
+      timeEnd: lastCategory.timeEnd,
     };
   });
 
-  const handleSubmit = async (tmpl: CompClassTemplate) => {
-    createCompClass.mutate(tmpl, {
+  const handleSubmit = async (tmpl: CategoryTemplate) => {
+    createCategory.mutate(tmpl, {
       onSuccess: () =>
-        navigate(`/admin/competitions/${competitionId}#comp-classes`),
+        navigate(`/admin/competitions/${competitionId}#categories`),
       onError: () => toastUnexpectedError("Failed to create category."),
     });
   };
 </script>
 
-{#if compClasses === undefined}
+{#if categories === undefined}
   <Loader />
 {:else}
-  <CompClassForm submit={handleSubmit} data={initialTimes} schema={formSchema}>
+  <CategoryForm submit={handleSubmit} data={initialTimes} schema={formSchema}>
     <div class="controls">
       <wa-button
         size="s"
         type="button"
         appearance="plain"
         onclick={() =>
-          navigate(`/admin/competitions/${competitionId}#comp-classes`)}
+          navigate(`/admin/competitions/${competitionId}#categories`)}
         >Cancel</wa-button
       >
       <wa-button
         size="s"
         type="submit"
-        loading={createCompClass.isPending}
+        loading={createCategory.isPending}
         variant="neutral"
         appearance="accent"
         >Create
       </wa-button>
     </div>
-  </CompClassForm>
+  </CategoryForm>
 {/if}
 
 <style>

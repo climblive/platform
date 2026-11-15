@@ -7,7 +7,7 @@
   interface Props {
     registrationCode: string;
     competitionName: string;
-    compClassName: string | undefined;
+    categoryName: string | undefined;
     contenderId: number;
     contenderName: string | undefined;
     contenderScrubbedAt: Date | undefined;
@@ -16,7 +16,7 @@
   const {
     registrationCode,
     competitionName,
-    compClassName,
+    categoryName,
     contenderId,
     contenderName,
     contenderScrubbedAt,
@@ -47,7 +47,7 @@
       />
     </h1>
     <p class="subtitle">
-      {competitionName}<span class="separator"> / </span>{compClassName}
+      {competitionName}<span class="separator"> / </span>{categoryName}
     </p>
   </div>
 </header>
