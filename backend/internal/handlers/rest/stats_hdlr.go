@@ -27,5 +27,6 @@ func (hdlr *statsHandler) GetGlobalStats(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	w.Header().Set("Cache-Control", "public, max-age=1800")
 	writeResponse(w, http.StatusOK, stats)
 }

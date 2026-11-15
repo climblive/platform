@@ -14,8 +14,8 @@ func (d *Database) GetGlobalStats(ctx context.Context) (domain.GlobalStats, erro
 	}
 
 	return domain.GlobalStats{
-		Contests:             record.Contests,
-		RegisteredContenders: record.RegisteredContenders,
-		Ticks:                record.Ticks,
+		Competitions:  record.Competitions,
+		Registrations: record.Registrations,
+		Ticks:         record.Ticks,
 	}, nil
 }

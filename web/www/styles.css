@@ -62,19 +62,16 @@ section:nth-child(odd of section:not([hidden])) {
 }
 
 .stats-section {
-  .stats-statement {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--wa-space-2xl);
+  .intro {
+    max-width: 680px;
+    margin: 0 auto var(--wa-space-2xl);
+  }
+
+  .statement {
     margin: 0;
   }
 
-  .stats-metric {
-    display: flex;
-    flex-direction: column;
-    gap: var(--wa-space-xs);
-    min-width: 0;
+  .metric {
     font-size: var(--wa-font-size-l);
 
     strong {
@@ -84,13 +81,6 @@ section:nth-child(odd of section:not([hidden])) {
       font-variant-numeric: tabular-nums;
       line-height: var(--wa-line-height-condensed);
       overflow-wrap: anywhere;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .stats-statement {
-      flex-direction: column;
-      gap: var(--wa-space-l);
     }
   }
 }

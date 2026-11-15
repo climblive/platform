@@ -12,9 +12,10 @@ import type { GlobalStats } from "@climblive/lib/models";
 import { getApiBaseUrl } from "./api";
 import "../styles.css";
 
-document.getElementById("current-year")!.textContent = new Date()
-  .getFullYear()
-  .toString();
+const currentYear = document.getElementById("current-year");
+if (currentYear) {
+  currentYear.textContent = new Date().getFullYear().toString();
+}
 
 watchColorSchemeChanges((prefersDarkColorScheme) =>
   updateTheme(prefersDarkColorScheme),
@@ -22,31 +23,30 @@ watchColorSchemeChanges((prefersDarkColorScheme) =>
 updateTheme(prefersDarkColorScheme());
 
 const loadGlobalStats = async () => {
-  try {
-    const response = await fetch(`${getApiBaseUrl()}/stats/global`, {
-      credentials: "omit",
-    });
-    if (!response.ok) {
-      return;
-    }
-
-    const stats: GlobalStats = await response.json();
-    const formatter = new Intl.NumberFormat(document.documentElement.lang);
-    document.getElementById("stats-ticks")!.textContent = formatter.format(
-      stats.ticks,
-    );
-    document.getElementById("stats-registrations")!.textContent =
-      formatter.format(stats.registeredContenders);
-    document.getElementById("stats-contests")!.textContent = formatter.format(
-      stats.contests,
-    );
-    document.getElementById("global-stats")!.hidden = false;
-  } catch {
-    document.getElementById("global-stats")!.hidden = true;
+  const section = document.getElementById("global-stats");
+  const ticks = document.getElementById("stats-ticks");
+  const registrations = document.getElementById("stats-registrations");
+  const competitions = document.getElementById("stats-competitions");
+  if (!section || !ticks || !registrations || !competitions) {
+    return;
   }
+
+  const response = await fetch(`${getApiBaseUrl()}/stats/global`);
+  if (!response.ok) {
+    return;
+  }
+
+  const stats: GlobalStats = await response.json();
+  const formatter = new Intl.NumberFormat(document.documentElement.lang);
+  ticks.textContent = formatter.format(stats.ticks);
+  registrations.textContent = formatter.format(stats.registrations);
+  competitions.textContent = formatter.format(stats.competitions);
+  section.hidden = false;
 };
 
-void loadGlobalStats();
+void loadGlobalStats().catch((error: unknown) => {
+  console.error("Failed to load global statistics", error);
+});
 
 const compactCarouselLayout = window.matchMedia("(max-width: 768px)");
 

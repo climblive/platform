@@ -672,28 +672,26 @@ func (q *Queries) GetContestsCurrentlyRunningOrByStartTime(ctx context.Context, 
 
 const getGlobalStats = `-- name: GetGlobalStats :one
 SELECT
-    (SELECT COUNT(*) FROM contest WHERE archived_at IS NULL) AS contests,
-    (SELECT COUNT(*)
-     FROM contender c
-     JOIN contest ON contest.id = c.contest_id
-     WHERE contest.archived_at IS NULL AND c.entered IS NOT NULL AND c.disqualified = FALSE) AS registered_contenders,
-    (SELECT COUNT(*)
-     FROM tick t
-     JOIN contender c ON c.id = t.contender_id
-     JOIN contest ON contest.id = t.contest_id
-     WHERE contest.archived_at IS NULL AND c.disqualified = FALSE) AS ticks
+    COUNT(DISTINCT competition.id) AS competitions,
+    COUNT(DISTINCT CASE WHEN registration.entered IS NOT NULL THEN registration.id END) AS registrations,
+    COUNT(tick.id) AS ticks
+FROM contest AS competition
+LEFT JOIN contender AS registration
+    ON registration.contest_id = competition.id AND registration.disqualified = FALSE
+LEFT JOIN tick ON tick.contender_id = registration.id AND tick.contest_id = competition.id
+WHERE competition.archived_at IS NULL
 `
 
 type GetGlobalStatsRow struct {
-	Contests             int64
-	RegisteredContenders int64
-	Ticks                int64
+	Competitions  int64
+	Registrations int64
+	Ticks         int64
 }
 
 func (q *Queries) GetGlobalStats(ctx context.Context) (GetGlobalStatsRow, error) {
 	row := q.db.QueryRowContext(ctx, getGlobalStats)
 	var i GetGlobalStatsRow
-	err := row.Scan(&i.Contests, &i.RegisteredContenders, &i.Ticks)
+	err := row.Scan(&i.Competitions, &i.Registrations, &i.Ticks)
 	return i, err
 }
 
