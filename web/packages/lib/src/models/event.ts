@@ -3,7 +3,7 @@ import type {
   AscentDeregisteredEvent,
   AscentRegisteredEvent,
   ContenderPublicInfoUpdatedEvent,
-  ContenderScoreUpdatedEvent,
+  ContenderResultUpdatedEvent,
   PointValueUpdatedEvent,
   RaffleWinnerDrawnEvent,
   RulesUpdatedEvent,
@@ -20,7 +20,7 @@ export const contenderPublicInfoUpdatedEventSchema: z.ZodType<ContenderPublicInf
     scrubbedAt: z.coerce.date().optional(),
   });
 
-export const contenderScoreUpdatedEventSchema: z.ZodType<ContenderScoreUpdatedEvent> =
+export const contenderResultUpdatedEventSchema: z.ZodType<ContenderResultUpdatedEvent> =
   z.object({
     timestamp: z.coerce.date(),
     contenderId: z.number(),

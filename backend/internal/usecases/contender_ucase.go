@@ -32,7 +32,7 @@ type ContenderUseCase struct {
 	Repo                      contenderUseCaseRepository
 	Authorizer                domain.Authorizer
 	EventBroker               domain.EventBroker
-	ScoreKeeper               domain.ScoreKeeper
+	ResultKeeper              domain.ResultKeeper
 	PointValueKeeper          pointValueKeeper
 	RegistrationCodeGenerator domain.CodeGenerator
 }
@@ -47,7 +47,7 @@ func (uc *ContenderUseCase) GetContender(ctx context.Context, contenderID domain
 		return domain.Contender{}, errors.Wrap(err, 0)
 	}
 
-	return withScore(contender, uc.ScoreKeeper), nil
+	return withResult(contender, uc.ResultKeeper), nil
 }
 
 func (uc *ContenderUseCase) GetContenderByCode(ctx context.Context, registrationCode string) (domain.Contender, error) {
@@ -56,7 +56,7 @@ func (uc *ContenderUseCase) GetContenderByCode(ctx context.Context, registration
 		return domain.Contender{}, errors.Wrap(err, 0)
 	}
 
-	return withScore(contender, uc.ScoreKeeper), nil
+	return withResult(contender, uc.ResultKeeper), nil
 }
 
 func (uc *ContenderUseCase) GetPointValues(ctx context.Context, contenderID domain.ContenderID) ([]domain.PointValue, error) {
@@ -88,7 +88,7 @@ func (uc *ContenderUseCase) GetContendersByCategory(ctx context.Context, categor
 	}
 
 	for i, contender := range contenders {
-		contenders[i] = withScore(contender, uc.ScoreKeeper)
+		contenders[i] = withResult(contender, uc.ResultKeeper)
 	}
 
 	return contenders, nil
@@ -110,7 +110,7 @@ func (uc *ContenderUseCase) GetContendersByCompetition(ctx context.Context, comp
 	}
 
 	for i, contender := range contenders {
-		contenders[i] = withScore(contender, uc.ScoreKeeper)
+		contenders[i] = withResult(contender, uc.ResultKeeper)
 	}
 
 	return contenders, nil
@@ -265,7 +265,7 @@ func (uc *ContenderUseCase) PatchContender(ctx context.Context, contenderID doma
 		uc.EventBroker.Dispatch(competition.ID, event)
 	}
 
-	return withScore(contender, uc.ScoreKeeper), nil
+	return withResult(contender, uc.ResultKeeper), nil
 }
 
 func (uc *ContenderUseCase) ScrubContender(ctx context.Context, contenderID domain.ContenderID) (domain.Contender, error) {
@@ -302,7 +302,7 @@ func (uc *ContenderUseCase) ScrubContender(ctx context.Context, contenderID doma
 		ContenderID: contenderID,
 	})
 
-	return withScore(contender, uc.ScoreKeeper), nil
+	return withResult(contender, uc.ResultKeeper), nil
 }
 
 func (uc *ContenderUseCase) DeleteContender(ctx context.Context, contenderID domain.ContenderID) error {
@@ -368,7 +368,7 @@ func (uc *ContenderUseCase) CreateContenders(ctx context.Context, competitionID 
 			Disqualified:        false,
 			ScrubbedAt:          time.Time{},
 			ScrubBefore:         time.Time{},
-			Score:               nil,
+			Result:              nil,
 		}
 
 		if contender, err = uc.Repo.StoreContender(ctx, tx, contender); err != nil {

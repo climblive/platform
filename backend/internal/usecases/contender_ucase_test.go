@@ -26,9 +26,9 @@ func TestGetContender(t *testing.T) {
 	t.Run("HappyPath", func(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 		mockedRepo := new(repositoryMock)
-		mockedScoreKeeper := new(scoreKeeperMock)
+		mockedResultKeeper := new(resultKeeperMock)
 
-		fakedScore := domain.Score{
+		fakedResult := domain.Result{
 			Timestamp:   time.Now(),
 			ContenderID: fakedContenderID,
 			Score:       "1000p",
@@ -48,12 +48,12 @@ func TestGetContender(t *testing.T) {
 				Ownership: fakedOwnership,
 			}, nil)
 
-		mockedScoreKeeper.On("GetScore", fakedContenderID).Return(fakedScore, nil)
+		mockedResultKeeper.On("GetResult", fakedContenderID).Return(fakedResult, nil)
 
 		ucase := usecases.ContenderUseCase{
-			Repo:        mockedRepo,
-			Authorizer:  mockedAuthorizer,
-			ScoreKeeper: mockedScoreKeeper,
+			Repo:         mockedRepo,
+			Authorizer:   mockedAuthorizer,
+			ResultKeeper: mockedResultKeeper,
 		}
 
 		contender, err := ucase.GetContender(context.Background(), fakedContenderID)
@@ -61,12 +61,12 @@ func TestGetContender(t *testing.T) {
 		require.NoError(t, err)
 
 		assert.Equal(t, fakedContenderID, contender.ID)
-		require.NotNil(t, contender.Score)
-		assert.Equal(t, fakedScore, *contender.Score)
+		require.NotNil(t, contender.Result)
+		assert.Equal(t, fakedResult, *contender.Result)
 
 		mockedAuthorizer.AssertExpectations(t)
 		mockedRepo.AssertExpectations(t)
-		mockedScoreKeeper.AssertExpectations(t)
+		mockedResultKeeper.AssertExpectations(t)
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {
@@ -108,9 +108,9 @@ func TestGetContenderByCode(t *testing.T) {
 
 	t.Run("HappyPath", func(t *testing.T) {
 		mockedRepo := new(repositoryMock)
-		mockedScoreKeeper := new(scoreKeeperMock)
+		mockedResultKeeper := new(resultKeeperMock)
 
-		fakedScore := domain.Score{
+		fakedResult := domain.Result{
 			Timestamp:   time.Now(),
 			ContenderID: fakedContenderID,
 			Score:       "1000p",
@@ -126,22 +126,22 @@ func TestGetContenderByCode(t *testing.T) {
 				Ownership: fakedOwnership,
 			}, nil)
 
-		mockedScoreKeeper.On("GetScore", fakedContenderID).Return(fakedScore, nil)
+		mockedResultKeeper.On("GetResult", fakedContenderID).Return(fakedResult, nil)
 
 		ucase := usecases.ContenderUseCase{
-			Repo:        mockedRepo,
-			ScoreKeeper: mockedScoreKeeper,
+			Repo:         mockedRepo,
+			ResultKeeper: mockedResultKeeper,
 		}
 
 		contender, err := ucase.GetContenderByCode(context.Background(), "ABCD1234")
 
 		require.NoError(t, err)
 		assert.Equal(t, fakedContenderID, contender.ID)
-		require.NotNil(t, contender.Score)
-		assert.Equal(t, fakedScore, *contender.Score)
+		require.NotNil(t, contender.Result)
+		assert.Equal(t, fakedResult, *contender.Result)
 
 		mockedRepo.AssertExpectations(t)
-		mockedScoreKeeper.AssertExpectations(t)
+		mockedResultKeeper.AssertExpectations(t)
 	})
 
 	t.Run("NotFound", func(t *testing.T) {
@@ -278,7 +278,7 @@ func TestGetContendersByCategory(t *testing.T) {
 	t.Run("HappyPath", func(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 		mockedRepo := new(repositoryMock)
-		mockedScoreKeeper := new(scoreKeeperMock)
+		mockedResultKeeper := new(resultKeeperMock)
 
 		var contenders []domain.Contender
 
@@ -289,7 +289,7 @@ func TestGetContendersByCategory(t *testing.T) {
 				ID: contenderID,
 			})
 
-			mockedScoreKeeper.On("GetScore", contenderID).Return(domain.Score{
+			mockedResultKeeper.On("GetResult", contenderID).Return(domain.Result{
 				Timestamp:   currentTime,
 				ContenderID: contenderID,
 				Score:       fmt.Sprintf("%dp", k*10),
@@ -315,9 +315,9 @@ func TestGetContendersByCategory(t *testing.T) {
 			Return(contenders, nil)
 
 		ucase := usecases.ContenderUseCase{
-			Repo:        mockedRepo,
-			Authorizer:  mockedAuthorizer,
-			ScoreKeeper: mockedScoreKeeper,
+			Repo:         mockedRepo,
+			Authorizer:   mockedAuthorizer,
+			ResultKeeper: mockedResultKeeper,
 		}
 
 		contenders, err := ucase.GetContendersByCategory(context.Background(), fakedCategoryID)
@@ -327,17 +327,17 @@ func TestGetContendersByCategory(t *testing.T) {
 
 		for i, contender := range contenders {
 			assert.Equal(t, domain.ContenderID(i+1), contender.ID)
-			require.NotNil(t, contender.Score)
-			assert.Equal(t, fmt.Sprintf("%dp", (i+1)*10), contender.Score.Score)
-			assert.Equal(t, i+1, contender.Score.Placement)
-			assert.Equal(t, i, contender.Score.RankOrder)
-			assert.True(t, contender.Score.Finalist)
-			assert.Equal(t, currentTime, contender.Score.Timestamp)
+			require.NotNil(t, contender.Result)
+			assert.Equal(t, fmt.Sprintf("%dp", (i+1)*10), contender.Result.Score)
+			assert.Equal(t, i+1, contender.Result.Placement)
+			assert.Equal(t, i, contender.Result.RankOrder)
+			assert.True(t, contender.Result.Finalist)
+			assert.Equal(t, currentTime, contender.Result.Timestamp)
 		}
 
 		mockedAuthorizer.AssertExpectations(t)
 		mockedRepo.AssertExpectations(t)
-		mockedScoreKeeper.AssertExpectations(t)
+		mockedResultKeeper.AssertExpectations(t)
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {
@@ -380,7 +380,7 @@ func TestGetContendersByCompetition(t *testing.T) {
 	t.Run("HappyPath", func(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
 		mockedRepo := new(repositoryMock)
-		mockedScoreKeeper := new(scoreKeeperMock)
+		mockedResultKeeper := new(resultKeeperMock)
 
 		var contenders []domain.Contender
 
@@ -391,7 +391,7 @@ func TestGetContendersByCompetition(t *testing.T) {
 				ID: contenderID,
 			})
 
-			mockedScoreKeeper.On("GetScore", contenderID).Return(domain.Score{
+			mockedResultKeeper.On("GetResult", contenderID).Return(domain.Result{
 				Timestamp:   currentTime,
 				ContenderID: contenderID,
 				Score:       fmt.Sprintf("%dp", k*10),
@@ -417,9 +417,9 @@ func TestGetContendersByCompetition(t *testing.T) {
 			Return(contenders, nil)
 
 		ucase := usecases.ContenderUseCase{
-			Repo:        mockedRepo,
-			Authorizer:  mockedAuthorizer,
-			ScoreKeeper: mockedScoreKeeper,
+			Repo:         mockedRepo,
+			Authorizer:   mockedAuthorizer,
+			ResultKeeper: mockedResultKeeper,
 		}
 
 		contenders, err := ucase.GetContendersByCompetition(context.Background(), fakedCompetitionID)
@@ -429,17 +429,17 @@ func TestGetContendersByCompetition(t *testing.T) {
 
 		for i, contender := range contenders {
 			assert.Equal(t, domain.ContenderID(i+1), contender.ID)
-			require.NotNil(t, contender.Score)
-			assert.Equal(t, fmt.Sprintf("%dp", (i+1)*10), contender.Score.Score)
-			assert.Equal(t, i+1, contender.Score.Placement)
-			assert.Equal(t, i, contender.Score.RankOrder)
-			assert.True(t, contender.Score.Finalist)
-			assert.Equal(t, currentTime, contender.Score.Timestamp)
+			require.NotNil(t, contender.Result)
+			assert.Equal(t, fmt.Sprintf("%dp", (i+1)*10), contender.Result.Score)
+			assert.Equal(t, i+1, contender.Result.Placement)
+			assert.Equal(t, i, contender.Result.RankOrder)
+			assert.True(t, contender.Result.Finalist)
+			assert.Equal(t, currentTime, contender.Result.Timestamp)
 		}
 
 		mockedAuthorizer.AssertExpectations(t)
 		mockedRepo.AssertExpectations(t)
-		mockedScoreKeeper.AssertExpectations(t)
+		mockedResultKeeper.AssertExpectations(t)
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {
@@ -770,7 +770,7 @@ func TestPatchContender(t *testing.T) {
 
 	t.Run("UpdateWithoutChanges", func(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
-		mockedScoreKeeper := new(scoreKeeperMock)
+		mockedResultKeeper := new(resultKeeperMock)
 
 		fakedContender := domain.Contender{
 			ID:                  fakedContenderID,
@@ -824,7 +824,7 @@ func TestPatchContender(t *testing.T) {
 			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.ContenderRole, nil)
 
-		fakedScore := domain.Score{
+		fakedResult := domain.Result{
 			Timestamp:   currentTime,
 			ContenderID: fakedContenderID,
 			Score:       "1000p",
@@ -833,12 +833,12 @@ func TestPatchContender(t *testing.T) {
 			RankOrder:   6,
 		}
 
-		mockedScoreKeeper.On("GetScore", fakedContenderID).Return(fakedScore, nil)
+		mockedResultKeeper.On("GetResult", fakedContenderID).Return(fakedResult, nil)
 
 		ucase := usecases.ContenderUseCase{
-			Repo:        mockedRepo,
-			Authorizer:  mockedAuthorizer,
-			ScoreKeeper: mockedScoreKeeper,
+			Repo:         mockedRepo,
+			Authorizer:   mockedAuthorizer,
+			ResultKeeper: mockedResultKeeper,
 		}
 
 		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{})
@@ -855,11 +855,11 @@ func TestPatchContender(t *testing.T) {
 		assert.Equal(t, fakedContender.WithdrawnFromFinals, contender.WithdrawnFromFinals)
 		assert.Equal(t, fakedContender.Disqualified, contender.Disqualified)
 
-		require.NotNil(t, contender.Score)
-		assert.Equal(t, fakedScore, *contender.Score)
+		require.NotNil(t, contender.Result)
+		assert.Equal(t, fakedResult, *contender.Result)
 
 		mockedAuthorizer.AssertExpectations(t)
-		mockedScoreKeeper.AssertExpectations(t)
+		mockedResultKeeper.AssertExpectations(t)
 		mockedRepo.AssertExpectations(t)
 	})
 
@@ -911,7 +911,7 @@ func TestPatchContender(t *testing.T) {
 	t.Run("EnterCompetition", func(t *testing.T) {
 		synctest.Test(t, func(t *testing.T) {
 			mockedAuthorizer := new(authorizerMock)
-			mockedScoreKeeper := new(scoreKeeperMock)
+			mockedResultKeeper := new(resultKeeperMock)
 			mockedEventBroker := new(eventBrokerMock)
 
 			fakedContender := domain.Contender{
@@ -968,15 +968,15 @@ func TestPatchContender(t *testing.T) {
 				On("HasOwnership", mock.Anything, fakedOwnership).
 				Return(domain.ContenderRole, nil)
 
-			mockedScoreKeeper.On("GetScore", fakedContenderID).Return(domain.Score{}, errMock)
+			mockedResultKeeper.On("GetResult", fakedContenderID).Return(domain.Result{}, errMock)
 
 			mockedEventBroker.On("Dispatch", fakedCompetitionID, mock.Anything).Return()
 
 			ucase := usecases.ContenderUseCase{
-				Repo:        mockedRepo,
-				Authorizer:  mockedAuthorizer,
-				ScoreKeeper: mockedScoreKeeper,
-				EventBroker: mockedEventBroker,
+				Repo:         mockedRepo,
+				Authorizer:   mockedAuthorizer,
+				ResultKeeper: mockedResultKeeper,
+				EventBroker:  mockedEventBroker,
 			}
 
 			contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
@@ -1005,7 +1005,7 @@ func TestPatchContender(t *testing.T) {
 			})
 
 			mockedAuthorizer.AssertExpectations(t)
-			mockedScoreKeeper.AssertExpectations(t)
+			mockedResultKeeper.AssertExpectations(t)
 			mockedEventBroker.AssertExpectations(t)
 			mockedRepo.AssertExpectations(t)
 		})
@@ -1093,7 +1093,7 @@ func TestPatchContender(t *testing.T) {
 
 	t.Run("BatchUpdate", func(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
-		mockedScoreKeeper := new(scoreKeeperMock)
+		mockedResultKeeper := new(resultKeeperMock)
 		mockedEventBroker := new(eventBrokerMock)
 
 		fakedContender := domain.Contender{
@@ -1157,7 +1157,7 @@ func TestPatchContender(t *testing.T) {
 			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.OrganizerRole, nil)
 
-		mockedScoreKeeper.On("GetScore", fakedContenderID).Return(domain.Score{}, errMock)
+		mockedResultKeeper.On("GetResult", fakedContenderID).Return(domain.Result{}, errMock)
 
 		mockedEventBroker.On("Dispatch", fakedCompetitionID, mock.Anything).Return()
 
@@ -1166,10 +1166,10 @@ func TestPatchContender(t *testing.T) {
 			Return(fakedOtherCategory, nil)
 
 		ucase := usecases.ContenderUseCase{
-			Repo:        mockedRepo,
-			Authorizer:  mockedAuthorizer,
-			ScoreKeeper: mockedScoreKeeper,
-			EventBroker: mockedEventBroker,
+			Repo:         mockedRepo,
+			Authorizer:   mockedAuthorizer,
+			ResultKeeper: mockedResultKeeper,
+			EventBroker:  mockedEventBroker,
 		}
 
 		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
@@ -1210,7 +1210,7 @@ func TestPatchContender(t *testing.T) {
 		})
 
 		mockedAuthorizer.AssertExpectations(t)
-		mockedScoreKeeper.AssertExpectations(t)
+		mockedResultKeeper.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)
 		mockedRepo.AssertExpectations(t)
 	})
@@ -1313,7 +1313,7 @@ func TestPatchContender(t *testing.T) {
 
 	t.Run("ReenterFinals", func(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
-		mockedScoreKeeper := new(scoreKeeperMock)
+		mockedResultKeeper := new(resultKeeperMock)
 		mockedEventBroker := new(eventBrokerMock)
 
 		fakedContender := domain.Contender{
@@ -1368,15 +1368,15 @@ func TestPatchContender(t *testing.T) {
 			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.ContenderRole, nil)
 
-		mockedScoreKeeper.On("GetScore", fakedContenderID).Return(domain.Score{}, errMock)
+		mockedResultKeeper.On("GetResult", fakedContenderID).Return(domain.Result{}, errMock)
 
 		mockedEventBroker.On("Dispatch", fakedCompetitionID, mock.Anything).Return()
 
 		ucase := usecases.ContenderUseCase{
-			Repo:        mockedRepo,
-			Authorizer:  mockedAuthorizer,
-			ScoreKeeper: mockedScoreKeeper,
-			EventBroker: mockedEventBroker,
+			Repo:         mockedRepo,
+			Authorizer:   mockedAuthorizer,
+			ResultKeeper: mockedResultKeeper,
+			EventBroker:  mockedEventBroker,
 		}
 
 		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
@@ -1391,14 +1391,14 @@ func TestPatchContender(t *testing.T) {
 		})
 
 		mockedAuthorizer.AssertExpectations(t)
-		mockedScoreKeeper.AssertExpectations(t)
+		mockedResultKeeper.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)
 		mockedRepo.AssertExpectations(t)
 	})
 
 	t.Run("Requalify", func(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
-		mockedScoreKeeper := new(scoreKeeperMock)
+		mockedResultKeeper := new(resultKeeperMock)
 		mockedEventBroker := new(eventBrokerMock)
 
 		fakedContender := domain.Contender{
@@ -1453,15 +1453,15 @@ func TestPatchContender(t *testing.T) {
 			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.OrganizerRole, nil)
 
-		mockedScoreKeeper.On("GetScore", fakedContenderID).Return(domain.Score{}, errMock)
+		mockedResultKeeper.On("GetResult", fakedContenderID).Return(domain.Result{}, errMock)
 
 		mockedEventBroker.On("Dispatch", fakedCompetitionID, mock.Anything).Return()
 
 		ucase := usecases.ContenderUseCase{
-			Repo:        mockedRepo,
-			Authorizer:  mockedAuthorizer,
-			ScoreKeeper: mockedScoreKeeper,
-			EventBroker: mockedEventBroker,
+			Repo:         mockedRepo,
+			Authorizer:   mockedAuthorizer,
+			ResultKeeper: mockedResultKeeper,
+			EventBroker:  mockedEventBroker,
 		}
 
 		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
@@ -1476,7 +1476,7 @@ func TestPatchContender(t *testing.T) {
 		})
 
 		mockedAuthorizer.AssertExpectations(t)
-		mockedScoreKeeper.AssertExpectations(t)
+		mockedResultKeeper.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)
 		mockedRepo.AssertExpectations(t)
 	})
@@ -1582,14 +1582,14 @@ func TestPatchContender(t *testing.T) {
 
 	t.Run("OrganizerCanMakeChangesAfterGracePeriod", func(t *testing.T) {
 		mockedAuthorizer := new(authorizerMock)
-		mockedScoreKeeper := new(scoreKeeperMock)
+		mockedResultKeeper := new(resultKeeperMock)
 		mockedEventBroker := new(eventBrokerMock)
 
 		mockedAuthorizer.
 			On("HasOwnership", mock.Anything, fakedOwnership).
 			Return(domain.OrganizerRole, nil)
 
-		mockedScoreKeeper.On("GetScore", fakedContenderID).Return(domain.Score{}, errMock)
+		mockedResultKeeper.On("GetResult", fakedContenderID).Return(domain.Result{}, errMock)
 
 		mockedEventBroker.On("Dispatch", fakedCompetitionID, mock.Anything).Return()
 
@@ -1654,10 +1654,10 @@ func TestPatchContender(t *testing.T) {
 			}, nil)
 
 		ucase := usecases.ContenderUseCase{
-			Repo:        mockedRepo,
-			Authorizer:  mockedAuthorizer,
-			ScoreKeeper: mockedScoreKeeper,
-			EventBroker: mockedEventBroker,
+			Repo:         mockedRepo,
+			Authorizer:   mockedAuthorizer,
+			ResultKeeper: mockedResultKeeper,
+			EventBroker:  mockedEventBroker,
 		}
 
 		contender, err := ucase.PatchContender(context.Background(), fakedContenderID, domain.ContenderPatch{
@@ -1668,7 +1668,7 @@ func TestPatchContender(t *testing.T) {
 		assert.Equal(t, fakedThirdCategory.ID, contender.CategoryID)
 
 		mockedAuthorizer.AssertExpectations(t)
-		mockedScoreKeeper.AssertExpectations(t)
+		mockedResultKeeper.AssertExpectations(t)
 		mockedEventBroker.AssertExpectations(t)
 		mockedRepo.AssertExpectations(t)
 	})
@@ -1716,7 +1716,7 @@ func TestScrubContender(t *testing.T) {
 		synctest.Test(t, func(t *testing.T) {
 			mockedAuthorizer := new(authorizerMock)
 			mockedRepo := new(repositoryMock)
-			mockedScoreKeeper := new(scoreKeeperMock)
+			mockedResultKeeper := new(resultKeeperMock)
 			mockedEventBroker := new(eventBrokerMock)
 
 			fakedContender := domain.Contender{
@@ -1780,13 +1780,13 @@ func TestScrubContender(t *testing.T) {
 				}).
 				Return()
 
-			mockedScoreKeeper.On("GetScore", fakedContenderID).Return(domain.Score{}, domain.ErrNotFound)
+			mockedResultKeeper.On("GetResult", fakedContenderID).Return(domain.Result{}, domain.ErrNotFound)
 
 			ucase := usecases.ContenderUseCase{
-				Repo:        mockedRepo,
-				Authorizer:  mockedAuthorizer,
-				EventBroker: mockedEventBroker,
-				ScoreKeeper: mockedScoreKeeper,
+				Repo:         mockedRepo,
+				Authorizer:   mockedAuthorizer,
+				EventBroker:  mockedEventBroker,
+				ResultKeeper: mockedResultKeeper,
 			}
 
 			contender, err := ucase.ScrubContender(context.Background(), fakedContenderID)
@@ -1799,7 +1799,7 @@ func TestScrubContender(t *testing.T) {
 
 			mockedAuthorizer.AssertExpectations(t)
 			mockedRepo.AssertExpectations(t)
-			mockedScoreKeeper.AssertExpectations(t)
+			mockedResultKeeper.AssertExpectations(t)
 			mockedEventBroker.AssertExpectations(t)
 		})
 	})

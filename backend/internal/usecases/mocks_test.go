@@ -273,8 +273,8 @@ func (m *repositoryMock) StoreOrganizerInvite(ctx context.Context, tx domain.Tra
 	return args.Error(0)
 }
 
-func (m *repositoryMock) StoreScore(ctx context.Context, tx domain.Transaction, score domain.Score) error {
-	args := m.Called(ctx, tx, score)
+func (m *repositoryMock) StoreResult(ctx context.Context, tx domain.Transaction, result domain.Result) error {
+	args := m.Called(ctx, tx, result)
 	return args.Error(0)
 }
 
@@ -292,13 +292,13 @@ func (m *authorizerMock) GetAuthentication(ctx context.Context) (domain.Authenti
 	return args.Get(0).(domain.Authentication), args.Error(1)
 }
 
-type scoreKeeperMock struct {
+type resultKeeperMock struct {
 	mock.Mock
 }
 
-func (m *scoreKeeperMock) GetScore(contenderID domain.ContenderID) (domain.Score, error) {
+func (m *resultKeeperMock) GetResult(contenderID domain.ContenderID) (domain.Result, error) {
 	args := m.Called(contenderID)
-	return args.Get(0).(domain.Score), args.Error(1)
+	return args.Get(0).(domain.Result), args.Error(1)
 }
 
 type eventBrokerMock struct {

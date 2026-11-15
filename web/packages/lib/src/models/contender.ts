@@ -1,6 +1,6 @@
 import { z } from "@climblive/lib/utils";
 import type { Contender } from "./generated";
-import { scoreSchema } from "./score";
+import { resultSchema } from "./result";
 
 export const contenderSchema: z.ZodType<Contender> = z.object({
   id: z.number(),
@@ -13,5 +13,5 @@ export const contenderSchema: z.ZodType<Contender> = z.object({
   disqualified: z.boolean(),
   scrubbedAt: z.coerce.date().optional(),
   scrubBefore: z.coerce.date().optional(),
-  score: scoreSchema.optional(),
+  result: resultSchema.optional(),
 });

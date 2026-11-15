@@ -87,10 +87,10 @@ func EventName(event any) string {
 		return "RULES_UPDATED"
 	case domain.ContenderPublicInfoUpdatedEvent:
 		return "CONTENDER_PUBLIC_INFO_UPDATED"
-	case domain.ContenderScoreUpdatedEvent:
-		return "CONTENDER_SCORE_UPDATED"
-	case []domain.ContenderScoreUpdatedEvent:
-		return "[]CONTENDER_SCORE_UPDATED"
+	case domain.ContenderResultUpdatedEvent:
+		return "CONTENDER_RESULT_UPDATED"
+	case []domain.ContenderResultUpdatedEvent:
+		return "[]CONTENDER_RESULT_UPDATED"
 	case domain.ScoreEngineStartedEvent:
 		return "SCORE_ENGINE_STARTED"
 	case domain.ScoreEngineStoppedEvent:
@@ -124,7 +124,7 @@ func extractContenderID(event any) domain.ContenderID {
 		return ev.ContenderID
 	case domain.ContenderPublicInfoUpdatedEvent:
 		return ev.ContenderID
-	case domain.ContenderScoreUpdatedEvent:
+	case domain.ContenderResultUpdatedEvent:
 		return ev.ContenderID
 	case domain.PointValueUpdatedEvent:
 		return ev.ContenderID

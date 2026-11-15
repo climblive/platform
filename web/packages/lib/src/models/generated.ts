@@ -72,7 +72,7 @@ export interface Contender {
   disqualified: boolean;
   scrubbedAt?: Date;
   scrubBefore?: Date;
-  score?: Score;
+  result?: Result;
 }
 export interface ContenderPatch {
   categoryId?: CategoryID;
@@ -210,7 +210,7 @@ export interface RaffleWinner {
   contenderScrubbedAt?: Date;
   timestamp: Date;
 }
-export interface Score {
+export interface Result {
   timestamp: Date;
   contenderId: ContenderID;
   score: string;
@@ -229,7 +229,7 @@ export interface ScoreboardEntry {
   withdrawnFromFinals: boolean;
   disqualified: boolean;
   scrubbedAt?: Date;
-  score?: Score;
+  result?: Result;
 }
 export interface Tick {
   id: TickID;
@@ -326,7 +326,7 @@ export interface ContenderPublicInfoUpdatedEvent {
   disqualified: boolean;
   scrubbedAt?: Date;
 }
-export interface ContenderScoreUpdatedEvent {
+export interface ContenderResultUpdatedEvent {
   timestamp: Date;
   contenderId: ContenderID;
   score: string;

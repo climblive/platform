@@ -22,7 +22,7 @@ type ScoringRules interface {
 }
 
 type Ranker interface {
-	RankContenders(contenders iter.Seq[Contender]) []domain.Score
+	RankContenders(contenders iter.Seq[Contender]) []domain.Result
 }
 
 type EffectType int8
@@ -111,8 +111,8 @@ type EngineStore interface {
 	SavePointValue(domain.ContenderID, domain.ProblemID, domain.PointValue)
 	GetDirtyPointValues() []domain.PointValue
 
-	SaveScore(domain.Score)
-	GetDirtyScores() []domain.Score
+	SaveResult(domain.Result)
+	GetDirtyResults() []domain.Result
 }
 
 type DefaultScoreEngine struct {
@@ -442,8 +442,8 @@ func (e *DefaultScoreEngine) HandleProblemUpdated(event domain.ProblemUpdatedEve
 	}
 }
 
-func (e *DefaultScoreEngine) GetDirtyScores() []domain.Score {
-	return e.store.GetDirtyScores()
+func (e *DefaultScoreEngine) GetDirtyResults() []domain.Result {
+	return e.store.GetDirtyResults()
 }
 
 func (e *DefaultScoreEngine) GetDirtyPointValues() []domain.PointValue {
@@ -624,9 +624,9 @@ func (e *DefaultScoreEngine) RankCategory(categoryID domain.CategoryID) {
 	}
 	ranker := NewBasicRanker(rules.Finalists, rules.UsePoints, zone1Enabled, zone2Enabled)
 
-	scores := ranker.RankContenders(e.store.GetContendersByCategory(categoryID))
+	results := ranker.RankContenders(e.store.GetContendersByCategory(categoryID))
 
-	for score := range slices.Values(scores) {
-		e.store.SaveScore(score)
+	for result := range slices.Values(results) {
+		e.store.SaveResult(result)
 	}
 }

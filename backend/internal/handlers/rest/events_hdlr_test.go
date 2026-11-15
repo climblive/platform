@@ -46,7 +46,7 @@ func TestEventsHandler(t *testing.T) {
 				competitionID,
 				contenderID,
 				"CONTENDER_PUBLIC_INFO_UPDATED",
-				"CONTENDER_SCORE_UPDATED",
+				"CONTENDER_RESULT_UPDATED",
 				"ASCENT_REGISTERED",
 				"ASCENT_DEREGISTERED",
 				"RAFFLE_WINNER_DRAWN",
@@ -243,7 +243,7 @@ func TestEventsHandler(t *testing.T) {
 		mockedEventBroker, subscription := makeMocks(0, filters)
 
 		err := subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderScoreUpdatedEvent{
+			Data: domain.ContenderResultUpdatedEvent{
 				Timestamp:   time.Date(2024, 12, 01, 00, 00, 00, 0, time.UTC),
 				ContenderID: fakedContenderID,
 				Score:       "100p",
@@ -278,7 +278,7 @@ func TestEventsHandler(t *testing.T) {
 		assert.Equal(t, []string{
 			"retry: 5000",
 			"",
-			"event: CONTENDER_SCORE_UPDATED",
+			"event: CONTENDER_RESULT_UPDATED",
 			fmt.Sprintf(`data: {"timestamp":"2024-12-01T00:00:00Z","contenderId":%v,"score":"100p","placement":10,"finalist":true,"rankOrder":9}`, fakedContenderID),
 		}, lines)
 
@@ -294,12 +294,12 @@ func TestEventsHandler(t *testing.T) {
 		mockedEventBroker, subscription := makeMocks(1, filters)
 
 		err := subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderScoreUpdatedEvent{},
+			Data: domain.ContenderResultUpdatedEvent{},
 		})
 		require.NoError(t, err)
 
 		err = subscription.Post(domain.EventEnvelope{
-			Data: domain.ContenderScoreUpdatedEvent{},
+			Data: domain.ContenderResultUpdatedEvent{},
 		})
 		require.ErrorIs(t, err, events.ErrBufferFull)
 

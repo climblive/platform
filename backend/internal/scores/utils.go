@@ -6,11 +6,11 @@ import (
 	"github.com/climblive/platform/backend/internal/domain"
 )
 
-func CompareScore(s1, s2 domain.Score) bool {
-	s1.Timestamp = time.Time{}
-	s2.Timestamp = time.Time{}
+func CompareResult(r1, r2 domain.Result) bool {
+	r1.Timestamp = time.Time{}
+	r2.Timestamp = time.Time{}
 
-	return s1 == s2
+	return r1 == r2
 }
 
 func ComparePointValue(pv1, pv2 domain.PointValue) bool {

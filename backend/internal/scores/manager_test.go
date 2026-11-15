@@ -239,8 +239,8 @@ func (m *repositoryMock) GetTicksByCompetition(ctx context.Context, tx domain.Tr
 	return args.Get(0).([]domain.Tick), args.Error(1)
 }
 
-func (m *repositoryMock) StoreScore(ctx context.Context, tx domain.Transaction, score domain.Score) error {
-	args := m.Called(ctx, tx, score)
+func (m *repositoryMock) StoreResult(ctx context.Context, tx domain.Transaction, result domain.Result) error {
+	args := m.Called(ctx, tx, result)
 	return args.Error(0)
 }
 

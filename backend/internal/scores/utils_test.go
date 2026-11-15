@@ -9,10 +9,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCompareScore(t *testing.T) {
+func TestCompareResult(t *testing.T) {
 	now := time.Now()
 
-	s1 := domain.Score{
+	r1 := domain.Result{
 		Timestamp:   now,
 		ContenderID: 1,
 		Score:       "100p",
@@ -20,7 +20,7 @@ func TestCompareScore(t *testing.T) {
 		Finalist:    true,
 		RankOrder:   0,
 	}
-	s2 := domain.Score{
+	r2 := domain.Result{
 		Timestamp:   now.Add(time.Second),
 		ContenderID: 1,
 		Score:       "100p",
@@ -29,5 +29,5 @@ func TestCompareScore(t *testing.T) {
 		RankOrder:   0,
 	}
 
-	assert.True(t, scores.CompareScore(s1, s2))
+	assert.True(t, scores.CompareResult(r1, r2))
 }

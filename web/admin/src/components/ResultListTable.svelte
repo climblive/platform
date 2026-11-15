@@ -64,20 +64,22 @@
       return;
     }
 
-    let scores = [...($scoreboard.get(selectedCategoryId) ?? [])];
+    let results = [...($scoreboard.get(selectedCategoryId) ?? [])];
 
     if (filterText) {
       const search = filterText.toLowerCase();
 
-      scores = scores.filter(({ name }) => name.toLowerCase().includes(search));
+      results = results.filter(({ name }) =>
+        name.toLowerCase().includes(search),
+      );
     }
 
-    scores.sort(
+    results.sort(
       (a: ScoreboardEntry, b: ScoreboardEntry) =>
-        (a.score?.rankOrder ?? Infinity) - (b.score?.rankOrder ?? Infinity),
+        (a.result?.rankOrder ?? Infinity) - (b.result?.rankOrder ?? Infinity),
     );
 
-    tableData = scores;
+    tableData = results;
   });
 
   const columns: ColumnDefinition<ScoreboardEntry>[] = [
@@ -126,25 +128,25 @@
   </Link>
 {/snippet}
 
-{#snippet renderScore({ score }: ScoreboardEntry)}
-  {#if score}
-    <Score value={score.score}></Score>
+{#snippet renderScore({ result }: ScoreboardEntry)}
+  {#if result}
+    <Score value={result.score}></Score>
   {/if}
 {/snippet}
 
-{#snippet renderPlacement({ score }: ScoreboardEntry)}
-  {#if score?.placement}
-    {score.placement}<sup>{ordinalSuperscript(score.placement)}</sup>
+{#snippet renderPlacement({ result }: ScoreboardEntry)}
+  {#if result?.placement}
+    {result.placement}<sup>{ordinalSuperscript(result.placement)}</sup>
   {:else}
     <wa-icon name="minus"></wa-icon>
   {/if}
 {/snippet}
 
-{#snippet renderFinalist({ score }: ScoreboardEntry)}
-  <wa-icon name={score?.finalist ? "medal" : "minus"}></wa-icon>
+{#snippet renderFinalist({ result }: ScoreboardEntry)}
+  <wa-icon name={result?.finalist ? "medal" : "minus"}></wa-icon>
 {/snippet}
 
-<h2>Scores</h2>
+<h2>Results</h2>
 
 <section>
   {#if categories}

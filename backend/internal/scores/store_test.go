@@ -513,12 +513,12 @@ func TestMemoryStore(t *testing.T) {
 		assert.Empty(t, dirtyPointValues)
 	})
 
-	t.Run("GetDirtyScores", func(t *testing.T) {
+	t.Run("GetDirtyResults", func(t *testing.T) {
 		store := scores.NewMemoryStore()
 
 		fakedContenderID := testutils.RandomResourceID[domain.ContenderID]()
 
-		score := domain.Score{
+		result := domain.Result{
 			Timestamp:   time.Now(),
 			ContenderID: fakedContenderID,
 			Score:       "1000p",
@@ -527,15 +527,15 @@ func TestMemoryStore(t *testing.T) {
 			RankOrder:   9,
 		}
 
-		store.SaveScore(score)
+		store.SaveResult(result)
 
-		dirtyScores := store.GetDirtyScores()
+		dirtyResults := store.GetDirtyResults()
 
-		assert.Len(t, dirtyScores, 1)
-		assert.Equal(t, score, dirtyScores[0])
+		assert.Len(t, dirtyResults, 1)
+		assert.Equal(t, result, dirtyResults[0])
 
-		dirtyScores = store.GetDirtyScores()
+		dirtyResults = store.GetDirtyResults()
 
-		assert.Empty(t, dirtyScores)
+		assert.Empty(t, dirtyResults)
 	})
 }

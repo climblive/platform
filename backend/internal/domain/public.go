@@ -55,7 +55,7 @@ type Contender struct {
 	Disqualified        bool          `json:"disqualified"`
 	ScrubbedAt          time.Time     `json:"scrubbedAt,omitzero"`
 	ScrubBefore         time.Time     `json:"scrubBefore,omitzero"`
-	Score               *Score        `json:"score,omitzero"`
+	Result              *Result       `json:"result,omitzero"`
 }
 
 type ContenderPatch struct {
@@ -218,7 +218,7 @@ type RaffleWinner struct {
 	Timestamp           time.Time      `json:"timestamp"`
 }
 
-type Score struct {
+type Result struct {
 	Timestamp   time.Time   `json:"timestamp"`
 	ContenderID ContenderID `json:"contenderId"`
 	Score       string      `json:"score"`
@@ -240,7 +240,7 @@ type ScoreboardEntry struct {
 	WithdrawnFromFinals bool        `json:"withdrawnFromFinals"`
 	Disqualified        bool        `json:"disqualified"`
 	ScrubbedAt          time.Time   `json:"scrubbedAt,omitzero"`
-	Score               *Score      `json:"score,omitzero"`
+	Result              *Result     `json:"result,omitzero"`
 }
 
 type Tick struct {
@@ -359,7 +359,7 @@ type ContenderPublicInfoUpdatedEvent struct {
 	ScrubbedAt          time.Time   `json:"scrubbedAt,omitzero"`
 }
 
-type ContenderScoreUpdatedEvent struct {
+type ContenderResultUpdatedEvent struct {
 	Timestamp   time.Time   `json:"timestamp"`
 	ContenderID ContenderID `json:"contenderId"`
 	Score       string      `json:"score"`

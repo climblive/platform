@@ -16,7 +16,7 @@ func contenderToDomain(record database.GetContenderRow) domain.Contender {
 			OrganizerID: domain.OrganizerID(record.Contender.OrganizerID),
 			ContenderID: nillableIntToResourceID[domain.ContenderID](&record.Contender.ID),
 		},
-		Score:               nil,
+		Result:              nil,
 		CompetitionID:       domain.CompetitionID(record.Contender.CompetitionID),
 		CategoryID:          domain.CategoryID(record.Contender.CategoryID.Int32),
 		RegistrationCode:    record.Contender.RegistrationCode,
@@ -29,7 +29,7 @@ func contenderToDomain(record database.GetContenderRow) domain.Contender {
 	}
 
 	if record.ContenderID.Valid {
-		score := domain.Score{
+		result := domain.Result{
 			Timestamp:   record.Timestamp.Time,
 			ContenderID: domain.ContenderID(record.ContenderID.Int32),
 			Score:       record.Score.String,
@@ -38,7 +38,7 @@ func contenderToDomain(record database.GetContenderRow) domain.Contender {
 			RankOrder:   int(record.RankOrder.Int32),
 		}
 
-		contender.Score = &score
+		contender.Result = &result
 	}
 
 	return contender

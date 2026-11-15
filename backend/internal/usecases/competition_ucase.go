@@ -40,13 +40,13 @@ type competitionUseCaseRepository interface {
 	GetTicksByCompetition(ctx context.Context, tx domain.Transaction, competitionID domain.CompetitionID) ([]domain.Tick, error)
 	DeleteTick(ctx context.Context, tx domain.Transaction, tickID domain.TickID) error
 	StoreTick(ctx context.Context, tx domain.Transaction, tick domain.Tick) (domain.Tick, error)
-	StoreScore(ctx context.Context, tx domain.Transaction, score domain.Score) error
+	StoreResult(ctx context.Context, tx domain.Transaction, result domain.Result) error
 }
 
 type CompetitionUseCase struct {
 	Authorizer         domain.Authorizer
 	Repo               competitionUseCaseRepository
-	ScoreKeeper        domain.ScoreKeeper
+	ResultKeeper       domain.ResultKeeper
 	ScoreEngineManager scoreEngineManager
 	EventBroker        domain.EventBroker
 }
@@ -120,11 +120,11 @@ func (uc *CompetitionUseCase) GetScoreboard(ctx context.Context, competitionID d
 			WithdrawnFromFinals: contender.WithdrawnFromFinals,
 			Disqualified:        contender.Disqualified,
 			ScrubbedAt:          contender.ScrubbedAt,
-			Score:               contender.Score,
+			Result:              contender.Result,
 		}
 
-		if score, err := uc.ScoreKeeper.GetScore(contender.ID); err == nil {
-			entry.Score = &score
+		if result, err := uc.ResultKeeper.GetResult(contender.ID); err == nil {
+			entry.Result = &result
 		}
 
 		entries = append(entries, entry)
@@ -574,12 +574,12 @@ func (uc *CompetitionUseCase) TransferCompetition(ctx context.Context, competiti
 				return err
 			}
 
-			score := contender.Score
-			if score == nil {
+			result := contender.Result
+			if result == nil {
 				continue
 			}
 
-			err := uc.Repo.StoreScore(ctx, tx, *score)
+			err := uc.Repo.StoreResult(ctx, tx, *result)
 			if err != nil {
 				return err
 			}

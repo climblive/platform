@@ -5,9 +5,9 @@
   import { ApiClient } from "../Api";
   import {
     contenderPublicInfoUpdatedEventSchema,
-    contenderScoreUpdatedEventSchema,
+    contenderResultUpdatedEventSchema,
     type EventFilter,
-    type Score,
+    type Result,
     type ScoreboardEntry,
   } from "../models";
   import { NO_SCORE } from "../models/score";
@@ -73,7 +73,7 @@
         competitionId,
         eventTypes: {
           CONTENDER_PUBLIC_INFO_UPDATED: {},
-          "[]CONTENDER_SCORE_UPDATED": {},
+          "[]CONTENDER_RESULT_UPDATED": {},
         },
       },
     ];
@@ -131,7 +131,7 @@
 
   const rebuildStore = () => {
     const results = new Map<number, ScoreboardEntry[]>();
-    const withoutScore: ScoreboardEntry[] = [];
+    const withoutResult: ScoreboardEntry[] = [];
 
     for (const contender of contenders.values()) {
       let categoryEntries = results.get(contender.categoryId);
@@ -145,28 +145,28 @@
         continue;
       }
 
-      if (!contender.score) {
-        withoutScore.push(contender);
+      if (!contender.result) {
+        withoutResult.push(contender);
       } else {
         categoryEntries.push(contender);
       }
     }
 
-    if (withoutScore.length) {
+    if (withoutResult.length) {
       for (const [categoryId, categoryEntries] of results.entries()) {
         const maxRankOrder = Math.max(
-          ...categoryEntries.map(({ score }) => score?.rankOrder ?? -1),
+          ...categoryEntries.map(({ result }) => result?.rankOrder ?? -1),
           -1,
         );
 
         let rankOrder = maxRankOrder + 1;
 
-        for (const contender of withoutScore) {
+        for (const contender of withoutResult) {
           if (contender.categoryId !== categoryId) {
             continue;
           }
 
-          contender.score = {
+          contender.result = {
             contenderId: contender.contenderId,
             score: NO_SCORE,
             placement: 0,
@@ -218,9 +218,9 @@
       });
     }
 
-    if (eventName === "[]CONTENDER_SCORE_UPDATED") {
+    if (eventName === "[]CONTENDER_RESULT_UPDATED") {
       const events = z
-        .array(contenderScoreUpdatedEventSchema)
+        .array(contenderResultUpdatedEventSchema)
         .parse(JSON.parse(e.data));
 
       for (const event of events) {
@@ -230,7 +230,7 @@
             contender = createEmptyEntry(event.contenderId);
           }
 
-          const score: Score = {
+          const result: Result = {
             contenderId: event.contenderId,
             score: event.score,
             placement: event.placement,
@@ -239,7 +239,7 @@
             timestamp: event.timestamp,
           };
 
-          contender.score = score;
+          contender.result = result;
           contenders.set(event.contenderId, { ...contender });
         });
       }

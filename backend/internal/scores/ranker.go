@@ -61,8 +61,8 @@ func disqualifiedContenders(contenders iter.Seq[Contender]) iter.Seq[Contender] 
 	}
 }
 
-func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Score {
-	var scores []domain.Score
+func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Result {
+	var results []domain.Result
 
 	comparator := func(c1, c2 Contender) int {
 		return c1.Compare(c2)
@@ -97,7 +97,7 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 			}
 		}
 
-		score := domain.Score{
+		result := domain.Result{
 			Timestamp:   now,
 			ContenderID: contender.ID,
 			Score:       scoreValue,
@@ -117,8 +117,8 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 			gap = 0
 		}
 
-		score.Placement = placement
-		score.RankOrder = i
+		result.Placement = placement
+		result.RankOrder = i
 
 		switch {
 		case contender.Score == Score{}:
@@ -127,16 +127,16 @@ func (r *BasicRanker) RankContenders(contenders iter.Seq[Contender]) []domain.Sc
 			fallthrough
 		case contender.Disqualified:
 		case numberOfAssignedFinalists < r.numberOfFinalists:
-			score.Finalist = true
+			result.Finalist = true
 			numberOfAssignedFinalists++
-			lastFinalistPlacement = score.Placement
-		case score.Placement == lastFinalistPlacement:
-			score.Finalist = true
+			lastFinalistPlacement = result.Placement
+		case result.Placement == lastFinalistPlacement:
+			result.Finalist = true
 		}
 
-		scores = append(scores, score)
+		results = append(results, result)
 		previousContender = &contender
 	}
 
-	return scores
+	return results
 }

@@ -323,9 +323,9 @@ CREATE UNIQUE INDEX `index4` ON `raffle_winner` (`raffle_id` ASC, `contender_id`
 
 
 -- -----------------------------------------------------
--- Table `score`
+-- Table `result`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `score` (
+CREATE TABLE IF NOT EXISTS `result` (
   `contender_id` INT NOT NULL,
   `timestamp` TIMESTAMP NOT NULL,
   `score` VARCHAR(128) NOT NULL,
@@ -333,7 +333,7 @@ CREATE TABLE IF NOT EXISTS `score` (
   `finalist` TINYINT(1) NOT NULL,
   `rank_order` INT NOT NULL,
   PRIMARY KEY (`contender_id`),
-  CONSTRAINT `fk_score_1`
+  CONSTRAINT `fk_result_1`
     FOREIGN KEY (`contender_id`)
     REFERENCES `contender` (`id`)
     ON DELETE CASCADE
