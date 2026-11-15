@@ -8,8 +8,8 @@
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import {
-    getContendersByCompetitionQuery,
     getCompetitionQuery,
+    getContendersByCompetitionQuery,
     getSelfQuery,
   } from "@climblive/lib/queries";
   import { format } from "date-fns";
@@ -233,7 +233,7 @@
     {/if}
 
     <p class="created">
-      Created <time datetime={competition.created.toISOString()}
+      Competition created on <time datetime={competition.created.toISOString()}
         >{format(competition.created, "PPp")}</time
       >
     </p>
@@ -271,7 +271,7 @@
   }
 
   .created {
-    margin-block-start: var(--wa-space-2xl);
+    margin-block-start: var(--wa-space-l);
     font-size: var(--wa-font-size-s);
     color: var(--wa-color-text-quiet);
   }
