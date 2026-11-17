@@ -231,6 +231,7 @@ export const updateRulesInQueryCache = (
     | "qualifyingProblems"
     | "finalists"
     | "usePoints"
+    | "favorTopAttempts"
     | "pooledPoints"
     | "maxAttempts"
     | "pointDeduction"

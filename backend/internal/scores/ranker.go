@@ -12,6 +12,7 @@ import (
 type BasicRanker struct {
 	numberOfFinalists int
 	usePoints         bool
+	favorTopAttempts  bool
 	zone1Enabled      bool
 	zone2Enabled      bool
 }
@@ -24,10 +25,11 @@ func (r *BasicRanker) scoresAreEqual(c1, c2 Competitor) bool {
 	return c1.Score == c2.Score
 }
 
-func NewBasicRanker(numberOfFinalists int, usePoints, zone1Enabled, zone2Enabled bool) *BasicRanker {
+func NewBasicRanker(numberOfFinalists int, usePoints, zone1Enabled, zone2Enabled, favorTopAttempts bool) *BasicRanker {
 	return &BasicRanker{
 		numberOfFinalists: numberOfFinalists,
 		usePoints:         usePoints,
+		favorTopAttempts:  favorTopAttempts,
 		zone1Enabled:      zone1Enabled,
 		zone2Enabled:      zone2Enabled,
 	}
@@ -65,7 +67,7 @@ func (r *BasicRanker) RankCompetitors(competitors iter.Seq[Competitor]) []domain
 	var results []domain.Result
 
 	comparator := func(c1, c2 Competitor) int {
-		return c1.Compare(c2)
+		return c1.Compare(c2, r.usePoints || r.favorTopAttempts)
 	}
 
 	var previousCompetitor *Competitor

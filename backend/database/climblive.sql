@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS `contest` (
   `qualifying_problems` INT NOT NULL,
   `finalists` INT NOT NULL,
   `use_points` TINYINT(1) NOT NULL DEFAULT 1,
+  `favor_top_attempts` TINYINT(1) NOT NULL DEFAULT 0,
   `pooled_points` TINYINT(1) NOT NULL DEFAULT 0,
   `max_attempts` INT NOT NULL DEFAULT 0,
   `point_deduction` DOUBLE NOT NULL DEFAULT 0,

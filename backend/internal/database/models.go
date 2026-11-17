@@ -32,6 +32,7 @@ type Competition struct {
 	QualifyingProblems int32
 	Finalists          int32
 	UsePoints          bool
+	FavorTopAttempts   bool
 	PooledPoints       bool
 	MaxAttempts        int32
 	PointDeduction     float64

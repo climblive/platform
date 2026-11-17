@@ -42,8 +42,8 @@ func TestCompareCompetitor(t *testing.T) {
 	assertOrder := func(t *testing.T, c1, c2 scores.Competitor) {
 		t.Helper()
 
-		assert.Less(t, c1.Compare(c2), 0)
-		assert.Greater(t, c2.Compare(c1), 0)
+		assert.Less(t, c1.Compare(c2, true), 0)
+		assert.Greater(t, c2.Compare(c1, true), 0)
 	}
 
 	c1 := worst(2)
@@ -127,7 +127,7 @@ func TestCompareCompetitor(t *testing.T) {
 		c1 = best(1)
 		c2 = best(1)
 
-		assert.Equal(t, 0, c1.Compare(c2))
+		assert.Equal(t, 0, c1.Compare(c2, true))
 	})
 }
 

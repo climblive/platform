@@ -26,7 +26,7 @@ func TestBasicRankerPointsFormatting(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ranker := scores.NewBasicRanker(0, true, false, false)
+			ranker := scores.NewBasicRanker(0, true, false, false, false)
 			competitors := []scores.Competitor{{ID: 1, Score: scores.Score{Points: tt.points}}}
 
 			ranked := ranker.RankCompetitors(slices.Values(competitors))
@@ -55,7 +55,7 @@ func TestBasicRanker(t *testing.T) {
 		competitors := makeCompetitors(3)
 		shuffleSlice(competitors)
 
-		ranker := scores.NewBasicRanker(5, true, false, false)
+		ranker := scores.NewBasicRanker(5, true, false, false, false)
 
 		results := ranker.RankCompetitors(slices.Values(competitors))
 
@@ -77,7 +77,7 @@ func TestBasicRanker(t *testing.T) {
 
 			shuffleSlice(competitors)
 
-			ranker := scores.NewBasicRanker(5, true, false, false)
+			ranker := scores.NewBasicRanker(5, true, false, false, false)
 
 			results := ranker.RankCompetitors(slices.Values(competitors))
 
@@ -100,7 +100,7 @@ func TestBasicRanker(t *testing.T) {
 
 			shuffleSlice(competitors)
 
-			ranker := scores.NewBasicRanker(5, true, false, false)
+			ranker := scores.NewBasicRanker(5, true, false, false, false)
 
 			results := ranker.RankCompetitors(slices.Values(competitors))
 
@@ -122,7 +122,7 @@ func TestBasicRanker(t *testing.T) {
 			competitors[0].AttemptsTops = 2
 			competitors[1].Points = 100
 
-			ranker := scores.NewBasicRanker(5, true, false, false)
+			ranker := scores.NewBasicRanker(5, true, false, false, false)
 
 			results := ranker.RankCompetitors(slices.Values(competitors))
 
@@ -149,7 +149,7 @@ func TestBasicRanker(t *testing.T) {
 
 			shuffleSlice(competitors)
 
-			ranker := scores.NewBasicRanker(5, true, false, false)
+			ranker := scores.NewBasicRanker(5, true, false, false, false)
 
 			results := ranker.RankCompetitors(slices.Values(competitors))
 
@@ -188,7 +188,7 @@ func TestBasicRanker(t *testing.T) {
 
 			shuffleSlice(competitors)
 
-			ranker := scores.NewBasicRanker(5, true, false, false)
+			ranker := scores.NewBasicRanker(5, true, false, false, false)
 
 			results := ranker.RankCompetitors(slices.Values(competitors))
 
@@ -220,7 +220,7 @@ func TestBasicRanker(t *testing.T) {
 
 			shuffleSlice(competitors)
 
-			ranker := scores.NewBasicRanker(5, true, false, false)
+			ranker := scores.NewBasicRanker(5, true, false, false, false)
 
 			results := ranker.RankCompetitors(slices.Values(competitors))
 
@@ -245,7 +245,7 @@ func TestBasicRanker(t *testing.T) {
 		competitors[2].Tops = 1
 		competitors[2].AttemptsTops = 3
 
-		ranker := scores.NewBasicRanker(1, false, true, true)
+		ranker := scores.NewBasicRanker(1, false, true, true, true)
 
 		results := ranker.RankCompetitors(slices.Values(competitors))
 
@@ -299,7 +299,7 @@ func TestBasicRankerScoreFormat(t *testing.T) {
 		{name: "Points", usePoints: true, zone1Enabled: true, zone2Enabled: true, expected: "100p"},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
-			ranker := scores.NewBasicRanker(0, tt.usePoints, tt.zone1Enabled, tt.zone2Enabled)
+			ranker := scores.NewBasicRanker(0, tt.usePoints, tt.zone1Enabled, tt.zone2Enabled, false)
 			competitors := []scores.Competitor{{
 				ID:    1,
 				Score: scores.Score{Tops: 2, Zone2s: 3, Zone1s: 4, Points: 1000},

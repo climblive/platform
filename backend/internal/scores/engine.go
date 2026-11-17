@@ -12,6 +12,7 @@ type Rules struct {
 	QualifyingProblems int
 	Finalists          int
 	UsePoints          bool
+	FavorTopAttempts   bool
 	PooledPoints       bool
 	MaxAttempts        int
 	PointDeduction     domain.Tenths
@@ -155,6 +156,7 @@ func (e *DefaultScoreEngine) HandleRulesUpdated(event domain.RulesUpdatedEvent) 
 		QualifyingProblems: event.QualifyingProblems,
 		Finalists:          event.Finalists,
 		UsePoints:          event.UsePoints,
+		FavorTopAttempts:   event.FavorTopAttempts,
 		PooledPoints:       event.PooledPoints,
 		MaxAttempts:        event.MaxAttempts,
 		PointDeduction:     event.PointDeduction,
@@ -622,7 +624,7 @@ func (e *DefaultScoreEngine) RankCategory(categoryID domain.CategoryID) {
 			zone2Enabled = zone2Enabled || problem.Zone2Enabled
 		}
 	}
-	ranker := NewBasicRanker(rules.Finalists, rules.UsePoints, zone1Enabled, zone2Enabled)
+	ranker := NewBasicRanker(rules.Finalists, rules.UsePoints, zone1Enabled, zone2Enabled, rules.FavorTopAttempts)
 
 	results := ranker.RankCompetitors(e.store.GetCompetitorsByCategory(categoryID))
 

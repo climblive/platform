@@ -25,7 +25,7 @@ type Competitor struct {
 	Score
 }
 
-func (c Competitor) Compare(other Competitor) int {
+func (c Competitor) Compare(other Competitor, favorTopAttempts bool) int {
 	if result := cmp.Compare(other.Points, c.Points); result != 0 {
 		return result
 	}
@@ -34,27 +34,25 @@ func (c Competitor) Compare(other Competitor) int {
 		return result
 	}
 
-	if result := cmp.Compare(c.AttemptsTops, other.AttemptsTops); result != 0 {
-		return result
+	if favorTopAttempts {
+		return cmp.Or(
+			cmp.Compare(c.AttemptsTops, other.AttemptsTops),
+			cmp.Compare(other.Zone2s, c.Zone2s),
+			cmp.Compare(c.AttemptsZone2s, other.AttemptsZone2s),
+			cmp.Compare(other.Zone1s, c.Zone1s),
+			cmp.Compare(c.AttemptsZone1s, other.AttemptsZone1s),
+			cmp.Compare(c.ID, other.ID),
+		)
 	}
 
-	if result := cmp.Compare(other.Zone2s, c.Zone2s); result != 0 {
-		return result
-	}
-
-	if result := cmp.Compare(c.AttemptsZone2s, other.AttemptsZone2s); result != 0 {
-		return result
-	}
-
-	if result := cmp.Compare(other.Zone1s, c.Zone1s); result != 0 {
-		return result
-	}
-
-	if result := cmp.Compare(c.AttemptsZone1s, other.AttemptsZone1s); result != 0 {
-		return result
-	}
-
-	return cmp.Compare(c.ID, other.ID)
+	return cmp.Or(
+		cmp.Compare(other.Zone2s, c.Zone2s),
+		cmp.Compare(other.Zone1s, c.Zone1s),
+		cmp.Compare(c.AttemptsTops, other.AttemptsTops),
+		cmp.Compare(c.AttemptsZone2s, other.AttemptsZone2s),
+		cmp.Compare(c.AttemptsZone1s, other.AttemptsZone1s),
+		cmp.Compare(c.ID, other.ID),
+	)
 }
 
 type Tick struct {

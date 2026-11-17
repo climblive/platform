@@ -83,6 +83,7 @@ type Competition struct {
 	QualifyingProblems    int           `json:"qualifyingProblems"`
 	Finalists             int           `json:"finalists"`
 	UsePoints             bool          `json:"usePoints"`
+	FavorTopAttempts      bool          `json:"favorTopAttempts"`
 	PooledPoints          bool          `json:"pooledPoints"`
 	MaxAttempts           int           `json:"maxAttempts"`
 	PointDeduction        Tenths        `json:"pointDeduction"`
@@ -104,6 +105,7 @@ type CompetitionTemplate struct {
 	QualifyingProblems int           `json:"qualifyingProblems"`
 	Finalists          int           `json:"finalists"`
 	UsePoints          bool          `json:"usePoints"`
+	FavorTopAttempts   bool          `json:"favorTopAttempts"`
 	PooledPoints       bool          `json:"pooledPoints"`
 	MaxAttempts        int           `json:"maxAttempts"`
 	PointDeduction     Tenths        `json:"pointDeduction"`
@@ -121,6 +123,7 @@ type CompetitionPatch struct {
 	QualifyingProblems Patch[int]           `json:"qualifyingProblems,omitzero" tstype:"number"`
 	Finalists          Patch[int]           `json:"finalists,omitzero" tstype:"number"`
 	UsePoints          Patch[bool]          `json:"usePoints,omitzero" tstype:"boolean"`
+	FavorTopAttempts   Patch[bool]          `json:"favorTopAttempts,omitzero" tstype:"boolean"`
 	PooledPoints       Patch[bool]          `json:"pooledPoints,omitzero" tstype:"boolean"`
 	MaxAttempts        Patch[int]           `json:"maxAttempts,omitzero" tstype:"number"`
 	PointDeduction     Patch[Tenths]        `json:"pointDeduction,omitzero" tstype:"number"`
@@ -351,6 +354,7 @@ type RulesUpdatedEvent struct {
 	QualifyingProblems int           `json:"qualifyingProblems"`
 	Finalists          int           `json:"finalists"`
 	UsePoints          bool          `json:"usePoints"`
+	FavorTopAttempts   bool          `json:"favorTopAttempts"`
 	PooledPoints       bool          `json:"pooledPoints"`
 	MaxAttempts        int           `json:"maxAttempts"`
 	PointDeduction     Tenths        `json:"pointDeduction"`

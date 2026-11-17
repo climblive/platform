@@ -78,6 +78,7 @@ func competitionToDomain(record database.Competition) domain.Competition {
 		QualifyingProblems:    int(record.QualifyingProblems),
 		Finalists:             int(record.Finalists),
 		UsePoints:             record.UsePoints,
+		FavorTopAttempts:      record.FavorTopAttempts,
 		PooledPoints:          record.PooledPoints,
 		MaxAttempts:           int(record.MaxAttempts),
 		PointDeduction:        domain.TenthsFromFloat64(record.PointDeduction),

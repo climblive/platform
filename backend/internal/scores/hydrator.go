@@ -29,6 +29,7 @@ func (h *StandardEngineStoreHydrator) Hydrate(ctx context.Context, competitionID
 		QualifyingProblems: competition.QualifyingProblems,
 		Finalists:          competition.Finalists,
 		UsePoints:          competition.UsePoints,
+		FavorTopAttempts:   competition.FavorTopAttempts,
 		PooledPoints:       competition.PooledPoints,
 		MaxAttempts:        competition.MaxAttempts,
 		PointDeduction:     competition.PointDeduction,

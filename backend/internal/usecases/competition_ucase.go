@@ -155,6 +155,7 @@ func (uc *CompetitionUseCase) PatchCompetition(ctx context.Context, competitionI
 		QualifyingProblems: competition.QualifyingProblems,
 		Finalists:          competition.Finalists,
 		UsePoints:          competition.UsePoints,
+		FavorTopAttempts:   competition.FavorTopAttempts,
 		PooledPoints:       competition.PooledPoints,
 		MaxAttempts:        competition.MaxAttempts,
 		PointDeduction:     competition.PointDeduction,
@@ -192,6 +193,10 @@ func (uc *CompetitionUseCase) PatchCompetition(ctx context.Context, competitionI
 		competition.UsePoints = patch.UsePoints.Value
 	}
 
+	if patch.FavorTopAttempts.Present {
+		competition.FavorTopAttempts = patch.FavorTopAttempts.Value
+	}
+
 	if patch.PooledPoints.Present {
 		competition.PooledPoints = patch.PooledPoints.Value
 	}
@@ -225,6 +230,7 @@ func (uc *CompetitionUseCase) PatchCompetition(ctx context.Context, competitionI
 		QualifyingProblems: competition.QualifyingProblems,
 		Finalists:          competition.Finalists,
 		UsePoints:          competition.UsePoints,
+		FavorTopAttempts:   competition.FavorTopAttempts,
 		PooledPoints:       competition.PooledPoints,
 		MaxAttempts:        competition.MaxAttempts,
 		PointDeduction:     competition.PointDeduction,
@@ -336,6 +342,7 @@ func (uc *CompetitionUseCase) CreateCompetition(ctx context.Context, organizerID
 		QualifyingProblems:    tmpl.QualifyingProblems,
 		Finalists:             tmpl.Finalists,
 		UsePoints:             tmpl.UsePoints,
+		FavorTopAttempts:      tmpl.FavorTopAttempts,
 		PooledPoints:          tmpl.PooledPoints,
 		MaxAttempts:           tmpl.MaxAttempts,
 		PointDeduction:        tmpl.PointDeduction,

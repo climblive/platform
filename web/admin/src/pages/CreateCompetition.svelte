@@ -23,6 +23,7 @@
       | "qualifyingProblems"
       | "finalists"
       | "usePoints"
+      | "favorTopAttempts"
       | "pooledPoints"
       | "maxAttempts"
       | "pointDeduction"
@@ -39,6 +40,7 @@
         qualifyingProblems: 0,
         finalists: 0,
         usePoints: true,
+        favorTopAttempts: false,
         pooledPoints: false,
         maxAttempts: 0,
         pointDeduction: 0,

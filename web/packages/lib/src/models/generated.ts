@@ -97,6 +97,7 @@ export interface Competition {
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
   usePoints: boolean;
+  favorTopAttempts: boolean;
   pooledPoints: boolean;
   maxAttempts: number /* int */;
   pointDeduction: Tenths;
@@ -117,6 +118,7 @@ export interface CompetitionTemplate {
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
   usePoints: boolean;
+  favorTopAttempts: boolean;
   pooledPoints: boolean;
   maxAttempts: number /* int */;
   pointDeduction: Tenths;
@@ -133,6 +135,7 @@ export interface CompetitionPatch {
   qualifyingProblems?: number;
   finalists?: number;
   usePoints?: boolean;
+  favorTopAttempts?: boolean;
   pooledPoints?: boolean;
   maxAttempts?: number;
   pointDeduction?: number;
@@ -319,6 +322,7 @@ export interface RulesUpdatedEvent {
   qualifyingProblems: number /* int */;
   finalists: number /* int */;
   usePoints: boolean;
+  favorTopAttempts: boolean;
   pooledPoints: boolean;
   maxAttempts: number /* int */;
   pointDeduction: Tenths;

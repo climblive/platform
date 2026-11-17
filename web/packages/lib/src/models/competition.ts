@@ -13,6 +13,7 @@ export const competitionSchema: z.ZodType<Competition> = z.object({
   description: z.string().optional(),
   qualifyingProblems: z.number(),
   usePoints: z.boolean(),
+  favorTopAttempts: z.boolean(),
   pooledPoints: z.boolean(),
   maxAttempts: z.number().int().min(0).max(999),
   pointDeduction: z

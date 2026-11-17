@@ -675,6 +675,7 @@ func TestDuplicateCompetition(t *testing.T) {
 		QualifyingProblems: 10,
 		Finalists:          7,
 		UsePoints:          true,
+		FavorTopAttempts:   true,
 		PooledPoints:       true,
 		MaxAttempts:        5,
 		PointDeduction:     2,
@@ -798,6 +799,7 @@ func TestDuplicateCompetition(t *testing.T) {
 		assert.Equal(t, 10, duplicatedCompetition.QualifyingProblems)
 		assert.Equal(t, 7, duplicatedCompetition.Finalists)
 		assert.True(t, duplicatedCompetition.UsePoints)
+		assert.True(t, duplicatedCompetition.FavorTopAttempts)
 		assert.True(t, duplicatedCompetition.PooledPoints)
 		assert.Equal(t, 5, duplicatedCompetition.MaxAttempts)
 		assert.Equal(t, domain.Tenths(2), duplicatedCompetition.PointDeduction)
