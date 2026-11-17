@@ -71,7 +71,7 @@ func TestHydrate(t *testing.T) {
 	mockedRepo.
 		On("GetTicksByCompetition", mock.Anything, nil, fakedCompetitionID).
 		Return([]domain.Tick{
-			{
+			testutils.MustTick(domain.Tick{
 				ID: fakedTickID,
 				Ownership: domain.OwnershipData{
 					CompetitorID: &fakedCompetitorID,
@@ -84,7 +84,7 @@ func TestHydrate(t *testing.T) {
 				AttemptsZone1: 1,
 				Zone2:         true,
 				AttemptsZone2: 2,
-			},
+			}),
 		}, nil)
 
 	mockedStore.On("SaveRules", scores.Rules{
@@ -115,7 +115,7 @@ func TestHydrate(t *testing.T) {
 		WithdrawnFromFinals: true,
 	}).Return()
 
-	mockedStore.On("SaveTick", fakedCompetitorID, scores.Tick{
+	mockedStore.On("SaveTick", fakedCompetitorID, testutils.MustTick(scores.Tick{
 		ID:            fakedTickID,
 		Revision:      1,
 		CompetitorID:  fakedCompetitorID,
@@ -126,7 +126,7 @@ func TestHydrate(t *testing.T) {
 		AttemptsZone1: 1,
 		Zone2:         true,
 		AttemptsZone2: 2,
-	}).Return()
+	})).Return()
 
 	hydrator := &scores.StandardEngineStoreHydrator{Repo: mockedRepo}
 	err := hydrator.Hydrate(context.Background(), fakedCompetitionID, mockedStore)

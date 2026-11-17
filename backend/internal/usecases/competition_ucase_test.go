@@ -968,7 +968,8 @@ func TestTransferCompetition(t *testing.T) {
 		Timestamp:      now.Add(time.Duration(rand.Int())),
 	}
 
-	fakedTick := domain.Tick{
+	fakedTick := testutils.MustTick(domain.Tick{
+		Revision:      1,
 		ID:            fakedTickID,
 		Ownership:     domain.OwnershipData{OrganizerID: fakedOldOrganizerID, CompetitorID: &fakedCompetitorID},
 		Timestamp:     now.Add(time.Duration(rand.Int())),
@@ -980,7 +981,7 @@ func TestTransferCompetition(t *testing.T) {
 		AttemptsZone2: 3,
 		Top:           true,
 		AttemptsTop:   5,
-	}
+	})
 
 	makeMocks := func() (*repositoryMock, *authorizerMock, *transactionMock) {
 		mockedRepo := new(repositoryMock)
@@ -1128,21 +1129,21 @@ func TestTransferCompetition(t *testing.T) {
 			Return(domain.RaffleWinner{}, nil)
 
 		mockedRepo.
-			On("StoreTick", mock.Anything, mockedTx, domain.Tick{
+			On("StoreTick", mock.Anything, mockedTx, testutils.MustTick(domain.Tick{
 				ID:            fakedTickID,
 				Ownership:     domain.OwnershipData{OrganizerID: fakedNewOrganizerID, CompetitorID: &fakedCompetitorID},
 				Timestamp:     fakedTick.Timestamp,
 				CompetitionID: fakedCompetitionID,
 				ProblemID:     fakedProblemID,
-				Revision:      1,
+				Revision:      2,
 				Zone1:         true,
 				AttemptsZone1: 2,
 				Zone2:         true,
 				AttemptsZone2: 3,
 				Top:           true,
 				AttemptsTop:   5,
-			}).
-			Return(domain.Tick{}, nil)
+			})).
+			Return(testutils.MustTick(domain.Tick{Revision: 2}), nil)
 
 		mockedTx.On("Commit").Return(nil)
 

@@ -606,7 +606,7 @@ func TestDeleteProblem(t *testing.T) {
 
 		mockedRepo.
 			On("GetTicksByProblem", mock.Anything, nil, fakedProblemID).
-			Return([]domain.Tick{{}}, nil)
+			Return([]domain.Tick{testutils.MustTick(domain.Tick{Revision: 1})}, nil)
 
 		ucase := usecases.ProblemUseCase{
 			Repo:       mockedRepo,

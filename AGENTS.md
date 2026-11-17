@@ -37,6 +37,7 @@
 - Table-driven tests preferred for multiple test cases.
 - Use `stretchr/testify` for assertions.
 - Mock interfaces using `stretchr/testify/mock`.
+- Always validate `domain.Tick` and `scores.Tick` test fixtures with `testutils.MustTick`, including after mutations. Only bypass validation for deliberately invalid inputs and zero-value "not found" placeholders.
 - Use `testing/synctest` (via `synctest.Test`) when assertions or synchronization depend on time, not merely because the code calls `time.Now()`.
 
 ## Common Tasks

@@ -198,21 +198,26 @@ func TestMemoryStore(t *testing.T) {
 		competitorID := domain.CompetitorID(1)
 		otherCompetitorID := domain.CompetitorID(2)
 
-		t1 := scores.Tick{
+		t1 := testutils.MustTick(scores.Tick{
+			Revision:  1,
 			ProblemID: 1,
-		}
-		t2 := scores.Tick{
+		})
+		t2 := testutils.MustTick(scores.Tick{
+			Revision:  1,
 			ProblemID: 2,
-		}
-		t3 := scores.Tick{
+		})
+		t3 := testutils.MustTick(scores.Tick{
+			Revision:  1,
 			ProblemID: 3,
-		}
-		t4 := scores.Tick{
+		})
+		t4 := testutils.MustTick(scores.Tick{
+			Revision:  1,
 			ProblemID: 4,
-		}
-		t5 := scores.Tick{
+		})
+		t5 := testutils.MustTick(scores.Tick{
+			Revision:  1,
 			ProblemID: 5,
-		}
+		})
 
 		store.SaveTick(competitorID, t1)
 		store.SaveTick(competitorID, t2)
@@ -231,7 +236,8 @@ func TestMemoryStore(t *testing.T) {
 		fakedCompetitorID := testutils.RandomResourceID[domain.CompetitorID]()
 		fakedProblemID := testutils.RandomResourceID[domain.ProblemID]()
 
-		fakedTick := scores.Tick{
+		fakedTick := testutils.MustTick(scores.Tick{
+			Revision:      1,
 			CompetitorID:  fakedCompetitorID,
 			ProblemID:     fakedProblemID,
 			Zone1:         true,
@@ -240,7 +246,7 @@ func TestMemoryStore(t *testing.T) {
 			AttemptsZone2: 2,
 			Top:           true,
 			AttemptsTop:   3,
-		}
+		})
 
 		store.SaveTick(fakedCompetitorID, fakedTick)
 
@@ -270,7 +276,8 @@ func TestMemoryStore(t *testing.T) {
 		fakedCompetitor3ID := testutils.RandomResourceID[domain.CompetitorID]()
 		fakedCompetitor4ID := testutils.RandomResourceID[domain.CompetitorID]()
 
-		t1 := scores.Tick{
+		t1 := testutils.MustTick(scores.Tick{
+			Revision:      1,
 			CompetitorID:  fakedCompetitor1ID,
 			ProblemID:     fakedProblemID,
 			Zone1:         true,
@@ -279,8 +286,9 @@ func TestMemoryStore(t *testing.T) {
 			AttemptsZone2: 2,
 			Top:           true,
 			AttemptsTop:   3,
-		}
-		t2 := scores.Tick{
+		})
+		t2 := testutils.MustTick(scores.Tick{
+			Revision:      1,
 			CompetitorID:  fakedCompetitor2ID,
 			ProblemID:     fakedProblemID,
 			Zone1:         false,
@@ -289,7 +297,7 @@ func TestMemoryStore(t *testing.T) {
 			AttemptsZone2: 5,
 			Top:           false,
 			AttemptsTop:   6,
-		}
+		})
 
 		store.SaveCompetitor(scores.Competitor{
 			ID:         fakedCompetitor1ID,
@@ -310,7 +318,8 @@ func TestMemoryStore(t *testing.T) {
 
 		store.SaveTick(fakedCompetitor1ID, t1)
 		store.SaveTick(fakedCompetitor2ID, t2)
-		store.SaveTick(fakedCompetitor2ID, scores.Tick{
+		store.SaveTick(fakedCompetitor2ID, testutils.MustTick(scores.Tick{
+			Revision:      1,
 			CompetitorID:  fakedCompetitor2ID,
 			ProblemID:     testutils.RandomResourceID[domain.ProblemID](),
 			Zone1:         false,
@@ -319,7 +328,7 @@ func TestMemoryStore(t *testing.T) {
 			AttemptsZone2: 8,
 			Top:           false,
 			AttemptsTop:   9,
-		})
+		}))
 
 		assert.ElementsMatch(t, []scores.Tick{t1, t2}, slices.Collect(store.GetTicksByProblem(fakedCategoryID, fakedProblemID)))
 	})
@@ -327,7 +336,8 @@ func TestMemoryStore(t *testing.T) {
 	t.Run("SaveTick", func(t *testing.T) {
 		store := scores.NewMemoryStore()
 
-		t1 := scores.Tick{
+		t1 := testutils.MustTick(scores.Tick{
+			Revision:      1,
 			ProblemID:     1,
 			Top:           true,
 			AttemptsTop:   7,
@@ -335,27 +345,29 @@ func TestMemoryStore(t *testing.T) {
 			AttemptsZone1: 2,
 			Zone2:         true,
 			AttemptsZone2: 3,
-		}
+		})
 
 		store.SaveTick(1, t1)
 
 		assert.ElementsMatch(t, []scores.Tick{t1}, slices.Collect(store.GetTicksByCompetitor(1)))
 
-		t2 := scores.Tick{
+		t2 := testutils.MustTick(scores.Tick{
+			Revision:      1,
 			ProblemID:     2,
 			Top:           false,
 			AttemptsTop:   5,
 			Zone1:         false,
-			AttemptsZone1: 4,
+			AttemptsZone1: 3,
 			Zone2:         false,
-			AttemptsZone2: 3,
-		}
+			AttemptsZone2: 4,
+		})
 
 		store.SaveTick(1, t2)
 
 		assert.ElementsMatch(t, []scores.Tick{t1, t2}, slices.Collect(store.GetTicksByCompetitor(1)))
 
-		t2.AttemptsZone2 = 123
+		t2.AttemptsTop = 123
+		t2 = testutils.MustTick(t2)
 		store.SaveTick(1, t2)
 
 		assert.ElementsMatch(t, []scores.Tick{t1, t2}, slices.Collect(store.GetTicksByCompetitor(1)))
@@ -366,18 +378,21 @@ func TestMemoryStore(t *testing.T) {
 
 		competitorID := domain.CompetitorID(1)
 
-		t1 := scores.Tick{
+		t1 := testutils.MustTick(scores.Tick{
+			Revision:  1,
 			ID:        10,
 			ProblemID: 1,
-		}
-		t2 := scores.Tick{
+		})
+		t2 := testutils.MustTick(scores.Tick{
+			Revision:  1,
 			ID:        20,
 			ProblemID: 2,
-		}
-		t3 := scores.Tick{
+		})
+		t3 := testutils.MustTick(scores.Tick{
+			Revision:  1,
 			ID:        30,
 			ProblemID: 3,
-		}
+		})
 
 		store.SaveTick(competitorID, t1)
 		store.SaveTick(competitorID, t2)

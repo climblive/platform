@@ -42,9 +42,10 @@ func TestGetTicksByCompetitor(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 
 		fakedTicks := []domain.Tick{
-			{
-				ID: testutils.RandomResourceID[domain.TickID](),
-			},
+			testutils.MustTick(domain.Tick{
+				Revision: 1,
+				ID:       testutils.RandomResourceID[domain.TickID](),
+			}),
 		}
 
 		mockedRepo.
@@ -117,9 +118,10 @@ func TestGetTicksByCompetition(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 
 		fakedTicks := []domain.Tick{
-			{
-				ID: testutils.RandomResourceID[domain.TickID](),
-			},
+			testutils.MustTick(domain.Tick{
+				Revision: 1,
+				ID:       testutils.RandomResourceID[domain.TickID](),
+			}),
 		}
 
 		mockedRepo.
@@ -238,7 +240,7 @@ func TestPutTick(t *testing.T) {
 			On("StoreTick", mock.Anything, nil, mock.MatchedBy(func(tick domain.Tick) bool {
 				tick.Timestamp = time.Time{}
 
-				expected := domain.Tick{
+				expected := testutils.MustTick(domain.Tick{
 					Ownership:     fakedOwnership,
 					CompetitionID: fakedCompetitionID,
 					Revision:      1,
@@ -249,11 +251,11 @@ func TestPutTick(t *testing.T) {
 					AttemptsZone1: 2,
 					Zone2:         true,
 					AttemptsZone2: 3,
-				}
+				})
 
 				return tick.Timestamp.Sub(now) < time.Second && tick == expected
 			})).
-			Return(domain.Tick{
+			Return(testutils.MustTick(domain.Tick{
 				ID:            fakedTickID,
 				Ownership:     fakedOwnership,
 				Timestamp:     now,
@@ -266,7 +268,7 @@ func TestPutTick(t *testing.T) {
 				AttemptsZone1: 2,
 				Zone2:         true,
 				AttemptsZone2: 3,
-			}, nil)
+			}), nil)
 
 		mockedEventBroker.On("Dispatch", fakedCompetitionID, domain.AscentRegisteredEvent{
 			TickID:        fakedTickID,
@@ -288,7 +290,7 @@ func TestPutTick(t *testing.T) {
 			EventBroker: mockedEventBroker,
 		}
 
-		tick, err := ucase.PutTick(context.Background(), fakedCompetitorID, domain.Tick{
+		tick, err := ucase.PutTick(context.Background(), fakedCompetitorID, testutils.MustTick(domain.Tick{
 			Revision:      1,
 			ProblemID:     fakedProblemID,
 			Top:           true,
@@ -297,7 +299,7 @@ func TestPutTick(t *testing.T) {
 			AttemptsZone1: 2,
 			Zone2:         true,
 			AttemptsZone2: 3,
-		})
+		}))
 
 		require.NoError(t, err)
 
@@ -330,7 +332,8 @@ func TestPutTick(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		tick, err := ucase.PutTick(context.Background(), fakedCompetitorID, domain.Tick{
+		tick, err := ucase.PutTick(context.Background(), fakedCompetitorID, testutils.MustTick(domain.Tick{
+			Revision:      1,
 			ProblemID:     fakedProblemID,
 			Top:           true,
 			AttemptsTop:   5,
@@ -338,7 +341,7 @@ func TestPutTick(t *testing.T) {
 			AttemptsZone1: 2,
 			Zone2:         true,
 			AttemptsZone2: 3,
-		})
+		}))
 
 		assert.ErrorIs(t, err, domain.ErrCompetitionNotStarted)
 		assert.Empty(t, tick)
@@ -361,7 +364,8 @@ func TestPutTick(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		tick, err := ucase.PutTick(context.Background(), fakedCompetitorID, domain.Tick{
+		tick, err := ucase.PutTick(context.Background(), fakedCompetitorID, testutils.MustTick(domain.Tick{
+			Revision:      1,
 			ProblemID:     fakedProblemID,
 			Top:           true,
 			AttemptsTop:   5,
@@ -369,7 +373,7 @@ func TestPutTick(t *testing.T) {
 			AttemptsZone1: 2,
 			Zone2:         true,
 			AttemptsZone2: 3,
-		})
+		}))
 
 		assert.ErrorIs(t, err, domain.ErrCompetitionEnded)
 		assert.Empty(t, tick)
@@ -401,7 +405,8 @@ func TestPutTick(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		tick, err := ucase.PutTick(context.Background(), fakedCompetitorID, domain.Tick{
+		tick, err := ucase.PutTick(context.Background(), fakedCompetitorID, testutils.MustTick(domain.Tick{
+			Revision:      1,
 			ProblemID:     fakedOtherProblemID,
 			Top:           true,
 			AttemptsTop:   5,
@@ -409,7 +414,7 @@ func TestPutTick(t *testing.T) {
 			AttemptsZone1: 2,
 			Zone2:         true,
 			AttemptsZone2: 3,
-		})
+		}))
 
 		assert.ErrorIs(t, err, domain.ErrProblemNotInCompetition)
 		assert.Empty(t, tick)
@@ -444,7 +449,7 @@ func TestPutTick(t *testing.T) {
 			On("StoreTick", mock.Anything, nil, mock.MatchedBy(func(tick domain.Tick) bool {
 				tick.Timestamp = time.Time{}
 
-				expected := domain.Tick{
+				expected := testutils.MustTick(domain.Tick{
 					Ownership:     fakedOwnership,
 					CompetitionID: fakedCompetitionID,
 					Revision:      1,
@@ -455,11 +460,11 @@ func TestPutTick(t *testing.T) {
 					AttemptsZone1: 2,
 					Zone2:         true,
 					AttemptsZone2: 3,
-				}
+				})
 
 				return tick.Timestamp.Sub(now) < time.Second && tick == expected
 			})).
-			Return(domain.Tick{
+			Return(testutils.MustTick(domain.Tick{
 				ID:            fakedTickID,
 				Ownership:     fakedOwnership,
 				Timestamp:     now,
@@ -472,7 +477,7 @@ func TestPutTick(t *testing.T) {
 				AttemptsZone1: 2,
 				Zone2:         true,
 				AttemptsZone2: 3,
-			}, nil)
+			}), nil)
 
 		mockedEventBroker.On("Dispatch", fakedCompetitionID, domain.AscentRegisteredEvent{
 			TickID:        fakedTickID,
@@ -494,7 +499,7 @@ func TestPutTick(t *testing.T) {
 			EventBroker: mockedEventBroker,
 		}
 
-		tick, err := ucase.PutTick(context.Background(), fakedCompetitorID, domain.Tick{
+		tick, err := ucase.PutTick(context.Background(), fakedCompetitorID, testutils.MustTick(domain.Tick{
 			Revision:      1,
 			ProblemID:     fakedProblemID,
 			Top:           true,
@@ -503,7 +508,7 @@ func TestPutTick(t *testing.T) {
 			AttemptsZone1: 2,
 			Zone2:         true,
 			AttemptsZone2: 3,
-		})
+		}))
 
 		require.NoError(t, err)
 		assert.NotEmpty(t, tick)
@@ -535,7 +540,7 @@ func TestPutTick(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		tick, err := ucase.PutTick(context.Background(), fakedCompetitorID, domain.Tick{})
+		tick, err := ucase.PutTick(context.Background(), fakedCompetitorID, testutils.MustTick(domain.Tick{Revision: 1}))
 
 		assert.ErrorIs(t, err, domain.ErrNoOwnership)
 		assert.Empty(t, tick)
@@ -601,17 +606,17 @@ func TestPutTick(t *testing.T) {
 
 		mockedRepo.
 			On("GetTickByCompetitorAndProblem", mock.Anything, nil, fakedCompetitorID, fakedProblemID).
-			Return(domain.Tick{Revision: 2}, nil)
+			Return(testutils.MustTick(domain.Tick{Revision: 2}), nil)
 
 		ucase := usecases.TickUseCase{
 			Repo:       mockedRepo,
 			Authorizer: mockedAuthorizer,
 		}
 
-		tick, err := ucase.PutTick(context.Background(), fakedCompetitorID, domain.Tick{
+		tick, err := ucase.PutTick(context.Background(), fakedCompetitorID, testutils.MustTick(domain.Tick{
 			Revision:  2,
 			ProblemID: fakedProblemID,
-		})
+		}))
 
 		assert.ErrorIs(t, err, domain.ErrSuperseded)
 		assert.Empty(t, tick)
@@ -638,17 +643,17 @@ func TestPutTick(t *testing.T) {
 
 		mockedRepo.
 			On("GetTickByCompetitorAndProblem", mock.Anything, nil, fakedCompetitorID, fakedProblemID).
-			Return(domain.Tick{Revision: 1}, nil)
+			Return(testutils.MustTick(domain.Tick{Revision: 1}), nil)
 
 		ucase := usecases.TickUseCase{
 			Repo:       mockedRepo,
 			Authorizer: mockedAuthorizer,
 		}
 
-		tick, err := ucase.PutTick(context.Background(), fakedCompetitorID, domain.Tick{
+		tick, err := ucase.PutTick(context.Background(), fakedCompetitorID, testutils.MustTick(domain.Tick{
 			Revision:  1002,
 			ProblemID: fakedProblemID,
-		})
+		}))
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
 		assert.Empty(t, tick)
@@ -666,14 +671,14 @@ func TestPutTick(t *testing.T) {
 
 			fakedTickID := testutils.RandomResourceID[domain.TickID]()
 
-			existingTick := domain.Tick{
+			existingTick := testutils.MustTick(domain.Tick{
 				ID:            fakedTickID,
 				Ownership:     fakedOwnership,
 				Timestamp:     now.Add(-time.Minute),
 				CompetitionID: fakedCompetitionID,
 				ProblemID:     fakedProblemID,
 				Revision:      1,
-			}
+			})
 
 			mockedRepo.
 				On("GetTickByCompetitorAndProblem", mock.Anything, nil, fakedCompetitorID, fakedProblemID).
@@ -691,7 +696,7 @@ func TestPutTick(t *testing.T) {
 				}, nil)
 
 			mockedRepo.
-				On("StoreTick", mock.Anything, nil, domain.Tick{
+				On("StoreTick", mock.Anything, nil, testutils.MustTick(domain.Tick{
 					ID:            fakedTickID,
 					Ownership:     fakedOwnership,
 					Timestamp:     now,
@@ -704,8 +709,8 @@ func TestPutTick(t *testing.T) {
 					AttemptsZone1: 1,
 					Zone2:         true,
 					AttemptsZone2: 2,
-				}).
-				Return(domain.Tick{
+				})).
+				Return(testutils.MustTick(domain.Tick{
 					ID:            fakedTickID,
 					Ownership:     fakedOwnership,
 					Timestamp:     now,
@@ -718,7 +723,7 @@ func TestPutTick(t *testing.T) {
 					AttemptsZone1: 1,
 					Zone2:         true,
 					AttemptsZone2: 2,
-				}, nil)
+				}), nil)
 
 			mockedEventBroker.
 				On("Dispatch", fakedCompetitionID, domain.AscentRegisteredEvent{
@@ -742,7 +747,7 @@ func TestPutTick(t *testing.T) {
 				EventBroker: mockedEventBroker,
 			}
 
-			updatedTick, err := ucase.PutTick(context.Background(), fakedCompetitorID, domain.Tick{
+			updatedTick, err := ucase.PutTick(context.Background(), fakedCompetitorID, testutils.MustTick(domain.Tick{
 				Revision:      2,
 				ProblemID:     fakedProblemID,
 				Top:           true,
@@ -751,7 +756,7 @@ func TestPutTick(t *testing.T) {
 				AttemptsZone1: 1,
 				Zone2:         true,
 				AttemptsZone2: 2,
-			})
+			}))
 
 			require.NoError(t, err)
 			assert.Equal(t, fakedTickID, updatedTick.ID)
@@ -796,12 +801,13 @@ func TestDeleteTick(t *testing.T) {
 			CategoryID:    fakedCategoryID,
 		}
 
-		fakedTick := domain.Tick{
+		fakedTick := testutils.MustTick(domain.Tick{
+			Revision:      1,
 			ID:            fakedTickID,
 			Ownership:     fakedOwnership,
 			ProblemID:     fakedProblemID,
 			CompetitionID: fakedCompetitionID,
-		}
+		})
 
 		mockedRepo.
 			On("GetTick", mock.Anything, mock.Anything, fakedTickID).
@@ -926,10 +932,11 @@ func TestDeleteTick(t *testing.T) {
 
 		mockedRepo.
 			On("GetTick", mock.Anything, mock.Anything, fakedTickID).
-			Return(domain.Tick{
+			Return(testutils.MustTick(domain.Tick{
+				Revision:  1,
 				ID:        fakedTickID,
 				Ownership: fakedOwnership,
-			}, nil)
+			}), nil)
 
 		ucase := usecases.TickUseCase{
 			Repo:       mockedRepo,
