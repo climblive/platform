@@ -280,7 +280,7 @@
         >Withdraw from finals</wa-switch
       >
 
-      <div class="wa-cluster">
+      <div class="actions">
         {#if competitor.disqualified}
           <wa-button
             onclick={handleRequalify}
@@ -384,6 +384,12 @@
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-l);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-s);
   }
 
   .registration-code {
