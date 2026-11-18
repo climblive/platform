@@ -7,7 +7,6 @@ export * from "./debounce";
 export * from "./errors";
 export * from "./guards";
 export * from "./maskName";
-export * from "./numberTicker";
 export * from "./points";
 export * from "./text";
 export * from "./time.svelte";

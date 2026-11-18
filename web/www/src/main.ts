@@ -6,7 +6,6 @@ import "@awesome.me/webawesome/dist/components/carousel-item/carousel-item.js";
 import "@awesome.me/webawesome/dist/components/number-ticker/number-ticker.js";
 import {
   prefersDarkColorScheme,
-  supportsNumberTicker,
   updateTheme,
   watchColorSchemeChanges,
 } from "@climblive/lib/utils";
@@ -39,17 +38,12 @@ const loadGlobalStats = async () => {
   }
 
   const stats: GlobalStats = await response.json();
-  const formatter = new Intl.NumberFormat(document.documentElement.lang);
   const showValue = (element: HTMLElement, value: number) => {
-    if (supportsNumberTicker()) {
-      const ticker = document.createElement("wa-number-ticker");
-      ticker.value = value;
-      ticker.duration = 1_000;
-      ticker.maximumFractionDigits = 0;
-      element.replaceChildren(ticker);
-    } else {
-      element.textContent = formatter.format(value);
-    }
+    const ticker = document.createElement("wa-number-ticker");
+    ticker.value = value;
+    ticker.duration = 1_000;
+    ticker.maximumFractionDigits = 0;
+    element.replaceChildren(ticker);
   };
 
   showValue(ticks, stats.ticks);
