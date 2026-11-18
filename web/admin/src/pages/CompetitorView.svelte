@@ -312,7 +312,7 @@
               }
             }}
           >
-            <wa-icon slot="start" name="user-slash"></wa-icon>
+            <wa-icon slot="start" name="user-secret"></wa-icon>
             Remove name
           </wa-button>
         {/if}
@@ -342,7 +342,7 @@
         loading={scrubCompetitor.isPending}
         onclick={handleScrub}
       >
-        <wa-icon slot="start" name="user-slash"></wa-icon>
+        <wa-icon slot="start" name="user-secret"></wa-icon>
         Remove name anyway
       </wa-button>
     </wa-dialog>
