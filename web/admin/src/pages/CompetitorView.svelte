@@ -388,7 +388,7 @@
 
   .actions {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: var(--wa-space-s);
   }
 
