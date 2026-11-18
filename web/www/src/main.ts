@@ -3,8 +3,10 @@ import "@awesome.me/webawesome/dist/components/button/button.js";
 import "@awesome.me/webawesome/dist/components/card/card.js";
 import "@awesome.me/webawesome/dist/components/carousel/carousel.js";
 import "@awesome.me/webawesome/dist/components/carousel-item/carousel-item.js";
+import "@awesome.me/webawesome/dist/components/number-ticker/number-ticker.js";
 import {
   prefersDarkColorScheme,
+  supportsNumberTicker,
   updateTheme,
   watchColorSchemeChanges,
 } from "@climblive/lib/utils";
@@ -25,9 +27,9 @@ updateTheme(prefersDarkColorScheme());
 const loadGlobalStats = async () => {
   const section = document.getElementById("global-stats");
   const ticks = document.getElementById("stats-ticks");
-  const competitors = document.getElementById("stats-competitors");
+  const registrations = document.getElementById("stats-registrations");
   const competitions = document.getElementById("stats-competitions");
-  if (!section || !ticks || !competitors || !competitions) {
+  if (!section || !ticks || !registrations || !competitions) {
     return;
   }
 
@@ -38,9 +40,21 @@ const loadGlobalStats = async () => {
 
   const stats: GlobalStats = await response.json();
   const formatter = new Intl.NumberFormat(document.documentElement.lang);
-  ticks.textContent = formatter.format(stats.ticks);
-  competitors.textContent = formatter.format(stats.competitors);
-  competitions.textContent = formatter.format(stats.competitions);
+  const showValue = (element: HTMLElement, value: number) => {
+    if (supportsNumberTicker()) {
+      const ticker = document.createElement("wa-number-ticker");
+      ticker.value = value;
+      ticker.duration = 1_000;
+      ticker.maximumFractionDigits = 0;
+      element.replaceChildren(ticker);
+    } else {
+      element.textContent = formatter.format(value);
+    }
+  };
+
+  showValue(ticks, stats.ticks);
+  showValue(registrations, stats.competitors);
+  showValue(competitions, stats.competitions);
   section.hidden = false;
 };
 

@@ -37,7 +37,7 @@
     {#if result === undefined || result.score === NO_SCORE}
       -
     {:else}
-      <Score value={result.score} />
+      <Score value={result.score} animate />
       <wa-icon name={result?.finalist ? "medal" : "minus"}></wa-icon>
     {/if}
   </div>

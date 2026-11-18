@@ -69,6 +69,10 @@ section:nth-child(odd of section:not([hidden])) {
 
   .statement {
     margin: 0;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
   }
 
   .metric {
