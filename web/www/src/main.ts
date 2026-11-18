@@ -25,9 +25,15 @@ updateTheme(prefersDarkColorScheme());
 
 const loadGlobalStats = async () => {
   const section = document.getElementById("global-stats");
-  const ticks = document.getElementById("stats-ticks");
-  const registrations = document.getElementById("stats-registrations");
-  const competitions = document.getElementById("stats-competitions");
+  const ticks = document
+    .getElementById("stats-ticks")
+    ?.querySelector("wa-number-ticker");
+  const registrations = document
+    .getElementById("stats-registrations")
+    ?.querySelector("wa-number-ticker");
+  const competitions = document
+    .getElementById("stats-competitions")
+    ?.querySelector("wa-number-ticker");
   if (!section || !ticks || !registrations || !competitions) {
     return;
   }
@@ -38,17 +44,9 @@ const loadGlobalStats = async () => {
   }
 
   const stats: GlobalStats = await response.json();
-  const showValue = (element: HTMLElement, value: number) => {
-    const ticker = document.createElement("wa-number-ticker");
-    ticker.value = value;
-    ticker.duration = 1_000;
-    ticker.maximumFractionDigits = 0;
-    element.replaceChildren(ticker);
-  };
-
-  showValue(ticks, stats.ticks);
-  showValue(registrations, stats.competitors);
-  showValue(competitions, stats.competitions);
+  ticks.value = stats.ticks;
+  registrations.value = stats.competitors;
+  competitions.value = stats.competitions;
   section.hidden = false;
 };
 
