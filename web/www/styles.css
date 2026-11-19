@@ -69,12 +69,16 @@ section:nth-child(odd of section:not([hidden])) {
 
   .statement {
     margin: 0;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
   }
 
   .metric {
     font-size: var(--wa-font-size-l);
 
-    strong {
+    .stat-value {
       color: var(--wa-color-brand-fill-loud);
       font-size: var(--wa-font-size-4xl);
       font-weight: var(--wa-font-weight-bold);

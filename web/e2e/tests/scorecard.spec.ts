@@ -274,6 +274,7 @@ test("cancel edit profile", async ({ page }) => {
 
 test("tick and untick all problems", async ({ page }) => {
   await page.goto("/ABCD0003");
+  const summary = page.locator(".summary");
 
   for (let p = 1; p <= 5; p++) {
     const problem = page.getByRole("region", { name: `Problem ${p}` });
@@ -285,7 +286,7 @@ test("tick and untick all problems", async ({ page }) => {
     await expect(problem.getByText(`+${p * 100}p`)).toBeVisible();
   }
 
-  await expect(page.getByText("1,500p")).toBeVisible();
+  await expect(summary.getByText("1,500p", { exact: true })).toBeVisible();
   await expect(page.getByText("1st").first()).toBeVisible();
 
   for (let p = 1; p <= 5; p++) {
@@ -298,7 +299,7 @@ test("tick and untick all problems", async ({ page }) => {
     await expect(problem.getByText(`+${p * 100}p`)).not.toBeVisible();
   }
 
-  await expect(page.getByText("0p", { exact: true })).toBeVisible();
+  await expect(summary.getByText("0p", { exact: true })).toBeVisible();
   await expect(page.getByText("1st").first()).toBeVisible();
 });
 

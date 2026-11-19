@@ -3,6 +3,8 @@ import "@awesome.me/webawesome/dist/components/button/button.js";
 import "@awesome.me/webawesome/dist/components/card/card.js";
 import "@awesome.me/webawesome/dist/components/carousel/carousel.js";
 import "@awesome.me/webawesome/dist/components/carousel-item/carousel-item.js";
+import "@awesome.me/webawesome/dist/components/number-ticker/number-ticker.js";
+import type WaNumberTicker from "@awesome.me/webawesome/dist/components/number-ticker/number-ticker.js";
 import {
   prefersDarkColorScheme,
   updateTheme,
@@ -24,10 +26,14 @@ updateTheme(prefersDarkColorScheme());
 
 const loadGlobalStats = async () => {
   const section = document.getElementById("global-stats");
-  const ticks = document.getElementById("stats-ticks");
-  const competitors = document.getElementById("stats-competitors");
-  const competitions = document.getElementById("stats-competitions");
-  if (!section || !ticks || !competitors || !competitions) {
+  const ticks = document.querySelector<WaNumberTicker>("#stats-ticks");
+  const registrations = document.querySelector<WaNumberTicker>(
+    "#stats-registrations",
+  );
+  const competitions = document.querySelector<WaNumberTicker>(
+    "#stats-competitions",
+  );
+  if (!section || !ticks || !registrations || !competitions) {
     return;
   }
 
@@ -37,10 +43,9 @@ const loadGlobalStats = async () => {
   }
 
   const stats: GlobalStats = await response.json();
-  const formatter = new Intl.NumberFormat(document.documentElement.lang);
-  ticks.textContent = formatter.format(stats.ticks);
-  competitors.textContent = formatter.format(stats.competitors);
-  competitions.textContent = formatter.format(stats.competitions);
+  ticks.value = stats.ticks;
+  registrations.value = stats.competitors;
+  competitions.value = stats.competitions;
   section.hidden = false;
 };
 
