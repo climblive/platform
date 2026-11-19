@@ -85,11 +85,11 @@
         prefix={counted ? "+" : undefined}
         compactThreshold={9_999}
       />
-    {:else if tick?.top}
+    {:else if !enablePoints && tick?.top}
       +1t
-    {:else if tick?.zone2 && problem.zone2Enabled}
+    {:else if !enablePoints && tick?.zone2 && problem.zone2Enabled}
       +1z₂
-    {:else if tick?.zone1 && problem.zone1Enabled}
+    {:else if !enablePoints && tick?.zone1 && problem.zone1Enabled}
       +1z₁
     {/if}
   </div>

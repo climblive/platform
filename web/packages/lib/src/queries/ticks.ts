@@ -53,20 +53,24 @@ export const deleteTickMutation = () => {
 };
 
 const updateTick = (oldTicks: Tick[] | undefined, updatedTick: Tick) => {
+  if (oldTicks === undefined) {
+    return undefined;
+  }
+
   const predicate = ({ id }: Tick) => id === updatedTick.id;
 
-  const existingTick = (oldTicks ?? []).find(predicate);
+  const existingTick = oldTicks.find(predicate);
 
   if (existingTick && existingTick.revision > updatedTick.revision) {
     return oldTicks;
   }
 
   if (existingTick) {
-    return (oldTicks ?? []).map((oldTick) =>
+    return oldTicks.map((oldTick) =>
       predicate(oldTick) ? updatedTick : oldTick,
     );
   } else {
-    return [...(oldTicks ?? []), updatedTick];
+    return [...oldTicks, updatedTick];
   }
 };
 
