@@ -101,16 +101,19 @@ export const updatePointValueInQueryCache = (
   const queryKey: QueryKey = ["point-values", { competitorId }];
 
   queryClient.setQueryData<PointValue[]>(queryKey, (pointValues) => {
-    const values = pointValues ?? [];
-    const index = values.findIndex(
+    if (pointValues === undefined) {
+      return undefined;
+    }
+
+    const index = pointValues.findIndex(
       ({ problemId }) => problemId === updatedPointValue.problemId,
     );
 
     if (index === -1) {
-      return [...values, updatedPointValue];
+      return [...pointValues, updatedPointValue];
     }
 
-    return values.map((pointValue, currentIndex) => {
+    return pointValues.map((pointValue, currentIndex) => {
       if (currentIndex === index) {
         return updatedPointValue;
       }
