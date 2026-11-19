@@ -5,6 +5,8 @@
   import "@awesome.me/webawesome/dist/components/breadcrumb/breadcrumb.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/copy-button/copy-button.js";
+  import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+  import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/option/option.js";
@@ -25,8 +27,12 @@
     getCompetitorQuery,
     getCompetitionQuery,
     patchCompetitorMutation,
+    scrubCompetitorMutation,
   } from "@climblive/lib/queries";
-  import { ordinalSuperscript } from "@climblive/lib/utils";
+  import {
+    ordinalSuperscript,
+    toastUnexpectedError,
+  } from "@climblive/lib/utils";
   import { format } from "date-fns";
   import { navigate } from "svelte-routing";
 
@@ -38,6 +44,7 @@
 
   const competitorQuery = $derived(getCompetitorQuery(competitorId));
   const patchCompetitor = $derived(patchCompetitorMutation(competitorId));
+  const scrubCompetitor = $derived(scrubCompetitorMutation(competitorId));
   const competitor = $derived(competitorQuery.data);
   const competitionId = $derived(competitor?.competitionId ?? 0);
 
@@ -54,6 +61,7 @@
 
   let withdrawFromFinalsToggle: WaSwitch | undefined = $state();
   let categorySelect: WaSelect | undefined = $state();
+  let scrubDialog: WaDialog | undefined = $state();
 
   const handleToggleWithdrawFromFinals = () => {
     if (!withdrawFromFinalsToggle) {
@@ -74,6 +82,21 @@
   const handleRequalify = () => {
     patchCompetitor.mutate({
       disqualified: false,
+    });
+  };
+
+  const handleScrub = () => {
+    if (!competitor?.name || scrubCompetitor.isPending) {
+      return;
+    }
+
+    scrubCompetitor.mutate(undefined, {
+      onSuccess: () => {
+        if (scrubDialog) {
+          scrubDialog.open = false;
+        }
+      },
+      onError: () => toastUnexpectedError("Failed to remove competitor name."),
     });
   };
 
@@ -257,25 +280,72 @@
         >Withdraw from finals</wa-switch
       >
 
-      {#if competitor.disqualified}
-        <wa-button
-          onclick={handleRequalify}
-          loading={patchCompetitor.isPending}
-          appearance="outlined"
-          >Requalify competitor<wa-icon slot="start" name="right-to-bracket"
-          ></wa-icon></wa-button
-        >
-      {:else}
-        <wa-button
-          size="s"
-          variant="danger"
-          onclick={handleDisqualify}
-          loading={patchCompetitor.isPending}
-          >Disqualify competitor<wa-icon slot="start" name="user-slash"
-          ></wa-icon></wa-button
-        >
-      {/if}
+      <div class="actions">
+        {#if competitor.disqualified}
+          <wa-button
+            onclick={handleRequalify}
+            loading={patchCompetitor.isPending}
+            appearance="outlined"
+            >Requalify competitor<wa-icon slot="start" name="right-to-bracket"
+            ></wa-icon></wa-button
+          >
+        {:else}
+          <wa-button
+            size="s"
+            variant="danger"
+            onclick={handleDisqualify}
+            loading={patchCompetitor.isPending}
+            >Disqualify competitor<wa-icon slot="start" name="user-slash"
+            ></wa-icon></wa-button
+          >
+        {/if}
+        {#if competitor.name}
+          <wa-button
+            size="s"
+            variant="danger"
+            appearance="outlined"
+            disabled={patchCompetitor.isPending}
+            loading={scrubCompetitor.isPending}
+            onclick={() => {
+              if (scrubDialog) {
+                scrubDialog.open = true;
+              }
+            }}
+          >
+            <wa-icon slot="start" name="user-secret"></wa-icon>
+            Remove name
+          </wa-button>
+        {/if}
+      </div>
     </div>
+
+    <wa-dialog bind:this={scrubDialog} label="Remove competitor name">
+      The competitor's name will be <strong>permanently</strong> removed and
+      their results will be anonymized. This action cannot be undone.
+      <br /><br />
+      Be aware that without a name, the competitor will lose their chance at finals
+      and cannot take part in any prize raffles.
+      <wa-button
+        size="s"
+        slot="footer"
+        appearance="plain"
+        onclick={() => {
+          if (scrubDialog) {
+            scrubDialog.open = false;
+          }
+        }}>Cancel</wa-button
+      >
+      <wa-button
+        size="s"
+        slot="footer"
+        variant="danger"
+        loading={scrubCompetitor.isPending}
+        onclick={handleScrub}
+      >
+        <wa-icon slot="start" name="user-secret"></wa-icon>
+        Remove name anyway
+      </wa-button>
+    </wa-dialog>
   {/if}
 {/if}
 
@@ -314,6 +384,12 @@
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-l);
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-s);
   }
 
   .registration-code {
