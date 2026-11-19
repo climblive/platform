@@ -11,19 +11,11 @@
 
   const rounded = $derived(roundPoints(value));
   const formatter = $derived(pointsNumberFormat(value, compactThreshold));
-  const valueFormatter = $derived.by(() => {
-    const fractionDigits =
-      formatter.formatToParts(rounded).find((part) => part.type === "fraction")
-        ?.value.length ?? 0;
-    const animatedFormatter = new Intl.NumberFormat(undefined, {
-      ...formatter.resolvedOptions(),
-      minimumFractionDigits: fractionDigits,
-      maximumFractionDigits: fractionDigits,
-    });
-
-    return (value: number) => animatedFormatter.format(value) + "p";
-  });
 </script>
 
-<wa-number-ticker value={rounded} {valueFormatter} duration={1_000} eager
-></wa-number-ticker>
+<wa-number-ticker
+  value={rounded}
+  valueFormatter={formatter.format}
+  duration={500}
+  eager
+></wa-number-ticker>p

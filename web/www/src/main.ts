@@ -4,6 +4,7 @@ import "@awesome.me/webawesome/dist/components/card/card.js";
 import "@awesome.me/webawesome/dist/components/carousel/carousel.js";
 import "@awesome.me/webawesome/dist/components/carousel-item/carousel-item.js";
 import "@awesome.me/webawesome/dist/components/number-ticker/number-ticker.js";
+import type WaNumberTicker from "@awesome.me/webawesome/dist/components/number-ticker/number-ticker.js";
 import {
   prefersDarkColorScheme,
   updateTheme,
@@ -25,15 +26,13 @@ updateTheme(prefersDarkColorScheme());
 
 const loadGlobalStats = async () => {
   const section = document.getElementById("global-stats");
-  const ticks = document
-    .getElementById("stats-ticks")
-    ?.querySelector("wa-number-ticker");
-  const registrations = document
-    .getElementById("stats-registrations")
-    ?.querySelector("wa-number-ticker");
-  const competitions = document
-    .getElementById("stats-competitions")
-    ?.querySelector("wa-number-ticker");
+  const ticks = document.querySelector<WaNumberTicker>("#stats-ticks");
+  const registrations = document.querySelector<WaNumberTicker>(
+    "#stats-registrations",
+  );
+  const competitions = document.querySelector<WaNumberTicker>(
+    "#stats-competitions",
+  );
   if (!section || !ticks || !registrations || !competitions) {
     return;
   }
