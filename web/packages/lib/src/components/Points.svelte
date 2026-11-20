@@ -15,14 +15,15 @@
 
 <span class="points">
   <span class="sizer" aria-hidden="true">
-    {formatter.format(rounded)}p
+    {formatter.format(rounded)}
   </span>
   <wa-number-ticker
     value={rounded}
-    valueFormatter={(value: number) => formatter.format(value) + "p"}
+    valueFormatter={formatter.format}
     duration={500}
+    eager
   ></wa-number-ticker>
-</span>
+</span>p
 
 <style>
   .points {
