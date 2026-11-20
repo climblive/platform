@@ -1,8 +1,8 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import { CompetitionStateProvider } from "@climblive/lib/components";
   import {
     getCategoriesQuery,
@@ -11,7 +11,7 @@
   } from "@climblive/lib/queries";
   import type { CompetitionState } from "@climblive/lib/types";
   import { getCountryName, getFlag } from "@climblive/lib/utils";
-  import { format } from "date-fns";
+  import { format, formatDuration, intervalToDuration } from "date-fns";
   import { navigate } from "svelte-routing";
 
   type Props = {
@@ -27,6 +27,16 @@
   const competition = $derived(competitionQuery.data);
   const categoryCount = $derived(categoriesQuery.data?.length ?? 0);
   const problemCount = $derived(problemsQuery.data?.length ?? 0);
+  const competitionDuration = $derived(
+    competition?.timeBegin && competition?.timeEnd
+      ? formatDuration(
+          intervalToDuration({
+            start: competition.timeBegin,
+            end: competition.timeEnd,
+          }),
+        ) || "0 seconds"
+      : undefined,
+  );
   const competitionSpansMultipleDays = $derived.by(() => {
     if (
       competition?.timeBegin === undefined ||
@@ -133,6 +143,11 @@
         {/if}
       </span>
     {/if}
+
+    <wa-badge variant="neutral" pill>
+      <wa-icon slot="start" name="stopwatch"></wa-icon>
+      {competitionDuration} long</wa-badge
+    >
 
     {#if competition.timeBegin && competition.timeEnd}
       <CompetitionStateProvider {competitionId}>
