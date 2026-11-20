@@ -66,7 +66,7 @@
 
   <RuleOptionCard
     title="Attempts"
-    description="Competitors are ranked by most tops, then fewest attempts to tops, most zone 2s, fewest attempts to zone 2s, most zone 1s, and finally fewest attempts to zone 1s. Each criterion is used only to break ties in the preceding criteria, so fewer attempts to tops rank ahead of additional zones."
+    description="Competitors are ranked based on the number of attempts needed to complete problems. The ranking order is tops → attempts to tops → zones → attempts to zones. Each step breaks ties from the previous steps, so fewer attempts to tops take priority over additional zones."
   >
     {#snippet header()}
       <wa-radio
