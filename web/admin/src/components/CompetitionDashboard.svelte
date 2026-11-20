@@ -146,7 +146,7 @@
 
     <wa-badge variant="neutral" pill>
       <wa-icon slot="start" name="stopwatch"></wa-icon>
-      {competitionDuration}</wa-badge
+      {competitionDuration} long</wa-badge
     >
 
     {#if competition.timeBegin && competition.timeEnd}
