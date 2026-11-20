@@ -17,5 +17,4 @@
   value={rounded}
   valueFormatter={(value: number) => formatter.format(value) + "p"}
   duration={500}
-  eager
 ></wa-number-ticker>
