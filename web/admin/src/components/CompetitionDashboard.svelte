@@ -1,8 +1,8 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import "@awesome.me/webawesome/dist/components/badge/badge.js";
   import { CompetitionStateProvider } from "@climblive/lib/components";
   import {
     getCategoriesQuery,
@@ -141,9 +141,13 @@
             new Date(competition.timeEnd),
           )}
         {/if}
-        ({competitionDuration})
       </span>
     {/if}
+
+    <wa-badge variant="neutral" pill>
+      <wa-icon slot="start" name="stopwatch"></wa-icon>
+      {competitionDuration}</wa-badge
+    >
 
     {#if competition.timeBegin && competition.timeEnd}
       <CompetitionStateProvider {competitionId}>
