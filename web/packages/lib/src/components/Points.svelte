@@ -13,9 +13,32 @@
   const formatter = $derived(pointsNumberFormat(value, compactThreshold));
 </script>
 
-<wa-number-ticker
-  value={rounded}
-  valueFormatter={formatter.format}
-  duration={500}
-  eager
-></wa-number-ticker>p
+<span class="points">
+  <span class="sizer" aria-hidden="true" data-value={formatter.format(rounded)}
+  ></span><wa-number-ticker
+    value={rounded}
+    valueFormatter={formatter.format}
+    duration={500}
+    eager
+  ></wa-number-ticker>
+</span>p
+
+<style>
+  .points {
+    display: inline-grid;
+
+    > * {
+      grid-area: 1 / 1;
+      white-space: nowrap;
+    }
+
+    .sizer {
+      font-variant-numeric: tabular-nums;
+      visibility: hidden;
+
+      &::before {
+        content: attr(data-value);
+      }
+    }
+  }
+</style>
