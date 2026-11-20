@@ -14,10 +14,8 @@
 </script>
 
 <span class="points">
-  <span class="sizer" aria-hidden="true">
-    {formatter.format(rounded)}
-  </span>
-  <wa-number-ticker
+  <span class="sizer" aria-hidden="true" data-value={formatter.format(rounded)}
+  ></span><wa-number-ticker
     value={rounded}
     valueFormatter={formatter.format}
     duration={500}
@@ -37,6 +35,10 @@
     .sizer {
       font-variant-numeric: tabular-nums;
       visibility: hidden;
+
+      &::before {
+        content: attr(data-value);
+      }
     }
   }
 </style>
