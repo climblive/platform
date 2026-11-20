@@ -27,7 +27,6 @@
 <style>
   .points {
     display: inline-grid;
-    font-variant-numeric: tabular-nums;
 
     > * {
       grid-area: 1 / 1;
@@ -35,6 +34,7 @@
     }
 
     .sizer {
+      font-variant-numeric: tabular-nums;
       visibility: hidden;
     }
   }
