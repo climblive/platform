@@ -123,6 +123,7 @@ const (
 	outcomeTop
 	outcomeZone2
 	outcomeZone1
+	outcomeAttempt
 )
 
 func pickWeightedProblem(problems []domain.Problem) domain.Problem {
@@ -152,7 +153,7 @@ func pickWeightedProblem(problems []domain.Problem) domain.Problem {
 }
 
 func buildTick(problem domain.Problem) domain.Tick {
-	outcomes := []tickOutcome{outcomeFlash, outcomeTop}
+	outcomes := []tickOutcome{outcomeFlash, outcomeTop, outcomeAttempt}
 
 	if problem.Zone1Enabled && problem.Zone2Enabled {
 		outcomes = append(outcomes, outcomeZone2)
@@ -166,9 +167,9 @@ func buildTick(problem domain.Problem) domain.Tick {
 	var tick domain.Tick
 	tick.ProblemID = problem.ID
 
-	tick.AttemptsTop = 999
-	tick.AttemptsZone1 = 999
-	tick.AttemptsZone2 = 999
+	tick.AttemptsTop = rand.Intn(4) + 2
+	tick.AttemptsZone2 = rand.Intn(tick.AttemptsTop) + 1
+	tick.AttemptsZone1 = rand.Intn(tick.AttemptsZone2) + 1
 
 	switch outcome {
 	case outcomeFlash:

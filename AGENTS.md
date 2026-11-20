@@ -33,6 +33,7 @@
 
 ### Backend
 
+- The simulator (`backend/cmd/simulator`) must never have tests.
 - Keep unit tests for use cases, domain logic, and utilities alongside implementation files (`*_test.go`).
 - Table-driven tests preferred for multiple test cases.
 - Use `stretchr/testify` for assertions.
