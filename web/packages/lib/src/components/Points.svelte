@@ -15,6 +15,6 @@
 
 <wa-number-ticker
   value={rounded}
-  valueFormatter={formatter.format}
+  valueFormatter={(value: number) => formatter.format(value) + "p"}
   duration={500}
-></wa-number-ticker>p
+></wa-number-ticker>
