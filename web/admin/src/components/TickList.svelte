@@ -18,20 +18,19 @@
   interface Props {
     competitionId: number;
     competitorId: number;
-    showPoints: boolean;
   }
 
-  const { competitionId, competitorId, showPoints }: Props = $props();
+  const { competitionId, competitorId }: Props = $props();
 
   const problemsQuery = $derived(getProblemsQuery(competitionId));
   const ticksQuery = $derived(getTicksByCompetitorQuery(competitorId));
   const pointValuesQuery = $derived(
-    showPoints ? getPointValuesByCompetitorQuery(competitorId) : undefined,
+    getPointValuesByCompetitorQuery(competitorId),
   );
 
   const pointValues = $derived(
     new Map(
-      pointValuesQuery?.data?.map(({ problemId, current }) => [
+      pointValuesQuery.data?.map(({ problemId, current }) => [
         problemId,
         current,
       ]) ?? [],
@@ -66,7 +65,7 @@
       ) ?? [],
   );
 
-  const columns = $derived<ColumnDefinition<TickAndProblem>[]>([
+  const columns: ColumnDefinition<TickAndProblem>[] = [
     {
       label: "Problem",
       mobile: true,
@@ -87,23 +86,19 @@
       width: "max-content",
       align: "left",
     },
-    ...(showPoints
-      ? [
-          {
-            label: "Points",
-            mobile: true,
-            render: renderPoints,
-            width: "max-content",
-          },
-        ]
-      : []),
+    {
+      label: "Points",
+      mobile: true,
+      render: renderPoints,
+      width: "max-content",
+    },
     {
       label: "Timestamp",
       mobile: false,
       render: renderTimestamp,
       width: "max-content",
     },
-  ]);
+  ];
 </script>
 
 {#snippet renderProblemNumberAndColor({ problem }: TickAndProblem)}

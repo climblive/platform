@@ -50,6 +50,7 @@
   } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { format } from "date-fns";
+  import { onMount } from "svelte";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -78,11 +79,10 @@
   );
   const competition = $derived(competitionQuery?.data);
 
-  const attachCompetitorEvents = () => {
+  onMount(() => {
     const currentCompetitorId = competitorId;
     const filters: EventFilter[] = [
       {
-        competitionId,
         competitorId: currentCompetitorId,
         eventTypes: {
           ASCENT_REGISTERED: {},
@@ -174,7 +174,17 @@
             ["competitor", { id: currentCompetitorId }],
             (competitor) => {
               if (competitor) {
-                return { ...competitor, result: event };
+                return {
+                  ...competitor,
+                  result: {
+                    competitorId: event.competitorId,
+                    timestamp: event.timestamp,
+                    score: event.score,
+                    placement: event.placement,
+                    rankOrder: event.rankOrder,
+                    finalist: event.finalist,
+                  },
+                };
               }
             },
           );
@@ -184,7 +194,7 @@
     });
 
     return () => unsubscribeEvents(subscriptionId);
-  };
+  });
 
   let withdrawFromFinalsToggle: WaSwitch | undefined = $state();
   let categorySelect: WaSelect | undefined = $state();
@@ -245,7 +255,7 @@
 </script>
 
 {#if competitor && categories && competition}
-  <wa-breadcrumb {@attach attachCompetitorEvents}>
+  <wa-breadcrumb>
     <wa-breadcrumb-item
       onclick={() =>
         navigate(
@@ -371,7 +381,6 @@
       <TickList
         competitorId={competitor.id}
         competitionId={competitor.competitionId}
-        showPoints={competition.usePoints}
       ></TickList>
     {/if}
 
