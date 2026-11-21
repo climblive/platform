@@ -17,7 +17,7 @@
 
   let details: WaDetails | undefined = $state();
 
-  const rulesDescription = $derived(describeCompetitionRules(competition));
+  const ruleDescriptions = $derived(describeCompetitionRules(competition));
   const scoreboardUrl = `${location.protocol}//${location.host}/scoreboard/${competition.id}`;
 </script>
 
@@ -45,10 +45,15 @@
   <LabeledText label="Number of problems">
     {problems.length.toString()}</LabeledText
   >
-  {#if rulesDescription}
-    <LabeledText label="Rules">
-      {rulesDescription}
-    </LabeledText>
+  {#if ruleDescriptions.length > 0}
+    <div class="rules">
+      <strong>Rules</strong>
+      <ul>
+        {#each ruleDescriptions as description (description)}
+          <li>{description}</li>
+        {/each}
+      </ul>
+    </div>
   {/if}
   {#if competition.finalists > 0}
     <LabeledText label="Number of finalists">
@@ -96,5 +101,20 @@
 
   wa-details::part(content) {
     padding-top: 0;
+  }
+
+  .rules {
+    strong {
+      display: block;
+      font-size: var(--wa-font-size-xs);
+      line-height: var(--wa-line-height-normal);
+      margin-block-end: var(--wa-space-2xs);
+      color: var(--wa-color-text-quiet);
+    }
+
+    ul {
+      margin: 0;
+      padding-inline-start: var(--wa-space-l);
+    }
   }
 </style>

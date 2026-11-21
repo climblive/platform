@@ -9,38 +9,34 @@ type CompetitionRules = Pick<
   | "maxAttempts"
 >;
 
-export const describeCompetitionRules = (rules: CompetitionRules): string => {
+export const describeCompetitionRules = (rules: CompetitionRules): string[] => {
   if (!rules.usePoints) {
-    return "";
+    return [];
   }
 
-  const sentences: string[] = [];
+  const descriptions: string[] = [];
 
   if (rules.qualifyingProblems === 1) {
-    sentences.push("Only the hardest problem counts.");
+    descriptions.push("Hardest problem counts");
   } else if (rules.qualifyingProblems > 1) {
-    sentences.push(
-      `Only the hardest ${rules.qualifyingProblems} problems count.`,
-    );
+    descriptions.push(`Hardest ${rules.qualifyingProblems} problems count`);
   }
 
   if (rules.pooledPoints) {
-    sentences.push(
-      "Points are shared among the competitors that complete a problem.",
-    );
+    descriptions.push("Points shared among problem finishers");
   }
 
   if (rules.pointDeduction > 0) {
-    sentences.push(
-      `There is a ${rules.pointDeduction} point penalty for each failed attempt.`,
+    descriptions.push(
+      `${rules.pointDeduction}-point penalty per failed attempt`,
     );
   }
 
   if (rules.maxAttempts === 1) {
-    sentences.push("Only one attempt is allowed per problem.");
+    descriptions.push("1 attempt per problem");
   } else if (rules.maxAttempts > 1) {
-    sentences.push(`Up to ${rules.maxAttempts} attempts allowed per problem.`);
+    descriptions.push(`Max ${rules.maxAttempts} attempts per problem`);
   }
 
-  return sentences.join(" ");
+  return descriptions;
 };

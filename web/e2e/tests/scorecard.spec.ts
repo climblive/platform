@@ -511,7 +511,7 @@ test("info tab", async ({ page }) => {
   await expect(page.getByText("Categories Males, Females")).toBeVisible();
   await expect(page.getByText("Number of problems 5")).toBeVisible();
   await expect(
-    page.getByText("Rules Only the hardest 10 problems count."),
+    page.getByRole("listitem").filter({ hasText: "Hardest 10 problems count" }),
   ).toBeVisible();
   await expect(page.getByText("Number of finalists 7")).toBeVisible();
 
