@@ -6,7 +6,11 @@
     patchCompetitorMutation,
     scrubCompetitorMutation,
   } from "@climblive/lib/queries";
-  import { maskScrubbedName, SyncedTime } from "@climblive/lib/utils";
+  import {
+    formatAgeSpan,
+    maskScrubbedName,
+    SyncedTime,
+  } from "@climblive/lib/utils";
   import { add, formatDistance, isBefore } from "date-fns";
   import { onMount } from "svelte";
 
@@ -137,7 +141,10 @@
     >
       {#each categories as category (category.id)}
         <option value={category.id}
-          >{category.name} (ages {category.minAge}–{category.maxAge})</option
+          >{category.name} (ages {formatAgeSpan(
+            category.minAge,
+            category.maxAge,
+          )})</option
         >
       {/each}
     </select>

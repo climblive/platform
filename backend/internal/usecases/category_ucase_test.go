@@ -165,6 +165,40 @@ func TestCreateCategory(t *testing.T) {
 		mockedAuthorizer.AssertExpectations(t)
 	})
 
+	for _, tc := range []struct {
+		name   string
+		minAge *int
+		maxAge *int
+	}{
+		{name: "BothAgesMissing"},
+		{name: "MinimumAgeMissing", maxAge: new(99)},
+		{name: "MaximumAgeMissing", minAge: new(18)},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			mockedRepo, mockedAuthorizer := makeMocks()
+			mockedAuthorizer.
+				On("HasOwnership", mock.Anything, fakedOwnership).
+				Return(domain.OrganizerRole, nil)
+			mockedRepo.
+				On("GetCategoriesByCompetition", mock.Anything, nil, fakedCompetitionID).
+				Return([]domain.Category{}, nil)
+
+			ucase := usecases.CategoryUseCase{Repo: mockedRepo, Authorizer: mockedAuthorizer}
+			_, err := ucase.CreateCategory(context.Background(), fakedCompetitionID, domain.CategoryTemplate{
+				Name:      "Females",
+				MinAge:    tc.minAge,
+				MaxAge:    tc.maxAge,
+				TimeBegin: now,
+				TimeEnd:   now.Add(time.Hour),
+			})
+
+			require.ErrorIs(t, err, domain.ErrInvalidData)
+			mockedRepo.AssertNotCalled(t, "StoreCategory", mock.Anything, mock.Anything, mock.Anything)
+			mockedRepo.AssertExpectations(t)
+			mockedAuthorizer.AssertExpectations(t)
+		})
+	}
+
 	t.Run("ValidatorIsInvoked", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()
 
@@ -372,6 +406,8 @@ func TestPatchCategory(t *testing.T) {
 					Ownership:   fakedOwnership,
 					Name:        "Females",
 					Description: "Female climbers",
+					MinAge:      18,
+					MaxAge:      99,
 					TimeBegin:   now,
 					TimeEnd:     now.Add(time.Hour),
 				},
@@ -381,6 +417,8 @@ func TestPatchCategory(t *testing.T) {
 				Ownership:   fakedOwnership,
 				Name:        "Females",
 				Description: "Female climbers",
+				MinAge:      18,
+				MaxAge:      99,
 				TimeBegin:   now,
 				TimeEnd:     now.Add(time.Hour),
 			}, nil)
@@ -393,6 +431,8 @@ func TestPatchCategory(t *testing.T) {
 		patch := domain.CategoryPatch{
 			Name:        domain.NewPatch("Females"),
 			Description: domain.NewPatch("Female climbers"),
+			MinAge:      domain.NewPatch(new(18)),
+			MaxAge:      domain.NewPatch(new(99)),
 			TimeBegin:   domain.NewPatch(now),
 			TimeEnd:     domain.NewPatch(now.Add(time.Hour)),
 		}
@@ -402,6 +442,8 @@ func TestPatchCategory(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, "Females", category.Name)
 		assert.Equal(t, "Female climbers", category.Description)
+		assert.Equal(t, 18, category.MinAge)
+		assert.Equal(t, 99, category.MaxAge)
 		assert.Equal(t, now, category.TimeBegin)
 		assert.Equal(t, now.Add(time.Hour), category.TimeEnd)
 
@@ -428,6 +470,65 @@ func TestPatchCategory(t *testing.T) {
 		mockedRepo.AssertExpectations(t)
 		mockedAuthorizer.AssertExpectations(t)
 	})
+
+	for _, tc := range []struct {
+		name    string
+		patch   domain.CategoryPatch
+		minAge  int
+		maxAge  int
+		invalid bool
+	}{
+		{name: "ChangeMinimumAge", patch: domain.CategoryPatch{MinAge: domain.NewPatch(new(16))}, minAge: 16, maxAge: 99},
+		{name: "ChangeMaximumAge", patch: domain.CategoryPatch{MaxAge: domain.NewPatch(new(65))}, minAge: 18, maxAge: 65},
+		{name: "SingleAge", patch: domain.CategoryPatch{MaxAge: domain.NewPatch(new(18))}, minAge: 18, maxAge: 18},
+		{name: "ZeroMinimumAge", patch: domain.CategoryPatch{MinAge: domain.NewPatch(new(0))}, minAge: 0, maxAge: 99},
+		{name: "ClearMinimumAge", patch: domain.CategoryPatch{MinAge: domain.NewPatch[*int](nil)}, invalid: true},
+		{name: "ClearMaximumAge", patch: domain.CategoryPatch{MaxAge: domain.NewPatch[*int](nil)}, invalid: true},
+		{name: "ReversedAgeSpan", patch: domain.CategoryPatch{MaxAge: domain.NewPatch(new(15))}, invalid: true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			mockedRepo := new(repositoryMock)
+			mockedAuthorizer := new(authorizerMock)
+			category := domain.Category{
+				ID:          fakedCategoryID,
+				Ownership:   fakedOwnership,
+				Name:        "Open",
+				Description: "Retained for rollback",
+				MinAge:      18,
+				MaxAge:      99,
+				TimeBegin:   now,
+				TimeEnd:     now.Add(time.Hour),
+			}
+			mockedRepo.
+				On("GetCategory", mock.Anything, nil, fakedCategoryID).
+				Return(category, nil)
+			mockedAuthorizer.
+				On("HasOwnership", mock.Anything, fakedOwnership).
+				Return(domain.OrganizerRole, nil)
+
+			updated := category
+			updated.MinAge, updated.MaxAge = tc.minAge, tc.maxAge
+			if !tc.invalid {
+				mockedRepo.
+					On("StoreCategory", mock.Anything, nil, updated).
+					Return(updated, nil).Once()
+			}
+
+			ucase := usecases.CategoryUseCase{Repo: mockedRepo, Authorizer: mockedAuthorizer}
+			result, err := ucase.PatchCategory(context.Background(), fakedCategoryID, tc.patch)
+			if tc.invalid {
+				require.ErrorIs(t, err, domain.ErrInvalidData)
+				mockedRepo.AssertNotCalled(t, "StoreCategory", mock.Anything, mock.Anything, mock.Anything)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, updated, result)
+				assert.Equal(t, category.Description, result.Description)
+			}
+
+			mockedRepo.AssertExpectations(t)
+			mockedAuthorizer.AssertExpectations(t)
+		})
+	}
 
 	t.Run("ValidatorIsInvoked", func(t *testing.T) {
 		mockedRepo, mockedAuthorizer := makeMocks()

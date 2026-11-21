@@ -1,3 +1,6 @@
+export const formatAgeSpan = (minAge: number, maxAge: number): string =>
+  `${minAge}–${maxAge}`;
+
 export const ordinalSuperscript = (value: number): string => {
   switch (true) {
     case value === 1:

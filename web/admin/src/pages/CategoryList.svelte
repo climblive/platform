@@ -13,6 +13,7 @@
   } from "@climblive/lib/components";
   import type { Category } from "@climblive/lib/models";
   import { getCategoriesQuery } from "@climblive/lib/queries";
+  import { formatAgeSpan } from "@climblive/lib/utils";
   import { format } from "date-fns";
   import { navigate } from "svelte-routing";
   import DeleteCategory from "./DeleteCategory.svelte";
@@ -73,7 +74,7 @@
 {/snippet}
 
 {#snippet renderAgeSpan({ minAge, maxAge }: Category)}
-  {minAge}–{maxAge}
+  {formatAgeSpan(minAge, maxAge)}
 {/snippet}
 
 {#snippet renderTimeBegin({ timeBegin }: Category)}

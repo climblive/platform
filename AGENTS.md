@@ -35,6 +35,7 @@
 
 - Keep unit tests for use cases, domain logic, and utilities alongside implementation files (`*_test.go`).
 - Table-driven tests preferred for multiple test cases.
+- Use PascalCase names for Go subtests and table-driven test cases (for example, `AdultSpan`, not `adult span`).
 - Use `stretchr/testify` for assertions.
 - Mock interfaces using `stretchr/testify/mock`.
 - Always validate `domain.Tick` and `scores.Tick` test fixtures with `testutils.MustTick`, including after mutations. Only bypass validation for deliberately invalid inputs and zero-value "not found" placeholders.

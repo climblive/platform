@@ -35,12 +35,12 @@ func TestCategoryValidator(t *testing.T) {
 		maxAge int
 		valid  bool
 	}{
-		{name: "adult span", minAge: 18, maxAge: 99, valid: true},
-		{name: "single age", minAge: 16, maxAge: 16, valid: true},
-		{name: "age zero", minAge: 0, maxAge: 15, valid: true},
-		{name: "reversed span", minAge: 18, maxAge: 16},
-		{name: "negative minimum", minAge: -1, maxAge: 16},
-		{name: "storage overflow", minAge: 18, maxAge: math.MaxInt32 + 1},
+		{name: "AdultSpan", minAge: 18, maxAge: 99, valid: true},
+		{name: "SingleAge", minAge: 16, maxAge: 16, valid: true},
+		{name: "AgeZero", minAge: 0, maxAge: 15, valid: true},
+		{name: "ReversedSpan", minAge: 18, maxAge: 16},
+		{name: "NegativeMinimum", minAge: -1, maxAge: 16},
+		{name: "StorageOverflow", minAge: 18, maxAge: math.MaxInt32 + 1},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			category := validCategory()

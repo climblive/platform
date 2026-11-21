@@ -223,9 +223,8 @@
 
     return formData.categoryNames.map<CategoryTemplate>((name) => ({
       name,
-      minAge:
-        name === "Boys" || name === "Girls" ? 0 : name === "Seniors" ? 60 : 18,
-      maxAge: name === "Boys" || name === "Girls" ? 15 : 99,
+      minAge: 18,
+      maxAge: 99,
       timeBegin,
       timeEnd,
     }));
