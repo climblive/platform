@@ -510,7 +510,9 @@ test("info tab", async ({ page }) => {
   await expect(page.getByText("Location On the web")).toBeVisible();
   await expect(page.getByText("Categories Males, Females")).toBeVisible();
   await expect(page.getByText("Number of problems 5")).toBeVisible();
-  await expect(page.getByText("Qualifying problems 10 hardest")).toBeVisible();
+  await expect(
+    page.getByText("Rules Only the hardest 10 problems count."),
+  ).toBeVisible();
   await expect(page.getByText("Number of finalists 7")).toBeVisible();
 
   await page.getByRole("button", { name: "General info" }).click();
