@@ -71,9 +71,11 @@
     <span class="scoreboard-link">
       <a href={scoreboardUrl} target="_blank">{scoreboardUrl}</a>
       {#if typeof navigator.share === "function"}
-        <wa-button size="small" appearance="plain" onclick={shareScoreboard}>
-          <wa-icon name="share-nodes" label="Share scoreboard"></wa-icon>
-        </wa-button>
+        <span class="share-button">
+          <wa-button size="small" appearance="plain" onclick={shareScoreboard}>
+            <wa-icon name="share-nodes" label="Share scoreboard"></wa-icon>
+          </wa-button>
+        </span>
       {/if}
     </span>
   </LabeledText>
@@ -127,8 +129,12 @@
       overflow-wrap: anywhere;
     }
 
-    wa-button {
+    .share-button {
+      display: flex;
+      align-items: center;
       flex-shrink: 0;
+      height: 1lh;
+      overflow-y: visible;
     }
   }
 </style>
