@@ -17,6 +17,7 @@
 
   let details: WaDetails | undefined = $state();
 
+  const rulesDescription = $derived(describeCompetitionRules(competition));
   const scoreboardUrl = `${location.protocol}//${location.host}/scoreboard/${competition.id}`;
 </script>
 
@@ -44,9 +45,11 @@
   <LabeledText label="Number of problems">
     {problems.length.toString()}</LabeledText
   >
-  <LabeledText label="Rules">
-    {describeCompetitionRules(competition)}
-  </LabeledText>
+  {#if rulesDescription}
+    <LabeledText label="Rules">
+      {rulesDescription}
+    </LabeledText>
+  {/if}
   {#if competition.finalists > 0}
     <LabeledText label="Number of finalists">
       {competition.finalists.toString()}
