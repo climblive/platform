@@ -32,7 +32,7 @@ export const describeCompetitionRules = (rules: CompetitionRules): string => {
 
   if (rules.pointDeduction > 0) {
     sentences.push(
-      `There is a ${rules.pointDeduction} point penalty for each failed attempt before reaching the scored top or zone.`,
+      `There is a ${rules.pointDeduction} point penalty for each failed attempt.`,
     );
   }
 
