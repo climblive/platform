@@ -128,7 +128,8 @@
 
   const tableData = $derived<TickAndProblem[]>(
     ticks
-      ?.map((tick) => {
+      ?.filter((tick) => tick.zone1 || tick.zone2 || tick.top)
+      .map((tick) => {
         const problem = problems.get(tick.problemId);
         if (problem === undefined) {
           return undefined;
