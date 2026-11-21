@@ -18,7 +18,6 @@ INSERT INTO tick VALUES (NULL, 1, 1, 1, 1, '2024-01-01 00:00:00', 1, TRUE, 999, 
 INSERT INTO contest VALUES (NULL, 1, NULL, 1, 'World Attempts Championships', 'A competition scored by tops, zones and attempts', 'On the web', 'AQ', 0, 0, FALSE, FALSE, 0, 0, NULL, 5, 20160, NOW());
 INSERT INTO comp_class VALUES (NULL, 1, 2, 'Open', NULL, '#ff0000', '2024-01-01 00:00:00', '2026-12-31 23:59:59');
 INSERT INTO contender VALUES (NULL, 1, 2, 'ABCD0006', 'Jim Halpert', 3, '2024-01-01 00:00:00', FALSE, FALSE, NULL, NULL);
-INSERT INTO contender VALUES (NULL, 1, 2, 'ABCD0007', NULL, NULL, NULL, FALSE, FALSE, NULL, NULL);
 INSERT INTO problem VALUES (NULL, 1, 2, 1, '#ef4444', NULL, TRUE, TRUE, NULL, 0, 0, 0, NULL);
 
 CREATE TABLE `goose_db_version` (
