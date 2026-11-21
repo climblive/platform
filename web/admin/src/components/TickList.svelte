@@ -8,9 +8,11 @@
   } from "@climblive/lib/components";
   import type { Problem, Tick } from "@climblive/lib/models";
   import {
+    getPointValuesByCompetitorQuery,
     getProblemsQuery,
     getTicksByCompetitorQuery,
   } from "@climblive/lib/queries";
+  import { localizedPointsValue } from "@climblive/lib/utils";
   import { format } from "date-fns";
 
   interface Props {
@@ -22,6 +24,18 @@
 
   const problemsQuery = $derived(getProblemsQuery(competitionId));
   const ticksQuery = $derived(getTicksByCompetitorQuery(competitorId));
+  const pointValuesQuery = $derived(
+    getPointValuesByCompetitorQuery(competitorId),
+  );
+
+  const pointValues = $derived(
+    new Map(
+      pointValuesQuery.data?.map(({ problemId, current }) => [
+        problemId,
+        current,
+      ]) ?? [],
+    ),
+  );
 
   const problems = $derived(
     new Map(problemsQuery.data?.map((problem) => [problem.id, problem]) ?? []),
@@ -32,7 +46,8 @@
 
   const tableData = $derived<TickAndProblem[]>(
     ticks
-      ?.map((tick) => {
+      ?.filter((tick) => tick.zone1 || tick.zone2 || tick.top)
+      .map((tick) => {
         const problem = problems.get(tick.problemId);
         if (problem === undefined) {
           return undefined;
@@ -70,6 +85,12 @@
       render: renderFlash,
       width: "max-content",
       align: "left",
+    },
+    {
+      label: "Points",
+      mobile: true,
+      render: renderPoints,
+      width: "max-content",
     },
     {
       label: "Timestamp",
@@ -113,6 +134,15 @@
   {format(tick.timestamp, "yyyy-MM-dd HH:mm")}
 {/snippet}
 
+{#snippet renderPoints({ tick }: TickAndProblem)}
+  {@const points = pointValues.get(tick.problemId)}
+  {#if points !== undefined}
+    {localizedPointsValue(points)}
+  {:else}
+    —
+  {/if}
+{/snippet}
+
 {#if tableData && tableData.length > 0}
   <Table {columns} data={tableData} getId={({ tick }) => tick.id}></Table>
 {:else if tableData}
@@ -123,6 +153,10 @@
 {/if}
 
 <style>
+  wa-icon[name="bolt"] {
+    color: var(--wa-color-yellow-50);
+  }
+
   .number {
     display: flex;
     align-items: center;
