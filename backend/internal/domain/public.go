@@ -31,6 +31,8 @@ type Category struct {
 	CompetitionID CompetitionID `json:"competitionId"`
 	Name          string        `json:"name"`
 	Description   string        `json:"description,omitzero"`
+	MinAge        int           `json:"minAge"`
+	MaxAge        int           `json:"maxAge"`
 	TimeBegin     time.Time     `json:"timeBegin"`
 	TimeEnd       time.Time     `json:"timeEnd"`
 }
@@ -38,6 +40,8 @@ type Category struct {
 type CategoryTemplate struct {
 	Name        string    `json:"name"`
 	Description string    `json:"description,omitzero"`
+	MinAge      *int      `json:"minAge" tstype:"number,required"`
+	MaxAge      *int      `json:"maxAge" tstype:"number,required"`
 	TimeBegin   time.Time `json:"timeBegin"`
 	TimeEnd     time.Time `json:"timeEnd"`
 }
@@ -45,6 +49,8 @@ type CategoryTemplate struct {
 type CategoryPatch struct {
 	Name        Patch[string]    `json:"name,omitzero" tstype:"string"`
 	Description Patch[string]    `json:"description,omitzero" tstype:"string"`
+	MinAge      Patch[*int]      `json:"minAge,omitzero" tstype:"number"`
+	MaxAge      Patch[*int]      `json:"maxAge,omitzero" tstype:"number"`
 	TimeBegin   Patch[time.Time] `json:"timeBegin,omitzero" tstype:"Date"`
 	TimeEnd     Patch[time.Time] `json:"timeEnd,omitzero" tstype:"Date"`
 }

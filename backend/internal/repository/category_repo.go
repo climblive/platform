@@ -43,6 +43,8 @@ func (d *Database) StoreCategory(ctx context.Context, tx domain.Transaction, cat
 		CompetitionID: int32(category.CompetitionID),
 		Name:          category.Name,
 		Description:   makeNullString(category.Description),
+		MinAge:        int32(category.MinAge),
+		MaxAge:        int32(category.MaxAge),
 		Color:         sql.NullString{String: "", Valid: false},
 		TimeBegin:     category.TimeBegin,
 		TimeEnd:       category.TimeEnd,

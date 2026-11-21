@@ -51,18 +51,24 @@ export interface Category {
   competitionId: CompetitionID;
   name: string;
   description?: string;
+  minAge: number /* int */;
+  maxAge: number /* int */;
   timeBegin: Date;
   timeEnd: Date;
 }
 export interface CategoryTemplate {
   name: string;
   description?: string;
+  minAge: number;
+  maxAge: number;
   timeBegin: Date;
   timeEnd: Date;
 }
 export interface CategoryPatch {
   name?: string;
   description?: string;
+  minAge?: number;
+  maxAge?: number;
   timeBegin?: Date;
   timeEnd?: Date;
 }

@@ -98,6 +98,8 @@ CREATE TABLE IF NOT EXISTS `comp_class` (
   `contest_id` INT NOT NULL,
   `name` VARCHAR(45) NOT NULL,
   `description` VARCHAR(255) NULL,
+  `min_age` INT NOT NULL,
+  `max_age` INT NOT NULL,
   `color` VARCHAR(7) NULL,
   `time_begin` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `time_end` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

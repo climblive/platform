@@ -180,9 +180,7 @@
                 <wa-badge pill variant="neutral">{count}</wa-badge>
               {/if}
             </div>
-            {#if category.description}
-              <small>{category.description}</small>
-            {/if}
+            <small>Ages {category.minAge}–{category.maxAge}</small>
           </wa-option>
         {/each}
       </wa-select>

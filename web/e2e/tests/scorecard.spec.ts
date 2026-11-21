@@ -46,7 +46,9 @@ test.beforeAll(async () => {
   await dbConnection.query(schema);
   await dbConnection.query(samples);
 
-  const appContainer = new GenericContainer("climblive-api:latest")
+  const appContainer = new GenericContainer(
+    process.env.E2E_API_IMAGE ?? "climblive-api:latest",
+  )
     .withEnvironment({
       DB_USERNAME: "climblive",
       DB_PASSWORD: "secretpassword",
@@ -66,7 +68,10 @@ test.beforeAll(async () => {
         target: "/certs",
       },
     ])
-    .withExposedPorts({ container: 443, host: 8443 })
+    .withExposedPorts({
+      container: 443,
+      host: Number(process.env.E2E_API_PORT ?? 8443),
+    })
     .withWaitStrategy(Wait.forLogMessage(/score engine started/));
 
   startedAppContainer = await appContainer.start();
@@ -94,7 +99,7 @@ test("enter competition by entering registration code", async ({ page }) => {
   const category = page.getByRole("combobox", { name: "Category *" });
   await category.click();
   await page
-    .getByRole("option", { name: "Males 16 years and older", exact: true })
+    .getByRole("option", { name: "Males Ages 18–99", exact: true })
     .click();
 
   await page.getByRole("button", { name: "Register" }).click();
@@ -213,7 +218,7 @@ test("edit profile", async ({ page }) => {
   const category = page.getByRole("combobox", { name: "Category *" });
   await category.click();
   await page
-    .getByRole("option", { name: "Females 16 years and older", exact: true })
+    .getByRole("option", { name: "Females Ages 18–99", exact: true })
     .click();
 
   await page.getByRole("button", { name: "Save" }).click();
@@ -597,6 +602,83 @@ test.describe("competition states", () => {
   });
 });
 
+test("category age spans replace descriptions without changing stored descriptions", async ({
+  page,
+  request,
+}) => {
+  let category = await (await request.get("/api/categories/1")).json();
+  const description = category.description;
+  category = {
+    ...category,
+    timeBegin: new Date().toISOString(),
+    timeEnd: new Date(Date.now() + 3_600_000).toISOString(),
+  };
+  await page.addInitScript(() => {
+    const payload = btoa(JSON.stringify({ exp: Date.now() / 1000 + 86400 }));
+    localStorage.setItem("access_token", `test.${payload}.test`);
+    localStorage.setItem("refresh_token", "test");
+  });
+  await page.route("**/api/users/self", (route) =>
+    route.fulfill({
+      json: {
+        id: 1,
+        username: "ui-test",
+        admin: false,
+        organizers: [{ id: 1, name: "Test Organizer" }],
+      },
+    }),
+  );
+  await page.route("**/api/categories/1", async (route) => {
+    if (route.request().method() === "PATCH") {
+      const patch = route.request().postDataJSON();
+      expect(patch).not.toHaveProperty("description");
+      category = { ...category, ...patch };
+    }
+    await route.fulfill({ json: category });
+  });
+  await page.route("**/api/competitions/1/categories", (route) =>
+    route.fulfill({ json: [category] }),
+  );
+  await page.route("**/api/competitions/1/competitors", (route) =>
+    route.fulfill({ json: [] }),
+  );
+
+  await page.goto("/admin/categories/1/edit");
+  await expect(page.locator('[name="description"]')).toHaveCount(0);
+  const minimum = page.locator('wa-number-input[name="minAge"] input');
+  const maximum = page.locator('wa-number-input[name="maxAge"] input');
+  await expect(minimum).toHaveValue("18");
+  await expect(maximum).toHaveValue("99");
+  await expect(page.locator(".age-span > span")).toHaveText("-");
+  const minimumBounds = await minimum.boundingBox();
+  const maximumBounds = await maximum.boundingBox();
+  expect(minimumBounds).not.toBeNull();
+  expect(maximumBounds).not.toBeNull();
+  expect(maximumBounds!.x).toBeGreaterThan(minimumBounds!.x);
+  expect(maximumBounds!.y).toBe(minimumBounds!.y);
+
+  await minimum.fill("16");
+  await maximum.fill("35");
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await page.waitForURL("/admin/competitions/1#categories");
+  expect(category).toMatchObject({ minAge: 16, maxAge: 35, description });
+  const table = page
+    .getByRole("table")
+    .filter({
+      has: page.getByRole("columnheader", { name: "Ages", exact: true }),
+    });
+  await expect(
+    table.getByRole("columnheader", { name: "Ages", exact: true }),
+  ).toBeVisible();
+  await expect(
+    table.getByRole("columnheader", { name: "Description", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    table.getByRole("cell", { name: "16–35", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText(description, { exact: true })).toHaveCount(0);
+});
+
 test("scrub name", async ({ page }) => {
   await page.goto("/ABCD0001");
 
@@ -637,7 +719,7 @@ test.describe("failsafe mode", () => {
       .pressSequentially("Andy Bernard");
     await page
       .getByRole("combobox", { name: "Category" })
-      .selectOption({ label: "Females" });
+      .selectOption({ label: "Females (ages 18–99)" });
 
     await page.getByRole("button", { name: "Register" }).click();
 

@@ -6,12 +6,22 @@
   export const formSchema = z
     .object({
       name: z.string().min(1),
-      description: z.string().optional(),
+      minAge: z.coerce.number().int().nonnegative(),
+      maxAge: z.coerce.number().int().nonnegative(),
       timeBegin: z.coerce.date(),
       timeEnd: z.coerce.date(),
     })
     .check((ctx) => {
       const data = ctx.value;
+
+      if (data.maxAge < data.minAge) {
+        ctx.issues.push({
+          code: "custom",
+          message: "Maximum age must be at least the minimum age",
+          input: data,
+          path: ["maxAge"],
+        });
+      }
 
       if (data.timeEnd.getTime() - data.timeBegin.getTime() > oneMonth) {
         ctx.issues.push({
@@ -36,6 +46,7 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
   import type WaInput from "@awesome.me/webawesome/dist/components/input/input.js";
   import { GenericForm, name } from "@climblive/lib/forms";
   import type { Category } from "@climblive/lib/models";
@@ -107,13 +118,27 @@
       value={data.name}
       placeholder="Males or Females"
     ></wa-input>
-    <wa-input
-      size="s"
-      {@attach name("description")}
-      label="Description"
-      type="text"
-      value={data.description}
-    ></wa-input>
+    <div class="age-span">
+      <wa-number-input
+        size="s"
+        {@attach name("minAge")}
+        label="Minimum age"
+        min="0"
+        step="1"
+        required
+        value={data.minAge?.toString()}
+      ></wa-number-input>
+      <span aria-hidden="true">-</span>
+      <wa-number-input
+        size="s"
+        {@attach name("maxAge")}
+        label="Maximum age"
+        min="0"
+        step="1"
+        required
+        value={data.maxAge?.toString()}
+      ></wa-number-input>
+    </div>
     <wa-input
       bind:this={timeBeginInput}
       size="s"
@@ -157,5 +182,20 @@
   .quick-controls {
     display: flex;
     gap: var(--wa-space-xs);
+  }
+
+  .age-span {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: var(--wa-space-s);
+    align-items: end;
+
+    wa-number-input {
+      min-width: 0;
+    }
+
+    span {
+      padding-block: var(--wa-space-s);
+    }
   }
 </style>

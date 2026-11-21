@@ -64,12 +64,18 @@ func (uc *CategoryUseCase) CreateCategory(ctx context.Context, competitionID dom
 		return domain.Category{}, errors.New(domain.ErrLimitExceeded)
 	}
 
+	if tmpl.MinAge == nil || tmpl.MaxAge == nil {
+		return domain.Category{}, errors.Wrap(domain.ErrInvalidData, 0)
+	}
+
 	category := domain.Category{
 		ID:            0,
 		Ownership:     competition.Ownership,
 		CompetitionID: competitionID,
 		Name:          tmpl.Name,
 		Description:   tmpl.Description,
+		MinAge:        *tmpl.MinAge,
+		MaxAge:        *tmpl.MaxAge,
 		TimeBegin:     tmpl.TimeBegin,
 		TimeEnd:       tmpl.TimeEnd,
 	}
@@ -129,6 +135,20 @@ func (uc *CategoryUseCase) PatchCategory(ctx context.Context, categoryID domain.
 
 	if patch.Description.Present {
 		category.Description = patch.Description.Value
+	}
+
+	if patch.MinAge.Present {
+		if patch.MinAge.Value == nil {
+			return domain.Category{}, errors.Wrap(domain.ErrInvalidData, 0)
+		}
+		category.MinAge = *patch.MinAge.Value
+	}
+
+	if patch.MaxAge.Present {
+		if patch.MaxAge.Value == nil {
+			return domain.Category{}, errors.Wrap(domain.ErrInvalidData, 0)
+		}
+		category.MaxAge = *patch.MaxAge.Value
 	}
 
 	if patch.TimeBegin.Present {

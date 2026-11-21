@@ -1,6 +1,7 @@
 package validators
 
 import (
+	"math"
 	"strings"
 	"time"
 
@@ -15,6 +16,8 @@ type CategoryValidator struct {
 
 func (v CategoryValidator) Validate(category domain.Category) error {
 	switch {
+	case category.MinAge < 0 || category.MaxAge < category.MinAge || category.MaxAge > math.MaxInt32:
+		fallthrough
 	case len(strings.TrimSpace(category.Name)) < 1:
 		fallthrough
 	case category.TimeEnd.Before(category.TimeBegin):
