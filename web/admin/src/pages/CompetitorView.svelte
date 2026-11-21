@@ -241,10 +241,13 @@
       <p class="copy">
         Problems attempted by the competitor during the competition.
       </p>
-      <TickList
-        competitorId={competitor.id}
-        competitionId={competitor.competitionId}
-      ></TickList>
+      {#key competitor.id}
+        <TickList
+          competitorId={competitor.id}
+          competitionId={competitor.competitionId}
+          showPoints={competition.usePoints}
+        ></TickList>
+      {/key}
     {/if}
 
     <h2>Settings</h2>
