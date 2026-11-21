@@ -81,20 +81,11 @@
 
   onMount(() => {
     const currentCompetitorId = competitorId;
-    const filters: EventFilter[] = [
-      {
-        competitorId: currentCompetitorId,
-        eventTypes: {
-          ASCENT_REGISTERED: {},
-          ASCENT_DEREGISTERED: {},
-          POINT_VALUE_UPDATED: {},
-          COMPETITOR_PUBLIC_INFO_UPDATED: {},
-          COMPETITOR_RESULT_UPDATED: {},
-        },
-      },
-    ];
+    const currentCompetitorQuery = competitorQuery;
+    let disposed = false;
+    let subscriptionId: symbol | undefined;
 
-    const subscriptionId = subscribeEvents(filters, (eventName, e) => {
+    const handleEvent = (eventName: string, e: MessageEvent) => {
       switch (eventName) {
         case "ASCENT_REGISTERED": {
           const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
@@ -191,9 +182,43 @@
           break;
         }
       }
-    });
+    };
 
-    return () => unsubscribeEvents(subscriptionId);
+    const setup = async () => {
+      const currentCompetitor =
+        currentCompetitorQuery.data ??
+        (await currentCompetitorQuery.refetch()).data;
+
+      if (disposed || !currentCompetitor) {
+        return;
+      }
+
+      const filters: EventFilter[] = [
+        {
+          competitionId: currentCompetitor.competitionId,
+          competitorId: currentCompetitorId,
+          eventTypes: {
+            ASCENT_REGISTERED: {},
+            ASCENT_DEREGISTERED: {},
+            POINT_VALUE_UPDATED: {},
+            COMPETITOR_PUBLIC_INFO_UPDATED: {},
+            COMPETITOR_RESULT_UPDATED: {},
+          },
+        },
+      ];
+
+      subscriptionId = subscribeEvents(filters, handleEvent);
+    };
+
+    setup();
+
+    return () => {
+      disposed = true;
+
+      if (subscriptionId !== undefined) {
+        unsubscribeEvents(subscriptionId);
+      }
+    };
   });
 
   let withdrawFromFinalsToggle: WaSwitch | undefined = $state();
