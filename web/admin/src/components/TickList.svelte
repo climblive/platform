@@ -68,74 +68,53 @@
       },
     ];
 
-    const subscriptionId = subscribeEvents(
-      filters,
-      (eventName, e) => {
-        switch (eventName) {
-          case "ASCENT_REGISTERED": {
-            const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
+    const subscriptionId = subscribeEvents(filters, (eventName, e) => {
+      switch (eventName) {
+        case "ASCENT_REGISTERED": {
+          const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
 
-            if (event.competitorId !== currentCompetitorId) {
-              return;
-            }
-
-            const tick: Tick = {
-              id: event.tickId,
-              timestamp: event.timestamp,
-              revision: event.revision,
-              problemId: event.problemId,
-              zone1: event.zone1,
-              attemptsZone1: event.attemptsZone1,
-              zone2: event.zone2,
-              attemptsZone2: event.attemptsZone2,
-              top: event.top,
-              attemptsTop: event.attemptsTop,
-            };
-
-            updateTickInQueryCache(queryClient, currentCompetitorId, tick);
-            break;
+          if (event.competitorId !== currentCompetitorId) {
+            return;
           }
-          case "ASCENT_DEREGISTERED": {
-            const event = ascentDeregisteredEventSchema.parse(
-              JSON.parse(e.data),
-            );
 
-            if (event.competitorId !== currentCompetitorId) {
-              return;
-            }
+          const tick: Tick = {
+            id: event.tickId,
+            timestamp: event.timestamp,
+            revision: event.revision,
+            problemId: event.problemId,
+            zone1: event.zone1,
+            attemptsZone1: event.attemptsZone1,
+            zone2: event.zone2,
+            attemptsZone2: event.attemptsZone2,
+            top: event.top,
+            attemptsTop: event.attemptsTop,
+          };
 
-            removeTickFromQueryCache(queryClient, event.tickId);
-            break;
-          }
-          case "POINT_VALUE_UPDATED": {
-            const event = pointValueUpdatedEventSchema.parse(
-              JSON.parse(e.data),
-            );
-
-            if (event.competitorId !== currentCompetitorId) {
-              return;
-            }
-
-            updatePointValueInQueryCache(
-              queryClient,
-              currentCompetitorId,
-              event,
-            );
-            break;
-          }
+          updateTickInQueryCache(queryClient, currentCompetitorId, tick);
+          break;
         }
-      },
-      {
-        onOpen: () => {
-          queryClient.invalidateQueries({
-            queryKey: ["ticks", { competitorId: currentCompetitorId }],
-          });
-          queryClient.invalidateQueries({
-            queryKey: ["point-values", { competitorId: currentCompetitorId }],
-          });
-        },
-      },
-    );
+        case "ASCENT_DEREGISTERED": {
+          const event = ascentDeregisteredEventSchema.parse(JSON.parse(e.data));
+
+          if (event.competitorId !== currentCompetitorId) {
+            return;
+          }
+
+          removeTickFromQueryCache(queryClient, event.tickId);
+          break;
+        }
+        case "POINT_VALUE_UPDATED": {
+          const event = pointValueUpdatedEventSchema.parse(JSON.parse(e.data));
+
+          if (event.competitorId !== currentCompetitorId) {
+            return;
+          }
+
+          updatePointValueInQueryCache(queryClient, currentCompetitorId, event);
+          break;
+        }
+      }
+    });
 
     return () => unsubscribeEvents(subscriptionId);
   });
