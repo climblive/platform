@@ -20,19 +20,28 @@
     LabeledText,
     RegistrationCode,
     Score,
+    useEvents,
   } from "@climblive/lib/components";
   import { checked, value } from "@climblive/lib/forms";
+  import {
+    competitorPublicInfoUpdatedEventSchema,
+    competitorResultUpdatedEventSchema,
+    type Competitor,
+    type EventFilter,
+  } from "@climblive/lib/models";
   import {
     getCategoriesQuery,
     getCompetitorQuery,
     getCompetitionQuery,
     patchCompetitorMutation,
     scrubCompetitorMutation,
+    updateCompetitorPublicInfoInQueryCache,
   } from "@climblive/lib/queries";
   import {
     ordinalSuperscript,
     toastUnexpectedError,
   } from "@climblive/lib/utils";
+  import { useQueryClient } from "@tanstack/svelte-query";
   import { format } from "date-fns";
   import { navigate } from "svelte-routing";
 
@@ -41,6 +50,9 @@
   }
 
   let { competitorId }: Props = $props();
+
+  const queryClient = useQueryClient();
+  const { subscribeEvents, unsubscribeEvents } = useEvents();
 
   const competitorQuery = $derived(getCompetitorQuery(competitorId));
   const patchCompetitor = $derived(patchCompetitorMutation(competitorId));
@@ -58,6 +70,72 @@
     competitionId ? getCompetitionQuery(competitionId) : undefined,
   );
   const competition = $derived(competitionQuery?.data);
+
+  $effect(() => {
+    if (!competitionId) {
+      return;
+    }
+
+    const currentCompetitorId = competitorId;
+    const filters: EventFilter[] = [
+      {
+        competitionId,
+        competitorId: currentCompetitorId,
+        eventTypes: {
+          COMPETITOR_PUBLIC_INFO_UPDATED: {},
+          COMPETITOR_RESULT_UPDATED: {},
+        },
+      },
+    ];
+
+    const subscriptionId = subscribeEvents(filters, (eventName, e) => {
+      switch (eventName) {
+        case "COMPETITOR_PUBLIC_INFO_UPDATED": {
+          const event = competitorPublicInfoUpdatedEventSchema.parse(
+            JSON.parse(e.data),
+          );
+
+          if (event.competitorId !== currentCompetitorId) {
+            return;
+          }
+
+          updateCompetitorPublicInfoInQueryCache(
+            queryClient,
+            currentCompetitorId,
+            {
+              categoryId: event.categoryId,
+              name: event.name,
+              withdrawnFromFinals: event.withdrawnFromFinals,
+              disqualified: event.disqualified,
+              scrubbedAt: event.scrubbedAt,
+            },
+          );
+          break;
+        }
+        case "COMPETITOR_RESULT_UPDATED": {
+          const event = competitorResultUpdatedEventSchema.parse(
+            JSON.parse(e.data),
+          );
+
+          if (event.competitorId !== currentCompetitorId) {
+            return;
+          }
+
+          queryClient.setQueryData<Competitor>(
+            ["competitor", { id: currentCompetitorId }],
+            (competitor) => {
+              if (competitor) {
+                return { ...competitor, result: event };
+              }
+            },
+          );
+          break;
+        }
+      }
+    });
+
+    return () => unsubscribeEvents(subscriptionId);
+  });
 
   let withdrawFromFinalsToggle: WaSwitch | undefined = $state();
   let categorySelect: WaSelect | undefined = $state();
