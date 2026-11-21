@@ -170,7 +170,7 @@
     ...(showPoints
       ? [
           {
-            label: "Current points",
+            label: "Points",
             mobile: true,
             render: renderPoints,
             width: "max-content",
@@ -238,6 +238,10 @@
 {/if}
 
 <style>
+  wa-icon[name="bolt"] {
+    color: var(--wa-color-yellow-50);
+  }
+
   .number {
     display: flex;
     align-items: center;
