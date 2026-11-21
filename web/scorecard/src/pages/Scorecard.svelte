@@ -421,7 +421,7 @@
 
 <svelte:window onvisibilitychange={handleVisibilityChange} />
 
-{#if showSplash || !competitor || !competition || !categories || !sortedProblems || !ticks || !selectedCategory}
+{#if showSplash || !competitor || !competition || !categories || !problems || !ticks || !selectedCategory}
   <SplashScreen onComplete={() => (showSplash = false)} />
 {:else}
   <CompetitionStateProvider
