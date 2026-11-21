@@ -42,10 +42,10 @@
       width: "1fr",
     },
     {
-      label: "Description",
-      mobile: false,
-      render: renderDescription,
-      width: "1fr",
+      label: "Ages",
+      mobile: true,
+      render: renderAgeSpan,
+      width: "max-content",
     },
     {
       label: "Start time",
@@ -72,8 +72,8 @@
   {name}
 {/snippet}
 
-{#snippet renderDescription({ description }: Category)}
-  {description}
+{#snippet renderAgeSpan({ minAge, maxAge }: Category)}
+  {minAge}–{maxAge}
 {/snippet}
 
 {#snippet renderTimeBegin({ timeBegin }: Category)}

@@ -136,7 +136,9 @@
       disabled={competitor.scrubbedAt !== undefined}
     >
       {#each categories as category (category.id)}
-        <option value={category.id}>{category.name}</option>
+        <option value={category.id}
+          >{category.name} (ages {category.minAge}–{category.maxAge})</option
+        >
       {/each}
     </select>
     <div class="actions">

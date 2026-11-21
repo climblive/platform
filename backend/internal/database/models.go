@@ -15,6 +15,8 @@ type Category struct {
 	CompetitionID int32
 	Name          string
 	Description   sql.NullString
+	MinAge        int32
+	MaxAge        int32
 	Color         sql.NullString
 	TimeBegin     time.Time
 	TimeEnd       time.Time

@@ -54,6 +54,8 @@ func categoryToDomain(record database.Category) domain.Category {
 		CompetitionID: domain.CompetitionID(record.CompetitionID),
 		Name:          record.Name,
 		Description:   record.Description.String,
+		MinAge:        int(record.MinAge),
+		MaxAge:        int(record.MaxAge),
 		TimeBegin:     record.TimeBegin,
 		TimeEnd:       record.TimeEnd,
 	}

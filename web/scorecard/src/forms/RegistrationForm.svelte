@@ -66,9 +66,7 @@
             label={category.name}
           >
             {category.name}
-            {#if category.description}
-              <small>{category.description}</small>
-            {/if}
+            <small>Ages {category.minAge}–{category.maxAge}</small>
           </wa-option>
         {/each}
       </wa-select>

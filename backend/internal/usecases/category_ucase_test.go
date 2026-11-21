@@ -118,6 +118,8 @@ func TestCreateCategory(t *testing.T) {
 					CompetitionID: fakedCompetitionID,
 					Name:          "Females",
 					Description:   "Female climbers",
+					MinAge:        18,
+					MaxAge:        99,
 					TimeBegin:     now,
 					TimeEnd:       now.Add(time.Hour),
 				},
@@ -129,6 +131,8 @@ func TestCreateCategory(t *testing.T) {
 					CompetitionID: fakedCompetitionID,
 					Name:          "Females",
 					Description:   "Female climbers",
+					MinAge:        18,
+					MaxAge:        99,
 					TimeBegin:     now,
 					TimeEnd:       now.Add(time.Hour),
 				}, nil)
@@ -140,6 +144,8 @@ func TestCreateCategory(t *testing.T) {
 
 		category, err := ucase.CreateCategory(context.Background(), fakedCompetitionID, domain.CategoryTemplate{
 			Name:        "Females",
+			MinAge:      new(18),
+			MaxAge:      new(99),
 			Description: "Female climbers",
 			TimeBegin:   now,
 			TimeEnd:     now.Add(time.Hour),
@@ -150,6 +156,8 @@ func TestCreateCategory(t *testing.T) {
 		assert.Equal(t, fakedOwnership, category.Ownership)
 		assert.Equal(t, "Females", category.Name)
 		assert.Equal(t, "Female climbers", category.Description)
+		assert.Equal(t, 18, category.MinAge)
+		assert.Equal(t, 99, category.MaxAge)
 		assert.Equal(t, now, category.TimeBegin)
 		assert.Equal(t, now.Add(time.Hour), category.TimeEnd)
 
@@ -173,7 +181,7 @@ func TestCreateCategory(t *testing.T) {
 			Authorizer: mockedAuthorizer,
 		}
 
-		_, err := ucase.CreateCategory(context.Background(), fakedCompetitionID, domain.CategoryTemplate{})
+		_, err := ucase.CreateCategory(context.Background(), fakedCompetitionID, domain.CategoryTemplate{MinAge: new(18), MaxAge: new(99)})
 
 		assert.ErrorIs(t, err, domain.ErrInvalidData)
 		assert.True(t, validators.CategoryValidator{}.IsValidationError(err))
