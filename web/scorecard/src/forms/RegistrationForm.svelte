@@ -35,6 +35,18 @@
 
   let categoriesQuery = $derived(getCategoriesQuery($session.competitionId));
 
+  const availableCategories = $derived(
+    categoriesQuery.data?.filter(
+      ({ timeEnd }) => !isAfter(new Date(), timeEnd),
+    ) ?? [],
+  );
+  const categoryId = $derived(
+    data.categoryId ??
+      (availableCategories.length === 1
+        ? availableCategories[0].id
+        : undefined),
+  );
+
   const disabled = $derived(rest.disabled || competitionState === "ENDED");
 </script>
 
@@ -56,7 +68,7 @@
         {@attach name("categoryId")}
         label="Category"
         required
-        {@attach value(data.categoryId)}
+        {@attach value(categoryId)}
         {disabled}
       >
         {#each categoriesQuery.data as category (category.id)}
