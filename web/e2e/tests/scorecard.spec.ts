@@ -92,6 +92,7 @@ test("enter competition by entering registration code", async ({ page }) => {
     .getByRole("textbox", { name: "Name *" })
     .pressSequentially("Dwight Schrute");
   const category = page.getByRole("combobox", { name: "Category *" });
+  await expect(category).toHaveValue("");
   await category.click();
   await page
     .getByRole("option", { name: "Males 16 years and older", exact: true })
@@ -101,6 +102,50 @@ test("enter competition by entering registration code", async ({ page }) => {
 
   await page.waitForURL("/ABCD0002");
 });
+
+test("automatically select the only category when registering", async ({
+  page,
+}) => {
+  await page.goto("/ABCD0007/register");
+
+  await expect(page.getByRole("combobox", { name: "Category *" })).toHaveValue(
+    "Open",
+  );
+  await page.getByRole("textbox", { name: "Name *" }).fill("Pam Beesly");
+  await page.getByRole("button", { name: "Register" }).click();
+
+  await page.waitForURL("/ABCD0007");
+  await expect(page.locator("main > .sticky header")).toContainText("Open");
+  await expect(page.getByText("Pam Beesly")).toBeVisible();
+});
+
+for (const { endedCategories, expectedValue } of [
+  { endedCategories: [1], expectedValue: "Females" },
+  { endedCategories: [1, 2], expectedValue: "" },
+]) {
+  test(`registration defaults with ended categories ${endedCategories.join(", ")}`, async ({
+    page,
+  }) => {
+    await page.route("**/competitions/1/categories", async (route) => {
+      const response = await route.fetch();
+      const categories = await response.json();
+
+      for (const category of categories) {
+        if (endedCategories.includes(category.id)) {
+          category.timeEnd = "2020-01-01T00:00:00Z";
+        }
+      }
+
+      await route.fulfill({ response, json: categories });
+    });
+
+    await page.goto("/ABCD0004/register");
+
+    await expect(
+      page.getByRole("combobox", { name: "Category *" }),
+    ).toHaveValue(expectedValue);
+  });
+}
 
 test("registration code is saved until 12 hours after competition ends", async ({
   page,
@@ -211,6 +256,7 @@ test("edit profile", async ({ page }) => {
   await nameInput.pressSequentially("Phyllis Lapin-Vance");
 
   const category = page.getByRole("combobox", { name: "Category *" });
+  await expect(category).toHaveValue("Males");
   await category.click();
   await page
     .getByRole("option", { name: "Females 16 years and older", exact: true })
