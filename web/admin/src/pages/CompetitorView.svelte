@@ -50,7 +50,6 @@
   } from "@climblive/lib/utils";
   import { useQueryClient } from "@tanstack/svelte-query";
   import { format } from "date-fns";
-  import { onMount } from "svelte";
   import { navigate } from "svelte-routing";
 
   interface Props {
@@ -79,13 +78,23 @@
   );
   const competition = $derived(competitionQuery?.data);
 
-  onMount(() => {
+  const attachCompetitorEvents = () => {
     const currentCompetitorId = competitorId;
-    const currentCompetitorQuery = competitorQuery;
-    let disposed = false;
-    let subscriptionId: symbol | undefined;
+    const filters: EventFilter[] = [
+      {
+        competitionId,
+        competitorId: currentCompetitorId,
+        eventTypes: {
+          ASCENT_REGISTERED: {},
+          ASCENT_DEREGISTERED: {},
+          POINT_VALUE_UPDATED: {},
+          COMPETITOR_PUBLIC_INFO_UPDATED: {},
+          COMPETITOR_RESULT_UPDATED: {},
+        },
+      },
+    ];
 
-    const handleEvent = (eventName: string, e: MessageEvent) => {
+    const subscriptionId = subscribeEvents(filters, (eventName, e) => {
       switch (eventName) {
         case "ASCENT_REGISTERED": {
           const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
@@ -182,44 +191,10 @@
           break;
         }
       }
-    };
+    });
 
-    const setup = async () => {
-      const currentCompetitor =
-        currentCompetitorQuery.data ??
-        (await currentCompetitorQuery.refetch()).data;
-
-      if (disposed || !currentCompetitor) {
-        return;
-      }
-
-      const filters: EventFilter[] = [
-        {
-          competitionId: currentCompetitor.competitionId,
-          competitorId: currentCompetitorId,
-          eventTypes: {
-            ASCENT_REGISTERED: {},
-            ASCENT_DEREGISTERED: {},
-            POINT_VALUE_UPDATED: {},
-            COMPETITOR_PUBLIC_INFO_UPDATED: {},
-            COMPETITOR_RESULT_UPDATED: {},
-          },
-        },
-      ];
-
-      subscriptionId = subscribeEvents(filters, handleEvent);
-    };
-
-    setup();
-
-    return () => {
-      disposed = true;
-
-      if (subscriptionId !== undefined) {
-        unsubscribeEvents(subscriptionId);
-      }
-    };
-  });
+    return () => unsubscribeEvents(subscriptionId);
+  };
 
   let withdrawFromFinalsToggle: WaSwitch | undefined = $state();
   let categorySelect: WaSelect | undefined = $state();
@@ -280,7 +255,7 @@
 </script>
 
 {#if competitor && categories && competition}
-  <wa-breadcrumb>
+  <wa-breadcrumb {@attach attachCompetitorEvents}>
     <wa-breadcrumb-item
       onclick={() =>
         navigate(
