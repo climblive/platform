@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { describeCompetitionRules } from "@/utils/competitionRules";
   import "@awesome.me/webawesome/dist/components/details/details.js";
   import type WaDetails from "@awesome.me/webawesome/dist/components/details/details.js";
   import { LabeledText } from "@climblive/lib/components";
@@ -43,11 +44,9 @@
   <LabeledText label="Number of problems">
     {problems.length.toString()}</LabeledText
   >
-  {#if competition.qualifyingProblems > 0}
-    <LabeledText label="Qualifying problems">
-      {`${competition.qualifyingProblems.toString()} hardest`}
-    </LabeledText>
-  {/if}
+  <LabeledText label="Rules">
+    {describeCompetitionRules(competition)}
+  </LabeledText>
   {#if competition.finalists > 0}
     <LabeledText label="Number of finalists">
       {competition.finalists.toString()}
