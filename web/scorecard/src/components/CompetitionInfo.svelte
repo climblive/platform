@@ -26,6 +26,7 @@
     navigator
       .share({
         title: competition.name,
+        text: `Follow my results in ${competition.name}!`,
         url: scoreboardUrl,
       })
       .catch(() => {});
