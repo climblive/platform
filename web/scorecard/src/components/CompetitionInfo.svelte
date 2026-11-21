@@ -5,7 +5,6 @@
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { LabeledText } from "@climblive/lib/components";
   import type { Category, Competition, Problem } from "@climblive/lib/models";
-  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { format } from "date-fns";
   import { sv } from "date-fns/locale";
 
@@ -18,27 +17,18 @@
   let { competition, categories, problems }: Props = $props();
 
   let details: WaDetails | undefined = $state();
-  let sharing = $state(false);
 
   const scoreboardUrl = $derived(
     `${location.origin}/scoreboard/${competition.id}`,
   );
 
-  async function shareScoreboard() {
-    sharing = true;
-
-    try {
-      await navigator.share({
+  function shareScoreboard() {
+    navigator
+      .share({
         title: competition.name,
         url: scoreboardUrl,
-      });
-    } catch (error) {
-      if (!(error instanceof DOMException && error.name === "AbortError")) {
-        toastUnexpectedError("Failed to share scoreboard.");
-      }
-    } finally {
-      sharing = false;
-    }
+      })
+      .catch(() => {});
   }
 </script>
 
@@ -80,12 +70,7 @@
     <span class="scoreboard-link">
       <a href={scoreboardUrl} target="_blank">{scoreboardUrl}</a>
       {#if typeof navigator.share === "function"}
-        <wa-button
-          size="small"
-          appearance="plain"
-          disabled={sharing}
-          onclick={shareScoreboard}
-        >
+        <wa-button size="small" appearance="plain" onclick={shareScoreboard}>
           <wa-icon name="share-nodes" label="Share scoreboard"></wa-icon>
         </wa-button>
       {/if}
