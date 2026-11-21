@@ -61,6 +61,11 @@ wa-checkbox {
   display: block;
 }
 
+wa-spinner,
+wa-button::part(spinner) {
+  --track-width: 0.15em;
+}
+
 wa-input:state(user-invalid)::part(base),
 wa-select:state(user-invalid)::part(combobox),
 wa-checkbox:state(user-invalid)::part(control) {
