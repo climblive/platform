@@ -522,6 +522,85 @@ test("info tab", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("share the public scoreboard from the info tab", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "share", {
+      value: async (data: ShareData) => {
+        localStorage.setItem("sharedScoreboard", JSON.stringify(data));
+      },
+    });
+  });
+
+  await page.goto("/ABCD0001");
+  await page.getByRole("tab", { name: "Info" }).click();
+
+  const scoreboardUrl = new URL("/scoreboard/1", page.url()).href;
+  await expect(page.getByRole("link", { name: scoreboardUrl })).toBeVisible();
+  await page.getByRole("button", { name: "Share scoreboard" }).click();
+
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem("sharedScoreboard")))
+    .toBe(
+      JSON.stringify({
+        title: "World Testing Championships",
+        url: scoreboardUrl,
+      }),
+    );
+  await expect(
+    page.getByRole("button", { name: "Share scoreboard" }),
+  ).toBeEnabled();
+});
+
+test("keep the scoreboard link when sharing is unsupported", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "share", { value: undefined });
+  });
+
+  await page.goto("/ABCD0001");
+  await page.getByRole("tab", { name: "Info" }).click();
+
+  const scoreboardUrl = new URL("/scoreboard/1", page.url()).href;
+  await expect(page.getByRole("link", { name: scoreboardUrl })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Share scoreboard" }),
+  ).toHaveCount(0);
+});
+
+for (const errorName of ["AbortError", "NotAllowedError"]) {
+  test(`handle scoreboard sharing ${errorName}`, async ({ page }) => {
+    await page.addInitScript((name) => {
+      Object.defineProperty(navigator, "share", {
+        value: async () => {
+          localStorage.setItem("shareError", name);
+          throw new DOMException("Sharing failed", name);
+        },
+      });
+    }, errorName);
+
+    await page.goto("/ABCD0001");
+    await page.getByRole("tab", { name: "Info" }).click();
+    await page.getByRole("button", { name: "Share scoreboard" }).click();
+
+    await expect
+      .poll(() => page.evaluate(() => localStorage.getItem("shareError")))
+      .toBe(errorName);
+    await expect(
+      page.getByRole("button", { name: "Share scoreboard" }),
+    ).toBeEnabled();
+
+    const errorMessage = page
+      .locator("wa-toast-item")
+      .filter({ hasText: "Failed to share scoreboard." });
+    if (errorName === "AbortError") {
+      await expect(errorMessage).not.toBeVisible();
+    } else {
+      await expect(errorMessage).toBeVisible();
+    }
+  });
+}
+
 test.describe("competition states", () => {
   test.beforeEach(async ({ page }) => {
     await page.clock.setFixedTime(new Date("2023-11-01T00:00:00"));

@@ -1,8 +1,11 @@
 <script lang="ts">
+  import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/details/details.js";
   import type WaDetails from "@awesome.me/webawesome/dist/components/details/details.js";
+  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { LabeledText } from "@climblive/lib/components";
   import type { Category, Competition, Problem } from "@climblive/lib/models";
+  import { toastUnexpectedError } from "@climblive/lib/utils";
   import { format } from "date-fns";
   import { sv } from "date-fns/locale";
 
@@ -15,8 +18,28 @@
   let { competition, categories, problems }: Props = $props();
 
   let details: WaDetails | undefined = $state();
+  let sharing = $state(false);
 
-  const scoreboardUrl = `${location.protocol}//${location.host}/scoreboard/${competition.id}`;
+  const scoreboardUrl = $derived(
+    `${location.origin}/scoreboard/${competition.id}`,
+  );
+
+  async function shareScoreboard() {
+    sharing = true;
+
+    try {
+      await navigator.share({
+        title: competition.name,
+        url: scoreboardUrl,
+      });
+    } catch (error) {
+      if (!(error instanceof DOMException && error.name === "AbortError")) {
+        toastUnexpectedError("Failed to share scoreboard.");
+      }
+    } finally {
+      sharing = false;
+    }
+  }
 </script>
 
 <section>
@@ -54,7 +77,19 @@
     </LabeledText>
   {/if}
   <LabeledText label="Scoreboard">
-    <a href={scoreboardUrl} target="_blank">{scoreboardUrl}</a>
+    <span class="scoreboard-link">
+      <a href={scoreboardUrl} target="_blank">{scoreboardUrl}</a>
+      {#if typeof navigator.share === "function"}
+        <wa-button
+          size="small"
+          appearance="plain"
+          disabled={sharing}
+          onclick={shareScoreboard}
+        >
+          <wa-icon name="share-nodes" label="Share scoreboard"></wa-icon>
+        </wa-button>
+      {/if}
+    </span>
   </LabeledText>
 </section>
 {#if competition.info}
@@ -94,5 +129,20 @@
 
   wa-details::part(content) {
     padding-top: 0;
+  }
+
+  .scoreboard-link {
+    display: flex;
+    align-items: center;
+    gap: var(--wa-space-xs);
+
+    a {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    wa-button {
+      flex-shrink: 0;
+    }
   }
 </style>
