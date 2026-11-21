@@ -4,29 +4,16 @@
     EmptyState,
     HoldColorIndicator,
     Table,
-    useEvents,
     type ColumnDefinition,
   } from "@climblive/lib/components";
-  import {
-    ascentDeregisteredEventSchema,
-    ascentRegisteredEventSchema,
-    pointValueUpdatedEventSchema,
-    type EventFilter,
-    type Problem,
-    type Tick,
-  } from "@climblive/lib/models";
+  import type { Problem, Tick } from "@climblive/lib/models";
   import {
     getPointValuesByCompetitorQuery,
     getProblemsQuery,
     getTicksByCompetitorQuery,
-    removeTickFromQueryCache,
-    updatePointValueInQueryCache,
-    updateTickInQueryCache,
   } from "@climblive/lib/queries";
   import { localizedPointsValue } from "@climblive/lib/utils";
-  import { useQueryClient } from "@tanstack/svelte-query";
   import { format } from "date-fns";
-  import { onMount } from "svelte";
 
   interface Props {
     competitionId: number;
@@ -35,9 +22,6 @@
   }
 
   const { competitionId, competitorId, showPoints }: Props = $props();
-
-  const queryClient = useQueryClient();
-  const { subscribeEvents, unsubscribeEvents } = useEvents();
 
   const problemsQuery = $derived(getProblemsQuery(competitionId));
   const ticksQuery = $derived(getTicksByCompetitorQuery(competitorId));
@@ -53,71 +37,6 @@
       ]) ?? [],
     ),
   );
-
-  onMount(() => {
-    const currentCompetitorId = competitorId;
-    const filters: EventFilter[] = [
-      {
-        competitionId,
-        competitorId: currentCompetitorId,
-        eventTypes: {
-          ASCENT_REGISTERED: {},
-          ASCENT_DEREGISTERED: {},
-          POINT_VALUE_UPDATED: {},
-        },
-      },
-    ];
-
-    const subscriptionId = subscribeEvents(filters, (eventName, e) => {
-      switch (eventName) {
-        case "ASCENT_REGISTERED": {
-          const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
-
-          if (event.competitorId !== currentCompetitorId) {
-            return;
-          }
-
-          const tick: Tick = {
-            id: event.tickId,
-            timestamp: event.timestamp,
-            revision: event.revision,
-            problemId: event.problemId,
-            zone1: event.zone1,
-            attemptsZone1: event.attemptsZone1,
-            zone2: event.zone2,
-            attemptsZone2: event.attemptsZone2,
-            top: event.top,
-            attemptsTop: event.attemptsTop,
-          };
-
-          updateTickInQueryCache(queryClient, currentCompetitorId, tick);
-          break;
-        }
-        case "ASCENT_DEREGISTERED": {
-          const event = ascentDeregisteredEventSchema.parse(JSON.parse(e.data));
-
-          if (event.competitorId !== currentCompetitorId) {
-            return;
-          }
-
-          removeTickFromQueryCache(queryClient, event.tickId);
-          break;
-        }
-        case "POINT_VALUE_UPDATED": {
-          const event = pointValueUpdatedEventSchema.parse(JSON.parse(e.data));
-
-          if (event.competitorId !== currentCompetitorId) {
-            return;
-          }
-
-          updatePointValueInQueryCache(queryClient, currentCompetitorId, event);
-          break;
-        }
-      }
-    });
-
-    return () => unsubscribeEvents(subscriptionId);
-  });
 
   const problems = $derived(
     new Map(problemsQuery.data?.map((problem) => [problem.id, problem]) ?? []),
