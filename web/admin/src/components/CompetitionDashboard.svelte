@@ -144,10 +144,12 @@
       </span>
     {/if}
 
-    <wa-badge variant="neutral" pill>
-      <wa-icon slot="start" name="stopwatch"></wa-icon>
-      {competitionDuration} long</wa-badge
-    >
+    {#if competitionDuration}
+      <wa-badge variant="neutral" pill>
+        <wa-icon slot="start" name="stopwatch"></wa-icon>
+        {competitionDuration} long</wa-badge
+      >
+    {/if}
 
     {#if competition.timeBegin && competition.timeEnd}
       <CompetitionStateProvider {competitionId}>

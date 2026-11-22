@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { describeCompetitionRules } from "@/utils/competitionRules";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/details/details.js";
   import type WaDetails from "@awesome.me/webawesome/dist/components/details/details.js";
@@ -18,6 +19,7 @@
 
   let details: WaDetails | undefined = $state();
 
+  const ruleDescriptions = $derived(describeCompetitionRules(competition));
   const scoreboardUrl = $derived(
     `${location.origin}/scoreboard/${competition.id}`,
   );
@@ -57,9 +59,16 @@
   <LabeledText label="Number of problems">
     {problems.length.toString()}</LabeledText
   >
-  {#if competition.qualifyingProblems > 0}
-    <LabeledText label="Qualifying problems">
-      {`${competition.qualifyingProblems.toString()} hardest`}
+  {#if ruleDescriptions.length > 0}
+    <LabeledText label="Rules">
+      <ul class="rules" role="list">
+        {#each ruleDescriptions as description (description)}
+          <li>
+            <wa-icon name="dice" aria-hidden="true"></wa-icon>
+            <span>{description}</span>
+          </li>
+        {/each}
+      </ul>
     </LabeledText>
   {/if}
   {#if competition.finalists > 0}
@@ -117,6 +126,22 @@
 
   wa-details::part(content) {
     padding-top: 0;
+  }
+
+  .rules {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: var(--wa-space-2xs);
+    }
+
+    wa-icon {
+      flex-shrink: 0;
+    }
   }
 
   .scoreboard-link {
