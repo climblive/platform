@@ -60,9 +60,8 @@
     {problems.length.toString()}</LabeledText
   >
   {#if ruleDescriptions.length > 0}
-    <div class="rules">
-      <strong>Rules</strong>
-      <ul role="list">
+    <LabeledText label="Rules">
+      <ul class="rules" role="list">
         {#each ruleDescriptions as description (description)}
           <li>
             <wa-icon name="dice" aria-hidden="true"></wa-icon>
@@ -70,7 +69,7 @@
           </li>
         {/each}
       </ul>
-    </div>
+    </LabeledText>
   {/if}
   {#if competition.finalists > 0}
     <LabeledText label="Number of finalists">
@@ -130,19 +129,9 @@
   }
 
   .rules {
-    strong {
-      display: block;
-      font-size: var(--wa-font-size-xs);
-      line-height: var(--wa-line-height-normal);
-      margin-block-end: var(--wa-space-2xs);
-      color: var(--wa-color-text-quiet);
-    }
-
-    ul {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
+    margin: 0;
+    padding: 0;
+    list-style: none;
 
     li {
       display: flex;
