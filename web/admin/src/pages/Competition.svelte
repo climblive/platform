@@ -163,6 +163,20 @@
 
       <h2>Advanced</h2>
       <wa-divider></wa-divider>
+      <h3>Paper scorecards</h3>
+      <p>
+        Collect results on paper if the app or scoring is unavailable. You can
+        print a blank scorecard or save it as a PDF ahead of time.
+      </p>
+      <wa-button
+        href={`/admin/competitions/${competitionId}/scorecard/print`}
+        target="_blank"
+        rel="noopener noreferrer"
+        appearance="outlined"
+      >
+        <wa-icon name="print" slot="start"></wa-icon>
+        Print paper scorecard
+      </wa-button>
       <h3>Actions</h3>
       <div class="actions">
         <DuplicateCompetition
