@@ -205,17 +205,14 @@
       </wa-button>
 
       <wa-popover for={qrCodeButtonId} placement="bottom-end">
-        <div class="registration-details">
-          <div class="registration-qr-code">
-            <QrCode registrationCode={competitor.registrationCode} width={200}
-            ></QrCode>
-          </div>
-          <span class="registration-code">
-            <RegistrationCode code={competitor.registrationCode} />
-            <wa-copy-button value={competitor.registrationCode}
-            ></wa-copy-button>
-          </span>
+        <div class="qr-code">
+          <QrCode registrationCode={competitor.registrationCode} width={200}
+          ></QrCode>
         </div>
+        <span class="code">
+          <RegistrationCode code={competitor.registrationCode} />
+          <wa-copy-button value={competitor.registrationCode}></wa-copy-button>
+        </span>
       </wa-popover>
     </div>
 
@@ -413,25 +410,27 @@
     gap: var(--wa-space-s);
   }
 
-  .registration-details {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--wa-space-s);
-  }
+  wa-popover {
+    &::part(body) {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--wa-space-s);
+    }
 
-  .registration-qr-code {
-    padding: var(--wa-space-s);
-    background: white;
-    line-height: 0;
-  }
+    .qr-code {
+      padding: var(--wa-space-s);
+      background: white;
+      line-height: 0;
+    }
 
-  .registration-code {
-    display: grid;
-    grid-template-columns: 1fr max-content;
-    align-items: center;
-    font-family: monospace;
-    font-size: var(--wa-font-size-m);
+    .code {
+      display: grid;
+      grid-template-columns: 1fr max-content;
+      align-items: center;
+      font-family: monospace;
+      font-size: var(--wa-font-size-m);
+    }
   }
 
   .entered {
