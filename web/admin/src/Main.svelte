@@ -14,6 +14,7 @@
   import InviteView from "./pages/InviteView.svelte";
   import ManageOrganizer from "./pages/ManageOrganizer.svelte";
   import OrganizerView from "./pages/OrganizerView.svelte";
+  import PrintableScorecard from "./pages/PrintableScorecard.svelte";
   import PrintableTicketList from "./pages/PrintableTicketList.svelte";
   import Profile from "./pages/Profile.svelte";
   import RaffleView from "./pages/RaffleView.svelte";
@@ -108,6 +109,11 @@
     <Route path="/competitions/:competitionId/tickets/print">
       {#snippet children({ params }: { params: { competitionId: number } })}
         <PrintableTicketList competitionId={Number(params.competitionId)} />
+      {/snippet}
+    </Route>
+    <Route path="/competitions/:competitionId/scorecard/print">
+      {#snippet children({ params }: { params: { competitionId: number } })}
+        <PrintableScorecard competitionId={Number(params.competitionId)} />
       {/snippet}
     </Route>
     <Route path="/competitors/:competitorId">
