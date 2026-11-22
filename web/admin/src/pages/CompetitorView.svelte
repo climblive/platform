@@ -10,6 +10,7 @@
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/option/option.js";
+  import "@awesome.me/webawesome/dist/components/popover/popover.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
@@ -20,19 +21,35 @@
     LabeledText,
     RegistrationCode,
     Score,
+    useEvents,
   } from "@climblive/lib/components";
   import { checked, value } from "@climblive/lib/forms";
+  import {
+    ascentDeregisteredEventSchema,
+    ascentRegisteredEventSchema,
+    competitorPublicInfoUpdatedEventSchema,
+    competitorResultUpdatedEventSchema,
+    pointValueUpdatedEventSchema,
+    type EventFilter,
+    type Tick,
+  } from "@climblive/lib/models";
   import {
     getCategoriesQuery,
     getCompetitorQuery,
     getCompetitionQuery,
     patchCompetitorMutation,
+    removeTickFromQueryCache,
     scrubCompetitorMutation,
+    updateCompetitorPublicInfoInQueryCache,
+    updateCompetitorResultInQueryCache,
+    updatePointValueInQueryCache,
+    updateTickInQueryCache,
   } from "@climblive/lib/queries";
   import {
     ordinalSuperscript,
     toastUnexpectedError,
   } from "@climblive/lib/utils";
+  import { useQueryClient } from "@tanstack/svelte-query";
   import { format } from "date-fns";
   import { navigate } from "svelte-routing";
 
@@ -41,6 +58,10 @@
   }
 
   let { competitorId }: Props = $props();
+  const qrCodeButtonId = $props.id();
+
+  const queryClient = useQueryClient();
+  const { subscribeEvents, unsubscribeEvents } = useEvents();
 
   const competitorQuery = $derived(getCompetitorQuery(competitorId));
   const patchCompetitor = $derived(patchCompetitorMutation(competitorId));
@@ -58,6 +79,114 @@
     competitionId ? getCompetitionQuery(competitionId) : undefined,
   );
   const competition = $derived(competitionQuery?.data);
+
+  const attachCompetitorEvents = () => {
+    const currentCompetitorId = competitorId;
+    const filters: EventFilter[] = [
+      {
+        competitionId,
+        competitorId: currentCompetitorId,
+        eventTypes: {
+          ASCENT_REGISTERED: {},
+          ASCENT_DEREGISTERED: {},
+          POINT_VALUE_UPDATED: {},
+          COMPETITOR_PUBLIC_INFO_UPDATED: {},
+          COMPETITOR_RESULT_UPDATED: {},
+        },
+      },
+    ];
+
+    const subscriptionId = subscribeEvents(filters, (eventName, e) => {
+      switch (eventName) {
+        case "ASCENT_REGISTERED": {
+          const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
+
+          if (event.competitorId !== currentCompetitorId) {
+            return;
+          }
+
+          const tick: Tick = {
+            id: event.tickId,
+            timestamp: event.timestamp,
+            revision: event.revision,
+            problemId: event.problemId,
+            zone1: event.zone1,
+            attemptsZone1: event.attemptsZone1,
+            zone2: event.zone2,
+            attemptsZone2: event.attemptsZone2,
+            top: event.top,
+            attemptsTop: event.attemptsTop,
+          };
+
+          updateTickInQueryCache(queryClient, currentCompetitorId, tick);
+          break;
+        }
+        case "ASCENT_DEREGISTERED": {
+          const event = ascentDeregisteredEventSchema.parse(JSON.parse(e.data));
+
+          if (event.competitorId !== currentCompetitorId) {
+            return;
+          }
+
+          removeTickFromQueryCache(queryClient, event.tickId);
+          break;
+        }
+        case "POINT_VALUE_UPDATED": {
+          const event = pointValueUpdatedEventSchema.parse(JSON.parse(e.data));
+
+          if (event.competitorId !== currentCompetitorId) {
+            return;
+          }
+
+          updatePointValueInQueryCache(queryClient, currentCompetitorId, event);
+          break;
+        }
+        case "COMPETITOR_PUBLIC_INFO_UPDATED": {
+          const event = competitorPublicInfoUpdatedEventSchema.parse(
+            JSON.parse(e.data),
+          );
+
+          if (event.competitorId !== currentCompetitorId) {
+            return;
+          }
+
+          updateCompetitorPublicInfoInQueryCache(
+            queryClient,
+            currentCompetitorId,
+            {
+              categoryId: event.categoryId,
+              name: event.name,
+              withdrawnFromFinals: event.withdrawnFromFinals,
+              disqualified: event.disqualified,
+              scrubbedAt: event.scrubbedAt,
+            },
+          );
+          break;
+        }
+        case "COMPETITOR_RESULT_UPDATED": {
+          const event = competitorResultUpdatedEventSchema.parse(
+            JSON.parse(e.data),
+          );
+
+          if (event.competitorId !== currentCompetitorId) {
+            return;
+          }
+
+          updateCompetitorResultInQueryCache(queryClient, currentCompetitorId, {
+            competitorId: event.competitorId,
+            timestamp: event.timestamp,
+            score: event.score,
+            placement: event.placement,
+            rankOrder: event.rankOrder,
+            finalist: event.finalist,
+          });
+          break;
+        }
+      }
+    });
+
+    return () => unsubscribeEvents(subscriptionId);
+  };
 
   let withdrawFromFinalsToggle: WaSwitch | undefined = $state();
   let categorySelect: WaSelect | undefined = $state();
@@ -118,7 +247,7 @@
 </script>
 
 {#if competitor && categories && competition}
-  <wa-breadcrumb>
+  <wa-breadcrumb {@attach attachCompetitorEvents}>
     <wa-breadcrumb-item
       onclick={() =>
         navigate(
@@ -192,10 +321,26 @@
         Open scorecard
       </a>
 
-      <span class="registration-code">
-        <RegistrationCode code={competitor.registrationCode} />
-        <wa-copy-button value={competitor.registrationCode}></wa-copy-button>
-      </span>
+      <wa-button
+        id={qrCodeButtonId}
+        appearance="plain"
+        variant="neutral"
+        size="s"
+        aria-label="Show registration QR code"
+      >
+        <wa-icon name="qrcode"></wa-icon>
+      </wa-button>
+
+      <wa-popover for={qrCodeButtonId} placement="bottom-end">
+        <div class="qr-code">
+          <QrCode registrationCode={competitor.registrationCode} width={200}
+          ></QrCode>
+        </div>
+        <span class="code">
+          <RegistrationCode code={competitor.registrationCode} />
+          <wa-copy-button value={competitor.registrationCode}></wa-copy-button>
+        </span>
+      </wa-popover>
     </div>
 
     <section>
@@ -392,12 +537,27 @@
     gap: var(--wa-space-s);
   }
 
-  .registration-code {
-    display: grid;
-    grid-template-columns: 1fr max-content;
-    align-items: center;
-    font-family: monospace;
-    font-size: var(--wa-font-size-m);
+  wa-popover {
+    &::part(body) {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--wa-space-s);
+    }
+
+    .qr-code {
+      padding: var(--wa-space-s);
+      background: white;
+      line-height: 0;
+    }
+
+    .code {
+      display: grid;
+      grid-template-columns: 1fr max-content;
+      align-items: center;
+      font-family: monospace;
+      font-size: var(--wa-font-size-m);
+    }
   }
 
   .entered {
