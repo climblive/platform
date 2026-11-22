@@ -29,7 +29,6 @@
     competitorPublicInfoUpdatedEventSchema,
     competitorResultUpdatedEventSchema,
     pointValueUpdatedEventSchema,
-    type Competitor,
     type EventFilter,
     type Tick,
   } from "@climblive/lib/models";
@@ -41,6 +40,7 @@
     removeTickFromQueryCache,
     scrubCompetitorMutation,
     updateCompetitorPublicInfoInQueryCache,
+    updateCompetitorResultInQueryCache,
     updatePointValueInQueryCache,
     updateTickInQueryCache,
   } from "@climblive/lib/queries";
@@ -170,23 +170,10 @@
             return;
           }
 
-          queryClient.setQueryData<Competitor>(
-            ["competitor", { id: currentCompetitorId }],
-            (competitor) => {
-              if (competitor) {
-                return {
-                  ...competitor,
-                  result: {
-                    competitorId: event.competitorId,
-                    timestamp: event.timestamp,
-                    score: event.score,
-                    placement: event.placement,
-                    rankOrder: event.rankOrder,
-                    finalist: event.finalist,
-                  },
-                };
-              }
-            },
+          updateCompetitorResultInQueryCache(
+            queryClient,
+            currentCompetitorId,
+            event,
           );
           break;
         }

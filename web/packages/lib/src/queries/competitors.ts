@@ -6,7 +6,12 @@ import {
   type QueryKey,
 } from "@tanstack/svelte-query";
 import { ApiClient } from "../Api";
-import type { Competitor, CompetitorPatch, PointValue } from "../models";
+import type {
+  Competitor,
+  CompetitorPatch,
+  PointValue,
+  Result,
+} from "../models";
 import type { CreateCompetitorsArguments } from "../models/rest";
 
 export const getCompetitorQuery = (competitorId: number) =>
@@ -101,6 +106,30 @@ export const updateCompetitorPublicInfoInQueryCache = (
   queryClient.setQueryData<Competitor>(queryKey, (competitor) => {
     if (competitor) {
       return { ...competitor, ...updatedPublicInfo };
+    }
+  });
+};
+
+export const updateCompetitorResultInQueryCache = (
+  queryClient: QueryClient,
+  competitorId: number,
+  updatedResult: Result,
+) => {
+  const queryKey: QueryKey = ["competitor", { id: competitorId }];
+
+  queryClient.setQueryData<Competitor>(queryKey, (competitor) => {
+    if (competitor) {
+      return {
+        ...competitor,
+        result: {
+          competitorId: updatedResult.competitorId,
+          timestamp: updatedResult.timestamp,
+          score: updatedResult.score,
+          placement: updatedResult.placement,
+          rankOrder: updatedResult.rankOrder,
+          finalist: updatedResult.finalist,
+        },
+      };
     }
   });
 };
