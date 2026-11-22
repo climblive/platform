@@ -23,7 +23,7 @@ export const describeCompetitionRules = (rules: CompetitionRules): string[] => {
   }
 
   if (rules.pooledPoints) {
-    descriptions.push("Points shared among problem finishers");
+    descriptions.push("Points are pooled");
   }
 
   if (rules.pointDeduction > 0) {

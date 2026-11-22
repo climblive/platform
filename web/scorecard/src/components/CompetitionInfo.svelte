@@ -62,9 +62,12 @@
   {#if ruleDescriptions.length > 0}
     <div class="rules">
       <strong>Rules</strong>
-      <ul>
+      <ul role="list">
         {#each ruleDescriptions as description (description)}
-          <li>{description}</li>
+          <li>
+            <wa-icon name="dice" aria-hidden="true"></wa-icon>
+            <span>{description}</span>
+          </li>
         {/each}
       </ul>
     </div>
@@ -137,7 +140,18 @@
 
     ul {
       margin: 0;
-      padding-inline-start: var(--wa-space-l);
+      padding: 0;
+      list-style: none;
+    }
+
+    li {
+      display: flex;
+      align-items: baseline;
+      gap: var(--wa-space-xs);
+    }
+
+    wa-icon {
+      flex-shrink: 0;
     }
   }
 
