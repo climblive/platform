@@ -1,6 +1,7 @@
 <script lang="ts">
   import { FullLogo } from "@climblive/lib/components";
   import type { Category, Problem } from "@climblive/lib/models";
+  import { localizedPointsValue } from "@climblive/lib/utils";
   import { onMount, tick } from "svelte";
 
   interface Props {
@@ -10,6 +11,12 @@
   }
 
   const { competitionName, categories, problems }: Props = $props();
+
+  const hasZone1 = (problem: Problem) =>
+    problem.zone1Enabled && (problem.pointsZone1 ?? 0) > 0;
+  const hasZone2 = (problem: Problem) =>
+    problem.zone2Enabled && (problem.pointsZone2 ?? 0) > 0;
+  const hasFlash = (problem: Problem) => (problem.flashBonus ?? 0) > 0;
 
   let rowsPerColumn = $state(24);
   let tableContainers = $state<HTMLDivElement[]>([]);
@@ -70,6 +77,14 @@
   });
 </script>
 
+{#snippet achievement(points: number)}
+  {@const value = localizedPointsValue(points)}
+  <span class="achievement">
+    <span class="checkbox" aria-hidden="true"></span>
+    <span style:font-size={`${Math.min(7, 48 / value.length)}pt`}>{value}</span>
+  </span>
+{/snippet}
+
 {#each pages as columns, pageIndex (pageIndex)}
   <section class="sheet" aria-label={`Scorecard page ${pageIndex + 1}`}>
     <header>
@@ -98,8 +113,9 @@
     <div class="problem-tables" bind:this={tableContainers[pageIndex]}>
       {#each columns as column, columnIndex (columnIndex)}
         {#if column.length > 0}
-          {@const zone1 = column.some((problem) => problem.zone1Enabled)}
-          {@const zone2 = column.some((problem) => problem.zone2Enabled)}
+          {@const zone1 = column.some(hasZone1)}
+          {@const zone2 = column.some(hasZone2)}
+          {@const flash = column.some(hasFlash)}
           <table
             aria-label={`Problems ${column[0].number}–${column[column.length - 1].number}`}
           >
@@ -109,53 +125,49 @@
                 {#if zone1}<th scope="col">Z1</th>{/if}
                 {#if zone2}<th scope="col">Z2</th>{/if}
                 <th scope="col">Top</th>
-                <th scope="col">Flash</th>
+                {#if flash}<th scope="col">Flash</th>{/if}
               </tr>
             </thead>
             <tbody>
               {#each column as problem (problem.id)}
+                {@const zone1Available = hasZone1(problem)}
+                {@const zone2Available = hasZone2(problem)}
                 <tr>
                   <th scope="row">{problem.number}</th>
                   {#if zone1}
                     <td
-                      aria-label={problem.zone1Enabled
-                        ? "Zone 1"
-                        : "Not available"}
+                      aria-label={zone1Available ? "Zone 1" : "Not available"}
                     >
-                      {#if problem.zone1Enabled}
-                        <span class="achievement">
-                          <span class="checkbox" aria-hidden="true"></span>
-                          <span>{problem.pointsZone1 ?? 0}p</span>
-                        </span>
+                      {#if zone1Available}
+                        {@render achievement(problem.pointsZone1 ?? 0)}
                       {:else}—{/if}
                     </td>
                   {/if}
                   {#if zone2}
                     <td
-                      aria-label={problem.zone2Enabled
-                        ? "Zone 2"
-                        : "Not available"}
+                      aria-label={zone2Available ? "Zone 2" : "Not available"}
                     >
-                      {#if problem.zone2Enabled}
-                        <span class="achievement">
-                          <span class="checkbox" aria-hidden="true"></span>
-                          <span>{problem.pointsZone2 ?? 0}p</span>
-                        </span>
+                      {#if zone2Available}
+                        {@render achievement(problem.pointsZone2 ?? 0)}
                       {:else}—{/if}
                     </td>
                   {/if}
                   <td aria-label="Top">
-                    <span class="achievement">
-                      <span class="checkbox" aria-hidden="true"></span>
-                      <span>{problem.pointsTop}p</span>
-                    </span>
+                    {#if problem.pointsTop > 0}
+                      {@render achievement(problem.pointsTop)}
+                    {:else}—{/if}
                   </td>
-                  <td aria-label="Flash">
-                    <span class="achievement">
-                      <span class="checkbox" aria-hidden="true"></span>
-                      <span>+{problem.flashBonus ?? 0}p</span>
-                    </span>
-                  </td>
+                  {#if flash}
+                    <td
+                      aria-label={hasFlash(problem) ? "Flash" : "Not available"}
+                    >
+                      {#if hasFlash(problem)}
+                        {@render achievement(
+                          problem.pointsTop + (problem.flashBonus ?? 0),
+                        )}
+                      {:else}—{/if}
+                    </td>
+                  {/if}
                 </tr>
               {/each}
             </tbody>
@@ -258,7 +270,7 @@
     gap: 0.5mm;
     font-size: 7pt;
     line-height: 1;
-    overflow-wrap: anywhere;
+    white-space: nowrap;
   }
 
   p {
