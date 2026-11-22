@@ -147,7 +147,7 @@
     li {
       display: flex;
       align-items: center;
-      gap: var(--wa-space-xs);
+      gap: var(--wa-space-2xs);
     }
 
     wa-icon {
