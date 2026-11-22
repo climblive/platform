@@ -146,7 +146,7 @@
 
     li {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: var(--wa-space-xs);
     }
 
