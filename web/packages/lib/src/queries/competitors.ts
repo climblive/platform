@@ -39,7 +39,19 @@ export const patchCompetitorMutation = (competitorId: number) => {
       ApiClient.getInstance().patchCompetitor(competitorId, patch),
     onSuccess: (updatedCompetitor) => {
       const queryKey: QueryKey = ["competitor", { id: competitorId }];
-      client.setQueryData<Competitor>(queryKey, updatedCompetitor);
+      client.setQueryData<Competitor>(queryKey, (competitor) => {
+        const currentResult = competitor?.result;
+
+        if (
+          currentResult &&
+          (!updatedCompetitor.result ||
+            currentResult.timestamp > updatedCompetitor.result.timestamp)
+        ) {
+          return { ...updatedCompetitor, result: currentResult };
+        }
+
+        return updatedCompetitor;
+      });
     },
   }));
 };
