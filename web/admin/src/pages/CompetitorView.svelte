@@ -170,11 +170,14 @@
             return;
           }
 
-          updateCompetitorResultInQueryCache(
-            queryClient,
-            currentCompetitorId,
-            event,
-          );
+          updateCompetitorResultInQueryCache(queryClient, currentCompetitorId, {
+            competitorId: event.competitorId,
+            timestamp: event.timestamp,
+            score: event.score,
+            placement: event.placement,
+            rankOrder: event.rankOrder,
+            finalist: event.finalist,
+          });
           break;
         }
       }

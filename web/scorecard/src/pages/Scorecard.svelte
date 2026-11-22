@@ -303,7 +303,14 @@
               updateCompetitorResultInQueryCache(
                 queryClient,
                 event.competitorId,
-                event,
+                {
+                  competitorId: event.competitorId,
+                  timestamp: event.timestamp,
+                  score: event.score,
+                  placement: event.placement,
+                  rankOrder: event.rankOrder,
+                  finalist: event.finalist,
+                },
               );
             }
           }

@@ -119,17 +119,7 @@ export const updateCompetitorResultInQueryCache = (
 
   queryClient.setQueryData<Competitor>(queryKey, (competitor) => {
     if (competitor) {
-      return {
-        ...competitor,
-        result: {
-          competitorId: updatedResult.competitorId,
-          timestamp: updatedResult.timestamp,
-          score: updatedResult.score,
-          placement: updatedResult.placement,
-          rankOrder: updatedResult.rankOrder,
-          finalist: updatedResult.finalist,
-        },
-      };
+      return { ...competitor, result: updatedResult };
     }
   });
 };
