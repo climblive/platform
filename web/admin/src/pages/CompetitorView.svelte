@@ -21,19 +21,35 @@
     LabeledText,
     RegistrationCode,
     Score,
+    useEvents,
   } from "@climblive/lib/components";
   import { checked, value } from "@climblive/lib/forms";
+  import {
+    ascentDeregisteredEventSchema,
+    ascentRegisteredEventSchema,
+    competitorPublicInfoUpdatedEventSchema,
+    competitorResultUpdatedEventSchema,
+    pointValueUpdatedEventSchema,
+    type EventFilter,
+    type Tick,
+  } from "@climblive/lib/models";
   import {
     getCategoriesQuery,
     getCompetitorQuery,
     getCompetitionQuery,
     patchCompetitorMutation,
+    removeTickFromQueryCache,
     scrubCompetitorMutation,
+    updateCompetitorPublicInfoInQueryCache,
+    updateCompetitorResultInQueryCache,
+    updatePointValueInQueryCache,
+    updateTickInQueryCache,
   } from "@climblive/lib/queries";
   import {
     ordinalSuperscript,
     toastUnexpectedError,
   } from "@climblive/lib/utils";
+  import { useQueryClient } from "@tanstack/svelte-query";
   import { format } from "date-fns";
   import { navigate } from "svelte-routing";
 
@@ -43,6 +59,9 @@
 
   let { competitorId }: Props = $props();
   const qrCodeButtonId = $props.id();
+
+  const queryClient = useQueryClient();
+  const { subscribeEvents, unsubscribeEvents } = useEvents();
 
   const competitorQuery = $derived(getCompetitorQuery(competitorId));
   const patchCompetitor = $derived(patchCompetitorMutation(competitorId));
@@ -60,6 +79,114 @@
     competitionId ? getCompetitionQuery(competitionId) : undefined,
   );
   const competition = $derived(competitionQuery?.data);
+
+  const attachCompetitorEvents = () => {
+    const currentCompetitorId = competitorId;
+    const filters: EventFilter[] = [
+      {
+        competitionId,
+        competitorId: currentCompetitorId,
+        eventTypes: {
+          ASCENT_REGISTERED: {},
+          ASCENT_DEREGISTERED: {},
+          POINT_VALUE_UPDATED: {},
+          COMPETITOR_PUBLIC_INFO_UPDATED: {},
+          COMPETITOR_RESULT_UPDATED: {},
+        },
+      },
+    ];
+
+    const subscriptionId = subscribeEvents(filters, (eventName, e) => {
+      switch (eventName) {
+        case "ASCENT_REGISTERED": {
+          const event = ascentRegisteredEventSchema.parse(JSON.parse(e.data));
+
+          if (event.competitorId !== currentCompetitorId) {
+            return;
+          }
+
+          const tick: Tick = {
+            id: event.tickId,
+            timestamp: event.timestamp,
+            revision: event.revision,
+            problemId: event.problemId,
+            zone1: event.zone1,
+            attemptsZone1: event.attemptsZone1,
+            zone2: event.zone2,
+            attemptsZone2: event.attemptsZone2,
+            top: event.top,
+            attemptsTop: event.attemptsTop,
+          };
+
+          updateTickInQueryCache(queryClient, currentCompetitorId, tick);
+          break;
+        }
+        case "ASCENT_DEREGISTERED": {
+          const event = ascentDeregisteredEventSchema.parse(JSON.parse(e.data));
+
+          if (event.competitorId !== currentCompetitorId) {
+            return;
+          }
+
+          removeTickFromQueryCache(queryClient, event.tickId);
+          break;
+        }
+        case "POINT_VALUE_UPDATED": {
+          const event = pointValueUpdatedEventSchema.parse(JSON.parse(e.data));
+
+          if (event.competitorId !== currentCompetitorId) {
+            return;
+          }
+
+          updatePointValueInQueryCache(queryClient, currentCompetitorId, event);
+          break;
+        }
+        case "COMPETITOR_PUBLIC_INFO_UPDATED": {
+          const event = competitorPublicInfoUpdatedEventSchema.parse(
+            JSON.parse(e.data),
+          );
+
+          if (event.competitorId !== currentCompetitorId) {
+            return;
+          }
+
+          updateCompetitorPublicInfoInQueryCache(
+            queryClient,
+            currentCompetitorId,
+            {
+              categoryId: event.categoryId,
+              name: event.name,
+              withdrawnFromFinals: event.withdrawnFromFinals,
+              disqualified: event.disqualified,
+              scrubbedAt: event.scrubbedAt,
+            },
+          );
+          break;
+        }
+        case "COMPETITOR_RESULT_UPDATED": {
+          const event = competitorResultUpdatedEventSchema.parse(
+            JSON.parse(e.data),
+          );
+
+          if (event.competitorId !== currentCompetitorId) {
+            return;
+          }
+
+          updateCompetitorResultInQueryCache(queryClient, currentCompetitorId, {
+            competitorId: event.competitorId,
+            timestamp: event.timestamp,
+            score: event.score,
+            placement: event.placement,
+            rankOrder: event.rankOrder,
+            finalist: event.finalist,
+          });
+          break;
+        }
+      }
+    });
+
+    return () => unsubscribeEvents(subscriptionId);
+  };
 
   let withdrawFromFinalsToggle: WaSwitch | undefined = $state();
   let categorySelect: WaSelect | undefined = $state();
@@ -120,7 +247,7 @@
 </script>
 
 {#if competitor && categories && competition}
-  <wa-breadcrumb>
+  <wa-breadcrumb {@attach attachCompetitorEvents}>
     <wa-breadcrumb-item
       onclick={() =>
         navigate(

@@ -46,6 +46,7 @@
     refetchProblems,
     removeTickFromQueryCache,
     updateCompetitorPublicInfoInQueryCache,
+    updateCompetitorResultInQueryCache,
     updatePointValueInQueryCache,
     updateRulesInQueryCache,
     updateTickInQueryCache,
@@ -74,11 +75,11 @@
   let tabGroup: WaTabGroup | undefined = $state();
   let raffleWinnerDialog: WaDialog | undefined = $state();
   let subscriptionId: symbol | undefined;
-  let score: string = $state(NO_SCORE);
-  let placement: number | undefined = $state();
-  let finalist: boolean = $state(false);
 
   let competitor = $derived(competitorQuery.data);
+  const score = $derived(competitor?.result?.score ?? NO_SCORE);
+  const placement = $derived(competitor?.result?.placement);
+  const finalist = $derived(competitor?.result?.finalist ?? false);
   let competition = $derived(competitionQuery.data);
   let categories = $derived(categoriesQuery.data);
   let ticks = $derived(ticksQuery.data);
@@ -219,14 +220,6 @@
     );
   });
 
-  $effect(() => {
-    if (competitor) {
-      score = competitor.result?.score ?? NO_SCORE;
-      placement = competitor.result?.placement;
-      finalist = competitor.result?.finalist ?? false;
-    }
-  });
-
   const handleShowTab = ({ detail }: WaTabShowEvent) => {
     if (detail.name === "results") {
       resultsConnected = true;
@@ -307,9 +300,18 @@
             );
 
             if (event.competitorId === competitor?.id) {
-              score = event.score;
-              placement = event.placement;
-              finalist = event.finalist;
+              updateCompetitorResultInQueryCache(
+                queryClient,
+                event.competitorId,
+                {
+                  competitorId: event.competitorId,
+                  timestamp: event.timestamp,
+                  score: event.score,
+                  placement: event.placement,
+                  rankOrder: event.rankOrder,
+                  finalist: event.finalist,
+                },
+              );
             }
           }
           break;
