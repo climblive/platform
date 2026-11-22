@@ -10,10 +10,10 @@
 </script>
 
 <section>
-  <p>
+  <div>
     <strong>{label}</strong>
     {@render children?.()}
-  </p>
+  </div>
 </section>
 
 <style>
@@ -25,7 +25,7 @@
     color: var(--wa-color-text-quiet);
   }
 
-  p {
+  div {
     margin: 0;
   }
 </style>
