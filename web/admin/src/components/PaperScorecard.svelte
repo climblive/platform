@@ -2,7 +2,7 @@
   import { FullLogo } from "@climblive/lib/components";
   import type { Category, Problem } from "@climblive/lib/models";
   import { localizedPointsValue } from "@climblive/lib/utils";
-  import { onMount, tick } from "svelte";
+  import { flushSync, onMount } from "svelte";
 
   interface Props {
     competitionName: string;
@@ -17,6 +17,9 @@
   const hasZone2 = (problem: Problem) =>
     problem.zone2Enabled && (problem.pointsZone2 ?? 0) > 0;
   const hasFlash = (problem: Problem) => (problem.flashBonus ?? 0) > 0;
+
+  const zone1 = $derived(problems.some(hasZone1));
+  const zone2 = $derived(problems.some(hasZone2));
 
   let rowsPerColumn = $state(24);
   let tableContainers = $state<HTMLDivElement[]>([]);
@@ -53,23 +56,19 @@
     }
 
     const availableHeight =
-      container.clientHeight - heading.getBoundingClientRect().height - 1;
+      container.clientHeight - heading.getBoundingClientRect().height - 2;
     rowsPerColumn = Math.max(
       1,
       Math.floor(availableHeight / row.getBoundingClientRect().height),
     );
   };
 
-  export const preparePrint = async () => {
-    updateRowsPerColumn();
-    await tick();
-  };
+  export const preparePrint = () => flushSync(updateRowsPerColumn);
 
   onMount(() => {
     const observer = new ResizeObserver(updateRowsPerColumn);
     observer.observe(tableContainers[0]);
     updateRowsPerColumn();
-
     return () => observer.disconnect();
   });
 </script>
@@ -77,7 +76,7 @@
 {#snippet achievement(points: number)}
   {@const value = localizedPointsValue(points)}
   <span class="achievement">
-    <span class="checkbox" aria-hidden="true"></span>
+    <span class="checkbox"></span>
     <span style:font-size={`${Math.min(6.5, 48 / value.length)}pt`}
       >{value}</span
     >
@@ -85,36 +84,28 @@
 {/snippet}
 
 {#each pages as columns, pageIndex (pageIndex)}
-  <section class="sheet" aria-label={`Scorecard page ${pageIndex + 1}`}>
+  <section class="sheet">
     <header>
-      <div class="logo" role="img" aria-label="ClimbLive"><FullLogo /></div>
+      <div class="logo"><FullLogo /></div>
       <h1>{competitionName}</h1>
       <div class="name">Name <span class="writing-line"></span></div>
       <div class="categories">
         <strong>Category</strong>
         {#each categories as category (category.id)}
           <span class="category">
-            <span class="checkbox" aria-hidden="true"></span>{category.name}
+            <span class="checkbox"></span>{category.name}
           </span>
         {:else}
           <span class="writing-line"></span>
         {/each}
       </div>
-      <p>
-        Tick only your highest achievement for each problem. Flash = top on the
-        first attempt. Leave unclimbed problems blank.
-      </p>
     </header>
 
     <div class="problem-tables" bind:this={tableContainers[pageIndex]}>
       {#each columns as column, columnIndex (columnIndex)}
         {#if column.length > 0}
-          {@const zone1 = column.some(hasZone1)}
-          {@const zone2 = column.some(hasZone2)}
           {@const flash = column.some(hasFlash)}
-          <table
-            aria-label={`Problems ${column[0].number}–${column[column.length - 1].number}`}
-          >
+          <table>
             <thead>
               <tr>
                 <th scope="col">No.</th>
@@ -131,32 +122,26 @@
                 <tr>
                   <th scope="row">{problem.number}</th>
                   {#if zone1}
-                    <td
-                      aria-label={zone1Available ? "Zone 1" : "Not available"}
-                    >
+                    <td>
                       {#if zone1Available}
                         {@render achievement(problem.pointsZone1 ?? 0)}
                       {:else}—{/if}
                     </td>
                   {/if}
                   {#if zone2}
-                    <td
-                      aria-label={zone2Available ? "Zone 2" : "Not available"}
-                    >
+                    <td>
                       {#if zone2Available}
                         {@render achievement(problem.pointsZone2 ?? 0)}
                       {:else}—{/if}
                     </td>
                   {/if}
-                  <td aria-label="Top">
+                  <td>
                     {#if problem.pointsTop > 0}
                       {@render achievement(problem.pointsTop)}
                     {:else}—{/if}
                   </td>
                   {#if flash}
-                    <td
-                      aria-label={hasFlash(problem) ? "Flash" : "Not available"}
-                    >
+                    <td>
                       {#if hasFlash(problem)}
                         {@render achievement(
                           problem.pointsTop + (problem.flashBonus ?? 0),
@@ -182,7 +167,7 @@
   .sheet {
     width: 190mm;
     height: 276mm;
-    margin: 0 auto var(--wa-space-l);
+    margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
@@ -247,6 +232,7 @@
     height: 3.5mm;
     flex-shrink: 0;
     border: 0.25mm solid black;
+    border-radius: 0.5mm;
     vertical-align: middle;
   }
 
@@ -261,11 +247,6 @@
     white-space: nowrap;
   }
 
-  p {
-    margin: 0;
-    font-size: 9pt;
-  }
-
   .problem-tables {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -278,7 +259,11 @@
   table {
     width: 100%;
     table-layout: fixed;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 0.25mm solid black;
+    border-radius: 1mm;
+    overflow: hidden;
     font-size: 9pt;
   }
 
@@ -286,9 +271,18 @@
   td {
     height: 8mm;
     padding: 0 1mm;
-    border: 0.25mm solid black;
+    border-inline-end: 0.25mm solid black;
+    border-block-end: 0.25mm solid black;
     text-align: center;
     vertical-align: middle;
+  }
+
+  tr > :last-child {
+    border-inline-end: 0;
+  }
+
+  tbody tr:last-child > * {
+    border-block-end: 0;
   }
 
   footer {
@@ -296,10 +290,8 @@
     justify-content: flex-end;
     font-size: 8pt;
   }
-
   @media print {
     .sheet {
-      margin: 0;
       break-after: page;
 
       &:last-child {

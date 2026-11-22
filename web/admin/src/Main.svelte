@@ -113,9 +113,7 @@
     </Route>
     <Route path="/competitions/:competitionId/scorecard/print">
       {#snippet children({ params }: { params: { competitionId: number } })}
-        {#key params.competitionId}
-          <PrintableScorecard competitionId={Number(params.competitionId)} />
-        {/key}
+        <PrintableScorecard competitionId={Number(params.competitionId)} />
       {/snippet}
     </Route>
     <Route path="/competitors/:competitorId">

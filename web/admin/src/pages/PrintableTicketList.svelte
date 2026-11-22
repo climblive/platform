@@ -44,8 +44,7 @@
   {#if !competition || !competitors}
     <Loader />
   {:else}
-    <PrintPrompt readyTitle="Your tickets are ready" />
-    <div class="tickets">
+    <PrintPrompt readyTitle="Your tickets are ready">
       {#each competitors as competitor (competitor.id)}
         <Ticket
           competitionName={competition.name}
@@ -53,24 +52,6 @@
           ticketNumber={competitor.id}
         />
       {/each}
-    </div>
+    </PrintPrompt>
   {/if}
 </main>
-
-<style>
-  .tickets {
-    display: none;
-    page: tickets;
-  }
-
-  @media print {
-    .tickets {
-      display: block;
-    }
-  }
-
-  @page tickets {
-    size: a4 portrait;
-    margin: 2cm;
-  }
-</style>
