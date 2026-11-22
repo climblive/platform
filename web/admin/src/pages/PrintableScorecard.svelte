@@ -1,8 +1,8 @@
 <script lang="ts">
   import Loader from "@/components/Loader.svelte";
   import PaperScorecard from "@/components/PaperScorecard.svelte";
+  import PrintPrompt from "@/components/PrintPrompt.svelte";
   import "@awesome.me/webawesome/dist/components/button/button.js";
-  import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import { EmptyState } from "@climblive/lib/components";
   import {
     getCategoriesQuery,
@@ -34,12 +34,6 @@
   });
 
   let scorecard: PaperScorecard | undefined = $state();
-
-  const handlePrint = async () => {
-    await document.fonts.ready;
-    await scorecard?.preparePrint();
-    window.print();
-  };
 </script>
 
 <svelte:head>
@@ -68,18 +62,10 @@
     />
   </div>
 {:else}
-  <section class="print-prompt">
-    <h1>Paper scorecard</h1>
-    <p>
-      Print as many blank copies as you need. Use A4 at 100% scale and turn off
-      browser headers and footers. For multiple pages, you can print
-      double-sided.
-    </p>
-    <wa-button variant="brand" onclick={handlePrint}>
-      <wa-icon slot="start" name="print"></wa-icon>
-      Print
-    </wa-button>
-  </section>
+  <PrintPrompt
+    readyTitle="Your scorecard is ready"
+    preparePrint={() => scorecard?.preparePrint()}
+  />
   <div class="print-content">
     <PaperScorecard
       bind:this={scorecard}
@@ -94,16 +80,13 @@
   .print-prompt {
     margin-block-end: var(--wa-space-xl);
     text-align: center;
-
-    & p {
-      color: var(--wa-color-text-quiet);
-    }
   }
 
   .print-content {
     position: absolute;
     inset-inline-start: -10000px;
     visibility: hidden;
+    page: scorecard;
   }
 
   @media print {
@@ -126,7 +109,7 @@
     }
   }
 
-  @page {
+  @page scorecard {
     size: a4 portrait;
     margin: 10mm;
   }

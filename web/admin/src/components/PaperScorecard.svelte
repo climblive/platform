@@ -31,13 +31,10 @@
 
     for (let start = 0; start < sortedProblems.length; start += capacity) {
       const page = sortedProblems.slice(start, start + capacity);
-      const columnLength = Math.ceil(page.length / 3);
-      const columns: Problem[][] = [];
+      const columns: Problem[][] = [[], [], []];
 
-      for (let column = 0; column < 3; column++) {
-        columns.push(
-          page.slice(column * columnLength, (column + 1) * columnLength),
-        );
+      for (let index = 0; index < page.length; index++) {
+        columns[index % 3].push(page[index]);
       }
 
       pages.push(columns);
@@ -81,17 +78,16 @@
   {@const value = localizedPointsValue(points)}
   <span class="achievement">
     <span class="checkbox" aria-hidden="true"></span>
-    <span style:font-size={`${Math.min(7, 48 / value.length)}pt`}>{value}</span>
+    <span style:font-size={`${Math.min(6.5, 48 / value.length)}pt`}
+      >{value}</span
+    >
   </span>
 {/snippet}
 
 {#each pages as columns, pageIndex (pageIndex)}
   <section class="sheet" aria-label={`Scorecard page ${pageIndex + 1}`}>
     <header>
-      <div class="brand">
-        <div class="logo" role="img" aria-label="ClimbLive"><FullLogo /></div>
-        <span>Paper scorecard</span>
-      </div>
+      <div class="logo" role="img" aria-label="ClimbLive"><FullLogo /></div>
       <h1>{competitionName}</h1>
       <div class="name">Name <span class="writing-line"></span></div>
       <div class="categories">
@@ -177,7 +173,6 @@
     </div>
 
     <footer>
-      <span>Return your scorecard to the organizer.</span>
       <span>Page {pageIndex + 1} of {pages.length}</span>
     </footer>
   </section>
@@ -202,13 +197,6 @@
   header {
     display: flex;
     flex-direction: column;
-    gap: 4mm;
-  }
-
-  .brand {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     gap: 4mm;
   }
 
@@ -268,7 +256,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.5mm;
-    font-size: 7pt;
+    font-size: 6.5pt;
     line-height: 1;
     white-space: nowrap;
   }
@@ -305,8 +293,7 @@
 
   footer {
     display: flex;
-    justify-content: space-between;
-    gap: 4mm;
+    justify-content: flex-end;
     font-size: 8pt;
   }
 
