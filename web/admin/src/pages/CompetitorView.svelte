@@ -10,6 +10,7 @@
   import "@awesome.me/webawesome/dist/components/divider/divider.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
   import "@awesome.me/webawesome/dist/components/option/option.js";
+  import "@awesome.me/webawesome/dist/components/popover/popover.js";
   import "@awesome.me/webawesome/dist/components/select/select.js";
   import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
   import "@awesome.me/webawesome/dist/components/switch/switch.js";
@@ -41,6 +42,7 @@
   }
 
   let { competitorId }: Props = $props();
+  const qrCodeButtonId = $props.id();
 
   const competitorQuery = $derived(getCompetitorQuery(competitorId));
   const patchCompetitor = $derived(patchCompetitorMutation(competitorId));
@@ -192,10 +194,29 @@
         Open scorecard
       </a>
 
-      <span class="registration-code">
-        <RegistrationCode code={competitor.registrationCode} />
-        <wa-copy-button value={competitor.registrationCode}></wa-copy-button>
-      </span>
+      <wa-button
+        id={qrCodeButtonId}
+        appearance="plain"
+        variant="neutral"
+        size="s"
+        aria-label="Show registration QR code"
+      >
+        <wa-icon name="qrcode"></wa-icon>
+      </wa-button>
+
+      <wa-popover for={qrCodeButtonId} placement="bottom-end">
+        <div class="registration-details">
+          <div class="registration-qr-code">
+            <QrCode registrationCode={competitor.registrationCode} width={200}
+            ></QrCode>
+          </div>
+          <span class="registration-code">
+            <RegistrationCode code={competitor.registrationCode} />
+            <wa-copy-button value={competitor.registrationCode}
+            ></wa-copy-button>
+          </span>
+        </div>
+      </wa-popover>
     </div>
 
     <section>
@@ -390,6 +411,19 @@
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-s);
+  }
+
+  .registration-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--wa-space-s);
+  }
+
+  .registration-qr-code {
+    padding: var(--wa-space-s);
+    background: white;
+    line-height: 0;
   }
 
   .registration-code {
