@@ -123,7 +123,10 @@
                         : "Not available"}
                     >
                       {#if problem.zone1Enabled}
-                        <span class="checkbox" aria-hidden="true"></span>
+                        <span class="achievement">
+                          <span class="checkbox" aria-hidden="true"></span>
+                          <span>{problem.pointsZone1 ?? 0}p</span>
+                        </span>
                       {:else}—{/if}
                     </td>
                   {/if}
@@ -134,16 +137,25 @@
                         : "Not available"}
                     >
                       {#if problem.zone2Enabled}
-                        <span class="checkbox" aria-hidden="true"></span>
+                        <span class="achievement">
+                          <span class="checkbox" aria-hidden="true"></span>
+                          <span>{problem.pointsZone2 ?? 0}p</span>
+                        </span>
                       {:else}—{/if}
                     </td>
                   {/if}
-                  <td aria-label="Top"
-                    ><span class="checkbox" aria-hidden="true"></span></td
-                  >
-                  <td aria-label="Flash"
-                    ><span class="checkbox" aria-hidden="true"></span></td
-                  >
+                  <td aria-label="Top">
+                    <span class="achievement">
+                      <span class="checkbox" aria-hidden="true"></span>
+                      <span>{problem.pointsTop}p</span>
+                    </span>
+                  </td>
+                  <td aria-label="Flash">
+                    <span class="achievement">
+                      <span class="checkbox" aria-hidden="true"></span>
+                      <span>+{problem.flashBonus ?? 0}p</span>
+                    </span>
+                  </td>
                 </tr>
               {/each}
             </tbody>
@@ -191,7 +203,7 @@
   .logo {
     height: 8mm;
     flex-shrink: 0;
-    filter: grayscale(1);
+    print-color-adjust: exact;
   }
 
   h1 {
@@ -216,7 +228,7 @@
 
   .categories {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     flex-wrap: wrap;
     gap: 3mm 5mm;
   }
@@ -236,6 +248,17 @@
     flex-shrink: 0;
     border: 0.25mm solid black;
     vertical-align: middle;
+  }
+
+  .achievement {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5mm;
+    font-size: 7pt;
+    line-height: 1;
+    overflow-wrap: anywhere;
   }
 
   p {

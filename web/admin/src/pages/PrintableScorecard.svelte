@@ -9,6 +9,7 @@
     getCompetitionQuery,
     getProblemsQuery,
   } from "@climblive/lib/queries";
+  import { untrack } from "svelte";
 
   interface Props {
     competitionId: number;
@@ -16,18 +17,21 @@
 
   const { competitionId }: Props = $props();
 
-  const competitionQuery = $derived(getCompetitionQuery(competitionId));
-  const categoriesQuery = $derived(getCategoriesQuery(competitionId));
-  const problemsQuery = $derived(getProblemsQuery(competitionId));
+  const id = untrack(() => competitionId);
+  const competitionQuery = getCompetitionQuery(id);
+  const categoriesQuery = getCategoriesQuery(id);
+  const problemsQuery = getProblemsQuery(id);
 
-  const competition = $derived(competitionQuery.data);
-  const categories = $derived(categoriesQuery.data);
-  const problems = $derived(problemsQuery.data);
-  const failed = $derived(
-    competitionQuery.isError ||
-      categoriesQuery.isError ||
+  const { competition, categories, problems, failed } = $derived({
+    competition: competitionQuery.data,
+    categories: categoriesQuery.data,
+    problems: problemsQuery.data,
+    failed: [
+      competitionQuery.isError,
+      categoriesQuery.isError,
       problemsQuery.isError,
-  );
+    ].some(Boolean),
+  });
 
   let scorecard: PaperScorecard | undefined = $state();
 
@@ -76,7 +80,7 @@
       Print
     </wa-button>
   </section>
-  <div class="preview">
+  <div class="print-content">
     <PaperScorecard
       bind:this={scorecard}
       competitionName={competition.name}
@@ -96,8 +100,10 @@
     }
   }
 
-  .preview {
-    overflow-x: auto;
+  .print-content {
+    position: absolute;
+    inset-inline-start: -10000px;
+    visibility: hidden;
   }
 
   @media print {
@@ -105,8 +111,9 @@
       display: none;
     }
 
-    .preview {
-      overflow: visible;
+    .print-content {
+      position: static;
+      visibility: visible;
     }
 
     :global(html),
