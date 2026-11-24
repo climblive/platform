@@ -6,20 +6,67 @@ package database
 
 import (
 	"database/sql"
+	"database/sql/driver"
+	"fmt"
 	"time"
 )
 
+type CompClassEligibilityBasis string
+
+const (
+	CompClassEligibilityBasisAge       CompClassEligibilityBasis = "age"
+	CompClassEligibilityBasisBirthYear CompClassEligibilityBasis = "birth_year"
+)
+
+func (e *CompClassEligibilityBasis) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = CompClassEligibilityBasis(s)
+	case string:
+		*e = CompClassEligibilityBasis(s)
+	default:
+		return fmt.Errorf("unsupported scan type for CompClassEligibilityBasis: %T", src)
+	}
+	return nil
+}
+
+type NullCompClassEligibilityBasis struct {
+	CompClassEligibilityBasis CompClassEligibilityBasis
+	Valid                     bool // Valid is true if CompClassEligibilityBasis is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullCompClassEligibilityBasis) Scan(value interface{}) error {
+	if value == nil {
+		ns.CompClassEligibilityBasis, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.CompClassEligibilityBasis.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullCompClassEligibilityBasis) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.CompClassEligibilityBasis), nil
+}
+
 type Category struct {
-	ID            int32
-	OrganizerID   int32
-	CompetitionID int32
-	Name          string
-	Description   sql.NullString
-	MinAge        int32
-	MaxAge        int32
-	Color         sql.NullString
-	TimeBegin     time.Time
-	TimeEnd       time.Time
+	ID               int32
+	OrganizerID      int32
+	CompetitionID    int32
+	Name             string
+	Description      sql.NullString
+	EligibilityBasis CompClassEligibilityBasis
+	MinAge           sql.NullInt32
+	MaxAge           sql.NullInt32
+	MinBirthYear     sql.NullInt32
+	MaxBirthYear     sql.NullInt32
+	Color            sql.NullString
+	TimeBegin        time.Time
+	TimeEnd          time.Time
 }
 
 type Competition struct {

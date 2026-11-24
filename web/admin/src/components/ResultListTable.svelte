@@ -15,7 +15,10 @@
   import { value } from "@climblive/lib/forms";
   import type { ScoreboardEntry } from "@climblive/lib/models";
   import { getCategoriesQuery } from "@climblive/lib/queries";
-  import { formatAgeSpan, ordinalSuperscript } from "@climblive/lib/utils";
+  import {
+    formatCategoryEligibility,
+    ordinalSuperscript,
+  } from "@climblive/lib/utils";
   import { Link } from "svelte-routing";
   import type { Readable } from "svelte/store";
   import Loader from "./Loader.svelte";
@@ -180,8 +183,7 @@
                 <wa-badge pill variant="neutral">{count}</wa-badge>
               {/if}
             </div>
-            <small>Ages {formatAgeSpan(category.minAge, category.maxAge)}</small
-            >
+            <small>{formatCategoryEligibility(category)}</small>
           </wa-option>
         {/each}
       </wa-select>

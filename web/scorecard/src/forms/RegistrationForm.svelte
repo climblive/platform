@@ -8,7 +8,7 @@
   import { type CompetitorPatch } from "@climblive/lib/models";
   import { getCategoriesQuery } from "@climblive/lib/queries";
   import type { CompetitionState } from "@climblive/lib/types";
-  import { formatAgeSpan, z } from "@climblive/lib/utils";
+  import { formatCategoryEligibility, z } from "@climblive/lib/utils";
   import { isAfter } from "date-fns";
   import { getContext, type Snippet } from "svelte";
   import type { Readable } from "svelte/store";
@@ -66,8 +66,7 @@
             label={category.name}
           >
             {category.name}
-            <small>Ages {formatAgeSpan(category.minAge, category.maxAge)}</small
-            >
+            <small>{formatCategoryEligibility(category)}</small>
           </wa-option>
         {/each}
       </wa-select>

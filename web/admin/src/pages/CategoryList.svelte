@@ -13,7 +13,7 @@
   } from "@climblive/lib/components";
   import type { Category } from "@climblive/lib/models";
   import { getCategoriesQuery } from "@climblive/lib/queries";
-  import { formatAgeSpan } from "@climblive/lib/utils";
+  import { formatCategoryEligibility } from "@climblive/lib/utils";
   import { format } from "date-fns";
   import { navigate } from "svelte-routing";
   import DeleteCategory from "./DeleteCategory.svelte";
@@ -43,9 +43,9 @@
       width: "1fr",
     },
     {
-      label: "Ages",
+      label: "Eligibility",
       mobile: true,
-      render: renderAgeSpan,
+      render: renderEligibility,
       width: "max-content",
     },
     {
@@ -73,8 +73,8 @@
   {name}
 {/snippet}
 
-{#snippet renderAgeSpan({ minAge, maxAge }: Category)}
-  {formatAgeSpan(minAge, maxAge)}
+{#snippet renderEligibility(category: Category)}
+  {formatCategoryEligibility(category)}
 {/snippet}
 
 {#snippet renderTimeBegin({ timeBegin }: Category)}

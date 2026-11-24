@@ -1,27 +1,40 @@
 <script lang="ts" module>
+  import { categoryEligibilitySchema } from "@climblive/lib/models";
   import { z } from "@climblive/lib/utils";
 
   const oneMonth = 31 * 24 * 60 * 60 * 1_000;
 
+  const optionalBound = (minimum: number, maximum: number) =>
+    z.preprocess(
+      (value) =>
+        value === undefined ||
+        value === null ||
+        (typeof value === "string" && value.trim() === "")
+          ? null
+          : value,
+      z.coerce.number().int().min(minimum).max(maximum).nullable(),
+    );
+
   export const formSchema = z
     .object({
       name: z.string().min(1),
-      minAge: z.coerce.number().int().nonnegative(),
-      maxAge: z.coerce.number().int().nonnegative(),
+      eligibilityBasis: z.enum(["age", "birth_year"]),
+      minAge: optionalBound(0, 2 ** 31 - 1),
+      maxAge: optionalBound(0, 2 ** 31 - 1),
+      minBirthYear: optionalBound(1, 9999),
+      maxBirthYear: optionalBound(1, 9999),
       timeBegin: z.coerce.date(),
       timeEnd: z.coerce.date(),
     })
+    .pipe(
+      categoryEligibilitySchema.safeExtend({
+        name: z.string().min(1),
+        timeBegin: z.date(),
+        timeEnd: z.date(),
+      }),
+    )
     .check((ctx) => {
       const data = ctx.value;
-
-      if (data.maxAge < data.minAge) {
-        ctx.issues.push({
-          code: "custom",
-          message: "Maximum age must be at least the minimum age",
-          input: data,
-          path: ["maxAge"],
-        });
-      }
 
       if (data.timeEnd.getTime() - data.timeBegin.getTime() > oneMonth) {
         ctx.issues.push({
@@ -47,22 +60,52 @@
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/input/input.js";
   import "@awesome.me/webawesome/dist/components/number-input/number-input.js";
+  import type WaNumberInput from "@awesome.me/webawesome/dist/components/number-input/number-input.js";
+  import "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
+  import type WaRadioGroup from "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
+  import "@awesome.me/webawesome/dist/components/radio/radio.js";
   import type WaInput from "@awesome.me/webawesome/dist/components/input/input.js";
   import { GenericForm, name } from "@climblive/lib/forms";
   import type { Category } from "@climblive/lib/models";
+  import { formatCategoryEligibility } from "@climblive/lib/utils";
   import { addSeconds, format } from "date-fns";
   import { type Snippet } from "svelte";
 
   type T = $$Generic<Partial<Category>>;
 
   interface Props {
-    data: Partial<T>;
+    data: Partial<Category>;
     schema: z.ZodType<T, unknown>;
     submit: (value: T) => void;
     children?: Snippet;
   }
 
   let { data, schema, submit, children }: Props = $props();
+
+  let eligibilityBasis = $derived(data.eligibilityBasis ?? "age");
+  let minAge = $derived(data.minAge?.toString() ?? "");
+  let maxAge = $derived(data.maxAge?.toString() ?? "");
+  let minBirthYear = $derived(data.minBirthYear?.toString() ?? "");
+  let maxBirthYear = $derived(data.maxBirthYear?.toString() ?? "");
+  const eligibilityHintId = $props.id();
+
+  const eligibilityPreview = $derived(
+    categoryEligibilitySchema.safeParse({
+      eligibilityBasis,
+      minAge:
+        eligibilityBasis === "age" && minAge !== "" ? Number(minAge) : null,
+      maxAge:
+        eligibilityBasis === "age" && maxAge !== "" ? Number(maxAge) : null,
+      minBirthYear:
+        eligibilityBasis === "birth_year" && minBirthYear !== ""
+          ? Number(minBirthYear)
+          : null,
+      maxBirthYear:
+        eligibilityBasis === "birth_year" && maxBirthYear !== ""
+          ? Number(maxBirthYear)
+          : null,
+    }),
+  );
 
   let previousTimeBegin = $derived(data.timeBegin);
 
@@ -118,26 +161,97 @@
       value={data.name}
       placeholder="Males or Females"
     ></wa-input>
-    <div class="age-span">
-      <wa-number-input
+    <div class="eligibility">
+      <wa-radio-group
         size="s"
-        {@attach name("minAge")}
-        label="Minimum age"
-        min="0"
-        step="1"
+        label="Define category by"
+        orientation="horizontal"
+        {@attach name("eligibilityBasis")}
+        value={eligibilityBasis}
         required
-        value={data.minAge?.toString()}
-      ></wa-number-input>
-      <span aria-hidden="true">-</span>
-      <wa-number-input
-        size="s"
-        {@attach name("maxAge")}
-        label="Maximum age"
-        min="0"
-        step="1"
-        required
-        value={data.maxAge?.toString()}
-      ></wa-number-input>
+        onchange={(event: Event) => {
+          eligibilityBasis = String(
+            (event.currentTarget as WaRadioGroup).value,
+          );
+        }}
+      >
+        <wa-radio appearance="button" value="age">Age range</wa-radio>
+        <wa-radio appearance="button" value="birth_year">Birth year</wa-radio>
+      </wa-radio-group>
+      <div class="age-span">
+        {#if eligibilityBasis === "age"}
+          <wa-number-input
+            size="s"
+            {@attach name("minAge")}
+            label="Minimum age"
+            placeholder="Any"
+            min="0"
+            max={2 ** 31 - 1}
+            step="1"
+            value={minAge}
+            aria-describedby={eligibilityHintId}
+            oninput={(event: Event) => {
+              minAge = (event.currentTarget as WaNumberInput).value ?? "";
+            }}
+          ></wa-number-input>
+          <span aria-hidden="true">-</span>
+          <wa-number-input
+            size="s"
+            {@attach name("maxAge")}
+            label="Maximum age"
+            placeholder="Any"
+            min="0"
+            max={2 ** 31 - 1}
+            step="1"
+            value={maxAge}
+            aria-describedby={eligibilityHintId}
+            oninput={(event: Event) => {
+              maxAge = (event.currentTarget as WaNumberInput).value ?? "";
+            }}
+          ></wa-number-input>
+        {:else}
+          <wa-number-input
+            size="s"
+            {@attach name("minBirthYear")}
+            label="Earliest birth year"
+            placeholder="Any"
+            min="1"
+            max="9999"
+            step="1"
+            value={minBirthYear}
+            aria-describedby={eligibilityHintId}
+            oninput={(event: Event) => {
+              minBirthYear = (event.currentTarget as WaNumberInput).value ?? "";
+            }}
+          ></wa-number-input>
+          <span aria-hidden="true">-</span>
+          <wa-number-input
+            size="s"
+            {@attach name("maxBirthYear")}
+            label="Latest birth year"
+            placeholder="Any"
+            min="1"
+            max="9999"
+            step="1"
+            value={maxBirthYear}
+            aria-describedby={eligibilityHintId}
+            oninput={(event: Event) => {
+              maxBirthYear = (event.currentTarget as WaNumberInput).value ?? "";
+            }}
+          ></wa-number-input>
+        {/if}
+      </div>
+      <p id={eligibilityHintId} class="hint">
+        {#if eligibilityBasis === "age"}
+          Age is measured at competition start.
+        {/if}
+        Leave either end empty for no limit.
+      </p>
+      <p class="summary" aria-live="polite">
+        {#if eligibilityPreview.success}
+          {formatCategoryEligibility(eligibilityPreview.data)}
+        {/if}
+      </p>
     </div>
     <wa-input
       bind:this={timeBeginInput}
@@ -197,5 +311,22 @@
     span {
       padding-block: var(--wa-space-s);
     }
+  }
+
+  .eligibility {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-s);
+  }
+
+  .hint {
+    margin: 0;
+    color: var(--wa-color-text-quiet);
+    font-size: var(--wa-font-size-s);
+  }
+
+  .summary {
+    margin: 0;
+    min-height: 1lh;
   }
 </style>

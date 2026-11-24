@@ -25,34 +25,50 @@ type OwnershipData struct {
 	CompetitorID *CompetitorID `json:"-"`
 }
 
+type EligibilityBasis string
+
+const (
+	EligibilityBasisAge       EligibilityBasis = "age"
+	EligibilityBasisBirthYear EligibilityBasis = "birth_year"
+)
+
 type Category struct {
-	ID            CategoryID    `json:"id"`
-	Ownership     OwnershipData `json:"-"`
-	CompetitionID CompetitionID `json:"competitionId"`
-	Name          string        `json:"name"`
-	Description   string        `json:"description,omitzero"`
-	MinAge        int           `json:"minAge"`
-	MaxAge        int           `json:"maxAge"`
-	TimeBegin     time.Time     `json:"timeBegin"`
-	TimeEnd       time.Time     `json:"timeEnd"`
+	ID               CategoryID       `json:"id"`
+	Ownership        OwnershipData    `json:"-"`
+	CompetitionID    CompetitionID    `json:"competitionId"`
+	Name             string           `json:"name"`
+	Description      string           `json:"description,omitzero"`
+	EligibilityBasis EligibilityBasis `json:"eligibilityBasis"`
+	MinAge           *int             `json:"minAge" tstype:"number | null,required"`
+	MaxAge           *int             `json:"maxAge" tstype:"number | null,required"`
+	MinBirthYear     *int             `json:"minBirthYear" tstype:"number | null,required"`
+	MaxBirthYear     *int             `json:"maxBirthYear" tstype:"number | null,required"`
+	TimeBegin        time.Time        `json:"timeBegin"`
+	TimeEnd          time.Time        `json:"timeEnd"`
 }
 
 type CategoryTemplate struct {
-	Name        string    `json:"name"`
-	Description string    `json:"description,omitzero"`
-	MinAge      *int      `json:"minAge" tstype:"number,required"`
-	MaxAge      *int      `json:"maxAge" tstype:"number,required"`
-	TimeBegin   time.Time `json:"timeBegin"`
-	TimeEnd     time.Time `json:"timeEnd"`
+	Name             string           `json:"name"`
+	Description      string           `json:"description,omitzero"`
+	EligibilityBasis EligibilityBasis `json:"eligibilityBasis"`
+	MinAge           *int             `json:"minAge" tstype:"number | null"`
+	MaxAge           *int             `json:"maxAge" tstype:"number | null"`
+	MinBirthYear     *int             `json:"minBirthYear" tstype:"number | null"`
+	MaxBirthYear     *int             `json:"maxBirthYear" tstype:"number | null"`
+	TimeBegin        time.Time        `json:"timeBegin"`
+	TimeEnd          time.Time        `json:"timeEnd"`
 }
 
 type CategoryPatch struct {
-	Name        Patch[string]    `json:"name,omitzero" tstype:"string"`
-	Description Patch[string]    `json:"description,omitzero" tstype:"string"`
-	MinAge      Patch[*int]      `json:"minAge,omitzero" tstype:"number"`
-	MaxAge      Patch[*int]      `json:"maxAge,omitzero" tstype:"number"`
-	TimeBegin   Patch[time.Time] `json:"timeBegin,omitzero" tstype:"Date"`
-	TimeEnd     Patch[time.Time] `json:"timeEnd,omitzero" tstype:"Date"`
+	Name             Patch[string]           `json:"name,omitzero" tstype:"string"`
+	Description      Patch[string]           `json:"description,omitzero" tstype:"string"`
+	EligibilityBasis Patch[EligibilityBasis] `json:"eligibilityBasis,omitzero" tstype:"EligibilityBasis"`
+	MinAge           Patch[*int]             `json:"minAge,omitzero" tstype:"number | null"`
+	MaxAge           Patch[*int]             `json:"maxAge,omitzero" tstype:"number | null"`
+	MinBirthYear     Patch[*int]             `json:"minBirthYear,omitzero" tstype:"number | null"`
+	MaxBirthYear     Patch[*int]             `json:"maxBirthYear,omitzero" tstype:"number | null"`
+	TimeBegin        Patch[time.Time]        `json:"timeBegin,omitzero" tstype:"Date"`
+	TimeEnd          Patch[time.Time]        `json:"timeEnd,omitzero" tstype:"Date"`
 }
 
 type Competitor struct {

@@ -642,7 +642,7 @@ test.describe("failsafe mode", () => {
       .pressSequentially("Andy Bernard");
     await page
       .getByRole("combobox", { name: "Category" })
-      .selectOption({ label: "Females (ages 18–99)" });
+      .selectOption({ label: "Females (Ages 18–99)" });
 
     await page.getByRole("button", { name: "Register" }).click();
 

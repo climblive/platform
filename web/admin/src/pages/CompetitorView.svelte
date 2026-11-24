@@ -26,7 +26,10 @@
     getCompetitionQuery,
     patchCompetitorMutation,
   } from "@climblive/lib/queries";
-  import { formatAgeSpan, ordinalSuperscript } from "@climblive/lib/utils";
+  import {
+    formatCategoryEligibility,
+    ordinalSuperscript,
+  } from "@climblive/lib/utils";
   import { format } from "date-fns";
   import { navigate } from "svelte-routing";
 
@@ -240,8 +243,7 @@
         {#each categories as category (category.id)}
           <wa-option value={category.id} label={category.name}>
             {category.name}
-            <small>Ages {formatAgeSpan(category.minAge, category.maxAge)}</small
-            >
+            <small>{formatCategoryEligibility(category)}</small>
           </wa-option>
         {/each}
       </wa-select>

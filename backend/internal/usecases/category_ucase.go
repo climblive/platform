@@ -64,20 +64,19 @@ func (uc *CategoryUseCase) CreateCategory(ctx context.Context, competitionID dom
 		return domain.Category{}, errors.New(domain.ErrLimitExceeded)
 	}
 
-	if tmpl.MinAge == nil || tmpl.MaxAge == nil {
-		return domain.Category{}, errors.Wrap(domain.ErrInvalidData, 0)
-	}
-
 	category := domain.Category{
-		ID:            0,
-		Ownership:     competition.Ownership,
-		CompetitionID: competitionID,
-		Name:          tmpl.Name,
-		Description:   tmpl.Description,
-		MinAge:        *tmpl.MinAge,
-		MaxAge:        *tmpl.MaxAge,
-		TimeBegin:     tmpl.TimeBegin,
-		TimeEnd:       tmpl.TimeEnd,
+		ID:               0,
+		Ownership:        competition.Ownership,
+		CompetitionID:    competitionID,
+		Name:             tmpl.Name,
+		Description:      tmpl.Description,
+		EligibilityBasis: tmpl.EligibilityBasis,
+		MinAge:           tmpl.MinAge,
+		MaxAge:           tmpl.MaxAge,
+		MinBirthYear:     tmpl.MinBirthYear,
+		MaxBirthYear:     tmpl.MaxBirthYear,
+		TimeBegin:        tmpl.TimeBegin,
+		TimeEnd:          tmpl.TimeEnd,
 	}
 
 	if err := (validators.CategoryValidator{}).Validate(category); err != nil {
@@ -137,18 +136,24 @@ func (uc *CategoryUseCase) PatchCategory(ctx context.Context, categoryID domain.
 		category.Description = patch.Description.Value
 	}
 
+	if patch.EligibilityBasis.Present {
+		category.EligibilityBasis = patch.EligibilityBasis.Value
+	}
+
 	if patch.MinAge.Present {
-		if patch.MinAge.Value == nil {
-			return domain.Category{}, errors.Wrap(domain.ErrInvalidData, 0)
-		}
-		category.MinAge = *patch.MinAge.Value
+		category.MinAge = patch.MinAge.Value
 	}
 
 	if patch.MaxAge.Present {
-		if patch.MaxAge.Value == nil {
-			return domain.Category{}, errors.Wrap(domain.ErrInvalidData, 0)
-		}
-		category.MaxAge = *patch.MaxAge.Value
+		category.MaxAge = patch.MaxAge.Value
+	}
+
+	if patch.MinBirthYear.Present {
+		category.MinBirthYear = patch.MinBirthYear.Value
+	}
+
+	if patch.MaxBirthYear.Present {
+		category.MaxBirthYear = patch.MaxBirthYear.Value
 	}
 
 	if patch.TimeBegin.Present {

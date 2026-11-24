@@ -51,13 +51,16 @@ func categoryToDomain(record database.Category) domain.Category {
 			OrganizerID:  domain.OrganizerID(record.OrganizerID),
 			CompetitorID: nil,
 		},
-		CompetitionID: domain.CompetitionID(record.CompetitionID),
-		Name:          record.Name,
-		Description:   record.Description.String,
-		MinAge:        int(record.MinAge),
-		MaxAge:        int(record.MaxAge),
-		TimeBegin:     record.TimeBegin,
-		TimeEnd:       record.TimeEnd,
+		CompetitionID:    domain.CompetitionID(record.CompetitionID),
+		Name:             record.Name,
+		Description:      record.Description.String,
+		EligibilityBasis: domain.EligibilityBasis(record.EligibilityBasis),
+		MinAge:           nullIntToPointer(record.MinAge),
+		MaxAge:           nullIntToPointer(record.MaxAge),
+		MinBirthYear:     nullIntToPointer(record.MinBirthYear),
+		MaxBirthYear:     nullIntToPointer(record.MaxBirthYear),
+		TimeBegin:        record.TimeBegin,
+		TimeEnd:          record.TimeEnd,
 	}
 }
 
@@ -199,6 +202,20 @@ func makeNullString(value string) sql.NullString {
 		Valid:  true,
 		String: value,
 	}
+}
+
+func makeNullIntPointer(value *int) sql.NullInt32 {
+	if value == nil {
+		return sql.NullInt32{}
+	}
+	return sql.NullInt32{Int32: int32(*value), Valid: true}
+}
+
+func nullIntToPointer(value sql.NullInt32) *int {
+	if !value.Valid {
+		return nil
+	}
+	return new(int(value.Int32))
 }
 
 func makeNullInt32(value int32) sql.NullInt32 {

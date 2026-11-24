@@ -136,3 +136,26 @@ func TestPatchUnmarshal(t *testing.T) {
 		assert.Equal(t, 5, nested2.Data.Value)
 	})
 }
+
+func TestCategoryEligibilityPatchJSON(t *testing.T) {
+	for _, tc := range []struct {
+		name     string
+		encoded  string
+		expected domain.CategoryPatch
+	}{
+		{name: "Omitted", encoded: `{}`},
+		{name: "ZeroAge", encoded: `{"minAge":0}`, expected: domain.CategoryPatch{MinAge: domain.NewPatch(new(0))}},
+		{name: "ClearAgeBounds", encoded: `{"minAge":null,"maxAge":null}`, expected: domain.CategoryPatch{MinAge: domain.NewPatch[*int](nil), MaxAge: domain.NewPatch[*int](nil)}},
+		{name: "BirthYearBounds", encoded: `{"eligibilityBasis":"birth_year","minBirthYear":2010,"maxBirthYear":2014}`, expected: domain.CategoryPatch{EligibilityBasis: domain.NewPatch(domain.EligibilityBasisBirthYear), MinBirthYear: domain.NewPatch(new(2010)), MaxBirthYear: domain.NewPatch(new(2014))}},
+		{name: "ClearBirthYearBounds", encoded: `{"minBirthYear":null,"maxBirthYear":null}`, expected: domain.CategoryPatch{MinBirthYear: domain.NewPatch[*int](nil), MaxBirthYear: domain.NewPatch[*int](nil)}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			var patch domain.CategoryPatch
+			require.NoError(t, json.Unmarshal([]byte(tc.encoded), &patch))
+			assert.Equal(t, tc.expected, patch)
+			encoded, err := json.Marshal(patch)
+			require.NoError(t, err)
+			assert.JSONEq(t, tc.encoded, string(encoded))
+		})
+	}
+}

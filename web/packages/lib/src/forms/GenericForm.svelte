@@ -64,7 +64,7 @@
     }
 
     for (const input of inputs) {
-      if (!Object.hasOwn(input, "setCustomValidity")) {
+      if (typeof input.setCustomValidity !== "function") {
         continue;
       }
 

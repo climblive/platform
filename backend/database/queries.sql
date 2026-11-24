@@ -76,16 +76,19 @@ WHERE id = ?;
 
 -- name: UpsertCategory :execlastid
 INSERT INTO 
-	comp_class (id, organizer_id, contest_id, name, description, min_age, max_age, color, time_begin, time_end)
+	comp_class (id, organizer_id, contest_id, name, description, eligibility_basis, min_age, max_age, min_birth_year, max_birth_year, color, time_begin, time_end)
 VALUES 
-	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     contest_id = VALUES(contest_id),
     name = VALUES(name),
     description = VALUES(description),
+    eligibility_basis = VALUES(eligibility_basis),
     min_age = VALUES(min_age),
     max_age = VALUES(max_age),
+    min_birth_year = VALUES(min_birth_year),
+    max_birth_year = VALUES(max_birth_year),
     color = VALUES(color),
     time_begin = VALUES(time_begin),
     time_end = VALUES(time_end);

@@ -7,7 +7,7 @@
     scrubCompetitorMutation,
   } from "@climblive/lib/queries";
   import {
-    formatAgeSpan,
+    formatCategoryEligibility,
     maskScrubbedName,
     SyncedTime,
   } from "@climblive/lib/utils";
@@ -141,10 +141,7 @@
     >
       {#each categories as category (category.id)}
         <option value={category.id}
-          >{category.name} (ages {formatAgeSpan(
-            category.minAge,
-            category.maxAge,
-          )})</option
+          >{category.name} ({formatCategoryEligibility(category)})</option
         >
       {/each}
     </select>

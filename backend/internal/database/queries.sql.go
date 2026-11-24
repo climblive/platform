@@ -211,7 +211,7 @@ func (q *Queries) GetAllOrganizers(ctx context.Context) ([]Organizer, error) {
 }
 
 const getCategoriesByCompetition = `-- name: GetCategoriesByCompetition :many
-SELECT comp_class.id, comp_class.organizer_id, comp_class.contest_id, comp_class.name, comp_class.description, comp_class.min_age, comp_class.max_age, comp_class.color, comp_class.time_begin, comp_class.time_end
+SELECT comp_class.id, comp_class.organizer_id, comp_class.contest_id, comp_class.name, comp_class.description, comp_class.eligibility_basis, comp_class.min_age, comp_class.max_age, comp_class.min_birth_year, comp_class.max_birth_year, comp_class.color, comp_class.time_begin, comp_class.time_end
 FROM comp_class
 WHERE contest_id = ?
 `
@@ -235,8 +235,11 @@ func (q *Queries) GetCategoriesByCompetition(ctx context.Context, competitionID 
 			&i.Category.CompetitionID,
 			&i.Category.Name,
 			&i.Category.Description,
+			&i.Category.EligibilityBasis,
 			&i.Category.MinAge,
 			&i.Category.MaxAge,
+			&i.Category.MinBirthYear,
+			&i.Category.MaxBirthYear,
 			&i.Category.Color,
 			&i.Category.TimeBegin,
 			&i.Category.TimeEnd,
@@ -255,7 +258,7 @@ func (q *Queries) GetCategoriesByCompetition(ctx context.Context, competitionID 
 }
 
 const getCategory = `-- name: GetCategory :one
-SELECT comp_class.id, comp_class.organizer_id, comp_class.contest_id, comp_class.name, comp_class.description, comp_class.min_age, comp_class.max_age, comp_class.color, comp_class.time_begin, comp_class.time_end
+SELECT comp_class.id, comp_class.organizer_id, comp_class.contest_id, comp_class.name, comp_class.description, comp_class.eligibility_basis, comp_class.min_age, comp_class.max_age, comp_class.min_birth_year, comp_class.max_birth_year, comp_class.color, comp_class.time_begin, comp_class.time_end
 FROM comp_class
 WHERE id = ?
 `
@@ -273,8 +276,11 @@ func (q *Queries) GetCategory(ctx context.Context, id int32) (GetCategoryRow, er
 		&i.Category.CompetitionID,
 		&i.Category.Name,
 		&i.Category.Description,
+		&i.Category.EligibilityBasis,
 		&i.Category.MinAge,
 		&i.Category.MaxAge,
+		&i.Category.MinBirthYear,
+		&i.Category.MaxBirthYear,
 		&i.Category.Color,
 		&i.Category.TimeBegin,
 		&i.Category.TimeEnd,
@@ -1348,32 +1354,38 @@ func (q *Queries) InsertOrganizerInvite(ctx context.Context, arg InsertOrganizer
 
 const upsertCategory = `-- name: UpsertCategory :execlastid
 INSERT INTO 
-	comp_class (id, organizer_id, contest_id, name, description, min_age, max_age, color, time_begin, time_end)
+	comp_class (id, organizer_id, contest_id, name, description, eligibility_basis, min_age, max_age, min_birth_year, max_birth_year, color, time_begin, time_end)
 VALUES 
-	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     contest_id = VALUES(contest_id),
     name = VALUES(name),
     description = VALUES(description),
+    eligibility_basis = VALUES(eligibility_basis),
     min_age = VALUES(min_age),
     max_age = VALUES(max_age),
+    min_birth_year = VALUES(min_birth_year),
+    max_birth_year = VALUES(max_birth_year),
     color = VALUES(color),
     time_begin = VALUES(time_begin),
     time_end = VALUES(time_end)
 `
 
 type UpsertCategoryParams struct {
-	ID            int32
-	OrganizerID   int32
-	CompetitionID int32
-	Name          string
-	Description   sql.NullString
-	MinAge        int32
-	MaxAge        int32
-	Color         sql.NullString
-	TimeBegin     time.Time
-	TimeEnd       time.Time
+	ID               int32
+	OrganizerID      int32
+	CompetitionID    int32
+	Name             string
+	Description      sql.NullString
+	EligibilityBasis CompClassEligibilityBasis
+	MinAge           sql.NullInt32
+	MaxAge           sql.NullInt32
+	MinBirthYear     sql.NullInt32
+	MaxBirthYear     sql.NullInt32
+	Color            sql.NullString
+	TimeBegin        time.Time
+	TimeEnd          time.Time
 }
 
 func (q *Queries) UpsertCategory(ctx context.Context, arg UpsertCategoryParams) (int64, error) {
@@ -1383,8 +1395,11 @@ func (q *Queries) UpsertCategory(ctx context.Context, arg UpsertCategoryParams) 
 		arg.CompetitionID,
 		arg.Name,
 		arg.Description,
+		arg.EligibilityBasis,
 		arg.MinAge,
 		arg.MaxAge,
+		arg.MinBirthYear,
+		arg.MaxBirthYear,
 		arg.Color,
 		arg.TimeBegin,
 		arg.TimeEnd,

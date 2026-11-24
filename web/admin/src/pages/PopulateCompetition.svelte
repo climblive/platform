@@ -223,6 +223,7 @@
 
     return formData.categoryNames.map<CategoryTemplate>((name) => ({
       name,
+      eligibilityBasis: "age",
       minAge: 18,
       maxAge: 99,
       timeBegin,

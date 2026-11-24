@@ -46,29 +46,41 @@ export type ColorRGB = string;
 export interface OwnershipData {
   organizerId: OrganizerID;
 }
+export type EligibilityBasis = string;
+export const EligibilityBasisAge: EligibilityBasis = "age";
+export const EligibilityBasisBirthYear: EligibilityBasis = "birth_year";
 export interface Category {
   id: CategoryID;
   competitionId: CompetitionID;
   name: string;
   description?: string;
-  minAge: number /* int */;
-  maxAge: number /* int */;
+  eligibilityBasis: EligibilityBasis;
+  minAge: number | null;
+  maxAge: number | null;
+  minBirthYear: number | null;
+  maxBirthYear: number | null;
   timeBegin: Date;
   timeEnd: Date;
 }
 export interface CategoryTemplate {
   name: string;
   description?: string;
-  minAge: number;
-  maxAge: number;
+  eligibilityBasis: EligibilityBasis;
+  minAge?: number | null;
+  maxAge?: number | null;
+  minBirthYear?: number | null;
+  maxBirthYear?: number | null;
   timeBegin: Date;
   timeEnd: Date;
 }
 export interface CategoryPatch {
   name?: string;
   description?: string;
-  minAge?: number;
-  maxAge?: number;
+  eligibilityBasis?: EligibilityBasis;
+  minAge?: number | null;
+  maxAge?: number | null;
+  minBirthYear?: number | null;
+  maxBirthYear?: number | null;
   timeBegin?: Date;
   timeEnd?: Date;
 }

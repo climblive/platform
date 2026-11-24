@@ -10,7 +10,7 @@
     SplashScreen,
   } from "@climblive/lib/components";
   import { value } from "@climblive/lib/forms";
-  import { formatAgeSpan } from "@climblive/lib/utils";
+  import { formatCategoryEligibility } from "@climblive/lib/utils";
   import {
     getCategoriesQuery,
     getCompetitionQuery,
@@ -88,9 +88,7 @@
             {#each categories as category (category.id)}
               <wa-option value={category.id} label={category.name}>
                 {category.name}
-                <small
-                  >Ages {formatAgeSpan(category.minAge, category.maxAge)}</small
-                >
+                <small>{formatCategoryEligibility(category)}</small>
               </wa-option>
             {/each}
           </wa-select>

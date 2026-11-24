@@ -38,16 +38,19 @@ func (d *Database) GetCategoriesByCompetition(ctx context.Context, tx domain.Tra
 
 func (d *Database) StoreCategory(ctx context.Context, tx domain.Transaction, category domain.Category) (domain.Category, error) {
 	params := database.UpsertCategoryParams{
-		ID:            int32(category.ID),
-		OrganizerID:   int32(category.Ownership.OrganizerID),
-		CompetitionID: int32(category.CompetitionID),
-		Name:          category.Name,
-		Description:   makeNullString(category.Description),
-		MinAge:        int32(category.MinAge),
-		MaxAge:        int32(category.MaxAge),
-		Color:         sql.NullString{String: "", Valid: false},
-		TimeBegin:     category.TimeBegin,
-		TimeEnd:       category.TimeEnd,
+		ID:               int32(category.ID),
+		OrganizerID:      int32(category.Ownership.OrganizerID),
+		CompetitionID:    int32(category.CompetitionID),
+		Name:             category.Name,
+		Description:      makeNullString(category.Description),
+		EligibilityBasis: database.CompClassEligibilityBasis(category.EligibilityBasis),
+		MinAge:           makeNullIntPointer(category.MinAge),
+		MaxAge:           makeNullIntPointer(category.MaxAge),
+		MinBirthYear:     makeNullIntPointer(category.MinBirthYear),
+		MaxBirthYear:     makeNullIntPointer(category.MaxBirthYear),
+		Color:            sql.NullString{String: "", Valid: false},
+		TimeBegin:        category.TimeBegin,
+		TimeEnd:          category.TimeEnd,
 	}
 
 	insertID, err := d.WithTx(tx).UpsertCategory(ctx, params)
