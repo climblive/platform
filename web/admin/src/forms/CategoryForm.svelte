@@ -67,7 +67,6 @@
   import type WaInput from "@awesome.me/webawesome/dist/components/input/input.js";
   import { GenericForm, name } from "@climblive/lib/forms";
   import type { Category } from "@climblive/lib/models";
-  import { formatCategoryEligibility } from "@climblive/lib/utils";
   import { addSeconds, format } from "date-fns";
   import { type Snippet } from "svelte";
 
@@ -88,24 +87,6 @@
   let minBirthYear = $derived(data.minBirthYear?.toString() ?? "");
   let maxBirthYear = $derived(data.maxBirthYear?.toString() ?? "");
   const eligibilityHintId = $props.id();
-
-  const eligibilityPreview = $derived(
-    categoryEligibilitySchema.safeParse({
-      eligibilityBasis,
-      minAge:
-        eligibilityBasis === "age" && minAge !== "" ? Number(minAge) : null,
-      maxAge:
-        eligibilityBasis === "age" && maxAge !== "" ? Number(maxAge) : null,
-      minBirthYear:
-        eligibilityBasis === "birth_year" && minBirthYear !== ""
-          ? Number(minBirthYear)
-          : null,
-      maxBirthYear:
-        eligibilityBasis === "birth_year" && maxBirthYear !== ""
-          ? Number(maxBirthYear)
-          : null,
-    }),
-  );
 
   let previousTimeBegin = $derived(data.timeBegin);
 
@@ -175,8 +156,8 @@
           );
         }}
       >
-        <wa-radio appearance="button" value="age">Age range</wa-radio>
-        <wa-radio appearance="button" value="birth_year">Birth year</wa-radio>
+        <wa-radio value="age">Age range</wa-radio>
+        <wa-radio value="birth_year">Birth year</wa-radio>
       </wa-radio-group>
       <div class="age-span">
         {#if eligibilityBasis === "age"}
@@ -242,15 +223,7 @@
         {/if}
       </div>
       <p id={eligibilityHintId} class="hint">
-        {#if eligibilityBasis === "age"}
-          Age is measured at competition start.
-        {/if}
         Leave either end empty for no limit.
-      </p>
-      <p class="summary" aria-live="polite">
-        {#if eligibilityPreview.success}
-          {formatCategoryEligibility(eligibilityPreview.data)}
-        {/if}
       </p>
     </div>
     <wa-input
@@ -323,10 +296,5 @@
     margin: 0;
     color: var(--wa-color-text-quiet);
     font-size: var(--wa-font-size-s);
-  }
-
-  .summary {
-    margin: 0;
-    min-height: 1lh;
   }
 </style>
