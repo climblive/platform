@@ -118,7 +118,7 @@
       </EventsProvider>
     {/if}
     {#if import.meta.env.DEV}
-      <SvelteQueryDevtools />
+      <SvelteQueryDevtools buttonPosition="bottom-right" />
     {/if}
   </QueryClientProvider>
 </ErrorBoundary>
