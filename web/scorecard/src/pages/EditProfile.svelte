@@ -1,21 +1,31 @@
 <script lang="ts">
   import "@awesome.me/webawesome/dist/components/callout/callout.js";
-  import RegistrationForm from "@/forms/RegistrationForm.svelte";
   import type { ScorecardSession } from "@/types";
   import "@awesome.me/webawesome/dist/components/button/button.js";
   import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import type WaDialog from "@awesome.me/webawesome/dist/components/dialog/dialog.js";
   import "@awesome.me/webawesome/dist/components/icon/icon.js";
-  import { CompetitionStateProvider } from "@climblive/lib/components";
+  import "@awesome.me/webawesome/dist/components/input/input.js";
+  import "@awesome.me/webawesome/dist/components/option/option.js";
+  import "@awesome.me/webawesome/dist/components/select/select.js";
+  import type WaSelect from "@awesome.me/webawesome/dist/components/select/select.js";
+  import "@awesome.me/webawesome/dist/components/switch/switch.js";
+  import type WaSwitch from "@awesome.me/webawesome/dist/components/switch/switch.js";
+  import {
+    CompetitionStateProvider,
+    SaveIndicator,
+  } from "@climblive/lib/components";
+  import { checked, GenericForm, name, value } from "@climblive/lib/forms";
   import type { CompetitorPatch } from "@climblive/lib/models";
   import {
     getCompetitorQuery,
     getCompetitionQuery,
+    getCategoriesQuery,
     patchCompetitorMutation,
     scrubCompetitorMutation,
   } from "@climblive/lib/queries";
-  import { SyncedTime, toastUnexpectedError } from "@climblive/lib/utils";
-  import { formatDistance, isBefore } from "date-fns";
+  import { SyncedTime, toastUnexpectedError, z } from "@climblive/lib/utils";
+  import { formatDistance, isAfter, isBefore } from "date-fns";
   import { getContext, onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import type { Readable } from "svelte/store";
@@ -24,6 +34,14 @@
   const session = getContext<Readable<ScorecardSession>>("scorecardSession");
 
   const competitorQuery = $derived(getCompetitorQuery($session.competitorId));
+  const categoriesQuery = $derived(getCategoriesQuery($session.competitionId));
+  const patchCategory = $derived(
+    patchCompetitorMutation($session.competitorId),
+  );
+  const patchSettings = $derived(
+    patchCompetitorMutation($session.competitorId),
+  );
+  const profileSchema = z.object({ name: z.string().min(1) });
   const competitionQuery = $derived(
     getCompetitionQuery($session.competitionId),
   );
@@ -87,6 +105,54 @@
       onError: () => toastUnexpectedError("Failed to remove your name."),
     });
   };
+
+  const handleCategoryChange = (event: Event) => {
+    const select = event.currentTarget as WaSelect;
+    const previousValue = competitor?.categoryId?.toString() ?? "";
+    const categoryId = Number(select.value);
+    const category = categoriesQuery.data?.find(
+      (category) => category.id === categoryId,
+    );
+
+    if (
+      !category ||
+      isAfter(new Date(), category.timeEnd) ||
+      patchCategory.isPending
+    ) {
+      select.value = previousValue;
+      return;
+    }
+
+    patchCategory.mutate(
+      { categoryId },
+      {
+        onError: () => {
+          select.value = previousValue;
+          toastUnexpectedError("Failed to save category.");
+        },
+      },
+    );
+  };
+
+  const handleSettingsChange = (event: Event) => {
+    const toggle = event.currentTarget as WaSwitch;
+    const previousValue = competitor?.withdrawnFromFinals ?? false;
+
+    if (patchSettings.isPending) {
+      toggle.checked = previousValue;
+      return;
+    }
+
+    patchSettings.mutate(
+      { withdrawnFromFinals: toggle.checked },
+      {
+        onError: () => {
+          toggle.checked = previousValue;
+          toastUnexpectedError("Failed to save settings.");
+        },
+      },
+    );
+  };
 </script>
 
 {#if !competitor || !competition}
@@ -100,53 +166,122 @@
       {@const disabled =
         competitor.scrubbedAt !== undefined || competitionState === "ENDED"}
 
-      <RegistrationForm
-        submit={handleSubmit}
-        data={{
-          name: competitor.name,
-          categoryId: competitor.categoryId,
-          withdrawnFromFinals: competitor.withdrawnFromFinals,
-        }}
-        callout={profileCallout}
-        {competitionState}
-        {disabled}
-      >
-        <div class="controls">
-          {#if !!competitor.name}
-            <wa-button
-              class="scrub-button"
+      <div class="profile-page">
+        <wa-button
+          class="back-button"
+          size="s"
+          appearance="plain"
+          onclick={gotoScorecard}
+        >
+          <wa-icon slot="start" name="arrow-left"></wa-icon>
+          Back to scorecard
+        </wa-button>
+
+        <section aria-labelledby="profile-heading">
+          <h2 id="profile-heading">Profile</h2>
+          <GenericForm schema={profileSchema} submit={handleSubmit}>
+            <fieldset>
+              <wa-input
+                size="s"
+                {@attach name("name")}
+                label="Name"
+                type="text"
+                required
+                value={competitor.name}
+                {disabled}
+              ></wa-input>
+              {@render profileCallout()}
+              <div class="controls">
+                {#if !!competitor.name}
+                  <wa-button
+                    class="scrub-button"
+                    size="s"
+                    type="button"
+                    variant="danger"
+                    appearance="outlined"
+                    onclick={() => {
+                      if (scrubDialog) {
+                        scrubDialog.open = true;
+                      }
+                    }}
+                  >
+                    <wa-icon slot="start" name="user-secret"></wa-icon>
+                    Remove my name
+                  </wa-button>
+                {/if}
+                <wa-button
+                  size="s"
+                  type="button"
+                  onclick={gotoScorecard}
+                  appearance="plain"
+                  >Cancel
+                </wa-button>
+                <wa-button
+                  size="s"
+                  type="submit"
+                  loading={patchCompetitor.isPending}
+                  variant="neutral"
+                  appearance="accent"
+                  {disabled}
+                  >Save
+                </wa-button>
+              </div>
+            </fieldset>
+          </GenericForm>
+        </section>
+
+        <section aria-labelledby="category-heading">
+          <div class="section-heading">
+            <h2 id="category-heading">Category</h2>
+            {#if patchCategory.isSuccess}
+              <SaveIndicator />
+            {/if}
+          </div>
+          <fieldset>
+            <wa-select
               size="s"
-              type="button"
-              variant="danger"
-              appearance="outlined"
-              onclick={() => {
-                if (scrubDialog) {
-                  scrubDialog.open = true;
-                }
-              }}
+              label="Category"
+              required
+              {@attach value(competitor.categoryId)}
+              disabled={disabled ||
+                patchCategory.isPending ||
+                !categoriesQuery.data}
+              onchange={handleCategoryChange}
             >
-              <wa-icon slot="start" name="user-secret"></wa-icon>
-              Remove my name
-            </wa-button>
-          {/if}
-          <wa-button
-            size="s"
-            type="button"
-            onclick={gotoScorecard}
-            appearance="plain"
-            >Cancel
-          </wa-button>
-          <wa-button
-            size="s"
-            type="submit"
-            loading={patchCompetitor.isPending}
-            variant="neutral"
-            appearance="accent"
-            {disabled}
-            >Save
-          </wa-button>
-        </div>
-      </RegistrationForm>
+              {#each categoriesQuery.data ?? [] as category (category.id)}
+                <wa-option
+                  value={category.id}
+                  disabled={isAfter(new Date(), category.timeEnd)}
+                  label={category.name}
+                >
+                  {category.name}
+                  {#if category.description}
+                    <small>{category.description}</small>
+                  {/if}
+                </wa-option>
+              {/each}
+            </wa-select>
+          </fieldset>
+        </section>
+
+        <section aria-labelledby="settings-heading">
+          <div class="section-heading">
+            <h2 id="settings-heading">Settings</h2>
+            {#if patchSettings.isSuccess}
+              <SaveIndicator />
+            {/if}
+          </div>
+          <fieldset>
+            <wa-switch
+              size="s"
+              hint="If you do not wish to participate in the finals, you can give up your spot."
+              disabled={disabled || patchSettings.isPending}
+              {@attach checked(competitor.withdrawnFromFinals)}
+              onchange={handleSettingsChange}>Opt out of finals</wa-switch
+            >
+          </fieldset>
+        </section>
+      </div>
 
       {#snippet profileCallout()}
         {#if !competitor?.scrubbedAt}
@@ -194,6 +329,35 @@
 {/if}
 
 <style>
+  .profile-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-l);
+  }
+
+  .back-button {
+    align-self: start;
+  }
+
+  .section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--wa-space-s);
+  }
+
+  h2 {
+    margin: 0 0 var(--wa-space-s);
+    font-size: var(--wa-font-size-l);
+  }
+
+  fieldset {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-s);
+    padding: var(--wa-space-m);
+  }
+
   .controls {
     display: flex;
     justify-content: end;
