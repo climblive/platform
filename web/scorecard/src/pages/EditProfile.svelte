@@ -233,9 +233,11 @@
         <section aria-labelledby="category-heading">
           <div class="section-heading">
             <h2 id="category-heading">Category</h2>
-            {#if patchCategory.isSuccess}
-              <SaveIndicator />
-            {/if}
+            <div class="save-status">
+              {#if patchCategory.isSuccess}
+                <SaveIndicator />
+              {/if}
+            </div>
           </div>
           <fieldset>
             <wa-select
@@ -267,9 +269,11 @@
         <section aria-labelledby="settings-heading">
           <div class="section-heading">
             <h2 id="settings-heading">Settings</h2>
-            {#if patchSettings.isSuccess}
-              <SaveIndicator />
-            {/if}
+            <div class="save-status">
+              {#if patchSettings.isSuccess}
+                <SaveIndicator />
+              {/if}
+            </div>
           </div>
           <fieldset>
             <wa-switch
@@ -333,10 +337,21 @@
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-l);
+    padding: var(--wa-space-m);
   }
 
   .back-button {
     align-self: start;
+
+    &::part(base) {
+      padding-inline: 0;
+    }
+  }
+
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wa-space-s);
   }
 
   .section-heading {
@@ -347,19 +362,29 @@
   }
 
   h2 {
-    margin: 0 0 var(--wa-space-s);
+    margin: 0;
     font-size: var(--wa-font-size-l);
+  }
+
+  .save-status {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    min-inline-size: 5em;
   }
 
   fieldset {
     display: flex;
     flex-direction: column;
     gap: var(--wa-space-s);
-    padding: var(--wa-space-m);
+    margin: 0;
+    padding: 0;
+    min-inline-size: 0;
   }
 
   .controls {
     display: flex;
+    flex-wrap: wrap;
     justify-content: end;
     gap: var(--wa-space-xs);
 
