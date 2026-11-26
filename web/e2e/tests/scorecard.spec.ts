@@ -206,6 +206,12 @@ test("edit profile", async ({ page }) => {
 
   await page.waitForURL("/ABCD0003/edit");
 
+  for (const name of ["Profile", "Category", "Settings"]) {
+    await expect(
+      page.getByRole("heading", { name, exact: true }),
+    ).toBeVisible();
+  }
+
   const nameInput = page.getByRole("textbox", { name: "Name *" });
   await nameInput.fill("");
   await nameInput.pressSequentially("Phyllis Lapin-Vance");
@@ -215,6 +221,14 @@ test("edit profile", async ({ page }) => {
   await page
     .getByRole("option", { name: "Females 16 years and older", exact: true })
     .click();
+
+  await expect(
+    page
+      .getByRole("region", { name: "Category", exact: true })
+      .getByRole("status"),
+  ).toContainText("Saved");
+  await expect(page).toHaveURL("/ABCD0003/edit");
+  await expect(nameInput).toHaveValue("Phyllis Lapin-Vance");
 
   await page.getByRole("button", { name: "Save" }).click();
 
@@ -226,6 +240,7 @@ test("edit profile", async ({ page }) => {
 
 test("withdraw from finals and reenter", async ({ page }) => {
   await page.goto("/ABCD0003/edit");
+  const settings = page.getByRole("region", { name: "Settings", exact: true });
 
   await expect(
     page.getByRole("switch", { name: "Opt out of finals" }),
@@ -234,7 +249,9 @@ test("withdraw from finals and reenter", async ({ page }) => {
     .getByRole("switch", { name: "Opt out of finals" })
     .check({ force: true });
 
-  await page.getByRole("button", { name: "Save" }).click();
+  await expect(settings.getByRole("status")).toContainText("Saved");
+  await expect(page).toHaveURL("/ABCD0003/edit");
+  await page.getByRole("button", { name: "Back to scorecard" }).click();
 
   await page.waitForURL("/ABCD0003");
 
@@ -249,7 +266,9 @@ test("withdraw from finals and reenter", async ({ page }) => {
     .getByRole("switch", { name: "Opt out of finals" })
     .uncheck({ force: true });
 
-  await page.getByRole("button", { name: "Save" }).click();
+  await expect(settings.getByRole("status")).toContainText("Saved");
+  await expect(page).toHaveURL("/ABCD0003/edit");
+  await page.getByRole("button", { name: "Back to scorecard" }).click();
 
   await page.waitForURL("/ABCD0003");
 
