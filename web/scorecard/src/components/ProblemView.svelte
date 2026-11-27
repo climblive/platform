@@ -5,7 +5,6 @@
     Score,
   } from "@climblive/lib/components";
   import type { PointValue, Problem, Tick } from "@climblive/lib/models";
-  import { roundPoints } from "@climblive/lib/utils";
   import TickDialog from "./TickDialog.svelte";
 
   type ScorecardProblem = Problem & {
@@ -29,20 +28,6 @@
     enablePoints,
     enableAttempts,
   }: Props = $props();
-
-  const valueRange = $derived.by<{ min: number; max: number } | undefined>(
-    () => {
-      if (problem.pointValue === undefined) {
-        return undefined;
-      }
-
-      const { zone1, zone2, top, flashBonus } = problem.pointValue;
-
-      const values = [zone1, zone2, roundPoints(top + flashBonus)];
-
-      return { min: Math.min(...values), max: Math.max(...values) };
-    },
-  );
 </script>
 
 <section
@@ -58,16 +43,21 @@
   />
   <span class="number">#{problem.number}</span>
   <span class="points">
-    {#if enablePoints && valueRange}
+    {#if enablePoints && problem.pointValue}
       <span class="top">
-        {#if valueRange.min !== valueRange.max}
-          <span class="lte">≤</span>
-        {/if}
         <Score
-          value={valueRange.max + "p"}
+          value={problem.pointValue.top + "p"}
           compactThreshold={9_999_999}
           animate
         />
+        {#if problem.pointValue.flashBonus > 0}
+          +
+          <Score
+            value={problem.pointValue.flashBonus + "p"}
+            compactThreshold={9_999_999}
+            animate
+          />
+        {/if}
       </span>
     {/if}
 
@@ -145,10 +135,6 @@
 
     & .top {
       white-space: nowrap;
-    }
-
-    & .lte {
-      color: var(--wa-color-text-quiet);
     }
   }
 
