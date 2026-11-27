@@ -47,16 +47,18 @@
       <span class="top">
         <Score
           value={problem.pointValue.top + "p"}
-          compactThreshold={9_999_999}
+          compactThreshold={problem.pointValue.flashBonus > 0 ? 999 : 9_999_999}
           animate
         />
         {#if problem.pointValue.flashBonus > 0}
-          +
-          <Score
-            value={problem.pointValue.flashBonus + "p"}
-            compactThreshold={9_999_999}
-            animate
-          />
+          <span class="flash">
+            +
+            <Score
+              value={problem.pointValue.flashBonus + "p"}
+              compactThreshold={999}
+              animate
+            />
+          </span>
         {/if}
       </span>
     {/if}
@@ -135,6 +137,10 @@
 
     & .top {
       white-space: nowrap;
+    }
+
+    & .flash {
+      font-size: var(--wa-font-size-s);
     }
   }
 
