@@ -140,6 +140,7 @@
 
   .score {
     text-align: right;
+    white-space: nowrap;
     font-weight: var(--wa-font-weight-semibold);
 
     &.uncounted {
