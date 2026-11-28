@@ -39,6 +39,8 @@ type Competition struct {
 	GracePeriod        int32
 	NameRetentionTime  int32
 	Created            time.Time
+	DuplicatedBy       sql.NullTime
+	DuplicatedFrom     sql.NullInt32
 }
 
 type Competitor struct {

@@ -108,6 +108,8 @@ func (d *Database) GetCompetitionsCurrentlyRunningOrByStartTime(ctx context.Cont
 			Description:        record.Description,
 			ArchivedAt:         record.ArchivedAt,
 			Created:            record.Created,
+			DuplicatedBy:       record.DuplicatedBy,
+			DuplicatedFrom:     record.DuplicatedFrom,
 			Location:           record.Location,
 			Country:            record.Country,
 			QualifyingProblems: record.QualifyingProblems,
@@ -155,6 +157,16 @@ func (d *Database) StoreCompetition(ctx context.Context, tx domain.Transaction, 
 		GracePeriod:        int32(competition.GracePeriod / time.Minute),
 		NameRetentionTime:  int32(competition.NameRetentionTime / time.Minute),
 		Created:            competition.Created,
+		DuplicatedBy:       sql.NullTime{},
+		DuplicatedFrom:     sql.NullInt32{},
+	}
+
+	if competition.DuplicatedBy != nil {
+		params.DuplicatedBy = sql.NullTime{Time: *competition.DuplicatedBy, Valid: true}
+	}
+
+	if competition.DuplicatedFrom != nil {
+		params.DuplicatedFrom = sql.NullInt32{Int32: int32(*competition.DuplicatedFrom), Valid: true}
 	}
 
 	insertID, err := d.WithTx(tx).UpsertCompetition(ctx, params)

@@ -671,6 +671,7 @@ func TestDuplicateCompetition(t *testing.T) {
 		Location:           "The garage",
 		SeriesID:           testutils.RandomResourceID[domain.SeriesID](),
 		Name:               "Original Competition",
+		Created:            timeBegin.Add(-24 * time.Hour),
 		Description:        "Who is the best climber in Sweden?",
 		QualifyingProblems: 10,
 		Finalists:          7,
@@ -720,94 +721,103 @@ func TestDuplicateCompetition(t *testing.T) {
 	}
 
 	t.Run("HappyCase", func(t *testing.T) {
-		mockedRepo, mockedAuthorizer := makeMocks()
+		synctest.Test(t, func(t *testing.T) {
+			mockedRepo, mockedAuthorizer := makeMocks()
 
-		fakedDuplicatedCompetition := fakedCompetition
-		fakedDuplicatedCompetition.ID = fakedDuplicatedCompetitionID
-		fakedDuplicatedCompetition.Name = "Original Competition (Copy)"
+			fakedDuplicatedCompetition := fakedCompetition
+			fakedDuplicatedCompetition.ID = fakedDuplicatedCompetitionID
+			fakedDuplicatedCompetition.Name = "Original Competition (Copy)"
+			fakedDuplicatedCompetition.Created = time.Now()
+			fakedDuplicatedCompetition.DuplicatedBy = &fakedDuplicatedCompetition.Created
+			fakedDuplicatedCompetition.DuplicatedFrom = &fakedCompetitionID
 
-		mockedAuthorizer.
-			On("HasOwnership", mock.Anything, fakedOwnership).
-			Return(domain.OrganizerRole, nil)
+			mockedAuthorizer.
+				On("HasOwnership", mock.Anything, fakedOwnership).
+				Return(domain.OrganizerRole, nil)
 
-		mockedRepo.
-			On("GetCompetition", mock.Anything, nil, fakedCompetitionID).
-			Return(fakedCompetition, nil)
+			mockedRepo.
+				On("GetCompetition", mock.Anything, nil, fakedCompetitionID).
+				Return(fakedCompetition, nil)
 
-		mockedRepo.
-			On("GetCategoriesByCompetition", mock.Anything, nil, fakedCompetitionID).
-			Return([]domain.Category{fakedCategory}, nil)
+			mockedRepo.
+				On("GetCategoriesByCompetition", mock.Anything, nil, fakedCompetitionID).
+				Return([]domain.Category{fakedCategory}, nil)
 
-		mockedRepo.
-			On("GetProblemsByCompetition", mock.Anything, nil, fakedCompetitionID).
-			Return([]domain.Problem{fakedProblem}, nil)
+			mockedRepo.
+				On("GetProblemsByCompetition", mock.Anything, nil, fakedCompetitionID).
+				Return([]domain.Problem{fakedProblem}, nil)
 
-		mockedTx := new(transactionMock)
+			mockedTx := new(transactionMock)
 
-		mockedRepo.
-			On("Begin").
-			Return(mockedTx, nil)
+			mockedRepo.
+				On("Begin").
+				Return(mockedTx, nil)
 
-		mockedRepo.
-			On("StoreCompetition", mock.Anything, mockedTx, mock.MatchedBy(func(competition domain.Competition) bool {
-				expected := fakedDuplicatedCompetition
-				expected.ID = 0
+			mockedRepo.
+				On("StoreCompetition", mock.Anything, mockedTx, mock.MatchedBy(func(competition domain.Competition) bool {
+					expected := fakedDuplicatedCompetition
+					expected.ID = 0
 
-				return competition == expected
-			})).
-			Return(fakedDuplicatedCompetition, nil)
+					return assert.ObjectsAreEqual(expected, competition)
+				})).
+				Return(fakedDuplicatedCompetition, nil)
 
-		mockedRepo.
-			On("StoreCategory", mock.Anything, mockedTx, mock.MatchedBy(func(category domain.Category) bool {
-				expected := fakedCategory
-				expected.ID = 0
-				expected.CompetitionID = fakedDuplicatedCompetitionID
+			mockedRepo.
+				On("StoreCategory", mock.Anything, mockedTx, mock.MatchedBy(func(category domain.Category) bool {
+					expected := fakedCategory
+					expected.ID = 0
+					expected.CompetitionID = fakedDuplicatedCompetitionID
 
-				return category == expected
-			})).
-			Return(domain.Category{}, nil)
+					return category == expected
+				})).
+				Return(domain.Category{}, nil)
 
-		mockedRepo.
-			On("StoreProblem", mock.Anything, mockedTx, mock.MatchedBy(func(problem domain.Problem) bool {
-				expected := fakedProblem
-				expected.ID = 0
-				expected.CompetitionID = fakedDuplicatedCompetitionID
+			mockedRepo.
+				On("StoreProblem", mock.Anything, mockedTx, mock.MatchedBy(func(problem domain.Problem) bool {
+					expected := fakedProblem
+					expected.ID = 0
+					expected.CompetitionID = fakedDuplicatedCompetitionID
 
-				return problem == expected
-			})).
-			Return(domain.Problem{}, nil)
+					return problem == expected
+				})).
+				Return(domain.Problem{}, nil)
 
-		mockedTx.
-			On("Commit").
-			Return(nil)
+			mockedTx.
+				On("Commit").
+				Return(nil)
 
-		ucase := usecases.CompetitionUseCase{
-			Repo:       mockedRepo,
-			Authorizer: mockedAuthorizer,
-		}
+			ucase := usecases.CompetitionUseCase{
+				Repo:       mockedRepo,
+				Authorizer: mockedAuthorizer,
+			}
 
-		duplicatedCompetition, err := ucase.DuplicateCompetition(context.Background(), fakedCompetitionID)
+			duplicatedCompetition, err := ucase.DuplicateCompetition(context.Background(), fakedCompetitionID)
 
-		require.NoError(t, err)
-		assert.Equal(t, fakedDuplicatedCompetitionID, duplicatedCompetition.ID)
-		assert.Equal(t, "Original Competition (Copy)", duplicatedCompetition.Name)
-		assert.Equal(t, fakedOwnership, duplicatedCompetition.Ownership)
-		assert.Equal(t, "The garage", duplicatedCompetition.Location)
-		assert.Equal(t, fakedCompetition.SeriesID, duplicatedCompetition.SeriesID)
-		assert.Equal(t, "Who is the best climber in Sweden?", duplicatedCompetition.Description)
-		assert.Equal(t, 10, duplicatedCompetition.QualifyingProblems)
-		assert.Equal(t, 7, duplicatedCompetition.Finalists)
-		assert.True(t, duplicatedCompetition.UsePoints)
-		assert.True(t, duplicatedCompetition.PooledPoints)
-		assert.Equal(t, 5, duplicatedCompetition.MaxAttempts)
-		assert.Equal(t, domain.Tenths(2), duplicatedCompetition.PointDeduction)
-		assert.Equal(t, "No rules!", duplicatedCompetition.Info)
-		assert.Equal(t, time.Hour, duplicatedCompetition.GracePeriod)
-		assert.Equal(t, timeBegin, duplicatedCompetition.TimeBegin)
-		assert.NotZero(t, timeEnd, duplicatedCompetition.TimeEnd)
+			require.NoError(t, err)
+			assert.Equal(t, fakedDuplicatedCompetitionID, duplicatedCompetition.ID)
+			assert.Equal(t, "Original Competition (Copy)", duplicatedCompetition.Name)
+			assert.Equal(t, fakedOwnership, duplicatedCompetition.Ownership)
+			assert.Equal(t, "The garage", duplicatedCompetition.Location)
+			assert.Equal(t, fakedCompetition.SeriesID, duplicatedCompetition.SeriesID)
+			assert.Equal(t, "Who is the best climber in Sweden?", duplicatedCompetition.Description)
+			assert.Equal(t, 10, duplicatedCompetition.QualifyingProblems)
+			assert.Equal(t, 7, duplicatedCompetition.Finalists)
+			assert.True(t, duplicatedCompetition.UsePoints)
+			assert.True(t, duplicatedCompetition.PooledPoints)
+			assert.Equal(t, 5, duplicatedCompetition.MaxAttempts)
+			assert.Equal(t, domain.Tenths(2), duplicatedCompetition.PointDeduction)
+			assert.Equal(t, "No rules!", duplicatedCompetition.Info)
+			assert.Equal(t, time.Hour, duplicatedCompetition.GracePeriod)
+			assert.Equal(t, timeBegin, duplicatedCompetition.TimeBegin)
+			assert.NotZero(t, timeEnd, duplicatedCompetition.TimeEnd)
+			assert.Equal(t, time.Now(), duplicatedCompetition.Created)
+			assert.NotEqual(t, fakedCompetition.Created, duplicatedCompetition.Created)
+			assert.Equal(t, &duplicatedCompetition.Created, duplicatedCompetition.DuplicatedBy)
+			assert.Equal(t, &fakedCompetitionID, duplicatedCompetition.DuplicatedFrom)
 
-		mockedRepo.AssertExpectations(t)
-		mockedAuthorizer.AssertExpectations(t)
+			mockedRepo.AssertExpectations(t)
+			mockedAuthorizer.AssertExpectations(t)
+		})
 	})
 
 	t.Run("BadCredentials", func(t *testing.T) {

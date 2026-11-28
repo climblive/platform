@@ -106,6 +106,8 @@ export interface Competition {
   timeBegin?: Date;
   timeEnd?: Date;
   created: Date;
+  duplicatedBy: Date | null;
+  duplicatedFrom: CompetitionID | null;
   registeredCompetitors: number /* int */;
 }
 export interface CompetitionTemplate {

@@ -67,6 +67,8 @@ CREATE TABLE IF NOT EXISTS `contest` (
   `grace_period` INT NOT NULL DEFAULT 300,
   `name_retention_time` INT NOT NULL DEFAULT 20160,
   `created` TIMESTAMP NOT NULL DEFAULT '1970-01-01 00:00:01',
+  `duplicated_by` TIMESTAMP NULL DEFAULT NULL,
+  `duplicated_from` INT NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_contest_2`
     FOREIGN KEY (`organizer_id`)

@@ -105,9 +105,9 @@ GROUP BY contest.id;
 
 -- name: UpsertCompetition :execlastid
 INSERT INTO 
-	contest (id, organizer_id, archived_at, series_id, name, description, location, country, qualifying_problems, finalists, use_points, pooled_points, max_attempts, point_deduction, info, grace_period, name_retention_time, created)
+	contest (id, organizer_id, archived_at, series_id, name, description, location, country, qualifying_problems, finalists, use_points, pooled_points, max_attempts, point_deduction, info, grace_period, name_retention_time, created, duplicated_by, duplicated_from)
 VALUES 
-	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     archived_at = VALUES(archived_at),
@@ -125,7 +125,9 @@ ON DUPLICATE KEY UPDATE
     info = VALUES(info),
     grace_period = VALUES(grace_period),
     name_retention_time = VALUES(name_retention_time),
-    created = VALUES(created);
+    created = VALUES(created),
+    duplicated_by = VALUES(duplicated_by),
+    duplicated_from = VALUES(duplicated_from);
 
 -- name: DeleteCompetition :exec
 DELETE FROM contest
