@@ -13,7 +13,7 @@
     getSelfQuery,
   } from "@climblive/lib/queries";
   import { format } from "date-fns";
-  import { navigate } from "svelte-routing";
+  import { Link, navigate } from "svelte-routing";
   import ArchiveCompetition from "./ArchiveCompetition.svelte";
   import CategoryList from "./CategoryList.svelte";
   import DuplicateCompetition from "./DuplicateCompetition.svelte";
@@ -236,6 +236,20 @@
       Competition created on <time datetime={competition.created.toISOString()}
         >{format(competition.created, "PPp")}</time
       >
+      {#if competition.duplicatedBy !== null}
+        <br />
+        Duplicated on
+        <time datetime={competition.duplicatedBy.toISOString()}
+          >{format(competition.duplicatedBy, "PPp")}</time
+        >
+      {/if}
+      {#if competition.duplicatedFrom !== null}
+        <br />
+        Duplicated from
+        <Link to={`/admin/competitions/${competition.duplicatedFrom}`}
+          >competition #{competition.duplicatedFrom}</Link
+        >
+      {/if}
     </p>
   {/if}
 </main>

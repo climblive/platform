@@ -343,6 +343,8 @@ func (uc *CompetitionUseCase) CreateCompetition(ctx context.Context, organizerID
 		GracePeriod:           tmpl.GracePeriod,
 		NameRetentionTime:     tmpl.NameRetentionTime,
 		Created:               time.Now(),
+		DuplicatedBy:          nil,
+		DuplicatedFrom:        nil,
 	}
 
 	if err := (validators.CompetitionValidator{}).Validate(competition); err != nil {
@@ -384,6 +386,9 @@ func (uc *CompetitionUseCase) DuplicateCompetition(ctx context.Context, competit
 	duplicatedCompetition := competition
 	duplicatedCompetition.ID = 0
 	duplicatedCompetition.Name += " (Copy)"
+	duplicatedCompetition.Created = time.Now()
+	duplicatedCompetition.DuplicatedBy = &duplicatedCompetition.Created
+	duplicatedCompetition.DuplicatedFrom = &competitionID
 
 	tx, err := uc.Repo.Begin()
 	if err != nil {

@@ -85,6 +85,16 @@ func competitionToDomain(record database.Competition) domain.Competition {
 		GracePeriod:           time.Duration(record.GracePeriod) * time.Minute,
 		NameRetentionTime:     time.Duration(record.NameRetentionTime) * time.Minute,
 		Created:               record.Created,
+		DuplicatedBy:          nil,
+		DuplicatedFrom:        nil,
+	}
+
+	if record.DuplicatedBy.Valid {
+		competition.DuplicatedBy = &record.DuplicatedBy.Time
+	}
+
+	if record.DuplicatedFrom.Valid {
+		competition.DuplicatedFrom = new(domain.CompetitionID(record.DuplicatedFrom.Int32))
 	}
 
 	return competition

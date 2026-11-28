@@ -123,7 +123,7 @@ func (q *Queries) DeleteTick(ctx context.Context, id int32) error {
 }
 
 const getAllCompetitions = `-- name: GetAllCompetitions :many
-SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.max_attempts, contest.point_deduction, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_competitors
+SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.max_attempts, contest.point_deduction, contest.info, contest.grace_period, contest.name_retention_time, contest.created, contest.duplicated_by, contest.duplicated_from, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_competitors
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 LEFT JOIN contender c ON c.contest_id = contest.id
@@ -165,6 +165,8 @@ func (q *Queries) GetAllCompetitions(ctx context.Context) ([]GetAllCompetitionsR
 			&i.Competition.GracePeriod,
 			&i.Competition.NameRetentionTime,
 			&i.Competition.Created,
+			&i.Competition.DuplicatedBy,
+			&i.Competition.DuplicatedFrom,
 			&i.TimeBegin,
 			&i.TimeEnd,
 			&i.RegisteredCompetitors,
@@ -279,7 +281,7 @@ func (q *Queries) GetCategory(ctx context.Context, id int32) (GetCategoryRow, er
 }
 
 const getCompetition = `-- name: GetCompetition :one
-SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.max_attempts, contest.point_deduction, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_competitors
+SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.max_attempts, contest.point_deduction, contest.info, contest.grace_period, contest.name_retention_time, contest.created, contest.duplicated_by, contest.duplicated_from, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_competitors
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 LEFT JOIN contender c ON c.contest_id = contest.id
@@ -316,6 +318,8 @@ func (q *Queries) GetCompetition(ctx context.Context, id int32) (GetCompetitionR
 		&i.Competition.GracePeriod,
 		&i.Competition.NameRetentionTime,
 		&i.Competition.Created,
+		&i.Competition.DuplicatedBy,
+		&i.Competition.DuplicatedFrom,
 		&i.TimeBegin,
 		&i.TimeEnd,
 		&i.RegisteredCompetitors,
@@ -324,7 +328,7 @@ func (q *Queries) GetCompetition(ctx context.Context, id int32) (GetCompetitionR
 }
 
 const getCompetitionsByOrganizer = `-- name: GetCompetitionsByOrganizer :many
-SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.max_attempts, contest.point_deduction, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_competitors
+SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.max_attempts, contest.point_deduction, contest.info, contest.grace_period, contest.name_retention_time, contest.created, contest.duplicated_by, contest.duplicated_from, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end, COUNT(DISTINCT CASE WHEN c.entered IS NOT NULL THEN c.id END) AS registered_competitors
 FROM contest
 LEFT JOIN comp_class cc ON cc.contest_id = contest.id
 LEFT JOIN contender c ON c.contest_id = contest.id
@@ -367,6 +371,8 @@ func (q *Queries) GetCompetitionsByOrganizer(ctx context.Context, organizerID in
 			&i.Competition.GracePeriod,
 			&i.Competition.NameRetentionTime,
 			&i.Competition.Created,
+			&i.Competition.DuplicatedBy,
+			&i.Competition.DuplicatedFrom,
 			&i.TimeBegin,
 			&i.TimeEnd,
 			&i.RegisteredCompetitors,
@@ -386,9 +392,9 @@ func (q *Queries) GetCompetitionsByOrganizer(ctx context.Context, organizerID in
 
 const getCompetitionsCurrentlyRunningOrByStartTime = `-- name: GetCompetitionsCurrentlyRunningOrByStartTime :many
 SELECT
-	id, organizer_id, archived_at, series_id, name, description, location, country, qualifying_problems, finalists, use_points, pooled_points, max_attempts, point_deduction, info, grace_period, name_retention_time, created, time_begin, time_end
+	id, organizer_id, archived_at, series_id, name, description, location, country, qualifying_problems, finalists, use_points, pooled_points, max_attempts, point_deduction, info, grace_period, name_retention_time, created, duplicated_by, duplicated_from, time_begin, time_end
 FROM (
-    SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.max_attempts, contest.point_deduction, contest.info, contest.grace_period, contest.name_retention_time, contest.created, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
+    SELECT contest.id, contest.organizer_id, contest.archived_at, contest.series_id, contest.name, contest.description, contest.location, contest.country, contest.qualifying_problems, contest.finalists, contest.use_points, contest.pooled_points, contest.max_attempts, contest.point_deduction, contest.info, contest.grace_period, contest.name_retention_time, contest.created, contest.duplicated_by, contest.duplicated_from, MIN(cc.time_begin) AS time_begin, MAX(cc.time_end) AS time_end
     FROM contest
     JOIN comp_class cc ON cc.contest_id = contest.id
     WHERE archived_at IS NULL
@@ -422,6 +428,8 @@ type GetCompetitionsCurrentlyRunningOrByStartTimeRow struct {
 	GracePeriod        int32
 	NameRetentionTime  int32
 	Created            time.Time
+	DuplicatedBy       sql.NullTime
+	DuplicatedFrom     sql.NullInt32
 	TimeBegin          interface{}
 	TimeEnd            interface{}
 }
@@ -454,6 +462,8 @@ func (q *Queries) GetCompetitionsCurrentlyRunningOrByStartTime(ctx context.Conte
 			&i.GracePeriod,
 			&i.NameRetentionTime,
 			&i.Created,
+			&i.DuplicatedBy,
+			&i.DuplicatedFrom,
 			&i.TimeBegin,
 			&i.TimeEnd,
 		); err != nil {
@@ -1387,9 +1397,9 @@ func (q *Queries) UpsertCategory(ctx context.Context, arg UpsertCategoryParams) 
 
 const upsertCompetition = `-- name: UpsertCompetition :execlastid
 INSERT INTO 
-	contest (id, organizer_id, archived_at, series_id, name, description, location, country, qualifying_problems, finalists, use_points, pooled_points, max_attempts, point_deduction, info, grace_period, name_retention_time, created)
+	contest (id, organizer_id, archived_at, series_id, name, description, location, country, qualifying_problems, finalists, use_points, pooled_points, max_attempts, point_deduction, info, grace_period, name_retention_time, created, duplicated_by, duplicated_from)
 VALUES 
-	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 ON DUPLICATE KEY UPDATE
     organizer_id = VALUES(organizer_id),
     archived_at = VALUES(archived_at),
@@ -1407,7 +1417,9 @@ ON DUPLICATE KEY UPDATE
     info = VALUES(info),
     grace_period = VALUES(grace_period),
     name_retention_time = VALUES(name_retention_time),
-    created = VALUES(created)
+    created = VALUES(created),
+    duplicated_by = VALUES(duplicated_by),
+    duplicated_from = VALUES(duplicated_from)
 `
 
 type UpsertCompetitionParams struct {
@@ -1429,6 +1441,8 @@ type UpsertCompetitionParams struct {
 	GracePeriod        int32
 	NameRetentionTime  int32
 	Created            time.Time
+	DuplicatedBy       sql.NullTime
+	DuplicatedFrom     sql.NullInt32
 }
 
 func (q *Queries) UpsertCompetition(ctx context.Context, arg UpsertCompetitionParams) (int64, error) {
@@ -1451,6 +1465,8 @@ func (q *Queries) UpsertCompetition(ctx context.Context, arg UpsertCompetitionPa
 		arg.GracePeriod,
 		arg.NameRetentionTime,
 		arg.Created,
+		arg.DuplicatedBy,
+		arg.DuplicatedFrom,
 	)
 	if err != nil {
 		return 0, err

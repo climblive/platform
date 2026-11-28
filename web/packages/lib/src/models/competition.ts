@@ -26,5 +26,7 @@ export const competitionSchema: z.ZodType<Competition> = z.object({
   timeBegin: z.coerce.date().optional(),
   timeEnd: z.coerce.date().optional(),
   created: z.coerce.date(),
+  duplicatedBy: z.coerce.date().nullable(),
+  duplicatedFrom: z.number().nullable(),
   registeredCompetitors: z.number(),
 });

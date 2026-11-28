@@ -72,27 +72,29 @@ type CompetitorPatch struct {
 }
 
 type Competition struct {
-	ID                    CompetitionID `json:"id"`
-	Ownership             OwnershipData `json:"ownership"`
-	ArchivedAt            time.Time     `json:"archivedAt,omitzero"`
-	Location              string        `json:"location,omitzero"`
-	Country               string        `json:"country"`
-	SeriesID              SeriesID      `json:"seriesId,omitzero"`
-	Name                  string        `json:"name"`
-	Description           string        `json:"description,omitzero"`
-	QualifyingProblems    int           `json:"qualifyingProblems"`
-	Finalists             int           `json:"finalists"`
-	UsePoints             bool          `json:"usePoints"`
-	PooledPoints          bool          `json:"pooledPoints"`
-	MaxAttempts           int           `json:"maxAttempts"`
-	PointDeduction        Tenths        `json:"pointDeduction"`
-	Info                  string        `json:"info,omitzero"`
-	GracePeriod           time.Duration `json:"gracePeriod"`
-	NameRetentionTime     time.Duration `json:"nameRetentionTime"`
-	TimeBegin             time.Time     `json:"timeBegin,omitzero"`
-	TimeEnd               time.Time     `json:"timeEnd,omitzero"`
-	Created               time.Time     `json:"created"`
-	RegisteredCompetitors int           `json:"registeredCompetitors"`
+	ID                    CompetitionID  `json:"id"`
+	Ownership             OwnershipData  `json:"ownership"`
+	ArchivedAt            time.Time      `json:"archivedAt,omitzero"`
+	Location              string         `json:"location,omitzero"`
+	Country               string         `json:"country"`
+	SeriesID              SeriesID       `json:"seriesId,omitzero"`
+	Name                  string         `json:"name"`
+	Description           string         `json:"description,omitzero"`
+	QualifyingProblems    int            `json:"qualifyingProblems"`
+	Finalists             int            `json:"finalists"`
+	UsePoints             bool           `json:"usePoints"`
+	PooledPoints          bool           `json:"pooledPoints"`
+	MaxAttempts           int            `json:"maxAttempts"`
+	PointDeduction        Tenths         `json:"pointDeduction"`
+	Info                  string         `json:"info,omitzero"`
+	GracePeriod           time.Duration  `json:"gracePeriod"`
+	NameRetentionTime     time.Duration  `json:"nameRetentionTime"`
+	TimeBegin             time.Time      `json:"timeBegin,omitzero"`
+	TimeEnd               time.Time      `json:"timeEnd,omitzero"`
+	Created               time.Time      `json:"created"`
+	DuplicatedBy          *time.Time     `json:"duplicatedBy" tstype:"Date | null,required"`
+	DuplicatedFrom        *CompetitionID `json:"duplicatedFrom" tstype:"CompetitionID | null,required"`
+	RegisteredCompetitors int            `json:"registeredCompetitors"`
 }
 
 type CompetitionTemplate struct {
